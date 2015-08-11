@@ -7918,7 +7918,7 @@ var Plottable;
                     var secondaryAttrTextSpace = _this._isVertical ? measurement.width : measurement.height;
                     var secondaryAttrAvailableSpace = _this._isVertical ? w : h;
                     var tooWide = secondaryAttrTextSpace + 2 * Bar._LABEL_HORIZONTAL_PADDING > secondaryAttrAvailableSpace;
-                    if (measurement.height <= h && measurement.width <= w) {
+                    if (measurement.width <= w) {
                         var offset = Math.min((primary - primarySpace) / 2, Bar._LABEL_VERTICAL_PADDING);
                         if (!positive) {
                             offset = offset * -1;
