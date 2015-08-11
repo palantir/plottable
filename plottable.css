@@ -70,12 +70,12 @@ svg.plottable {
   font-size: 14px;
 }
 
-.plottable .light-label text {
-  fill: white;
+.plottable .above-bar-label text {
+  fill: #5279c7;
 }
 
-.plottable .dark-label text {
-  fill: #32313F;
+.plottable .in-bar-label text {
+  fill: white;
 }
 
 .plottable .axis-label text {
