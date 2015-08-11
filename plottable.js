@@ -1405,7 +1405,7 @@ var Plottable;
                 throw new RangeError("Formatter precision must be between 0 and 20");
             }
             if (precision !== Math.floor(precision)) {
-                throw new RangeError("Formatter precision must be an integer number");
+                throw new RangeError("Formatter precision must be an integer");
             }
         }
     })(Formatters = Plottable.Formatters || (Plottable.Formatters = {}));

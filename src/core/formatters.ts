@@ -270,7 +270,7 @@ export module Formatters {
     }
 
     if (precision !== Math.floor(precision)) {
-      throw new RangeError("Formatter precision must be an integer number");
+      throw new RangeError("Formatter precision must be an integer");
     }
   }
 

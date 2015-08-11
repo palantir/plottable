@@ -25,7 +25,7 @@ describe("Formatters", () => {
     });
 
     it("non-integer precision throws exception", () => {
-      assert.throws(() => Plottable.Formatters.fixed(2.1)(123.313), "Formatter precision must be an integer number");
+      assert.throws(() => Plottable.Formatters.fixed(2.1)(123.313), "Formatter precision must be an integer");
     });
   });
 
@@ -58,7 +58,7 @@ describe("Formatters", () => {
     });
 
     it("non-integer precision throws error", () => {
-      assert.throws(() => Plottable.Formatters.general(2.1)(123.313), "Formatter precision must be an integer number");
+      assert.throws(() => Plottable.Formatters.general(2.1)(123.313), "Formatter precision must be an integer");
     });
   });
 
@@ -96,7 +96,7 @@ describe("Formatters", () => {
     });
 
     it("non-integer precision throws exception", () => {
-      assert.throws(() => Plottable.Formatters.currency(2.1)(123.313), "Formatter precision must be an integer number");
+      assert.throws(() => Plottable.Formatters.currency(2.1)(123.313), "Formatter precision must be an integer");
     });
 
   });
@@ -146,7 +146,7 @@ describe("Formatters", () => {
     });
 
     it("non-integer precision throws exception", () => {
-      assert.throws(() => Plottable.Formatters.percentage(2.1)(0.313), "Formatter precision must be an integer number");
+      assert.throws(() => Plottable.Formatters.percentage(2.1)(0.313), "Formatter precision must be an integer");
     });
   });
 
@@ -183,7 +183,7 @@ describe("Formatters", () => {
     });
 
     it("non-integer precision throws exception", () => {
-      assert.throws(() => Plottable.Formatters.siSuffix(2.1)(123.313), "Formatter precision must be an integer number");
+      assert.throws(() => Plottable.Formatters.siSuffix(2.1)(123.313), "Formatter precision must be an integer");
     });
   });
 
@@ -275,7 +275,7 @@ describe("Formatters", () => {
     });
 
     it("non-integer precision throws exception", () => {
-      assert.throws(() => Plottable.Formatters.shortScale(2.1)(123.313), "Formatter precision must be an integer number");
+      assert.throws(() => Plottable.Formatters.shortScale(2.1)(123.313), "Formatter precision must be an integer");
     });
   });
 
