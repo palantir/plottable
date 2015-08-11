@@ -7911,8 +7911,6 @@ var Plottable;
                     var y = attrToProjector["y"](d, i, dataset);
                     var positive = originalPositionFn(d, i, dataset) <= scaledBaseline;
                     var measurement = measurer.measure(text);
-                    var color = attrToProjector["fill"](d, i, dataset);
-                    var dark = Plottable.Utils.Color.contrast("white", color) * 1.6 < Plottable.Utils.Color.contrast("black", color);
                     var primary = _this._isVertical ? h : w;
                     var primarySpace = _this._isVertical ? measurement.height : measurement.width;
                     var secondaryAttrTextSpace = _this._isVertical ? measurement.width : measurement.height;
@@ -8118,7 +8116,7 @@ var Plottable;
                         Plottable.Utils.Math.isValidNumber(attrToProjector["y"](d, i, dataset)) &&
                         Plottable.Utils.Math.isValidNumber(attrToProjector["width"](d, i, dataset)) &&
                         Plottable.Utils.Math.isValidNumber(attrToProjector["height"](d, i, dataset)) &&
-                        (primaryAccessor(d, i, dataset) != 0); });
+                        (primaryAccessor(d, i, dataset) !== 0); });
                     dataToDraw.set(dataset, data);
                 });
                 return dataToDraw;

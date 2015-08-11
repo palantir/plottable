@@ -424,8 +424,6 @@ export module Plots {
         let y = attrToProjector["y"](d, i, dataset);
         let positive = originalPositionFn(d, i, dataset) <= scaledBaseline;
         let measurement = measurer.measure(text);
-        let color = attrToProjector["fill"](d, i, dataset);
-        let dark = Utils.Color.contrast("white", color) * 1.6 < Utils.Color.contrast("black", color);
         let primary = this._isVertical ? h : w;
         let primarySpace = this._isVertical ? measurement.height : measurement.width;
         let secondaryAttrTextSpace = this._isVertical ? measurement.width : measurement.height;
@@ -446,7 +444,7 @@ export module Plots {
             y: y
           };
 
-          if(showLabelAboveBar) {
+          if (showLabelAboveBar) {
             y = y - h + offset;
             labelPosition.y = y;
           } else {
@@ -640,7 +638,7 @@ export module Plots {
                                                    Utils.Math.isValidNumber(attrToProjector["y"](d, i, dataset)) &&
                                                    Utils.Math.isValidNumber(attrToProjector["width"](d, i, dataset)) &&
                                                    Utils.Math.isValidNumber(attrToProjector["height"](d, i, dataset)) &&
-                                                   (primaryAccessor(d, i, dataset) != 0));
+                                                   (primaryAccessor(d, i, dataset) !== 0));
         dataToDraw.set(dataset, data);
       });
       return dataToDraw;
