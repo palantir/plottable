@@ -332,8 +332,25 @@ describe("Interactive Components", () => {
         resetBox();
       });
 
-      it("resizable() defaults to false", () => {
+      it("resizable() getter/setter", () => {
         assert.isFalse(dbl.resizable(), "defaults to false");
+        assert.strictEqual(dbl.resizable(true), dbl, "returns DragBoxLayer when invoked as setter");
+        assert.isTrue(dbl.resizable(), "successfully set to true");
+        svg.remove();
+      });
+
+      it("resizable() correctly sets pointer-events", () => {
+        dbl.resizable(true);
+        let edges = dbl.content().selectAll("line");
+        edges[0].forEach((edge) => {
+          let computedStyle = window.getComputedStyle(<Element> edge);
+          assert.strictEqual(computedStyle.pointerEvents.toLowerCase(), "visiblestroke", "pointer-events set correctly on edges");
+        });
+        let corners = dbl.content().selectAll("circle");
+        corners[0].forEach((corner) => {
+          let computedStyle = window.getComputedStyle(<Element> corner);
+          assert.strictEqual(computedStyle.pointerEvents.toLowerCase(), "visiblefill", "pointer-events set correctly on corners");
+        });
         svg.remove();
       });
 

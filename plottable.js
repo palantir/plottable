@@ -10890,7 +10890,8 @@ var Plottable;
                 _super.prototype._setup.call(this);
                 var createLine = function () { return _this._box.append("line").style({
                     "opacity": 0,
-                    "stroke": "pink"
+                    "stroke": "pink",
+                    "pointer-events": "visibleStroke"
                 }); };
                 this._detectionEdgeT = createLine().classed("drag-edge-tb", true);
                 this._detectionEdgeB = createLine().classed("drag-edge-tb", true);
@@ -10900,7 +10901,8 @@ var Plottable;
                     var createCorner = function () { return _this._box.append("circle")
                         .style({
                         "opacity": 0,
-                        "fill": "pink"
+                        "fill": "pink",
+                        "pointer-events": "visibleFill"
                     }); };
                     this._detectionCornerTL = createCorner().classed("drag-corner-tl", true);
                     this._detectionCornerTR = createCorner().classed("drag-corner-tr", true);
