@@ -22,7 +22,7 @@ export module Components {
       this._clipPathEnabled = true;
       this.addClass("guide-line-layer");
       this._scaleUpdateCallback = () => {
-        this._updatePixelPosition();
+        this._syncValueAndPixelPosition();
         this.render();
       };
     }
@@ -53,7 +53,7 @@ export module Components {
 
     public renderImmediately() {
       super.renderImmediately();
-      this._updatePixelPosition();
+      this._syncValueAndPixelPosition();
       this._guideLine.attr({
         x1: this._isVertical() ? this.pixelPosition() : 0,
         y1: this._isVertical() ? 0 : this.pixelPosition(),
@@ -63,9 +63,13 @@ export module Components {
       return this;
     }
 
-    private _updatePixelPosition() {
-      if (this.scale() != null && this.value() != null) {
-        this._pixelPosition = this.scale().scale(this.value());
+    private _syncValueAndPixelPosition() {
+      if (this.scale() != null) {
+        if (this.value() != null) {
+          this._pixelPosition = this.scale().scale(this.value());
+        } else if (this.pixelPosition() != null) {
+          this._value = this.scale().invert(this.pixelPosition());
+        }
       }
     }
 
@@ -93,7 +97,7 @@ export module Components {
       }
       this._scale = scale;
       this._scale.onUpdate(this._scaleUpdateCallback);
-      this._updatePixelPosition();
+      this._syncValueAndPixelPosition();
       this.render();
       return this;
     }
@@ -117,7 +121,7 @@ export module Components {
         return this._value;
       }
       this._value = value;
-      this._updatePixelPosition();
+      this._syncValueAndPixelPosition();
       this.render();
       return this;
     }
@@ -141,9 +145,7 @@ export module Components {
         return this._pixelPosition;
       }
       this._pixelPosition = pixelPosition;
-      if (this.scale() != null) {
-        this._value = this.scale().invert(pixelPosition);
-      }
+      this._syncValueAndPixelPosition();
       this.render();
       return this;
     }

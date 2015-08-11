@@ -6214,7 +6214,7 @@ var Plottable;
                 this._clipPathEnabled = true;
                 this.addClass("guide-line-layer");
                 this._scaleUpdateCallback = function () {
-                    _this._updatePixelPosition();
+                    _this._syncValueAndPixelPosition();
                     _this.render();
                 };
             }
@@ -6239,7 +6239,7 @@ var Plottable;
             };
             GuideLineLayer.prototype.renderImmediately = function () {
                 _super.prototype.renderImmediately.call(this);
-                this._updatePixelPosition();
+                this._syncValueAndPixelPosition();
                 this._guideLine.attr({
                     x1: this._isVertical() ? this.pixelPosition() : 0,
                     y1: this._isVertical() ? 0 : this.pixelPosition(),
@@ -6248,9 +6248,14 @@ var Plottable;
                 });
                 return this;
             };
-            GuideLineLayer.prototype._updatePixelPosition = function () {
-                if (this.scale() != null && this.value() != null) {
-                    this._pixelPosition = this.scale().scale(this.value());
+            GuideLineLayer.prototype._syncValueAndPixelPosition = function () {
+                if (this.scale() != null) {
+                    if (this.value() != null) {
+                        this._pixelPosition = this.scale().scale(this.value());
+                    }
+                    else if (this.pixelPosition() != null) {
+                        this._value = this.scale().invert(this.pixelPosition());
+                    }
                 }
             };
             GuideLineLayer.prototype.scale = function (scale) {
@@ -6263,7 +6268,7 @@ var Plottable;
                 }
                 this._scale = scale;
                 this._scale.onUpdate(this._scaleUpdateCallback);
-                this._updatePixelPosition();
+                this._syncValueAndPixelPosition();
                 this.render();
                 return this;
             };
@@ -6272,7 +6277,7 @@ var Plottable;
                     return this._value;
                 }
                 this._value = value;
-                this._updatePixelPosition();
+                this._syncValueAndPixelPosition();
                 this.render();
                 return this;
             };
@@ -6281,9 +6286,7 @@ var Plottable;
                     return this._pixelPosition;
                 }
                 this._pixelPosition = pixelPosition;
-                if (this.scale() != null) {
-                    this._value = this.scale().invert(pixelPosition);
-                }
+                this._syncValueAndPixelPosition();
                 this.render();
                 return this;
             };

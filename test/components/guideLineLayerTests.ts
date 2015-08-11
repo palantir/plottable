@@ -62,7 +62,7 @@ describe("GuideLineLayer", () => {
       assert.strictEqual(gll.pixelPosition(), linearScale.scale(value), "pixel position was updated when scale updated");
     });
 
-    it("changing the scale updates pixelPosition() to match the existing value()", () => {
+    it("changing the scale updates pixelPosition() if value() is set", () => {
       let linearScale = new Plottable.Scales.Linear();
       linearScale.domain([0, 1]);
       linearScale.range([0, 100]);
@@ -70,9 +70,12 @@ describe("GuideLineLayer", () => {
       let gll = new Plottable.Components.GuideLineLayer<number>("vertical");
       let value = 0.5;
       gll.value(value);
+      var setPosition = -999;
+      gll.position(setPosition);
       let expectedPosition = linearScale.scale(value);
       gll.scale(linearScale);
       assert.strictEqual(gll.pixelPosition(), expectedPosition, "setting the scale updates the pixel position");
+      assert.notStrictEqual(gll.pixelPosition(), setPosition, "originally-set pixel position was overridden");
 
       let linearScaleB = new Plottable.Scales.Linear();
       linearScaleB.domain([0, 1]);
@@ -86,6 +89,20 @@ describe("GuideLineLayer", () => {
       linearScale.domain([0, 2]);
       assert.strictEqual(gll.pixelPosition(), expectedPositionB, "changing the old scale does not trigger updates");
     });
+
+    it("changing the scale updates value() if pixelPosition() is set but value() is not", () => {
+      let gll = new Plottable.Components.GuideLineLayer<number>("vertical");
+      let position = 50;
+      gll.pixelPosition(position);
+
+      let linearScale = new Plottable.Scales.Linear();
+      linearScale.domain([0, 1]);
+      linearScale.range([0, 100]);
+
+      gll.scale(linearScale);
+      let expectedValue = linearScale.invert(position);
+      assert.strictEqual(gll.value(), expectedValue, "value was updated to match the set pixel position");
+    });
   });
 
   it("rejects invalid orientations", () => {
@@ -96,7 +113,7 @@ describe("GuideLineLayer", () => {
 
   describe("rendering (vertical)", () => {
     let SVG_WIDTH = 400;
-    let SVG_HEIGHT = 400;
+    let SVG_HEIGHT = 300;
 
     it("has an effective size of 0, but will occupy all offered space", () => {
       let gll = new Plottable.Components.GuideLineLayer<void>("vertical");
@@ -236,7 +253,7 @@ describe("GuideLineLayer", () => {
   });
 
   describe("rendering (horizontal)", () => {
-    let SVG_WIDTH = 400;
+    let SVG_WIDTH = 300;
     let SVG_HEIGHT = 400;
 
     it("has an effective size of 0, but will occupy all offered space", () => {
