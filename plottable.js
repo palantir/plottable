@@ -6220,7 +6220,7 @@ var Plottable;
             }
             GuideLineLayer.prototype._setup = function () {
                 _super.prototype._setup.call(this);
-                this._line = this.content().append("line").classed("guide-line", true);
+                this._guideLine = this.content().append("line").classed("guide-line", true);
             };
             GuideLineLayer.prototype._sizeFromOffer = function (availableWidth, availableHeight) {
                 return {
@@ -6240,7 +6240,7 @@ var Plottable;
             GuideLineLayer.prototype.renderImmediately = function () {
                 _super.prototype.renderImmediately.call(this);
                 this._updatePixelPosition();
-                this._line.attr({
+                this._guideLine.attr({
                     x1: this._isVertical() ? this.pixelPosition() : 0,
                     y1: this._isVertical() ? 0 : this.pixelPosition(),
                     x2: this._isVertical() ? this.pixelPosition() : this.width(),

@@ -11,7 +11,7 @@ export module Components {
     private _scale: QuantitativeScale<D>;
     private _pixelPosition: number;
     private _scaleUpdateCallback: ScaleCallback<QuantitativeScale<D>>;
-    private _line: d3.Selection<void>;
+    private _guideLine: d3.Selection<void>;
 
     constructor(orientation: string) {
       super();
@@ -29,7 +29,7 @@ export module Components {
 
     protected _setup() {
       super._setup();
-      this._line = this.content().append("line").classed("guide-line", true);
+      this._guideLine = this.content().append("line").classed("guide-line", true);
     }
 
     protected _sizeFromOffer(availableWidth: number, availableHeight: number) {
@@ -54,7 +54,7 @@ export module Components {
     public renderImmediately() {
       super.renderImmediately();
       this._updatePixelPosition();
-      this._line.attr({
+      this._guideLine.attr({
         x1: this._isVertical() ? this.pixelPosition() : 0,
         y1: this._isVertical() ? 0 : this.pixelPosition(),
         x2: this._isVertical() ? this.pixelPosition() : this.width(),
@@ -77,8 +77,7 @@ export module Components {
     public scale(): QuantitativeScale<D>;
     /**
      * Sets the QuantitativeScale on the GuideLineLayer.
-     * If the value of the guide line in data-space has been set,
-     * the position of the guide line in pixel-space will be updated.
+     * If value() has been set, pixelPosition() will be updated according to the new scale.
      *
      * @param {QuantitativeScale<D>} scale
      * @return {GuideLineLayer<D>} The calling GuideLineLayer.
@@ -107,8 +106,7 @@ export module Components {
     public value(): D;
     /**
      * Sets the position of the guide line in data-space.
-     * If the GuideLineLayer has a scale, the position of the line
-     * in pixel-space will be updated accordingly.
+     * If the GuideLineLayer has a scale, pixelPosition() will be updated.
      *
      * @param {D} value
      * @return {GuideLineLayer<D>} The calling GuideLineLayer.
@@ -132,8 +130,7 @@ export module Components {
     public pixelPosition(): number;
     /**
      * Sets the position of the guide line in pixel-space.
-     * If the GuideLineLayer has a scale, the position of the line
-     * in data-space will be updated accordingly.
+     * If the GuideLineLayer has a scale, the value() will be updated.
      *
      * @param {number} pixelPosition
      * @return {GuideLineLayer<D>} The calling GuideLineLayer.

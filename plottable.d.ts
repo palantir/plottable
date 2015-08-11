@@ -2436,8 +2436,7 @@ declare module Plottable {
             scale(): QuantitativeScale<D>;
             /**
              * Sets the QuantitativeScale on the GuideLineLayer.
-             * If the value of the guide line in data-space has been set,
-             * the position of the guide line in pixel-space will be updated.
+             * If value() has been set, pixelPosition() will be updated according to the new scale.
              *
              * @param {QuantitativeScale<D>} scale
              * @return {GuideLineLayer<D>} The calling GuideLineLayer.
@@ -2451,8 +2450,7 @@ declare module Plottable {
             value(): D;
             /**
              * Sets the position of the guide line in data-space.
-             * If the GuideLineLayer has a scale, the position of the line
-             * in pixel-space will be updated accordingly.
+             * If the GuideLineLayer has a scale, pixelPosition() will be updated.
              *
              * @param {D} value
              * @return {GuideLineLayer<D>} The calling GuideLineLayer.
@@ -2466,8 +2464,7 @@ declare module Plottable {
             pixelPosition(): number;
             /**
              * Sets the position of the guide line in pixel-space.
-             * If the GuideLineLayer has a scale, the position of the line
-             * in data-space will be updated accordingly.
+             * If the GuideLineLayer has a scale, the value() will be updated.
              *
              * @param {number} pixelPosition
              * @return {GuideLineLayer<D>} The calling GuideLineLayer.
