@@ -65,16 +65,16 @@ svg.plottable {
 }
 
 .plottable .label-area text {
-  fill: #32313F;
+  fill: white;
   font-family: "Helvetica Neue", sans-serif;
   font-size: 14px;
 }
 
-.plottable .above-bar-label text {
+.plottable .off-bar-label text {
   fill: #5279c7;
 }
 
-.plottable .in-bar-label text {
+.plottable .on-bar-label text {
   fill: white;
 }
 
