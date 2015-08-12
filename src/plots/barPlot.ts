@@ -420,7 +420,7 @@ export module Plots {
         let text = this._labelFormatter(primaryAccessor(d, i, dataset)).toString();
         let w = attrToProjector["width"](d, i, dataset);
         let h = attrToProjector["height"](d, i, dataset);
-        let x = attrToProjector["x"](d, i, dataset);
+        let baselineX = attrToProjector["x"](d, i, dataset);
         let baselineY = attrToProjector["y"](d, i, dataset);
         let positive = originalPositionFn(d, i, dataset) <= scaledBaseline;
         let measurement = measurer.measure(text);
@@ -429,25 +429,40 @@ export module Plots {
         let secondaryAttrTextSpace = this._isVertical ? measurement.width : measurement.height;
         let secondaryAttrAvailableSpace = this._isVertical ? w : h;
         let tooWide = secondaryAttrTextSpace + 2 * Bar._LABEL_HORIZONTAL_PADDING > secondaryAttrAvailableSpace;
-        let showLabelOffBar = (measurement.height > h);
-        if (measurement.width <= w) {
+        let showLabelOffBar = this._isVertical ? (measurement.height > h) : (measurement.width > w)
+        if (true) {
           let offset = Math.min((primary - primarySpace) / 2, Bar._LABEL_VERTICAL_PADDING);
           if (!positive) { offset = offset * -1; }
 
-          let yCalculator = () => {
-            let addend = offset;
-            if (showLabelOffBar && positive) {
-                addend += (offset - h);
+          let getY = () => {
+            let addend = 0;
+            if (this._isVertical)  {
+                addend += offset;
+                if (showLabelOffBar && positive) {
+                    addend += (offset - h);
+                }
+                if (showLabelOffBar && !positive) {
+                    addend += measurement.height
+                };
             }
-            if (showLabelOffBar && !positive) {
-                addend += measurement.height
-            };
             return baselineY + addend;
           };
 
-          let y = yCalculator();
+          let getX = () => {
+            let addend = 0;
+            if (!this._isVertical)  {
+                addend += offset;
+                if (showLabelOffBar && positive) {
+                    addend += (offset - w);
+                }
+                if (showLabelOffBar && !positive) {
+                    addend += measurement.width
+                };
+            }
+            return baselineX + addend;
+          };
 
-          let g = labelArea.append("g").attr("transform", "translate(" + x + "," + y + ")");
+          let g = labelArea.append("g").attr("transform", "translate(" + getX() + "," + getY() + ")");
           let labelPositioningClassName = showLabelOffBar ? "off-bar-label" : "on-bar-label";
           g.classed(labelPositioningClassName, true);
 

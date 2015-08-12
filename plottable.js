@@ -7907,7 +7907,7 @@ var Plottable;
                     var text = _this._labelFormatter(primaryAccessor(d, i, dataset)).toString();
                     var w = attrToProjector["width"](d, i, dataset);
                     var h = attrToProjector["height"](d, i, dataset);
-                    var x = attrToProjector["x"](d, i, dataset);
+                    var baselineX = attrToProjector["x"](d, i, dataset);
                     var baselineY = attrToProjector["y"](d, i, dataset);
                     var positive = originalPositionFn(d, i, dataset) <= scaledBaseline;
                     var measurement = measurer.measure(text);
@@ -7916,25 +7916,41 @@ var Plottable;
                     var secondaryAttrTextSpace = _this._isVertical ? measurement.width : measurement.height;
                     var secondaryAttrAvailableSpace = _this._isVertical ? w : h;
                     var tooWide = secondaryAttrTextSpace + 2 * Bar._LABEL_HORIZONTAL_PADDING > secondaryAttrAvailableSpace;
-                    var showLabelOffBar = (measurement.height > h);
-                    if (measurement.width <= w) {
+                    var showLabelOffBar = _this._isVertical ? (measurement.height > h) : (measurement.width > w);
+                    if (true) {
                         var offset = Math.min((primary - primarySpace) / 2, Bar._LABEL_VERTICAL_PADDING);
                         if (!positive) {
                             offset = offset * -1;
                         }
-                        var yCalculator = function () {
-                            var addend = offset;
-                            if (showLabelOffBar && positive) {
-                                addend += (offset - h);
+                        var getY = function () {
+                            var addend = 0;
+                            if (_this._isVertical) {
+                                addend += offset;
+                                if (showLabelOffBar && positive) {
+                                    addend += (offset - h);
+                                }
+                                if (showLabelOffBar && !positive) {
+                                    addend += measurement.height;
+                                }
+                                ;
                             }
-                            if (showLabelOffBar && !positive) {
-                                addend += measurement.height;
-                            }
-                            ;
                             return baselineY + addend;
                         };
-                        var y = yCalculator();
-                        var g = labelArea.append("g").attr("transform", "translate(" + x + "," + y + ")");
+                        var getX = function () {
+                            var addend = 0;
+                            if (!_this._isVertical) {
+                                addend += offset;
+                                if (showLabelOffBar && positive) {
+                                    addend += (offset - w);
+                                }
+                                if (showLabelOffBar && !positive) {
+                                    addend += measurement.width;
+                                }
+                                ;
+                            }
+                            return baselineX + addend;
+                        };
+                        var g = labelArea.append("g").attr("transform", "translate(" + getX() + "," + getY() + ")");
                         var labelPositioningClassName = showLabelOffBar ? "off-bar-label" : "on-bar-label";
                         g.classed(labelPositioningClassName, true);
                         g.style("visibility", "inherit");
