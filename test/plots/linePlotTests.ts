@@ -417,7 +417,35 @@ describe("Plots", () => {
         assert.deepEqual(yScale.domain(), [-2, -1], "no changes for autoranging smooth with same edge points (smooth)");
 
         svg.remove();
+      });
 
+      it("smooth autoranging works (called before accessors)", () => {
+        var svg = TestMethods.generateSVG(500, 500);
+
+        var xScale = new Plottable.Scales.Linear();
+        var yScale = new Plottable.Scales.Linear();
+        xScale.domain([0.1, 1.1]);
+
+        var data = [
+          {"x": 0.0, "y": -1},
+          {"x": 1.8, "y": -2}
+        ];
+
+        var line = new Plottable.Plots.Line();
+        line.autorangeSmooth(true);
+        line.x(function(d) { return d.x; }, xScale);
+        line.y(function(d) { return d.y; }, yScale);
+        line.addDataset(new Plottable.Dataset(data));
+        line.autorangeMode("y");
+
+        xScale.padProportion(0);
+        yScale.padProportion(0);
+        line.renderTo(svg);
+
+        assert.closeTo(yScale.domain()[0], -1.61111, 0.001, "smooth autoranging forces the domain to include the line (left)");
+        assert.closeTo(yScale.domain()[1], -1.05555, 0.001, "Smooth autoranging forces the domain to include the line (right)");
+
+        svg.remove();
       });
 
       it("autoDomaining works with smooth autoranging (before rendering)", () => {
