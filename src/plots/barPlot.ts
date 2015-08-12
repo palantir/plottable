@@ -462,11 +462,17 @@ export module Plots {
             return baselineX + addend;
           };
 
-          let g = labelArea.append("g").attr("transform", "translate(" + getX() + "," + getY() + ")");
+          let x = getX();
+          let y = getY();
+
+          let g = labelArea.append("g").attr("transform", "translate(" + x + "," + y + ")");
           let labelPositioningClassName = showLabelOffBar ? "off-bar-label" : "on-bar-label";
+
           g.classed(labelPositioningClassName, true);
 
-          g.style("visibility", "inherit");
+          let hideLabel = (x + measurement.width > this.width() || (positive ? y + measurement.height : y + h) > this.height());
+
+          g.style("visibility", hideLabel ? "hidden" : "inherit");
           let xAlign: string;
           let yAlign: string;
           if (this._isVertical) {

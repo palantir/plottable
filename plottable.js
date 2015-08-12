@@ -7950,10 +7950,13 @@ var Plottable;
                             }
                             return baselineX + addend;
                         };
-                        var g = labelArea.append("g").attr("transform", "translate(" + getX() + "," + getY() + ")");
+                        var x = getX();
+                        var y = getY();
+                        var g = labelArea.append("g").attr("transform", "translate(" + x + "," + y + ")");
                         var labelPositioningClassName = showLabelOffBar ? "off-bar-label" : "on-bar-label";
                         g.classed(labelPositioningClassName, true);
-                        g.style("visibility", "inherit");
+                        var hideLabel = (x + measurement.width > _this.width() || (positive ? y + measurement.height : y + h) > _this.height());
+                        g.style("visibility", hideLabel ? "hidden" : "inherit");
                         var xAlign;
                         var yAlign;
                         if (_this._isVertical) {
