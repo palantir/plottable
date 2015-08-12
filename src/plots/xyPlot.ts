@@ -337,7 +337,6 @@ export class XYPlot<X, Y> extends Plot {
       this._updateYExtentsAndAutodomain();
     }
   }
-
   private _adjustXDomainOnChangeFromY() {
     if (!this._projectorsReady()) { return; }
     if (this._autoAdjustXScaleDomain) {

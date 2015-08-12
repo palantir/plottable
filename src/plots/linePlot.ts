@@ -125,7 +125,6 @@ export module Plots {
         return extent;
       }
 
-
       if (this.autorangeMode() === "x" && accScaleBinding !== this.x()) {
         return extent;
       }
