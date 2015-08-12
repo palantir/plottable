@@ -447,21 +447,6 @@ export module Plots {
 
           let y = yCalculator();
 
-          let labelPosition = {
-            x: x,
-            y: positive ? y : y + h - measurement.height
-          };
-
-          if (this._isVertical) {
-            labelPosition.x = x + w / 2 - measurement.width / 2;
-          } else {
-            if (!positive) {
-              labelPosition.x = x + w - measurement.width;
-            } else {
-              labelPosition.x = x;
-            }
-          }
-
           let g = labelArea.append("g").attr("transform", "translate(" + x + "," + y + ")");
           let labelPositioningClassName = showLabelOffBar ? "off-bar-label" : "on-bar-label";
           g.classed(labelPositioningClassName, true);

@@ -7934,21 +7934,6 @@ var Plottable;
                             return baselineY + addend;
                         };
                         var y = yCalculator();
-                        var labelPosition = {
-                            x: x,
-                            y: positive ? y : y + h - measurement.height
-                        };
-                        if (_this._isVertical) {
-                            labelPosition.x = x + w / 2 - measurement.width / 2;
-                        }
-                        else {
-                            if (!positive) {
-                                labelPosition.x = x + w - measurement.width;
-                            }
-                            else {
-                                labelPosition.x = x;
-                            }
-                        }
                         var g = labelArea.append("g").attr("transform", "translate(" + x + "," + y + ")");
                         var labelPositioningClassName = showLabelOffBar ? "off-bar-label" : "on-bar-label";
                         g.classed(labelPositioningClassName, true);
