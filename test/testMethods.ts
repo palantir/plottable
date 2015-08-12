@@ -95,10 +95,11 @@ module TestMethods {
     line: d3.Selection<void>,
     expectedAttrs: { x1: number, y1: number, x2: number, y2: number },
     message: string) {
-    assert.strictEqual(TestMethods.numAttr(line, "x1"), expectedAttrs.x1, message + " (x1)");
-    assert.strictEqual(TestMethods.numAttr(line, "y1"), expectedAttrs.y1, message + " (y1)");
-    assert.strictEqual(TestMethods.numAttr(line, "x2"), expectedAttrs.x2, message + " (x2)");
-    assert.strictEqual(TestMethods.numAttr(line, "y2"), expectedAttrs.y2, message + " (y2)");
+    let floatingPointError = 0.000000001;
+    assert.closeTo(TestMethods.numAttr(line, "x1"), expectedAttrs.x1, floatingPointError, message + " (x1)");
+    assert.closeTo(TestMethods.numAttr(line, "y1"), expectedAttrs.y1, floatingPointError, message + " (y1)");
+    assert.closeTo(TestMethods.numAttr(line, "x2"), expectedAttrs.x2, floatingPointError, message + " (x2)");
+    assert.closeTo(TestMethods.numAttr(line, "y2"), expectedAttrs.y2, floatingPointError, message + " (y2)");
   }
 
   export function assertEntitiesEqual(
