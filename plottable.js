@@ -8159,10 +8159,10 @@ var Plottable;
             };
             Line.prototype.autorangeMode = function (autorangeMode) {
                 if (this.autorangeSmooth() && autorangeMode === "x" || autorangeMode === "y") {
-                    if (this.x() && this.x().scale && this.x().scale instanceof Plottable.QuantitativeScale && this.autorangeMode() === "x") {
+                    if (autorangeMode === "x" && this.x() && this.x().scale && this.x().scale instanceof Plottable.QuantitativeScale) {
                         this.x().scale.snapsDomain(!this.autorangeSmooth());
                     }
-                    if (this.y() && this.y().scale && this.y().scale instanceof Plottable.QuantitativeScale && this.autorangeMode() === "y") {
+                    if (autorangeMode === "y" && this.y() && this.y().scale && this.y().scale instanceof Plottable.QuantitativeScale) {
                         this.y().scale.snapsDomain(!this.autorangeSmooth());
                     }
                 }
