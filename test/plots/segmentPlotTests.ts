@@ -113,5 +113,69 @@ describe("Plots", () => {
 
       svg.remove();
     });
+
+    describe("entitiesIn() returns segments that intersect with the given constraints", () => {
+      let data = [
+        { x: 1, x2: 1, y: 1, y2: 4 },
+        { x: 2, x2: 3, y: 4, y2: 3 },
+        { x: 3, x2: 4, y: 2, y2: 4 },
+        { x: 2, x2: 4, y: 1, y2: 1 }];
+
+      it("retrieves the entities that intersect with the bounding box", () => {
+        let plot = new Plottable.Plots.Segment()
+          .x((d) => d.x, xScale).x2((d) => d.x2)
+          .y((d) => d.y, yScale).y2((d) => d.y2);
+        plot.addDataset(new Plottable.Dataset(data)).renderTo(svg);
+        let entities = plot.entitiesIn({
+          topLeft: { x: xScale.scale(0), y: yScale.scale(4.5) },
+          bottomRight: { x: xScale.scale(2.5), y: yScale.scale(3) } });
+        assert.lengthOf(entities, 2, "retrieved 2 entities intersect with the box");
+        assert.strictEqual(entities[0].index, 0, "the entity of index 0 is retrieved");
+        assert.strictEqual(entities[1].index, 1, "the entity of index 1 is retrieved");
+        svg.remove();
+      });
+
+      it("retrieves the entities that intersect with the bounding box", () => {
+        let plot = new Plottable.Plots.Segment()
+          .x((d) => d.x, xScale).x2((d) => d.x2)
+          .y((d) => d.y, yScale).y2((d) => d.y2);
+        plot.addDataset(new Plottable.Dataset(data)).renderTo(svg);
+        let entities = plot.entitiesIn({
+          topLeft: { x: xScale.scale(0), y: yScale.scale(2) },
+          bottomRight: { x: xScale.scale(2.5), y: yScale.scale(0) } });
+        assert.lengthOf(entities, 2, "retrieved 2 entities intersect with the box");
+        assert.strictEqual(entities[0].index, 0, "the entity of index 0 is retrieved");
+        assert.strictEqual(entities[1].index, 3, "the entity of index 3 is retrieved");
+        svg.remove();
+      });
+
+      it("retrieves the entities that intersect with given ranges", () => {
+        let plot = new Plottable.Plots.Segment()
+          .x((d) => d.x, xScale).x2((d) => d.x2)
+          .y((d) => d.y, yScale).y2((d) => d.y2);
+        plot.addDataset(new Plottable.Dataset(data)).renderTo(svg);
+        let entities = plot.entitiesIn(
+          { min: xScale.scale(2.5), max: xScale.scale(4) },
+          { min: yScale.scale(3.5), max: yScale.scale(2.5) });
+        assert.lengthOf(entities, 2, "retrieved 2 entities intersect with the box");
+        assert.strictEqual(entities[0].index, 1, "the entity of index 1 is retrieved");
+        assert.strictEqual(entities[1].index, 2, "the entity of index 2 is retrieved");
+        svg.remove();
+      });
+
+      it("retrieves the entities that intersect with given ranges", () => {
+        let plot = new Plottable.Plots.Segment()
+          .x((d) => d.x, xScale).x2((d) => d.x2)
+          .y((d) => d.y, yScale).y2((d) => d.y2);
+        plot.addDataset(new Plottable.Dataset(data)).renderTo(svg);
+        let entities = plot.entitiesIn(
+          { min: xScale.scale(2), max: xScale.scale(3.5) },
+          { min: yScale.scale(2.5), max: yScale.scale(0) });
+        assert.lengthOf(entities, 2, "retrieved 2 entities intersect with the box");
+        assert.strictEqual(entities[0].index, 2, "the entity of index 2 is retrieved");
+        assert.strictEqual(entities[1].index, 3, "the entity of index 2 is retrieved");
+        svg.remove();
+      });
+    });
   });
 });
