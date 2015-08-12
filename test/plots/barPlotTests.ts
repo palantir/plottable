@@ -769,23 +769,6 @@ describe("Plots", () => {
         plot.renderTo(svg);
       });
 
-      it("hides labels outside of the visible render area (horizontal)", () => {
-        xScale.domain([1, 3]);
-
-        let texts = svg.selectAll("text");
-        assert.strictEqual(texts.size(), plot.datasets()[0].data().length, "One label rendered for each piece of data");
-
-        let label1 = d3.select(texts[0][0]);
-        let label2 = d3.select(texts[0][1]);
-        let label3 = d3.select(texts[0][2]);
-
-        assert.strictEqual(label1.style("visibility"), "hidden", "Left label is cut off by the margin");
-        assert.include(["visible", "inherit"], label2.style("visibility"), "Middle label should still show");
-        assert.strictEqual(label3.style("visibility"), "hidden", "Right label is cut off by the margin");
-
-        svg.remove();
-      });
-
       it("hides labels outside of the visible render area (vertical)", () => {
         yScale.domain([2.5, 11]);
 
