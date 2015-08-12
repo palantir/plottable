@@ -43,7 +43,7 @@ export module Plots {
     public y(): Plots.AccessorScaleBinding<number, number>;
     public y(y: number | Accessor<number>): Line<X>;
     public y(y: number | Accessor<number>, yScale: Scale<number, number>): Line<X>;
-    public y(y?: number | Accessor<number> | number | Accessor<number>, yScale?: Scale<number, number>): any {
+    public y(y?: number | Accessor<number>, yScale?: Scale<number, number>): any {
       if (yScale instanceof QuantitativeScale) {
         (<QuantitativeScale<number>>yScale).snapsDomain(!this._autorangeSmooth);
       }
