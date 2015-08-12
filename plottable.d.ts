@@ -2897,20 +2897,22 @@ declare module Plottable {
              */
             entitiesIn(xRange: Range, yRange: Range): PlotEntity[];
             /**
-             * Gets the Accessor for label.
+             * Gets the accessor for labels.
+             *
+             * @returns {Accessor<string>}
              */
             label(): Accessor<string>;
             /**
-             * Sets label to the result of an Accessor.
+             * Sets the text of labels to the result of an Accessor.
              *
              * @param {Accessor<string>} label
              * @returns {Plots.Rectangle} The calling Rectangle Plot.
              */
             label(label: Accessor<string>): Plots.Rectangle<X, Y>;
             /**
-             * Get whether rectangle labels are enabled.
+             * Gets whether labels are enabled.
              *
-             * @returns {boolean} Whether rectangles should display labels or not.
+             * @returns {boolean}
              */
             labelsEnabled(): boolean;
             /**

@@ -455,8 +455,8 @@ describe("Plots", () => {
         svg = TestMethods.generateSVG(SVG_WIDTH / 2, SVG_HEIGHT);
         rectanglePlot = new Plottable.Plots.Rectangle<number, number>();
         DATA = [
-          { x: 0, y: 0, x2: 1, y2: 1, val: 1 },
-          { x: 0, y: 1, x2: 1, y2: 2, val: 2 }
+          { x: 0, y: 0, x2: 1, y2: 1, val: "1" },
+          { x: 0, y: 1, x2: 1, y2: 2, val: "2" }
         ];
         dataset = new Plottable.Dataset(DATA);
         rectanglePlot.addDataset(dataset);
@@ -479,7 +479,7 @@ describe("Plots", () => {
         let texts = svg.selectAll("text")[0].map((n: any) => d3.select(n).text());
         assert.lengthOf(texts, 2, "all labels are drawn");
         texts.forEach((text, i) => {
-          assert.strictEqual(text, DATA[i].val + "", "label is drawn correctly");
+          assert.strictEqual(text, DATA[i].val, "label is drawn correctly");
         });
         svg.remove();
       });
