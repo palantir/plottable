@@ -3066,6 +3066,10 @@ declare module Plottable {
              */
             entitiesIn(xRange: Range, yRange: Range): PlotEntity[];
             protected _additionalPaint(time: number): void;
+            /**
+             * Makes sure the extent takes into account the widths of the bars
+             */
+            protected _extentsForProperty(property: string): any[];
             protected _generateDrawSteps(): Drawers.DrawStep[];
             protected _generateAttrToProjector(): {
                 [attr: string]: (datum: any, index: number, dataset: Dataset) => any;
@@ -3074,9 +3078,8 @@ declare module Plottable {
              * Computes the barPixelWidth of all the bars in the plot.
              *
              * If the position scale of the plot is a CategoryScale and in bands mode, then the rangeBands function will be used.
-             * If the position scale of the plot is a CategoryScale and in points mode, then
-             *   from https://github.com/mbostock/d3/wiki/Ordinal-Scales#ordinal_rangePoints, the max barPixelWidth is step * padding
-             * If the position scale of the plot is a QuantitativeScale, then _getMinimumDataWidth is scaled to compute the barPixelWidth
+             * If the position scale of the plot is a QuantitativeScale, then the bar width is equal to the smallest distance between
+             * two adjacent data points, padded for visualisation.
              */
             protected _getBarPixelWidth(): number;
             entities(datasets?: Dataset[]): PlotEntity[];

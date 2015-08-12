@@ -7885,6 +7885,32 @@ var Plottable;
                     Plottable.Utils.Window.setTimeout(function () { return _this._drawLabels(); }, time);
                 }
             };
+            /**
+             * Makes sure the extent takes into account the widths of the bars
+             */
+            Bar.prototype._extentsForProperty = function (property) {
+                var _this = this;
+                var extents = _super.prototype._extentsForProperty.call(this, property);
+                var accScaleBinding;
+                if (property === "x" && this._isVertical) {
+                    accScaleBinding = this.x();
+                }
+                else if (property === "y" && !this._isVertical) {
+                    accScaleBinding = this.y();
+                }
+                else {
+                    return extents;
+                }
+                if (!(accScaleBinding && accScaleBinding.scale && accScaleBinding.scale instanceof Plottable.QuantitativeScale)) {
+                    return extents;
+                }
+                var scale = accScaleBinding.scale;
+                extents = extents.map(function (extent) { return [
+                    scale.invert(scale.scale(extent[0]) - _this._barPixelWidth / 2),
+                    scale.invert(scale.scale(extent[1]) + _this._barPixelWidth / 2),
+                ]; });
+                return extents;
+            };
             Bar.prototype._drawLabels = function () {
                 var _this = this;
                 var dataToDraw = this._getDataToDraw();
@@ -8024,9 +8050,8 @@ var Plottable;
              * Computes the barPixelWidth of all the bars in the plot.
              *
              * If the position scale of the plot is a CategoryScale and in bands mode, then the rangeBands function will be used.
-             * If the position scale of the plot is a CategoryScale and in points mode, then
-             *   from https://github.com/mbostock/d3/wiki/Ordinal-Scales#ordinal_rangePoints, the max barPixelWidth is step * padding
-             * If the position scale of the plot is a QuantitativeScale, then _getMinimumDataWidth is scaled to compute the barPixelWidth
+             * If the position scale of the plot is a QuantitativeScale, then the bar width is equal to the smallest distance between
+             * two adjacent data points, padded for visualisation.
              */
             Bar.prototype._getBarPixelWidth = function () {
                 if (!this._projectorsReady()) {
@@ -8051,15 +8076,6 @@ var Plottable;
                     barPixelWidth = Plottable.Utils.Math.min(barAccessorDataPairs, function (pair, i) {
                         return Math.abs(pair[1] - pair[0]);
                     }, barWidthDimension * Bar._SINGLE_BAR_DIMENSION_RATIO);
-                    var minScaledDatum = Plottable.Utils.Math.min(scaledData, 0);
-                    if (minScaledDatum > 0) {
-                        barPixelWidth = Math.min(barPixelWidth, minScaledDatum * 2);
-                    }
-                    var maxScaledDatum = Plottable.Utils.Math.max(scaledData, 0);
-                    if (maxScaledDatum < barWidthDimension) {
-                        var margin = barWidthDimension - maxScaledDatum;
-                        barPixelWidth = Math.min(barPixelWidth, margin * 2);
-                    }
                     barPixelWidth *= Bar._BAR_WIDTH_RATIO;
                 }
                 return barPixelWidth;
