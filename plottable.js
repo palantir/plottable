@@ -7403,6 +7403,42 @@ var Plottable;
                     return x <= point.x && point.x <= x + width && y <= point.y && point.y <= y + height;
                 });
             };
+            Rectangle.prototype.entitiesIn = function (xRangeOrBounds, yRange) {
+                var dataXRange;
+                var dataYRange;
+                if (yRange == null) {
+                    var bounds = xRangeOrBounds;
+                    dataXRange = { min: bounds.topLeft.x, max: bounds.bottomRight.x };
+                    dataYRange = { min: bounds.topLeft.y, max: bounds.bottomRight.y };
+                }
+                else {
+                    dataXRange = xRangeOrBounds;
+                    dataYRange = yRange;
+                }
+                return this._entitiesIntersecting(dataXRange, dataYRange);
+            };
+            Rectangle.prototype._entityBBox = function (entity, attrToProjector) {
+                var datum = entity.datum;
+                var index = entity.index;
+                var dataset = entity.dataset;
+                return {
+                    x: attrToProjector["x"](datum, index, dataset),
+                    y: attrToProjector["y"](datum, index, dataset),
+                    width: attrToProjector["width"](datum, index, dataset),
+                    height: attrToProjector["height"](datum, index, dataset)
+                };
+            };
+            Rectangle.prototype._entitiesIntersecting = function (xValOrRange, yValOrRange) {
+                var _this = this;
+                var intersected = [];
+                var attrToProjector = this._generateAttrToProjector();
+                this.entities().forEach(function (entity) {
+                    if (Plottable.Utils.DOM.intersectsBBox(xValOrRange, yValOrRange, _this._entityBBox(entity, attrToProjector))) {
+                        intersected.push(entity);
+                    }
+                });
+                return intersected;
+            };
             Rectangle.prototype._propertyProjectors = function () {
                 var attrToProjector = _super.prototype._propertyProjectors.call(this);
                 if (this.x2() != null) {

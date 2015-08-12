@@ -251,6 +251,58 @@ export module Plots {
       });
     }
 
+    /**
+     * Gets the Entities that intersect the Bounds.
+     *
+     * @param {Bounds} bounds
+     * @returns {PlotEntity[]}
+     */
+    public entitiesIn(bounds: Bounds): PlotEntity[];
+    /**
+     * Gets the Entities that intersect the area defined by the ranges.
+     *
+     * @param {Range} xRange
+     * @param {Range} yRange
+     * @returns {PlotEntity[]}
+     */
+    public entitiesIn(xRange: Range, yRange: Range): PlotEntity[];
+    public entitiesIn(xRangeOrBounds: Range | Bounds, yRange?: Range): PlotEntity[] {
+      let dataXRange: Range;
+      let dataYRange: Range;
+      if (yRange == null) {
+        let bounds = (<Bounds> xRangeOrBounds);
+        dataXRange = { min: bounds.topLeft.x, max: bounds.bottomRight.x };
+        dataYRange = { min: bounds.topLeft.y, max: bounds.bottomRight.y };
+      } else {
+        dataXRange = (<Range> xRangeOrBounds);
+        dataYRange = yRange;
+      }
+      return this._entitiesIntersecting(dataXRange, dataYRange);
+    }
+
+    private _entityBBox(entity: PlotEntity, attrToProjector: AttributeToProjector): SVGRect {
+      let datum = entity.datum;
+      let index = entity.index;
+      let dataset = entity.dataset;
+      return {
+        x: attrToProjector["x"](datum, index, dataset),
+        y: attrToProjector["y"](datum, index, dataset),
+        width: attrToProjector["width"](datum, index, dataset),
+        height: attrToProjector["height"](datum, index, dataset)
+      };
+    }
+
+    private _entitiesIntersecting(xValOrRange: number | Range, yValOrRange: number | Range): PlotEntity[] {
+      let intersected: PlotEntity[] = [];
+      let attrToProjector = this._generateAttrToProjector();
+      this.entities().forEach((entity) => {
+        if (Utils.DOM.intersectsBBox(xValOrRange, yValOrRange, this._entityBBox(entity, attrToProjector))) {
+          intersected.push(entity);
+        }
+      });
+      return intersected;
+    }
+
     protected _propertyProjectors(): AttributeToProjector {
       let attrToProjector = super._propertyProjectors();
       if (this.x2() != null) {

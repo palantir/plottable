@@ -2881,6 +2881,21 @@ declare module Plottable {
              * @returns {PlotEntity[]} The PlotEntities at the particular point
              */
             entitiesAt(point: Point): PlotEntity[];
+            /**
+             * Gets the Entities that intersect the Bounds.
+             *
+             * @param {Bounds} bounds
+             * @returns {PlotEntity[]}
+             */
+            entitiesIn(bounds: Bounds): PlotEntity[];
+            /**
+             * Gets the Entities that intersect the area defined by the ranges.
+             *
+             * @param {Range} xRange
+             * @param {Range} yRange
+             * @returns {PlotEntity[]}
+             */
+            entitiesIn(xRange: Range, yRange: Range): PlotEntity[];
             protected _propertyProjectors(): AttributeToProjector;
             protected _pixelPoint(datum: any, index: number, dataset: Dataset): {
                 x: any;
