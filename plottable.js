@@ -8179,11 +8179,15 @@ var Plottable;
                 if (this.autorangeMode() === "y" && accScaleBinding !== this.y()) {
                     return extent;
                 }
+                if (this.autorangeMode() !== "x" && this.autorangeMode() !== "y") {
+                    return extent;
+                }
                 if (!(accScaleBinding.scale)) {
                     return extent;
                 }
-                var edgeIntersectionPoints = this._getEdgeIntersectionPoints();
-                var includedValues = edgeIntersectionPoints[0].concat(edgeIntersectionPoints[1]).map(function (point) { return point.y; });
+                var direction = this.autorangeMode();
+                var edgeIntersectionPoints = this._getEdgeIntersectionPoints(direction);
+                var includedValues = edgeIntersectionPoints[0].concat(edgeIntersectionPoints[1]).map(function (point) { return point[direction]; });
                 var maxIncludedValue = Math.max.apply(this, includedValues);
                 var minIncludedValue = Math.min.apply(this, includedValues);
                 if (extent.length === 0) {
@@ -8197,16 +8201,18 @@ var Plottable;
                 }
                 return extent;
             };
-            Line.prototype._getEdgeIntersectionPoints = function () {
+            Line.prototype._getEdgeIntersectionPoints = function (direction) {
                 var _this = this;
-                if (!(this.y().scale instanceof Plottable.QuantitativeScale)) {
-                    return [[], []];
+                if (!(this.y().scale instanceof Plottable.QuantitativeScale && this.x().scale instanceof Plottable.QuantitativeScale)) {
+                    return [[], [], [], []];
                 }
                 var yScale = this.y().scale;
                 var xScale = this.x().scale;
                 var intersectionPoints = [[], []];
                 var leftX = xScale.scale(xScale.domain()[0]);
                 var rightX = xScale.scale(xScale.domain()[1]);
+                var downY = yScale.scale(yScale.domain()[0]);
+                var upY = yScale.scale(yScale.domain()[1]);
                 this.datasets().forEach(function (dataset) {
                     var data = dataset.data();
                     var x1, x2, y1, y2;
@@ -8217,7 +8223,7 @@ var Plottable;
                         currX = xScale.scale(_this.x().accessor(data[i], i, dataset));
                         currY = yScale.scale(_this.y().accessor(data[i], i, dataset));
                         // If values crossed left edge
-                        if (prevX < leftX && leftX <= currX) {
+                        if ((prevX < leftX) === (leftX <= currX)) {
                             x1 = leftX - prevX;
                             x2 = currX - prevX;
                             y2 = currY - prevY;
@@ -8228,7 +8234,7 @@ var Plottable;
                             });
                         }
                         // If values crossed right edge
-                        if (prevX < rightX && rightX <= currX) {
+                        if ((prevX < rightX) === (rightX <= currX)) {
                             x1 = rightX - prevX;
                             x2 = currX - prevX;
                             y2 = currY - prevY;
@@ -8241,6 +8247,8 @@ var Plottable;
                     }
                     ;
                 });
+                intersectionPoints.push([]);
+                intersectionPoints.push([]);
                 return intersectionPoints;
             };
             Line.prototype._getResetYFunction = function () {
