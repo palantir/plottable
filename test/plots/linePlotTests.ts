@@ -432,18 +432,16 @@ describe("Plots", () => {
         ];
 
         var line = new Plottable.Plots.Line();
-        line.autorangeSmooth(true);
         line.x(function(d) { return d.x; }, xScale);
         line.y(function(d) { return d.y; }, yScale);
         line.addDataset(new Plottable.Dataset(data));
         line.autorangeMode("y");
+        line.autorangeSmooth(true);
 
-        xScale.padProportion(0);
-        yScale.padProportion(0);
         line.renderTo(svg);
 
-        assert.closeTo(yScale.domain()[0], -1.61111, 0.001, "smooth autoranging forces the domain to include the line (left)");
-        assert.closeTo(yScale.domain()[1], -1.05555, 0.001, "Smooth autoranging forces the domain to include the line (right)");
+        assert.closeTo(yScale.domain()[0], -1.625, 0.001, "smooth autoranging forces the domain to include the line (left)");
+        assert.closeTo(yScale.domain()[1], -1.041, 0.001, "Smooth autoranging forces the domain to include the line (right)");
 
         svg.remove();
       });
