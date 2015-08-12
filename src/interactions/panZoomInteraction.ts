@@ -195,17 +195,11 @@ export module Interactions {
 
         this.xScales().forEach((xScale) => {
           zoomAmount = this._constrainedZoomAmountUsingExtent(xScale, zoomAmount);
-        });
-
-        this.xScales().forEach((xScale) => {
           zoomAmount = this._constrainedZoomAmountUsingValueLimits(xScale, zoomAmount, translatedP.x);
         });
 
         this.yScales().forEach((yScale) => {
           zoomAmount = this._constrainedZoomAmountUsingExtent(yScale, zoomAmount);
-        });
-
-        this.yScales().forEach((yScale) => {
           zoomAmount = this._constrainedZoomAmountUsingValueLimits(yScale, zoomAmount, translatedP.y);
         });
 

@@ -10379,14 +10379,10 @@ var Plottable;
                     var zoomAmount = Math.pow(2, deltaPixelAmount * .002);
                     this.xScales().forEach(function (xScale) {
                         zoomAmount = _this._constrainedZoomAmountUsingExtent(xScale, zoomAmount);
-                    });
-                    this.xScales().forEach(function (xScale) {
                         zoomAmount = _this._constrainedZoomAmountUsingValueLimits(xScale, zoomAmount, translatedP.x);
                     });
                     this.yScales().forEach(function (yScale) {
                         zoomAmount = _this._constrainedZoomAmountUsingExtent(yScale, zoomAmount);
-                    });
-                    this.yScales().forEach(function (yScale) {
                         zoomAmount = _this._constrainedZoomAmountUsingValueLimits(yScale, zoomAmount, translatedP.y);
                     });
                     this.xScales().forEach(function (xScale) {
