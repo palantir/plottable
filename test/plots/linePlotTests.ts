@@ -378,12 +378,22 @@ describe("Plots", () => {
 
   describe("Line Plot", () => {
     describe("smooth autoranging", () => {
+
+      var svg: d3.Selection<void>;
+      var xScale: Plottable.Scales.Linear;
+      var yScale: Plottable.Scales.Linear;
+
+      beforeEach(() => {
+        svg = TestMethods.generateSVG(500, 500);
+        xScale = new Plottable.Scales.Linear();
+        yScale = new Plottable.Scales.Linear();
+      });
+
+      afterEach(() => {
+        svg.remove();
+      });
+
       it("smooth autoranging works", () => {
-
-        var svg = TestMethods.generateSVG(500, 500);
-
-        var xScale = new Plottable.Scales.Linear();
-        var yScale = new Plottable.Scales.Linear();
         xScale.domain([0.1, 1.1]);
 
         var data = [
@@ -415,15 +425,9 @@ describe("Plots", () => {
 
         line.autorangeSmooth(true);
         assert.deepEqual(yScale.domain(), [-2, -1], "no changes for autoranging smooth with same edge points (smooth)");
-
-        svg.remove();
       });
 
       it("smooth autoranging works (called before accessors)", () => {
-        var svg = TestMethods.generateSVG(500, 500);
-
-        var xScale = new Plottable.Scales.Linear();
-        var yScale = new Plottable.Scales.Linear();
         xScale.domain([0.1, 1.1]);
 
         var data = [
@@ -442,15 +446,9 @@ describe("Plots", () => {
 
         assert.closeTo(yScale.domain()[0], -1.625, 0.001, "smooth autoranging forces the domain to include the line (left)");
         assert.closeTo(yScale.domain()[1], -1.041, 0.001, "Smooth autoranging forces the domain to include the line (right)");
-
-        svg.remove();
       });
 
       it("smooth autoranging works (called before before autorangeMode)", () => {
-        var svg = TestMethods.generateSVG(500, 500);
-
-        var xScale = new Plottable.Scales.Linear();
-        var yScale = new Plottable.Scales.Linear();
         xScale.domain([0.1, 1.1]);
 
         var data = [
@@ -469,15 +467,9 @@ describe("Plots", () => {
 
         assert.closeTo(yScale.domain()[0], -1.625, 0.001, "smooth autoranging forces the domain to include the line (left)");
         assert.closeTo(yScale.domain()[1], -1.041, 0.001, "Smooth autoranging forces the domain to include the line (right)");
-
-        svg.remove();
       });
 
       it("smooth autoranging works (called before before rendering)", () => {
-        var svg = TestMethods.generateSVG(500, 500);
-
-        var xScale = new Plottable.Scales.Linear();
-        var yScale = new Plottable.Scales.Linear();
         xScale.domain([0.1, 1.1]);
 
         var data = [
@@ -496,15 +488,9 @@ describe("Plots", () => {
 
         assert.closeTo(yScale.domain()[0], -1.625, 0.001, "smooth autoranging forces the domain to include the line (left)");
         assert.closeTo(yScale.domain()[1], -1.041, 0.001, "Smooth autoranging forces the domain to include the line (right)");
-
-        svg.remove();
       });
 
       it("smooth autoranging works (called before after rendering)", () => {
-        var svg = TestMethods.generateSVG(500, 500);
-
-        var xScale = new Plottable.Scales.Linear();
-        var yScale = new Plottable.Scales.Linear();
         xScale.domain([0.1, 1.1]);
 
         var data = [
@@ -523,15 +509,9 @@ describe("Plots", () => {
         line.autorangeSmooth(true);
         assert.closeTo(yScale.domain()[0], -1.625, 0.001, "smooth autoranging forces the domain to include the line (left)");
         assert.closeTo(yScale.domain()[1], -1.041, 0.001, "Smooth autoranging forces the domain to include the line (right)");
-
-        svg.remove();
       });
 
       it("smooth autoranging works (called before after rendering, before autorangeMode)", () => {
-        var svg = TestMethods.generateSVG(500, 500);
-
-        var xScale = new Plottable.Scales.Linear();
-        var yScale = new Plottable.Scales.Linear();
         xScale.domain([0.1, 1.1]);
 
         var data = [
@@ -550,16 +530,9 @@ describe("Plots", () => {
         line.autorangeMode("y");
         assert.closeTo(yScale.domain()[0], -1.625, 0.001, "smooth autoranging forces the domain to include the line (left)");
         assert.closeTo(yScale.domain()[1], -1.041, 0.001, "Smooth autoranging forces the domain to include the line (right)");
-
-        svg.remove();
       });
 
       it("autoDomaining works with smooth autoranging (before rendering)", () => {
-        var svg = TestMethods.generateSVG(500, 500);
-
-        var xScale = new Plottable.Scales.Linear();
-        var yScale = new Plottable.Scales.Linear();
-
         xScale.domain([-0.1, 0.2]);
 
         var data = [
@@ -581,16 +554,9 @@ describe("Plots", () => {
 
         line.autorangeSmooth(false);
         assert.deepEqual(xScale.domain(), [-0.2, 2], "autoDomain works when smooth autoranging is disabled back");
-
-        svg.remove();
       });
 
       it("autoDomaining works with smooth autoranging (after rendering)", () => {
-        var svg = TestMethods.generateSVG(500, 500);
-
-        var xScale = new Plottable.Scales.Linear();
-        var yScale = new Plottable.Scales.Linear();
-
         xScale.domain([-0.1, 0.2]);
 
         var data = [
@@ -613,15 +579,9 @@ describe("Plots", () => {
 
         line.autorangeSmooth(false);
         assert.deepEqual(xScale.domain(), [-0.2, 2], "autoDomain works when smooth autoranging is disabled back");
-
-        svg.remove();
       });
 
       it("smooth autoranging works for vertical lines", () => {
-        var svg = TestMethods.generateSVG(500, 500);
-
-        var xScale = new Plottable.Scales.Linear();
-        var yScale = new Plottable.Scales.Linear();
         yScale.domain([0.1, 1.1]);
 
         var data = [
@@ -653,8 +613,6 @@ describe("Plots", () => {
 
         line.autorangeSmooth(true);
         assert.deepEqual(xScale.domain(), [-2, -1], "no changes for autoranging smooth with same edge points (smooth)");
-
-        svg.remove();
       });
 
     });
