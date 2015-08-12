@@ -3101,6 +3101,8 @@ declare module Plottable {
             y(): Plots.AccessorScaleBinding<number, number>;
             y(y: number | Accessor<number>): Line<X>;
             y(y: number | Accessor<number>, yScale: Scale<number, number>): Line<X>;
+            autorangeMode(): string;
+            autorangeMode(autorangeMode: string): Line<X>;
             /**
              * Gets whether or not the autoranging is done smoothly.
              */

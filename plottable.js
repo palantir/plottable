@@ -1,5 +1,5 @@
 /*!
-Plottable 1.6.1 (https://github.com/palantir/plottable)
+Plottable 1.5.2 (https://github.com/palantir/plottable)
 Copyright 2014-2015 Palantir Technologies
 Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
 */
@@ -900,7 +900,7 @@ var Plottable;
 ///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
-    Plottable.version = "1.6.1";
+    Plottable.version = "1.5.2";
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
@@ -8141,7 +8141,7 @@ var Plottable;
                 this.attr("stroke-width", "2px");
             }
             Line.prototype.x = function (x, xScale) {
-                if (xScale instanceof Plottable.QuantitativeScale) {
+                if (xScale instanceof Plottable.QuantitativeScale && this.autorangeMode() === "x") {
                     xScale.snapsDomain(!this._autorangeSmooth);
                 }
                 if (xScale == null) {
@@ -8152,20 +8152,31 @@ var Plottable;
                 }
             };
             Line.prototype.y = function (y, yScale) {
-                if (yScale instanceof Plottable.QuantitativeScale) {
+                if (yScale instanceof Plottable.QuantitativeScale && this.autorangeMode() === "y") {
                     yScale.snapsDomain(!this._autorangeSmooth);
                 }
                 return _super.prototype.y.call(this, y, yScale);
+            };
+            Line.prototype.autorangeMode = function (autorangeMode) {
+                if (this.autorangeSmooth() && autorangeMode === "x" || autorangeMode === "y") {
+                    if (this.x() && this.x().scale && this.x().scale instanceof Plottable.QuantitativeScale && this.autorangeMode() === "x") {
+                        this.x().scale.snapsDomain(!this.autorangeSmooth());
+                    }
+                    if (this.y() && this.y().scale && this.y().scale instanceof Plottable.QuantitativeScale && this.autorangeMode() === "y") {
+                        this.y().scale.snapsDomain(!this.autorangeSmooth());
+                    }
+                }
+                return _super.prototype.autorangeMode.call(this, autorangeMode);
             };
             Line.prototype.autorangeSmooth = function (autorangeSmooth) {
                 if (autorangeSmooth == null) {
                     return this._autorangeSmooth;
                 }
                 this._autorangeSmooth = autorangeSmooth;
-                if (this.x() && this.x().scale && this.x().scale instanceof Plottable.QuantitativeScale) {
+                if (this.x() && this.x().scale && this.x().scale instanceof Plottable.QuantitativeScale && this.autorangeMode() === "x") {
                     this.x().scale.snapsDomain(!autorangeSmooth);
                 }
-                if (this.y() && this.y().scale && this.y().scale instanceof Plottable.QuantitativeScale) {
+                if (this.y() && this.y().scale && this.y().scale instanceof Plottable.QuantitativeScale && this.autorangeMode() === "y") {
                     this.y().scale.snapsDomain(!autorangeSmooth);
                 }
                 this.autorangeMode(this.autorangeMode());

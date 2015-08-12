@@ -28,7 +28,7 @@ export module Plots {
     public x(x: number | Accessor<number>): Line<X>;
     public x(x: X | Accessor<X>, xScale: Scale<X, number>): Line<X>;
     public x(x?: number | Accessor<number> | X | Accessor<X>, xScale?: Scale<X, number>): any {
-      if (xScale instanceof QuantitativeScale) {
+      if (xScale instanceof QuantitativeScale && this.autorangeMode() === "x") {
         (<QuantitativeScale<X>>xScale).snapsDomain(!this._autorangeSmooth);
       }
 
@@ -44,10 +44,25 @@ export module Plots {
     public y(y: number | Accessor<number>): Line<X>;
     public y(y: number | Accessor<number>, yScale: Scale<number, number>): Line<X>;
     public y(y?: number | Accessor<number>, yScale?: Scale<number, number>): any {
-      if (yScale instanceof QuantitativeScale) {
+      if (yScale instanceof QuantitativeScale && this.autorangeMode() === "y") {
         (<QuantitativeScale<number>>yScale).snapsDomain(!this._autorangeSmooth);
       }
       return super.y(y, yScale);
+    }
+
+    public autorangeMode(): string;
+    public autorangeMode(autorangeMode: string): Line<X>;
+    public autorangeMode(autorangeMode?: string): any {
+      if (this.autorangeSmooth() && autorangeMode === "x" || autorangeMode === "y") {
+        if (this.x() && this.x().scale && this.x().scale instanceof QuantitativeScale && this.autorangeMode() === "x") {
+          (<QuantitativeScale<X>>this.x().scale).snapsDomain(!this.autorangeSmooth());
+        }
+
+        if (this.y() && this.y().scale && this.y().scale instanceof QuantitativeScale && this.autorangeMode() === "y") {
+          (<QuantitativeScale<number>>this.y().scale).snapsDomain(!this.autorangeSmooth());
+        }
+      }
+      return super.autorangeMode(autorangeMode);
     }
 
     /**
@@ -67,11 +82,11 @@ export module Plots {
       }
       this._autorangeSmooth = autorangeSmooth;
 
-      if (this.x() && this.x().scale && this.x().scale instanceof QuantitativeScale) {
+      if (this.x() && this.x().scale && this.x().scale instanceof QuantitativeScale && this.autorangeMode() === "x") {
         (<QuantitativeScale<X>>this.x().scale).snapsDomain(!autorangeSmooth);
       }
 
-      if (this.y() && this.y().scale && this.y().scale instanceof QuantitativeScale) {
+      if (this.y() && this.y().scale && this.y().scale instanceof QuantitativeScale && this.autorangeMode() === "y") {
         (<QuantitativeScale<number>>this.y().scale).snapsDomain(!autorangeSmooth);
       }
 
