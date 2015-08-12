@@ -121,7 +121,7 @@ describe("GuideLineLayer", () => {
     let SVG_WIDTH = 400;
     let SVG_HEIGHT = 300;
 
-    it("has an effective size of 0, but will occupy all offered space", () => {
+    it("requests no space, but will occupy all offered space", () => {
       let gll = new Plottable.Components.GuideLineLayer<void>("vertical");
       let request = gll.requestedSpace(SVG_WIDTH, SVG_HEIGHT);
       TestMethods.verifySpaceRequest(request, 0, 0, "does not request any space");
@@ -154,8 +154,8 @@ describe("GuideLineLayer", () => {
       gll.pixelPosition(expectedPosition1);
       gll.renderTo(svg);
 
-      assert.strictEqual(gll.content().selectAll("line").size(), 1, "exactly one line is drawn");
-      let line = gll.content().select("line");
+      assert.strictEqual(gll.content().selectAll(".guide-line").size(), 1, "exactly one line is drawn");
+      let line = gll.content().select(".guide-line");
       let expectedAttrs1 = {
         x1: expectedPosition1,
         x2: expectedPosition1,
@@ -166,8 +166,8 @@ describe("GuideLineLayer", () => {
 
       let expectedPosition2 = SVG_WIDTH * 3 / 4;
       gll.pixelPosition(expectedPosition2);
-      assert.strictEqual(gll.content().selectAll("line").size(), 1, "exactly one line is drawn");
-      line = gll.content().select("line");
+      assert.strictEqual(gll.content().selectAll(".guide-line").size(), 1, "exactly one line is drawn");
+      line = gll.content().select(".guide-line");
       let expectedAttrs2 = {
         x1: expectedPosition2,
         x2: expectedPosition2,
@@ -189,8 +189,8 @@ describe("GuideLineLayer", () => {
 
       let value1 = 5;
       gll.value(value1);
-      assert.strictEqual(gll.content().selectAll("line").size(), 1, "exactly one line is drawn");
-      let line = gll.content().select("line");
+      assert.strictEqual(gll.content().selectAll(".guide-line").size(), 1, "exactly one line is drawn");
+      let line = gll.content().select(".guide-line");
       let expectedAttrs1 = {
         x1: scale.scale(value1),
         x2: scale.scale(value1),
@@ -201,8 +201,8 @@ describe("GuideLineLayer", () => {
 
       let value2 = 8;
       gll.value(value2);
-      assert.strictEqual(gll.content().selectAll("line").size(), 1, "exactly one line is drawn");
-      line = gll.content().select("line");
+      assert.strictEqual(gll.content().selectAll(".guide-line").size(), 1, "exactly one line is drawn");
+      line = gll.content().select(".guide-line");
       let expectedAttrs2 = {
         x1: scale.scale(value2),
         x2: scale.scale(value2),
@@ -224,7 +224,7 @@ describe("GuideLineLayer", () => {
       let scale1 = new Plottable.Scales.Linear();
       scale1.domain([0, 10]);
       gll.scale(scale1);
-      let line = gll.content().select("line");
+      let line = gll.content().select(".guide-line");
       let expectedAttrs1 = {
         x1: scale1.scale(value),
         x2: scale1.scale(value),
@@ -245,7 +245,7 @@ describe("GuideLineLayer", () => {
       let scale2 = new Plottable.Scales.Linear();
       scale2.domain([0, 100]);
       gll.scale(scale2);
-      line = gll.content().select("line");
+      line = gll.content().select(".guide-line");
       let expectedAttrs2 = {
         x1: scale2.scale(value),
         x2: scale2.scale(value),
@@ -262,7 +262,7 @@ describe("GuideLineLayer", () => {
     let SVG_WIDTH = 300;
     let SVG_HEIGHT = 400;
 
-    it("has an effective size of 0, but will occupy all offered space", () => {
+    it("requests no space, but will occupy all offered space", () => {
       let gll = new Plottable.Components.GuideLineLayer<void>("horizontal");
       let request = gll.requestedSpace(SVG_WIDTH, SVG_HEIGHT);
       TestMethods.verifySpaceRequest(request, 0, 0, "does not request any space");
@@ -295,8 +295,8 @@ describe("GuideLineLayer", () => {
       gll.pixelPosition(expectedPosition1);
       gll.renderTo(svg);
 
-      assert.strictEqual(gll.content().selectAll("line").size(), 1, "exactly one line is drawn");
-      let line = gll.content().select("line");
+      assert.strictEqual(gll.content().selectAll(".guide-line").size(), 1, "exactly one line is drawn");
+      let line = gll.content().select(".guide-line");
       let expectedAttrs1 = {
         x1: 0,
         x2: SVG_WIDTH,
@@ -307,8 +307,8 @@ describe("GuideLineLayer", () => {
 
       let expectedPosition2 = SVG_WIDTH * 3 / 4;
       gll.pixelPosition(expectedPosition2);
-      assert.strictEqual(gll.content().selectAll("line").size(), 1, "exactly one line is drawn");
-      line = gll.content().select("line");
+      assert.strictEqual(gll.content().selectAll(".guide-line").size(), 1, "exactly one line is drawn");
+      line = gll.content().select(".guide-line");
       let expectedAttrs2 = {
         x1: 0,
         x2: SVG_WIDTH,
@@ -330,8 +330,8 @@ describe("GuideLineLayer", () => {
 
       let value1 = 5;
       gll.value(value1);
-      assert.strictEqual(gll.content().selectAll("line").size(), 1, "exactly one line is drawn");
-      let line = gll.content().select("line");
+      assert.strictEqual(gll.content().selectAll(".guide-line").size(), 1, "exactly one line is drawn");
+      let line = gll.content().select(".guide-line");
       let expectedAttrs1 = {
         x1: 0,
         x2: SVG_WIDTH,
@@ -342,8 +342,8 @@ describe("GuideLineLayer", () => {
 
       let value2 = 8;
       gll.value(value2);
-      assert.strictEqual(gll.content().selectAll("line").size(), 1, "exactly one line is drawn");
-      line = gll.content().select("line");
+      assert.strictEqual(gll.content().selectAll(".guide-line").size(), 1, "exactly one line is drawn");
+      line = gll.content().select(".guide-line");
       let expectedAttrs2 = {
         x1: 0,
         x2: SVG_WIDTH,
@@ -365,7 +365,7 @@ describe("GuideLineLayer", () => {
       let scale1 = new Plottable.Scales.Linear();
       scale1.domain([0, 10]);
       gll.scale(scale1);
-      let line = gll.content().select("line");
+      let line = gll.content().select(".guide-line");
       let expectedAttrs1 = {
         x1: 0,
         x2: SVG_WIDTH,
@@ -386,7 +386,7 @@ describe("GuideLineLayer", () => {
       let scale2 = new Plottable.Scales.Linear();
       scale2.domain([0, 100]);
       gll.scale(scale2);
-      line = gll.content().select("line");
+      line = gll.content().select(".guide-line");
       let expectedAttrs2 = {
         x1: 0,
         x2: SVG_WIDTH,
