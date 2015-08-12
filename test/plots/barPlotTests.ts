@@ -696,9 +696,9 @@ describe("Plots", () => {
         plot.labelsEnabled(true);
         let texts = svg.selectAll("text")[0].map((n: any) => d3.select(n).text());
         assert.lengthOf(texts, 3, "all texts drawn");
-        assert.strictEqual(texts[0], "640", "first label is 640");
-        assert.strictEqual(texts[1], "12345", "first label is 12345");
-        assert.strictEqual(texts[2], "5", "first label is 5");
+        assert.strictEqual(texts[0], "5", "first label is 640");
+        assert.strictEqual(texts[1], "640", "first label is 640");
+        assert.strictEqual(texts[2], "12345", "first label is 12345");
         svg.remove();
       });
 
