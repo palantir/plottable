@@ -118,26 +118,26 @@ describe("Scales", () => {
       assert.deepEqual(scale.domain(), [-1, 5], "Regular domains still accepted");
     });
 
-    describe("nice domain", () => {
-      it("nice domain setter and getter", () => {
+    describe("domain snapping", () => {
+      it("domain snapping setter and getter", () => {
         var scale = new Plottable.Scales.Linear();
 
-        assert.strictEqual(scale.snapsDomain(), true, "scales make their domain nice by default");
-        assert.strictEqual(scale.snapsDomain(false), scale, "setting disabling nice domain returns the scale");
-        assert.strictEqual(scale.snapsDomain(), false, "the domain is no longer nice");
+        assert.strictEqual(scale.snapsDomain(), true, "scales make their domain snap by default");
+        assert.strictEqual(scale.snapsDomain(false), scale, "setting disabling domain snapping returns the scale");
+        assert.strictEqual(scale.snapsDomain(), false, "the domain is no longer snaps");
       });
 
-      it("nice domain works", () => {
+      it("domain snapping works", () => {
         var scale = new Plottable.Scales.Linear();
         scale.addIncludedValuesProvider(function() {
           return [1.123123123, 3.123123123];
         });
 
-        assert.deepEqual(scale.domain(), [1, 3.2], "nice domain works");
+        assert.deepEqual(scale.domain(), [1, 3.2], "domain snapping works");
         scale.snapsDomain(false);
-        assert.deepEqual(scale.domain(), [1.073123123, 3.173123123], "nice domain can be deactivated");
+        assert.deepEqual(scale.domain(), [1.073123123, 3.173123123], "domain snapping can be deactivated");
         scale.snapsDomain(true);
-        assert.deepEqual(scale.domain(), [1, 3.2], "nice domain can be activated back");
+        assert.deepEqual(scale.domain(), [1, 3.2], "domain snapping can be activated back");
       });
     });
 
