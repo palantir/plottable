@@ -133,7 +133,7 @@ describe("Interactions", () => {
         svg.remove();
       });
 
-      it("does not fire callback pressing the key when mouse was outside and moved inside", () => {
+      it("does not fire the callback if the key is pressed and held down outside, then the mouse moved inside", () => {
         keyInteraction.onKeyPress(aCode, aCallback);
         keyInteraction.attachTo(component);
 
