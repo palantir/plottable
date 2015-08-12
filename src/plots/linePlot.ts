@@ -31,7 +31,13 @@ export module Plots {
       if (xScale instanceof QuantitativeScale) {
         (<QuantitativeScale<X>>xScale).snapsDomain(!this._autorangeSmooth);
       }
-      return super.x(x, xScale);
+
+      if (xScale == null) {
+        return super.x(<number | Accessor<number>>x);
+      } else {
+        return super.x(<X | Accessor<X>>x, xScale);
+      }
+
     }
 
     public y(): Plots.AccessorScaleBinding<number, number>;
@@ -168,7 +174,7 @@ export module Plots {
       }
 
       var yScale = <QuantitativeScale<number>>this.y().scale;
-      var xScale = <QuantitativeScale<X>>this.x().scale;
+      var xScale = <QuantitativeScale<any>>this.x().scale;
 
       var intersectionPoints: Point[][] = [[], [], [], []];
       var leftX = xScale.scale(xScale.domain()[0]);

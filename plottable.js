@@ -8144,7 +8144,12 @@ var Plottable;
                 if (xScale instanceof Plottable.QuantitativeScale) {
                     xScale.snapsDomain(!this._autorangeSmooth);
                 }
-                return _super.prototype.x.call(this, x, xScale);
+                if (xScale == null) {
+                    return _super.prototype.x.call(this, x);
+                }
+                else {
+                    return _super.prototype.x.call(this, x, xScale);
+                }
             };
             Line.prototype.y = function (y, yScale) {
                 if (yScale instanceof Plottable.QuantitativeScale) {
