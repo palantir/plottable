@@ -6759,7 +6759,7 @@ var Plottable;
                 return this;
             };
             Pie.prototype.labelsEnabled = function (enabled) {
-                if (enabled === undefined) {
+                if (enabled == null) {
                     return this._labelsEnabled;
                 }
                 else {
@@ -7714,7 +7714,7 @@ var Plottable;
                 return this;
             };
             Bar.prototype.labelsEnabled = function (enabled) {
-                if (enabled === undefined) {
+                if (enabled == null) {
                     return this._labelsEnabled;
                 }
                 else {
