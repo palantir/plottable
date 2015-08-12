@@ -252,7 +252,7 @@ describe("GuideLineLayer", () => {
         y1: 0,
         y2: SVG_HEIGHT
       };
-      TestMethods.assertLineAttrs(line, expectedAttrs2, "the line was redrawn at the new position when the value was changed");
+      TestMethods.assertLineAttrs(line, expectedAttrs2, "the line was redrawn at the new position when the scale was changed");
 
       svg.remove();
     });
@@ -393,7 +393,7 @@ describe("GuideLineLayer", () => {
         y1: scale2.scale(value),
         y2: scale2.scale(value)
       };
-      TestMethods.assertLineAttrs(line, expectedAttrs2, "the line was redrawn at the new position when the value was changed");
+      TestMethods.assertLineAttrs(line, expectedAttrs2, "the line was redrawn at the new position when the scale was changed");
 
       svg.remove();
     });
