@@ -22,7 +22,7 @@ export module Components {
       this._clipPathEnabled = true;
       this.addClass("guide-line-layer");
       this._scaleUpdateCallback = () => {
-        this._syncValueAndPixelPosition();
+        this._setPixelPositionFromValue();
         this.render();
       };
     }
@@ -65,7 +65,7 @@ export module Components {
 
     public renderImmediately() {
       super.renderImmediately();
-      this._syncValueAndPixelPosition();
+      this._setPixelPositionFromValue();
       this._guideLine.attr({
         x1: this._isVertical() ? this.pixelPosition() : 0,
         y1: this._isVertical() ? 0 : this.pixelPosition(),
@@ -75,13 +75,15 @@ export module Components {
       return this;
     }
 
-    private _syncValueAndPixelPosition() {
-      if (this.scale() != null) {
-        if (this.value() != null) {
-          this._pixelPosition = this.scale().scale(this.value());
-        } else if (this.pixelPosition() != null) {
-          this._value = this.scale().invert(this.pixelPosition());
-        }
+    private _setPixelPositionFromValue() {
+      if (this.scale() != null && this.value() != null) {
+        this._pixelPosition = this.scale().scale(this.value());
+      }
+    }
+
+    private _setValueFromPixelPosition() {
+      if (this.scale() != null && this.pixelPosition() != null) {
+        this._value = this.scale().invert(this.pixelPosition());
       }
     }
 
@@ -110,7 +112,8 @@ export module Components {
       }
       this._scale = scale;
       this._scale.onUpdate(this._scaleUpdateCallback);
-      this._syncValueAndPixelPosition();
+      this._setPixelPositionFromValue();
+      this._setValueFromPixelPosition();
       this.redraw();
       return this;
     }
@@ -134,7 +137,7 @@ export module Components {
         return this._value;
       }
       this._value = value;
-      this._syncValueAndPixelPosition();
+      this._setPixelPositionFromValue();
       this.render();
       return this;
     }
@@ -158,7 +161,7 @@ export module Components {
         return this._pixelPosition;
       }
       this._pixelPosition = pixelPosition;
-      this._syncValueAndPixelPosition();
+      this._setValueFromPixelPosition();
       this.render();
       return this;
     }

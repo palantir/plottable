@@ -45,6 +45,11 @@ describe("GuideLineLayer", () => {
       let expectedPosition = linearScale.scale(value);
       gll.value(value);
       assert.strictEqual(gll.pixelPosition(), expectedPosition, "pixel position was updated to match the set value");
+
+      let valueB = 0.8;
+      let expectedPositionB = linearScale.scale(valueB);
+      gll.value(valueB);
+      assert.strictEqual(gll.pixelPosition(), expectedPositionB, "pixel position was updated when value was changed again");
     });
 
     it("changing pixelPosition() updates value() if scale() is set", () => {
@@ -57,6 +62,11 @@ describe("GuideLineLayer", () => {
       let expectedValue = linearScale.invert(position);
       gll.pixelPosition(position);
       assert.strictEqual(gll.value(), expectedValue, "value was updated to match the set pixel position");
+
+      let positionB = 75;
+      let expectedValueB = linearScale.invert(positionB);
+      gll.pixelPosition(positionB);
+      assert.strictEqual(gll.value(), expectedValueB, "value was updated when the position was changed again");
     });
 
     it("updating the scale's domain updates pixelPosition() to match the existing value()", () => {
