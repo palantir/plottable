@@ -7941,7 +7941,7 @@ var Plottable;
                             if (!_this._isVertical) {
                                 addend += offset;
                                 if (showLabelOffBar && positive) {
-                                    addend += (offset - w);
+                                    addend += (offset - w - Bar._LABEL_HORIZONTAL_PADDING);
                                 }
                                 if (showLabelOffBar && !positive) {
                                     addend += measurement.width;
