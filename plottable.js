@@ -8170,7 +8170,16 @@ var Plottable;
             };
             Line.prototype._computeExtent = function (dataset, accScaleBinding, filter) {
                 var extent = _super.prototype._computeExtent.call(this, dataset, accScaleBinding, filter);
-                if (!(this._autorangeSmooth && this.y() && this.y().scale && accScaleBinding === this.y())) {
+                if (!this._autorangeSmooth) {
+                    return extent;
+                }
+                if (this.autorangeMode() === "x" && accScaleBinding !== this.x()) {
+                    return extent;
+                }
+                if (this.autorangeMode() === "y" && accScaleBinding !== this.y()) {
+                    return extent;
+                }
+                if (!(accScaleBinding.scale)) {
                     return extent;
                 }
                 var edgeIntersectionPoints = this._getEdgeIntersectionPoints();

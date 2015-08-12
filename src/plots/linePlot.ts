@@ -102,7 +102,19 @@ export module Plots {
 
       var extent = super._computeExtent(dataset, accScaleBinding, filter);
 
-      if (!(this._autorangeSmooth && this.y() && this.y().scale && accScaleBinding === this.y())) {
+      if (!this._autorangeSmooth) {
+        return extent;
+      }
+
+      if (this.autorangeMode() === "x" && accScaleBinding !== this.x()) {
+        return extent;
+      }
+
+      if (this.autorangeMode() === "y" && accScaleBinding !== this.y()) {
+        return extent;
+      }
+
+      if (!(accScaleBinding.scale)) {
         return extent;
       }
 
