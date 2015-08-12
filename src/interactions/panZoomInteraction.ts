@@ -122,11 +122,11 @@ export module Interactions {
       });
 
       this.xScales().forEach((xScale) => {
-        magnifyAmount = this._constrainedZoomAmount(xScale, magnifyAmount);
+        magnifyAmount = this._constrainedZoomAmountUsingExtent(xScale, magnifyAmount);
       });
 
       this.yScales().forEach((yScale) => {
-        magnifyAmount = this._constrainedZoomAmount(yScale, magnifyAmount);
+        magnifyAmount = this._constrainedZoomAmountUsingExtent(yScale, magnifyAmount);
       });
 
       var constrainedPoints = oldPoints.map((oldPoint, i) => {
@@ -194,11 +194,19 @@ export module Interactions {
         var zoomAmount = Math.pow(2, deltaPixelAmount * .002);
 
         this.xScales().forEach((xScale) => {
-          zoomAmount = this._constrainedZoomAmount(xScale, zoomAmount);
+          zoomAmount = this._constrainedZoomAmountUsingExtent(xScale, zoomAmount);
+        });
+
+        this.xScales().forEach((xScale) => {
+          zoomAmount = this._constrainedZoomAmountUsingValueLimits(xScale, zoomAmount, translatedP.x);
         });
 
         this.yScales().forEach((yScale) => {
-          zoomAmount = this._constrainedZoomAmount(yScale, zoomAmount);
+          zoomAmount = this._constrainedZoomAmountUsingExtent(yScale, zoomAmount);
+        });
+
+        this.yScales().forEach((yScale) => {
+          zoomAmount = this._constrainedZoomAmountUsingValueLimits(yScale, zoomAmount, translatedP.y);
         });
 
         this.xScales().forEach((xScale) => {
@@ -210,7 +218,7 @@ export module Interactions {
       }
     }
 
-    private _constrainedZoomAmount(scale: QuantitativeScale<any>, zoomAmount: number) {
+    private _constrainedZoomAmountUsingExtent(scale: QuantitativeScale<any>, zoomAmount: number) {
       var extentIncreasing = zoomAmount > 1;
 
       var boundingDomainExtent = extentIncreasing ? this.maxDomainExtent(scale) : this.minDomainExtent(scale);
@@ -220,6 +228,22 @@ export module Interactions {
       var domainExtent = Math.abs(scaleDomain[1] - scaleDomain[0]);
       var compareF = extentIncreasing ? Math.min : Math.max;
       return compareF(zoomAmount, boundingDomainExtent / domainExtent);
+    }
+
+    private _constrainedZoomAmountUsingValueLimits(scale: QuantitativeScale<any>, zoomAmount: number, zoomCenter: number) {
+      if (zoomAmount <= 1) {
+        return zoomAmount;
+      }
+      let zoomLimitForDomainValue = (domainLimit: any, domainValue: any) => {
+        return domainLimit == null ? Infinity : (scale.scale(domainLimit) - zoomCenter) / (scale.scale(domainValue) - zoomCenter);
+      };
+      let minDomain = Math.min(scale.domain()[0], scale.domain()[1]);
+      let maxDomain = Math.max(scale.domain()[0], scale.domain()[1]);
+      let minDomainLimit = this.minDomainValue(scale);
+      let maxDomainLimit = this.maxDomainValue(scale);
+      let zoomLimitOnMin = zoomLimitForDomainValue(minDomainLimit, minDomain);
+      let zoomLimitOnMax = zoomLimitForDomainValue(maxDomainLimit, maxDomain);
+      return Math.min(zoomAmount, zoomLimitOnMin, zoomLimitOnMax);
     }
 
     private _setupDragInteraction() {
@@ -261,7 +285,7 @@ export module Interactions {
             return;
           }
           let relevantRangeValue = positiveTranslate ? yScale.range()[1] : yScale.range()[0];
-          let limiter = positiveTranslate ? Math.min : Math.max;
+          let limiter = positiveTranslate ? Math.max : Math.min;
           translateAmountY = limiter(translateAmountY, yScale.scale(limitingDomainValue) - relevantRangeValue);
         });
 

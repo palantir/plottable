@@ -10319,10 +10319,10 @@ var Plottable;
                     return { x: (point.x - oldPoints[i].x) / magnifyAmount, y: (point.y - oldPoints[i].y) / magnifyAmount };
                 });
                 this.xScales().forEach(function (xScale) {
-                    magnifyAmount = _this._constrainedZoomAmount(xScale, magnifyAmount);
+                    magnifyAmount = _this._constrainedZoomAmountUsingExtent(xScale, magnifyAmount);
                 });
                 this.yScales().forEach(function (yScale) {
-                    magnifyAmount = _this._constrainedZoomAmount(yScale, magnifyAmount);
+                    magnifyAmount = _this._constrainedZoomAmountUsingExtent(yScale, magnifyAmount);
                 });
                 var constrainedPoints = oldPoints.map(function (oldPoint, i) {
                     return {
@@ -10378,10 +10378,16 @@ var Plottable;
                     var deltaPixelAmount = e.deltaY * (e.deltaMode ? PanZoom._PIXELS_PER_LINE : 1);
                     var zoomAmount = Math.pow(2, deltaPixelAmount * .002);
                     this.xScales().forEach(function (xScale) {
-                        zoomAmount = _this._constrainedZoomAmount(xScale, zoomAmount);
+                        zoomAmount = _this._constrainedZoomAmountUsingExtent(xScale, zoomAmount);
+                    });
+                    this.xScales().forEach(function (xScale) {
+                        zoomAmount = _this._constrainedZoomAmountUsingValueLimits(xScale, zoomAmount, translatedP.x);
                     });
                     this.yScales().forEach(function (yScale) {
-                        zoomAmount = _this._constrainedZoomAmount(yScale, zoomAmount);
+                        zoomAmount = _this._constrainedZoomAmountUsingExtent(yScale, zoomAmount);
+                    });
+                    this.yScales().forEach(function (yScale) {
+                        zoomAmount = _this._constrainedZoomAmountUsingValueLimits(yScale, zoomAmount, translatedP.y);
                     });
                     this.xScales().forEach(function (xScale) {
                         _this._magnifyScale(xScale, zoomAmount, translatedP.x);
@@ -10391,7 +10397,7 @@ var Plottable;
                     });
                 }
             };
-            PanZoom.prototype._constrainedZoomAmount = function (scale, zoomAmount) {
+            PanZoom.prototype._constrainedZoomAmountUsingExtent = function (scale, zoomAmount) {
                 var extentIncreasing = zoomAmount > 1;
                 var boundingDomainExtent = extentIncreasing ? this.maxDomainExtent(scale) : this.minDomainExtent(scale);
                 if (boundingDomainExtent == null) {
@@ -10401,6 +10407,21 @@ var Plottable;
                 var domainExtent = Math.abs(scaleDomain[1] - scaleDomain[0]);
                 var compareF = extentIncreasing ? Math.min : Math.max;
                 return compareF(zoomAmount, boundingDomainExtent / domainExtent);
+            };
+            PanZoom.prototype._constrainedZoomAmountUsingValueLimits = function (scale, zoomAmount, zoomCenter) {
+                if (zoomAmount <= 1) {
+                    return zoomAmount;
+                }
+                var zoomLimitForDomainValue = function (domainLimit, domainValue) {
+                    return domainLimit == null ? Infinity : (scale.scale(domainLimit) - zoomCenter) / (scale.scale(domainValue) - zoomCenter);
+                };
+                var minDomain = Math.min(scale.domain()[0], scale.domain()[1]);
+                var maxDomain = Math.max(scale.domain()[0], scale.domain()[1]);
+                var minDomainLimit = this.minDomainValue(scale);
+                var maxDomainLimit = this.maxDomainValue(scale);
+                var zoomLimitOnMin = zoomLimitForDomainValue(minDomainLimit, minDomain);
+                var zoomLimitOnMax = zoomLimitForDomainValue(maxDomainLimit, maxDomain);
+                return Math.min(zoomAmount, zoomLimitOnMin, zoomLimitOnMax);
             };
             PanZoom.prototype._setupDragInteraction = function () {
                 var _this = this;
@@ -10437,7 +10458,7 @@ var Plottable;
                             return;
                         }
                         var relevantRangeValue = positiveTranslate ? yScale.range()[1] : yScale.range()[0];
-                        var limiter = positiveTranslate ? Math.min : Math.max;
+                        var limiter = positiveTranslate ? Math.max : Math.min;
                         translateAmountY = limiter(translateAmountY, yScale.scale(limitingDomainValue) - relevantRangeValue);
                     });
                     _this.yScales().forEach(function (yScale) {
