@@ -3095,9 +3095,12 @@ declare module Plottable {
              * @constructor
              */
             constructor();
+            x(): Plots.AccessorScaleBinding<X, number>;
+            x(x: number | Accessor<number>): Line<X>;
+            x(x: X | Accessor<X>, xScale: Scale<X, number>): Line<X>;
             y(): Plots.AccessorScaleBinding<number, number>;
-            y(y: number | Accessor<number>): Plots.Line<X>;
-            y(y: number | Accessor<number>, yScale: Scale<number, number>): Plots.Line<X>;
+            y(y: number | Accessor<number>): Line<X>;
+            y(y: number | Accessor<number>, yScale: Scale<number, number>): Line<X>;
             /**
              * Gets whether or not the autoranging is done smoothly.
              */

@@ -8140,6 +8140,12 @@ var Plottable;
                 this.attr("stroke", new Plottable.Scales.Color().range()[0]);
                 this.attr("stroke-width", "2px");
             }
+            Line.prototype.x = function (x, xScale) {
+                if (xScale instanceof Plottable.QuantitativeScale) {
+                    xScale.snapsDomain(!this._autorangeSmooth);
+                }
+                return _super.prototype.x.call(this, x, xScale);
+            };
             Line.prototype.y = function (y, yScale) {
                 if (yScale instanceof Plottable.QuantitativeScale) {
                     yScale.snapsDomain(!this._autorangeSmooth);
@@ -8151,6 +8157,9 @@ var Plottable;
                     return this._autorangeSmooth;
                 }
                 this._autorangeSmooth = autorangeSmooth;
+                if (this.x() && this.x().scale && this.x().scale instanceof Plottable.QuantitativeScale) {
+                    this.x().scale.snapsDomain(!autorangeSmooth);
+                }
                 if (this.y() && this.y().scale && this.y().scale instanceof Plottable.QuantitativeScale) {
                     this.y().scale.snapsDomain(!autorangeSmooth);
                 }

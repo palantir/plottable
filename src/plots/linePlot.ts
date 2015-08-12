@@ -24,9 +24,19 @@ export module Plots {
       this.attr("stroke-width", "2px");
     }
 
+    public x(): Plots.AccessorScaleBinding<X, number>;
+    public x(x: number | Accessor<number>): Line<X>;
+    public x(x: X | Accessor<X>, xScale: Scale<X, number>): Line<X>;
+    public x(x?: number | Accessor<number> | X | Accessor<X>, xScale?: Scale<X, number>): any {
+      if (xScale instanceof QuantitativeScale) {
+        (<QuantitativeScale<X>>xScale).snapsDomain(!this._autorangeSmooth);
+      }
+      return super.x(x, xScale);
+    }
+
     public y(): Plots.AccessorScaleBinding<number, number>;
-    public y(y: number | Accessor<number>): Plots.Line<X>;
-    public y(y: number | Accessor<number>, yScale: Scale<number, number>): Plots.Line<X>;
+    public y(y: number | Accessor<number>): Line<X>;
+    public y(y: number | Accessor<number>, yScale: Scale<number, number>): Line<X>;
     public y(y?: number | Accessor<number> | number | Accessor<number>, yScale?: Scale<number, number>): any {
       if (yScale instanceof QuantitativeScale) {
         (<QuantitativeScale<number>>yScale).snapsDomain(!this._autorangeSmooth);
@@ -50,6 +60,10 @@ export module Plots {
         return this._autorangeSmooth;
       }
       this._autorangeSmooth = autorangeSmooth;
+
+      if (this.x() && this.x().scale && this.x().scale instanceof QuantitativeScale) {
+        (<QuantitativeScale<X>>this.x().scale).snapsDomain(!autorangeSmooth);
+      }
 
       if (this.y() && this.y().scale && this.y().scale instanceof QuantitativeScale) {
         (<QuantitativeScale<number>>this.y().scale).snapsDomain(!autorangeSmooth);
@@ -154,7 +168,7 @@ export module Plots {
       }
 
       var yScale = <QuantitativeScale<number>>this.y().scale;
-      var xScale = <QuantitativeScale<any>>this.x().scale;
+      var xScale = <QuantitativeScale<X>>this.x().scale;
 
       var intersectionPoints: Point[][] = [[], [], [], []];
       var leftX = xScale.scale(xScale.domain()[0]);
