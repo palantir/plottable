@@ -6237,6 +6237,18 @@ var Plottable;
             GuideLineLayer.prototype.fixedHeight = function () {
                 return true;
             };
+            GuideLineLayer.prototype.computeLayout = function (origin, availableWidth, availableHeight) {
+                _super.prototype.computeLayout.call(this, origin, availableWidth, availableHeight);
+                if (this.scale() != null) {
+                    if (this._isVertical()) {
+                        this.scale().range([0, this.width()]);
+                    }
+                    else {
+                        this.scale().range([this.height(), 0]);
+                    }
+                }
+                return this;
+            };
             GuideLineLayer.prototype.renderImmediately = function () {
                 _super.prototype.renderImmediately.call(this);
                 this._syncValueAndPixelPosition();
@@ -6269,7 +6281,7 @@ var Plottable;
                 this._scale = scale;
                 this._scale.onUpdate(this._scaleUpdateCallback);
                 this._syncValueAndPixelPosition();
-                this.render();
+                this.redraw();
                 return this;
             };
             GuideLineLayer.prototype.value = function (value) {

@@ -51,6 +51,18 @@ export module Components {
       return true;
     }
 
+    public computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number) {
+      super.computeLayout(origin, availableWidth, availableHeight);
+      if (this.scale() != null) {
+        if (this._isVertical()) {
+          this.scale().range([0, this.width()]);
+        } else {
+          this.scale().range([this.height(), 0]);
+        }
+      }
+      return this;
+    }
+
     public renderImmediately() {
       super.renderImmediately();
       this._syncValueAndPixelPosition();
@@ -99,7 +111,7 @@ export module Components {
       this._scale = scale;
       this._scale.onUpdate(this._scaleUpdateCallback);
       this._syncValueAndPixelPosition();
-      this.render();
+      this.redraw();
       return this;
     }
 

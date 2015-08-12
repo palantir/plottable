@@ -2427,6 +2427,7 @@ declare module Plottable {
             };
             fixedWidth(): boolean;
             fixedHeight(): boolean;
+            computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number): GuideLineLayer<D>;
             renderImmediately(): GuideLineLayer<D>;
             /**
              * Gets the QuantitativeScale on the GuideLineLayer.

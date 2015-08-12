@@ -256,6 +256,21 @@ describe("GuideLineLayer", () => {
 
       svg.remove();
     });
+
+    it("sets the scale's range based on the allocated width", () => {
+      let svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+      let gll = new Plottable.Components.GuideLineLayer<number>("vertical");
+      let scale1 = new Plottable.Scales.Linear();
+      gll.scale(scale1);
+      gll.renderTo(svg);
+      assert.deepEqual(gll.scale().range(), [0, SVG_WIDTH], "range was set based on the allocated width");
+
+      let scale2 = new Plottable.Scales.Linear();
+      gll.scale(scale2);
+      assert.deepEqual(gll.scale().range(), [0, SVG_WIDTH], "replacement scale has its range set based on the allocated width");
+
+      svg.remove();
+    });
   });
 
   describe("rendering (horizontal)", () => {
@@ -394,6 +409,21 @@ describe("GuideLineLayer", () => {
         y2: scale2.scale(value)
       };
       TestMethods.assertLineAttrs(line, expectedAttrs2, "the line was redrawn at the new position when the scale was changed");
+
+      svg.remove();
+    });
+
+    it("sets the scale's range based on the allocated height", () => {
+      let svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+      let gll = new Plottable.Components.GuideLineLayer<number>("horizontal");
+      let scale1 = new Plottable.Scales.Linear();
+      gll.scale(scale1);
+      gll.renderTo(svg);
+      assert.deepEqual(gll.scale().range(), [SVG_HEIGHT, 0], "range was set based on the allocated height");
+
+      let scale2 = new Plottable.Scales.Linear();
+      gll.scale(scale2);
+      assert.deepEqual(gll.scale().range(), [SVG_HEIGHT, 0], "replacement scale has its range set based on the allocated height");
 
       svg.remove();
     });
