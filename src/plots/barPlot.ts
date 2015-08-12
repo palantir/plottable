@@ -421,7 +421,7 @@ export module Plots {
         let w = attrToProjector["width"](d, i, dataset);
         let h = attrToProjector["height"](d, i, dataset);
         let x = attrToProjector["x"](d, i, dataset);
-        let y = attrToProjector["y"](d, i, dataset);
+        let baselineY = attrToProjector["y"](d, i, dataset);
         let positive = originalPositionFn(d, i, dataset) <= scaledBaseline;
         let measurement = measurer.measure(text);
         let primary = this._isVertical ? h : w;
@@ -429,26 +429,27 @@ export module Plots {
         let secondaryAttrTextSpace = this._isVertical ? measurement.width : measurement.height;
         let secondaryAttrAvailableSpace = this._isVertical ? w : h;
         let tooWide = secondaryAttrTextSpace + 2 * Bar._LABEL_HORIZONTAL_PADDING > secondaryAttrAvailableSpace;
-        let showLabelAboveBar = (measurement.height > h);
+        let showLabelOffBar = (measurement.height > h);
         if (measurement.width <= w) {
           let offset = Math.min((primary - primarySpace) / 2, Bar._LABEL_VERTICAL_PADDING);
           if (!positive) { offset = offset * -1; }
-          if (this._isVertical) {
-            y += offset;
-          } else {
-            x += offset;
-          }
+
+          let yCalculator = () => {
+            let addend = offset;
+            if (showLabelOffBar && positive) {
+                addend += (offset - h);
+            }
+            if (showLabelOffBar && !positive) {
+                addend += measurement.height
+            };
+            return baselineY + addend;
+          };
+
+          let y = yCalculator();
 
           let labelPosition = {
             x: x,
-            y: y
-          };
-
-          if (showLabelAboveBar) {
-            y = y - h + offset;
-            labelPosition.y = y;
-          } else {
-            labelPosition.y = positive ? y : y + h - measurement.height;
+            y: positive ? y : y + h - measurement.height
           };
 
           if (this._isVertical) {
@@ -462,7 +463,7 @@ export module Plots {
           }
 
           let g = labelArea.append("g").attr("transform", "translate(" + x + "," + y + ")");
-          let labelPositioningClassName = showLabelAboveBar ? "above-bar-label" : "in-bar-label";
+          let labelPositioningClassName = showLabelOffBar ? "off-bar-label" : "on-bar-label";
           g.classed(labelPositioningClassName, true);
 
           g.style("visibility", "inherit");

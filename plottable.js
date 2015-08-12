@@ -7908,7 +7908,7 @@ var Plottable;
                     var w = attrToProjector["width"](d, i, dataset);
                     var h = attrToProjector["height"](d, i, dataset);
                     var x = attrToProjector["x"](d, i, dataset);
-                    var y = attrToProjector["y"](d, i, dataset);
+                    var baselineY = attrToProjector["y"](d, i, dataset);
                     var positive = originalPositionFn(d, i, dataset) <= scaledBaseline;
                     var measurement = measurer.measure(text);
                     var primary = _this._isVertical ? h : w;
@@ -7916,30 +7916,28 @@ var Plottable;
                     var secondaryAttrTextSpace = _this._isVertical ? measurement.width : measurement.height;
                     var secondaryAttrAvailableSpace = _this._isVertical ? w : h;
                     var tooWide = secondaryAttrTextSpace + 2 * Bar._LABEL_HORIZONTAL_PADDING > secondaryAttrAvailableSpace;
-                    var showLabelAboveBar = (measurement.height > h);
+                    var showLabelOffBar = (measurement.height > h);
                     if (measurement.width <= w) {
                         var offset = Math.min((primary - primarySpace) / 2, Bar._LABEL_VERTICAL_PADDING);
                         if (!positive) {
                             offset = offset * -1;
                         }
-                        if (_this._isVertical) {
-                            y += offset;
-                        }
-                        else {
-                            x += offset;
-                        }
+                        var yCalculator = function () {
+                            var addend = offset;
+                            if (showLabelOffBar && positive) {
+                                addend += (offset - h);
+                            }
+                            if (showLabelOffBar && !positive) {
+                                addend += measurement.height;
+                            }
+                            ;
+                            return baselineY + addend;
+                        };
+                        var y = yCalculator();
                         var labelPosition = {
                             x: x,
-                            y: y
+                            y: positive ? y : y + h - measurement.height
                         };
-                        if (showLabelAboveBar) {
-                            y = y - h + offset;
-                            labelPosition.y = y;
-                        }
-                        else {
-                            labelPosition.y = positive ? y : y + h - measurement.height;
-                        }
-                        ;
                         if (_this._isVertical) {
                             labelPosition.x = x + w / 2 - measurement.width / 2;
                         }
@@ -7952,7 +7950,7 @@ var Plottable;
                             }
                         }
                         var g = labelArea.append("g").attr("transform", "translate(" + x + "," + y + ")");
-                        var labelPositioningClassName = showLabelAboveBar ? "above-bar-label" : "in-bar-label";
+                        var labelPositioningClassName = showLabelOffBar ? "off-bar-label" : "on-bar-label";
                         g.classed(labelPositioningClassName, true);
                         g.style("visibility", "inherit");
                         var xAlign;
