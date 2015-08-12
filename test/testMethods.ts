@@ -230,11 +230,7 @@ module TestMethods {
     event.initEvent(type, true, true);
     event.keyCode = keyCode;
     if (options != null ) {
-      for (var key in options) {
-        if (options.hasOwnProperty(key)) {
-          (<any> event)[key] = options[key];
-        }
-      }
+      Object.keys(options).forEach((key) => (<any> event)[key] = options[key] );
     }
     target.node().dispatchEvent(event);
   }

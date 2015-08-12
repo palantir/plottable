@@ -116,6 +116,36 @@ describe("Interactions", () => {
         keyInteraction.offKeyPress(aCode, aCallback2);
         svg.remove();
       });
+
+      it("is only triggered once when the key is pressed", () => {
+        keyInteraction.onKeyPress(aCode, aCallback);
+        keyInteraction.attachTo(component);
+
+        TestMethods.triggerFakeMouseEvent("mouseover", component.background(), 100, 100);
+        TestMethods.triggerFakeKeyboardEvent("keydown", component.background(), aCode);
+        assert.isTrue(aCallbackCalled, "callback for \"a\" was called when \"a\" key was pressed");
+
+        aCallbackCalled = false;
+        TestMethods.triggerFakeKeyboardEvent("keydown", component.background(), aCode, { repeat : true });
+        assert.isFalse(aCallbackCalled, "callback for \"a\" was not called when keydown was fired the second time");
+
+        keyInteraction.offKeyPress(aCode, aCallback);
+        svg.remove();
+      });
+
+      it("does not fire callback pressing the key when mouse was outside and moved inside", () => {
+        keyInteraction.onKeyPress(aCode, aCallback);
+        keyInteraction.attachTo(component);
+
+        TestMethods.triggerFakeMouseEvent("mouseout", component.background(), -100, -100);
+        TestMethods.triggerFakeKeyboardEvent("keydown", component.background(), aCode);
+        TestMethods.triggerFakeMouseEvent("mouseover", component.background(), 100, 100);
+        TestMethods.triggerFakeKeyboardEvent("keydown", component.background(), aCode, { repeat : true });
+        assert.isFalse(aCallbackCalled, "callback for \"a\" was not called");
+
+        keyInteraction.offKeyPress(aCode, aCallback);
+        svg.remove();
+      });
     });
 
     describe("onKeyRelease", () => {
@@ -196,12 +226,6 @@ describe("Interactions", () => {
         TestMethods.triggerFakeKeyboardEvent("keyup", component.background(), aCode);
         assert.isFalse(aCallbackCalled, "callback for \"a\" was not called when \"a\" key was released");
 
-        TestMethods.triggerFakeMouseEvent("mouseout", component.background(), -100, -100);
-        TestMethods.triggerFakeKeyboardEvent("keydown", component.background(), aCode);
-        TestMethods.triggerFakeMouseEvent("mouseover", component.background(), 100, 100);
-        TestMethods.triggerFakeKeyboardEvent("keyup", component.background(), aCode);
-        TestMethods.triggerFakeKeyboardEvent("keydown", component.background(), aCode, { repeat : true });
-        assert.isFalse(aCallbackCalled, "callback for \"a\" was not called when \"a\" key was released");
         keyInteraction.offKeyRelease(aCode, aCallback);
         svg.remove();
       });
