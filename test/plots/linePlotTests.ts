@@ -432,14 +432,122 @@ describe("Plots", () => {
         ];
 
         var line = new Plottable.Plots.Line();
+        line.autorangeSmooth(true);
         line.x(function(d) { return d.x; }, xScale);
         line.y(function(d) { return d.y; }, yScale);
         line.addDataset(new Plottable.Dataset(data));
         line.autorangeMode("y");
-        line.autorangeSmooth(true);
 
         line.renderTo(svg);
 
+        assert.closeTo(yScale.domain()[0], -1.625, 0.001, "smooth autoranging forces the domain to include the line (left)");
+        assert.closeTo(yScale.domain()[1], -1.041, 0.001, "Smooth autoranging forces the domain to include the line (right)");
+
+        svg.remove();
+      });
+
+      it("smooth autoranging works (called before before autorangeMode)", () => {
+        var svg = TestMethods.generateSVG(500, 500);
+
+        var xScale = new Plottable.Scales.Linear();
+        var yScale = new Plottable.Scales.Linear();
+        xScale.domain([0.1, 1.1]);
+
+        var data = [
+          {"x": 0.0, "y": -1},
+          {"x": 1.8, "y": -2}
+        ];
+
+        var line = new Plottable.Plots.Line();
+        line.x(function(d) { return d.x; }, xScale);
+        line.y(function(d) { return d.y; }, yScale);
+        line.addDataset(new Plottable.Dataset(data));
+        line.autorangeSmooth(true);
+        line.autorangeMode("y");
+
+        line.renderTo(svg);
+
+        assert.closeTo(yScale.domain()[0], -1.625, 0.001, "smooth autoranging forces the domain to include the line (left)");
+        assert.closeTo(yScale.domain()[1], -1.041, 0.001, "Smooth autoranging forces the domain to include the line (right)");
+
+        svg.remove();
+      });
+
+      it("smooth autoranging works (called before before rendering)", () => {
+        var svg = TestMethods.generateSVG(500, 500);
+
+        var xScale = new Plottable.Scales.Linear();
+        var yScale = new Plottable.Scales.Linear();
+        xScale.domain([0.1, 1.1]);
+
+        var data = [
+          {"x": 0.0, "y": -1},
+          {"x": 1.8, "y": -2}
+        ];
+
+        var line = new Plottable.Plots.Line();
+        line.x(function(d) { return d.x; }, xScale);
+        line.y(function(d) { return d.y; }, yScale);
+        line.addDataset(new Plottable.Dataset(data));
+        line.autorangeMode("y");
+
+        line.autorangeSmooth(true);
+        line.renderTo(svg);
+
+        assert.closeTo(yScale.domain()[0], -1.625, 0.001, "smooth autoranging forces the domain to include the line (left)");
+        assert.closeTo(yScale.domain()[1], -1.041, 0.001, "Smooth autoranging forces the domain to include the line (right)");
+
+        svg.remove();
+      });
+
+      it("smooth autoranging works (called before after rendering)", () => {
+        var svg = TestMethods.generateSVG(500, 500);
+
+        var xScale = new Plottable.Scales.Linear();
+        var yScale = new Plottable.Scales.Linear();
+        xScale.domain([0.1, 1.1]);
+
+        var data = [
+          {"x": 0.0, "y": -1},
+          {"x": 1.8, "y": -2}
+        ];
+
+        var line = new Plottable.Plots.Line();
+        line.x(function(d) { return d.x; }, xScale);
+        line.y(function(d) { return d.y; }, yScale);
+        line.addDataset(new Plottable.Dataset(data));
+        line.autorangeMode("y");
+
+        line.renderTo(svg);
+
+        line.autorangeSmooth(true);
+        assert.closeTo(yScale.domain()[0], -1.625, 0.001, "smooth autoranging forces the domain to include the line (left)");
+        assert.closeTo(yScale.domain()[1], -1.041, 0.001, "Smooth autoranging forces the domain to include the line (right)");
+
+        svg.remove();
+      });
+
+      it("smooth autoranging works (called before after rendering, before autorangeMode)", () => {
+        var svg = TestMethods.generateSVG(500, 500);
+
+        var xScale = new Plottable.Scales.Linear();
+        var yScale = new Plottable.Scales.Linear();
+        xScale.domain([0.1, 1.1]);
+
+        var data = [
+          {"x": 0.0, "y": -1},
+          {"x": 1.8, "y": -2}
+        ];
+
+        var line = new Plottable.Plots.Line();
+        line.x(function(d) { return d.x; }, xScale);
+        line.y(function(d) { return d.y; }, yScale);
+        line.addDataset(new Plottable.Dataset(data));
+
+        line.renderTo(svg);
+
+        line.autorangeSmooth(true);
+        line.autorangeMode("y");
         assert.closeTo(yScale.domain()[0], -1.625, 0.001, "smooth autoranging forces the domain to include the line (left)");
         assert.closeTo(yScale.domain()[1], -1.041, 0.001, "Smooth autoranging forces the domain to include the line (right)");
 
