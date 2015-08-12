@@ -8186,8 +8186,11 @@ var Plottable;
                     return extent;
                 }
                 var direction = this.autorangeMode();
-                var edgeIntersectionPoints = this._getEdgeIntersectionPoints(direction);
-                var includedValues = edgeIntersectionPoints[0].concat(edgeIntersectionPoints[1]).map(function (point) { return point[direction]; });
+                var edgeIntersectionPoints = this._getEdgeIntersectionPoints();
+                var includedValues = direction === "y" ?
+                    edgeIntersectionPoints[0].concat(edgeIntersectionPoints[1]) :
+                    edgeIntersectionPoints[2].concat(edgeIntersectionPoints[3]);
+                includedValues = includedValues.map(function (point) { return point[direction]; });
                 var maxIncludedValue = Math.max.apply(this, includedValues);
                 var minIncludedValue = Math.min.apply(this, includedValues);
                 if (extent.length === 0) {
@@ -8201,14 +8204,14 @@ var Plottable;
                 }
                 return extent;
             };
-            Line.prototype._getEdgeIntersectionPoints = function (direction) {
+            Line.prototype._getEdgeIntersectionPoints = function () {
                 var _this = this;
                 if (!(this.y().scale instanceof Plottable.QuantitativeScale && this.x().scale instanceof Plottable.QuantitativeScale)) {
                     return [[], [], [], []];
                 }
                 var yScale = this.y().scale;
                 var xScale = this.x().scale;
-                var intersectionPoints = [[], []];
+                var intersectionPoints = [[], [], [], []];
                 var leftX = xScale.scale(xScale.domain()[0]);
                 var rightX = xScale.scale(xScale.domain()[1]);
                 var downY = yScale.scale(yScale.domain()[0]);
@@ -8244,11 +8247,31 @@ var Plottable;
                                 y: yScale.invert(prevY + y1)
                             });
                         }
+                        // If values crossed upper edge
+                        if ((prevY < upY) === (upY <= currY)) {
+                            x2 = currX - prevX;
+                            y1 = upY - prevY;
+                            y2 = currY - prevY;
+                            x1 = y1 * x2 / y2;
+                            intersectionPoints[2].push({
+                                x: xScale.invert(prevX + x1),
+                                y: upY
+                            });
+                        }
+                        // If values crossed lower edge
+                        if ((prevY < downY) === (downY <= currY)) {
+                            x2 = currX - prevX;
+                            y1 = downY - prevY;
+                            y2 = currY - prevY;
+                            x1 = y1 * x2 / y2;
+                            intersectionPoints[3].push({
+                                x: xScale.invert(prevX + x1),
+                                y: downY
+                            });
+                        }
                     }
                     ;
                 });
-                intersectionPoints.push([]);
-                intersectionPoints.push([]);
                 return intersectionPoints;
             };
             Line.prototype._getResetYFunction = function () {

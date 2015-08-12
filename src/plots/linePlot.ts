@@ -106,6 +106,7 @@ export module Plots {
         return extent;
       }
 
+
       if (this.autorangeMode() === "x" && accScaleBinding !== this.x()) {
         return extent;
       }
@@ -122,10 +123,14 @@ export module Plots {
         return extent;
       }
 
+
       var direction = this.autorangeMode();
 
-      var edgeIntersectionPoints = this._getEdgeIntersectionPoints(direction);
-      var includedValues = edgeIntersectionPoints[0].concat(edgeIntersectionPoints[1]).map((point: any) => point[direction]);
+      var edgeIntersectionPoints = this._getEdgeIntersectionPoints();
+      var includedValues = direction === "y" ?
+          edgeIntersectionPoints[0].concat(edgeIntersectionPoints[1]) :
+          edgeIntersectionPoints[2].concat(edgeIntersectionPoints[3]);
+      includedValues = includedValues.map((point: any) => point[direction]);
 
       var maxIncludedValue = Math.max.apply(this, includedValues);
       var minIncludedValue = Math.min.apply(this, includedValues);
@@ -145,16 +150,16 @@ export module Plots {
       return extent;
     }
 
-    private _getEdgeIntersectionPoints(direction: string): Point[][] {
+    private _getEdgeIntersectionPoints(): Point[][] {
 
       if (!(this.y().scale instanceof QuantitativeScale && this.x().scale instanceof QuantitativeScale)) {
         return [[], [], [], []];
       }
 
       var yScale = <QuantitativeScale<number>>this.y().scale;
-      var xScale = this.x().scale;
+      var xScale = <QuantitativeScale<any>>this.x().scale;
 
-      var intersectionPoints: Point[][] = [[], []];
+      var intersectionPoints: Point[][] = [[], [], [], []];
       var leftX = xScale.scale(xScale.domain()[0]);
       var rightX = xScale.scale(xScale.domain()[1]);
       var downY = yScale.scale(yScale.domain()[0]);
@@ -199,11 +204,32 @@ export module Plots {
           }
 
           // If values crossed upper edge
+          if ((prevY < upY) === (upY <= currY)) {
+            x2 = currX - prevX;
+            y1 = upY - prevY;
+            y2 = currY - prevY;
+            x1 = y1 * x2 / y2;
+
+            intersectionPoints[2].push({
+              x: xScale.invert(prevX + x1),
+              y: upY
+            });
+          }
+
+          // If values crossed lower edge
+          if ((prevY < downY) === (downY <= currY)) {
+            x2 = currX - prevX;
+            y1 = downY - prevY;
+            y2 = currY - prevY;
+            x1 = y1 * x2 / y2;
+
+            intersectionPoints[3].push({
+              x: xScale.invert(prevX + x1),
+              y: downY
+            });
+          }
         };
       });
-
-      intersectionPoints.push([]);
-      intersectionPoints.push([]);
 
       return intersectionPoints;
     }
