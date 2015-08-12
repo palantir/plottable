@@ -388,7 +388,7 @@ describe("Plots", () => {
 
         var data = [
           {"x": 0.0, "y": -1},
-          {"x": 1.8, "y": -2},
+          {"x": 1.8, "y": -2}
         ];
 
         var line = new Plottable.Plots.Line();
@@ -430,7 +430,7 @@ describe("Plots", () => {
 
         var data = [
           {"x": 0.0, "y": -1},
-          {"x": 1.8, "y": -2},
+          {"x": 1.8, "y": -2}
         ];
 
         var line = new Plottable.Plots.Line();
@@ -461,7 +461,7 @@ describe("Plots", () => {
 
         var data = [
           {"x": 0.0, "y": -1},
-          {"x": 1.8, "y": -2},
+          {"x": 1.8, "y": -2}
         ];
 
         var line = new Plottable.Plots.Line();
@@ -483,47 +483,45 @@ describe("Plots", () => {
         svg.remove();
       });
 
-      // it("smooth autoranging works for vertical lines", () => {
-      //   var svg = TestMethods.generateSVG(500, 500);
+      it("smooth autoranging works for vertical lines", () => {
+        var svg = TestMethods.generateSVG(500, 500);
 
-      //   var xScale = new Plottable.Scales.Linear();
-      //   var yScale = new Plottable.Scales.Linear();
-      //   yScale.domain([0.1, 1.1]);
+        var xScale = new Plottable.Scales.Linear();
+        var yScale = new Plottable.Scales.Linear();
+        yScale.domain([0.1, 1.1]);
 
-      //   var data = [
-      //     {"x": 0.0, "y": -1},
-      //     {"x": 1.8, "y": -2},
-      //   ];
+        var data = [
+          {"x": -2, "y": 1.8},
+          {"x": -1, "y": 0.0}
+        ];
 
-      //   var line = new Plottable.Plots.Line();
-      //   line.x(function(d) { return d.x; }, xScale);
-      //   line.y(function(d) { return d.y; }, yScale);
-      //   line.addDataset(new Plottable.Dataset(data));
-      //   line.autorangeMode("x");
+        var line = new Plottable.Plots.Line();
+        line.x(function(d) { return d.x; }, xScale);
+        line.y(function(d) { return d.y; }, yScale);
+        line.addDataset(new Plottable.Dataset(data));
+        line.autorangeMode("x");
 
-      //   xScale.padProportion(0);
-      //   yScale.padProportion(0);
-      //   line.renderTo(svg);
+        xScale.padProportion(0);
+        yScale.padProportion(0);
+        line.renderTo(svg);
 
-      //   assert.deepEqual(xScale.domain(), [0, 1], "when there are no visible points in the view, the x-scale domain defaults to [0, 1]");
+        assert.deepEqual(xScale.domain(), [0, 1], "when there are no visible points in the view, the x-scale domain defaults to [0, 1]");
 
-      //   line.autorangeSmooth(true);
-      //   assert.closeTo(xScale.domain()[0], -1.61111, 0.001, "smooth autoranging forces the domain to include the line (left)");
-      //   assert.closeTo(xScale.domain()[1], -1.05555, 0.001, "Smooth autoranging forces the domain to include the line (right)");
+        line.autorangeSmooth(true);
+        assert.closeTo(xScale.domain()[0], -1.61111, 0.001, "smooth autoranging forces the domain to include the line (left)");
+        assert.closeTo(xScale.domain()[1], -1.05555, 0.001, "smooth autoranging forces the domain to include the line (right)");
 
-      //   line.autorangeSmooth(false);
-      //   assert.deepEqual(xScale.domain(), [0, 1], "Resetting the smooth autorange works");
+        line.autorangeSmooth(false);
+        assert.deepEqual(xScale.domain(), [0, 1], "resetting the smooth autorange works");
 
-      //   xScale.domain([data[0].x, data[1].x]);
-      //   assert.deepEqual(xScale.domain(), [-2, -1], "no changes for autoranging smooth with same edge poitns (no smooth)");
+        yScale.domain([data[0].y, data[1].y]);
+        assert.deepEqual(xScale.domain(), [-2, -1], "no changes for autoranging smooth with same edge poitns (no smooth)");
 
-      //   line.autorangeSmooth(true);
-      //   assert.deepEqual(xScale.domain(), [-2, -1], "no changes for autoranging smooth with same edge points (smooth)");
+        line.autorangeSmooth(true);
+        assert.deepEqual(xScale.domain(), [-2, -1], "no changes for autoranging smooth with same edge points (smooth)");
 
-      //   svg.remove();
-
-      // });
-
+        svg.remove();
+      });
 
     });
   });
