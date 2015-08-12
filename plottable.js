@@ -6759,7 +6759,7 @@ var Plottable;
                 return this;
             };
             Pie.prototype.labelsEnabled = function (enabled) {
-                if (enabled == null) {
+                if (enabled === undefined) {
                     return this._labelsEnabled;
                 }
                 else {
@@ -7259,6 +7259,7 @@ var Plottable;
             function Rectangle() {
                 _super.call(this);
                 this._labelsEnabled = false;
+                this._label = null;
                 this.animator("rectangles", new Plottable.Animators.Null());
                 this.addClass("rectangle-plot");
             }
@@ -7442,9 +7443,9 @@ var Plottable;
             };
             Rectangle.prototype.label = function (label) {
                 if (label == null) {
-                    return this._propertyBindings.get(Rectangle._LABEL_KEY);
+                    return this._label;
                 }
-                this._bindProperty(Rectangle._LABEL_KEY, label, null);
+                this._label = label;
                 this.render();
                 return this;
             };
@@ -7526,7 +7527,7 @@ var Plottable;
                 var measurer = new SVGTypewriter.Measurers.Measurer(labelArea);
                 var writer = new SVGTypewriter.Writers.Writer(measurer);
                 data.forEach(function (datum, datumIndex) {
-                    var label = "" + _this.label().accessor(datum, datumIndex, dataset);
+                    var label = "" + _this.label()(datum, datumIndex, dataset);
                     var measurement = measurer.measure(label);
                     var x = attrToProjector["x"](datum, datumIndex, dataset);
                     var y = attrToProjector["y"](datum, datumIndex, dataset);
@@ -7553,7 +7554,6 @@ var Plottable;
             };
             Rectangle._X2_KEY = "x2";
             Rectangle._Y2_KEY = "y2";
-            Rectangle._LABEL_KEY = "label";
             return Rectangle;
         })(Plottable.XYPlot);
         Plots.Rectangle = Rectangle;
@@ -7814,7 +7814,7 @@ var Plottable;
                 return this;
             };
             Bar.prototype.labelsEnabled = function (enabled) {
-                if (enabled == null) {
+                if (enabled === undefined) {
                     return this._labelsEnabled;
                 }
                 else {

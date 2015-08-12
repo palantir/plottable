@@ -5,8 +5,8 @@ export module Plots {
   export class Rectangle<X, Y> extends XYPlot<X, Y> {
     private static _X2_KEY = "x2";
     private static _Y2_KEY = "y2";
-    private static _LABEL_KEY = "label";
     private _labelsEnabled = false;
+    private _label: Accessor<string> = null;
 
     /**
      * A Rectangle Plot displays rectangles based on the data.
@@ -308,7 +308,7 @@ export module Plots {
     /**
      * Gets the Accessor for label.
      */
-    public label(): AccessorScaleBinding<any, string>;
+    public label(): Accessor<string>;
     /**
      * Sets label to the result of an Accessor.
      *
@@ -318,10 +318,10 @@ export module Plots {
     public label(label: Accessor<string>): Plots.Rectangle<X, Y>;
     public label(label?: Accessor<string>): any {
       if (label == null) {
-        return this._propertyBindings.get(Rectangle._LABEL_KEY);
+        return this._label;
       }
 
-      this._bindProperty(Rectangle._LABEL_KEY, label, null);
+      this._label = label;
       this.render();
       return this;
     }
@@ -419,7 +419,7 @@ export module Plots {
       let measurer = new SVGTypewriter.Measurers.Measurer(labelArea);
       let writer = new SVGTypewriter.Writers.Writer(measurer);
       data.forEach((datum, datumIndex) => {
-        let label = "" + this.label().accessor(datum, datumIndex, dataset);
+        let label = "" + this.label()(datum, datumIndex, dataset);
         let measurement = measurer.measure(label);
 
         let x = attrToProjector["x"](datum, datumIndex, dataset);

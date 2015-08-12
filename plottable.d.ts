@@ -2899,7 +2899,7 @@ declare module Plottable {
             /**
              * Gets the Accessor for label.
              */
-            label(): AccessorScaleBinding<any, string>;
+            label(): Accessor<string>;
             /**
              * Sets label to the result of an Accessor.
              *
