@@ -8185,12 +8185,14 @@ var Plottable;
                 if (!(accScaleBinding.scale)) {
                     return extent;
                 }
-                var direction = this.autorangeMode();
                 var edgeIntersectionPoints = this._getEdgeIntersectionPoints();
-                var includedValues = direction === "y" ?
-                    edgeIntersectionPoints[0].concat(edgeIntersectionPoints[1]) :
-                    edgeIntersectionPoints[2].concat(edgeIntersectionPoints[3]);
-                includedValues = includedValues.map(function (point) { return point[direction]; });
+                var includedValues;
+                if (this.autorangeMode() === "y") {
+                    includedValues = edgeIntersectionPoints[0].concat(edgeIntersectionPoints[1]).map(function (point) { return point.y; });
+                }
+                else {
+                    includedValues = edgeIntersectionPoints[2].concat(edgeIntersectionPoints[3]).map(function (point) { return point.x; });
+                }
                 var maxIncludedValue = Math.max.apply(this, includedValues);
                 var minIncludedValue = Math.min.apply(this, includedValues);
                 if (extent.length === 0) {

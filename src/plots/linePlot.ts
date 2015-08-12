@@ -99,7 +99,6 @@ export module Plots {
     }
 
     protected _computeExtent(dataset: Dataset, accScaleBinding: Plots.AccessorScaleBinding<any, any>, filter: Accessor<boolean>): any[] {
-
       var extent = super._computeExtent(dataset, accScaleBinding, filter);
 
       if (!this._autorangeSmooth) {
@@ -123,14 +122,13 @@ export module Plots {
         return extent;
       }
 
-
-      var direction = this.autorangeMode();
-
       var edgeIntersectionPoints = this._getEdgeIntersectionPoints();
-      var includedValues = direction === "y" ?
-          edgeIntersectionPoints[0].concat(edgeIntersectionPoints[1]) :
-          edgeIntersectionPoints[2].concat(edgeIntersectionPoints[3]);
-      includedValues = includedValues.map((point: any) => point[direction]);
+      var includedValues: number[];
+      if (this.autorangeMode() === "y") {
+        includedValues = edgeIntersectionPoints[0].concat(edgeIntersectionPoints[1]).map((point) => point.y);
+      } else { // === "x"
+        includedValues = edgeIntersectionPoints[2].concat(edgeIntersectionPoints[3]).map((point) => point.x);
+      }
 
       var maxIncludedValue = Math.max.apply(this, includedValues);
       var minIncludedValue = Math.min.apply(this, includedValues);
@@ -151,7 +149,6 @@ export module Plots {
     }
 
     private _getEdgeIntersectionPoints(): Point[][] {
-
       if (!(this.y().scale instanceof QuantitativeScale && this.x().scale instanceof QuantitativeScale)) {
         return [[], [], [], []];
       }
