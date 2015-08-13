@@ -89,11 +89,11 @@ export module Plots {
       }
       this._autorangeSmooth = autorangeSmooth;
 
-      if (this.x() && this.x().scale && this.x().scale instanceof QuantitativeScale && this.autorangeMode() === "x") {
+      if (this.autorangeMode() === "x" && this.x() && this.x().scale && this.x().scale instanceof QuantitativeScale) {
         (<QuantitativeScale<X>>this.x().scale).snapsDomain(!autorangeSmooth);
       }
 
-      if (this.y() && this.y().scale && this.y().scale instanceof QuantitativeScale && this.autorangeMode() === "y") {
+      if (this.autorangeMode() === "y" && this.y() && this.y().scale && this.y().scale instanceof QuantitativeScale) {
         (<QuantitativeScale<number>>this.y().scale).snapsDomain(!autorangeSmooth);
       }
 

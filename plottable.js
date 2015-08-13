@@ -8173,10 +8173,10 @@ var Plottable;
                     return this._autorangeSmooth;
                 }
                 this._autorangeSmooth = autorangeSmooth;
-                if (this.x() && this.x().scale && this.x().scale instanceof Plottable.QuantitativeScale && this.autorangeMode() === "x") {
+                if (this.autorangeMode() === "x" && this.x() && this.x().scale && this.x().scale instanceof Plottable.QuantitativeScale) {
                     this.x().scale.snapsDomain(!autorangeSmooth);
                 }
-                if (this.y() && this.y().scale && this.y().scale instanceof Plottable.QuantitativeScale && this.autorangeMode() === "y") {
+                if (this.autorangeMode() === "y" && this.y() && this.y().scale && this.y().scale instanceof Plottable.QuantitativeScale) {
                     this.y().scale.snapsDomain(!autorangeSmooth);
                 }
                 this.autorangeMode(this.autorangeMode());
