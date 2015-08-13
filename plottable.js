@@ -8306,19 +8306,19 @@ var Plottable;
                 var _this = this;
                 if (!(this.y().scale instanceof Plottable.QuantitativeScale && this.x().scale instanceof Plottable.QuantitativeScale)) {
                     return {
-                        top: [],
-                        bottom: [],
                         left: [],
-                        right: []
+                        right: [],
+                        top: [],
+                        bottom: []
                     };
                 }
                 var yScale = this.y().scale;
                 var xScale = this.x().scale;
                 var intersectionPoints = {
-                    top: [],
-                    bottom: [],
                     left: [],
-                    right: []
+                    right: [],
+                    top: [],
+                    bottom: []
                 };
                 var leftX = xScale.scale(xScale.domain()[0]);
                 var rightX = xScale.scale(xScale.domain()[1]);

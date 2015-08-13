@@ -169,10 +169,10 @@ export module Plots {
     private _getEdgeIntersectionPoints(): EdgeIntersection {
       if (!(this.y().scale instanceof QuantitativeScale && this.x().scale instanceof QuantitativeScale)) {
         return {
-          top: [],
-          bottom: [],
           left: [],
-          right: []
+          right: [],
+          top: [],
+          bottom: []
         };
       }
 
@@ -180,10 +180,10 @@ export module Plots {
       let xScale = <QuantitativeScale<any>>this.x().scale;
 
       let intersectionPoints: EdgeIntersection = {
-        top: [],
-        bottom: [],
         left: [],
-        right: []
+        right: [],
+        top: [],
+        bottom: []
       };
       let leftX = xScale.scale(xScale.domain()[0]);
       let rightX = xScale.scale(xScale.domain()[1]);
