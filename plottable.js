@@ -8300,16 +8300,7 @@ var Plottable;
                 else {
                     includedValues = edgeIntersectionPoints.top.concat(edgeIntersectionPoints.bottom).map(function (point) { return point.x; });
                 }
-                var maxIncludedValue = Math.max.apply(this, includedValues);
-                var minIncludedValue = Math.min.apply(this, includedValues);
-                extents = extents.map(function (extent) {
-                    // When no end-points are in the viewport
-                    if (extent.length === 0) {
-                        return [minIncludedValue, maxIncludedValue];
-                    }
-                    return [Math.min(minIncludedValue, extent[0]), Math.max(maxIncludedValue, extent[1])];
-                });
-                return extents;
+                return extents.map(function (extent) { return d3.extent(d3.merge([extent, includedValues])); });
             };
             Line.prototype._getEdgeIntersectionPoints = function () {
                 var _this = this;

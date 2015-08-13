@@ -163,18 +163,7 @@ export module Plots {
         includedValues = edgeIntersectionPoints.top.concat(edgeIntersectionPoints.bottom).map((point) => point.x);
       }
 
-      let maxIncludedValue = Math.max.apply(this, includedValues);
-      let minIncludedValue = Math.min.apply(this, includedValues);
-
-      extents = extents.map((extent) => {
-        // When no end-points are in the viewport
-        if (extent.length === 0) {
-          return [minIncludedValue, maxIncludedValue];
-        }
-        return [Math.min(minIncludedValue, extent[0]), Math.max(maxIncludedValue, extent[1])];
-      });
-
-      return extents;
+      return extents.map((extent: [number, number]) => d3.extent(d3.merge([extent, includedValues])));
     }
 
     private _getEdgeIntersectionPoints(): EdgeIntersection {
