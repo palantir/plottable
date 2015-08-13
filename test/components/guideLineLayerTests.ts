@@ -69,7 +69,7 @@ describe("GuideLineLayer", () => {
       assert.strictEqual(gll.value(), expectedValueB, "value was updated when the position was changed again");
     });
 
-    it("updating the scale's domain updates pixelPosition() to match the existing value()", () => {
+    it("changing the scale's domain updates pixelPositon() if value() was the last property set", () => {
       let linearScale = new Plottable.Scales.Linear();
       linearScale.domain([0, 1]);
       linearScale.range([0, 100]);
@@ -82,42 +82,77 @@ describe("GuideLineLayer", () => {
       assert.strictEqual(gll.pixelPosition(), linearScale.scale(value), "pixel position was updated when scale updated");
     });
 
-    it("changing the scale updates pixelPosition() if value() is set", () => {
+    it("changing the scale's domain updates value() if pixelPosition() was the last property set", () => {
+      let linearScale = new Plottable.Scales.Linear();
+      linearScale.domain([0, 1]);
+      linearScale.range([0, 100]);
+      let gll = new Plottable.Components.GuideLineLayer<number>("vertical");
+      gll.scale(linearScale);
+      let pixelPosition = 50;
+      gll.pixelPosition(pixelPosition);
+      assert.strictEqual(gll.value(), linearScale.invert(pixelPosition), "value matches set pixel position");
+      linearScale.domain([0, 2]);
+      assert.strictEqual(gll.value(), linearScale.invert(pixelPosition), "value was updated when scale updated");
+    });
+
+    it("changing the scale updates pixelPosition() if value() was the last property set", () => {
       let linearScale = new Plottable.Scales.Linear();
       linearScale.domain([0, 1]);
       linearScale.range([0, 100]);
 
       let gll = new Plottable.Components.GuideLineLayer<number>("vertical");
-      let value = 0.5;
-      gll.value(value);
-      let setPosition = -999;
+
+      let setPosition = -100;
       gll.pixelPosition(setPosition);
-      let expectedPosition = linearScale.scale(value);
+      let setValue = 0.5;
+      gll.value(setValue);
+      let expectedPosition = linearScale.scale(setValue);
+
       gll.scale(linearScale);
-      assert.strictEqual(gll.pixelPosition(), expectedPosition, "setting the scale updates the pixel position");
+      assert.strictEqual(gll.pixelPosition(), expectedPosition,
+        "setting the scale updates the pixel position if value() was the last thing set");
+      assert.strictEqual(gll.value(), setValue, "value is not changed");
       assert.notStrictEqual(gll.pixelPosition(), setPosition, "originally-set pixel position was overridden");
 
       let linearScaleB = new Plottable.Scales.Linear();
       linearScaleB.domain([0, 1]);
       linearScaleB.range([0, 200]);
-      let expectedPositionB = linearScaleB.scale(value);
+      let expectedPositionB = linearScaleB.scale(setValue);
       gll.scale(linearScaleB);
-      assert.strictEqual(gll.pixelPosition(), expectedPositionB, "changing the scale updates the pixel position");
+      assert.strictEqual(gll.pixelPosition(), expectedPositionB,
+        "changing the scale updates the pixel position if value() was the last thing set");
+      assert.strictEqual(gll.value(), setValue, "value is not changed");
       assert.strictEqual((<any>linearScale)._callbacks.size, 0, "callback was removed from the previous Scale");
     });
 
-    it("changing the scale updates value() if pixelPosition() is set but value() is not", () => {
-      let gll = new Plottable.Components.GuideLineLayer<number>("vertical");
-      let position = 50;
-      gll.pixelPosition(position);
-
+    it("changing the scale updates value() if pixelPosition() was the last property set", () => {
       let linearScale = new Plottable.Scales.Linear();
       linearScale.domain([0, 1]);
       linearScale.range([0, 100]);
 
+      let gll = new Plottable.Components.GuideLineLayer<number>("vertical");
+
+      let setValue = 0.5;
+      gll.value(setValue);
+      let setPosition = -100;
+      gll.pixelPosition(setPosition);
+      let expectedValue = linearScale.invert(setPosition);
+
       gll.scale(linearScale);
-      let expectedValue = linearScale.invert(position);
-      assert.strictEqual(gll.value(), expectedValue, "value was updated to match the set pixel position");
+      assert.strictEqual(gll.value(), expectedValue,
+        "setting the scale updates the value if pixelPosition() was the last thing set");
+      assert.strictEqual(gll.pixelPosition(), setPosition, "pixel position is not changed");
+      assert.notStrictEqual(gll.value(), setValue, "originally-set value was overridden");
+
+      let linearScaleB = new Plottable.Scales.Linear();
+      linearScaleB.domain([0, 1]);
+      linearScaleB.range([0, 200]);
+      let expectedValueB = linearScaleB.invert(setPosition);
+      gll.scale(linearScaleB);
+      assert.strictEqual(gll.value(), expectedValueB,
+        "changing the scale updates the value if pixelPosition() was the last thing set");
+      assert.strictEqual(gll.pixelPosition(), setPosition, "pixel position is not changed");
+      assert.strictEqual((<any>linearScale)._callbacks.size, 0, "callback was removed from the previous Scale");
     });
   });
 

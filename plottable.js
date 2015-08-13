@@ -6207,6 +6207,7 @@ var Plottable;
             function GuideLineLayer(orientation) {
                 var _this = this;
                 _super.call(this);
+                this._primaryProperty = "value";
                 if (orientation !== GuideLineLayer.ORIENTATION_VERTICAL && orientation !== GuideLineLayer.ORIENTATION_HORIZONTAL) {
                     throw new Error(orientation + " is not a valid orientation for GuideLineLayer");
                 }
@@ -6214,7 +6215,7 @@ var Plottable;
                 this._clipPathEnabled = true;
                 this.addClass("guide-line-layer");
                 this._scaleUpdateCallback = function () {
-                    _this._setPixelPositionFromValue();
+                    _this._syncPixelPositionAndValue();
                     _this.render();
                 };
             }
@@ -6251,7 +6252,7 @@ var Plottable;
             };
             GuideLineLayer.prototype.renderImmediately = function () {
                 _super.prototype.renderImmediately.call(this);
-                this._setPixelPositionFromValue();
+                this._syncPixelPositionAndValue();
                 this._guideLine.attr({
                     x1: this._isVertical() ? this.pixelPosition() : 0,
                     y1: this._isVertical() ? 0 : this.pixelPosition(),
@@ -6260,13 +6261,15 @@ var Plottable;
                 });
                 return this;
             };
-            GuideLineLayer.prototype._setPixelPositionFromValue = function () {
-                if (this.scale() != null && this.value() != null) {
+            // sets pixelPosition() or value() based on the other, depending on which was the last one set
+            GuideLineLayer.prototype._syncPixelPositionAndValue = function () {
+                if (this.scale() == null) {
+                    return;
+                }
+                if (this._primaryProperty === "value" && this.value() != null) {
                     this._pixelPosition = this.scale().scale(this.value());
                 }
-            };
-            GuideLineLayer.prototype._setValueFromPixelPosition = function () {
-                if (this.scale() != null && this.pixelPosition() != null) {
+                else if (this._primaryProperty === "pixelPosition" && this.pixelPosition() != null) {
                     this._value = this.scale().invert(this.pixelPosition());
                 }
             };
@@ -6280,8 +6283,7 @@ var Plottable;
                 }
                 this._scale = scale;
                 this._scale.onUpdate(this._scaleUpdateCallback);
-                this._setPixelPositionFromValue();
-                this._setValueFromPixelPosition();
+                this._syncPixelPositionAndValue();
                 this.redraw();
                 return this;
             };
@@ -6290,7 +6292,8 @@ var Plottable;
                     return this._value;
                 }
                 this._value = value;
-                this._setPixelPositionFromValue();
+                this._primaryProperty = "value";
+                this._syncPixelPositionAndValue();
                 this.render();
                 return this;
             };
@@ -6299,7 +6302,8 @@ var Plottable;
                     return this._pixelPosition;
                 }
                 this._pixelPosition = pixelPosition;
-                this._setValueFromPixelPosition();
+                this._primaryProperty = "pixelPosition";
+                this._syncPixelPositionAndValue();
                 this.render();
                 return this;
             };

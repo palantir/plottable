@@ -12,6 +12,7 @@ export module Components {
     private _pixelPosition: number;
     private _scaleUpdateCallback: ScaleCallback<QuantitativeScale<D>>;
     private _guideLine: d3.Selection<void>;
+    private _primaryProperty = "value";
 
     constructor(orientation: string) {
       super();
@@ -22,7 +23,7 @@ export module Components {
       this._clipPathEnabled = true;
       this.addClass("guide-line-layer");
       this._scaleUpdateCallback = () => {
-        this._setPixelPositionFromValue();
+        this._syncPixelPositionAndValue();
         this.render();
       };
     }
@@ -65,7 +66,7 @@ export module Components {
 
     public renderImmediately() {
       super.renderImmediately();
-      this._setPixelPositionFromValue();
+      this._syncPixelPositionAndValue();
       this._guideLine.attr({
         x1: this._isVertical() ? this.pixelPosition() : 0,
         y1: this._isVertical() ? 0 : this.pixelPosition(),
@@ -75,14 +76,14 @@ export module Components {
       return this;
     }
 
-    private _setPixelPositionFromValue() {
-      if (this.scale() != null && this.value() != null) {
-        this._pixelPosition = this.scale().scale(this.value());
+    // sets pixelPosition() or value() based on the other, depending on which was the last one set
+    private _syncPixelPositionAndValue() {
+      if (this.scale() == null) {
+        return;
       }
-    }
-
-    private _setValueFromPixelPosition() {
-      if (this.scale() != null && this.pixelPosition() != null) {
+      if (this._primaryProperty === "value" && this.value() != null) {
+        this._pixelPosition = this.scale().scale(this.value());
+      } else if (this._primaryProperty === "pixelPosition" && this.pixelPosition() != null) {
         this._value = this.scale().invert(this.pixelPosition());
       }
     }
@@ -95,8 +96,8 @@ export module Components {
     public scale(): QuantitativeScale<D>;
     /**
      * Sets the QuantitativeScale on the GuideLineLayer.
-     * If value() has been set, pixelPosition() will be updated according to the new scale.
-     * Otherwise, if pixelPosition() has been set but value() has not, value() will be set.
+     * If value() was the last property set, pixelPosition() will be updated according to the new scale.
+     * If pixelPosition() was the last property set, value() will be updated according to the new scale.
      *
      * @param {QuantitativeScale<D>} scale
      * @return {GuideLineLayer<D>} The calling GuideLineLayer.
@@ -112,8 +113,7 @@ export module Components {
       }
       this._scale = scale;
       this._scale.onUpdate(this._scaleUpdateCallback);
-      this._setPixelPositionFromValue();
-      this._setValueFromPixelPosition();
+      this._syncPixelPositionAndValue();
       this.redraw();
       return this;
     }
@@ -126,7 +126,7 @@ export module Components {
     public value(): D;
     /**
      * Sets the value of the guide line in data-space.
-     * If the GuideLineLayer has a scale, pixelPosition() will be updated.
+     * If the GuideLineLayer has a scale, pixelPosition() will be updated now and whenever the scale updates.
      *
      * @param {D} value
      * @return {GuideLineLayer<D>} The calling GuideLineLayer.
@@ -137,7 +137,8 @@ export module Components {
         return this._value;
       }
       this._value = value;
-      this._setPixelPositionFromValue();
+      this._primaryProperty = "value";
+      this._syncPixelPositionAndValue();
       this.render();
       return this;
     }
@@ -150,7 +151,7 @@ export module Components {
     public pixelPosition(): number;
     /**
      * Sets the position of the guide line in pixel-space.
-     * If the GuideLineLayer has a scale, the value() will be updated.
+     * If the GuideLineLayer has a scale, the value() will be updated now and whenever the scale updates.
      *
      * @param {number} pixelPosition
      * @return {GuideLineLayer<D>} The calling GuideLineLayer.
@@ -161,7 +162,8 @@ export module Components {
         return this._pixelPosition;
       }
       this._pixelPosition = pixelPosition;
-      this._setValueFromPixelPosition();
+      this._primaryProperty = "pixelPosition";
+      this._syncPixelPositionAndValue();
       this.render();
       return this;
     }
