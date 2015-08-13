@@ -149,7 +149,6 @@ export module Plots {
       }
 
       var edgeIntersectionPoints = this._getEdgeIntersectionPoints();
-      console.log(edgeIntersectionPoints);
       var includedValues: number[];
       if (this.autorangeMode() === "y") {
         includedValues = edgeIntersectionPoints[0].concat(edgeIntersectionPoints[1]).map((point) => point.y);

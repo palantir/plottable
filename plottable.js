@@ -8205,7 +8205,6 @@ var Plottable;
                     return extents;
                 }
                 var edgeIntersectionPoints = this._getEdgeIntersectionPoints();
-                console.log(edgeIntersectionPoints);
                 var includedValues;
                 if (this.autorangeMode() === "y") {
                     includedValues = edgeIntersectionPoints[0].concat(edgeIntersectionPoints[1]).map(function (point) { return point.y; });
