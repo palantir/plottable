@@ -2,7 +2,7 @@
 
 module Plottable {
 export module Plots {
-  type EdgeIntersection = {
+  type EdgeIntersections = {
     left: Point[],
     right: Point[],
     top: Point[],
@@ -166,7 +166,7 @@ export module Plots {
       return extents.map((extent: [number, number]) => d3.extent(d3.merge([extent, includedValues])));
     }
 
-    private _getEdgeIntersectionPoints(): EdgeIntersection {
+    private _getEdgeIntersectionPoints(): EdgeIntersections {
       if (!(this.y().scale instanceof QuantitativeScale && this.x().scale instanceof QuantitativeScale)) {
         return {
           left: [],
@@ -179,7 +179,7 @@ export module Plots {
       let yScale = <QuantitativeScale<number>>this.y().scale;
       let xScale = <QuantitativeScale<any>>this.x().scale;
 
-      let intersectionPoints: EdgeIntersection = {
+      let intersectionPoints: EdgeIntersections = {
         left: [],
         right: [],
         top: [],
