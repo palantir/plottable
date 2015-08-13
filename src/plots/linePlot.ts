@@ -198,8 +198,8 @@ export module Plots {
       };
       let leftX = xScale.scale(xScale.domain()[0]);
       let rightX = xScale.scale(xScale.domain()[1]);
-      let downY = yScale.scale(yScale.domain()[0]);
-      let upY = yScale.scale(yScale.domain()[1]);
+      let bottomY = yScale.scale(yScale.domain()[0]);
+      let topY = yScale.scale(yScale.domain()[1]);
 
       this.datasets().forEach((dataset) => {
         let data = dataset.data();
@@ -240,28 +240,28 @@ export module Plots {
           }
 
           // If values crossed upper edge
-          if ((prevY < upY) === (upY <= currY)) {
+          if ((prevY < topY) === (topY <= currY)) {
             x2 = currX - prevX;
-            y1 = upY - prevY;
+            y1 = topY - prevY;
             y2 = currY - prevY;
             x1 = y1 * x2 / y2;
 
             intersectionPoints.top.push({
               x: xScale.invert(prevX + x1),
-              y: upY
+              y: topY
             });
           }
 
           // If values crossed lower edge
-          if ((prevY < downY) === (downY <= currY)) {
+          if ((prevY < bottomY) === (bottomY <= currY)) {
             x2 = currX - prevX;
-            y1 = downY - prevY;
+            y1 = bottomY - prevY;
             y2 = currY - prevY;
             x1 = y1 * x2 / y2;
 
             intersectionPoints.bottom.push({
               x: xScale.invert(prevX + x1),
-              y: downY
+              y: bottomY
             });
           }
         };

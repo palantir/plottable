@@ -8331,8 +8331,8 @@ var Plottable;
                 };
                 var leftX = xScale.scale(xScale.domain()[0]);
                 var rightX = xScale.scale(xScale.domain()[1]);
-                var downY = yScale.scale(yScale.domain()[0]);
-                var upY = yScale.scale(yScale.domain()[1]);
+                var bottomY = yScale.scale(yScale.domain()[0]);
+                var topY = yScale.scale(yScale.domain()[1]);
                 this.datasets().forEach(function (dataset) {
                     var data = dataset.data();
                     var x1, x2, y1, y2;
@@ -8365,25 +8365,25 @@ var Plottable;
                             });
                         }
                         // If values crossed upper edge
-                        if ((prevY < upY) === (upY <= currY)) {
+                        if ((prevY < topY) === (topY <= currY)) {
                             x2 = currX - prevX;
-                            y1 = upY - prevY;
+                            y1 = topY - prevY;
                             y2 = currY - prevY;
                             x1 = y1 * x2 / y2;
                             intersectionPoints.top.push({
                                 x: xScale.invert(prevX + x1),
-                                y: upY
+                                y: topY
                             });
                         }
                         // If values crossed lower edge
-                        if ((prevY < downY) === (downY <= currY)) {
+                        if ((prevY < bottomY) === (bottomY <= currY)) {
                             x2 = currX - prevX;
-                            y1 = downY - prevY;
+                            y1 = bottomY - prevY;
                             y2 = currY - prevY;
                             x1 = y1 * x2 / y2;
                             intersectionPoints.bottom.push({
                                 x: xScale.invert(prevX + x1),
-                                y: downY
+                                y: bottomY
                             });
                         }
                     }
