@@ -8207,10 +8207,10 @@ var Plottable;
                 var edgeIntersectionPoints = this._getEdgeIntersectionPoints();
                 var includedValues;
                 if (this.autorangeMode() === "y") {
-                    includedValues = edgeIntersectionPoints[0].concat(edgeIntersectionPoints[1]).map(function (point) { return point.y; });
+                    includedValues = edgeIntersectionPoints.left.concat(edgeIntersectionPoints.right).map(function (point) { return point.y; });
                 }
                 else {
-                    includedValues = edgeIntersectionPoints[2].concat(edgeIntersectionPoints[3]).map(function (point) { return point.x; });
+                    includedValues = edgeIntersectionPoints.top.concat(edgeIntersectionPoints.bottom).map(function (point) { return point.x; });
                 }
                 var maxIncludedValue = Math.max.apply(this, includedValues);
                 var minIncludedValue = Math.min.apply(this, includedValues);
@@ -8226,11 +8226,21 @@ var Plottable;
             Line.prototype._getEdgeIntersectionPoints = function () {
                 var _this = this;
                 if (!(this.y().scale instanceof Plottable.QuantitativeScale && this.x().scale instanceof Plottable.QuantitativeScale)) {
-                    return [[], [], [], []];
+                    return {
+                        top: [],
+                        bottom: [],
+                        left: [],
+                        right: []
+                    };
                 }
                 var yScale = this.y().scale;
                 var xScale = this.x().scale;
-                var intersectionPoints = [[], [], [], []];
+                var intersectionPoints = {
+                    top: [],
+                    bottom: [],
+                    left: [],
+                    right: []
+                };
                 var leftX = xScale.scale(xScale.domain()[0]);
                 var rightX = xScale.scale(xScale.domain()[1]);
                 var downY = yScale.scale(yScale.domain()[0]);
@@ -8250,7 +8260,7 @@ var Plottable;
                             x2 = currX - prevX;
                             y2 = currY - prevY;
                             y1 = x1 * y2 / x2;
-                            intersectionPoints[0].push({
+                            intersectionPoints.left.push({
                                 x: leftX,
                                 y: yScale.invert(prevY + y1)
                             });
@@ -8261,7 +8271,7 @@ var Plottable;
                             x2 = currX - prevX;
                             y2 = currY - prevY;
                             y1 = x1 * y2 / x2;
-                            intersectionPoints[1].push({
+                            intersectionPoints.right.push({
                                 x: rightX,
                                 y: yScale.invert(prevY + y1)
                             });
@@ -8272,7 +8282,7 @@ var Plottable;
                             y1 = upY - prevY;
                             y2 = currY - prevY;
                             x1 = y1 * x2 / y2;
-                            intersectionPoints[2].push({
+                            intersectionPoints.top.push({
                                 x: xScale.invert(prevX + x1),
                                 y: upY
                             });
@@ -8283,7 +8293,7 @@ var Plottable;
                             y1 = downY - prevY;
                             y2 = currY - prevY;
                             x1 = y1 * x2 / y2;
-                            intersectionPoints[3].push({
+                            intersectionPoints.bottom.push({
                                 x: xScale.invert(prevX + x1),
                                 y: downY
                             });

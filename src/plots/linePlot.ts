@@ -2,6 +2,13 @@
 
 module Plottable {
 export module Plots {
+  type EdgeIntersection = {
+    left: Point[],
+    right: Point[],
+    top: Point[],
+    bottom: Point[]
+  };
+
   export class Line<X> extends XYPlot<X, number> {
     private _interpolator: string | ((points: Array<[number, number]>) => string) = "linear";
 
@@ -151,9 +158,9 @@ export module Plots {
       var edgeIntersectionPoints = this._getEdgeIntersectionPoints();
       var includedValues: number[];
       if (this.autorangeMode() === "y") {
-        includedValues = edgeIntersectionPoints[0].concat(edgeIntersectionPoints[1]).map((point) => point.y);
+        includedValues = edgeIntersectionPoints.left.concat(edgeIntersectionPoints.right).map((point) => point.y);
       } else { // === "x"
-        includedValues = edgeIntersectionPoints[2].concat(edgeIntersectionPoints[3]).map((point) => point.x);
+        includedValues = edgeIntersectionPoints.top.concat(edgeIntersectionPoints.bottom).map((point) => point.x);
       }
 
       var maxIncludedValue = Math.max.apply(this, includedValues);
@@ -170,15 +177,25 @@ export module Plots {
       return extents;
     }
 
-    private _getEdgeIntersectionPoints(): Point[][] {
+    private _getEdgeIntersectionPoints(): EdgeIntersection {
       if (!(this.y().scale instanceof QuantitativeScale && this.x().scale instanceof QuantitativeScale)) {
-        return [[], [], [], []];
+        return {
+          top: [],
+          bottom: [],
+          left: [],
+          right: []
+        };
       }
 
       var yScale = <QuantitativeScale<number>>this.y().scale;
       var xScale = <QuantitativeScale<any>>this.x().scale;
 
-      var intersectionPoints: Point[][] = [[], [], [], []];
+      var intersectionPoints: EdgeIntersection = {
+        top: [],
+        bottom: [],
+        left: [],
+        right: []
+      };
       var leftX = xScale.scale(xScale.domain()[0]);
       var rightX = xScale.scale(xScale.domain()[1]);
       var downY = yScale.scale(yScale.domain()[0]);
@@ -203,7 +220,7 @@ export module Plots {
             y2 = currY - prevY;
             y1 = x1 * y2 / x2;
 
-            intersectionPoints[0].push({
+            intersectionPoints.left.push({
               x: leftX,
               y: yScale.invert(prevY + y1)
             });
@@ -216,7 +233,7 @@ export module Plots {
             y2 = currY - prevY;
             y1 = x1 * y2 / x2;
 
-            intersectionPoints[1].push({
+            intersectionPoints.right.push({
               x: rightX,
               y: yScale.invert(prevY + y1)
             });
@@ -229,7 +246,7 @@ export module Plots {
             y2 = currY - prevY;
             x1 = y1 * x2 / y2;
 
-            intersectionPoints[2].push({
+            intersectionPoints.top.push({
               x: xScale.invert(prevX + x1),
               y: upY
             });
@@ -242,7 +259,7 @@ export module Plots {
             y2 = currY - prevY;
             x1 = y1 * x2 / y2;
 
-            intersectionPoints[3].push({
+            intersectionPoints.bottom.push({
               x: xScale.invert(prevX + x1),
               y: downY
             });
