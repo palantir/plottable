@@ -3711,6 +3711,14 @@ var Plottable;
             this._tickLabelContainer = this.content().append("g")
                 .classed(Axis.TICK_LABEL_CLASS + "-container", true);
             this._baseline = this.content().append("line").classed("baseline", true);
+            this._annotationContainer = this.content().append("g")
+                .classed("annotation-container", true);
+            this._annotationContainer.append("g").classed("annotation-line-container", true);
+            this._annotationContainer.append("g").classed("annotation-circle-container", true);
+            this._annotationContainer.append("g").classed("annotation-rect-container", true);
+            var annotationLabelContainer = this._annotationContainer.append("g").classed("annotation-label-container", true);
+            this._annotationMeasurer = new SVGTypewriter.Measurers.Measurer(annotationLabelContainer);
+            this._annotationWriter = new SVGTypewriter.Writers.Writer(this._annotationMeasurer);
         };
         /*
          * Function for generating tick values in data-space (as opposed to pixel values).
@@ -3730,7 +3738,95 @@ var Plottable;
                 .attr(this._generateTickMarkAttrHash(true));
             tickMarks.exit().remove();
             this._baseline.attr(this._generateBaselineAttrHash());
+            this._drawAnnotations();
             return this;
+        };
+        Axis.prototype._drawAnnotations = function () {
+            var _this = this;
+            var annotatedTicks = [];
+            var labelPadding = 2;
+            var measurements = new Plottable.Utils.Map();
+            annotatedTicks.forEach(function (annotatedTick) {
+                var measurement = _this._annotationMeasurer.measure(annotatedTick.toString());
+                var paddedMeasurement = { width: measurement.width + 2 * labelPadding, height: measurement.height + 2 * labelPadding };
+                measurements.set(annotatedTick, paddedMeasurement);
+            });
+            var tierHeight = this._annotationMeasurer.measure().height + 2 * labelPadding;
+            var numTiers = Math.floor(this.margin() / tierHeight);
+            var annotationToTier = this._annotationToTier(annotatedTicks, measurements);
+            var hiddenAnnotations = new Plottable.Utils.Set();
+            annotationToTier.forEach(function (tier, annotation) {
+                if (tier === -1 || tier >= numTiers) {
+                    hiddenAnnotations.add(annotation);
+                }
+            });
+            var bindElements = function (selection, elementName, className) {
+                var elements = selection.selectAll("." + className).data(annotatedTicks);
+                elements.enter().append(elementName).classed(className, true);
+                elements.exit().remove();
+                return elements;
+            };
+            var offsetF = function (d) { return annotationToTier.get(d) * tierHeight + _this._computedHeight; };
+            var positionF = function (d) { return _this._scale.scale(d); };
+            var visibilityF = function (d) { return hiddenAnnotations.has(d) ? "hidden" : "visible"; };
+            bindElements(this._annotationContainer.select(".annotation-line-container"), "line", "annotation-line")
+                .attr("x1", positionF)
+                .attr("x2", positionF)
+                .attr("y1", 0)
+                .attr("y2", offsetF)
+                .attr("visibility", visibilityF);
+            bindElements(this._annotationContainer.select(".annotation-circle-container"), "circle", "annotation-circle")
+                .attr("cx", positionF)
+                .attr("cy", 0)
+                .attr("r", 3)
+                .attr("visibility", visibilityF);
+            bindElements(this._annotationContainer.select(".annotation-rect-container"), "rect", "annotation-rect")
+                .attr("x", positionF)
+                .attr("y", offsetF)
+                .attr("width", function (d) { return measurements.get(d).width; })
+                .attr("height", function (d) { return measurements.get(d).height; })
+                .attr("visibility", visibilityF);
+            var annotationWriter = this._annotationWriter;
+            bindElements(this._annotationContainer.select(".annotation-label-container"), "g", "annotation-label")
+                .attr("transform", function (d) { return "translate(" + positionF(d) + "," + offsetF(d) + ")"; })
+                .attr("visibility", visibilityF)
+                .each(function (annotationLabel) {
+                var writeOptions = {
+                    selection: d3.select(this),
+                    xAlign: "center",
+                    yAlign: "center",
+                    textRotation: 0
+                };
+                annotationWriter.write(annotationLabel.toString(), measurements.get(annotationLabel).width, measurements.get(annotationLabel).height, writeOptions);
+            });
+        };
+        Axis.prototype._annotationToTier = function (annotatedTicks, measurements) {
+            var _this = this;
+            var annotationTiers = [[]];
+            var annotationToTier = new Plottable.Utils.Map();
+            annotatedTicks.forEach(function (annotatedTick) {
+                var x = _this._scale.scale(annotatedTick);
+                var width = measurements.get(annotatedTick).width;
+                if (x < 0 || x + width > _this.width()) {
+                    annotationToTier.set(annotatedTick, -1);
+                    return;
+                }
+                var tierHasCollision = function (testTier) { return annotationTiers[testTier].some(function (testTick) {
+                    var testX = _this._scale.scale(testTick);
+                    var testWidth = measurements.get(testTick).width;
+                    return x + width >= testX && x <= testX + testWidth;
+                }); };
+                var tier = 0;
+                while (tierHasCollision(tier)) {
+                    tier++;
+                    if (annotationTiers.length === tier) {
+                        annotationTiers.push([]);
+                    }
+                }
+                annotationTiers[tier].push(annotatedTick);
+                annotationToTier.set(annotatedTick, tier);
+            });
+            return annotationToTier;
         };
         Axis.prototype._generateBaselineAttrHash = function () {
             var baselineAttrHash = {

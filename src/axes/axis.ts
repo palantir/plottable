@@ -29,6 +29,10 @@ export class Axis<D> extends Component {
   private _showEndTickLabels = false;
   private _rescaleCallback: ScaleCallback<Scale<D, number>>;
 
+  private _annotationContainer: d3.Selection<void>;
+  private _annotationMeasurer: SVGTypewriter.Measurers.Measurer;
+  private _annotationWriter: SVGTypewriter.Writers.Writer;
+
   /**
    * Constructs an Axis.
    * An Axis is a visual representation of a Scale.
@@ -129,6 +133,14 @@ export class Axis<D> extends Component {
     this._tickLabelContainer = this.content().append("g")
                                            .classed(Axis.TICK_LABEL_CLASS + "-container", true);
     this._baseline = this.content().append("line").classed("baseline", true);
+    this._annotationContainer = this.content().append("g")
+                                              .classed("annotation-container", true);
+    this._annotationContainer.append("g").classed("annotation-line-container", true);
+    this._annotationContainer.append("g").classed("annotation-circle-container", true);
+    this._annotationContainer.append("g").classed("annotation-rect-container", true);
+    let annotationLabelContainer = this._annotationContainer.append("g").classed("annotation-label-container", true);
+    this._annotationMeasurer = new SVGTypewriter.Measurers.Measurer(annotationLabelContainer);
+    this._annotationWriter = new SVGTypewriter.Writers.Writer(this._annotationMeasurer);
   }
 
   /*
@@ -150,7 +162,107 @@ export class Axis<D> extends Component {
                                                     .attr(this._generateTickMarkAttrHash(true));
     tickMarks.exit().remove();
     this._baseline.attr(this._generateBaselineAttrHash());
+    this._drawAnnotations();
     return this;
+  }
+
+  private _drawAnnotations() {
+    let annotatedTicks: any[] = [];
+
+    let labelPadding = 2;
+    let measurements = new Utils.Map<D, SVGTypewriter.Measurers.Dimensions> ();
+    annotatedTicks.forEach((annotatedTick) => {
+      let measurement = this._annotationMeasurer.measure(annotatedTick.toString());
+      let paddedMeasurement = { width: measurement.width + 2 * labelPadding, height: measurement.height + 2 * labelPadding };
+      measurements.set(<any> annotatedTick, paddedMeasurement);
+    });
+
+    let tierHeight = this._annotationMeasurer.measure().height + 2 * labelPadding;
+    let numTiers = Math.floor(this.margin() / tierHeight);
+
+    let annotationToTier = this._annotationToTier(annotatedTicks, measurements);
+
+    let hiddenAnnotations = new Utils.Set<any>();
+    annotationToTier.forEach((tier, annotation) => {
+      if (tier === -1 || tier >= numTiers) {
+        hiddenAnnotations.add(annotation);
+      }
+    });
+
+    let bindElements = (selection: d3.Selection<any>, elementName: string, className: string) => {
+      let elements = selection.selectAll("." + className).data(annotatedTicks);
+      elements.enter().append(elementName).classed(className, true);
+      elements.exit().remove();
+      return elements;
+    };
+    let offsetF = (d: any) => annotationToTier.get(d) * tierHeight + this._computedHeight;
+    let positionF = (d: any) => this._scale.scale(<any> d);
+    let visibilityF = (d: any) => hiddenAnnotations.has(d) ? "hidden" : "visible";
+
+    bindElements(this._annotationContainer.select(".annotation-line-container"), "line", "annotation-line")
+      .attr("x1", positionF)
+      .attr("x2", positionF)
+      .attr("y1", 0)
+      .attr("y2", offsetF)
+      .attr("visibility", visibilityF);
+
+    bindElements(this._annotationContainer.select(".annotation-circle-container"), "circle", "annotation-circle")
+      .attr("cx", positionF)
+      .attr("cy", 0)
+      .attr("r", 3)
+      .attr("visibility", visibilityF);
+
+    bindElements(this._annotationContainer.select(".annotation-rect-container"), "rect", "annotation-rect")
+      .attr("x", positionF)
+      .attr("y", offsetF)
+      .attr("width", (d) => measurements.get(<any> d).width)
+      .attr("height", (d) => measurements.get(<any> d).height)
+      .attr("visibility", visibilityF);
+
+    let annotationWriter = this._annotationWriter;
+    bindElements(this._annotationContainer.select(".annotation-label-container"), "g", "annotation-label")
+      .attr("transform", (d) => "translate(" + positionF(d) + "," + offsetF(d) + ")")
+      .attr("visibility", visibilityF)
+      .each(function (annotationLabel) {
+        let writeOptions = {
+          selection: d3.select(this),
+          xAlign: "center",
+          yAlign: "center",
+          textRotation: 0
+        };
+        annotationWriter.write(annotationLabel.toString(),
+                                 measurements.get(<any> annotationLabel).width,
+                                 measurements.get(<any> annotationLabel).height,
+                                 writeOptions);
+      });
+  }
+
+  private _annotationToTier(annotatedTicks: any[], measurements: Utils.Map<D, SVGTypewriter.Measurers.Dimensions>) {
+    let annotationTiers: any[][] = [[]];
+    let annotationToTier = new Utils.Map<any, any>();
+    annotatedTicks.forEach((annotatedTick) => {
+      let x = this._scale.scale(<any> annotatedTick);
+      let width = measurements.get(<any> annotatedTick).width;
+      if (x < 0 || x + width > this.width()) {
+        annotationToTier.set(annotatedTick, -1);
+        return;
+      }
+      let tierHasCollision = (testTier: number) => annotationTiers[testTier].some((testTick) => {
+        let testX = this._scale.scale(<any> testTick);
+        let testWidth = measurements.get(<any> testTick).width;
+        return x + width >= testX && x <= testX + testWidth;
+      });
+      let tier = 0;
+      while (tierHasCollision(tier)) {
+        tier++;
+        if (annotationTiers.length === tier) {
+          annotationTiers.push([]);
+        }
+      }
+      annotationTiers[tier].push(annotatedTick);
+      annotationToTier.set(annotatedTick, tier);
+    });
+    return annotationToTier;
   }
 
   protected _generateBaselineAttrHash() {

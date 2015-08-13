@@ -109,6 +109,23 @@ svg.plottable {
   line-height: normal;
 }
 
+.plottable .axis .annotation-circle {
+  fill: white;
+  stroke-width: 1px;
+  stroke: gray;
+}
+
+.plottable .axis .annotation-line {
+  stroke: gray;
+  stroke-width: 1px;
+}
+
+.plottable .axis .annotation-rect {
+  stroke: gray;
+  stroke-width: 1px;
+  fill: white;
+}
+
 .plottable .bar-plot .baseline {
   stroke: #999;
 }
