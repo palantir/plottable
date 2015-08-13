@@ -2969,6 +2969,13 @@ declare module Plottable {
              * @returns {PlotEntity[]}
              */
             entitiesIn(xRange: Range, yRange: Range): PlotEntity[];
+            /**
+             * Gets the Entities at a particular Point.
+             *
+             * @param {Point} p
+             * @returns {PlotEntity[]}
+             */
+            entitiesAt(p: Point): PlotEntity[];
         }
     }
 }

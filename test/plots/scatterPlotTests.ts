@@ -214,6 +214,71 @@ describe("Plots", () => {
       svg.remove();
     });
 
+    it("can retrieve entities centered at a given point", () => {
+      let svg = TestMethods.generateSVG(400, 400);
+      let xScale = new Plottable.Scales.Linear();
+      let yScale = new Plottable.Scales.Linear();
+
+      let dataset = new Plottable.Dataset([{x: 0, y: 0}, {x: 1, y: 1}]);
+      let dataset2 = new Plottable.Dataset([{x: 1, y: 2}, {x: 3, y: 4}]);
+      let plot = new Plottable.Plots.Scatter();
+      plot.x((d: any) => d.x, xScale)
+          .y((d: any) => d.y, yScale)
+          .addDataset(dataset)
+          .addDataset(dataset2);
+      plot.renderTo(svg);
+
+      let entities = plot.entitiesAt({ x: xScale.scale(1), y: yScale.scale(1) });
+      assert.lengthOf(entities, 1, "only one entity has been retrieved");
+      assert.deepEqual(entities[0].datum, {x: 1, y: 1}, "correct datum has been retrieved");
+
+      svg.remove();
+    });
+
+    it("determines whether an entity contains a given point by its size", () => {
+      let svg = TestMethods.generateSVG(400, 400);
+      let xScale = new Plottable.Scales.Linear();
+      let yScale = new Plottable.Scales.Linear();
+
+      let dataset = new Plottable.Dataset([{x: 0, y: 0}, {x: 1, y: 1}]);
+      let dataset2 = new Plottable.Dataset([{x: 1, y: 2}, {x: 3, y: 4}]);
+      let plot = new Plottable.Plots.Scatter();
+      plot.size(10)
+          .x((d: any) => d.x, xScale)
+          .y((d: any) => d.y, yScale)
+          .addDataset(dataset)
+          .addDataset(dataset2);
+      plot.renderTo(svg);
+
+      let entities = plot.entitiesAt({ x: xScale.scale(1) + 5, y: yScale.scale(2) - 5});
+      assert.lengthOf(entities, 1, "only one entity has been retrieved");
+      assert.deepEqual(entities[0].datum, {x: 1, y: 2}, "correct datum has been retrieved");
+
+      plot.size(6);
+      entities = plot.entitiesAt({ x: xScale.scale(1) + 5, y: yScale.scale(2) - 5});
+      assert.lengthOf(entities, 0, "none of the entities is retrieved");
+      svg.remove();
+    });
+
+    it("returns an empty array when no entities contain a given point", () => {
+      let svg = TestMethods.generateSVG(400, 400);
+      let xScale = new Plottable.Scales.Linear();
+      let yScale = new Plottable.Scales.Linear();
+
+      let dataset = new Plottable.Dataset([{x: 0, y: 0}, {x: 1, y: 1}]);
+      let dataset2 = new Plottable.Dataset([{x: 1, y: 2}, {x: 3, y: 4}]);
+      let plot = new Plottable.Plots.Scatter();
+      plot.x((d: any) => d.x, xScale)
+          .y((d: any) => d.y, yScale)
+          .addDataset(dataset)
+          .addDataset(dataset2);
+      plot.renderTo(svg);
+
+      let entities = plot.entitiesAt({ x: xScale.scale(3), y: yScale.scale(3)});
+      assert.lengthOf(entities, 0, "none of the entities is retrieved");
+      svg.remove();
+    });
+
     it("correctly handles NaN and undefined x and y values", () => {
       let svg = TestMethods.generateSVG(400, 400);
       let data = [
