@@ -8955,6 +8955,65 @@ var Plottable;
                 attrToProjector["y2"] = this.y2() == null ? Plottable.Plot._scaledAccessor(this.y()) : Plottable.Plot._scaledAccessor(this.y2());
                 return attrToProjector;
             };
+            Segment.prototype.entitiesIn = function (xRangeOrBounds, yRange) {
+                var dataXRange;
+                var dataYRange;
+                if (yRange == null) {
+                    var bounds = xRangeOrBounds;
+                    dataXRange = { min: bounds.topLeft.x, max: bounds.bottomRight.x };
+                    dataYRange = { min: bounds.topLeft.y, max: bounds.bottomRight.y };
+                }
+                else {
+                    dataXRange = xRangeOrBounds;
+                    dataYRange = yRange;
+                }
+                return this._entitiesIntersecting(dataXRange, dataYRange);
+            };
+            Segment.prototype._entitiesIntersecting = function (xRange, yRange) {
+                var _this = this;
+                var intersected = [];
+                var attrToProjector = this._generateAttrToProjector();
+                this.entities().forEach(function (entity) {
+                    if (_this._lineIntersectsBox(entity, xRange, yRange, attrToProjector)) {
+                        intersected.push(entity);
+                    }
+                });
+                return intersected;
+            };
+            Segment.prototype._lineIntersectsBox = function (entity, xRange, yRange, attrToProjector) {
+                var _this = this;
+                var x1 = attrToProjector["x1"](entity.datum, entity.index, entity.dataset);
+                var x2 = attrToProjector["x2"](entity.datum, entity.index, entity.dataset);
+                var y1 = attrToProjector["y1"](entity.datum, entity.index, entity.dataset);
+                var y2 = attrToProjector["y2"](entity.datum, entity.index, entity.dataset);
+                // check if any of end points of the segment is inside the box
+                if ((xRange.min <= x1 && x1 <= xRange.max && yRange.min <= y1 && y1 <= yRange.max) ||
+                    (xRange.min <= x2 && x2 <= xRange.max && yRange.min <= y2 && y2 <= yRange.max)) {
+                    return true;
+                }
+                var startPoint = { x: x1, y: y1 };
+                var endPoint = { x: x2, y: y2 };
+                var corners = [
+                    { x: xRange.min, y: yRange.min },
+                    { x: xRange.min, y: yRange.max },
+                    { x: xRange.max, y: yRange.max },
+                    { x: xRange.max, y: yRange.min }];
+                var intersections = corners.filter(function (point, index) {
+                    if (index !== 0) {
+                        // return true if border formed by conecting current corner and previous corner intersects with the segment
+                        return _this._lineIntersectsSegment(startPoint, endPoint, point, corners[index - 1]) &&
+                            _this._lineIntersectsSegment(point, corners[index - 1], startPoint, endPoint);
+                    }
+                });
+                return intersections.length > 0;
+            };
+            Segment.prototype._lineIntersectsSegment = function (point1, point2, point3, point4) {
+                var calcOrientation = function (point1, point2, point) {
+                    return (point2.x - point1.x) * (point.y - point2.y) - (point2.y - point1.y) * (point.x - point2.x);
+                };
+                // point3 and point4 are on different sides of line formed by point1 and point2
+                return calcOrientation(point1, point2, point3) * calcOrientation(point1, point2, point4) < 0;
+            };
             Segment._X2_KEY = "x2";
             Segment._Y2_KEY = "y2";
             return Segment;
