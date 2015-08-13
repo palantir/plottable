@@ -3141,7 +3141,7 @@ declare module Plottable {
             interpolator(interpolator: "cardinal-closed"): Line<X>;
             interpolator(interpolator: "monotone"): Line<X>;
             protected _createDrawer(dataset: Dataset): Drawer;
-            protected _computeExtent(dataset: Dataset, accScaleBinding: Plots.AccessorScaleBinding<any, any>, filter: Accessor<boolean>): any[];
+            protected _extentsForProperty(property: string): any[];
             protected _getResetYFunction(): (d: any, i: number, dataset: Dataset) => number;
             protected _generateDrawSteps(): Drawers.DrawStep[];
             protected _generateAttrToProjector(): {

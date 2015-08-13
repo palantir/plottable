@@ -8193,22 +8193,17 @@ var Plottable;
             Line.prototype._createDrawer = function (dataset) {
                 return new Plottable.Drawers.Line(dataset);
             };
-            Line.prototype._computeExtent = function (dataset, accScaleBinding, filter) {
-                var extent = _super.prototype._computeExtent.call(this, dataset, accScaleBinding, filter);
+            Line.prototype._extentsForProperty = function (property) {
+                // return super._extentsForProperty(property);
+                var extents = _super.prototype._extentsForProperty.call(this, property);
                 if (!this._autorangeSmooth) {
-                    return extent;
+                    return extents;
                 }
-                if (this.autorangeMode() === "x" && accScaleBinding !== this.x()) {
-                    return extent;
-                }
-                if (this.autorangeMode() === "y" && accScaleBinding !== this.y()) {
-                    return extent;
+                if (this.autorangeMode() !== property) {
+                    return extents;
                 }
                 if (this.autorangeMode() !== "x" && this.autorangeMode() !== "y") {
-                    return extent;
-                }
-                if (!(accScaleBinding.scale)) {
-                    return extent;
+                    return extents;
                 }
                 var edgeIntersectionPoints = this._getEdgeIntersectionPoints();
                 var includedValues;
@@ -8220,17 +8215,58 @@ var Plottable;
                 }
                 var maxIncludedValue = Math.max.apply(this, includedValues);
                 var minIncludedValue = Math.min.apply(this, includedValues);
-                if (extent.length === 0) {
-                    extent = [minIncludedValue, maxIncludedValue];
-                }
-                if (minIncludedValue < extent[0]) {
-                    extent[0] = minIncludedValue;
-                }
-                if (maxIncludedValue > extent[1]) {
-                    extent[1] = maxIncludedValue;
-                }
-                return extent;
+                extents.forEach(function (extent) {
+                    // When no end-points are in the viewport
+                    if (extent.length === 0) {
+                        extent = [minIncludedValue, maxIncludedValue];
+                    }
+                    if (minIncludedValue < extent[0]) {
+                        extent[0] = minIncludedValue;
+                    }
+                    if (maxIncludedValue > extent[1]) {
+                        extent[1] = maxIncludedValue;
+                    }
+                });
+                return extents;
             };
+            // protected _computeExtent(dataset: Dataset, accScaleBinding: Plots.AccessorScaleBinding<any, any>, filter: Accessor<boolean>): any[] {
+            //   var extent = super._computeExtent(dataset, accScaleBinding, filter);
+            //   if (!this._autorangeSmooth) {
+            //     return extent;
+            //   }
+            //   if (this.autorangeMode() === "x" && accScaleBinding !== this.x()) {
+            //     return extent;
+            //   }
+            //   if (this.autorangeMode() === "y" && accScaleBinding !== this.y()) {
+            //     return extent;
+            //   }
+            //   if (this.autorangeMode() !== "x" && this.autorangeMode() !== "y") {
+            //     return extent;
+            //   }
+            //   if (!(accScaleBinding.scale)) {
+            //     return extent;
+            //   }
+            //   var edgeIntersectionPoints = this._getEdgeIntersectionPoints();
+            //   var includedValues: number[];
+            //   if (this.autorangeMode() === "y") {
+            //     includedValues = edgeIntersectionPoints[0].concat(edgeIntersectionPoints[1]).map((point) => point.y);
+            //   } else { // === "x"
+            //     includedValues = edgeIntersectionPoints[2].concat(edgeIntersectionPoints[3]).map((point) => point.x);
+            //   }
+            //   var maxIncludedValue = Math.max.apply(this, includedValues);
+            //   var minIncludedValue = Math.min.apply(this, includedValues);
+            //   // Generally when no points are in the viewport (only lines crossing)
+            //   if (extent.length === 0) {
+            //     extent = [minIncludedValue, maxIncludedValue];
+            //   }
+            //   if (minIncludedValue < extent[0]) {
+            //     extent[0] = minIncludedValue;
+            //   }
+            //   if (maxIncludedValue > extent[1]) {
+            //     extent[1] = maxIncludedValue;
+            //   }
+            //   return extent;
+            // }
             Line.prototype._getEdgeIntersectionPoints = function () {
                 var _this = this;
                 if (!(this.y().scale instanceof Plottable.QuantitativeScale && this.x().scale instanceof Plottable.QuantitativeScale)) {
