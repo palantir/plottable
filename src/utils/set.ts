@@ -37,12 +37,12 @@ export module Utils {
 
     public delete(value: T) {
       if (this._es6Set != null) {
-        var deleted = <boolean>this._es6Set.delete(value);
+        let deleted = <boolean>this._es6Set.delete(value);
         this.size = this._es6Set.size;
         return deleted;
       }
 
-      var index = this._values.indexOf(value);
+      let index = this._values.indexOf(value);
       if (index !== -1) {
         this._values.splice(index, 1);
         this.size = this._values.length;
@@ -61,7 +61,7 @@ export module Utils {
 
     public forEach(callback: (value: T, value2: T, set: Set<T>) => void, thisArg?: any) {
       if (this._es6Set != null) {
-        var callbackWrapper = (value: T, value2: T) => callback.call(thisArg, value, value2, this);
+        let callbackWrapper = (value: T, value2: T) => callback.call(thisArg, value, value2, this);
         this._es6Set.forEach(callbackWrapper, thisArg);
         return;
       }

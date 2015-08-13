@@ -22,7 +22,7 @@ export module Plots {
     constructor() {
       super();
       this.addClass("line-plot");
-      var animator = new Animators.Easing();
+      let animator = new Animators.Easing();
       animator.stepDuration(Plot._ANIMATION_MAX_DURATION);
       animator.easingMode("exp-in-out");
       animator.maxTotalDuration(Plot._ANIMATION_MAX_DURATION);
@@ -141,7 +141,7 @@ export module Plots {
     }
 
     protected _extentsForProperty(property: string) {
-      var extents = super._extentsForProperty(property);
+      let extents = super._extentsForProperty(property);
 
       if (!this._autorangeSmooth) {
         return extents;
@@ -155,16 +155,16 @@ export module Plots {
         return extents;
       }
 
-      var edgeIntersectionPoints = this._getEdgeIntersectionPoints();
-      var includedValues: number[];
+      let edgeIntersectionPoints = this._getEdgeIntersectionPoints();
+      let includedValues: number[];
       if (this.autorangeMode() === "y") {
         includedValues = edgeIntersectionPoints.left.concat(edgeIntersectionPoints.right).map((point) => point.y);
       } else { // === "x"
         includedValues = edgeIntersectionPoints.top.concat(edgeIntersectionPoints.bottom).map((point) => point.x);
       }
 
-      var maxIncludedValue = Math.max.apply(this, includedValues);
-      var minIncludedValue = Math.min.apply(this, includedValues);
+      let maxIncludedValue = Math.max.apply(this, includedValues);
+      let minIncludedValue = Math.min.apply(this, includedValues);
 
       extents = extents.map((extent) => {
         // When no end-points are in the viewport
@@ -187,26 +187,26 @@ export module Plots {
         };
       }
 
-      var yScale = <QuantitativeScale<number>>this.y().scale;
-      var xScale = <QuantitativeScale<any>>this.x().scale;
+      let yScale = <QuantitativeScale<number>>this.y().scale;
+      let xScale = <QuantitativeScale<any>>this.x().scale;
 
-      var intersectionPoints: EdgeIntersection = {
+      let intersectionPoints: EdgeIntersection = {
         top: [],
         bottom: [],
         left: [],
         right: []
       };
-      var leftX = xScale.scale(xScale.domain()[0]);
-      var rightX = xScale.scale(xScale.domain()[1]);
-      var downY = yScale.scale(yScale.domain()[0]);
-      var upY = yScale.scale(yScale.domain()[1]);
+      let leftX = xScale.scale(xScale.domain()[0]);
+      let rightX = xScale.scale(xScale.domain()[1]);
+      let downY = yScale.scale(yScale.domain()[0]);
+      let upY = yScale.scale(yScale.domain()[1]);
 
       this.datasets().forEach((dataset) => {
-        var data = dataset.data();
+        let data = dataset.data();
 
-        var x1: number, x2: number, y1: number, y2: number;
-        var prevX: number, prevY: number, currX: number, currY: number;
-        for (var i = 1; i < data.length; i++) {
+        let x1: number, x2: number, y1: number, y2: number;
+        let prevX: number, prevY: number, currX: number, currY: number;
+        for (let i = 1; i < data.length; i++) {
           prevX = currX || xScale.scale(this.x().accessor(data[i - 1], i - 1, dataset));
           prevY = currY || yScale.scale(this.y().accessor(data[i - 1], i - 1, dataset));
 
@@ -272,20 +272,20 @@ export module Plots {
 
     protected _getResetYFunction() {
       // gets the y-value generator for the animation start point
-      var yDomain = this.y().scale.domain();
-      var domainMax = Math.max(yDomain[0], yDomain[1]);
-      var domainMin = Math.min(yDomain[0], yDomain[1]);
+      let yDomain = this.y().scale.domain();
+      let domainMax = Math.max(yDomain[0], yDomain[1]);
+      let domainMin = Math.min(yDomain[0], yDomain[1]);
       // start from zero, or the closest domain value to zero
       // avoids lines zooming on from offscreen.
-      var startValue = (domainMax < 0 && domainMax) || (domainMin > 0 && domainMin) || 0;
-      var scaledStartValue = this.y().scale.scale(startValue);
+      let startValue = (domainMax < 0 && domainMax) || (domainMin > 0 && domainMin) || 0;
+      let scaledStartValue = this.y().scale.scale(startValue);
       return (d: any, i: number, dataset: Dataset) => scaledStartValue;
     }
 
     protected _generateDrawSteps(): Drawers.DrawStep[] {
-      var drawSteps: Drawers.DrawStep[] = [];
+      let drawSteps: Drawers.DrawStep[] = [];
       if (this._animateOnNextRender()) {
-        var attrToProjector = this._generateAttrToProjector();
+        let attrToProjector = this._generateAttrToProjector();
         attrToProjector["d"] = this._constructLineProjector(Plot._scaledAccessor(this.x()), this._getResetYFunction());
         drawSteps.push({attrToProjector: attrToProjector, animator: this._getAnimator(Plots.Animator.RESET)});
       }
@@ -296,10 +296,10 @@ export module Plots {
     }
 
     protected _generateAttrToProjector() {
-      var attrToProjector = super._generateAttrToProjector();
+      let attrToProjector = super._generateAttrToProjector();
       Object.keys(attrToProjector).forEach((attribute: string) => {
         if (attribute === "d") { return; }
-        var projector = attrToProjector[attribute];
+        let projector = attrToProjector[attribute];
         attrToProjector[attribute] = (data: any[], i: number, dataset: Dataset) =>
           data.length > 0 ? projector(data[0], i, dataset) : null;
       });
@@ -314,15 +314,15 @@ export module Plots {
      * @returns {PlotEntity} The nearest PlotEntity, or undefined if no PlotEntity can be found.
      */
     public entityNearest(queryPoint: Point): PlotEntity {
-      var minXDist = Infinity;
-      var minYDist = Infinity;
-      var closest: PlotEntity;
+      let minXDist = Infinity;
+      let minYDist = Infinity;
+      let closest: PlotEntity;
       this.entities().forEach((entity) => {
         if (!this._entityVisibleOnPlot(entity.position, entity.datum, entity.index, entity.dataset)) {
           return;
         }
-        var xDist = Math.abs(queryPoint.x - entity.position.x);
-        var yDist = Math.abs(queryPoint.y - entity.position.y);
+        let xDist = Math.abs(queryPoint.x - entity.position.x);
+        let yDist = Math.abs(queryPoint.y - entity.position.y);
 
         if (xDist < minXDist || xDist === minXDist && yDist < minYDist) {
           closest = entity;
@@ -335,15 +335,15 @@ export module Plots {
     }
 
     protected _propertyProjectors(): AttributeToProjector {
-      var propertyToProjectors = super._propertyProjectors();
+      let propertyToProjectors = super._propertyProjectors();
       propertyToProjectors["d"] = this._constructLineProjector(Plot._scaledAccessor(this.x()), Plot._scaledAccessor(this.y()));
       return propertyToProjectors;
     }
 
     protected _constructLineProjector(xProjector: Projector, yProjector: Projector) {
-      var definedProjector = (d: any, i: number, dataset: Dataset) => {
-        var positionX = Plot._scaledAccessor(this.x())(d, i, dataset);
-        var positionY = Plot._scaledAccessor(this.y())(d, i, dataset);
+      let definedProjector = (d: any, i: number, dataset: Dataset) => {
+        let positionX = Plot._scaledAccessor(this.x())(d, i, dataset);
+        let positionY = Plot._scaledAccessor(this.y())(d, i, dataset);
         return positionX != null && !Utils.Math.isNaN(positionX) &&
                positionY != null && !Utils.Math.isNaN(positionY);
       };
@@ -357,7 +357,7 @@ export module Plots {
     }
 
     protected _getDataToDraw() {
-      var dataToDraw = new Utils.Map<Dataset, any[]> ();
+      let dataToDraw = new Utils.Map<Dataset, any[]> ();
       this.datasets().forEach((dataset) => dataToDraw.set(dataset, [dataset.data()]));
       return dataToDraw;
     }

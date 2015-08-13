@@ -90,7 +90,7 @@ export class Interaction {
    * @return {Point} The same location in Component-space coordinates.
    */
   protected _translateToComponentSpace(p: Point): Point {
-    var origin = this._componentAttachedTo.originToSVG();
+    let origin = this._componentAttachedTo.originToSVG();
     return {
       x: p.x - origin.x,
       y: p.y - origin.y

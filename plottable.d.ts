@@ -94,6 +94,7 @@ declare module Plottable {
     }
 }
 
+
 declare module Plottable {
     module Utils {
         module DOM {
@@ -2255,12 +2256,10 @@ declare module Plottable {
              *
              * For example, instead of calling `new Table([[a, b], [null, c]])`, you
              * could call
-             * ```typescript
-             * var table = new Table();
+             * var table = new Plottable.Components.Table();
              * table.add(a, 0, 0);
              * table.add(b, 0, 1);
              * table.add(c, 1, 1);
-             * ```
              *
              * @param {Component} component The Component to be added.
              * @param {number} row
@@ -2890,6 +2889,21 @@ declare module Plottable {
              * @returns {PlotEntity[]} The PlotEntities at the particular point
              */
             entitiesAt(point: Point): PlotEntity[];
+            /**
+             * Gets the Entities that intersect the Bounds.
+             *
+             * @param {Bounds} bounds
+             * @returns {PlotEntity[]}
+             */
+            entitiesIn(bounds: Bounds): PlotEntity[];
+            /**
+             * Gets the Entities that intersect the area defined by the ranges.
+             *
+             * @param {Range} xRange
+             * @param {Range} yRange
+             * @returns {PlotEntity[]}
+             */
+            entitiesIn(xRange: Range, yRange: Range): PlotEntity[];
             protected _propertyProjectors(): AttributeToProjector;
             protected _pixelPoint(datum: any, index: number, dataset: Dataset): {
                 x: any;
@@ -2948,6 +2962,21 @@ declare module Plottable {
             protected _visibleOnPlot(datum: any, pixelPoint: Point, selection: d3.Selection<void>): boolean;
             protected _entityVisibleOnPlot(pixelPoint: Point, datum: any, index: number, dataset: Dataset): boolean;
             protected _propertyProjectors(): AttributeToProjector;
+            /**
+             * Gets the Entities that intersect the Bounds.
+             *
+             * @param {Bounds} bounds
+             * @returns {PlotEntity[]}
+             */
+            entitiesIn(bounds: Bounds): PlotEntity[];
+            /**
+             * Gets the Entities that intersect the area defined by the ranges.
+             *
+             * @param {Range} xRange
+             * @param {Range} yRange
+             * @returns {PlotEntity[]}
+             */
+            entitiesIn(xRange: Range, yRange: Range): PlotEntity[];
         }
     }
 }
@@ -3060,6 +3089,10 @@ declare module Plottable {
              */
             entitiesIn(xRange: Range, yRange: Range): PlotEntity[];
             protected _additionalPaint(time: number): void;
+            /**
+             * Makes sure the extent takes into account the widths of the bars
+             */
+            protected _extentsForProperty(property: string): any[];
             protected _generateDrawSteps(): Drawers.DrawStep[];
             protected _generateAttrToProjector(): {
                 [attr: string]: (datum: any, index: number, dataset: Dataset) => any;
@@ -3068,9 +3101,8 @@ declare module Plottable {
              * Computes the barPixelWidth of all the bars in the plot.
              *
              * If the position scale of the plot is a CategoryScale and in bands mode, then the rangeBands function will be used.
-             * If the position scale of the plot is a CategoryScale and in points mode, then
-             *   from https://github.com/mbostock/d3/wiki/Ordinal-Scales#ordinal_rangePoints, the max barPixelWidth is step * padding
-             * If the position scale of the plot is a QuantitativeScale, then _getMinimumDataWidth is scaled to compute the barPixelWidth
+             * If the position scale of the plot is a QuantitativeScale, then the bar width is equal to the smallest distance between
+             * two adjacent data points, padded for visualisation.
              */
             protected _getBarPixelWidth(): number;
             entities(datasets?: Dataset[]): PlotEntity[];

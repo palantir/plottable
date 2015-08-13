@@ -33,9 +33,9 @@ export module Formatters {
    * @returns {Formatter} A formatter for currency values.
    */
   export function currency(precision = 2, symbol = "$", prefix = true) {
-    var fixedFormatter = Formatters.fixed(precision);
+    let fixedFormatter = Formatters.fixed(precision);
     return (d: any) => {
-      var formattedValue = fixedFormatter(Math.abs(d));
+      let formattedValue = fixedFormatter(Math.abs(d));
       if (formattedValue !== "") {
         if (prefix) {
           formattedValue = symbol + formattedValue;
@@ -77,7 +77,7 @@ export module Formatters {
     verifyPrecision(precision);
     return (d: any) => {
       if (typeof d === "number") {
-        var multiplier = Math.pow(10, precision);
+        let multiplier = Math.pow(10, precision);
         return String(Math.round(d * multiplier) / multiplier);
       } else {
         return String(d);
@@ -104,13 +104,13 @@ export module Formatters {
    * @returns {Formatter} A formatter for percentage values.
    */
   export function percentage(precision = 0) {
-    var fixedFormatter = Formatters.fixed(precision);
+    let fixedFormatter = Formatters.fixed(precision);
     return (d: any) => {
-      var valToFormat = d * 100;
+      let valToFormat = d * 100;
 
       // Account for float imprecision
-      var valString = d.toString();
-      var integerPowerTen = Math.pow(10, valString.length - (valString.indexOf(".") + 1));
+      let valString = d.toString();
+      let integerPowerTen = Math.pow(10, valString.length - (valString.indexOf(".") + 1));
       valToFormat = parseInt((valToFormat * integerPowerTen).toString(), 10) / integerPowerTen;
 
       return fixedFormatter(valToFormat) + "%";
@@ -147,22 +147,21 @@ export module Formatters {
    */
   export function shortScale(precision = 3) {
     verifyPrecision(precision);
-    precision = Math.floor(precision);
-    var suffixes = "KMBTQ";
-    var exponentFormatter = d3.format("." + precision + "e");
-    var fixedFormatter = d3.format("." + precision + "f");
-    var max = Math.pow(10, (3 * (suffixes.length + 1)));
-    var min = Math.pow(10, -precision);
+    let suffixes = "KMBTQ";
+    let exponentFormatter = d3.format("." + precision + "e");
+    let fixedFormatter = d3.format("." + precision + "f");
+    let max = Math.pow(10, (3 * (suffixes.length + 1)));
+    let min = Math.pow(10, -precision);
     return (num: number) => {
-      var absNum = Math.abs(num);
+      let absNum = Math.abs(num);
       if ((absNum < min || absNum >= max) && absNum !== 0) {
         return exponentFormatter(num);
       }
-      var idx = -1;
+      let idx = -1;
       while (absNum >= Math.pow(1000, idx + 2) && idx < (suffixes.length - 1)) {
         idx++;
       }
-      var output = "";
+      let output = "";
       if (idx === -1) {
         output = fixedFormatter(num);
       } else {
@@ -187,11 +186,11 @@ export module Formatters {
    */
   export function multiTime() {
 
-    var numFormats = 8;
+    let numFormats = 8;
 
     // these defaults were taken from d3
     // https://github.com/mbostock/d3/wiki/Time-Formatting#format_multi
-    var timeFormat: { [index: number]: TimeFilterFormat } = {};
+    let timeFormat: { [index: number]: TimeFilterFormat } = {};
 
     timeFormat[0] = {
       format: ".%L",
@@ -227,7 +226,7 @@ export module Formatters {
     };
 
     return (d: any) => {
-      for (var i = 0; i < numFormats; i++) {
+      for (let i = 0; i < numFormats; i++) {
         if (timeFormat[i].filter(d)) {
           return d3.time.format(timeFormat[i].format)(d);
         }
@@ -260,7 +259,7 @@ export module Formatters {
   export function relativeDate(baseValue: number = 0, increment: number = MILLISECONDS_IN_ONE_DAY, label: string = "") {
     Plottable.Utils.Window.deprecated("relativeDate()", "1.3", "Not safe for use with time zones.");
     return (d: any) => {
-      var relativeDate = Math.round((d.valueOf() - baseValue) / increment);
+      let relativeDate = Math.round((d.valueOf() - baseValue) / increment);
       return relativeDate.toString() + label;
     };
   }
@@ -268,6 +267,10 @@ export module Formatters {
   function verifyPrecision(precision: number) {
     if (precision < 0 || precision > 20) {
       throw new RangeError("Formatter precision must be between 0 and 20");
+    }
+
+    if (precision !== Math.floor(precision)) {
+      throw new RangeError("Formatter precision must be an integer");
     }
   }
 

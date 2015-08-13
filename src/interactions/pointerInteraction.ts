@@ -35,9 +35,9 @@ export module Interactions {
     }
 
     private _handlePointerEvent(p: Point) {
-      var translatedP = this._translateToComponentSpace(p);
+      let translatedP = this._translateToComponentSpace(p);
       if (this._isInsideComponent(translatedP)) {
-        var wasOverComponent = this._overComponent;
+        let wasOverComponent = this._overComponent;
         this._overComponent = true;
         if (!wasOverComponent) {
           this._pointerEnterCallbacks.callCallbacks(translatedP);

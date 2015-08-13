@@ -78,7 +78,7 @@ export module Scales {
     }
 
     public extentOfValues(values: number[]): number[] {
-      var extent = d3.extent(values);
+      let extent = d3.extent(values);
       if (extent[0] == null || extent[1] == null) {
         return [];
       } else {
@@ -97,7 +97,7 @@ export module Scales {
      * Generates the d3 interpolator for colors.
      */
     private _interpolateColors() {
-      var colors = this._colorRange;
+      let colors = this._colorRange;
       if (colors.length < 2) {
         throw new Error("Color scale arrays must have at least two elements.");
       };
@@ -107,10 +107,10 @@ export module Scales {
           t = Math.max(0, Math.min(1, t));
 
           // Determine indices for colors
-          var tScaled = t * (colors.length - 1);
-          var i0 = Math.floor(tScaled);
-          var i1 = Math.ceil(tScaled);
-          var frac = (tScaled - i0);
+          let tScaled = t * (colors.length - 1);
+          let i0 = Math.floor(tScaled);
+          let i1 = Math.ceil(tScaled);
+          let frac = (tScaled - i0);
 
           // Interpolate in the L*a*b color space
           return d3.interpolateLab(colors[i0], colors[i1])(frac);
@@ -126,7 +126,7 @@ export module Scales {
 
     public autoDomain() {
       // InterpolatedColorScales do not pad
-      var includedValues = this._getAllIncludedValues();
+      let includedValues = this._getAllIncludedValues();
       if (includedValues.length > 0) {
         this._setDomain([Utils.Math.min(includedValues, 0), Utils.Math.max(includedValues, 0)]);
       }

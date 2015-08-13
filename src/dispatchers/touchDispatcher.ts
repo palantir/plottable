@@ -20,9 +20,9 @@ export module Dispatchers {
      * @return {Dispatchers.Touch}
      */
     public static getDispatcher(elem: SVGElement): Dispatchers.Touch {
-      var svg = Utils.DOM.boundingSVG(elem);
+      let svg = Utils.DOM.boundingSVG(elem);
 
-      var dispatcher: Touch = (<any> svg)[Touch._DISPATCHER_KEY];
+      let dispatcher: Touch = (<any> svg)[Touch._DISPATCHER_KEY];
       if (dispatcher == null) {
         dispatcher = new Touch(svg);
         (<any> svg)[Touch._DISPATCHER_KEY] = dispatcher;
@@ -48,9 +48,9 @@ export module Dispatchers {
       this._callbacks = [this._moveCallbacks, this._startCallbacks, this._endCallbacks, this._cancelCallbacks];
 
       this._eventToCallback["touchstart"] = (e: TouchEvent) => this._measureAndDispatch(e, this._startCallbacks);
-      this._eventToCallback["touchmove"] = (e: TouchEvent) => this._measureAndDispatch(e, this._moveCallbacks);
-      this._eventToCallback["touchend"] = (e: TouchEvent) => this._measureAndDispatch(e, this._endCallbacks);
-      this._eventToCallback["touchcancel"] = (e: TouchEvent) => this._measureAndDispatch(e, this._cancelCallbacks);
+      this._eventToCallback["touchmove"] = (e: TouchEvent) => this._measureAndDispatch(e, this._moveCallbacks, "page");
+      this._eventToCallback["touchend"] = (e: TouchEvent) => this._measureAndDispatch(e, this._endCallbacks, "page");
+      this._eventToCallback["touchcancel"] = (e: TouchEvent) => this._measureAndDispatch(e, this._cancelCallbacks, "page");
     }
 
     /**
@@ -145,14 +145,20 @@ export module Dispatchers {
      * Computes the Touch position from the given event, and if successful
      * calls all the callbacks in the provided callbackSet.
      */
-    private _measureAndDispatch(event: TouchEvent, callbackSet: Utils.CallbackSet<TouchCallback>) {
-      var touches = event.changedTouches;
-      var touchPositions: { [id: number]: Point; } = {};
-      var touchIdentifiers: number[] = [];
-      for (var i = 0; i < touches.length; i++) {
-        var touch = touches[i];
-        var touchID = touch.identifier;
-        var newTouchPosition = this._translator.computePosition(touch.clientX, touch.clientY);
+    private _measureAndDispatch(event: TouchEvent, callbackSet: Utils.CallbackSet<TouchCallback>, scope = "element") {
+      if (scope !== "page" && scope !== "element") {
+        throw new Error("Invalid scope '" + scope + "', must be 'element' or 'page'");
+      }
+      if (scope === "element" && !this._translator.insideSVG(event)) {
+        return;
+      }
+      let touches = event.changedTouches;
+      let touchPositions: { [id: number]: Point; } = {};
+      let touchIdentifiers: number[] = [];
+      for (let i = 0; i < touches.length; i++) {
+        let touch = touches[i];
+        let touchID = touch.identifier;
+        let newTouchPosition = this._translator.computePosition(touch.clientX, touch.clientY);
         if (newTouchPosition != null) {
           touchPositions[touchID] = newTouchPosition;
           touchIdentifiers.push(touchID);

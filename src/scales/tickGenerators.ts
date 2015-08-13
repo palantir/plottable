@@ -28,15 +28,15 @@ export module Scales {
       }
 
       return function(s: QuantitativeScale<number>) {
-        var domain = s.domain();
-        var low = Math.min(domain[0], domain[1]);
-        var high = Math.max(domain[0], domain[1]);
-        var firstTick = Math.ceil(low / interval) * interval;
-        var numTicks = Math.floor((high - firstTick) / interval) + 1;
+        let domain = s.domain();
+        let low = Math.min(domain[0], domain[1]);
+        let high = Math.max(domain[0], domain[1]);
+        let firstTick = Math.ceil(low / interval) * interval;
+        let numTicks = Math.floor((high - firstTick) / interval) + 1;
 
-        var lowTicks = low % interval === 0 ? [] : [low];
-        var middleTicks = Utils.Math.range(0, numTicks).map(t => firstTick + t * interval);
-        var highTicks = high % interval === 0 ? [] : [high];
+        let lowTicks = low % interval === 0 ? [] : [low];
+        let middleTicks = Utils.Math.range(0, numTicks).map(t => firstTick + t * interval);
+        let highTicks = high % interval === 0 ? [] : [high];
 
         return lowTicks.concat(middleTicks).concat(highTicks);
       };
@@ -49,7 +49,7 @@ export module Scales {
      */
     export function integerTickGenerator(): TickGenerator<number> {
       return function(s: QuantitativeScale<number>) {
-        var defaultTicks = s.defaultTicks();
+        let defaultTicks = s.defaultTicks();
         return defaultTicks.filter((tick, i) => (tick % 1 === 0) || (i === 0) || (i === defaultTicks.length - 1));
       };
     }

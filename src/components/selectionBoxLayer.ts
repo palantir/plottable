@@ -71,11 +71,11 @@ export module Components {
     }
 
     protected _setBounds(newBounds: Bounds) {
-      var topLeft: Point = {
+      let topLeft: Point = {
         x: Math.min(newBounds.topLeft.x, newBounds.bottomRight.x),
         y: Math.min(newBounds.topLeft.y, newBounds.bottomRight.y)
       };
-      var bottomRight: Point = {
+      let bottomRight: Point = {
         x: Math.max(newBounds.topLeft.x, newBounds.bottomRight.x),
         y: Math.max(newBounds.topLeft.y, newBounds.bottomRight.y)
       };
@@ -88,10 +88,10 @@ export module Components {
 
     public renderImmediately() {
       if (this._boxVisible) {
-        var t = this._boxBounds.topLeft.y;
-        var b = this._boxBounds.bottomRight.y;
-        var l = this._boxBounds.topLeft.x;
-        var r = this._boxBounds.bottomRight.x;
+        let t = this._boxBounds.topLeft.y;
+        let b = this._boxBounds.bottomRight.y;
+        let l = this._boxBounds.topLeft.x;
+        let r = this._boxBounds.bottomRight.x;
 
         this._boxArea.attr({
           x: l, y: t, width: r - l, height: b - t
