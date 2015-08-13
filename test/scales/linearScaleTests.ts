@@ -120,7 +120,7 @@ describe("Scales", () => {
 
     describe("domain snapping", () => {
       it("domain snapping setter and getter", () => {
-        var scale = new Plottable.Scales.Linear();
+        let scale = new Plottable.Scales.Linear();
 
         assert.strictEqual(scale.snapsDomain(), true, "scales make their domain snap by default");
         assert.strictEqual(scale.snapsDomain(false), scale, "setting disabling domain snapping returns the scale");
@@ -128,7 +128,7 @@ describe("Scales", () => {
       });
 
       it("domain snapping works", () => {
-        var scale = new Plottable.Scales.Linear();
+        let scale = new Plottable.Scales.Linear();
         scale.addIncludedValuesProvider(function() {
           return [1.123123123, 3.123123123];
         });
