@@ -155,6 +155,17 @@ describe("Interactive Components", () => {
       svg.remove();
     });
 
+    it("does not have resizable CSS class when enabled(false)", () => {
+      let ydbl = new Plottable.Components.YDragBoxLayer();
+      ydbl.resizable(true);
+      assert.isTrue(ydbl.hasClass("y-resizable"), "carries \"y-resizable\" class if resizable");
+      ydbl.enabled(false);
+      assert.isFalse(ydbl.hasClass("y-resizable"), "does not carry \"y-resizable\" class if resizable, but not enabled");
+      ydbl.resizable(false);
+      ydbl.enabled(true);
+      assert.isFalse(ydbl.hasClass("y-resizable"), "does not carry \"y-resizable\" class if enabled, but not resizable");
+    });
+
     it("destroy() does not error if scales are not inputted", () => {
       let svg = TestMethods.generateSVG();
       let sbl = new Plottable.Components.YDragBoxLayer();
