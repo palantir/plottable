@@ -56,6 +56,7 @@
 /// <reference path="components/gridlines.ts" />
 /// <reference path="components/table.ts" />
 /// <reference path="components/selectionBoxLayer.ts" />
+/// <reference path="components/guideLineLayer.ts" />
 
 /// <reference path="plots/plot.ts" />
 /// <reference path="plots/piePlot.ts" />
