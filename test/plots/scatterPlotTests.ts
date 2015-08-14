@@ -256,7 +256,7 @@ describe("Plots", () => {
       svg.remove();
     });
 
-    it("returns an empty array when no entities contain a given point", () => {
+    it("returns all entities containing a given point across all datasets", () => {
       let svg = TestMethods.generateSVG(400, 400);
       let xScale = new Plottable.Scales.Linear();
       let yScale = new Plottable.Scales.Linear();
