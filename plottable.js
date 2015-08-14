@@ -4095,6 +4095,7 @@ var Plottable;
                 this.addClass("time-axis");
                 this.tickLabelPadding(5);
                 this.axisConfigurations(Time._DEFAULT_TIME_AXIS_CONFIGURATIONS);
+                this.annotationFormatter(Plottable.Formatters.time("%b %e, %Y"));
             }
             Time.prototype.tierLabelPositions = function (newPositions) {
                 if (newPositions == null) {
@@ -4342,6 +4343,9 @@ var Plottable;
                 for (var i = 0; i < tierConfigs.length; ++i) {
                     this._renderTickMarks(tierTicks[i], i);
                     this._hideOverlappingAndCutOffLabels(i);
+                }
+                if (this.annotationsEnabled()) {
+                    this._drawAnnotations();
                 }
                 return this;
             };

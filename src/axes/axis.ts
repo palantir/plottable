@@ -207,7 +207,7 @@ export class Axis<D> extends Component {
     return this;
   }
 
-  private _drawAnnotations() {
+  protected _drawAnnotations() {
     let labelPadding = 2;
     let measurements = new Utils.Map<D, SVGTypewriter.Measurers.Dimensions> ();
     this.annotatedTicks().forEach((annotatedTick) => {
