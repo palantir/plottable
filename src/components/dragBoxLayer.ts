@@ -289,7 +289,7 @@ export module Components {
 
     // Sets resizable classes. Overridden by subclasses that only resize in one dimension.
     protected _setResizableClasses(canResize: boolean) {
-      if (canResize) {
+      if (canResize && this.enabled()) {
         this.addClass("x-resizable");
         this.addClass("y-resizable");
       } else {
@@ -314,12 +314,16 @@ export module Components {
         return this._movable;
       }
       this._movable = movable;
-      if (movable) {
+      this._setMovableClass();
+      return this;
+    }
+
+    private _setMovableClass() {
+      if (this.movable() && this.enabled()) {
         this.addClass("movable");
       } else {
         this.removeClass("movable");
       }
-      return this;
     }
 
     /**
@@ -408,6 +412,8 @@ export module Components {
         return this._dragInteraction.enabled();
       }
       this._dragInteraction.enabled(enabled);
+      this._setResizableClasses(this.resizable());
+      this._setMovableClass();
       return this;
     }
   }

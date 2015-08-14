@@ -11103,7 +11103,7 @@ var Plottable;
             };
             // Sets resizable classes. Overridden by subclasses that only resize in one dimension.
             DragBoxLayer.prototype._setResizableClasses = function (canResize) {
-                if (canResize) {
+                if (canResize && this.enabled()) {
                     this.addClass("x-resizable");
                     this.addClass("y-resizable");
                 }
@@ -11117,13 +11117,16 @@ var Plottable;
                     return this._movable;
                 }
                 this._movable = movable;
-                if (movable) {
+                this._setMovableClass();
+                return this;
+            };
+            DragBoxLayer.prototype._setMovableClass = function () {
+                if (this.movable() && this.enabled()) {
                     this.addClass("movable");
                 }
                 else {
                     this.removeClass("movable");
                 }
-                return this;
             };
             /**
              * Sets the callback to be called when dragging starts.
@@ -11196,6 +11199,8 @@ var Plottable;
                     return this._dragInteraction.enabled();
                 }
                 this._dragInteraction.enabled(enabled);
+                this._setResizableClasses(this.resizable());
+                this._setMovableClass();
                 return this;
             };
             return DragBoxLayer;
@@ -11240,7 +11245,7 @@ var Plottable;
                 });
             };
             XDragBoxLayer.prototype._setResizableClasses = function (canResize) {
-                if (canResize) {
+                if (canResize && this.enabled()) {
                     this.addClass("x-resizable");
                 }
                 else {
@@ -11298,7 +11303,7 @@ var Plottable;
                 });
             };
             YDragBoxLayer.prototype._setResizableClasses = function (canResize) {
-                if (canResize) {
+                if (canResize && this.enabled()) {
                     this.addClass("y-resizable");
                 }
                 else {
