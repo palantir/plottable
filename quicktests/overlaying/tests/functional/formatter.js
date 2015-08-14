@@ -42,32 +42,32 @@ function run(svg, data, Plottable) {
   bigTable.renderTo(svg);
 
   function useIdentityFormatter() {
-    xAxis.formatter(Plottable.Formatters.identity());
+    xAxis.formatter(Plottable.Formatters.identity(2.1));
     yAxis.formatter(Plottable.Formatters.identity());
   }
   function useGeneralFormatter() {
-    xAxis.formatter(Plottable.Formatters.general(2));
-    yAxis.formatter(Plottable.Formatters.general(2));
+    xAxis.formatter(Plottable.Formatters.general(7));
+    yAxis.formatter(Plottable.Formatters.general(3));
   }
   function useFixedFormatter() {
-    xAxis.formatter(Plottable.Formatters.fixed(2));
-    yAxis.formatter(Plottable.Formatters.fixed(2));
+    xAxis.formatter(Plottable.Formatters.fixed(2.00));
+    yAxis.formatter(Plottable.Formatters.fixed(7.00));
   }
   function useCurrencyFormatter() {
-    xAxis.formatter(Plottable.Formatters.currency(2, "$", true));
-    yAxis.formatter(Plottable.Formatters.currency(2, "$", true));
+    xAxis.formatter(Plottable.Formatters.currency(3, "$", true));
+    yAxis.formatter(Plottable.Formatters.currency(3, "$", true));
   }
   function usePercentageFormatter() {
-    xAxis.formatter(Plottable.Formatters.percentage(2));
-    yAxis.formatter(Plottable.Formatters.percentage(2));
+    xAxis.formatter(Plottable.Formatters.percentage(12.3 - 11.3));
+    yAxis.formatter(Plottable.Formatters.percentage(2.5 + 1.5));
   }
   function useSIFormatter() {
-     xAxis.formatter(Plottable.Formatters.siSuffix(2));
-     yAxis.formatter(Plottable.Formatters.siSuffix(2));
+     xAxis.formatter(Plottable.Formatters.siSuffix(7));
+     yAxis.formatter(Plottable.Formatters.siSuffix(14));
   }
   function useCustomFormatter() {
-     xAxis.formatter(custFormatter);
-     yAxis.formatter(custFormatter);
+     xAxis.formatter(Plottable.Formatters.shortScale(3));
+     yAxis.formatter(Plottable.Formatters.shortScale(0));
   }
 
   new Plottable.Interactions.Click().onClick(useIdentityFormatter).attachTo(IdTitle);
