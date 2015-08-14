@@ -41,7 +41,7 @@ export module Plots {
         if (xScale == null) {
           super.x(<number | Accessor<number>>x);
         } else {
-          super.x(< X | Accessor<X>>x, xScale);
+          super.x(<X | Accessor<X>>x, xScale);
         }
         this._setScaleSnapping();
         return this;
