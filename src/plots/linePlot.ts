@@ -38,7 +38,11 @@ export module Plots {
       if (x == null) {
         return super.x();
       } else {
-        super.x(<X | Accessor<X>>x, xScale);
+        if (xScale == null) {
+          super.x(<number | Accessor<number>>x);
+        } else {
+          super.x(< X | Accessor<X>>x, xScale);
+        }
         this._setScaleSnapping();
         return this;
       }

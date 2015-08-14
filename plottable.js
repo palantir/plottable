@@ -8233,7 +8233,12 @@ var Plottable;
                     return _super.prototype.x.call(this);
                 }
                 else {
-                    _super.prototype.x.call(this, x, xScale);
+                    if (xScale == null) {
+                        _super.prototype.x.call(this, x);
+                    }
+                    else {
+                        _super.prototype.x.call(this, x, xScale);
+                    }
                     this._setScaleSnapping();
                     return this;
                 }
