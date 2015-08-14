@@ -8246,27 +8246,27 @@ var Plottable;
                 return _super.prototype.y.call(this, y, yScale);
             };
             Line.prototype.autorangeMode = function (autorangeMode) {
-                if (autorangeMode === "x" && this.x() && this.x().scale && this.x().scale instanceof Plottable.QuantitativeScale) {
-                    this.x().scale.snapsDomain(!this.autorangeSmooth());
+                var ret = _super.prototype.autorangeMode.call(this, autorangeMode);
+                if (autorangeMode != null) {
+                    this._setScaleSnappingForAutorangeSmooth();
                 }
-                if (autorangeMode === "y" && this.y() && this.y().scale && this.y().scale instanceof Plottable.QuantitativeScale) {
-                    this.y().scale.snapsDomain(!this.autorangeSmooth());
-                }
-                return _super.prototype.autorangeMode.call(this, autorangeMode);
+                return ret;
             };
             Line.prototype.autorangeSmooth = function (autorangeSmooth) {
                 if (autorangeSmooth == null) {
                     return this._autorangeSmooth;
                 }
                 this._autorangeSmooth = autorangeSmooth;
+                this._setScaleSnappingForAutorangeSmooth();
+                return this;
+            };
+            Line.prototype._setScaleSnappingForAutorangeSmooth = function () {
                 if (this.autorangeMode() === "x" && this.x() && this.x().scale && this.x().scale instanceof Plottable.QuantitativeScale) {
-                    this.x().scale.snapsDomain(!autorangeSmooth);
+                    this.x().scale.snapsDomain(!this.autorangeSmooth());
                 }
                 if (this.autorangeMode() === "y" && this.y() && this.y().scale && this.y().scale instanceof Plottable.QuantitativeScale) {
-                    this.y().scale.snapsDomain(!autorangeSmooth);
+                    this.y().scale.snapsDomain(!this.autorangeSmooth());
                 }
-                this.autorangeMode(this.autorangeMode());
-                return this;
             };
             Line.prototype.interpolator = function (interpolator) {
                 if (interpolator == null) {

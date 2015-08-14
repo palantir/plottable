@@ -3145,6 +3145,7 @@ declare module Plottable {
              * and deactivating the nice domain feature on the scales
              */
             autorangeSmooth(autorangeSmooth: boolean): Plots.Line<X>;
+            _setScaleSnappingForAutorangeSmooth(): void;
             /**
              * Gets the interpolation function associated with the plot.
              *
