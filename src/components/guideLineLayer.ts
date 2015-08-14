@@ -2,7 +2,7 @@
 
 module Plottable {
 export module Components {
-  enum PropertyMode { value, pixel };
+  enum PropertyMode { VALUE, PIXEL };
   export class GuideLineLayer<D> extends Component {
     public static ORIENTATION_VERTICAL = "vertical";
     public static ORIENTATION_HORIZONTAL = "horizontal";
@@ -13,7 +13,7 @@ export module Components {
     private _pixelPosition: number;
     private _scaleUpdateCallback: ScaleCallback<QuantitativeScale<D>>;
     private _guideLine: d3.Selection<void>;
-    private _mode = PropertyMode.value;
+    private _mode = PropertyMode.VALUE;
 
     constructor(orientation: string) {
       super();
@@ -82,9 +82,9 @@ export module Components {
       if (this.scale() == null) {
         return;
       }
-      if (this._mode === PropertyMode.value && this.value() != null) {
+      if (this._mode === PropertyMode.VALUE && this.value() != null) {
         this._pixelPosition = this.scale().scale(this.value());
-      } else if (this._mode === PropertyMode.pixel && this.pixelPosition() != null) {
+      } else if (this._mode === PropertyMode.PIXEL && this.pixelPosition() != null) {
         this._value = this.scale().invert(this.pixelPosition());
       }
     }
@@ -138,7 +138,7 @@ export module Components {
         return this._value;
       }
       this._value = value;
-      this._mode = PropertyMode.value;
+      this._mode = PropertyMode.VALUE;
       this._syncPixelPositionAndValue();
       this.render();
       return this;
@@ -163,7 +163,7 @@ export module Components {
         return this._pixelPosition;
       }
       this._pixelPosition = pixelPosition;
-      this._mode = PropertyMode.pixel;
+      this._mode = PropertyMode.PIXEL;
       this._syncPixelPositionAndValue();
       this.render();
       return this;
