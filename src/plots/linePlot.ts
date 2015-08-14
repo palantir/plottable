@@ -35,26 +35,26 @@ export module Plots {
     public x(x: number | Accessor<number>): Line<X>;
     public x(x: X | Accessor<X>, xScale: Scale<X, number>): Line<X>;
     public x(x?: number | Accessor<number> | X | Accessor<X>, xScale?: Scale<X, number>): any {
-      if (xScale instanceof QuantitativeScale && this.autorangeMode() === "x") {
-        (<QuantitativeScale<X>>xScale).snapsDomain(!this._autorangeSmooth);
-      }
-
-      if (xScale == null) {
-        return super.x(<number | Accessor<number>>x);
+      if (x == null) {
+        return super.x();
       } else {
-        return super.x(<X | Accessor<X>>x, xScale);
+        super.x(<X | Accessor<X>>x, xScale);
+        this._setScaleSnapping();
+        return this;
       }
-
     }
 
     public y(): Plots.AccessorScaleBinding<number, number>;
     public y(y: number | Accessor<number>): Line<X>;
     public y(y: number | Accessor<number>, yScale: Scale<number, number>): Line<X>;
     public y(y?: number | Accessor<number>, yScale?: Scale<number, number>): any {
-      if (yScale instanceof QuantitativeScale && this.autorangeMode() === "y") {
-        (<QuantitativeScale<number>>yScale).snapsDomain(!this._autorangeSmooth);
+      if (y == null) {
+        return super.y();
+      } else {
+        super.y(y, yScale);
+        this._setScaleSnapping();
+        return this;
       }
-      return super.y(y, yScale);
     }
 
     public autorangeMode(): string;

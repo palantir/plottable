@@ -8229,21 +8229,24 @@ var Plottable;
                 this.attr("stroke-width", "2px");
             }
             Line.prototype.x = function (x, xScale) {
-                if (xScale instanceof Plottable.QuantitativeScale && this.autorangeMode() === "x") {
-                    xScale.snapsDomain(!this._autorangeSmooth);
-                }
-                if (xScale == null) {
-                    return _super.prototype.x.call(this, x);
+                if (x == null) {
+                    return _super.prototype.x.call(this);
                 }
                 else {
-                    return _super.prototype.x.call(this, x, xScale);
+                    _super.prototype.x.call(this, x, xScale);
+                    this._setScaleSnapping();
+                    return this;
                 }
             };
             Line.prototype.y = function (y, yScale) {
-                if (yScale instanceof Plottable.QuantitativeScale && this.autorangeMode() === "y") {
-                    yScale.snapsDomain(!this._autorangeSmooth);
+                if (y == null) {
+                    return _super.prototype.y.call(this);
                 }
-                return _super.prototype.y.call(this, y, yScale);
+                else {
+                    _super.prototype.y.call(this, y, yScale);
+                    this._setScaleSnapping();
+                    return this;
+                }
             };
             Line.prototype.autorangeMode = function (autorangeMode) {
                 if (autorangeMode == null) {
