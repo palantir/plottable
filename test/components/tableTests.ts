@@ -80,7 +80,7 @@ describe("Tables", () => {
       assert.throw(() => t.add(null, 0, 0), "Cannot add null to a table cell");
     });
 
-    it("add()-ing a Component to the Group should detach() it from its current location", () => {
+    it("add()-ing a Component to the Table should detach() it from its current location", () => {
       let c1 = new Plottable.Component;
       let svg = TestMethods.generateSVG();
       c1.renderTo(svg);
@@ -319,21 +319,19 @@ describe("Tables", () => {
 
     it("detach()-ing a Component removes it from the Table", () => {
       table = new Plottable.Components.Table([[c1]]);
-      let svg = TestMethods.generateSVG();
-      table.renderTo(svg);
       c1.detach();
       assert.deepEqual((<any> table)._rows, [[null]], "calling detach() on the Component removed it from the Table");
-      svg.remove();
+      assert.isNull(c1.parent(), "Component disconnected from the Table");
     });
   });
 
   it("has()", () => {
     let c0 = new Plottable.Component();
-    let componentGroup = new Plottable.Components.Table([[c0]]);
-    assert.isTrue(componentGroup.has(c0), "correctly checks that Component is in the Table");
-    componentGroup.remove(c0);
-    assert.isFalse(componentGroup.has(c0), "correctly checks that Component is no longer in the Table");
-    componentGroup.add(c0, 1, 1);
-    assert.isTrue(componentGroup.has(c0), "correctly checks that Component is in the Table again");
+    let table = new Plottable.Components.Table([[c0]]);
+    assert.isTrue(table.has(c0), "correctly checks that Component is in the Table");
+    table.remove(c0);
+    assert.isFalse(table.has(c0), "correctly checks that Component is no longer in the Table");
+    table.add(c0, 1, 1);
+    assert.isTrue(table.has(c0), "correctly checks that Component is in the Table again");
   });
 });

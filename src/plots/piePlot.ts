@@ -173,7 +173,7 @@ export module Plots {
      */
     public labelsEnabled(enabled: boolean): Pie;
     public labelsEnabled(enabled?: boolean): any {
-      if (enabled === undefined) {
+      if (enabled == null) {
         return this._labelsEnabled;
       } else {
         this._labelsEnabled = enabled;

@@ -30,40 +30,6 @@ describe("Interactive Components", () => {
       svg.remove();
     });
 
-    it("enabled(boolean) properly modifies the state", () => {
-      let svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
-      let dbl = new Plottable.Components.DragBoxLayer();
-      assert.isTrue(dbl.enabled(), "drag box layer is enabled by default");
-      assert.strictEqual(dbl.enabled(false), dbl, "enabled(boolean) returns itself");
-      assert.isFalse(dbl.enabled(), "drag box layer reports when it is disabled");
-      svg.remove();
-    });
-
-    it("disables box when enabled(false)", () => {
-      let svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
-      let dbl = new Plottable.Components.DragBoxLayer();
-      dbl.enabled(false);
-      dbl.renderTo(svg);
-      assert.isFalse(dbl.boxVisible(), "box is hidden initially");
-
-      let startPoint = {
-        x: SVG_WIDTH / 4,
-        y: SVG_HEIGHT / 4
-      };
-      let endPoint = {
-        x: SVG_WIDTH / 2,
-        y: SVG_HEIGHT / 2
-      };
-
-      let target = dbl.background();
-      TestMethods.triggerFakeDragSequence(target, startPoint, endPoint);
-      assert.isFalse(dbl.boxVisible(), "box is not shown when disabled");
-      dbl.enabled(true);
-      TestMethods.triggerFakeDragSequence(target, startPoint, endPoint);
-      assert.isTrue(dbl.boxVisible(), "box is shown when enabled");
-      svg.remove();
-    });
-
     it("dismisses on click", () => {
       let svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
       let dbl = new Plottable.Components.DragBoxLayer();
@@ -301,6 +267,67 @@ describe("Interactive Components", () => {
       svg.remove();
     });
 
+    describe("enabling/disabling", () => {
+      it("enabled(boolean) properly modifies the state", () => {
+        let svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+        let dbl = new Plottable.Components.DragBoxLayer();
+        assert.isTrue(dbl.enabled(), "drag box layer is enabled by default");
+        assert.strictEqual(dbl.enabled(false), dbl, "enabled(boolean) returns itself");
+        assert.isFalse(dbl.enabled(), "drag box layer reports when it is disabled");
+        svg.remove();
+      });
+
+      it("disables box when enabled(false)", () => {
+        let svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+        let dbl = new Plottable.Components.DragBoxLayer();
+        dbl.enabled(false);
+        dbl.renderTo(svg);
+        assert.isFalse(dbl.boxVisible(), "box is hidden initially");
+
+        let startPoint = {
+          x: SVG_WIDTH / 4,
+          y: SVG_HEIGHT / 4
+        };
+        let endPoint = {
+          x: SVG_WIDTH / 2,
+          y: SVG_HEIGHT / 2
+        };
+
+        let target = dbl.background();
+        TestMethods.triggerFakeDragSequence(target, startPoint, endPoint);
+        assert.isFalse(dbl.boxVisible(), "box is not shown when disabled");
+        dbl.enabled(true);
+        TestMethods.triggerFakeDragSequence(target, startPoint, endPoint);
+        assert.isTrue(dbl.boxVisible(), "box is shown when enabled");
+        svg.remove();
+      });
+
+      it("does not have resizable CSS classes when enabled(false)", () => {
+        let dbl = new Plottable.Components.DragBoxLayer();
+        dbl.resizable(true);
+        assert.isTrue(dbl.hasClass("x-resizable"), "carries \"x-resizable\" class if resizable");
+        assert.isTrue(dbl.hasClass("y-resizable"), "carries \"y-resizable\" class if resizable");
+        dbl.enabled(false);
+        assert.isFalse(dbl.hasClass("x-resizable"), "does not carry \"x-resizable\" class if resizable, but not enabled");
+        assert.isFalse(dbl.hasClass("y-resizable"), "does not carry \"y-resizable\" class if resizable, but not enabled");
+        dbl.resizable(false);
+        dbl.enabled(true);
+        assert.isFalse(dbl.hasClass("x-resizable"), "does not carry \"x-resizable\" class if enabled, but not resizable");
+        assert.isFalse(dbl.hasClass("y-resizable"), "does not carry \"y-resizable\" class if enabled, but not resizable");
+      });
+
+      it("does not have movable CSS classe when enabled(false)", () => {
+        let dbl = new Plottable.Components.DragBoxLayer();
+        dbl.movable(true);
+        assert.isTrue(dbl.hasClass("movable"), "carries \"movable\" class if movable");
+        dbl.enabled(false);
+        assert.isFalse(dbl.hasClass("movable"), "does not carry \"movable\" class if movable, but not enabled");
+        dbl.movable(false);
+        dbl.enabled(true);
+        assert.isFalse(dbl.hasClass("movable"), "does not carry \"movable\" class if enabled, but not movable");
+      });
+    });
+
     describe("resizing", () => {
       let svg: d3.Selection<void>;
       let dbl: Plottable.Components.DragBoxLayer;
@@ -332,8 +359,25 @@ describe("Interactive Components", () => {
         resetBox();
       });
 
-      it("resizable() defaults to false", () => {
+      it("resizable() getter/setter", () => {
         assert.isFalse(dbl.resizable(), "defaults to false");
+        assert.strictEqual(dbl.resizable(true), dbl, "returns DragBoxLayer when invoked as setter");
+        assert.isTrue(dbl.resizable(), "successfully set to true");
+        svg.remove();
+      });
+
+      it("resizable() correctly sets pointer-events", () => {
+        dbl.resizable(true);
+        let edges = dbl.content().selectAll("line");
+        edges[0].forEach((edge) => {
+          let computedStyle = window.getComputedStyle(<Element> edge);
+          assert.strictEqual(computedStyle.pointerEvents.toLowerCase(), "visiblestroke", "pointer-events set correctly on edges");
+        });
+        let corners = dbl.content().selectAll("circle");
+        corners[0].forEach((corner) => {
+          let computedStyle = window.getComputedStyle(<Element> corner);
+          assert.strictEqual(computedStyle.pointerEvents.toLowerCase(), "visiblefill", "pointer-events set correctly on corners");
+        });
         svg.remove();
       });
 

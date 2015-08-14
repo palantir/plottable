@@ -77,6 +77,44 @@ describe("Plots", () => {
       svg.remove();
     });
 
+    it("retrieves the entities that intersect with the bounding box", () => {
+      let xScale = new Plottable.Scales.Linear();
+      let yScale = new Plottable.Scales.Linear();
+      let svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+      let dataset = new Plottable.Dataset(DATA);
+      let plot = new Plottable.Plots.Rectangle()
+        .x((d) => d.x, xScale).x2((d) => d.x2)
+        .y((d) => d.y, yScale).y2((d) => d.y2);
+      plot.addDataset(dataset).renderTo(svg);
+
+      let entities = plot.entitiesIn({
+        topLeft: { x: xScale.scale(1.5), y: yScale.scale(2.5) },
+        bottomRight: { x: xScale.scale(2.5), y: yScale.scale(1.5) } });
+      assert.lengthOf(entities, 2, "retrieved 2 entities intersect with the box");
+      assert.strictEqual(entities[0].index, 1, "the entity of index 1 is retrieved");
+      assert.strictEqual(entities[1].index, 2, "the entity of index 2 is retrieved");
+      svg.remove();
+    });
+
+    it("retrieves the entities that intersect with the given ranges", () => {
+      let xScale = new Plottable.Scales.Linear();
+      let yScale = new Plottable.Scales.Linear();
+      let svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+      let dataset = new Plottable.Dataset(DATA);
+      let plot = new Plottable.Plots.Rectangle()
+        .x((d) => d.x, xScale).x2((d) => d.x2)
+        .y((d) => d.y, yScale).y2((d) => d.y2);
+      plot.addDataset(dataset).renderTo(svg);
+
+      let entities = plot.entitiesIn(
+        {min: xScale.scale(1.5), max: xScale.scale(2.5)},
+        {min: yScale.scale(2.5), max: yScale.scale(1.5)});
+      assert.lengthOf(entities, 2, "retrieved 2 entities intersect with the box");
+      assert.strictEqual(entities[0].index, 1, "the entity of index 1 is retrieved");
+      assert.strictEqual(entities[1].index, 2, "the entity of index 2 is retrieved");
+      svg.remove();
+    });
+
     it("autorangeMode(\"x\")", () => {
       let staggeredData = [
         { y: "A", x: 0, x2: 1 },

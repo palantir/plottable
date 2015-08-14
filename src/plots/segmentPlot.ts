@@ -88,7 +88,7 @@ export module Plots {
     /**
      * Sets X2 to a constant number or the result of an Accessor.
      * If a Scale has been set for X, it will also be used to scale X2.
-     * 
+     *
      * @param {number|Accessor<number>|Y|Accessor<Y>} y2
      * @returns {Plots.Segment} The calling Segment Plot
      */
@@ -171,6 +171,83 @@ export module Plots {
       attrToProjector["y1"] = Plot._scaledAccessor(this.y());
       attrToProjector["y2"] = this.y2() == null ? Plot._scaledAccessor(this.y()) : Plot._scaledAccessor(this.y2());
       return attrToProjector;
+    }
+
+    /**
+     * Gets the Entities that intersect the Bounds.
+     *
+     * @param {Bounds} bounds
+     * @returns {PlotEntity[]}
+     */
+    public entitiesIn(bounds: Bounds): PlotEntity[];
+    /**
+     * Gets the Entities that intersect the area defined by the ranges.
+     *
+     * @param {Range} xRange
+     * @param {Range} yRange
+     * @returns {PlotEntity[]}
+     */
+    public entitiesIn(xRange: Range, yRange: Range): PlotEntity[];
+    public entitiesIn(xRangeOrBounds: Range | Bounds, yRange?: Range): PlotEntity[] {
+      let dataXRange: Range;
+      let dataYRange: Range;
+      if (yRange == null) {
+        let bounds = (<Bounds> xRangeOrBounds);
+        dataXRange = { min: bounds.topLeft.x, max: bounds.bottomRight.x };
+        dataYRange = { min: bounds.topLeft.y, max: bounds.bottomRight.y };
+      } else {
+        dataXRange = (<Range> xRangeOrBounds);
+        dataYRange = yRange;
+      }
+      return this._entitiesIntersecting(dataXRange, dataYRange);
+    }
+
+    private _entitiesIntersecting(xRange: Range, yRange: Range): PlotEntity[] {
+      let intersected: PlotEntity[] = [];
+      let attrToProjector = this._generateAttrToProjector();
+      this.entities().forEach((entity) => {
+        if (this._lineIntersectsBox(entity, xRange, yRange, attrToProjector)) {
+          intersected.push(entity);
+        }
+      });
+      return intersected;
+    }
+
+    private _lineIntersectsBox(entity: PlotEntity, xRange: Range, yRange: Range, attrToProjector: AttributeToProjector) {
+      let x1 = attrToProjector["x1"](entity.datum, entity.index, entity.dataset);
+      let x2 = attrToProjector["x2"](entity.datum, entity.index, entity.dataset);
+      let y1 = attrToProjector["y1"](entity.datum, entity.index, entity.dataset);
+      let y2 = attrToProjector["y2"](entity.datum, entity.index, entity.dataset);
+
+      // check if any of end points of the segment is inside the box
+      if ( ( xRange.min <= x1 && x1 <= xRange.max && yRange.min <= y1 && y1 <= yRange.max ) ||
+           ( xRange.min <= x2 && x2 <= xRange.max && yRange.min <= y2 && y2 <= yRange.max ) ) {
+        return true;
+      }
+
+      let startPoint = { x: x1, y: y1};
+      let endPoint = { x: x2, y: y2};
+      let corners = [
+        { x: xRange.min, y: yRange.min },
+        { x: xRange.min, y: yRange.max },
+        { x: xRange.max, y: yRange.max },
+        { x: xRange.max, y: yRange.min }];
+      let intersections = corners.filter((point: Point, index: number) => {
+          if (index !== 0) {
+            // return true if border formed by conecting current corner and previous corner intersects with the segment
+            return this._lineIntersectsSegment(startPoint, endPoint, point, corners[index - 1]) &&
+                   this._lineIntersectsSegment(point, corners[index - 1], startPoint, endPoint) ;
+          }
+      });
+      return intersections.length > 0;
+    }
+
+    private _lineIntersectsSegment(point1: Point, point2: Point, point3: Point, point4: Point) {
+      let calcOrientation = (point1: Point, point2: Point, point: Point) => {
+        return (point2.x - point1.x) * (point.y - point2.y) - (point2.y - point1.y) * (point.x - point2.x);
+      };
+      // point3 and point4 are on different sides of line formed by point1 and point2
+      return calcOrientation(point1, point2, point3) * calcOrientation(point1, point2, point4) < 0;
     }
   }
 }

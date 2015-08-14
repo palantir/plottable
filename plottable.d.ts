@@ -2427,6 +2427,70 @@ declare module Plottable {
 
 
 declare module Plottable {
+    module Components {
+        class GuideLineLayer<D> extends Component {
+            static ORIENTATION_VERTICAL: string;
+            static ORIENTATION_HORIZONTAL: string;
+            constructor(orientation: string);
+            protected _setup(): void;
+            protected _sizeFromOffer(availableWidth: number, availableHeight: number): {
+                width: number;
+                height: number;
+            };
+            fixedWidth(): boolean;
+            fixedHeight(): boolean;
+            computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number): GuideLineLayer<D>;
+            renderImmediately(): GuideLineLayer<D>;
+            /**
+             * Gets the QuantitativeScale on the GuideLineLayer.
+             *
+             * @return {QuantitativeScale<D>}
+             */
+            scale(): QuantitativeScale<D>;
+            /**
+             * Sets the QuantitativeScale on the GuideLineLayer.
+             * If value() was the last property set, pixelPosition() will be updated according to the new scale.
+             * If pixelPosition() was the last property set, value() will be updated according to the new scale.
+             *
+             * @param {QuantitativeScale<D>} scale
+             * @return {GuideLineLayer<D>} The calling GuideLineLayer.
+             */
+            scale(scale: QuantitativeScale<D>): GuideLineLayer<D>;
+            /**
+             * Gets the value of the guide line in data-space.
+             *
+             * @return {D}
+             */
+            value(): D;
+            /**
+             * Sets the value of the guide line in data-space.
+             * If the GuideLineLayer has a scale, pixelPosition() will be updated now and whenever the scale updates.
+             *
+             * @param {D} value
+             * @return {GuideLineLayer<D>} The calling GuideLineLayer.
+             */
+            value(value: D): GuideLineLayer<D>;
+            /**
+             * Gets the position of the guide line in pixel-space.
+             *
+             * @return {number}
+             */
+            pixelPosition(): number;
+            /**
+             * Sets the position of the guide line in pixel-space.
+             * If the GuideLineLayer has a scale, the value() will be updated now and whenever the scale updates.
+             *
+             * @param {number} pixelPosition
+             * @return {GuideLineLayer<D>} The calling GuideLineLayer.
+             */
+            pixelPosition(pixelPosition: number): GuideLineLayer<D>;
+            destroy(): void;
+        }
+    }
+}
+
+
+declare module Plottable {
     module Plots {
         interface PlotEntity extends Entity<Plot> {
             dataset: Dataset;
@@ -2881,6 +2945,21 @@ declare module Plottable {
              * @returns {PlotEntity[]} The PlotEntities at the particular point
              */
             entitiesAt(point: Point): PlotEntity[];
+            /**
+             * Gets the Entities that intersect the Bounds.
+             *
+             * @param {Bounds} bounds
+             * @returns {PlotEntity[]}
+             */
+            entitiesIn(bounds: Bounds): PlotEntity[];
+            /**
+             * Gets the Entities that intersect the area defined by the ranges.
+             *
+             * @param {Range} xRange
+             * @param {Range} yRange
+             * @returns {PlotEntity[]}
+             */
+            entitiesIn(xRange: Range, yRange: Range): PlotEntity[];
             protected _propertyProjectors(): AttributeToProjector;
             protected _pixelPoint(datum: any, index: number, dataset: Dataset): {
                 x: any;
@@ -3066,6 +3145,10 @@ declare module Plottable {
              */
             entitiesIn(xRange: Range, yRange: Range): PlotEntity[];
             protected _additionalPaint(time: number): void;
+            /**
+             * Makes sure the extent takes into account the widths of the bars
+             */
+            protected _extentsForProperty(property: string): any[];
             protected _generateDrawSteps(): Drawers.DrawStep[];
             protected _generateAttrToProjector(): {
                 [attr: string]: (datum: any, index: number, dataset: Dataset) => any;
@@ -3074,9 +3157,8 @@ declare module Plottable {
              * Computes the barPixelWidth of all the bars in the plot.
              *
              * If the position scale of the plot is a CategoryScale and in bands mode, then the rangeBands function will be used.
-             * If the position scale of the plot is a CategoryScale and in points mode, then
-             *   from https://github.com/mbostock/d3/wiki/Ordinal-Scales#ordinal_rangePoints, the max barPixelWidth is step * padding
-             * If the position scale of the plot is a QuantitativeScale, then _getMinimumDataWidth is scaled to compute the barPixelWidth
+             * If the position scale of the plot is a QuantitativeScale, then the bar width is equal to the smallest distance between
+             * two adjacent data points, padded for visualisation.
              */
             protected _getBarPixelWidth(): number;
             entities(datasets?: Dataset[]): PlotEntity[];
@@ -3345,6 +3427,21 @@ declare module Plottable {
              */
             y2(y2: number | Accessor<number> | Y | Accessor<Y>): Plots.Segment<X, Y>;
             protected _propertyProjectors(): AttributeToProjector;
+            /**
+             * Gets the Entities that intersect the Bounds.
+             *
+             * @param {Bounds} bounds
+             * @returns {PlotEntity[]}
+             */
+            entitiesIn(bounds: Bounds): PlotEntity[];
+            /**
+             * Gets the Entities that intersect the area defined by the ranges.
+             *
+             * @param {Range} xRange
+             * @param {Range} yRange
+             * @returns {PlotEntity[]}
+             */
+            entitiesIn(xRange: Range, yRange: Range): PlotEntity[];
         }
     }
 }
