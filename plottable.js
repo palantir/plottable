@@ -3794,7 +3794,8 @@ var Plottable;
                 elements.exit().remove();
                 return elements;
             };
-            var offsetF = function (d) { return annotationToTier.get(d) * tierHeight + _this._computedHeight; };
+            var height = this._computedHeight || (this._maxLabelTickLength() + this.tickLabelPadding() + this._annotationMeasurer.measure().height);
+            var offsetF = function (d) { return annotationToTier.get(d) * tierHeight + height; };
             var positionF = function (d) { return _this._scale.scale(d); };
             var visibilityF = function (d) { return hiddenAnnotations.has(d) ? "hidden" : "visible"; };
             bindElements(this._annotationContainer.select(".annotation-line-container"), "line", "annotation-line")
