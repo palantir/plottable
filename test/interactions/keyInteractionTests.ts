@@ -2,16 +2,16 @@
 
 describe("Interactions", () => {
   describe("KeyInteraction", () => {
-    var svg: d3.Selection<void>;
-    var component: Plottable.Component;
-    var keyInteraction: Plottable.Interactions.Key;
-    var aCode: number;
-    var bCode: number;
+    let svg: d3.Selection<void>;
+    let component: Plottable.Component;
+    let keyInteraction: Plottable.Interactions.Key;
+    let aCode: number;
+    let bCode: number;
 
-    var aCallbackCalled: boolean;
-    var bCallbackCalled: boolean;
-    var aCallback: Plottable.KeyCallback;
-    var bCallback: Plottable.KeyCallback;
+    let aCallbackCalled: boolean;
+    let bCallbackCalled: boolean;
+    let aCallback: Plottable.KeyCallback;
+    let bCallback: Plottable.KeyCallback;
 
     beforeEach(() => {
       aCode = 65;
@@ -76,10 +76,10 @@ describe("Interactions", () => {
       });
 
       it("multiple keyPress callbacks are possible", () => {
-        var aCallback1Called = false;
-        var aCallback1 = () => aCallback1Called = true;
-        var aCallback2Called = false;
-        var aCallback2 = () => aCallback2Called = true;
+        let aCallback1Called = false;
+        let aCallback1 = () => aCallback1Called = true;
+        let aCallback2Called = false;
+        let aCallback2 = () => aCallback2Called = true;
 
         keyInteraction.onKeyPress(aCode, aCallback1);
         keyInteraction.onKeyPress(aCode, aCallback2);
@@ -96,10 +96,10 @@ describe("Interactions", () => {
       });
 
       it("can remove only one of the registered keypress callbacks", () => {
-        var aCallback1Called = false;
-        var aCallback1 = () => aCallback1Called = true;
-        var aCallback2Called = false;
-        var aCallback2 = () => aCallback2Called = true;
+        let aCallback1Called = false;
+        let aCallback1 = () => aCallback1Called = true;
+        let aCallback2Called = false;
+        let aCallback2 = () => aCallback2Called = true;
 
         keyInteraction.onKeyPress(aCode, aCallback1);
         keyInteraction.onKeyPress(aCode, aCallback2);
@@ -114,6 +114,36 @@ describe("Interactions", () => {
         assert.isTrue(aCallback2Called, "callback 2 for \"a\" is still connected to the interaction");
 
         keyInteraction.offKeyPress(aCode, aCallback2);
+        svg.remove();
+      });
+
+      it("is only triggered once when the key is pressed", () => {
+        keyInteraction.onKeyPress(aCode, aCallback);
+        keyInteraction.attachTo(component);
+
+        TestMethods.triggerFakeMouseEvent("mouseover", component.background(), 100, 100);
+        TestMethods.triggerFakeKeyboardEvent("keydown", component.background(), aCode);
+        assert.isTrue(aCallbackCalled, "callback for \"a\" was called when \"a\" key was pressed");
+
+        aCallbackCalled = false;
+        TestMethods.triggerFakeKeyboardEvent("keydown", component.background(), aCode, { repeat : true });
+        assert.isFalse(aCallbackCalled, "callback for \"a\" was not called when keydown was fired the second time");
+
+        keyInteraction.offKeyPress(aCode, aCallback);
+        svg.remove();
+      });
+
+      it("does not fire the callback if the key is pressed and held down outside, then the mouse moved inside", () => {
+        keyInteraction.onKeyPress(aCode, aCallback);
+        keyInteraction.attachTo(component);
+
+        TestMethods.triggerFakeMouseEvent("mouseout", component.background(), -100, -100);
+        TestMethods.triggerFakeKeyboardEvent("keydown", component.background(), aCode);
+        TestMethods.triggerFakeMouseEvent("mouseover", component.background(), 100, 100);
+        TestMethods.triggerFakeKeyboardEvent("keydown", component.background(), aCode, { repeat : true });
+        assert.isFalse(aCallbackCalled, "callback for \"a\" was not called");
+
+        keyInteraction.offKeyPress(aCode, aCallback);
         svg.remove();
       });
     });
@@ -225,10 +255,10 @@ describe("Interactions", () => {
       });
 
       it("multiple keyRelease callbacks are possible", () => {
-        var aCallback1Called = false;
-        var aCallback1 = () => aCallback1Called = true;
-        var aCallback2Called = false;
-        var aCallback2 = () => aCallback2Called = true;
+        let aCallback1Called = false;
+        let aCallback1 = () => aCallback1Called = true;
+        let aCallback2Called = false;
+        let aCallback2 = () => aCallback2Called = true;
 
         keyInteraction.onKeyRelease(aCode, aCallback1);
         keyInteraction.onKeyRelease(aCode, aCallback2);
@@ -246,10 +276,10 @@ describe("Interactions", () => {
       });
 
       it("can remove only one of the registered keyrelease callback", () => {
-        var aCallback1Called = false;
-        var aCallback1 = () => aCallback1Called = true;
-        var aCallback2Called = false;
-        var aCallback2 = () => aCallback2Called = true;
+        let aCallback1Called = false;
+        let aCallback1 = () => aCallback1Called = true;
+        let aCallback2Called = false;
+        let aCallback2 = () => aCallback2Called = true;
 
         keyInteraction.onKeyRelease(aCode, aCallback1);
         keyInteraction.onKeyRelease(aCode, aCallback2);

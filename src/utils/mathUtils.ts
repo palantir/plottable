@@ -4,7 +4,7 @@ module Plottable {
 export module Utils {
   export module Math {
 
-    var nativeMath: Math = (<any>window).Math;
+    let nativeMath: Math = (<any>window).Math;
 
     /**
      * Checks if x is between a and b.
@@ -37,10 +37,10 @@ export module Utils {
     export function max<C>(array: C[], defaultValue: C): C;
     export function max<T, C>(array: T[], accessor: (t?: T, i?: number) => C, defaultValue: C): C;
     export function max(array: any[], firstArg: any, secondArg?: any): any {
-      var accessor = typeof(firstArg) === "function" ? firstArg : null;
-      var defaultValue = accessor == null ? firstArg : secondArg;
+      let accessor = typeof(firstArg) === "function" ? firstArg : null;
+      let defaultValue = accessor == null ? firstArg : secondArg;
       /* tslint:disable:ban */
-      var maxValue = accessor == null ? d3.max(array) : d3.max(array, accessor);
+      let maxValue = accessor == null ? d3.max(array) : d3.max(array, accessor);
       /* tslint:enable:ban */
       return maxValue !== undefined ? maxValue : defaultValue;
     }
@@ -52,10 +52,10 @@ export module Utils {
     export function min<C>(array: C[], defaultValue: C): C;
     export function min<T, C>(array: T[], accessor: (t?: T, i?: number) => C, defaultValue: C): C;
     export function min(array: any[], firstArg: any, secondArg?: any): any {
-      var accessor = typeof(firstArg) === "function" ? firstArg : null;
-      var defaultValue = accessor == null ? firstArg : secondArg;
+      let accessor = typeof(firstArg) === "function" ? firstArg : null;
+      let defaultValue = accessor == null ? firstArg : secondArg;
       /* tslint:disable:ban */
-      var minValue = accessor == null ? d3.min(array) : d3.min(array, accessor);
+      let minValue = accessor == null ? d3.min(array) : d3.min(array, accessor);
       /* tslint:enable:ban */
       return minValue !== undefined ? minValue : defaultValue;
     }
@@ -83,10 +83,10 @@ export module Utils {
       if (step === 0) {
         throw new Error("step cannot be 0");
       }
-      var length = nativeMath.max(nativeMath.ceil((stop - start) / step), 0);
-      var range: number[] = [];
+      let length = nativeMath.max(nativeMath.ceil((stop - start) / step), 0);
+      let range: number[] = [];
 
-      for (var i = 0; i < length; ++i) {
+      for (let i = 0; i < length; ++i) {
         range[i] = start + step * i;
       }
 

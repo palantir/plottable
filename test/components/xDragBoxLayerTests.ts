@@ -2,20 +2,20 @@
 
 describe("Interactive Components", () => {
   describe("XDragBoxLayer", () => {
-    var SVG_WIDTH = 400;
-    var SVG_HEIGHT = 400;
+    let SVG_WIDTH = 400;
+    let SVG_HEIGHT = 400;
 
     it("bounds()", () => {
-      var svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
-      var dbl = new Plottable.Components.XDragBoxLayer();
+      let svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+      let dbl = new Plottable.Components.XDragBoxLayer();
       dbl.boxVisible(true);
       dbl.renderTo(svg);
 
-      var topLeft = {
+      let topLeft = {
         x: SVG_WIDTH / 4,
         y: SVG_HEIGHT / 4
       };
-      var bottomRight = {
+      let bottomRight = {
         x: SVG_WIDTH / 2,
         y: SVG_HEIGHT / 2
       };
@@ -25,7 +25,7 @@ describe("Interactive Components", () => {
         bottomRight: bottomRight
       });
 
-      var actualBounds = dbl.bounds();
+      let actualBounds = dbl.bounds();
       assert.strictEqual(actualBounds.topLeft.y, 0, "box starts at top");
       assert.strictEqual(actualBounds.topLeft.x, topLeft.x, "left edge set correctly");
       assert.strictEqual(actualBounds.bottomRight.y, dbl.height(), "box ends at bottom");
@@ -35,17 +35,17 @@ describe("Interactive Components", () => {
     });
 
     it("resizes only in x", () => {
-      var svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
-      var dbl = new Plottable.Components.XDragBoxLayer();
+      let svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+      let dbl = new Plottable.Components.XDragBoxLayer();
       dbl.boxVisible(true);
       dbl.resizable(true);
       dbl.renderTo(svg);
 
-      var topLeft = {
+      let topLeft = {
         x: SVG_WIDTH / 4,
         y: SVG_HEIGHT / 4
       };
-      var bottomRight = {
+      let bottomRight = {
         x: SVG_WIDTH / 2,
         y: SVG_HEIGHT / 2
       };
@@ -55,8 +55,8 @@ describe("Interactive Components", () => {
         bottomRight: bottomRight
       });
 
-      var actualBounds = dbl.bounds();
-      var dragTo = {
+      let actualBounds = dbl.bounds();
+      let dragTo = {
         x: SVG_WIDTH * 3 / 4,
         y: SVG_HEIGHT / 2
       };
@@ -69,17 +69,17 @@ describe("Interactive Components", () => {
     });
 
     it("stays full height after resizing", () => {
-      var svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
-      var dbl = new Plottable.Components.XDragBoxLayer();
+      let svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+      let dbl = new Plottable.Components.XDragBoxLayer();
       dbl.boxVisible(true);
       dbl.resizable(true);
       dbl.renderTo(svg);
 
-      var topLeft = {
+      let topLeft = {
         x: SVG_WIDTH / 4,
         y: SVG_HEIGHT / 4
       };
-      var bottomRight = {
+      let bottomRight = {
         x: SVG_WIDTH / 2,
         y: SVG_HEIGHT / 2
       };
@@ -89,13 +89,13 @@ describe("Interactive Components", () => {
         bottomRight: bottomRight
       });
 
-      var heightBefore = dbl.height();
-      var boundsBefore = dbl.bounds();
+      let heightBefore = dbl.height();
+      let boundsBefore = dbl.bounds();
       svg.attr("height", 2 * SVG_HEIGHT);
       dbl.redraw();
       assert.notStrictEqual(dbl.height(), heightBefore, "component changed size");
 
-      var boundsAfter = dbl.bounds();
+      let boundsAfter = dbl.bounds();
       assert.strictEqual(boundsAfter.topLeft.x, boundsBefore.topLeft.x, "box keeps same left edge");
       assert.strictEqual(boundsAfter.topLeft.y, 0, "box still starts at top");
       assert.strictEqual(boundsAfter.bottomRight.x, boundsBefore.bottomRight.x, "box keeps same right edge");
@@ -104,32 +104,32 @@ describe("Interactive Components", () => {
     });
 
     it("throws error on getting y scale", () => {
-      var dbl = new Plottable.Components.XDragBoxLayer();
+      let dbl = new Plottable.Components.XDragBoxLayer();
       assert.throws(() => dbl.yScale(), "no yScale");
     });
 
     it("throws error on setting y scale", () => {
-      var dbl = new Plottable.Components.XDragBoxLayer();
+      let dbl = new Plottable.Components.XDragBoxLayer();
       assert.throws(() => dbl.yScale(new Plottable.Scales.Linear()), "yScales cannot be set");
     });
 
     it("throws error on getting y extent", () => {
-      var dbl = new Plottable.Components.XDragBoxLayer();
+      let dbl = new Plottable.Components.XDragBoxLayer();
       assert.throws(() => dbl.yExtent(), "no yExtent");
     });
 
     it("moves only in x", () => {
-      var svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
-      var dbl = new Plottable.Components.XDragBoxLayer();
+      let svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+      let dbl = new Plottable.Components.XDragBoxLayer();
       dbl.boxVisible(true);
       dbl.movable(true);
       dbl.renderTo(svg);
 
-      var topLeft = {
+      let topLeft = {
         x: SVG_WIDTH / 4,
         y: SVG_HEIGHT / 4
       };
-      var bottomRight = {
+      let bottomRight = {
         x: SVG_WIDTH * 3 / 4,
         y: SVG_HEIGHT * 3 / 4
       };
@@ -139,14 +139,14 @@ describe("Interactive Components", () => {
         bottomRight: bottomRight
       });
 
-      var boundsBefore = dbl.bounds();
-      var dragDistance = 10;
+      let boundsBefore = dbl.bounds();
+      let dragDistance = 10;
       TestMethods.triggerFakeDragSequence(dbl.background(),
         { x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2 },
         { x: SVG_WIDTH / 2 + dragDistance, y: SVG_HEIGHT / 2 + dragDistance }
       );
 
-      var boundsAfter = dbl.bounds();
+      let boundsAfter = dbl.bounds();
       assert.strictEqual(boundsAfter.topLeft.x, boundsBefore.topLeft.x + dragDistance, "left edge moved");
       assert.strictEqual(boundsAfter.topLeft.y, 0, "box still starts at top");
       assert.strictEqual(boundsAfter.bottomRight.x, boundsBefore.bottomRight.x + dragDistance, "right edge moved");
@@ -155,9 +155,20 @@ describe("Interactive Components", () => {
       svg.remove();
     });
 
+    it("does not have resizable CSS class when enabled(false)", () => {
+      let xdbl = new Plottable.Components.XDragBoxLayer();
+      xdbl.resizable(true);
+      assert.isTrue(xdbl.hasClass("x-resizable"), "carries \"x-resizable\" class if resizable");
+      xdbl.enabled(false);
+      assert.isFalse(xdbl.hasClass("x-resizable"), "does not carry \"x-resizable\" class if resizable, but not enabled");
+      xdbl.resizable(false);
+      xdbl.enabled(true);
+      assert.isFalse(xdbl.hasClass("x-resizable"), "does not carry \"x-resizable\" class if enabled, but not resizable");
+    });
+
     it("destroy() does not error if scales are not inputted", () => {
-      var svg = TestMethods.generateSVG();
-      var sbl = new Plottable.Components.XDragBoxLayer();
+      let svg = TestMethods.generateSVG();
+      let sbl = new Plottable.Components.XDragBoxLayer();
       sbl.renderTo(svg);
       assert.doesNotThrow(() => sbl.destroy(), Error, "can destroy");
 

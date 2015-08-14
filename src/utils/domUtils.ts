@@ -1,8 +1,9 @@
+///<reference path="../reference.ts" />
 
 module Plottable {
 export module Utils {
   export module DOM {
-    var nativeMath: Math = (<any>window).Math;
+    let nativeMath: Math = (<any>window).Math;
 
     /**
      * Gets the bounding box of an element.
@@ -10,7 +11,7 @@ export module Utils {
      * @returns {SVGRed} The bounding box.
      */
     export function elementBBox(element: d3.Selection<any>) {
-      var bbox: SVGRect;
+      let bbox: SVGRect;
       // HACKHACK: Firefox won't correctly measure nodes with style "display: none" or their descendents (FF Bug 612118).
       try {
         bbox = (<any> element.node()).getBBox();
@@ -48,7 +49,7 @@ export module Utils {
      * @returns {number} The width of the element.
      */
     export function elementWidth(element: Element) {
-      var style = window.getComputedStyle(element);
+      let style = window.getComputedStyle(element);
       return _parseStyleValue(style, "width")
         + _parseStyleValue(style, "padding-left")
         + _parseStyleValue(style, "padding-right")
@@ -64,7 +65,7 @@ export module Utils {
      * @returns {number} The height of the element
      */
     export function elementHeight(element: Element) {
-      var style = window.getComputedStyle(element);
+      let style = window.getComputedStyle(element);
       return _parseStyleValue(style, "height")
         + _parseStyleValue(style, "padding-top")
         + _parseStyleValue(style, "padding-bottom")
@@ -89,7 +90,7 @@ export module Utils {
      */
     export function translate(selection: d3.Selection<any>, x: number, y: number): d3.Selection<any>;
     export function translate(selection: d3.Selection<any>, x?: number, y?: number): any {
-      var transformMatrix = d3.transform(selection.attr("transform"));
+      let transformMatrix = d3.transform(selection.attr("transform"));
 
       if (x == null) {
         return transformMatrix.translate;
@@ -140,7 +141,7 @@ export module Utils {
      * @returns {SVGElement} The bounding svg
      */
     export function boundingSVG(element: SVGElement): SVGElement {
-      var ownerSVG = element.ownerSVGElement;
+      let ownerSVG = element.ownerSVGElement;
       if (ownerSVG != null) {
         return ownerSVG;
       }
@@ -150,7 +151,7 @@ export module Utils {
       return null; // not in the DOM
     }
 
-    var _latestClipPathId = 0;
+    let _latestClipPathId = 0;
     /**
      * Generates a ClipPath ID that is unique for this instance of Plottable
      */
@@ -175,8 +176,8 @@ export module Utils {
         yValOrRange: number | Range,
         bbox: SVGRect,
         tolerance = 0.5) {
-      var xRange = _parseRange(xValOrRange);
-      var yRange = _parseRange(yValOrRange);
+      let xRange = _parseRange(xValOrRange);
+      let yRange = _parseRange(yValOrRange);
 
       // SVGRects are positioned with sub-pixel accuracy (the default unit
       // for the x, y, height & width attributes), but user selections (e.g. via
@@ -197,11 +198,11 @@ export module Utils {
      */
     function _parseRange(input: number | Range): Range {
       if (typeof (input) === "number") {
-        var value = <number>input;
+        let value = <number>input;
         return { min: value, max: value };
       }
 
-      var range = <Range>input;
+      let range = <Range>input;
       if (range instanceof Object && "min" in range && "max" in range) {
         return range;
       }
@@ -210,8 +211,8 @@ export module Utils {
     }
 
     function _parseStyleValue(style: CSSStyleDeclaration, property: string): number {
-      var value = style.getPropertyValue(property);
-      var parsedValue = parseFloat(value);
+      let value = style.getPropertyValue(property);
+      let parsedValue = parseFloat(value);
       return parsedValue || 0;
     }
   }

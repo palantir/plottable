@@ -2,18 +2,18 @@
 
 describe("Plots", () => {
   describe("Clustered Bar Plot", () => {
-    var svg: d3.Selection<void>;
-    var dataset1: Plottable.Dataset;
-    var dataset2: Plottable.Dataset;
-    var xScale: Plottable.Scales.Category;
-    var yScale: Plottable.Scales.Linear;
-    var renderer: Plottable.Plots.ClusteredBar<string, number>;
-    var SVG_WIDTH = 600;
-    var SVG_HEIGHT = 400;
-    var axisHeight = 0;
-    var bandWidth = 0;
-    var originalData1: any[];
-    var originalData2: any[];
+    let svg: d3.Selection<void>;
+    let dataset1: Plottable.Dataset;
+    let dataset2: Plottable.Dataset;
+    let xScale: Plottable.Scales.Category;
+    let yScale: Plottable.Scales.Linear;
+    let renderer: Plottable.Plots.ClusteredBar<string, number>;
+    let SVG_WIDTH = 600;
+    let SVG_HEIGHT = 400;
+    let axisHeight = 0;
+    let bandWidth = 0;
+    let originalData1: any[];
+    let originalData2: any[];
 
     beforeEach(() => {
       svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
@@ -30,11 +30,11 @@ describe("Plots", () => {
         {x: "B", y: 1}
       ];
 
-      var data1 = [
+      let data1 = [
         {x: "A", y: 1},
         {x: "B", y: 2}
       ];
-      var data2 = [
+      let data2 = [
         {x: "A", y: 2},
         {x: "B", y: 1}
       ];
@@ -48,22 +48,22 @@ describe("Plots", () => {
       renderer.baselineValue(0);
       renderer.x((d) => d.x, xScale);
       renderer.y((d) => d.y, yScale);
-      var xAxis = new Plottable.Axes.Category(xScale, "bottom");
+      let xAxis = new Plottable.Axes.Category(xScale, "bottom");
       new Plottable.Components.Table([[renderer], [xAxis]]).renderTo(svg);
       axisHeight = xAxis.height();
       bandWidth = xScale.rangeBand();
     });
 
     it("renders correctly", () => {
-      var bars = (<any> renderer)._renderArea.selectAll("rect");
-      var bar0 = d3.select(bars[0][0]);
-      var bar1 = d3.select(bars[0][1]);
-      var bar2 = d3.select(bars[0][2]);
-      var bar3 = d3.select(bars[0][3]);
-      var bar0X = bar0.data()[0].x;
-      var bar1X = bar1.data()[0].x;
-      var bar2X = bar2.data()[0].x;
-      var bar3X = bar3.data()[0].x;
+      let bars = (<any> renderer)._renderArea.selectAll("rect");
+      let bar0 = d3.select(bars[0][0]);
+      let bar1 = d3.select(bars[0][1]);
+      let bar2 = d3.select(bars[0][2]);
+      let bar3 = d3.select(bars[0][3]);
+      let bar0X = bar0.data()[0].x;
+      let bar1X = bar1.data()[0].x;
+      let bar2X = bar2.data()[0].x;
+      let bar3X = bar3.data()[0].x;
 
       // check widths
       assert.closeTo(TestMethods.numAttr(bar0, "width"), 40, 2);
@@ -78,9 +78,9 @@ describe("Plots", () => {
       assert.closeTo(TestMethods.numAttr(bar3, "height"), (400 - axisHeight) / 2, 0.01, "height is correct for bar3");
 
       // check that clustering is correct
-      var innerScale = (<any>renderer)._makeInnerScale();
-      var off = innerScale.scale("0");
-      var width = xScale.rangeBand() / 2;
+      let innerScale = (<any>renderer)._makeInnerScale();
+      let off = innerScale.scale("0");
+      let width = xScale.rangeBand() / 2;
       assert.closeTo(TestMethods.numAttr(bar0, "x") + TestMethods.numAttr(bar0, "width") / 2, xScale.scale(bar0X) - width + off, 0.01
           , "x pos correct for bar0");
       assert.closeTo(TestMethods.numAttr(bar1, "x") + TestMethods.numAttr(bar1, "width") / 2, xScale.scale(bar1X) - width + off, 0.01
@@ -97,16 +97,16 @@ describe("Plots", () => {
   });
 
   describe("Horizontal Clustered Bar Plot", () => {
-    var svg: d3.Selection<void>;
-    var dataset1: Plottable.Dataset;
-    var dataset2: Plottable.Dataset;
-    var yScale: Plottable.Scales.Category;
-    var xScale: Plottable.Scales.Linear;
-    var renderer: Plottable.Plots.ClusteredBar<number, string>;
-    var SVG_WIDTH = 600;
-    var SVG_HEIGHT = 400;
-    var rendererWidth: number;
-    var bandWidth = 0;
+    let svg: d3.Selection<void>;
+    let dataset1: Plottable.Dataset;
+    let dataset2: Plottable.Dataset;
+    let yScale: Plottable.Scales.Category;
+    let xScale: Plottable.Scales.Linear;
+    let renderer: Plottable.Plots.ClusteredBar<number, string>;
+    let SVG_WIDTH = 600;
+    let SVG_HEIGHT = 400;
+    let rendererWidth: number;
+    let bandWidth = 0;
 
     beforeEach(() => {
       svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
@@ -114,11 +114,11 @@ describe("Plots", () => {
       xScale = new Plottable.Scales.Linear();
       xScale.domain([0, 2]);
 
-      var data1 = [
+      let data1 = [
         {y: "A", x: 1},
         {y: "B", x: 2}
       ];
-      var data2 = [
+      let data2 = [
         {y: "A", x: 2},
         {y: "B", x: 1}
       ];
@@ -131,18 +131,18 @@ describe("Plots", () => {
       renderer.baselineValue(0);
       renderer.x((d) => d.x, xScale);
       renderer.y((d) => d.y, yScale);
-      var yAxis = new Plottable.Axes.Category(yScale, "left");
+      let yAxis = new Plottable.Axes.Category(yScale, "left");
       new Plottable.Components.Table([[yAxis, renderer]]).renderTo(svg);
       rendererWidth = renderer.width();
       bandWidth = yScale.rangeBand();
     });
 
     it("renders correctly", () => {
-      var bars = (<any> renderer)._renderArea.selectAll("rect");
-      var bar0 = d3.select(bars[0][0]);
-      var bar1 = d3.select(bars[0][1]);
-      var bar2 = d3.select(bars[0][2]);
-      var bar3 = d3.select(bars[0][3]);
+      let bars = (<any> renderer)._renderArea.selectAll("rect");
+      let bar0 = d3.select(bars[0][0]);
+      let bar1 = d3.select(bars[0][1]);
+      let bar2 = d3.select(bars[0][2]);
+      let bar3 = d3.select(bars[0][3]);
 
       // check widths
       assert.closeTo(TestMethods.numAttr(bar0, "height"), 26, 2, "height is correct for bar0");
@@ -156,15 +156,15 @@ describe("Plots", () => {
       assert.closeTo(TestMethods.numAttr(bar2, "width"), rendererWidth, 0.01, "width is correct for bar2");
       assert.closeTo(TestMethods.numAttr(bar3, "width"), rendererWidth / 2, 0.01, "width is correct for bar3");
 
-      var bar0Y = bar0.data()[0].y;
-      var bar1Y = bar1.data()[0].y;
-      var bar2Y = bar2.data()[0].y;
-      var bar3Y = bar3.data()[0].y;
+      let bar0Y = bar0.data()[0].y;
+      let bar1Y = bar1.data()[0].y;
+      let bar2Y = bar2.data()[0].y;
+      let bar3Y = bar3.data()[0].y;
 
       // check that clustering is correct
-      var innerScale = (<any>renderer)._makeInnerScale();
-      var off = innerScale.scale("0");
-      var width = yScale.rangeBand() / 2;
+      let innerScale = (<any>renderer)._makeInnerScale();
+      let off = innerScale.scale("0");
+      let width = yScale.rangeBand() / 2;
       assert.closeTo(TestMethods.numAttr(bar0, "y") + TestMethods.numAttr(bar0, "height") / 2, yScale.scale(bar0Y) - width + off, 0.01
             , "y pos correct for bar0");
       assert.closeTo(TestMethods.numAttr(bar1, "y") + TestMethods.numAttr(bar1, "height") / 2, yScale.scale(bar1Y) - width + off, 0.01
@@ -178,19 +178,19 @@ describe("Plots", () => {
   });
 
   describe("Clustered Bar Plot Missing Values", () => {
-    var svg: d3.Selection<void>;
-    var plot: Plottable.Plots.ClusteredBar<string, number>;
+    let svg: d3.Selection<void>;
+    let plot: Plottable.Plots.ClusteredBar<string, number>;
 
     beforeEach(() => {
-      var SVG_WIDTH = 600;
-      var SVG_HEIGHT = 400;
+      let SVG_WIDTH = 600;
+      let SVG_HEIGHT = 400;
       svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
-      var xScale = new Plottable.Scales.Category();
-      var yScale = new Plottable.Scales.Linear();
+      let xScale = new Plottable.Scales.Category();
+      let yScale = new Plottable.Scales.Linear();
 
-      var data1 = [{x: "A", y: 1}, {x: "B", y: 2}, {x: "C", y: 1}];
-      var data2 = [{x: "A", y: 2}, {x: "B", y: 4}];
-      var data3 = [{x: "B", y: 15}, {x: "C", y: 15}];
+      let data1 = [{x: "A", y: 1}, {x: "B", y: 2}, {x: "C", y: 1}];
+      let data2 = [{x: "A", y: 2}, {x: "B", y: 4}];
+      let data3 = [{x: "B", y: 15}, {x: "C", y: 15}];
 
       plot = new Plottable.Plots.ClusteredBar<string, number>();
       plot.addDataset(new Plottable.Dataset(data1));
@@ -199,24 +199,24 @@ describe("Plots", () => {
       plot.baselineValue(0);
       plot.x((d) => d.x, xScale);
       plot.y((d) => d.y, yScale);
-      var xAxis = new Plottable.Axes.Category(xScale, "bottom");
+      let xAxis = new Plottable.Axes.Category(xScale, "bottom");
       new Plottable.Components.Table([[plot], [xAxis]]).renderTo(svg);
     });
 
     it("renders correctly", () => {
-      var bars = (<any> plot)._renderArea.selectAll("rect");
+      let bars = (<any> plot)._renderArea.selectAll("rect");
 
       assert.lengthOf(bars[0], 7, "Number of bars should be equivalent to number of datum");
 
-      var aBar0 = d3.select(bars[0][0]);
-      var aBar1 = d3.select(bars[0][3]);
+      let aBar0 = d3.select(bars[0][0]);
+      let aBar1 = d3.select(bars[0][3]);
 
-      var bBar0 = d3.select(bars[0][1]);
-      var bBar1 = d3.select(bars[0][4]);
-      var bBar2 = d3.select(bars[0][5]);
+      let bBar0 = d3.select(bars[0][1]);
+      let bBar1 = d3.select(bars[0][4]);
+      let bBar2 = d3.select(bars[0][5]);
 
-      var cBar0 = d3.select(bars[0][2]);
-      var cBar1 = d3.select(bars[0][6]);
+      let cBar0 = d3.select(bars[0][2]);
+      let cBar1 = d3.select(bars[0][6]);
 
       // check bars are in domain order
       assert.operator(TestMethods.numAttr(aBar0, "x"), "<", TestMethods.numAttr(bBar0, "x"), "first dataset bars ordered correctly");
@@ -239,19 +239,19 @@ describe("Plots", () => {
   });
 
   describe("Horizontal Clustered Bar Plot Missing Values", () => {
-    var svg: d3.Selection<void>;
-    var plot: Plottable.Plots.ClusteredBar<number, string>;
+    let svg: d3.Selection<void>;
+    let plot: Plottable.Plots.ClusteredBar<number, string>;
 
     beforeEach(() => {
-      var SVG_WIDTH = 600;
-      var SVG_HEIGHT = 400;
+      let SVG_WIDTH = 600;
+      let SVG_HEIGHT = 400;
       svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
-      var xScale = new Plottable.Scales.Linear();
-      var yScale = new Plottable.Scales.Category();
+      let xScale = new Plottable.Scales.Linear();
+      let yScale = new Plottable.Scales.Category();
 
-      var data1 = [{y: "A", x: 1}, {y: "B", x: 2}, {y: "C", x: 1}];
-      var data2 = [{y: "A", x: 2}, {y: "B", x: 4}];
-      var data3 = [{y: "B", x: 15}, {y: "C", x: 15}];
+      let data1 = [{y: "A", x: 1}, {y: "B", x: 2}, {y: "C", x: 1}];
+      let data2 = [{y: "A", x: 2}, {y: "B", x: 4}];
+      let data3 = [{y: "B", x: 15}, {y: "C", x: 15}];
 
       plot = new Plottable.Plots.ClusteredBar<number, string>(Plottable.Plots.Bar.ORIENTATION_HORIZONTAL);
       plot.addDataset(new Plottable.Dataset(data1));
@@ -263,19 +263,19 @@ describe("Plots", () => {
     });
 
     it("renders correctly", () => {
-      var bars = plot.selections();
+      let bars = plot.selections();
 
       assert.strictEqual(bars.size(), 7, "Number of bars should be equivalent to number of datum");
 
-      var aBar0 = d3.select(bars[0][0]);
-      var aBar1 = d3.select(bars[0][3]);
+      let aBar0 = d3.select(bars[0][0]);
+      let aBar1 = d3.select(bars[0][3]);
 
-      var bBar0 = d3.select(bars[0][1]);
-      var bBar1 = d3.select(bars[0][4]);
-      var bBar2 = d3.select(bars[0][5]);
+      let bBar0 = d3.select(bars[0][1]);
+      let bBar1 = d3.select(bars[0][4]);
+      let bBar2 = d3.select(bars[0][5]);
 
-      var cBar0 = d3.select(bars[0][2]);
-      var cBar1 = d3.select(bars[0][6]);
+      let cBar0 = d3.select(bars[0][2]);
+      let cBar1 = d3.select(bars[0][6]);
 
       // check bars are in domain order
       assert.operator(TestMethods.numAttr(aBar0, "y"), "<", TestMethods.numAttr(bBar0, "y"), "first dataset bars ordered correctly");

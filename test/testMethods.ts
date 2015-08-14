@@ -3,15 +3,15 @@
 module TestMethods {
 
   export function generateSVG(width = 400, height = 400): d3.Selection<void> {
-    var parent = TestMethods.getSVGParent();
+    let parent = TestMethods.getSVGParent();
     return parent.append("svg").attr("width", width).attr("height", height).attr("class", "svg");
   }
 
   export function getSVGParent(): d3.Selection<void> {
-    var mocha = d3.select("#mocha-report");
+    let mocha = d3.select("#mocha-report");
     if (mocha.node() != null) {
-      var suites = mocha.selectAll(".suite");
-      var lastSuite = d3.select(suites[0][suites[0].length - 1]);
+      let suites = mocha.selectAll(".suite");
+      let lastSuite = d3.select(suites[0][suites[0].length - 1]);
       return lastSuite.selectAll("ul");
     } else {
       return d3.select("body");
@@ -44,15 +44,15 @@ module TestMethods {
   }
 
   export function assertBBoxEquivalence(bbox: SVGRect, widthAndHeightPair: number[], message: string) {
-    var width = widthAndHeightPair[0];
-    var height = widthAndHeightPair[1];
+    let width = widthAndHeightPair[0];
+    let height = widthAndHeightPair[1];
     assert.strictEqual(bbox.width, width, "width: " + message);
     assert.strictEqual(bbox.height, height, "height: " + message);
   }
 
   export function assertBBoxInclusion(outerEl: d3.Selection<void>, innerEl: d3.Selection<void>) {
-    var outerBox = (<Element> outerEl.node()).getBoundingClientRect();
-    var innerBox = (<Element> innerEl.node()).getBoundingClientRect();
+    let outerBox = (<Element> outerEl.node()).getBoundingClientRect();
+    let innerBox = (<Element> innerEl.node()).getBoundingClientRect();
     assert.operator(Math.floor(outerBox.left), "<=", Math.ceil(innerBox.left) + window.Pixel_CloseTo_Requirement,
       "bounding rect left included");
     assert.operator(Math.floor(outerBox.top), "<=", Math.ceil(innerBox.top) + window.Pixel_CloseTo_Requirement,
@@ -64,10 +64,10 @@ module TestMethods {
   }
 
   export function assertBBoxNonIntersection(firstEl: d3.Selection<void>, secondEl: d3.Selection<void>) {
-    var firstBox = (<Element> firstEl.node()).getBoundingClientRect();
-    var secondBox = (<Element> secondEl.node()).getBoundingClientRect();
+    let firstBox = (<Element> firstEl.node()).getBoundingClientRect();
+    let secondBox = (<Element> secondEl.node()).getBoundingClientRect();
 
-    var intersectionBox = {
+    let intersectionBox = {
       left: Math.max(firstBox.left, secondBox.left),
       right: Math.min(firstBox.right, secondBox.right),
       bottom: Math.min(firstBox.bottom, secondBox.bottom),
@@ -85,10 +85,21 @@ module TestMethods {
   };
 
   export function assertWidthHeight(el: d3.Selection<void>, widthExpected: number, heightExpected: number, message: string) {
-    var width = el.attr("width");
-    var height = el.attr("height");
+    let width = el.attr("width");
+    let height = el.attr("height");
     assert.strictEqual(width, String(widthExpected), "width: " + message);
     assert.strictEqual(height, String(heightExpected), "height: " + message);
+  }
+
+  export function assertLineAttrs(
+    line: d3.Selection<void>,
+    expectedAttrs: { x1: number, y1: number, x2: number, y2: number },
+    message: string) {
+    let floatingPointError = 0.000000001;
+    assert.closeTo(TestMethods.numAttr(line, "x1"), expectedAttrs.x1, floatingPointError, message + " (x1)");
+    assert.closeTo(TestMethods.numAttr(line, "y1"), expectedAttrs.y1, floatingPointError, message + " (y1)");
+    assert.closeTo(TestMethods.numAttr(line, "x2"), expectedAttrs.x2, floatingPointError, message + " (x2)");
+    assert.closeTo(TestMethods.numAttr(line, "y2"), expectedAttrs.y2, floatingPointError, message + " (y2)");
   }
 
   export function assertEntitiesEqual(
@@ -137,16 +148,16 @@ module TestMethods {
   }
 
   export function triggerFakeUIEvent(type: string, target: d3.Selection<void>) {
-    var e = <UIEvent> document.createEvent("UIEvents");
+    let e = <UIEvent> document.createEvent("UIEvents");
     e.initUIEvent(type, true, true, window, 1);
     target.node().dispatchEvent(e);
   }
 
   export function triggerFakeMouseEvent(type: string, target: d3.Selection<void>, relativeX: number, relativeY: number, button = 0) {
-    var clientRect = (<Element> target.node()).getBoundingClientRect();
-    var xPos = clientRect.left + relativeX;
-    var yPos = clientRect.top + relativeY;
-    var e = <MouseEvent> document.createEvent("MouseEvents");
+    let clientRect = (<Element> target.node()).getBoundingClientRect();
+    let xPos = clientRect.left + relativeX;
+    let yPos = clientRect.top + relativeY;
+    let e = <MouseEvent> document.createEvent("MouseEvents");
     e.initMouseEvent(type, true, true, window, 1,
       xPos, yPos,
       xPos, yPos,
@@ -157,7 +168,7 @@ module TestMethods {
 
   export function triggerFakeDragSequence(target: d3.Selection<void>, start: Plottable.Point, end: Plottable.Point, numSteps = 2) {
     triggerFakeMouseEvent("mousedown", target, start.x, start.y);
-    for (var i = 1; i < numSteps; i++) {
+    for (let i = 1; i < numSteps; i++) {
       triggerFakeMouseEvent(
         "mousemove",
         target,
@@ -170,15 +181,15 @@ module TestMethods {
   }
 
   export function isIE() {
-    var userAgent = window.navigator.userAgent;
+    let userAgent = window.navigator.userAgent;
     return userAgent.indexOf("MSIE ") > -1 || userAgent.indexOf("Trident/") > -1;
   }
 
   export function triggerFakeWheelEvent(type: string, target: d3.Selection<void>, relativeX: number, relativeY: number, deltaY: number) {
-    var clientRect = (<Element> target.node()).getBoundingClientRect();
-    var xPos = clientRect.left + relativeX;
-    var yPos = clientRect.top + relativeY;
-    var event: WheelEvent;
+    let clientRect = (<Element> target.node()).getBoundingClientRect();
+    let xPos = clientRect.left + relativeX;
+    let yPos = clientRect.top + relativeY;
+    let event: WheelEvent;
     if (isIE()) {
       event = document.createEvent("WheelEvent");
       event.initWheelEvent("wheel", true, true, window, 1, xPos, yPos, xPos, yPos, 0, null, null, 0, deltaY, 0, 0);
@@ -192,16 +203,16 @@ module TestMethods {
   }
 
   export function triggerFakeTouchEvent(type: string, target: d3.Selection<void>, touchPoints: Plottable.Point[], ids: number[] = [] ) {
-    var targetNode = <Element> target.node();
-    var clientRect = targetNode.getBoundingClientRect();
-    var e = <TouchEvent> document.createEvent( "UIEvent" );
+    let targetNode = <Element> target.node();
+    let clientRect = targetNode.getBoundingClientRect();
+    let e = <TouchEvent> document.createEvent( "UIEvent" );
     e.initUIEvent( type, true, true, window, 1 );
-    var fakeTouchList: any = [];
+    let fakeTouchList: any = [];
 
     touchPoints.forEach(( touchPoint, i ) => {
-      var xPos = clientRect.left + touchPoint.x;
-      var yPos = clientRect.top + touchPoint.y;
-      var identifier = ids[i] == null ? 0 : ids[i];
+      let xPos = clientRect.left + touchPoint.x;
+      let yPos = clientRect.top + touchPoint.y;
+      let identifier = ids[i] == null ? 0 : ids[i];
       fakeTouchList.push( {
         identifier: identifier,
         target: targetNode,
@@ -225,32 +236,34 @@ module TestMethods {
     target.node().dispatchEvent(e);
   }
 
-  export function triggerFakeKeyboardEvent(type: string, target: d3.Selection<void>, keyCode: number) {
-    var event = <KeyboardEvent> document.createEvent("Events");
+  export function triggerFakeKeyboardEvent(type: string, target: d3.Selection<void>, keyCode: number, options?: {[key: string]: any}) {
+    let event = <KeyboardEvent> document.createEvent("Events");
     event.initEvent(type, true, true);
     event.keyCode = keyCode;
+    if (options != null ) {
+      Object.keys(options).forEach((key) => (<any> event)[key] = options[key] );
+    }
     target.node().dispatchEvent(event);
-    return event;
   }
 
   export function assertAreaPathCloseTo(actualPath: string, expectedPath: string, precision: number, msg: string) {
-    var actualAreaPathStrings = actualPath.split("Z");
-    var expectedAreaPathStrings = expectedPath.split("Z");
+    let actualAreaPathStrings = actualPath.split("Z");
+    let expectedAreaPathStrings = expectedPath.split("Z");
 
     actualAreaPathStrings.pop();
     expectedAreaPathStrings.pop();
 
-    var actualAreaPathPoints = actualAreaPathStrings.map((path) => path.split(/[A-Z]/).map((point) => point.split(",")));
+    let actualAreaPathPoints = actualAreaPathStrings.map((path) => path.split(/[A-Z]/).map((point) => point.split(",")));
     actualAreaPathPoints.forEach((areaPathPoint) => areaPathPoint.shift());
-    var expectedAreaPathPoints = expectedAreaPathStrings.map((path) => path.split(/[A-Z]/).map((point) => point.split(",")));
+    let expectedAreaPathPoints = expectedAreaPathStrings.map((path) => path.split(/[A-Z]/).map((point) => point.split(",")));
     expectedAreaPathPoints.forEach((areaPathPoint) => areaPathPoint.shift());
 
     assert.lengthOf(actualAreaPathPoints, expectedAreaPathPoints.length, "number of broken area paths should be equal");
     actualAreaPathPoints.forEach((actualAreaPoints, i) => {
-      var expectedAreaPoints = expectedAreaPathPoints[i];
+      let expectedAreaPoints = expectedAreaPathPoints[i];
       assert.lengthOf(actualAreaPoints, expectedAreaPoints.length, "number of points in path should be equal");
       actualAreaPoints.forEach((actualAreaPoint, j) => {
-        var expectedAreaPoint = expectedAreaPoints[j];
+        let expectedAreaPoint = expectedAreaPoints[j];
         assert.closeTo(+actualAreaPoint[0], +expectedAreaPoint[0], 0.1, msg);
         assert.closeTo(+actualAreaPoint[1], +expectedAreaPoint[1], 0.1, msg);
       });
@@ -258,12 +271,12 @@ module TestMethods {
   }
 
   export function verifyClipPath(c: Plottable.Component) {
-    var clipPathId = (<any>c)._boxContainer[0][0].firstChild.id;
-    var expectedPrefix = /MSIE [5-9]/.test(navigator.userAgent) ? "" : document.location.href;
+    let clipPathId = (<any>c)._boxContainer[0][0].firstChild.id;
+    let expectedPrefix = /MSIE [5-9]/.test(navigator.userAgent) ? "" : document.location.href;
     expectedPrefix = expectedPrefix.replace(/#.*/g, "");
-    var expectedClipPathURL = "url(" + expectedPrefix + "#" + clipPathId + ")";
+    let expectedClipPathURL = "url(" + expectedPrefix + "#" + clipPathId + ")";
     // IE 9 has clipPath like 'url("#clipPath")', must accomodate
-    var normalizeClipPath = (s: string) => s.replace(/"/g, "");
+    let normalizeClipPath = (s: string) => s.replace(/"/g, "");
     assert.isTrue(normalizeClipPath((<any> c)._element.attr("clip-path")) === expectedClipPathURL,
                   "the element has clip-path url attached");
   }

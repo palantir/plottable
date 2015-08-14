@@ -57,9 +57,9 @@ export class Scale<D, R> {
   }
 
   protected _getAllIncludedValues(): D[] {
-    var providerArray: D[] = [];
+    let providerArray: D[] = [];
     this._includedValuesProviders.forEach((provider: Scales.IncludedValuesProvider<D>) => {
-      var extents = provider(this);
+      let extents = provider(this);
       providerArray = providerArray.concat(extents);
     });
     return providerArray;
