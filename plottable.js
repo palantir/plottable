@@ -8246,11 +8246,12 @@ var Plottable;
                 return _super.prototype.y.call(this, y, yScale);
             };
             Line.prototype.autorangeMode = function (autorangeMode) {
-                var ret = _super.prototype.autorangeMode.call(this, autorangeMode);
-                if (autorangeMode != null) {
-                    this._setScaleSnappingForAutorangeSmooth();
+                if (autorangeMode == null) {
+                    return _super.prototype.autorangeMode.call(this);
                 }
-                return ret;
+                _super.prototype.autorangeMode.call(this, autorangeMode);
+                this._setScaleSnappingForAutorangeSmooth();
+                return this;
             };
             Line.prototype.autorangeSmooth = function (autorangeSmooth) {
                 if (autorangeSmooth == null) {

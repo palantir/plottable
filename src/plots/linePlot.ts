@@ -60,13 +60,13 @@ export module Plots {
     public autorangeMode(): string;
     public autorangeMode(autorangeMode: string): Line<X>;
     public autorangeMode(autorangeMode?: string): any {
-      let ret = super.autorangeMode(autorangeMode);
-
-      if (autorangeMode != null) {
-        this._setScaleSnappingForAutorangeSmooth();
+      if (autorangeMode == null) {
+        return super.autorangeMode();
       }
 
-      return ret;
+      super.autorangeMode(autorangeMode);
+      this._setScaleSnappingForAutorangeSmooth();
+      return this;
     }
 
     /**
@@ -89,7 +89,7 @@ export module Plots {
       return this;
     }
 
-    public _setScaleSnappingForAutorangeSmooth() {
+    private _setScaleSnappingForAutorangeSmooth() {
       if (this.autorangeMode() === "x" && this.x() && this.x().scale && this.x().scale instanceof QuantitativeScale) {
         (<QuantitativeScale<X>>this.x().scale).snapsDomain(!this.autorangeSmooth());
       }
