@@ -6202,12 +6202,18 @@ var Plottable;
 (function (Plottable) {
     var Components;
     (function (Components) {
+        var PropertyMode;
+        (function (PropertyMode) {
+            PropertyMode[PropertyMode["value"] = 0] = "value";
+            PropertyMode[PropertyMode["pixel"] = 1] = "pixel";
+        })(PropertyMode || (PropertyMode = {}));
+        ;
         var GuideLineLayer = (function (_super) {
             __extends(GuideLineLayer, _super);
             function GuideLineLayer(orientation) {
                 var _this = this;
                 _super.call(this);
-                this._primaryProperty = "value";
+                this._mode = PropertyMode.value;
                 if (orientation !== GuideLineLayer.ORIENTATION_VERTICAL && orientation !== GuideLineLayer.ORIENTATION_HORIZONTAL) {
                     throw new Error(orientation + " is not a valid orientation for GuideLineLayer");
                 }
@@ -6266,10 +6272,10 @@ var Plottable;
                 if (this.scale() == null) {
                     return;
                 }
-                if (this._primaryProperty === "value" && this.value() != null) {
+                if (this._mode === PropertyMode.value && this.value() != null) {
                     this._pixelPosition = this.scale().scale(this.value());
                 }
-                else if (this._primaryProperty === "pixelPosition" && this.pixelPosition() != null) {
+                else if (this._mode === PropertyMode.pixel && this.pixelPosition() != null) {
                     this._value = this.scale().invert(this.pixelPosition());
                 }
             };
@@ -6292,7 +6298,7 @@ var Plottable;
                     return this._value;
                 }
                 this._value = value;
-                this._primaryProperty = "value";
+                this._mode = PropertyMode.value;
                 this._syncPixelPositionAndValue();
                 this.render();
                 return this;
@@ -6302,7 +6308,7 @@ var Plottable;
                     return this._pixelPosition;
                 }
                 this._pixelPosition = pixelPosition;
-                this._primaryProperty = "pixelPosition";
+                this._mode = PropertyMode.pixel;
                 this._syncPixelPositionAndValue();
                 this.render();
                 return this;
