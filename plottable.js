@@ -8246,13 +8246,11 @@ var Plottable;
                 return _super.prototype.y.call(this, y, yScale);
             };
             Line.prototype.autorangeMode = function (autorangeMode) {
-                if (this.autorangeSmooth() && autorangeMode === "x" || autorangeMode === "y") {
-                    if (autorangeMode === "x" && this.x() && this.x().scale && this.x().scale instanceof Plottable.QuantitativeScale) {
-                        this.x().scale.snapsDomain(!this.autorangeSmooth());
-                    }
-                    if (autorangeMode === "y" && this.y() && this.y().scale && this.y().scale instanceof Plottable.QuantitativeScale) {
-                        this.y().scale.snapsDomain(!this.autorangeSmooth());
-                    }
+                if (autorangeMode === "x" && this.x() && this.x().scale && this.x().scale instanceof Plottable.QuantitativeScale) {
+                    this.x().scale.snapsDomain(!this.autorangeSmooth());
+                }
+                if (autorangeMode === "y" && this.y() && this.y().scale && this.y().scale instanceof Plottable.QuantitativeScale) {
+                    this.y().scale.snapsDomain(!this.autorangeSmooth());
                 }
                 return _super.prototype.autorangeMode.call(this, autorangeMode);
             };

@@ -60,14 +60,12 @@ export module Plots {
     public autorangeMode(): string;
     public autorangeMode(autorangeMode: string): Line<X>;
     public autorangeMode(autorangeMode?: string): any {
-      if (this.autorangeSmooth() && autorangeMode === "x" || autorangeMode === "y") {
-        if (autorangeMode === "x" && this.x() && this.x().scale && this.x().scale instanceof QuantitativeScale) {
-          (<QuantitativeScale<X>>this.x().scale).snapsDomain(!this.autorangeSmooth());
-        }
+      if (autorangeMode === "x" && this.x() && this.x().scale && this.x().scale instanceof QuantitativeScale) {
+        (<QuantitativeScale<X>>this.x().scale).snapsDomain(!this.autorangeSmooth());
+      }
 
-        if (autorangeMode === "y" && this.y() && this.y().scale && this.y().scale instanceof QuantitativeScale) {
-          (<QuantitativeScale<number>>this.y().scale).snapsDomain(!this.autorangeSmooth());
-        }
+      if (autorangeMode === "y" && this.y() && this.y().scale && this.y().scale instanceof QuantitativeScale) {
+        (<QuantitativeScale<number>>this.y().scale).snapsDomain(!this.autorangeSmooth());
       }
       return super.autorangeMode(autorangeMode);
     }
