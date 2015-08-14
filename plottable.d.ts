@@ -1695,6 +1695,12 @@ declare module Plottable {
         protected _setup(): void;
         protected _getTickValues(): D[];
         renderImmediately(): Axis<D>;
+        annotatedTicks(): D[];
+        annotatedTicks(annotatedTicks: D[]): Axis<D>;
+        annotationFormatter(): Formatter;
+        annotationFormatter(annotationFormatter: Formatter): Axis<D>;
+        annotationsEnabled(): boolean;
+        annotationsEnabled(annotationsEnabled: boolean): Axis<D>;
         protected _generateBaselineAttrHash(): {
             [key: string]: number;
         };

@@ -29,6 +29,9 @@ export class Axis<D> extends Component {
   private _showEndTickLabels = false;
   private _rescaleCallback: ScaleCallback<Scale<D, number>>;
 
+  private _annotatedTicks: D[];
+  private _annotationFormatter: Formatter;
+  private _annotationsEnabled = false;
   private _annotationContainer: d3.Selection<void>;
   private _annotationMeasurer: SVGTypewriter.Measurers.Measurer;
   private _annotationWriter: SVGTypewriter.Writers.Writer;
@@ -58,6 +61,9 @@ export class Axis<D> extends Component {
 
     this._rescaleCallback = (scale) => this._rescale();
     this._scale.onUpdate(this._rescaleCallback);
+
+    this._annotatedTicks = [];
+    this._annotationFormatter = Formatters.identity();
   }
 
   public destroy() {
@@ -162,24 +168,57 @@ export class Axis<D> extends Component {
                                                     .attr(this._generateTickMarkAttrHash(true));
     tickMarks.exit().remove();
     this._baseline.attr(this._generateBaselineAttrHash());
-    this._drawAnnotations();
+    if (this.annotationsEnabled()) {
+      this._drawAnnotations();
+    }
+    return this;
+  }
+
+  public annotatedTicks(): D[];
+  public annotatedTicks(annotatedTicks: D[]): Axis<D>;
+  public annotatedTicks(annotatedTicks?: D[]): any {
+    if (annotatedTicks == null) {
+      return this._annotatedTicks;
+    }
+    this._annotatedTicks = annotatedTicks;
+    this.render();
+    return this;
+  }
+
+  public annotationFormatter(): Formatter;
+  public annotationFormatter(annotationFormatter: Formatter): Axis<D>;
+  public annotationFormatter(annotationFormatter?: Formatter): any {
+    if (annotationFormatter == null) {
+      return this._annotationFormatter;
+    }
+    this._annotationFormatter = annotationFormatter;
+    this.render();
+    return this;
+  }
+
+  public annotationsEnabled(): boolean;
+  public annotationsEnabled(annotationsEnabled: boolean): Axis<D>;
+  public annotationsEnabled(annotationsEnabled?: boolean): any {
+    if (annotationsEnabled == null) {
+      return this._annotationsEnabled;
+    }
+    this._annotationsEnabled = annotationsEnabled;
+    this.render();
     return this;
   }
 
   private _drawAnnotations() {
-    let annotatedTicks: D[] = [];
-
     let labelPadding = 2;
     let measurements = new Utils.Map<D, SVGTypewriter.Measurers.Dimensions> ();
-    annotatedTicks.forEach((annotatedTick) => {
-      let measurement = this._annotationMeasurer.measure(annotatedTick.toString());
+    this.annotatedTicks().forEach((annotatedTick) => {
+      let measurement = this._annotationMeasurer.measure(this.annotationFormatter()(annotatedTick));
       let paddedMeasurement = { width: measurement.width + 2 * labelPadding, height: measurement.height + 2 * labelPadding };
       measurements.set(annotatedTick, paddedMeasurement);
     });
 
     let tierHeight = this._annotationMeasurer.measure().height + 2 * labelPadding;
 
-    let annotationToTier = this._annotationToTier(annotatedTicks, measurements);
+    let annotationToTier = this._annotationToTier(measurements);
 
     let hiddenAnnotations = new Utils.Set<any>();
     let numTiers = Math.floor(this.margin() / tierHeight);
@@ -190,7 +229,7 @@ export class Axis<D> extends Component {
     });
 
     let bindElements = (selection: d3.Selection<any>, elementName: string, className: string) => {
-      let elements = selection.selectAll("." + className).data(annotatedTicks);
+      let elements = selection.selectAll("." + className).data(this.annotatedTicks());
       elements.enter().append(elementName).classed(className, true);
       elements.exit().remove();
       return elements;
@@ -220,6 +259,7 @@ export class Axis<D> extends Component {
       .attr("visibility", visibilityF);
 
     let annotationWriter = this._annotationWriter;
+    let annotationFormatter = this.annotationFormatter();
     bindElements(this._annotationContainer.select(".annotation-label-container"), "g", "annotation-label")
       .attr("transform", (d) => "translate(" + positionF(d) + "," + offsetF(d) + ")")
       .attr("visibility", visibilityF)
@@ -230,17 +270,17 @@ export class Axis<D> extends Component {
           yAlign: "center",
           textRotation: 0
         };
-        annotationWriter.write(annotationLabel.toString(),
+        annotationWriter.write(annotationFormatter(annotationLabel),
                                  measurements.get(annotationLabel).width,
                                  measurements.get(annotationLabel).height,
                                  writeOptions);
       });
   }
 
-  private _annotationToTier(annotatedTicks: D[], measurements: Utils.Map<D, SVGTypewriter.Measurers.Dimensions>) {
+  private _annotationToTier(measurements: Utils.Map<D, SVGTypewriter.Measurers.Dimensions>) {
     let annotationTiers: D[][] = [[]];
     let annotationToTier = new Utils.Map<D, number>();
-    annotatedTicks.forEach((annotatedTick) => {
+    this.annotatedTicks().forEach((annotatedTick) => {
       let x = this._scale.scale(annotatedTick);
       let width = measurements.get(annotatedTick).width;
       if (x < 0 || x + width > this.width()) {

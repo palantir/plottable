@@ -3630,6 +3630,7 @@ var Plottable;
             this._tickLabelPadding = 10;
             this._margin = 15;
             this._showEndTickLabels = false;
+            this._annotationsEnabled = false;
             if (scale == null || orientation == null) {
                 throw new Error("Axis requires a scale and orientation");
             }
@@ -3646,6 +3647,8 @@ var Plottable;
             this.formatter(Plottable.Formatters.identity());
             this._rescaleCallback = function (scale) { return _this._rescale(); };
             this._scale.onUpdate(this._rescaleCallback);
+            this._annotatedTicks = [];
+            this._annotationFormatter = Plottable.Formatters.identity();
         }
         Axis.prototype.destroy = function () {
             _super.prototype.destroy.call(this);
@@ -3738,21 +3741,46 @@ var Plottable;
                 .attr(this._generateTickMarkAttrHash(true));
             tickMarks.exit().remove();
             this._baseline.attr(this._generateBaselineAttrHash());
-            this._drawAnnotations();
+            if (this.annotationsEnabled()) {
+                this._drawAnnotations();
+            }
+            return this;
+        };
+        Axis.prototype.annotatedTicks = function (annotatedTicks) {
+            if (annotatedTicks == null) {
+                return this._annotatedTicks;
+            }
+            this._annotatedTicks = annotatedTicks;
+            this.render();
+            return this;
+        };
+        Axis.prototype.annotationFormatter = function (annotationFormatter) {
+            if (annotationFormatter == null) {
+                return this._annotationFormatter;
+            }
+            this._annotationFormatter = annotationFormatter;
+            this.render();
+            return this;
+        };
+        Axis.prototype.annotationsEnabled = function (annotationsEnabled) {
+            if (annotationsEnabled == null) {
+                return this._annotationsEnabled;
+            }
+            this._annotationsEnabled = annotationsEnabled;
+            this.render();
             return this;
         };
         Axis.prototype._drawAnnotations = function () {
             var _this = this;
-            var annotatedTicks = [];
             var labelPadding = 2;
             var measurements = new Plottable.Utils.Map();
-            annotatedTicks.forEach(function (annotatedTick) {
-                var measurement = _this._annotationMeasurer.measure(annotatedTick.toString());
+            this.annotatedTicks().forEach(function (annotatedTick) {
+                var measurement = _this._annotationMeasurer.measure(_this.annotationFormatter()(annotatedTick));
                 var paddedMeasurement = { width: measurement.width + 2 * labelPadding, height: measurement.height + 2 * labelPadding };
                 measurements.set(annotatedTick, paddedMeasurement);
             });
             var tierHeight = this._annotationMeasurer.measure().height + 2 * labelPadding;
-            var annotationToTier = this._annotationToTier(annotatedTicks, measurements);
+            var annotationToTier = this._annotationToTier(measurements);
             var hiddenAnnotations = new Plottable.Utils.Set();
             var numTiers = Math.floor(this.margin() / tierHeight);
             annotationToTier.forEach(function (tier, annotation) {
@@ -3761,7 +3789,7 @@ var Plottable;
                 }
             });
             var bindElements = function (selection, elementName, className) {
-                var elements = selection.selectAll("." + className).data(annotatedTicks);
+                var elements = selection.selectAll("." + className).data(_this.annotatedTicks());
                 elements.enter().append(elementName).classed(className, true);
                 elements.exit().remove();
                 return elements;
@@ -3787,6 +3815,7 @@ var Plottable;
                 .attr("height", function (d) { return measurements.get(d).height; })
                 .attr("visibility", visibilityF);
             var annotationWriter = this._annotationWriter;
+            var annotationFormatter = this.annotationFormatter();
             bindElements(this._annotationContainer.select(".annotation-label-container"), "g", "annotation-label")
                 .attr("transform", function (d) { return "translate(" + positionF(d) + "," + offsetF(d) + ")"; })
                 .attr("visibility", visibilityF)
@@ -3797,14 +3826,14 @@ var Plottable;
                     yAlign: "center",
                     textRotation: 0
                 };
-                annotationWriter.write(annotationLabel.toString(), measurements.get(annotationLabel).width, measurements.get(annotationLabel).height, writeOptions);
+                annotationWriter.write(annotationFormatter(annotationLabel), measurements.get(annotationLabel).width, measurements.get(annotationLabel).height, writeOptions);
             });
         };
-        Axis.prototype._annotationToTier = function (annotatedTicks, measurements) {
+        Axis.prototype._annotationToTier = function (measurements) {
             var _this = this;
             var annotationTiers = [[]];
             var annotationToTier = new Plottable.Utils.Map();
-            annotatedTicks.forEach(function (annotatedTick) {
+            this.annotatedTicks().forEach(function (annotatedTick) {
                 var x = _this._scale.scale(annotatedTick);
                 var width = measurements.get(annotatedTick).width;
                 if (x < 0 || x + width > _this.width()) {
