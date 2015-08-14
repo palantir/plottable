@@ -8250,7 +8250,7 @@ var Plottable;
                     return _super.prototype.autorangeMode.call(this);
                 }
                 _super.prototype.autorangeMode.call(this, autorangeMode);
-                this._setScaleSnappingForAutorangeSmooth();
+                this._setScaleSnapping();
                 return this;
             };
             Line.prototype.autorangeSmooth = function (autorangeSmooth) {
@@ -8258,10 +8258,10 @@ var Plottable;
                     return this._autorangeSmooth;
                 }
                 this._autorangeSmooth = autorangeSmooth;
-                this._setScaleSnappingForAutorangeSmooth();
+                this._setScaleSnapping();
                 return this;
             };
-            Line.prototype._setScaleSnappingForAutorangeSmooth = function () {
+            Line.prototype._setScaleSnapping = function () {
                 if (this.autorangeMode() === "x" && this.x() && this.x().scale && this.x().scale instanceof Plottable.QuantitativeScale) {
                     this.x().scale.snapsDomain(!this.autorangeSmooth());
                 }

@@ -65,7 +65,7 @@ export module Plots {
       }
 
       super.autorangeMode(autorangeMode);
-      this._setScaleSnappingForAutorangeSmooth();
+      this._setScaleSnapping();
       return this;
     }
 
@@ -85,11 +85,11 @@ export module Plots {
         return this._autorangeSmooth;
       }
       this._autorangeSmooth = autorangeSmooth;
-      this._setScaleSnappingForAutorangeSmooth();
+      this._setScaleSnapping();
       return this;
     }
 
-    private _setScaleSnappingForAutorangeSmooth() {
+    private _setScaleSnapping() {
       if (this.autorangeMode() === "x" && this.x() && this.x().scale && this.x().scale instanceof QuantitativeScale) {
         (<QuantitativeScale<X>>this.x().scale).snapsDomain(!this.autorangeSmooth());
       }
