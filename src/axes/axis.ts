@@ -167,22 +167,22 @@ export class Axis<D> extends Component {
   }
 
   private _drawAnnotations() {
-    let annotatedTicks: any[] = [];
+    let annotatedTicks: D[] = [];
 
     let labelPadding = 2;
     let measurements = new Utils.Map<D, SVGTypewriter.Measurers.Dimensions> ();
     annotatedTicks.forEach((annotatedTick) => {
       let measurement = this._annotationMeasurer.measure(annotatedTick.toString());
       let paddedMeasurement = { width: measurement.width + 2 * labelPadding, height: measurement.height + 2 * labelPadding };
-      measurements.set(<any> annotatedTick, paddedMeasurement);
+      measurements.set(annotatedTick, paddedMeasurement);
     });
 
     let tierHeight = this._annotationMeasurer.measure().height + 2 * labelPadding;
-    let numTiers = Math.floor(this.margin() / tierHeight);
 
     let annotationToTier = this._annotationToTier(annotatedTicks, measurements);
 
     let hiddenAnnotations = new Utils.Set<any>();
+    let numTiers = Math.floor(this.margin() / tierHeight);
     annotationToTier.forEach((tier, annotation) => {
       if (tier === -1 || tier >= numTiers) {
         hiddenAnnotations.add(annotation);
@@ -196,7 +196,7 @@ export class Axis<D> extends Component {
       return elements;
     };
     let offsetF = (d: any) => annotationToTier.get(d) * tierHeight + this._computedHeight;
-    let positionF = (d: any) => this._scale.scale(<any> d);
+    let positionF = (d: any) => this._scale.scale(d);
     let visibilityF = (d: any) => hiddenAnnotations.has(d) ? "hidden" : "visible";
 
     bindElements(this._annotationContainer.select(".annotation-line-container"), "line", "annotation-line")
@@ -215,8 +215,8 @@ export class Axis<D> extends Component {
     bindElements(this._annotationContainer.select(".annotation-rect-container"), "rect", "annotation-rect")
       .attr("x", positionF)
       .attr("y", offsetF)
-      .attr("width", (d) => measurements.get(<any> d).width)
-      .attr("height", (d) => measurements.get(<any> d).height)
+      .attr("width", (d) => measurements.get(d).width)
+      .attr("height", (d) => measurements.get(d).height)
       .attr("visibility", visibilityF);
 
     let annotationWriter = this._annotationWriter;
@@ -231,25 +231,25 @@ export class Axis<D> extends Component {
           textRotation: 0
         };
         annotationWriter.write(annotationLabel.toString(),
-                                 measurements.get(<any> annotationLabel).width,
-                                 measurements.get(<any> annotationLabel).height,
+                                 measurements.get(annotationLabel).width,
+                                 measurements.get(annotationLabel).height,
                                  writeOptions);
       });
   }
 
-  private _annotationToTier(annotatedTicks: any[], measurements: Utils.Map<D, SVGTypewriter.Measurers.Dimensions>) {
-    let annotationTiers: any[][] = [[]];
-    let annotationToTier = new Utils.Map<any, any>();
+  private _annotationToTier(annotatedTicks: D[], measurements: Utils.Map<D, SVGTypewriter.Measurers.Dimensions>) {
+    let annotationTiers: D[][] = [[]];
+    let annotationToTier = new Utils.Map<D, number>();
     annotatedTicks.forEach((annotatedTick) => {
-      let x = this._scale.scale(<any> annotatedTick);
-      let width = measurements.get(<any> annotatedTick).width;
+      let x = this._scale.scale(annotatedTick);
+      let width = measurements.get(annotatedTick).width;
       if (x < 0 || x + width > this.width()) {
         annotationToTier.set(annotatedTick, -1);
         return;
       }
       let tierHasCollision = (testTier: number) => annotationTiers[testTier].some((testTick) => {
-        let testX = this._scale.scale(<any> testTick);
-        let testWidth = measurements.get(<any> testTick).width;
+        let testX = this._scale.scale(testTick);
+        let testWidth = measurements.get(testTick).width;
         return x + width >= testX && x <= testX + testWidth;
       });
       let tier = 0;

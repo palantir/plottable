@@ -3752,9 +3752,9 @@ var Plottable;
                 measurements.set(annotatedTick, paddedMeasurement);
             });
             var tierHeight = this._annotationMeasurer.measure().height + 2 * labelPadding;
-            var numTiers = Math.floor(this.margin() / tierHeight);
             var annotationToTier = this._annotationToTier(annotatedTicks, measurements);
             var hiddenAnnotations = new Plottable.Utils.Set();
+            var numTiers = Math.floor(this.margin() / tierHeight);
             annotationToTier.forEach(function (tier, annotation) {
                 if (tier === -1 || tier >= numTiers) {
                     hiddenAnnotations.add(annotation);
