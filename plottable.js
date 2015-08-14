@@ -6307,6 +6307,9 @@ var Plottable;
                 if (pixelPosition == null) {
                     return this._pixelPosition;
                 }
+                if (!Plottable.Utils.Math.isValidNumber(pixelPosition)) {
+                    throw new Error("pixelPosition must be a finite number");
+                }
                 this._pixelPosition = pixelPosition;
                 this._mode = PropertyMode.PIXEL;
                 this._syncPixelPositionAndValue();

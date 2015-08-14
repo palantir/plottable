@@ -22,6 +22,11 @@ describe("GuideLineLayer", () => {
     assert.isUndefined(gll.pixelPosition(), "returns undefined before any pixel position is set");
     assert.strictEqual(gll.pixelPosition(expectedPosition), gll, "setter returns the calling GuideLineLayer");
     assert.strictEqual(gll.pixelPosition(), expectedPosition, "getter returns the set pixel position");
+    // HACKHACK #2614: chai-assert.d.ts has the wrong signature
+    (<any> assert).throws(() => gll.pixelPosition(NaN), Error, "", "Rejects NaN");
+    (<any> assert).throws(() => gll.pixelPosition(Infinity), Error, "", "Rejects Infinity");
+    (<any> assert).throws(() => gll.pixelPosition(-Infinity), Error, "", "Rejects -Infinity");
+    (<any> assert).throws(() => gll.pixelPosition(<any> "5"), Error, "", "Rejects stringy numbers");
   });
 
   it("destroy() disconnects from scale safely", () => {
