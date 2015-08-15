@@ -35,12 +35,14 @@ function run(svg, data, Plottable) {
   var hover = new Plottable.Interactions.Pointer();
   hover.onPointerMove(function(p){
     plot.entities().forEach(function(entity) {
-      entity.selection.attr("opacity", .5);
+      entity.selection.attr("opacity", .3);
     });
     var xRange = {min: p.x, max: p.x};
     var yRange = {min: p.y, max: p.y};
     var entities = plot.entitiesIn(xRange, yRange);
-    entities[0].selection.attr("opacity", 1);
+    if (entities.length > 0) {
+      entities[0].selection.attr("opacity", 1);
+    }
   })
   .attachTo(plot);
 }
