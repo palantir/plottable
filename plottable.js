@@ -4063,9 +4063,10 @@ var Plottable;
                 // Makes sure that the size it requires is a multiple of tier sizes, such that
                 // we have no leftover tiers
                 var size = _super.prototype._sizeFromOffer.call(this, availableWidth, availableHeight);
-                size.height = this._tierHeights.reduce(function (prevValue, currValue, index, arr) {
+                var tierHeights = this._tierHeights.reduce(function (prevValue, currValue, index, arr) {
                     return (prevValue + currValue > size.height) ? prevValue : (prevValue + currValue);
                 });
+                size.height = Math.min(size.height, tierHeights + this.margin());
                 return size;
             };
             Time.prototype._setup = function () {
@@ -4222,7 +4223,7 @@ var Plottable;
             };
             Time.prototype._hideOverflowingTiers = function () {
                 var _this = this;
-                var availableHeight = this.height();
+                var availableHeight = this.height() - this.margin();
                 var usedHeight = 0;
                 this.content()
                     .selectAll("." + Time.TIME_AXIS_TIER_CLASS)
