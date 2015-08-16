@@ -234,8 +234,7 @@ export class Axis<D> extends Component {
       elements.exit().remove();
       return elements;
     };
-    let height = this._computedHeight || (this._maxLabelTickLength() + this.tickLabelPadding() + this._annotationMeasurer.measure().height);
-    let offsetF = (d: any) => annotationToTier.get(d) * tierHeight + height;
+    let offsetF = (d: any) => annotationToTier.get(d) * tierHeight + this.height() - this.margin();
     let positionF = (d: any) => this._scale.scale(d);
     let visibilityF = (d: any) => hiddenAnnotations.has(d) ? "hidden" : "visible";
 
