@@ -498,7 +498,7 @@ export module Plots {
           } else {
              let color = attrToProjector["fill"](d, i, dataset);
              let dark = Utils.Color.contrast("white", color) * 1.6 < Utils.Color.contrast("black", color);
-             g.classed(dark ? "dark-label" : "light-label");
+             g.classed(dark ? "dark-label" : "light-label", true);
           }
 
 

@@ -7971,7 +7971,7 @@ var Plottable;
                         else {
                             var color = attrToProjector["fill"](d, i, dataset);
                             var dark = Plottable.Utils.Color.contrast("white", color) * 1.6 < Plottable.Utils.Color.contrast("black", color);
-                            g.classed(dark ? "dark-label" : "light-label");
+                            g.classed(dark ? "dark-label" : "light-label", true);
                         }
                         var hideLabel = (x + measurement.width > _this.width() || (positive ? y + measurement.height : y + h) > _this.height());
                         g.style("visibility", hideLabel ? "hidden" : "inherit");
