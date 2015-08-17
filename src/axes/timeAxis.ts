@@ -497,7 +497,7 @@ export module Axes {
     }
 
     private _hideOverflowingTiers() {
-      let availableHeight = this.height() - this.margin();
+      let availableHeight = this.height();
       let usedHeight = 0;
 
       this.content()

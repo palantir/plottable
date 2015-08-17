@@ -282,12 +282,13 @@ describe("TimeAxis", () => {
 
   });
 
-  it("height includes margin, label padding, and tick length", () => {
+  it("occupied space includes margin, label padding, and tick length", () => {
     let svg = TestMethods.generateSVG(400, 400);
     let xScale = new Plottable.Scales.Time();
     let xAxis = new Plottable.Axes.Time(xScale, "bottom");
     xAxis.margin(100);
-    xAxis.renderTo(svg);
+    xAxis.anchor(svg);
+    xAxis.computeLayout({ x: 0, y: 0}, 400, 400);
     let minimumHeight = xAxis.tickLabelPadding() + xAxis.margin() + xAxis.innerTickLength();
     assert.operator(xAxis.height(), ">=", minimumHeight, "height includes all relevant pieces");
     svg.remove();
