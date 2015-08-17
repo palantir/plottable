@@ -7964,11 +7964,15 @@ var Plottable;
                         var x = getX();
                         var y = getY();
                         var g = labelArea.append("g").attr("transform", "translate(" + x + "," + y + ")");
-                        var labelPositioningClassName = showLabelOffBar ? "off-bar-label" : "on-bar-label";
-                        var color = attrToProjector["fill"](d, i, dataset);
-                        var dark = Plottable.Utils.Color.contrast("white", color) * 1.6 < Plottable.Utils.Color.contrast("black", color);
-                        g.classed(dark ? "dark-label" : "light-label");
-                        g.classed(labelPositioningClassName, true);
+                        if (_this._displayLabelsOffBar) {
+                            var labelPositioningClassName = showLabelOffBar ? "off-bar-label" : "on-bar-label";
+                            g.classed(labelPositioningClassName, true);
+                        }
+                        else {
+                            var color = attrToProjector["fill"](d, i, dataset);
+                            var dark = Plottable.Utils.Color.contrast("white", color) * 1.6 < Plottable.Utils.Color.contrast("black", color);
+                            g.classed(dark ? "dark-label" : "light-label");
+                        }
                         var hideLabel = (x + measurement.width > _this.width() || (positive ? y + measurement.height : y + h) > _this.height());
                         g.style("visibility", hideLabel ? "hidden" : "inherit");
                         var xAlign;
