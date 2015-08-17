@@ -3794,56 +3794,97 @@ var Plottable;
                 elements.exit().remove();
                 return elements;
             };
-            var offsetF = function (d) { return annotationToTier.get(d) * tierHeight + _this.height() - _this.margin(); };
+            var dimension = this._isHorizontal() ? this.height() : this.width();
+            var offsetF = function (d) {
+                switch (_this.orientation()) {
+                    case "bottom":
+                    case "right":
+                        return annotationToTier.get(d) * tierHeight + dimension - _this.margin();
+                    case "top":
+                    case "left":
+                        return _this.margin() - annotationToTier.get(d) * tierHeight;
+                }
+            };
             var positionF = function (d) { return _this._scale.scale(d); };
             var visibilityF = function (d) { return hiddenAnnotations.has(d) ? "hidden" : "visible"; };
+            var secondaryPosition;
+            switch (this.orientation()) {
+                case "bottom":
+                    secondaryPosition = 0;
+                    break;
+                case "top":
+                    secondaryPosition = this.height();
+                    break;
+                case "left":
+                    secondaryPosition = this.width();
+                    break;
+                case "right":
+                    secondaryPosition = 0;
+                    break;
+            }
             bindElements(this._annotationContainer.select(".annotation-line-container"), "line", "annotation-line")
-                .attr("x1", positionF)
-                .attr("x2", positionF)
-                .attr("y1", 0)
-                .attr("y2", offsetF)
+                .attr(this._isHorizontal() ? "x1" : "y1", positionF)
+                .attr(this._isHorizontal() ? "x2" : "y2", positionF)
+                .attr(this._isHorizontal() ? "y1" : "x1", secondaryPosition)
+                .attr(this._isHorizontal() ? "y2" : "x2", offsetF)
                 .attr("visibility", visibilityF);
             bindElements(this._annotationContainer.select(".annotation-circle-container"), "circle", "annotation-circle")
-                .attr("cx", positionF)
-                .attr("cy", 0)
+                .attr(this._isHorizontal() ? "cx" : "cy", positionF)
+                .attr(this._isHorizontal() ? "cy" : "cx", secondaryPosition)
                 .attr("r", 3)
                 .attr("visibility", visibilityF);
+            var rectangleOffsetF = function (d) {
+                switch (_this.orientation()) {
+                    case "bottom":
+                    case "right":
+                        return offsetF(d);
+                    case "top":
+                    case "left":
+                        return offsetF(d) - measurements.get(d).height;
+                }
+            };
             bindElements(this._annotationContainer.select(".annotation-rect-container"), "rect", "annotation-rect")
-                .attr("x", positionF)
-                .attr("y", offsetF)
-                .attr("width", function (d) { return measurements.get(d).width; })
-                .attr("height", function (d) { return measurements.get(d).height; })
+                .attr(this._isHorizontal() ? "x" : "y", positionF)
+                .attr(this._isHorizontal() ? "y" : "x", rectangleOffsetF)
+                .attr(this._isHorizontal() ? "width" : "height", function (d) { return measurements.get(d).width; })
+                .attr(this._isHorizontal() ? "height" : "width", function (d) { return measurements.get(d).height; })
                 .attr("visibility", visibilityF);
             var annotationWriter = this._annotationWriter;
             var annotationFormatter = this.annotationFormatter();
+            var isHorizontal = this._isHorizontal();
             bindElements(this._annotationContainer.select(".annotation-label-container"), "g", "annotation-label")
-                .attr("transform", function (d) { return "translate(" + positionF(d) + "," + offsetF(d) + ")"; })
+                .attr("transform", function (d) {
+                var xTranslate = _this._isHorizontal() ? positionF(d) : rectangleOffsetF(d);
+                var yTranslate = _this._isHorizontal() ? rectangleOffsetF(d) : positionF(d);
+                return "translate(" + xTranslate + "," + yTranslate + ")";
+            })
                 .attr("visibility", visibilityF)
                 .each(function (annotationLabel) {
                 var writeOptions = {
                     selection: d3.select(this),
                     xAlign: "center",
                     yAlign: "center",
-                    textRotation: 0
+                    textRotation: isHorizontal ? 0 : 90
                 };
-                annotationWriter.write(annotationFormatter(annotationLabel), measurements.get(annotationLabel).width, measurements.get(annotationLabel).height, writeOptions);
+                annotationWriter.write(annotationFormatter(annotationLabel), isHorizontal ? measurements.get(annotationLabel).width : measurements.get(annotationLabel).height, isHorizontal ? measurements.get(annotationLabel).height : measurements.get(annotationLabel).width, writeOptions);
             });
         };
         Axis.prototype._annotationToTier = function (measurements) {
             var _this = this;
             var annotationTiers = [[]];
             var annotationToTier = new Plottable.Utils.Map();
+            var dimension = this._isHorizontal() ? this.width() : this.height();
             this.annotatedTicks().forEach(function (annotatedTick) {
-                var x = _this._scale.scale(annotatedTick);
-                var width = measurements.get(annotatedTick).width;
-                if (x < 0 || x + width > _this.width()) {
+                var position = _this._scale.scale(annotatedTick);
+                var length = measurements.get(annotatedTick).width;
+                if (position < 0 || position + length > dimension) {
                     annotationToTier.set(annotatedTick, -1);
                     return;
                 }
                 var tierHasCollision = function (testTier) { return annotationTiers[testTier].some(function (testTick) {
-                    var testX = _this._scale.scale(testTick);
-                    var testWidth = measurements.get(testTick).width;
-                    return x + width >= testX && x <= testX + testWidth;
+                    var testPosition = _this._scale.scale(testTick);
+                    var testLength = measurements.get(testTick).width;
+                    return position + length >= testPosition && position <= testPosition + testLength;
                 }); };
                 var tier = 0;
                 while (tierHasCollision(tier)) {
