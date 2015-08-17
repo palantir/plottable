@@ -740,7 +740,7 @@ describe("Plots", () => {
         };
         dataset.data(data);
         texts = svg.selectAll("text")[0].map((n: any) => d3.select(n).text());
-        assert.lengthOf(texts, 2, "texts were immediately removed");
+        assert.lengthOf(texts, 0, "texts were immediately removed");
       });
     });
 
