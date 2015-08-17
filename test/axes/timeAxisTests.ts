@@ -287,7 +287,8 @@ describe("TimeAxis", () => {
     let xScale = new Plottable.Scales.Time();
     let xAxis = new Plottable.Axes.Time(xScale, "bottom");
     xAxis.margin(100);
-    xAxis.renderTo(svg);
+    xAxis.anchor(svg);
+    xAxis.computeLayout({ x: 0, y: 0}, 400, 400);
     let minimumHeight = xAxis.tickLabelPadding() + xAxis.margin() + xAxis.innerTickLength();
     assert.operator(xAxis.height(), ">=", minimumHeight, "height includes all relevant pieces");
     svg.remove();
