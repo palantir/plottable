@@ -611,7 +611,7 @@ describe("Plots", () => {
       });
     });
 
-    describe("Horizontal Bar Plot label visibility", () => {
+    describe("Horizontal Bar Plot With Bar Labels", () => {
       let svg: d3.Selection<void>;
       let yScale: Plottable.Scales.Category;
       let xScale: Plottable.Scales.Linear;
@@ -623,7 +623,7 @@ describe("Plots", () => {
 
         let data = [
           {y: "A", x: -1.5},
-          {y: "B", x: 1},
+          {y: "B", x: 100},
         ];
 
         barPlot = new Plottable.Plots.Bar<number, string>(Plottable.Plots.Bar.ORIENTATION_HORIZONTAL);
@@ -634,32 +634,15 @@ describe("Plots", () => {
         barPlot.renderTo(svg);
       });
 
-      it("hides labels properly on the right", () => {
-        xScale.domainMax(0.95);
+      it("shows both inner and outer labels", () => {
         let texts = svg.selectAll("text");
-
         assert.strictEqual(texts.size(), 2, "There should be two labels rendered");
 
-        let label1 = d3.select(texts[0][0]);
-        let label2 = d3.select(texts[0][1]);
+        let offBarLabelCount = d3.selectAll(".off-bar-label")[0].length;
+        assert.strictEqual(offBarLabelCount, 1, "There should be 1 labels rendered outside the bar");
 
-        assert.include(["visible", "inherit"], label1.style("visibility"), "label 1 is visible");
-        assert.strictEqual(label2.style("visibility"), "hidden", "label 2 is not visible");
-
-        svg.remove();
-      });
-
-      it("hides labels properly on the left", () => {
-        xScale.domainMin(-1.4);
-        let texts = svg.selectAll("text");
-
-        assert.strictEqual(texts.size(), 2, "There should be two labels rendered");
-
-        let label1 = d3.select(texts[0][0]);
-        let label2 = d3.select(texts[0][1]);
-
-        assert.strictEqual(label1.style("visibility"), "hidden", "label 2 is not visible");
-        assert.include(["visible", "inherit"], label2.style("visibility"), "label 1 is visible");
+        let onBarLabelCount = d3.selectAll(".on-bar-label")[0].length;
+        assert.strictEqual(onBarLabelCount, 1, "There should be 1 labels rendered inside the bar");
         svg.remove();
       });
     });
