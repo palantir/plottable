@@ -4775,9 +4775,11 @@ var Plottable;
                 }
                 var categoryScale = this._scale;
                 var measureResult = this._measureTicks(offeredWidth, offeredHeight, categoryScale, categoryScale.domain());
+                this._computedWidth = measureResult.usedWidth + widthRequiredByTicks;
+                this._computedHeight = measureResult.usedHeight + heightRequiredByTicks;
                 return {
-                    minWidth: measureResult.usedWidth + widthRequiredByTicks,
-                    minHeight: measureResult.usedHeight + heightRequiredByTicks
+                    minWidth: this._computedWidth,
+                    minHeight: this._computedHeight
                 };
             };
             Category.prototype._getTickValues = function () {
@@ -4868,9 +4870,6 @@ var Plottable;
                 // HACKHACK: https://github.com/palantir/svg-typewriter/issues/25
                 var widthFn = (this._isHorizontal() && this._tickLabelAngle === 0) ? d3.sum : Plottable.Utils.Math.max;
                 var heightFn = (this._isHorizontal() && this._tickLabelAngle === 0) ? Plottable.Utils.Math.max : d3.sum;
-                var textFits = wrappingResults.every(function (t) {
-                    return !SVGTypewriter.Utils.StringMethods.isNotEmptyString(t.truncatedText) && t.noLines === 1;
-                });
                 var usedWidth = widthFn(wrappingResults, function (t) { return _this._measurer.measure(t.wrappedText).width; }, 0);
                 var usedHeight = heightFn(wrappingResults, function (t) { return _this._measurer.measure(t.wrappedText).height; }, 0);
                 // If the tick labels are rotated, reverse usedWidth and usedHeight
@@ -4881,7 +4880,6 @@ var Plottable;
                     usedWidth = tempHeight;
                 }
                 return {
-                    textFits: textFits,
                     usedWidth: usedWidth,
                     usedHeight: usedHeight
                 };

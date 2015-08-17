@@ -46,10 +46,12 @@ export module Axes {
 
       let categoryScale = <Scales.Category> this._scale;
       let measureResult = this._measureTicks(offeredWidth, offeredHeight, categoryScale, categoryScale.domain());
+      this._computedWidth = measureResult.usedWidth + widthRequiredByTicks;
+      this._computedHeight = measureResult.usedHeight + heightRequiredByTicks;
 
       return {
-        minWidth: measureResult.usedWidth + widthRequiredByTicks,
-        minHeight: measureResult.usedHeight + heightRequiredByTicks
+        minWidth: this._computedWidth,
+        minHeight: this._computedHeight
       };
     }
 
@@ -161,8 +163,6 @@ export module Axes {
       let widthFn = (this._isHorizontal() && this._tickLabelAngle === 0) ? d3.sum : Utils.Math.max;
       let heightFn = (this._isHorizontal() && this._tickLabelAngle === 0) ? Utils.Math.max : d3.sum;
 
-      let textFits = wrappingResults.every((t: SVGTypewriter.Wrappers.WrappingResult) =>
-                    !SVGTypewriter.Utils.StringMethods.isNotEmptyString(t.truncatedText) && t.noLines === 1);
       let usedWidth = widthFn<SVGTypewriter.Wrappers.WrappingResult, number>(wrappingResults,
                       (t: SVGTypewriter.Wrappers.WrappingResult) => this._measurer.measure(t.wrappedText).width, 0);
       let usedHeight = heightFn<SVGTypewriter.Wrappers.WrappingResult, number>(wrappingResults,
@@ -177,7 +177,6 @@ export module Axes {
       }
 
       return {
-        textFits: textFits,
         usedWidth: usedWidth,
         usedHeight: usedHeight
       };
