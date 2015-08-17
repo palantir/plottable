@@ -235,7 +235,7 @@ export class Axis<D> extends Component {
       return elements;
     };
     let dimension = this._isHorizontal() ? this.height() : this.width();
-    let offsetF = (d: any) => {
+    let offsetF = (d: D) => {
       switch (this.orientation()) {
         case "bottom":
         case "right":
@@ -245,8 +245,8 @@ export class Axis<D> extends Component {
           return this.margin() - annotationToTier.get(d) * tierHeight;
       }
     };
-    let positionF = (d: any) => this._scale.scale(d);
-    let visibilityF = (d: any) => hiddenAnnotations.has(d) ? "hidden" : "visible";
+    let positionF = (d: D) => this._scale.scale(d);
+    let visibilityF = (d: D) => hiddenAnnotations.has(d) ? "hidden" : "visible";
 
     let secondaryPosition: number;
     switch (this.orientation()) {
@@ -277,7 +277,7 @@ export class Axis<D> extends Component {
       .attr("r", 3)
       .attr("visibility", visibilityF);
 
-    let rectangleOffsetF = (d: any) => {
+    let rectangleOffsetF = (d: D) => {
       switch (this.orientation()) {
         case "bottom":
         case "right":
