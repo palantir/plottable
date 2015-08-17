@@ -23,6 +23,7 @@ export module Plots {
     protected _isVertical: boolean;
     private _labelFormatter: Formatter = Formatters.identity();
     private _labelsEnabled = false;
+    private _displayLabelsOffBar = false;
     private _hideBarsIfAnyAreTooWide = true;
     private _labelConfig: Utils.Map<Dataset, LabelConfig>;
     private _baselineValueProvider: () => (X|Y)[];
@@ -185,6 +186,30 @@ export module Plots {
         return this._labelsEnabled;
       } else {
         this._labelsEnabled = enabled;
+        this.render();
+        return this;
+      }
+    }
+
+    /**
+     * Get whether to display labels off the bar
+     *
+     * @returns {boolean} Whether labels should be displayed off the bar
+     */
+    public displayLabelsOffBar(): boolean;
+
+    /**
+     * Sets whether labels are displayed off the bar
+     *
+     * @param {boolean} displayLabelsOffBar
+     * @return {Bar} The calling Bar Plot.
+     */
+    public displayLabelsOffBar(display: boolean): Bar <X, Y>;
+    public displayLabelsOffBar(display?: boolean): any {
+      if (display === undefined) {
+        return this._displayLabelsOffBar;
+      } else {
+        this._displayLabelsOffBar = display;
         this.render();
         return this;
       }
@@ -429,8 +454,8 @@ export module Plots {
         let secondaryAttrTextSpace = this._isVertical ? measurement.width : measurement.height;
         let secondaryAttrAvailableSpace = this._isVertical ? w : h;
         let tooWide = secondaryAttrTextSpace + 2 * Bar._LABEL_HORIZONTAL_PADDING > secondaryAttrAvailableSpace;
-        let showLabelOffBar = this._isVertical ? (measurement.height > h) : (measurement.width > w)
-        if (true) {
+        let showLabelOffBar = this._isVertical ? (measurement.height > h) : (measurement.width > w);
+        if ((measurement.height <= h && measurement.width <= w) || this._displayLabelsOffBar) {
           let offset = Math.min((primary - primarySpace) / 2, Bar._LABEL_VERTICAL_PADDING);
           if (!positive) { offset = offset * -1; }
 

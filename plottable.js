@@ -7615,6 +7615,7 @@ var Plottable;
                 _super.call(this);
                 this._labelFormatter = Plottable.Formatters.identity();
                 this._labelsEnabled = false;
+                this._displayLabelsOffBar = false;
                 this._hideBarsIfAnyAreTooWide = true;
                 this._barPixelWidth = 0;
                 this.addClass("bar-plot");
@@ -7717,6 +7718,16 @@ var Plottable;
                 }
                 else {
                     this._labelsEnabled = enabled;
+                    this.render();
+                    return this;
+                }
+            };
+            Bar.prototype.displayLabelsOffBar = function (display) {
+                if (display === undefined) {
+                    return this._displayLabelsOffBar;
+                }
+                else {
+                    this._displayLabelsOffBar = display;
                     this.render();
                     return this;
                 }
@@ -7917,7 +7928,7 @@ var Plottable;
                     var secondaryAttrAvailableSpace = _this._isVertical ? w : h;
                     var tooWide = secondaryAttrTextSpace + 2 * Bar._LABEL_HORIZONTAL_PADDING > secondaryAttrAvailableSpace;
                     var showLabelOffBar = _this._isVertical ? (measurement.height > h) : (measurement.width > w);
-                    if (true) {
+                    if ((measurement.height <= h && measurement.width <= w) || _this._displayLabelsOffBar) {
                         var offset = Math.min((primary - primarySpace) / 2, Bar._LABEL_VERTICAL_PADDING);
                         if (!positive) {
                             offset = offset * -1;

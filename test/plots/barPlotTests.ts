@@ -635,6 +635,9 @@ describe("Plots", () => {
       });
 
       it("shows both inner and outer labels", () => {
+        barPlot.displayLabelsOffBar(true);
+        barPlot.renderTo(svg);
+
         let texts = svg.selectAll("text");
         assert.strictEqual(texts.size(), 2, "There should be two labels rendered");
 
@@ -678,10 +681,9 @@ describe("Plots", () => {
         plot.renderTo(svg);
         plot.labelsEnabled(true);
         let texts = svg.selectAll("text")[0].map((n: any) => d3.select(n).text());
-        assert.lengthOf(texts, 3, "all texts drawn");
-        assert.strictEqual(texts[0], "5", "first label is 640");
-        assert.strictEqual(texts[1], "640", "first label is 640");
-        assert.strictEqual(texts[2], "12345", "first label is 12345");
+        assert.lengthOf(texts, 2, "both texts drawn");
+        assert.strictEqual(texts[0], "640", "first label is 640");
+        assert.strictEqual(texts[1], "12345", "first label is 12345");
         svg.remove();
       });
 
@@ -699,16 +701,15 @@ describe("Plots", () => {
         plot.labelFormatter((n: number) => n.toString() + "%");
         plot.renderTo(svg);
         let texts = svg.selectAll("text")[0].map((n: any) => d3.select(n).text());
-        assert.lengthOf(texts, 3, "all texts drawn");
-        assert.strictEqual(texts[0], "5%", "first label is 5%");
-        assert.strictEqual(texts[1], "640%", "first label is 640%");
-        assert.strictEqual(texts[2], "12345%", "first label is 12345%");
+        assert.lengthOf(texts, 2, "both texts drawn");
+        assert.strictEqual(texts[0], "640%", "first label is 640%");
+        assert.strictEqual(texts[1], "12345%", "first label is 12345%");
         svg.remove();
       });
 
       it("bar labels are shown inside or outside the bar as appropriate", () => {
+        plot.displayLabelsOffBar(true);
         plot.labelsEnabled(true);
-        plot.renderTo(svg);
         plot.renderTo(svg);
         let texts = svg.selectAll("text")[0].map((n: any) => d3.select(n).text());
 
@@ -724,14 +725,14 @@ describe("Plots", () => {
         plot.labelsEnabled(true);
         plot.renderTo(svg);
         let texts = svg.selectAll("text")[0].map((n: any) => d3.select(n).text());
-        assert.lengthOf(texts, 3, "all texts drawn");
+        assert.lengthOf(texts, 2, "both texts drawn");
         let originalDrawLabels = (<any> plot)._drawLabels;
         let called = false;
         (<any> plot)._drawLabels = () => {
           if (!called) {
             originalDrawLabels.apply(plot);
             texts = svg.selectAll("text")[0].map((n: any) => d3.select(n).text());
-            assert.lengthOf(texts, 3, "texts were repopulated by drawLabels after the update");
+            assert.lengthOf(texts, 2, "texts were repopulated by drawLabels after the update");
             svg.remove();
             called = true; // for some reason, in phantomJS, `done` was being called multiple times and this caused the test to fail.
             done();
@@ -739,7 +740,7 @@ describe("Plots", () => {
         };
         dataset.data(data);
         texts = svg.selectAll("text")[0].map((n: any) => d3.select(n).text());
-        assert.lengthOf(texts, 0, "texts were immediately removed");
+        assert.lengthOf(texts, 2, "texts were immediately removed");
       });
     });
 

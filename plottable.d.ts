@@ -3018,6 +3018,19 @@ declare module Plottable {
              */
             labelsEnabled(enabled: boolean): Bar<X, Y>;
             /**
+             * Get whether to display labels off the bar
+             *
+             * @returns {boolean} Whether labels should be displayed off the bar
+             */
+            displayLabelsOffBar(): boolean;
+            /**
+             * Sets whether labels are displayed off the bar
+             *
+             * @param {boolean} displayLabelsOffBar
+             * @return {Bar} The calling Bar Plot.
+             */
+            displayLabelsOffBar(display: boolean): Bar<X, Y>;
+            /**
              * Gets the Formatter for the labels.
              */
             labelFormatter(): Formatter;
