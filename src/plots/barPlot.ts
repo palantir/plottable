@@ -467,7 +467,7 @@ export module Plots {
                     addend += (offset - h);
                 }
                 if (showLabelOffBar && !positive) {
-                    addend += measurement.height
+                    addend += measurement.height;
                 };
             }
             return baselineY + addend;
@@ -500,8 +500,6 @@ export module Plots {
              let dark = Utils.Color.contrast("white", color) * 1.6 < Utils.Color.contrast("black", color);
              g.classed(dark ? "dark-label" : "light-label", true);
           }
-
-
 
           let hideLabel = (x + measurement.width > this.width() || (positive ? y + measurement.height : y + h) > this.height());
 
@@ -672,7 +670,6 @@ export module Plots {
     protected _getDataToDraw() {
       let dataToDraw = new Utils.Map<Dataset, any[]>();
       let attrToProjector = this._generateAttrToProjector();
-      let primaryAccessor = this._isVertical ? this.y().accessor : this.x().accessor;
       this.datasets().forEach((dataset: Dataset) => {
         let data = dataset.data().filter((d, i) => Utils.Math.isValidNumber(attrToProjector["x"](d, i, dataset)) &&
                                                    Utils.Math.isValidNumber(attrToProjector["y"](d, i, dataset)) &&

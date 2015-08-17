@@ -8130,7 +8130,6 @@ var Plottable;
             Bar.prototype._getDataToDraw = function () {
                 var dataToDraw = new Plottable.Utils.Map();
                 var attrToProjector = this._generateAttrToProjector();
-                var primaryAccessor = this._isVertical ? this.y().accessor : this.x().accessor;
                 this.datasets().forEach(function (dataset) {
                     var data = dataset.data().filter(function (d, i) { return Plottable.Utils.Math.isValidNumber(attrToProjector["x"](d, i, dataset)) &&
                         Plottable.Utils.Math.isValidNumber(attrToProjector["y"](d, i, dataset)) &&

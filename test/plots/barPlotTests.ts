@@ -711,7 +711,9 @@ describe("Plots", () => {
         plot.displayLabelsOffBar(true);
         plot.labelsEnabled(true);
         plot.renderTo(svg);
+
         let texts = svg.selectAll("text")[0].map((n: any) => d3.select(n).text());
+        assert.lengthOf(texts, 3, "both texts drawn");
 
         let offBarLabelCount = d3.selectAll(".off-bar-label")[0].length;
         assert.strictEqual(offBarLabelCount, 1, "There should be 1 label rendered outside the bar");
