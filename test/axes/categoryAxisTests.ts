@@ -177,4 +177,18 @@ describe("Category Axes", () => {
 
     svg.remove();
   });
+
+  it("_computed space variables should be set on requestedSpace", () => {
+    let svg = TestMethods.generateSVG(300, 300);
+    let labels = ["label1", "label2", "label100"];
+    let scale = new Plottable.Scales.Category().domain(labels);
+    let axis = new Plottable.Axes.Category(scale, "bottom");
+    axis.anchor(svg);
+    axis.requestedSpace(300, 300);
+
+    assert.isNotNull((<any> axis)._computedWidth, "computed width variable should be set to a value");
+    assert.isNotNull((<any> axis)._computedHeight, "computed height variable should be a set to a value");
+
+    svg.remove();
+  });
 });

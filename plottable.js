@@ -4946,9 +4946,11 @@ var Plottable;
                 }
                 var categoryScale = this._scale;
                 var measureResult = this._measureTicks(offeredWidth, offeredHeight, categoryScale, categoryScale.domain());
+                this._computedWidth = measureResult.usedWidth + widthRequiredByTicks;
+                this._computedHeight = measureResult.usedHeight + heightRequiredByTicks;
                 return {
-                    minWidth: measureResult.usedWidth + widthRequiredByTicks,
-                    minHeight: measureResult.usedHeight + heightRequiredByTicks
+                    minWidth: this._computedWidth,
+                    minHeight: this._computedHeight
                 };
             };
             Category.prototype._getTickValues = function () {

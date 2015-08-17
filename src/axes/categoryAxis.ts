@@ -46,10 +46,12 @@ export module Axes {
 
       let categoryScale = <Scales.Category> this._scale;
       let measureResult = this._measureTicks(offeredWidth, offeredHeight, categoryScale, categoryScale.domain());
+      this._computedWidth = measureResult.usedWidth + widthRequiredByTicks;
+      this._computedHeight = measureResult.usedHeight + heightRequiredByTicks;
 
       return {
-        minWidth: measureResult.usedWidth + widthRequiredByTicks,
-        minHeight: measureResult.usedHeight + heightRequiredByTicks
+        minWidth: this._computedWidth,
+        minHeight: this._computedHeight
       };
     }
 
