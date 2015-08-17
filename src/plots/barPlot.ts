@@ -644,8 +644,7 @@ export module Plots {
         let data = dataset.data().filter((d, i) => Utils.Math.isValidNumber(attrToProjector["x"](d, i, dataset)) &&
                                                    Utils.Math.isValidNumber(attrToProjector["y"](d, i, dataset)) &&
                                                    Utils.Math.isValidNumber(attrToProjector["width"](d, i, dataset)) &&
-                                                   Utils.Math.isValidNumber(attrToProjector["height"](d, i, dataset)) &&
-                                                   (primaryAccessor(d, i, dataset) !== 0));
+                                                   Utils.Math.isValidNumber(attrToProjector["height"](d, i, dataset)));
         dataToDraw.set(dataset, data);
       });
       return dataToDraw;

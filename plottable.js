@@ -8117,8 +8117,7 @@ var Plottable;
                     var data = dataset.data().filter(function (d, i) { return Plottable.Utils.Math.isValidNumber(attrToProjector["x"](d, i, dataset)) &&
                         Plottable.Utils.Math.isValidNumber(attrToProjector["y"](d, i, dataset)) &&
                         Plottable.Utils.Math.isValidNumber(attrToProjector["width"](d, i, dataset)) &&
-                        Plottable.Utils.Math.isValidNumber(attrToProjector["height"](d, i, dataset)) &&
-                        (primaryAccessor(d, i, dataset) !== 0); });
+                        Plottable.Utils.Math.isValidNumber(attrToProjector["height"](d, i, dataset)); });
                     dataToDraw.set(dataset, data);
                 });
                 return dataToDraw;
