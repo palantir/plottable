@@ -50,7 +50,7 @@ export module Plots {
         return this;
       }
       this._updatePieAngles();
-      var strokeDrawer = new Drawers.ArcOutline(dataset);
+      let strokeDrawer = new Drawers.ArcOutline(dataset);
       if (this._isSetup) {
        strokeDrawer.renderArea(this._renderArea.append("g"));
       }
@@ -72,9 +72,9 @@ export module Plots {
     }
 
     public selections(datasets = this.datasets()) {
-      var allSelections = super.selections(datasets)[0];
+      let allSelections = super.selections(datasets)[0];
       datasets.forEach((dataset) => {
-        var drawer = this._strokeDrawers.get(dataset);
+        let drawer = this._strokeDrawers.get(dataset);
         if (drawer == null) { return; }
         drawer.renderArea().selectAll(drawer.selector()).each(function() {
           allSelections.push(this);
@@ -97,7 +97,7 @@ export module Plots {
       entities.forEach((entity) => {
         entity.position.x += this.width() / 2;
         entity.position.y += this.height() / 2;
-        var stroke = this._strokeDrawers.get(entity.dataset).selectionForIndex(entity.index);
+        let stroke = this._strokeDrawers.get(entity.dataset).selectionForIndex(entity.index);
         entity.selection[0].push(stroke[0][0]);
       });
       return entities;
@@ -307,13 +307,13 @@ export module Plots {
         Utils.Window.setTimeout(() => this._drawLabels(), time);
       }
 
-      var drawSteps = this._generateStrokeDrawSteps();
-      var dataToDraw = this._getDataToDraw();
+      let drawSteps = this._generateStrokeDrawSteps();
+      let dataToDraw = this._getDataToDraw();
       this.datasets().forEach((dataset) => this._strokeDrawers.get(dataset).draw(dataToDraw.get(dataset), drawSteps));
     }
 
     private _generateStrokeDrawSteps() {
-      var attrToProjector = this._generateAttrToProjector();
+      let attrToProjector = this._generateAttrToProjector();
       return [{attrToProjector: attrToProjector, animator: new Animators.Null()}];
     }
 

@@ -14,20 +14,20 @@ describe("Plots", () => {
     });
 
     it("each slice consists of a fill path and a stroke path", () => {
-      var svg = TestMethods.generateSVG(500, 500);
-      var piePlot = new Plottable.Plots.Pie();
+      let svg = TestMethods.generateSVG(500, 500);
+      let piePlot = new Plottable.Plots.Pie();
       piePlot.sectorValue((d) => d.value);
-      var data = [
+      let data = [
         { value: 1 },
         { value: 1 }
       ];
-      var dataset = new Plottable.Dataset(data);
+      let dataset = new Plottable.Dataset(data);
       piePlot.addDataset(dataset);
       piePlot.renderTo(svg);
-      var renderArea = (<any> piePlot)._renderArea;
-      var arcPaths = renderArea.selectAll(".arc");
-      var arcFillPaths = renderArea.selectAll(".arc.fill");
-      var arcOutlinePaths = renderArea.selectAll(".arc.outline");
+      let renderArea = (<any> piePlot)._renderArea;
+      let arcPaths = renderArea.selectAll(".arc");
+      let arcFillPaths = renderArea.selectAll(".arc.fill");
+      let arcOutlinePaths = renderArea.selectAll(".arc.outline");
       assert.strictEqual(arcPaths.size(), 4, "2 paths per datum");
       assert.strictEqual(arcFillPaths.size(), 2, "1 fill path per datum");
       assert.strictEqual(arcOutlinePaths.size(), 2, "1 outline path1 per datum");

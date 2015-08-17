@@ -14,6 +14,7 @@ export module Drawers {
     protected _applyDefaultAttributes(selection: d3.Selection<any>) {
       super._applyDefaultAttributes(selection);
       selection.style("fill", "none");
+      selection.style("stroke-linejoin", "round");
     }
   }
 }
