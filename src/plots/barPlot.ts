@@ -468,6 +468,11 @@ export module Plots {
           let g = labelArea.append("g").attr("transform", "translate(" + x + "," + y + ")");
           let labelPositioningClassName = showLabelOffBar ? "off-bar-label" : "on-bar-label";
 
+          let color = attrToProjector["fill"](d, i, dataset);
+          let dark = Utils.Color.contrast("white", color) * 1.6 < Utils.Color.contrast("black", color);
+
+          g.classed(dark ? "dark-label" : "light-label");
+
           g.classed(labelPositioningClassName, true);
 
           let hideLabel = (x + measurement.width > this.width() || (positive ? y + measurement.height : y + h) > this.height());

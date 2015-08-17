@@ -70,6 +70,14 @@ svg.plottable {
   font-size: 14px;
 }
 
+.plottable .light-label text {
+  fill: white;
+}
+
+.plottable .dark-label text {
+  fill: #32313F;
+}
+
 .plottable .off-bar-label text {
   fill: #5279c7;
 }
