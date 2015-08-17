@@ -706,6 +706,20 @@ describe("Plots", () => {
         svg.remove();
       });
 
+      it("bar labels are shown inside or outside the bar as appropriate", () => {
+        plot.labelsEnabled(true);
+        plot.renderTo(svg);
+        plot.renderTo(svg);
+        let texts = svg.selectAll("text")[0].map((n: any) => d3.select(n).text());
+
+        let offBarLabelCount = d3.selectAll(".off-bar-label")[0].length;
+        assert.strictEqual(offBarLabelCount, 1, "There should be 1 label rendered outside the bar");
+
+        let onBarLabelCount = d3.selectAll(".on-bar-label")[0].length;
+        assert.strictEqual(onBarLabelCount, 2, "There should be 2 labels rendered inside the bar");
+        svg.remove();
+      });
+
       it("bar labels are removed instantly on dataset change", (done) => {
         plot.labelsEnabled(true);
         plot.renderTo(svg);
