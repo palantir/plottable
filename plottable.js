@@ -4223,7 +4223,7 @@ var Plottable;
             };
             Time.prototype._hideOverflowingTiers = function () {
                 var _this = this;
-                var availableHeight = this.height() - this.margin();
+                var availableHeight = this.height();
                 var usedHeight = 0;
                 this.content()
                     .selectAll("." + Time.TIME_AXIS_TIER_CLASS)
