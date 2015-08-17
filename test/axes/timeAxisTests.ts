@@ -282,7 +282,7 @@ describe("TimeAxis", () => {
 
   });
 
-  it("height includes margin, label padding, and tick length", () => {
+  it("occupied space includes margin, label padding, and tick length", () => {
     let svg = TestMethods.generateSVG(400, 400);
     let xScale = new Plottable.Scales.Time();
     let xAxis = new Plottable.Axes.Time(xScale, "bottom");
