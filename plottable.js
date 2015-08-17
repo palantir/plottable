@@ -3794,15 +3794,16 @@ var Plottable;
                 elements.exit().remove();
                 return elements;
             };
-            var dimension = this._isHorizontal() ? this.height() : this.width();
+            var axisHeight = this._isHorizontal() ? this.height() : this.width();
+            var axisHeightWithoutMargin = this._isHorizontal() ? this._computedHeight : this._computedWidth;
             var offsetF = function (d) {
                 switch (_this.orientation()) {
                     case "bottom":
                     case "right":
-                        return annotationToTier.get(d) * tierHeight + dimension - _this.margin();
+                        return annotationToTier.get(d) * tierHeight + axisHeightWithoutMargin;
                     case "top":
                     case "left":
-                        return _this.margin() - annotationToTier.get(d) * tierHeight;
+                        return axisHeight - axisHeightWithoutMargin - annotationToTier.get(d) * tierHeight;
                 }
             };
             var positionF = function (d) { return _this._scale.scale(d); };

@@ -234,15 +234,16 @@ export class Axis<D> extends Component {
       elements.exit().remove();
       return elements;
     };
-    let dimension = this._isHorizontal() ? this.height() : this.width();
+    let axisHeight = this._isHorizontal() ? this.height() : this.width();
+    let axisHeightWithoutMargin = this._isHorizontal() ? this._computedHeight : this._computedWidth;
     let offsetF = (d: D) => {
       switch (this.orientation()) {
         case "bottom":
         case "right":
-          return annotationToTier.get(d) * tierHeight + dimension - this.margin();
+          return annotationToTier.get(d) * tierHeight + axisHeightWithoutMargin;
         case "top":
         case "left":
-          return this.margin() - annotationToTier.get(d) * tierHeight;
+          return axisHeight - axisHeightWithoutMargin - annotationToTier.get(d) * tierHeight;
       }
     };
     let positionF = (d: D) => this._scale.scale(d);
