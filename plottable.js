@@ -1,5 +1,5 @@
 /*!
-Plottable 1.6.1 (https://github.com/palantir/plottable)
+Plottable 1.7.0 (https://github.com/palantir/plottable)
 Copyright 2014-2015 Palantir Technologies
 Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
 */
@@ -901,7 +901,7 @@ var Plottable;
 ///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
-    Plottable.version = "1.6.1";
+    Plottable.version = "1.7.0";
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
@@ -4189,9 +4189,10 @@ var Plottable;
                 // Makes sure that the size it requires is a multiple of tier sizes, such that
                 // we have no leftover tiers
                 var size = _super.prototype._sizeFromOffer.call(this, availableWidth, availableHeight);
-                size.height = this._tierHeights.reduce(function (prevValue, currValue, index, arr) {
+                var tierHeights = this._tierHeights.reduce(function (prevValue, currValue, index, arr) {
                     return (prevValue + currValue > size.height) ? prevValue : (prevValue + currValue);
                 });
+                size.height = Math.min(size.height, tierHeights + this.margin());
                 return size;
             };
             Time.prototype._setup = function () {
@@ -4351,7 +4352,7 @@ var Plottable;
             };
             Time.prototype._hideOverflowingTiers = function () {
                 var _this = this;
-                var availableHeight = this.height();
+                var availableHeight = this.height() - this.margin();
                 var usedHeight = 0;
                 this.content()
                     .selectAll("." + Time.TIME_AXIS_TIER_CLASS)
@@ -6351,6 +6352,145 @@ var __extends = (this && this.__extends) || function (d, b) {
 };
 var Plottable;
 (function (Plottable) {
+    var Components;
+    (function (Components) {
+        var PropertyMode;
+        (function (PropertyMode) {
+            PropertyMode[PropertyMode["VALUE"] = 0] = "VALUE";
+            PropertyMode[PropertyMode["PIXEL"] = 1] = "PIXEL";
+        })(PropertyMode || (PropertyMode = {}));
+        ;
+        var GuideLineLayer = (function (_super) {
+            __extends(GuideLineLayer, _super);
+            function GuideLineLayer(orientation) {
+                var _this = this;
+                _super.call(this);
+                this._mode = PropertyMode.VALUE;
+                if (orientation !== GuideLineLayer.ORIENTATION_VERTICAL && orientation !== GuideLineLayer.ORIENTATION_HORIZONTAL) {
+                    throw new Error(orientation + " is not a valid orientation for GuideLineLayer");
+                }
+                this._orientation = orientation;
+                this._clipPathEnabled = true;
+                this.addClass("guide-line-layer");
+                this._scaleUpdateCallback = function () {
+                    _this._syncPixelPositionAndValue();
+                    _this.render();
+                };
+            }
+            GuideLineLayer.prototype._setup = function () {
+                _super.prototype._setup.call(this);
+                this._guideLine = this.content().append("line").classed("guide-line", true);
+            };
+            GuideLineLayer.prototype._sizeFromOffer = function (availableWidth, availableHeight) {
+                return {
+                    width: availableWidth,
+                    height: availableHeight
+                };
+            };
+            GuideLineLayer.prototype._isVertical = function () {
+                return this._orientation === GuideLineLayer.ORIENTATION_VERTICAL;
+            };
+            GuideLineLayer.prototype.fixedWidth = function () {
+                return true;
+            };
+            GuideLineLayer.prototype.fixedHeight = function () {
+                return true;
+            };
+            GuideLineLayer.prototype.computeLayout = function (origin, availableWidth, availableHeight) {
+                _super.prototype.computeLayout.call(this, origin, availableWidth, availableHeight);
+                if (this.scale() != null) {
+                    if (this._isVertical()) {
+                        this.scale().range([0, this.width()]);
+                    }
+                    else {
+                        this.scale().range([this.height(), 0]);
+                    }
+                }
+                return this;
+            };
+            GuideLineLayer.prototype.renderImmediately = function () {
+                _super.prototype.renderImmediately.call(this);
+                this._syncPixelPositionAndValue();
+                this._guideLine.attr({
+                    x1: this._isVertical() ? this.pixelPosition() : 0,
+                    y1: this._isVertical() ? 0 : this.pixelPosition(),
+                    x2: this._isVertical() ? this.pixelPosition() : this.width(),
+                    y2: this._isVertical() ? this.height() : this.pixelPosition()
+                });
+                return this;
+            };
+            // sets pixelPosition() or value() based on the other, depending on which was the last one set
+            GuideLineLayer.prototype._syncPixelPositionAndValue = function () {
+                if (this.scale() == null) {
+                    return;
+                }
+                if (this._mode === PropertyMode.VALUE && this.value() != null) {
+                    this._pixelPosition = this.scale().scale(this.value());
+                }
+                else if (this._mode === PropertyMode.PIXEL && this.pixelPosition() != null) {
+                    this._value = this.scale().invert(this.pixelPosition());
+                }
+            };
+            GuideLineLayer.prototype.scale = function (scale) {
+                if (scale == null) {
+                    return this._scale;
+                }
+                var previousScale = this._scale;
+                if (previousScale != null) {
+                    previousScale.offUpdate(this._scaleUpdateCallback);
+                }
+                this._scale = scale;
+                this._scale.onUpdate(this._scaleUpdateCallback);
+                this._syncPixelPositionAndValue();
+                this.redraw();
+                return this;
+            };
+            GuideLineLayer.prototype.value = function (value) {
+                if (value == null) {
+                    return this._value;
+                }
+                this._value = value;
+                this._mode = PropertyMode.VALUE;
+                this._syncPixelPositionAndValue();
+                this.render();
+                return this;
+            };
+            GuideLineLayer.prototype.pixelPosition = function (pixelPosition) {
+                if (pixelPosition == null) {
+                    return this._pixelPosition;
+                }
+                if (!Plottable.Utils.Math.isValidNumber(pixelPosition)) {
+                    throw new Error("pixelPosition must be a finite number");
+                }
+                this._pixelPosition = pixelPosition;
+                this._mode = PropertyMode.PIXEL;
+                this._syncPixelPositionAndValue();
+                this.render();
+                return this;
+            };
+            GuideLineLayer.prototype.destroy = function () {
+                _super.prototype.destroy.call(this);
+                if (this.scale() != null) {
+                    this.scale().offUpdate(this._scaleUpdateCallback);
+                }
+            };
+            GuideLineLayer.ORIENTATION_VERTICAL = "vertical";
+            GuideLineLayer.ORIENTATION_HORIZONTAL = "horizontal";
+            return GuideLineLayer;
+        })(Plottable.Component);
+        Components.GuideLineLayer = GuideLineLayer;
+    })(Components = Plottable.Components || (Plottable.Components = {}));
+})(Plottable || (Plottable = {}));
+
+///<reference path="../reference.ts" />
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var Plottable;
+(function (Plottable) {
     var Plots;
     (function (Plots) {
         var Animator;
@@ -6888,7 +7028,7 @@ var Plottable;
                 return this;
             };
             Pie.prototype.labelsEnabled = function (enabled) {
-                if (enabled === undefined) {
+                if (enabled == null) {
                     return this._labelsEnabled;
                 }
                 else {
@@ -7879,7 +8019,7 @@ var Plottable;
                 return this;
             };
             Bar.prototype.labelsEnabled = function (enabled) {
-                if (enabled === undefined) {
+                if (enabled == null) {
                     return this._labelsEnabled;
                 }
                 else {
@@ -9084,6 +9224,65 @@ var Plottable;
                 attrToProjector["y2"] = this.y2() == null ? Plottable.Plot._scaledAccessor(this.y()) : Plottable.Plot._scaledAccessor(this.y2());
                 return attrToProjector;
             };
+            Segment.prototype.entitiesIn = function (xRangeOrBounds, yRange) {
+                var dataXRange;
+                var dataYRange;
+                if (yRange == null) {
+                    var bounds = xRangeOrBounds;
+                    dataXRange = { min: bounds.topLeft.x, max: bounds.bottomRight.x };
+                    dataYRange = { min: bounds.topLeft.y, max: bounds.bottomRight.y };
+                }
+                else {
+                    dataXRange = xRangeOrBounds;
+                    dataYRange = yRange;
+                }
+                return this._entitiesIntersecting(dataXRange, dataYRange);
+            };
+            Segment.prototype._entitiesIntersecting = function (xRange, yRange) {
+                var _this = this;
+                var intersected = [];
+                var attrToProjector = this._generateAttrToProjector();
+                this.entities().forEach(function (entity) {
+                    if (_this._lineIntersectsBox(entity, xRange, yRange, attrToProjector)) {
+                        intersected.push(entity);
+                    }
+                });
+                return intersected;
+            };
+            Segment.prototype._lineIntersectsBox = function (entity, xRange, yRange, attrToProjector) {
+                var _this = this;
+                var x1 = attrToProjector["x1"](entity.datum, entity.index, entity.dataset);
+                var x2 = attrToProjector["x2"](entity.datum, entity.index, entity.dataset);
+                var y1 = attrToProjector["y1"](entity.datum, entity.index, entity.dataset);
+                var y2 = attrToProjector["y2"](entity.datum, entity.index, entity.dataset);
+                // check if any of end points of the segment is inside the box
+                if ((xRange.min <= x1 && x1 <= xRange.max && yRange.min <= y1 && y1 <= yRange.max) ||
+                    (xRange.min <= x2 && x2 <= xRange.max && yRange.min <= y2 && y2 <= yRange.max)) {
+                    return true;
+                }
+                var startPoint = { x: x1, y: y1 };
+                var endPoint = { x: x2, y: y2 };
+                var corners = [
+                    { x: xRange.min, y: yRange.min },
+                    { x: xRange.min, y: yRange.max },
+                    { x: xRange.max, y: yRange.max },
+                    { x: xRange.max, y: yRange.min }];
+                var intersections = corners.filter(function (point, index) {
+                    if (index !== 0) {
+                        // return true if border formed by conecting current corner and previous corner intersects with the segment
+                        return _this._lineIntersectsSegment(startPoint, endPoint, point, corners[index - 1]) &&
+                            _this._lineIntersectsSegment(point, corners[index - 1], startPoint, endPoint);
+                    }
+                });
+                return intersections.length > 0;
+            };
+            Segment.prototype._lineIntersectsSegment = function (point1, point2, point3, point4) {
+                var calcOrientation = function (point1, point2, point) {
+                    return (point2.x - point1.x) * (point.y - point2.y) - (point2.y - point1.y) * (point.x - point2.x);
+                };
+                // point3 and point4 are on different sides of line formed by point1 and point2
+                return calcOrientation(point1, point2, point3) * calcOrientation(point1, point2, point4) < 0;
+            };
             Segment._X2_KEY = "x2";
             Segment._Y2_KEY = "y2";
             return Segment;
@@ -10242,7 +10441,7 @@ var Plottable;
                 this._keyReleaseCallbacks = {};
                 this._mouseMoveCallback = function (point) { return false; }; // HACKHACK: registering a listener
                 this._downedKeys = new Plottable.Utils.Set();
-                this._keyDownCallback = function (keyCode) { return _this._handleKeyDownEvent(keyCode); };
+                this._keyDownCallback = function (keyCode, event) { return _this._handleKeyDownEvent(keyCode, event); };
                 this._keyUpCallback = function (keyCode) { return _this._handleKeyUpEvent(keyCode); };
             }
             Key.prototype._anchor = function (component) {
@@ -10261,9 +10460,9 @@ var Plottable;
                 this._keyDispatcher.offKeyUp(this._keyUpCallback);
                 this._keyDispatcher = null;
             };
-            Key.prototype._handleKeyDownEvent = function (keyCode) {
+            Key.prototype._handleKeyDownEvent = function (keyCode, event) {
                 var p = this._translateToComponentSpace(this._positionDispatcher.lastMousePosition());
-                if (this._isInsideComponent(p)) {
+                if (this._isInsideComponent(p) && !event.repeat) {
                     if (this._keyPressCallbacks[keyCode]) {
                         this._keyPressCallbacks[keyCode].callCallbacks(keyCode);
                     }
@@ -11173,7 +11372,7 @@ var Plottable;
             };
             // Sets resizable classes. Overridden by subclasses that only resize in one dimension.
             DragBoxLayer.prototype._setResizableClasses = function (canResize) {
-                if (canResize) {
+                if (canResize && this.enabled()) {
                     this.addClass("x-resizable");
                     this.addClass("y-resizable");
                 }
@@ -11187,13 +11386,16 @@ var Plottable;
                     return this._movable;
                 }
                 this._movable = movable;
-                if (movable) {
+                this._setMovableClass();
+                return this;
+            };
+            DragBoxLayer.prototype._setMovableClass = function () {
+                if (this.movable() && this.enabled()) {
                     this.addClass("movable");
                 }
                 else {
                     this.removeClass("movable");
                 }
-                return this;
             };
             /**
              * Sets the callback to be called when dragging starts.
@@ -11266,6 +11468,8 @@ var Plottable;
                     return this._dragInteraction.enabled();
                 }
                 this._dragInteraction.enabled(enabled);
+                this._setResizableClasses(this.resizable());
+                this._setMovableClass();
                 return this;
             };
             return DragBoxLayer;
@@ -11310,7 +11514,7 @@ var Plottable;
                 });
             };
             XDragBoxLayer.prototype._setResizableClasses = function (canResize) {
-                if (canResize) {
+                if (canResize && this.enabled()) {
                     this.addClass("x-resizable");
                 }
                 else {
@@ -11368,7 +11572,7 @@ var Plottable;
                 });
             };
             YDragBoxLayer.prototype._setResizableClasses = function (canResize) {
-                if (canResize) {
+                if (canResize && this.enabled()) {
                     this.addClass("y-resizable");
                 }
                 else {

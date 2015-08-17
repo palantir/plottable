@@ -176,6 +176,11 @@ svg.plottable {
 }
 /* /DragBoxLayer */
 
+.plottable .guide-line-layer line.guide-line {
+  stroke: #CCC;
+  stroke-width: 1px;
+}
+
 .plottable .legend text {
   fill: #32313F;
   font-family: "Helvetica Neue", sans-serif;

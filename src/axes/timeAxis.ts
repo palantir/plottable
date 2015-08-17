@@ -310,9 +310,10 @@ export module Axes {
       // we have no leftover tiers
 
       let size = super._sizeFromOffer(availableWidth, availableHeight);
-      size.height = this._tierHeights.reduce((prevValue, currValue, index, arr) => {
+      let tierHeights = this._tierHeights.reduce((prevValue, currValue, index, arr) => {
         return (prevValue + currValue > size.height) ? prevValue : (prevValue + currValue);
       });
+      size.height = Math.min(size.height, tierHeights + this.margin());
       return size;
     }
 
@@ -496,7 +497,7 @@ export module Axes {
     }
 
     private _hideOverflowingTiers() {
-      let availableHeight = this.height();
+      let availableHeight = this.height() - this.margin();
       let usedHeight = 0;
 
       this.content()
