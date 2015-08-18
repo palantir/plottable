@@ -174,7 +174,15 @@ export class Axis<D> extends Component {
     return this;
   }
 
+  /**
+   * Gets the annotated ticks
+   */
   public annotatedTicks(): D[];
+  /**
+   * Sets the annotated ticks
+   *
+   * @returns {Axis} The calling Axis.
+   */
   public annotatedTicks(annotatedTicks: D[]): Axis<D>;
   public annotatedTicks(annotatedTicks?: D[]): any {
     if (annotatedTicks == null) {
@@ -185,7 +193,15 @@ export class Axis<D> extends Component {
     return this;
   }
 
+  /**
+   * Gets the formatter for the annotations
+   */
   public annotationFormatter(): Formatter;
+  /**
+   * Sets the formatter for the annotations
+   *
+   * @returns {Axis} The calling Axis.
+   */
   public annotationFormatter(annotationFormatter: Formatter): Axis<D>;
   public annotationFormatter(annotationFormatter?: Formatter): any {
     if (annotationFormatter == null) {
@@ -196,7 +212,15 @@ export class Axis<D> extends Component {
     return this;
   }
 
+  /**
+   * Gets if annotations are enabled
+   */
   public annotationsEnabled(): boolean;
+  /**
+   * Sets if annotations are enabled
+   *
+   * @returns {Axis} The calling Axis.
+   */
   public annotationsEnabled(annotationsEnabled: boolean): Axis<D>;
   public annotationsEnabled(annotationsEnabled?: boolean): any {
     if (annotationsEnabled == null) {

@@ -1695,11 +1695,35 @@ declare module Plottable {
         protected _setup(): void;
         protected _getTickValues(): D[];
         renderImmediately(): Axis<D>;
+        /**
+         * Gets the annotated ticks
+         */
         annotatedTicks(): D[];
+        /**
+         * Sets the annotated ticks
+         *
+         * @returns {Axis} The calling Axis.
+         */
         annotatedTicks(annotatedTicks: D[]): Axis<D>;
+        /**
+         * Gets the formatter for the annotations
+         */
         annotationFormatter(): Formatter;
+        /**
+         * Sets the formatter for the annotations
+         *
+         * @returns {Axis} The calling Axis.
+         */
         annotationFormatter(annotationFormatter: Formatter): Axis<D>;
+        /**
+         * Gets if annotations are enabled
+         */
         annotationsEnabled(): boolean;
+        /**
+         * Sets if annotations are enabled
+         *
+         * @returns {Axis} The calling Axis.
+         */
         annotationsEnabled(annotationsEnabled: boolean): Axis<D>;
         protected _drawAnnotations(): void;
         protected _generateBaselineAttrHash(): {
