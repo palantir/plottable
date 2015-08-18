@@ -421,10 +421,7 @@ describe("Plots", () => {
         let y2 = data[1].y - data[0].y;
         let expectedBottom = base + y2 * x1 / x2;
 
-        base = data[0].y;
         x1 = xScale.domain()[0] - data[0].x;
-        x2 = data[1].x - data[0].x;
-        y2 = data[1].y - data[0].y;
         let expectedTop = base + y2 * x1 / x2;
 
         assert.closeTo(yScale.domain()[0], expectedBottom, 0.001, "smooth autoranging forces the domain to include the line (left)");
@@ -463,10 +460,7 @@ describe("Plots", () => {
         let y2 = data[1].y - data[0].y;
         let expectedTop = base + y2 * x1 / x2;
 
-        base = data[0].y;
         x1 = (xScale.domain()[0] - data[0].x) + (xScale.domain()[1] - xScale.domain()[0]) * (1 + yScale.padProportion() / 2);
-        x2 = data[1].x - data[0].x;
-        y2 = data[1].y - data[0].y;
         let expectedBottom = base + y2 * x1 / x2;
 
         assert.closeTo(yScale.domain()[0], expectedBottom, 0.001, "smooth autoranging forces the domain to include the line (left)");
@@ -496,10 +490,7 @@ describe("Plots", () => {
         let y2 = data[1].y - data[0].y;
         let expectedTop = base + y2 * x1 / x2;
 
-        base = data[0].y;
         x1 = (xScale.domain()[0] - data[0].x) + (xScale.domain()[1] - xScale.domain()[0]) * (1 + yScale.padProportion() / 2);
-        x2 = data[1].x - data[0].x;
-        y2 = data[1].y - data[0].y;
         let expectedBottom = base + y2 * x1 / x2;
 
         assert.closeTo(yScale.domain()[0], expectedBottom, 0.001, "smooth autoranging forces the domain to include the line (left)");
@@ -529,10 +520,7 @@ describe("Plots", () => {
         let y2 = data[1].y - data[0].y;
         let expectedTop = base + y2 * x1 / x2;
 
-        base = data[0].y;
         x1 = (xScale.domain()[0] - data[0].x) + (xScale.domain()[1] - xScale.domain()[0]) * (1 + yScale.padProportion() / 2);
-        x2 = data[1].x - data[0].x;
-        y2 = data[1].y - data[0].y;
         let expectedBottom = base + y2 * x1 / x2;
 
         assert.closeTo(yScale.domain()[0], expectedBottom, 0.001, "smooth autoranging forces the domain to include the line (left)");
@@ -562,10 +550,7 @@ describe("Plots", () => {
         let y2 = data[1].y - data[0].y;
         let expectedTop = base + y2 * x1 / x2;
 
-        base = data[0].y;
         x1 = (xScale.domain()[0] - data[0].x) + (xScale.domain()[1] - xScale.domain()[0]) * (1 + yScale.padProportion() / 2);
-        x2 = data[1].x - data[0].x;
-        y2 = data[1].y - data[0].y;
         let expectedBottom = base + y2 * x1 / x2;
 
         assert.closeTo(yScale.domain()[0], expectedBottom, 0.001, "smooth autoranging forces the domain to include the line (left)");
@@ -596,10 +581,7 @@ describe("Plots", () => {
         let y2 = data[1].y - data[0].y;
         let expectedTop = base + y2 * x1 / x2;
 
-        base = data[0].y;
         x1 = (xScale.domain()[0] - data[0].x) + (xScale.domain()[1] - xScale.domain()[0]) * (1 + yScale.padProportion() / 2);
-        x2 = data[1].x - data[0].x;
-        y2 = data[1].y - data[0].y;
         let expectedBottom = base + y2 * x1 / x2;
 
         assert.closeTo(yScale.domain()[0], expectedBottom, 0.001, "smooth autoranging forces the domain to include the line (left)");
@@ -683,10 +665,7 @@ describe("Plots", () => {
         let y2 = data[1].x - data[0].x;
         let expectedTop = base + y2 * x1 / x2;
 
-        base = data[0].x;
         x1 = (yScale.domain()[0] - data[0].y);
-        x2 = data[1].y - data[0].y;
-        y2 = data[1].x - data[0].x;
         let expectedBottom = base + y2 * x1 / x2;
 
         assert.closeTo(xScale.domain()[0], expectedTop, 0.001, "smooth autoranging forces the domain to include the line (left)");
