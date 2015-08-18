@@ -449,9 +449,11 @@ describe("Plots", () => {
       let rectanglePlot: Plottable.Plots.Rectangle<number, number>;
       let DATA: [any];
       let dataset: Plottable.Dataset;
+      let xScale: Plottable.Scales.Linear;
+      let yScale: Plottable.Scales.Linear;
       beforeEach(() => {
-        let xScale = new Plottable.Scales.Linear();
-        let yScale = new Plottable.Scales.Linear();
+        xScale = new Plottable.Scales.Linear();
+        yScale = new Plottable.Scales.Linear();
         svg = TestMethods.generateSVG(SVG_WIDTH / 2, SVG_HEIGHT);
         rectanglePlot = new Plottable.Plots.Rectangle<number, number>();
         DATA = [
@@ -508,11 +510,51 @@ describe("Plots", () => {
         let texts = svg.selectAll("text")[0].map((n: any) => d3.select(n).text());
         assert.lengthOf(texts, 2, "all labels are drawn");
 
-        let data2 = [{ x: 0, y: 0, x2: 1, y2: 1, val: 5 }];
+        let data2 = [{ x: 0, y: 0, x2: 1, y2: 1, val: "5" }];
         dataset.data(data2);
         texts = svg.selectAll("text")[0].map((n: any) => d3.select(n).text());
         assert.lengthOf(texts, 1, "new label is drawn");
         assert.strictEqual(texts[0], "5");
+        svg.remove();
+      });
+
+      it("labels cut off by edges are not shown", () => {
+        rectanglePlot.labelsEnabled(true);
+        let data = [
+          { x: 2, y: 2, x2: 3, y2: 3, val: "center" },
+          { x: 0.5, y: 2, x2: 1.5, y2: 3, val: "left" },
+          { x: 3.5, y: 2, x2: 4.5, y2: 3, val: "right" },
+          { x: 2, y: 3.5, x2: 3, y2: 4.5, val: "top" },
+          { x: 2, y: 0.5, x2: 3, y2: 1.5, val: "bottom" }];
+        dataset.data(data);
+        xScale.domain([1, 4]);
+        yScale.domain([1, 4]);
+
+        let texts = svg.selectAll("text")[0].map((n: any) => d3.select(n).text());
+        assert.lengthOf(texts, 1, "only one label is drawn");
+        assert.strictEqual(texts[0], "center");
+        svg.remove();
+      });
+
+      it("labels cut off by other rectangels are not shown", () => {
+        rectanglePlot.labelsEnabled(true);
+        let data = [
+          { x: 0, y: 0, x2: 2, y2: 2, val: "bottom" },
+          { x: 1, y: 1, x2: 3, y2: 3, val: "middle" }];
+        let data2 = [
+          { x: 2, y: 2, x2: 4, y2: 4, val: "top" },
+          { x: 4, y: 4, x2: 6, y2: 6, val: "other" }];
+        dataset.data(data);
+        let texts = svg.selectAll("text")[0].map((n: any) => d3.select(n).text());
+        assert.lengthOf(texts, 1, "1 label is drawn");
+        assert.strictEqual(texts[0], "middle");
+
+        rectanglePlot.addDataset(new Plottable.Dataset(data2));
+
+        texts = svg.selectAll("text")[0].map((n: any) => d3.select(n).text());
+        assert.lengthOf(texts, 2, "2 labels are drawn");
+        assert.strictEqual(texts[0], "top");
+        assert.strictEqual(texts[1], "other");
         svg.remove();
       });
     });

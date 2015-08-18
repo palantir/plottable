@@ -282,10 +282,7 @@ export module Plots {
       return this._entitiesIntersecting(dataXRange, dataYRange);
     }
 
-    private _entityBBox(entity: PlotEntity, attrToProjector: AttributeToProjector): SVGRect {
-      let datum = entity.datum;
-      let index = entity.index;
-      let dataset = entity.dataset;
+    private _entityBBox(datum: any, index: number, dataset: Plottable.Dataset, attrToProjector: AttributeToProjector): SVGRect {
       return {
         x: attrToProjector["x"](datum, index, dataset),
         y: attrToProjector["y"](datum, index, dataset),
@@ -298,7 +295,8 @@ export module Plots {
       let intersected: PlotEntity[] = [];
       let attrToProjector = this._generateAttrToProjector();
       this.entities().forEach((entity) => {
-        if (Utils.DOM.intersectsBBox(xValOrRange, yValOrRange, this._entityBBox(entity, attrToProjector))) {
+        if (Utils.DOM.intersectsBBox(xValOrRange, yValOrRange,
+                                     this._entityBBox(entity.datum, entity.index, entity.dataset, attrToProjector))) {
           intersected.push(entity);
         }
       });
@@ -404,7 +402,7 @@ export module Plots {
     }
 
     protected _additionalPaint(time: number) {
-      this._renderArea.select(".label-area").remove();
+      this._renderArea.selectAll(".label-area").remove();
       if (this._labelsEnabled && this.label() != null) {
         Utils.Window.setTimeout(() => this._drawLabels(), time);
       }
@@ -412,14 +410,21 @@ export module Plots {
 
     private _drawLabels() {
       let dataToDraw = this._getDataToDraw();
-      this.datasets().forEach((dataset) => this._drawLabel(dataToDraw.get(dataset), dataset));
+      this.datasets().forEach((dataset, i) => this._drawLabel(dataToDraw, dataset, i));
     }
 
-    private _drawLabel(data: any[], dataset: Dataset) {
+    private _drawLabel(dataToDraw: Utils.Map<Dataset, any[]>, dataset: Dataset, datasetIndex: number) {
       let attrToProjector = this._generateAttrToProjector();
       let labelArea = this._renderArea.append("g").classed("label-area", true);
       let measurer = new SVGTypewriter.Measurers.Measurer(labelArea);
       let writer = new SVGTypewriter.Writers.Writer(measurer);
+      let xRange = this.x().scale.range();
+      let yRange = this.y().scale.range();
+      let xMin = Math.min.apply(null, xRange);
+      let xMax = Math.max.apply(null, xRange);
+      let yMin = Math.min.apply(null, yRange);
+      let yMax = Math.max.apply(null, yRange);
+      let data = dataToDraw.get(dataset);
       data.forEach((datum, datumIndex) => {
         let label = "" + this.label()(datum, datumIndex, dataset);
         let measurement = measurer.measure(label);
@@ -428,12 +433,21 @@ export module Plots {
         let y = attrToProjector["y"](datum, datumIndex, dataset);
         let width = attrToProjector["width"](datum, datumIndex, dataset);
         let height = attrToProjector["height"](datum, datumIndex, dataset);
-
         if (measurement.height <= height && measurement.width <= width) {
+
           let horizontalOffset = (width - measurement.width) / 2;
           let verticalOffset = (height - measurement.height) / 2;
           x += horizontalOffset;
           y += verticalOffset;
+
+          let xLabelRange = { min: x, max: x + measurement.width };
+          let yLabelRange = { min : y, max: y + measurement.height };
+          if (xLabelRange.min < xMin || xLabelRange.max > xMax || yLabelRange.min < yMin || yLabelRange.max > yMax) {
+            return;
+          }
+          if (this._overlayLabel(xLabelRange, yLabelRange, datumIndex, datasetIndex, dataToDraw)) {
+            return;
+          }
 
           let color = attrToProjector["fill"] == null ? "black" : attrToProjector["fill"](datum, datumIndex, dataset);
           let dark = Utils.Color.contrast("white", color) * 1.6 < Utils.Color.contrast("black", color);
@@ -449,6 +463,21 @@ export module Plots {
           });
         }
       });
+    }
+
+    private _overlayLabel(labelXRange: Range, labelYRange: Range, datumIndex: number, datasetIndex: number,
+                          dataToDraw: Utils.Map<Dataset, any[]>) {
+      let attrToProjector = this._generateAttrToProjector();
+      for (let i = datasetIndex; i < this.datasets().length; i ++ ) {
+        let dataset = this.datasets()[i];
+        let data = dataToDraw.get(dataset);
+        for (let j = (i === datasetIndex ? datumIndex + 1 : 0); j < data.length ; j ++ ) {
+          if (Utils.DOM.intersectsBBox(labelXRange, labelYRange, this._entityBBox(data[j], j, dataset, attrToProjector))) {
+            return true;
+          }
+        }
+      }
+      return false;
     }
   }
 }
