@@ -51,8 +51,8 @@ describe("Plots", () => {
       let entities = piePlot.entities();
       entities.forEach((entity) => {
         assert.strictEqual(entity.selection.size(), 2, "each entity selection has 2 paths");
-        assert.lengthOf(entity.selection.filter("fill"), 1, "each entity selection has 1 fill path");
-        assert.lengthOf(entity.selection.filter("outline"), 1, "each entity selection has 1 stroke path");
+        assert.strictEqual(entity.selection.filter(".fill").size(), 1, "each entity selection has 1 fill path");
+        assert.strictEqual(entity.selection.filter(".outline").size(), 1, "each entity selection has 1 stroke path");
       });
 
       svg.remove();
