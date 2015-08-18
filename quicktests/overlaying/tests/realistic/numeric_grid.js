@@ -37,9 +37,7 @@ function run(svg, data, Plottable) {
     plot.entities().forEach(function(entity) {
       entity.selection.attr("opacity", .3);
     });
-    var xRange = {min: p.x, max: p.x};
-    var yRange = {min: p.y, max: p.y};
-    var entities = plot.entitiesIn(xRange, yRange);
+    var entities = plot.entitiesAt(p);
     if (entities.length > 0) {
       entities[0].selection.attr("opacity", 1);
     }
