@@ -149,7 +149,13 @@ export module Plots {
 
     protected _getDataToDraw() {
       let dataToDraw = new Utils.Map<Dataset, any[]> ();
-      this.datasets().forEach((dataset) => dataToDraw.set(dataset, [dataset.data()]));
+      var xScale: any = this.x().scale;
+      this.datasets().forEach((dataset) => dataToDraw.set(dataset, [dataset.data().filter((d, i, dataset) => {
+        var domain = xScale.domain();
+
+        return (domain[0] <= d.x && d.x <= domain[1]);
+      })]));
+
       return dataToDraw;
     }
   }

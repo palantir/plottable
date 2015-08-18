@@ -8468,7 +8468,11 @@ var Plottable;
             };
             Line.prototype._getDataToDraw = function () {
                 var dataToDraw = new Plottable.Utils.Map();
-                this.datasets().forEach(function (dataset) { return dataToDraw.set(dataset, [dataset.data()]); });
+                var xScale = this.x().scale;
+                this.datasets().forEach(function (dataset) { return dataToDraw.set(dataset, [dataset.data().filter(function (d, i, dataset) {
+                        var domain = xScale.domain();
+                        return (domain[0] <= d.x && d.x <= domain[1]);
+                    })]); });
                 return dataToDraw;
             };
             return Line;
