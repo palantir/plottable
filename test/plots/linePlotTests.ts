@@ -676,8 +676,21 @@ describe("Plots", () => {
         assert.deepEqual(xScale.domain(), [0, 1], "when there are no visible points in the view, the x-scale domain defaults to [0, 1]");
 
         line.autorangeSmooth(true);
-        assert.closeTo(xScale.domain()[0], -1.61111, 0.001, "smooth autoranging forces the domain to include the line (left)");
-        assert.closeTo(xScale.domain()[1], -1.05555, 0.001, "smooth autoranging forces the domain to include the line (right)");
+
+        let base = data[0].x;
+        let x1 = (yScale.domain()[1] - data[0].y);
+        let x2 = data[1].y - data[0].y;
+        let y2 = data[1].x - data[0].x;
+        let expectedTop = base + y2 * x1 / x2;
+
+        base = data[0].x;
+        x1 = (yScale.domain()[0] - data[0].y);
+        x2 = data[1].y - data[0].y;
+        y2 = data[1].x - data[0].x;
+        let expectedBottom = base + y2 * x1 / x2;
+
+        assert.closeTo(xScale.domain()[0], expectedTop, 0.001, "smooth autoranging forces the domain to include the line (left)");
+        assert.closeTo(xScale.domain()[1], expectedBottom, 0.001, "smooth autoranging forces the domain to include the line (right)");
 
         line.autorangeSmooth(false);
         assert.deepEqual(xScale.domain(), [0, 1], "resetting the smooth autorange works");
