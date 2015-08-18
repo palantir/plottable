@@ -177,7 +177,7 @@ export module Axes {
       this.addClass("time-axis");
       this.tickLabelPadding(5);
       this.axisConfigurations(Time._DEFAULT_TIME_AXIS_CONFIGURATIONS);
-      this.annotationFormatter(Plottable.Formatters.time("%b %e, %Y"));
+      this.annotationFormatter(Plottable.Formatters.time("%a %b %d, %Y"));
     }
 
     /**
