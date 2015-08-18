@@ -467,7 +467,7 @@ describe("Plots", () => {
         assert.closeTo(yScale.domain()[1], expectedTop, 0.001, "smooth autoranging forces the domain to include the line (right)");
       });
 
-      it("smooth autoranging works (called before before autorangeMode)", () => {
+      it("smooth autoranging works (called before autorangeMode)", () => {
         xScale.domain([0.1, 1.1]);
 
         let data = [
@@ -497,7 +497,7 @@ describe("Plots", () => {
         assert.closeTo(yScale.domain()[1], expectedTop, 0.001, "smooth autoranging forces the domain to include the line (right)");
       });
 
-      it("smooth autoranging works (called before before rendering)", () => {
+      it("smooth autoranging works (called before rendering)", () => {
         xScale.domain([0.1, 1.1]);
 
         let data = [
@@ -527,7 +527,7 @@ describe("Plots", () => {
         assert.closeTo(yScale.domain()[1], expectedTop, 0.001, "smooth autoranging forces the domain to include the line (right)");
       });
 
-      it("smooth autoranging works (called before after rendering)", () => {
+      it("smooth autoranging works (called after rendering)", () => {
         xScale.domain([0.1, 1.1]);
 
         let data = [
@@ -557,7 +557,7 @@ describe("Plots", () => {
         assert.closeTo(yScale.domain()[1], expectedTop, 0.001, "smooth autoranging forces the domain to include the line (right)");
       });
 
-      it("smooth autoranging works (called before after rendering, before autorangeMode)", () => {
+      it("smooth autoranging works (called after rendering, before autorangeMode)", () => {
         xScale.domain([0.1, 1.1]);
 
         let data = [
