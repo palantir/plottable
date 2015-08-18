@@ -457,8 +457,20 @@ describe("Plots", () => {
 
         line.renderTo(svg);
 
-        assert.closeTo(yScale.domain()[0], -1.625, 0.001, "smooth autoranging forces the domain to include the line (left)");
-        assert.closeTo(yScale.domain()[1], -1.041, 0.001, "smooth autoranging forces the domain to include the line (right)");
+        let base = data[0].y;
+        let x1 = (xScale.domain()[1] - data[0].x) - (xScale.domain()[1] - xScale.domain()[0]) * (1 + yScale.padProportion() / 2);
+        let x2 = data[1].x - data[0].x;
+        let y2 = data[1].y - data[0].y;
+        let expectedTop = base + y2 * x1 / x2;
+
+        base = data[0].y;
+        x1 = (xScale.domain()[0] - data[0].x) + (xScale.domain()[1] - xScale.domain()[0]) * (1 + yScale.padProportion() / 2);
+        x2 = data[1].x - data[0].x;
+        y2 = data[1].y - data[0].y;
+        let expectedBottom = base + y2 * x1 / x2;
+
+        assert.closeTo(yScale.domain()[0], expectedBottom, 0.001, "smooth autoranging forces the domain to include the line (left)");
+        assert.closeTo(yScale.domain()[1], expectedTop, 0.001, "smooth autoranging forces the domain to include the line (right)");
       });
 
       it("smooth autoranging works (called before before autorangeMode)", () => {
@@ -478,8 +490,20 @@ describe("Plots", () => {
 
         line.renderTo(svg);
 
-        assert.closeTo(yScale.domain()[0], -1.625, 0.001, "smooth autoranging forces the domain to include the line (left)");
-        assert.closeTo(yScale.domain()[1], -1.041, 0.001, "smooth autoranging forces the domain to include the line (right)");
+        let base = data[0].y;
+        let x1 = (xScale.domain()[1] - data[0].x) - (xScale.domain()[1] - xScale.domain()[0]) * (1 + yScale.padProportion() / 2);
+        let x2 = data[1].x - data[0].x;
+        let y2 = data[1].y - data[0].y;
+        let expectedTop = base + y2 * x1 / x2;
+
+        base = data[0].y;
+        x1 = (xScale.domain()[0] - data[0].x) + (xScale.domain()[1] - xScale.domain()[0]) * (1 + yScale.padProportion() / 2);
+        x2 = data[1].x - data[0].x;
+        y2 = data[1].y - data[0].y;
+        let expectedBottom = base + y2 * x1 / x2;
+
+        assert.closeTo(yScale.domain()[0], expectedBottom, 0.001, "smooth autoranging forces the domain to include the line (left)");
+        assert.closeTo(yScale.domain()[1], expectedTop, 0.001, "smooth autoranging forces the domain to include the line (right)");
       });
 
       it("smooth autoranging works (called before before rendering)", () => {
@@ -499,8 +523,20 @@ describe("Plots", () => {
         line.autorangeSmooth(true);
         line.renderTo(svg);
 
-        assert.closeTo(yScale.domain()[0], -1.625, 0.001, "smooth autoranging forces the domain to include the line (left)");
-        assert.closeTo(yScale.domain()[1], -1.041, 0.001, "smooth autoranging forces the domain to include the line (right)");
+        let base = data[0].y;
+        let x1 = (xScale.domain()[1] - data[0].x) - (xScale.domain()[1] - xScale.domain()[0]) * (1 + yScale.padProportion() / 2);
+        let x2 = data[1].x - data[0].x;
+        let y2 = data[1].y - data[0].y;
+        let expectedTop = base + y2 * x1 / x2;
+
+        base = data[0].y;
+        x1 = (xScale.domain()[0] - data[0].x) + (xScale.domain()[1] - xScale.domain()[0]) * (1 + yScale.padProportion() / 2);
+        x2 = data[1].x - data[0].x;
+        y2 = data[1].y - data[0].y;
+        let expectedBottom = base + y2 * x1 / x2;
+
+        assert.closeTo(yScale.domain()[0], expectedBottom, 0.001, "smooth autoranging forces the domain to include the line (left)");
+        assert.closeTo(yScale.domain()[1], expectedTop, 0.001, "smooth autoranging forces the domain to include the line (right)");
       });
 
       it("smooth autoranging works (called before after rendering)", () => {
@@ -518,10 +554,22 @@ describe("Plots", () => {
         line.autorangeMode("y");
 
         line.renderTo(svg);
-
         line.autorangeSmooth(true);
-        assert.closeTo(yScale.domain()[0], -1.625, 0.001, "smooth autoranging forces the domain to include the line (left)");
-        assert.closeTo(yScale.domain()[1], -1.041, 0.001, "smooth autoranging forces the domain to include the line (right)");
+
+        let base = data[0].y;
+        let x1 = (xScale.domain()[1] - data[0].x) - (xScale.domain()[1] - xScale.domain()[0]) * (1 + yScale.padProportion() / 2);
+        let x2 = data[1].x - data[0].x;
+        let y2 = data[1].y - data[0].y;
+        let expectedTop = base + y2 * x1 / x2;
+
+        base = data[0].y;
+        x1 = (xScale.domain()[0] - data[0].x) + (xScale.domain()[1] - xScale.domain()[0]) * (1 + yScale.padProportion() / 2);
+        x2 = data[1].x - data[0].x;
+        y2 = data[1].y - data[0].y;
+        let expectedBottom = base + y2 * x1 / x2;
+
+        assert.closeTo(yScale.domain()[0], expectedBottom, 0.001, "smooth autoranging forces the domain to include the line (left)");
+        assert.closeTo(yScale.domain()[1], expectedTop, 0.001, "smooth autoranging forces the domain to include the line (right)");
       });
 
       it("smooth autoranging works (called before after rendering, before autorangeMode)", () => {
@@ -541,8 +589,21 @@ describe("Plots", () => {
 
         line.autorangeSmooth(true);
         line.autorangeMode("y");
-        assert.closeTo(yScale.domain()[0], -1.625, 0.001, "smooth autoranging forces the domain to include the line (left)");
-        assert.closeTo(yScale.domain()[1], -1.041, 0.001, "smooth autoranging forces the domain to include the line (right)");
+
+        let base = data[0].y;
+        let x1 = (xScale.domain()[1] - data[0].x) - (xScale.domain()[1] - xScale.domain()[0]) * (1 + yScale.padProportion() / 2);
+        let x2 = data[1].x - data[0].x;
+        let y2 = data[1].y - data[0].y;
+        let expectedTop = base + y2 * x1 / x2;
+
+        base = data[0].y;
+        x1 = (xScale.domain()[0] - data[0].x) + (xScale.domain()[1] - xScale.domain()[0]) * (1 + yScale.padProportion() / 2);
+        x2 = data[1].x - data[0].x;
+        y2 = data[1].y - data[0].y;
+        let expectedBottom = base + y2 * x1 / x2;
+
+        assert.closeTo(yScale.domain()[0], expectedBottom, 0.001, "smooth autoranging forces the domain to include the line (left)");
+        assert.closeTo(yScale.domain()[1], expectedTop, 0.001, "smooth autoranging forces the domain to include the line (right)");
       });
 
       it("autoDomaining works with smooth autoranging (before rendering)", () => {

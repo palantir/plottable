@@ -153,6 +153,7 @@ export class QuantitativeScale<D> extends Scale<D, number> {
     });
     let newMin = minExistsInExceptions ? min : this.invert(this.scale(min) - (this.scale(max) - this.scale(min)) * p);
     let newMax = maxExistsInExceptions ? max : this.invert(this.scale(max) + (this.scale(max) - this.scale(min)) * p);
+
     if (this._snapsDomain) {
       return this._niceDomain([newMin, newMax]);
     }
