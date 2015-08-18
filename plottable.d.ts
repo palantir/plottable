@@ -889,11 +889,11 @@ declare module Plottable {
         /**
          * Gets whether or not the scale snaps its domain to nice values.
          */
-        snapsDomain(): boolean;
+        snappingDomainEnabled(): boolean;
         /**
          * Sets whether or not the scale snaps its domain to nice values.
          */
-        snapsDomain(snapsDomain: boolean): QuantitativeScale<D>;
+        snappingDomainEnabled(snappingDomainEnabled: boolean): QuantitativeScale<D>;
         protected _expandSingleValueDomain(singleValueDomain: D[]): D[];
         /**
          * Computes the domain value corresponding to a supplied range value.

@@ -122,9 +122,9 @@ describe("Scales", () => {
       it("domain snapping setter and getter", () => {
         let scale = new Plottable.Scales.Linear();
 
-        assert.strictEqual(scale.snapsDomain(), true, "scales make their domain snap by default");
-        assert.strictEqual(scale.snapsDomain(false), scale, "setting disabling domain snapping returns the scale");
-        assert.strictEqual(scale.snapsDomain(), false, "the domain is no longer snaps");
+        assert.strictEqual(scale.snappingDomainEnabled(), true, "scales make their domain snap by default");
+        assert.strictEqual(scale.snappingDomainEnabled(false), scale, "setting disabling domain snapping returns the scale");
+        assert.strictEqual(scale.snappingDomainEnabled(), false, "the domain is no longer snaps");
       });
 
       it("domain snapping works", () => {
@@ -134,9 +134,9 @@ describe("Scales", () => {
         });
 
         assert.deepEqual(scale.domain(), [1, 3.2], "domain snapping works");
-        scale.snapsDomain(false);
+        scale.snappingDomainEnabled(false);
         assert.deepEqual(scale.domain(), [1.073123123, 3.173123123], "domain snapping can be deactivated");
-        scale.snapsDomain(true);
+        scale.snappingDomainEnabled(true);
         assert.deepEqual(scale.domain(), [1, 3.2], "domain snapping can be activated back");
       });
     });

@@ -1613,7 +1613,7 @@ var Plottable;
             _super.call(this);
             this._tickGenerator = function (scale) { return scale.defaultTicks(); };
             this._padProportion = 0.05;
-            this._snapsDomain = true;
+            this._snappingDomainEnabled = true;
             this._paddingExceptionsProviders = new Plottable.Utils.Set();
         }
         QuantitativeScale.prototype.autoDomain = function () {
@@ -1725,16 +1725,16 @@ var Plottable;
             });
             var newMin = minExistsInExceptions ? min : this.invert(this.scale(min) - (this.scale(max) - this.scale(min)) * p);
             var newMax = maxExistsInExceptions ? max : this.invert(this.scale(max) + (this.scale(max) - this.scale(min)) * p);
-            if (this._snapsDomain) {
+            if (this._snappingDomainEnabled) {
                 return this._niceDomain([newMin, newMax]);
             }
             return ([newMin, newMax]);
         };
-        QuantitativeScale.prototype.snapsDomain = function (snapsDomain) {
-            if (snapsDomain == null) {
-                return this._snapsDomain;
+        QuantitativeScale.prototype.snappingDomainEnabled = function (snappingDomainEnabled) {
+            if (snappingDomainEnabled == null) {
+                return this._snappingDomainEnabled;
             }
-            this._snapsDomain = snapsDomain;
+            this._snappingDomainEnabled = snappingDomainEnabled;
             this._autoDomainIfAutomaticMode();
             return this;
         };
@@ -8271,10 +8271,10 @@ var Plottable;
             };
             Line.prototype._setScaleSnapping = function () {
                 if (this.autorangeMode() === "x" && this.x() && this.x().scale && this.x().scale instanceof Plottable.QuantitativeScale) {
-                    this.x().scale.snapsDomain(!this.autorangeSmooth());
+                    this.x().scale.snappingDomainEnabled(!this.autorangeSmooth());
                 }
                 if (this.autorangeMode() === "y" && this.y() && this.y().scale && this.y().scale instanceof Plottable.QuantitativeScale) {
-                    this.y().scale.snapsDomain(!this.autorangeSmooth());
+                    this.y().scale.snappingDomainEnabled(!this.autorangeSmooth());
                 }
             };
             Line.prototype.interpolator = function (interpolator) {

@@ -95,11 +95,11 @@ export module Plots {
 
     private _setScaleSnapping() {
       if (this.autorangeMode() === "x" && this.x() && this.x().scale && this.x().scale instanceof QuantitativeScale) {
-        (<QuantitativeScale<X>>this.x().scale).snapsDomain(!this.autorangeSmooth());
+        (<QuantitativeScale<X>>this.x().scale).snappingDomainEnabled(!this.autorangeSmooth());
       }
 
       if (this.autorangeMode() === "y" && this.y() && this.y().scale && this.y().scale instanceof QuantitativeScale) {
-        (<QuantitativeScale<number>>this.y().scale).snapsDomain(!this.autorangeSmooth());
+        (<QuantitativeScale<number>>this.y().scale).snappingDomainEnabled(!this.autorangeSmooth());
       }
     }
 
