@@ -259,7 +259,7 @@ export class Axis<D> extends Component {
       return elements;
     };
     let axisHeight = this._isHorizontal() ? this.height() : this.width();
-    let axisHeightWithoutMargin = this._isHorizontal() ? this._computedHeight : this._computedWidth;
+    let axisHeightWithoutMargin = this._axisHeightWithoutMargin();
     let offsetF = (d: D) => {
       switch (this.orientation()) {
         case "bottom":
@@ -341,6 +341,12 @@ export class Axis<D> extends Component {
                                  isHorizontal ? measurements.get(annotationLabel).height : measurements.get(annotationLabel).width,
                                  writeOptions);
       });
+  }
+
+  protected _axisHeightWithoutMargin() {
+    let relevantDimension = this._isHorizontal() ? this.height() : this.width();
+    let axisHeightWithoutMargin = this._isHorizontal() ? this._computedHeight : this._computedWidth;
+    return Math.min(axisHeightWithoutMargin, relevantDimension);
   }
 
   private _annotationToTier(measurements: Utils.Map<D, SVGTypewriter.Measurers.Dimensions>) {
