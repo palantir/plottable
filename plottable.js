@@ -6413,7 +6413,8 @@ var Plottable;
             var _this = this;
             _super.prototype.destroy.call(this);
             this._scales().forEach(function (scale) { return scale.offUpdate(_this._renderCallback); });
-            this.datasets().forEach(function (dataset) { return _this.removeDataset(dataset); });
+            this.datasets().forEach(function (dataset) { return _this._removeDataset(dataset, false); });
+            this._onDatasetUpdate();
         };
         Plot.prototype._createNodesForDataset = function (dataset) {
             var drawer = this._datasetToDrawer.get(dataset);
