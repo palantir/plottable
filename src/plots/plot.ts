@@ -93,8 +93,7 @@ export class Plot extends Component {
   public destroy() {
     super.destroy();
     this._scales().forEach((scale) => scale.offUpdate(this._renderCallback));
-    this.datasets().forEach((dataset) => this._removeDataset(dataset));
-    this._onDatasetUpdate();
+    this.datasets([]);
   }
 
   protected _createNodesForDataset(dataset: Dataset) {
