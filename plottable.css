@@ -112,16 +112,16 @@ svg.plottable {
 .plottable .axis .annotation-circle {
   fill: white;
   stroke-width: 1px;
-  stroke: gray;
+  stroke: #CCC;
 }
 
 .plottable .axis .annotation-line {
-  stroke: gray;
+  stroke: #CCC;
   stroke-width: 1px;
 }
 
 .plottable .axis .annotation-rect {
-  stroke: gray;
+  stroke: #CCC;
   stroke-width: 1px;
   fill: white;
 }

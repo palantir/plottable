@@ -232,7 +232,7 @@ export class Axis<D> extends Component {
   }
 
   protected _drawAnnotations() {
-    let labelPadding = 2;
+    let labelPadding = 4;
     let measurements = new Utils.Map<D, SVGTypewriter.Measurers.Dimensions> ();
     this.annotatedTicks().forEach((annotatedTick) => {
       let measurement = this._annotationMeasurer.measure(this.annotationFormatter()(annotatedTick));
@@ -289,11 +289,23 @@ export class Axis<D> extends Component {
         break;
     }
 
+    let lineOffsetF = (d: D) => {
+      let offset = offsetF(d);
+      switch (this.orientation()) {
+        case "bottom":
+        case "right":
+          return offset + measurements.get(d).height / 2;
+        case "top":
+        case "left":
+          return offset - measurements.get(d).height / 2;
+      }
+    };
+
     bindElements(this._annotationContainer.select(".annotation-line-container"), "line", "annotation-line")
       .attr(this._isHorizontal() ? "x1" : "y1", positionF)
       .attr(this._isHorizontal() ? "x2" : "y2", positionF)
       .attr(this._isHorizontal() ? "y1" : "x1", secondaryPosition)
-      .attr(this._isHorizontal() ? "y2" : "x2", offsetF)
+      .attr(this._isHorizontal() ? "y2" : "x2", lineOffsetF)
       .attr("visibility", visibilityF);
 
     bindElements(this._annotationContainer.select(".annotation-circle-container"), "circle", "annotation-circle")
@@ -317,6 +329,8 @@ export class Axis<D> extends Component {
       .attr(this._isHorizontal() ? "y" : "x", rectangleOffsetF)
       .attr(this._isHorizontal() ? "width" : "height", (d) => measurements.get(d).width)
       .attr(this._isHorizontal() ? "height" : "width", (d) => measurements.get(d).height)
+      .attr("rx", 3)
+      .attr("ry", 3)
       .attr("visibility", visibilityF);
 
     let annotationWriter = this._annotationWriter;

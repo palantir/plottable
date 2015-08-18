@@ -3772,7 +3772,7 @@ var Plottable;
         };
         Axis.prototype._drawAnnotations = function () {
             var _this = this;
-            var labelPadding = 2;
+            var labelPadding = 4;
             var measurements = new Plottable.Utils.Map();
             this.annotatedTicks().forEach(function (annotatedTick) {
                 var measurement = _this._annotationMeasurer.measure(_this.annotationFormatter()(annotatedTick));
@@ -3823,11 +3823,22 @@ var Plottable;
                     secondaryPosition = 0;
                     break;
             }
+            var lineOffsetF = function (d) {
+                var offset = offsetF(d);
+                switch (_this.orientation()) {
+                    case "bottom":
+                    case "right":
+                        return offset + measurements.get(d).height / 2;
+                    case "top":
+                    case "left":
+                        return offset - measurements.get(d).height / 2;
+                }
+            };
             bindElements(this._annotationContainer.select(".annotation-line-container"), "line", "annotation-line")
                 .attr(this._isHorizontal() ? "x1" : "y1", positionF)
                 .attr(this._isHorizontal() ? "x2" : "y2", positionF)
                 .attr(this._isHorizontal() ? "y1" : "x1", secondaryPosition)
-                .attr(this._isHorizontal() ? "y2" : "x2", offsetF)
+                .attr(this._isHorizontal() ? "y2" : "x2", lineOffsetF)
                 .attr("visibility", visibilityF);
             bindElements(this._annotationContainer.select(".annotation-circle-container"), "circle", "annotation-circle")
                 .attr(this._isHorizontal() ? "cx" : "cy", positionF)
@@ -3849,6 +3860,8 @@ var Plottable;
                 .attr(this._isHorizontal() ? "y" : "x", rectangleOffsetF)
                 .attr(this._isHorizontal() ? "width" : "height", function (d) { return measurements.get(d).width; })
                 .attr(this._isHorizontal() ? "height" : "width", function (d) { return measurements.get(d).height; })
+                .attr("rx", 3)
+                .attr("ry", 3)
                 .attr("visibility", visibilityF);
             var annotationWriter = this._annotationWriter;
             var annotationFormatter = this.annotationFormatter();
