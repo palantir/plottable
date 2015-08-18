@@ -6801,7 +6801,7 @@ var Plottable;
                 var validDatumIndex = 0;
                 dataset.data().forEach(function (datum, datasetIndex) {
                     var position = _this._pixelPoint(datum, datasetIndex, dataset);
-                    if (Plottable.Utils.Math.isNaN(position.x) || Plottable.Utils.Math.isNaN(position.y)) {
+                    if (!Plottable.Utils.Math.isValidNumber(position.x) || !Plottable.Utils.Math.isValidNumber(position.y)) {
                         return;
                     }
                     lightweightEntities.push({
