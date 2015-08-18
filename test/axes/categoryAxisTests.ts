@@ -178,7 +178,7 @@ describe("Category Axes", () => {
     svg.remove();
   });
 
-  it("_computed space variables should be set on requestedSpace", () => {
+  it("_computedHeight should be set to height without margin", () => {
     let svgWidth = 300;
     let svgHeight = 300;
     let svg = TestMethods.generateSVG(svgWidth, svgHeight);
