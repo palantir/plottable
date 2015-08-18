@@ -358,7 +358,7 @@ export class Plot extends Component {
    * @returns {Plot} The calling Plot.
    */
   public addDataset(dataset: Dataset) {
-    this._addDataset(dataset, true);
+    return this._addDataset(dataset, true);
   }
 
   public _addDataset(dataset: Dataset, withUpdate: boolean) {

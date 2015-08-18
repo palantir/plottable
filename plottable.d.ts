@@ -2591,7 +2591,7 @@ declare module Plottable {
          * @param {Dataset} dataset
          * @returns {Plot} The calling Plot.
          */
-        addDataset(dataset: Dataset): void;
+        addDataset(dataset: Dataset): Plot;
         _addDataset(dataset: Dataset, withUpdate: boolean): Plot;
         /**
          * Removes a Dataset from the Plot.

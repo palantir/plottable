@@ -6605,7 +6605,7 @@ var Plottable;
          * @returns {Plot} The calling Plot.
          */
         Plot.prototype.addDataset = function (dataset) {
-            this._addDataset(dataset, true);
+            return this._addDataset(dataset, true);
         };
         Plot.prototype._addDataset = function (dataset, withUpdate) {
             // if (this.datasets().indexOf(dataset) > -1) {
