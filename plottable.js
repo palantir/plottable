@@ -6415,26 +6415,6 @@ var Plottable;
             this._scales().forEach(function (scale) { return scale.offUpdate(_this._renderCallback); });
             this.datasets().forEach(function (dataset) { return _this.removeDataset(dataset); });
         };
-        /**
-         * Adds a Dataset to the Plot.
-         *
-         * @param {Dataset} dataset
-         * @returns {Plot} The calling Plot.
-         */
-        Plot.prototype.addDataset = function (dataset) {
-            if (this.datasets().indexOf(dataset) > -1) {
-                this.removeDataset(dataset);
-            }
-            ;
-            var drawer = this._createDrawer(dataset);
-            this._datasetToDrawer.set(dataset, drawer);
-            if (this._isSetup) {
-                this._createNodesForDataset(dataset);
-            }
-            dataset.onUpdate(this._onDatasetUpdateCallback);
-            this._onDatasetUpdate();
-            return this;
-        };
         Plot.prototype._createNodesForDataset = function (dataset) {
             var drawer = this._datasetToDrawer.get(dataset);
             drawer.renderArea(this._renderArea.append("g"));
@@ -6619,16 +6599,46 @@ var Plottable;
             }
         };
         /**
+         * Adds a Dataset to the Plot.
+         *
+         * @param {Dataset} dataset
+         * @returns {Plot} The calling Plot.
+         */
+        Plot.prototype.addDataset = function (dataset) {
+            this._addDataset(dataset, true);
+        };
+        Plot.prototype._addDataset = function (dataset, withUpdate) {
+            // if (this.datasets().indexOf(dataset) > -1) {
+            this._removeDataset(dataset, false);
+            // };
+            var drawer = this._createDrawer(dataset);
+            this._datasetToDrawer.set(dataset, drawer);
+            if (this._isSetup) {
+                this._createNodesForDataset(dataset);
+            }
+            dataset.onUpdate(this._onDatasetUpdateCallback);
+            if (withUpdate) {
+                this._onDatasetUpdate();
+            }
+            return this;
+        };
+        /**
          * Removes a Dataset from the Plot.
          *
          * @param {Dataset} dataset
          * @returns {Plot} The calling Plot.
          */
         Plot.prototype.removeDataset = function (dataset) {
-            if (this.datasets().indexOf(dataset) > -1) {
-                this._removeDatasetNodes(dataset);
-                dataset.offUpdate(this._onDatasetUpdateCallback);
-                this._datasetToDrawer.delete(dataset);
+            return this._removeDataset(dataset, true);
+        };
+        Plot.prototype._removeDataset = function (dataset, withUpdate) {
+            if (this.datasets().indexOf(dataset) === -1) {
+                return this;
+            }
+            this._removeDatasetNodes(dataset);
+            dataset.offUpdate(this._onDatasetUpdateCallback);
+            this._datasetToDrawer.delete(dataset);
+            if (withUpdate) {
                 this._onDatasetUpdate();
             }
             return this;
@@ -6644,8 +6654,9 @@ var Plottable;
             if (datasets == null) {
                 return currentDatasets;
             }
-            currentDatasets.forEach(function (dataset) { return _this.removeDataset(dataset); });
-            datasets.forEach(function (dataset) { return _this.addDataset(dataset); });
+            currentDatasets.forEach(function (dataset) { return _this._removeDataset(dataset, false); });
+            datasets.forEach(function (dataset) { return _this._addDataset(dataset, false); });
+            this._onDatasetUpdate();
             return this;
         };
         Plot.prototype._getDrawersInOrder = function () {

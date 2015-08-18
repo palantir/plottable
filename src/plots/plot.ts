@@ -96,28 +96,6 @@ export class Plot extends Component {
     this.datasets().forEach((dataset) => this.removeDataset(dataset));
   }
 
-  /**
-   * Adds a Dataset to the Plot.
-   *
-   * @param {Dataset} dataset
-   * @returns {Plot} The calling Plot.
-   */
-  public addDataset(dataset: Dataset) {
-    if (this.datasets().indexOf(dataset) > -1) {
-      this.removeDataset(dataset);
-    };
-    let drawer = this._createDrawer(dataset);
-    this._datasetToDrawer.set(dataset, drawer);
-
-    if (this._isSetup) {
-      this._createNodesForDataset(dataset);
-    }
-
-    dataset.onUpdate(this._onDatasetUpdateCallback);
-    this._onDatasetUpdate();
-    return this;
-  }
-
   protected _createNodesForDataset(dataset: Dataset) {
     let drawer = this._datasetToDrawer.get(dataset);
     drawer.renderArea(this._renderArea.append("g"));
@@ -374,16 +352,52 @@ export class Plot extends Component {
   }
 
   /**
+   * Adds a Dataset to the Plot.
+   *
+   * @param {Dataset} dataset
+   * @returns {Plot} The calling Plot.
+   */
+  public addDataset(dataset: Dataset) {
+    this._addDataset(dataset, true);
+  }
+
+  public _addDataset(dataset: Dataset, withUpdate: boolean) {
+    // if (this.datasets().indexOf(dataset) > -1) {
+      this._removeDataset(dataset, false);
+    // };
+    let drawer = this._createDrawer(dataset);
+    this._datasetToDrawer.set(dataset, drawer);
+
+    if (this._isSetup) {
+      this._createNodesForDataset(dataset);
+    }
+
+    dataset.onUpdate(this._onDatasetUpdateCallback);
+    if (withUpdate) {
+      this._onDatasetUpdate();
+    }
+    return this;
+  }
+
+  /**
    * Removes a Dataset from the Plot.
    *
    * @param {Dataset} dataset
    * @returns {Plot} The calling Plot.
    */
   public removeDataset(dataset: Dataset): Plot {
-    if (this.datasets().indexOf(dataset) > -1) {
-      this._removeDatasetNodes(dataset);
-      dataset.offUpdate(this._onDatasetUpdateCallback);
-      this._datasetToDrawer.delete(dataset);
+    return this._removeDataset(dataset, true);
+  }
+
+  public _removeDataset(dataset: Dataset, withUpdate: boolean) {
+    if (this.datasets().indexOf(dataset) === -1) {
+      return this;
+    }
+
+    this._removeDatasetNodes(dataset);
+    dataset.offUpdate(this._onDatasetUpdateCallback);
+    this._datasetToDrawer.delete(dataset);
+    if (withUpdate) {
       this._onDatasetUpdate();
     }
     return this;
@@ -402,8 +416,10 @@ export class Plot extends Component {
     if (datasets == null) {
       return currentDatasets;
     }
-    currentDatasets.forEach((dataset) => this.removeDataset(dataset));
-    datasets.forEach((dataset) => this.addDataset(dataset));
+
+    currentDatasets.forEach((dataset) => this._removeDataset(dataset, false));
+    datasets.forEach((dataset) => this._addDataset(dataset, false));
+    this._onDatasetUpdate();
     return this;
   }
 

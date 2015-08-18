@@ -2521,13 +2521,6 @@ declare module Plottable {
         anchor(selection: d3.Selection<void>): Plot;
         protected _setup(): void;
         destroy(): void;
-        /**
-         * Adds a Dataset to the Plot.
-         *
-         * @param {Dataset} dataset
-         * @returns {Plot} The calling Plot.
-         */
-        addDataset(dataset: Dataset): Plot;
         protected _createNodesForDataset(dataset: Dataset): Drawer;
         protected _createDrawer(dataset: Dataset): Drawer;
         protected _getAnimator(key: string): Animator;
@@ -2593,12 +2586,21 @@ declare module Plottable {
          */
         animator(animatorKey: string, animator: Animator): Plot;
         /**
+         * Adds a Dataset to the Plot.
+         *
+         * @param {Dataset} dataset
+         * @returns {Plot} The calling Plot.
+         */
+        addDataset(dataset: Dataset): void;
+        _addDataset(dataset: Dataset, withUpdate: boolean): Plot;
+        /**
          * Removes a Dataset from the Plot.
          *
          * @param {Dataset} dataset
          * @returns {Plot} The calling Plot.
          */
         removeDataset(dataset: Dataset): Plot;
+        _removeDataset(dataset: Dataset, withUpdate: boolean): Plot;
         protected _removeDatasetNodes(dataset: Dataset): void;
         datasets(): Dataset[];
         datasets(datasets: Dataset[]): Plot;
