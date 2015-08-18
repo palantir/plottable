@@ -93,7 +93,7 @@ export class Plot extends Component {
   public destroy() {
     super.destroy();
     this._scales().forEach((scale) => scale.offUpdate(this._renderCallback));
-    this.datasets().forEach((dataset) => this._removeDataset(dataset, false));
+    this.datasets().forEach((dataset) => this._removeDataset(dataset));
     this._onDatasetUpdate();
   }
 
@@ -359,11 +359,13 @@ export class Plot extends Component {
    * @returns {Plot} The calling Plot.
    */
   public addDataset(dataset: Dataset) {
-    return this._addDataset(dataset, true);
+    this._addDataset(dataset);
+    this._onDatasetUpdate();
+    return this;
   }
 
-  private _addDataset(dataset: Dataset, dispatchUpdate: boolean) {
-    this._removeDataset(dataset, false);
+  private _addDataset(dataset: Dataset) {
+    this._removeDataset(dataset);
     let drawer = this._createDrawer(dataset);
     this._datasetToDrawer.set(dataset, drawer);
 
@@ -372,9 +374,6 @@ export class Plot extends Component {
     }
 
     dataset.onUpdate(this._onDatasetUpdateCallback);
-    if (dispatchUpdate) {
-      this._onDatasetUpdate();
-    }
     return this;
   }
 
@@ -385,10 +384,12 @@ export class Plot extends Component {
    * @returns {Plot} The calling Plot.
    */
   public removeDataset(dataset: Dataset): Plot {
-    return this._removeDataset(dataset, true);
+    this._removeDataset(dataset);
+    this._onDatasetUpdate()
+    return this;
   }
 
-  private _removeDataset(dataset: Dataset, dispatchUpdate: boolean) {
+  private _removeDataset(dataset: Dataset) {
     if (this.datasets().indexOf(dataset) === -1) {
       return this;
     }
@@ -396,9 +397,6 @@ export class Plot extends Component {
     this._removeDatasetNodes(dataset);
     dataset.offUpdate(this._onDatasetUpdateCallback);
     this._datasetToDrawer.delete(dataset);
-    if (dispatchUpdate) {
-      this._onDatasetUpdate();
-    }
     return this;
   }
 
@@ -416,8 +414,8 @@ export class Plot extends Component {
       return currentDatasets;
     }
 
-    currentDatasets.forEach((dataset) => this._removeDataset(dataset, false));
-    datasets.forEach((dataset) => this._addDataset(dataset, false));
+    currentDatasets.forEach((dataset) => this._removeDataset(dataset));
+    datasets.forEach((dataset) => this._addDataset(dataset));
     this._onDatasetUpdate();
     return this;
   }
