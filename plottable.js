@@ -2890,7 +2890,6 @@ var Plottable;
             ArcOutline.prototype._applyDefaultAttributes = function (selection) {
                 _super.prototype._applyDefaultAttributes.call(this, selection);
                 selection.style("fill", "none");
-                selection.style("stroke-linejoin", "round");
             };
             return ArcOutline;
         })(Plottable.Drawer);

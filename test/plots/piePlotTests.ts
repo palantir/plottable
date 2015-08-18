@@ -30,9 +30,31 @@ describe("Plots", () => {
       let arcOutlinePaths = renderArea.selectAll(".arc.outline");
       assert.strictEqual(arcPaths.size(), 4, "2 paths per datum");
       assert.strictEqual(arcFillPaths.size(), 2, "1 fill path per datum");
-      assert.strictEqual(arcOutlinePaths.size(), 2, "1 outline path1 per datum");
+      assert.strictEqual(arcOutlinePaths.size(), 2, "1 outline path per datum");
       assert.strictEqual(arcFillPaths.style("stroke"), "none", "fill paths have no stroke");
       assert.strictEqual(arcOutlinePaths.style("fill"), "none", "outline paths have no fill");
+      svg.remove();
+    });
+
+    it("each entity selection consists of a fill path and a stroke path", () => {
+      let svg = TestMethods.generateSVG(500, 500);
+      let piePlot = new Plottable.Plots.Pie();
+      piePlot.sectorValue((d) => d.value);
+      let data = [
+        { value: 1 },
+        { value: 1 }
+      ];
+      let dataset = new Plottable.Dataset(data);
+      piePlot.addDataset(dataset);
+      piePlot.renderTo(svg);
+
+      let entities = piePlot.entities();
+      entities.forEach((entity) => {
+        assert.strictEqual(entity.selection.size(), 2, "each entity selection has 2 paths");
+        assert.lengthOf(entity.selection.filter("fill"), 1, "each entity selection has 1 fill path");
+        assert.lengthOf(entity.selection.filter("outline"), 1, "each entity selection has 1 stroke path");
+      });
+
       svg.remove();
     });
 
@@ -375,13 +397,16 @@ describe("Plots", () => {
       it("retrieves all dataset selections with no args", () => {
         let allSectors = piePlot.selections();
         assert.strictEqual(allSectors.size(), 2 * 2, "all sectors retrieved");
-
+        assert.strictEqual(allSectors.filter(".fill").size(), 2, "each sector has a fill path");
+        assert.strictEqual(allSectors.filter(".outline").size(), 2, "each sector has an outline path");
         svg.remove();
       });
 
       it("retrieves correct selections", () => {
         let allSectors = piePlot.selections([simpleDataset]);
         assert.strictEqual(allSectors.size(), 2 * 2, "all sectors retrieved");
+        assert.strictEqual(allSectors.filter(".fill").size(), 2, "each sector has a fill path");
+        assert.strictEqual(allSectors.filter(".outline").size(), 2, "each sector has an outline path");
         assert.includeMembers(allSectors.data(), simpleData, "dataset data in selection data");
 
         svg.remove();
