@@ -7,7 +7,7 @@ function makeData() {
         "x": i,
         "y": Math.random(),
         "symbol": Math.floor(6 * Math.random()),
-        "size": Math.floor(4 * Math.random()) + 4
+        "size": Math.floor(10 * Math.random()) + 10
     }); }
     return data;
 
@@ -31,18 +31,51 @@ function run(svg, data, Plottable) {
       .x(function(d) { return d.x; }, xScale)
       .y(function(d) { return d.y; }, yScale)
       .symbol(function(d) { return symbols[d.symbol];})
+      .attr("fill", "#dddddd")
       .size(function(d) { return d.size;})
       .addDataset(new Plottable.Dataset(data));
 
-    var interaction = new Plottable.Interactions.Pointer();
-    interaction.onPointerMove(function(p) {
-      plot.selections().attr("fill", "#5279C7");
-      var entities = plot.entitiesAt(p);
-      if (entities.length > 0) {
-          entities.map(function(e){e.selection.attr("fill", "red")});
-      }
-    });
+    var dragLabel = new Plottable.Components.Label("EntitiesIn", 0);
+    var clickLabel = new Plottable.Components.Label("EntitiesAt", 0);
 
-    interaction.attachTo(plot);
-    plot.renderTo(svg);
+    var dblX = new Plottable.Components.XDragBoxLayer()
+    .onDrag(function(bounds){
+      plot.entities().forEach(function(e){
+        e.selection.attr("fill", "#dddddd");
+      });
+      plot.entitiesIn(bounds).forEach(function(e){
+        e.selection.attr("fill", "#34be6c");
+      });
+    })
+    .movable(true);
+
+    var hover = new Plottable.Interactions.Pointer()
+    .onPointerMove(function(p){
+      plot.entities().forEach(function(e){
+        e.selection.attr("fill", "#dddddd");
+      });
+      plot.entitiesAt(p).forEach(function(e){
+        e.selection.attr("fill", "#be346c");
+      });
+    })
+    .attachTo(plot)
+    .enabled(false);
+
+    var enableDrag = new Plottable.Interactions.Click()
+    .onClick(function(p){
+      hover.enabled(false);
+      dblX.enabled(true);
+     })
+    .attachTo(dragLabel);
+
+    var enableClick = new Plottable.Interactions.Click()
+    .onClick(function(p){
+      hover.enabled(true);
+      dblX.enabled(false);
+     })
+    .attachTo(clickLabel);
+
+    var labels = new Plottable.Components.Table([[dragLabel], [clickLabel]]);
+    var group = new Plottable.Components.Group([plot, dblX]);
+    new Plottable.Components.Table([[group], [labels]]).renderTo(svg)
 }
