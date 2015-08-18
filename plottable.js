@@ -6607,17 +6607,15 @@ var Plottable;
         Plot.prototype.addDataset = function (dataset) {
             return this._addDataset(dataset, true);
         };
-        Plot.prototype._addDataset = function (dataset, withUpdate) {
-            // if (this.datasets().indexOf(dataset) > -1) {
+        Plot.prototype._addDataset = function (dataset, dispatchUpdate) {
             this._removeDataset(dataset, false);
-            // };
             var drawer = this._createDrawer(dataset);
             this._datasetToDrawer.set(dataset, drawer);
             if (this._isSetup) {
                 this._createNodesForDataset(dataset);
             }
             dataset.onUpdate(this._onDatasetUpdateCallback);
-            if (withUpdate) {
+            if (dispatchUpdate) {
                 this._onDatasetUpdate();
             }
             return this;
@@ -6631,14 +6629,14 @@ var Plottable;
         Plot.prototype.removeDataset = function (dataset) {
             return this._removeDataset(dataset, true);
         };
-        Plot.prototype._removeDataset = function (dataset, withUpdate) {
+        Plot.prototype._removeDataset = function (dataset, dispatchUpdate) {
             if (this.datasets().indexOf(dataset) === -1) {
                 return this;
             }
             this._removeDatasetNodes(dataset);
             dataset.offUpdate(this._onDatasetUpdateCallback);
             this._datasetToDrawer.delete(dataset);
-            if (withUpdate) {
+            if (dispatchUpdate) {
                 this._onDatasetUpdate();
             }
             return this;

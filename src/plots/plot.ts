@@ -361,10 +361,8 @@ export class Plot extends Component {
     return this._addDataset(dataset, true);
   }
 
-  public _addDataset(dataset: Dataset, withUpdate: boolean) {
-    // if (this.datasets().indexOf(dataset) > -1) {
-      this._removeDataset(dataset, false);
-    // };
+  private _addDataset(dataset: Dataset, dispatchUpdate: boolean) {
+    this._removeDataset(dataset, false);
     let drawer = this._createDrawer(dataset);
     this._datasetToDrawer.set(dataset, drawer);
 
@@ -373,7 +371,7 @@ export class Plot extends Component {
     }
 
     dataset.onUpdate(this._onDatasetUpdateCallback);
-    if (withUpdate) {
+    if (dispatchUpdate) {
       this._onDatasetUpdate();
     }
     return this;
@@ -389,7 +387,7 @@ export class Plot extends Component {
     return this._removeDataset(dataset, true);
   }
 
-  public _removeDataset(dataset: Dataset, withUpdate: boolean) {
+  private _removeDataset(dataset: Dataset, dispatchUpdate: boolean) {
     if (this.datasets().indexOf(dataset) === -1) {
       return this;
     }
@@ -397,7 +395,7 @@ export class Plot extends Component {
     this._removeDatasetNodes(dataset);
     dataset.offUpdate(this._onDatasetUpdateCallback);
     this._datasetToDrawer.delete(dataset);
-    if (withUpdate) {
+    if (dispatchUpdate) {
       this._onDatasetUpdate();
     }
     return this;

@@ -2592,7 +2592,6 @@ declare module Plottable {
          * @returns {Plot} The calling Plot.
          */
         addDataset(dataset: Dataset): Plot;
-        _addDataset(dataset: Dataset, withUpdate: boolean): Plot;
         /**
          * Removes a Dataset from the Plot.
          *
@@ -2600,7 +2599,6 @@ declare module Plottable {
          * @returns {Plot} The calling Plot.
          */
         removeDataset(dataset: Dataset): Plot;
-        _removeDataset(dataset: Dataset, withUpdate: boolean): Plot;
         protected _removeDatasetNodes(dataset: Dataset): void;
         datasets(): Dataset[];
         datasets(datasets: Dataset[]): Plot;
