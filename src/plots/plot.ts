@@ -385,7 +385,7 @@ export class Plot extends Component {
    */
   public removeDataset(dataset: Dataset): Plot {
     this._removeDataset(dataset);
-    this._onDatasetUpdate()
+    this._onDatasetUpdate();
     return this;
   }
 
