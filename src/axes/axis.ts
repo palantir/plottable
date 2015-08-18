@@ -276,6 +276,7 @@ export class Axis<D> extends Component {
     let secondaryPosition: number;
     switch (this.orientation()) {
       case "bottom":
+      case "right":
         secondaryPosition = 0;
         break;
       case "top":
@@ -283,9 +284,6 @@ export class Axis<D> extends Component {
         break;
       case "left":
         secondaryPosition = this.width();
-        break;
-      case "right":
-        secondaryPosition = 0;
         break;
     }
 

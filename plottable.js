@@ -3811,6 +3811,7 @@ var Plottable;
             var secondaryPosition;
             switch (this.orientation()) {
                 case "bottom":
+                case "right":
                     secondaryPosition = 0;
                     break;
                 case "top":
@@ -3818,9 +3819,6 @@ var Plottable;
                     break;
                 case "left":
                     secondaryPosition = this.width();
-                    break;
-                case "right":
-                    secondaryPosition = 0;
                     break;
             }
             bindElements(this._annotationContainer.select(".annotation-line-container"), "line", "annotation-line")
