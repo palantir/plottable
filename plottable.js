@@ -8469,10 +8469,14 @@ var Plottable;
             Line.prototype._getDataToDraw = function () {
                 var dataToDraw = new Plottable.Utils.Map();
                 var xScale = this.x().scale;
+                var domain = xScale.domain();
                 this.datasets().forEach(function (dataset) { return dataToDraw.set(dataset, [dataset.data().filter(function (d, i, dataset) {
-                        var domain = xScale.domain();
-                        return (domain[0] <= d.x && d.x <= domain[1]);
+                        var shouldShow = domain[0] <= dataset[i].x && dataset[i].x <= domain[1];
+                        shouldShow = shouldShow || dataset[i - 1] && domain[0] <= dataset[i - 1].x && dataset[i - 1].x <= domain[1];
+                        shouldShow = shouldShow || dataset[i + 1] && domain[0] <= dataset[i + 1].x && dataset[i + 1].x <= domain[1];
+                        return shouldShow;
                     })]); });
+                // this.datasets().forEach((dataset) => dataToDraw.set(dataset, [dataset.data()]));
                 return dataToDraw;
             };
             return Line;
