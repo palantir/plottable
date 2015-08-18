@@ -34,8 +34,8 @@ export module Axes {
     }
 
     public requestedSpace(offeredWidth: number, offeredHeight: number): SpaceRequest {
-      let widthRequiredByTicks = this._isHorizontal() ? 0 : this._maxLabelTickLength() + this.tickLabelPadding() + this.margin();
-      let heightRequiredByTicks = this._isHorizontal() ? this._maxLabelTickLength() + this.tickLabelPadding() + this.margin() : 0;
+      let widthRequiredByTicks = this._isHorizontal() ? 0 : this._maxLabelTickLength() + this.tickLabelPadding();
+      let heightRequiredByTicks = this._isHorizontal() ? this._maxLabelTickLength() + this.tickLabelPadding() : 0;
 
       if (this._scale.domain().length === 0) {
         return {
@@ -46,10 +46,12 @@ export module Axes {
 
       let categoryScale = <Scales.Category> this._scale;
       let measureResult = this._measureTicks(offeredWidth, offeredHeight, categoryScale, categoryScale.domain());
+      this._computedWidth = measureResult.usedWidth + widthRequiredByTicks;
+      this._computedHeight = measureResult.usedHeight + heightRequiredByTicks;
 
       return {
-        minWidth: measureResult.usedWidth + widthRequiredByTicks,
-        minHeight: measureResult.usedHeight + heightRequiredByTicks
+        minWidth: this._isHorizontal() ? this._computedWidth : this._computedWidth + this.margin(),
+        minHeight: this._isHorizontal() ? this._computedHeight + this.margin() : this._computedHeight
       };
     }
 

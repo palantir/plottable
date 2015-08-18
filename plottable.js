@@ -4766,8 +4766,8 @@ var Plottable;
                 return this.redraw();
             };
             Category.prototype.requestedSpace = function (offeredWidth, offeredHeight) {
-                var widthRequiredByTicks = this._isHorizontal() ? 0 : this._maxLabelTickLength() + this.tickLabelPadding() + this.margin();
-                var heightRequiredByTicks = this._isHorizontal() ? this._maxLabelTickLength() + this.tickLabelPadding() + this.margin() : 0;
+                var widthRequiredByTicks = this._isHorizontal() ? 0 : this._maxLabelTickLength() + this.tickLabelPadding();
+                var heightRequiredByTicks = this._isHorizontal() ? this._maxLabelTickLength() + this.tickLabelPadding() : 0;
                 if (this._scale.domain().length === 0) {
                     return {
                         minWidth: 0,
@@ -4776,9 +4776,11 @@ var Plottable;
                 }
                 var categoryScale = this._scale;
                 var measureResult = this._measureTicks(offeredWidth, offeredHeight, categoryScale, categoryScale.domain());
+                this._computedWidth = measureResult.usedWidth + widthRequiredByTicks;
+                this._computedHeight = measureResult.usedHeight + heightRequiredByTicks;
                 return {
-                    minWidth: measureResult.usedWidth + widthRequiredByTicks,
-                    minHeight: measureResult.usedHeight + heightRequiredByTicks
+                    minWidth: this._isHorizontal() ? this._computedWidth : this._computedWidth + this.margin(),
+                    minHeight: this._isHorizontal() ? this._computedHeight + this.margin() : this._computedHeight
                 };
             };
             Category.prototype._getTickValues = function () {
