@@ -4063,9 +4063,10 @@ var Plottable;
                 // Makes sure that the size it requires is a multiple of tier sizes, such that
                 // we have no leftover tiers
                 var size = _super.prototype._sizeFromOffer.call(this, availableWidth, availableHeight);
-                size.height = this._tierHeights.reduce(function (prevValue, currValue, index, arr) {
+                var tierHeights = this._tierHeights.reduce(function (prevValue, currValue, index, arr) {
                     return (prevValue + currValue > size.height) ? prevValue : (prevValue + currValue);
                 });
+                size.height = Math.min(size.height, tierHeights + this.margin());
                 return size;
             };
             Time.prototype._setup = function () {
@@ -7757,6 +7758,26 @@ var Plottable;
                     var x = xProjector(datum, index, dataset);
                     var y = yProjector(datum, index, dataset);
                     return dataXRange.min <= x && x <= dataXRange.max && dataYRange.min <= y && y <= dataYRange.max;
+                });
+            };
+            /**
+             * Gets the Entities at a particular Point.
+             *
+             * @param {Point} p
+             * @returns {PlotEntity[]}
+             */
+            Scatter.prototype.entitiesAt = function (p) {
+                var xProjector = Plottable.Plot._scaledAccessor(this.x());
+                var yProjector = Plottable.Plot._scaledAccessor(this.y());
+                var sizeProjector = Plottable.Plot._scaledAccessor(this.size());
+                return this.entities().filter(function (entity) {
+                    var datum = entity.datum;
+                    var index = entity.index;
+                    var dataset = entity.dataset;
+                    var x = xProjector(datum, index, dataset);
+                    var y = yProjector(datum, index, dataset);
+                    var size = sizeProjector(datum, index, dataset);
+                    return x - size / 2 <= p.x && p.x <= x + size / 2 && y - size / 2 <= p.y && p.y <= y + size / 2;
                 });
             };
             Scatter._SIZE_KEY = "size";
