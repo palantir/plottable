@@ -2917,6 +2917,7 @@ declare module Plottable {
             labelsEnabled(): boolean;
             /**
              * Sets whether labels are enabled.
+             * Labels too big to be contained in the rectangle, cut off by edges, or blocked by other rectangles will not be shown.
              *
              * @param {boolean} labelsEnabled
              * @returns {Rectangle} The calling Rectangle Plot.

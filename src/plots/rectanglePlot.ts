@@ -334,6 +334,7 @@ export module Plots {
     public labelsEnabled(): boolean;
     /**
      * Sets whether labels are enabled.
+     * Labels too big to be contained in the rectangle, cut off by edges, or blocked by other rectangles will not be shown.
      *
      * @param {boolean} labelsEnabled
      * @returns {Rectangle} The calling Rectangle Plot.
@@ -468,8 +469,9 @@ export module Plots {
     private _overlayLabel(labelXRange: Range, labelYRange: Range, datumIndex: number, datasetIndex: number,
                           dataToDraw: Utils.Map<Dataset, any[]>) {
       let attrToProjector = this._generateAttrToProjector();
-      for (let i = datasetIndex; i < this.datasets().length; i ++ ) {
-        let dataset = this.datasets()[i];
+      let datasets = this.datasets();
+      for (let i = datasetIndex; i < datasets.length; i ++ ) {
+        let dataset = datasets[i];
         let data = dataToDraw.get(dataset);
         for (let j = (i === datasetIndex ? datumIndex + 1 : 0); j < data.length ; j ++ ) {
           if (Utils.DOM.intersectsBBox(labelXRange, labelYRange, this._entityBBox(data[j], j, dataset, attrToProjector))) {

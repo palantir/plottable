@@ -7566,8 +7566,9 @@ var Plottable;
             };
             Rectangle.prototype._overlayLabel = function (labelXRange, labelYRange, datumIndex, datasetIndex, dataToDraw) {
                 var attrToProjector = this._generateAttrToProjector();
-                for (var i = datasetIndex; i < this.datasets().length; i++) {
-                    var dataset = this.datasets()[i];
+                var datasets = this.datasets();
+                for (var i = datasetIndex; i < datasets.length; i++) {
+                    var dataset = datasets[i];
                     var data = dataToDraw.get(dataset);
                     for (var j = (i === datasetIndex ? datumIndex + 1 : 0); j < data.length; j++) {
                         if (Plottable.Utils.DOM.intersectsBBox(labelXRange, labelYRange, this._entityBBox(data[j], j, dataset, attrToProjector))) {
