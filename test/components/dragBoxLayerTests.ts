@@ -8,9 +8,11 @@ describe("Interactive Components", () => {
       let SVG_HEIGHT = 400;
 
       var svg: d3.Selection<void>;
+      let dbl: Plottable.Components.DragBoxLayer;
 
       beforeEach(() => {
         svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+        dbl = new Plottable.Components.DragBoxLayer();
       });
 
       afterEach(() => {
@@ -18,7 +20,6 @@ describe("Interactive Components", () => {
       });
 
       it("correctly draws box on drag", () => {
-        let dbl = new Plottable.Components.DragBoxLayer();
         dbl.renderTo(svg);
         assert.isFalse(dbl.boxVisible(), "box is hidden initially");
 
@@ -40,7 +41,6 @@ describe("Interactive Components", () => {
       });
 
       it("dismisses on click", () => {
-        let dbl = new Plottable.Components.DragBoxLayer();
         dbl.renderTo(svg);
 
         let targetPoint = {
@@ -55,8 +55,8 @@ describe("Interactive Components", () => {
       });
 
       it("clipPath enabled", () => {
-        let dbl = new Plottable.Components.DragBoxLayer();
         dbl.renderTo(svg);
+
         TestMethods.verifyClipPath(dbl);
         let clipRect = (<any> dbl)._boxContainer.select(".clip-rect");
         assert.strictEqual(TestMethods.numAttr(clipRect, "width"), SVG_WIDTH, "the clipRect has an appropriate width");
@@ -64,10 +64,7 @@ describe("Interactive Components", () => {
       });
 
       it("detectionRadius()", () => {
-        let dbl = new Plottable.Components.DragBoxLayer();
-
         assert.doesNotThrow(() => dbl.detectionRadius(3), Error, "can set detection radius before anchoring");
-
         dbl.renderTo("svg");
 
         let radius = 5;
@@ -89,7 +86,6 @@ describe("Interactive Components", () => {
       });
 
       it("onDragStart()", () => {
-        let dbl = new Plottable.Components.DragBoxLayer();
         dbl.renderTo(svg);
 
         let startPoint = {
@@ -124,7 +120,6 @@ describe("Interactive Components", () => {
       });
 
       it("onDrag()", () => {
-        let dbl = new Plottable.Components.DragBoxLayer();
         dbl.renderTo(svg);
 
         let startPoint = {
@@ -159,7 +154,6 @@ describe("Interactive Components", () => {
       });
 
       it("onDragEnd()", () => {
-        let dbl = new Plottable.Components.DragBoxLayer();
         dbl.renderTo(svg);
 
         let startPoint = {
@@ -193,7 +187,6 @@ describe("Interactive Components", () => {
       });
 
       it("multiple drag interaction callbacks", () => {
-        let dbl = new Plottable.Components.DragBoxLayer();
         dbl.renderTo(svg);
 
         let startPoint = {
@@ -256,7 +249,6 @@ describe("Interactive Components", () => {
         assert.isTrue(callbackDragEnd2Called, "the callback 2 for drag end is still connected");
       });
     });
-
 
     describe("DragBoxLayer - enabling/disabling", () => {
       let SVG_WIDTH = 400;
