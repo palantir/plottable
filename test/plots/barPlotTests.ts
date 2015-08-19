@@ -634,6 +634,36 @@ describe("Plots", () => {
         barPlot.renderTo(svg);
       });
 
+      it("hides labels properly on the right", () => {
+        xScale.domainMax(0.95);
+        let texts = svg.selectAll("text");
+
+        assert.strictEqual(texts.size(), 2, "There should be two labels rendered");
+
+        let label1 = d3.select(texts[0][0]);
+        let label2 = d3.select(texts[0][1]);
+
+        assert.include(["visible", "inherit"], label1.style("visibility"), "label 1 is visible");
+        assert.strictEqual(label2.style("visibility"), "hidden", "label 2 is not visible");
+
+        svg.remove();
+      });
+
+      it("hides labels properly on the left", () => {
+        xScale.domainMax(-1.4);
+        let texts = svg.selectAll("text");
+
+        assert.strictEqual(texts.size(), 2, "There should be two labels rendered");
+
+        let label1 = d3.select(texts[0][0]);
+        let label2 = d3.select(texts[0][1]);
+
+        assert.strictEqual(label1.style("visibility"), "hidden", "label 2 is not visible");
+        assert.include(["visible", "inherit"], label2.style("visibility"), "label 1 is visible");
+
+        svg.remove();
+      });
+
       it("shows both inner and outer labels", () => {
         barPlot.renderTo(svg);
 
