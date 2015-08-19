@@ -234,7 +234,8 @@ export class Axis<D> extends Component {
   protected _drawAnnotations() {
     let labelPadding = 4;
     let measurements = new Utils.Map<D, SVGTypewriter.Measurers.Dimensions>();
-    this.annotatedTicks().forEach((annotatedTick) => {
+    let annotatedTicks = this._annotatedTicksInDomain();
+    annotatedTicks.forEach((annotatedTick) => {
       let measurement = this._annotationMeasurer.measure(this.annotationFormatter()(annotatedTick));
       let paddedMeasurement = { width: measurement.width + 2 * labelPadding, height: measurement.height + 2 * labelPadding };
       measurements.set(annotatedTick, paddedMeasurement);
@@ -253,7 +254,7 @@ export class Axis<D> extends Component {
     });
 
     let bindElements = (selection: d3.Selection<any>, elementName: string, className: string) => {
-      let elements = selection.selectAll("." + className).data(this.annotatedTicks());
+      let elements = selection.selectAll("." + className).data(annotatedTicks);
       elements.enter().append(elementName).classed(className, true);
       elements.exit().remove();
       return elements;
@@ -341,6 +342,20 @@ export class Axis<D> extends Component {
       });
   }
 
+  private _annotatedTicksInDomain() {
+    return this.annotatedTicks().filter((annotatedTick) => {
+      if (typeof annotatedTick === "number" && !Utils.Math.isValidNumber(annotatedTick)) {
+        return false;
+      }
+      if (this._scale instanceof Scales.Category) {
+        return this._scale.domain().indexOf(annotatedTick) !== -1;
+      } else if (this._scale instanceof QuantitativeScale) {
+        return (this._scale.domain()[0] <= annotatedTick && annotatedTick <= this._scale.domain()[0]) ||
+               (this._scale.domain()[1] <= annotatedTick && annotatedTick <= this._scale.domain()[1]);
+      }
+    });
+  }
+
   protected _axisSizeWithoutMargin() {
     let relevantDimension = this._isHorizontal() ? this.height() : this.width();
     let axisHeightWithoutMargin = this._isHorizontal() ? this._computedHeight : this._computedWidth;
@@ -351,7 +366,7 @@ export class Axis<D> extends Component {
     let annotationTiers: D[][] = [[]];
     let annotationToTier = new Utils.Map<D, number>();
     let dimension = this._isHorizontal() ? this.width() : this.height();
-    this.annotatedTicks().forEach((annotatedTick) => {
+    this._annotatedTicksInDomain().forEach((annotatedTick) => {
       let position = this._scale.scale(annotatedTick);
       let length = measurements.get(annotatedTick).width;
       if (position < 0 || position + length > dimension) {

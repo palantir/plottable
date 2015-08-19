@@ -3774,7 +3774,8 @@ var Plottable;
             var _this = this;
             var labelPadding = 4;
             var measurements = new Plottable.Utils.Map();
-            this.annotatedTicks().forEach(function (annotatedTick) {
+            var annotatedTicks = this._annotatedTicksInDomain();
+            annotatedTicks.forEach(function (annotatedTick) {
                 var measurement = _this._annotationMeasurer.measure(_this.annotationFormatter()(annotatedTick));
                 var paddedMeasurement = { width: measurement.width + 2 * labelPadding, height: measurement.height + 2 * labelPadding };
                 measurements.set(annotatedTick, paddedMeasurement);
@@ -3789,7 +3790,7 @@ var Plottable;
                 }
             });
             var bindElements = function (selection, elementName, className) {
-                var elements = selection.selectAll("." + className).data(_this.annotatedTicks());
+                var elements = selection.selectAll("." + className).data(annotatedTicks);
                 elements.enter().append(elementName).classed(className, true);
                 elements.exit().remove();
                 return elements;
@@ -3868,6 +3869,21 @@ var Plottable;
                 annotationWriter.write(annotationFormatter(annotationLabel), isHorizontal ? measurements.get(annotationLabel).width : measurements.get(annotationLabel).height, isHorizontal ? measurements.get(annotationLabel).height : measurements.get(annotationLabel).width, writeOptions);
             });
         };
+        Axis.prototype._annotatedTicksInDomain = function () {
+            var _this = this;
+            return this.annotatedTicks().filter(function (annotatedTick) {
+                if (typeof annotatedTick === "number" && !Plottable.Utils.Math.isValidNumber(annotatedTick)) {
+                    return false;
+                }
+                if (_this._scale instanceof Plottable.Scales.Category) {
+                    return _this._scale.domain().indexOf(annotatedTick) !== -1;
+                }
+                else if (_this._scale instanceof Plottable.QuantitativeScale) {
+                    return (_this._scale.domain()[0] <= annotatedTick && annotatedTick <= _this._scale.domain()[0]) ||
+                        (_this._scale.domain()[1] <= annotatedTick && annotatedTick <= _this._scale.domain()[1]);
+                }
+            });
+        };
         Axis.prototype._axisSizeWithoutMargin = function () {
             var relevantDimension = this._isHorizontal() ? this.height() : this.width();
             var axisHeightWithoutMargin = this._isHorizontal() ? this._computedHeight : this._computedWidth;
@@ -3878,7 +3894,7 @@ var Plottable;
             var annotationTiers = [[]];
             var annotationToTier = new Plottable.Utils.Map();
             var dimension = this._isHorizontal() ? this.width() : this.height();
-            this.annotatedTicks().forEach(function (annotatedTick) {
+            this._annotatedTicksInDomain().forEach(function (annotatedTick) {
                 var position = _this._scale.scale(annotatedTick);
                 var length = measurements.get(annotatedTick).width;
                 if (position < 0 || position + length > dimension) {
