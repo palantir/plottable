@@ -7,7 +7,6 @@ describe("Plots", () => {
       let svg: d3.Selection<void>;
       let xScale: Plottable.Scales.Linear;
       let yScale: Plottable.Scales.Linear;
-      let renderArea: d3.Selection<void>;
       let data = [
         { x: 1, y: 1, x2: 4, y2: 4 },
         { x: 2, y: 2, x2: 3, y2: 5 },
