@@ -393,13 +393,6 @@ export module Axes {
       return true;
     }
 
-    protected _annotatedTicksInDomain() {
-      return this.annotatedTicks().filter((annotatedTick) => {
-        let scaleDomain = this._scale.domain();
-        return Math.min(scaleDomain[0], scaleDomain[1]) <= annotatedTick &&
-               annotatedTick <= Math.max(scaleDomain[0], scaleDomain[1]);
-      });
-    }
   }
 }
 }

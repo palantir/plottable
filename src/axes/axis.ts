@@ -350,8 +350,9 @@ export class Axis<D> extends Component {
       });
   }
 
-  protected _annotatedTicksInDomain() {
-    return this.annotatedTicks();
+  private _annotatedTicksInDomain() {
+    let scaleRange = this._scale.range();
+    return this.annotatedTicks().filter((tick) => Utils.Math.inRange(this._scale.scale(tick), scaleRange[0], scaleRange[1]));
   }
 
   protected _axisSizeWithoutMargin() {

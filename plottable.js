@@ -3878,7 +3878,9 @@ var Plottable;
             });
         };
         Axis.prototype._annotatedTicksInDomain = function () {
-            return this.annotatedTicks();
+            var _this = this;
+            var scaleRange = this._scale.range();
+            return this.annotatedTicks().filter(function (tick) { return Plottable.Utils.Math.inRange(_this._scale.scale(tick), scaleRange[0], scaleRange[1]); });
         };
         Axis.prototype._axisSizeWithoutMargin = function () {
             var relevantDimension = this._isHorizontal() ? this.height() : this.width();
@@ -4457,14 +4459,6 @@ var Plottable;
                     }
                 });
             };
-            Time.prototype._annotatedTicksInDomain = function () {
-                var _this = this;
-                return this.annotatedTicks().filter(function (annotatedTick) {
-                    var domainMin = Math.min(_this._scale.domain()[0].valueOf(), _this._scale.domain()[1].valueOf());
-                    var domainMax = Math.min(_this._scale.domain()[0].valueOf(), _this._scale.domain()[1].valueOf());
-                    return domainMin <= annotatedTick.valueOf() && annotatedTick.valueOf() <= domainMax;
-                });
-            };
             /**
              * The CSS class applied to each Time Axis tier
              */
@@ -4917,14 +4911,6 @@ var Plottable;
                 }
                 return true;
             };
-            Numeric.prototype._annotatedTicksInDomain = function () {
-                var _this = this;
-                return this.annotatedTicks().filter(function (annotatedTick) {
-                    var scaleDomain = _this._scale.domain();
-                    return Math.min(scaleDomain[0], scaleDomain[1]) <= annotatedTick &&
-                        annotatedTick <= Math.max(scaleDomain[0], scaleDomain[1]);
-                });
-            };
             return Numeric;
         })(Plottable.Axis);
         Axes.Numeric = Numeric;
@@ -4982,10 +4968,6 @@ var Plottable;
                     minWidth: measureResult.usedWidth + widthRequiredByTicks,
                     minHeight: measureResult.usedHeight + heightRequiredByTicks
                 };
-            };
-            Category.prototype._annotatedTicksInDomain = function () {
-                var _this = this;
-                return this.annotatedTicks().filter(function (annotatedTick) { return _this._scale.domain().indexOf(annotatedTick) !== -1; });
             };
             Category.prototype._axisHeightWithoutMargin = function () {
                 var relevantDimension = this._isHorizontal() ? this.height() : this.width();
