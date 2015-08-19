@@ -429,7 +429,7 @@ export module Plots {
         let secondaryAttrTextSpace = this._isVertical ? measurement.width : measurement.height;
         let secondaryAttrAvailableSpace = this._isVertical ? w : h;
         let tooWide = secondaryAttrTextSpace + 2 * Bar._LABEL_HORIZONTAL_PADDING > secondaryAttrAvailableSpace;
-        let showLabelOffBar = this._isVertical ? (measurement.height > h) : (measurement.width > w)
+        let showLabelOffBar = this._isVertical ? (measurement.height > h) : (measurement.width > w);
         let offset = Math.min((primary - primarySpace) / 2, Bar._LABEL_VERTICAL_PADDING);
         if (!positive) { offset = offset * -1; }
 
