@@ -552,6 +552,14 @@ export module Axes {
         }
       });
     }
+
+    protected _annotatedTicksInDomain() {
+      return this.annotatedTicks().filter((annotatedTick) => {
+        let domainMin = Math.min(this._scale.domain()[0].valueOf(), this._scale.domain()[1].valueOf());
+        let domainMax = Math.min(this._scale.domain()[0].valueOf(), this._scale.domain()[1].valueOf());
+        return domainMin <= annotatedTick.valueOf() && annotatedTick.valueOf() <= domainMax;
+      });
+    }
   }
 }
 }

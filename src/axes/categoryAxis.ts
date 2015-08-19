@@ -53,6 +53,10 @@ export module Axes {
       };
     }
 
+    protected _annotatedTicksInDomain() {
+      return this.annotatedTicks().filter((annotatedTick) => this._scale.domain().indexOf(annotatedTick) !== -1);
+    }
+
     protected _axisHeightWithoutMargin() {
       let relevantDimension = this._isHorizontal() ? this.height() : this.width();
       let axisHeightWithoutMargin = this.requestedSpace(this.width(), this.height()).minHeight - this.margin();

@@ -323,15 +323,15 @@ export class Axis<D> extends Component {
         width: isHorizontal ? (d) => measurements.get(d).width : (d) => measurements.get(d).height,
         height: isHorizontal ? (d) => measurements.get(d).height : (d) => measurements.get(d).width,
         visibility: visibilityF
-      })
+      });
 
     let annotationWriter = this._annotationWriter;
     let annotationFormatter = this.annotationFormatter();
     bindElements(this._annotationContainer.select(".annotation-label-container"), "g", "annotation-label")
       .attr({
         transform: (d) => {
-          let xTranslate = this._isHorizontal() ? positionF(d) : rectangleOffsetF(d);
-          let yTranslate = this._isHorizontal() ? rectangleOffsetF(d) : positionF(d);
+          let xTranslate = isHorizontal ? positionF(d) : rectangleOffsetF(d);
+          let yTranslate = isHorizontal ? rectangleOffsetF(d) : positionF(d);
           return "translate(" + xTranslate + "," + yTranslate + ")";
         },
         visibility: visibilityF
@@ -350,7 +350,7 @@ export class Axis<D> extends Component {
       });
   }
 
-  private _annotatedTicksInDomain() {
+  protected _annotatedTicksInDomain() {
     return this.annotatedTicks();
   }
 

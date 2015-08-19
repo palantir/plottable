@@ -1726,6 +1726,7 @@ declare module Plottable {
          */
         annotationsEnabled(annotationsEnabled: boolean): Axis<D>;
         protected _drawAnnotations(): void;
+        protected _annotatedTicksInDomain(): D[];
         protected _axisSizeWithoutMargin(): number;
         protected _generateBaselineAttrHash(): {
             [key: string]: number;
@@ -1911,6 +1912,7 @@ declare module Plottable {
             protected _setup(): void;
             protected _getTickValues(): any[];
             renderImmediately(): Time;
+            protected _annotatedTicksInDomain(): Date[];
         }
     }
 }
@@ -1965,6 +1967,7 @@ declare module Plottable {
              * @returns {Axes.Numeric} The calling Axes.Numeric.
              */
             usesTextWidthApproximation(enable: boolean): Axes.Numeric;
+            protected _annotatedTicksInDomain(): number[];
         }
     }
 }
@@ -1986,6 +1989,7 @@ declare module Plottable {
             protected _setup(): void;
             protected _rescale(): Component;
             requestedSpace(offeredWidth: number, offeredHeight: number): SpaceRequest;
+            protected _annotatedTicksInDomain(): string[];
             protected _axisHeightWithoutMargin(): number;
             protected _getTickValues(): string[];
             /**
