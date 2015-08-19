@@ -277,9 +277,9 @@ describe("Plots", () => {
       it("renders correctly", () => {
         let plot = new Plottable.Plots.Rectangle();
         plot.addDataset(new Plottable.Dataset(DATA))
-                .attr("fill", (d) => d.magnitude, colorScale);
+        plot.attr("fill", (d) => d.magnitude, colorScale);
         plot.x((d: any) => d.x, xScale)
-                .y((d: any) => d.y, yScale);
+        plot.y((d: any) => d.y, yScale);
         plot.renderTo(svg);
         VERIFY_CELLS((<any> plot)._renderArea.selectAll("rect")[0]);
       });
@@ -288,10 +288,10 @@ describe("Plots", () => {
         let dataset = new Plottable.Dataset();
         let plot = new Plottable.Plots.Rectangle();
         plot.addDataset(dataset)
-                .attr("fill", (d) => d.magnitude, colorScale);
+        plot.attr("fill", (d) => d.magnitude, colorScale);
         plot.x((d: any) => d.x, xScale)
-                .y((d: any) => d.y, yScale)
-                .renderTo(svg);
+        plot.y((d: any) => d.y, yScale)
+        plot.renderTo(svg);
         dataset.data(DATA);
         VERIFY_CELLS((<any> plot)._renderArea.selectAll("rect")[0]);
       });
@@ -302,10 +302,10 @@ describe("Plots", () => {
         let dataset = new Plottable.Dataset();
         let plot = new Plottable.Plots.Rectangle();
         plot.addDataset(dataset)
-                .attr("fill", (d) => d.magnitude, colorScale);
+        plot.attr("fill", (d) => d.magnitude, colorScale);
         plot.x((d: any) => d.x, xScale)
-                .y((d: any) => d.y, yScale)
-                .renderTo(svg);
+        plot.y((d: any) => d.y, yScale)
+        plot.renderTo(svg);
         let data = [
           {x: "A", y: "W", magnitude: 0},
           {x: "B", y: "X", magnitude: 8},
@@ -327,10 +327,10 @@ describe("Plots", () => {
       it("can invert y axis correctly", () => {
         let plot = new Plottable.Plots.Rectangle();
         plot.addDataset(new Plottable.Dataset(DATA))
-                .attr("fill", (d) => d.magnitude, colorScale);
+        plot.attr("fill", (d) => d.magnitude, colorScale);
         plot.x((d: any) => d.x, xScale)
-                .y((d: any) => d.y, yScale)
-                .renderTo(svg);
+        plot.y((d: any) => d.y, yScale)
+        plot.renderTo(svg);
 
         yScale.domain(["U", "V"]);
 
@@ -356,13 +356,8 @@ describe("Plots", () => {
         cellAV.attr("fill", "#ffffff");
         cellAV.attr("x", "0");
         cellAV.attr("y", "100");
-
       });
     });
-
-
-
-
 
     describe("Rectangle Plot - selections()", () => {
       let SVG_WIDTH = 400;
