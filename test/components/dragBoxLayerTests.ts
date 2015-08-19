@@ -2,272 +2,280 @@
 
 describe("Interactive Components", () => {
   describe("DragBoxLayer", () => {
-    let SVG_WIDTH = 400;
-    let SVG_HEIGHT = 400;
 
-    it("correctly draws box on drag", () => {
-      let svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
-      let dbl = new Plottable.Components.DragBoxLayer();
-      dbl.renderTo(svg);
-      assert.isFalse(dbl.boxVisible(), "box is hidden initially");
+    describe("DragBoxLayer - basics", () => {
+      let SVG_WIDTH = 400;
+      let SVG_HEIGHT = 400;
 
-      let startPoint = {
-        x: SVG_WIDTH / 4,
-        y: SVG_HEIGHT / 4
-      };
-      let endPoint = {
-        x: SVG_WIDTH / 2,
-        y: SVG_HEIGHT / 2
-      };
+      it("correctly draws box on drag", () => {
+        let svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+        let dbl = new Plottable.Components.DragBoxLayer();
+        dbl.renderTo(svg);
+        assert.isFalse(dbl.boxVisible(), "box is hidden initially");
 
-      let target = dbl.background();
-      TestMethods.triggerFakeDragSequence(target, startPoint, endPoint);
-      assert.isTrue(dbl.boxVisible(), "box is drawn on drag");
-      let bounds = dbl.bounds();
-      assert.deepEqual(bounds.topLeft, startPoint, "top-left point was set correctly");
-      assert.deepEqual(bounds.bottomRight, endPoint, "bottom-right point was set correctly");
+        let startPoint = {
+          x: SVG_WIDTH / 4,
+          y: SVG_HEIGHT / 4
+        };
+        let endPoint = {
+          x: SVG_WIDTH / 2,
+          y: SVG_HEIGHT / 2
+        };
 
-      svg.remove();
-    });
+        let target = dbl.background();
+        TestMethods.triggerFakeDragSequence(target, startPoint, endPoint);
+        assert.isTrue(dbl.boxVisible(), "box is drawn on drag");
+        let bounds = dbl.bounds();
+        assert.deepEqual(bounds.topLeft, startPoint, "top-left point was set correctly");
+        assert.deepEqual(bounds.bottomRight, endPoint, "bottom-right point was set correctly");
 
-    it("dismisses on click", () => {
-      let svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
-      let dbl = new Plottable.Components.DragBoxLayer();
-      dbl.renderTo(svg);
-
-      let targetPoint = {
-        x: SVG_WIDTH / 2,
-        y: SVG_HEIGHT / 2
-      };
-
-      let target = dbl.background();
-      TestMethods.triggerFakeDragSequence(target, targetPoint, targetPoint);
-
-      assert.isFalse(dbl.boxVisible(), "box is hidden on click");
-
-      svg.remove();
-    });
-
-    it("clipPath enabled", () => {
-      let svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
-      let dbl = new Plottable.Components.DragBoxLayer();
-      dbl.renderTo(svg);
-      TestMethods.verifyClipPath(dbl);
-      let clipRect = (<any> dbl)._boxContainer.select(".clip-rect");
-      assert.strictEqual(TestMethods.numAttr(clipRect, "width"), SVG_WIDTH, "the clipRect has an appropriate width");
-      assert.strictEqual(TestMethods.numAttr(clipRect, "height"), SVG_HEIGHT, "the clipRect has an appropriate height");
-      svg.remove();
-    });
-
-    it("detectionRadius()", () => {
-      let dbl = new Plottable.Components.DragBoxLayer();
-
-      assert.doesNotThrow(() => dbl.detectionRadius(3), Error, "can set detection radius before anchoring");
-
-      let svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
-      dbl.renderTo("svg");
-
-      let radius = 5;
-      dbl.detectionRadius(radius);
-      assert.strictEqual(dbl.detectionRadius(), radius, "can retrieve the detection radius");
-      let edges = dbl.content().selectAll("line");
-      edges.each(function() {
-        let edge = d3.select(this);
-        assert.strictEqual(edge.style("stroke-width"), 2 * radius, "edge width was set correctly");
-      });
-      let corners = dbl.content().selectAll("circle");
-      corners.each(function() {
-        let corner = d3.select(this);
-        assert.strictEqual(corner.attr("r"), radius, "corner radius was set correctly");
+        svg.remove();
       });
 
-      // HACKHACK: chai-assert.d.ts has the wrong signature
-      (<any> assert.throws)(() => dbl.detectionRadius(-1), Error, "", "rejects negative values");
+      it("dismisses on click", () => {
+        let svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+        let dbl = new Plottable.Components.DragBoxLayer();
+        dbl.renderTo(svg);
 
-      svg.remove();
+        let targetPoint = {
+          x: SVG_WIDTH / 2,
+          y: SVG_HEIGHT / 2
+        };
+
+        let target = dbl.background();
+        TestMethods.triggerFakeDragSequence(target, targetPoint, targetPoint);
+
+        assert.isFalse(dbl.boxVisible(), "box is hidden on click");
+
+        svg.remove();
+      });
+
+      it("clipPath enabled", () => {
+        let svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+        let dbl = new Plottable.Components.DragBoxLayer();
+        dbl.renderTo(svg);
+        TestMethods.verifyClipPath(dbl);
+        let clipRect = (<any> dbl)._boxContainer.select(".clip-rect");
+        assert.strictEqual(TestMethods.numAttr(clipRect, "width"), SVG_WIDTH, "the clipRect has an appropriate width");
+        assert.strictEqual(TestMethods.numAttr(clipRect, "height"), SVG_HEIGHT, "the clipRect has an appropriate height");
+        svg.remove();
+      });
+
+      it("detectionRadius()", () => {
+        let dbl = new Plottable.Components.DragBoxLayer();
+
+        assert.doesNotThrow(() => dbl.detectionRadius(3), Error, "can set detection radius before anchoring");
+
+        let svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+        dbl.renderTo("svg");
+
+        let radius = 5;
+        dbl.detectionRadius(radius);
+        assert.strictEqual(dbl.detectionRadius(), radius, "can retrieve the detection radius");
+        let edges = dbl.content().selectAll("line");
+        edges.each(function() {
+          let edge = d3.select(this);
+          assert.strictEqual(edge.style("stroke-width"), 2 * radius, "edge width was set correctly");
+        });
+        let corners = dbl.content().selectAll("circle");
+        corners.each(function() {
+          let corner = d3.select(this);
+          assert.strictEqual(corner.attr("r"), radius, "corner radius was set correctly");
+        });
+
+        // HACKHACK: chai-assert.d.ts has the wrong signature
+        (<any> assert.throws)(() => dbl.detectionRadius(-1), Error, "", "rejects negative values");
+
+        svg.remove();
+      });
+
+      it("onDragStart()", () => {
+        let svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+        let dbl = new Plottable.Components.DragBoxLayer();
+        dbl.renderTo(svg);
+
+        let startPoint = {
+          x: SVG_WIDTH / 4,
+          y: SVG_HEIGHT / 4
+        };
+        let endPoint = {
+          x: SVG_WIDTH / 2,
+          y: SVG_HEIGHT / 2
+        };
+
+        let receivedBounds: Plottable.Bounds;
+        let callbackCalled = false;
+        let callback = (b: Plottable.Bounds) => {
+          receivedBounds = b;
+          callbackCalled = true;
+        };
+        dbl.onDragStart(callback);
+
+        let target = dbl.background();
+        TestMethods.triggerFakeDragSequence(target, startPoint, endPoint);
+
+        assert.isTrue(callbackCalled, "the callback was called");
+        assert.deepEqual(receivedBounds.topLeft, startPoint, "top-left point was set correctly");
+        assert.deepEqual(receivedBounds.bottomRight, startPoint, "bottom-right point was set correctly");
+
+        dbl.offDragStart(callback);
+
+        callbackCalled = false;
+        TestMethods.triggerFakeDragSequence(target, startPoint, endPoint);
+        assert.isFalse(callbackCalled, "the callback was detached from the dragBoxLayer and not called");
+
+        svg.remove();
+      });
+
+      it("onDrag()", () => {
+        let svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+        let dbl = new Plottable.Components.DragBoxLayer();
+        dbl.renderTo(svg);
+
+        let startPoint = {
+          x: SVG_WIDTH / 4,
+          y: SVG_HEIGHT / 4
+        };
+        let endPoint = {
+          x: SVG_WIDTH / 2,
+          y: SVG_HEIGHT / 2
+        };
+
+        let receivedBounds: Plottable.Bounds;
+        let callbackCalled = false;
+        let callback = (b: Plottable.Bounds) => {
+          receivedBounds = b;
+          callbackCalled = true;
+        };
+        dbl.onDrag(callback);
+
+        let target = dbl.background();
+        TestMethods.triggerFakeDragSequence(target, startPoint, endPoint);
+
+        assert.isTrue(callbackCalled, "the callback was called");
+        assert.deepEqual(receivedBounds.topLeft, startPoint, "top-left point was set correctly");
+        assert.deepEqual(receivedBounds.bottomRight, endPoint, "bottom-right point was set correctly");
+
+        callbackCalled = false;
+        dbl.offDrag(callback);
+
+        TestMethods.triggerFakeDragSequence(target, startPoint, endPoint);
+        assert.isFalse(callbackCalled, "the callback was detached from the dragoBoxLayer and not called");
+
+        svg.remove();
+      });
+
+      it("onDragEnd()", () => {
+        let svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+        let dbl = new Plottable.Components.DragBoxLayer();
+        dbl.renderTo(svg);
+
+        let startPoint = {
+          x: SVG_WIDTH / 4,
+          y: SVG_HEIGHT / 4
+        };
+        let endPoint = {
+          x: SVG_WIDTH / 2,
+          y: SVG_HEIGHT / 2
+        };
+
+        let receivedBounds: Plottable.Bounds;
+        let callbackCalled = false;
+        let callback = (b: Plottable.Bounds) => {
+          receivedBounds = b;
+          callbackCalled = true;
+        };
+        dbl.onDragEnd(callback);
+
+        let target = dbl.background();
+        TestMethods.triggerFakeDragSequence(target, startPoint, endPoint);
+
+        assert.isTrue(callbackCalled, "the callback was called");
+        assert.deepEqual(receivedBounds.topLeft, startPoint, "top-left point was set correctly");
+        assert.deepEqual(receivedBounds.bottomRight, endPoint, "bottom-right point was set correctly");
+        dbl.offDragEnd(callback);
+        callbackCalled = false;
+
+        TestMethods.triggerFakeDragSequence(target, startPoint, endPoint);
+        assert.isFalse(callbackCalled, "the callback was detached from the dragoBoxLayer and not called");
+
+        svg.remove();
+      });
+
+      it("multiple drag interaction callbacks", () => {
+        let svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+        let dbl = new Plottable.Components.DragBoxLayer();
+        dbl.renderTo(svg);
+
+        let startPoint = {
+          x: SVG_WIDTH / 4,
+          y: SVG_HEIGHT / 4
+        };
+        let endPoint = {
+          x: SVG_WIDTH / 2,
+          y: SVG_HEIGHT / 2
+        };
+
+        let callbackDragStart1Called = false;
+        let callbackDragStart2Called = false;
+        let callbackDrag1Called = false;
+        let callbackDrag2Called = false;
+        let callbackDragEnd1Called = false;
+        let callbackDragEnd2Called = false;
+
+        let callbackDragStart1 = () => callbackDragStart1Called = true;
+        let callbackDragStart2 = () => callbackDragStart2Called = true;
+        let callbackDrag1 = () => callbackDrag1Called = true;
+        let callbackDrag2 = () => callbackDrag2Called = true;
+        let callbackDragEnd1 = () => callbackDragEnd1Called = true;
+        let callbackDragEnd2 = () => callbackDragEnd2Called = true;
+
+        dbl.onDragStart(callbackDragStart1);
+        dbl.onDragStart(callbackDragStart2);
+        dbl.onDrag(callbackDrag1);
+        dbl.onDrag(callbackDrag2);
+        dbl.onDragEnd(callbackDragEnd1);
+        dbl.onDragEnd(callbackDragEnd2);
+
+        let target = dbl.background();
+        TestMethods.triggerFakeDragSequence(target, startPoint, endPoint);
+
+        assert.isTrue(callbackDragStart1Called, "the callback 1 for drag start was called");
+        assert.isTrue(callbackDragStart2Called, "the callback 2 for drag start was called");
+        assert.isTrue(callbackDrag1Called, "the callback 1 for drag was called");
+        assert.isTrue(callbackDrag2Called, "the callback 2 for drag was called");
+        assert.isTrue(callbackDragEnd1Called, "the callback 1 for drag end was called");
+        assert.isTrue(callbackDragEnd2Called, "the callback 2 for drag end was called");
+
+        dbl.offDragStart(callbackDragStart1);
+        dbl.offDrag(callbackDrag1);
+        dbl.offDragEnd(callbackDragEnd1);
+
+        callbackDragStart1Called = false;
+        callbackDragStart2Called = false;
+        callbackDrag1Called = false;
+        callbackDrag2Called = false;
+        callbackDragEnd1Called = false;
+        callbackDragEnd2Called = false;
+
+        TestMethods.triggerFakeDragSequence(target, startPoint, endPoint);
+        assert.isFalse(callbackDragStart1Called, "the callback 1 for drag start was disconnected");
+        assert.isTrue(callbackDragStart2Called, "the callback 2 for drag start is still connected");
+        assert.isFalse(callbackDrag1Called, "the callback 1 for drag was called disconnected");
+        assert.isTrue(callbackDrag2Called, "the callback 2 for drag is still connected");
+        assert.isFalse(callbackDragEnd1Called, "the callback 1 for drag end was disconnected");
+        assert.isTrue(callbackDragEnd2Called, "the callback 2 for drag end is still connected");
+
+        svg.remove();
+      });
     });
 
-    it("onDragStart()", () => {
-      let svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
-      let dbl = new Plottable.Components.DragBoxLayer();
-      dbl.renderTo(svg);
-
-      let startPoint = {
-        x: SVG_WIDTH / 4,
-        y: SVG_HEIGHT / 4
-      };
-      let endPoint = {
-        x: SVG_WIDTH / 2,
-        y: SVG_HEIGHT / 2
-      };
-
-      let receivedBounds: Plottable.Bounds;
-      let callbackCalled = false;
-      let callback = (b: Plottable.Bounds) => {
-        receivedBounds = b;
-        callbackCalled = true;
-      };
-      dbl.onDragStart(callback);
-
-      let target = dbl.background();
-      TestMethods.triggerFakeDragSequence(target, startPoint, endPoint);
-
-      assert.isTrue(callbackCalled, "the callback was called");
-      assert.deepEqual(receivedBounds.topLeft, startPoint, "top-left point was set correctly");
-      assert.deepEqual(receivedBounds.bottomRight, startPoint, "bottom-right point was set correctly");
-
-      dbl.offDragStart(callback);
-
-      callbackCalled = false;
-      TestMethods.triggerFakeDragSequence(target, startPoint, endPoint);
-      assert.isFalse(callbackCalled, "the callback was detached from the dragBoxLayer and not called");
-
-      svg.remove();
-    });
-
-    it("onDrag()", () => {
-      let svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
-      let dbl = new Plottable.Components.DragBoxLayer();
-      dbl.renderTo(svg);
-
-      let startPoint = {
-        x: SVG_WIDTH / 4,
-        y: SVG_HEIGHT / 4
-      };
-      let endPoint = {
-        x: SVG_WIDTH / 2,
-        y: SVG_HEIGHT / 2
-      };
-
-      let receivedBounds: Plottable.Bounds;
-      let callbackCalled = false;
-      let callback = (b: Plottable.Bounds) => {
-        receivedBounds = b;
-        callbackCalled = true;
-      };
-      dbl.onDrag(callback);
-
-      let target = dbl.background();
-      TestMethods.triggerFakeDragSequence(target, startPoint, endPoint);
-
-      assert.isTrue(callbackCalled, "the callback was called");
-      assert.deepEqual(receivedBounds.topLeft, startPoint, "top-left point was set correctly");
-      assert.deepEqual(receivedBounds.bottomRight, endPoint, "bottom-right point was set correctly");
-
-      callbackCalled = false;
-      dbl.offDrag(callback);
-
-      TestMethods.triggerFakeDragSequence(target, startPoint, endPoint);
-      assert.isFalse(callbackCalled, "the callback was detached from the dragoBoxLayer and not called");
-
-      svg.remove();
-    });
-
-    it("onDragEnd()", () => {
-      let svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
-      let dbl = new Plottable.Components.DragBoxLayer();
-      dbl.renderTo(svg);
-
-      let startPoint = {
-        x: SVG_WIDTH / 4,
-        y: SVG_HEIGHT / 4
-      };
-      let endPoint = {
-        x: SVG_WIDTH / 2,
-        y: SVG_HEIGHT / 2
-      };
-
-      let receivedBounds: Plottable.Bounds;
-      let callbackCalled = false;
-      let callback = (b: Plottable.Bounds) => {
-        receivedBounds = b;
-        callbackCalled = true;
-      };
-      dbl.onDragEnd(callback);
-
-      let target = dbl.background();
-      TestMethods.triggerFakeDragSequence(target, startPoint, endPoint);
-
-      assert.isTrue(callbackCalled, "the callback was called");
-      assert.deepEqual(receivedBounds.topLeft, startPoint, "top-left point was set correctly");
-      assert.deepEqual(receivedBounds.bottomRight, endPoint, "bottom-right point was set correctly");
-      dbl.offDragEnd(callback);
-      callbackCalled = false;
-
-      TestMethods.triggerFakeDragSequence(target, startPoint, endPoint);
-      assert.isFalse(callbackCalled, "the callback was detached from the dragoBoxLayer and not called");
-
-      svg.remove();
-    });
-
-    it("multiple drag interaction callbacks", () => {
-      let svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
-      let dbl = new Plottable.Components.DragBoxLayer();
-      dbl.renderTo(svg);
-
-      let startPoint = {
-        x: SVG_WIDTH / 4,
-        y: SVG_HEIGHT / 4
-      };
-      let endPoint = {
-        x: SVG_WIDTH / 2,
-        y: SVG_HEIGHT / 2
-      };
-
-      let callbackDragStart1Called = false;
-      let callbackDragStart2Called = false;
-      let callbackDrag1Called = false;
-      let callbackDrag2Called = false;
-      let callbackDragEnd1Called = false;
-      let callbackDragEnd2Called = false;
-
-      let callbackDragStart1 = () => callbackDragStart1Called = true;
-      let callbackDragStart2 = () => callbackDragStart2Called = true;
-      let callbackDrag1 = () => callbackDrag1Called = true;
-      let callbackDrag2 = () => callbackDrag2Called = true;
-      let callbackDragEnd1 = () => callbackDragEnd1Called = true;
-      let callbackDragEnd2 = () => callbackDragEnd2Called = true;
-
-      dbl.onDragStart(callbackDragStart1);
-      dbl.onDragStart(callbackDragStart2);
-      dbl.onDrag(callbackDrag1);
-      dbl.onDrag(callbackDrag2);
-      dbl.onDragEnd(callbackDragEnd1);
-      dbl.onDragEnd(callbackDragEnd2);
-
-      let target = dbl.background();
-      TestMethods.triggerFakeDragSequence(target, startPoint, endPoint);
-
-      assert.isTrue(callbackDragStart1Called, "the callback 1 for drag start was called");
-      assert.isTrue(callbackDragStart2Called, "the callback 2 for drag start was called");
-      assert.isTrue(callbackDrag1Called, "the callback 1 for drag was called");
-      assert.isTrue(callbackDrag2Called, "the callback 2 for drag was called");
-      assert.isTrue(callbackDragEnd1Called, "the callback 1 for drag end was called");
-      assert.isTrue(callbackDragEnd2Called, "the callback 2 for drag end was called");
-
-      dbl.offDragStart(callbackDragStart1);
-      dbl.offDrag(callbackDrag1);
-      dbl.offDragEnd(callbackDragEnd1);
-
-      callbackDragStart1Called = false;
-      callbackDragStart2Called = false;
-      callbackDrag1Called = false;
-      callbackDrag2Called = false;
-      callbackDragEnd1Called = false;
-      callbackDragEnd2Called = false;
-
-      TestMethods.triggerFakeDragSequence(target, startPoint, endPoint);
-      assert.isFalse(callbackDragStart1Called, "the callback 1 for drag start was disconnected");
-      assert.isTrue(callbackDragStart2Called, "the callback 2 for drag start is still connected");
-      assert.isFalse(callbackDrag1Called, "the callback 1 for drag was called disconnected");
-      assert.isTrue(callbackDrag2Called, "the callback 2 for drag is still connected");
-      assert.isFalse(callbackDragEnd1Called, "the callback 1 for drag end was disconnected");
-      assert.isTrue(callbackDragEnd2Called, "the callback 2 for drag end is still connected");
-
-      svg.remove();
-    });
 
     describe("enabling/disabling", () => {
+
+      let SVG_WIDTH = 400;
+      let SVG_HEIGHT = 400;
+
       it("enabled(boolean) properly modifies the state", () => {
         let svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
         let dbl = new Plottable.Components.DragBoxLayer();
@@ -329,6 +337,10 @@ describe("Interactive Components", () => {
     });
 
     describe("resizing", () => {
+
+      let SVG_WIDTH = 400;
+      let SVG_HEIGHT = 400;
+
       let svg: d3.Selection<void>;
       let dbl: Plottable.Components.DragBoxLayer;
       let target: d3.Selection<void>;
@@ -519,6 +531,10 @@ describe("Interactive Components", () => {
     });
 
     describe("moving", () => {
+
+      let SVG_WIDTH = 400;
+      let SVG_HEIGHT = 400;
+
       let svg: d3.Selection<void>;
       let dbl: Plottable.Components.DragBoxLayer;
       let target: d3.Selection<void>;
