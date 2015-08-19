@@ -11,6 +11,7 @@ export module Components {
     private _padding = 5;
     private _numSwatches = 10;
     private _formatter: Formatter;
+    private _fixedSize: boolean;
 
     private _swatchContainer: d3.Selection<void>;
     private _swatchBoundingBox: d3.Selection<void>;
@@ -43,6 +44,7 @@ export module Components {
       this._scale.onUpdate(this._redrawCallback);
       this._formatter = Formatters.general();
       this._orientation = "horizontal";
+      this._fixedSize = true;
 
       this.addClass("legend");
       this.addClass("interpolated-color-legend");
@@ -69,6 +71,26 @@ export module Components {
         return this._formatter;
       }
       this._formatter = formatter;
+      this.redraw();
+      return this;
+    }
+
+    /**
+     * Gets whether InterpolatedColorLegend is fixed size.
+     */
+    public fixedSize(): boolean;
+    /**
+     * Sets whether InterpolatedColorLegend is fixed size.
+     *
+     * @param {fixed} boolean
+     * @returns {InterpolatedColorLegend} The calling InterpolatedColorLegend.
+     */
+    public fixedSize(fixed: boolean): InterpolatedColorLegend;
+    public fixedSize(fixed?: boolean): any {
+      if (fixed == null) {
+        return this._fixedSize;
+      }
+      this._fixedSize = fixed;
       this.redraw();
       return this;
     }
@@ -104,11 +126,11 @@ export module Components {
     }
 
     public fixedWidth() {
-      return true;
+      return this._fixedSize || this._isVertical();
     }
 
     public fixedHeight() {
-      return true;
+      return this._fixedSize || !this._isVertical();
     }
 
     private _generateTicks() {

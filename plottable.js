@@ -5402,6 +5402,7 @@ var Plottable;
                 this._scale.onUpdate(this._redrawCallback);
                 this._formatter = Plottable.Formatters.general();
                 this._orientation = "horizontal";
+                this._fixedSize = true;
                 this.addClass("legend");
                 this.addClass("interpolated-color-legend");
             }
@@ -5414,6 +5415,14 @@ var Plottable;
                     return this._formatter;
                 }
                 this._formatter = formatter;
+                this.redraw();
+                return this;
+            };
+            InterpolatedColorLegend.prototype.fixedSize = function (fixed) {
+                if (fixed == null) {
+                    return this._fixedSize;
+                }
+                this._fixedSize = fixed;
                 this.redraw();
                 return this;
             };
@@ -5437,10 +5446,10 @@ var Plottable;
                 }
             };
             InterpolatedColorLegend.prototype.fixedWidth = function () {
-                return true;
+                return this._fixedSize || this._isVertical();
             };
             InterpolatedColorLegend.prototype.fixedHeight = function () {
-                return true;
+                return this._fixedSize || !this._isVertical();
             };
             InterpolatedColorLegend.prototype._generateTicks = function () {
                 var domain = this._scale.domain();

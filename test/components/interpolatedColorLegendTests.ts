@@ -3,9 +3,10 @@
 describe("InterpolatedColorLegend", () => {
   let svg: d3.Selection<void>;
   let colorScale: Plottable.Scales.InterpolatedColor;
-
+  let SVG_HEIGNT = 400;
+  let SVG_WIDTH = 400;
   beforeEach(() => {
-    svg = TestMethods.generateSVG(400, 400);
+    svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGNT);
     colorScale = new Plottable.Scales.InterpolatedColor();
   });
 
@@ -185,6 +186,62 @@ describe("InterpolatedColorLegend", () => {
     legend.orientation("left");
     legend.renderTo(svg);
     assertBasicRendering(legend);
+    svg.remove();
+  });
+
+  it("fixed height if fixedSize is set to true or orientation is horizontal", () => {
+    let legend = new Plottable.Components.InterpolatedColorLegend(colorScale);
+    assert.isTrue(legend.fixedHeight(), "height is fixed on default");
+
+    legend.fixedSize(false);
+    assert.isTrue(legend.fixedHeight(), "height is fixed oriented horizontally");
+
+    legend.orientation("left");
+    assert.isFalse(legend.fixedHeight(), "height is not fixed oriented vertically");
+
+    legend.orientation("right");
+    assert.isFalse(legend.fixedHeight(), "height is not fixed oriented vertically");
+
+    legend.fixedSize(true);
+    assert.isTrue(legend.fixedHeight(), "height is fixed when fixedSize is set to true");
+
+    svg.remove();
+  });
+
+  it("fixed width if fixedSize is set to true or orientation is vertically", () => {
+    let legend = new Plottable.Components.InterpolatedColorLegend(colorScale);
+    assert.isTrue(legend.fixedWidth(), "width is fixed on default");
+
+    legend.fixedSize(false);
+    assert.isFalse(legend.fixedWidth(), "width is not fixed oriented horizontally");
+
+    legend.orientation("left");
+    assert.isTrue(legend.fixedWidth(), "width is fixed oriented vertically");
+
+    legend.orientation("right");
+    assert.isTrue(legend.fixedWidth(), "width is fixed oriented vertically");
+
+    legend.fixedSize(true);
+    legend.orientation("horizontal");
+    assert.isTrue(legend.fixedWidth(), "width is fixed when fixedSize is set to true");
+
+    svg.remove();
+  });
+
+  it("spams the entire height if oriented vertically and fixedSize is set to false", () => {
+    let legend = new Plottable.Components.InterpolatedColorLegend(colorScale);
+    legend.orientation("left");
+    legend.fixedSize(false);
+    legend.renderTo(svg);
+    assert.closeTo(legend.height(), SVG_HEIGNT, 0.01, "legend height is the same as svg height");
+    svg.remove();
+  });
+
+  it("spams the entire width if oriented horizontally and fixedSize is set to false", () => {
+    let legend = new Plottable.Components.InterpolatedColorLegend(colorScale);
+    legend.fixedSize(false);
+    legend.renderTo(svg);
+    assert.closeTo(legend.width(), SVG_WIDTH, 0.01, "legend width is the same as svg width");
     svg.remove();
   });
 });
