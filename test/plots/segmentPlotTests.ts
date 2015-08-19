@@ -129,11 +129,16 @@ describe("Plots", () => {
       let svg: d3.Selection<void>;
       let xScale: Plottable.Scales.Linear;
       let yScale: Plottable.Scales.Linear;
+      let plot: Plottable.Plots.Segment<number, number>;
 
       beforeEach(() => {
         svg = TestMethods.generateSVG(500, 500);
         xScale = new Plottable.Scales.Linear();
         yScale = new Plottable.Scales.Linear();
+        plot = new Plottable.Plots.Segment<number, number>()
+          .x((d) => d.x, xScale).x2((d) => d.x2)
+          .y((d) => d.y, yScale).y2((d) => d.y2);
+        plot.addDataset(new Plottable.Dataset(data)).renderTo(svg);
       });
 
       afterEach(() => {
@@ -141,10 +146,6 @@ describe("Plots", () => {
       });
 
       it("retrieves the entities that intersect with the bounding box", () => {
-        let plot = new Plottable.Plots.Segment()
-          .x((d) => d.x, xScale).x2((d) => d.x2)
-          .y((d) => d.y, yScale).y2((d) => d.y2);
-        plot.addDataset(new Plottable.Dataset(data)).renderTo(svg);
         let entities = plot.entitiesIn({
           topLeft: { x: xScale.scale(0), y: yScale.scale(4.5) },
           bottomRight: { x: xScale.scale(2.5), y: yScale.scale(3) } });
@@ -154,10 +155,6 @@ describe("Plots", () => {
       });
 
       it("retrieves the entities that intersect with given ranges", () => {
-        let plot = new Plottable.Plots.Segment()
-          .x((d) => d.x, xScale).x2((d) => d.x2)
-          .y((d) => d.y, yScale).y2((d) => d.y2);
-        plot.addDataset(new Plottable.Dataset(data)).renderTo(svg);
         let entities = plot.entitiesIn(
           { min: xScale.scale(2.5), max: xScale.scale(4.5) },
           { min: yScale.scale(4.5), max: yScale.scale(2.5) });
@@ -167,11 +164,6 @@ describe("Plots", () => {
       });
 
       it("retrieves the entity if exactly one of its endpoints is in the ranges", () => {
-        let plot = new Plottable.Plots.Segment()
-          .x((d) => d.x, xScale).x2((d) => d.x2)
-          .y((d) => d.y, yScale).y2((d) => d.y2);
-        plot.addDataset(new Plottable.Dataset(data)).renderTo(svg);
-
         // vertial segment
         checkEntitiesInRange(plot, 0, 0.5, 1.5, 1.5, 0.5);
         checkEntitiesInRange(plot, 0, 0.5, 1.5, 4.5, 3.5);
@@ -190,11 +182,6 @@ describe("Plots", () => {
       });
 
       it("retrieves the entity if both of its endpoints are in the ranges", () => {
-        let plot = new Plottable.Plots.Segment()
-          .x((d) => d.x, xScale).x2((d) => d.x2)
-          .y((d) => d.y, yScale).y2((d) => d.y2);
-        plot.addDataset(new Plottable.Dataset(data)).renderTo(svg);
-
         // vertial segment
         checkEntitiesInRange(plot, 0, 0.5, 1.5, 4.5, 0.5);
 
@@ -209,11 +196,6 @@ describe("Plots", () => {
       });
 
       it("retrieves the entity if it intersects with the ranges with no endpoints inside", () => {
-        let plot = new Plottable.Plots.Segment()
-          .x((d) => d.x, xScale).x2((d) => d.x2)
-          .y((d) => d.y, yScale).y2((d) => d.y2);
-        plot.addDataset(new Plottable.Dataset(data)).renderTo(svg);
-
         // vertial segment
         checkEntitiesInRange(plot, 0, 0.5, 1.5, 3.5, 1.5);
 
@@ -228,11 +210,6 @@ describe("Plots", () => {
       });
 
       it("returns empty array when no entities intersect with the ranges", () => {
-        let plot = new Plottable.Plots.Segment()
-          .x((d) => d.x, xScale).x2((d) => d.x2)
-          .y((d) => d.y, yScale).y2((d) => d.y2);
-        plot.addDataset(new Plottable.Dataset(data)).renderTo(svg);
-
         let entities = plot.entitiesIn(
           { min: xScale.scale(1.5), max: xScale.scale(2.5) },
           { min: yScale.scale(2.5), max: yScale.scale(1.5) });
