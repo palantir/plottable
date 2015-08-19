@@ -15,7 +15,6 @@ describe("Interactive Components", () => {
       beforeEach(() => {
         svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
         dbl = new Plottable.Components.DragBoxLayer();
-
         quarterPoint = {
           x: SVG_WIDTH / 4,
           y: SVG_HEIGHT / 4
@@ -24,7 +23,6 @@ describe("Interactive Components", () => {
           x: SVG_WIDTH / 2,
           y: SVG_HEIGHT / 2
         };
-
       });
 
       afterEach(() => {
