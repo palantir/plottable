@@ -218,7 +218,7 @@ describe("Interactive Components", () => {
       let SVG_WIDTH = 400;
       let SVG_HEIGHT = 400;
 
-      var svg: d3.Selection<void>;
+      let svg: d3.Selection<void>;
       let dbl: Plottable.Components.DragBoxLayer;
 
       beforeEach(() => {
