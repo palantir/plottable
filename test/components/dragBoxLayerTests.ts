@@ -215,9 +215,11 @@ describe("Interactive Components", () => {
       let SVG_HEIGHT = 400;
 
       var svg: d3.Selection<void>;
+      let dbl: Plottable.Components.DragBoxLayer;
 
       beforeEach(() => {
         svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+        dbl = new Plottable.Components.DragBoxLayer();
       });
 
       afterEach(() => {
@@ -225,14 +227,12 @@ describe("Interactive Components", () => {
       });
 
       it("enabled(boolean) properly modifies the state", () => {
-        let dbl = new Plottable.Components.DragBoxLayer();
         assert.isTrue(dbl.enabled(), "drag box layer is enabled by default");
         assert.strictEqual(dbl.enabled(false), dbl, "enabled(boolean) returns itself");
         assert.isFalse(dbl.enabled(), "drag box layer reports when it is disabled");
       });
 
       it("disables box when enabled(false)", () => {
-        let dbl = new Plottable.Components.DragBoxLayer();
         dbl.enabled(false);
         dbl.renderTo(svg);
         assert.isFalse(dbl.boxVisible(), "box is hidden initially");
@@ -255,7 +255,6 @@ describe("Interactive Components", () => {
       });
 
       it("does not have resizable CSS classes when enabled(false)", () => {
-        let dbl = new Plottable.Components.DragBoxLayer();
         dbl.resizable(true);
         assert.isTrue(dbl.hasClass("x-resizable"), "carries \"x-resizable\" class if resizable");
         assert.isTrue(dbl.hasClass("y-resizable"), "carries \"y-resizable\" class if resizable");
@@ -269,7 +268,6 @@ describe("Interactive Components", () => {
       });
 
       it("does not have movable CSS classe when enabled(false)", () => {
-        let dbl = new Plottable.Components.DragBoxLayer();
         dbl.movable(true);
         assert.isTrue(dbl.hasClass("movable"), "carries \"movable\" class if movable");
         dbl.enabled(false);
