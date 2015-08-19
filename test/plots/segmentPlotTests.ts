@@ -45,8 +45,8 @@ describe("Plots", () => {
         plot.addDataset(new Plottable.Dataset(data));
         plot.renderTo(svg);
 
-        plot.content().selectAll("line")[0].forEach((line) => {
-          let lineSelection = d3.select(line);
+        plot.content().selectAll("line").each(function() {
+          let lineSelection = d3.select(this);
           assert.strictEqual(lineSelection.attr("x1"), lineSelection.attr("x2"), "line is vertical");
         });
         svg.remove();
@@ -60,8 +60,8 @@ describe("Plots", () => {
         plot.addDataset(new Plottable.Dataset(data));
         plot.renderTo(svg);
 
-        plot.content().selectAll("line")[0].forEach((line) => {
-          let lineSelection = d3.select(line);
+        plot.content().selectAll("line").each(function() {
+          let lineSelection = d3.select(this);
           assert.strictEqual(lineSelection.attr("y1"), lineSelection.attr("y2"), "line is horizontal");
         });
         svg.remove();
