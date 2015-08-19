@@ -23,7 +23,6 @@ export module Plots {
     protected _isVertical: boolean;
     private _labelFormatter: Formatter = Formatters.identity();
     private _labelsEnabled = false;
-    private _displayLabelsOffBar = false;
     private _hideBarsIfAnyAreTooWide = true;
     private _labelConfig: Utils.Map<Dataset, LabelConfig>;
     private _baselineValueProvider: () => (X|Y)[];
@@ -186,30 +185,6 @@ export module Plots {
         return this._labelsEnabled;
       } else {
         this._labelsEnabled = enabled;
-        this.render();
-        return this;
-      }
-    }
-
-    /**
-     * Get whether to display labels off the bar
-     *
-     * @returns {boolean} Whether labels should be displayed off the bar
-     */
-    public displayLabelsOffBar(): boolean;
-
-    /**
-     * Sets whether labels are displayed off the bar
-     *
-     * @param {boolean} displayLabelsOffBar
-     * @return {Bar} The calling Bar Plot.
-     */
-    public displayLabelsOffBar(display: boolean): Bar <X, Y>;
-    public displayLabelsOffBar(display?: boolean): any {
-      if (display === undefined) {
-        return this._displayLabelsOffBar;
-      } else {
-        this._displayLabelsOffBar = display;
         this.render();
         return this;
       }
@@ -454,73 +429,69 @@ export module Plots {
         let secondaryAttrTextSpace = this._isVertical ? measurement.width : measurement.height;
         let secondaryAttrAvailableSpace = this._isVertical ? w : h;
         let tooWide = secondaryAttrTextSpace + 2 * Bar._LABEL_HORIZONTAL_PADDING > secondaryAttrAvailableSpace;
-        let showLabelOffBar = this._isVertical ? (measurement.height > h) : (measurement.width > w);
-        if ((measurement.height <= h && measurement.width <= w) || this._displayLabelsOffBar) {
-          let offset = Math.min((primary - primarySpace) / 2, Bar._LABEL_VERTICAL_PADDING);
-          if (!positive) { offset = offset * -1; }
+        let showLabelOffBar = this._isVertical ? (measurement.height > h) : (measurement.width > w)
+        let offset = Math.min((primary - primarySpace) / 2, Bar._LABEL_VERTICAL_PADDING);
+        if (!positive) { offset = offset * -1; }
 
-          let getY = () => {
-            let addend = 0;
-            if (this._isVertical)  {
-                addend += offset;
-                if (showLabelOffBar && positive) {
-                    addend += (offset - h);
-                }
-                if (showLabelOffBar && !positive) {
-                    addend += measurement.height;
-                };
-            }
-            return baselineY + addend;
-          };
-
-          let getX = () => {
-            let addend = 0;
-            if (!this._isVertical)  {
-                addend += offset;
-                if (showLabelOffBar && positive) {
-                    addend += (offset - w - Bar._LABEL_HORIZONTAL_PADDING);
-                }
-                if (showLabelOffBar && !positive) {
-                    addend += measurement.width;
-                };
-            }
-            return baselineX + addend;
-          };
-
-          let x = getX();
-          let y = getY();
-
-          let g = labelArea.append("g").attr("transform", "translate(" + x + "," + y + ")");
-
-          if (this._displayLabelsOffBar) {
-             let labelPositioningClassName = showLabelOffBar ? "off-bar-label" : "on-bar-label";
-             g.classed(labelPositioningClassName, true);
-          } else {
-             let color = attrToProjector["fill"](d, i, dataset);
-             let dark = Utils.Color.contrast("white", color) * 1.6 < Utils.Color.contrast("black", color);
-             g.classed(dark ? "dark-label" : "light-label", true);
+        let getY = () => {
+          let addend = 0;
+          if (this._isVertical)  {
+              addend += offset;
+              if (showLabelOffBar && positive) {
+                  addend += (offset - h);
+              }
+              if (showLabelOffBar && !positive) {
+                  addend += measurement.height;
+              };
           }
+          return baselineY + addend;
+        };
 
-          let hideLabel = (x + measurement.width > this.width() || (positive ? y + measurement.height : y + h) > this.height());
-
-          g.style("visibility", hideLabel ? "hidden" : "inherit");
-          let xAlign: string;
-          let yAlign: string;
-          if (this._isVertical) {
-            xAlign = "center";
-            yAlign = positive ? "top" : "bottom";
-          } else {
-            xAlign = positive ? "left" : "right";
-            yAlign = "center";
+        let getX = () => {
+          let addend = 0;
+          if (!this._isVertical)  {
+              addend += offset;
+              if (showLabelOffBar && positive) {
+                  addend += (offset - w - Bar._LABEL_HORIZONTAL_PADDING);
+              }
+              if (showLabelOffBar && !positive) {
+                  addend += measurement.width;
+              };
           }
-          let writeOptions = {
-              selection: g,
-              xAlign: xAlign,
-              yAlign: yAlign,
-              textRotation: 0
-          };
-          writer.write(text, w, h, writeOptions);
+          return baselineX + addend;
+        };
+
+        let x = getX();
+        let y = getY();
+
+        let g = labelArea.append("g").attr("transform", "translate(" + x + "," + y + ")");
+
+        let labelPositioningClassName = showLabelOffBar ? "off-bar-label" : "on-bar-label";
+        g.classed(labelPositioningClassName, true);
+
+        let color = attrToProjector["fill"](d, i, dataset);
+        let dark = Utils.Color.contrast("white", color) * 1.6 < Utils.Color.contrast("black", color);
+        g.classed(dark ? "dark-label" : "light-label", true);
+
+        let hideLabel = (x + measurement.width > this.width() || (positive ? y + measurement.height : y + h) > this.height());
+
+        g.style("visibility", hideLabel ? "hidden" : "inherit");
+        let xAlign: string;
+        let yAlign: string;
+        if (this._isVertical) {
+          xAlign = "center";
+          yAlign = positive ? "top" : "bottom";
+        } else {
+          xAlign = positive ? "left" : "right";
+          yAlign = "center";
         }
+        let writeOptions = {
+            selection: g,
+            xAlign: xAlign,
+            yAlign: yAlign,
+            textRotation: 0
+        };
+        writer.write(text, w, h, writeOptions);
         return tooWide;
       });
       return labelTooWide.some((d: boolean) => d);

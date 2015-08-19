@@ -7615,7 +7615,6 @@ var Plottable;
                 _super.call(this);
                 this._labelFormatter = Plottable.Formatters.identity();
                 this._labelsEnabled = false;
-                this._displayLabelsOffBar = false;
                 this._hideBarsIfAnyAreTooWide = true;
                 this._barPixelWidth = 0;
                 this.addClass("bar-plot");
@@ -7718,16 +7717,6 @@ var Plottable;
                 }
                 else {
                     this._labelsEnabled = enabled;
-                    this.render();
-                    return this;
-                }
-            };
-            Bar.prototype.displayLabelsOffBar = function (display) {
-                if (display === undefined) {
-                    return this._displayLabelsOffBar;
-                }
-                else {
-                    this._displayLabelsOffBar = display;
                     this.render();
                     return this;
                 }
@@ -7928,71 +7917,65 @@ var Plottable;
                     var secondaryAttrAvailableSpace = _this._isVertical ? w : h;
                     var tooWide = secondaryAttrTextSpace + 2 * Bar._LABEL_HORIZONTAL_PADDING > secondaryAttrAvailableSpace;
                     var showLabelOffBar = _this._isVertical ? (measurement.height > h) : (measurement.width > w);
-                    if ((measurement.height <= h && measurement.width <= w) || _this._displayLabelsOffBar) {
-                        var offset = Math.min((primary - primarySpace) / 2, Bar._LABEL_VERTICAL_PADDING);
-                        if (!positive) {
-                            offset = offset * -1;
-                        }
-                        var getY = function () {
-                            var addend = 0;
-                            if (_this._isVertical) {
-                                addend += offset;
-                                if (showLabelOffBar && positive) {
-                                    addend += (offset - h);
-                                }
-                                if (showLabelOffBar && !positive) {
-                                    addend += measurement.height;
-                                }
-                                ;
-                            }
-                            return baselineY + addend;
-                        };
-                        var getX = function () {
-                            var addend = 0;
-                            if (!_this._isVertical) {
-                                addend += offset;
-                                if (showLabelOffBar && positive) {
-                                    addend += (offset - w - Bar._LABEL_HORIZONTAL_PADDING);
-                                }
-                                if (showLabelOffBar && !positive) {
-                                    addend += measurement.width;
-                                }
-                                ;
-                            }
-                            return baselineX + addend;
-                        };
-                        var x = getX();
-                        var y = getY();
-                        var g = labelArea.append("g").attr("transform", "translate(" + x + "," + y + ")");
-                        if (_this._displayLabelsOffBar) {
-                            var labelPositioningClassName = showLabelOffBar ? "off-bar-label" : "on-bar-label";
-                            g.classed(labelPositioningClassName, true);
-                        }
-                        else {
-                            var color = attrToProjector["fill"](d, i, dataset);
-                            var dark = Plottable.Utils.Color.contrast("white", color) * 1.6 < Plottable.Utils.Color.contrast("black", color);
-                            g.classed(dark ? "dark-label" : "light-label", true);
-                        }
-                        var hideLabel = (x + measurement.width > _this.width() || (positive ? y + measurement.height : y + h) > _this.height());
-                        g.style("visibility", hideLabel ? "hidden" : "inherit");
-                        var xAlign;
-                        var yAlign;
-                        if (_this._isVertical) {
-                            xAlign = "center";
-                            yAlign = positive ? "top" : "bottom";
-                        }
-                        else {
-                            xAlign = positive ? "left" : "right";
-                            yAlign = "center";
-                        }
-                        var writeOptions = {
-                            selection: g,
-                            xAlign: xAlign,
-                            yAlign: yAlign,
-                            textRotation: 0
-                        };
-                        writer.write(text, w, h, writeOptions);
+                    var offset = Math.min((primary - primarySpace) / 2, Bar._LABEL_VERTICAL_PADDING);
+                    if (!positive) {
+                        offset = offset * -1;
                     }
+                    var getY = function () {
+                        var addend = 0;
+                        if (_this._isVertical) {
+                            addend += offset;
+                            if (showLabelOffBar && positive) {
+                                addend += (offset - h);
+                            }
+                            if (showLabelOffBar && !positive) {
+                                addend += measurement.height;
+                            }
+                            ;
+                        }
+                        return baselineY + addend;
+                    };
+                    var getX = function () {
+                        var addend = 0;
+                        if (!_this._isVertical) {
+                            addend += offset;
+                            if (showLabelOffBar && positive) {
+                                addend += (offset - w - Bar._LABEL_HORIZONTAL_PADDING);
+                            }
+                            if (showLabelOffBar && !positive) {
+                                addend += measurement.width;
+                            }
+                            ;
+                        }
+                        return baselineX + addend;
+                    };
+                    var x = getX();
+                    var y = getY();
+                    var g = labelArea.append("g").attr("transform", "translate(" + x + "," + y + ")");
+                    var labelPositioningClassName = showLabelOffBar ? "off-bar-label" : "on-bar-label";
+                    g.classed(labelPositioningClassName, true);
+                    var color = attrToProjector["fill"](d, i, dataset);
+                    var dark = Plottable.Utils.Color.contrast("white", color) * 1.6 < Plottable.Utils.Color.contrast("black", color);
+                    g.classed(dark ? "dark-label" : "light-label", true);
+                    var hideLabel = (x + measurement.width > _this.width() || (positive ? y + measurement.height : y + h) > _this.height());
+                    g.style("visibility", hideLabel ? "hidden" : "inherit");
+                    var xAlign;
+                    var yAlign;
+                    if (_this._isVertical) {
+                        xAlign = "center";
+                        yAlign = positive ? "top" : "bottom";
+                    }
+                    else {
+                        xAlign = positive ? "left" : "right";
+                        yAlign = "center";
+                    }
+                    var writeOptions = {
+                        selection: g,
+                        xAlign: xAlign,
+                        yAlign: yAlign,
+                        textRotation: 0
+                    };
+                    writer.write(text, w, h, writeOptions);
                     return tooWide;
                 });
                 return labelTooWide.some(function (d) { return d; });
