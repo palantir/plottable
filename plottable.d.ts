@@ -4406,3 +4406,15 @@ declare module Plottable {
         }
     }
 }
+
+
+declare module Plottable {
+    module Components {
+        class DragLineLayer<D> extends GuideLineLayer<D> {
+            detectionRadius(): number;
+            detectionRadius(r: number): DragLineLayer<D>;
+            enabled(): boolean;
+            enabled(enabled: boolean): DragLineLayer<D>;
+        }
+    }
+}

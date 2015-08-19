@@ -11464,6 +11464,32 @@ var Plottable;
     })(Components = Plottable.Components || (Plottable.Components = {}));
 })(Plottable || (Plottable = {}));
 
+///<reference path="../reference.ts" />
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var Plottable;
+(function (Plottable) {
+    var Components;
+    (function (Components) {
+        var DragLineLayer = (function (_super) {
+            __extends(DragLineLayer, _super);
+            function DragLineLayer() {
+                _super.apply(this, arguments);
+            }
+            DragLineLayer.prototype.detectionRadius = function (r) {
+            };
+            DragLineLayer.prototype.enabled = function (enabled) {
+            };
+            return DragLineLayer;
+        })(Components.GuideLineLayer);
+        Components.DragLineLayer = DragLineLayer;
+    })(Components = Plottable.Components || (Plottable.Components = {}));
+})(Plottable || (Plottable = {}));
+
 /*!
 SVG Typewriter 0.3.0 (https://github.com/palantir/svg-typewriter)
 Copyright 2014 Palantir Technologies
