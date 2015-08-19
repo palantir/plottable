@@ -14,7 +14,7 @@ describe("Plots", () => {
       ];
       let VERIFY_CELLS = (cells: d3.Selection<any>) => {
         assert.strictEqual(cells[0].length, 5);
-        cells.each(function(d: any, i: number) {
+        cells.each(function(d, i) {
           let cell = d3.select(this);
           assert.closeTo(+cell.attr("height"), 50, 0.5, "Cell height is correct");
           assert.closeTo(+cell.attr("width"), 50, 0.5, "Cell width is correct");
@@ -23,10 +23,19 @@ describe("Plots", () => {
         });
       };
 
+      let svg: d3.Selection<void>;
+
+      beforeEach(() => {
+        svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+      });
+
+      afterEach(() => {
+        svg.remove();
+      });
+
       it("renders correctly", () => {
         let xScale = new Plottable.Scales.Linear();
         let yScale = new Plottable.Scales.Linear();
-        let svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
         let rectanglePlot = new Plottable.Plots.Rectangle();
         rectanglePlot.addDataset(new Plottable.Dataset(DATA));
         rectanglePlot.x((d) => d.x, xScale)
@@ -35,13 +44,11 @@ describe("Plots", () => {
                      .y2((d) => d.y2)
                      .renderTo(svg);
         VERIFY_CELLS((<any> rectanglePlot)._renderArea.selectAll("rect"));
-        svg.remove();
       });
 
       it("retrieves the correct entity under a point", () => {
         let xScale = new Plottable.Scales.Linear();
         let yScale = new Plottable.Scales.Linear();
-        let svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
         let dataset = new Plottable.Dataset(DATA);
         let plot = new Plottable.Plots.Rectangle()
           .x((d) => d.x, xScale).x2((d) => d.x2)
@@ -50,13 +57,11 @@ describe("Plots", () => {
         let entities = plot.entitiesAt({ x: xScale.scale(2.5), y: yScale.scale(2.5) });
         assert.lengthOf(entities, 1, "found only one entity when querying a point inside the third rectangle");
         assert.strictEqual(entities[0].index, 2, "entity retrieved is at index 2");
-        svg.remove();
       });
 
       it("retrieves correct entities under a point", () => {
         let xScale = new Plottable.Scales.Linear();
         let yScale = new Plottable.Scales.Linear();
-        let svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
         let dataset = new Plottable.Dataset([
           { x: 1, y: 1, x2: 3, y2: 3 },
           { x: 4, y: 2, x2: 2, y2: 4 }
@@ -75,13 +80,11 @@ describe("Plots", () => {
         entities = plot.entitiesAt({ x: xScale.scale(1), y: yScale.scale(1) });
         assert.lengthOf(entities, 1, "found only one entity when querying a point inside the first rectangle");
         assert.strictEqual(entities[0].index, 0, "entity retrieved is at index 0");
-        svg.remove();
       });
 
       it("retrieves the entities that intersect with the bounding box", () => {
         let xScale = new Plottable.Scales.Linear();
         let yScale = new Plottable.Scales.Linear();
-        let svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
         let dataset = new Plottable.Dataset(DATA);
         let plot = new Plottable.Plots.Rectangle()
           .x((d) => d.x, xScale).x2((d) => d.x2)
@@ -94,13 +97,11 @@ describe("Plots", () => {
         assert.lengthOf(entities, 2, "retrieved 2 entities intersect with the box");
         assert.strictEqual(entities[0].index, 1, "the entity of index 1 is retrieved");
         assert.strictEqual(entities[1].index, 2, "the entity of index 2 is retrieved");
-        svg.remove();
       });
 
       it("retrieves the entities that intersect with the given ranges", () => {
         let xScale = new Plottable.Scales.Linear();
         let yScale = new Plottable.Scales.Linear();
-        let svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
         let dataset = new Plottable.Dataset(DATA);
         let plot = new Plottable.Plots.Rectangle()
           .x((d) => d.x, xScale).x2((d) => d.x2)
@@ -113,6 +114,21 @@ describe("Plots", () => {
         assert.lengthOf(entities, 2, "retrieved 2 entities intersect with the box");
         assert.strictEqual(entities[0].index, 1, "the entity of index 1 is retrieved");
         assert.strictEqual(entities[1].index, 2, "the entity of index 2 is retrieved");
+      });
+
+    });
+
+    describe("RectanglePlot - autorangeMode()", () => {
+      let SVG_WIDTH = 300;
+      let SVG_HEIGHT = 300;
+
+      let svg: d3.Selection<void>;
+
+      beforeEach(() => {
+        svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+      });
+
+      afterEach(() => {
         svg.remove();
       });
 
@@ -132,7 +148,6 @@ describe("Plots", () => {
         plot.y(function(d) { return d.y; }, yScale);
         plot.addDataset(new Plottable.Dataset(staggeredData));
         plot.autorangeMode("x");
-        let svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
         plot.renderTo(svg);
 
         assert.deepEqual(xScale.domain(), [0, 2], "y domain includes both visible segments");
@@ -143,7 +158,6 @@ describe("Plots", () => {
         yScale.domain(["B"]);
         assert.deepEqual(xScale.domain(), [1, 2], "y domain includes only the visible segment (second)");
 
-        svg.remove();
       });
 
       it("autorangeMode(\"y\")", () => {
@@ -162,7 +176,6 @@ describe("Plots", () => {
         plot.y2(function(d) { return d.y2; });
         plot.addDataset(new Plottable.Dataset(staggeredData));
         plot.autorangeMode("y");
-        let svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
         plot.renderTo(svg);
 
         assert.deepEqual(yScale.domain(), [0, 2], "y domain includes both visible segments");
@@ -173,7 +186,6 @@ describe("Plots", () => {
         xScale.domain(["B"]);
         assert.deepEqual(yScale.domain(), [1, 2], "y domain includes only the visible segment (second)");
 
-        svg.remove();
       });
     });
 
