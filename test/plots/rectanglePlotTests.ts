@@ -30,9 +30,9 @@ describe("Plots", () => {
         svg = TestMethods.generateSVG(300, 300);
         xScale = new Plottable.Scales.Linear();
         yScale = new Plottable.Scales.Linear();
-        plot = new Plottable.Plots.Rectangle<number, number>()
-          .x((d) => d.x, xScale).x2((d) => d.x2)
-          .y((d) => d.y, yScale).y2((d) => d.y2);
+        plot = new Plottable.Plots.Rectangle<number, number>();
+        plot.x((d) => d.x, xScale).x2((d) => d.x2);
+        plot.y((d) => d.y, yScale).y2((d) => d.y2);
       });
 
       afterEach(() => {
@@ -47,7 +47,7 @@ describe("Plots", () => {
       });
 
       it("retrieves the correct entity under a point", () => {
-        plot.addDataset(new Plottable.Dataset(DATA))
+        plot.addDataset(new Plottable.Dataset(DATA));
         plot.renderTo(svg);
 
         let entities = plot.entitiesAt({ x: xScale.scale(2.5), y: yScale.scale(2.5) });
@@ -60,7 +60,7 @@ describe("Plots", () => {
           { x: 1, y: 1, x2: 3, y2: 3 },
           { x: 4, y: 2, x2: 2, y2: 4 }
         ]);
-        plot.addDataset(dataset)
+        plot.addDataset(dataset);
         plot.renderTo(svg);
 
         let entities = plot.entitiesAt({ x: xScale.scale(2), y: xScale.scale(2) });
@@ -76,7 +76,7 @@ describe("Plots", () => {
       });
 
       it("retrieves the entities that intersect with the bounding box", () => {
-        plot.addDataset(new Plottable.Dataset(DATA))
+        plot.addDataset(new Plottable.Dataset(DATA));
         plot.renderTo(svg);
 
         let entities = plot.entitiesIn({
@@ -88,7 +88,7 @@ describe("Plots", () => {
       });
 
       it("retrieves the entities that intersect with the given ranges", () => {
-        plot.addDataset(new Plottable.Dataset(DATA))
+        plot.addDataset(new Plottable.Dataset(DATA));
         plot.renderTo(svg);
 
         let entities = plot.entitiesIn(
@@ -185,10 +185,9 @@ describe("Plots", () => {
         let yScale = new Plottable.Scales.Linear();
 
         let plot = new Plottable.Plots.Rectangle();
-        plot
-          .x((d: any) => d.x, xScale)
-          .y((d: any) => d.y, yScale)
-          .y2((d: any) => d.y2);
+        plot.x((d: any) => d.x, xScale);
+        plot.y((d: any) => d.y, yScale);
+        plot.y2((d: any) => d.y2);
         plot.addDataset(new Plottable.Dataset(data1));
 
         plot.renderTo(svg);
@@ -276,9 +275,9 @@ describe("Plots", () => {
 
       it("renders correctly", () => {
         let plot = new Plottable.Plots.Rectangle();
-        plot.addDataset(new Plottable.Dataset(DATA))
+        plot.addDataset(new Plottable.Dataset(DATA));
         plot.attr("fill", (d) => d.magnitude, colorScale);
-        plot.x((d: any) => d.x, xScale)
+        plot.x((d: any) => d.x, xScale);
         plot.y((d: any) => d.y, yScale);
         plot.renderTo(svg);
         VERIFY_CELLS((<any> plot)._renderArea.selectAll("rect")[0]);
@@ -289,8 +288,8 @@ describe("Plots", () => {
         let plot = new Plottable.Plots.Rectangle();
         plot.addDataset(dataset)
         plot.attr("fill", (d) => d.magnitude, colorScale);
-        plot.x((d: any) => d.x, xScale)
-        plot.y((d: any) => d.y, yScale)
+        plot.x((d: any) => d.x, xScale);
+        plot.y((d: any) => d.y, yScale);
         plot.renderTo(svg);
         dataset.data(DATA);
         VERIFY_CELLS((<any> plot)._renderArea.selectAll("rect")[0]);
@@ -301,10 +300,10 @@ describe("Plots", () => {
         let CELL_WIDTH = 100;
         let dataset = new Plottable.Dataset();
         let plot = new Plottable.Plots.Rectangle();
-        plot.addDataset(dataset)
+        plot.addDataset(dataset);
         plot.attr("fill", (d) => d.magnitude, colorScale);
-        plot.x((d: any) => d.x, xScale)
-        plot.y((d: any) => d.y, yScale)
+        plot.x((d: any) => d.x, xScale);
+        plot.y((d: any) => d.y, yScale);
         plot.renderTo(svg);
         let data = [
           {x: "A", y: "W", magnitude: 0},
@@ -326,10 +325,10 @@ describe("Plots", () => {
 
       it("can invert y axis correctly", () => {
         let plot = new Plottable.Plots.Rectangle();
-        plot.addDataset(new Plottable.Dataset(DATA))
+        plot.addDataset(new Plottable.Dataset(DATA));
         plot.attr("fill", (d) => d.magnitude, colorScale);
-        plot.x((d: any) => d.x, xScale)
-        plot.y((d: any) => d.y, yScale)
+        plot.x((d: any) => d.x, xScale);
+        plot.y((d: any) => d.y, yScale);
         plot.renderTo(svg);
 
         yScale.domain(["U", "V"]);
@@ -369,60 +368,52 @@ describe("Plots", () => {
         {x: "B", y: "V", magnitude: 8},
       ];
 
-      it("retrieves all selections with no args", () => {
-        let xScale = new Plottable.Scales.Category();
-        let yScale = new Plottable.Scales.Category();
-        let colorScale = new Plottable.Scales.InterpolatedColor();
+      let svg: d3.Selection<void>;
+      let xScale: Plottable.Scales.Category;
+      let yScale: Plottable.Scales.Category;
+      let colorScale: Plottable.Scales.InterpolatedColor;
+      let plot: Plottable.Plots.Rectangle<string, string>;
+
+      beforeEach(() => {
+        svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+        xScale = new Plottable.Scales.Category();
+        yScale = new Plottable.Scales.Category();
+        colorScale = new Plottable.Scales.InterpolatedColor();
         colorScale.range(["black", "white"]);
-        let svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
-        let plot = new Plottable.Plots.Rectangle();
+
+        plot = new Plottable.Plots.Rectangle<string, string>();
+        plot.attr("fill", (d) => d.magnitude, colorScale);
+        plot.x((d: any) => d.x, xScale);
+        plot.y((d: any) => d.y, yScale);
+      });
+
+      afterEach(() => {
+        svg.remove();
+      });
+
+      it("retrieves all selections with no args", () => {
         let dataset = new Plottable.Dataset(DATA);
-        plot.addDataset(dataset)
-                .attr("fill", (d) => d.magnitude, colorScale);
-        plot.x((d: any) => d.x, xScale)
-                .y((d: any) => d.y, yScale);
+        plot.addDataset(dataset);
         plot.renderTo(svg);
 
         let allCells = plot.selections();
         assert.strictEqual(allCells.size(), 4, "all cells retrieved");
-
-        svg.remove();
       });
 
       it("retrieves correct selections", () => {
-        let xScale = new Plottable.Scales.Category();
-        let yScale = new Plottable.Scales.Category();
-        let colorScale = new Plottable.Scales.InterpolatedColor();
-        colorScale.range(["black", "white"]);
-        let svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
-        let plot = new Plottable.Plots.Rectangle();
         let dataset = new Plottable.Dataset(DATA);
-        plot.addDataset(dataset)
-                .attr("fill", (d) => d.magnitude, colorScale);
-        plot.x((d: any) => d.x, xScale)
-                .y((d: any) => d.y, yScale);
+        plot.addDataset(dataset);
         plot.renderTo(svg);
 
         let allCells = plot.selections([dataset]);
         assert.strictEqual(allCells.size(), 4, "all cells retrieved");
         let selectionData = allCells.data();
         assert.includeMembers(selectionData, DATA, "data in selection data");
-
-        svg.remove();
       });
 
       it("skips invalid Datasets", () => {
-        let xScale = new Plottable.Scales.Category();
-        let yScale = new Plottable.Scales.Category();
-        let colorScale = new Plottable.Scales.InterpolatedColor();
-        colorScale.range(["black", "white"]);
-        let svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
-        let plot = new Plottable.Plots.Rectangle();
         let dataset = new Plottable.Dataset(DATA);
-        plot.addDataset(dataset)
-          .attr("fill", (d) => d.magnitude, colorScale);
-         plot.x((d: any) => d.x, xScale)
-          .y((d: any) => d.y, yScale);
+        plot.addDataset(dataset);
         plot.renderTo(svg);
 
         let dummyDataset = new Plottable.Dataset([]);
@@ -430,8 +421,6 @@ describe("Plots", () => {
         assert.strictEqual(allCells.size(), 4, "all cells retrieved");
         let selectionData = allCells.data();
         assert.includeMembers(selectionData, DATA, "data in selection data");
-
-        svg.remove();
       });
     });
   });
