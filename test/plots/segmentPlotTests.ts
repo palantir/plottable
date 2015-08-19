@@ -20,6 +20,10 @@ describe("Plots", () => {
         yScale = new Plottable.Scales.Linear();
       });
 
+      afterEach(() => {
+        svg.remove();
+      });
+
       it("renders a line properly", () => {
         let plot = new Plottable.Plots.Segment();
         plot.x((d) => d.x, xScale);
@@ -34,7 +38,6 @@ describe("Plots", () => {
         assert.strictEqual(+lineSelection.attr("x2"), 437.5, "x2 is correct");
         assert.strictEqual(+lineSelection.attr("y1"), 437.5, "y1 is correct");
         assert.strictEqual(+lineSelection.attr("y2"), 62.5, "y2 is correct");
-        svg.remove();
       });
 
       it("renders vertical lines when x2 is not set", () => {
@@ -46,10 +49,9 @@ describe("Plots", () => {
         plot.renderTo(svg);
         renderArea = (<any> plot)._renderArea;
         renderArea.selectAll("line")[0].forEach((line) => {
-        let lineSelection = d3.select(line);
-        assert.strictEqual(lineSelection.attr("x1"), lineSelection.attr("x2"), "line is vertical");
+          let lineSelection = d3.select(line);
+          assert.strictEqual(lineSelection.attr("x1"), lineSelection.attr("x2"), "line is vertical");
         });
-        svg.remove();
       });
 
       it("renders horizontal lines when y2 is not set", () => {
@@ -61,10 +63,9 @@ describe("Plots", () => {
         plot.renderTo(svg);
         renderArea = (<any> plot)._renderArea;
         renderArea.selectAll("line")[0].forEach((line) => {
-        let lineSelection = d3.select(line);
-        assert.strictEqual(lineSelection.attr("y1"), lineSelection.attr("y2"), "line is horizontal");
+          let lineSelection = d3.select(line);
+          assert.strictEqual(lineSelection.attr("y1"), lineSelection.attr("y2"), "line is horizontal");
         });
-        svg.remove();
       });
 
       it("autorangeMode(\"x\")", () => {
@@ -90,8 +91,6 @@ describe("Plots", () => {
 
         yScale.domain([0.5, 1.5]);
         assert.deepEqual(xScale.domain(), [1, 2], "y domain includes only the visible segment (second)");
-
-        svg.remove();
       });
 
       it("autorangeMode(\"y\")", () => {
@@ -117,12 +116,10 @@ describe("Plots", () => {
 
         xScale.domain([0.5, 1.5]);
         assert.deepEqual(yScale.domain(), [1, 2], "y domain includes only the visible segment (second)");
-
-        svg.remove();
       });
     });
 
-    describe("entitiesIn() returns segments that intersect with the given constraints", () => {
+    describe("SegmentPlot - entitiesIn()", () => {
       let data = [
         { x: 1, x2: 1, y: 1, y2: 4 },
         { x: 2, x2: 3, y: 4, y2: 3 },
@@ -139,6 +136,10 @@ describe("Plots", () => {
         yScale = new Plottable.Scales.Linear();
       });
 
+      afterEach(() => {
+        svg.remove();
+      });
+
       it("retrieves the entities that intersect with the bounding box", () => {
         let plot = new Plottable.Plots.Segment()
           .x((d) => d.x, xScale).x2((d) => d.x2)
@@ -150,7 +151,6 @@ describe("Plots", () => {
         assert.lengthOf(entities, 2, "retrieved 2 entities intersect with the box");
         assert.strictEqual(entities[0].index, 0, "the entity of index 0 is retrieved");
         assert.strictEqual(entities[1].index, 1, "the entity of index 1 is retrieved");
-        svg.remove();
       });
 
       it("retrieves the entities that intersect with given ranges", () => {
@@ -164,7 +164,6 @@ describe("Plots", () => {
         assert.lengthOf(entities, 2, "retrieved 2 entities intersect with the ranges");
         assert.strictEqual(entities[0].index, 1, "the entity of index 1 is retrieved");
         assert.strictEqual(entities[1].index, 2, "the entity of index 2 is retrieved");
-        svg.remove();
       });
 
       it("retrieves the entity if exactly one of its endpoints is in the ranges", () => {
@@ -188,8 +187,6 @@ describe("Plots", () => {
         // horizontal segment
         checkEntitiesInRange(plot, 3, 1.5, 2.5, 1.5, 0.5);
         checkEntitiesInRange(plot, 3, 3.5, 4.5, 1.5, 0.5);
-
-        svg.remove();
       });
 
       it("retrieves the entity if both of its endpoints are in the ranges", () => {
@@ -209,8 +206,6 @@ describe("Plots", () => {
 
         // horizontal segment
         checkEntitiesInRange(plot, 3, 1.5, 4.5, 1.5, 0.5);
-
-        svg.remove();
       });
 
       it("retrieves the entity if it intersects with the ranges with no endpoints inside", () => {
@@ -230,8 +225,6 @@ describe("Plots", () => {
 
         // horizontal segment
         checkEntitiesInRange(plot, 3, 2.5, 3.5, 1.5, 0.5);
-
-        svg.remove();
       });
 
       it("returns empty array when no entities intersect with the ranges", () => {
@@ -244,8 +237,6 @@ describe("Plots", () => {
           { min: xScale.scale(1.5), max: xScale.scale(2.5) },
           { min: yScale.scale(2.5), max: yScale.scale(1.5) });
         assert.lengthOf(entities, 0, "no entities intersects with the ranges");
-
-        svg.remove();
       });
 
       function checkEntitiesInRange(plot: Plottable.Plots.Segment<any, any>, index: number,
