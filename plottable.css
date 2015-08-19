@@ -79,11 +79,7 @@ svg.plottable {
 }
 
 .plottable .off-bar-label text {
-  fill: #5279c7;
-}
-
-.plottable .on-bar-label text {
-  fill: white;
+  fill: #32313F;
 }
 
 .plottable .axis-label text {
