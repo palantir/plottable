@@ -3,8 +3,6 @@
 describe("Plots", () => {
   describe("RectanglePlot", () => {
     describe("RectanglePlot - basics", () => {
-      let SVG_WIDTH = 300;
-      let SVG_HEIGHT = 300;
       let DATA = [
         { x: 0, y: 0, x2: 1, y2: 1 },
         { x: 1, y: 1, x2: 2, y2: 2 },
@@ -29,7 +27,7 @@ describe("Plots", () => {
       let plot: Plottable.Plots.Rectangle<number, number>;
 
       beforeEach(() => {
-        svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+        svg = TestMethods.generateSVG(300, 300);
         xScale = new Plottable.Scales.Linear();
         yScale = new Plottable.Scales.Linear();
         plot = new Plottable.Plots.Rectangle<number, number>()
@@ -44,12 +42,14 @@ describe("Plots", () => {
       it("renders correctly", () => {
         plot.addDataset(new Plottable.Dataset(DATA));
         plot.renderTo(svg);
+
         VERIFY_CELLS((<any> plot)._renderArea.selectAll("rect"));
       });
 
       it("retrieves the correct entity under a point", () => {
         plot.addDataset(new Plottable.Dataset(DATA))
         plot.renderTo(svg);
+
         let entities = plot.entitiesAt({ x: xScale.scale(2.5), y: yScale.scale(2.5) });
         assert.lengthOf(entities, 1, "found only one entity when querying a point inside the third rectangle");
         assert.strictEqual(entities[0].index, 2, "entity retrieved is at index 2");
@@ -101,13 +101,10 @@ describe("Plots", () => {
     });
 
     describe("RectanglePlot - autorangeMode()", () => {
-      let SVG_WIDTH = 300;
-      let SVG_HEIGHT = 300;
-
       let svg: d3.Selection<void>;
 
       beforeEach(() => {
-        svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+        svg = TestMethods.generateSVG(300, 300);
       });
 
       afterEach(() => {
@@ -125,9 +122,9 @@ describe("Plots", () => {
         xScale.padProportion(0);
 
         let plot = new Plottable.Plots.Rectangle();
-        plot.x(function(d) { return d.x; }, xScale);
-        plot.x2(function(d) { return d.x2; });
-        plot.y(function(d) { return d.y; }, yScale);
+        plot.x((d) => d.x, xScale);
+        plot.x2((d) => d.x2);
+        plot.y((d) => d.y, yScale);
         plot.addDataset(new Plottable.Dataset(staggeredData));
         plot.autorangeMode("x");
         plot.renderTo(svg);
@@ -153,9 +150,9 @@ describe("Plots", () => {
         yScale.padProportion(0);
 
         let plot = new Plottable.Plots.Rectangle();
-        plot.x(function(d) { return d.x; }, xScale);
-        plot.y(function(d) { return d.y; }, yScale);
-        plot.y2(function(d) { return d.y2; });
+        plot.x((d) => d.x, xScale);
+        plot.y((d) => d.y, yScale);
+        plot.y2((d) => d.y2);
         plot.addDataset(new Plottable.Dataset(staggeredData));
         plot.autorangeMode("y");
         plot.renderTo(svg);
