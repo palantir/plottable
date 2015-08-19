@@ -288,18 +288,23 @@ export class Axis<D> extends Component {
         break;
     }
 
+    let isHorizontal = this._isHorizontal();
     bindElements(this._annotationContainer.select(".annotation-line-container"), "line", "annotation-line")
-      .attr(this._isHorizontal() ? "x1" : "y1", positionF)
-      .attr(this._isHorizontal() ? "x2" : "y2", positionF)
-      .attr(this._isHorizontal() ? "y1" : "x1", secondaryPosition)
-      .attr(this._isHorizontal() ? "y2" : "x2", offsetF)
-      .attr("visibility", visibilityF);
+      .attr({
+        x1: isHorizontal ? positionF : secondaryPosition,
+        x2: isHorizontal ? positionF : offsetF,
+        y1: isHorizontal ? secondaryPosition : positionF,
+        y2: isHorizontal ? offsetF : positionF,
+        visibility: visibilityF
+      });
 
     bindElements(this._annotationContainer.select(".annotation-circle-container"), "circle", "annotation-circle")
-      .attr(this._isHorizontal() ? "cx" : "cy", positionF)
-      .attr(this._isHorizontal() ? "cy" : "cx", secondaryPosition)
-      .attr("r", 3)
-      .attr("visibility", visibilityF);
+      .attr({
+        cx: isHorizontal ? positionF : secondaryPosition,
+        cy: isHorizontal ? secondaryPosition : positionF,
+        r: 3,
+        visibility: visibilityF
+      });
 
     let rectangleOffsetF = (d: D) => {
       switch (this.orientation()) {
@@ -312,22 +317,25 @@ export class Axis<D> extends Component {
       }
     };
     bindElements(this._annotationContainer.select(".annotation-rect-container"), "rect", "annotation-rect")
-      .attr(this._isHorizontal() ? "x" : "y", positionF)
-      .attr(this._isHorizontal() ? "y" : "x", rectangleOffsetF)
-      .attr(this._isHorizontal() ? "width" : "height", (d) => measurements.get(d).width)
-      .attr(this._isHorizontal() ? "height" : "width", (d) => measurements.get(d).height)
-      .attr("visibility", visibilityF);
+      .attr({
+        x: isHorizontal ? positionF : rectangleOffsetF,
+        y: isHorizontal ? rectangleOffsetF : positionF,
+        width: isHorizontal ? (d) => measurements.get(d).width : (d) => measurements.get(d).height,
+        height: isHorizontal ? (d) => measurements.get(d).height : (d) => measurements.get(d).width,
+        visibility: visibilityF
+      })
 
     let annotationWriter = this._annotationWriter;
     let annotationFormatter = this.annotationFormatter();
-    let isHorizontal = this._isHorizontal();
     bindElements(this._annotationContainer.select(".annotation-label-container"), "g", "annotation-label")
-      .attr("transform", (d) => {
-        let xTranslate = this._isHorizontal() ? positionF(d) : rectangleOffsetF(d);
-        let yTranslate = this._isHorizontal() ? rectangleOffsetF(d) : positionF(d);
-        return "translate(" + xTranslate + "," + yTranslate + ")";
+      .attr({
+        transform: (d) => {
+          let xTranslate = this._isHorizontal() ? positionF(d) : rectangleOffsetF(d);
+          let yTranslate = this._isHorizontal() ? rectangleOffsetF(d) : positionF(d);
+          return "translate(" + xTranslate + "," + yTranslate + ")";
+        },
+        visibility: visibilityF
       })
-      .attr("visibility", visibilityF)
       .each(function (annotationLabel) {
         let writeOptions = {
           selection: d3.select(this),
@@ -343,17 +351,7 @@ export class Axis<D> extends Component {
   }
 
   private _annotatedTicksInDomain() {
-    return this.annotatedTicks().filter((annotatedTick) => {
-      if (typeof annotatedTick === "number" && !Utils.Math.isValidNumber(annotatedTick)) {
-        return false;
-      }
-      if (this._scale instanceof Scales.Category) {
-        return this._scale.domain().indexOf(annotatedTick) !== -1;
-      } else if (this._scale instanceof QuantitativeScale) {
-        return (this._scale.domain()[0] <= annotatedTick && annotatedTick <= this._scale.domain()[0]) ||
-               (this._scale.domain()[1] <= annotatedTick && annotatedTick <= this._scale.domain()[1]);
-      }
-    });
+    return this.annotatedTicks();
   }
 
   protected _axisSizeWithoutMargin() {
