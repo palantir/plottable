@@ -1613,6 +1613,7 @@ var Plottable;
             _super.call(this);
             this._tickGenerator = function (scale) { return scale.defaultTicks(); };
             this._padProportion = 0.05;
+            this._snappingDomainEnabled = true;
             this._paddingExceptionsProviders = new Plottable.Utils.Set();
         }
         QuantitativeScale.prototype.autoDomain = function () {
@@ -1724,7 +1725,18 @@ var Plottable;
             });
             var newMin = minExistsInExceptions ? min : this.invert(this.scale(min) - (this.scale(max) - this.scale(min)) * p);
             var newMax = maxExistsInExceptions ? max : this.invert(this.scale(max) + (this.scale(max) - this.scale(min)) * p);
-            return this._niceDomain([newMin, newMax]);
+            if (this._snappingDomainEnabled) {
+                return this._niceDomain([newMin, newMax]);
+            }
+            return ([newMin, newMax]);
+        };
+        QuantitativeScale.prototype.snappingDomainEnabled = function (snappingDomainEnabled) {
+            if (snappingDomainEnabled == null) {
+                return this._snappingDomainEnabled;
+            }
+            this._snappingDomainEnabled = snappingDomainEnabled;
+            this._autoDomainIfAutomaticMode();
+            return this;
         };
         QuantitativeScale.prototype._expandSingleValueDomain = function (singleValueDomain) {
             return singleValueDomain;
@@ -8366,6 +8378,7 @@ var Plottable;
             function Line() {
                 _super.call(this);
                 this._interpolator = "linear";
+                this._autorangeSmooth = false;
                 this.addClass("line-plot");
                 var animator = new Plottable.Animators.Easing();
                 animator.stepDuration(Plottable.Plot._ANIMATION_MAX_DURATION);
@@ -8375,6 +8388,55 @@ var Plottable;
                 this.attr("stroke", new Plottable.Scales.Color().range()[0]);
                 this.attr("stroke-width", "2px");
             }
+            Line.prototype.x = function (x, xScale) {
+                if (x == null) {
+                    return _super.prototype.x.call(this);
+                }
+                else {
+                    if (xScale == null) {
+                        _super.prototype.x.call(this, x);
+                    }
+                    else {
+                        _super.prototype.x.call(this, x, xScale);
+                    }
+                    this._setScaleSnapping();
+                    return this;
+                }
+            };
+            Line.prototype.y = function (y, yScale) {
+                if (y == null) {
+                    return _super.prototype.y.call(this);
+                }
+                else {
+                    _super.prototype.y.call(this, y, yScale);
+                    this._setScaleSnapping();
+                    return this;
+                }
+            };
+            Line.prototype.autorangeMode = function (autorangeMode) {
+                if (autorangeMode == null) {
+                    return _super.prototype.autorangeMode.call(this);
+                }
+                _super.prototype.autorangeMode.call(this, autorangeMode);
+                this._setScaleSnapping();
+                return this;
+            };
+            Line.prototype.autorangeSmooth = function (autorangeSmooth) {
+                if (autorangeSmooth == null) {
+                    return this._autorangeSmooth;
+                }
+                this._autorangeSmooth = autorangeSmooth;
+                this._setScaleSnapping();
+                return this;
+            };
+            Line.prototype._setScaleSnapping = function () {
+                if (this.autorangeMode() === "x" && this.x() && this.x().scale && this.x().scale instanceof Plottable.QuantitativeScale) {
+                    this.x().scale.snappingDomainEnabled(!this.autorangeSmooth());
+                }
+                if (this.autorangeMode() === "y" && this.y() && this.y().scale && this.y().scale instanceof Plottable.QuantitativeScale) {
+                    this.y().scale.snappingDomainEnabled(!this.autorangeSmooth());
+                }
+            };
             Line.prototype.interpolator = function (interpolator) {
                 if (interpolator == null) {
                     return this._interpolator;
@@ -8385,6 +8447,107 @@ var Plottable;
             };
             Line.prototype._createDrawer = function (dataset) {
                 return new Plottable.Drawers.Line(dataset);
+            };
+            Line.prototype._extentsForProperty = function (property) {
+                var extents = _super.prototype._extentsForProperty.call(this, property);
+                if (!this._autorangeSmooth) {
+                    return extents;
+                }
+                if (this.autorangeMode() !== property) {
+                    return extents;
+                }
+                if (this.autorangeMode() !== "x" && this.autorangeMode() !== "y") {
+                    return extents;
+                }
+                var edgeIntersectionPoints = this._getEdgeIntersectionPoints();
+                var includedValues;
+                if (this.autorangeMode() === "y") {
+                    includedValues = edgeIntersectionPoints.left.concat(edgeIntersectionPoints.right).map(function (point) { return point.y; });
+                }
+                else {
+                    includedValues = edgeIntersectionPoints.top.concat(edgeIntersectionPoints.bottom).map(function (point) { return point.x; });
+                }
+                return extents.map(function (extent) { return d3.extent(d3.merge([extent, includedValues])); });
+            };
+            Line.prototype._getEdgeIntersectionPoints = function () {
+                var _this = this;
+                if (!(this.y().scale instanceof Plottable.QuantitativeScale && this.x().scale instanceof Plottable.QuantitativeScale)) {
+                    return {
+                        left: [],
+                        right: [],
+                        top: [],
+                        bottom: []
+                    };
+                }
+                var yScale = this.y().scale;
+                var xScale = this.x().scale;
+                var intersectionPoints = {
+                    left: [],
+                    right: [],
+                    top: [],
+                    bottom: []
+                };
+                var leftX = xScale.scale(xScale.domain()[0]);
+                var rightX = xScale.scale(xScale.domain()[1]);
+                var bottomY = yScale.scale(yScale.domain()[0]);
+                var topY = yScale.scale(yScale.domain()[1]);
+                this.datasets().forEach(function (dataset) {
+                    var data = dataset.data();
+                    var x1, x2, y1, y2;
+                    var prevX, prevY, currX, currY;
+                    for (var i = 1; i < data.length; i++) {
+                        prevX = currX || xScale.scale(_this.x().accessor(data[i - 1], i - 1, dataset));
+                        prevY = currY || yScale.scale(_this.y().accessor(data[i - 1], i - 1, dataset));
+                        currX = xScale.scale(_this.x().accessor(data[i], i, dataset));
+                        currY = yScale.scale(_this.y().accessor(data[i], i, dataset));
+                        // If values crossed left edge
+                        if ((prevX < leftX) === (leftX <= currX)) {
+                            x1 = leftX - prevX;
+                            x2 = currX - prevX;
+                            y2 = currY - prevY;
+                            y1 = x1 * y2 / x2;
+                            intersectionPoints.left.push({
+                                x: leftX,
+                                y: yScale.invert(prevY + y1)
+                            });
+                        }
+                        // If values crossed right edge
+                        if ((prevX < rightX) === (rightX <= currX)) {
+                            x1 = rightX - prevX;
+                            x2 = currX - prevX;
+                            y2 = currY - prevY;
+                            y1 = x1 * y2 / x2;
+                            intersectionPoints.right.push({
+                                x: rightX,
+                                y: yScale.invert(prevY + y1)
+                            });
+                        }
+                        // If values crossed upper edge
+                        if ((prevY < topY) === (topY <= currY)) {
+                            x2 = currX - prevX;
+                            y1 = topY - prevY;
+                            y2 = currY - prevY;
+                            x1 = y1 * x2 / y2;
+                            intersectionPoints.top.push({
+                                x: xScale.invert(prevX + x1),
+                                y: topY
+                            });
+                        }
+                        // If values crossed lower edge
+                        if ((prevY < bottomY) === (bottomY <= currY)) {
+                            x2 = currX - prevX;
+                            y1 = bottomY - prevY;
+                            y2 = currY - prevY;
+                            x1 = y1 * x2 / y2;
+                            intersectionPoints.bottom.push({
+                                x: xScale.invert(prevX + x1),
+                                y: bottomY
+                            });
+                        }
+                    }
+                    ;
+                });
+                return intersectionPoints;
             };
             Line.prototype._getResetYFunction = function () {
                 // gets the y-value generator for the animation start point

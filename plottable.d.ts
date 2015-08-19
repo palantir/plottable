@@ -886,6 +886,14 @@ declare module Plottable {
          * @returns {QuantitativeScale} The calling QuantitativeScale.
          */
         padProportion(padProportion: number): QuantitativeScale<D>;
+        /**
+         * Gets whether or not the scale snaps its domain to nice values.
+         */
+        snappingDomainEnabled(): boolean;
+        /**
+         * Sets whether or not the scale snaps its domain to nice values.
+         */
+        snappingDomainEnabled(snappingDomainEnabled: boolean): QuantitativeScale<D>;
         protected _expandSingleValueDomain(singleValueDomain: D[]): D[];
         /**
          * Computes the domain value corresponding to a supplied range value.
@@ -3189,6 +3197,25 @@ declare module Plottable {
              * @constructor
              */
             constructor();
+            x(): Plots.AccessorScaleBinding<X, number>;
+            x(x: number | Accessor<number>): Line<X>;
+            x(x: X | Accessor<X>, xScale: Scale<X, number>): Line<X>;
+            y(): Plots.AccessorScaleBinding<number, number>;
+            y(y: number | Accessor<number>): Line<X>;
+            y(y: number | Accessor<number>, yScale: Scale<number, number>): Line<X>;
+            autorangeMode(): string;
+            autorangeMode(autorangeMode: string): Line<X>;
+            /**
+             * Gets whether or not the autoranging is done smoothly.
+             */
+            autorangeSmooth(): boolean;
+            /**
+             * Sets whether or not the autorange is done smoothly.
+             *
+             * Smooth autoranging is done by making sure lines always exit on the left / right side of the plot
+             * and deactivating the nice domain feature on the scales
+             */
+            autorangeSmooth(autorangeSmooth: boolean): Plots.Line<X>;
             /**
              * Gets the interpolation function associated with the plot.
              *
@@ -3216,6 +3243,7 @@ declare module Plottable {
             interpolator(interpolator: "cardinal-closed"): Line<X>;
             interpolator(interpolator: "monotone"): Line<X>;
             protected _createDrawer(dataset: Dataset): Drawer;
+            protected _extentsForProperty(property: string): any[];
             protected _getResetYFunction(): (d: any, i: number, dataset: Dataset) => number;
             protected _generateDrawSteps(): Drawers.DrawStep[];
             protected _generateAttrToProjector(): {
