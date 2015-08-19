@@ -7028,11 +7028,8 @@ var Plottable;
                 }
                 var sectorValueAccessor = Plottable.Plot._scaledAccessor(this.sectorValue());
                 var dataset = this.datasets()[0];
-                var data = dataset.data().filter(function (d, i) { return Plottable.Utils.Math.isValidNumber(sectorValueAccessor(d, i, dataset)); });
+                var data = this._getDataToDraw().get(dataset);
                 var pie = d3.layout.pie().sort(null).value(function (d, i) { return sectorValueAccessor(d, i, dataset); })(data);
-                if (pie.some(function (slice) { return slice.value < 0; })) {
-                    Plottable.Utils.Window.warn("Negative values will not render correctly in a Pie Plot.");
-                }
                 this._startAngles = pie.map(function (slice) { return slice.startAngle; });
                 this._endAngles = pie.map(function (slice) { return slice.endAngle; });
             };
@@ -7044,7 +7041,10 @@ var Plottable;
                 var sectorValueAccessor = Plottable.Plot._scaledAccessor(this.sectorValue());
                 var ds = this.datasets()[0];
                 var data = dataToDraw.get(ds);
-                var filteredData = data.filter(function (d, i) { return Plottable.Utils.Math.isValidNumber(sectorValueAccessor(d, i, ds)); });
+                var filteredData = data.filter(function (d, i) {
+                    var value = sectorValueAccessor(d, i, ds);
+                    return Plottable.Utils.Math.isValidNumber(value) && value >= 0;
+                });
                 dataToDraw.set(ds, filteredData);
                 return dataToDraw;
             };
