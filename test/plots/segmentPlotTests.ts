@@ -3,7 +3,7 @@
 describe("Plots", () => {
   describe("SegmentPlot", () => {
 
-    describe("SegmentPlot - basics", () => {
+    describe("Basics", () => {
       let svg: d3.Selection<void>;
       let xScale: Plottable.Scales.Linear;
       let yScale: Plottable.Scales.Linear;
@@ -32,12 +32,13 @@ describe("Plots", () => {
         plot.y2((d) => d.y2);
         plot.addDataset(new Plottable.Dataset([data[0]]));
         plot.renderTo(svg);
-        renderArea = (<any> plot)._renderArea;
-        let lineSelection = d3.select(renderArea.selectAll("line")[0][0]);
-        assert.strictEqual(+lineSelection.attr("x1"), 62.5, "x1 is correct");
-        assert.strictEqual(+lineSelection.attr("x2"), 437.5, "x2 is correct");
-        assert.strictEqual(+lineSelection.attr("y1"), 437.5, "y1 is correct");
-        assert.strictEqual(+lineSelection.attr("y2"), 62.5, "y2 is correct");
+
+        let line = plot.content().selectAll("line");
+        assert.strictEqual(line.size(), 1, "exactly one line has been rendered");
+        assert.strictEqual(+line.attr("x1"), 62.5, "x1 is correct");
+        assert.strictEqual(+line.attr("x2"), 437.5, "x2 is correct");
+        assert.strictEqual(+line.attr("y1"), 437.5, "y1 is correct");
+        assert.strictEqual(+line.attr("y2"), 62.5, "y2 is correct");
       });
 
       it("renders vertical lines when x2 is not set", () => {
@@ -47,8 +48,8 @@ describe("Plots", () => {
         plot.y2((d) => d.y2);
         plot.addDataset(new Plottable.Dataset(data));
         plot.renderTo(svg);
-        renderArea = (<any> plot)._renderArea;
-        renderArea.selectAll("line")[0].forEach((line) => {
+
+        plot.content().selectAll("line")[0].forEach((line) => {
           let lineSelection = d3.select(line);
           assert.strictEqual(lineSelection.attr("x1"), lineSelection.attr("x2"), "line is vertical");
         });
@@ -61,8 +62,8 @@ describe("Plots", () => {
         plot.y((d) => d.y, yScale);
         plot.addDataset(new Plottable.Dataset(data));
         plot.renderTo(svg);
-        renderArea = (<any> plot)._renderArea;
-        renderArea.selectAll("line")[0].forEach((line) => {
+
+        plot.content().selectAll("line")[0].forEach((line) => {
           let lineSelection = d3.select(line);
           assert.strictEqual(lineSelection.attr("y1"), lineSelection.attr("y2"), "line is horizontal");
         });
@@ -84,13 +85,13 @@ describe("Plots", () => {
 
         plot.renderTo(svg);
 
-        assert.deepEqual(xScale.domain(), [0, 2], "y domain includes both visible segments");
+        assert.deepEqual(xScale.domain(), [0, 2], "x domain includes both visible segments");
 
         yScale.domain([-0.5, 0.5]);
-        assert.deepEqual(xScale.domain(), [0, 1], "y domain includes only the visible segment (first)");
+        assert.deepEqual(xScale.domain(), [0, 1], "x domain includes only the visible segment (first)");
 
         yScale.domain([0.5, 1.5]);
-        assert.deepEqual(xScale.domain(), [1, 2], "y domain includes only the visible segment (second)");
+        assert.deepEqual(xScale.domain(), [1, 2], "x domain includes only the visible segment (second)");
       });
 
       it("autorangeMode(\"y\")", () => {
@@ -119,7 +120,7 @@ describe("Plots", () => {
       });
     });
 
-    describe("SegmentPlot - entitiesIn()", () => {
+    describe("entitiesIn()", () => {
       let data = [
         { x: 1, x2: 1, y: 1, y2: 4 },
         { x: 2, x2: 3, y: 4, y2: 3 },
