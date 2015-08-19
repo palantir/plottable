@@ -286,7 +286,7 @@ describe("Plots", () => {
       it("renders correctly when data is set after construction", () => {
         let dataset = new Plottable.Dataset();
         let plot = new Plottable.Plots.Rectangle();
-        plot.addDataset(dataset)
+        plot.addDataset(dataset);
         plot.attr("fill", (d) => d.magnitude, colorScale);
         plot.x((d: any) => d.x, xScale);
         plot.y((d: any) => d.y, yScale);
@@ -373,6 +373,7 @@ describe("Plots", () => {
       let yScale: Plottable.Scales.Category;
       let colorScale: Plottable.Scales.InterpolatedColor;
       let plot: Plottable.Plots.Rectangle<string, string>;
+      var dataset: Plottable.Dataset;
 
       beforeEach(() => {
         svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
@@ -385,6 +386,10 @@ describe("Plots", () => {
         plot.attr("fill", (d) => d.magnitude, colorScale);
         plot.x((d: any) => d.x, xScale);
         plot.y((d: any) => d.y, yScale);
+
+        dataset = new Plottable.Dataset(DATA);
+        plot.addDataset(dataset);
+        plot.renderTo(svg);
       });
 
       afterEach(() => {
@@ -392,19 +397,11 @@ describe("Plots", () => {
       });
 
       it("retrieves all selections with no args", () => {
-        let dataset = new Plottable.Dataset(DATA);
-        plot.addDataset(dataset);
-        plot.renderTo(svg);
-
         let allCells = plot.selections();
         assert.strictEqual(allCells.size(), 4, "all cells retrieved");
       });
 
       it("retrieves correct selections", () => {
-        let dataset = new Plottable.Dataset(DATA);
-        plot.addDataset(dataset);
-        plot.renderTo(svg);
-
         let allCells = plot.selections([dataset]);
         assert.strictEqual(allCells.size(), 4, "all cells retrieved");
         let selectionData = allCells.data();
@@ -412,10 +409,6 @@ describe("Plots", () => {
       });
 
       it("skips invalid Datasets", () => {
-        let dataset = new Plottable.Dataset(DATA);
-        plot.addDataset(dataset);
-        plot.renderTo(svg);
-
         let dummyDataset = new Plottable.Dataset([]);
         let allCells = plot.selections([dataset, dummyDataset]);
         assert.strictEqual(allCells.size(), 4, "all cells retrieved");
