@@ -24,9 +24,17 @@ describe("Plots", () => {
       };
 
       let svg: d3.Selection<void>;
+      let xScale: Plottable.Scales.Linear;
+      let yScale: Plottable.Scales.Linear;
+      let plot: Plottable.Plots.Rectangle<number, number>;
 
       beforeEach(() => {
         svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+        xScale = new Plottable.Scales.Linear();
+        yScale = new Plottable.Scales.Linear();
+        plot = new Plottable.Plots.Rectangle<number, number>()
+          .x((d) => d.x, xScale).x2((d) => d.x2)
+          .y((d) => d.y, yScale).y2((d) => d.y2);
       });
 
       afterEach(() => {
@@ -34,42 +42,27 @@ describe("Plots", () => {
       });
 
       it("renders correctly", () => {
-        let xScale = new Plottable.Scales.Linear();
-        let yScale = new Plottable.Scales.Linear();
-        let rectanglePlot = new Plottable.Plots.Rectangle();
-        rectanglePlot.addDataset(new Plottable.Dataset(DATA));
-        rectanglePlot.x((d) => d.x, xScale)
-                     .y((d) => d.y, yScale)
-                     .x2((d) => d.x2)
-                     .y2((d) => d.y2)
-                     .renderTo(svg);
-        VERIFY_CELLS((<any> rectanglePlot)._renderArea.selectAll("rect"));
+        plot.addDataset(new Plottable.Dataset(DATA));
+        plot.renderTo(svg);
+        VERIFY_CELLS((<any> plot)._renderArea.selectAll("rect"));
       });
 
       it("retrieves the correct entity under a point", () => {
-        let xScale = new Plottable.Scales.Linear();
-        let yScale = new Plottable.Scales.Linear();
-        let dataset = new Plottable.Dataset(DATA);
-        let plot = new Plottable.Plots.Rectangle()
-          .x((d) => d.x, xScale).x2((d) => d.x2)
-          .y((d) => d.y, yScale).y2((d) => d.y2);
-        plot.addDataset(dataset).renderTo(svg);
+        plot.addDataset(new Plottable.Dataset(DATA))
+        plot.renderTo(svg);
         let entities = plot.entitiesAt({ x: xScale.scale(2.5), y: yScale.scale(2.5) });
         assert.lengthOf(entities, 1, "found only one entity when querying a point inside the third rectangle");
         assert.strictEqual(entities[0].index, 2, "entity retrieved is at index 2");
       });
 
       it("retrieves correct entities under a point", () => {
-        let xScale = new Plottable.Scales.Linear();
-        let yScale = new Plottable.Scales.Linear();
         let dataset = new Plottable.Dataset([
           { x: 1, y: 1, x2: 3, y2: 3 },
           { x: 4, y: 2, x2: 2, y2: 4 }
         ]);
-        let plot = new Plottable.Plots.Rectangle()
-          .x((d) => d.x, xScale).x2((d) => d.x2)
-          .y((d) => d.y, yScale).y2((d) => d.y2);
-        plot.addDataset(dataset).renderTo(svg);
+        plot.addDataset(dataset)
+        plot.renderTo(svg);
+
         let entities = plot.entitiesAt({ x: xScale.scale(2), y: xScale.scale(2) });
         assert.lengthOf(entities, 2, "two entities when querying a point in both");
         assert.strictEqual(entities[0].index, 0, "entity retrieved is at index 0");
@@ -83,13 +76,8 @@ describe("Plots", () => {
       });
 
       it("retrieves the entities that intersect with the bounding box", () => {
-        let xScale = new Plottable.Scales.Linear();
-        let yScale = new Plottable.Scales.Linear();
-        let dataset = new Plottable.Dataset(DATA);
-        let plot = new Plottable.Plots.Rectangle()
-          .x((d) => d.x, xScale).x2((d) => d.x2)
-          .y((d) => d.y, yScale).y2((d) => d.y2);
-        plot.addDataset(dataset).renderTo(svg);
+        plot.addDataset(new Plottable.Dataset(DATA))
+        plot.renderTo(svg);
 
         let entities = plot.entitiesIn({
           topLeft: { x: xScale.scale(1.5), y: yScale.scale(2.5) },
@@ -100,13 +88,8 @@ describe("Plots", () => {
       });
 
       it("retrieves the entities that intersect with the given ranges", () => {
-        let xScale = new Plottable.Scales.Linear();
-        let yScale = new Plottable.Scales.Linear();
-        let dataset = new Plottable.Dataset(DATA);
-        let plot = new Plottable.Plots.Rectangle()
-          .x((d) => d.x, xScale).x2((d) => d.x2)
-          .y((d) => d.y, yScale).y2((d) => d.y2);
-        plot.addDataset(dataset).renderTo(svg);
+        plot.addDataset(new Plottable.Dataset(DATA))
+        plot.renderTo(svg);
 
         let entities = plot.entitiesIn(
           {min: xScale.scale(1.5), max: xScale.scale(2.5)},
@@ -115,7 +98,6 @@ describe("Plots", () => {
         assert.strictEqual(entities[0].index, 1, "the entity of index 1 is retrieved");
         assert.strictEqual(entities[1].index, 2, "the entity of index 2 is retrieved");
       });
-
     });
 
     describe("RectanglePlot - autorangeMode()", () => {
