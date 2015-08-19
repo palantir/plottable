@@ -30,7 +30,7 @@ describe("Plots", () => {
         plot.x2((d) => d.x2);
         plot.y((d) => d.y, yScale);
         plot.y2((d) => d.y2);
-        plot.addDataset(new Plottable.Dataset([data[0]]))
+        plot.addDataset(new Plottable.Dataset([data[0]]));
         plot.renderTo(svg);
         renderArea = (<any> plot)._renderArea;
         let lineSelection = d3.select(renderArea.selectAll("line")[0][0]);
@@ -45,7 +45,7 @@ describe("Plots", () => {
         plot.x((d) => d.x, xScale);
         plot.y((d) => d.y, yScale);
         plot.y2((d) => d.y2);
-        plot.addDataset(new Plottable.Dataset(data))
+        plot.addDataset(new Plottable.Dataset(data));
         plot.renderTo(svg);
         renderArea = (<any> plot)._renderArea;
         renderArea.selectAll("line")[0].forEach((line) => {
@@ -59,7 +59,7 @@ describe("Plots", () => {
         plot.x((d) => d.x, xScale);
         plot.x2((d) => d.x2);
         plot.y((d) => d.y, yScale);
-        plot.addDataset(new Plottable.Dataset(data))
+        plot.addDataset(new Plottable.Dataset(data));
         plot.renderTo(svg);
         renderArea = (<any> plot)._renderArea;
         renderArea.selectAll("line")[0].forEach((line) => {
