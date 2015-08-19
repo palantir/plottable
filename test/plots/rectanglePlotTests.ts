@@ -373,7 +373,7 @@ describe("Plots", () => {
       let yScale: Plottable.Scales.Category;
       let colorScale: Plottable.Scales.InterpolatedColor;
       let plot: Plottable.Plots.Rectangle<string, string>;
-      var dataset: Plottable.Dataset;
+      let dataset: Plottable.Dataset;
 
       beforeEach(() => {
         svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
