@@ -81,6 +81,10 @@ describe("Interactive Components", () => {
         (<any> assert.throws)(() => dbl.detectionRadius(-1), Error, "", "rejects negative values");
       });
 
+      it("destroy() does not error if scales are not inputted", () => {
+        assert.doesNotThrow(() => dbl.destroy(), Error, "can destroy");
+      });
+
       it("onDragStart()", () => {
         dbl.renderTo(svg);
 
@@ -279,7 +283,6 @@ describe("Interactive Components", () => {
     });
 
     describe("DragBoxLayer - resizing", () => {
-
       let SVG_WIDTH = 400;
       let SVG_HEIGHT = 400;
 
@@ -295,7 +298,7 @@ describe("Interactive Components", () => {
       function resetBox() {
         dbl.bounds({
           topLeft: { x: 0, y: 0 },
-          bottomRight: { x: 0, y: 0}
+          bottomRight: { x: 0, y: 0 }
         });
         TestMethods.triggerFakeDragSequence(target,
                                 { x: SVG_WIDTH / 4, y: SVG_HEIGHT / 4},
@@ -467,7 +470,6 @@ describe("Interactive Components", () => {
     });
 
     describe("DragBoxLayer - moving", () => {
-
       let SVG_WIDTH = 400;
       let SVG_HEIGHT = 400;
 
@@ -601,12 +603,6 @@ describe("Interactive Components", () => {
         let bounds = dbl.bounds();
         assert.strictEqual(bounds.topLeft.x, midPoint.x, "new box was started at the drag start position (x)");
         assert.strictEqual(bounds.topLeft.y, midPoint.y, "new box was started at the drag start position (y)");
-      });
-
-      it("destroy() does not error if scales are not inputted", () => {
-        let sbl = new Plottable.Components.DragBoxLayer();
-        sbl.renderTo(svg);
-        assert.doesNotThrow(() => sbl.destroy(), Error, "can destroy");
       });
     });
   });
