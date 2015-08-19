@@ -3795,7 +3795,7 @@ var Plottable;
                 return elements;
             };
             var axisHeight = this._isHorizontal() ? this.height() : this.width();
-            var axisHeightWithoutMargin = this._axisHeightWithoutMargin();
+            var axisHeightWithoutMargin = this._axisSizeWithoutMargin();
             var offsetF = function (d) {
                 switch (_this.orientation()) {
                     case "bottom":
@@ -3868,7 +3868,7 @@ var Plottable;
                 annotationWriter.write(annotationFormatter(annotationLabel), isHorizontal ? measurements.get(annotationLabel).width : measurements.get(annotationLabel).height, isHorizontal ? measurements.get(annotationLabel).height : measurements.get(annotationLabel).width, writeOptions);
             });
         };
-        Axis.prototype._axisHeightWithoutMargin = function () {
+        Axis.prototype._axisSizeWithoutMargin = function () {
             var relevantDimension = this._isHorizontal() ? this.height() : this.width();
             var axisHeightWithoutMargin = this._isHorizontal() ? this._computedHeight : this._computedWidth;
             return Math.min(axisHeightWithoutMargin, relevantDimension);

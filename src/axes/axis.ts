@@ -233,7 +233,7 @@ export class Axis<D> extends Component {
 
   protected _drawAnnotations() {
     let labelPadding = 4;
-    let measurements = new Utils.Map<D, SVGTypewriter.Measurers.Dimensions> ();
+    let measurements = new Utils.Map<D, SVGTypewriter.Measurers.Dimensions>();
     this.annotatedTicks().forEach((annotatedTick) => {
       let measurement = this._annotationMeasurer.measure(this.annotationFormatter()(annotatedTick));
       let paddedMeasurement = { width: measurement.width + 2 * labelPadding, height: measurement.height + 2 * labelPadding };
@@ -259,7 +259,7 @@ export class Axis<D> extends Component {
       return elements;
     };
     let axisHeight = this._isHorizontal() ? this.height() : this.width();
-    let axisHeightWithoutMargin = this._axisHeightWithoutMargin();
+    let axisHeightWithoutMargin = this._axisSizeWithoutMargin();
     let offsetF = (d: D) => {
       switch (this.orientation()) {
         case "bottom":
@@ -341,7 +341,7 @@ export class Axis<D> extends Component {
       });
   }
 
-  protected _axisHeightWithoutMargin() {
+  protected _axisSizeWithoutMargin() {
     let relevantDimension = this._isHorizontal() ? this.height() : this.width();
     let axisHeightWithoutMargin = this._isHorizontal() ? this._computedHeight : this._computedWidth;
     return Math.min(axisHeightWithoutMargin, relevantDimension);

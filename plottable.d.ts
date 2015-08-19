@@ -1726,7 +1726,7 @@ declare module Plottable {
          */
         annotationsEnabled(annotationsEnabled: boolean): Axis<D>;
         protected _drawAnnotations(): void;
-        protected _axisHeightWithoutMargin(): number;
+        protected _axisSizeWithoutMargin(): number;
         protected _generateBaselineAttrHash(): {
             [key: string]: number;
         };
