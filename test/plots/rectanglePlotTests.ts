@@ -257,53 +257,53 @@ describe("Plots", () => {
         assert.strictEqual(cellBV.attr("fill"), "#777777", "cell 'BV' color is correct");
       };
 
-      it("renders correctly", () => {
-        let xScale = new Plottable.Scales.Category();
-        let yScale = new Plottable.Scales.Category();
-        let colorScale = new Plottable.Scales.InterpolatedColor();
+      let svg: d3.Selection<void>;
+      let xScale: Plottable.Scales.Category;
+      let yScale: Plottable.Scales.Category;
+      let colorScale: Plottable.Scales.InterpolatedColor;
+
+      beforeEach(() => {
+        svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+        xScale = new Plottable.Scales.Category();
+        yScale = new Plottable.Scales.Category();
+        colorScale = new Plottable.Scales.InterpolatedColor();
         colorScale.range(["black", "white"]);
-        let svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
-        let gridPlot = new Plottable.Plots.Rectangle();
-        gridPlot.addDataset(new Plottable.Dataset(DATA))
-                .attr("fill", (d) => d.magnitude, colorScale);
-        gridPlot.x((d: any) => d.x, xScale)
-                .y((d: any) => d.y, yScale);
-        gridPlot.renderTo(svg);
-        VERIFY_CELLS((<any> gridPlot)._renderArea.selectAll("rect")[0]);
+      });
+
+      afterEach(() => {
         svg.remove();
       });
 
-      it("renders correctly when data is set after construction", () => {
-        let xScale = new Plottable.Scales.Category();
-        let yScale = new Plottable.Scales.Category();
-        let colorScale = new Plottable.Scales.InterpolatedColor();
-        colorScale.range(["black", "white"]);
-        let svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
-        let dataset = new Plottable.Dataset();
-        let gridPlot = new Plottable.Plots.Rectangle();
-        gridPlot.addDataset(dataset)
+      it("renders correctly", () => {
+        let plot = new Plottable.Plots.Rectangle();
+        plot.addDataset(new Plottable.Dataset(DATA))
                 .attr("fill", (d) => d.magnitude, colorScale);
-        gridPlot.x((d: any) => d.x, xScale)
+        plot.x((d: any) => d.x, xScale)
+                .y((d: any) => d.y, yScale);
+        plot.renderTo(svg);
+        VERIFY_CELLS((<any> plot)._renderArea.selectAll("rect")[0]);
+      });
+
+      it("renders correctly when data is set after construction", () => {
+        let dataset = new Plottable.Dataset();
+        let plot = new Plottable.Plots.Rectangle();
+        plot.addDataset(dataset)
+                .attr("fill", (d) => d.magnitude, colorScale);
+        plot.x((d: any) => d.x, xScale)
                 .y((d: any) => d.y, yScale)
                 .renderTo(svg);
         dataset.data(DATA);
-        VERIFY_CELLS((<any> gridPlot)._renderArea.selectAll("rect")[0]);
-        svg.remove();
+        VERIFY_CELLS((<any> plot)._renderArea.selectAll("rect")[0]);
       });
 
       it("renders correctly when there isn't data for every spot", () => {
         let CELL_HEIGHT = 50;
         let CELL_WIDTH = 100;
-        let xScale = new Plottable.Scales.Category();
-        let yScale = new Plottable.Scales.Category();
-        let colorScale = new Plottable.Scales.InterpolatedColor();
-        colorScale.range(["black", "white"]);
-        let svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
         let dataset = new Plottable.Dataset();
-        let gridPlot = new Plottable.Plots.Rectangle();
-        gridPlot.addDataset(dataset)
+        let plot = new Plottable.Plots.Rectangle();
+        plot.addDataset(dataset)
                 .attr("fill", (d) => d.magnitude, colorScale);
-        gridPlot.x((d: any) => d.x, xScale)
+        plot.x((d: any) => d.x, xScale)
                 .y((d: any) => d.y, yScale)
                 .renderTo(svg);
         let data = [
@@ -313,7 +313,7 @@ describe("Plots", () => {
           {x: "D", y: "Z", magnitude: 24}
         ];
         dataset.data(data);
-        let cells = (<any> gridPlot)._renderArea.selectAll("rect")[0];
+        let cells = (<any> plot)._renderArea.selectAll("rect")[0];
         assert.strictEqual(cells.length, data.length);
         for (let i = 0; i < cells.length; i++) {
           let cell = d3.select(cells[i]);
@@ -322,25 +322,19 @@ describe("Plots", () => {
           assert.strictEqual(cell.attr("width"), String(CELL_WIDTH), "Cell width is correct");
           assert.strictEqual(cell.attr("height"), String(CELL_HEIGHT), "Cell height is correct");
         }
-        svg.remove();
       });
 
       it("can invert y axis correctly", () => {
-        let xScale = new Plottable.Scales.Category();
-        let yScale = new Plottable.Scales.Category();
-        let colorScale = new Plottable.Scales.InterpolatedColor();
-        colorScale.range(["black", "white"]);
-        let svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
-        let gridPlot = new Plottable.Plots.Rectangle();
-        gridPlot.addDataset(new Plottable.Dataset(DATA))
+        let plot = new Plottable.Plots.Rectangle();
+        plot.addDataset(new Plottable.Dataset(DATA))
                 .attr("fill", (d) => d.magnitude, colorScale);
-        gridPlot.x((d: any) => d.x, xScale)
+        plot.x((d: any) => d.x, xScale)
                 .y((d: any) => d.y, yScale)
                 .renderTo(svg);
 
         yScale.domain(["U", "V"]);
 
-        let cells = (<any> gridPlot)._renderArea.selectAll("rect")[0];
+        let cells = (<any> plot)._renderArea.selectAll("rect")[0];
         let cellAU = d3.select(cells[0]);
         let cellAV = d3.select(cells[2]);
         cellAU.attr("fill", "#000000");
@@ -352,7 +346,7 @@ describe("Plots", () => {
         cellAV.attr("y", "0");
 
         yScale.domain(["V", "U"]);
-        cells = (<any> gridPlot)._renderArea.selectAll("rect")[0];
+        cells = (<any> plot)._renderArea.selectAll("rect")[0];
         cellAU = d3.select(cells[0]);
         cellAV = d3.select(cells[2]);
         cellAU.attr("fill", "#000000");
@@ -363,9 +357,12 @@ describe("Plots", () => {
         cellAV.attr("x", "0");
         cellAV.attr("y", "100");
 
-        svg.remove();
       });
     });
+
+
+
+
 
     describe("Rectangle Plot - selections()", () => {
       let SVG_WIDTH = 400;
@@ -383,15 +380,15 @@ describe("Plots", () => {
         let colorScale = new Plottable.Scales.InterpolatedColor();
         colorScale.range(["black", "white"]);
         let svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
-        let gridPlot = new Plottable.Plots.Rectangle();
+        let plot = new Plottable.Plots.Rectangle();
         let dataset = new Plottable.Dataset(DATA);
-        gridPlot.addDataset(dataset)
+        plot.addDataset(dataset)
                 .attr("fill", (d) => d.magnitude, colorScale);
-        gridPlot.x((d: any) => d.x, xScale)
+        plot.x((d: any) => d.x, xScale)
                 .y((d: any) => d.y, yScale);
-        gridPlot.renderTo(svg);
+        plot.renderTo(svg);
 
-        let allCells = gridPlot.selections();
+        let allCells = plot.selections();
         assert.strictEqual(allCells.size(), 4, "all cells retrieved");
 
         svg.remove();
@@ -403,15 +400,15 @@ describe("Plots", () => {
         let colorScale = new Plottable.Scales.InterpolatedColor();
         colorScale.range(["black", "white"]);
         let svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
-        let gridPlot = new Plottable.Plots.Rectangle();
+        let plot = new Plottable.Plots.Rectangle();
         let dataset = new Plottable.Dataset(DATA);
-        gridPlot.addDataset(dataset)
+        plot.addDataset(dataset)
                 .attr("fill", (d) => d.magnitude, colorScale);
-        gridPlot.x((d: any) => d.x, xScale)
+        plot.x((d: any) => d.x, xScale)
                 .y((d: any) => d.y, yScale);
-        gridPlot.renderTo(svg);
+        plot.renderTo(svg);
 
-        let allCells = gridPlot.selections([dataset]);
+        let allCells = plot.selections([dataset]);
         assert.strictEqual(allCells.size(), 4, "all cells retrieved");
         let selectionData = allCells.data();
         assert.includeMembers(selectionData, DATA, "data in selection data");
@@ -425,16 +422,16 @@ describe("Plots", () => {
         let colorScale = new Plottable.Scales.InterpolatedColor();
         colorScale.range(["black", "white"]);
         let svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
-        let gridPlot = new Plottable.Plots.Rectangle();
+        let plot = new Plottable.Plots.Rectangle();
         let dataset = new Plottable.Dataset(DATA);
-        gridPlot.addDataset(dataset)
+        plot.addDataset(dataset)
           .attr("fill", (d) => d.magnitude, colorScale);
-         gridPlot.x((d: any) => d.x, xScale)
+         plot.x((d: any) => d.x, xScale)
           .y((d: any) => d.y, yScale);
-        gridPlot.renderTo(svg);
+        plot.renderTo(svg);
 
         let dummyDataset = new Plottable.Dataset([]);
-        let allCells = gridPlot.selections([dataset, dummyDataset]);
+        let allCells = plot.selections([dataset, dummyDataset]);
         assert.strictEqual(allCells.size(), 4, "all cells retrieved");
         let selectionData = allCells.data();
         assert.includeMembers(selectionData, DATA, "data in selection data");
