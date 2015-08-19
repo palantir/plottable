@@ -2968,12 +2968,40 @@ declare module Plottable {
              * @returns {PlotEntity[]}
              */
             entitiesIn(xRange: Range, yRange: Range): PlotEntity[];
+            /**
+             * Gets the accessor for labels.
+             *
+             * @returns {Accessor<string>}
+             */
+            label(): Accessor<string>;
+            /**
+             * Sets the text of labels to the result of an Accessor.
+             *
+             * @param {Accessor<string>} label
+             * @returns {Plots.Rectangle} The calling Rectangle Plot.
+             */
+            label(label: Accessor<string>): Plots.Rectangle<X, Y>;
+            /**
+             * Gets whether labels are enabled.
+             *
+             * @returns {boolean}
+             */
+            labelsEnabled(): boolean;
+            /**
+             * Sets whether labels are enabled.
+             * Labels too big to be contained in the rectangle, cut off by edges, or blocked by other rectangles will not be shown.
+             *
+             * @param {boolean} labelsEnabled
+             * @returns {Rectangle} The calling Rectangle Plot.
+             */
+            labelsEnabled(enabled: boolean): Plots.Rectangle<X, Y>;
             protected _propertyProjectors(): AttributeToProjector;
             protected _pixelPoint(datum: any, index: number, dataset: Dataset): {
                 x: any;
                 y: any;
             };
             protected _getDataToDraw(): Utils.Map<Dataset, any[]>;
+            protected _additionalPaint(time: number): void;
         }
     }
 }
