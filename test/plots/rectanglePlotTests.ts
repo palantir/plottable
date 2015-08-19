@@ -2,9 +2,7 @@
 
 describe("Plots", () => {
   describe("RectanglePlot", () => {
-
     describe("RectanglePlot - basics", () => {
-
       let SVG_WIDTH = 300;
       let SVG_HEIGHT = 300;
       let DATA = [
@@ -376,73 +374,81 @@ describe("Plots", () => {
 
         svg.remove();
       });
+    });
 
-      describe("selections()", () => {
+    describe("Rectangle Plot - selections()", () => {
+      let SVG_WIDTH = 400;
+      let SVG_HEIGHT = 200;
+      let DATA = [
+        {x: "A", y: "U", magnitude: 0},
+        {x: "B", y: "U", magnitude: 2},
+        {x: "A", y: "V", magnitude: 16},
+        {x: "B", y: "V", magnitude: 8},
+      ];
 
-        it("retrieves all selections with no args", () => {
-          let xScale = new Plottable.Scales.Category();
-          let yScale = new Plottable.Scales.Category();
-          let colorScale = new Plottable.Scales.InterpolatedColor();
-          colorScale.range(["black", "white"]);
-          let svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
-          let gridPlot = new Plottable.Plots.Rectangle();
-          let dataset = new Plottable.Dataset(DATA);
-          gridPlot.addDataset(dataset)
-                  .attr("fill", (d) => d.magnitude, colorScale);
-          gridPlot.x((d: any) => d.x, xScale)
-                  .y((d: any) => d.y, yScale);
-          gridPlot.renderTo(svg);
+      it("retrieves all selections with no args", () => {
+        let xScale = new Plottable.Scales.Category();
+        let yScale = new Plottable.Scales.Category();
+        let colorScale = new Plottable.Scales.InterpolatedColor();
+        colorScale.range(["black", "white"]);
+        let svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+        let gridPlot = new Plottable.Plots.Rectangle();
+        let dataset = new Plottable.Dataset(DATA);
+        gridPlot.addDataset(dataset)
+                .attr("fill", (d) => d.magnitude, colorScale);
+        gridPlot.x((d: any) => d.x, xScale)
+                .y((d: any) => d.y, yScale);
+        gridPlot.renderTo(svg);
 
-          let allCells = gridPlot.selections();
-          assert.strictEqual(allCells.size(), 4, "all cells retrieved");
+        let allCells = gridPlot.selections();
+        assert.strictEqual(allCells.size(), 4, "all cells retrieved");
 
-          svg.remove();
-        });
+        svg.remove();
+      });
 
-        it("retrieves correct selections", () => {
-          let xScale = new Plottable.Scales.Category();
-          let yScale = new Plottable.Scales.Category();
-          let colorScale = new Plottable.Scales.InterpolatedColor();
-          colorScale.range(["black", "white"]);
-          let svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
-          let gridPlot = new Plottable.Plots.Rectangle();
-          let dataset = new Plottable.Dataset(DATA);
-          gridPlot.addDataset(dataset)
-                  .attr("fill", (d) => d.magnitude, colorScale);
-          gridPlot.x((d: any) => d.x, xScale)
-                  .y((d: any) => d.y, yScale);
-          gridPlot.renderTo(svg);
+      it("retrieves correct selections", () => {
+        let xScale = new Plottable.Scales.Category();
+        let yScale = new Plottable.Scales.Category();
+        let colorScale = new Plottable.Scales.InterpolatedColor();
+        colorScale.range(["black", "white"]);
+        let svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+        let gridPlot = new Plottable.Plots.Rectangle();
+        let dataset = new Plottable.Dataset(DATA);
+        gridPlot.addDataset(dataset)
+                .attr("fill", (d) => d.magnitude, colorScale);
+        gridPlot.x((d: any) => d.x, xScale)
+                .y((d: any) => d.y, yScale);
+        gridPlot.renderTo(svg);
 
-          let allCells = gridPlot.selections([dataset]);
-          assert.strictEqual(allCells.size(), 4, "all cells retrieved");
-          let selectionData = allCells.data();
-          assert.includeMembers(selectionData, DATA, "data in selection data");
+        let allCells = gridPlot.selections([dataset]);
+        assert.strictEqual(allCells.size(), 4, "all cells retrieved");
+        let selectionData = allCells.data();
+        assert.includeMembers(selectionData, DATA, "data in selection data");
 
-          svg.remove();
-        });
+        svg.remove();
+      });
 
-        it("skips invalid Datasets", () => {
-          let xScale = new Plottable.Scales.Category();
-          let yScale = new Plottable.Scales.Category();
-          let colorScale = new Plottable.Scales.InterpolatedColor();
-          colorScale.range(["black", "white"]);
-          let svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
-          let gridPlot = new Plottable.Plots.Rectangle();
-          let dataset = new Plottable.Dataset(DATA);
-          gridPlot.addDataset(dataset)
-            .attr("fill", (d) => d.magnitude, colorScale);
-           gridPlot.x((d: any) => d.x, xScale)
-            .y((d: any) => d.y, yScale);
-          gridPlot.renderTo(svg);
+      it("skips invalid Datasets", () => {
+        let xScale = new Plottable.Scales.Category();
+        let yScale = new Plottable.Scales.Category();
+        let colorScale = new Plottable.Scales.InterpolatedColor();
+        colorScale.range(["black", "white"]);
+        let svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+        let gridPlot = new Plottable.Plots.Rectangle();
+        let dataset = new Plottable.Dataset(DATA);
+        gridPlot.addDataset(dataset)
+          .attr("fill", (d) => d.magnitude, colorScale);
+         gridPlot.x((d: any) => d.x, xScale)
+          .y((d: any) => d.y, yScale);
+        gridPlot.renderTo(svg);
 
-          let dummyDataset = new Plottable.Dataset([]);
-          let allCells = gridPlot.selections([dataset, dummyDataset]);
-          assert.strictEqual(allCells.size(), 4, "all cells retrieved");
-          let selectionData = allCells.data();
-          assert.includeMembers(selectionData, DATA, "data in selection data");
+        let dummyDataset = new Plottable.Dataset([]);
+        let allCells = gridPlot.selections([dataset, dummyDataset]);
+        assert.strictEqual(allCells.size(), 4, "all cells retrieved");
+        let selectionData = allCells.data();
+        assert.includeMembers(selectionData, DATA, "data in selection data");
 
-          svg.remove();
-        });
+        svg.remove();
       });
     });
   });
