@@ -420,8 +420,8 @@ export module Plots {
         let text = this._labelFormatter(primaryAccessor(d, i, dataset)).toString();
         let w = attrToProjector["width"](d, i, dataset);
         let h = attrToProjector["height"](d, i, dataset);
-        let baselineX = attrToProjector["x"](d, i, dataset);
-        let baselineY = attrToProjector["y"](d, i, dataset);
+        let baseX = attrToProjector["x"](d, i, dataset);
+        let baseY = attrToProjector["y"](d, i, dataset);
         let positive = originalPositionFn(d, i, dataset) <= scaledBaseline;
         let measurement = measurer.measure(text);
         let primary = this._isVertical ? h : w;
@@ -444,7 +444,7 @@ export module Plots {
                   addend += measurement.height;
               };
           }
-          return baselineY + addend;
+          return baseY + addend;
         };
 
         let getX = () => {
@@ -458,7 +458,7 @@ export module Plots {
                   addend += measurement.width;
               };
           }
-          return baselineX + addend;
+          return baseX + addend;
         };
 
         let x = getX();

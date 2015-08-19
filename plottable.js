@@ -7907,8 +7907,8 @@ var Plottable;
                     var text = _this._labelFormatter(primaryAccessor(d, i, dataset)).toString();
                     var w = attrToProjector["width"](d, i, dataset);
                     var h = attrToProjector["height"](d, i, dataset);
-                    var baselineX = attrToProjector["x"](d, i, dataset);
-                    var baselineY = attrToProjector["y"](d, i, dataset);
+                    var baseX = attrToProjector["x"](d, i, dataset);
+                    var baseY = attrToProjector["y"](d, i, dataset);
                     var positive = originalPositionFn(d, i, dataset) <= scaledBaseline;
                     var measurement = measurer.measure(text);
                     var primary = _this._isVertical ? h : w;
@@ -7933,7 +7933,7 @@ var Plottable;
                             }
                             ;
                         }
-                        return baselineY + addend;
+                        return baseY + addend;
                     };
                     var getX = function () {
                         var addend = 0;
@@ -7947,7 +7947,7 @@ var Plottable;
                             }
                             ;
                         }
-                        return baselineX + addend;
+                        return baseX + addend;
                     };
                     var x = getX();
                     var y = getY();
