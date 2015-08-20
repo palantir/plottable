@@ -3161,7 +3161,7 @@ var Plottable;
                 if (typeof (element) === "string") {
                     selection = d3.select(element);
                 }
-                else if (element instanceof SVGSVGElement) {
+                else if (element instanceof HTMLElement) {
                     selection = d3.select(element);
                 }
                 else {
