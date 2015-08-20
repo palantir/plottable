@@ -469,7 +469,7 @@ describe("Plots", () => {
       });
 
       it("rectangle labels hide if rectangle is too short", () => {
-        let svg = TestMethods.generateSVG(150, 30)
+        let svg = TestMethods.generateSVG(150, 30);
         plot.renderTo(svg);
         plot.labelsEnabled(true);
         plot.label((d: any) => d.val);
@@ -479,7 +479,7 @@ describe("Plots", () => {
       });
 
       it("rectangle labels are updated on dataset change", () => {
-        let svg = TestMethods.generateSVG(150, 300)
+        let svg = TestMethods.generateSVG(150, 300);
         plot.renderTo(svg);
         plot.labelsEnabled(true);
         let texts = svg.selectAll("text")[0].map((n: any) => d3.select(n).text());
@@ -494,7 +494,7 @@ describe("Plots", () => {
       });
 
       it("labels cut off by edges are not shown", () => {
-        let svg = TestMethods.generateSVG(150, 300)
+        let svg = TestMethods.generateSVG(150, 300);
         plot.renderTo(svg);
         plot.labelsEnabled(true);
         let data = [
@@ -514,7 +514,7 @@ describe("Plots", () => {
       });
 
       it("labels cut off by other rectangels are not shown", () => {
-        let svg = TestMethods.generateSVG(150, 300)
+        let svg = TestMethods.generateSVG(150, 300);
         plot.renderTo(svg);
         plot.labelsEnabled(true);
         let data = [
