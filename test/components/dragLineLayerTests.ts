@@ -523,6 +523,7 @@ describe("Interactive Components", () => {
       assert.strictEqual(interactionStartCallbacks.size, 0, "Interaction dragStart callbacks removed on destroy()");
       assert.strictEqual(interactionCallbacks.size, 0, "Interaction drag callbacks removed on destroy()");
       assert.strictEqual(interactionEndCallbacks.size, 0, "Interaction drag end callbacks removed on destroy()");
+      assert.notStrictEqual((<any> dragInteraction)._componentAttachedTo, dll, "Interaction was detached");
     });
   });
 });

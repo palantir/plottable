@@ -14,7 +14,7 @@ export module Components {
     private _dragStartCallbacks: Utils.CallbackSet<DragLineCallback<D>>;
     private _dragCallbacks: Utils.CallbackSet<DragLineCallback<D>>;
     private _dragEndCallbacks: Utils.CallbackSet<DragLineCallback<D>>;
-    private _disconnectInteractionCallbacks: () => void;
+    private _disconnectInteraction: () => void;
 
     constructor(orientation: string) {
       super(orientation);
@@ -37,33 +37,36 @@ export module Components {
       };
 
       let dragging = false;
-      let dragStartCallback = (start: Point) => {
+      let interactionDragStartCallback = (start: Point) => {
         if (grabbedLine(start)) {
           dragging = true;
           this._dragStartCallbacks.callCallbacks(this);
         }
       };
-      this._dragInteraction.onDragStart(dragStartCallback);
-      let dragCallback = (start: Point, end: Point) => {
+      this._dragInteraction.onDragStart(interactionDragStartCallback);
+
+      let interactionDragCallback = (start: Point, end: Point) => {
         if (dragging) {
           this._setPixelPositionWithoutChangingMode(this._isVertical() ? end.x : end.y);
           this._dragCallbacks.callCallbacks(this);
         }
       };
-      this._dragInteraction.onDrag(dragCallback);
-      let dragEndCallback = (start: Point, end: Point) => {
+      this._dragInteraction.onDrag(interactionDragCallback);
+
+      let interactionDragEndCallback = (start: Point, end: Point) => {
         if (dragging) {
           dragging = false;
           this._dragEndCallbacks.callCallbacks(this);
         }
       };
-      this._dragInteraction.onDragEnd(dragEndCallback);
+      this._dragInteraction.onDragEnd(interactionDragEndCallback);
 
-      this._disconnectInteractionCallbacks = () => {
-        this._dragInteraction.offDragStart(dragStartCallback);
-        this._dragInteraction.offDrag(dragCallback);
-        this._dragInteraction.offDragEnd(dragEndCallback);
-        delete this._disconnectInteractionCallbacks;
+      this._disconnectInteraction = () => {
+        this._dragInteraction.offDragStart(interactionDragStartCallback);
+        this._dragInteraction.offDrag(interactionDragCallback);
+        this._dragInteraction.offDragEnd(interactionDragEndCallback);
+        this._dragInteraction.detachFrom(this);
+        delete this._disconnectInteraction;
       };
 
       this._dragStartCallbacks = new Utils.CallbackSet<DragLineCallback<D>>();
@@ -214,7 +217,7 @@ export module Components {
       this._dragStartCallbacks.forEach((callback) => this._dragStartCallbacks.delete(callback));
       this._dragCallbacks.forEach((callback) => this._dragCallbacks.delete(callback));
       this._dragEndCallbacks.forEach((callback) => this._dragEndCallbacks.delete(callback));
-      this._disconnectInteractionCallbacks();
+      this._disconnectInteraction();
     }
   }
 }

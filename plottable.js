@@ -11509,32 +11509,33 @@ var Plottable;
                             p.y <= _this.pixelPosition() + _this.detectionRadius());
                 };
                 var dragging = false;
-                var dragStartCallback = function (start) {
+                var interactionDragStartCallback = function (start) {
                     if (grabbedLine(start)) {
                         dragging = true;
                         _this._dragStartCallbacks.callCallbacks(_this);
                     }
                 };
-                this._dragInteraction.onDragStart(dragStartCallback);
-                var dragCallback = function (start, end) {
+                this._dragInteraction.onDragStart(interactionDragStartCallback);
+                var interactionDragCallback = function (start, end) {
                     if (dragging) {
                         _this._setPixelPositionWithoutChangingMode(_this._isVertical() ? end.x : end.y);
                         _this._dragCallbacks.callCallbacks(_this);
                     }
                 };
-                this._dragInteraction.onDrag(dragCallback);
-                var dragEndCallback = function (start, end) {
+                this._dragInteraction.onDrag(interactionDragCallback);
+                var interactionDragEndCallback = function (start, end) {
                     if (dragging) {
                         dragging = false;
                         _this._dragEndCallbacks.callCallbacks(_this);
                     }
                 };
-                this._dragInteraction.onDragEnd(dragEndCallback);
-                this._disconnectInteractionCallbacks = function () {
-                    _this._dragInteraction.offDragStart(dragStartCallback);
-                    _this._dragInteraction.offDrag(dragCallback);
-                    _this._dragInteraction.offDragEnd(dragEndCallback);
-                    delete _this._disconnectInteractionCallbacks;
+                this._dragInteraction.onDragEnd(interactionDragEndCallback);
+                this._disconnectInteraction = function () {
+                    _this._dragInteraction.offDragStart(interactionDragStartCallback);
+                    _this._dragInteraction.offDrag(interactionDragCallback);
+                    _this._dragInteraction.offDragEnd(interactionDragEndCallback);
+                    _this._dragInteraction.detachFrom(_this);
+                    delete _this._disconnectInteraction;
                 };
                 this._dragStartCallbacks = new Plottable.Utils.CallbackSet();
                 this._dragCallbacks = new Plottable.Utils.CallbackSet();
@@ -11653,7 +11654,7 @@ var Plottable;
                 this._dragStartCallbacks.forEach(function (callback) { return _this._dragStartCallbacks.delete(callback); });
                 this._dragCallbacks.forEach(function (callback) { return _this._dragCallbacks.delete(callback); });
                 this._dragEndCallbacks.forEach(function (callback) { return _this._dragEndCallbacks.delete(callback); });
-                this._disconnectInteractionCallbacks();
+                this._disconnectInteraction();
             };
             return DragLineLayer;
         })(Components.GuideLineLayer);
