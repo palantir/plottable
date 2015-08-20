@@ -11482,6 +11482,7 @@ var Plottable;
 (function (Plottable) {
     var Components;
     (function (Components) {
+        ;
         var DragLineLayer = (function (_super) {
             __extends(DragLineLayer, _super);
             function DragLineLayer(orientation) {
@@ -11511,16 +11512,24 @@ var Plottable;
                 this._dragInteraction.onDragStart(function (start) {
                     if (grabbedLine(start)) {
                         dragging = true;
+                        _this._dragStartCallbacks.callCallbacks(_this);
                     }
                 });
                 this._dragInteraction.onDrag(function (start, end) {
                     if (dragging) {
                         _this._setPixelPositionWithoutChangingMode(_this._isVertical() ? end.x : end.y);
+                        _this._dragCallbacks.callCallbacks(_this);
                     }
                 });
                 this._dragInteraction.onDragEnd(function (start, end) {
-                    dragging = false;
+                    if (dragging) {
+                        dragging = false;
+                        _this._dragEndCallbacks.callCallbacks(_this);
+                    }
                 });
+                this._dragStartCallbacks = new Plottable.Utils.CallbackSet();
+                this._dragCallbacks = new Plottable.Utils.CallbackSet();
+                this._dragEndCallbacks = new Plottable.Utils.CallbackSet();
             }
             DragLineLayer.prototype._setup = function () {
                 _super.prototype._setup.call(this);
@@ -11564,6 +11573,30 @@ var Plottable;
                     this.removeClass("enabled");
                 }
                 this._dragInteraction.enabled(enabled);
+                return this;
+            };
+            DragLineLayer.prototype.onDragStart = function (callback) {
+                this._dragStartCallbacks.add(callback);
+                return this;
+            };
+            DragLineLayer.prototype.offDragStart = function (callback) {
+                this._dragStartCallbacks.delete(callback);
+                return this;
+            };
+            DragLineLayer.prototype.onDrag = function (callback) {
+                this._dragCallbacks.add(callback);
+                return this;
+            };
+            DragLineLayer.prototype.offDrag = function (callback) {
+                this._dragCallbacks.delete(callback);
+                return this;
+            };
+            DragLineLayer.prototype.onDragEnd = function (callback) {
+                this._dragEndCallbacks.add(callback);
+                return this;
+            };
+            DragLineLayer.prototype.offDragEnd = function (callback) {
+                this._dragEndCallbacks.delete(callback);
                 return this;
             };
             return DragLineLayer;

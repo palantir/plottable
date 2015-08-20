@@ -2,11 +2,17 @@
 
 module Plottable {
 export module Components {
+  export interface DragLineCallback<D> { (dragLineLayer: DragLineLayer<D>): void };
+
   export class DragLineLayer<D> extends GuideLineLayer<D> {
     private _dragInteraction: Interactions.Drag;
     private _detectionRadius = 3;
     private _detectionEdge: d3.Selection<void>;
     private _enabled = true;
+
+    private _dragStartCallbacks: Utils.CallbackSet<DragLineCallback<D>>;
+    private _dragCallbacks: Utils.CallbackSet<DragLineCallback<D>>;
+    private _dragEndCallbacks: Utils.CallbackSet<DragLineCallback<D>>;
 
     constructor(orientation: string) {
       super(orientation);
@@ -37,16 +43,25 @@ export module Components {
       this._dragInteraction.onDragStart((start: Point) => {
         if (grabbedLine(start)) {
           dragging = true;
+          this._dragStartCallbacks.callCallbacks(this);
         }
       });
       this._dragInteraction.onDrag((start: Point, end: Point) => {
         if (dragging) {
           this._setPixelPositionWithoutChangingMode(this._isVertical() ? end.x : end.y);
+          this._dragCallbacks.callCallbacks(this);
         }
       });
       this._dragInteraction.onDragEnd((start: Point, end: Point) => {
-        dragging = false;
+        if (dragging) {
+          dragging = false;
+          this._dragEndCallbacks.callCallbacks(this);
+        }
       });
+
+      this._dragStartCallbacks = new Utils.CallbackSet<DragLineCallback<D>>();
+      this._dragCallbacks = new Utils.CallbackSet<DragLineCallback<D>>();
+      this._dragEndCallbacks = new Utils.CallbackSet<DragLineCallback<D>>();
     }
 
     protected _setup() {
@@ -98,6 +113,36 @@ export module Components {
         this.removeClass("enabled");
       }
       this._dragInteraction.enabled(enabled);
+      return this;
+    }
+
+    public onDragStart(callback: DragLineCallback<D>) {
+      this._dragStartCallbacks.add(callback);
+      return this;
+    }
+
+    public offDragStart(callback: DragLineCallback<D>) {
+      this._dragStartCallbacks.delete(callback);
+      return this;
+    }
+
+    public onDrag(callback: DragLineCallback<D>) {
+      this._dragCallbacks.add(callback);
+      return this;
+    }
+
+    public offDrag(callback: DragLineCallback<D>) {
+      this._dragCallbacks.delete(callback)
+      return this;
+    }
+
+    public onDragEnd(callback: DragLineCallback<D>) {
+      this._dragEndCallbacks.add(callback);
+      return this;
+    }
+
+    public offDragEnd(callback: DragLineCallback<D>) {
+      this._dragEndCallbacks.delete(callback);
       return this;
     }
   }

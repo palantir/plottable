@@ -4412,6 +4412,9 @@ declare module Plottable {
 
 declare module Plottable {
     module Components {
+        interface DragLineCallback<D> {
+            (dragLineLayer: DragLineLayer<D>): void;
+        }
         class DragLineLayer<D> extends GuideLineLayer<D> {
             constructor(orientation: string);
             protected _setup(): void;
@@ -4420,6 +4423,12 @@ declare module Plottable {
             detectionRadius(detectionRadius: number): DragLineLayer<D>;
             enabled(): boolean;
             enabled(enabled: boolean): DragLineLayer<D>;
+            onDragStart(callback: DragLineCallback<D>): DragLineLayer<D>;
+            offDragStart(callback: DragLineCallback<D>): DragLineLayer<D>;
+            onDrag(callback: DragLineCallback<D>): DragLineLayer<D>;
+            offDrag(callback: DragLineCallback<D>): DragLineLayer<D>;
+            onDragEnd(callback: DragLineCallback<D>): DragLineLayer<D>;
+            offDragEnd(callback: DragLineCallback<D>): DragLineLayer<D>;
         }
     }
 }
