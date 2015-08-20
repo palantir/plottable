@@ -423,6 +423,8 @@ describe("Plots", () => {
       it("retrieves all selections with no args", () => {
         let allCells = plot.selections();
         assert.strictEqual(allCells.size(), 4, "all cells retrieved");
+        let selectionData = allCells.data();
+        assert.includeMembers(selectionData, data, "data in selection data");
         svg.remove();
       });
 
@@ -468,7 +470,7 @@ describe("Plots", () => {
           .label((d: any) => d.val);
       });
 
-      it("displays rectangle labels by default", () => {
+      it("does not display rectangle labels by default", () => {
         let svg = TestMethods.generateSVG(150, 300);
         plot.renderTo(svg);
         let texts = svg.selectAll("text")[0].map((n: any) => d3.select(n).text());
