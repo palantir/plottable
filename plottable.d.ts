@@ -1340,6 +1340,16 @@ declare module Plottable {
 
 declare module Plottable {
     module Drawers {
+        class ArcOutline extends Drawer {
+            constructor(dataset: Dataset);
+            protected _applyDefaultAttributes(selection: d3.Selection<any>): void;
+        }
+    }
+}
+
+
+declare module Plottable {
+    module Drawers {
         class Symbol extends Drawer {
             constructor(dataset: Dataset);
         }
