@@ -525,6 +525,8 @@ describe("Plots", () => {
 
       assert.strictEqual(elementsDrawnSel.size(), 4,
         "There should be exactly 4 slices in the pie chart, representing the valid values");
+      assert.lengthOf(plot.entities(), 4, "there should be exactly 4 entities, representing the valid values");
+
       for (let i = 0 ; i < 4 ; i ++ ) {
         let startAngle = (<any> plot)._startAngles[i];
         let endAngle = (<any> plot)._endAngles[i];

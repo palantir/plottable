@@ -278,23 +278,31 @@ export module Plots {
       let sectorValueAccessor = Plot._scaledAccessor(this.sectorValue());
       let ds = this.datasets()[0];
       let data = dataToDraw.get(ds);
-      let filteredData = data.filter((d, i) => {
-        let value = sectorValueAccessor(d, i, ds);
-        return Plottable.Utils.Math.isValidNumber(value) && value >= 0;
-      });
+      let filteredData = data.filter((d, i) => Pie._isValidData(sectorValueAccessor(d, i, ds)));
       dataToDraw.set(ds, filteredData);
       return dataToDraw;
     }
 
+    protected static _isValidData(value: any) {
+      return Plottable.Utils.Math.isValidNumber(value) && value >= 0;
+    }
+
     protected _pixelPoint(datum: any, index: number, dataset: Dataset) {
+      let scaledValueAccessor = Plot._scaledAccessor(this.sectorValue());
+      if (!Pie._isValidData(scaledValueAccessor(datum, index, dataset))) {
+        return { x: NaN, y: NaN};
+      }
+
       let innerRadius = Plot._scaledAccessor(this.innerRadius())(datum, index, dataset);
       let outerRadius = Plot._scaledAccessor(this.outerRadius())(datum, index, dataset);
       let avgRadius = (innerRadius + outerRadius) / 2;
 
-      let scaledValueAccessor = Plot._scaledAccessor(this.sectorValue());
       let pie = d3.layout.pie()
                          .sort(null)
-                         .value((d: any, i: number) => scaledValueAccessor(d, i, dataset))(dataset.data());
+                         .value((d: any, i: number) => {
+                           let value = scaledValueAccessor(d, i, dataset);
+                           return Pie._isValidData(value) ? value : 0;
+                         })(dataset.data());
       let startAngle = pie[index].startAngle;
       let endAngle = pie[index].endAngle;
       let avgAngle = (startAngle + endAngle) / 2;
