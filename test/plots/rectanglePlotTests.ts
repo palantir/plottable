@@ -108,7 +108,7 @@ describe("Plots", () => {
         svg = TestMethods.generateSVG(300, 300);
       });
 
-      it("autorangeMode on x behaves as expected when changing the domain of the yScale", () => {
+      it("adjusts the xScale domain with respect to the yScale domain when autorangeMode on x", () => {
         let data = [
           { y: "A", x: 0, x2: 1 },
           { y: "B", x: 1, x2: 2 }
@@ -136,7 +136,7 @@ describe("Plots", () => {
         svg.remove();
       });
 
-      it("autorangeMode on y behaves as expected when changing the domain of the xScale", () => {
+      it("adjusts the yScale domain with respect to the xScale domain when autorangeMode on y", () => {
         let data = [
           { x: "A", y: 0, y2: 1 },
           { x: "B", y: 1, y2: 2 }
@@ -166,7 +166,7 @@ describe("Plots", () => {
     });
 
     describe("Fail safe tests", () => {
-      it("data points that are not valid, do not draw rectangles on the plot", () => {
+      it("does not draw rectangles for invalid data points", () => {
         let svg = TestMethods.generateSVG();
 
         let data1 = [
