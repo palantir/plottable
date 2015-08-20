@@ -181,58 +181,67 @@ describe("Interactive Components", () => {
         svg.remove();
       });
 
-      it("calls all the drag interaction callbacks when needed", () => {
+      it("can register two callbacks for the same event", () => {
         dbl.renderTo(svg);
 
         let callbackDragStart1Called = false;
         let callbackDragStart2Called = false;
-        let callbackDrag1Called = false;
-        let callbackDrag2Called = false;
-        let callbackDragEnd1Called = false;
-        let callbackDragEnd2Called = false;
 
         let callbackDragStart1 = () => callbackDragStart1Called = true;
         let callbackDragStart2 = () => callbackDragStart2Called = true;
-        let callbackDrag1 = () => callbackDrag1Called = true;
-        let callbackDrag2 = () => callbackDrag2Called = true;
-        let callbackDragEnd1 = () => callbackDragEnd1Called = true;
-        let callbackDragEnd2 = () => callbackDragEnd2Called = true;
 
         dbl.onDragStart(callbackDragStart1);
         dbl.onDragStart(callbackDragStart2);
-        dbl.onDrag(callbackDrag1);
-        dbl.onDrag(callbackDrag2);
-        dbl.onDragEnd(callbackDragEnd1);
-        dbl.onDragEnd(callbackDragEnd2);
 
         let target = dbl.background();
         TestMethods.triggerFakeDragSequence(target, quarterPoint, halfPoint);
 
         assert.isTrue(callbackDragStart1Called, "the callback 1 for drag start was called");
         assert.isTrue(callbackDragStart2Called, "the callback 2 for drag start was called");
-        assert.isTrue(callbackDrag1Called, "the callback 1 for drag was called");
-        assert.isTrue(callbackDrag2Called, "the callback 2 for drag was called");
-        assert.isTrue(callbackDragEnd1Called, "the callback 1 for drag end was called");
-        assert.isTrue(callbackDragEnd2Called, "the callback 2 for drag end was called");
 
         dbl.offDragStart(callbackDragStart1);
-        dbl.offDrag(callbackDrag1);
-        dbl.offDragEnd(callbackDragEnd1);
-
         callbackDragStart1Called = false;
         callbackDragStart2Called = false;
-        callbackDrag1Called = false;
-        callbackDrag2Called = false;
-        callbackDragEnd1Called = false;
-        callbackDragEnd2Called = false;
 
         TestMethods.triggerFakeDragSequence(target, quarterPoint, halfPoint);
         assert.isFalse(callbackDragStart1Called, "the callback 1 for drag start was disconnected");
         assert.isTrue(callbackDragStart2Called, "the callback 2 for drag start is still connected");
-        assert.isFalse(callbackDrag1Called, "the callback 1 for drag was called disconnected");
-        assert.isTrue(callbackDrag2Called, "the callback 2 for drag is still connected");
-        assert.isFalse(callbackDragEnd1Called, "the callback 1 for drag end was disconnected");
-        assert.isTrue(callbackDragEnd2Called, "the callback 2 for drag end is still connected");
+        svg.remove();
+      });
+
+      it("calls all the drag interaction callbacks when needed", () => {
+        dbl.renderTo(svg);
+
+        let callbackDragStartCalled = false;
+        let callbackDragCalled = false;
+        let callbackDragEndCalled = false;
+
+        let callbackDragStart = () => callbackDragStartCalled = true;
+        let callbackDrag = () => callbackDragCalled = true;
+        let callbackDragEnd = () => callbackDragEndCalled = true;
+
+        dbl.onDragStart(callbackDragStart);
+        dbl.onDrag(callbackDrag);
+        dbl.onDragEnd(callbackDragEnd);
+
+        let target = dbl.background();
+        TestMethods.triggerFakeDragSequence(target, quarterPoint, halfPoint);
+
+        assert.isTrue(callbackDragStartCalled, "the callback for drag start was called");
+        assert.isTrue(callbackDragCalled, "the callback for drag was called");
+        assert.isTrue(callbackDragEndCalled, "the callback for drag end was called");
+
+        dbl.offDragStart(callbackDragStart);
+        dbl.offDrag(callbackDrag);
+        dbl.offDragEnd(callbackDragEnd);
+
+        callbackDragStartCalled = false;
+        callbackDragCalled = false;
+
+        TestMethods.triggerFakeDragSequence(target, quarterPoint, halfPoint);
+        assert.isFalse(callbackDragStartCalled, "the callback for drag start was disconnected");
+        assert.isFalse(callbackDragCalled, "the callback for drag was disconnected");
+        assert.isTrue(callbackDragEndCalled, "the callback for drag end is still connected");
         svg.remove();
       });
     });
