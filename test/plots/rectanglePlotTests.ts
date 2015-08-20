@@ -423,6 +423,7 @@ describe("Plots", () => {
       let dataset: Plottable.Dataset;
       let xScale: Plottable.Scales.Linear;
       let yScale: Plottable.Scales.Linear;
+
       beforeEach(() => {
         xScale = new Plottable.Scales.Linear();
         yScale = new Plottable.Scales.Linear();
