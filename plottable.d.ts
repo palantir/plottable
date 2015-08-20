@@ -2757,6 +2757,7 @@ declare module Plottable {
             entitiesAt(queryPoint: Point): PlotEntity[];
             protected _propertyProjectors(): AttributeToProjector;
             protected _getDataToDraw(): Utils.Map<Dataset, any[]>;
+            protected static _isValidData(value: any): boolean;
             protected _pixelPoint(datum: any, index: number, dataset: Dataset): {
                 x: number;
                 y: number;
