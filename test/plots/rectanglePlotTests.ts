@@ -478,7 +478,7 @@ describe("Plots", () => {
         svg.remove();
       });
 
-      it("renders correct number of labels with the correct text", () => {
+      it("renders correct text for the labels", () => {
         let svg = TestMethods.generateSVG(150, 300);
         plot.renderTo(svg);
         plot.labelsEnabled(true);
