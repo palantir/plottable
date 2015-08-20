@@ -47,6 +47,7 @@ function run(svg, data, Plottable) {
         e.selection.attr("fill", "#34be6c");
       });
     })
+    .xScale(xScale)
     .movable(true);
 
     var hover = new Plottable.Interactions.Pointer()
