@@ -25,7 +25,7 @@ describe("Interactive Components", () => {
         };
       });
 
-      it("correctly draws box on drag", () => {
+      it("draws box on drag", () => {
         dbl.renderTo(svg);
         assert.isFalse(dbl.boxVisible(), "box is hidden initially");
 
@@ -75,7 +75,7 @@ describe("Interactive Components", () => {
         svg.remove();
       });
 
-      it("applies the given detection radius", () => {
+      it("applies the given detection radius property", () => {
         dbl.renderTo("svg");
 
         let radius = 5;
