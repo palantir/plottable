@@ -363,7 +363,7 @@ export class Plot extends Component {
     return this;
   }
 
-  private _addDataset(dataset: Dataset) {
+  protected _addDataset(dataset: Dataset) {
     this._removeDataset(dataset);
     let drawer = this._createDrawer(dataset);
     this._datasetToDrawer.set(dataset, drawer);

@@ -2592,6 +2592,7 @@ declare module Plottable {
          * @returns {Plot} The calling Plot.
          */
         addDataset(dataset: Dataset): Plot;
+        protected _addDataset(dataset: Dataset): Plot;
         /**
          * Removes a Dataset from the Plot.
          *
@@ -3262,7 +3263,7 @@ declare module Plottable {
              */
             y0(y0: number | Accessor<number>): Area<X>;
             protected _onDatasetUpdate(): void;
-            addDataset(dataset: Dataset): Area<X>;
+            protected _addDataset(dataset: Dataset): Area<X>;
             protected _removeDatasetNodes(dataset: Dataset): void;
             protected _additionalPaint(): void;
             protected _createDrawer(dataset: Dataset): Drawers.Area;

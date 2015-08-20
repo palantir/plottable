@@ -80,13 +80,13 @@ export module Plots {
       this._updateYScale();
     }
 
-    public addDataset(dataset: Dataset) {
+    protected _addDataset(dataset: Dataset) {
       let lineDrawer = new Drawers.Line(dataset);
       if (this._isSetup) {
         lineDrawer.renderArea(this._renderArea.append("g"));
       }
       this._lineDrawers.set(dataset, lineDrawer);
-      super.addDataset(dataset);
+      super._addDataset(dataset);
       return this;
     }
 

@@ -8549,13 +8549,13 @@ var Plottable;
                 _super.prototype._onDatasetUpdate.call(this);
                 this._updateYScale();
             };
-            Area.prototype.addDataset = function (dataset) {
+            Area.prototype._addDataset = function (dataset) {
                 var lineDrawer = new Plottable.Drawers.Line(dataset);
                 if (this._isSetup) {
                     lineDrawer.renderArea(this._renderArea.append("g"));
                 }
                 this._lineDrawers.set(dataset, lineDrawer);
-                _super.prototype.addDataset.call(this, dataset);
+                _super.prototype._addDataset.call(this, dataset);
                 return this;
             };
             Area.prototype._removeDatasetNodes = function (dataset) {
