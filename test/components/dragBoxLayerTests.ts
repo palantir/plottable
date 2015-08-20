@@ -87,13 +87,15 @@ describe("Interactive Components", () => {
         assert.strictEqual(edges.size(), 4, "the edges of a rectangle are drawn");
         edges.each(function() {
           let edge = d3.select(this);
-          assert.strictEqual(edge.style("stroke-width"), 2 * radius + "px", "edge width was set correctly");
+          let strokeWidth = parseFloat(edge.style("stroke-width"));
+          assert.strictEqual(strokeWidth, 2 * radius, "edge width was set correctly");
         });
         let corners = dbl.content().selectAll("circle");
         assert.strictEqual(corners.size(), 4, "the corners of a rectangle are drawn");
         corners.each(function() {
           let corner = d3.select(this);
-          assert.strictEqual(corner.attr("r"), "" + radius, "corner radius was set correctly");
+          let cornerRadius = parseFloat(corner.attr("r"));
+          assert.strictEqual(cornerRadius, radius, "corner radius was set correctly");
         });
 
         svg.remove();
