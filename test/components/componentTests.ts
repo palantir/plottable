@@ -449,15 +449,15 @@ describe("Component behavior", () => {
     svg.attr("id", "render-to-test");
     assert.doesNotThrow(() => c.renderTo("#render-to-test"), Error, "accepts strings that identify svgs");
     assert.doesNotThrow(() => c.renderTo(svg), Error, "accepts selections that contain svgs");
-    assert.doesNotThrow(() => c.renderTo(<HTMLElement> document.getElementById("render-to-test")), Error, "accepts svg elements");
+    assert.doesNotThrow(() => c.renderTo(document.getElementById("render-to-test")), Error, "accepts svg elements");
     let parent = TestMethods.getSVGParent();
     let div = parent.append("div");
     // HACKHACK #2614: chai-assert.d.ts has the wrong signature
     (<any> assert).throws(() => c.renderTo(div), Error, "", "rejects selections that don't contain svgs");
-    (<any> assert).throws(() => c.renderTo(<HTMLElement> div[0][0]), Error, "", "rejects DOM nodes that are not svgs");
+    (<any> assert).throws(() => c.renderTo(<Element> div.node()), Error, "", "rejects DOM nodes that are not svgs");
     (<any> assert).throws(() => c.renderTo("#not-a-element"), Error, "", "rejects strings that don't correspond to DOM elements");
     (<any> assert).throws(() => c.renderTo(d3.select(null)), Error, "", "rejects empty d3 selections");
-    //svg.remove();
+    svg.remove();
   });
 
   describe("origin methods", () => {
