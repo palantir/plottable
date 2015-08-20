@@ -11584,26 +11584,65 @@ var Plottable;
                 this._dragInteraction.enabled(enabled);
                 return this;
             };
+            /**
+             * Sets the callback to be called when dragging starts.
+             * The callback will be passed the calling DragLineLayer.
+             *
+             * @param {DragLineCallback<D>} callback
+             * @returns {DragLineLayer<D>} The calling DragLineLayer.
+             */
             DragLineLayer.prototype.onDragStart = function (callback) {
                 this._dragStartCallbacks.add(callback);
                 return this;
             };
+            /**
+             * Removes a callback that would be called when dragging starts.
+             *
+             * @param {DragLineCallback<D>} callback
+             * @returns {DragLineLayer<D>} The calling DragLineLayer.
+             */
             DragLineLayer.prototype.offDragStart = function (callback) {
                 this._dragStartCallbacks.delete(callback);
                 return this;
             };
+            /**
+             * Sets a callback to be called during dragging.
+             * The callback will be passed the calling DragLineLayer.
+             *
+             * @param {DragLineCallback<D>} callback
+             * @returns {DragLineLayer<D>} The calling DragLineLayer.
+             */
             DragLineLayer.prototype.onDrag = function (callback) {
                 this._dragCallbacks.add(callback);
                 return this;
             };
+            /**
+             * Removes a callback that would be called during dragging.
+             *
+             * @param {DragLineCallback<D>} callback
+             * @returns {DragLineLayer<D>} The calling DragLineLayer.
+             */
             DragLineLayer.prototype.offDrag = function (callback) {
                 this._dragCallbacks.delete(callback);
                 return this;
             };
+            /**
+             * Sets a callback to be called when dragging ends.
+             * The callback will be passed the calling DragLineLayer.
+             *
+             * @param {DragLineCallback<D>} callback
+             * @returns {DragLineLayer<D>} The calling DragLineLayer.
+             */
             DragLineLayer.prototype.onDragEnd = function (callback) {
                 this._dragEndCallbacks.add(callback);
                 return this;
             };
+            /**
+             * Removes a callback that would be called when dragging ends.
+             *
+             * @param {DragLineCallback<D>} callback
+             * @returns {DragLineLayer<D>} The calling DragLineLayer.
+             */
             DragLineLayer.prototype.offDragEnd = function (callback) {
                 this._dragEndCallbacks.delete(callback);
                 return this;

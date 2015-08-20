@@ -97,8 +97,16 @@ export module Components {
 
       return this;
     }
-
+    /**
+     * Gets the detection radius of the drag line in pixels.
+     */
     public detectionRadius(): number;
+    /**
+     * Sets the detection radius of the drag line in pixels.
+     *
+     * @param {number} detectionRadius
+     * @return {DragLineLayer<D>} The calling DragLineLayer.
+     */
     public detectionRadius(detectionRadius: number): DragLineLayer<D>;
     public detectionRadius(detectionRadius?: number): any {
       if (detectionRadius == null) {
@@ -112,7 +120,16 @@ export module Components {
       return this;
     }
 
+    /**
+     * Gets whether the DragLineLayer is enabled.
+     */
     public enabled(): boolean;
+    /**
+     * Enables or disables the DragLineLayer.
+     *
+     * @param {boolean} enabled
+     * @return {DragLineLayer<D>} The calling DragLineLayer.
+     */
     public enabled(enabled: boolean): DragLineLayer<D>;
     public enabled(enabled?: boolean): any {
       if (enabled == null) {
@@ -128,31 +145,70 @@ export module Components {
       return this;
     }
 
+    /**
+     * Sets the callback to be called when dragging starts.
+     * The callback will be passed the calling DragLineLayer.
+     *
+     * @param {DragLineCallback<D>} callback
+     * @returns {DragLineLayer<D>} The calling DragLineLayer.
+     */
     public onDragStart(callback: DragLineCallback<D>) {
       this._dragStartCallbacks.add(callback);
       return this;
     }
 
+    /**
+     * Removes a callback that would be called when dragging starts.
+     *
+     * @param {DragLineCallback<D>} callback
+     * @returns {DragLineLayer<D>} The calling DragLineLayer.
+     */
     public offDragStart(callback: DragLineCallback<D>) {
       this._dragStartCallbacks.delete(callback);
       return this;
     }
 
+    /**
+     * Sets a callback to be called during dragging.
+     * The callback will be passed the calling DragLineLayer.
+     *
+     * @param {DragLineCallback<D>} callback
+     * @returns {DragLineLayer<D>} The calling DragLineLayer.
+     */
     public onDrag(callback: DragLineCallback<D>) {
       this._dragCallbacks.add(callback);
       return this;
     }
 
+    /**
+     * Removes a callback that would be called during dragging.
+     *
+     * @param {DragLineCallback<D>} callback
+     * @returns {DragLineLayer<D>} The calling DragLineLayer.
+     */
     public offDrag(callback: DragLineCallback<D>) {
       this._dragCallbacks.delete(callback);
       return this;
     }
 
+    /**
+     * Sets a callback to be called when dragging ends.
+     * The callback will be passed the calling DragLineLayer.
+     *
+     * @param {DragLineCallback<D>} callback
+     * @returns {DragLineLayer<D>} The calling DragLineLayer.
+     */
     public onDragEnd(callback: DragLineCallback<D>) {
       this._dragEndCallbacks.add(callback);
       return this;
     }
 
+    /**
+     * Removes a callback that would be called when dragging ends.
+     *
+     * @param {DragLineCallback<D>} callback
+     * @returns {DragLineLayer<D>} The calling DragLineLayer.
+     */
     public offDragEnd(callback: DragLineCallback<D>) {
       this._dragEndCallbacks.delete(callback);
       return this;
