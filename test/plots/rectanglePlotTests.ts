@@ -109,7 +109,7 @@ describe("Plots", () => {
       });
 
       it("autorangeMode on x behaves as expected when changing the domain of the yScale", () => {
-        let staggeredData = [
+        let data = [
           { y: "A", x: 0, x2: 1 },
           { y: "B", x: 1, x2: 2 }
         ];
@@ -122,7 +122,7 @@ describe("Plots", () => {
         plot.x((d) => d.x, xScale);
         plot.x2((d) => d.x2);
         plot.y((d) => d.y, yScale);
-        plot.addDataset(new Plottable.Dataset(staggeredData));
+        plot.addDataset(new Plottable.Dataset(data));
         plot.autorangeMode("x");
         plot.renderTo(svg);
 
@@ -137,7 +137,7 @@ describe("Plots", () => {
       });
 
       it("autorangeMode on y behaves as expected when changing the domain of the xScale", () => {
-        let staggeredData = [
+        let data = [
           { x: "A", y: 0, y2: 1 },
           { x: "B", y: 1, y2: 2 }
         ];
@@ -150,7 +150,7 @@ describe("Plots", () => {
         plot.x((d) => d.x, xScale);
         plot.y((d) => d.y, yScale);
         plot.y2((d) => d.y2);
-        plot.addDataset(new Plottable.Dataset(staggeredData));
+        plot.addDataset(new Plottable.Dataset(data));
         plot.autorangeMode("y");
         plot.renderTo(svg);
 
@@ -166,7 +166,7 @@ describe("Plots", () => {
     });
 
     describe("Fail safe tests", () => {
-      it("illegal rectangles don't get displayed", () => {
+      it("data points that are not valid, do not draw rectangles on the plot", () => {
         let svg = TestMethods.generateSVG();
 
         let data1 = [
