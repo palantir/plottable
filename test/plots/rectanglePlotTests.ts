@@ -3,15 +3,26 @@
 describe("Plots", () => {
   describe("RectanglePlot", () => {
     describe("Basic usage", () => {
-      let data = [
-        { x: 0, y: 0, x2: 1, y2: 1 },
-        { x: 1, y: 1, x2: 2, y2: 2 },
-        { x: 2, y: 2, x2: 3, y2: 3 },
-        { x: 3, y: 3, x2: 4, y2: 4 },
-        { x: 4, y: 4, x2: 5, y2: 5 }
-      ];
-      let verifyCells = (cells: d3.Selection<any>) => {
-        assert.strictEqual(cells[0].length, 5);
+      it("has correct rectangle heights and positions (renders correctly)", () => {
+        let data = [
+          { x: 0, y: 0, x2: 1, y2: 1 },
+          { x: 1, y: 1, x2: 2, y2: 2 },
+          { x: 2, y: 2, x2: 3, y2: 3 },
+          { x: 3, y: 3, x2: 4, y2: 4 },
+          { x: 4, y: 4, x2: 5, y2: 5 }
+        ];
+
+        let svg = TestMethods.generateSVG(300, 300);
+        let xScale = new Plottable.Scales.Linear();
+        let yScale = new Plottable.Scales.Linear();
+        let plot = new Plottable.Plots.Rectangle<number, number>();
+        plot.x((d) => d.x, xScale).x2((d) => d.x2);
+        plot.y((d) => d.y, yScale).y2((d) => d.y2);
+        plot.addDataset(new Plottable.Dataset(data));
+        plot.renderTo(svg);
+
+        let cells = plot.content().selectAll("rect");
+        assert.strictEqual(cells.size(), data.length);
         cells.each(function(d, i) {
           let cell = d3.select(this);
           assert.closeTo(+cell.attr("height"), 50, 0.5, "Cell height is correct");
@@ -19,7 +30,18 @@ describe("Plots", () => {
           assert.closeTo(+cell.attr("x"), 25 + 50 * i, 0.5, "Cell x coordinate is correct");
           assert.closeTo(+cell.attr("y"), 25 + 50 * (cells[0].length - i - 1), 0.5, "Cell y coordinate is correct");
         });
-      };
+        svg.remove();
+      });
+    });
+
+    describe("entities", () => {
+      let data = [
+        { x: 0, y: 0, x2: 1, y2: 1 },
+        { x: 1, y: 1, x2: 2, y2: 2 },
+        { x: 2, y: 2, x2: 3, y2: 3 },
+        { x: 3, y: 3, x2: 4, y2: 4 },
+        { x: 4, y: 4, x2: 5, y2: 5 }
+      ];
 
       let svg: d3.Selection<void>;
       let xScale: Plottable.Scales.Linear;
@@ -33,14 +55,6 @@ describe("Plots", () => {
         plot = new Plottable.Plots.Rectangle<number, number>();
         plot.x((d) => d.x, xScale).x2((d) => d.x2);
         plot.y((d) => d.y, yScale).y2((d) => d.y2);
-      });
-
-      it("has correct rectangle heights and positions (renders correctly)", () => {
-        plot.addDataset(new Plottable.Dataset(data));
-        plot.renderTo(svg);
-
-        verifyCells(plot.content().selectAll("rect"));
-        svg.remove();
       });
 
       it("retrieves the correct entity under a point", () => {
@@ -108,7 +122,7 @@ describe("Plots", () => {
         svg = TestMethods.generateSVG(300, 300);
       });
 
-      it("adjusts the xScale domain with respect to the yScale domain when autorangeMode on x", () => {
+      it("adjusts the xScale domain with respect to the yScale domain when autorangeMode is set to x", () => {
         let data = [
           { y: "A", x: 0, x2: 1 },
           { y: "B", x: 1, x2: 2 }
@@ -136,7 +150,7 @@ describe("Plots", () => {
         svg.remove();
       });
 
-      it("adjusts the yScale domain with respect to the xScale domain when autorangeMode on y", () => {
+      it("adjusts the yScale domain with respect to the xScale domain when autorangeMode is set to y", () => {
         let data = [
           { x: "A", y: 0, y2: 1 },
           { x: "B", y: 1, y2: 2 }
@@ -210,7 +224,7 @@ describe("Plots", () => {
       });
     });
 
-    describe("Grids", () => {
+    describe("Plots based on Category Scales", () => {
       let SVG_WIDTH = 400;
       let SVG_HEIGHT = 200;
       let data = [
@@ -291,8 +305,6 @@ describe("Plots", () => {
       });
 
       it("renders correctly when there isn't data for every spot", () => {
-        let CELL_HEIGHT = 50;
-        let CELL_WIDTH = 100;
         let dataset = new Plottable.Dataset();
         let plot = new Plottable.Plots.Rectangle();
         plot.addDataset(dataset);
@@ -309,12 +321,14 @@ describe("Plots", () => {
         dataset.data(data);
         let cells = plot.content().selectAll("rect")[0];
         assert.strictEqual(cells.length, data.length);
+        let cellHeight = 50;
+        let cellWidth = 100;
         for (let i = 0; i < cells.length; i++) {
           let cell = d3.select(cells[i]);
-          assert.strictEqual(cell.attr("x"), String(i * CELL_WIDTH), "Cell x coord is correct");
-          assert.strictEqual(cell.attr("y"), String(i * CELL_HEIGHT), "Cell y coord is correct");
-          assert.strictEqual(cell.attr("width"), String(CELL_WIDTH), "Cell width is correct");
-          assert.strictEqual(cell.attr("height"), String(CELL_HEIGHT), "Cell height is correct");
+          assert.strictEqual(cell.attr("x"), String(i * cellWidth), "Cell x coord is correct");
+          assert.strictEqual(cell.attr("y"), String(i * cellHeight), "Cell y coord is correct");
+          assert.strictEqual(cell.attr("width"), String(cellWidth), "Cell width is correct");
+          assert.strictEqual(cell.attr("height"), String(cellHeight), "Cell height is correct");
         }
         svg.remove();
       });
@@ -329,28 +343,45 @@ describe("Plots", () => {
 
         yScale.domain(["U", "V"]);
 
-        let cells = plot.content().selectAll("rect")[0];
-        let cellAU = d3.select(cells[0]);
-        let cellAV = d3.select(cells[2]);
-        cellAU.attr("fill", "#000000");
-        cellAU.attr("x", "0");
-        cellAU.attr("y", "100");
+        let cells = plot.content().selectAll("rect");
+        assert.strictEqual(cells.size(), data.length, data.length + " cells are drawn");
+        let cellAU = d3.select(cells[0][0]);
+        let cellAV = d3.select(cells[0][2]);
 
-        cellAV.attr("fill", "#ffffff");
-        cellAV.attr("x", "0");
-        cellAV.attr("y", "0");
+        let checksDone = 0;
+        cells.each(function() {
+          let cell = d3.select(this);
+          if (cell.attr("x") === "0" && cell.attr("y") === "0") {
+            assert.strictEqual(cell.attr("fill"), "#000000", "top-left cell is black");
+            checksDone++;
+          }
+          if (cell.attr("x") === "0" && cell.attr("y") === "100") {
+            assert.strictEqual(cell.attr("fill"), "#ffffff", "bottom-left cell is black");
+            checksDone++;
+          }
+        });
+        assert.strictEqual(checksDone, 2, "checked all both cells we were interested in");
 
         yScale.domain(["V", "U"]);
-        cells = plot.content().selectAll("rect")[0];
-        cellAU = d3.select(cells[0]);
-        cellAV = d3.select(cells[2]);
-        cellAU.attr("fill", "#000000");
-        cellAU.attr("x", "0");
-        cellAU.attr("y", "0");
 
-        cellAV.attr("fill", "#ffffff");
-        cellAV.attr("x", "0");
-        cellAV.attr("y", "100");
+        cells = plot.content().selectAll("rect");
+        assert.strictEqual(cells.size(), data.length, data.length + " cells are drawn");
+        cellAU = d3.select(cells[0][0]);
+        cellAV = d3.select(cells[0][2]);
+
+        checksDone = 0;
+        cells.each(function() {
+          let cell = d3.select(this);
+          if (cell.attr("x") === "0" && cell.attr("y") === "0") {
+            assert.strictEqual(cell.attr("fill"), "#ffffff", "top-left cell is black");
+            checksDone++;
+          }
+          if (cell.attr("x") === "0" && cell.attr("y") === "100") {
+            assert.strictEqual(cell.attr("fill"), "#000000", "bottom-left cell is black");
+            checksDone++;
+          }
+        });
+        assert.strictEqual(checksDone, 2, "checked all both cells we were interested in");
         svg.remove();
       });
     });
