@@ -415,7 +415,6 @@ describe("Plots", () => {
     });
 
     describe("Labels", () => {
-      let svg: d3.Selection<void>;
       let plot: Plottable.Plots.Rectangle<number, number>;
       let data = [
         { x: 0, y: 0, x2: 1, y2: 1, val: "1" },
@@ -427,26 +426,27 @@ describe("Plots", () => {
       beforeEach(() => {
         xScale = new Plottable.Scales.Linear();
         yScale = new Plottable.Scales.Linear();
-        svg = TestMethods.generateSVG(150, 300);
         plot = new Plottable.Plots.Rectangle<number, number>();
-        data = ;
         dataset = new Plottable.Dataset(data);
         plot.addDataset(dataset);
         plot.x((d: any) => d.x, xScale)
-                     .y((d: any) => d.y, yScale)
-                     .x2((d: any) => d.x2)
-                     .y2((d: any) => d.y2)
-                     .label((d: any) => d.val)
-                     .renderTo(svg);
+          .y((d: any) => d.y, yScale)
+          .x2((d: any) => d.x2)
+          .y2((d: any) => d.y2)
+          .label((d: any) => d.val);
       });
 
       it("rectangle labels disabled by default", () => {
+        let svg = TestMethods.generateSVG(150, 300);
+        plot.renderTo(svg);
         let texts = svg.selectAll("text")[0].map((n: any) => d3.select(n).text());
         assert.lengthOf(texts, 0, "by default, no labels are drawn");
         svg.remove();
       });
 
       it("rectangle labels render properly", () => {
+        let svg = TestMethods.generateSVG(150, 300);
+        plot.renderTo(svg);
         plot.labelsEnabled(true);
         let texts = svg.selectAll("text")[0].map((n: any) => d3.select(n).text());
         assert.lengthOf(texts, 2, "all labels are drawn");
@@ -457,6 +457,8 @@ describe("Plots", () => {
       });
 
       it("rectangle labels hide if rectangle is too skinny", () => {
+        let svg = TestMethods.generateSVG(150, 300);
+        plot.renderTo(svg);
         plot.labelsEnabled(true);
         plot.label((d: any, i: number) => d.val + ( i !== 0 ? "a really really really long string" : "" ));
         let texts = svg.selectAll("text")[0].map((n: any) => d3.select(n).text());
@@ -466,9 +468,9 @@ describe("Plots", () => {
       });
 
       it("rectangle labels hide if rectangle is too short", () => {
+        let svg = TestMethods.generateSVG(150, 30)
+        plot.renderTo(svg);
         plot.labelsEnabled(true);
-        svg.remove();
-        svg = TestMethods.generateSVG(150, 30);
         plot.label((d: any) => d.val);
         let texts = svg.selectAll("text")[0].map((n: any) => d3.select(n).text());
         assert.lengthOf(texts, 0, "labels are not drawn when rectangles are too short");
@@ -476,6 +478,8 @@ describe("Plots", () => {
       });
 
       it("rectangle labels are updated on dataset change", () => {
+        let svg = TestMethods.generateSVG(150, 300)
+        plot.renderTo(svg);
         plot.labelsEnabled(true);
         let texts = svg.selectAll("text")[0].map((n: any) => d3.select(n).text());
         assert.lengthOf(texts, 2, "all labels are drawn");
@@ -489,6 +493,8 @@ describe("Plots", () => {
       });
 
       it("labels cut off by edges are not shown", () => {
+        let svg = TestMethods.generateSVG(150, 300)
+        plot.renderTo(svg);
         plot.labelsEnabled(true);
         let data = [
           { x: 2, y: 2, x2: 3, y2: 3, val: "center" },
@@ -507,6 +513,8 @@ describe("Plots", () => {
       });
 
       it("labels cut off by other rectangels are not shown", () => {
+        let svg = TestMethods.generateSVG(150, 300)
+        plot.renderTo(svg);
         plot.labelsEnabled(true);
         let data = [
           { x: 0, y: 0, x2: 2, y2: 2, val: "bottom" },
