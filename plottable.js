@@ -6848,17 +6848,17 @@ var Plottable;
                 }
                 return this;
             };
-            Pie.prototype.addDataset = function (dataset) {
+            Pie.prototype._addDataset = function (dataset) {
                 if (this.datasets().length === 1) {
                     Plottable.Utils.Window.warn("Only one dataset is supported in Pie plots");
                     return this;
                 }
                 this._updatePieAngles();
-                _super.prototype.addDataset.call(this, dataset);
+                _super.prototype._addDataset.call(this, dataset);
                 return this;
             };
-            Pie.prototype.removeDataset = function (dataset) {
-                _super.prototype.removeDataset.call(this, dataset);
+            Pie.prototype._removeDataset = function (dataset) {
+                _super.prototype._removeDataset.call(this, dataset);
                 this._startAngles = [];
                 this._endAngles = [];
                 return this;
@@ -7905,15 +7905,24 @@ var Plottable;
                 return this;
             };
             Bar.prototype.addDataset = function (dataset) {
-                dataset.onUpdate(this._updateBarPixelWidthCallback);
                 _super.prototype.addDataset.call(this, dataset);
                 this._updateBarPixelWidth();
+                return this;
+            };
+            Bar.prototype._addDataset = function (dataset) {
+                dataset.onUpdate(this._updateBarPixelWidthCallback);
+                _super.prototype._addDataset.call(this, dataset);
                 return this;
             };
             Bar.prototype.removeDataset = function (dataset) {
                 dataset.offUpdate(this._updateBarPixelWidthCallback);
                 _super.prototype.removeDataset.call(this, dataset);
                 this._updateBarPixelWidth();
+                return this;
+            };
+            Bar.prototype._removeDataset = function (dataset) {
+                dataset.offUpdate(this._updateBarPixelWidthCallback);
+                _super.prototype._removeDataset.call(this, dataset);
                 return this;
             };
             Bar.prototype.labelsEnabled = function (enabled) {

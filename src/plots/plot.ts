@@ -388,7 +388,7 @@ export class Plot extends Component {
     return this;
   }
 
-  private _removeDataset(dataset: Dataset) {
+  protected _removeDataset(dataset: Dataset) {
     if (this.datasets().indexOf(dataset) === -1) {
       return this;
     }

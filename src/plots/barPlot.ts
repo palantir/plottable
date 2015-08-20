@@ -154,9 +154,14 @@ export module Plots {
     }
 
     public addDataset(dataset: Dataset) {
-      dataset.onUpdate(this._updateBarPixelWidthCallback);
       super.addDataset(dataset);
       this._updateBarPixelWidth();
+      return this;
+    }
+
+    protected _addDataset(dataset: Dataset) {
+      dataset.onUpdate(this._updateBarPixelWidthCallback);
+      super._addDataset(dataset);
       return this;
     }
 
@@ -164,6 +169,12 @@ export module Plots {
       dataset.offUpdate(this._updateBarPixelWidthCallback);
       super.removeDataset(dataset);
       this._updateBarPixelWidth();
+      return this;
+    }
+
+    public _removeDataset(dataset: Dataset) {
+      dataset.offUpdate(this._updateBarPixelWidthCallback);
+      super._removeDataset(dataset);
       return this;
     }
 

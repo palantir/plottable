@@ -36,18 +36,18 @@ export module Plots {
       return this;
     }
 
-    public addDataset(dataset: Dataset) {
+    protected _addDataset(dataset: Dataset) {
       if (this.datasets().length === 1) {
         Utils.Window.warn("Only one dataset is supported in Pie plots");
         return this;
       }
       this._updatePieAngles();
-      super.addDataset(dataset);
+      super._addDataset(dataset);
       return this;
     }
 
-    public removeDataset(dataset: Dataset) {
-      super.removeDataset(dataset);
+    protected _removeDataset(dataset: Dataset) {
+      super._removeDataset(dataset);
       this._startAngles = [];
       this._endAngles = [];
       return this;

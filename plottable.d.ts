@@ -2600,6 +2600,7 @@ declare module Plottable {
          * @returns {Plot} The calling Plot.
          */
         removeDataset(dataset: Dataset): Plot;
+        protected _removeDataset(dataset: Dataset): Plot;
         protected _removeDatasetNodes(dataset: Dataset): void;
         datasets(): Dataset[];
         datasets(datasets: Dataset[]): Plot;
@@ -2650,8 +2651,8 @@ declare module Plottable {
              */
             constructor();
             computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number): Pie;
-            addDataset(dataset: Dataset): Pie;
-            removeDataset(dataset: Dataset): Pie;
+            protected _addDataset(dataset: Dataset): Pie;
+            protected _removeDataset(dataset: Dataset): Pie;
             protected _onDatasetUpdate(): void;
             protected _createDrawer(dataset: Dataset): Drawers.Arc;
             entities(datasets?: Dataset[]): PlotEntity[];
@@ -3090,7 +3091,9 @@ declare module Plottable {
              */
             baselineValue(value: X | Y): Bar<X, Y>;
             addDataset(dataset: Dataset): Bar<X, Y>;
+            protected _addDataset(dataset: Dataset): Bar<X, Y>;
             removeDataset(dataset: Dataset): Bar<X, Y>;
+            _removeDataset(dataset: Dataset): Bar<X, Y>;
             /**
              * Get whether bar labels are enabled.
              *
