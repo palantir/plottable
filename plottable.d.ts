@@ -2437,10 +2437,12 @@ declare module Plottable {
                 width: number;
                 height: number;
             };
+            protected _isVertical(): boolean;
             fixedWidth(): boolean;
             fixedHeight(): boolean;
             computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number): GuideLineLayer<D>;
             renderImmediately(): GuideLineLayer<D>;
+            protected _setPixelPositionWithoutChangingMode(pixelPosition: number): void;
             /**
              * Gets the QuantitativeScale on the GuideLineLayer.
              *
@@ -4411,8 +4413,11 @@ declare module Plottable {
 declare module Plottable {
     module Components {
         class DragLineLayer<D> extends GuideLineLayer<D> {
+            constructor(orientation: string);
+            protected _setup(): void;
+            renderImmediately(): DragLineLayer<D>;
             detectionRadius(): number;
-            detectionRadius(r: number): DragLineLayer<D>;
+            detectionRadius(detectionRadius: number): DragLineLayer<D>;
             enabled(): boolean;
             enabled(enabled: boolean): DragLineLayer<D>;
         }

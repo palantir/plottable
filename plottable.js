@@ -6301,6 +6301,13 @@ var Plottable;
                     this._value = this.scale().invert(this.pixelPosition());
                 }
             };
+            GuideLineLayer.prototype._setPixelPositionWithoutChangingMode = function (pixelPosition) {
+                this._pixelPosition = pixelPosition;
+                if (this.scale() != null) {
+                    this._value = this.scale().invert(this.pixelPosition());
+                }
+                this.render();
+            };
             GuideLineLayer.prototype.scale = function (scale) {
                 if (scale == null) {
                     return this._scale;
@@ -11477,12 +11484,87 @@ var Plottable;
     (function (Components) {
         var DragLineLayer = (function (_super) {
             __extends(DragLineLayer, _super);
-            function DragLineLayer() {
-                _super.apply(this, arguments);
+            function DragLineLayer(orientation) {
+                var _this = this;
+                _super.call(this, orientation);
+                this._detectionRadius = 3;
+                this._enabled = true;
+                this.addClass("drag-line-layer");
+                this.addClass("enabled");
+                if (this._isVertical()) {
+                    this.addClass("vertical");
+                }
+                else {
+                    this.addClass("horizontal");
+                }
+                this._dragInteraction = new Plottable.Interactions.Drag();
+                this._dragInteraction.attachTo(this);
+                var grabbedLine = function (p) {
+                    return (_this._isVertical() &&
+                        p.x >= _this.pixelPosition() - _this.detectionRadius() &&
+                        p.x <= _this.pixelPosition() + _this.detectionRadius()) ||
+                        (!_this._isVertical() &&
+                            p.y >= _this.pixelPosition() - _this.detectionRadius() &&
+                            p.y <= _this.pixelPosition() + _this.detectionRadius());
+                };
+                var dragging = false;
+                this._dragInteraction.onDragStart(function (start) {
+                    if (grabbedLine(start)) {
+                        dragging = true;
+                    }
+                });
+                this._dragInteraction.onDrag(function (start, end) {
+                    if (dragging) {
+                        _this._setPixelPositionWithoutChangingMode(_this._isVertical() ? end.x : end.y);
+                    }
+                });
+                this._dragInteraction.onDragEnd(function (start, end) {
+                    dragging = false;
+                });
             }
-            DragLineLayer.prototype.detectionRadius = function (r) {
+            DragLineLayer.prototype._setup = function () {
+                _super.prototype._setup.call(this);
+                this._detectionEdge = this.content().append("line").style({
+                    opacity: 0,
+                    fill: "pink",
+                    "pointer-events": "visibleStroke"
+                }).classed("drag-edge", true);
+            };
+            DragLineLayer.prototype.renderImmediately = function () {
+                _super.prototype.renderImmediately.call(this);
+                this._detectionEdge.attr({
+                    x1: this._isVertical() ? this.pixelPosition() : 0,
+                    y1: this._isVertical() ? 0 : this.pixelPosition(),
+                    x2: this._isVertical() ? this.pixelPosition() : this.width(),
+                    y2: this._isVertical() ? this.height() : this.pixelPosition(),
+                    "stroke-width": this._detectionRadius * 2
+                });
+                return this;
+            };
+            DragLineLayer.prototype.detectionRadius = function (detectionRadius) {
+                if (detectionRadius == null) {
+                    return this._detectionRadius;
+                }
+                if (detectionRadius < 0) {
+                    throw new Error("detection radius cannot be negative.");
+                }
+                this._detectionRadius = detectionRadius;
+                this.render();
+                return this;
             };
             DragLineLayer.prototype.enabled = function (enabled) {
+                if (enabled == null) {
+                    return this._enabled;
+                }
+                this._enabled = enabled;
+                if (enabled) {
+                    this.addClass("enabled");
+                }
+                else {
+                    this.removeClass("enabled");
+                }
+                this._dragInteraction.enabled(enabled);
+                return this;
             };
             return DragLineLayer;
         })(Components.GuideLineLayer);

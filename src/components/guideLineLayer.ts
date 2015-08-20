@@ -41,7 +41,7 @@ export module Components {
       };
     }
 
-    private _isVertical() {
+    protected _isVertical() {
       return this._orientation === GuideLineLayer.ORIENTATION_VERTICAL;
     }
 
@@ -87,6 +87,14 @@ export module Components {
       } else if (this._mode === PropertyMode.PIXEL && this.pixelPosition() != null) {
         this._value = this.scale().invert(this.pixelPosition());
       }
+    }
+
+    protected _setPixelPositionWithoutChangingMode(pixelPosition: number) {
+      this._pixelPosition = pixelPosition;
+      if (this.scale() != null) {
+        this._value = this.scale().invert(this.pixelPosition());
+      }
+      this.render();
     }
 
     /**
