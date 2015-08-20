@@ -3,7 +3,7 @@
 describe("Interactive Components", () => {
   describe("DragBoxLayer", () => {
 
-    describe("DragBoxLayer - basics", () => {
+    describe("Basics usage", () => {
       let SVG_WIDTH = 400;
       let SVG_HEIGHT = 400;
 
@@ -25,10 +25,6 @@ describe("Interactive Components", () => {
         };
       });
 
-      afterEach(() => {
-        svg.remove();
-      });
-
       it("correctly draws box on drag", () => {
         dbl.renderTo(svg);
         assert.isFalse(dbl.boxVisible(), "box is hidden initially");
@@ -39,53 +35,76 @@ describe("Interactive Components", () => {
         let bounds = dbl.bounds();
         assert.deepEqual(bounds.topLeft, quarterPoint, "top-left point was set correctly");
         assert.deepEqual(bounds.bottomRight, halfPoint, "bottom-right point was set correctly");
+        svg.remove();
       });
 
       it("dismisses on click", () => {
         dbl.renderTo(svg);
 
         let target = dbl.background();
-        TestMethods.triggerFakeDragSequence(target, halfPoint, halfPoint);
 
+        assert.isFalse(dbl.boxVisible(), "box is hidden initially");
+        TestMethods.triggerFakeDragSequence(target, quarterPoint, halfPoint);
+        assert.isTrue(dbl.boxVisible(), "box is drawn on drag");
+
+        TestMethods.triggerFakeDragSequence(target, halfPoint, halfPoint);
         assert.isFalse(dbl.boxVisible(), "box is hidden on click");
+        svg.remove();
       });
 
-      it("clipPath enabled", () => {
+      it("generates the correct clipPath", () => {
         dbl.renderTo(svg);
 
         TestMethods.verifyClipPath(dbl);
         let clipRect = (<any> dbl)._boxContainer.select(".clip-rect");
         assert.strictEqual(TestMethods.numAttr(clipRect, "width"), SVG_WIDTH, "the clipRect has an appropriate width");
         assert.strictEqual(TestMethods.numAttr(clipRect, "height"), SVG_HEIGHT, "the clipRect has an appropriate height");
+        svg.remove();
       });
 
-      it("detectionRadius()", () => {
-        assert.doesNotThrow(() => dbl.detectionRadius(3), Error, "can set detection radius before anchoring");
+      it("can get and set the detection radius", () => {
+        assert.strictEqual(dbl.detectionRadius(), 3, "there is a default detection radius");
+        assert.doesNotThrow(() => dbl.detectionRadius(4), Error, "can set detection radius before anchoring");
+        dbl.renderTo("svg");
+
+        assert.strictEqual(dbl.detectionRadius(), 4, "detection radius did not change upon rendering");
+        assert.strictEqual(dbl.detectionRadius(5), dbl, "setting the detection radius returns the drag box layer");
+        assert.strictEqual(dbl.detectionRadius(), 5, "can retrieve the detection radius");
+
+        assert.throws(() => dbl.detectionRadius(-1), "detection radius cannot be negative");
+        svg.remove();
+      });
+
+      it("applies the given detection radius", () => {
         dbl.renderTo("svg");
 
         let radius = 5;
         dbl.detectionRadius(radius);
-        assert.strictEqual(dbl.detectionRadius(), radius, "can retrieve the detection radius");
+
+        TestMethods.triggerFakeDragSequence(dbl.background(), quarterPoint, halfPoint);
+
         let edges = dbl.content().selectAll("line");
+        assert.strictEqual(edges.size(), 4, "the edges of a rectangle are drawn");
         edges.each(function() {
           let edge = d3.select(this);
-          assert.strictEqual(edge.style("stroke-width"), 2 * radius, "edge width was set correctly");
+          assert.strictEqual(edge.style("stroke-width"), 2 * radius + "px", "edge width was set correctly");
         });
         let corners = dbl.content().selectAll("circle");
+        assert.strictEqual(corners.size(), 4, "the corners of a rectangle are drawn");
         corners.each(function() {
           let corner = d3.select(this);
-          assert.strictEqual(corner.attr("r"), radius, "corner radius was set correctly");
+          assert.strictEqual(corner.attr("r"), "" + radius, "corner radius was set correctly");
         });
 
-        // HACKHACK: chai-assert.d.ts has the wrong signature
-        (<any> assert.throws)(() => dbl.detectionRadius(-1), Error, "", "rejects negative values");
+        svg.remove();
       });
 
-      it("destroy() does not error if scales are not inputted", () => {
+      it("does not error on destroy() if scales are not inputted", () => {
         assert.doesNotThrow(() => dbl.destroy(), Error, "can destroy");
+        svg.remove();
       });
 
-      it("onDragStart()", () => {
+      it("calls the onDragStart callback", () => {
         dbl.renderTo(svg);
 
         let receivedBounds: Plottable.Bounds;
@@ -108,9 +127,10 @@ describe("Interactive Components", () => {
         callbackCalled = false;
         TestMethods.triggerFakeDragSequence(target, quarterPoint, halfPoint);
         assert.isFalse(callbackCalled, "the callback was detached from the dragBoxLayer and not called");
+        svg.remove();
       });
 
-      it("onDrag()", () => {
+      it("calls the onDrag callback", () => {
         dbl.renderTo(svg);
 
         let receivedBounds: Plottable.Bounds;
@@ -133,9 +153,10 @@ describe("Interactive Components", () => {
 
         TestMethods.triggerFakeDragSequence(target, quarterPoint, halfPoint);
         assert.isFalse(callbackCalled, "the callback was detached from the dragoBoxLayer and not called");
+        svg.remove();
       });
 
-      it("onDragEnd()", () => {
+      it("calls the onDragEnd callback", () => {
         dbl.renderTo(svg);
 
         let receivedBounds: Plottable.Bounds;
@@ -157,9 +178,10 @@ describe("Interactive Components", () => {
 
         TestMethods.triggerFakeDragSequence(target, quarterPoint, halfPoint);
         assert.isFalse(callbackCalled, "the callback was detached from the dragoBoxLayer and not called");
+        svg.remove();
       });
 
-      it("multiple drag interaction callbacks", () => {
+      it("calls all the drag interaction callbacks when needed", () => {
         dbl.renderTo(svg);
 
         let callbackDragStart1Called = false;
@@ -211,10 +233,11 @@ describe("Interactive Components", () => {
         assert.isTrue(callbackDrag2Called, "the callback 2 for drag is still connected");
         assert.isFalse(callbackDragEnd1Called, "the callback 1 for drag end was disconnected");
         assert.isTrue(callbackDragEnd2Called, "the callback 2 for drag end is still connected");
+        svg.remove();
       });
     });
 
-    describe("DragBoxLayer - enabling/disabling", () => {
+    describe("Enabling and disabling", () => {
       let SVG_WIDTH = 400;
       let SVG_HEIGHT = 400;
 
@@ -226,14 +249,11 @@ describe("Interactive Components", () => {
         dbl = new Plottable.Components.DragBoxLayer();
       });
 
-      afterEach(() => {
-        svg.remove();
-      });
-
-      it("enabled(boolean) properly modifies the state", () => {
+      it("can enable / disable the DragBoxLayer", () => {
         assert.isTrue(dbl.enabled(), "drag box layer is enabled by default");
-        assert.strictEqual(dbl.enabled(false), dbl, "enabled(boolean) returns itself");
-        assert.isFalse(dbl.enabled(), "drag box layer reports when it is disabled");
+        assert.strictEqual(dbl.enabled(false), dbl, "the setter returns the drag box layer");
+        assert.isFalse(dbl.enabled(), "drag box layer can be disabled");
+        svg.remove();
       });
 
       it("disables box when enabled(false)", () => {
@@ -256,33 +276,11 @@ describe("Interactive Components", () => {
         dbl.enabled(true);
         TestMethods.triggerFakeDragSequence(target, startPoint, endPoint);
         assert.isTrue(dbl.boxVisible(), "box is shown when enabled");
-      });
-
-      it("does not have resizable CSS classes when enabled(false)", () => {
-        dbl.resizable(true);
-        assert.isTrue(dbl.hasClass("x-resizable"), "carries \"x-resizable\" class if resizable");
-        assert.isTrue(dbl.hasClass("y-resizable"), "carries \"y-resizable\" class if resizable");
-        dbl.enabled(false);
-        assert.isFalse(dbl.hasClass("x-resizable"), "does not carry \"x-resizable\" class if resizable, but not enabled");
-        assert.isFalse(dbl.hasClass("y-resizable"), "does not carry \"y-resizable\" class if resizable, but not enabled");
-        dbl.resizable(false);
-        dbl.enabled(true);
-        assert.isFalse(dbl.hasClass("x-resizable"), "does not carry \"x-resizable\" class if enabled, but not resizable");
-        assert.isFalse(dbl.hasClass("y-resizable"), "does not carry \"y-resizable\" class if enabled, but not resizable");
-      });
-
-      it("does not have movable CSS classe when enabled(false)", () => {
-        dbl.movable(true);
-        assert.isTrue(dbl.hasClass("movable"), "carries \"movable\" class if movable");
-        dbl.enabled(false);
-        assert.isFalse(dbl.hasClass("movable"), "does not carry \"movable\" class if movable, but not enabled");
-        dbl.movable(false);
-        dbl.enabled(true);
-        assert.isFalse(dbl.hasClass("movable"), "does not carry \"movable\" class if enabled, but not movable");
+        svg.remove();
       });
     });
 
-    describe("DragBoxLayer - resizing", () => {
+    describe("Resizing", () => {
       let SVG_WIDTH = 400;
       let SVG_HEIGHT = 400;
 
@@ -316,17 +314,14 @@ describe("Interactive Components", () => {
         resetBox();
       });
 
-      afterEach(() => {
+      it("can get/set the resizable property", () => {
+        assert.isFalse(dbl.resizable(), "defaults to false");
+        assert.strictEqual(dbl.resizable(true), dbl, "the setter returns the drag box layer");
+        assert.isTrue(dbl.resizable(), "successfully set to true");
         svg.remove();
       });
 
-      it("resizable() getter/setter", () => {
-        assert.isFalse(dbl.resizable(), "defaults to false");
-        assert.strictEqual(dbl.resizable(true), dbl, "returns DragBoxLayer when invoked as setter");
-        assert.isTrue(dbl.resizable(), "successfully set to true");
-      });
-
-      it("resizable() correctly sets pointer-events", () => {
+      it("correctly sets pointer-events for resizable DragBoxLayer", () => {
         dbl.resizable(true);
         let edges = dbl.content().selectAll("line");
         edges[0].forEach((edge) => {
@@ -338,9 +333,10 @@ describe("Interactive Components", () => {
           let computedStyle = window.getComputedStyle(<Element> corner);
           assert.strictEqual(computedStyle.pointerEvents.toLowerCase(), "visiblefill", "pointer-events set correctly on corners");
         });
+        svg.remove();
       });
 
-      it("resize from top edge", () => {
+      it("can resize from top edge", () => {
         dbl.resizable(true);
         TestMethods.triggerFakeDragSequence(target,
                                 { x: midPoint.x, y: initialBounds.topLeft.y },
@@ -359,9 +355,10 @@ describe("Interactive Components", () => {
                                );
         bounds = dbl.bounds();
         assert.strictEqual(bounds.bottomRight.y, SVG_HEIGHT, "can drag through to other side");
+        svg.remove();
       });
 
-      it("resize from bottom edge", () => {
+      it("can resize from bottom edge", () => {
         dbl.resizable(true);
         TestMethods.triggerFakeDragSequence(target,
                                 { x: midPoint.x, y: initialBounds.bottomRight.y },
@@ -380,9 +377,10 @@ describe("Interactive Components", () => {
                                );
         bounds = dbl.bounds();
         assert.strictEqual(bounds.topLeft.y, 0, "can drag through to other side");
+        svg.remove();
       });
 
-      it("resize from left edge", () => {
+      it("can resize from left edge", () => {
         dbl.resizable(true);
         TestMethods.triggerFakeDragSequence(target,
                                 { x: initialBounds.topLeft.x, y: midPoint.y },
@@ -401,9 +399,10 @@ describe("Interactive Components", () => {
                                );
         bounds = dbl.bounds();
         assert.strictEqual(bounds.bottomRight.x, SVG_WIDTH, "can drag through to other side");
+        svg.remove();
       });
 
-      it("resize from right edge", () => {
+      it("can resize from right edge", () => {
         dbl.resizable(true);
         TestMethods.triggerFakeDragSequence(target,
                                 { x: initialBounds.bottomRight.x, y: midPoint.y },
@@ -422,6 +421,7 @@ describe("Interactive Components", () => {
                                );
         bounds = dbl.bounds();
         assert.strictEqual(bounds.topLeft.x, 0, "can drag through to other side");
+        svg.remove();
       });
 
       it("resizes if grabbed within detectionRadius()", () => {
@@ -445,6 +445,7 @@ describe("Interactive Components", () => {
                                );
         bounds = dbl.bounds();
         assert.strictEqual(bounds.topLeft.y, startYOutside, "new box was started at the drag start position");
+        svg.remove();
       });
 
       it("doesn't dismiss on no-op resize", () => {
@@ -466,10 +467,25 @@ describe("Interactive Components", () => {
                                );
         let bounds = dbl.bounds();
         assert.strictEqual(bounds.topLeft.y, initialBounds.bottomRight.y, "new box was started at the drag start position");
+        svg.remove();
+      });
+
+      it("does not have resizable CSS classes when enabled(false) or resizable(false)", () => {
+        dbl.resizable(true);
+        assert.isTrue(dbl.hasClass("x-resizable"), "carries \"x-resizable\" class if resizable");
+        assert.isTrue(dbl.hasClass("y-resizable"), "carries \"y-resizable\" class if resizable");
+        dbl.enabled(false);
+        assert.isFalse(dbl.hasClass("x-resizable"), "does not carry \"x-resizable\" class if resizable, but not enabled");
+        assert.isFalse(dbl.hasClass("y-resizable"), "does not carry \"y-resizable\" class if resizable, but not enabled");
+        dbl.resizable(false);
+        dbl.enabled(true);
+        assert.isFalse(dbl.hasClass("x-resizable"), "does not carry \"x-resizable\" class if enabled, but not resizable");
+        assert.isFalse(dbl.hasClass("y-resizable"), "does not carry \"y-resizable\" class if enabled, but not resizable");
+        svg.remove();
       });
     });
 
-    describe("DragBoxLayer - moving", () => {
+    describe("Moving", () => {
       let SVG_WIDTH = 400;
       let SVG_HEIGHT = 400;
 
@@ -497,19 +513,14 @@ describe("Interactive Components", () => {
         initialBounds = dbl.bounds();
       });
 
-      afterEach(() => {
+      it("can get/set the movable() property", () => {
+        assert.isFalse(dbl.movable(), "defaults to false");
+        assert.strictEqual(dbl.movable(true), dbl, "setter returns DragBoxLayer");
+        assert.isTrue(dbl.movable(), "can set to true");
         svg.remove();
       });
 
-      it("get and set movable()", () => {
-        assert.isFalse(dbl.movable(), "defaults to false");
-        assert.isFalse(dbl.hasClass("movable"), "initially does not have \"movable\" CSS class");
-        assert.strictEqual(dbl.movable(true), dbl, "setter mode returns DragBoxLayer");
-        assert.isTrue(dbl.movable(), "set to true");
-        assert.isTrue(dbl.hasClass("movable"), "\"movable\" CSS class is applied");
-      });
-
-      it("move left", () => {
+      it("can move left", () => {
         dbl.movable(true);
         TestMethods.triggerFakeDragSequence(target,
           { x: midPoint.x, y: midPoint.y },
@@ -520,9 +531,10 @@ describe("Interactive Components", () => {
         assert.strictEqual(bounds.bottomRight.x, initialBounds.bottomRight.x - dragDistance, "right edge moved");
         assert.strictEqual(bounds.topLeft.y, initialBounds.topLeft.y, "top edge did not move");
         assert.strictEqual(bounds.bottomRight.y, initialBounds.bottomRight.y, "bottom edge did not move");
+        svg.remove();
       });
 
-      it("move right", () => {
+      it("can move right", () => {
         dbl.movable(true);
         TestMethods.triggerFakeDragSequence(target,
           { x: midPoint.x, y: midPoint.y },
@@ -533,9 +545,10 @@ describe("Interactive Components", () => {
         assert.strictEqual(bounds.bottomRight.x, initialBounds.bottomRight.x + dragDistance, "right edge moved");
         assert.strictEqual(bounds.topLeft.y, initialBounds.topLeft.y, "top edge did not move");
         assert.strictEqual(bounds.bottomRight.y, initialBounds.bottomRight.y, "bottom edge did not move");
+        svg.remove();
       });
 
-      it("move up", () => {
+      it("can move up", () => {
         dbl.movable(true);
         TestMethods.triggerFakeDragSequence(target,
           { x: midPoint.x, y: midPoint.y },
@@ -546,9 +559,10 @@ describe("Interactive Components", () => {
         assert.strictEqual(bounds.bottomRight.x, initialBounds.bottomRight.x, "right edge did not move");
         assert.strictEqual(bounds.topLeft.y, initialBounds.topLeft.y - dragDistance, "top edge moved");
         assert.strictEqual(bounds.bottomRight.y, initialBounds.bottomRight.y - dragDistance, "bottom edge moved");
+        svg.remove();
       });
 
-      it("move down", () => {
+      it("can move down", () => {
         dbl.movable(true);
         TestMethods.triggerFakeDragSequence(target,
           { x: midPoint.x, y: midPoint.y },
@@ -559,6 +573,7 @@ describe("Interactive Components", () => {
         assert.strictEqual(bounds.bottomRight.x, initialBounds.bottomRight.x, "right edge did not move");
         assert.strictEqual(bounds.topLeft.y, initialBounds.topLeft.y + dragDistance, "top edge moved");
         assert.strictEqual(bounds.bottomRight.y, initialBounds.bottomRight.y + dragDistance, "bottom edge moved");
+        svg.remove();
       });
 
       it("does not move if grabbed within detectionRadius() while resizable()", () => {
@@ -573,6 +588,7 @@ describe("Interactive Components", () => {
         assert.strictEqual(bounds.bottomRight.y, initialBounds.bottomRight.y, "bottom edge was not moved");
         assert.strictEqual(bounds.topLeft.x, initialBounds.topLeft.x, "left edge was not moved");
         assert.strictEqual(bounds.bottomRight.x, SVG_WIDTH, "right edge was repositioned");
+        svg.remove();
       });
 
       it("doesn't dismiss on no-op move", () => {
@@ -584,6 +600,7 @@ describe("Interactive Components", () => {
         assert.isTrue(dbl.boxVisible(), "box remains visible");
         let bounds = dbl.bounds();
         assert.deepEqual(bounds, initialBounds, "bounds did not change");
+        svg.remove();
       });
 
       it("dismisses on click outside of box", () => {
@@ -591,6 +608,7 @@ describe("Interactive Components", () => {
         let origin = { x: 0, y: 0 };
         TestMethods.triggerFakeDragSequence(target, origin, origin);
         assert.isFalse(dbl.boxVisible(), "box is no longer visible");
+        svg.remove();
       });
 
       it("starts new box if hidden instead of moving", () => {
@@ -603,6 +621,19 @@ describe("Interactive Components", () => {
         let bounds = dbl.bounds();
         assert.strictEqual(bounds.topLeft.x, midPoint.x, "new box was started at the drag start position (x)");
         assert.strictEqual(bounds.topLeft.y, midPoint.y, "new box was started at the drag start position (y)");
+        svg.remove();
+      });
+
+      it("does not have movable CSS classe when enabled(false) or movable(false)", () => {
+        assert.isFalse(dbl.hasClass("movable"), "initially does not have \"movable\" CSS class");
+        dbl.movable(true);
+        assert.isTrue(dbl.hasClass("movable"), "carries \"movable\" class if movable");
+        dbl.enabled(false);
+        assert.isFalse(dbl.hasClass("movable"), "does not carry \"movable\" class if movable, but not enabled");
+        dbl.movable(false);
+        dbl.enabled(true);
+        assert.isFalse(dbl.hasClass("movable"), "does not carry \"movable\" class if enabled, but not movable");
+        svg.remove();
       });
     });
   });
