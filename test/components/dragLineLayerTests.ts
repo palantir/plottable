@@ -204,6 +204,165 @@ describe("Interactive Components", () => {
       });
     });
 
+    describe("Dragging (horizontal)", () => {
+      let SVG_WIDTH = 300;
+      let SVG_HEIGHT = 400;
+
+      it("line can be dragged", () => {
+        let svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+        let dll = new Plottable.Components.DragLineLayer<void>("horizontal");
+        let startY = SVG_HEIGHT / 2;
+        dll.pixelPosition(startY);
+        dll.renderTo(svg);
+        let endY = SVG_HEIGHT / 4;
+        TestMethods.triggerFakeDragSequence(
+          dll.background(),
+          { x: SVG_WIDTH / 2, y: startY },
+          { x: SVG_WIDTH / 2, y: endY }
+        );
+        TestMethods.assertLineAttrs(
+          dll.content().select(".guide-line"),
+          {
+            x1: 0,
+            y1: endY,
+            x2: SVG_WIDTH,
+            y2: endY
+          },
+          "line was dragged to the final location"
+        );
+        assert.strictEqual(dll.pixelPosition(), endY, "pixelPosition was updated correctly");
+        svg.remove();
+      });
+
+      it("line can be dragged if drag starts within detectionRadius()", () => {
+        let svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+        let dll = new Plottable.Components.DragLineLayer<void>("horizontal");
+        let linePosition = SVG_HEIGHT / 2;
+        dll.pixelPosition(linePosition);
+        dll.renderTo(svg);
+        let endY = SVG_HEIGHT / 4;
+        TestMethods.triggerFakeDragSequence(
+          dll.background(),
+          { x: SVG_WIDTH / 2, y: linePosition + dll.detectionRadius() },
+          { x: SVG_WIDTH / 2, y: endY }
+        );
+        TestMethods.assertLineAttrs(
+          dll.content().select(".guide-line"),
+          {
+            x1: 0,
+            y1: endY,
+            x2: SVG_WIDTH,
+            y2: endY
+          },
+          "line was dragged to the final location"
+        );
+        assert.strictEqual(dll.pixelPosition(), endY, "pixelPosition was updated correctly");
+        svg.remove();
+      });
+
+      it("starting a drag outside the detection radius does nothing", () => {
+        let svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+        let dll = new Plottable.Components.DragLineLayer<void>("horizontal");
+        let linePosition = SVG_HEIGHT / 2;
+        dll.pixelPosition(linePosition);
+        dll.renderTo(svg);
+        let endY = SVG_HEIGHT / 4;
+        TestMethods.triggerFakeDragSequence(
+          dll.background(),
+          { x: SVG_WIDTH / 2, y: linePosition + 2 * dll.detectionRadius() },
+          { x: SVG_WIDTH / 2, y: endY }
+        );
+        TestMethods.assertLineAttrs(
+          dll.content().select(".guide-line"),
+          {
+            x1: 0,
+            y1: linePosition,
+            x2: SVG_WIDTH,
+            y2: linePosition
+          },
+          "line did not move"
+        );
+        svg.remove();
+      });
+
+      it("can't be dragged if not enabled", () => {
+        let svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+        let dll = new Plottable.Components.DragLineLayer<void>("horizontal");
+        dll.enabled(false);
+        let startY = SVG_HEIGHT / 2;
+        dll.pixelPosition(startY);
+        dll.renderTo(svg);
+        let endY = SVG_HEIGHT / 4;
+        TestMethods.triggerFakeDragSequence(
+          dll.background(),
+          { x: SVG_WIDTH / 2, y: startY },
+          { x: SVG_WIDTH / 2, y: endY }
+        );
+        TestMethods.assertLineAttrs(
+          dll.content().select(".guide-line"),
+          {
+            x1: 0,
+            y1: startY,
+            x2: SVG_WIDTH,
+            y2: startY
+          },
+          "line did not move"
+        );
+        svg.remove();
+      });
+
+      it("dragging does not affect the mode (value mode)", () => {
+        let svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+        let dll = new Plottable.Components.DragLineLayer<number>("horizontal");
+        let scale = new Plottable.Scales.Linear();
+        scale.domain([0, 1]);
+        dll.scale(scale);
+
+        let startValue = 0.5;
+        dll.value(startValue);
+        dll.renderTo(svg);
+
+        let startY = scale.scale(startValue);
+        let endY = SVG_HEIGHT / 4;
+        TestMethods.triggerFakeDragSequence(
+          dll.background(),
+          { x: SVG_WIDTH / 2, y: startY },
+          { x: SVG_WIDTH / 2, y: endY }
+        );
+        let endValue = scale.invert(endY);
+        assert.strictEqual(dll.value(), endValue, "value was updated correctly");
+
+        scale.domain([0, 2]);
+        assert.strictEqual(dll.value(), endValue, "remained in \"value\" mode: value did not change when scale updated");
+        svg.remove();
+      });
+
+      it("dragging does not affect the mode (pixel mode)", () => {
+        let svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+        let dll = new Plottable.Components.DragLineLayer<number>("horizontal");
+        let scale = new Plottable.Scales.Linear();
+        scale.domain([0, 1]);
+        dll.scale(scale);
+
+        let startY = SVG_HEIGHT / 2;
+        dll.pixelPosition(startY);
+        dll.renderTo(svg);
+
+        let endY = SVG_HEIGHT / 4;
+        TestMethods.triggerFakeDragSequence(
+          dll.background(),
+          { x: SVG_WIDTH / 2, y: startY },
+          { x: SVG_WIDTH / 2, y: endY }
+        );
+        let endValue = scale.invert(endY);
+        assert.strictEqual(dll.value(), endValue, "value was updated correctly");
+
+        scale.domain([0, 2]);
+        assert.strictEqual(dll.pixelPosition(), endY, "remained in \"position\" mode: position did not change when scale updated");
+        svg.remove();
+      });
+    });
+
     // it("onDragStart()", () => {
       // triggers on start
       // passed correct object
