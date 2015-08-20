@@ -11502,10 +11502,10 @@ var Plottable;
                 this._dragInteraction.attachTo(this);
                 var grabbedLine = function (p) {
                     return (_this._isVertical() &&
-                        p.x >= _this.pixelPosition() - _this.detectionRadius() &&
+                        _this.pixelPosition() - _this.detectionRadius() <= p.x &&
                         p.x <= _this.pixelPosition() + _this.detectionRadius()) ||
                         (!_this._isVertical() &&
-                            p.y >= _this.pixelPosition() - _this.detectionRadius() &&
+                            _this.pixelPosition() - _this.detectionRadius() <= p.y &&
                             p.y <= _this.pixelPosition() + _this.detectionRadius());
                 };
                 var dragging = false;

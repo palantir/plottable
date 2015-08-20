@@ -26,12 +26,12 @@ export module Components {
 
       let grabbedLine = (p: Point) => {
         return (this._isVertical() &&
-                 p.x >= this.pixelPosition() - this.detectionRadius() &&
+                 this.pixelPosition() - this.detectionRadius() <= p.x &&
                  p.x <= this.pixelPosition() + this.detectionRadius()
                ) ||
                (
                  !this._isVertical() &&
-                 p.y >= this.pixelPosition() - this.detectionRadius() &&
+                 this.pixelPosition() - this.detectionRadius() <= p.y &&
                  p.y <= this.pixelPosition() + this.detectionRadius()
                );
       };
