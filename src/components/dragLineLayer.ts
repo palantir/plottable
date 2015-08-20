@@ -2,7 +2,7 @@
 
 module Plottable {
 export module Components {
-  export interface DragLineCallback<D> { (dragLineLayer: DragLineLayer<D>): void };
+  export interface DragLineCallback<D> { (dragLineLayer: DragLineLayer<D>): void; };
 
   export class DragLineLayer<D> extends GuideLineLayer<D> {
     private _dragInteraction: Interactions.Drag;
@@ -37,7 +37,7 @@ export module Components {
                  p.y >= this.pixelPosition() - this.detectionRadius() &&
                  p.y <= this.pixelPosition() + this.detectionRadius()
                );
-      }
+      };
 
       let dragging = false;
       this._dragInteraction.onDragStart((start: Point) => {
@@ -132,7 +132,7 @@ export module Components {
     }
 
     public offDrag(callback: DragLineCallback<D>) {
-      this._dragCallbacks.delete(callback)
+      this._dragCallbacks.delete(callback);
       return this;
     }
 
