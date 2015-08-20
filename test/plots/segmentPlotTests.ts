@@ -141,7 +141,8 @@ describe("Plots", () => {
         { x: 1, x2: 1, y: 1, y2: 4 },
         { x: 2, x2: 3, y: 4, y2: 3 },
         { x: 4, x2: 5, y: 2, y2: 4 },
-        { x: 2, x2: 4, y: 1, y2: 1 }];
+        { x: 2, x2: 4, y: 1, y2: 1 }
+      ];
 
       let svg: d3.Selection<void>;
       let xScale: Plottable.Scales.Linear;
@@ -161,7 +162,8 @@ describe("Plots", () => {
       it("retrieves the entities that intersect with the bounding box", () => {
         let entities = plot.entitiesIn({
           topLeft: { x: xScale.scale(0), y: yScale.scale(4.5) },
-          bottomRight: { x: xScale.scale(2.5), y: yScale.scale(3) } });
+          bottomRight: { x: xScale.scale(2.5), y: yScale.scale(3) }
+        });
         assert.lengthOf(entities, 2, "retrieved 2 entities intersect with the box");
         assert.strictEqual(entities[0].index, 0, "the entity of index 0 is retrieved");
         assert.strictEqual(entities[1].index, 1, "the entity of index 1 is retrieved");
@@ -171,7 +173,8 @@ describe("Plots", () => {
       it("retrieves the entities that intersect with given ranges", () => {
         let entities = plot.entitiesIn(
           { min: xScale.scale(2.5), max: xScale.scale(4.5) },
-          { min: yScale.scale(4.5), max: yScale.scale(2.5) });
+          { min: yScale.scale(4.5), max: yScale.scale(2.5) }
+        );
         assert.lengthOf(entities, 2, "retrieved 2 entities intersect with the ranges");
         assert.strictEqual(entities[0].index, 1, "the entity of index 1 is retrieved");
         assert.strictEqual(entities[1].index, 2, "the entity of index 2 is retrieved");
@@ -230,7 +233,8 @@ describe("Plots", () => {
       it("returns empty array when no entities intersect with the ranges", () => {
         let entities = plot.entitiesIn(
           { min: xScale.scale(1.5), max: xScale.scale(2.5) },
-          { min: yScale.scale(2.5), max: yScale.scale(1.5) });
+          { min: yScale.scale(2.5), max: yScale.scale(1.5) }
+        );
         assert.lengthOf(entities, 0, "no entities intersects with the ranges");
         svg.remove();
       });
@@ -239,7 +243,8 @@ describe("Plots", () => {
                                     x1: number, x2: number, y1: number, y2: number) {
         let entities = plot.entitiesIn(
           { min: xScale.scale(x1), max: xScale.scale(x2) },
-          { min: yScale.scale(y1), max: yScale.scale(y2) });
+          { min: yScale.scale(y1), max: yScale.scale(y2) }
+        );
         assert.lengthOf(entities, 1, "retrieved 1 entity that intersects with the box");
         assert.strictEqual(entities[0].index, index, `the entity of index ${index} is retrieved`);
       }
