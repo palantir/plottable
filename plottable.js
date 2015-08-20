@@ -2868,12 +2868,44 @@ var Plottable;
             __extends(Arc, _super);
             function Arc(dataset) {
                 _super.call(this, dataset);
-                this._className = "arc";
+                this._className = "arc fill";
                 this._svgElementName = "path";
             }
+            Arc.prototype._applyDefaultAttributes = function (selection) {
+                _super.prototype._applyDefaultAttributes.call(this, selection);
+                selection.style("stroke", "none");
+            };
             return Arc;
         })(Plottable.Drawer);
         Drawers.Arc = Arc;
+    })(Drawers = Plottable.Drawers || (Plottable.Drawers = {}));
+})(Plottable || (Plottable = {}));
+
+///<reference path="../reference.ts" />
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var Plottable;
+(function (Plottable) {
+    var Drawers;
+    (function (Drawers) {
+        var ArcOutline = (function (_super) {
+            __extends(ArcOutline, _super);
+            function ArcOutline(dataset) {
+                _super.call(this, dataset);
+                this._className = "arc outline";
+                this._svgElementName = "path";
+            }
+            ArcOutline.prototype._applyDefaultAttributes = function (selection) {
+                _super.prototype._applyDefaultAttributes.call(this, selection);
+                selection.style("fill", "none");
+            };
+            return ArcOutline;
+        })(Plottable.Drawer);
+        Drawers.ArcOutline = ArcOutline;
     })(Drawers = Plottable.Drawers || (Plottable.Drawers = {}));
 })(Plottable || (Plottable = {}));
 
@@ -6847,7 +6879,13 @@ var Plottable;
                 this.outerRadius(function () { return Math.min(_this.width(), _this.height()) / 2; });
                 this.addClass("pie-plot");
                 this.attr("fill", function (d, i) { return String(i); }, new Plottable.Scales.Color());
+                this._strokeDrawers = new Plottable.Utils.Map();
             }
+            Pie.prototype._setup = function () {
+                var _this = this;
+                _super.prototype._setup.call(this);
+                this._strokeDrawers.forEach(function (d) { return d.renderArea(_this._renderArea.append("g")); });
+            };
             Pie.prototype.computeLayout = function (origin, availableWidth, availableHeight) {
                 _super.prototype.computeLayout.call(this, origin, availableWidth, availableHeight);
                 this._renderArea.attr("transform", "translate(" + this.width() / 2 + "," + this.height() / 2 + ")");
@@ -6866,14 +6904,38 @@ var Plottable;
                     return this;
                 }
                 this._updatePieAngles();
+                var strokeDrawer = new Plottable.Drawers.ArcOutline(dataset);
+                if (this._isSetup) {
+                    strokeDrawer.renderArea(this._renderArea.append("g"));
+                }
+                this._strokeDrawers.set(dataset, strokeDrawer);
                 _super.prototype._addDataset.call(this, dataset);
                 return this;
+            };
+            Pie.prototype._removeDatasetNodes = function (dataset) {
+                _super.prototype._removeDatasetNodes.call(this, dataset);
+                this._strokeDrawers.get(dataset).remove();
             };
             Pie.prototype._removeDataset = function (dataset) {
                 _super.prototype._removeDataset.call(this, dataset);
                 this._startAngles = [];
                 this._endAngles = [];
                 return this;
+            };
+            Pie.prototype.selections = function (datasets) {
+                var _this = this;
+                if (datasets === void 0) { datasets = this.datasets(); }
+                var allSelections = _super.prototype.selections.call(this, datasets)[0];
+                datasets.forEach(function (dataset) {
+                    var drawer = _this._strokeDrawers.get(dataset);
+                    if (drawer == null) {
+                        return;
+                    }
+                    drawer.renderArea().selectAll(drawer.selector()).each(function () {
+                        allSelections.push(this);
+                    });
+                });
+                return d3.selectAll(allSelections);
             };
             Pie.prototype._onDatasetUpdate = function () {
                 this._updatePieAngles();
@@ -6889,6 +6951,8 @@ var Plottable;
                 entities.forEach(function (entity) {
                     entity.position.x += _this.width() / 2;
                     entity.position.y += _this.height() / 2;
+                    var stroke = _this._strokeDrawers.get(entity.dataset).selectionForIndex(entity.index);
+                    entity.selection[0].push(stroke[0][0]);
                 });
                 return entities;
             };
@@ -7010,6 +7074,13 @@ var Plottable;
                 if (this._labelsEnabled) {
                     Plottable.Utils.Window.setTimeout(function () { return _this._drawLabels(); }, time);
                 }
+                var drawSteps = this._generateStrokeDrawSteps();
+                var dataToDraw = this._getDataToDraw();
+                this.datasets().forEach(function (dataset) { return _this._strokeDrawers.get(dataset).draw(dataToDraw.get(dataset), drawSteps); });
+            };
+            Pie.prototype._generateStrokeDrawSteps = function () {
+                var attrToProjector = this._generateAttrToProjector();
+                return [{ attrToProjector: attrToProjector, animator: new Plottable.Animators.Null() }];
             };
             Pie.prototype._sliceIndexForPoint = function (p) {
                 var pointRadius = Math.sqrt(Math.pow(p.x, 2) + Math.pow(p.y, 2));
