@@ -2,15 +2,15 @@
 
 describe("Plots", () => {
   describe("RectanglePlot", () => {
-    describe("RectanglePlot - basics", () => {
-      let DATA = [
+    describe("Basic usage", () => {
+      let data = [
         { x: 0, y: 0, x2: 1, y2: 1 },
         { x: 1, y: 1, x2: 2, y2: 2 },
         { x: 2, y: 2, x2: 3, y2: 3 },
         { x: 3, y: 3, x2: 4, y2: 4 },
         { x: 4, y: 4, x2: 5, y2: 5 }
       ];
-      let VERIFY_CELLS = (cells: d3.Selection<any>) => {
+      let verifyCells = (cells: d3.Selection<any>) => {
         assert.strictEqual(cells[0].length, 5);
         cells.each(function(d, i) {
           let cell = d3.select(this);
@@ -35,27 +35,25 @@ describe("Plots", () => {
         plot.y((d) => d.y, yScale).y2((d) => d.y2);
       });
 
-      afterEach(() => {
+      it("has correct rectangle heights and positions (renders correctly)", () => {
+        plot.addDataset(new Plottable.Dataset(data));
+        plot.renderTo(svg);
+
+        verifyCells(plot.content().selectAll("rect"));
         svg.remove();
       });
 
-      it("renders correctly", () => {
-        plot.addDataset(new Plottable.Dataset(DATA));
-        plot.renderTo(svg);
-
-        VERIFY_CELLS((<any> plot)._renderArea.selectAll("rect"));
-      });
-
       it("retrieves the correct entity under a point", () => {
-        plot.addDataset(new Plottable.Dataset(DATA));
+        plot.addDataset(new Plottable.Dataset(data));
         plot.renderTo(svg);
 
         let entities = plot.entitiesAt({ x: xScale.scale(2.5), y: yScale.scale(2.5) });
         assert.lengthOf(entities, 1, "found only one entity when querying a point inside the third rectangle");
         assert.strictEqual(entities[0].index, 2, "entity retrieved is at index 2");
+        svg.remove();
       });
 
-      it("retrieves correct entities under a point", () => {
+      it("retrieves correct entities under a point when rectangles intersect", () => {
         let dataset = new Plottable.Dataset([
           { x: 1, y: 1, x2: 3, y2: 3 },
           { x: 4, y: 2, x2: 2, y2: 4 }
@@ -73,10 +71,11 @@ describe("Plots", () => {
         entities = plot.entitiesAt({ x: xScale.scale(1), y: yScale.scale(1) });
         assert.lengthOf(entities, 1, "found only one entity when querying a point inside the first rectangle");
         assert.strictEqual(entities[0].index, 0, "entity retrieved is at index 0");
+        svg.remove();
       });
 
       it("retrieves the entities that intersect with the bounding box", () => {
-        plot.addDataset(new Plottable.Dataset(DATA));
+        plot.addDataset(new Plottable.Dataset(data));
         plot.renderTo(svg);
 
         let entities = plot.entitiesIn({
@@ -85,10 +84,11 @@ describe("Plots", () => {
         assert.lengthOf(entities, 2, "retrieved 2 entities intersect with the box");
         assert.strictEqual(entities[0].index, 1, "the entity of index 1 is retrieved");
         assert.strictEqual(entities[1].index, 2, "the entity of index 2 is retrieved");
+        svg.remove();
       });
 
       it("retrieves the entities that intersect with the given ranges", () => {
-        plot.addDataset(new Plottable.Dataset(DATA));
+        plot.addDataset(new Plottable.Dataset(data));
         plot.renderTo(svg);
 
         let entities = plot.entitiesIn(
@@ -97,21 +97,18 @@ describe("Plots", () => {
         assert.lengthOf(entities, 2, "retrieved 2 entities intersect with the box");
         assert.strictEqual(entities[0].index, 1, "the entity of index 1 is retrieved");
         assert.strictEqual(entities[1].index, 2, "the entity of index 2 is retrieved");
+        svg.remove();
       });
     });
 
-    describe("RectanglePlot - autorangeMode()", () => {
+    describe("autorangeMode()", () => {
       let svg: d3.Selection<void>;
 
       beforeEach(() => {
         svg = TestMethods.generateSVG(300, 300);
       });
 
-      afterEach(() => {
-        svg.remove();
-      });
-
-      it("autorangeMode(\"x\")", () => {
+      it("autorangeMode on x behaves as expected when changing the domain of the yScale", () => {
         let staggeredData = [
           { y: "A", x: 0, x2: 1 },
           { y: "B", x: 1, x2: 2 }
@@ -129,17 +126,17 @@ describe("Plots", () => {
         plot.autorangeMode("x");
         plot.renderTo(svg);
 
-        assert.deepEqual(xScale.domain(), [0, 2], "y domain includes both visible segments");
+        assert.deepEqual(xScale.domain(), [0, 2], "x domain includes both visible segments");
 
         yScale.domain(["A"]);
-        assert.deepEqual(xScale.domain(), [0, 1], "y domain includes only the visible segment (first)");
+        assert.deepEqual(xScale.domain(), [0, 1], "x domain includes only the visible segment (first)");
 
         yScale.domain(["B"]);
-        assert.deepEqual(xScale.domain(), [1, 2], "y domain includes only the visible segment (second)");
-
+        assert.deepEqual(xScale.domain(), [1, 2], "x domain includes only the visible segment (second)");
+        svg.remove();
       });
 
-      it("autorangeMode(\"y\")", () => {
+      it("autorangeMode on y behaves as expected when changing the domain of the xScale", () => {
         let staggeredData = [
           { x: "A", y: 0, y2: 1 },
           { x: "B", y: 1, y2: 2 }
@@ -164,11 +161,11 @@ describe("Plots", () => {
 
         xScale.domain(["B"]);
         assert.deepEqual(yScale.domain(), [1, 2], "y domain includes only the visible segment (second)");
-
+        svg.remove();
       });
     });
 
-    describe("RectanglePlot - fail safe tests", () => {
+    describe("Fail safe tests", () => {
       it("illegal rectangles don't get displayed", () => {
         let svg = TestMethods.generateSVG();
 
@@ -213,17 +210,17 @@ describe("Plots", () => {
       });
     });
 
-    describe("RectanglePlot - Grids", () => {
+    describe("Grids", () => {
       let SVG_WIDTH = 400;
       let SVG_HEIGHT = 200;
-      let DATA = [
+      let data = [
         {x: "A", y: "U", magnitude: 0},
         {x: "B", y: "U", magnitude: 2},
         {x: "A", y: "V", magnitude: 16},
         {x: "B", y: "V", magnitude: 8},
       ];
 
-      let VERIFY_CELLS = (cells: any[]) => {
+      let verifyCells = (cells: any[]) => {
         assert.strictEqual(cells.length, 4);
 
         let cellAU = d3.select(cells[0]);
@@ -269,18 +266,15 @@ describe("Plots", () => {
         colorScale.range(["black", "white"]);
       });
 
-      afterEach(() => {
-        svg.remove();
-      });
-
       it("renders correctly", () => {
         let plot = new Plottable.Plots.Rectangle();
-        plot.addDataset(new Plottable.Dataset(DATA));
+        plot.addDataset(new Plottable.Dataset(data));
         plot.attr("fill", (d) => d.magnitude, colorScale);
         plot.x((d: any) => d.x, xScale);
         plot.y((d: any) => d.y, yScale);
         plot.renderTo(svg);
-        VERIFY_CELLS((<any> plot)._renderArea.selectAll("rect")[0]);
+        verifyCells(plot.content().selectAll("rect")[0]);
+        svg.remove();
       });
 
       it("renders correctly when data is set after construction", () => {
@@ -291,8 +285,9 @@ describe("Plots", () => {
         plot.x((d: any) => d.x, xScale);
         plot.y((d: any) => d.y, yScale);
         plot.renderTo(svg);
-        dataset.data(DATA);
-        VERIFY_CELLS((<any> plot)._renderArea.selectAll("rect")[0]);
+        dataset.data(data);
+        verifyCells(plot.content().selectAll("rect")[0]);
+        svg.remove();
       });
 
       it("renders correctly when there isn't data for every spot", () => {
@@ -312,7 +307,7 @@ describe("Plots", () => {
           {x: "D", y: "Z", magnitude: 24}
         ];
         dataset.data(data);
-        let cells = (<any> plot)._renderArea.selectAll("rect")[0];
+        let cells = plot.content().selectAll("rect")[0];
         assert.strictEqual(cells.length, data.length);
         for (let i = 0; i < cells.length; i++) {
           let cell = d3.select(cells[i]);
@@ -321,11 +316,12 @@ describe("Plots", () => {
           assert.strictEqual(cell.attr("width"), String(CELL_WIDTH), "Cell width is correct");
           assert.strictEqual(cell.attr("height"), String(CELL_HEIGHT), "Cell height is correct");
         }
+        svg.remove();
       });
 
       it("can invert y axis correctly", () => {
         let plot = new Plottable.Plots.Rectangle();
-        plot.addDataset(new Plottable.Dataset(DATA));
+        plot.addDataset(new Plottable.Dataset(data));
         plot.attr("fill", (d) => d.magnitude, colorScale);
         plot.x((d: any) => d.x, xScale);
         plot.y((d: any) => d.y, yScale);
@@ -333,7 +329,7 @@ describe("Plots", () => {
 
         yScale.domain(["U", "V"]);
 
-        let cells = (<any> plot)._renderArea.selectAll("rect")[0];
+        let cells = plot.content().selectAll("rect")[0];
         let cellAU = d3.select(cells[0]);
         let cellAV = d3.select(cells[2]);
         cellAU.attr("fill", "#000000");
@@ -345,7 +341,7 @@ describe("Plots", () => {
         cellAV.attr("y", "0");
 
         yScale.domain(["V", "U"]);
-        cells = (<any> plot)._renderArea.selectAll("rect")[0];
+        cells = plot.content().selectAll("rect")[0];
         cellAU = d3.select(cells[0]);
         cellAV = d3.select(cells[2]);
         cellAU.attr("fill", "#000000");
@@ -355,13 +351,14 @@ describe("Plots", () => {
         cellAV.attr("fill", "#ffffff");
         cellAV.attr("x", "0");
         cellAV.attr("y", "100");
+        svg.remove();
       });
     });
 
-    describe("Rectangle Plot - selections()", () => {
+    describe("selections()", () => {
       let SVG_WIDTH = 400;
       let SVG_HEIGHT = 200;
-      let DATA = [
+      let data = [
         {x: "A", y: "U", magnitude: 0},
         {x: "B", y: "U", magnitude: 2},
         {x: "A", y: "V", magnitude: 16},
@@ -387,25 +384,23 @@ describe("Plots", () => {
         plot.x((d: any) => d.x, xScale);
         plot.y((d: any) => d.y, yScale);
 
-        dataset = new Plottable.Dataset(DATA);
+        dataset = new Plottable.Dataset(data);
         plot.addDataset(dataset);
         plot.renderTo(svg);
-      });
-
-      afterEach(() => {
-        svg.remove();
       });
 
       it("retrieves all selections with no args", () => {
         let allCells = plot.selections();
         assert.strictEqual(allCells.size(), 4, "all cells retrieved");
+        svg.remove();
       });
 
       it("retrieves correct selections", () => {
         let allCells = plot.selections([dataset]);
         assert.strictEqual(allCells.size(), 4, "all cells retrieved");
         let selectionData = allCells.data();
-        assert.includeMembers(selectionData, DATA, "data in selection data");
+        assert.includeMembers(selectionData, data, "data in selection data");
+        svg.remove();
       });
 
       it("skips invalid Datasets", () => {
@@ -413,7 +408,8 @@ describe("Plots", () => {
         let allCells = plot.selections([dataset, dummyDataset]);
         assert.strictEqual(allCells.size(), 4, "all cells retrieved");
         let selectionData = allCells.data();
-        assert.includeMembers(selectionData, DATA, "data in selection data");
+        assert.includeMembers(selectionData, data, "data in selection data");
+        svg.remove();
       });
     });
   });
