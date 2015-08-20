@@ -25,10 +25,10 @@ describe("Interactive Components", () => {
       dll.renderTo(svg);
       let dragEdge = dll.content().select(".drag-edge");
       let computedStyles = window.getComputedStyle(<Element> dragEdge.node());
-      assert.strictEqual(computedStyles.cursor, "resize-ew", "shows the resize cursor if enabled");
+      assert.strictEqual(computedStyles.cursor, "ew-resize", "shows the resize cursor if enabled");
       dll.enabled(false);
       computedStyles = window.getComputedStyle(<Element> dragEdge.node());
-      assert.strictEqual(computedStyles.cursor, "inherit", "cursor set to \"auto\" if not enabled");
+      assert.strictEqual(computedStyles.cursor, "auto", "cursor set to \"auto\" if not enabled");
       svg.remove();
     });
 
@@ -38,10 +38,10 @@ describe("Interactive Components", () => {
       dll.renderTo(svg);
       let dragEdge = dll.content().select(".drag-edge");
       let computedStyles = window.getComputedStyle(<Element> dragEdge.node());
-      assert.strictEqual(computedStyles.cursor, "resize-ns", "shows the resize cursor if enabled");
+      assert.strictEqual(computedStyles.cursor, "ns-resize", "shows the resize cursor if enabled");
       dll.enabled(false);
       computedStyles = window.getComputedStyle(<Element> dragEdge.node());
-      assert.strictEqual(computedStyles.cursor, "inherit", "cursor set to \"auto\" if not enabled");
+      assert.strictEqual(computedStyles.cursor, "auto", "cursor set to \"auto\" if not enabled");
       svg.remove();
     });
 
@@ -57,7 +57,7 @@ describe("Interactive Components", () => {
         dll.renderTo(svg);
         let endX = SVG_WIDTH / 4;
         TestMethods.triggerFakeDragSequence(
-          dll.content(),
+          dll.background(),
           { x: startX, y: SVG_HEIGHT / 2 },
           { x: endX, y: SVG_HEIGHT / 2 }
         );
@@ -78,13 +78,13 @@ describe("Interactive Components", () => {
       it("line can be dragged if drag starts within detectionRadius()", () => {
         let svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
         let dll = new Plottable.Components.DragLineLayer<void>("vertical");
-        let startX = SVG_WIDTH / 2 + dll.detectionRadius();
-        dll.pixelPosition(startX);
+        let linePosition = SVG_WIDTH / 2;
+        dll.pixelPosition(linePosition);
         dll.renderTo(svg);
         let endX = SVG_WIDTH / 4;
         TestMethods.triggerFakeDragSequence(
-          dll.content(),
-          { x: startX, y: SVG_HEIGHT / 2 },
+          dll.background(),
+          { x: linePosition + dll.detectionRadius(), y: SVG_HEIGHT / 2 },
           { x: endX, y: SVG_HEIGHT / 2 }
         );
         TestMethods.assertLineAttrs(
@@ -104,21 +104,21 @@ describe("Interactive Components", () => {
       it("starting a drag outside the detection radius does nothing", () => {
         let svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
         let dll = new Plottable.Components.DragLineLayer<void>("vertical");
-        let startX = SVG_WIDTH / 2 + 2 * dll.detectionRadius();
-        dll.pixelPosition(startX);
+        let linePosition = SVG_WIDTH / 2;
+        dll.pixelPosition(linePosition);
         dll.renderTo(svg);
         let endX = SVG_WIDTH / 4;
         TestMethods.triggerFakeDragSequence(
-          dll.content(),
-          { x: startX, y: SVG_HEIGHT / 2 },
+          dll.background(),
+          { x: linePosition + 2 * dll.detectionRadius(), y: SVG_HEIGHT / 2 },
           { x: endX, y: SVG_HEIGHT / 2 }
         );
         TestMethods.assertLineAttrs(
           dll.content().select(".guide-line"),
           {
-            x1: startX,
+            x1: linePosition,
             y1: 0,
-            x2: startX,
+            x2: linePosition,
             y2: SVG_HEIGHT
           },
           "line did not move"
@@ -135,7 +135,7 @@ describe("Interactive Components", () => {
         dll.renderTo(svg);
         let endX = SVG_WIDTH / 4;
         TestMethods.triggerFakeDragSequence(
-          dll.content(),
+          dll.background(),
           { x: startX, y: SVG_HEIGHT / 2 },
           { x: endX, y: SVG_HEIGHT / 2 }
         );
@@ -166,7 +166,7 @@ describe("Interactive Components", () => {
         let startX = scale.scale(startValue);
         let endX = SVG_WIDTH / 4;
         TestMethods.triggerFakeDragSequence(
-          dll.content(),
+          dll.background(),
           { x: startX, y: SVG_HEIGHT / 2 },
           { x: endX, y: SVG_HEIGHT / 2 }
         );
@@ -191,7 +191,7 @@ describe("Interactive Components", () => {
 
         let endX = SVG_WIDTH / 4;
         TestMethods.triggerFakeDragSequence(
-          dll.content(),
+          dll.background(),
           { x: startX, y: SVG_HEIGHT / 2 },
           { x: endX, y: SVG_HEIGHT / 2 }
         );
