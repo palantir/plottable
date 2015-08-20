@@ -497,24 +497,11 @@ describe("Plots", () => {
         assert.strictEqual(arcPath1.attr("fill"), "#aec7e8", "second sector filled appropriately");
         svg.remove();
       });
-
-    });
-
-    it("throws warnings on negative data", () => {
-      let message: String;
-      let oldWarn = Plottable.Utils.Window.warn;
-      Plottable.Utils.Window.warn = (warn) => message = warn;
-      piePlot.removeDataset(simpleDataset);
-      let negativeDataset = new Plottable.Dataset([{value: -5}, {value: 15}]);
-      piePlot.addDataset(negativeDataset);
-      assert.strictEqual(message, "Negative values will not render correctly in a Pie Plot.");
-      Plottable.Utils.Window.warn = oldWarn;
-      svg.remove();
     });
   });
 
   describe("fail safe tests", () => {
-    it("undefined, NaN and non-numeric strings not be represented in a Pie Chart", () => {
+    it("undefined, NaN, non-numeric strings, and negative number not be represented in a Pie Chart", () => {
       let svg = TestMethods.generateSVG();
 
       let data1 = [
@@ -525,6 +512,7 @@ describe("Plots", () => {
         { v: 1 },
         { v: "Bad String" },
         { v: 1 },
+        { v: -100 },
       ];
 
       let plot = new Plottable.Plots.Pie();
@@ -537,9 +525,15 @@ describe("Plots", () => {
 
       assert.strictEqual(elementsDrawnSel.size(), 4,
         "There should be exactly 4 slices in the pie chart, representing the valid values");
+      assert.lengthOf(plot.entities(), 4, "there should be exactly 4 entities, representing the valid values");
+
+      for (let i = 0 ; i < 4 ; i ++ ) {
+        let startAngle = (<any> plot)._startAngles[i];
+        let endAngle = (<any> plot)._endAngles[i];
+        assert.closeTo(endAngle - startAngle, Math.PI / 2, 0.001, "each slice is a quarter of the pie");
+      }
 
       svg.remove();
-
     });
   });
 });

@@ -7028,11 +7028,8 @@ var Plottable;
                 }
                 var sectorValueAccessor = Plottable.Plot._scaledAccessor(this.sectorValue());
                 var dataset = this.datasets()[0];
-                var data = dataset.data().filter(function (d, i) { return Plottable.Utils.Math.isValidNumber(sectorValueAccessor(d, i, dataset)); });
+                var data = this._getDataToDraw().get(dataset);
                 var pie = d3.layout.pie().sort(null).value(function (d, i) { return sectorValueAccessor(d, i, dataset); })(data);
-                if (pie.some(function (slice) { return slice.value < 0; })) {
-                    Plottable.Utils.Window.warn("Negative values will not render correctly in a Pie Plot.");
-                }
                 this._startAngles = pie.map(function (slice) { return slice.startAngle; });
                 this._endAngles = pie.map(function (slice) { return slice.endAngle; });
             };
@@ -7044,18 +7041,27 @@ var Plottable;
                 var sectorValueAccessor = Plottable.Plot._scaledAccessor(this.sectorValue());
                 var ds = this.datasets()[0];
                 var data = dataToDraw.get(ds);
-                var filteredData = data.filter(function (d, i) { return Plottable.Utils.Math.isValidNumber(sectorValueAccessor(d, i, ds)); });
+                var filteredData = data.filter(function (d, i) { return Pie._isValidData(sectorValueAccessor(d, i, ds)); });
                 dataToDraw.set(ds, filteredData);
                 return dataToDraw;
             };
+            Pie._isValidData = function (value) {
+                return Plottable.Utils.Math.isValidNumber(value) && value >= 0;
+            };
             Pie.prototype._pixelPoint = function (datum, index, dataset) {
+                var scaledValueAccessor = Plottable.Plot._scaledAccessor(this.sectorValue());
+                if (!Pie._isValidData(scaledValueAccessor(datum, index, dataset))) {
+                    return { x: NaN, y: NaN };
+                }
                 var innerRadius = Plottable.Plot._scaledAccessor(this.innerRadius())(datum, index, dataset);
                 var outerRadius = Plottable.Plot._scaledAccessor(this.outerRadius())(datum, index, dataset);
                 var avgRadius = (innerRadius + outerRadius) / 2;
-                var scaledValueAccessor = Plottable.Plot._scaledAccessor(this.sectorValue());
                 var pie = d3.layout.pie()
                     .sort(null)
-                    .value(function (d, i) { return scaledValueAccessor(d, i, dataset); })(dataset.data());
+                    .value(function (d, i) {
+                    var value = scaledValueAccessor(d, i, dataset);
+                    return Pie._isValidData(value) ? value : 0;
+                })(dataset.data());
                 var startAngle = pie[index].startAngle;
                 var endAngle = pie[index].endAngle;
                 var avgAngle = (startAngle + endAngle) / 2;
