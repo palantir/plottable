@@ -416,8 +416,11 @@ describe("Plots", () => {
 
     describe("Labels", () => {
       let svg: d3.Selection<void>;
-      let rectanglePlot: Plottable.Plots.Rectangle<number, number>;
-      let DATA: [any];
+      let plot: Plottable.Plots.Rectangle<number, number>;
+      let data = [
+        { x: 0, y: 0, x2: 1, y2: 1, val: "1" },
+        { x: 0, y: 1, x2: 1, y2: 2, val: "2" }
+      ];
       let dataset: Plottable.Dataset;
       let xScale: Plottable.Scales.Linear;
       let yScale: Plottable.Scales.Linear;
@@ -425,14 +428,11 @@ describe("Plots", () => {
         xScale = new Plottable.Scales.Linear();
         yScale = new Plottable.Scales.Linear();
         svg = TestMethods.generateSVG(150, 300);
-        rectanglePlot = new Plottable.Plots.Rectangle<number, number>();
-        DATA = [
-          { x: 0, y: 0, x2: 1, y2: 1, val: "1" },
-          { x: 0, y: 1, x2: 1, y2: 2, val: "2" }
-        ];
-        dataset = new Plottable.Dataset(DATA);
-        rectanglePlot.addDataset(dataset);
-        rectanglePlot.x((d: any) => d.x, xScale)
+        plot = new Plottable.Plots.Rectangle<number, number>();
+        data = ;
+        dataset = new Plottable.Dataset(data);
+        plot.addDataset(dataset);
+        plot.x((d: any) => d.x, xScale)
                      .y((d: any) => d.y, yScale)
                      .x2((d: any) => d.x2)
                      .y2((d: any) => d.y2)
@@ -447,18 +447,18 @@ describe("Plots", () => {
       });
 
       it("rectangle labels render properly", () => {
-        rectanglePlot.labelsEnabled(true);
+        plot.labelsEnabled(true);
         let texts = svg.selectAll("text")[0].map((n: any) => d3.select(n).text());
         assert.lengthOf(texts, 2, "all labels are drawn");
         texts.forEach((text, i) => {
-          assert.strictEqual(text, DATA[i].val, "label is drawn correctly");
+          assert.strictEqual(text, data[i].val, "label is drawn correctly");
         });
         svg.remove();
       });
 
       it("rectangle labels hide if rectangle is too skinny", () => {
-        rectanglePlot.labelsEnabled(true);
-        rectanglePlot.label((d: any, i: number) => d.val + ( i !== 0 ? "a really really really long string" : "" ));
+        plot.labelsEnabled(true);
+        plot.label((d: any, i: number) => d.val + ( i !== 0 ? "a really really really long string" : "" ));
         let texts = svg.selectAll("text")[0].map((n: any) => d3.select(n).text());
         assert.lengthOf(texts, 1, "the second label is too long to be drawn");
         assert.strictEqual(texts[0], "1");
@@ -466,17 +466,17 @@ describe("Plots", () => {
       });
 
       it("rectangle labels hide if rectangle is too short", () => {
-        rectanglePlot.labelsEnabled(true);
+        plot.labelsEnabled(true);
         svg.remove();
         svg = TestMethods.generateSVG(150, 30);
-        rectanglePlot.label((d: any) => d.val);
+        plot.label((d: any) => d.val);
         let texts = svg.selectAll("text")[0].map((n: any) => d3.select(n).text());
         assert.lengthOf(texts, 0, "labels are not drawn when rectangles are too short");
         svg.remove();
       });
 
       it("rectangle labels are updated on dataset change", () => {
-        rectanglePlot.labelsEnabled(true);
+        plot.labelsEnabled(true);
         let texts = svg.selectAll("text")[0].map((n: any) => d3.select(n).text());
         assert.lengthOf(texts, 2, "all labels are drawn");
 
@@ -489,7 +489,7 @@ describe("Plots", () => {
       });
 
       it("labels cut off by edges are not shown", () => {
-        rectanglePlot.labelsEnabled(true);
+        plot.labelsEnabled(true);
         let data = [
           { x: 2, y: 2, x2: 3, y2: 3, val: "center" },
           { x: 0.5, y: 2, x2: 1.5, y2: 3, val: "left" },
@@ -507,7 +507,7 @@ describe("Plots", () => {
       });
 
       it("labels cut off by other rectangels are not shown", () => {
-        rectanglePlot.labelsEnabled(true);
+        plot.labelsEnabled(true);
         let data = [
           { x: 0, y: 0, x2: 2, y2: 2, val: "bottom" },
           { x: 1, y: 1, x2: 3, y2: 3, val: "middle" }];
@@ -519,7 +519,7 @@ describe("Plots", () => {
         assert.lengthOf(texts, 1, "1 label is drawn");
         assert.strictEqual(texts[0], "middle");
 
-        rectanglePlot.addDataset(new Plottable.Dataset(data2));
+        plot.addDataset(new Plottable.Dataset(data2));
 
         texts = svg.selectAll("text")[0].map((n: any) => d3.select(n).text());
         assert.lengthOf(texts, 2, "2 labels are drawn");
