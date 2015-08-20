@@ -414,7 +414,7 @@ describe("Plots", () => {
 
     });
 
-    describe("Rectangle Plot With Labels", () => {
+    describe("Labels", () => {
       let svg: d3.Selection<void>;
       let rectanglePlot: Plottable.Plots.Rectangle<number, number>;
       let DATA: [any];
@@ -424,7 +424,7 @@ describe("Plots", () => {
       beforeEach(() => {
         xScale = new Plottable.Scales.Linear();
         yScale = new Plottable.Scales.Linear();
-        svg = TestMethods.generateSVG(SVG_WIDTH / 2, SVG_HEIGHT);
+        svg = TestMethods.generateSVG(150, 300);
         rectanglePlot = new Plottable.Plots.Rectangle<number, number>();
         DATA = [
           { x: 0, y: 0, x2: 1, y2: 1, val: "1" },
@@ -468,7 +468,7 @@ describe("Plots", () => {
       it("rectangle labels hide if rectangle is too short", () => {
         rectanglePlot.labelsEnabled(true);
         svg.remove();
-        svg = TestMethods.generateSVG(SVG_WIDTH / 2, 30);
+        svg = TestMethods.generateSVG(150, 30);
         rectanglePlot.label((d: any) => d.val);
         let texts = svg.selectAll("text")[0].map((n: any) => d3.select(n).text());
         assert.lengthOf(texts, 0, "labels are not drawn when rectangles are too short");
