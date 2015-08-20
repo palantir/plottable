@@ -494,7 +494,35 @@ describe("Interactive Components", () => {
       svg.remove();
     });
 
-    // it("destroy() removes all callbacks and properly disconnects from its Interaction", () => {
-    // });
+    it("destroy() removes all callbacks on the DragLineLayer", () => {
+      let dll = new Plottable.Components.DragLineLayer<void>("vertical");
+      let callback = () => "foo";
+      dll.onDragStart(callback);
+      dll.onDrag(callback);
+      dll.onDragEnd(callback);
+
+      dll.destroy();
+
+      let dragStartCallbacks = <Plottable.Utils.CallbackSet<Plottable.DragLineCallback<void>>> (<any> dll)._dragStartCallbacks;
+      let dragCallbacks = <Plottable.Utils.CallbackSet<Plottable.DragLineCallback<void>>> (<any> dll)._dragCallbacks;
+      let dragEndCallbacks = <Plottable.Utils.CallbackSet<Plottable.DragLineCallback<void>>> (<any> dll)._dragEndCallbacks;
+      assert.strictEqual(dragStartCallbacks.size, 0, "dragStart callbacks removed on destroy()");
+      assert.strictEqual(dragCallbacks.size, 0, "drag callbacks removed on destroy()");
+      assert.strictEqual(dragEndCallbacks.size, 0, "drag end callbacks removed on destroy()");
+    });
+
+    it("destroy() correctly disconnects from the internal Drag Interaction", () => {
+      let dll = new Plottable.Components.DragLineLayer<void>("vertical");
+      let dragInteraction = (<any> dll)._dragInteraction;
+
+      dll.destroy();
+
+      let interactionStartCallbacks = <Plottable.Utils.CallbackSet<Plottable.DragCallback>> dragInteraction._dragStartCallbacks;
+      let interactionCallbacks = <Plottable.Utils.CallbackSet<Plottable.DragCallback>> dragInteraction._dragCallbacks;
+      let interactionEndCallbacks = <Plottable.Utils.CallbackSet<Plottable.DragCallback>> dragInteraction._dragEndCallbacks;
+      assert.strictEqual(interactionStartCallbacks.size, 0, "Interaction dragStart callbacks removed on destroy()");
+      assert.strictEqual(interactionCallbacks.size, 0, "Interaction drag callbacks removed on destroy()");
+      assert.strictEqual(interactionEndCallbacks.size, 0, "Interaction drag end callbacks removed on destroy()");
+    });
   });
 });
