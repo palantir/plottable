@@ -45,7 +45,9 @@ describe("Plots", () => {
         plot.addDataset(new Plottable.Dataset(data));
         plot.renderTo(svg);
 
-        plot.content().selectAll("line").each(function() {
+        let lines = plot.content().selectAll("line");
+        assert.strictEqual(lines.size(), data.length, "correct number of lines has been drawn");
+        lines.each(function() {
           let lineSelection = d3.select(this);
           assert.strictEqual(lineSelection.attr("x1"), lineSelection.attr("x2"), "line is vertical");
         });
@@ -60,11 +62,27 @@ describe("Plots", () => {
         plot.addDataset(new Plottable.Dataset(data));
         plot.renderTo(svg);
 
-        plot.content().selectAll("line").each(function() {
+        let lines = plot.content().selectAll("line");
+        assert.strictEqual(lines.size(), data.length, "correct number of lines has been drawn");
+        lines.each(function() {
           let lineSelection = d3.select(this);
           assert.strictEqual(lineSelection.attr("y1"), lineSelection.attr("y2"), "line is horizontal");
         });
         svg.remove();
+      });
+    });
+
+    describe("autorangeMode", () => {
+      let svg: d3.Selection<void>;
+      let xScale: Plottable.Scales.Linear;
+      let yScale: Plottable.Scales.Linear;
+
+      beforeEach(() => {
+        svg = TestMethods.generateSVG(500, 500);
+        xScale = new Plottable.Scales.Linear();
+        yScale = new Plottable.Scales.Linear();
+        xScale.padProportion(0);
+        yScale.padProportion(0);
       });
 
       it("adjusts the xScale domain with respect to the yScale domain when autorangeMode is set to x", () => {
@@ -72,7 +90,6 @@ describe("Plots", () => {
           { y: 0, x: 0, x2: 1 },
           { y: 1, x: 1, x2: 2 }
         ];
-        xScale.padProportion(0);
 
         let plot = new Plottable.Plots.Segment();
         plot.x((d) => d.x, xScale);
@@ -98,7 +115,6 @@ describe("Plots", () => {
           { x: 0, y: 0, y2: 1 },
           { x: 1, y: 1, y2: 2 }
         ];
-        yScale.padProportion(0);
 
         let plot = new Plottable.Plots.Segment();
         plot.x((d) => d.x, xScale);
