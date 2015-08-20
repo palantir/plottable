@@ -8283,8 +8283,27 @@ var Plottable;
                     var color = attrToProjector["fill"](d, i, dataset);
                     var dark = Plottable.Utils.Color.contrast("white", color) * 1.6 < Plottable.Utils.Color.contrast("black", color);
                     g.classed(dark ? "dark-label" : "light-label", true);
-                    var hideLabel = (x + measurement.width > _this.width() || (positive ? y + measurement.height : y + h) > _this.height());
-                    g.style("visibility", hideLabel ? "hidden" : "inherit");
+                    var showLabel = true;
+                    var labelPosition = {
+                        x: x,
+                        y: positive ? y : y + h - measurement.height
+                    };
+                    if (_this._isVertical) {
+                        labelPosition.x = baseX + w / 2 - measurement.width / 2;
+                    }
+                    else {
+                        if (!positive) {
+                            labelPosition.x = baseX + offset + w - measurement.width;
+                        }
+                        else {
+                            labelPosition.x = baseX + offset;
+                        }
+                    }
+                    if (labelPosition.x < 0 || labelPosition.x + measurement.width > _this.width() ||
+                        labelPosition.y < 0 || labelPosition.y + measurement.height > _this.height()) {
+                        showLabel = false;
+                    }
+                    g.style("visibility", showLabel ? "inherit" : "hidden");
                     var xAlign;
                     var yAlign;
                     if (_this._isVertical) {

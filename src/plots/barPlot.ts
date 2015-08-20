@@ -502,9 +502,30 @@ export module Plots {
         let dark = Utils.Color.contrast("white", color) * 1.6 < Utils.Color.contrast("black", color);
         g.classed(dark ? "dark-label" : "light-label", true);
 
-        let hideLabel = (x + measurement.width > this.width() || (positive ? y + measurement.height : y + h) > this.height());
+        let showLabel = true;
 
-        g.style("visibility", hideLabel ? "hidden" : "inherit");
+        let labelPosition = {
+          x: x,
+          y: positive ? y : y + h - measurement.height
+        };
+
+        if (this._isVertical) {
+          labelPosition.x = baseX + w / 2 - measurement.width / 2;
+        } else {
+          if (!positive) {
+            labelPosition.x = baseX + offset + w - measurement.width;
+          } else {
+            labelPosition.x = baseX + offset;
+          }
+        }
+
+        if (labelPosition.x < 0 || labelPosition.x + measurement.width > this.width() ||
+            labelPosition.y < 0 || labelPosition.y + measurement.height > this.height()) {
+          showLabel = false;
+        }
+
+        g.style("visibility", showLabel ? "inherit" : "hidden");
+
         let xAlign: string;
         let yAlign: string;
         if (this._isVertical) {

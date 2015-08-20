@@ -671,7 +671,7 @@ describe("Plots", () => {
       });
 
       it("hides labels properly on the left", () => {
-        xScale.domainMax(-1.4);
+        xScale.domainMin(-1.4);
         let texts = svg.selectAll("text");
 
         assert.strictEqual(texts.size(), 2, "There should be two labels rendered");
