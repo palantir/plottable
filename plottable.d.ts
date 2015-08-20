@@ -1340,16 +1340,6 @@ declare module Plottable {
 
 declare module Plottable {
     module Drawers {
-        class ArcOutline extends Drawer {
-            constructor(dataset: Dataset);
-            protected _applyDefaultAttributes(selection: d3.Selection<any>): void;
-        }
-    }
-}
-
-
-declare module Plottable {
-    module Drawers {
         class Symbol extends Drawer {
             constructor(dataset: Dataset);
         }
@@ -2671,7 +2661,9 @@ declare module Plottable {
             constructor();
             protected _setup(): void;
             computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number): Pie;
+            addDataset(dataset: Dataset): Pie;
             protected _addDataset(dataset: Dataset): Pie;
+            removeDataset(dataset: Dataset): Pie;
             protected _removeDatasetNodes(dataset: Dataset): void;
             protected _removeDataset(dataset: Dataset): Pie;
             selections(datasets?: Dataset[]): d3.Selection<any>;
@@ -3338,6 +3330,7 @@ declare module Plottable {
              */
             y0(y0: number | Accessor<number>): Area<X>;
             protected _onDatasetUpdate(): void;
+            addDataset(dataset: Dataset): Area<X>;
             protected _addDataset(dataset: Dataset): Area<X>;
             protected _removeDatasetNodes(dataset: Dataset): void;
             protected _additionalPaint(): void;

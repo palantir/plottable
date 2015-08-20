@@ -2892,34 +2892,6 @@ var Plottable;
 (function (Plottable) {
     var Drawers;
     (function (Drawers) {
-        var ArcOutline = (function (_super) {
-            __extends(ArcOutline, _super);
-            function ArcOutline(dataset) {
-                _super.call(this, dataset);
-                this._className = "arc outline";
-                this._svgElementName = "path";
-            }
-            ArcOutline.prototype._applyDefaultAttributes = function (selection) {
-                _super.prototype._applyDefaultAttributes.call(this, selection);
-                selection.style("fill", "none");
-            };
-            return ArcOutline;
-        })(Plottable.Drawer);
-        Drawers.ArcOutline = ArcOutline;
-    })(Drawers = Plottable.Drawers || (Plottable.Drawers = {}));
-})(Plottable || (Plottable = {}));
-
-///<reference path="../reference.ts" />
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    __.prototype = b.prototype;
-    d.prototype = new __();
-};
-var Plottable;
-(function (Plottable) {
-    var Drawers;
-    (function (Drawers) {
         var Symbol = (function (_super) {
             __extends(Symbol, _super);
             function Symbol(dataset) {
@@ -6898,6 +6870,10 @@ var Plottable;
                 }
                 return this;
             };
+            Pie.prototype.addDataset = function (dataset) {
+                _super.prototype.addDataset.call(this, dataset);
+                return this;
+            };
             Pie.prototype._addDataset = function (dataset) {
                 if (this.datasets().length === 1) {
                     Plottable.Utils.Window.warn("Only one dataset is supported in Pie plots");
@@ -6910,6 +6886,10 @@ var Plottable;
                 }
                 this._strokeDrawers.set(dataset, strokeDrawer);
                 _super.prototype._addDataset.call(this, dataset);
+                return this;
+            };
+            Pie.prototype.removeDataset = function (dataset) {
+                _super.prototype.removeDataset.call(this, dataset);
                 return this;
             };
             Pie.prototype._removeDatasetNodes = function (dataset) {
@@ -8889,6 +8869,10 @@ var Plottable;
             Area.prototype._onDatasetUpdate = function () {
                 _super.prototype._onDatasetUpdate.call(this);
                 this._updateYScale();
+            };
+            Area.prototype.addDataset = function (dataset) {
+                _super.prototype.addDataset.call(this, dataset);
+                return this;
             };
             Area.prototype._addDataset = function (dataset) {
                 var lineDrawer = new Plottable.Drawers.Line(dataset);

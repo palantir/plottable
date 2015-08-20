@@ -44,6 +44,11 @@ export module Plots {
       return this;
     }
 
+    public addDataset(dataset: Dataset) {
+      super.addDataset(dataset);
+      return this;
+    }
+
     protected _addDataset(dataset: Dataset) {
       if (this.datasets().length === 1) {
         Utils.Window.warn("Only one dataset is supported in Pie plots");
@@ -56,6 +61,11 @@ export module Plots {
       }
       this._strokeDrawers.set(dataset, strokeDrawer);
       super._addDataset(dataset);
+      return this;
+    }
+
+    public removeDataset(dataset: Dataset) {
+      super.removeDataset(dataset);
       return this;
     }
 

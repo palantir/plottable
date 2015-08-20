@@ -232,8 +232,7 @@ describe("Plots", () => {
           { value: 5000 },
           { value: 5000 }];
         let dataset = new Plottable.Dataset(data);
-        piePlot.addDataset(dataset);
-        piePlot.outerRadius(500);
+        piePlot.addDataset(dataset).outerRadius(500);
         piePlot.renderTo(svg);
 
         let texts = svg.selectAll("text");
