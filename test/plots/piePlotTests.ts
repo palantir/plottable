@@ -187,7 +187,7 @@ describe("Plots", () => {
           { value: 5000 },
           { value: 5000 }];
         let dataset = new Plottable.Dataset(data);
-        piePlot.addDataset(dataset)
+        piePlot.addDataset(dataset);
         piePlot.outerRadius(500);
         piePlot.renderTo(svg);
 
