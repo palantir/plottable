@@ -23,6 +23,10 @@ describe("Formatters", () => {
       let result = fixed3(1.2349);
       assert.strictEqual(result, "1.235", "long values are rounded correctly");
     });
+
+    it("non-integer precision throws exception", () => {
+      assert.throws(() => Plottable.Formatters.fixed(2.1)(123.313), "Formatter precision must be an integer");
+    });
   });
 
   describe("general", () => {
@@ -51,6 +55,10 @@ describe("Formatters", () => {
       assert.throws(() => {
           Plottable.Formatters.general(100);
       });
+    });
+
+    it("non-integer precision throws error", () => {
+      assert.throws(() => Plottable.Formatters.general(2.1)(123.313), "Formatter precision must be an integer");
     });
   });
 
@@ -86,6 +94,11 @@ describe("Formatters", () => {
       let result = centsFormatter(1);
       assert.strictEqual(result.charAt(result.length - 1), "c", "The specified currency symbol was appended");
     });
+
+    it("non-integer precision throws exception", () => {
+      assert.throws(() => Plottable.Formatters.currency(2.1)(123.313), "Formatter precision must be an integer");
+    });
+
   });
 
   describe("multiTime", () => {
@@ -131,6 +144,10 @@ describe("Formatters", () => {
       let result = percentFormatter(0.075);
       assert.strictEqual(result, "8%", "shows formatter changed value");
     });
+
+    it("non-integer precision throws exception", () => {
+      assert.throws(() => Plottable.Formatters.percentage(2.1)(0.313), "Formatter precision must be an integer");
+    });
   });
 
   describe("multiTime", () => {
@@ -163,6 +180,10 @@ describe("Formatters", () => {
       assert.operator(result.length, "<=", 5, "large number was formatted to a short string");
       result = lnFormatter(Math.pow(10, -12));
       assert.operator(result.length, "<=", 5, "small number was formatted to a short string");
+    });
+
+    it("non-integer precision throws exception", () => {
+      assert.throws(() => Plottable.Formatters.siSuffix(2.1)(123.313), "Formatter precision must be an integer");
     });
   });
 
@@ -253,9 +274,8 @@ describe("Formatters", () => {
       assert.strictEqual(formatter(0), "0", "0 gets formatted well");
     });
 
-    it("non-integer precision rounds down", () => {
-      assert.strictEqual(Plottable.Formatters.shortScale(1.1)(3), "3.0", "Precision of 1.1 should be same as precision of 1");
-      assert.strictEqual(Plottable.Formatters.shortScale(1.9)(3), "3.0", "Precision of 1.9 should be same as precision of 1");
+    it("non-integer precision throws exception", () => {
+      assert.throws(() => Plottable.Formatters.shortScale(2.1)(123.313), "Formatter precision must be an integer");
     });
   });
 

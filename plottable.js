@@ -1,5 +1,5 @@
 /*!
-Plottable 1.6.1 (https://github.com/palantir/plottable)
+Plottable 1.7.0 (https://github.com/palantir/plottable)
 Copyright 2014-2015 Palantir Technologies
 Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
 */
@@ -901,7 +901,7 @@ var Plottable;
 ///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
-    Plottable.version = "1.6.1";
+    Plottable.version = "1.7.0";
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
@@ -1281,7 +1281,6 @@ var Plottable;
         function shortScale(precision) {
             if (precision === void 0) { precision = 3; }
             verifyPrecision(precision);
-            precision = Math.floor(precision);
             var suffixes = "KMBTQ";
             var exponentFormatter = d3.format("." + precision + "e");
             var fixedFormatter = d3.format("." + precision + "f");
@@ -1404,6 +1403,9 @@ var Plottable;
         function verifyPrecision(precision) {
             if (precision < 0 || precision > 20) {
                 throw new RangeError("Formatter precision must be between 0 and 20");
+            }
+            if (precision !== Math.floor(precision)) {
+                throw new RangeError("Formatter precision must be an integer");
             }
         }
     })(Formatters = Plottable.Formatters || (Plottable.Formatters = {}));
@@ -1611,6 +1613,7 @@ var Plottable;
             _super.call(this);
             this._tickGenerator = function (scale) { return scale.defaultTicks(); };
             this._padProportion = 0.05;
+            this._snappingDomainEnabled = true;
             this._paddingExceptionsProviders = new Plottable.Utils.Set();
         }
         QuantitativeScale.prototype.autoDomain = function () {
@@ -1722,7 +1725,18 @@ var Plottable;
             });
             var newMin = minExistsInExceptions ? min : this.invert(this.scale(min) - (this.scale(max) - this.scale(min)) * p);
             var newMax = maxExistsInExceptions ? max : this.invert(this.scale(max) + (this.scale(max) - this.scale(min)) * p);
-            return this._niceDomain([newMin, newMax]);
+            if (this._snappingDomainEnabled) {
+                return this._niceDomain([newMin, newMax]);
+            }
+            return ([newMin, newMax]);
+        };
+        QuantitativeScale.prototype.snappingDomainEnabled = function (snappingDomainEnabled) {
+            if (snappingDomainEnabled == null) {
+                return this._snappingDomainEnabled;
+            }
+            this._snappingDomainEnabled = snappingDomainEnabled;
+            this._autoDomainIfAutomaticMode();
+            return this;
         };
         QuantitativeScale.prototype._expandSingleValueDomain = function (singleValueDomain) {
             return singleValueDomain;
@@ -4061,9 +4075,10 @@ var Plottable;
                 // Makes sure that the size it requires is a multiple of tier sizes, such that
                 // we have no leftover tiers
                 var size = _super.prototype._sizeFromOffer.call(this, availableWidth, availableHeight);
-                size.height = this._tierHeights.reduce(function (prevValue, currValue, index, arr) {
+                var tierHeights = this._tierHeights.reduce(function (prevValue, currValue, index, arr) {
                     return (prevValue + currValue > size.height) ? prevValue : (prevValue + currValue);
                 });
+                size.height = Math.min(size.height, tierHeights + this.margin());
                 return size;
             };
             Time.prototype._setup = function () {
@@ -6220,6 +6235,145 @@ var __extends = (this && this.__extends) || function (d, b) {
 };
 var Plottable;
 (function (Plottable) {
+    var Components;
+    (function (Components) {
+        var PropertyMode;
+        (function (PropertyMode) {
+            PropertyMode[PropertyMode["VALUE"] = 0] = "VALUE";
+            PropertyMode[PropertyMode["PIXEL"] = 1] = "PIXEL";
+        })(PropertyMode || (PropertyMode = {}));
+        ;
+        var GuideLineLayer = (function (_super) {
+            __extends(GuideLineLayer, _super);
+            function GuideLineLayer(orientation) {
+                var _this = this;
+                _super.call(this);
+                this._mode = PropertyMode.VALUE;
+                if (orientation !== GuideLineLayer.ORIENTATION_VERTICAL && orientation !== GuideLineLayer.ORIENTATION_HORIZONTAL) {
+                    throw new Error(orientation + " is not a valid orientation for GuideLineLayer");
+                }
+                this._orientation = orientation;
+                this._clipPathEnabled = true;
+                this.addClass("guide-line-layer");
+                this._scaleUpdateCallback = function () {
+                    _this._syncPixelPositionAndValue();
+                    _this.render();
+                };
+            }
+            GuideLineLayer.prototype._setup = function () {
+                _super.prototype._setup.call(this);
+                this._guideLine = this.content().append("line").classed("guide-line", true);
+            };
+            GuideLineLayer.prototype._sizeFromOffer = function (availableWidth, availableHeight) {
+                return {
+                    width: availableWidth,
+                    height: availableHeight
+                };
+            };
+            GuideLineLayer.prototype._isVertical = function () {
+                return this._orientation === GuideLineLayer.ORIENTATION_VERTICAL;
+            };
+            GuideLineLayer.prototype.fixedWidth = function () {
+                return true;
+            };
+            GuideLineLayer.prototype.fixedHeight = function () {
+                return true;
+            };
+            GuideLineLayer.prototype.computeLayout = function (origin, availableWidth, availableHeight) {
+                _super.prototype.computeLayout.call(this, origin, availableWidth, availableHeight);
+                if (this.scale() != null) {
+                    if (this._isVertical()) {
+                        this.scale().range([0, this.width()]);
+                    }
+                    else {
+                        this.scale().range([this.height(), 0]);
+                    }
+                }
+                return this;
+            };
+            GuideLineLayer.prototype.renderImmediately = function () {
+                _super.prototype.renderImmediately.call(this);
+                this._syncPixelPositionAndValue();
+                this._guideLine.attr({
+                    x1: this._isVertical() ? this.pixelPosition() : 0,
+                    y1: this._isVertical() ? 0 : this.pixelPosition(),
+                    x2: this._isVertical() ? this.pixelPosition() : this.width(),
+                    y2: this._isVertical() ? this.height() : this.pixelPosition()
+                });
+                return this;
+            };
+            // sets pixelPosition() or value() based on the other, depending on which was the last one set
+            GuideLineLayer.prototype._syncPixelPositionAndValue = function () {
+                if (this.scale() == null) {
+                    return;
+                }
+                if (this._mode === PropertyMode.VALUE && this.value() != null) {
+                    this._pixelPosition = this.scale().scale(this.value());
+                }
+                else if (this._mode === PropertyMode.PIXEL && this.pixelPosition() != null) {
+                    this._value = this.scale().invert(this.pixelPosition());
+                }
+            };
+            GuideLineLayer.prototype.scale = function (scale) {
+                if (scale == null) {
+                    return this._scale;
+                }
+                var previousScale = this._scale;
+                if (previousScale != null) {
+                    previousScale.offUpdate(this._scaleUpdateCallback);
+                }
+                this._scale = scale;
+                this._scale.onUpdate(this._scaleUpdateCallback);
+                this._syncPixelPositionAndValue();
+                this.redraw();
+                return this;
+            };
+            GuideLineLayer.prototype.value = function (value) {
+                if (value == null) {
+                    return this._value;
+                }
+                this._value = value;
+                this._mode = PropertyMode.VALUE;
+                this._syncPixelPositionAndValue();
+                this.render();
+                return this;
+            };
+            GuideLineLayer.prototype.pixelPosition = function (pixelPosition) {
+                if (pixelPosition == null) {
+                    return this._pixelPosition;
+                }
+                if (!Plottable.Utils.Math.isValidNumber(pixelPosition)) {
+                    throw new Error("pixelPosition must be a finite number");
+                }
+                this._pixelPosition = pixelPosition;
+                this._mode = PropertyMode.PIXEL;
+                this._syncPixelPositionAndValue();
+                this.render();
+                return this;
+            };
+            GuideLineLayer.prototype.destroy = function () {
+                _super.prototype.destroy.call(this);
+                if (this.scale() != null) {
+                    this.scale().offUpdate(this._scaleUpdateCallback);
+                }
+            };
+            GuideLineLayer.ORIENTATION_VERTICAL = "vertical";
+            GuideLineLayer.ORIENTATION_HORIZONTAL = "horizontal";
+            return GuideLineLayer;
+        })(Plottable.Component);
+        Components.GuideLineLayer = GuideLineLayer;
+    })(Components = Plottable.Components || (Plottable.Components = {}));
+})(Plottable || (Plottable = {}));
+
+///<reference path="../reference.ts" />
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var Plottable;
+(function (Plottable) {
     var Plots;
     (function (Plots) {
         var Animator;
@@ -6757,7 +6911,7 @@ var Plottable;
                 return this;
             };
             Pie.prototype.labelsEnabled = function (enabled) {
-                if (enabled === undefined) {
+                if (enabled == null) {
                     return this._labelsEnabled;
                 }
                 else {
@@ -7256,6 +7410,8 @@ var Plottable;
              */
             function Rectangle() {
                 _super.call(this);
+                this._labelsEnabled = false;
+                this._label = null;
                 this.animator("rectangles", new Plottable.Animators.Null());
                 this.addClass("rectangle-plot");
             }
@@ -7401,6 +7557,57 @@ var Plottable;
                     return x <= point.x && point.x <= x + width && y <= point.y && point.y <= y + height;
                 });
             };
+            Rectangle.prototype.entitiesIn = function (xRangeOrBounds, yRange) {
+                var dataXRange;
+                var dataYRange;
+                if (yRange == null) {
+                    var bounds = xRangeOrBounds;
+                    dataXRange = { min: bounds.topLeft.x, max: bounds.bottomRight.x };
+                    dataYRange = { min: bounds.topLeft.y, max: bounds.bottomRight.y };
+                }
+                else {
+                    dataXRange = xRangeOrBounds;
+                    dataYRange = yRange;
+                }
+                return this._entitiesIntersecting(dataXRange, dataYRange);
+            };
+            Rectangle.prototype._entityBBox = function (datum, index, dataset, attrToProjector) {
+                return {
+                    x: attrToProjector["x"](datum, index, dataset),
+                    y: attrToProjector["y"](datum, index, dataset),
+                    width: attrToProjector["width"](datum, index, dataset),
+                    height: attrToProjector["height"](datum, index, dataset)
+                };
+            };
+            Rectangle.prototype._entitiesIntersecting = function (xValOrRange, yValOrRange) {
+                var _this = this;
+                var intersected = [];
+                var attrToProjector = this._generateAttrToProjector();
+                this.entities().forEach(function (entity) {
+                    if (Plottable.Utils.DOM.intersectsBBox(xValOrRange, yValOrRange, _this._entityBBox(entity.datum, entity.index, entity.dataset, attrToProjector))) {
+                        intersected.push(entity);
+                    }
+                });
+                return intersected;
+            };
+            Rectangle.prototype.label = function (label) {
+                if (label == null) {
+                    return this._label;
+                }
+                this._label = label;
+                this.render();
+                return this;
+            };
+            Rectangle.prototype.labelsEnabled = function (enabled) {
+                if (enabled == null) {
+                    return this._labelsEnabled;
+                }
+                else {
+                    this._labelsEnabled = enabled;
+                    this.render();
+                    return this;
+                }
+            };
             Rectangle.prototype._propertyProjectors = function () {
                 var attrToProjector = _super.prototype._propertyProjectors.call(this);
                 if (this.x2() != null) {
@@ -7449,6 +7656,79 @@ var Plottable;
                     dataToDraw.set(dataset, data);
                 });
                 return dataToDraw;
+            };
+            Rectangle.prototype._additionalPaint = function (time) {
+                var _this = this;
+                this._renderArea.selectAll(".label-area").remove();
+                if (this._labelsEnabled && this.label() != null) {
+                    Plottable.Utils.Window.setTimeout(function () { return _this._drawLabels(); }, time);
+                }
+            };
+            Rectangle.prototype._drawLabels = function () {
+                var _this = this;
+                var dataToDraw = this._getDataToDraw();
+                this.datasets().forEach(function (dataset, i) { return _this._drawLabel(dataToDraw, dataset, i); });
+            };
+            Rectangle.prototype._drawLabel = function (dataToDraw, dataset, datasetIndex) {
+                var _this = this;
+                var attrToProjector = this._generateAttrToProjector();
+                var labelArea = this._renderArea.append("g").classed("label-area", true);
+                var measurer = new SVGTypewriter.Measurers.Measurer(labelArea);
+                var writer = new SVGTypewriter.Writers.Writer(measurer);
+                var xRange = this.x().scale.range();
+                var yRange = this.y().scale.range();
+                var xMin = Math.min.apply(null, xRange);
+                var xMax = Math.max.apply(null, xRange);
+                var yMin = Math.min.apply(null, yRange);
+                var yMax = Math.max.apply(null, yRange);
+                var data = dataToDraw.get(dataset);
+                data.forEach(function (datum, datumIndex) {
+                    var label = "" + _this.label()(datum, datumIndex, dataset);
+                    var measurement = measurer.measure(label);
+                    var x = attrToProjector["x"](datum, datumIndex, dataset);
+                    var y = attrToProjector["y"](datum, datumIndex, dataset);
+                    var width = attrToProjector["width"](datum, datumIndex, dataset);
+                    var height = attrToProjector["height"](datum, datumIndex, dataset);
+                    if (measurement.height <= height && measurement.width <= width) {
+                        var horizontalOffset = (width - measurement.width) / 2;
+                        var verticalOffset = (height - measurement.height) / 2;
+                        x += horizontalOffset;
+                        y += verticalOffset;
+                        var xLabelRange = { min: x, max: x + measurement.width };
+                        var yLabelRange = { min: y, max: y + measurement.height };
+                        if (xLabelRange.min < xMin || xLabelRange.max > xMax || yLabelRange.min < yMin || yLabelRange.max > yMax) {
+                            return;
+                        }
+                        if (_this._overlayLabel(xLabelRange, yLabelRange, datumIndex, datasetIndex, dataToDraw)) {
+                            return;
+                        }
+                        var color = attrToProjector["fill"] == null ? "black" : attrToProjector["fill"](datum, datumIndex, dataset);
+                        var dark = Plottable.Utils.Color.contrast("white", color) * 1.6 < Plottable.Utils.Color.contrast("black", color);
+                        var g = labelArea.append("g").attr("transform", "translate(" + x + "," + y + ")");
+                        var className = dark ? "dark-label" : "light-label";
+                        g.classed(className, true);
+                        writer.write(label, measurement.width, measurement.height, {
+                            selection: g,
+                            xAlign: "center",
+                            yAlign: "center",
+                            textRotation: 0
+                        });
+                    }
+                });
+            };
+            Rectangle.prototype._overlayLabel = function (labelXRange, labelYRange, datumIndex, datasetIndex, dataToDraw) {
+                var attrToProjector = this._generateAttrToProjector();
+                var datasets = this.datasets();
+                for (var i = datasetIndex; i < datasets.length; i++) {
+                    var dataset = datasets[i];
+                    var data = dataToDraw.get(dataset);
+                    for (var j = (i === datasetIndex ? datumIndex + 1 : 0); j < data.length; j++) {
+                        if (Plottable.Utils.DOM.intersectsBBox(labelXRange, labelYRange, this._entityBBox(data[j], j, dataset, attrToProjector))) {
+                            return true;
+                        }
+                    }
+                }
+                return false;
             };
             Rectangle._X2_KEY = "x2";
             Rectangle._Y2_KEY = "y2";
@@ -7582,6 +7862,26 @@ var Plottable;
                     return dataXRange.min <= x && x <= dataXRange.max && dataYRange.min <= y && y <= dataYRange.max;
                 });
             };
+            /**
+             * Gets the Entities at a particular Point.
+             *
+             * @param {Point} p
+             * @returns {PlotEntity[]}
+             */
+            Scatter.prototype.entitiesAt = function (p) {
+                var xProjector = Plottable.Plot._scaledAccessor(this.x());
+                var yProjector = Plottable.Plot._scaledAccessor(this.y());
+                var sizeProjector = Plottable.Plot._scaledAccessor(this.size());
+                return this.entities().filter(function (entity) {
+                    var datum = entity.datum;
+                    var index = entity.index;
+                    var dataset = entity.dataset;
+                    var x = xProjector(datum, index, dataset);
+                    var y = yProjector(datum, index, dataset);
+                    var size = sizeProjector(datum, index, dataset);
+                    return x - size / 2 <= p.x && p.x <= x + size / 2 && y - size / 2 <= p.y && p.y <= y + size / 2;
+                });
+            };
             Scatter._SIZE_KEY = "size";
             Scatter._SYMBOL_KEY = "symbol";
             return Scatter;
@@ -7712,7 +8012,7 @@ var Plottable;
                 return this;
             };
             Bar.prototype.labelsEnabled = function (enabled) {
-                if (enabled === undefined) {
+                if (enabled == null) {
                     return this._labelsEnabled;
                 }
                 else {
@@ -7883,6 +8183,32 @@ var Plottable;
                     Plottable.Utils.Window.setTimeout(function () { return _this._drawLabels(); }, time);
                 }
             };
+            /**
+             * Makes sure the extent takes into account the widths of the bars
+             */
+            Bar.prototype._extentsForProperty = function (property) {
+                var _this = this;
+                var extents = _super.prototype._extentsForProperty.call(this, property);
+                var accScaleBinding;
+                if (property === "x" && this._isVertical) {
+                    accScaleBinding = this.x();
+                }
+                else if (property === "y" && !this._isVertical) {
+                    accScaleBinding = this.y();
+                }
+                else {
+                    return extents;
+                }
+                if (!(accScaleBinding && accScaleBinding.scale && accScaleBinding.scale instanceof Plottable.QuantitativeScale)) {
+                    return extents;
+                }
+                var scale = accScaleBinding.scale;
+                extents = extents.map(function (extent) { return [
+                    scale.invert(scale.scale(extent[0]) - _this._barPixelWidth / 2),
+                    scale.invert(scale.scale(extent[1]) + _this._barPixelWidth / 2),
+                ]; });
+                return extents;
+            };
             Bar.prototype._drawLabels = function () {
                 var _this = this;
                 var dataToDraw = this._getDataToDraw();
@@ -8027,9 +8353,8 @@ var Plottable;
              * Computes the barPixelWidth of all the bars in the plot.
              *
              * If the position scale of the plot is a CategoryScale and in bands mode, then the rangeBands function will be used.
-             * If the position scale of the plot is a CategoryScale and in points mode, then
-             *   from https://github.com/mbostock/d3/wiki/Ordinal-Scales#ordinal_rangePoints, the max barPixelWidth is step * padding
-             * If the position scale of the plot is a QuantitativeScale, then _getMinimumDataWidth is scaled to compute the barPixelWidth
+             * If the position scale of the plot is a QuantitativeScale, then the bar width is equal to the smallest distance between
+             * two adjacent data points, padded for visualisation.
              */
             Bar.prototype._getBarPixelWidth = function () {
                 if (!this._projectorsReady()) {
@@ -8054,15 +8379,6 @@ var Plottable;
                     barPixelWidth = Plottable.Utils.Math.min(barAccessorDataPairs, function (pair, i) {
                         return Math.abs(pair[1] - pair[0]);
                     }, barWidthDimension * Bar._SINGLE_BAR_DIMENSION_RATIO);
-                    var minScaledDatum = Plottable.Utils.Math.min(scaledData, 0);
-                    if (minScaledDatum > 0) {
-                        barPixelWidth = Math.min(barPixelWidth, minScaledDatum * 2);
-                    }
-                    var maxScaledDatum = Plottable.Utils.Math.max(scaledData, 0);
-                    if (maxScaledDatum < barWidthDimension) {
-                        var margin = barWidthDimension - maxScaledDatum;
-                        barPixelWidth = Math.min(barPixelWidth, margin * 2);
-                    }
                     barPixelWidth *= Bar._BAR_WIDTH_RATIO;
                 }
                 return barPixelWidth;
@@ -8157,6 +8473,7 @@ var Plottable;
             function Line() {
                 _super.call(this);
                 this._interpolator = "linear";
+                this._autorangeSmooth = false;
                 this.addClass("line-plot");
                 var animator = new Plottable.Animators.Easing();
                 animator.stepDuration(Plottable.Plot._ANIMATION_MAX_DURATION);
@@ -8166,6 +8483,55 @@ var Plottable;
                 this.attr("stroke", new Plottable.Scales.Color().range()[0]);
                 this.attr("stroke-width", "2px");
             }
+            Line.prototype.x = function (x, xScale) {
+                if (x == null) {
+                    return _super.prototype.x.call(this);
+                }
+                else {
+                    if (xScale == null) {
+                        _super.prototype.x.call(this, x);
+                    }
+                    else {
+                        _super.prototype.x.call(this, x, xScale);
+                    }
+                    this._setScaleSnapping();
+                    return this;
+                }
+            };
+            Line.prototype.y = function (y, yScale) {
+                if (y == null) {
+                    return _super.prototype.y.call(this);
+                }
+                else {
+                    _super.prototype.y.call(this, y, yScale);
+                    this._setScaleSnapping();
+                    return this;
+                }
+            };
+            Line.prototype.autorangeMode = function (autorangeMode) {
+                if (autorangeMode == null) {
+                    return _super.prototype.autorangeMode.call(this);
+                }
+                _super.prototype.autorangeMode.call(this, autorangeMode);
+                this._setScaleSnapping();
+                return this;
+            };
+            Line.prototype.autorangeSmooth = function (autorangeSmooth) {
+                if (autorangeSmooth == null) {
+                    return this._autorangeSmooth;
+                }
+                this._autorangeSmooth = autorangeSmooth;
+                this._setScaleSnapping();
+                return this;
+            };
+            Line.prototype._setScaleSnapping = function () {
+                if (this.autorangeMode() === "x" && this.x() && this.x().scale && this.x().scale instanceof Plottable.QuantitativeScale) {
+                    this.x().scale.snappingDomainEnabled(!this.autorangeSmooth());
+                }
+                if (this.autorangeMode() === "y" && this.y() && this.y().scale && this.y().scale instanceof Plottable.QuantitativeScale) {
+                    this.y().scale.snappingDomainEnabled(!this.autorangeSmooth());
+                }
+            };
             Line.prototype.interpolator = function (interpolator) {
                 if (interpolator == null) {
                     return this._interpolator;
@@ -8176,6 +8542,107 @@ var Plottable;
             };
             Line.prototype._createDrawer = function (dataset) {
                 return new Plottable.Drawers.Line(dataset);
+            };
+            Line.prototype._extentsForProperty = function (property) {
+                var extents = _super.prototype._extentsForProperty.call(this, property);
+                if (!this._autorangeSmooth) {
+                    return extents;
+                }
+                if (this.autorangeMode() !== property) {
+                    return extents;
+                }
+                if (this.autorangeMode() !== "x" && this.autorangeMode() !== "y") {
+                    return extents;
+                }
+                var edgeIntersectionPoints = this._getEdgeIntersectionPoints();
+                var includedValues;
+                if (this.autorangeMode() === "y") {
+                    includedValues = edgeIntersectionPoints.left.concat(edgeIntersectionPoints.right).map(function (point) { return point.y; });
+                }
+                else {
+                    includedValues = edgeIntersectionPoints.top.concat(edgeIntersectionPoints.bottom).map(function (point) { return point.x; });
+                }
+                return extents.map(function (extent) { return d3.extent(d3.merge([extent, includedValues])); });
+            };
+            Line.prototype._getEdgeIntersectionPoints = function () {
+                var _this = this;
+                if (!(this.y().scale instanceof Plottable.QuantitativeScale && this.x().scale instanceof Plottable.QuantitativeScale)) {
+                    return {
+                        left: [],
+                        right: [],
+                        top: [],
+                        bottom: []
+                    };
+                }
+                var yScale = this.y().scale;
+                var xScale = this.x().scale;
+                var intersectionPoints = {
+                    left: [],
+                    right: [],
+                    top: [],
+                    bottom: []
+                };
+                var leftX = xScale.scale(xScale.domain()[0]);
+                var rightX = xScale.scale(xScale.domain()[1]);
+                var bottomY = yScale.scale(yScale.domain()[0]);
+                var topY = yScale.scale(yScale.domain()[1]);
+                this.datasets().forEach(function (dataset) {
+                    var data = dataset.data();
+                    var x1, x2, y1, y2;
+                    var prevX, prevY, currX, currY;
+                    for (var i = 1; i < data.length; i++) {
+                        prevX = currX || xScale.scale(_this.x().accessor(data[i - 1], i - 1, dataset));
+                        prevY = currY || yScale.scale(_this.y().accessor(data[i - 1], i - 1, dataset));
+                        currX = xScale.scale(_this.x().accessor(data[i], i, dataset));
+                        currY = yScale.scale(_this.y().accessor(data[i], i, dataset));
+                        // If values crossed left edge
+                        if ((prevX < leftX) === (leftX <= currX)) {
+                            x1 = leftX - prevX;
+                            x2 = currX - prevX;
+                            y2 = currY - prevY;
+                            y1 = x1 * y2 / x2;
+                            intersectionPoints.left.push({
+                                x: leftX,
+                                y: yScale.invert(prevY + y1)
+                            });
+                        }
+                        // If values crossed right edge
+                        if ((prevX < rightX) === (rightX <= currX)) {
+                            x1 = rightX - prevX;
+                            x2 = currX - prevX;
+                            y2 = currY - prevY;
+                            y1 = x1 * y2 / x2;
+                            intersectionPoints.right.push({
+                                x: rightX,
+                                y: yScale.invert(prevY + y1)
+                            });
+                        }
+                        // If values crossed upper edge
+                        if ((prevY < topY) === (topY <= currY)) {
+                            x2 = currX - prevX;
+                            y1 = topY - prevY;
+                            y2 = currY - prevY;
+                            x1 = y1 * x2 / y2;
+                            intersectionPoints.top.push({
+                                x: xScale.invert(prevX + x1),
+                                y: topY
+                            });
+                        }
+                        // If values crossed lower edge
+                        if ((prevY < bottomY) === (bottomY <= currY)) {
+                            x2 = currX - prevX;
+                            y1 = bottomY - prevY;
+                            y2 = currY - prevY;
+                            x1 = y1 * x2 / y2;
+                            intersectionPoints.bottom.push({
+                                x: xScale.invert(prevX + x1),
+                                y: bottomY
+                            });
+                        }
+                    }
+                    ;
+                });
+                return intersectionPoints;
             };
             Line.prototype._getResetYFunction = function () {
                 // gets the y-value generator for the animation start point
@@ -8905,6 +9372,65 @@ var Plottable;
                 attrToProjector["y1"] = Plottable.Plot._scaledAccessor(this.y());
                 attrToProjector["y2"] = this.y2() == null ? Plottable.Plot._scaledAccessor(this.y()) : Plottable.Plot._scaledAccessor(this.y2());
                 return attrToProjector;
+            };
+            Segment.prototype.entitiesIn = function (xRangeOrBounds, yRange) {
+                var dataXRange;
+                var dataYRange;
+                if (yRange == null) {
+                    var bounds = xRangeOrBounds;
+                    dataXRange = { min: bounds.topLeft.x, max: bounds.bottomRight.x };
+                    dataYRange = { min: bounds.topLeft.y, max: bounds.bottomRight.y };
+                }
+                else {
+                    dataXRange = xRangeOrBounds;
+                    dataYRange = yRange;
+                }
+                return this._entitiesIntersecting(dataXRange, dataYRange);
+            };
+            Segment.prototype._entitiesIntersecting = function (xRange, yRange) {
+                var _this = this;
+                var intersected = [];
+                var attrToProjector = this._generateAttrToProjector();
+                this.entities().forEach(function (entity) {
+                    if (_this._lineIntersectsBox(entity, xRange, yRange, attrToProjector)) {
+                        intersected.push(entity);
+                    }
+                });
+                return intersected;
+            };
+            Segment.prototype._lineIntersectsBox = function (entity, xRange, yRange, attrToProjector) {
+                var _this = this;
+                var x1 = attrToProjector["x1"](entity.datum, entity.index, entity.dataset);
+                var x2 = attrToProjector["x2"](entity.datum, entity.index, entity.dataset);
+                var y1 = attrToProjector["y1"](entity.datum, entity.index, entity.dataset);
+                var y2 = attrToProjector["y2"](entity.datum, entity.index, entity.dataset);
+                // check if any of end points of the segment is inside the box
+                if ((xRange.min <= x1 && x1 <= xRange.max && yRange.min <= y1 && y1 <= yRange.max) ||
+                    (xRange.min <= x2 && x2 <= xRange.max && yRange.min <= y2 && y2 <= yRange.max)) {
+                    return true;
+                }
+                var startPoint = { x: x1, y: y1 };
+                var endPoint = { x: x2, y: y2 };
+                var corners = [
+                    { x: xRange.min, y: yRange.min },
+                    { x: xRange.min, y: yRange.max },
+                    { x: xRange.max, y: yRange.max },
+                    { x: xRange.max, y: yRange.min }];
+                var intersections = corners.filter(function (point, index) {
+                    if (index !== 0) {
+                        // return true if border formed by conecting current corner and previous corner intersects with the segment
+                        return _this._lineIntersectsSegment(startPoint, endPoint, point, corners[index - 1]) &&
+                            _this._lineIntersectsSegment(point, corners[index - 1], startPoint, endPoint);
+                    }
+                });
+                return intersections.length > 0;
+            };
+            Segment.prototype._lineIntersectsSegment = function (point1, point2, point3, point4) {
+                var calcOrientation = function (point1, point2, point) {
+                    return (point2.x - point1.x) * (point.y - point2.y) - (point2.y - point1.y) * (point.x - point2.x);
+                };
+                // point3 and point4 are on different sides of line formed by point1 and point2
+                return calcOrientation(point1, point2, point3) * calcOrientation(point1, point2, point4) < 0;
             };
             Segment._X2_KEY = "x2";
             Segment._Y2_KEY = "y2";
@@ -10064,7 +10590,7 @@ var Plottable;
                 this._keyReleaseCallbacks = {};
                 this._mouseMoveCallback = function (point) { return false; }; // HACKHACK: registering a listener
                 this._downedKeys = new Plottable.Utils.Set();
-                this._keyDownCallback = function (keyCode) { return _this._handleKeyDownEvent(keyCode); };
+                this._keyDownCallback = function (keyCode, event) { return _this._handleKeyDownEvent(keyCode, event); };
                 this._keyUpCallback = function (keyCode) { return _this._handleKeyUpEvent(keyCode); };
             }
             Key.prototype._anchor = function (component) {
@@ -10083,9 +10609,9 @@ var Plottable;
                 this._keyDispatcher.offKeyUp(this._keyUpCallback);
                 this._keyDispatcher = null;
             };
-            Key.prototype._handleKeyDownEvent = function (keyCode) {
+            Key.prototype._handleKeyDownEvent = function (keyCode, event) {
                 var p = this._translateToComponentSpace(this._positionDispatcher.lastMousePosition());
-                if (this._isInsideComponent(p)) {
+                if (this._isInsideComponent(p) && !event.repeat) {
                     if (this._keyPressCallbacks[keyCode]) {
                         this._keyPressCallbacks[keyCode].callCallbacks(keyCode);
                     }
@@ -10895,7 +11421,8 @@ var Plottable;
                 _super.prototype._setup.call(this);
                 var createLine = function () { return _this._box.append("line").style({
                     "opacity": 0,
-                    "stroke": "pink"
+                    "stroke": "pink",
+                    "pointer-events": "visibleStroke"
                 }); };
                 this._detectionEdgeT = createLine().classed("drag-edge-tb", true);
                 this._detectionEdgeB = createLine().classed("drag-edge-tb", true);
@@ -10905,7 +11432,8 @@ var Plottable;
                     var createCorner = function () { return _this._box.append("circle")
                         .style({
                         "opacity": 0,
-                        "fill": "pink"
+                        "fill": "pink",
+                        "pointer-events": "visibleFill"
                     }); };
                     this._detectionCornerTL = createCorner().classed("drag-corner-tl", true);
                     this._detectionCornerTR = createCorner().classed("drag-corner-tr", true);
@@ -10993,7 +11521,7 @@ var Plottable;
             };
             // Sets resizable classes. Overridden by subclasses that only resize in one dimension.
             DragBoxLayer.prototype._setResizableClasses = function (canResize) {
-                if (canResize) {
+                if (canResize && this.enabled()) {
                     this.addClass("x-resizable");
                     this.addClass("y-resizable");
                 }
@@ -11007,13 +11535,16 @@ var Plottable;
                     return this._movable;
                 }
                 this._movable = movable;
-                if (movable) {
+                this._setMovableClass();
+                return this;
+            };
+            DragBoxLayer.prototype._setMovableClass = function () {
+                if (this.movable() && this.enabled()) {
                     this.addClass("movable");
                 }
                 else {
                     this.removeClass("movable");
                 }
-                return this;
             };
             /**
              * Sets the callback to be called when dragging starts.
@@ -11086,6 +11617,8 @@ var Plottable;
                     return this._dragInteraction.enabled();
                 }
                 this._dragInteraction.enabled(enabled);
+                this._setResizableClasses(this.resizable());
+                this._setMovableClass();
                 return this;
             };
             return DragBoxLayer;
@@ -11130,7 +11663,7 @@ var Plottable;
                 });
             };
             XDragBoxLayer.prototype._setResizableClasses = function (canResize) {
-                if (canResize) {
+                if (canResize && this.enabled()) {
                     this.addClass("x-resizable");
                 }
                 else {
@@ -11188,7 +11721,7 @@ var Plottable;
                 });
             };
             YDragBoxLayer.prototype._setResizableClasses = function (canResize) {
-                if (canResize) {
+                if (canResize && this.enabled()) {
                     this.addClass("y-resizable");
                 }
                 else {

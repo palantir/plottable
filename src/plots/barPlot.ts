@@ -181,7 +181,7 @@ export module Plots {
      */
     public labelsEnabled(enabled: boolean): Bar<X, Y>;
     public labelsEnabled(enabled?: boolean): any {
-      if (enabled === undefined) {
+      if (enabled == null) {
         return this._labelsEnabled;
       } else {
         this._labelsEnabled = enabled;
@@ -397,6 +397,35 @@ export module Plots {
       }
     }
 
+    /**
+     * Makes sure the extent takes into account the widths of the bars
+     */
+    protected _extentsForProperty(property: string) {
+      let extents = super._extentsForProperty(property);
+
+      let accScaleBinding: Plots.AccessorScaleBinding<any, any>;
+      if (property === "x" && this._isVertical) {
+        accScaleBinding = this.x();
+      } else if (property === "y" && !this._isVertical) {
+        accScaleBinding = this.y();
+      } else {
+        return extents;
+      }
+
+      if (!(accScaleBinding && accScaleBinding.scale && accScaleBinding.scale instanceof QuantitativeScale)) {
+        return extents;
+      }
+
+      let scale = <QuantitativeScale<any>>accScaleBinding.scale;
+
+      extents = extents.map((extent) => [
+        scale.invert(scale.scale(extent[0]) - this._barPixelWidth / 2),
+        scale.invert(scale.scale(extent[1]) + this._barPixelWidth / 2),
+      ]);
+
+      return extents;
+    }
+
     private _drawLabels() {
       let dataToDraw = this._getDataToDraw();
       let labelsTooWide = false;
@@ -550,9 +579,8 @@ export module Plots {
      * Computes the barPixelWidth of all the bars in the plot.
      *
      * If the position scale of the plot is a CategoryScale and in bands mode, then the rangeBands function will be used.
-     * If the position scale of the plot is a CategoryScale and in points mode, then
-     *   from https://github.com/mbostock/d3/wiki/Ordinal-Scales#ordinal_rangePoints, the max barPixelWidth is step * padding
-     * If the position scale of the plot is a QuantitativeScale, then _getMinimumDataWidth is scaled to compute the barPixelWidth
+     * If the position scale of the plot is a QuantitativeScale, then the bar width is equal to the smallest distance between
+     * two adjacent data points, padded for visualisation.
      */
     protected _getBarPixelWidth(): number {
       if (!this._projectorsReady()) { return 0; }
@@ -578,16 +606,6 @@ export module Plots {
         barPixelWidth = Utils.Math.min(barAccessorDataPairs, (pair: any[], i: number) => {
           return Math.abs(pair[1] - pair[0]);
         }, barWidthDimension * Bar._SINGLE_BAR_DIMENSION_RATIO);
-
-        let minScaledDatum = Utils.Math.min(scaledData, 0);
-        if (minScaledDatum > 0) {
-          barPixelWidth = Math.min(barPixelWidth, minScaledDatum * 2);
-        }
-        let maxScaledDatum = Utils.Math.max(scaledData, 0);
-        if ( maxScaledDatum < barWidthDimension) {
-          let margin = barWidthDimension - maxScaledDatum;
-          barPixelWidth = Math.min(barPixelWidth, margin * 2);
-        }
 
         barPixelWidth *= Bar._BAR_WIDTH_RATIO;
       }

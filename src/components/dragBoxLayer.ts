@@ -154,7 +154,8 @@ export module Components {
 
       let createLine = () => this._box.append("line").style({
                                "opacity": 0,
-                               "stroke": "pink"
+                               "stroke": "pink",
+                               "pointer-events": "visibleStroke"
                              });
       this._detectionEdgeT = createLine().classed("drag-edge-tb", true);
       this._detectionEdgeB = createLine().classed("drag-edge-tb", true);
@@ -165,7 +166,8 @@ export module Components {
         let createCorner = () => this._box.append("circle")
                                      .style({
                                        "opacity": 0,
-                                       "fill": "pink"
+                                       "fill": "pink",
+                                       "pointer-events": "visibleFill"
                                      });
         this._detectionCornerTL = createCorner().classed("drag-corner-tl", true);
         this._detectionCornerTR = createCorner().classed("drag-corner-tr", true);
@@ -287,7 +289,7 @@ export module Components {
 
     // Sets resizable classes. Overridden by subclasses that only resize in one dimension.
     protected _setResizableClasses(canResize: boolean) {
-      if (canResize) {
+      if (canResize && this.enabled()) {
         this.addClass("x-resizable");
         this.addClass("y-resizable");
       } else {
@@ -312,12 +314,16 @@ export module Components {
         return this._movable;
       }
       this._movable = movable;
-      if (movable) {
+      this._setMovableClass();
+      return this;
+    }
+
+    private _setMovableClass() {
+      if (this.movable() && this.enabled()) {
         this.addClass("movable");
       } else {
         this.removeClass("movable");
       }
-      return this;
     }
 
     /**
@@ -406,6 +412,8 @@ export module Components {
         return this._dragInteraction.enabled();
       }
       this._dragInteraction.enabled(enabled);
+      this._setResizableClasses(this.resizable());
+      this._setMovableClass();
       return this;
     }
   }
