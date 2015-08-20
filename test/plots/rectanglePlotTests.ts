@@ -414,7 +414,7 @@ describe("Plots", () => {
 
     });
 
-    describe("Labels", () => {
+    describe("Label behavior", () => {
       let plot: Plottable.Plots.Rectangle<number, number>;
       let data = [
         { x: 0, y: 0, x2: 1, y2: 1, val: "1" },
@@ -437,7 +437,7 @@ describe("Plots", () => {
           .label((d: any) => d.val);
       });
 
-      it("rectangle labels disabled by default", () => {
+      it("displays rectangle labels by default", () => {
         let svg = TestMethods.generateSVG(150, 300);
         plot.renderTo(svg);
         let texts = svg.selectAll("text")[0].map((n: any) => d3.select(n).text());
@@ -445,7 +445,7 @@ describe("Plots", () => {
         svg.remove();
       });
 
-      it("rectangle labels render properly", () => {
+      it("renders correct number of labels with the correct text", () => {
         let svg = TestMethods.generateSVG(150, 300);
         plot.renderTo(svg);
         plot.labelsEnabled(true);
@@ -457,7 +457,7 @@ describe("Plots", () => {
         svg.remove();
       });
 
-      it("rectangle labels hide if rectangle is too skinny", () => {
+      it("hides labels when rectangles do not offer enough width", () => {
         let svg = TestMethods.generateSVG(150, 300);
         plot.renderTo(svg);
         plot.labelsEnabled(true);
@@ -468,7 +468,7 @@ describe("Plots", () => {
         svg.remove();
       });
 
-      it("rectangle labels hide if rectangle is too short", () => {
+      it("hides labels when rectangles do not offer enough height", () => {
         let svg = TestMethods.generateSVG(150, 30);
         plot.renderTo(svg);
         plot.labelsEnabled(true);
@@ -478,7 +478,7 @@ describe("Plots", () => {
         svg.remove();
       });
 
-      it("rectangle labels are updated on dataset change", () => {
+      it("updates labels on dataset change", () => {
         let svg = TestMethods.generateSVG(150, 300);
         plot.renderTo(svg);
         plot.labelsEnabled(true);
@@ -493,7 +493,7 @@ describe("Plots", () => {
         svg.remove();
       });
 
-      it("labels cut off by edges are not shown", () => {
+      it("hides labels cut off by edges", () => {
         let svg = TestMethods.generateSVG(150, 300);
         plot.renderTo(svg);
         plot.labelsEnabled(true);
@@ -513,7 +513,7 @@ describe("Plots", () => {
         svg.remove();
       });
 
-      it("labels cut off by other rectangels are not shown", () => {
+      it("hides labels cut off by other rectangels", () => {
         let svg = TestMethods.generateSVG(150, 300);
         plot.renderTo(svg);
         plot.labelsEnabled(true);
