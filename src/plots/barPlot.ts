@@ -172,7 +172,7 @@ export module Plots {
       return this;
     }
 
-    public _removeDataset(dataset: Dataset) {
+    protected _removeDataset(dataset: Dataset) {
       dataset.offUpdate(this._updateBarPixelWidthCallback);
       super._removeDataset(dataset);
       return this;
