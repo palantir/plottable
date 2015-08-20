@@ -8098,6 +8098,14 @@ var Plottable;
                 _super.prototype._removeDataset.call(this, dataset);
                 return this;
             };
+            Bar.prototype.datasets = function (datasets) {
+                if (datasets == null) {
+                    return _super.prototype.datasets.call(this);
+                }
+                _super.prototype.datasets.call(this, datasets);
+                this._updateBarPixelWidth();
+                return this;
+            };
             Bar.prototype.labelsEnabled = function (enabled) {
                 if (enabled == null) {
                     return this._labelsEnabled;

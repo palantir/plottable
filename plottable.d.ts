@@ -3144,6 +3144,8 @@ declare module Plottable {
             protected _addDataset(dataset: Dataset): Bar<X, Y>;
             removeDataset(dataset: Dataset): Bar<X, Y>;
             protected _removeDataset(dataset: Dataset): Bar<X, Y>;
+            datasets(): Dataset[];
+            datasets(datasets: Dataset[]): Plot;
             /**
              * Get whether bar labels are enabled.
              *

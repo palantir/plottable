@@ -178,6 +178,18 @@ export module Plots {
       return this;
     }
 
+    public datasets(): Dataset[];
+    public datasets(datasets: Dataset[]): Plot;
+    public datasets(datasets?: Dataset[]): any {
+      if (datasets == null) {
+        return super.datasets();
+      }
+
+      super.datasets(datasets);
+      this._updateBarPixelWidth();
+      return this;
+    }
+
     /**
      * Get whether bar labels are enabled.
      *
