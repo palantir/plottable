@@ -3,7 +3,7 @@
 describe("Plots", () => {
   describe("SegmentPlot", () => {
 
-    describe("Basics", () => {
+    describe("Basic Usage", () => {
       let svg: d3.Selection<void>;
       let xScale: Plottable.Scales.Linear;
       let yScale: Plottable.Scales.Linear;
@@ -67,7 +67,7 @@ describe("Plots", () => {
         svg.remove();
       });
 
-      it("autorangeMode(\"x\")", () => {
+      it("adjusts the xScale domain with respect to the yScale domain when autorangeMode is set to x", () => {
         let staggeredData = [
           { y: 0, x: 0, x2: 1 },
           { y: 1, x: 1, x2: 2 }
@@ -93,7 +93,7 @@ describe("Plots", () => {
         svg.remove();
       });
 
-      it("autorangeMode(\"y\")", () => {
+      it("adjusts the yScale domain with respect to the xScale domain when autorangeMode is set to y", () => {
         let staggeredData = [
           { x: 0, y: 0, y2: 1 },
           { x: 1, y: 1, y2: 2 }
