@@ -453,10 +453,14 @@ describe("Component behavior", () => {
     let parent = TestMethods.getSVGParent();
     let div = parent.append("div");
     // HACKHACK #2614: chai-assert.d.ts has the wrong signature
-    (<any> assert).throws(() => c.renderTo(div), Error, "", "rejects selections that don't contain svgs");
-    (<any> assert).throws(() => c.renderTo(<Element> div.node()), Error, "", "rejects DOM nodes that are not svgs");
-    (<any> assert).throws(() => c.renderTo("#not-a-element"), Error, "", "rejects strings that don't correspond to DOM elements");
-    (<any> assert).throws(() => c.renderTo(d3.select(null)), Error, "", "rejects empty d3 selections");
+    (<any> assert).throws(() => c.renderTo(div), Error,
+      "Plottable requires a valid SVG to renderTo", "rejects selections that don't contain svgs");
+    (<any> assert).throws(() => c.renderTo(<Element> div.node()), Error,
+      "Plottable requires a valid SVG to renderTo", "rejects DOM nodes that are not svgs");
+    (<any> assert).throws(() => c.renderTo("#not-a-element"), Error,
+      "Plottable requires a valid SVG to renderTo", "rejects strings that don't correspond to DOM elements");
+    (<any> assert).throws(() => c.renderTo(d3.select(null)), Error,
+      "Plottable requires a valid SVG to renderTo", "rejects empty d3 selections");
     svg.remove();
   });
 
