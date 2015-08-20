@@ -11500,7 +11500,7 @@ var Plottable;
                 this.addClass("enabled");
                 this._dragInteraction = new Plottable.Interactions.Drag();
                 this._dragInteraction.attachTo(this);
-                var grabbedLine = function (p) {
+                var onLine = function (p) {
                     return (_this._isVertical() &&
                         _this.pixelPosition() - _this.detectionRadius() <= p.x &&
                         p.x <= _this.pixelPosition() + _this.detectionRadius()) ||
@@ -11510,7 +11510,7 @@ var Plottable;
                 };
                 var dragging = false;
                 var interactionDragStartCallback = function (start) {
-                    if (grabbedLine(start)) {
+                    if (onLine(start)) {
                         dragging = true;
                         _this._dragStartCallbacks.callCallbacks(_this);
                     }
@@ -11535,7 +11535,6 @@ var Plottable;
                     _this._dragInteraction.offDrag(interactionDragCallback);
                     _this._dragInteraction.offDragEnd(interactionDragEndCallback);
                     _this._dragInteraction.detachFrom(_this);
-                    delete _this._disconnectInteraction;
                 };
                 this._dragStartCallbacks = new Plottable.Utils.CallbackSet();
                 this._dragCallbacks = new Plottable.Utils.CallbackSet();

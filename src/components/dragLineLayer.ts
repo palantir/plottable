@@ -24,7 +24,7 @@ export module Components {
       this._dragInteraction = new Plottable.Interactions.Drag();
       this._dragInteraction.attachTo(this);
 
-      let grabbedLine = (p: Point) => {
+      let onLine = (p: Point) => {
         return (this._isVertical() &&
                  this.pixelPosition() - this.detectionRadius() <= p.x &&
                  p.x <= this.pixelPosition() + this.detectionRadius()
@@ -38,7 +38,7 @@ export module Components {
 
       let dragging = false;
       let interactionDragStartCallback = (start: Point) => {
-        if (grabbedLine(start)) {
+        if (onLine(start)) {
           dragging = true;
           this._dragStartCallbacks.callCallbacks(this);
         }
@@ -66,7 +66,6 @@ export module Components {
         this._dragInteraction.offDrag(interactionDragCallback);
         this._dragInteraction.offDragEnd(interactionDragEndCallback);
         this._dragInteraction.detachFrom(this);
-        delete this._disconnectInteraction;
       };
 
       this._dragStartCallbacks = new Utils.CallbackSet<DragLineCallback<D>>();
