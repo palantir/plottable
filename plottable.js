@@ -11480,9 +11480,9 @@ var __extends = (this && this.__extends) || function (d, b) {
 };
 var Plottable;
 (function (Plottable) {
+    ;
     var Components;
     (function (Components) {
-        ;
         var DragLineLayer = (function (_super) {
             __extends(DragLineLayer, _super);
             function DragLineLayer(orientation) {
@@ -11509,24 +11509,33 @@ var Plottable;
                             p.y <= _this.pixelPosition() + _this.detectionRadius());
                 };
                 var dragging = false;
-                this._dragInteraction.onDragStart(function (start) {
+                var dragStartCallback = function (start) {
                     if (grabbedLine(start)) {
                         dragging = true;
                         _this._dragStartCallbacks.callCallbacks(_this);
                     }
-                });
-                this._dragInteraction.onDrag(function (start, end) {
+                };
+                this._dragInteraction.onDragStart(dragStartCallback);
+                var dragCallback = function (start, end) {
                     if (dragging) {
                         _this._setPixelPositionWithoutChangingMode(_this._isVertical() ? end.x : end.y);
                         _this._dragCallbacks.callCallbacks(_this);
                     }
-                });
-                this._dragInteraction.onDragEnd(function (start, end) {
+                };
+                this._dragInteraction.onDrag(dragCallback);
+                var dragEndCallback = function (start, end) {
                     if (dragging) {
                         dragging = false;
                         _this._dragEndCallbacks.callCallbacks(_this);
                     }
-                });
+                };
+                this._dragInteraction.onDragEnd(dragEndCallback);
+                this._disconnectInteractionCallbacks = function () {
+                    _this._dragInteraction.offDragStart(dragStartCallback);
+                    _this._dragInteraction.offDrag(dragCallback);
+                    _this._dragInteraction.offDragEnd(dragEndCallback);
+                    delete _this._disconnectInteractionCallbacks;
+                };
                 this._dragStartCallbacks = new Plottable.Utils.CallbackSet();
                 this._dragCallbacks = new Plottable.Utils.CallbackSet();
                 this._dragEndCallbacks = new Plottable.Utils.CallbackSet();
@@ -11598,6 +11607,14 @@ var Plottable;
             DragLineLayer.prototype.offDragEnd = function (callback) {
                 this._dragEndCallbacks.delete(callback);
                 return this;
+            };
+            DragLineLayer.prototype.destroy = function () {
+                var _this = this;
+                _super.prototype.destroy.call(this);
+                this._dragStartCallbacks.forEach(function (callback) { return _this._dragStartCallbacks.delete(callback); });
+                this._dragCallbacks.forEach(function (callback) { return _this._dragCallbacks.delete(callback); });
+                this._dragEndCallbacks.forEach(function (callback) { return _this._dragEndCallbacks.delete(callback); });
+                this._disconnectInteractionCallbacks();
             };
             return DragLineLayer;
         })(Components.GuideLineLayer);

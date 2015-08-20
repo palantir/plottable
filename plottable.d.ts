@@ -4411,10 +4411,10 @@ declare module Plottable {
 
 
 declare module Plottable {
+    interface DragLineCallback<D> {
+        (dragLineLayer: Components.DragLineLayer<D>): void;
+    }
     module Components {
-        interface DragLineCallback<D> {
-            (dragLineLayer: DragLineLayer<D>): void;
-        }
         class DragLineLayer<D> extends GuideLineLayer<D> {
             constructor(orientation: string);
             protected _setup(): void;
@@ -4429,6 +4429,7 @@ declare module Plottable {
             offDrag(callback: DragLineCallback<D>): DragLineLayer<D>;
             onDragEnd(callback: DragLineCallback<D>): DragLineLayer<D>;
             offDragEnd(callback: DragLineCallback<D>): DragLineLayer<D>;
+            destroy(): void;
         }
     }
 }

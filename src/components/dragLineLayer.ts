@@ -1,9 +1,10 @@
 ///<reference path="../reference.ts" />
 
 module Plottable {
-export module Components {
-  export interface DragLineCallback<D> { (dragLineLayer: DragLineLayer<D>): void; };
 
+export interface DragLineCallback<D> { (dragLineLayer: Components.DragLineLayer<D>): void; };
+
+export module Components {
   export class DragLineLayer<D> extends GuideLineLayer<D> {
     private _dragInteraction: Interactions.Drag;
     private _detectionRadius = 3;
@@ -13,6 +14,7 @@ export module Components {
     private _dragStartCallbacks: Utils.CallbackSet<DragLineCallback<D>>;
     private _dragCallbacks: Utils.CallbackSet<DragLineCallback<D>>;
     private _dragEndCallbacks: Utils.CallbackSet<DragLineCallback<D>>;
+    private _disconnectInteractionCallbacks: () => void;
 
     constructor(orientation: string) {
       super(orientation);
@@ -40,24 +42,34 @@ export module Components {
       };
 
       let dragging = false;
-      this._dragInteraction.onDragStart((start: Point) => {
+      let dragStartCallback = (start: Point) => {
         if (grabbedLine(start)) {
           dragging = true;
           this._dragStartCallbacks.callCallbacks(this);
         }
-      });
-      this._dragInteraction.onDrag((start: Point, end: Point) => {
+      };
+      this._dragInteraction.onDragStart(dragStartCallback);
+      let dragCallback = (start: Point, end: Point) => {
         if (dragging) {
           this._setPixelPositionWithoutChangingMode(this._isVertical() ? end.x : end.y);
           this._dragCallbacks.callCallbacks(this);
         }
-      });
-      this._dragInteraction.onDragEnd((start: Point, end: Point) => {
+      };
+      this._dragInteraction.onDrag(dragCallback);
+      let dragEndCallback = (start: Point, end: Point) => {
         if (dragging) {
           dragging = false;
           this._dragEndCallbacks.callCallbacks(this);
         }
-      });
+      };
+      this._dragInteraction.onDragEnd(dragEndCallback);
+
+      this._disconnectInteractionCallbacks = () => {
+        this._dragInteraction.offDragStart(dragStartCallback);
+        this._dragInteraction.offDrag(dragCallback);
+        this._dragInteraction.offDragEnd(dragEndCallback);
+        delete this._disconnectInteractionCallbacks;
+      };
 
       this._dragStartCallbacks = new Utils.CallbackSet<DragLineCallback<D>>();
       this._dragCallbacks = new Utils.CallbackSet<DragLineCallback<D>>();
@@ -144,6 +156,14 @@ export module Components {
     public offDragEnd(callback: DragLineCallback<D>) {
       this._dragEndCallbacks.delete(callback);
       return this;
+    }
+
+    public destroy() {
+      super.destroy();
+      this._dragStartCallbacks.forEach((callback) => this._dragStartCallbacks.delete(callback));
+      this._dragCallbacks.forEach((callback) => this._dragCallbacks.delete(callback));
+      this._dragEndCallbacks.forEach((callback) => this._dragEndCallbacks.delete(callback));
+      this._disconnectInteractionCallbacks();
     }
   }
 }
