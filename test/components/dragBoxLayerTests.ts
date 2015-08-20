@@ -101,7 +101,7 @@ describe("Interactive Components", () => {
         svg.remove();
       });
 
-      it("does not error on destroy() if scales are not inputted", () => {
+      it("does not error on destroy() if scales are not added", () => {
         assert.doesNotThrow(() => dbl.destroy(), Error, "can destroy");
         svg.remove();
       });
