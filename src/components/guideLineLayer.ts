@@ -23,6 +23,11 @@ export module Components {
       this._orientation = orientation;
       this._clipPathEnabled = true;
       this.addClass("guide-line-layer");
+      if (this._isVertical()) {
+        this.addClass("vertical");
+      } else {
+        this.addClass("horizontal");
+      }
       this._scaleUpdateCallback = () => {
         this._syncPixelPositionAndValue();
         this.render();

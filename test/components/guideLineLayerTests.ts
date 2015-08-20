@@ -1,6 +1,13 @@
 ///<reference path="../testReference.ts" />
 
 describe("GuideLineLayer", () => {
+  it("has \"vertical\" class if vertical, \"horizontal\" class if horizontal", () => {
+    let verticalGLL = new Plottable.Components.GuideLineLayer<void>("vertical");
+    assert.isTrue(verticalGLL.hasClass("vertical"), "vertical GuideLineLayer has \"vertical\" class");
+    let horizontalGLL = new Plottable.Components.GuideLineLayer<void>("horizontal");
+    assert.isTrue(horizontalGLL.hasClass("horizontal"), "horizontal GuideLineLayer has \"horizontal\" class");
+  });
+
   it("scale()", () => {
     let gll = new Plottable.Components.GuideLineLayer<Date>("vertical");
     let timeScale = new Plottable.Scales.Time();

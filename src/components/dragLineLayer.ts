@@ -20,11 +20,6 @@ export module Components {
       super(orientation);
       this.addClass("drag-line-layer");
       this.addClass("enabled");
-      if (this._isVertical()) {
-        this.addClass("vertical");
-      } else {
-        this.addClass("horizontal");
-      }
 
       this._dragInteraction = new Plottable.Interactions.Drag();
       this._dragInteraction.attachTo(this);

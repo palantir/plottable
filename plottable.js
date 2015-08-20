@@ -6242,6 +6242,12 @@ var Plottable;
                 this._orientation = orientation;
                 this._clipPathEnabled = true;
                 this.addClass("guide-line-layer");
+                if (this._isVertical()) {
+                    this.addClass("vertical");
+                }
+                else {
+                    this.addClass("horizontal");
+                }
                 this._scaleUpdateCallback = function () {
                     _this._syncPixelPositionAndValue();
                     _this.render();
@@ -11492,12 +11498,6 @@ var Plottable;
                 this._enabled = true;
                 this.addClass("drag-line-layer");
                 this.addClass("enabled");
-                if (this._isVertical()) {
-                    this.addClass("vertical");
-                }
-                else {
-                    this.addClass("horizontal");
-                }
                 this._dragInteraction = new Plottable.Interactions.Drag();
                 this._dragInteraction.attachTo(this);
                 var grabbedLine = function (p) {
