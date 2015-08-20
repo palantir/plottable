@@ -170,6 +170,8 @@ export class Axis<D> extends Component {
     this._baseline.attr(this._generateBaselineAttrHash());
     if (this.annotationsEnabled()) {
       this._drawAnnotations();
+    } else {
+      this._removeAnnotations();
     }
     return this;
   }
@@ -327,8 +329,9 @@ export class Axis<D> extends Component {
 
     let annotationWriter = this._annotationWriter;
     let annotationFormatter = this.annotationFormatter();
-    bindElements(this._annotationContainer.select(".annotation-label-container"), "g", "annotation-label")
-      .attr({
+    let annotationLabels = bindElements(this._annotationContainer.select(".annotation-label-container"), "g", "annotation-label");
+    annotationLabels.selectAll(".text-container").remove();
+    annotationLabels.attr({
         transform: (d) => {
           let xTranslate = isHorizontal ? positionF(d) : rectangleOffsetF(d);
           let yTranslate = isHorizontal ? rectangleOffsetF(d) : positionF(d);
@@ -388,6 +391,13 @@ export class Axis<D> extends Component {
       annotationToTier.set(annotatedTick, tier);
     });
     return annotationToTier;
+  }
+
+  protected _removeAnnotations() {
+    this._annotationContainer.selectAll(".annotation-line").remove();
+    this._annotationContainer.selectAll(".annotation-circle").remove();
+    this._annotationContainer.selectAll(".annotation-rect").remove();
+    this._annotationContainer.selectAll(".annotation-label").remove();
   }
 
   protected _generateBaselineAttrHash() {

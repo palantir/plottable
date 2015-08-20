@@ -3744,6 +3744,9 @@ var Plottable;
             if (this.annotationsEnabled()) {
                 this._drawAnnotations();
             }
+            else {
+                this._removeAnnotations();
+            }
             return this;
         };
         Axis.prototype.annotatedTicks = function (annotatedTicks) {
@@ -3858,8 +3861,9 @@ var Plottable;
             });
             var annotationWriter = this._annotationWriter;
             var annotationFormatter = this.annotationFormatter();
-            bindElements(this._annotationContainer.select(".annotation-label-container"), "g", "annotation-label")
-                .attr({
+            var annotationLabels = bindElements(this._annotationContainer.select(".annotation-label-container"), "g", "annotation-label");
+            annotationLabels.selectAll(".text-container").remove();
+            annotationLabels.attr({
                 transform: function (d) {
                     var xTranslate = isHorizontal ? positionF(d) : rectangleOffsetF(d);
                     var yTranslate = isHorizontal ? rectangleOffsetF(d) : positionF(d);
@@ -3915,6 +3919,12 @@ var Plottable;
                 annotationToTier.set(annotatedTick, tier);
             });
             return annotationToTier;
+        };
+        Axis.prototype._removeAnnotations = function () {
+            this._annotationContainer.selectAll(".annotation-line").remove();
+            this._annotationContainer.selectAll(".annotation-circle").remove();
+            this._annotationContainer.selectAll(".annotation-rect").remove();
+            this._annotationContainer.selectAll(".annotation-label").remove();
         };
         Axis.prototype._generateBaselineAttrHash = function () {
             var baselineAttrHash = {
@@ -4406,6 +4416,9 @@ var Plottable;
                 }
                 if (this.annotationsEnabled()) {
                     this._drawAnnotations();
+                }
+                else {
+                    this._removeAnnotations();
                 }
                 return this;
             };

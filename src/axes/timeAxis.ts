@@ -491,6 +491,8 @@ export module Axes {
 
       if (this.annotationsEnabled()) {
         this._drawAnnotations();
+      } else {
+        this._removeAnnotations();
       }
 
       return this;
