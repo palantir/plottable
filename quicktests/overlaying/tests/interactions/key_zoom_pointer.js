@@ -53,7 +53,6 @@ function run(svg, data, Plottable) {
       [yAxis, plotGroup],
       [null, xAxisSquare],
       [null, squareLabel]]);
-
   chart.renderTo(svg);
 
   var pointer = new Plottable.Interactions.Pointer();
@@ -73,7 +72,6 @@ function run(svg, data, Plottable) {
   pzi.minDomainExtent(xScaleSquare, .5);
   pzi.attachTo(plotGroup);
   pzi.enabled(false);
-
 
   var key = new Plottable.Interactions.Key();
   key.onKeyPress(80, function(keycode) {

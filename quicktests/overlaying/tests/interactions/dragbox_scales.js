@@ -18,8 +18,6 @@ function makeData() {
 
 function run(svg, data, Plottable) {
   "use strict";
-
-
     var xScale = new Plottable.Scales.Linear();
     var yScale = new Plottable.Scales.Linear();
 
@@ -40,7 +38,6 @@ function run(svg, data, Plottable) {
       .y2(function(d){ return d.y + .1; }, yScale)
       .attr("fill", "#dddddd")
       .addDataset(new Plottable.Dataset(data[1]));
-
 
     var dbl = new Plottable.Components.DragBoxLayer()
     .onDrag(function(bounds){

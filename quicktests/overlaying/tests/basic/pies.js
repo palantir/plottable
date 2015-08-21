@@ -33,8 +33,6 @@ function run(svg, data, Plottable){
         .attr("opacity", .5)
         .attr("fill", function(d){ return d.key; }, cs);
 
-
-
   var outerPie = new Plottable.Plots.Pie();
   outerPie.addDataset(new Plottable.Dataset(data[1]));
   outerPie.sectorValue(function(d){ return d.value; })

@@ -1,8 +1,6 @@
 function makeData() {
   "use strict";
     var data = [];
-
-
     for (var i = 0; i < 250; i++) { data.push({
         "x": i,
         "y": Math.random(),
