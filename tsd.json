@@ -4,14 +4,14 @@
   "ref": "master",
   "path": "typings",
   "installed": {
-    "chai/chai-assert.d.ts": {
-      "commit": "16dd1ab76fb4c65e532ca820dd45c875636521b6"
+    "chai/chai.d.ts": {
+      "commit": "8f081073e6cb416f901b272810d8b04d6e01c9e0"
     },
     "d3/d3.d.ts": {
       "commit": "7c27233ae47768442b9b0a40d7f03fadf593fad2"
     },
     "mocha/mocha.d.ts": {
-      "commit": "484544d14d400190b20f270341c97b16adc0f1ef"
+      "commit": "8f081073e6cb416f901b272810d8b04d6e01c9e0"
     },
     "jquery/jquery.d.ts": {
       "commit": "484544d14d400190b20f270341c97b16adc0f1ef"

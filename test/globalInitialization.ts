@@ -5,7 +5,7 @@ interface Window {
   Pixel_CloseTo_Requirement: number;
 }
 
-assert = chai.assert;
+let assert = chai.assert;
 
 before(() => {
   // Set the render policy to immediate to make sure ETE tests can check DOM change immediately
