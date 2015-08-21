@@ -1460,7 +1460,7 @@ declare module Plottable {
          * @param {String|d3.Selection} element A selector-string for the <svg>, or a d3 selection containing an <svg>.
          * @returns {Component} The calling Component.
          */
-        renderTo(element: String | d3.Selection<void>): Component;
+        renderTo(element: String | Element | d3.Selection<void>): Component;
         /**
          * Gets the x alignment of the Component.
          */

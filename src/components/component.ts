@@ -262,12 +262,14 @@ export class Component {
    * @param {String|d3.Selection} element A selector-string for the <svg>, or a d3 selection containing an <svg>.
    * @returns {Component} The calling Component.
    */
-  public renderTo(element: String | d3.Selection<void>): Component {
+  public renderTo(element: String | Element | d3.Selection<void>): Component {
     this.detach();
     if (element != null) {
       let selection: d3.Selection<void>;
       if (typeof(element) === "string") {
         selection = d3.select(<string> element);
+      } else if (element instanceof Element) {
+        selection = d3.select(<Element> element);
       } else {
         selection = <d3.Selection<void>> element;
       }
