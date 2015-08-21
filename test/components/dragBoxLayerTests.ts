@@ -235,10 +235,10 @@ describe("Interactive Components", () => {
 
         dbl.offDragStart(callbackDragStart);
         dbl.offDrag(callbackDrag);
-        dbl.offDragEnd(callbackDragEnd);
 
         callbackDragStartCalled = false;
         callbackDragCalled = false;
+        callbackDragEndCalled = false;
 
         TestMethods.triggerFakeDragSequence(target, quarterPoint, halfPoint);
         assert.isFalse(callbackDragStartCalled, "the callback for drag start was disconnected");
