@@ -375,4 +375,312 @@ describe("Plots", () => {
       svg.remove();
     });
   });
+
+  describe("Line Plot", () => {
+    describe("smooth autoranging", () => {
+
+      let svg: d3.Selection<void>;
+      let xScale: Plottable.Scales.Linear;
+      let yScale: Plottable.Scales.Linear;
+
+      beforeEach(() => {
+        svg = TestMethods.generateSVG(500, 500);
+        xScale = new Plottable.Scales.Linear();
+        yScale = new Plottable.Scales.Linear();
+      });
+
+      afterEach(() => {
+        svg.remove();
+      });
+
+      it("smooth autoranging works", () => {
+        xScale.domain([0.1, 1.1]);
+
+        let data = [
+          {"x": 0.0, "y": -1},
+          {"x": 1.8, "y": -2}
+        ];
+
+        let line = new Plottable.Plots.Line();
+        line.x(function(d) { return d.x; }, xScale);
+        line.y(function(d) { return d.y; }, yScale);
+        line.addDataset(new Plottable.Dataset(data));
+        line.autorangeMode("y");
+
+        xScale.padProportion(0);
+        yScale.padProportion(0);
+        line.renderTo(svg);
+
+        assert.deepEqual(yScale.domain(), [0, 1], "when there are no visible points in the view, the y-scale domain defaults to [0, 1]");
+
+        line.autorangeSmooth(true);
+
+        let base = data[0].y;
+        let x1 = xScale.domain()[1] - data[0].x;
+        let x2 = data[1].x - data[0].x;
+        let y2 = data[1].y - data[0].y;
+        let expectedBottom = base + y2 * x1 / x2;
+
+        x1 = xScale.domain()[0] - data[0].x;
+        let expectedTop = base + y2 * x1 / x2;
+
+        assert.closeTo(yScale.domain()[0], expectedBottom, 0.001, "smooth autoranging forces the domain to include the line (left)");
+        assert.closeTo(yScale.domain()[1], expectedTop, 0.001, "smooth autoranging forces the domain to include the line (right)");
+
+        line.autorangeSmooth(false);
+        assert.deepEqual(yScale.domain(), [0, 1], "resetting the smooth autorange works");
+
+        xScale.domain([data[0].x, data[1].x]);
+        assert.deepEqual(yScale.domain(), [-2, -1], "no changes for autoranging smooth with same edge poitns (no smooth)");
+
+        line.autorangeSmooth(true);
+        assert.deepEqual(yScale.domain(), [-2, -1], "no changes for autoranging smooth with same edge points (smooth)");
+      });
+
+      it("smooth autoranging works (called before accessors)", () => {
+        xScale.domain([0.1, 1.1]);
+
+        let data = [
+          {"x": 0.0, "y": -1},
+          {"x": 1.8, "y": -2}
+        ];
+
+        let line = new Plottable.Plots.Line();
+        line.autorangeSmooth(true);
+        line.x(function(d) { return d.x; }, xScale);
+        line.y(function(d) { return d.y; }, yScale);
+        line.addDataset(new Plottable.Dataset(data));
+        line.autorangeMode("y");
+
+        line.renderTo(svg);
+
+        let base = data[0].y;
+        let x1 = (xScale.domain()[1] - data[0].x) - (xScale.domain()[1] - xScale.domain()[0]) * (1 + yScale.padProportion() / 2);
+        let x2 = data[1].x - data[0].x;
+        let y2 = data[1].y - data[0].y;
+        let expectedTop = base + y2 * x1 / x2;
+
+        x1 = (xScale.domain()[0] - data[0].x) + (xScale.domain()[1] - xScale.domain()[0]) * (1 + yScale.padProportion() / 2);
+        let expectedBottom = base + y2 * x1 / x2;
+
+        assert.closeTo(yScale.domain()[0], expectedBottom, 0.001, "smooth autoranging forces the domain to include the line (left)");
+        assert.closeTo(yScale.domain()[1], expectedTop, 0.001, "smooth autoranging forces the domain to include the line (right)");
+      });
+
+      it("smooth autoranging works (called before autorangeMode)", () => {
+        xScale.domain([0.1, 1.1]);
+
+        let data = [
+          {"x": 0.0, "y": -1},
+          {"x": 1.8, "y": -2}
+        ];
+
+        let line = new Plottable.Plots.Line();
+        line.x(function(d) { return d.x; }, xScale);
+        line.y(function(d) { return d.y; }, yScale);
+        line.addDataset(new Plottable.Dataset(data));
+        line.autorangeSmooth(true);
+        line.autorangeMode("y");
+
+        line.renderTo(svg);
+
+        let base = data[0].y;
+        let x1 = (xScale.domain()[1] - data[0].x) - (xScale.domain()[1] - xScale.domain()[0]) * (1 + yScale.padProportion() / 2);
+        let x2 = data[1].x - data[0].x;
+        let y2 = data[1].y - data[0].y;
+        let expectedTop = base + y2 * x1 / x2;
+
+        x1 = (xScale.domain()[0] - data[0].x) + (xScale.domain()[1] - xScale.domain()[0]) * (1 + yScale.padProportion() / 2);
+        let expectedBottom = base + y2 * x1 / x2;
+
+        assert.closeTo(yScale.domain()[0], expectedBottom, 0.001, "smooth autoranging forces the domain to include the line (left)");
+        assert.closeTo(yScale.domain()[1], expectedTop, 0.001, "smooth autoranging forces the domain to include the line (right)");
+      });
+
+      it("smooth autoranging works (called before rendering)", () => {
+        xScale.domain([0.1, 1.1]);
+
+        let data = [
+          {"x": 0.0, "y": -1},
+          {"x": 1.8, "y": -2}
+        ];
+
+        let line = new Plottable.Plots.Line();
+        line.x(function(d) { return d.x; }, xScale);
+        line.y(function(d) { return d.y; }, yScale);
+        line.addDataset(new Plottable.Dataset(data));
+        line.autorangeMode("y");
+
+        line.autorangeSmooth(true);
+        line.renderTo(svg);
+
+        let base = data[0].y;
+        let x1 = (xScale.domain()[1] - data[0].x) - (xScale.domain()[1] - xScale.domain()[0]) * (1 + yScale.padProportion() / 2);
+        let x2 = data[1].x - data[0].x;
+        let y2 = data[1].y - data[0].y;
+        let expectedTop = base + y2 * x1 / x2;
+
+        x1 = (xScale.domain()[0] - data[0].x) + (xScale.domain()[1] - xScale.domain()[0]) * (1 + yScale.padProportion() / 2);
+        let expectedBottom = base + y2 * x1 / x2;
+
+        assert.closeTo(yScale.domain()[0], expectedBottom, 0.001, "smooth autoranging forces the domain to include the line (left)");
+        assert.closeTo(yScale.domain()[1], expectedTop, 0.001, "smooth autoranging forces the domain to include the line (right)");
+      });
+
+      it("smooth autoranging works (called after rendering)", () => {
+        xScale.domain([0.1, 1.1]);
+
+        let data = [
+          {"x": 0.0, "y": -1},
+          {"x": 1.8, "y": -2}
+        ];
+
+        let line = new Plottable.Plots.Line();
+        line.x(function(d) { return d.x; }, xScale);
+        line.y(function(d) { return d.y; }, yScale);
+        line.addDataset(new Plottable.Dataset(data));
+        line.autorangeMode("y");
+
+        line.renderTo(svg);
+        line.autorangeSmooth(true);
+
+        let base = data[0].y;
+        let x1 = (xScale.domain()[1] - data[0].x) - (xScale.domain()[1] - xScale.domain()[0]) * (1 + yScale.padProportion() / 2);
+        let x2 = data[1].x - data[0].x;
+        let y2 = data[1].y - data[0].y;
+        let expectedTop = base + y2 * x1 / x2;
+
+        x1 = (xScale.domain()[0] - data[0].x) + (xScale.domain()[1] - xScale.domain()[0]) * (1 + yScale.padProportion() / 2);
+        let expectedBottom = base + y2 * x1 / x2;
+
+        assert.closeTo(yScale.domain()[0], expectedBottom, 0.001, "smooth autoranging forces the domain to include the line (left)");
+        assert.closeTo(yScale.domain()[1], expectedTop, 0.001, "smooth autoranging forces the domain to include the line (right)");
+      });
+
+      it("smooth autoranging works (called after rendering, before autorangeMode)", () => {
+        xScale.domain([0.1, 1.1]);
+
+        let data = [
+          {"x": 0.0, "y": -1},
+          {"x": 1.8, "y": -2}
+        ];
+
+        let line = new Plottable.Plots.Line();
+        line.x(function(d) { return d.x; }, xScale);
+        line.y(function(d) { return d.y; }, yScale);
+        line.addDataset(new Plottable.Dataset(data));
+
+        line.renderTo(svg);
+
+        line.autorangeSmooth(true);
+        line.autorangeMode("y");
+
+        let base = data[0].y;
+        let x1 = (xScale.domain()[1] - data[0].x) - (xScale.domain()[1] - xScale.domain()[0]) * (1 + yScale.padProportion() / 2);
+        let x2 = data[1].x - data[0].x;
+        let y2 = data[1].y - data[0].y;
+        let expectedTop = base + y2 * x1 / x2;
+
+        x1 = (xScale.domain()[0] - data[0].x) + (xScale.domain()[1] - xScale.domain()[0]) * (1 + yScale.padProportion() / 2);
+        let expectedBottom = base + y2 * x1 / x2;
+
+        assert.closeTo(yScale.domain()[0], expectedBottom, 0.001, "smooth autoranging forces the domain to include the line (left)");
+        assert.closeTo(yScale.domain()[1], expectedTop, 0.001, "smooth autoranging forces the domain to include the line (right)");
+      });
+
+      it("autoDomaining works with smooth autoranging (before rendering)", () => {
+        xScale.domain([-0.1, 0.2]);
+
+        let data = [
+          {"x": 0.0, "y": -1},
+          {"x": 1.8, "y": -2}
+        ];
+
+        let line = new Plottable.Plots.Line();
+        line.x(function(d) { return d.x; }, xScale);
+        line.y(function(d) { return d.y; }, yScale);
+        line.addDataset(new Plottable.Dataset(data));
+        line.autorangeMode("y");
+
+        line.autorangeSmooth(true);
+        xScale.autoDomain();
+        line.renderTo(svg);
+
+        assert.deepEqual(xScale.domain(), [-0.2, 2], "autoDomain works even when autoranging is done smoothly");
+
+        line.autorangeSmooth(false);
+        assert.deepEqual(xScale.domain(), [-0.2, 2], "autoDomain works when smooth autoranging is disabled back");
+      });
+
+      it("autoDomaining works with smooth autoranging (after rendering)", () => {
+        xScale.domain([-0.1, 0.2]);
+
+        let data = [
+          {"x": 0.0, "y": -1},
+          {"x": 1.8, "y": -2}
+        ];
+
+        let line = new Plottable.Plots.Line();
+        line.x(function(d) { return d.x; }, xScale);
+        line.y(function(d) { return d.y; }, yScale);
+        line.addDataset(new Plottable.Dataset(data));
+        line.autorangeMode("y");
+
+        line.renderTo(svg);
+
+        line.autorangeSmooth(true);
+        xScale.autoDomain();
+
+        assert.deepEqual(xScale.domain(), [-0.2, 2], "autoDomain works even when autoranging is done smoothly");
+
+        line.autorangeSmooth(false);
+        assert.deepEqual(xScale.domain(), [-0.2, 2], "autoDomain works when smooth autoranging is disabled back");
+      });
+
+      it("smooth autoranging works for vertical lines", () => {
+        yScale.domain([0.1, 1.1]);
+
+        let data = [
+          {"x": -2, "y": 1.8},
+          {"x": -1, "y": 0.0}
+        ];
+
+        let line = new Plottable.Plots.Line();
+        line.x(function(d) { return d.x; }, xScale);
+        line.y(function(d) { return d.y; }, yScale);
+        line.addDataset(new Plottable.Dataset(data));
+        line.autorangeMode("x");
+
+        xScale.padProportion(0);
+        yScale.padProportion(0);
+        line.renderTo(svg);
+
+        assert.deepEqual(xScale.domain(), [0, 1], "when there are no visible points in the view, the x-scale domain defaults to [0, 1]");
+
+        line.autorangeSmooth(true);
+
+        let base = data[0].x;
+        let x1 = (yScale.domain()[1] - data[0].y);
+        let x2 = data[1].y - data[0].y;
+        let y2 = data[1].x - data[0].x;
+        let expectedTop = base + y2 * x1 / x2;
+
+        x1 = (yScale.domain()[0] - data[0].y);
+        let expectedBottom = base + y2 * x1 / x2;
+
+        assert.closeTo(xScale.domain()[0], expectedTop, 0.001, "smooth autoranging forces the domain to include the line (left)");
+        assert.closeTo(xScale.domain()[1], expectedBottom, 0.001, "smooth autoranging forces the domain to include the line (right)");
+
+        line.autorangeSmooth(false);
+        assert.deepEqual(xScale.domain(), [0, 1], "resetting the smooth autorange works");
+
+        yScale.domain([data[0].y, data[1].y]);
+        assert.deepEqual(xScale.domain(), [-2, -1], "no changes for autoranging smooth with same edge poitns (no smooth)");
+
+        line.autorangeSmooth(true);
+        assert.deepEqual(xScale.domain(), [-2, -1], "no changes for autoranging smooth with same edge points (smooth)");
+      });
+
+    });
+  });
 });

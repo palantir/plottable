@@ -886,6 +886,14 @@ declare module Plottable {
          * @returns {QuantitativeScale} The calling QuantitativeScale.
          */
         padProportion(padProportion: number): QuantitativeScale<D>;
+        /**
+         * Gets whether or not the scale snaps its domain to nice values.
+         */
+        snappingDomainEnabled(): boolean;
+        /**
+         * Sets whether or not the scale snaps its domain to nice values.
+         */
+        snappingDomainEnabled(snappingDomainEnabled: boolean): QuantitativeScale<D>;
         protected _expandSingleValueDomain(singleValueDomain: D[]): D[];
         /**
          * Computes the domain value corresponding to a supplied range value.
@@ -1324,6 +1332,17 @@ declare module Plottable {
     module Drawers {
         class Arc extends Drawer {
             constructor(dataset: Dataset);
+            protected _applyDefaultAttributes(selection: d3.Selection<any>): void;
+        }
+    }
+}
+
+
+declare module Plottable {
+    module Drawers {
+        class ArcOutline extends Drawer {
+            constructor(dataset: Dataset);
+            protected _applyDefaultAttributes(selection: d3.Selection<any>): void;
         }
     }
 }
@@ -2521,13 +2540,6 @@ declare module Plottable {
         anchor(selection: d3.Selection<void>): Plot;
         protected _setup(): void;
         destroy(): void;
-        /**
-         * Adds a Dataset to the Plot.
-         *
-         * @param {Dataset} dataset
-         * @returns {Plot} The calling Plot.
-         */
-        addDataset(dataset: Dataset): Plot;
         protected _createNodesForDataset(dataset: Dataset): Drawer;
         protected _createDrawer(dataset: Dataset): Drawer;
         protected _getAnimator(key: string): Animator;
@@ -2593,12 +2605,21 @@ declare module Plottable {
          */
         animator(animatorKey: string, animator: Animator): Plot;
         /**
+         * Adds a Dataset to the Plot.
+         *
+         * @param {Dataset} dataset
+         * @returns {Plot} The calling Plot.
+         */
+        addDataset(dataset: Dataset): Plot;
+        protected _addDataset(dataset: Dataset): Plot;
+        /**
          * Removes a Dataset from the Plot.
          *
          * @param {Dataset} dataset
          * @returns {Plot} The calling Plot.
          */
         removeDataset(dataset: Dataset): Plot;
+        protected _removeDataset(dataset: Dataset): Plot;
         protected _removeDatasetNodes(dataset: Dataset): void;
         datasets(): Dataset[];
         datasets(datasets: Dataset[]): Plot;
@@ -2648,9 +2669,14 @@ declare module Plottable {
              * @constructor
              */
             constructor();
+            protected _setup(): void;
             computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number): Pie;
             addDataset(dataset: Dataset): Pie;
+            protected _addDataset(dataset: Dataset): Pie;
             removeDataset(dataset: Dataset): Pie;
+            protected _removeDatasetNodes(dataset: Dataset): void;
+            protected _removeDataset(dataset: Dataset): Pie;
+            selections(datasets?: Dataset[]): d3.Selection<any>;
             protected _onDatasetUpdate(): void;
             protected _createDrawer(dataset: Dataset): Drawers.Arc;
             entities(datasets?: Dataset[]): PlotEntity[];
@@ -2741,6 +2767,7 @@ declare module Plottable {
             entitiesAt(queryPoint: Point): PlotEntity[];
             protected _propertyProjectors(): AttributeToProjector;
             protected _getDataToDraw(): Utils.Map<Dataset, any[]>;
+            protected static _isValidData(value: any): boolean;
             protected _pixelPoint(datum: any, index: number, dataset: Dataset): {
                 x: number;
                 y: number;
@@ -2960,12 +2987,40 @@ declare module Plottable {
              * @returns {PlotEntity[]}
              */
             entitiesIn(xRange: Range, yRange: Range): PlotEntity[];
+            /**
+             * Gets the accessor for labels.
+             *
+             * @returns {Accessor<string>}
+             */
+            label(): Accessor<string>;
+            /**
+             * Sets the text of labels to the result of an Accessor.
+             *
+             * @param {Accessor<string>} label
+             * @returns {Plots.Rectangle} The calling Rectangle Plot.
+             */
+            label(label: Accessor<string>): Plots.Rectangle<X, Y>;
+            /**
+             * Gets whether labels are enabled.
+             *
+             * @returns {boolean}
+             */
+            labelsEnabled(): boolean;
+            /**
+             * Sets whether labels are enabled.
+             * Labels too big to be contained in the rectangle, cut off by edges, or blocked by other rectangles will not be shown.
+             *
+             * @param {boolean} labelsEnabled
+             * @returns {Rectangle} The calling Rectangle Plot.
+             */
+            labelsEnabled(enabled: boolean): Plots.Rectangle<X, Y>;
             protected _propertyProjectors(): AttributeToProjector;
             protected _pixelPoint(datum: any, index: number, dataset: Dataset): {
                 x: any;
                 y: any;
             };
             protected _getDataToDraw(): Utils.Map<Dataset, any[]>;
+            protected _additionalPaint(time: number): void;
         }
     }
 }
@@ -3033,6 +3088,13 @@ declare module Plottable {
              * @returns {PlotEntity[]}
              */
             entitiesIn(xRange: Range, yRange: Range): PlotEntity[];
+            /**
+             * Gets the Entities at a particular Point.
+             *
+             * @param {Point} p
+             * @returns {PlotEntity[]}
+             */
+            entitiesAt(p: Point): PlotEntity[];
         }
     }
 }
@@ -3082,7 +3144,11 @@ declare module Plottable {
              */
             baselineValue(value: X | Y): Bar<X, Y>;
             addDataset(dataset: Dataset): Bar<X, Y>;
+            protected _addDataset(dataset: Dataset): Bar<X, Y>;
             removeDataset(dataset: Dataset): Bar<X, Y>;
+            protected _removeDataset(dataset: Dataset): Bar<X, Y>;
+            datasets(): Dataset[];
+            datasets(datasets: Dataset[]): Plot;
             /**
              * Get whether bar labels are enabled.
              *
@@ -3182,6 +3248,25 @@ declare module Plottable {
              * @constructor
              */
             constructor();
+            x(): Plots.AccessorScaleBinding<X, number>;
+            x(x: number | Accessor<number>): Line<X>;
+            x(x: X | Accessor<X>, xScale: Scale<X, number>): Line<X>;
+            y(): Plots.AccessorScaleBinding<number, number>;
+            y(y: number | Accessor<number>): Line<X>;
+            y(y: number | Accessor<number>, yScale: Scale<number, number>): Line<X>;
+            autorangeMode(): string;
+            autorangeMode(autorangeMode: string): Line<X>;
+            /**
+             * Gets whether or not the autoranging is done smoothly.
+             */
+            autorangeSmooth(): boolean;
+            /**
+             * Sets whether or not the autorange is done smoothly.
+             *
+             * Smooth autoranging is done by making sure lines always exit on the left / right side of the plot
+             * and deactivating the nice domain feature on the scales
+             */
+            autorangeSmooth(autorangeSmooth: boolean): Plots.Line<X>;
             /**
              * Gets the interpolation function associated with the plot.
              *
@@ -3209,6 +3294,7 @@ declare module Plottable {
             interpolator(interpolator: "cardinal-closed"): Line<X>;
             interpolator(interpolator: "monotone"): Line<X>;
             protected _createDrawer(dataset: Dataset): Drawer;
+            protected _extentsForProperty(property: string): any[];
             protected _getResetYFunction(): (d: any, i: number, dataset: Dataset) => number;
             protected _generateDrawSteps(): Drawers.DrawStep[];
             protected _generateAttrToProjector(): {
@@ -3256,6 +3342,7 @@ declare module Plottable {
             y0(y0: number | Accessor<number>): Area<X>;
             protected _onDatasetUpdate(): void;
             addDataset(dataset: Dataset): Area<X>;
+            protected _addDataset(dataset: Dataset): Area<X>;
             protected _removeDatasetNodes(dataset: Dataset): void;
             protected _additionalPaint(): void;
             protected _createDrawer(dataset: Dataset): Drawers.Area;

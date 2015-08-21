@@ -154,15 +154,38 @@ export module Plots {
     }
 
     public addDataset(dataset: Dataset) {
-      dataset.onUpdate(this._updateBarPixelWidthCallback);
       super.addDataset(dataset);
       this._updateBarPixelWidth();
+      return this;
+    }
+
+    protected _addDataset(dataset: Dataset) {
+      dataset.onUpdate(this._updateBarPixelWidthCallback);
+      super._addDataset(dataset);
       return this;
     }
 
     public removeDataset(dataset: Dataset) {
       dataset.offUpdate(this._updateBarPixelWidthCallback);
       super.removeDataset(dataset);
+      this._updateBarPixelWidth();
+      return this;
+    }
+
+    protected _removeDataset(dataset: Dataset) {
+      dataset.offUpdate(this._updateBarPixelWidthCallback);
+      super._removeDataset(dataset);
+      return this;
+    }
+
+    public datasets(): Dataset[];
+    public datasets(datasets: Dataset[]): Plot;
+    public datasets(datasets?: Dataset[]): any {
+      if (datasets == null) {
+        return super.datasets();
+      }
+
+      super.datasets(datasets);
       this._updateBarPixelWidth();
       return this;
     }
