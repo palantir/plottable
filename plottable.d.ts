@@ -2540,13 +2540,6 @@ declare module Plottable {
         anchor(selection: d3.Selection<void>): Plot;
         protected _setup(): void;
         destroy(): void;
-        /**
-         * Adds a Dataset to the Plot.
-         *
-         * @param {Dataset} dataset
-         * @returns {Plot} The calling Plot.
-         */
-        addDataset(dataset: Dataset): Plot;
         protected _createNodesForDataset(dataset: Dataset): Drawer;
         protected _createDrawer(dataset: Dataset): Drawer;
         protected _getAnimator(key: string): Animator;
@@ -2612,12 +2605,21 @@ declare module Plottable {
          */
         animator(animatorKey: string, animator: Animator): Plot;
         /**
+         * Adds a Dataset to the Plot.
+         *
+         * @param {Dataset} dataset
+         * @returns {Plot} The calling Plot.
+         */
+        addDataset(dataset: Dataset): Plot;
+        protected _addDataset(dataset: Dataset): Plot;
+        /**
          * Removes a Dataset from the Plot.
          *
          * @param {Dataset} dataset
          * @returns {Plot} The calling Plot.
          */
         removeDataset(dataset: Dataset): Plot;
+        protected _removeDataset(dataset: Dataset): Plot;
         protected _removeDatasetNodes(dataset: Dataset): void;
         datasets(): Dataset[];
         datasets(datasets: Dataset[]): Plot;
@@ -2670,8 +2672,10 @@ declare module Plottable {
             protected _setup(): void;
             computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number): Pie;
             addDataset(dataset: Dataset): Pie;
-            protected _removeDatasetNodes(dataset: Dataset): void;
+            protected _addDataset(dataset: Dataset): Pie;
             removeDataset(dataset: Dataset): Pie;
+            protected _removeDatasetNodes(dataset: Dataset): void;
+            protected _removeDataset(dataset: Dataset): Pie;
             selections(datasets?: Dataset[]): d3.Selection<any>;
             protected _onDatasetUpdate(): void;
             protected _createDrawer(dataset: Dataset): Drawers.Arc;
@@ -3140,7 +3144,11 @@ declare module Plottable {
              */
             baselineValue(value: X | Y): Bar<X, Y>;
             addDataset(dataset: Dataset): Bar<X, Y>;
+            protected _addDataset(dataset: Dataset): Bar<X, Y>;
             removeDataset(dataset: Dataset): Bar<X, Y>;
+            protected _removeDataset(dataset: Dataset): Bar<X, Y>;
+            datasets(): Dataset[];
+            datasets(datasets: Dataset[]): Plot;
             /**
              * Get whether bar labels are enabled.
              *
@@ -3334,6 +3342,7 @@ declare module Plottable {
             y0(y0: number | Accessor<number>): Area<X>;
             protected _onDatasetUpdate(): void;
             addDataset(dataset: Dataset): Area<X>;
+            protected _addDataset(dataset: Dataset): Area<X>;
             protected _removeDatasetNodes(dataset: Dataset): void;
             protected _additionalPaint(): void;
             protected _createDrawer(dataset: Dataset): Drawers.Area;

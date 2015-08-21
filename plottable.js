@@ -6457,27 +6457,7 @@ var Plottable;
             var _this = this;
             _super.prototype.destroy.call(this);
             this._scales().forEach(function (scale) { return scale.offUpdate(_this._renderCallback); });
-            this.datasets().forEach(function (dataset) { return _this.removeDataset(dataset); });
-        };
-        /**
-         * Adds a Dataset to the Plot.
-         *
-         * @param {Dataset} dataset
-         * @returns {Plot} The calling Plot.
-         */
-        Plot.prototype.addDataset = function (dataset) {
-            if (this.datasets().indexOf(dataset) > -1) {
-                this.removeDataset(dataset);
-            }
-            ;
-            var drawer = this._createDrawer(dataset);
-            this._datasetToDrawer.set(dataset, drawer);
-            if (this._isSetup) {
-                this._createNodesForDataset(dataset);
-            }
-            dataset.onUpdate(this._onDatasetUpdateCallback);
-            this._onDatasetUpdate();
-            return this;
+            this.datasets([]);
         };
         Plot.prototype._createNodesForDataset = function (dataset) {
             var drawer = this._datasetToDrawer.get(dataset);
@@ -6663,18 +6643,44 @@ var Plottable;
             }
         };
         /**
+         * Adds a Dataset to the Plot.
+         *
+         * @param {Dataset} dataset
+         * @returns {Plot} The calling Plot.
+         */
+        Plot.prototype.addDataset = function (dataset) {
+            this._addDataset(dataset);
+            this._onDatasetUpdate();
+            return this;
+        };
+        Plot.prototype._addDataset = function (dataset) {
+            this._removeDataset(dataset);
+            var drawer = this._createDrawer(dataset);
+            this._datasetToDrawer.set(dataset, drawer);
+            if (this._isSetup) {
+                this._createNodesForDataset(dataset);
+            }
+            dataset.onUpdate(this._onDatasetUpdateCallback);
+            return this;
+        };
+        /**
          * Removes a Dataset from the Plot.
          *
          * @param {Dataset} dataset
          * @returns {Plot} The calling Plot.
          */
         Plot.prototype.removeDataset = function (dataset) {
-            if (this.datasets().indexOf(dataset) > -1) {
-                this._removeDatasetNodes(dataset);
-                dataset.offUpdate(this._onDatasetUpdateCallback);
-                this._datasetToDrawer.delete(dataset);
-                this._onDatasetUpdate();
+            this._removeDataset(dataset);
+            this._onDatasetUpdate();
+            return this;
+        };
+        Plot.prototype._removeDataset = function (dataset) {
+            if (this.datasets().indexOf(dataset) === -1) {
+                return this;
             }
+            this._removeDatasetNodes(dataset);
+            dataset.offUpdate(this._onDatasetUpdateCallback);
+            this._datasetToDrawer.delete(dataset);
             return this;
         };
         Plot.prototype._removeDatasetNodes = function (dataset) {
@@ -6688,8 +6694,9 @@ var Plottable;
             if (datasets == null) {
                 return currentDatasets;
             }
-            currentDatasets.forEach(function (dataset) { return _this.removeDataset(dataset); });
-            datasets.forEach(function (dataset) { return _this.addDataset(dataset); });
+            currentDatasets.forEach(function (dataset) { return _this._removeDataset(dataset); });
+            datasets.forEach(function (dataset) { return _this._addDataset(dataset); });
+            this._onDatasetUpdate();
             return this;
         };
         Plot.prototype._getDrawersInOrder = function () {
@@ -6892,6 +6899,10 @@ var Plottable;
                 return this;
             };
             Pie.prototype.addDataset = function (dataset) {
+                _super.prototype.addDataset.call(this, dataset);
+                return this;
+            };
+            Pie.prototype._addDataset = function (dataset) {
                 if (this.datasets().length === 1) {
                     Plottable.Utils.Window.warn("Only one dataset is supported in Pie plots");
                     return this;
@@ -6902,15 +6913,19 @@ var Plottable;
                     strokeDrawer.renderArea(this._renderArea.append("g"));
                 }
                 this._strokeDrawers.set(dataset, strokeDrawer);
-                _super.prototype.addDataset.call(this, dataset);
+                _super.prototype._addDataset.call(this, dataset);
+                return this;
+            };
+            Pie.prototype.removeDataset = function (dataset) {
+                _super.prototype.removeDataset.call(this, dataset);
                 return this;
             };
             Pie.prototype._removeDatasetNodes = function (dataset) {
                 _super.prototype._removeDatasetNodes.call(this, dataset);
                 this._strokeDrawers.get(dataset).remove();
             };
-            Pie.prototype.removeDataset = function (dataset) {
-                _super.prototype.removeDataset.call(this, dataset);
+            Pie.prototype._removeDataset = function (dataset) {
+                _super.prototype._removeDataset.call(this, dataset);
                 this._startAngles = [];
                 this._endAngles = [];
                 return this;
@@ -8077,14 +8092,31 @@ var Plottable;
                 return this;
             };
             Bar.prototype.addDataset = function (dataset) {
-                dataset.onUpdate(this._updateBarPixelWidthCallback);
                 _super.prototype.addDataset.call(this, dataset);
                 this._updateBarPixelWidth();
+                return this;
+            };
+            Bar.prototype._addDataset = function (dataset) {
+                dataset.onUpdate(this._updateBarPixelWidthCallback);
+                _super.prototype._addDataset.call(this, dataset);
                 return this;
             };
             Bar.prototype.removeDataset = function (dataset) {
                 dataset.offUpdate(this._updateBarPixelWidthCallback);
                 _super.prototype.removeDataset.call(this, dataset);
+                this._updateBarPixelWidth();
+                return this;
+            };
+            Bar.prototype._removeDataset = function (dataset) {
+                dataset.offUpdate(this._updateBarPixelWidthCallback);
+                _super.prototype._removeDataset.call(this, dataset);
+                return this;
+            };
+            Bar.prototype.datasets = function (datasets) {
+                if (datasets == null) {
+                    return _super.prototype.datasets.call(this);
+                }
+                _super.prototype.datasets.call(this, datasets);
                 this._updateBarPixelWidth();
                 return this;
             };
@@ -8873,12 +8905,16 @@ var Plottable;
                 this._updateYScale();
             };
             Area.prototype.addDataset = function (dataset) {
+                _super.prototype.addDataset.call(this, dataset);
+                return this;
+            };
+            Area.prototype._addDataset = function (dataset) {
                 var lineDrawer = new Plottable.Drawers.Line(dataset);
                 if (this._isSetup) {
                     lineDrawer.renderArea(this._renderArea.append("g"));
                 }
                 this._lineDrawers.set(dataset, lineDrawer);
-                _super.prototype.addDataset.call(this, dataset);
+                _super.prototype._addDataset.call(this, dataset);
                 return this;
             };
             Area.prototype._removeDatasetNodes = function (dataset) {
