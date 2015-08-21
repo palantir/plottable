@@ -5,7 +5,9 @@ interface Window {
   Pixel_CloseTo_Requirement: number;
 }
 
-assert = chai.assert;
+/* tslint:disable:no-unused-variable */
+const assert = chai.assert;
+/* tslint:enable:no-unused-variable */
 
 before(() => {
   // Set the render policy to immediate to make sure ETE tests can check DOM change immediately

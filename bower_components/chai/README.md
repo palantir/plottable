@@ -5,9 +5,17 @@ can be delightfully paired with any javascript testing framework.
 
 For more information or to download plugins, view the [documentation](http://chaijs.com).
 
-[![Build Status](https://travis-ci.org/chaijs/chai.png?branch=master)](https://travis-ci.org/chaijs/chai)
+[![Build Status](https://travis-ci.org/chaijs/chai.svg?branch=master)](https://travis-ci.org/chaijs/chai)
 
 [![Selenium Test Status](https://saucelabs.com/browser-matrix/chaijs.svg)](https://saucelabs.com/u/chaijs)
+
+### Plugins
+
+Chai offers a robust Plugin architecture for extending Chai's assertions and interfaces.
+
+- Need a plugin? View the [official plugin list](http://chaijs.com/plugins).
+- Have a plugin and want it listed? Open a Pull Request at [chaijs/chai-docs:plugin.js](https://github.com/chaijs/chai-docs/blob/master/plugins.js#L1-L12).
+- Want to build a plugin? Read the [plugin api documentation](http://chaijs.com/guide/plugins/).
 
 ### Related Projects
 
@@ -17,55 +25,82 @@ For more information or to download plugins, view the [documentation](http://cha
 ### Contributors
 
      project  : chai
-     repo age : 2 years, 2 months ago
-     commits  : 735
-     active   : 158 days
-     files    : 56
+     repo age : 3 years, 2 months
+     active   : 220 days
+     commits  : 845
+     files    : 59
      authors  :
-       532  Jake Luer               72.4%
-        79  Veselin Todorov         10.7%
-        43  Domenic Denicola        5.9%
-         6  Ruben Verborgh          0.8%
-         5  George Kats             0.7%
-         5  Jo Liss                 0.7%
-         5  Juliusz Gonera          0.7%
-         5  Scott Nonnenberg        0.7%
-         4  John Firebaugh          0.5%
-         4  Max Edmands             0.5%
-         4  Nick Heiner             0.5%
-         4  josher19                0.5%
-         3  Andrei Neculau          0.4%
-         3  Jake Rosoman            0.4%
-         3  Jeff Barczewski         0.4%
-         3  Ryunosuke SATO          0.4%
-         2  Bartvds                 0.3%
-         2  Duncan Beevers          0.3%
-         2  Edwin Shao              0.3%
-         2  Jakub Nešetřil          0.3%
-         2  Teddy Cross             0.3%
-         1  Anand Patil             0.1%
-         1  Benjamin Horsleben      0.1%
-         1  Brandon Payton          0.1%
-         1  Chris Connelly          0.1%
-         1  Chun-Yi                 0.1%
-         1  DD                      0.1%
-         1  Jeff Welch              0.1%
-         1  Kilian Ciuffolo         0.1%
-         1  Niklas Närhinen         0.1%
-         1  Paul Miller             0.1%
-         1  Sasha Koss              0.1%
-         1  Veselin                 0.1%
-         1  Victor Costan           0.1%
-         1  Vinay Pulim             0.1%
-         1  Virginie BARDALES       0.1%
-         1  laconbass               0.1%
-         1  piecioshka              0.1%
+       553  Jake Luer           65.4%
+        79  Veselin Todorov     9.3%
+        43  Domenic Denicola    5.1%
+        23  Keith Cirkel        2.7%
+        14  Joshua Perry        1.7%
+         8  Chris Polis         0.9%
+         6  Ruben Verborgh      0.7%
+         5  Scott Nonnenberg    0.6%
+         5  George Kats         0.6%
+         5  Juliusz Gonera      0.6%
+         5  leider              0.6%
+         5  Jo Liss             0.6%
+         4  Chris Jones         0.5%
+         4  David da Silva      0.5%
+         4  Nick Heiner         0.5%
+         4  John Firebaugh      0.5%
+         4  Veselin             0.5%
+         4  Max Edmands         0.5%
+         4  charlierudolph      0.5%
+         4  josher19            0.5%
+         3  Jake Rosoman        0.4%
+         3  Jeff Barczewski     0.4%
+         3  Andrei Neculau      0.4%
+         3  Duncan Beevers      0.4%
+         3  Jason Karns         0.4%
+         3  Ryunosuke SATO      0.4%
+         2  Gregg Lind          0.2%
+         2  Teddy Cross         0.2%
+         2  Bartvds             0.2%
+         2  Jakub Nešetřil      0.2%
+         2  Edwin Shao          0.2%
+         2  Roman Masek         0.2%
+         1  toastynerd          0.1%
+         1  Anand Patil         0.1%
+         1  Benjamin Horsleben  0.1%
+         1  Brandon Payton      0.1%
+         1  Chasen Le Hara      0.1%
+         1  Chris Connelly      0.1%
+         1  Chris Thompson      0.1%
+         1  Christopher Hiller  0.1%
+         1  Chun-Yi             0.1%
+         1  DD                  0.1%
+         1  Danilo Vaz          0.1%
+         1  Dido Arellano       0.1%
+         1  Jeff Welch          0.1%
+         1  Julien Wajsberg     0.1%
+         1  Kilian Ciuffolo     0.1%
+         1  Luís Cardoso        0.1%
+         1  Martin Middel       0.1%
+         1  Mathias Schreck     0.1%
+         1  Michael Lange       0.1%
+         1  Niklas Närhinen     0.1%
+         1  Paul Miller         0.1%
+         1  Refael Ackermann    0.1%
+         1  Sasha Koss          0.1%
+         1  Victor Costan       0.1%
+         1  Vinay Pulim         0.1%
+         1  Virginie BARDALES   0.1%
+         1  ericdouglas         0.1%
+         1  laconbass           0.1%
+         1  mohayonao           0.1%
+         1  piecioshka          0.1%
+         1  shinnn              0.1%
+         1  Adam Hull           0.1%
+
 
 ## License
 
 (The MIT License)
 
-Copyright (c) 2011-2014 Jake Luer <jake@alogicalparadox.com>
+Copyright (c) 2011-2015 Jake Luer <jake@alogicalparadox.com>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
