@@ -624,11 +624,13 @@ export class Axis<D> extends Component {
   /**
    * Gets the margin in pixels.
    * The margin is the amount of space between the tick labels and the outer edge of the Axis.
+   * The margin also determines the space that annotations will reside in if annotations are enabled.
    */
   public margin(): number;
   /**
    * Sets the margin in pixels.
    * The margin is the amount of space between the tick labels and the outer edge of the Axis.
+   * The margin also determines the space that annotations will reside in if annotations are enabled.
    *
    * @param {number} size
    * @returns {Axis} The calling Axis.
