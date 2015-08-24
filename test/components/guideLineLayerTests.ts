@@ -157,6 +157,7 @@ describe("Interactive Components", () => {
     describe("Rendering (vertical)", () => {
       let SVG_WIDTH = 400;
       let SVG_HEIGHT = 300;
+      let guidelineClass = "." + "guide-line";
 
       let svg: d3.Selection<void>;
 
@@ -178,7 +179,7 @@ describe("Interactive Components", () => {
         svg.remove();
       });
 
-      it("clipPath enabled", () => {
+      it("generates the correct clipPath", () => {
         let gll = new Plottable.Components.GuideLineLayer<void>("vertical");
         gll.renderTo(svg);
         TestMethods.verifyClipPath(gll);
@@ -194,8 +195,8 @@ describe("Interactive Components", () => {
         gll.pixelPosition(expectedPosition1);
         gll.renderTo(svg);
 
-        assert.strictEqual(gll.content().selectAll(".guide-line").size(), 1, "exactly one line is drawn");
-        let line = gll.content().select(".guide-line");
+        assert.strictEqual(gll.content().selectAll(guidelineClass).size(), 1, "exactly one line is drawn");
+        let line = gll.content().select(guidelineClass);
         let expectedAttrs1 = {
           x1: expectedPosition1,
           x2: expectedPosition1,
@@ -206,8 +207,8 @@ describe("Interactive Components", () => {
 
         let expectedPosition2 = SVG_WIDTH * 3 / 4;
         gll.pixelPosition(expectedPosition2);
-        assert.strictEqual(gll.content().selectAll(".guide-line").size(), 1, "exactly one line is drawn");
-        line = gll.content().select(".guide-line");
+        assert.strictEqual(gll.content().selectAll(guidelineClass).size(), 1, "exactly one line is drawn");
+        line = gll.content().select(guidelineClass);
         let expectedAttrs2 = {
           x1: expectedPosition2,
           x2: expectedPosition2,
@@ -228,8 +229,8 @@ describe("Interactive Components", () => {
 
         let value1 = 5;
         gll.value(value1);
-        assert.strictEqual(gll.content().selectAll(".guide-line").size(), 1, "exactly one line is drawn");
-        let line = gll.content().select(".guide-line");
+        assert.strictEqual(gll.content().selectAll(guidelineClass).size(), 1, "exactly one line is drawn");
+        let line = gll.content().select(guidelineClass);
         let expectedAttrs1 = {
           x1: scale.scale(value1),
           x2: scale.scale(value1),
@@ -240,8 +241,8 @@ describe("Interactive Components", () => {
 
         let value2 = 8;
         gll.value(value2);
-        assert.strictEqual(gll.content().selectAll(".guide-line").size(), 1, "exactly one line is drawn");
-        line = gll.content().select(".guide-line");
+        assert.strictEqual(gll.content().selectAll(guidelineClass).size(), 1, "exactly one line is drawn");
+        line = gll.content().select(guidelineClass);
         let expectedAttrs2 = {
           x1: scale.scale(value2),
           x2: scale.scale(value2),
@@ -262,7 +263,7 @@ describe("Interactive Components", () => {
         let scale1 = new Plottable.Scales.Linear();
         scale1.domain([0, 10]);
         gll.scale(scale1);
-        let line = gll.content().select(".guide-line");
+        let line = gll.content().select(guidelineClass);
         let expectedAttrs1 = {
           x1: scale1.scale(value),
           x2: scale1.scale(value),
@@ -283,7 +284,7 @@ describe("Interactive Components", () => {
         let scale2 = new Plottable.Scales.Linear();
         scale2.domain([0, 100]);
         gll.scale(scale2);
-        line = gll.content().select(".guide-line");
+        line = gll.content().select(guidelineClass);
         let expectedAttrs2 = {
           x1: scale2.scale(value),
           x2: scale2.scale(value),
@@ -313,6 +314,7 @@ describe("Interactive Components", () => {
     describe("Rendering (horizontal)", () => {
       let SVG_WIDTH = 300;
       let SVG_HEIGHT = 400;
+      let guidelineClass = "." + "guide-line";
 
       let svg: d3.Selection<void>;
 
@@ -334,7 +336,7 @@ describe("Interactive Components", () => {
         svg.remove();
       });
 
-      it("clipPath enabled", () => {
+      it("generates the correct clipPath", () => {
         let gll = new Plottable.Components.GuideLineLayer<void>("horizontal");
         gll.renderTo(svg);
         TestMethods.verifyClipPath(gll);
@@ -350,8 +352,8 @@ describe("Interactive Components", () => {
         gll.pixelPosition(expectedPosition1);
         gll.renderTo(svg);
 
-        assert.strictEqual(gll.content().selectAll(".guide-line").size(), 1, "exactly one line is drawn");
-        let line = gll.content().select(".guide-line");
+        assert.strictEqual(gll.content().selectAll(guidelineClass).size(), 1, "exactly one line is drawn");
+        let line = gll.content().select(guidelineClass);
         let expectedAttrs1 = {
           x1: 0,
           x2: SVG_WIDTH,
@@ -362,8 +364,8 @@ describe("Interactive Components", () => {
 
         let expectedPosition2 = SVG_WIDTH * 3 / 4;
         gll.pixelPosition(expectedPosition2);
-        assert.strictEqual(gll.content().selectAll(".guide-line").size(), 1, "exactly one line is drawn");
-        line = gll.content().select(".guide-line");
+        assert.strictEqual(gll.content().selectAll(guidelineClass).size(), 1, "exactly one line is drawn");
+        line = gll.content().select(guidelineClass);
         let expectedAttrs2 = {
           x1: 0,
           x2: SVG_WIDTH,
@@ -384,8 +386,8 @@ describe("Interactive Components", () => {
 
         let value1 = 5;
         gll.value(value1);
-        assert.strictEqual(gll.content().selectAll(".guide-line").size(), 1, "exactly one line is drawn");
-        let line = gll.content().select(".guide-line");
+        assert.strictEqual(gll.content().selectAll(guidelineClass).size(), 1, "exactly one line is drawn");
+        let line = gll.content().select(guidelineClass);
         let expectedAttrs1 = {
           x1: 0,
           x2: SVG_WIDTH,
@@ -396,8 +398,8 @@ describe("Interactive Components", () => {
 
         let value2 = 8;
         gll.value(value2);
-        assert.strictEqual(gll.content().selectAll(".guide-line").size(), 1, "exactly one line is drawn");
-        line = gll.content().select(".guide-line");
+        assert.strictEqual(gll.content().selectAll(guidelineClass).size(), 1, "exactly one line is drawn");
+        line = gll.content().select(guidelineClass);
         let expectedAttrs2 = {
           x1: 0,
           x2: SVG_WIDTH,
@@ -418,7 +420,7 @@ describe("Interactive Components", () => {
         let scale1 = new Plottable.Scales.Linear();
         scale1.domain([0, 10]);
         gll.scale(scale1);
-        let line = gll.content().select(".guide-line");
+        let line = gll.content().select(guidelineClass);
         let expectedAttrs1 = {
           x1: 0,
           x2: SVG_WIDTH,
@@ -439,7 +441,7 @@ describe("Interactive Components", () => {
         let scale2 = new Plottable.Scales.Linear();
         scale2.domain([0, 100]);
         gll.scale(scale2);
-        line = gll.content().select(".guide-line");
+        line = gll.content().select(guidelineClass);
         let expectedAttrs2 = {
           x1: 0,
           x2: SVG_WIDTH,
