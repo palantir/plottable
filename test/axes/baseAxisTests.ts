@@ -446,12 +446,12 @@ describe("BaseAxis", () => {
             let annotationLine = d3.select(this);
             let correspondingRect = d3.select(annotationRects[0][i]);
             assert.strictEqual(TestMethods.numAttr(annotationLine, "x1"),
-              TestMethods.numAttr(correspondingRect, "x"), "line at start of rectangle");
+              TestMethods.numAttr(correspondingRect, "x"), "line at start of rect");
             assert.strictEqual(TestMethods.numAttr(annotationLine, "x2"),
-              TestMethods.numAttr(correspondingRect, "x"), "line at start of rectangle");
+              TestMethods.numAttr(correspondingRect, "x"), "line at start of rect");
             assert.strictEqual(TestMethods.numAttr(annotationLine, "y1"), 0, "line starts at the top");
             assert.strictEqual(TestMethods.numAttr(annotationLine, "y2"),
-              TestMethods.numAttr(correspondingRect, "y"), "line goes to the rectangle");
+              TestMethods.numAttr(correspondingRect, "y"), "line goes to the rect");
           });
 
           axis.content().selectAll(".annotation-label").each(function (d, i) {
@@ -476,7 +476,7 @@ describe("BaseAxis", () => {
             let annotationCircle = d3.select(this);
             let correspondingRect = d3.select(annotationRects[0][i]);
             assert.strictEqual(TestMethods.numAttr(annotationCircle, "cx"),
-              TestMethods.numAttr(correspondingRect, "x"), "circle at start of rectangle");
+              TestMethods.numAttr(correspondingRect, "x"), "circle at start of rect");
             assert.strictEqual(TestMethods.numAttr(annotationCircle, "cy"), axis.height(), "circle at the bottom");
           });
 
@@ -488,8 +488,8 @@ describe("BaseAxis", () => {
             assert.strictEqual(TestMethods.numAttr(annotationLine, "x2"),
               TestMethods.numAttr(correspondingRect, "x"), "line at tick scaled x position");
             assert.strictEqual(TestMethods.numAttr(annotationLine, "y1"), axis.height(), "line starts at the bottom");
-            assert.strictEqual(TestMethods.numAttr(annotationLine, "y2"),
-              TestMethods.numAttr(correspondingRect, "y") + TestMethods.numAttr(correspondingRect, "height"), "line goes to the margin");
+            assert.closeTo(TestMethods.numAttr(annotationLine, "y2"),
+              TestMethods.numAttr(correspondingRect, "y") + TestMethods.numAttr(correspondingRect, "height"), 1, "line goes to the margin");
           });
 
           axis.content().selectAll(".annotation-label").each(function (d, i) {
@@ -522,8 +522,8 @@ describe("BaseAxis", () => {
             let annotationLine = d3.select(this);
             let correspondingRect = d3.select(annotationRects[0][i]);
             assert.strictEqual(TestMethods.numAttr(annotationLine, "x1"), axis.width(), "line starts at the right");
-            assert.strictEqual(TestMethods.numAttr(annotationLine, "x2"),
-              TestMethods.numAttr(correspondingRect, "x") + TestMethods.numAttr(correspondingRect, "width"), "line goes to the rect");
+            assert.closeTo(TestMethods.numAttr(annotationLine, "x2"),
+              TestMethods.numAttr(correspondingRect, "x") + TestMethods.numAttr(correspondingRect, "width"), 1, "line goes to the rect");
             assert.strictEqual(TestMethods.numAttr(annotationLine, "y1"),
               TestMethods.numAttr(correspondingRect, "y"), "line at tick scaled y position");
             assert.strictEqual(TestMethods.numAttr(annotationLine, "y2"),
@@ -561,7 +561,7 @@ describe("BaseAxis", () => {
             let correspondingRect = d3.select(annotationRects[0][i]);
             assert.strictEqual(TestMethods.numAttr(annotationLine, "x1"), 0, "line starts at the left");
             assert.strictEqual(TestMethods.numAttr(annotationLine, "x2"),
-              TestMethods.numAttr(correspondingRect, "x"), "line ends at the rectangle");
+              TestMethods.numAttr(correspondingRect, "x"), "line ends at the rect");
             assert.strictEqual(TestMethods.numAttr(annotationLine, "y1"),
               TestMethods.numAttr(correspondingRect, "y"), "line at tick scaled y position");
             assert.strictEqual(TestMethods.numAttr(annotationLine, "y2"),
