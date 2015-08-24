@@ -4,35 +4,49 @@ describe("Scales", () => {
   describe("Color Scale", () => {
 
     describe("Basic Usage", () => {
-      it("accepts categorical string types and Category domain", () => {
-        let scale = new Plottable.Scales.Color("10");
-        scale.domain(["yes", "no", "maybe"]);
-        assert.strictEqual("#1f77b4", scale.scale("yes"));
-        assert.strictEqual("#ff7f0e", scale.scale("no"));
-        assert.strictEqual("#2ca02c", scale.scale("maybe"));
-      });
+
+      let defaultColors = [
+        "#5279c7", "#fd373e", "#63c261", "#fad419", "#2c2b6f",
+        "#ff7939", "#db2e65", "#99ce50", "#962565", "#06cccc"
+      ];
 
       it("default colors are generated", () => {
         let scale = new Plottable.Scales.Color();
-        let colorArray = ["#5279c7", "#fd373e", "#63c261",
-                          "#fad419", "#2c2b6f", "#ff7939",
-                          "#db2e65", "#99ce50", "#962565", "#06cccc"];
-        assert.deepEqual(scale.range(), colorArray);
+        assert.deepEqual(scale.range(), defaultColors, "The color scale uses the default colors by default");
       });
 
       it("uses altered colors if size of domain exceeds size of range", () => {
         let scale = new Plottable.Scales.Color();
-        scale.range(["#5279c7", "#fd373e"]);
+        let colorRange = ["#5279c7", "#fd373e"];
+        scale.range(colorRange);
         scale.domain(["a", "b", "c"]);
-        assert.notEqual(scale.scale("c"), "#5279c7");
+        assert.strictEqual(scale.scale("a"), colorRange[0], "first color is used");
+        assert.strictEqual(scale.scale("b"), colorRange[1], "second color is used");
+        assert.notStrictEqual(scale.scale("c"), colorRange[0], "first color is slightly modified and used");
       });
 
       it("interprets named color values correctly", () => {
         let scale = new Plottable.Scales.Color();
         scale.range(["red", "blue"]);
         scale.domain(["a", "b"]);
-        assert.strictEqual(scale.scale("a"), "#ff0000");
-        assert.strictEqual(scale.scale("b"), "#0000ff");
+        assert.strictEqual(scale.scale("a"), "#ff0000", "red color as string should be correctly identified");
+        assert.strictEqual(scale.scale("b"), "#0000ff", "blue color as string should be correctly identified");
+      });
+
+      it("accepts Category domain", () => {
+        let scale = new Plottable.Scales.Color();
+        scale.domain(["yes", "no", "maybe"]);
+        assert.strictEqual(scale.scale("yes"), defaultColors[0], "first color used for first option");
+        assert.strictEqual(scale.scale("no"), defaultColors[1], "second color used for second option");
+        assert.strictEqual(scale.scale("maybe"), defaultColors[2], "third color used for third option");
+      });
+
+      it("accepts categorical string types and Category domain", () => {
+        let scale = new Plottable.Scales.Color("10");
+        scale.domain(["yes", "no", "maybe"]);
+        assert.strictEqual(scale.scale("yes"), "#1f77b4", "D3 Scale 10 color 1 used for option 1");
+        assert.strictEqual(scale.scale("no"), "#ff7f0e", "D3 Scale 10 color 2 used for option 2");
+        assert.strictEqual(scale.scale("maybe"), "#2ca02c", "D3 Scale 10 color 3 used for option 3");
       });
 
       it("accepts CSS specified colors", () => {
