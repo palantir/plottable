@@ -4,7 +4,6 @@ describe("Scales", () => {
   describe("Color Scale", () => {
 
     describe("Basic Usage", () => {
-
       let defaultColors = [
         "#5279c7", "#fd373e", "#63c261", "#fad419", "#2c2b6f",
         "#ff7939", "#db2e65", "#99ce50", "#962565", "#06cccc"
@@ -52,12 +51,14 @@ describe("Scales", () => {
       it("accepts CSS specified colors", () => {
         let style = d3.select("body").append("style");
         style.html(".plottable-colors-0 {background-color: #ff0000 !important; }");
+
         Plottable.Scales.Color.invalidateColorCache();
         let scale = new Plottable.Scales.Color();
+        assert.strictEqual(scale.range()[0], "#ff0000", "User has specified red color for first color scale color");
+        assert.strictEqual(scale.range()[1], defaultColors[1], "The second color of the color scale should be the same");
+
         style.remove();
         Plottable.Scales.Color.invalidateColorCache();
-        assert.strictEqual(scale.range()[0], "#ff0000", "User has specified red color for first color scale color");
-        assert.strictEqual(scale.range()[1], "#fd373e", "The second color of the color scale should be the same");
 
         let defaultScale = new Plottable.Scales.Color();
         assert.strictEqual(scale.range()[0], "#ff0000",
