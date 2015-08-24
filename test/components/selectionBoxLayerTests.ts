@@ -146,6 +146,34 @@ describe("Interactive Components", () => {
         svg.remove();
       });
 
+      it("gets the correct xExtent", () => {
+        let xScale = new Plottable.Scales.Linear();
+        xScale.domain([0, 2000]);
+        xScale.range([0, svgWidth]);
+
+        assert.deepEqual(sbl.xExtent(), [undefined, undefined], "xExtent is not set unless an yScale is set");
+        sbl.xScale(xScale);
+        sbl.renderTo(svg);
+
+        let topLeft: Plottable.Point = {
+          x: 100,
+          y: 0
+        };
+        let bottomRight: Plottable.Point = {
+          x: 250,
+          y: 300
+        };
+        sbl.bounds({
+          topLeft: topLeft,
+          bottomRight: bottomRight
+        });
+
+        assert.strictEqual(sbl.xExtent()[0], xScale.invert(100), "left data value maps correctly");
+        assert.strictEqual(sbl.xExtent()[1], xScale.invert(250), "right data value maps correctly");
+
+        svg.remove();
+      });
+
       it("can get and set the yScale() property", () => {
         let yScale = new Plottable.Scales.Linear();
         yScale.domain([0, 2000]);
@@ -182,12 +210,14 @@ describe("Interactive Components", () => {
         svg.remove();
       });
 
-      it("boxDataValue endpoints", () => {
-        let xScale = new Plottable.Scales.Linear();
-        xScale.domain([0, 2000]);
-        xScale.range([0, svgHeight]);
+      it("gets the correct yExtent", () => {
+        let yScale = new Plottable.Scales.Linear();
+        yScale.domain([0, 2000]);
+        yScale.range([0, svgHeight]);
 
-        sbl.xScale(xScale);
+        assert.deepEqual(sbl.yExtent(), [undefined, undefined], "yExtent is not set unless an yScale is set");
+
+        sbl.yScale(yScale);
         sbl.renderTo(svg);
 
         let topLeft: Plottable.Point = {
@@ -203,11 +233,12 @@ describe("Interactive Components", () => {
           bottomRight: bottomRight
         });
 
-        assert.strictEqual(sbl.xExtent()[0], 400, "data value maps correctly");
-        assert.strictEqual(sbl.xExtent()[1], 1000, "data value maps correctly");
+        assert.strictEqual(sbl.yExtent()[0], yScale.invert(0), "bottom data value maps correctly");
+        assert.strictEqual(sbl.yExtent()[1], yScale.invert(300), "top data value maps correctly");
 
         svg.remove();
       });
+
     });
   });
 });
