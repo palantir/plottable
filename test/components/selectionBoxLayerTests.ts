@@ -53,7 +53,13 @@ describe("Interactive Components", () => {
         svg.remove();
       });
 
-      it("bounds()", () => {
+      it("can get and set the bounds() property", () => {
+        let defaultBounds = sbl.bounds();
+        assert.strictEqual(defaultBounds.topLeft.x, 0, "top-left bound is correct (x)");
+        assert.strictEqual(defaultBounds.topLeft.y, 0, "top-left bound is correct (y)");
+        assert.strictEqual(defaultBounds.bottomRight.x, 0, "bottom-right bound is correct (x)");
+        assert.strictEqual(defaultBounds.bottomRight.y, 0, "bottom-right bound is correct (y)");
+
         let topLeft: Plottable.Point = {
           x: 100,
           y: 100
@@ -70,6 +76,22 @@ describe("Interactive Components", () => {
         sbl.boxVisible(true);
         sbl.renderTo(svg);
 
+        assertCorrectRendering(topLeft, bottomRight, "rendered correctly");
+        let queriedBounds = sbl.bounds();
+        assert.deepEqual(queriedBounds.topLeft, topLeft, "returns correct top-left position");
+        assert.deepEqual(queriedBounds.bottomRight, bottomRight, "returns correct bottom-right position");
+
+        assert.strictEqual(sbl.bounds({
+          topLeft: bottomRight,
+          bottomRight: topLeft
+        }), sbl, "Setting the bounds property returns the selection box layer");
+        assertCorrectRendering(topLeft, bottomRight, "rendered correctly with reversed bounds");
+        queriedBounds = sbl.bounds();
+        assert.deepEqual(queriedBounds.topLeft, topLeft, "returns correct top-left position");
+        assert.deepEqual(queriedBounds.bottomRight, bottomRight, "returns correct bottom-right position");
+
+        svg.remove();
+
         function assertCorrectRendering(expectedTL: Plottable.Point, expectedBR: Plottable.Point, msg: string) {
           let selectionBox = svg.select(".selection-box");
           let bbox = Plottable.Utils.DOM.elementBBox(selectionBox);
@@ -78,22 +100,6 @@ describe("Interactive Components", () => {
           assert.strictEqual(bbox.width, expectedBR.x - expectedTL.x, msg + " (width)");
           assert.strictEqual(bbox.height, expectedBR.y - expectedTL.y, msg + " (height)");
         }
-
-        assertCorrectRendering(topLeft, bottomRight, "rendered correctly");
-        let queriedBounds = sbl.bounds();
-        assert.deepEqual(queriedBounds.topLeft, topLeft, "returns correct top-left position");
-        assert.deepEqual(queriedBounds.bottomRight, bottomRight, "returns correct bottom-right position");
-
-        sbl.bounds({
-          topLeft: bottomRight,
-          bottomRight: topLeft
-        });
-        assertCorrectRendering(topLeft, bottomRight, "rendered correctly with reversed bounds");
-        queriedBounds = sbl.bounds();
-        assert.deepEqual(queriedBounds.topLeft, topLeft, "returns correct top-left position");
-        assert.deepEqual(queriedBounds.bottomRight, bottomRight, "returns correct bottom-right position");
-
-        svg.remove();
       });
 
       it("has an effective size of 0, but will occupy all offered space", () => {
@@ -105,12 +111,14 @@ describe("Interactive Components", () => {
         svg.remove();
       });
 
-      it("xScale()", () => {
+      it("can get and set the xScale() property", () => {
         let xScale = new Plottable.Scales.Linear();
         xScale.domain([0, 2000]);
         xScale.range([0, svgWidth]);
 
-        sbl.xScale(xScale);
+        assert.isUndefined(sbl.xScale(), "no xScale is specified by default");
+        assert.strictEqual(sbl.xScale(xScale), sbl, "setting the xScale returns the selection box layer");
+        assert.strictEqual(sbl.xScale(), xScale, "The getter returns the correct scale");
         sbl.renderTo(svg);
 
         let topLeft: Plottable.Point = {
@@ -138,12 +146,15 @@ describe("Interactive Components", () => {
         svg.remove();
       });
 
-      it("yScale()", () => {
+      it("can get and set the yScale() property", () => {
         let yScale = new Plottable.Scales.Linear();
         yScale.domain([0, 2000]);
         yScale.range([0, svgHeight]);
 
-        sbl.yScale(yScale);
+        assert.isUndefined(sbl.yScale(), "no yScale is specified by default");
+        assert.strictEqual(sbl.yScale(yScale), sbl, "setting the yScale returns the selection box layer");
+        assert.strictEqual(sbl.yScale(), yScale, "The getter returns the correct scale");
+
         sbl.renderTo(svg);
 
         let topLeft: Plottable.Point = {
