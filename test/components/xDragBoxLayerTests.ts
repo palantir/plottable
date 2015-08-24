@@ -29,7 +29,7 @@ describe("Interactive Components", () => {
         dbl = new Plottable.Components.XDragBoxLayer();
       });
 
-      it("bounds()", () => {
+      it("has the correct bounds", () => {
         dbl.boxVisible(true);
         dbl.renderTo(svg);
 
@@ -147,7 +147,7 @@ describe("Interactive Components", () => {
         svg.remove();
       });
 
-      it("destroy() does not error if scales are not inputted", () => {
+      it("does not error on destroy() when scales are not inputted", () => {
         dbl.renderTo(svg);
         assert.doesNotThrow(() => dbl.destroy(), Error, "can destroy");
         svg.remove();
