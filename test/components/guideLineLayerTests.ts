@@ -4,14 +4,15 @@ describe("Interactive Components", () => {
   describe("GuideLineLayer", () => {
 
     describe("Basic Usage", () => {
-      it("scale()", () => {
+      it("can get and set the scale property", () => {
         let gll = new Plottable.Components.GuideLineLayer<Date>("vertical");
         let timeScale = new Plottable.Scales.Time();
+        assert.isUndefined(gll.scale(), "there is no default scale");
         assert.strictEqual(gll.scale(timeScale), gll, "setter returns the calling GuideLineLayer");
         assert.strictEqual(gll.scale(), timeScale, "getter returns the set Scale");
       });
 
-      it("value()", () => {
+      it("can get and set the value property", () => {
         let gll = new Plottable.Components.GuideLineLayer<number>("vertical");
         let expectedValue = 5;
         assert.isUndefined(gll.value(), "returns undefined before any value is set");
@@ -19,7 +20,7 @@ describe("Interactive Components", () => {
         assert.strictEqual(gll.value(), expectedValue, "getter returns the set value");
       });
 
-      it("pixelPosition()", () => {
+      it("can get and set the pixelPosition property", () => {
         let gll = new Plottable.Components.GuideLineLayer<void>("vertical");
         let expectedPosition = 5;
         assert.isUndefined(gll.pixelPosition(), "returns undefined before any pixel position is set");
@@ -32,7 +33,7 @@ describe("Interactive Components", () => {
         (<any> assert).throws(() => gll.pixelPosition(<any> "5"), Error, "", "Rejects stringy numbers");
       });
 
-      it("destroy() disconnects from scale safely", () => {
+      it("disconnects scales safely when using destroy()", () => {
         let scaleLessGLL = new Plottable.Components.GuideLineLayer<void>("vertical");
         assert.doesNotThrow(() => scaleLessGLL.destroy(), Error, "destroy() does not error if no scale was set");
         let timeScaleGLL = new Plottable.Components.GuideLineLayer<Date>("vertical");
@@ -49,12 +50,18 @@ describe("Interactive Components", () => {
       });
     });
 
-    describe("coordination between scale(), value(), and pixelPosition()", () => {
-      it("changing value() updates pixelPosition() if scale() is set", () => {
-        let linearScale = new Plottable.Scales.Linear();
+    describe("Coordination between scale(), value(), and pixelPosition()", () => {
+      let linearScale: Plottable.Scales.Linear;
+      let gll: Plottable.Components.GuideLineLayer<number>;
+
+      beforeEach(() => {
+        linearScale = new Plottable.Scales.Linear();
         linearScale.domain([0, 1]);
         linearScale.range([0, 100]);
-        let gll = new Plottable.Components.GuideLineLayer<number>("vertical");
+        gll = new Plottable.Components.GuideLineLayer<number>("vertical");
+      });
+
+      it("updates pixelPosition() when changing value() if scale() is set", () => {
         gll.scale(linearScale);
         let value = 0.5;
         let expectedPosition = linearScale.scale(value);
@@ -67,11 +74,7 @@ describe("Interactive Components", () => {
         assert.strictEqual(gll.pixelPosition(), expectedPositionB, "pixel position was updated when value was changed again");
       });
 
-      it("changing pixelPosition() updates value() if scale() is set", () => {
-        let linearScale = new Plottable.Scales.Linear();
-        linearScale.domain([0, 1]);
-        linearScale.range([0, 100]);
-        let gll = new Plottable.Components.GuideLineLayer<number>("vertical");
+      it("updates value() when changing pixelPosition() if scale() is set", () => {
         gll.scale(linearScale);
         let position = 50;
         let expectedValue = linearScale.invert(position);
@@ -84,11 +87,7 @@ describe("Interactive Components", () => {
         assert.strictEqual(gll.value(), expectedValueB, "value was updated when the position was changed again");
       });
 
-      it("changing the scale's domain updates pixelPositon() if value() was the last property set", () => {
-        let linearScale = new Plottable.Scales.Linear();
-        linearScale.domain([0, 1]);
-        linearScale.range([0, 100]);
-        let gll = new Plottable.Components.GuideLineLayer<number>("vertical");
+      it("updates pixelPositon() when the scale's domain changes if value() was the last property set", () => {
         gll.scale(linearScale);
         let value = 0.5;
         gll.value(value);
@@ -97,11 +96,7 @@ describe("Interactive Components", () => {
         assert.strictEqual(gll.pixelPosition(), linearScale.scale(value), "pixel position was updated when scale updated");
       });
 
-      it("changing the scale's domain updates value() if pixelPosition() was the last property set", () => {
-        let linearScale = new Plottable.Scales.Linear();
-        linearScale.domain([0, 1]);
-        linearScale.range([0, 100]);
-        let gll = new Plottable.Components.GuideLineLayer<number>("vertical");
+      it("updates value() when the scale's domain changes if pixelPosition() was the last property set", () => {
         gll.scale(linearScale);
         let pixelPosition = 50;
         gll.pixelPosition(pixelPosition);
@@ -110,13 +105,7 @@ describe("Interactive Components", () => {
         assert.strictEqual(gll.value(), linearScale.invert(pixelPosition), "value was updated when scale updated");
       });
 
-      it("changing the scale updates pixelPosition() if value() was the last property set", () => {
-        let linearScale = new Plottable.Scales.Linear();
-        linearScale.domain([0, 1]);
-        linearScale.range([0, 100]);
-
-        let gll = new Plottable.Components.GuideLineLayer<number>("vertical");
-
+      it("updates pixelPosition() when changing the scale if value() was the last property set", () => {
         let setPosition = -100;
         gll.pixelPosition(setPosition);
         let setValue = 0.5;
@@ -140,13 +129,7 @@ describe("Interactive Components", () => {
         assert.strictEqual((<any>linearScale)._callbacks.size, 0, "callback was removed from the previous Scale");
       });
 
-      it("changing the scale updates value() if pixelPosition() was the last property set", () => {
-        let linearScale = new Plottable.Scales.Linear();
-        linearScale.domain([0, 1]);
-        linearScale.range([0, 100]);
-
-        let gll = new Plottable.Components.GuideLineLayer<number>("vertical");
-
+      it("updates value() when changing the scale if pixelPosition() was the last property set", () => {
         let setValue = 0.5;
         gll.value(setValue);
         let setPosition = -100;
