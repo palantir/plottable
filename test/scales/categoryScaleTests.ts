@@ -61,27 +61,27 @@ describe("Scales", () => {
           });
         }
       });
+    });
 
-      describe("extent calculation", () => {
-        let scale: Plottable.Scales.Category;
+    describe("Extent calculation", () => {
+      let scale: Plottable.Scales.Category;
 
-        beforeEach(() => {
-          scale = new Plottable.Scales.Category();
-        });
+      beforeEach(() => {
+        scale = new Plottable.Scales.Category();
+      });
 
-        it("categoryScale gives the unique values when domain is stringy", () => {
-          let values = ["1", "3", "2", "1"];
-          let computedExtent = scale.extentOfValues(values);
+      it("categoryScale gives the unique values when domain is stringy", () => {
+        let values = ["1", "3", "2", "1"];
+        let computedExtent = scale.extentOfValues(values);
 
-          assert.deepEqual(computedExtent, ["1", "3", "2"], "the extent is made of all the unique values in the domain");
-        });
+        assert.deepEqual(computedExtent, ["1", "3", "2"], "the extent is made of all the unique values in the domain");
+      });
 
-        it("categoryScale gives the unique values when domain is numeric", () => {
-          let values = [1, 3, 2, 1];
-          let computedExtent = scale.extentOfValues(<any>values);
+      it("categoryScale gives the unique values when domain is numeric", () => {
+        let values = [1, 3, 2, 1];
+        let computedExtent = scale.extentOfValues(<any>values);
 
-          assert.deepEqual(computedExtent, [1, 3, 2], "the extent is made of all the unique values in the domain");
-        });
+        assert.deepEqual(computedExtent, [1, 3, 2], "the extent is made of all the unique values in the domain");
       });
     });
 
