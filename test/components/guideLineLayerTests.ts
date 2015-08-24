@@ -159,9 +159,9 @@ describe("Layer Components", () => {
     });
 
     describe("Rendering (vertical)", () => {
-      const SVG_WIDTH = 400;
-      const SVG_HEIGHT = 300;
-      const GUIDE_LINE_CLASS = "." + "guide-line";
+      let SVG_WIDTH = 400;
+      let SVG_HEIGHT = 300;
+      let GUIDE_LINE_CLASS = "." + "guide-line";
 
       let svg: d3.Selection<void>;
 
@@ -316,9 +316,9 @@ describe("Layer Components", () => {
     });
 
     describe("Rendering (horizontal)", () => {
-      const SVG_WIDTH = 300;
-      const SVG_HEIGHT = 400;
-      const GUIDE_LINE_CLASS = "." + "guide-line";
+      let SVG_WIDTH = 300;
+      let SVG_HEIGHT = 400;
+      let GUIDE_LINE_CLASS = "." + "guide-line";
 
       let svg: d3.Selection<void>;
 
