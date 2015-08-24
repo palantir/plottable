@@ -1,6 +1,6 @@
 ///<reference path="../testReference.ts" />
 
-describe("Interactive Components", () => {
+describe("Layer Components", () => {
   describe("GuideLineLayer", () => {
 
     describe("Basic Usage", () => {
@@ -27,10 +27,14 @@ describe("Interactive Components", () => {
         assert.strictEqual(gll.pixelPosition(expectedPosition), gll, "setter returns the calling GuideLineLayer");
         assert.strictEqual(gll.pixelPosition(), expectedPosition, "getter returns the set pixel position");
         // HACKHACK #2614: chai-assert.d.ts has the wrong signature
-        (<any> assert).throws(() => gll.pixelPosition(NaN), Error, "", "Rejects NaN");
-        (<any> assert).throws(() => gll.pixelPosition(Infinity), Error, "", "Rejects Infinity");
-        (<any> assert).throws(() => gll.pixelPosition(-Infinity), Error, "", "Rejects -Infinity");
-        (<any> assert).throws(() => gll.pixelPosition(<any> "5"), Error, "", "Rejects stringy numbers");
+        (<any> assert).throws(() => gll.pixelPosition(NaN), Error,
+          "pixelPosition must be a finite number", "Rejects NaN");
+        (<any> assert).throws(() => gll.pixelPosition(Infinity), Error,
+          "pixelPosition must be a finite number", "Rejects Infinity");
+        (<any> assert).throws(() => gll.pixelPosition(-Infinity), Error,
+          "pixelPosition must be a finite number", "Rejects -Infinity");
+        (<any> assert).throws(() => gll.pixelPosition(<any> "5"), Error,
+          "pixelPosition must be a finite number", "Rejects stringy numbers");
       });
 
       it("disconnects scales safely when using destroy()", () => {
@@ -87,7 +91,7 @@ describe("Interactive Components", () => {
         assert.strictEqual(gll.value(), expectedValueB, "value was updated when the position was changed again");
       });
 
-      it("updates pixelPositon() when the scale's domain changes if value() was the last property set", () => {
+      it("updates pixelPosition() when the scale's domain changes if value() was the last property set", () => {
         gll.scale(linearScale);
         let value = 0.5;
         gll.value(value);
@@ -155,9 +159,9 @@ describe("Interactive Components", () => {
     });
 
     describe("Rendering (vertical)", () => {
-      let SVG_WIDTH = 400;
-      let SVG_HEIGHT = 300;
-      let guidelineClass = "." + "guide-line";
+      const SVG_WIDTH = 400;
+      const SVG_HEIGHT = 300;
+      const GUIDE_LINE_CLASS = "." + "guide-line";
 
       let svg: d3.Selection<void>;
 
@@ -195,8 +199,8 @@ describe("Interactive Components", () => {
         gll.pixelPosition(expectedPosition1);
         gll.renderTo(svg);
 
-        assert.strictEqual(gll.content().selectAll(guidelineClass).size(), 1, "exactly one line is drawn");
-        let line = gll.content().select(guidelineClass);
+        assert.strictEqual(gll.content().selectAll(GUIDE_LINE_CLASS).size(), 1, "exactly one line is drawn");
+        let line = gll.content().select(GUIDE_LINE_CLASS);
         let expectedAttrs1 = {
           x1: expectedPosition1,
           x2: expectedPosition1,
@@ -207,8 +211,8 @@ describe("Interactive Components", () => {
 
         let expectedPosition2 = SVG_WIDTH * 3 / 4;
         gll.pixelPosition(expectedPosition2);
-        assert.strictEqual(gll.content().selectAll(guidelineClass).size(), 1, "exactly one line is drawn");
-        line = gll.content().select(guidelineClass);
+        assert.strictEqual(gll.content().selectAll(GUIDE_LINE_CLASS).size(), 1, "exactly one line is drawn");
+        line = gll.content().select(GUIDE_LINE_CLASS);
         let expectedAttrs2 = {
           x1: expectedPosition2,
           x2: expectedPosition2,
@@ -229,8 +233,8 @@ describe("Interactive Components", () => {
 
         let value1 = 5;
         gll.value(value1);
-        assert.strictEqual(gll.content().selectAll(guidelineClass).size(), 1, "exactly one line is drawn");
-        let line = gll.content().select(guidelineClass);
+        assert.strictEqual(gll.content().selectAll(GUIDE_LINE_CLASS).size(), 1, "exactly one line is drawn");
+        let line = gll.content().select(GUIDE_LINE_CLASS);
         let expectedAttrs1 = {
           x1: scale.scale(value1),
           x2: scale.scale(value1),
@@ -241,8 +245,8 @@ describe("Interactive Components", () => {
 
         let value2 = 8;
         gll.value(value2);
-        assert.strictEqual(gll.content().selectAll(guidelineClass).size(), 1, "exactly one line is drawn");
-        line = gll.content().select(guidelineClass);
+        assert.strictEqual(gll.content().selectAll(GUIDE_LINE_CLASS).size(), 1, "exactly one line is drawn");
+        line = gll.content().select(GUIDE_LINE_CLASS);
         let expectedAttrs2 = {
           x1: scale.scale(value2),
           x2: scale.scale(value2),
@@ -263,7 +267,7 @@ describe("Interactive Components", () => {
         let scale1 = new Plottable.Scales.Linear();
         scale1.domain([0, 10]);
         gll.scale(scale1);
-        let line = gll.content().select(guidelineClass);
+        let line = gll.content().select(GUIDE_LINE_CLASS);
         let expectedAttrs1 = {
           x1: scale1.scale(value),
           x2: scale1.scale(value),
@@ -284,7 +288,7 @@ describe("Interactive Components", () => {
         let scale2 = new Plottable.Scales.Linear();
         scale2.domain([0, 100]);
         gll.scale(scale2);
-        line = gll.content().select(guidelineClass);
+        line = gll.content().select(GUIDE_LINE_CLASS);
         let expectedAttrs2 = {
           x1: scale2.scale(value),
           x2: scale2.scale(value),
@@ -312,9 +316,9 @@ describe("Interactive Components", () => {
     });
 
     describe("Rendering (horizontal)", () => {
-      let SVG_WIDTH = 300;
-      let SVG_HEIGHT = 400;
-      let guidelineClass = "." + "guide-line";
+      const SVG_WIDTH = 300;
+      const SVG_HEIGHT = 400;
+      const GUIDE_LINE_CLASS = "." + "guide-line";
 
       let svg: d3.Selection<void>;
 
@@ -352,8 +356,8 @@ describe("Interactive Components", () => {
         gll.pixelPosition(expectedPosition1);
         gll.renderTo(svg);
 
-        assert.strictEqual(gll.content().selectAll(guidelineClass).size(), 1, "exactly one line is drawn");
-        let line = gll.content().select(guidelineClass);
+        assert.strictEqual(gll.content().selectAll(GUIDE_LINE_CLASS).size(), 1, "exactly one line is drawn");
+        let line = gll.content().select(GUIDE_LINE_CLASS);
         let expectedAttrs1 = {
           x1: 0,
           x2: SVG_WIDTH,
@@ -364,8 +368,8 @@ describe("Interactive Components", () => {
 
         let expectedPosition2 = SVG_WIDTH * 3 / 4;
         gll.pixelPosition(expectedPosition2);
-        assert.strictEqual(gll.content().selectAll(guidelineClass).size(), 1, "exactly one line is drawn");
-        line = gll.content().select(guidelineClass);
+        assert.strictEqual(gll.content().selectAll(GUIDE_LINE_CLASS).size(), 1, "exactly one line is drawn");
+        line = gll.content().select(GUIDE_LINE_CLASS);
         let expectedAttrs2 = {
           x1: 0,
           x2: SVG_WIDTH,
@@ -386,8 +390,8 @@ describe("Interactive Components", () => {
 
         let value1 = 5;
         gll.value(value1);
-        assert.strictEqual(gll.content().selectAll(guidelineClass).size(), 1, "exactly one line is drawn");
-        let line = gll.content().select(guidelineClass);
+        assert.strictEqual(gll.content().selectAll(GUIDE_LINE_CLASS).size(), 1, "exactly one line is drawn");
+        let line = gll.content().select(GUIDE_LINE_CLASS);
         let expectedAttrs1 = {
           x1: 0,
           x2: SVG_WIDTH,
@@ -398,8 +402,8 @@ describe("Interactive Components", () => {
 
         let value2 = 8;
         gll.value(value2);
-        assert.strictEqual(gll.content().selectAll(guidelineClass).size(), 1, "exactly one line is drawn");
-        line = gll.content().select(guidelineClass);
+        assert.strictEqual(gll.content().selectAll(GUIDE_LINE_CLASS).size(), 1, "exactly one line is drawn");
+        line = gll.content().select(GUIDE_LINE_CLASS);
         let expectedAttrs2 = {
           x1: 0,
           x2: SVG_WIDTH,
@@ -420,7 +424,7 @@ describe("Interactive Components", () => {
         let scale1 = new Plottable.Scales.Linear();
         scale1.domain([0, 10]);
         gll.scale(scale1);
-        let line = gll.content().select(guidelineClass);
+        let line = gll.content().select(GUIDE_LINE_CLASS);
         let expectedAttrs1 = {
           x1: 0,
           x2: SVG_WIDTH,
@@ -441,7 +445,7 @@ describe("Interactive Components", () => {
         let scale2 = new Plottable.Scales.Linear();
         scale2.domain([0, 100]);
         gll.scale(scale2);
-        line = gll.content().select(guidelineClass);
+        line = gll.content().select(GUIDE_LINE_CLASS);
         let expectedAttrs2 = {
           x1: 0,
           x2: SVG_WIDTH,
