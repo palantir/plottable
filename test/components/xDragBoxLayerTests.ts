@@ -17,8 +17,8 @@ describe("Interactive Components", () => {
         y: SVG_HEIGHT / 2
       };
       let quarterBottomRightPoint = {
-          x: SVG_WIDTH * 3 / 4,
-          y: SVG_HEIGHT * 3 / 4
+        x: SVG_WIDTH * 3 / 4,
+        y: SVG_HEIGHT * 3 / 4
       };
 
       let svg: d3.Selection<void>;
