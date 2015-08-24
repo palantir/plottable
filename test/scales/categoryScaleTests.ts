@@ -10,7 +10,7 @@ describe("Scales", () => {
         scale = new Plottable.Scales.Category();
       });
 
-      it("rangeBand is updated when domain changes", () => {
+      it("updates rangeBand when domain changes", () => {
         scale.range([0, 2679]);
 
         scale.domain(["1", "2", "3", "4"]);
@@ -20,7 +20,7 @@ describe("Scales", () => {
         assert.closeTo(scale.rangeBand(), 329, 1);
       });
 
-      it("stepWidth operates normally", () => {
+      it("computes the correct stepWidth", () => {
         scale.range([0, 3000]);
 
         scale.domain(["1", "2", "3", "4"]);
@@ -28,7 +28,7 @@ describe("Scales", () => {
         assert.strictEqual(scale.stepWidth(), widthSum, "step width is the sum of innerPadding width and band width");
       });
 
-      it("CategoryScale + BarPlot combo works as expected when the data is swapped", () => {
+      it("interacts well with BarPlot and data swapping", () => {
         // This unit test taken from SLATE, see SLATE-163 a fix for SLATE-102
         let xScale = new Plottable.Scales.Category();
         let yScale = new Plottable.Scales.Linear();
@@ -70,14 +70,14 @@ describe("Scales", () => {
         scale = new Plottable.Scales.Category();
       });
 
-      it("categoryScale gives the unique values when domain is stringy", () => {
+      it("gives the unique values when domain is stringy", () => {
         let values = ["1", "3", "2", "1"];
         let computedExtent = scale.extentOfValues(values);
 
         assert.deepEqual(computedExtent, ["1", "3", "2"], "the extent is made of all the unique values in the domain");
       });
 
-      it("categoryScale gives the unique values when domain is numeric", () => {
+      it("gives the unique values even when domain is numeric", () => {
         let values = [1, 3, 2, 1];
         let computedExtent = scale.extentOfValues(<any>values);
 
