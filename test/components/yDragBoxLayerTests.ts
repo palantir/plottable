@@ -2,57 +2,56 @@
 
 describe("Interactive Components", () => {
   describe("YDragBoxLayer", () => {
-    let SVG_WIDTH = 400;
-    let SVG_HEIGHT = 400;
+      let SVG_WIDTH = 400;
+      let SVG_HEIGHT = 400;
 
-    it("bounds()", () => {
-      let svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
-      let dbl = new Plottable.Components.YDragBoxLayer();
-      dbl.boxVisible(true);
-      dbl.renderTo(svg);
-
-      let topLeft = {
+      let quarterTopLeftPoint = {
         x: SVG_WIDTH / 4,
         y: SVG_HEIGHT / 4
       };
-      let bottomRight = {
+      let middlePoint = {
         x: SVG_WIDTH / 2,
         y: SVG_HEIGHT / 2
       };
+      let quarterBottomRightPoint = {
+          x: SVG_WIDTH * 3 / 4,
+          y: SVG_HEIGHT * 3 / 4
+      };
+
+      let svg: d3.Selection<void>;
+      let dbl: Plottable.Components.YDragBoxLayer;
+
+      beforeEach(() => {
+        svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+        dbl = new Plottable.Components.YDragBoxLayer();
+      });
+
+    it("bounds()", () => {
+      dbl.boxVisible(true);
+      dbl.renderTo(svg);
 
       dbl.bounds({
-        topLeft: topLeft,
-        bottomRight: bottomRight
+        topLeft: quarterTopLeftPoint,
+        bottomRight: middlePoint
       });
 
       let actualBounds = dbl.bounds();
       assert.strictEqual(actualBounds.topLeft.x, 0, "box starts at left");
-      assert.strictEqual(actualBounds.topLeft.y, topLeft.y, "top edge set correctly");
+      assert.strictEqual(actualBounds.topLeft.y, quarterTopLeftPoint.y, "top edge set correctly");
       assert.strictEqual(actualBounds.bottomRight.x, dbl.width(), "box ends at right");
-      assert.strictEqual(actualBounds.bottomRight.y, bottomRight.y, "bottom edge set correctly");
+      assert.strictEqual(actualBounds.bottomRight.y, middlePoint.y, "bottom edge set correctly");
 
       svg.remove();
     });
 
     it("resizes only in y", () => {
-      let svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
-      let dbl = new Plottable.Components.YDragBoxLayer();
       dbl.boxVisible(true);
       dbl.resizable(true);
       dbl.renderTo(svg);
 
-      let topLeft = {
-        x: SVG_WIDTH / 4,
-        y: SVG_HEIGHT / 4
-      };
-      let bottomRight = {
-        x: SVG_WIDTH / 2,
-        y: SVG_HEIGHT / 2
-      };
-
       dbl.bounds({
-        topLeft: topLeft,
-        bottomRight: bottomRight
+        topLeft: quarterTopLeftPoint,
+        bottomRight: middlePoint
       });
 
       let actualBounds = dbl.bounds();
@@ -69,24 +68,13 @@ describe("Interactive Components", () => {
     });
 
     it("stays full width after resizing", () => {
-      let svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
-      let dbl = new Plottable.Components.YDragBoxLayer();
       dbl.boxVisible(true);
       dbl.resizable(true);
       dbl.renderTo(svg);
 
-      let topLeft = {
-        x: SVG_WIDTH / 4,
-        y: SVG_HEIGHT / 4
-      };
-      let bottomRight = {
-        x: SVG_WIDTH / 2,
-        y: SVG_HEIGHT / 2
-      };
-
       dbl.bounds({
-        topLeft: topLeft,
-        bottomRight: bottomRight
+        topLeft: quarterTopLeftPoint,
+        bottomRight: middlePoint
       });
 
       let widthBefore = dbl.width();
@@ -104,39 +92,28 @@ describe("Interactive Components", () => {
     });
 
     it("throws error on getting x scale", () => {
-      let dbl = new Plottable.Components.YDragBoxLayer();
       assert.throws(() => dbl.xScale(), "no xScale");
+      svg.remove();
     });
 
     it("throws error on setting x scale", () => {
-      let dbl = new Plottable.Components.YDragBoxLayer();
       assert.throws(() => dbl.xScale(new Plottable.Scales.Linear()), "xScales cannot be set");
+      svg.remove();
     });
 
     it("throws error on getting x extent", () => {
-      let dbl = new Plottable.Components.YDragBoxLayer();
       assert.throws(() => dbl.xExtent(), "no xExtent");
+      svg.remove();
     });
 
     it("moves only in y", () => {
-      let svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
-      let dbl = new Plottable.Components.YDragBoxLayer();
       dbl.boxVisible(true);
       dbl.movable(true);
       dbl.renderTo(svg);
 
-      let topLeft = {
-        x: SVG_WIDTH / 4,
-        y: SVG_HEIGHT / 4
-      };
-      let bottomRight = {
-        x: SVG_WIDTH * 3 / 4,
-        y: SVG_HEIGHT * 3 / 4
-      };
-
       dbl.bounds({
-        topLeft: topLeft,
-        bottomRight: bottomRight
+        topLeft: quarterTopLeftPoint,
+        bottomRight: quarterBottomRightPoint
       });
 
       let boundsBefore = dbl.bounds();
@@ -164,13 +141,12 @@ describe("Interactive Components", () => {
       ydbl.resizable(false);
       ydbl.enabled(true);
       assert.isFalse(ydbl.hasClass("y-resizable"), "does not carry \"y-resizable\" class if enabled, but not resizable");
+      svg.remove();
     });
 
     it("destroy() does not error if scales are not inputted", () => {
-      let svg = TestMethods.generateSVG();
-      let sbl = new Plottable.Components.YDragBoxLayer();
-      sbl.renderTo(svg);
-      assert.doesNotThrow(() => sbl.destroy(), Error, "can destroy");
+      dbl.renderTo(svg);
+      assert.doesNotThrow(() => dbl.destroy(), Error, "can destroy");
 
       svg.remove();
     });
