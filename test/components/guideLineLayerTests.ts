@@ -154,9 +154,15 @@ describe("Interactive Components", () => {
       });
     });
 
-    describe("rendering (vertical)", () => {
+    describe("Rendering (vertical)", () => {
       let SVG_WIDTH = 400;
       let SVG_HEIGHT = 300;
+
+      let svg: d3.Selection<void>;
+
+      beforeEach(() => {
+        svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+      });
 
       it("requests no space, but will occupy all offered space", () => {
         let gll = new Plottable.Components.GuideLineLayer<void>("vertical");
@@ -165,7 +171,6 @@ describe("Interactive Components", () => {
         assert.isTrue(gll.fixedWidth(), "fixed width");
         assert.isTrue(gll.fixedHeight(), "fixed height");
 
-        let svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
         gll.anchor(svg);
         gll.computeLayout({x: 0, y: 0}, SVG_WIDTH, SVG_HEIGHT);
         assert.strictEqual(gll.width(), SVG_WIDTH, "accepted all offered width");
@@ -174,7 +179,6 @@ describe("Interactive Components", () => {
       });
 
       it("clipPath enabled", () => {
-        let svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
         let gll = new Plottable.Components.GuideLineLayer<void>("vertical");
         gll.renderTo(svg);
         TestMethods.verifyClipPath(gll);
@@ -185,7 +189,6 @@ describe("Interactive Components", () => {
       });
 
       it("renders correctly given a pixel position", () => {
-        let svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
         let expectedPosition1 = SVG_WIDTH / 2;
         let gll = new Plottable.Components.GuideLineLayer<number>("vertical");
         gll.pixelPosition(expectedPosition1);
@@ -217,7 +220,6 @@ describe("Interactive Components", () => {
       });
 
       it("renders correctly given a value and scale", () => {
-        let svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
         let gll = new Plottable.Components.GuideLineLayer<number>("vertical");
         gll.renderTo(svg);
         let scale = new Plottable.Scales.Linear();
@@ -252,7 +254,6 @@ describe("Interactive Components", () => {
       });
 
       it("re-renders correctly when the scale is updated", () => {
-        let svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
         let gll = new Plottable.Components.GuideLineLayer<number>("vertical");
         let value = 5;
         gll.value(value);
@@ -295,7 +296,6 @@ describe("Interactive Components", () => {
       });
 
       it("sets the scale's range based on the allocated width", () => {
-        let svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
         let gll = new Plottable.Components.GuideLineLayer<number>("vertical");
         let scale1 = new Plottable.Scales.Linear();
         gll.scale(scale1);
@@ -310,9 +310,15 @@ describe("Interactive Components", () => {
       });
     });
 
-    describe("rendering (horizontal)", () => {
+    describe("Rendering (horizontal)", () => {
       let SVG_WIDTH = 300;
       let SVG_HEIGHT = 400;
+
+      let svg: d3.Selection<void>;
+
+      beforeEach(() => {
+        svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+      });
 
       it("requests no space, but will occupy all offered space", () => {
         let gll = new Plottable.Components.GuideLineLayer<void>("horizontal");
@@ -321,7 +327,6 @@ describe("Interactive Components", () => {
         assert.isTrue(gll.fixedWidth(), "fixed width");
         assert.isTrue(gll.fixedHeight(), "fixed height");
 
-        let svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
         gll.anchor(svg);
         gll.computeLayout({x: 0, y: 0}, SVG_WIDTH, SVG_HEIGHT);
         assert.strictEqual(gll.width(), SVG_WIDTH, "accepted all offered width");
@@ -330,7 +335,6 @@ describe("Interactive Components", () => {
       });
 
       it("clipPath enabled", () => {
-        let svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
         let gll = new Plottable.Components.GuideLineLayer<void>("horizontal");
         gll.renderTo(svg);
         TestMethods.verifyClipPath(gll);
@@ -341,7 +345,6 @@ describe("Interactive Components", () => {
       });
 
       it("renders correctly given a pixel position", () => {
-        let svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
         let expectedPosition1 = SVG_WIDTH / 2;
         let gll = new Plottable.Components.GuideLineLayer<number>("horizontal");
         gll.pixelPosition(expectedPosition1);
@@ -373,7 +376,6 @@ describe("Interactive Components", () => {
       });
 
       it("renders correctly given a value and scale", () => {
-        let svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
         let gll = new Plottable.Components.GuideLineLayer<number>("horizontal");
         gll.renderTo(svg);
         let scale = new Plottable.Scales.Linear();
@@ -408,7 +410,6 @@ describe("Interactive Components", () => {
       });
 
       it("re-renders correctly when the scale is updated", () => {
-        let svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
         let gll = new Plottable.Components.GuideLineLayer<number>("horizontal");
         let value = 5;
         gll.value(value);
@@ -451,7 +452,6 @@ describe("Interactive Components", () => {
       });
 
       it("sets the scale's range based on the allocated height", () => {
-        let svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
         let gll = new Plottable.Components.GuideLineLayer<number>("horizontal");
         let scale1 = new Plottable.Scales.Linear();
         gll.scale(scale1);
