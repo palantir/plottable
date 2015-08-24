@@ -8,13 +8,28 @@ describe("Interactive Components", () => {
       let svgHeight = 500;
 
       let svg: d3.Selection<void>;
+      let sbl: Plottable.Components.SelectionBoxLayer;
 
       beforeEach(() => {
         svg = TestMethods.generateSVG(svgWidth, svgHeight);
+        sbl = new Plottable.Components.SelectionBoxLayer();
       });
 
-      it("boxVisible()", () => {
-        let sbl = new Plottable.Components.SelectionBoxLayer();
+      it("can get and set the boxVisible() property", () => {
+        assert.strictEqual(sbl.boxVisible(), false, "The box is not visible by default");
+
+        sbl.renderTo(svg);
+        assert.strictEqual(sbl.boxVisible(), false, "The box is not visible by default after rendering to svg");
+
+        assert.strictEqual(sbl.boxVisible(true), sbl, "Setting the boxVisible attribute returns the selection box layer");
+        assert.strictEqual(sbl.boxVisible(), true, "Setting the boxVisible to true attribute works");
+        sbl.boxVisible(false);
+        assert.strictEqual(sbl.boxVisible(), false, "Setting the boxVisible attribute to false works");
+
+        svg.remove();
+      });
+
+      it("renders the box in accordance to boxVisible() property", () => {
         sbl.renderTo(svg);
 
         let selectionBox = svg.select(".selection-box");
@@ -31,8 +46,7 @@ describe("Interactive Components", () => {
         svg.remove();
       });
 
-      it("destroy() does not error if scales are not inputted", () => {
-        let sbl = new Plottable.Components.SelectionBoxLayer();
+      it("does not error on destroy() when scales are not inputted", () => {
         sbl.renderTo(svg);
         assert.doesNotThrow(() => sbl.destroy(), Error, "can destroy even with no scales");
 
@@ -40,8 +54,6 @@ describe("Interactive Components", () => {
       });
 
       it("bounds()", () => {
-        let sbl = new Plottable.Components.SelectionBoxLayer();
-
         let topLeft: Plottable.Point = {
           x: 100,
           y: 100
@@ -85,7 +97,6 @@ describe("Interactive Components", () => {
       });
 
       it("has an effective size of 0, but will occupy all offered space", () => {
-        let sbl = new Plottable.Components.SelectionBoxLayer();
         let request = sbl.requestedSpace(400, 400);
         TestMethods.verifySpaceRequest(request, 0, 0, "does not request any space");
         assert.isTrue(sbl.fixedWidth(), "fixed width");
@@ -99,7 +110,6 @@ describe("Interactive Components", () => {
         xScale.domain([0, 2000]);
         xScale.range([0, svgWidth]);
 
-        let sbl = new Plottable.Components.SelectionBoxLayer();
         sbl.xScale(xScale);
         sbl.renderTo(svg);
 
@@ -133,7 +143,6 @@ describe("Interactive Components", () => {
         yScale.domain([0, 2000]);
         yScale.range([0, svgHeight]);
 
-        let sbl = new Plottable.Components.SelectionBoxLayer();
         sbl.yScale(yScale);
         sbl.renderTo(svg);
 
@@ -167,7 +176,6 @@ describe("Interactive Components", () => {
         xScale.domain([0, 2000]);
         xScale.range([0, svgHeight]);
 
-        let sbl = new Plottable.Components.SelectionBoxLayer();
         sbl.xScale(xScale);
         sbl.renderTo(svg);
 
