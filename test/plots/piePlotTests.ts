@@ -275,7 +275,7 @@ describe("Plots", () => {
 
       beforeEach(() => {
         svg = TestMethods.generateSVG(500, 500);
-        simpleData = [{value: 5, value2: 10, type: "A"}, {value: 15, value2: 10, type: "B"}];
+        simpleData = [{value: 5, type: "A"}, {value: 15, type: "B"}];
         simpleDataset = new Plottable.Dataset(simpleData);
         piePlot = new Plottable.Plots.Pie();
         piePlot.addDataset(simpleDataset);
@@ -316,37 +316,6 @@ describe("Plots", () => {
         let secondPathPoints1 = pathPoints1[2].split(",");
         assert.closeTo(parseFloat(secondPathPoints1[0]), 0, 1, "draws line to origin");
         assert.closeTo(parseFloat(secondPathPoints1[1]), 0, 1, "draws line to origin");
-        svg.remove();
-      });
-
-      it("project value onto different attribute", () => {
-        piePlot.sectorValue((d) => d.value2);
-
-        let arcPaths = renderArea.selectAll(".arc.fill");
-        assert.lengthOf(arcPaths[0], 2, "only has two sectors");
-        let arcPath0 = d3.select(arcPaths[0][0]);
-        let pathPoints0 = TestMethods.normalizePath(arcPath0.attr("d")).split(/[A-Z]/).slice(1, 4);
-
-        let firstPathPoints0 = pathPoints0[0].split(",");
-        assert.closeTo(parseFloat(firstPathPoints0[0]), 0, 1, "draws line vertically at beginning");
-        assert.operator(parseFloat(firstPathPoints0[1]), "<", 0, "draws line upwards");
-
-        let arcDestPoint0 = pathPoints0[1].split(",").slice(5);
-        assert.closeTo(parseFloat(arcDestPoint0[0]), 0, 1, "ends on a line vertically from beginning");
-        assert.operator(parseFloat(arcDestPoint0[1]), ">", 0, "ends below the center");
-
-        let arcPath1 = d3.select(arcPaths[0][1]);
-        let pathPoints1 = TestMethods.normalizePath(arcPath1.attr("d")).split(/[A-Z]/).slice(1, 4);
-
-        let firstPathPoints1 = pathPoints1[0].split(",");
-        assert.closeTo(parseFloat(firstPathPoints1[0]), 0, 1, "draws line vertically at beginning");
-        assert.operator(parseFloat(firstPathPoints1[1]), ">", 0, "draws line downwards");
-
-        let arcDestPoint1 = pathPoints1[1].split(",").slice(5);
-        assert.closeTo(parseFloat(arcDestPoint1[0]), 0, 1, "ends on a line vertically from beginning");
-        assert.operator(parseFloat(arcDestPoint1[1]), "<", 0, "ends above the center");
-
-        piePlot.sectorValue((d) => d.value);
         svg.remove();
       });
 
@@ -402,7 +371,7 @@ describe("Plots", () => {
 
       beforeEach(() => {
         svg = TestMethods.generateSVG(500, 500);
-        simpleData = [{value: 5, value2: 10, type: "A"}, {value: 15, value2: 10, type: "B"}];
+        simpleData = [{value: 5, type: "A"}, {value: 15, type: "B"}];
         simpleDataset = new Plottable.Dataset(simpleData);
         piePlot = new Plottable.Plots.Pie();
         piePlot.addDataset(simpleDataset);
@@ -492,7 +461,7 @@ describe("Plots", () => {
 
       beforeEach(() => {
         svg = TestMethods.generateSVG(500, 500);
-        simpleData = [{value: 5, value2: 10, type: "A"}, {value: 15, value2: 10, type: "B"}];
+        simpleData = [{value: 5, type: "A"}, {value: 15, type: "B"}];
         simpleDataset = new Plottable.Dataset(simpleData);
         piePlot = new Plottable.Plots.Pie();
         piePlot.addDataset(simpleDataset);
