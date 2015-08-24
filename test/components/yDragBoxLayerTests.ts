@@ -27,7 +27,7 @@ describe("Interactive Components", () => {
         dbl = new Plottable.Components.YDragBoxLayer();
       });
 
-      it("bounds()", () => {
+      it("has the correct bounds()", () => {
         dbl.boxVisible(true);
         dbl.renderTo(svg);
 
@@ -134,18 +134,18 @@ describe("Interactive Components", () => {
       });
 
       it("does not have resizable CSS class when enabled(false)", () => {
-        let ydbl = new Plottable.Components.YDragBoxLayer();
-        ydbl.resizable(true);
-        assert.isTrue(ydbl.hasClass("y-resizable"), "carries \"y-resizable\" class if resizable");
-        ydbl.enabled(false);
-        assert.isFalse(ydbl.hasClass("y-resizable"), "does not carry \"y-resizable\" class if resizable, but not enabled");
-        ydbl.resizable(false);
-        ydbl.enabled(true);
-        assert.isFalse(ydbl.hasClass("y-resizable"), "does not carry \"y-resizable\" class if enabled, but not resizable");
+        dbl.resizable(true);
+        assert.isTrue(dbl.hasClass("y-resizable"), "carries \"y-resizable\" class if resizable");
+        dbl.enabled(false);
+        assert.isFalse(dbl.hasClass("y-resizable"), "does not carry \"y-resizable\" class if resizable, but not enabled");
+        dbl.resizable(false);
+        dbl.enabled(true);
+        assert.isFalse(dbl.hasClass("y-resizable"), "does not carry \"y-resizable\" class if enabled, but not resizable");
+
         svg.remove();
       });
 
-      it("destroy() does not error if scales are not inputted", () => {
+      it("does not error on destroy() when scales are not inputted", () => {
         dbl.renderTo(svg);
         assert.doesNotThrow(() => dbl.destroy(), Error, "can destroy");
 

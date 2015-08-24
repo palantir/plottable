@@ -2,9 +2,7 @@
 
 describe("Interactive Components", () => {
   describe("XDragBoxLayer", () => {
-
     describe("Basic Usage", () => {
-
       let SVG_WIDTH = 400;
       let SVG_HEIGHT = 400;
 
@@ -29,7 +27,7 @@ describe("Interactive Components", () => {
         dbl = new Plottable.Components.XDragBoxLayer();
       });
 
-      it("has the correct bounds", () => {
+      it("has the correct bounds()", () => {
         dbl.boxVisible(true);
         dbl.renderTo(svg);
 
