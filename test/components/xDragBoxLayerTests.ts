@@ -21,9 +21,15 @@ describe("Interactive Components", () => {
           y: SVG_HEIGHT * 3 / 4
       };
 
+      let svg: d3.Selection<void>;
+      let dbl: Plottable.Components.XDragBoxLayer;
+
+      beforeEach(() => {
+        svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+        dbl = new Plottable.Components.XDragBoxLayer();
+      });
+
       it("bounds()", () => {
-        let svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
-        let dbl = new Plottable.Components.XDragBoxLayer();
         dbl.boxVisible(true);
         dbl.renderTo(svg);
 
@@ -42,8 +48,6 @@ describe("Interactive Components", () => {
       });
 
       it("resizes only in x", () => {
-        let svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
-        let dbl = new Plottable.Components.XDragBoxLayer();
         dbl.boxVisible(true);
         dbl.resizable(true);
         dbl.renderTo(svg);
@@ -67,8 +71,6 @@ describe("Interactive Components", () => {
       });
 
       it("stays full height after resizing", () => {
-        let svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
-        let dbl = new Plottable.Components.XDragBoxLayer();
         dbl.boxVisible(true);
         dbl.resizable(true);
         dbl.renderTo(svg);
@@ -93,23 +95,21 @@ describe("Interactive Components", () => {
       });
 
       it("throws error on getting y scale", () => {
-        let dbl = new Plottable.Components.XDragBoxLayer();
         assert.throws(() => dbl.yScale(), "no yScale");
+        svg.remove();
       });
 
       it("throws error on setting y scale", () => {
-        let dbl = new Plottable.Components.XDragBoxLayer();
         assert.throws(() => dbl.yScale(new Plottable.Scales.Linear()), "yScales cannot be set");
+        svg.remove();
       });
 
       it("throws error on getting y extent", () => {
-        let dbl = new Plottable.Components.XDragBoxLayer();
         assert.throws(() => dbl.yExtent(), "no yExtent");
+        svg.remove();
       });
 
       it("moves only in x", () => {
-        let svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
-        let dbl = new Plottable.Components.XDragBoxLayer();
         dbl.boxVisible(true);
         dbl.movable(true);
         dbl.renderTo(svg);
@@ -136,22 +136,20 @@ describe("Interactive Components", () => {
       });
 
       it("does not have resizable CSS class when enabled(false)", () => {
-        let xdbl = new Plottable.Components.XDragBoxLayer();
-        xdbl.resizable(true);
-        assert.isTrue(xdbl.hasClass("x-resizable"), "carries \"x-resizable\" class if resizable");
-        xdbl.enabled(false);
-        assert.isFalse(xdbl.hasClass("x-resizable"), "does not carry \"x-resizable\" class if resizable, but not enabled");
-        xdbl.resizable(false);
-        xdbl.enabled(true);
-        assert.isFalse(xdbl.hasClass("x-resizable"), "does not carry \"x-resizable\" class if enabled, but not resizable");
+        dbl.resizable(true);
+        assert.isTrue(dbl.hasClass("x-resizable"), "carries \"x-resizable\" class if resizable");
+        dbl.enabled(false);
+        assert.isFalse(dbl.hasClass("x-resizable"), "does not carry \"x-resizable\" class if resizable, but not enabled");
+        dbl.resizable(false);
+        dbl.enabled(true);
+        assert.isFalse(dbl.hasClass("x-resizable"), "does not carry \"x-resizable\" class if enabled, but not resizable");
+
+        svg.remove();
       });
 
       it("destroy() does not error if scales are not inputted", () => {
-        let svg = TestMethods.generateSVG();
-        let sbl = new Plottable.Components.XDragBoxLayer();
-        sbl.renderTo(svg);
-        assert.doesNotThrow(() => sbl.destroy(), Error, "can destroy");
-
+        dbl.renderTo(svg);
+        assert.doesNotThrow(() => dbl.destroy(), Error, "can destroy");
         svg.remove();
       });
     });
