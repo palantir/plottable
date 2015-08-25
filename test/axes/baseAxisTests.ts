@@ -544,7 +544,8 @@ describe("BaseAxis", () => {
             let annotationRects = axis.content().selectAll(".annotation-rect");
             annotationRects.each(function (d) {
               let annotationRect = d3.select(this);
-              assert.strictEqual(TestMethods.numAttr(annotationRect, "x"), scale.scale(d), "rectangle positioned correctly");
+              assert.closeTo(TestMethods.numAttr(annotationRect, "x"), scale.scale(d),
+                window.Pixel_CloseTo_Requirement, "rectangle positioned correctly");
             });
             svg.remove();
           });
@@ -560,7 +561,8 @@ describe("BaseAxis", () => {
             let annotationRects = axis.content().selectAll(".annotation-rect");
             annotationRects.each(function (d) {
               let annotationRect = d3.select(this);
-              assert.strictEqual(TestMethods.numAttr(annotationRect, "x"), scale.scale(d), "rectangle positioned correctly");
+              assert.closeTo(TestMethods.numAttr(annotationRect, "x"), scale.scale(d),
+                window.Pixel_CloseTo_Requirement, "rectangle positioned correctly");
             });
             svg.remove();
           });
@@ -576,7 +578,8 @@ describe("BaseAxis", () => {
             let annotationRects = axis.content().selectAll(".annotation-rect");
             annotationRects.each(function (d) {
               let annotationRect = d3.select(this);
-              assert.strictEqual(TestMethods.numAttr(annotationRect, "y"), scale.scale(d), "rectangle positioned correctly");
+              assert.closeTo(TestMethods.numAttr(annotationRect, "y"), scale.scale(d),
+                window.Pixel_CloseTo_Requirement, "rectangle positioned correctly");
             });
             svg.remove();
           });
@@ -592,7 +595,8 @@ describe("BaseAxis", () => {
             let annotationRects = axis.content().selectAll(".annotation-rect");
             annotationRects.each(function (d) {
               let annotationRect = d3.select(this);
-              assert.strictEqual(TestMethods.numAttr(annotationRect, "y"), scale.scale(d), "rectangle positioned correctly");
+              assert.closeTo(TestMethods.numAttr(annotationRect, "y"), scale.scale(d), window.Pixel_CloseTo_Requirement,
+                "rectangle positioned correctly");
             });
             svg.remove();
           });
