@@ -84,3 +84,4 @@
 ///<reference path="components/dragBoxLayerTests.ts" />
 ///<reference path="components/xDragBoxLayerTests.ts" />
 ///<reference path="components/yDragBoxLayerTests.ts" />
+///<reference path="components/dragLineLayerTests.ts" />

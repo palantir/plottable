@@ -164,6 +164,14 @@ svg.plottable {
   stroke-width: 1px;
 }
 
+.plottable .drag-line-layer.enabled.vertical line.drag-edge {
+  cursor: ew-resize;
+}
+
+.plottable .drag-line-layer.enabled.horizontal line.drag-edge {
+  cursor: ns-resize;
+}
+
 .plottable .legend text {
   fill: #32313F;
   font-family: "Helvetica Neue", sans-serif;

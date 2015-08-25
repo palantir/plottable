@@ -4,6 +4,13 @@ describe("Layer Components", () => {
   describe("GuideLineLayer", () => {
 
     describe("Basic Usage", () => {
+      it("has the \"vertical\" class if vertical, and the \"horizontal\" class if horizontal", () => {
+        let verticalGLL = new Plottable.Components.GuideLineLayer<void>("vertical");
+        assert.isTrue(verticalGLL.hasClass("vertical"), "vertical GuideLineLayer has \"vertical\" class");
+        let horizontalGLL = new Plottable.Components.GuideLineLayer<void>("horizontal");
+        assert.isTrue(horizontalGLL.hasClass("horizontal"), "horizontal GuideLineLayer has \"horizontal\" class");
+      });
+
       it("can get and set the scale property", () => {
         let gll = new Plottable.Components.GuideLineLayer<Date>("vertical");
         let timeScale = new Plottable.Scales.Time();

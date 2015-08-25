@@ -93,3 +93,4 @@
 /// <reference path="components/dragBoxLayer.ts" />
 /// <reference path="components/xDragBoxLayer.ts" />
 /// <reference path="components/yDragBoxLayer.ts" />
+/// <reference path="components/dragLineLayer.ts" />
