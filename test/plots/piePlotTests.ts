@@ -275,7 +275,7 @@ describe("Plots", () => {
 
       beforeEach(() => {
         svg = TestMethods.generateSVG(500, 500);
-        simpleData = [{value: 5, type: "A"}, {value: 15, type: "B"}];
+        simpleData = [{value: 5}, {value: 15}];
         simpleDataset = new Plottable.Dataset(simpleData);
         piePlot = new Plottable.Plots.Pie();
         piePlot.addDataset(simpleDataset);
@@ -316,6 +316,17 @@ describe("Plots", () => {
         let secondPathPoints1 = pathPoints1[2].split(",");
         assert.closeTo(parseFloat(secondPathPoints1[0]), 0, 1, "draws line to origin");
         assert.closeTo(parseFloat(secondPathPoints1[1]), 0, 1, "draws line to origin");
+        svg.remove();
+      });
+
+      it("sectors are filled in according to defaults", () => {
+        let arcPaths = renderArea.selectAll(".arc");
+
+        let arcPath0 = d3.select(arcPaths[0][0]);
+        assert.strictEqual(arcPath0.attr("fill"), "#5279c7", "first sector filled appropriately");
+
+        let arcPath1 = d3.select(arcPaths[0][1]);
+        assert.strictEqual(arcPath1.attr("fill"), "#fd373e", "second sector filled appropriately");
         svg.remove();
       });
 
@@ -371,7 +382,7 @@ describe("Plots", () => {
 
       beforeEach(() => {
         svg = TestMethods.generateSVG(500, 500);
-        simpleData = [{value: 5, type: "A"}, {value: 15, type: "B"}];
+        simpleData = [{value: 5}, {value: 15}];
         simpleDataset = new Plottable.Dataset(simpleData);
         piePlot = new Plottable.Plots.Pie();
         piePlot.addDataset(simpleDataset);
@@ -450,55 +461,6 @@ describe("Plots", () => {
         svg.remove();
       });
 
-    });
-
-    describe("Fill", () => {
-      let svg: d3.Selection<void>;
-      let simpleDataset: Plottable.Dataset;
-      let simpleData: any[];
-      let piePlot: Plottable.Plots.Pie;
-      let renderArea: d3.Selection<void>;
-
-      beforeEach(() => {
-        svg = TestMethods.generateSVG(500, 500);
-        simpleData = [{value: 5, type: "A"}, {value: 15, type: "B"}];
-        simpleDataset = new Plottable.Dataset(simpleData);
-        piePlot = new Plottable.Plots.Pie();
-        piePlot.addDataset(simpleDataset);
-        piePlot.sectorValue((d) => d.value);
-        piePlot.renderTo(svg);
-        renderArea = (<any> piePlot)._renderArea;
-      });
-
-      it("sectors are filled in according to defaults", () => {
-        let arcPaths = renderArea.selectAll(".arc");
-
-        let arcPath0 = d3.select(arcPaths[0][0]);
-        assert.strictEqual(arcPath0.attr("fill"), "#5279c7", "first sector filled appropriately");
-
-        let arcPath1 = d3.select(arcPaths[0][1]);
-        assert.strictEqual(arcPath1.attr("fill"), "#fd373e", "second sector filled appropriately");
-        svg.remove();
-      });
-
-      it("project fill", () => {
-        piePlot.attr("fill", (d: any, i: number) => String(i), new Plottable.Scales.Color("10"));
-
-        let arcPaths = renderArea.selectAll(".arc");
-
-        let arcPath0 = d3.select(arcPaths[0][0]);
-        assert.strictEqual(arcPath0.attr("fill"), "#1f77b4", "first sector filled appropriately");
-
-        let arcPath1 = d3.select(arcPaths[0][1]);
-        assert.strictEqual(arcPath1.attr("fill"), "#ff7f0e", "second sector filled appropriately");
-
-        piePlot.attr("fill", (d) => d.type, new Plottable.Scales.Color("20"));
-
-        assert.strictEqual(arcPath0.attr("fill"), "#1f77b4", "first sector filled appropriately");
-
-        assert.strictEqual(arcPath1.attr("fill"), "#aec7e8", "second sector filled appropriately");
-        svg.remove();
-      });
     });
   });
 
