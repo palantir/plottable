@@ -13,7 +13,7 @@ describe("Plots", () => {
       svg.remove();
     });
 
-    it("each slice consists of a fill path and a stroke path", () => {
+    it("draws a fill path and a stroke path for each slice", () => {
       let svg = TestMethods.generateSVG(500, 500);
       let piePlot = new Plottable.Plots.Pie();
       piePlot.sectorValue((d) => d.value);
@@ -36,7 +36,7 @@ describe("Plots", () => {
       svg.remove();
     });
 
-    it("each entity selection consists of a fill path and a stroke path", () => {
+    it("returns both a fill path and a stroke path in each Entity's selection", () => {
       let svg = TestMethods.generateSVG(500, 500);
       let piePlot = new Plottable.Plots.Pie();
       piePlot.sectorValue((d) => d.value);
@@ -101,7 +101,7 @@ describe("Plots", () => {
         piePlot.labelsEnabled(true);
       });
 
-      it("rendering twice does not erase or add labels", () => {
+      it("does not erase or add labels when rendered twice", () => {
         let data = [
           { value: 1 },
           { value: 2 },
@@ -185,7 +185,7 @@ describe("Plots", () => {
         svg.remove();
       });
 
-      it("formatters are used properly", () => {
+      it("uses its formatter to format labels", () => {
         let data = [
           { value: 5 },
           { value: 15 }
@@ -201,7 +201,7 @@ describe("Plots", () => {
         svg.remove();
       });
 
-      it("labels are shown and hidden appropriately", () => {
+      it("hides labels if they don't fit", () => {
         let data = [
           { value: 1 }, { value: 50 },
           { value: 1 }, { value: 50 },
@@ -226,7 +226,7 @@ describe("Plots", () => {
         svg.remove();
       });
 
-      it("labels outside of the render area are hidden", () => {
+      it("hides labels outside of the render area", () => {
         let data = [
           { value: 5000 },
           { value: 5000 },
@@ -249,7 +249,7 @@ describe("Plots", () => {
         svg.remove();
       });
 
-      it("does not show label for invalid data", () => {
+      it("does not show labels for invalid data", () => {
         let data = [
           { value: 1 },
           { value: "value" },
@@ -284,7 +284,7 @@ describe("Plots", () => {
         renderArea = (<any> piePlot)._renderArea;
       });
 
-      it("sectors divided evenly", () => {
+      it("draws slices proportional in angle to their value", () => {
         let arcPaths = renderArea.selectAll(".arc.fill");
         assert.lengthOf(arcPaths[0], 2, "only has two sectors");
         let arcPath0 = d3.select(arcPaths[0][0]);
@@ -319,7 +319,7 @@ describe("Plots", () => {
         svg.remove();
       });
 
-      it("sectors are filled in according to defaults", () => {
+      it("uses a plottable-colors color scale to color sectors by default", () => {
         let arcPaths = renderArea.selectAll(".arc");
 
         let arcPath0 = d3.select(arcPaths[0][0]);
@@ -330,7 +330,7 @@ describe("Plots", () => {
         svg.remove();
       });
 
-      it("innerRadius", () => {
+      it("can set innerRadius", () => {
         piePlot.innerRadius(5);
         let arcPaths = renderArea.selectAll(".arc.fill");
         assert.lengthOf(arcPaths[0], 2, "only has two sectors");
@@ -351,7 +351,7 @@ describe("Plots", () => {
         svg.remove();
       });
 
-      it("outerRadius", () => {
+      it("can set outerRadius", () => {
         piePlot.outerRadius(() => 150);
         let arcPaths = renderArea.selectAll(".arc.fill");
         assert.lengthOf(arcPaths[0], 2, "only has two sectors");
@@ -409,7 +409,7 @@ describe("Plots", () => {
         svg.remove();
       });
 
-      it("skips invalid Datsets", () => {
+      it("skips invalid Datasets", () => {
         let allSectors = piePlot.selections([new Plottable.Dataset([])]);
         assert.strictEqual(allSectors.size(), 0, "no sectors retrieved");
 
@@ -484,7 +484,7 @@ describe("Plots", () => {
     });
 
     describe("fail safe tests", () => {
-      it("undefined, NaN, non-numeric strings, and negative number not be represented in a Pie Chart", () => {
+      it("does not render slices for undefined, NaN, strings, or negative numbers", () => {
         let svg = TestMethods.generateSVG();
 
         let data1 = [
