@@ -25,6 +25,7 @@ describe("Interactive Components", () => {
       dll.renderTo(svg);
       let dragEdge = dll.content().select(".drag-edge");
       let computedStyles = window.getComputedStyle(<Element> dragEdge.node());
+      assert.notStrictEqual(computedStyles.stroke, "none", "drag-edge has a non-\"none\" stroke");
       assert.strictEqual(computedStyles.cursor, "ew-resize", "shows the resize cursor if enabled");
       dll.enabled(false);
       computedStyles = window.getComputedStyle(<Element> dragEdge.node());
@@ -38,6 +39,7 @@ describe("Interactive Components", () => {
       dll.renderTo(svg);
       let dragEdge = dll.content().select(".drag-edge");
       let computedStyles = window.getComputedStyle(<Element> dragEdge.node());
+      assert.notStrictEqual(computedStyles.stroke, "none", "drag-edge has a non-\"none\" stroke");
       assert.strictEqual(computedStyles.cursor, "ns-resize", "shows the resize cursor if enabled");
       dll.enabled(false);
       computedStyles = window.getComputedStyle(<Element> dragEdge.node());

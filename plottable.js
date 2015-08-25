@@ -11933,8 +11933,8 @@ var Plottable;
             DragLineLayer.prototype._setup = function () {
                 _super.prototype._setup.call(this);
                 this._detectionEdge = this.content().append("line").style({
-                    opacity: 0,
-                    fill: "pink",
+                    "opacity": 0,
+                    "stroke": "pink",
                     "pointer-events": "visibleStroke"
                 }).classed("drag-edge", true);
             };

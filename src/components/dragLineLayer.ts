@@ -76,8 +76,8 @@ export module Components {
     protected _setup() {
       super._setup();
       this._detectionEdge = this.content().append("line").style({
-                              opacity: 0,
-                              fill: "pink",
+                              "opacity": 0,
+                              "stroke": "pink",
                               "pointer-events": "visibleStroke"
                             }).classed("drag-edge", true);
     }
