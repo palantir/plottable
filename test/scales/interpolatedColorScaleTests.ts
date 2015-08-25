@@ -57,6 +57,38 @@ describe("Scales", () => {
         scale.range(Plottable.Scales.InterpolatedColor.REDS);
         assert.strictEqual(scale.scale(16), "#b10026", "");
       });
+
+      function linearlyInterpolateColors(color1: string, color2: string, ratio: number) {
+
+        let red1 = parseInt(color1.substr(1, 2), 16);
+        let green1 = parseInt(color1.substr(3, 2), 16);
+        let blue1 = parseInt(color1.substr(5, 2), 16);
+
+        let red2 = parseInt(color2.substr(1, 2), 16);
+        let green2 = parseInt(color2.substr(3, 2), 16);
+        let blue2 = parseInt(color2.substr(5, 2), 16);
+
+        let redOutput = Math.floor(red1 * ratio + red2 * (1 - ratio));
+        let greenOutput = Math.floor(green1 * ratio + green2 * (1 - ratio));
+        let blueOutput = Math.floor(blue1 * ratio + blue2 * (1 - ratio));
+
+        let redHex = redOutput.toString(16);
+        if (redHex.length === 1) {
+          redHex = "0" + redHex;
+        }
+
+        let greenHex = greenOutput.toString(16);
+        if (greenHex.length === 1) {
+          greenHex = "0" + greenHex;
+        }
+
+        let blueHex = blueOutput.toString(16);
+        if (blueHex.length === 1) {
+          blueHex = "0" + blueHex;
+        }
+
+        return "#" + redHex + greenHex + blueHex;
+      }
     });
 
   });
