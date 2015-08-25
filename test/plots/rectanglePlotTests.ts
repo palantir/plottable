@@ -22,13 +22,17 @@ describe("Plots", () => {
         plot.renderTo(svg);
 
         let cells = plot.content().selectAll("rect");
-        assert.strictEqual(cells.size(), data.length);
+        assert.strictEqual(cells.size(), data.length, "There is one rectangle for each piece of data");
         cells.each(function(d, i) {
           let cell = d3.select(this);
-          assert.closeTo(+cell.attr("height"), 50, 0.5, "Cell height is correct");
-          assert.closeTo(+cell.attr("width"), 50, 0.5, "Cell width is correct");
-          assert.closeTo(+cell.attr("x"), 25 + 50 * i, 0.5, "Cell x coordinate is correct");
-          assert.closeTo(+cell.attr("y"), 25 + 50 * (cells[0].length - i - 1), 0.5, "Cell y coordinate is correct");
+          assert.closeTo(+cell.attr("height"), 50, window.Pixel_CloseTo_Requirement,
+            "Cell height is correct");
+          assert.closeTo(+cell.attr("width"), 50, window.Pixel_CloseTo_Requirement,
+            "Cell width is correct");
+          assert.closeTo(+cell.attr("x"), 25 + 50 * i, window.Pixel_CloseTo_Requirement,
+            "Cell x coordinate is correct");
+          assert.closeTo(+cell.attr("y"), 25 + 50 * (cells[0].length - i - 1), window.Pixel_CloseTo_Requirement,
+            "Cell y coordinate is correct");
         });
         svg.remove();
       });
