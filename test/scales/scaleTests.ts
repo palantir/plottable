@@ -144,61 +144,6 @@ describe("Scales", () => {
 
   });
 
-  describe("Interpolated Color Scales", () => {
-    it("default scale uses reds and a linear scale type", () => {
-      let scale = new Plottable.Scales.InterpolatedColor();
-      scale.domain([0, 16]);
-      assert.strictEqual("#ffffff", scale.scale(0));
-      assert.strictEqual("#feb24c", scale.scale(8));
-      assert.strictEqual("#b10026", scale.scale(16));
-    });
-
-    it("linearly interpolates colors in L*a*b color space", () => {
-      let scale = new Plottable.Scales.InterpolatedColor();
-      scale.domain([0, 1]);
-      assert.strictEqual("#b10026", scale.scale(1));
-      assert.strictEqual("#d9151f", scale.scale(0.9));
-    });
-
-    it("accepts array types with color hex values", () => {
-      let scale = new Plottable.Scales.InterpolatedColor();
-      scale.range(["#000", "#FFF"]);
-      scale.domain([0, 16]);
-      assert.strictEqual("#000000", scale.scale(0));
-      assert.strictEqual("#ffffff", scale.scale(16));
-      assert.strictEqual("#777777", scale.scale(8));
-    });
-
-    it("accepts array types with color names", () => {
-      let scale = new Plottable.Scales.InterpolatedColor();
-      scale.range(["black", "white"]);
-      scale.domain([0, 16]);
-      assert.strictEqual("#000000", scale.scale(0));
-      assert.strictEqual("#ffffff", scale.scale(16));
-      assert.strictEqual("#777777", scale.scale(8));
-    });
-
-    it("overflow scale values clamp to range", () => {
-      let scale = new Plottable.Scales.InterpolatedColor();
-      scale.range(["black", "white"]);
-      scale.domain([0, 16]);
-      assert.strictEqual("#000000", scale.scale(0));
-      assert.strictEqual("#ffffff", scale.scale(16));
-      assert.strictEqual("#000000", scale.scale(-100));
-      assert.strictEqual("#ffffff", scale.scale(100));
-    });
-
-    it("can be converted to a different range", () => {
-      let scale = new Plottable.Scales.InterpolatedColor();
-      scale.range(["black", "white"]);
-      scale.domain([0, 16]);
-      assert.strictEqual("#000000", scale.scale(0));
-      assert.strictEqual("#ffffff", scale.scale(16));
-      scale.range(Plottable.Scales.InterpolatedColor.REDS);
-      assert.strictEqual("#b10026", scale.scale(16));
-    });
-  });
-
   describe("extent calculation", () => {
 
     it("quantitaveScale gives the minimum and maxiumum when the domain is stringy", () => {

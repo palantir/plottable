@@ -55,6 +55,7 @@
 ///<reference path="scales/linearScaleTests.ts" />
 ///<reference path="scales/modifiedLogScaleTests.ts" />
 ///<reference path="scales/timeScaleTests.ts" />
+///<reference path="scales/interpolatedColorScaleTests.ts" />
 ///<reference path="scales/tickGeneratorsTests.ts" />
 
 ///<reference path="utils/domUtilsTests.ts" />
