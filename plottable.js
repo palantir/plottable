@@ -9770,6 +9770,143 @@ var Plottable;
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var Plottable;
+(function (Plottable) {
+    var Plots;
+    (function (Plots) {
+        var Wheel = (function (_super) {
+            __extends(Wheel, _super);
+            /**
+             * @constructor
+             */
+            function Wheel() {
+                _super.call(this);
+                this.addClass("wheel-plot");
+                this.attr("fill", function (d, i) { return String(i); }, new Plottable.Scales.Color());
+            }
+            Wheel.prototype.computeLayout = function (origin, availableWidth, availableHeight) {
+                _super.prototype.computeLayout.call(this, origin, availableWidth, availableHeight);
+                this._renderArea.attr("transform", "translate(" + this.width() / 2 + "," + this.height() / 2 + ")");
+                var radiusLimit = Math.min(this.width(), this.height()) / 2;
+                if (this.innerRadius() != null && this.innerRadius().scale != null) {
+                    this.innerRadius().scale.range([0, radiusLimit]);
+                }
+                if (this.outerRadius() != null && this.outerRadius().scale != null) {
+                    this.outerRadius().scale.range([0, radiusLimit]);
+                }
+                return this;
+            };
+            Wheel.prototype._createDrawer = function (dataset) {
+                return new Plottable.Drawers.Arc(dataset);
+            };
+            Wheel.prototype.entities = function (datasets) {
+                var _this = this;
+                if (datasets === void 0) { datasets = this.datasets(); }
+                var entities = _super.prototype.entities.call(this, datasets);
+                entities.forEach(function (entity) {
+                    entity.position.x += _this.width() / 2;
+                    entity.position.y += _this.height() / 2;
+                });
+                return entities;
+            };
+            Wheel.prototype._getDataToDraw = function () {
+                var dataToDraw = _super.prototype._getDataToDraw.call(this);
+                if (this.datasets().length === 0) {
+                    return dataToDraw;
+                }
+                var startAngleAccessor = Plottable.Plot._scaledAccessor(this.startAngle());
+                var endAngleAccessor = Plottable.Plot._scaledAccessor(this.endAngle());
+                var innerRadiusAccessor = Plottable.Plot._scaledAccessor(this.innerRadius());
+                var outerRadiusAccessor = Plottable.Plot._scaledAccessor(this.outerRadius());
+                var ds = this.datasets()[0];
+                var data = dataToDraw.get(ds);
+                var filteredData = data.filter(function (d, i) {
+                    return Plottable.Utils.Math.isValidNumber(startAngleAccessor(d, i, ds)) &&
+                        Plottable.Utils.Math.isValidNumber(endAngleAccessor(d, i, ds)) &&
+                        Plottable.Utils.Math.isValidNumber(innerRadiusAccessor(d, i, ds)) &&
+                        Plottable.Utils.Math.isValidNumber(outerRadiusAccessor(d, i, ds));
+                });
+                dataToDraw.set(ds, filteredData);
+                return dataToDraw;
+            };
+            Wheel.prototype._propertyProjectors = function () {
+                var attrToProjector = _super.prototype._propertyProjectors.call(this);
+                var innerRadiusAccessor = Plottable.Plot._scaledAccessor(this.innerRadius());
+                var outerRadiusAccessor = Plottable.Plot._scaledAccessor(this.outerRadius());
+                var startAngleAccessor = Plottable.Plot._scaledAccessor(this.startAngle());
+                var endAngleAccessor = Plottable.Plot._scaledAccessor(this.endAngle());
+                attrToProjector["d"] = function (datum, index, ds) {
+                    return d3.svg.arc().innerRadius(innerRadiusAccessor(datum, index, ds))
+                        .outerRadius(outerRadiusAccessor(datum, index, ds))
+                        .startAngle(startAngleAccessor(datum, index, ds))
+                        .endAngle(endAngleAccessor(datum, index, ds))(datum, index);
+                };
+                return attrToProjector;
+            };
+            Wheel.prototype.startAngle = function (startAngle, scale) {
+                if (startAngle == null) {
+                    return this._propertyBindings.get(Wheel._START_ANGLE_KEY);
+                }
+                if (scale != null) {
+                    scale.range([0, Math.PI * 2]);
+                }
+                this._bindProperty(Wheel._START_ANGLE_KEY, startAngle, scale);
+                this.render();
+                return this;
+            };
+            Wheel.prototype.endAngle = function (endAngle, scale) {
+                if (endAngle == null) {
+                    return this._propertyBindings.get(Wheel._END_ANGLE_KEY);
+                }
+                if (scale != null) {
+                    scale.range([0, Math.PI * 2]);
+                }
+                this._bindProperty(Wheel._END_ANGLE_KEY, endAngle, scale);
+                this.render();
+                return this;
+            };
+            Wheel.prototype.innerRadius = function (innerRadius, scale) {
+                if (innerRadius == null) {
+                    return this._propertyBindings.get(Wheel._INNER_RADIUS_KEY);
+                }
+                this._bindProperty(Wheel._INNER_RADIUS_KEY, innerRadius, scale);
+                this.render();
+                return this;
+            };
+            Wheel.prototype.outerRadius = function (outerRadius, scale) {
+                if (outerRadius == null) {
+                    return this._propertyBindings.get(Wheel._OUTER_RADIUS_KEY);
+                }
+                this._bindProperty(Wheel._OUTER_RADIUS_KEY, outerRadius, scale);
+                this.render();
+                return this;
+            };
+            Wheel.prototype._pixelPoint = function (datum, index, dataset) {
+                var innerRadius = Plottable.Plot._scaledAccessor(this.innerRadius())(datum, index, dataset);
+                var outerRadius = Plottable.Plot._scaledAccessor(this.outerRadius())(datum, index, dataset);
+                var avgRadius = (innerRadius + outerRadius) / 2;
+                var startAngle = Plottable.Plot._scaledAccessor(this.startAngle())(datum, index, dataset);
+                var endAngle = Plottable.Plot._scaledAccessor(this.endAngle())(datum, index, dataset);
+                var avgAngle = (startAngle + endAngle) / 2;
+                return { x: avgRadius * Math.sin(avgAngle), y: -avgRadius * Math.cos(avgAngle) };
+            };
+            Wheel._INNER_RADIUS_KEY = "inner-radius";
+            Wheel._OUTER_RADIUS_KEY = "outer-radius";
+            Wheel._START_ANGLE_KEY = "start-angle";
+            Wheel._END_ANGLE_KEY = "end-angle";
+            return Wheel;
+        })(Plottable.Plot);
+        Plots.Wheel = Wheel;
+    })(Plots = Plottable.Plots || (Plottable.Plots = {}));
+})(Plottable || (Plottable = {}));
+
+///<reference path="../reference.ts" />
 
 ///<reference path="../reference.ts" />
 var Plottable;
