@@ -807,9 +807,9 @@ describe("BaseAxis", () => {
         axis.content().selectAll(".annotation-rect").each(function() {
           let annotationRect = d3.select(this);
           let bbox = this.getBBox();
-          let allowVisible = bbox.x >= 0 && bbox.x + bbox.width <= axis.width() &&
+          let insideMargin = bbox.x >= 0 && bbox.x + bbox.width <= axis.width() &&
                              bbox.y >= axis.height() - axis.margin() && bbox.y + bbox.height <= axis.height();
-          let visibilityAttr = allowVisible ? "visible" : "hidden";
+          let visibilityAttr = insideMargin ? "visible" : "hidden";
           assert.strictEqual(annotationRect.attr("visibility"), visibilityAttr, "annotation rect inside margin area");
         });
         svg.remove();
