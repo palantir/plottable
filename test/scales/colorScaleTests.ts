@@ -26,18 +26,17 @@ describe("Scales", () => {
         assert.strictEqual(scale.scale("a"), colorRange[0], "first color is used");
         assert.strictEqual(scale.scale("b"), colorRange[1], "second color is used");
 
-        let alteredColor1 = scale.scale("c");
-        assert.notStrictEqual(alteredColor1, colorRange[0], "first color has not been reused");
-        assert.notStrictEqual(alteredColor1, colorRange[1], "second color has not been reused");
-        assert.notStrictEqual(alteredColor1, "#000000", "the color does not fallback to black when running out of colors");
-        assert.notStrictEqual(alteredColor1, "#ffffff", "the color does not fallback to white when running out of colors");
+        let alteredColor1Hex = scale.scale("c");
+        assert.notStrictEqual(alteredColor1Hex, colorRange[0], "first color has not been reused");
+        assert.notStrictEqual(alteredColor1Hex, colorRange[1], "second color has not been reused");
+        assert.notStrictEqual(alteredColor1Hex, "#000000", "the color does not fallback to black when running out of colors");
+        assert.notStrictEqual(alteredColor1Hex, "#ffffff", "the color does not fallback to white when running out of colors");
 
-        assert.operator(parseInt(alteredColor1.substr(1, 2), 16), ">", parseInt(colorRange[0].substr(1, 2), 16),
-          "The resulting color should be lighter in the red component");
-        assert.operator(parseInt(alteredColor1.substr(1, 3), 16), ">", parseInt(colorRange[0].substr(3, 2), 16),
-          "The resulting color should be lighter in the red component");
-        assert.operator(parseInt(alteredColor1.substr(1, 5), 16), ">", parseInt(colorRange[0].substr(5, 2), 16),
-          "The resulting color should be lighter in the red component");
+        let color1 = TestMethods.colorHexToRGB(colorRange[0]);
+        let alteredColor1 = TestMethods.colorHexToRGB(alteredColor1Hex);
+        assert.operator(alteredColor1.red, ">", color1.red, "The resulting color should be lighter in the red component");
+        assert.operator(alteredColor1.green, ">", color1.green, "The resulting color should be lighter in the green component");
+        assert.operator(alteredColor1.blue, ">", color1.blue, "The resulting color should be lighter in the blue component");
       });
 
       it("interprets named color values correctly", () => {
@@ -149,11 +148,11 @@ describe("Scales", () => {
         ];
 
         scale.domain(["yes", "no", "maybe"]);
-        assert.strictEqual(scale.scale("yes"), category10Colors[0], "D3 Scale 10 color 1 used for option 1");
-        assert.strictEqual(scale.scale("no"), category10Colors[1], "D3 Scale 10 color 2 used for option 2");
-        assert.strictEqual(scale.scale("maybe"), category10Colors[2], "D3 Scale 10 color 3 used for option 3");
+        assert.strictEqual(scale.scale("yes"), category10Colors[0], "D3 Category 10 Scale color 1 used for option 1");
+        assert.strictEqual(scale.scale("no"), category10Colors[1], "D3 Category 10 Scale color 2 used for option 2");
+        assert.strictEqual(scale.scale("maybe"), category10Colors[2], "D3 Category 10 Scale color 3 used for option 3");
 
-        assert.deepEqual(scale.range(), category10Colors, "The correct D3 Category10 colors are in range");
+        assert.deepEqual(scale.range(), category10Colors, "The correct D3 Category 10 Scale colors are in range");
       });
 
       it("Category 20 scale", () => {
@@ -167,9 +166,9 @@ describe("Scales", () => {
         ];
 
         scale.domain(["yes"]);
-        assert.strictEqual(scale.scale("yes"), category20Colors[0], "D3 Scale 10 color 1 used for option 1");
+        assert.strictEqual(scale.scale("yes"), category20Colors[0], "D3 Category 20 Scale color 1 used for option 1");
 
-        assert.deepEqual(scale.range(), category20Colors, "The correct D3 Category10 colors are in range");
+        assert.deepEqual(scale.range(), category20Colors, "The correct D3 Category 20 Scale colors are in range");
       });
     });
 
