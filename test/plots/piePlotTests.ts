@@ -416,7 +416,27 @@ describe("Plots", () => {
         svg.remove();
       });
 
-      it("retrieves entities under a point with entitiesAt()", () => {
+    });
+
+    describe("entities", () => {
+      let svg: d3.Selection<void>;
+      let simpleDataset: Plottable.Dataset;
+      let simpleData: any[];
+      let piePlot: Plottable.Plots.Pie;
+      let renderArea: d3.Selection<void>;
+
+      beforeEach(() => {
+        svg = TestMethods.generateSVG(500, 500);
+        simpleData = [{value: 5}, {value: 15}];
+        simpleDataset = new Plottable.Dataset(simpleData);
+        piePlot = new Plottable.Plots.Pie();
+        piePlot.addDataset(simpleDataset);
+        piePlot.sectorValue((d) => d.value);
+        piePlot.renderTo(svg);
+        renderArea = (<any> piePlot)._renderArea;
+      });
+
+      it("retrieves the entity under each given point", () => {
         let data = [
           {value: 500},
           {value: 5},
@@ -446,7 +466,7 @@ describe("Plots", () => {
         svg.remove();
       });
 
-      it("points within innerRadius() and outside of outerRadius() don't return entities", () => {
+      it("returns nothing for points within innerRadius() or outside of outerRadius()", () => {
         piePlot.innerRadius(100).render();
         let click1 = { x: 200, y: 201 };
         let entity1 = piePlot.entitiesAt(click1);
