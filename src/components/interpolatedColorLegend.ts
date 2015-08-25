@@ -11,7 +11,7 @@ export module Components {
     private _padding = 5;
     private _numSwatches = 10;
     private _formatter: Formatter;
-    private _fixedSize: boolean;
+    private _expand: boolean;
 
     private _swatchContainer: d3.Selection<void>;
     private _swatchBoundingBox: d3.Selection<void>;
@@ -44,7 +44,7 @@ export module Components {
       this._scale.onUpdate(this._redrawCallback);
       this._formatter = Formatters.general();
       this._orientation = "horizontal";
-      this._fixedSize = true;
+      this._expand = false;
 
       this.addClass("legend");
       this.addClass("interpolated-color-legend");
@@ -76,21 +76,21 @@ export module Components {
     }
 
     /**
-     * Gets whether InterpolatedColorLegend is fixed size.
+     * Gets whether InterpolatedColorLegend will expand in the long direction
      */
-    public fixedSize(): boolean;
+    public expand(): boolean;
     /**
-     * Sets whether InterpolatedColorLegend is fixed size.
+     * Sets whether InterpolatedColorLegend will expand in the long direction
      *
-     * @param {fixed} boolean
+     * @param {expand} boolean
      * @returns {InterpolatedColorLegend} The calling InterpolatedColorLegend.
      */
-    public fixedSize(fixed: boolean): InterpolatedColorLegend;
-    public fixedSize(fixed?: boolean): any {
-      if (fixed == null) {
-        return this._fixedSize;
+    public expand(expand: boolean): InterpolatedColorLegend;
+    public expand(expand?: boolean): any {
+      if (expand == null) {
+        return this._expand;
       }
-      this._fixedSize = fixed;
+      this._expand = expand;
       this.redraw();
       return this;
     }
@@ -126,18 +126,18 @@ export module Components {
     }
 
     public fixedWidth() {
-      return this._fixedSize || this._isVertical();
+      return !this.expand() || this._isVertical();
     }
 
     public fixedHeight() {
-      return this._fixedSize || !this._isVertical();
+      return !this.expand() || !this._isVertical();
     }
 
-    private _generateTicks() {
+    private _generateTicks(numSwatches = this._numSwatches) {
       let domain = this._scale.domain();
-      let slope = (domain[1] - domain[0]) / this._numSwatches;
+      let slope = (domain[1] - domain[0]) / (numSwatches - 1);
       let ticks: number[] = [];
-      for (let i = 0; i <= this._numSwatches; i++) {
+      for (let i = 0; i < numSwatches; i++) {
         ticks.push(domain[0] + slope * i);
       }
       return ticks;
@@ -159,9 +159,6 @@ export module Components {
     public requestedSpace(offeredWidth: number, offeredHeight: number): SpaceRequest {
       let textHeight = this._measurer.measure().height;
 
-      let ticks = this._generateTicks();
-      let numSwatches = ticks.length;
-
       let domain = this._scale.domain();
       let labelWidths = domain.map((d: number) => this._measurer.measure(this._formatter(d)).width);
 
@@ -170,11 +167,11 @@ export module Components {
       if (this._isVertical()) {
         let longestWidth = Utils.Math.max(labelWidths, 0);
         desiredWidth = this._padding + textHeight + this._padding + longestWidth + this._padding;
-        desiredHeight = this._padding + numSwatches * textHeight + this._padding;
+        desiredHeight = this._padding + this._numSwatches * textHeight + this._padding;
       } else {
         desiredHeight = this._padding + textHeight + this._padding;
         desiredWidth = this._padding + labelWidths[0] + this._padding
-                        + numSwatches * textHeight
+                        + this._numSwatches * textHeight
                         + this._padding + labelWidths[1] + this._padding;
       }
 
@@ -197,9 +194,6 @@ export module Components {
       let text0Width = this._measurer.measure(text0).width;
       let text1 = this._formatter(domain[1]);
       let text1Width = this._measurer.measure(text1).width;
-
-      let ticks = this._generateTicks();
-      let numSwatches = ticks.length;
 
       let padding = this._padding;
 
@@ -229,6 +223,15 @@ export module Components {
         width: 0,
         height: 0
       };
+
+      let numSwatches = this._numSwatches;
+
+      if (this.expand()) {
+        let textHeight = this._measurer.measure().height;
+        let offset = this._isVertical() ? 2 * padding :  4 * padding - text0Width - text1Width;
+        let fullLength = this._isVertical() ? this.height() : this.width();
+        numSwatches = Math.max(Math.floor((fullLength - offset) / textHeight), this._numSwatches);
+      }
 
       if (this._isVertical()) {
         let longestTextWidth = Math.max(text0Width, text1Width);
@@ -284,6 +287,7 @@ export module Components {
 
       this._swatchBoundingBox.attr(boundingBoxAttr);
 
+      let ticks = this._generateTicks(numSwatches);
       let swatches = this._swatchContainer.selectAll("rect.swatch").data(ticks);
       swatches.enter().append("rect").classed("swatch", true);
       swatches.exit().remove();

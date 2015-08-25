@@ -189,11 +189,13 @@ describe("InterpolatedColorLegend", () => {
     svg.remove();
   });
 
-  it("fixed height if fixedSize is set to true or orientation is horizontal", () => {
+  it("fixed height if expand is set to false or orientation is horizontal", () => {
     let legend = new Plottable.Components.InterpolatedColorLegend(colorScale);
+    legend.renderTo(svg);
+
     assert.isTrue(legend.fixedHeight(), "height is fixed on default");
 
-    legend.fixedSize(false);
+    legend.expand(true);
     assert.isTrue(legend.fixedHeight(), "height is fixed oriented horizontally");
 
     legend.orientation("left");
@@ -202,17 +204,19 @@ describe("InterpolatedColorLegend", () => {
     legend.orientation("right");
     assert.isFalse(legend.fixedHeight(), "height is not fixed oriented vertically");
 
-    legend.fixedSize(true);
-    assert.isTrue(legend.fixedHeight(), "height is fixed when fixedSize is set to true");
+    legend.expand(false);
+    assert.isTrue(legend.fixedHeight(), "height is fixed when expand is set to false");
 
     svg.remove();
   });
 
-  it("fixed width if fixedSize is set to true or orientation is vertically", () => {
+  it("fixed width if expand is set to false or orientation is vertically", () => {
     let legend = new Plottable.Components.InterpolatedColorLegend(colorScale);
+    legend.renderTo(svg);
+
     assert.isTrue(legend.fixedWidth(), "width is fixed on default");
 
-    legend.fixedSize(false);
+    legend.expand(true);
     assert.isFalse(legend.fixedWidth(), "width is not fixed oriented horizontally");
 
     legend.orientation("left");
@@ -221,27 +225,65 @@ describe("InterpolatedColorLegend", () => {
     legend.orientation("right");
     assert.isTrue(legend.fixedWidth(), "width is fixed oriented vertically");
 
-    legend.fixedSize(true);
+    legend.expand(false);
     legend.orientation("horizontal");
-    assert.isTrue(legend.fixedWidth(), "width is fixed when fixedSize is set to true");
+    assert.isTrue(legend.fixedWidth(), "width is fixed when expand is set to false");
 
     svg.remove();
   });
 
-  it("spams the entire height if oriented vertically and fixedSize is set to false", () => {
+  it("spams the entire height if oriented vertically and expand is set to true", () => {
     let legend = new Plottable.Components.InterpolatedColorLegend(colorScale);
     legend.orientation("left");
-    legend.fixedSize(false);
+    legend.expand(true);
     legend.renderTo(svg);
     assert.closeTo(legend.height(), SVG_HEIGNT, 0.01, "legend height is the same as svg height");
     svg.remove();
   });
 
-  it("spams the entire width if oriented horizontally and fixedSize is set to false", () => {
+  it("spams the entire width if oriented horizontally and expand is set to true", () => {
     let legend = new Plottable.Components.InterpolatedColorLegend(colorScale);
-    legend.fixedSize(false);
+    legend.expand(true);
     legend.renderTo(svg);
     assert.closeTo(legend.width(), SVG_WIDTH, 0.01, "legend width is the same as svg width");
+    svg.remove();
+  });
+
+  it("has default number of swatches by default", () => {
+    let legend = new Plottable.Components.InterpolatedColorLegend(colorScale);
+    legend.renderTo(svg);
+
+    let numSwatches = (<any> legend)._numSwatches;
+    let horzontalSwatches = legend.content().selectAll(".swatch");
+    assert.strictEqual(horzontalSwatches.size(), numSwatches, "there are 10 swatches by default");
+
+    legend.orientation("left");
+    let leftSwatches = legend.content().selectAll(".swatch");
+    assert.strictEqual(leftSwatches.size(), numSwatches, "there are 10 swatches by default");
+
+    legend.orientation("right");
+    let rightSwatches = legend.content().selectAll(".swatch");
+    assert.strictEqual(rightSwatches.size(), numSwatches, "there are 10 swatches by default");
+
+    svg.remove();
+  });
+
+  it("has more swatches than default when expand is true", () => {
+    let legend = new Plottable.Components.InterpolatedColorLegend(colorScale);
+    legend.expand(true).renderTo(svg);
+
+    let numSwatches = (<any> legend)._numSwatches;
+    let horzontalSwatches = legend.content().selectAll(".swatch");
+    assert.isTrue(horzontalSwatches.size() > numSwatches, "there are more than 10 swatches when expanded");
+
+    legend.orientation("left");
+    let leftSwatches = legend.content().selectAll(".swatch");
+    assert.isTrue(leftSwatches.size() > numSwatches, "there are more than 10 swatches when expanded");
+
+    legend.orientation("right");
+    let rightSwatches = legend.content().selectAll(".swatch");
+    assert.isTrue(rightSwatches.size() > numSwatches, "there are more than 10 swatches when expanded");
+
     svg.remove();
   });
 });
