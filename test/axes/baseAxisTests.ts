@@ -400,14 +400,9 @@ describe("BaseAxis", () => {
           });
 
           axis.content().selectAll(".annotation-label").each(function (d, i) {
-            let annotationLabelBBox = this.getBBox();
-            let surroundingRectBBox = (<any> annotationRects[0][i]).getBBox();
-            assert.operator(annotationLabelBBox.x, ">=", surroundingRectBBox.x, "label inside left edge");
-            assert.operator(annotationLabelBBox.y, ">=", surroundingRectBBox.y, "label inside top edge");
-            assert.operator(annotationLabelBBox.x + annotationLabelBBox.width, "<=",
-              surroundingRectBBox.x + surroundingRectBBox.width, "label inside right edge");
-            assert.operator(annotationLabelBBox.y + annotationLabelBBox.height, "<=",
-              surroundingRectBBox.x + surroundingRectBBox.height, "label inside bottom edge");
+            let annotationLabel = d3.select(this);
+            let surroundingRect = d3.select(annotationRects[0][i]);
+            TestMethods.assertBBoxInclusion(surroundingRect, annotationLabel);
           });
           svg.remove();
         });
