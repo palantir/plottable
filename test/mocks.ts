@@ -26,35 +26,4 @@ module Mocks {
       return true;
     }
   }
-
-  export class Scale<D, R> extends Plottable.Scale<D, R> {
-    private _domain: D[] = [];
-    private _range: R[] = [];
-    private _domainToRangeMapping = new Plottable.Utils.Map<D, R>();
-
-    protected _getDomain() {
-      return this._domain;
-    }
-
-    protected _setBackingScaleDomain(values: D[]) {
-      this._domain = values;
-    }
-
-    protected _getRange() {
-      return this._range;
-    }
-
-    protected _setRange(values: R[]) {
-      this._range = values;
-    }
-
-    public scale(value: D): R {
-      return this._domainToRangeMapping.get(value);
-    }
-
-    public setDomainRangeMapping(key: D, value: R) {
-      this._domainToRangeMapping.set(key, value);
-      return this;
-    }
-  }
 }

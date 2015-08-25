@@ -272,12 +272,10 @@ describe("BaseAxis", () => {
     describe("rendering annotations", () => {
       describe("label content", () => {
         it("re-renders when the annotation formatter is changed", () => {
-          let annotatedTicks = ["foo", "bar"];
-          let mockScale = new Mocks.Scale<{}, number>();
-          mockScale.domain(["foo", "bar"]);
-          mockScale.setDomainRangeMapping("foo", 0);
-          mockScale.setDomainRangeMapping("bar", 300);
-          let axis = new Plottable.Axis(mockScale, "bottom");
+          let annotatedTicks = [new Date(1994, 11, 17), new Date(1995, 11, 17)];
+          let scale = new Plottable.Scales.Time();
+          scale.domain([new Date(1994, 11, 17), new Date(1995, 11, 17)]);
+          let axis = new Plottable.Axis(scale, "bottom");
           axis.annotationsEnabled(true);
           axis.annotatedTicks(annotatedTicks);
           let svg = TestMethods.generateSVG(300, 300);
@@ -299,12 +297,10 @@ describe("BaseAxis", () => {
         });
 
         it("can enable annotations after render", () => {
-          let annotatedTicks = ["foo", "bar"];
-          let mockScale = new Mocks.Scale<{}, number>();
-          mockScale.domain(["foo", "bar"]);
-          mockScale.setDomainRangeMapping("foo", 0);
-          mockScale.setDomainRangeMapping("bar", 300);
-          let axis = new Plottable.Axis(mockScale, "bottom");
+          let annotatedTicks = [new Date(1994, 11, 17), new Date(1995, 11, 17)];
+          let scale = new Plottable.Scales.Time();
+          scale.domain([new Date(1994, 11, 17), new Date(1995, 11, 17)]);
+          let axis = new Plottable.Axis(scale, "bottom");
           axis.annotatedTicks(annotatedTicks);
           let svg = TestMethods.generateSVG(300, 300);
           axis.renderTo(svg);
@@ -319,12 +315,10 @@ describe("BaseAxis", () => {
         });
 
         it("can disable annotations after render", () => {
-          let annotatedTicks = ["foo", "bar"];
-          let mockScale = new Mocks.Scale<{}, number>();
-          mockScale.domain(["foo", "bar"]);
-          mockScale.setDomainRangeMapping("foo", 0);
-          mockScale.setDomainRangeMapping("bar", 300);
-          let axis = new Plottable.Axis(mockScale, "bottom");
+          let annotatedTicks = [new Date(1994, 11, 17), new Date(1995, 11, 17)];
+          let scale = new Plottable.Scales.Time();
+          scale.domain([new Date(1994, 11, 17), new Date(1995, 11, 17)]);
+          let axis = new Plottable.Axis(scale, "bottom");
           axis.annotationsEnabled(true);
           axis.annotatedTicks(annotatedTicks);
           let svg = TestMethods.generateSVG(300, 300);
@@ -340,12 +334,10 @@ describe("BaseAxis", () => {
         });
 
         it("re-renders when annotated ticks are set after render", () => {
-          let annotatedTicks = ["foo", "bar"];
-          let mockScale = new Mocks.Scale<{}, number>();
-          mockScale.domain(["foo", "bar"]);
-          mockScale.setDomainRangeMapping("foo", 0);
-          mockScale.setDomainRangeMapping("bar", 300);
-          let axis = new Plottable.Axis(mockScale, "bottom");
+          let annotatedTicks = [new Date(1994, 11, 17), new Date(1995, 11, 17)];
+          let scale = new Plottable.Scales.Time();
+          scale.domain([new Date(1994, 11, 17), new Date(1995, 11, 17)]);
+          let axis = new Plottable.Axis(scale, "bottom");
           axis.annotationsEnabled(true);
           let svg = TestMethods.generateSVG(300, 300);
           axis.renderTo(svg);
@@ -368,22 +360,17 @@ describe("BaseAxis", () => {
 
       describe("element placement in relation to annotation rectangle", () => {
 
-        let mockScale: Mocks.Scale<string, number>;
-        let annotatedTicks: string[];
+        let scale: Plottable.Scales.ModifiedLog;
+        let annotatedTicks: number[];
 
         beforeEach(() => {
-          mockScale = new Mocks.Scale<string, number>();
-          annotatedTicks = ["A", "B", "C"];
-          mockScale.domain(annotatedTicks);
-
-          // Space out the tick values to not have collisions
-          mockScale.setDomainRangeMapping("A", 50);
-          mockScale.setDomainRangeMapping("B", 51);
-          mockScale.setDomainRangeMapping("C", 240);
+          scale = new Plottable.Scales.ModifiedLog();
+          annotatedTicks = [3, 100, 250];
+          scale.domain([0, 300]);
         });
 
         it("renders annotations at the axis baseline extending downwards with a bottom orientation axis", () => {
-          let axis = new Plottable.Axis(mockScale, "bottom");
+          let axis = new Plottable.Axis(scale, "bottom");
           axis.annotatedTicks(annotatedTicks);
           axis.annotationsEnabled(true);
 
@@ -421,7 +408,7 @@ describe("BaseAxis", () => {
         });
 
         it("renders annotations at the axis baseline extending upwards with a top orientation axis", () => {
-          let axis = new Plottable.Axis(mockScale, "top");
+          let axis = new Plottable.Axis(scale, "top");
           axis.annotatedTicks(annotatedTicks);
           axis.annotationsEnabled(true);
 
@@ -459,7 +446,7 @@ describe("BaseAxis", () => {
         });
 
         it("renders annotations at the axis baseline extending leftwards with a left orientation axis", () => {
-          let axis = new Plottable.Axis(mockScale, "left");
+          let axis = new Plottable.Axis(scale, "left");
           axis.annotatedTicks(annotatedTicks);
           axis.annotationsEnabled(true);
 
@@ -497,7 +484,7 @@ describe("BaseAxis", () => {
         });
 
         it("renders annotations at the axis baseline extending rightwards with a right orientation axis", () => {
-          let axis = new Plottable.Axis(mockScale, "right");
+          let axis = new Plottable.Axis(scale, "right");
           axis.annotatedTicks(annotatedTicks);
           axis.annotationsEnabled(true);
 
@@ -536,22 +523,18 @@ describe("BaseAxis", () => {
       });
 
       describe("annotation rectangle placement", () => {
-        let mockScale: Mocks.Scale<string, number>;
-        let annotatedTicks: string[];
+        let scale: Plottable.Scales.Linear;
+        let annotatedTicks: number[];
 
         beforeEach(() => {
-          mockScale = new Mocks.Scale<string, number>();
-          annotatedTicks = ["A", "B", "C"];
-          mockScale.domain(annotatedTicks);
-
-          mockScale.setDomainRangeMapping("A", 50);
-          mockScale.setDomainRangeMapping("B", 100);
-          mockScale.setDomainRangeMapping("C", 150);
+          scale = new Plottable.Scales.Linear();
+          annotatedTicks = [50, 100, 150];
+          scale.domain([0, 300]);
         });
 
         describe("scaled position along axis", () => {
           it("places the rectangle at the scaled x position for bottom orientation", () => {
-            let axis = new Plottable.Axis(mockScale, "bottom");
+            let axis = new Plottable.Axis(scale, "bottom");
             axis.annotatedTicks(annotatedTicks);
             axis.annotationsEnabled(true);
 
@@ -561,13 +544,13 @@ describe("BaseAxis", () => {
             let annotationRects = axis.content().selectAll(".annotation-rect");
             annotationRects.each(function (d) {
               let annotationRect = d3.select(this);
-              assert.strictEqual(TestMethods.numAttr(annotationRect, "x"), mockScale.scale(d), "rectangle positioned correctly");
+              assert.strictEqual(TestMethods.numAttr(annotationRect, "x"), scale.scale(d), "rectangle positioned correctly");
             });
             svg.remove();
           });
 
           it("places the rectangle at the scaled x position for top orientation", () => {
-            let axis = new Plottable.Axis(mockScale, "top");
+            let axis = new Plottable.Axis(scale, "top");
             axis.annotatedTicks(annotatedTicks);
             axis.annotationsEnabled(true);
 
@@ -577,13 +560,13 @@ describe("BaseAxis", () => {
             let annotationRects = axis.content().selectAll(".annotation-rect");
             annotationRects.each(function (d) {
               let annotationRect = d3.select(this);
-              assert.strictEqual(TestMethods.numAttr(annotationRect, "x"), mockScale.scale(d), "rectangle positioned correctly");
+              assert.strictEqual(TestMethods.numAttr(annotationRect, "x"), scale.scale(d), "rectangle positioned correctly");
             });
             svg.remove();
           });
 
           it("places the rectangle at the scaled y position for left orientation", () => {
-            let axis = new Plottable.Axis(mockScale, "left");
+            let axis = new Plottable.Axis(scale, "left");
             axis.annotatedTicks(annotatedTicks);
             axis.annotationsEnabled(true);
 
@@ -593,13 +576,13 @@ describe("BaseAxis", () => {
             let annotationRects = axis.content().selectAll(".annotation-rect");
             annotationRects.each(function (d) {
               let annotationRect = d3.select(this);
-              assert.strictEqual(TestMethods.numAttr(annotationRect, "y"), mockScale.scale(d), "rectangle positioned correctly");
+              assert.strictEqual(TestMethods.numAttr(annotationRect, "y"), scale.scale(d), "rectangle positioned correctly");
             });
             svg.remove();
           });
 
           it("places the rectangle at the scaled y position for right orientation", () => {
-            let axis = new Plottable.Axis(mockScale, "right");
+            let axis = new Plottable.Axis(scale, "right");
             axis.annotatedTicks(annotatedTicks);
             axis.annotationsEnabled(true);
 
@@ -609,7 +592,7 @@ describe("BaseAxis", () => {
             let annotationRects = axis.content().selectAll(".annotation-rect");
             annotationRects.each(function (d) {
               let annotationRect = d3.select(this);
-              assert.strictEqual(TestMethods.numAttr(annotationRect, "y"), mockScale.scale(d), "rectangle positioned correctly");
+              assert.strictEqual(TestMethods.numAttr(annotationRect, "y"), scale.scale(d), "rectangle positioned correctly");
             });
             svg.remove();
           });
@@ -617,7 +600,7 @@ describe("BaseAxis", () => {
 
         describe("first row offset position", () => {
           it("places the first row right at the beginning of the margin for bottom orientation", () => {
-            let axis = new Plottable.Axis(mockScale, "bottom");
+            let axis = new Plottable.Axis(scale, "bottom");
             axis.annotatedTicks(annotatedTicks);
             axis.annotationsEnabled(true);
 
@@ -631,7 +614,7 @@ describe("BaseAxis", () => {
           });
 
           it("places the first row right at the beginning of the margin for top orientation", () => {
-            let axis = new Plottable.Axis(mockScale, "top");
+            let axis = new Plottable.Axis(scale, "top");
             axis.annotatedTicks(annotatedTicks);
             axis.annotationsEnabled(true);
 
@@ -645,7 +628,7 @@ describe("BaseAxis", () => {
           });
 
           it("places the first row right at the beginning of the margin for left orientation", () => {
-            let axis = new Plottable.Axis(mockScale, "left");
+            let axis = new Plottable.Axis(scale, "left");
             axis.annotatedTicks(annotatedTicks);
             axis.annotationsEnabled(true);
 
@@ -659,7 +642,7 @@ describe("BaseAxis", () => {
           });
 
           it("places the first row right at the beginning of the margin for right orientation", () => {
-            let axis = new Plottable.Axis(mockScale, "right");
+            let axis = new Plottable.Axis(scale, "right");
             axis.annotatedTicks(annotatedTicks);
             axis.annotationsEnabled(true);
 
@@ -675,9 +658,8 @@ describe("BaseAxis", () => {
 
         describe("additional row offset position", () => {
           it("moves rectangles that would overlap to different rows downwards (orientation: bottom)", () => {
-            mockScale.setDomainRangeMapping("B", mockScale.scale("A") + 1);
-            let axis = new Plottable.Axis(mockScale, "bottom");
-            axis.annotatedTicks(annotatedTicks);
+            let axis = new Plottable.Axis(scale, "bottom");
+            axis.annotatedTicks([50, 51]);
             axis.annotationsEnabled(true);
 
             let svg = TestMethods.generateSVG(300, 300);
@@ -692,9 +674,8 @@ describe("BaseAxis", () => {
           });
 
           it("moves rectangles that would overlap to different rows upwards (orientation: top)", () => {
-            mockScale.setDomainRangeMapping("B", mockScale.scale("A") + 1);
-            let axis = new Plottable.Axis(mockScale, "top");
-            axis.annotatedTicks(annotatedTicks);
+            let axis = new Plottable.Axis(scale, "top");
+            axis.annotatedTicks([50, 51]);
             axis.annotationsEnabled(true);
 
             let svg = TestMethods.generateSVG(300, 300);
@@ -709,9 +690,8 @@ describe("BaseAxis", () => {
           });
 
           it("moves rectangles that would overlap to different rows leftwards (orientation: left)", () => {
-            mockScale.setDomainRangeMapping("B", mockScale.scale("A") + 1);
-            let axis = new Plottable.Axis(mockScale, "left");
-            axis.annotatedTicks(annotatedTicks);
+            let axis = new Plottable.Axis(scale, "left");
+            axis.annotatedTicks([50, 51]);
             axis.annotationsEnabled(true);
 
             let svg = TestMethods.generateSVG(300, 300);
@@ -726,9 +706,8 @@ describe("BaseAxis", () => {
           });
 
           it("moves rectangles that would overlap to different rows rightwards (orientation: right)", () => {
-            mockScale.setDomainRangeMapping("B", mockScale.scale("A") + 1);
-            let axis = new Plottable.Axis(mockScale, "right");
-            axis.annotatedTicks(annotatedTicks);
+            let axis = new Plottable.Axis(scale, "right");
+            axis.annotatedTicks([50, 51]);
             axis.annotationsEnabled(true);
 
             let svg = TestMethods.generateSVG(300, 300);
@@ -746,13 +725,9 @@ describe("BaseAxis", () => {
       });
 
       it("hides annotations if rectangles are outside the margin area", () => {
-        let mockScale = new Mocks.Scale<string, number>();
-        let annotatedTicks = ["A", "B", "C"];
+        let mockScale = new Plottable.Scales.Linear;
+        let annotatedTicks = [50, 51, 150];
         mockScale.domain(annotatedTicks);
-
-        mockScale.setDomainRangeMapping("A", 50);
-        mockScale.setDomainRangeMapping("B", 51);
-        mockScale.setDomainRangeMapping("C", 150);
 
         let axis = new Plottable.Axis(mockScale, "bottom");
         axis.annotatedTicks(annotatedTicks);
