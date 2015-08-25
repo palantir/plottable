@@ -26,6 +26,7 @@ describe("Interactive Components", () => {
         sbl.boxVisible(false);
         assert.strictEqual(sbl.boxVisible(), false, "Setting the boxVisible attribute to false works");
 
+        sbl.destroy();
         svg.remove();
       });
 
@@ -43,13 +44,7 @@ describe("Interactive Components", () => {
         selectionBox = svg.select(".selection-box");
         assert.isTrue(selectionBox.empty(), "box is removed from DOM when not showing");
 
-        svg.remove();
-      });
-
-      it("does not error on destroy() when scales are not inputted", () => {
-        sbl.renderTo(svg);
-        assert.doesNotThrow(() => sbl.destroy(), Error, "can destroy even with no scales");
-
+        sbl.destroy();
         svg.remove();
       });
 
@@ -90,6 +85,7 @@ describe("Interactive Components", () => {
         assert.deepEqual(queriedBounds.topLeft, topLeft, "returns correct top-left position");
         assert.deepEqual(queriedBounds.bottomRight, bottomRight, "returns correct bottom-right position");
 
+        sbl.destroy();
         svg.remove();
 
         function assertCorrectRendering(expectedTL: Plottable.Point, expectedBR: Plottable.Point, msg: string) {
@@ -108,6 +104,7 @@ describe("Interactive Components", () => {
         assert.isTrue(sbl.fixedWidth(), "fixed width");
         assert.isTrue(sbl.fixedHeight(), "fixed height");
 
+        sbl.destroy();
         svg.remove();
       });
 
@@ -143,6 +140,7 @@ describe("Interactive Components", () => {
         selectionBox = svg.select(".selection-area");
         assert.strictEqual(selectionBox.attr("x"), "250", "domain change moves box");
 
+        sbl.destroy();
         svg.remove();
       });
 
@@ -171,6 +169,7 @@ describe("Interactive Components", () => {
         assert.strictEqual(sbl.xExtent()[0], xScale.invert(100), "left data value maps correctly");
         assert.strictEqual(sbl.xExtent()[1], xScale.invert(250), "right data value maps correctly");
 
+        sbl.destroy();
         svg.remove();
       });
 
@@ -207,6 +206,7 @@ describe("Interactive Components", () => {
         selectionBox = svg.select(".selection-area");
         assert.strictEqual(selectionBox.attr("y"), "250", "domain change moves box");
 
+        sbl.destroy();
         svg.remove();
       });
 
@@ -236,9 +236,9 @@ describe("Interactive Components", () => {
         assert.strictEqual(sbl.yExtent()[0], yScale.invert(0), "bottom data value maps correctly");
         assert.strictEqual(sbl.yExtent()[1], yScale.invert(300), "top data value maps correctly");
 
+        sbl.destroy();
         svg.remove();
       });
-
     });
   });
 });
