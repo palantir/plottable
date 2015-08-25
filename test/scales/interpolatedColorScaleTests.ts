@@ -58,36 +58,15 @@ describe("Scales", () => {
         assert.strictEqual(scale.scale(16), "#b10026", "");
       });
 
-      function linearlyInterpolateColors(color1: string, color2: string, ratio: number) {
+      function linearlyInterpolateColors(color1Hex: string, color2Hex: string, ratio: number) {
+        let color1 = TestMethods.colorHexToRGB(color1Hex);
+        let color2 = TestMethods.colorHexToRGB(color2Hex);
 
-        let red1 = parseInt(color1.substr(1, 2), 16);
-        let green1 = parseInt(color1.substr(3, 2), 16);
-        let blue1 = parseInt(color1.substr(5, 2), 16);
-
-        let red2 = parseInt(color2.substr(1, 2), 16);
-        let green2 = parseInt(color2.substr(3, 2), 16);
-        let blue2 = parseInt(color2.substr(5, 2), 16);
-
-        let redOutput = Math.floor(red1 * ratio + red2 * (1 - ratio));
-        let greenOutput = Math.floor(green1 * ratio + green2 * (1 - ratio));
-        let blueOutput = Math.floor(blue1 * ratio + blue2 * (1 - ratio));
-
-        let redHex = redOutput.toString(16);
-        if (redHex.length === 1) {
-          redHex = "0" + redHex;
-        }
-
-        let greenHex = greenOutput.toString(16);
-        if (greenHex.length === 1) {
-          greenHex = "0" + greenHex;
-        }
-
-        let blueHex = blueOutput.toString(16);
-        if (blueHex.length === 1) {
-          blueHex = "0" + blueHex;
-        }
-
-        return "#" + redHex + greenHex + blueHex;
+        return TestMethods.colorRGBToHex({
+          red: Math.floor(color1.red * ratio + color2.red * (1 - ratio)),
+          green: Math.floor(color1.green * ratio + color2.green * (1 - ratio)),
+          blue: Math.floor(color1.blue * ratio + color2.blue * (1 - ratio))
+        });
       }
     });
 
