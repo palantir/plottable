@@ -8,11 +8,12 @@ function makeData() {
       }
     }
     return d;
-  }
+  };
   return makeGridData(10, 10);
 }
 
 function run(svg, data, Plottable) {
+  "use strict";
   var ds = new Plottable.Dataset(data);
 
   var xScale = new Plottable.Scales.Linear().domain([0, 9.5]);
@@ -21,8 +22,8 @@ function run(svg, data, Plottable) {
   var accessor = function(key){
     return function(d){
       return d[key];
-    }
-  }
+    };
+  };
 
  var plot = new Plottable.Plots.Rectangle()
  .addDataset(ds)
@@ -58,20 +59,20 @@ function run(svg, data, Plottable) {
             {min: point.y, max: plotTop},
             "#c775ac");
    fillArea({min: plotLeft, max: point.x},
-            {min: plotBottom , max: point.y},
+            {min: plotBottom, max: point.y},
             "#acc775");
    fillArea({min: point.x, max: plotRight},
             {min: plotBottom, max: point.y},
             "#c7b975");
- }
+ };
 
- var group = new Plottable.Components.Group([plot, gllh, gllv])
- .renderTo(svg);
+   new Plottable.Components.Group([plot, gllh, gllv])
+  .renderTo(svg);
   updateColors({x: gllv.pixelPosition(), y: gllh.pixelPosition()});
 
- var followPlot = new Plottable.Interactions.Pointer()
- .onPointerMove(function(point){
-   updateColors(point);
- })
- .attachTo(plot);
+  new Plottable.Interactions.Pointer()
+  .onPointerMove(function(point){
+    updateColors(point);
+  })
+  .attachTo(plot);
 }

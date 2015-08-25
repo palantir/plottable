@@ -1,18 +1,18 @@
 function makeData() {
   "use strict";
-    var segment_data = [];
-    for (var i = 0; i < 10; i++) { segment_data.push({
+    var segmentData = [];
+    for (var i = 0; i < 10; i++) { segmentData.push({
         "x": i,
         "y": Math.random(),
         "x2": i + Math.random()
     }); }
-    var rect_data = [];
-    for (var i = 0; i < 10; i++) { rect_data.push({
+    var rectData = [];
+    for (i = 0; i < 10; i++) { rectData.push({
         "x": i,
         "y": Math.random(),
         "x2": i + Math.random()
     }); }
-    return [segment_data, rect_data];
+    return [segmentData, rectData];
 
 }
 
@@ -59,5 +59,5 @@ function run(svg, data, Plottable) {
     .movable(true);
 
     var group = new Plottable.Components.Group([segment, rectangle, dbl]);
-    new Plottable.Components.Table([[yAxis, group], [null, xAxis]]).renderTo(svg)
+    new Plottable.Components.Table([[yAxis, group], [null, xAxis]]).renderTo(svg);
 }

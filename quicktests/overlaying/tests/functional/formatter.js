@@ -30,8 +30,6 @@ function run(svg, data, Plottable) {
   var SITitle = new Plottable.Components.Label("SI");
   var CustTitle = new Plottable.Components.Label("Custom");
 
-  var custFormatter = function() { return "= ' w ' ="; };
-
   var plot = new Plottable.Plots.Line().addDataset(dataseries1);
   plot.x(function(d) { return d.x; }, xScale).y(function(d) { return d.y; }, yScale);
   var basicTable = new Plottable.Components.Table([[yAxis, plot], [null, xAxis]]);

@@ -28,9 +28,9 @@ function run(svg, data, Plottable) {
     var plot = new Plottable.Plots.Scatter()
       .x(function(d) { return d.x; }, xScale)
       .y(function(d) { return d.y; }, yScale)
-      .symbol(function(d) { return symbols[d.symbol];})
+      .symbol(function(d) { return symbols[d.symbol]; })
       .attr("fill", "#dddddd")
-      .size(function(d) { return d.size;})
+      .size(function(d) { return d.size; })
       .addDataset(new Plottable.Dataset(data));
 
     var dragLabel = new Plottable.Components.Label("EntitiesIn", 0);
@@ -60,15 +60,15 @@ function run(svg, data, Plottable) {
     .attachTo(plot)
     .enabled(false);
 
-    var enableDrag = new Plottable.Interactions.Click()
-    .onClick(function(p){
+    new Plottable.Interactions.Click()
+    .onClick(function(){
       hover.enabled(false);
       dblX.enabled(true);
      })
     .attachTo(dragLabel);
 
-    var enableClick = new Plottable.Interactions.Click()
-    .onClick(function(p){
+    new Plottable.Interactions.Click()
+    .onClick(function(){
       hover.enabled(true);
       dblX.enabled(false);
      })
@@ -76,5 +76,5 @@ function run(svg, data, Plottable) {
 
     var labels = new Plottable.Components.Table([[dragLabel], [clickLabel]]);
     var group = new Plottable.Components.Group([plot, dblX]);
-    new Plottable.Components.Table([[group], [labels]]).renderTo(svg)
+    new Plottable.Components.Table([[group], [labels]]).renderTo(svg);
 }

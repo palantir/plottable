@@ -33,9 +33,9 @@ function run(svg, data, Plottable) {
         .x(getX, xScale)
         .y(getY, yScale)
         .attr("stroke", color, cs)
-        .interpolator("step")
+        .interpolator("step");
         plotGroupArray.push(plots[color]);
-    }
+    };
 
     addPlot("red");
     addPlot("blue");
@@ -65,11 +65,11 @@ function run(svg, data, Plottable) {
     legendInteraction.attachTo(legend);
 
     var plotInteraction = new Plottable.Interactions.Click();
-    plotInteraction.onClick(function(point) {
+    plotInteraction.onClick(function() {
     for(var key in plots) {
       plots[key].selections().attr("opacity", 1);
     }
-      legend.symbolOpacity(function(d) {
+      legend.symbolOpacity(function() {
         return 1;
       });
     });

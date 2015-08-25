@@ -1,15 +1,15 @@
 function makeData() {
   "use strict";
-  var makeWaterfallData = function(cycles, start_total){
+  var makeWaterfallData = function(cycles, startTotal){
     var data = [];
-    if(start_total){
+    if(startTotal){
       data.push({
         x: "start",
-        y: start_total,
+        y: startTotal,
         type: "total"
       });
     }
-    var total = start_total || 0;
+    var total = startTotal || 0;
     for( var i = 0; i < cycles; i++){
       var deltaPos = Math.random() * 10;
       var deltaNeg = Math.random() * -5;
@@ -31,37 +31,38 @@ function makeData() {
       });
     }
     return data;
-  }
+  };
   return makeWaterfallData(5, 3);
 }
 
 function run(svg, data, Plottable) {
-    var xScale = new Plottable.Scales.Category();
-    var yScale = new Plottable.Scales.Linear();
-    var xAxis = new Plottable.Axes.Category(xScale, "bottom");
-    var yAxis = new Plottable.Axes.Numeric(yScale, "left");
+  "use strict";
+  var xScale = new Plottable.Scales.Category();
+  var yScale = new Plottable.Scales.Linear();
+  var xAxis = new Plottable.Axes.Category(xScale, "bottom");
+  var yAxis = new Plottable.Axes.Numeric(yScale, "left");
 
-    var waterfall = new Plottable.Plots.Waterfall();
-    waterfall.x(function(d) { return d.x; }, xScale);
-    waterfall.y(function(d) { return d.y; }, yScale);
-    waterfall.total(function(d) { return d.type === "total" ? true : false; });
-    waterfall.connectorsEnabled(true);
-    waterfall.baselineValue(0);
-    waterfall.attr("fill", function(d){
-      if(d.type === "total"){
-        return "#abbabb"
-      }
-      else if (d.y > 0){
-        return "#09cd2e"
-      }
-      else{
-        return "#de345c"
-      }
-    })
-    waterfall.addDataset(new Plottable.Dataset(data));
+  var waterfall = new Plottable.Plots.Waterfall();
+  waterfall.x(function(d) { return d.x; }, xScale);
+  waterfall.y(function(d) { return d.y; }, yScale);
+  waterfall.total(function(d) { return d.type === "total" ? true : false; });
+  waterfall.connectorsEnabled(true);
+  waterfall.baselineValue(0);
+  waterfall.attr("fill", function(d){
+    if(d.type === "total"){
+      return "#abbabb";
+    }
+    else if (d.y > 0){
+      return "#09cd2e";
+    }
+    else{
+      return "#de345c";
+    }
+  });
+  waterfall.addDataset(new Plottable.Dataset(data));
 
-    new Plottable.Components.Table([
-        [yAxis, waterfall],
-        [null, xAxis]
-    ]).renderTo(svg);
+  new Plottable.Components.Table([
+      [yAxis, waterfall],
+      [null, xAxis]
+  ]).renderTo(svg);
 }

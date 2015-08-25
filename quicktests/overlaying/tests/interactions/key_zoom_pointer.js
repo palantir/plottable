@@ -21,7 +21,7 @@ function run(svg, data, Plottable) {
   var titleLabel = new Plottable.Components.Label("Press 'P' to panzoom", 0);
 
   var symbolAccessor = function (d, i, ds) {
-    if (ds.metadata()['shape'] === "square") {
+    if (ds.metadata().shape === "square") {
       return Plottable.SymbolFactories.square();
     } else {
       return Plottable.SymbolFactories.triangleUp();
@@ -30,14 +30,14 @@ function run(svg, data, Plottable) {
 
   var plotSquare = new Plottable.Plots.Scatter()
     .addDataset(dsSquare)
-    .x(function (d) { return d.x ; }, xScaleSquare)
+    .x(function (d) { return d.x; }, xScaleSquare)
     .y(function (d) { return d.y - 1; }, yScale)
     .size(20)
     .symbol(symbolAccessor);
 
   var plotTriangle = new Plottable.Plots.Scatter()
     .addDataset(dsTriangle)
-    .x(function (d) { return d.x * 10 ; }, xScaleTriangle)
+    .x(function (d) { return d.x * 10; }, xScaleTriangle)
     .y(function (d) { return d.y; }, yScale)
     .attr("fill", "#aaaaaa")
     .size(20)
@@ -56,14 +56,14 @@ function run(svg, data, Plottable) {
   chart.renderTo(svg);
 
   var pointer = new Plottable.Interactions.Pointer();
-  var pointer_callback = function(p) {
+  var pointerCallback = function(p) {
     plotSquare.entities().forEach(function(entity) {
       entity.selection.attr("fill", "#5279C7");
     });
     var entity = plotSquare.entityNearest(p);
     entity.selection.attr("fill", "red");
   };
-  pointer.onPointerMove(pointer_callback);
+  pointer.onPointerMove(pointerCallback);
   pointer.attachTo(plotSquare);
 
   var pzi = new Plottable.Interactions.PanZoom();
@@ -74,13 +74,13 @@ function run(svg, data, Plottable) {
   pzi.enabled(false);
 
   var key = new Plottable.Interactions.Key();
-  key.onKeyPress(80, function(keycode) {
+  key.onKeyPress(80, function() {
     pzi.enabled(true);
-    pointer.offPointerMove(pointer_callback);
+    pointer.offPointerMove(pointerCallback);
   });
-  key.onKeyRelease(80, function(keycode) {
+  key.onKeyRelease(80, function() {
     pzi.enabled(false);
-    pointer.onPointerMove(pointer_callback);
+    pointer.onPointerMove(pointerCallback);
 
   });
   key.attachTo(plotGroup);

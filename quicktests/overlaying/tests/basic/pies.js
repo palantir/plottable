@@ -39,13 +39,13 @@ function run(svg, data, Plottable){
           .innerRadius(100)
           .outerRadius(200)
           .labelsEnabled(true)
-          .labelFormatter(function(d){return "Value: " + d })
+          .labelFormatter(function(d){return "Value: " + d; })
           .attr("fill", function(d){ return d.key; }, cs);
 
   var pies = new Plottable.Components.Group([innerPie, outerPie]);
   pies.renderTo(svg);
 
-  var pointer = new Plottable.Interactions.Pointer()
+  new Plottable.Interactions.Pointer()
   .onPointerMove(function(p){
     innerPie.entities().forEach(function(e){
       e.selection.attr("opacity", .5);
