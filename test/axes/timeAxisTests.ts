@@ -296,7 +296,7 @@ describe("TimeAxis", () => {
 
   describe("axis annotations", () => {
     describe("formatting annotation ticks", () => {
-      it("formats the dates to [{{abbreviated weekday}} {{abbreviated month}} {{day of month}}, {{year}}]", () => {
+      it("formats the dates to [{{abbreviated weekday}} {{abbreviated month}} {{day of month}}, {{year}}] by default", () => {
         let axis = new Plottable.Axes.Time(new Plottable.Scales.Time(), "bottom");
         let annotationFormatter = axis.annotationFormatter();
         let testDate = new Date(1995, 11, 17);
