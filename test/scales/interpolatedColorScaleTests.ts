@@ -9,7 +9,7 @@ describe("Scales", () => {
 
       beforeEach(() => {
         scale = new Plottable.Scales.InterpolatedColor();
-      })
+      });
 
       it("defaults to a linear scale and a red color palette", () => {
         scale.domain([0, 16]);
