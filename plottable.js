@@ -4982,7 +4982,7 @@ var Plottable;
                     minHeight: measureResult.usedHeight + heightRequiredByTicks
                 };
             };
-            Category.prototype._axisHeightWithoutMargin = function () {
+            Category.prototype._axisSizeWithoutMargin = function () {
                 var relevantDimension = this._isHorizontal() ? this.height() : this.width();
                 var axisHeightWithoutMargin = this.requestedSpace(this.width(), this.height()).minHeight - this.margin();
                 return Math.min(axisHeightWithoutMargin, relevantDimension);

@@ -399,7 +399,7 @@ describe("BaseAxis", () => {
               TestMethods.numAttr(correspondingRect, "y"), "line goes to the rect");
           });
 
-          axis.content().selectAll(".annotation-label").each(function (d, i) {
+          axis.content().selectAll(".annotation-label text").each(function (d, i) {
             let annotationLabel = d3.select(this);
             let surroundingRect = d3.select(annotationRects[0][i]);
             TestMethods.assertBBoxInclusion(surroundingRect, annotationLabel);
@@ -437,7 +437,7 @@ describe("BaseAxis", () => {
               TestMethods.numAttr(correspondingRect, "y") + TestMethods.numAttr(correspondingRect, "height"), 1, "line goes to the margin");
           });
 
-          axis.content().selectAll(".annotation-label").each(function (d, i) {
+          axis.content().selectAll(".annotation-label text").each(function (d, i) {
             let annotationLabel = d3.select(this);
             let surroundingRect = d3.select(annotationRects[0][i]);
             TestMethods.assertBBoxInclusion(surroundingRect, annotationLabel);
@@ -475,7 +475,7 @@ describe("BaseAxis", () => {
               TestMethods.numAttr(correspondingRect, "y"), "line at tick scaled y position");
           });
 
-          axis.content().selectAll(".annotation-label").each(function (d, i) {
+          axis.content().selectAll(".annotation-label text").each(function (d, i) {
             let annotationLabel = d3.select(this);
             let surroundingRect = d3.select(annotationRects[0][i]);
             TestMethods.assertBBoxInclusion(surroundingRect, annotationLabel);
@@ -513,7 +513,7 @@ describe("BaseAxis", () => {
               TestMethods.numAttr(correspondingRect, "y"), "line at tick scaled y position");
           });
 
-          axis.content().selectAll(".annotation-label").each(function (d, i) {
+          axis.content().selectAll(".annotation-label text").each(function (d, i) {
             let annotationLabel = d3.select(this);
             let surroundingRect = d3.select(annotationRects[0][i]);
             TestMethods.assertBBoxInclusion(surroundingRect, annotationLabel);

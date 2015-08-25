@@ -1989,7 +1989,7 @@ declare module Plottable {
             protected _setup(): void;
             protected _rescale(): Component;
             requestedSpace(offeredWidth: number, offeredHeight: number): SpaceRequest;
-            protected _axisHeightWithoutMargin(): number;
+            protected _axisSizeWithoutMargin(): number;
             protected _getTickValues(): string[];
             /**
              * Gets the tick label angle in degrees.
