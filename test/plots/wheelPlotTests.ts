@@ -49,8 +49,8 @@ describe("Plots", () => {
         let arc2 = d3.svg.arc().innerRadius(rScale.scale(1)).outerRadius(rScale.scale(2))
                                .startAngle(tScale.scale(180)).endAngle(tScale.scale(360));
         let arc2Path = (<any> arc2)();
-        assert.strictEqual(path1, arc1Path);
-        assert.strictEqual(path2, arc2Path);
+        TestMethods.assertAreaPathCloseTo(path1, arc1Path, 0.1, "arc is drawn as represented by data");
+        TestMethods.assertAreaPathCloseTo(path2, arc2Path, 0.1, "arc is drawn as represented by data");
 
         svg.remove();
       });

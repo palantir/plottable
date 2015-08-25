@@ -253,21 +253,27 @@ module TestMethods {
     actualAreaPathStrings.pop();
     expectedAreaPathStrings.pop();
 
-    let actualAreaPathPoints = actualAreaPathStrings.map((path) => path.split(/[A-Z]/).map((point) => point.split(",")));
-    actualAreaPathPoints.forEach((areaPathPoint) => areaPathPoint.shift());
-    let expectedAreaPathPoints = expectedAreaPathStrings.map((path) => path.split(/[A-Z]/).map((point) => point.split(",")));
-    expectedAreaPathPoints.forEach((areaPathPoint) => areaPathPoint.shift());
+    let actualAreaPathNumbers = tokenizePathString(actualAreaPathStrings);
+    let expectedAreaPathNumbers = tokenizePathString(expectedAreaPathStrings);
 
-    assert.lengthOf(actualAreaPathPoints, expectedAreaPathPoints.length, "number of broken area paths should be equal");
-    actualAreaPathPoints.forEach((actualAreaPoints, i) => {
-      let expectedAreaPoints = expectedAreaPathPoints[i];
-      assert.lengthOf(actualAreaPoints, expectedAreaPoints.length, "number of points in path should be equal");
-      actualAreaPoints.forEach((actualAreaPoint, j) => {
-        let expectedAreaPoint = expectedAreaPoints[j];
-        assert.closeTo(+actualAreaPoint[0], +expectedAreaPoint[0], 0.1, msg);
-        assert.closeTo(+actualAreaPoint[1], +expectedAreaPoint[1], 0.1, msg);
-      });
+    assert.lengthOf(actualAreaPathNumbers, expectedAreaPathNumbers.length, "number of numbers in each path should be equal");
+    actualAreaPathNumbers.forEach((actualAreaNumber, i) => {
+      let expectedAreaNumber = expectedAreaPathNumbers[i];
+        assert.closeTo(+actualAreaNumber, +expectedAreaNumber, 0.1, msg);
     });
+  }
+
+  function tokenizePathString(pathStrings: string[]) {
+    let numbers: string[] = [];
+    pathStrings.forEach((path) =>
+      path.split(/[A-Z]/).forEach((token) =>
+        token.split(",").forEach((numberString) =>
+          numberString.split(" ").forEach((num) => {
+            if (num !== "") {
+              numbers.push(num);
+            }
+          }))));
+    return numbers;
   }
 
   export function verifyClipPath(c: Plottable.Component) {
