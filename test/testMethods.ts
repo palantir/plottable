@@ -292,7 +292,7 @@ module TestMethods {
       red: parseInt(hex.substr(1, 2), 16),
       green: parseInt(hex.substr(3, 2), 16),
       blue: parseInt(hex.substr(5, 2), 16)
-    }
+    };
   }
 
   export function colorRGBToHex(rgb: RGB) {
