@@ -716,7 +716,7 @@ describe("BaseAxis", () => {
         });
 
         describe("additional row offset position", () => {
-          it("offsets additional rows by the placement of colliding rectangles for bottom orientation", () => {
+          it("moves rectangles that would overlap to different rows downwards (orientation: bottom)", () => {
             mockScale.setDomainRangeMapping("B", mockScale.scale("A") + 1);
             let axis = new Plottable.Axis(mockScale, "bottom");
             axis.annotatedTicks(annotatedTicks);
@@ -733,7 +733,7 @@ describe("BaseAxis", () => {
             svg.remove();
           });
 
-          it("offsets additional rows by the placement of colliding rectangles for top orientation", () => {
+          it("moves rectangles that would overlap to different rows upwards (orientation: top)", () => {
             mockScale.setDomainRangeMapping("B", mockScale.scale("A") + 1);
             let axis = new Plottable.Axis(mockScale, "top");
             axis.annotatedTicks(annotatedTicks);
@@ -750,7 +750,7 @@ describe("BaseAxis", () => {
             svg.remove();
           });
 
-          it("offsets additional rows by the placement of colliding rectangles for left orientation", () => {
+          it("moves rectangles that would overlap to different rows leftwards (orientation: left)", () => {
             mockScale.setDomainRangeMapping("B", mockScale.scale("A") + 1);
             let axis = new Plottable.Axis(mockScale, "left");
             axis.annotatedTicks(annotatedTicks);
@@ -767,7 +767,7 @@ describe("BaseAxis", () => {
             svg.remove();
           });
 
-          it("offsets additional rows by the placement of colliding rectangles for right orientation", () => {
+          it("moves rectangles that would overlap to different rows rightwards (orientation: right)", () => {
             mockScale.setDomainRangeMapping("B", mockScale.scale("A") + 1);
             let axis = new Plottable.Axis(mockScale, "right");
             axis.annotatedTicks(annotatedTicks);
