@@ -15,7 +15,7 @@ describe("Interactive Components", () => {
         sbl = new Plottable.Components.SelectionBoxLayer();
       });
 
-      it("can get and set the boxVisible() property", () => {
+      it("can set the boxVisible() property", () => {
         assert.strictEqual(sbl.boxVisible(), false, "The box is not visible by default");
 
         sbl.renderTo(svg);
@@ -48,7 +48,7 @@ describe("Interactive Components", () => {
         svg.remove();
       });
 
-      it("can get and set the bounds() property", () => {
+      it("can set the bounds() property", () => {
         let defaultBounds = sbl.bounds();
         assert.strictEqual(defaultBounds.topLeft.x, 0, "top-left bound is correct (x)");
         assert.strictEqual(defaultBounds.topLeft.y, 0, "top-left bound is correct (y)");
@@ -108,7 +108,7 @@ describe("Interactive Components", () => {
         svg.remove();
       });
 
-      it("can get and set the xScale() property", () => {
+      it("can set the xScale() property", () => {
         let xScale = new Plottable.Scales.Linear();
         xScale.domain([0, 2000]);
         xScale.range([0, svgWidth]);
@@ -173,7 +173,7 @@ describe("Interactive Components", () => {
         svg.remove();
       });
 
-      it("can get and set the yScale() property", () => {
+      it("can set the yScale() property", () => {
         let yScale = new Plottable.Scales.Linear();
         yScale.domain([0, 2000]);
         yScale.range([0, svgHeight]);
