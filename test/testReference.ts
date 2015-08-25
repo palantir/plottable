@@ -51,6 +51,7 @@
 ///<reference path="core/formattersTests.ts" />
 
 ///<reference path="scales/scaleTests.ts" />
+///<reference path="scales/categoryScaleTests.ts" />
 ///<reference path="scales/linearScaleTests.ts" />
 ///<reference path="scales/colorScaleTests.ts" />
 ///<reference path="scales/modifiedLogScaleTests.ts" />
