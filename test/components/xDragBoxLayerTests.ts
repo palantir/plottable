@@ -4,7 +4,7 @@ describe("Layer Components", () => {
   describe("XDragBoxLayer", () => {
     describe("Basic Usage", () => {
       let SVG_WIDTH = 400;
-      let SVG_HEIGHT = 400;
+      let SVG_HEIGHT = 300;
 
       let quarterTopLeftPoint = {
         x: SVG_WIDTH / 4,
@@ -27,7 +27,7 @@ describe("Layer Components", () => {
         dbl = new Plottable.Components.XDragBoxLayer();
       });
 
-      it("has the correct bounds()", () => {
+      it("has bounds() that extend across full SVG height", () => {
         dbl.boxVisible(true);
         dbl.renderTo(svg);
 
@@ -39,7 +39,7 @@ describe("Layer Components", () => {
         let actualBounds = dbl.bounds();
         assert.strictEqual(actualBounds.topLeft.y, 0, "box starts at top");
         assert.strictEqual(actualBounds.topLeft.x, quarterTopLeftPoint.x, "left edge set correctly");
-        assert.strictEqual(actualBounds.bottomRight.y, dbl.height(), "box ends at bottom");
+        assert.strictEqual(actualBounds.bottomRight.y, SVG_HEIGHT, "box ends at bottom");
         assert.strictEqual(actualBounds.bottomRight.x, middlePoint.x, "right edge set correctly");
 
         svg.remove();
@@ -56,19 +56,15 @@ describe("Layer Components", () => {
         });
 
         let actualBounds = dbl.bounds();
-        let dragTo = {
-          x: SVG_WIDTH * 3 / 4,
-          y: SVG_HEIGHT / 2
-        };
-        TestMethods.triggerFakeDragSequence(dbl.background(), actualBounds.bottomRight, dragTo);
+        TestMethods.triggerFakeDragSequence(dbl.background(), actualBounds.bottomRight, quarterBottomRightPoint);
         actualBounds = dbl.bounds();
-        assert.strictEqual(actualBounds.bottomRight.x, dragTo.x, "resized in x");
+        assert.strictEqual(actualBounds.bottomRight.x, quarterBottomRightPoint.x, "resized in x");
         assert.strictEqual(actualBounds.topLeft.y, 0, "box still starts at top");
-        assert.strictEqual(actualBounds.bottomRight.y, dbl.height(), "box still ends at bottom");
+        assert.strictEqual(actualBounds.bottomRight.y, SVG_HEIGHT, "box still ends at bottom");
         svg.remove();
       });
 
-      it("stays full height after resizing", () => {
+      it("adapts to new SVG heights upon redraws", () => {
         dbl.boxVisible(true);
         dbl.resizable(true);
         dbl.renderTo(svg);
@@ -88,7 +84,7 @@ describe("Layer Components", () => {
         assert.strictEqual(boundsAfter.topLeft.x, boundsBefore.topLeft.x, "box keeps same left edge");
         assert.strictEqual(boundsAfter.topLeft.y, 0, "box still starts at top");
         assert.strictEqual(boundsAfter.bottomRight.x, boundsBefore.bottomRight.x, "box keeps same right edge");
-        assert.strictEqual(boundsAfter.bottomRight.y, dbl.height(), "box still ends at bottom");
+        assert.strictEqual(boundsAfter.bottomRight.y, SVG_HEIGHT * 2, "box still ends at bottom");
         svg.remove();
       });
 
@@ -128,7 +124,7 @@ describe("Layer Components", () => {
         assert.strictEqual(boundsAfter.topLeft.x, boundsBefore.topLeft.x + dragDistance, "left edge moved");
         assert.strictEqual(boundsAfter.topLeft.y, 0, "box still starts at top");
         assert.strictEqual(boundsAfter.bottomRight.x, boundsBefore.bottomRight.x + dragDistance, "right edge moved");
-        assert.strictEqual(boundsAfter.bottomRight.y, dbl.height(), "box still ends at bottom");
+        assert.strictEqual(boundsAfter.bottomRight.y, SVG_HEIGHT, "box still ends at bottom");
 
         svg.remove();
       });
