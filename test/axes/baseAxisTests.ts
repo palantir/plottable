@@ -271,48 +271,6 @@ describe("BaseAxis", () => {
 
     describe("rendering annotations", () => {
       describe("label content", () => {
-        it("does not render annotations by default", () => {
-          let mockScale = new Mocks.Scale<{}, number>();
-          let axis = new Plottable.Axis(mockScale, "bottom");
-          let svg = TestMethods.generateSVG(300, 300);
-          axis.renderTo(svg);
-          assert.strictEqual(axis.content().selectAll(".annotation-label").size(), 0, "no annotations by default");
-          svg.remove();
-        });
-
-        it("does not have annotations to render by default", () => {
-          let mockScale = new Mocks.Scale<{}, number>();
-          let axis = new Plottable.Axis(mockScale, "bottom");
-          axis.annotationsEnabled(true);
-          let svg = TestMethods.generateSVG(300, 300);
-          axis.renderTo(svg);
-          assert.strictEqual(axis.content().selectAll(".annotation-label").size(), 0, "no annotations by default when enabled");
-          svg.remove();
-        });
-
-        it("renders input annotated ticks formatted to the default formatter", () => {
-          let annotatedTicks = ["foo", "bar"];
-          let mockScale = new Mocks.Scale<{}, number>();
-          mockScale.domain(["foo", "bar"]);
-          mockScale.setDomainRangeMapping("foo", 0);
-          mockScale.setDomainRangeMapping("bar", 300);
-          let axis = new Plottable.Axis(mockScale, "bottom");
-          axis.annotationsEnabled(true);
-          axis.annotatedTicks(annotatedTicks);
-          let svg = TestMethods.generateSVG(300, 300);
-          axis.renderTo(svg);
-
-          let annotationLabels = axis.content().selectAll(".annotation-label");
-          assert.strictEqual(annotationLabels.size(), annotatedTicks.length, "same number of annotations as datum");
-
-          let annotationFormatter = axis.annotationFormatter();
-          annotationLabels.each(function(d, i) {
-            let d3this = d3.select(this);
-            assert.strictEqual(d3this.text(), annotationFormatter(annotatedTicks[i]));
-          });
-          svg.remove();
-        });
-
         it("re-renders when the annotation formatter is changed", () => {
           let annotatedTicks = ["foo", "bar"];
           let mockScale = new Mocks.Scale<{}, number>();
