@@ -190,3 +190,7 @@ svg.plottable {
   stroke: #CCC;
   stroke-width: 1px;
 }
+
+.plottable .pie-plot .arc.outline {
+  stroke-linejoin: round;
+}

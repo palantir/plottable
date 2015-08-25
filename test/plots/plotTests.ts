@@ -82,6 +82,9 @@ describe("Plots", () => {
 
       plot.removeDataset(dataset1);
       assert.deepEqual(plot.datasets(), [dataset2, dataset3], "removing a Dataset leaves the remainder in the same order");
+
+      plot.datasets([]);
+      assert.deepEqual(plot.datasets(), [], "the datasets() call first removes all the datasets");
     });
 
     it("Updates its projectors when the Dataset is changed", () => {

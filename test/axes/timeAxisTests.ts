@@ -231,6 +231,7 @@ describe("TimeAxis", () => {
     let xScale = new Plottable.Scales.Time();
     xScale.domain([new Date("2013-03-23 12:00"), new Date("2013-04-03 0:00")]);
     let xAxis = new Plottable.Axes.Time(xScale, "bottom");
+    xAxis.margin(0);
 
     let tiersToCreate = 15;
     let configuration = Array.apply(null, Array(tiersToCreate)).map(() => {
@@ -279,6 +280,18 @@ describe("TimeAxis", () => {
       return "visible";
     }
 
+  });
+
+  it("occupied space includes margin, label padding, and tick length", () => {
+    let svg = TestMethods.generateSVG(400, 400);
+    let xScale = new Plottable.Scales.Time();
+    let xAxis = new Plottable.Axes.Time(xScale, "bottom");
+    xAxis.margin(100);
+    xAxis.anchor(svg);
+    xAxis.computeLayout({ x: 0, y: 0}, 400, 400);
+    let minimumHeight = xAxis.tickLabelPadding() + xAxis.margin() + xAxis.innerTickLength();
+    assert.operator(xAxis.height(), ">=", minimumHeight, "height includes all relevant pieces");
+    svg.remove();
   });
 
 });

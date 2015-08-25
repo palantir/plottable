@@ -180,6 +180,27 @@ export module Plots {
         return dataXRange.min <= x && x <= dataXRange.max && dataYRange.min <= y && y <= dataYRange.max;
       });
     }
+
+    /**
+     * Gets the Entities at a particular Point.
+     *
+     * @param {Point} p
+     * @returns {PlotEntity[]}
+     */
+    public entitiesAt(p: Point) {
+      let xProjector = Plot._scaledAccessor(this.x());
+      let yProjector = Plot._scaledAccessor(this.y());
+      let sizeProjector = Plot._scaledAccessor(this.size());
+      return this.entities().filter((entity) => {
+        let datum = entity.datum;
+        let index = entity.index;
+        let dataset = entity.dataset;
+        let x = xProjector(datum, index, dataset);
+        let y = yProjector(datum, index, dataset);
+        let size = sizeProjector(datum, index, dataset);
+        return x - size / 2  <= p.x && p.x <= x + size / 2 && y - size / 2 <= p.y && p.y <= y + size / 2;
+      });
+    }
   }
 }
 }
