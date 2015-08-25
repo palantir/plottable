@@ -9,23 +9,38 @@ describe("Scales", () => {
         "#ff7939", "#db2e65", "#99ce50", "#962565", "#06cccc"
       ];
 
-      it("default colors are generated", () => {
-        let scale = new Plottable.Scales.Color();
+      let scale: Plottable.Scales.Color;
+
+      beforeEach(() => {
+        scale = new Plottable.Scales.Color();
+      });
+
+      it("uses the default colors by default", () => {
         assert.deepEqual(scale.range(), defaultColors, "The color scale uses the default colors by default");
       });
 
       it("uses altered colors if size of domain exceeds size of range", () => {
-        let scale = new Plottable.Scales.Color();
         let colorRange = ["#5279c7", "#fd373e"];
         scale.range(colorRange);
         scale.domain(["a", "b", "c"]);
         assert.strictEqual(scale.scale("a"), colorRange[0], "first color is used");
         assert.strictEqual(scale.scale("b"), colorRange[1], "second color is used");
-        assert.notStrictEqual(scale.scale("c"), colorRange[0], "first color is slightly modified and used");
+
+        let alteredColor1 = scale.scale("c");
+        assert.notStrictEqual(alteredColor1, colorRange[0], "first color has not been reused")
+        assert.notStrictEqual(alteredColor1, colorRange[1], "second color has not been reused")
+        assert.notStrictEqual(alteredColor1, "#000000", "the color does not fallback to black when running out of colors")
+        assert.notStrictEqual(alteredColor1, "#ffffff", "the color does not fallback to white when running out of colors")
+
+        assert.operator(parseInt(alteredColor1.substr(1, 2), 16), ">", parseInt(colorRange[0].substr(1, 2), 16),
+          "The resulting color should be lighter in the red component");
+        assert.operator(parseInt(alteredColor1.substr(1, 3), 16), ">", parseInt(colorRange[0].substr(3, 2), 16),
+          "The resulting color should be lighter in the red component");
+        assert.operator(parseInt(alteredColor1.substr(1, 5), 16), ">", parseInt(colorRange[0].substr(5, 2), 16),
+          "The resulting color should be lighter in the red component");
       });
 
       it("interprets named color values correctly", () => {
-        let scale = new Plottable.Scales.Color();
         scale.range(["red", "blue"]);
         scale.domain(["a", "b"]);
         assert.strictEqual(scale.scale("a"), "#ff0000", "red color as string should be correctly identified");
@@ -33,20 +48,18 @@ describe("Scales", () => {
       });
 
       it("accepts Category domain", () => {
-        let scale = new Plottable.Scales.Color();
         scale.domain(["yes", "no", "maybe"]);
         assert.strictEqual(scale.scale("yes"), defaultColors[0], "first color used for first option");
         assert.strictEqual(scale.scale("no"), defaultColors[1], "second color used for second option");
         assert.strictEqual(scale.scale("maybe"), defaultColors[2], "third color used for third option");
       });
+    });
 
-      it("accepts categorical string types and Category domain", () => {
-        let scale = new Plottable.Scales.Color("10");
-        scale.domain(["yes", "no", "maybe"]);
-        assert.strictEqual(scale.scale("yes"), "#1f77b4", "D3 Scale 10 color 1 used for option 1");
-        assert.strictEqual(scale.scale("no"), "#ff7f0e", "D3 Scale 10 color 2 used for option 2");
-        assert.strictEqual(scale.scale("maybe"), "#2ca02c", "D3 Scale 10 color 3 used for option 3");
-      });
+    describe("CSS integration", () => {
+      let defaultColors = [
+        "#5279c7", "#fd373e", "#63c261", "#fad419", "#2c2b6f",
+        "#ff7939", "#db2e65", "#99ce50", "#962565", "#06cccc"
+      ];
 
       it("accepts CSS specified colors", () => {
         let style = d3.select("body").append("style");
@@ -85,7 +98,7 @@ describe("Scales", () => {
       });
 
       it("should try to recover from malicious CSS styleseets", () => {
-        let defaultNumberOfColors = 10;
+        let defaultNumberOfColors = defaultColors.length;
 
         let initialScale = new Plottable.Scales.Color();
         assert.strictEqual(initialScale.range().length, defaultNumberOfColors,
@@ -123,7 +136,17 @@ describe("Scales", () => {
         assert.strictEqual(affectedScale.range().length, maximumColorsFromCss,
           "current malicious CSS countermeasure is to cap maximum number of colors to 256");
       });
-
     });
+
+    describe("Custom color scales", () => {
+      it("accepts categorical string types and Category domain", () => {
+        let scale = new Plottable.Scales.Color("10");
+        scale.domain(["yes", "no", "maybe"]);
+        assert.strictEqual(scale.scale("yes"), "#1f77b4", "D3 Scale 10 color 1 used for option 1");
+        assert.strictEqual(scale.scale("no"), "#ff7f0e", "D3 Scale 10 color 2 used for option 2");
+        assert.strictEqual(scale.scale("maybe"), "#2ca02c", "D3 Scale 10 color 3 used for option 3");
+      });
+    });
+
   });
 });
