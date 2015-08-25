@@ -11,63 +11,55 @@ describe("Scales", () => {
         scale = new Plottable.Scales.InterpolatedColor();
       })
 
-      it("default scale uses reds and a linear scale type", () => {
+      it("defaults to a linear scale and a red color palette", () => {
         scale.domain([0, 16]);
-        assert.strictEqual(scale.scale(0), "#ffffff", "");
-        assert.strictEqual(scale.scale(8), "#feb24c", "");
-        assert.strictEqual(scale.scale(16), "#b10026", "");
+        assert.strictEqual(scale.scale(0), "#ffffff", "domain minimum maps to white");
+        assert.strictEqual(scale.scale(8), "#feb24c", "domain median maps in between red and white");
+        assert.strictEqual(scale.scale(16), "#b10026", "domain maximum maps to red");
+
+        assert.deepEqual(scale.range(), Plottable.Scales.InterpolatedColor.REDS,
+          "the range of the default scale is made of shades of red");
       });
 
       it("linearly interpolates colors in L*a*b color space", () => {
         scale.domain([0, 1]);
-        assert.strictEqual(scale.scale(1), "#b10026", "");
-        assert.strictEqual(scale.scale(0.9), "#d9151f", "");
+        assert.strictEqual(scale.scale(1), "#b10026", "domain maximum maps to red");
+        assert.strictEqual(scale.scale(0.5), "#feb24c", "domain median maps in between red and white");
+        assert.strictEqual(scale.scale(0.9), "#d9151f", "different shades of red are obtained for different values");
       });
 
       it("accepts array types with color hex values", () => {
         scale.range(["#000", "#FFF"]);
         scale.domain([0, 16]);
-        assert.strictEqual(scale.scale(0), "#000000", "");
-        assert.strictEqual(scale.scale(8), "#777777", "");
-        assert.strictEqual(scale.scale(16), "#ffffff", "");
+        assert.strictEqual(scale.scale(0), "#000000", "domain minimum maps to black");
+        assert.strictEqual(scale.scale(8), "#777777", "domain median maps to gray");
+        assert.strictEqual(scale.scale(16), "#ffffff", "domain maximum maps to white");
       });
 
       it("accepts array types with color names", () => {
-        scale.range(["black", "white"]);
+        scale.range(["white", "black"]);
         scale.domain([0, 16]);
-        assert.strictEqual(scale.scale(0), "#000000", "");
-        assert.strictEqual(scale.scale(8), "#777777", "");
-        assert.strictEqual(scale.scale(16), "#ffffff", "");
+        assert.strictEqual(scale.scale(0), "#ffffff", "domain minimum maps to white");
+        assert.strictEqual(scale.scale(8), "#777777", "domain median maps to gray");
+        assert.strictEqual(scale.scale(16), "#000000", "domain maximum maps to black");
       });
 
-      it("overflow scale values clamp to range", () => {
+      it("clamps overflow and underflow values to range", () => {
         scale.range(["black", "white"]);
         scale.domain([0, 16]);
-        assert.strictEqual(scale.scale(0), "#000000", "");
-        assert.strictEqual(scale.scale(16), "#ffffff", "");
-        assert.strictEqual(scale.scale(-100), "#000000", "");
-        assert.strictEqual(scale.scale(100), "#ffffff", "");
+        assert.strictEqual(scale.scale(0), "#000000", "domain minimum maps to black");
+        assert.strictEqual(scale.scale(16), "#ffffff", "domain maximum maps to white");
+        assert.strictEqual(scale.scale(-100), "#000000", "values smaller than the domain minimum clamp to black");
+        assert.strictEqual(scale.scale(100), "#ffffff", "values larger than the domain maximum clamp to white");
       });
 
       it("can be converted to a different range", () => {
         scale.range(["black", "white"]);
         scale.domain([0, 16]);
-        assert.strictEqual(scale.scale(0), "#000000", "");
-        assert.strictEqual(scale.scale(16), "#ffffff", "");
+        assert.strictEqual(scale.scale(16), "#ffffff", "domain maximum maps to white");
         scale.range(Plottable.Scales.InterpolatedColor.REDS);
-        assert.strictEqual(scale.scale(16), "#b10026", "");
+        assert.strictEqual(scale.scale(16), "#b10026", "scale changing took effect");
       });
-
-      function linearlyInterpolateColors(color1Hex: string, color2Hex: string, ratio: number) {
-        let color1 = TestMethods.colorHexToRGB(color1Hex);
-        let color2 = TestMethods.colorHexToRGB(color2Hex);
-
-        return TestMethods.colorRGBToHex({
-          red: Math.floor(color1.red * ratio + color2.red * (1 - ratio)),
-          green: Math.floor(color1.green * ratio + color2.green * (1 - ratio)),
-          blue: Math.floor(color1.blue * ratio + color2.blue * (1 - ratio))
-        });
-      }
     });
 
   });
