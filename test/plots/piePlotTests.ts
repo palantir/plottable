@@ -462,42 +462,42 @@ describe("Plots", () => {
       });
 
     });
-  });
 
-  describe("fail safe tests", () => {
-    it("undefined, NaN, non-numeric strings, and negative number not be represented in a Pie Chart", () => {
-      let svg = TestMethods.generateSVG();
+    describe("fail safe tests", () => {
+      it("undefined, NaN, non-numeric strings, and negative number not be represented in a Pie Chart", () => {
+        let svg = TestMethods.generateSVG();
 
-      let data1 = [
-        { v: 1 },
-        { v: undefined },
-        { v: 1 },
-        { v: NaN },
-        { v: 1 },
-        { v: "Bad String" },
-        { v: 1 },
-        { v: -100 },
-      ];
+        let data1 = [
+          { v: 1 },
+          { v: undefined },
+          { v: 1 },
+          { v: NaN },
+          { v: 1 },
+          { v: "Bad String" },
+          { v: 1 },
+          { v: -100 },
+        ];
 
-      let plot = new Plottable.Plots.Pie();
-      plot.addDataset(new Plottable.Dataset(data1));
-      plot.sectorValue((d) => d.v);
+        let plot = new Plottable.Plots.Pie();
+        plot.addDataset(new Plottable.Dataset(data1));
+        plot.sectorValue((d) => d.v);
 
-      plot.renderTo(svg);
+        plot.renderTo(svg);
 
-      let elementsDrawnSel = (<any> plot)._element.selectAll(".arc.fill");
+        let elementsDrawnSel = (<any> plot)._element.selectAll(".arc.fill");
 
-      assert.strictEqual(elementsDrawnSel.size(), 4,
-        "There should be exactly 4 slices in the pie chart, representing the valid values");
-      assert.lengthOf(plot.entities(), 4, "there should be exactly 4 entities, representing the valid values");
+        assert.strictEqual(elementsDrawnSel.size(), 4,
+          "There should be exactly 4 slices in the pie chart, representing the valid values");
+        assert.lengthOf(plot.entities(), 4, "there should be exactly 4 entities, representing the valid values");
 
-      for (let i = 0 ; i < 4 ; i ++ ) {
-        let startAngle = (<any> plot)._startAngles[i];
-        let endAngle = (<any> plot)._endAngles[i];
-        assert.closeTo(endAngle - startAngle, Math.PI / 2, 0.001, "each slice is a quarter of the pie");
-      }
+        for (let i = 0 ; i < 4 ; i ++ ) {
+          let startAngle = (<any> plot)._startAngles[i];
+          let endAngle = (<any> plot)._endAngles[i];
+          assert.closeTo(endAngle - startAngle, Math.PI / 2, 0.001, "each slice is a quarter of the pie");
+        }
 
-      svg.remove();
+        svg.remove();
+      });
     });
   });
 });
