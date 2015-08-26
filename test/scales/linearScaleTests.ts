@@ -19,6 +19,11 @@ describe("Scales", () => {
 
         assert.deepEqual(scale.domain(), [5, 6], "the domain has been set");
         assert.deepEqual(scale.range(), [6, 7], "the range has been set");
+
+        scale.domain([6, 5]);
+        scale.range([7, 6]);
+        assert.deepEqual(scale.domain(), [6, 5], "the domain can be unordered");
+        assert.deepEqual(scale.range(), [7, 6], "the range can be unordered");
       });
 
       it("maps domain to range in a linear fashion", () => {
@@ -49,18 +54,25 @@ describe("Scales", () => {
         assert.deepEqual(extent, expectedExtent, "invalid values were filtered out");
       });
 
-      it("domain can't include NaN or Infinity", () => {
+      it("does not accept NaN or Infinity as domain", () => {
         scale.domain([1, 2]);
         scale.domain([5, Infinity]);
         assert.deepEqual(scale.domain(), [1, 2], "Infinity containing domain was ignored");
-        scale.domain([5, -Infinity]);
+        scale.domain([-Infinity, 5]);
         assert.deepEqual(scale.domain(), [1, 2], "-Infinity containing domain was ignored");
         scale.domain([NaN, 7]);
         assert.deepEqual(scale.domain(), [1, 2], "NaN containing domain was ignored");
         scale.domain([-1, 5]);
         assert.deepEqual(scale.domain(), [-1, 5], "Regular domains still accepted");
-        scale.domain([5, -1]);
-        assert.deepEqual(scale.domain(), [5, -1], "Values that flip the domain are accepted");
+      });
+
+      it("accepts NaN or Infinity as range", () => {
+        scale.range([5, Infinity]);
+        assert.deepEqual(scale.range(), [5, Infinity], "Infinity accepted as part of range");
+        scale.range([-Infinity, 5]);
+        assert.deepEqual(scale.range(), [-Infinity, 5], "-Infinity accepted as part of range");
+        scale.range([NaN, 7]);
+        assert.deepEqual(scale.range(), [NaN, 7], "NaN accepted as part of range");
       });
     });
 
