@@ -257,11 +257,6 @@ describe("BaseAxis", () => {
         let test = "testString";
         assert.strictEqual(annotationFormatter(test), axis.annotationFormatter()(test), "can set the annotated ticks");
       });
-
-      it("returns the axis when setting the annotation formatter", () => {
-        let axis = new Plottable.Axis(new Plottable.Scale<{}, number>(), "bottom");
-        assert.strictEqual(axis.annotationFormatter(() => ""), axis, "setting the annotation formatter returns calling axis");
-      });
     });
 
     describe("rendering annotations", () => {
