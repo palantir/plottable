@@ -2192,16 +2192,16 @@ declare module Plottable {
              */
             formatter(formatter: Formatter): InterpolatedColorLegend;
             /**
-             * Gets whether InterpolatedColorLegend will expand in the long direction
+             * Gets whether the InterpolatedColorLegend expands to occupy all offered space in the long direction
              */
-            expand(): boolean;
+            expands(): boolean;
             /**
-             * Sets whether InterpolatedColorLegend will expand in the long direction
+             * Sets whether the InterpolatedColorLegend expands to occupy all offered space in the long direction
              *
-             * @param {expand} boolean
+             * @param {expands} boolean
              * @returns {InterpolatedColorLegend} The calling InterpolatedColorLegend.
              */
-            expand(expand: boolean): InterpolatedColorLegend;
+            expands(expands: boolean): InterpolatedColorLegend;
             /**
              * Gets the orientation.
              */
