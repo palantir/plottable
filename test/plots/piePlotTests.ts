@@ -331,28 +331,29 @@ describe("Plots", () => {
       });
 
       it("can set innerRadius", () => {
-        piePlot.innerRadius(5);
+        let expectedInnerRadius = 5;
+        piePlot.innerRadius(expectedInnerRadius);
         let arcPaths = renderArea.selectAll(".arc.fill");
         assert.lengthOf(arcPaths[0], 2, "only has two sectors");
 
         let pathPoints0 = TestMethods.normalizePath(d3.select(arcPaths[0][0]).attr("d")).split(/[A-Z]/).slice(1, 5);
 
         let radiusPath0 = pathPoints0[2].split(",").map((coordinate: string) => parseFloat(coordinate));
-        assert.closeTo(radiusPath0[0], 5, 1, "stops line at innerRadius point");
+        assert.closeTo(radiusPath0[0], expectedInnerRadius, 1, "stops line at innerRadius point");
         assert.closeTo(radiusPath0[1], 0, 1, "stops line at innerRadius point");
 
         let innerArcPath0 = pathPoints0[3].split(",").map((coordinate: string) => parseFloat(coordinate));
-        assert.closeTo(innerArcPath0[0], 5, 1, "makes inner arc of radius 5");
-        assert.closeTo(innerArcPath0[1], 5, 1, "makes inner arc of radius 5");
+        assert.closeTo(innerArcPath0[0], expectedInnerRadius, 1, "makes inner arc of correct radius");
+        assert.closeTo(innerArcPath0[1], expectedInnerRadius, 1, "makes inner arc of correct radius");
         assert.closeTo(innerArcPath0[5], 0, 1, "make inner arc to center");
-        assert.closeTo(innerArcPath0[6], -5, 1, "makes inner arc to top of inner circle");
+        assert.closeTo(innerArcPath0[6], -expectedInnerRadius, 1, "makes inner arc to top of inner circle");
 
-        piePlot.innerRadius(0);
         svg.remove();
       });
 
       it("can set outerRadius", () => {
-        piePlot.outerRadius(() => 150);
+        let expectedOuterRadius = 150;
+        piePlot.outerRadius(() => expectedOuterRadius);
         let arcPaths = renderArea.selectAll(".arc.fill");
         assert.lengthOf(arcPaths[0], 2, "only has two sectors");
 
@@ -360,15 +361,14 @@ describe("Plots", () => {
 
         let radiusPath0 = pathPoints0[0].split(",").map((coordinate: string) => parseFloat(coordinate));
         assert.closeTo(radiusPath0[0], 0, 1, "starts at outerRadius point");
-        assert.closeTo(radiusPath0[1], -150, 1, "starts at outerRadius point");
+        assert.closeTo(radiusPath0[1], -expectedOuterRadius, 1, "starts at outerRadius point");
 
         let outerArcPath0 = pathPoints0[1].split(",").map((coordinate: string) => parseFloat(coordinate));
-        assert.closeTo(outerArcPath0[0], 150, 1, "makes outer arc of radius 150");
-        assert.closeTo(outerArcPath0[1], 150, 1, "makes outer arc of radius 150");
-        assert.closeTo(outerArcPath0[5], 150, 1, "makes outer arc to right edge");
+        assert.closeTo(outerArcPath0[0], expectedOuterRadius, 1, "makes outer arc of correct radius");
+        assert.closeTo(outerArcPath0[1], expectedOuterRadius, 1, "makes outer arc of correct radius");
+        assert.closeTo(outerArcPath0[5], expectedOuterRadius, 1, "makes outer arc to right edge");
         assert.closeTo(outerArcPath0[6], 0, 1, "makes outer arc to right edge");
 
-        piePlot.outerRadius(() => 250);
         svg.remove();
       });
     });
