@@ -62,6 +62,7 @@ describe("Scales", () => {
       ];
 
       it("accepts CSS specified colors", () => {
+        // Make sure you delete this at the end of the test
         let style = d3.select("body").append("style");
         style.html(".plottable-colors-0 {background-color: #ff0000 !important; }");
 
@@ -81,6 +82,7 @@ describe("Scales", () => {
       });
 
        it("caches CSS specified colors unless the cache is invalidated", () => {
+        // Make sure you delete this at the end of the test
         let style = d3.select("body").append("style");
         style.html(".plottable-colors-0 {background-color: #ff0000 !important; }");
         Plottable.Scales.Color.invalidateColorCache();
@@ -104,6 +106,7 @@ describe("Scales", () => {
         assert.strictEqual(initialScale.range().length, defaultNumberOfColors,
           "there should initially be " + defaultNumberOfColors + " default colors");
 
+        // Make sure you delete this at the end of the test
         let maliciousStyle = d3.select("body").append("style");
         maliciousStyle.html("* {background-color: #fff000;}");
         Plottable.Scales.Color.invalidateColorCache();
@@ -126,6 +129,7 @@ describe("Scales", () => {
         let initialScale = new Plottable.Scales.Color();
         assert.strictEqual(initialScale.range().length, 10, "there should initially be 10 default colors");
 
+        // Make sure you delete this at the end of the test
         let maliciousStyle = d3.select("body").append("style");
         maliciousStyle.html("[class^='plottable-'] {background-color: pink;}");
         Plottable.Scales.Color.invalidateColorCache();
