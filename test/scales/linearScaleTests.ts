@@ -74,6 +74,16 @@ describe("Scales", () => {
         scale.range([NaN, 7]);
         assert.deepEqual(scale.range(), [NaN, 7], "NaN accepted as part of range");
       });
+
+      it("can receive custom tick generator", () => {
+        scale.domain([0, 10]);
+        let defaultTicks = scale.ticks();
+        assert.strictEqual(defaultTicks.length, 11, "ticks were generated correctly with default generator");
+        scale.tickGenerator((scale) => scale.defaultTicks().filter(tick => tick % 3 === 0));
+        let customTicks = scale.ticks();
+        assert.deepEqual(customTicks, [0, 3, 6, 9], "ticks were generated correctly with custom generator");
+      });
+
     });
 
     describe("Auto Domaining", () => {
@@ -177,16 +187,19 @@ describe("Scales", () => {
     });
 
     describe("Domain snapping", () => {
-      it("domain snapping setter and getter", () => {
-        let scale = new Plottable.Scales.Linear();
+      let scale: Plottable.Scales.Linear;
 
+      beforeEach(() => {
+        scale = new Plottable.Scales.Linear();
+      });
+
+      it("can set domain snapping", () => {
         assert.strictEqual(scale.snappingDomainEnabled(), true, "scales make their domain snap by default");
         assert.strictEqual(scale.snappingDomainEnabled(false), scale, "setting disabling domain snapping returns the scale");
         assert.strictEqual(scale.snappingDomainEnabled(), false, "the domain is no longer snaps");
       });
 
-      it("domain snapping works", () => {
-        let scale = new Plottable.Scales.Linear();
+      it("stops snapping the domain when option is disabled", () => {
         scale.addIncludedValuesProvider(function() {
           return [1.123123123, 3.123123123];
         });
@@ -197,20 +210,16 @@ describe("Scales", () => {
         scale.snappingDomainEnabled(true);
         assert.deepEqual(scale.domain(), [1, 3.2], "domain snapping can be activated back");
       });
-
-      it("custom tick generator", () => {
-        let scale = new Plottable.Scales.Linear();
-        scale.domain([0, 10]);
-        let defaultTicks = scale.ticks();
-        assert.closeTo(defaultTicks.length, 10, 1, "ticks were generated correctly with default generator");
-        scale.tickGenerator((scale) => scale.defaultTicks().filter(tick => tick % 3 === 0));
-        let customTicks = scale.ticks();
-        assert.deepEqual(customTicks, [0, 3, 6, 9], "ticks were generated correctly with custom generator");
-      });
     });
 
     describe("Padding exceptions", () => {
-      it("addPaddingExceptionsProvider() works as expected on one end", () => {
+      let scale: Plottable.Scales.Linear;
+
+      beforeEach(() => {
+        scale = new Plottable.Scales.Linear();
+      });
+
+      it("can stop padding on one end using addPaddingExceptionsProvider()", () => {
         let scale = new Plottable.Scales.Linear();
         scale.addIncludedValuesProvider(() => [10, 13]);
         assert.strictEqual(scale.domain()[0], 9.5, "The left side of the domain is padded");
@@ -222,7 +231,7 @@ describe("Scales", () => {
         assert.strictEqual(scale.domain()[0], 10, "The left side of the domain is no longer padded");
       });
 
-      it("addPaddingExceptionsProvider() works as expected on both ends", () => {
+      it("can stop padding on both ends using addPaddingExceptionsProvider()", () => {
         let scale = new Plottable.Scales.Linear();
         scale.addIncludedValuesProvider(() => [10, 13]);
         assert.deepEqual(scale.domain(), [9.5, 13.5], "The domain is padded");
@@ -237,7 +246,7 @@ describe("Scales", () => {
         assert.deepEqual(scale.domain(), [10, 13], "The domain is no longer padded");
       });
 
-      it("removePaddingExceptionsProvider() works as expected", () => {
+      it("can remove the PaddingExceptionProvider", () => {
         let scale = new Plottable.Scales.Linear();
         scale.addIncludedValuesProvider(() => [10, 13]);
 
@@ -262,8 +271,8 @@ describe("Scales", () => {
         scale.addPaddingExceptionsProvider(paddingExceptionProviderBoth);
         assert.deepEqual(scale.domain(), [10, 13], "The domain is no longer padded");
 
-        scale.addPaddingExceptionsProvider(paddingExceptionProviderLeft);
-        assert.deepEqual(scale.domain(), [10, 13], "The domain is still no longer padded");
+        scale.removePaddingExceptionsProvider(paddingExceptionProviderLeft);
+        assert.deepEqual(scale.domain(), [10, 13], "The domain is still not padded");
       });
     });
 
