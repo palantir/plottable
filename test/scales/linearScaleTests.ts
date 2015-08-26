@@ -83,7 +83,6 @@ describe("Scales", () => {
         let customTicks = scale.ticks();
         assert.deepEqual(customTicks, [0, 3, 6, 9], "ticks were generated correctly with custom generator");
       });
-
     });
 
     describe("Auto Domaining", () => {
@@ -98,6 +97,14 @@ describe("Scales", () => {
 
         scale.autoDomain();
         assert.deepEqual(scale.domain(), [0, 1], "the domain is still [0, 1]");
+      });
+
+      it("modififes the autodomain flag accordingly", () => {
+        scale.addIncludedValuesProvider((scale) => [0, 5]);
+        assert.isTrue((<any> scale)._autoDomainAutomatically,
+          "the autoDomain flag is still set after autoranginging and padding and nice-ing");
+        scale.domain([0, 5]);
+        assert.isFalse((<any> scale)._autoDomainAutomatically, "the autoDomain flag is false after domain explicitly set");
       });
 
       it("expands single value domains to [value - 1, value + 1] when auto domaining", () => {
@@ -286,14 +293,6 @@ describe("Scales", () => {
         dataset = new Plottable.Dataset(data);
         scale = new Plottable.Scales.Linear();
         scale.padProportion(0);
-      });
-
-      it("scale autoDomain flag is not overwritten without explicitly setting the domain", () => {
-        scale.addIncludedValuesProvider((scale: Plottable.Scale<number, number>) => d3.extent(data, (e) => e.foo));
-        assert.isTrue((<any> scale)._autoDomainAutomatically,
-                            "the autoDomain flag is still set after autoranginging and padding and nice-ing");
-        scale.domain([0, 5]);
-        assert.isFalse((<any> scale)._autoDomainAutomatically, "the autoDomain flag is false after domain explicitly set");
       });
 
       it("scale autorange works as expected with single dataset", () => {
