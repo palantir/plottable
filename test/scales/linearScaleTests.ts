@@ -220,7 +220,6 @@ describe("Scales", () => {
       });
 
       it("can stop padding on one end using addPaddingExceptionsProvider()", () => {
-        let scale = new Plottable.Scales.Linear();
         scale.addIncludedValuesProvider(() => [10, 13]);
         assert.strictEqual(scale.domain()[0], 9.5, "The left side of the domain is padded");
 
@@ -232,7 +231,6 @@ describe("Scales", () => {
       });
 
       it("can stop padding on both ends using addPaddingExceptionsProvider()", () => {
-        let scale = new Plottable.Scales.Linear();
         scale.addIncludedValuesProvider(() => [10, 13]);
         assert.deepEqual(scale.domain(), [9.5, 13.5], "The domain is padded");
 
@@ -247,7 +245,6 @@ describe("Scales", () => {
       });
 
       it("can remove the PaddingExceptionProvider", () => {
-        let scale = new Plottable.Scales.Linear();
         scale.addIncludedValuesProvider(() => [10, 13]);
 
         let paddingExceptionProviderLeft = () => [10];
@@ -277,11 +274,15 @@ describe("Scales", () => {
     });
 
     describe("Autoranging behavior", () => {
-      let data: any[];
+      let data = [
+        {foo: 2, bar: 1},
+        {foo: 5, bar: -20},
+        {foo: 0, bar: 0}
+      ];
       let dataset: Plottable.Dataset;
       let scale: Plottable.Scales.Linear;
+
       beforeEach(() => {
-        data = [{foo: 2, bar: 1}, {foo: 5, bar: -20}, {foo: 0, bar: 0}];
         dataset = new Plottable.Dataset(data);
         scale = new Plottable.Scales.Linear();
         scale.padProportion(0);
