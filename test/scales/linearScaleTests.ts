@@ -107,6 +107,38 @@ describe("Scales", () => {
         assert.isFalse((<any> scale)._autoDomainAutomatically, "the autoDomain flag is false after domain explicitly set");
       });
 
+      it("accounts for included values providers", () => {
+        scale.padProportion(0);
+
+        assert.deepEqual(scale.domain(), [0, 1], "the default domain is [0, 1]");
+
+        scale.addIncludedValuesProvider((scale) => [0, 10]);
+        assert.deepEqual(scale.domain(), [0, 10], "scale domain accounts for first provider");
+
+        scale.addIncludedValuesProvider((scale) => [-10, 0]);
+        assert.deepEqual(scale.domain(), [-10, 10], "scale domain accounts for second provider");
+      });
+
+      it("can remove included values providers", () => {
+        scale.padProportion(0);
+
+        assert.deepEqual(scale.domain(), [0, 1], "the default domain is [0, 1]");
+
+        let posProvider = () => [0, 10];
+        assert.strictEqual(scale.addIncludedValuesProvider(posProvider), scale,
+          "Adding an included values provider returns the scale");
+        let negProvider = () => [-10, 0];
+        scale.addIncludedValuesProvider(negProvider);
+        assert.deepEqual(scale.domain(), [-10, 10], "scale domain accounts for both providers");
+
+        assert.strictEqual(scale.removeIncludedValuesProvider(negProvider), scale,
+          "Removing an included values provider returns the scale");
+        assert.deepEqual(scale.domain(), [0, 10], "scale domain only accounts for remaining provider");
+
+        scale.removeIncludedValuesProvider(posProvider);
+        assert.deepEqual(scale.domain(), [0, 1], "scale defaults back to the [0, 1] domain when all value providers are removed");
+      });
+
       it("expands single value domains to [value - 1, value + 1] when auto domaining", () => {
         let singleValue = 15;
         scale.addIncludedValuesProvider((scale: Plottable.Scales.Linear) => [singleValue]);
@@ -280,7 +312,7 @@ describe("Scales", () => {
       });
     });
 
-    describe("Autoranging behavior", () => {
+    describe("Plot interaction", () => {
       let data = [
         {foo: 2, bar: 1},
         {foo: 5, bar: -20},
@@ -330,25 +362,6 @@ describe("Scales", () => {
         assert.deepEqual(scale.domain(), [0, 1], "scale shows default values when all perspectives removed");
         svg1.remove();
         svg2.remove();
-      });
-
-      it("addIncludedValuesProvider()", () => {
-        scale.addIncludedValuesProvider((scale: Plottable.Scale<number, number>) => [0, 10]);
-        assert.deepEqual(scale.domain(), [0, 10], "scale domain accounts for first provider");
-
-        scale.addIncludedValuesProvider((scale: Plottable.Scale<number, number>) => [-10, 0]);
-        assert.deepEqual(scale.domain(), [-10, 10], "scale domain accounts for second provider");
-      });
-
-      it("removeIncludedValuesProvider()", () => {
-        let posProvider = (scale: Plottable.Scale<number, number>) => [0, 10];
-        scale.addIncludedValuesProvider(posProvider);
-        let negProvider = (scale: Plottable.Scale<number, number>) => [-10, 0];
-        scale.addIncludedValuesProvider(negProvider);
-        assert.deepEqual(scale.domain(), [-10, 10], "scale domain accounts for both providers");
-
-        scale.removeIncludedValuesProvider(negProvider);
-        assert.deepEqual(scale.domain(), [0, 10], "scale domain only accounts for remaining provider");
       });
 
       it("should resize when a plot is removed", () => {
