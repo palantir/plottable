@@ -2456,10 +2456,12 @@ declare module Plottable {
                 width: number;
                 height: number;
             };
+            protected _isVertical(): boolean;
             fixedWidth(): boolean;
             fixedHeight(): boolean;
             computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number): GuideLineLayer<D>;
             renderImmediately(): GuideLineLayer<D>;
+            protected _setPixelPositionWithoutChangingMode(pixelPosition: number): void;
             /**
              * Gets the QuantitativeScale on the GuideLineLayer.
              *
@@ -4490,6 +4492,88 @@ declare module Plottable {
             xExtent(): (number | {
                 valueOf(): number;
             })[];
+        }
+    }
+}
+
+
+declare module Plottable {
+    interface DragLineCallback<D> {
+        (dragLineLayer: Components.DragLineLayer<D>): void;
+    }
+    module Components {
+        class DragLineLayer<D> extends GuideLineLayer<D> {
+            constructor(orientation: string);
+            protected _setup(): void;
+            renderImmediately(): DragLineLayer<D>;
+            /**
+             * Gets the detection radius of the drag line in pixels.
+             */
+            detectionRadius(): number;
+            /**
+             * Sets the detection radius of the drag line in pixels.
+             *
+             * @param {number} detectionRadius
+             * @return {DragLineLayer<D>} The calling DragLineLayer.
+             */
+            detectionRadius(detectionRadius: number): DragLineLayer<D>;
+            /**
+             * Gets whether the DragLineLayer is enabled.
+             */
+            enabled(): boolean;
+            /**
+             * Enables or disables the DragLineLayer.
+             *
+             * @param {boolean} enabled
+             * @return {DragLineLayer<D>} The calling DragLineLayer.
+             */
+            enabled(enabled: boolean): DragLineLayer<D>;
+            /**
+             * Sets the callback to be called when dragging starts.
+             * The callback will be passed the calling DragLineLayer.
+             *
+             * @param {DragLineCallback<D>} callback
+             * @returns {DragLineLayer<D>} The calling DragLineLayer.
+             */
+            onDragStart(callback: DragLineCallback<D>): DragLineLayer<D>;
+            /**
+             * Removes a callback that would be called when dragging starts.
+             *
+             * @param {DragLineCallback<D>} callback
+             * @returns {DragLineLayer<D>} The calling DragLineLayer.
+             */
+            offDragStart(callback: DragLineCallback<D>): DragLineLayer<D>;
+            /**
+             * Sets a callback to be called during dragging.
+             * The callback will be passed the calling DragLineLayer.
+             *
+             * @param {DragLineCallback<D>} callback
+             * @returns {DragLineLayer<D>} The calling DragLineLayer.
+             */
+            onDrag(callback: DragLineCallback<D>): DragLineLayer<D>;
+            /**
+             * Removes a callback that would be called during dragging.
+             *
+             * @param {DragLineCallback<D>} callback
+             * @returns {DragLineLayer<D>} The calling DragLineLayer.
+             */
+            offDrag(callback: DragLineCallback<D>): DragLineLayer<D>;
+            /**
+             * Sets a callback to be called when dragging ends.
+             * The callback will be passed the calling DragLineLayer.
+             *
+             * @param {DragLineCallback<D>} callback
+             * @returns {DragLineLayer<D>} The calling DragLineLayer.
+             */
+            onDragEnd(callback: DragLineCallback<D>): DragLineLayer<D>;
+            /**
+             * Removes a callback that would be called when dragging ends.
+             *
+             * @param {DragLineCallback<D>} callback
+             * @returns {DragLineLayer<D>} The calling DragLineLayer.
+             */
+            offDragEnd(callback: DragLineCallback<D>): DragLineLayer<D>;
+            destroy(): void;
         }
     }
 }
