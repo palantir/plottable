@@ -1,7 +1,7 @@
 ///<reference path="../testReference.ts" />
 
 describe("Scales", () => {
-  describe("Linear Scales", () => {
+  describe("Linear Scale", () => {
 
     describe("Basic usage", () => {
       let scale: Plottable.Scales.Linear;
@@ -10,11 +10,65 @@ describe("Scales", () => {
         scale = new Plottable.Scales.Linear();
       });
 
+      it("can set domain and range", () => {
+        assert.deepEqual(scale.domain(), [0, 1], "the domain defaults to [0, 1]");
+        assert.deepEqual(scale.range(), [0, 1], "the range defaults to [0, 1]");
+
+        assert.strictEqual(scale.domain([5, 6]), scale, "setting the domain returns the scale");
+        assert.strictEqual(scale.range([6, 7]), scale, "setting the range returns the scale");
+
+        assert.deepEqual(scale.domain(), [5, 6], "the domain has been set");
+        assert.deepEqual(scale.range(), [6, 7], "the range has been set");
+      });
+
+      it("maps domain to range in a linear fashion", () => {
+        scale.domain([10, 20]);
+        scale.range([400, 500]);
+        assert.strictEqual(scale.scale(10), 400, "first value in domain maps to first value in range");
+        assert.strictEqual(scale.scale(20), 500, "last value in domain maps to last value in range");
+        assert.strictEqual(scale.scale(15), 450, "middle value in domain maps to middle value in range");
+
+        assert.strictEqual(scale.invert(400), 10, "first value in range maps to first value in domain");
+        assert.strictEqual(scale.invert(500), 20, "last value in range maps to last value in domain");
+        assert.strictEqual(scale.invert(450), 15, "middle value in range maps to middle value in domain");
+
+        scale.domain([20, 10]);
+        assert.strictEqual(scale.scale(10), 500, "first value in flipped domain maps to first value in range");
+        assert.strictEqual(scale.scale(20), 400, "last value in flipped domain maps to last value in range");
+        assert.strictEqual(scale.scale(15), 450, "middle value in flipped domain maps to middle value in range");
+
+        assert.strictEqual(scale.invert(400), 20, "first value in range maps to first value in flipped domain");
+        assert.strictEqual(scale.invert(500), 10, "last value in range maps to last value in flipped domain");
+        assert.strictEqual(scale.invert(450), 15, "middle value in range maps to middle value in flipped domain");
+      });
+
       it("filters out invalid numbers when using extentOfValues()", () => {
         let arrayWithBadValues: any[] = [null, NaN, undefined, Infinity, -Infinity, "a string", 1, 1.2];
         let expectedExtent = [1, 1.2];
         let extent = scale.extentOfValues(arrayWithBadValues);
         assert.deepEqual(extent, expectedExtent, "invalid values were filtered out");
+      });
+
+      it("domain can't include NaN or Infinity", () => {
+        scale.domain([1, 2]);
+        scale.domain([5, Infinity]);
+        assert.deepEqual(scale.domain(), [1, 2], "Infinity containing domain was ignored");
+        scale.domain([5, -Infinity]);
+        assert.deepEqual(scale.domain(), [1, 2], "-Infinity containing domain was ignored");
+        scale.domain([NaN, 7]);
+        assert.deepEqual(scale.domain(), [1, 2], "NaN containing domain was ignored");
+        scale.domain([-1, 5]);
+        assert.deepEqual(scale.domain(), [-1, 5], "Regular domains still accepted");
+        scale.domain([5, -1]);
+        assert.deepEqual(scale.domain(), [5, -1], "Values that flip the domain are accepted");
+      });
+    });
+
+    describe("Auto Domaining", () => {
+      let scale: Plottable.Scales.Linear;
+
+      beforeEach(() => {
+        scale = new Plottable.Scales.Linear();
       });
 
       it("auto domains by default", () => {
@@ -30,15 +84,15 @@ describe("Scales", () => {
         assert.deepEqual(scale.domain(), [singleValue - 1, singleValue + 1], "single-value extent was expanded");
       });
 
-      it("domainMin()", () => {
+      it("can force the minimum of the domain with domainMin()", () => {
         scale.padProportion(0);
         let requestedDomain = [-5, 5];
-        scale.addIncludedValuesProvider((scale: Plottable.Scales.Linear) => requestedDomain);
+        scale.addIncludedValuesProvider((scale) => requestedDomain);
 
         let minBelowBottom = -10;
-        scale.domainMin(minBelowBottom);
+        assert.strictEqual(scale.domainMin(minBelowBottom), scale, "the scale is returned by the setter");
+        assert.strictEqual(scale.domainMin(), minBelowBottom, "can get the domainMin");
         assert.deepEqual(scale.domain(), [minBelowBottom, requestedDomain[1]], "lower end of domain was set by domainMin()");
-        assert.strictEqual(scale.domainMin(), minBelowBottom, "returns the set minimum value");
 
         let minInMiddle = 0;
         scale.domainMin(minInMiddle);
@@ -56,16 +110,17 @@ describe("Scales", () => {
         scale.domainMin(minInMiddle);
         let requestedDomain2 = [-10, 10];
         scale.addIncludedValuesProvider((scale: Plottable.Scales.Linear) => requestedDomain2);
-        assert.deepEqual(scale.domain(), [minInMiddle, requestedDomain2[1]], "adding another ExtentsProvider doesn't change domainMin()");
+        assert.deepEqual(scale.domain(), [minInMiddle, requestedDomain2[1]],
+          "adding new IncludedValuesProvider doesn't change domainMin()");
       });
 
-      it("domainMax()", () => {
+      it("can force the maximum of the domain with domainMax()", () => {
         scale.padProportion(0);
         let requestedDomain = [-5, 5];
-        scale.addIncludedValuesProvider((scale: Plottable.Scales.Linear) => requestedDomain);
+        scale.addIncludedValuesProvider((scale) => requestedDomain);
 
         let maxAboveTop = 10;
-        scale.domainMax(maxAboveTop);
+        assert.strictEqual(scale.domainMax(maxAboveTop), scale, "the scale is returned by the setter");
         assert.deepEqual(scale.domain(), [requestedDomain[0], maxAboveTop], "upper end of domain was set by domainMax()");
         assert.strictEqual(scale.domainMax(), maxAboveTop, "returns the set maximum value");
 
@@ -85,13 +140,14 @@ describe("Scales", () => {
         scale.domainMax(maxInMiddle);
         let requestedDomain2 = [-10, 10];
         scale.addIncludedValuesProvider((scale: Plottable.Scales.Linear) => requestedDomain2);
-        assert.deepEqual(scale.domain(), [requestedDomain2[0], maxInMiddle], "adding another ExtentsProvider doesn't change domainMax()");
+        assert.deepEqual(scale.domain(), [requestedDomain2[0], maxInMiddle],
+          "adding another IncludedValuesProvider doesn't change domainMax()");
       });
 
-      it("domainMin() and domainMax() together", () => {
+      it("can force the domain by using domainMin() and domainMax() together", () => {
         scale.padProportion(0);
         let requestedDomain = [-5, 5];
-        scale.addIncludedValuesProvider((scale: Plottable.Scales.Linear) => requestedDomain);
+        scale.addIncludedValuesProvider((scale) => requestedDomain);
 
         let desiredMin = -10;
         let desiredMax = 10;
@@ -104,19 +160,7 @@ describe("Scales", () => {
         let smallMax = -10;
         scale.domainMin(bigMin);
         scale.domainMax(smallMax);
-        assert.deepEqual(scale.domain(), [bigMin, smallMax], "setting both is allowed even if it reverse the domain");
-      });
-
-      it("domain can't include NaN or Infinity", () => {
-        scale.domain([0, 1]);
-        scale.domain([5, Infinity]);
-        assert.deepEqual(scale.domain(), [0, 1], "Infinity containing domain was ignored");
-        scale.domain([5, -Infinity]);
-        assert.deepEqual(scale.domain(), [0, 1], "-Infinity containing domain was ignored");
-        scale.domain([NaN, 7]);
-        assert.deepEqual(scale.domain(), [0, 1], "NaN containing domain was ignored");
-        scale.domain([-1, 5]);
-        assert.deepEqual(scale.domain(), [-1, 5], "Regular domains still accepted");
+        assert.deepEqual(scale.domain(), [bigMin, smallMax], "setting both is allowed even if it reverses the domain");
       });
     });
 
