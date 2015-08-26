@@ -217,13 +217,8 @@ describe("BaseAxis", () => {
       it("can set if annotations are enabled", () => {
         let axis = new Plottable.Axis(new Plottable.Scale<{}, number>(), "bottom");
         let annotationsEnabled = axis.annotationsEnabled();
-        axis.annotationsEnabled(!annotationsEnabled);
+        assert.strictEqual(axis.annotationsEnabled(!annotationsEnabled), axis, "enabling/disabling annotations returns calling axis");
         assert.strictEqual(axis.annotationsEnabled(), !annotationsEnabled, "can set if annotations are enabled");
-      });
-
-      it("returns the axis when setting if annotations are enabled", () => {
-        let axis = new Plottable.Axis(new Plottable.Scale<{}, number>(), "bottom");
-        assert.strictEqual(axis.annotationsEnabled(true), axis, "enabling annotations return calling axis");
       });
     });
 
@@ -236,7 +231,7 @@ describe("BaseAxis", () => {
       it("can set the annotated ticks", () => {
         let axis = new Plottable.Axis(new Plottable.Scale<{}, number>(), "bottom");
         let annotatedTicks = [20, 30, 40];
-        axis.annotatedTicks(annotatedTicks);
+        assert.strictEqual(axis.annotatedTicks(annotatedTicks), axis, "setting annotated ticks returns calling axis");
         assert.deepEqual(axis.annotatedTicks(), annotatedTicks, "can set the annotated ticks");
       });
 
@@ -258,7 +253,7 @@ describe("BaseAxis", () => {
       it("can set the annotation formatter", () => {
         let axis = new Plottable.Axis(new Plottable.Scale<{}, number>(), "bottom");
         let annotationFormatter = (d: any) => "";
-        axis.annotationFormatter(annotationFormatter);
+        assert.strictEqual(axis.annotationFormatter(annotationFormatter), axis, "setting annotation formatter returns calling axis");
         let test = "testString";
         assert.strictEqual(annotationFormatter(test), axis.annotationFormatter()(test), "can set the annotated ticks");
       });
