@@ -2,38 +2,6 @@
 
 describe("Plots", () => {
   describe("PiePlot", () => {
-    it("updates slices when data changes", () => {
-      let svg = TestMethods.generateSVG(500, 500);
-      let piePlot = new Plottable.Plots.Pie();
-      piePlot.sectorValue((d) => d.value);
-      let fourSliceData = [
-        { value: 1 },
-        { value: 1 },
-        { value: 1 },
-        { value: 1 }
-      ];
-      let dataset = new Plottable.Dataset(fourSliceData);
-      piePlot.addDataset(dataset);
-      piePlot.renderTo(svg);
-      let fourSlicePathStrings: String[] = [];
-      piePlot.content().selectAll("path").each(function() { fourSlicePathStrings.push(d3.select(this).attr("d")); });
-      assert.lengthOf(fourSlicePathStrings, fourSliceData.length * 2, "2 paths per datum");
-
-      let twoSliceData = [
-        { value: 1 },
-        { value: 1 }
-      ];
-      dataset.data(twoSliceData);
-      let twoSlicePathStrings: String[] = [];
-      piePlot.content().selectAll("path").each(function() { twoSlicePathStrings.push(d3.select(this).attr("d")); });
-      assert.lengthOf(twoSlicePathStrings, twoSliceData.length * 2, "2 paths per datum");
-
-      twoSlicePathStrings.forEach((pathString, index) => {
-        assert.notStrictEqual(pathString, fourSlicePathStrings[index], "slices were updated when data changed");
-      });
-      svg.remove();
-    });
-
     describe("Labels", () => {
       let svg: d3.Selection<void>;
       let piePlot: Plottable.Plots.Pie;
@@ -281,6 +249,27 @@ describe("Plots", () => {
 
         let arcPath1 = d3.select(arcPaths[0][1]);
         assert.strictEqual(arcPath1.attr("fill"), "#fd373e", "second sector filled appropriately");
+        svg.remove();
+      });
+
+      it("updates slices when data changes", () => {
+        let twoSlicePathStrings: String[] = [];
+        piePlot.content().selectAll("path").each(function() { twoSlicePathStrings.push(d3.select(this).attr("d")); });
+        assert.lengthOf(twoSlicePathStrings, simpleData.length * 2, "2 paths per datum");
+
+        let threeSliceData = [
+          { value: 1 },
+          { value: 1 },
+          { value: 1 },
+        ];
+        simpleDataset.data(threeSliceData);
+        let threeSlicePathStrings: String[] = [];
+        piePlot.content().selectAll("path").each(function() { threeSlicePathStrings.push(d3.select(this).attr("d")); });
+        assert.lengthOf(threeSlicePathStrings, threeSliceData.length * 2, "2 paths per datum");
+
+        twoSlicePathStrings.forEach((pathString, index) => {
+          assert.notStrictEqual(pathString, threeSlicePathStrings[index], "slices were updated when data changed");
+        });
         svg.remove();
       });
 
