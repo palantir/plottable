@@ -24,10 +24,10 @@ Quick Start
   - Downloading [plottable.zip](plottable.zip).
 - Check out [examples](http://plottablejs.org/examples/), read the [tutorials](http://plottablejs.org/tutorials/), and visit the [website](http://plottablejs.org/).
 
-Upgrading to 1.0
+Upgrading to v1.0.0
 ---
 
-If you are upgrading from a pre-1.0 version of Plottable to v1.0 or later, please use the [Upgrade Guide](https://github.com/palantir/plottable/wiki/Upgrading-to-1.0.0) on the wiki.
+If you are upgrading from a pre-v1.0.0 version of Plottable to v1.0.0 or later, please use the [Upgrade Guide](https://github.com/palantir/plottable/wiki/Upgrading-to-1.0.0) on the wiki.
 
 We Want To Help!
 ---
