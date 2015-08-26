@@ -55,15 +55,38 @@ describe("Scales", () => {
       });
 
       it("does not accept NaN or Infinity as domain", () => {
+        let warningCalled = false;
+        let oldWarn = Plottable.Utils.Window.warn;
+        Plottable.Utils.Window.warn = (msg: string) => {
+          if (msg.indexOf("NaN or Infinity") > -1) {
+            warningCalled = true;
+          }
+        };
+
         scale.domain([1, 2]);
+        assert.deepEqual(scale.domain(), [1, 2], "initial domain is set");
+
+        warningCalled = false;
         scale.domain([5, Infinity]);
         assert.deepEqual(scale.domain(), [1, 2], "Infinity containing domain was ignored");
+        assert.isTrue(warningCalled, "a warning was thrown for setting domain to Infinity");
+
+        warningCalled = false;
         scale.domain([-Infinity, 5]);
         assert.deepEqual(scale.domain(), [1, 2], "-Infinity containing domain was ignored");
+        assert.isTrue(warningCalled, "a warning was thrown for setting domain to -Infinity");
+
+        warningCalled = false;
         scale.domain([NaN, 7]);
         assert.deepEqual(scale.domain(), [1, 2], "NaN containing domain was ignored");
+        assert.isTrue(warningCalled, "a warning was thrown for setting domain to NaN");
+
+        warningCalled = false;
         scale.domain([-1, 5]);
         assert.deepEqual(scale.domain(), [-1, 5], "Regular domains still accepted");
+        assert.isFalse(warningCalled, "a warning is not thrown when correct domains are given");
+
+        Plottable.Utils.Window.warn = oldWarn;
       });
 
       it("accepts NaN or Infinity as range", () => {
