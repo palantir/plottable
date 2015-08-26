@@ -52,11 +52,24 @@ describe("Scales", () => {
     });
 
     describe("Other bases", () => {
+      it("works with base 2", () => {
+        let scale = new Plottable.Scales.ModifiedLog(2);
+        scale.domain([0, 16]);
+        scale.range([0, 1]);
 
+        assert.strictEqual(scale.scale(-2), -0.25, "scales negative values");
+        assert.strictEqual(scale.scale(0), 0, "scales 0");
+        assert.strictEqual(scale.scale(2), 0.25, "scales base");
+        assert.strictEqual(scale.scale(4), 0.5, "scales random values");
+        assert.strictEqual(scale.scale(16), 1, "scales maximum value");
+        assert.strictEqual(scale.scale(256), 2, "scales values outside the domain");
 
+        assert.strictEqual(scale.invert(1), 16, "inverts maximum value");
+        assert.strictEqual(scale.invert(0), 0, "inverts zero");
+      });
     });
 
-    describe("AutoDomain", () => {
+    describe("Auto Domaining", () => {
       let scale: Plottable.Scales.ModifiedLog;
       let base = 10;
 
