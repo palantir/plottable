@@ -324,13 +324,15 @@ describe("Scales", () => {
         scale.padProportion(0);
       });
 
-      it("scale autorange works as expected with single dataset", () => {
+      it("receives updates from the plot and autodomains in accordange", () => {
         let svg = TestMethods.generateSVG();
         let plot = new Plottable.Plot();
+
         (<any> plot)._createDrawer = (dataset: Plottable.Dataset) => createMockDrawer(dataset);
         plot.addDataset(dataset);
         plot.attr("x", (d) => d.x, scale);
         plot.renderTo(svg);
+
         assert.deepEqual(scale.domain(), [0, 5], "scale domain was autoranged properly");
 
         dataset.data([{x: 100}]);
@@ -339,7 +341,7 @@ describe("Scales", () => {
         svg.remove();
       });
 
-      it("scale reference counting works as expected", () => {
+      it("uses reference counting to keep track of the plots it coordinates", () => {
         let svg1 = TestMethods.generateSVG();
         let svg2 = TestMethods.generateSVG();
 
@@ -371,13 +373,13 @@ describe("Scales", () => {
         svg2.remove();
       });
 
-      it("scale domain updates when plots are added or removed", () => {
+      it("adjusts to plot detaching, reattaching or destruction", () => {
         let svg = TestMethods.generateSVG();
-        let ds1 = new Plottable.Dataset([
+        let dataset1 = new Plottable.Dataset([
           {x: 0, y: 0},
           {x: 1, y: 1}
         ]);
-        let ds2 = new Plottable.Dataset([
+        let dataset2 = new Plottable.Dataset([
           {x: 1, y: 1},
           {x: 2, y: 2}
         ]);
@@ -388,12 +390,12 @@ describe("Scales", () => {
         yScale.padProportion(0);
 
         let plot1 = new Plottable.Plots.Line();
-        plot1.addDataset(ds1);
+        plot1.addDataset(dataset1);
         plot1.x((d) => d.x, xScale);
         plot1.y((d) => d.y, yScale);
 
         let plot2 = new Plottable.Plots.Line();
-        plot2.addDataset(ds2);
+        plot2.addDataset(dataset2);
         plot2.x((d) => d.x, xScale);
         plot2.y((d) => d.y, yScale);
 
