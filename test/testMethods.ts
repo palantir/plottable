@@ -250,7 +250,7 @@ module TestMethods {
     let actualAreaPathNumbers = tokenizePathString(actualPath);
     let expectedAreaPathNumbers = tokenizePathString(expectedPath);
 
-    assert.lengthOf(actualAreaPathNumbers, expectedAreaPathNumbers.length, "number of numbers in each path should be equal");
+    assert.lengthOf(actualAreaPathNumbers, expectedAreaPathNumbers.length, `${msg}: number of numbers in each path should be equal`);
     actualAreaPathNumbers.forEach((actualAreaNumber, i) => {
       let expectedAreaNumber = expectedAreaPathNumbers[i];
         assert.closeTo(+actualAreaNumber, +expectedAreaNumber, 0.1, msg);

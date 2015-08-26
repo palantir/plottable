@@ -9841,10 +9841,10 @@ var Plottable;
                 var startAngleAccessor = Plottable.Plot._scaledAccessor(this.startAngle());
                 var endAngleAccessor = Plottable.Plot._scaledAccessor(this.endAngle());
                 attrToProjector["d"] = function (datum, index, ds) {
-                    var startAngle = startAngleAccessor(datum, index, ds) % (Math.PI * 2);
-                    var endAngle = endAngleAccessor(datum, index, ds) % (Math.PI * 2);
-                    while (endAngle < startAngle) {
-                        endAngle += Math.PI * 2;
+                    var startAngle = startAngleAccessor(datum, index, ds);
+                    var endAngle = endAngleAccessor(datum, index, ds);
+                    if (endAngle < startAngle) {
+                        endAngle += (Math.floor((startAngle - endAngle) / (Math.PI * 2)) + 1) * Math.PI * 2;
                     }
                     return d3.svg.arc().innerRadius(innerRadiusAccessor(datum, index, ds))
                         .outerRadius(outerRadiusAccessor(datum, index, ds))

@@ -3601,9 +3601,10 @@ declare module Plottable {
             startAngle(startAngle: number | Accessor<number>): Plots.Wheel<R, T>;
             /**
              * Sets the start angle to a scaled constant value or scaled result of an Accessor.
+             * This also sets the scale for end angle.
              * The provided Scale will account for the values when autoDomain()-ing.
              *
-             * @param {S|Accessor<number>} startAngle
+             * @param {T|Accessor<T>} startAngle
              * @param {Scale<T, number>} scale
              * @returns {Wheel} The calling Wheel Plot.
              */
@@ -3614,6 +3615,7 @@ declare module Plottable {
             endAngle<T>(): AccessorScaleBinding<T, number>;
             /**
              * Sets the end angle to a constant number or the result of an Accessor<number>.
+             * The scale of end angle is set to be the scale of start angle.
              *
              * @param {number|Accessor<number>} endAngle
              * @returns {Wheel} The calling Wheel Plot.
@@ -3632,6 +3634,7 @@ declare module Plottable {
             innerRadius(innerRadius: number | Accessor<number>): Plots.Wheel<R, T>;
             /**
              * Sets the inner radius to a scaled constant value or scaled result of an Accessor.
+             * This also sets the scale for outer radius.
              * The provided Scale will account for the values when autoDomain()-ing.
              *
              * @param {R|Accessor<R>} innerRadius
@@ -3645,6 +3648,7 @@ declare module Plottable {
             outerRadius<R>(): AccessorScaleBinding<R, number>;
             /**
              * Sets the outer radius to a constant number or the result of an Accessor<number>.
+             * The scale of outer radius is set to be the scale of inner radius.
              *
              * @param {number|Accessor<number>} outerRadius
              * @returns {Wheel} The calling Wheel Plot.

@@ -68,9 +68,11 @@ export module Plots {
       let startAngleAccessor = Plot._scaledAccessor(this.startAngle());
       let endAngleAccessor = Plot._scaledAccessor(this.endAngle());
       attrToProjector["d"] = (datum: any, index: number, ds: Dataset) => {
-        let startAngle = startAngleAccessor(datum, index, ds) % (Math.PI * 2);
-        let endAngle = endAngleAccessor(datum, index, ds) % (Math.PI * 2);
-        while (endAngle < startAngle) { endAngle += Math.PI * 2; }
+        let startAngle = startAngleAccessor(datum, index, ds);
+        let endAngle = endAngleAccessor(datum, index, ds);
+        if (endAngle < startAngle) {
+          endAngle += (Math.floor((startAngle - endAngle) / (Math.PI * 2)) + 1) * Math.PI * 2;
+        }
         return d3.svg.arc().innerRadius(innerRadiusAccessor(datum, index, ds))
                            .outerRadius(outerRadiusAccessor(datum, index, ds))
                            .startAngle(startAngle)
@@ -92,9 +94,10 @@ export module Plots {
     public startAngle(startAngle: number | Accessor<number>): Plots.Wheel<R, T>;
     /**
      * Sets the start angle to a scaled constant value or scaled result of an Accessor.
+     * This also sets the scale for end angle.
      * The provided Scale will account for the values when autoDomain()-ing.
      *
-     * @param {S|Accessor<number>} startAngle
+     * @param {T|Accessor<T>} startAngle
      * @param {Scale<T, number>} scale
      * @returns {Wheel} The calling Wheel Plot.
      */
@@ -125,6 +128,7 @@ export module Plots {
     public endAngle<T>(): AccessorScaleBinding<T, number>;
     /**
      * Sets the end angle to a constant number or the result of an Accessor<number>.
+     * The scale of end angle is set to be the scale of start angle.
      *
      * @param {number|Accessor<number>} endAngle
      * @returns {Wheel} The calling Wheel Plot.
@@ -156,6 +160,7 @@ export module Plots {
     public innerRadius(innerRadius: number | Accessor<number>): Plots.Wheel<R, T>;
     /**
      * Sets the inner radius to a scaled constant value or scaled result of an Accessor.
+     * This also sets the scale for outer radius.
      * The provided Scale will account for the values when autoDomain()-ing.
      *
      * @param {R|Accessor<R>} innerRadius
@@ -189,6 +194,7 @@ export module Plots {
     public outerRadius<R>(): AccessorScaleBinding<R, number>;
     /**
      * Sets the outer radius to a constant number or the result of an Accessor<number>.
+     * The scale of outer radius is set to be the scale of inner radius.
      *
      * @param {number|Accessor<number>} outerRadius
      * @returns {Wheel} The calling Wheel Plot.

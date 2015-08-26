@@ -69,17 +69,28 @@ describe("Plots", () => {
       });
 
       it("draws arc clockwise from startAngle toendAngle", () => {
-        let data = [{r1: 0, r2: 1, t1: 60, t2: -60 }];
+        let data = [
+            { r1: 0, r2: 1, t1: 60, t2: -60, expected: 300 },
+            { r1: 1, r2: 2, t1: 60, t2: 60, expected: 60 },
+            { r1: 2, r2: 3, t1: 60, t2: -300, expected: 420 },
+            { r1: 3, r2: 4, t1: 0, t2: 360, expected: 360 },
+            { r1: 3, r2: 4, t1: 90, t2: 70, expected: 430 },
+            { r1: 3, r2: 4, t1: -60, t2: -180, expected: 180 }
+        ];
         let dataset = new Plottable.Dataset(data);
         wheelPlot.addDataset(dataset);
         wheelPlot.renderTo(svg);
-
         let slices = wheelPlot.selections();
-        let path = d3.select(slices[0][0]).attr("d");
-        let arc = d3.svg.arc().innerRadius(rScale.scale(0)).outerRadius(rScale.scale(1))
-                               .startAngle(tScale.scale(60)).endAngle(tScale.scale(300));
-        let expectedPath = arc(null);
-        TestMethods.assertAreaPathCloseTo(path, expectedPath, 0.1, "arc is drawn from 60 to -60");
+        data.forEach((datum, i) => {
+          let startAngle = datum.t1;
+          let endAngle = datum.t2;
+          let expectedEndAngle = datum.expected;
+          let path = d3.select(slices[0][i]).attr("d");
+          let arc = d3.svg.arc().innerRadius(rScale.scale(datum.r1)).outerRadius(rScale.scale(datum.r2))
+                                .startAngle(tScale.scale(startAngle)).endAngle(tScale.scale(expectedEndAngle));
+          let expectedPath = arc(null);
+          TestMethods.assertAreaPathCloseTo(path, expectedPath, 0.1, `arc is drawn from ${startAngle} to ${endAngle}`);
+        });
 
         svg.remove();
       });
