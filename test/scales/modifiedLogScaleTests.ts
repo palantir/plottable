@@ -52,8 +52,14 @@ describe("Scales", () => {
     });
 
     describe("Other bases", () => {
+      it("uses 10 as the default base", () => {
+        let scale = new Plottable.Scales.ModifiedLog();
+        assert.strictEqual((<any>scale)._base, 10, "10 is the default base");
+      });
+
       it("works with base 2", () => {
         let scale = new Plottable.Scales.ModifiedLog(2);
+        assert.strictEqual((<any>scale)._base, 2, "base 2 is selected");
         scale.domain([0, 16]);
         scale.range([0, 1]);
 
