@@ -339,7 +339,7 @@ export class Axis<D> extends Component {
         transform: (d) => {
           let xTranslate = isHorizontal ? positionF(d) : rectangleOffsetF(d);
           let yTranslate = isHorizontal ? rectangleOffsetF(d) : positionF(d);
-          return "translate(" + xTranslate + "," + yTranslate + ")";
+          return `translate(${xTranslate},${yTranslate})`;
         },
         visibility: visibilityF
       })
