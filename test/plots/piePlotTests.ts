@@ -2,28 +2,6 @@
 
 describe("Plots", () => {
   describe("PiePlot", () => {
-    it("returns both a fill path and a stroke path in each Entity's selection", () => {
-      let svg = TestMethods.generateSVG(500, 500);
-      let piePlot = new Plottable.Plots.Pie();
-      piePlot.sectorValue((d) => d.value);
-      let data = [
-        { value: 1 },
-        { value: 1 }
-      ];
-      let dataset = new Plottable.Dataset(data);
-      piePlot.addDataset(dataset);
-      piePlot.renderTo(svg);
-
-      let entities = piePlot.entities();
-      entities.forEach((entity) => {
-        assert.strictEqual(entity.selection.size(), 2, "each entity selection has 2 paths");
-        assert.strictEqual(entity.selection.filter(".fill").size(), 1, "each entity selection has 1 fill path");
-        assert.strictEqual(entity.selection.filter(".outline").size(), 1, "each entity selection has 1 stroke path");
-      });
-
-      svg.remove();
-    });
-
     it("updates slices when data changes", () => {
       let svg = TestMethods.generateSVG(500, 500);
       let piePlot = new Plottable.Plots.Pie();
@@ -408,7 +386,17 @@ describe("Plots", () => {
         piePlot.renderTo(svg);
       });
 
-      it("retrieves the entity under each given point", () => {
+      it("returns both a fill path and a stroke path in each Entity's selection", () => {
+        let entities = piePlot.entities();
+        entities.forEach((entity) => {
+          assert.strictEqual(entity.selection.size(), 2, "each entity selection has 2 paths");
+          assert.strictEqual(entity.selection.filter(".fill").size(), 1, "each entity selection has 1 fill path");
+          assert.strictEqual(entity.selection.filter(".outline").size(), 1, "each entity selection has 1 stroke path");
+        });
+        svg.remove();
+      });
+
+      it("retrieves the entity under each given point with entitiesAt()", () => {
         let data = [
           {value: 500},
           {value: 5},
@@ -438,7 +426,7 @@ describe("Plots", () => {
         svg.remove();
       });
 
-      it("returns nothing for points within innerRadius() or outside of outerRadius()", () => {
+      it("returns nothing for points within innerRadius() or outside of outerRadius() with entitiesAt()", () => {
         piePlot.innerRadius(100).render();
         let click1 = { x: 200, y: 201 };
         let entity1 = piePlot.entitiesAt(click1);
@@ -452,7 +440,6 @@ describe("Plots", () => {
         assert.strictEqual(entity3.length, 0, "no entities returned");
         svg.remove();
       });
-
     });
 
     describe("fail safe tests", () => {
