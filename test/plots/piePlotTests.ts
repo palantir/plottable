@@ -253,22 +253,20 @@ describe("Plots", () => {
       });
 
       it("updates slices when data changes", () => {
-        let twoSlicePathStrings: String[] = [];
-        piePlot.content().selectAll("path").each(function() { twoSlicePathStrings.push(d3.select(this).attr("d")); });
-        assert.lengthOf(twoSlicePathStrings, simpleData.length * 2, "2 paths per datum");
+        let originalPathStrings: String[] = [];
+        piePlot.content().selectAll("path").each(function() { originalPathStrings.push(d3.select(this).attr("d")); });
+        assert.lengthOf(originalPathStrings, simpleData.length * 2, "2 paths per datum");
 
-        let threeSliceData = [
-          { value: 1 },
-          { value: 1 },
-          { value: 1 },
-        ];
-        simpleDataset.data(threeSliceData);
-        let threeSlicePathStrings: String[] = [];
-        piePlot.content().selectAll("path").each(function() { threeSlicePathStrings.push(d3.select(this).attr("d")); });
-        assert.lengthOf(threeSlicePathStrings, threeSliceData.length * 2, "2 paths per datum");
+        let oneMoreSliceData = simpleData.slice();
+        oneMoreSliceData.push({ value: 5 });
+        simpleDataset.data(oneMoreSliceData);
 
-        twoSlicePathStrings.forEach((pathString, index) => {
-          assert.notStrictEqual(pathString, threeSlicePathStrings[index], "slices were updated when data changed");
+        let oneMoreSlicePathStrings: String[] = [];
+        piePlot.content().selectAll("path").each(function() { oneMoreSlicePathStrings.push(d3.select(this).attr("d")); });
+        assert.lengthOf(oneMoreSlicePathStrings, oneMoreSliceData.length * 2, "2 paths per datum");
+
+        originalPathStrings.forEach((pathString, index) => {
+          assert.notStrictEqual(pathString, oneMoreSlicePathStrings[index], "slices were updated when data changed");
         });
         svg.remove();
       });
