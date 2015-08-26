@@ -2,17 +2,6 @@
 
 describe("Plots", () => {
   describe("PiePlot", () => {
-    // HACKHACK #1798: beforeEach being used below
-    it("renders correctly with no data", () => {
-      let svg = TestMethods.generateSVG(400, 400);
-      let plot = new Plottable.Plots.Pie();
-      plot.sectorValue((d) => d.value);
-      assert.doesNotThrow(() => plot.renderTo(svg), Error);
-      assert.strictEqual(plot.width(), 400, "was allocated width");
-      assert.strictEqual(plot.height(), 400, "was allocated height");
-      svg.remove();
-    });
-
     it("draws a fill path and a stroke path for each slice", () => {
       let svg = TestMethods.generateSVG(500, 500);
       let piePlot = new Plottable.Plots.Pie();
@@ -484,6 +473,16 @@ describe("Plots", () => {
     });
 
     describe("fail safe tests", () => {
+      it("renders correctly with no Datasets", () => {
+        let svg = TestMethods.generateSVG(400, 400);
+        let plot = new Plottable.Plots.Pie();
+        plot.sectorValue((d) => d.value);
+        assert.doesNotThrow(() => plot.renderTo(svg), Error);
+        assert.strictEqual(plot.width(), 400, "was allocated width");
+        assert.strictEqual(plot.height(), 400, "was allocated height");
+        svg.remove();
+      });
+
       it("does not render slices for undefined, NaN, strings, or negative numbers", () => {
         let svg = TestMethods.generateSVG();
 
