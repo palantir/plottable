@@ -23,9 +23,9 @@ export module Dispatchers {
      * @return {Dispatchers.Mouse}
      */
     public static getDispatcher(elem: SVGElement): Dispatchers.Mouse {
-      var svg = Utils.DOM.boundingSVG(elem);
+      let svg = Utils.DOM.boundingSVG(elem);
 
-      var dispatcher: Mouse = (<any> svg)[Mouse._DISPATCHER_KEY];
+      let dispatcher: Mouse = (<any> svg)[Mouse._DISPATCHER_KEY];
       if (dispatcher == null) {
         dispatcher = new Mouse(svg);
         (<any> svg)[Mouse._DISPATCHER_KEY] = dispatcher;
@@ -54,7 +54,7 @@ export module Dispatchers {
       this._callbacks = [this._moveCallbacks, this._downCallbacks, this._upCallbacks, this._wheelCallbacks,
                          this._dblClickCallbacks];
 
-      var processMoveCallback = (e: MouseEvent) => this._measureAndDispatch(e, this._moveCallbacks, "page");
+      let processMoveCallback = (e: MouseEvent) => this._measureAndDispatch(e, this._moveCallbacks, "page");
       this._eventToCallback["mouseover"] = processMoveCallback;
       this._eventToCallback["mousemove"] = processMoveCallback;
       this._eventToCallback["mouseout"] = processMoveCallback;
@@ -183,7 +183,7 @@ export module Dispatchers {
         throw new Error("Invalid scope '" + scope + "', must be 'element' or 'page'");
       }
       if (scope === "page" || this._translator.insideSVG(event)) {
-        var newMousePosition = this._translator.computePosition(event.clientX, event.clientY);
+        let newMousePosition = this._translator.computePosition(event.clientX, event.clientY);
         if (newMousePosition != null) {
           this._lastMousePosition = newMousePosition;
           callbackSet.callCallbacks(this.lastMousePosition(), event);

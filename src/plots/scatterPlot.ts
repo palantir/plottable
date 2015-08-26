@@ -14,7 +14,7 @@ export module Plots {
     constructor() {
       super();
       this.addClass("scatter-plot");
-      var animator = new Animators.Easing();
+      let animator = new Animators.Easing();
       animator.startDelay(5);
       animator.stepDuration(250);
       animator.maxTotalDuration(Plot._ANIMATION_MAX_DURATION);
@@ -22,7 +22,7 @@ export module Plots {
       this.attr("opacity", 0.6);
       this.attr("fill", new Scales.Color().range()[0]);
       this.size(6);
-      var circleSymbolFactory = SymbolFactories.circle();
+      let circleSymbolFactory = SymbolFactories.circle();
       this.symbol(() => circleSymbolFactory);
     }
 
@@ -82,9 +82,9 @@ export module Plots {
     }
 
     protected _generateDrawSteps(): Drawers.DrawStep[] {
-      var drawSteps: Drawers.DrawStep[] = [];
+      let drawSteps: Drawers.DrawStep[] = [];
       if (this._animateOnNextRender()) {
-        var resetAttrToProjector = this._generateAttrToProjector();
+        let resetAttrToProjector = this._generateAttrToProjector();
         resetAttrToProjector["d"] = () => "";
         drawSteps.push({attrToProjector: resetAttrToProjector, animator: this._getAnimator(Plots.Animator.RESET)});
       }
@@ -95,12 +95,12 @@ export module Plots {
 
     protected _visibleOnPlot(datum: any, pixelPoint: Point, selection: d3.Selection<void>): boolean {
       Utils.Window.deprecated("Scatter._visibleOnPlot()", "v1.1.0");
-      var xRange = { min: 0, max: this.width() };
-      var yRange = { min: 0, max: this.height() };
+      let xRange = { min: 0, max: this.width() };
+      let yRange = { min: 0, max: this.height() };
 
-      var translation = d3.transform(selection.attr("transform")).translate;
-      var bbox = Utils.DOM.elementBBox(selection);
-      var translatedBbox: SVGRect = {
+      let translation = d3.transform(selection.attr("transform")).translate;
+      let bbox = Utils.DOM.elementBBox(selection);
+      let translatedBbox: SVGRect = {
         x: bbox.x + translation[0],
         y: bbox.y + translation[1],
         width: bbox.width,
@@ -111,11 +111,11 @@ export module Plots {
     }
 
     protected _entityVisibleOnPlot(pixelPoint: Point, datum: any, index: number, dataset: Dataset) {
-      var xRange = { min: 0, max: this.width() };
-      var yRange = { min: 0, max: this.height() };
+      let xRange = { min: 0, max: this.width() };
+      let yRange = { min: 0, max: this.height() };
 
-      var diameter = Plot._scaledAccessor(this.size())(datum, index, dataset);
-      var translatedBbox = {
+      let diameter = Plot._scaledAccessor(this.size())(datum, index, dataset);
+      let translatedBbox = {
         x: pixelPoint.x - diameter,
         y: pixelPoint.y - diameter,
         width: diameter,
@@ -126,17 +126,17 @@ export module Plots {
     }
 
     protected _propertyProjectors(): AttributeToProjector {
-      var propertyToProjectors = super._propertyProjectors();
+      let propertyToProjectors = super._propertyProjectors();
 
-      var xProjector = Plot._scaledAccessor(this.x());
-      var yProjector = Plot._scaledAccessor(this.y());
+      let xProjector = Plot._scaledAccessor(this.x());
+      let yProjector = Plot._scaledAccessor(this.y());
 
-      var sizeProjector = Plot._scaledAccessor(this.size());
+      let sizeProjector = Plot._scaledAccessor(this.size());
 
       propertyToProjectors["transform"] = (datum: any, index: number, dataset: Dataset) =>
         "translate(" + xProjector(datum, index, dataset) + "," + yProjector(datum, index, dataset) + ")";
 
-      var symbolProjector = Plot._scaledAccessor(this.symbol());
+      let symbolProjector = Plot._scaledAccessor(this.symbol());
 
       propertyToProjectors["d"] = (datum: any, index: number, dataset: Dataset) =>
         symbolProjector(datum, index, dataset)(sizeProjector(datum, index, dataset));
@@ -159,25 +159,46 @@ export module Plots {
      */
     public entitiesIn(xRange: Range, yRange: Range): PlotEntity[];
     public entitiesIn(xRangeOrBounds: Range | Bounds, yRange?: Range): PlotEntity[] {
-      var dataXRange: Range;
-      var dataYRange: Range;
+      let dataXRange: Range;
+      let dataYRange: Range;
       if (yRange == null) {
-        var bounds = (<Bounds> xRangeOrBounds);
+        let bounds = (<Bounds> xRangeOrBounds);
         dataXRange = { min: bounds.topLeft.x, max: bounds.bottomRight.x };
         dataYRange = { min: bounds.topLeft.y, max: bounds.bottomRight.y };
       } else {
         dataXRange = (<Range> xRangeOrBounds);
         dataYRange = yRange;
       }
-      var xProjector = Plot._scaledAccessor(this.x());
-      var yProjector = Plot._scaledAccessor(this.y());
+      let xProjector = Plot._scaledAccessor(this.x());
+      let yProjector = Plot._scaledAccessor(this.y());
       return this.entities().filter((entity) => {
-        var datum = entity.datum;
-        var index = entity.index;
-        var dataset = entity.dataset;
-        var x = xProjector(datum, index, dataset);
-        var y = yProjector(datum, index, dataset);
+        let datum = entity.datum;
+        let index = entity.index;
+        let dataset = entity.dataset;
+        let x = xProjector(datum, index, dataset);
+        let y = yProjector(datum, index, dataset);
         return dataXRange.min <= x && x <= dataXRange.max && dataYRange.min <= y && y <= dataYRange.max;
+      });
+    }
+
+    /**
+     * Gets the Entities at a particular Point.
+     *
+     * @param {Point} p
+     * @returns {PlotEntity[]}
+     */
+    public entitiesAt(p: Point) {
+      let xProjector = Plot._scaledAccessor(this.x());
+      let yProjector = Plot._scaledAccessor(this.y());
+      let sizeProjector = Plot._scaledAccessor(this.size());
+      return this.entities().filter((entity) => {
+        let datum = entity.datum;
+        let index = entity.index;
+        let dataset = entity.dataset;
+        let x = xProjector(datum, index, dataset);
+        let y = yProjector(datum, index, dataset);
+        let size = sizeProjector(datum, index, dataset);
+        return x - size / 2  <= p.x && p.x <= x + size / 2 && y - size / 2 <= p.y && p.y <= y + size / 2;
       });
     }
   }

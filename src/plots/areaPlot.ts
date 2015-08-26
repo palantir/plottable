@@ -42,7 +42,7 @@ export module Plots {
       }
 
       if (yScale != null) {
-        var y0 = this.y0().accessor;
+        let y0 = this.y0().accessor;
         if (y0 != null) {
           this._bindProperty(Area._Y0_KEY, y0, yScale);
         }
@@ -67,8 +67,8 @@ export module Plots {
       if (y0 == null) {
         return this._propertyBindings.get(Area._Y0_KEY);
       }
-      var yBinding = this.y();
-      var yScale = yBinding && yBinding.scale;
+      let yBinding = this.y();
+      let yScale = yBinding && yBinding.scale;
       this._bindProperty(Area._Y0_KEY, y0, yScale);
       this._updateYScale();
       this.render();
@@ -81,12 +81,17 @@ export module Plots {
     }
 
     public addDataset(dataset: Dataset) {
-      var lineDrawer = new Drawers.Line(dataset);
+      super.addDataset(dataset);
+      return this;
+    }
+
+    protected _addDataset(dataset: Dataset) {
+      let lineDrawer = new Drawers.Line(dataset);
       if (this._isSetup) {
         lineDrawer.renderArea(this._renderArea.append("g"));
       }
       this._lineDrawers.set(dataset, lineDrawer);
-      super.addDataset(dataset);
+      super._addDataset(dataset);
       return this;
     }
 
@@ -96,15 +101,15 @@ export module Plots {
     }
 
     protected _additionalPaint() {
-      var drawSteps = this._generateLineDrawSteps();
-      var dataToDraw = this._getDataToDraw();
+      let drawSteps = this._generateLineDrawSteps();
+      let dataToDraw = this._getDataToDraw();
       this.datasets().forEach((dataset) => this._lineDrawers.get(dataset).draw(dataToDraw.get(dataset), drawSteps));
     }
 
     private _generateLineDrawSteps() {
-      var drawSteps: Drawers.DrawStep[] = [];
+      let drawSteps: Drawers.DrawStep[] = [];
       if (this._animateOnNextRender()) {
-        var attrToProjector = this._generateLineAttrToProjector();
+        let attrToProjector = this._generateLineAttrToProjector();
         attrToProjector["d"] = this._constructLineProjector(Plot._scaledAccessor(this.x()), this._getResetYFunction());
         drawSteps.push({attrToProjector: attrToProjector, animator: this._getAnimator(Plots.Animator.RESET)});
       }
@@ -113,7 +118,7 @@ export module Plots {
     }
 
     private _generateLineAttrToProjector() {
-      var lineAttrToProjector = this._generateAttrToProjector();
+      let lineAttrToProjector = this._generateAttrToProjector();
       lineAttrToProjector["d"] = this._constructLineProjector(Plot._scaledAccessor(this.x()), Plot._scaledAccessor(this.y()));
       return lineAttrToProjector;
     }
@@ -123,9 +128,9 @@ export module Plots {
     }
 
     protected _generateDrawSteps(): Drawers.DrawStep[] {
-      var drawSteps: Drawers.DrawStep[] = [];
+      let drawSteps: Drawers.DrawStep[] = [];
       if (this._animateOnNextRender()) {
-        var attrToProjector = this._generateAttrToProjector();
+        let attrToProjector = this._generateAttrToProjector();
         attrToProjector["d"] = this._constructAreaProjector(Plot._scaledAccessor(this.x()),
                                                             this._getResetYFunction(),
                                                             Plot._scaledAccessor(this.y0()));
@@ -138,13 +143,13 @@ export module Plots {
     }
 
     protected _updateYScale() {
-      var extents = this._propertyExtents.get("y0");
-      var extent = Utils.Array.flatten<number>(extents);
-      var uniqExtentVals = Utils.Array.uniq<number>(extent);
-      var constantBaseline = uniqExtentVals.length === 1 ? uniqExtentVals[0] : null;
+      let extents = this._propertyExtents.get("y0");
+      let extent = Utils.Array.flatten<number>(extents);
+      let uniqExtentVals = Utils.Array.uniq<number>(extent);
+      let constantBaseline = uniqExtentVals.length === 1 ? uniqExtentVals[0] : null;
 
-      var yBinding = this.y();
-      var yScale = <QuantitativeScale<number>> (yBinding && yBinding.scale);
+      let yBinding = this.y();
+      let yScale = <QuantitativeScale<number>> (yBinding && yBinding.scale);
       if (yScale == null) {
         return;
       }
@@ -165,7 +170,7 @@ export module Plots {
     }
 
     protected _propertyProjectors(): AttributeToProjector {
-      var propertyToProjectors = super._propertyProjectors();
+      let propertyToProjectors = super._propertyProjectors();
       propertyToProjectors["d"] = this._constructAreaProjector(Plot._scaledAccessor(this.x()),
                                                                Plot._scaledAccessor(this.y()),
                                                                Plot._scaledAccessor(this.y0()));
@@ -173,21 +178,21 @@ export module Plots {
     }
 
     public selections(datasets = this.datasets()) {
-      var allSelections = super.selections(datasets)[0];
-      var lineDrawers = datasets.map((dataset) => this._lineDrawers.get(dataset))
+      let allSelections = super.selections(datasets)[0];
+      let lineDrawers = datasets.map((dataset) => this._lineDrawers.get(dataset))
                                 .filter((drawer) => drawer != null);
       lineDrawers.forEach((ld, i) => allSelections.push(ld.selectionForIndex(i).node()));
       return d3.selectAll(allSelections);
     }
 
     protected _constructAreaProjector(xProjector: Projector, yProjector: Projector, y0Projector: Projector) {
-      var definedProjector = (d: any, i: number, dataset: Dataset) => {
-        var positionX = Plot._scaledAccessor(this.x())(d, i, dataset);
-        var positionY = Plot._scaledAccessor(this.y())(d, i, dataset);
+      let definedProjector = (d: any, i: number, dataset: Dataset) => {
+        let positionX = Plot._scaledAccessor(this.x())(d, i, dataset);
+        let positionY = Plot._scaledAccessor(this.y())(d, i, dataset);
         return Utils.Math.isValidNumber(positionX) && Utils.Math.isValidNumber(positionY);
       };
       return (datum: any[], index: number, dataset: Dataset) => {
-        var areaGenerator = d3.svg.area()
+        let areaGenerator = d3.svg.area()
                                   .x((innerDatum, innerIndex) => xProjector(innerDatum, innerIndex, dataset))
                                   .y1((innerDatum, innerIndex) => yProjector(innerDatum, innerIndex, dataset))
                                   .y0((innerDatum, innerIndex) => y0Projector(innerDatum, innerIndex, dataset))

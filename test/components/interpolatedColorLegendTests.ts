@@ -1,8 +1,8 @@
 ///<reference path="../testReference.ts" />
 
 describe("InterpolatedColorLegend", () => {
-  var svg: d3.Selection<void>;
-  var colorScale: Plottable.Scales.InterpolatedColor;
+  let svg: d3.Selection<void>;
+  let colorScale: Plottable.Scales.InterpolatedColor;
 
   beforeEach(() => {
     svg = TestMethods.generateSVG(400, 400);
@@ -10,10 +10,10 @@ describe("InterpolatedColorLegend", () => {
   });
 
   function assertBasicRendering(legend: Plottable.Components.InterpolatedColorLegend) {
-    var scaleDomain = colorScale.domain();
-    var legendElement: d3.Selection<void> = (<any> legend)._element;
+    let scaleDomain = colorScale.domain();
+    let legendElement: d3.Selection<void> = (<any> legend)._element;
 
-    var swatches = legendElement.selectAll(".swatch");
+    let swatches = legendElement.selectAll(".swatch");
     assert.strictEqual(d3.select(swatches[0][0]).attr("fill"),
                        colorScale.scale(scaleDomain[0]),
                        "first swatch's color corresponds with first domain value");
@@ -21,36 +21,36 @@ describe("InterpolatedColorLegend", () => {
                        colorScale.scale(scaleDomain[1]),
                        "last swatch's color corresponds with second domain value");
 
-    var swatchContainer = legendElement.select(".swatch-container");
-    var swatchContainerBCR = (<Element> swatchContainer.node()).getBoundingClientRect();
-    var swatchBoundingBox = legendElement.select(".swatch-bounding-box");
-    var boundingBoxBCR = (<Element> swatchBoundingBox.node()).getBoundingClientRect();
+    let swatchContainer = legendElement.select(".swatch-container");
+    let swatchContainerBCR = (<Element> swatchContainer.node()).getBoundingClientRect();
+    let swatchBoundingBox = legendElement.select(".swatch-bounding-box");
+    let boundingBoxBCR = (<Element> swatchBoundingBox.node()).getBoundingClientRect();
     assert.isTrue(Plottable.Utils.DOM.clientRectInside(swatchContainerBCR, boundingBoxBCR),
                   "bounding box contains all swatches");
 
-    var elementBCR = (<Element> legendElement.node()).getBoundingClientRect();
+    let elementBCR = (<Element> legendElement.node()).getBoundingClientRect();
     assert.isTrue(Plottable.Utils.DOM.clientRectInside(swatchContainerBCR, elementBCR),
                   "swatches are drawn within the legend's element");
 
-    var formattedDomainValues = scaleDomain.map((<any> legend)._formatter);
-    var labels = legendElement.selectAll("text");
-    var labelTexts = labels[0].map((textNode: HTMLScriptElement) => textNode.textContent);
+    let formattedDomainValues = scaleDomain.map((<any> legend)._formatter);
+    let labels = legendElement.selectAll("text");
+    let labelTexts = labels[0].map((textNode: HTMLScriptElement) => textNode.textContent);
     assert.deepEqual(labelTexts, formattedDomainValues, "formatter is used to format label text");
   }
 
   it("renders correctly (orientation: horizontal)", () => {
-    var legend = new Plottable.Components.InterpolatedColorLegend(colorScale);
+    let legend = new Plottable.Components.InterpolatedColorLegend(colorScale);
     legend.renderTo(svg);
 
     assertBasicRendering(legend);
 
-    var legendElement: d3.Selection<void> = (<any> legend)._element;
-    var labels = legendElement.selectAll("text");
-    var swatchContainer = legendElement.select(".swatch-container");
-    var swatchContainerBCR = (<Element> swatchContainer.node()).getBoundingClientRect();
+    let legendElement: d3.Selection<void> = (<any> legend)._element;
+    let labels = legendElement.selectAll("text");
+    let swatchContainer = legendElement.select(".swatch-container");
+    let swatchContainerBCR = (<Element> swatchContainer.node()).getBoundingClientRect();
 
-    var lowerLabelBCR = (<Element> labels[0][0]).getBoundingClientRect();
-    var upperLabelBCR = (<Element> labels[0][1]).getBoundingClientRect();
+    let lowerLabelBCR = (<Element> labels[0][0]).getBoundingClientRect();
+    let upperLabelBCR = (<Element> labels[0][1]).getBoundingClientRect();
     assert.operator(lowerLabelBCR.right, "<=", swatchContainerBCR.left, "first label to left of swatches");
     assert.operator(swatchContainerBCR.right, "<=", upperLabelBCR.left, "second label to right of swatches");
 
@@ -58,19 +58,19 @@ describe("InterpolatedColorLegend", () => {
   });
 
   it("renders correctly (orientation: right)", () => {
-    var legend = new Plottable.Components.InterpolatedColorLegend(colorScale);
+    let legend = new Plottable.Components.InterpolatedColorLegend(colorScale);
     legend.orientation("right");
     legend.renderTo(svg);
 
     assertBasicRendering(legend);
 
-    var legendElement: d3.Selection<void> = (<any> legend)._element;
-    var labels = legendElement.selectAll("text");
-    var swatchContainer = legendElement.select(".swatch-container");
-    var swatchContainerBCR = (<Element> swatchContainer.node()).getBoundingClientRect();
+    let legendElement: d3.Selection<void> = (<any> legend)._element;
+    let labels = legendElement.selectAll("text");
+    let swatchContainer = legendElement.select(".swatch-container");
+    let swatchContainerBCR = (<Element> swatchContainer.node()).getBoundingClientRect();
 
-    var lowerLabelBCR = (<Element> labels[0][0]).getBoundingClientRect();
-    var upperLabelBCR = (<Element> labels[0][1]).getBoundingClientRect();
+    let lowerLabelBCR = (<Element> labels[0][0]).getBoundingClientRect();
+    let upperLabelBCR = (<Element> labels[0][1]).getBoundingClientRect();
     assert.operator(swatchContainerBCR.right, "<=", lowerLabelBCR.left, "first label to right of swatches");
     assert.operator(swatchContainerBCR.right, "<=", upperLabelBCR.left, "second label to right of swatches");
     assert.operator(upperLabelBCR.bottom, "<=", lowerLabelBCR.top, "lower label is drawn below upper label");
@@ -79,19 +79,19 @@ describe("InterpolatedColorLegend", () => {
   });
 
   it("renders correctly (orientation: left)", () => {
-    var legend = new Plottable.Components.InterpolatedColorLegend(colorScale);
+    let legend = new Plottable.Components.InterpolatedColorLegend(colorScale);
     legend.orientation("left");
     legend.renderTo(svg);
 
     assertBasicRendering(legend);
 
-    var legendElement: d3.Selection<void> = (<any> legend)._element;
-    var labels = legendElement.selectAll("text");
-    var swatchContainer = legendElement.select(".swatch-container");
-    var swatchContainerBCR = (<Element> swatchContainer.node()).getBoundingClientRect();
+    let legendElement: d3.Selection<void> = (<any> legend)._element;
+    let labels = legendElement.selectAll("text");
+    let swatchContainer = legendElement.select(".swatch-container");
+    let swatchContainerBCR = (<Element> swatchContainer.node()).getBoundingClientRect();
 
-    var lowerLabelBCR = (<Element> labels[0][0]).getBoundingClientRect();
-    var upperLabelBCR = (<Element> labels[0][1]).getBoundingClientRect();
+    let lowerLabelBCR = (<Element> labels[0][0]).getBoundingClientRect();
+    let upperLabelBCR = (<Element> labels[0][1]).getBoundingClientRect();
     assert.operator(lowerLabelBCR.left, "<=", swatchContainerBCR.left, "first label to left of swatches");
     assert.operator(upperLabelBCR.left, "<=", swatchContainerBCR.left, "second label to left of swatches");
     assert.operator(upperLabelBCR.bottom, "<=", lowerLabelBCR.top, "lower label is drawn below upper label");
@@ -100,7 +100,7 @@ describe("InterpolatedColorLegend", () => {
   });
 
   it("re-renders when scale domain updates", () => {
-    var legend = new Plottable.Components.InterpolatedColorLegend(colorScale);
+    let legend = new Plottable.Components.InterpolatedColorLegend(colorScale);
     legend.orientation("horizontal");
     legend.renderTo(svg);
 
@@ -111,7 +111,7 @@ describe("InterpolatedColorLegend", () => {
   });
 
   it("orientation() input-checking", () => {
-    var legend = new Plottable.Components.InterpolatedColorLegend(colorScale);
+    let legend = new Plottable.Components.InterpolatedColorLegend(colorScale);
 
     legend.orientation("horizontal"); // should work
     legend.orientation("right"); // should work
@@ -122,11 +122,11 @@ describe("InterpolatedColorLegend", () => {
   });
 
   it("orient() triggers layout computation", () => {
-    var legend = new Plottable.Components.InterpolatedColorLegend(colorScale);
+    let legend = new Plottable.Components.InterpolatedColorLegend(colorScale);
     legend.renderTo(svg);
 
-    var widthBefore = legend.width();
-    var heightBefore = legend.height();
+    let widthBefore = legend.width();
+    let heightBefore = legend.height();
 
     legend.orientation("right");
     assert.notEqual(legend.width(), widthBefore, "proportions changed (width)");
@@ -136,7 +136,7 @@ describe("InterpolatedColorLegend", () => {
 
   it("renders correctly when width is constrained (orientation: horizontal)", () => {
     svg.attr("width", 100);
-    var legend = new Plottable.Components.InterpolatedColorLegend(colorScale);
+    let legend = new Plottable.Components.InterpolatedColorLegend(colorScale);
     legend.orientation("horizontal");
     legend.renderTo(svg);
     assertBasicRendering(legend);
@@ -145,7 +145,7 @@ describe("InterpolatedColorLegend", () => {
 
   it("renders correctly when height is constrained (orientation: horizontal)", () => {
     svg.attr("height", 20);
-    var legend = new Plottable.Components.InterpolatedColorLegend(colorScale);
+    let legend = new Plottable.Components.InterpolatedColorLegend(colorScale);
     legend.orientation("horizontal");
     legend.renderTo(svg);
     assertBasicRendering(legend);
@@ -154,7 +154,7 @@ describe("InterpolatedColorLegend", () => {
 
   it("renders correctly when width is constrained (orientation: right)", () => {
     svg.attr("width", 30);
-    var legend = new Plottable.Components.InterpolatedColorLegend(colorScale);
+    let legend = new Plottable.Components.InterpolatedColorLegend(colorScale);
     legend.orientation("right");
     legend.renderTo(svg);
     assertBasicRendering(legend);
@@ -163,7 +163,7 @@ describe("InterpolatedColorLegend", () => {
 
   it("renders correctly when height is constrained (orientation: right)", () => {
     svg.attr("height", 100);
-    var legend = new Plottable.Components.InterpolatedColorLegend(colorScale);
+    let legend = new Plottable.Components.InterpolatedColorLegend(colorScale);
     legend.orientation("right");
     legend.renderTo(svg);
     assertBasicRendering(legend);
@@ -172,7 +172,7 @@ describe("InterpolatedColorLegend", () => {
 
   it("renders correctly when width is constrained (orientation: left)", () => {
     svg.attr("width", 30);
-    var legend = new Plottable.Components.InterpolatedColorLegend(colorScale);
+    let legend = new Plottable.Components.InterpolatedColorLegend(colorScale);
     legend.orientation("left");
     legend.renderTo(svg);
     assertBasicRendering(legend);
@@ -181,7 +181,7 @@ describe("InterpolatedColorLegend", () => {
 
   it("renders correctly when height is constrained (orientation: left)", () => {
     svg.attr("height", 100);
-    var legend = new Plottable.Components.InterpolatedColorLegend(colorScale);
+    let legend = new Plottable.Components.InterpolatedColorLegend(colorScale);
     legend.orientation("left");
     legend.renderTo(svg);
     assertBasicRendering(legend);

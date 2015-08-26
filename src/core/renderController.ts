@@ -18,16 +18,16 @@ module Plottable {
  * ```
  */
 export module RenderController {
-  var _componentsNeedingRender = new Utils.Set<Component>();
-  var _componentsNeedingComputeLayout = new Utils.Set<Component>();
-  var _animationRequested = false;
-  var _isCurrentlyFlushing = false;
+  let _componentsNeedingRender = new Utils.Set<Component>();
+  let _componentsNeedingComputeLayout = new Utils.Set<Component>();
+  let _animationRequested = false;
+  let _isCurrentlyFlushing = false;
   export module Policy {
     export var IMMEDIATE = "immediate";
     export var ANIMATION_FRAME = "animationframe";
     export var TIMEOUT = "timeout";
   }
-  var _renderPolicy: RenderPolicies.RenderPolicy = new RenderPolicies.AnimationFrame();
+  let _renderPolicy: RenderPolicies.RenderPolicy = new RenderPolicies.AnimationFrame();
 
   export function renderPolicy(): RenderPolicies.RenderPolicy;
   export function renderPolicy(renderPolicy: string): void;
@@ -97,7 +97,7 @@ export module RenderController {
       _componentsNeedingRender.forEach((component: Component) => component.render());
 
       _isCurrentlyFlushing = true;
-      var failed = new Utils.Set<Component>();
+      let failed = new Utils.Set<Component>();
       _componentsNeedingRender.forEach((component: Component) => {
         try {
           component.renderImmediately();

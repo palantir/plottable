@@ -3,10 +3,10 @@
 describe("Plots", () => {
   describe("ScatterPlot", () => {
     it("renders correctly with no data", () => {
-      var svg = TestMethods.generateSVG(400, 400);
-      var xScale = new Plottable.Scales.Linear();
-      var yScale = new Plottable.Scales.Linear();
-      var plot = new Plottable.Plots.Scatter();
+      let svg = TestMethods.generateSVG(400, 400);
+      let xScale = new Plottable.Scales.Linear();
+      let yScale = new Plottable.Scales.Linear();
+      let plot = new Plottable.Plots.Scatter();
       plot.x((d: any) => d.x, xScale);
       plot.y((d: any) => d.y, yScale);
       assert.doesNotThrow(() => plot.renderTo(svg), Error);
@@ -16,33 +16,33 @@ describe("Plots", () => {
     });
 
     it("the accessors properly access data, index and Dataset", () => {
-      var svg = TestMethods.generateSVG(400, 400);
-      var xScale = new Plottable.Scales.Linear();
-      var yScale = new Plottable.Scales.Linear();
+      let svg = TestMethods.generateSVG(400, 400);
+      let xScale = new Plottable.Scales.Linear();
+      let yScale = new Plottable.Scales.Linear();
       xScale.domain([0, 400]);
       yScale.domain([400, 0]);
-      var data = [{x: 0, y: 0}, {x: 1, y: 1}];
-      var metadata = {foo: 10, bar: 20};
-      var xAccessor = (d: any, i: number, dataset: Plottable.Dataset) => d.x + i * dataset.metadata().foo;
-      var yAccessor = (d: any, i: number, dataset: Plottable.Dataset) => dataset.metadata().bar;
-      var dataset = new Plottable.Dataset(data, metadata);
-      var plot = new Plottable.Plots.Scatter()
+      let data = [{x: 0, y: 0}, {x: 1, y: 1}];
+      let metadata = {foo: 10, bar: 20};
+      let xAccessor = (d: any, i: number, dataset: Plottable.Dataset) => d.x + i * dataset.metadata().foo;
+      let yAccessor = (d: any, i: number, dataset: Plottable.Dataset) => dataset.metadata().bar;
+      let dataset = new Plottable.Dataset(data, metadata);
+      let plot = new Plottable.Plots.Scatter()
                                   .x(xAccessor)
                                   .y(yAccessor);
       plot.addDataset(dataset);
       plot.renderTo(svg);
-      var symbols = plot.selections();
-      var c1 = d3.select(symbols[0][0]);
-      var c2 = d3.select(symbols[0][1]);
-      var c1Position = d3.transform(c1.attr("transform")).translate;
-      var c2Position = d3.transform(c2.attr("transform")).translate;
+      let symbols = plot.selections();
+      let c1 = d3.select(symbols[0][0]);
+      let c2 = d3.select(symbols[0][1]);
+      let c1Position = d3.transform(c1.attr("transform")).translate;
+      let c2Position = d3.transform(c2.attr("transform")).translate;
       assert.closeTo(c1Position[0], 0, 0.01, "first symbol cx is correct");
       assert.closeTo(c1Position[1], 20, 0.01, "first symbol cy is correct");
       assert.closeTo(c2Position[0], 11, 0.01, "second symbol cx is correct");
       assert.closeTo(c2Position[1], 20, 0.01, "second symbol cy is correct");
 
-      data = [{x: 2, y: 2}, {x: 4, y: 4}];
-      dataset.data(data);
+      let changedData = [{x: 2, y: 2}, {x: 4, y: 4}];
+      dataset.data(changedData);
       c1Position = d3.transform(c1.attr("transform")).translate;
       c2Position = d3.transform(c2.attr("transform")).translate;
       assert.closeTo(c1Position[0], 2, 0.01, "first symbol cx is correct after data change");
@@ -50,8 +50,8 @@ describe("Plots", () => {
       assert.closeTo(c2Position[0], 14, 0.01, "second symbol cx is correct after data change");
       assert.closeTo(c2Position[1], 20, 0.01, "second symbol cy is correct after data change");
 
-      metadata = {foo: 0, bar: 0};
-      dataset.metadata(metadata);
+      let changedMetadata = {foo: 0, bar: 0};
+      dataset.metadata(changedMetadata);
       c1Position = d3.transform(c1.attr("transform")).translate;
       c2Position = d3.transform(c2.attr("transform")).translate;
 
@@ -64,20 +64,20 @@ describe("Plots", () => {
     });
 
     it("selections()", () => {
-      var svg = TestMethods.generateSVG(400, 400);
-      var xScale = new Plottable.Scales.Linear();
-      var yScale = new Plottable.Scales.Linear();
-      var data = [{x: 0, y: 0}, {x: 1, y: 1}];
-      var data2 = [{x: 1, y: 2}, {x: 3, y: 4}];
-      var plot = new Plottable.Plots.Scatter()
+      let svg = TestMethods.generateSVG(400, 400);
+      let xScale = new Plottable.Scales.Linear();
+      let yScale = new Plottable.Scales.Linear();
+      let data = [{x: 0, y: 0}, {x: 1, y: 1}];
+      let data2 = [{x: 1, y: 2}, {x: 3, y: 4}];
+      let plot = new Plottable.Plots.Scatter()
                                    .x((d: any) => d.x, xScale)
                                    .y((d: any) => d.y, yScale)
                                    .addDataset(new Plottable.Dataset(data))
                                    .addDataset(new Plottable.Dataset(data2));
       plot.renderTo(svg);
-      var allCircles = plot.selections();
+      let allCircles = plot.selections();
       assert.strictEqual(allCircles.size(), 4, "all circles retrieved");
-      var selectionData = allCircles.data();
+      let selectionData = allCircles.data();
       assert.includeMembers(selectionData, data, "first dataset data in selection data");
       assert.includeMembers(selectionData, data2, "second dataset data in selection data");
 
@@ -85,27 +85,27 @@ describe("Plots", () => {
     });
 
     it("entityNearest()", () => {
-      var svg = TestMethods.generateSVG(400, 400);
-      var xScale = new Plottable.Scales.Linear();
-      var yScale = new Plottable.Scales.Linear();
+      let svg = TestMethods.generateSVG(400, 400);
+      let xScale = new Plottable.Scales.Linear();
+      let yScale = new Plottable.Scales.Linear();
 
-      var dataset = new Plottable.Dataset([{x: 0, y: 0}, {x: 1, y: 1}]);
-      var dataset2 = new Plottable.Dataset([{x: 1, y: 2}, {x: 3, y: 4}]);
-      var plot = new Plottable.Plots.Scatter()
+      let dataset = new Plottable.Dataset([{x: 0, y: 0}, {x: 1, y: 1}]);
+      let dataset2 = new Plottable.Dataset([{x: 1, y: 2}, {x: 3, y: 4}]);
+      let plot = new Plottable.Plots.Scatter()
                                    .x((d: any) => d.x, xScale)
                                    .y((d: any) => d.y, yScale)
                                    .addDataset(dataset)
                                    .addDataset(dataset2);
       plot.renderTo(svg);
 
-      var points = d3.selectAll(".scatter-plot path");
-      var d0 = dataset.data()[0];
-      var d0Px = {
+      let points = d3.selectAll(".scatter-plot path");
+      let d0 = dataset.data()[0];
+      let d0Px = {
         x: xScale.scale(d0.x),
         y: yScale.scale(d0.y)
       };
 
-      var expected: Plottable.Plots.PlotEntity = {
+      let expected: Plottable.Plots.PlotEntity = {
         datum: d0,
         index: 0,
         dataset: dataset,
@@ -114,13 +114,13 @@ describe("Plots", () => {
         component: plot
       };
 
-      var closest = plot.entityNearest({ x: d0Px.x + 1, y: d0Px.y + 1 });
+      let closest = plot.entityNearest({ x: d0Px.x + 1, y: d0Px.y + 1 });
       TestMethods.assertPlotEntitiesEqual(closest, expected, "it selects the closest data point");
 
       yScale.domain([0, 1.9]);
 
-      var d1 = dataset.data()[1];
-      var d1Px = {
+      let d1 = dataset.data()[1];
+      let d1Px = {
         x: xScale.scale(d1.x),
         y: yScale.scale(d1.y)
       };
@@ -141,20 +141,20 @@ describe("Plots", () => {
     });
 
     it("can retrieve entities in a certain range", () => {
-      var svg = TestMethods.generateSVG(400, 400);
-      var xScale = new Plottable.Scales.Linear();
-      var yScale = new Plottable.Scales.Linear();
+      let svg = TestMethods.generateSVG(400, 400);
+      let xScale = new Plottable.Scales.Linear();
+      let yScale = new Plottable.Scales.Linear();
 
-      var dataset = new Plottable.Dataset([{x: 0, y: 0}, {x: 1, y: 1}]);
-      var dataset2 = new Plottable.Dataset([{x: 1, y: 2}, {x: 3, y: 4}]);
-      var plot = new Plottable.Plots.Scatter();
+      let dataset = new Plottable.Dataset([{x: 0, y: 0}, {x: 1, y: 1}]);
+      let dataset2 = new Plottable.Dataset([{x: 1, y: 2}, {x: 3, y: 4}]);
+      let plot = new Plottable.Plots.Scatter();
       plot.x((d: any) => d.x, xScale)
           .y((d: any) => d.y, yScale)
           .addDataset(dataset)
           .addDataset(dataset2);
       plot.renderTo(svg);
 
-      var entities = plot.entitiesIn({ min: xScale.scale(1), max: xScale.scale(1) },
+      let entities = plot.entitiesIn({ min: xScale.scale(1), max: xScale.scale(1) },
                                      { min: yScale.scale(1), max: yScale.scale(1) });
 
       assert.lengthOf(entities, 1, "only one entity has been retrieved");
@@ -164,20 +164,20 @@ describe("Plots", () => {
     });
 
     it("entities are not returned if their center lies outside the range", () => {
-      var svg = TestMethods.generateSVG(400, 400);
-      var xScale = new Plottable.Scales.Linear();
-      var yScale = new Plottable.Scales.Linear();
+      let svg = TestMethods.generateSVG(400, 400);
+      let xScale = new Plottable.Scales.Linear();
+      let yScale = new Plottable.Scales.Linear();
 
-      var dataset = new Plottable.Dataset([{x: 0, y: 0}, {x: 1, y: 1}]);
-      var dataset2 = new Plottable.Dataset([{x: 1, y: 2}, {x: 3, y: 4}]);
-      var plot = new Plottable.Plots.Scatter();
+      let dataset = new Plottable.Dataset([{x: 0, y: 0}, {x: 1, y: 1}]);
+      let dataset2 = new Plottable.Dataset([{x: 1, y: 2}, {x: 3, y: 4}]);
+      let plot = new Plottable.Plots.Scatter();
       plot.x((d: any) => d.x, xScale)
           .y((d: any) => d.y, yScale)
           .addDataset(dataset)
           .addDataset(dataset2);
       plot.renderTo(svg);
 
-      var entities = plot.entitiesIn({ min: xScale.scale(1.001), max: xScale.scale(1.001) },
+      let entities = plot.entitiesIn({ min: xScale.scale(1.001), max: xScale.scale(1.001) },
                                      { min: yScale.scale(1.001), max: yScale.scale(1.001) });
 
       assert.lengthOf(entities, 0, "no entities retrieved");
@@ -186,20 +186,20 @@ describe("Plots", () => {
     });
 
     it("can retrieve entities in a certain bounds", () => {
-      var svg = TestMethods.generateSVG(400, 400);
-      var xScale = new Plottable.Scales.Linear();
-      var yScale = new Plottable.Scales.Linear();
+      let svg = TestMethods.generateSVG(400, 400);
+      let xScale = new Plottable.Scales.Linear();
+      let yScale = new Plottable.Scales.Linear();
 
-      var dataset = new Plottable.Dataset([{x: 0, y: 0}, {x: 1, y: 1}]);
-      var dataset2 = new Plottable.Dataset([{x: 1, y: 2}, {x: 3, y: 4}]);
-      var plot = new Plottable.Plots.Scatter();
+      let dataset = new Plottable.Dataset([{x: 0, y: 0}, {x: 1, y: 1}]);
+      let dataset2 = new Plottable.Dataset([{x: 1, y: 2}, {x: 3, y: 4}]);
+      let plot = new Plottable.Plots.Scatter();
       plot.x((d: any) => d.x, xScale)
           .y((d: any) => d.y, yScale)
           .addDataset(dataset)
           .addDataset(dataset2);
       plot.renderTo(svg);
 
-      var entities = plot.entitiesIn({ topLeft: {
+      let entities = plot.entitiesIn({ topLeft: {
                                          x: xScale.scale(1),
                                          y: yScale.scale(1)
                                        },
@@ -214,30 +214,95 @@ describe("Plots", () => {
       svg.remove();
     });
 
+    it("can retrieve entities centered at a given point", () => {
+      let svg = TestMethods.generateSVG(400, 400);
+      let xScale = new Plottable.Scales.Linear();
+      let yScale = new Plottable.Scales.Linear();
+
+      let dataset = new Plottable.Dataset([{x: 0, y: 0}, {x: 1, y: 1}]);
+      let plot = new Plottable.Plots.Scatter();
+      plot.x((d: any) => d.x, xScale)
+          .y((d: any) => d.y, yScale)
+          .addDataset(dataset);
+      plot.renderTo(svg);
+
+      let entities = plot.entitiesAt({ x: xScale.scale(1), y: yScale.scale(1) });
+      assert.lengthOf(entities, 1, "only one entity has been retrieved");
+      assert.deepEqual(entities[0].datum, {x: 1, y: 1}, "correct datum has been retrieved");
+
+      svg.remove();
+    });
+
+    it("determines whether an entity contains a given point by its size", () => {
+      let svg = TestMethods.generateSVG(400, 400);
+      let xScale = new Plottable.Scales.Linear();
+      let yScale = new Plottable.Scales.Linear();
+
+      let dataset = new Plottable.Dataset([{x: 0, y: 0}, {x: 1, y: 1}]);
+      let plot = new Plottable.Plots.Scatter();
+      plot.size(10)
+          .x((d: any) => d.x, xScale)
+          .y((d: any) => d.y, yScale)
+          .addDataset(dataset);
+      plot.renderTo(svg);
+
+      let entities = plot.entitiesAt({ x: xScale.scale(1) + 5, y: yScale.scale(1) - 5});
+      assert.lengthOf(entities, 1, "only one entity has been retrieved");
+      assert.deepEqual(entities[0].datum, {x: 1, y: 1}, "correct datum has been retrieved");
+
+      plot.size(6);
+      entities = plot.entitiesAt({ x: xScale.scale(1) + 5, y: yScale.scale(1) - 5});
+      assert.lengthOf(entities, 0, "none of the entities is retrieved");
+      svg.remove();
+    });
+
+    it("returns all entities containing a given point across all datasets", () => {
+      let svg = TestMethods.generateSVG(400, 400);
+      let xScale = new Plottable.Scales.Linear();
+      let yScale = new Plottable.Scales.Linear();
+
+      let dataset = new Plottable.Dataset([{x: 0, y: 0}, {x: 200, y: 200}]);
+      let dataset2 = new Plottable.Dataset([{x: 0, y: 1}, {x: 1, y: 0}]);
+      let plot = new Plottable.Plots.Scatter();
+
+      plot.x((d: any) => d.x, xScale)
+          .y((d: any) => d.y, yScale)
+          .addDataset(dataset)
+          .addDataset(dataset2);
+      plot.renderTo(svg);
+
+      let entities = plot.entitiesAt({ x: xScale.scale(0.5), y: yScale.scale(0.5)});
+      assert.lengthOf(entities, 3, "all 3 entities containing the point have been retrieved");
+      assert.deepEqual(entities[0].datum, {x: 0, y: 0}, "correct datum has been retrieved");
+      assert.deepEqual(entities[1].datum, {x: 0, y: 1}, "correct datum has been retrieved");
+      assert.deepEqual(entities[2].datum, {x: 1, y: 0}, "correct datum has been retrieved");
+      svg.remove();
+    });
+
     it("correctly handles NaN and undefined x and y values", () => {
-      var svg = TestMethods.generateSVG(400, 400);
-      var data = [
+      let svg = TestMethods.generateSVG(400, 400);
+      let data = [
         { foo: 0.0, bar: 0.0 },
         { foo: 0.2, bar: 0.2 },
         { foo: 0.4, bar: 0.4 },
         { foo: 0.6, bar: 0.6 },
         { foo: 0.8, bar: 0.8 }
       ];
-      var dataset = new Plottable.Dataset(data);
-      var xScale = new Plottable.Scales.Linear();
-      var yScale = new Plottable.Scales.Linear();
-      var plot = new Plottable.Plots.Scatter();
+      let dataset = new Plottable.Dataset(data);
+      let xScale = new Plottable.Scales.Linear();
+      let yScale = new Plottable.Scales.Linear();
+      let plot = new Plottable.Plots.Scatter();
       plot.addDataset(dataset);
       plot.x((d: any) => d.foo, xScale)
           .y((d: any) => d.bar, yScale);
       plot.renderTo(svg);
 
-      var dataWithNaN = data.slice();
+      let dataWithNaN = data.slice();
       dataWithNaN[2] = { foo: 0.4, bar: NaN };
       dataset.data(dataWithNaN);
       assert.strictEqual(plot.selections().size(), 4, "does not draw NaN point");
 
-      var dataWithUndefined = data.slice();
+      let dataWithUndefined = data.slice();
       dataWithUndefined[2] = { foo: 0.4, bar: undefined };
       dataset.data(dataWithUndefined);
       assert.strictEqual(plot.selections().size(), 4, "does not draw undefined point");
@@ -249,34 +314,32 @@ describe("Plots", () => {
     });
 
     describe("Example ScatterPlot with quadratic series", () => {
-      var svg: d3.Selection<void>;
-      var xScale: Plottable.Scales.Linear;
-      var yScale: Plottable.Scales.Linear;
-      var circlePlot: Plottable.Plots.Scatter<number, number>;
-      var SVG_WIDTH = 600;
-      var SVG_HEIGHT = 300;
-      var dataAreaFull = {xMin: 0, xMax: 9, yMin: 81, yMax: 0};
-      var dataAreaPart = {xMin: 3, xMax: 9, yMin: 54, yMax: 27};
-      var colorAccessor = (d: any, i: number, m: any) => d3.rgb(d.x, d.y, i).toString();
-      var circlesInArea: number;
-      var quadraticDataset = new Plottable.Dataset(TestMethods.makeQuadraticSeries(10));
+      let svg: d3.Selection<void>;
+      let xScale: Plottable.Scales.Linear;
+      let yScale: Plottable.Scales.Linear;
+      let circlePlot: Plottable.Plots.Scatter<number, number>;
+      let SVG_WIDTH = 600;
+      let SVG_HEIGHT = 300;
+      let colorAccessor = (d: any, i: number, m: any) => d3.rgb(d.x, d.y, i).toString();
+      let circlesInArea: number;
+      let quadraticDataset = new Plottable.Dataset(TestMethods.makeQuadraticSeries(10));
 
       function getCirclePlotVerifier() {
         // creates a function that verifies that circles are drawn properly after accounting for svg transform
         // and then modifies circlesInArea to contain the number of circles that were discovered in the plot area
         circlesInArea = 0;
-        var renderArea = (<any> circlePlot)._renderArea;
-        var renderAreaTransform = d3.transform(renderArea.attr("transform"));
-        var translate = renderAreaTransform.translate;
-        var scale = renderAreaTransform.scale;
+        let renderArea = (<any> circlePlot)._renderArea;
+        let renderAreaTransform = d3.transform(renderArea.attr("transform"));
+        let translate = renderAreaTransform.translate;
+        let scale = renderAreaTransform.scale;
         return function (datum: any, index: number) {
           // This function takes special care to compute the position of circles after taking svg transformation
           // into account.
-          var selection = d3.select(this);
+          let selection = d3.select(this);
 
-          var circlePosition = d3.transform(selection.attr("transform")).translate;
-          var x = +circlePosition[0] * scale[0] + translate[0];
-          var y = +circlePosition[1] * scale[1] + translate[1];
+          let circlePosition = d3.transform(selection.attr("transform")).translate;
+          let x = +circlePosition[0] * scale[0] + translate[0];
+          let y = +circlePosition[1] * scale[1] + translate[1];
           if (0 <= x && x <= SVG_WIDTH && 0 <= y && y <= SVG_HEIGHT) {
             circlesInArea++;
             assert.closeTo(x, xScale.scale(datum.x), 0.01, "the scaled/translated x is correct");
@@ -320,12 +383,10 @@ describe("Plots", () => {
         beforeEach(() => {
           xScale.domain([0, 3]);
           yScale.domain([0, 9]);
-          dataAreaFull = {xMin: 0, xMax: 3, yMin: 9, yMax: 0};
-          dataAreaPart = {xMin: 1, xMax: 3, yMin: 6, yMax: 3};
         });
 
         it("the circles re-rendered properly", () => {
-          var circles = circlePlot.selections();
+          let circles = circlePlot.selections();
           circles.each(getCirclePlotVerifier());
           assert.strictEqual(circlesInArea, 4, "four circles were found in the render area");
           svg.remove();

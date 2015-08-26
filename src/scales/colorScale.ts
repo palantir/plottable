@@ -22,7 +22,7 @@ export module Scales {
      */
     constructor(scaleType?: string) {
       super();
-      var scale: d3.scale.Ordinal<string, string>;
+      let scale: d3.scale.Ordinal<string, string>;
       switch (scaleType) {
         case null:
         case undefined:
@@ -71,12 +71,12 @@ export module Scales {
     }
 
     private static _getPlottableColors(): string[] {
-      var plottableDefaultColors: string[] = [];
-      var colorTester = d3.select("body").append("plottable-color-tester");
+      let plottableDefaultColors: string[] = [];
+      let colorTester = d3.select("body").append("plottable-color-tester");
 
-      var defaultColorHex: string = Utils.Color.colorTest(colorTester, "");
-      var i = 0;
-      var colorHex: string;
+      let defaultColorHex: string = Utils.Color.colorTest(colorTester, "");
+      let i = 0;
+      let colorHex: string;
       while ((colorHex = Utils.Color.colorTest(colorTester, "plottable-colors-" + i)) !== null &&
               i < this._MAXIMUM_COLORS_FROM_CSS) {
         if (colorHex === defaultColorHex && colorHex === plottableDefaultColors[plottableDefaultColors.length - 1]) {
@@ -97,10 +97,10 @@ export module Scales {
      * @returns {string}
      */
     public scale(value: string): string {
-      var color = this._d3Scale(value);
-      var index = this.domain().indexOf(value);
-      var numLooped = Math.floor(index / this.range().length);
-      var modifyFactor = Math.log(numLooped * Color._LOOP_LIGHTEN_FACTOR + 1);
+      let color = this._d3Scale(value);
+      let index = this.domain().indexOf(value);
+      let numLooped = Math.floor(index / this.range().length);
+      let modifyFactor = Math.log(numLooped * Color._LOOP_LIGHTEN_FACTOR + 1);
       return Utils.Color.lightenColor(color, modifyFactor);
     }
 

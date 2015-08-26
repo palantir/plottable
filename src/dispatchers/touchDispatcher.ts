@@ -20,9 +20,9 @@ export module Dispatchers {
      * @return {Dispatchers.Touch}
      */
     public static getDispatcher(elem: SVGElement): Dispatchers.Touch {
-      var svg = Utils.DOM.boundingSVG(elem);
+      let svg = Utils.DOM.boundingSVG(elem);
 
-      var dispatcher: Touch = (<any> svg)[Touch._DISPATCHER_KEY];
+      let dispatcher: Touch = (<any> svg)[Touch._DISPATCHER_KEY];
       if (dispatcher == null) {
         dispatcher = new Touch(svg);
         (<any> svg)[Touch._DISPATCHER_KEY] = dispatcher;
@@ -152,13 +152,13 @@ export module Dispatchers {
       if (scope === "element" && !this._translator.insideSVG(event)) {
         return;
       }
-      var touches = event.changedTouches;
-      var touchPositions: { [id: number]: Point; } = {};
-      var touchIdentifiers: number[] = [];
-      for (var i = 0; i < touches.length; i++) {
-        var touch = touches[i];
-        var touchID = touch.identifier;
-        var newTouchPosition = this._translator.computePosition(touch.clientX, touch.clientY);
+      let touches = event.changedTouches;
+      let touchPositions: { [id: number]: Point; } = {};
+      let touchIdentifiers: number[] = [];
+      for (let i = 0; i < touches.length; i++) {
+        let touch = touches[i];
+        let touchID = touch.identifier;
+        let newTouchPosition = this._translator.computePosition(touch.clientX, touch.clientY);
         if (newTouchPosition != null) {
           touchPositions[touchID] = newTouchPosition;
           touchIdentifiers.push(touchID);

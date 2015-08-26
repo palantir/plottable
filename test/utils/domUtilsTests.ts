@@ -3,32 +3,32 @@
 describe("Utils.DOM", () => {
 
   it("getBBox works properly", () => {
-    var svg = TestMethods.generateSVG();
-    var expectedBox: { [key: string]: number } = {
+    let svg = TestMethods.generateSVG();
+    let expectedBox: { [key: string]: number } = {
       x: 0,
       y: 0,
       width: 40,
       height: 20
     };
-    var rect = svg.append("rect").attr(expectedBox);
-    var measuredBox = Plottable.Utils.DOM.elementBBox(rect);
+    let rect = svg.append("rect").attr(expectedBox);
+    let measuredBox = Plottable.Utils.DOM.elementBBox(rect);
     assert.deepEqual(measuredBox, expectedBox, "getBBox measures correctly");
     svg.remove();
   });
 
   it("getBBox does not fail on disconnected and display:none nodes", () => {
-    var expectedBox: { [key: string]: number } = {
+    let expectedBox: { [key: string]: number } = {
       x: 0,
       y: 0,
       width: 40,
       height: 20
     };
 
-    var removedSVG = TestMethods.generateSVG().remove();
-    var rect = removedSVG.append("rect").attr(expectedBox);
+    let removedSVG = TestMethods.generateSVG().remove();
+    let rect = removedSVG.append("rect").attr(expectedBox);
     Plottable.Utils.DOM.elementBBox(rect); // could throw NS_ERROR on FF
 
-    var noneSVG = TestMethods.generateSVG().style("display", "none");
+    let noneSVG = TestMethods.generateSVG().style("display", "none");
     rect = noneSVG.append("rect").attr(expectedBox);
     Plottable.Utils.DOM.elementBBox(rect); // could throw NS_ERROR on FF
 
@@ -37,33 +37,33 @@ describe("Utils.DOM", () => {
 
   describe("elementWidth(), elementHeight()", () => {
     it("can get a plain element's size", () => {
-      var parent = TestMethods.getSVGParent();
+      let parent = TestMethods.getSVGParent();
       parent.style("width", "300px");
       parent.style("height", "200px");
-      var parentElem = <Element> parent[0][0];
+      let parentElem = <Element> parent[0][0];
 
-      var width = Plottable.Utils.DOM.elementWidth(parentElem);
+      let width = Plottable.Utils.DOM.elementWidth(parentElem);
       assert.strictEqual(width, 300, "measured width matches set width");
-      var height = Plottable.Utils.DOM.elementHeight(parentElem);
+      let height = Plottable.Utils.DOM.elementHeight(parentElem);
       assert.strictEqual(height, 200, "measured height matches set height");
     });
 
     it("can get the svg's size", () => {
-      var svg = TestMethods.generateSVG(450, 120);
-      var svgElem = <Element> svg[0][0];
+      let svg = TestMethods.generateSVG(450, 120);
+      let svgElem = <Element> svg[0][0];
 
-      var width = Plottable.Utils.DOM.elementWidth(svgElem);
+      let width = Plottable.Utils.DOM.elementWidth(svgElem);
       assert.strictEqual(width, 450, "measured width matches set width");
-      var height = Plottable.Utils.DOM.elementHeight(svgElem);
+      let height = Plottable.Utils.DOM.elementHeight(svgElem);
       assert.strictEqual(height, 120, "measured height matches set height");
       svg.remove();
     });
 
     it("can accept multiple units and convert to pixels", () => {
-      var parent = TestMethods.getSVGParent();
-      var parentElem = <Element> parent[0][0];
-      var child = parent.append("div");
-      var childElem = <Element> child[0][0];
+      let parent = TestMethods.getSVGParent();
+      let parentElem = <Element> parent[0][0];
+      let child = parent.append("div");
+      let childElem = <Element> child[0][0];
 
       parent.style("width", "200px");
       parent.style("height", "50px");
@@ -92,22 +92,22 @@ describe("Utils.DOM", () => {
     });
 
     it("generateUniqueClipPathId()", () => {
-      var firstClipPathId = Plottable.Utils.DOM.generateUniqueClipPathId();
-      var secondClipPathId = Plottable.Utils.DOM.generateUniqueClipPathId();
+      let firstClipPathId = Plottable.Utils.DOM.generateUniqueClipPathId();
+      let secondClipPathId = Plottable.Utils.DOM.generateUniqueClipPathId();
 
-      var firstClipPathIDPrefix = firstClipPathId.split(/\d/)[0];
-      var secondClipPathIDPrefix = secondClipPathId.split(/\d/)[0];
+      let firstClipPathIDPrefix = firstClipPathId.split(/\d/)[0];
+      let secondClipPathIDPrefix = secondClipPathId.split(/\d/)[0];
 
       assert.strictEqual(firstClipPathIDPrefix, secondClipPathIDPrefix,
         "clip path ids should have the same prefix");
 
-      var prefix = firstClipPathIDPrefix;
+      let prefix = firstClipPathIDPrefix;
 
       assert.isTrue(/plottable/.test(prefix),
         "the prefix should contain the word plottable to avoid collisions");
 
-      var firstClipPathIdNumber = +firstClipPathId.replace(prefix, "");
-      var secondClipPathIdNumber = +secondClipPathId.replace(prefix, "");
+      let firstClipPathIdNumber = +firstClipPathId.replace(prefix, "");
+      let secondClipPathIdNumber = +secondClipPathId.replace(prefix, "");
 
       assert.isFalse(Plottable.Utils.Math.isNaN(firstClipPathIdNumber),
         "first clip path id should only have a number after the prefix");

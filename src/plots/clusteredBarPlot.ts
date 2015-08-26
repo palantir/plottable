@@ -20,15 +20,15 @@ export module Plots {
     }
 
     protected _generateAttrToProjector() {
-      var attrToProjector = super._generateAttrToProjector();
+      let attrToProjector = super._generateAttrToProjector();
       // the width is constant, so set the inner scale range to that
-      var innerScale = this._makeInnerScale();
-      var innerWidthF = (d: any, i: number) => innerScale.rangeBand();
+      let innerScale = this._makeInnerScale();
+      let innerWidthF = (d: any, i: number) => innerScale.rangeBand();
       attrToProjector["width"] = this._isVertical ? innerWidthF : attrToProjector["width"];
       attrToProjector["height"] = !this._isVertical ? innerWidthF : attrToProjector["height"];
 
-      var xAttr = attrToProjector["x"];
-      var yAttr = attrToProjector["y"];
+      let xAttr = attrToProjector["x"];
+      let yAttr = attrToProjector["y"];
       attrToProjector["x"] = this._isVertical ?
                                (d: any, i: number, ds: Dataset) => xAttr(d, i, ds) + this._clusterOffsets.get(ds) :
                                (d: any, i: number, ds: Dataset) => xAttr(d, i, ds);
@@ -40,14 +40,14 @@ export module Plots {
     }
 
     private _updateClusterPosition() {
-      var innerScale = this._makeInnerScale();
+      let innerScale = this._makeInnerScale();
       this.datasets().forEach((d, i) => this._clusterOffsets.set(d, innerScale.scale(String(i)) - innerScale.rangeBand() / 2));
     }
 
     private _makeInnerScale() {
-      var innerScale = new Scales.Category();
+      let innerScale = new Scales.Category();
       innerScale.domain(this.datasets().map((d, i) => String(i)));
-      var widthProjector = Plot._scaledAccessor(this.attr("width"));
+      let widthProjector = Plot._scaledAccessor(this.attr("width"));
       innerScale.range([0, widthProjector(null, 0, null)]);
       return innerScale;
     }

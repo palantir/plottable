@@ -2,18 +2,18 @@
 
 function assertComponentXY(component: Plottable.Component, x: number, y: number, message: string) {
   // use <any> to examine the private variables
-  var translate = d3.transform((<any> component)._element.attr("transform")).translate;
-  var xActual = translate[0];
-  var yActual = translate[1];
+  let translate = d3.transform((<any> component)._element.attr("transform")).translate;
+  let xActual = translate[0];
+  let yActual = translate[1];
   assert.strictEqual(xActual, x, "X: " + message);
   assert.strictEqual(yActual, y, "Y: " + message);
 }
 
 describe("Component behavior", () => {
-  var svg: d3.Selection<void>;
-  var c: Plottable.Component;
-  var SVG_WIDTH = 400;
-  var SVG_HEIGHT = 300;
+  let svg: d3.Selection<void>;
+  let c: Plottable.Component;
+  let SVG_WIDTH = 400;
+  let SVG_HEIGHT = 300;
   beforeEach(() => {
     svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
     c = new Plottable.Component();
@@ -33,7 +33,7 @@ describe("Component behavior", () => {
     it("can re-anchor() to a different element", () => {
       c.anchor(svg);
 
-      var svg2 = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+      let svg2 = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
       c.anchor(svg2);
       assert.strictEqual((<any> c)._element.node(), svg2.select("g").node(), "the component re-achored under the second <svg>");
       assert.isTrue(svg2.classed("plottable"), "second <svg> was given \"plottable\" CSS class");
@@ -47,9 +47,9 @@ describe("Component behavior", () => {
 
     describe("anchor() callbacks", () => {
       it("callbacks called on anchor()-ing", () => {
-        var callbackCalled = false;
-        var passedComponent: Plottable.Component;
-        var callback = (component: Plottable.Component) => {
+        let callbackCalled = false;
+        let passedComponent: Plottable.Component;
+        let callback = (component: Plottable.Component) => {
           callbackCalled = true;
           passedComponent = component;
         };
@@ -58,7 +58,7 @@ describe("Component behavior", () => {
         assert.isTrue(callbackCalled, "callback was called on anchor()-ing");
         assert.strictEqual(passedComponent, c, "callback was passed the Component that anchor()-ed");
 
-        var svg2 = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+        let svg2 = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
         callbackCalled = false;
         c.anchor(svg2);
         assert.isTrue(callbackCalled, "callback was called on anchor()-ing to a new <svg>");
@@ -69,9 +69,9 @@ describe("Component behavior", () => {
       });
 
       it("callbacks called immediately if already anchor()-ed", () => {
-        var callbackCalled = false;
-        var passedComponent: Plottable.Component;
-        var callback = (component: Plottable.Component) => {
+        let callbackCalled = false;
+        let passedComponent: Plottable.Component;
+        let callback = (component: Plottable.Component) => {
           callbackCalled = true;
           passedComponent = component;
         };
@@ -83,8 +83,8 @@ describe("Component behavior", () => {
       });
 
       it("removing callbacks", () => {
-        var callbackCalled = false;
-        var callback = (component: Plottable.Component) => {
+        let callbackCalled = false;
+        let callback = (component: Plottable.Component) => {
           callbackCalled = true;
         };
         c.onAnchor(callback);
@@ -98,7 +98,7 @@ describe("Component behavior", () => {
 
   describe("detach()", () => {
     it("detach() works as expected", () => {
-      var c1 = new Plottable.Component();
+      let c1 = new Plottable.Component();
 
       c1.renderTo(svg);
       assert.isTrue((<Node> svg.node()).hasChildNodes(), "the svg has children");
@@ -109,8 +109,19 @@ describe("Component behavior", () => {
     });
 
     it("components can be detach()-ed even if not anchor()-ed", () => {
-      var c = new Plottable.Component();
-      c.detach(); // no error thrown
+      let c = new Plottable.Component();
+
+      let callbackCalled = false;
+      let passedComponent: Plottable.Component;
+      let callback = (component: Plottable.Component) => {
+        callbackCalled = true;
+        passedComponent = component;
+      };
+      c.onDetach(callback);
+
+      assert.doesNotThrow(() => c.detach(), Error, "does not throw error if detach() called before anchor()");
+      assert.isTrue(callbackCalled, "detach() callback was still called");
+      assert.strictEqual(passedComponent, c, "callback was passed the Component that detach()-ed");
       svg.remove();
     });
 
@@ -118,9 +129,9 @@ describe("Component behavior", () => {
       c = new Plottable.Component();
       c.renderTo(svg);
 
-      var callbackCalled = false;
-      var passedComponent: Plottable.Component;
-      var callback = (component: Plottable.Component) => {
+      let callbackCalled = false;
+      let passedComponent: Plottable.Component;
+      let callback = (component: Plottable.Component) => {
         callbackCalled = true;
         passedComponent = component;
       };
@@ -128,42 +139,24 @@ describe("Component behavior", () => {
       c.detach();
       assert.isTrue(callbackCalled, "callback was called when the Component was detach()-ed");
       assert.strictEqual(passedComponent, c, "callback was passed the Component that detach()-ed");
-      svg.remove();
-    });
-
-    it("callbacks on detach() not called unless the component is anchored", () => {
-      c = new Plottable.Component();
-
-      var callbackCalled = false;
-      var callback = (component: Plottable.Component) => callbackCalled = true;
-      c.onDetach(callback);
 
       callbackCalled = false;
       c.detach();
-      assert.isFalse(callbackCalled, "callback was not called because the Component is not rendered yet");
-
-      c.renderTo(svg);
-
-      callbackCalled = false;
-      c.detach();
-      assert.isTrue(callbackCalled, "callback was called when the Component was detach()-ed");
-
-      callbackCalled = false;
-      c.detach();
-      assert.isFalse(callbackCalled, "callback was not called because the Component was detached already");
+      assert.isTrue(callbackCalled, "callback called even if already detach()-ed");
+      assert.strictEqual(passedComponent, c, "callback was passed the Component that detach()-ed");
 
       svg.remove();
     });
   });
 
   it("parent()", () => {
-    var c = new Plottable.Component();
-    var acceptingContainer = {
+    let c = new Plottable.Component();
+    let acceptingContainer = {
       has: (component: Plottable.Component) => true
     };
     c.parent(<any> acceptingContainer);
     assert.strictEqual(c.parent(), acceptingContainer, "Component's parent was set if the Component is contained in the parent");
-    var rejectingContainer = {
+    let rejectingContainer = {
       has: (component: Plottable.Component) => false
     };
     assert.throws(() => c.parent(<any> rejectingContainer), Error, "invalid parent");
@@ -176,7 +169,7 @@ describe("Component behavior", () => {
       c.computeLayout();
       assert.strictEqual(c.width() , SVG_WIDTH, "computeLayout defaulted width to svg width");
       assert.strictEqual(c.height(), SVG_HEIGHT, "computeLayout defaulted height to svg height");
-      var origin = c.origin();
+      let origin = c.origin();
       assert.strictEqual(origin.x, 0 , "xOrigin defaulted to 0");
       assert.strictEqual(origin.y, 0 , "yOrigin defaulted to 0");
 
@@ -193,7 +186,7 @@ describe("Component behavior", () => {
 
     it("computeLayout works with CSS layouts", () => {
       // Manually size parent
-      var parent = d3.select(<Element> (<Element> svg.node()).parentNode);
+      let parent = d3.select(<Element> (<Element> svg.node()).parentNode);
       parent.style("width", "400px");
       parent.style("height", "200px");
 
@@ -203,7 +196,7 @@ describe("Component behavior", () => {
       c.computeLayout();
       assert.strictEqual(c.width(), 400, "defaults to width of parent if width is not specified on <svg>");
       assert.strictEqual(c.height(), 200, "defaults to height of parent if width is not specified on <svg>");
-      var origin = c.origin();
+      let origin = c.origin();
       assert.strictEqual(origin.x, 0, "xOrigin defaulted to 0");
       assert.strictEqual(origin.y, 0, "yOrigin defaulted to 0");
 
@@ -233,7 +226,7 @@ describe("Component behavior", () => {
     });
 
     it("computeLayout will not default when attached to non-root node", () => {
-      var g = svg.append("g");
+      let g = svg.append("g");
       c.anchor(g);
       assert.throws(() => c.computeLayout(), "null arguments");
       svg.remove();
@@ -245,15 +238,15 @@ describe("Component behavior", () => {
     });
 
     it("computeLayout uses its arguments apropriately", () => {
-      var origin = {
+      let origin = {
         x: 10,
         y: 20
       };
-      var width = 100;
-      var height = 200;
+      let width = 100;
+      let height = 200;
       c.anchor(svg);
       c.computeLayout(origin, width, height);
-      var translate = TestMethods.getTranslate((<any> c)._element);
+      let translate = TestMethods.getTranslate((<any> c)._element);
       assert.deepEqual(translate, [origin.x, origin.y], "the element translated appropriately");
       assert.strictEqual(c.width() , width, "the width set properly");
       assert.strictEqual(c.height(), height, "the height set propery");
@@ -263,11 +256,11 @@ describe("Component behavior", () => {
 
   it("subelement containers are ordered properly", () => {
     c.renderTo(svg);
-    var gs = (<any> c)._element.selectAll("g");
-    var g0 = d3.select(gs[0][0]);
-    var g1 = d3.select(gs[0][1]);
-    var g2 = d3.select(gs[0][2]);
-    var g3 = d3.select(gs[0][3]);
+    let gs = (<any> c)._element.selectAll("g");
+    let g0 = d3.select(gs[0][0]);
+    let g1 = d3.select(gs[0][1]);
+    let g2 = d3.select(gs[0][2]);
+    let g3 = d3.select(gs[0][3]);
     assert.isTrue(g0.classed("background-container"), "the first g is a background container");
     assert.isTrue(g1.classed("content"), "the second g is a content container");
     assert.isTrue(g2.classed("foreground-container"), "the third g is a foreground container");
@@ -278,7 +271,7 @@ describe("Component behavior", () => {
   it("component defaults are as expected", () => {
     assert.strictEqual(c.xAlignment(), "left", "x alignment defaults to \"left\"");
     assert.strictEqual(c.yAlignment(), "top", "y alignment defaults to \"top\"");
-    var layout = c.requestedSpace(1, 1);
+    let layout = c.requestedSpace(1, 1);
     assert.strictEqual(layout.minWidth, 0, "requested minWidth defaults to 0");
     assert.strictEqual(layout.minHeight, 0, "requested minHeight defaults to 0");
     svg.remove();
@@ -305,14 +298,14 @@ describe("Component behavior", () => {
     assert.throws(() => (<any> c)._addBox("pre-anchor"), Error, "Adding boxes before anchoring is currently disallowed");
     c.renderTo(svg);
     (<any> c)._addBox("post-anchor");
-    var e = (<any> c)._element;
-    var boxContainer = e.select(".box-container");
-    var boxStrings = [".bounding-box", ".post-anchor"];
+    let e = (<any> c)._element;
+    let boxContainer = e.select(".box-container");
+    let boxStrings = [".bounding-box", ".post-anchor"];
 
     boxStrings.forEach((s) => {
-      var box = boxContainer.select(s);
+      let box = boxContainer.select(s);
       assert.isNotNull(box.node(), s + " box was created and placed inside boxContainer");
-      var bb = Plottable.Utils.DOM.elementBBox(box);
+      let bb = Plottable.Utils.DOM.elementBBox(box);
       assert.strictEqual(bb.width, SVG_WIDTH, s + " width as expected");
       assert.strictEqual(bb.height, SVG_HEIGHT, s + " height as expected");
     });
@@ -348,7 +341,7 @@ describe("Component behavior", () => {
   });
 
   it("can't reuse component if it's been destroy()-ed", () => {
-    var c1 = new Plottable.Component();
+    let c1 = new Plottable.Component();
     c1.renderTo(svg);
     c1.destroy();
 
@@ -357,8 +350,8 @@ describe("Component behavior", () => {
   });
 
   it("redraw() works as expected", () => {
-    var cg = new Plottable.Components.Group();
-    var c = TestMethods.makeFixedSizeComponent(10, 10);
+    let cg = new Plottable.Components.Group();
+    let c = TestMethods.makeFixedSizeComponent(10, 10);
     cg.append(c);
     cg.renderTo(svg);
     assert.strictEqual(cg.height(), 300, "height() is the entire available height");
@@ -371,10 +364,10 @@ describe("Component behavior", () => {
   });
 
   it("component remains in own cell", () => {
-    var horizontalComponent = new Plottable.Component();
-    var verticalComponent = new Plottable.Component();
-    var placeHolder = new Plottable.Component();
-    var t = new Plottable.Components.Table().add(verticalComponent, 0, 0)
+    let horizontalComponent = new Plottable.Component();
+    let verticalComponent = new Plottable.Component();
+    let placeHolder = new Plottable.Component();
+    let t = new Plottable.Components.Table().add(verticalComponent, 0, 0)
                                  .add(new Plottable.Component(), 0, 1)
                                  .add(placeHolder, 1, 0)
                                  .add(horizontalComponent, 1, 1);
@@ -392,22 +385,22 @@ describe("Component behavior", () => {
 
   it("Components will not translate if they are fixed width/height and request more space than offered", () => {
     // catches #1188
-    var c = new Plottable.Component();
+    let c = new Plottable.Component();
     c.requestedSpace = () => { return { minWidth: 500, minHeight: 500}; };
     (<any> c)._fixedWidthFlag = true;
     (<any> c)._fixedHeightFlag = true;
     c.xAlignment("left");
-    var t = new Plottable.Components.Table([[c]]);
+    let t = new Plottable.Components.Table([[c]]);
     t.renderTo(svg);
 
-    var transform = d3.transform((<any> c)._element.attr("transform"));
+    let transform = d3.transform((<any> c)._element.attr("transform"));
     assert.deepEqual(transform.translate, [0, 0], "the element was not translated");
     svg.remove();
   });
 
   it("components do not render unless allocated space", () => {
-    var renderFlag = false;
-    var c: any = new Plottable.Component();
+    let renderFlag = false;
+    let c: any = new Plottable.Component();
     c.renderImmediately = () => renderFlag = true;
     c.anchor(svg);
     c._setup();
@@ -427,13 +420,13 @@ describe("Component behavior", () => {
   });
 
   it("rendering to a new svg detaches the component", () => {
-    var SVG_HEIGHT_1 = 300;
-    var SVG_HEIGHT_2 = 50;
-    var svg1 = TestMethods.generateSVG(300, SVG_HEIGHT_1);
-    var svg2 = TestMethods.generateSVG(300, SVG_HEIGHT_2);
+    let SVG_HEIGHT_1 = 300;
+    let SVG_HEIGHT_2 = 50;
+    let svg1 = TestMethods.generateSVG(300, SVG_HEIGHT_1);
+    let svg2 = TestMethods.generateSVG(300, SVG_HEIGHT_2);
 
-    var plot = new Plottable.Plots.Line();
-    var group = new Plottable.Components.Group;
+    let plot = new Plottable.Plots.Line();
+    let group = new Plottable.Components.Group;
     plot.x(0).y(0);
     group.renderTo(svg1);
 
@@ -452,14 +445,33 @@ describe("Component behavior", () => {
     svg.remove();
   });
 
+  it("renderTo() only accepts strings, selections containing svgs, and SVG elements", () => {
+    svg.attr("id", "render-to-test");
+    assert.doesNotThrow(() => c.renderTo("#render-to-test"), Error, "accepts strings that identify svgs");
+    assert.doesNotThrow(() => c.renderTo(svg), Error, "accepts selections that contain svgs");
+    assert.doesNotThrow(() => c.renderTo(document.getElementById("render-to-test")), Error, "accepts svg elements");
+    let parent = TestMethods.getSVGParent();
+    let div = parent.append("div");
+    // HACKHACK #2614: chai-assert.d.ts has the wrong signature
+    (<any> assert).throws(() => c.renderTo(div), Error,
+      "Plottable requires a valid SVG to renderTo", "rejects selections that don't contain svgs");
+    (<any> assert).throws(() => c.renderTo(<Element> div.node()), Error,
+      "Plottable requires a valid SVG to renderTo", "rejects DOM nodes that are not svgs");
+    (<any> assert).throws(() => c.renderTo("#not-a-element"), Error,
+      "Plottable requires a valid SVG to renderTo", "rejects strings that don't correspond to DOM elements");
+    (<any> assert).throws(() => c.renderTo(d3.select(null)), Error,
+      "Plottable requires a valid SVG to renderTo", "rejects empty d3 selections");
+    svg.remove();
+  });
+
   describe("origin methods", () => {
-    var cWidth = 100;
-    var cHeight = 100;
+    let cWidth = 100;
+    let cHeight = 100;
 
     it("modifying returned value does not affect origin", () => {
       c.renderTo(svg);
-      var receivedOrigin = c.origin();
-      var delta = 10;
+      let receivedOrigin = c.origin();
+      let delta = 10;
       receivedOrigin.x += delta;
       receivedOrigin.y += delta;
       assert.notStrictEqual(receivedOrigin.x, c.origin().x, "receieved point can be modified without affecting origin (x)");
@@ -472,7 +484,7 @@ describe("Component behavior", () => {
       c.renderTo(svg);
 
       c.xAlignment("left").yAlignment("top");
-      var origin = c.origin();
+      let origin = c.origin();
       assert.strictEqual(origin.x, 0, "returns correct value (xAlign left)");
       assert.strictEqual(origin.y, 0, "returns correct value (yAlign top)");
 
@@ -491,14 +503,14 @@ describe("Component behavior", () => {
 
     it("origin() (nested)", () => {
       TestMethods.fixComponentSize(c, cWidth, cHeight);
-      var group = new Plottable.Components.Group([c]);
+      let group = new Plottable.Components.Group([c]);
       group.renderTo(svg);
 
-      var groupWidth = group.width();
-      var groupHeight = group.height();
+      let groupWidth = group.width();
+      let groupHeight = group.height();
 
       c.xAlignment("left").yAlignment("top");
-      var origin = c.origin();
+      let origin = c.origin();
       assert.strictEqual(origin.x, 0, "returns correct value (xAlign left)");
       assert.strictEqual(origin.y, 0, "returns correct value (yAlign top)");
 
@@ -520,7 +532,7 @@ describe("Component behavior", () => {
       c.renderTo(svg);
 
       c.xAlignment("left").yAlignment("top");
-      var origin = c.originToSVG();
+      let origin = c.originToSVG();
       assert.strictEqual(origin.x, 0, "returns correct value (xAlign left)");
       assert.strictEqual(origin.y, 0, "returns correct value (yAlign top)");
 
@@ -539,14 +551,14 @@ describe("Component behavior", () => {
 
     it("originToSVG() (nested)", () => {
       TestMethods.fixComponentSize(c, cWidth, cHeight);
-      var group = new Plottable.Components.Group([c]);
+      let group = new Plottable.Components.Group([c]);
       group.renderTo(svg);
 
-      var groupWidth = group.width();
-      var groupHeight = group.height();
+      let groupWidth = group.width();
+      let groupHeight = group.height();
 
       c.xAlignment("left").yAlignment("top");
-      var origin = c.originToSVG();
+      let origin = c.originToSVG();
       assert.strictEqual(origin.x, 0, "returns correct value (xAlign left)");
       assert.strictEqual(origin.y, 0, "returns correct value (yAlign top)");
 

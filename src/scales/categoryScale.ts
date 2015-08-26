@@ -17,7 +17,7 @@ export module Scales {
     constructor() {
       super();
       this._d3Scale = d3.scale.ordinal<string, number>();
-      var d3InnerPadding = 0.3;
+      let d3InnerPadding = 0.3;
       this._innerPadding = Category._convertToPlottableInnerPadding(d3InnerPadding);
       this._outerPadding = Category._convertToPlottableOuterPadding(0.5, d3InnerPadding);
     }
@@ -48,8 +48,8 @@ export module Scales {
         return this._range;
       } else {
         this._range = values;
-        var d3InnerPadding = 1 - 1 / (1 + this.innerPadding());
-        var d3OuterPadding = this.outerPadding() / (1 + this.innerPadding());
+        let d3InnerPadding = 1 - 1 / (1 + this.innerPadding());
+        let d3OuterPadding = this.outerPadding() / (1 + this.innerPadding());
         this._d3Scale.rangeBands(values, d3InnerPadding, d3OuterPadding);
         return this;
       }

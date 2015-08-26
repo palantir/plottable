@@ -5,6 +5,8 @@ export module Plots {
   export class Rectangle<X, Y> extends XYPlot<X, Y> {
     private static _X2_KEY = "x2";
     private static _Y2_KEY = "y2";
+    private _labelsEnabled = false;
+    private _label: Accessor<string> = null;
 
     /**
      * A Rectangle Plot displays rectangles based on the data.
@@ -29,16 +31,16 @@ export module Plots {
     }
 
     protected _generateAttrToProjector() {
-      var attrToProjector = super._generateAttrToProjector();
+      let attrToProjector = super._generateAttrToProjector();
 
       // Copy each of the different projectors.
-      var xAttr = Plot._scaledAccessor(this.x());
-      var x2Attr = attrToProjector[Rectangle._X2_KEY];
-      var yAttr = Plot._scaledAccessor(this.y());
-      var y2Attr = attrToProjector[Rectangle._Y2_KEY];
+      let xAttr = Plot._scaledAccessor(this.x());
+      let x2Attr = attrToProjector[Rectangle._X2_KEY];
+      let yAttr = Plot._scaledAccessor(this.y());
+      let y2Attr = attrToProjector[Rectangle._Y2_KEY];
 
-      var xScale = this.x().scale;
-      var yScale = this.y().scale;
+      let xScale = this.x().scale;
+      let yScale = this.y().scale;
 
       if (x2Attr != null) {
         attrToProjector["width"] = (d, i, dataset) => Math.abs(x2Attr(d, i, dataset) - xAttr(d, i, dataset));
@@ -119,8 +121,8 @@ export module Plots {
       }
 
       if (xScale != null) {
-        var x2Binding = this.x2();
-        var x2 = x2Binding && x2Binding.accessor;
+        let x2Binding = this.x2();
+        let x2 = x2Binding && x2Binding.accessor;
         if (x2 != null) {
           this._bindProperty(Rectangle._X2_KEY, x2, xScale);
         }
@@ -151,8 +153,8 @@ export module Plots {
         return this._propertyBindings.get(Rectangle._X2_KEY);
       }
 
-      var xBinding = this.x();
-      var xScale = xBinding && xBinding.scale;
+      let xBinding = this.x();
+      let xScale = xBinding && xBinding.scale;
       this._bindProperty(Rectangle._X2_KEY, x2, xScale);
 
       this.render();
@@ -191,8 +193,8 @@ export module Plots {
       }
 
       if (yScale != null) {
-        var y2Binding = this.y2();
-        var y2 = y2Binding && y2Binding.accessor;
+        let y2Binding = this.y2();
+        let y2 = y2Binding && y2Binding.accessor;
         if (y2 != null) {
           this._bindProperty(Rectangle._Y2_KEY, y2, yScale);
         }
@@ -223,8 +225,8 @@ export module Plots {
         return this._propertyBindings.get(Rectangle._Y2_KEY);
       }
 
-      var yBinding = this.y();
-      var yScale = yBinding && yBinding.scale;
+      let yBinding = this.y();
+      let yScale = yBinding && yBinding.scale;
       this._bindProperty(Rectangle._Y2_KEY, y2, yScale);
 
       this.render();
@@ -238,21 +240,118 @@ export module Plots {
      * @returns {PlotEntity[]} The PlotEntities at the particular point
      */
     public entitiesAt(point: Point) {
-      var attrToProjector = this._generateAttrToProjector();
+      let attrToProjector = this._generateAttrToProjector();
       return this.entities().filter((entity) => {
-        var datum = entity.datum;
-        var index = entity.index;
-        var dataset = entity.dataset;
-        var x = attrToProjector["x"](datum, index, dataset);
-        var y = attrToProjector["y"](datum, index, dataset);
-        var width = attrToProjector["width"](datum, index, dataset);
-        var height = attrToProjector["height"](datum, index, dataset);
+        let datum = entity.datum;
+        let index = entity.index;
+        let dataset = entity.dataset;
+        let x = attrToProjector["x"](datum, index, dataset);
+        let y = attrToProjector["y"](datum, index, dataset);
+        let width = attrToProjector["width"](datum, index, dataset);
+        let height = attrToProjector["height"](datum, index, dataset);
         return x <= point.x && point.x <= x + width && y <= point.y && point.y <= y + height;
       });
     }
 
+    /**
+     * Gets the Entities that intersect the Bounds.
+     *
+     * @param {Bounds} bounds
+     * @returns {PlotEntity[]}
+     */
+    public entitiesIn(bounds: Bounds): PlotEntity[];
+    /**
+     * Gets the Entities that intersect the area defined by the ranges.
+     *
+     * @param {Range} xRange
+     * @param {Range} yRange
+     * @returns {PlotEntity[]}
+     */
+    public entitiesIn(xRange: Range, yRange: Range): PlotEntity[];
+    public entitiesIn(xRangeOrBounds: Range | Bounds, yRange?: Range): PlotEntity[] {
+      let dataXRange: Range;
+      let dataYRange: Range;
+      if (yRange == null) {
+        let bounds = (<Bounds> xRangeOrBounds);
+        dataXRange = { min: bounds.topLeft.x, max: bounds.bottomRight.x };
+        dataYRange = { min: bounds.topLeft.y, max: bounds.bottomRight.y };
+      } else {
+        dataXRange = (<Range> xRangeOrBounds);
+        dataYRange = yRange;
+      }
+      return this._entitiesIntersecting(dataXRange, dataYRange);
+    }
+
+    private _entityBBox(datum: any, index: number, dataset: Plottable.Dataset, attrToProjector: AttributeToProjector): SVGRect {
+      return {
+        x: attrToProjector["x"](datum, index, dataset),
+        y: attrToProjector["y"](datum, index, dataset),
+        width: attrToProjector["width"](datum, index, dataset),
+        height: attrToProjector["height"](datum, index, dataset)
+      };
+    }
+
+    private _entitiesIntersecting(xValOrRange: number | Range, yValOrRange: number | Range): PlotEntity[] {
+      let intersected: PlotEntity[] = [];
+      let attrToProjector = this._generateAttrToProjector();
+      this.entities().forEach((entity) => {
+        if (Utils.DOM.intersectsBBox(xValOrRange, yValOrRange,
+                                     this._entityBBox(entity.datum, entity.index, entity.dataset, attrToProjector))) {
+          intersected.push(entity);
+        }
+      });
+      return intersected;
+    }
+
+    /**
+     * Gets the accessor for labels.
+     *
+     * @returns {Accessor<string>}
+     */
+    public label(): Accessor<string>;
+    /**
+     * Sets the text of labels to the result of an Accessor.
+     *
+     * @param {Accessor<string>} label
+     * @returns {Plots.Rectangle} The calling Rectangle Plot.
+     */
+    public label(label: Accessor<string>): Plots.Rectangle<X, Y>;
+    public label(label?: Accessor<string>): any {
+      if (label == null) {
+        return this._label;
+      }
+
+      this._label = label;
+      this.render();
+      return this;
+    }
+
+    /**
+     * Gets whether labels are enabled.
+     *
+     * @returns {boolean}
+     */
+    public labelsEnabled(): boolean;
+    /**
+     * Sets whether labels are enabled.
+     * Labels too big to be contained in the rectangle, cut off by edges, or blocked by other rectangles will not be shown.
+     *
+     * @param {boolean} labelsEnabled
+     * @returns {Rectangle} The calling Rectangle Plot.
+     */
+    public labelsEnabled(enabled: boolean): Plots.Rectangle<X, Y>;
+    public labelsEnabled(enabled?: boolean): any {
+      if (enabled == null) {
+        return this._labelsEnabled;
+      } else {
+        this._labelsEnabled = enabled;
+        this.render();
+        return this;
+      }
+    }
+
     protected _propertyProjectors(): AttributeToProjector {
-      var attrToProjector = super._propertyProjectors();
+      let attrToProjector = super._propertyProjectors();
       if (this.x2() != null) {
         attrToProjector["x2"] = Plot._scaledAccessor(this.x2());
       }
@@ -263,13 +362,13 @@ export module Plots {
     }
 
     protected _pixelPoint(datum: any, index: number, dataset: Dataset) {
-      var attrToProjector = this._generateAttrToProjector();
-      var rectX = attrToProjector["x"](datum, index, dataset);
-      var rectY = attrToProjector["y"](datum, index, dataset);
-      var rectWidth = attrToProjector["width"](datum, index, dataset);
-      var rectHeight = attrToProjector["height"](datum, index, dataset);
-      var x = rectX + rectWidth / 2;
-      var y = rectY + rectHeight / 2;
+      let attrToProjector = this._generateAttrToProjector();
+      let rectX = attrToProjector["x"](datum, index, dataset);
+      let rectY = attrToProjector["y"](datum, index, dataset);
+      let rectWidth = attrToProjector["width"](datum, index, dataset);
+      let rectHeight = attrToProjector["height"](datum, index, dataset);
+      let x = rectX + rectWidth / 2;
+      let y = rectY + rectHeight / 2;
       return { x: x, y: y };
     }
 
@@ -277,30 +376,110 @@ export module Plots {
       if (scale instanceof Plottable.Scales.Category) {
         return (<Plottable.Scales.Category> scale).rangeBand();
       } else {
-        var accessor = scale === this.x().scale ? this.x().accessor : this.y().accessor;
-        var accessorData = d3.set(Utils.Array.flatten(this.datasets().map((dataset) => {
+        let accessor = scale === this.x().scale ? this.x().accessor : this.y().accessor;
+        let accessorData = d3.set(Utils.Array.flatten(this.datasets().map((dataset) => {
           return dataset.data().map((d, i) => accessor(d, i, dataset).valueOf());
         }))).values().map((value) => +value);
         // Get the absolute difference between min and max
-        var min = Plottable.Utils.Math.min(accessorData, 0);
-        var max = Plottable.Utils.Math.max(accessorData, 0);
-        var scaledMin = scale.scale(min);
-        var scaledMax = scale.scale(max);
+        let min = Plottable.Utils.Math.min(accessorData, 0);
+        let max = Plottable.Utils.Math.max(accessorData, 0);
+        let scaledMin = scale.scale(min);
+        let scaledMax = scale.scale(max);
         return (scaledMax - scaledMin) / Math.abs(max - min);
       }
     }
 
     protected _getDataToDraw() {
-      var dataToDraw = new Utils.Map<Dataset, any[]>();
-      var attrToProjector = this._generateAttrToProjector();
+      let dataToDraw = new Utils.Map<Dataset, any[]>();
+      let attrToProjector = this._generateAttrToProjector();
       this.datasets().forEach((dataset) => {
-        var data = dataset.data().filter((d, i) => Utils.Math.isValidNumber(attrToProjector["x"](d, i, dataset)) &&
+        let data = dataset.data().filter((d, i) => Utils.Math.isValidNumber(attrToProjector["x"](d, i, dataset)) &&
                                                    Utils.Math.isValidNumber(attrToProjector["y"](d, i, dataset)) &&
                                                    Utils.Math.isValidNumber(attrToProjector["width"](d, i, dataset)) &&
                                                    Utils.Math.isValidNumber(attrToProjector["height"](d, i, dataset)));
         dataToDraw.set(dataset, data);
       });
       return dataToDraw;
+    }
+
+    protected _additionalPaint(time: number) {
+      this._renderArea.selectAll(".label-area").remove();
+      if (this._labelsEnabled && this.label() != null) {
+        Utils.Window.setTimeout(() => this._drawLabels(), time);
+      }
+    }
+
+    private _drawLabels() {
+      let dataToDraw = this._getDataToDraw();
+      this.datasets().forEach((dataset, i) => this._drawLabel(dataToDraw, dataset, i));
+    }
+
+    private _drawLabel(dataToDraw: Utils.Map<Dataset, any[]>, dataset: Dataset, datasetIndex: number) {
+      let attrToProjector = this._generateAttrToProjector();
+      let labelArea = this._renderArea.append("g").classed("label-area", true);
+      let measurer = new SVGTypewriter.Measurers.Measurer(labelArea);
+      let writer = new SVGTypewriter.Writers.Writer(measurer);
+      let xRange = this.x().scale.range();
+      let yRange = this.y().scale.range();
+      let xMin = Math.min.apply(null, xRange);
+      let xMax = Math.max.apply(null, xRange);
+      let yMin = Math.min.apply(null, yRange);
+      let yMax = Math.max.apply(null, yRange);
+      let data = dataToDraw.get(dataset);
+      data.forEach((datum, datumIndex) => {
+        let label = "" + this.label()(datum, datumIndex, dataset);
+        let measurement = measurer.measure(label);
+
+        let x = attrToProjector["x"](datum, datumIndex, dataset);
+        let y = attrToProjector["y"](datum, datumIndex, dataset);
+        let width = attrToProjector["width"](datum, datumIndex, dataset);
+        let height = attrToProjector["height"](datum, datumIndex, dataset);
+        if (measurement.height <= height && measurement.width <= width) {
+
+          let horizontalOffset = (width - measurement.width) / 2;
+          let verticalOffset = (height - measurement.height) / 2;
+          x += horizontalOffset;
+          y += verticalOffset;
+
+          let xLabelRange = { min: x, max: x + measurement.width };
+          let yLabelRange = { min : y, max: y + measurement.height };
+          if (xLabelRange.min < xMin || xLabelRange.max > xMax || yLabelRange.min < yMin || yLabelRange.max > yMax) {
+            return;
+          }
+          if (this._overlayLabel(xLabelRange, yLabelRange, datumIndex, datasetIndex, dataToDraw)) {
+            return;
+          }
+
+          let color = attrToProjector["fill"] == null ? "black" : attrToProjector["fill"](datum, datumIndex, dataset);
+          let dark = Utils.Color.contrast("white", color) * 1.6 < Utils.Color.contrast("black", color);
+          let g = labelArea.append("g").attr("transform", "translate(" + x + "," + y + ")");
+          let className = dark ? "dark-label" : "light-label";
+          g.classed(className, true);
+
+          writer.write(label, measurement.width, measurement.height, {
+            selection: g,
+            xAlign: "center",
+            yAlign: "center",
+            textRotation: 0
+          });
+        }
+      });
+    }
+
+    private _overlayLabel(labelXRange: Range, labelYRange: Range, datumIndex: number, datasetIndex: number,
+                          dataToDraw: Utils.Map<Dataset, any[]>) {
+      let attrToProjector = this._generateAttrToProjector();
+      let datasets = this.datasets();
+      for (let i = datasetIndex; i < datasets.length; i ++ ) {
+        let dataset = datasets[i];
+        let data = dataToDraw.get(dataset);
+        for (let j = (i === datasetIndex ? datumIndex + 1 : 0); j < data.length ; j ++ ) {
+          if (Utils.DOM.intersectsBBox(labelXRange, labelYRange, this._entityBBox(data[j], j, dataset, attrToProjector))) {
+            return true;
+          }
+        }
+      }
+      return false;
     }
   }
 }

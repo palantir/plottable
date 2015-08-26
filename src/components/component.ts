@@ -183,18 +183,18 @@ export class Component {
           this._rootSVG.attr("height", "100%");
         }
 
-        var elem: HTMLScriptElement = (<HTMLScriptElement> this._rootSVG.node());
+        let elem: HTMLScriptElement = (<HTMLScriptElement> this._rootSVG.node());
         availableWidth = Utils.DOM.elementWidth(elem);
         availableHeight = Utils.DOM.elementHeight(elem);
       } else {
         throw new Error("null arguments cannot be passed to computeLayout() on a non-root node");
       }
     }
-    var size = this._sizeFromOffer(availableWidth, availableHeight);
+    let size = this._sizeFromOffer(availableWidth, availableHeight);
     this._width = size.width;
     this._height = size.height;
-    var xAlignProportion = Component._xAlignToProportion[this._xAlignment];
-    var yAlignProportion = Component._yAlignToProportion[this._yAlignment];
+    let xAlignProportion = Component._xAlignToProportion[this._xAlignment];
+    let yAlignProportion = Component._yAlignToProportion[this._yAlignment];
     this._origin = {
       x: origin.x + (availableWidth - this.width()) * xAlignProportion,
       y: origin.y + (availableHeight - this.height()) * yAlignProportion
@@ -205,7 +205,7 @@ export class Component {
   }
 
   protected _sizeFromOffer(availableWidth: number, availableHeight: number) {
-    var requestedSpace = this.requestedSpace(availableWidth, availableHeight);
+    let requestedSpace = this.requestedSpace(availableWidth, availableHeight);
     return {
       width: this.fixedWidth() ? Math.min(availableWidth , requestedSpace.minWidth) : availableWidth,
       height: this.fixedHeight() ? Math.min(availableHeight, requestedSpace.minHeight) : availableHeight
@@ -262,12 +262,14 @@ export class Component {
    * @param {String|d3.Selection} element A selector-string for the <svg>, or a d3 selection containing an <svg>.
    * @returns {Component} The calling Component.
    */
-  public renderTo(element: String | d3.Selection<void>): Component {
+  public renderTo(element: String | Element | d3.Selection<void>): Component {
     this.detach();
     if (element != null) {
-      var selection: d3.Selection<void>;
+      let selection: d3.Selection<void>;
       if (typeof(element) === "string") {
         selection = d3.select(<string> element);
+      } else if (element instanceof Element) {
+        selection = d3.select(<Element> element);
       } else {
         selection = <d3.Selection<void>> element;
       }
@@ -342,7 +344,7 @@ export class Component {
       throw new Error("Adding boxes before anchoring is currently disallowed");
     }
     parentElement = parentElement == null ? this._boxContainer : parentElement;
-    var box = parentElement.append("rect");
+    let box = parentElement.append("rect");
     if (className != null) { box.classed(className, true); }
 
     this._boxes.push(box);
@@ -356,11 +358,11 @@ export class Component {
     // The clip path will prevent content from overflowing its Component space.
     // HACKHACK: IE <=9 does not respect the HTML base element in SVG.
     // They don't need the current URL in the clip path reference.
-    var prefix = /MSIE [5-9]/.test(navigator.userAgent) ? "" : document.location.href;
+    let prefix = /MSIE [5-9]/.test(navigator.userAgent) ? "" : document.location.href;
     prefix = prefix.split("#")[0]; // To fix cases where an anchor tag was used
-    var clipPathId = Utils.DOM.generateUniqueClipPathId();
+    let clipPathId = Utils.DOM.generateUniqueClipPathId();
     this._element.attr("clip-path", "url(\"" + prefix + "#" + clipPathId + "\")");
-    var clipPathParent = this._boxContainer.append("clipPath")
+    let clipPathParent = this._boxContainer.append("clipPath")
                                            .attr("id", clipPathId);
     this._addBox("clip-rect", clipPathParent);
   }
@@ -450,9 +452,9 @@ export class Component {
 
     if (this._isAnchored) {
       this._element.remove();
-      this._isAnchored = false;
-      this._onDetachCallbacks.callCallbacks(this);
     }
+    this._isAnchored = false;
+    this._onDetachCallbacks.callCallbacks(this);
 
     return this;
   }
@@ -542,10 +544,10 @@ export class Component {
    * @return {Point}
    */
   public originToSVG(): Point {
-    var origin = this.origin();
-    var ancestor = this.parent();
+    let origin = this.origin();
+    let ancestor = this.parent();
     while (ancestor != null) {
-      var ancestorOrigin = ancestor.origin();
+      let ancestorOrigin = ancestor.origin();
       origin.x += ancestorOrigin.x;
       origin.y += ancestorOrigin.y;
       ancestor = ancestor.parent();

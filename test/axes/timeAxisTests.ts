@@ -1,8 +1,8 @@
 ///<reference path="../testReference.ts" />
 
 describe("TimeAxis", () => {
-  var scale: Plottable.Scales.Time;
-  var axis: Plottable.Axes.Time;
+  let scale: Plottable.Scales.Time;
+  let axis: Plottable.Axes.Time;
   beforeEach(() => {
     scale = new Plottable.Scales.Time();
     axis = new Plottable.Axes.Time(scale, "bottom");
@@ -20,7 +20,7 @@ describe("TimeAxis", () => {
   });
 
   it("Computing the default ticks doesn't error out for edge cases", () => {
-    var svg = TestMethods.generateSVG(400, 100);
+    let svg = TestMethods.generateSVG(400, 100);
     scale.range([0, 400]);
 
     // very large time span
@@ -35,7 +35,7 @@ describe("TimeAxis", () => {
   });
 
   it("Tick labels don't overlap", () => {
-    var svg = TestMethods.generateSVG(400, 100);
+    let svg = TestMethods.generateSVG(400, 100);
     scale.range([0, 400]);
 
     function checkDomain(domain: any[]) {
@@ -43,16 +43,16 @@ describe("TimeAxis", () => {
       axis.renderTo(svg);
 
       function checkLabelsForContainer(container: d3.Selection<void>) {
-        var visibleTickLabels = container
+        let visibleTickLabels = container
                 .selectAll("." + Plottable.Axis.TICK_LABEL_CLASS)
                 .filter(function(d: any, i: number) {
                   return d3.select(this).style("visibility") === "visible";
                 });
-        var numLabels = visibleTickLabels[0].length;
-        var clientRect1: ClientRect;
-        var clientRect2: ClientRect;
-        for (var i = 0; i < numLabels; i++) {
-          for (var j = i + 1; j < numLabels; j++) {
+        let numLabels = visibleTickLabels[0].length;
+        let clientRect1: ClientRect;
+        let clientRect2: ClientRect;
+        for (let i = 0; i < numLabels; i++) {
+          for (let j = i + 1; j < numLabels; j++) {
             clientRect1 = (<Element> visibleTickLabels[0][i]).getBoundingClientRect();
             clientRect2 = (<Element> visibleTickLabels[0][j]).getBoundingClientRect();
 
@@ -82,62 +82,62 @@ describe("TimeAxis", () => {
   });
 
   it("custom possible axis configurations", () => {
-    var svg = TestMethods.generateSVG(800, 100);
-    var scale = new Plottable.Scales.Time();
-    var axis = new Plottable.Axes.Time(scale, "bottom");
-    var configurations = axis.axisConfigurations();
-    var newPossibleConfigurations = configurations.slice(0, 3);
+    let svg = TestMethods.generateSVG(800, 100);
+    let scale = new Plottable.Scales.Time();
+    let axis = new Plottable.Axes.Time(scale, "bottom");
+    let configurations = axis.axisConfigurations();
+    let newPossibleConfigurations = configurations.slice(0, 3);
     newPossibleConfigurations.forEach(axisConfig => axisConfig.forEach(tierConfig => {
       tierConfig.interval = Plottable.TimeInterval.minute;
       tierConfig.step += 3;
     }));
     axis.axisConfigurations(newPossibleConfigurations);
-    var now = new Date();
-    var twoMinutesBefore = new Date(now.getTime());
+    let now = new Date();
+    let twoMinutesBefore = new Date(now.getTime());
     twoMinutesBefore.setMinutes(now.getMinutes() - 2);
     scale.domain([twoMinutesBefore, now]);
     scale.range([0, 800]);
     axis.renderTo(svg);
-    var configs = newPossibleConfigurations[(<any> axis)._mostPreciseConfigIndex];
+    let configs = newPossibleConfigurations[(<any> axis)._mostPreciseConfigIndex];
     assert.deepEqual(configs[0].interval, Plottable.TimeInterval.minute, "axis used new time unit");
     assert.deepEqual(configs[0].step, 4, "axis used new step");
     svg.remove();
   });
 
   it("renders end ticks on either side", () => {
-    var width = 500;
-    var svg = TestMethods.generateSVG(width, 100);
+    let width = 500;
+    let svg = TestMethods.generateSVG(width, 100);
     scale.domain([new Date("2010-01-01"), new Date("2014-01-01")]);
     axis.renderTo(svg);
-    var firstTick = d3.select(".tick-mark");
+    let firstTick = d3.select(".tick-mark");
     assert.strictEqual(firstTick.attr("x1"), "0", "xPos (x1) of first end tick is at the beginning of the axis container");
     assert.strictEqual(firstTick.attr("x2"), "0", "xPos (x2) of first end tick is at the beginning of the axis container");
-    var lastTick = d3.select(d3.selectAll(".tick-mark")[0].pop());
+    let lastTick = d3.select(d3.selectAll(".tick-mark")[0].pop());
     assert.strictEqual(lastTick.attr("x1"), String(width), "xPos (x1) of last end tick is at the end of the axis container");
     assert.strictEqual(lastTick.attr("x2"), String(width), "xPos (x2) of last end tick is at the end of the axis container");
     svg.remove();
   });
 
   it("adds a class corresponding to the end-tick for the first and last ticks", () => {
-    var width = 500;
-    var svg = TestMethods.generateSVG(width, 100);
+    let width = 500;
+    let svg = TestMethods.generateSVG(width, 100);
     scale.domain([new Date("2010-01-01"), new Date("2014-01-01")]);
     axis.renderTo(svg);
-    var firstTick = d3.select("." + Plottable.Axis.TICK_MARK_CLASS);
+    let firstTick = d3.select("." + Plottable.Axis.TICK_MARK_CLASS);
     assert.isTrue(firstTick.classed(Plottable.Axis.END_TICK_MARK_CLASS), "first end tick has the end-tick-mark class");
-    var lastTick = d3.select(d3.selectAll("." + Plottable.Axis.TICK_MARK_CLASS)[0].pop());
+    let lastTick = d3.select(d3.selectAll("." + Plottable.Axis.TICK_MARK_CLASS)[0].pop());
     assert.isTrue(lastTick.classed(Plottable.Axis.END_TICK_MARK_CLASS), "last end tick has the end-tick-mark class");
     svg.remove();
   });
 
   it("tick labels do not overlap with tick marks", () => {
-    var svg = TestMethods.generateSVG(400, 100);
+    let svg = TestMethods.generateSVG(400, 100);
     scale = new Plottable.Scales.Time();
     scale.domain([new Date("2009-12-20"), new Date("2011-01-01")]);
     axis = new Plottable.Axes.Time(scale, "bottom");
     axis.renderTo(svg);
-    var tickRects = d3.selectAll("." + Plottable.Axis.TICK_MARK_CLASS)[0].map((mark: Element) => mark.getBoundingClientRect());
-    var labelRects = d3.selectAll("." + Plottable.Axis.TICK_LABEL_CLASS)
+    let tickRects = d3.selectAll("." + Plottable.Axis.TICK_MARK_CLASS)[0].map((mark: Element) => mark.getBoundingClientRect());
+    let labelRects = d3.selectAll("." + Plottable.Axis.TICK_LABEL_CLASS)
         .filter(function(d: Element, i: number) {
           return d3.select(this).style("visibility") === "visible";
         })[0].map((label: Element) => label.getBoundingClientRect());
@@ -150,10 +150,10 @@ describe("TimeAxis", () => {
   });
 
   it("if the time only uses one tier, there should be no space left for the second tier", () => {
-    var svg = TestMethods.generateSVG();
-    var xScale = new Plottable.Scales.Time();
+    let svg = TestMethods.generateSVG();
+    let xScale = new Plottable.Scales.Time();
     xScale.domain([new Date("2013-03-23 12:00"), new Date("2013-04-03 0:00")]);
-    var xAxis = new Plottable.Axes.Time(xScale, "bottom");
+    let xAxis = new Plottable.Axes.Time(xScale, "bottom");
     xAxis.margin(0);
 
     xAxis.axisConfigurations([
@@ -164,7 +164,7 @@ describe("TimeAxis", () => {
 
     xAxis.renderTo(svg);
 
-    var oneTierSize: number = xAxis.height();
+    let oneTierSize: number = xAxis.height();
 
     xAxis.axisConfigurations([
         [
@@ -173,7 +173,7 @@ describe("TimeAxis", () => {
         ],
     ]);
 
-    var twoTierSize: number = xAxis.height();
+    let twoTierSize: number = xAxis.height();
 
     assert.strictEqual(twoTierSize, oneTierSize * 2, "two-tier axis is twice as tall as one-tier axis");
 
@@ -183,7 +183,7 @@ describe("TimeAxis", () => {
         ],
     ]);
 
-    var initialTierSize: number = xAxis.height();
+    let initialTierSize: number = xAxis.height();
 
     assert.strictEqual(initialTierSize, oneTierSize,
                       "2-tier time axis should shrink when presented new configuration with 1 tier");
@@ -192,10 +192,10 @@ describe("TimeAxis", () => {
   });
 
   it("three tier time axis should be possible", () => {
-    var svg = TestMethods.generateSVG();
-    var xScale = new Plottable.Scales.Time();
+    let svg = TestMethods.generateSVG();
+    let xScale = new Plottable.Scales.Time();
     xScale.domain([new Date("2013-03-23 12:00"), new Date("2013-04-03 0:00")]);
-    var xAxis = new Plottable.Axes.Time(xScale, "bottom");
+    let xAxis = new Plottable.Axes.Time(xScale, "bottom");
     xAxis.margin(0);
 
     xAxis.renderTo(svg);
@@ -207,7 +207,7 @@ describe("TimeAxis", () => {
         ],
     ]);
 
-    var twoTierAxisHeight: number = xAxis.height();
+    let twoTierAxisHeight: number = xAxis.height();
 
     xAxis.axisConfigurations([
         [
@@ -217,7 +217,7 @@ describe("TimeAxis", () => {
         ],
     ]);
 
-    var threeTierAxisHeight: number = xAxis.height();
+    let threeTierAxisHeight: number = xAxis.height();
 
     assert.strictEqual(threeTierAxisHeight, twoTierAxisHeight * 3 / 2,
       "three tier height is 3/2 bigger than the two tier height");
@@ -227,22 +227,23 @@ describe("TimeAxis", () => {
   });
 
   it("many tier Axis.Time should not exceed the drawing area", () => {
-    var svg = TestMethods.generateSVG(400, 50);
-    var xScale = new Plottable.Scales.Time();
+    let svg = TestMethods.generateSVG(400, 50);
+    let xScale = new Plottable.Scales.Time();
     xScale.domain([new Date("2013-03-23 12:00"), new Date("2013-04-03 0:00")]);
-    var xAxis = new Plottable.Axes.Time(xScale, "bottom");
+    let xAxis = new Plottable.Axes.Time(xScale, "bottom");
+    xAxis.margin(0);
 
-    var tiersToCreate = 15;
-    var configuration = Array.apply(null, Array(tiersToCreate)).map(() => {
+    let tiersToCreate = 15;
+    let configuration = Array.apply(null, Array(tiersToCreate)).map(() => {
       return {interval: Plottable.TimeInterval.day, step: 2, formatter: Plottable.Formatters.time("%a %e") };
     });
     xAxis.axisConfigurations([configuration]);
 
     xAxis.renderTo(svg);
 
-    var axisBoundingRect: ClientRect = (<any> xAxis)._element.select(".bounding-box")[0][0].getBoundingClientRect();
+    let axisBoundingRect: ClientRect = (<any> xAxis)._element.select(".bounding-box")[0][0].getBoundingClientRect();
 
-    var isInsideAxisBoundingRect = function(innerRect: ClientRect) {
+    let isInsideAxisBoundingRect = function(innerRect: ClientRect) {
       return Math.floor(innerRect.bottom) <= Math.ceil(axisBoundingRect.bottom) + window.Pixel_CloseTo_Requirement &&
              Math.floor(axisBoundingRect.top) <= Math.ceil(innerRect.top) + window.Pixel_CloseTo_Requirement;
     };
@@ -250,8 +251,8 @@ describe("TimeAxis", () => {
     (<any> xAxis)._element
       .selectAll("." + Plottable.Axes.Time.TIME_AXIS_TIER_CLASS)
       .each(function(e: any, i: number) {
-        var sel = d3.select(this);
-        var visibility = sel.style("visibility");
+        let sel = d3.select(this);
+        let visibility = sel.style("visibility");
 
         // HACKHACK window.getComputedStyle() is behaving weirdly in IE9. Further investigation required
         if (visibility === "inherit") {
@@ -270,7 +271,7 @@ describe("TimeAxis", () => {
 
     function getStyleInIE9(element: any) {
       while (element) {
-        var visibility = window.getComputedStyle(element).visibility;
+        let visibility = window.getComputedStyle(element).visibility;
         if (visibility !== "inherit") {
           return visibility;
         }
@@ -279,6 +280,18 @@ describe("TimeAxis", () => {
       return "visible";
     }
 
+  });
+
+  it("occupied space includes margin, label padding, and tick length", () => {
+    let svg = TestMethods.generateSVG(400, 400);
+    let xScale = new Plottable.Scales.Time();
+    let xAxis = new Plottable.Axes.Time(xScale, "bottom");
+    xAxis.margin(100);
+    xAxis.anchor(svg);
+    xAxis.computeLayout({ x: 0, y: 0}, 400, 400);
+    let minimumHeight = xAxis.tickLabelPadding() + xAxis.margin() + xAxis.innerTickLength();
+    assert.operator(xAxis.height(), ">=", minimumHeight, "height includes all relevant pieces");
+    svg.remove();
   });
 
 });

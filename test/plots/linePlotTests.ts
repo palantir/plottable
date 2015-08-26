@@ -4,8 +4,8 @@ describe("Plots", () => {
   // HACKHACK #1798: beforeEach being used below
   describe("LinePlot", () => {
     it("entities() with NaN in data", () => {
-      var svg = TestMethods.generateSVG(500, 500);
-      var dataWithNaN = [
+      let svg = TestMethods.generateSVG(500, 500);
+      let dataWithNaN = [
         { foo: 0.0, bar: 0.0 },
         { foo: 0.2, bar: 0.2 },
         { foo: 0.4, bar: NaN },
@@ -13,20 +13,20 @@ describe("Plots", () => {
         { foo: 0.8, bar: 0.8 }
       ];
 
-      var xScale = new Plottable.Scales.Linear();
+      let xScale = new Plottable.Scales.Linear();
       xScale.domain([0, 1]);
-      var yScale = new Plottable.Scales.Linear();
+      let yScale = new Plottable.Scales.Linear();
       yScale.domain([0, 1]);
 
-      var linePlot = new Plottable.Plots.Line();
+      let linePlot = new Plottable.Plots.Line();
       linePlot.addDataset(new Plottable.Dataset(dataWithNaN));
       linePlot.x((d: any) => d.foo, xScale);
       linePlot.y((d: any) => d.bar, yScale);
       linePlot.renderTo(svg);
 
-      var entities = linePlot.entities();
+      let entities = linePlot.entities();
 
-      var expectedLength = dataWithNaN.length - 1;
+      let expectedLength = dataWithNaN.length - 1;
       assert.lengthOf(entities, expectedLength, "NaN data was not returned");
 
       svg.remove();
@@ -34,15 +34,15 @@ describe("Plots", () => {
 
     describe("interpolation", () => {
       it("interpolator() get / set", () => {
-        var linePlot = new Plottable.Plots.Line();
+        let linePlot = new Plottable.Plots.Line();
         assert.strictEqual(linePlot.interpolator(), "linear", "the default interpolation mode is linear");
         assert.strictEqual(linePlot.interpolator("step"), linePlot, "setting an interpolation mode returns the plot");
         assert.strictEqual(linePlot.interpolator(), "step", "setting an interpolation mode works");
       });
 
       it("interpolator() behavior for the step function", () => {
-        var svg = TestMethods.generateSVG(400, 400);
-        var data = [
+        let svg = TestMethods.generateSVG(400, 400);
+        let data = [
           {"x": 0.0, "y": 0},
           {"x": 0.8, "y": 0.717},
           {"x": 1.6, "y": 0.999},
@@ -53,16 +53,16 @@ describe("Plots", () => {
           {"x": 5.6, "y": -0.631},
         ];
 
-        var xScale = new Plottable.Scales.Linear();
-        var yScale = new Plottable.Scales.Linear();
-        var linePlot = new Plottable.Plots.Line();
+        let xScale = new Plottable.Scales.Linear();
+        let yScale = new Plottable.Scales.Linear();
+        let linePlot = new Plottable.Plots.Line();
         linePlot.addDataset(new Plottable.Dataset(data));
         linePlot.x((d) => d.x, xScale);
         linePlot.y((d) => d.y, yScale);
 
         linePlot.renderTo(svg);
 
-        var svgPath: string;
+        let svgPath: string;
         svgPath = linePlot.content().select("path").attr("d");
         assert.lengthOf(svgPath.match(/L/g), data.length - 1, "one line for each pair of consecutive points");
         assert.isNull(svgPath.match(/V/g), "no vertical lines");
@@ -83,10 +83,10 @@ describe("Plots", () => {
   describe("LinePlot", () => {
     // HACKHACK #1798: beforeEach being used below
     it("renders correctly with no data", () => {
-      var svg = TestMethods.generateSVG(400, 400);
-      var xScale = new Plottable.Scales.Linear();
-      var yScale = new Plottable.Scales.Linear();
-      var plot = new Plottable.Plots.Line();
+      let svg = TestMethods.generateSVG(400, 400);
+      let xScale = new Plottable.Scales.Linear();
+      let yScale = new Plottable.Scales.Linear();
+      let plot = new Plottable.Plots.Line();
       plot.x((d: any) => d.x, xScale);
       plot.y((d: any) => d.y, yScale);
       assert.doesNotThrow(() => plot.renderTo(svg), Error);
@@ -97,16 +97,16 @@ describe("Plots", () => {
   });
 
   describe("LinePlot", () => {
-    var svg: d3.Selection<void>;
-    var xScale: Plottable.Scales.Linear;
-    var yScale: Plottable.Scales.Linear;
-    var xAccessor: any;
-    var yAccessor: any;
-    var colorAccessor: any;
-    var twoPointData = [{foo: 0, bar: 0}, {foo: 1, bar: 1}];
-    var simpleDataset: Plottable.Dataset;
-    var linePlot: Plottable.Plots.Line<number>;
-    var renderArea: d3.Selection<void>;
+    let svg: d3.Selection<void>;
+    let xScale: Plottable.Scales.Linear;
+    let yScale: Plottable.Scales.Linear;
+    let xAccessor: any;
+    let yAccessor: any;
+    let colorAccessor: any;
+    let twoPointData = [{foo: 0, bar: 0}, {foo: 1, bar: 1}];
+    let simpleDataset: Plottable.Dataset;
+    let linePlot: Plottable.Plots.Line<number>;
+    let renderArea: d3.Selection<void>;
 
     before(() => {
       xScale = new Plottable.Scales.Linear();
@@ -131,33 +131,33 @@ describe("Plots", () => {
     });
 
     it("draws a line correctly", () => {
-      var linePath = renderArea.select(".line");
+      let linePath = renderArea.select(".line");
       assert.strictEqual(TestMethods.normalizePath(linePath.attr("d")), "M0,500L500,0", "line d was set correctly");
       assert.strictEqual(linePath.style("fill"), "none", "line fill renders as \"none\"");
       svg.remove();
     });
 
     it("attributes set appropriately from accessor", () => {
-      var areaPath = renderArea.select(".line");
+      let areaPath = renderArea.select(".line");
       assert.strictEqual(areaPath.attr("stroke"), "#000000", "stroke set correctly");
       svg.remove();
     });
 
     it("attributes can be changed by projecting new accessor and re-render appropriately", () => {
-      var newColorAccessor = () => "pink";
+      let newColorAccessor = () => "pink";
       linePlot.attr("stroke", newColorAccessor);
       linePlot.renderTo(svg);
-      var linePath = renderArea.select(".line");
+      let linePath = renderArea.select(".line");
       assert.strictEqual(linePath.attr("stroke"), "pink", "stroke changed correctly");
       svg.remove();
     });
 
     it("attributes can be changed by projecting attribute accessor (sets to first datum attribute)", () => {
-      var data = JSON.parse(JSON.stringify(twoPointData)); // deep copy to not affect other tests
+      let data = JSON.parse(JSON.stringify(twoPointData)); // deep copy to not affect other tests
       data.forEach(function(d: any) { d.stroke = "pink"; });
       simpleDataset.data(data);
       linePlot.attr("stroke", (d) => d.stroke);
-      var linePath = renderArea.select(".line");
+      let linePath = renderArea.select(".line");
       assert.strictEqual(linePath.attr("stroke"), "pink", "stroke set to uniform stroke color");
 
       data[0].stroke = "green";
@@ -167,7 +167,7 @@ describe("Plots", () => {
     });
 
     it("correctly handles NaN and undefined x and y values", () => {
-      var lineData = [
+      let lineData = [
         { foo: 0.0, bar: 0.0 },
         { foo: 0.2, bar: 0.2 },
         { foo: 0.4, bar: 0.4 },
@@ -175,20 +175,20 @@ describe("Plots", () => {
         { foo: 0.8, bar: 0.8 }
       ];
       simpleDataset.data(lineData);
-      var linePath = renderArea.select(".line");
-      var dOriginal = TestMethods.normalizePath(linePath.attr("d"));
+      let linePath = renderArea.select(".line");
+      let dOriginal = TestMethods.normalizePath(linePath.attr("d"));
 
       function assertCorrectPathSplitting(msgPrefix: string) {
-        var d = TestMethods.normalizePath(linePath.attr("d"));
-        var pathSegements = d.split("M").filter((segment) => segment !== "");
+        let d = TestMethods.normalizePath(linePath.attr("d"));
+        let pathSegements = d.split("M").filter((segment) => segment !== "");
         assert.lengthOf(pathSegements, 2, msgPrefix + " split path into two segments");
-        var firstSegmentContained = dOriginal.indexOf(pathSegements[0]) >= 0;
+        let firstSegmentContained = dOriginal.indexOf(pathSegements[0]) >= 0;
         assert.isTrue(firstSegmentContained, "first path segment is a subpath of the original path");
-        var secondSegmentContained = dOriginal.indexOf(pathSegements[1]) >= 0;
+        let secondSegmentContained = dOriginal.indexOf(pathSegements[1]) >= 0;
         assert.isTrue(secondSegmentContained, "second path segment is a subpath of the original path");
       }
 
-      var dataWithNaN = lineData.slice();
+      let dataWithNaN = lineData.slice();
       dataWithNaN[2] = { foo: 0.4, bar: NaN };
       simpleDataset.data(dataWithNaN);
       assertCorrectPathSplitting("y=NaN");
@@ -196,7 +196,7 @@ describe("Plots", () => {
       simpleDataset.data(dataWithNaN);
       assertCorrectPathSplitting("x=NaN");
 
-      var dataWithUndefined = lineData.slice();
+      let dataWithUndefined = lineData.slice();
       dataWithUndefined[2] = { foo: 0.4, bar: undefined };
       simpleDataset.data(dataWithUndefined);
       assertCorrectPathSplitting("y=undefined");
@@ -209,44 +209,44 @@ describe("Plots", () => {
 
     describe("selections()", () => {
       it("retrieves all dataset selections with no args", () => {
-        var dataset3 = new Plottable.Dataset([
+        let dataset3 = new Plottable.Dataset([
           { foo: 0, bar: 1 },
           { foo: 1, bar: 0.95 }
         ]);
         linePlot.addDataset(dataset3);
 
-        var allLines = linePlot.selections();
+        let allLines = linePlot.selections();
         assert.strictEqual(allLines.size(), 2, "all lines retrieved");
 
         svg.remove();
       });
 
       it("retrieves correct selections", () => {
-        var dataset3 = new Plottable.Dataset([
+        let dataset3 = new Plottable.Dataset([
           { foo: 0, bar: 1 },
           { foo: 1, bar: 0.95 }
         ]);
         linePlot.addDataset(dataset3);
 
-        var allLines = linePlot.selections([dataset3]);
+        let allLines = linePlot.selections([dataset3]);
         assert.strictEqual(allLines.size(), 1, "all lines retrieved");
-        var selectionData = allLines.data();
+        let selectionData = allLines.data();
         assert.include(selectionData, dataset3.data(), "third dataset data in selection data");
 
         svg.remove();
       });
 
       it("skips invalid Dataset", () => {
-        var dataset3 = new Plottable.Dataset([
+        let dataset3 = new Plottable.Dataset([
           { foo: 0, bar: 1 },
           { foo: 1, bar: 0.95 }
         ]);
         linePlot.addDataset(dataset3);
-        var dummyDataset = new Plottable.Dataset([]);
+        let dummyDataset = new Plottable.Dataset([]);
 
-        var allLines = linePlot.selections([dataset3, dummyDataset]);
+        let allLines = linePlot.selections([dataset3, dummyDataset]);
         assert.strictEqual(allLines.size(), 1, "all lines retrieved");
-        var selectionData = allLines.data();
+        let selectionData = allLines.data();
         assert.include(selectionData, dataset3.data(), "third dataset data in selection data");
 
         svg.remove();
@@ -256,14 +256,14 @@ describe("Plots", () => {
 
     describe("entities()", () => {
       it("retrieves correct data", () => {
-        var dataset3 = new Plottable.Dataset([
+        let dataset3 = new Plottable.Dataset([
           { foo: 0, bar: 1 },
           { foo: 1, bar: 0.95 }
         ]);
         linePlot.addDataset(dataset3);
 
-        var nodes = linePlot.entities().map((entity) => entity.selection.node());
-        var uniqueNodes: EventTarget[] = [];
+        let nodes = linePlot.entities().map((entity) => entity.selection.node());
+        let uniqueNodes: EventTarget[] = [];
         nodes.forEach((node) => {
           if (uniqueNodes.indexOf(node) === -1) {
             uniqueNodes.push(node);
@@ -275,10 +275,10 @@ describe("Plots", () => {
     });
 
     describe("entityNearest()", () => {
-      var lines: d3.Selection<void>;
-      var d0: any, d1: any;
-      var d0Px: Plottable.Point, d1Px: Plottable.Point;
-      var dataset2: Plottable.Dataset;
+      let lines: d3.Selection<void>;
+      let d0: any, d1: any;
+      let d0Px: Plottable.Point, d1Px: Plottable.Point;
+      let dataset2: Plottable.Dataset;
 
       beforeEach(() => {
         dataset2 = new Plottable.Dataset([
@@ -303,7 +303,7 @@ describe("Plots", () => {
       });
 
       it("returns nearest Entity", () => {
-        var expected: Plottable.Plots.PlotEntity = {
+        let expected: Plottable.Plots.PlotEntity = {
           datum: d0,
           index: 0,
           dataset: dataset2,
@@ -312,7 +312,7 @@ describe("Plots", () => {
           component: linePlot
         };
 
-        var closest = linePlot.entityNearest({x: d0Px.x, y: d0Px.y - 1});
+        let closest = linePlot.entityNearest({x: d0Px.x, y: d0Px.y - 1});
         TestMethods.assertPlotEntitiesEqual(closest, expected, "if above a point, it is closest");
 
         closest = linePlot.entityNearest({x: d0Px.x, y: d0Px.y + 1});
@@ -339,7 +339,7 @@ describe("Plots", () => {
       it("considers only in-view points", () => {
         xScale.domain([0.25, 1]);
 
-        var expected: Plottable.Plots.PlotEntity = {
+        let expected: Plottable.Plots.PlotEntity = {
           datum: d1,
           index: 1,
           dataset: dataset2,
@@ -351,7 +351,7 @@ describe("Plots", () => {
           component: linePlot
         };
 
-        var closest = linePlot.entityNearest({ x: xScale.scale(0.25), y: d1Px.y });
+        let closest = linePlot.entityNearest({ x: xScale.scale(0.25), y: d1Px.y });
         TestMethods.assertPlotEntitiesEqual(closest, expected, "only in-view points are considered");
 
         svg.remove();
@@ -359,20 +359,328 @@ describe("Plots", () => {
 
       it("returns undefined if no Entities are visible", () => {
         linePlot = new Plottable.Plots.Line<number>();
-        var closest = linePlot.entityNearest({ x: d0Px.x, y: d0Px.y });
+        let closest = linePlot.entityNearest({ x: d0Px.x, y: d0Px.y });
         assert.isUndefined(closest, "returns undefined if no Entity can be found");
         svg.remove();
       });
     });
 
     it("retains original classes when class is projected", () => {
-      var newClassProjector = () => "pink";
+      let newClassProjector = () => "pink";
       linePlot.attr("class", newClassProjector);
       linePlot.renderTo(svg);
-      var linePath = renderArea.select(".line");
+      let linePath = renderArea.select(".line");
       assert.isTrue(linePath.classed("pink"), "'pink' class is applied");
       assert.isTrue(linePath.classed("line"), "'line' class is retained");
       svg.remove();
+    });
+  });
+
+  describe("Line Plot", () => {
+    describe("smooth autoranging", () => {
+
+      let svg: d3.Selection<void>;
+      let xScale: Plottable.Scales.Linear;
+      let yScale: Plottable.Scales.Linear;
+
+      beforeEach(() => {
+        svg = TestMethods.generateSVG(500, 500);
+        xScale = new Plottable.Scales.Linear();
+        yScale = new Plottable.Scales.Linear();
+      });
+
+      afterEach(() => {
+        svg.remove();
+      });
+
+      it("smooth autoranging works", () => {
+        xScale.domain([0.1, 1.1]);
+
+        let data = [
+          {"x": 0.0, "y": -1},
+          {"x": 1.8, "y": -2}
+        ];
+
+        let line = new Plottable.Plots.Line();
+        line.x(function(d) { return d.x; }, xScale);
+        line.y(function(d) { return d.y; }, yScale);
+        line.addDataset(new Plottable.Dataset(data));
+        line.autorangeMode("y");
+
+        xScale.padProportion(0);
+        yScale.padProportion(0);
+        line.renderTo(svg);
+
+        assert.deepEqual(yScale.domain(), [0, 1], "when there are no visible points in the view, the y-scale domain defaults to [0, 1]");
+
+        line.autorangeSmooth(true);
+
+        let base = data[0].y;
+        let x1 = xScale.domain()[1] - data[0].x;
+        let x2 = data[1].x - data[0].x;
+        let y2 = data[1].y - data[0].y;
+        let expectedBottom = base + y2 * x1 / x2;
+
+        x1 = xScale.domain()[0] - data[0].x;
+        let expectedTop = base + y2 * x1 / x2;
+
+        assert.closeTo(yScale.domain()[0], expectedBottom, 0.001, "smooth autoranging forces the domain to include the line (left)");
+        assert.closeTo(yScale.domain()[1], expectedTop, 0.001, "smooth autoranging forces the domain to include the line (right)");
+
+        line.autorangeSmooth(false);
+        assert.deepEqual(yScale.domain(), [0, 1], "resetting the smooth autorange works");
+
+        xScale.domain([data[0].x, data[1].x]);
+        assert.deepEqual(yScale.domain(), [-2, -1], "no changes for autoranging smooth with same edge poitns (no smooth)");
+
+        line.autorangeSmooth(true);
+        assert.deepEqual(yScale.domain(), [-2, -1], "no changes for autoranging smooth with same edge points (smooth)");
+      });
+
+      it("smooth autoranging works (called before accessors)", () => {
+        xScale.domain([0.1, 1.1]);
+
+        let data = [
+          {"x": 0.0, "y": -1},
+          {"x": 1.8, "y": -2}
+        ];
+
+        let line = new Plottable.Plots.Line();
+        line.autorangeSmooth(true);
+        line.x(function(d) { return d.x; }, xScale);
+        line.y(function(d) { return d.y; }, yScale);
+        line.addDataset(new Plottable.Dataset(data));
+        line.autorangeMode("y");
+
+        line.renderTo(svg);
+
+        let base = data[0].y;
+        let x1 = (xScale.domain()[1] - data[0].x) - (xScale.domain()[1] - xScale.domain()[0]) * (1 + yScale.padProportion() / 2);
+        let x2 = data[1].x - data[0].x;
+        let y2 = data[1].y - data[0].y;
+        let expectedTop = base + y2 * x1 / x2;
+
+        x1 = (xScale.domain()[0] - data[0].x) + (xScale.domain()[1] - xScale.domain()[0]) * (1 + yScale.padProportion() / 2);
+        let expectedBottom = base + y2 * x1 / x2;
+
+        assert.closeTo(yScale.domain()[0], expectedBottom, 0.001, "smooth autoranging forces the domain to include the line (left)");
+        assert.closeTo(yScale.domain()[1], expectedTop, 0.001, "smooth autoranging forces the domain to include the line (right)");
+      });
+
+      it("smooth autoranging works (called before autorangeMode)", () => {
+        xScale.domain([0.1, 1.1]);
+
+        let data = [
+          {"x": 0.0, "y": -1},
+          {"x": 1.8, "y": -2}
+        ];
+
+        let line = new Plottable.Plots.Line();
+        line.x(function(d) { return d.x; }, xScale);
+        line.y(function(d) { return d.y; }, yScale);
+        line.addDataset(new Plottable.Dataset(data));
+        line.autorangeSmooth(true);
+        line.autorangeMode("y");
+
+        line.renderTo(svg);
+
+        let base = data[0].y;
+        let x1 = (xScale.domain()[1] - data[0].x) - (xScale.domain()[1] - xScale.domain()[0]) * (1 + yScale.padProportion() / 2);
+        let x2 = data[1].x - data[0].x;
+        let y2 = data[1].y - data[0].y;
+        let expectedTop = base + y2 * x1 / x2;
+
+        x1 = (xScale.domain()[0] - data[0].x) + (xScale.domain()[1] - xScale.domain()[0]) * (1 + yScale.padProportion() / 2);
+        let expectedBottom = base + y2 * x1 / x2;
+
+        assert.closeTo(yScale.domain()[0], expectedBottom, 0.001, "smooth autoranging forces the domain to include the line (left)");
+        assert.closeTo(yScale.domain()[1], expectedTop, 0.001, "smooth autoranging forces the domain to include the line (right)");
+      });
+
+      it("smooth autoranging works (called before rendering)", () => {
+        xScale.domain([0.1, 1.1]);
+
+        let data = [
+          {"x": 0.0, "y": -1},
+          {"x": 1.8, "y": -2}
+        ];
+
+        let line = new Plottable.Plots.Line();
+        line.x(function(d) { return d.x; }, xScale);
+        line.y(function(d) { return d.y; }, yScale);
+        line.addDataset(new Plottable.Dataset(data));
+        line.autorangeMode("y");
+
+        line.autorangeSmooth(true);
+        line.renderTo(svg);
+
+        let base = data[0].y;
+        let x1 = (xScale.domain()[1] - data[0].x) - (xScale.domain()[1] - xScale.domain()[0]) * (1 + yScale.padProportion() / 2);
+        let x2 = data[1].x - data[0].x;
+        let y2 = data[1].y - data[0].y;
+        let expectedTop = base + y2 * x1 / x2;
+
+        x1 = (xScale.domain()[0] - data[0].x) + (xScale.domain()[1] - xScale.domain()[0]) * (1 + yScale.padProportion() / 2);
+        let expectedBottom = base + y2 * x1 / x2;
+
+        assert.closeTo(yScale.domain()[0], expectedBottom, 0.001, "smooth autoranging forces the domain to include the line (left)");
+        assert.closeTo(yScale.domain()[1], expectedTop, 0.001, "smooth autoranging forces the domain to include the line (right)");
+      });
+
+      it("smooth autoranging works (called after rendering)", () => {
+        xScale.domain([0.1, 1.1]);
+
+        let data = [
+          {"x": 0.0, "y": -1},
+          {"x": 1.8, "y": -2}
+        ];
+
+        let line = new Plottable.Plots.Line();
+        line.x(function(d) { return d.x; }, xScale);
+        line.y(function(d) { return d.y; }, yScale);
+        line.addDataset(new Plottable.Dataset(data));
+        line.autorangeMode("y");
+
+        line.renderTo(svg);
+        line.autorangeSmooth(true);
+
+        let base = data[0].y;
+        let x1 = (xScale.domain()[1] - data[0].x) - (xScale.domain()[1] - xScale.domain()[0]) * (1 + yScale.padProportion() / 2);
+        let x2 = data[1].x - data[0].x;
+        let y2 = data[1].y - data[0].y;
+        let expectedTop = base + y2 * x1 / x2;
+
+        x1 = (xScale.domain()[0] - data[0].x) + (xScale.domain()[1] - xScale.domain()[0]) * (1 + yScale.padProportion() / 2);
+        let expectedBottom = base + y2 * x1 / x2;
+
+        assert.closeTo(yScale.domain()[0], expectedBottom, 0.001, "smooth autoranging forces the domain to include the line (left)");
+        assert.closeTo(yScale.domain()[1], expectedTop, 0.001, "smooth autoranging forces the domain to include the line (right)");
+      });
+
+      it("smooth autoranging works (called after rendering, before autorangeMode)", () => {
+        xScale.domain([0.1, 1.1]);
+
+        let data = [
+          {"x": 0.0, "y": -1},
+          {"x": 1.8, "y": -2}
+        ];
+
+        let line = new Plottable.Plots.Line();
+        line.x(function(d) { return d.x; }, xScale);
+        line.y(function(d) { return d.y; }, yScale);
+        line.addDataset(new Plottable.Dataset(data));
+
+        line.renderTo(svg);
+
+        line.autorangeSmooth(true);
+        line.autorangeMode("y");
+
+        let base = data[0].y;
+        let x1 = (xScale.domain()[1] - data[0].x) - (xScale.domain()[1] - xScale.domain()[0]) * (1 + yScale.padProportion() / 2);
+        let x2 = data[1].x - data[0].x;
+        let y2 = data[1].y - data[0].y;
+        let expectedTop = base + y2 * x1 / x2;
+
+        x1 = (xScale.domain()[0] - data[0].x) + (xScale.domain()[1] - xScale.domain()[0]) * (1 + yScale.padProportion() / 2);
+        let expectedBottom = base + y2 * x1 / x2;
+
+        assert.closeTo(yScale.domain()[0], expectedBottom, 0.001, "smooth autoranging forces the domain to include the line (left)");
+        assert.closeTo(yScale.domain()[1], expectedTop, 0.001, "smooth autoranging forces the domain to include the line (right)");
+      });
+
+      it("autoDomaining works with smooth autoranging (before rendering)", () => {
+        xScale.domain([-0.1, 0.2]);
+
+        let data = [
+          {"x": 0.0, "y": -1},
+          {"x": 1.8, "y": -2}
+        ];
+
+        let line = new Plottable.Plots.Line();
+        line.x(function(d) { return d.x; }, xScale);
+        line.y(function(d) { return d.y; }, yScale);
+        line.addDataset(new Plottable.Dataset(data));
+        line.autorangeMode("y");
+
+        line.autorangeSmooth(true);
+        xScale.autoDomain();
+        line.renderTo(svg);
+
+        assert.deepEqual(xScale.domain(), [-0.2, 2], "autoDomain works even when autoranging is done smoothly");
+
+        line.autorangeSmooth(false);
+        assert.deepEqual(xScale.domain(), [-0.2, 2], "autoDomain works when smooth autoranging is disabled back");
+      });
+
+      it("autoDomaining works with smooth autoranging (after rendering)", () => {
+        xScale.domain([-0.1, 0.2]);
+
+        let data = [
+          {"x": 0.0, "y": -1},
+          {"x": 1.8, "y": -2}
+        ];
+
+        let line = new Plottable.Plots.Line();
+        line.x(function(d) { return d.x; }, xScale);
+        line.y(function(d) { return d.y; }, yScale);
+        line.addDataset(new Plottable.Dataset(data));
+        line.autorangeMode("y");
+
+        line.renderTo(svg);
+
+        line.autorangeSmooth(true);
+        xScale.autoDomain();
+
+        assert.deepEqual(xScale.domain(), [-0.2, 2], "autoDomain works even when autoranging is done smoothly");
+
+        line.autorangeSmooth(false);
+        assert.deepEqual(xScale.domain(), [-0.2, 2], "autoDomain works when smooth autoranging is disabled back");
+      });
+
+      it("smooth autoranging works for vertical lines", () => {
+        yScale.domain([0.1, 1.1]);
+
+        let data = [
+          {"x": -2, "y": 1.8},
+          {"x": -1, "y": 0.0}
+        ];
+
+        let line = new Plottable.Plots.Line();
+        line.x(function(d) { return d.x; }, xScale);
+        line.y(function(d) { return d.y; }, yScale);
+        line.addDataset(new Plottable.Dataset(data));
+        line.autorangeMode("x");
+
+        xScale.padProportion(0);
+        yScale.padProportion(0);
+        line.renderTo(svg);
+
+        assert.deepEqual(xScale.domain(), [0, 1], "when there are no visible points in the view, the x-scale domain defaults to [0, 1]");
+
+        line.autorangeSmooth(true);
+
+        let base = data[0].x;
+        let x1 = (yScale.domain()[1] - data[0].y);
+        let x2 = data[1].y - data[0].y;
+        let y2 = data[1].x - data[0].x;
+        let expectedTop = base + y2 * x1 / x2;
+
+        x1 = (yScale.domain()[0] - data[0].y);
+        let expectedBottom = base + y2 * x1 / x2;
+
+        assert.closeTo(xScale.domain()[0], expectedTop, 0.001, "smooth autoranging forces the domain to include the line (left)");
+        assert.closeTo(xScale.domain()[1], expectedBottom, 0.001, "smooth autoranging forces the domain to include the line (right)");
+
+        line.autorangeSmooth(false);
+        assert.deepEqual(xScale.domain(), [0, 1], "resetting the smooth autorange works");
+
+        yScale.domain([data[0].y, data[1].y]);
+        assert.deepEqual(xScale.domain(), [-2, -1], "no changes for autoranging smooth with same edge poitns (no smooth)");
+
+        line.autorangeSmooth(true);
+        assert.deepEqual(xScale.domain(), [-2, -1], "no changes for autoranging smooth with same edge points (smooth)");
+      });
+
     });
   });
 });

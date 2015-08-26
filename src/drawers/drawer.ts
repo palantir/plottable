@@ -76,7 +76,7 @@ export class Drawer {
    * @param{any[]} data The data to be drawn
    */
   private _bindSelectionData(data: any[]) {
-    var dataElements = this.selection().data(data);
+    let dataElements = this.selection().data(data);
     dataElements.enter().append(this._svgElementName);
     dataElements.exit().remove();
     this._applyDefaultAttributes(dataElements);
@@ -94,8 +94,8 @@ export class Drawer {
    * @param{AppliedDrawStep} step The step, how data should be drawn.
    */
   private _drawStep(step: Drawers.AppliedDrawStep) {
-    var selection = this.selection();
-    var colorAttributes = ["fill", "stroke"];
+    let selection = this.selection();
+    let colorAttributes = ["fill", "stroke"];
     colorAttributes.forEach((colorAttribute) => {
       if (step.attrToAppliedProjector[colorAttribute] != null) {
         selection.attr(colorAttribute, step.attrToAppliedProjector[colorAttribute]);
@@ -108,7 +108,7 @@ export class Drawer {
   }
 
   private _appliedProjectors(attrToProjector: AttributeToProjector): AttributeToAppliedProjector {
-    var modifiedAttrToProjector: AttributeToAppliedProjector = {};
+    let modifiedAttrToProjector: AttributeToAppliedProjector = {};
     Object.keys(attrToProjector).forEach((attr: string) => {
       modifiedAttrToProjector[attr] =
         (datum: any, index: number) => attrToProjector[attr](datum, index, this._dataset);
@@ -125,7 +125,7 @@ export class Drawer {
    * @returns {number} The total time it takes to draw
    */
   public totalDrawTime(data: any[], drawSteps: Drawers.DrawStep[]) {
-    var delay = 0;
+    let delay = 0;
     drawSteps.forEach((drawStep, i) => {
       delay += drawStep.animator.totalTime(data.length);
     });
@@ -140,8 +140,8 @@ export class Drawer {
    * @param{DrawStep[]} drawSteps The list of steps, which needs to be drawn
    */
   public draw(data: any[], drawSteps: Drawers.DrawStep[]) {
-    var appliedDrawSteps: Drawers.AppliedDrawStep[] = drawSteps.map((dr: Drawers.DrawStep) => {
-      var attrToAppliedProjector = this._appliedProjectors(dr.attrToProjector);
+    let appliedDrawSteps: Drawers.AppliedDrawStep[] = drawSteps.map((dr: Drawers.DrawStep) => {
+      let attrToAppliedProjector = this._appliedProjectors(dr.attrToProjector);
       return {
         attrToAppliedProjector: attrToAppliedProjector,
         animator: dr.animator
@@ -151,7 +151,7 @@ export class Drawer {
     this._bindSelectionData(data);
     this._cachedSelectionValid = false;
 
-    var delay = 0;
+    let delay = 0;
     appliedDrawSteps.forEach((drawStep, i) => {
       Utils.Window.setTimeout(() => this._drawStep(drawStep), delay);
       delay += drawStep.animator.totalTime(data.length);

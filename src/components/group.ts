@@ -32,7 +32,7 @@ export module Components {
     }
 
     public requestedSpace(offeredWidth: number, offeredHeight: number): SpaceRequest {
-      var requests = this._components.map((c: Component) => c.requestedSpace(offeredWidth, offeredHeight));
+      let requests = this._components.map((c: Component) => c.requestedSpace(offeredWidth, offeredHeight));
       return {
         minWidth: Utils.Math.max<SpaceRequest, number>(requests, (request) => request.minWidth, 0),
         minHeight: Utils.Math.max<SpaceRequest, number>(requests, (request) => request.minHeight, 0)
@@ -84,7 +84,7 @@ export module Components {
     }
 
     protected _remove(component: Component) {
-      var removeIndex = this._components.indexOf(component);
+      let removeIndex = this._components.indexOf(component);
       if (removeIndex >= 0) {
         this._components.splice(removeIndex, 1);
         return true;

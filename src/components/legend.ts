@@ -54,8 +54,8 @@ export module Components {
 
     protected _setup() {
       super._setup();
-      var fakeLegendRow = this.content().append("g").classed(Legend.LEGEND_ROW_CLASS, true);
-      var fakeLegendEntry = fakeLegendRow.append("g").classed(Legend.LEGEND_ENTRY_CLASS, true);
+      let fakeLegendRow = this.content().append("g").classed(Legend.LEGEND_ROW_CLASS, true);
+      let fakeLegendEntry = fakeLegendRow.append("g").classed(Legend.LEGEND_ENTRY_CLASS, true);
       fakeLegendEntry.append("text");
       this._measurer = new SVGTypewriter.Measurers.Measurer(fakeLegendRow);
       this._wrapper = new SVGTypewriter.Wrappers.Wrapper().maxLines(1);
@@ -140,25 +140,25 @@ export module Components {
     }
 
     private _calculateLayoutInfo(availableWidth: number, availableHeight: number) {
-      var textHeight = this._measurer.measure().height;
+      let textHeight = this._measurer.measure().height;
 
-      var availableWidthForEntries = Math.max(0, (availableWidth - this._padding));
+      let availableWidthForEntries = Math.max(0, (availableWidth - this._padding));
 
-      var entryNames = this._colorScale.domain().slice();
+      let entryNames = this._colorScale.domain().slice();
       entryNames.sort(this.comparator());
 
-      var entryLengths: d3.Map<number> = d3.map<number>();
-      var untruncatedEntryLengths: d3.Map<number> = d3.map<number>();
+      let entryLengths: d3.Map<number> = d3.map<number>();
+      let untruncatedEntryLengths: d3.Map<number> = d3.map<number>();
       entryNames.forEach((entryName) => {
-        var untruncatedEntryLength = textHeight + this._measurer.measure(entryName).width + this._padding;
-        var entryLength = Math.min(untruncatedEntryLength, availableWidthForEntries);
+        let untruncatedEntryLength = textHeight + this._measurer.measure(entryName).width + this._padding;
+        let entryLength = Math.min(untruncatedEntryLength, availableWidthForEntries);
         entryLengths.set(entryName, entryLength);
         untruncatedEntryLengths.set(entryName, untruncatedEntryLength);
       });
 
-      var rows = this._packRows(availableWidthForEntries, entryNames, entryLengths);
+      let rows = this._packRows(availableWidthForEntries, entryNames, entryLengths);
 
-      var rowsAvailable = Math.floor((availableHeight - 2 * this._padding) / textHeight);
+      let rowsAvailable = Math.floor((availableHeight - 2 * this._padding) / textHeight);
       if (rowsAvailable !== rowsAvailable) { // rowsAvailable can be NaN if this.textHeight = 0
         rowsAvailable = 0;
       }
@@ -173,12 +173,12 @@ export module Components {
     }
 
     public requestedSpace(offeredWidth: number, offeredHeight: number): SpaceRequest {
-      var estimatedLayout = this._calculateLayoutInfo(offeredWidth, offeredHeight);
+      let estimatedLayout = this._calculateLayoutInfo(offeredWidth, offeredHeight);
 
-      var untruncatedRowLengths = estimatedLayout.rows.map((row) => {
+      let untruncatedRowLengths = estimatedLayout.rows.map((row) => {
         return d3.sum(row, (entry) => estimatedLayout.untruncatedEntryLengths.get(entry));
       });
-      var longestUntruncatedRowLength = Utils.Math.max(untruncatedRowLengths, 0);
+      let longestUntruncatedRowLength = Utils.Math.max(untruncatedRowLengths, 0);
 
       return {
         minWidth: this._padding + longestUntruncatedRowLength,
@@ -187,11 +187,11 @@ export module Components {
     }
 
     private _packRows(availableWidth: number, entries: string[], entryLengths: d3.Map<number>) {
-      var rows: string[][] = [];
-      var currentRow: string[] = [];
-      var spaceLeft = availableWidth;
+      let rows: string[][] = [];
+      let currentRow: string[] = [];
+      let spaceLeft = availableWidth;
       entries.forEach((e: string) => {
-        var entryLength = entryLengths.get(e);
+        let entryLength = entryLengths.get(e);
         if (entryLength > spaceLeft || currentRow.length === this._maxEntriesPerRow) {
           rows.push(currentRow);
           currentRow = [];
@@ -219,23 +219,23 @@ export module Components {
         return [];
       }
 
-      var entities: Entity<Legend>[] = [];
-      var layout = this._calculateLayoutInfo(this.width(), this.height());
-      var legendPadding = this._padding;
-      var legend = this;
+      let entities: Entity<Legend>[] = [];
+      let layout = this._calculateLayoutInfo(this.width(), this.height());
+      let legendPadding = this._padding;
+      let legend = this;
       this.content().selectAll("g." + Legend.LEGEND_ROW_CLASS).each(function(d: any, i: number) {
-        var lowY = i * layout.textHeight + legendPadding;
-        var highY = (i + 1) * layout.textHeight + legendPadding;
-        var symbolY = (lowY + highY) / 2;
-        var lowX = legendPadding;
-        var highX = legendPadding;
+        let lowY = i * layout.textHeight + legendPadding;
+        let highY = (i + 1) * layout.textHeight + legendPadding;
+        let symbolY = (lowY + highY) / 2;
+        let lowX = legendPadding;
+        let highX = legendPadding;
         d3.select(this).selectAll("g." + Legend.LEGEND_ENTRY_CLASS).each(function(value: string) {
           highX += layout.entryLengths.get(value);
-          var symbolX = lowX + layout.textHeight / 2;
+          let symbolX = lowX + layout.textHeight / 2;
           if (highX >= p.x && lowX <= p.x &&
               highY >= p.y && lowY <= p.y) {
-            var entrySelection = d3.select(this);
-            var datum = entrySelection.datum();
+            let entrySelection = d3.select(this);
+            let datum = entrySelection.datum();
             entities.push({
               datum: datum,
               position: { x: symbolX, y: symbolY },
@@ -253,27 +253,27 @@ export module Components {
     public renderImmediately() {
       super.renderImmediately();
 
-      var layout = this._calculateLayoutInfo(this.width(), this.height());
+      let layout = this._calculateLayoutInfo(this.width(), this.height());
 
-      var rowsToDraw = layout.rows.slice(0, layout.numRowsToDraw);
-      var rows = this.content().selectAll("g." + Legend.LEGEND_ROW_CLASS).data(rowsToDraw);
+      let rowsToDraw = layout.rows.slice(0, layout.numRowsToDraw);
+      let rows = this.content().selectAll("g." + Legend.LEGEND_ROW_CLASS).data(rowsToDraw);
       rows.enter().append("g").classed(Legend.LEGEND_ROW_CLASS, true);
       rows.exit().remove();
 
       rows.attr("transform", (d: any, i: number) => "translate(0, " + (i * layout.textHeight + this._padding) + ")");
 
-      var entries = rows.selectAll("g." + Legend.LEGEND_ENTRY_CLASS).data((d) => d);
-      var entriesEnter = entries.enter().append("g").classed(Legend.LEGEND_ENTRY_CLASS, true);
+      let entries = rows.selectAll("g." + Legend.LEGEND_ENTRY_CLASS).data((d) => d);
+      let entriesEnter = entries.enter().append("g").classed(Legend.LEGEND_ENTRY_CLASS, true);
       entriesEnter.append("path");
       entriesEnter.append("g").classed("text-container", true);
       entries.exit().remove();
 
-      var legendPadding = this._padding;
+      let legendPadding = this._padding;
       rows.each(function (values: string[]) {
-        var xShift = legendPadding;
-        var entriesInRow = d3.select(this).selectAll("g." + Legend.LEGEND_ENTRY_CLASS);
+        let xShift = legendPadding;
+        let entriesInRow = d3.select(this).selectAll("g." + Legend.LEGEND_ENTRY_CLASS);
         entriesInRow.attr("transform", (value: string, i: number) => {
-          var translateString = "translate(" + xShift + ", 0)";
+          let translateString = "translate(" + xShift + ", 0)";
           xShift += layout.entryLengths.get(value);
           return translateString;
         });
@@ -285,16 +285,16 @@ export module Components {
                             .attr("opacity", (d: any, i: number, j: number) => this.symbolOpacity()(d, j))
                             .classed(Legend.LEGEND_SYMBOL_CLASS, true);
 
-      var padding = this._padding;
-      var textContainers = entries.select("g.text-container");
+      let padding = this._padding;
+      let textContainers = entries.select("g.text-container");
       textContainers.text(""); // clear out previous results
       textContainers.append("title").text((value: string) => value);
-      var self = this;
+      let self = this;
       textContainers.attr("transform", "translate(" + layout.textHeight + ", 0)")
                     .each(function(value: string) {
-                      var container = d3.select(this);
-                      var maxTextLength = layout.entryLengths.get(value) - layout.textHeight - padding;
-                      var writeOptions = {
+                      let container = d3.select(this);
+                      let maxTextLength = layout.entryLengths.get(value) - layout.textHeight - padding;
+                      let writeOptions = {
                         selection: container,
                         xAlign: "left",
                         yAlign: "top",
