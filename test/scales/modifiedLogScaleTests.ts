@@ -180,20 +180,22 @@ describe("Scales", () => {
 
       let scale: Plottable.Scales.ModifiedLog;
       let base = 10;
-      let epsilon = 0.00001;
 
       beforeEach(() => {
         scale = new Plottable.Scales.ModifiedLog(base);
       });
 
       it("gives reasonable values for ticks()", () => {
-        let providedExtents = [0, base / 2];
-        scale.addIncludedValuesProvider((scale: Plottable.Scale<number, number>) => providedExtents);
+        let includedValuesProvider = (scale: Plottable.Scales.ModifiedLog) => [0, base / 2];
+        scale.addIncludedValuesProvider(includedValuesProvider);
+
         let ticks = scale.ticks();
         assert.operator(ticks.length, ">", 0);
 
-        providedExtents = [-base * 2, base * 2];
-        scale.autoDomain();
+        scale.removeIncludedValuesProvider(includedValuesProvider);
+        includedValuesProvider = (scale: Plottable.Scales.ModifiedLog) => [-base * 2, base * 2];
+        scale.addIncludedValuesProvider(includedValuesProvider);
+
         ticks = scale.ticks();
         let beforePivot = ticks.filter((x) => x <= -base);
         let afterPivot = ticks.filter((x) => base <= x);
@@ -206,8 +208,8 @@ describe("Scales", () => {
       it("works on inverted domain", () => {
         scale.domain([200, -100]);
         let range = scale.range();
-        assert.closeTo(scale.scale(-100), range[1], epsilon);
-        assert.closeTo(scale.scale(200), range[0], epsilon);
+        assert.strictEqual(scale.scale(-100), range[1]);
+        assert.strictEqual(scale.scale(200), range[0]);
         let a = [-100, -10, -3, 0, 1, 3.64, 50, 60, 200];
         let b = a.map((x) => scale.scale(x));
         // should be decreasing function; reverse is sorted
