@@ -3603,8 +3603,8 @@ declare module Plottable {
              * Sets the start angle to a scaled constant value or scaled result of an Accessor.
              * The provided Scale will account for the values when autoDomain()-ing.
              *
-             * @param {S|Accessor<S>} startAngle
-             * @param {Scale<S, number>} scale
+             * @param {S|Accessor<number>} startAngle
+             * @param {Scale<T, number>} scale
              * @returns {Wheel} The calling Wheel Plot.
              */
             startAngle<T>(startAngle: T | Accessor<T>, scale: Scale<T, number>): Plots.Wheel<R, T>;
@@ -3619,15 +3619,6 @@ declare module Plottable {
              * @returns {Wheel} The calling Wheel Plot.
              */
             endAngle(endAngle: number | Accessor<number>): Plots.Wheel<R, T>;
-            /**
-             * Sets the end angle to a scaled constant value or scaled result of an Accessor.
-             * The provided Scale will account for the values when autoDomain()-ing.
-             *
-             * @param {S|Accessor<S>} endAngle
-             * @param {Scale<S, number>} scale
-             * @returns {Wheel} The calling Wheel Plot.
-             */
-            endAngle<T>(endAngle: T | Accessor<T>, scale: Scale<T, number>): Plots.Wheel<R, T>;
             /**
              * Gets the AccessorScaleBinding for the inner radius.
              */
@@ -3659,15 +3650,6 @@ declare module Plottable {
              * @returns {Wheel} The calling Wheel Plot.
              */
             outerRadius(outerRadius: number | Accessor<number>): Plots.Wheel<R, T>;
-            /**
-             * Sets the outer radius to a scaled constant value or scaled result of an Accessor.
-             * The provided Scale will account for the values when autoDomain()-ing.
-             *
-             * @param {R|Accessor<R>} outerRadius
-             * @param {Scale<R, number>} scale
-             * @returns {Wheel} The calling Wheel Plot.
-             */
-            outerRadius<R>(outerRadius: R | Accessor<R>, scale: Scale<R, number>): Plots.Wheel<R, T>;
             protected _pixelPoint(datum: any, index: number, dataset: Dataset): {
                 x: number;
                 y: number;

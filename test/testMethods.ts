@@ -247,14 +247,8 @@ module TestMethods {
   }
 
   export function assertAreaPathCloseTo(actualPath: string, expectedPath: string, precision: number, msg: string) {
-    let actualAreaPathStrings = actualPath.split("Z");
-    let expectedAreaPathStrings = expectedPath.split("Z");
-
-    actualAreaPathStrings.pop();
-    expectedAreaPathStrings.pop();
-
-    let actualAreaPathNumbers = tokenizePathString(actualAreaPathStrings);
-    let expectedAreaPathNumbers = tokenizePathString(expectedAreaPathStrings);
+    let actualAreaPathNumbers = tokenizePathString(actualPath);
+    let expectedAreaPathNumbers = tokenizePathString(expectedPath);
 
     assert.lengthOf(actualAreaPathNumbers, expectedAreaPathNumbers.length, "number of numbers in each path should be equal");
     actualAreaPathNumbers.forEach((actualAreaNumber, i) => {
@@ -263,9 +257,9 @@ module TestMethods {
     });
   }
 
-  function tokenizePathString(pathStrings: string[]) {
+  function tokenizePathString(pathString: string) {
     let numbers: string[] = [];
-    pathStrings.forEach((path) =>
+    pathString.split("Z").forEach((path) =>
       path.split(/[A-Z]/).forEach((token) =>
         token.split(",").forEach((numberString) =>
           numberString.split(" ").forEach((num) => {

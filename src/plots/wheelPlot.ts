@@ -15,7 +15,6 @@ export module Plots {
     constructor() {
       super();
       this.addClass("wheel-plot");
-      this.attr("fill", (d, i) => String(i), new Scales.Color());
     }
 
     public computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number) {
@@ -69,10 +68,13 @@ export module Plots {
       let startAngleAccessor = Plot._scaledAccessor(this.startAngle());
       let endAngleAccessor = Plot._scaledAccessor(this.endAngle());
       attrToProjector["d"] = (datum: any, index: number, ds: Dataset) => {
+        let startAngle = startAngleAccessor(datum, index, ds) % (Math.PI * 2);
+        let endAngle = endAngleAccessor(datum, index, ds) % (Math.PI * 2);
+        while (endAngle < startAngle) { endAngle += Math.PI * 2; }
         return d3.svg.arc().innerRadius(innerRadiusAccessor(datum, index, ds))
                            .outerRadius(outerRadiusAccessor(datum, index, ds))
-                           .startAngle(startAngleAccessor(datum, index, ds))
-                           .endAngle(endAngleAccessor(datum, index, ds))(datum, index);
+                           .startAngle(startAngle)
+                           .endAngle(endAngle)(datum, index);
       };
       return attrToProjector;
     }
@@ -92,8 +94,8 @@ export module Plots {
      * Sets the start angle to a scaled constant value or scaled result of an Accessor.
      * The provided Scale will account for the values when autoDomain()-ing.
      *
-     * @param {S|Accessor<S>} startAngle
-     * @param {Scale<S, number>} scale
+     * @param {S|Accessor<number>} startAngle
+     * @param {Scale<T, number>} scale
      * @returns {Wheel} The calling Wheel Plot.
      */
     public startAngle<T>(startAngle: T | Accessor<T>, scale: Scale<T, number>): Plots.Wheel<R, T>;
@@ -104,6 +106,12 @@ export module Plots {
 
       if (scale != null) {
         scale.range([0, Math.PI * 2]);
+      }
+
+      let endAngleBinding = this.endAngle();
+      let endAngleAccessor = endAngleBinding && endAngleBinding.accessor;
+      if (endAngleAccessor != null) {
+        this._bindProperty(Wheel._END_ANGLE_KEY, endAngleAccessor, scale);
       }
 
       this._bindProperty(Wheel._START_ANGLE_KEY, startAngle, scale);
@@ -122,25 +130,15 @@ export module Plots {
      * @returns {Wheel} The calling Wheel Plot.
      */
     public endAngle(endAngle: number | Accessor<number>): Plots.Wheel<R, T>;
-    /**
-     * Sets the end angle to a scaled constant value or scaled result of an Accessor.
-     * The provided Scale will account for the values when autoDomain()-ing.
-     *
-     * @param {S|Accessor<S>} endAngle
-     * @param {Scale<S, number>} scale
-     * @returns {Wheel} The calling Wheel Plot.
-     */
-    public endAngle<T>(endAngle: T | Accessor<T>, scale: Scale<T, number>): Plots.Wheel<R, T>;
-    public endAngle<T>(endAngle?: number | Accessor<number> | T | Accessor<T>, scale?: Scale<T, number>): any {
+    public endAngle<T>(endAngle?: number | Accessor<number> | T | Accessor<T>): any {
       if (endAngle == null) {
         return this._propertyBindings.get(Wheel._END_ANGLE_KEY);
       }
 
-      if (scale != null) {
-        scale.range([0, Math.PI * 2]);
-      }
+      let startAngleBinding = this.startAngle();
+      let angleScale = startAngleBinding && startAngleBinding.scale;
+      this._bindProperty(Wheel._END_ANGLE_KEY, endAngle, angleScale);
 
-      this._bindProperty(Wheel._END_ANGLE_KEY, endAngle, scale);
       this.render();
       return this;
     }
@@ -169,6 +167,17 @@ export module Plots {
       if (innerRadius == null) {
         return this._propertyBindings.get(Wheel._INNER_RADIUS_KEY);
       }
+
+      if (scale != null) {
+        scale.range([0, Math.PI * 2]);
+      }
+
+      let outerRadiusBinding = this.outerRadius();
+      let outerRadiusAccessor = outerRadiusBinding && outerRadiusBinding.accessor;
+      if (outerRadiusAccessor != null) {
+        this._bindProperty(Wheel._OUTER_RADIUS_KEY, outerRadiusAccessor, scale);
+      }
+
       this._bindProperty(Wheel._INNER_RADIUS_KEY, innerRadius, scale);
       this.render();
       return this;
@@ -185,20 +194,14 @@ export module Plots {
      * @returns {Wheel} The calling Wheel Plot.
      */
     public outerRadius(outerRadius: number | Accessor<number>): Plots.Wheel<R, T>;
-    /**
-     * Sets the outer radius to a scaled constant value or scaled result of an Accessor.
-     * The provided Scale will account for the values when autoDomain()-ing.
-     *
-     * @param {R|Accessor<R>} outerRadius
-     * @param {Scale<R, number>} scale
-     * @returns {Wheel} The calling Wheel Plot.
-     */
-    public outerRadius<R>(outerRadius: R | Accessor<R>, scale: Scale<R, number>): Plots.Wheel<R, T>;
-    public outerRadius<R>(outerRadius?: number | Accessor<number> | R | Accessor<R>, scale?: Scale<R, number>): any {
+    public outerRadius<R>(outerRadius?: number | Accessor<number> | R | Accessor<R>): any {
       if (outerRadius == null) {
         return this._propertyBindings.get(Wheel._OUTER_RADIUS_KEY);
       }
-      this._bindProperty(Wheel._OUTER_RADIUS_KEY, outerRadius, scale);
+
+      let innerRadiusBinding = this.innerRadius();
+      let radiusScale = innerRadiusBinding && innerRadiusBinding.scale;
+      this._bindProperty(Wheel._OUTER_RADIUS_KEY, outerRadius, radiusScale);
       this.render();
       return this;
     }

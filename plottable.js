@@ -9788,7 +9788,6 @@ var Plottable;
             function Wheel() {
                 _super.call(this);
                 this.addClass("wheel-plot");
-                this.attr("fill", function (d, i) { return String(i); }, new Plottable.Scales.Color());
             }
             Wheel.prototype.computeLayout = function (origin, availableWidth, availableHeight) {
                 _super.prototype.computeLayout.call(this, origin, availableWidth, availableHeight);
@@ -9842,10 +9841,15 @@ var Plottable;
                 var startAngleAccessor = Plottable.Plot._scaledAccessor(this.startAngle());
                 var endAngleAccessor = Plottable.Plot._scaledAccessor(this.endAngle());
                 attrToProjector["d"] = function (datum, index, ds) {
+                    var startAngle = startAngleAccessor(datum, index, ds) % (Math.PI * 2);
+                    var endAngle = endAngleAccessor(datum, index, ds) % (Math.PI * 2);
+                    while (endAngle < startAngle) {
+                        endAngle += Math.PI * 2;
+                    }
                     return d3.svg.arc().innerRadius(innerRadiusAccessor(datum, index, ds))
                         .outerRadius(outerRadiusAccessor(datum, index, ds))
-                        .startAngle(startAngleAccessor(datum, index, ds))
-                        .endAngle(endAngleAccessor(datum, index, ds))(datum, index);
+                        .startAngle(startAngle)
+                        .endAngle(endAngle)(datum, index);
                 };
                 return attrToProjector;
             };
@@ -9856,18 +9860,22 @@ var Plottable;
                 if (scale != null) {
                     scale.range([0, Math.PI * 2]);
                 }
+                var endAngleBinding = this.endAngle();
+                var endAngleAccessor = endAngleBinding && endAngleBinding.accessor;
+                if (endAngleAccessor != null) {
+                    this._bindProperty(Wheel._END_ANGLE_KEY, endAngleAccessor, scale);
+                }
                 this._bindProperty(Wheel._START_ANGLE_KEY, startAngle, scale);
                 this.render();
                 return this;
             };
-            Wheel.prototype.endAngle = function (endAngle, scale) {
+            Wheel.prototype.endAngle = function (endAngle) {
                 if (endAngle == null) {
                     return this._propertyBindings.get(Wheel._END_ANGLE_KEY);
                 }
-                if (scale != null) {
-                    scale.range([0, Math.PI * 2]);
-                }
-                this._bindProperty(Wheel._END_ANGLE_KEY, endAngle, scale);
+                var startAngleBinding = this.startAngle();
+                var angleScale = startAngleBinding && startAngleBinding.scale;
+                this._bindProperty(Wheel._END_ANGLE_KEY, endAngle, angleScale);
                 this.render();
                 return this;
             };
@@ -9875,15 +9883,25 @@ var Plottable;
                 if (innerRadius == null) {
                     return this._propertyBindings.get(Wheel._INNER_RADIUS_KEY);
                 }
+                if (scale != null) {
+                    scale.range([0, Math.PI * 2]);
+                }
+                var outerRadiusBinding = this.outerRadius();
+                var outerRadiusAccessor = outerRadiusBinding && outerRadiusBinding.accessor;
+                if (outerRadiusAccessor != null) {
+                    this._bindProperty(Wheel._OUTER_RADIUS_KEY, outerRadiusAccessor, scale);
+                }
                 this._bindProperty(Wheel._INNER_RADIUS_KEY, innerRadius, scale);
                 this.render();
                 return this;
             };
-            Wheel.prototype.outerRadius = function (outerRadius, scale) {
+            Wheel.prototype.outerRadius = function (outerRadius) {
                 if (outerRadius == null) {
                     return this._propertyBindings.get(Wheel._OUTER_RADIUS_KEY);
                 }
-                this._bindProperty(Wheel._OUTER_RADIUS_KEY, outerRadius, scale);
+                var innerRadiusBinding = this.innerRadius();
+                var radiusScale = innerRadiusBinding && innerRadiusBinding.scale;
+                this._bindProperty(Wheel._OUTER_RADIUS_KEY, outerRadius, radiusScale);
                 this.render();
                 return this;
             };
