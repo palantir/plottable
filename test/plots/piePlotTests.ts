@@ -359,22 +359,23 @@ describe("Plots", () => {
 
     describe("entities", () => {
       let svg: d3.Selection<void>;
-      let simpleDataset: Plottable.Dataset;
-      let simpleData: any[];
+      let dataset: Plottable.Dataset;
+      let simpleData = [{value: 5}, {value: 15}];
       let piePlot: Plottable.Plots.Pie;
 
       beforeEach(() => {
         svg = TestMethods.generateSVG(500, 500);
-        simpleData = [{value: 5}, {value: 15}];
-        simpleDataset = new Plottable.Dataset(simpleData);
+        dataset = new Plottable.Dataset();
         piePlot = new Plottable.Plots.Pie();
-        piePlot.addDataset(simpleDataset);
+        dataset.data(simpleData);
+        piePlot.addDataset(dataset);
         piePlot.sectorValue((d) => d.value);
         piePlot.renderTo(svg);
       });
 
       it("returns both a fill path and a stroke path in each Entity's selection", () => {
         let entities = piePlot.entities();
+        assert.lengthOf(entities, simpleData.length, "returned one Entity per datum");
         entities.forEach((entity) => {
           assert.strictEqual(entity.selection.size(), 2, "each entity selection has 2 paths");
           assert.strictEqual(entity.selection.filter(".fill").size(), 1, "each entity selection has 1 fill path");
@@ -391,6 +392,7 @@ describe("Plots", () => {
           {value: 5},
           {value: 5}
         ];
+        dataset.data(data);
 
         let clicks =  [
           { x: 260, y: 25 },
@@ -399,8 +401,6 @@ describe("Plots", () => {
           { x: 230, y: 25 },
           { x: 245, y: 25 }
         ];
-        piePlot.removeDataset(simpleDataset);
-        piePlot.addDataset(new Plottable.Dataset(data));
         clicks.forEach((point: Plottable.Point, i: number) => {
           let entity = piePlot.entitiesAt(point);
           assert.strictEqual(entity.length, 1, "exactly one entity is selected");
