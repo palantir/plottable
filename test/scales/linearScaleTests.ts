@@ -313,80 +313,101 @@ describe("Scales", () => {
     });
 
     describe("Plot interaction", () => {
-      let data = [
-        {foo: 2, bar: 1},
-        {foo: 5, bar: -20},
-        {foo: 0, bar: 0}
-      ];
+      let data: any[];
       let dataset: Plottable.Dataset;
       let scale: Plottable.Scales.Linear;
 
       beforeEach(() => {
+        data = [{x: 2}, {x: 5}, {x: 0}];
         dataset = new Plottable.Dataset(data);
         scale = new Plottable.Scales.Linear();
         scale.padProportion(0);
       });
 
       it("scale autorange works as expected with single dataset", () => {
-        let svg = TestMethods.generateSVG(100, 100);
+        let svg = TestMethods.generateSVG();
         let plot = new Plottable.Plot();
         (<any> plot)._createDrawer = (dataset: Plottable.Dataset) => createMockDrawer(dataset);
-        plot.addDataset(dataset)
-            .attr("x", (d) => d.foo, scale)
-            .renderTo(svg);
+        plot.addDataset(dataset);
+        plot.attr("x", (d) => d.x, scale);
+        plot.renderTo(svg);
         assert.deepEqual(scale.domain(), [0, 5], "scale domain was autoranged properly");
-        data.push({foo: 100, bar: 200});
-        dataset.data(data);
-        assert.deepEqual(scale.domain(), [0, 100], "scale domain was autoranged properly");
+
+        dataset.data([{x: 100}]);
+        assert.deepEqual(scale.domain(), [99, 101], "scale domain was updated properly");
+
         svg.remove();
       });
 
       it("scale reference counting works as expected", () => {
-        let svg1 = TestMethods.generateSVG(100, 100);
-        let svg2 = TestMethods.generateSVG(100, 100);
-        let renderer1 = new Plottable.Plot();
-        (<any> renderer1)._createDrawer = (dataset: Plottable.Dataset) => createMockDrawer(dataset);
-        renderer1.addDataset(dataset).attr("x", (d) => d.foo, scale);
-        renderer1.renderTo(svg1);
-        let renderer2 = new Plottable.Plot();
-        (<any> renderer2)._createDrawer = (dataset: Plottable.Dataset) => createMockDrawer(dataset);
-        renderer2.addDataset(dataset).attr("x", (d) => d.foo, scale);
-        renderer2.renderTo(svg2);
+        let svg1 = TestMethods.generateSVG();
+        let svg2 = TestMethods.generateSVG();
+
+        let plot1 = new Plottable.Plot();
+        (<any> plot1)._createDrawer = (dataset: Plottable.Dataset) => createMockDrawer(dataset);
+        plot1.addDataset(dataset).attr("x", (d) => d.x, scale);
+        plot1.renderTo(svg1);
+
+        let plot2 = new Plottable.Plot();
+        (<any> plot2)._createDrawer = (dataset: Plottable.Dataset) => createMockDrawer(dataset);
+        plot2.addDataset(dataset).attr("x", (d) => d.x, scale);
+        plot2.renderTo(svg2);
+
+        assert.deepEqual(scale.domain(), [0, 5], "correct domain is initially set for the scale");
+
         let otherScale = new Plottable.Scales.Linear();
-        renderer1.attr("x", (d) => d.foo, otherScale);
-        dataset.data([{foo: 10}, {foo: 11}]);
+        plot1.attr("x", (d) => d.x, otherScale);
+
+        assert.deepEqual(scale.domain(), [0, 5], "the domain for the scale did not change as it is still attached to plot 2");
+        dataset.data([{x: 10}, {x: 11}]);
         assert.deepEqual(scale.domain(), [10, 11], "scale was still listening to dataset after one perspective deregistered");
-        renderer2.attr("x", (d) => d.foo, otherScale);
-        // "scale not listening to the dataset after all perspectives removed"
-        dataset.data([{foo: 99}, {foo: 100}]);
+
+        plot2.attr("x", (d) => d.x, otherScale);
+        assert.deepEqual(scale.domain(), [0, 1], "scale resetted to the default domain as it is no longer attached to plots");
+        dataset.data([{x: 99}, {x: 100}]);
         assert.deepEqual(scale.domain(), [0, 1], "scale shows default values when all perspectives removed");
+
         svg1.remove();
         svg2.remove();
       });
 
-      it("should resize when a plot is removed", () => {
-        let svg = TestMethods.generateSVG(400, 400);
-        let ds1 = new Plottable.Dataset([{x: 0, y: 0}, {x: 1, y: 1}]);
-        let ds2 = new Plottable.Dataset([{x: 1, y: 1}, {x: 2, y: 2}]);
+      it("scale domain updates when plots are added or removed", () => {
+        let svg = TestMethods.generateSVG();
+        let ds1 = new Plottable.Dataset([
+          {x: 0, y: 0},
+          {x: 1, y: 1}
+        ]);
+        let ds2 = new Plottable.Dataset([
+          {x: 1, y: 1},
+          {x: 2, y: 2}
+        ]);
+
         let xScale = new Plottable.Scales.Linear();
         xScale.padProportion(0);
         let yScale = new Plottable.Scales.Linear();
         yScale.padProportion(0);
-        let renderAreaD1 = new Plottable.Plots.Line();
-        renderAreaD1.addDataset(ds1);
-        renderAreaD1.x((d) => d.x, xScale);
-        renderAreaD1.y((d) => d.y, yScale);
-        let renderAreaD2 = new Plottable.Plots.Line();
-        renderAreaD2.addDataset(ds2);
-        renderAreaD2.x((d) => d.x, xScale);
-        renderAreaD2.y((d) => d.y, yScale);
-        let renderAreas = new Plottable.Components.Group([renderAreaD1, renderAreaD2]);
-        renderAreas.renderTo(svg);
+
+        let plot1 = new Plottable.Plots.Line();
+        plot1.addDataset(ds1);
+        plot1.x((d) => d.x, xScale);
+        plot1.y((d) => d.y, yScale);
+
+        let plot2 = new Plottable.Plots.Line();
+        plot2.addDataset(ds2);
+        plot2.x((d) => d.x, xScale);
+        plot2.y((d) => d.y, yScale);
+
+        let group = new Plottable.Components.Group([plot1, plot2]);
+        group.renderTo(svg);
+
         assert.deepEqual(xScale.domain(), [0, 2]);
-        renderAreaD1.detach();
-        assert.deepEqual(xScale.domain(), [1, 2], "resize on plot.detach()");
-        renderAreas.append(renderAreaD1);
-        assert.deepEqual(xScale.domain(), [0, 2], "resize on plot.merge()");
+        plot1.detach();
+        assert.deepEqual(xScale.domain(), [1, 2], "domain update on removing plot 1");
+        group.append(plot1);
+        assert.deepEqual(xScale.domain(), [0, 2], "domain update on readding plot 1");
+        plot1.destroy();
+        assert.deepEqual(xScale.domain(), [1, 2], "domain update on destroying plot 1");
+
         svg.remove();
       });
     });
