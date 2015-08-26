@@ -731,7 +731,7 @@ describe("BaseAxis", () => {
       it("hides annotations if rectangles are outside the margin area", () => {
         let mockScale = new Plottable.Scales.Linear;
         let annotatedTicks = [50, 51, 150];
-        mockScale.domain(annotatedTicks);
+        mockScale.domain([0, 300]);
 
         let axis = new Plottable.Axis(mockScale, "bottom");
         axis.annotatedTicks(annotatedTicks);
@@ -746,8 +746,11 @@ describe("BaseAxis", () => {
           let bbox = this.getBBox();
           let insideMargin = bbox.x >= 0 && bbox.x + bbox.width <= axis.width() &&
                              bbox.y >= axis.height() - axis.margin() && bbox.y + bbox.height <= axis.height();
-          let visibilityAttr = insideMargin ? "visible" : "hidden";
-          assert.strictEqual(annotationRect.attr("visibility"), visibilityAttr, "annotation rect inside margin area");
+          if (insideMargin) {
+            assert.strictEqual(annotationRect.attr("visibility"), "visible", "annotation rect inside margin area should be visible");
+          } else {
+            assert.strictEqual(annotationRect.attr("visibility"), "hidden", "annotation rect outside margin area should be not visible");
+          }
         });
         svg.remove();
       });
