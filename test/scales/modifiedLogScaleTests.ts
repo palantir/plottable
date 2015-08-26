@@ -231,11 +231,11 @@ describe("Scales", () => {
         assert.operator(betweenPivots.length, ">", 0, "should be ticks between -base and base");
       });
 
-      it("ticks() always has more than 2 ticks", () => {
+      it("always has more than 2 ticks", () => {
         [null, [2, 9], [0, 1], [1, 2], [0.001, 0.01], [-0.1, 0.1], [-3, -2]].forEach((domain) => {
           scale.domain(domain);
           let ticks = scale.ticks();
-          assert.operator(ticks.length, ">", 2);
+          assert.operator(ticks.length, ">", 2, "there should be at least 2 ticks in domain " + domain);
         });
       });
     });
