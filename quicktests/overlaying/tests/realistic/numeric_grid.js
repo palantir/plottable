@@ -32,15 +32,22 @@ function run(svg, data, Plottable) {
 
   plot.renderTo(svg);
 
-  var hover = new Plottable.Interactions.Pointer();
-  hover.onPointerMove(function(p){
-    plot.entities().forEach(function(entity) {
-      entity.selection.attr("opacity", .3);
-    });
+  var hover = new Plottable.Interactions.Pointer().attachTo(plot);
+  hover.onPointerEnter(function() {
+    plot.entities().forEach(function(entity) { entity.selection.attr("opacity", 0.3); });
+  });
+
+  var lastEntities = [];
+  hover.onPointerMove(function(p) {
+    lastEntities.forEach(function(entity) { entity.selection.attr("opacity", 0.3); });
     var entities = plot.entitiesAt(p);
-    if (entities.length > 0) {
-      entities[0].selection.attr("opacity", 1);
-    }
-  })
-  .attachTo(plot);
+    entities.forEach(function(entity) { entity.selection.attr("opacity", 1); });
+    lastEntities = entities;
+  });
+
+  hover.onPointerExit(function() {
+    plot.entities().forEach(function(entity) { entity.selection.attr("opacity", 1); });
+    lastEntities = [];
+  });
+
 }

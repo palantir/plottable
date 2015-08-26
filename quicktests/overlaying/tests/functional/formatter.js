@@ -1,14 +1,14 @@
 function makeData() {
   "use strict";
 
-  return [makeRandomData(50), makeRandomData(50)];
+  return [makeRandomData(10), makeRandomData(10)];
 }
 
 function run(svg, data, Plottable) {
   "use strict";
 
-    var largeX = function(d){
-         d.x = d.x * 100000000;
+    var largeX = function(d, i){
+         d.x = Math.pow(10, i);
     };
 
   var bigNumbers = [];
@@ -28,12 +28,12 @@ function run(svg, data, Plottable) {
   var CurrTitle = new Plottable.Components.Label("Currency");
   var PerTitle = new Plottable.Components.Label("Percentage");
   var SITitle = new Plottable.Components.Label("SI");
-  var CustTitle = new Plottable.Components.Label("Custom");
+  var SSTitle = new Plottable.Components.Label("Short Scale");
 
   var plot = new Plottable.Plots.Line().addDataset(dataseries1);
   plot.x(function(d) { return d.x; }, xScale).y(function(d) { return d.y; }, yScale);
   var basicTable = new Plottable.Components.Table([[yAxis, plot], [null, xAxis]]);
-  var formatChoices = new Plottable.Components.Table([[IdTitle, GenTitle, FixTitle], [CurrTitle, null, PerTitle], [SITitle, null, CustTitle]]);
+  var formatChoices = new Plottable.Components.Table([[IdTitle, GenTitle, FixTitle], [CurrTitle, null, PerTitle], [SITitle, null, SSTitle]]);
   var bigTable = new Plottable.Components.Table([[basicTable], [formatChoices]]);
   formatChoices.xAlignment("center");
 
@@ -63,8 +63,8 @@ function run(svg, data, Plottable) {
      xAxis.formatter(Plottable.Formatters.siSuffix(7));
      yAxis.formatter(Plottable.Formatters.siSuffix(14));
   }
-  function useCustomFormatter() {
-     xAxis.formatter(Plottable.Formatters.shortScale(3));
+  function useSSFormatter() {
+     xAxis.formatter(Plottable.Formatters.shortScale(0));
      yAxis.formatter(Plottable.Formatters.shortScale(0));
   }
 
@@ -74,6 +74,6 @@ function run(svg, data, Plottable) {
   new Plottable.Interactions.Click().onClick(useCurrencyFormatter).attachTo(CurrTitle);
   new Plottable.Interactions.Click().onClick(usePercentageFormatter).attachTo(PerTitle);
   new Plottable.Interactions.Click().onClick(useSIFormatter).attachTo(SITitle);
-  new Plottable.Interactions.Click().onClick(useCustomFormatter).attachTo(CustTitle);
+  new Plottable.Interactions.Click().onClick(useSSFormatter).attachTo(SSTitle);
 
 }
