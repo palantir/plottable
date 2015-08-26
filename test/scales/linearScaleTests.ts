@@ -2,123 +2,125 @@
 
 describe("Scales", () => {
   describe("Linear Scales", () => {
-    it("extentOfValues() filters out invalid numbers", () => {
-      let scale = new Plottable.Scales.Linear();
-      let expectedExtent = [0, 1];
-      let arrayWithBadValues: any[] = [null, NaN, undefined, Infinity, -Infinity, "a string", 0, 1];
-      let extent = scale.extentOfValues(arrayWithBadValues);
-      assert.deepEqual(extent, expectedExtent, "invalid values were filtered out");
+
+    describe("Basic usage", () => {
+      let scale: Plottable.Scales.Linear;
+
+      beforeEach(() => {
+        scale = new Plottable.Scales.Linear();
+      });
+
+      it("filters out invalid numbers when using extentOfValues()", () => {
+        let arrayWithBadValues: any[] = [null, NaN, undefined, Infinity, -Infinity, "a string", 1, 1.2];
+        let expectedExtent = [1, 1.2];
+        let extent = scale.extentOfValues(arrayWithBadValues);
+        assert.deepEqual(extent, expectedExtent, "invalid values were filtered out");
+      });
+
+      it("auto domains by default", () => {
+        assert.deepEqual(scale.domain(), [0, 1], "the default domain is [0, 1]");
+
+        scale.autoDomain();
+        assert.deepEqual(scale.domain(), [0, 1], "the domain is still [0, 1]");
+      });
+
+      it("expands single value domains to [value - 1, value + 1] when auto domaining", () => {
+        let singleValue = 15;
+        scale.addIncludedValuesProvider((scale: Plottable.Scales.Linear) => [singleValue]);
+        assert.deepEqual(scale.domain(), [singleValue - 1, singleValue + 1], "single-value extent was expanded");
+      });
+
+      it("domainMin()", () => {
+        scale.padProportion(0);
+        let requestedDomain = [-5, 5];
+        scale.addIncludedValuesProvider((scale: Plottable.Scales.Linear) => requestedDomain);
+
+        let minBelowBottom = -10;
+        scale.domainMin(minBelowBottom);
+        assert.deepEqual(scale.domain(), [minBelowBottom, requestedDomain[1]], "lower end of domain was set by domainMin()");
+        assert.strictEqual(scale.domainMin(), minBelowBottom, "returns the set minimum value");
+
+        let minInMiddle = 0;
+        scale.domainMin(minInMiddle);
+        assert.deepEqual(scale.domain(), [minInMiddle, requestedDomain[1]], "lower end was set even if requested value cuts off some data");
+
+        scale.autoDomain();
+        assert.deepEqual(scale.domain(), requestedDomain, "calling autoDomain() overrides domainMin()");
+        assert.strictEqual(scale.domainMin(), scale.domain()[0], "returns autoDomain()-ed min value after autoDomain()-ing");
+
+        let minEqualTop = scale.domain()[1];
+        scale.domainMin(minEqualTop);
+        assert.deepEqual(scale.domain(), [minEqualTop, minEqualTop + 1],
+          "domain is set to [min, min + 1] if the requested value is >= to autoDomain()-ed max value");
+
+        scale.domainMin(minInMiddle);
+        let requestedDomain2 = [-10, 10];
+        scale.addIncludedValuesProvider((scale: Plottable.Scales.Linear) => requestedDomain2);
+        assert.deepEqual(scale.domain(), [minInMiddle, requestedDomain2[1]], "adding another ExtentsProvider doesn't change domainMin()");
+      });
+
+      it("domainMax()", () => {
+        scale.padProportion(0);
+        let requestedDomain = [-5, 5];
+        scale.addIncludedValuesProvider((scale: Plottable.Scales.Linear) => requestedDomain);
+
+        let maxAboveTop = 10;
+        scale.domainMax(maxAboveTop);
+        assert.deepEqual(scale.domain(), [requestedDomain[0], maxAboveTop], "upper end of domain was set by domainMax()");
+        assert.strictEqual(scale.domainMax(), maxAboveTop, "returns the set maximum value");
+
+        let maxInMiddle = 0;
+        scale.domainMax(maxInMiddle);
+        assert.deepEqual(scale.domain(), [requestedDomain[0], maxInMiddle], "upper end was set even if requested value cuts off some data");
+
+        scale.autoDomain();
+        assert.deepEqual(scale.domain(), requestedDomain, "calling autoDomain() overrides domainMax()");
+        assert.strictEqual(scale.domainMax(), scale.domain()[1], "returns autoDomain()-ed max value after autoDomain()-ing");
+
+        let maxEqualBottom = scale.domain()[0];
+        scale.domainMax(maxEqualBottom);
+        assert.deepEqual(scale.domain(), [maxEqualBottom - 1, maxEqualBottom],
+          "domain is set to [max - 1, max] if the requested value is <= to autoDomain()-ed min value");
+
+        scale.domainMax(maxInMiddle);
+        let requestedDomain2 = [-10, 10];
+        scale.addIncludedValuesProvider((scale: Plottable.Scales.Linear) => requestedDomain2);
+        assert.deepEqual(scale.domain(), [requestedDomain2[0], maxInMiddle], "adding another ExtentsProvider doesn't change domainMax()");
+      });
+
+      it("domainMin() and domainMax() together", () => {
+        scale.padProportion(0);
+        let requestedDomain = [-5, 5];
+        scale.addIncludedValuesProvider((scale: Plottable.Scales.Linear) => requestedDomain);
+
+        let desiredMin = -10;
+        let desiredMax = 10;
+        scale.domainMin(desiredMin);
+        scale.domainMax(desiredMax);
+        assert.deepEqual(scale.domain(), [desiredMin, desiredMax], "setting domainMin() and domainMax() sets the domain");
+
+        scale.autoDomain();
+        let bigMin = 10;
+        let smallMax = -10;
+        scale.domainMin(bigMin);
+        scale.domainMax(smallMax);
+        assert.deepEqual(scale.domain(), [bigMin, smallMax], "setting both is allowed even if it reverse the domain");
+      });
+
+      it("domain can't include NaN or Infinity", () => {
+        scale.domain([0, 1]);
+        scale.domain([5, Infinity]);
+        assert.deepEqual(scale.domain(), [0, 1], "Infinity containing domain was ignored");
+        scale.domain([5, -Infinity]);
+        assert.deepEqual(scale.domain(), [0, 1], "-Infinity containing domain was ignored");
+        scale.domain([NaN, 7]);
+        assert.deepEqual(scale.domain(), [0, 1], "NaN containing domain was ignored");
+        scale.domain([-1, 5]);
+        assert.deepEqual(scale.domain(), [-1, 5], "Regular domains still accepted");
+      });
     });
 
-    it("autoDomain() defaults to [0, 1]", () => {
-      let scale = new Plottable.Scales.Linear();
-      scale.autoDomain();
-      let d = scale.domain();
-      assert.strictEqual(d[0], 0);
-      assert.strictEqual(d[1], 1);
-    });
-
-    it("autoDomain() expands single value to [value - 1, value + 1]", () => {
-      let scale = new Plottable.Scales.Linear();
-      let singleValue = 15;
-      scale.addIncludedValuesProvider((scale: Plottable.Scales.Linear) => [singleValue, singleValue]);
-      assert.deepEqual(scale.domain(), [singleValue - 1, singleValue + 1], "single-value extent was expanded");
-    });
-
-    it("domainMin()", () => {
-      let scale = new Plottable.Scales.Linear();
-      scale.padProportion(0);
-      let requestedDomain = [-5, 5];
-      scale.addIncludedValuesProvider((scale: Plottable.Scales.Linear) => requestedDomain);
-
-      let minBelowBottom = -10;
-      scale.domainMin(minBelowBottom);
-      assert.deepEqual(scale.domain(), [minBelowBottom, requestedDomain[1]], "lower end of domain was set by domainMin()");
-      assert.strictEqual(scale.domainMin(), minBelowBottom, "returns the set minimum value");
-
-      let minInMiddle = 0;
-      scale.domainMin(minInMiddle);
-      assert.deepEqual(scale.domain(), [minInMiddle, requestedDomain[1]], "lower end was set even if requested value cuts off some data");
-
-      scale.autoDomain();
-      assert.deepEqual(scale.domain(), requestedDomain, "calling autoDomain() overrides domainMin()");
-      assert.strictEqual(scale.domainMin(), scale.domain()[0], "returns autoDomain()-ed min value after autoDomain()-ing");
-
-      let minEqualTop = scale.domain()[1];
-      scale.domainMin(minEqualTop);
-      assert.deepEqual(scale.domain(), [minEqualTop, minEqualTop + 1],
-        "domain is set to [min, min + 1] if the requested value is >= to autoDomain()-ed max value");
-
-      scale.domainMin(minInMiddle);
-      let requestedDomain2 = [-10, 10];
-      scale.addIncludedValuesProvider((scale: Plottable.Scales.Linear) => requestedDomain2);
-      assert.deepEqual(scale.domain(), [minInMiddle, requestedDomain2[1]], "adding another ExtentsProvider doesn't change domainMin()");
-    });
-
-    it("domainMax()", () => {
-      let scale = new Plottable.Scales.Linear();
-      scale.padProportion(0);
-      let requestedDomain = [-5, 5];
-      scale.addIncludedValuesProvider((scale: Plottable.Scales.Linear) => requestedDomain);
-
-      let maxAboveTop = 10;
-      scale.domainMax(maxAboveTop);
-      assert.deepEqual(scale.domain(), [requestedDomain[0], maxAboveTop], "upper end of domain was set by domainMax()");
-      assert.strictEqual(scale.domainMax(), maxAboveTop, "returns the set maximum value");
-
-      let maxInMiddle = 0;
-      scale.domainMax(maxInMiddle);
-      assert.deepEqual(scale.domain(), [requestedDomain[0], maxInMiddle], "upper end was set even if requested value cuts off some data");
-
-      scale.autoDomain();
-      assert.deepEqual(scale.domain(), requestedDomain, "calling autoDomain() overrides domainMax()");
-      assert.strictEqual(scale.domainMax(), scale.domain()[1], "returns autoDomain()-ed max value after autoDomain()-ing");
-
-      let maxEqualBottom = scale.domain()[0];
-      scale.domainMax(maxEqualBottom);
-      assert.deepEqual(scale.domain(), [maxEqualBottom - 1, maxEqualBottom],
-        "domain is set to [max - 1, max] if the requested value is <= to autoDomain()-ed min value");
-
-      scale.domainMax(maxInMiddle);
-      let requestedDomain2 = [-10, 10];
-      scale.addIncludedValuesProvider((scale: Plottable.Scales.Linear) => requestedDomain2);
-      assert.deepEqual(scale.domain(), [requestedDomain2[0], maxInMiddle], "adding another ExtentsProvider doesn't change domainMax()");
-    });
-
-    it("domainMin() and domainMax() together", () => {
-      let scale = new Plottable.Scales.Linear();
-      scale.padProportion(0);
-      let requestedDomain = [-5, 5];
-      scale.addIncludedValuesProvider((scale: Plottable.Scales.Linear) => requestedDomain);
-
-      let desiredMin = -10;
-      let desiredMax = 10;
-      scale.domainMin(desiredMin);
-      scale.domainMax(desiredMax);
-      assert.deepEqual(scale.domain(), [desiredMin, desiredMax], "setting domainMin() and domainMax() sets the domain");
-
-      scale.autoDomain();
-      let bigMin = 10;
-      let smallMax = -10;
-      scale.domainMin(bigMin);
-      scale.domainMax(smallMax);
-      assert.deepEqual(scale.domain(), [bigMin, smallMax], "setting both is allowed even if it reverse the domain");
-    });
-
-    it("domain can't include NaN or Infinity", () => {
-      let scale = new Plottable.Scales.Linear();
-      scale.domain([0, 1]);
-      scale.domain([5, Infinity]);
-      assert.deepEqual(scale.domain(), [0, 1], "Infinity containing domain was ignored");
-      scale.domain([5, -Infinity]);
-      assert.deepEqual(scale.domain(), [0, 1], "-Infinity containing domain was ignored");
-      scale.domain([NaN, 7]);
-      assert.deepEqual(scale.domain(), [0, 1], "NaN containing domain was ignored");
-      scale.domain([-1, 5]);
-      assert.deepEqual(scale.domain(), [-1, 5], "Regular domains still accepted");
-    });
-
-    describe("domain snapping", () => {
+    describe("Domain snapping", () => {
       it("domain snapping setter and getter", () => {
         let scale = new Plottable.Scales.Linear();
 
@@ -139,16 +141,16 @@ describe("Scales", () => {
         scale.snappingDomainEnabled(true);
         assert.deepEqual(scale.domain(), [1, 3.2], "domain snapping can be activated back");
       });
-    });
 
-    it("custom tick generator", () => {
-      let scale = new Plottable.Scales.Linear();
-      scale.domain([0, 10]);
-      let defaultTicks = scale.ticks();
-      assert.closeTo(defaultTicks.length, 10, 1, "ticks were generated correctly with default generator");
-      scale.tickGenerator((scale) => scale.defaultTicks().filter(tick => tick % 3 === 0));
-      let customTicks = scale.ticks();
-      assert.deepEqual(customTicks, [0, 3, 6, 9], "ticks were generated correctly with custom generator");
+      it("custom tick generator", () => {
+        let scale = new Plottable.Scales.Linear();
+        scale.domain([0, 10]);
+        let defaultTicks = scale.ticks();
+        assert.closeTo(defaultTicks.length, 10, 1, "ticks were generated correctly with default generator");
+        scale.tickGenerator((scale) => scale.defaultTicks().filter(tick => tick % 3 === 0));
+        let customTicks = scale.ticks();
+        assert.deepEqual(customTicks, [0, 3, 6, 9], "ticks were generated correctly with custom generator");
+      });
     });
 
     describe("Padding exceptions", () => {
@@ -209,7 +211,7 @@ describe("Scales", () => {
       });
     });
 
-    describe("autoranging behavior", () => {
+    describe("Autoranging behavior", () => {
       let data: any[];
       let dataset: Plottable.Dataset;
       let scale: Plottable.Scales.Linear;
