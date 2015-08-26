@@ -49,6 +49,18 @@ describe("Scales", () => {
         assert.operator(scale.domain()[0], "<", unpaddedDomain[0], "left side of domain has been padded");
         assert.operator(unpaddedDomain[1], "<", scale.domain()[1], "right side of domain has been padded");
       });
+
+      it("works on inverted domain", () => {
+        scale.domain([200, -100]);
+        scale.range([10, 20]);
+        let range = scale.range();
+        assert.strictEqual(scale.scale(-100), range[1], "minimum value in domain maps to maximum value in range");
+        assert.strictEqual(scale.scale(200), range[0], "maximum value in domain maps to minimum value in range");
+        let a = [-100, -10, -3, 0, 1, 3.64, 50, 60, 200];
+        let b = a.map((x) => scale.scale(x));
+        assert.deepEqual(b, b.slice().sort().reverse(), "should be decreasing function; reverse is sorted");
+      });
+
     });
 
     describe("Other bases", () => {
@@ -190,7 +202,7 @@ describe("Scales", () => {
         scale.addIncludedValuesProvider(includedValuesProvider);
 
         let ticks = scale.ticks();
-        assert.operator(ticks.length, ">", 0);
+        assert.operator(ticks.length, ">", 0, "there should be some ticks generated");
 
         scale.removeIncludedValuesProvider(includedValuesProvider);
         includedValuesProvider = (scale: Plottable.Scales.ModifiedLog) => [-base * 2, base * 2];
@@ -200,20 +212,13 @@ describe("Scales", () => {
         let beforePivot = ticks.filter((x) => x <= -base);
         let afterPivot = ticks.filter((x) => base <= x);
         let betweenPivots = ticks.filter((x) => -base < x && x < base);
-        assert.operator(beforePivot.length, ">", 0, "should be ticks before -base");
-        assert.operator(afterPivot.length, ">", 0, "should be ticks after base");
-        assert.operator(betweenPivots.length, ">", 0, "should be ticks between -base and base");
+        assert.operator(beforePivot.length, ">", 0, "there should be ticks before -base");
+        assert.operator(afterPivot.length, ">", 0, "there should be ticks after base");
+        assert.operator(betweenPivots.length, ">", 0, "there should be ticks between -base and base");
       });
 
       it("works on inverted domain", () => {
         scale.domain([200, -100]);
-        let range = scale.range();
-        assert.strictEqual(scale.scale(-100), range[1]);
-        assert.strictEqual(scale.scale(200), range[0]);
-        let a = [-100, -10, -3, 0, 1, 3.64, 50, 60, 200];
-        let b = a.map((x) => scale.scale(x));
-        // should be decreasing function; reverse is sorted
-        assert.deepEqual(b.slice().reverse(), b.slice().sort((x, y) => x - y));
 
         let ticks = scale.ticks();
         assert.deepEqual(ticks, ticks.slice().sort((x, y) => x - y), "ticks should be sorted");
