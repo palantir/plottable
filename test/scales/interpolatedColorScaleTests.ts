@@ -19,12 +19,10 @@ describe("Scales", () => {
 
         assert.deepEqual(scale.range(), Plottable.Scales.InterpolatedColor.REDS,
           "the range of the default scale is made of shades of red");
-      });
 
-      it("linearly interpolates colors in L*a*b color space", () => {
         scale.domain([0, 1]);
-        assert.strictEqual(scale.scale(1), "#b10026", "domain maximum maps to red");
-        assert.strictEqual(scale.scale(0.5), "#feb24c", "domain median maps in between red and white");
+        assert.strictEqual(scale.scale(1), "#b10026", "new domain maximum maps to red");
+        assert.strictEqual(scale.scale(0.5), "#feb24c", "new domain median maps in between red and white");
         assert.strictEqual(scale.scale(0.9), "#d9151f", "different shades of red are obtained for different values");
       });
 
@@ -53,14 +51,6 @@ describe("Scales", () => {
         assert.strictEqual(scale.scale(100), "#ffffff", "values larger than the domain maximum clamp to white");
       });
 
-      it("can be converted to a different range", () => {
-        scale.range(["black", "white"]);
-        scale.domain([0, 16]);
-        assert.strictEqual(scale.scale(16), "#ffffff", "domain maximum maps to white");
-        scale.range(Plottable.Scales.InterpolatedColor.REDS);
-        assert.strictEqual(scale.scale(16), "#b10026", "scale changing took effect");
-      });
     });
-
   });
 });
