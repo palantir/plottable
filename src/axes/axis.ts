@@ -177,11 +177,11 @@ export class Axis<D> extends Component {
   }
 
   /**
-   * Gets the annotated ticks
+   * Gets the annotated ticks.
    */
   public annotatedTicks(): D[];
   /**
-   * Sets the annotated ticks
+   * Sets the annotated ticks.
    *
    * @returns {Axis} The calling Axis.
    */
@@ -196,11 +196,11 @@ export class Axis<D> extends Component {
   }
 
   /**
-   * Gets the formatter for the annotations
+   * Gets the Formatter for the annotations.
    */
   public annotationFormatter(): Formatter;
   /**
-   * Sets the formatter for the annotations
+   * Sets the Formatter for the annotations.
    *
    * @returns {Axis} The calling Axis.
    */
@@ -215,15 +215,15 @@ export class Axis<D> extends Component {
   }
 
   /**
-   * Gets if annotations are enabled
+   * Gets if annotations are enabled.
    *
-   * Annotations will render in the margin area of the axis if enabled and if there is enough space
+   * Annotations are drawn in the margin of the Axis..
    */
   public annotationsEnabled(): boolean;
   /**
-   * Sets if annotations are enabled
+   * Sets if annotations are enabled.
    *
-   * Annotations will render in the margin area of the axis if enabled and if there is enough space
+   * Annotations are drawn in the margin of the Axis..
    *
    * @returns {Axis} The calling Axis.
    */

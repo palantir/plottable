@@ -1696,35 +1696,35 @@ declare module Plottable {
         protected _getTickValues(): D[];
         renderImmediately(): Axis<D>;
         /**
-         * Gets the annotated ticks
+         * Gets the annotated ticks.
          */
         annotatedTicks(): D[];
         /**
-         * Sets the annotated ticks
+         * Sets the annotated ticks.
          *
          * @returns {Axis} The calling Axis.
          */
         annotatedTicks(annotatedTicks: D[]): Axis<D>;
         /**
-         * Gets the formatter for the annotations
+         * Gets the Formatter for the annotations.
          */
         annotationFormatter(): Formatter;
         /**
-         * Sets the formatter for the annotations
+         * Sets the Formatter for the annotations.
          *
          * @returns {Axis} The calling Axis.
          */
         annotationFormatter(annotationFormatter: Formatter): Axis<D>;
         /**
-         * Gets if annotations are enabled
+         * Gets if annotations are enabled.
          *
-         * Annotations will render in the margin area of the axis if enabled and if there is enough space
+         * Annotations are drawn in the margin of the Axis..
          */
         annotationsEnabled(): boolean;
         /**
-         * Sets if annotations are enabled
+         * Sets if annotations are enabled.
          *
-         * Annotations will render in the margin area of the axis if enabled and if there is enough space
+         * Annotations are drawn in the margin of the Axis..
          *
          * @returns {Axis} The calling Axis.
          */
