@@ -216,10 +216,14 @@ export class Axis<D> extends Component {
 
   /**
    * Gets if annotations are enabled
+   *
+   * Annotations will render in the margin area of the axis if enabled and if there is enough space
    */
   public annotationsEnabled(): boolean;
   /**
    * Sets if annotations are enabled
+   *
+   * Annotations will render in the margin area of the axis if enabled and if there is enough space
    *
    * @returns {Axis} The calling Axis.
    */
