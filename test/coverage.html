@@ -5,12 +5,11 @@
     <title>Plottable.js Tests</title>
     <link rel="stylesheet" href="../bower_components/mocha/mocha.css">
     <link href="../plottable.css" type="text/css" rel="stylesheet" />
-    <style>
-      svg {
-        background-color : #DEF;
-      }
-    </style>
+    <link href="tests.css" type="text/css" rel="stylesheet" />
 
+    <script>
+      window.PlottableTestCode = true;
+    </script>
     <script src="../bower_components/d3/d3.min.js"></script>
     <script src="../bower_components/svg-typewriter/svgtypewriter.js" charset="utf-8"></script>
     <script src="../bower_components/chai/chai.js"></script>
@@ -19,9 +18,6 @@
     <script src="../bower_components/jquery.simulate/libs/jquery.simulate.js"></script>
     <script src="blanket_mocha.js"></script>
     <script src="../plottable.js" data-cover></script>
-    <script>
-      window.PlottableTestCode = true;
-    </script>
   </head>
   <body>
     <div id="mocha"></div>

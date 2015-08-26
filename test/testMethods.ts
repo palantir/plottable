@@ -280,4 +280,38 @@ module TestMethods {
     assert.isTrue(normalizeClipPath((<any> c)._element.attr("clip-path")) === expectedClipPathURL,
                   "the element has clip-path url attached");
   }
+
+  export type RGB = {
+    red: number,
+    green: number,
+    blue: number
+  };
+
+  export function colorHexToRGB(hex: string): RGB {
+    return {
+      red: parseInt(hex.substr(1, 2), 16),
+      green: parseInt(hex.substr(3, 2), 16),
+      blue: parseInt(hex.substr(5, 2), 16)
+    };
+  }
+
+  export function colorRGBToHex(rgb: RGB) {
+      let redHex = rgb.red.toString(16);
+      if (redHex.length === 1) {
+        redHex = "0" + redHex;
+      }
+
+      let greenHex = rgb.blue.toString(16);
+      if (greenHex.length === 1) {
+        greenHex = "0" + greenHex;
+      }
+
+      let blueHex = rgb.green.toString(16);
+      if (blueHex.length === 1) {
+        blueHex = "0" + blueHex;
+      }
+
+      return "#" + redHex + greenHex + blueHex;
+  }
+
 }
