@@ -1718,13 +1718,13 @@ declare module Plottable {
         /**
          * Gets if annotations are enabled.
          *
-         * Annotations are drawn in the margin of the Axis..
+         * Annotations are drawn in the margin of the Axis.
          */
         annotationsEnabled(): boolean;
         /**
          * Sets if annotations are enabled.
          *
-         * Annotations are drawn in the margin of the Axis..
+         * Annotations are drawn in the margin of the Axis.
          *
          * @returns {Axis} The calling Axis.
          */
