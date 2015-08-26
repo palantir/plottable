@@ -2,6 +2,142 @@
 
 describe("Plots", () => {
   describe("PiePlot", () => {
+    describe("Rendering", () => {
+      let svg: d3.Selection<void>;
+      let simpleDataset: Plottable.Dataset;
+      let simpleData: any[];
+      let piePlot: Plottable.Plots.Pie;
+
+      beforeEach(() => {
+        svg = TestMethods.generateSVG(500, 500);
+        simpleData = [{value: 5}, {value: 15}];
+        simpleDataset = new Plottable.Dataset(simpleData);
+        piePlot = new Plottable.Plots.Pie();
+        piePlot.addDataset(simpleDataset);
+        piePlot.sectorValue((d) => d.value);
+        piePlot.renderTo(svg);
+      });
+
+      it("draws a fill path and a stroke path for each slice", () => {
+        let arcPaths = piePlot.content().selectAll(".arc");
+        let arcFillPaths = piePlot.content().selectAll(".arc.fill");
+        let arcOutlinePaths = piePlot.content().selectAll(".arc.outline");
+        assert.strictEqual(arcPaths.size(), simpleData.length * 2, "2 paths per datum");
+        assert.strictEqual(arcFillPaths.size(), simpleData.length, "1 fill path per datum");
+        assert.strictEqual(arcOutlinePaths.size(), simpleData.length, "1 outline path per datum");
+        assert.strictEqual(arcFillPaths.style("stroke"), "none", "fill paths have no stroke");
+        assert.strictEqual(arcOutlinePaths.style("fill"), "none", "outline paths have no fill");
+        svg.remove();
+      });
+
+      it("draws slices proportional in angle to their value", () => {
+        let arcPaths = piePlot.content().selectAll(".arc.fill");
+        assert.lengthOf(arcPaths[0], 2, "only has two sectors");
+        let arcPath0 = d3.select(arcPaths[0][0]);
+        let pathPoints0 = TestMethods.normalizePath(arcPath0.attr("d")).split(/[A-Z]/).slice(1, 4);
+
+        let firstPathPoints0 = pathPoints0[0].split(",");
+        assert.closeTo(parseFloat(firstPathPoints0[0]), 0, 1, "draws line vertically at beginning");
+        assert.operator(parseFloat(firstPathPoints0[1]), "<", 0, "draws line upwards");
+
+        let arcDestPoint0 = pathPoints0[1].split(",").slice(5);
+        assert.operator(parseFloat(arcDestPoint0[0]), ">", 0, "arcs line to the right");
+        assert.closeTo(parseFloat(arcDestPoint0[1]), 0, 1, "ends on same level of svg");
+
+        let secondPathPoints0 = pathPoints0[2].split(",");
+        assert.closeTo(parseFloat(secondPathPoints0[0]), 0, 1, "draws line to origin");
+        assert.closeTo(parseFloat(secondPathPoints0[1]), 0, 1, "draws line to origin");
+
+        let arcPath1 = d3.select(arcPaths[0][1]);
+        let pathPoints1 = TestMethods.normalizePath(arcPath1.attr("d")).split(/[A-Z]/).slice(1, 4);
+
+        let firstPathPoints1 = pathPoints1[0].split(",");
+        assert.operator(parseFloat(firstPathPoints1[0]), ">", 0, "draws line to the right");
+        assert.closeTo(parseFloat(firstPathPoints1[1]), 0, 1, "draws line horizontally");
+
+        let arcDestPoint1 = pathPoints1[1].split(",").slice(5);
+        assert.closeTo(parseFloat(arcDestPoint1[0]), 0, 1, "ends at x origin");
+        assert.operator(parseFloat(arcDestPoint1[1]), "<", 0, "ends above 0");
+
+        let secondPathPoints1 = pathPoints1[2].split(",");
+        assert.closeTo(parseFloat(secondPathPoints1[0]), 0, 1, "draws line to origin");
+        assert.closeTo(parseFloat(secondPathPoints1[1]), 0, 1, "draws line to origin");
+        svg.remove();
+      });
+
+      it("uses a plottable-colors color scale to color sectors by default", () => {
+        let arcPaths = piePlot.content().selectAll(".arc");
+
+        let arcPath0 = d3.select(arcPaths[0][0]);
+        assert.strictEqual(arcPath0.attr("fill"), "#5279c7", "first sector filled appropriately");
+
+        let arcPath1 = d3.select(arcPaths[0][1]);
+        assert.strictEqual(arcPath1.attr("fill"), "#fd373e", "second sector filled appropriately");
+        svg.remove();
+      });
+
+      it("updates slices when data changes", () => {
+        let originalPathStrings: String[] = [];
+        piePlot.content().selectAll("path").each(function() { originalPathStrings.push(d3.select(this).attr("d")); });
+        assert.lengthOf(originalPathStrings, simpleData.length * 2, "2 paths per datum");
+
+        let oneMoreSliceData = simpleData.slice();
+        oneMoreSliceData.push({ value: 5 });
+        simpleDataset.data(oneMoreSliceData);
+
+        let oneMoreSlicePathStrings: String[] = [];
+        piePlot.content().selectAll("path").each(function() { oneMoreSlicePathStrings.push(d3.select(this).attr("d")); });
+        assert.lengthOf(oneMoreSlicePathStrings, oneMoreSliceData.length * 2, "2 paths per datum");
+
+        originalPathStrings.forEach((pathString, index) => {
+          assert.notStrictEqual(pathString, oneMoreSlicePathStrings[index], "slices were updated when data changed");
+        });
+        svg.remove();
+      });
+
+      it("can set innerRadius", () => {
+        let expectedInnerRadius = 5;
+        piePlot.innerRadius(expectedInnerRadius);
+        let arcPaths = piePlot.content().selectAll(".arc.fill");
+        assert.lengthOf(arcPaths[0], 2, "only has two sectors");
+
+        let pathPoints0 = TestMethods.normalizePath(d3.select(arcPaths[0][0]).attr("d")).split(/[A-Z]/).slice(1, 5);
+
+        let radiusPath0 = pathPoints0[2].split(",").map((coordinate: string) => parseFloat(coordinate));
+        assert.closeTo(radiusPath0[0], expectedInnerRadius, 1, "stops line at innerRadius point");
+        assert.closeTo(radiusPath0[1], 0, 1, "stops line at innerRadius point");
+
+        let innerArcPath0 = pathPoints0[3].split(",").map((coordinate: string) => parseFloat(coordinate));
+        assert.closeTo(innerArcPath0[0], expectedInnerRadius, 1, "makes inner arc of correct radius");
+        assert.closeTo(innerArcPath0[1], expectedInnerRadius, 1, "makes inner arc of correct radius");
+        assert.closeTo(innerArcPath0[5], 0, 1, "make inner arc to center");
+        assert.closeTo(innerArcPath0[6], -expectedInnerRadius, 1, "makes inner arc to top of inner circle");
+
+        svg.remove();
+      });
+
+      it("can set outerRadius", () => {
+        let expectedOuterRadius = 150;
+        piePlot.outerRadius(() => expectedOuterRadius);
+        let arcPaths = piePlot.content().selectAll(".arc.fill");
+        assert.lengthOf(arcPaths[0], 2, "only has two sectors");
+
+        let pathPoints0 = TestMethods.normalizePath(d3.select(arcPaths[0][0]).attr("d")).split(/[A-Z]/).slice(1, 5);
+
+        let radiusPath0 = pathPoints0[0].split(",").map((coordinate: string) => parseFloat(coordinate));
+        assert.closeTo(radiusPath0[0], 0, 1, "starts at outerRadius point");
+        assert.closeTo(radiusPath0[1], -expectedOuterRadius, 1, "starts at outerRadius point");
+
+        let outerArcPath0 = pathPoints0[1].split(",").map((coordinate: string) => parseFloat(coordinate));
+        assert.closeTo(outerArcPath0[0], expectedOuterRadius, 1, "makes outer arc of correct radius");
+        assert.closeTo(outerArcPath0[1], expectedOuterRadius, 1, "makes outer arc of correct radius");
+        assert.closeTo(outerArcPath0[5], expectedOuterRadius, 1, "makes outer arc to right edge");
+        assert.closeTo(outerArcPath0[6], 0, 1, "makes outer arc to right edge");
+
+        svg.remove();
+      });
+    });
+
     describe("Labels", () => {
       let svg: d3.Selection<void>;
       let piePlot: Plottable.Plots.Pie;
@@ -174,142 +310,6 @@ describe("Plots", () => {
         assert.lengthOf(texts, 2, "One label is rendered for each valid of data");
         assert.strictEqual(texts[0], "1", "Label for the first valid data is shown");
         assert.strictEqual(texts[1], "2", "Label for the second valid data is shown");
-        svg.remove();
-      });
-    });
-
-    describe("Rendering", () => {
-      let svg: d3.Selection<void>;
-      let simpleDataset: Plottable.Dataset;
-      let simpleData: any[];
-      let piePlot: Plottable.Plots.Pie;
-
-      beforeEach(() => {
-        svg = TestMethods.generateSVG(500, 500);
-        simpleData = [{value: 5}, {value: 15}];
-        simpleDataset = new Plottable.Dataset(simpleData);
-        piePlot = new Plottable.Plots.Pie();
-        piePlot.addDataset(simpleDataset);
-        piePlot.sectorValue((d) => d.value);
-        piePlot.renderTo(svg);
-      });
-
-      it("draws a fill path and a stroke path for each slice", () => {
-        let arcPaths = piePlot.content().selectAll(".arc");
-        let arcFillPaths = piePlot.content().selectAll(".arc.fill");
-        let arcOutlinePaths = piePlot.content().selectAll(".arc.outline");
-        assert.strictEqual(arcPaths.size(), simpleData.length * 2, "2 paths per datum");
-        assert.strictEqual(arcFillPaths.size(), simpleData.length, "1 fill path per datum");
-        assert.strictEqual(arcOutlinePaths.size(), simpleData.length, "1 outline path per datum");
-        assert.strictEqual(arcFillPaths.style("stroke"), "none", "fill paths have no stroke");
-        assert.strictEqual(arcOutlinePaths.style("fill"), "none", "outline paths have no fill");
-        svg.remove();
-      });
-
-      it("draws slices proportional in angle to their value", () => {
-        let arcPaths = piePlot.content().selectAll(".arc.fill");
-        assert.lengthOf(arcPaths[0], 2, "only has two sectors");
-        let arcPath0 = d3.select(arcPaths[0][0]);
-        let pathPoints0 = TestMethods.normalizePath(arcPath0.attr("d")).split(/[A-Z]/).slice(1, 4);
-
-        let firstPathPoints0 = pathPoints0[0].split(",");
-        assert.closeTo(parseFloat(firstPathPoints0[0]), 0, 1, "draws line vertically at beginning");
-        assert.operator(parseFloat(firstPathPoints0[1]), "<", 0, "draws line upwards");
-
-        let arcDestPoint0 = pathPoints0[1].split(",").slice(5);
-        assert.operator(parseFloat(arcDestPoint0[0]), ">", 0, "arcs line to the right");
-        assert.closeTo(parseFloat(arcDestPoint0[1]), 0, 1, "ends on same level of svg");
-
-        let secondPathPoints0 = pathPoints0[2].split(",");
-        assert.closeTo(parseFloat(secondPathPoints0[0]), 0, 1, "draws line to origin");
-        assert.closeTo(parseFloat(secondPathPoints0[1]), 0, 1, "draws line to origin");
-
-        let arcPath1 = d3.select(arcPaths[0][1]);
-        let pathPoints1 = TestMethods.normalizePath(arcPath1.attr("d")).split(/[A-Z]/).slice(1, 4);
-
-        let firstPathPoints1 = pathPoints1[0].split(",");
-        assert.operator(parseFloat(firstPathPoints1[0]), ">", 0, "draws line to the right");
-        assert.closeTo(parseFloat(firstPathPoints1[1]), 0, 1, "draws line horizontally");
-
-        let arcDestPoint1 = pathPoints1[1].split(",").slice(5);
-        assert.closeTo(parseFloat(arcDestPoint1[0]), 0, 1, "ends at x origin");
-        assert.operator(parseFloat(arcDestPoint1[1]), "<", 0, "ends above 0");
-
-        let secondPathPoints1 = pathPoints1[2].split(",");
-        assert.closeTo(parseFloat(secondPathPoints1[0]), 0, 1, "draws line to origin");
-        assert.closeTo(parseFloat(secondPathPoints1[1]), 0, 1, "draws line to origin");
-        svg.remove();
-      });
-
-      it("uses a plottable-colors color scale to color sectors by default", () => {
-        let arcPaths = piePlot.content().selectAll(".arc");
-
-        let arcPath0 = d3.select(arcPaths[0][0]);
-        assert.strictEqual(arcPath0.attr("fill"), "#5279c7", "first sector filled appropriately");
-
-        let arcPath1 = d3.select(arcPaths[0][1]);
-        assert.strictEqual(arcPath1.attr("fill"), "#fd373e", "second sector filled appropriately");
-        svg.remove();
-      });
-
-      it("updates slices when data changes", () => {
-        let originalPathStrings: String[] = [];
-        piePlot.content().selectAll("path").each(function() { originalPathStrings.push(d3.select(this).attr("d")); });
-        assert.lengthOf(originalPathStrings, simpleData.length * 2, "2 paths per datum");
-
-        let oneMoreSliceData = simpleData.slice();
-        oneMoreSliceData.push({ value: 5 });
-        simpleDataset.data(oneMoreSliceData);
-
-        let oneMoreSlicePathStrings: String[] = [];
-        piePlot.content().selectAll("path").each(function() { oneMoreSlicePathStrings.push(d3.select(this).attr("d")); });
-        assert.lengthOf(oneMoreSlicePathStrings, oneMoreSliceData.length * 2, "2 paths per datum");
-
-        originalPathStrings.forEach((pathString, index) => {
-          assert.notStrictEqual(pathString, oneMoreSlicePathStrings[index], "slices were updated when data changed");
-        });
-        svg.remove();
-      });
-
-      it("can set innerRadius", () => {
-        let expectedInnerRadius = 5;
-        piePlot.innerRadius(expectedInnerRadius);
-        let arcPaths = piePlot.content().selectAll(".arc.fill");
-        assert.lengthOf(arcPaths[0], 2, "only has two sectors");
-
-        let pathPoints0 = TestMethods.normalizePath(d3.select(arcPaths[0][0]).attr("d")).split(/[A-Z]/).slice(1, 5);
-
-        let radiusPath0 = pathPoints0[2].split(",").map((coordinate: string) => parseFloat(coordinate));
-        assert.closeTo(radiusPath0[0], expectedInnerRadius, 1, "stops line at innerRadius point");
-        assert.closeTo(radiusPath0[1], 0, 1, "stops line at innerRadius point");
-
-        let innerArcPath0 = pathPoints0[3].split(",").map((coordinate: string) => parseFloat(coordinate));
-        assert.closeTo(innerArcPath0[0], expectedInnerRadius, 1, "makes inner arc of correct radius");
-        assert.closeTo(innerArcPath0[1], expectedInnerRadius, 1, "makes inner arc of correct radius");
-        assert.closeTo(innerArcPath0[5], 0, 1, "make inner arc to center");
-        assert.closeTo(innerArcPath0[6], -expectedInnerRadius, 1, "makes inner arc to top of inner circle");
-
-        svg.remove();
-      });
-
-      it("can set outerRadius", () => {
-        let expectedOuterRadius = 150;
-        piePlot.outerRadius(() => expectedOuterRadius);
-        let arcPaths = piePlot.content().selectAll(".arc.fill");
-        assert.lengthOf(arcPaths[0], 2, "only has two sectors");
-
-        let pathPoints0 = TestMethods.normalizePath(d3.select(arcPaths[0][0]).attr("d")).split(/[A-Z]/).slice(1, 5);
-
-        let radiusPath0 = pathPoints0[0].split(",").map((coordinate: string) => parseFloat(coordinate));
-        assert.closeTo(radiusPath0[0], 0, 1, "starts at outerRadius point");
-        assert.closeTo(radiusPath0[1], -expectedOuterRadius, 1, "starts at outerRadius point");
-
-        let outerArcPath0 = pathPoints0[1].split(",").map((coordinate: string) => parseFloat(coordinate));
-        assert.closeTo(outerArcPath0[0], expectedOuterRadius, 1, "makes outer arc of correct radius");
-        assert.closeTo(outerArcPath0[1], expectedOuterRadius, 1, "makes outer arc of correct radius");
-        assert.closeTo(outerArcPath0[5], expectedOuterRadius, 1, "makes outer arc to right edge");
-        assert.closeTo(outerArcPath0[6], 0, 1, "makes outer arc to right edge");
-
         svg.remove();
       });
     });
