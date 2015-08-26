@@ -3,10 +3,10 @@
 describe("InterpolatedColorLegend", () => {
   let svg: d3.Selection<void>;
   let colorScale: Plottable.Scales.InterpolatedColor;
-  let SVG_HEIGNT = 400;
+  let SVG_HEIGHT = 400;
   let SVG_WIDTH = 400;
   beforeEach(() => {
-    svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGNT);
+    svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
     colorScale = new Plottable.Scales.InterpolatedColor();
   });
 
@@ -22,7 +22,7 @@ describe("InterpolatedColorLegend", () => {
                        colorScale.scale(scaleDomain[1]),
                        "last swatch's color corresponds with second domain value");
     let defaultNumSwatches = (<any> Plottable.Components.InterpolatedColorLegend)._DEFAULT_NUM_SWATCHES;
-    assert.isTrue(swatches.size() >= defaultNumSwatches, "there are at least 10 swatches");
+    assert.operator(swatches.size(), ">=", defaultNumSwatches, "there are at least 11 swatches");
 
     let swatchContainer = legendElement.select(".swatch-container");
     let swatchContainerBCR = (<Element> swatchContainer.node()).getBoundingClientRect();
@@ -99,6 +99,18 @@ describe("InterpolatedColorLegend", () => {
     assert.operator(upperLabelBCR.left, "<=", swatchContainerBCR.left, "second label to left of swatches");
     assert.operator(upperLabelBCR.bottom, "<=", lowerLabelBCR.top, "lower label is drawn below upper label");
 
+    svg.remove();
+  });
+
+  it("does not crash when font-size is 0px", () => {
+    let legend = new Plottable.Components.InterpolatedColorLegend(colorScale);
+    legend.renderTo(svg);
+    let style = (<any> legend)._element.append("style");
+    style.attr("type", "text/css");
+    style.text(".plottable .legend { font-size: 0px; }");
+    assert.doesNotThrow(() => legend.expands(true), Error, "it does not throw error when font-size is 0px");
+
+    style.remove();
     svg.remove();
   });
 
@@ -239,7 +251,7 @@ describe("InterpolatedColorLegend", () => {
     legend.orientation("left");
     legend.expands(true);
     legend.renderTo(svg);
-    assert.strictEqual(legend.height(), SVG_HEIGNT, "legend height is the same as svg height");
+    assert.strictEqual(legend.height(), SVG_HEIGHT, "legend height is the same as svg height");
     svg.remove();
   });
 
@@ -260,7 +272,7 @@ describe("InterpolatedColorLegend", () => {
       let numSwatches = legend.content().selectAll(".swatch").size();
       legend.expands(true);
       let newNumSwatches = legend.content().selectAll(".swatch").size();
-      assert.isTrue(newNumSwatches > numSwatches, `there are more swatches when expanded (orientation: ${orientation})`);
+      assert.operator(newNumSwatches, ">", numSwatches, `there are more swatches when expanded (orientation: ${orientation})`);
     });
     svg.remove();
   });

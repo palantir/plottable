@@ -5533,6 +5533,9 @@ var Plottable;
                 var numSwatches = InterpolatedColorLegend._DEFAULT_NUM_SWATCHES;
                 if (this.expands()) {
                     var textHeight = this._measurer.measure().height;
+                    if (textHeight === 0) {
+                        return this;
+                    }
                     var offset = this._isVertical() ? 2 * padding : 4 * padding - text0Width - text1Width;
                     var fullLength = this._isVertical() ? this.height() : this.width();
                     numSwatches = Math.max(Math.floor((fullLength - offset) / textHeight), numSwatches);
@@ -5598,7 +5601,7 @@ var Plottable;
                 });
                 return this;
             };
-            InterpolatedColorLegend._DEFAULT_NUM_SWATCHES = 10;
+            InterpolatedColorLegend._DEFAULT_NUM_SWATCHES = 11;
             /**
              * The css class applied to the legend labels.
              */

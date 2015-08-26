@@ -3,7 +3,7 @@
 module Plottable {
 export module Components {
   export class InterpolatedColorLegend extends Component {
-    private static _DEFAULT_NUM_SWATCHES = 10;
+    private static _DEFAULT_NUM_SWATCHES = 11;
 
     private _measurer: SVGTypewriter.Measurers.Measurer;
     private _wrapper: SVGTypewriter.Wrappers.Wrapper;
@@ -230,6 +230,9 @@ export module Components {
 
       if (this.expands()) {
         let textHeight = this._measurer.measure().height;
+        if (textHeight === 0) {
+          return this;
+        }
         let offset = this._isVertical() ? 2 * padding :  4 * padding - text0Width - text1Width;
         let fullLength = this._isVertical() ? this.height() : this.width();
         numSwatches = Math.max(Math.floor((fullLength - offset) / textHeight), numSwatches);
