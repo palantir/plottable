@@ -2,6 +2,7 @@
 
 module Plottable {
 export module Components {
+  enum PropertyMode { VALUE, PIXEL };
   export class SelectionBoxLayer extends Component {
     protected _box: d3.Selection<void>;
     private _boxArea: d3.Selection<void>;
@@ -10,29 +11,23 @@ export module Components {
       topLeft: { x: 0, y: 0 },
       bottomRight: { x: 0, y: 0 }
     };
-    private _boxLeftDataValue: number | { valueOf(): number };
-    private _boxRightDataValue: number | { valueOf(): number };
-    private _boxTopDataValue: number | { valueOf(): number };
-    private _boxBottomDataValue: number | { valueOf(): number };
+    private _xExtent: [number | { valueOf(): number }, number | { valueOf(): number }];
+    private _yExtent: [number | { valueOf(): number }, number | { valueOf(): number }];
     private _xScale: QuantitativeScale<number | { valueOf(): number }>;
     private _yScale: QuantitativeScale<number | { valueOf(): number }>;
     private _adjustBoundsCallback: ScaleCallback<QuantitativeScale<number | { valueOf(): number }>>;
+    private _xBoundsMode = PropertyMode.VALUE;
+    private _yBoundsMode = PropertyMode.VALUE;
 
     constructor() {
       super();
       this.addClass("selection-box-layer");
       this._adjustBoundsCallback = () => {
-        this.bounds({
-          topLeft: {
-            x: this._xScale ? this._xScale.scale(this._boxLeftDataValue) : this._boxBounds.topLeft.x,
-            y: this._yScale ? this._yScale.scale(this._boxTopDataValue) : this._boxBounds.topLeft.y
-          },
-          bottomRight: {
-            x: this._xScale ? this._xScale.scale(this._boxRightDataValue) : this._boxBounds.bottomRight.x,
-            y: this._yScale ? this._yScale.scale(this._boxBottomDataValue) : this._boxBounds.bottomRight.y
-          }
-        });
+        this._syncPixelPositionAndValue();
+        this.render();
       };
+      this._xExtent = [undefined, undefined];
+      this._yExtent = [undefined, undefined];
     }
 
     protected _setup() {
@@ -66,6 +61,9 @@ export module Components {
       }
 
       this._setBounds(newBounds);
+      this._xBoundsMode = PropertyMode.PIXEL;
+      this._yBoundsMode = PropertyMode.PIXEL;
+      this._syncPixelPositionAndValue();
       this.render();
       return this;
     }
@@ -83,11 +81,53 @@ export module Components {
         topLeft: topLeft,
         bottomRight: bottomRight
       };
-      this._bindBoxDataValues();
+    }
+
+    // sets pixelPosition() or value() based on the other, depending on which was the last one set
+    private _syncPixelPositionAndValue() {
+      if (this._xScale != null) {
+        if (this._xBoundsMode === PropertyMode.VALUE && this._xExtent[0] != null
+            && this._xExtent[1] != null) {
+          let topLeft = {
+            x: this._xScale.scale(this._xExtent[0]),
+            y: this.bounds().topLeft.y
+          };
+          let bottomRight = {
+            x: this._xScale.scale(this._xExtent[1]),
+            y: this.bounds().bottomRight.y
+          };
+          this._setBounds({
+            topLeft: topLeft,
+            bottomRight: bottomRight
+          });
+        } else if (this._xBoundsMode === PropertyMode.PIXEL) {
+          this._xExtent = [this._xScale.invert(this.bounds().topLeft.x), this._xScale.invert(this.bounds().bottomRight.x)];
+        }
+      }
+      if (this._yScale != null) {
+        if (this._yBoundsMode === PropertyMode.VALUE && this._yExtent[0] != null
+            && this._yExtent[1] != null) {
+          let topLeft = {
+            x: this.bounds().topLeft.x,
+            y: this._yScale.scale(this._yExtent[0])
+          };
+          let bottomRight = {
+            x: this.bounds().bottomRight.x,
+            y: this._yScale.scale(this._yExtent[1])
+          };
+          this._setBounds({
+            topLeft: topLeft,
+            bottomRight: bottomRight
+          });
+        } else if (this._yBoundsMode === PropertyMode.PIXEL) {
+          this._yExtent = [this._yScale.invert(this.bounds().topLeft.y), this._yScale.invert(this.bounds().bottomRight.y)];
+        }
+      }
     }
 
     public renderImmediately() {
       if (this._boxVisible) {
+        this._syncPixelPositionAndValue();
         let t = this._boxBounds.topLeft.y;
         let b = this._boxBounds.bottomRight.y;
         let l = this._boxBounds.topLeft.x;
@@ -151,7 +191,8 @@ export module Components {
       }
       this._xScale = xScale;
       this._xScale.onUpdate(this._adjustBoundsCallback);
-      this._bindBoxDataValues();
+      this._syncPixelPositionAndValue();
+      this.render();
       return this;
     }
 
@@ -174,7 +215,8 @@ export module Components {
       }
       this._yScale = yScale;
       this._yScale.onUpdate(this._adjustBoundsCallback);
-      this._bindBoxDataValues();
+      this._syncPixelPositionAndValue();
+      this.render();
       return this;
     }
 
@@ -183,9 +225,21 @@ export module Components {
      *
      * Returns an undefined array if the edges are not backed by a scale.
      */
-    public xExtent(): (number | { valueOf(): number })[] {
+    public xExtent(): (number | { valueOf(): number })[];
+    /**
+     * Sets the data values backing the left and right edges of the box.
+     */
+    public xExtent(xExtent: (number | { valueOf(): number })[]): SelectionBoxLayer;
+    public xExtent(xExtent?: (number | { valueOf(): number })[]): any {
       // Explicit typing for Typescript 1.4
-      return [this._boxLeftDataValue, this._boxRightDataValue];
+      if (xExtent == null) {
+        return this._xExtent;
+      }
+      this._xExtent = [xExtent[0], xExtent[1]];
+      this._xBoundsMode = PropertyMode.VALUE;
+      this._syncPixelPositionAndValue();
+      this.render();
+      return this;
     }
 
     /**
@@ -193,16 +247,21 @@ export module Components {
      *
      * Returns an undefined array if the edges are not backed by a scale.
      */
-    public yExtent(): (number | { valueOf(): number })[] {
+    public yExtent(): (number | { valueOf(): number })[];
+    /**
+     * Sets the data values backing the top and bottom edges of the box.
+     */
+    public yExtent(yExtent: (number | { valueOf(): number })[]): SelectionBoxLayer;
+    public yExtent(yExtent?: (number | { valueOf(): number })[]): any {
       // Explicit typing for Typescript 1.4
-      return [this._boxTopDataValue, this._boxBottomDataValue];
-    }
-
-    private _bindBoxDataValues() {
-      this._boxLeftDataValue = this._xScale ? this._xScale.invert(this._boxBounds.topLeft.x) : null;
-      this._boxTopDataValue = this._yScale ? this._yScale.invert(this._boxBounds.topLeft.y) : null;
-      this._boxRightDataValue = this._xScale ? this._xScale.invert(this._boxBounds.bottomRight.x) : null;
-      this._boxBottomDataValue = this._yScale ? this._yScale.invert(this._boxBounds.bottomRight.y) : null;
+      if (yExtent == null) {
+        return this._yExtent;
+      }
+      this._yExtent = [yExtent[0], yExtent[1]];
+      this._yBoundsMode = PropertyMode.VALUE;
+      this._syncPixelPositionAndValue();
+      this.render();
+      return this;
     }
 
     public destroy() {
@@ -213,6 +272,17 @@ export module Components {
       if (this._yScale != null) {
         this.yScale().offUpdate(this._adjustBoundsCallback);
       }
+    }
+
+    protected _setBoundsWithoutChangingMode(bounds: Bounds) {
+      this._setBounds(bounds);
+      if (this._xScale != null) {
+        this._xExtent = [this._xScale.invert(this._boxBounds.topLeft.x), this._xScale.invert(this._boxBounds.bottomRight.x)];
+      }
+      if (this._yScale != null) {
+        this._yExtent = [this._yScale.invert(this._boxBounds.topLeft.y), this._yScale.invert(this._boxBounds.bottomRight.y)];
+      }
+      this.render();
     }
   }
 }

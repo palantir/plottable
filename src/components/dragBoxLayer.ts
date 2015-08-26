@@ -87,7 +87,7 @@ export module Components {
           mode = DRAG_MODES.move;
         } else {
           mode = DRAG_MODES.newBox;
-          this.bounds({
+          this._setBoundsWithoutChangingMode({
             topLeft: startPoint,
             bottomRight: startPoint
           });
@@ -132,7 +132,7 @@ export module Components {
             break;
         }
 
-        this.bounds({
+        this._setBoundsWithoutChangingMode({
           topLeft: topLeft,
           bottomRight: bottomRight
         });

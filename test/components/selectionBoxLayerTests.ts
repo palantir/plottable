@@ -118,18 +118,7 @@ describe("Interactive Components", () => {
         assert.strictEqual(sbl.xScale(), xScale, "The getter returns the correct scale");
         sbl.renderTo(svg);
 
-        let topLeft: Plottable.Point = {
-          x: 0,
-          y: 0
-        };
-        let bottomRight: Plottable.Point = {
-          x: 250,
-          y: 300
-        };
-        sbl.bounds({
-          topLeft: topLeft,
-          bottomRight: bottomRight
-        });
+        sbl.xExtent([0, 1000]);
 
         sbl.boxVisible(true);
         let selectionBox = svg.select(".selection-area");
@@ -184,18 +173,7 @@ describe("Interactive Components", () => {
 
         sbl.renderTo(svg);
 
-        let topLeft: Plottable.Point = {
-          x: 0,
-          y: 0
-        };
-        let bottomRight: Plottable.Point = {
-          x: 250,
-          y: 300
-        };
-        sbl.bounds({
-          topLeft: topLeft,
-          bottomRight: bottomRight
-        });
+        sbl.yExtent([0, 1000]);
 
         sbl.boxVisible(true);
         let selectionBox = svg.select(".selection-area");

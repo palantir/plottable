@@ -2432,6 +2432,12 @@ declare module Plottable {
                 valueOf(): number;
             })[];
             /**
+             * Sets the data values backing the left and right edges of the box.
+             */
+            xExtent(xExtent: (number | {
+                valueOf(): number;
+            })[]): SelectionBoxLayer;
+            /**
              * Gets the data values backing the top and bottom edges of the box.
              *
              * Returns an undefined array if the edges are not backed by a scale.
@@ -2439,7 +2445,14 @@ declare module Plottable {
             yExtent(): (number | {
                 valueOf(): number;
             })[];
+            /**
+             * Sets the data values backing the top and bottom edges of the box.
+             */
+            yExtent(yExtent: (number | {
+                valueOf(): number;
+            })[]): SelectionBoxLayer;
             destroy(): void;
+            protected _setBoundsWithoutChangingMode(bounds: Bounds): void;
         }
     }
 }
@@ -4465,6 +4478,9 @@ declare module Plottable {
             yExtent(): (number | {
                 valueOf(): number;
             })[];
+            yExtent(yExtent: (number | {
+                valueOf(): number;
+            })[]): SelectionBoxLayer;
         }
     }
 }
@@ -4492,6 +4508,9 @@ declare module Plottable {
             xExtent(): (number | {
                 valueOf(): number;
             })[];
+            xExtent(xExtent: (number | {
+                valueOf(): number;
+            })[]): SelectionBoxLayer;
         }
     }
 }

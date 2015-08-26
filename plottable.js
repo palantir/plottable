@@ -6110,6 +6110,12 @@ var Plottable;
 (function (Plottable) {
     var Components;
     (function (Components) {
+        var PropertyMode;
+        (function (PropertyMode) {
+            PropertyMode[PropertyMode["VALUE"] = 0] = "VALUE";
+            PropertyMode[PropertyMode["PIXEL"] = 1] = "PIXEL";
+        })(PropertyMode || (PropertyMode = {}));
+        ;
         var SelectionBoxLayer = (function (_super) {
             __extends(SelectionBoxLayer, _super);
             function SelectionBoxLayer() {
@@ -6120,19 +6126,15 @@ var Plottable;
                     topLeft: { x: 0, y: 0 },
                     bottomRight: { x: 0, y: 0 }
                 };
+                this._xBoundsMode = PropertyMode.VALUE;
+                this._yBoundsMode = PropertyMode.VALUE;
                 this.addClass("selection-box-layer");
                 this._adjustBoundsCallback = function () {
-                    _this.bounds({
-                        topLeft: {
-                            x: _this._xScale ? _this._xScale.scale(_this._boxLeftDataValue) : _this._boxBounds.topLeft.x,
-                            y: _this._yScale ? _this._yScale.scale(_this._boxTopDataValue) : _this._boxBounds.topLeft.y
-                        },
-                        bottomRight: {
-                            x: _this._xScale ? _this._xScale.scale(_this._boxRightDataValue) : _this._boxBounds.bottomRight.x,
-                            y: _this._yScale ? _this._yScale.scale(_this._boxBottomDataValue) : _this._boxBounds.bottomRight.y
-                        }
-                    });
+                    _this._syncPixelPositionAndValue();
+                    _this.render();
                 };
+                this._xExtent = [undefined, undefined];
+                this._yExtent = [undefined, undefined];
             }
             SelectionBoxLayer.prototype._setup = function () {
                 _super.prototype._setup.call(this);
@@ -6150,6 +6152,9 @@ var Plottable;
                     return this._boxBounds;
                 }
                 this._setBounds(newBounds);
+                this._xBoundsMode = PropertyMode.PIXEL;
+                this._yBoundsMode = PropertyMode.PIXEL;
+                this._syncPixelPositionAndValue();
                 this.render();
                 return this;
             };
@@ -6166,10 +6171,53 @@ var Plottable;
                     topLeft: topLeft,
                     bottomRight: bottomRight
                 };
-                this._bindBoxDataValues();
+            };
+            // sets pixelPosition() or value() based on the other, depending on which was the last one set
+            SelectionBoxLayer.prototype._syncPixelPositionAndValue = function () {
+                if (this._xScale != null) {
+                    if (this._xBoundsMode === PropertyMode.VALUE && this._xExtent[0] != null
+                        && this._xExtent[1] != null) {
+                        var topLeft = {
+                            x: this._xScale.scale(this._xExtent[0]),
+                            y: this.bounds().topLeft.y
+                        };
+                        var bottomRight = {
+                            x: this._xScale.scale(this._xExtent[1]),
+                            y: this.bounds().bottomRight.y
+                        };
+                        this._setBounds({
+                            topLeft: topLeft,
+                            bottomRight: bottomRight
+                        });
+                    }
+                    else if (this._xBoundsMode === PropertyMode.PIXEL) {
+                        this._xExtent = [this._xScale.invert(this.bounds().topLeft.x), this._xScale.invert(this.bounds().bottomRight.x)];
+                    }
+                }
+                if (this._yScale != null) {
+                    if (this._yBoundsMode === PropertyMode.VALUE && this._yExtent[0] != null
+                        && this._yExtent[1] != null) {
+                        var topLeft = {
+                            x: this.bounds().topLeft.x,
+                            y: this._yScale.scale(this._yExtent[0])
+                        };
+                        var bottomRight = {
+                            x: this.bounds().bottomRight.x,
+                            y: this._yScale.scale(this._yExtent[1])
+                        };
+                        this._setBounds({
+                            topLeft: topLeft,
+                            bottomRight: bottomRight
+                        });
+                    }
+                    else if (this._yBoundsMode === PropertyMode.PIXEL) {
+                        this._yExtent = [this._yScale.invert(this.bounds().topLeft.y), this._yScale.invert(this.bounds().bottomRight.y)];
+                    }
+                }
             };
             SelectionBoxLayer.prototype.renderImmediately = function () {
                 if (this._boxVisible) {
+                    this._syncPixelPositionAndValue();
                     var t = this._boxBounds.topLeft.y;
                     var b = this._boxBounds.bottomRight.y;
                     var l = this._boxBounds.topLeft.x;
@@ -6207,7 +6255,8 @@ var Plottable;
                 }
                 this._xScale = xScale;
                 this._xScale.onUpdate(this._adjustBoundsCallback);
-                this._bindBoxDataValues();
+                this._syncPixelPositionAndValue();
+                this.render();
                 return this;
             };
             SelectionBoxLayer.prototype.yScale = function (yScale) {
@@ -6219,32 +6268,31 @@ var Plottable;
                 }
                 this._yScale = yScale;
                 this._yScale.onUpdate(this._adjustBoundsCallback);
-                this._bindBoxDataValues();
+                this._syncPixelPositionAndValue();
+                this.render();
                 return this;
             };
-            /**
-             * Gets the data values backing the left and right edges of the box.
-             *
-             * Returns an undefined array if the edges are not backed by a scale.
-             */
-            SelectionBoxLayer.prototype.xExtent = function () {
+            SelectionBoxLayer.prototype.xExtent = function (xExtent) {
                 // Explicit typing for Typescript 1.4
-                return [this._boxLeftDataValue, this._boxRightDataValue];
+                if (xExtent == null) {
+                    return this._xExtent;
+                }
+                this._xExtent = [xExtent[0], xExtent[1]];
+                this._xBoundsMode = PropertyMode.VALUE;
+                this._syncPixelPositionAndValue();
+                this.render();
+                return this;
             };
-            /**
-             * Gets the data values backing the top and bottom edges of the box.
-             *
-             * Returns an undefined array if the edges are not backed by a scale.
-             */
-            SelectionBoxLayer.prototype.yExtent = function () {
+            SelectionBoxLayer.prototype.yExtent = function (yExtent) {
                 // Explicit typing for Typescript 1.4
-                return [this._boxTopDataValue, this._boxBottomDataValue];
-            };
-            SelectionBoxLayer.prototype._bindBoxDataValues = function () {
-                this._boxLeftDataValue = this._xScale ? this._xScale.invert(this._boxBounds.topLeft.x) : null;
-                this._boxTopDataValue = this._yScale ? this._yScale.invert(this._boxBounds.topLeft.y) : null;
-                this._boxRightDataValue = this._xScale ? this._xScale.invert(this._boxBounds.bottomRight.x) : null;
-                this._boxBottomDataValue = this._yScale ? this._yScale.invert(this._boxBounds.bottomRight.y) : null;
+                if (yExtent == null) {
+                    return this._yExtent;
+                }
+                this._yExtent = [yExtent[0], yExtent[1]];
+                this._yBoundsMode = PropertyMode.VALUE;
+                this._syncPixelPositionAndValue();
+                this.render();
+                return this;
             };
             SelectionBoxLayer.prototype.destroy = function () {
                 _super.prototype.destroy.call(this);
@@ -6254,6 +6302,16 @@ var Plottable;
                 if (this._yScale != null) {
                     this.yScale().offUpdate(this._adjustBoundsCallback);
                 }
+            };
+            SelectionBoxLayer.prototype._setBoundsWithoutChangingMode = function (bounds) {
+                this._setBounds(bounds);
+                if (this._xScale != null) {
+                    this._xExtent = [this._xScale.invert(this._boxBounds.topLeft.x), this._xScale.invert(this._boxBounds.bottomRight.x)];
+                }
+                if (this._yScale != null) {
+                    this._yExtent = [this._yScale.invert(this._boxBounds.topLeft.y), this._yScale.invert(this._boxBounds.bottomRight.y)];
+                }
+                this.render();
             };
             return SelectionBoxLayer;
         })(Plottable.Component);
@@ -11484,7 +11542,7 @@ var Plottable;
                     }
                     else {
                         mode = DRAG_MODES.newBox;
-                        _this.bounds({
+                        _this._setBoundsWithoutChangingMode({
                             topLeft: startPoint,
                             bottomRight: startPoint
                         });
@@ -11527,7 +11585,7 @@ var Plottable;
                             lastEndPoint = endPoint;
                             break;
                     }
-                    _this.bounds({
+                    _this._setBoundsWithoutChangingMode({
                         topLeft: topLeft,
                         bottomRight: bottomRight
                     });
@@ -11777,7 +11835,7 @@ var Plottable;
             }
             XDragBoxLayer.prototype.computeLayout = function (origin, availableWidth, availableHeight) {
                 _super.prototype.computeLayout.call(this, origin, availableWidth, availableHeight);
-                this.bounds(this.bounds()); // set correct bounds when width/height changes
+                this._setBoundsWithoutChangingMode(this.bounds()); // set correct bounds when width/height changes
                 return this;
             };
             XDragBoxLayer.prototype._setBounds = function (newBounds) {
@@ -11800,7 +11858,7 @@ var Plottable;
                 }
                 throw new Error("yScales cannot be set on an XDragBoxLayer");
             };
-            XDragBoxLayer.prototype.yExtent = function () {
+            XDragBoxLayer.prototype.yExtent = function (yExtent) {
                 throw new Error("XDragBoxLayer has no yExtent");
             };
             return XDragBoxLayer;
@@ -11835,7 +11893,7 @@ var Plottable;
             }
             YDragBoxLayer.prototype.computeLayout = function (origin, availableWidth, availableHeight) {
                 _super.prototype.computeLayout.call(this, origin, availableWidth, availableHeight);
-                this.bounds(this.bounds()); // set correct bounds when width/height changes
+                this._setBoundsWithoutChangingMode(this.bounds()); // set correct bounds when width/height changes
                 return this;
             };
             YDragBoxLayer.prototype._setBounds = function (newBounds) {
@@ -11858,7 +11916,7 @@ var Plottable;
                 }
                 throw new Error("xScales cannot be set on an YDragBoxLayer");
             };
-            YDragBoxLayer.prototype.xExtent = function () {
+            YDragBoxLayer.prototype.xExtent = function (xExtent) {
                 throw new Error("YDragBoxLayer has no xExtent");
             };
             return YDragBoxLayer;
