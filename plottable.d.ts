@@ -3655,10 +3655,38 @@ declare module Plottable {
              * @returns {Wheel} The calling Wheel Plot.
              */
             outerRadius(outerRadius: number | Accessor<number>): Plots.Wheel<R, T>;
+            /**
+             * Gets the Accessor for labels.
+             *
+             * @returns {Accessor<string>}
+             */
+            label(): Accessor<string>;
+            /**
+             * Sets the text of labels to the result of an Accessor.
+             *
+             * @param {Accessor<string>} label
+             * @returns {Plots.Wheel} The calling Wheel Plot.
+             */
+            label(label: Accessor<string>): Plots.Wheel<R, T>;
+            /**
+             * Gets whether labels are enabled.
+             *
+             * @returns {boolean}
+             */
+            labelsEnabled(): boolean;
+            /**
+             * Sets whether labels are enabled.
+             * Labels too big to be contained in the sector or cut off by edges will not be shown.
+             *
+             * @param {boolean} labelsEnabled
+             * @returns {Wheel} The calling Wheel Plot.
+             */
+            labelsEnabled(enabled: boolean): Plots.Wheel<R, T>;
             protected _pixelPoint(datum: any, index: number, dataset: Dataset): {
                 x: number;
                 y: number;
             };
+            protected _additionalPaint(time: number): void;
         }
     }
 }

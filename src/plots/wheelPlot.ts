@@ -8,6 +8,8 @@ export module Plots {
     private static _OUTER_RADIUS_KEY = "outer-radius";
     private static _START_ANGLE_KEY = "start-angle";
     private static _END_ANGLE_KEY = "end-angle";
+    private _labelsEnabled = false;
+    private _label: Accessor<string> = null;
 
     /**
      * @constructor
@@ -212,6 +214,53 @@ export module Plots {
       return this;
     }
 
+    /**
+     * Gets the Accessor for labels.
+     *
+     * @returns {Accessor<string>}
+     */
+    public label(): Accessor<string>;
+    /**
+     * Sets the text of labels to the result of an Accessor.
+     *
+     * @param {Accessor<string>} label
+     * @returns {Plots.Wheel} The calling Wheel Plot.
+     */
+    public label(label: Accessor<string>): Plots.Wheel<R, T>;
+    public label(label?: Accessor<string>): any {
+      if (label == null) {
+        return this._label;
+      }
+
+      this._label = label;
+      this.render();
+      return this;
+    }
+
+    /**
+     * Gets whether labels are enabled.
+     *
+     * @returns {boolean}
+     */
+    public labelsEnabled(): boolean;
+    /**
+     * Sets whether labels are enabled.
+     * Labels too big to be contained in the sector or cut off by edges will not be shown.
+     *
+     * @param {boolean} labelsEnabled
+     * @returns {Wheel} The calling Wheel Plot.
+     */
+    public labelsEnabled(enabled: boolean): Plots.Wheel<R, T>;
+    public labelsEnabled(enabled?: boolean): any {
+      if (enabled == null) {
+        return this._labelsEnabled;
+      } else {
+        this._labelsEnabled = enabled;
+        this.render();
+        return this;
+      }
+    }
+
     protected _pixelPoint(datum: any, index: number, dataset: Dataset) {
       let innerRadius = Plot._scaledAccessor(this.innerRadius())(datum, index, dataset);
       let outerRadius = Plot._scaledAccessor(this.outerRadius())(datum, index, dataset);
@@ -223,6 +272,94 @@ export module Plots {
       return { x: avgRadius * Math.sin(avgAngle), y: -avgRadius * Math.cos(avgAngle) };
     }
 
+    protected _additionalPaint(time: number) {
+      this._renderArea.selectAll(".label-area").remove();
+      if (this._labelsEnabled && this.label() != null) {
+        Utils.Window.setTimeout(() => this._drawLabels(), time);
+      }
+    }
+
+    private _drawLabels() {
+      this.datasets().forEach((dataset, i) => this._drawLabel(dataset));
+    }
+
+    private _pointInSector(p: Point, startAngle: number, endAngle: number, outerRadius: number, innerRadius: number) {
+      let pointRadius = Math.sqrt(Math.pow(p.x, 2) + Math.pow(p.y, 2));
+      let pointAngle = Math.acos(-p.y / pointRadius);
+      if (p.x < 0) {
+        pointAngle = Math.PI * 2 - pointAngle;
+      }
+
+      let angleInRange = false;
+      if (startAngle < endAngle) {
+        angleInRange = startAngle <= pointAngle && pointAngle <= endAngle;
+      } else if (startAngle === endAngle) {
+        angleInRange = true;
+      } else {
+        angleInRange = (startAngle <= pointAngle && pointAngle <= Math.PI * 2 ) || (0 <= pointAngle && pointAngle <= endAngle );
+      }
+      return angleInRange && Utils.Math.inRange(pointRadius, innerRadius, outerRadius);
+    }
+
+    private _drawLabel(dataset: Dataset) {
+      let attrToProjector = this._generateAttrToProjector();
+      let labelArea = this._renderArea.append("g").classed("label-area", true);
+      let measurer = new SVGTypewriter.Measurers.Measurer(labelArea);
+      let writer = new SVGTypewriter.Writers.Writer(measurer);
+
+      let scaledInnerRadiusAccessor = Plot._scaledAccessor(this.innerRadius());
+      let scaledOuterRadiusAccessor = Plot._scaledAccessor(this.outerRadius());
+      let scaledStartAngleAccessor = Plot._scaledAccessor(this.startAngle());
+      let scaledEndAngleAccessor = Plot._scaledAccessor(this.endAngle());
+      dataset.data().forEach((datum, datumIndex) => {
+        let label = "" + this.label()(datum, datumIndex, dataset);
+        let measurement = measurer.measure(label);
+
+        let startAngle = scaledStartAngleAccessor(datum, datumIndex, dataset);
+        let endAngle = scaledEndAngleAccessor(datum, datumIndex, dataset);
+        let outerRadius = scaledOuterRadiusAccessor(datum, datumIndex, dataset);
+        let innerRadius = scaledInnerRadiusAccessor(datum, datumIndex, dataset);
+        if (!Utils.Math.isValidNumber(startAngle) || !Utils.Math.isValidNumber(endAngle) ||
+            !Utils.Math.isValidNumber(innerRadius) || !Utils.Math.isValidNumber(outerRadius) || startAngle === endAngle) {
+          return;
+        }
+        startAngle = Utils.Math.degreesToRadians((((startAngle % 360) + 360) % 360));
+        endAngle =  Utils.Math.degreesToRadians((((endAngle % 360) + 360) % 360));
+        let theta = startAngle < endAngle ? (endAngle + startAngle) / 2 : (endAngle + startAngle + Math.PI * 2) / 2;
+        let labelRadius = (outerRadius + innerRadius) / 2;
+
+        let x = Math.sin(theta) * labelRadius - measurement.width / 2;
+        let y = -Math.cos(theta) * labelRadius - measurement.height / 2;
+
+        let corners = [
+          { x: x, y: y },
+          { x: x, y: y + measurement.height},
+          { x: x + measurement.width, y: y },
+          { x: x + measurement.width, y: y + measurement.height }
+        ];
+
+        let showLabel = corners.every((corner) => {
+          return Math.abs(corner.x) <= this.width() / 2 && Math.abs(corner.y) <= this.height() / 2 &&
+                 this._pointInSector(corner, startAngle, endAngle, innerRadius, outerRadius);
+        });
+        if (!showLabel) {
+          return;
+        }
+
+        let color = attrToProjector["fill"] == null ? "black" : attrToProjector["fill"](datum, datumIndex, dataset);
+        let dark = Utils.Color.contrast("white", color) * 1.6 < Utils.Color.contrast("black", color);
+        let g = labelArea.append("g").attr("transform", "translate(" + x + "," + y + ")");
+        let className = dark ? "dark-label" : "light-label";
+        g.classed(className, true);
+
+        writer.write(label, measurement.width, measurement.height, {
+          selection: g,
+          xAlign: "center",
+          yAlign: "center",
+          textRotation: 0
+        });
+      });
+    }
   }
 }
 }

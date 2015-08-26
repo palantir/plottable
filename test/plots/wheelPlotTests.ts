@@ -220,8 +220,6 @@ describe("Plots", () => {
     });
 
     describe("startAngle() and endAngle()", () => {
-      let SVG_WIDTH = 400;
-      let SVG_HEIGHT = 500;
       let svg: d3.Selection<void>;
       let wheelPlot: Plottable.Plots.Wheel<number, number>;
       let rScale: Plottable.Scales.Linear;
@@ -308,6 +306,132 @@ describe("Plots", () => {
         assert.isNull(wheelPlot.endAngle().scale, "scale of endAngle is set to null");
         svg.remove();
       });
+    });
+
+    describe("Labels", () => {
+      let svg: d3.Selection<void>;
+      let wheelPlot: Plottable.Plots.Wheel<number, number>;
+      let rScale: Plottable.Scales.Linear;
+      let data: any[];
+      let dataset: Plottable.Dataset;
+
+      beforeEach(() => {
+        svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+        rScale = new Plottable.Scales.Linear();
+        wheelPlot = new Plottable.Plots.Wheel();
+        wheelPlot.innerRadius((d) => d.r1, rScale);
+        wheelPlot.outerRadius((d) => d.r2);
+        wheelPlot.startAngle((d) => d.t1);
+        wheelPlot.endAngle((d) => d.t2);
+        wheelPlot.label((d) => d.val);
+        data = [
+          { r1: 0, r2: 1, t1: 0, t2: 180, val: "1" },
+          { r1: 1, r2: 2, t1: 180, t2: 360, val: "2" }];
+        dataset = new Plottable.Dataset(data);
+        wheelPlot.addDataset(dataset);
+      });
+
+      it("does not display labels by default", () => {
+        wheelPlot.renderTo(svg);
+        let texts = svg.selectAll("text")[0].map((n: any) => d3.select(n).text());
+        assert.lengthOf(texts, 0, "by default, no labels are drawn");
+        svg.remove();
+      });
+
+      it("renders correct text for the labels", () => {
+        wheelPlot.labelsEnabled(true);
+        wheelPlot.renderTo(svg);
+        let texts = svg.selectAll("text")[0].map((n: any) => d3.select(n).text());
+        assert.lengthOf(texts, 2, "all labels are drawn");
+        texts.forEach((text, i) => {
+          assert.strictEqual(text, data[i].val, "label is drawn correctly");
+        });
+        svg.remove();
+      });
+
+      it("does not erase or add labels when rendered twice", () => {
+        wheelPlot.labelsEnabled(true);
+        wheelPlot.renderTo(svg);
+        let labels = wheelPlot.content().selectAll("text");
+        assert.strictEqual(labels.size(), data.length, "one label per data entry");
+        wheelPlot.render();
+        labels = wheelPlot.content().selectAll("text");
+        assert.strictEqual(labels.size(), data.length, "one label per data entry after re-rendering");
+        svg.remove();
+      });
+
+      it("hides labels when there is not enough space", () => {
+        wheelPlot.labelsEnabled(true);
+        wheelPlot.label((d: any, i: number) => d.val + ( i !== 0 ? "a really really really long string" : "" ));
+        wheelPlot.renderTo(svg);
+        let texts = svg.selectAll("text")[0].map((n: any) => d3.select(n).text());
+        assert.lengthOf(texts, 1, "the second label is too long to be drawn");
+        assert.strictEqual(texts[0], "1");
+        svg.remove();
+      });
+
+      it("updates labels on dataset change", () => {
+        wheelPlot.labelsEnabled(true);
+        wheelPlot.renderTo(svg);
+        let texts = svg.selectAll("text")[0].map((n: any) => d3.select(n).text());
+        assert.lengthOf(texts, 2, "all labels are drawn");
+
+        let data2 = [{r1: 0, r2: 1, t1: 0, t2: 180, val: "5" }];
+        dataset.data(data2);
+        texts = svg.selectAll("text")[0].map((n: any) => d3.select(n).text());
+        assert.lengthOf(texts, 1, "new label is drawn");
+        assert.strictEqual(texts[0], "5");
+        svg.remove();
+      });
+
+      it("hides labels cut off by edges", () => {
+        wheelPlot.labelsEnabled(true);
+        wheelPlot.renderTo(svg);
+        let data = [
+          { r1: 0, r2: 1, t1: 0, t2: 360, val: "center" },
+          { r1: 1, r2: 3, t1: 45, t2: 135, val: "right" },
+          { r1: 1, r2: 3, t1: 135, t2: 225, val: "bottom" },
+          { r1: 1, r2: 3, t1: 225, t2: 315, val: "left" },
+          { r1: 1, r2: 3, t1: 315, t2: 45, val: "top" }];
+        dataset.data(data);
+        rScale.domain([0, 1.5]);
+
+        let texts = svg.selectAll("text")[0].map((n: any) => d3.select(n).text());
+        assert.lengthOf(texts, 1, "only one label is drawn");
+        assert.strictEqual(texts[0], "center");
+        svg.remove();
+      });
+
+      it("does not show labels for invalid data", () => {
+        let data = [
+          { r1: 0, r2: 1, t1: 0, t2: 180, val: "1" },
+          { r1: 1, r2: 2, t1: 180, t2: null, val: "2" },
+          { r1: 1, r2: 2, t1: NaN, t2: 360, val: "3" },
+          { r1: 1, r2: Infinity, t1: 180, t2: 360, val: "4" },
+          { r1: undefined, r2: 2, t1: 180, t2: 360, val: "5" },
+          { r1: 1, r2: 2, t1: 180, t2: 360, val: "6" }];
+        dataset.data(data);
+        wheelPlot.labelsEnabled(true);
+        wheelPlot.renderTo(svg);
+
+        let texts = svg.selectAll("text")[0].map((n: any) => d3.select(n).text());
+        assert.lengthOf(texts, 2, "One label is rendered for each valid of data");
+        assert.strictEqual(texts[0], "1", "Label for the first valid data is shown");
+        assert.strictEqual(texts[1], "6", "Label for the second valid data is shown");
+        svg.remove();
+      });
+
+      it("removes labels when they are disabled after rendering", () => {
+        wheelPlot.labelsEnabled(true);
+        wheelPlot.renderTo(svg);
+        let labels = wheelPlot.content().selectAll("text");
+        assert.strictEqual(labels.size(), data.length, "one label per datum");
+        wheelPlot.labelsEnabled(false);
+        labels = wheelPlot.content().selectAll("text");
+        assert.strictEqual(labels.size(), 0, "labels were removed");
+        svg.remove();
+      });
+
     });
   });
 

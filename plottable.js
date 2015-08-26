@@ -9791,6 +9791,8 @@ var Plottable;
              */
             function Wheel() {
                 _super.call(this);
+                this._labelsEnabled = false;
+                this._label = null;
                 this.addClass("wheel-plot");
             }
             Wheel.prototype.computeLayout = function (origin, availableWidth, availableHeight) {
@@ -9909,6 +9911,24 @@ var Plottable;
                 this.render();
                 return this;
             };
+            Wheel.prototype.label = function (label) {
+                if (label == null) {
+                    return this._label;
+                }
+                this._label = label;
+                this.render();
+                return this;
+            };
+            Wheel.prototype.labelsEnabled = function (enabled) {
+                if (enabled == null) {
+                    return this._labelsEnabled;
+                }
+                else {
+                    this._labelsEnabled = enabled;
+                    this.render();
+                    return this;
+                }
+            };
             Wheel.prototype._pixelPoint = function (datum, index, dataset) {
                 var innerRadius = Plottable.Plot._scaledAccessor(this.innerRadius())(datum, index, dataset);
                 var outerRadius = Plottable.Plot._scaledAccessor(this.outerRadius())(datum, index, dataset);
@@ -9917,6 +9937,88 @@ var Plottable;
                 var endAngle = Plottable.Plot._scaledAccessor(this.endAngle())(datum, index, dataset);
                 var avgAngle = Plottable.Utils.Math.degreesToRadians((startAngle + endAngle) / 2);
                 return { x: avgRadius * Math.sin(avgAngle), y: -avgRadius * Math.cos(avgAngle) };
+            };
+            Wheel.prototype._additionalPaint = function (time) {
+                var _this = this;
+                this._renderArea.selectAll(".label-area").remove();
+                if (this._labelsEnabled && this.label() != null) {
+                    Plottable.Utils.Window.setTimeout(function () { return _this._drawLabels(); }, time);
+                }
+            };
+            Wheel.prototype._drawLabels = function () {
+                var _this = this;
+                this.datasets().forEach(function (dataset, i) { return _this._drawLabel(dataset); });
+            };
+            Wheel.prototype._pointInSector = function (p, startAngle, endAngle, outerRadius, innerRadius) {
+                var pointRadius = Math.sqrt(Math.pow(p.x, 2) + Math.pow(p.y, 2));
+                var pointAngle = Math.acos(-p.y / pointRadius);
+                if (p.x < 0) {
+                    pointAngle = Math.PI * 2 - pointAngle;
+                }
+                var angleInRange = false;
+                if (startAngle < endAngle) {
+                    angleInRange = startAngle <= pointAngle && pointAngle <= endAngle;
+                }
+                else if (startAngle === endAngle) {
+                    angleInRange = true;
+                }
+                else {
+                    angleInRange = (startAngle <= pointAngle && pointAngle <= Math.PI * 2) || (0 <= pointAngle && pointAngle <= endAngle);
+                }
+                return angleInRange && Plottable.Utils.Math.inRange(pointRadius, innerRadius, outerRadius);
+            };
+            Wheel.prototype._drawLabel = function (dataset) {
+                var _this = this;
+                var attrToProjector = this._generateAttrToProjector();
+                var labelArea = this._renderArea.append("g").classed("label-area", true);
+                var measurer = new SVGTypewriter.Measurers.Measurer(labelArea);
+                var writer = new SVGTypewriter.Writers.Writer(measurer);
+                var scaledInnerRadiusAccessor = Plottable.Plot._scaledAccessor(this.innerRadius());
+                var scaledOuterRadiusAccessor = Plottable.Plot._scaledAccessor(this.outerRadius());
+                var scaledStartAngleAccessor = Plottable.Plot._scaledAccessor(this.startAngle());
+                var scaledEndAngleAccessor = Plottable.Plot._scaledAccessor(this.endAngle());
+                dataset.data().forEach(function (datum, datumIndex) {
+                    var label = "" + _this.label()(datum, datumIndex, dataset);
+                    var measurement = measurer.measure(label);
+                    var startAngle = scaledStartAngleAccessor(datum, datumIndex, dataset);
+                    var endAngle = scaledEndAngleAccessor(datum, datumIndex, dataset);
+                    var outerRadius = scaledOuterRadiusAccessor(datum, datumIndex, dataset);
+                    var innerRadius = scaledInnerRadiusAccessor(datum, datumIndex, dataset);
+                    if (!Plottable.Utils.Math.isValidNumber(startAngle) || !Plottable.Utils.Math.isValidNumber(endAngle) ||
+                        !Plottable.Utils.Math.isValidNumber(innerRadius) || !Plottable.Utils.Math.isValidNumber(outerRadius) || startAngle === endAngle) {
+                        return;
+                    }
+                    startAngle = Plottable.Utils.Math.degreesToRadians((((startAngle % 360) + 360) % 360));
+                    endAngle = Plottable.Utils.Math.degreesToRadians((((endAngle % 360) + 360) % 360));
+                    var theta = startAngle < endAngle ? (endAngle + startAngle) / 2 : (endAngle + startAngle + Math.PI * 2) / 2;
+                    var labelRadius = (outerRadius + innerRadius) / 2;
+                    var x = Math.sin(theta) * labelRadius - measurement.width / 2;
+                    var y = -Math.cos(theta) * labelRadius - measurement.height / 2;
+                    var corners = [
+                        { x: x, y: y },
+                        { x: x, y: y + measurement.height },
+                        { x: x + measurement.width, y: y },
+                        { x: x + measurement.width, y: y + measurement.height }
+                    ];
+                    var showLabel = corners.every(function (corner) {
+                        return Math.abs(corner.x) <= _this.width() / 2 && Math.abs(corner.y) <= _this.height() / 2 &&
+                            _this._pointInSector(corner, startAngle, endAngle, innerRadius, outerRadius);
+                    });
+                    if (!showLabel) {
+                        return;
+                    }
+                    var color = attrToProjector["fill"] == null ? "black" : attrToProjector["fill"](datum, datumIndex, dataset);
+                    var dark = Plottable.Utils.Color.contrast("white", color) * 1.6 < Plottable.Utils.Color.contrast("black", color);
+                    var g = labelArea.append("g").attr("transform", "translate(" + x + "," + y + ")");
+                    var className = dark ? "dark-label" : "light-label";
+                    g.classed(className, true);
+                    writer.write(label, measurement.width, measurement.height, {
+                        selection: g,
+                        xAlign: "center",
+                        yAlign: "center",
+                        textRotation: 0
+                    });
+                });
             };
             Wheel._INNER_RADIUS_KEY = "inner-radius";
             Wheel._OUTER_RADIUS_KEY = "outer-radius";
