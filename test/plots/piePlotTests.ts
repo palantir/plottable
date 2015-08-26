@@ -2,28 +2,6 @@
 
 describe("Plots", () => {
   describe("PiePlot", () => {
-    it("draws a fill path and a stroke path for each slice", () => {
-      let svg = TestMethods.generateSVG(500, 500);
-      let piePlot = new Plottable.Plots.Pie();
-      piePlot.sectorValue((d) => d.value);
-      let data = [
-        { value: 1 },
-        { value: 1 }
-      ];
-      let dataset = new Plottable.Dataset(data);
-      piePlot.addDataset(dataset);
-      piePlot.renderTo(svg);
-      let arcPaths = piePlot.content().selectAll(".arc");
-      let arcFillPaths = piePlot.content().selectAll(".arc.fill");
-      let arcOutlinePaths = piePlot.content().selectAll(".arc.outline");
-      assert.strictEqual(arcPaths.size(), 4, "2 paths per datum");
-      assert.strictEqual(arcFillPaths.size(), 2, "1 fill path per datum");
-      assert.strictEqual(arcOutlinePaths.size(), 2, "1 outline path per datum");
-      assert.strictEqual(arcFillPaths.style("stroke"), "none", "fill paths have no stroke");
-      assert.strictEqual(arcOutlinePaths.style("fill"), "none", "outline paths have no fill");
-      svg.remove();
-    });
-
     it("returns both a fill path and a stroke path in each Entity's selection", () => {
       let svg = TestMethods.generateSVG(500, 500);
       let piePlot = new Plottable.Plots.Pie();
@@ -254,7 +232,7 @@ describe("Plots", () => {
       });
     });
 
-    describe("Basic usage", () => {
+    describe("Rendering", () => {
       let svg: d3.Selection<void>;
       let simpleDataset: Plottable.Dataset;
       let simpleData: any[];
@@ -268,6 +246,18 @@ describe("Plots", () => {
         piePlot.addDataset(simpleDataset);
         piePlot.sectorValue((d) => d.value);
         piePlot.renderTo(svg);
+      });
+
+      it("draws a fill path and a stroke path for each slice", () => {
+        let arcPaths = piePlot.content().selectAll(".arc");
+        let arcFillPaths = piePlot.content().selectAll(".arc.fill");
+        let arcOutlinePaths = piePlot.content().selectAll(".arc.outline");
+        assert.strictEqual(arcPaths.size(), simpleData.length * 2, "2 paths per datum");
+        assert.strictEqual(arcFillPaths.size(), simpleData.length, "1 fill path per datum");
+        assert.strictEqual(arcOutlinePaths.size(), simpleData.length, "1 outline path per datum");
+        assert.strictEqual(arcFillPaths.style("stroke"), "none", "fill paths have no stroke");
+        assert.strictEqual(arcOutlinePaths.style("fill"), "none", "outline paths have no fill");
+        svg.remove();
       });
 
       it("draws slices proportional in angle to their value", () => {
