@@ -13,10 +13,9 @@ describe("Plots", () => {
       let dataset = new Plottable.Dataset(data);
       piePlot.addDataset(dataset);
       piePlot.renderTo(svg);
-      let renderArea = (<any> piePlot)._renderArea;
-      let arcPaths = renderArea.selectAll(".arc");
-      let arcFillPaths = renderArea.selectAll(".arc.fill");
-      let arcOutlinePaths = renderArea.selectAll(".arc.outline");
+      let arcPaths = piePlot.content().selectAll(".arc");
+      let arcFillPaths = piePlot.content().selectAll(".arc.fill");
+      let arcOutlinePaths = piePlot.content().selectAll(".arc.outline");
       assert.strictEqual(arcPaths.size(), 4, "2 paths per datum");
       assert.strictEqual(arcFillPaths.size(), 2, "1 fill path per datum");
       assert.strictEqual(arcOutlinePaths.size(), 2, "1 outline path per datum");
@@ -260,7 +259,6 @@ describe("Plots", () => {
       let simpleDataset: Plottable.Dataset;
       let simpleData: any[];
       let piePlot: Plottable.Plots.Pie;
-      let renderArea: d3.Selection<void>;
 
       beforeEach(() => {
         svg = TestMethods.generateSVG(500, 500);
@@ -270,11 +268,10 @@ describe("Plots", () => {
         piePlot.addDataset(simpleDataset);
         piePlot.sectorValue((d) => d.value);
         piePlot.renderTo(svg);
-        renderArea = (<any> piePlot)._renderArea;
       });
 
       it("draws slices proportional in angle to their value", () => {
-        let arcPaths = renderArea.selectAll(".arc.fill");
+        let arcPaths = piePlot.content().selectAll(".arc.fill");
         assert.lengthOf(arcPaths[0], 2, "only has two sectors");
         let arcPath0 = d3.select(arcPaths[0][0]);
         let pathPoints0 = TestMethods.normalizePath(arcPath0.attr("d")).split(/[A-Z]/).slice(1, 4);
@@ -309,7 +306,7 @@ describe("Plots", () => {
       });
 
       it("uses a plottable-colors color scale to color sectors by default", () => {
-        let arcPaths = renderArea.selectAll(".arc");
+        let arcPaths = piePlot.content().selectAll(".arc");
 
         let arcPath0 = d3.select(arcPaths[0][0]);
         assert.strictEqual(arcPath0.attr("fill"), "#5279c7", "first sector filled appropriately");
@@ -322,7 +319,7 @@ describe("Plots", () => {
       it("can set innerRadius", () => {
         let expectedInnerRadius = 5;
         piePlot.innerRadius(expectedInnerRadius);
-        let arcPaths = renderArea.selectAll(".arc.fill");
+        let arcPaths = piePlot.content().selectAll(".arc.fill");
         assert.lengthOf(arcPaths[0], 2, "only has two sectors");
 
         let pathPoints0 = TestMethods.normalizePath(d3.select(arcPaths[0][0]).attr("d")).split(/[A-Z]/).slice(1, 5);
@@ -343,7 +340,7 @@ describe("Plots", () => {
       it("can set outerRadius", () => {
         let expectedOuterRadius = 150;
         piePlot.outerRadius(() => expectedOuterRadius);
-        let arcPaths = renderArea.selectAll(".arc.fill");
+        let arcPaths = piePlot.content().selectAll(".arc.fill");
         assert.lengthOf(arcPaths[0], 2, "only has two sectors");
 
         let pathPoints0 = TestMethods.normalizePath(d3.select(arcPaths[0][0]).attr("d")).split(/[A-Z]/).slice(1, 5);
@@ -367,7 +364,6 @@ describe("Plots", () => {
       let simpleDataset: Plottable.Dataset;
       let simpleData: any[];
       let piePlot: Plottable.Plots.Pie;
-      let renderArea: d3.Selection<void>;
 
       beforeEach(() => {
         svg = TestMethods.generateSVG(500, 500);
@@ -377,7 +373,6 @@ describe("Plots", () => {
         piePlot.addDataset(simpleDataset);
         piePlot.sectorValue((d) => d.value);
         piePlot.renderTo(svg);
-        renderArea = (<any> piePlot)._renderArea;
       });
 
       it("retrieves all dataset selections with no args", () => {
@@ -412,7 +407,6 @@ describe("Plots", () => {
       let simpleDataset: Plottable.Dataset;
       let simpleData: any[];
       let piePlot: Plottable.Plots.Pie;
-      let renderArea: d3.Selection<void>;
 
       beforeEach(() => {
         svg = TestMethods.generateSVG(500, 500);
@@ -422,7 +416,6 @@ describe("Plots", () => {
         piePlot.addDataset(simpleDataset);
         piePlot.sectorValue((d) => d.value);
         piePlot.renderTo(svg);
-        renderArea = (<any> piePlot)._renderArea;
       });
 
       it("retrieves the entity under each given point", () => {
