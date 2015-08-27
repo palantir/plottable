@@ -3786,7 +3786,8 @@ var Plottable;
             var tierHeight = this._annotationMeasurer.measure().height + 2 * labelPadding;
             var annotationToTier = this._annotationToTier(measurements);
             var hiddenAnnotations = new Plottable.Utils.Set();
-            var numTiers = Math.floor(this.margin() / tierHeight);
+            var axisHeight = this._isHorizontal() ? this.height() : this.width();
+            var numTiers = Math.floor((axisHeight - this._axisSizeWithoutMargin()) / tierHeight);
             annotationToTier.forEach(function (tier, annotation) {
                 if (tier === -1 || tier >= numTiers) {
                     hiddenAnnotations.add(annotation);
@@ -3798,7 +3799,6 @@ var Plottable;
                 elements.exit().remove();
                 return elements;
             };
-            var axisHeight = this._isHorizontal() ? this.height() : this.width();
             var axisHeightWithoutMargin = this._axisSizeWithoutMargin();
             var offsetF = function (d) {
                 switch (_this.orientation()) {

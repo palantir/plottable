@@ -252,7 +252,8 @@ export class Axis<D> extends Component {
     let annotationToTier = this._annotationToTier(measurements);
 
     let hiddenAnnotations = new Utils.Set<any>();
-    let numTiers = Math.floor(this.margin() / tierHeight);
+    let axisHeight = this._isHorizontal() ? this.height() : this.width();
+    let numTiers = Math.floor((axisHeight - this._axisSizeWithoutMargin()) / tierHeight);
     annotationToTier.forEach((tier, annotation) => {
       if (tier === -1 || tier >= numTiers) {
         hiddenAnnotations.add(annotation);
@@ -265,7 +266,6 @@ export class Axis<D> extends Component {
       elements.exit().remove();
       return elements;
     };
-    let axisHeight = this._isHorizontal() ? this.height() : this.width();
     let axisHeightWithoutMargin = this._axisSizeWithoutMargin();
     let offsetF = (d: D) => {
       switch (this.orientation()) {
