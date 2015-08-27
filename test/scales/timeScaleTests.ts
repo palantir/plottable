@@ -1,12 +1,28 @@
 ///<reference path="../testReference.ts" />
 
-
 describe("Scales", () => {
   describe("TimeScale tests", () => {
 
     describe("Basic Usage", () => {
-      it.skip("extentOfValues() filters out invalid Dates", () => {
-        let scale = new Plottable.Scales.Time();
+      let scale: Plottable.Scales.Time;
+
+      beforeEach(() => {
+        scale = new Plottable.Scales.Time();
+      });
+
+      it("calculates the correct extent", () => {
+        let date1 = new Date(2015, 2, 25, 19, 0, 0);
+        let date2 = new Date(2015, 2, 24, 19, 0, 0);
+        let date3 = new Date(2015, 2, 25, 19, 0, 0);
+        let date4 = new Date(2015, 2, 26, 19, 0, 0);
+        let values = [date1, date2, date3, date4];
+
+        let computedExtent = scale.extentOfValues(values);
+
+        assert.deepEqual(computedExtent, [date2, date4], "The extent is the miminum and the maximum value in the domain");
+      });
+
+      it.skip("ignores invalid values when calculating the extent", () => {
         let expectedExtent = [new Date("2015-06-05"), new Date("2015-06-04")];
         let arrayWithBadValues: any[] = [null, NaN, undefined, Infinity, -Infinity, "a string",
           0, new Date("2015-06-05"), new Date("2015-06-04")];
@@ -16,7 +32,6 @@ describe("Scales", () => {
       });
 
       it("can be padded", () => {
-        let scale = new Plottable.Scales.Time();
         scale.padProportion(0);
         let unpaddedDomain = scale.domain();
         scale.addIncludedValuesProvider(() => unpaddedDomain);
@@ -26,71 +41,60 @@ describe("Scales", () => {
       });
 
       it("respects padding exceptions", () => {
-        let scale = new Plottable.Scales.Time();
         let minValue = new Date(2000, 5, 4);
         let maxValue = new Date(2000, 5, 6);
         scale.addIncludedValuesProvider(() => [minValue, maxValue]);
-        scale.padProportion(0.1);
         assert.operator(scale.domain()[0].getTime(), "<", minValue.getTime(), "left side of domain is normally padded");
         assert.operator(scale.domain()[1].getTime(), ">", maxValue.getTime(), "right side of domain is normally padded");
         scale.addPaddingExceptionsProvider(() => [minValue]);
         assert.strictEqual(scale.domain()[0].getTime(), minValue.getTime(),
           "left side of domain isn't padded if it matches the exception");
-        scale.addPaddingExceptionsProvider(() => [maxValue]);
+        let maxValuePaddingException = () => [maxValue];
+        scale.addPaddingExceptionsProvider(maxValuePaddingException);
         assert.strictEqual(scale.domain()[1].getTime(), maxValue.getTime(),
           "right side of domain isn't padded if it matches the exception");
+
+        scale.removePaddingExceptionsProvider(maxValuePaddingException);
+        assert.strictEqual(scale.domain()[0].getTime(), minValue.getTime(),
+          "left side of domain still isn't padded");
+        assert.operator(scale.domain()[1].getTime(), ">", maxValue.getTime(),
+          "right side of the domain is padded again because exception was removed");
       });
 
       it("can't set reversed domain", () => {
-        let scale = new Plottable.Scales.Time();
-        assert.throws(() => scale.domain([new Date("1985-10-26"), new Date("1955-11-05")]), "chronological");
+        assert.throws(() => scale.domain([new Date("1986-10-26"), new Date("1985-11-05")]), "chronological");
       });
 
-      it("tickInterval produces correct number of ticks", () => {
-        let scale = new Plottable.Scales.Time();
+      it("produces correct number of ticks", () => {
         // 100 year span
         scale.domain([new Date(2000, 0, 1, 0, 0, 0, 0), new Date(2100, 0, 1, 0, 0, 0, 0)]);
         let yearTicks = scale.tickInterval(Plottable.TimeInterval.year);
-        assert.strictEqual(yearTicks.length, 101, "generated correct number of ticks");
+        assert.strictEqual(yearTicks.length, 101, "generated correct number of ticks for 100 year span, every year");
         // 1 year span
         scale.domain([new Date(2000, 0, 1, 0, 0, 0, 0), new Date(2000, 11, 31, 0, 0, 0, 0)]);
         let monthTicks = scale.tickInterval(Plottable.TimeInterval.month);
-        assert.strictEqual(monthTicks.length, 12, "generated correct number of ticks");
+        assert.strictEqual(monthTicks.length, 12, "generated correct number of ticks for 1 year span, every month");
         let threeMonthTicks = scale.tickInterval(Plottable.TimeInterval.month, 3);
-        assert.strictEqual(threeMonthTicks.length, 4, "generated correct number of ticks");
+        assert.strictEqual(threeMonthTicks.length, 4, "generated correct number of ticks for 1 year span, every 3 months");
         // 1 month span
         scale.domain([new Date(2000, 0, 1, 0, 0, 0, 0), new Date(2000, 1, 1, 0, 0, 0, 0)]);
         let dayTicks = scale.tickInterval(Plottable.TimeInterval.day);
-        assert.strictEqual(dayTicks.length, 32, "generated correct number of ticks");
+        assert.strictEqual(dayTicks.length, 32, "generated correct number of ticks for 1 month span, every day");
         // 1 day span
         scale.domain([new Date(2000, 0, 1, 0, 0, 0, 0), new Date(2000, 0, 1, 23, 0, 0, 0)]);
         let hourTicks = scale.tickInterval(Plottable.TimeInterval.hour);
-        assert.strictEqual(hourTicks.length, 24, "generated correct number of ticks");
+        assert.strictEqual(hourTicks.length, 24, "generated correct number of ticks for 1 day span, every hour");
         // 1 hour span
         scale.domain([new Date(2000, 0, 1, 0, 0, 0, 0), new Date(2000, 0, 1, 1, 0, 0, 0)]);
         let minuteTicks = scale.tickInterval(Plottable.TimeInterval.minute);
-        assert.strictEqual(minuteTicks.length, 61, "generated correct number of ticks");
+        assert.strictEqual(minuteTicks.length, 61, "generated correct number of ticks for 1 hour span, every minute");
         let tenMinuteTicks = scale.tickInterval(Plottable.TimeInterval.minute, 10);
-        assert.strictEqual(tenMinuteTicks.length, 7, "generated correct number of ticks");
+        assert.strictEqual(tenMinuteTicks.length, 7, "generated correct number of ticks for 1 hour span, every 10 minutes");
         // 1 minute span
         scale.domain([new Date(2000, 0, 1, 0, 0, 0, 0), new Date(2000, 0, 1, 0, 1, 0, 0)]);
         let secondTicks = scale.tickInterval(Plottable.TimeInterval.second);
-        assert.strictEqual(secondTicks.length, 61, "generated correct number of ticks");
+        assert.strictEqual(secondTicks.length, 61, "generated correct number of ticks for 1 minute span, every second");
       });
-
-      it("timeScale extent calculation works as expected", () => {
-        let date1 = new Date(2015, 2, 25, 19, 0, 0);
-        let date2 = new Date(2015, 2, 24, 19, 0, 0);
-        let date3 = new Date(2015, 2, 25, 19, 0, 0);
-        let date4 = new Date(2015, 2, 26, 19, 0, 0);
-        let values = [date1, date2, date3, date4];
-
-        let scale = new Plottable.Scales.Time();
-        let computedExtent = scale.extentOfValues(values);
-
-        assert.deepEqual(computedExtent, [date2, date4], "The extent is the miminum and the maximum value in the domain");
-      });
-
     });
 
     describe("Auto Domaining", () => {
@@ -118,7 +122,7 @@ describe("Scales", () => {
 
         let minBelowBottom = new Date("2015-04-01");
         assert.strictEqual(scale.domainMin(minBelowBottom), scale, "the scale is returned by the setter");
-        assert.strictEqual(scale.domainMin().valueOf(), minBelowBottom.valueOf(), "can get domainMin");
+        assert.strictEqual(scale.domainMin().getTime(), minBelowBottom.getTime(), "can get domainMin");
         assert.strictEqual(scale.domain()[0].getTime(), minBelowBottom.getTime(), "lower end of domain was set by domainMin()");
         assert.strictEqual(scale.domainMin().getTime(), minBelowBottom.getTime(), "returns the set minimum value");
 
@@ -154,7 +158,7 @@ describe("Scales", () => {
 
         let maxAboveTop = new Date("2015-08-01");
         assert.strictEqual(scale.domainMax(maxAboveTop), scale, "the scale is returned by the setter");
-        assert.strictEqual(scale.domainMax().valueOf(), maxAboveTop.valueOf(), "can get domainMax");
+        assert.strictEqual(scale.domainMax().getTime(), maxAboveTop.getTime(), "can get domainMax");
         assert.strictEqual(scale.domain()[1].getTime(), maxAboveTop.getTime(), "upper end of domain was set by domainMax()");
         assert.strictEqual(scale.domainMax().getTime(), maxAboveTop.getTime(), "returns the set maximum value");
 
