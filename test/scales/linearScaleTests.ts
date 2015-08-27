@@ -48,7 +48,7 @@ describe("Scales", () => {
         assert.strictEqual(scale.invert(400), 20, "first value in range maps to first value in flipped domain");
         assert.strictEqual(scale.invert(500), 10, "last value in range maps to last value in flipped domain");
         assert.strictEqual(scale.invert(450), 15, "middle value in range maps to middle value in flipped domain");
-      })
+      });
 
       it("filters out invalid numbers when using extentOfValues()", () => {
         let arrayWithBadValues: any[] = [null, NaN, undefined, Infinity, -Infinity, "a string", 1, 1.2];
