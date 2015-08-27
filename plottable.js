@@ -3804,7 +3804,8 @@ var Plottable;
             var annotationToTier = this._annotationToTier(measurements);
             var hiddenAnnotations = new Plottable.Utils.Set();
             var axisHeight = this._isHorizontal() ? this.height() : this.width();
-            var numTiers = Math.floor((axisHeight - this._axisSizeWithoutMarginAndAnnotations()) / tierHeight);
+            var axisLabelAndTickHeight = this._axisSizeWithoutMarginAndAnnotations();
+            var numTiers = Math.min(this.annotationTierCount(), Math.floor((axisHeight - axisLabelAndTickHeight) / tierHeight));
             annotationToTier.forEach(function (tier, annotation) {
                 if (tier === -1 || tier >= numTiers) {
                     hiddenAnnotations.add(annotation);
@@ -3816,15 +3817,14 @@ var Plottable;
                 elements.exit().remove();
                 return elements;
             };
-            var axisHeightWithoutMarginAndAnnotations = this._axisSizeWithoutMarginAndAnnotations();
             var offsetF = function (d) {
                 switch (_this.orientation()) {
                     case "bottom":
                     case "right":
-                        return annotationToTier.get(d) * tierHeight + axisHeightWithoutMarginAndAnnotations;
+                        return annotationToTier.get(d) * tierHeight + axisLabelAndTickHeight;
                     case "top":
                     case "left":
-                        return axisHeight - axisHeightWithoutMarginAndAnnotations - annotationToTier.get(d) * tierHeight;
+                        return axisHeight - axisLabelAndTickHeight - annotationToTier.get(d) * tierHeight;
                 }
             };
             var positionF = function (d) { return _this._scale.scale(d); };
