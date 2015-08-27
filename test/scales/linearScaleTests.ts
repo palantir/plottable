@@ -369,7 +369,7 @@ describe("Scales", () => {
         scale.padProportion(0);
       });
 
-      it("receives updates from the plot and autodomains in accordange", () => {
+      it("receives updates from the plot and autodomains accordingly", () => {
         let svg = TestMethods.generateSVG();
         let plot = new Plottable.Plot();
 
@@ -410,7 +410,7 @@ describe("Scales", () => {
         assert.deepEqual(scale.domain(), [10, 11], "scale was still listening to dataset after one perspective deregistered");
 
         plot2.attr("x", (d) => d.x, otherScale);
-        assert.deepEqual(scale.domain(), [0, 1], "scale resetted to the default domain as it is no longer attached to plots");
+        assert.deepEqual(scale.domain(), [0, 1], "scale resets to the default domain as it is no longer attached to plots");
         dataset.data([{x: 99}, {x: 100}]);
         assert.deepEqual(scale.domain(), [0, 1], "scale shows default values when all perspectives removed");
 
