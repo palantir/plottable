@@ -4,16 +4,16 @@ describe("Plots", () => {
   describe("PiePlot", () => {
     describe("Rendering", () => {
       let svg: d3.Selection<void>;
-      let simpleDataset: Plottable.Dataset;
-      let simpleData: any[];
+      let dataset: Plottable.Dataset;
+      let data: any[];
       let piePlot: Plottable.Plots.Pie;
 
       beforeEach(() => {
         svg = TestMethods.generateSVG();
-        simpleData = [{value: 5}, {value: 15}];
-        simpleDataset = new Plottable.Dataset(simpleData);
+        data = [{value: 5}, {value: 15}];
+        dataset = new Plottable.Dataset(data);
         piePlot = new Plottable.Plots.Pie();
-        piePlot.addDataset(simpleDataset);
+        piePlot.addDataset(dataset);
         piePlot.sectorValue((d) => d.value);
         piePlot.renderTo(svg);
       });
@@ -22,9 +22,9 @@ describe("Plots", () => {
         let arcPaths = piePlot.content().selectAll(".arc");
         let arcFillPaths = piePlot.content().selectAll(".arc.fill");
         let arcOutlinePaths = piePlot.content().selectAll(".arc.outline");
-        assert.strictEqual(arcPaths.size(), simpleData.length * 2, "2 paths per datum");
-        assert.strictEqual(arcFillPaths.size(), simpleData.length, "1 fill path per datum");
-        assert.strictEqual(arcOutlinePaths.size(), simpleData.length, "1 outline path per datum");
+        assert.strictEqual(arcPaths.size(), data.length * 2, "2 paths per datum");
+        assert.strictEqual(arcFillPaths.size(), data.length, "1 fill path per datum");
+        assert.strictEqual(arcOutlinePaths.size(), data.length, "1 outline path per datum");
         assert.strictEqual(arcFillPaths.style("stroke"), "none", "fill paths have no stroke");
         assert.strictEqual(arcOutlinePaths.style("fill"), "none", "outline paths have no fill");
         svg.remove();
@@ -81,11 +81,11 @@ describe("Plots", () => {
         piePlot.content().selectAll("path").each(function() {
           originalPathStrings.push(d3.select(this).attr("d"));
         });
-        assert.lengthOf(originalPathStrings, simpleData.length * 2, "2 paths per datum");
+        assert.lengthOf(originalPathStrings, data.length * 2, "2 paths per datum");
 
-        let oneMoreSliceData = simpleData.slice();
+        let oneMoreSliceData = data.slice();
         oneMoreSliceData.push({ value: 5 });
-        simpleDataset.data(oneMoreSliceData);
+        dataset.data(oneMoreSliceData);
 
         let oneMoreSlicePathStrings: String[] = [];
         piePlot.content().selectAll("path").each(function() {
@@ -107,11 +107,11 @@ describe("Plots", () => {
 
         let pathPoints0 = TestMethods.normalizePath(d3.select(arcPaths[0][0]).attr("d")).split(/[A-Z]/).slice(1, 5);
 
-        let radiusPath0 = pathPoints0[2].split(",").map((coordinate: string) => parseFloat(coordinate));
+        let radiusPath0 = pathPoints0[2].split(",").map((coordinate) => parseFloat(coordinate));
         assert.closeTo(radiusPath0[0], expectedInnerRadius, 1, "stops line at innerRadius point");
         assert.closeTo(radiusPath0[1], 0, 1, "stops line at innerRadius point");
 
-        let innerArcPath0 = pathPoints0[3].split(",").map((coordinate: string) => parseFloat(coordinate));
+        let innerArcPath0 = pathPoints0[3].split(",").map((coordinate) => parseFloat(coordinate));
         assert.closeTo(innerArcPath0[0], expectedInnerRadius, 1, "makes inner arc of correct radius");
         assert.closeTo(innerArcPath0[1], expectedInnerRadius, 1, "makes inner arc of correct radius");
         assert.closeTo(innerArcPath0[5], 0, 1, "make inner arc to center");
@@ -128,11 +128,11 @@ describe("Plots", () => {
 
         let pathPoints0 = TestMethods.normalizePath(d3.select(arcPaths[0][0]).attr("d")).split(/[A-Z]/).slice(1, 5);
 
-        let radiusPath0 = pathPoints0[0].split(",").map((coordinate: string) => parseFloat(coordinate));
+        let radiusPath0 = pathPoints0[0].split(",").map((coordinate) => parseFloat(coordinate));
         assert.closeTo(radiusPath0[0], 0, 1, "starts at outerRadius point");
         assert.closeTo(radiusPath0[1], -expectedOuterRadius, 1, "starts at outerRadius point");
 
-        let outerArcPath0 = pathPoints0[1].split(",").map((coordinate: string) => parseFloat(coordinate));
+        let outerArcPath0 = pathPoints0[1].split(",").map((coordinate) => parseFloat(coordinate));
         assert.closeTo(outerArcPath0[0], expectedOuterRadius, 1, "makes outer arc of correct radius");
         assert.closeTo(outerArcPath0[1], expectedOuterRadius, 1, "makes outer arc of correct radius");
         assert.closeTo(outerArcPath0[5], expectedOuterRadius, 1, "makes outer arc to right edge");
@@ -200,16 +200,16 @@ describe("Plots", () => {
       });
 
       it("removes labels when they are disabled after rendering", () => {
-        let data1 = [
+        let data = [
           { value: 1 },
           { value: 1 },
           { value: 1 }
         ];
-        let dataset = new Plottable.Dataset(data1);
+        let dataset = new Plottable.Dataset(data);
         piePlot.addDataset(dataset);
         piePlot.renderTo(svg);
         let labels = piePlot.content().selectAll("text");
-        assert.strictEqual(labels.size(), data1.length, "one label per datum");
+        assert.strictEqual(labels.size(), data.length, "one label per datum");
         piePlot.labelsEnabled(false);
         labels = piePlot.content().selectAll("text");
         assert.strictEqual(labels.size(), 0, "labels were removed");
@@ -328,16 +328,16 @@ describe("Plots", () => {
 
     describe("Selections", () => {
       let svg: d3.Selection<void>;
-      let simpleDataset: Plottable.Dataset;
-      let simpleData: any[];
+      let dataset: Plottable.Dataset;
+      let data: any[];
       let piePlot: Plottable.Plots.Pie;
 
       beforeEach(() => {
         svg = TestMethods.generateSVG();
-        simpleData = [{value: 5}, {value: 15}];
-        simpleDataset = new Plottable.Dataset(simpleData);
+        data = [{value: 5}, {value: 15}];
+        dataset = new Plottable.Dataset(data);
         piePlot = new Plottable.Plots.Pie();
-        piePlot.addDataset(simpleDataset);
+        piePlot.addDataset(dataset);
         piePlot.sectorValue((d) => d.value);
         piePlot.renderTo(svg);
       });
@@ -351,11 +351,11 @@ describe("Plots", () => {
       });
 
       it("retrieves correct selections", () => {
-        let allSectors = piePlot.selections([simpleDataset]);
+        let allSectors = piePlot.selections([dataset]);
         assert.strictEqual(allSectors.size(), 2 * 2, "all sectors retrieved");
         assert.strictEqual(allSectors.filter(".fill").size(), 2, "each sector has a fill path");
         assert.strictEqual(allSectors.filter(".outline").size(), 2, "each sector has an outline path");
-        assert.includeMembers(allSectors.data(), simpleData, "dataset data in selection data");
+        assert.includeMembers(allSectors.data(), data, "dataset data in selection data");
 
         svg.remove();
       });
@@ -372,14 +372,14 @@ describe("Plots", () => {
     describe("Entities", () => {
       let svg: d3.Selection<void>;
       let dataset: Plottable.Dataset;
-      let simpleData = [{value: 5}, {value: 15}];
+      let data = [{value: 5}, {value: 15}];
       let piePlot: Plottable.Plots.Pie;
 
       beforeEach(() => {
         svg = TestMethods.generateSVG();
         dataset = new Plottable.Dataset();
         piePlot = new Plottable.Plots.Pie();
-        dataset.data(simpleData);
+        dataset.data(data);
         piePlot.addDataset(dataset);
         piePlot.sectorValue((d) => d.value);
         piePlot.renderTo(svg);
@@ -387,7 +387,7 @@ describe("Plots", () => {
 
       it("returns both a fill path and a stroke path in each Entity's selection", () => {
         let entities = piePlot.entities();
-        assert.lengthOf(entities, simpleData.length, "returned one Entity per datum");
+        assert.lengthOf(entities, data.length, "returned one Entity per datum");
         entities.forEach((entity) => {
           assert.strictEqual(entity.selection.size(), 2, "each entity selection has 2 paths");
           assert.strictEqual(entity.selection.filter(".fill").size(), 1, "each entity selection has 1 fill path");
@@ -481,7 +481,7 @@ describe("Plots", () => {
       it("does not render slices for undefined, NaN, strings, or negative numbers", () => {
         let svg = TestMethods.generateSVG();
 
-        let data1 = [
+        let dataWithBadValue = [
           { v: 1 },
           { v: undefined },
           { v: 1 },
@@ -493,7 +493,7 @@ describe("Plots", () => {
         ];
 
         let plot = new Plottable.Plots.Pie();
-        plot.addDataset(new Plottable.Dataset(data1));
+        plot.addDataset(new Plottable.Dataset(dataWithBadValue));
         plot.sectorValue((d) => d.v);
 
         plot.renderTo(svg);
