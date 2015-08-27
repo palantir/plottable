@@ -314,7 +314,7 @@ describe("Plots", () => {
       });
     });
 
-    describe("selections", () => {
+    describe("Selections", () => {
       let svg: d3.Selection<void>;
       let simpleDataset: Plottable.Dataset;
       let simpleData: any[];
@@ -357,7 +357,7 @@ describe("Plots", () => {
 
     });
 
-    describe("entities", () => {
+    describe("Entities", () => {
       let svg: d3.Selection<void>;
       let dataset: Plottable.Dataset;
       let simpleData = [{value: 5}, {value: 15}];
@@ -429,7 +429,7 @@ describe("Plots", () => {
       });
     });
 
-    describe("fail safe tests", () => {
+    describe("Fail safe tests", () => {
       it("renders correctly with no Datasets", () => {
         let svg = TestMethods.generateSVG(400, 400);
         let plot = new Plottable.Plots.Pie();
