@@ -78,7 +78,9 @@ describe("Plots", () => {
 
       it("updates slices when data changes", () => {
         let originalPathStrings: String[] = [];
-        piePlot.content().selectAll("path").each(function() { originalPathStrings.push(d3.select(this).attr("d")); });
+        piePlot.content().selectAll("path").each(function() {
+          originalPathStrings.push(d3.select(this).attr("d"));
+        });
         assert.lengthOf(originalPathStrings, simpleData.length * 2, "2 paths per datum");
 
         let oneMoreSliceData = simpleData.slice();
@@ -86,7 +88,9 @@ describe("Plots", () => {
         simpleDataset.data(oneMoreSliceData);
 
         let oneMoreSlicePathStrings: String[] = [];
-        piePlot.content().selectAll("path").each(function() { oneMoreSlicePathStrings.push(d3.select(this).attr("d")); });
+        piePlot.content().selectAll("path").each(function() {
+          oneMoreSlicePathStrings.push(d3.select(this).attr("d"));
+        });
         assert.lengthOf(oneMoreSlicePathStrings, oneMoreSliceData.length * 2, "2 paths per datum");
 
         originalPathStrings.forEach((pathString, index) => {
@@ -214,9 +218,12 @@ describe("Plots", () => {
 
       it("hides labels if slices are too small", () => {
         let data = [
-          { key: "A", value: 1 }, { key: "B", value: 50 },
-          { key: "C", value: 1 }, { key: "D", value: 50 },
-          { key: "E", value: 1 }, { key: "F", value: 50 }
+          { key: "A", value: 1 },
+          { key: "B", value: 50 },
+          { key: "C", value: 1 },
+          { key: "D", value: 50 },
+          { key: "E", value: 1 },
+          { key: "F", value: 50 }
         ];
         let dataset = new Plottable.Dataset(data);
         piePlot.addDataset(dataset);
@@ -251,9 +258,12 @@ describe("Plots", () => {
 
       it("hides labels if they don't fit", () => {
         let data = [
-          { value: 1 }, { value: 50 },
-          { value: 1 }, { value: 50 },
-          { value: 1 }, { value: 50 }
+          { value: 1 },
+          { value: 50 },
+          { value: 1 },
+          { value: 50 },
+          { value: 1 },
+          { value: 50 }
         ];
         let dataset = new Plottable.Dataset(data);
         piePlot.addDataset(dataset);
@@ -278,7 +288,8 @@ describe("Plots", () => {
         let data = [
           { value: 5000 },
           { value: 5000 },
-          { value: 5000 }];
+          { value: 5000 }
+        ];
         let dataset = new Plottable.Dataset(data);
         piePlot.addDataset(dataset).outerRadius(500);
         piePlot.renderTo(svg);
@@ -301,7 +312,8 @@ describe("Plots", () => {
         let data = [
           { value: 1 },
           { value: "value" },
-          { value: 2 }];
+          { value: 2 }
+        ];
         let dataset = new Plottable.Dataset(data);
         piePlot.addDataset(dataset);
         piePlot.renderTo(svg);
@@ -477,7 +489,7 @@ describe("Plots", () => {
           { v: 1 },
           { v: "Bad String" },
           { v: 1 },
-          { v: -100 },
+          { v: -100 }
         ];
 
         let plot = new Plottable.Plots.Pie();
