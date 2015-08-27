@@ -53,7 +53,7 @@ export module Axes {
       };
     }
 
-    protected _axisSizeWithoutMargin() {
+    protected _axisSizeWithoutMarginAndAnnotations() {
       let relevantDimension = this._isHorizontal() ? this.height() : this.width();
       let axisHeightWithoutMargin = this.requestedSpace(this.width(), this.height()).minHeight - this.margin();
       return Math.min(axisHeightWithoutMargin, relevantDimension);

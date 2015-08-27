@@ -14,6 +14,7 @@ export class Axis<D> extends Component {
    * The css class applied to each tick label (the text associated with the tick).
    */
   public static TICK_LABEL_CLASS = "tick-label";
+  private static _ANNOTATION_LABEL_PADDING = 4;
   protected _tickMarkContainer: d3.Selection<void>;
   protected _tickLabelContainer: d3.Selection<void>;
   protected _baseline: d3.Selection<void>;
@@ -32,6 +33,7 @@ export class Axis<D> extends Component {
   private _annotatedTicks: D[];
   private _annotationFormatter: Formatter;
   private _annotationsEnabled = false;
+  private _annotationTierCount = 1;
   private _annotationContainer: d3.Selection<void>;
   private _annotationMeasurer: SVGTypewriter.Measurers.Measurer;
   private _annotationWriter: SVGTypewriter.Writers.Writer;
@@ -96,11 +98,19 @@ export class Axis<D> extends Component {
         this._computeHeight();
       }
       requestedHeight = this._computedHeight + this._margin;
+      if (this.annotationsEnabled()) {
+        let tierHeight = this._annotationMeasurer.measure().height + 2 * Axis._ANNOTATION_LABEL_PADDING;
+        requestedHeight += tierHeight * this.annotationTierCount();
+      }
     } else { // vertical
       if (this._computedWidth == null) {
         this._computeWidth();
       }
       requestedWidth = this._computedWidth + this._margin;
+      if (this.annotationsEnabled()) {
+        let tierHeight = this._annotationMeasurer.measure().height + 2 * Axis._ANNOTATION_LABEL_PADDING;
+        requestedWidth += tierHeight * this.annotationTierCount();
+      }
     }
 
     return {
@@ -216,14 +226,10 @@ export class Axis<D> extends Component {
 
   /**
    * Gets if annotations are enabled.
-   *
-   * Annotations are drawn in the margin of the Axis.
    */
   public annotationsEnabled(): boolean;
   /**
    * Sets if annotations are enabled.
-   *
-   * Annotations are drawn in the margin of the Axis.
    *
    * @returns {Axis} The calling Axis.
    */
@@ -233,12 +239,31 @@ export class Axis<D> extends Component {
       return this._annotationsEnabled;
     }
     this._annotationsEnabled = annotationsEnabled;
-    this.render();
+    this.redraw();
+    return this;
+  }
+
+  /**
+   * Gets the count of annotation tiers to render.
+   */
+  public annotationTierCount(): number;
+  /**
+   * Sets the count of annotation tiers to render.
+   *
+   * @returns {Axis} The calling Axis.
+   */
+  public annotationTierCount(annotationTierCount: number): Axis<D>;
+  public annotationTierCount(annotationTierCount?: number): any {
+    if (annotationTierCount == null) {
+      return this._annotationTierCount;
+    }
+    this._annotationTierCount = annotationTierCount;
+    this.redraw();
     return this;
   }
 
   protected _drawAnnotations() {
-    let labelPadding = 4;
+    let labelPadding = Axis._ANNOTATION_LABEL_PADDING;
     let measurements = new Utils.Map<D, SVGTypewriter.Measurers.Dimensions>();
     let annotatedTicks = this._annotatedTicksInDomain();
     annotatedTicks.forEach((annotatedTick) => {
@@ -253,7 +278,7 @@ export class Axis<D> extends Component {
 
     let hiddenAnnotations = new Utils.Set<any>();
     let axisHeight = this._isHorizontal() ? this.height() : this.width();
-    let numTiers = Math.floor((axisHeight - this._axisSizeWithoutMargin()) / tierHeight);
+    let numTiers = Math.floor((axisHeight - this._axisSizeWithoutMarginAndAnnotations()) / tierHeight);
     annotationToTier.forEach((tier, annotation) => {
       if (tier === -1 || tier >= numTiers) {
         hiddenAnnotations.add(annotation);
@@ -266,15 +291,15 @@ export class Axis<D> extends Component {
       elements.exit().remove();
       return elements;
     };
-    let axisHeightWithoutMargin = this._axisSizeWithoutMargin();
+    let axisHeightWithoutMarginAndAnnotations = this._axisSizeWithoutMarginAndAnnotations();
     let offsetF = (d: D) => {
       switch (this.orientation()) {
         case "bottom":
         case "right":
-          return annotationToTier.get(d) * tierHeight + axisHeightWithoutMargin;
+          return annotationToTier.get(d) * tierHeight + axisHeightWithoutMarginAndAnnotations;
         case "top":
         case "left":
-          return axisHeight - axisHeightWithoutMargin - annotationToTier.get(d) * tierHeight;
+          return axisHeight - axisHeightWithoutMarginAndAnnotations - annotationToTier.get(d) * tierHeight;
       }
     };
     let positionF = (d: D) => this._scale.scale(d);
@@ -367,7 +392,7 @@ export class Axis<D> extends Component {
     });
   }
 
-  protected _axisSizeWithoutMargin() {
+  protected _axisSizeWithoutMarginAndAnnotations() {
     let relevantDimension = this._isHorizontal() ? this.height() : this.width();
     let axisHeightWithoutMargin = this._isHorizontal() ? this._computedHeight : this._computedWidth;
     return Math.min(axisHeightWithoutMargin, relevantDimension);

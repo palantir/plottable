@@ -424,7 +424,7 @@ describe("BaseAxis", () => {
               TestMethods.numAttr(correspondingRect, "x"), "line at tick scaled x position");
             assert.strictEqual(TestMethods.numAttr(annotationLine, "y1"), axis.height(), "line starts at the bottom");
             assert.closeTo(TestMethods.numAttr(annotationLine, "y2"),
-              TestMethods.numAttr(correspondingRect, "y") + TestMethods.numAttr(correspondingRect, "height"), 1, "line goes to the margin");
+              TestMethods.numAttr(correspondingRect, "y") + TestMethods.numAttr(correspondingRect, "height"), 1, "line goes to the rect");
           });
 
           axis.content().selectAll(".annotation-label text").each(function (d, i) {
@@ -593,7 +593,7 @@ describe("BaseAxis", () => {
         });
 
         describe("first row offset position", () => {
-          it("places the first row right at the beginning of the margin for bottom orientation", () => {
+          it("places the first row right at the beginning of the annotation area for bottom orientation", () => {
             let axis = new Plottable.Axis(scale, "bottom");
             axis.annotatedTicks(annotatedTicks);
             axis.annotationsEnabled(true);
@@ -602,12 +602,12 @@ describe("BaseAxis", () => {
             axis.renderTo(svg);
 
             let firstAnnotationRect = axis.content().select(".annotation-rect");
-            assert.strictEqual(TestMethods.numAttr(firstAnnotationRect, "y"),
+            assert.strictEqual(TestMethods.numAttr(firstAnnotationRect, "y") + TestMethods.numAttr(firstAnnotationRect, "height"),
               axis.height() - axis.margin(), "rectangle positioned correctly");
             svg.remove();
           });
 
-          it("places the first row right at the beginning of the margin for top orientation", () => {
+          it("places the first row right at the beginning of the annotation area for top orientation", () => {
             let axis = new Plottable.Axis(scale, "top");
             axis.annotatedTicks(annotatedTicks);
             axis.annotationsEnabled(true);
@@ -616,12 +616,12 @@ describe("BaseAxis", () => {
             axis.renderTo(svg);
 
             let firstAnnotationRect = axis.content().select(".annotation-rect");
-            assert.strictEqual(TestMethods.numAttr(firstAnnotationRect, "y") + TestMethods.numAttr(firstAnnotationRect, "height"),
+            assert.strictEqual(TestMethods.numAttr(firstAnnotationRect, "y"),
               axis.margin(), "rectangle positioned correctly");
             svg.remove();
           });
 
-          it("places the first row right at the beginning of the margin for left orientation", () => {
+          it("places the first row right at the beginning of the annotation area for left orientation", () => {
             let axis = new Plottable.Axis(scale, "left");
             axis.annotatedTicks(annotatedTicks);
             axis.annotationsEnabled(true);
@@ -630,12 +630,12 @@ describe("BaseAxis", () => {
             axis.renderTo(svg);
 
             let firstAnnotationRect = axis.content().select(".annotation-rect");
-            assert.strictEqual(TestMethods.numAttr(firstAnnotationRect, "x") + TestMethods.numAttr(firstAnnotationRect, "width"),
+            assert.strictEqual(TestMethods.numAttr(firstAnnotationRect, "x"),
               axis.margin(), "rectangle positioned correctly");
             svg.remove();
           });
 
-          it("places the first row right at the beginning of the margin for right orientation", () => {
+          it("places the first row right at the beginning of the annotation area for right orientation", () => {
             let axis = new Plottable.Axis(scale, "right");
             axis.annotatedTicks(annotatedTicks);
             axis.annotationsEnabled(true);
@@ -644,7 +644,7 @@ describe("BaseAxis", () => {
             axis.renderTo(svg);
 
             let firstAnnotationRect = axis.content().select(".annotation-rect");
-            assert.strictEqual(TestMethods.numAttr(firstAnnotationRect, "x"),
+            assert.strictEqual(TestMethods.numAttr(firstAnnotationRect, "x") + TestMethods.numAttr(firstAnnotationRect, "width"),
               axis.width() - axis.margin(), "rectangle positioned correctly");
             svg.remove();
           });
@@ -718,7 +718,7 @@ describe("BaseAxis", () => {
 
       });
 
-      it("hides annotations if rectangles are outside the margin area", () => {
+      it("hides annotations if rectangles are outside the annotation area", () => {
         let mockScale = new Plottable.Scales.Linear;
         let annotatedTicks = [50, 51, 150];
         mockScale.domain([0, 300]);
@@ -726,7 +726,6 @@ describe("BaseAxis", () => {
         let axis = new Plottable.Axis(mockScale, "bottom");
         axis.annotatedTicks(annotatedTicks);
         axis.annotationsEnabled(true);
-        axis.margin(25);
 
         let svg = TestMethods.generateSVG(300, 300);
         axis.renderTo(svg);
@@ -734,9 +733,10 @@ describe("BaseAxis", () => {
         axis.content().selectAll(".annotation-rect").each(function() {
           let annotationRect = d3.select(this);
           let bbox = this.getBBox();
-          let insideMargin = bbox.x >= 0 && bbox.x + bbox.width <= axis.width() &&
-                             bbox.y >= axis.height() - axis.margin() && bbox.y + bbox.height <= axis.height();
-          if (insideMargin) {
+          let insideAnnotationArea = bbox.x >= 0 && bbox.x + bbox.width <= axis.width() &&
+                                     bbox.y >= (<any> axis)._axisSizeWithoutMarginAndAnnotations() &&
+                                     bbox.y + bbox.height <= axis.height() - axis.margin();
+          if (insideAnnotationArea) {
             assert.strictEqual(annotationRect.attr("visibility"), "visible", "annotation rect inside margin area should be visible");
           } else {
             assert.strictEqual(annotationRect.attr("visibility"), "hidden", "annotation rect outside margin area should be not visible");

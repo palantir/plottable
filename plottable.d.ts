@@ -1717,20 +1717,26 @@ declare module Plottable {
         annotationFormatter(annotationFormatter: Formatter): Axis<D>;
         /**
          * Gets if annotations are enabled.
-         *
-         * Annotations are drawn in the margin of the Axis.
          */
         annotationsEnabled(): boolean;
         /**
          * Sets if annotations are enabled.
          *
-         * Annotations are drawn in the margin of the Axis.
-         *
          * @returns {Axis} The calling Axis.
          */
         annotationsEnabled(annotationsEnabled: boolean): Axis<D>;
+        /**
+         * Gets the count of annotation tiers to render.
+         */
+        annotationTierCount(): number;
+        /**
+         * Sets the count of annotation tiers to render.
+         *
+         * @returns {Axis} The calling Axis.
+         */
+        annotationTierCount(annotationTierCount: number): Axis<D>;
         protected _drawAnnotations(): void;
-        protected _axisSizeWithoutMargin(): number;
+        protected _axisSizeWithoutMarginAndAnnotations(): number;
         protected _removeAnnotations(): void;
         protected _generateBaselineAttrHash(): {
             [key: string]: number;
@@ -1993,7 +1999,7 @@ declare module Plottable {
             protected _setup(): void;
             protected _rescale(): Component;
             requestedSpace(offeredWidth: number, offeredHeight: number): SpaceRequest;
-            protected _axisSizeWithoutMargin(): number;
+            protected _axisSizeWithoutMarginAndAnnotations(): number;
             protected _getTickValues(): string[];
             /**
              * Gets the tick label angle in degrees.
