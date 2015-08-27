@@ -45,8 +45,8 @@ describe("Plots", () => {
         assert.closeTo(parseFloat(arcDestPoint0[1]), 0, 1, "ends on same level of svg");
 
         let secondPathPoints0 = pathPoints0[2].split(",");
-        assert.closeTo(parseFloat(secondPathPoints0[0]), 0, 1, "draws line to origin");
-        assert.closeTo(parseFloat(secondPathPoints0[1]), 0, 1, "draws line to origin");
+        assert.closeTo(parseFloat(secondPathPoints0[0]), 0, 1, "draws line to origin (x)");
+        assert.closeTo(parseFloat(secondPathPoints0[1]), 0, 1, "draws line to origin (y)");
 
         let arcPath1 = d3.select(arcPaths[0][1]);
         let pathPoints1 = TestMethods.normalizePath(arcPath1.attr("d")).split(/[A-Z]/).slice(1, 4);
@@ -60,8 +60,8 @@ describe("Plots", () => {
         assert.operator(parseFloat(arcDestPoint1[1]), "<", 0, "ends above 0");
 
         let secondPathPoints1 = pathPoints1[2].split(",");
-        assert.closeTo(parseFloat(secondPathPoints1[0]), 0, 1, "draws line to origin");
-        assert.closeTo(parseFloat(secondPathPoints1[1]), 0, 1, "draws line to origin");
+        assert.closeTo(parseFloat(secondPathPoints1[0]), 0, 1, "draws line to origin (x)");
+        assert.closeTo(parseFloat(secondPathPoints1[1]), 0, 1, "draws line to origin (y)");
         svg.remove();
       });
 
@@ -98,7 +98,7 @@ describe("Plots", () => {
         svg.remove();
       });
 
-      it("can set innerRadius", () => {
+      it("can set innerRadius()", () => {
         let expectedInnerRadius = 5;
         piePlot.innerRadius(expectedInnerRadius);
         let arcPaths = piePlot.content().selectAll(".arc.fill");
@@ -107,19 +107,19 @@ describe("Plots", () => {
         let pathPoints0 = TestMethods.normalizePath(d3.select(arcPaths[0][0]).attr("d")).split(/[A-Z]/).slice(1, 5);
 
         let radiusPath0 = pathPoints0[2].split(",").map((coordinate) => parseFloat(coordinate));
-        assert.closeTo(radiusPath0[0], expectedInnerRadius, 1, "stops line at innerRadius point");
-        assert.closeTo(radiusPath0[1], 0, 1, "stops line at innerRadius point");
+        assert.closeTo(radiusPath0[0], expectedInnerRadius, 1, "stops line at innerRadius point (x)");
+        assert.closeTo(radiusPath0[1], 0, 1, "stops line at innerRadius point (y)");
 
         let innerArcPath0 = pathPoints0[3].split(",").map((coordinate) => parseFloat(coordinate));
-        assert.closeTo(innerArcPath0[0], expectedInnerRadius, 1, "makes inner arc of correct radius");
-        assert.closeTo(innerArcPath0[1], expectedInnerRadius, 1, "makes inner arc of correct radius");
-        assert.closeTo(innerArcPath0[5], 0, 1, "make inner arc to center");
-        assert.closeTo(innerArcPath0[6], -expectedInnerRadius, 1, "makes inner arc to top of inner circle");
+        assert.closeTo(innerArcPath0[0], expectedInnerRadius, 1, "makes inner arc of correct radius (x)");
+        assert.closeTo(innerArcPath0[1], expectedInnerRadius, 1, "makes inner arc of correct radius (y)");
+        assert.closeTo(innerArcPath0[5], 0, 1, "make inner arc to center (x)");
+        assert.closeTo(innerArcPath0[6], -expectedInnerRadius, 1, "makes inner arc to top of inner circle (y)");
 
         svg.remove();
       });
 
-      it("can set outerRadius", () => {
+      it("can set outerRadius()", () => {
         let expectedOuterRadius = 150;
         piePlot.outerRadius(() => expectedOuterRadius);
         let arcPaths = piePlot.content().selectAll(".arc.fill");
@@ -132,10 +132,10 @@ describe("Plots", () => {
         assert.closeTo(radiusPath0[1], -expectedOuterRadius, 1, "starts at outerRadius point");
 
         let outerArcPath0 = pathPoints0[1].split(",").map((coordinate) => parseFloat(coordinate));
-        assert.closeTo(outerArcPath0[0], expectedOuterRadius, 1, "makes outer arc of correct radius");
-        assert.closeTo(outerArcPath0[1], expectedOuterRadius, 1, "makes outer arc of correct radius");
-        assert.closeTo(outerArcPath0[5], expectedOuterRadius, 1, "makes outer arc to right edge");
-        assert.closeTo(outerArcPath0[6], 0, 1, "makes outer arc to right edge");
+        assert.closeTo(outerArcPath0[0], expectedOuterRadius, 1, "makes outer arc of correct radius (x)");
+        assert.closeTo(outerArcPath0[1], expectedOuterRadius, 1, "makes outer arc of correct radius (y)");
+        assert.closeTo(outerArcPath0[5], expectedOuterRadius, 1, "makes outer arc to right edge (x)");
+        assert.closeTo(outerArcPath0[6], 0, 1, "makes outer arc to right edge (y)");
 
         svg.remove();
       });
@@ -250,8 +250,8 @@ describe("Plots", () => {
         piePlot.renderTo(svg);
         let texts = svg.selectAll("text")[0].map((n: any) => d3.select(n).text());
         assert.lengthOf(texts, 2, "both labels are drawn");
-        assert.strictEqual(texts[0], "5 m", "The formatter was used to format the first label");
-        assert.strictEqual(texts[1], "15 m", "The formatter was used to format the second label");
+        assert.strictEqual(texts[0], "5 m", "The formatter was used to format the label for slice index 0");
+        assert.strictEqual(texts[1], "15 m", "The formatter was used to format the label for slice index 1");
         svg.remove();
       });
 
@@ -318,9 +318,9 @@ describe("Plots", () => {
         piePlot.renderTo(svg);
 
         let texts = svg.selectAll("text")[0].map((n: any) => d3.select(n).text());
-        assert.lengthOf(texts, 2, "One label is rendered for each valid of data");
-        assert.strictEqual(texts[0], "1", "Label for the first valid data is shown");
-        assert.strictEqual(texts[1], "2", "Label for the second valid data is shown");
+        assert.lengthOf(texts, 2, "One label is rendered for each valid datum");
+        assert.strictEqual(texts[0], "1", "Label for the first valid datum is shown");
+        assert.strictEqual(texts[1], "2", "Label for the second valid datum is shown");
         svg.remove();
       });
     });
@@ -341,9 +341,9 @@ describe("Plots", () => {
         piePlot.renderTo(svg);
       });
 
-      it("retrieves all dataset selections with no args", () => {
+      it("retrieves all dataset selections when no arguments are specified", () => {
         let allSectors = piePlot.selections();
-        assert.strictEqual(allSectors.size(), 2 * 2, "all sectors retrieved");
+        assert.strictEqual(allSectors.size(), data.length * 2, "all sectors retrieved");
         assert.strictEqual(allSectors.filter(".fill").size(), 2, "each sector has a fill path");
         assert.strictEqual(allSectors.filter(".outline").size(), 2, "each sector has an outline path");
         svg.remove();
@@ -351,7 +351,7 @@ describe("Plots", () => {
 
       it("retrieves correct selections", () => {
         let allSectors = piePlot.selections([dataset]);
-        assert.strictEqual(allSectors.size(), 2 * 2, "all sectors retrieved");
+        assert.strictEqual(allSectors.size(), data.length * 2, "all sectors retrieved");
         assert.strictEqual(allSectors.filter(".fill").size(), 2, "each sector has a fill path");
         assert.strictEqual(allSectors.filter(".outline").size(), 2, "each sector has an outline path");
         assert.includeMembers(allSectors.data(), data, "dataset data in selection data");
@@ -422,13 +422,14 @@ describe("Plots", () => {
         });
 
         clicks.forEach((point: Plottable.Point, i: number) => {
-          let entity = piePlot.entitiesAt(point);
-          assert.strictEqual(entity.length, 1, "exactly one entity is selected");
-          TestMethods.assertPlotEntitiesEqual(entity[0], piePlot.entities()[i], "the correct entity is selcted");
+          let entities = piePlot.entitiesAt(point);
+          assert.lengthOf(entities, 1, "exactly one entity is selected");
+          TestMethods.assertPlotEntitiesEqual(entities[0], piePlot.entities()[i],
+            `the Entity with index ${i} is selected when clicking at [${point.x}, ${point.y}]`);
         });
 
-        let entity = piePlot.entitiesAt( { x: 0, y: 0 } );
-        assert.strictEqual(entity.length, 0, "no entities returned");
+        let entities = piePlot.entitiesAt( { x: 0, y: 0 } );
+        assert.lengthOf(entities, 0, "no entities returned");
 
         svg.remove();
       });
