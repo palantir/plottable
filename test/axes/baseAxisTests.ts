@@ -745,6 +745,21 @@ describe("BaseAxis", () => {
         svg.remove();
       });
 
+      it("does not render the null annotatedTick", () => {
+        let annotatedTicks: Date[] = [null];
+        let scale = new Plottable.Scales.Time();
+        scale.domain([new Date(1994, 11, 17), new Date(1995, 11, 17)]);
+        let axis = new Plottable.Axis(scale, "bottom");
+        axis.annotationsEnabled(true);
+        let svg = TestMethods.generateSVG(300, 300);
+        axis.renderTo(svg);
+
+        axis.annotatedTicks(annotatedTicks);
+
+        assert.strictEqual(axis.content().selectAll(".annotation-label").size(), 0, "no annotated ticks");
+
+        svg.remove();
+      });
     });
   });
 });

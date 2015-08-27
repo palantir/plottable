@@ -359,7 +359,12 @@ export class Axis<D> extends Component {
 
   private _annotatedTicksInDomain() {
     let scaleRange = this._scale.range();
-    return this.annotatedTicks().filter((tick) => Utils.Math.inRange(this._scale.scale(tick), scaleRange[0], scaleRange[1]));
+    return this.annotatedTicks().filter((tick) => {
+      if (tick == null) {
+        return false;
+      }
+      return Utils.Math.inRange(this._scale.scale(tick), scaleRange[0], scaleRange[1]);
+    });
   }
 
   protected _axisSizeWithoutMargin() {

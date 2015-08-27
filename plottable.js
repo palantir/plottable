@@ -3884,7 +3884,12 @@ var Plottable;
         Axis.prototype._annotatedTicksInDomain = function () {
             var _this = this;
             var scaleRange = this._scale.range();
-            return this.annotatedTicks().filter(function (tick) { return Plottable.Utils.Math.inRange(_this._scale.scale(tick), scaleRange[0], scaleRange[1]); });
+            return this.annotatedTicks().filter(function (tick) {
+                if (tick == null) {
+                    return false;
+                }
+                return Plottable.Utils.Math.inRange(_this._scale.scale(tick), scaleRange[0], scaleRange[1]);
+            });
         };
         Axis.prototype._axisSizeWithoutMargin = function () {
             var relevantDimension = this._isHorizontal() ? this.height() : this.width();
