@@ -36,8 +36,11 @@ describe("Scales", () => {
         assert.strictEqual(scale.invert(400), 10, "first value in range maps to first value in domain");
         assert.strictEqual(scale.invert(500), 20, "last value in range maps to last value in domain");
         assert.strictEqual(scale.invert(450), 15, "middle value in range maps to middle value in domain");
+      });
 
+      it("can have a reversed domain", () => {
         scale.domain([20, 10]);
+        scale.range([400, 500]);
         assert.strictEqual(scale.scale(10), 500, "first value in flipped domain maps to first value in range");
         assert.strictEqual(scale.scale(20), 400, "last value in flipped domain maps to last value in range");
         assert.strictEqual(scale.scale(15), 450, "middle value in flipped domain maps to middle value in range");
@@ -45,7 +48,7 @@ describe("Scales", () => {
         assert.strictEqual(scale.invert(400), 20, "first value in range maps to first value in flipped domain");
         assert.strictEqual(scale.invert(500), 10, "last value in range maps to last value in flipped domain");
         assert.strictEqual(scale.invert(450), 15, "middle value in range maps to middle value in flipped domain");
-      });
+      })
 
       it("filters out invalid numbers when using extentOfValues()", () => {
         let arrayWithBadValues: any[] = [null, NaN, undefined, Infinity, -Infinity, "a string", 1, 1.2];
@@ -102,6 +105,8 @@ describe("Scales", () => {
         scale.domain([0, 10]);
         let defaultTicks = scale.ticks();
         assert.strictEqual(defaultTicks.length, 11, "ticks were generated correctly with default generator");
+        assert.deepEqual(defaultTicks, Array.apply(null, Array(11)).map((d: any, i: number) => i),
+          "all numbers from 0 to 10 were generated");
         scale.tickGenerator((scale) => scale.defaultTicks().filter(tick => tick % 3 === 0));
         let customTicks = scale.ticks();
         assert.deepEqual(customTicks, [0, 3, 6, 9], "ticks were generated correctly with custom generator");
@@ -115,11 +120,28 @@ describe("Scales", () => {
         scale = new Plottable.Scales.Linear();
       });
 
-      it("auto domains by default", () => {
+      it("has a default domain of [0, 1]", () => {
         assert.deepEqual(scale.domain(), [0, 1], "the default domain is [0, 1]");
 
         scale.autoDomain();
         assert.deepEqual(scale.domain(), [0, 1], "the domain is still [0, 1]");
+      });
+
+      it("auto domains upon request", () => {
+        scale.padProportion(0);
+
+        assert.deepEqual(scale.domain(), [0, 1], "Default domain is [0, 1]");
+        scale.addIncludedValuesProvider(() => [4, 6]);
+        assert.deepEqual(scale.domain(), [4, 6], "auto domains by default");
+
+        assert.strictEqual(scale.domain([7, 8]), scale, "Setting the domain explicitly returns the scale");
+        assert.deepEqual(scale.domain(), [7, 8], "setting the domain explicitly stops autoDomaining");
+
+        scale.addIncludedValuesProvider(() => [4, 6]);
+        assert.deepEqual(scale.domain(), [7, 8], "adding new values providers does not trigger autoDomain");
+
+        assert.strictEqual(scale.autoDomain(), scale, "setting the autoDomain returns the scale");
+        assert.deepEqual(scale.domain(), [4, 6], "triggering the autoDomain overrides the manually inputted domain");
       });
 
       it("modififes the autodomain flag accordingly", () => {
