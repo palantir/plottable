@@ -24,8 +24,17 @@ describe("Scales", () => {
 
       it.skip("ignores invalid values when calculating the extent", () => {
         let expectedExtent = [new Date("2015-06-05"), new Date("2015-06-04")];
-        let arrayWithBadValues: any[] = [null, NaN, undefined, Infinity, -Infinity, "a string",
-          0, new Date("2015-06-05"), new Date("2015-06-04")];
+        let arrayWithBadValues: any = [
+          null,
+          NaN,
+          undefined,
+          Infinity,
+          -Infinity,
+          "a string",
+          0,
+          expectedExtent[0],
+          expectedExtent[1]
+        ];
         let extent = scale.extentOfValues(arrayWithBadValues);
         assert.strictEqual(extent[0].getTime(), expectedExtent[0].getTime(), "returned correct min");
         assert.strictEqual(extent[1].getTime(), expectedExtent[1].getTime(), "returned correct max");
