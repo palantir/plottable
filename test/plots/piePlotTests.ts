@@ -9,7 +9,7 @@ describe("Plots", () => {
       let piePlot: Plottable.Plots.Pie;
 
       beforeEach(() => {
-        svg = TestMethods.generateSVG(500, 500);
+        svg = TestMethods.generateSVG();
         simpleData = [{value: 5}, {value: 15}];
         simpleDataset = new Plottable.Dataset(simpleData);
         piePlot = new Plottable.Plots.Pie();
@@ -321,7 +321,7 @@ describe("Plots", () => {
       let piePlot: Plottable.Plots.Pie;
 
       beforeEach(() => {
-        svg = TestMethods.generateSVG(500, 500);
+        svg = TestMethods.generateSVG();
         simpleData = [{value: 5}, {value: 15}];
         simpleDataset = new Plottable.Dataset(simpleData);
         piePlot = new Plottable.Plots.Pie();
@@ -364,7 +364,7 @@ describe("Plots", () => {
       let piePlot: Plottable.Plots.Pie;
 
       beforeEach(() => {
-        svg = TestMethods.generateSVG(500, 500);
+        svg = TestMethods.generateSVG();
         dataset = new Plottable.Dataset();
         piePlot = new Plottable.Plots.Pie();
         dataset.data(simpleData);
@@ -385,6 +385,8 @@ describe("Plots", () => {
       });
 
       it("retrieves the entity under each given point with entitiesAt()", () => {
+        let OUTER_RADIUS = 200;
+        piePlot.outerRadius(OUTER_RADIUS);
         let data = [
           {value: 500},
           {value: 5},
@@ -394,13 +396,21 @@ describe("Plots", () => {
         ];
         dataset.data(data);
 
-        let clicks =  [
-          { x: 260, y: 25 },
-          { x: 200, y: 25 },
-          { x: 215, y: 25 },
-          { x: 230, y: 25 },
-          { x: 245, y: 25 }
-        ];
+        let totalValue = data.map((d) => d.value).reduce((previous, current) => previous + current);
+        let runningTotal = 0;
+        let clickAngles = data.map(function(d) {
+          let angle = (runningTotal + d.value / 2) / totalValue * 2 * Math.PI;
+          runningTotal += d.value;
+          return angle;
+        });
+
+        let clicks = clickAngles.map((angle) => {
+          return {
+            x: OUTER_RADIUS + Math.sin(angle),
+            y: OUTER_RADIUS - Math.cos(angle)
+          };
+        });
+
         clicks.forEach((point: Plottable.Point, i: number) => {
           let entity = piePlot.entitiesAt(point);
           assert.strictEqual(entity.length, 1, "exactly one entity is selected");
@@ -414,29 +424,45 @@ describe("Plots", () => {
       });
 
       it("returns nothing for points within innerRadius() or outside of outerRadius() with entitiesAt()", () => {
-        piePlot.innerRadius(100).render();
-        let click1 = { x: 200, y: 201 };
-        let entity1 = piePlot.entitiesAt(click1);
-        assert.strictEqual(entity1.length, 0, "no entities returned");
-        piePlot.outerRadius(150).render();
-        let click2 = { x: 200, y: 350 };
-        let entity2 = piePlot.entitiesAt(click2);
-        TestMethods.assertPlotEntitiesEqual(entity2[0], piePlot.entities()[1], "entities are equal");
-        let click3 = { x: 200, y: 399 };
-        let entity3 = piePlot.entitiesAt(click3);
-        assert.strictEqual(entity3.length, 0, "no entities returned");
+        let INNER_RADIUS = 100;
+        piePlot.innerRadius(INNER_RADIUS);
+
+        let clickInCenter = {
+          x: 200,
+          y: 200
+        };
+        let entitiesInCenter = piePlot.entitiesAt(clickInCenter);
+        assert.lengthOf(entitiesInCenter, 0, "no entities returned when clicking inside innerRadius()");
+
+        let OUTER_RADIUS = 150;
+        piePlot.outerRadius(OUTER_RADIUS);
+        let clickBetweenRadii = {
+          x: 200,
+          y: 200 + (INNER_RADIUS + OUTER_RADIUS) / 2
+        };
+        let entitiesBetweenRadii = piePlot.entitiesAt(clickBetweenRadii);
+        TestMethods.assertPlotEntitiesEqual(entitiesBetweenRadii[0], piePlot.entities()[1], "retrieved the correct entity");
+
+        let clickOutsideOuterRadius = {
+          x: 200,
+          y: 200 + OUTER_RADIUS + 1
+        };
+        let entitiesOutsideOuterRadius = piePlot.entitiesAt(clickOutsideOuterRadius);
+        assert.lengthOf(entitiesOutsideOuterRadius, 0, "no entities returned when clicking outside outerRadius()");
         svg.remove();
       });
     });
 
     describe("Fail safe tests", () => {
       it("renders correctly with no Datasets", () => {
-        let svg = TestMethods.generateSVG(400, 400);
+        let SVG_WIDTH = 400;
+        let SVG_HEIGHT = 400;
+        let svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
         let plot = new Plottable.Plots.Pie();
         plot.sectorValue((d) => d.value);
         assert.doesNotThrow(() => plot.renderTo(svg), Error);
-        assert.strictEqual(plot.width(), 400, "was allocated width");
-        assert.strictEqual(plot.height(), 400, "was allocated height");
+        assert.strictEqual(plot.width(), SVG_WIDTH, "was allocated width");
+        assert.strictEqual(plot.height(), SVG_HEIGHT, "was allocated height");
         svg.remove();
       });
 
