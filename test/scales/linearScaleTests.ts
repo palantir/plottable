@@ -105,8 +105,7 @@ describe("Scales", () => {
         scale.domain([0, 10]);
         let defaultTicks = scale.ticks();
         assert.strictEqual(defaultTicks.length, 11, "ticks were generated correctly with default generator");
-        assert.deepEqual(defaultTicks, Array.apply(null, Array(11)).map((d: any, i: number) => i),
-          "all numbers from 0 to 10 were generated");
+        assert.deepEqual(defaultTicks, [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10], "all numbers from 0 to 10 were generated");
         scale.tickGenerator((scale) => scale.defaultTicks().filter(tick => tick % 3 === 0));
         let customTicks = scale.ticks();
         assert.deepEqual(customTicks, [0, 3, 6, 9], "ticks were generated correctly with custom generator");
@@ -142,14 +141,6 @@ describe("Scales", () => {
 
         assert.strictEqual(scale.autoDomain(), scale, "setting the autoDomain returns the scale");
         assert.deepEqual(scale.domain(), [4, 6], "triggering the autoDomain overrides the manually inputted domain");
-      });
-
-      it("modififes the autodomain flag accordingly", () => {
-        scale.addIncludedValuesProvider((scale) => [0, 5]);
-        assert.isTrue((<any> scale)._autoDomainAutomatically,
-          "the autoDomain flag is still set after autodomaining, padding and nice-ing");
-        scale.domain([0, 5]);
-        assert.isFalse((<any> scale)._autoDomainAutomatically, "the autoDomain flag is false after domain explicitly set");
       });
 
       it("accounts for included values providers", () => {
