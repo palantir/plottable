@@ -71,30 +71,30 @@ export module Plots {
         let startAngle = startAngleAccessor(datum, index, ds);
         let endAngle = endAngleAccessor(datum, index, ds);
         if (endAngle < startAngle) {
-          endAngle += (Math.floor((startAngle - endAngle) / (Math.PI * 2)) + 1) * Math.PI * 2;
+          endAngle += (Math.floor((startAngle - endAngle) / 360) + 1) * 360;
         }
         return d3.svg.arc().innerRadius(innerRadiusAccessor(datum, index, ds))
                            .outerRadius(outerRadiusAccessor(datum, index, ds))
-                           .startAngle(startAngle)
-                           .endAngle(endAngle)(datum, index);
+                           .startAngle(Utils.Math.degreeToRadian(startAngle))
+                           .endAngle(Utils.Math.degreeToRadian(endAngle))(datum, index);
       };
       return attrToProjector;
     }
 
     /**
-     * Gets the AccessorScaleBinding for the start angle.
+     * Gets the AccessorScaleBinding for the start angle in degree.
      */
     public startAngle<T>(): AccessorScaleBinding<T, number>;
     /**
-     * Sets the start angle to a constant number or the result of an Accessor<number>.
+     * Sets the start angle to a constant number or the result of an Accessor<number> in degree.
      *
      * @param {number|Accessor<number>} startAngle
      * @returns {Wheel} The calling Wheel Plot.
      */
     public startAngle(startAngle: number | Accessor<number>): Plots.Wheel<R, T>;
     /**
-     * Sets the start angle to a scaled constant value or scaled result of an Accessor.
-     * This also sets the scale for end angle.
+     * Sets the start angle to a scaled constant value or scaled result of an Accessor in degree.
+     * The supplied Scale will also be used for endAngle().
      * The provided Scale will account for the values when autoDomain()-ing.
      *
      * @param {T|Accessor<T>} startAngle
@@ -108,7 +108,7 @@ export module Plots {
       }
 
       if (scale != null) {
-        scale.range([0, Math.PI * 2]);
+        scale.range([0, 360]);
       }
 
       let endAngleBinding = this.endAngle();
@@ -123,12 +123,12 @@ export module Plots {
     }
 
     /**
-     * Gets the AccessorScaleBinding for the end angle.
+     * Gets the AccessorScaleBinding for the end angle in degree.
      */
     public endAngle<T>(): AccessorScaleBinding<T, number>;
     /**
-     * Sets the end angle to a constant number or the result of an Accessor<number>.
-     * The scale of end angle is set to be the scale of start angle.
+     * Sets the end angle to a constant number or the result of an Accessor<number> in degree.
+     * If a Scale has been set for startAngle, it will also be used to scale endAngle.
      *
      * @param {number|Accessor<number>} endAngle
      * @returns {Wheel} The calling Wheel Plot.
@@ -160,7 +160,7 @@ export module Plots {
     public innerRadius(innerRadius: number | Accessor<number>): Plots.Wheel<R, T>;
     /**
      * Sets the inner radius to a scaled constant value or scaled result of an Accessor.
-     * This also sets the scale for outer radius.
+     * The supplied Scale will also be used for outerRadius().
      * The provided Scale will account for the values when autoDomain()-ing.
      *
      * @param {R|Accessor<R>} innerRadius
@@ -174,7 +174,7 @@ export module Plots {
       }
 
       if (scale != null) {
-        scale.range([0, Math.PI * 2]);
+        scale.range([0, 360]);
       }
 
       let outerRadiusBinding = this.outerRadius();
@@ -194,7 +194,7 @@ export module Plots {
     public outerRadius<R>(): AccessorScaleBinding<R, number>;
     /**
      * Sets the outer radius to a constant number or the result of an Accessor<number>.
-     * The scale of outer radius is set to be the scale of inner radius.
+     * If a Scale has been set for innerRadius, it will also be used to scale outerRadius.
      *
      * @param {number|Accessor<number>} outerRadius
      * @returns {Wheel} The calling Wheel Plot.
@@ -219,7 +219,7 @@ export module Plots {
 
       let startAngle = Plot._scaledAccessor(this.startAngle())(datum, index, dataset);
       let endAngle = Plot._scaledAccessor(this.endAngle())(datum, index, dataset);
-      let avgAngle = (startAngle + endAngle) / 2;
+      let avgAngle = Utils.Math.degreeToRadian((startAngle + endAngle) / 2);
       return { x: avgRadius * Math.sin(avgAngle), y: -avgRadius * Math.cos(avgAngle) };
     }
 

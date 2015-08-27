@@ -103,6 +103,13 @@ export module Utils {
     export function distanceSquared(p1: Point, p2: Point) {
       return nativeMath.pow(p2.y - p1.y, 2) + nativeMath.pow(p2.x - p1.x, 2);
     }
+
+    /**
+     * Converts degree to radian
+     */
+     export function degreeToRadian(degree: number) {
+      return degree / 360 * nativeMath.PI * 2;
+    }
   }
 }
 }

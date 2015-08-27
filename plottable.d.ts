@@ -54,6 +54,10 @@ declare module Plottable {
              * @return {number} dist(p1, p2)^2
              */
             function distanceSquared(p1: Point, p2: Point): number;
+            /**
+             * Converts degree to radian
+             */
+            function degreeToRadian(degree: number): number;
         }
     }
 }
@@ -3589,19 +3593,19 @@ declare module Plottable {
             protected _getDataToDraw(): Utils.Map<Dataset, any[]>;
             protected _propertyProjectors(): AttributeToProjector;
             /**
-             * Gets the AccessorScaleBinding for the start angle.
+             * Gets the AccessorScaleBinding for the start angle in degree.
              */
             startAngle<T>(): AccessorScaleBinding<T, number>;
             /**
-             * Sets the start angle to a constant number or the result of an Accessor<number>.
+             * Sets the start angle to a constant number or the result of an Accessor<number> in degree.
              *
              * @param {number|Accessor<number>} startAngle
              * @returns {Wheel} The calling Wheel Plot.
              */
             startAngle(startAngle: number | Accessor<number>): Plots.Wheel<R, T>;
             /**
-             * Sets the start angle to a scaled constant value or scaled result of an Accessor.
-             * This also sets the scale for end angle.
+             * Sets the start angle to a scaled constant value or scaled result of an Accessor in degree.
+             * The supplied Scale will also be used for endAngle().
              * The provided Scale will account for the values when autoDomain()-ing.
              *
              * @param {T|Accessor<T>} startAngle
@@ -3610,12 +3614,12 @@ declare module Plottable {
              */
             startAngle<T>(startAngle: T | Accessor<T>, scale: Scale<T, number>): Plots.Wheel<R, T>;
             /**
-             * Gets the AccessorScaleBinding for the end angle.
+             * Gets the AccessorScaleBinding for the end angle in degree.
              */
             endAngle<T>(): AccessorScaleBinding<T, number>;
             /**
-             * Sets the end angle to a constant number or the result of an Accessor<number>.
-             * The scale of end angle is set to be the scale of start angle.
+             * Sets the end angle to a constant number or the result of an Accessor<number> in degree.
+             * If a Scale has been set for startAngle, it will also be used to scale endAngle.
              *
              * @param {number|Accessor<number>} endAngle
              * @returns {Wheel} The calling Wheel Plot.
@@ -3634,7 +3638,7 @@ declare module Plottable {
             innerRadius(innerRadius: number | Accessor<number>): Plots.Wheel<R, T>;
             /**
              * Sets the inner radius to a scaled constant value or scaled result of an Accessor.
-             * This also sets the scale for outer radius.
+             * The supplied Scale will also be used for outerRadius().
              * The provided Scale will account for the values when autoDomain()-ing.
              *
              * @param {R|Accessor<R>} innerRadius
@@ -3648,7 +3652,7 @@ declare module Plottable {
             outerRadius<R>(): AccessorScaleBinding<R, number>;
             /**
              * Sets the outer radius to a constant number or the result of an Accessor<number>.
-             * The scale of outer radius is set to be the scale of inner radius.
+             * If a Scale has been set for innerRadius, it will also be used to scale outerRadius.
              *
              * @param {number|Accessor<number>} outerRadius
              * @returns {Wheel} The calling Wheel Plot.

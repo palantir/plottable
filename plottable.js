@@ -111,6 +111,13 @@ var Plottable;
                 return nativeMath.pow(p2.y - p1.y, 2) + nativeMath.pow(p2.x - p1.x, 2);
             }
             Math.distanceSquared = distanceSquared;
+            /**
+             * Converts degree to radian
+             */
+            function degreeToRadian(degree) {
+                return degree / 360 * nativeMath.PI * 2;
+            }
+            Math.degreeToRadian = degreeToRadian;
         })(Math = Utils.Math || (Utils.Math = {}));
     })(Utils = Plottable.Utils || (Plottable.Utils = {}));
 })(Plottable || (Plottable = {}));
@@ -9844,12 +9851,12 @@ var Plottable;
                     var startAngle = startAngleAccessor(datum, index, ds);
                     var endAngle = endAngleAccessor(datum, index, ds);
                     if (endAngle < startAngle) {
-                        endAngle += (Math.floor((startAngle - endAngle) / (Math.PI * 2)) + 1) * Math.PI * 2;
+                        endAngle += (Math.floor((startAngle - endAngle) / 360) + 1) * 360;
                     }
                     return d3.svg.arc().innerRadius(innerRadiusAccessor(datum, index, ds))
                         .outerRadius(outerRadiusAccessor(datum, index, ds))
-                        .startAngle(startAngle)
-                        .endAngle(endAngle)(datum, index);
+                        .startAngle(Plottable.Utils.Math.degreeToRadian(startAngle))
+                        .endAngle(Plottable.Utils.Math.degreeToRadian(endAngle))(datum, index);
                 };
                 return attrToProjector;
             };
@@ -9858,7 +9865,7 @@ var Plottable;
                     return this._propertyBindings.get(Wheel._START_ANGLE_KEY);
                 }
                 if (scale != null) {
-                    scale.range([0, Math.PI * 2]);
+                    scale.range([0, 360]);
                 }
                 var endAngleBinding = this.endAngle();
                 var endAngleAccessor = endAngleBinding && endAngleBinding.accessor;
@@ -9884,7 +9891,7 @@ var Plottable;
                     return this._propertyBindings.get(Wheel._INNER_RADIUS_KEY);
                 }
                 if (scale != null) {
-                    scale.range([0, Math.PI * 2]);
+                    scale.range([0, 360]);
                 }
                 var outerRadiusBinding = this.outerRadius();
                 var outerRadiusAccessor = outerRadiusBinding && outerRadiusBinding.accessor;
@@ -9911,7 +9918,7 @@ var Plottable;
                 var avgRadius = (innerRadius + outerRadius) / 2;
                 var startAngle = Plottable.Plot._scaledAccessor(this.startAngle())(datum, index, dataset);
                 var endAngle = Plottable.Plot._scaledAccessor(this.endAngle())(datum, index, dataset);
-                var avgAngle = (startAngle + endAngle) / 2;
+                var avgAngle = Plottable.Utils.Math.degreeToRadian((startAngle + endAngle) / 2);
                 return { x: avgRadius * Math.sin(avgAngle), y: -avgRadius * Math.cos(avgAngle) };
             };
             Wheel._INNER_RADIUS_KEY = "inner-radius";

@@ -2,9 +2,11 @@
 
 describe("Plots", () => {
   describe("WheelPlot", () => {
+    const SVG_WIDTH = 400;
+    const SVG_HEIGHT = 500;
+    const TAU = Math.PI * 2;
+
     describe("basic usage", () => {
-      let SVG_WIDTH = 400;
-      let SVG_HEIGHT = 500;
       let svg: d3.Selection<void>;
       let wheelPlot: Plottable.Plots.Wheel<number, number>;
       let rScale: Plottable.Scales.Linear;
@@ -14,7 +16,7 @@ describe("Plots", () => {
         svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
         rScale = new Plottable.Scales.Linear();
         tScale = new Plottable.Scales.Linear();
-        tScale.domain([0, 360]);
+        tScale.domain([0, TAU]);
         wheelPlot = new Plottable.Plots.Wheel();
         wheelPlot.innerRadius((d) => d.r1, rScale);
         wheelPlot.outerRadius((d) => d.r2);
@@ -32,8 +34,8 @@ describe("Plots", () => {
 
       it("the accessors properly access data, index and Dataset", () => {
         let data = [
-          {r1: 0, r2: 1, t1: 0, t2: 180 },
-          {r1: 1, r2: 2, t1: 180, t2: 360 }];
+          {r1: 0, r2: 1, t1: 0, t2: TAU / 2 },
+          {r1: 1, r2: 2, t1: TAU / 2, t2: TAU }];
         let dataset = new Plottable.Dataset(data);
         wheelPlot.addDataset(dataset);
         wheelPlot.renderTo(svg);
@@ -43,11 +45,11 @@ describe("Plots", () => {
         let path2 = d3.select(slices[0][1]).attr("d");
 
         let arc1 = d3.svg.arc().innerRadius(rScale.scale(0)).outerRadius(rScale.scale(1))
-                               .startAngle(tScale.scale(0)).endAngle(tScale.scale(180));
+                               .startAngle(0).endAngle(TAU / 2);
         let arc1Path = arc1(null);
 
         let arc2 = d3.svg.arc().innerRadius(rScale.scale(1)).outerRadius(rScale.scale(2))
-                               .startAngle(tScale.scale(180)).endAngle(tScale.scale(360));
+                               .startAngle(TAU / 2).endAngle(TAU);
         let arc2Path = arc2(null);
         TestMethods.assertAreaPathCloseTo(path1, arc1Path, 0.1, "arc is drawn as represented by data");
         TestMethods.assertAreaPathCloseTo(path2, arc2Path, 0.1, "arc is drawn as represented by data");
@@ -68,28 +70,29 @@ describe("Plots", () => {
         svg.remove();
       });
 
-      it("draws arc clockwise from startAngle toendAngle", () => {
+      it("draws arc clockwise from startAngle to endAngle", () => {
         let data = [
-            { r1: 0, r2: 1, t1: 60, t2: -60, expected: 300 },
-            { r1: 1, r2: 2, t1: 60, t2: 60, expected: 60 },
-            { r1: 2, r2: 3, t1: 60, t2: -300, expected: 420 },
-            { r1: 3, r2: 4, t1: 0, t2: 360, expected: 360 },
-            { r1: 3, r2: 4, t1: 90, t2: 70, expected: 430 },
-            { r1: 3, r2: 4, t1: -60, t2: -180, expected: 180 }
+            { r1: 0, r2: 1, t1: 60, t2: -60, expectedEndAngle: 300 },
+            { r1: 1, r2: 2, t1: 60, t2: 60, expectedEndAngle: 60 },
+            { r1: 2, r2: 3, t1: 60, t2: -300, expectedEndAngle: 420 },
+            { r1: 3, r2: 4, t1: 0, t2: 360, expectedEndAngle: 360 },
+            { r1: 3, r2: 4, t1: 90, t2: 70, expectedEndAngle: 430 },
+            { r1: 3, r2: 4, t1: -60, t2: -180, expectedEndAngle: 180 }
         ];
+
         let dataset = new Plottable.Dataset(data);
         wheelPlot.addDataset(dataset);
+        wheelPlot.startAngle((d) => d.t1, null);
         wheelPlot.renderTo(svg);
         let slices = wheelPlot.selections();
         data.forEach((datum, i) => {
-          let startAngle = datum.t1;
-          let endAngle = datum.t2;
-          let expectedEndAngle = datum.expected;
+          let startAngle = Plottable.Utils.Math.degreeToRadian(datum.t1);
+          let expectedEndAngle = Plottable.Utils.Math.degreeToRadian(datum.expectedEndAngle);
           let path = d3.select(slices[0][i]).attr("d");
           let arc = d3.svg.arc().innerRadius(rScale.scale(datum.r1)).outerRadius(rScale.scale(datum.r2))
-                                .startAngle(tScale.scale(startAngle)).endAngle(tScale.scale(expectedEndAngle));
+                                .startAngle(startAngle).endAngle(expectedEndAngle);
           let expectedPath = arc(null);
-          TestMethods.assertAreaPathCloseTo(path, expectedPath, 0.1, `arc is drawn from ${startAngle} to ${endAngle}`);
+          TestMethods.assertAreaPathCloseTo(path, expectedPath, 0.1, `arc is drawn from ${datum.t1} to ${datum.t2}`);
         });
 
         svg.remove();
@@ -115,6 +118,7 @@ describe("Plots", () => {
         ];
 
         let dataset = new Plottable.Dataset(data);
+        wheelPlot.startAngle((d) => d.t1, null);
         wheelPlot.addDataset(dataset);
         wheelPlot.renderTo(svg);
 
@@ -130,23 +134,18 @@ describe("Plots", () => {
       });
     });
 
-    describe("innerRadius and outerRadius", () => {
-      let SVG_WIDTH = 400;
-      let SVG_HEIGHT = 500;
+    describe("innerRadius() and outerRadius()", () => {
       let svg: d3.Selection<void>;
       let wheelPlot: Plottable.Plots.Wheel<number, number>;
       let rScale: Plottable.Scales.Linear;
-      let tScale: Plottable.Scales.Linear;
       let data: [any];
       let dataset: Plottable.Dataset;
 
       beforeEach(() => {
         svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
         rScale = new Plottable.Scales.Linear();
-        tScale = new Plottable.Scales.Linear();
-        tScale.domain([0, 360]);
         wheelPlot = new Plottable.Plots.Wheel();
-        wheelPlot.startAngle((d) => d.t1, tScale);
+        wheelPlot.startAngle((d) => d.t1);
         wheelPlot.endAngle((d) => d.t2);
         data = [
           {r1: 0, r2: 1, t1: 0, t2: 180 },
@@ -195,9 +194,8 @@ describe("Plots", () => {
         svg.remove();
       });
 
-      it("sets scale of outerRadius when scale of innerRadius is set", () => {
+      it("updates the scale of outerRadius when scale of innerRadius is set", () => {
         wheelPlot.outerRadius((d) => d.r2);
-        wheelPlot.renderTo(svg);
 
         assert.isUndefined(wheelPlot.outerRadius().scale, "scale of outerRadius is undefined initially");
 
@@ -208,9 +206,20 @@ describe("Plots", () => {
         assert.isNull(wheelPlot.outerRadius().scale, "scale of outerRadius is set to null");
         svg.remove();
       });
+
+      it("sets the scale of outerRadius to the scale of innerRadius", () => {
+        wheelPlot.innerRadius((d) => d.r1, rScale);
+        wheelPlot.outerRadius((d) => d.r2);
+        assert.deepEqual(wheelPlot.outerRadius().scale, rScale, "scale of outerRadius is set to be the same scale as innerRadius");
+
+        wheelPlot.innerRadius((d) => d.r1, null);
+        wheelPlot.outerRadius((d) => d.r2);
+        assert.isNull(wheelPlot.outerRadius().scale, "scale of outerRadius is set to null");
+        svg.remove();
+      });
     });
 
-    describe("startAngle and endAngle", () => {
+    describe("startAngle() and endAngle()", () => {
       let SVG_WIDTH = 400;
       let SVG_HEIGHT = 500;
       let svg: d3.Selection<void>;
@@ -224,13 +233,13 @@ describe("Plots", () => {
         svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
         rScale = new Plottable.Scales.Linear();
         tScale = new Plottable.Scales.Linear();
-        tScale.domain([0, 360]);
+        tScale.domain([0, TAU]);
         wheelPlot = new Plottable.Plots.Wheel();
         wheelPlot.innerRadius((d) => d.r1, rScale);
         wheelPlot.outerRadius((d) => d.r2);
         data = [
-          {r1: 0, r2: 1, t1: 0, t2: 180 },
-          {r1: 1, r2: 2, t1: 180, t2: 360 }];
+          {r1: 0, r2: 1, t1: 0, t2: TAU / 2 },
+          {r1: 1, r2: 2, t1: TAU / 2, t2: TAU }];
         dataset = new Plottable.Dataset(data);
         wheelPlot.addDataset(dataset);
       });
@@ -247,13 +256,13 @@ describe("Plots", () => {
 
         wheelPlot.startAngle((d) => d.t1);
         assert.strictEqual(wheelPlot.startAngle().accessor(data[0], 0, dataset), 0, "access startAngle correctly without a scale");
-        assert.strictEqual(wheelPlot.startAngle().accessor(data[1], 1, dataset), 180, "access startAngle correctly without a scale");
+        assert.strictEqual(wheelPlot.startAngle().accessor(data[1], 1, dataset), TAU / 2, "access startAngle correctly without a scale");
         assert.isUndefined(wheelPlot.startAngle().scale, "scale of startAngle is undefined");
 
         wheelPlot.startAngle((d) => d.t1, tScale);
-        assert.deepEqual(wheelPlot.startAngle().scale.range(), [0, Math.PI * 2], "range of startAngle should be 0 to 2PI");
+        assert.deepEqual(wheelPlot.startAngle().scale.range(), [0, 360], "range of startAngle should be 0 to 360");
         assert.strictEqual(wheelPlot.startAngle().accessor(data[0], 0, dataset), 0, "access startAngle correctly with a scale");
-        assert.strictEqual(wheelPlot.startAngle().accessor(data[1], 1, dataset), 180, "access startAngle correctly with a scale");
+        assert.strictEqual(wheelPlot.startAngle().accessor(data[1], 1, dataset), TAU / 2, "access startAngle correctly with a scale");
         assert.deepEqual(wheelPlot.startAngle().scale, tScale, "scale of startAngle is set correctly");
 
         svg.remove();
@@ -270,15 +279,14 @@ describe("Plots", () => {
         assert.isUndefined(wheelPlot.endAngle().scale, "scale of endAngle is undefined");
 
         wheelPlot.endAngle((d) => d.t2);
-        assert.strictEqual(wheelPlot.endAngle().accessor(data[0], 0, dataset), 180, "access endAngle correctly without a scale");
-        assert.strictEqual(wheelPlot.endAngle().accessor(data[1], 1, dataset), 360, "access endAngle correctly without a scale");
+        assert.strictEqual(wheelPlot.endAngle().accessor(data[0], 0, dataset), TAU / 2, "access endAngle correctly without a scale");
+        assert.strictEqual(wheelPlot.endAngle().accessor(data[1], 1, dataset), TAU, "access endAngle correctly without a scale");
         assert.isUndefined(wheelPlot.endAngle().scale, "scale of endAngle is undefined");
         svg.remove();
       });
 
-      it("sets scale of endAngle when scale of startAngle is set", () => {
+      it("updates the scale of endAngle when scale of startAngle is set", () => {
         wheelPlot.endAngle((d) => d.t2);
-        wheelPlot.renderTo(svg);
 
         assert.isUndefined(wheelPlot.endAngle().scale, "scale of endAngle is undefined initially");
 
@@ -287,7 +295,17 @@ describe("Plots", () => {
 
         wheelPlot.startAngle((d) => d.t1, null);
         assert.isNull(wheelPlot.endAngle().scale, "scale of endAngle is set to null");
+        svg.remove();
+      });
 
+      it("sets the scale of endAngle to the scale of startAngle", () => {
+        wheelPlot.startAngle((d) => d.t1, tScale);
+        wheelPlot.endAngle((d) => d.t2);
+        assert.deepEqual(wheelPlot.endAngle().scale, tScale, "scale of endAngle is set to be the same scale of startAngle");
+
+        wheelPlot.startAngle((d) => d.t1, null);
+        wheelPlot.endAngle((d) => d.t2);
+        assert.isNull(wheelPlot.endAngle().scale, "scale of endAngle is set to null");
         svg.remove();
       });
     });
