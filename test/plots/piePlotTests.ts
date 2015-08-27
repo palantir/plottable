@@ -65,14 +65,13 @@ describe("Plots", () => {
         svg.remove();
       });
 
-      it("uses a plottable-colors color scale to color sectors by default", () => {
-        let arcPaths = piePlot.content().selectAll(".arc");
+      it("uses a plottable colors for sectors by default", () => {
+        let arcPaths = piePlot.content().selectAll(".arc.fill");
+        let plottableColors = new Plottable.Scales.Color().range();
 
-        let arcPath0 = d3.select(arcPaths[0][0]);
-        assert.strictEqual(arcPath0.attr("fill"), "#5279c7", "first sector filled appropriately");
-
-        let arcPath1 = d3.select(arcPaths[0][1]);
-        assert.strictEqual(arcPath1.attr("fill"), "#fd373e", "second sector filled appropriately");
+        arcPaths.each(function(d, i) {
+          assert.strictEqual(d3.select(this).attr("fill"), plottableColors[i], `sector with index ${i} has the correct fill color`);
+        });
         svg.remove();
       });
 
