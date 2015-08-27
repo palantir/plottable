@@ -105,9 +105,9 @@ describe("InterpolatedColorLegend", () => {
   it("does not crash when font-size is 0px", () => {
     let legend = new Plottable.Components.InterpolatedColorLegend(colorScale);
     legend.renderTo(svg);
-    let style = (<any> legend)._element.append("style");
+    let style = legend.content().append("style");
     style.attr("type", "text/css");
-    style.text(".plottable .legend { font-size: 0px; }");
+    style.text(".plottable .interpolated-color-legend text { font-size: 0px; }");
     assert.doesNotThrow(() => legend.expands(true), Error, "it does not throw error when font-size is 0px");
 
     style.remove();

@@ -227,12 +227,8 @@ export module Components {
       };
 
       let numSwatches = InterpolatedColorLegend._DEFAULT_NUM_SWATCHES;
-
-      if (this.expands()) {
-        let textHeight = this._measurer.measure().height;
-        if (textHeight === 0) {
-          return this;
-        }
+      let textHeight = this._measurer.measure().height;
+      if (this.expands() && textHeight > 0) {
         let offset = this._isVertical() ? 2 * padding :  4 * padding - text0Width - text1Width;
         let fullLength = this._isVertical() ? this.height() : this.width();
         numSwatches = Math.max(Math.floor((fullLength - offset) / textHeight), numSwatches);
