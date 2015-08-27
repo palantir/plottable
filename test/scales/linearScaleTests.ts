@@ -147,7 +147,7 @@ describe("Scales", () => {
       it("modififes the autodomain flag accordingly", () => {
         scale.addIncludedValuesProvider((scale) => [0, 5]);
         assert.isTrue((<any> scale)._autoDomainAutomatically,
-          "the autoDomain flag is still set after autoranginging and padding and nice-ing");
+          "the autoDomain flag is still set after autodomaining, padding and nice-ing");
         scale.domain([0, 5]);
         assert.isFalse((<any> scale)._autoDomainAutomatically, "the autoDomain flag is false after domain explicitly set");
       });
@@ -378,7 +378,7 @@ describe("Scales", () => {
         plot.attr("x", (d) => d.x, scale);
         plot.renderTo(svg);
 
-        assert.deepEqual(scale.domain(), [0, 5], "scale domain was autoranged properly");
+        assert.deepEqual(scale.domain(), [0, 5], "scale domain was autodomained correctly");
 
         dataset.data([{x: 100}]);
         assert.deepEqual(scale.domain(), [99, 101], "scale domain was updated properly");
