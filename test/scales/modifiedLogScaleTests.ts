@@ -6,6 +6,7 @@ describe("Scales", () => {
     describe("Basic Usage", () => {
       let scale: Plottable.Scales.ModifiedLog;
       let base = 10;
+      let delta = 0.00001;
       let epsilon = 0.00001;
 
       beforeEach(() => {
@@ -15,18 +16,18 @@ describe("Scales", () => {
       it("is an increasing, continuous function that can go negative", () => {
         d3.range(-base * 2, base * 2, base / 20).forEach((x: number) => {
           // increasing
-          assert.operator(scale.scale(x - epsilon), "<", scale.scale(x));
-          assert.operator(scale.scale(x), "<", scale.scale(x + epsilon));
+          assert.operator(scale.scale(x - delta), "<", scale.scale(x));
+          assert.operator(scale.scale(x), "<", scale.scale(x + delta));
           // continuous
-          assert.closeTo(scale.scale(x - epsilon), scale.scale(x), epsilon);
-          assert.closeTo(scale.scale(x), scale.scale(x + epsilon), epsilon);
+          assert.closeTo(scale.scale(x - delta), scale.scale(x), epsilon);
+          assert.closeTo(scale.scale(x), scale.scale(x + delta), epsilon);
         });
         assert.closeTo(scale.scale(0), 0, epsilon);
       });
 
       it("has log() behavior at values > base", () => {
-        [10, 100, 23103.4, 5].forEach((x) => {
-          assert.closeTo(scale.scale(x), Math.log(x) / Math.log(10), 0.1);
+        [10, 100, 23103.4, 1e+45].forEach((x) => {
+          assert.closeTo(scale.scale(x), Math.log(x) / Math.log(10), epsilon);
         });
       });
 
@@ -42,7 +43,7 @@ describe("Scales", () => {
       });
 
       it("can be padded", () => {
-        scale.addIncludedValuesProvider((scale: Plottable.Scales.ModifiedLog) => [0, base]);
+        scale.addIncludedValuesProvider(() => [0, base]);
         scale.padProportion(0);
         let unpaddedDomain = scale.domain();
         scale.padProportion(0.1);
@@ -63,22 +64,23 @@ describe("Scales", () => {
 
     });
 
-    describe("Other bases", () => {
+    describe("Scale bases", () => {
       it("uses 10 as the default base", () => {
         let scale = new Plottable.Scales.ModifiedLog();
-        assert.strictEqual((<any>scale)._base, 10, "10 is the default base");
+        scale.range([0, 1]);
+        assert.strictEqual(scale.scale(10), 1, "10 is base");
+        assert.strictEqual(scale.scale(100), 2, "10^2 will result in a double value compared to the base");
       });
 
-      it("works with base 2", () => {
+      it("can scale values using base 2", () => {
         let scale = new Plottable.Scales.ModifiedLog(2);
-        assert.strictEqual((<any>scale)._base, 2, "base 2 is selected");
         scale.domain([0, 16]);
         scale.range([0, 1]);
 
         assert.strictEqual(scale.scale(-2), -0.25, "scales negative values");
         assert.strictEqual(scale.scale(0), 0, "scales 0");
         assert.strictEqual(scale.scale(2), 0.25, "scales base");
-        assert.strictEqual(scale.scale(4), 0.5, "scales random values");
+        assert.strictEqual(scale.scale(4), 0.5, "scales other values");
         assert.strictEqual(scale.scale(16), 1, "scales maximum value");
         assert.strictEqual(scale.scale(256), 2, "scales values outside the domain");
 
@@ -98,7 +100,7 @@ describe("Scales", () => {
 
       it("expands single value domains to [value / base, value * base].sort()", () => {
         let singleValue = 15;
-        scale.addIncludedValuesProvider((scale: Plottable.Scales.ModifiedLog) => [singleValue]);
+        scale.addIncludedValuesProvider(() => [singleValue]);
         assert.deepEqual(scale.domain(), [singleValue / base, singleValue * base],
           "positive single-value extent was expanded to [value / base, value * base]");
         singleValue = -15;
@@ -113,7 +115,7 @@ describe("Scales", () => {
 
       it("can force the minimum of the domain with domainMin()", () => {
         let requestedDomain = [-5, 5];
-        scale.addIncludedValuesProvider((scale) => requestedDomain);
+        scale.addIncludedValuesProvider(() => requestedDomain);
 
         let minBelowBottom = -10;
         assert.strictEqual(scale.domainMin(minBelowBottom), scale, "the scale is returned by the setter");
@@ -136,13 +138,13 @@ describe("Scales", () => {
 
         scale.domainMin(minInMiddle);
         let requestedDomain2 = [-10, 10];
-        scale.addIncludedValuesProvider((scale) => requestedDomain2);
+        scale.addIncludedValuesProvider(() => requestedDomain2);
         assert.deepEqual(scale.domain(), [minInMiddle, requestedDomain2[1]], "adding another ExtentsProvider doesn't change domainMin()");
       });
 
       it("can force the maximum of the domain with domainMax()", () => {
         let requestedDomain = [-5, 5];
-        scale.addIncludedValuesProvider((scale) => requestedDomain);
+        scale.addIncludedValuesProvider(() => requestedDomain);
 
         let maxAboveTop = 10;
         assert.strictEqual(scale.domainMax(maxAboveTop), scale, "the scale is returned by the setter");
@@ -165,13 +167,13 @@ describe("Scales", () => {
 
         scale.domainMax(maxInMiddle);
         let requestedDomain2 = [-10, 10];
-        scale.addIncludedValuesProvider((scale) => requestedDomain2);
+        scale.addIncludedValuesProvider(() => requestedDomain2);
         assert.deepEqual(scale.domain(), [requestedDomain2[0], maxInMiddle], "adding another ExtentsProvider doesn't change domainMax()");
       });
 
       it("can force the domain by using domainMin() and domainMax() together", () => {
         let requestedDomain = [-5, 5];
-        scale.addIncludedValuesProvider((scale) => requestedDomain);
+        scale.addIncludedValuesProvider(() => requestedDomain);
 
         let desiredMin = -10;
         let desiredMax = 10;
@@ -198,14 +200,14 @@ describe("Scales", () => {
       });
 
       it("gives reasonable values for ticks()", () => {
-        let includedValuesProvider = (scale: Plottable.Scales.ModifiedLog) => [0, base / 2];
+        let includedValuesProvider = () => [0, base / 2];
         scale.addIncludedValuesProvider(includedValuesProvider);
 
         let ticks = scale.ticks();
         assert.operator(ticks.length, ">", 0, "there should be some ticks generated");
 
         scale.removeIncludedValuesProvider(includedValuesProvider);
-        includedValuesProvider = (scale: Plottable.Scales.ModifiedLog) => [-base * 2, base * 2];
+        includedValuesProvider = () => [-base * 2, base * 2];
         scale.addIncludedValuesProvider(includedValuesProvider);
 
         ticks = scale.ticks();
