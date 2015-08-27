@@ -104,10 +104,7 @@ export module Utils {
       return nativeMath.pow(p2.y - p1.y, 2) + nativeMath.pow(p2.x - p1.x, 2);
     }
 
-    /**
-     * Converts degree to radian
-     */
-     export function degreeToRadian(degree: number) {
+    export function degreesToRadians(degree: number) {
       return degree / 360 * nativeMath.PI * 2;
     }
   }

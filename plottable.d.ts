@@ -54,10 +54,7 @@ declare module Plottable {
              * @return {number} dist(p1, p2)^2
              */
             function distanceSquared(p1: Point, p2: Point): number;
-            /**
-             * Converts degree to radian
-             */
-            function degreeToRadian(degree: number): number;
+            function degreesToRadians(degree: number): number;
         }
     }
 }
@@ -3593,18 +3590,18 @@ declare module Plottable {
             protected _getDataToDraw(): Utils.Map<Dataset, any[]>;
             protected _propertyProjectors(): AttributeToProjector;
             /**
-             * Gets the AccessorScaleBinding for the start angle in degree.
+             * Gets the AccessorScaleBinding for the start angle in degrees.
              */
             startAngle<T>(): AccessorScaleBinding<T, number>;
             /**
-             * Sets the start angle to a constant number or the result of an Accessor<number> in degree.
+             * Sets the start angle to a constant number or the result of an Accessor<number> in degrees.
              *
              * @param {number|Accessor<number>} startAngle
              * @returns {Wheel} The calling Wheel Plot.
              */
             startAngle(startAngle: number | Accessor<number>): Plots.Wheel<R, T>;
             /**
-             * Sets the start angle to a scaled constant value or scaled result of an Accessor in degree.
+             * Sets the start angle to a scaled constant value or scaled result of an Accessor in degrees.
              * The supplied Scale will also be used for endAngle().
              * The provided Scale will account for the values when autoDomain()-ing.
              *
@@ -3614,11 +3611,11 @@ declare module Plottable {
              */
             startAngle<T>(startAngle: T | Accessor<T>, scale: Scale<T, number>): Plots.Wheel<R, T>;
             /**
-             * Gets the AccessorScaleBinding for the end angle in degree.
+             * Gets the AccessorScaleBinding for the end angle in degrees.
              */
             endAngle<T>(): AccessorScaleBinding<T, number>;
             /**
-             * Sets the end angle to a constant number or the result of an Accessor<number> in degree.
+             * Sets the end angle to a constant number or the result of an Accessor<number> in degrees.
              * If a Scale has been set for startAngle, it will also be used to scale endAngle.
              *
              * @param {number|Accessor<number>} endAngle

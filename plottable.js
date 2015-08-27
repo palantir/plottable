@@ -111,13 +111,10 @@ var Plottable;
                 return nativeMath.pow(p2.y - p1.y, 2) + nativeMath.pow(p2.x - p1.x, 2);
             }
             Math.distanceSquared = distanceSquared;
-            /**
-             * Converts degree to radian
-             */
-            function degreeToRadian(degree) {
+            function degreesToRadians(degree) {
                 return degree / 360 * nativeMath.PI * 2;
             }
-            Math.degreeToRadian = degreeToRadian;
+            Math.degreesToRadians = degreesToRadians;
         })(Math = Utils.Math || (Utils.Math = {}));
     })(Utils = Plottable.Utils || (Plottable.Utils = {}));
 })(Plottable || (Plottable = {}));
@@ -9855,8 +9852,8 @@ var Plottable;
                     }
                     return d3.svg.arc().innerRadius(innerRadiusAccessor(datum, index, ds))
                         .outerRadius(outerRadiusAccessor(datum, index, ds))
-                        .startAngle(Plottable.Utils.Math.degreeToRadian(startAngle))
-                        .endAngle(Plottable.Utils.Math.degreeToRadian(endAngle))(datum, index);
+                        .startAngle(Plottable.Utils.Math.degreesToRadians(startAngle))
+                        .endAngle(Plottable.Utils.Math.degreesToRadians(endAngle))(datum, index);
                 };
                 return attrToProjector;
             };
@@ -9918,7 +9915,7 @@ var Plottable;
                 var avgRadius = (innerRadius + outerRadius) / 2;
                 var startAngle = Plottable.Plot._scaledAccessor(this.startAngle())(datum, index, dataset);
                 var endAngle = Plottable.Plot._scaledAccessor(this.endAngle())(datum, index, dataset);
-                var avgAngle = Plottable.Utils.Math.degreeToRadian((startAngle + endAngle) / 2);
+                var avgAngle = Plottable.Utils.Math.degreesToRadians((startAngle + endAngle) / 2);
                 return { x: avgRadius * Math.sin(avgAngle), y: -avgRadius * Math.cos(avgAngle) };
             };
             Wheel._INNER_RADIUS_KEY = "inner-radius";

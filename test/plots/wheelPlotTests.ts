@@ -86,8 +86,8 @@ describe("Plots", () => {
         wheelPlot.renderTo(svg);
         let slices = wheelPlot.selections();
         data.forEach((datum, i) => {
-          let startAngle = Plottable.Utils.Math.degreeToRadian(datum.t1);
-          let expectedEndAngle = Plottable.Utils.Math.degreeToRadian(datum.expectedEndAngle);
+          let startAngle = Plottable.Utils.Math.degreesToRadians(datum.t1);
+          let expectedEndAngle = Plottable.Utils.Math.degreesToRadians(datum.expectedEndAngle);
           let path = d3.select(slices[0][i]).attr("d");
           let arc = d3.svg.arc().innerRadius(rScale.scale(datum.r1)).outerRadius(rScale.scale(datum.r2))
                                 .startAngle(startAngle).endAngle(expectedEndAngle);
