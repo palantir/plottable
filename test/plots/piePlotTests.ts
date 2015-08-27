@@ -32,7 +32,7 @@ describe("Plots", () => {
 
       it("draws slices proportional in angle to their value", () => {
         let arcPaths = piePlot.content().selectAll(".arc.fill");
-        assert.lengthOf(arcPaths[0], 2, "only has two sectors");
+        assert.strictEqual(arcPaths.size(), 2, "has two sectors");
         let arcPath0 = d3.select(arcPaths[0][0]);
         let pathPoints0 = TestMethods.normalizePath(arcPath0.attr("d")).split(/[A-Z]/).slice(1, 4);
 
@@ -103,7 +103,7 @@ describe("Plots", () => {
         let expectedInnerRadius = 5;
         piePlot.innerRadius(expectedInnerRadius);
         let arcPaths = piePlot.content().selectAll(".arc.fill");
-        assert.lengthOf(arcPaths[0], 2, "only has two sectors");
+        assert.strictEqual(arcPaths.size(), 2, "has two sectors");
 
         let pathPoints0 = TestMethods.normalizePath(d3.select(arcPaths[0][0]).attr("d")).split(/[A-Z]/).slice(1, 5);
 
@@ -124,7 +124,7 @@ describe("Plots", () => {
         let expectedOuterRadius = 150;
         piePlot.outerRadius(() => expectedOuterRadius);
         let arcPaths = piePlot.content().selectAll(".arc.fill");
-        assert.lengthOf(arcPaths[0], 2, "only has two sectors");
+        assert.strictEqual(arcPaths.size(), 2, "has two sectors");
 
         let pathPoints0 = TestMethods.normalizePath(d3.select(arcPaths[0][0]).attr("d")).split(/[A-Z]/).slice(1, 5);
 
@@ -366,7 +366,6 @@ describe("Plots", () => {
 
         svg.remove();
       });
-
     });
 
     describe("Entities", () => {
