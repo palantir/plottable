@@ -5,7 +5,9 @@ interface Window {
   Pixel_CloseTo_Requirement: number;
 }
 
-assert = chai.assert;
+/* tslint:disable:no-unused-variable */
+const assert = chai.assert;
+/* tslint:enable:no-unused-variable */
 
 before(() => {
   // Set the render policy to immediate to make sure ETE tests can check DOM change immediately
@@ -27,14 +29,6 @@ before(() => {
 });
 
 after(() => {
-  let mocha = d3.select("#mocha-report");
-  if (mocha.node() != null) {
-    let suites = mocha.selectAll(".suite");
-    for (let i = 0; i < suites[0].length; i++) {
-      let curSuite = d3.select(suites[0][i]);
-      assert(curSuite.selectAll("ul").selectAll("svg").node() === null, "all svgs have been removed");
-    }
-  } else {
-    assert(d3.select("body").selectAll("svg").node() === null, "all svgs have been removed");
-  }
+  assert.strictEqual(d3.selectAll("svg").size(), 0, "all svgs have been removed");
+  assert.strictEqual(d3.selectAll("style").size(), 0, "all style nodes have been removed");
 });

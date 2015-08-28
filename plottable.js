@@ -1,5 +1,5 @@
 /*!
-Plottable 1.8.0 (https://github.com/palantir/plottable)
+Plottable 1.9.0 (https://github.com/palantir/plottable)
 Copyright 2014-2015 Palantir Technologies
 Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
 */
@@ -111,6 +111,10 @@ var Plottable;
                 return nativeMath.pow(p2.y - p1.y, 2) + nativeMath.pow(p2.x - p1.x, 2);
             }
             Math.distanceSquared = distanceSquared;
+            function degreesToRadians(degree) {
+                return degree / 360 * nativeMath.PI * 2;
+            }
+            Math.degreesToRadians = degreesToRadians;
         })(Math = Utils.Math || (Utils.Math = {}));
     })(Utils = Plottable.Utils || (Plottable.Utils = {}));
 })(Plottable || (Plottable = {}));
@@ -901,7 +905,7 @@ var Plottable;
 ///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
-    Plottable.version = "1.8.0";
+    Plottable.version = "1.9.0";
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
@@ -3191,6 +3195,9 @@ var Plottable;
             if (element != null) {
                 var selection;
                 if (typeof (element) === "string") {
+                    selection = d3.select(element);
+                }
+                else if (element instanceof Element) {
                     selection = d3.select(element);
                 }
                 else {
@@ -6287,6 +6294,12 @@ var Plottable;
                 this._orientation = orientation;
                 this._clipPathEnabled = true;
                 this.addClass("guide-line-layer");
+                if (this._isVertical()) {
+                    this.addClass("vertical");
+                }
+                else {
+                    this.addClass("horizontal");
+                }
                 this._scaleUpdateCallback = function () {
                     _this._syncPixelPositionAndValue();
                     _this.render();
@@ -6345,6 +6358,13 @@ var Plottable;
                 else if (this._mode === PropertyMode.PIXEL && this.pixelPosition() != null) {
                     this._value = this.scale().invert(this.pixelPosition());
                 }
+            };
+            GuideLineLayer.prototype._setPixelPositionWithoutChangingMode = function (pixelPosition) {
+                this._pixelPosition = pixelPosition;
+                if (this.scale() != null) {
+                    this._value = this.scale().invert(this.pixelPosition());
+                }
+                this.render();
             };
             GuideLineLayer.prototype.scale = function (scale) {
                 if (scale == null) {
@@ -9754,6 +9774,166 @@ var Plottable;
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var Plottable;
+(function (Plottable) {
+    var Plots;
+    (function (Plots) {
+        var Wheel = (function (_super) {
+            __extends(Wheel, _super);
+            /**
+             * @constructor
+             */
+            function Wheel() {
+                _super.call(this);
+                this.addClass("wheel-plot");
+            }
+            Wheel.prototype.computeLayout = function (origin, availableWidth, availableHeight) {
+                _super.prototype.computeLayout.call(this, origin, availableWidth, availableHeight);
+                this._renderArea.attr("transform", "translate(" + this.width() / 2 + "," + this.height() / 2 + ")");
+                var radiusLimit = Math.min(this.width(), this.height()) / 2;
+                if (this.r() != null && this.r().scale != null) {
+                    this.r().scale.range([0, radiusLimit]);
+                }
+                if (this.r2() != null && this.r2().scale != null) {
+                    this.r2().scale.range([0, radiusLimit]);
+                }
+                return this;
+            };
+            Wheel.prototype._createDrawer = function (dataset) {
+                return new Plottable.Drawers.Arc(dataset);
+            };
+            Wheel.prototype.entities = function (datasets) {
+                var _this = this;
+                if (datasets === void 0) { datasets = this.datasets(); }
+                var entities = _super.prototype.entities.call(this, datasets);
+                entities.forEach(function (entity) {
+                    entity.position.x += _this.width() / 2;
+                    entity.position.y += _this.height() / 2;
+                });
+                return entities;
+            };
+            Wheel.prototype._getDataToDraw = function () {
+                var dataToDraw = _super.prototype._getDataToDraw.call(this);
+                if (this.datasets().length === 0) {
+                    return dataToDraw;
+                }
+                var tAccessor = Plottable.Plot._scaledAccessor(this.t());
+                var t2Accessor = Plottable.Plot._scaledAccessor(this.t2());
+                var rAccessor = Plottable.Plot._scaledAccessor(this.r());
+                var r2Accessor = Plottable.Plot._scaledAccessor(this.r2());
+                var ds = this.datasets()[0];
+                var data = dataToDraw.get(ds);
+                var filteredData = data.filter(function (d, i) {
+                    return Plottable.Utils.Math.isValidNumber(tAccessor(d, i, ds)) &&
+                        Plottable.Utils.Math.isValidNumber(t2Accessor(d, i, ds)) &&
+                        Plottable.Utils.Math.isValidNumber(rAccessor(d, i, ds)) &&
+                        Plottable.Utils.Math.isValidNumber(r2Accessor(d, i, ds)) &&
+                        rAccessor(d, i, ds) >= 0 && r2Accessor(d, i, ds) >= 0;
+                });
+                dataToDraw.set(ds, filteredData);
+                return dataToDraw;
+            };
+            Wheel.prototype._propertyProjectors = function () {
+                var attrToProjector = _super.prototype._propertyProjectors.call(this);
+                var rAccessor = Plottable.Plot._scaledAccessor(this.r());
+                var r2Accessor = Plottable.Plot._scaledAccessor(this.r2());
+                var tAccessor = Plottable.Plot._scaledAccessor(this.t());
+                var t2Accessor = Plottable.Plot._scaledAccessor(this.t2());
+                attrToProjector["d"] = function (datum, index, ds) {
+                    var t = tAccessor(datum, index, ds);
+                    var t2 = t2Accessor(datum, index, ds);
+                    if (t2 < t) {
+                        t2 += (Math.floor((t - t2) / 360) + 1) * 360;
+                    }
+                    return d3.svg.arc().innerRadius(rAccessor(datum, index, ds))
+                        .outerRadius(r2Accessor(datum, index, ds))
+                        .startAngle(Plottable.Utils.Math.degreesToRadians(t))
+                        .endAngle(Plottable.Utils.Math.degreesToRadians(t2))(datum, index);
+                };
+                return attrToProjector;
+            };
+            Wheel.prototype.t = function (t, scale) {
+                if (t == null) {
+                    return this._propertyBindings.get(Wheel._T_KEY);
+                }
+                if (scale != null) {
+                    if (!Plottable.QuantitativeScale.prototype.isPrototypeOf(scale)) {
+                        throw new Error("scale needs to inherit from Scale.QuantitativeScale");
+                    }
+                    scale.range([0, 360]);
+                    scale.padProportion(0);
+                }
+                var t2Binding = this.t2();
+                var t2Accessor = t2Binding && t2Binding.accessor;
+                if (t2Accessor != null) {
+                    this._bindProperty(Wheel._T2_KEY, t2Accessor, scale);
+                }
+                this._bindProperty(Wheel._T_KEY, t, scale);
+                this.render();
+                return this;
+            };
+            Wheel.prototype.t2 = function (t2) {
+                if (t2 == null) {
+                    return this._propertyBindings.get(Wheel._T2_KEY);
+                }
+                var tBinding = this.t();
+                var angleScale = tBinding && tBinding.scale;
+                this._bindProperty(Wheel._T2_KEY, t2, angleScale);
+                this.render();
+                return this;
+            };
+            Wheel.prototype.r = function (r, scale) {
+                if (r == null) {
+                    return this._propertyBindings.get(Wheel._R_KEY);
+                }
+                if (scale != null && !Plottable.QuantitativeScale.prototype.isPrototypeOf(scale)) {
+                    throw new Error("scale needs to inherit from Scale.QuantitativeScale");
+                }
+                var r2Binding = this.r2();
+                var r2Accessor = r2Binding && r2Binding.accessor;
+                if (r2Accessor != null) {
+                    this._bindProperty(Wheel._R2_KEY, r2Accessor, scale);
+                }
+                this._bindProperty(Wheel._R_KEY, r, scale);
+                this.render();
+                return this;
+            };
+            Wheel.prototype.r2 = function (r2) {
+                if (r2 == null) {
+                    return this._propertyBindings.get(Wheel._R2_KEY);
+                }
+                var rBinding = this.r();
+                var radiusScale = rBinding && rBinding.scale;
+                this._bindProperty(Wheel._R2_KEY, r2, radiusScale);
+                this.render();
+                return this;
+            };
+            Wheel.prototype._pixelPoint = function (datum, index, dataset) {
+                var r = Plottable.Plot._scaledAccessor(this.r())(datum, index, dataset);
+                var r2 = Plottable.Plot._scaledAccessor(this.r2())(datum, index, dataset);
+                var avgRadius = r >= 0 && r2 >= 0 ? (r + r2) / 2 : NaN;
+                var t = Plottable.Plot._scaledAccessor(this.t())(datum, index, dataset);
+                var t2 = Plottable.Plot._scaledAccessor(this.t2())(datum, index, dataset);
+                var avgAngle = Plottable.Utils.Math.degreesToRadians((t + t2) / 2);
+                return { x: avgRadius * Math.sin(avgAngle), y: -avgRadius * Math.cos(avgAngle) };
+            };
+            Wheel._R_KEY = "r";
+            Wheel._R2_KEY = "r2";
+            Wheel._T_KEY = "t";
+            Wheel._T2_KEY = "t2";
+            return Wheel;
+        })(Plottable.Plot);
+        Plots.Wheel = Wheel;
+    })(Plots = Plottable.Plots || (Plottable.Plots = {}));
+})(Plottable || (Plottable = {}));
+
+///<reference path="../reference.ts" />
 
 ///<reference path="../reference.ts" />
 var Plottable;
@@ -11848,6 +12028,190 @@ var Plottable;
             return YDragBoxLayer;
         })(Components.DragBoxLayer);
         Components.YDragBoxLayer = YDragBoxLayer;
+    })(Components = Plottable.Components || (Plottable.Components = {}));
+})(Plottable || (Plottable = {}));
+
+///<reference path="../reference.ts" />
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var Plottable;
+(function (Plottable) {
+    ;
+    var Components;
+    (function (Components) {
+        var DragLineLayer = (function (_super) {
+            __extends(DragLineLayer, _super);
+            function DragLineLayer(orientation) {
+                var _this = this;
+                _super.call(this, orientation);
+                this._detectionRadius = 3;
+                this._enabled = true;
+                this.addClass("drag-line-layer");
+                this.addClass("enabled");
+                this._dragInteraction = new Plottable.Interactions.Drag();
+                this._dragInteraction.attachTo(this);
+                var onLine = function (p) {
+                    return (_this._isVertical() &&
+                        _this.pixelPosition() - _this.detectionRadius() <= p.x &&
+                        p.x <= _this.pixelPosition() + _this.detectionRadius()) ||
+                        (!_this._isVertical() &&
+                            _this.pixelPosition() - _this.detectionRadius() <= p.y &&
+                            p.y <= _this.pixelPosition() + _this.detectionRadius());
+                };
+                var dragging = false;
+                var interactionDragStartCallback = function (start) {
+                    if (onLine(start)) {
+                        dragging = true;
+                        _this._dragStartCallbacks.callCallbacks(_this);
+                    }
+                };
+                this._dragInteraction.onDragStart(interactionDragStartCallback);
+                var interactionDragCallback = function (start, end) {
+                    if (dragging) {
+                        _this._setPixelPositionWithoutChangingMode(_this._isVertical() ? end.x : end.y);
+                        _this._dragCallbacks.callCallbacks(_this);
+                    }
+                };
+                this._dragInteraction.onDrag(interactionDragCallback);
+                var interactionDragEndCallback = function (start, end) {
+                    if (dragging) {
+                        dragging = false;
+                        _this._dragEndCallbacks.callCallbacks(_this);
+                    }
+                };
+                this._dragInteraction.onDragEnd(interactionDragEndCallback);
+                this._disconnectInteraction = function () {
+                    _this._dragInteraction.offDragStart(interactionDragStartCallback);
+                    _this._dragInteraction.offDrag(interactionDragCallback);
+                    _this._dragInteraction.offDragEnd(interactionDragEndCallback);
+                    _this._dragInteraction.detachFrom(_this);
+                };
+                this._dragStartCallbacks = new Plottable.Utils.CallbackSet();
+                this._dragCallbacks = new Plottable.Utils.CallbackSet();
+                this._dragEndCallbacks = new Plottable.Utils.CallbackSet();
+            }
+            DragLineLayer.prototype._setup = function () {
+                _super.prototype._setup.call(this);
+                this._detectionEdge = this.content().append("line").style({
+                    "opacity": 0,
+                    "stroke": "pink",
+                    "pointer-events": "visibleStroke"
+                }).classed("drag-edge", true);
+            };
+            DragLineLayer.prototype.renderImmediately = function () {
+                _super.prototype.renderImmediately.call(this);
+                this._detectionEdge.attr({
+                    x1: this._isVertical() ? this.pixelPosition() : 0,
+                    y1: this._isVertical() ? 0 : this.pixelPosition(),
+                    x2: this._isVertical() ? this.pixelPosition() : this.width(),
+                    y2: this._isVertical() ? this.height() : this.pixelPosition(),
+                    "stroke-width": this._detectionRadius * 2
+                });
+                return this;
+            };
+            DragLineLayer.prototype.detectionRadius = function (detectionRadius) {
+                if (detectionRadius == null) {
+                    return this._detectionRadius;
+                }
+                if (detectionRadius < 0) {
+                    throw new Error("detection radius cannot be negative.");
+                }
+                this._detectionRadius = detectionRadius;
+                this.render();
+                return this;
+            };
+            DragLineLayer.prototype.enabled = function (enabled) {
+                if (enabled == null) {
+                    return this._enabled;
+                }
+                this._enabled = enabled;
+                if (enabled) {
+                    this.addClass("enabled");
+                }
+                else {
+                    this.removeClass("enabled");
+                }
+                this._dragInteraction.enabled(enabled);
+                return this;
+            };
+            /**
+             * Sets the callback to be called when dragging starts.
+             * The callback will be passed the calling DragLineLayer.
+             *
+             * @param {DragLineCallback<D>} callback
+             * @returns {DragLineLayer<D>} The calling DragLineLayer.
+             */
+            DragLineLayer.prototype.onDragStart = function (callback) {
+                this._dragStartCallbacks.add(callback);
+                return this;
+            };
+            /**
+             * Removes a callback that would be called when dragging starts.
+             *
+             * @param {DragLineCallback<D>} callback
+             * @returns {DragLineLayer<D>} The calling DragLineLayer.
+             */
+            DragLineLayer.prototype.offDragStart = function (callback) {
+                this._dragStartCallbacks.delete(callback);
+                return this;
+            };
+            /**
+             * Sets a callback to be called during dragging.
+             * The callback will be passed the calling DragLineLayer.
+             *
+             * @param {DragLineCallback<D>} callback
+             * @returns {DragLineLayer<D>} The calling DragLineLayer.
+             */
+            DragLineLayer.prototype.onDrag = function (callback) {
+                this._dragCallbacks.add(callback);
+                return this;
+            };
+            /**
+             * Removes a callback that would be called during dragging.
+             *
+             * @param {DragLineCallback<D>} callback
+             * @returns {DragLineLayer<D>} The calling DragLineLayer.
+             */
+            DragLineLayer.prototype.offDrag = function (callback) {
+                this._dragCallbacks.delete(callback);
+                return this;
+            };
+            /**
+             * Sets a callback to be called when dragging ends.
+             * The callback will be passed the calling DragLineLayer.
+             *
+             * @param {DragLineCallback<D>} callback
+             * @returns {DragLineLayer<D>} The calling DragLineLayer.
+             */
+            DragLineLayer.prototype.onDragEnd = function (callback) {
+                this._dragEndCallbacks.add(callback);
+                return this;
+            };
+            /**
+             * Removes a callback that would be called when dragging ends.
+             *
+             * @param {DragLineCallback<D>} callback
+             * @returns {DragLineLayer<D>} The calling DragLineLayer.
+             */
+            DragLineLayer.prototype.offDragEnd = function (callback) {
+                this._dragEndCallbacks.delete(callback);
+                return this;
+            };
+            DragLineLayer.prototype.destroy = function () {
+                var _this = this;
+                _super.prototype.destroy.call(this);
+                this._dragStartCallbacks.forEach(function (callback) { return _this._dragStartCallbacks.delete(callback); });
+                this._dragCallbacks.forEach(function (callback) { return _this._dragCallbacks.delete(callback); });
+                this._dragEndCallbacks.forEach(function (callback) { return _this._dragEndCallbacks.delete(callback); });
+                this._disconnectInteraction();
+            };
+            return DragLineLayer;
+        })(Components.GuideLineLayer);
+        Components.DragLineLayer = DragLineLayer;
     })(Components = Plottable.Components || (Plottable.Components = {}));
 })(Plottable || (Plottable = {}));
 
