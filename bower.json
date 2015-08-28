@@ -3,6 +3,9 @@
   "description": "A modular charting library built on D3",
   "version": "1.8.0",
   "main": ["plottable.js", "plottable.css"],
+  "typescript": {
+    "definition": "plottable.d.ts"
+  },
   "license": "MIT",
   "ignore": [
     "**/*",
