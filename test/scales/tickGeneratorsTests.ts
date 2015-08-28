@@ -13,7 +13,12 @@ describe("Scales", () => {
         let start = 0.5, end = 4.01, interval = 1;
         scale.domain([start, end]);
         let ticks = Plottable.Scales.TickGenerators.intervalTickGenerator(interval)(scale);
-        assert.deepEqual(ticks, [0.5, 1, 2, 3, 4, 4.01], "generated ticks contains all possible ticks within range");
+
+        assert.strictEqual(ticks.length, 6, "ticks are generated");
+        ticks.forEach((tick) => {
+          assert.operator(start, "<=", tick, "tick " + tick + " should be greater than the lower bound of the domain");
+          assert.operator(tick, "<=", end, "tick " + tick + " should be less than the upper bound of the domain");
+        })
       });
 
       it("generates ticks for a domain crossing 0", () => {
@@ -64,7 +69,7 @@ describe("Scales", () => {
         assert.deepEqual(integerTickGenerator(scale), [-2, -1, 0, 1], "only the integers are returned");
       });
 
-      it("includes endticks", () => {
+      it("includes end ticks", () => {
         scale.domain([-2.7, 1.5]);
         assert.deepEqual(integerTickGenerator(scale), [-2.5, -2, -1, 0, 1, 1.5], "end ticks are included");
       });
