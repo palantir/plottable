@@ -44,6 +44,15 @@ export module Axes {
         };
       }
 
+      if (this.annotationsEnabled()) {
+        let tierTotalHeight = this._annotationTierHeight() * this.annotationTierCount();
+        if (this._isHorizontal()) {
+          heightRequiredByTicks += tierTotalHeight;
+        } else {
+          widthRequiredByTicks += tierTotalHeight;
+        }
+      }
+
       let categoryScale = <Scales.Category> this._scale;
       let measureResult = this._measureTicks(offeredWidth, offeredHeight, categoryScale, categoryScale.domain());
 
@@ -55,7 +64,11 @@ export module Axes {
 
     protected _axisSizeWithoutMarginAndAnnotations() {
       let relevantDimension = this._isHorizontal() ? this.height() : this.width();
-      let axisHeightWithoutMargin = this.requestedSpace(this.width(), this.height()).minHeight - this.margin();
+      let relevantRequestedSpaceDimension = this._isHorizontal() ?
+                                              this.requestedSpace(this.width(), this.height()).minHeight :
+                                              this.requestedSpace(this.width(), this.height()).minWidth;
+      let marginAndAnnotationSize = this.margin() + this._annotationTierHeight();
+      let axisHeightWithoutMargin = relevantRequestedSpaceDimension - marginAndAnnotationSize;
       return Math.min(axisHeightWithoutMargin, relevantDimension);
     }
 

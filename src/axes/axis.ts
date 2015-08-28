@@ -278,8 +278,8 @@ export class Axis<D> extends Component {
 
     let hiddenAnnotations = new Utils.Set<any>();
     let axisHeight = this._isHorizontal() ? this.height() : this.width();
-    let axisLabelAndTickHeight = this._axisSizeWithoutMarginAndAnnotations();
-    let numTiers = Math.min(this.annotationTierCount(), Math.floor((axisHeight - axisLabelAndTickHeight) / tierHeight));
+    let axisHeightWithoutMarginAndAnnotations = this._axisSizeWithoutMarginAndAnnotations();
+    let numTiers = Math.min(this.annotationTierCount(), Math.floor((axisHeight - axisHeightWithoutMarginAndAnnotations) / tierHeight));
     annotationToTier.forEach((tier, annotation) => {
       if (tier === -1 || tier >= numTiers) {
         hiddenAnnotations.add(annotation);
@@ -296,10 +296,10 @@ export class Axis<D> extends Component {
       switch (this.orientation()) {
         case "bottom":
         case "right":
-          return annotationToTier.get(d) * tierHeight + axisLabelAndTickHeight;
+          return annotationToTier.get(d) * tierHeight + axisHeightWithoutMarginAndAnnotations;
         case "top":
         case "left":
-          return axisHeight - axisLabelAndTickHeight - annotationToTier.get(d) * tierHeight;
+          return axisHeight - axisHeightWithoutMarginAndAnnotations - annotationToTier.get(d) * tierHeight;
       }
     };
     let positionF = (d: D) => this._scale.scale(d);
@@ -396,6 +396,10 @@ export class Axis<D> extends Component {
     let relevantDimension = this._isHorizontal() ? this.height() : this.width();
     let axisHeightWithoutMargin = this._isHorizontal() ? this._computedHeight : this._computedWidth;
     return Math.min(axisHeightWithoutMargin, relevantDimension);
+  }
+
+  protected _annotationTierHeight() {
+    return this._annotationMeasurer.measure().height + 2 * Axis._ANNOTATION_LABEL_PADDING;
   }
 
   private _annotationToTier(measurements: Utils.Map<D, SVGTypewriter.Measurers.Dimensions>) {

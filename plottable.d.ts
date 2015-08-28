@@ -1737,6 +1737,7 @@ declare module Plottable {
         annotationTierCount(annotationTierCount: number): Axis<D>;
         protected _drawAnnotations(): void;
         protected _axisSizeWithoutMarginAndAnnotations(): number;
+        protected _annotationTierHeight(): number;
         protected _removeAnnotations(): void;
         protected _generateBaselineAttrHash(): {
             [key: string]: number;

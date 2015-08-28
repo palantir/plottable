@@ -3804,8 +3804,8 @@ var Plottable;
             var annotationToTier = this._annotationToTier(measurements);
             var hiddenAnnotations = new Plottable.Utils.Set();
             var axisHeight = this._isHorizontal() ? this.height() : this.width();
-            var axisLabelAndTickHeight = this._axisSizeWithoutMarginAndAnnotations();
-            var numTiers = Math.min(this.annotationTierCount(), Math.floor((axisHeight - axisLabelAndTickHeight) / tierHeight));
+            var axisHeightWithoutMarginAndAnnotations = this._axisSizeWithoutMarginAndAnnotations();
+            var numTiers = Math.min(this.annotationTierCount(), Math.floor((axisHeight - axisHeightWithoutMarginAndAnnotations) / tierHeight));
             annotationToTier.forEach(function (tier, annotation) {
                 if (tier === -1 || tier >= numTiers) {
                     hiddenAnnotations.add(annotation);
@@ -3821,10 +3821,10 @@ var Plottable;
                 switch (_this.orientation()) {
                     case "bottom":
                     case "right":
-                        return annotationToTier.get(d) * tierHeight + axisLabelAndTickHeight;
+                        return annotationToTier.get(d) * tierHeight + axisHeightWithoutMarginAndAnnotations;
                     case "top":
                     case "left":
-                        return axisHeight - axisLabelAndTickHeight - annotationToTier.get(d) * tierHeight;
+                        return axisHeight - axisHeightWithoutMarginAndAnnotations - annotationToTier.get(d) * tierHeight;
                 }
             };
             var positionF = function (d) { return _this._scale.scale(d); };
@@ -3912,6 +3912,9 @@ var Plottable;
             var relevantDimension = this._isHorizontal() ? this.height() : this.width();
             var axisHeightWithoutMargin = this._isHorizontal() ? this._computedHeight : this._computedWidth;
             return Math.min(axisHeightWithoutMargin, relevantDimension);
+        };
+        Axis.prototype._annotationTierHeight = function () {
+            return this._annotationMeasurer.measure().height + 2 * Axis._ANNOTATION_LABEL_PADDING;
         };
         Axis.prototype._annotationToTier = function (measurements) {
             var _this = this;
@@ -4998,6 +5001,15 @@ var Plottable;
                         minHeight: 0
                     };
                 }
+                if (this.annotationsEnabled()) {
+                    var tierTotalHeight = this._annotationTierHeight() * this.annotationTierCount();
+                    if (this._isHorizontal()) {
+                        heightRequiredByTicks += tierTotalHeight;
+                    }
+                    else {
+                        widthRequiredByTicks += tierTotalHeight;
+                    }
+                }
                 var categoryScale = this._scale;
                 var measureResult = this._measureTicks(offeredWidth, offeredHeight, categoryScale, categoryScale.domain());
                 return {
@@ -5007,7 +5019,11 @@ var Plottable;
             };
             Category.prototype._axisSizeWithoutMarginAndAnnotations = function () {
                 var relevantDimension = this._isHorizontal() ? this.height() : this.width();
-                var axisHeightWithoutMargin = this.requestedSpace(this.width(), this.height()).minHeight - this.margin();
+                var relevantRequestedSpaceDimension = this._isHorizontal() ?
+                    this.requestedSpace(this.width(), this.height()).minHeight :
+                    this.requestedSpace(this.width(), this.height()).minWidth;
+                var marginAndAnnotationSize = this.margin() + this._annotationTierHeight();
+                var axisHeightWithoutMargin = relevantRequestedSpaceDimension - marginAndAnnotationSize;
                 return Math.min(axisHeightWithoutMargin, relevantDimension);
             };
             Category.prototype._getTickValues = function () {
