@@ -19,12 +19,12 @@ describe("Interactions", () => {
         clickInteraction.attachTo(component);
       });
 
-      it("onClick", () => {
+      it("can register interaction using onClick()", () => {
         let callbackCalled = false;
         let lastPoint: Plottable.Point;
-        let callback = function(p: Plottable.Point) {
+        let callback = function(point: Plottable.Point) {
           callbackCalled = true;
-          lastPoint = p;
+          lastPoint = point;
         };
         clickInteraction.onClick(callback);
 
@@ -86,7 +86,7 @@ describe("Interactions", () => {
         svg.remove();
       });
 
-      it("offClick()", () => {
+      it("can deregister interaction using offClick()", () => {
         let callbackWasCalled = false;
         let callback = () => callbackWasCalled = true;
 
@@ -104,7 +104,7 @@ describe("Interactions", () => {
         svg.remove();
       });
 
-      it("multiple click listeners", () => {
+      it("can register multiple interaction listeners for the same component", () => {
         clickInteraction.attachTo(component);
 
         let callback1WasCalled = false;
@@ -129,10 +129,9 @@ describe("Interactions", () => {
         assert.isTrue(callback2WasCalled, "Callback2 should still exist on the click interaction");
 
         svg.remove();
-
       });
 
-      it("cancelling touches cancels any ongoing clicks", () => {
+      it("cancels ongoing clicks by cancelling touches", () => {
         let callbackCalled = false;
         let callback = () => callbackCalled = true;
         clickInteraction.onClick(callback);
