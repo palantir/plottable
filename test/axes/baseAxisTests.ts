@@ -234,11 +234,6 @@ describe("BaseAxis", () => {
         assert.strictEqual(axis.annotatedTicks(annotatedTicks), axis, "setting annotated ticks returns calling axis");
         assert.deepEqual(axis.annotatedTicks(), annotatedTicks, "can set the annotated ticks");
       });
-
-      it("returns the axis when setting the annotated ticks", () => {
-        let axis = new Plottable.Axis(new Plottable.Scale<{}, number>(), "bottom");
-        assert.strictEqual(axis.annotatedTicks([]), axis, "setting the annotated ticks returns calling axis");
-      });
     });
 
     describe("formatting annotation ticks", () => {
@@ -256,6 +251,20 @@ describe("BaseAxis", () => {
         assert.strictEqual(axis.annotationFormatter(annotationFormatter), axis, "setting annotation formatter returns calling axis");
         let test = "testString";
         assert.strictEqual(annotationFormatter(test), axis.annotationFormatter()(test), "can set the annotated ticks");
+      });
+    });
+
+    describe("annotation tier count", () => {
+      it("one annotation tier by default", () => {
+        let axis = new Plottable.Axis(new Plottable.Scale<{}, number>(), "bottom");
+        assert.deepEqual(axis.annotationTierCount(), 1, "one annotation tier by default");
+      });
+
+      it("can set the annotation tier count", () => {
+        let axis = new Plottable.Axis(new Plottable.Scale<{}, number>(), "bottom");
+        let annotationTierCount = 5;
+        assert.strictEqual(axis.annotationTierCount(annotationTierCount), axis, "setting annotation tier count returns calling axis");
+        assert.deepEqual(axis.annotationTierCount(), annotationTierCount, "can set the annotation tier count");
       });
     });
 
