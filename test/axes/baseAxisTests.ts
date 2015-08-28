@@ -372,21 +372,21 @@ describe("BaseAxis", () => {
           axis.content().selectAll(".annotation-circle").each(function (d, i) {
             let annotationCircle = d3.select(this);
             let correspondingRect = d3.select(annotationRects[0][i]);
-            assert.strictEqual(TestMethods.numAttr(annotationCircle, "cx"),
-              TestMethods.numAttr(correspondingRect, "x"), "circle at start of rectangle");
-            assert.strictEqual(TestMethods.numAttr(annotationCircle, "cy"), 0, "circle at the top");
+            assert.closeTo(TestMethods.numAttr(annotationCircle, "cx"),
+              TestMethods.numAttr(correspondingRect, "x"), window.Pixel_CloseTo_Requirement, "circle at start of rectangle");
+            assert.closeTo(TestMethods.numAttr(annotationCircle, "cy"), 0, window.Pixel_CloseTo_Requirement, "circle at the top");
           });
 
           axis.content().selectAll(".annotation-line").each(function (d, i) {
             let annotationLine = d3.select(this);
             let correspondingRect = d3.select(annotationRects[0][i]);
-            assert.strictEqual(TestMethods.numAttr(annotationLine, "x1"),
-              TestMethods.numAttr(correspondingRect, "x"), "line at start of rect");
-            assert.strictEqual(TestMethods.numAttr(annotationLine, "x2"),
-              TestMethods.numAttr(correspondingRect, "x"), "line at start of rect");
-            assert.strictEqual(TestMethods.numAttr(annotationLine, "y1"), 0, "line starts at the top");
-            assert.strictEqual(TestMethods.numAttr(annotationLine, "y2"),
-              TestMethods.numAttr(correspondingRect, "y"), "line goes to the rect");
+            assert.closeTo(TestMethods.numAttr(annotationLine, "x1"),
+              TestMethods.numAttr(correspondingRect, "x"), window.Pixel_CloseTo_Requirement, "line at start of rect");
+            assert.closeTo(TestMethods.numAttr(annotationLine, "x2"),
+              TestMethods.numAttr(correspondingRect, "x"), window.Pixel_CloseTo_Requirement, "line at start of rect");
+            assert.closeTo(TestMethods.numAttr(annotationLine, "y1"), 0, window.Pixel_CloseTo_Requirement, "line starts at the top");
+            assert.closeTo(TestMethods.numAttr(annotationLine, "y2"),
+              TestMethods.numAttr(correspondingRect, "y"), window.Pixel_CloseTo_Requirement, "line goes to the rect");
           });
 
           axis.content().selectAll(".annotation-label text").each(function (d, i) {
@@ -410,21 +410,23 @@ describe("BaseAxis", () => {
           axis.content().selectAll(".annotation-circle").each(function (d, i) {
             let annotationCircle = d3.select(this);
             let correspondingRect = d3.select(annotationRects[0][i]);
-            assert.strictEqual(TestMethods.numAttr(annotationCircle, "cx"),
-              TestMethods.numAttr(correspondingRect, "x"), "circle at start of rect");
+            assert.closeTo(TestMethods.numAttr(annotationCircle, "cx"),
+              TestMethods.numAttr(correspondingRect, "x"), window.Pixel_CloseTo_Requirement, "circle at start of rect");
             assert.strictEqual(TestMethods.numAttr(annotationCircle, "cy"), axis.height(), "circle at the bottom");
           });
 
           axis.content().selectAll(".annotation-line").each(function (d, i) {
             let annotationLine = d3.select(this);
             let correspondingRect = d3.select(annotationRects[0][i]);
-            assert.strictEqual(TestMethods.numAttr(annotationLine, "x1"),
-              TestMethods.numAttr(correspondingRect, "x"), "line at tick scaled x position");
-            assert.strictEqual(TestMethods.numAttr(annotationLine, "x2"),
-              TestMethods.numAttr(correspondingRect, "x"), "line at tick scaled x position");
-            assert.strictEqual(TestMethods.numAttr(annotationLine, "y1"), axis.height(), "line starts at the bottom");
+            assert.closeTo(TestMethods.numAttr(annotationLine, "x1"),
+              TestMethods.numAttr(correspondingRect, "x"), window.Pixel_CloseTo_Requirement, "line at tick scaled x position");
+            assert.closeTo(TestMethods.numAttr(annotationLine, "x2"),
+              TestMethods.numAttr(correspondingRect, "x"), window.Pixel_CloseTo_Requirement, "line at tick scaled x position");
+            assert.closeTo(TestMethods.numAttr(annotationLine, "y1"), axis.height(),
+              window.Pixel_CloseTo_Requirement, "line starts at the bottom");
             assert.closeTo(TestMethods.numAttr(annotationLine, "y2"),
-              TestMethods.numAttr(correspondingRect, "y") + TestMethods.numAttr(correspondingRect, "height"), 1, "line goes to the rect");
+              TestMethods.numAttr(correspondingRect, "y") + TestMethods.numAttr(correspondingRect, "height"),
+              window.Pixel_CloseTo_Requirement, "line goes to the rect");
           });
 
           axis.content().selectAll(".annotation-label text").each(function (d, i) {
@@ -448,9 +450,10 @@ describe("BaseAxis", () => {
           axis.content().selectAll(".annotation-circle").each(function (d, i) {
             let annotationCircle = d3.select(this);
             let correspondingRect = d3.select(annotationRects[0][i]);
-            assert.strictEqual(TestMethods.numAttr(annotationCircle, "cx"), axis.width(), "circle at the right");
-            assert.strictEqual(TestMethods.numAttr(annotationCircle, "cy"),
-              TestMethods.numAttr(correspondingRect, "y"), "circle at tick scaled y position");
+            assert.closeTo(TestMethods.numAttr(annotationCircle, "cx"), axis.width(),
+              window.Pixel_CloseTo_Requirement, "circle at the right");
+            assert.closeTo(TestMethods.numAttr(annotationCircle, "cy"),
+              TestMethods.numAttr(correspondingRect, "y"), window.Pixel_CloseTo_Requirement, "circle at tick scaled y position");
           });
 
           axis.content().selectAll(".annotation-line").each(function (d, i) {
@@ -459,10 +462,10 @@ describe("BaseAxis", () => {
             assert.strictEqual(TestMethods.numAttr(annotationLine, "x1"), axis.width(), "line starts at the right");
             assert.closeTo(TestMethods.numAttr(annotationLine, "x2"),
               TestMethods.numAttr(correspondingRect, "x") + TestMethods.numAttr(correspondingRect, "width"), 1, "line goes to the rect");
-            assert.strictEqual(TestMethods.numAttr(annotationLine, "y1"),
-              TestMethods.numAttr(correspondingRect, "y"), "line at tick scaled y position");
-            assert.strictEqual(TestMethods.numAttr(annotationLine, "y2"),
-              TestMethods.numAttr(correspondingRect, "y"), "line at tick scaled y position");
+            assert.closeTo(TestMethods.numAttr(annotationLine, "y1"),
+              TestMethods.numAttr(correspondingRect, "y"), window.Pixel_CloseTo_Requirement, "line at tick scaled y position");
+            assert.closeTo(TestMethods.numAttr(annotationLine, "y2"),
+              TestMethods.numAttr(correspondingRect, "y"), window.Pixel_CloseTo_Requirement, "line at tick scaled y position");
           });
 
           axis.content().selectAll(".annotation-label text").each(function (d, i) {
@@ -486,21 +489,21 @@ describe("BaseAxis", () => {
           axis.content().selectAll(".annotation-circle").each(function (d, i) {
             let annotationCircle = d3.select(this);
             let correspondingRect = d3.select(annotationRects[0][i]);
-            assert.strictEqual(TestMethods.numAttr(annotationCircle, "cx"), 0, "circle at the left");
-            assert.strictEqual(TestMethods.numAttr(annotationCircle, "cy"),
-              TestMethods.numAttr(correspondingRect, "y"), "circle at tick scaled y position");
+            assert.closeTo(TestMethods.numAttr(annotationCircle, "cx"), 0, window.Pixel_CloseTo_Requirement, "circle at the left");
+            assert.closeTo(TestMethods.numAttr(annotationCircle, "cy"),
+              TestMethods.numAttr(correspondingRect, "y"), window.Pixel_CloseTo_Requirement, "circle at tick scaled y position");
           });
 
           axis.content().selectAll(".annotation-line").each(function (d, i) {
             let annotationLine = d3.select(this);
             let correspondingRect = d3.select(annotationRects[0][i]);
-            assert.strictEqual(TestMethods.numAttr(annotationLine, "x1"), 0, "line starts at the left");
-            assert.strictEqual(TestMethods.numAttr(annotationLine, "x2"),
-              TestMethods.numAttr(correspondingRect, "x"), "line ends at the rect");
-            assert.strictEqual(TestMethods.numAttr(annotationLine, "y1"),
-              TestMethods.numAttr(correspondingRect, "y"), "line at tick scaled y position");
-            assert.strictEqual(TestMethods.numAttr(annotationLine, "y2"),
-              TestMethods.numAttr(correspondingRect, "y"), "line at tick scaled y position");
+            assert.closeTo(TestMethods.numAttr(annotationLine, "x1"), 0, window.Pixel_CloseTo_Requirement, "line starts at the left");
+            assert.closeTo(TestMethods.numAttr(annotationLine, "x2"),
+              TestMethods.numAttr(correspondingRect, "x"), window.Pixel_CloseTo_Requirement, "line ends at the rect");
+            assert.closeTo(TestMethods.numAttr(annotationLine, "y1"),
+              TestMethods.numAttr(correspondingRect, "y"), window.Pixel_CloseTo_Requirement, "line at tick scaled y position");
+            assert.closeTo(TestMethods.numAttr(annotationLine, "y2"),
+              TestMethods.numAttr(correspondingRect, "y"), window.Pixel_CloseTo_Requirement, "line at tick scaled y position");
           });
 
           axis.content().selectAll(".annotation-label text").each(function (d, i) {
