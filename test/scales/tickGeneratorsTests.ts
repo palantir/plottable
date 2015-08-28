@@ -54,7 +54,7 @@ describe("Scales", () => {
         integerTickGenerator = Plottable.Scales.TickGenerators.integerTickGenerator();
       });
 
-      it("normal case", () => {
+      it("generates integer ticks", () => {
         scale.domain([0, 4]);
         assert.deepEqual(integerTickGenerator(scale), [0, 1, 2, 3, 4], "only the integers are returned");
       });
@@ -69,7 +69,7 @@ describe("Scales", () => {
         assert.deepEqual(integerTickGenerator(scale), [-2.5, -2, -1, 0, 1, 1.5], "end ticks are included");
       });
 
-      it("all float ticks", () => {
+      it("does not include integer ticks when there are none in the domain", () => {
         scale.domain([1.1, 1.5]);
         assert.deepEqual(integerTickGenerator(scale), [1.1, 1.5],
           "only the end ticks are returned when there is no integer in the interval");
