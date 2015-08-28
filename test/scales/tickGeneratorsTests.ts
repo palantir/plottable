@@ -18,7 +18,7 @@ describe("Scales", () => {
         ticks.forEach((tick) => {
           assert.operator(start, "<=", tick, "tick " + tick + " should be greater than the lower bound of the domain");
           assert.operator(tick, "<=", end, "tick " + tick + " should be less than the upper bound of the domain");
-        })
+        });
       });
 
       it("generates ticks for a domain crossing 0", () => {
