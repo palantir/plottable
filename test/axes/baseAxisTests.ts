@@ -257,14 +257,14 @@ describe("BaseAxis", () => {
     describe("annotation tier count", () => {
       it("one annotation tier by default", () => {
         let axis = new Plottable.Axis(new Plottable.Scale<{}, number>(), "bottom");
-        assert.deepEqual(axis.annotationTierCount(), 1, "one annotation tier by default");
+        assert.deepEqual(axis.maxAnnotationTiers(), 1, "one annotation tier by default");
       });
 
       it("can set the annotation tier count", () => {
         let axis = new Plottable.Axis(new Plottable.Scale<{}, number>(), "bottom");
-        let annotationTierCount = 5;
-        assert.strictEqual(axis.annotationTierCount(annotationTierCount), axis, "setting annotation tier count returns calling axis");
-        assert.deepEqual(axis.annotationTierCount(), annotationTierCount, "can set the annotation tier count");
+        let maxAnnotationTiers = 5;
+        assert.strictEqual(axis.maxAnnotationTiers(maxAnnotationTiers), axis, "setting annotation tier count returns calling axis");
+        assert.deepEqual(axis.maxAnnotationTiers(), maxAnnotationTiers, "can set the annotation tier count");
       });
     });
 

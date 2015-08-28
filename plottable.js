@@ -3631,7 +3631,7 @@ var Plottable;
             this._margin = 15;
             this._showEndTickLabels = false;
             this._annotationsEnabled = false;
-            this._annotationTierCount = 1;
+            this._maxAnnotationTiers = 1;
             if (scale == null || orientation == null) {
                 throw new Error("Axis requires a scale and orientation");
             }
@@ -3678,7 +3678,7 @@ var Plottable;
                 requestedHeight = this._computedHeight + this._margin;
                 if (this.annotationsEnabled()) {
                     var tierHeight = this._annotationMeasurer.measure().height + 2 * Axis._ANNOTATION_LABEL_PADDING;
-                    requestedHeight += tierHeight * this.annotationTierCount();
+                    requestedHeight += tierHeight * this.maxAnnotationTiers();
                 }
             }
             else {
@@ -3688,7 +3688,7 @@ var Plottable;
                 requestedWidth = this._computedWidth + this._margin;
                 if (this.annotationsEnabled()) {
                     var tierHeight = this._annotationMeasurer.measure().height + 2 * Axis._ANNOTATION_LABEL_PADDING;
-                    requestedWidth += tierHeight * this.annotationTierCount();
+                    requestedWidth += tierHeight * this.maxAnnotationTiers();
                 }
             }
             return {
@@ -3782,11 +3782,11 @@ var Plottable;
             this.redraw();
             return this;
         };
-        Axis.prototype.annotationTierCount = function (annotationTierCount) {
-            if (annotationTierCount == null) {
-                return this._annotationTierCount;
+        Axis.prototype.maxAnnotationTiers = function (maxAnnotationTiers) {
+            if (maxAnnotationTiers == null) {
+                return this._maxAnnotationTiers;
             }
-            this._annotationTierCount = annotationTierCount;
+            this._maxAnnotationTiers = maxAnnotationTiers;
             this.redraw();
             return this;
         };
@@ -3805,7 +3805,7 @@ var Plottable;
             var hiddenAnnotations = new Plottable.Utils.Set();
             var axisHeight = this._isHorizontal() ? this.height() : this.width();
             var axisHeightWithoutMarginAndAnnotations = this._axisSizeWithoutMarginAndAnnotations();
-            var numTiers = Math.min(this.annotationTierCount(), Math.floor((axisHeight - axisHeightWithoutMarginAndAnnotations) / tierHeight));
+            var numTiers = Math.min(this.maxAnnotationTiers(), Math.floor((axisHeight - axisHeightWithoutMarginAndAnnotations) / tierHeight));
             annotationToTier.forEach(function (tier, annotation) {
                 if (tier === -1 || tier >= numTiers) {
                     hiddenAnnotations.add(annotation);
@@ -5002,7 +5002,7 @@ var Plottable;
                     };
                 }
                 if (this.annotationsEnabled()) {
-                    var tierTotalHeight = this._annotationTierHeight() * this.annotationTierCount();
+                    var tierTotalHeight = this._annotationTierHeight() * this.maxAnnotationTiers();
                     if (this._isHorizontal()) {
                         heightRequiredByTicks += tierTotalHeight;
                     }
