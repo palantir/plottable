@@ -17,7 +17,7 @@ describe("Plots", () => {
         rScale = new Plottable.Scales.Linear();
         tScale = new Plottable.Scales.Linear();
         tScale.domain([0, TAU]);
-        wheelPlot = new Plottable.Plots.Wheel();
+        wheelPlot = new Plottable.Plots.Wheel<number, number>();
         wheelPlot.r((d) => d.r, rScale);
         wheelPlot.r2((d) => d.r2);
         wheelPlot.t((d) => d.t, tScale);
@@ -147,7 +147,7 @@ describe("Plots", () => {
       beforeEach(() => {
         svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
         rScale = new Plottable.Scales.Linear();
-        wheelPlot = new Plottable.Plots.Wheel();
+        wheelPlot = new Plottable.Plots.Wheel<number, number>();
         wheelPlot.t((d) => d.t);
         wheelPlot.t2((d) => d.t2);
         data = [
@@ -243,7 +243,7 @@ describe("Plots", () => {
         rScale = new Plottable.Scales.Linear();
         tScale = new Plottable.Scales.Linear();
         tScale.domain([0, TAU]);
-        wheelPlot = new Plottable.Plots.Wheel();
+        wheelPlot = new Plottable.Plots.Wheel<number, number>();
         wheelPlot.r((d) => d.r, rScale);
         wheelPlot.r2((d) => d.r2);
         data = [

@@ -85,7 +85,7 @@ export module Plots {
     /**
      * Gets the AccessorScaleBinding for t in degrees.
      */
-    public t<T>(): AccessorScaleBinding<T, number>;
+    public t(): AccessorScaleBinding<T, number>;
     /**
      * Sets t to a constant number or the result of an Accessor<number> in degrees.
      *
@@ -102,8 +102,8 @@ export module Plots {
      * @param {QuantitativeScale<T>} scale
      * @returns {Wheel} The calling Wheel Plot.
      */
-    public t<T>(t: T | Accessor<T>, scale: QuantitativeScale<T>): Plots.Wheel<R, T>;
-    public t<T>(t?: number | Accessor<number> | T | Accessor<T>, scale?: QuantitativeScale<T>): any {
+    public t(t: T | Accessor<T>, scale: QuantitativeScale<T>): Plots.Wheel<R, T>;
+    public t(t?: number | Accessor<number> | T | Accessor<T>, scale?: QuantitativeScale<T>): any {
       if (t == null) {
         return this._propertyBindings.get(Wheel._T_KEY);
       }
@@ -130,16 +130,16 @@ export module Plots {
     /**
      * Gets the AccessorScaleBinding for t2 in degrees.
      */
-    public t2<T>(): AccessorScaleBinding<T, number>;
+    public t2(): AccessorScaleBinding<T, number>;
     /**
      * Sets t2 to a constant number or the result of an Accessor<number> in degrees.
      * If a Scale has been set for t, it will also be used to scale t2.
      *
-     * @param {number|Accessor<number>} t2
+     * @param {number|Accessor<number|T|Accessor<T>>} t2
      * @returns {Wheel} The calling Wheel Plot.
      */
-    public t2(t2: number | Accessor<number>): Plots.Wheel<R, T>;
-    public t2<T>(t2?: number | Accessor<number> | T | Accessor<T>): any {
+    public t2(t2: number | Accessor<number> | T | Accessor<T>): Plots.Wheel<R, T>;
+    public t2(t2?: number | Accessor<number> | T | Accessor<T>): any {
       if (t2 == null) {
         return this._propertyBindings.get(Wheel._T2_KEY);
       }
@@ -155,7 +155,7 @@ export module Plots {
     /**
      * Gets the AccessorScaleBinding for r.
      */
-    public r<R>(): AccessorScaleBinding<R, number>;
+    public r(): AccessorScaleBinding<R, number>;
     /**
      * Sets r to a constant number or the result of an Accessor<number>.
      *
@@ -172,8 +172,8 @@ export module Plots {
      * @param {QuantitativeScale<R>} scale
      * @returns {Wheel} The calling Wheel Plot.
      */
-    public r<R>(r: R | Accessor<R>, scale: QuantitativeScale<R>): Plots.Wheel<R, T>;
-    public r<R>(r?: number | Accessor<number> | R | Accessor<R>, scale?: QuantitativeScale<R>): any {
+    public r(r: R | Accessor<R>, scale: QuantitativeScale<R>): Plots.Wheel<R, T>;
+    public r(r?: number | Accessor<number> | R | Accessor<R>, scale?: QuantitativeScale<R>): any {
       if (r == null) {
         return this._propertyBindings.get(Wheel._R_KEY);
       }
@@ -196,16 +196,16 @@ export module Plots {
     /**
      * Gets the AccessorScaleBinding for r2.
      */
-    public r2<R>(): AccessorScaleBinding<R, number>;
+    public r2(): AccessorScaleBinding<R, number>;
     /**
      * Sets r2 to a constant number or the result of an Accessor<number>.
      * If a Scale has been set for r, it will also be used to scale r2.
      *
-     * @param {number|Accessor<number>} r2
+     * @param {number|Accessor<number>|R|Accessor<R>} r2
      * @returns {Wheel} The calling Wheel Plot.
      */
-    public r2(r2: number | Accessor<number>): Plots.Wheel<R, T>;
-    public r2<R>(r2?: number | Accessor<number> | R | Accessor<R>): any {
+    public r2(r2: number | Accessor<number> | R | Accessor<R>): Plots.Wheel<R, T>;
+    public r2(r2?: number | Accessor<number> | R | Accessor<R>): any {
       if (r2 == null) {
         return this._propertyBindings.get(Wheel._R2_KEY);
       }
