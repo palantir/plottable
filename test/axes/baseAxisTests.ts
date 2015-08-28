@@ -412,7 +412,8 @@ describe("BaseAxis", () => {
             let correspondingRect = d3.select(annotationRects[0][i]);
             assert.closeTo(TestMethods.numAttr(annotationCircle, "cx"),
               TestMethods.numAttr(correspondingRect, "x"), window.Pixel_CloseTo_Requirement, "circle at start of rect");
-            assert.strictEqual(TestMethods.numAttr(annotationCircle, "cy"), axis.height(), "circle at the bottom");
+            assert.closeTo(TestMethods.numAttr(annotationCircle, "cy"), axis.height(),
+              window.Pixel_CloseTo_Requirement, "circle at the bottom");
           });
 
           axis.content().selectAll(".annotation-line").each(function (d, i) {
@@ -459,7 +460,8 @@ describe("BaseAxis", () => {
           axis.content().selectAll(".annotation-line").each(function (d, i) {
             let annotationLine = d3.select(this);
             let correspondingRect = d3.select(annotationRects[0][i]);
-            assert.strictEqual(TestMethods.numAttr(annotationLine, "x1"), axis.width(), "line starts at the right");
+            assert.closeTo(TestMethods.numAttr(annotationLine, "x1"), axis.width(),
+              window.Pixel_CloseTo_Requirement, "line starts at the right");
             assert.closeTo(TestMethods.numAttr(annotationLine, "x2"),
               TestMethods.numAttr(correspondingRect, "x") + TestMethods.numAttr(correspondingRect, "width"), 1, "line goes to the rect");
             assert.closeTo(TestMethods.numAttr(annotationLine, "y1"),
@@ -605,8 +607,8 @@ describe("BaseAxis", () => {
             axis.renderTo(svg);
 
             let firstAnnotationRect = axis.content().select(".annotation-rect");
-            assert.strictEqual(TestMethods.numAttr(firstAnnotationRect, "y") + TestMethods.numAttr(firstAnnotationRect, "height"),
-              axis.height() - axis.margin(), "rectangle positioned correctly");
+            assert.closeTo(TestMethods.numAttr(firstAnnotationRect, "y") + TestMethods.numAttr(firstAnnotationRect, "height"),
+              axis.height() - axis.margin(), window.Pixel_CloseTo_Requirement, "rectangle positioned correctly");
             svg.remove();
           });
 
@@ -619,8 +621,8 @@ describe("BaseAxis", () => {
             axis.renderTo(svg);
 
             let firstAnnotationRect = axis.content().select(".annotation-rect");
-            assert.strictEqual(TestMethods.numAttr(firstAnnotationRect, "y"),
-              axis.margin(), "rectangle positioned correctly");
+            assert.closeTo(TestMethods.numAttr(firstAnnotationRect, "y"),
+              axis.margin(), window.Pixel_CloseTo_Requirement, "rectangle positioned correctly");
             svg.remove();
           });
 
@@ -633,8 +635,8 @@ describe("BaseAxis", () => {
             axis.renderTo(svg);
 
             let firstAnnotationRect = axis.content().select(".annotation-rect");
-            assert.strictEqual(TestMethods.numAttr(firstAnnotationRect, "x"),
-              axis.margin(), "rectangle positioned correctly");
+            assert.closeTo(TestMethods.numAttr(firstAnnotationRect, "x"),
+              axis.margin(), window.Pixel_CloseTo_Requirement, "rectangle positioned correctly");
             svg.remove();
           });
 
@@ -647,8 +649,8 @@ describe("BaseAxis", () => {
             axis.renderTo(svg);
 
             let firstAnnotationRect = axis.content().select(".annotation-rect");
-            assert.strictEqual(TestMethods.numAttr(firstAnnotationRect, "x") + TestMethods.numAttr(firstAnnotationRect, "width"),
-              axis.width() - axis.margin(), "rectangle positioned correctly");
+            assert.closeTo(TestMethods.numAttr(firstAnnotationRect, "x") + TestMethods.numAttr(firstAnnotationRect, "width"),
+              axis.width() - axis.margin(), window.Pixel_CloseTo_Requirement, "rectangle positioned correctly");
             svg.remove();
           });
         });
