@@ -247,27 +247,27 @@ module TestMethods {
   }
 
   export function assertAreaPathCloseTo(actualPath: string, expectedPath: string, precision: number, msg: string) {
-    let actualAreaPathStrings = actualPath.split("Z");
-    let expectedAreaPathStrings = expectedPath.split("Z");
+    let actualAreaPathNumbers = tokenizePathString(actualPath);
+    let expectedAreaPathNumbers = tokenizePathString(expectedPath);
 
-    actualAreaPathStrings.pop();
-    expectedAreaPathStrings.pop();
-
-    let actualAreaPathPoints = actualAreaPathStrings.map((path) => path.split(/[A-Z]/).map((point) => point.split(",")));
-    actualAreaPathPoints.forEach((areaPathPoint) => areaPathPoint.shift());
-    let expectedAreaPathPoints = expectedAreaPathStrings.map((path) => path.split(/[A-Z]/).map((point) => point.split(",")));
-    expectedAreaPathPoints.forEach((areaPathPoint) => areaPathPoint.shift());
-
-    assert.lengthOf(actualAreaPathPoints, expectedAreaPathPoints.length, "number of broken area paths should be equal");
-    actualAreaPathPoints.forEach((actualAreaPoints, i) => {
-      let expectedAreaPoints = expectedAreaPathPoints[i];
-      assert.lengthOf(actualAreaPoints, expectedAreaPoints.length, "number of points in path should be equal");
-      actualAreaPoints.forEach((actualAreaPoint, j) => {
-        let expectedAreaPoint = expectedAreaPoints[j];
-        assert.closeTo(+actualAreaPoint[0], +expectedAreaPoint[0], 0.1, msg);
-        assert.closeTo(+actualAreaPoint[1], +expectedAreaPoint[1], 0.1, msg);
-      });
+    assert.lengthOf(actualAreaPathNumbers, expectedAreaPathNumbers.length, `${msg}: number of numbers in each path should be equal`);
+    actualAreaPathNumbers.forEach((actualAreaNumber, i) => {
+      let expectedAreaNumber = expectedAreaPathNumbers[i];
+        assert.closeTo(+actualAreaNumber, +expectedAreaNumber, 0.1, msg);
     });
+  }
+
+  function tokenizePathString(pathString: string) {
+    let numbers: string[] = [];
+    pathString.split("Z").forEach((path) =>
+      path.split(/[A-Z]/).forEach((token) =>
+        token.split(",").forEach((numberString) =>
+          numberString.split(" ").forEach((num) => {
+            if (num !== "") {
+              numbers.push(num);
+            }
+          }))));
+    return numbers;
   }
 
   export function verifyClipPath(c: Plottable.Component) {
