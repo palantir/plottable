@@ -107,9 +107,12 @@ describe("InterpolatedColorLegend", () => {
     legend.renderTo(svg);
     let style = legend.content().append("style");
     style.attr("type", "text/css");
-    style.text(".plottable .interpolated-color-legend text { font-size: 0px; }");
-    assert.doesNotThrow(() => legend.expands(true), Error, "it does not throw error when font-size is 0px");
+    style.text(".plottable .interpolated-color-legend text { font-size: 0px; }" +
+               ".plottable .interpolated-color-legend { display: none; }");
+    let textHeight = (<any> legend)._measurer.measure().height;
 
+    assert.doesNotThrow(() => legend.expands(true), Error, "it does not throw error when text height is 0");
+    assert.strictEqual(textHeight, 0, "text height is set to 0");
     style.remove();
     svg.remove();
   });
