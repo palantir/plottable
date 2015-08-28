@@ -84,7 +84,7 @@ describe("Interactions", () => {
         svg.remove();
       });
 
-      it("works with touch events as well", () => {
+      it("works with touch events", () => {
         let doubleClickedPoint: Plottable.Point = null;
         let dblClickCallback = (point: Plottable.Point) => doubleClickedPoint = point;
         dblClickInteraction.onDoubleClick(dblClickCallback);
