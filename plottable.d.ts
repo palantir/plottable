@@ -3590,66 +3590,66 @@ declare module Plottable {
             protected _getDataToDraw(): Utils.Map<Dataset, any[]>;
             protected _propertyProjectors(): AttributeToProjector;
             /**
-             * Gets the AccessorScaleBinding for t1 in degrees.
+             * Gets the AccessorScaleBinding for t in degrees.
              */
-            t1<T>(): AccessorScaleBinding<T, number>;
+            t<T>(): AccessorScaleBinding<T, number>;
             /**
-             * Sets t1 to a constant number or the result of an Accessor<number> in degrees.
+             * Sets t to a constant number or the result of an Accessor<number> in degrees.
              *
-             * @param {number|Accessor<number>} t1
+             * @param {number|Accessor<number>} t
              * @returns {Wheel} The calling Wheel Plot.
              */
-            t1(t1: number | Accessor<number>): Plots.Wheel<R, T>;
+            t(t: number | Accessor<number>): Plots.Wheel<R, T>;
             /**
-             * Sets t1 to a scaled constant value or scaled result of an Accessor in degrees.
+             * Sets t to a scaled constant value or scaled result of an Accessor in degrees.
              * The supplied Scale will also be used for t2().
              * The provided Scale will account for the values when autoDomain()-ing.
              *
-             * @param {T|Accessor<T>} t1
+             * @param {T|Accessor<T>} t
              * @param {QuantitativeScale<T>} scale
              * @returns {Wheel} The calling Wheel Plot.
              */
-            t1<T>(t1: T | Accessor<T>, scale: QuantitativeScale<T>): Plots.Wheel<R, T>;
+            t<T>(t: T | Accessor<T>, scale: QuantitativeScale<T>): Plots.Wheel<R, T>;
             /**
              * Gets the AccessorScaleBinding for t2 in degrees.
              */
             t2<T>(): AccessorScaleBinding<T, number>;
             /**
              * Sets t2 to a constant number or the result of an Accessor<number> in degrees.
-             * If a Scale has been set for t1, it will also be used to scale t2.
+             * If a Scale has been set for t, it will also be used to scale t2.
              *
              * @param {number|Accessor<number>} t2
              * @returns {Wheel} The calling Wheel Plot.
              */
             t2(t2: number | Accessor<number>): Plots.Wheel<R, T>;
             /**
-             * Gets the AccessorScaleBinding for r1.
+             * Gets the AccessorScaleBinding for r.
              */
-            r1<R>(): AccessorScaleBinding<R, number>;
+            r<R>(): AccessorScaleBinding<R, number>;
             /**
-             * Sets r1 to a constant number or the result of an Accessor<number>.
+             * Sets r to a constant number or the result of an Accessor<number>.
              *
-             * @param {number|Accessor<number>} r1
+             * @param {number|Accessor<number>} r
              * @returns {Wheel} The calling Wheel Plot.
              */
-            r1(r1: number | Accessor<number>): Plots.Wheel<R, T>;
+            r(r: number | Accessor<number>): Plots.Wheel<R, T>;
             /**
-             * Sets r1 to a scaled constant value or scaled result of an Accessor.
+             * Sets r to a scaled constant value or scaled result of an Accessor.
              * The supplied Scale will also be used for r2().
              * The provided Scale will account for the values when autoDomain()-ing.
              *
-             * @param {R|Accessor<R>} r1
+             * @param {R|Accessor<R>} r
              * @param {QuantitativeScale<R>} scale
              * @returns {Wheel} The calling Wheel Plot.
              */
-            r1<R>(r1: R | Accessor<R>, scale: QuantitativeScale<R>): Plots.Wheel<R, T>;
+            r<R>(r: R | Accessor<R>, scale: QuantitativeScale<R>): Plots.Wheel<R, T>;
             /**
              * Gets the AccessorScaleBinding for r2.
              */
             r2<R>(): AccessorScaleBinding<R, number>;
             /**
              * Sets r2 to a constant number or the result of an Accessor<number>.
-             * If a Scale has been set for r1, it will also be used to scale r2.
+             * If a Scale has been set for r, it will also be used to scale r2.
              *
              * @param {number|Accessor<number>} r2
              * @returns {Wheel} The calling Wheel Plot.

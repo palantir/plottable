@@ -9797,8 +9797,8 @@ var Plottable;
                 _super.prototype.computeLayout.call(this, origin, availableWidth, availableHeight);
                 this._renderArea.attr("transform", "translate(" + this.width() / 2 + "," + this.height() / 2 + ")");
                 var radiusLimit = Math.min(this.width(), this.height()) / 2;
-                if (this.r1() != null && this.r1().scale != null) {
-                    this.r1().scale.range([0, radiusLimit]);
+                if (this.r() != null && this.r().scale != null) {
+                    this.r().scale.range([0, radiusLimit]);
                 }
                 if (this.r2() != null && this.r2().scale != null) {
                     this.r2().scale.range([0, radiusLimit]);
@@ -9823,43 +9823,44 @@ var Plottable;
                 if (this.datasets().length === 0) {
                     return dataToDraw;
                 }
-                var t1Accessor = Plottable.Plot._scaledAccessor(this.t1());
+                var tAccessor = Plottable.Plot._scaledAccessor(this.t());
                 var t2Accessor = Plottable.Plot._scaledAccessor(this.t2());
-                var r1Accessor = Plottable.Plot._scaledAccessor(this.r1());
+                var rAccessor = Plottable.Plot._scaledAccessor(this.r());
                 var r2Accessor = Plottable.Plot._scaledAccessor(this.r2());
                 var ds = this.datasets()[0];
                 var data = dataToDraw.get(ds);
                 var filteredData = data.filter(function (d, i) {
-                    return Plottable.Utils.Math.isValidNumber(t1Accessor(d, i, ds)) &&
+                    return Plottable.Utils.Math.isValidNumber(tAccessor(d, i, ds)) &&
                         Plottable.Utils.Math.isValidNumber(t2Accessor(d, i, ds)) &&
-                        Plottable.Utils.Math.isValidNumber(r1Accessor(d, i, ds)) &&
-                        Plottable.Utils.Math.isValidNumber(r2Accessor(d, i, ds));
+                        Plottable.Utils.Math.isValidNumber(rAccessor(d, i, ds)) &&
+                        Plottable.Utils.Math.isValidNumber(r2Accessor(d, i, ds)) &&
+                        rAccessor(d, i, ds) >= 0 && r2Accessor(d, i, ds) >= 0;
                 });
                 dataToDraw.set(ds, filteredData);
                 return dataToDraw;
             };
             Wheel.prototype._propertyProjectors = function () {
                 var attrToProjector = _super.prototype._propertyProjectors.call(this);
-                var r1Accessor = Plottable.Plot._scaledAccessor(this.r1());
+                var rAccessor = Plottable.Plot._scaledAccessor(this.r());
                 var r2Accessor = Plottable.Plot._scaledAccessor(this.r2());
-                var t1Accessor = Plottable.Plot._scaledAccessor(this.t1());
+                var tAccessor = Plottable.Plot._scaledAccessor(this.t());
                 var t2Accessor = Plottable.Plot._scaledAccessor(this.t2());
                 attrToProjector["d"] = function (datum, index, ds) {
-                    var t1 = t1Accessor(datum, index, ds);
+                    var t = tAccessor(datum, index, ds);
                     var t2 = t2Accessor(datum, index, ds);
-                    if (t2 < t1) {
-                        t2 += (Math.floor((t1 - t2) / 360) + 1) * 360;
+                    if (t2 < t) {
+                        t2 += (Math.floor((t - t2) / 360) + 1) * 360;
                     }
-                    return d3.svg.arc().innerRadius(r1Accessor(datum, index, ds))
+                    return d3.svg.arc().innerRadius(rAccessor(datum, index, ds))
                         .outerRadius(r2Accessor(datum, index, ds))
-                        .startAngle(Plottable.Utils.Math.degreesToRadians(t1))
+                        .startAngle(Plottable.Utils.Math.degreesToRadians(t))
                         .endAngle(Plottable.Utils.Math.degreesToRadians(t2))(datum, index);
                 };
                 return attrToProjector;
             };
-            Wheel.prototype.t1 = function (t1, scale) {
-                if (t1 == null) {
-                    return this._propertyBindings.get(Wheel._T1_KEY);
+            Wheel.prototype.t = function (t, scale) {
+                if (t == null) {
+                    return this._propertyBindings.get(Wheel._T_KEY);
                 }
                 if (scale != null) {
                     if (!Plottable.QuantitativeScale.prototype.isPrototypeOf(scale)) {
@@ -9873,7 +9874,7 @@ var Plottable;
                 if (t2Accessor != null) {
                     this._bindProperty(Wheel._T2_KEY, t2Accessor, scale);
                 }
-                this._bindProperty(Wheel._T1_KEY, t1, scale);
+                this._bindProperty(Wheel._T_KEY, t, scale);
                 this.render();
                 return this;
             };
@@ -9881,15 +9882,15 @@ var Plottable;
                 if (t2 == null) {
                     return this._propertyBindings.get(Wheel._T2_KEY);
                 }
-                var t1Binding = this.t1();
-                var angleScale = t1Binding && t1Binding.scale;
+                var tBinding = this.t();
+                var angleScale = tBinding && tBinding.scale;
                 this._bindProperty(Wheel._T2_KEY, t2, angleScale);
                 this.render();
                 return this;
             };
-            Wheel.prototype.r1 = function (r1, scale) {
-                if (r1 == null) {
-                    return this._propertyBindings.get(Wheel._R1_KEY);
+            Wheel.prototype.r = function (r, scale) {
+                if (r == null) {
+                    return this._propertyBindings.get(Wheel._R_KEY);
                 }
                 if (scale != null && !Plottable.QuantitativeScale.prototype.isPrototypeOf(scale)) {
                     throw new Error("scale needs to inherit from Scale.QuantitativeScale");
@@ -9899,7 +9900,7 @@ var Plottable;
                 if (r2Accessor != null) {
                     this._bindProperty(Wheel._R2_KEY, r2Accessor, scale);
                 }
-                this._bindProperty(Wheel._R1_KEY, r1, scale);
+                this._bindProperty(Wheel._R_KEY, r, scale);
                 this.render();
                 return this;
             };
@@ -9907,24 +9908,24 @@ var Plottable;
                 if (r2 == null) {
                     return this._propertyBindings.get(Wheel._R2_KEY);
                 }
-                var r1Binding = this.r1();
-                var radiusScale = r1Binding && r1Binding.scale;
+                var rBinding = this.r();
+                var radiusScale = rBinding && rBinding.scale;
                 this._bindProperty(Wheel._R2_KEY, r2, radiusScale);
                 this.render();
                 return this;
             };
             Wheel.prototype._pixelPoint = function (datum, index, dataset) {
-                var r1 = Plottable.Plot._scaledAccessor(this.r1())(datum, index, dataset);
+                var r = Plottable.Plot._scaledAccessor(this.r())(datum, index, dataset);
                 var r2 = Plottable.Plot._scaledAccessor(this.r2())(datum, index, dataset);
-                var avgRadius = (r1 + r2) / 2;
-                var t1 = Plottable.Plot._scaledAccessor(this.t1())(datum, index, dataset);
+                var avgRadius = r >= 0 && r2 >= 0 ? (r + r2) / 2 : NaN;
+                var t = Plottable.Plot._scaledAccessor(this.t())(datum, index, dataset);
                 var t2 = Plottable.Plot._scaledAccessor(this.t2())(datum, index, dataset);
-                var avgAngle = Plottable.Utils.Math.degreesToRadians((t1 + t2) / 2);
+                var avgAngle = Plottable.Utils.Math.degreesToRadians((t + t2) / 2);
                 return { x: avgRadius * Math.sin(avgAngle), y: -avgRadius * Math.cos(avgAngle) };
             };
-            Wheel._R1_KEY = "r1";
+            Wheel._R_KEY = "r";
             Wheel._R2_KEY = "r2";
-            Wheel._T1_KEY = "t1";
+            Wheel._T_KEY = "t";
             Wheel._T2_KEY = "t2";
             return Wheel;
         })(Plottable.Plot);
