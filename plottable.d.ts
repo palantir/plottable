@@ -3590,71 +3590,71 @@ declare module Plottable {
             protected _getDataToDraw(): Utils.Map<Dataset, any[]>;
             protected _propertyProjectors(): AttributeToProjector;
             /**
-             * Gets the AccessorScaleBinding for the start angle in degrees.
+             * Gets the AccessorScaleBinding for t1 in degrees.
              */
-            startAngle<T>(): AccessorScaleBinding<T, number>;
+            t1<T>(): AccessorScaleBinding<T, number>;
             /**
-             * Sets the start angle to a constant number or the result of an Accessor<number> in degrees.
+             * Sets t1 to a constant number or the result of an Accessor<number> in degrees.
              *
-             * @param {number|Accessor<number>} startAngle
+             * @param {number|Accessor<number>} t1
              * @returns {Wheel} The calling Wheel Plot.
              */
-            startAngle(startAngle: number | Accessor<number>): Plots.Wheel<R, T>;
+            t1(t1: number | Accessor<number>): Plots.Wheel<R, T>;
             /**
-             * Sets the start angle to a scaled constant value or scaled result of an Accessor in degrees.
-             * The supplied Scale will also be used for endAngle().
+             * Sets t1 to a scaled constant value or scaled result of an Accessor in degrees.
+             * The supplied Scale will also be used for t2().
              * The provided Scale will account for the values when autoDomain()-ing.
              *
-             * @param {T|Accessor<T>} startAngle
-             * @param {Scale<T, number>} scale
+             * @param {T|Accessor<T>} t1
+             * @param {QuantitativeScale<T>} scale
              * @returns {Wheel} The calling Wheel Plot.
              */
-            startAngle<T>(startAngle: T | Accessor<T>, scale: Scale<T, number>): Plots.Wheel<R, T>;
+            t1<T>(t1: T | Accessor<T>, scale: QuantitativeScale<T>): Plots.Wheel<R, T>;
             /**
-             * Gets the AccessorScaleBinding for the end angle in degrees.
+             * Gets the AccessorScaleBinding for t2 in degrees.
              */
-            endAngle<T>(): AccessorScaleBinding<T, number>;
+            t2<T>(): AccessorScaleBinding<T, number>;
             /**
-             * Sets the end angle to a constant number or the result of an Accessor<number> in degrees.
-             * If a Scale has been set for startAngle, it will also be used to scale endAngle.
+             * Sets t2 to a constant number or the result of an Accessor<number> in degrees.
+             * If a Scale has been set for t1, it will also be used to scale t2.
              *
-             * @param {number|Accessor<number>} endAngle
+             * @param {number|Accessor<number>} t2
              * @returns {Wheel} The calling Wheel Plot.
              */
-            endAngle(endAngle: number | Accessor<number>): Plots.Wheel<R, T>;
+            t2(t2: number | Accessor<number>): Plots.Wheel<R, T>;
             /**
-             * Gets the AccessorScaleBinding for the inner radius.
+             * Gets the AccessorScaleBinding for r1.
              */
-            innerRadius<R>(): AccessorScaleBinding<R, number>;
+            r1<R>(): AccessorScaleBinding<R, number>;
             /**
-             * Sets the inner radius to a constant number or the result of an Accessor<number>.
+             * Sets r1 to a constant number or the result of an Accessor<number>.
              *
-             * @param {number|Accessor<number>} innerRadius
+             * @param {number|Accessor<number>} r1
              * @returns {Wheel} The calling Wheel Plot.
              */
-            innerRadius(innerRadius: number | Accessor<number>): Plots.Wheel<R, T>;
+            r1(r1: number | Accessor<number>): Plots.Wheel<R, T>;
             /**
-             * Sets the inner radius to a scaled constant value or scaled result of an Accessor.
-             * The supplied Scale will also be used for outerRadius().
+             * Sets r1 to a scaled constant value or scaled result of an Accessor.
+             * The supplied Scale will also be used for r2().
              * The provided Scale will account for the values when autoDomain()-ing.
              *
-             * @param {R|Accessor<R>} innerRadius
-             * @param {Scale<R, number>} scale
+             * @param {R|Accessor<R>} r1
+             * @param {QuantitativeScale<R>} scale
              * @returns {Wheel} The calling Wheel Plot.
              */
-            innerRadius<R>(innerRadius: R | Accessor<R>, scale: Scale<R, number>): Plots.Wheel<R, T>;
+            r1<R>(r1: R | Accessor<R>, scale: QuantitativeScale<R>): Plots.Wheel<R, T>;
             /**
-             * Gets the AccessorScaleBinding for the outer radius.
+             * Gets the AccessorScaleBinding for r2.
              */
-            outerRadius<R>(): AccessorScaleBinding<R, number>;
+            r2<R>(): AccessorScaleBinding<R, number>;
             /**
-             * Sets the outer radius to a constant number or the result of an Accessor<number>.
-             * If a Scale has been set for innerRadius, it will also be used to scale outerRadius.
+             * Sets r2 to a constant number or the result of an Accessor<number>.
+             * If a Scale has been set for r1, it will also be used to scale r2.
              *
-             * @param {number|Accessor<number>} outerRadius
+             * @param {number|Accessor<number>} r2
              * @returns {Wheel} The calling Wheel Plot.
              */
-            outerRadius(outerRadius: number | Accessor<number>): Plots.Wheel<R, T>;
+            r2(r2: number | Accessor<number>): Plots.Wheel<R, T>;
             protected _pixelPoint(datum: any, index: number, dataset: Dataset): {
                 x: number;
                 y: number;

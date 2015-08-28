@@ -9797,11 +9797,11 @@ var Plottable;
                 _super.prototype.computeLayout.call(this, origin, availableWidth, availableHeight);
                 this._renderArea.attr("transform", "translate(" + this.width() / 2 + "," + this.height() / 2 + ")");
                 var radiusLimit = Math.min(this.width(), this.height()) / 2;
-                if (this.innerRadius() != null && this.innerRadius().scale != null) {
-                    this.innerRadius().scale.range([0, radiusLimit]);
+                if (this.r1() != null && this.r1().scale != null) {
+                    this.r1().scale.range([0, radiusLimit]);
                 }
-                if (this.outerRadius() != null && this.outerRadius().scale != null) {
-                    this.outerRadius().scale.range([0, radiusLimit]);
+                if (this.r2() != null && this.r2().scale != null) {
+                    this.r2().scale.range([0, radiusLimit]);
                 }
                 return this;
             };
@@ -9823,105 +9823,109 @@ var Plottable;
                 if (this.datasets().length === 0) {
                     return dataToDraw;
                 }
-                var startAngleAccessor = Plottable.Plot._scaledAccessor(this.startAngle());
-                var endAngleAccessor = Plottable.Plot._scaledAccessor(this.endAngle());
-                var innerRadiusAccessor = Plottable.Plot._scaledAccessor(this.innerRadius());
-                var outerRadiusAccessor = Plottable.Plot._scaledAccessor(this.outerRadius());
+                var t1Accessor = Plottable.Plot._scaledAccessor(this.t1());
+                var t2Accessor = Plottable.Plot._scaledAccessor(this.t2());
+                var r1Accessor = Plottable.Plot._scaledAccessor(this.r1());
+                var r2Accessor = Plottable.Plot._scaledAccessor(this.r2());
                 var ds = this.datasets()[0];
                 var data = dataToDraw.get(ds);
                 var filteredData = data.filter(function (d, i) {
-                    return Plottable.Utils.Math.isValidNumber(startAngleAccessor(d, i, ds)) &&
-                        Plottable.Utils.Math.isValidNumber(endAngleAccessor(d, i, ds)) &&
-                        Plottable.Utils.Math.isValidNumber(innerRadiusAccessor(d, i, ds)) &&
-                        Plottable.Utils.Math.isValidNumber(outerRadiusAccessor(d, i, ds));
+                    return Plottable.Utils.Math.isValidNumber(t1Accessor(d, i, ds)) &&
+                        Plottable.Utils.Math.isValidNumber(t2Accessor(d, i, ds)) &&
+                        Plottable.Utils.Math.isValidNumber(r1Accessor(d, i, ds)) &&
+                        Plottable.Utils.Math.isValidNumber(r2Accessor(d, i, ds));
                 });
                 dataToDraw.set(ds, filteredData);
                 return dataToDraw;
             };
             Wheel.prototype._propertyProjectors = function () {
                 var attrToProjector = _super.prototype._propertyProjectors.call(this);
-                var innerRadiusAccessor = Plottable.Plot._scaledAccessor(this.innerRadius());
-                var outerRadiusAccessor = Plottable.Plot._scaledAccessor(this.outerRadius());
-                var startAngleAccessor = Plottable.Plot._scaledAccessor(this.startAngle());
-                var endAngleAccessor = Plottable.Plot._scaledAccessor(this.endAngle());
+                var r1Accessor = Plottable.Plot._scaledAccessor(this.r1());
+                var r2Accessor = Plottable.Plot._scaledAccessor(this.r2());
+                var t1Accessor = Plottable.Plot._scaledAccessor(this.t1());
+                var t2Accessor = Plottable.Plot._scaledAccessor(this.t2());
                 attrToProjector["d"] = function (datum, index, ds) {
-                    var startAngle = startAngleAccessor(datum, index, ds);
-                    var endAngle = endAngleAccessor(datum, index, ds);
-                    if (endAngle < startAngle) {
-                        endAngle += (Math.floor((startAngle - endAngle) / 360) + 1) * 360;
+                    var t1 = t1Accessor(datum, index, ds);
+                    var t2 = t2Accessor(datum, index, ds);
+                    if (t2 < t1) {
+                        t2 += (Math.floor((t1 - t2) / 360) + 1) * 360;
                     }
-                    return d3.svg.arc().innerRadius(innerRadiusAccessor(datum, index, ds))
-                        .outerRadius(outerRadiusAccessor(datum, index, ds))
-                        .startAngle(Plottable.Utils.Math.degreesToRadians(startAngle))
-                        .endAngle(Plottable.Utils.Math.degreesToRadians(endAngle))(datum, index);
+                    return d3.svg.arc().innerRadius(r1Accessor(datum, index, ds))
+                        .outerRadius(r2Accessor(datum, index, ds))
+                        .startAngle(Plottable.Utils.Math.degreesToRadians(t1))
+                        .endAngle(Plottable.Utils.Math.degreesToRadians(t2))(datum, index);
                 };
                 return attrToProjector;
             };
-            Wheel.prototype.startAngle = function (startAngle, scale) {
-                if (startAngle == null) {
-                    return this._propertyBindings.get(Wheel._START_ANGLE_KEY);
+            Wheel.prototype.t1 = function (t1, scale) {
+                if (t1 == null) {
+                    return this._propertyBindings.get(Wheel._T1_KEY);
                 }
                 if (scale != null) {
+                    if (!Plottable.QuantitativeScale.prototype.isPrototypeOf(scale)) {
+                        throw new Error("scale needs to inherit from Scale.QuantitativeScale");
+                    }
                     scale.range([0, 360]);
+                    scale.padProportion(0);
                 }
-                var endAngleBinding = this.endAngle();
-                var endAngleAccessor = endAngleBinding && endAngleBinding.accessor;
-                if (endAngleAccessor != null) {
-                    this._bindProperty(Wheel._END_ANGLE_KEY, endAngleAccessor, scale);
+                var t2Binding = this.t2();
+                var t2Accessor = t2Binding && t2Binding.accessor;
+                if (t2Accessor != null) {
+                    this._bindProperty(Wheel._T2_KEY, t2Accessor, scale);
                 }
-                this._bindProperty(Wheel._START_ANGLE_KEY, startAngle, scale);
+                this._bindProperty(Wheel._T1_KEY, t1, scale);
                 this.render();
                 return this;
             };
-            Wheel.prototype.endAngle = function (endAngle) {
-                if (endAngle == null) {
-                    return this._propertyBindings.get(Wheel._END_ANGLE_KEY);
+            Wheel.prototype.t2 = function (t2) {
+                if (t2 == null) {
+                    return this._propertyBindings.get(Wheel._T2_KEY);
                 }
-                var startAngleBinding = this.startAngle();
-                var angleScale = startAngleBinding && startAngleBinding.scale;
-                this._bindProperty(Wheel._END_ANGLE_KEY, endAngle, angleScale);
+                var t1Binding = this.t1();
+                var angleScale = t1Binding && t1Binding.scale;
+                this._bindProperty(Wheel._T2_KEY, t2, angleScale);
                 this.render();
                 return this;
             };
-            Wheel.prototype.innerRadius = function (innerRadius, scale) {
-                if (innerRadius == null) {
-                    return this._propertyBindings.get(Wheel._INNER_RADIUS_KEY);
+            Wheel.prototype.r1 = function (r1, scale) {
+                if (r1 == null) {
+                    return this._propertyBindings.get(Wheel._R1_KEY);
                 }
-                if (scale != null) {
-                    scale.range([0, 360]);
+                if (scale != null && !Plottable.QuantitativeScale.prototype.isPrototypeOf(scale)) {
+                    throw new Error("scale needs to inherit from Scale.QuantitativeScale");
                 }
-                var outerRadiusBinding = this.outerRadius();
-                var outerRadiusAccessor = outerRadiusBinding && outerRadiusBinding.accessor;
-                if (outerRadiusAccessor != null) {
-                    this._bindProperty(Wheel._OUTER_RADIUS_KEY, outerRadiusAccessor, scale);
+                var r2Binding = this.r2();
+                var r2Accessor = r2Binding && r2Binding.accessor;
+                if (r2Accessor != null) {
+                    this._bindProperty(Wheel._R2_KEY, r2Accessor, scale);
                 }
-                this._bindProperty(Wheel._INNER_RADIUS_KEY, innerRadius, scale);
+                this._bindProperty(Wheel._R1_KEY, r1, scale);
                 this.render();
                 return this;
             };
-            Wheel.prototype.outerRadius = function (outerRadius) {
-                if (outerRadius == null) {
-                    return this._propertyBindings.get(Wheel._OUTER_RADIUS_KEY);
+            Wheel.prototype.r2 = function (r2) {
+                if (r2 == null) {
+                    return this._propertyBindings.get(Wheel._R2_KEY);
                 }
-                var innerRadiusBinding = this.innerRadius();
-                var radiusScale = innerRadiusBinding && innerRadiusBinding.scale;
-                this._bindProperty(Wheel._OUTER_RADIUS_KEY, outerRadius, radiusScale);
+                var r1Binding = this.r1();
+                var radiusScale = r1Binding && r1Binding.scale;
+                this._bindProperty(Wheel._R2_KEY, r2, radiusScale);
                 this.render();
                 return this;
             };
             Wheel.prototype._pixelPoint = function (datum, index, dataset) {
-                var innerRadius = Plottable.Plot._scaledAccessor(this.innerRadius())(datum, index, dataset);
-                var outerRadius = Plottable.Plot._scaledAccessor(this.outerRadius())(datum, index, dataset);
-                var avgRadius = (innerRadius + outerRadius) / 2;
-                var startAngle = Plottable.Plot._scaledAccessor(this.startAngle())(datum, index, dataset);
-                var endAngle = Plottable.Plot._scaledAccessor(this.endAngle())(datum, index, dataset);
-                var avgAngle = Plottable.Utils.Math.degreesToRadians((startAngle + endAngle) / 2);
+                var r1 = Plottable.Plot._scaledAccessor(this.r1())(datum, index, dataset);
+                var r2 = Plottable.Plot._scaledAccessor(this.r2())(datum, index, dataset);
+                var avgRadius = (r1 + r2) / 2;
+                var t1 = Plottable.Plot._scaledAccessor(this.t1())(datum, index, dataset);
+                var t2 = Plottable.Plot._scaledAccessor(this.t2())(datum, index, dataset);
+                var avgAngle = Plottable.Utils.Math.degreesToRadians((t1 + t2) / 2);
                 return { x: avgRadius * Math.sin(avgAngle), y: -avgRadius * Math.cos(avgAngle) };
             };
-            Wheel._INNER_RADIUS_KEY = "inner-radius";
-            Wheel._OUTER_RADIUS_KEY = "outer-radius";
-            Wheel._START_ANGLE_KEY = "start-angle";
-            Wheel._END_ANGLE_KEY = "end-angle";
+            Wheel._R1_KEY = "r1";
+            Wheel._R2_KEY = "r2";
+            Wheel._T1_KEY = "t1";
+            Wheel._T2_KEY = "t2";
             return Wheel;
         })(Plottable.Plot);
         Plots.Wheel = Wheel;

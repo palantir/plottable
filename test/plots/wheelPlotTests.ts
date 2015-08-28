@@ -18,10 +18,10 @@ describe("Plots", () => {
         tScale = new Plottable.Scales.Linear();
         tScale.domain([0, TAU]);
         wheelPlot = new Plottable.Plots.Wheel();
-        wheelPlot.innerRadius((d) => d.r1, rScale);
-        wheelPlot.outerRadius((d) => d.r2);
-        wheelPlot.startAngle((d) => d.t1, tScale);
-        wheelPlot.endAngle((d) => d.t2);
+        wheelPlot.r1((d) => d.r1, rScale);
+        wheelPlot.r2((d) => d.r2);
+        wheelPlot.t1((d) => d.t1, tScale);
+        wheelPlot.t2((d) => d.t2);
       });
 
       it("renders correctly with no data", () => {
@@ -70,7 +70,7 @@ describe("Plots", () => {
         svg.remove();
       });
 
-      it("draws arc clockwise from startAngle to endAngle", () => {
+      it("draws arc clockwise from t1 to t2", () => {
         let data = [
             { r1: 0, r2: 1, t1: 60, t2: -60, expectedEndAngle: 300 },
             { r1: 1, r2: 2, t1: 60, t2: 60, expectedEndAngle: 60 },
@@ -82,15 +82,15 @@ describe("Plots", () => {
 
         let dataset = new Plottable.Dataset(data);
         wheelPlot.addDataset(dataset);
-        wheelPlot.startAngle((d) => d.t1, null);
+        wheelPlot.t1((d) => d.t1, null);
         wheelPlot.renderTo(svg);
         let slices = wheelPlot.selections();
         data.forEach((datum, i) => {
-          let startAngle = Plottable.Utils.Math.degreesToRadians(datum.t1);
+          let t1 = Plottable.Utils.Math.degreesToRadians(datum.t1);
           let expectedEndAngle = Plottable.Utils.Math.degreesToRadians(datum.expectedEndAngle);
           let path = d3.select(slices[0][i]).attr("d");
           let arc = d3.svg.arc().innerRadius(rScale.scale(datum.r1)).outerRadius(rScale.scale(datum.r2))
-                                .startAngle(startAngle).endAngle(expectedEndAngle);
+                                .startAngle(t1).endAngle(expectedEndAngle);
           let expectedPath = arc(null);
           TestMethods.assertAreaPathCloseTo(path, expectedPath, 0.1, `arc is drawn from ${datum.t1} to ${datum.t2}`);
         });
@@ -118,7 +118,7 @@ describe("Plots", () => {
         ];
 
         let dataset = new Plottable.Dataset(data);
-        wheelPlot.startAngle((d) => d.t1, null);
+        wheelPlot.t1((d) => d.t1, null);
         wheelPlot.addDataset(dataset);
         wheelPlot.renderTo(svg);
 
@@ -134,7 +134,7 @@ describe("Plots", () => {
       });
     });
 
-    describe("innerRadius() and outerRadius()", () => {
+    describe("r1() and r2()", () => {
       let svg: d3.Selection<void>;
       let wheelPlot: Plottable.Plots.Wheel<number, number>;
       let rScale: Plottable.Scales.Linear;
@@ -145,8 +145,8 @@ describe("Plots", () => {
         svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
         rScale = new Plottable.Scales.Linear();
         wheelPlot = new Plottable.Plots.Wheel();
-        wheelPlot.startAngle((d) => d.t1);
-        wheelPlot.endAngle((d) => d.t2);
+        wheelPlot.t1((d) => d.t1);
+        wheelPlot.t2((d) => d.t2);
         data = [
           {r1: 0, r2: 1, t1: 0, t2: 180 },
           {r1: 1, r2: 2, t1: 180, t2: 360 }];
@@ -154,72 +154,78 @@ describe("Plots", () => {
         wheelPlot.addDataset(dataset);
       });
 
-      it("can set and get innerRadius", () => {
-        wheelPlot.outerRadius((d) => d.r2);
-        assert.isUndefined(wheelPlot.innerRadius(), "innerRadius is initiized to undefined");
+      it("can set and get r1", () => {
+        wheelPlot.r2((d) => d.r2);
+        assert.isUndefined(wheelPlot.r1(), "r1 is initiized to undefined");
 
-        wheelPlot.innerRadius(0);
+        wheelPlot.r1(0);
         wheelPlot.renderTo(svg);
-        assert.strictEqual(wheelPlot.innerRadius().accessor(data[0], 0, dataset), 0, "access innerRadius that is set to a constant");
-        assert.strictEqual(wheelPlot.innerRadius().accessor(data[1], 1, dataset), 0, "access innerRadius that is set to a constant");
-        assert.isUndefined(wheelPlot.innerRadius().scale, "scale of innerRadius is undefined");
+        assert.strictEqual(wheelPlot.r1().accessor(data[0], 0, dataset), 0, "access r1 that is set to a constant");
+        assert.strictEqual(wheelPlot.r1().accessor(data[1], 1, dataset), 0, "access r1 that is set to a constant");
+        assert.isUndefined(wheelPlot.r1().scale, "scale of r1 is undefined");
 
-        wheelPlot.innerRadius((d: any) => d.r1);
-        assert.strictEqual(wheelPlot.innerRadius().accessor(data[0], 0, dataset), 0, "access innerRadius correctly without a scale");
-        assert.strictEqual(wheelPlot.innerRadius().accessor(data[1], 1, dataset), 1, "access innerRadius correctly without a scale");
-        assert.isUndefined(wheelPlot.innerRadius().scale, "scale of innerRadius is undefined");
+        wheelPlot.r1((d: any) => d.r1);
+        assert.strictEqual(wheelPlot.r1().accessor(data[0], 0, dataset), 0, "access r1 correctly without a scale");
+        assert.strictEqual(wheelPlot.r1().accessor(data[1], 1, dataset), 1, "access r1 correctly without a scale");
+        assert.isUndefined(wheelPlot.r1().scale, "scale of r1 is undefined");
 
-        wheelPlot.innerRadius((d: any) => d.r1, rScale);
-        assert.strictEqual(wheelPlot.innerRadius().accessor(data[0], 0, dataset), 0, "access innerRadius correctly with a scale");
-        assert.strictEqual(wheelPlot.innerRadius().accessor(data[1], 1, dataset), 1, "access innerRadius correctly with a scale");
-        assert.deepEqual(wheelPlot.innerRadius().scale, rScale, "scale of innerRadius is set correctly");
+        wheelPlot.r1((d: any) => d.r1, rScale);
+        assert.strictEqual(wheelPlot.r1().accessor(data[0], 0, dataset), 0, "access r1 correctly with a scale");
+        assert.strictEqual(wheelPlot.r1().accessor(data[1], 1, dataset), 1, "access r1 correctly with a scale");
+        assert.deepEqual(wheelPlot.r1().scale, rScale, "scale of r1 is set correctly");
         svg.remove();
       });
 
-      it("can set and get outerRadius", () => {
-        wheelPlot.innerRadius((d) => d.r1);
-        assert.isUndefined(wheelPlot.outerRadius(), "outerRadius is initiized to undefined");
+      it("can set and get r2", () => {
+        wheelPlot.r1((d) => d.r1);
+        assert.isUndefined(wheelPlot.r2(), "r2 is initiized to undefined");
 
-        wheelPlot.outerRadius(0);
+        wheelPlot.r2(0);
         wheelPlot.renderTo(svg);
-        assert.strictEqual(wheelPlot.outerRadius().accessor(data[0], 0, dataset), 0, "access outerRadius that is set to a constant");
-        assert.strictEqual(wheelPlot.outerRadius().accessor(data[1], 1, dataset), 0, "access outerRadius that is set to a constant");
-        assert.isUndefined(wheelPlot.outerRadius().scale, "scale of outerRadius is undefined");
+        assert.strictEqual(wheelPlot.r2().accessor(data[0], 0, dataset), 0, "access r2 that is set to a constant");
+        assert.strictEqual(wheelPlot.r2().accessor(data[1], 1, dataset), 0, "access r2 that is set to a constant");
+        assert.isUndefined(wheelPlot.r2().scale, "scale of r2 is undefined");
 
-        wheelPlot.outerRadius((d: any) => d.r2);
-        assert.strictEqual(wheelPlot.outerRadius().accessor(data[0], 0, dataset), 1, "access outerRadius correctly without a scale");
-        assert.strictEqual(wheelPlot.outerRadius().accessor(data[1], 1, dataset), 2, "access outerRadius correctly without a scale");
-        assert.isUndefined(wheelPlot.outerRadius().scale, "scale of outerRadius is undefined");
+        wheelPlot.r2((d: any) => d.r2);
+        assert.strictEqual(wheelPlot.r2().accessor(data[0], 0, dataset), 1, "access r2 correctly without a scale");
+        assert.strictEqual(wheelPlot.r2().accessor(data[1], 1, dataset), 2, "access r2 correctly without a scale");
+        assert.isUndefined(wheelPlot.r2().scale, "scale of r2 is undefined");
 
         svg.remove();
       });
 
-      it("updates the scale of outerRadius when scale of innerRadius is set", () => {
-        wheelPlot.outerRadius((d) => d.r2);
+      it("updates the scale of r2 when scale of r1 is set", () => {
+        wheelPlot.r2((d) => d.r2);
 
-        assert.isUndefined(wheelPlot.outerRadius().scale, "scale of outerRadius is undefined initially");
+        assert.isUndefined(wheelPlot.r2().scale, "scale of r2 is undefined initially");
 
-        wheelPlot.innerRadius((d) => d.r1, rScale);
-        assert.deepEqual(wheelPlot.outerRadius().scale, rScale, "scale of outerRadius is set to be the same scale as innerRadius");
+        wheelPlot.r1((d) => d.r1, rScale);
+        assert.deepEqual(wheelPlot.r2().scale, rScale, "scale of r2 is set to be the same scale as r1");
 
-        wheelPlot.innerRadius((d) => d.r1, null);
-        assert.isNull(wheelPlot.outerRadius().scale, "scale of outerRadius is set to null");
+        wheelPlot.r1((d) => d.r1, null);
+        assert.isNull(wheelPlot.r2().scale, "scale of r2 is set to null");
         svg.remove();
       });
 
-      it("sets the scale of outerRadius to the scale of innerRadius", () => {
-        wheelPlot.innerRadius((d) => d.r1, rScale);
-        wheelPlot.outerRadius((d) => d.r2);
-        assert.deepEqual(wheelPlot.outerRadius().scale, rScale, "scale of outerRadius is set to be the same scale as innerRadius");
+      it("sets the scale of r2 to the scale of r1", () => {
+        wheelPlot.r1((d) => d.r1, rScale);
+        wheelPlot.r2((d) => d.r2);
+        assert.deepEqual(wheelPlot.r2().scale, rScale, "scale of r2 is set to be the same scale as r1");
 
-        wheelPlot.innerRadius((d) => d.r1, null);
-        wheelPlot.outerRadius((d) => d.r2);
-        assert.isNull(wheelPlot.outerRadius().scale, "scale of outerRadius is set to null");
+        wheelPlot.r1((d) => d.r1, null);
+        wheelPlot.r2((d) => d.r2);
+        assert.isNull(wheelPlot.r2().scale, "scale of r2 is set to null");
+        svg.remove();
+      });
+
+      it("only takes QuantitativeScales", () => {
+        let scale = new Plottable.Scales.Category();
+        assert.throws(() => wheelPlot.r1((d) => d.r1, (<any>scale)), "scale needs to inherit from Scale.QuantitativeScale");
         svg.remove();
       });
     });
 
-    describe("startAngle() and endAngle()", () => {
+    describe("t1() and t2()", () => {
       let SVG_WIDTH = 400;
       let SVG_HEIGHT = 500;
       let svg: d3.Selection<void>;
@@ -235,8 +241,8 @@ describe("Plots", () => {
         tScale = new Plottable.Scales.Linear();
         tScale.domain([0, TAU]);
         wheelPlot = new Plottable.Plots.Wheel();
-        wheelPlot.innerRadius((d) => d.r1, rScale);
-        wheelPlot.outerRadius((d) => d.r2);
+        wheelPlot.r1((d) => d.r1, rScale);
+        wheelPlot.r2((d) => d.r2);
         data = [
           {r1: 0, r2: 1, t1: 0, t2: TAU / 2 },
           {r1: 1, r2: 2, t1: TAU / 2, t2: TAU }];
@@ -244,68 +250,74 @@ describe("Plots", () => {
         wheelPlot.addDataset(dataset);
       });
 
-      it("can set and get startAngle", () => {
-        wheelPlot.endAngle((d) => d.t2);
-        assert.isUndefined(wheelPlot.startAngle(), "startAngle is initiized to undefined");
+      it("can set and get t1", () => {
+        wheelPlot.t2((d) => d.t2);
+        assert.isUndefined(wheelPlot.t1(), "t1 is initiized to undefined");
 
-        wheelPlot.startAngle(0);
+        wheelPlot.t1(0);
         wheelPlot.renderTo(svg);
-        assert.strictEqual(wheelPlot.startAngle().accessor(data[0], 0, dataset), 0, "access startAngle that is set to a constant");
-        assert.strictEqual(wheelPlot.startAngle().accessor(data[1], 1, dataset), 0, "access startAngle that is set to a constant");
-        assert.isUndefined(wheelPlot.startAngle().scale, "scale of startAngle is undefined");
+        assert.strictEqual(wheelPlot.t1().accessor(data[0], 0, dataset), 0, "access t1 that is set to a constant");
+        assert.strictEqual(wheelPlot.t1().accessor(data[1], 1, dataset), 0, "access t1 that is set to a constant");
+        assert.isUndefined(wheelPlot.t1().scale, "scale of t1 is undefined");
 
-        wheelPlot.startAngle((d) => d.t1);
-        assert.strictEqual(wheelPlot.startAngle().accessor(data[0], 0, dataset), 0, "access startAngle correctly without a scale");
-        assert.strictEqual(wheelPlot.startAngle().accessor(data[1], 1, dataset), TAU / 2, "access startAngle correctly without a scale");
-        assert.isUndefined(wheelPlot.startAngle().scale, "scale of startAngle is undefined");
+        wheelPlot.t1((d) => d.t1);
+        assert.strictEqual(wheelPlot.t1().accessor(data[0], 0, dataset), 0, "access t1 correctly without a scale");
+        assert.strictEqual(wheelPlot.t1().accessor(data[1], 1, dataset), TAU / 2, "access t1 correctly without a scale");
+        assert.isUndefined(wheelPlot.t1().scale, "scale of t1 is undefined");
 
-        wheelPlot.startAngle((d) => d.t1, tScale);
-        assert.deepEqual(wheelPlot.startAngle().scale.range(), [0, 360], "range of startAngle should be 0 to 360");
-        assert.strictEqual(wheelPlot.startAngle().accessor(data[0], 0, dataset), 0, "access startAngle correctly with a scale");
-        assert.strictEqual(wheelPlot.startAngle().accessor(data[1], 1, dataset), TAU / 2, "access startAngle correctly with a scale");
-        assert.deepEqual(wheelPlot.startAngle().scale, tScale, "scale of startAngle is set correctly");
+        wheelPlot.t1((d) => d.t1, tScale);
+        assert.deepEqual(wheelPlot.t1().scale.range(), [0, 360], "range of t1 should be 0 to 360");
+        assert.strictEqual(wheelPlot.t1().accessor(data[0], 0, dataset), 0, "access t1 correctly with a scale");
+        assert.strictEqual(wheelPlot.t1().accessor(data[1], 1, dataset), TAU / 2, "access t1 correctly with a scale");
+        assert.deepEqual(wheelPlot.t1().scale, tScale, "scale of t1 is set correctly");
 
         svg.remove();
       });
 
-      it("can set and get endAngle", () => {
-        wheelPlot.startAngle((d) => d.t1);
-        assert.isUndefined(wheelPlot.endAngle(), "endAngle is initiized to undefined");
+      it("can set and get t2", () => {
+        wheelPlot.t1((d) => d.t1);
+        assert.isUndefined(wheelPlot.t2(), "t2 is initiized to undefined");
 
-        wheelPlot.endAngle(0);
+        wheelPlot.t2(0);
         wheelPlot.renderTo(svg);
-        assert.strictEqual(wheelPlot.endAngle().accessor(data[0], 0, dataset), 0, "access endAngle that is set to a constant");
-        assert.strictEqual(wheelPlot.endAngle().accessor(data[1], 1, dataset), 0, "access endAngle that is set to a constant");
-        assert.isUndefined(wheelPlot.endAngle().scale, "scale of endAngle is undefined");
+        assert.strictEqual(wheelPlot.t2().accessor(data[0], 0, dataset), 0, "access t2 that is set to a constant");
+        assert.strictEqual(wheelPlot.t2().accessor(data[1], 1, dataset), 0, "access t2 that is set to a constant");
+        assert.isUndefined(wheelPlot.t2().scale, "scale of t2 is undefined");
 
-        wheelPlot.endAngle((d) => d.t2);
-        assert.strictEqual(wheelPlot.endAngle().accessor(data[0], 0, dataset), TAU / 2, "access endAngle correctly without a scale");
-        assert.strictEqual(wheelPlot.endAngle().accessor(data[1], 1, dataset), TAU, "access endAngle correctly without a scale");
-        assert.isUndefined(wheelPlot.endAngle().scale, "scale of endAngle is undefined");
+        wheelPlot.t2((d) => d.t2);
+        assert.strictEqual(wheelPlot.t2().accessor(data[0], 0, dataset), TAU / 2, "access t2 correctly without a scale");
+        assert.strictEqual(wheelPlot.t2().accessor(data[1], 1, dataset), TAU, "access t2 correctly without a scale");
+        assert.isUndefined(wheelPlot.t2().scale, "scale of t2 is undefined");
         svg.remove();
       });
 
-      it("updates the scale of endAngle when scale of startAngle is set", () => {
-        wheelPlot.endAngle((d) => d.t2);
+      it("updates the scale of t2 when scale of t1 is set", () => {
+        wheelPlot.t2((d) => d.t2);
 
-        assert.isUndefined(wheelPlot.endAngle().scale, "scale of endAngle is undefined initially");
+        assert.isUndefined(wheelPlot.t2().scale, "scale of t2 is undefined initially");
 
-        wheelPlot.startAngle((d) => d.t1, tScale);
-        assert.deepEqual(wheelPlot.endAngle().scale, tScale, "scale of endAngle is set to be the same scale of startAngle");
+        wheelPlot.t1((d) => d.t1, tScale);
+        assert.deepEqual(wheelPlot.t2().scale, tScale, "scale of t2 is set to be the same scale of t1");
 
-        wheelPlot.startAngle((d) => d.t1, null);
-        assert.isNull(wheelPlot.endAngle().scale, "scale of endAngle is set to null");
+        wheelPlot.t1((d) => d.t1, null);
+        assert.isNull(wheelPlot.t2().scale, "scale of t2 is set to null");
         svg.remove();
       });
 
-      it("sets the scale of endAngle to the scale of startAngle", () => {
-        wheelPlot.startAngle((d) => d.t1, tScale);
-        wheelPlot.endAngle((d) => d.t2);
-        assert.deepEqual(wheelPlot.endAngle().scale, tScale, "scale of endAngle is set to be the same scale of startAngle");
+      it("sets the scale of t2 to the scale of t1", () => {
+        wheelPlot.t1((d) => d.t1, tScale);
+        wheelPlot.t2((d) => d.t2);
+        assert.deepEqual(wheelPlot.t2().scale, tScale, "scale of t2 is set to be the same scale of t1");
 
-        wheelPlot.startAngle((d) => d.t1, null);
-        wheelPlot.endAngle((d) => d.t2);
-        assert.isNull(wheelPlot.endAngle().scale, "scale of endAngle is set to null");
+        wheelPlot.t1((d) => d.t1, null);
+        wheelPlot.t2((d) => d.t2);
+        assert.isNull(wheelPlot.t2().scale, "scale of t2 is set to null");
+        svg.remove();
+      });
+
+      it("only takes QuantitativeScales", () => {
+        let scale = new Plottable.Scales.Category();
+        assert.throws(() => wheelPlot.t1((d) => d.t1, (<any>scale)), "scale needs to inherit from Scale.QuantitativeScale");
         svg.remove();
       });
     });
