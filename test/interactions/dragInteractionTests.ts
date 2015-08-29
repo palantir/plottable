@@ -173,6 +173,7 @@ describe("Interactions", () => {
 
         let target = component.background();
 
+        TestMethods.triggerFakeMouseEvent("mousedown", target, startPoint.x, startPoint.y);
         TestMethods.triggerFakeMouseEvent("mousemove", target, endPoint.x, endPoint.y);
         assert.isTrue(moveCallback1Called, "callback 1 was called on dragging (mousemove)");
         assert.isTrue(moveCallback2Called, "callback 2 was called on dragging (mousemove)");
@@ -180,6 +181,7 @@ describe("Interactions", () => {
         moveCallback1Called = false;
         moveCallback2Called = false;
         dragInteraction.offDrag(moveCallback1);
+        TestMethods.triggerFakeMouseEvent("mousedown", target, startPoint.x, startPoint.y);
         TestMethods.triggerFakeMouseEvent("mousemove", target, endPoint.x, endPoint.y);
         assert.isFalse(moveCallback1Called, "callback 1 was disconnected from drag interaction");
         assert.isTrue(moveCallback2Called, "callback 2 is still connected to the drag interaction");
@@ -248,6 +250,7 @@ describe("Interactions", () => {
 
         let target = component.background();
 
+        TestMethods.triggerFakeMouseEvent("mousedown", target, startPoint.x, startPoint.y);
         TestMethods.triggerFakeMouseEvent("mouseup", target, endPoint.x, endPoint.y);
         assert.isTrue(endCallback1Called, "callback 1 was called on drag ending (mouseup)");
         assert.isTrue(endCallback2Called, "callback 2 was called on drag ending (mouseup)");
@@ -255,6 +258,7 @@ describe("Interactions", () => {
         endCallback1Called = false;
         endCallback2Called = false;
         dragInteraction.offDragEnd(endCallback1);
+        TestMethods.triggerFakeMouseEvent("mousedown", target, startPoint.x, startPoint.y);
         TestMethods.triggerFakeMouseEvent("mouseup", target, endPoint.x, endPoint.y);
         assert.isFalse(endCallback1Called, "callback 1 was disconnected from the drag end interaction");
         assert.isTrue(endCallback2Called, "callback 2 is still connected to the drag end interaction");
