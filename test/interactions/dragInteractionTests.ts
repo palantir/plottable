@@ -44,12 +44,12 @@ describe("Interactions", () => {
         dragInteraction = new Plottable.Interactions.Drag();
       });
 
-      it("onDragStart()", () => {
+      it("calls the onDragStart() callback", () => {
         let startCallbackCalled = false;
         let receivedStart: Plottable.Point;
-        let startCallback = (p: Plottable.Point) => {
+        let startCallback = (point: Plottable.Point) => {
           startCallbackCalled = true;
-          receivedStart = p;
+          receivedStart = point;
         };
         dragInteraction.onDragStart(startCallback);
         dragInteraction.attachTo(component);
@@ -93,7 +93,33 @@ describe("Interactions", () => {
         svg.remove();
       });
 
-      it("onDrag()", () => {
+      it("can register two onDragStart() callbacks on the same component", () => {
+        let startCallback1Called = false;
+        let startCallback2Called = false;
+        let startCallback1 = () => startCallback1Called = true;
+        let startCallback2 = () => startCallback2Called = true;
+
+        dragInteraction.onDragStart(startCallback1);
+        dragInteraction.onDragStart(startCallback2);
+
+        dragInteraction.attachTo(component);
+
+        let target = component.background();
+        TestMethods.triggerFakeMouseEvent("mousedown", target, startPoint.x, startPoint.y);
+        assert.isTrue(startCallback1Called, "callback 1 was called on beginning drag (mousedown)");
+        assert.isTrue(startCallback2Called, "callback 2 was called on beginning drag (mousedown)");
+
+        startCallback1Called = false;
+        startCallback2Called = false;
+        dragInteraction.offDragStart(startCallback1);
+        TestMethods.triggerFakeMouseEvent("mousedown", target, startPoint.x, startPoint.y);
+        assert.isFalse(startCallback1Called, "callback 1 was disconnected from drag start interaction");
+        assert.isTrue(startCallback2Called, "callback 2 is still connected to the drag start interaction");
+
+        svg.remove();
+      });
+
+      it("calls the onDrag() callback", () => {
         let moveCallbackCalled = false;
         let receivedStart: Plottable.Point;
         let receivedEnd: Plottable.Point;
@@ -134,7 +160,34 @@ describe("Interactions", () => {
         svg.remove();
       });
 
-      it("onDragEnd()", () => {
+      it("can register two onDrag() callbacks on the same component", () => {
+        let moveCallback1Called = false;
+        let moveCallback2Called = false;
+        let moveCallback1 = () => moveCallback1Called = true;
+        let moveCallback2 = () => moveCallback2Called = true;
+
+        dragInteraction.onDrag(moveCallback1);
+        dragInteraction.onDrag(moveCallback2);
+
+        dragInteraction.attachTo(component);
+
+        let target = component.background();
+
+        TestMethods.triggerFakeMouseEvent("mousemove", target, endPoint.x, endPoint.y);
+        assert.isTrue(moveCallback1Called, "callback 1 was called on dragging (mousemove)");
+        assert.isTrue(moveCallback2Called, "callback 2 was called on dragging (mousemove)");
+
+        moveCallback1Called = false;
+        moveCallback2Called = false;
+        dragInteraction.offDrag(moveCallback1);
+        TestMethods.triggerFakeMouseEvent("mousemove", target, endPoint.x, endPoint.y);
+        assert.isFalse(moveCallback1Called, "callback 1 was disconnected from drag interaction");
+        assert.isTrue(moveCallback2Called, "callback 2 is still connected to the drag interaction");
+
+        svg.remove();
+      });
+
+      it("calls the onDragEnd() callback", () => {
         let endCallbackCalled = false;
         let receivedStart: Plottable.Point;
         let receivedEnd: Plottable.Point;
@@ -182,65 +235,67 @@ describe("Interactions", () => {
         svg.remove();
       });
 
-      it("multiple interactions on drag", () => {
-        let startCallback1Called = false;
-        let startCallback2Called = false;
-        let moveCallback1Called = false;
-        let moveCallback2Called = false;
+      it("can register two onDragEnd() callbacks on the same component", () => {
         let endCallback1Called = false;
         let endCallback2Called = false;
-
-        let startCallback1 = () => startCallback1Called = true;
-        let startCallback2 = () => startCallback2Called = true;
-        let moveCallback1 = () => moveCallback1Called = true;
-        let moveCallback2 = () => moveCallback2Called = true;
         let endCallback1 = () => endCallback1Called = true;
         let endCallback2 = () => endCallback2Called = true;
 
-        dragInteraction.onDragStart(startCallback1);
-        dragInteraction.onDragStart(startCallback2);
-        dragInteraction.onDrag(moveCallback1);
-        dragInteraction.onDrag(moveCallback2);
         dragInteraction.onDragEnd(endCallback1);
         dragInteraction.onDragEnd(endCallback2);
 
         dragInteraction.attachTo(component);
 
         let target = component.background();
-        TestMethods.triggerFakeMouseEvent("mousedown", target, startPoint.x, startPoint.y);
-        assert.isTrue(startCallback1Called, "callback 1 was called on beginning drag (mousedown)");
-        assert.isTrue(startCallback2Called, "callback 2 was called on beginning drag (mousedown)");
-
-        TestMethods.triggerFakeMouseEvent("mousemove", target, endPoint.x, endPoint.y);
-        assert.isTrue(moveCallback1Called, "callback 1 was called on dragging (mousemove)");
-        assert.isTrue(moveCallback2Called, "callback 2 was called on dragging (mousemove)");
 
         TestMethods.triggerFakeMouseEvent("mouseup", target, endPoint.x, endPoint.y);
         assert.isTrue(endCallback1Called, "callback 1 was called on drag ending (mouseup)");
         assert.isTrue(endCallback2Called, "callback 2 was called on drag ending (mouseup)");
 
-        startCallback1Called = false;
-        startCallback2Called = false;
-        moveCallback1Called = false;
-        moveCallback2Called = false;
         endCallback1Called = false;
         endCallback2Called = false;
-
-        dragInteraction.offDragStart(startCallback1);
-        dragInteraction.offDrag(moveCallback1);
         dragInteraction.offDragEnd(endCallback1);
-
-        TestMethods.triggerFakeMouseEvent("mousedown", target, startPoint.x, startPoint.y);
-        assert.isFalse(startCallback1Called, "callback 1 was disconnected from drag start interaction");
-        assert.isTrue(startCallback2Called, "callback 2 is still connected to the drag start interaction");
-
-        TestMethods.triggerFakeMouseEvent("mousemove", target, endPoint.x, endPoint.y);
-        assert.isFalse(moveCallback1Called, "callback 1 was disconnected from drag interaction");
-        assert.isTrue(moveCallback2Called, "callback 2 is still connected to the drag interaction");
-
         TestMethods.triggerFakeMouseEvent("mouseup", target, endPoint.x, endPoint.y);
         assert.isFalse(endCallback1Called, "callback 1 was disconnected from the drag end interaction");
         assert.isTrue(endCallback2Called, "callback 2 is still connected to the drag end interaction");
+
+        svg.remove();
+      });
+
+      it("calls all the drag interaction callbacks when needed", () => {
+        let startCallbackCalled = false;
+        let moveCallbackCalled = false;
+        let endCallbackCalled = false;
+        let startCallback = () => startCallbackCalled = true;
+        let moveCallback = () => moveCallbackCalled = true;
+        let endCallback = () => endCallbackCalled = true;
+
+        dragInteraction.onDragStart(startCallback);
+        dragInteraction.onDrag(moveCallback);
+        dragInteraction.onDragEnd(endCallback);
+
+        dragInteraction.attachTo(component);
+
+        let target = component.background();
+        TestMethods.triggerFakeMouseEvent("mousedown", target, startPoint.x, startPoint.y);
+        assert.isTrue(startCallbackCalled, "callback for drag start was called");
+        TestMethods.triggerFakeMouseEvent("mousemove", target, endPoint.x, endPoint.y);
+        assert.isTrue(moveCallbackCalled, "callback for drag was called");
+        TestMethods.triggerFakeMouseEvent("mouseup", target, endPoint.x, endPoint.y);
+        assert.isTrue(endCallbackCalled, "callback for drag end was called");
+
+        startCallbackCalled = false;
+        moveCallbackCalled = false;
+        endCallbackCalled = false;
+        dragInteraction.offDragStart(startCallback);
+        dragInteraction.offDrag(moveCallback);
+
+        TestMethods.triggerFakeMouseEvent("mousedown", target, startPoint.x, startPoint.y);
+        assert.isFalse(startCallbackCalled, "callback for drag start was disconnected");
+        TestMethods.triggerFakeMouseEvent("mousemove", target, endPoint.x, endPoint.y);
+        assert.isFalse(moveCallbackCalled, "callback for drag was disconnected");
+        TestMethods.triggerFakeMouseEvent("mouseup", target, endPoint.x, endPoint.y);
+        assert.isTrue(endCallbackCalled, "callback for drag end is still connected");
 
         svg.remove();
       });
