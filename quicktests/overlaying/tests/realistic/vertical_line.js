@@ -18,11 +18,9 @@ function run(svg, data, Plottable) {
   plot.addDataset(ds);
   plot.x(function(d){ return d.y; }, xScale)
       .y(function(d){ return d.x; }, yScale);
-  if (typeof plot.autorange === "function") {
-    plot.autorange("x");
-  } else {
-    plot.autorangeMode("x");
-  }
+  plot.autorangeMode("x")
+      .autorangeSmooth(true);
+
 
   var table = new Plottable.Components.Table([[yAxis, plot],
                                              [null, xAxis]]);
