@@ -14,7 +14,6 @@ describe("Interactions", () => {
         x: SVG_WIDTH / 2,
         y: SVG_HEIGHT / 2
       };
-
       let outsidePointPos = {
         x: SVG_WIDTH * 1.5,
         y: SVG_HEIGHT * 1.5
@@ -51,7 +50,9 @@ describe("Interactions", () => {
           startCallbackCalled = true;
           receivedStart = point;
         };
-        dragInteraction.onDragStart(startCallback);
+
+        assert.strictEqual(dragInteraction.onDragStart(startCallback), dragInteraction,
+          "setting onDragStart callback returns the drag interaction");
         dragInteraction.attachTo(component);
 
         let target = component.background();
@@ -128,7 +129,9 @@ describe("Interactions", () => {
           receivedStart = start;
           receivedEnd = end;
         };
-        dragInteraction.onDrag(moveCallback);
+
+        assert.strictEqual(dragInteraction.onDrag(moveCallback), dragInteraction,
+          "setting onDrag callback returns the drag interaction");
         dragInteraction.attachTo(component);
 
         let target = component.background();
@@ -198,7 +201,8 @@ describe("Interactions", () => {
           receivedStart = start;
           receivedEnd = end;
         };
-        dragInteraction.onDragEnd(endCallback);
+        assert.strictEqual(dragInteraction.onDragEnd(endCallback), dragInteraction,
+          "setting onDragEnd callback returns the drag interaction");
         dragInteraction.attachTo(component);
 
         let target = component.background();
