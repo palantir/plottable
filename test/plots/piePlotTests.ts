@@ -33,35 +33,37 @@ describe("Plots", () => {
       it("draws slices proportional in angle to their value", () => {
         let arcPaths = piePlot.content().selectAll(".arc.fill");
         assert.strictEqual(arcPaths.size(), 2, "has two sectors");
-        let arcPath0 = d3.select(arcPaths[0][0]);
-        let pathPoints0 = TestMethods.normalizePath(arcPath0.attr("d")).split(/[A-Z]/).slice(1, 4);
 
-        let firstPathPoints0 = pathPoints0[0].split(",");
-        assert.closeTo(parseFloat(firstPathPoints0[0]), 0, 1, "draws line vertically at beginning");
-        assert.operator(parseFloat(firstPathPoints0[1]), "<", 0, "draws line upwards");
+        let pathString0 = d3.select(arcPaths[0][0]).attr("d");
+        let decomposedPath0 = TestMethods.decomposePath(TestMethods.normalizePath(pathString0));
 
-        let arcDestPoint0 = pathPoints0[1].split(",").slice(5);
-        assert.operator(parseFloat(arcDestPoint0[0]), ">", 0, "arcs line to the right");
-        assert.closeTo(parseFloat(arcDestPoint0[1]), 0, 1, "ends on same level of svg");
+        let moveCommand0 = decomposedPath0[0];
+        assert.closeTo(moveCommand0.arguments[0], 0, 1, "starts first arc at top of circle (x)");
+        assert.operator(moveCommand0.arguments[1], "<", 0, "starts first arc at top of circle (x)");
 
-        let secondPathPoints0 = pathPoints0[2].split(",");
-        assert.closeTo(parseFloat(secondPathPoints0[0]), 0, 1, "draws line to origin (x)");
-        assert.closeTo(parseFloat(secondPathPoints0[1]), 0, 1, "draws line to origin (y)");
+        let arcCommand0 = decomposedPath0[1];
+        assert.operator(arcCommand0.arguments[5], ">", 0, "arc ends on the right side of the circle (x)");
+        assert.closeTo(arcCommand0.arguments[6], 0, 1, "arc ends on the right side of the circle (y)");
 
-        let arcPath1 = d3.select(arcPaths[0][1]);
-        let pathPoints1 = TestMethods.normalizePath(arcPath1.attr("d")).split(/[A-Z]/).slice(1, 4);
+        let lineCommand0 = decomposedPath0[2];
+        assert.closeTo(lineCommand0.arguments[0], 0, 1, "draws line to origin (x)");
+        assert.closeTo(lineCommand0.arguments[1], 0, 1, "draws line to origin (y)");
 
-        let firstPathPoints1 = pathPoints1[0].split(",");
-        assert.operator(parseFloat(firstPathPoints1[0]), ">", 0, "draws line to the right");
-        assert.closeTo(parseFloat(firstPathPoints1[1]), 0, 1, "draws line horizontally");
+        let pathString1 = d3.select(arcPaths[0][1]).attr("d");
+        let decomposedPath1 = TestMethods.decomposePath(TestMethods.normalizePath(pathString1));
 
-        let arcDestPoint1 = pathPoints1[1].split(",").slice(5);
-        assert.closeTo(parseFloat(arcDestPoint1[0]), 0, 1, "ends at x origin");
-        assert.operator(parseFloat(arcDestPoint1[1]), "<", 0, "ends above 0");
+        let moveCommand1 = decomposedPath1[0];
+        assert.operator(moveCommand1.arguments[0], ">", 0, "draws line to the right");
+        assert.closeTo(moveCommand1.arguments[1], 0, 1, "draws line horizontally");
 
-        let secondPathPoints1 = pathPoints1[2].split(",");
-        assert.closeTo(parseFloat(secondPathPoints1[0]), 0, 1, "draws line to origin (x)");
-        assert.closeTo(parseFloat(secondPathPoints1[1]), 0, 1, "draws line to origin (y)");
+        let arcCommand1 = decomposedPath1[1];
+        assert.closeTo(arcCommand1.arguments[5], 0, 1, "ends at x origin");
+        assert.operator(arcCommand1.arguments[6], "<", 0, "ends above 0");
+
+        let lineCommand1 = decomposedPath1[2];
+        assert.closeTo(lineCommand1.arguments[0], 0, 1, "draws line to origin (x)");
+        assert.closeTo(lineCommand1.arguments[1], 0, 1, "draws line to origin (y)");
+
         svg.remove();
       });
 
@@ -104,17 +106,17 @@ describe("Plots", () => {
         let arcPaths = piePlot.content().selectAll(".arc.fill");
         assert.strictEqual(arcPaths.size(), 2, "has two sectors");
 
-        let pathPoints0 = TestMethods.normalizePath(d3.select(arcPaths[0][0]).attr("d")).split(/[A-Z]/).slice(1, 5);
+        let decomposedPath0 = TestMethods.decomposePath(TestMethods.normalizePath(d3.select(arcPaths[0][0]).attr("d")));
 
-        let radiusPath0 = pathPoints0[2].split(",").map((coordinate) => parseFloat(coordinate));
-        assert.closeTo(radiusPath0[0], expectedInnerRadius, 1, "stops line at innerRadius point (x)");
-        assert.closeTo(radiusPath0[1], 0, 1, "stops line at innerRadius point (y)");
+        let lineBeforeInnerArcCommand0 = decomposedPath0[2];
+        assert.closeTo(lineBeforeInnerArcCommand0.arguments[0], expectedInnerRadius, 1, "inner arc starts at correct x");
+        assert.closeTo(lineBeforeInnerArcCommand0.arguments[1], 0, 1, "inner arc starts at correct y");
 
-        let innerArcPath0 = pathPoints0[3].split(",").map((coordinate) => parseFloat(coordinate));
-        assert.closeTo(innerArcPath0[0], expectedInnerRadius, 1, "makes inner arc of correct radius (x)");
-        assert.closeTo(innerArcPath0[1], expectedInnerRadius, 1, "makes inner arc of correct radius (y)");
-        assert.closeTo(innerArcPath0[5], 0, 1, "make inner arc to center (x)");
-        assert.closeTo(innerArcPath0[6], -expectedInnerRadius, 1, "makes inner arc to top of inner circle (y)");
+        let innerArcCommand0 = decomposedPath0[3];
+        assert.closeTo(innerArcCommand0.arguments[0], expectedInnerRadius, 1, "inner arc has correct rx");
+        assert.closeTo(innerArcCommand0.arguments[1], expectedInnerRadius, 1, "inner arc has correct ry");
+        assert.closeTo(innerArcCommand0.arguments[5], 0, 1, "inner arc ends at correct position (x)");
+        assert.closeTo(innerArcCommand0.arguments[6], -expectedInnerRadius, 1, "inner arc ends at correct position (y)");
 
         svg.remove();
       });
@@ -125,17 +127,17 @@ describe("Plots", () => {
         let arcPaths = piePlot.content().selectAll(".arc.fill");
         assert.strictEqual(arcPaths.size(), 2, "has two sectors");
 
-        let pathPoints0 = TestMethods.normalizePath(d3.select(arcPaths[0][0]).attr("d")).split(/[A-Z]/).slice(1, 5);
+        let decomposedPath0 = TestMethods.decomposePath(TestMethods.normalizePath(d3.select(arcPaths[0][0]).attr("d")));
 
-        let radiusPath0 = pathPoints0[0].split(",").map((coordinate) => parseFloat(coordinate));
-        assert.closeTo(radiusPath0[0], 0, 1, "starts at outerRadius point");
-        assert.closeTo(radiusPath0[1], -expectedOuterRadius, 1, "starts at outerRadius point");
+        let lineCommand0 = decomposedPath0[0];
+        assert.closeTo(lineCommand0.arguments[0], 0, 1, "starts outer arc at correct position (x)");
+        assert.closeTo(lineCommand0.arguments[1], -expectedOuterRadius, 1, "starts outer arc at correct position (y)");
 
-        let outerArcPath0 = pathPoints0[1].split(",").map((coordinate) => parseFloat(coordinate));
-        assert.closeTo(outerArcPath0[0], expectedOuterRadius, 1, "makes outer arc of correct radius (x)");
-        assert.closeTo(outerArcPath0[1], expectedOuterRadius, 1, "makes outer arc of correct radius (y)");
-        assert.closeTo(outerArcPath0[5], expectedOuterRadius, 1, "makes outer arc to right edge (x)");
-        assert.closeTo(outerArcPath0[6], 0, 1, "makes outer arc to right edge (y)");
+        let outerArcCommand0 = decomposedPath0[1];
+        assert.closeTo(outerArcCommand0.arguments[0], expectedOuterRadius, 1, "outer arc has correct rx");
+        assert.closeTo(outerArcCommand0.arguments[1], expectedOuterRadius, 1, "outer arc has correct ry");
+        assert.closeTo(outerArcCommand0.arguments[5], expectedOuterRadius, 1, "outer arc ends at correct position (x)");
+        assert.closeTo(outerArcCommand0.arguments[6], 0, 1, "outer arc ends at correct position (y)");
 
         svg.remove();
       });
