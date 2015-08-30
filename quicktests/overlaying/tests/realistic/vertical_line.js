@@ -9,10 +9,16 @@ function run(svg, data, Plottable) {
 
   var ds = new Plottable.Dataset(data);
 
+  var customFormatter = function(d){
+    return d + " units";
+  };
+
   var xScale = new Plottable.Scales.Linear();
   var yScale = new Plottable.Scales.Linear();
-  var xAxis = new Plottable.Axes.Numeric(xScale, "bottom");
-  var yAxis = new Plottable.Axes.Numeric(yScale, "left");
+  var xAxis = new Plottable.Axes.Numeric(xScale, "bottom")
+  .formatter(customFormatter);
+  var yAxis = new Plottable.Axes.Numeric(yScale, "left")
+  .formatter(customFormatter);
 
   var plot = new Plottable.Plots.Line();
   plot.addDataset(ds);

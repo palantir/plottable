@@ -52,9 +52,24 @@ function run(svg, data, Plottable) {
   ABplot.addDataset(new Plottable.Dataset(data[2]));
   ABplot.sectorValue(function(d) { return d.percent; });
   ABplot.attr("fill", function(d) { return d.region; }, colorScale);
-  ABplot.innerRadius(50);
-  ABplot.outerRadius(100);
+  ABplot.attr("stroke", "#000000");
+  ABplot.innerRadius(45);
+  ABplot.outerRadius(90);
   var ABGroup = new Plottable.Components.Group([ABplot, ABlabel]);
+
+  new Plottable.Interactions.Click()
+  .onClick(function(p){
+    ABplot.entities().forEach(function(e){
+      e.selection.attr("stroke-width", 0);
+    });
+    var e = ABplot.entitiesAt(p);
+    if(e[0] !== undefined){
+      e[0].selection.attr("stroke-width", 3);
+    }
+
+
+  })
+  .attachTo(ABplot);
 
   var productPlots = new Plottable.Components.Table([
       [AGroup],
