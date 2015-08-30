@@ -505,10 +505,10 @@ describe("Plots", () => {
           "There should be exactly 4 slices in the pie chart, representing the valid values");
         assert.lengthOf(plot.entities(), 4, "there should be exactly 4 entities, representing the valid values");
 
-        for (let i = 0 ; i < 4 ; i ++ ) {
+        for (let i = 0; i < 4; i++) {
           let startAngle = (<any> plot)._startAngles[i];
           let endAngle = (<any> plot)._endAngles[i];
-          assert.closeTo(endAngle - startAngle, Math.PI / 2, 0.001, "each slice is a quarter of the pie");
+          assert.closeTo(endAngle - startAngle, Math.PI / 2, 0.001, `slice with index ${i} is a quarter of the pie`);
         }
 
         svg.remove();
