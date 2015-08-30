@@ -26,7 +26,6 @@ function run(svg, data, Plottable) {
   .scale(yScale)
   .value(2);
 
-
   var plots = new Plottable.Components.Group([plot1, plot2, dll]);
 
   var xAxis1 = new Plottable.Axes.Category(xScale1, "bottom");

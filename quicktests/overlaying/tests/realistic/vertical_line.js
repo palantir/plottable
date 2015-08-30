@@ -27,7 +27,6 @@ function run(svg, data, Plottable) {
   plot.autorangeMode("x")
       .autorangeSmooth(true);
 
-
   var table = new Plottable.Components.Table([[yAxis, plot],
                                              [null, xAxis]]);
   table.renderTo(svg);

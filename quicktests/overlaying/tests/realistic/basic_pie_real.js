@@ -66,8 +66,6 @@ function run(svg, data, Plottable) {
     if(e[0] !== undefined){
       e[0].selection.attr("stroke-width", 3);
     }
-
-
   })
   .attachTo(ABplot);
 
