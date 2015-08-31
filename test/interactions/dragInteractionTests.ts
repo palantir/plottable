@@ -395,7 +395,7 @@ describe("Interactions", () => {
         svg.remove();
       });
 
-      it("touchcancel cancels the current drag", () => {
+      it("does not continue dragging once the touch is cancelled", () => {
         let moveCallbackCalled = false;
         let receivedStart: Plottable.Point;
         let receivedEnd: Plottable.Point;
@@ -413,8 +413,10 @@ describe("Interactions", () => {
         TestMethods.triggerFakeTouchEvent("touchstart", target, [{x: startPoint.x, y: startPoint.y}]);
         TestMethods.triggerFakeTouchEvent("touchmove", target, [{x: endPoint.x - 10, y: endPoint.y - 10}]);
         TestMethods.triggerFakeTouchEvent("touchcancel", target, [{x: endPoint.x - 10, y: endPoint.y - 10}]);
-        TestMethods.triggerFakeTouchEvent("touchmove", target, [{x: endPoint.x, y: endPoint.y}]);
-        assert.notEqual(receivedEnd, endPoint, "was not passed touch point after cancelled");
+        TestMethods.triggerFakeTouchEvent("touchend", target, [{x: endPoint.x, y: endPoint.y}]);
+        assert.isTrue(moveCallbackCalled, "the callback is called");
+        assert.deepEqual(receivedStart, {x: startPoint.x, y: startPoint.y}, "1");
+        assert.deepEqual(receivedEnd, {x: endPoint.x - 10, y: endPoint.y - 10}, "2");
 
         svg.remove();
       });
