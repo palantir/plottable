@@ -24,9 +24,9 @@ function run(svg, data, Plottable) {
   var wheel = new Plottable.Plots.Wheel()
     .addDataset(new Plottable.Dataset(data))
     .r(function(d){ return d.r1; }, rScale)
-    .r2(function(d){ return d.r2; }, rScale)
-    .t(function(d){ return d.t1; }, tScale)
-    .t2(function(d){ return d.t2; }, tScale)
+    .r2(function(d){ return d.r2; })
+    .t(function(d){ return d.t1; })
+    .t2(function(d){ return d.t2; })
     .attr("fill", function(d){ return "" + d.id.toString(); }, cs);
 
   var yScale = new Plottable.Scales.Linear().domain([4, -1]);
@@ -35,9 +35,9 @@ function run(svg, data, Plottable) {
   var rectangle = new Plottable.Plots.Rectangle()
     .addDataset(new Plottable.Dataset(data))
     .x(function(d){ return d.t1; }, xScale)
-    .x2(function(d){ return d.t2; }, xScale)
+    .x2(function(d){ return d.t2; })
     .y(function(d){ return d.r1; }, yScale)
-    .y2(function(d){ return d.r2; }, yScale)
+    .y2(function(d){ return d.r2; })
     .attr("fill", function(d){ return "" + d.id.toString(); }, cs);
 
    new Plottable.Components.Table([[legend, wheel],
