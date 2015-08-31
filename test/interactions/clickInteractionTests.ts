@@ -114,7 +114,7 @@ describe("Interactions", () => {
         svg.remove();
       });
 
-      it("can register multiple callbacks listeners for the same Component", () => {
+      it("can register multiple callbacks", () => {
         clickInteraction.attachTo(component);
 
         let callback1WasCalled = false;
