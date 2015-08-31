@@ -94,7 +94,7 @@ describe("Interactions", () => {
         svg.remove();
       });
 
-      it("can register two onDragStart() callbacks on the same component", () => {
+      it("can register two onDragStart() callbacks on the same Component", () => {
         let startCallback1Called = false;
         let startCallback2Called = false;
         let startCallback1 = () => startCallback1Called = true;
@@ -163,7 +163,7 @@ describe("Interactions", () => {
         svg.remove();
       });
 
-      it("can register two onDrag() callbacks on the same component", () => {
+      it("can register two onDrag() callbacks on the same Component", () => {
         let moveCallback1Called = false;
         let moveCallback2Called = false;
         let moveCallback1 = () => moveCallback1Called = true;
@@ -241,7 +241,7 @@ describe("Interactions", () => {
         svg.remove();
       });
 
-      it("can register two onDragEnd() callbacks on the same component", () => {
+      it("can register two onDragEnd() callbacks on the same Component", () => {
         let endCallback1Called = false;
         let endCallback2Called = false;
         let endCallback1 = () => endCallback1Called = true;
@@ -270,7 +270,7 @@ describe("Interactions", () => {
         svg.remove();
       });
 
-      it("calls all the drag interaction callbacks when needed", () => {
+      it("can register multiple callbacks", () => {
         let startCallbackCalled = false;
         let moveCallbackCalled = false;
         let endCallbackCalled = false;
