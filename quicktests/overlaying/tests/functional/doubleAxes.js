@@ -22,11 +22,7 @@ function run(svg, data, Plottable) {
   plot2.addDataset(ds2);
   plot2.x(function(d) { return d.x; }, xScale2).y(function(d) { return d.y; }, yScale);
 
-  var dll = new Plottable.Components.DragLineLayer("horizontal")
-  .scale(yScale)
-  .value(2);
-
-  var plots = new Plottable.Components.Group([plot1, plot2, dll]);
+  var plots = new Plottable.Components.Group([plot1, plot2]);
 
   var xAxis1 = new Plottable.Axes.Category(xScale1, "bottom");
   var xAxis2 = new Plottable.Axes.Category(xScale2, "bottom");
