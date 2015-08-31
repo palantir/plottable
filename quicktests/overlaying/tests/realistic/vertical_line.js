@@ -10,7 +10,7 @@ function run(svg, data, Plottable) {
   var ds = new Plottable.Dataset(data);
 
   var customFormatter = function(d){
-    return d + " units";
+    return d.toFixed(2) + " units";
   };
 
   var xScale = new Plottable.Scales.Linear();
