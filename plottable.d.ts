@@ -1736,7 +1736,7 @@ declare module Plottable {
          */
         annotationTierCount(annotationTierCount: number): Axis<D>;
         protected _drawAnnotations(): void;
-        protected _axisSizeWithoutMarginAndAnnotations(): number;
+        protected _coreAxisHeight(): number;
         protected _annotationTierHeight(): number;
         protected _removeAnnotations(): void;
         protected _generateBaselineAttrHash(): {
@@ -2000,7 +2000,7 @@ declare module Plottable {
             protected _setup(): void;
             protected _rescale(): Component;
             requestedSpace(offeredWidth: number, offeredHeight: number): SpaceRequest;
-            protected _axisSizeWithoutMarginAndAnnotations(): number;
+            protected _coreAxisHeight(): number;
             protected _getTickValues(): string[];
             /**
              * Gets the tick label angle in degrees.

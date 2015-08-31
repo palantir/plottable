@@ -62,7 +62,7 @@ export module Axes {
       };
     }
 
-    protected _axisSizeWithoutMarginAndAnnotations() {
+    protected _coreAxisHeight() {
       let relevantDimension = this._isHorizontal() ? this.height() : this.width();
       let relevantRequestedSpaceDimension = this._isHorizontal() ?
                                               this.requestedSpace(this.width(), this.height()).minHeight :

@@ -3804,7 +3804,7 @@ var Plottable;
             var annotationToTier = this._annotationToTier(measurements);
             var hiddenAnnotations = new Plottable.Utils.Set();
             var axisHeight = this._isHorizontal() ? this.height() : this.width();
-            var axisHeightWithoutMarginAndAnnotations = this._axisSizeWithoutMarginAndAnnotations();
+            var axisHeightWithoutMarginAndAnnotations = this._coreAxisHeight();
             var numTiers = Math.min(this.annotationTierCount(), Math.floor((axisHeight - axisHeightWithoutMarginAndAnnotations) / tierHeight));
             annotationToTier.forEach(function (tier, annotation) {
                 if (tier === -1 || tier >= numTiers) {
@@ -3907,7 +3907,7 @@ var Plottable;
                 return Plottable.Utils.Math.inRange(_this._scale.scale(tick), scaleRange[0], scaleRange[1]);
             });
         };
-        Axis.prototype._axisSizeWithoutMarginAndAnnotations = function () {
+        Axis.prototype._coreAxisHeight = function () {
             var relevantDimension = this._isHorizontal() ? this.height() : this.width();
             var axisHeightWithoutMargin = this._isHorizontal() ? this._computedHeight : this._computedWidth;
             return Math.min(axisHeightWithoutMargin, relevantDimension);
@@ -5016,7 +5016,7 @@ var Plottable;
                     minHeight: measureResult.usedHeight + heightRequiredByTicks
                 };
             };
-            Category.prototype._axisSizeWithoutMarginAndAnnotations = function () {
+            Category.prototype._coreAxisHeight = function () {
                 var relevantDimension = this._isHorizontal() ? this.height() : this.width();
                 var relevantRequestedSpaceDimension = this._isHorizontal() ?
                     this.requestedSpace(this.width(), this.height()).minHeight :
