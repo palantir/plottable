@@ -378,7 +378,11 @@ describe("BaseAxis", () => {
 
           let annotationRects = axis.content().selectAll(".annotation-rect");
 
-          axis.content().selectAll(".annotation-circle").each(function (d, i) {
+          let annotationCircles = axis.content().selectAll(".annotation-circle");
+
+          assert.strictEqual(annotationCircles.size(), annotationRects.size(), "same number of annotation circles as rects");
+
+          annotationCircles.each(function (d, i) {
             let annotationCircle = d3.select(this);
             let correspondingRect = d3.select(annotationRects[0][i]);
             assert.closeTo(TestMethods.numAttr(annotationCircle, "cx"),
@@ -386,7 +390,11 @@ describe("BaseAxis", () => {
             assert.closeTo(TestMethods.numAttr(annotationCircle, "cy"), 0, window.Pixel_CloseTo_Requirement, "circle at the top");
           });
 
-          axis.content().selectAll(".annotation-line").each(function (d, i) {
+          let annotationLines = axis.content().selectAll(".annotation-line");
+
+          assert.strictEqual(annotationLines.size(), annotationRects.size(), "same number of annotation lines as rects");
+
+          annotationLines.each(function (d, i) {
             let annotationLine = d3.select(this);
             let correspondingRect = d3.select(annotationRects[0][i]);
             assert.closeTo(TestMethods.numAttr(annotationLine, "x1"),
@@ -398,7 +406,11 @@ describe("BaseAxis", () => {
               TestMethods.numAttr(correspondingRect, "y"), window.Pixel_CloseTo_Requirement, "line goes to the rect");
           });
 
-          axis.content().selectAll(".annotation-label text").each(function (d, i) {
+          let annotationLabelTexts = axis.content().selectAll(".annotation-label text");
+
+          assert.strictEqual(annotationLabelTexts.size(), annotationRects.size(), "same number of annotation labels as rects");
+
+          annotationLabelTexts.each(function (d, i) {
             let annotationLabel = d3.select(this);
             let surroundingRect = d3.select(annotationRects[0][i]);
             TestMethods.assertBBoxInclusion(surroundingRect, annotationLabel);
@@ -416,7 +428,11 @@ describe("BaseAxis", () => {
 
           let annotationRects = axis.content().selectAll(".annotation-rect");
 
-          axis.content().selectAll(".annotation-circle").each(function (d, i) {
+          let annotationCircles = axis.content().selectAll(".annotation-circle");
+
+          assert.strictEqual(annotationCircles.size(), annotationRects.size(), "same number of annotation circles as rects");
+
+          annotationCircles.each(function (d, i) {
             let annotationCircle = d3.select(this);
             let correspondingRect = d3.select(annotationRects[0][i]);
             assert.closeTo(TestMethods.numAttr(annotationCircle, "cx"),
@@ -425,7 +441,11 @@ describe("BaseAxis", () => {
               window.Pixel_CloseTo_Requirement, "circle at the bottom");
           });
 
-          axis.content().selectAll(".annotation-line").each(function (d, i) {
+          let annotationLines = axis.content().selectAll(".annotation-line");
+
+          assert.strictEqual(annotationLines.size(), annotationRects.size(), "same number of annotation lines as rects");
+
+          annotationLines.each(function (d, i) {
             let annotationLine = d3.select(this);
             let correspondingRect = d3.select(annotationRects[0][i]);
             assert.closeTo(TestMethods.numAttr(annotationLine, "x1"),
@@ -439,7 +459,11 @@ describe("BaseAxis", () => {
               window.Pixel_CloseTo_Requirement, "line goes to the rect");
           });
 
-          axis.content().selectAll(".annotation-label text").each(function (d, i) {
+          let annotationLabelTexts = axis.content().selectAll(".annotation-label text");
+
+          assert.strictEqual(annotationLabelTexts.size(), annotationRects.size(), "same number of annotation labels as rects");
+
+          annotationLabelTexts.each(function (d, i) {
             let annotationLabel = d3.select(this);
             let surroundingRect = d3.select(annotationRects[0][i]);
             TestMethods.assertBBoxInclusion(surroundingRect, annotationLabel);
@@ -457,7 +481,11 @@ describe("BaseAxis", () => {
 
           let annotationRects = axis.content().selectAll(".annotation-rect");
 
-          axis.content().selectAll(".annotation-circle").each(function (d, i) {
+          let annotationCircles = axis.content().selectAll(".annotation-circle");
+
+          assert.strictEqual(annotationCircles.size(), annotationRects.size(), "same number of annotation circles as rects");
+
+          annotationCircles.each(function (d, i) {
             let annotationCircle = d3.select(this);
             let correspondingRect = d3.select(annotationRects[0][i]);
             assert.closeTo(TestMethods.numAttr(annotationCircle, "cx"), axis.width(),
@@ -466,7 +494,11 @@ describe("BaseAxis", () => {
               TestMethods.numAttr(correspondingRect, "y"), window.Pixel_CloseTo_Requirement, "circle at tick scaled y position");
           });
 
-          axis.content().selectAll(".annotation-line").each(function (d, i) {
+          let annotationLines = axis.content().selectAll(".annotation-line");
+
+          assert.strictEqual(annotationLines.size(), annotationRects.size(), "same number of annotation lines as rects");
+
+          annotationLines.each(function (d, i) {
             let annotationLine = d3.select(this);
             let correspondingRect = d3.select(annotationRects[0][i]);
             assert.closeTo(TestMethods.numAttr(annotationLine, "x1"), axis.width(),
@@ -479,7 +511,11 @@ describe("BaseAxis", () => {
               TestMethods.numAttr(correspondingRect, "y"), window.Pixel_CloseTo_Requirement, "line at tick scaled y position");
           });
 
-          axis.content().selectAll(".annotation-label text").each(function (d, i) {
+          let annotationLabelTexts = axis.content().selectAll(".annotation-label text");
+
+          assert.strictEqual(annotationLabelTexts.size(), annotationRects.size(), "same number of annotation labels as rects");
+
+          annotationLabelTexts.each(function (d, i) {
             let annotationLabel = d3.select(this);
             let surroundingRect = d3.select(annotationRects[0][i]);
             TestMethods.assertBBoxInclusion(surroundingRect, annotationLabel);
@@ -497,7 +533,11 @@ describe("BaseAxis", () => {
 
           let annotationRects = axis.content().selectAll(".annotation-rect");
 
-          axis.content().selectAll(".annotation-circle").each(function (d, i) {
+          let annotationCircles = axis.content().selectAll(".annotation-circle");
+
+          assert.strictEqual(annotationCircles.size(), annotationRects.size(), "same number of annotation circles as rects");
+
+          annotationCircles.each(function (d, i) {
             let annotationCircle = d3.select(this);
             let correspondingRect = d3.select(annotationRects[0][i]);
             assert.closeTo(TestMethods.numAttr(annotationCircle, "cx"), 0, window.Pixel_CloseTo_Requirement, "circle at the left");
@@ -505,7 +545,11 @@ describe("BaseAxis", () => {
               TestMethods.numAttr(correspondingRect, "y"), window.Pixel_CloseTo_Requirement, "circle at tick scaled y position");
           });
 
-          axis.content().selectAll(".annotation-line").each(function (d, i) {
+          let annotationLines = axis.content().selectAll(".annotation-line");
+
+          assert.strictEqual(annotationLines.size(), annotationRects.size(), "same number of annotation lines as rects");
+
+          annotationLines.each(function (d, i) {
             let annotationLine = d3.select(this);
             let correspondingRect = d3.select(annotationRects[0][i]);
             assert.closeTo(TestMethods.numAttr(annotationLine, "x1"), 0, window.Pixel_CloseTo_Requirement, "line starts at the left");
@@ -517,7 +561,11 @@ describe("BaseAxis", () => {
               TestMethods.numAttr(correspondingRect, "y"), window.Pixel_CloseTo_Requirement, "line at tick scaled y position");
           });
 
-          axis.content().selectAll(".annotation-label text").each(function (d, i) {
+          let annotationLabelTexts = axis.content().selectAll(".annotation-label text");
+
+          assert.strictEqual(annotationLabelTexts.size(), annotationRects.size(), "same number of annotation labels as rects");
+
+          annotationLabelTexts.each(function (d, i) {
             let annotationLabel = d3.select(this);
             let surroundingRect = d3.select(annotationRects[0][i]);
             TestMethods.assertBBoxInclusion(surroundingRect, annotationLabel);
@@ -546,6 +594,9 @@ describe("BaseAxis", () => {
             axis.renderTo(svg);
 
             let annotationRects = axis.content().selectAll(".annotation-rect");
+
+            assert.strictEqual(annotationRects.size(), annotatedTicks.length, "same number of annotation rects as ticks");
+
             annotationRects.each(function (d) {
               let annotationRect = d3.select(this);
               assert.closeTo(TestMethods.numAttr(annotationRect, "x"), scale.scale(d),
@@ -563,6 +614,9 @@ describe("BaseAxis", () => {
             axis.renderTo(svg);
 
             let annotationRects = axis.content().selectAll(".annotation-rect");
+
+            assert.strictEqual(annotationRects.size(), annotatedTicks.length, "same number of annotation rects as ticks");
+
             annotationRects.each(function (d) {
               let annotationRect = d3.select(this);
               assert.closeTo(TestMethods.numAttr(annotationRect, "x"), scale.scale(d),
@@ -580,6 +634,9 @@ describe("BaseAxis", () => {
             axis.renderTo(svg);
 
             let annotationRects = axis.content().selectAll(".annotation-rect");
+
+            assert.strictEqual(annotationRects.size(), annotatedTicks.length, "same number of annotation rects as ticks");
+
             annotationRects.each(function (d) {
               let annotationRect = d3.select(this);
               assert.closeTo(TestMethods.numAttr(annotationRect, "y"), scale.scale(d),
@@ -597,6 +654,9 @@ describe("BaseAxis", () => {
             axis.renderTo(svg);
 
             let annotationRects = axis.content().selectAll(".annotation-rect");
+
+            assert.strictEqual(annotationRects.size(), annotatedTicks.length, "same number of annotation rects as ticks");
+
             annotationRects.each(function (d) {
               let annotationRect = d3.select(this);
               assert.closeTo(TestMethods.numAttr(annotationRect, "y"), scale.scale(d), window.Pixel_CloseTo_Requirement,
@@ -744,7 +804,11 @@ describe("BaseAxis", () => {
         let svg = TestMethods.generateSVG(300, 300);
         axis.renderTo(svg);
 
-        axis.content().selectAll(".annotation-rect").each(function() {
+        let annotationRects = axis.content().selectAll(".annotation-rect");
+
+        assert.strictEqual(annotationRects.size(), annotatedTicks.length, "same number of annotation rects as ticks");
+
+        annotationRects.each(function() {
           let annotationRect = d3.select(this);
           let bbox = this.getBBox();
           let insideAnnotationArea = bbox.x >= 0 && bbox.x + bbox.width <= axis.width() &&
@@ -771,7 +835,11 @@ describe("BaseAxis", () => {
         let svg = TestMethods.generateSVG(300, 300);
         axis.renderTo(svg);
 
-        axis.content().selectAll(".annotation-circle").each(function() {
+        let annotationCircles = axis.content().selectAll(".annotation-circle");
+
+        assert.strictEqual(annotationCircles.size(), annotatedTicks.length, "same number of annotation circles as ticks");
+
+        annotationCircles.each(function() {
           let annotationCircle = d3.select(this);
           assert.notStrictEqual(annotationCircle.attr("visibility"), "hidden", "annotation circle inside margin area should be visible");
         });
