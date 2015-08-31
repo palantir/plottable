@@ -151,12 +151,22 @@ describe("Scales", () => {
         assert.strictEqual(domain[0].getTime(), minEqualTop.getTime(),
           "lower end was set even if requested value is >= autoDomain()-ed max");
         assert.strictEqual(domain[1].getTime(), nextDay.getTime(), "upper end is set one day later");
+      });
 
+      it("does not change domainMin after adding more included values providers", () => {
+        scale.padProportion(0);
+        let requestedDomain = [new Date("2015-05-01"), new Date("2015-07-01")];
+        scale.addIncludedValuesProvider(() => requestedDomain);
+
+        let minInMiddle = new Date("2015-06-01");
+
+        assert.strictEqual(scale.domain()[0].getTime(), requestedDomain[0].getTime(), "domain minimum is the minimum value");
         scale.domainMin(minInMiddle);
+        assert.strictEqual(scale.domain()[0].getTime(), minInMiddle.getTime(), "can set domain minimum with domainMin()");
+
         let requestedDomain2 = [new Date("2014-05-01"), new Date("2016-07-01")];
         scale.addIncludedValuesProvider(() => requestedDomain2);
-        assert.strictEqual(scale.domain()[0].getTime(), minInMiddle.getTime(),
-          "adding another ExtentsProvider doesn't change domainMin()");
+        assert.strictEqual(scale.domain()[0].getTime(), minInMiddle.getTime(), "adding IncludedValuesProvider doesn't change domainMin()");
       });
 
       it("can force the maximum of the domain with domainMax()", () => {
@@ -186,8 +196,19 @@ describe("Scales", () => {
         assert.strictEqual(domain[1].getTime(), maxEqualBottom.getTime(),
           "upper end was set even if requested value is <= autoDomain()-ed min");
         assert.strictEqual(domain[0].getTime(), dayBefore.getTime(), "lower end is set one day before");
+      });
 
+      it("does not change domainMax after adding more included values providers", () => {
+        scale.padProportion(0);
+        let requestedDomain = [new Date("2015-05-01"), new Date("2015-07-01")];
+        scale.addIncludedValuesProvider(() => requestedDomain);
+
+        let maxInMiddle = new Date("2015-06-01");
+
+        assert.strictEqual(scale.domain()[1].getTime(), requestedDomain[1].getTime(), "domain maximum is the maximum value");
         scale.domainMax(maxInMiddle);
+        assert.strictEqual(scale.domain()[1].getTime(), maxInMiddle.getTime(), "can set domain maximum with domainMax()");
+
         let requestedDomain2 = [new Date("2014-05-01"), new Date("2016-07-01")];
         scale.addIncludedValuesProvider((scale: Plottable.Scales.Time) => requestedDomain2);
         assert.strictEqual(scale.domain()[1].getTime(), maxInMiddle.getTime(),
