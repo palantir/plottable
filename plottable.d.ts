@@ -1726,15 +1726,15 @@ declare module Plottable {
          */
         annotationsEnabled(annotationsEnabled: boolean): Axis<D>;
         /**
-         * Gets the maximum of annotation tiers to render.
+         * Gets the count of annotation tiers to render.
          */
-        maxAnnotationTiers(): number;
+        annotationTierCount(): number;
         /**
-         * Sets the maximum of annotation tiers to render.
+         * Sets the count of annotation tiers to render.
          *
          * @returns {Axis} The calling Axis.
          */
-        maxAnnotationTiers(maxAnnotationTiers: number): Axis<D>;
+        annotationTierCount(annotationTierCount: number): Axis<D>;
         protected _drawAnnotations(): void;
         protected _axisSizeWithoutMarginAndAnnotations(): number;
         protected _annotationTierHeight(): number;

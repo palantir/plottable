@@ -33,7 +33,7 @@ export class Axis<D> extends Component {
   private _annotatedTicks: D[];
   private _annotationFormatter: Formatter;
   private _annotationsEnabled = false;
-  private _maxAnnotationTiers = 1;
+  private _annotationTierCount = 1;
   private _annotationContainer: d3.Selection<void>;
   private _annotationMeasurer: SVGTypewriter.Measurers.Measurer;
   private _annotationWriter: SVGTypewriter.Writers.Writer;
@@ -100,7 +100,7 @@ export class Axis<D> extends Component {
       requestedHeight = this._computedHeight + this._margin;
       if (this.annotationsEnabled()) {
         let tierHeight = this._annotationMeasurer.measure().height + 2 * Axis._ANNOTATION_LABEL_PADDING;
-        requestedHeight += tierHeight * this.maxAnnotationTiers();
+        requestedHeight += tierHeight * this.annotationTierCount();
       }
     } else { // vertical
       if (this._computedWidth == null) {
@@ -109,7 +109,7 @@ export class Axis<D> extends Component {
       requestedWidth = this._computedWidth + this._margin;
       if (this.annotationsEnabled()) {
         let tierHeight = this._annotationMeasurer.measure().height + 2 * Axis._ANNOTATION_LABEL_PADDING;
-        requestedWidth += tierHeight * this.maxAnnotationTiers();
+        requestedWidth += tierHeight * this.annotationTierCount();
       }
     }
 
@@ -244,20 +244,20 @@ export class Axis<D> extends Component {
   }
 
   /**
-   * Gets the maximum of annotation tiers to render.
+   * Gets the count of annotation tiers to render.
    */
-  public maxAnnotationTiers(): number;
+  public annotationTierCount(): number;
   /**
-   * Sets the maximum of annotation tiers to render.
+   * Sets the count of annotation tiers to render.
    *
    * @returns {Axis} The calling Axis.
    */
-  public maxAnnotationTiers(maxAnnotationTiers: number): Axis<D>;
-  public maxAnnotationTiers(maxAnnotationTiers?: number): any {
-    if (maxAnnotationTiers == null) {
-      return this._maxAnnotationTiers;
+  public annotationTierCount(annotationTierCount: number): Axis<D>;
+  public annotationTierCount(annotationTierCount?: number): any {
+    if (annotationTierCount == null) {
+      return this._annotationTierCount;
     }
-    this._maxAnnotationTiers = maxAnnotationTiers;
+    this._annotationTierCount = annotationTierCount;
     this.redraw();
     return this;
   }
@@ -279,7 +279,7 @@ export class Axis<D> extends Component {
     let hiddenAnnotations = new Utils.Set<any>();
     let axisHeight = this._isHorizontal() ? this.height() : this.width();
     let axisHeightWithoutMarginAndAnnotations = this._axisSizeWithoutMarginAndAnnotations();
-    let numTiers = Math.min(this.maxAnnotationTiers(), Math.floor((axisHeight - axisHeightWithoutMarginAndAnnotations) / tierHeight));
+    let numTiers = Math.min(this.annotationTierCount(), Math.floor((axisHeight - axisHeightWithoutMarginAndAnnotations) / tierHeight));
     annotationToTier.forEach((tier, annotation) => {
       if (tier === -1 || tier >= numTiers) {
         hiddenAnnotations.add(annotation);

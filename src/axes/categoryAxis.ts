@@ -45,7 +45,7 @@ export module Axes {
       }
 
       if (this.annotationsEnabled()) {
-        let tierTotalHeight = this._annotationTierHeight() * this.maxAnnotationTiers();
+        let tierTotalHeight = this._annotationTierHeight() * this.annotationTierCount();
         if (this._isHorizontal()) {
           heightRequiredByTicks += tierTotalHeight;
         } else {
