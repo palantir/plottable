@@ -86,7 +86,7 @@ describe("Interactions", () => {
         svg.remove();
       });
 
-      it("can register two onDragStart() callbacks on the same Component", () => {
+      it("can register two onDragStart() callbacks", () => {
         let startCallback1Called = false;
         let startCallback2Called = false;
         let startCallback1 = () => startCallback1Called = true;
@@ -155,7 +155,7 @@ describe("Interactions", () => {
         svg.remove();
       });
 
-      it("can register two onDrag() callbacks on the same Component", () => {
+      it("can register two onDrag() callbacks", () => {
         let moveCallback1Called = false;
         let moveCallback2Called = false;
         let moveCallback1 = () => moveCallback1Called = true;
@@ -233,7 +233,7 @@ describe("Interactions", () => {
         svg.remove();
       });
 
-      it("can register two onDragEnd() callbacks on the same Component", () => {
+      it("can register two onDragEnd() callbacks", () => {
         let endCallback1Called = false;
         let endCallback2Called = false;
         let endCallback1 = () => endCallback1Called = true;
@@ -262,7 +262,7 @@ describe("Interactions", () => {
         svg.remove();
       });
 
-      it("can register multiple callbacks", () => {
+      it("can register start/move/end drag callbacks in the same time", () => {
         let startCallbackCalled = false;
         let moveCallbackCalled = false;
         let endCallbackCalled = false;
@@ -300,7 +300,7 @@ describe("Interactions", () => {
         svg.remove();
       });
 
-      it("constraints the drag interaction to the Component space", () => {
+      it("can constrain the drag to inside the Component's space", () => {
         let constrainedPos = { x: SVG_WIDTH, y: SVG_HEIGHT };
         let constrainedNeg = { x: 0, y: 0 };
 
