@@ -52,6 +52,7 @@ function run(svg, data, Plottable) {
   ABplot.addDataset(new Plottable.Dataset(data[2]));
   ABplot.sectorValue(function(d) { return d.percent; });
   ABplot.attr("fill", function(d) { return d.region; }, colorScale);
+  ABplot.attr("stroke-width", 0);
   ABplot.attr("stroke", "#000000");
   ABplot.innerRadius(45);
   ABplot.outerRadius(90);
