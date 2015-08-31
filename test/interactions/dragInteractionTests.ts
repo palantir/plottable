@@ -74,6 +74,21 @@ describe("Interactions", () => {
         TestMethods.triggerFakeTouchEvent("touchstart", target, [{x: negativeOutsidePoint.x, y: negativeOutsidePoint.y}]);
         assert.isFalse(startCallbackCalled, "does not trigger callback if drag starts outside the Component (negative) (touchstart)");
 
+        svg.remove();
+      });
+
+      it("can de-register the onDragStart() interaction", () => {
+        dragInteraction.attachTo(component);
+
+        let startCallbackCalled = false;
+        let startCallback = () => startCallbackCalled = true;
+
+        dragInteraction.onDragStart(startCallback);
+
+        let target = component.background();
+        TestMethods.triggerFakeMouseEvent("mousedown", target, startPoint.x, startPoint.y);
+        assert.isTrue(startCallbackCalled, "callback was called on beginning drag (mousedown)");
+
         dragInteraction.offDragStart(startCallback);
 
         startCallbackCalled = false;
@@ -140,6 +155,22 @@ describe("Interactions", () => {
         assert.isTrue(moveCallbackCalled, "callback was called on dragging (touchmove)");
         assert.deepEqual(receivedStart, startPoint, "was passed the correct starting point");
         assert.deepEqual(receivedEnd, endPoint, "was passed the correct current point");
+
+        svg.remove();
+      });
+
+      it("can de-register the onDrag() interaction", () => {
+        dragInteraction.attachTo(component);
+
+        let moveCallbackCalled = false;
+        let moveCallback = () => moveCallbackCalled = true;
+
+        dragInteraction.onDrag(moveCallback);
+
+        let target = component.background();
+        TestMethods.triggerFakeMouseEvent("mousedown", target, startPoint.x, startPoint.y);
+        TestMethods.triggerFakeMouseEvent("mousemove", target, endPoint.x, endPoint.y);
+        assert.isTrue(moveCallbackCalled, "callback was called on beginning drag (mousedown)");
 
         dragInteraction.offDrag(moveCallback);
 
@@ -218,6 +249,22 @@ describe("Interactions", () => {
         assert.isTrue(endCallbackCalled, "callback was called on drag ending (touchend)");
         assert.deepEqual(receivedStart, startPoint, "was passed the correct starting point");
         assert.deepEqual(receivedEnd, endPoint, "was passed the correct current point");
+
+        svg.remove();
+      });
+
+      it("can de-register the onDragEnd() interaction", () => {
+        dragInteraction.attachTo(component);
+
+        let endCallbackCalled = false;
+        let endCallback = () => endCallbackCalled = true;
+
+        dragInteraction.onDragEnd(endCallback);
+
+        let target = component.background();
+        TestMethods.triggerFakeMouseEvent("mousedown", target, startPoint.x, startPoint.y);
+        TestMethods.triggerFakeMouseEvent("mouseup", target, endPoint.x, endPoint.y);
+        assert.isTrue(endCallbackCalled, "callback was called on beginning drag (mousedown)");
 
         dragInteraction.offDragEnd(endCallback);
 
