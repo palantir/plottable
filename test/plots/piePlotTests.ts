@@ -67,7 +67,7 @@ describe("Plots", () => {
         svg.remove();
       });
 
-      it("uses a plottable colors for sectors by default", () => {
+      it("uses Plottable colors for sectors by default", () => {
         let arcPaths = piePlot.content().selectAll(".arc.fill");
         let plottableColors = new Plottable.Scales.Color().range();
 
@@ -102,7 +102,7 @@ describe("Plots", () => {
 
       it("can set innerRadius()", () => {
         let expectedInnerRadius = 5;
-        piePlot.innerRadius(expectedInnerRadius);
+        assert.strictEqual(piePlot.innerRadius(expectedInnerRadius), piePlot, "setter returns the calling pie plot");
         let arcPaths = piePlot.content().selectAll(".arc.fill");
         assert.strictEqual(arcPaths.size(), 2, "has two sectors");
 
@@ -123,7 +123,7 @@ describe("Plots", () => {
 
       it("can set outerRadius()", () => {
         let expectedOuterRadius = 150;
-        piePlot.outerRadius(() => expectedOuterRadius);
+        assert.strictEqual(piePlot.outerRadius(() => expectedOuterRadius), piePlot, "setter returns the calling pie plot");
         let arcPaths = piePlot.content().selectAll(".arc.fill");
         assert.strictEqual(arcPaths.size(), 2, "has two sectors");
 
@@ -233,9 +233,9 @@ describe("Plots", () => {
         labelGs.each(function(d, i) {
           let visibility = d3.select(this).style("visibility");
           if (data[i].value === 1) {
-            assert.strictEqual(visibility, "hidden", "label hidden when slice is too small");
+            assert.strictEqual(visibility, "hidden", `label ${i} hidden when slice is too small`);
           } else {
-            assert.include(["visible", "inherit"], visibility, "label shown when slice is appropriately sized");
+            assert.include(["visible", "inherit"], visibility, `label with index ${i} shown when slice is appropriately sized`);
           }
         });
         svg.remove();
@@ -276,9 +276,9 @@ describe("Plots", () => {
         texts.each(function(d, i) {
           let visibility = d3.select(this).style("visibility");
           if (i % 2 === 0) {
-            assert.strictEqual(visibility, "hidden", "label hidden when slice is too small");
+            assert.strictEqual(visibility, "hidden", `label ${i} hidden when slice is too small`);
           } else {
-            assert.include(["visible", "inherit"], visibility, "label shown when slice is appropriately sized");
+            assert.include(["visible", "inherit"], visibility, `label ${i} shown when slice is appropriately sized`);
           }
         });
 
@@ -301,9 +301,9 @@ describe("Plots", () => {
         texts.each(function(d, i) {
           let visibility = d3.select(this).style("visibility");
           if (i === 1) {
-            assert.strictEqual(visibility, "hidden", "label hidden when cut off by the lower margin");
+            assert.strictEqual(visibility, "hidden", `label ${i} hidden when cut off by the lower margin`);
           } else {
-            assert.include(["visible", "inherit"], visibility, "label shown when in the renderArea");
+            assert.include(["visible", "inherit"], visibility, `label ${i} shown when in the renderArea`);
           }
         });
         svg.remove();
@@ -471,11 +471,11 @@ describe("Plots", () => {
         let SVG_WIDTH = 400;
         let SVG_HEIGHT = 400;
         let svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
-        let plot = new Plottable.Plots.Pie();
-        plot.sectorValue((d) => d.value);
-        assert.doesNotThrow(() => plot.renderTo(svg), Error);
-        assert.strictEqual(plot.width(), SVG_WIDTH, "was allocated width");
-        assert.strictEqual(plot.height(), SVG_HEIGHT, "was allocated height");
+        let piePlot = new Plottable.Plots.Pie();
+        piePlot.sectorValue((d) => d.value);
+        assert.doesNotThrow(() => piePlot.renderTo(svg), Error);
+        assert.strictEqual(piePlot.width(), SVG_WIDTH, "was allocated width");
+        assert.strictEqual(piePlot.height(), SVG_HEIGHT, "was allocated height");
         svg.remove();
       });
 
@@ -493,21 +493,21 @@ describe("Plots", () => {
           { v: -100 }
         ];
 
-        let plot = new Plottable.Plots.Pie();
-        plot.addDataset(new Plottable.Dataset(dataWithBadValue));
-        plot.sectorValue((d) => d.v);
+        let piePlot = new Plottable.Plots.Pie();
+        piePlot.addDataset(new Plottable.Dataset(dataWithBadValue));
+        piePlot.sectorValue((d) => d.v);
 
-        plot.renderTo(svg);
+        piePlot.renderTo(svg);
 
-        let elementsDrawnSel = (<any> plot)._element.selectAll(".arc.fill");
+        let elementsDrawnSel = piePlot.content().selectAll(".arc.fill");
 
         assert.strictEqual(elementsDrawnSel.size(), 4,
           "There should be exactly 4 slices in the pie chart, representing the valid values");
-        assert.lengthOf(plot.entities(), 4, "there should be exactly 4 entities, representing the valid values");
+        assert.lengthOf(piePlot.entities(), 4, "there should be exactly 4 entities, representing the valid values");
 
         for (let i = 0; i < 4; i++) {
-          let startAngle = (<any> plot)._startAngles[i];
-          let endAngle = (<any> plot)._endAngles[i];
+          let startAngle = (<any> piePlot)._startAngles[i];
+          let endAngle = (<any> piePlot)._endAngles[i];
           assert.closeTo(endAngle - startAngle, Math.PI / 2, 0.001, `slice with index ${i} is a quarter of the pie`);
         }
 
