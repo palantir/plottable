@@ -3855,8 +3855,7 @@ var Plottable;
                 .attr({
                 cx: isHorizontal ? positionF : secondaryPosition,
                 cy: isHorizontal ? secondaryPosition : positionF,
-                r: 3,
-                visibility: visibilityF
+                r: 3
             });
             var rectangleOffsetF = function (d) {
                 switch (_this.orientation()) {

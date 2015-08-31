@@ -759,6 +759,25 @@ describe("BaseAxis", () => {
         svg.remove();
       });
 
+      it("shows annotation circles are not hidden regardless if rectangles are hidden", () => {
+        let mockScale = new Plottable.Scales.Linear;
+        let annotatedTicks = [50, 51, 150];
+        mockScale.domain([0, 300]);
+
+        let axis = new Plottable.Axis(mockScale, "bottom");
+        axis.annotatedTicks(annotatedTicks);
+        axis.annotationsEnabled(true);
+
+        let svg = TestMethods.generateSVG(300, 300);
+        axis.renderTo(svg);
+
+        axis.content().selectAll(".annotation-circle").each(function() {
+          let annotationCircle = d3.select(this);
+          assert.notStrictEqual(annotationCircle.attr("visibility"), "hidden", "annotation circle inside margin area should be visible");
+        });
+        svg.remove();
+      });
+
       it("does not render the null annotatedTick", () => {
         let annotatedTicks: Date[] = [null];
         let scale = new Plottable.Scales.Time();

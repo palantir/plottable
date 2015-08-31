@@ -333,8 +333,7 @@ export class Axis<D> extends Component {
       .attr({
         cx: isHorizontal ? positionF : secondaryPosition,
         cy: isHorizontal ? secondaryPosition : positionF,
-        r: 3,
-        visibility: visibilityF
+        r: 3
       });
 
     let rectangleOffsetF = (d: D) => {
