@@ -29,15 +29,15 @@ function run(svg, data, Plottable) {
     .t2(function(d){ return d.t2; }, tScale)
     .attr("fill", function(d){ return "" + d.id.toString(); }, cs);
 
-  var xScale = new Plottable.Scales.Linear().domain([0, 4]);
-  var yScale = new Plottable.Scales.Linear().domain([0, 360]);
+  var yScale = new Plottable.Scales.Linear().domain([4, -1]);
+  var xScale = new Plottable.Scales.Linear().domain([-70, 310]);
 
   var rectangle = new Plottable.Plots.Rectangle()
     .addDataset(new Plottable.Dataset(data))
-    .x(function(d){ return d.r1; }, xScale)
-    .x2(function(d){ return d.r2; }, xScale)
-    .y(function(d){ return d.t1; }, yScale)
-    .y2(function(d){ return d.t2; }, yScale)
+    .x(function(d){ return d.t1; }, xScale)
+    .x2(function(d){ return d.t2; }, xScale)
+    .y(function(d){ return d.r1; }, yScale)
+    .y2(function(d){ return d.r2; }, yScale)
     .attr("fill", function(d){ return "" + d.id.toString(); }, cs);
 
    new Plottable.Components.Table([[legend, wheel],
