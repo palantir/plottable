@@ -282,6 +282,8 @@ module.exports = function(grunt) {
       options: {
         urls: ["http://127.0.0.1:9999/test/tests.html"],
         testname: "Plottable Sauce Unit Tests",
+        pollInterval: 5000,
+        statusCheckAttempts: 60,
         browsers: [{
           browserName: "firefox",
           platform: "linux"
