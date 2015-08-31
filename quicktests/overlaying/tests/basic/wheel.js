@@ -17,11 +17,11 @@ function makeData() {
 function run(svg, data, Plottable) {
   "use strict";
   var cs = new Plottable.Scales.Color();
-  var rScale = new Plottable.Scales.Linear().domain([0, 5]);
+  var rScale = new Plottable.Scales.Linear().domain([0, 4]);
   var tScale = new Plottable.Scales.Linear().domain([0, 360]);
   var legend = new Plottable.Components.Legend(cs);
 
-  var plot = new Plottable.Plots.Wheel()
+  var wheel = new Plottable.Plots.Wheel()
     .addDataset(new Plottable.Dataset(data))
     .r(function(d){ return d.r1; }, rScale)
     .r2(function(d){ return d.r2; }, rScale)
@@ -29,6 +29,18 @@ function run(svg, data, Plottable) {
     .t2(function(d){ return d.t2; }, tScale)
     .attr("fill", function(d){ return "" + d.id.toString(); }, cs);
 
-   new Plottable.Components.Table([[legend, plot]]).renderTo(svg);
+  var xScale = new Plottable.Scales.Linear().domain([0, 4]);
+  var yScale = new Plottable.Scales.Linear().domain([0, 360]);
+
+  var rectangle = new Plottable.Plots.Rectangle()
+    .addDataset(new Plottable.Dataset(data))
+    .x(function(d){ return d.r1; }, xScale)
+    .x2(function(d){ return d.r2; }, xScale)
+    .y(function(d){ return d.t1; }, yScale)
+    .y2(function(d){ return d.t2; }, yScale)
+    .attr("fill", function(d){ return "" + d.id.toString(); }, cs);
+
+   new Plottable.Components.Table([[legend, wheel],
+                                   [null, rectangle]]).renderTo(svg);
 
 }
