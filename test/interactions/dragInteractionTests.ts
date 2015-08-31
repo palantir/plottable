@@ -18,17 +18,9 @@ describe("Interactions", () => {
         x: SVG_WIDTH * 1.5,
         y: SVG_HEIGHT * 1.5
       };
-      let constrainedPos = {
-        x: SVG_WIDTH,
-        y: SVG_HEIGHT
-      };
       let outsidePointNeg = {
         x: -SVG_WIDTH / 2,
         y: -SVG_HEIGHT / 2
-      };
-      let constrainedNeg = {
-        x: 0,
-        y: 0
       };
 
       let svg: d3.Selection<void>;
@@ -308,36 +300,33 @@ describe("Interactions", () => {
         svg.remove();
       });
 
-      it("constrainToComponent()", () => {
-        assert.isTrue(dragInteraction.constrainedToComponent(), "constrains by default");
+      it("constraints the drag interaction to the Component space", () => {
+        let constrainedPos = { x: SVG_WIDTH, y: SVG_HEIGHT };
+        let constrainedNeg = { x: 0, y: 0 };
 
-        let receivedStart: Plottable.Point;
         let receivedEnd: Plottable.Point;
-        let moveCallback = (start: Plottable.Point, end: Plottable.Point) => {
-          receivedStart = start;
-          receivedEnd = end;
-        };
-        dragInteraction.onDrag(moveCallback);
-        let endCallback = (start: Plottable.Point, end: Plottable.Point) => {
-          receivedStart = start;
-          receivedEnd = end;
-        };
-        dragInteraction.onDragEnd(endCallback);
+        dragInteraction.onDrag((startPoint, endPoint) => receivedEnd = endPoint);
+        dragInteraction.onDragEnd((startPoint, endPoint) => receivedEnd = endPoint);
 
         dragInteraction.attachTo(component);
         let target = component.content();
+
+        assert.isTrue(dragInteraction.constrainedToComponent(), "constrains by default");
 
         TestMethods.triggerFakeMouseEvent("mousedown", target, startPoint.x, startPoint.y);
         TestMethods.triggerFakeMouseEvent("mousemove", target, outsidePointPos.x, outsidePointPos.y);
         assert.deepEqual(receivedEnd, constrainedPos, "dragging outside the Component is constrained (positive) (mousemove)");
         TestMethods.triggerFakeMouseEvent("mousemove", target, outsidePointNeg.x, outsidePointNeg.y);
         assert.deepEqual(receivedEnd, constrainedNeg, "dragging outside the Component is constrained (negative) (mousemove)");
+        TestMethods.triggerFakeMouseEvent("mouseup", target, startPoint.x, startPoint.y);
 
         receivedEnd = null;
+        TestMethods.triggerFakeTouchEvent("touchstart", target, [{x: startPoint.x, y: startPoint.y}]);
         TestMethods.triggerFakeTouchEvent("touchmove", target, [{x: outsidePointPos.x, y: outsidePointPos.y}]);
         assert.deepEqual(receivedEnd, constrainedPos, "dragging outside the Component is constrained (positive) (touchmove)");
         TestMethods.triggerFakeTouchEvent("touchmove", target, [{x: outsidePointNeg.x, y: outsidePointNeg.y}]);
         assert.deepEqual(receivedEnd, constrainedNeg, "dragging outside the Component is constrained (negative) (touchmove)");
+        TestMethods.triggerFakeTouchEvent("touchend", target, [{x: startPoint.x, y: startPoint.y}]);
 
         receivedEnd = null;
         TestMethods.triggerFakeMouseEvent("mousedown", target, startPoint.x, startPoint.y);
@@ -359,39 +348,35 @@ describe("Interactions", () => {
 
         TestMethods.triggerFakeMouseEvent("mousedown", target, startPoint.x, startPoint.y);
         TestMethods.triggerFakeMouseEvent("mousemove", target, outsidePointPos.x, outsidePointPos.y);
-        assert.deepEqual(receivedEnd, outsidePointPos,
-                         "dragging outside the Component is no longer constrained (positive) (mousemove)");
+        assert.deepEqual(receivedEnd, outsidePointPos, "dragging outside the Component is no longer constrained (positive) (mousemove)");
         TestMethods.triggerFakeMouseEvent("mousemove", target, outsidePointNeg.x, outsidePointNeg.y);
-        assert.deepEqual(receivedEnd, outsidePointNeg,
-                         "dragging outside the Component is no longer constrained (negative) (mousemove)");
+        assert.deepEqual(receivedEnd, outsidePointNeg, "dragging outside the Component is no longer constrained (negative) (mousemove)");
+        TestMethods.triggerFakeMouseEvent("mouseup", target, startPoint.x, startPoint.y);
 
         receivedEnd = null;
+        TestMethods.triggerFakeTouchEvent("touchstart", target, [{x: startPoint.x, y: startPoint.y}]);
         TestMethods.triggerFakeTouchEvent("touchmove", target, [{x: outsidePointPos.x, y: outsidePointPos.y}]);
-        assert.deepEqual(receivedEnd, outsidePointPos,
-                         "dragging outside the Component is no longer constrained (positive) (touchmove)");
+        assert.deepEqual(receivedEnd, outsidePointPos, "dragging outside the Component is no longer constrained (positive) (touchmove)");
         TestMethods.triggerFakeTouchEvent("touchmove", target, [{x: outsidePointNeg.x, y: outsidePointNeg.y}]);
-        assert.deepEqual(receivedEnd, outsidePointNeg,
-                         "dragging outside the Component is no longer constrained (negative) (touchmove)");
+        assert.deepEqual(receivedEnd, outsidePointNeg, "dragging outside the Component is no longer constrained (negative) (touchmove)");
+        TestMethods.triggerFakeTouchEvent("touchend", target, [{x: startPoint.x, y: startPoint.y}]);
 
         receivedEnd = null;
         TestMethods.triggerFakeMouseEvent("mousedown", target, startPoint.x, startPoint.y);
         TestMethods.triggerFakeMouseEvent("mouseup", target, outsidePointPos.x, outsidePointPos.y);
-        assert.deepEqual(receivedEnd, outsidePointPos,
-                         "dragging outside the Component is no longer constrained (positive) (mouseup)");
+        assert.deepEqual(receivedEnd, outsidePointPos, "dragging outside the Component is no longer constrained (positive) (mouseup)");
         TestMethods.triggerFakeMouseEvent("mousedown", target, startPoint.x, startPoint.y);
         TestMethods.triggerFakeMouseEvent("mouseup", target, outsidePointNeg.x, outsidePointNeg.y);
-        assert.deepEqual(receivedEnd, outsidePointNeg,
-                         "dragging outside the Component is no longer constrained (negative) (mouseup)");
+        assert.deepEqual(receivedEnd, outsidePointNeg, "dragging outside the Component is no longer constrained (negative) (mouseup)");
 
         receivedEnd = null;
         TestMethods.triggerFakeTouchEvent("touchstart", target, [{x: startPoint.x, y: startPoint.y}]);
         TestMethods.triggerFakeTouchEvent("touchend", target, [{x: outsidePointPos.x, y: outsidePointPos.y}]);
-        assert.deepEqual(receivedEnd, outsidePointPos,
-                         "dragging outside the Component is no longer constrained (positive) (touchend)");
+        assert.deepEqual(receivedEnd, outsidePointPos, "dragging outside the Component is no longer constrained (positive) (touchend)");
         TestMethods.triggerFakeTouchEvent("touchstart", target, [{x: startPoint.x, y: startPoint.y}]);
         TestMethods.triggerFakeTouchEvent("touchend", target, [{x: outsidePointNeg.x, y: outsidePointNeg.y}]);
-        assert.deepEqual(receivedEnd, outsidePointNeg,
-                         "dragging outside the Component is no longer constrained (negative) (touchend)");
+        assert.deepEqual(receivedEnd, outsidePointNeg, "dragging outside the Component is no longer constrained (negative) (touchend)");
+
         svg.remove();
       });
 
