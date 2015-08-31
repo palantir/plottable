@@ -14,7 +14,9 @@ function run(svg, data, Plottable) {
   var yAxis = new Plottable.Axes.Numeric(yScale, "left");
 
   var scatterPlot = new Plottable.Plots.Scatter().addDataset(dataseries1);
-  scatterPlot.x(function(d) { return d.x; }, xScale).y(function(d) { return d.y; }, yScale);
+  scatterPlot.x(function(d) { return d.x; }, xScale)
+  .y(function(d) { return d.y; }, yScale)
+  .attr("fill", "#4bd388");
 
   var bigVal = function(){ return [10]; };
   var negVal = function(){ return [-10]; };
@@ -66,13 +68,40 @@ function run(svg, data, Plottable) {
                                                     [removePadExceptionBig, removePadExceptionNeg]
                                                   ]);
 
+  var middle = dataseries1.data()[5].x;
+  var dll = new Plottable.Components.DragLineLayer("vertical")
+  .value(middle)
+  .scale(xScale);
+
+  var gll = new Plottable.Components.GuideLineLayer("vertical")
+  .value(middle)
+  .scale(xScale);
+
+  var colorPoints = function(){
+    scatterPlot.entities().forEach(function(d){
+      d.selection.attr("fill", "#4bd388");
+      if(d.datum.x < dll.value()){
+        d.selection.attr("fill", "#ff0000");
+      }
+    });
+  };
+
+  dll.onDrag(function(){
+    gll.value(dll.value());
+    colorPoints();
+  });
+
+  var axisGroup = new Plottable.Components.Group([xAxis, dll]);
+  var plotGroup = new Plottable.Components.Group([scatterPlot, gll]);
+
   var basicTable = new Plottable.Components.Table([
-                                                    [yAxis, scatterPlot],
-                                                    [null, xAxis],
+                                                    [yAxis, plotGroup],
+                                                    [null, axisGroup],
                                                     [null, labelTable]
                                                   ]);
 
   basicTable.renderTo(svg);
+  colorPoints();
 
   new Plottable.Interactions.Click().onClick(addBigVal).attachTo(addBig);
   new Plottable.Interactions.Click().onClick(removeBigVal).attachTo(removeBig);
