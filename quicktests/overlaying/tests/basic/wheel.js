@@ -18,7 +18,6 @@ function run(svg, data, Plottable) {
   "use strict";
   var cs = new Plottable.Scales.Color();
   var rScale = new Plottable.Scales.Linear().domain([0, 4]);
-  var tScale = new Plottable.Scales.Linear().domain([0, 360]);
   var legend = new Plottable.Components.Legend(cs);
 
   var wheel = new Plottable.Plots.Wheel()
@@ -29,7 +28,7 @@ function run(svg, data, Plottable) {
     .t2(function(d){ return d.t2; })
     .attr("fill", function(d){ return "" + d.id.toString(); }, cs);
 
-  var yScale = new Plottable.Scales.Linear().domain([4, -1]);
+  var yScale = new Plottable.Scales.Linear().domain([0, 4]);
   var xScale = new Plottable.Scales.Linear().domain([-70, 310]);
 
   var rectangle = new Plottable.Plots.Rectangle()
@@ -40,7 +39,6 @@ function run(svg, data, Plottable) {
     .y2(function(d){ return d.r2; })
     .attr("fill", function(d){ return "" + d.id.toString(); }, cs);
 
-   new Plottable.Components.Table([[legend, wheel],
-                                   [null, rectangle]]).renderTo(svg);
-
+   new Plottable.Components.Table([[null, rectangle],
+                                   [legend, wheel]]).renderTo(svg);
 }
