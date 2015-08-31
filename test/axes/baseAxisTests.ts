@@ -290,7 +290,7 @@ describe("BaseAxis", () => {
 
           annotationLabels.each(function(d, i) {
             let d3this = d3.select(this);
-            assert.strictEqual(d3this.text(), bazFormatter(annotatedTicks[i]), "new formatter used for annotation labels");
+            assert.strictEqual(d3this.text(), bazFormatter(annotatedTicks[i]), `new formatter used for annotation label ${i}`);
           });
           svg.remove();
         });
@@ -351,7 +351,7 @@ describe("BaseAxis", () => {
           let annotationLabels = axis.content().selectAll(".annotation-label");
           annotationLabels.each(function(d, i) {
             let d3this = d3.select(this);
-            assert.strictEqual(d3this.text(), annotationFormatter(annotatedTicks[i]), "annotated tick has been formatted");
+            assert.strictEqual(d3this.text(), annotationFormatter(annotatedTicks[i]), `annotated tick ${i} has been formatted`);
           });
           svg.remove();
         });
@@ -386,8 +386,8 @@ describe("BaseAxis", () => {
             let annotationCircle = d3.select(this);
             let correspondingRect = d3.select(annotationRects[0][i]);
             assert.closeTo(TestMethods.numAttr(annotationCircle, "cx"),
-              TestMethods.numAttr(correspondingRect, "x"), window.Pixel_CloseTo_Requirement, "circle at start of rectangle");
-            assert.closeTo(TestMethods.numAttr(annotationCircle, "cy"), 0, window.Pixel_CloseTo_Requirement, "circle at the top");
+              TestMethods.numAttr(correspondingRect, "x"), window.Pixel_CloseTo_Requirement, `circle ${i} at start of rect`);
+            assert.closeTo(TestMethods.numAttr(annotationCircle, "cy"), 0, window.Pixel_CloseTo_Requirement, `circle ${i} at the top`);
           });
 
           let annotationLines = axis.content().selectAll(".annotation-line");
@@ -398,12 +398,12 @@ describe("BaseAxis", () => {
             let annotationLine = d3.select(this);
             let correspondingRect = d3.select(annotationRects[0][i]);
             assert.closeTo(TestMethods.numAttr(annotationLine, "x1"),
-              TestMethods.numAttr(correspondingRect, "x"), window.Pixel_CloseTo_Requirement, "line at start of rect");
+              TestMethods.numAttr(correspondingRect, "x"), window.Pixel_CloseTo_Requirement, `line ${i} at start of rect`);
             assert.closeTo(TestMethods.numAttr(annotationLine, "x2"),
-              TestMethods.numAttr(correspondingRect, "x"), window.Pixel_CloseTo_Requirement, "line at start of rect");
-            assert.closeTo(TestMethods.numAttr(annotationLine, "y1"), 0, window.Pixel_CloseTo_Requirement, "line starts at the top");
+              TestMethods.numAttr(correspondingRect, "x"), window.Pixel_CloseTo_Requirement, `line ${i} at start of rect`);
+            assert.closeTo(TestMethods.numAttr(annotationLine, "y1"), 0, window.Pixel_CloseTo_Requirement, `line ${i} starts at the top`);
             assert.closeTo(TestMethods.numAttr(annotationLine, "y2"),
-              TestMethods.numAttr(correspondingRect, "y"), window.Pixel_CloseTo_Requirement, "line goes to the rect");
+              TestMethods.numAttr(correspondingRect, "y"), window.Pixel_CloseTo_Requirement, `line ${i} goes to the rect`);
           });
 
           let annotationLabelTexts = axis.content().selectAll(".annotation-label text");
@@ -436,9 +436,9 @@ describe("BaseAxis", () => {
             let annotationCircle = d3.select(this);
             let correspondingRect = d3.select(annotationRects[0][i]);
             assert.closeTo(TestMethods.numAttr(annotationCircle, "cx"),
-              TestMethods.numAttr(correspondingRect, "x"), window.Pixel_CloseTo_Requirement, "circle at start of rect");
+              TestMethods.numAttr(correspondingRect, "x"), window.Pixel_CloseTo_Requirement, `circle ${i} at start of rect`);
             assert.closeTo(TestMethods.numAttr(annotationCircle, "cy"), axis.height(),
-              window.Pixel_CloseTo_Requirement, "circle at the bottom");
+              window.Pixel_CloseTo_Requirement, `circle ${i} at the bottom`);
           });
 
           let annotationLines = axis.content().selectAll(".annotation-line");
@@ -449,14 +449,14 @@ describe("BaseAxis", () => {
             let annotationLine = d3.select(this);
             let correspondingRect = d3.select(annotationRects[0][i]);
             assert.closeTo(TestMethods.numAttr(annotationLine, "x1"),
-              TestMethods.numAttr(correspondingRect, "x"), window.Pixel_CloseTo_Requirement, "line at tick scaled x position");
+              TestMethods.numAttr(correspondingRect, "x"), window.Pixel_CloseTo_Requirement, `line ${i} at tick scaled x position`);
             assert.closeTo(TestMethods.numAttr(annotationLine, "x2"),
-              TestMethods.numAttr(correspondingRect, "x"), window.Pixel_CloseTo_Requirement, "line at tick scaled x position");
+              TestMethods.numAttr(correspondingRect, "x"), window.Pixel_CloseTo_Requirement, `line ${i} at tick scaled x position`);
             assert.closeTo(TestMethods.numAttr(annotationLine, "y1"), axis.height(),
-              window.Pixel_CloseTo_Requirement, "line starts at the bottom");
+              window.Pixel_CloseTo_Requirement, `line ${i} starts at the bottom`);
             assert.closeTo(TestMethods.numAttr(annotationLine, "y2"),
               TestMethods.numAttr(correspondingRect, "y") + TestMethods.numAttr(correspondingRect, "height"),
-              window.Pixel_CloseTo_Requirement, "line goes to the rect");
+              window.Pixel_CloseTo_Requirement, `line ${i} goes to the rect`);
           });
 
           let annotationLabelTexts = axis.content().selectAll(".annotation-label text");
@@ -489,9 +489,9 @@ describe("BaseAxis", () => {
             let annotationCircle = d3.select(this);
             let correspondingRect = d3.select(annotationRects[0][i]);
             assert.closeTo(TestMethods.numAttr(annotationCircle, "cx"), axis.width(),
-              window.Pixel_CloseTo_Requirement, "circle at the right");
+              window.Pixel_CloseTo_Requirement, `circle ${i} at the right`);
             assert.closeTo(TestMethods.numAttr(annotationCircle, "cy"),
-              TestMethods.numAttr(correspondingRect, "y"), window.Pixel_CloseTo_Requirement, "circle at tick scaled y position");
+              TestMethods.numAttr(correspondingRect, "y"), window.Pixel_CloseTo_Requirement, `circle ${i} at tick scaled y position`);
           });
 
           let annotationLines = axis.content().selectAll(".annotation-line");
@@ -502,13 +502,13 @@ describe("BaseAxis", () => {
             let annotationLine = d3.select(this);
             let correspondingRect = d3.select(annotationRects[0][i]);
             assert.closeTo(TestMethods.numAttr(annotationLine, "x1"), axis.width(),
-              window.Pixel_CloseTo_Requirement, "line starts at the right");
+              window.Pixel_CloseTo_Requirement, `line ${i} starts at the right`);
             assert.closeTo(TestMethods.numAttr(annotationLine, "x2"),
-              TestMethods.numAttr(correspondingRect, "x") + TestMethods.numAttr(correspondingRect, "width"), 1, "line goes to the rect");
+              TestMethods.numAttr(correspondingRect, "x") + TestMethods.numAttr(correspondingRect, "width"), 1, `line ${i} goes to rect`);
             assert.closeTo(TestMethods.numAttr(annotationLine, "y1"),
-              TestMethods.numAttr(correspondingRect, "y"), window.Pixel_CloseTo_Requirement, "line at tick scaled y position");
+              TestMethods.numAttr(correspondingRect, "y"), window.Pixel_CloseTo_Requirement, `line ${i} at tick scaled y position`);
             assert.closeTo(TestMethods.numAttr(annotationLine, "y2"),
-              TestMethods.numAttr(correspondingRect, "y"), window.Pixel_CloseTo_Requirement, "line at tick scaled y position");
+              TestMethods.numAttr(correspondingRect, "y"), window.Pixel_CloseTo_Requirement, `line ${i} at tick scaled y position`);
           });
 
           let annotationLabelTexts = axis.content().selectAll(".annotation-label text");
@@ -540,9 +540,9 @@ describe("BaseAxis", () => {
           annotationCircles.each(function (d, i) {
             let annotationCircle = d3.select(this);
             let correspondingRect = d3.select(annotationRects[0][i]);
-            assert.closeTo(TestMethods.numAttr(annotationCircle, "cx"), 0, window.Pixel_CloseTo_Requirement, "circle at the left");
+            assert.closeTo(TestMethods.numAttr(annotationCircle, "cx"), 0, window.Pixel_CloseTo_Requirement, `circle ${i} at the left`);
             assert.closeTo(TestMethods.numAttr(annotationCircle, "cy"),
-              TestMethods.numAttr(correspondingRect, "y"), window.Pixel_CloseTo_Requirement, "circle at tick scaled y position");
+              TestMethods.numAttr(correspondingRect, "y"), window.Pixel_CloseTo_Requirement, `circle ${i} at tick scaled y position`);
           });
 
           let annotationLines = axis.content().selectAll(".annotation-line");
@@ -552,13 +552,13 @@ describe("BaseAxis", () => {
           annotationLines.each(function (d, i) {
             let annotationLine = d3.select(this);
             let correspondingRect = d3.select(annotationRects[0][i]);
-            assert.closeTo(TestMethods.numAttr(annotationLine, "x1"), 0, window.Pixel_CloseTo_Requirement, "line starts at the left");
+            assert.closeTo(TestMethods.numAttr(annotationLine, "x1"), 0, window.Pixel_CloseTo_Requirement, `line ${i} starts at the left`);
             assert.closeTo(TestMethods.numAttr(annotationLine, "x2"),
-              TestMethods.numAttr(correspondingRect, "x"), window.Pixel_CloseTo_Requirement, "line ends at the rect");
+              TestMethods.numAttr(correspondingRect, "x"), window.Pixel_CloseTo_Requirement, `line ${i} ends at the rect`);
             assert.closeTo(TestMethods.numAttr(annotationLine, "y1"),
-              TestMethods.numAttr(correspondingRect, "y"), window.Pixel_CloseTo_Requirement, "line at tick scaled y position");
+              TestMethods.numAttr(correspondingRect, "y"), window.Pixel_CloseTo_Requirement, `line ${i} at tick scaled y position`);
             assert.closeTo(TestMethods.numAttr(annotationLine, "y2"),
-              TestMethods.numAttr(correspondingRect, "y"), window.Pixel_CloseTo_Requirement, "line at tick scaled y position");
+              TestMethods.numAttr(correspondingRect, "y"), window.Pixel_CloseTo_Requirement, `line ${i} at tick scaled y position`);
           });
 
           let annotationLabelTexts = axis.content().selectAll(".annotation-label text");
@@ -597,10 +597,10 @@ describe("BaseAxis", () => {
 
             assert.strictEqual(annotationRects.size(), annotatedTicks.length, "same number of annotation rects as ticks");
 
-            annotationRects.each(function (d) {
+            annotationRects.each(function (d, i) {
               let annotationRect = d3.select(this);
               assert.closeTo(TestMethods.numAttr(annotationRect, "x"), scale.scale(d),
-                window.Pixel_CloseTo_Requirement, "rectangle positioned correctly");
+                window.Pixel_CloseTo_Requirement, `rectangle ${i} positioned correctly`);
             });
             svg.remove();
           });
@@ -617,10 +617,10 @@ describe("BaseAxis", () => {
 
             assert.strictEqual(annotationRects.size(), annotatedTicks.length, "same number of annotation rects as ticks");
 
-            annotationRects.each(function (d) {
+            annotationRects.each(function (d, i) {
               let annotationRect = d3.select(this);
               assert.closeTo(TestMethods.numAttr(annotationRect, "x"), scale.scale(d),
-                window.Pixel_CloseTo_Requirement, "rectangle positioned correctly");
+                window.Pixel_CloseTo_Requirement, `rectangle ${i} positioned correctly`);
             });
             svg.remove();
           });
@@ -637,10 +637,10 @@ describe("BaseAxis", () => {
 
             assert.strictEqual(annotationRects.size(), annotatedTicks.length, "same number of annotation rects as ticks");
 
-            annotationRects.each(function (d) {
+            annotationRects.each(function (d, i) {
               let annotationRect = d3.select(this);
               assert.closeTo(TestMethods.numAttr(annotationRect, "y"), scale.scale(d),
-                window.Pixel_CloseTo_Requirement, "rectangle positioned correctly");
+                window.Pixel_CloseTo_Requirement, `rectangle ${i} positioned correctly`);
             });
             svg.remove();
           });
@@ -657,10 +657,10 @@ describe("BaseAxis", () => {
 
             assert.strictEqual(annotationRects.size(), annotatedTicks.length, "same number of annotation rects as ticks");
 
-            annotationRects.each(function (d) {
+            annotationRects.each(function (d, i) {
               let annotationRect = d3.select(this);
               assert.closeTo(TestMethods.numAttr(annotationRect, "y"), scale.scale(d), window.Pixel_CloseTo_Requirement,
-                "rectangle positioned correctly");
+                `rectangle ${i} positioned correctly`);
             });
             svg.remove();
           });
@@ -808,16 +808,16 @@ describe("BaseAxis", () => {
 
         assert.strictEqual(annotationRects.size(), annotatedTicks.length, "same number of annotation rects as ticks");
 
-        annotationRects.each(function() {
+        annotationRects.each(function(d, i) {
           let annotationRect = d3.select(this);
           let bbox = this.getBBox();
           let insideAnnotationArea = bbox.x >= 0 && bbox.x + bbox.width <= axis.width() &&
                                      bbox.y >= (<any> axis)._axisSizeWithoutMarginAndAnnotations() &&
                                      bbox.y + bbox.height <= axis.height() - axis.margin();
           if (insideAnnotationArea) {
-            assert.strictEqual(annotationRect.attr("visibility"), "visible", "annotation rect inside margin area should be visible");
+            assert.strictEqual(annotationRect.attr("visibility"), "visible", `rect ${i} inside margin area should be visible`);
           } else {
-            assert.strictEqual(annotationRect.attr("visibility"), "hidden", "annotation rect outside margin area should be not visible");
+            assert.strictEqual(annotationRect.attr("visibility"), "hidden", `rect ${i} outside margin area should be not visible`);
           }
         });
         svg.remove();
@@ -839,9 +839,9 @@ describe("BaseAxis", () => {
 
         assert.strictEqual(annotationCircles.size(), annotatedTicks.length, "same number of annotation circles as ticks");
 
-        annotationCircles.each(function() {
+        annotationCircles.each(function(d, i) {
           let annotationCircle = d3.select(this);
-          assert.notStrictEqual(annotationCircle.attr("visibility"), "hidden", "annotation circle inside margin area should be visible");
+          assert.notStrictEqual(annotationCircle.attr("visibility"), "hidden", `circle ${i} inside margin area should be visible`);
         });
         svg.remove();
       });
