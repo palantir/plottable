@@ -9,20 +9,23 @@ function run(svg, data, Plottable) {
 
   var ds = new Plottable.Dataset(data);
 
+  var customFormatter = function(d){
+    return d.toFixed(2) + " units";
+  };
+
   var xScale = new Plottable.Scales.Linear();
   var yScale = new Plottable.Scales.Linear();
-  var xAxis = new Plottable.Axes.Numeric(xScale, "bottom");
-  var yAxis = new Plottable.Axes.Numeric(yScale, "left");
+  var xAxis = new Plottable.Axes.Numeric(xScale, "bottom")
+  .formatter(customFormatter);
+  var yAxis = new Plottable.Axes.Numeric(yScale, "left")
+  .formatter(customFormatter);
 
   var plot = new Plottable.Plots.Line();
   plot.addDataset(ds);
   plot.x(function(d){ return d.y; }, xScale)
       .y(function(d){ return d.x; }, yScale);
-  if (typeof plot.autorange === "function") {
-    plot.autorange("x");
-  } else {
-    plot.autorangeMode("x");
-  }
+  plot.autorangeMode("x")
+      .autorangeSmooth(true);
 
   var table = new Plottable.Components.Table([[yAxis, plot],
                                              [null, xAxis]]);

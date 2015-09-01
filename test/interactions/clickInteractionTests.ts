@@ -1,160 +1,158 @@
 ///<reference path="../testReference.ts" />
 
 describe("Interactions", () => {
-  describe("Click", () => {
-    let SVG_WIDTH = 400;
-    let SVG_HEIGHT = 400;
+  describe("Click Interaction", () => {
+    describe("Basic Usage", () => {
+      let SVG_WIDTH = 400;
+      let SVG_HEIGHT = 400;
 
-    it("onClick", () => {
-      let svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
-      let c = new Plottable.Component();
-      c.renderTo(svg);
+      let svg: d3.Selection<void>;
+      let component: Plottable.Component;
+      let clickInteraction: Plottable.Interactions.Click;
 
-      let clickInteraction = new Plottable.Interactions.Click();
-      clickInteraction.attachTo(c);
+      beforeEach(() => {
+        svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+        component = new Plottable.Component();
+        component.renderTo(svg);
 
-      let callbackCalled = false;
-      let lastPoint: Plottable.Point;
-      let callback = function(p: Plottable.Point) {
-        callbackCalled = true;
-        lastPoint = p;
-      };
-      clickInteraction.onClick(callback);
+        clickInteraction = new Plottable.Interactions.Click();
+        clickInteraction.attachTo(component);
+      });
 
-      TestMethods.triggerFakeMouseEvent("mousedown", c.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
-      TestMethods.triggerFakeMouseEvent("mouseup", c.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
-      assert.isTrue(callbackCalled, "callback called on clicking Component (mouse)");
-      assert.deepEqual(lastPoint, { x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2 }, "was passed correct point (mouse)");
+      it("can register callback using onClick()", () => {
+        let callbackCalled = false;
+        let lastPoint: Plottable.Point;
+        let callback = function(point: Plottable.Point) {
+          callbackCalled = true;
+          lastPoint = point;
+        };
+        clickInteraction.onClick(callback);
 
-      callbackCalled = false;
-      lastPoint = null;
-      TestMethods.triggerFakeMouseEvent("mousedown", c.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
-      TestMethods.triggerFakeMouseEvent("mouseup", c.content(), SVG_WIDTH / 4, SVG_HEIGHT / 4);
-      assert.isTrue(callbackCalled, "callback called on clicking Component (mouse)");
-      assert.deepEqual(lastPoint, { x: SVG_WIDTH / 4, y: SVG_HEIGHT / 4 }, "was passed mouseup point (mouse)");
+        TestMethods.triggerFakeMouseEvent("mousedown", component.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
+        TestMethods.triggerFakeMouseEvent("mouseup", component.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
+        assert.isTrue(callbackCalled, "callback called on clicking Component without moving mouse");
+        assert.deepEqual(lastPoint, { x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2 }, "was passed correct point");
 
-      callbackCalled = false;
-      TestMethods.triggerFakeMouseEvent("mousedown", c.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
-      TestMethods.triggerFakeMouseEvent("mouseup", c.content(), SVG_WIDTH * 2, SVG_HEIGHT * 2);
-      assert.isFalse(callbackCalled, "callback not called if released outside component (mouse)");
+        callbackCalled = false;
+        lastPoint = null;
+        TestMethods.triggerFakeMouseEvent("mousedown", component.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
+        TestMethods.triggerFakeMouseEvent("mouseup", component.content(), SVG_WIDTH / 4, SVG_HEIGHT / 4);
+        assert.isTrue(callbackCalled, "callback called on clicking and releasing inside the Component");
+        assert.deepEqual(lastPoint, { x: SVG_WIDTH / 4, y: SVG_HEIGHT / 4 }, "was passed mouseup point");
 
-      TestMethods.triggerFakeMouseEvent("mousedown", c.content(), SVG_WIDTH * 2, SVG_HEIGHT * 2);
-      TestMethods.triggerFakeMouseEvent("mouseup", c.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
-      assert.isFalse(callbackCalled, "callback not called if started outside component (mouse)");
+        callbackCalled = false;
+        TestMethods.triggerFakeMouseEvent("mousedown", component.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
+        TestMethods.triggerFakeMouseEvent("mouseup", component.content(), SVG_WIDTH * 2, SVG_HEIGHT * 2);
+        assert.isFalse(callbackCalled, "callback not called if mouse is released outside Component");
 
-      TestMethods.triggerFakeMouseEvent("mousedown", c.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
-      TestMethods.triggerFakeMouseEvent("mousemove", c.content(), SVG_WIDTH * 2, SVG_HEIGHT * 2);
-      TestMethods.triggerFakeMouseEvent("mouseup", c.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
-      assert.isTrue(callbackCalled, "callback called even if moved outside component (mouse)");
+        TestMethods.triggerFakeMouseEvent("mousedown", component.content(), SVG_WIDTH * 2, SVG_HEIGHT * 2);
+        TestMethods.triggerFakeMouseEvent("mouseup", component.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
+        assert.isFalse(callbackCalled, "callback not called if click was started outside Component");
 
-      callbackCalled = false;
-      lastPoint = null;
-      TestMethods.triggerFakeTouchEvent("touchstart", c.content(), [{x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2}]);
-      TestMethods.triggerFakeTouchEvent("touchend", c.content(), [{x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2}]);
-      assert.isTrue(callbackCalled, "callback called on entering Component (touch)");
-      assert.deepEqual(lastPoint, { x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2 }, "was passed correct point (touch)");
+        TestMethods.triggerFakeMouseEvent("mousedown", component.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
+        TestMethods.triggerFakeMouseEvent("mousemove", component.content(), SVG_WIDTH * 2, SVG_HEIGHT * 2);
+        TestMethods.triggerFakeMouseEvent("mouseup", component.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
+        assert.isTrue(callbackCalled, "callback still called if the mouse is moved out then back inside the Component before releasing");
 
-      callbackCalled = false;
-      lastPoint = null;
-      TestMethods.triggerFakeTouchEvent("touchstart", c.content(), [{x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2}]);
-      TestMethods.triggerFakeTouchEvent("touchend", c.content(), [{x: SVG_WIDTH / 4, y: SVG_HEIGHT / 4}]);
-      assert.isTrue(callbackCalled, "callback called on clicking Component (mouse)");
-      assert.deepEqual(lastPoint, { x: SVG_WIDTH / 4, y: SVG_HEIGHT / 4 }, "was passed mouseup point (touch)");
+        svg.remove();
+      });
 
-      callbackCalled = false;
-      TestMethods.triggerFakeTouchEvent("touchstart", c.content(), [{x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2}]);
-      TestMethods.triggerFakeTouchEvent("touchend", c.content(), [{x: SVG_WIDTH * 2, y: SVG_HEIGHT * 2}]);
-      assert.isFalse(callbackCalled, "callback not called if released outside component (touch)");
+      it("treats touch events same as click events for callbacks registered with onClick()", () => {
+        let callbackCalled = false;
+        let lastPoint: Plottable.Point;
+        let callback = function(point: Plottable.Point) {
+          callbackCalled = true;
+          lastPoint = point;
+        };
+        clickInteraction.onClick(callback);
 
-      callbackCalled = false;
-      TestMethods.triggerFakeTouchEvent("touchstart", c.content(), [{x: SVG_WIDTH * 2, y: SVG_HEIGHT * 2}]);
-      TestMethods.triggerFakeTouchEvent("touchend", c.content(), [{x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2}]);
-      assert.isFalse(callbackCalled, "callback not called if started outside component (touch)");
+        TestMethods.triggerFakeTouchEvent("touchstart", component.content(), [{x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2}]);
+        TestMethods.triggerFakeTouchEvent("touchend", component.content(), [{x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2}]);
+        assert.isTrue(callbackCalled, "callback called on clicking Component without moving mouse");
+        assert.deepEqual(lastPoint, { x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2 }, "was passed correct point");
 
-      TestMethods.triggerFakeTouchEvent("touchstart", c.content(), [{x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2}]);
-      TestMethods.triggerFakeTouchEvent("touchmove", c.content(), [{x: SVG_WIDTH * 2, y: SVG_HEIGHT * 2}]);
-      TestMethods.triggerFakeTouchEvent("touchend", c.content(), [{x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2}]);
-      assert.isTrue(callbackCalled, "callback called even if moved outside component (touch)");
+        callbackCalled = false;
+        lastPoint = null;
+        TestMethods.triggerFakeTouchEvent("touchstart", component.content(), [{x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2}]);
+        TestMethods.triggerFakeTouchEvent("touchend", component.content(), [{x: SVG_WIDTH / 4, y: SVG_HEIGHT / 4}]);
+        assert.isTrue(callbackCalled, "callback called on clicking and releasing inside the Component");
+        assert.deepEqual(lastPoint, { x: SVG_WIDTH / 4, y: SVG_HEIGHT / 4 }, "was passed mouseup point");
 
-      svg.remove();
-    });
+        callbackCalled = false;
+        TestMethods.triggerFakeTouchEvent("touchstart", component.content(), [{x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2}]);
+        TestMethods.triggerFakeTouchEvent("touchend", component.content(), [{x: SVG_WIDTH * 2, y: SVG_HEIGHT * 2}]);
+        assert.isFalse(callbackCalled, "callback not called if released outside Component");
 
-    it("offClick()", () => {
-      let svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
-      let component = new Plottable.Component();
-      component.renderTo(svg);
-      let clickInteraction = new Plottable.Interactions.Click();
+        callbackCalled = false;
+        TestMethods.triggerFakeTouchEvent("touchstart", component.content(), [{x: SVG_WIDTH * 2, y: SVG_HEIGHT * 2}]);
+        TestMethods.triggerFakeTouchEvent("touchend", component.content(), [{x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2}]);
+        assert.isFalse(callbackCalled, "callback not called if started outside Component");
 
-      clickInteraction.attachTo(component);
+        TestMethods.triggerFakeTouchEvent("touchstart", component.content(), [{x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2}]);
+        TestMethods.triggerFakeTouchEvent("touchmove", component.content(), [{x: SVG_WIDTH * 2, y: SVG_HEIGHT * 2}]);
+        TestMethods.triggerFakeTouchEvent("touchend", component.content(), [{x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2}]);
+        assert.isTrue(callbackCalled, "callback called even if moved outside Component");
 
-      let callbackWasCalled = false;
-      let callback = () => callbackWasCalled = true;
+        svg.remove();
+      });
 
-      clickInteraction.onClick(callback);
-      TestMethods.triggerFakeMouseEvent("mousedown", component.content(), 0, 0);
-      TestMethods.triggerFakeMouseEvent("mouseup", component.content(), 0, 0);
-      assert.isTrue(callbackWasCalled, "Click interaction should trigger the callback");
+      it("can deregister callback using offClick()", () => {
+        let callbackWasCalled = false;
+        let callback = () => callbackWasCalled = true;
 
-      clickInteraction.offClick(callback);
-      callbackWasCalled = false;
-      TestMethods.triggerFakeMouseEvent("mousedown", component.content(), 0, 0);
-      TestMethods.triggerFakeMouseEvent("mouseup", component.content(), 0, 0);
-      assert.isFalse(callbackWasCalled, "Callback should be disconnected from the click interaction");
+        clickInteraction.onClick(callback);
+        TestMethods.triggerFakeMouseEvent("mousedown", component.content(), 0, 0);
+        TestMethods.triggerFakeMouseEvent("mouseup", component.content(), 0, 0);
+        assert.isTrue(callbackWasCalled, "Click interaction should trigger the callback");
 
-      svg.remove();
-    });
+        callbackWasCalled = false;
+        clickInteraction.offClick(callback);
+        TestMethods.triggerFakeMouseEvent("mousedown", component.content(), 0, 0);
+        TestMethods.triggerFakeMouseEvent("mouseup", component.content(), 0, 0);
+        assert.isFalse(callbackWasCalled, "Callback should be disconnected from the click interaction");
 
-    it("multiple click listeners", () => {
-      let svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
-      let component = new Plottable.Component();
-      component.renderTo(svg);
-      let clickInteraction = new Plottable.Interactions.Click();
+        svg.remove();
+      });
 
-      clickInteraction.attachTo(component);
+      it("can register multiple callbacks", () => {
+        clickInteraction.attachTo(component);
 
-      let callback1WasCalled = false;
-      let callback1 = () => callback1WasCalled = true;
+        let callback1WasCalled = false;
+        let callback1 = () => callback1WasCalled = true;
 
-      let callback2WasCalled = false;
-      let callback2 = () => callback2WasCalled = true;
+        let callback2WasCalled = false;
+        let callback2 = () => callback2WasCalled = true;
 
-      clickInteraction.onClick(callback1);
-      clickInteraction.onClick(callback2);
-      TestMethods.triggerFakeMouseEvent("mousedown", component.content(), 0, 0);
-      TestMethods.triggerFakeMouseEvent("mouseup", component.content(), 0, 0);
-      assert.isTrue(callback1WasCalled, "Click interaction should trigger the first callback");
-      assert.isTrue(callback2WasCalled, "Click interaction should trigger the second callback");
+        clickInteraction.onClick(callback1);
+        clickInteraction.onClick(callback2);
+        TestMethods.triggerFakeMouseEvent("mousedown", component.content(), 0, 0);
+        TestMethods.triggerFakeMouseEvent("mouseup", component.content(), 0, 0);
+        assert.isTrue(callback1WasCalled, "Click interaction should trigger the first callback");
+        assert.isTrue(callback2WasCalled, "Click interaction should trigger the second callback");
 
-      clickInteraction.offClick(callback1);
-      callback1WasCalled = false;
-      callback2WasCalled = false;
-      TestMethods.triggerFakeMouseEvent("mousedown", component.content(), 0, 0);
-      TestMethods.triggerFakeMouseEvent("mouseup", component.content(), 0, 0);
-      assert.isFalse(callback1WasCalled, "Callback1 should be disconnected from the click interaction");
-      assert.isTrue(callback2WasCalled, "Callback2 should still exist on the click interaction");
+        callback1WasCalled = false;
+        callback2WasCalled = false;
+        clickInteraction.offClick(callback1);
+        TestMethods.triggerFakeMouseEvent("mousedown", component.content(), 0, 0);
+        TestMethods.triggerFakeMouseEvent("mouseup", component.content(), 0, 0);
+        assert.isFalse(callback1WasCalled, "Callback1 should be disconnected from the click interaction");
+        assert.isTrue(callback2WasCalled, "Callback2 should still exist on the click interaction");
 
-      svg.remove();
+        svg.remove();
+      });
 
-    });
+      it("does not trigger callback when touch event is cancelled", () => {
+        let callbackCalled = false;
+        let callback = () => callbackCalled = true;
+        clickInteraction.onClick(callback);
 
-    it("cancelling touches cancels any ongoing clicks", () => {
-      let svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
-      let c = new Plottable.Component();
-      c.renderTo(svg);
+        TestMethods.triggerFakeTouchEvent("touchstart", component.content(), [{x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2}]);
+        TestMethods.triggerFakeTouchEvent("touchcancel", component.content(), [{x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2}]);
+        TestMethods.triggerFakeTouchEvent("touchend", component.content(), [{x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2}]);
+        assert.isFalse(callbackCalled, "callback not called since click was interrupted");
 
-      let clickInteraction = new Plottable.Interactions.Click();
-      clickInteraction.attachTo(c);
-
-      let callbackCalled = false;
-      let callback = () => callbackCalled = true;
-      clickInteraction.onClick(callback);
-
-      TestMethods.triggerFakeTouchEvent("touchstart", c.content(), [{x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2}]);
-      TestMethods.triggerFakeTouchEvent("touchcancel", c.content(), [{x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2}]);
-      TestMethods.triggerFakeTouchEvent("touchend", c.content(), [{x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2}]);
-      assert.isFalse(callbackCalled, "callback not called since click was interrupted");
-
-      svg.remove();
+        svg.remove();
+      });
     });
   });
 });

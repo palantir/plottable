@@ -2,8 +2,17 @@
 
 module Plottable {
 export module Plots {
+  type EdgeIntersections = {
+    left: Point[],
+    right: Point[],
+    top: Point[],
+    bottom: Point[]
+  };
+
   export class Line<X> extends XYPlot<X, number> {
     private _interpolator: string | ((points: Array<[number, number]>) => string) = "linear";
+
+    private _autorangeSmooth = false;
 
     /**
      * A Line Plot draws line segments starting from the first data point to the next.
@@ -20,6 +29,78 @@ export module Plots {
       this.animator(Plots.Animator.MAIN, animator);
       this.attr("stroke", new Scales.Color().range()[0]);
       this.attr("stroke-width", "2px");
+    }
+
+    public x(): Plots.AccessorScaleBinding<X, number>;
+    public x(x: number | Accessor<number>): Line<X>;
+    public x(x: X | Accessor<X>, xScale: Scale<X, number>): Line<X>;
+    public x(x?: number | Accessor<number> | X | Accessor<X>, xScale?: Scale<X, number>): any {
+      if (x == null) {
+        return super.x();
+      } else {
+        if (xScale == null) {
+          super.x(<number | Accessor<number>>x);
+        } else {
+          super.x(<X | Accessor<X>>x, xScale);
+        }
+        this._setScaleSnapping();
+        return this;
+      }
+    }
+
+    public y(): Plots.AccessorScaleBinding<number, number>;
+    public y(y: number | Accessor<number>): Line<X>;
+    public y(y: number | Accessor<number>, yScale: Scale<number, number>): Line<X>;
+    public y(y?: number | Accessor<number>, yScale?: Scale<number, number>): any {
+      if (y == null) {
+        return super.y();
+      } else {
+        super.y(y, yScale);
+        this._setScaleSnapping();
+        return this;
+      }
+    }
+
+    public autorangeMode(): string;
+    public autorangeMode(autorangeMode: string): Line<X>;
+    public autorangeMode(autorangeMode?: string): any {
+      if (autorangeMode == null) {
+        return super.autorangeMode();
+      }
+
+      super.autorangeMode(autorangeMode);
+      this._setScaleSnapping();
+      return this;
+    }
+
+    /**
+     * Gets whether or not the autoranging is done smoothly.
+     */
+    public autorangeSmooth(): boolean;
+    /**
+     * Sets whether or not the autorange is done smoothly.
+     *
+     * Smooth autoranging is done by making sure lines always exit on the left / right side of the plot
+     * and deactivating the nice domain feature on the scales
+     */
+    public autorangeSmooth(autorangeSmooth: boolean): Plots.Line<X>;
+    public autorangeSmooth(autorangeSmooth?: boolean): any {
+      if (autorangeSmooth == null) {
+        return this._autorangeSmooth;
+      }
+      this._autorangeSmooth = autorangeSmooth;
+      this._setScaleSnapping();
+      return this;
+    }
+
+    private _setScaleSnapping() {
+      if (this.autorangeMode() === "x" && this.x() && this.x().scale && this.x().scale instanceof QuantitativeScale) {
+        (<QuantitativeScale<X>>this.x().scale).snappingDomainEnabled(!this.autorangeSmooth());
+      }
+
+      if (this.autorangeMode() === "y" && this.y() && this.y().scale && this.y().scale instanceof QuantitativeScale) {
+        (<QuantitativeScale<number>>this.y().scale).snappingDomainEnabled(!this.autorangeSmooth());
+      }
     }
 
     /**
@@ -59,6 +140,125 @@ export module Plots {
 
     protected _createDrawer(dataset: Dataset): Drawer {
       return new Plottable.Drawers.Line(dataset);
+    }
+
+    protected _extentsForProperty(property: string) {
+      let extents = super._extentsForProperty(property);
+
+      if (!this._autorangeSmooth) {
+        return extents;
+      }
+
+      if (this.autorangeMode() !== property) {
+        return extents;
+      }
+
+      if (this.autorangeMode() !== "x" && this.autorangeMode() !== "y") {
+        return extents;
+      }
+
+      let edgeIntersectionPoints = this._getEdgeIntersectionPoints();
+      let includedValues: number[];
+      if (this.autorangeMode() === "y") {
+        includedValues = edgeIntersectionPoints.left.concat(edgeIntersectionPoints.right).map((point) => point.y);
+      } else { // === "x"
+        includedValues = edgeIntersectionPoints.top.concat(edgeIntersectionPoints.bottom).map((point) => point.x);
+      }
+
+      return extents.map((extent: [number, number]) => d3.extent(d3.merge([extent, includedValues])));
+    }
+
+    private _getEdgeIntersectionPoints(): EdgeIntersections {
+      if (!(this.y().scale instanceof QuantitativeScale && this.x().scale instanceof QuantitativeScale)) {
+        return {
+          left: [],
+          right: [],
+          top: [],
+          bottom: []
+        };
+      }
+
+      let yScale = <QuantitativeScale<number>>this.y().scale;
+      let xScale = <QuantitativeScale<any>>this.x().scale;
+
+      let intersectionPoints: EdgeIntersections = {
+        left: [],
+        right: [],
+        top: [],
+        bottom: []
+      };
+      let leftX = xScale.scale(xScale.domain()[0]);
+      let rightX = xScale.scale(xScale.domain()[1]);
+      let bottomY = yScale.scale(yScale.domain()[0]);
+      let topY = yScale.scale(yScale.domain()[1]);
+
+      this.datasets().forEach((dataset) => {
+        let data = dataset.data();
+
+        let x1: number, x2: number, y1: number, y2: number;
+        let prevX: number, prevY: number, currX: number, currY: number;
+        for (let i = 1; i < data.length; i++) {
+          prevX = currX || xScale.scale(this.x().accessor(data[i - 1], i - 1, dataset));
+          prevY = currY || yScale.scale(this.y().accessor(data[i - 1], i - 1, dataset));
+
+          currX = xScale.scale(this.x().accessor(data[i], i, dataset));
+          currY = yScale.scale(this.y().accessor(data[i], i, dataset));
+
+          // If values crossed left edge
+          if ((prevX < leftX) === (leftX <= currX)) {
+            x1 = leftX - prevX;
+            x2 = currX - prevX;
+            y2 = currY - prevY;
+            y1 = x1 * y2 / x2;
+
+            intersectionPoints.left.push({
+              x: leftX,
+              y: yScale.invert(prevY + y1)
+            });
+          }
+
+          // If values crossed right edge
+          if ((prevX < rightX) === (rightX <= currX)) {
+            x1 = rightX - prevX;
+            x2 = currX - prevX;
+            y2 = currY - prevY;
+            y1 = x1 * y2 / x2;
+
+            intersectionPoints.right.push({
+              x: rightX,
+              y: yScale.invert(prevY + y1)
+            });
+          }
+
+          // If values crossed upper edge
+          if ((prevY < topY) === (topY <= currY)) {
+            x2 = currX - prevX;
+            y1 = topY - prevY;
+            y2 = currY - prevY;
+            x1 = y1 * x2 / y2;
+
+            intersectionPoints.top.push({
+              x: xScale.invert(prevX + x1),
+              y: topY
+            });
+          }
+
+          // If values crossed lower edge
+          if ((prevY < bottomY) === (bottomY <= currY)) {
+            x2 = currX - prevX;
+            y1 = bottomY - prevY;
+            y2 = currY - prevY;
+            x1 = y1 * x2 / y2;
+
+            intersectionPoints.bottom.push({
+              x: xScale.invert(prevX + x1),
+              y: bottomY
+            });
+          }
+        };
+      });
+
+      return intersectionPoints;
     }
 
     protected _getResetYFunction() {
@@ -152,6 +352,7 @@ export module Plots {
       this.datasets().forEach((dataset) => dataToDraw.set(dataset, [dataset.data()]));
       return dataToDraw;
     }
+
   }
 }
 }
