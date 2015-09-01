@@ -380,7 +380,7 @@ describe("BaseAxis", () => {
 
           let annotationCircles = axis.content().selectAll(".annotation-circle");
 
-          assert.strictEqual(annotationCircles.size(), annotationRects.size(), "same number of annotation circles as rects");
+          assert.strictEqual(annotationCircles.size(), annotatedTicks.length, "circle for each annotated tick");
 
           annotationCircles.each(function (d, i) {
             let annotationCircle = d3.select(this);
@@ -392,7 +392,7 @@ describe("BaseAxis", () => {
 
           let annotationLines = axis.content().selectAll(".annotation-line");
 
-          assert.strictEqual(annotationLines.size(), annotationRects.size(), "same number of annotation lines as rects");
+          assert.strictEqual(annotationLines.size(), annotatedTicks.length, "line for each annotated tick");
 
           annotationLines.each(function (d, i) {
             let annotationLine = d3.select(this);
@@ -408,7 +408,7 @@ describe("BaseAxis", () => {
 
           let annotationLabelTexts = axis.content().selectAll(".annotation-label text");
 
-          assert.strictEqual(annotationLabelTexts.size(), annotationRects.size(), "same number of annotation labels as rects");
+          assert.strictEqual(annotationLabelTexts.size(), annotatedTicks.length, "label text for each annotated tick");
 
           annotationLabelTexts.each(function (d, i) {
             let annotationLabel = d3.select(this);
@@ -430,7 +430,7 @@ describe("BaseAxis", () => {
 
           let annotationCircles = axis.content().selectAll(".annotation-circle");
 
-          assert.strictEqual(annotationCircles.size(), annotationRects.size(), "same number of annotation circles as rects");
+          assert.strictEqual(annotationCircles.size(), annotatedTicks.length, "circle for each annotated tick");
 
           annotationCircles.each(function (d, i) {
             let annotationCircle = d3.select(this);
@@ -443,7 +443,7 @@ describe("BaseAxis", () => {
 
           let annotationLines = axis.content().selectAll(".annotation-line");
 
-          assert.strictEqual(annotationLines.size(), annotationRects.size(), "same number of annotation lines as rects");
+          assert.strictEqual(annotationLines.size(), annotatedTicks.length, "line for each annotated tick");
 
           annotationLines.each(function (d, i) {
             let annotationLine = d3.select(this);
@@ -461,7 +461,7 @@ describe("BaseAxis", () => {
 
           let annotationLabelTexts = axis.content().selectAll(".annotation-label text");
 
-          assert.strictEqual(annotationLabelTexts.size(), annotationRects.size(), "same number of annotation labels as rects");
+          assert.strictEqual(annotationLabelTexts.size(), annotatedTicks.length, "label text for each annotated tick");
 
           annotationLabelTexts.each(function (d, i) {
             let annotationLabel = d3.select(this);
@@ -483,7 +483,7 @@ describe("BaseAxis", () => {
 
           let annotationCircles = axis.content().selectAll(".annotation-circle");
 
-          assert.strictEqual(annotationCircles.size(), annotationRects.size(), "same number of annotation circles as rects");
+          assert.strictEqual(annotationCircles.size(), annotatedTicks.length, "circle for each annotated tick");
 
           annotationCircles.each(function (d, i) {
             let annotationCircle = d3.select(this);
@@ -496,7 +496,7 @@ describe("BaseAxis", () => {
 
           let annotationLines = axis.content().selectAll(".annotation-line");
 
-          assert.strictEqual(annotationLines.size(), annotationRects.size(), "same number of annotation lines as rects");
+          assert.strictEqual(annotationLines.size(), annotatedTicks.length, "line for each annotated tick");
 
           annotationLines.each(function (d, i) {
             let annotationLine = d3.select(this);
@@ -513,7 +513,7 @@ describe("BaseAxis", () => {
 
           let annotationLabelTexts = axis.content().selectAll(".annotation-label text");
 
-          assert.strictEqual(annotationLabelTexts.size(), annotationRects.size(), "same number of annotation labels as rects");
+          assert.strictEqual(annotationLabelTexts.size(), annotatedTicks.length, "label rect for each annotated tick");
 
           annotationLabelTexts.each(function (d, i) {
             let annotationLabel = d3.select(this);
@@ -535,7 +535,7 @@ describe("BaseAxis", () => {
 
           let annotationCircles = axis.content().selectAll(".annotation-circle");
 
-          assert.strictEqual(annotationCircles.size(), annotationRects.size(), "same number of annotation circles as rects");
+          assert.strictEqual(annotationCircles.size(), annotatedTicks.length, "circle for each annotated tick");
 
           annotationCircles.each(function (d, i) {
             let annotationCircle = d3.select(this);
@@ -547,7 +547,7 @@ describe("BaseAxis", () => {
 
           let annotationLines = axis.content().selectAll(".annotation-line");
 
-          assert.strictEqual(annotationLines.size(), annotationRects.size(), "same number of annotation lines as rects");
+          assert.strictEqual(annotationLines.size(), annotatedTicks.length, "line for each annotated tick");
 
           annotationLines.each(function (d, i) {
             let annotationLine = d3.select(this);
@@ -563,7 +563,7 @@ describe("BaseAxis", () => {
 
           let annotationLabelTexts = axis.content().selectAll(".annotation-label text");
 
-          assert.strictEqual(annotationLabelTexts.size(), annotationRects.size(), "same number of annotation labels as rects");
+          assert.strictEqual(annotationLabelTexts.size(), annotatedTicks.length, "label text for each annotated tick");
 
           annotationLabelTexts.each(function (d, i) {
             let annotationLabel = d3.select(this);
