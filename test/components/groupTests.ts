@@ -126,7 +126,7 @@ describe("ComponentGroups", () => {
   });
 
   it("components in componentGroups overlap", () => {
-    let c1 = TestMethods.makeFixedSizeComponent(10, 10);
+    let c1 = new Mocks.FixedSizeComponent(10, 10);
     let c2 = new Plottable.Component();
     let c3 = new Plottable.Component();
 
