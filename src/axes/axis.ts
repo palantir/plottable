@@ -391,6 +391,12 @@ export class Axis<D> extends Component {
     });
   }
 
+  /**
+   * Retrieves the height of the core pieces of the Axis,
+   * where height is vertical for horizontal Axes and horizontal for vertical Axes.
+   *
+   * The core pieces include the axis labels, the end tick marks, the inner tick marks, and the tick label padding.
+   */
   protected _coreAxisHeight() {
     let relevantDimension = this._isHorizontal() ? this.height() : this.width();
     let axisHeightWithoutMargin = this._isHorizontal() ? this._computedHeight : this._computedWidth;

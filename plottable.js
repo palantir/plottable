@@ -3907,6 +3907,12 @@ var Plottable;
                 return Plottable.Utils.Math.inRange(_this._scale.scale(tick), scaleRange[0], scaleRange[1]);
             });
         };
+        /**
+         * Retrieves the height of the core pieces of the Axis,
+         * where height is vertical for horizontal Axes and horizontal for vertical Axes.
+         *
+         * The core pieces include the axis labels, the end tick marks, the inner tick marks, and the tick label padding.
+         */
         Axis.prototype._coreAxisHeight = function () {
             var relevantDimension = this._isHorizontal() ? this.height() : this.width();
             var axisHeightWithoutMargin = this._isHorizontal() ? this._computedHeight : this._computedWidth;
