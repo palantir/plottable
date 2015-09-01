@@ -877,7 +877,7 @@ describe("BaseAxis", () => {
         annotatedTicks.forEach((annotatedTick) => {
           annotatedTickSet.add(annotatedTick);
         });
-        assert.strictEqual(axis.content().selectAll(".annotation-label").size(), 2, "only unique annotations rendered");
+        assert.strictEqual(axis.content().selectAll(".annotation-label").size(), annotatedTickSet.size, "only unique annotations rendered");
 
         svg.remove();
       });
