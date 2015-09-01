@@ -19,7 +19,7 @@ export class Axis<D> extends Component {
   protected _baseline: d3.Selection<void>;
   protected _scale: Scale<D, number>;
   private _formatter: Formatter;
-  private _orientation: string;
+  protected _orientation: string;
   protected _computedWidth: number;
   protected _computedHeight: number;
   private _endTickLength = 5;
