@@ -106,14 +106,14 @@ describe("Scales", () => {
       });
     });
 
-    describe("Auto Domaining", () => {
+    describe("Automatic Domaining", () => {
       let scale: Plottable.Scales.Time;
 
       beforeEach(() => {
         scale = new Plottable.Scales.Time();
       });
 
-      it("expands single value domains to [value - 1, value + 1] when auto domaining", () => {
+      it("expands single value domains to [value - 1, value + 1] when autoDomaining()-ing", () => {
         let singleValue = new Date(2000, 5, 5);
         let dayBefore = new Date(2000, 5, 4);
         let dayAfter = new Date(2000, 5, 6);
@@ -167,6 +167,14 @@ describe("Scales", () => {
         let requestedDomain2 = [new Date("2014-05-01"), new Date("2016-07-01")];
         scale.addIncludedValuesProvider(() => requestedDomain2);
         assert.strictEqual(scale.domain()[0].getTime(), minInMiddle.getTime(), "adding IncludedValuesProvider doesn't change domainMin()");
+      });
+    });
+
+    describe("Domain constraints with domainMin() and domainMax()", () => {
+      let scale: Plottable.Scales.Time;
+
+      beforeEach(() => {
+        scale = new Plottable.Scales.Time();
       });
 
       it("can force the maximum of the domain with domainMax()", () => {
