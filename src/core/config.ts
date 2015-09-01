@@ -6,5 +6,10 @@ export module Configs {
    * Specifies if Plottable should show warnings.
    */
   export var SHOW_WARNINGS = true;
+
+  /**
+   * Specifies if Plottable should add title elements.
+   */
+  export var ADD_TITLE_ELEMENTS = true;
 }
 }
