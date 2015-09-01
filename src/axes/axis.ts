@@ -265,7 +265,7 @@ export class Axis<D> extends Component {
   protected _drawAnnotations() {
     let labelPadding = Axis._ANNOTATION_LABEL_PADDING;
     let measurements = new Utils.Map<D, SVGTypewriter.Measurers.Dimensions>();
-    let annotatedTicks = this._annotatedTicksInDomain();
+    let annotatedTicks = Utils.Array.uniq(this._annotatedTicksInDomain());
     annotatedTicks.forEach((annotatedTick) => {
       let measurement = this._annotationMeasurer.measure(this.annotationFormatter()(annotatedTick));
       let paddedMeasurement = { width: measurement.width + 2 * labelPadding, height: measurement.height + 2 * labelPadding };

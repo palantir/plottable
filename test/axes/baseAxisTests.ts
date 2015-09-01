@@ -861,6 +861,26 @@ describe("BaseAxis", () => {
 
         svg.remove();
       });
+
+      it("only renders unique annotated ticks", () => {
+        let annotatedTicks = [150, 150, 200];
+        let scale = new Plottable.Scales.Linear();
+        scale.domain([100, 200]);
+        let axis = new Plottable.Axis(scale, "bottom");
+        axis.annotationsEnabled(true);
+        let svg = TestMethods.generateSVG(300, 300);
+        axis.renderTo(svg);
+
+        axis.annotatedTicks(annotatedTicks);
+
+        let annotatedTickSet = new Plottable.Utils.Set();
+        annotatedTicks.forEach((annotatedTick) => {
+          annotatedTickSet.add(annotatedTick);
+        });
+        assert.strictEqual(axis.content().selectAll(".annotation-label").size(), 2, "only unique annotations rendered");
+
+        svg.remove();
+      });
     });
   });
 });

@@ -3845,7 +3845,7 @@ var Plottable;
             var _this = this;
             var labelPadding = Axis._ANNOTATION_LABEL_PADDING;
             var measurements = new Plottable.Utils.Map();
-            var annotatedTicks = this._annotatedTicksInDomain();
+            var annotatedTicks = Plottable.Utils.Array.uniq(this._annotatedTicksInDomain());
             annotatedTicks.forEach(function (annotatedTick) {
                 var measurement = _this._annotationMeasurer.measure(_this.annotationFormatter()(annotatedTick));
                 var paddedMeasurement = { width: measurement.width + 2 * labelPadding, height: measurement.height + 2 * labelPadding };
