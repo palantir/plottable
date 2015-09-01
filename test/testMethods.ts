@@ -143,6 +143,25 @@ module TestMethods {
     return pathString.replace(/ *([A-Z]) */g, "$1").replace(/ /g, ",");
   }
 
+  /**
+   * Decomposes a normalized path-string ("d" attribute from a <path>)
+   * to an array of command-argument pairs:
+   * {
+   *   command: string;
+   *   arguments: number[];
+   * }[]
+   */
+  export function decomposePath(normalizedPathString: string) {
+    let commands = normalizedPathString.split(/[^A-Z]/).filter((s) => s !== "");
+    let argumentStrings = normalizedPathString.split(/[A-Z]/).slice(1);
+    return commands.map((command, index) => {
+      return {
+        command: command,
+        arguments: argumentStrings[index].split(",").filter((s) => s !== "").map((s) => parseFloat(s))
+      };
+    });
+  }
+
   export function numAttr(s: d3.Selection<void>, a: string) {
     return parseFloat(s.attr(a));
   }
