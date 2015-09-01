@@ -72,6 +72,7 @@
 /// <reference path="plots/stackedBarPlot.ts" />
 /// <reference path="plots/segmentPlot.ts" />
 /// <reference path="plots/waterfallPlot.ts" />
+/// <reference path="plots/wheelPlot.ts" />
 
 /// <reference path="animators/animator.ts" />
 /// <reference path="animators/nullAnimator.ts" />
@@ -93,3 +94,4 @@
 /// <reference path="components/dragBoxLayer.ts" />
 /// <reference path="components/xDragBoxLayer.ts" />
 /// <reference path="components/yDragBoxLayer.ts" />
+/// <reference path="components/dragLineLayer.ts" />

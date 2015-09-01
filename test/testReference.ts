@@ -44,6 +44,7 @@
 ///<reference path="plots/clusteredBarPlotTests.ts" />
 ///<reference path="plots/segmentPlotTests.ts" />
 ///<reference path="plots/waterfallPlotTests.ts" />
+///<reference path="plots/wheelPlotTests.ts" />
 
 ///<reference path="core/metadataTests.ts" />
 ///<reference path="core/renderControllerTests.ts" />
@@ -51,9 +52,12 @@
 ///<reference path="core/formattersTests.ts" />
 
 ///<reference path="scales/scaleTests.ts" />
+///<reference path="scales/categoryScaleTests.ts" />
 ///<reference path="scales/linearScaleTests.ts" />
+///<reference path="scales/colorScaleTests.ts" />
 ///<reference path="scales/modifiedLogScaleTests.ts" />
 ///<reference path="scales/timeScaleTests.ts" />
+///<reference path="scales/interpolatedColorScaleTests.ts" />
 ///<reference path="scales/tickGeneratorsTests.ts" />
 
 ///<reference path="utils/domUtilsTests.ts" />
@@ -83,3 +87,4 @@
 ///<reference path="components/dragBoxLayerTests.ts" />
 ///<reference path="components/xDragBoxLayerTests.ts" />
 ///<reference path="components/yDragBoxLayerTests.ts" />
+///<reference path="components/dragLineLayerTests.ts" />
