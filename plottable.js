@@ -3855,7 +3855,7 @@ var Plottable;
             var annotationToTier = this._annotationToTier(measurements);
             var hiddenAnnotations = new Plottable.Utils.Set();
             var axisHeight = this._isHorizontal() ? this.height() : this.width();
-            var axisHeightWithoutMarginAndAnnotations = this._coreAxisHeight();
+            var axisHeightWithoutMarginAndAnnotations = this._coreSize();
             var numTiers = Math.min(this.annotationTierCount(), Math.floor((axisHeight - axisHeightWithoutMarginAndAnnotations) / tierHeight));
             annotationToTier.forEach(function (tier, annotation) {
                 if (tier === -1 || tier >= numTiers) {
@@ -3959,12 +3959,11 @@ var Plottable;
             });
         };
         /**
-         * Retrieves the height of the core pieces of the Axis,
-         * where height is vertical for horizontal Axes and horizontal for vertical Axes.
+         * Retrieves the size of the core pieces.
          *
-         * The core pieces include the axis labels, the end tick marks, the inner tick marks, and the tick label padding.
+         * The core pieces include the labels, the end tick marks, the inner tick marks, and the tick label padding.
          */
-        Axis.prototype._coreAxisHeight = function () {
+        Axis.prototype._coreSize = function () {
             var relevantDimension = this._isHorizontal() ? this.height() : this.width();
             var axisHeightWithoutMargin = this._isHorizontal() ? this._computedHeight : this._computedWidth;
             return Math.min(axisHeightWithoutMargin, relevantDimension);
@@ -5073,7 +5072,7 @@ var Plottable;
                     minHeight: measureResult.usedHeight + heightRequiredByTicks
                 };
             };
-            Category.prototype._coreAxisHeight = function () {
+            Category.prototype._coreSize = function () {
                 var relevantDimension = this._isHorizontal() ? this.height() : this.width();
                 var relevantRequestedSpaceDimension = this._isHorizontal() ?
                     this.requestedSpace(this.width(), this.height()).minHeight :

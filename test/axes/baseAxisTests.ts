@@ -812,7 +812,7 @@ describe("BaseAxis", () => {
           let annotationRect = d3.select(this);
           let bbox = this.getBBox();
           let insideAnnotationArea = bbox.x >= 0 && bbox.x + bbox.width <= axis.width() &&
-                                     bbox.y >= (<any> axis)._coreAxisHeight() &&
+                                     bbox.y >= (<any> axis)._coreSize() &&
                                      bbox.y + bbox.height <= axis.height() - axis.margin();
           if (insideAnnotationArea) {
             assert.strictEqual(annotationRect.attr("visibility"), "visible", `rect ${i} inside margin area should be visible`);

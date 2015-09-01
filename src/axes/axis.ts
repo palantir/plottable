@@ -278,7 +278,7 @@ export class Axis<D> extends Component {
 
     let hiddenAnnotations = new Utils.Set<any>();
     let axisHeight = this._isHorizontal() ? this.height() : this.width();
-    let axisHeightWithoutMarginAndAnnotations = this._coreAxisHeight();
+    let axisHeightWithoutMarginAndAnnotations = this._coreSize();
     let numTiers = Math.min(this.annotationTierCount(), Math.floor((axisHeight - axisHeightWithoutMarginAndAnnotations) / tierHeight));
     annotationToTier.forEach((tier, annotation) => {
       if (tier === -1 || tier >= numTiers) {
@@ -392,12 +392,11 @@ export class Axis<D> extends Component {
   }
 
   /**
-   * Retrieves the height of the core pieces of the Axis,
-   * where height is vertical for horizontal Axes and horizontal for vertical Axes.
+   * Retrieves the size of the core pieces.
    *
-   * The core pieces include the axis labels, the end tick marks, the inner tick marks, and the tick label padding.
+   * The core pieces include the labels, the end tick marks, the inner tick marks, and the tick label padding.
    */
-  protected _coreAxisHeight() {
+  protected _coreSize() {
     let relevantDimension = this._isHorizontal() ? this.height() : this.width();
     let axisHeightWithoutMargin = this._isHorizontal() ? this._computedHeight : this._computedWidth;
     return Math.min(axisHeightWithoutMargin, relevantDimension);

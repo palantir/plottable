@@ -1757,12 +1757,11 @@ declare module Plottable {
         annotationTierCount(annotationTierCount: number): Axis<D>;
         protected _drawAnnotations(): void;
         /**
-         * Retrieves the height of the core pieces of the Axis,
-         * where height is vertical for horizontal Axes and horizontal for vertical Axes.
+         * Retrieves the size of the core pieces.
          *
-         * The core pieces include the axis labels, the end tick marks, the inner tick marks, and the tick label padding.
+         * The core pieces include the labels, the end tick marks, the inner tick marks, and the tick label padding.
          */
-        protected _coreAxisHeight(): number;
+        protected _coreSize(): number;
         protected _annotationTierHeight(): number;
         protected _removeAnnotations(): void;
         protected _generateBaselineAttrHash(): {
@@ -2026,7 +2025,7 @@ declare module Plottable {
             protected _setup(): void;
             protected _rescale(): Component;
             requestedSpace(offeredWidth: number, offeredHeight: number): SpaceRequest;
-            protected _coreAxisHeight(): number;
+            protected _coreSize(): number;
             protected _getTickValues(): string[];
             /**
              * Gets the tick label angle in degrees.
