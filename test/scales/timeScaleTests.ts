@@ -106,14 +106,9 @@ describe("Scales", () => {
       });
     });
 
-    describe("Automatic Domaining", () => {
-      let scale: Plottable.Scales.Time;
-
-      beforeEach(() => {
-        scale = new Plottable.Scales.Time();
-      });
-
-      it("expands single value domains to [value - 1, value + 1] when autoDomaining()-ing", () => {
+    describe("Automatic Domain Calculation", () => {
+      it("expands single value domains to [value - 1, value + 1] when autoDomain()-ing", () => {
+        let scale = new Plottable.Scales.Time();
         let singleValue = new Date(2000, 5, 5);
         let dayBefore = new Date(2000, 5, 4);
         let dayAfter = new Date(2000, 5, 6);
@@ -123,6 +118,14 @@ describe("Scales", () => {
         assert.strictEqual(domain[0].getTime(), dayBefore.getTime(), "left side of domain was expaded by one day");
         assert.strictEqual(domain[1].getTime(), dayAfter.getTime(), "right side of domain was expaded by one day");
       });
+    });
+
+    describe("Domain constraints with domainMin() and domainMax()", () => {
+      let scale: Plottable.Scales.Time;
+
+      beforeEach(() => {
+        scale = new Plottable.Scales.Time();
+      });
 
       it("can force the minimum of the domain with domainMin()", () => {
         scale.padProportion(0);
@@ -131,7 +134,7 @@ describe("Scales", () => {
 
         let minBelowBottom = new Date("2015-04-01");
         assert.strictEqual(scale.domainMin(minBelowBottom), scale, "the scale is returned by the setter");
-        assert.strictEqual(scale.domainMin().getTime(), minBelowBottom.getTime(), "can get domainMin");
+        assert.strictEqual(scale.domainMin().getTime(), minBelowBottom.getTime(), "can get domainMin()");
         assert.strictEqual(scale.domain()[0].getTime(), minBelowBottom.getTime(), "lower end of domain was set by domainMin()");
 
         let minInMiddle = new Date("2015-06-01");
@@ -153,7 +156,7 @@ describe("Scales", () => {
         assert.strictEqual(domain[1].getTime(), nextDay.getTime(), "upper end is set one day later");
       });
 
-      it("does not change domainMin after adding more included values providers", () => {
+      it("does not change domainMin() after adding more included values providers", () => {
         scale.padProportion(0);
         let requestedDomain = [new Date("2015-05-01"), new Date("2015-07-01")];
         scale.addIncludedValuesProvider(() => requestedDomain);
@@ -168,14 +171,6 @@ describe("Scales", () => {
         scale.addIncludedValuesProvider(() => requestedDomain2);
         assert.strictEqual(scale.domain()[0].getTime(), minInMiddle.getTime(), "adding IncludedValuesProvider doesn't change domainMin()");
       });
-    });
-
-    describe("Domain constraints with domainMin() and domainMax()", () => {
-      let scale: Plottable.Scales.Time;
-
-      beforeEach(() => {
-        scale = new Plottable.Scales.Time();
-      });
 
       it("can force the maximum of the domain with domainMax()", () => {
         scale.padProportion(0);
@@ -184,7 +179,7 @@ describe("Scales", () => {
 
         let maxAboveTop = new Date("2015-08-01");
         assert.strictEqual(scale.domainMax(maxAboveTop), scale, "the scale is returned by the setter");
-        assert.strictEqual(scale.domainMax().getTime(), maxAboveTop.getTime(), "can get domainMax");
+        assert.strictEqual(scale.domainMax().getTime(), maxAboveTop.getTime(), "can get domainMax()");
         assert.strictEqual(scale.domain()[1].getTime(), maxAboveTop.getTime(), "upper end of domain was set by domainMax()");
 
         let maxInMiddle = new Date("2015-06-01");
@@ -206,7 +201,7 @@ describe("Scales", () => {
         assert.strictEqual(domain[0].getTime(), dayBefore.getTime(), "lower end is set one day before");
       });
 
-      it("does not change domainMax after adding more included values providers", () => {
+      it("does not change domainMax() after adding more included values providers", () => {
         scale.padProportion(0);
         let requestedDomain = [new Date("2015-05-01"), new Date("2015-07-01")];
         scale.addIncludedValuesProvider(() => requestedDomain);
