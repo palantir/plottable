@@ -5432,7 +5432,6 @@ var Plottable;
                 var _this = this;
                 _super.call(this);
                 this._padding = 5;
-                this._numSwatches = 10;
                 if (interpolatedColorScale == null) {
                     throw new Error("InterpolatedColorLegend requires a interpolatedColorScale");
                 }
@@ -5441,6 +5440,7 @@ var Plottable;
                 this._scale.onUpdate(this._redrawCallback);
                 this._formatter = Plottable.Formatters.general();
                 this._orientation = "horizontal";
+                this._expands = false;
                 this.addClass("legend");
                 this.addClass("interpolated-color-legend");
             }
@@ -5453,6 +5453,14 @@ var Plottable;
                     return this._formatter;
                 }
                 this._formatter = formatter;
+                this.redraw();
+                return this;
+            };
+            InterpolatedColorLegend.prototype.expands = function (expands) {
+                if (expands == null) {
+                    return this._expands;
+                }
+                this._expands = expands;
                 this.redraw();
                 return this;
             };
@@ -5476,16 +5484,17 @@ var Plottable;
                 }
             };
             InterpolatedColorLegend.prototype.fixedWidth = function () {
-                return true;
+                return !this.expands() || this._isVertical();
             };
             InterpolatedColorLegend.prototype.fixedHeight = function () {
-                return true;
+                return !this.expands() || !this._isVertical();
             };
-            InterpolatedColorLegend.prototype._generateTicks = function () {
+            InterpolatedColorLegend.prototype._generateTicks = function (numSwatches) {
+                if (numSwatches === void 0) { numSwatches = InterpolatedColorLegend._DEFAULT_NUM_SWATCHES; }
                 var domain = this._scale.domain();
-                var slope = (domain[1] - domain[0]) / this._numSwatches;
+                var slope = (domain[1] - domain[0]) / (numSwatches - 1);
                 var ticks = [];
-                for (var i = 0; i <= this._numSwatches; i++) {
+                for (var i = 0; i < numSwatches; i++) {
                     ticks.push(domain[0] + slope * i);
                 }
                 return ticks;
@@ -5503,12 +5512,11 @@ var Plottable;
             InterpolatedColorLegend.prototype.requestedSpace = function (offeredWidth, offeredHeight) {
                 var _this = this;
                 var textHeight = this._measurer.measure().height;
-                var ticks = this._generateTicks();
-                var numSwatches = ticks.length;
                 var domain = this._scale.domain();
                 var labelWidths = domain.map(function (d) { return _this._measurer.measure(_this._formatter(d)).width; });
                 var desiredHeight;
                 var desiredWidth;
+                var numSwatches = InterpolatedColorLegend._DEFAULT_NUM_SWATCHES;
                 if (this._isVertical()) {
                     var longestWidth = Plottable.Utils.Math.max(labelWidths, 0);
                     desiredWidth = this._padding + textHeight + this._padding + longestWidth + this._padding;
@@ -5536,8 +5544,6 @@ var Plottable;
                 var text0Width = this._measurer.measure(text0).width;
                 var text1 = this._formatter(domain[1]);
                 var text1Width = this._measurer.measure(text1).width;
-                var ticks = this._generateTicks();
-                var numSwatches = ticks.length;
                 var padding = this._padding;
                 var upperLabelShift = { x: 0, y: 0 };
                 var lowerLabelShift = { x: 0, y: 0 };
@@ -5563,6 +5569,13 @@ var Plottable;
                     width: 0,
                     height: 0
                 };
+                var numSwatches = InterpolatedColorLegend._DEFAULT_NUM_SWATCHES;
+                var textHeight = this._measurer.measure().height;
+                if (this.expands() && textHeight > 0) {
+                    var offset = this._isVertical() ? 2 * padding : 4 * padding - text0Width - text1Width;
+                    var fullLength = this._isVertical() ? this.height() : this.width();
+                    numSwatches = Math.max(Math.floor((fullLength - offset) / textHeight), numSwatches);
+                }
                 if (this._isVertical()) {
                     var longestTextWidth = Math.max(text0Width, text1Width);
                     swatchWidth = Math.max((this.width() - 3 * padding - longestTextWidth), 0);
@@ -5611,6 +5624,7 @@ var Plottable;
                 var lowerTranslateString = "translate(" + lowerLabelShift.x + ", " + lowerLabelShift.y + ")";
                 this._lowerLabel.attr("transform", lowerTranslateString);
                 this._swatchBoundingBox.attr(boundingBoxAttr);
+                var ticks = this._generateTicks(numSwatches);
                 var swatches = this._swatchContainer.selectAll("rect.swatch").data(ticks);
                 swatches.enter().append("rect").classed("swatch", true);
                 swatches.exit().remove();
@@ -5623,6 +5637,7 @@ var Plottable;
                 });
                 return this;
             };
+            InterpolatedColorLegend._DEFAULT_NUM_SWATCHES = 11;
             /**
              * The css class applied to the legend labels.
              */
