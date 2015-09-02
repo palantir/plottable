@@ -3845,7 +3845,7 @@ var Plottable;
             var _this = this;
             var labelPadding = Axis._ANNOTATION_LABEL_PADDING;
             var measurements = new Plottable.Utils.Map();
-            var annotatedTicks = Plottable.Utils.Array.uniq(this._annotatedTicksInDomain());
+            var annotatedTicks = this._annotatedTicksToRender();
             annotatedTicks.forEach(function (annotatedTick) {
                 var measurement = _this._annotationMeasurer.measure(_this.annotationFormatter()(annotatedTick));
                 var paddedMeasurement = { width: measurement.width + 2 * labelPadding, height: measurement.height + 2 * labelPadding };
@@ -3948,15 +3948,15 @@ var Plottable;
                 annotationWriter.write(annotationFormatter(annotationLabel), isHorizontal ? measurements.get(annotationLabel).width : measurements.get(annotationLabel).height, isHorizontal ? measurements.get(annotationLabel).height : measurements.get(annotationLabel).width, writeOptions);
             });
         };
-        Axis.prototype._annotatedTicksInDomain = function () {
+        Axis.prototype._annotatedTicksToRender = function () {
             var _this = this;
             var scaleRange = this._scale.range();
-            return this.annotatedTicks().filter(function (tick) {
+            return Plottable.Utils.Array.uniq(this.annotatedTicks().filter(function (tick) {
                 if (tick == null) {
                     return false;
                 }
                 return Plottable.Utils.Math.inRange(_this._scale.scale(tick), scaleRange[0], scaleRange[1]);
-            });
+            }));
         };
         /**
          * Retrieves the size of the core pieces.
@@ -3976,7 +3976,7 @@ var Plottable;
             var annotationTiers = [[]];
             var annotationToTier = new Plottable.Utils.Map();
             var dimension = this._isHorizontal() ? this.width() : this.height();
-            this._annotatedTicksInDomain().forEach(function (annotatedTick) {
+            this._annotatedTicksToRender().forEach(function (annotatedTick) {
                 var position = _this._scale.scale(annotatedTick);
                 var length = measurements.get(annotatedTick).width;
                 if (position < 0 || position + length > dimension) {

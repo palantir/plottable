@@ -265,7 +265,7 @@ export class Axis<D> extends Component {
   protected _drawAnnotations() {
     let labelPadding = Axis._ANNOTATION_LABEL_PADDING;
     let measurements = new Utils.Map<D, SVGTypewriter.Measurers.Dimensions>();
-    let annotatedTicks = Utils.Array.uniq(this._annotatedTicksInDomain());
+    let annotatedTicks = this._annotatedTicksToRender();
     annotatedTicks.forEach((annotatedTick) => {
       let measurement = this._annotationMeasurer.measure(this.annotationFormatter()(annotatedTick));
       let paddedMeasurement = { width: measurement.width + 2 * labelPadding, height: measurement.height + 2 * labelPadding };
@@ -381,14 +381,14 @@ export class Axis<D> extends Component {
       });
   }
 
-  private _annotatedTicksInDomain() {
+  private _annotatedTicksToRender() {
     let scaleRange = this._scale.range();
-    return this.annotatedTicks().filter((tick) => {
+    return Utils.Array.uniq(this.annotatedTicks().filter((tick) => {
       if (tick == null) {
         return false;
       }
       return Utils.Math.inRange(this._scale.scale(tick), scaleRange[0], scaleRange[1]);
-    });
+    }));
   }
 
   /**
@@ -410,7 +410,7 @@ export class Axis<D> extends Component {
     let annotationTiers: D[][] = [[]];
     let annotationToTier = new Utils.Map<D, number>();
     let dimension = this._isHorizontal() ? this.width() : this.height();
-    this._annotatedTicksInDomain().forEach((annotatedTick) => {
+    this._annotatedTicksToRender().forEach((annotatedTick) => {
       let position = this._scale.scale(annotatedTick);
       let length = measurements.get(annotatedTick).width;
       if (position < 0 || position + length > dimension) {
