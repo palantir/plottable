@@ -51,7 +51,7 @@ describe("Plots", () => {
       barPlot.y((d) => d.y, yScale);
       barPlot.renderTo(svg);
 
-      let positiveBar =  barPlot.entities()[0];
+      let positiveBar = barPlot.entities()[0];
       let negativeBar = barPlot.entities()[1];
       let baselineBar = barPlot.entities()[2];
 
@@ -96,7 +96,7 @@ describe("Plots", () => {
       barPlot.y((d) => d.y, yScale);
       barPlot.renderTo(svg);
 
-      let positiveBar =  barPlot.entities()[0];
+      let positiveBar = barPlot.entities()[0];
       let negativeBar = barPlot.entities()[1];
       let baselineBar = barPlot.entities()[2];
 
