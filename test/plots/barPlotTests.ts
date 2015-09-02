@@ -32,6 +32,80 @@ describe("Plots", () => {
       assert.strictEqual(horizontalPlot.orientation(), "horizontal", "horizontal Plots.Bar()");
     });
 
+    it("gets the nearest Entity when any part of the bar is visible (vertical)", () => {
+      let SVG_WIDTH = 600;
+      let SVG_HEIGHT = 400;
+      let svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+      let xScale = new Plottable.Scales.Category();
+      let yScale = new Plottable.Scales.Linear();
+      let data = [
+        {x: "A", y: 3},
+        {x: "B", y: -3}
+      ];
+      let dataset = new Plottable.Dataset(data);
+      let barPlot = new Plottable.Plots.Bar<string, number>();
+      barPlot.addDataset(dataset);
+      yScale.domain([-2, 2]);
+      barPlot.x((d) => d.x, xScale);
+      barPlot.y((d) => d.y, yScale);
+      barPlot.renderTo(svg);
+
+      let positiveBar =  barPlot.entities()[0];
+      let negativeBar = barPlot.entities()[1];
+
+      let pointLeft = {
+        x: xScale.scale("A"),
+        y: yScale.scale(0)
+      };
+      let pointRight = {
+        x: xScale.scale("B"),
+        y: yScale.scale(0)
+      };
+
+      TestMethods.assertEntitiesEqual(barPlot.entityNearest(pointLeft), positiveBar,
+        "EntityNearest considers vertical bars that extend off the top of a plot");
+      TestMethods.assertEntitiesEqual(barPlot.entityNearest(pointRight), negativeBar,
+        "EntityNearest considers vertical bars that extend off the bottom of a plot");
+
+    });
+
+    it("gets the nearest Entity when any part of the bar is visible (horizontal)", () => {
+      let SVG_WIDTH = 600;
+      let SVG_HEIGHT = 400;
+      let svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+      let xScale = new Plottable.Scales.Linear();
+      let yScale = new Plottable.Scales.Category();
+      let data = [
+        {x: 3, y: "A"},
+        {x: -3, y: "B"}
+      ];
+      let dataset = new Plottable.Dataset(data);
+      let barPlot = new Plottable.Plots.Bar<number, string>("horizontal");
+      barPlot.addDataset(dataset);
+      xScale.domain([-2, 2]);
+      barPlot.x((d) => d.x, xScale);
+      barPlot.y((d) => d.y, yScale);
+      barPlot.renderTo(svg);
+
+      let positiveBar =  barPlot.entities()[0];
+      let negativeBar = barPlot.entities()[1];
+
+      let pointTop= {
+        x: xScale.scale(0),
+        y: yScale.scale("A")
+      };
+      let pointBottom = {
+        x: xScale.scale(0),
+        y: yScale.scale("B")
+      };
+
+      TestMethods.assertEntitiesEqual(barPlot.entityNearest(pointTop), positiveBar,
+        "EntityNearest considers horizontal bars that extend off the right of a plot");
+      TestMethods.assertEntitiesEqual(barPlot.entityNearest(pointBottom), negativeBar,
+        "EntityNearest considers horizontal bars that extend off the left of a plot");
+
+    });
+
     describe("Vertical Bar Plot", () => {
       let svg: d3.Selection<void>;
       let dataset: Plottable.Dataset;
