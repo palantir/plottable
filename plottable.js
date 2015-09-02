@@ -900,7 +900,7 @@ var Plottable;
          */
         Configs.SHOW_WARNINGS = true;
         /**
-         * Specifies if Plottable should add title elements.
+         * Specifies if Plottable should add <title> elements to text.
          */
         Configs.ADD_TITLE_ELEMENTS = true;
     })(Configs = Plottable.Configs || (Plottable.Configs = {}));

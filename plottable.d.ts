@@ -376,7 +376,7 @@ declare module Plottable {
          */
         var SHOW_WARNINGS: boolean;
         /**
-         * Specifies if Plottable should add title elements.
+         * Specifies if Plottable should add <title> elements to text.
          */
         var ADD_TITLE_ELEMENTS: boolean;
     }
