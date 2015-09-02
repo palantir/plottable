@@ -881,6 +881,27 @@ describe("BaseAxis", () => {
 
         svg.remove();
       });
+
+      it("renders a duplicate tick in the first tier it can fit in", () => {
+        let annotatedTicks = [150, 150];
+        let scale = new Plottable.Scales.Linear();
+        scale.domain([100, 200]);
+        let axis = new Plottable.Axis(scale, "bottom");
+        axis.annotationsEnabled(true);
+        let svg = TestMethods.generateSVG(300, 300);
+        axis.renderTo(svg);
+
+        axis.annotatedTicks(annotatedTicks);
+
+        let annotationRects = axis.content().selectAll(".annotation-rect");
+        assert.strictEqual(annotationRects.size(), 1, "only one annotation rendered");
+
+        let annotationRect = d3.select(annotationRects[0][0]);
+        assert.closeTo(TestMethods.numAttr(annotationRect, "y") + TestMethods.numAttr(annotationRect, "height"),
+          axis.height() - axis.margin(), window.Pixel_CloseTo_Requirement, "rectangle positioned correctly");
+
+        svg.remove();
+      });
     });
   });
 });
