@@ -1688,6 +1688,22 @@ declare module Plottable {
          * The css class applied to each tick label (the text associated with the tick).
          */
         static TICK_LABEL_CLASS: string;
+        /**
+         * The css class applied to each annotation line, which extends from the axis to the rect.
+         */
+        static ANNOTATION_LINE_CLASS: string;
+        /**
+         * The css class applied to each annotation rect, which surrounds the annotation label.
+         */
+        static ANNOTATION_RECT_CLASS: string;
+        /**
+         * The css class applied to each annotation circle, which denotes which tick is being annotated.
+         */
+        static ANNOTATION_CIRCLE_CLASS: string;
+        /**
+         * The css class applied to each annotation label, which shows the formatted annotation text.
+         */
+        static ANNOTATION_LABEL_CLASS: string;
         protected _tickMarkContainer: d3.Selection<void>;
         protected _tickLabelContainer: d3.Selection<void>;
         protected _baseline: d3.Selection<void>;

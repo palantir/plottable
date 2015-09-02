@@ -280,12 +280,13 @@ describe("BaseAxis", () => {
           let svg = TestMethods.generateSVG(300, 300);
           axis.renderTo(svg);
 
-          assert.strictEqual(axis.content().selectAll(".annotation-label").size(), annotatedTicks.length, "annotations have rendered");
+          assert.strictEqual(axis.content().selectAll(`.${Plottable.Axis.ANNOTATION_LABEL_CLASS}`).size(),
+            annotatedTicks.length, "annotations have rendered");
 
           let bazFormatter = (d: any) => d + "baz";
           axis.annotationFormatter(bazFormatter);
 
-          let annotationLabels = axis.content().selectAll(".annotation-label");
+          let annotationLabels = axis.content().selectAll(`.${Plottable.Axis.ANNOTATION_LABEL_CLASS}`);
           assert.strictEqual(annotationLabels.size(), annotatedTicks.length, "annotations have rendered");
 
           annotationLabels.each(function(d, i) {
@@ -304,11 +305,13 @@ describe("BaseAxis", () => {
           let svg = TestMethods.generateSVG(300, 300);
           axis.renderTo(svg);
 
-          assert.strictEqual(axis.content().selectAll(".annotation-label").size(), 0, "no annotations by default");
+          assert.strictEqual(axis.content().selectAll(`.${Plottable.Axis.ANNOTATION_LABEL_CLASS}`).size(),
+            0, "no annotations by default");
 
           axis.annotationsEnabled(true);
 
-          assert.strictEqual(axis.content().selectAll(".annotation-label").size(), annotatedTicks.length, "no annotations by default");
+          assert.strictEqual(axis.content().selectAll(`.${Plottable.Axis.ANNOTATION_LABEL_CLASS}`).size(),
+            annotatedTicks.length, "no annotations by default");
 
           svg.remove();
         });
@@ -323,11 +326,13 @@ describe("BaseAxis", () => {
           let svg = TestMethods.generateSVG(300, 300);
           axis.renderTo(svg);
 
-          assert.strictEqual(axis.content().selectAll(".annotation-label").size(), annotatedTicks.length, "no annotations by default");
+          assert.strictEqual(axis.content().selectAll(`.${Plottable.Axis.ANNOTATION_LABEL_CLASS}`).size(),
+            annotatedTicks.length, "no annotations by default");
 
           axis.annotationsEnabled(false);
 
-          assert.strictEqual(axis.content().selectAll(".annotation-label").size(), 0, "no annotations by default");
+          assert.strictEqual(axis.content().selectAll(`.${Plottable.Axis.ANNOTATION_LABEL_CLASS}`).size(),
+            0, "no annotations by default");
 
           svg.remove();
         });
@@ -341,14 +346,16 @@ describe("BaseAxis", () => {
           let svg = TestMethods.generateSVG(300, 300);
           axis.renderTo(svg);
 
-          assert.strictEqual(axis.content().selectAll(".annotation-label").size(), 0, "no annotations by default");
+          assert.strictEqual(axis.content().selectAll(`.${Plottable.Axis.ANNOTATION_LABEL_CLASS}`).size(),
+            0, "no annotations by default");
 
           axis.annotatedTicks(annotatedTicks);
 
-          assert.strictEqual(axis.content().selectAll(".annotation-label").size(), annotatedTicks.length, "annotated ticks annotated");
+          assert.strictEqual(axis.content().selectAll(`.${Plottable.Axis.ANNOTATION_LABEL_CLASS}`).size(),
+            annotatedTicks.length, "annotated ticks annotated");
 
           let annotationFormatter = axis.annotationFormatter();
-          let annotationLabels = axis.content().selectAll(".annotation-label");
+          let annotationLabels = axis.content().selectAll(`.${Plottable.Axis.ANNOTATION_LABEL_CLASS}`);
           annotationLabels.each(function(d, i) {
             let d3this = d3.select(this);
             assert.strictEqual(d3this.text(), annotationFormatter(annotatedTicks[i]), `annotated tick ${i} has been formatted`);
@@ -376,9 +383,9 @@ describe("BaseAxis", () => {
           let svg = TestMethods.generateSVG(300, 300);
           axis.renderTo(svg);
 
-          let annotationRects = axis.content().selectAll(".annotation-rect");
+          let annotationRects = axis.content().selectAll(`.${Plottable.Axis.ANNOTATION_RECT_CLASS}`);
 
-          let annotationCircles = axis.content().selectAll(".annotation-circle");
+          let annotationCircles = axis.content().selectAll(`.${Plottable.Axis.ANNOTATION_CIRCLE_CLASS}`);
 
           assert.strictEqual(annotationCircles.size(), annotatedTicks.length, "circle for each annotated tick");
 
@@ -390,7 +397,7 @@ describe("BaseAxis", () => {
             assert.closeTo(TestMethods.numAttr(annotationCircle, "cy"), 0, window.Pixel_CloseTo_Requirement, `circle ${i} at the top`);
           });
 
-          let annotationLines = axis.content().selectAll(".annotation-line");
+          let annotationLines = axis.content().selectAll(`.${Plottable.Axis.ANNOTATION_LINE_CLASS}`);
 
           assert.strictEqual(annotationLines.size(), annotatedTicks.length, "line for each annotated tick");
 
@@ -406,7 +413,7 @@ describe("BaseAxis", () => {
               TestMethods.numAttr(correspondingRect, "y"), window.Pixel_CloseTo_Requirement, `line ${i} goes to the rect`);
           });
 
-          let annotationLabelTexts = axis.content().selectAll(".annotation-label text");
+          let annotationLabelTexts = axis.content().selectAll(`.${Plottable.Axis.ANNOTATION_LABEL_CLASS} text`);
 
           assert.strictEqual(annotationLabelTexts.size(), annotatedTicks.length, "label text for each annotated tick");
 
@@ -426,9 +433,9 @@ describe("BaseAxis", () => {
           let svg = TestMethods.generateSVG(300, 300);
           axis.renderTo(svg);
 
-          let annotationRects = axis.content().selectAll(".annotation-rect");
+          let annotationRects = axis.content().selectAll(`.${Plottable.Axis.ANNOTATION_RECT_CLASS}`);
 
-          let annotationCircles = axis.content().selectAll(".annotation-circle");
+          let annotationCircles = axis.content().selectAll(`.${Plottable.Axis.ANNOTATION_CIRCLE_CLASS}`);
 
           assert.strictEqual(annotationCircles.size(), annotatedTicks.length, "circle for each annotated tick");
 
@@ -441,7 +448,7 @@ describe("BaseAxis", () => {
               window.Pixel_CloseTo_Requirement, `circle ${i} at the bottom`);
           });
 
-          let annotationLines = axis.content().selectAll(".annotation-line");
+          let annotationLines = axis.content().selectAll(`.${Plottable.Axis.ANNOTATION_LINE_CLASS}`);
 
           assert.strictEqual(annotationLines.size(), annotatedTicks.length, "line for each annotated tick");
 
@@ -459,7 +466,7 @@ describe("BaseAxis", () => {
               window.Pixel_CloseTo_Requirement, `line ${i} goes to the rect`);
           });
 
-          let annotationLabelTexts = axis.content().selectAll(".annotation-label text");
+          let annotationLabelTexts = axis.content().selectAll(`.${Plottable.Axis.ANNOTATION_LABEL_CLASS} text`);
 
           assert.strictEqual(annotationLabelTexts.size(), annotatedTicks.length, "label text for each annotated tick");
 
@@ -479,9 +486,9 @@ describe("BaseAxis", () => {
           let svg = TestMethods.generateSVG(300, 300);
           axis.renderTo(svg);
 
-          let annotationRects = axis.content().selectAll(".annotation-rect");
+          let annotationRects = axis.content().selectAll(`.${Plottable.Axis.ANNOTATION_RECT_CLASS}`);
 
-          let annotationCircles = axis.content().selectAll(".annotation-circle");
+          let annotationCircles = axis.content().selectAll(`.${Plottable.Axis.ANNOTATION_CIRCLE_CLASS}`);
 
           assert.strictEqual(annotationCircles.size(), annotatedTicks.length, "circle for each annotated tick");
 
@@ -494,7 +501,7 @@ describe("BaseAxis", () => {
               TestMethods.numAttr(correspondingRect, "y"), window.Pixel_CloseTo_Requirement, `circle ${i} at tick scaled y position`);
           });
 
-          let annotationLines = axis.content().selectAll(".annotation-line");
+          let annotationLines = axis.content().selectAll(`.${Plottable.Axis.ANNOTATION_LINE_CLASS}`);
 
           assert.strictEqual(annotationLines.size(), annotatedTicks.length, "line for each annotated tick");
 
@@ -511,7 +518,7 @@ describe("BaseAxis", () => {
               TestMethods.numAttr(correspondingRect, "y"), window.Pixel_CloseTo_Requirement, `line ${i} at tick scaled y position`);
           });
 
-          let annotationLabelTexts = axis.content().selectAll(".annotation-label text");
+          let annotationLabelTexts = axis.content().selectAll(`.${Plottable.Axis.ANNOTATION_LABEL_CLASS} text`);
 
           assert.strictEqual(annotationLabelTexts.size(), annotatedTicks.length, "label rect for each annotated tick");
 
@@ -531,9 +538,9 @@ describe("BaseAxis", () => {
           let svg = TestMethods.generateSVG(300, 300);
           axis.renderTo(svg);
 
-          let annotationRects = axis.content().selectAll(".annotation-rect");
+          let annotationRects = axis.content().selectAll(`.${Plottable.Axis.ANNOTATION_RECT_CLASS}`);
 
-          let annotationCircles = axis.content().selectAll(".annotation-circle");
+          let annotationCircles = axis.content().selectAll(`.${Plottable.Axis.ANNOTATION_CIRCLE_CLASS}`);
 
           assert.strictEqual(annotationCircles.size(), annotatedTicks.length, "circle for each annotated tick");
 
@@ -545,7 +552,7 @@ describe("BaseAxis", () => {
               TestMethods.numAttr(correspondingRect, "y"), window.Pixel_CloseTo_Requirement, `circle ${i} at tick scaled y position`);
           });
 
-          let annotationLines = axis.content().selectAll(".annotation-line");
+          let annotationLines = axis.content().selectAll(`.${Plottable.Axis.ANNOTATION_LINE_CLASS}`);
 
           assert.strictEqual(annotationLines.size(), annotatedTicks.length, "line for each annotated tick");
 
@@ -561,7 +568,7 @@ describe("BaseAxis", () => {
               TestMethods.numAttr(correspondingRect, "y"), window.Pixel_CloseTo_Requirement, `line ${i} at tick scaled y position`);
           });
 
-          let annotationLabelTexts = axis.content().selectAll(".annotation-label text");
+          let annotationLabelTexts = axis.content().selectAll(`.${Plottable.Axis.ANNOTATION_LABEL_CLASS} text`);
 
           assert.strictEqual(annotationLabelTexts.size(), annotatedTicks.length, "label text for each annotated tick");
 
@@ -593,7 +600,7 @@ describe("BaseAxis", () => {
             let svg = TestMethods.generateSVG(300, 300);
             axis.renderTo(svg);
 
-            let annotationRects = axis.content().selectAll(".annotation-rect");
+            let annotationRects = axis.content().selectAll(`.${Plottable.Axis.ANNOTATION_RECT_CLASS}`);
 
             assert.strictEqual(annotationRects.size(), annotatedTicks.length, "same number of annotation rects as ticks");
 
@@ -613,7 +620,7 @@ describe("BaseAxis", () => {
             let svg = TestMethods.generateSVG(300, 300);
             axis.renderTo(svg);
 
-            let annotationRects = axis.content().selectAll(".annotation-rect");
+            let annotationRects = axis.content().selectAll(`.${Plottable.Axis.ANNOTATION_RECT_CLASS}`);
 
             assert.strictEqual(annotationRects.size(), annotatedTicks.length, "same number of annotation rects as ticks");
 
@@ -633,7 +640,7 @@ describe("BaseAxis", () => {
             let svg = TestMethods.generateSVG(300, 300);
             axis.renderTo(svg);
 
-            let annotationRects = axis.content().selectAll(".annotation-rect");
+            let annotationRects = axis.content().selectAll(`.${Plottable.Axis.ANNOTATION_RECT_CLASS}`);
 
             assert.strictEqual(annotationRects.size(), annotatedTicks.length, "same number of annotation rects as ticks");
 
@@ -653,7 +660,7 @@ describe("BaseAxis", () => {
             let svg = TestMethods.generateSVG(300, 300);
             axis.renderTo(svg);
 
-            let annotationRects = axis.content().selectAll(".annotation-rect");
+            let annotationRects = axis.content().selectAll(`.${Plottable.Axis.ANNOTATION_RECT_CLASS}`);
 
             assert.strictEqual(annotationRects.size(), annotatedTicks.length, "same number of annotation rects as ticks");
 
@@ -675,7 +682,7 @@ describe("BaseAxis", () => {
             let svg = TestMethods.generateSVG(300, 300);
             axis.renderTo(svg);
 
-            let firstAnnotationRect = axis.content().select(".annotation-rect");
+            let firstAnnotationRect = axis.content().select(`.${Plottable.Axis.ANNOTATION_RECT_CLASS}`);
             assert.closeTo(TestMethods.numAttr(firstAnnotationRect, "y") + TestMethods.numAttr(firstAnnotationRect, "height"),
               axis.height() - axis.margin(), window.Pixel_CloseTo_Requirement, "rectangle positioned correctly");
             svg.remove();
@@ -689,7 +696,7 @@ describe("BaseAxis", () => {
             let svg = TestMethods.generateSVG(300, 300);
             axis.renderTo(svg);
 
-            let firstAnnotationRect = axis.content().select(".annotation-rect");
+            let firstAnnotationRect = axis.content().select(`.${Plottable.Axis.ANNOTATION_RECT_CLASS}`);
             assert.closeTo(TestMethods.numAttr(firstAnnotationRect, "y"),
               axis.margin(), window.Pixel_CloseTo_Requirement, "rectangle positioned correctly");
             svg.remove();
@@ -703,7 +710,7 @@ describe("BaseAxis", () => {
             let svg = TestMethods.generateSVG(300, 300);
             axis.renderTo(svg);
 
-            let firstAnnotationRect = axis.content().select(".annotation-rect");
+            let firstAnnotationRect = axis.content().select(`.${Plottable.Axis.ANNOTATION_RECT_CLASS}`);
             assert.closeTo(TestMethods.numAttr(firstAnnotationRect, "x"),
               axis.margin(), window.Pixel_CloseTo_Requirement, "rectangle positioned correctly");
             svg.remove();
@@ -717,7 +724,7 @@ describe("BaseAxis", () => {
             let svg = TestMethods.generateSVG(300, 300);
             axis.renderTo(svg);
 
-            let firstAnnotationRect = axis.content().select(".annotation-rect");
+            let firstAnnotationRect = axis.content().select(`.${Plottable.Axis.ANNOTATION_RECT_CLASS}`);
             assert.closeTo(TestMethods.numAttr(firstAnnotationRect, "x") + TestMethods.numAttr(firstAnnotationRect, "width"),
               axis.width() - axis.margin(), window.Pixel_CloseTo_Requirement, "rectangle positioned correctly");
             svg.remove();
@@ -733,7 +740,7 @@ describe("BaseAxis", () => {
             let svg = TestMethods.generateSVG(300, 300);
             axis.renderTo(svg);
 
-            let annotationRects = axis.content().selectAll(".annotation-rect");
+            let annotationRects = axis.content().selectAll(`.${Plottable.Axis.ANNOTATION_RECT_CLASS}`);
             let firstAnnotationRect = d3.select(annotationRects[0][0]);
             let secondAnnotationRect = d3.select(annotationRects[0][1]);
             assert.strictEqual(TestMethods.numAttr(secondAnnotationRect, "y") - TestMethods.numAttr(firstAnnotationRect, "y"),
@@ -749,7 +756,7 @@ describe("BaseAxis", () => {
             let svg = TestMethods.generateSVG(300, 300);
             axis.renderTo(svg);
 
-            let annotationRects = axis.content().selectAll(".annotation-rect");
+            let annotationRects = axis.content().selectAll(`.${Plottable.Axis.ANNOTATION_RECT_CLASS}`);
             let firstAnnotationRect = d3.select(annotationRects[0][0]);
             let secondAnnotationRect = d3.select(annotationRects[0][1]);
             assert.strictEqual(TestMethods.numAttr(firstAnnotationRect, "y") - TestMethods.numAttr(secondAnnotationRect, "y"),
@@ -765,7 +772,7 @@ describe("BaseAxis", () => {
             let svg = TestMethods.generateSVG(300, 300);
             axis.renderTo(svg);
 
-            let annotationRects = axis.content().selectAll(".annotation-rect");
+            let annotationRects = axis.content().selectAll(`.${Plottable.Axis.ANNOTATION_RECT_CLASS}`);
             let firstAnnotationRect = d3.select(annotationRects[0][0]);
             let secondAnnotationRect = d3.select(annotationRects[0][1]);
             assert.strictEqual(TestMethods.numAttr(firstAnnotationRect, "x") - TestMethods.numAttr(secondAnnotationRect, "x"),
@@ -781,7 +788,7 @@ describe("BaseAxis", () => {
             let svg = TestMethods.generateSVG(300, 300);
             axis.renderTo(svg);
 
-            let annotationRects = axis.content().selectAll(".annotation-rect");
+            let annotationRects = axis.content().selectAll(`.${Plottable.Axis.ANNOTATION_RECT_CLASS}`);
             let firstAnnotationRect = d3.select(annotationRects[0][0]);
             let secondAnnotationRect = d3.select(annotationRects[0][1]);
             assert.strictEqual(TestMethods.numAttr(secondAnnotationRect, "x") - TestMethods.numAttr(firstAnnotationRect, "x"),
@@ -804,7 +811,7 @@ describe("BaseAxis", () => {
         let svg = TestMethods.generateSVG(300, 300);
         axis.renderTo(svg);
 
-        let annotationRects = axis.content().selectAll(".annotation-rect");
+        let annotationRects = axis.content().selectAll(`.${Plottable.Axis.ANNOTATION_RECT_CLASS}`);
 
         assert.strictEqual(annotationRects.size(), annotatedTicks.length, "same number of annotation rects as ticks");
 
@@ -835,7 +842,7 @@ describe("BaseAxis", () => {
         let svg = TestMethods.generateSVG(300, 300);
         axis.renderTo(svg);
 
-        let annotationCircles = axis.content().selectAll(".annotation-circle");
+        let annotationCircles = axis.content().selectAll(`.${Plottable.Axis.ANNOTATION_CIRCLE_CLASS}`);
 
         assert.strictEqual(annotationCircles.size(), annotatedTicks.length, "same number of annotation circles as ticks");
 
@@ -857,7 +864,7 @@ describe("BaseAxis", () => {
 
         axis.annotatedTicks(annotatedTicks);
 
-        assert.strictEqual(axis.content().selectAll(".annotation-label").size(), 0, "no annotated ticks");
+        assert.strictEqual(axis.content().selectAll(`.${Plottable.Axis.ANNOTATION_LABEL_CLASS}`).size(), 0, "no annotated ticks");
 
         svg.remove();
       });
@@ -877,7 +884,8 @@ describe("BaseAxis", () => {
         annotatedTicks.forEach((annotatedTick) => {
           annotatedTickSet.add(annotatedTick);
         });
-        assert.strictEqual(axis.content().selectAll(".annotation-label").size(), annotatedTickSet.size, "only unique annotations rendered");
+        assert.strictEqual(axis.content().selectAll(`.${Plottable.Axis.ANNOTATION_LABEL_CLASS}`).size(),
+          annotatedTickSet.size, "only unique annotations rendered");
 
         svg.remove();
       });
@@ -893,7 +901,7 @@ describe("BaseAxis", () => {
 
         axis.annotatedTicks(annotatedTicks);
 
-        let annotationRects = axis.content().selectAll(".annotation-rect");
+        let annotationRects = axis.content().selectAll(`.${Plottable.Axis.ANNOTATION_RECT_CLASS}`);
         assert.strictEqual(annotationRects.size(), 1, "only one annotation rendered");
 
         let annotationRect = d3.select(annotationRects[0][0]);

@@ -4200,6 +4200,22 @@ var Plottable;
          * The css class applied to each tick label (the text associated with the tick).
          */
         Axis.TICK_LABEL_CLASS = "tick-label";
+        /**
+         * The css class applied to each annotation line, which extends from the axis to the rect.
+         */
+        Axis.ANNOTATION_LINE_CLASS = "annotation-line";
+        /**
+         * The css class applied to each annotation rect, which surrounds the annotation label.
+         */
+        Axis.ANNOTATION_RECT_CLASS = "annotation-rect";
+        /**
+         * The css class applied to each annotation circle, which denotes which tick is being annotated.
+         */
+        Axis.ANNOTATION_CIRCLE_CLASS = "annotation-circle";
+        /**
+         * The css class applied to each annotation label, which shows the formatted annotation text.
+         */
+        Axis.ANNOTATION_LABEL_CLASS = "annotation-label";
         Axis._ANNOTATION_LABEL_PADDING = 4;
         return Axis;
     })(Plottable.Component);

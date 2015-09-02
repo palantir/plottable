@@ -14,6 +14,22 @@ export class Axis<D> extends Component {
    * The css class applied to each tick label (the text associated with the tick).
    */
   public static TICK_LABEL_CLASS = "tick-label";
+  /**
+   * The css class applied to each annotation line, which extends from the axis to the rect.
+   */
+  public static ANNOTATION_LINE_CLASS = "annotation-line";
+  /**
+   * The css class applied to each annotation rect, which surrounds the annotation label.
+   */
+  public static ANNOTATION_RECT_CLASS = "annotation-rect";
+  /**
+   * The css class applied to each annotation circle, which denotes which tick is being annotated.
+   */
+  public static ANNOTATION_CIRCLE_CLASS = "annotation-circle";
+  /**
+   * The css class applied to each annotation label, which shows the formatted annotation text.
+   */
+  public static ANNOTATION_LABEL_CLASS = "annotation-label";
   private static _ANNOTATION_LABEL_PADDING = 4;
   protected _tickMarkContainer: d3.Selection<void>;
   protected _tickLabelContainer: d3.Selection<void>;
