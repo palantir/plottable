@@ -27,8 +27,7 @@ describe("Plots", () => {
       });
 
       it("is initialized correctly", () => {
-        let data = [{ x: 0, y: 0 }];
-        let dataset = new Plottable.Dataset(data);
+        let dataset = new Plottable.Dataset([{ x: 0, y: 0 }]);
         plot.addDataset(dataset);
 
         assert.isDefined(plot.attr("fill"), "default color is defined");
@@ -40,26 +39,24 @@ describe("Plots", () => {
       });
     });
 
-    describe("the Accessors properly access data, index and Dataset", () => {
-      const SVG_WIDTH = 400;
-      const SVG_HEIGHT = 400;
+    describe("The Accessors properly access data, index and Dataset", () => {
       let svg: d3.Selection<void>;
       let plot: Plottable.Plots.Scatter<number, number>;
       let dataset: Plottable.Dataset;
       let data: any[];
 
       beforeEach(() => {
+        const SVG_WIDTH = 400;
+        const SVG_HEIGHT = 400;
         svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
         let xScale = new Plottable.Scales.Linear().domain([0, SVG_WIDTH]);
         let yScale = new Plottable.Scales.Linear().domain([SVG_HEIGHT, 0]);
         let metadata = { foo: 10, bar: 20 };
-        let xAccessor = (d: any, i: number, dataset: Plottable.Dataset) => d.x + i * dataset.metadata().foo;
-        let yAccessor = (d: any, i: number, dataset: Plottable.Dataset) => dataset.metadata().bar;
         data = [{ x: 0, y: 0 }, { x: 1, y: 1 }];
         dataset = new Plottable.Dataset(data, metadata);
         plot = new Plottable.Plots.Scatter<number, number>();
-        plot.x(xAccessor, xScale);
-        plot.y(yAccessor, yScale);
+        plot.x((d, i, dataset) => d.x + i * dataset.metadata().foo, xScale);
+        plot.y((d, i, dataset) => dataset.metadata().bar, yScale);
         plot.addDataset(dataset);
       });
 
@@ -120,39 +117,40 @@ describe("Plots", () => {
         svg.remove();
       });
 
-      it("sets and gets size() correctly", () => {
-        assert.strictEqual(plot.size().accessor(data[0], 0, dataset), 6, "first symbol size is initialized.");
-        assert.strictEqual(plot.size().accessor(data[1], 1, dataset), 6, "second symbol size is initialized.");
+      it("sets size() correctly", () => {
+        assert.strictEqual(plot.size().accessor(data[0], 0, dataset), 6, "first symbol size is initialized");
+        assert.strictEqual(plot.size().accessor(data[1], 1, dataset), 6, "second symbol size is initialized");
 
-        plot.size(10);
-        assert.strictEqual(plot.size().accessor(data[0], 0, dataset), 10, "first symbol size is set to a constant.");
-        assert.strictEqual(plot.size().accessor(data[1], 1, dataset), 10, "second symbol size is set to a constant.");
+        assert.strictEqual(plot.size(10), plot, "setting size() returns calling Plot.Scatter");
+        assert.strictEqual(plot.size().accessor(data[0], 0, dataset), 10, "first symbol size is set to a constant");
+        assert.strictEqual(plot.size().accessor(data[1], 1, dataset), 10, "second symbol size is set to a constant");
 
-        plot.size((d: any, i: number) => i + d.x * d.y);
-        assert.strictEqual(plot.size().accessor(data[0], 0, dataset), 0, "first symbol size is calculated correctly.");
-        assert.strictEqual(plot.size().accessor(data[1], 1, dataset), 2, "second symbol size is calculated correctly.");
+        assert.strictEqual(plot.size((d, i) => i + d.x * d.y), plot, "setting size() returns calling Plot.Scatter");
+        assert.strictEqual(plot.size().accessor(data[0], 0, dataset), 0, "first symbol size is calculated correctly");
+        assert.strictEqual(plot.size().accessor(data[1], 1, dataset), 2, "second symbol size is calculated correctly");
 
         svg.remove();
       });
 
-      it("sets and gets symbol() correctly", () => {
+      it("sets symbol() correctly", () => {
         let circleSymbolFactory = Plottable.SymbolFactories.circle();
         let squareSymbolFactory = Plottable.SymbolFactories.square();
 
-        plot.symbol(() => circleSymbolFactory);
-        assert.deepEqual(plot.symbol().accessor(data[0], 0, dataset), circleSymbolFactory, "first symbol SymbolFactory is set correctly.");
-        assert.deepEqual(plot.symbol().accessor(data[1], 1, dataset), circleSymbolFactory, "second symbol SymbolFactory is set correctly.");
+        assert.strictEqual(plot.symbol(() => circleSymbolFactory), plot, "setting symbol() returns calling Plot.Scatter");
+        assert.deepEqual(plot.symbol().accessor(data[0], 0, dataset), circleSymbolFactory, "first symbol SymbolFactory is set correctly");
+        assert.deepEqual(plot.symbol().accessor(data[1], 1, dataset), circleSymbolFactory, "second symbol SymbolFactory is set correctly");
 
-        plot.symbol((d: any, i: number) => i === 0 ? squareSymbolFactory : circleSymbolFactory);
-        assert.deepEqual(plot.symbol().accessor(data[0], 0, dataset), squareSymbolFactory, "first symbol SymbolFactory is set correctly.");
-        assert.deepEqual(plot.symbol().accessor(data[1], 1, dataset), circleSymbolFactory, "second symbol SymbolFactory is set correctly.");
+        assert.strictEqual(plot.symbol((d, i) => i === 0 ? squareSymbolFactory : circleSymbolFactory), plot,
+          "setting symbol() returns calling Plot.Scatter");
+        assert.deepEqual(plot.symbol().accessor(data[0], 0, dataset), squareSymbolFactory, "first symbol SymbolFactory is set correctly");
+        assert.deepEqual(plot.symbol().accessor(data[1], 1, dataset), circleSymbolFactory, "second symbol SymbolFactory is set correctly");
 
         svg.remove();
       });
 
     });
 
-    describe("selections", () => {
+    describe("Selections", () => {
       let svg: d3.Selection<void>;
       let plot: Plottable.Plots.Scatter<number, number>;
       let dataset: Plottable.Dataset;
@@ -162,7 +160,7 @@ describe("Plots", () => {
       let data: any[];
       let data2: any[];
       beforeEach(() => {
-        svg = TestMethods.generateSVG(400, 400);
+        svg = TestMethods.generateSVG();
         xScale = new Plottable.Scales.Linear();
         yScale = new Plottable.Scales.Linear();
         data = [{ x: 0, y: 0 }, { x: 1, y: 1 }];
@@ -172,11 +170,11 @@ describe("Plots", () => {
         plot = new Plottable.Plots.Scatter<number, number>();
         plot.x((d: any) => d.x, xScale)
             .y((d: any) => d.y, yScale)
-            .addDataset(dataset)
-            .addDataset(dataset2);
+            .addDataset(dataset);
       });
 
       it("selects all points in all datasets", () => {
+        plot.addDataset(dataset2);
         plot.renderTo(svg);
         let allCircles = plot.selections();
         assert.strictEqual(allCircles.size(), 4, "all circles retrieved");
@@ -188,10 +186,12 @@ describe("Plots", () => {
       });
 
       it("selects the closest data point", () => {
+        plot.addDataset(dataset2);
         plot.renderTo(svg);
         let closest = plot.entityNearest({
           x: xScale.scale(0) + 1,
-          y: yScale.scale(0) + 1 });
+          y: yScale.scale(0) + 1
+        });
 
         assert.deepEqual(closest.datum, dataset.data()[0], "correct datum has been retrieved");
 
@@ -199,22 +199,30 @@ describe("Plots", () => {
       });
 
       it("ignores off-plot data points when retrieving the nearest Entity", () => {
+        plot.addDataset(dataset2);
         plot.renderTo(svg);
         yScale.domain([0, 1.9]);
 
         let closest = plot.entityNearest({
           x: xScale.scale(1),
-          y: xScale.scale(2) });
+          y: xScale.scale(2)
+        });
         assert.deepEqual(closest.datum, dataset.data()[1], "correct datum has been retrieved");
 
         svg.remove();
       });
 
       it("can retrieve Entities in a certain range", () => {
+        plot.addDataset(dataset2);
         plot.renderTo(svg);
 
-        let entities = plot.entitiesIn({ min: xScale.scale(1), max: xScale.scale(1) },
-                                      { min: yScale.scale(1), max: yScale.scale(1) });
+        let entities = plot.entitiesIn({
+          min: xScale.scale(1),
+          max: xScale.scale(1)
+        }, {
+          min: yScale.scale(1),
+          max: yScale.scale(1)
+        });
 
         assert.lengthOf(entities, 1, "only one Entity has been retrieved");
         assert.deepEqual(entities[0].datum, { x: 1, y: 1 }, "correct datum has been retrieved");
@@ -223,10 +231,16 @@ describe("Plots", () => {
       });
 
       it("does not return Entities whose center lies outside the range", () => {
+        plot.addDataset(dataset2);
         plot.renderTo(svg);
 
-        let entities = plot.entitiesIn({ min: xScale.scale(1.001), max: xScale.scale(1.001) },
-                                      { min: yScale.scale(1.001), max: yScale.scale(1.001) });
+        let entities = plot.entitiesIn({
+          min: xScale.scale(1.001),
+          max: xScale.scale(1.001)
+        }, {
+          min: yScale.scale(1.001),
+          max: yScale.scale(1.001)
+        });
 
         assert.lengthOf(entities, 0, "no Entities retrieved");
 
@@ -234,15 +248,17 @@ describe("Plots", () => {
       });
 
       it("can retrieve Entities in a certain bounds", () => {
+        plot.addDataset(dataset2);
         plot.renderTo(svg);
-        let entities = plot.entitiesIn({ topLeft: {
-                                          x: xScale.scale(1),
-                                          y: yScale.scale(1)
-                                        },
-                                        bottomRight: {
-                                          x: xScale.scale(1),
-                                          y: yScale.scale(1)
-                                        }});
+        let entities = plot.entitiesIn({
+          topLeft: {
+            x: xScale.scale(1),
+            y: yScale.scale(1)
+          },
+          bottomRight: {
+            x: xScale.scale(1),
+            y: yScale.scale(1)
+          }});
 
         assert.lengthOf(entities, 1, "only one Entity has been retrieved");
         assert.deepEqual(entities[0].datum, { x: 1, y: 1 }, "correct datum has been retrieved");
@@ -251,7 +267,6 @@ describe("Plots", () => {
       });
 
       it("can retrieve Entities centered at a given Point", () => {
-        plot.removeDataset(dataset2);
         plot.renderTo(svg);
 
         let entities = plot.entitiesAt({ x: xScale.scale(1), y: yScale.scale(1) });
@@ -263,7 +278,6 @@ describe("Plots", () => {
 
       it("determines whether an Entity contains a given Point by its position and size", () => {
         plot.size(10);
-        plot.removeDataset(dataset2);
         plot.renderTo(svg);
 
         let entities = plot.entitiesAt({ x: xScale.scale(1) + 5, y: yScale.scale(1) - 5});
@@ -277,32 +291,31 @@ describe("Plots", () => {
       });
 
       it("returns all Entities containing a given Point across all Datasets", () => {
-        dataset.data([{ x: 0, y: 0 }, { x: 200, y: 200 }]);
-        dataset2.data([{ x: 0, y: 1 }, { x: 1, y: 0 }]);
+        plot.addDataset(new Plottable.Dataset([{ x: 0, y: 1 }, { x: 200, y: 200 }]));
         plot.renderTo(svg);
 
         let entities = plot.entitiesAt({ x: xScale.scale(0.5), y: yScale.scale(0.5) });
         assert.lengthOf(entities, 3, "all 3 Entities containing the Point have been retrieved");
         assert.deepEqual(entities[0].datum, { x: 0, y: 0 }, "correct datum has been retrieved");
-        assert.deepEqual(entities[1].datum, { x: 0, y: 1 }, "correct datum has been retrieved");
-        assert.deepEqual(entities[2].datum, { x: 1, y: 0 }, "correct datum has been retrieved");
+        assert.deepEqual(entities[1].datum, { x: 1, y: 1 }, "correct datum has been retrieved");
+        assert.deepEqual(entities[2].datum, { x: 0, y: 1 }, "correct datum has been retrieved");
 
         svg.remove();
       });
     });
 
-    describe("invalid data and deprecated method", () => {
+    describe("Invalid data and deprecated method", () => {
       let svg: d3.Selection<void>;
       let plot: Plottable.Plots.Scatter<number, number>;
       beforeEach(() => {
-        svg = TestMethods.generateSVG(400, 400);
+        svg = TestMethods.generateSVG();
         plot = new Plottable.Plots.Scatter<number, number>();
         plot.x((d: any) => d.x)
             .y((d: any) => d.y);
       });
 
-      it("correctly handles NaN, undefined, Infinity, and non-number x and y values", () => {
-        let data: { [key: string]: any }[] = [
+      it.skip("correctly handles NaN, undefined, Infinity, and non-number x and y values", () => {
+        let data = [
           { x: 0.0, y: 0.0 },
           { x: 0.2, y: 0.2 },
           { x: 0.4, y: 0.4 },
@@ -315,51 +328,51 @@ describe("Plots", () => {
 
         assert.strictEqual(plot.selections().size(), 5, "all 5 data points are drawn");
 
-        let dataWithNaN = data.slice();
-        dataWithNaN[2] = { x: 0.4, y: NaN };
-        dataset.data(dataWithNaN);
+        let dataWithError = data.slice();
+        dataWithError[2] = { x: 0.4, y: NaN };
+        dataset.data(dataWithError);
         assert.strictEqual(plot.selections().size(), 4, "only 4 data points are drawn when one of the y values is NaN");
         assert.lengthOf(plot.entities(), 4, "only 4 Entities returned  when one of the y values is NaN");
 
-        dataWithNaN = data.slice();
-        dataWithNaN[2] = { x: NaN, y: 0.4 };
-        dataset.data(dataWithNaN);
+        dataWithError = data.slice();
+        dataWithError[2] = { x: NaN, y: 0.4 };
+        dataset.data(dataWithError);
         assert.strictEqual(plot.selections().size(), 4, "only 4 data points are drawn when one of the x values is NaN");
         assert.lengthOf(plot.entities(), 4, "only 4 Entities returned when one of the x values is NaN");
 
-        let dataWithUndefined = data.slice();
-        dataWithUndefined[2] = { x: 0.4, y: undefined };
-        dataset.data(dataWithUndefined);
+        dataWithError = data.slice();
+        dataWithError[2] = { x: 0.4, y: undefined };
+        dataset.data(dataWithError);
         assert.strictEqual(plot.selections().size(), 4, "only 4 data points are drawn when one of the y values is undefined");
         assert.lengthOf(plot.entities(), 4, "only 4 Entities returned when one of the y values is undefined");
 
-        dataWithUndefined = data.slice();
-        dataWithUndefined[2] = { x: undefined, y: 0.4 };
-        dataset.data(dataWithUndefined);
+        dataWithError = data.slice();
+        dataWithError[2] = { x: undefined, y: 0.4 };
+        dataset.data(dataWithError);
         assert.strictEqual(plot.selections().size(), 4, "only 4 data points are drawn when one of the x values is undefined");
         assert.lengthOf(plot.entities(), 4, "only 4 Entities returned when one of the x values is undefined");
 
-        let dataWithInfinity = data.slice();
-        dataWithInfinity[2] = { x: 0.4, y: Infinity };
-        dataset.data(dataWithInfinity);
+        dataWithError = data.slice();
+        dataWithError[2] = { x: 0.4, y: Infinity };
+        dataset.data(dataWithError);
         assert.strictEqual(plot.selections().size(), 4, "only 4 data points are drawn when one of the y values is Infinity");
         assert.lengthOf(plot.entities(), 4, "only 4 Entities returned when one of the y values is Infinity");
 
-        dataWithInfinity = data.slice();
-        dataWithInfinity[2] = { x: -Infinity, y: 0.4 };
-        dataset.data(dataWithInfinity);
+        dataWithError = data.slice();
+        dataWithError[2] = { x: -Infinity, y: 0.4 };
+        dataset.data(dataWithError);
         assert.strictEqual(plot.selections().size(), 4, "only 4 data points are drawn when one of the x values is -Infinity");
         assert.lengthOf(plot.entities(), 4, "only 4 Entities returned when one of the x values is -Infinity");
 
-        let dataWithString = data.slice();
-        dataWithString[2] = { x: 0.4, y: "12" };
-        dataset.data(dataWithString);
+        dataWithError = data.slice();
+        (<any> dataWithError)[2] = { x: 0.4, y: "12" };
+        dataset.data(dataWithError);
         assert.strictEqual(plot.selections().size(), 4, "only 4 data points are drawn when one of the y values is \"12\"");
         assert.lengthOf(plot.entities(), 4, "only 4 Entities returned when one of the y values is \"12\"");
 
-        dataWithString = data.slice();
-        dataWithString[2] = { x: "abc", y: 0.4 };
-        dataset.data(dataWithString);
+        dataWithError = data.slice();
+        (<any> dataWithError)[2] = { x: "abc", y: 0.4 };
+        dataset.data(dataWithError);
         assert.strictEqual(plot.selections().size(), 4, "only 4 data points are drawn when one of the x values is \"abc\"");
         assert.lengthOf(plot.entities(), 4, "only 4 Entities returned when one of the x values is \"abc\"");
         svg.remove();

@@ -489,7 +489,7 @@ export class Plot extends Component {
 
       dataset.data().forEach((datum: any, datasetIndex: number) => {
         let position = this._pixelPoint(datum, datasetIndex, dataset);
-        if (!Utils.Math.isValidNumber(position.x) || !Utils.Math.isValidNumber(position.y)) {
+        if (Utils.Math.isNaN(position.x) || Utils.Math.isNaN(position.y)) {
           return;
         }
         lightweightEntities.push({
