@@ -327,19 +327,13 @@ export module Plots {
       let yRange = { min: 0, max: this.height() };
 
       let attrToProjector = this._generateAttrToProjector();
-      let width = attrToProjector["width"](datum, index, dataset);
-      let height = attrToProjector["height"](datum, index, dataset);
 
       let barBBox = {
-        x: pixelPoint.x - width / 2,
-        y: pixelPoint.y,
-        width: width,
-        height: height
+        x: attrToProjector["x"](datum, index, dataset),
+        y: attrToProjector["y"](datum, index, dataset),
+        width: attrToProjector["width"](datum, index, dataset),
+        height: attrToProjector["height"](datum, index, dataset)
       };
-
-      if(this._isVertical && pixelPoint.y > this.y().scale.scale(<Y>this._baselineValue)){
-        barBBox.y -= height;
-      }
 
       return Plottable.Utils.DOM.intersectsBBox(xRange, yRange, barBBox);
     }
