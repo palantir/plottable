@@ -337,6 +337,10 @@ export module Plots {
         height: height
       };
 
+      if(this._isVertical && pixelPoint.y > this.y().scale.scale(<Y>this._baselineValue)){
+        barBBox.y -= height;
+      }
+
       return Plottable.Utils.DOM.intersectsBBox(xRange, yRange, barBBox);
     }
 

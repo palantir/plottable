@@ -66,7 +66,7 @@ describe("Plots", () => {
         "EntityNearest considers vertical bars that extend off the top of a plot");
       TestMethods.assertEntitiesEqual(barPlot.entityNearest(pointRight), negativeBar,
         "EntityNearest considers vertical bars that extend off the bottom of a plot");
-
+      svg.remove();
     });
 
     it("gets the nearest Entity when any part of the bar is visible (horizontal)", () => {
@@ -103,7 +103,7 @@ describe("Plots", () => {
         "EntityNearest considers horizontal bars that extend off the right of a plot");
       TestMethods.assertEntitiesEqual(barPlot.entityNearest(pointBottom), negativeBar,
         "EntityNearest considers horizontal bars that extend off the left of a plot");
-
+      svg.remove();
     });
 
     describe("Vertical Bar Plot", () => {
