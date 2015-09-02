@@ -350,4 +350,16 @@ module TestMethods {
     assert.include(receivedWarning, warningMessage, assertMessage);
   }
 
+  export function areaVertices(areaSelection: d3.Selection<any>): Plottable.Point[] {
+    let areaPathString = TestMethods.normalizePath(areaSelection.attr("d")).slice(1, -1);
+    return areaPathString.split("L")
+      .map((d) => {
+        let pointArray = d.trim().split(",");
+        return {
+          x: +pointArray[0],
+          y: +pointArray[1]
+        };
+      });
+  }
+
 }
