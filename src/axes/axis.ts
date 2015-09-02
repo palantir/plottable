@@ -303,7 +303,7 @@ export class Axis<D> extends Component {
     });
 
     let bindElements = (selection: d3.Selection<any>, elementName: string, className: string) => {
-      let elements = selection.selectAll("." + className).data(annotatedTicks);
+      let elements = selection.selectAll(`.${className}`).data(annotatedTicks);
       elements.enter().append(elementName).classed(className, true);
       elements.exit().remove();
       return elements;
@@ -336,7 +336,7 @@ export class Axis<D> extends Component {
     }
 
     let isHorizontal = this._isHorizontal();
-    bindElements(this._annotationContainer.select(".annotation-line-container"), "line", "annotation-line")
+    bindElements(this._annotationContainer.select(".annotation-line-container"), "line", Axis.ANNOTATION_LINE_CLASS)
       .attr({
         x1: isHorizontal ? positionF : secondaryPosition,
         x2: isHorizontal ? positionF : offsetF,
@@ -345,7 +345,7 @@ export class Axis<D> extends Component {
         visibility: visibilityF
       });
 
-    bindElements(this._annotationContainer.select(".annotation-circle-container"), "circle", "annotation-circle")
+    bindElements(this._annotationContainer.select(".annotation-circle-container"), "circle", Axis.ANNOTATION_CIRCLE_CLASS)
       .attr({
         cx: isHorizontal ? positionF : secondaryPosition,
         cy: isHorizontal ? secondaryPosition : positionF,
@@ -362,7 +362,7 @@ export class Axis<D> extends Component {
           return offsetF(d) - measurements.get(d).height;
       }
     };
-    bindElements(this._annotationContainer.select(".annotation-rect-container"), "rect", "annotation-rect")
+    bindElements(this._annotationContainer.select(".annotation-rect-container"), "rect", Axis.ANNOTATION_RECT_CLASS)
       .attr({
         x: isHorizontal ? positionF : rectangleOffsetF,
         y: isHorizontal ? rectangleOffsetF : positionF,
@@ -373,7 +373,7 @@ export class Axis<D> extends Component {
 
     let annotationWriter = this._annotationWriter;
     let annotationFormatter = this.annotationFormatter();
-    let annotationLabels = bindElements(this._annotationContainer.select(".annotation-label-container"), "g", "annotation-label");
+    let annotationLabels = bindElements(this._annotationContainer.select(".annotation-label-container"), "g", Axis.ANNOTATION_LABEL_CLASS);
     annotationLabels.selectAll(".text-container").remove();
     annotationLabels.attr({
         transform: (d) => {

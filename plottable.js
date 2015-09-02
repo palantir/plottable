@@ -3894,7 +3894,7 @@ var Plottable;
                     break;
             }
             var isHorizontal = this._isHorizontal();
-            bindElements(this._annotationContainer.select(".annotation-line-container"), "line", "annotation-line")
+            bindElements(this._annotationContainer.select(".annotation-line-container"), "line", Axis.ANNOTATION_LINE_CLASS)
                 .attr({
                 x1: isHorizontal ? positionF : secondaryPosition,
                 x2: isHorizontal ? positionF : offsetF,
@@ -3902,7 +3902,7 @@ var Plottable;
                 y2: isHorizontal ? offsetF : positionF,
                 visibility: visibilityF
             });
-            bindElements(this._annotationContainer.select(".annotation-circle-container"), "circle", "annotation-circle")
+            bindElements(this._annotationContainer.select(".annotation-circle-container"), "circle", Axis.ANNOTATION_CIRCLE_CLASS)
                 .attr({
                 cx: isHorizontal ? positionF : secondaryPosition,
                 cy: isHorizontal ? secondaryPosition : positionF,
@@ -3918,7 +3918,7 @@ var Plottable;
                         return offsetF(d) - measurements.get(d).height;
                 }
             };
-            bindElements(this._annotationContainer.select(".annotation-rect-container"), "rect", "annotation-rect")
+            bindElements(this._annotationContainer.select(".annotation-rect-container"), "rect", Axis.ANNOTATION_RECT_CLASS)
                 .attr({
                 x: isHorizontal ? positionF : rectangleOffsetF,
                 y: isHorizontal ? rectangleOffsetF : positionF,
@@ -3928,7 +3928,7 @@ var Plottable;
             });
             var annotationWriter = this._annotationWriter;
             var annotationFormatter = this.annotationFormatter();
-            var annotationLabels = bindElements(this._annotationContainer.select(".annotation-label-container"), "g", "annotation-label");
+            var annotationLabels = bindElements(this._annotationContainer.select(".annotation-label-container"), "g", Axis.ANNOTATION_LABEL_CLASS);
             annotationLabels.selectAll(".text-container").remove();
             annotationLabels.attr({
                 transform: function (d) {
