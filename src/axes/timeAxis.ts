@@ -177,6 +177,7 @@ export module Axes {
       this.addClass("time-axis");
       this.tickLabelPadding(5);
       this.axisConfigurations(Time._DEFAULT_TIME_AXIS_CONFIGURATIONS);
+      this.annotationFormatter(Plottable.Formatters.time("%a %b %d, %Y"));
     }
 
     /**
@@ -488,6 +489,12 @@ export module Axes {
         this._hideOverlappingAndCutOffLabels(i);
       }
 
+      if (this.annotationsEnabled()) {
+        this._drawAnnotations();
+      } else {
+        this._removeAnnotations();
+      }
+
       return this;
     }
 
@@ -547,6 +554,7 @@ export module Axes {
         }
       });
     }
+
   }
 }
 }

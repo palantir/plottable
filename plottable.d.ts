@@ -1688,6 +1688,22 @@ declare module Plottable {
          * The css class applied to each tick label (the text associated with the tick).
          */
         static TICK_LABEL_CLASS: string;
+        /**
+         * The css class applied to each annotation line, which extends from the axis to the rect.
+         */
+        static ANNOTATION_LINE_CLASS: string;
+        /**
+         * The css class applied to each annotation rect, which surrounds the annotation label.
+         */
+        static ANNOTATION_RECT_CLASS: string;
+        /**
+         * The css class applied to each annotation circle, which denotes which tick is being annotated.
+         */
+        static ANNOTATION_CIRCLE_CLASS: string;
+        /**
+         * The css class applied to each annotation label, which shows the formatted annotation text.
+         */
+        static ANNOTATION_LABEL_CLASS: string;
         protected _tickMarkContainer: d3.Selection<void>;
         protected _tickLabelContainer: d3.Selection<void>;
         protected _baseline: d3.Selection<void>;
@@ -1715,6 +1731,55 @@ declare module Plottable {
         protected _setup(): void;
         protected _getTickValues(): D[];
         renderImmediately(): Axis<D>;
+        /**
+         * Gets the annotated ticks.
+         */
+        annotatedTicks(): D[];
+        /**
+         * Sets the annotated ticks.
+         *
+         * @returns {Axis} The calling Axis.
+         */
+        annotatedTicks(annotatedTicks: D[]): Axis<D>;
+        /**
+         * Gets the Formatter for the annotations.
+         */
+        annotationFormatter(): Formatter;
+        /**
+         * Sets the Formatter for the annotations.
+         *
+         * @returns {Axis} The calling Axis.
+         */
+        annotationFormatter(annotationFormatter: Formatter): Axis<D>;
+        /**
+         * Gets if annotations are enabled.
+         */
+        annotationsEnabled(): boolean;
+        /**
+         * Sets if annotations are enabled.
+         *
+         * @returns {Axis} The calling Axis.
+         */
+        annotationsEnabled(annotationsEnabled: boolean): Axis<D>;
+        /**
+         * Gets the count of annotation tiers to render.
+         */
+        annotationTierCount(): number;
+        /**
+         * Sets the count of annotation tiers to render.
+         *
+         * @returns {Axis} The calling Axis.
+         */
+        annotationTierCount(annotationTierCount: number): Axis<D>;
+        protected _drawAnnotations(): void;
+        /**
+         * Retrieves the size of the core pieces.
+         *
+         * The core pieces include the labels, the end tick marks, the inner tick marks, and the tick label padding.
+         */
+        protected _coreSize(): number;
+        protected _annotationTierHeight(): number;
+        protected _removeAnnotations(): void;
         protected _generateBaselineAttrHash(): {
             [key: string]: number;
         };
@@ -1786,11 +1851,13 @@ declare module Plottable {
         /**
          * Gets the margin in pixels.
          * The margin is the amount of space between the tick labels and the outer edge of the Axis.
+         * The margin also determines the space that annotations will reside in if annotations are enabled.
          */
         margin(): number;
         /**
          * Sets the margin in pixels.
          * The margin is the amount of space between the tick labels and the outer edge of the Axis.
+         * The margin also determines the space that annotations will reside in if annotations are enabled.
          *
          * @param {number} size
          * @returns {Axis} The calling Axis.
@@ -1974,6 +2041,7 @@ declare module Plottable {
             protected _setup(): void;
             protected _rescale(): Component;
             requestedSpace(offeredWidth: number, offeredHeight: number): SpaceRequest;
+            protected _coreSize(): number;
             protected _getTickValues(): string[];
             /**
              * Gets the tick label angle in degrees.

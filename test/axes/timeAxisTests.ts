@@ -294,4 +294,15 @@ describe("TimeAxis", () => {
     svg.remove();
   });
 
+  describe("axis annotations", () => {
+    describe("formatting annotation ticks", () => {
+      it("formats the dates to [{{abbreviated weekday}} {{abbreviated month}} {{day of month}}, {{year}}] by default", () => {
+        let axis = new Plottable.Axes.Time(new Plottable.Scales.Time(), "bottom");
+        let annotationFormatter = axis.annotationFormatter();
+        let testDate = new Date(1995, 11, 17);
+        assert.strictEqual(annotationFormatter(testDate), "Sun Dec 17, 1995", "formats to a default customized time formatter");
+      });
+    });
+  });
+
 });

@@ -3681,6 +3681,8 @@ var Plottable;
             this._tickLabelPadding = 10;
             this._margin = 15;
             this._showEndTickLabels = false;
+            this._annotationsEnabled = false;
+            this._annotationTierCount = 1;
             if (scale == null || orientation == null) {
                 throw new Error("Axis requires a scale and orientation");
             }
@@ -3697,6 +3699,8 @@ var Plottable;
             this.formatter(Plottable.Formatters.identity());
             this._rescaleCallback = function (scale) { return _this._rescale(); };
             this._scale.onUpdate(this._rescaleCallback);
+            this._annotatedTicks = [];
+            this._annotationFormatter = Plottable.Formatters.identity();
         }
         Axis.prototype.destroy = function () {
             _super.prototype.destroy.call(this);
@@ -3723,12 +3727,20 @@ var Plottable;
                     this._computeHeight();
                 }
                 requestedHeight = this._computedHeight + this._margin;
+                if (this.annotationsEnabled()) {
+                    var tierHeight = this._annotationMeasurer.measure().height + 2 * Axis._ANNOTATION_LABEL_PADDING;
+                    requestedHeight += tierHeight * this.annotationTierCount();
+                }
             }
             else {
                 if (this._computedWidth == null) {
                     this._computeWidth();
                 }
                 requestedWidth = this._computedWidth + this._margin;
+                if (this.annotationsEnabled()) {
+                    var tierHeight = this._annotationMeasurer.measure().height + 2 * Axis._ANNOTATION_LABEL_PADDING;
+                    requestedWidth += tierHeight * this.annotationTierCount();
+                }
             }
             return {
                 minWidth: requestedWidth,
@@ -3762,6 +3774,14 @@ var Plottable;
             this._tickLabelContainer = this.content().append("g")
                 .classed(Axis.TICK_LABEL_CLASS + "-container", true);
             this._baseline = this.content().append("line").classed("baseline", true);
+            this._annotationContainer = this.content().append("g")
+                .classed("annotation-container", true);
+            this._annotationContainer.append("g").classed("annotation-line-container", true);
+            this._annotationContainer.append("g").classed("annotation-circle-container", true);
+            this._annotationContainer.append("g").classed("annotation-rect-container", true);
+            var annotationLabelContainer = this._annotationContainer.append("g").classed("annotation-label-container", true);
+            this._annotationMeasurer = new SVGTypewriter.Measurers.Measurer(annotationLabelContainer);
+            this._annotationWriter = new SVGTypewriter.Writers.Writer(this._annotationMeasurer);
         };
         /*
          * Function for generating tick values in data-space (as opposed to pixel values).
@@ -3781,7 +3801,210 @@ var Plottable;
                 .attr(this._generateTickMarkAttrHash(true));
             tickMarks.exit().remove();
             this._baseline.attr(this._generateBaselineAttrHash());
+            if (this.annotationsEnabled()) {
+                this._drawAnnotations();
+            }
+            else {
+                this._removeAnnotations();
+            }
             return this;
+        };
+        Axis.prototype.annotatedTicks = function (annotatedTicks) {
+            if (annotatedTicks == null) {
+                return this._annotatedTicks;
+            }
+            this._annotatedTicks = annotatedTicks;
+            this.render();
+            return this;
+        };
+        Axis.prototype.annotationFormatter = function (annotationFormatter) {
+            if (annotationFormatter == null) {
+                return this._annotationFormatter;
+            }
+            this._annotationFormatter = annotationFormatter;
+            this.render();
+            return this;
+        };
+        Axis.prototype.annotationsEnabled = function (annotationsEnabled) {
+            if (annotationsEnabled == null) {
+                return this._annotationsEnabled;
+            }
+            this._annotationsEnabled = annotationsEnabled;
+            this.redraw();
+            return this;
+        };
+        Axis.prototype.annotationTierCount = function (annotationTierCount) {
+            if (annotationTierCount == null) {
+                return this._annotationTierCount;
+            }
+            this._annotationTierCount = annotationTierCount;
+            this.redraw();
+            return this;
+        };
+        Axis.prototype._drawAnnotations = function () {
+            var _this = this;
+            var labelPadding = Axis._ANNOTATION_LABEL_PADDING;
+            var measurements = new Plottable.Utils.Map();
+            var annotatedTicks = this._annotatedTicksToRender();
+            annotatedTicks.forEach(function (annotatedTick) {
+                var measurement = _this._annotationMeasurer.measure(_this.annotationFormatter()(annotatedTick));
+                var paddedMeasurement = { width: measurement.width + 2 * labelPadding, height: measurement.height + 2 * labelPadding };
+                measurements.set(annotatedTick, paddedMeasurement);
+            });
+            var tierHeight = this._annotationMeasurer.measure().height + 2 * labelPadding;
+            var annotationToTier = this._annotationToTier(measurements);
+            var hiddenAnnotations = new Plottable.Utils.Set();
+            var axisHeight = this._isHorizontal() ? this.height() : this.width();
+            var axisHeightWithoutMarginAndAnnotations = this._coreSize();
+            var numTiers = Math.min(this.annotationTierCount(), Math.floor((axisHeight - axisHeightWithoutMarginAndAnnotations) / tierHeight));
+            annotationToTier.forEach(function (tier, annotation) {
+                if (tier === -1 || tier >= numTiers) {
+                    hiddenAnnotations.add(annotation);
+                }
+            });
+            var bindElements = function (selection, elementName, className) {
+                var elements = selection.selectAll("." + className).data(annotatedTicks);
+                elements.enter().append(elementName).classed(className, true);
+                elements.exit().remove();
+                return elements;
+            };
+            var offsetF = function (d) {
+                switch (_this.orientation()) {
+                    case "bottom":
+                    case "right":
+                        return annotationToTier.get(d) * tierHeight + axisHeightWithoutMarginAndAnnotations;
+                    case "top":
+                    case "left":
+                        return axisHeight - axisHeightWithoutMarginAndAnnotations - annotationToTier.get(d) * tierHeight;
+                }
+            };
+            var positionF = function (d) { return _this._scale.scale(d); };
+            var visibilityF = function (d) { return hiddenAnnotations.has(d) ? "hidden" : "visible"; };
+            var secondaryPosition;
+            switch (this.orientation()) {
+                case "bottom":
+                case "right":
+                    secondaryPosition = 0;
+                    break;
+                case "top":
+                    secondaryPosition = this.height();
+                    break;
+                case "left":
+                    secondaryPosition = this.width();
+                    break;
+            }
+            var isHorizontal = this._isHorizontal();
+            bindElements(this._annotationContainer.select(".annotation-line-container"), "line", Axis.ANNOTATION_LINE_CLASS)
+                .attr({
+                x1: isHorizontal ? positionF : secondaryPosition,
+                x2: isHorizontal ? positionF : offsetF,
+                y1: isHorizontal ? secondaryPosition : positionF,
+                y2: isHorizontal ? offsetF : positionF,
+                visibility: visibilityF
+            });
+            bindElements(this._annotationContainer.select(".annotation-circle-container"), "circle", Axis.ANNOTATION_CIRCLE_CLASS)
+                .attr({
+                cx: isHorizontal ? positionF : secondaryPosition,
+                cy: isHorizontal ? secondaryPosition : positionF,
+                r: 3
+            });
+            var rectangleOffsetF = function (d) {
+                switch (_this.orientation()) {
+                    case "bottom":
+                    case "right":
+                        return offsetF(d);
+                    case "top":
+                    case "left":
+                        return offsetF(d) - measurements.get(d).height;
+                }
+            };
+            bindElements(this._annotationContainer.select(".annotation-rect-container"), "rect", Axis.ANNOTATION_RECT_CLASS)
+                .attr({
+                x: isHorizontal ? positionF : rectangleOffsetF,
+                y: isHorizontal ? rectangleOffsetF : positionF,
+                width: isHorizontal ? function (d) { return measurements.get(d).width; } : function (d) { return measurements.get(d).height; },
+                height: isHorizontal ? function (d) { return measurements.get(d).height; } : function (d) { return measurements.get(d).width; },
+                visibility: visibilityF
+            });
+            var annotationWriter = this._annotationWriter;
+            var annotationFormatter = this.annotationFormatter();
+            var annotationLabels = bindElements(this._annotationContainer.select(".annotation-label-container"), "g", Axis.ANNOTATION_LABEL_CLASS);
+            annotationLabels.selectAll(".text-container").remove();
+            annotationLabels.attr({
+                transform: function (d) {
+                    var xTranslate = isHorizontal ? positionF(d) : rectangleOffsetF(d);
+                    var yTranslate = isHorizontal ? rectangleOffsetF(d) : positionF(d);
+                    return "translate(" + xTranslate + "," + yTranslate + ")";
+                },
+                visibility: visibilityF
+            })
+                .each(function (annotationLabel) {
+                var writeOptions = {
+                    selection: d3.select(this),
+                    xAlign: "center",
+                    yAlign: "center",
+                    textRotation: isHorizontal ? 0 : 90
+                };
+                annotationWriter.write(annotationFormatter(annotationLabel), isHorizontal ? measurements.get(annotationLabel).width : measurements.get(annotationLabel).height, isHorizontal ? measurements.get(annotationLabel).height : measurements.get(annotationLabel).width, writeOptions);
+            });
+        };
+        Axis.prototype._annotatedTicksToRender = function () {
+            var _this = this;
+            var scaleRange = this._scale.range();
+            return Plottable.Utils.Array.uniq(this.annotatedTicks().filter(function (tick) {
+                if (tick == null) {
+                    return false;
+                }
+                return Plottable.Utils.Math.inRange(_this._scale.scale(tick), scaleRange[0], scaleRange[1]);
+            }));
+        };
+        /**
+         * Retrieves the size of the core pieces.
+         *
+         * The core pieces include the labels, the end tick marks, the inner tick marks, and the tick label padding.
+         */
+        Axis.prototype._coreSize = function () {
+            var relevantDimension = this._isHorizontal() ? this.height() : this.width();
+            var axisHeightWithoutMargin = this._isHorizontal() ? this._computedHeight : this._computedWidth;
+            return Math.min(axisHeightWithoutMargin, relevantDimension);
+        };
+        Axis.prototype._annotationTierHeight = function () {
+            return this._annotationMeasurer.measure().height + 2 * Axis._ANNOTATION_LABEL_PADDING;
+        };
+        Axis.prototype._annotationToTier = function (measurements) {
+            var _this = this;
+            var annotationTiers = [[]];
+            var annotationToTier = new Plottable.Utils.Map();
+            var dimension = this._isHorizontal() ? this.width() : this.height();
+            this._annotatedTicksToRender().forEach(function (annotatedTick) {
+                var position = _this._scale.scale(annotatedTick);
+                var length = measurements.get(annotatedTick).width;
+                if (position < 0 || position + length > dimension) {
+                    annotationToTier.set(annotatedTick, -1);
+                    return;
+                }
+                var tierHasCollision = function (testTier) { return annotationTiers[testTier].some(function (testTick) {
+                    var testPosition = _this._scale.scale(testTick);
+                    var testLength = measurements.get(testTick).width;
+                    return position + length >= testPosition && position <= testPosition + testLength;
+                }); };
+                var tier = 0;
+                while (tierHasCollision(tier)) {
+                    tier++;
+                    if (annotationTiers.length === tier) {
+                        annotationTiers.push([]);
+                    }
+                }
+                annotationTiers[tier].push(annotatedTick);
+                annotationToTier.set(annotatedTick, tier);
+            });
+            return annotationToTier;
+        };
+        Axis.prototype._removeAnnotations = function () {
+            this._annotationContainer.selectAll(".annotation-line").remove();
+            this._annotationContainer.selectAll(".annotation-circle").remove();
+            this._annotationContainer.selectAll(".annotation-rect").remove();
+            this._annotationContainer.selectAll(".annotation-label").remove();
         };
         Axis.prototype._generateBaselineAttrHash = function () {
             var baselineAttrHash = {
@@ -3977,6 +4200,23 @@ var Plottable;
          * The css class applied to each tick label (the text associated with the tick).
          */
         Axis.TICK_LABEL_CLASS = "tick-label";
+        /**
+         * The css class applied to each annotation line, which extends from the axis to the rect.
+         */
+        Axis.ANNOTATION_LINE_CLASS = "annotation-line";
+        /**
+         * The css class applied to each annotation rect, which surrounds the annotation label.
+         */
+        Axis.ANNOTATION_RECT_CLASS = "annotation-rect";
+        /**
+         * The css class applied to each annotation circle, which denotes which tick is being annotated.
+         */
+        Axis.ANNOTATION_CIRCLE_CLASS = "annotation-circle";
+        /**
+         * The css class applied to each annotation label, which shows the formatted annotation text.
+         */
+        Axis.ANNOTATION_LABEL_CLASS = "annotation-label";
+        Axis._ANNOTATION_LABEL_PADDING = 4;
         return Axis;
     })(Plottable.Component);
     Plottable.Axis = Axis;
@@ -4021,6 +4261,7 @@ var Plottable;
                 this.addClass("time-axis");
                 this.tickLabelPadding(5);
                 this.axisConfigurations(Time._DEFAULT_TIME_AXIS_CONFIGURATIONS);
+                this.annotationFormatter(Plottable.Formatters.time("%a %b %d, %Y"));
             }
             Time.prototype.tierLabelPositions = function (newPositions) {
                 if (newPositions == null) {
@@ -4269,6 +4510,12 @@ var Plottable;
                 for (var i = 0; i < tierConfigs.length; ++i) {
                     this._renderTickMarks(tierTicks[i], i);
                     this._hideOverlappingAndCutOffLabels(i);
+                }
+                if (this.annotationsEnabled()) {
+                    this._drawAnnotations();
+                }
+                else {
+                    this._removeAnnotations();
                 }
                 return this;
             };
@@ -4825,12 +5072,30 @@ var Plottable;
                         minHeight: 0
                     };
                 }
+                if (this.annotationsEnabled()) {
+                    var tierTotalHeight = this._annotationTierHeight() * this.annotationTierCount();
+                    if (this._isHorizontal()) {
+                        heightRequiredByTicks += tierTotalHeight;
+                    }
+                    else {
+                        widthRequiredByTicks += tierTotalHeight;
+                    }
+                }
                 var categoryScale = this._scale;
                 var measureResult = this._measureTicks(offeredWidth, offeredHeight, categoryScale, categoryScale.domain());
                 return {
                     minWidth: measureResult.usedWidth + widthRequiredByTicks,
                     minHeight: measureResult.usedHeight + heightRequiredByTicks
                 };
+            };
+            Category.prototype._coreSize = function () {
+                var relevantDimension = this._isHorizontal() ? this.height() : this.width();
+                var relevantRequestedSpaceDimension = this._isHorizontal() ?
+                    this.requestedSpace(this.width(), this.height()).minHeight :
+                    this.requestedSpace(this.width(), this.height()).minWidth;
+                var marginAndAnnotationSize = this.margin() + this._annotationTierHeight();
+                var axisHeightWithoutMargin = relevantRequestedSpaceDimension - marginAndAnnotationSize;
+                return Math.min(axisHeightWithoutMargin, relevantDimension);
             };
             Category.prototype._getTickValues = function () {
                 return this._scale.domain();
