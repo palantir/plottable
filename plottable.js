@@ -7809,6 +7809,7 @@ var Plottable;
                 this._label = null;
                 this.animator("rectangles", new Plottable.Animators.Null());
                 this.addClass("rectangle-plot");
+                this.attr("fill", new Plottable.Scales.Color().range()[0]);
             }
             Rectangle.prototype._createDrawer = function (dataset) {
                 return new Plottable.Drawers.Rectangle(dataset);
@@ -10073,6 +10074,7 @@ var Plottable;
             function Wheel() {
                 _super.call(this);
                 this.addClass("wheel-plot");
+                this.attr("fill", new Plottable.Scales.Color().range()[0]);
             }
             Wheel.prototype.computeLayout = function (origin, availableWidth, availableHeight) {
                 _super.prototype.computeLayout.call(this, origin, availableWidth, availableHeight);

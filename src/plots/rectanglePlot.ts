@@ -24,6 +24,7 @@ export module Plots {
 
       this.animator("rectangles", new Animators.Null());
       this.addClass("rectangle-plot");
+      this.attr("fill", new Scales.Color().range()[0]);
     }
 
     protected _createDrawer(dataset: Dataset) {
