@@ -4,38 +4,32 @@ describe("Formatters", () => {
   describe("fixed()", () => {
     it("shows correct amount of digits according to precision", () => {
       let fixed3 = Plottable.Formatters.fixed();
-      assert.strictEqual(fixed3(1), "1.000", "shows three decimal places");
-      assert.strictEqual(fixed3(-1), "-1.000", "shows three decimal places");
-      assert.strictEqual(fixed3(1.234), "1.234", "shows three decimal places");
-      assert.strictEqual(fixed3(-1.234), "-1.234", "shows three decimal places");
-      assert.strictEqual(fixed3(1.2346111111), "1.235", "shows three decimal places");
-      assert.strictEqual(fixed3(-1.2346111111), "-1.235", "shows three decimal places");
+      assert.strictEqual(fixed3(1), "1.000", "shows three decimal places by defalut");
+      assert.strictEqual(fixed3(-1), "-1.000", "shows three decimal places for negative integer");
+      assert.strictEqual(fixed3(1.234), "1.234", "shows three decimal places for float");
+      assert.strictEqual(fixed3(-1.234), "-1.234", "shows three decimal placesfor for negative float");
+      assert.strictEqual(fixed3(1.2346111111), "1.235", "shows three decimal places for long float");
+      assert.strictEqual(fixed3(-1.2346111111), "-1.235", "shows three decimal places for long negatvie float");
+      assert.strictEqual(fixed3(123), "123.000", "shows three decimal places for integer");
 
       assert.strictEqual(fixed3(Infinity), "Infinity", "formats non-numeric number correctly");
       assert.strictEqual(fixed3(-Infinity), "-Infinity", "formats non-numeric number correctly");
       assert.strictEqual(fixed3(NaN), "NaN", "formats non-numeric number correctly");
 
-      let fixed2 = Plottable.Formatters.fixed(2);
-      assert.strictEqual(fixed2(1), "1.00", "shows two decimal places");
-      assert.strictEqual(fixed2(-1), "-1.00", "shows two decimal places");
-      assert.strictEqual(fixed2(1.23), "1.23", "shows two decimal places");
-      assert.strictEqual(fixed2(-1.23), "-1.23", "shows two decimal places");
-      assert.strictEqual(fixed2(1.2346111111), "1.23", "shows two decimal places");
-      assert.strictEqual(fixed2(-1.2346111111), "-1.23", "shows two decimal places");
-
       let fixed0 = Plottable.Formatters.fixed(0);
-      assert.strictEqual(fixed0(1), "1", "shows no decimal places");
-      assert.strictEqual(fixed0(-1), "-1", "shows no decimal places");
-      assert.strictEqual(fixed0(1.23), "1", "shows no decimal places");
-      assert.strictEqual(fixed0(-1.23), "-1", "shows no decimal places");
+      assert.strictEqual(fixed0(1), "1", "shows no decimal places for integer");
+      assert.strictEqual(fixed0(-1), "-1", "shows no decimal places for negative integer");
+      assert.strictEqual(fixed0(1.23), "1", "shows no decimal places for float");
+      assert.strictEqual(fixed0(-1.23), "-1", "shows no decimal places for negative float");
+      assert.strictEqual(fixed0(123.456), "123", "shows no decimal places for integer");
     });
 
     it.skip("throws exception for non-numeric values", () => {
-      let nonNumbricValues = [null, undefined, "123", "abc", ""];
+      let nonNumericValues = [null, undefined, "123", "abc", ""];
       let fixed = Plottable.Formatters.fixed();
-      nonNumbricValues.forEach((value) =>
+      nonNumericValues.forEach((value) =>
         (<any> assert).throws(() => fixed(<any> value), Error,
-          "", `${value} is not a valid value for Formatter.fixed`)
+          "error message TBD", `${value} is not a valid value for Formatter.fixed`)
       );
     });
 
@@ -81,9 +75,9 @@ describe("Formatters", () => {
 
     it("stringifies non-numeric values", () => {
       let general = Plottable.Formatters.general();
-      let nonNumbricValues = [null, undefined, Infinity, -Infinity, NaN, "123", "abc"];
+      let nonNumericValues = [null, undefined, Infinity, -Infinity, NaN, "123", "abc"];
       let stringifiedValues = ["null", "undefined", "Infinity", "-Infinity", "NaN", "123", "abc"];
-      nonNumbricValues.forEach((value, i) =>
+      nonNumericValues.forEach((value, i) =>
         assert.strictEqual(general(value), stringifiedValues[i], `non-numeric input ${value} is stringified`)
       );
     });
@@ -118,12 +112,13 @@ describe("Formatters", () => {
     it("formats values based on precision, symobl, and prefix correctly", () => {
       let defaultFormatter = Plottable.Formatters.currency();
       assert.strictEqual(defaultFormatter(1), "$1.00", "formatted correctly with default \"$\" prefix");
-      assert.strictEqual(defaultFormatter(-1), "-$1.00", "formatted negative value correctly with default \"$\" prefix");
+      assert.strictEqual(defaultFormatter(-1), "-$1.00", "formatted negative integer correctly with default \"$\" prefix");
       assert.strictEqual(defaultFormatter(1.999), "$2.00", "formatted correctly with default \"$\" prefix");
-      assert.strictEqual(defaultFormatter(-1.234), "-$1.23", "formatted negative value correctly with default \"$\" prefix");
+      assert.strictEqual(defaultFormatter(-1.234), "-$1.23", "formatted negative float correctly with default \"$\" prefix");
 
       let currencyFormatter0 = Plottable.Formatters.currency(0);
       assert.strictEqual(currencyFormatter0(1.1234), "$1", "formatted with correct precision");
+      assert.strictEqual(currencyFormatter0(123), "$123", "formatted with correct precision");
 
       let poundFormatter = Plottable.Formatters.currency(2, "£");
       assert.strictEqual(poundFormatter(1.1234), "£1.12", "formatted with correct precision and \"£\" as prefix");
@@ -149,12 +144,12 @@ describe("Formatters", () => {
     });
 
     it.skip("throws exception for non-numeric values", () => {
-      let nonNumbricValues: any[] = [null, undefined, "123", "abc", ""];
+      let nonNumericValues: any[] = [null, undefined, "123", "abc", ""];
       // "$0.00", "$NaN", "$123.00", "$NaN", "$0.00"
       let defaultFormatter = Plottable.Formatters.currency();
-      nonNumbricValues.forEach((value) =>
+      nonNumericValues.forEach((value) =>
         (<any> assert).throws(() => defaultFormatter(<any> value), Error,
-          "", `${value} is not a valid value for Formatter.currency`)
+          "error message TBD", `${value} is not a valid value for Formatter.currency`)
       );
     });
 
@@ -175,11 +170,11 @@ describe("Formatters", () => {
     });
 
     it.skip("throws exception for non-Date values", () => {
-      let nonNumbricValues = [null, undefined, NaN, "123", "abc", "", 0];
+      let nonNumericValues = [null, undefined, NaN, "123", "abc", "", 0];
       let timeFormatter = Plottable.Formatters.multiTime();
-      nonNumbricValues.forEach((value) =>
+      nonNumericValues.forEach((value) =>
         (<any> assert).throws(() => timeFormatter(<any> value), Error,
-          "", `${value} is not a valid value for Formatter.multiTime`)
+          "error message TBD", `${value} is not a valid value for Formatter.multiTime`)
       );
     });
   });
@@ -191,6 +186,7 @@ describe("Formatters", () => {
         "the value was multiplied by 100, a percent sign was appended, and no decimal places are shown by default");
       assert.strictEqual(percentFormatter(0.07), "7%", "does not have trailing zeros and is not empty string");
       assert.strictEqual(percentFormatter(-0.355), "-36%", "negative values are formatted correctly");
+      assert.strictEqual(percentFormatter(50), "5000%", "formats 2 digit integer correctly");
 
       let twoPercentFormatter = Plottable.Formatters.percentage(2);
       assert.strictEqual(twoPercentFormatter(0.0035), "0.35%", "works even if multiplying by 100 does not make it an integer");
@@ -218,12 +214,12 @@ describe("Formatters", () => {
       );
     });
 
-    it.skip("throws exception for non-number values", () => {
-      let nonNumbricValues = [null, undefined, "123", "abc", ""];
+    it.skip("throws exception for non-numeric values", () => {
+      let nonNumericValues = [null, undefined, "123", "abc", ""];
       let percentFormatter = Plottable.Formatters.percentage();
-      nonNumbricValues.forEach((value) =>
+      nonNumericValues.forEach((value) =>
         (<any> assert).throws(() => percentFormatter(<any> value), Error,
-          "", `${value} is not a valid value for Formatter.percentage`)
+          "error message TBD", `${value} is not a valid value for Formatter.percentage`)
       );
     });
   });
@@ -264,12 +260,12 @@ describe("Formatters", () => {
       );
     });
 
-    it.skip("throws exception for non-number values", () => {
-      let nonNumbricValues = [null, undefined, "123", "abc", ""];
+    it.skip("throws exception for non-numeric values", () => {
+      let nonNumericValues = [null, undefined, "123", "abc", ""];
       let lnFormatter = Plottable.Formatters.siSuffix();
-      nonNumbricValues.forEach((value) =>
+      nonNumericValues.forEach((value) =>
         (<any> assert).throws(() => lnFormatter(<any> value), Error,
-          "", `${value} is not a valid value for Formatter.siSuffix`)
+          "error message TBD", `${value} is not a valid value for Formatter.siSuffix`)
       );
     });
   });
