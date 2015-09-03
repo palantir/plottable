@@ -899,6 +899,10 @@ var Plottable;
          * Specifies if Plottable should show warnings.
          */
         Configs.SHOW_WARNINGS = true;
+        /**
+         * Specifies if Plottable should add <title> elements to text.
+         */
+        Configs.ADD_TITLE_ELEMENTS = true;
     })(Configs = Plottable.Configs || (Plottable.Configs = {}));
 })(Plottable || (Plottable = {}));
 
@@ -5439,7 +5443,7 @@ var Plottable;
                 fakeLegendEntry.append("text");
                 this._measurer = new SVGTypewriter.Measurers.Measurer(fakeLegendRow);
                 this._wrapper = new SVGTypewriter.Wrappers.Wrapper().maxLines(1);
-                this._writer = new SVGTypewriter.Writers.Writer(this._measurer, this._wrapper).addTitleElement(true);
+                this._writer = new SVGTypewriter.Writers.Writer(this._measurer, this._wrapper).addTitleElement(Plottable.Configs.ADD_TITLE_ELEMENTS);
             };
             Legend.prototype.maxEntriesPerRow = function (maxEntriesPerRow) {
                 if (maxEntriesPerRow == null) {
@@ -5607,7 +5611,6 @@ var Plottable;
                 var padding = this._padding;
                 var textContainers = entries.select("g.text-container");
                 textContainers.text(""); // clear out previous results
-                textContainers.append("title").text(function (value) { return value; });
                 var self = this;
                 textContainers.attr("transform", "translate(" + layout.textHeight + ", 0)")
                     .each(function (value) {
