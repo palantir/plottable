@@ -8526,13 +8526,11 @@ var Plottable;
                 var xRange = { min: 0, max: this.width() };
                 var yRange = { min: 0, max: this.height() };
                 var attrToProjector = this._generateAttrToProjector();
-                var width = attrToProjector["width"](datum, index, dataset);
-                var height = attrToProjector["height"](datum, index, dataset);
                 var barBBox = {
-                    x: pixelPoint.x - width / 2,
-                    y: pixelPoint.y,
-                    width: width,
-                    height: height
+                    x: attrToProjector["x"](datum, index, dataset),
+                    y: attrToProjector["y"](datum, index, dataset),
+                    width: attrToProjector["width"](datum, index, dataset),
+                    height: attrToProjector["height"](datum, index, dataset)
                 };
                 return Plottable.Utils.DOM.intersectsBBox(xRange, yRange, barBBox);
             };
