@@ -26,12 +26,12 @@ describe("Component", () => {
       assert.isFalse(c.content().empty(), "content exists in the DOM");
       assert.isFalse(c.background().select(".background-fill").empty(), "background fill container exists in the DOM");
 
-      assert.strictEqual((<Node> c.foreground().node()).previousSibling,
-        c.content().node(), "content under foreground");
-      assert.strictEqual((<Node> c.content().node()).previousSibling,
-        c.background().node(), "background under content");
-      assert.strictEqual((<Node> c.background().select(".background-fill").node()).parentElement,
-        c.background().node(), "background-fill inside background");
+      let componentElement = svg.select(".component");
+      let containers = componentElement.selectAll("g");
+      assert.strictEqual(containers[0][0], c.background().node(), "background at the back");
+      assert.strictEqual(containers[0][1], c.content().node(), "content at the middle");
+      assert.strictEqual(containers[0][2], c.foreground().node(), "foreground at the front");
+      assert.strictEqual(containers[0][3], componentElement.select(".box-container").node(), "boxes at front of foreground");
       c.destroy();
       svg.remove();
     });
@@ -350,8 +350,8 @@ describe("Component", () => {
       assert.strictEqual(c.width() , width, "width set");
       assert.strictEqual(c.height(), height, "height set");
 
-      let contentParent = svg.select(".component");
-      let translate = TestMethods.getTranslate(contentParent);
+      let componentElement = svg.select(".component");
+      let translate = TestMethods.getTranslate(componentElement);
       assert.deepEqual(translate, [origin.x, origin.y], "the element translated appropriately");
       let backgroundFillBox = svg.select(".background-fill");
       assert.closeTo(TestMethods.numAttr(backgroundFillBox, "width"),
@@ -397,8 +397,8 @@ describe("Component", () => {
         let t = new Plottable.Components.Table([[c]]);
         t.renderTo(svg);
 
-        let contentParent = svg.select(".component");
-        assert.deepEqual(TestMethods.getTranslate(contentParent), [0, 0], "the element was not translated");
+        let componentElement = svg.select(".component");
+        assert.deepEqual(TestMethods.getTranslate(componentElement), [0, 0], "the element was not translated");
         svg.remove();
       });
     });
@@ -663,8 +663,8 @@ describe("Component", () => {
     c.redraw();
     let origin = c.origin();
     assert.deepEqual(origin, {x: 0, y: 0}, "origin reset");
-    let contentParent = svg.select(".component");
-    let translate = TestMethods.getTranslate(contentParent);
+    let componentElement = svg.select(".component");
+    let translate = TestMethods.getTranslate(componentElement);
     assert.deepEqual(translate, [origin.x, origin.y], "DOM element rendered at new origin");
     c.destroy();
     svg.remove();
@@ -673,8 +673,8 @@ describe("Component", () => {
   it("generates a clipPath element if it is enabled", () => {
     (<any> c)._clipPathEnabled = true;
     c.anchor(svg);
-    let contentParent = svg.select(".component");
-    assert.isNotNull(contentParent.attr("clip-path"), "clip-path attribute set");
+    let componentElement = svg.select(".component");
+    assert.isNotNull(componentElement.attr("clip-path"), "clip-path attribute set");
     c.destroy();
     svg.remove();
   });
