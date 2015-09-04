@@ -4358,7 +4358,8 @@ var Plottable;
                 var tierHeights = this._tierHeights.reduce(function (prevValue, currValue, index, arr) {
                     return (prevValue + currValue > size.height) ? prevValue : (prevValue + currValue);
                 });
-                size.height = Math.min(size.height, tierHeights + this.margin());
+                var nonCoreHeight = this.margin() + (this.annotationsEnabled() ? this.annotationTierCount() * this._annotationTierHeight() : 0);
+                size.height = Math.min(size.height, tierHeights + nonCoreHeight);
                 return size;
             };
             Time.prototype._setup = function () {
