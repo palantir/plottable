@@ -340,22 +340,22 @@ describe("Plots", () => {
       });
 
       it("determines whether an Entity contains a given Point by its position and size", () => {
-        let originalSize = 10;
-        let originRadius = originalSize / 2;
-        plot.size(originalSize);
+        let initialSize = 10;
+        let initialRadius = initialSize / 2;
+        plot.size(initialSize);
         plot.renderTo(svg);
 
         let entities = plot.entitiesAt({
-          x: xScale.scale(1) + originRadius,
-          y: yScale.scale(1) - originRadius
+          x: xScale.scale(1) + initialRadius,
+          y: yScale.scale(1) - initialRadius
         });
         assert.lengthOf(entities, 1, "only one Entity has been retrieved");
         assert.deepEqual(entities[0].datum, { x: 1, y: 1 }, "correct datum has been retrieved");
 
-        plot.size(originalSize - 1);
+        plot.size(initialSize - 1);
         entities = plot.entitiesAt({
-          x: xScale.scale(1) + originRadius,
-          y: yScale.scale(1) - originRadius
+          x: xScale.scale(1) + initialRadius,
+          y: yScale.scale(1) - initialRadius
         });
         assert.lengthOf(entities, 0, "none of the Entities is retrieved");
         svg.remove();
