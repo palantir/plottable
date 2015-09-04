@@ -313,7 +313,8 @@ export module Axes {
       let tierHeights = this._tierHeights.reduce((prevValue, currValue, index, arr) => {
         return (prevValue + currValue > size.height) ? prevValue : (prevValue + currValue);
       });
-      size.height = Math.min(size.height, tierHeights + this.margin() + this.annotationTierCount() * this._annotationTierHeight());
+      let nonCoreHeight = this.margin() + (this.annotationsEnabled() ? this.annotationTierCount() * this._annotationTierHeight() : 0);
+      size.height = Math.min(size.height, tierHeights + nonCoreHeight);
       return size;
     }
 
