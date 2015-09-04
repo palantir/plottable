@@ -305,7 +305,9 @@ describe("TimeAxis", () => {
     });
 
     it("includes the annotation space in the final size calculation", () => {
-      let svg = TestMethods.generateSVG(400, 400);
+      let svgWidth = 400;
+      let svgHeight = 400;
+      let svg = TestMethods.generateSVG(svgWidth, svgHeight);
       let xScale = new Plottable.Scales.Time();
       let xAxis = new Plottable.Axes.Time(xScale, "bottom");
       xAxis.margin(100);
@@ -313,7 +315,7 @@ describe("TimeAxis", () => {
       xAxis.annotationTierCount(3);
 
       xAxis.anchor(svg);
-      xAxis.computeLayout({ x: 0, y: 0}, 400, 400);
+      xAxis.computeLayout({ x: 0, y: 0}, svgWidth, svgHeight);
       let coreHeight = xAxis.tickLabelPadding() + xAxis.innerTickLength();
       let annotationHeight = xAxis.annotationTierCount() * (<any> xAxis)._annotationTierHeight();
       let minimumHeight = coreHeight + xAxis.margin() + annotationHeight;
