@@ -4358,7 +4358,7 @@ var Plottable;
                 var tierHeights = this._tierHeights.reduce(function (prevValue, currValue, index, arr) {
                     return (prevValue + currValue > size.height) ? prevValue : (prevValue + currValue);
                 });
-                size.height = Math.min(size.height, tierHeights + this.margin());
+                size.height = Math.min(size.height, tierHeights + this.margin() + this._annotationTierHeight());
                 return size;
             };
             Time.prototype._setup = function () {
