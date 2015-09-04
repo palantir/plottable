@@ -23,6 +23,8 @@ before(() => {
   } else if (isFirefox) {
     // HACKHACK #2122
     window.Pixel_CloseTo_Requirement = 2;
+  } else if (TestMethods.isIE()) {
+    window.Pixel_CloseTo_Requirement = 1.5;
   } else {
     window.Pixel_CloseTo_Requirement = 0.5;
   }

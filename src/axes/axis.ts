@@ -14,6 +14,23 @@ export class Axis<D> extends Component {
    * The css class applied to each tick label (the text associated with the tick).
    */
   public static TICK_LABEL_CLASS = "tick-label";
+  /**
+   * The css class applied to each annotation line, which extends from the axis to the rect.
+   */
+  public static ANNOTATION_LINE_CLASS = "annotation-line";
+  /**
+   * The css class applied to each annotation rect, which surrounds the annotation label.
+   */
+  public static ANNOTATION_RECT_CLASS = "annotation-rect";
+  /**
+   * The css class applied to each annotation circle, which denotes which tick is being annotated.
+   */
+  public static ANNOTATION_CIRCLE_CLASS = "annotation-circle";
+  /**
+   * The css class applied to each annotation label, which shows the formatted annotation text.
+   */
+  public static ANNOTATION_LABEL_CLASS = "annotation-label";
+  private static _ANNOTATION_LABEL_PADDING = 4;
   protected _tickMarkContainer: d3.Selection<void>;
   protected _tickLabelContainer: d3.Selection<void>;
   protected _baseline: d3.Selection<void>;
@@ -28,6 +45,14 @@ export class Axis<D> extends Component {
   private _margin = 15;
   private _showEndTickLabels = false;
   private _rescaleCallback: ScaleCallback<Scale<D, number>>;
+
+  private _annotatedTicks: D[];
+  private _annotationFormatter: Formatter;
+  private _annotationsEnabled = false;
+  private _annotationTierCount = 1;
+  private _annotationContainer: d3.Selection<void>;
+  private _annotationMeasurer: SVGTypewriter.Measurers.Measurer;
+  private _annotationWriter: SVGTypewriter.Writers.Writer;
 
   /**
    * Constructs an Axis.
@@ -54,6 +79,9 @@ export class Axis<D> extends Component {
 
     this._rescaleCallback = (scale) => this._rescale();
     this._scale.onUpdate(this._rescaleCallback);
+
+    this._annotatedTicks = [];
+    this._annotationFormatter = Formatters.identity();
   }
 
   public destroy() {
@@ -86,11 +114,19 @@ export class Axis<D> extends Component {
         this._computeHeight();
       }
       requestedHeight = this._computedHeight + this._margin;
+      if (this.annotationsEnabled()) {
+        let tierHeight = this._annotationMeasurer.measure().height + 2 * Axis._ANNOTATION_LABEL_PADDING;
+        requestedHeight += tierHeight * this.annotationTierCount();
+      }
     } else { // vertical
       if (this._computedWidth == null) {
         this._computeWidth();
       }
       requestedWidth = this._computedWidth + this._margin;
+      if (this.annotationsEnabled()) {
+        let tierHeight = this._annotationMeasurer.measure().height + 2 * Axis._ANNOTATION_LABEL_PADDING;
+        requestedWidth += tierHeight * this.annotationTierCount();
+      }
     }
 
     return {
@@ -129,6 +165,14 @@ export class Axis<D> extends Component {
     this._tickLabelContainer = this.content().append("g")
                                            .classed(Axis.TICK_LABEL_CLASS + "-container", true);
     this._baseline = this.content().append("line").classed("baseline", true);
+    this._annotationContainer = this.content().append("g")
+                                              .classed("annotation-container", true);
+    this._annotationContainer.append("g").classed("annotation-line-container", true);
+    this._annotationContainer.append("g").classed("annotation-circle-container", true);
+    this._annotationContainer.append("g").classed("annotation-rect-container", true);
+    let annotationLabelContainer = this._annotationContainer.append("g").classed("annotation-label-container", true);
+    this._annotationMeasurer = new SVGTypewriter.Measurers.Measurer(annotationLabelContainer);
+    this._annotationWriter = new SVGTypewriter.Writers.Writer(this._annotationMeasurer);
   }
 
   /*
@@ -150,7 +194,268 @@ export class Axis<D> extends Component {
                                                     .attr(this._generateTickMarkAttrHash(true));
     tickMarks.exit().remove();
     this._baseline.attr(this._generateBaselineAttrHash());
+    if (this.annotationsEnabled()) {
+      this._drawAnnotations();
+    } else {
+      this._removeAnnotations();
+    }
     return this;
+  }
+
+  /**
+   * Gets the annotated ticks.
+   */
+  public annotatedTicks(): D[];
+  /**
+   * Sets the annotated ticks.
+   *
+   * @returns {Axis} The calling Axis.
+   */
+  public annotatedTicks(annotatedTicks: D[]): Axis<D>;
+  public annotatedTicks(annotatedTicks?: D[]): any {
+    if (annotatedTicks == null) {
+      return this._annotatedTicks;
+    }
+    this._annotatedTicks = annotatedTicks;
+    this.render();
+    return this;
+  }
+
+  /**
+   * Gets the Formatter for the annotations.
+   */
+  public annotationFormatter(): Formatter;
+  /**
+   * Sets the Formatter for the annotations.
+   *
+   * @returns {Axis} The calling Axis.
+   */
+  public annotationFormatter(annotationFormatter: Formatter): Axis<D>;
+  public annotationFormatter(annotationFormatter?: Formatter): any {
+    if (annotationFormatter == null) {
+      return this._annotationFormatter;
+    }
+    this._annotationFormatter = annotationFormatter;
+    this.render();
+    return this;
+  }
+
+  /**
+   * Gets if annotations are enabled.
+   */
+  public annotationsEnabled(): boolean;
+  /**
+   * Sets if annotations are enabled.
+   *
+   * @returns {Axis} The calling Axis.
+   */
+  public annotationsEnabled(annotationsEnabled: boolean): Axis<D>;
+  public annotationsEnabled(annotationsEnabled?: boolean): any {
+    if (annotationsEnabled == null) {
+      return this._annotationsEnabled;
+    }
+    this._annotationsEnabled = annotationsEnabled;
+    this.redraw();
+    return this;
+  }
+
+  /**
+   * Gets the count of annotation tiers to render.
+   */
+  public annotationTierCount(): number;
+  /**
+   * Sets the count of annotation tiers to render.
+   *
+   * @returns {Axis} The calling Axis.
+   */
+  public annotationTierCount(annotationTierCount: number): Axis<D>;
+  public annotationTierCount(annotationTierCount?: number): any {
+    if (annotationTierCount == null) {
+      return this._annotationTierCount;
+    }
+    this._annotationTierCount = annotationTierCount;
+    this.redraw();
+    return this;
+  }
+
+  protected _drawAnnotations() {
+    let labelPadding = Axis._ANNOTATION_LABEL_PADDING;
+    let measurements = new Utils.Map<D, SVGTypewriter.Measurers.Dimensions>();
+    let annotatedTicks = this._annotatedTicksToRender();
+    annotatedTicks.forEach((annotatedTick) => {
+      let measurement = this._annotationMeasurer.measure(this.annotationFormatter()(annotatedTick));
+      let paddedMeasurement = { width: measurement.width + 2 * labelPadding, height: measurement.height + 2 * labelPadding };
+      measurements.set(annotatedTick, paddedMeasurement);
+    });
+
+    let tierHeight = this._annotationMeasurer.measure().height + 2 * labelPadding;
+
+    let annotationToTier = this._annotationToTier(measurements);
+
+    let hiddenAnnotations = new Utils.Set<any>();
+    let axisHeight = this._isHorizontal() ? this.height() : this.width();
+    let axisHeightWithoutMarginAndAnnotations = this._coreSize();
+    let numTiers = Math.min(this.annotationTierCount(), Math.floor((axisHeight - axisHeightWithoutMarginAndAnnotations) / tierHeight));
+    annotationToTier.forEach((tier, annotation) => {
+      if (tier === -1 || tier >= numTiers) {
+        hiddenAnnotations.add(annotation);
+      }
+    });
+
+    let bindElements = (selection: d3.Selection<any>, elementName: string, className: string) => {
+      let elements = selection.selectAll(`.${className}`).data(annotatedTicks);
+      elements.enter().append(elementName).classed(className, true);
+      elements.exit().remove();
+      return elements;
+    };
+    let offsetF = (d: D) => {
+      switch (this.orientation()) {
+        case "bottom":
+        case "right":
+          return annotationToTier.get(d) * tierHeight + axisHeightWithoutMarginAndAnnotations;
+        case "top":
+        case "left":
+          return axisHeight - axisHeightWithoutMarginAndAnnotations - annotationToTier.get(d) * tierHeight;
+      }
+    };
+    let positionF = (d: D) => this._scale.scale(d);
+    let visibilityF = (d: D) => hiddenAnnotations.has(d) ? "hidden" : "visible";
+
+    let secondaryPosition: number;
+    switch (this.orientation()) {
+      case "bottom":
+      case "right":
+        secondaryPosition = 0;
+        break;
+      case "top":
+        secondaryPosition = this.height();
+        break;
+      case "left":
+        secondaryPosition = this.width();
+        break;
+    }
+
+    let isHorizontal = this._isHorizontal();
+    bindElements(this._annotationContainer.select(".annotation-line-container"), "line", Axis.ANNOTATION_LINE_CLASS)
+      .attr({
+        x1: isHorizontal ? positionF : secondaryPosition,
+        x2: isHorizontal ? positionF : offsetF,
+        y1: isHorizontal ? secondaryPosition : positionF,
+        y2: isHorizontal ? offsetF : positionF,
+        visibility: visibilityF
+      });
+
+    bindElements(this._annotationContainer.select(".annotation-circle-container"), "circle", Axis.ANNOTATION_CIRCLE_CLASS)
+      .attr({
+        cx: isHorizontal ? positionF : secondaryPosition,
+        cy: isHorizontal ? secondaryPosition : positionF,
+        r: 3
+      });
+
+    let rectangleOffsetF = (d: D) => {
+      switch (this.orientation()) {
+        case "bottom":
+        case "right":
+          return offsetF(d);
+        case "top":
+        case "left":
+          return offsetF(d) - measurements.get(d).height;
+      }
+    };
+    bindElements(this._annotationContainer.select(".annotation-rect-container"), "rect", Axis.ANNOTATION_RECT_CLASS)
+      .attr({
+        x: isHorizontal ? positionF : rectangleOffsetF,
+        y: isHorizontal ? rectangleOffsetF : positionF,
+        width: isHorizontal ? (d) => measurements.get(d).width : (d) => measurements.get(d).height,
+        height: isHorizontal ? (d) => measurements.get(d).height : (d) => measurements.get(d).width,
+        visibility: visibilityF
+      });
+
+    let annotationWriter = this._annotationWriter;
+    let annotationFormatter = this.annotationFormatter();
+    let annotationLabels = bindElements(this._annotationContainer.select(".annotation-label-container"), "g", Axis.ANNOTATION_LABEL_CLASS);
+    annotationLabels.selectAll(".text-container").remove();
+    annotationLabels.attr({
+        transform: (d) => {
+          let xTranslate = isHorizontal ? positionF(d) : rectangleOffsetF(d);
+          let yTranslate = isHorizontal ? rectangleOffsetF(d) : positionF(d);
+          return `translate(${xTranslate},${yTranslate})`;
+        },
+        visibility: visibilityF
+      })
+      .each(function (annotationLabel) {
+        let writeOptions = {
+          selection: d3.select(this),
+          xAlign: "center",
+          yAlign: "center",
+          textRotation: isHorizontal ? 0 : 90
+        };
+        annotationWriter.write(annotationFormatter(annotationLabel),
+                                 isHorizontal ? measurements.get(annotationLabel).width : measurements.get(annotationLabel).height,
+                                 isHorizontal ? measurements.get(annotationLabel).height : measurements.get(annotationLabel).width,
+                                 writeOptions);
+      });
+  }
+
+  private _annotatedTicksToRender() {
+    let scaleRange = this._scale.range();
+    return Utils.Array.uniq(this.annotatedTicks().filter((tick) => {
+      if (tick == null) {
+        return false;
+      }
+      return Utils.Math.inRange(this._scale.scale(tick), scaleRange[0], scaleRange[1]);
+    }));
+  }
+
+  /**
+   * Retrieves the size of the core pieces.
+   *
+   * The core pieces include the labels, the end tick marks, the inner tick marks, and the tick label padding.
+   */
+  protected _coreSize() {
+    let relevantDimension = this._isHorizontal() ? this.height() : this.width();
+    let axisHeightWithoutMargin = this._isHorizontal() ? this._computedHeight : this._computedWidth;
+    return Math.min(axisHeightWithoutMargin, relevantDimension);
+  }
+
+  protected _annotationTierHeight() {
+    return this._annotationMeasurer.measure().height + 2 * Axis._ANNOTATION_LABEL_PADDING;
+  }
+
+  private _annotationToTier(measurements: Utils.Map<D, SVGTypewriter.Measurers.Dimensions>) {
+    let annotationTiers: D[][] = [[]];
+    let annotationToTier = new Utils.Map<D, number>();
+    let dimension = this._isHorizontal() ? this.width() : this.height();
+    this._annotatedTicksToRender().forEach((annotatedTick) => {
+      let position = this._scale.scale(annotatedTick);
+      let length = measurements.get(annotatedTick).width;
+      if (position < 0 || position + length > dimension) {
+        annotationToTier.set(annotatedTick, -1);
+        return;
+      }
+      let tierHasCollision = (testTier: number) => annotationTiers[testTier].some((testTick) => {
+        let testPosition = this._scale.scale(testTick);
+        let testLength = measurements.get(testTick).width;
+        return position + length >= testPosition && position <= testPosition + testLength;
+      });
+      let tier = 0;
+      while (tierHasCollision(tier)) {
+        tier++;
+        if (annotationTiers.length === tier) {
+          annotationTiers.push([]);
+        }
+      }
+      annotationTiers[tier].push(annotatedTick);
+      annotationToTier.set(annotatedTick, tier);
+    });
+    return annotationToTier;
+  }
+
+  protected _removeAnnotations() {
+    this._annotationContainer.selectAll(".annotation-line").remove();
+    this._annotationContainer.selectAll(".annotation-circle").remove();
+    this._annotationContainer.selectAll(".annotation-rect").remove();
+    this._annotationContainer.selectAll(".annotation-label").remove();
   }
 
   protected _generateBaselineAttrHash() {
@@ -377,11 +682,13 @@ export class Axis<D> extends Component {
   /**
    * Gets the margin in pixels.
    * The margin is the amount of space between the tick labels and the outer edge of the Axis.
+   * The margin also determines the space that annotations will reside in if annotations are enabled.
    */
   public margin(): number;
   /**
    * Sets the margin in pixels.
    * The margin is the amount of space between the tick labels and the outer edge of the Axis.
+   * The margin also determines the space that annotations will reside in if annotations are enabled.
    *
    * @param {number} size
    * @returns {Axis} The calling Axis.

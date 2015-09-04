@@ -32,6 +32,96 @@ describe("Plots", () => {
       assert.strictEqual(horizontalPlot.orientation(), "horizontal", "horizontal Plots.Bar()");
     });
 
+    it("gets the nearest Entity when any part of the bar is visible (vertical)", () => {
+      let SVG_WIDTH = 600;
+      let SVG_HEIGHT = 400;
+      let svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+      let xScale = new Plottable.Scales.Category();
+      let yScale = new Plottable.Scales.Linear();
+      let data = [
+        {x: "A", y: 3},
+        {x: "B", y: -3},
+        {x: "C", y: 0}
+      ];
+      let dataset = new Plottable.Dataset(data);
+      let barPlot = new Plottable.Plots.Bar<string, number>();
+      barPlot.addDataset(dataset);
+      yScale.domain([-1, 1]);
+      barPlot.x((d) => d.x, xScale);
+      barPlot.y((d) => d.y, yScale);
+      barPlot.renderTo(svg);
+
+      let positiveBar = barPlot.entities()[0];
+      let negativeBar = barPlot.entities()[1];
+      let baselineBar = barPlot.entities()[2];
+
+      let pointPos = {
+        x: xScale.scale("A"),
+        y: yScale.scale(0)
+      };
+      let pointNeg = {
+        x: xScale.scale("B"),
+        y: yScale.scale(0)
+      };
+      let pointBaseline = {
+        x: xScale.scale("C"),
+        y: yScale.scale(0)
+      };
+
+      TestMethods.assertEntitiesEqual(barPlot.entityNearest(pointPos), positiveBar,
+        "EntityNearest considers vertical bars that extend off the top of a plot");
+      TestMethods.assertEntitiesEqual(barPlot.entityNearest(pointNeg), negativeBar,
+        "EntityNearest considers vertical bars that extend off the bottom of a plot");
+      TestMethods.assertEntitiesEqual(barPlot.entityNearest(pointBaseline), baselineBar,
+        "EntityNearest considers vertical bars that don't extend off the baseline");
+      svg.remove();
+    });
+
+    it("gets the nearest Entity when any part of the bar is visible (horizontal)", () => {
+      let SVG_WIDTH = 600;
+      let SVG_HEIGHT = 400;
+      let svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+      let xScale = new Plottable.Scales.Linear();
+      let yScale = new Plottable.Scales.Category();
+      let data = [
+        {x: 3, y: "A"},
+        {x: -3, y: "B"},
+        {x: 0, y: "C"}
+      ];
+      let dataset = new Plottable.Dataset(data);
+      let barPlot = new Plottable.Plots.Bar<number, string>("horizontal");
+      barPlot.addDataset(dataset);
+      xScale.domain([-1, 1]);
+      barPlot.x((d) => d.x, xScale);
+      barPlot.y((d) => d.y, yScale);
+      barPlot.renderTo(svg);
+
+      let positiveBar = barPlot.entities()[0];
+      let negativeBar = barPlot.entities()[1];
+      let baselineBar = barPlot.entities()[2];
+
+      let pointPos = {
+        x: xScale.scale(0),
+        y: yScale.scale("A")
+      };
+      let pointNeg = {
+        x: xScale.scale(0),
+        y: yScale.scale("B")
+      };
+      let pointBaseline = {
+        x: xScale.scale(0),
+        y: yScale.scale("C")
+      };
+
+      TestMethods.assertEntitiesEqual(barPlot.entityNearest(pointPos), positiveBar,
+        "EntityNearest considers horizontal bars that extend off the right of a plot");
+      TestMethods.assertEntitiesEqual(barPlot.entityNearest(pointNeg), negativeBar,
+        "EntityNearest considers horizontal bars that extend off the left of a plot");
+      TestMethods.assertEntitiesEqual(barPlot.entityNearest(pointBaseline), baselineBar,
+        "EntityNearest considers horizontal bars that don't extend off the baseline");
+      svg.remove();
+    });
+
     describe("Vertical Bar Plot", () => {
       let svg: d3.Selection<void>;
       let dataset: Plottable.Dataset;
