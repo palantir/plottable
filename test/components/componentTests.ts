@@ -350,7 +350,7 @@ describe("Component", () => {
       assert.strictEqual(c.width() , width, "width set");
       assert.strictEqual(c.height(), height, "height set");
 
-      let contentParent = d3.select((<any> c)._element);
+      let contentParent = svg.select(".component");
       let translate = TestMethods.getTranslate(contentParent);
       assert.deepEqual(translate, [origin.x, origin.y], "the element translated appropriately");
       let backgroundFillBox = svg.select(".background-fill");
@@ -397,7 +397,7 @@ describe("Component", () => {
         let t = new Plottable.Components.Table([[c]]);
         t.renderTo(svg);
 
-        let contentParent = d3.select((<any> c)._element);
+        let contentParent = svg.select(".component");
         assert.deepEqual(TestMethods.getTranslate(contentParent), [0, 0], "the element was not translated");
         svg.remove();
       });
@@ -663,7 +663,7 @@ describe("Component", () => {
     c.redraw();
     let origin = c.origin();
     assert.deepEqual(origin, {x: 0, y: 0}, "origin reset");
-    let contentParent = d3.select((<any> c)._element);
+    let contentParent = svg.select(".component");
     let translate = TestMethods.getTranslate(contentParent);
     assert.deepEqual(translate, [origin.x, origin.y], "DOM element rendered at new origin");
     c.destroy();
@@ -673,7 +673,7 @@ describe("Component", () => {
   it("generates a clipPath element if it is enabled", () => {
     (<any> c)._clipPathEnabled = true;
     c.anchor(svg);
-    let contentParent = d3.select((<any> c)._element);
+    let contentParent = svg.select(".component");
     assert.isNotNull(contentParent.attr("clip-path"), "clip-path attribute set");
     c.destroy();
     svg.remove();
