@@ -451,6 +451,7 @@ export module Plots {
             return;
           }
 
+          let color = attrToProjector["fill"](datum, datumIndex, dataset);
           let dark = Utils.Color.contrast("white", color) * 1.6 < Utils.Color.contrast("black", color);
           let g = labelArea.append("g").attr("transform", "translate(" + x + "," + y + ")");
           let className = dark ? "dark-label" : "light-label";

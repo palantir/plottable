@@ -8098,7 +8098,7 @@ var Plottable;
                         if (_this._overlayLabel(xLabelRange, yLabelRange, datumIndex, datasetIndex, dataToDraw)) {
                             return;
                         }
-                        var color = attrToProjector["fill"] == null ? "black" : attrToProjector["fill"](datum, datumIndex, dataset);
+                        var color = attrToProjector["fill"](datum, datumIndex, dataset);
                         var dark = Plottable.Utils.Color.contrast("white", color) * 1.6 < Plottable.Utils.Color.contrast("black", color);
                         var g = labelArea.append("g").attr("transform", "translate(" + x + "," + y + ")");
                         var className = dark ? "dark-label" : "light-label";
