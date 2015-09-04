@@ -305,8 +305,8 @@ describe("TimeAxis", () => {
     });
 
     it("includes the annotation space in the final size calculation", () => {
-      const SVG_WIDTH = 400;
-      const SVG_HEIGHT = 400;
+      let SVG_WIDTH = 400;
+      let SVG_HEIGHT = 400;
       let svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
       let xScale = new Plottable.Scales.Time();
       let xAxis = new Plottable.Axes.Time(xScale, "bottom");
