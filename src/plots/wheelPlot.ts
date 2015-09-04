@@ -15,6 +15,7 @@ export module Plots {
     constructor() {
       super();
       this.addClass("wheel-plot");
+      this.attr("fill", new Scales.Color().range()[0]);
     }
 
     public computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number) {
