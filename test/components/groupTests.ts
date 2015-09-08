@@ -31,13 +31,11 @@ describe("Group", () => {
 
       group.append(component);
 
-      assert.strictEqual(group.components().length, 1,
-        "there should first be 1 element in the group");
+      assert.strictEqual(group.components().length, 1, "there should first be 1 element in the group");
 
       assert.doesNotThrow(() => group.append(null));
 
-      assert.strictEqual(group.components().length, 1,
-        "adding null to a group should have no effect on the group");
+      assert.strictEqual(group.components().length, 1, "adding null to a group should have no effect on the group");
     });
 
     it("removes Components using remove()", () => {
@@ -53,7 +51,7 @@ describe("Group", () => {
       c2.renderTo(svg);
       componentGroup.remove(c2);
       assert.deepEqual(componentGroup.components(), [c1, c3],
-      "removing a Component not in the Group does not remove Components from the Group");
+        "removing a Component not in the Group does not remove Components from the Group");
       assert.strictEqual((<SVGElement> c2.content().node()).ownerSVGElement, svg.node(), "The Component not in the Group stayed put");
 
       svg.remove();
@@ -156,28 +154,21 @@ describe("Group", () => {
       group1.renderTo(svg);
       group2.renderTo(svg);
 
-      assert.strictEqual(group2.components().length, 0,
-        "second group should have no component before movement");
+      assert.strictEqual(group2.components().length, 0, "second group should have no component before movement");
 
-      assert.strictEqual(group1.components().length, 1,
-        "first group should have 1 component before movement");
+      assert.strictEqual(group1.components().length, 1, "first group should have 1 component before movement");
 
-      assert.strictEqual(component.parent(), group1,
-        "component's parent before moving should be the group 1"
+      assert.strictEqual(component.parent(), group1, "component's parent before moving should be the group 1"
       );
 
-      assert.doesNotThrow(() => group2.append(component), Error,
-        "should be able to move components between groups after anchoring"
+      assert.doesNotThrow(() => group2.append(component), Error, "should be able to move components between groups after anchoring"
       );
 
-      assert.strictEqual(group2.components().length, 1,
-        "second group should have 1 component after movement");
+      assert.strictEqual(group2.components().length, 1, "second group should have 1 component after movement");
 
-      assert.strictEqual(group1.components().length, 0,
-        "first group should have no components after movement");
+      assert.strictEqual(group1.components().length, 0, "first group should have no components after movement");
 
-      assert.strictEqual(component.parent(), group2,
-        "component's parent after movement should be the group 2"
+      assert.strictEqual(component.parent(), group2, "component's parent after movement should be the group 2"
       );
 
       svg.remove();
