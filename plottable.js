@@ -8611,12 +8611,13 @@ var Plottable;
                     return extents;
                 }
                 var scale = accScaleBinding.scale;
-                // console.log("aici", extents, scale.scale(extents[0][0]), scale.scale(extents[0][1]));
-                extents = extents.map(function (extent) { return [
+                // To account for inverted domains
+                extents = extents.map(function (extent) { return d3.extent([
                     scale.invert(scale.scale(extent[0]) - _this._barPixelWidth / 2),
-                    scale.invert(scale.scale(extent[1]) + _this._barPixelWidth / 2),
-                ]; });
-                // console.log("acolo", extents);
+                    scale.invert(scale.scale(extent[0]) + _this._barPixelWidth / 2),
+                    scale.invert(scale.scale(extent[1]) - _this._barPixelWidth / 2),
+                    scale.invert(scale.scale(extent[1]) + _this._barPixelWidth / 2)
+                ]); });
                 return extents;
             };
             Bar.prototype._drawLabels = function () {

@@ -438,13 +438,13 @@ export module Plots {
       }
 
       let scale = <QuantitativeScale<any>>accScaleBinding.scale;
-      // console.log("aici", extents, scale.scale(extents[0][0]), scale.scale(extents[0][1]));
-
-      extents = extents.map((extent) => [
+      // To account for inverted domains
+      extents = extents.map((extent) => d3.extent([
         scale.invert(scale.scale(extent[0]) - this._barPixelWidth / 2),
-        scale.invert(scale.scale(extent[1]) + this._barPixelWidth / 2),
-      ]);
-      // console.log("acolo", extents);
+        scale.invert(scale.scale(extent[0]) + this._barPixelWidth / 2),
+        scale.invert(scale.scale(extent[1]) - this._barPixelWidth / 2),
+        scale.invert(scale.scale(extent[1]) + this._barPixelWidth / 2)
+      ]));
 
       return extents;
     }
