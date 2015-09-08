@@ -133,30 +133,29 @@ describe("Interactive Components", () => {
         svg.remove();
       });
 
-      it("gets the correct xExtent", () => {
+      it("can set the data values of the left and right sides directly", () => {
         let xScale = new Plottable.Scales.Linear();
         xScale.domain([0, 2000]);
         xScale.range([0, svgWidth]);
 
-        assert.deepEqual(sbl.xExtent(), [undefined, undefined], "xExtent is not set unless an yScale is set");
+        sbl.boxVisible(true);
         sbl.xScale(xScale);
+
+        assert.deepEqual(sbl.xExtent(), [undefined, undefined], "xExtent is not set unless an yScale is set");
+        let xExtent = [100, 250];
+        assert.strictEqual(sbl.xExtent(xExtent), sbl, "returns calling object");
+
+        assert.deepEqual(sbl.xExtent(), xExtent, "xExtent set");
+        assert.strictEqual(sbl.bounds().topLeft.x, xScale.scale(xExtent[0]), "left pixel position adjusts accordingly");
+        assert.strictEqual(sbl.bounds().bottomRight.x, xScale.scale(xExtent[1]), "right pixel position adjusts accordingly");
         sbl.renderTo(svg);
 
-        let topLeft: Plottable.Point = {
-          x: 100,
-          y: 0
-        };
-        let bottomRight: Plottable.Point = {
-          x: 250,
-          y: 300
-        };
-        sbl.bounds({
-          topLeft: topLeft,
-          bottomRight: bottomRight
-        });
+        let box = sbl.content().select(".selection-area");
 
-        assert.strictEqual(sbl.xExtent()[0], xScale.invert(100), "left data value maps correctly");
-        assert.strictEqual(sbl.xExtent()[1], xScale.invert(250), "right data value maps correctly");
+        assert.closeTo(TestMethods.numAttr(box, "x"), xScale.scale(xExtent[0]),
+          window.Pixel_CloseTo_Requirement, "box x attribute starts at start of x extent");
+        assert.closeTo(TestMethods.numAttr(box, "width"), xScale.scale(xExtent[1]) - xScale.scale(xExtent[0]),
+          window.Pixel_CloseTo_Requirement, "box width attribute extends for width of x extent");
 
         sbl.destroy();
         svg.remove();
@@ -188,31 +187,29 @@ describe("Interactive Components", () => {
         svg.remove();
       });
 
-      it("gets the correct yExtent", () => {
+      it("can set the data values of the top and bottom sides directly", () => {
         let yScale = new Plottable.Scales.Linear();
         yScale.domain([0, 2000]);
         yScale.range([0, svgHeight]);
 
-        assert.deepEqual(sbl.yExtent(), [undefined, undefined], "yExtent is not set unless an yScale is set");
-
+        sbl.boxVisible(true);
         sbl.yScale(yScale);
+
+        assert.deepEqual(sbl.yExtent(), [undefined, undefined], "yExtent is not set unless an yScale is set");
+        let yExtent = [0, 300];
+        assert.strictEqual(sbl.yExtent(yExtent), sbl, "returns calling object");
+
+        assert.deepEqual(sbl.yExtent(), yExtent, "yExtent set");
+        assert.strictEqual(sbl.bounds().topLeft.y, yScale.scale(yExtent[0]), "top pixel position adjusts accordingly");
+        assert.strictEqual(sbl.bounds().bottomRight.y, yScale.scale(yExtent[1]), "bottom pixel position adjusts accordingly");
         sbl.renderTo(svg);
 
-        let topLeft: Plottable.Point = {
-          x: 100,
-          y: 0
-        };
-        let bottomRight: Plottable.Point = {
-          x: 250,
-          y: 300
-        };
-        sbl.bounds({
-          topLeft: topLeft,
-          bottomRight: bottomRight
-        });
+        let box = sbl.content().select(".selection-area");
 
-        assert.strictEqual(sbl.yExtent()[0], yScale.invert(0), "bottom data value maps correctly");
-        assert.strictEqual(sbl.yExtent()[1], yScale.invert(300), "top data value maps correctly");
+        assert.closeTo(TestMethods.numAttr(box, "y"), yScale.scale(yExtent[0]),
+          window.Pixel_CloseTo_Requirement, "box y attribute starts at start of y extent");
+        assert.closeTo(TestMethods.numAttr(box, "height"), yScale.scale(yExtent[1]) - yScale.scale(yExtent[0]),
+          window.Pixel_CloseTo_Requirement, "box height attribute extends for width of y extent");
 
         sbl.destroy();
         svg.remove();
