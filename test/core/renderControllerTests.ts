@@ -43,14 +43,14 @@ describe("RenderController", () => {
   it("can queue a component to render", () => {
     let svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
     let component = new Plottable.Component();
-    let rendered = false;
+    let renderedClass = "rendered";
     component.renderImmediately = () => {
-      rendered = true;
+      component.content().append("g").classed(renderedClass, true);
       return component;
     };
     component.anchor(svg);
     Plottable.RenderController.registerToRender(component);
-    assert.isTrue(rendered, "component has rendered");
+    assert.isFalse(component.content().select(`.${renderedClass}`).empty(), "component has rendered");
     component.destroy();
     svg.remove();
   });
@@ -58,14 +58,14 @@ describe("RenderController", () => {
   it("can queue a component to undergo layout computation and render", () => {
     let svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
     let component = new Plottable.Component();
-    let rendered = false;
+    let renderedClass = "rendered";
     component.renderImmediately = () => {
-      rendered = true;
+      component.content().append("g").classed(renderedClass, true);
       return component;
     };
     component.anchor(svg);
     Plottable.RenderController.registerToComputeLayout(component);
-    assert.isTrue(rendered, "component has rendered");
+    assert.isFalse(component.content().select(`.${renderedClass}`).empty(), "component has rendered");
     assert.deepEqual(component.origin(), {x: 0, y: 0}, "origin set");
     assert.strictEqual(component.width(), SVG_WIDTH, "width set");
     assert.strictEqual(component.height(), SVG_HEIGHT, "height set");
