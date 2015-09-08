@@ -42,7 +42,9 @@ describe("Group", () => {
       let c1 = new Plottable.Component();
       let c2 = new Plottable.Component();
       let c3 = new Plottable.Component();
+
       let componentGroup = new Plottable.Components.Group([c1, c2, c3]);
+      assert.deepEqual(componentGroup.components(), [c1, c2, c3], "Group initialized correctly");
 
       componentGroup.remove(c2);
       assert.deepEqual(componentGroup.components(), [c1, c3], "removing a Component respects the order of the remaining Components");
@@ -79,7 +81,7 @@ describe("Group", () => {
       let c2 = new Plottable.Component();
       let group = new Plottable.Components.Group([c1, c2]);
 
-      let svg = TestMethods.generateSVG(200, 200);
+      let svg = TestMethods.generateSVG();
 
       group.renderTo(svg);
       assert.isTrue(isInDOM(group), "Group was added to the DOM");
@@ -179,7 +181,7 @@ describe("Group", () => {
       let c2 = new Plottable.Component();
       let group = new Plottable.Components.Group([c1, c2]);
 
-      let svg = TestMethods.generateSVG(200, 200);
+      let svg = TestMethods.generateSVG();
       group.renderTo(svg);
 
       group.destroy();
@@ -195,7 +197,7 @@ describe("Group", () => {
     let SVG_HEIGHT = 400;
 
     it("requests no space when empty, but occupies all offered space", () => {
-      let svg = TestMethods.generateSVG();
+      let svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
       let group = new Plottable.Components.Group([]);
 
       let request = group.requestedSpace(SVG_WIDTH, SVG_HEIGHT);
@@ -208,7 +210,7 @@ describe("Group", () => {
     });
 
     it("requests space correctly when it contains a non-fixed-size Component", () => {
-      let svg = TestMethods.generateSVG();
+      let svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
       let c1 = new Plottable.Component();
       let c2 = new Plottable.Component();
       let group = new Plottable.Components.Group([c1, c2]);
@@ -226,7 +228,7 @@ describe("Group", () => {
     });
 
     it("requests space correctly when it contains fixed-size Components", () => {
-      let svg = TestMethods.generateSVG();
+      let svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
       let tall = new Mocks.FixedSizeComponent(SVG_WIDTH / 4, SVG_WIDTH / 2);
       let wide = new Mocks.FixedSizeComponent(SVG_WIDTH / 2, SVG_WIDTH / 4);
 
