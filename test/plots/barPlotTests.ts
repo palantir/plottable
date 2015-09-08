@@ -777,24 +777,47 @@ describe("Plots", () => {
 
     describe("Horizontal Bar Plot extent calculation", () => {
 
+      let svg: d3.Selection<void>;
+      let xScale: Plottable.Scales.Linear;
+      let yScale: Plottable.Scales.Linear;
+      let plot: Plottable.Plots.Bar<number, number>;
 
-      it("has the same size before and after autoDomain()-ing", () => {
-        let svg = TestMethods.generateSVG();
+      beforeEach(() => {
+        svg = TestMethods.generateSVG();
 
-        let xScale = new Plottable.Scales.Linear();
-        let yScale = new Plottable.Scales.Linear();
+        xScale = new Plottable.Scales.Linear();
+        yScale = new Plottable.Scales.Linear();
 
-        let plot = new Plottable.Plots.Bar<number, number>("horizontal");
-        var data = Array.apply(null, Array(10)).map(function(d: any, i: any) {
+        plot = new Plottable.Plots.Bar<number, number>("horizontal");
+        plot.x((d) => d.x, xScale);
+        plot.y((d) => d.y, yScale);
+      });
+
+      it("pads the domain in the correct direction", () => {
+
+        let data = Array.apply(null, Array(10)).map(function(d: any, i: any) {
           return {
             x: i + 1,
             y: i
           };
         });
-
         plot.addDataset(new Plottable.Dataset(data));
-        plot.x((d) => d.x, xScale);
-        plot.y((d) => d.y, yScale);
+        plot.renderTo(svg);
+
+        assert.operator(yScale.domain()[0], "<", data[0].y, "lower end of the domain is padded");
+        assert.operator(yScale.domain()[1], ">", data[data.length - 1].y, "higher end of the domain is padded");
+
+        svg.remove();
+      });
+
+      it("has the same size before and after autoDomain()-ing", () => {
+        let data = Array.apply(null, Array(10)).map(function(d: any, i: any) {
+          return {
+            x: i + 1,
+            y: i
+          };
+        });
+        plot.addDataset(new Plottable.Dataset(data));
 
         plot.renderTo(svg);
 
@@ -804,7 +827,6 @@ describe("Plots", () => {
         assert.deepEqual(initialYScaleDomain, yScale.domain(), "The domain did not change");
 
         svg.remove();
-
       });
     });
 

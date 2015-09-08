@@ -59,7 +59,6 @@ export class QuantitativeScale<D> extends Scale<D, number> {
 
   protected _getExtent(): D[] {
     let includedValues = this._getAllIncludedValues();
-    console.log(includedValues);
 
     let extent = this._defaultExtent();
     if (includedValues.length !== 0) {
