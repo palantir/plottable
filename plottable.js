@@ -6172,7 +6172,9 @@ var Plottable;
                     bottomRight: bottomRight
                 };
             };
-            // sets pixelPosition() or value() based on the other, depending on which was the last one set
+            /**
+             * Sets bounds() or xExtent() / yExtent() based on the other, depending on which was the last one set.
+             */
             SelectionBoxLayer.prototype._syncPixelPositionAndValue = function () {
                 if (this._xScale != null) {
                     if (this._xBoundsMode === PropertyMode.VALUE && this._xExtent[0] != null
