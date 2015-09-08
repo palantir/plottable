@@ -6,17 +6,17 @@ describe("RenderController", () => {
 
   describe("configuring the render policy", () => {
     let oldWarn: (msg: string) => void;
-    let warned: boolean;
+    let storedWarningMsg: string;
 
     before(() => {
       oldWarn = Plottable.Utils.Window.warn;
-      Plottable.Utils.Window.warn = () => {
-        warned = true;
+      Plottable.Utils.Window.warn = (warningMsg: string) => {
+        storedWarningMsg = warningMsg;
       };
     });
 
     beforeEach(() => {
-      warned = false;
+      storedWarningMsg = "";
     });
 
     after(() => {
@@ -36,7 +36,7 @@ describe("RenderController", () => {
       let unrecognizedRenderPolicy = "foo";
       Plottable.RenderController.renderPolicy(unrecognizedRenderPolicy);
 
-      assert.isTrue(warned, "warning sent for unrecognized render policy");
+      assert.include(storedWarningMsg, "Unrecognized renderPolicy", "warning sent for unrecognized render policy");
     });
   });
 
