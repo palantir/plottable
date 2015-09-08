@@ -438,6 +438,7 @@ export module Plots {
       }
 
       let scale = <QuantitativeScale<any>>accScaleBinding.scale;
+
       // To account for inverted domains
       extents = extents.map((extent) => d3.extent([
         scale.invert(scale.scale(extent[0]) - this._barPixelWidth / 2),
