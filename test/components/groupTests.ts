@@ -20,7 +20,7 @@ describe("ComponentGroups", () => {
       componentGroup.renderTo(svg);
       let c3 = new Plottable.Component();
       componentGroup.append(c3);
-      assert.deepEqual(componentGroup.components(), [c1, c2, c3], "Components can be append()-ed after rendering");
+      assert.deepEqual(componentGroup.components(), [c1, c2, c3], "Components can be append()ed after rendering");
 
       svg.remove();
     });
@@ -70,18 +70,44 @@ describe("ComponentGroups", () => {
     });
   });
 
-  describe("detach()-ing constituent Components", () => {
-    it("takes its constutuent Components with it when detach()-ed or anchor()-ed", () => {
+  describe("detach()ing constituent Components", () => {
+    it("takes its constutuent Components with it when detach()ed or anchor()ed", () => {
+      function isInDOM(component: Plottable.Component) {
+        let contentNode = component.content().node();
+        return contentNode != null && Plottable.Utils.DOM.boundingSVG(<SVGElement> contentNode) != null;
+      };
 
+      let c1 = new Plottable.Component();
+      let c2 = new Plottable.Component();
+      let cg = new Plottable.Components.Group([c1, c2]);
+
+      let svg = TestMethods.generateSVG(200, 200);
+
+      cg.renderTo(svg);
+      assert.isTrue(isInDOM(cg), "Group was added to the DOM");
+      assert.isTrue(isInDOM(c1), "Component 1 was added to the DOM");
+      assert.isTrue(isInDOM(c2), "Component 2 was added to the DOM");
+
+      cg.detach();
+      assert.isFalse(isInDOM(cg), "Group was removed from the DOM");
+      assert.isFalse(isInDOM(c1), "Component 1 was also removed from the DOM");
+      assert.isFalse(isInDOM(c2), "Component 2 was also removed from the DOM");
+
+      cg.renderTo(svg);
+      assert.isTrue(isInDOM(cg), "Group was added back to the DOM");
+      assert.isTrue(isInDOM(c1), "Component 1 was also added back to the DOM");
+      assert.isTrue(isInDOM(c2), "Component 2 was also added back to the DOM");
+
+      svg.remove();
     });
 
-    it("detach()-es Components from their previous location when they are append()-ed", () => {
+    it("detach()es Components from their previous location when they are append()ed", () => {
       let c1 = new Plottable.Component;
       let svg = TestMethods.generateSVG();
       c1.renderTo(svg);
       let group = new Plottable.Components.Group();
       group.append(c1);
-      assert.isFalse((<Node> svg.node()).hasChildNodes(), "Component was detach()-ed");
+      assert.isFalse((<Node> svg.node()).hasChildNodes(), "Component was detach()ed");
       svg.remove();
     });
 
@@ -106,23 +132,14 @@ describe("ComponentGroups", () => {
       let svg = TestMethods.generateSVG(200, 200);
       cg.renderTo(svg);
 
-      assert.isTrue(isInDOM(c1), "component 1 was added to the DOM");
-      assert.isTrue(isInDOM(c2), "component 2 was added to the DOM");
+      assert.isTrue(isInDOM(c1), "Component 1 was added to the DOM");
+      assert.isTrue(isInDOM(c2), "Component 2 was added to the DOM");
 
       c2.detach();
 
-      assert.isTrue(isInDOM(c1), "component 1 is still in the DOM");
-      assert.isFalse(isInDOM(c2), "component 2 was removed from the DOM");
-
-      cg.detach();
-
-      assert.isFalse(isInDOM(cg), "component group was removed from the DOM");
-      assert.isFalse(isInDOM(c1), "component 1 was also removed from the DOM");
-
-      cg.renderTo(svg);
-
-      assert.isTrue(isInDOM(cg), "component group was added back to the DOM");
-      assert.isTrue(isInDOM(c1), "component 1 was also added back to the DOM");
+      assert.isTrue(isInDOM(c1), "Component 1 is still in the DOM");
+      assert.isFalse(isInDOM(c2), "Component 2 was removed from the DOM");
+      assert.isFalse(cg.has(c2), "Component 2 was removed from the Group");
 
       svg.remove();
     });
@@ -165,6 +182,21 @@ describe("ComponentGroups", () => {
 
       svg.remove();
     });
+
+    it("destroy()s its Components when destroy()ed", () => {
+      let c1 = new Plottable.Component();
+      let c2 = new Plottable.Component();
+      let cg = new Plottable.Components.Group([c1, c2]);
+
+      let svg = TestMethods.generateSVG(200, 200);
+      cg.renderTo(svg);
+
+      cg.destroy();
+      assert.throws(() => c1.renderTo(svg), Error);
+      assert.throws(() => c2.renderTo(svg), Error);
+
+      svg.remove();
+    });
   });
 
   it("overlaps its Components", () => {
@@ -185,21 +217,6 @@ describe("ComponentGroups", () => {
     TestMethods.assertWidthHeight(t1, 10, 10, "rect1 sized correctly");
     TestMethods.assertWidthHeight(t2, 400, 400, "rect2 sized correctly");
     TestMethods.assertWidthHeight(t3, 400, 400, "rect3 sized correctly");
-    svg.remove();
-  });
-
-  it("destroy()s its Components when destroy()ed", () => {
-    let c1 = new Plottable.Component().addClass("component-1");
-    let c2 = new Plottable.Component().addClass("component-2");
-    let cg = new Plottable.Components.Group([c1, c2]);
-
-    let svg = TestMethods.generateSVG(200, 200);
-    cg.renderTo(svg);
-
-    cg.destroy();
-    assert.throws(() => c1.renderTo(svg), Error);
-    assert.throws(() => c2.renderTo(svg), Error);
-
     svg.remove();
   });
 
