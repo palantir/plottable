@@ -775,6 +775,39 @@ describe("Plots", () => {
       });
     });
 
+    describe("Horizontal Bar Plot extent calculation", () => {
+
+
+      it("has the same size before and after autoDomain()-ing", () => {
+        let svg = TestMethods.generateSVG();
+
+        let xScale = new Plottable.Scales.Linear();
+        let yScale = new Plottable.Scales.Linear();
+
+        let plot = new Plottable.Plots.Bar<number, number>("horizontal");
+        var data = Array.apply(null, Array(10)).map(function(d: any, i: any) {
+          return {
+            x: i + 1,
+            y: i
+          };
+        });
+
+        plot.addDataset(new Plottable.Dataset(data));
+        plot.x((d) => d.x, xScale);
+        plot.y((d) => d.y, yScale);
+
+        plot.renderTo(svg);
+
+        let initialYScaleDomain = yScale.domain();
+        yScale.autoDomain();
+
+        assert.deepEqual(initialYScaleDomain, yScale.domain(), "The domain did not change");
+
+        svg.remove();
+
+      });
+    });
+
     describe("Vertical Bar Plot With Bar Labels", () => {
       let plot: Plottable.Plots.Bar<string, number>;
       let data: any[];
