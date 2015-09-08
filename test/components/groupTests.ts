@@ -195,9 +195,13 @@ describe("Group", () => {
   describe("Layout", () => {
     let SVG_WIDTH = 400;
     let SVG_HEIGHT = 400;
+    let svg: d3.Selection<void>;
+
+    beforeEach(() => {
+      svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+    })
 
     it("requests no space when empty, but occupies all offered space", () => {
-      let svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
       let group = new Plottable.Components.Group([]);
 
       let request = group.requestedSpace(SVG_WIDTH, SVG_HEIGHT);
@@ -210,7 +214,6 @@ describe("Group", () => {
     });
 
     it("requests space correctly when it contains a non-fixed-size Component", () => {
-      let svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
       let c1 = new Plottable.Component();
       let c2 = new Plottable.Component();
       let group = new Plottable.Components.Group([c1, c2]);
@@ -228,7 +231,6 @@ describe("Group", () => {
     });
 
     it("requests space correctly when it contains fixed-size Components", () => {
-      let svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
       let tallComponent = new Mocks.FixedSizeComponent(SVG_WIDTH / 4, SVG_WIDTH / 2);
       let wideComponent = new Mocks.FixedSizeComponent(SVG_WIDTH / 2, SVG_WIDTH / 4);
 
@@ -255,7 +257,6 @@ describe("Group", () => {
       let unfixedComponent = new Plottable.Component();
 
       let group = new Plottable.Components.Group([fixedComponent, unfixedComponent]);
-      let svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
       group.renderTo(svg);
 
       assert.strictEqual(fixedComponent.width(), FIXED_COMPONENT_SIZE, "fixed-size Component has correct width");
