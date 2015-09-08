@@ -229,10 +229,10 @@ describe("Group", () => {
 
     it("requests space correctly when it contains fixed-size Components", () => {
       let svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
-      let tall = new Mocks.FixedSizeComponent(SVG_WIDTH / 4, SVG_WIDTH / 2);
-      let wide = new Mocks.FixedSizeComponent(SVG_WIDTH / 2, SVG_WIDTH / 4);
+      let tallComponent = new Mocks.FixedSizeComponent(SVG_WIDTH / 4, SVG_WIDTH / 2);
+      let wideComponent = new Mocks.FixedSizeComponent(SVG_WIDTH / 2, SVG_WIDTH / 4);
 
-      let group = new Plottable.Components.Group([tall, wide]);
+      let group = new Plottable.Components.Group([tallComponent, wideComponent]);
 
       let request = group.requestedSpace(SVG_WIDTH, SVG_HEIGHT);
       assert.strictEqual(request.minWidth, SVG_WIDTH / 2, "requested enough space for widest Component");
