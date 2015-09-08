@@ -2,7 +2,7 @@
 
 describe("Scales", () => {
   describe("Tick generators", () => {
-    describe("intervalTickGenerator()", () => {
+    describe("intervalTickGenerator() generates ticks with a given interval", () => {
       let scale: Plottable.Scales.Linear;
 
       beforeEach(() => {
@@ -43,13 +43,13 @@ describe("Scales", () => {
         let end = 10.01;
         scale.domain([start, end]);
         let ticks = Plottable.Scales.TickGenerators.intervalTickGenerator(11)(scale);
-        assert.deepEqual(ticks, [0.5, 10.01], "no middle ticks were added when interval is 11");
+        assert.deepEqual(ticks, [start, end], "no middle ticks were added when interval is 11");
 
         ticks = Plottable.Scales.TickGenerators.intervalTickGenerator(Infinity)(scale);
-        assert.deepEqual(ticks, [0.5, 10.01], "no middle ticks were added when interval is Infinity");
+        assert.deepEqual(ticks, [start, end], "no middle ticks were added when interval is Infinity");
 
         ticks = Plottable.Scales.TickGenerators.intervalTickGenerator(NaN)(scale);
-        assert.deepEqual(ticks, [0.5, 10.01], "no middle ticks were added when interval is NaN");
+        assert.deepEqual(ticks, [start, end], "no middle ticks were added when interval is NaN");
       });
 
       it("works for Scales.ModifiedLog", () => {
@@ -66,6 +66,8 @@ describe("Scales", () => {
           "interval cannot be negatvie");
       });
 
+      // HACKHACK: skipping failing test
+      // intervalTickGenerator() does not detect invalids scale
       it.skip("rejects non-QuantitativeScale<number> Scales", () => {
         let categoryScale: any = new Plottable.Scales.Category();
         (<any>assert).throws(() => Plottable.Scales.TickGenerators.intervalTickGenerator(1)(categoryScale), Error,
@@ -78,7 +80,7 @@ describe("Scales", () => {
 
     });
 
-    describe("integerTickGenerator()", () => {
+    describe("integerTickGenerator() generates integer ticks ", () => {
       let scale: Plottable.Scales.Linear;
       let integerTickGenerator: Plottable.Scales.TickGenerators.TickGenerator<number>;
 
@@ -108,6 +110,8 @@ describe("Scales", () => {
           "only the end ticks are returned when there is no integer in the interval");
       });
 
+      // HACKHACK: skipping failing test
+      // integerTickGenerator() returns an array of powers instead of actual value
       it.skip("works for Scales.ModifiedLog", () => {
         let logScale = new Plottable.Scales.ModifiedLog(2);
         logScale.domain([-2, 4.5]);
@@ -115,6 +119,8 @@ describe("Scales", () => {
         assert.deepEqual(logTicks, [-2, -1, 0, 1, 2, 4, 4.5], "generates interger ticks for Scales.ModifiedLog");
       });
 
+      // HACKHACK: skipping failing test
+      // integerTickGenerator() does not detect invalids scale
       it.skip("rejects non-QuantitativeScale<number> Scales", () => {
         let categoryScale: any = new Plottable.Scales.Category();
         (<any>assert).throws(() => integerTickGenerator(categoryScale), Error,
