@@ -200,7 +200,7 @@ describe("Group", () => {
 
     beforeEach(() => {
       svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
-    })
+    });
 
     it("requests no space when empty, but occupies all offered space", () => {
       let group = new Plottable.Components.Group([]);
