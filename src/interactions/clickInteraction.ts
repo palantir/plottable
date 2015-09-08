@@ -45,14 +45,14 @@ export module Interactions {
     }
 
     private _handleClickDown(p: Point) {
-      var translatedPoint = this._translateToComponentSpace(p);
+      let translatedPoint = this._translateToComponentSpace(p);
       if (this._isInsideComponent(translatedPoint)) {
         this._clickedDown = true;
       }
     }
 
     private _handleClickUp(p: Point) {
-      var translatedPoint = this._translateToComponentSpace(p);
+      let translatedPoint = this._translateToComponentSpace(p);
       if (this._clickedDown && this._isInsideComponent(translatedPoint)) {
         this._onClickCallbacks.callCallbacks(translatedPoint);
       }

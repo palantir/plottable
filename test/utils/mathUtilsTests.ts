@@ -8,24 +8,24 @@ describe("Utils.Methods", () => {
   });
 
   describe("max() and min()", () => {
-    var max = Plottable.Utils.Math.max;
-    var min = Plottable.Utils.Math.min;
-    var today = new Date();
+    let max = Plottable.Utils.Math.max;
+    let min = Plottable.Utils.Math.min;
+    let today = new Date();
 
     it("return the default value if max() or min() can't be computed", () => {
-      var minValue = 1;
-      var maxValue = 5;
-      var defaultValue = 3;
-      var goodArray: number[][] = [
+      let minValue = 1;
+      let maxValue = 5;
+      let defaultValue = 3;
+      let goodArray: number[][] = [
         [minValue],
         [maxValue]
       ];
       // bad array is technically of type number[][], but subarrays are empty!
-      var badArray: number[][] = [
+      let badArray: number[][] = [
         [],
         []
       ];
-      var accessor = (arr: number[]) => arr[0];
+      let accessor = (arr: number[]) => arr[0];
       assert.strictEqual(min<number[], number>(goodArray, accessor, defaultValue),
         minValue, "min(): minimum value is returned in good case");
       assert.strictEqual(min<number[], number>(badArray, accessor, defaultValue),
@@ -37,11 +37,11 @@ describe("Utils.Methods", () => {
     });
 
     it("max() and min() work on numbers", () => {
-      var alist = [1, 2, 3, 4, 5];
-      var dbl = (x: number) => x * 2;
-      var dblIndexOffset = (x: number, i: number) => x * 2 - i;
-      var numToDate = (x: number) => {
-        var t = new Date(today.getTime());
+      let alist = [1, 2, 3, 4, 5];
+      let dbl = (x: number) => x * 2;
+      let dblIndexOffset = (x: number, i: number) => x * 2 - i;
+      let numToDate = (x: number) => {
+        let t = new Date(today.getTime());
         t.setDate(today.getDate() + x);
         return t;
       };
@@ -63,17 +63,17 @@ describe("Utils.Methods", () => {
     });
 
     it("max() and min() work on strings", () => {
-      var strings = ["a", "bb", "ccc", "ddd"];
+      let strings = ["a", "bb", "ccc", "ddd"];
       assert.deepEqual(max(strings, (s: string) => s.length, 0), 3, "works on arrays of non-numbers with a function");
       assert.deepEqual(max([], (s: string) => s.length, 5), 5, "defaults work even with non-number function type");
     });
 
     it("max() and min() work on dates", () => {
-      var tomorrow = new Date(today.getTime());
+      let tomorrow = new Date(today.getTime());
       tomorrow.setDate(today.getDate() + 1);
-      var dayAfterTomorrow = new Date(today.getTime());
+      let dayAfterTomorrow = new Date(today.getTime());
       dayAfterTomorrow.setDate(today.getDate() + 2);
-      var dates: Date[] = [today, tomorrow, dayAfterTomorrow, null];
+      let dates: Date[] = [today, tomorrow, dayAfterTomorrow, null];
       assert.deepEqual(min<Date>(dates, dayAfterTomorrow), today, "works on arrays of non-numeric values but comparable");
       assert.deepEqual(max<Date>(dates, today), dayAfterTomorrow, "works on arrays of non-number values but comparable");
       assert.deepEqual(max<Date>([null], today), today, "returns default value if passed array of null values");
@@ -82,7 +82,7 @@ describe("Utils.Methods", () => {
   });
 
   it("isNaN()", () => {
-    var isNaN = Plottable.Utils.Math.isNaN;
+    let isNaN = Plottable.Utils.Math.isNaN;
 
     assert.isTrue(isNaN(NaN), "Only NaN should pass the isNaN check");
 
@@ -97,7 +97,7 @@ describe("Utils.Methods", () => {
   });
 
   it("isValidNumber()", () => {
-    var isValidNumber = Plottable.Utils.Math.isValidNumber;
+    let isValidNumber = Plottable.Utils.Math.isValidNumber;
 
     assert.isTrue(isValidNumber(0), "(0 is a valid number");
     assert.isTrue(isValidNumber(1), "(1 is a valid number");
@@ -123,9 +123,9 @@ describe("Utils.Methods", () => {
   });
 
   it("range()", () => {
-    var start = 0;
-    var end = 6;
-    var range = Plottable.Utils.Math.range(start, end);
+    let start = 0;
+    let end = 6;
+    let range = Plottable.Utils.Math.range(start, end);
     assert.deepEqual(range, [0, 1, 2, 3, 4, 5], "all entries has been generated");
 
     range = Plottable.Utils.Math.range(start, end, 2);

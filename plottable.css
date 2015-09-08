@@ -41,6 +41,7 @@
 
 svg.plottable {
   display : block; /* SVGs must be block elements for width/height calculations to work in Firefox. */
+  pointer-events: visibleFill;
 }
 
 .plottable .background-fill {
@@ -108,6 +109,23 @@ svg.plottable {
   line-height: normal;
 }
 
+.plottable .axis .annotation-circle {
+  fill: white;
+  stroke-width: 1px;
+  stroke: #CCC;
+}
+
+.plottable .axis .annotation-line {
+  stroke: #CCC;
+  stroke-width: 1px;
+}
+
+.plottable .axis .annotation-rect {
+  stroke: #CCC;
+  stroke-width: 1px;
+  fill: white;
+}
+
 .plottable .bar-plot .baseline {
   stroke: #999;
 }
@@ -158,6 +176,19 @@ svg.plottable {
 }
 /* /DragBoxLayer */
 
+.plottable .guide-line-layer line.guide-line {
+  stroke: #CCC;
+  stroke-width: 1px;
+}
+
+.plottable .drag-line-layer.enabled.vertical line.drag-edge {
+  cursor: ew-resize;
+}
+
+.plottable .drag-line-layer.enabled.horizontal line.drag-edge {
+  cursor: ns-resize;
+}
+
 .plottable .legend text {
   fill: #32313F;
   font-family: "Helvetica Neue", sans-serif;
@@ -175,4 +206,8 @@ svg.plottable {
 .plottable .waterfall-plot line.connector {
   stroke: #CCC;
   stroke-width: 1px;
+}
+
+.plottable .pie-plot .arc.outline {
+  stroke-linejoin: round;
 }

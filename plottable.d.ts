@@ -54,6 +54,7 @@ declare module Plottable {
              * @return {number} dist(p1, p2)^2
              */
             function distanceSquared(p1: Point, p2: Point): number;
+            function degreesToRadians(degree: number): number;
         }
     }
 }
@@ -93,6 +94,7 @@ declare module Plottable {
         }
     }
 }
+
 
 declare module Plottable {
     module Utils {
@@ -373,6 +375,10 @@ declare module Plottable {
          * Specifies if Plottable should show warnings.
          */
         var SHOW_WARNINGS: boolean;
+        /**
+         * Specifies if Plottable should add <title> elements to text.
+         */
+        var ADD_TITLE_ELEMENTS: boolean;
     }
 }
 
@@ -611,7 +617,6 @@ declare module Plottable {
          * @param {number} [precision] The number of decimal places to show (default 2).
          * @param {string} [symbol] The currency symbol to use (default "$").
          * @param {boolean} [prefix] Whether to prepend or append the currency symbol (default true).
-         * @param {boolean} [onlyShowUnchanged] Whether to return a value if value changes after formatting (default true).
          *
          * @returns {Formatter} A formatter for currency values.
          */
@@ -620,7 +625,6 @@ declare module Plottable {
          * Creates a formatter that displays exactly [precision] decimal places.
          *
          * @param {number} [precision] The number of decimal places to show (default 3).
-         * @param {boolean} [onlyShowUnchanged] Whether to return a value if value changes after formatting (default true).
          *
          * @returns {Formatter} A formatter that displays exactly [precision] decimal places.
          */
@@ -630,7 +634,6 @@ declare module Plottable {
          * [precision] decimal places. All other values are stringified.
          *
          * @param {number} [precision] The number of decimal places to show (default 3).
-         * @param {boolean} [onlyShowUnchanged] Whether to return a value if value changes after formatting (default true).
          *
          * @returns {Formatter} A formatter for general values.
          */
@@ -646,7 +649,6 @@ declare module Plottable {
          * Multiplies the input by 100 and appends "%".
          *
          * @param {number} [precision] The number of decimal places to show (default 0).
-         * @param {boolean} [onlyShowUnchanged] Whether to return a value if value changes after formatting (default true).
          *
          * @returns {Formatter} A formatter for percentage values.
          */
@@ -885,6 +887,14 @@ declare module Plottable {
          * @returns {QuantitativeScale} The calling QuantitativeScale.
          */
         padProportion(padProportion: number): QuantitativeScale<D>;
+        /**
+         * Gets whether or not the scale snaps its domain to nice values.
+         */
+        snappingDomainEnabled(): boolean;
+        /**
+         * Sets whether or not the scale snaps its domain to nice values.
+         */
+        snappingDomainEnabled(snappingDomainEnabled: boolean): QuantitativeScale<D>;
         protected _expandSingleValueDomain(singleValueDomain: D[]): D[];
         /**
          * Computes the domain value corresponding to a supplied range value.
@@ -1323,6 +1333,17 @@ declare module Plottable {
     module Drawers {
         class Arc extends Drawer {
             constructor(dataset: Dataset);
+            protected _applyDefaultAttributes(selection: d3.Selection<any>): void;
+        }
+    }
+}
+
+
+declare module Plottable {
+    module Drawers {
+        class ArcOutline extends Drawer {
+            constructor(dataset: Dataset);
+            protected _applyDefaultAttributes(selection: d3.Selection<any>): void;
         }
     }
 }
@@ -1440,7 +1461,7 @@ declare module Plottable {
          * @param {String|d3.Selection} element A selector-string for the <svg>, or a d3 selection containing an <svg>.
          * @returns {Component} The calling Component.
          */
-        renderTo(element: String | d3.Selection<void>): Component;
+        renderTo(element: String | Element | d3.Selection<void>): Component;
         /**
          * Gets the x alignment of the Component.
          */
@@ -1667,6 +1688,22 @@ declare module Plottable {
          * The css class applied to each tick label (the text associated with the tick).
          */
         static TICK_LABEL_CLASS: string;
+        /**
+         * The css class applied to each annotation line, which extends from the axis to the rect.
+         */
+        static ANNOTATION_LINE_CLASS: string;
+        /**
+         * The css class applied to each annotation rect, which surrounds the annotation label.
+         */
+        static ANNOTATION_RECT_CLASS: string;
+        /**
+         * The css class applied to each annotation circle, which denotes which tick is being annotated.
+         */
+        static ANNOTATION_CIRCLE_CLASS: string;
+        /**
+         * The css class applied to each annotation label, which shows the formatted annotation text.
+         */
+        static ANNOTATION_LABEL_CLASS: string;
         protected _tickMarkContainer: d3.Selection<void>;
         protected _tickLabelContainer: d3.Selection<void>;
         protected _baseline: d3.Selection<void>;
@@ -1694,6 +1731,55 @@ declare module Plottable {
         protected _setup(): void;
         protected _getTickValues(): D[];
         renderImmediately(): Axis<D>;
+        /**
+         * Gets the annotated ticks.
+         */
+        annotatedTicks(): D[];
+        /**
+         * Sets the annotated ticks.
+         *
+         * @returns {Axis} The calling Axis.
+         */
+        annotatedTicks(annotatedTicks: D[]): Axis<D>;
+        /**
+         * Gets the Formatter for the annotations.
+         */
+        annotationFormatter(): Formatter;
+        /**
+         * Sets the Formatter for the annotations.
+         *
+         * @returns {Axis} The calling Axis.
+         */
+        annotationFormatter(annotationFormatter: Formatter): Axis<D>;
+        /**
+         * Gets if annotations are enabled.
+         */
+        annotationsEnabled(): boolean;
+        /**
+         * Sets if annotations are enabled.
+         *
+         * @returns {Axis} The calling Axis.
+         */
+        annotationsEnabled(annotationsEnabled: boolean): Axis<D>;
+        /**
+         * Gets the count of annotation tiers to render.
+         */
+        annotationTierCount(): number;
+        /**
+         * Sets the count of annotation tiers to render.
+         *
+         * @returns {Axis} The calling Axis.
+         */
+        annotationTierCount(annotationTierCount: number): Axis<D>;
+        protected _drawAnnotations(): void;
+        /**
+         * Retrieves the size of the core pieces.
+         *
+         * The core pieces include the labels, the end tick marks, the inner tick marks, and the tick label padding.
+         */
+        protected _coreSize(): number;
+        protected _annotationTierHeight(): number;
+        protected _removeAnnotations(): void;
         protected _generateBaselineAttrHash(): {
             [key: string]: number;
         };
@@ -1765,11 +1851,13 @@ declare module Plottable {
         /**
          * Gets the margin in pixels.
          * The margin is the amount of space between the tick labels and the outer edge of the Axis.
+         * The margin also determines the space that annotations will reside in if annotations are enabled.
          */
         margin(): number;
         /**
          * Sets the margin in pixels.
          * The margin is the amount of space between the tick labels and the outer edge of the Axis.
+         * The margin also determines the space that annotations will reside in if annotations are enabled.
          *
          * @param {number} size
          * @returns {Axis} The calling Axis.
@@ -1953,6 +2041,7 @@ declare module Plottable {
             protected _setup(): void;
             protected _rescale(): Component;
             requestedSpace(offeredWidth: number, offeredHeight: number): SpaceRequest;
+            protected _coreSize(): number;
             protected _getTickValues(): string[];
             /**
              * Gets the tick label angle in degrees.
@@ -2132,6 +2221,19 @@ declare module Plottable {
              * @returns {Legend} The calling Legend
              */
             symbol(symbol: (datum: any, index: number) => SymbolFactory): Legend;
+            /**
+             * Gets the opacity of the symbols of the Legend.
+             *
+             * @returns {(datum: any, index: number) => number}
+             */
+            symbolOpacity(): (datum: any, index: number) => number;
+            /**
+             * Sets the opacity of the symbols of the Legend.
+             *
+             * @param {number | ((datum: any, index: number) => number)} symbolOpacity
+             * @returns {Legend} The calling Legend
+             */
+            symbolOpacity(symbolOpacity: number | ((datum: any, index: number) => number)): Legend;
             fixedWidth(): boolean;
             fixedHeight(): boolean;
         }
@@ -2169,6 +2271,17 @@ declare module Plottable {
              * @returns {InterpolatedColorLegend} The calling InterpolatedColorLegend.
              */
             formatter(formatter: Formatter): InterpolatedColorLegend;
+            /**
+             * Gets whether the InterpolatedColorLegend expands to occupy all offered space in the long direction
+             */
+            expands(): boolean;
+            /**
+             * Sets whether the InterpolatedColorLegend expands to occupy all offered space in the long direction
+             *
+             * @param {expands} boolean
+             * @returns {InterpolatedColorLegend} The calling InterpolatedColorLegend.
+             */
+            expands(expands: boolean): InterpolatedColorLegend;
             /**
              * Gets the orientation.
              */
@@ -2234,12 +2347,10 @@ declare module Plottable {
              *
              * For example, instead of calling `new Table([[a, b], [null, c]])`, you
              * could call
-             * ```typescript
-             * var table = new Table();
+             * var table = new Plottable.Components.Table();
              * table.add(a, 0, 0);
              * table.add(b, 0, 1);
              * table.add(c, 1, 1);
-             * ```
              *
              * @param {Component} component The Component to be added.
              * @param {number} row
@@ -2415,6 +2526,72 @@ declare module Plottable {
 
 
 declare module Plottable {
+    module Components {
+        class GuideLineLayer<D> extends Component {
+            static ORIENTATION_VERTICAL: string;
+            static ORIENTATION_HORIZONTAL: string;
+            constructor(orientation: string);
+            protected _setup(): void;
+            protected _sizeFromOffer(availableWidth: number, availableHeight: number): {
+                width: number;
+                height: number;
+            };
+            protected _isVertical(): boolean;
+            fixedWidth(): boolean;
+            fixedHeight(): boolean;
+            computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number): GuideLineLayer<D>;
+            renderImmediately(): GuideLineLayer<D>;
+            protected _setPixelPositionWithoutChangingMode(pixelPosition: number): void;
+            /**
+             * Gets the QuantitativeScale on the GuideLineLayer.
+             *
+             * @return {QuantitativeScale<D>}
+             */
+            scale(): QuantitativeScale<D>;
+            /**
+             * Sets the QuantitativeScale on the GuideLineLayer.
+             * If value() was the last property set, pixelPosition() will be updated according to the new scale.
+             * If pixelPosition() was the last property set, value() will be updated according to the new scale.
+             *
+             * @param {QuantitativeScale<D>} scale
+             * @return {GuideLineLayer<D>} The calling GuideLineLayer.
+             */
+            scale(scale: QuantitativeScale<D>): GuideLineLayer<D>;
+            /**
+             * Gets the value of the guide line in data-space.
+             *
+             * @return {D}
+             */
+            value(): D;
+            /**
+             * Sets the value of the guide line in data-space.
+             * If the GuideLineLayer has a scale, pixelPosition() will be updated now and whenever the scale updates.
+             *
+             * @param {D} value
+             * @return {GuideLineLayer<D>} The calling GuideLineLayer.
+             */
+            value(value: D): GuideLineLayer<D>;
+            /**
+             * Gets the position of the guide line in pixel-space.
+             *
+             * @return {number}
+             */
+            pixelPosition(): number;
+            /**
+             * Sets the position of the guide line in pixel-space.
+             * If the GuideLineLayer has a scale, the value() will be updated now and whenever the scale updates.
+             *
+             * @param {number} pixelPosition
+             * @return {GuideLineLayer<D>} The calling GuideLineLayer.
+             */
+            pixelPosition(pixelPosition: number): GuideLineLayer<D>;
+            destroy(): void;
+        }
+    }
+}
+
+
+declare module Plottable {
     module Plots {
         interface PlotEntity extends Entity<Plot> {
             dataset: Dataset;
@@ -2445,13 +2622,6 @@ declare module Plottable {
         anchor(selection: d3.Selection<void>): Plot;
         protected _setup(): void;
         destroy(): void;
-        /**
-         * Adds a Dataset to the Plot.
-         *
-         * @param {Dataset} dataset
-         * @returns {Plot} The calling Plot.
-         */
-        addDataset(dataset: Dataset): Plot;
         protected _createNodesForDataset(dataset: Dataset): Drawer;
         protected _createDrawer(dataset: Dataset): Drawer;
         protected _getAnimator(key: string): Animator;
@@ -2517,12 +2687,21 @@ declare module Plottable {
          */
         animator(animatorKey: string, animator: Animator): Plot;
         /**
+         * Adds a Dataset to the Plot.
+         *
+         * @param {Dataset} dataset
+         * @returns {Plot} The calling Plot.
+         */
+        addDataset(dataset: Dataset): Plot;
+        protected _addDataset(dataset: Dataset): Plot;
+        /**
          * Removes a Dataset from the Plot.
          *
          * @param {Dataset} dataset
          * @returns {Plot} The calling Plot.
          */
         removeDataset(dataset: Dataset): Plot;
+        protected _removeDataset(dataset: Dataset): Plot;
         protected _removeDatasetNodes(dataset: Dataset): void;
         datasets(): Dataset[];
         datasets(datasets: Dataset[]): Plot;
@@ -2572,9 +2751,14 @@ declare module Plottable {
              * @constructor
              */
             constructor();
+            protected _setup(): void;
             computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number): Pie;
             addDataset(dataset: Dataset): Pie;
+            protected _addDataset(dataset: Dataset): Pie;
             removeDataset(dataset: Dataset): Pie;
+            protected _removeDatasetNodes(dataset: Dataset): void;
+            protected _removeDataset(dataset: Dataset): Pie;
+            selections(datasets?: Dataset[]): d3.Selection<any>;
             protected _onDatasetUpdate(): void;
             protected _createDrawer(dataset: Dataset): Drawers.Arc;
             entities(datasets?: Dataset[]): PlotEntity[];
@@ -2665,6 +2849,7 @@ declare module Plottable {
             entitiesAt(queryPoint: Point): PlotEntity[];
             protected _propertyProjectors(): AttributeToProjector;
             protected _getDataToDraw(): Utils.Map<Dataset, any[]>;
+            protected static _isValidData(value: any): boolean;
             protected _pixelPoint(datum: any, index: number, dataset: Dataset): {
                 x: number;
                 y: number;
@@ -2869,12 +3054,55 @@ declare module Plottable {
              * @returns {PlotEntity[]} The PlotEntities at the particular point
              */
             entitiesAt(point: Point): PlotEntity[];
+            /**
+             * Gets the Entities that intersect the Bounds.
+             *
+             * @param {Bounds} bounds
+             * @returns {PlotEntity[]}
+             */
+            entitiesIn(bounds: Bounds): PlotEntity[];
+            /**
+             * Gets the Entities that intersect the area defined by the ranges.
+             *
+             * @param {Range} xRange
+             * @param {Range} yRange
+             * @returns {PlotEntity[]}
+             */
+            entitiesIn(xRange: Range, yRange: Range): PlotEntity[];
+            /**
+             * Gets the accessor for labels.
+             *
+             * @returns {Accessor<string>}
+             */
+            label(): Accessor<string>;
+            /**
+             * Sets the text of labels to the result of an Accessor.
+             *
+             * @param {Accessor<string>} label
+             * @returns {Plots.Rectangle} The calling Rectangle Plot.
+             */
+            label(label: Accessor<string>): Plots.Rectangle<X, Y>;
+            /**
+             * Gets whether labels are enabled.
+             *
+             * @returns {boolean}
+             */
+            labelsEnabled(): boolean;
+            /**
+             * Sets whether labels are enabled.
+             * Labels too big to be contained in the rectangle, cut off by edges, or blocked by other rectangles will not be shown.
+             *
+             * @param {boolean} labelsEnabled
+             * @returns {Rectangle} The calling Rectangle Plot.
+             */
+            labelsEnabled(enabled: boolean): Plots.Rectangle<X, Y>;
             protected _propertyProjectors(): AttributeToProjector;
             protected _pixelPoint(datum: any, index: number, dataset: Dataset): {
                 x: any;
                 y: any;
             };
             protected _getDataToDraw(): Utils.Map<Dataset, any[]>;
+            protected _additionalPaint(time: number): void;
         }
     }
 }
@@ -2927,6 +3155,28 @@ declare module Plottable {
             protected _visibleOnPlot(datum: any, pixelPoint: Point, selection: d3.Selection<void>): boolean;
             protected _entityVisibleOnPlot(pixelPoint: Point, datum: any, index: number, dataset: Dataset): boolean;
             protected _propertyProjectors(): AttributeToProjector;
+            /**
+             * Gets the Entities that intersect the Bounds.
+             *
+             * @param {Bounds} bounds
+             * @returns {PlotEntity[]}
+             */
+            entitiesIn(bounds: Bounds): PlotEntity[];
+            /**
+             * Gets the Entities that intersect the area defined by the ranges.
+             *
+             * @param {Range} xRange
+             * @param {Range} yRange
+             * @returns {PlotEntity[]}
+             */
+            entitiesIn(xRange: Range, yRange: Range): PlotEntity[];
+            /**
+             * Gets the Entities at a particular Point.
+             *
+             * @param {Point} p
+             * @returns {PlotEntity[]}
+             */
+            entitiesAt(p: Point): PlotEntity[];
         }
     }
 }
@@ -2976,7 +3226,11 @@ declare module Plottable {
              */
             baselineValue(value: X | Y): Bar<X, Y>;
             addDataset(dataset: Dataset): Bar<X, Y>;
+            protected _addDataset(dataset: Dataset): Bar<X, Y>;
             removeDataset(dataset: Dataset): Bar<X, Y>;
+            protected _removeDataset(dataset: Dataset): Bar<X, Y>;
+            datasets(): Dataset[];
+            datasets(datasets: Dataset[]): Plot;
             /**
              * Get whether bar labels are enabled.
              *
@@ -3039,6 +3293,10 @@ declare module Plottable {
              */
             entitiesIn(xRange: Range, yRange: Range): PlotEntity[];
             protected _additionalPaint(time: number): void;
+            /**
+             * Makes sure the extent takes into account the widths of the bars
+             */
+            protected _extentsForProperty(property: string): any[];
             protected _generateDrawSteps(): Drawers.DrawStep[];
             protected _generateAttrToProjector(): {
                 [attr: string]: (datum: any, index: number, dataset: Dataset) => any;
@@ -3047,9 +3305,8 @@ declare module Plottable {
              * Computes the barPixelWidth of all the bars in the plot.
              *
              * If the position scale of the plot is a CategoryScale and in bands mode, then the rangeBands function will be used.
-             * If the position scale of the plot is a CategoryScale and in points mode, then
-             *   from https://github.com/mbostock/d3/wiki/Ordinal-Scales#ordinal_rangePoints, the max barPixelWidth is step * padding
-             * If the position scale of the plot is a QuantitativeScale, then _getMinimumDataWidth is scaled to compute the barPixelWidth
+             * If the position scale of the plot is a QuantitativeScale, then the bar width is equal to the smallest distance between
+             * two adjacent data points, padded for visualisation.
              */
             protected _getBarPixelWidth(): number;
             entities(datasets?: Dataset[]): PlotEntity[];
@@ -3073,6 +3330,25 @@ declare module Plottable {
              * @constructor
              */
             constructor();
+            x(): Plots.AccessorScaleBinding<X, number>;
+            x(x: number | Accessor<number>): Line<X>;
+            x(x: X | Accessor<X>, xScale: Scale<X, number>): Line<X>;
+            y(): Plots.AccessorScaleBinding<number, number>;
+            y(y: number | Accessor<number>): Line<X>;
+            y(y: number | Accessor<number>, yScale: Scale<number, number>): Line<X>;
+            autorangeMode(): string;
+            autorangeMode(autorangeMode: string): Line<X>;
+            /**
+             * Gets whether or not the autoranging is done smoothly.
+             */
+            autorangeSmooth(): boolean;
+            /**
+             * Sets whether or not the autorange is done smoothly.
+             *
+             * Smooth autoranging is done by making sure lines always exit on the left / right side of the plot
+             * and deactivating the nice domain feature on the scales
+             */
+            autorangeSmooth(autorangeSmooth: boolean): Plots.Line<X>;
             /**
              * Gets the interpolation function associated with the plot.
              *
@@ -3100,6 +3376,7 @@ declare module Plottable {
             interpolator(interpolator: "cardinal-closed"): Line<X>;
             interpolator(interpolator: "monotone"): Line<X>;
             protected _createDrawer(dataset: Dataset): Drawer;
+            protected _extentsForProperty(property: string): any[];
             protected _getResetYFunction(): (d: any, i: number, dataset: Dataset) => number;
             protected _generateDrawSteps(): Drawers.DrawStep[];
             protected _generateAttrToProjector(): {
@@ -3147,6 +3424,7 @@ declare module Plottable {
             y0(y0: number | Accessor<number>): Area<X>;
             protected _onDatasetUpdate(): void;
             addDataset(dataset: Dataset): Area<X>;
+            protected _addDataset(dataset: Dataset): Area<X>;
             protected _removeDatasetNodes(dataset: Dataset): void;
             protected _additionalPaint(): void;
             protected _createDrawer(dataset: Dataset): Drawers.Area;
@@ -3318,6 +3596,21 @@ declare module Plottable {
              */
             y2(y2: number | Accessor<number> | Y | Accessor<Y>): Plots.Segment<X, Y>;
             protected _propertyProjectors(): AttributeToProjector;
+            /**
+             * Gets the Entities that intersect the Bounds.
+             *
+             * @param {Bounds} bounds
+             * @returns {PlotEntity[]}
+             */
+            entitiesIn(bounds: Bounds): PlotEntity[];
+            /**
+             * Gets the Entities that intersect the area defined by the ranges.
+             *
+             * @param {Range} xRange
+             * @param {Range} yRange
+             * @returns {PlotEntity[]}
+             */
+            entitiesIn(xRange: Range, yRange: Range): PlotEntity[];
         }
     }
 }
@@ -3358,6 +3651,93 @@ declare module Plottable {
                 [attr: string]: (datum: any, index: number, dataset: Dataset) => any;
             };
             protected _onDatasetUpdate(): Waterfall<X, Y>;
+        }
+    }
+}
+
+
+declare module Plottable {
+    module Plots {
+        class Wheel<R, T> extends Plot {
+            /**
+             * @constructor
+             */
+            constructor();
+            computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number): Wheel<R, T>;
+            protected _createDrawer(dataset: Dataset): Drawers.Arc;
+            entities(datasets?: Dataset[]): PlotEntity[];
+            protected _getDataToDraw(): Utils.Map<Dataset, any[]>;
+            protected _propertyProjectors(): AttributeToProjector;
+            /**
+             * Gets the AccessorScaleBinding for t in degrees.
+             */
+            t(): AccessorScaleBinding<T, number>;
+            /**
+             * Sets t to a constant number or the result of an Accessor<number> in degrees.
+             *
+             * @param {number|Accessor<number>} t
+             * @returns {Wheel} The calling Wheel Plot.
+             */
+            t(t: number | Accessor<number>): Plots.Wheel<R, T>;
+            /**
+             * Sets t to a scaled constant value or scaled result of an Accessor in degrees.
+             * The supplied Scale will also be used for t2().
+             * The provided Scale will account for the values when autoDomain()-ing.
+             *
+             * @param {T|Accessor<T>} t
+             * @param {QuantitativeScale<T>} scale
+             * @returns {Wheel} The calling Wheel Plot.
+             */
+            t(t: T | Accessor<T>, scale: QuantitativeScale<T>): Plots.Wheel<R, T>;
+            /**
+             * Gets the AccessorScaleBinding for t2 in degrees.
+             */
+            t2(): AccessorScaleBinding<T, number>;
+            /**
+             * Sets t2 to a constant number or the result of an Accessor<number> in degrees.
+             * If a Scale has been set for t, it will also be used to scale t2.
+             *
+             * @param {number|Accessor<number|T|Accessor<T>>} t2
+             * @returns {Wheel} The calling Wheel Plot.
+             */
+            t2(t2: number | Accessor<number> | T | Accessor<T>): Plots.Wheel<R, T>;
+            /**
+             * Gets the AccessorScaleBinding for r.
+             */
+            r(): AccessorScaleBinding<R, number>;
+            /**
+             * Sets r to a constant number or the result of an Accessor<number>.
+             *
+             * @param {number|Accessor<number>} r
+             * @returns {Wheel} The calling Wheel Plot.
+             */
+            r(r: number | Accessor<number>): Plots.Wheel<R, T>;
+            /**
+             * Sets r to a scaled constant value or scaled result of an Accessor.
+             * The supplied Scale will also be used for r2().
+             * The provided Scale will account for the values when autoDomain()-ing.
+             *
+             * @param {R|Accessor<R>} r
+             * @param {QuantitativeScale<R>} scale
+             * @returns {Wheel} The calling Wheel Plot.
+             */
+            r(r: R | Accessor<R>, scale: QuantitativeScale<R>): Plots.Wheel<R, T>;
+            /**
+             * Gets the AccessorScaleBinding for r2.
+             */
+            r2(): AccessorScaleBinding<R, number>;
+            /**
+             * Sets r2 to a constant number or the result of an Accessor<number>.
+             * If a Scale has been set for r, it will also be used to scale r2.
+             *
+             * @param {number|Accessor<number>|R|Accessor<R>} r2
+             * @returns {Wheel} The calling Wheel Plot.
+             */
+            r2(r2: number | Accessor<number> | R | Accessor<R>): Plots.Wheel<R, T>;
+            protected _pixelPoint(datum: any, index: number, dataset: Dataset): {
+                x: number;
+                y: number;
+            };
         }
     }
 }
@@ -4317,6 +4697,88 @@ declare module Plottable {
             xExtent(): (number | {
                 valueOf(): number;
             })[];
+        }
+    }
+}
+
+
+declare module Plottable {
+    interface DragLineCallback<D> {
+        (dragLineLayer: Components.DragLineLayer<D>): void;
+    }
+    module Components {
+        class DragLineLayer<D> extends GuideLineLayer<D> {
+            constructor(orientation: string);
+            protected _setup(): void;
+            renderImmediately(): DragLineLayer<D>;
+            /**
+             * Gets the detection radius of the drag line in pixels.
+             */
+            detectionRadius(): number;
+            /**
+             * Sets the detection radius of the drag line in pixels.
+             *
+             * @param {number} detectionRadius
+             * @return {DragLineLayer<D>} The calling DragLineLayer.
+             */
+            detectionRadius(detectionRadius: number): DragLineLayer<D>;
+            /**
+             * Gets whether the DragLineLayer is enabled.
+             */
+            enabled(): boolean;
+            /**
+             * Enables or disables the DragLineLayer.
+             *
+             * @param {boolean} enabled
+             * @return {DragLineLayer<D>} The calling DragLineLayer.
+             */
+            enabled(enabled: boolean): DragLineLayer<D>;
+            /**
+             * Sets the callback to be called when dragging starts.
+             * The callback will be passed the calling DragLineLayer.
+             *
+             * @param {DragLineCallback<D>} callback
+             * @returns {DragLineLayer<D>} The calling DragLineLayer.
+             */
+            onDragStart(callback: DragLineCallback<D>): DragLineLayer<D>;
+            /**
+             * Removes a callback that would be called when dragging starts.
+             *
+             * @param {DragLineCallback<D>} callback
+             * @returns {DragLineLayer<D>} The calling DragLineLayer.
+             */
+            offDragStart(callback: DragLineCallback<D>): DragLineLayer<D>;
+            /**
+             * Sets a callback to be called during dragging.
+             * The callback will be passed the calling DragLineLayer.
+             *
+             * @param {DragLineCallback<D>} callback
+             * @returns {DragLineLayer<D>} The calling DragLineLayer.
+             */
+            onDrag(callback: DragLineCallback<D>): DragLineLayer<D>;
+            /**
+             * Removes a callback that would be called during dragging.
+             *
+             * @param {DragLineCallback<D>} callback
+             * @returns {DragLineLayer<D>} The calling DragLineLayer.
+             */
+            offDrag(callback: DragLineCallback<D>): DragLineLayer<D>;
+            /**
+             * Sets a callback to be called when dragging ends.
+             * The callback will be passed the calling DragLineLayer.
+             *
+             * @param {DragLineCallback<D>} callback
+             * @returns {DragLineLayer<D>} The calling DragLineLayer.
+             */
+            onDragEnd(callback: DragLineCallback<D>): DragLineLayer<D>;
+            /**
+             * Removes a callback that would be called when dragging ends.
+             *
+             * @param {DragLineCallback<D>} callback
+             * @returns {DragLineLayer<D>} The calling DragLineLayer.
+             */
+            offDragEnd(callback: DragLineCallback<D>): DragLineLayer<D>;
+            destroy(): void;
         }
     }
 }

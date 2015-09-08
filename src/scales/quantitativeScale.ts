@@ -8,6 +8,7 @@ export class QuantitativeScale<D> extends Scale<D, number> {
   private _paddingExceptionsProviders: Utils.Set<Scales.PaddingExceptionsProvider<D>>;
   private _domainMin: D;
   private _domainMax: D;
+  private _snappingDomainEnabled = true;
 
   /**
    * A QuantitativeScale is a Scale that maps number-like values to numbers.
@@ -33,10 +34,10 @@ export class QuantitativeScale<D> extends Scale<D, number> {
       return;
     }
 
-    var computedExtent = this._getExtent();
+    let computedExtent = this._getExtent();
 
     if (this._domainMin != null) {
-      var maxValue = computedExtent[1];
+      let maxValue = computedExtent[1];
       if (this._domainMin >= maxValue) {
         maxValue = this._expandSingleValueDomain([this._domainMin, this._domainMin])[1];
       }
@@ -45,7 +46,7 @@ export class QuantitativeScale<D> extends Scale<D, number> {
     }
 
     if (this._domainMax != null) {
-      var minValue = computedExtent[0];
+      let minValue = computedExtent[0];
       if (this._domainMax <= minValue) {
         minValue = this._expandSingleValueDomain([this._domainMax, this._domainMax])[0];
       }
@@ -57,10 +58,10 @@ export class QuantitativeScale<D> extends Scale<D, number> {
   }
 
   protected _getExtent(): D[] {
-    var includedValues = this._getAllIncludedValues();
-    var extent = this._defaultExtent();
+    let includedValues = this._getAllIncludedValues();
+    let extent = this._defaultExtent();
     if (includedValues.length !== 0) {
-      var combinedExtent = [
+      let combinedExtent = [
         Utils.Math.min<D>(includedValues, extent[0]),
         Utils.Math.max<D>(includedValues, extent[1])
       ];
@@ -134,13 +135,13 @@ export class QuantitativeScale<D> extends Scale<D, number> {
     if (this._padProportion === 0) {
       return domain;
     }
-    var p = this._padProportion / 2;
-    var min = domain[0];
-    var max = domain[1];
-    var minExistsInExceptions = false;
-    var maxExistsInExceptions = false;
+    let p = this._padProportion / 2;
+    let min = domain[0];
+    let max = domain[1];
+    let minExistsInExceptions = false;
+    let maxExistsInExceptions = false;
     this._paddingExceptionsProviders.forEach((provider) => {
-      var values = provider(this);
+      let values = provider(this);
       values.forEach((value) => {
         if (value.valueOf() === min.valueOf()) {
           minExistsInExceptions = true;
@@ -150,9 +151,31 @@ export class QuantitativeScale<D> extends Scale<D, number> {
         }
       });
     });
-    var newMin = minExistsInExceptions ? min : this.invert(this.scale(min) - (this.scale(max) - this.scale(min)) * p);
-    var newMax = maxExistsInExceptions ? max : this.invert(this.scale(max) + (this.scale(max) - this.scale(min)) * p);
-    return this._niceDomain([newMin, newMax]);
+    let newMin = minExistsInExceptions ? min : this.invert(this.scale(min) - (this.scale(max) - this.scale(min)) * p);
+    let newMax = maxExistsInExceptions ? max : this.invert(this.scale(max) + (this.scale(max) - this.scale(min)) * p);
+
+    if (this._snappingDomainEnabled) {
+      return this._niceDomain([newMin, newMax]);
+    }
+    return ([newMin, newMax]);
+  }
+
+  /**
+   * Gets whether or not the scale snaps its domain to nice values.
+   */
+  public snappingDomainEnabled(): boolean;
+  /**
+   * Sets whether or not the scale snaps its domain to nice values.
+   */
+  public snappingDomainEnabled(snappingDomainEnabled: boolean): QuantitativeScale<D>;
+  public snappingDomainEnabled(snappingDomainEnabled?: boolean): any {
+    if (snappingDomainEnabled == null) {
+      return this._snappingDomainEnabled;
+    }
+
+    this._snappingDomainEnabled = snappingDomainEnabled;
+    this._autoDomainIfAutomaticMode();
+    return this;
   }
 
   protected _expandSingleValueDomain(singleValueDomain: D[]): D[] {
@@ -223,7 +246,7 @@ export class QuantitativeScale<D> extends Scale<D, number> {
 
   public extentOfValues(values: D[]): D[] {
     // HACKHACK: TS1.4 doesn't consider numbers to be Number-like (valueOf() returning number), so D can't be typed correctly
-    var extent = d3.extent(<any[]> values.filter((value) => Utils.Math.isValidNumber(+value)));
+    let extent = d3.extent(<any[]> values.filter((value) => Utils.Math.isValidNumber(+value)));
     if (extent[0] == null || extent[1] == null) {
       return [];
     } else {
@@ -232,7 +255,7 @@ export class QuantitativeScale<D> extends Scale<D, number> {
   }
 
   protected _setDomain(values: D[]) {
-    var isNaNOrInfinity = (x: any) => Utils.Math.isNaN(x) || x === Infinity || x === -Infinity;
+    let isNaNOrInfinity = (x: any) => Utils.Math.isNaN(x) || x === Infinity || x === -Infinity;
     if (isNaNOrInfinity(values[0]) || isNaNOrInfinity(values[1])) {
       Utils.Window.warn("Warning: QuantitativeScales cannot take NaN or Infinity as a domain value. Ignoring.");
       return;

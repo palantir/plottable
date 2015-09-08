@@ -1,174 +1,278 @@
 ///<reference path="../testReference.ts" />
 
 describe("Formatters", () => {
-  describe("fixed", () => {
-    it("shows exactly [precision] digits", () => {
-      var fixed3 = Plottable.Formatters.fixed();
-      var result = fixed3(1);
-      assert.strictEqual(result, "1.000", "defaults to three decimal places");
-      result = fixed3(1.234);
-      assert.strictEqual(result, "1.234", "shows three decimal places");
-      result = fixed3(1.2346);
-      assert.strictEqual(result, "1.235", "changed values are not shown (get turned into empty strings)");
+  describe("fixed()", () => {
+    it("shows correct amount of digits according to precision", () => {
+      let fixed3 = Plottable.Formatters.fixed();
+      assert.strictEqual(fixed3(1), "1.000", "shows three decimal places by defalut");
+      assert.strictEqual(fixed3(-1), "-1.000", "shows three decimal places for negative integer");
+      assert.strictEqual(fixed3(1.234), "1.234", "shows three decimal places for float");
+      assert.strictEqual(fixed3(-1.234), "-1.234", "shows three decimal placesfor for negative float");
+      assert.strictEqual(fixed3(1.2346111111), "1.235", "shows three decimal places for long float");
+      assert.strictEqual(fixed3(-1.2346111111), "-1.235", "shows three decimal places for long negatvie float");
+      assert.strictEqual(fixed3(123), "123.000", "shows three decimal places for integer");
+
+      assert.strictEqual(fixed3(Infinity), "Infinity", "formats non-numeric number correctly");
+      assert.strictEqual(fixed3(-Infinity), "-Infinity", "formats non-numeric number correctly");
+      assert.strictEqual(fixed3(NaN), "NaN", "formats non-numeric number correctly");
+
+      let fixed0 = Plottable.Formatters.fixed(0);
+      assert.strictEqual(fixed0(1), "1", "shows no decimal places for integer");
+      assert.strictEqual(fixed0(-1), "-1", "shows no decimal places for negative integer");
+      assert.strictEqual(fixed0(1.23), "1", "shows no decimal places for float");
+      assert.strictEqual(fixed0(-1.23), "-1", "shows no decimal places for negative float");
+      assert.strictEqual(fixed0(123.456), "123", "shows no decimal places for integer");
     });
 
-    it("precision can be changed", () => {
-      var fixed2 = Plottable.Formatters.fixed(2);
-      var result = fixed2(1);
-      assert.strictEqual(result, "1.00", "formatter was changed to show only two decimal places");
+    it.skip("throws exception for non-numeric values", () => {
+      let nonNumericValues = [null, undefined, "123", "abc", ""];
+      let fixed = Plottable.Formatters.fixed();
+      nonNumericValues.forEach((value) =>
+        (<any> assert).throws(() => fixed(<any> value), Error,
+          "error message TBD", `${value} is not a valid value for Formatter.fixed`)
+      );
     });
 
-    it("can be set to show rounded values", () => {
-      var fixed3 = Plottable.Formatters.fixed(3);
-      var result = fixed3(1.2349);
-      assert.strictEqual(result, "1.235", "long values are rounded correctly");
-    });
-  });
+    it("throws exception for invalid precision", () => {
+      let nonIntegerValues = [null, 2.1, NaN, "5", "abc"];
+      nonIntegerValues.forEach((value) =>
+        (<any> assert).throws(() => Plottable.Formatters.fixed(<any> value), Error,
+          "Formatter precision must be an integer", `${value} is not a valid precision value`)
+      );
 
-  describe("general", () => {
-    it("formats number to show at most [precision] digits", () => {
-      var general = Plottable.Formatters.general();
-      var result = general(1);
-      assert.strictEqual(result, "1", "shows no decimals if formatting an integer");
-      result = general(1.234);
-      assert.strictEqual(result, "1.234", "shows up to three decimal places");
-      result = general(1.2345);
-      assert.strictEqual(result, "1.235", "(changed) values with more than three decimal places are not shown");
-    });
-
-    it("stringifies non-number values", () => {
-      var general = Plottable.Formatters.general();
-      var result = general("blargh");
-      assert.strictEqual(result, "blargh", "string values are passed through unchanged");
-      result = general(null);
-      assert.strictEqual(result, "null", "non-number inputs are stringified");
-    });
-
-    it("throws an error on strange precision", () => {
-      assert.throws(() => {
-          Plottable.Formatters.general(-1);
-      });
-      assert.throws(() => {
-          Plottable.Formatters.general(100);
-      });
+      let outOfBoundValues = [-1, 21, -Infinity, Infinity];
+      outOfBoundValues.forEach((value) =>
+        (<any> assert).throws(() => Plottable.Formatters.fixed(<any> value), Error,
+          "Formatter precision must be between 0 and 20", `${value} is not a valid precision value`)
+      );
     });
   });
 
-  describe("identity", () => {
+  describe("general()", () => {
+    it("shows correct amount of digits according to precision", () => {
+      let general3 = Plottable.Formatters.general();
+      assert.strictEqual(general3(1), "1", "does not pad 0 to three decimal places");
+      assert.strictEqual(general3(-1), "-1", "does not pad 0 to three decimal places");
+      assert.strictEqual(general3(1.234), "1.234", "shows up to three decimal places");
+      assert.strictEqual(general3(-1.234), "-1.234", "shows up to three decimal places");
+      assert.strictEqual(general3(1.2346), "1.235", "shows up to three decimal places");
+      assert.strictEqual(general3(-1.2346), "-1.235", "shows up to three decimal places");
+
+      let general2 = Plottable.Formatters.general(2);
+      assert.strictEqual(general2(1), "1", "does not pad 0 to two decimal places");
+      assert.strictEqual(general2(-1), "-1", "does not pad 0 to two decimal places");
+      assert.strictEqual(general2(1.2), "1.2", "does not pad 0 to two decimal places");
+      assert.strictEqual(general2(-1.2), "-1.2", "does not pad 0 to two decimal places");
+      assert.strictEqual(general2(1.23), "1.23", "shows up to two decimal places");
+      assert.strictEqual(general2(-1.23), "-1.23", "shows up to two decimal places");
+      assert.strictEqual(general2(1.235), "1.24", "shows up to two decimal places");
+      assert.strictEqual(general2(-1.235), "-1.24", "shows up to two decimal places");
+
+      let general0 = Plottable.Formatters.general(0);
+      assert.strictEqual(general0(1), "1", "shows no decimals");
+      assert.strictEqual(general0(1.535), "2", "shows no decimals");
+    });
+
+    it("stringifies non-numeric values", () => {
+      let general = Plottable.Formatters.general();
+      let nonNumericValues = [null, undefined, Infinity, -Infinity, NaN, "123", "abc"];
+      let stringifiedValues = ["null", "undefined", "Infinity", "-Infinity", "NaN", "123", "abc"];
+      nonNumericValues.forEach((value, i) =>
+        assert.strictEqual(general(value), stringifiedValues[i], `non-numeric input ${value} is stringified`)
+      );
+    });
+
+    it("throws an error on invalid precision", () => {
+      let nonIntegerValues = [null, 2.1, NaN, "5", "abc"];
+      nonIntegerValues.forEach((value) =>
+        (<any> assert).throws(() => Plottable.Formatters.general(<any> value), Error,
+          "Formatter precision must be an integer", `${value} is not a valid precision value`)
+      );
+
+      let outOfBoundValues = [-1, 21, -Infinity, Infinity];
+      outOfBoundValues.forEach((value) =>
+        (<any> assert).throws(() => Plottable.Formatters.general(<any> value), Error,
+          "Formatter precision must be between 0 and 20", `${value} is not a valid precision value`)
+      );
+    });
+  });
+
+  describe("identity()", () => {
     it("stringifies inputs", () => {
-      var identity = Plottable.Formatters.identity();
-      var result = identity(1);
-      assert.strictEqual(result, "1", "numbers are stringified");
-      result = identity(0.999999);
-      assert.strictEqual(result, "0.999999", "long numbers are stringified");
-      result = identity(null);
-      assert.strictEqual(result, "null", "formats null");
-      result = identity(undefined);
-      assert.strictEqual(result, "undefined", "formats undefined");
+      let identity = Plottable.Formatters.identity();
+      let values = [1, 0.999999, null, undefined, Infinity, -Infinity, NaN, "123", "abc", ""];
+      let stringifiedValues = ["1", "0.999999", "null", "undefined", "Infinity", "-Infinity", "NaN", "123", "abc", ""];
+      values.forEach((value, i) =>
+        assert.strictEqual(identity(value), stringifiedValues[i], `${value} is stringified`)
+      );
     });
   });
 
-  describe("currency", () => {
-    it("uses reasonable defaults", () => {
-      var currencyFormatter = Plottable.Formatters.currency();
-      var result = currencyFormatter(1);
-      assert.strictEqual(result.charAt(0), "$", "defaults to $ for currency symbol");
-      var decimals = result.substring(result.indexOf(".") + 1, result.length);
-      assert.strictEqual(decimals.length, 2, "defaults to 2 decimal places");
+  describe("currency()", () => {
+    it("formats values based on precision, symobl, and prefix correctly", () => {
+      let defaultFormatter = Plottable.Formatters.currency();
+      assert.strictEqual(defaultFormatter(1), "$1.00", "formatted correctly with default \"$\" prefix");
+      assert.strictEqual(defaultFormatter(-1), "-$1.00", "formatted negative integer correctly with default \"$\" prefix");
+      assert.strictEqual(defaultFormatter(1.999), "$2.00", "formatted correctly with default \"$\" prefix");
+      assert.strictEqual(defaultFormatter(-1.234), "-$1.23", "formatted negative float correctly with default \"$\" prefix");
 
-      result = currencyFormatter(-1);
-      assert.strictEqual(result.charAt(0), "-", "prefixes negative values with \"-\"");
-      assert.strictEqual(result.charAt(1), "$", "places the currency symbol after the negative sign");
+      let currencyFormatter0 = Plottable.Formatters.currency(0);
+      assert.strictEqual(currencyFormatter0(1.1234), "$1", "formatted with correct precision");
+      assert.strictEqual(currencyFormatter0(123), "$123", "formatted with correct precision");
+
+      let poundFormatter = Plottable.Formatters.currency(2, "£");
+      assert.strictEqual(poundFormatter(1.1234), "£1.12", "formatted with correct precision and \"£\" as prefix");
+      assert.strictEqual(poundFormatter(-100.987), "-£100.99", "formatted with correct precision and \"£\" as prefix");
+
+      let centsFormatter = Plottable.Formatters.currency(0, "c", false);
+      assert.strictEqual(centsFormatter(1), "1c", "formatted correctly with \"c\" as suffix");
+      assert.strictEqual(centsFormatter(-1), "-1c", "formatted correctly with \"c\" as suffix");
     });
 
-    it("can change the type and position of the currency symbol", () => {
-      var centsFormatter = Plottable.Formatters.currency(0, "c", false);
-      var result = centsFormatter(1);
-      assert.strictEqual(result.charAt(result.length - 1), "c", "The specified currency symbol was appended");
+    it("throws an error on invalid precision", () => {
+      let nonIntegerValues = [null, 2.1, NaN, "5", "abc"];
+      nonIntegerValues.forEach((value) =>
+        (<any> assert).throws(() => Plottable.Formatters.currency(<any> value), Error,
+          "Formatter precision must be an integer", `${value} is not a valid precision value`)
+      );
+
+      let outOfBoundValues = [-1, 21, -Infinity, Infinity];
+      outOfBoundValues.forEach((value) =>
+        (<any> assert).throws(() => Plottable.Formatters.currency(<any> value), Error,
+          "Formatter precision must be between 0 and 20", `${value} is not a valid precision value`)
+      );
     });
+
+    it.skip("throws exception for non-numeric values", () => {
+      let nonNumericValues: any[] = [null, undefined, "123", "abc", ""];
+      // "$0.00", "$NaN", "$123.00", "$NaN", "$0.00"
+      let defaultFormatter = Plottable.Formatters.currency();
+      nonNumericValues.forEach((value) =>
+        (<any> assert).throws(() => defaultFormatter(<any> value), Error,
+          "error message TBD", `${value} is not a valid value for Formatter.currency`)
+      );
+    });
+
   });
 
-  describe("multiTime", () => {
+  describe("multiTime()", () => {
     it("uses reasonable defaults", () => {
-      var timeFormatter = Plottable.Formatters.multiTime();
+      let timeFormatter = Plottable.Formatters.multiTime();
       // year, month, day, hours, minutes, seconds, milliseconds
-      var result = timeFormatter(new Date(2000, 0, 1, 0, 0, 0, 0));
-      assert.strictEqual(result, "2000", "only the year was displayed");
-      result = timeFormatter(new Date(2000, 2, 1, 0, 0, 0, 0));
-      assert.strictEqual(result, "Mar", "only the month was displayed");
-      result = timeFormatter(new Date(2000, 2, 2, 0, 0, 0, 0));
-      assert.strictEqual(result, "Thu 02", "month and date displayed");
-      result = timeFormatter(new Date(2000, 2, 1, 20, 0, 0, 0));
-      assert.strictEqual(result, "08 PM", "only hour was displayed");
-      result = timeFormatter(new Date(2000, 2, 1, 20, 34, 0, 0));
-      assert.strictEqual(result, "08:34", "hour and minute was displayed");
-      result = timeFormatter(new Date(2000, 2, 1, 20, 34, 53, 0));
-      assert.strictEqual(result, ":53", "seconds was displayed");
-      result = timeFormatter(new Date(2000, 0, 1, 0, 0, 0, 950));
-      assert.strictEqual(result, ".950", "milliseconds was displayed");
+      assert.strictEqual(timeFormatter(new Date(2000, 0, 1, 0, 0, 0, 0)), "2000", "only the year was displayed");
+      assert.strictEqual(timeFormatter(new Date(2000, 2, 1, 0, 0, 0, 0)), "Mar", "only the month was displayed");
+      assert.strictEqual(timeFormatter(new Date(2000, 2, 5, 0, 0, 0, 0)), "Mar 05", "month and date displayed");
+      assert.strictEqual(timeFormatter(new Date(2000, 2, 2, 0, 0, 0, 0)), "Thu 02", "day and date displayed");
+      assert.strictEqual(timeFormatter(new Date(2000, 2, 1, 20, 0, 0, 0)), "08 PM", "only hour was displayed");
+      assert.strictEqual(timeFormatter(new Date(2000, 2, 1, 20, 34, 0, 0)), "08:34", "hour and minute was displayed");
+      assert.strictEqual(timeFormatter(new Date(2000, 2, 1, 20, 34, 53, 0)), ":53", "seconds was displayed");
+      assert.strictEqual(timeFormatter(new Date(2000, 0, 1, 0, 0, 0, 950)), ".950", "milliseconds was displayed");
+    });
+
+    it.skip("throws exception for non-Date values", () => {
+      let nonNumericValues = [null, undefined, NaN, "123", "abc", "", 0];
+      let timeFormatter = Plottable.Formatters.multiTime();
+      nonNumericValues.forEach((value) =>
+        (<any> assert).throws(() => timeFormatter(<any> value), Error,
+          "error message TBD", `${value} is not a valid value for Formatter.multiTime`)
+      );
     });
   });
 
-  describe("percentage", () => {
-    it("uses reasonable defaults", () => {
-      var percentFormatter = Plottable.Formatters.percentage();
-      var result = percentFormatter(1);
-      assert.strictEqual(result, "100%",
+  describe("percentage()", () => {
+    it("formats number to percetage with correct precision", () => {
+      let percentFormatter = Plottable.Formatters.percentage();
+      assert.strictEqual(percentFormatter(1), "100%",
         "the value was multiplied by 100, a percent sign was appended, and no decimal places are shown by default");
+      assert.strictEqual(percentFormatter(0.07), "7%", "does not have trailing zeros and is not empty string");
+      assert.strictEqual(percentFormatter(-0.355), "-36%", "negative values are formatted correctly");
+      assert.strictEqual(percentFormatter(50), "5000%", "formats 2 digit integer correctly");
+
+      let twoPercentFormatter = Plottable.Formatters.percentage(2);
+      assert.strictEqual(twoPercentFormatter(0.0035), "0.35%", "works even if multiplying by 100 does not make it an integer");
+      assert.strictEqual(twoPercentFormatter(-0.123), "-12.30%", "add 0 padding to make precision");
     });
 
-    it("can handle float imprecision", () => {
-      var percentFormatter = Plottable.Formatters.percentage();
-      var result = percentFormatter(0.07);
-      assert.strictEqual(result, "7%", "does not have trailing zeros and is not empty string");
-      percentFormatter = Plottable.Formatters.percentage(2);
-      var result2 = percentFormatter(0.0035);
-      assert.strictEqual(result2, "0.35%", "works even if multiplying by 100 does not make it an integer");
+    it.skip("formats non-numeric number correctly", () => {
+      let percentFormatter = Plottable.Formatters.percentage();
+      assert.strictEqual(percentFormatter(NaN), "NaN", "stringifies non-numeric number");
+      assert.strictEqual(percentFormatter(Infinity), "Infinity", "stringifies non-numeric number");
+      assert.strictEqual(percentFormatter(-Infinity), "-Infinity", "stringifies non-numeric number");
     });
 
-    it("onlyShowUnchanged set to false", () => {
-      var percentFormatter = Plottable.Formatters.percentage(0);
-      var result = percentFormatter(0.075);
-      assert.strictEqual(result, "8%", "shows formatter changed value");
+    it("throws an error on invalid precision", () => {
+      let nonIntegerValues = [null, 2.1, NaN, "5", "abc"];
+      nonIntegerValues.forEach((value) =>
+        (<any> assert).throws(() => Plottable.Formatters.percentage(<any> value), Error,
+          "Formatter precision must be an integer", `${value} is not a valid precision value`)
+      );
+
+      let outOfBoundValues = [-1, 21, -Infinity, Infinity];
+      outOfBoundValues.forEach((value) =>
+        (<any> assert).throws(() => Plottable.Formatters.percentage(<any> value), Error,
+          "Formatter precision must be between 0 and 20", `${value} is not a valid precision value`)
+      );
+    });
+
+    it.skip("throws exception for non-numeric values", () => {
+      let nonNumericValues = [null, undefined, "123", "abc", ""];
+      let percentFormatter = Plottable.Formatters.percentage();
+      nonNumericValues.forEach((value) =>
+        (<any> assert).throws(() => percentFormatter(<any> value), Error,
+          "error message TBD", `${value} is not a valid value for Formatter.percentage`)
+      );
     });
   });
 
-  describe("multiTime", () => {
-    it("uses reasonable defaults", () => {
-      var timeFormatter = Plottable.Formatters.multiTime();
-      // year, month, day, hours, minutes, seconds, milliseconds
-      var result = timeFormatter(new Date(2000, 0, 1, 0, 0, 0, 0));
-      assert.strictEqual(result, "2000", "only the year was displayed");
-      result = timeFormatter(new Date(2000, 2, 1, 0, 0, 0, 0));
-      assert.strictEqual(result, "Mar", "only the month was displayed");
-      result = timeFormatter(new Date(2000, 2, 2, 0, 0, 0, 0));
-      assert.strictEqual(result, "Thu 02", "month and date displayed");
-      result = timeFormatter(new Date(2000, 2, 1, 20, 0, 0, 0));
-      assert.strictEqual(result, "08 PM", "only hour was displayed");
-      result = timeFormatter(new Date(2000, 2, 1, 20, 34, 0, 0));
-      assert.strictEqual(result, "08:34", "hour and minute was displayed");
-      result = timeFormatter(new Date(2000, 2, 1, 20, 34, 53, 0));
-      assert.strictEqual(result, ":53", "seconds was displayed");
-      result = timeFormatter(new Date(2000, 0, 1, 0, 0, 0, 950));
-      assert.strictEqual(result, ".950", "milliseconds was displayed");
-    });
-  });
-
-  describe("SISuffix", () => {
+  describe("siSuffix()", () => {
     it("shortens long numbers", () => {
-      var lnFormatter = Plottable.Formatters.siSuffix();
-      var result = lnFormatter(1);
-      assert.strictEqual(result, "1.00", "shows 3 signifigicant figures by default");
-      result = lnFormatter(Math.pow(10, 12));
-      assert.operator(result.length, "<=", 5, "large number was formatted to a short string");
-      result = lnFormatter(Math.pow(10, -12));
-      assert.operator(result.length, "<=", 5, "small number was formatted to a short string");
+      let lnFormatter = Plottable.Formatters.siSuffix();
+      assert.strictEqual(lnFormatter(1), "1.00", "shows 3 signifigicant figures by default");
+      assert.operator(lnFormatter(Math.pow(10, 12)).length, "<=", 5, "large number was formatted to a short string");
+      assert.operator(lnFormatter(Math.pow(10, -12)).length, "<=", 5, "small number was formatted to a short string");
+      assert.strictEqual(lnFormatter(Math.pow(10, 5) * 1.55555), "156k", "formatting respects precision");
+      assert.strictEqual(lnFormatter(-Math.pow(10, 6) * 23.456), "-23.5M", "formatting respects precision");
+
+      let lnFormatter2 = Plottable.Formatters.siSuffix(2);
+      assert.strictEqual(lnFormatter2(1), "1.0", "shows 2 signifigicant figures by default");
+      assert.strictEqual(lnFormatter2(Math.pow(10, 5) * 1.55555), "160k", "formatting respects precision");
+      assert.strictEqual(lnFormatter2(-Math.pow(10, 6) * 23.456), "-23M", "formatting respects precision");
+    });
+
+    it.skip("formats non-numeric number correctly", () => {
+      let lnFormatter = Plottable.Formatters.siSuffix();
+      assert.strictEqual(lnFormatter(NaN), "NaN", "stringifies non-numeric number");
+      assert.strictEqual(lnFormatter(Infinity), "Infinity", "stringifies non-numeric number");
+      assert.strictEqual(lnFormatter(-Infinity), "-Infinity", "stringifies non-numeric number");
+    });
+
+    it("throws an error on invalid precision", () => {
+      let nonIntegerValues = [null, 2.1, NaN, "5", "abc"];
+      nonIntegerValues.forEach((value) =>
+        (<any> assert).throws(() => Plottable.Formatters.siSuffix(<any> value), Error,
+          "Formatter precision must be an integer", `${value} is not a valid precision value`)
+      );
+
+      let outOfBoundValues = [-1, 21, -Infinity, Infinity];
+      outOfBoundValues.forEach((value) =>
+        (<any> assert).throws(() => Plottable.Formatters.siSuffix(<any> value), Error,
+          "Formatter precision must be between 0 and 20", `${value} is not a valid precision value`)
+      );
+    });
+
+    it.skip("throws exception for non-numeric values", () => {
+      let nonNumericValues = [null, undefined, "123", "abc", ""];
+      let lnFormatter = Plottable.Formatters.siSuffix();
+      nonNumericValues.forEach((value) =>
+        (<any> assert).throws(() => lnFormatter(<any> value), Error,
+          "error message TBD", `${value} is not a valid value for Formatter.siSuffix`)
+      );
     });
   });
 
-  describe("shortScale", () => {
+  describe("shortScale()", () => {
     it("shortens long numbers", () => {
-      var formatter = Plottable.Formatters.shortScale();
+      let formatter = Plottable.Formatters.shortScale();
       assert.strictEqual(formatter(1), "1.000", "small numbers format simply");
       assert.strictEqual(formatter(-1), "-1.000", "negative small numbers format simply");
 
@@ -213,7 +317,7 @@ describe("Formatters", () => {
     });
 
     it("respects the precision provided", () => {
-      var formatter = Plottable.Formatters.shortScale(1);
+      let formatter = Plottable.Formatters.shortScale(1);
       assert.strictEqual(formatter(1), "1.0", "Just one decimal digit is added");
       assert.strictEqual(formatter(999), "999.0", "Conversion to K happens in the same place (lower)");
       assert.strictEqual(formatter(1000), "1.0K", "Conversion to K happens in the same place (upper)");
@@ -233,60 +337,77 @@ describe("Formatters", () => {
       assert.strictEqual(formatter(-0.09), "-9.0e-2", "Round up is not applied for very small negative numbers");
 
       assert.strictEqual(formatter(0), "0.0", "0 gets formatted well");
+
+      let formatter0 = Plottable.Formatters.shortScale(0);
+      assert.strictEqual(formatter0(1), "1", "Just one decimal digit is added");
+      assert.strictEqual(formatter0(999), "999", "Conversion to K happens in the same place (lower)");
+      assert.strictEqual(formatter0(1000), "1K", "Conversion to K happens in the same place (upper)");
+
+      assert.strictEqual(formatter0(999000000000000000), "999Q", "Largest positive short-scale representable number");
+      assert.strictEqual(formatter0(999400000000000000), "999Q", "Largest positive short-scale representable number round-down");
+      assert.strictEqual(formatter0(999500000000000000), "1e+18", "Largest positive short-scale representable number round-up");
+
+      assert.strictEqual(formatter0(-999000000000000000), "-999Q", "Largest negative short-scale representable number");
+      assert.strictEqual(formatter0(-999400000000000000), "-999Q", "Largest negative short-scale representable number round-down");
+      assert.strictEqual(formatter0(-999500000000000000), "-1e+18", "Largest negative short-scale representable number round-up");
+
+      assert.strictEqual(formatter0(0.9), "9e-1", "Round up is not applied for very small positive numbers");
+      assert.strictEqual(formatter0(0), "0", "0 gets formatted well");
     });
 
-    it("0 as precision also works and uses integers only", () => {
-      var formatter = Plottable.Formatters.shortScale(0);
-      assert.strictEqual(formatter(1), "1", "Just one decimal digit is added");
-      assert.strictEqual(formatter(999), "999", "Conversion to K happens in the same place (lower)");
-      assert.strictEqual(formatter(1000), "1K", "Conversion to K happens in the same place (upper)");
+    it("throws an error on invalid precision", () => {
+      let nonIntegerValues = [null, 2.1, NaN, "5", "abc"];
+      nonIntegerValues.forEach((value) =>
+        (<any> assert).throws(() => Plottable.Formatters.shortScale(<any> value), Error,
+          "Formatter precision must be an integer", `${value} is not a valid precision value`)
+      );
 
-      assert.strictEqual(formatter(999000000000000000), "999Q", "Largest positive short-scale representable number");
-      assert.strictEqual(formatter(999400000000000000), "999Q", "Largest positive short-scale representable number round-down");
-      assert.strictEqual(formatter(999500000000000000), "1e+18", "Largest positive short-scale representable number round-up");
-
-      assert.strictEqual(formatter(-999000000000000000), "-999Q", "Largest negative short-scale representable number");
-      assert.strictEqual(formatter(-999400000000000000), "-999Q", "Largest negative short-scale representable number round-down");
-      assert.strictEqual(formatter(-999500000000000000), "-1e+18", "Largest negative short-scale representable number round-up");
-
-      assert.strictEqual(formatter(0.9), "9e-1", "Round up is not applied for very small positive numbers");
-      assert.strictEqual(formatter(0), "0", "0 gets formatted well");
-    });
-
-    it("non-integer precision rounds down", () => {
-      assert.strictEqual(Plottable.Formatters.shortScale(1.1)(3), "3.0", "Precision of 1.1 should be same as precision of 1");
-      assert.strictEqual(Plottable.Formatters.shortScale(1.9)(3), "3.0", "Precision of 1.9 should be same as precision of 1");
+      let outOfBoundValues = [-1, 21, -Infinity, Infinity];
+      outOfBoundValues.forEach((value) =>
+        (<any> assert).throws(() => Plottable.Formatters.shortScale(<any> value), Error,
+          "Formatter precision must be between 0 and 20", `${value} is not a valid precision value`)
+      );
     });
   });
 
-  describe("relativeDate", () => {
+  describe("relativeDate()", () => {
+    let showWarning: boolean;
+    beforeEach(() => {
+      showWarning = Plottable.Configs.SHOW_WARNINGS;
+      Plottable.Configs.SHOW_WARNINGS = false;
+    });
+
+    afterEach(() => {
+      Plottable.Configs.SHOW_WARNINGS = showWarning;
+    });
+
     it("uses reasonable defaults", () => {
-      var relativeDateFormatter = Plottable.Formatters.relativeDate();
-      var result = relativeDateFormatter(7 * Plottable.MILLISECONDS_IN_ONE_DAY);
+      let relativeDateFormatter = Plottable.Formatters.relativeDate();
+      let result = relativeDateFormatter(7 * Plottable.MILLISECONDS_IN_ONE_DAY);
       assert.strictEqual(result, "7", "7 day difference from epoch, incremented by days, no suffix");
     });
 
     it("resulting value is difference from base value", () => {
-      var relativeDateFormatter = Plottable.Formatters.relativeDate(5 * Plottable.MILLISECONDS_IN_ONE_DAY);
-      var result = relativeDateFormatter(9 * Plottable.MILLISECONDS_IN_ONE_DAY);
+      let relativeDateFormatter = Plottable.Formatters.relativeDate(5 * Plottable.MILLISECONDS_IN_ONE_DAY);
+      let result = relativeDateFormatter(9 * Plottable.MILLISECONDS_IN_ONE_DAY);
       assert.strictEqual(result, "4", "4 days greater from base value");
       result = relativeDateFormatter(Plottable.MILLISECONDS_IN_ONE_DAY);
       assert.strictEqual(result, "-4", "4 days less from base value");
     });
 
     it("can increment by different time types (hours, minutes)", () => {
-      var hoursRelativeDateFormatter = Plottable.Formatters.relativeDate(0, Plottable.MILLISECONDS_IN_ONE_DAY / 24);
-      var result = hoursRelativeDateFormatter(3 * Plottable.MILLISECONDS_IN_ONE_DAY);
+      let hoursRelativeDateFormatter = Plottable.Formatters.relativeDate(0, Plottable.MILLISECONDS_IN_ONE_DAY / 24);
+      let result = hoursRelativeDateFormatter(3 * Plottable.MILLISECONDS_IN_ONE_DAY);
       assert.strictEqual(result, "72", "72 hour difference from epoch");
 
-      var minutesRelativeDateFormatter = Plottable.Formatters.relativeDate(0, Plottable.MILLISECONDS_IN_ONE_DAY / (24 * 60));
+      let minutesRelativeDateFormatter = Plottable.Formatters.relativeDate(0, Plottable.MILLISECONDS_IN_ONE_DAY / (24 * 60));
       result = minutesRelativeDateFormatter(3 * Plottable.MILLISECONDS_IN_ONE_DAY);
       assert.strictEqual(result, "4320", "4320 minute difference from epoch");
     });
 
     it("can append a suffix", () => {
-      var relativeDateFormatter = Plottable.Formatters.relativeDate(0, Plottable.MILLISECONDS_IN_ONE_DAY, "days");
-      var result = relativeDateFormatter(7 * Plottable.MILLISECONDS_IN_ONE_DAY);
+      let relativeDateFormatter = Plottable.Formatters.relativeDate(0, Plottable.MILLISECONDS_IN_ONE_DAY, "days");
+      let result = relativeDateFormatter(7 * Plottable.MILLISECONDS_IN_ONE_DAY);
       assert.strictEqual(result, "7days", "days appended to the end");
     });
   });

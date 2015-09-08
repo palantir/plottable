@@ -84,8 +84,8 @@ export module Interactions {
     }
 
     private _handleTouchStart(ids: number[], idToPoint: { [id: number]: Point; }, e: TouchEvent) {
-      for (var i = 0; i < ids.length && this._touchIds.size() < 2; i++) {
-        var id = ids[i];
+      for (let i = 0; i < ids.length && this._touchIds.size() < 2; i++) {
+        let id = ids[i];
         this._touchIds.set(id.toString(), this._translateToComponentSpace(idToPoint[id]));
       }
     }
@@ -95,8 +95,14 @@ export module Interactions {
         return;
       }
 
-      var oldPoints = this._touchIds.values();
-      var oldCornerDistance = PanZoom._pointDistance(oldPoints[0], oldPoints[1]);
+      let oldPoints = this._touchIds.values();
+
+      if (!this._isInsideComponent(this._translateToComponentSpace(oldPoints[0])) ||
+         !this._isInsideComponent(this._translateToComponentSpace(oldPoints[1]))) {
+        return;
+      }
+
+      let oldCornerDistance = PanZoom._pointDistance(oldPoints[0], oldPoints[1]);
 
       if (oldCornerDistance === 0) {
         return;
@@ -108,16 +114,16 @@ export module Interactions {
         }
       });
 
-      var points = this._touchIds.values();
-      var newCornerDistance = PanZoom._pointDistance(points[0], points[1]);
+      let points = this._touchIds.values();
+      let newCornerDistance = PanZoom._pointDistance(points[0], points[1]);
 
       if (newCornerDistance === 0) {
         return;
       }
 
-      var magnifyAmount = oldCornerDistance / newCornerDistance;
+      let magnifyAmount = oldCornerDistance / newCornerDistance;
 
-      var normalizedPointDiffs = points.map((point, i) => {
+      let normalizedPointDiffs = points.map((point, i) => {
         return { x: (point.x - oldPoints[i].x) / magnifyAmount, y: (point.y - oldPoints[i].y) / magnifyAmount };
       });
 
@@ -129,22 +135,22 @@ export module Interactions {
         magnifyAmount = this._constrainedZoomAmountUsingExtent(yScale, magnifyAmount);
       });
 
-      var constrainedPoints = oldPoints.map((oldPoint, i) => {
+      let constrainedPoints = oldPoints.map((oldPoint, i) => {
         return {
           x: normalizedPointDiffs[i].x * magnifyAmount + oldPoint.x,
           y: normalizedPointDiffs[i].y * magnifyAmount + oldPoint.y
         };
       });
 
-      var oldCenterPoint = PanZoom._centerPoint(oldPoints[0], oldPoints[1]);
+      let oldCenterPoint = PanZoom._centerPoint(oldPoints[0], oldPoints[1]);
 
-      var translateAmountX = oldCenterPoint.x - ((constrainedPoints[0].x + constrainedPoints[1].x) / 2);
+      let translateAmountX = oldCenterPoint.x - ((constrainedPoints[0].x + constrainedPoints[1].x) / 2);
       this.xScales().forEach((xScale) => {
         this._magnifyScale(xScale, magnifyAmount, oldCenterPoint.x);
         this._translateScale(xScale, translateAmountX);
       });
 
-      var translateAmountY = oldCenterPoint.y - ((constrainedPoints[0].y + constrainedPoints[1].y) / 2);
+      let translateAmountY = oldCenterPoint.y - ((constrainedPoints[0].y + constrainedPoints[1].y) / 2);
       this.yScales().forEach((yScale) => {
         this._magnifyScale(yScale, magnifyAmount, oldCenterPoint.y);
         this._translateScale(yScale, translateAmountY);
@@ -152,19 +158,19 @@ export module Interactions {
     }
 
     private static _centerPoint(point1: Point, point2: Point) {
-      var leftX = Math.min(point1.x, point2.x);
-      var rightX = Math.max(point1.x, point2.x);
-      var topY = Math.min(point1.y, point2.y);
-      var bottomY = Math.max(point1.y, point2.y);
+      let leftX = Math.min(point1.x, point2.x);
+      let rightX = Math.max(point1.x, point2.x);
+      let topY = Math.min(point1.y, point2.y);
+      let bottomY = Math.max(point1.y, point2.y);
 
       return {x: (leftX + rightX) / 2, y: (bottomY + topY) / 2};
     }
 
     private static _pointDistance(point1: Point, point2: Point) {
-      var leftX = Math.min(point1.x, point2.x);
-      var rightX = Math.max(point1.x, point2.x);
-      var topY = Math.min(point1.y, point2.y);
-      var bottomY = Math.max(point1.y, point2.y);
+      let leftX = Math.min(point1.x, point2.x);
+      let rightX = Math.max(point1.x, point2.x);
+      let topY = Math.min(point1.y, point2.y);
+      let bottomY = Math.max(point1.y, point2.y);
 
       return Math.sqrt(Math.pow(rightX - leftX, 2) + Math.pow(bottomY - topY, 2));
     }
@@ -176,22 +182,22 @@ export module Interactions {
     }
 
     private _magnifyScale<D>(scale: QuantitativeScale<D>, magnifyAmount: number, centerValue: number) {
-      var magnifyTransform = (rangeValue: number) => scale.invert(centerValue - (centerValue - rangeValue) * magnifyAmount);
+      let magnifyTransform = (rangeValue: number) => scale.invert(centerValue - (centerValue - rangeValue) * magnifyAmount);
       scale.domain(scale.range().map(magnifyTransform));
     }
 
     private _translateScale<D>(scale: QuantitativeScale<D>, translateAmount: number) {
-      var translateTransform = (rangeValue: number) => scale.invert(rangeValue + translateAmount);
+      let translateTransform = (rangeValue: number) => scale.invert(rangeValue + translateAmount);
       scale.domain(scale.range().map(translateTransform));
     }
 
     private _handleWheelEvent(p: Point, e: WheelEvent) {
-      var translatedP = this._translateToComponentSpace(p);
+      let translatedP = this._translateToComponentSpace(p);
       if (this._isInsideComponent(translatedP)) {
         e.preventDefault();
 
-        var deltaPixelAmount = e.deltaY * (e.deltaMode ? PanZoom._PIXELS_PER_LINE : 1);
-        var zoomAmount = Math.pow(2, deltaPixelAmount * .002);
+        let deltaPixelAmount = e.deltaY * (e.deltaMode ? PanZoom._PIXELS_PER_LINE : 1);
+        let zoomAmount = Math.pow(2, deltaPixelAmount * .002);
 
         this.xScales().forEach((xScale) => {
           zoomAmount = this._constrainedZoomAmountUsingExtent(xScale, zoomAmount);
@@ -213,14 +219,14 @@ export module Interactions {
     }
 
     private _constrainedZoomAmountUsingExtent(scale: QuantitativeScale<any>, zoomAmount: number) {
-      var extentIncreasing = zoomAmount > 1;
+      let extentIncreasing = zoomAmount > 1;
 
-      var boundingDomainExtent = extentIncreasing ? this.maxDomainExtent(scale) : this.minDomainExtent(scale);
+      let boundingDomainExtent = extentIncreasing ? this.maxDomainExtent(scale) : this.minDomainExtent(scale);
       if (boundingDomainExtent == null) { return zoomAmount; }
 
-      var scaleDomain = scale.domain();
-      var domainExtent = Math.abs(scaleDomain[1] - scaleDomain[0]);
-      var compareF = extentIncreasing ? Math.min : Math.max;
+      let scaleDomain = scale.domain();
+      let domainExtent = Math.abs(scaleDomain[1] - scaleDomain[0]);
+      let compareF = extentIncreasing ? Math.min : Math.max;
       return compareF(zoomAmount, boundingDomainExtent / domainExtent);
     }
 
@@ -243,13 +249,13 @@ export module Interactions {
     private _setupDragInteraction() {
       this._dragInteraction.constrainedToComponent(false);
 
-      var lastDragPoint: Point;
+      let lastDragPoint: Point;
       this._dragInteraction.onDragStart(() => lastDragPoint = null);
       this._dragInteraction.onDrag((startPoint, endPoint) => {
         if (this._touchIds.size() >= 2) {
           return;
         }
-        var translateAmountX = (lastDragPoint == null ? startPoint.x : lastDragPoint.x) - endPoint.x;
+        let translateAmountX = (lastDragPoint == null ? startPoint.x : lastDragPoint.x) - endPoint.x;
 
         this.xScales().forEach((xScale) => {
           let domainIncreasing = xScale.domain()[1] > xScale.domain()[0];
@@ -268,7 +274,7 @@ export module Interactions {
           this._translateScale(xScale, translateAmountX);
         });
 
-        var translateAmountY = (lastDragPoint == null ? startPoint.y : lastDragPoint.y) - endPoint.y;
+        let translateAmountY = (lastDragPoint == null ? startPoint.y : lastDragPoint.y) - endPoint.y;
 
         this.yScales().forEach((yScale) => {
           let domainIncreasing = yScale.domain()[1] > yScale.domain()[0];
@@ -301,13 +307,13 @@ export module Interactions {
     public xScales(): QuantitativeScale<any>[];
     /**
      * Sets the x scales for this PanZoom Interaction.
-     * 
+     *
      * @returns {Interactions.PanZoom} The calling PanZoom Interaction.
      */
     public xScales(xScales: QuantitativeScale<any>[]): Interactions.PanZoom;
     public xScales(xScales?: QuantitativeScale<any>[]): any {
       if (xScales == null) {
-        var scales: QuantitativeScale<any>[] = [];
+        let scales: QuantitativeScale<any>[] = [];
         this._xScales.forEach((xScale) => {
           scales.push(xScale);
         });
@@ -326,13 +332,13 @@ export module Interactions {
     public yScales(): QuantitativeScale<any>[];
     /**
      * Sets the y scales for this PanZoom Interaction.
-     * 
+     *
      * @returns {Interactions.PanZoom} The calling PanZoom Interaction.
      */
     public yScales(yScales: QuantitativeScale<any>[]): Interactions.PanZoom;
     public yScales(yScales?: QuantitativeScale<any>[]): any {
       if (yScales == null) {
-        var scales: QuantitativeScale<any>[] = [];
+        let scales: QuantitativeScale<any>[] = [];
         this._yScales.forEach((yScale) => {
           scales.push(yScale);
         });
@@ -347,7 +353,7 @@ export module Interactions {
 
     /**
      * Adds an x scale to this PanZoom Interaction
-     * 
+     *
      * @param {QuantitativeScale<any>} An x scale to add
      * @returns {Interactions.PanZoom} The calling PanZoom Interaction.
      */
@@ -358,7 +364,7 @@ export module Interactions {
 
     /**
      * Removes an x scale from this PanZoom Interaction
-     * 
+     *
      * @param {QuantitativeScale<any>} An x scale to remove
      * @returns {Interactions.PanZoom} The calling PanZoom Interaction.
      */
@@ -371,7 +377,7 @@ export module Interactions {
 
     /**
      * Adds a y scale to this PanZoom Interaction
-     * 
+     *
      * @param {QuantitativeScale<any>} A y scale to add
      * @returns {Interactions.PanZoom} The calling PanZoom Interaction.
      */
@@ -382,7 +388,7 @@ export module Interactions {
 
     /**
      * Removes a y scale from this PanZoom Interaction
-     * 
+     *
      * @param {QuantitativeScale<any>} A y scale to remove
      * @returns {Interactions.PanZoom} The calling PanZoom Interaction.
      */
@@ -421,7 +427,7 @@ export module Interactions {
       if (minDomainExtent.valueOf() < 0) {
         throw new Error("extent must be non-negative");
       }
-      var maxExtentForScale = this.maxDomainExtent(quantitativeScale);
+      let maxExtentForScale = this.maxDomainExtent(quantitativeScale);
       if (maxExtentForScale != null && maxExtentForScale.valueOf() < minDomainExtent.valueOf()) {
         throw new Error("minDomainExtent must be smaller than maxDomainExtent for the same Scale");
       }
@@ -460,7 +466,7 @@ export module Interactions {
       if (maxDomainExtent.valueOf() <= 0) {
         throw new Error("extent must be positive");
       }
-      var minExtentForScale = this.minDomainExtent(quantitativeScale);
+      let minExtentForScale = this.minDomainExtent(quantitativeScale);
       if (minExtentForScale != null && maxDomainExtent.valueOf() < minExtentForScale.valueOf()) {
         throw new Error("maxDomainExtent must be larger than minDomainExtent for the same Scale");
       }

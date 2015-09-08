@@ -29,7 +29,7 @@ export module Components {
     }
 
     protected _setResizableClasses(canResize: boolean) {
-      if (canResize) {
+      if (canResize && this.enabled()) {
         this.addClass("x-resizable");
       } else {
         this.removeClass("x-resizable");

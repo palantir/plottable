@@ -58,28 +58,28 @@ export module Plots {
     }
 
     protected _generateAttrToProjector() {
-      var attrToProjector = super._generateAttrToProjector();
+      let attrToProjector = super._generateAttrToProjector();
 
-      var valueAttr = this._isVertical ? "y" : "x";
-      var keyAttr = this._isVertical ? "x" : "y";
-      var primaryScale: Scale<any, number> = this._isVertical ? this.y().scale : this.x().scale;
-      var primaryAccessor = this._propertyBindings.get(valueAttr).accessor;
-      var keyAccessor = this._propertyBindings.get(keyAttr).accessor;
-      var normalizedKeyAccessor = (datum: any, index: number, dataset: Dataset) => {
+      let valueAttr = this._isVertical ? "y" : "x";
+      let keyAttr = this._isVertical ? "x" : "y";
+      let primaryScale: Scale<any, number> = this._isVertical ? this.y().scale : this.x().scale;
+      let primaryAccessor = this._propertyBindings.get(valueAttr).accessor;
+      let keyAccessor = this._propertyBindings.get(keyAttr).accessor;
+      let normalizedKeyAccessor = (datum: any, index: number, dataset: Dataset) => {
         return Utils.Stacking.normalizeKey(keyAccessor(datum, index, dataset));
       };
-      var getStart = (d: any, i: number, dataset: Dataset) =>
+      let getStart = (d: any, i: number, dataset: Dataset) =>
         primaryScale.scale(this._stackingResult.get(dataset).get(normalizedKeyAccessor(d, i, dataset)).offset);
-      var getEnd = (d: any, i: number, dataset: Dataset) =>
+      let getEnd = (d: any, i: number, dataset: Dataset) =>
         primaryScale.scale(+primaryAccessor(d, i, dataset) +
           this._stackingResult.get(dataset).get(normalizedKeyAccessor(d, i, dataset)).offset);
 
-      var heightF = (d: any, i: number, dataset: Dataset) => {
+      let heightF = (d: any, i: number, dataset: Dataset) => {
         return Math.abs(getEnd(d, i, dataset) - getStart(d, i, dataset));
       };
       attrToProjector[this._isVertical ? "height" : "width"] = heightF;
 
-      var attrFunction = (d: any, i: number, dataset: Dataset) =>
+      let attrFunction = (d: any, i: number, dataset: Dataset) =>
         +primaryAccessor(d, i, dataset) < 0 ? getStart(d, i, dataset) : getEnd(d, i, dataset);
       attrToProjector[valueAttr] = (d: any, i: number, dataset: Dataset) =>
         this._isVertical ? attrFunction(d, i, dataset) : attrFunction(d, i, dataset) - heightF(d, i, dataset);
@@ -100,7 +100,7 @@ export module Plots {
     }
 
     protected _extentsForProperty(attr: string) {
-      var primaryAttr = this._isVertical ? "y" : "x";
+      let primaryAttr = this._isVertical ? "y" : "x";
       if (attr === primaryAttr) {
         return [this._stackedExtent];
       } else {
@@ -113,10 +113,10 @@ export module Plots {
         return;
       }
 
-      var datasets = this.datasets();
-      var keyAccessor = this._isVertical ? this.x().accessor : this.y().accessor;
-      var valueAccessor = this._isVertical ? this.y().accessor : this.x().accessor;
-      var filter = this._filterForProperty(this._isVertical ? "y" : "x");
+      let datasets = this.datasets();
+      let keyAccessor = this._isVertical ? this.x().accessor : this.y().accessor;
+      let valueAccessor = this._isVertical ? this.y().accessor : this.x().accessor;
+      let filter = this._filterForProperty(this._isVertical ? "y" : "x");
 
       this._stackingResult = Utils.Stacking.stack(datasets, keyAccessor, valueAccessor);
       this._stackedExtent = Utils.Stacking.stackedExtent(this._stackingResult, keyAccessor, filter);

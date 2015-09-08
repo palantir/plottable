@@ -38,6 +38,7 @@
 /// <reference path="drawers/areaDrawer.ts" />
 /// <reference path="drawers/rectangleDrawer.ts" />
 /// <reference path="drawers/arcDrawer.ts" />
+/// <reference path="drawers/arcOutlineDrawer.ts" />
 /// <reference path="drawers/symbolDrawer.ts" />
 /// <reference path="drawers/segmentDrawer.ts" />
 
@@ -56,6 +57,7 @@
 /// <reference path="components/gridlines.ts" />
 /// <reference path="components/table.ts" />
 /// <reference path="components/selectionBoxLayer.ts" />
+/// <reference path="components/guideLineLayer.ts" />
 
 /// <reference path="plots/plot.ts" />
 /// <reference path="plots/piePlot.ts" />
@@ -70,6 +72,7 @@
 /// <reference path="plots/stackedBarPlot.ts" />
 /// <reference path="plots/segmentPlot.ts" />
 /// <reference path="plots/waterfallPlot.ts" />
+/// <reference path="plots/wheelPlot.ts" />
 
 /// <reference path="animators/animator.ts" />
 /// <reference path="animators/nullAnimator.ts" />
@@ -91,3 +94,4 @@
 /// <reference path="components/dragBoxLayer.ts" />
 /// <reference path="components/xDragBoxLayer.ts" />
 /// <reference path="components/yDragBoxLayer.ts" />
+/// <reference path="components/dragLineLayer.ts" />

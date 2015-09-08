@@ -16,7 +16,7 @@ export module Dispatchers {
      * @return {Dispatchers.Key}
      */
     public static getDispatcher(): Dispatchers.Key {
-      var dispatcher: Key = (<any> document)[Key._DISPATCHER_KEY];
+      let dispatcher: Key = (<any> document)[Key._DISPATCHER_KEY];
       if (dispatcher == null) {
         dispatcher = new Key();
         (<any> document)[Key._DISPATCHER_KEY] = dispatcher;

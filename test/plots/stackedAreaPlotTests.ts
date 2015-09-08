@@ -2,14 +2,14 @@
 
 describe("Plots", () => {
   describe("Stacked Area Plot", () => {
-    var svg: d3.Selection<void>;
-    var dataset1: Plottable.Dataset;
-    var dataset2: Plottable.Dataset;
-    var xScale: Plottable.Scales.Linear;
-    var yScale: Plottable.Scales.Linear;
-    var renderer: Plottable.Plots.StackedArea<number>;
-    var SVG_WIDTH = 600;
-    var SVG_HEIGHT = 400;
+    let svg: d3.Selection<void>;
+    let dataset1: Plottable.Dataset;
+    let dataset2: Plottable.Dataset;
+    let xScale: Plottable.Scales.Linear;
+    let yScale: Plottable.Scales.Linear;
+    let renderer: Plottable.Plots.StackedArea<number>;
+    let SVG_WIDTH = 600;
+    let SVG_HEIGHT = 400;
 
     beforeEach(() => {
       svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
@@ -17,13 +17,13 @@ describe("Plots", () => {
       xScale.domain([1, 3]);
       yScale = new Plottable.Scales.Linear();
       yScale.domain([0, 4]);
-      var colorScale = new Plottable.Scales.Color("10").domain(["a", "b"]);
+      let colorScale = new Plottable.Scales.Color("10").domain(["a", "b"]);
 
-      var data1 = [
+      let data1 = [
         {x: 1, y: 1, type: "a"},
         {x: 3, y: 2, type: "a"}
       ];
-      var data2 = [
+      let data2 = [
         {x: 1, y: 3, type: "b"},
         {x: 3, y: 1, type: "b"}
       ];
@@ -36,32 +36,32 @@ describe("Plots", () => {
       renderer.x((d) => d.x, xScale);
       renderer.y((d) => d.y, yScale);
       renderer.attr("fill", "type", colorScale);
-      var xAxis = new Plottable.Axes.Numeric(xScale, "bottom");
+      let xAxis = new Plottable.Axes.Numeric(xScale, "bottom");
       new Plottable.Components.Table([[renderer], [xAxis]]).renderTo(svg);
     });
 
     it("renders correctly", () => {
-      var areas = (<any> renderer)._renderArea.selectAll(".area");
-      var area0 = d3.select(areas[0][0]);
-      var d0 = TestMethods.normalizePath(area0.attr("d")).split(/[a-zA-Z]/);
-      var d0Ys = d0.slice(1, d0.length - 1).map((s) => parseFloat(s.split(",")[1]));
+      let areas = (<any> renderer)._renderArea.selectAll(".area");
+      let area0 = d3.select(areas[0][0]);
+      let d0 = TestMethods.normalizePath(area0.attr("d")).split(/[a-zA-Z]/);
+      let d0Ys = d0.slice(1, d0.length - 1).map((s) => parseFloat(s.split(",")[1]));
       assert.strictEqual(d0Ys.indexOf(0), -1, "bottom area never touches the top");
 
-      var area1 = d3.select(areas[0][1]);
-      var d1 = TestMethods.normalizePath(area1.attr("d")).split(/[a-zA-Z]/);
-      var d1Ys = d1.slice(1, d1.length - 1).map((s) => parseFloat(s.split(",")[1]));
+      let area1 = d3.select(areas[0][1]);
+      let d1 = TestMethods.normalizePath(area1.attr("d")).split(/[a-zA-Z]/);
+      let d1Ys = d1.slice(1, d1.length - 1).map((s) => parseFloat(s.split(",")[1]));
       assert.notEqual(d1Ys.indexOf(0), -1, "touches the top");
 
-      var domain = yScale.domain();
+      let domain = yScale.domain();
       assert.strictEqual(0, domain[0], "domain starts at a min value at 0");
       assert.strictEqual(4, domain[1], "highest area stacking is at upper limit of yScale domain");
       svg.remove();
     });
 
     it("pixel positions account for stack offsets", () => {
-      var dataYs = renderer.entities().map((entity) => yScale.invert(entity.position.y));
-      var dataset1Ys = dataset1.data().map((d) => d.y);
-      var dataset2Ys = dataset2.data().map((d, i) => d.y + dataset1.data()[i].y);
+      let dataYs = renderer.entities().map((entity) => yScale.invert(entity.position.y));
+      let dataset1Ys = dataset1.data().map((d) => d.y);
+      let dataset2Ys = dataset2.data().map((d, i) => d.y + dataset1.data()[i].y);
       assert.includeMembers(dataYs, dataset1Ys, "all dataset1 points found");
       assert.includeMembers(dataYs, dataset2Ys, "all dataset2 points found");
       svg.remove();
@@ -70,22 +70,22 @@ describe("Plots", () => {
   });
 
   describe("Stacked Area Plot no data", () => {
-    var svg: d3.Selection<void>;
-    var renderer: Plottable.Plots.StackedArea<number>;
-    var SVG_WIDTH = 600;
-    var SVG_HEIGHT = 400;
+    let svg: d3.Selection<void>;
+    let renderer: Plottable.Plots.StackedArea<number>;
+    let SVG_WIDTH = 600;
+    let SVG_HEIGHT = 400;
 
     beforeEach(() => {
       svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
-      var xScale = new Plottable.Scales.Linear();
+      let xScale = new Plottable.Scales.Linear();
       xScale.domain([1, 3]);
-      var yScale = new Plottable.Scales.Linear();
+      let yScale = new Plottable.Scales.Linear();
       yScale.domain([0, 4]);
-      var colorScale = new Plottable.Scales.Color("10");
+      let colorScale = new Plottable.Scales.Color("10");
 
-      var data1: any[] = [
+      let data1: any[] = [
       ];
-      var data2 = [
+      let data2 = [
         {x: 1, y: 3, type: "b"},
         {x: 3, y: 1, type: "b"}
       ];
@@ -100,11 +100,11 @@ describe("Plots", () => {
     });
 
     it("path elements rendered correctly", () => {
-      var areas = (<any> renderer)._renderArea.selectAll(".area");
-      var area0 = d3.select(areas[0][0]);
+      let areas = (<any> renderer)._renderArea.selectAll(".area");
+      let area0 = d3.select(areas[0][0]);
       assert.strictEqual(area0.attr("d"), null, "no path string on an empty dataset");
 
-      var area1 = d3.select(areas[0][1]);
+      let area1 = d3.select(areas[0][1]);
       assert.notEqual(area1.attr("d"), "", "path string has been created");
       assert.strictEqual(area1.attr("fill"), "#1f77b4", "fill attribute is correct");
 
@@ -114,25 +114,25 @@ describe("Plots", () => {
   });
 
   describe("Stacked Area Plot Stacking", () => {
-    var svg: d3.Selection<void>;
-    var xScale: Plottable.Scales.Linear;
-    var yScale: Plottable.Scales.Linear;
-    var renderer: Plottable.Plots.StackedArea<number>;
-    var SVG_WIDTH = 600;
-    var SVG_HEIGHT = 400;
+    let svg: d3.Selection<void>;
+    let xScale: Plottable.Scales.Linear;
+    let yScale: Plottable.Scales.Linear;
+    let renderer: Plottable.Plots.StackedArea<number>;
+    let SVG_WIDTH = 600;
+    let SVG_HEIGHT = 400;
 
     beforeEach(() => {
       svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
       xScale = new Plottable.Scales.Linear();
       xScale.domain([1, 3]);
       yScale = new Plottable.Scales.Linear();
-      var colorScale = new Plottable.Scales.Color("10").domain(["a", "b"]);
+      let colorScale = new Plottable.Scales.Color("10").domain(["a", "b"]);
 
-      var data1 = [
+      let data1 = [
         {x: 1, y: 1, type: "a"},
         {x: 3, y: 2, type: "a"}
       ];
-      var data2 = [
+      let data2 = [
         {x: 1, y: 5, type: "b"},
         {x: 3, y: 1, type: "b"}
       ];
@@ -151,14 +151,14 @@ describe("Plots", () => {
       assert.closeTo(0, yScale.domain()[0], 1, "0 is close to lower bound");
       assert.closeTo(6, yScale.domain()[1], 1, "6 is close to upper bound");
 
-      var oldLowerBound = yScale.domain()[0];
-      var oldUpperBound = yScale.domain()[1];
+      let oldLowerBound = yScale.domain()[0];
+      let oldUpperBound = yScale.domain()[1];
       renderer.detach();
-      var data = [
+      let data = [
         {x: 1, y: 0, type: "c"},
         {x: 3, y: 0, type: "c"}
       ];
-      var datasetA = new Plottable.Dataset(data);
+      let datasetA = new Plottable.Dataset(data);
       renderer.addDataset(datasetA);
       renderer.renderTo(svg);
 
@@ -168,11 +168,11 @@ describe("Plots", () => {
       oldLowerBound = yScale.domain()[0];
       oldUpperBound = yScale.domain()[1];
       renderer.detach();
-      data = [
+      let increaseStackingData = [
         {x: 1, y: 10, type: "d"},
         {x: 3, y: 3, type: "d"}
       ];
-      var datasetB = new Plottable.Dataset(data);
+      let datasetB = new Plottable.Dataset(increaseStackingData);
       renderer.addDataset(datasetB);
       renderer.renderTo(svg);
 
@@ -181,11 +181,11 @@ describe("Plots", () => {
 
       oldUpperBound = yScale.domain()[1];
       renderer.detach();
-      data = [
+      let nonincreasingStackingData = [
         {x: 1, y: 0, type: "e"},
         {x: 3, y: 1, type: "e"}
       ];
-      var datasetC = new Plottable.Dataset(data);
+      let datasetC = new Plottable.Dataset(nonincreasingStackingData);
       renderer.addDataset(datasetC);
       renderer.renderTo(svg);
 
@@ -200,25 +200,25 @@ describe("Plots", () => {
     it("stacks correctly on removing datasets", () => {
       renderer.detach();
 
-      var data = [
+      let dataA = [
         {x: 1, y: 0, type: "c"},
         {x: 3, y: 0, type: "c"}
       ];
-      var datasetA = new Plottable.Dataset(data);
+      let datasetA = new Plottable.Dataset(dataA);
       renderer.addDataset(datasetA);
 
-      data = [
+      let dataB = [
         {x: 1, y: 10, type: "d"},
         {x: 3, y: 3, type: "d"}
       ];
-      var datasetB = new Plottable.Dataset(data);
+      let datasetB = new Plottable.Dataset(dataB);
       renderer.addDataset(datasetB);
 
-      data = [
+      let dataC = [
         {x: 1, y: 0, type: "e"},
         {x: 3, y: 1, type: "e"}
       ];
-      var datasetC = new Plottable.Dataset(data);
+      let datasetC = new Plottable.Dataset(dataC);
       renderer.addDataset(datasetC);
       renderer.x((d) => d.x, xScale);
       renderer.y((d) => d.y, yScale);
@@ -233,7 +233,7 @@ describe("Plots", () => {
 
       assert.closeTo(16, yScale.domain()[1], 2, "Remains with around 14 at highest extent");
 
-      var oldUpperBound = yScale.domain()[1];
+      let oldUpperBound = yScale.domain()[1];
       renderer.detach();
       renderer.removeDataset(datasetB);
       renderer.renderTo(svg);
@@ -253,14 +253,14 @@ describe("Plots", () => {
       assert.closeTo(0, yScale.domain()[0], 1, "0 is close to lower bound");
       assert.closeTo(6, yScale.domain()[1], 1, "6 is close to upper bound");
 
-      var oldLowerBound = yScale.domain()[0];
-      var oldUpperBound = yScale.domain()[1];
+      let oldLowerBound = yScale.domain()[0];
+      let oldUpperBound = yScale.domain()[1];
       renderer.detach();
-      var data = [
+      let zeroData = [
         {x: 1, y: 0, type: "c"},
         {x: 3, y: 0, type: "c"}
       ];
-      var dataset = new Plottable.Dataset(data);
+      let dataset = new Plottable.Dataset(zeroData);
       renderer.addDataset(dataset);
       renderer.x((d) => d.x, xScale);
       renderer.y((d) => d.y, yScale);
@@ -272,11 +272,11 @@ describe("Plots", () => {
       oldLowerBound = yScale.domain()[0];
       oldUpperBound = yScale.domain()[1];
       renderer.detach();
-      data = [
+      let increasingStackData = [
         {x: 1, y: 10, type: "c"},
         {x: 3, y: 3, type: "c"}
       ];
-      dataset.data(data);
+      dataset.data(increasingStackData);
       renderer.renderTo(svg);
 
       assert.closeTo(oldLowerBound, yScale.domain()[0], 2, "lower bound doesn't change on positive addition");
@@ -284,22 +284,22 @@ describe("Plots", () => {
 
       oldUpperBound = yScale.domain()[1];
       renderer.detach();
-      data = [
+      let decreasingStackData = [
         {x: 1, y: 8, type: "c"},
         {x: 3, y: 3, type: "c"}
       ];
-      dataset.data(data);
+      dataset.data(decreasingStackData);
       renderer.renderTo(svg);
 
       assert.closeTo(oldUpperBound - 2, yScale.domain()[1], 1, "upper bound decreases by 2");
 
       oldUpperBound = yScale.domain()[1];
       renderer.detach();
-      data = [
+      let nonmodifyingStackData = [
         {x: 1, y: 8, type: "c"},
         {x: 3, y: 1, type: "c"}
       ];
-      dataset.data(data);
+      dataset.data(nonmodifyingStackData);
       renderer.renderTo(svg);
 
       assert.strictEqual(oldUpperBound, yScale.domain()[1], "upper bound does not change");
@@ -307,16 +307,16 @@ describe("Plots", () => {
     });
 
     it("warning is thrown when datasets are updated with different domains", () => {
-      var flag = false;
-      var oldWarn = Plottable.Utils.Window.warn;
+      let flag = false;
+      let oldWarn = Plottable.Utils.Window.warn;
       Plottable.Utils.Window.warn = (msg: string) => {
         if (msg.indexOf("domain") > -1) { flag = true; }
       };
 
-      var missingDomainData = [
+      let missingDomainData = [
         { x: 1, y: 0, type: "c" }
       ];
-      var dataset = new Plottable.Dataset(missingDomainData);
+      let dataset = new Plottable.Dataset(missingDomainData);
       renderer.addDataset(dataset);
 
       Plottable.Utils.Window.warn = oldWarn;
@@ -327,12 +327,12 @@ describe("Plots", () => {
   });
 
   describe("Stacked Area Plot Project", () => {
-    var svg: d3.Selection<void>;
-    var xScale: Plottable.Scales.Linear;
-    var yScale: Plottable.Scales.Linear;
-    var renderer: Plottable.Plots.StackedArea<number>;
-    var SVG_WIDTH = 600;
-    var SVG_HEIGHT = 400;
+    let svg: d3.Selection<void>;
+    let xScale: Plottable.Scales.Linear;
+    let yScale: Plottable.Scales.Linear;
+    let renderer: Plottable.Plots.StackedArea<number>;
+    let SVG_WIDTH = 600;
+    let SVG_HEIGHT = 400;
 
     beforeEach(() => {
       svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
@@ -340,13 +340,13 @@ describe("Plots", () => {
       xScale.domain([1, 3]);
       yScale = new Plottable.Scales.Linear();
       yScale.domain([0, 4]);
-      var colorScale = new Plottable.Scales.Color("10").domain(["a", "b"]);
+      let colorScale = new Plottable.Scales.Color("10").domain(["a", "b"]);
 
-      var data1 = [
+      let data1 = [
         {x: 1, yTest: 1, type: "a"},
         {x: 3, yTest: 2, type: "a"}
       ];
-      var data2 = [
+      let data2 = [
         {x: 1, yTest: 3, type: "b"},
         {x: 3, yTest: 1, type: "b"}
       ];
@@ -357,23 +357,23 @@ describe("Plots", () => {
       renderer.addDataset(new Plottable.Dataset(data1));
       renderer.addDataset(new Plottable.Dataset(data2));
       renderer.attr("fill", (d) => d.type, colorScale);
-      var xAxis = new Plottable.Axes.Numeric(xScale, "bottom");
+      let xAxis = new Plottable.Axes.Numeric(xScale, "bottom");
       new Plottable.Components.Table([[renderer], [xAxis]]).renderTo(svg);
     });
 
     it("renders correctly", () => {
-      var areas = (<any> renderer)._renderArea.selectAll(".area");
-      var area0 = d3.select(areas[0][0]);
-      var d0 = TestMethods.normalizePath(area0.attr("d")).split(/[a-zA-Z]/);
-      var d0Ys = d0.slice(1, d0.length - 1).map((s) => parseFloat(s.split(",")[1]));
+      let areas = (<any> renderer)._renderArea.selectAll(".area");
+      let area0 = d3.select(areas[0][0]);
+      let d0 = TestMethods.normalizePath(area0.attr("d")).split(/[a-zA-Z]/);
+      let d0Ys = d0.slice(1, d0.length - 1).map((s) => parseFloat(s.split(",")[1]));
       assert.strictEqual(d0Ys.indexOf(0), -1, "bottom area never touches the top");
 
-      var area1 = d3.select(areas[0][1]);
-      var d1 = TestMethods.normalizePath(area1.attr("d")).split(/[a-zA-Z]/);
-      var d1Ys = d1.slice(1, d1.length - 1).map((s) => parseFloat(s.split(",")[1]));
+      let area1 = d3.select(areas[0][1]);
+      let d1 = TestMethods.normalizePath(area1.attr("d")).split(/[a-zA-Z]/);
+      let d1Ys = d1.slice(1, d1.length - 1).map((s) => parseFloat(s.split(",")[1]));
       assert.notEqual(d1Ys.indexOf(0), -1, "touches the top");
 
-      var domain = yScale.domain();
+      let domain = yScale.domain();
       assert.strictEqual(0, domain[0], "domain starts at a min value at 0");
       assert.strictEqual(4, domain[1], "highest area stacking is at upper limit of yScale domain");
       svg.remove();
@@ -381,11 +381,11 @@ describe("Plots", () => {
 
     it("project works correctly", () => {
       renderer.attr("check", (d) => d.type);
-      var areas = (<any> renderer)._renderArea.selectAll(".area");
-      var area0 = d3.select(areas[0][0]);
+      let areas = (<any> renderer)._renderArea.selectAll(".area");
+      let area0 = d3.select(areas[0][0]);
       assert.strictEqual(area0.attr("check"), "a", "projector has been applied to first area");
 
-      var area1 = d3.select(areas[0][1]);
+      let area1 = d3.select(areas[0][1]);
       assert.strictEqual(area1.attr("check"), "b", "projector has been applied to second area");
       svg.remove();
     });
@@ -394,37 +394,37 @@ describe("Plots", () => {
 
   describe("fail safe tests", () => {
     it("0 as a string coerces correctly and is not subject to off by one errors", () => {
-      var data0 = [
+      let data0 = [
         { x: 1, y: 1, fill: "blue" },
         { x: 2, y: 2, fill: "blue" },
         { x: 3, y: 3, fill: "blue" },
       ];
-      var data1 = [
+      let data1 = [
         { x: 1, y: 1, fill: "red" },
         { x: 2, y: "0", fill: "red" },
         { x: 3, y: 3, fill: "red" },
       ];
-      var data2 = [
+      let data2 = [
         { x: 1, y: 1, fill: "green" },
         { x: 2, y: 2, fill: "green" },
         { x: 3, y: 3, fill: "green" },
       ];
-      var xScale = new Plottable.Scales.Linear();
-      var yScale = new Plottable.Scales.Linear();
+      let xScale = new Plottable.Scales.Linear();
+      let yScale = new Plottable.Scales.Linear();
 
-      var plot = new Plottable.Plots.StackedArea<number>();
-      var dataset0 = new Plottable.Dataset(data0);
+      let plot = new Plottable.Plots.StackedArea<number>();
+      let dataset0 = new Plottable.Dataset(data0);
       plot.addDataset(dataset0);
-      var dataset1 = new Plottable.Dataset(data1);
+      let dataset1 = new Plottable.Dataset(data1);
       plot.addDataset(dataset1);
-      var dataset2 = new Plottable.Dataset(data2);
+      let dataset2 = new Plottable.Dataset(data2);
       plot.addDataset(dataset2);
       plot.attr("fill", "fill");
       plot.x((d: any) => d.x, xScale).y((d: any) => d.y, yScale);
 
-      var ds0Point2Offset = (<any> plot)._stackingResult.get(dataset0).get("2").offset;
-      var ds1Point2Offset = (<any> plot)._stackingResult.get(dataset1).get("2").offset;
-      var ds2Point2Offset = (<any> plot)._stackingResult.get(dataset2).get("2").offset;
+      let ds0Point2Offset = (<any> plot)._stackingResult.get(dataset0).get("2").offset;
+      let ds1Point2Offset = (<any> plot)._stackingResult.get(dataset1).get("2").offset;
+      let ds2Point2Offset = (<any> plot)._stackingResult.get(dataset2).get("2").offset;
 
       assert.strictEqual(ds0Point2Offset, 0,
         "dataset0 (blue) sh1uld have no offset on middle point");
@@ -435,37 +435,37 @@ describe("Plots", () => {
     });
 
     it("null defaults to 0", () => {
-      var data0 = [
+      let data0 = [
         { x: 1, y: 1, fill: "blue" },
         { x: 2, y: 2, fill: "blue" },
         { x: 3, y: 3, fill: "blue" },
       ];
-      var data1 = [
+      let data1 = [
         { x: 1, y: 1, fill: "red" },
         { x: 2, y: "0", fill: "red" },
         { x: 3, y: 3, fill: "red" },
       ];
-      var data2 = [
+      let data2 = [
         { x: 1, y: 1, fill: "green" },
         { x: 2, y: 2, fill: "green" },
         { x: 3, y: 3, fill: "green" },
       ];
-      var xScale = new Plottable.Scales.Linear();
-      var yScale = new Plottable.Scales.Linear();
+      let xScale = new Plottable.Scales.Linear();
+      let yScale = new Plottable.Scales.Linear();
 
-      var plot = new Plottable.Plots.StackedArea<number>();
-      var dataset0 = new Plottable.Dataset(data0);
+      let plot = new Plottable.Plots.StackedArea<number>();
+      let dataset0 = new Plottable.Dataset(data0);
       plot.addDataset(dataset0);
-      var dataset1 = new Plottable.Dataset(data1);
+      let dataset1 = new Plottable.Dataset(data1);
       plot.addDataset(dataset1);
-      var dataset2 = new Plottable.Dataset(data2);
+      let dataset2 = new Plottable.Dataset(data2);
       plot.addDataset(dataset2);
       plot.attr("fill", "fill");
       plot.x((d: any) => d.x, xScale).y((d: any) => d.y, yScale);
 
-      var ds0Point2Offset = (<any> plot)._stackingResult.get(dataset0).get("2").offset;
-      var ds1Point2Offset = (<any> plot)._stackingResult.get(dataset1).get("2").offset;
-      var ds2Point2Offset = (<any> plot)._stackingResult.get(dataset2).get("2").offset;
+      let ds0Point2Offset = (<any> plot)._stackingResult.get(dataset0).get("2").offset;
+      let ds1Point2Offset = (<any> plot)._stackingResult.get(dataset1).get("2").offset;
+      let ds2Point2Offset = (<any> plot)._stackingResult.get(dataset2).get("2").offset;
 
       assert.strictEqual(ds0Point2Offset, 0,
         "dataset0 (blue) should have no offset on middle point");

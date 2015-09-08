@@ -3,11 +3,11 @@
 describe("Dispatchers", () => {
   describe("Key Dispatcher", () => {
     it("triggers callback on keydown", () => {
-      var ked = Plottable.Dispatchers.Key.getDispatcher();
-      var keyCodeToSend = 65;
-      var keyDowned = false;
-      var body = d3.select("body");
-      var callback = (code: number, e: KeyboardEvent) => {
+      let ked = Plottable.Dispatchers.Key.getDispatcher();
+      let keyCodeToSend = 65;
+      let keyDowned = false;
+      let body = d3.select("body");
+      let callback = (code: number, e: KeyboardEvent) => {
         keyDowned = true;
         assert.strictEqual(code, keyCodeToSend, "correct keycode was passed");
         assert.isNotNull(e, "key event was passed to the callback");
@@ -26,11 +26,11 @@ describe("Dispatchers", () => {
     });
 
     it("triggers callback on keyup", () => {
-      var ked = Plottable.Dispatchers.Key.getDispatcher();
-      var keyCodeToSend = 65;
-      var keyUped = false;
-      var body = d3.select("body");
-      var callback = (code: number, e: KeyboardEvent) => {
+      let ked = Plottable.Dispatchers.Key.getDispatcher();
+      let keyCodeToSend = 65;
+      let keyUped = false;
+      let body = d3.select("body");
+      let callback = (code: number, e: KeyboardEvent) => {
         keyUped = true;
         assert.strictEqual(code, keyCodeToSend, "correct keycode was passed");
         assert.isNotNull(e, "key event was passed to the callback");

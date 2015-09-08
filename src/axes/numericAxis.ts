@@ -30,7 +30,7 @@ export module Axes {
     }
 
     protected _computeWidth() {
-      var maxTextWidth = this._usesTextWidthApproximation ? this._computeApproximateTextWidth() : this._computeExactTextWidth();
+      let maxTextWidth = this._usesTextWidthApproximation ? this._computeApproximateTextWidth() : this._computeExactTextWidth();
 
       if (this._tickLabelPositioning === "center") {
         this._computedWidth = this._maxLabelTickLength() + this.tickLabelPadding() + maxTextWidth;
@@ -42,9 +42,9 @@ export module Axes {
     }
 
     private _computeExactTextWidth(): number {
-      var tickValues = this._getTickValues();
-      var textLengths = tickValues.map((v: any) => {
-        var formattedValue = this.formatter()(v);
+      let tickValues = this._getTickValues();
+      let textLengths = tickValues.map((v: any) => {
+        let formattedValue = this.formatter()(v);
         return this._measurer.measure(formattedValue).width;
       });
 
@@ -52,10 +52,10 @@ export module Axes {
     }
 
     private _computeApproximateTextWidth(): number {
-      var tickValues = this._getTickValues();
-      var mWidth = this._measurer.measure("M").width;
-      var textLengths = tickValues.map((v: number): number => {
-        var formattedValue = this.formatter()(v);
+      let tickValues = this._getTickValues();
+      let mWidth = this._measurer.measure("M").width;
+      let textLengths = tickValues.map((v: number): number => {
+        let formattedValue = this.formatter()(v);
         return formattedValue.length * mWidth;
       });
 
@@ -63,7 +63,7 @@ export module Axes {
     }
 
     protected _computeHeight() {
-      var textHeight = this._measurer.measure().height;
+      let textHeight = this._measurer.measure().height;
 
       if (this._tickLabelPositioning === "center") {
         this._computedHeight = this._maxLabelTickLength() + this.tickLabelPadding() + textHeight;
@@ -75,10 +75,10 @@ export module Axes {
     }
 
     protected _getTickValues() {
-      var scale = (<QuantitativeScale<number>> this._scale);
-      var domain = scale.domain();
-      var min = domain[0] <= domain[1] ? domain[0] : domain[1];
-      var max = domain[0] >= domain[1] ? domain[0] : domain[1];
+      let scale = (<QuantitativeScale<number>> this._scale);
+      let domain = scale.domain();
+      let min = domain[0] <= domain[1] ? domain[0] : domain[1];
+      let max = domain[0] >= domain[1] ? domain[0] : domain[1];
       if (min === domain[0]) {
         return scale.ticks().filter((i: number) => i >= min && i <= max);
       } else {
@@ -92,7 +92,7 @@ export module Axes {
       }
 
       if (!this._isHorizontal()) {
-        var reComputedWidth = this._computeWidth();
+        let reComputedWidth = this._computeWidth();
         if (reComputedWidth > this.width() || reComputedWidth < (this.width() - this.margin())) {
           this.redraw();
           return;
@@ -105,22 +105,22 @@ export module Axes {
     public renderImmediately() {
       super.renderImmediately();
 
-      var tickLabelAttrHash: { [key: string]: number | string | ((d: any) => number) } = {
+      let tickLabelAttrHash: { [key: string]: number | string | ((d: any) => number) } = {
         x: <any> 0,
         y: <any> 0,
         dx: "0em",
         dy: "0.3em"
       };
 
-      var tickMarkLength = this._maxLabelTickLength();
-      var tickLabelPadding = this.tickLabelPadding();
+      let tickMarkLength = this._maxLabelTickLength();
+      let tickLabelPadding = this.tickLabelPadding();
 
-      var tickLabelTextAnchor = "middle";
+      let tickLabelTextAnchor = "middle";
 
-      var labelGroupTransformX = 0;
-      var labelGroupTransformY = 0;
-      var labelGroupShiftX = 0;
-      var labelGroupShiftY = 0;
+      let labelGroupTransformX = 0;
+      let labelGroupTransformY = 0;
+      let labelGroupShiftX = 0;
+      let labelGroupShiftY = 0;
       if (this._isHorizontal()) {
         switch (this._tickLabelPositioning) {
           case "left":
@@ -155,7 +155,7 @@ export module Axes {
         }
       }
 
-      var tickMarkAttrHash = this._generateTickMarkAttrHash();
+      let tickMarkAttrHash = this._generateTickMarkAttrHash();
       switch (this.orientation()) {
         case "bottom":
           tickLabelAttrHash["x"] = tickMarkAttrHash["x1"];
@@ -182,8 +182,8 @@ export module Axes {
           break;
       }
 
-      var tickLabelValues = this._getTickValues();
-      var tickLabels = this._tickLabelContainer
+      let tickLabelValues = this._getTickValues();
+      let tickLabels = this._tickLabelContainer
                            .selectAll("." + Axis.TICK_LABEL_CLASS)
                            .data(tickLabelValues);
       tickLabels.enter().append("text").classed(Axis.TICK_LABEL_CLASS, true);
@@ -194,7 +194,7 @@ export module Axes {
                 .attr(tickLabelAttrHash)
                 .text((s: any) => this.formatter()(s));
 
-      var labelGroupTransform = "translate(" + labelGroupTransformX + ", " + labelGroupTransformY + ")";
+      let labelGroupTransform = "translate(" + labelGroupTransformX + ", " + labelGroupTransformY + ")";
       this._tickLabelContainer.attr("transform", labelGroupTransform);
 
       this._showAllTickMarks();
@@ -226,15 +226,15 @@ export module Axes {
      * Hides the Tick Marks which have no corresponding Tick Labels
      */
     private _hideTickMarksWithoutLabel() {
-      var visibleTickMarks = this._tickMarkContainer.selectAll("." + Axis.TICK_MARK_CLASS);
-      var visibleTickLabels = this._tickLabelContainer
+      let visibleTickMarks = this._tickMarkContainer.selectAll("." + Axis.TICK_MARK_CLASS);
+      let visibleTickLabels = this._tickLabelContainer
                                   .selectAll("." + Axis.TICK_LABEL_CLASS)
                                   .filter(function(d: any, i: number) {
-                                    var visibility = d3.select(this).style("visibility");
+                                    let visibility = d3.select(this).style("visibility");
                                     return (visibility === "inherit") || (visibility === "visible");
                                   });
 
-      var labelNumbersShown: number[] = [];
+      let labelNumbersShown: number[] = [];
       visibleTickLabels.each((labelNumber: number) => labelNumbersShown.push(labelNumber));
 
       visibleTickMarks.each(function(e, i) {
@@ -262,7 +262,7 @@ export module Axes {
       if (position == null) {
         return this._tickLabelPositioning;
       } else {
-        var positionLC = position.toLowerCase();
+        let positionLC = position.toLowerCase();
         if (this._isHorizontal()) {
           if (!(positionLC === "left" || positionLC === "center" || positionLC === "right")) {
             throw new Error(positionLC + " is not a valid tick label position for a horizontal NumericAxis");
@@ -304,16 +304,16 @@ export module Axes {
     }
 
     private _hideEndTickLabels() {
-      var boundingBox = (<Element> this._boundingBox.node()).getBoundingClientRect();
-      var tickLabels = this._tickLabelContainer.selectAll("." + Axis.TICK_LABEL_CLASS);
+      let boundingBox = (<Element> this._boundingBox.node()).getBoundingClientRect();
+      let tickLabels = this._tickLabelContainer.selectAll("." + Axis.TICK_LABEL_CLASS);
       if (tickLabels[0].length === 0) {
         return;
       }
-      var firstTickLabel = <Element> tickLabels[0][0];
+      let firstTickLabel = <Element> tickLabels[0][0];
       if (!Utils.DOM.clientRectInside(firstTickLabel.getBoundingClientRect(), boundingBox)) {
         d3.select(firstTickLabel).style("visibility", "hidden");
       }
-      var lastTickLabel = <Element> tickLabels[0][tickLabels[0].length - 1];
+      let lastTickLabel = <Element> tickLabels[0][tickLabels[0].length - 1];
       if (!Utils.DOM.clientRectInside(lastTickLabel.getBoundingClientRect(), boundingBox)) {
         d3.select(lastTickLabel).style("visibility", "hidden");
       }
@@ -321,8 +321,8 @@ export module Axes {
 
     // Responsible for hiding any tick labels that break out of the bounding container
     private _hideOverflowingTickLabels() {
-      var boundingBox = (<Element> this._boundingBox.node()).getBoundingClientRect();
-      var tickLabels = this._tickLabelContainer.selectAll("." + Axis.TICK_LABEL_CLASS);
+      let boundingBox = (<Element> this._boundingBox.node()).getBoundingClientRect();
+      let tickLabels = this._tickLabelContainer.selectAll("." + Axis.TICK_LABEL_CLASS);
       if (tickLabels.empty()) {
         return;
       }
@@ -334,22 +334,22 @@ export module Axes {
     }
 
     private _hideOverlappingTickLabels() {
-      var visibleTickLabels = this._tickLabelContainer
+      let visibleTickLabels = this._tickLabelContainer
                                     .selectAll("." + Axis.TICK_LABEL_CLASS)
                                     .filter(function(d: any, i: number) {
-                                      var visibility = d3.select(this).style("visibility");
+                                      let visibility = d3.select(this).style("visibility");
                                       return (visibility === "inherit") || (visibility === "visible");
                                     });
 
-      var visibleTickLabelRects = visibleTickLabels[0].map((label: HTMLScriptElement) => label.getBoundingClientRect());
-      var interval = 1;
+      let visibleTickLabelRects = visibleTickLabels[0].map((label: HTMLScriptElement) => label.getBoundingClientRect());
+      let interval = 1;
 
       while (!this._hasOverlapWithInterval(interval, visibleTickLabelRects) && interval < visibleTickLabelRects.length) {
         interval += 1;
       }
 
       visibleTickLabels.each(function (d: string, i: number) {
-        var tickLabel = d3.select(this);
+        let tickLabel = d3.select(this);
         if (i % interval !== 0) {
           tickLabel.style("visibility", "hidden");
         }
@@ -368,7 +368,7 @@ export module Axes {
      */
     private _hasOverlapWithInterval(interval: number, rects: ClientRect[]): boolean {
 
-      var padding = this.tickLabelPadding();
+      let padding = this.tickLabelPadding();
 
       if (this._tickLabelPositioning === "bottom" ||
           this._tickLabelPositioning === "top" ||
@@ -377,9 +377,9 @@ export module Axes {
         padding *= 3;
       }
 
-      for (var i = 0; i < rects.length - (interval); i += interval) {
-        var currRect = rects[i];
-        var nextRect = rects[i + interval];
+      for (let i = 0; i < rects.length - (interval); i += interval) {
+        let currRect = rects[i];
+        let nextRect = rects[i + interval];
         if (this._isHorizontal()) {
           if (currRect.right + padding >= nextRect.left) {
             return false;
@@ -392,6 +392,7 @@ export module Axes {
       }
       return true;
     }
+
   }
 }
 }

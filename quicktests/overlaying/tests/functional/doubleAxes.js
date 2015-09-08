@@ -21,6 +21,7 @@ function run(svg, data, Plottable) {
   var plot2 = new Plottable.Plots.Line();
   plot2.addDataset(ds2);
   plot2.x(function(d) { return d.x; }, xScale2).y(function(d) { return d.y; }, yScale);
+
   var plots = new Plottable.Components.Group([plot1, plot2]);
 
   var xAxis1 = new Plottable.Axes.Category(xScale1, "bottom");

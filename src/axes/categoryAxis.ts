@@ -34,8 +34,8 @@ export module Axes {
     }
 
     public requestedSpace(offeredWidth: number, offeredHeight: number): SpaceRequest {
-      var widthRequiredByTicks = this._isHorizontal() ? 0 : this._maxLabelTickLength() + this.tickLabelPadding() + this.margin();
-      var heightRequiredByTicks = this._isHorizontal() ? this._maxLabelTickLength() + this.tickLabelPadding() + this.margin() : 0;
+      let widthRequiredByTicks = this._isHorizontal() ? 0 : this._maxLabelTickLength() + this.tickLabelPadding() + this.margin();
+      let heightRequiredByTicks = this._isHorizontal() ? this._maxLabelTickLength() + this.tickLabelPadding() + this.margin() : 0;
 
       if (this._scale.domain().length === 0) {
         return {
@@ -44,13 +44,32 @@ export module Axes {
         };
       }
 
-      var categoryScale = <Scales.Category> this._scale;
-      var measureResult = this._measureTicks(offeredWidth, offeredHeight, categoryScale, categoryScale.domain());
+      if (this.annotationsEnabled()) {
+        let tierTotalHeight = this._annotationTierHeight() * this.annotationTierCount();
+        if (this._isHorizontal()) {
+          heightRequiredByTicks += tierTotalHeight;
+        } else {
+          widthRequiredByTicks += tierTotalHeight;
+        }
+      }
+
+      let categoryScale = <Scales.Category> this._scale;
+      let measureResult = this._measureTicks(offeredWidth, offeredHeight, categoryScale, categoryScale.domain());
 
       return {
         minWidth: measureResult.usedWidth + widthRequiredByTicks,
         minHeight: measureResult.usedHeight + heightRequiredByTicks
       };
+    }
+
+    protected _coreSize() {
+      let relevantDimension = this._isHorizontal() ? this.height() : this.width();
+      let relevantRequestedSpaceDimension = this._isHorizontal() ?
+                                              this.requestedSpace(this.width(), this.height()).minHeight :
+                                              this.requestedSpace(this.width(), this.height()).minWidth;
+      let marginAndAnnotationSize = this.margin() + this._annotationTierHeight();
+      let axisHeightWithoutMargin = relevantRequestedSpaceDimension - marginAndAnnotationSize;
+      return Math.min(axisHeightWithoutMargin, relevantDimension);
     }
 
     protected _getTickValues() {
@@ -86,9 +105,9 @@ export module Axes {
      * @param {d3.Selection} ticks The tick elements to be written to.
      */
     private _drawTicks(axisWidth: number, axisHeight: number, scale: Scales.Category, ticks: d3.Selection<string>) {
-      var self = this;
-      var xAlign: {[s: string]: string};
-      var yAlign: {[s: string]: string};
+      let self = this;
+      let xAlign: {[s: string]: string};
+      let yAlign: {[s: string]: string};
       switch (this.tickLabelAngle()) {
         case 0:
           xAlign = {left: "right", right: "left", top: "center", bottom: "center"};
@@ -104,10 +123,10 @@ export module Axes {
           break;
       }
       ticks.each(function (d: string) {
-        var bandWidth = scale.stepWidth();
-        var width = self._isHorizontal() ? bandWidth : axisWidth - self._maxLabelTickLength() - self.tickLabelPadding();
-        var height = self._isHorizontal() ? axisHeight - self._maxLabelTickLength() - self.tickLabelPadding() : bandWidth;
-        var writeOptions = {
+        let bandWidth = scale.stepWidth();
+        let width = self._isHorizontal() ? bandWidth : axisWidth - self._maxLabelTickLength() - self.tickLabelPadding();
+        let height = self._isHorizontal() ? axisHeight - self._maxLabelTickLength() - self.tickLabelPadding() : bandWidth;
+        let writeOptions = {
           selection: d3.select(this),
           xAlign: xAlign[self.orientation()],
           yAlign: yAlign[self.orientation()],
@@ -124,16 +143,16 @@ export module Axes {
      * @param {string[]} ticks The strings that will be printed on the ticks.
      */
     private _measureTicks(axisWidth: number, axisHeight: number, scale: Scales.Category, ticks: string[]) {
-      var axisSpace = this._isHorizontal() ? axisWidth : axisHeight;
-      var totalOuterPaddingRatio = 2 * scale.outerPadding();
-      var totalInnerPaddingRatio = (ticks.length - 1) * scale.innerPadding();
-      var expectedRangeBand = axisSpace / (totalOuterPaddingRatio + totalInnerPaddingRatio + ticks.length);
-      var stepWidth = expectedRangeBand * (1 + scale.innerPadding());
+      let axisSpace = this._isHorizontal() ? axisWidth : axisHeight;
+      let totalOuterPaddingRatio = 2 * scale.outerPadding();
+      let totalInnerPaddingRatio = (ticks.length - 1) * scale.innerPadding();
+      let expectedRangeBand = axisSpace / (totalOuterPaddingRatio + totalInnerPaddingRatio + ticks.length);
+      let stepWidth = expectedRangeBand * (1 + scale.innerPadding());
 
-      var wrappingResults = ticks.map((s: string) => {
+      let wrappingResults = ticks.map((s: string) => {
 
         // HACKHACK: https://github.com/palantir/svg-typewriter/issues/25
-        var width = axisWidth - this._maxLabelTickLength() - this.tickLabelPadding(); // default for left/right
+        let width = axisWidth - this._maxLabelTickLength() - this.tickLabelPadding(); // default for left/right
         if (this._isHorizontal()) { // case for top/bottom
           width = stepWidth; // defaults to the band width
           if (this._tickLabelAngle !== 0) { // rotated label
@@ -144,7 +163,7 @@ export module Axes {
         }
 
         // HACKHACK: https://github.com/palantir/svg-typewriter/issues/25
-        var height = stepWidth; // default for left/right
+        let height = stepWidth; // default for left/right
         if (this._isHorizontal()) { // case for top/bottom
           height = axisHeight - this._maxLabelTickLength() - this.tickLabelPadding();
           if (this._tickLabelAngle !== 0) { // rotated label
@@ -158,20 +177,20 @@ export module Axes {
       });
 
       // HACKHACK: https://github.com/palantir/svg-typewriter/issues/25
-      var widthFn = (this._isHorizontal() && this._tickLabelAngle === 0) ? d3.sum : Utils.Math.max;
-      var heightFn = (this._isHorizontal() && this._tickLabelAngle === 0) ? Utils.Math.max : d3.sum;
+      let widthFn = (this._isHorizontal() && this._tickLabelAngle === 0) ? d3.sum : Utils.Math.max;
+      let heightFn = (this._isHorizontal() && this._tickLabelAngle === 0) ? Utils.Math.max : d3.sum;
 
-      var textFits = wrappingResults.every((t: SVGTypewriter.Wrappers.WrappingResult) =>
+      let textFits = wrappingResults.every((t: SVGTypewriter.Wrappers.WrappingResult) =>
                     !SVGTypewriter.Utils.StringMethods.isNotEmptyString(t.truncatedText) && t.noLines === 1);
-      var usedWidth = widthFn<SVGTypewriter.Wrappers.WrappingResult, number>(wrappingResults,
+      let usedWidth = widthFn<SVGTypewriter.Wrappers.WrappingResult, number>(wrappingResults,
                       (t: SVGTypewriter.Wrappers.WrappingResult) => this._measurer.measure(t.wrappedText).width, 0);
-      var usedHeight = heightFn<SVGTypewriter.Wrappers.WrappingResult, number>(wrappingResults,
+      let usedHeight = heightFn<SVGTypewriter.Wrappers.WrappingResult, number>(wrappingResults,
                       (t: SVGTypewriter.Wrappers.WrappingResult) => this._measurer.measure(t.wrappedText).height, 0);
 
       // If the tick labels are rotated, reverse usedWidth and usedHeight
       // HACKHACK: https://github.com/palantir/svg-typewriter/issues/25
       if (this._tickLabelAngle !== 0) {
-        var tempHeight = usedHeight;
+        let tempHeight = usedHeight;
         usedHeight = usedWidth;
         usedWidth = tempHeight;
       }
@@ -185,14 +204,14 @@ export module Axes {
 
     public renderImmediately() {
       super.renderImmediately();
-      var catScale = <Scales.Category> this._scale;
-      var tickLabels = this._tickLabelContainer.selectAll("." + Axis.TICK_LABEL_CLASS).data(this._scale.domain(), (d) => d);
+      let catScale = <Scales.Category> this._scale;
+      let tickLabels = this._tickLabelContainer.selectAll("." + Axis.TICK_LABEL_CLASS).data(this._scale.domain(), (d) => d);
 
-      var getTickLabelTransform = (d: string, i: number) => {
-        var innerPaddingWidth = catScale.stepWidth() - catScale.rangeBand();
-        var scaledValue = catScale.scale(d) - catScale.rangeBand() / 2 - innerPaddingWidth / 2;
-        var x = this._isHorizontal() ? scaledValue : 0;
-        var y = this._isHorizontal() ? 0 : scaledValue;
+      let getTickLabelTransform = (d: string, i: number) => {
+        let innerPaddingWidth = catScale.stepWidth() - catScale.rangeBand();
+        let scaledValue = catScale.scale(d) - catScale.rangeBand() / 2 - innerPaddingWidth / 2;
+        let x = this._isHorizontal() ? scaledValue : 0;
+        let y = this._isHorizontal() ? 0 : scaledValue;
         return "translate(" + x + "," + y + ")";
       };
       tickLabels.enter().append("g").classed(Axis.TICK_LABEL_CLASS, true);
@@ -202,8 +221,8 @@ export module Axes {
       tickLabels.text("");
       this._drawTicks(this.width(), this.height(), catScale, tickLabels);
 
-      var xTranslate = this.orientation() === "right" ? this._maxLabelTickLength() + this.tickLabelPadding() : 0;
-      var yTranslate = this.orientation() === "bottom" ? this._maxLabelTickLength() + this.tickLabelPadding() : 0;
+      let xTranslate = this.orientation() === "right" ? this._maxLabelTickLength() + this.tickLabelPadding() : 0;
+      let yTranslate = this.orientation() === "bottom" ? this._maxLabelTickLength() + this.tickLabelPadding() : 0;
       Utils.DOM.translate(this._tickLabelContainer, xTranslate, yTranslate);
       return this;
     }
