@@ -199,32 +199,10 @@ describe("ComponentGroups", () => {
     });
   });
 
-  it("overlaps its Components", () => {
-    let c1 = new Mocks.FixedSizeComponent(10, 10);
-    let c2 = new Plottable.Component();
-    let c3 = new Plottable.Component();
-
-    let cg = new Plottable.Components.Group([c1, c2, c3]);
-    let svg = TestMethods.generateSVG(400, 400);
-    cg.anchor(svg);
-    (<any> c1)._addBox("test-box1");
-    (<any> c2)._addBox("test-box2");
-    (<any> c3)._addBox("test-box3");
-    cg.computeLayout().render();
-    let t1 = svg.select(".test-box1");
-    let t2 = svg.select(".test-box2");
-    let t3 = svg.select(".test-box3");
-    TestMethods.assertWidthHeight(t1, 10, 10, "rect1 sized correctly");
-    TestMethods.assertWidthHeight(t2, 400, 400, "rect2 sized correctly");
-    TestMethods.assertWidthHeight(t3, 400, 400, "rect3 sized correctly");
-    svg.remove();
-  });
-
-  describe("requests space based on contents, but occupies total offered space", () => {
+  describe("Layout", () => {
     let SVG_WIDTH = 400;
     let SVG_HEIGHT = 400;
-
-    it("with no Components", () => {
+    it("requests no space when empty, but occupies all offered space", () => {
       let svg = TestMethods.generateSVG();
       let cg = new Plottable.Components.Group([]);
 
@@ -237,7 +215,7 @@ describe("ComponentGroups", () => {
       svg.remove();
     });
 
-    it("with a non-fixed-size Component", () => {
+    it("requests space correctly when it contains a non-fixed-size Component", () => {
       let svg = TestMethods.generateSVG();
       let c1 = new Plottable.Component();
       let c2 = new Plottable.Component();
@@ -255,7 +233,7 @@ describe("ComponentGroups", () => {
       svg.remove();
     });
 
-    it("with fixed-size Components", () => {
+    it("requests space correctly when it contains fixed-size Components", () => {
       let svg = TestMethods.generateSVG();
       let tall = new Mocks.FixedSizeComponent(SVG_WIDTH / 4, SVG_WIDTH / 2);
       let wide = new Mocks.FixedSizeComponent(SVG_WIDTH / 2, SVG_WIDTH / 4);
@@ -273,6 +251,35 @@ describe("ComponentGroups", () => {
       cg.renderTo(svg);
       assert.strictEqual(cg.width(), SVG_WIDTH, "occupies all offered width");
       assert.strictEqual(cg.height(), SVG_HEIGHT, "occupies all offered height");
+      svg.remove();
+    });
+
+    it("allocates space to its Components correctly", () => {
+      let FIXED_COMPONENT_SIZE = SVG_WIDTH / 4;
+      let fixedComponent = new Mocks.FixedSizeComponent(FIXED_COMPONENT_SIZE, FIXED_COMPONENT_SIZE)
+                                    .xAlignment("right").yAlignment("bottom");
+      let unfixedComponent = new Plottable.Component();
+
+      let cg = new Plottable.Components.Group([fixedComponent, unfixedComponent]);
+      let svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+      cg.renderTo(svg);
+
+      assert.strictEqual(fixedComponent.width(), FIXED_COMPONENT_SIZE, "fixed-size Component has correct width");
+      assert.strictEqual(fixedComponent.height(), FIXED_COMPONENT_SIZE, "fixed-size Component has correct height");
+      let expectedFixedOrigin = {
+        x: SVG_WIDTH - FIXED_COMPONENT_SIZE,
+        y: SVG_HEIGHT - FIXED_COMPONENT_SIZE
+      };
+      TestMethods.assertPointsClose(expectedFixedOrigin, fixedComponent.origin(), 1, "fixed-size Component has correct origin");
+
+      assert.strictEqual(unfixedComponent.width(), SVG_WIDTH, "non-fixed-size Component has correct width");
+      assert.strictEqual(unfixedComponent.height(), SVG_HEIGHT, "non-fixed-size Component has correct height");
+      let expectedUnfixedOrigin = {
+        x: 0,
+        y: 0
+      };
+      TestMethods.assertPointsClose(expectedUnfixedOrigin, unfixedComponent.origin(), 1, "non-fixed-size Component has correct origin");
+
       svg.remove();
     });
   });
