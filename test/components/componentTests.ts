@@ -14,7 +14,7 @@ describe("Component", () => {
     it("adds itself as a child element of the input selection", () => {
       assert.strictEqual(c.anchor(svg), c, "setter returns calling object");
       assert.strictEqual(Plottable.Utils.DOM.boundingSVG(<SVGElement> c.content().node()),
-        svg.node(), "component child of svg");
+        svg.node(), "component DOM elements are children of svg element");
       c.destroy();
       svg.remove();
     });
