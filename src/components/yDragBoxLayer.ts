@@ -17,7 +17,7 @@ export module Components {
 
     public computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number) {
       super.computeLayout(origin, availableWidth, availableHeight);
-      this._setBoundsWithoutChangingMode(this.bounds()); // set correct bounds when width/height changes
+      this._setBoundsAndExtents(this.bounds()); // set correct bounds when width/height changes
       return this;
     }
 

@@ -6305,16 +6305,6 @@ var Plottable;
                     this.yScale().offUpdate(this._adjustBoundsCallback);
                 }
             };
-            SelectionBoxLayer.prototype._setBoundsWithoutChangingMode = function (bounds) {
-                this._setBounds(bounds);
-                if (this._xScale != null) {
-                    this._xExtent = [this._xScale.invert(this._boxBounds.topLeft.x), this._xScale.invert(this._boxBounds.bottomRight.x)];
-                }
-                if (this._yScale != null) {
-                    this._yExtent = [this._yScale.invert(this._boxBounds.topLeft.y), this._yScale.invert(this._boxBounds.bottomRight.y)];
-                }
-                this.render();
-            };
             return SelectionBoxLayer;
         })(Plottable.Component);
         Components.SelectionBoxLayer = SelectionBoxLayer;
@@ -11544,7 +11534,7 @@ var Plottable;
                     }
                     else {
                         mode = DRAG_MODES.newBox;
-                        _this._setBoundsWithoutChangingMode({
+                        _this._setBoundsAndExtents({
                             topLeft: startPoint,
                             bottomRight: startPoint
                         });
@@ -11587,7 +11577,7 @@ var Plottable;
                             lastEndPoint = endPoint;
                             break;
                     }
-                    _this._setBoundsWithoutChangingMode({
+                    _this._setBoundsAndExtents({
                         topLeft: topLeft,
                         bottomRight: bottomRight
                     });
@@ -11714,6 +11704,17 @@ var Plottable;
                     this.removeClass("y-resizable");
                 }
             };
+            DragBoxLayer.prototype._setBoundsAndExtents = function (bounds) {
+                this._setBounds(bounds);
+                // HACKHACK: https://github.com/palantir/plottable/issues/2734 Getters error based on subclass.
+                if (this._xScale != null) {
+                    this.xExtent([this.xScale().invert(this.bounds().topLeft.x), this.xScale().invert(this.bounds().bottomRight.x)]);
+                }
+                if (this._yScale != null) {
+                    this.yExtent([this.yScale().invert(this.bounds().topLeft.y), this.yScale().invert(this.bounds().bottomRight.y)]);
+                }
+                this.render();
+            };
             DragBoxLayer.prototype.movable = function (movable) {
                 if (movable == null) {
                     return this._movable;
@@ -11837,7 +11838,7 @@ var Plottable;
             }
             XDragBoxLayer.prototype.computeLayout = function (origin, availableWidth, availableHeight) {
                 _super.prototype.computeLayout.call(this, origin, availableWidth, availableHeight);
-                this._setBoundsWithoutChangingMode(this.bounds()); // set correct bounds when width/height changes
+                this._setBoundsAndExtents(this.bounds()); // set correct bounds when width/height changes
                 return this;
             };
             XDragBoxLayer.prototype._setBounds = function (newBounds) {
@@ -11895,7 +11896,7 @@ var Plottable;
             }
             YDragBoxLayer.prototype.computeLayout = function (origin, availableWidth, availableHeight) {
                 _super.prototype.computeLayout.call(this, origin, availableWidth, availableHeight);
-                this._setBoundsWithoutChangingMode(this.bounds()); // set correct bounds when width/height changes
+                this._setBoundsAndExtents(this.bounds()); // set correct bounds when width/height changes
                 return this;
             };
             YDragBoxLayer.prototype._setBounds = function (newBounds) {

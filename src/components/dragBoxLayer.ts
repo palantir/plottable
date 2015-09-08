@@ -87,7 +87,7 @@ export module Components {
           mode = DRAG_MODES.move;
         } else {
           mode = DRAG_MODES.newBox;
-          this._setBoundsWithoutChangingMode({
+          this._setBoundsAndExtents({
             topLeft: startPoint,
             bottomRight: startPoint
           });
@@ -132,7 +132,7 @@ export module Components {
             break;
         }
 
-        this._setBoundsWithoutChangingMode({
+        this._setBoundsAndExtents({
           topLeft: topLeft,
           bottomRight: bottomRight
         });
@@ -296,6 +296,18 @@ export module Components {
         this.removeClass("x-resizable");
         this.removeClass("y-resizable");
       }
+    }
+
+    protected _setBoundsAndExtents(bounds: Bounds) {
+      this._setBounds(bounds);
+      // HACKHACK: https://github.com/palantir/plottable/issues/2734 Getters error based on subclass.
+      if ((<any> this)._xScale != null) {
+        this.xExtent([this.xScale().invert(this.bounds().topLeft.x), this.xScale().invert(this.bounds().bottomRight.x)]);
+      }
+      if ((<any> this)._yScale != null) {
+        this.yExtent([this.yScale().invert(this.bounds().topLeft.y), this.yScale().invert(this.bounds().bottomRight.y)]);
+      }
+      this.render();
     }
 
     /**

@@ -275,17 +275,6 @@ export module Components {
         this.yScale().offUpdate(this._adjustBoundsCallback);
       }
     }
-
-    protected _setBoundsWithoutChangingMode(bounds: Bounds) {
-      this._setBounds(bounds);
-      if (this._xScale != null) {
-        this._xExtent = [this._xScale.invert(this._boxBounds.topLeft.x), this._xScale.invert(this._boxBounds.bottomRight.x)];
-      }
-      if (this._yScale != null) {
-        this._yExtent = [this._yScale.invert(this._boxBounds.topLeft.y), this._yScale.invert(this._boxBounds.bottomRight.y)];
-      }
-      this.render();
-    }
   }
 }
 }

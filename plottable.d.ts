@@ -2452,7 +2452,6 @@ declare module Plottable {
                 valueOf(): number;
             })[]): SelectionBoxLayer;
             destroy(): void;
-            protected _setBoundsWithoutChangingMode(bounds: Bounds): void;
         }
     }
 }
@@ -4386,6 +4385,7 @@ declare module Plottable {
              */
             resizable(canResize: boolean): DragBoxLayer;
             protected _setResizableClasses(canResize: boolean): void;
+            protected _setBoundsAndExtents(bounds: Bounds): void;
             /**
              * Gets whether or not the drag box is movable.
              */
