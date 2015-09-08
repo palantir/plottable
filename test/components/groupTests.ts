@@ -71,6 +71,10 @@ describe("ComponentGroups", () => {
   });
 
   describe("detach()-ing constituent Components", () => {
+    it("takes its constutuent Components with it when detach()-ed or anchor()-ed", () => {
+
+    });
+
     it("detach()-es Components from their previous location when they are append()-ed", () => {
       let c1 = new Plottable.Component;
       let svg = TestMethods.generateSVG();
@@ -89,41 +93,36 @@ describe("ComponentGroups", () => {
       assert.isNull(c0.parent(), "Component disconnected from Group");
     });
 
-    it("removes Components if detach() is caleld on them (after rendering)", () => {
-      let c1 = new Plottable.Component().addClass("component-1");
-      let c2 = new Plottable.Component().addClass("component-2");
+    it("removes Components if detach() is called on them (after rendering)", () => {
+      function isInDOM(component: Plottable.Component) {
+        let contentNode = component.content().node();
+        return contentNode != null && Plottable.Utils.DOM.boundingSVG(<SVGElement> contentNode) != null;
+      };
+
+      let c1 = new Plottable.Component();
+      let c2 = new Plottable.Component();
       let cg = new Plottable.Components.Group([c1, c2]);
 
       let svg = TestMethods.generateSVG(200, 200);
       cg.renderTo(svg);
 
-      let c1Node = svg.select(".component-1").node();
-      let c2Node = svg.select(".component-2").node();
-
-      assert.isNotNull(c1Node, "component 1 was added to the DOM");
-      assert.isNotNull(c2Node, "component 2 was added to the DOM");
+      assert.isTrue(isInDOM(c1), "component 1 was added to the DOM");
+      assert.isTrue(isInDOM(c2), "component 2 was added to the DOM");
 
       c2.detach();
 
-      c1Node = svg.select(".component-1").node();
-      c2Node = svg.select(".comopnent-2").node();
-
-      assert.isNotNull(c1Node, "component 1 is still in the DOM");
-      assert.isNull(c2Node, "component 2 was removed from the DOM");
+      assert.isTrue(isInDOM(c1), "component 1 is still in the DOM");
+      assert.isFalse(isInDOM(c2), "component 2 was removed from the DOM");
 
       cg.detach();
-      let cgNode = svg.select(".component-group").node();
-      c1Node = svg.select(".component-1").node();
 
-      assert.isNull(cgNode, "component group was removed from the DOM");
-      assert.isNull(c1Node, "componet 1 was also removed from the DOM");
+      assert.isFalse(isInDOM(cg), "component group was removed from the DOM");
+      assert.isFalse(isInDOM(c1), "component 1 was also removed from the DOM");
 
       cg.renderTo(svg);
-      cgNode = svg.select(".component-group").node();
-      c1Node = svg.select(".component-1").node();
 
-      assert.isNotNull(cgNode, "component group was added back to the DOM");
-      assert.isNotNull(c1Node, "componet 1 was also added back to the DOM");
+      assert.isTrue(isInDOM(cg), "component group was added back to the DOM");
+      assert.isTrue(isInDOM(c1), "component 1 was also added back to the DOM");
 
       svg.remove();
     });
