@@ -794,12 +794,8 @@ describe("Plots", () => {
       });
 
       it("pads the domain in the correct direction", () => {
-
-        let data = Array.apply(null, Array(10)).map(function(d: any, i: any) {
-          return {
-            x: i + 1,
-            y: i
-          };
+        let data = Array.apply(null, Array(10)).map((d: any, i: number) => {
+          return { x: i + 1, y: i + 1 }
         });
         plot.addDataset(new Plottable.Dataset(data));
         plot.renderTo(svg);
@@ -810,12 +806,9 @@ describe("Plots", () => {
         svg.remove();
       });
 
-      it("has the same size before and after autoDomain()-ing", () => {
-        let data = Array.apply(null, Array(10)).map(function(d: any, i: any) {
-          return {
-            x: i + 1,
-            y: i
-          };
+      it("computes the correct extent when autoDomain()-ing right after render", () => {
+        let data = Array.apply(null, Array(10)).map((d: any, i: number) => {
+          return { x: i + 1, y: i + 1 };
         });
         plot.addDataset(new Plottable.Dataset(data));
 
@@ -823,7 +816,6 @@ describe("Plots", () => {
 
         let initialYScaleDomain = yScale.domain();
         yScale.autoDomain();
-
         assert.deepEqual(initialYScaleDomain, yScale.domain(), "The domain did not change");
 
         svg.remove();
