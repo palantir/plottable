@@ -226,7 +226,9 @@ describe("Component", () => {
       let rejectingContainer: any = {
         has: (component: Plottable.Component) => false
       };
-      assert.throws(() => c.parent(rejectingContainer), Error, "invalid parent");
+      // HACKHACK: https://github.com/palantir/plottable/issues/2661 Cannot assert errors being thrown with description
+      (<any> assert).throws(() => c.parent(rejectingContainer), Error,
+        "invalid parent", "error thrown for parent not containing child");
       c.destroy();
       svg.remove();
     });
@@ -328,12 +330,16 @@ describe("Component", () => {
     it("throws an error when computing layout when attached to non-root node using default arguments", () => {
       let g = svg.append("g");
       c.anchor(g);
-      assert.throws(() => c.computeLayout(), "null arguments");
+      // HACKHACK: https://github.com/palantir/plottable/issues/2661 Cannot assert errors being thrown with description
+      (<any> assert).throws(() => c.computeLayout(), "null arguments",
+        "cannot compute layout with no arguments and not being the top svg element");
       svg.remove();
     });
 
     it("throws an error when computing the layout on an unanchored component", () => {
-      assert.throws(() => c.computeLayout(), Error);
+      // HACKHACK: https://github.com/palantir/plottable/issues/2661 Cannot assert errors being thrown with description
+      (<any> assert).throws(() => c.computeLayout(), Error, "anchor() must be called before",
+        "cannot compute layout on an unanchored component");
       svg.remove();
     });
 
@@ -428,8 +434,11 @@ describe("Component", () => {
 
     it("throws errors on bad alignments", () => {
       let invalidAlignment = "foo";
-      assert.throws(() => c.xAlignment(invalidAlignment), Error, "Unsupported alignment");
-      assert.throws(() => c.yAlignment(invalidAlignment), Error, "Unsupported alignment");
+      // HACKHACK: https://github.com/palantir/plottable/issues/2661 Cannot assert errors being thrown with description
+      (<any> assert).throws(() => c.xAlignment(invalidAlignment), Error,
+        "Unsupported alignment", "cannot set an invalid x alignment");
+      (<any> assert).throws(() => c.yAlignment(invalidAlignment), Error,
+        "Unsupported alignment", "cannot set an invalid y alignment");
       c.destroy();
       svg.remove();
     });
@@ -478,7 +487,8 @@ describe("Component", () => {
       c.renderTo(svg);
       c.destroy();
 
-      assert.throws(() => c.renderTo(svg), "reuse");
+      // HACKHACK: https://github.com/palantir/plottable/issues/2661 Cannot assert errors being thrown with description
+      (<any> assert).throws(() => c.renderTo(svg), "reuse", "cannot reanchor a destroyed component");
       svg.remove();
     });
 
