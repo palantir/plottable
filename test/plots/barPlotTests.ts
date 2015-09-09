@@ -788,7 +788,7 @@ describe("Plots", () => {
         xScale = new Plottable.Scales.Linear();
         yScale = new Plottable.Scales.Linear();
 
-        plot = new Plottable.Plots.Bar<number, number>("horizontal");
+        plot = new Plottable.Plots.Bar<number, number>(Plottable.Plots.Bar.ORIENTATION_HORIZONTAL);
         plot.x((d) => d.x, xScale);
         plot.y((d) => d.y, yScale);
       });
@@ -811,7 +811,6 @@ describe("Plots", () => {
           return { x: i + 1, y: i + 1 };
         });
         plot.addDataset(new Plottable.Dataset(data));
-
         plot.renderTo(svg);
 
         let initialYScaleDomain = yScale.domain();
