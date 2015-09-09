@@ -228,11 +228,11 @@ export module Components {
 
     private _getXExtent(): (number | { valueOf(): number })[] {
       return this._xBoundsMode === PropertyMode.VALUE ?
-               this._xExtent :
-               (this._xScale == null ?
-                 [undefined, undefined] :
-                 [this._xScale.invert(this._boxBounds.topLeft.x),
-                  this._xScale.invert(this._boxBounds.bottomRight.x)]);
+        this._xExtent :
+        (this._xScale == null ?
+          [undefined, undefined] :
+          [this._xScale.invert(this._boxBounds.topLeft.x),
+          this._xScale.invert(this._boxBounds.bottomRight.x)]);
     }
 
     protected _setXExtent(xExtent: (number | { valueOf(): number })[]) {
@@ -262,11 +262,11 @@ export module Components {
 
     private _getYExtent(): (number | { valueOf(): number })[] {
       return this._yBoundsMode === PropertyMode.VALUE ?
-               this._yExtent :
-               (this._yScale == null ?
-                 [undefined, undefined] :
-                 [this._yScale.invert(this._boxBounds.topLeft.y),
-                  this._yScale.invert(this._boxBounds.bottomRight.y)]);
+        this._yExtent :
+        (this._yScale == null ?
+          [undefined, undefined] :
+          [this._yScale.invert(this._boxBounds.topLeft.y),
+          this._yScale.invert(this._boxBounds.bottomRight.y)]);
     }
 
     protected _setYExtent(yExtent: (number | { valueOf(): number })[]) {
