@@ -458,17 +458,20 @@ describe("Component", () => {
       });
 
       it("translates the origin in accordance with alignment", () => {
-        c.xAlignment("left").yAlignment("top");
+        c.xAlignment(Plottable.Components.Alignment.LEFT)
+         .yAlignment(Plottable.Components.Alignment.TOP);
         c.computeLayout();
         let componentOrigin = {x: 0, y: 0};
         assert.deepEqual(c.origin(), componentOrigin, "top-left component aligns correctly");
 
-        c.xAlignment("center").yAlignment("center");
+        c.xAlignment(Plottable.Components.Alignment.CENTER)
+         .yAlignment(Plottable.Components.Alignment.CENTER);
         c.computeLayout();
         componentOrigin = {x: SVG_WIDTH / 2 - fixedWidth / 2, y: SVG_HEIGHT / 2 - fixedHeight / 2};
         assert.deepEqual(c.origin(), componentOrigin, "center component aligns correctly");
 
-        c.xAlignment("right").yAlignment("bottom");
+        c.xAlignment(Plottable.Components.Alignment.RIGHT)
+         .yAlignment(Plottable.Components.Alignment.BOTTOM);
         c.computeLayout();
         componentOrigin = {x: SVG_WIDTH - fixedWidth, y: SVG_HEIGHT - fixedHeight};
         assert.deepEqual(c.origin(), componentOrigin, "bottom-right component aligns correctly");
