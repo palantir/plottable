@@ -648,8 +648,7 @@ describe("Component", () => {
     let delta = 10;
     receivedOrigin.x += delta;
     receivedOrigin.y += delta;
-    assert.notStrictEqual(receivedOrigin.x, c.origin().x, "can be modified without affecting origin (x)");
-    assert.notStrictEqual(receivedOrigin.y, c.origin().y, "can be modified without affecting origin (y)");
+    assert.notDeepEqual(c.origin(), receivedOrigin, "underlying origin object cannot be modified");
     c.destroy();
     svg.remove();
   });
