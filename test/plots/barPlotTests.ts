@@ -795,7 +795,7 @@ describe("Plots", () => {
 
       it("pads the domain in the correct direction", () => {
         let data = Array.apply(null, Array(10)).map((d: any, i: number) => {
-          return { x: i + 1, y: i + 1 }
+          return { x: i + 1, y: i + 1 };
         });
         plot.addDataset(new Plottable.Dataset(data));
         plot.renderTo(svg);
