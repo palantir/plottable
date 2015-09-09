@@ -579,7 +579,7 @@ describe("Component", () => {
       svg.remove();
     });
 
-    it("node chosen through D3 selection", () => {
+    it("renders to a node chosen through D3 selection", () => {
       c.renderTo(svg);
       assert.isTrue(svg.classed("plottable"), "anchored to svg");
       assert.isTrue(renderFlag, "component has rendered");
@@ -587,7 +587,7 @@ describe("Component", () => {
       svg.remove();
     });
 
-    it("node chosen through a selector string", () => {
+    it("renders to a node chosen through a selector string", () => {
       let svgId = "foo";
       svg.attr("id", svgId);
       c.renderTo(`#${svgId}`);
@@ -597,7 +597,7 @@ describe("Component", () => {
       svg.remove();
     });
 
-    it("node chosen through DOM element", () => {
+    it("renders to a node chosen through DOM element", () => {
       c.renderTo(<Element> svg.node());
       assert.isTrue(svg.classed("plottable"), "correct svg chosen");
       assert.isTrue(renderFlag, "component has rendered");
@@ -613,7 +613,7 @@ describe("Component", () => {
         "Plottable requires a valid SVG to renderTo", "rejects selections that don't contain svgs");
       (<any> assert).throws(() => c.renderTo(<Element> div.node()), Error,
         "Plottable requires a valid SVG to renderTo", "rejects DOM nodes that are not svgs");
-      (<any> assert).throws(() => c.renderTo("#not-a-element"), Error,
+      (<any> assert).throws(() => c.renderTo("#not-an-element"), Error,
         "Plottable requires a valid SVG to renderTo", "rejects strings that don't correspond to DOM elements");
       (<any> assert).throws(() => c.renderTo(d3.select(null)), Error,
         "Plottable requires a valid SVG to renderTo", "rejects empty d3 selections");
