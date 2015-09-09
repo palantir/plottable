@@ -98,6 +98,35 @@ describe("Interactive Components", () => {
         }
       });
 
+      it("uses the pixel values sides if they were set last", () => {
+        let xExtent = [0, 100];
+        let yExtent = [0, 100];
+        sbl.xExtent(xExtent);
+        sbl.yExtent(yExtent);
+        assert.deepEqual(sbl.xExtent(), xExtent, "x extent set");
+        assert.deepEqual(sbl.yExtent(), yExtent, "y extent set");
+
+        let topLeft: Plottable.Point = {
+          x: 100,
+          y: 100
+        };
+        let bottomRight: Plottable.Point = {
+          x: 300,
+          y: 300
+        };
+        assert.doesNotThrow(() => sbl.bounds({
+          topLeft: topLeft,
+          bottomRight: bottomRight
+        }), Error, "can set bounds before anchoring");
+
+        let queriedBounds = sbl.bounds();
+        assert.deepEqual(queriedBounds.topLeft, topLeft, "returns correct top-left position");
+        assert.deepEqual(queriedBounds.bottomRight, bottomRight, "returns correct bottom-right position");
+
+        sbl.destroy();
+        svg.remove();
+      });
+
       it("has an effective size of 0, but will occupy all offered space", () => {
         let request = sbl.requestedSpace(400, 400);
         TestMethods.verifySpaceRequest(request, 0, 0, "does not request any space");
