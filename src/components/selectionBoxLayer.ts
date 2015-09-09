@@ -2,7 +2,7 @@
 
 module Plottable {
 export module Components {
-  enum PropertyMode { VALUE, PIXEL };
+  export enum PropertyMode { VALUE, PIXEL };
   export class SelectionBoxLayer extends Component {
     protected _box: d3.Selection<void>;
     private _boxArea: d3.Selection<void>;
@@ -16,14 +16,13 @@ export module Components {
     private _xScale: QuantitativeScale<number | { valueOf(): number }>;
     private _yScale: QuantitativeScale<number | { valueOf(): number }>;
     private _adjustBoundsCallback: ScaleCallback<QuantitativeScale<number | { valueOf(): number }>>;
-    private _xBoundsMode = PropertyMode.VALUE;
-    private _yBoundsMode = PropertyMode.VALUE;
+    protected _xBoundsMode = PropertyMode.PIXEL;
+    protected _yBoundsMode = PropertyMode.PIXEL;
 
     constructor() {
       super();
       this.addClass("selection-box-layer");
       this._adjustBoundsCallback = () => {
-        this._syncPixelPositionAndValue();
         this.render();
       };
       this._xExtent = [undefined, undefined];
@@ -57,13 +56,12 @@ export module Components {
     public bounds(newBounds: Bounds): SelectionBoxLayer;
     public bounds(newBounds?: Bounds): any {
       if (newBounds == null) {
-        return this._boxBounds;
+        return this._getBounds();
       }
 
       this._setBounds(newBounds);
       this._xBoundsMode = PropertyMode.PIXEL;
       this._yBoundsMode = PropertyMode.PIXEL;
-      this._syncPixelPositionAndValue();
       this.render();
       return this;
     }
@@ -83,57 +81,42 @@ export module Components {
       };
     }
 
-    /**
-     * Sets bounds() or xExtent() / yExtent() based on the other, depending on which was the last one set.
-     */
-    private _syncPixelPositionAndValue() {
-      if (this._xScale != null) {
-        if (this._xBoundsMode === PropertyMode.VALUE && this._xExtent[0] != null
-            && this._xExtent[1] != null) {
-          let topLeft = {
-            x: this._xScale.scale(this._xExtent[0]),
-            y: this.bounds().topLeft.y
-          };
-          let bottomRight = {
-            x: this._xScale.scale(this._xExtent[1]),
-            y: this.bounds().bottomRight.y
-          };
-          this._setBounds({
-            topLeft: topLeft,
-            bottomRight: bottomRight
-          });
-        } else if (this._xBoundsMode === PropertyMode.PIXEL) {
-          this._xExtent = [this._xScale.invert(this.bounds().topLeft.x), this._xScale.invert(this.bounds().bottomRight.x)];
+    private _getBounds(): Bounds {
+      return {
+        topLeft: {
+          x: this._xBoundsMode === PropertyMode.PIXEL ?
+               this._boxBounds.topLeft.x :
+               (this._xScale == null ?
+                 0 :
+                 Math.min(this.xScale().scale(this.xExtent()[0]), this.xScale().scale(this.xExtent()[1]))),
+          y: this._yBoundsMode === PropertyMode.PIXEL ?
+               this._boxBounds.topLeft.y :
+               (this._yScale == null ?
+                 0 :
+                 Math.min(this.yScale().scale(this.yExtent()[0]), this.yScale().scale(this.yExtent()[1])))
+        },
+        bottomRight: {
+          x: this._xBoundsMode === PropertyMode.PIXEL ?
+               this._boxBounds.bottomRight.x :
+               (this._xScale == null ?
+                 0 :
+                 Math.max(this.xScale().scale(this.xExtent()[0]), this.xScale().scale(this.xExtent()[1]))),
+          y: this._yBoundsMode === PropertyMode.PIXEL ?
+               this._boxBounds.bottomRight.y :
+               (this._yScale == null ?
+                 0 :
+                 Math.max(this.yScale().scale(this.yExtent()[0]), this.yScale().scale(this.yExtent()[1])))
         }
-      }
-      if (this._yScale != null) {
-        if (this._yBoundsMode === PropertyMode.VALUE && this._yExtent[0] != null
-            && this._yExtent[1] != null) {
-          let topLeft = {
-            x: this.bounds().topLeft.x,
-            y: this._yScale.scale(this._yExtent[0])
-          };
-          let bottomRight = {
-            x: this.bounds().bottomRight.x,
-            y: this._yScale.scale(this._yExtent[1])
-          };
-          this._setBounds({
-            topLeft: topLeft,
-            bottomRight: bottomRight
-          });
-        } else if (this._yBoundsMode === PropertyMode.PIXEL) {
-          this._yExtent = [this._yScale.invert(this.bounds().topLeft.y), this._yScale.invert(this.bounds().bottomRight.y)];
-        }
-      }
+      };
     }
 
     public renderImmediately() {
       if (this._boxVisible) {
-        this._syncPixelPositionAndValue();
-        let t = this._boxBounds.topLeft.y;
-        let b = this._boxBounds.bottomRight.y;
-        let l = this._boxBounds.topLeft.x;
-        let r = this._boxBounds.bottomRight.x;
+        let bounds = this.bounds();
+        let t = bounds.topLeft.y;
+        let b = bounds.bottomRight.y;
+        let l = bounds.topLeft.x;
+        let r = bounds.bottomRight.x;
 
         this._boxArea.attr({
           x: l, y: t, width: r - l, height: b - t
@@ -192,8 +175,8 @@ export module Components {
         this._xScale.offUpdate(this._adjustBoundsCallback);
       }
       this._xScale = xScale;
+      this._xBoundsMode = PropertyMode.VALUE;
       this._xScale.onUpdate(this._adjustBoundsCallback);
-      this._syncPixelPositionAndValue();
       this.render();
       return this;
     }
@@ -216,8 +199,8 @@ export module Components {
         this._yScale.offUpdate(this._adjustBoundsCallback);
       }
       this._yScale = yScale;
+      this._yBoundsMode = PropertyMode.VALUE;
       this._yScale.onUpdate(this._adjustBoundsCallback);
-      this._syncPixelPositionAndValue();
       this.render();
       return this;
     }
@@ -235,13 +218,25 @@ export module Components {
     public xExtent(xExtent?: (number | { valueOf(): number })[]): any {
       // Explicit typing for Typescript 1.4
       if (xExtent == null) {
-        return this._xExtent;
+        return this._getXExtent();
       }
-      this._xExtent = [xExtent[0], xExtent[1]];
+      this._setXExtent(xExtent);
       this._xBoundsMode = PropertyMode.VALUE;
-      this._syncPixelPositionAndValue();
       this.render();
       return this;
+    }
+
+    private _getXExtent(): (number | { valueOf(): number })[] {
+      return this._xBoundsMode === PropertyMode.VALUE ?
+               this._xExtent :
+               (this._xScale == null ?
+                 [undefined, undefined] :
+                 [this._xScale.invert(this._boxBounds.topLeft.x),
+                  this._xScale.invert(this._boxBounds.bottomRight.x)]);
+    }
+
+    protected _setXExtent(xExtent: (number | { valueOf(): number })[]) {
+      this._xExtent = [xExtent[0], xExtent[1]];
     }
 
     /**
@@ -257,13 +252,25 @@ export module Components {
     public yExtent(yExtent?: (number | { valueOf(): number })[]): any {
       // Explicit typing for Typescript 1.4
       if (yExtent == null) {
-        return this._yExtent;
+        return this._getYExtent();
       }
-      this._yExtent = [yExtent[0], yExtent[1]];
+      this._setYExtent(yExtent);
       this._yBoundsMode = PropertyMode.VALUE;
-      this._syncPixelPositionAndValue();
       this.render();
       return this;
+    }
+
+    private _getYExtent(): (number | { valueOf(): number })[] {
+      return this._yBoundsMode === PropertyMode.VALUE ?
+               this._yExtent :
+               (this._yScale == null ?
+                 [undefined, undefined] :
+                 [this._yScale.invert(this._boxBounds.topLeft.y),
+                  this._yScale.invert(this._boxBounds.bottomRight.y)]);
+    }
+
+    protected _setYExtent(yExtent: (number | { valueOf(): number })[]) {
+      this._yExtent = [yExtent[0], yExtent[1]];
     }
 
     public destroy() {

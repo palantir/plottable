@@ -141,7 +141,7 @@ describe("Interactive Components", () => {
         sbl.boxVisible(true);
         sbl.xScale(xScale);
 
-        assert.deepEqual(sbl.xExtent(), [undefined, undefined], "xExtent is not set unless an yScale is set");
+        assert.deepEqual(sbl.xExtent(), [undefined, undefined], "xExtent is not set unless an xScale is set");
         let xExtent = [100, 250];
         assert.strictEqual(sbl.xExtent(xExtent), sbl, "returns calling object");
 

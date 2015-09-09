@@ -87,10 +87,17 @@ export module Components {
           mode = DRAG_MODES.move;
         } else {
           mode = DRAG_MODES.newBox;
-          this._setBoundsAndExtents({
+          this._setBounds({
             topLeft: startPoint,
             bottomRight: startPoint
           });
+          if (this._xBoundsMode === PropertyMode.VALUE && this.xScale() != null) {
+            this._setXExtent([this.xScale().invert(startPoint.x), this.xScale().invert(startPoint.x)]);
+          }
+          if (this._yBoundsMode === PropertyMode.VALUE && this.xScale() != null) {
+            this._setYExtent([this.yScale().invert(startPoint.y), this.yScale().invert(startPoint.y)]);
+          }
+          this.render();
         }
 
         this.boxVisible(true);
@@ -132,10 +139,17 @@ export module Components {
             break;
         }
 
-        this._setBoundsAndExtents({
+        this._setBounds({
           topLeft: topLeft,
           bottomRight: bottomRight
         });
+        if (this._xBoundsMode === PropertyMode.VALUE && this.xScale() != null) {
+          this._setXExtent([this.xScale().invert(topLeft.x), this.xScale().invert(bottomRight.x)]);
+        }
+        if (this._yBoundsMode === PropertyMode.VALUE && this.yScale() != null) {
+          this._setYExtent([this.yScale().invert(topLeft.y), this.yScale().invert(bottomRight.y)]);
+        }
+        this.render();
 
         this._dragCallbacks.callCallbacks(this.bounds());
       });
@@ -296,18 +310,6 @@ export module Components {
         this.removeClass("x-resizable");
         this.removeClass("y-resizable");
       }
-    }
-
-    protected _setBoundsAndExtents(bounds: Bounds) {
-      this._setBounds(bounds);
-      // HACKHACK: https://github.com/palantir/plottable/issues/2734 Getters error based on subclass.
-      if ((<any> this)._xScale != null) {
-        this.xExtent([this.xScale().invert(this.bounds().topLeft.x), this.xScale().invert(this.bounds().bottomRight.x)]);
-      }
-      if ((<any> this)._yScale != null) {
-        this.yExtent([this.yScale().invert(this.bounds().topLeft.y), this.yScale().invert(this.bounds().bottomRight.y)]);
-      }
-      this.render();
     }
 
     /**

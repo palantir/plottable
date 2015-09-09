@@ -6110,11 +6110,11 @@ var Plottable;
 (function (Plottable) {
     var Components;
     (function (Components) {
-        var PropertyMode;
         (function (PropertyMode) {
             PropertyMode[PropertyMode["VALUE"] = 0] = "VALUE";
             PropertyMode[PropertyMode["PIXEL"] = 1] = "PIXEL";
-        })(PropertyMode || (PropertyMode = {}));
+        })(Components.PropertyMode || (Components.PropertyMode = {}));
+        var PropertyMode = Components.PropertyMode;
         ;
         var SelectionBoxLayer = (function (_super) {
             __extends(SelectionBoxLayer, _super);
@@ -6126,11 +6126,10 @@ var Plottable;
                     topLeft: { x: 0, y: 0 },
                     bottomRight: { x: 0, y: 0 }
                 };
-                this._xBoundsMode = PropertyMode.VALUE;
-                this._yBoundsMode = PropertyMode.VALUE;
+                this._xBoundsMode = PropertyMode.PIXEL;
+                this._yBoundsMode = PropertyMode.PIXEL;
                 this.addClass("selection-box-layer");
                 this._adjustBoundsCallback = function () {
-                    _this._syncPixelPositionAndValue();
                     _this.render();
                 };
                 this._xExtent = [undefined, undefined];
@@ -6149,12 +6148,11 @@ var Plottable;
             };
             SelectionBoxLayer.prototype.bounds = function (newBounds) {
                 if (newBounds == null) {
-                    return this._boxBounds;
+                    return this._getBounds();
                 }
                 this._setBounds(newBounds);
                 this._xBoundsMode = PropertyMode.PIXEL;
                 this._yBoundsMode = PropertyMode.PIXEL;
-                this._syncPixelPositionAndValue();
                 this.render();
                 return this;
             };
@@ -6172,58 +6170,41 @@ var Plottable;
                     bottomRight: bottomRight
                 };
             };
-            /**
-             * Sets bounds() or xExtent() / yExtent() based on the other, depending on which was the last one set.
-             */
-            SelectionBoxLayer.prototype._syncPixelPositionAndValue = function () {
-                if (this._xScale != null) {
-                    if (this._xBoundsMode === PropertyMode.VALUE && this._xExtent[0] != null
-                        && this._xExtent[1] != null) {
-                        var topLeft = {
-                            x: this._xScale.scale(this._xExtent[0]),
-                            y: this.bounds().topLeft.y
-                        };
-                        var bottomRight = {
-                            x: this._xScale.scale(this._xExtent[1]),
-                            y: this.bounds().bottomRight.y
-                        };
-                        this._setBounds({
-                            topLeft: topLeft,
-                            bottomRight: bottomRight
-                        });
+            SelectionBoxLayer.prototype._getBounds = function () {
+                return {
+                    topLeft: {
+                        x: this._xBoundsMode === PropertyMode.PIXEL ?
+                            this._boxBounds.topLeft.x :
+                            (this._xScale == null ?
+                                0 :
+                                Math.min(this.xScale().scale(this.xExtent()[0]), this.xScale().scale(this.xExtent()[1]))),
+                        y: this._yBoundsMode === PropertyMode.PIXEL ?
+                            this._boxBounds.topLeft.y :
+                            (this._yScale == null ?
+                                0 :
+                                Math.min(this.yScale().scale(this.yExtent()[0]), this.yScale().scale(this.yExtent()[1])))
+                    },
+                    bottomRight: {
+                        x: this._xBoundsMode === PropertyMode.PIXEL ?
+                            this._boxBounds.bottomRight.x :
+                            (this._xScale == null ?
+                                0 :
+                                Math.max(this.xScale().scale(this.xExtent()[0]), this.xScale().scale(this.xExtent()[1]))),
+                        y: this._yBoundsMode === PropertyMode.PIXEL ?
+                            this._boxBounds.bottomRight.y :
+                            (this._yScale == null ?
+                                0 :
+                                Math.max(this.yScale().scale(this.yExtent()[0]), this.yScale().scale(this.yExtent()[1])))
                     }
-                    else if (this._xBoundsMode === PropertyMode.PIXEL) {
-                        this._xExtent = [this._xScale.invert(this.bounds().topLeft.x), this._xScale.invert(this.bounds().bottomRight.x)];
-                    }
-                }
-                if (this._yScale != null) {
-                    if (this._yBoundsMode === PropertyMode.VALUE && this._yExtent[0] != null
-                        && this._yExtent[1] != null) {
-                        var topLeft = {
-                            x: this.bounds().topLeft.x,
-                            y: this._yScale.scale(this._yExtent[0])
-                        };
-                        var bottomRight = {
-                            x: this.bounds().bottomRight.x,
-                            y: this._yScale.scale(this._yExtent[1])
-                        };
-                        this._setBounds({
-                            topLeft: topLeft,
-                            bottomRight: bottomRight
-                        });
-                    }
-                    else if (this._yBoundsMode === PropertyMode.PIXEL) {
-                        this._yExtent = [this._yScale.invert(this.bounds().topLeft.y), this._yScale.invert(this.bounds().bottomRight.y)];
-                    }
-                }
+                };
             };
             SelectionBoxLayer.prototype.renderImmediately = function () {
                 if (this._boxVisible) {
-                    this._syncPixelPositionAndValue();
-                    var t = this._boxBounds.topLeft.y;
-                    var b = this._boxBounds.bottomRight.y;
-                    var l = this._boxBounds.topLeft.x;
-                    var r = this._boxBounds.bottomRight.x;
+                    var bounds = this.bounds();
+                    var t = bounds.topLeft.y;
+                    var b = bounds.bottomRight.y;
+                    var l = bounds.topLeft.x;
+                    var r = bounds.bottomRight.x;
                     this._boxArea.attr({
                         x: l, y: t, width: r - l, height: b - t
                     });
@@ -6256,8 +6237,8 @@ var Plottable;
                     this._xScale.offUpdate(this._adjustBoundsCallback);
                 }
                 this._xScale = xScale;
+                this._xBoundsMode = PropertyMode.VALUE;
                 this._xScale.onUpdate(this._adjustBoundsCallback);
-                this._syncPixelPositionAndValue();
                 this.render();
                 return this;
             };
@@ -6269,32 +6250,52 @@ var Plottable;
                     this._yScale.offUpdate(this._adjustBoundsCallback);
                 }
                 this._yScale = yScale;
+                this._yBoundsMode = PropertyMode.VALUE;
                 this._yScale.onUpdate(this._adjustBoundsCallback);
-                this._syncPixelPositionAndValue();
                 this.render();
                 return this;
             };
             SelectionBoxLayer.prototype.xExtent = function (xExtent) {
                 // Explicit typing for Typescript 1.4
                 if (xExtent == null) {
-                    return this._xExtent;
+                    return this._getXExtent();
                 }
-                this._xExtent = [xExtent[0], xExtent[1]];
+                this._setXExtent(xExtent);
                 this._xBoundsMode = PropertyMode.VALUE;
-                this._syncPixelPositionAndValue();
                 this.render();
                 return this;
+            };
+            SelectionBoxLayer.prototype._getXExtent = function () {
+                return this._xBoundsMode === PropertyMode.VALUE ?
+                    this._xExtent :
+                    (this._xScale == null ?
+                        [undefined, undefined] :
+                        [this._xScale.invert(this._boxBounds.topLeft.x),
+                            this._xScale.invert(this._boxBounds.bottomRight.x)]);
+            };
+            SelectionBoxLayer.prototype._setXExtent = function (xExtent) {
+                this._xExtent = [xExtent[0], xExtent[1]];
             };
             SelectionBoxLayer.prototype.yExtent = function (yExtent) {
                 // Explicit typing for Typescript 1.4
                 if (yExtent == null) {
-                    return this._yExtent;
+                    return this._getYExtent();
                 }
-                this._yExtent = [yExtent[0], yExtent[1]];
+                this._setYExtent(yExtent);
                 this._yBoundsMode = PropertyMode.VALUE;
-                this._syncPixelPositionAndValue();
                 this.render();
                 return this;
+            };
+            SelectionBoxLayer.prototype._getYExtent = function () {
+                return this._yBoundsMode === PropertyMode.VALUE ?
+                    this._yExtent :
+                    (this._yScale == null ?
+                        [undefined, undefined] :
+                        [this._yScale.invert(this._boxBounds.topLeft.y),
+                            this._yScale.invert(this._boxBounds.bottomRight.y)]);
+            };
+            SelectionBoxLayer.prototype._setYExtent = function (yExtent) {
+                this._yExtent = [yExtent[0], yExtent[1]];
             };
             SelectionBoxLayer.prototype.destroy = function () {
                 _super.prototype.destroy.call(this);
@@ -11534,10 +11535,17 @@ var Plottable;
                     }
                     else {
                         mode = DRAG_MODES.newBox;
-                        _this._setBoundsAndExtents({
+                        _this._setBounds({
                             topLeft: startPoint,
                             bottomRight: startPoint
                         });
+                        if (_this._xBoundsMode === Components.PropertyMode.VALUE && _this.xScale() != null) {
+                            _this._setXExtent([_this.xScale().invert(startPoint.x), _this.xScale().invert(startPoint.x)]);
+                        }
+                        if (_this._yBoundsMode === Components.PropertyMode.VALUE && _this.xScale() != null) {
+                            _this._setYExtent([_this.yScale().invert(startPoint.y), _this.yScale().invert(startPoint.y)]);
+                        }
+                        _this.render();
                     }
                     _this.boxVisible(true);
                     bounds = _this.bounds();
@@ -11577,10 +11585,17 @@ var Plottable;
                             lastEndPoint = endPoint;
                             break;
                     }
-                    _this._setBoundsAndExtents({
+                    _this._setBounds({
                         topLeft: topLeft,
                         bottomRight: bottomRight
                     });
+                    if (_this._xBoundsMode === Components.PropertyMode.VALUE && _this.xScale() != null) {
+                        _this._setXExtent([_this.xScale().invert(topLeft.x), _this.xScale().invert(bottomRight.x)]);
+                    }
+                    if (_this._yBoundsMode === Components.PropertyMode.VALUE && _this.yScale() != null) {
+                        _this._setYExtent([_this.yScale().invert(topLeft.y), _this.yScale().invert(bottomRight.y)]);
+                    }
+                    _this.render();
                     _this._dragCallbacks.callCallbacks(_this.bounds());
                 });
                 this._dragInteraction.onDragEnd(function (startPoint, endPoint) {
@@ -11703,17 +11718,6 @@ var Plottable;
                     this.removeClass("x-resizable");
                     this.removeClass("y-resizable");
                 }
-            };
-            DragBoxLayer.prototype._setBoundsAndExtents = function (bounds) {
-                this._setBounds(bounds);
-                // HACKHACK: https://github.com/palantir/plottable/issues/2734 Getters error based on subclass.
-                if (this._xScale != null) {
-                    this.xExtent([this.xScale().invert(this.bounds().topLeft.x), this.xScale().invert(this.bounds().bottomRight.x)]);
-                }
-                if (this._yScale != null) {
-                    this.yExtent([this.yScale().invert(this.bounds().topLeft.y), this.yScale().invert(this.bounds().bottomRight.y)]);
-                }
-                this.render();
             };
             DragBoxLayer.prototype.movable = function (movable) {
                 if (movable == null) {
@@ -11838,7 +11842,7 @@ var Plottable;
             }
             XDragBoxLayer.prototype.computeLayout = function (origin, availableWidth, availableHeight) {
                 _super.prototype.computeLayout.call(this, origin, availableWidth, availableHeight);
-                this._setBoundsAndExtents(this.bounds()); // set correct bounds when width/height changes
+                this._setBounds(this.bounds()); // set correct bounds when width/height changes
                 return this;
             };
             XDragBoxLayer.prototype._setBounds = function (newBounds) {
@@ -11896,7 +11900,7 @@ var Plottable;
             }
             YDragBoxLayer.prototype.computeLayout = function (origin, availableWidth, availableHeight) {
                 _super.prototype.computeLayout.call(this, origin, availableWidth, availableHeight);
-                this._setBoundsAndExtents(this.bounds()); // set correct bounds when width/height changes
+                this._setBounds(this.bounds()); // set correct bounds when width/height changes
                 return this;
             };
             YDragBoxLayer.prototype._setBounds = function (newBounds) {

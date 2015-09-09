@@ -2361,8 +2361,14 @@ declare module Plottable {
 
 declare module Plottable {
     module Components {
+        enum PropertyMode {
+            VALUE = 0,
+            PIXEL = 1,
+        }
         class SelectionBoxLayer extends Component {
             protected _box: d3.Selection<void>;
+            protected _xBoundsMode: PropertyMode;
+            protected _yBoundsMode: PropertyMode;
             constructor();
             protected _setup(): void;
             protected _sizeFromOffer(availableWidth: number, availableHeight: number): {
@@ -2437,6 +2443,9 @@ declare module Plottable {
             xExtent(xExtent: (number | {
                 valueOf(): number;
             })[]): SelectionBoxLayer;
+            protected _setXExtent(xExtent: (number | {
+                valueOf(): number;
+            })[]): void;
             /**
              * Gets the data values backing the top and bottom edges of the box.
              *
@@ -2451,6 +2460,9 @@ declare module Plottable {
             yExtent(yExtent: (number | {
                 valueOf(): number;
             })[]): SelectionBoxLayer;
+            protected _setYExtent(yExtent: (number | {
+                valueOf(): number;
+            })[]): void;
             destroy(): void;
         }
     }
@@ -4385,7 +4397,6 @@ declare module Plottable {
              */
             resizable(canResize: boolean): DragBoxLayer;
             protected _setResizableClasses(canResize: boolean): void;
-            protected _setBoundsAndExtents(bounds: Bounds): void;
             /**
              * Gets whether or not the drag box is movable.
              */
