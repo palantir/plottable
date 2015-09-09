@@ -452,7 +452,7 @@ export module Plots {
       let labelsTooWide = false;
       this.datasets().forEach((dataset) => labelsTooWide = labelsTooWide || this._drawLabel(dataToDraw.get(dataset), dataset));
       if (this._hideBarsIfAnyAreTooWide && labelsTooWide) {
-        this.datasets().forEach((dataset) => this._labelConfig.get(dataset).labelArea.selectAll("g").remove());
+         this.datasets().forEach((dataset) => this._labelConfig.get(dataset).labelArea.selectAll("g").remove());
       }
     }
 
@@ -489,7 +489,6 @@ export module Plots {
           } else {
             x += offset;
           }
-
           let showLabel = true;
           let labelPosition = {
             x: x,
@@ -499,6 +498,7 @@ export module Plots {
           if (this._isVertical) {
             labelPosition.x = x + w / 2 - measurement.width / 2;
           } else {
+            labelPosition.y = y + h / 2 - measurement.height / 2;
             if (!positive) {
               labelPosition.x = x + w - measurement.width;
             } else {
