@@ -379,7 +379,8 @@ describe("Component", () => {
       let fixedHeight = 100;
 
       beforeEach(() => {
-        TestMethods.fixComponentSize(c, fixedWidth, fixedHeight);
+        c.destroy();
+        c = new Mocks.FixedSizeComponent(fixedWidth, fixedHeight);
         c.anchor(svg);
       });
 
@@ -404,8 +405,8 @@ describe("Component", () => {
       it("does not translate if more space was requested than offered", () => {
         let requestedWidth = SVG_WIDTH * 2;
         let requestedHeight = SVG_HEIGHT * 2;
-        let c = new Plottable.Component();
-        TestMethods.fixComponentSize(c, requestedWidth, requestedHeight);
+        c.destroy();
+        c = new Mocks.FixedSizeComponent(requestedWidth, requestedHeight);
         let t = new Plottable.Components.Table([[c]]);
         t.renderTo(svg);
 
