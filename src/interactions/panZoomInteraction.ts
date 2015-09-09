@@ -135,14 +135,42 @@ export module Interactions {
         magnifyAmount = this._constrainedZoomAmountUsingExtent(yScale, magnifyAmount);
       });
 
+      let oldCenterPoint = PanZoom._centerPoint(oldPoints[0], oldPoints[1]);
+
+      let constrainedPinchAmountUsingValueLimits = (scale: QuantitativeScale<any>, center: number) => {
+        if (magnifyAmount <= 1) {
+          return;
+        }
+        let minDomain = Math.min(scale.domain()[0], scale.domain()[1]);
+        let maxDomain = Math.max(scale.domain()[1], scale.domain()[0]);
+        let maxDomainValue = this.maxDomainValue(scale);
+        if (maxDomainValue == null) {
+          maxDomainValue = Infinity;
+        }
+        let minDomainValue = this.minDomainValue(scale);
+        if (minDomainValue == null) {
+          minDomainValue = -Infinity;
+        }
+        let centerDataValue = scale.invert(center);
+        magnifyAmount = Math.min(magnifyAmount,
+          (minDomainValue - centerDataValue) / (minDomain - centerDataValue),
+          (maxDomainValue - centerDataValue) / (maxDomain - centerDataValue));
+      };
+
+      this.xScales().forEach((xScale) => {
+        constrainedPinchAmountUsingValueLimits(xScale, oldCenterPoint.x);
+      });
+
+      this.yScales().forEach((yScale) => {
+        constrainedPinchAmountUsingValueLimits(yScale, oldCenterPoint.y);
+      });
+
       let constrainedPoints = oldPoints.map((oldPoint, i) => {
         return {
           x: normalizedPointDiffs[i].x * magnifyAmount + oldPoint.x,
           y: normalizedPointDiffs[i].y * magnifyAmount + oldPoint.y
         };
       });
-
-      let oldCenterPoint = PanZoom._centerPoint(oldPoints[0], oldPoints[1]);
 
       let translateAmountX = oldCenterPoint.x - ((constrainedPoints[0].x + constrainedPoints[1].x) / 2);
       this.xScales().forEach((xScale) => {

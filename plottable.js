@@ -11483,13 +11483,36 @@ var Plottable;
                 this.yScales().forEach(function (yScale) {
                     magnifyAmount = _this._constrainedZoomAmountUsingExtent(yScale, magnifyAmount);
                 });
+                var oldCenterPoint = PanZoom._centerPoint(oldPoints[0], oldPoints[1]);
+                var constrainedPinchAmountUsingValueLimits = function (scale, center) {
+                    if (magnifyAmount <= 1) {
+                        return;
+                    }
+                    var minDomain = Math.min(scale.domain()[0], scale.domain()[1]);
+                    var maxDomain = Math.max(scale.domain()[1], scale.domain()[0]);
+                    var maxDomainValue = _this.maxDomainValue(scale);
+                    if (maxDomainValue == null) {
+                        maxDomainValue = Infinity;
+                    }
+                    var minDomainValue = _this.minDomainValue(scale);
+                    if (minDomainValue == null) {
+                        minDomainValue = -Infinity;
+                    }
+                    var centerDataValue = scale.invert(center);
+                    magnifyAmount = Math.min(magnifyAmount, (minDomainValue - centerDataValue) / (minDomain - centerDataValue), (maxDomainValue - centerDataValue) / (maxDomain - centerDataValue));
+                };
+                this.xScales().forEach(function (xScale) {
+                    constrainedPinchAmountUsingValueLimits(xScale, oldCenterPoint.x);
+                });
+                this.yScales().forEach(function (yScale) {
+                    constrainedPinchAmountUsingValueLimits(yScale, oldCenterPoint.y);
+                });
                 var constrainedPoints = oldPoints.map(function (oldPoint, i) {
                     return {
                         x: normalizedPointDiffs[i].x * magnifyAmount + oldPoint.x,
                         y: normalizedPointDiffs[i].y * magnifyAmount + oldPoint.y
                     };
                 });
-                var oldCenterPoint = PanZoom._centerPoint(oldPoints[0], oldPoints[1]);
                 var translateAmountX = oldCenterPoint.x - ((constrainedPoints[0].x + constrainedPoints[1].x) / 2);
                 this.xScales().forEach(function (xScale) {
                     _this._magnifyScale(xScale, magnifyAmount, oldCenterPoint.x);
