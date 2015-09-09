@@ -72,11 +72,6 @@ describe("Group", () => {
 
   describe("Detaching constituent Components", () => {
     it("takes its constutuent Components with it when detach()ed or anchor()ed", () => {
-      function isInDOM(component: Plottable.Component) {
-        let contentNode = component.content().node();
-        return contentNode != null && Plottable.Utils.DOM.boundingSVG(<SVGElement> contentNode) != null;
-      };
-
       let c1 = new Plottable.Component();
       let c2 = new Plottable.Component();
       let group = new Plottable.Components.Group([c1, c2]);
@@ -84,19 +79,19 @@ describe("Group", () => {
       let svg = TestMethods.generateSVG();
 
       group.renderTo(svg);
-      assert.isTrue(isInDOM(group), "Group was added to the DOM");
-      assert.isTrue(isInDOM(c1), "Component 1 was added to the DOM");
-      assert.isTrue(isInDOM(c2), "Component 2 was added to the DOM");
+      assert.isTrue(TestMethods.isInDOM(group), "Group was added to the DOM");
+      assert.isTrue(TestMethods.isInDOM(c1), "Component 1 was added to the DOM");
+      assert.isTrue(TestMethods.isInDOM(c2), "Component 2 was added to the DOM");
 
       group.detach();
-      assert.isFalse(isInDOM(group), "Group was removed from the DOM");
-      assert.isFalse(isInDOM(c1), "Component 1 was also removed from the DOM");
-      assert.isFalse(isInDOM(c2), "Component 2 was also removed from the DOM");
+      assert.isFalse(TestMethods.isInDOM(group), "Group was removed from the DOM");
+      assert.isFalse(TestMethods.isInDOM(c1), "Component 1 was also removed from the DOM");
+      assert.isFalse(TestMethods.isInDOM(c2), "Component 2 was also removed from the DOM");
 
       group.renderTo(svg);
-      assert.isTrue(isInDOM(group), "Group was added back to the DOM");
-      assert.isTrue(isInDOM(c1), "Component 1 was also added back to the DOM");
-      assert.isTrue(isInDOM(c2), "Component 2 was also added back to the DOM");
+      assert.isTrue(TestMethods.isInDOM(group), "Group was added back to the DOM");
+      assert.isTrue(TestMethods.isInDOM(c1), "Component 1 was also added back to the DOM");
+      assert.isTrue(TestMethods.isInDOM(c2), "Component 2 was also added back to the DOM");
 
       svg.remove();
     });
@@ -120,11 +115,6 @@ describe("Group", () => {
     });
 
     it("removes Components if detach() is called on them (after rendering)", () => {
-      function isInDOM(component: Plottable.Component) {
-        let contentNode = component.content().node();
-        return contentNode != null && Plottable.Utils.DOM.boundingSVG(<SVGElement> contentNode) != null;
-      };
-
       let c1 = new Plottable.Component();
       let c2 = new Plottable.Component();
       let group = new Plottable.Components.Group([c1, c2]);
@@ -132,13 +122,13 @@ describe("Group", () => {
       let svg = TestMethods.generateSVG();
       group.renderTo(svg);
 
-      assert.isTrue(isInDOM(c1), "Component 1 was added to the DOM");
-      assert.isTrue(isInDOM(c2), "Component 2 was added to the DOM");
+      assert.isTrue(TestMethods.isInDOM(c1), "Component 1 was added to the DOM");
+      assert.isTrue(TestMethods.isInDOM(c2), "Component 2 was added to the DOM");
 
       c2.detach();
 
-      assert.isTrue(isInDOM(c1), "Component 1 is still in the DOM");
-      assert.isFalse(isInDOM(c2), "Component 2 was removed from the DOM");
+      assert.isTrue(TestMethods.isInDOM(c1), "Component 1 is still in the DOM");
+      assert.isFalse(TestMethods.isInDOM(c2), "Component 2 was removed from the DOM");
       assert.isFalse(group.has(c2), "Component 2 was removed from the Group");
 
       svg.remove();
