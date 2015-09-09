@@ -161,6 +161,35 @@ describe("Interactive Components", () => {
         svg.remove();
       });
 
+      it("uses the data values for the left and right sides if they were set last", () => {
+        let xScale = new Plottable.Scales.Linear();
+        xScale.domain([0, 2000]);
+        xScale.range([0, svgWidth]);
+        sbl.xScale(xScale);
+
+        let bounds = {
+          topLeft: {
+            x: 100,
+            y: 100
+          },
+          bottomRight: {
+            x: 200,
+            y: 200
+          }
+        };
+        sbl.bounds(bounds);
+        assert.deepEqual(sbl.bounds(), bounds, "latest bounds set");
+        let xExtent = [100, 250];
+        assert.strictEqual(sbl.xExtent(xExtent), sbl, "returns calling object");
+
+        assert.deepEqual(sbl.xExtent(), xExtent, "xExtent set");
+        assert.strictEqual(sbl.bounds().topLeft.x, xScale.scale(xExtent[0]), "left pixel position adjusts accordingly");
+        assert.strictEqual(sbl.bounds().bottomRight.x, xScale.scale(xExtent[1]), "right pixel position adjusts accordingly");
+
+        sbl.destroy();
+        svg.remove();
+      });
+
       it("can set the yScale() property", () => {
         let yScale = new Plottable.Scales.Linear();
         yScale.domain([0, 2000]);
@@ -210,6 +239,35 @@ describe("Interactive Components", () => {
           window.Pixel_CloseTo_Requirement, "box y attribute starts at start of y extent");
         assert.closeTo(TestMethods.numAttr(box, "height"), yScale.scale(yExtent[1]) - yScale.scale(yExtent[0]),
           window.Pixel_CloseTo_Requirement, "box height attribute extends for width of y extent");
+
+        sbl.destroy();
+        svg.remove();
+      });
+
+      it("uses the data values for the top and bottom sides if they were set last", () => {
+        let yScale = new Plottable.Scales.Linear();
+        yScale.domain([0, 2000]);
+        yScale.range([0, svgHeight]);
+        sbl.yScale(yScale);
+
+        let bounds = {
+          topLeft: {
+            x: 100,
+            y: 100
+          },
+          bottomRight: {
+            x: 200,
+            y: 200
+          }
+        };
+        sbl.bounds(bounds);
+        assert.deepEqual(sbl.bounds(), bounds, "latest bounds set");
+        let yExtent = [100, 250];
+        assert.strictEqual(sbl.yExtent(yExtent), sbl, "returns calling object");
+
+        assert.deepEqual(sbl.yExtent(), yExtent, "yExtent set");
+        assert.strictEqual(sbl.bounds().topLeft.y, yScale.scale(yExtent[0]), "top pixel position adjusts accordingly");
+        assert.strictEqual(sbl.bounds().bottomRight.y, yScale.scale(yExtent[1]), "bottom pixel position adjusts accordingly");
 
         sbl.destroy();
         svg.remove();
