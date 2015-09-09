@@ -617,6 +617,7 @@ describe("Component", () => {
         "Plottable requires a valid SVG to renderTo", "rejects strings that don't correspond to DOM elements");
       (<any> assert).throws(() => c.renderTo(d3.select(null)), Error,
         "Plottable requires a valid SVG to renderTo", "rejects empty d3 selections");
+      div.remove();
       c.destroy();
       svg.remove();
     });
