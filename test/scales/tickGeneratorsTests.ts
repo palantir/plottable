@@ -12,8 +12,9 @@ describe("Scales", () => {
       it("generates ticks within domain", () => {
         let start = 0.5;
         let end = 4.01;
+        let interval = 1;
         scale.domain([start, end]);
-        let ticks = Plottable.Scales.TickGenerators.intervalTickGenerator(1)(scale);
+        let ticks = Plottable.Scales.TickGenerators.intervalTickGenerator(interval)(scale);
 
         assert.strictEqual(ticks.length, 6, "ticks are generated");
         ticks.forEach((tick) => {
@@ -25,24 +26,27 @@ describe("Scales", () => {
       it("generates ticks for a domain crossing 0", () => {
         let start = -1.5;
         let end = 1;
+        let interval = 0.5;
         scale.domain([start, end]);
-        let ticks = Plottable.Scales.TickGenerators.intervalTickGenerator(0.5)(scale);
+        let ticks = Plottable.Scales.TickGenerators.intervalTickGenerator(interval)(scale);
         assert.deepEqual(ticks, [-1.5, -1, -0.5, 0, 0.5, 1], "generated all number divisible by 0.5 in domain");
       });
 
       it("generates ticks with reversed domain", () => {
         let start = -2.2;
         let end = -7.6;
+        let interval = 2.5;
         scale.domain([start, end]);
-        let ticks = Plottable.Scales.TickGenerators.intervalTickGenerator(2.5)(scale);
+        let ticks = Plottable.Scales.TickGenerators.intervalTickGenerator(interval)(scale);
         assert.deepEqual(ticks, [-7.6, -7.5, -5, -2.5, -2.2], "generated all ticks between lower and higher value");
       });
 
       it("returns the ends of the domain if interval is NaN or bigger than the domain", () => {
         let start = 0.5;
         let end = 10.01;
+        let interval = 11;
         scale.domain([start, end]);
-        let ticks = Plottable.Scales.TickGenerators.intervalTickGenerator(11)(scale);
+        let ticks = Plottable.Scales.TickGenerators.intervalTickGenerator(interval)(scale);
         assert.deepEqual(ticks, [start, end], "no middle ticks were added when interval is 11");
 
         ticks = Plottable.Scales.TickGenerators.intervalTickGenerator(Infinity)(scale);
@@ -54,27 +58,31 @@ describe("Scales", () => {
 
       it("works for Scales.ModifiedLog", () => {
         let logScale = new Plottable.Scales.ModifiedLog(2);
+        let interval = 40;
         logScale.domain([0, 100]);
-        let logTicks = Plottable.Scales.TickGenerators.intervalTickGenerator(40)(logScale);
+        let logTicks = Plottable.Scales.TickGenerators.intervalTickGenerator(interval)(logScale);
         assert.deepEqual(logTicks, [0, 40, 80, 100], "generates ticks for Scales.ModifiedLog");
       });
 
       it("rejects non-positive values", () => {
-        (<any>assert).throws(() => Plottable.Scales.TickGenerators.intervalTickGenerator(0), Error, "interval must be positive number",
+        // HACKHACK #2614: chai-assert.d.ts has the wrong signature
+        (<any> assert).throws(() => Plottable.Scales.TickGenerators.intervalTickGenerator(0), Error, "interval must be positive number",
           "interval cannot be 0");
-        (<any>assert).throws(() => Plottable.Scales.TickGenerators.intervalTickGenerator(-2), Error, "interval must be positive number",
-          "interval cannot be negatvie");
+        (<any> assert).throws(() => Plottable.Scales.TickGenerators.intervalTickGenerator(-2), Error, "interval must be positive number",
+          "interval cannot be negative");
       });
 
-      // HACKHACK: skipping failing test
-      // intervalTickGenerator() does not detect invalids scale
+      // HACKHACK #2743: skipping failing test
+      // intervalTickGenerator() does not detect invalid scale
       it.skip("rejects non-QuantitativeScale<number> Scales", () => {
+        let interval = 1;
         let categoryScale: any = new Plottable.Scales.Category();
-        (<any>assert).throws(() => Plottable.Scales.TickGenerators.intervalTickGenerator(1)(categoryScale), Error,
+        // HACKHACK #2614: chai-assert.d.ts has the wrong signature
+        (<any> assert).throws(() => Plottable.Scales.TickGenerators.intervalTickGenerator(interval)(categoryScale), Error,
           "scale needs to inherit from Scale.QuantitativeScale<number>", "Scales.Category is not a valid parameter for TickGenerators");
 
         let timeScale: any = new Plottable.Scales.Time();
-        (<any>assert).throws(() => Plottable.Scales.TickGenerators.intervalTickGenerator(1)(timeScale), Error,
+        (<any> assert).throws(() => Plottable.Scales.TickGenerators.intervalTickGenerator(interval)(timeScale), Error,
           "scale needs to inherit from Scale.QuantitativeScale<number>", "Scales.Time is not a valid parameter for TickGenerators");
       });
 
@@ -110,7 +118,7 @@ describe("Scales", () => {
           "only the end ticks are returned when there is no integer in the interval");
       });
 
-      // HACKHACK: skipping failing test
+      // HACKHACK #2743: skipping failing test
       // integerTickGenerator() returns an array of powers instead of actual value
       it.skip("works for Scales.ModifiedLog", () => {
         let logScale = new Plottable.Scales.ModifiedLog(2);
@@ -119,15 +127,16 @@ describe("Scales", () => {
         assert.deepEqual(logTicks, [-2, -1, 0, 1, 2, 4, 4.5], "generates interger ticks for Scales.ModifiedLog");
       });
 
-      // HACKHACK: skipping failing test
+      // HACKHACK #2743: skipping failing test
       // integerTickGenerator() does not detect invalids scale
       it.skip("rejects non-QuantitativeScale<number> Scales", () => {
         let categoryScale: any = new Plottable.Scales.Category();
-        (<any>assert).throws(() => integerTickGenerator(categoryScale), Error,
+        // HACKHACK #2614: chai-assert.d.ts has the wrong signature
+        (<any> assert).throws(() => integerTickGenerator(categoryScale), Error,
           "scale needs to inherit from Scale.QuantitativeScale<number>", "Scales.Category is not a valid parameter for TickGenerators");
 
         let timeScale: any = new Plottable.Scales.Time();
-        (<any>assert).throws(() => integerTickGenerator(timeScale), Error,
+        (<any> assert).throws(() => integerTickGenerator(timeScale), Error,
           "scale needs to inherit from Scale.QuantitativeScale<number>", "Scales.Time is not a valid parameter for TickGenerators");
       });
     });
