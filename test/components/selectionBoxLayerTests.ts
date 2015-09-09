@@ -219,6 +219,29 @@ describe("Interactive Components", () => {
         svg.remove();
       });
 
+      it("updates left and right edge pixel positions if in VALUE mode and scales are switched", () => {
+        let xScale = new Plottable.Scales.Linear();
+        xScale.domain([0, 2000]);
+        xScale.range([0, svgHeight]);
+        sbl.xScale(xScale);
+
+        let xExtent = [100, 250];
+        sbl.xExtent(xExtent);
+        assert.strictEqual(sbl.bounds().topLeft.x, xScale.scale(xExtent[0]), "left pixel position adjusts accordingly");
+        assert.strictEqual(sbl.bounds().bottomRight.x, xScale.scale(xExtent[1]), "right pixel position adjusts accordingly");
+
+        let xScale2 = new Plottable.Scales.Linear();
+        xScale2.domain([0, 1000]);
+        xScale2.range([0, svgHeight]);
+
+        sbl.xScale(xScale2);
+        assert.strictEqual(sbl.bounds().topLeft.x, xScale2.scale(xExtent[0]), "left pixel position adjusts accordingly");
+        assert.strictEqual(sbl.bounds().bottomRight.x, xScale2.scale(xExtent[1]), "right pixel position adjusts accordingly");
+
+        sbl.destroy();
+        svg.remove();
+      });
+
       it("can set the yScale() property", () => {
         let yScale = new Plottable.Scales.Linear();
         yScale.domain([0, 2000]);
@@ -297,6 +320,29 @@ describe("Interactive Components", () => {
         assert.deepEqual(sbl.yExtent(), yExtent, "yExtent set");
         assert.strictEqual(sbl.bounds().topLeft.y, yScale.scale(yExtent[0]), "top pixel position adjusts accordingly");
         assert.strictEqual(sbl.bounds().bottomRight.y, yScale.scale(yExtent[1]), "bottom pixel position adjusts accordingly");
+
+        sbl.destroy();
+        svg.remove();
+      });
+
+      it("updates top and bottom edge pixel positions if in VALUE mode and scales are switched", () => {
+        let yScale = new Plottable.Scales.Linear();
+        yScale.domain([0, 2000]);
+        yScale.range([0, svgHeight]);
+        sbl.yScale(yScale);
+
+        let yExtent = [100, 250];
+        sbl.yExtent(yExtent);
+        assert.strictEqual(sbl.bounds().topLeft.y, yScale.scale(yExtent[0]), "top pixel position adjusts accordingly");
+        assert.strictEqual(sbl.bounds().bottomRight.y, yScale.scale(yExtent[1]), "bottom pixel position adjusts accordingly");
+
+        let yScale2 = new Plottable.Scales.Linear();
+        yScale2.domain([0, 1000]);
+        yScale2.range([0, svgHeight]);
+
+        sbl.yScale(yScale2);
+        assert.strictEqual(sbl.bounds().topLeft.y, yScale2.scale(yExtent[0]), "top pixel position adjusts accordingly");
+        assert.strictEqual(sbl.bounds().bottomRight.y, yScale2.scale(yExtent[1]), "bottom pixel position adjusts accordingly");
 
         sbl.destroy();
         svg.remove();
