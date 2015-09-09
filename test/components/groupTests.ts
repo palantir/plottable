@@ -129,7 +129,7 @@ describe("Group", () => {
       let c2 = new Plottable.Component();
       let group = new Plottable.Components.Group([c1, c2]);
 
-      let svg = TestMethods.generateSVG(200, 200);
+      let svg = TestMethods.generateSVG();
       group.renderTo(svg);
 
       assert.isTrue(isInDOM(c1), "Component 1 was added to the DOM");
@@ -160,18 +160,15 @@ describe("Group", () => {
 
       assert.strictEqual(group1.components().length, 1, "first group should have 1 component before movement");
 
-      assert.strictEqual(component.parent(), group1, "component's parent before moving should be the group 1"
-      );
+      assert.strictEqual(component.parent(), group1, "component's parent before moving should be the group 1");
 
-      assert.doesNotThrow(() => group2.append(component), Error, "should be able to move components between groups after anchoring"
-      );
+      assert.doesNotThrow(() => group2.append(component), Error, "should be able to move components between groups after anchoring");
 
       assert.strictEqual(group2.components().length, 1, "second group should have 1 component after movement");
 
       assert.strictEqual(group1.components().length, 0, "first group should have no components after movement");
 
-      assert.strictEqual(component.parent(), group2, "component's parent after movement should be the group 2"
-      );
+      assert.strictEqual(component.parent(), group2, "component's parent after movement should be the group 2");
 
       svg.remove();
     });
@@ -253,8 +250,7 @@ describe("Group", () => {
 
     it("allocates space to its Components correctly", () => {
       let FIXED_COMPONENT_SIZE = SVG_WIDTH / 4;
-      let fixedComponent = new Mocks.FixedSizeComponent(FIXED_COMPONENT_SIZE, FIXED_COMPONENT_SIZE)
-                                    .xAlignment("right").yAlignment("bottom");
+      let fixedComponent = new Mocks.FixedSizeComponent(FIXED_COMPONENT_SIZE, FIXED_COMPONENT_SIZE).xAlignment("right").yAlignment("bottom");
       let unfixedComponent = new Plottable.Component();
 
       let group = new Plottable.Components.Group([fixedComponent, unfixedComponent]);
