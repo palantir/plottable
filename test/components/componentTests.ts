@@ -297,26 +297,30 @@ describe("Component", () => {
     });
 
     it("can compute the layout based on CSS", () => {
+      let parentWidth = 400;
+      let parentHeight = 200;
       // Manually size parent
       let parent = d3.select(<Element> (<Element> svg.node()).parentNode);
-      parent.style("width", "400px");
-      parent.style("height", "200px");
+      parent.style("width", `${parentWidth}px`);
+      parent.style("height", `${parentHeight}px`);
 
       // Remove width/height attributes and style with CSS
       svg.attr("width", null).attr("height", null);
       c.anchor(svg);
       c.computeLayout();
-      assert.strictEqual(c.width(), 400, "defaults to width of parent");
-      assert.strictEqual(c.height(), 200, "defaults to height of parent");
+      assert.strictEqual(c.width(), parentWidth, "defaults to width of parent");
+      assert.strictEqual(c.height(), parentHeight, "defaults to height of parent");
       let origin = c.origin();
       assert.strictEqual(origin.x, 0, "xOrigin defaulted to 0");
       assert.strictEqual(origin.y, 0, "yOrigin defaulted to 0");
 
-      svg.style("width", "50%").style("height", "50%");
+      let svgWidthPercentage = 50;
+      let svgHeightPercentage = 50;
+      svg.style("width", `${svgWidthPercentage}%`).style("height", `${svgHeightPercentage}%`);
       c.computeLayout();
 
-      assert.strictEqual(c.width(), 200, "width computed to be percentage of svg width");
-      assert.strictEqual(c.height(), 100, "height computed to be percentage of svg height");
+      assert.strictEqual(c.width(), parentWidth * svgWidthPercentage / 100, "width computed to be percentage of svg width");
+      assert.strictEqual(c.height(), parentHeight * svgHeightPercentage / 100, "height computed to be percentage of svg height");
       origin = c.origin();
       assert.strictEqual(origin.x, 0, "xOrigin defaulted to 0");
       assert.strictEqual(origin.y, 0, "yOrigin defaulted to 0");
