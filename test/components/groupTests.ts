@@ -240,7 +240,8 @@ describe("Group", () => {
 
     it("allocates space to its Components correctly", () => {
       let FIXED_COMPONENT_SIZE = SVG_WIDTH / 4;
-      let fixedComponent = new Mocks.FixedSizeComponent(FIXED_COMPONENT_SIZE, FIXED_COMPONENT_SIZE).xAlignment("right").yAlignment("bottom");
+      let fixedComponent = new Mocks.FixedSizeComponent(FIXED_COMPONENT_SIZE, FIXED_COMPONENT_SIZE);
+      fixedComponent.xAlignment("right").yAlignment("bottom");
       let unfixedComponent = new Plottable.Component();
 
       let group = new Plottable.Components.Group([fixedComponent, unfixedComponent]);
