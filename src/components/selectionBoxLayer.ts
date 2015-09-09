@@ -11,8 +11,8 @@ export module Components {
       topLeft: { x: 0, y: 0 },
       bottomRight: { x: 0, y: 0 }
     };
-    private _xExtent: [number | { valueOf(): number }, number | { valueOf(): number }];
-    private _yExtent: [number | { valueOf(): number }, number | { valueOf(): number }];
+    private _xExtent: (number | { valueOf(): number })[];
+    private _yExtent: (number | { valueOf(): number })[];
     private _xScale: QuantitativeScale<number | { valueOf(): number }>;
     private _yScale: QuantitativeScale<number | { valueOf(): number }>;
     private _adjustBoundsCallback: ScaleCallback<QuantitativeScale<number | { valueOf(): number }>>;
