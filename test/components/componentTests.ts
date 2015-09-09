@@ -213,20 +213,20 @@ describe("Component", () => {
 
   describe("parent container", () => {
     it("can set its parent to a container that contains this component", () => {
-      let acceptingContainer = {
+      let acceptingContainer: any = {
         has: () => true
       };
-      assert.strictEqual(c.parent(<any> acceptingContainer), c, "setter returns calling object");
+      assert.strictEqual(c.parent(acceptingContainer), c, "setter returns calling object");
       assert.strictEqual(c.parent(), acceptingContainer, "parent set if parent contains component");
       c.destroy();
       svg.remove();
     });
 
     it("throws an error when the input parent does not contain this component", () => {
-      let rejectingContainer = {
+      let rejectingContainer: any = {
         has: (component: Plottable.Component) => false
       };
-      assert.throws(() => c.parent(<any> rejectingContainer), Error, "invalid parent");
+      assert.throws(() => c.parent(rejectingContainer), Error, "invalid parent");
       c.destroy();
       svg.remove();
     });
