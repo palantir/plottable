@@ -624,7 +624,7 @@ describe("Component", () => {
 
     it("detaches the component if rendering to a new svg", () => {
       let svgHeight2 = 50;
-      let svg2 = TestMethods.generateSVG(300, svgHeight2);
+      let svg2 = TestMethods.generateSVG(SVG_WIDTH, svgHeight2);
 
       c.renderTo(svg);
       assert.isTrue((<Node> svg.node()).hasChildNodes(), "anchored onto svg");
