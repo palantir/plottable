@@ -142,22 +142,16 @@ describe("Group", () => {
       let component = new Plottable.Component();
 
       group1.append(component);
-
       group1.renderTo(svg);
       group2.renderTo(svg);
 
       assert.strictEqual(group2.components().length, 0, "second group should have no component before movement");
-
       assert.strictEqual(group1.components().length, 1, "first group should have 1 component before movement");
-
       assert.strictEqual(component.parent(), group1, "component's parent before moving should be the group 1");
 
       assert.doesNotThrow(() => group2.append(component), Error, "should be able to move components between groups after anchoring");
-
       assert.strictEqual(group2.components().length, 1, "second group should have 1 component after movement");
-
       assert.strictEqual(group1.components().length, 0, "first group should have no components after movement");
-
       assert.strictEqual(component.parent(), group2, "component's parent after movement should be the group 2");
 
       svg.remove();
