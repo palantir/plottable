@@ -513,7 +513,7 @@ describe("Component", () => {
   });
 
   describe("rendering on the anchored svg", () => {
-    it("performs all of the same operations as rendering immediately", () => {
+    it("performs all of the same operations as renderImmediately()", () => {
       let renderFlag = false;
       let c = new Plottable.Component();
       c.renderImmediately = () => {
@@ -523,7 +523,7 @@ describe("Component", () => {
       c.anchor(svg);
       c.computeLayout();
       assert.strictEqual(c.render(), c, "returns calling object");
-      assert.isTrue(renderFlag, "renderImmediately called in render invocation");
+      assert.isTrue(renderFlag, "renderImmediately() called in render invocation");
 
       c.destroy();
       svg.remove();
