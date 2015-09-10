@@ -277,6 +277,17 @@ describe("Component", () => {
       svg.remove();
     });
 
+    it("does not allow the origin object to be modified", () => {
+      c.renderTo(svg);
+      let receivedOrigin = c.origin();
+      let delta = 10;
+      receivedOrigin.x += delta;
+      receivedOrigin.y += delta;
+      assert.notDeepEqual(c.origin(), receivedOrigin, "underlying origin object cannot be modified");
+      c.destroy();
+      svg.remove();
+    });
+
     it("recomputes the layout if the environment changes", () => {
       c.anchor(svg);
       c.computeLayout();
@@ -366,6 +377,19 @@ describe("Component", () => {
         width, window.Pixel_CloseTo_Requirement, "box width set to computed width");
       assert.closeTo(TestMethods.numAttr(backgroundFillBox, "height"),
         height, window.Pixel_CloseTo_Requirement, "box height set to computed height");
+      c.destroy();
+      svg.remove();
+    });
+
+    it("allows for recomputing the layout and rendering", () => {
+      c.renderTo(svg);
+      c.computeLayout({x: SVG_WIDTH / 4, y: SVG_HEIGHT / 4}, SVG_WIDTH / 4, SVG_HEIGHT / 4);
+      c.redraw();
+      let origin = c.origin();
+      assert.deepEqual(origin, {x: 0, y: 0}, "origin reset");
+      let componentElement = svg.select(".component");
+      let translate = TestMethods.getTranslate(componentElement);
+      assert.deepEqual(translate, [origin.x, origin.y], "DOM element rendered at new origin");
       c.destroy();
       svg.remove();
     });
@@ -638,17 +662,6 @@ describe("Component", () => {
     });
   });
 
-  it("does not allow the origin object to be modified", () => {
-    c.renderTo(svg);
-    let receivedOrigin = c.origin();
-    let delta = 10;
-    receivedOrigin.x += delta;
-    receivedOrigin.y += delta;
-    assert.notDeepEqual(c.origin(), receivedOrigin, "underlying origin object cannot be modified");
-    c.destroy();
-    svg.remove();
-  });
-
   describe("calculating the origin in relation to the svg", () => {
     it("returns origin without a parent", () => {
       assert.deepEqual(c.originToSVG(), c.origin(), "same as origin with no parent");
@@ -673,25 +686,14 @@ describe("Component", () => {
     });
   });
 
-  it("allows for recomputing the layout and rendering", () => {
-    c.renderTo(svg);
-    c.computeLayout({x: SVG_WIDTH / 4, y: SVG_HEIGHT / 4}, SVG_WIDTH / 4, SVG_HEIGHT / 4);
-    c.redraw();
-    let origin = c.origin();
-    assert.deepEqual(origin, {x: 0, y: 0}, "origin reset");
-    let componentElement = svg.select(".component");
-    let translate = TestMethods.getTranslate(componentElement);
-    assert.deepEqual(translate, [origin.x, origin.y], "DOM element rendered at new origin");
-    c.destroy();
-    svg.remove();
-  });
-
-  it("generates a clipPath element if it is enabled", () => {
-    (<any> c)._clipPathEnabled = true;
-    c.anchor(svg);
-    let componentElement = svg.select(".component");
-    assert.isNotNull(componentElement.attr("clip-path"), "clip-path attribute set");
-    c.destroy();
-    svg.remove();
+  describe("restricting rendering through clipPath", () => {
+    it("generates a clipPath element if it is enabled", () => {
+      (<any> c)._clipPathEnabled = true;
+      c.anchor(svg);
+      let componentElement = svg.select(".component");
+      assert.isNotNull(componentElement.attr("clip-path"), "clip-path attribute set");
+      c.destroy();
+      svg.remove();
+    });
   });
 });
