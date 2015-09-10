@@ -501,13 +501,15 @@ describe("Component", () => {
     });
   });
 
-  it("does not request any space when offered a width and a height", () => {
-    let offeredWidth = 1;
-    let offeredHeight = 1;
-    let layout = c.requestedSpace(offeredWidth, offeredHeight);
-    assert.strictEqual(layout.minWidth, 0, "requested minWidth defaults to 0");
-    assert.strictEqual(layout.minHeight, 0, "requested minHeight defaults to 0");
-    svg.remove();
+  describe("calculating the minimum requested space", () => {
+    it("does not request any space when offered a width and a height", () => {
+      let offeredWidth = 1;
+      let offeredHeight = 1;
+      let layout = c.requestedSpace(offeredWidth, offeredHeight);
+      assert.strictEqual(layout.minWidth, 0, "requested minWidth defaults to 0");
+      assert.strictEqual(layout.minHeight, 0, "requested minHeight defaults to 0");
+      svg.remove();
+    });
   });
 
   describe("destroying", () => {
