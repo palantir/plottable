@@ -775,6 +775,52 @@ describe("Plots", () => {
       });
     });
 
+    describe("Horizontal Bar Plot extent calculation", () => {
+
+      let svg: d3.Selection<void>;
+      let xScale: Plottable.Scales.Linear;
+      let yScale: Plottable.Scales.Linear;
+      let plot: Plottable.Plots.Bar<number, number>;
+
+      beforeEach(() => {
+        svg = TestMethods.generateSVG();
+
+        xScale = new Plottable.Scales.Linear();
+        yScale = new Plottable.Scales.Linear();
+
+        plot = new Plottable.Plots.Bar<number, number>(Plottable.Plots.Bar.ORIENTATION_HORIZONTAL);
+        plot.x((d) => d.x, xScale);
+        plot.y((d) => d.y, yScale);
+      });
+
+      it("pads the domain in the correct direction", () => {
+        let data = Array.apply(null, Array(10)).map((d: any, i: number) => {
+          return { x: i + 1, y: i + 1 };
+        });
+        plot.addDataset(new Plottable.Dataset(data));
+        plot.renderTo(svg);
+
+        assert.operator(yScale.domain()[0], "<", data[0].y, "lower end of the domain is padded");
+        assert.operator(yScale.domain()[1], ">", data[data.length - 1].y, "higher end of the domain is padded");
+
+        svg.remove();
+      });
+
+      it("computes the correct extent when autoDomain()-ing right after render", () => {
+        let data = Array.apply(null, Array(10)).map((d: any, i: number) => {
+          return { x: i + 1, y: i + 1 };
+        });
+        plot.addDataset(new Plottable.Dataset(data));
+        plot.renderTo(svg);
+
+        let initialYScaleDomain = yScale.domain();
+        yScale.autoDomain();
+        assert.deepEqual(initialYScaleDomain, yScale.domain(), "The domain did not change");
+
+        svg.remove();
+      });
+    });
+
     describe("Vertical Bar Plot With Bar Labels", () => {
       let plot: Plottable.Plots.Bar<string, number>;
       let data: any[];
