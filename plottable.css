@@ -46,6 +46,7 @@ svg.plottable {
 
 .plottable .background-fill {
   fill: none;
+  pointer-events: none;
 }
 
 .plottable .bounding-box {
