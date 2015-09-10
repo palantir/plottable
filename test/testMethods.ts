@@ -338,8 +338,8 @@ module TestMethods {
     let oldWarn = Plottable.Utils.Window.warn;
     Plottable.Utils.Window.warn = (msg: string) => receivedWarning = msg;
     funct();
-    assert.include(receivedWarning, warningMessage, assertMessage);
     Plottable.Utils.Window.warn = oldWarn;
+    assert.include(receivedWarning, warningMessage, assertMessage);
   }
 
 }
