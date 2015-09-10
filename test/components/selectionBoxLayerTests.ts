@@ -227,14 +227,18 @@ describe("Interactive Components", () => {
 
         let xExtent = [100, 250];
         sbl.xExtent(xExtent);
-        assert.strictEqual(sbl.bounds().topLeft.x, xScale.scale(xExtent[0]), "left pixel position adjusts accordingly");
-        assert.strictEqual(sbl.bounds().bottomRight.x, xScale.scale(xExtent[1]), "right pixel position adjusts accordingly");
+        let leftPosition = sbl.bounds().topLeft.x;
+        let rightPosition = sbl.bounds().bottomRight.x;
+        assert.strictEqual(leftPosition, xScale.scale(xExtent[0]), "left pixel position adjusts accordingly");
+        assert.strictEqual(rightPosition, xScale.scale(xExtent[1]), "right pixel position adjusts accordingly");
 
         let xScale2 = new Plottable.Scales.ModifiedLog();
         xScale2.domain([0, 1000]);
         xScale2.range([0, svgHeight]);
 
         sbl.xScale(xScale2);
+        assert.notStrictEqual(sbl.bounds().topLeft.x, leftPosition, "left pixel position changed");
+        assert.notStrictEqual(sbl.bounds().bottomRight.x, rightPosition, "right pixel position changed");
         assert.strictEqual(sbl.bounds().topLeft.x, xScale2.scale(xExtent[0]), "left pixel position adjusts accordingly");
         assert.strictEqual(sbl.bounds().bottomRight.x, xScale2.scale(xExtent[1]), "right pixel position adjusts accordingly");
 
@@ -250,11 +254,15 @@ describe("Interactive Components", () => {
 
         let xExtent = [100, 250];
         sbl.xExtent(xExtent);
-        assert.strictEqual(sbl.bounds().topLeft.x, xScale.scale(xExtent[0]), "left pixel position adjusts accordingly");
-        assert.strictEqual(sbl.bounds().bottomRight.x, xScale.scale(xExtent[1]), "right pixel position adjusts accordingly");
+        let leftPosition = sbl.bounds().topLeft.x;
+        let rightPosition = sbl.bounds().bottomRight.x;
+        assert.strictEqual(leftPosition, xScale.scale(xExtent[0]), "left pixel position adjusts accordingly");
+        assert.strictEqual(rightPosition, xScale.scale(xExtent[1]), "right pixel position adjusts accordingly");
 
         xScale.domain([0, 1000]);
 
+        assert.notStrictEqual(sbl.bounds().topLeft.x, leftPosition, "left pixel position changed");
+        assert.notStrictEqual(sbl.bounds().bottomRight.x, rightPosition, "right pixel position changed");
         assert.strictEqual(sbl.bounds().topLeft.x, xScale.scale(xExtent[0]), "left pixel position adjusts accordingly");
         assert.strictEqual(sbl.bounds().bottomRight.x, xScale.scale(xExtent[1]), "right pixel position adjusts accordingly");
 
@@ -353,14 +361,18 @@ describe("Interactive Components", () => {
 
         let yExtent = [100, 250];
         sbl.yExtent(yExtent);
-        assert.strictEqual(sbl.bounds().topLeft.y, yScale.scale(yExtent[0]), "top pixel position adjusts accordingly");
-        assert.strictEqual(sbl.bounds().bottomRight.y, yScale.scale(yExtent[1]), "bottom pixel position adjusts accordingly");
+        let topPosition = sbl.bounds().topLeft.y;
+        let bottomPosition = sbl.bounds().bottomRight.y;
+        assert.strictEqual(topPosition, yScale.scale(yExtent[0]), "top pixel position adjusts accordingly");
+        assert.strictEqual(bottomPosition, yScale.scale(yExtent[1]), "bottom pixel position adjusts accordingly");
 
         let yScale2 = new Plottable.Scales.ModifiedLog();
         yScale2.domain([0, 1000]);
         yScale2.range([0, svgHeight]);
 
         sbl.yScale(yScale2);
+        assert.notStrictEqual(sbl.bounds().topLeft.y, topPosition, "top pixel position changed");
+        assert.notStrictEqual(sbl.bounds().bottomRight.y, bottomPosition, "bottom pixel position changed");
         assert.strictEqual(sbl.bounds().topLeft.y, yScale2.scale(yExtent[0]), "top pixel position adjusts accordingly");
         assert.strictEqual(sbl.bounds().bottomRight.y, yScale2.scale(yExtent[1]), "bottom pixel position adjusts accordingly");
 
@@ -376,11 +388,15 @@ describe("Interactive Components", () => {
 
         let yExtent = [100, 250];
         sbl.yExtent(yExtent);
-        assert.strictEqual(sbl.bounds().topLeft.y, yScale.scale(yExtent[0]), "top pixel position adjusts accordingly");
-        assert.strictEqual(sbl.bounds().bottomRight.y, yScale.scale(yExtent[1]), "bottom pixel position adjusts accordingly");
+        let topPosition = sbl.bounds().topLeft.y;
+        let bottomPosition = sbl.bounds().bottomRight.y;
+        assert.strictEqual(topPosition, yScale.scale(yExtent[0]), "top pixel position adjusts accordingly");
+        assert.strictEqual(bottomPosition, yScale.scale(yExtent[1]), "bottom pixel position adjusts accordingly");
 
         yScale.domain([0, 1000]);
 
+        assert.notStrictEqual(sbl.bounds().topLeft.y, topPosition, "top pixel position changed");
+        assert.notStrictEqual(sbl.bounds().bottomRight.y, bottomPosition, "bottom pixel position changed");
         assert.strictEqual(sbl.bounds().topLeft.y, yScale.scale(yExtent[0]), "top pixel position adjusts accordingly");
         assert.strictEqual(sbl.bounds().bottomRight.y, yScale.scale(yExtent[1]), "bottom pixel position adjusts accordingly");
 
