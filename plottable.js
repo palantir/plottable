@@ -8641,70 +8641,94 @@ var Plottable;
                     var text = _this._labelFormatter(primaryAccessor(d, i, dataset)).toString();
                     var w = attrToProjector["width"](d, i, dataset);
                     var h = attrToProjector["height"](d, i, dataset);
-                    var x = attrToProjector["x"](d, i, dataset);
-                    var y = attrToProjector["y"](d, i, dataset);
+                    var baseX = attrToProjector["x"](d, i, dataset);
+                    var baseY = attrToProjector["y"](d, i, dataset);
                     var positive = originalPositionFn(d, i, dataset) <= scaledBaseline;
                     var measurement = measurer.measure(text);
-                    var color = attrToProjector["fill"](d, i, dataset);
-                    var dark = Plottable.Utils.Color.contrast("white", color) * 1.6 < Plottable.Utils.Color.contrast("black", color);
                     var primary = _this._isVertical ? h : w;
                     var primarySpace = _this._isVertical ? measurement.height : measurement.width;
                     var secondaryAttrTextSpace = _this._isVertical ? measurement.width : measurement.height;
                     var secondaryAttrAvailableSpace = _this._isVertical ? w : h;
                     var tooWide = secondaryAttrTextSpace + 2 * Bar._LABEL_HORIZONTAL_PADDING > secondaryAttrAvailableSpace;
-                    if (measurement.height <= h && measurement.width <= w) {
-                        var offset = Math.min((primary - primarySpace) / 2, Bar._LABEL_VERTICAL_PADDING);
-                        if (!positive) {
-                            offset = offset * -1;
-                        }
-                        if (_this._isVertical) {
-                            y += offset;
-                        }
-                        else {
-                            x += offset;
-                        }
-                        var showLabel = true;
-                        var labelPosition = {
-                            x: x,
-                            y: positive ? y : y + h - measurement.height
-                        };
-                        if (_this._isVertical) {
-                            labelPosition.x = x + w / 2 - measurement.width / 2;
-                        }
-                        else {
-                            if (!positive) {
-                                labelPosition.x = x + w - measurement.width;
-                            }
-                            else {
-                                labelPosition.x = x;
-                            }
-                        }
-                        if (labelPosition.x < 0 || labelPosition.x + measurement.width > _this.width() ||
-                            labelPosition.y < 0 || labelPosition.y + measurement.height > _this.height()) {
-                            showLabel = false;
-                        }
-                        var g = labelArea.append("g").attr("transform", "translate(" + x + "," + y + ")");
-                        var className = dark ? "dark-label" : "light-label";
-                        g.classed(className, true);
-                        g.style("visibility", showLabel ? "inherit" : "hidden");
-                        var xAlign;
-                        var yAlign;
-                        if (_this._isVertical) {
-                            xAlign = "center";
-                            yAlign = positive ? "top" : "bottom";
-                        }
-                        else {
-                            xAlign = positive ? "left" : "right";
-                            yAlign = "center";
-                        }
-                        var writeOptions = {
-                            selection: g,
-                            xAlign: xAlign,
-                            yAlign: yAlign,
-                            textRotation: 0
-                        };
-                        writer.write(text, w, h, writeOptions);
+                    var showLabelOffBar = _this._isVertical ? (measurement.height > h) : (measurement.width > w);
+                    var offset = Math.min((primary - primarySpace) / 2, Bar._LABEL_VERTICAL_PADDING);
+                    if (!positive) {
+                        offset = offset * -1;
                     }
+                    var getY = function () {
+                        var addend = 0;
+                        if (_this._isVertical) {
+                            addend += offset;
+                            if (showLabelOffBar && positive) {
+                                addend += (offset - h);
+                            }
+                            if (showLabelOffBar && !positive) {
+                                addend += measurement.height;
+                            }
+                            ;
+                        }
+                        return baseY + addend;
+                    };
+                    var getX = function () {
+                        var addend = 0;
+                        if (!_this._isVertical) {
+                            addend += offset;
+                            if (showLabelOffBar && positive) {
+                                addend += (offset - w - Bar._LABEL_HORIZONTAL_PADDING);
+                            }
+                            if (showLabelOffBar && !positive) {
+                                addend += measurement.width;
+                            }
+                            ;
+                        }
+                        return baseX + addend;
+                    };
+                    var x = getX();
+                    var y = getY();
+                    var g = labelArea.append("g").attr("transform", "translate(" + x + "," + y + ")");
+                    var labelPositioningClassName = showLabelOffBar ? "off-bar-label" : "on-bar-label";
+                    g.classed(labelPositioningClassName, true);
+                    var color = attrToProjector["fill"](d, i, dataset);
+                    var dark = Plottable.Utils.Color.contrast("white", color) * 1.6 < Plottable.Utils.Color.contrast("black", color);
+                    g.classed(dark ? "dark-label" : "light-label", true);
+                    var showLabel = true;
+                    var labelPosition = {
+                        x: x,
+                        y: positive ? y : y + h - measurement.height
+                    };
+                    if (_this._isVertical) {
+                        labelPosition.x = baseX + w / 2 - measurement.width / 2;
+                    }
+                    else {
+                        if (!positive) {
+                            labelPosition.x = baseX + offset + w - measurement.width;
+                        }
+                        else {
+                            labelPosition.x = baseX + offset;
+                        }
+                    }
+                    if (labelPosition.x < 0 || labelPosition.x + measurement.width > _this.width() ||
+                        labelPosition.y < 0 || labelPosition.y + measurement.height > _this.height()) {
+                        showLabel = false;
+                    }
+                    g.style("visibility", showLabel ? "inherit" : "hidden");
+                    var xAlign;
+                    var yAlign;
+                    if (_this._isVertical) {
+                        xAlign = "center";
+                        yAlign = positive ? "top" : "bottom";
+                    }
+                    else {
+                        xAlign = positive ? "left" : "right";
+                        yAlign = "center";
+                    }
+                    var writeOptions = {
+                        selection: g,
+                        xAlign: xAlign,
+                        yAlign: yAlign,
+                        textRotation: 0
+                    };
+                    writer.write(text, w, h, writeOptions);
                     return tooWide;
                 });
                 return labelTooWide.some(function (d) { return d; });
