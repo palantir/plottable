@@ -5,23 +5,8 @@ describe("RenderController", () => {
   let SVG_HEIGHT = 300;
 
   describe("configuring the render policy", () => {
-    let oldWarn: (msg: string) => void;
-    let storedWarningMsg: string;
-
-    before(() => {
-      oldWarn = Plottable.Utils.Window.warn;
-      Plottable.Utils.Window.warn = (warningMsg: string) => {
-        storedWarningMsg = warningMsg;
-      };
-    });
-
-    beforeEach(() => {
-      storedWarningMsg = "";
-    });
-
     after(() => {
       Plottable.RenderController.renderPolicy(Plottable.RenderController.Policy.IMMEDIATE);
-      Plottable.Utils.Window.warn = oldWarn;
     });
 
     it("can set a render policy", () => {
@@ -34,9 +19,8 @@ describe("RenderController", () => {
 
     it("throws a warning for unrecognized render policies", () => {
       let unrecognizedRenderPolicy = "foo";
-      Plottable.RenderController.renderPolicy(unrecognizedRenderPolicy);
-
-      assert.include(storedWarningMsg, "Unrecognized renderPolicy", "warning sent for unrecognized render policy");
+      TestMethods.assertWarns(() => Plottable.RenderController.renderPolicy(unrecognizedRenderPolicy),
+        "Unrecognized renderPolicy", "warning sent for unrecognized render policy");
     });
   });
 
