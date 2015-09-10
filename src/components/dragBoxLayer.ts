@@ -416,6 +416,12 @@ export module Components {
       this._setMovableClass();
       return this;
     }
+
+    public destroy() {
+      super.destroy();
+      this._dragInteraction.detachFrom(this);
+    }
+
   }
 }
 }

@@ -12189,6 +12189,10 @@ var Plottable;
                 this._setMovableClass();
                 return this;
             };
+            DragBoxLayer.prototype.destroy = function () {
+                _super.prototype.destroy.call(this);
+                this._dragInteraction.detachFrom(this);
+            };
             return DragBoxLayer;
         })(Components.SelectionBoxLayer);
         Components.DragBoxLayer = DragBoxLayer;

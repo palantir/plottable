@@ -106,6 +106,26 @@ describe("Interactive Components", () => {
         svg.remove();
       });
 
+      it("does not call callbacks after destroy() is called", () => {
+        let group = new Plottable.Components.Group([dbl]).renderTo(svg);
+        let target = group.background();
+        let onDragStartCallbackCalled = false;
+        let onDragCallbackCalled = false;
+        let onDragEndcallbackCalled = false;
+        dbl.onDragStart(() => onDragStartCallbackCalled = true);
+        dbl.onDrag(() => onDragCallbackCalled = true);
+        dbl.onDragEnd(() => onDragEndcallbackCalled = true);
+
+        dbl.destroy();
+        TestMethods.triggerFakeDragSequence(target, quarterPoint, halfPoint);
+
+        assert.isFalse(onDragStartCallbackCalled, "onDragStart callback is not called");
+        assert.isFalse(onDragCallbackCalled, "onDrag callback is not called");
+        assert.isFalse(onDragEndcallbackCalled, "onDragEnd callback is not called");
+
+        svg.remove();
+      });
+
       it("calls the onDragStart callback", () => {
         dbl.renderTo(svg);
 

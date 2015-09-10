@@ -4605,6 +4605,7 @@ declare module Plottable {
              * Gets the enabled state.
              */
             enabled(): boolean;
+            destroy(): void;
         }
     }
 }
