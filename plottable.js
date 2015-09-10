@@ -1385,6 +1385,8 @@ var Plottable;
         }
         Formatters.time = time;
         /**
+         * @deprecated As of release 1.3.0, not safe for use with time zones.
+         *
          * Creates a formatter for relative dates.
          *
          * @param {number} baseValue The start date (as epoch time) used in computing relative dates (default 0)
@@ -7117,8 +7119,11 @@ var Plottable;
             });
             return this._lightweightPlotEntityToPlotEntity(closestPointEntity);
         };
+        /**
+         * @deprecated As of release 1.1.0, replaced by _entityVisibleOnPlot()
+         */
         Plot.prototype._visibleOnPlot = function (datum, pixelPoint, selection) {
-            Plottable.Utils.Window.deprecated("Plot._visibleOnPlot()", "v1.1.0");
+            Plottable.Utils.Window.deprecated("Plot._visibleOnPlot()", "v1.1.0", "replaced by _entityVisibleOnPlot()");
             return !(pixelPoint.x < 0 || pixelPoint.y < 0 ||
                 pixelPoint.x > this.width() || pixelPoint.y > this.height());
         };
@@ -8192,8 +8197,11 @@ var Plottable;
                 drawSteps.push({ attrToProjector: this._generateAttrToProjector(), animator: this._getAnimator(Plots.Animator.MAIN) });
                 return drawSteps;
             };
+            /**
+             * @deprecated As of release 1.1.0, replaced by _entityVisibleOnPlot()
+             */
             Scatter.prototype._visibleOnPlot = function (datum, pixelPoint, selection) {
-                Plottable.Utils.Window.deprecated("Scatter._visibleOnPlot()", "v1.1.0");
+                Plottable.Utils.Window.deprecated("Scatter._visibleOnPlot()", "v1.1.0", "replaced by _entityVisibleOnPlot()");
                 var xRange = { min: 0, max: this.width() };
                 var yRange = { min: 0, max: this.height() };
                 var translation = d3.transform(selection.attr("transform")).translate;
@@ -8513,8 +8521,11 @@ var Plottable;
                 });
                 return closest;
             };
+            /**
+             * @deprecated As of release 1.1.0, replaced by _entityVisibleOnPlot()
+             */
             Bar.prototype._visibleOnPlot = function (datum, pixelPoint, selection) {
-                Plottable.Utils.Window.deprecated("Bar._visibleOnPlot()", "v1.1.0");
+                Plottable.Utils.Window.deprecated("Bar._visibleOnPlot()", "v1.1.0", "replaced by _entityVisibleOnPlot()");
                 var xRange = { min: 0, max: this.width() };
                 var yRange = { min: 0, max: this.height() };
                 var barBBox = Plottable.Utils.DOM.elementBBox(selection);

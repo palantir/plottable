@@ -244,6 +244,8 @@ export module Formatters {
   }
 
   /**
+   * @deprecated As of release 1.3.0, not safe for use with time zones.
+   *
    * Creates a formatter for relative dates.
    *
    * @param {number} baseValue The start date (as epoch time) used in computing relative dates (default 0)
