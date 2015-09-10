@@ -338,4 +338,16 @@ module TestMethods {
       return "#" + redHex + greenHex + blueHex;
   }
 
+  export function assertWarns(fn: Function, warningMessage: string, assertMessage: string) {
+    let receivedWarning = "";
+    let oldWarn = Plottable.Utils.Window.warn;
+    Plottable.Utils.Window.warn = (msg: string) => receivedWarning = msg;
+    try {
+      fn.call(this);
+    } finally {
+      Plottable.Utils.Window.warn = oldWarn;
+    }
+    assert.include(receivedWarning, warningMessage, assertMessage);
+  }
+
 }
