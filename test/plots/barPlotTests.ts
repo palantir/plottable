@@ -785,7 +785,9 @@ describe("Plots", () => {
           let svgBounding = (<Element> svg[0][0]).getBoundingClientRect();
           let isLabelCutOff = (textBounding.top < svgBounding.top && textBounding.bottom > svgBounding.top)
             || (textBounding.top < svgBounding.bottom && textBounding.bottom > svgBounding.bottom);
-          assert.isTrue(isLabelCutOff, `label ${i} is partially cut off`);
+          let labelNotes = `label: { top: ${textBounding.top}, bottom: ${textBounding.bottom} }`;
+          let svgNotes = `svg:  top: ${svgBounding.top}, bottom: ${svgBounding.bottom} }`;
+          assert.isTrue(isLabelCutOff, `label ${i} is partially cut off ; ${labelNotes} ; ${svgNotes}`);
           assert.strictEqual(d3.select(this).style("visibility"), "hidden", `label ${i} is not visible`);
         });
         svg.remove();
