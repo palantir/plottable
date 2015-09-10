@@ -30,5 +30,4 @@ quicktests/overlaying/list_of_quicktests.json
 *.project
 
 # Visual Studio Code
-.settings/
-
+.vscode/
