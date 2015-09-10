@@ -6274,7 +6274,7 @@ var Plottable;
                             this._xScale.invert(this._boxBounds.bottomRight.x)]);
             };
             SelectionBoxLayer.prototype._setXExtent = function (xExtent) {
-                this._xExtent = [xExtent[0], xExtent[1]];
+                this._xExtent = xExtent;
             };
             SelectionBoxLayer.prototype.yExtent = function (yExtent) {
                 // Explicit typing for Typescript 1.4
@@ -6295,7 +6295,7 @@ var Plottable;
                             this._yScale.invert(this._boxBounds.bottomRight.y)]);
             };
             SelectionBoxLayer.prototype._setYExtent = function (yExtent) {
-                this._yExtent = [yExtent[0], yExtent[1]];
+                this._yExtent = yExtent;
             };
             SelectionBoxLayer.prototype.destroy = function () {
                 _super.prototype.destroy.call(this);
@@ -11842,7 +11842,8 @@ var Plottable;
             }
             XDragBoxLayer.prototype.computeLayout = function (origin, availableWidth, availableHeight) {
                 _super.prototype.computeLayout.call(this, origin, availableWidth, availableHeight);
-                this._setBounds(this.bounds()); // set correct bounds when width/height changes
+                // set correct bounds when width/height changes
+                this._setBounds(this.bounds());
                 return this;
             };
             XDragBoxLayer.prototype._setBounds = function (newBounds) {
@@ -11900,7 +11901,8 @@ var Plottable;
             }
             YDragBoxLayer.prototype.computeLayout = function (origin, availableWidth, availableHeight) {
                 _super.prototype.computeLayout.call(this, origin, availableWidth, availableHeight);
-                this._setBounds(this.bounds()); // set correct bounds when width/height changes
+                // set correct bounds when width/height changes
+                this._setBounds(this.bounds());
                 return this;
             };
             YDragBoxLayer.prototype._setBounds = function (newBounds) {

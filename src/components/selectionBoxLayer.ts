@@ -85,15 +85,15 @@ export module Components {
       return {
         topLeft: {
           x: this._xBoundsMode === PropertyMode.PIXEL ?
-               this._boxBounds.topLeft.x :
-               (this._xScale == null ?
-                 0 :
-                 Math.min(this.xScale().scale(this.xExtent()[0]), this.xScale().scale(this.xExtent()[1]))),
+            this._boxBounds.topLeft.x :
+            (this._xScale == null ?
+              0 :
+              Math.min(this.xScale().scale(this.xExtent()[0]), this.xScale().scale(this.xExtent()[1]))),
           y: this._yBoundsMode === PropertyMode.PIXEL ?
-               this._boxBounds.topLeft.y :
-               (this._yScale == null ?
-                 0 :
-                 Math.min(this.yScale().scale(this.yExtent()[0]), this.yScale().scale(this.yExtent()[1])))
+            this._boxBounds.topLeft.y :
+            (this._yScale == null ?
+              0 :
+              Math.min(this.yScale().scale(this.yExtent()[0]), this.yScale().scale(this.yExtent()[1])))
         },
         bottomRight: {
           x: this._xBoundsMode === PropertyMode.PIXEL ?
@@ -236,7 +236,7 @@ export module Components {
     }
 
     protected _setXExtent(xExtent: (number | { valueOf(): number })[]) {
-      this._xExtent = [xExtent[0], xExtent[1]];
+      this._xExtent = xExtent;
     }
 
     /**
@@ -270,7 +270,7 @@ export module Components {
     }
 
     protected _setYExtent(yExtent: (number | { valueOf(): number })[]) {
-      this._yExtent = [yExtent[0], yExtent[1]];
+      this._yExtent = yExtent;
     }
 
     public destroy() {
