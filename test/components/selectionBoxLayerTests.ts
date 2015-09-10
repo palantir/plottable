@@ -170,7 +170,7 @@ describe("Interactive Components", () => {
         sbl.boxVisible(true);
         sbl.xScale(xScale);
 
-        assert.deepEqual(sbl.xExtent(), [undefined, undefined], "xExtent is not set unless an xScale is set");
+        assert.deepEqual(sbl.xExtent(), [undefined, undefined], "xExtent is not set");
         let xExtent = [100, 250];
         assert.strictEqual(sbl.xExtent(xExtent), sbl, "returns calling object");
 
@@ -207,7 +207,7 @@ describe("Interactive Components", () => {
           }
         };
         sbl.bounds(bounds);
-        assert.deepEqual(sbl.bounds(), bounds, "latest bounds set");
+        assert.deepEqual(sbl.bounds(), bounds, "bounds set");
         let xExtent = [100, 250];
         assert.strictEqual(sbl.xExtent(xExtent), sbl, "returns calling object");
 
@@ -230,7 +230,7 @@ describe("Interactive Components", () => {
         assert.strictEqual(sbl.bounds().topLeft.x, xScale.scale(xExtent[0]), "left pixel position adjusts accordingly");
         assert.strictEqual(sbl.bounds().bottomRight.x, xScale.scale(xExtent[1]), "right pixel position adjusts accordingly");
 
-        let xScale2 = new Plottable.Scales.Linear();
+        let xScale2 = new Plottable.Scales.ModifiedLog();
         xScale2.domain([0, 1000]);
         xScale2.range([0, svgHeight]);
 
@@ -296,7 +296,7 @@ describe("Interactive Components", () => {
         sbl.boxVisible(true);
         sbl.yScale(yScale);
 
-        assert.deepEqual(sbl.yExtent(), [undefined, undefined], "yExtent is not set unless an yScale is set");
+        assert.deepEqual(sbl.yExtent(), [undefined, undefined], "yExtent is not set");
         let yExtent = [0, 300];
         assert.strictEqual(sbl.yExtent(yExtent), sbl, "returns calling object");
 
@@ -333,7 +333,7 @@ describe("Interactive Components", () => {
           }
         };
         sbl.bounds(bounds);
-        assert.deepEqual(sbl.bounds(), bounds, "latest bounds set");
+        assert.deepEqual(sbl.bounds(), bounds, "bounds set");
         let yExtent = [100, 250];
         assert.strictEqual(sbl.yExtent(yExtent), sbl, "returns calling object");
 
@@ -356,7 +356,7 @@ describe("Interactive Components", () => {
         assert.strictEqual(sbl.bounds().topLeft.y, yScale.scale(yExtent[0]), "top pixel position adjusts accordingly");
         assert.strictEqual(sbl.bounds().bottomRight.y, yScale.scale(yExtent[1]), "bottom pixel position adjusts accordingly");
 
-        let yScale2 = new Plottable.Scales.Linear();
+        let yScale2 = new Plottable.Scales.ModifiedLog();
         yScale2.domain([0, 1000]);
         yScale2.range([0, svgHeight]);
 
