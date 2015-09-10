@@ -782,7 +782,7 @@ describe("Plots", () => {
 
         texts.each(function(d, i) {
           let textBounding = (<Element> this).getBoundingClientRect();
-          let svgBounding = (<Element> svg[0][0]).getBoundingClientRect();
+          let svgBounding = (<Element> barPlot.background().node()).getBoundingClientRect();
           let isLabelCutOff = (textBounding.top < svgBounding.top && textBounding.bottom > svgBounding.top)
             || (textBounding.top < svgBounding.bottom && textBounding.bottom > svgBounding.bottom);
           assert.isTrue(isLabelCutOff, `label ${i} is partially cut off`);
