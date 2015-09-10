@@ -127,14 +127,6 @@ export module Interactions {
         return { x: (point.x - oldPoints[i].x) / magnifyAmount, y: (point.y - oldPoints[i].y) / magnifyAmount };
       });
 
-      this.xScales().forEach((xScale) => {
-        magnifyAmount = this._constrainedZoomAmountUsingExtent(xScale, magnifyAmount);
-      });
-
-      this.yScales().forEach((yScale) => {
-        magnifyAmount = this._constrainedZoomAmountUsingExtent(yScale, magnifyAmount);
-      });
-
       let oldCenterPoint = PanZoom._centerPoint(oldPoints[0], oldPoints[1]);
 
       let constrainedPinchAmountUsingValueLimits = (scale: QuantitativeScale<any>, center: number) => {
@@ -158,10 +150,12 @@ export module Interactions {
       };
 
       this.xScales().forEach((xScale) => {
+        magnifyAmount = this._constrainedZoomAmountUsingExtent(xScale, magnifyAmount);
         constrainedPinchAmountUsingValueLimits(xScale, oldCenterPoint.x);
       });
 
       this.yScales().forEach((yScale) => {
+        magnifyAmount = this._constrainedZoomAmountUsingExtent(yScale, magnifyAmount);
         constrainedPinchAmountUsingValueLimits(yScale, oldCenterPoint.y);
       });
 

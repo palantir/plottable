@@ -11477,12 +11477,6 @@ var Plottable;
                 var normalizedPointDiffs = points.map(function (point, i) {
                     return { x: (point.x - oldPoints[i].x) / magnifyAmount, y: (point.y - oldPoints[i].y) / magnifyAmount };
                 });
-                this.xScales().forEach(function (xScale) {
-                    magnifyAmount = _this._constrainedZoomAmountUsingExtent(xScale, magnifyAmount);
-                });
-                this.yScales().forEach(function (yScale) {
-                    magnifyAmount = _this._constrainedZoomAmountUsingExtent(yScale, magnifyAmount);
-                });
                 var oldCenterPoint = PanZoom._centerPoint(oldPoints[0], oldPoints[1]);
                 var constrainedPinchAmountUsingValueLimits = function (scale, center) {
                     if (magnifyAmount <= 1) {
@@ -11502,9 +11496,11 @@ var Plottable;
                     magnifyAmount = Math.min(magnifyAmount, (minDomainValue - centerDataValue) / (minDomain - centerDataValue), (maxDomainValue - centerDataValue) / (maxDomain - centerDataValue));
                 };
                 this.xScales().forEach(function (xScale) {
+                    magnifyAmount = _this._constrainedZoomAmountUsingExtent(xScale, magnifyAmount);
                     constrainedPinchAmountUsingValueLimits(xScale, oldCenterPoint.x);
                 });
                 this.yScales().forEach(function (yScale) {
+                    magnifyAmount = _this._constrainedZoomAmountUsingExtent(yScale, magnifyAmount);
                     constrainedPinchAmountUsingValueLimits(yScale, oldCenterPoint.y);
                 });
                 var constrainedPoints = oldPoints.map(function (oldPoint, i) {
