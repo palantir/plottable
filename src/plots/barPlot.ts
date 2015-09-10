@@ -452,7 +452,7 @@ export module Plots {
       let labelsTooWide = false;
       this.datasets().forEach((dataset) => labelsTooWide = labelsTooWide || this._drawLabel(dataToDraw.get(dataset), dataset));
       if (this._hideBarsIfAnyAreTooWide && labelsTooWide) {
-         this.datasets().forEach((dataset) => this._labelConfig.get(dataset).labelArea.selectAll("g").remove());
+        this.datasets().forEach((dataset) => this._labelConfig.get(dataset).labelArea.selectAll("g").remove());
       }
     }
 

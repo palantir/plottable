@@ -776,15 +776,18 @@ describe("Plots", () => {
 
       it("hides labels that are partially cut off in y", () => {
         yScale.domain([1, 2]);
-        let texts = svg.selectAll("text");
+        let texts = barPlot.content().selectAll("text");
 
         assert.strictEqual(texts.size(), 2, "There should be two labels rendered");
 
-        let label1 = d3.select(texts[0][0]);
-        let label2 = d3.select(texts[0][1]);
-
-        assert.strictEqual(label1.style("visibility"), "hidden", "label 1 is not visible");
-        assert.strictEqual(label2.style("visibility"), "hidden", "label 2 is not visible");
+        texts.each(function(d, i) {
+          let textBounding = (<Element> this).getBoundingClientRect();
+          let svgBounding = (<Element> svg[0][0]).getBoundingClientRect();
+          let isLabelCutOff = (textBounding.top < svgBounding.top && textBounding.bottom > svgBounding.top)
+            || (textBounding.top < svgBounding.bottom && textBounding.bottom > svgBounding.bottom);
+          assert.isTrue(isLabelCutOff, `label ${i} is partially cut off`);
+          assert.strictEqual(d3.select(this).style("visibility"), "hidden", `label ${i} is not visible`);
+        });
         svg.remove();
       });
     });
