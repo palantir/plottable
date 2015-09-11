@@ -116,6 +116,14 @@ describe("Interactive Components", () => {
         dbl.onDrag(() => onDragCallbackCalled = true);
         dbl.onDragEnd(() => onDragEndcallbackCalled = true);
 
+        TestMethods.triggerFakeDragSequence(target, quarterPoint, halfPoint);
+        assert.isTrue(onDragStartCallbackCalled, "onDragStart callback is called");
+        assert.isTrue(onDragCallbackCalled, "onDrag callback is called");
+        assert.isTrue(onDragEndcallbackCalled, "onDragEnd callback is called");
+
+        onDragStartCallbackCalled = false;
+        onDragCallbackCalled = false;
+        onDragEndcallbackCalled = false;
         dbl.destroy();
         TestMethods.triggerFakeDragSequence(target, quarterPoint, halfPoint);
 
