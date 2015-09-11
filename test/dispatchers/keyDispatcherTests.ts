@@ -2,50 +2,53 @@
 
 describe("Dispatchers", () => {
   describe("Key Dispatcher", () => {
-    it("triggers callback on keydown", () => {
-      let ked = Plottable.Dispatchers.Key.getDispatcher();
-      let keyCodeToSend = 65;
-      let keyDowned = false;
-      let body = d3.select("body");
-      let callback = (code: number, e: KeyboardEvent) => {
-        keyDowned = true;
-        assert.strictEqual(code, keyCodeToSend, "correct keycode was passed");
-        assert.isNotNull(e, "key event was passed to the callback");
-      };
 
-      ked.onKeyDown(callback);
+    describe("Basic usage", () => {
+      it("triggers callback on keydown", () => {
+        let ked = Plottable.Dispatchers.Key.getDispatcher();
+        let keyCodeToSend = 65;
+        let keyDowned = false;
+        let body = d3.select("body");
+        let callback = (code: number, e: KeyboardEvent) => {
+          keyDowned = true;
+          assert.strictEqual(code, keyCodeToSend, "correct keycode was passed");
+          assert.isNotNull(e, "key event was passed to the callback");
+        };
 
-      TestMethods.triggerFakeKeyboardEvent("keydown", body, keyCodeToSend);
-      assert.isTrue(keyDowned, "callback when a key was pressed");
+        ked.onKeyDown(callback);
 
-      ked.offKeyDown(callback);
+        TestMethods.triggerFakeKeyboardEvent("keydown", body, keyCodeToSend);
+        assert.isTrue(keyDowned, "callback when a key was pressed");
 
-      keyDowned = false;
-      TestMethods.triggerFakeKeyboardEvent("keydown", body, keyCodeToSend);
-      assert.isFalse(keyDowned, "nothing happens when a key was pressed");
-    });
+        ked.offKeyDown(callback);
 
-    it("triggers callback on keyup", () => {
-      let ked = Plottable.Dispatchers.Key.getDispatcher();
-      let keyCodeToSend = 65;
-      let keyUped = false;
-      let body = d3.select("body");
-      let callback = (code: number, e: KeyboardEvent) => {
-        keyUped = true;
-        assert.strictEqual(code, keyCodeToSend, "correct keycode was passed");
-        assert.isNotNull(e, "key event was passed to the callback");
-      };
+        keyDowned = false;
+        TestMethods.triggerFakeKeyboardEvent("keydown", body, keyCodeToSend);
+        assert.isFalse(keyDowned, "nothing happens when a key was pressed");
+      });
 
-      ked.onKeyUp(callback);
+      it("triggers callback on keyup", () => {
+        let ked = Plottable.Dispatchers.Key.getDispatcher();
+        let keyCodeToSend = 65;
+        let keyUped = false;
+        let body = d3.select("body");
+        let callback = (code: number, e: KeyboardEvent) => {
+          keyUped = true;
+          assert.strictEqual(code, keyCodeToSend, "correct keycode was passed");
+          assert.isNotNull(e, "key event was passed to the callback");
+        };
 
-      TestMethods.triggerFakeKeyboardEvent("keyup", body, keyCodeToSend);
-      assert.isTrue(keyUped, "callback when a key was release");
+        ked.onKeyUp(callback);
 
-      ked.offKeyUp(callback);
+        TestMethods.triggerFakeKeyboardEvent("keyup", body, keyCodeToSend);
+        assert.isTrue(keyUped, "callback when a key was release");
 
-      keyUped = false;
-      TestMethods.triggerFakeKeyboardEvent("keyup", body, keyCodeToSend);
-      assert.isFalse(keyUped, "nothing happens when a key was release");
+        ked.offKeyUp(callback);
+
+        keyUped = false;
+        TestMethods.triggerFakeKeyboardEvent("keyup", body, keyCodeToSend);
+        assert.isFalse(keyUped, "nothing happens when a key was release");
+      });
     });
   });
 });
