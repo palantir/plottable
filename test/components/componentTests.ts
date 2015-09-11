@@ -66,21 +66,21 @@ describe("Component", () => {
       svg.remove();
     });
 
-      it("can undergo set behavior upon anchoring", () => {
-        let callbackCalled = false;
-        let passedComponent: Plottable.Component;
-        let callback = (component: Plottable.Component) => {
-          callbackCalled = true;
-          passedComponent = component;
-        };
-        assert.strictEqual(c.onAnchor(callback), c, "setter returns calling object");
-        c.anchor(svg);
-        assert.isTrue(callbackCalled, "callback was called on anchoring");
-        assert.strictEqual(passedComponent, c, "callback was passed anchored Component");
+    it("can undergo set behavior upon anchoring", () => {
+      let callbackCalled = false;
+      let passedComponent: Plottable.Component;
+      let callback = (component: Plottable.Component) => {
+        callbackCalled = true;
+        passedComponent = component;
+      };
+      assert.strictEqual(c.onAnchor(callback), c, "setter returns calling object");
+      c.anchor(svg);
+      assert.isTrue(callbackCalled, "callback was called on anchoring");
+      assert.strictEqual(passedComponent, c, "callback was passed anchored Component");
 
-        c.destroy();
-        svg.remove();
-      });
+      c.destroy();
+      svg.remove();
+    });
 
     it("undergoes on-anchor behavior if already anchored", () => {
       let callbackCalled = false;
