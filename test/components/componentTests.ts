@@ -1,16 +1,19 @@
 ///<reference path="../testReference.ts" />
 
 describe("Component", () => {
-  let c: Plottable.Component;
   let SVG_WIDTH = 400;
   let SVG_HEIGHT = 300;
-  let svg: d3.Selection<void>;
-  beforeEach(() => {
-    c = new Plottable.Component();
-    svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
-  });
 
   describe("anchoring", () => {
+
+    let c: Plottable.Component;
+    let svg: d3.Selection<void>;
+
+    beforeEach(() => {
+      c = new Plottable.Component();
+      svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+    });
+
     it("adds itself as a child element of the input selection", () => {
       assert.strictEqual(c.anchor(svg), c, "setter returns calling object");
       assert.strictEqual(Plottable.Utils.DOM.boundingSVG(<SVGElement> c.content().node()),
@@ -134,6 +137,15 @@ describe("Component", () => {
   });
 
   describe("detaching", () => {
+
+    let c: Plottable.Component;
+    let svg: d3.Selection<void>;
+
+    beforeEach(() => {
+      c = new Plottable.Component();
+      svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+    });
+
     it("can remove its own DOM elements", () => {
       c.renderTo(svg);
       assert.isTrue((<Node> svg.node()).hasChildNodes(), "the svg has children");
@@ -208,6 +220,15 @@ describe("Component", () => {
   });
 
   describe("parent container", () => {
+
+    let c: Plottable.Component;
+    let svg: d3.Selection<void>;
+
+    beforeEach(() => {
+      c = new Plottable.Component();
+      svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+    });
+
     it("can set its parent to a container that contains this component", () => {
       let acceptingContainer: any = {
         has: () => true
@@ -231,6 +252,15 @@ describe("Component", () => {
   });
 
   describe("css classes", () => {
+
+    let c: Plottable.Component;
+    let svg: d3.Selection<void>;
+
+    beforeEach(() => {
+      c = new Plottable.Component();
+      svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+    });
+
     it("can add css classes", () => {
       let className = "foo";
       assert.strictEqual(c.addClass(className), c, "setter returns calling object");
@@ -261,6 +291,15 @@ describe("Component", () => {
   });
 
   describe("computing the layout", () => {
+
+    let c: Plottable.Component;
+    let svg: d3.Selection<void>;
+
+    beforeEach(() => {
+      c = new Plottable.Component();
+      svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+    });
+
     it("defaults to take up all space", () => {
       assert.isFalse(c.fixedWidth(), "will take all available width");
       assert.isFalse(c.fixedHeight(), "will take all available height");
@@ -438,6 +477,15 @@ describe("Component", () => {
   });
 
   describe("aligning", () => {
+
+    let c: Plottable.Component;
+    let svg: d3.Selection<void>;
+
+    beforeEach(() => {
+      c = new Plottable.Component();
+      svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+    });
+
     it("defaults to a top and left alignment", () => {
       assert.strictEqual(c.xAlignment(), Plottable.Components.Alignment.LEFT, "x alignment defaults to \"left\"");
       assert.strictEqual(c.yAlignment(), Plottable.Components.Alignment.TOP, "y alignment defaults to \"top\"");
@@ -502,6 +550,15 @@ describe("Component", () => {
   });
 
   describe("calculating the minimum requested space", () => {
+
+    let c: Plottable.Component;
+    let svg: d3.Selection<void>;
+
+    beforeEach(() => {
+      c = new Plottable.Component();
+      svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+    });
+
     it("does not request any space when offered a width and a height", () => {
       let offeredWidth = 1;
       let offeredHeight = 1;
@@ -513,6 +570,15 @@ describe("Component", () => {
   });
 
   describe("destroying", () => {
+
+    let c: Plottable.Component;
+    let svg: d3.Selection<void>;
+
+    beforeEach(() => {
+      c = new Plottable.Component();
+      svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+    });
+
     it("cannot reanchor if destroyed", () => {
       c.renderTo(svg);
       c.destroy();
@@ -535,6 +601,15 @@ describe("Component", () => {
   });
 
   describe("rendering on the anchored svg", () => {
+
+    let c: Plottable.Component;
+    let svg: d3.Selection<void>;
+
+    beforeEach(() => {
+      c = new Plottable.Component();
+      svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+    });
+
     it("performs all of the same operations as renderImmediately()", () => {
       let renderFlag = false;
       let c = new Plottable.Component();
@@ -581,10 +656,14 @@ describe("Component", () => {
 
   describe("rendering to a DOM node", () => {
 
+    let c: Plottable.Component;
+    let svg: d3.Selection<void>;
     let renderFlag: boolean;
 
     beforeEach(() => {
       renderFlag = false;
+      c = new Plottable.Component();
+      svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
       c.renderImmediately = () => {
         renderFlag = true;
         return this;
@@ -665,6 +744,15 @@ describe("Component", () => {
   });
 
   describe("calculating the origin in relation to the svg", () => {
+
+    let c: Plottable.Component;
+    let svg: d3.Selection<void>;
+
+    beforeEach(() => {
+      c = new Plottable.Component();
+      svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+    });
+
     it("returns origin without a parent", () => {
       assert.deepEqual(c.originToSVG(), c.origin(), "same as origin with no parent");
       c.destroy();
@@ -689,6 +777,15 @@ describe("Component", () => {
   });
 
   describe("restricting rendering through clipPath", () => {
+
+    let c: Plottable.Component;
+    let svg: d3.Selection<void>;
+
+    beforeEach(() => {
+      c = new Plottable.Component();
+      svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+    });
+
     it("generates a clipPath element if it is enabled", () => {
       (<any> c)._clipPathEnabled = true;
       c.anchor(svg);
