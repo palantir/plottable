@@ -1,7 +1,7 @@
 ///<reference path="../testReference.ts" />
 
 describe("Interactions", () => {
-  describe("Pointer", () => {
+  describe("Pointer Interaction", () => {
     let SVG_WIDTH = 400;
     let SVG_HEIGHT = 400;
 

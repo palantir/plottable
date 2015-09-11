@@ -1,7 +1,7 @@
 ///<reference path="../testReference.ts" />
 
 describe("Interactions", () => {
-  describe("PanZoomInteraction", () => {
+  describe("PanZoom Interaction", () => {
 
     describe("Scale setting", () => {
       let xScale: Plottable.QuantitativeScale<number>;
@@ -356,11 +356,7 @@ describe("Interactions", () => {
       });
 
       it("can't set minDomainExtent() be larger than maxDomainExtent() for the same Scale", () => {
-        let minimumDomainExtent = SVG_WIDTH / 4;
-        // panZoomInteraction.minDomainExtent(xScale, minimumDomainExtent);
-
-
-        let maximumDomainExtent = minimumDomainExtent * 2;
+        let maximumDomainExtent = SVG_WIDTH / 2;
         panZoomInteraction.maxDomainExtent(xScale, maximumDomainExtent);
 
         let tooBigMinimumDomainExtent = maximumDomainExtent * 2;
@@ -453,11 +449,7 @@ describe("Interactions", () => {
       });
 
       it("can't set maxDomainExtent() to be smaller than minDomainExtent() for the same Scale", () => {
-        let maximumDomainExtent = SVG_WIDTH;
-        panZoomInteraction.maxDomainExtent(xScale, maximumDomainExtent);
-
-
-        let minimumDomainExtent = maximumDomainExtent / 2;
+        let minimumDomainExtent = SVG_WIDTH / 2;
         panZoomInteraction.minDomainExtent(xScale, minimumDomainExtent);
         let tooSmallMaximumDomainExtent = minimumDomainExtent / 2;
         (<any>assert).throws(() => panZoomInteraction.maxDomainExtent(xScale, tooSmallMaximumDomainExtent), Error,
