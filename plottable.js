@@ -12255,12 +12255,9 @@ var Plottable;
             };
             XDragBoxLayer.prototype.yScale = function (yScale) {
                 if (yScale == null) {
-                    throw new Error("XDragBoxLayer has no yScale");
+                    return _super.prototype.yScale.call(this);
                 }
                 throw new Error("yScales cannot be set on an XDragBoxLayer");
-            };
-            XDragBoxLayer.prototype.yExtent = function () {
-                throw new Error("XDragBoxLayer has no yExtent");
             };
             return XDragBoxLayer;
         })(Components.DragBoxLayer);
@@ -12313,12 +12310,9 @@ var Plottable;
             };
             YDragBoxLayer.prototype.xScale = function (xScale) {
                 if (xScale == null) {
-                    throw new Error("YDragBoxLayer has no xScale");
+                    return _super.prototype.xScale.call(this);
                 }
                 throw new Error("xScales cannot be set on an YDragBoxLayer");
-            };
-            YDragBoxLayer.prototype.xExtent = function () {
-                throw new Error("YDragBoxLayer has no xExtent");
             };
             return YDragBoxLayer;
         })(Components.DragBoxLayer);
