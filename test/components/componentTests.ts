@@ -441,47 +441,50 @@ describe("Component", () => {
       c.destroy();
       svg.remove();
     });
+  });
 
-    describe("on fixed size components", () => {
-      let fixedWidth = 100;
-      let fixedHeight = 100;
+  describe("computing the layout when of fixed size", () => {
 
-      beforeEach(() => {
-        c.destroy();
-        c = new Mocks.FixedSizeComponent(fixedWidth, fixedHeight);
-        c.anchor(svg);
-      });
+    let c: Plottable.Component;
+    let svg: d3.Selection<void>;
+    let fixedWidth = 100;
+    let fixedHeight = 100;
 
-      it("gives the component the fixed space if offered more space", () => {
-        c.computeLayout();
-        assert.strictEqual(c.width(), fixedWidth, "width bounded to fixed width");
-        assert.strictEqual(c.height(), fixedHeight, "height bounded to fixed height");
-        c.destroy();
-        svg.remove();
-      });
+    beforeEach(() => {
+      c = new Mocks.FixedSizeComponent(fixedWidth, fixedHeight);
+      svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+      c.anchor(svg);
+    });
 
-      it("gives the component the offered space if it is less than the fixed space", () => {
-        let restrictedWidth = fixedWidth / 2;
-        let restrictedHeight = fixedHeight / 2;
-        c.computeLayout({x: 0, y: 0}, restrictedWidth, restrictedHeight);
-        assert.strictEqual(c.width(), restrictedWidth, "width bounded to restricted width");
-        assert.strictEqual(c.height(), restrictedHeight, "height bounded to restricted height");
-        c.destroy();
-        svg.remove();
-      });
+    it("gives the component the fixed space if offered more space", () => {
+      c.computeLayout();
+      assert.strictEqual(c.width(), fixedWidth, "width bounded to fixed width");
+      assert.strictEqual(c.height(), fixedHeight, "height bounded to fixed height");
+      c.destroy();
+      svg.remove();
+    });
 
-      it("does not translate if more space was requested than offered", () => {
-        let requestedWidth = SVG_WIDTH * 2;
-        let requestedHeight = SVG_HEIGHT * 2;
-        c.destroy();
-        c = new Mocks.FixedSizeComponent(requestedWidth, requestedHeight);
-        let t = new Plottable.Components.Table([[c]]);
-        t.renderTo(svg);
+    it("gives the component the offered space if it is less than the fixed space", () => {
+      let restrictedWidth = fixedWidth / 2;
+      let restrictedHeight = fixedHeight / 2;
+      c.computeLayout({x: 0, y: 0}, restrictedWidth, restrictedHeight);
+      assert.strictEqual(c.width(), restrictedWidth, "width bounded to restricted width");
+      assert.strictEqual(c.height(), restrictedHeight, "height bounded to restricted height");
+      c.destroy();
+      svg.remove();
+    });
 
-        let componentElement = svg.select(".component");
-        assert.deepEqual(TestMethods.getTranslate(componentElement), [0, 0], "the element was not translated");
-        svg.remove();
-      });
+    it("does not translate if more space was requested than offered", () => {
+      let requestedWidth = SVG_WIDTH * 2;
+      let requestedHeight = SVG_HEIGHT * 2;
+      c.destroy();
+      c = new Mocks.FixedSizeComponent(requestedWidth, requestedHeight);
+      let t = new Plottable.Components.Table([[c]]);
+      t.renderTo(svg);
+
+      let componentElement = svg.select(".component");
+      assert.deepEqual(TestMethods.getTranslate(componentElement), [0, 0], "the element was not translated");
+      svg.remove();
     });
   });
 
@@ -524,37 +527,41 @@ describe("Component", () => {
       c.destroy();
       svg.remove();
     });
+  });
 
-    describe("on fixed size components", () => {
-      let fixedWidth = 100;
-      let fixedHeight = 100;
+  describe("aligning when of fixed size", () => {
 
-      beforeEach(() => {
-        TestMethods.fixComponentSize(c, fixedWidth, fixedHeight);
-        c.anchor(svg);
-      });
+    let c: Plottable.Component;
+    let svg: d3.Selection<void>;
+    let fixedWidth = 100;
+    let fixedHeight = 100;
 
-      it("translates the origin in accordance with alignment", () => {
-        c.xAlignment(Plottable.Components.Alignment.LEFT)
-         .yAlignment(Plottable.Components.Alignment.TOP);
-        c.computeLayout();
-        let expectedOrigin = {x: 0, y: 0};
-        assert.deepEqual(c.origin(), expectedOrigin, "top-left component aligns correctly");
+    beforeEach(() => {
+      c = new Mocks.FixedSizeComponent(fixedWidth, fixedHeight);
+      svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+      c.anchor(svg);
+    });
 
-        c.xAlignment(Plottable.Components.Alignment.CENTER)
-         .yAlignment(Plottable.Components.Alignment.CENTER);
-        c.computeLayout();
-        expectedOrigin = {x: SVG_WIDTH / 2 - fixedWidth / 2, y: SVG_HEIGHT / 2 - fixedHeight / 2};
-        assert.deepEqual(c.origin(), expectedOrigin, "center component aligns correctly");
+    it("translates the origin in accordance with alignment", () => {
+      c.xAlignment(Plottable.Components.Alignment.LEFT)
+        .yAlignment(Plottable.Components.Alignment.TOP);
+      c.computeLayout();
+      let expectedOrigin = {x: 0, y: 0};
+      assert.deepEqual(c.origin(), expectedOrigin, "top-left component aligns correctly");
 
-        c.xAlignment(Plottable.Components.Alignment.RIGHT)
-         .yAlignment(Plottable.Components.Alignment.BOTTOM);
-        c.computeLayout();
-        expectedOrigin = {x: SVG_WIDTH - fixedWidth, y: SVG_HEIGHT - fixedHeight};
-        assert.deepEqual(c.origin(), expectedOrigin, "bottom-right component aligns correctly");
-        c.destroy();
-        svg.remove();
-      });
+      c.xAlignment(Plottable.Components.Alignment.CENTER)
+        .yAlignment(Plottable.Components.Alignment.CENTER);
+      c.computeLayout();
+      expectedOrigin = {x: SVG_WIDTH / 2 - fixedWidth / 2, y: SVG_HEIGHT / 2 - fixedHeight / 2};
+      assert.deepEqual(c.origin(), expectedOrigin, "center component aligns correctly");
+
+      c.xAlignment(Plottable.Components.Alignment.RIGHT)
+        .yAlignment(Plottable.Components.Alignment.BOTTOM);
+      c.computeLayout();
+      expectedOrigin = {x: SVG_WIDTH - fixedWidth, y: SVG_HEIGHT - fixedHeight};
+      assert.deepEqual(c.origin(), expectedOrigin, "bottom-right component aligns correctly");
+      c.destroy();
+      svg.remove();
     });
   });
 
