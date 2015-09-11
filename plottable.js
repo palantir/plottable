@@ -1,5 +1,5 @@
 /*!
-Plottable 1.10.0 (https://github.com/palantir/plottable)
+Plottable 1.11.0 (https://github.com/palantir/plottable)
 Copyright 2014-2015 Palantir Technologies
 Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
 */
@@ -909,7 +909,7 @@ var Plottable;
 ///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
-    Plottable.version = "1.10.0";
+    Plottable.version = "1.11.0";
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
@@ -1385,6 +1385,8 @@ var Plottable;
         }
         Formatters.time = time;
         /**
+         * @deprecated As of release v1.3.0, not safe for use with time zones.
+         *
          * Creates a formatter for relative dates.
          *
          * @param {number} baseValue The start date (as epoch time) used in computing relative dates (default 0)
@@ -1397,7 +1399,7 @@ var Plottable;
             if (baseValue === void 0) { baseValue = 0; }
             if (increment === void 0) { increment = Plottable.MILLISECONDS_IN_ONE_DAY; }
             if (label === void 0) { label = ""; }
-            Plottable.Utils.Window.deprecated("relativeDate()", "1.3", "Not safe for use with time zones.");
+            Plottable.Utils.Window.deprecated("relativeDate()", "v1.3.0", "Not safe for use with time zones.");
             return function (d) {
                 var relativeDate = Math.round((d.valueOf() - baseValue) / increment);
                 return relativeDate.toString() + label;
@@ -7117,8 +7119,11 @@ var Plottable;
             });
             return this._lightweightPlotEntityToPlotEntity(closestPointEntity);
         };
+        /**
+         * @deprecated As of release v1.1.0, replaced by _entityVisibleOnPlot()
+         */
         Plot.prototype._visibleOnPlot = function (datum, pixelPoint, selection) {
-            Plottable.Utils.Window.deprecated("Plot._visibleOnPlot()", "v1.1.0");
+            Plottable.Utils.Window.deprecated("Plot._visibleOnPlot()", "v1.1.0", "replaced by _entityVisibleOnPlot()");
             return !(pixelPoint.x < 0 || pixelPoint.y < 0 ||
                 pixelPoint.x > this.width() || pixelPoint.y > this.height());
         };
@@ -8192,8 +8197,11 @@ var Plottable;
                 drawSteps.push({ attrToProjector: this._generateAttrToProjector(), animator: this._getAnimator(Plots.Animator.MAIN) });
                 return drawSteps;
             };
+            /**
+             * @deprecated As of release v1.1.0, replaced by _entityVisibleOnPlot()
+             */
             Scatter.prototype._visibleOnPlot = function (datum, pixelPoint, selection) {
-                Plottable.Utils.Window.deprecated("Scatter._visibleOnPlot()", "v1.1.0");
+                Plottable.Utils.Window.deprecated("Scatter._visibleOnPlot()", "v1.1.0", "replaced by _entityVisibleOnPlot()");
                 var xRange = { min: 0, max: this.width() };
                 var yRange = { min: 0, max: this.height() };
                 var translation = d3.transform(selection.attr("transform")).translate;
@@ -8513,8 +8521,11 @@ var Plottable;
                 });
                 return closest;
             };
+            /**
+             * @deprecated As of release v1.1.0, replaced by _entityVisibleOnPlot()
+             */
             Bar.prototype._visibleOnPlot = function (datum, pixelPoint, selection) {
-                Plottable.Utils.Window.deprecated("Bar._visibleOnPlot()", "v1.1.0");
+                Plottable.Utils.Window.deprecated("Bar._visibleOnPlot()", "v1.1.0", "replaced by _entityVisibleOnPlot()");
                 var xRange = { min: 0, max: this.width() };
                 var yRange = { min: 0, max: this.height() };
                 var barBBox = Plottable.Utils.DOM.elementBBox(selection);
@@ -8611,10 +8622,13 @@ var Plottable;
                     return extents;
                 }
                 var scale = accScaleBinding.scale;
-                extents = extents.map(function (extent) { return [
+                // To account for inverted domains
+                extents = extents.map(function (extent) { return d3.extent([
                     scale.invert(scale.scale(extent[0]) - _this._barPixelWidth / 2),
-                    scale.invert(scale.scale(extent[1]) + _this._barPixelWidth / 2),
-                ]; });
+                    scale.invert(scale.scale(extent[0]) + _this._barPixelWidth / 2),
+                    scale.invert(scale.scale(extent[1]) - _this._barPixelWidth / 2),
+                    scale.invert(scale.scale(extent[1]) + _this._barPixelWidth / 2)
+                ]); });
                 return extents;
             };
             Bar.prototype._drawLabels = function () {
@@ -8672,6 +8686,7 @@ var Plottable;
                             labelPosition.x = x + w / 2 - measurement.width / 2;
                         }
                         else {
+                            labelPosition.y = y + h / 2 - measurement.height / 2;
                             if (!positive) {
                                 labelPosition.x = x + w - measurement.width;
                             }

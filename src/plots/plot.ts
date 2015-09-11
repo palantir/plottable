@@ -544,8 +544,11 @@ export class Plot extends Component {
     return this._lightweightPlotEntityToPlotEntity(closestPointEntity);
   }
 
+  /**
+   * @deprecated As of release v1.1.0, replaced by _entityVisibleOnPlot()
+   */
   protected _visibleOnPlot(datum: any, pixelPoint: Point, selection: d3.Selection<void>): boolean {
-    Utils.Window.deprecated("Plot._visibleOnPlot()", "v1.1.0");
+    Utils.Window.deprecated("Plot._visibleOnPlot()", "v1.1.0", "replaced by _entityVisibleOnPlot()");
     return !(pixelPoint.x < 0 || pixelPoint.y < 0 ||
       pixelPoint.x > this.width() || pixelPoint.y > this.height());
   }

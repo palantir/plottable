@@ -724,20 +724,20 @@ describe("Plots", () => {
 
     describe("Horizontal Bar Plot label visibility", () => {
       let svg: d3.Selection<void>;
-      let yScale: Plottable.Scales.Category;
+      let yScale: Plottable.Scales.Linear;
       let xScale: Plottable.Scales.Linear;
-      let barPlot: Plottable.Plots.Bar<number, string>;
+      let barPlot: Plottable.Plots.Bar<number, number>;
       beforeEach(() => {
         svg = TestMethods.generateSVG(600, 400);
-        yScale = new Plottable.Scales.Category().domain(["A", "B"]);
+        yScale = new Plottable.Scales.Linear();
         xScale = new Plottable.Scales.Linear();
 
         let data = [
-          {y: "A", x: -1.5},
-          {y: "B", x: 1},
+          {y: 1, x: -1.5},
+          {y: 2, x: 1},
         ];
 
-        barPlot = new Plottable.Plots.Bar<number, string>(Plottable.Plots.Bar.ORIENTATION_HORIZONTAL);
+        barPlot = new Plottable.Plots.Bar<number, number>(Plottable.Plots.Bar.ORIENTATION_HORIZONTAL);
         barPlot.addDataset(new Plottable.Dataset(data));
         barPlot.x((d) => d.x, xScale);
         barPlot.y((d) => d.y, yScale);
@@ -771,6 +771,69 @@ describe("Plots", () => {
 
         assert.strictEqual(label1.style("visibility"), "hidden", "label 2 is not visible");
         assert.include(["visible", "inherit"], label2.style("visibility"), "label 1 is visible");
+        svg.remove();
+      });
+
+      it("hides labels that are partially cut off in y", () => {
+        yScale.domain([1, 2]);
+        let texts = barPlot.content().selectAll("text");
+
+        assert.strictEqual(texts.size(), 2, "There should be two labels rendered");
+
+        texts.each(function(d, i) {
+          let textBounding = (<Element> this).getBoundingClientRect();
+          let svgBounding = (<Element> barPlot.background().node()).getBoundingClientRect();
+          let isLabelCutOff = (textBounding.top < svgBounding.top && textBounding.bottom > svgBounding.top)
+            || (textBounding.top < svgBounding.bottom && textBounding.bottom > svgBounding.bottom);
+          assert.isTrue(isLabelCutOff, `label ${i} is partially cut off`);
+          assert.strictEqual(d3.select(this).style("visibility"), "hidden", `label ${i} is not visible`);
+        });
+        svg.remove();
+      });
+    });
+
+    describe("Horizontal Bar Plot extent calculation", () => {
+
+      let svg: d3.Selection<void>;
+      let xScale: Plottable.Scales.Linear;
+      let yScale: Plottable.Scales.Linear;
+      let plot: Plottable.Plots.Bar<number, number>;
+
+      beforeEach(() => {
+        svg = TestMethods.generateSVG();
+
+        xScale = new Plottable.Scales.Linear();
+        yScale = new Plottable.Scales.Linear();
+
+        plot = new Plottable.Plots.Bar<number, number>(Plottable.Plots.Bar.ORIENTATION_HORIZONTAL);
+        plot.x((d) => d.x, xScale);
+        plot.y((d) => d.y, yScale);
+      });
+
+      it("pads the domain in the correct direction", () => {
+        let data = Array.apply(null, Array(10)).map((d: any, i: number) => {
+          return { x: i + 1, y: i + 1 };
+        });
+        plot.addDataset(new Plottable.Dataset(data));
+        plot.renderTo(svg);
+
+        assert.operator(yScale.domain()[0], "<", data[0].y, "lower end of the domain is padded");
+        assert.operator(yScale.domain()[1], ">", data[data.length - 1].y, "higher end of the domain is padded");
+
+        svg.remove();
+      });
+
+      it("computes the correct extent when autoDomain()-ing right after render", () => {
+        let data = Array.apply(null, Array(10)).map((d: any, i: number) => {
+          return { x: i + 1, y: i + 1 };
+        });
+        plot.addDataset(new Plottable.Dataset(data));
+        plot.renderTo(svg);
+
+        let initialYScaleDomain = yScale.domain();
+        yScale.autoDomain();
+        assert.deepEqual(initialYScaleDomain, yScale.domain(), "The domain did not change");
+
         svg.remove();
       });
     });

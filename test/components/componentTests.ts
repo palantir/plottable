@@ -340,6 +340,14 @@ describe("Component behavior", () => {
     svg.remove();
   });
 
+  it("background-fill's pointer-event is set to none", () => {
+    c.renderTo(svg);
+    let backgroundFill = c.background().select(".background-fill").node();
+    let pointerEvent = window.getComputedStyle(<Element>backgroundFill).pointerEvents;
+    assert.strictEqual(pointerEvent, "none", "background-fill's pointer-event is set to none");
+    svg.remove();
+  });
+
   it("can't reuse component if it's been destroy()-ed", () => {
     let c1 = new Plottable.Component();
     c1.renderTo(svg);
