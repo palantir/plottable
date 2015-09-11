@@ -41,7 +41,7 @@ describe("Interactions", () => {
 
       });
 
-      it("Setting the xScales in batch is the same as adding one at a time", () => {
+      it("can add set the xScales in batch", () => {
         let xScale2 = new Plottable.Scales.Linear();
 
         panZoomInteraction.addXScale(xScale);
@@ -55,7 +55,7 @@ describe("Interactions", () => {
         assert.deepEqual(xScales, panZoomInteraction.xScales(), "setting and adding x scales result in the same behavior");
       });
 
-      it("Setting the yScales in batch is the same as adding one at a time", () => {
+      it("can add the yScales in batch", () => {
         let yScale2 = new Plottable.Scales.Linear();
         panZoomInteraction.addYScale(yScale);
         panZoomInteraction.addYScale(yScale2);
@@ -68,14 +68,14 @@ describe("Interactions", () => {
         assert.deepEqual(yScales, panZoomInteraction.yScales(), "setting and adding y scales result in the same behavior");
       });
 
-      it("Adding an already existent xScale does nothing", () => {
+      it("silently fails on adding an already existent xScale", () => {
         panZoomInteraction.addXScale(xScale);
         let oldXScaleNumber = panZoomInteraction.xScales().length;
         panZoomInteraction.addXScale(panZoomInteraction.xScales()[0]);
         assert.lengthOf(panZoomInteraction.xScales(), oldXScaleNumber, "the number of x scales is maintained");
       });
 
-      it("Adding an already existent yScale does nothing", () => {
+      it("silently fails on adding an already existent yScale", () => {
         panZoomInteraction.addYScale(yScale);
         let oldYScaleNumber = panZoomInteraction.yScales().length;
         panZoomInteraction.addYScale(panZoomInteraction.yScales()[0]);
@@ -113,7 +113,7 @@ describe("Interactions", () => {
         eventTarget = component.background();
       });
 
-      it("dragging a will translate the scale correctly (mouse)", () => {
+      it("translates the scale correctly on draging (mouse)", () => {
         let startPoint = { x: SVG_WIDTH / 4, y: SVG_HEIGHT / 4 };
         let endPoint = { x: SVG_WIDTH / 2, y: SVG_HEIGHT * 3 / 4 };
         TestMethods.triggerFakeMouseEvent("mousedown", eventTarget, startPoint.x, startPoint.y);
@@ -124,7 +124,7 @@ describe("Interactions", () => {
         svg.remove();
       });
 
-      it("dragging to outside the component will translate the scale correctly (mouse)", () => {
+      it("translates the scale correctly on dragging to outside of the component (mouse)", () => {
         let startPoint = { x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2 };
         let endPoint = { x: -SVG_WIDTH / 2, y: -SVG_HEIGHT / 2 };
         TestMethods.triggerFakeMouseEvent("mousedown", eventTarget, startPoint.x, startPoint.y);
@@ -135,7 +135,7 @@ describe("Interactions", () => {
         svg.remove();
       });
 
-      it("dragging a certain amount will translate multiple scales correctly (mouse)", () => {
+      it("translates multiple scales correctly on dragging (mouse)", () => {
         let xScale2 = new Plottable.Scales.Linear();
         xScale2.domain([0, 2 * SVG_WIDTH]).range([0, SVG_WIDTH]);
         panZoomInteraction.addXScale(xScale2);
@@ -149,7 +149,7 @@ describe("Interactions", () => {
         svg.remove();
       });
 
-      it("dragging a certain amount will translate the scale correctly (touch)", () => {
+      it("translates the scale correctly on draging (touch)", () => {
         let startPoint = { x: SVG_WIDTH / 4, y: SVG_HEIGHT / 4 };
         let endPoint = { x: SVG_WIDTH / 2, y: SVG_HEIGHT * 3 / 4 };
         TestMethods.triggerFakeTouchEvent("touchstart", eventTarget, [startPoint]);
@@ -160,7 +160,7 @@ describe("Interactions", () => {
         svg.remove();
       });
 
-      it("dragging to outside the component will translate the scale correctly (touch)", () => {
+      it("translates the scale correctly on dragging to outside of the component (touch)", () => {
         let startPoint = { x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2 };
         let endPoint = { x: -SVG_WIDTH / 2, y: -SVG_HEIGHT / 2 };
         TestMethods.triggerFakeTouchEvent("touchstart", eventTarget, [startPoint]);
@@ -171,7 +171,7 @@ describe("Interactions", () => {
         svg.remove();
       });
 
-      it("dragging a certain amount will translate multiple scales correctly (touch)", () => {
+      it("translates multiple scales correctly on dragging (touch)", () => {
         let xScale2 = new Plottable.Scales.Linear();
         xScale2.domain([0, 2 * SVG_WIDTH]).range([0, SVG_WIDTH]);
         panZoomInteraction.addXScale(xScale2);
@@ -217,7 +217,7 @@ describe("Interactions", () => {
         eventTarget = component.background();
       });
 
-      it("mousewheeling a certain amount will magnify the scale correctly", () => {
+      it("magnifies the scale correctly (mousewheel)", () => {
         // HACKHACK PhantomJS doesn't implement fake creation of WheelEvents
         // https://github.com/ariya/phantomjs/issues/11289
         if (window.PHANTOMJS) {
@@ -235,7 +235,7 @@ describe("Interactions", () => {
         svg.remove();
       });
 
-      it("mousewheeling a certain amount will magnify multiple scales correctly", () => {
+      it("magnifies multiple scales correctly (mousewheel)", () => {
         // HACKHACK PhantomJS doesn't implement fake creation of WheelEvents
         // https://github.com/ariya/phantomjs/issues/11289
         if (window.PHANTOMJS) {
@@ -256,7 +256,7 @@ describe("Interactions", () => {
         svg.remove();
       });
 
-      it("pinching a certain amount will magnify the scale correctly", () => {
+      it("magnifies the scale correctly (pinching)", () => {
         let startPoint = { x: SVG_WIDTH / 4, y: SVG_HEIGHT / 4 };
         let startPoint2 = { x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2 };
         TestMethods.triggerFakeTouchEvent( "touchstart", eventTarget, [startPoint, startPoint2], [0, 1] );
@@ -269,7 +269,7 @@ describe("Interactions", () => {
         svg.remove();
       });
 
-      it("pinching a certain amount will magnify multiple scales correctly", () => {
+      it("magnifies multiple scales correctly (pinching)", () => {
         let xScale2 = new Plottable.Scales.Linear();
         xScale2.domain([0, 2 * SVG_WIDTH]).range([0, SVG_WIDTH]);
         panZoomInteraction.addXScale(xScale2);
@@ -285,7 +285,7 @@ describe("Interactions", () => {
         svg.remove();
       });
 
-      it("pinching inside one component does not affect another component", () => {
+      it("can pitch inside one component and not affect another component", () => {
         let xScale2 = new Plottable.Scales.Linear();
         let initialDomain = [0, SVG_WIDTH / 2];
         xScale2.domain(initialDomain).range([0, SVG_WIDTH]);
@@ -312,7 +312,7 @@ describe("Interactions", () => {
       });
     });
 
-    describe("minDomainExtent", () => {
+    describe("Setting minDomainExtent", () => {
       let svg: d3.Selection<void>;
       let SVG_WIDTH = 400;
       let SVG_HEIGHT = 500;
@@ -349,13 +349,13 @@ describe("Interactions", () => {
         svg.remove();
       });
 
-      it("Rejects negative extents", () => {
+      it("rejects negative extents", () => {
         (<any>assert).throws(() => panZoomInteraction.minDomainExtent(xScale, -1), Error, "extent must be non-negative",
           "Correctly rejects -1");
         svg.remove();
       });
 
-      it("can't be larger than maxDomainExtent() for the same Scale", () => {
+      it("can't set minDomainExtent() be larger than maxDomainExtent() for the same Scale", () => {
         let minimumDomainExtent = SVG_WIDTH / 4;
         // panZoomInteraction.minDomainExtent(xScale, minimumDomainExtent);
 
@@ -370,7 +370,7 @@ describe("Interactions", () => {
         svg.remove();
       });
 
-      it("Mousewheeling in cannot go beyond the specified domainExtent", () => {
+      it("cannot go beyond the specified domainExtent (mousewheel)", () => {
         // HACKHACK PhantomJS doesn't implement fake creation of WheelEvents
         // https://github.com/ariya/phantomjs/issues/11289
         if (window.PHANTOMJS) {
@@ -390,7 +390,7 @@ describe("Interactions", () => {
         svg.remove();
       });
 
-      it("Pinching in cannot go beyond the specified domainExtent", () => {
+      it("cannot go beyond the specified domainExtent (pitching)", () => {
         let minimumDomainExtent = SVG_WIDTH / 4;
         panZoomInteraction.minDomainExtent(xScale, minimumDomainExtent);
 
@@ -407,7 +407,7 @@ describe("Interactions", () => {
       });
     });
 
-    describe("maxDomainExtent", () => {
+    describe("Setting maxDomainExtent", () => {
       let svg: d3.Selection<void>;
       let SVG_WIDTH = 400;
       let SVG_HEIGHT = 500;
@@ -444,7 +444,7 @@ describe("Interactions", () => {
         svg.remove();
       });
 
-      it("Rejects non-positive extents", () => {
+      it("rejects non-positive extents", () => {
         (<any>assert).throws(() => panZoomInteraction.maxDomainExtent(xScale, -1), Error, "extent must be positive",
           "Correctly rejects -1");
         (<any>assert).throws(() => panZoomInteraction.maxDomainExtent(xScale, 0), Error, "extent must be positive",
@@ -452,7 +452,7 @@ describe("Interactions", () => {
         svg.remove();
       });
 
-      it("can't be smaller than minDomainExtent() for the same Scale", () => {
+      it("can't set maxDomainExtent() to be smaller than minDomainExtent() for the same Scale", () => {
         let maximumDomainExtent = SVG_WIDTH;
         panZoomInteraction.maxDomainExtent(xScale, maximumDomainExtent);
 
@@ -467,7 +467,7 @@ describe("Interactions", () => {
         svg.remove();
       });
 
-      it("Mousewheeling out cannot go beyond the specified domainExtent", () => {
+      it("cannot go beyond the specified domainExtent (mousewheel)", () => {
         // HACKHACK PhantomJS doesn't implement fake creation of WheelEvents
         // https://github.com/ariya/phantomjs/issues/11289
         if (window.PHANTOMJS) {
@@ -487,7 +487,7 @@ describe("Interactions", () => {
         svg.remove();
       });
 
-      it("Pinching in cannot go beyond the specified domainExtent", () => {
+      it("cannot go beyond the specified domainExtent (pitching)", () => {
         let maximumDomainExtent = SVG_WIDTH;
         panZoomInteraction.maxDomainExtent(xScale, maximumDomainExtent);
 
