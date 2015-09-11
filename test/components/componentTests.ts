@@ -344,7 +344,7 @@ describe("Component behavior", () => {
     c.renderTo(svg);
     let backgroundFill = c.background().select(".background-fill").node();
     let pointerEvent = window.getComputedStyle(<Element>backgroundFill).pointerEvents;
-    assert.strictEqual(pointerEvent, "none", "background-fill's pointer-event is not set to none");
+    assert.strictEqual(pointerEvent, "none", "background-fill's pointer-event is set to none");
     svg.remove();
   });
 
