@@ -8,7 +8,6 @@ describe("Interactions", () => {
       let SVG_HEIGHT = 400;
 
       let svg: d3.Selection<void>;
-      let component: Plottable.Component;
       let pointerInteraction: Plottable.Interactions.Pointer;
       let eventTarget: d3.Selection<void>;
 
@@ -19,7 +18,7 @@ describe("Interactions", () => {
       beforeEach(() => {
         svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
 
-        component = new Plottable.Component();
+        let component = new Plottable.Component();
         component.renderTo(svg);
 
         pointerInteraction = new Plottable.Interactions.Pointer();
