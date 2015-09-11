@@ -50,6 +50,7 @@
 /// <reference path="axes/timeAxis.ts" />
 /// <reference path="axes/numericAxis.ts" />
 /// <reference path="axes/categoryAxis.ts" />
+/// <reference path="axes/radialAxis.ts" />
 
 /// <reference path="components/label.ts" />
 /// <reference path="components/legend.ts" />

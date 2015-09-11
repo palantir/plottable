@@ -19,6 +19,7 @@
 ///<reference path="axes/timeAxisTests.ts" />
 ///<reference path="axes/numericAxisTests.ts" />
 ///<reference path="axes/categoryAxisTests.ts" />
+///<reference path="axes/radialAxisTests.ts" />
 
 ///<reference path="components/gridlinesTests.ts" />
 ///<reference path="components/labelTests.ts" />

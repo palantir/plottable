@@ -5251,6 +5251,195 @@ var __extends = (this && this.__extends) || function (d, b) {
 };
 var Plottable;
 (function (Plottable) {
+    var Axes;
+    (function (Axes) {
+        var RadialAxis = (function (_super) {
+            __extends(RadialAxis, _super);
+            /**
+             * Constructs a Radial Axis.
+             *
+             * A Radial Axis is a visual representation of a QuantitativeScale in polar system.
+             *
+             * @constructor
+             * @param {QuantitativeScale} scale
+             * @param {string} orientation One of "left"/"right"
+             */
+            function RadialAxis(scale, orientation) {
+                _super.call(this, scale, orientation);
+                this.formatter(Plottable.Formatters.general());
+                this.tickLabelPadding(5);
+                this.removeClass("x-axis");
+                this.removeClass("y-axis");
+                this.addClass("r-axis");
+            }
+            RadialAxis.prototype.computeLayout = function (origin, availableWidth, availableHeight) {
+                var range = this._scale.range();
+                _super.prototype.computeLayout.call(this, origin, availableWidth, availableHeight);
+                this._scale.range(range);
+                this.content().attr("transform", "translate(" + this.width() / 2 + "," + this.height() / 2 + ")");
+                return this;
+            };
+            RadialAxis.prototype.fixedHeight = function () {
+                return false;
+            };
+            RadialAxis.prototype.fixedWidth = function () {
+                return false;
+            };
+            RadialAxis.prototype.renderImmediately = function () {
+                var _this = this;
+                _super.prototype.renderImmediately.call(this);
+                var tickMarkValues = this._getTickValues();
+                var tickLabelTextAnchor = this.orientation() === "left" ? "start" : "end";
+                var tickLabels = this._tickLabelContainer
+                    .selectAll("." + Plottable.Axis.TICK_LABEL_CLASS)
+                    .data(tickMarkValues);
+                tickLabels.enter().append("text").classed(Plottable.Axis.TICK_LABEL_CLASS, true);
+                tickLabels.exit().remove();
+                tickLabels.style("text-anchor", tickLabelTextAnchor)
+                    .style("visibility", "inherit")
+                    .attr(this._generateTickLabelAttrHash())
+                    .text(function (s) { return _this.formatter()(s); });
+                if (!this.showEndTickLabels()) {
+                    this._hideEndTickLabels();
+                }
+                this._hideOverlappingTickLabels();
+                this._hideOverflowingTickLabels();
+                return this;
+            };
+            RadialAxis.prototype.orientation = function (orientation) {
+                if (orientation == null) {
+                    return this._orientation;
+                }
+                else {
+                    var newOrientationLC = orientation.toLowerCase();
+                    if (newOrientationLC !== "left" &&
+                        newOrientationLC !== "right") {
+                        throw new Error("unsupported orientation");
+                    }
+                    this._orientation = newOrientationLC;
+                    this.redraw();
+                    return this;
+                }
+            };
+            RadialAxis.prototype._generateTickLabelAttrHash = function () {
+                var padding = this.tickLabelPadding() + this._maxLabelTickLength();
+                var tickLabelAttrHash = {
+                    x: 0,
+                    y: this._scaledPosition(),
+                    dx: (this.orientation() === "left" ? 1 : -1) * padding,
+                    dy: "0.3em"
+                };
+                return tickLabelAttrHash;
+            };
+            RadialAxis.prototype._generateBaselineAttrHash = function () {
+                var radiusLimit = Math.min(this.height(), this.width()) / 2;
+                var baselineAttrHash = {
+                    x1: 0,
+                    y1: 0,
+                    x2: 0,
+                    y2: -1 * radiusLimit
+                };
+                return baselineAttrHash;
+            };
+            RadialAxis.prototype._generateTickMarkAttrHash = function (isEndTickMark) {
+                if (isEndTickMark === void 0) { isEndTickMark = false; }
+                var tickMarkAttrHash = {
+                    x1: 0,
+                    y1: this._scaledPosition(),
+                    x2: (this.orientation() === "left" ? 1 : -1) * this._maxLabelTickLength(),
+                    y2: this._scaledPosition()
+                };
+                return tickMarkAttrHash;
+            };
+            RadialAxis.prototype._getTickValues = function () {
+                var scale = this._scale;
+                var domain = scale.domain();
+                var min = domain[0] <= domain[1] ? domain[0] : domain[1];
+                var max = domain[0] >= domain[1] ? domain[0] : domain[1];
+                if (min === domain[0]) {
+                    return scale.ticks().filter(function (i) { return i >= min && i <= max; });
+                }
+                else {
+                    return scale.ticks().filter(function (i) { return i >= min && i <= max; }).reverse();
+                }
+            };
+            RadialAxis.prototype._scaledPosition = function () {
+                var _this = this;
+                return function (d) { return -1 * _this._scale.scale(d); };
+            };
+            RadialAxis.prototype._hideEndTickLabels = function () {
+                var tickLabels = this._tickLabelContainer.selectAll("." + Plottable.Axis.TICK_LABEL_CLASS);
+                if (tickLabels[0].length === 0) {
+                    return;
+                }
+                var firstTickLabel = tickLabels[0][0];
+                var lastTickLabel = tickLabels[0][tickLabels[0].length - 1];
+                d3.select(firstTickLabel).style("visibility", "hidden");
+                d3.select(lastTickLabel).style("visibility", "hidden");
+            };
+            RadialAxis.prototype._hideOverlappingTickLabels = function () {
+                var visibleTickLabels = this._tickLabelContainer
+                    .selectAll("." + Plottable.Axis.TICK_LABEL_CLASS)
+                    .filter(function (d, i) {
+                    var visibility = d3.select(this).style("visibility");
+                    return (visibility === "inherit") || (visibility === "visible");
+                });
+                var visibleTickLabelRects = visibleTickLabels[0].map(function (label) { return label.getBoundingClientRect(); });
+                var interval = 1;
+                while (this._hasOverlapWithInterval(interval, visibleTickLabelRects) && interval < visibleTickLabelRects.length) {
+                    interval += 1;
+                }
+                visibleTickLabels.each(function (d, i) {
+                    var tickLabel = d3.select(this);
+                    if (i % interval !== 0) {
+                        tickLabel.style("visibility", "hidden");
+                    }
+                });
+            };
+            /**
+             * The method is responsible for evenly spacing the labels on the axis.
+             * @return test to see if taking every `interval` recrangle from `rects`
+             *         will result in labels not overlapping
+             *
+             */
+            RadialAxis.prototype._hasOverlapWithInterval = function (interval, rects) {
+                var padding = this.tickLabelPadding();
+                for (var i = 0; i < rects.length - (interval); i += interval) {
+                    var currRect = rects[i];
+                    var nextRect = rects[i + interval];
+                    if (currRect.top - padding <= nextRect.bottom) {
+                        return true;
+                    }
+                }
+                return false;
+            };
+            RadialAxis.prototype._hideOverflowingTickLabels = function () {
+                var boundingBox = this._boundingBox.node().getBoundingClientRect();
+                var tickLabels = this._tickLabelContainer.selectAll("." + Plottable.Axis.TICK_LABEL_CLASS);
+                if (tickLabels.empty()) {
+                    return;
+                }
+                tickLabels.each(function (d, i) {
+                    if (!Plottable.Utils.DOM.clientRectInside(this.getBoundingClientRect(), boundingBox)) {
+                        d3.select(this).style("visibility", "hidden");
+                    }
+                });
+            };
+            return RadialAxis;
+        })(Plottable.Axis);
+        Axes.RadialAxis = RadialAxis;
+    })(Axes = Plottable.Axes || (Plottable.Axes = {}));
+})(Plottable || (Plottable = {}));
+
+///<reference path="../reference.ts" />
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var Plottable;
+(function (Plottable) {
     var Components;
     (function (Components) {
         var Label = (function (_super) {

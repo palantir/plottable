@@ -1710,6 +1710,7 @@ declare module Plottable {
         protected _tickLabelContainer: d3.Selection<void>;
         protected _baseline: d3.Selection<void>;
         protected _scale: Scale<D, number>;
+        protected _orientation: string;
         protected _computedWidth: number;
         protected _computedHeight: number;
         /**
@@ -2059,6 +2060,40 @@ declare module Plottable {
             tickLabelAngle(angle: number): Category;
             renderImmediately(): Category;
             computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number): Axis<string>;
+        }
+    }
+}
+
+
+declare module Plottable {
+    module Axes {
+        class RadialAxis extends Axis<number> {
+            /**
+             * Constructs a Radial Axis.
+             *
+             * A Radial Axis is a visual representation of a QuantitativeScale in polar system.
+             *
+             * @constructor
+             * @param {QuantitativeScale} scale
+             * @param {string} orientation One of "left"/"right"
+             */
+            constructor(scale: QuantitativeScale<number>, orientation: string);
+            computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number): RadialAxis;
+            fixedHeight(): boolean;
+            fixedWidth(): boolean;
+            renderImmediately(): RadialAxis;
+            orientation(orientation?: string): any;
+            protected _generateTickLabelAttrHash(): {
+                [key: string]: string | number | ((d: any) => number);
+            };
+            protected _generateBaselineAttrHash(): {
+                [key: string]: number;
+            };
+            protected _generateTickMarkAttrHash(isEndTickMark?: boolean): {
+                [key: string]: number | ((d: any) => number);
+            };
+            protected _getTickValues(): number[];
+            protected _scaledPosition(): (d: any) => number;
         }
     }
 }
