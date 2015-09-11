@@ -18,17 +18,18 @@ describe("Interactions", () => {
         aCode = 65;
         bCode = 66;
         component = new Plottable.Component();
-        svg = TestMethods.generateSVG(400, 400);
         keyInteraction = new Plottable.Interactions.Key();
-        aCallback = () => aCallbackCalled = true;
-        bCallback = () => bCallbackCalled = true;
-        component.renderTo(svg);
         aCallbackCalled = false;
         bCallbackCalled = false;
+        aCallback = () => aCallbackCalled = true;
+        bCallback = () => bCallbackCalled = true;
+        svg = TestMethods.generateSVG();
+        component.renderTo(svg);
       });
 
       it("only fires callback for \"a\" when \"a\" key is pressed", () => {
-        keyInteraction.onKeyPress(aCode, aCallback);
+        assert.strictEqual(keyInteraction.onKeyPress(aCode, aCallback), keyInteraction,
+          "setting the keyPress callback returns the interaction");
         keyInteraction.onKeyPress(bCode, bCallback);
         keyInteraction.attachTo(component);
 
@@ -37,7 +38,8 @@ describe("Interactions", () => {
         assert.isTrue(aCallbackCalled, "callback for \"a\" was called when \"a\" key was pressed");
         assert.isFalse(bCallbackCalled, "callback for \"b\" was not called when \"a\" key was pressed");
 
-        keyInteraction.offKeyPress(aCode, aCallback);
+        assert.strictEqual(keyInteraction.offKeyPress(aCode, aCallback), keyInteraction,
+          "unsetting the keyPress callback returns the interaction");
         keyInteraction.offKeyPress(bCode, bCallback);
         svg.remove();
       });
@@ -54,7 +56,7 @@ describe("Interactions", () => {
         svg.remove();
       });
 
-      it("removing keyPress callbacks is possible", () => {
+      it("can remove keyPress callbacks", () => {
         keyInteraction.onKeyPress(aCode, aCallback);
         keyInteraction.attachTo(component);
 
@@ -75,7 +77,7 @@ describe("Interactions", () => {
         svg.remove();
       });
 
-      it("multiple keyPress callbacks are possible", () => {
+      it("can attach multiple multiple keyPress callbacks", () => {
         let aCallback1Called = false;
         let aCallback1 = () => aCallback1Called = true;
         let aCallback2Called = false;
@@ -164,23 +166,25 @@ describe("Interactions", () => {
         aCode = 65;
         bCode = 66;
         component = new Plottable.Component();
-        svg = TestMethods.generateSVG(400, 400);
         keyInteraction = new Plottable.Interactions.Key();
-        aCallback = () => aCallbackCalled = true;
-        bCallback = () => bCallbackCalled = true;
-        component.renderTo(svg);
         aCallbackCalled = false;
         bCallbackCalled = false;
+        aCallback = () => aCallbackCalled = true;
+        bCallback = () => bCallbackCalled = true;
+        svg = TestMethods.generateSVG();
+        component.renderTo(svg);
       });
 
       it("doesn't fire callback if key was released without being pressed", () => {
-        keyInteraction.onKeyRelease(aCode, aCallback);
+        assert.strictEqual(keyInteraction.onKeyRelease(aCode, aCallback), keyInteraction,
+          "setting the keyRelease callback returns the interaction");
         keyInteraction.attachTo(component);
 
         TestMethods.triggerFakeKeyboardEvent("keyup", component.background(), aCode);
         assert.isFalse(aCallbackCalled, "callback for \"a\" was not called when \"a\" key was released");
 
-        keyInteraction.offKeyRelease(aCode, aCallback);
+        assert.strictEqual(keyInteraction.offKeyRelease(aCode, aCallback), keyInteraction,
+          "unsetting the keyRelease callback returns the interaction");
         svg.remove();
       });
 
@@ -254,7 +258,7 @@ describe("Interactions", () => {
         svg.remove();
       });
 
-      it("removing keyRelease callbacks is possible", () => {
+      it("can remove removing keyRelease callbacks", () => {
         keyInteraction.onKeyRelease(aCode, aCallback);
         keyInteraction.attachTo(component);
 
@@ -278,7 +282,7 @@ describe("Interactions", () => {
         svg.remove();
       });
 
-      it("multiple keyRelease callbacks are possible", () => {
+      it("can register multiple keyRelease callbacks", () => {
         let aCallback1Called = false;
         let aCallback1 = () => aCallback1Called = true;
         let aCallback2Called = false;
@@ -299,7 +303,7 @@ describe("Interactions", () => {
         svg.remove();
       });
 
-      it("can remove only one of the registered keyrelease callback", () => {
+      it("can remove only one of the registered keyRelease callbacks", () => {
         let aCallback1Called = false;
         let aCallback1 = () => aCallback1Called = true;
         let aCallback2Called = false;
@@ -322,5 +326,6 @@ describe("Interactions", () => {
         svg.remove();
       });
     });
+
   });
 });
