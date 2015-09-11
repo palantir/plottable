@@ -8686,6 +8686,7 @@ var Plottable;
                             labelPosition.x = x + w / 2 - measurement.width / 2;
                         }
                         else {
+                            labelPosition.y = y + h / 2 - measurement.height / 2;
                             if (!positive) {
                                 labelPosition.x = x + w - measurement.width;
                             }

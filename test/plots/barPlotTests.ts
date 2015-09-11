@@ -724,20 +724,20 @@ describe("Plots", () => {
 
     describe("Horizontal Bar Plot label visibility", () => {
       let svg: d3.Selection<void>;
-      let yScale: Plottable.Scales.Category;
+      let yScale: Plottable.Scales.Linear;
       let xScale: Plottable.Scales.Linear;
-      let barPlot: Plottable.Plots.Bar<number, string>;
+      let barPlot: Plottable.Plots.Bar<number, number>;
       beforeEach(() => {
         svg = TestMethods.generateSVG(600, 400);
-        yScale = new Plottable.Scales.Category().domain(["A", "B"]);
+        yScale = new Plottable.Scales.Linear();
         xScale = new Plottable.Scales.Linear();
 
         let data = [
-          {y: "A", x: -1.5},
-          {y: "B", x: 1},
+          {y: 1, x: -1.5},
+          {y: 2, x: 1},
         ];
 
-        barPlot = new Plottable.Plots.Bar<number, string>(Plottable.Plots.Bar.ORIENTATION_HORIZONTAL);
+        barPlot = new Plottable.Plots.Bar<number, number>(Plottable.Plots.Bar.ORIENTATION_HORIZONTAL);
         barPlot.addDataset(new Plottable.Dataset(data));
         barPlot.x((d) => d.x, xScale);
         barPlot.y((d) => d.y, yScale);
@@ -771,6 +771,23 @@ describe("Plots", () => {
 
         assert.strictEqual(label1.style("visibility"), "hidden", "label 2 is not visible");
         assert.include(["visible", "inherit"], label2.style("visibility"), "label 1 is visible");
+        svg.remove();
+      });
+
+      it("hides labels that are partially cut off in y", () => {
+        yScale.domain([1, 2]);
+        let texts = barPlot.content().selectAll("text");
+
+        assert.strictEqual(texts.size(), 2, "There should be two labels rendered");
+
+        texts.each(function(d, i) {
+          let textBounding = (<Element> this).getBoundingClientRect();
+          let svgBounding = (<Element> barPlot.background().node()).getBoundingClientRect();
+          let isLabelCutOff = (textBounding.top < svgBounding.top && textBounding.bottom > svgBounding.top)
+            || (textBounding.top < svgBounding.bottom && textBounding.bottom > svgBounding.bottom);
+          assert.isTrue(isLabelCutOff, `label ${i} is partially cut off`);
+          assert.strictEqual(d3.select(this).style("visibility"), "hidden", `label ${i} is not visible`);
+        });
         svg.remove();
       });
     });
