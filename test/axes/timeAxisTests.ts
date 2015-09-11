@@ -294,4 +294,35 @@ describe("TimeAxis", () => {
     svg.remove();
   });
 
+  describe("axis annotations", () => {
+    describe("formatting annotation ticks", () => {
+      it("formats the dates to [{{abbreviated weekday}} {{abbreviated month}} {{day of month}}, {{year}}] by default", () => {
+        let axis = new Plottable.Axes.Time(new Plottable.Scales.Time(), "bottom");
+        let annotationFormatter = axis.annotationFormatter();
+        let testDate = new Date(1995, 11, 17);
+        assert.strictEqual(annotationFormatter(testDate), "Sun Dec 17, 1995", "formats to a default customized time formatter");
+      });
+    });
+
+    it("includes the annotation space in the final size calculation", () => {
+      let SVG_WIDTH = 400;
+      let SVG_HEIGHT = 400;
+      let svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+      let xScale = new Plottable.Scales.Time();
+      let xAxis = new Plottable.Axes.Time(xScale, "bottom");
+      xAxis.margin(100);
+      xAxis.annotationsEnabled(true);
+      xAxis.annotationTierCount(3);
+
+      xAxis.anchor(svg);
+      xAxis.computeLayout({ x: 0, y: 0}, SVG_WIDTH, SVG_HEIGHT);
+      let coreHeight = xAxis.tickLabelPadding() + xAxis.innerTickLength();
+      let annotationHeight = xAxis.annotationTierCount() * (<any> xAxis)._annotationTierHeight();
+      let minimumHeight = coreHeight + xAxis.margin() + annotationHeight;
+      assert.operator(xAxis.height(), ">=", minimumHeight, "height includes all relevant pieces");
+      xAxis.destroy();
+      svg.remove();
+    });
+  });
+
 });

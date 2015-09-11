@@ -39,6 +39,15 @@ describe("Component", () => {
       svg.remove();
     });
 
+    it("sets the background-fill's pointer-event to none", () => {
+      c.anchor(svg);
+      let backgroundFill = c.background().select(".background-fill").node();
+      let pointerEvent = window.getComputedStyle(<Element>backgroundFill).pointerEvents;
+      assert.strictEqual(pointerEvent, "none", "background-fill's pointer-event is set to none");
+      c.destroy();
+      svg.remove();
+    });
+
     it("classes the input with 'plottable' if it is an svg", () => {
       c.anchor(svg);
       assert.isTrue(svg.classed("plottable"), "<svg> was given \"plottable\" CSS class");

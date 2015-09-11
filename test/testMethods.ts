@@ -18,6 +18,11 @@ module TestMethods {
     }
   }
 
+  export function isInDOM(component: Plottable.Component) {
+    let contentNode = component.content().node();
+    return contentNode != null && Plottable.Utils.DOM.boundingSVG(<SVGElement> contentNode) != null;
+  };
+
   export function verifySpaceRequest(sr: Plottable.SpaceRequest, expectedMinWidth: number, expectedMinHeight: number, message: string) {
     assert.strictEqual(sr.minWidth, expectedMinWidth, message + " (space request: minWidth)");
     assert.strictEqual(sr.minHeight, expectedMinHeight, message + " (space request: minHeight)");
@@ -141,6 +146,25 @@ module TestMethods {
   // for IE, whose paths look like "M 0 500 L" instead of "M0,500L"
   export function normalizePath(pathString: string) {
     return pathString.replace(/ *([A-Z]) */g, "$1").replace(/ /g, ",");
+  }
+
+  /**
+   * Decomposes a normalized path-string ("d" attribute from a <path>)
+   * to an array of command-argument pairs:
+   * {
+   *   command: string;
+   *   arguments: number[];
+   * }[]
+   */
+  export function decomposePath(normalizedPathString: string) {
+    let commands = normalizedPathString.split(/[^A-Z]/).filter((s) => s !== "");
+    let argumentStrings = normalizedPathString.split(/[A-Z]/).slice(1);
+    return commands.map((command, index) => {
+      return {
+        command: command,
+        arguments: argumentStrings[index].split(",").filter((s) => s !== "").map((s) => parseFloat(s))
+      };
+    });
   }
 
   export function numAttr(s: d3.Selection<void>, a: string) {
@@ -312,6 +336,18 @@ module TestMethods {
       }
 
       return "#" + redHex + greenHex + blueHex;
+  }
+
+  export function assertWarns(fn: Function, warningMessage: string, assertMessage: string) {
+    let receivedWarning = "";
+    let oldWarn = Plottable.Utils.Window.warn;
+    Plottable.Utils.Window.warn = (msg: string) => receivedWarning = msg;
+    try {
+      fn.call(this);
+    } finally {
+      Plottable.Utils.Window.warn = oldWarn;
+    }
+    assert.include(receivedWarning, warningMessage, assertMessage);
   }
 
 }
