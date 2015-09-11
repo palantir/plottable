@@ -317,48 +317,56 @@ describe("Interactions", () => {
       let SVG_WIDTH = 400;
       let SVG_HEIGHT = 500;
 
-      let component: Plottable.Component;
       let eventTarget: d3.Selection<void>;
 
       let xScale: Plottable.QuantitativeScale<number>;
-      let yScale: Plottable.QuantitativeScale<number>;
       let panZoomInteraction: Plottable.Interactions.PanZoom;
 
       beforeEach(() => {
+        xScale = new Plottable.Scales.Linear();
+        xScale.domain([0, SVG_WIDTH / 2]);
+
         svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
 
-        component = new Plottable.Component();
+        let component = new Plottable.Component();
         component.renderTo(svg);
 
-        xScale = new Plottable.Scales.Linear();
-        xScale.domain([0, SVG_WIDTH / 2]).range([0, SVG_WIDTH]);
-        yScale = new Plottable.Scales.Linear();
-        yScale.domain([0, SVG_HEIGHT / 2]).range([0, SVG_HEIGHT]);
         panZoomInteraction = new Plottable.Interactions.PanZoom();
         panZoomInteraction.addXScale(xScale);
-        panZoomInteraction.addYScale(yScale);
         panZoomInteraction.attachTo(component);
 
         eventTarget = component.background();
       });
 
-      let minimumDomainExtent: number;
+      it("can set minDomainExtent", () => {
+        let minimumDomainExtent = SVG_WIDTH / 4;
+        assert.strictEqual(panZoomInteraction.minDomainExtent(xScale, minimumDomainExtent), panZoomInteraction,
+          "setting the minDomainExtent returns the interaction");
 
-      beforeEach(() => {
-        minimumDomainExtent = SVG_WIDTH / 4;
-        panZoomInteraction.minDomainExtent(xScale, minimumDomainExtent);
+        assert.strictEqual(panZoomInteraction.minDomainExtent(xScale), minimumDomainExtent,
+          "returns the correct minDomainExtent");
+
+        svg.remove();
       });
 
       it("Rejects negative extents", () => {
-        assert.throws(() => panZoomInteraction.minDomainExtent(xScale, -1), Error);
+        (<any>assert).throws(() => panZoomInteraction.minDomainExtent(xScale, -1), Error, "extent must be non-negative",
+          "Correctly rejects -1");
         svg.remove();
       });
 
       it("can't be larger than maxDomainExtent() for the same Scale", () => {
+        let minimumDomainExtent = SVG_WIDTH / 4;
+        // panZoomInteraction.minDomainExtent(xScale, minimumDomainExtent);
+
+
         let maximumDomainExtent = minimumDomainExtent * 2;
         panZoomInteraction.maxDomainExtent(xScale, maximumDomainExtent);
+
         let tooBigMinimumDomainExtent = maximumDomainExtent * 2;
-        assert.throws(() => panZoomInteraction.minDomainExtent(xScale, tooBigMinimumDomainExtent), Error);
+        (<any>assert).throws(() => panZoomInteraction.minDomainExtent(xScale, tooBigMinimumDomainExtent), Error,
+          "minDomainExtent must be smaller than maxDomainExtent for the same Scale",
+          "cannot have minDomainExtent larger than maxDomainExtent");
         svg.remove();
       });
 
@@ -370,23 +378,29 @@ describe("Interactions", () => {
           return;
         }
 
+        let minimumDomainExtent = SVG_WIDTH / 4;
+        panZoomInteraction.minDomainExtent(xScale, minimumDomainExtent);
+
         let scrollPoint = { x: SVG_WIDTH / 4, y: SVG_HEIGHT / 4 };
         let deltaY = -3000;
 
-        TestMethods.triggerFakeWheelEvent("wheel", svg, scrollPoint.x, scrollPoint.y, deltaY );
+        TestMethods.triggerFakeWheelEvent("wheel", svg, scrollPoint.x, scrollPoint.y, deltaY);
         let domainExtent = Math.abs(xScale.domain()[1] - xScale.domain()[0]);
         assert.strictEqual(domainExtent, minimumDomainExtent, "xScale zooms to the correct domain via scroll");
         svg.remove();
       });
 
       it("Pinching in cannot go beyond the specified domainExtent", () => {
+        let minimumDomainExtent = SVG_WIDTH / 4;
+        panZoomInteraction.minDomainExtent(xScale, minimumDomainExtent);
+
         let startPoint = { x: SVG_WIDTH / 4, y: SVG_HEIGHT / 4 };
         let startPoint2 = { x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2 };
-        TestMethods.triggerFakeTouchEvent( "touchstart", eventTarget, [startPoint, startPoint2], [0, 1] );
+        TestMethods.triggerFakeTouchEvent( "touchstart", eventTarget, [startPoint, startPoint2], [0, 1]);
 
-        let endPoint = { x: SVG_WIDTH, y: SVG_HEIGHT};
-        TestMethods.triggerFakeTouchEvent("touchmove", eventTarget, [endPoint], [1] );
-        TestMethods.triggerFakeTouchEvent("touchend", eventTarget, [endPoint], [1] );
+        let endPoint = { x: SVG_WIDTH, y: SVG_HEIGHT };
+        TestMethods.triggerFakeTouchEvent("touchmove", eventTarget, [endPoint], [1]);
+        TestMethods.triggerFakeTouchEvent("touchend", eventTarget, [endPoint], [1]);
         let domainExtent = Math.abs(xScale.domain()[1] - xScale.domain()[0]);
         assert.strictEqual(domainExtent, minimumDomainExtent, "xScale zooms to the correct domain via pinch");
         svg.remove();
@@ -398,49 +412,58 @@ describe("Interactions", () => {
       let SVG_WIDTH = 400;
       let SVG_HEIGHT = 500;
 
-      let component: Plottable.Component;
       let eventTarget: d3.Selection<void>;
 
       let xScale: Plottable.QuantitativeScale<number>;
-      let yScale: Plottable.QuantitativeScale<number>;
       let panZoomInteraction: Plottable.Interactions.PanZoom;
 
       beforeEach(() => {
+        xScale = new Plottable.Scales.Linear();
+        xScale.domain([0, SVG_WIDTH / 2]);
+
         svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
 
-        component = new Plottable.Component();
+        let component = new Plottable.Component();
         component.renderTo(svg);
 
-        xScale = new Plottable.Scales.Linear();
-        xScale.domain([0, SVG_WIDTH / 2]).range([0, SVG_WIDTH]);
-        yScale = new Plottable.Scales.Linear();
-        yScale.domain([0, SVG_HEIGHT / 2]).range([0, SVG_HEIGHT]);
         panZoomInteraction = new Plottable.Interactions.PanZoom();
         panZoomInteraction.addXScale(xScale);
-        panZoomInteraction.addYScale(yScale);
         panZoomInteraction.attachTo(component);
 
         eventTarget = component.background();
       });
 
-      let maximumDomainExtent: number;
+      it("can set maxDomainExtent", () => {
+        let maximumDomainExtent = SVG_WIDTH;
+        assert.strictEqual(panZoomInteraction.maxDomainExtent(xScale, maximumDomainExtent), panZoomInteraction,
+          "setting the maxDomainExtent returns the interaction");
 
-      beforeEach(() => {
-        maximumDomainExtent = SVG_WIDTH;
-        panZoomInteraction.maxDomainExtent(xScale, maximumDomainExtent);
+        assert.strictEqual(panZoomInteraction.maxDomainExtent(xScale), maximumDomainExtent,
+          "returns the correct maxDomainExtent");
+
+        svg.remove();
       });
 
       it("Rejects non-positive extents", () => {
-        assert.throws(() => panZoomInteraction.maxDomainExtent(xScale, -1), Error);
-        assert.throws(() => panZoomInteraction.maxDomainExtent(xScale, 0), Error);
+        (<any>assert).throws(() => panZoomInteraction.maxDomainExtent(xScale, -1), Error, "extent must be positive",
+          "Correctly rejects -1");
+        (<any>assert).throws(() => panZoomInteraction.maxDomainExtent(xScale, 0), Error, "extent must be positive",
+          "Correctly rejects 0");
         svg.remove();
       });
 
       it("can't be smaller than minDomainExtent() for the same Scale", () => {
+        let maximumDomainExtent = SVG_WIDTH;
+        panZoomInteraction.maxDomainExtent(xScale, maximumDomainExtent);
+
+
         let minimumDomainExtent = maximumDomainExtent / 2;
         panZoomInteraction.minDomainExtent(xScale, minimumDomainExtent);
         let tooSmallMaximumDomainExtent = minimumDomainExtent / 2;
-        assert.throws(() => panZoomInteraction.maxDomainExtent(xScale, tooSmallMaximumDomainExtent), Error);
+        (<any>assert).throws(() => panZoomInteraction.maxDomainExtent(xScale, tooSmallMaximumDomainExtent), Error,
+          "maxDomainExtent must be larger than minDomainExtent for the same Scale",
+          "cannot have maxDomainExtent smaller than minDomainExtent");
+
         svg.remove();
       });
 
@@ -452,23 +475,29 @@ describe("Interactions", () => {
           return;
         }
 
+        let maximumDomainExtent = SVG_WIDTH;
+        panZoomInteraction.maxDomainExtent(xScale, maximumDomainExtent);
+
         let scrollPoint = { x: SVG_WIDTH / 4, y: SVG_HEIGHT / 4 };
         let deltaY = 3000;
 
-        TestMethods.triggerFakeWheelEvent("wheel", svg, scrollPoint.x, scrollPoint.y, deltaY );
+        TestMethods.triggerFakeWheelEvent("wheel", svg, scrollPoint.x, scrollPoint.y, deltaY);
         let domainExtent = Math.abs(xScale.domain()[1] - xScale.domain()[0]);
         assert.strictEqual(domainExtent, maximumDomainExtent, "xScale zooms to the correct domain via scroll");
         svg.remove();
       });
 
       it("Pinching in cannot go beyond the specified domainExtent", () => {
+        let maximumDomainExtent = SVG_WIDTH;
+        panZoomInteraction.maxDomainExtent(xScale, maximumDomainExtent);
+
         let startPoint = { x: SVG_WIDTH / 4, y: SVG_HEIGHT / 4 };
         let startPoint2 = { x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2 };
-        TestMethods.triggerFakeTouchEvent( "touchstart", eventTarget, [startPoint, startPoint2], [0, 1] );
+        TestMethods.triggerFakeTouchEvent( "touchstart", eventTarget, [startPoint, startPoint2], [0, 1]);
 
         let endPoint = { x: 5 * SVG_WIDTH / 16, y: 5 * SVG_HEIGHT / 16 };
-        TestMethods.triggerFakeTouchEvent("touchmove", eventTarget, [endPoint], [1] );
-        TestMethods.triggerFakeTouchEvent("touchend", eventTarget, [endPoint], [1] );
+        TestMethods.triggerFakeTouchEvent("touchmove", eventTarget, [endPoint], [1]);
+        TestMethods.triggerFakeTouchEvent("touchend", eventTarget, [endPoint], [1]);
         let domainExtent = Math.abs(xScale.domain()[1] - xScale.domain()[0]);
         assert.strictEqual(domainExtent, maximumDomainExtent, "xScale zooms to the correct domain via pinch");
         svg.remove();
