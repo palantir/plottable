@@ -286,15 +286,18 @@ describe("Interactions", () => {
       });
 
       it("pinching inside one component does not affect another component", () => {
-        let component2 = new Plottable.Component();
-        let table = new Plottable.Components.Table([[component], [component2]]);
-        table.renderTo(svg);
         let xScale2 = new Plottable.Scales.Linear();
-        const initialDomain = [0, SVG_WIDTH / 2];
+        let initialDomain = [0, SVG_WIDTH / 2];
         xScale2.domain(initialDomain).range([0, SVG_WIDTH]);
+
+        let component2 = new Plottable.Component();
+
         let panZoomInteraction2 = new Plottable.Interactions.PanZoom();
         panZoomInteraction2.addXScale(xScale2);
         panZoomInteraction2.attachTo(component2);
+
+        let table = new Plottable.Components.Table([[component, component2]]);
+        table.renderTo(svg);
 
         let startPoint = { x: SVG_WIDTH / 4, y: SVG_HEIGHT / 2 };
         let startPoint2 = { x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2 };
