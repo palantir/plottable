@@ -4,7 +4,6 @@ describe("Interactions", () => {
   describe("PanZoomInteraction", () => {
 
     describe("Scale setting", () => {
-
       let xScale: Plottable.QuantitativeScale<number>;
       let yScale: Plottable.QuantitativeScale<number>;
       let panZoomInteraction: Plottable.Interactions.PanZoom;
@@ -89,7 +88,6 @@ describe("Interactions", () => {
       let SVG_WIDTH = 400;
       let SVG_HEIGHT = 500;
 
-      let component: Plottable.Component;
       let eventTarget: d3.Selection<void>;
 
       let xScale: Plottable.QuantitativeScale<number>;
@@ -97,15 +95,16 @@ describe("Interactions", () => {
       let panZoomInteraction: Plottable.Interactions.PanZoom;
 
       beforeEach(() => {
-        svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
-
-        component = new Plottable.Component();
-        component.renderTo(svg);
-
         xScale = new Plottable.Scales.Linear();
         xScale.domain([0, SVG_WIDTH / 2]).range([0, SVG_WIDTH]);
         yScale = new Plottable.Scales.Linear();
         yScale.domain([0, SVG_HEIGHT / 2]).range([0, SVG_HEIGHT]);
+
+        svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+
+        let component = new Plottable.Component();
+        component.renderTo(svg);
+
         panZoomInteraction = new Plottable.Interactions.PanZoom();
         panZoomInteraction.addXScale(xScale);
         panZoomInteraction.addYScale(yScale);
@@ -114,7 +113,7 @@ describe("Interactions", () => {
         eventTarget = component.background();
       });
 
-      it("dragging a certain amount will translate the scale correctly (mouse)", () => {
+      it("dragging a will translate the scale correctly (mouse)", () => {
         let startPoint = { x: SVG_WIDTH / 4, y: SVG_HEIGHT / 4 };
         let endPoint = { x: SVG_WIDTH / 2, y: SVG_HEIGHT * 3 / 4 };
         TestMethods.triggerFakeMouseEvent("mousedown", eventTarget, startPoint.x, startPoint.y);
@@ -151,13 +150,6 @@ describe("Interactions", () => {
       });
 
       it("dragging a certain amount will translate the scale correctly (touch)", () => {
-        // HACKHACK PhantomJS doesn't implement fake creation of WheelEvents
-        // https://github.com/ariya/phantomjs/issues/11289
-        if ( window.PHANTOMJS ) {
-          svg.remove();
-          return;
-        }
-
         let startPoint = { x: SVG_WIDTH / 4, y: SVG_HEIGHT / 4 };
         let endPoint = { x: SVG_WIDTH / 2, y: SVG_HEIGHT * 3 / 4 };
         TestMethods.triggerFakeTouchEvent("touchstart", eventTarget, [startPoint]);
@@ -207,15 +199,16 @@ describe("Interactions", () => {
       let panZoomInteraction: Plottable.Interactions.PanZoom;
 
       beforeEach(() => {
+        xScale = new Plottable.Scales.Linear();
+        xScale.domain([0, SVG_WIDTH / 2]).range([0, SVG_WIDTH]);
+        yScale = new Plottable.Scales.Linear();
+        yScale.domain([0, SVG_HEIGHT / 2]).range([0, SVG_HEIGHT]);
+
         svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
 
         component = new Plottable.Component();
         component.renderTo(svg);
 
-        xScale = new Plottable.Scales.Linear();
-        xScale.domain([0, SVG_WIDTH / 2]).range([0, SVG_WIDTH]);
-        yScale = new Plottable.Scales.Linear();
-        yScale.domain([0, SVG_HEIGHT / 2]).range([0, SVG_HEIGHT]);
         panZoomInteraction = new Plottable.Interactions.PanZoom();
         panZoomInteraction.addXScale(xScale);
         panZoomInteraction.addYScale(yScale);
@@ -227,7 +220,7 @@ describe("Interactions", () => {
       it("mousewheeling a certain amount will magnify the scale correctly", () => {
         // HACKHACK PhantomJS doesn't implement fake creation of WheelEvents
         // https://github.com/ariya/phantomjs/issues/11289
-        if ( window.PHANTOMJS ) {
+        if (window.PHANTOMJS) {
           svg.remove();
           return;
         }
@@ -235,7 +228,7 @@ describe("Interactions", () => {
         let scrollPoint = { x: SVG_WIDTH / 4, y: SVG_HEIGHT / 4 };
         let deltaY = 500;
 
-        TestMethods.triggerFakeWheelEvent( "wheel", svg, scrollPoint.x, scrollPoint.y, deltaY );
+        TestMethods.triggerFakeWheelEvent("wheel", svg, scrollPoint.x, scrollPoint.y, deltaY);
 
         assert.deepEqual(xScale.domain(), [-SVG_WIDTH / 8, SVG_WIDTH * 7 / 8], "xScale zooms to the correct domain via scroll");
         assert.deepEqual(yScale.domain(), [-SVG_HEIGHT / 8, SVG_HEIGHT * 7 / 8], "yScale zooms to the correct domain via scroll");
@@ -245,7 +238,7 @@ describe("Interactions", () => {
       it("mousewheeling a certain amount will magnify multiple scales correctly", () => {
         // HACKHACK PhantomJS doesn't implement fake creation of WheelEvents
         // https://github.com/ariya/phantomjs/issues/11289
-        if ( window.PHANTOMJS ) {
+        if (window.PHANTOMJS) {
           svg.remove();
           return;
         }
@@ -451,7 +444,7 @@ describe("Interactions", () => {
       it("Mousewheeling out cannot go beyond the specified domainExtent", () => {
         // HACKHACK PhantomJS doesn't implement fake creation of WheelEvents
         // https://github.com/ariya/phantomjs/issues/11289
-        if ( window.PHANTOMJS ) {
+        if (window.PHANTOMJS) {
           svg.remove();
           return;
         }
