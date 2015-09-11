@@ -1,32 +1,32 @@
 ///<reference path="../testReference.ts" />
 
 describe("Interactions", () => {
-  describe("KeyInteraction", () => {
-    let svg: d3.Selection<void>;
-    let component: Plottable.Component;
-    let keyInteraction: Plottable.Interactions.Key;
-    let aCode: number;
-    let bCode: number;
-
-    let aCallbackCalled: boolean;
-    let bCallbackCalled: boolean;
-    let aCallback: Plottable.KeyCallback;
-    let bCallback: Plottable.KeyCallback;
-
-    beforeEach(() => {
-      aCode = 65;
-      bCode = 66;
-      component = new Plottable.Component();
-      svg = TestMethods.generateSVG(400, 400);
-      keyInteraction = new Plottable.Interactions.Key();
-      aCallback = () => aCallbackCalled = true;
-      bCallback = () => bCallbackCalled = true;
-      component.renderTo(svg);
-      aCallbackCalled = false;
-      bCallbackCalled = false;
-    });
-
+  describe("Key Interaction", () => {
     describe("onKeyPress", () => {
+      let svg: d3.Selection<void>;
+      let component: Plottable.Component;
+      let keyInteraction: Plottable.Interactions.Key;
+      let aCode: number;
+      let bCode: number;
+
+      let aCallbackCalled: boolean;
+      let bCallbackCalled: boolean;
+      let aCallback: Plottable.KeyCallback;
+      let bCallback: Plottable.KeyCallback;
+
+      beforeEach(() => {
+        aCode = 65;
+        bCode = 66;
+        component = new Plottable.Component();
+        svg = TestMethods.generateSVG(400, 400);
+        keyInteraction = new Plottable.Interactions.Key();
+        aCallback = () => aCallbackCalled = true;
+        bCallback = () => bCallbackCalled = true;
+        component.renderTo(svg);
+        aCallbackCalled = false;
+        bCallbackCalled = false;
+      });
+
       it("only fires callback for \"a\" when \"a\" key is pressed", () => {
         keyInteraction.onKeyPress(aCode, aCallback);
         keyInteraction.onKeyPress(bCode, bCallback);
@@ -149,6 +149,30 @@ describe("Interactions", () => {
     });
 
     describe("onKeyRelease", () => {
+      let svg: d3.Selection<void>;
+      let component: Plottable.Component;
+      let keyInteraction: Plottable.Interactions.Key;
+      let aCode: number;
+      let bCode: number;
+
+      let aCallbackCalled: boolean;
+      let bCallbackCalled: boolean;
+      let aCallback: Plottable.KeyCallback;
+      let bCallback: Plottable.KeyCallback;
+
+      beforeEach(() => {
+        aCode = 65;
+        bCode = 66;
+        component = new Plottable.Component();
+        svg = TestMethods.generateSVG(400, 400);
+        keyInteraction = new Plottable.Interactions.Key();
+        aCallback = () => aCallbackCalled = true;
+        bCallback = () => bCallbackCalled = true;
+        component.renderTo(svg);
+        aCallbackCalled = false;
+        bCallbackCalled = false;
+      });
+
       it("doesn't fire callback if key was released without being pressed", () => {
         keyInteraction.onKeyRelease(aCode, aCallback);
         keyInteraction.attachTo(component);
