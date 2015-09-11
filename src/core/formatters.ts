@@ -244,7 +244,7 @@ export module Formatters {
   }
 
   /**
-   * @deprecated As of release 1.3.0, not safe for use with time zones.
+   * @deprecated As of release v1.3.0, not safe for use with time zones.
    *
    * Creates a formatter for relative dates.
    *
@@ -255,7 +255,7 @@ export module Formatters {
    * @returns {Formatter} A formatter for time/date values.
    */
   export function relativeDate(baseValue: number = 0, increment: number = MILLISECONDS_IN_ONE_DAY, label: string = "") {
-    Plottable.Utils.Window.deprecated("relativeDate()", "1.3", "Not safe for use with time zones.");
+    Plottable.Utils.Window.deprecated("relativeDate()", "v1.3.0", "Not safe for use with time zones.");
     return (d: any) => {
       let relativeDate = Math.round((d.valueOf() - baseValue) / increment);
       return relativeDate.toString() + label;

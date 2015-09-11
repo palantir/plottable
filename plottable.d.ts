@@ -695,7 +695,7 @@ declare module Plottable {
          */
         function time(specifier: string): Formatter;
         /**
-         * @deprecated As of release 1.3.0, not safe for use with time zones.
+         * @deprecated As of release v1.3.0, not safe for use with time zones.
          *
          * Creates a formatter for relative dates.
          *
@@ -1804,7 +1804,7 @@ declare module Plottable {
          */
         formatter(formatter: Formatter): Axis<D>;
         /**
-         * @deprecated As of release 1.3.0, replaced by innerTickLength()
+         * @deprecated As of release v1.3.0, replaced by innerTickLength()
          *
          * Gets the tick mark length in pixels.
          */
@@ -2735,7 +2735,7 @@ declare module Plottable {
          */
         entityNearest(queryPoint: Point): Plots.PlotEntity;
         /**
-         * @deprecated As of release 1.1.0, replaced by _entityVisibleOnPlot()
+         * @deprecated As of release v1.1.0, replaced by _entityVisibleOnPlot()
          */
         protected _visibleOnPlot(datum: any, pixelPoint: Point, selection: d3.Selection<void>): boolean;
         protected _entityVisibleOnPlot(pixelPoint: Point, datum: any, index: number, dataset: Dataset): boolean;
@@ -3158,7 +3158,7 @@ declare module Plottable {
             symbol(symbol: Accessor<SymbolFactory>): Plots.Scatter<X, Y>;
             protected _generateDrawSteps(): Drawers.DrawStep[];
             /**
-             * @deprecated As of release 1.1.0, replaced by _entityVisibleOnPlot()
+             * @deprecated As of release v1.1.0, replaced by _entityVisibleOnPlot()
              */
             protected _visibleOnPlot(datum: any, pixelPoint: Point, selection: d3.Selection<void>): boolean;
             protected _entityVisibleOnPlot(pixelPoint: Point, datum: any, index: number, dataset: Dataset): boolean;
@@ -3277,7 +3277,7 @@ declare module Plottable {
              */
             entityNearest(queryPoint: Point): PlotEntity;
             /**
-             * @deprecated As of release 1.1.0, replaced by _entityVisibleOnPlot()
+             * @deprecated As of release v1.1.0, replaced by _entityVisibleOnPlot()
              */
             protected _visibleOnPlot(datum: any, pixelPoint: Point, selection: d3.Selection<void>): boolean;
             protected _entityVisibleOnPlot(pixelPoint: Point, datum: any, index: number, dataset: Dataset): boolean;

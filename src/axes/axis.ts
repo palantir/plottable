@@ -582,7 +582,7 @@ export class Axis<D> extends Component {
   }
 
   /**
-   * @deprecated As of release 1.3.0, replaced by innerTickLength()
+   * @deprecated As of release v1.3.0, replaced by innerTickLength()
    *
    * Gets the tick mark length in pixels.
    */

@@ -1385,7 +1385,7 @@ var Plottable;
         }
         Formatters.time = time;
         /**
-         * @deprecated As of release 1.3.0, not safe for use with time zones.
+         * @deprecated As of release v1.3.0, not safe for use with time zones.
          *
          * Creates a formatter for relative dates.
          *
@@ -1399,7 +1399,7 @@ var Plottable;
             if (baseValue === void 0) { baseValue = 0; }
             if (increment === void 0) { increment = Plottable.MILLISECONDS_IN_ONE_DAY; }
             if (label === void 0) { label = ""; }
-            Plottable.Utils.Window.deprecated("relativeDate()", "1.3", "Not safe for use with time zones.");
+            Plottable.Utils.Window.deprecated("relativeDate()", "v1.3.0", "Not safe for use with time zones.");
             return function (d) {
                 var relativeDate = Math.round((d.valueOf() - baseValue) / increment);
                 return relativeDate.toString() + label;
@@ -7120,7 +7120,7 @@ var Plottable;
             return this._lightweightPlotEntityToPlotEntity(closestPointEntity);
         };
         /**
-         * @deprecated As of release 1.1.0, replaced by _entityVisibleOnPlot()
+         * @deprecated As of release v1.1.0, replaced by _entityVisibleOnPlot()
          */
         Plot.prototype._visibleOnPlot = function (datum, pixelPoint, selection) {
             Plottable.Utils.Window.deprecated("Plot._visibleOnPlot()", "v1.1.0", "replaced by _entityVisibleOnPlot()");
@@ -8198,7 +8198,7 @@ var Plottable;
                 return drawSteps;
             };
             /**
-             * @deprecated As of release 1.1.0, replaced by _entityVisibleOnPlot()
+             * @deprecated As of release v1.1.0, replaced by _entityVisibleOnPlot()
              */
             Scatter.prototype._visibleOnPlot = function (datum, pixelPoint, selection) {
                 Plottable.Utils.Window.deprecated("Scatter._visibleOnPlot()", "v1.1.0", "replaced by _entityVisibleOnPlot()");
@@ -8522,7 +8522,7 @@ var Plottable;
                 return closest;
             };
             /**
-             * @deprecated As of release 1.1.0, replaced by _entityVisibleOnPlot()
+             * @deprecated As of release v1.1.0, replaced by _entityVisibleOnPlot()
              */
             Bar.prototype._visibleOnPlot = function (datum, pixelPoint, selection) {
                 Plottable.Utils.Window.deprecated("Bar._visibleOnPlot()", "v1.1.0", "replaced by _entityVisibleOnPlot()");

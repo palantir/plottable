@@ -545,7 +545,7 @@ export class Plot extends Component {
   }
 
   /**
-   * @deprecated As of release 1.1.0, replaced by _entityVisibleOnPlot()
+   * @deprecated As of release v1.1.0, replaced by _entityVisibleOnPlot()
    */
   protected _visibleOnPlot(datum: any, pixelPoint: Point, selection: d3.Selection<void>): boolean {
     Utils.Window.deprecated("Plot._visibleOnPlot()", "v1.1.0", "replaced by _entityVisibleOnPlot()");
