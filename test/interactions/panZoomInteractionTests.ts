@@ -4,65 +4,83 @@ describe("Interactions", () => {
   describe("PanZoomInteraction", () => {
 
     describe("Scale setting", () => {
-      let svg: d3.Selection<void>;
-      let SVG_WIDTH = 400;
-      let SVG_HEIGHT = 500;
-
-      let component: Plottable.Component;
-      let eventTarget: d3.Selection<void>;
 
       let xScale: Plottable.QuantitativeScale<number>;
       let yScale: Plottable.QuantitativeScale<number>;
       let panZoomInteraction: Plottable.Interactions.PanZoom;
 
       beforeEach(() => {
-        svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
-
-        component = new Plottable.Component();
-        component.renderTo(svg);
-
         xScale = new Plottable.Scales.Linear();
-        xScale.domain([0, SVG_WIDTH / 2]).range([0, SVG_WIDTH]);
         yScale = new Plottable.Scales.Linear();
-        yScale.domain([0, SVG_HEIGHT / 2]).range([0, SVG_HEIGHT]);
+
         panZoomInteraction = new Plottable.Interactions.PanZoom();
+      });
+
+      it("can set scales", () => {
+        assert.deepEqual(panZoomInteraction.xScales(), [], "no xScales exist by default");
+        assert.deepEqual(panZoomInteraction.yScales(), [], "no yScales exist by default");
+
+        assert.strictEqual(panZoomInteraction.addXScale(xScale), panZoomInteraction, "setting the xScale returns the interaction");
+        assert.strictEqual(panZoomInteraction.addYScale(yScale), panZoomInteraction, "setting the yScale returns the interaction");
+
+        assert.deepEqual(panZoomInteraction.xScales(), [xScale], "xScale has been added");
+        assert.deepEqual(panZoomInteraction.yScales(), [yScale], "yScale has been added");
+      });
+
+      it("can remove scales", () => {
         panZoomInteraction.addXScale(xScale);
         panZoomInteraction.addYScale(yScale);
-        panZoomInteraction.attachTo(component);
 
-        eventTarget = component.background();
+        assert.deepEqual(panZoomInteraction.xScales(), [xScale], "xScale has been added");
+        assert.deepEqual(panZoomInteraction.yScales(), [yScale], "yScale has been added");
+
+        assert.strictEqual(panZoomInteraction.removeXScale(xScale), panZoomInteraction, "removing the xScale returns the interaction");
+        assert.strictEqual(panZoomInteraction.removeYScale(yScale), panZoomInteraction, "removing the yScale returns the interaction");
+
+        assert.deepEqual(panZoomInteraction.xScales(), [], "xScale has been removed");
+        assert.deepEqual(panZoomInteraction.yScales(), [], "yScale has been removed");
+
       });
 
       it("Setting the xScales in batch is the same as adding one at a time", () => {
         let xScale2 = new Plottable.Scales.Linear();
+
+        panZoomInteraction.addXScale(xScale);
         panZoomInteraction.addXScale(xScale2);
         let xScales = panZoomInteraction.xScales();
+
+        panZoomInteraction.xScales([]);
+        assert.deepEqual(panZoomInteraction.xScales(), [], "scales can be removed with the xScales call");
+
         panZoomInteraction.xScales([xScale, xScale2]);
-        assert.deepEqual(xScales, panZoomInteraction.xScales(), "Setting and adding x scales result in the same behavior");
-        svg.remove();
+        assert.deepEqual(xScales, panZoomInteraction.xScales(), "setting and adding x scales result in the same behavior");
       });
 
       it("Setting the yScales in batch is the same as adding one at a time", () => {
         let yScale2 = new Plottable.Scales.Linear();
+        panZoomInteraction.addYScale(yScale);
         panZoomInteraction.addYScale(yScale2);
         let yScales = panZoomInteraction.yScales();
+
+        panZoomInteraction.yScales([]);
+        assert.deepEqual(panZoomInteraction.yScales(), [], "scales can be removed with the yScales call");
+
         panZoomInteraction.yScales([yScale, yScale2]);
-        assert.deepEqual(yScales, panZoomInteraction.yScales(), "Setting and adding y scales result in the same behavior");
-        svg.remove();
+        assert.deepEqual(yScales, panZoomInteraction.yScales(), "setting and adding y scales result in the same behavior");
       });
 
       it("Adding an already existent xScale does nothing", () => {
+        panZoomInteraction.addXScale(xScale);
         let oldXScaleNumber = panZoomInteraction.xScales().length;
         panZoomInteraction.addXScale(panZoomInteraction.xScales()[0]);
-        assert.lengthOf(panZoomInteraction.xScales(), oldXScaleNumber, "Number of x scales is maintained");
-        svg.remove();
+        assert.lengthOf(panZoomInteraction.xScales(), oldXScaleNumber, "the number of x scales is maintained");
       });
 
       it("Adding an already existent yScale does nothing", () => {
+        panZoomInteraction.addYScale(yScale);
         let oldYScaleNumber = panZoomInteraction.yScales().length;
         panZoomInteraction.addYScale(panZoomInteraction.yScales()[0]);
-        assert.lengthOf(panZoomInteraction.yScales(), oldYScaleNumber, "Number of y scales is maintained");
-        svg.remove();
+        assert.lengthOf(panZoomInteraction.yScales(), oldYScaleNumber, "the number of y scales is maintained");
       });
     });
 
