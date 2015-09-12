@@ -4,7 +4,7 @@ describe("Dispatchers", () => {
   describe("Touch Dispatcher", () => {
 
     describe("Basic usage", () => {
-      it("getDispatcher() creates only one Dispatcher.Touch per <svg>", () => {
+      it("creates only one Dispatcher.Touch per <svg> using getDispatcher()", () => {
         let svg = TestMethods.generateSVG();
 
         let td1 = Plottable.Dispatchers.Touch.getDispatcher(<SVGElement> svg.node());
@@ -30,7 +30,7 @@ describe("Dispatchers", () => {
         touchDispatcher = Plottable.Dispatchers.Touch.getDispatcher(<SVGElement> svg.node());
       });
 
-      it("onTouchStart()", () => {
+      it("calls the touchStart callback", () => {
         let targetXs = [17, 18, 12, 23, 44];
         let targetYs = [77, 78, 52, 43, 14];
         let expectedPoints = targetXs.map((targetX, i) => {
@@ -66,7 +66,7 @@ describe("Dispatchers", () => {
         svg.remove();
       });
 
-      it("onTouchMove()", () => {
+      it("calls the touchMove callback", () => {
         let targetXs = [17, 18, 12, 23, 44];
         let targetYs = [77, 78, 52, 43, 14];
         let expectedPoints = targetXs.map((targetX, i) => {
@@ -102,7 +102,7 @@ describe("Dispatchers", () => {
         svg.remove();
       });
 
-      it("onTouchEnd()", () => {
+      it("calls the touchEnd callback", () => {
         let targetXs = [17, 18, 12, 23, 44];
         let targetYs = [77, 78, 52, 43, 14];
         let expectedPoints = targetXs.map((targetX, i) => {
@@ -138,7 +138,7 @@ describe("Dispatchers", () => {
         svg.remove();
       });
 
-      it("onTouchCancel()", () => {
+      it("calls the touchCancel callback", () => {
         let targetXs = [17, 18, 12, 23, 44];
         let targetYs = [77, 78, 52, 43, 14];
         let expectedPoints = targetXs.map((targetX, i) => {
@@ -170,6 +170,41 @@ describe("Dispatchers", () => {
         callbackWasCalled = false;
         TestMethods.triggerFakeTouchEvent("touchcancel", svg, expectedPoints, ids);
         assert.isFalse(callbackWasCalled, "callback was disconnected from the dispatcher");
+
+        svg.remove();
+      });
+
+      it("can register two callbacks for the same touch dispatcher", () => {
+        let targetXs = [17, 18, 12, 23, 44];
+        let targetYs = [77, 78, 52, 43, 14];
+        let expectedPoints = targetXs.map((targetX, i) => {
+          return {
+            x: targetX,
+            y: targetYs[i]
+          };
+        });
+        let ids = targetXs.map((targetX, i) => i);
+
+        let callback1WasCalled = false;
+        let callback1 = () => callback1WasCalled = true;
+        let callback2WasCalled = false;
+        let callback2 = () => callback2WasCalled = true;
+
+        touchDispatcher.onTouchStart(callback1);
+        touchDispatcher.onTouchStart(callback2);
+
+        TestMethods.triggerFakeTouchEvent("touchstart", svg, expectedPoints, ids);
+
+        assert.isTrue(callback1WasCalled, "callback 1 was called on touchstart");
+        assert.isTrue(callback2WasCalled, "callback 2 was called on touchstart");
+
+        touchDispatcher.offTouchStart(callback1);
+
+        callback1WasCalled = false;
+        callback2WasCalled = false;
+        TestMethods.triggerFakeTouchEvent("touchstart", svg, expectedPoints, ids);
+        assert.isFalse(callback1WasCalled, "callback 1 was disconnected from the dispatcher");
+        assert.isTrue(callback2WasCalled, "callback 2 is still connected to the dispatcher");
 
         svg.remove();
       });
