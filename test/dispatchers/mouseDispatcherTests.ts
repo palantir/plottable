@@ -103,6 +103,7 @@ describe("Dispatchers", () => {
         // HACKHACK PhantomJS doesn't implement fake creation of WheelEvents
         // https://github.com/ariya/phantomjs/issues/11289
         if (window.PHANTOMJS) {
+          svg.remove();
           return;
         }
 
