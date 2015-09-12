@@ -53,10 +53,10 @@ describe("Dispatchers", () => {
 
       it("onMouseDown()", () => {
         let callbackWasCalled = false;
-        let callback = (p: Plottable.Point, e: MouseEvent) => {
+        let callback = (point: Plottable.Point, event: MouseEvent) => {
           callbackWasCalled = true;
-          TestMethods.assertPointsClose(p, expectedPoint, 0.5, "mouse position is correct");
-          assert.isNotNull(e, "mouse event was passed to the callback");
+          TestMethods.assertPointsClose(point, expectedPoint, 0.5, "mouse position is correct");
+          assert.isNotNull(event, "mouse event was passed to the callback");
         };
 
         assert.strictEqual(mouseDispatcher.onMouseDown(callback), mouseDispatcher,
@@ -77,10 +77,10 @@ describe("Dispatchers", () => {
 
       it("onMouseUp()", () => {
         let callbackWasCalled = false;
-        let callback = (p: Plottable.Point, e: MouseEvent) => {
+        let callback = (point: Plottable.Point, event: MouseEvent) => {
           callbackWasCalled = true;
-          TestMethods.assertPointsClose(p, expectedPoint, 0.5, "mouse position is correct");
-          assert.isNotNull(e, "mouse event was passed to the callback");
+          TestMethods.assertPointsClose(point, expectedPoint, 0.5, "mouse position is correct");
+          assert.isNotNull(event, "mouse event was passed to the callback");
         };
 
         assert.strictEqual(mouseDispatcher.onMouseUp(callback), mouseDispatcher,
@@ -109,11 +109,11 @@ describe("Dispatchers", () => {
         let targetDeltaY = 10;
 
         let callbackWasCalled = false;
-        let callback = (p: Plottable.Point, e: WheelEvent) => {
+        let callback = (point: Plottable.Point, event: WheelEvent) => {
           callbackWasCalled = true;
-          assert.strictEqual(e.deltaY, targetDeltaY, "deltaY value was passed to callback");
-          TestMethods.assertPointsClose(p, expectedPoint, 0.5, "mouse position is correct");
-          assert.isNotNull(e, "mouse event was passed to the callback");
+          assert.strictEqual(event.deltaY, targetDeltaY, "deltaY value was passed to callback");
+          TestMethods.assertPointsClose(point, expectedPoint, 0.5, "mouse position is correct");
+          assert.isNotNull(event, "mouse event was passed to the callback");
         };
 
         assert.strictEqual(mouseDispatcher.onWheel(callback), mouseDispatcher,
@@ -134,9 +134,10 @@ describe("Dispatchers", () => {
 
       it("onDblClick()", () => {
         let callbackWasCalled = false;
-        let callback = (p: Plottable.Point, e: MouseEvent) => {
+        let callback = (point: Plottable.Point, event: MouseEvent) => {
           callbackWasCalled = true;
-          assert.isNotNull(e, "mouse event was passed to the callback");
+          TestMethods.assertPointsClose(point, expectedPoint, 0.5, "mouse position is correct");
+          assert.isNotNull(event, "mouse event was passed to the callback");
         };
 
         assert.strictEqual(mouseDispatcher.onDblClick(callback), mouseDispatcher,
@@ -157,9 +158,9 @@ describe("Dispatchers", () => {
 
       it("can register two callbacks for the samme mouse dispatcher", () => {
         let cb1Called = false;
-        let cb1 = (p: Plottable.Point, e: MouseEvent) => cb1Called = true;
+        let cb1 = () => cb1Called = true;
         let cb2Called = false;
-        let cb2 = (p: Plottable.Point, e: MouseEvent) => cb2Called = true;
+        let cb2 = () => cb2Called = true;
 
         mouseDispatcher.onMouseMove(cb1);
         mouseDispatcher.onMouseMove(cb2);
@@ -179,7 +180,7 @@ describe("Dispatchers", () => {
 
       it("doesn't call callbacks if not in the DOM", () => {
         let callbackWasCalled = false;
-        let callback = (p: Plottable.Point, e: MouseEvent) => callbackWasCalled = true;
+        let callback = () => callbackWasCalled = true;
 
         mouseDispatcher.onMouseMove(callback);
         TestMethods.triggerFakeMouseEvent("mousemove", svg, targetX, targetY);
@@ -195,7 +196,7 @@ describe("Dispatchers", () => {
 
       it("doesn't call callbacks for clicks if obscured by overlay", () => {
         let callbackWasCalled = false;
-        let callback = (p: Plottable.Point, e: MouseEvent) => callbackWasCalled = true;
+        let callback = () => callbackWasCalled = true;
 
         mouseDispatcher.onMouseDown(callback);
         TestMethods.triggerFakeMouseEvent("mousedown", svg, targetX, targetY);
@@ -209,14 +210,13 @@ describe("Dispatchers", () => {
           element = <HTMLElement> (element.offsetParent || element.parentNode);
         }
 
-        let overlay = TestMethods.getSVGParent().append("div")
-              .style({
-                height: "400px",
-                width: "400px",
-                position: "absolute",
-                top: position.y + "px",
-                left: position.x + "px"
-              });
+        let overlay = TestMethods.getSVGParent().append("div").style({
+          height: "400px",
+          width: "400px",
+          position: "absolute",
+          top: position.y + "px",
+          left: position.x + "px"
+        });
 
         callbackWasCalled = false;
         TestMethods.triggerFakeMouseEvent("mousedown", overlay, targetX, targetY);
@@ -229,10 +229,10 @@ describe("Dispatchers", () => {
 
       it("calls callbacks on mouseover, mousemove, and mouseout", () => {
         let callbackWasCalled = false;
-        let callback = (p: Plottable.Point, e: MouseEvent) => {
+        let callback = (point: Plottable.Point, event: MouseEvent) => {
           callbackWasCalled = true;
-          TestMethods.assertPointsClose(p, expectedPoint, 0.5, "mouse position is correct");
-          assert.isNotNull(e, "mouse event was passed to the callback");
+          TestMethods.assertPointsClose(point, expectedPoint, 0.5, "mouse position is correct");
+          assert.isNotNull(event, "mouse event was passed to the callback");
         };
 
         mouseDispatcher.onMouseMove(callback);
