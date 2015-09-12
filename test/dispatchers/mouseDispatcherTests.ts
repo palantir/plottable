@@ -4,9 +4,6 @@ describe("Dispatchers", () => {
   describe("Mouse Dispatcher", () => {
 
     describe("Callbacks", () => {
-      let SVG_WIDTH = 400;
-      let SVG_HEIGHT = 400;
-
       let targetX = 17;
       let targetY = 76;
       let expectedPoint = {
@@ -18,6 +15,8 @@ describe("Dispatchers", () => {
       let mouseDispatcher: Plottable.Dispatchers.Mouse;
 
       beforeEach(() => {
+        let SVG_WIDTH = 400;
+        let SVG_HEIGHT = 400;
         svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
         // HACKHACK: PhantomJS can't measure SVGs unless they have something in them occupying space
         svg.append("rect").attr("width", SVG_WIDTH).attr("height", SVG_HEIGHT);
