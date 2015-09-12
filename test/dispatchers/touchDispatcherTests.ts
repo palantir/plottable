@@ -17,13 +17,13 @@ describe("Dispatchers", () => {
     });
 
     describe("Callbacks", () => {
-      let SVG_WIDTH = 400
-      let SVG_HEIGHT = 400;
-
       let svg: d3.Selection<void>;
       let touchDispatcher: Plottable.Dispatchers.Touch;
 
       beforeEach(() => {
+        let SVG_WIDTH = 400;
+        let SVG_HEIGHT = 400;
+
         svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
         // HACKHACK: PhantomJS can't measure SVGs unless they have something in them occupying space
         svg.append("rect").attr("width", SVG_WIDTH).attr("height", SVG_HEIGHT);
