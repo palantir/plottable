@@ -2,7 +2,7 @@
 
 describe("Dispatchers", () => {
   describe("Dispatcher", () => {
-    it("_connect() and _disconnect()", () => {
+    it("can connect and disconnect dispatcher to the DOM", () => {
       let dispatcher = new Plottable.Dispatcher();
 
       let callbackCalls = 0;
@@ -24,7 +24,7 @@ describe("Dispatchers", () => {
       assert.strictEqual(callbackCalls, 0, "disconnected correctly (callback not called)");
     });
 
-    it("won't _disconnect() if dispatcher still have listeners", () => {
+    it("doesn't disconnect if still having listeners (in the callback set)", () => {
       let dispatcher = new Plottable.Dispatcher();
 
       let callbackWasCalled = false;
@@ -53,7 +53,7 @@ describe("Dispatchers", () => {
       assert.isFalse(callbackWasCalled, "disconnected when dispatcher had no listeners");
     });
 
-    it("_setCallback()", () => {
+    it("can set and unset callbacks", () => {
       let dispatcher = new Plottable.Dispatcher();
       let callbackSet = new Plottable.Utils.CallbackSet<Function>();
 
