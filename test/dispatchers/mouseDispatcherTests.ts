@@ -10,7 +10,7 @@ describe("Dispatchers", () => {
         svg = TestMethods.generateSVG();
       });
 
-      it("getDispatcher() creates only one Dispatcher.Mouse per <svg>", () => {
+      it("creates only one Dispatcher.Mouse per <svg> using getDispatcher() ", () => {
         let dispatcher1 = Plottable.Dispatchers.Mouse.getDispatcher(<SVGElement> svg.node());
         assert.isNotNull(dispatcher1, "created a new Dispatcher on an SVG");
         let dispatcher2 = Plottable.Dispatchers.Mouse.getDispatcher(<SVGElement> svg.node());
@@ -19,7 +19,7 @@ describe("Dispatchers", () => {
         svg.remove();
       });
 
-      it("lastMousePosition() defaults to a non-null value", () => {
+      it("returns non-null value for default lastMousePosition()", () => {
         let mouseDispatcher = Plottable.Dispatchers.Mouse.getDispatcher(<SVGElement> svg.node());
         let point = mouseDispatcher.lastMousePosition();
         assert.isNotNull(point, "returns a value after initialization");
@@ -51,7 +51,7 @@ describe("Dispatchers", () => {
         mouseDispatcher = Plottable.Dispatchers.Mouse.getDispatcher(<SVGElement> svg.node());
       });
 
-      it("onMouseDown()", () => {
+      it("calls the mouseDown callback", () => {
         let callbackWasCalled = false;
         let callback = (point: Plottable.Point, event: MouseEvent) => {
           callbackWasCalled = true;
@@ -75,7 +75,7 @@ describe("Dispatchers", () => {
         svg.remove();
       });
 
-      it("onMouseUp()", () => {
+      it("calls the mouseUp callback", () => {
         let callbackWasCalled = false;
         let callback = (point: Plottable.Point, event: MouseEvent) => {
           callbackWasCalled = true;
@@ -99,7 +99,7 @@ describe("Dispatchers", () => {
         svg.remove();
       });
 
-      it("onWheel()", () => {
+      it("calls the wheel callback", () => {
         // HACKHACK PhantomJS doesn't implement fake creation of WheelEvents
         // https://github.com/ariya/phantomjs/issues/11289
         if (window.PHANTOMJS) {
@@ -132,7 +132,7 @@ describe("Dispatchers", () => {
         svg.remove();
       });
 
-      it("onDblClick()", () => {
+      it("calls the dblClick callback", () => {
         let callbackWasCalled = false;
         let callback = (point: Plottable.Point, event: MouseEvent) => {
           callbackWasCalled = true;
