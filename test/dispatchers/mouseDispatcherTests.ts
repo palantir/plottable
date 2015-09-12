@@ -3,6 +3,33 @@
 describe("Dispatchers", () => {
   describe("Mouse Dispatcher", () => {
 
+    describe("Basic usage", () => {
+      let svg: d3.Selection<void>;
+
+      beforeEach(() => {
+        svg = TestMethods.generateSVG();
+      });
+
+      it("getDispatcher() creates only one Dispatcher.Mouse per <svg>", () => {
+        let dispatcher1 = Plottable.Dispatchers.Mouse.getDispatcher(<SVGElement> svg.node());
+        assert.isNotNull(dispatcher1, "created a new Dispatcher on an SVG");
+        let dispatcher2 = Plottable.Dispatchers.Mouse.getDispatcher(<SVGElement> svg.node());
+        assert.strictEqual(dispatcher1, dispatcher2, "returned the existing Dispatcher if called again with same <svg>");
+
+        svg.remove();
+      });
+
+      it("lastMousePosition() defaults to a non-null value", () => {
+        let mouseDispatcher = Plottable.Dispatchers.Mouse.getDispatcher(<SVGElement> svg.node());
+        let point = mouseDispatcher.lastMousePosition();
+        assert.isNotNull(point, "returns a value after initialization");
+        assert.isNotNull(point.x, "x value is set");
+        assert.isNotNull(point.y, "y value is set");
+
+        svg.remove();
+      });
+    });
+
     describe("Callbacks", () => {
       let targetX = 17;
       let targetY = 76;
@@ -127,46 +154,8 @@ describe("Dispatchers", () => {
 
         svg.remove();
       });
-    });
 
-    describe("Basic usage", () => {
-      let SVG_WIDTH = 400;
-      let SVG_HEIGHT = 400;
-
-      let svg: d3.Selection<void>;
-
-      beforeEach(() => {
-        svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
-      });
-
-      it("getDispatcher() creates only one Dispatcher.Mouse per <svg>", () => {
-        let dispatcher1 = Plottable.Dispatchers.Mouse.getDispatcher(<SVGElement> svg.node());
-        assert.isNotNull(dispatcher1, "created a new Dispatcher on an SVG");
-        let dispatcher2 = Plottable.Dispatchers.Mouse.getDispatcher(<SVGElement> svg.node());
-        assert.strictEqual(dispatcher1, dispatcher2, "returned the existing Dispatcher if called again with same <svg>");
-
-        svg.remove();
-      });
-
-      it("lastMousePosition() defaults to a non-null value", () => {
-        let mouseDispatcher = Plottable.Dispatchers.Mouse.getDispatcher(<SVGElement> svg.node());
-        let point = mouseDispatcher.lastMousePosition();
-        assert.isNotNull(point, "returns a value after initialization");
-        assert.isNotNull(point.x, "x value is set");
-        assert.isNotNull(point.y, "y value is set");
-
-        svg.remove();
-      });
-
-      it("can remove callbacks by passing null", () => {
-        // HACKHACK: PhantomJS can't measure SVGs unless they have something in them occupying space
-        svg.append("rect").attr("width", SVG_WIDTH).attr("height", SVG_HEIGHT);
-
-        let targetX = 17;
-        let targetY = 76;
-
-        let mouseDispatcher = Plottable.Dispatchers.Mouse.getDispatcher(<SVGElement> svg.node());
-
+      it("can register two callbacks for the samme mouse dispatcher", () => {
         let cb1Called = false;
         let cb1 = (p: Plottable.Point, e: MouseEvent) => cb1Called = true;
         let cb2Called = false;
@@ -189,14 +178,6 @@ describe("Dispatchers", () => {
       });
 
       it("doesn't call callbacks if not in the DOM", () => {
-        // HACKHACK: PhantomJS can't measure SVGs unless they have something in them occupying space
-        svg.append("rect").attr("width", SVG_WIDTH).attr("height", SVG_HEIGHT);
-
-        let targetX = 17;
-        let targetY = 76;
-
-        let mouseDispatcher = Plottable.Dispatchers.Mouse.getDispatcher(<SVGElement> svg.node());
-
         let callbackWasCalled = false;
         let callback = (p: Plottable.Point, e: MouseEvent) => callbackWasCalled = true;
 
@@ -213,14 +194,6 @@ describe("Dispatchers", () => {
       });
 
       it("doesn't call callbacks for clicks if obscured by overlay", () => {
-        // HACKHACK: PhantomJS can't measure SVGs unless they have something in them occupying space
-        svg.append("rect").attr("width", SVG_WIDTH).attr("height", SVG_HEIGHT);
-
-        let targetX = 17;
-        let targetY = 76;
-
-        let mouseDispatcher = Plottable.Dispatchers.Mouse.getDispatcher(<SVGElement> svg.node());
-
         let callbackWasCalled = false;
         let callback = (p: Plottable.Point, e: MouseEvent) => callbackWasCalled = true;
 
@@ -255,18 +228,6 @@ describe("Dispatchers", () => {
       });
 
       it("calls callbacks on mouseover, mousemove, and mouseout", () => {
-        // HACKHACK: PhantomJS can't measure SVGs unless they have something in them occupying space
-        svg.append("rect").attr("width", SVG_WIDTH).attr("height", SVG_HEIGHT);
-
-        let targetX = 17;
-        let targetY = 76;
-        let expectedPoint = {
-          x: targetX,
-          y: targetY
-        };
-
-        let mouseDispatcher = Plottable.Dispatchers.Mouse.getDispatcher(<SVGElement> svg.node());
-
         let callbackWasCalled = false;
         let callback = (p: Plottable.Point, e: MouseEvent) => {
           callbackWasCalled = true;
@@ -288,7 +249,7 @@ describe("Dispatchers", () => {
         mouseDispatcher.offMouseMove(callback);
         svg.remove();
       });
-
     });
+
   });
 });
