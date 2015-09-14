@@ -88,8 +88,18 @@ describe("Layer Components", () => {
         svg.remove();
       });
 
+      it("does not error on getting x scale", () => {
+        assert.doesNotThrow(() => dbl.xScale(), Error, "getting xScale should not error");
+        svg.remove();
+      });
+
       it("throws error on setting x scale", () => {
         assert.throws(() => dbl.xScale(new Plottable.Scales.Linear()), "xScales cannot be set");
+        svg.remove();
+      });
+
+      it("does not error on getting x extent", () => {
+        assert.doesNotThrow(() => dbl.xExtent(), Error, "getting xExtent should not error");
         svg.remove();
       });
 
