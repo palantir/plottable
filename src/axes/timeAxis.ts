@@ -394,7 +394,7 @@ export module Axes {
       let xTranslate = (this._tierLabelPositions[index] === "center" || config.step === 1) ? 0 : this.tickLabelPadding();
       let yTranslate = this.orientation() === "bottom" ?
           d3.sum(this._tierHeights.slice(0, index + 1)) - this.tickLabelPadding() :
-          this.height() - d3.sum(this._tierHeights.slice(0, index)) - this.tickLabelPadding();
+          this.height() - this.innerTickLength() - d3.sum(this._tierHeights.slice(0, index)) - this.tickLabelPadding();
 
       let textSelection = tickLabels.selectAll("text");
       if (textSelection.size() > 0) {
@@ -548,8 +548,8 @@ export module Axes {
         let trailingTickMark = visibleTickMarkRects[i + 1];
 
         let isOverlappingLastLabel = (lastLabelClientRect != null && Utils.DOM.clientRectsOverlap(clientRect, lastLabelClientRect));
-        let isOverlappingLeadingTickMark = (leadingTickMark && Utils.DOM.clientRectsOverlap(clientRect, leadingTickMark));
-        let isOverlappingTrailingTickMark = (trailingTickMark && Utils.DOM.clientRectsOverlap(clientRect, trailingTickMark));
+        let isOverlappingLeadingTickMark = (leadingTickMark != null && Utils.DOM.clientRectsOverlap(clientRect, leadingTickMark));
+        let isOverlappingTrailingTickMark = (trailingTickMark != null && Utils.DOM.clientRectsOverlap(clientRect, trailingTickMark));
 
         if (!isInsideBBox(clientRect) || isOverlappingLastLabel || isOverlappingLeadingTickMark || isOverlappingTrailingTickMark) {
           tickLabel.style("visibility", "hidden");
