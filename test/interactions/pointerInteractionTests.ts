@@ -174,47 +174,6 @@ describe("Interactions", () => {
         svg.remove();
       });
 
-      it("calls all the drag pointer interaction callbacks when needed", () => {
-        let enterCallback1Called = false;
-        let moveCallback1Called = false;
-        let exitCallback1Called = false;
-
-        let enterCallback1 = () => enterCallback1Called = true;
-        let moveCallback1 = () => moveCallback1Called = true;
-        let exitCallback1 = () => exitCallback1Called = true;
-
-        pointerInteraction.onPointerEnter(enterCallback1);
-        pointerInteraction.onPointerMove(moveCallback1);
-        pointerInteraction.onPointerExit(exitCallback1);
-
-        let insidePoint = { x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2 };
-        let outsidePoint = { x: SVG_WIDTH * 2, y: SVG_HEIGHT * 2 };
-        TestMethods.triggerFakeMouseEvent("mousemove", eventTarget, outsidePoint.x, outsidePoint.y);
-        TestMethods.triggerFakeMouseEvent("mousemove", eventTarget, insidePoint.x, insidePoint.y);
-        TestMethods.triggerFakeMouseEvent("mousemove", eventTarget, outsidePoint.x, outsidePoint.y);
-
-        assert.isTrue(enterCallback1Called, "callback 1 was called on entering Component (mouse)");
-        assert.isTrue(moveCallback1Called, "callback 1 was called on moving inside Component (mouse)");
-        assert.isTrue(exitCallback1Called, "callback 1 was called on exiting Component (mouse)");
-
-        enterCallback1Called = false;
-        moveCallback1Called = false;
-        exitCallback1Called = false;
-
-        pointerInteraction.offPointerMove(moveCallback1);
-        pointerInteraction.offPointerExit(exitCallback1);
-
-        TestMethods.triggerFakeMouseEvent("mousemove", eventTarget, outsidePoint.x, outsidePoint.y);
-        TestMethods.triggerFakeMouseEvent("mousemove", eventTarget, insidePoint.x, insidePoint.y);
-        TestMethods.triggerFakeMouseEvent("mousemove", eventTarget, outsidePoint.x, outsidePoint.y);
-
-        assert.isTrue(enterCallback1Called, "callback 1 is still connected to pointer enter interaction");
-        assert.isFalse(moveCallback1Called, "callback 1 was disconnected from pointer interaction");
-        assert.isFalse(exitCallback1Called, "callback 1 was disconnected from the pointer exit interaction");
-
-        svg.remove();
-      });
-
     });
   });
 });
