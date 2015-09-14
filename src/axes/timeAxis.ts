@@ -540,6 +540,7 @@ export module Axes {
                                       return visibility === "visible" || visibility === "inherit";
                                     });
       let lastLabelClientRect: ClientRect;
+      let tierLabelPositions = this.tierLabelPositions();
 
       visibleTickLabels.each(function (d: Element, i: number) {
         let clientRect = this.getBoundingClientRect();
@@ -547,7 +548,8 @@ export module Axes {
         let leadingTickMark = visibleTickMarkRects[i];
         let trailingTickMark = visibleTickMarkRects[i + 1];
         if (!isInsideBBox(clientRect) || (lastLabelClientRect != null && Utils.DOM.clientRectsOverlap(clientRect, lastLabelClientRect))
-            || (leadingTickMark.right > clientRect.left || trailingTickMark.left < clientRect.right)) {
+            || (tierLabelPositions[i] === "between"
+            && (leadingTickMark.right > clientRect.left || trailingTickMark.left < clientRect.right))) {
           tickLabel.style("visibility", "hidden");
         } else {
           lastLabelClientRect = clientRect;

@@ -294,6 +294,50 @@ describe("TimeAxis", () => {
     svg.remove();
   });
 
+  it("tick labels show correctly when display format is set to 'center'", () => {
+    let svg = TestMethods.generateSVG(400, 100);
+    scale.domain([new Date("2015-09-02"), new Date("2015-09-03")]);
+    axis.tierLabelPositions(["center", "center"]);
+    axis.renderTo(svg);
+
+    let labels = axis.content().selectAll("." + Plottable.Axis.TICK_LABEL_CLASS);
+    assert.isFalse(labels.size() === 0, "More than one labels are selected in testing");
+
+    let axisBoundingRect: ClientRect = (<any> axis)._element.select(".bounding-box")[0][0].getBoundingClientRect();
+    let isInsideAxisBoundingRect = function(innerRect: ClientRect) {
+      return (axisBoundingRect.left <= innerRect.left + window.Pixel_CloseTo_Requirement) &&
+             (innerRect.right <= axisBoundingRect.right + window.Pixel_CloseTo_Requirement);
+    };
+
+    let isOverlapping = function(targetIndex: number) {
+         let targetRect = (<Element>labels[0][targetIndex]).getBoundingClientRect();
+         let isOverlapsResult = false;
+         labels.each(function(d, i){
+           if (!isOverlapsResult && i !== targetIndex) {
+             let curRect = this.getBoundingClientRect();
+             if (window.getComputedStyle(this).visibility === "visible" && Plottable.Utils.DOM.clientRectsOverlap(targetRect, curRect)) {
+               isOverlapsResult = true;
+             }
+           }
+         });
+         return isOverlapsResult;
+    };
+
+    labels.each(function(d, i) {
+      let labelVisibility = window.getComputedStyle(this).visibility;
+      let bounding = this.getBoundingClientRect();
+
+      let isInside = isInsideAxisBoundingRect(bounding);
+      let isOverlappingResult = isOverlapping(i);
+      if (labelVisibility === "hidden") {
+             assert.isTrue(!isInside || isOverlappingResult, `Wrong lables ${i} are hidden`);
+      }else {
+             assert.isTrue(isInside && !isOverlappingResult, `Wrong lables ${i} are visible`);
+      }
+    });
+    svg.remove();
+  });
+
   describe("axis annotations", () => {
     describe("formatting annotation ticks", () => {
       it("formats the dates to [{{abbreviated weekday}} {{abbreviated month}} {{day of month}}, {{year}}] by default", () => {
