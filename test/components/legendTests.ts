@@ -413,4 +413,35 @@ describe("Legend", () => {
     legend.renderTo(svg);
     svg.remove();
   });
+
+  it("Title elements are created by default", () => {
+    color.domain(["foo", "bar", "baz"]);
+    legend.renderTo(svg);
+
+    let entries = (<any> legend)._element.selectAll(entrySelector);
+    let titles = entries.selectAll("title");
+    assert.strictEqual(titles.size(), color.domain().length, "same number of title tags as legend entries");
+
+    entries.each(function(d: any, i: number) {
+      let d3this = d3.select(this);
+      let text = d3this.select("text").text();
+      let titles = d3this.selectAll("title");
+      assert.strictEqual(titles.size(), 1, "only one title node per legend entry should be present");
+      assert.strictEqual(text, titles.text(), "the text and title node have the same text");
+    });
+    svg.remove();
+  });
+
+  it("No title elements are created if configuration is set to false", () => {
+    color.domain(["foo", "bar", "baz"]);
+    let originalSetting = Plottable.Configs.ADD_TITLE_ELEMENTS;
+    Plottable.Configs.ADD_TITLE_ELEMENTS = false;
+    legend.renderTo(svg);
+    Plottable.Configs.ADD_TITLE_ELEMENTS = originalSetting;
+
+    let entries = (<any> legend)._element.selectAll(entrySelector);
+    let titles = entries.selectAll("title");
+    assert.strictEqual(titles.size(), 0, "no titles should be rendered");
+    svg.remove();
+  });
 });

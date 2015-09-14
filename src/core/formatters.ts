@@ -28,7 +28,6 @@ export module Formatters {
    * @param {number} [precision] The number of decimal places to show (default 2).
    * @param {string} [symbol] The currency symbol to use (default "$").
    * @param {boolean} [prefix] Whether to prepend or append the currency symbol (default true).
-   * @param {boolean} [onlyShowUnchanged] Whether to return a value if value changes after formatting (default true).
    *
    * @returns {Formatter} A formatter for currency values.
    */
@@ -55,7 +54,6 @@ export module Formatters {
    * Creates a formatter that displays exactly [precision] decimal places.
    *
    * @param {number} [precision] The number of decimal places to show (default 3).
-   * @param {boolean} [onlyShowUnchanged] Whether to return a value if value changes after formatting (default true).
    *
    * @returns {Formatter} A formatter that displays exactly [precision] decimal places.
    */
@@ -69,7 +67,6 @@ export module Formatters {
    * [precision] decimal places. All other values are stringified.
    *
    * @param {number} [precision] The number of decimal places to show (default 3).
-   * @param {boolean} [onlyShowUnchanged] Whether to return a value if value changes after formatting (default true).
    *
    * @returns {Formatter} A formatter for general values.
    */
@@ -99,7 +96,6 @@ export module Formatters {
    * Multiplies the input by 100 and appends "%".
    *
    * @param {number} [precision] The number of decimal places to show (default 0).
-   * @param {boolean} [onlyShowUnchanged] Whether to return a value if value changes after formatting (default true).
    *
    * @returns {Formatter} A formatter for percentage values.
    */
@@ -248,6 +244,8 @@ export module Formatters {
   }
 
   /**
+   * @deprecated As of release v1.3.0, not safe for use with time zones.
+   *
    * Creates a formatter for relative dates.
    *
    * @param {number} baseValue The start date (as epoch time) used in computing relative dates (default 0)
@@ -257,7 +255,7 @@ export module Formatters {
    * @returns {Formatter} A formatter for time/date values.
    */
   export function relativeDate(baseValue: number = 0, increment: number = MILLISECONDS_IN_ONE_DAY, label: string = "") {
-    Plottable.Utils.Window.deprecated("relativeDate()", "1.3", "Not safe for use with time zones.");
+    Plottable.Utils.Window.deprecated("relativeDate()", "v1.3.0", "Not safe for use with time zones.");
     return (d: any) => {
       let relativeDate = Math.round((d.valueOf() - baseValue) / increment);
       return relativeDate.toString() + label;

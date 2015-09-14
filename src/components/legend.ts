@@ -59,7 +59,7 @@ export module Components {
       fakeLegendEntry.append("text");
       this._measurer = new SVGTypewriter.Measurers.Measurer(fakeLegendRow);
       this._wrapper = new SVGTypewriter.Wrappers.Wrapper().maxLines(1);
-      this._writer = new SVGTypewriter.Writers.Writer(this._measurer, this._wrapper).addTitleElement(true);
+      this._writer = new SVGTypewriter.Writers.Writer(this._measurer, this._wrapper).addTitleElement(Configs.ADD_TITLE_ELEMENTS);
     }
 
     /**
@@ -288,7 +288,6 @@ export module Components {
       let padding = this._padding;
       let textContainers = entries.select("g.text-container");
       textContainers.text(""); // clear out previous results
-      textContainers.append("title").text((value: string) => value);
       let self = this;
       textContainers.attr("transform", "translate(" + layout.textHeight + ", 0)")
                     .each(function(value: string) {

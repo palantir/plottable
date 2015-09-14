@@ -46,6 +46,7 @@ svg.plottable {
 
 .plottable .background-fill {
   fill: none;
+  pointer-events: none;
 }
 
 .plottable .bounding-box {
@@ -107,6 +108,23 @@ svg.plottable {
   font-size: 12px;
   font-weight: 200;
   line-height: normal;
+}
+
+.plottable .axis .annotation-circle {
+  fill: white;
+  stroke-width: 1px;
+  stroke: #CCC;
+}
+
+.plottable .axis .annotation-line {
+  stroke: #CCC;
+  stroke-width: 1px;
+}
+
+.plottable .axis .annotation-rect {
+  stroke: #CCC;
+  stroke-width: 1px;
+  fill: white;
 }
 
 .plottable .bar-plot .baseline {

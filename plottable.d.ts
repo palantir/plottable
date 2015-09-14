@@ -54,6 +54,7 @@ declare module Plottable {
              * @return {number} dist(p1, p2)^2
              */
             function distanceSquared(p1: Point, p2: Point): number;
+            function degreesToRadians(degree: number): number;
         }
     }
 }
@@ -374,6 +375,10 @@ declare module Plottable {
          * Specifies if Plottable should show warnings.
          */
         var SHOW_WARNINGS: boolean;
+        /**
+         * Specifies if Plottable should add <title> elements to text.
+         */
+        var ADD_TITLE_ELEMENTS: boolean;
     }
 }
 
@@ -612,7 +617,6 @@ declare module Plottable {
          * @param {number} [precision] The number of decimal places to show (default 2).
          * @param {string} [symbol] The currency symbol to use (default "$").
          * @param {boolean} [prefix] Whether to prepend or append the currency symbol (default true).
-         * @param {boolean} [onlyShowUnchanged] Whether to return a value if value changes after formatting (default true).
          *
          * @returns {Formatter} A formatter for currency values.
          */
@@ -621,7 +625,6 @@ declare module Plottable {
          * Creates a formatter that displays exactly [precision] decimal places.
          *
          * @param {number} [precision] The number of decimal places to show (default 3).
-         * @param {boolean} [onlyShowUnchanged] Whether to return a value if value changes after formatting (default true).
          *
          * @returns {Formatter} A formatter that displays exactly [precision] decimal places.
          */
@@ -631,7 +634,6 @@ declare module Plottable {
          * [precision] decimal places. All other values are stringified.
          *
          * @param {number} [precision] The number of decimal places to show (default 3).
-         * @param {boolean} [onlyShowUnchanged] Whether to return a value if value changes after formatting (default true).
          *
          * @returns {Formatter} A formatter for general values.
          */
@@ -647,7 +649,6 @@ declare module Plottable {
          * Multiplies the input by 100 and appends "%".
          *
          * @param {number} [precision] The number of decimal places to show (default 0).
-         * @param {boolean} [onlyShowUnchanged] Whether to return a value if value changes after formatting (default true).
          *
          * @returns {Formatter} A formatter for percentage values.
          */
@@ -694,6 +695,8 @@ declare module Plottable {
          */
         function time(specifier: string): Formatter;
         /**
+         * @deprecated As of release v1.3.0, not safe for use with time zones.
+         *
          * Creates a formatter for relative dates.
          *
          * @param {number} baseValue The start date (as epoch time) used in computing relative dates (default 0)
@@ -1687,6 +1690,22 @@ declare module Plottable {
          * The css class applied to each tick label (the text associated with the tick).
          */
         static TICK_LABEL_CLASS: string;
+        /**
+         * The css class applied to each annotation line, which extends from the axis to the rect.
+         */
+        static ANNOTATION_LINE_CLASS: string;
+        /**
+         * The css class applied to each annotation rect, which surrounds the annotation label.
+         */
+        static ANNOTATION_RECT_CLASS: string;
+        /**
+         * The css class applied to each annotation circle, which denotes which tick is being annotated.
+         */
+        static ANNOTATION_CIRCLE_CLASS: string;
+        /**
+         * The css class applied to each annotation label, which shows the formatted annotation text.
+         */
+        static ANNOTATION_LABEL_CLASS: string;
         protected _tickMarkContainer: d3.Selection<void>;
         protected _tickLabelContainer: d3.Selection<void>;
         protected _baseline: d3.Selection<void>;
@@ -1714,6 +1733,55 @@ declare module Plottable {
         protected _setup(): void;
         protected _getTickValues(): D[];
         renderImmediately(): Axis<D>;
+        /**
+         * Gets the annotated ticks.
+         */
+        annotatedTicks(): D[];
+        /**
+         * Sets the annotated ticks.
+         *
+         * @returns {Axis} The calling Axis.
+         */
+        annotatedTicks(annotatedTicks: D[]): Axis<D>;
+        /**
+         * Gets the Formatter for the annotations.
+         */
+        annotationFormatter(): Formatter;
+        /**
+         * Sets the Formatter for the annotations.
+         *
+         * @returns {Axis} The calling Axis.
+         */
+        annotationFormatter(annotationFormatter: Formatter): Axis<D>;
+        /**
+         * Gets if annotations are enabled.
+         */
+        annotationsEnabled(): boolean;
+        /**
+         * Sets if annotations are enabled.
+         *
+         * @returns {Axis} The calling Axis.
+         */
+        annotationsEnabled(annotationsEnabled: boolean): Axis<D>;
+        /**
+         * Gets the count of annotation tiers to render.
+         */
+        annotationTierCount(): number;
+        /**
+         * Sets the count of annotation tiers to render.
+         *
+         * @returns {Axis} The calling Axis.
+         */
+        annotationTierCount(annotationTierCount: number): Axis<D>;
+        protected _drawAnnotations(): void;
+        /**
+         * Retrieves the size of the core pieces.
+         *
+         * The core pieces include the labels, the end tick marks, the inner tick marks, and the tick label padding.
+         */
+        protected _coreSize(): number;
+        protected _annotationTierHeight(): number;
+        protected _removeAnnotations(): void;
         protected _generateBaselineAttrHash(): {
             [key: string]: number;
         };
@@ -1736,7 +1804,7 @@ declare module Plottable {
          */
         formatter(formatter: Formatter): Axis<D>;
         /**
-         * @deprecated As of release 1.3, replaced by innerTickLength()
+         * @deprecated As of release v1.3.0, replaced by innerTickLength()
          *
          * Gets the tick mark length in pixels.
          */
@@ -1785,11 +1853,13 @@ declare module Plottable {
         /**
          * Gets the margin in pixels.
          * The margin is the amount of space between the tick labels and the outer edge of the Axis.
+         * The margin also determines the space that annotations will reside in if annotations are enabled.
          */
         margin(): number;
         /**
          * Sets the margin in pixels.
          * The margin is the amount of space between the tick labels and the outer edge of the Axis.
+         * The margin also determines the space that annotations will reside in if annotations are enabled.
          *
          * @param {number} size
          * @returns {Axis} The calling Axis.
@@ -1973,6 +2043,7 @@ declare module Plottable {
             protected _setup(): void;
             protected _rescale(): Component;
             requestedSpace(offeredWidth: number, offeredHeight: number): SpaceRequest;
+            protected _coreSize(): number;
             protected _getTickValues(): string[];
             /**
              * Gets the tick label angle in degrees.
@@ -2202,6 +2273,17 @@ declare module Plottable {
              * @returns {InterpolatedColorLegend} The calling InterpolatedColorLegend.
              */
             formatter(formatter: Formatter): InterpolatedColorLegend;
+            /**
+             * Gets whether the InterpolatedColorLegend expands to occupy all offered space in the long direction
+             */
+            expands(): boolean;
+            /**
+             * Sets whether the InterpolatedColorLegend expands to occupy all offered space in the long direction
+             *
+             * @param {expands} boolean
+             * @returns {InterpolatedColorLegend} The calling InterpolatedColorLegend.
+             */
+            expands(expands: boolean): InterpolatedColorLegend;
             /**
              * Gets the orientation.
              */
@@ -2676,6 +2758,9 @@ declare module Plottable {
          * @returns {Plots.PlotEntity} The nearest PlotEntity, or undefined if no PlotEntity can be found.
          */
         entityNearest(queryPoint: Point): Plots.PlotEntity;
+        /**
+         * @deprecated As of release v1.1.0, replaced by _entityVisibleOnPlot()
+         */
         protected _visibleOnPlot(datum: any, pixelPoint: Point, selection: d3.Selection<void>): boolean;
         protected _entityVisibleOnPlot(pixelPoint: Point, datum: any, index: number, dataset: Dataset): boolean;
         protected _uninstallScaleForKey(scale: Scale<any, any>, key: string): void;
@@ -3096,6 +3181,9 @@ declare module Plottable {
              */
             symbol(symbol: Accessor<SymbolFactory>): Plots.Scatter<X, Y>;
             protected _generateDrawSteps(): Drawers.DrawStep[];
+            /**
+             * @deprecated As of release v1.1.0, replaced by _entityVisibleOnPlot()
+             */
             protected _visibleOnPlot(datum: any, pixelPoint: Point, selection: d3.Selection<void>): boolean;
             protected _entityVisibleOnPlot(pixelPoint: Point, datum: any, index: number, dataset: Dataset): boolean;
             protected _propertyProjectors(): AttributeToProjector;
@@ -3212,6 +3300,9 @@ declare module Plottable {
              * @returns {PlotEntity} The nearest PlotEntity, or undefined if no PlotEntity can be found.
              */
             entityNearest(queryPoint: Point): PlotEntity;
+            /**
+             * @deprecated As of release v1.1.0, replaced by _entityVisibleOnPlot()
+             */
             protected _visibleOnPlot(datum: any, pixelPoint: Point, selection: d3.Selection<void>): boolean;
             protected _entityVisibleOnPlot(pixelPoint: Point, datum: any, index: number, dataset: Dataset): boolean;
             /**
@@ -3595,6 +3686,93 @@ declare module Plottable {
                 [attr: string]: (datum: any, index: number, dataset: Dataset) => any;
             };
             protected _onDatasetUpdate(): Waterfall<X, Y>;
+        }
+    }
+}
+
+
+declare module Plottable {
+    module Plots {
+        class Wheel<R, T> extends Plot {
+            /**
+             * @constructor
+             */
+            constructor();
+            computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number): Wheel<R, T>;
+            protected _createDrawer(dataset: Dataset): Drawers.Arc;
+            entities(datasets?: Dataset[]): PlotEntity[];
+            protected _getDataToDraw(): Utils.Map<Dataset, any[]>;
+            protected _propertyProjectors(): AttributeToProjector;
+            /**
+             * Gets the AccessorScaleBinding for t in degrees.
+             */
+            t(): AccessorScaleBinding<T, number>;
+            /**
+             * Sets t to a constant number or the result of an Accessor<number> in degrees.
+             *
+             * @param {number|Accessor<number>} t
+             * @returns {Wheel} The calling Wheel Plot.
+             */
+            t(t: number | Accessor<number>): Plots.Wheel<R, T>;
+            /**
+             * Sets t to a scaled constant value or scaled result of an Accessor in degrees.
+             * The supplied Scale will also be used for t2().
+             * The provided Scale will account for the values when autoDomain()-ing.
+             *
+             * @param {T|Accessor<T>} t
+             * @param {QuantitativeScale<T>} scale
+             * @returns {Wheel} The calling Wheel Plot.
+             */
+            t(t: T | Accessor<T>, scale: QuantitativeScale<T>): Plots.Wheel<R, T>;
+            /**
+             * Gets the AccessorScaleBinding for t2 in degrees.
+             */
+            t2(): AccessorScaleBinding<T, number>;
+            /**
+             * Sets t2 to a constant number or the result of an Accessor<number> in degrees.
+             * If a Scale has been set for t, it will also be used to scale t2.
+             *
+             * @param {number|Accessor<number|T|Accessor<T>>} t2
+             * @returns {Wheel} The calling Wheel Plot.
+             */
+            t2(t2: number | Accessor<number> | T | Accessor<T>): Plots.Wheel<R, T>;
+            /**
+             * Gets the AccessorScaleBinding for r.
+             */
+            r(): AccessorScaleBinding<R, number>;
+            /**
+             * Sets r to a constant number or the result of an Accessor<number>.
+             *
+             * @param {number|Accessor<number>} r
+             * @returns {Wheel} The calling Wheel Plot.
+             */
+            r(r: number | Accessor<number>): Plots.Wheel<R, T>;
+            /**
+             * Sets r to a scaled constant value or scaled result of an Accessor.
+             * The supplied Scale will also be used for r2().
+             * The provided Scale will account for the values when autoDomain()-ing.
+             *
+             * @param {R|Accessor<R>} r
+             * @param {QuantitativeScale<R>} scale
+             * @returns {Wheel} The calling Wheel Plot.
+             */
+            r(r: R | Accessor<R>, scale: QuantitativeScale<R>): Plots.Wheel<R, T>;
+            /**
+             * Gets the AccessorScaleBinding for r2.
+             */
+            r2(): AccessorScaleBinding<R, number>;
+            /**
+             * Sets r2 to a constant number or the result of an Accessor<number>.
+             * If a Scale has been set for r, it will also be used to scale r2.
+             *
+             * @param {number|Accessor<number>|R|Accessor<R>} r2
+             * @returns {Wheel} The calling Wheel Plot.
+             */
+            r2(r2: number | Accessor<number> | R | Accessor<R>): Plots.Wheel<R, T>;
+            protected _pixelPoint(datum: any, index: number, dataset: Dataset): {
+                x: number;
+                y: number;
+            };
         }
     }
 }
