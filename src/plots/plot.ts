@@ -155,19 +155,23 @@ export class Plot extends Component {
   }
 
   protected _bindProperty(property: string, value: any, scale: Scale<any, any>) {
-    this._bind(property, value, scale, this._propertyBindings, this._propertyExtents);
-    this._updateExtentsForProperty(property);
+    let updateExtentsForKey = () => this._updateExtentsForProperty(property);
+    this._bind(property, value, scale, this._propertyBindings, this._propertyExtents, updateExtentsForKey);
   }
 
   private _bindAttr(attr: string, value: any, scale: Scale<any, any>) {
-    this._bind(attr, value, scale, this._attrBindings, this._attrExtents);
-    this._updateExtentsForAttr(attr);
+    let updateExtentsForKey = () => this._updateExtentsForAttr(attr);
+    this._bind(attr, value, scale, this._attrBindings, this._attrExtents, updateExtentsForKey);
   }
 
   private _bind(key: string, value: any, scale: Scale<any, any>,
-                    bindings: d3.Map<Plots.AccessorScaleBinding<any, any>>, extents: d3.Map<any[]>) {
+                bindings: d3.Map<Plots.AccessorScaleBinding<any, any>>, extents: d3.Map<any[]>,
+                updateExtentsForKey: (key: string) => void) {
     let binding = bindings.get(key);
     let oldScale = binding != null ? binding.scale : null;
+
+    bindings.set(key, { accessor: d3.functor(value), scale: scale });
+    updateExtentsForKey(key);
 
     if (oldScale != null) {
       this._uninstallScaleForKey(oldScale, key);
@@ -175,8 +179,6 @@ export class Plot extends Component {
     if (scale != null) {
       this._installScaleForKey(scale, key);
     }
-
-    bindings.set(key, { accessor: d3.functor(value), scale: scale });
   }
 
   protected _generateAttrToProjector(): AttributeToProjector {

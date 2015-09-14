@@ -133,6 +133,26 @@ describe("Plots", () => {
 
     });
 
+    it("sets the scale domain automatically", () => {
+      let dataset = new Plottable.Dataset([{x: 5}, {x: 10}]);
+      let plot = new Plottable.Plot();
+      let svg = TestMethods.generateSVG();
+      (<any> plot)._createDrawer = (dataset: Plottable.Dataset) => createMockDrawer(dataset);
+      plot.addDataset(dataset);
+
+      let scale = new Plottable.Scales.Linear();
+      let defaultDomain = [0, 1];
+
+      plot.attr("x", (d) => d.x);
+      plot.attr("y", (d) => 1);
+      plot.renderTo(svg);
+      assert.deepEqual(scale.domain(), defaultDomain, "scale domain scale is same as default");
+
+      plot.attr("x", (d) => d.x, scale);
+      assert.deepEqual(scale.domain(), [4.5, 10.5], "scale domain scale is auto updated");
+      svg.remove();
+    });
+
     it("Plot.project works as intended", () => {
       let r = new Plottable.Plot();
       (<any> r)._createDrawer = (dataset: Plottable.Dataset) => createMockDrawer(dataset);
