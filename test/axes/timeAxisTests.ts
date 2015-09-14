@@ -303,37 +303,19 @@ describe("TimeAxis", () => {
     let labels = axis.content().selectAll("." + Plottable.Axis.TICK_LABEL_CLASS);
     assert.isFalse(labels.size() === 0, "More than one labels are selected in testing");
 
-    let axisBoundingRect: ClientRect = (<any> axis)._element.select(".bounding-box")[0][0].getBoundingClientRect();
+    let axisBoundingRect: ClientRect = (<Element>axis.background().node()).getBoundingClientRect();
     let isInsideAxisBoundingRect = function(innerRect: ClientRect) {
       return (axisBoundingRect.left <= innerRect.left + window.Pixel_CloseTo_Requirement) &&
-             (innerRect.right <= axisBoundingRect.right + window.Pixel_CloseTo_Requirement);
-    };
-
-    let isOverlapping = function(targetIndex: number) {
-         let targetRect = (<Element>labels[0][targetIndex]).getBoundingClientRect();
-         let isOverlapsResult = false;
-         labels.each(function(d, i){
-           if (!isOverlapsResult && i !== targetIndex) {
-             let curRect = this.getBoundingClientRect();
-             if (window.getComputedStyle(this).visibility === "visible" && Plottable.Utils.DOM.clientRectsOverlap(targetRect, curRect)) {
-               isOverlapsResult = true;
-             }
-           }
-         });
-         return isOverlapsResult;
+             (innerRect.right <= axisBoundingRect.right + window.Pixel_CloseTo_Requirement) &&
+             (axisBoundingRect.top <= innerRect.top + window.Pixel_CloseTo_Requirement) &&
+             (innerRect.bottom <= axisBoundingRect.bottom + window.Pixel_CloseTo_Requirement);
     };
 
     labels.each(function(d, i) {
       let labelVisibility = window.getComputedStyle(this).visibility;
       let bounding = this.getBoundingClientRect();
-
       let isInside = isInsideAxisBoundingRect(bounding);
-      let isOverlappingResult = isOverlapping(i);
-      if (labelVisibility === "hidden") {
-             assert.isTrue(!isInside || isOverlappingResult, `Wrong lables ${i} are hidden`);
-      }else {
-             assert.isTrue(isInside && !isOverlappingResult, `Wrong lables ${i} are visible`);
-      }
+      assert.isFalse(isInside && (labelVisibility === "hidden"),  `Wrong lables ${i} are ${labelVisibility}`);
     });
     svg.remove();
   });
