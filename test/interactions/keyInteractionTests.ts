@@ -6,28 +6,26 @@ describe("Interactions", () => {
       let svg: d3.Selection<void>;
       let component: Plottable.Component;
       let keyInteraction: Plottable.Interactions.Key;
-      let aCode: number;
-      let bCode: number;
 
+      let aCode: number;
       let aCallbackCalled: boolean;
-      let bCallbackCalled: boolean;
       let aCallback: Plottable.KeyCallback;
-      let bCallback: Plottable.KeyCallback;
 
       beforeEach(() => {
-        aCode = 65;
-        bCode = 66;
         component = new Plottable.Component();
         keyInteraction = new Plottable.Interactions.Key();
+        aCode = 65;
         aCallbackCalled = false;
-        bCallbackCalled = false;
         aCallback = () => aCallbackCalled = true;
-        bCallback = () => bCallbackCalled = true;
         svg = TestMethods.generateSVG();
         component.renderTo(svg);
       });
 
       it("only fires callback for \"a\" when \"a\" key is pressed", () => {
+        let bCode = 66;
+        let bCallbackCalled = false;
+        let bCallback = () => bCallbackCalled = true;
+
         assert.strictEqual(keyInteraction.onKeyPress(aCode, aCallback), keyInteraction,
           "setting the keyPress callback returns the interaction");
         keyInteraction.onKeyPress(bCode, bCallback);
@@ -38,8 +36,7 @@ describe("Interactions", () => {
         assert.isTrue(aCallbackCalled, "callback for \"a\" was called when \"a\" key was pressed");
         assert.isFalse(bCallbackCalled, "callback for \"b\" was not called when \"a\" key was pressed");
 
-        assert.strictEqual(keyInteraction.offKeyPress(aCode, aCallback), keyInteraction,
-          "unsetting the keyPress callback returns the interaction");
+        keyInteraction.offKeyPress(aCode, aCallback);
         keyInteraction.offKeyPress(bCode, bCallback);
         svg.remove();
       });
@@ -73,11 +70,12 @@ describe("Interactions", () => {
         TestMethods.triggerFakeKeyboardEvent("keydown", component.background(), aCode);
         assert.isTrue(aCallbackCalled, "callback for \"a\" was properly connected back to the interaction");
 
-        keyInteraction.offKeyPress(aCode, aCallback);
+        assert.strictEqual(keyInteraction.offKeyPress(aCode, aCallback), keyInteraction,
+          "unsetting the keyPress callback returns the interaction");
         svg.remove();
       });
 
-      it("can attach multiple multiple keyPress callbacks", () => {
+      it("can attach multiple keyPress callbacks", () => {
         let aCallback1Called = false;
         let aCallback1 = () => aCallback1Called = true;
         let aCallback2Called = false;
@@ -154,23 +152,17 @@ describe("Interactions", () => {
       let svg: d3.Selection<void>;
       let component: Plottable.Component;
       let keyInteraction: Plottable.Interactions.Key;
-      let aCode: number;
-      let bCode: number;
 
+      let aCode: number;
       let aCallbackCalled: boolean;
-      let bCallbackCalled: boolean;
       let aCallback: Plottable.KeyCallback;
-      let bCallback: Plottable.KeyCallback;
 
       beforeEach(() => {
         aCode = 65;
-        bCode = 66;
         component = new Plottable.Component();
         keyInteraction = new Plottable.Interactions.Key();
         aCallbackCalled = false;
-        bCallbackCalled = false;
         aCallback = () => aCallbackCalled = true;
-        bCallback = () => bCallbackCalled = true;
         svg = TestMethods.generateSVG();
         component.renderTo(svg);
       });
@@ -183,8 +175,7 @@ describe("Interactions", () => {
         TestMethods.triggerFakeKeyboardEvent("keyup", component.background(), aCode);
         assert.isFalse(aCallbackCalled, "callback for \"a\" was not called when \"a\" key was released");
 
-        assert.strictEqual(keyInteraction.offKeyRelease(aCode, aCallback), keyInteraction,
-          "unsetting the keyRelease callback returns the interaction");
+        keyInteraction.offKeyRelease(aCode, aCallback);
         svg.remove();
       });
 
@@ -202,6 +193,10 @@ describe("Interactions", () => {
       });
 
       it("only fires callback for key that has been released", () => {
+        let bCode = 66;
+        let bCallbackCalled = false;
+        let bCallback = () => bCallbackCalled = true;
+
         keyInteraction.onKeyRelease(aCode, aCallback);
         keyInteraction.onKeyRelease(bCode, bCallback);
         keyInteraction.attachTo(component);
@@ -258,7 +253,7 @@ describe("Interactions", () => {
         svg.remove();
       });
 
-      it("can remove removing keyRelease callbacks", () => {
+      it("can remove keyRelease callbacks", () => {
         keyInteraction.onKeyRelease(aCode, aCallback);
         keyInteraction.attachTo(component);
 
@@ -267,7 +262,8 @@ describe("Interactions", () => {
         TestMethods.triggerFakeKeyboardEvent("keyup", component.background(), aCode);
         assert.isTrue(aCallbackCalled, "callback for \"a\" was called when \"a\" key was released");
 
-        keyInteraction.offKeyRelease(aCode, aCallback);
+        assert.strictEqual(keyInteraction.offKeyRelease(aCode, aCallback), keyInteraction,
+          "unsetting the keyRelease callback returns the interaction");
         aCallbackCalled = false;
         TestMethods.triggerFakeKeyboardEvent("keydown", component.background(), aCode);
         TestMethods.triggerFakeKeyboardEvent("keyup", component.background(), aCode);
