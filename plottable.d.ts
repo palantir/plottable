@@ -4640,9 +4640,6 @@ declare module Plottable {
             yScale<D extends number | {
                 valueOf(): number;
             }>(yScale: QuantitativeScale<D>): SelectionBoxLayer;
-            yExtent(): (number | {
-                valueOf(): number;
-            })[];
         }
     }
 }
@@ -4667,9 +4664,6 @@ declare module Plottable {
             xScale<D extends number | {
                 valueOf(): number;
             }>(xScale: QuantitativeScale<D>): SelectionBoxLayer;
-            xExtent(): (number | {
-                valueOf(): number;
-            })[];
         }
     }
 }
