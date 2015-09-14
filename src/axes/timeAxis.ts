@@ -513,7 +513,6 @@ export module Axes {
 
     private _hideOverlappingAndCutOffLabels(index: number) {
       let boundingBox = (<Element> this._boundingBox.node()).getBoundingClientRect();
-
       let isInsideBBox = (tickBox: ClientRect) => {
         return (
           Math.floor(boundingBox.left) <= Math.ceil(tickBox.left) &&

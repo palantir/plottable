@@ -305,17 +305,19 @@ describe("TimeAxis", () => {
 
     let axisBoundingRect: ClientRect = (<Element>axis.background().node()).getBoundingClientRect();
     let isInsideAxisBoundingRect = function(innerRect: ClientRect) {
-      return (axisBoundingRect.left <= innerRect.left + window.Pixel_CloseTo_Requirement) &&
-             (innerRect.right <= axisBoundingRect.right + window.Pixel_CloseTo_Requirement) &&
-             (axisBoundingRect.top <= innerRect.top + window.Pixel_CloseTo_Requirement) &&
-             (innerRect.bottom <= axisBoundingRect.bottom + window.Pixel_CloseTo_Requirement);
+        return (
+          Math.floor(axisBoundingRect.left) <= Math.ceil(innerRect.left) &&
+          Math.floor(axisBoundingRect.top) <= Math.ceil(innerRect.top) &&
+          Math.floor(innerRect.right) <= Math.ceil(axisBoundingRect.right) &&
+          Math.floor(innerRect.bottom) <= Math.ceil(axisBoundingRect.bottom)
+        );
     };
 
     labels.each(function(d, i) {
       let labelVisibility = window.getComputedStyle(this).visibility;
       let bounding = this.getBoundingClientRect();
       let isInside = isInsideAxisBoundingRect(bounding);
-      assert.isFalse(isInside && (labelVisibility === "hidden"),  `Wrong lables ${i} are ${labelVisibility}`);
+      assert.isFalse(isInside && (labelVisibility === "hidden"),  `Wrong labels ${i} are ${labelVisibility}`);
     });
     svg.remove();
   });
