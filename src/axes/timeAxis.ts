@@ -540,16 +540,18 @@ export module Axes {
                                       return visibility === "visible" || visibility === "inherit";
                                     });
       let lastLabelClientRect: ClientRect;
-      let tierLabelPositions = this.tierLabelPositions();
 
       visibleTickLabels.each(function (d: Element, i: number) {
         let clientRect = this.getBoundingClientRect();
         let tickLabel = d3.select(this);
         let leadingTickMark = visibleTickMarkRects[i];
         let trailingTickMark = visibleTickMarkRects[i + 1];
-        if (!isInsideBBox(clientRect) || (lastLabelClientRect != null && Utils.DOM.clientRectsOverlap(clientRect, lastLabelClientRect))
-            || (tierLabelPositions[i] === "between"
-            && (leadingTickMark.right > clientRect.left || trailingTickMark.left < clientRect.right))) {
+
+        let isOverlappingLastLabel = (lastLabelClientRect != null && Utils.DOM.clientRectsOverlap(clientRect, lastLabelClientRect));
+        let isOverlappingLeadingTickMark = (leadingTickMark && Utils.DOM.clientRectsOverlap(clientRect, leadingTickMark));
+        let isOverlappingTrailingTickMark = (trailingTickMark && Utils.DOM.clientRectsOverlap(clientRect, trailingTickMark));
+
+        if (!isInsideBBox(clientRect) || isOverlappingLastLabel || isOverlappingLeadingTickMark || isOverlappingTrailingTickMark) {
           tickLabel.style("visibility", "hidden");
         } else {
           lastLabelClientRect = clientRect;

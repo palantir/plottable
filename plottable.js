@@ -4555,15 +4555,15 @@ var Plottable;
                     return visibility === "visible" || visibility === "inherit";
                 });
                 var lastLabelClientRect;
-                var tierLabelPositions = this.tierLabelPositions();
                 visibleTickLabels.each(function (d, i) {
                     var clientRect = this.getBoundingClientRect();
                     var tickLabel = d3.select(this);
                     var leadingTickMark = visibleTickMarkRects[i];
                     var trailingTickMark = visibleTickMarkRects[i + 1];
-                    if (!isInsideBBox(clientRect) || (lastLabelClientRect != null && Plottable.Utils.DOM.clientRectsOverlap(clientRect, lastLabelClientRect))
-                        || (tierLabelPositions[i] === "between"
-                            && (leadingTickMark.right > clientRect.left || trailingTickMark.left < clientRect.right))) {
+                    var isOverlappingLastLabel = (lastLabelClientRect != null && Plottable.Utils.DOM.clientRectsOverlap(clientRect, lastLabelClientRect));
+                    var isOverlappingLeadingTickMark = (leadingTickMark && Plottable.Utils.DOM.clientRectsOverlap(clientRect, leadingTickMark));
+                    var isOverlappingTrailingTickMark = (trailingTickMark && Plottable.Utils.DOM.clientRectsOverlap(clientRect, trailingTickMark));
+                    if (!isInsideBBox(clientRect) || isOverlappingLastLabel || isOverlappingLeadingTickMark || isOverlappingTrailingTickMark) {
                         tickLabel.style("visibility", "hidden");
                     }
                     else {
