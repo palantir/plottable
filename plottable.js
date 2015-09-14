@@ -12206,6 +12206,18 @@ var Plottable;
                 this._dragEndCallbacks.forEach(function (callback) { return _this._dragEndCallbacks.delete(callback); });
                 this._disconnectInteraction();
             };
+            DragBoxLayer.prototype.detach = function () {
+                this.bounds({
+                    topLeft: { x: 0, y: 0 },
+                    bottomRight: { x: 0, y: 0 }
+                });
+                this._dragInteraction.detachFrom(this);
+                return _super.prototype.detach.call(this);
+            };
+            DragBoxLayer.prototype.anchor = function (selection) {
+                this._dragInteraction.attachTo(this);
+                return _super.prototype.anchor.call(this, selection);
+            };
             return DragBoxLayer;
         })(Components.SelectionBoxLayer);
         Components.DragBoxLayer = DragBoxLayer;

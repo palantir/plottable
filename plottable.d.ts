@@ -4606,6 +4606,8 @@ declare module Plottable {
              */
             enabled(): boolean;
             destroy(): void;
+            detach(): Component;
+            anchor(selection: d3.Selection<void>): Component;
         }
     }
 }

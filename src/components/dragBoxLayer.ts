@@ -437,6 +437,19 @@ export module Components {
       this._disconnectInteraction();
     }
 
+    public detach() {
+      this.bounds({
+        topLeft: { x: 0, y: 0 },
+        bottomRight: { x: 0, y: 0 }
+      });
+      this._dragInteraction.detachFrom(this);
+      return super.detach();
+    }
+
+    public anchor(selection: d3.Selection<void>) {
+      this._dragInteraction.attachTo(this);
+      return super.anchor(selection);
+    }
   }
 }
 }
