@@ -15,7 +15,7 @@ describe("Dispatchers", () => {
         body = d3.select("body");
       });
 
-      it("calls the keydown callback", () => {
+      it("can set a callback to be called when a key is pressed down", () => {
         let keyDowned = false;
         let callback = (code: number, event: KeyboardEvent) => {
           keyDowned = true;
@@ -31,7 +31,7 @@ describe("Dispatchers", () => {
         keyDispatcher.offKeyDown(callback);
       });
 
-      it("can remove keydown listener", () => {
+      it("can remove the keydown listener", () => {
         let keyDowned = false;
         let callback = () => keyDowned = true;
 
@@ -47,7 +47,7 @@ describe("Dispatchers", () => {
         assert.isFalse(keyDowned, "nothing happens when a key was pressed");
       });
 
-      it("calls the keyup callback", () => {
+      it("can set a callback to be called when the key is released", () => {
         let keyUped = false;
         let callback = (code: number, event: KeyboardEvent) => {
           keyUped = true;
@@ -63,7 +63,7 @@ describe("Dispatchers", () => {
         keyDispatcher.offKeyUp(callback);
       });
 
-      it("can remove keyup listener", () => {
+      it("can remove the keyup listener", () => {
         let keyUped = false;
         let callback = () => keyUped = true;
 
