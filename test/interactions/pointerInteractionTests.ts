@@ -27,7 +27,7 @@ describe("Interactions", () => {
         eventTarget = component.background();
 
         callbackCalled = false;
-        callback = function(point) {
+        callback = (point) => {
           callbackCalled = true;
           lastPoint = point;
         };
