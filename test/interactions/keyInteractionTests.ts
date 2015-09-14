@@ -21,13 +21,25 @@ describe("Interactions", () => {
         component.renderTo(svg);
       });
 
+      it("fires callback for key press", () => {
+        assert.strictEqual(keyInteraction.onKeyPress(aKeyCode, aKeyCodeCallback), keyInteraction,
+          "setting the keyPress callback returns the interaction");
+        keyInteraction.attachTo(component);
+
+        TestMethods.triggerFakeMouseEvent("mouseover", component.background(), 100, 100);
+        TestMethods.triggerFakeKeyboardEvent("keydown", component.background(), aKeyCode);
+        assert.isTrue(aKeyCodeCallbackCalled, "callback for \"a\" was called when \"a\" key was pressed");
+
+        keyInteraction.offKeyPress(aKeyCode, aKeyCodeCallback);
+        svg.remove();
+      });
+
       it("only fires callback for \"a\" when \"a\" key is pressed", () => {
         let bKeyCode = 66;
         let bKeyCodeCallbackCalled = false;
         let bKeyCodeCallback = () => bKeyCodeCallbackCalled = true;
 
-        assert.strictEqual(keyInteraction.onKeyPress(aKeyCode, aKeyCodeCallback), keyInteraction,
-          "setting the keyPress callback returns the interaction");
+        keyInteraction.onKeyPress(aKeyCode, aKeyCodeCallback);
         keyInteraction.onKeyPress(bKeyCode, bKeyCodeCallback);
         keyInteraction.attachTo(component);
 
@@ -53,7 +65,7 @@ describe("Interactions", () => {
         svg.remove();
       });
 
-      it("can remove keyPress callbacks", () => {
+      it("can remove and reattach keyPress callbacks", () => {
         keyInteraction.onKeyPress(aKeyCode, aKeyCodeCallback);
         keyInteraction.attachTo(component);
 
@@ -61,7 +73,8 @@ describe("Interactions", () => {
         TestMethods.triggerFakeKeyboardEvent("keydown", component.background(), aKeyCode);
         assert.isTrue(aKeyCodeCallbackCalled, "callback for \"a\" was called when \"a\" key was pressed");
 
-        keyInteraction.offKeyPress(aKeyCode, aKeyCodeCallback);
+        assert.strictEqual(keyInteraction.offKeyPress(aKeyCode, aKeyCodeCallback), keyInteraction,
+          "unsetting the keyPress callback returns the interaction");
         aKeyCodeCallbackCalled = false;
         TestMethods.triggerFakeKeyboardEvent("keydown", component.background(), aKeyCode);
         assert.isFalse(aKeyCodeCallbackCalled, "callback for \"a\" was disconnected from the interaction");
@@ -70,12 +83,11 @@ describe("Interactions", () => {
         TestMethods.triggerFakeKeyboardEvent("keydown", component.background(), aKeyCode);
         assert.isTrue(aKeyCodeCallbackCalled, "callback for \"a\" was properly connected back to the interaction");
 
-        assert.strictEqual(keyInteraction.offKeyPress(aKeyCode, aKeyCodeCallback), keyInteraction,
-          "unsetting the keyPress callback returns the interaction");
+        keyInteraction.offKeyPress(aKeyCode, aKeyCodeCallback);
         svg.remove();
       });
 
-      it("can attach multiple keyPress callbacks", () => {
+      it("can attach multiple keyPress callbacks on the same key code", () => {
         let aKeyCodeCallback1Called = false;
         let aKeyCodeCallback1 = () => aKeyCodeCallback1Called = true;
         let aKeyCodeCallback2Called = false;
@@ -95,7 +107,7 @@ describe("Interactions", () => {
         svg.remove();
       });
 
-      it("can remove only one of the registered keypress callbacks", () => {
+      it("can remove only the specified keypress callbacks", () => {
         let aKeyCodeCallback1Called = false;
         let aKeyCodeCallback1 = () => aKeyCodeCallback1Called = true;
         let aKeyCodeCallback2Called = false;
@@ -253,7 +265,7 @@ describe("Interactions", () => {
         svg.remove();
       });
 
-      it("can remove keyRelease callbacks", () => {
+      it("can remove and reattach keyRelease callbacks", () => {
         keyInteraction.onKeyRelease(aKeyCode, aKeyCodeCallback);
         keyInteraction.attachTo(component);
 
