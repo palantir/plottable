@@ -12001,7 +12001,7 @@ var Plottable;
                         if (_this._xBoundsMode === Components.PropertyMode.VALUE && _this.xScale() != null) {
                             _this._setXExtent([_this.xScale().invert(startPoint.x), _this.xScale().invert(startPoint.x)]);
                         }
-                        if (_this._yBoundsMode === Components.PropertyMode.VALUE && _this.xScale() != null) {
+                        if (_this._yBoundsMode === Components.PropertyMode.VALUE && _this.yScale() != null) {
                             _this._setYExtent([_this.yScale().invert(startPoint.y), _this.yScale().invert(startPoint.y)]);
                         }
                         _this.render();

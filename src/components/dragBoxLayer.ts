@@ -94,7 +94,7 @@ export module Components {
           if (this._xBoundsMode === PropertyMode.VALUE && this.xScale() != null) {
             this._setXExtent([this.xScale().invert(startPoint.x), this.xScale().invert(startPoint.x)]);
           }
-          if (this._yBoundsMode === PropertyMode.VALUE && this.xScale() != null) {
+          if (this._yBoundsMode === PropertyMode.VALUE && this.yScale() != null) {
             this._setYExtent([this.yScale().invert(startPoint.y), this.yScale().invert(startPoint.y)]);
           }
           this.render();
