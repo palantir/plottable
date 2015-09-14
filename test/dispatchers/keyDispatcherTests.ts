@@ -35,7 +35,7 @@ describe("Dispatchers", () => {
         let keyDowned = false;
         let callback = () => keyDowned = true;
 
-        assert.strictEqual(keyDispatcher.onKeyDown(callback), keyDispatcher, "setting the keyDown callback returns the dispatcher");
+        keyDispatcher.onKeyDown(callback);
 
         TestMethods.triggerFakeKeyboardEvent("keydown", body, keyCodeToSend);
         assert.isTrue(keyDowned, "callback when a key was pressed");
