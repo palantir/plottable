@@ -8470,12 +8470,48 @@ var Plottable;
                 var dataToDraw = new Plottable.Utils.Map();
                 var xScale = this.x().scale;
                 var domain = xScale.domain();
-                this.datasets().forEach(function (dataset) { return dataToDraw.set(dataset, [dataset.data().filter(function (d, i, dataset) {
+                this.datasets().forEach(function (dataset) {
+                    var reducedData = dataset.data().filter(function (d, i, dataset) {
                         var shouldShow = domain[0] <= dataset[i].x && dataset[i].x <= domain[1];
                         shouldShow = shouldShow || dataset[i - 1] && domain[0] <= dataset[i - 1].x && dataset[i - 1].x <= domain[1];
                         shouldShow = shouldShow || dataset[i + 1] && domain[0] <= dataset[i + 1].x && dataset[i + 1].x <= domain[1];
                         return shouldShow;
-                    })]); });
+                    });
+                    var rez = [];
+                    var lastSampleBucket = -1;
+                    for (var i = 0; i < reducedData.length;) {
+                        var min = Infinity;
+                        var max = -Infinity;
+                        var currBucket = Math.floor(xScale.scale(reducedData[i].x));
+                        var p1 = reducedData[i];
+                        var p2 = reducedData[i];
+                        var p3 = reducedData[i];
+                        while (i < reducedData.length && Math.floor(xScale.scale(reducedData[i].x)) === currBucket) {
+                            if (reducedData[i].y > max) {
+                                max = reducedData[i].y;
+                                p2 = reducedData[i];
+                            }
+                            if (reducedData[i].y < min) {
+                                min = reducedData[i].y;
+                                p3 = reducedData[i];
+                            }
+                            i++;
+                        }
+                        var p4 = reducedData[i - 1];
+                        rez.push(p1);
+                        if (p2 !== p1) {
+                            rez.push(p2);
+                        }
+                        if (p3 !== p2 && p3 !== p1) {
+                            rez.push(p3);
+                        }
+                        if (p4 !== p3 && p4 !== p2 && p4 != p1) {
+                            rez.push(p4);
+                        }
+                    }
+                    // console.log(rez);
+                    dataToDraw.set(dataset, [rez]);
+                });
                 // this.datasets().forEach((dataset) => dataToDraw.set(dataset, [dataset.data()]));
                 return dataToDraw;
             };
