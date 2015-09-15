@@ -524,5 +524,41 @@ describe("Plots", () => {
       plot.animated(false);
       assert.strictEqual(plot.animated(), false, "animated toggled off");
     });
+
+    describe("clipPath", () => {
+      it("uses the correct clipPath", () => {
+        let svg = TestMethods.generateSVG();
+        let plot = new Plottable.Plot();
+        plot.renderTo(svg);
+        TestMethods.verifyClipPath(plot);
+        svg.remove();
+      });
+
+      it("updates the clipPath reference when render()-ed", () => {
+        if (window.history) { // not supported on IE9 (http://caniuse.com/#feat=history)
+          let svg = TestMethods.generateSVG();
+          let plot = new Plottable.Plot();
+          plot.renderTo(svg);
+
+          let originalState = window.history.state;
+          let originalTitle = document.title;
+          let originalLocation = document.location.href;
+          window.history.replaceState(null, null, "clipPathTest");
+          plot.render();
+
+          let clipPathId = (<any> plot)._boxContainer[0][0].firstChild.id;
+          let expectedPrefix = /MSIE [5-9]/.test(navigator.userAgent) ? "" : document.location.href;
+          expectedPrefix = expectedPrefix.replace(/#.*/g, "");
+          let expectedClipPathURL = "url(" + expectedPrefix + "#" + clipPathId + ")";
+
+          window.history.replaceState(originalState, originalTitle, originalLocation);
+
+          let normalizeClipPath = (s: string) => s.replace(/"/g, "");
+          assert.strictEqual(normalizeClipPath((<any> plot)._element.attr("clip-path")), expectedClipPathURL,
+            "the clipPath reference was updated");
+          svg.remove();
+        }
+      });
+    });
   });
 });
