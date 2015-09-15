@@ -1,5 +1,5 @@
 /*!
-Plottable 1.11.0 (https://github.com/palantir/plottable)
+Plottable 1.10.0 (https://github.com/palantir/plottable)
 Copyright 2014-2015 Palantir Technologies
 Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
 */
@@ -909,7 +909,7 @@ var Plottable;
 ///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
-    Plottable.version = "1.11.0";
+    Plottable.version = "1.10.0";
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
@@ -1203,18 +1203,18 @@ var Plottable;
         Formatters.fixed = fixed;
         /**
          * Creates a formatter that formats numbers to show no more than
-         * [precision] decimal places. All other values are stringified.
+         * [maxNumberOfDecimalPlaces] decimal places. All other values are stringified.
          *
-         * @param {number} [precision] The number of decimal places to show (default 3).
+         * @param {number} [maxNumberOfDecimalPlaces] The number of decimal places to show (default 3).
          *
          * @returns {Formatter} A formatter for general values.
          */
-        function general(precision) {
-            if (precision === void 0) { precision = 3; }
-            verifyPrecision(precision);
+        function general(maxNumberOfDecimalPlaces) {
+            if (maxNumberOfDecimalPlaces === void 0) { maxNumberOfDecimalPlaces = 3; }
+            verifyPrecision(maxNumberOfDecimalPlaces);
             return function (d) {
                 if (typeof d === "number") {
-                    var multiplier = Math.pow(10, precision);
+                    var multiplier = Math.pow(10, maxNumberOfDecimalPlaces);
                     return String(Math.round(d * multiplier) / multiplier);
                 }
                 else {
@@ -1261,10 +1261,10 @@ var Plottable;
          *
          * @returns {Formatter} A formatter for SI values.
          */
-        function siSuffix(precision) {
-            if (precision === void 0) { precision = 3; }
-            verifyPrecision(precision);
-            return function (d) { return d3.format("." + precision + "s")(d); };
+        function siSuffix(numberOfSignificantFigures) {
+            if (numberOfSignificantFigures === void 0) { numberOfSignificantFigures = 3; }
+            verifyPrecision(numberOfSignificantFigures);
+            return function (d) { return d3.format("." + numberOfSignificantFigures + "s")(d); };
         }
         Formatters.siSuffix = siSuffix;
         /**

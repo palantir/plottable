@@ -64,17 +64,17 @@ export module Formatters {
 
   /**
    * Creates a formatter that formats numbers to show no more than
-   * [precision] decimal places. All other values are stringified.
+   * [maxNumberOfDecimalPlaces] decimal places. All other values are stringified.
    *
-   * @param {number} [precision] The number of decimal places to show (default 3).
+   * @param {number} [maxNumberOfDecimalPlaces] The number of decimal places to show (default 3).
    *
    * @returns {Formatter} A formatter for general values.
    */
-  export function general(precision = 3) {
-    verifyPrecision(precision);
+  export function general(maxNumberOfDecimalPlaces = 3) {
+    verifyPrecision(maxNumberOfDecimalPlaces);
     return (d: any) => {
       if (typeof d === "number") {
-        let multiplier = Math.pow(10, precision);
+        let multiplier = Math.pow(10, maxNumberOfDecimalPlaces);
         return String(Math.round(d * multiplier) / multiplier);
       } else {
         return String(d);
@@ -121,9 +121,9 @@ export module Formatters {
    *
    * @returns {Formatter} A formatter for SI values.
    */
-  export function siSuffix(precision = 3) {
-    verifyPrecision(precision);
-    return (d: any) => d3.format("." + precision + "s")(d);
+  export function siSuffix(numberOfSignificantFigures = 3) {
+    verifyPrecision(numberOfSignificantFigures);
+    return (d: any) => d3.format("." + numberOfSignificantFigures + "s")(d);
   }
 
   /**

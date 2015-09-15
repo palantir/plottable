@@ -631,13 +631,13 @@ declare module Plottable {
         function fixed(precision?: number): (d: any) => string;
         /**
          * Creates a formatter that formats numbers to show no more than
-         * [precision] decimal places. All other values are stringified.
+         * [maxNumberOfDecimalPlaces] decimal places. All other values are stringified.
          *
-         * @param {number} [precision] The number of decimal places to show (default 3).
+         * @param {number} [maxNumberOfDecimalPlaces] The number of decimal places to show (default 3).
          *
          * @returns {Formatter} A formatter for general values.
          */
-        function general(precision?: number): (d: any) => string;
+        function general(maxNumberOfDecimalPlaces?: number): (d: any) => string;
         /**
          * Creates a formatter that stringifies its input.
          *
@@ -661,7 +661,7 @@ declare module Plottable {
          *
          * @returns {Formatter} A formatter for SI values.
          */
-        function siSuffix(precision?: number): (d: any) => string;
+        function siSuffix(numberOfSignificantFigures?: number): (d: any) => string;
         /**
          * Creates a formatter for values that displays abbreviated values
          * and uses standard short scale suffixes
