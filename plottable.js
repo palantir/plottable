@@ -4428,7 +4428,7 @@ var Plottable;
                 var xTranslate = (this._tierLabelPositions[index] === "center" || config.step === 1) ? 0 : this.tickLabelPadding();
                 var yTranslate = this.orientation() === "bottom" ?
                     d3.sum(this._tierHeights.slice(0, index + 1)) - this.tickLabelPadding() :
-                    this.height() - this.innerTickLength() - d3.sum(this._tierHeights.slice(0, index)) - this.tickLabelPadding();
+                    this.height() - d3.sum(this._tierHeights.slice(0, index)) - this.tickLabelPadding();
                 var textSelection = tickLabels.selectAll("text");
                 if (textSelection.size() > 0) {
                     Plottable.Utils.DOM.translate(textSelection, xTranslate, yTranslate);
