@@ -6834,6 +6834,7 @@ var Plottable;
             return h;
         };
         Plot.prototype.renderImmediately = function () {
+            _super.prototype.renderImmediately.call(this);
             if (this._isAnchored) {
                 this._paint();
                 this._dataChanged = false;
