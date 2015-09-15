@@ -12207,16 +12207,19 @@ var Plottable;
                 this._disconnectInteraction();
             };
             DragBoxLayer.prototype.detach = function () {
-                this.bounds({
-                    topLeft: { x: 0, y: 0 },
-                    bottomRight: { x: 0, y: 0 }
-                });
+                this._resetBound();
                 this._dragInteraction.detachFrom(this);
                 return _super.prototype.detach.call(this);
             };
             DragBoxLayer.prototype.anchor = function (selection) {
                 this._dragInteraction.attachTo(this);
                 return _super.prototype.anchor.call(this, selection);
+            };
+            DragBoxLayer.prototype._resetBound = function () {
+                this.bounds({
+                    topLeft: { x: 0, y: 0 },
+                    bottomRight: { x: 0, y: 0 }
+                });
             };
             return DragBoxLayer;
         })(Components.SelectionBoxLayer);

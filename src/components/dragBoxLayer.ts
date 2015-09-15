@@ -438,10 +438,7 @@ export module Components {
     }
 
     public detach() {
-      this.bounds({
-        topLeft: { x: 0, y: 0 },
-        bottomRight: { x: 0, y: 0 }
-      });
+      this._resetBound();
       this._dragInteraction.detachFrom(this);
       return super.detach();
     }
@@ -449,6 +446,13 @@ export module Components {
     public anchor(selection: d3.Selection<void>) {
       this._dragInteraction.attachTo(this);
       return super.anchor(selection);
+    }
+
+    private _resetBound() {
+      this.bounds({
+        topLeft: { x: 0, y: 0 },
+        bottomRight: { x: 0, y: 0 }
+      });
     }
   }
 }

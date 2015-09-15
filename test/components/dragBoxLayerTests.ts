@@ -106,7 +106,7 @@ describe("Layer Components", () => {
         svg.remove();
       });
 
-      it("does not call callbacks after destroy() is called", () => {
+      it("does not call callbacks when dragBoxLayer is destroy()-ed", () => {
         // rendered in a Group so that drag sequence can be simulated on Group background after DragBoxLayer is destroyed
         let group = new Plottable.Components.Group([dbl]).renderTo(svg);
         let target = group.background();
