@@ -62,6 +62,30 @@ describe("Interactive Components", () => {
         svg.remove();
       });
 
+      it("updates the clipPath reference when render()-ed", () => {
+        if (window.history) { // not supported on IE9 (http://caniuse.com/#feat=history)
+          dbl.renderTo(svg);
+
+          let originalState = window.history.state;
+          let originalTitle = document.title;
+          let originalLocation = document.location.href;
+          window.history.replaceState(null, null, "clipPathTest");
+          dbl.render();
+
+          let clipPathId = (<any> dbl)._boxContainer[0][0].firstChild.id;
+          let expectedPrefix = /MSIE [5-9]/.test(navigator.userAgent) ? "" : document.location.href;
+          expectedPrefix = expectedPrefix.replace(/#.*/g, "");
+          let expectedClipPathURL = "url(" + expectedPrefix + "#" + clipPathId + ")";
+
+          window.history.replaceState(originalState, originalTitle, originalLocation);
+
+          let normalizeClipPath = (s: string) => s.replace(/"/g, "");
+          assert.strictEqual(normalizeClipPath((<any> dbl)._element.attr("clip-path")), expectedClipPathURL,
+            "the clipPath reference was updated");
+        }
+        svg.remove();
+      });
+
       it("can get and set the detection radius", () => {
         assert.strictEqual(dbl.detectionRadius(), 3, "there is a default detection radius");
         assert.doesNotThrow(() => dbl.detectionRadius(4), Error, "can set detection radius before anchoring");
