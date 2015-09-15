@@ -818,7 +818,7 @@ describe("Component", () => {
     });
 
     it("updates the clipPath reference when render()-ed", () => {
-      if (window.history) { // not supported on IE9 (http://caniuse.com/#feat=history)
+      if (window.history && window.history.replaceState) { // not supported on IE9 (http://caniuse.com/#feat=history)
         clippedComponent.renderTo(svg);
 
         let originalState = window.history.state;
