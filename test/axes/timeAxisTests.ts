@@ -301,7 +301,7 @@ describe("TimeAxis", () => {
     axis.renderTo(svg);
 
     let labels = axis.content().selectAll(`.${Plottable.Axis.TICK_LABEL_CLASS}`);
-    assert.operator(labels.size(), ">", 0, "More than one labels are selected in testing");
+    assert.operator(labels.size(), ">", 0, "At least one label is selected in testing");
 
     let axisBoundingRect: ClientRect = (<Element>axis.background().node()).getBoundingClientRect();
     let isInsideAxisBoundingRect = function(innerRect: ClientRect) {
@@ -317,10 +317,10 @@ describe("TimeAxis", () => {
       let labelVisibility = window.getComputedStyle(this).visibility;
       let boundingClientRect = this.getBoundingClientRect();
       let isInside = isInsideAxisBoundingRect(boundingClientRect);
-      if(labelVisibility === "hidden") {
-        assert.isFalse(isInside,  `label "${this.textContent}" is hidden, should be visible as it is inside the bounding box`);
+      if (labelVisibility === "hidden") {
+        assert.isFalse(isInside,  `label ${i} "${this.textContent}" is hidden, should be visible as it is inside the axis bounding box`);
       }else {
-        assert.isTrue(isInside,  `label "${this.textContent}" is visible, should be hidden as it is outside the bounding box`);
+        assert.isTrue(isInside,  `label ${i} "${this.textContent}" is visible, should be hidden as it is outside the axis bounding box`);
       }
     });
     svg.remove();
