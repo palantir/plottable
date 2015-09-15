@@ -318,9 +318,9 @@ describe("TimeAxis", () => {
       let boundingClientRect = this.getBoundingClientRect();
       let isInside = isInsideAxisBoundingRect(boundingClientRect);
       if (labelVisibility === "hidden") {
-        assert.isFalse(isInside,  `label ${i} "${this.textContent}" is hidden, should be visible as it is inside the axis bounding box`);
-      }else {
-        assert.isTrue(isInside,  `label ${i} "${this.textContent}" is visible, should be hidden as it is outside the axis bounding box`);
+        assert.isFalse(isInside, `label ${i} "${this.textContent}" is hidden, should be visible as it is inside the axis bounding box`);
+      } else {
+        assert.isTrue(isInside, `label ${i} "${this.textContent}" is visible, should be hidden as it is outside the axis bounding box`);
       }
     });
     svg.remove();
