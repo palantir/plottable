@@ -1203,18 +1203,18 @@ var Plottable;
         Formatters.fixed = fixed;
         /**
          * Creates a formatter that formats numbers to show no more than
-         * [maxNumberOfDecimalPlaces] decimal places. All other values are stringified.
+         * [precision] decimal places. All other values are stringified.
          *
-         * @param {number} [maxNumberOfDecimalPlaces] The number of decimal places to show (default 3).
+         * @param {number} [precision] The number of decimal places to show (default 3).
          *
          * @returns {Formatter} A formatter for general values.
          */
-        function general(maxNumberOfDecimalPlaces) {
-            if (maxNumberOfDecimalPlaces === void 0) { maxNumberOfDecimalPlaces = 3; }
-            verifyPrecision(maxNumberOfDecimalPlaces);
+        function general(precision) {
+            if (precision === void 0) { precision = 3; }
+            verifyPrecision(precision);
             return function (d) {
                 if (typeof d === "number") {
-                    var multiplier = Math.pow(10, maxNumberOfDecimalPlaces);
+                    var multiplier = Math.pow(10, precision);
                     return String(Math.round(d * multiplier) / multiplier);
                 }
                 else {
@@ -1254,17 +1254,17 @@ var Plottable;
         }
         Formatters.percentage = percentage;
         /**
-         * Creates a formatter for values that displays [numberOfSignificantFigures] significant figures
+         * Creates a formatter for values that displays [precision] significant figures
          * and puts SI notation.
          *
-         * @param {number} [numberOfSignificantFigures] The number of significant figures to show (default 3).
+         * @param {number} [precision] The number of significant figures to show (default 3).
          *
          * @returns {Formatter} A formatter for SI values.
          */
-        function siSuffix(numberOfSignificantFigures) {
-            if (numberOfSignificantFigures === void 0) { numberOfSignificantFigures = 3; }
-            verifyPrecision(numberOfSignificantFigures);
-            return function (d) { return d3.format("." + numberOfSignificantFigures + "s")(d); };
+        function siSuffix(precision) {
+            if (precision === void 0) { precision = 3; }
+            verifyPrecision(precision);
+            return function (d) { return d3.format("." + precision + "s")(d); };
         }
         Formatters.siSuffix = siSuffix;
         /**

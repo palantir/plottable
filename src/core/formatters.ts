@@ -64,17 +64,17 @@ export module Formatters {
 
   /**
    * Creates a formatter that formats numbers to show no more than
-   * [maxNumberOfDecimalPlaces] decimal places. All other values are stringified.
+   * [precision] decimal places. All other values are stringified.
    *
-   * @param {number} [maxNumberOfDecimalPlaces] The number of decimal places to show (default 3).
+   * @param {number} [precision] The number of decimal places to show (default 3).
    *
    * @returns {Formatter} A formatter for general values.
    */
-  export function general(maxNumberOfDecimalPlaces = 3) {
-    verifyPrecision(maxNumberOfDecimalPlaces);
+  export function general(precision = 3) {
+    verifyPrecision(precision);
     return (d: any) => {
       if (typeof d === "number") {
-        let multiplier = Math.pow(10, maxNumberOfDecimalPlaces);
+        let multiplier = Math.pow(10, precision);
         return String(Math.round(d * multiplier) / multiplier);
       } else {
         return String(d);
@@ -114,16 +114,16 @@ export module Formatters {
   }
 
   /**
-   * Creates a formatter for values that displays [numberOfSignificantFigures] significant figures
+   * Creates a formatter for values that displays [precision] significant figures
    * and puts SI notation.
    *
-   * @param {number} [numberOfSignificantFigures] The number of significant figures to show (default 3).
+   * @param {number} [precision] The number of significant figures to show (default 3).
    *
    * @returns {Formatter} A formatter for SI values.
    */
-  export function siSuffix(numberOfSignificantFigures= 3) {
-    verifyPrecision(numberOfSignificantFigures);
-    return (d: any) => d3.format("." + numberOfSignificantFigures + "s")(d);
+  export function siSuffix(precision = 3) {
+    verifyPrecision(precision);
+    return (d: any) => d3.format("." + precision + "s")(d);
   }
 
   /**

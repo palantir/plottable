@@ -300,8 +300,8 @@ describe("TimeAxis", () => {
     axis.tierLabelPositions(["center", "center"]);
     axis.renderTo(svg);
 
-    let labels = axis.content().selectAll("." + Plottable.Axis.TICK_LABEL_CLASS);
-    assert.isFalse(labels.size() === 0, "More than one labels are selected in testing");
+    let labels = axis.content().selectAll(`.${Plottable.Axis.TICK_LABEL_CLASS}`);
+    assert.notStrictEqual(labels.size(), 0, "More than one labels are selected in testing");
 
     let axisBoundingRect: ClientRect = (<Element>axis.background().node()).getBoundingClientRect();
     let isInsideAxisBoundingRect = function(innerRect: ClientRect) {
@@ -315,8 +315,8 @@ describe("TimeAxis", () => {
 
     labels.each(function(d, i) {
       let labelVisibility = window.getComputedStyle(this).visibility;
-      let bounding = this.getBoundingClientRect();
-      let isInside = isInsideAxisBoundingRect(bounding);
+      let boundingClientRect = this.getBoundingClientRect();
+      let isInside = isInsideAxisBoundingRect(boundingClientRect);
       assert.isFalse(isInside && (labelVisibility === "hidden"),  `Wrong labels ${i} are ${labelVisibility}`);
     });
     svg.remove();
