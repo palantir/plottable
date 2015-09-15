@@ -114,10 +114,10 @@ export module Formatters {
   }
 
   /**
-   * Creates a formatter for values that displays [precision] significant figures
+   * Creates a formatter for values that displays [numberOfSignificantFigures] significant figures
    * and puts SI notation.
    *
-   * @param {number} [precision] The number of significant figures to show (default 3).
+   * @param {number} [numberOfSignificantFigures] The number of significant figures to show (default 3).
    *
    * @returns {Formatter} A formatter for SI values.
    */

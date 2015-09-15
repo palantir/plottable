@@ -1,5 +1,5 @@
 /*!
-Plottable 1.11.0 (https://github.com/palantir/plottable)
+Plottable 1.10.0 (https://github.com/palantir/plottable)
 Copyright 2014-2015 Palantir Technologies
 Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
 */
@@ -909,7 +909,7 @@ var Plottable;
 ///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
-    Plottable.version = "1.11.0";
+    Plottable.version = "1.10.0";
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
@@ -1254,10 +1254,10 @@ var Plottable;
         }
         Formatters.percentage = percentage;
         /**
-         * Creates a formatter for values that displays [precision] significant figures
+         * Creates a formatter for values that displays [numberOfSignificantFigures] significant figures
          * and puts SI notation.
          *
-         * @param {number} [precision] The number of significant figures to show (default 3).
+         * @param {number} [numberOfSignificantFigures] The number of significant figures to show (default 3).
          *
          * @returns {Formatter} A formatter for SI values.
          */
