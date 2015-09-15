@@ -6789,25 +6789,27 @@ var Plottable;
             return this;
         };
         Plot.prototype._bindProperty = function (property, value, scale) {
-            var _this = this;
-            var updateExtentsForKey = function () { return _this._updateExtentsForProperty(property); };
-            this._bind(property, value, scale, this._propertyBindings, this._propertyExtents, updateExtentsForKey);
-        };
-        Plot.prototype._bindAttr = function (attr, value, scale) {
-            var _this = this;
-            var updateExtentsForKey = function () { return _this._updateExtentsForAttr(attr); };
-            this._bind(attr, value, scale, this._attrBindings, this._attrExtents, updateExtentsForKey);
-        };
-        Plot.prototype._bind = function (key, value, scale, bindings, extents, updateExtentsForKey) {
-            var binding = bindings.get(key);
+            var binding = this._propertyBindings.get(property);
             var oldScale = binding != null ? binding.scale : null;
-            bindings.set(key, { accessor: d3.functor(value), scale: scale });
-            updateExtentsForKey(key);
+            this._propertyBindings.set(property, { accessor: d3.functor(value), scale: scale });
+            this._updateExtentsForProperty(property);
             if (oldScale != null) {
-                this._uninstallScaleForKey(oldScale, key);
+                this._uninstallScaleForKey(oldScale, property);
             }
             if (scale != null) {
-                this._installScaleForKey(scale, key);
+                this._installScaleForKey(scale, property);
+            }
+        };
+        Plot.prototype._bindAttr = function (attr, value, scale) {
+            var binding = this._attrBindings.get(attr);
+            var oldScale = binding != null ? binding.scale : null;
+            this._attrBindings.set(attr, { accessor: d3.functor(value), scale: scale });
+            this._updateExtentsForAttr(attr);
+            if (oldScale != null) {
+                this._uninstallScaleForKey(oldScale, attr);
+            }
+            if (scale != null) {
+                this._installScaleForKey(scale, attr);
             }
         };
         Plot.prototype._generateAttrToProjector = function () {

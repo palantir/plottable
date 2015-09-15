@@ -133,7 +133,7 @@ describe("Plots", () => {
 
     });
 
-    it("sets the scale domain automatically", () => {
+    it("sets the domain automatically when attaching a Scale to an attr", () => {
       let dataset = new Plottable.Dataset([{x: 5}, {x: 10}]);
       let plot = new Plottable.Plot();
       let svg = TestMethods.generateSVG();
