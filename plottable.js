@@ -6463,6 +6463,7 @@ var Plottable;
                 this._bindBoxDataValues();
             };
             SelectionBoxLayer.prototype.renderImmediately = function () {
+                _super.prototype.renderImmediately.call(this);
                 if (this._boxVisible) {
                     var t = this._boxBounds.topLeft.y;
                     var b = this._boxBounds.bottomRight.y;
