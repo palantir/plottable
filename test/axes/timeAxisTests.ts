@@ -301,7 +301,7 @@ describe("TimeAxis", () => {
     axis.renderTo(svg);
 
     let labels = axis.content().selectAll(`.${Plottable.Axis.TICK_LABEL_CLASS}`);
-    assert.operator(labels.size(), ">", 0, "At least one label is selected in testing");
+    assert.operator(labels.size(), ">=", 1, "At least one label is selected in testing");
 
     let axisBoundingRect: ClientRect = (<Element>axis.background().node()).getBoundingClientRect();
     let isInsideAxisBoundingRect = function(innerRect: ClientRect) {
