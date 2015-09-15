@@ -794,20 +794,50 @@ describe("Component", () => {
 
   describe("restricting rendering through clipPath", () => {
 
-    let c: Plottable.Component;
+    let clippedComponent: Plottable.Component;
     let svg: d3.Selection<void>;
 
     beforeEach(() => {
-      c = new Plottable.Component();
+      clippedComponent = new Plottable.Component();
+      (<any> clippedComponent)._clipPathEnabled = true;
       svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
     });
 
     it("generates a clipPath element if it is enabled", () => {
-      (<any> c)._clipPathEnabled = true;
-      c.anchor(svg);
+      clippedComponent.anchor(svg);
       let componentElement = svg.select(".component");
       assert.isNotNull(componentElement.attr("clip-path"), "clip-path attribute set");
-      c.destroy();
+      clippedComponent.destroy();
+      svg.remove();
+    });
+
+    it("uses the correct clipPath", () => {
+      clippedComponent.renderTo(svg);
+      TestMethods.verifyClipPath(clippedComponent);
+      svg.remove();
+    });
+
+    it("updates the clipPath reference when render()-ed", () => {
+      if (window.history) { // not supported on IE9 (http://caniuse.com/#feat=history)
+        clippedComponent.renderTo(svg);
+
+        let originalState = window.history.state;
+        let originalTitle = document.title;
+        let originalLocation = document.location.href;
+        window.history.replaceState(null, null, "clipPathTest");
+        clippedComponent.render();
+
+        let clipPathId = (<any> clippedComponent)._boxContainer[0][0].firstChild.id;
+        let expectedPrefix = /MSIE [5-9]/.test(navigator.userAgent) ? "" : document.location.href;
+        expectedPrefix = expectedPrefix.replace(/#.*/g, "");
+        let expectedClipPathURL = "url(" + expectedPrefix + "#" + clipPathId + ")";
+
+        window.history.replaceState(originalState, originalTitle, originalLocation);
+
+        let normalizeClipPath = (s: string) => s.replace(/"/g, "");
+        assert.strictEqual(normalizeClipPath((<any> clippedComponent)._element.attr("clip-path")), expectedClipPathURL,
+          "the clipPath reference was updated");
+      }
       svg.remove();
     });
   });

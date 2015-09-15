@@ -3165,6 +3165,9 @@ var Plottable;
          * Renders the Component without waiting for the next frame.
          */
         Component.prototype.renderImmediately = function () {
+            if (this._clipPathEnabled && this._updateClipPath != null) {
+                this._updateClipPath();
+            }
             return this;
         };
         /**
@@ -3260,16 +3263,19 @@ var Plottable;
             return box;
         };
         Component.prototype._generateClipPath = function () {
+            var _this = this;
             // The clip path will prevent content from overflowing its Component space.
-            // HACKHACK: IE <=9 does not respect the HTML base element in SVG.
-            // They don't need the current URL in the clip path reference.
-            var prefix = /MSIE [5-9]/.test(navigator.userAgent) ? "" : document.location.href;
-            prefix = prefix.split("#")[0]; // To fix cases where an anchor tag was used
             var clipPathId = Plottable.Utils.DOM.generateUniqueClipPathId();
-            this._element.attr("clip-path", "url(\"" + prefix + "#" + clipPathId + "\")");
-            var clipPathParent = this._boxContainer.append("clipPath")
-                .attr("id", clipPathId);
+            var clipPathParent = this._boxContainer.append("clipPath").attr("id", clipPathId);
             this._addBox("clip-rect", clipPathParent);
+            this._updateClipPath = function () {
+                // HACKHACK: IE <= 9 does not respect the HTML base element in SVG.
+                // They don't need the current URL in the clip path reference.
+                var prefix = /MSIE [5-9]/.test(navigator.userAgent) ? "" : document.location.href;
+                prefix = prefix.split("#")[0]; // To fix cases where an anchor tag was used
+                _this._element.attr("clip-path", "url(\"" + prefix + "#" + clipPathId + "\")");
+            };
+            this._updateClipPath();
         };
         /**
          * Checks if the Component has a given CSS class.
