@@ -93,29 +93,7 @@ export class Plot extends Component {
   public destroy() {
     super.destroy();
     this._scales().forEach((scale) => scale.offUpdate(this._renderCallback));
-    this.datasets().forEach((dataset) => this.removeDataset(dataset));
-  }
-
-  /**
-   * Adds a Dataset to the Plot.
-   *
-   * @param {Dataset} dataset
-   * @returns {Plot} The calling Plot.
-   */
-  public addDataset(dataset: Dataset) {
-    if (this.datasets().indexOf(dataset) > -1) {
-      this.removeDataset(dataset);
-    };
-    let drawer = this._createDrawer(dataset);
-    this._datasetToDrawer.set(dataset, drawer);
-
-    if (this._isSetup) {
-      this._createNodesForDataset(dataset);
-    }
-
-    dataset.onUpdate(this._onDatasetUpdateCallback);
-    this._onDatasetUpdate();
-    return this;
+    this.datasets([]);
   }
 
   protected _createNodesForDataset(dataset: Dataset) {
@@ -374,18 +352,50 @@ export class Plot extends Component {
   }
 
   /**
+   * Adds a Dataset to the Plot.
+   *
+   * @param {Dataset} dataset
+   * @returns {Plot} The calling Plot.
+   */
+  public addDataset(dataset: Dataset) {
+    this._addDataset(dataset);
+    this._onDatasetUpdate();
+    return this;
+  }
+
+  protected _addDataset(dataset: Dataset) {
+    this._removeDataset(dataset);
+    let drawer = this._createDrawer(dataset);
+    this._datasetToDrawer.set(dataset, drawer);
+
+    if (this._isSetup) {
+      this._createNodesForDataset(dataset);
+    }
+
+    dataset.onUpdate(this._onDatasetUpdateCallback);
+    return this;
+  }
+
+  /**
    * Removes a Dataset from the Plot.
    *
    * @param {Dataset} dataset
    * @returns {Plot} The calling Plot.
    */
   public removeDataset(dataset: Dataset): Plot {
-    if (this.datasets().indexOf(dataset) > -1) {
-      this._removeDatasetNodes(dataset);
-      dataset.offUpdate(this._onDatasetUpdateCallback);
-      this._datasetToDrawer.delete(dataset);
-      this._onDatasetUpdate();
+    this._removeDataset(dataset);
+    this._onDatasetUpdate();
+    return this;
+  }
+
+  protected _removeDataset(dataset: Dataset) {
+    if (this.datasets().indexOf(dataset) === -1) {
+      return this;
     }
+
+    this._removeDatasetNodes(dataset);
+    dataset.offUpdate(this._onDatasetUpdateCallback);
+    this._datasetToDrawer.delete(dataset);
     return this;
   }
 
@@ -402,8 +412,10 @@ export class Plot extends Component {
     if (datasets == null) {
       return currentDatasets;
     }
-    currentDatasets.forEach((dataset) => this.removeDataset(dataset));
-    datasets.forEach((dataset) => this.addDataset(dataset));
+
+    currentDatasets.forEach((dataset) => this._removeDataset(dataset));
+    datasets.forEach((dataset) => this._addDataset(dataset));
+    this._onDatasetUpdate();
     return this;
   }
 
@@ -532,8 +544,11 @@ export class Plot extends Component {
     return this._lightweightPlotEntityToPlotEntity(closestPointEntity);
   }
 
+  /**
+   * @deprecated As of release v1.1.0, replaced by _entityVisibleOnPlot()
+   */
   protected _visibleOnPlot(datum: any, pixelPoint: Point, selection: d3.Selection<void>): boolean {
-    Utils.Window.deprecated("Plot._visibleOnPlot()", "v1.1.0");
+    Utils.Window.deprecated("Plot._visibleOnPlot()", "v1.1.0", "replaced by _entityVisibleOnPlot()");
     return !(pixelPoint.x < 0 || pixelPoint.y < 0 ||
       pixelPoint.x > this.width() || pixelPoint.y > this.height());
   }

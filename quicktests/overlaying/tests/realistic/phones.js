@@ -77,13 +77,13 @@ function run(svg, data, Plottable) {
   var yScale = new Plottable.Scales.Category();
 
   var AusLabels = new Plottable.Axes.Category(yScale, "left")
-    .tickLength(0)
+    .innerTickLength(0)
     .endTickLength(0);
   var IndLabels = new Plottable.Axes.Category(yScale, "left")
-    .tickLength(0)
+    .innerTickLength(0)
     .endTickLength(0);
   var RoKLabels = new Plottable.Axes.Category(yScale, "left")
-    .tickLength(0)
+    .innerTickLength(0)
     .endTickLength(0);
   var featureLabel = new Plottable.Components.Label("Feature Phones", 0);
   var smartLabel = new Plottable.Components.Label("Smart Phones", 0);

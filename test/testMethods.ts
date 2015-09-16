@@ -18,6 +18,11 @@ module TestMethods {
     }
   }
 
+  export function isInDOM(component: Plottable.Component) {
+    let contentNode = component.content().node();
+    return contentNode != null && Plottable.Utils.DOM.boundingSVG(<SVGElement> contentNode) != null;
+  };
+
   export function verifySpaceRequest(sr: Plottable.SpaceRequest, expectedMinWidth: number, expectedMinHeight: number, message: string) {
     assert.strictEqual(sr.minWidth, expectedMinWidth, message + " (space request: minWidth)");
     assert.strictEqual(sr.minHeight, expectedMinHeight, message + " (space request: minHeight)");
@@ -143,6 +148,25 @@ module TestMethods {
     return pathString.replace(/ *([A-Z]) */g, "$1").replace(/ /g, ",");
   }
 
+  /**
+   * Decomposes a normalized path-string ("d" attribute from a <path>)
+   * to an array of command-argument pairs:
+   * {
+   *   command: string;
+   *   arguments: number[];
+   * }[]
+   */
+  export function decomposePath(normalizedPathString: string) {
+    let commands = normalizedPathString.split(/[^A-Z]/).filter((s) => s !== "");
+    let argumentStrings = normalizedPathString.split(/[A-Z]/).slice(1);
+    return commands.map((command, index) => {
+      return {
+        command: command,
+        arguments: argumentStrings[index].split(",").filter((s) => s !== "").map((s) => parseFloat(s))
+      };
+    });
+  }
+
   export function numAttr(s: d3.Selection<void>, a: string) {
     return parseFloat(s.attr(a));
   }
@@ -247,27 +271,27 @@ module TestMethods {
   }
 
   export function assertAreaPathCloseTo(actualPath: string, expectedPath: string, precision: number, msg: string) {
-    let actualAreaPathStrings = actualPath.split("Z");
-    let expectedAreaPathStrings = expectedPath.split("Z");
+    let actualAreaPathNumbers = tokenizePathString(actualPath);
+    let expectedAreaPathNumbers = tokenizePathString(expectedPath);
 
-    actualAreaPathStrings.pop();
-    expectedAreaPathStrings.pop();
-
-    let actualAreaPathPoints = actualAreaPathStrings.map((path) => path.split(/[A-Z]/).map((point) => point.split(",")));
-    actualAreaPathPoints.forEach((areaPathPoint) => areaPathPoint.shift());
-    let expectedAreaPathPoints = expectedAreaPathStrings.map((path) => path.split(/[A-Z]/).map((point) => point.split(",")));
-    expectedAreaPathPoints.forEach((areaPathPoint) => areaPathPoint.shift());
-
-    assert.lengthOf(actualAreaPathPoints, expectedAreaPathPoints.length, "number of broken area paths should be equal");
-    actualAreaPathPoints.forEach((actualAreaPoints, i) => {
-      let expectedAreaPoints = expectedAreaPathPoints[i];
-      assert.lengthOf(actualAreaPoints, expectedAreaPoints.length, "number of points in path should be equal");
-      actualAreaPoints.forEach((actualAreaPoint, j) => {
-        let expectedAreaPoint = expectedAreaPoints[j];
-        assert.closeTo(+actualAreaPoint[0], +expectedAreaPoint[0], 0.1, msg);
-        assert.closeTo(+actualAreaPoint[1], +expectedAreaPoint[1], 0.1, msg);
-      });
+    assert.lengthOf(actualAreaPathNumbers, expectedAreaPathNumbers.length, `${msg}: number of numbers in each path should be equal`);
+    actualAreaPathNumbers.forEach((actualAreaNumber, i) => {
+      let expectedAreaNumber = expectedAreaPathNumbers[i];
+        assert.closeTo(+actualAreaNumber, +expectedAreaNumber, 0.1, msg);
     });
+  }
+
+  function tokenizePathString(pathString: string) {
+    let numbers: string[] = [];
+    pathString.split("Z").forEach((path) =>
+      path.split(/[A-Z]/).forEach((token) =>
+        token.split(",").forEach((numberString) =>
+          numberString.split(" ").forEach((num) => {
+            if (num !== "") {
+              numbers.push(num);
+            }
+          }))));
+    return numbers;
   }
 
   export function verifyClipPath(c: Plottable.Component) {
@@ -280,4 +304,50 @@ module TestMethods {
     assert.isTrue(normalizeClipPath((<any> c)._element.attr("clip-path")) === expectedClipPathURL,
                   "the element has clip-path url attached");
   }
+
+  export type RGB = {
+    red: number,
+    green: number,
+    blue: number
+  };
+
+  export function colorHexToRGB(hex: string): RGB {
+    return {
+      red: parseInt(hex.substr(1, 2), 16),
+      green: parseInt(hex.substr(3, 2), 16),
+      blue: parseInt(hex.substr(5, 2), 16)
+    };
+  }
+
+  export function colorRGBToHex(rgb: RGB) {
+      let redHex = rgb.red.toString(16);
+      if (redHex.length === 1) {
+        redHex = "0" + redHex;
+      }
+
+      let greenHex = rgb.blue.toString(16);
+      if (greenHex.length === 1) {
+        greenHex = "0" + greenHex;
+      }
+
+      let blueHex = rgb.green.toString(16);
+      if (blueHex.length === 1) {
+        blueHex = "0" + blueHex;
+      }
+
+      return "#" + redHex + greenHex + blueHex;
+  }
+
+  export function assertWarns(fn: Function, warningMessage: string, assertMessage: string) {
+    let receivedWarning = "";
+    let oldWarn = Plottable.Utils.Window.warn;
+    Plottable.Utils.Window.warn = (msg: string) => receivedWarning = msg;
+    try {
+      fn.call(this);
+    } finally {
+      Plottable.Utils.Window.warn = oldWarn;
+    }
+    assert.include(receivedWarning, warningMessage, assertMessage);
+  }
+
 }

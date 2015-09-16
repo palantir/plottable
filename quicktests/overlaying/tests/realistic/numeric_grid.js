@@ -26,8 +26,28 @@ function run(svg, data, Plottable) {
       .x2(function(d){ return d.x2; }, xScale)
       .y2(function(d) { return d.y2; }, yScale)
       .attr("fill", function(d) { return d.fill; })
+      .attr("opacity", .5)
       .attr("stroke", function(){ return "#000000"; })
       .attr("stroke-width", function(){ return 4; });
 
   plot.renderTo(svg);
+
+  var hover = new Plottable.Interactions.Pointer().attachTo(plot);
+  hover.onPointerEnter(function() {
+    plot.entities().forEach(function(entity) { entity.selection.attr("opacity", 0.3); });
+  });
+
+  var lastEntities = [];
+  hover.onPointerMove(function(p) {
+    lastEntities.forEach(function(entity) { entity.selection.attr("opacity", 0.3); });
+    var entities = plot.entitiesAt(p);
+    entities.forEach(function(entity) { entity.selection.attr("opacity", 1); });
+    lastEntities = entities;
+  });
+
+  hover.onPointerExit(function() {
+    plot.entities().forEach(function(entity) { entity.selection.attr("opacity", 1); });
+    lastEntities = [];
+  });
+
 }

@@ -3,14 +3,16 @@
 module Plottable {
 export module Components {
   export class InterpolatedColorLegend extends Component {
+    private static _DEFAULT_NUM_SWATCHES = 11;
+
     private _measurer: SVGTypewriter.Measurers.Measurer;
     private _wrapper: SVGTypewriter.Wrappers.Wrapper;
     private _writer: SVGTypewriter.Writers.Writer;
     private _scale: Scales.InterpolatedColor;
     private _orientation: String ;
     private _padding = 5;
-    private _numSwatches = 10;
     private _formatter: Formatter;
+    private _expands: boolean;
 
     private _swatchContainer: d3.Selection<void>;
     private _swatchBoundingBox: d3.Selection<void>;
@@ -43,6 +45,7 @@ export module Components {
       this._scale.onUpdate(this._redrawCallback);
       this._formatter = Formatters.general();
       this._orientation = "horizontal";
+      this._expands = false;
 
       this.addClass("legend");
       this.addClass("interpolated-color-legend");
@@ -69,6 +72,26 @@ export module Components {
         return this._formatter;
       }
       this._formatter = formatter;
+      this.redraw();
+      return this;
+    }
+
+    /**
+     * Gets whether the InterpolatedColorLegend expands to occupy all offered space in the long direction
+     */
+    public expands(): boolean;
+    /**
+     * Sets whether the InterpolatedColorLegend expands to occupy all offered space in the long direction
+     *
+     * @param {expands} boolean
+     * @returns {InterpolatedColorLegend} The calling InterpolatedColorLegend.
+     */
+    public expands(expands: boolean): InterpolatedColorLegend;
+    public expands(expands?: boolean): any {
+      if (expands == null) {
+        return this._expands;
+      }
+      this._expands = expands;
       this.redraw();
       return this;
     }
@@ -104,18 +127,18 @@ export module Components {
     }
 
     public fixedWidth() {
-      return true;
+      return !this.expands() || this._isVertical();
     }
 
     public fixedHeight() {
-      return true;
+      return !this.expands() || !this._isVertical();
     }
 
-    private _generateTicks() {
+    private _generateTicks(numSwatches = InterpolatedColorLegend._DEFAULT_NUM_SWATCHES) {
       let domain = this._scale.domain();
-      let slope = (domain[1] - domain[0]) / this._numSwatches;
+      let slope = (domain[1] - domain[0]) / (numSwatches - 1);
       let ticks: number[] = [];
-      for (let i = 0; i <= this._numSwatches; i++) {
+      for (let i = 0; i < numSwatches; i++) {
         ticks.push(domain[0] + slope * i);
       }
       return ticks;
@@ -137,14 +160,12 @@ export module Components {
     public requestedSpace(offeredWidth: number, offeredHeight: number): SpaceRequest {
       let textHeight = this._measurer.measure().height;
 
-      let ticks = this._generateTicks();
-      let numSwatches = ticks.length;
-
       let domain = this._scale.domain();
       let labelWidths = domain.map((d: number) => this._measurer.measure(this._formatter(d)).width);
 
       let desiredHeight: number;
       let desiredWidth: number;
+      let numSwatches = InterpolatedColorLegend._DEFAULT_NUM_SWATCHES;
       if (this._isVertical()) {
         let longestWidth = Utils.Math.max(labelWidths, 0);
         desiredWidth = this._padding + textHeight + this._padding + longestWidth + this._padding;
@@ -176,9 +197,6 @@ export module Components {
       let text1 = this._formatter(domain[1]);
       let text1Width = this._measurer.measure(text1).width;
 
-      let ticks = this._generateTicks();
-      let numSwatches = ticks.length;
-
       let padding = this._padding;
 
       let upperLabelShift: Point = { x: 0, y: 0 };
@@ -207,6 +225,14 @@ export module Components {
         width: 0,
         height: 0
       };
+
+      let numSwatches = InterpolatedColorLegend._DEFAULT_NUM_SWATCHES;
+      let textHeight = this._measurer.measure().height;
+      if (this.expands() && textHeight > 0) {
+        let offset = this._isVertical() ? 2 * padding :  4 * padding - text0Width - text1Width;
+        let fullLength = this._isVertical() ? this.height() : this.width();
+        numSwatches = Math.max(Math.floor((fullLength - offset) / textHeight), numSwatches);
+      }
 
       if (this._isVertical()) {
         let longestTextWidth = Math.max(text0Width, text1Width);
@@ -262,6 +288,7 @@ export module Components {
 
       this._swatchBoundingBox.attr(boundingBoxAttr);
 
+      let ticks = this._generateTicks(numSwatches);
       let swatches = this._swatchContainer.selectAll("rect.swatch").data(ticks);
       swatches.enter().append("rect").classed("swatch", true);
       swatches.exit().remove();

@@ -154,15 +154,38 @@ export module Plots {
     }
 
     public addDataset(dataset: Dataset) {
-      dataset.onUpdate(this._updateBarPixelWidthCallback);
       super.addDataset(dataset);
       this._updateBarPixelWidth();
+      return this;
+    }
+
+    protected _addDataset(dataset: Dataset) {
+      dataset.onUpdate(this._updateBarPixelWidthCallback);
+      super._addDataset(dataset);
       return this;
     }
 
     public removeDataset(dataset: Dataset) {
       dataset.offUpdate(this._updateBarPixelWidthCallback);
       super.removeDataset(dataset);
+      this._updateBarPixelWidth();
+      return this;
+    }
+
+    protected _removeDataset(dataset: Dataset) {
+      dataset.offUpdate(this._updateBarPixelWidthCallback);
+      super._removeDataset(dataset);
+      return this;
+    }
+
+    public datasets(): Dataset[];
+    public datasets(datasets: Dataset[]): Plot;
+    public datasets(datasets?: Dataset[]): any {
+      if (datasets == null) {
+        return super.datasets();
+      }
+
+      super.datasets(datasets);
       this._updateBarPixelWidth();
       return this;
     }
@@ -290,8 +313,11 @@ export module Plots {
       return closest;
     }
 
+    /**
+     * @deprecated As of release v1.1.0, replaced by _entityVisibleOnPlot()
+     */
     protected _visibleOnPlot(datum: any, pixelPoint: Point, selection: d3.Selection<void>): boolean {
-      Utils.Window.deprecated("Bar._visibleOnPlot()", "v1.1.0");
+      Utils.Window.deprecated("Bar._visibleOnPlot()", "v1.1.0", "replaced by _entityVisibleOnPlot()");
       let xRange = { min: 0, max: this.width() };
       let yRange = { min: 0, max: this.height() };
       let barBBox = Utils.DOM.elementBBox(selection);
@@ -304,14 +330,12 @@ export module Plots {
       let yRange = { min: 0, max: this.height() };
 
       let attrToProjector = this._generateAttrToProjector();
-      let width = attrToProjector["width"](datum, index, dataset);
-      let height = attrToProjector["height"](datum, index, dataset);
 
       let barBBox = {
-        x: pixelPoint.x - width / 2,
-        y: pixelPoint.y,
-        width: width,
-        height: height
+        x: attrToProjector["x"](datum, index, dataset),
+        y: attrToProjector["y"](datum, index, dataset),
+        width: attrToProjector["width"](datum, index, dataset),
+        height: attrToProjector["height"](datum, index, dataset)
       };
 
       return Plottable.Utils.DOM.intersectsBBox(xRange, yRange, barBBox);
@@ -418,10 +442,13 @@ export module Plots {
 
       let scale = <QuantitativeScale<any>>accScaleBinding.scale;
 
-      extents = extents.map((extent) => [
+      // To account for inverted domains
+      extents = extents.map((extent) => d3.extent([
         scale.invert(scale.scale(extent[0]) - this._barPixelWidth / 2),
-        scale.invert(scale.scale(extent[1]) + this._barPixelWidth / 2),
-      ]);
+        scale.invert(scale.scale(extent[0]) + this._barPixelWidth / 2),
+        scale.invert(scale.scale(extent[1]) - this._barPixelWidth / 2),
+        scale.invert(scale.scale(extent[1]) + this._barPixelWidth / 2)
+      ]));
 
       return extents;
     }
@@ -468,7 +495,6 @@ export module Plots {
           } else {
             x += offset;
           }
-
           let showLabel = true;
           let labelPosition = {
             x: x,
@@ -478,6 +504,7 @@ export module Plots {
           if (this._isVertical) {
             labelPosition.x = x + w / 2 - measurement.width / 2;
           } else {
+            labelPosition.y = y + h / 2 - measurement.height / 2;
             if (!positive) {
               labelPosition.x = x + w - measurement.width;
             } else {

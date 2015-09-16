@@ -177,6 +177,7 @@ export module Axes {
       this.addClass("time-axis");
       this.tickLabelPadding(5);
       this.axisConfigurations(Time._DEFAULT_TIME_AXIS_CONFIGURATIONS);
+      this.annotationFormatter(Plottable.Formatters.time("%a %b %d, %Y"));
     }
 
     /**
@@ -312,7 +313,8 @@ export module Axes {
       let tierHeights = this._tierHeights.reduce((prevValue, currValue, index, arr) => {
         return (prevValue + currValue > size.height) ? prevValue : (prevValue + currValue);
       });
-      size.height = Math.min(size.height, tierHeights + this.margin());
+      let nonCoreHeight = this.margin() + (this.annotationsEnabled() ? this.annotationTierCount() * this._annotationTierHeight() : 0);
+      size.height = Math.min(size.height, tierHeights + nonCoreHeight);
       return size;
     }
 
@@ -488,6 +490,12 @@ export module Axes {
         this._hideOverlappingAndCutOffLabels(i);
       }
 
+      if (this.annotationsEnabled()) {
+        this._drawAnnotations();
+      } else {
+        this._removeAnnotations();
+      }
+
       return this;
     }
 
@@ -538,8 +546,12 @@ export module Axes {
         let tickLabel = d3.select(this);
         let leadingTickMark = visibleTickMarkRects[i];
         let trailingTickMark = visibleTickMarkRects[i + 1];
-        if (!isInsideBBox(clientRect) || (lastLabelClientRect != null && Utils.DOM.clientRectsOverlap(clientRect, lastLabelClientRect))
-            || (leadingTickMark.right > clientRect.left || trailingTickMark.left < clientRect.right)) {
+
+        let isOverlappingLastLabel = (lastLabelClientRect != null && Utils.DOM.clientRectsOverlap(clientRect, lastLabelClientRect));
+        let isOverlappingLeadingTickMark = (leadingTickMark != null && Utils.DOM.clientRectsOverlap(clientRect, leadingTickMark));
+        let isOverlappingTrailingTickMark = (trailingTickMark != null && Utils.DOM.clientRectsOverlap(clientRect, trailingTickMark));
+
+        if (!isInsideBBox(clientRect) || isOverlappingLastLabel || isOverlappingLeadingTickMark || isOverlappingTrailingTickMark) {
           tickLabel.style("visibility", "hidden");
         } else {
           lastLabelClientRect = clientRect;
@@ -547,6 +559,7 @@ export module Axes {
         }
       });
     }
+
   }
 }
 }

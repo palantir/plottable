@@ -3,9 +3,10 @@
 describe("InterpolatedColorLegend", () => {
   let svg: d3.Selection<void>;
   let colorScale: Plottable.Scales.InterpolatedColor;
-
+  let SVG_HEIGHT = 400;
+  let SVG_WIDTH = 400;
   beforeEach(() => {
-    svg = TestMethods.generateSVG(400, 400);
+    svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
     colorScale = new Plottable.Scales.InterpolatedColor();
   });
 
@@ -20,6 +21,8 @@ describe("InterpolatedColorLegend", () => {
     assert.strictEqual(d3.select(swatches[0][swatches[0].length - 1]).attr("fill"),
                        colorScale.scale(scaleDomain[1]),
                        "last swatch's color corresponds with second domain value");
+    let defaultNumSwatches = (<any> Plottable.Components.InterpolatedColorLegend)._DEFAULT_NUM_SWATCHES;
+    assert.operator(swatches.size(), ">=", defaultNumSwatches, "there are at least 11 swatches");
 
     let swatchContainer = legendElement.select(".swatch-container");
     let swatchContainerBCR = (<Element> swatchContainer.node()).getBoundingClientRect();
@@ -96,6 +99,21 @@ describe("InterpolatedColorLegend", () => {
     assert.operator(upperLabelBCR.left, "<=", swatchContainerBCR.left, "second label to left of swatches");
     assert.operator(upperLabelBCR.bottom, "<=", lowerLabelBCR.top, "lower label is drawn below upper label");
 
+    svg.remove();
+  });
+
+  it("does not crash when font-size is 0px", () => {
+    let legend = new Plottable.Components.InterpolatedColorLegend(colorScale);
+    legend.renderTo(svg);
+    let style = legend.content().append("style");
+    style.attr("type", "text/css");
+    style.text(".plottable .interpolated-color-legend text { font-size: 0px; }" +
+               ".plottable .interpolated-color-legend { display: none; }");
+    let textHeight = (<any> legend)._measurer.measure().height;
+
+    assert.doesNotThrow(() => legend.expands(true), Error, "it does not throw error when text height is 0");
+    assert.strictEqual(textHeight, 0, "text height is set to 0");
+    style.remove();
     svg.remove();
   });
 
@@ -185,6 +203,80 @@ describe("InterpolatedColorLegend", () => {
     legend.orientation("left");
     legend.renderTo(svg);
     assertBasicRendering(legend);
+    svg.remove();
+  });
+
+  it("fixed height if expand is set to false or orientation is horizontal", () => {
+    let legend = new Plottable.Components.InterpolatedColorLegend(colorScale);
+    legend.renderTo(svg);
+
+    assert.isTrue(legend.fixedHeight(), "height is fixed on default");
+
+    legend.expands(true);
+    assert.isTrue(legend.fixedHeight(), "height is fixed oriented horizontally");
+
+    legend.orientation("left");
+    assert.isFalse(legend.fixedHeight(), "height is not fixed oriented vertically");
+
+    legend.orientation("right");
+    assert.isFalse(legend.fixedHeight(), "height is not fixed oriented vertically");
+
+    legend.expands(false);
+    assert.isTrue(legend.fixedHeight(), "height is fixed when expand is set to false");
+
+    svg.remove();
+  });
+
+  it("fixed width if expand is set to false or orientation is vertically", () => {
+    let legend = new Plottable.Components.InterpolatedColorLegend(colorScale);
+    legend.renderTo(svg);
+
+    assert.isTrue(legend.fixedWidth(), "width is fixed on default");
+
+    legend.expands(true);
+    assert.isFalse(legend.fixedWidth(), "width is not fixed oriented horizontally");
+
+    legend.orientation("left");
+    assert.isTrue(legend.fixedWidth(), "width is fixed oriented vertically");
+
+    legend.orientation("right");
+    assert.isTrue(legend.fixedWidth(), "width is fixed oriented vertically");
+
+    legend.expands(false);
+    legend.orientation("horizontal");
+    assert.isTrue(legend.fixedWidth(), "width is fixed when expand is set to false");
+
+    svg.remove();
+  });
+
+  it("spams the entire height if oriented vertically and expand is set to true", () => {
+    let legend = new Plottable.Components.InterpolatedColorLegend(colorScale);
+    legend.orientation("left");
+    legend.expands(true);
+    legend.renderTo(svg);
+    assert.strictEqual(legend.height(), SVG_HEIGHT, "legend height is the same as svg height");
+    svg.remove();
+  });
+
+  it("spams the entire width if oriented horizontally and expand is set to true", () => {
+    let legend = new Plottable.Components.InterpolatedColorLegend(colorScale);
+    legend.expands(true);
+    legend.renderTo(svg);
+    assert.strictEqual(legend.width(), SVG_WIDTH, "legend width is the same as svg width");
+    svg.remove();
+  });
+
+  it("has more swatches than default when expand is true", () => {
+    let legend = new Plottable.Components.InterpolatedColorLegend(colorScale);
+    legend.renderTo(svg);
+    let orientations = ["horizontal", "left", "right"];
+    orientations.forEach((orientation) => {
+      legend.orientation(orientation).expands(false);
+      let numSwatches = legend.content().selectAll(".swatch").size();
+      legend.expands(true);
+      let newNumSwatches = legend.content().selectAll(".swatch").size();
+      assert.operator(newNumSwatches, ">", numSwatches, `there are more swatches when expanded (orientation: ${orientation})`);
+    });
     svg.remove();
   });
 });
