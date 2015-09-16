@@ -118,6 +118,13 @@ export module Components {
         let l = bounds.topLeft.x;
         let r = bounds.bottomRight.x;
 
+        if (!(Utils.Math.isValidNumber(t) &&
+            Utils.Math.isValidNumber(b) &&
+            Utils.Math.isValidNumber(l) &&
+            Utils.Math.isValidNumber(r))) {
+          throw new Error("bounds have not been properly set");
+        }
+
         this._boxArea.attr({
           x: l, y: t, width: r - l, height: b - t
         });

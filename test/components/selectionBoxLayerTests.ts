@@ -98,6 +98,28 @@ describe("Interactive Components", () => {
         }
       });
 
+      it("throws an error if the bounds have not been set properly before rendering", () => {
+        let topLeft: Plottable.Point = {
+          x: <any> "a",
+          y: <any> "b"
+        };
+        let bottomRight: Plottable.Point = {
+          x: 300,
+          y: 300
+        };
+        sbl.bounds({
+          topLeft: topLeft,
+          bottomRight: bottomRight
+        });
+
+        sbl.boxVisible(true);
+        sbl.anchor(svg);
+        assert.throws(() => sbl.renderImmediately(), "have not been properly set");
+
+        sbl.destroy();
+        svg.remove();
+      });
+
       it("uses the pixel values sides if they were set last", () => {
         let xExtent = [0, 100];
         let yExtent = [0, 100];

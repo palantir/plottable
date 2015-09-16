@@ -6491,6 +6491,12 @@ var Plottable;
                     var b = bounds.bottomRight.y;
                     var l = bounds.topLeft.x;
                     var r = bounds.bottomRight.x;
+                    if (!(Plottable.Utils.Math.isValidNumber(t) &&
+                        Plottable.Utils.Math.isValidNumber(b) &&
+                        Plottable.Utils.Math.isValidNumber(l) &&
+                        Plottable.Utils.Math.isValidNumber(r))) {
+                        throw new Error("bounds have not been properly set");
+                    }
                     this._boxArea.attr({
                         x: l, y: t, width: r - l, height: b - t
                     });
