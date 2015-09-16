@@ -1,5 +1,5 @@
 /*!
-Plottable 1.11.0 (https://github.com/palantir/plottable)
+Plottable 1.10.0 (https://github.com/palantir/plottable)
 Copyright 2014-2015 Palantir Technologies
 Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
 */
@@ -909,7 +909,7 @@ var Plottable;
 ///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
-    Plottable.version = "1.11.0";
+    Plottable.version = "1.10.0";
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
@@ -3838,6 +3838,9 @@ var Plottable;
         Axis.prototype.annotationTierCount = function (annotationTierCount) {
             if (annotationTierCount == null) {
                 return this._annotationTierCount;
+            }
+            if (annotationTierCount < 0) {
+                throw new Error("annotationTierCount " + annotationTierCount + " is not valid, should be positive or 0");
             }
             this._annotationTierCount = annotationTierCount;
             this.redraw();
