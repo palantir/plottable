@@ -79,6 +79,10 @@ svg.plottable {
   fill: #32313F;
 }
 
+.plottable .off-bar-label text {
+  fill: #32313F;
+}
+
 .plottable .axis-label text {
   font-size: 10px;
   font-weight: bold;

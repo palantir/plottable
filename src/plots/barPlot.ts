@@ -476,68 +476,100 @@ export module Plots {
         let text = this._labelFormatter(primaryAccessor(d, i, dataset)).toString();
         let w = attrToProjector["width"](d, i, dataset);
         let h = attrToProjector["height"](d, i, dataset);
-        let x = attrToProjector["x"](d, i, dataset);
-        let y = attrToProjector["y"](d, i, dataset);
-        let positive = originalPositionFn(d, i, dataset) <= scaledBaseline;
+        let baseX = attrToProjector["x"](d, i, dataset);
+        let baseY = attrToProjector["y"](d, i, dataset);
         let measurement = measurer.measure(text);
-        let color = attrToProjector["fill"](d, i, dataset);
-        let dark = Utils.Color.contrast("white", color) * 1.6 < Utils.Color.contrast("black", color);
         let primary = this._isVertical ? h : w;
         let primarySpace = this._isVertical ? measurement.height : measurement.width;
         let secondaryAttrTextSpace = this._isVertical ? measurement.width : measurement.height;
         let secondaryAttrAvailableSpace = this._isVertical ? w : h;
         let tooWide = secondaryAttrTextSpace + 2 * Bar._LABEL_HORIZONTAL_PADDING > secondaryAttrAvailableSpace;
-        if (measurement.height <= h && measurement.width <= w) {
-          let offset = Math.min((primary - primarySpace) / 2, Bar._LABEL_VERTICAL_PADDING);
-          if (!positive) { offset = offset * -1; }
-          if (this._isVertical) {
-            y += offset;
-          } else {
-            x += offset;
-          }
-          let showLabel = true;
-          let labelPosition = {
-            x: x,
-            y: positive ? y : y + h - measurement.height
-          };
+        let showLabelOffBar = this._isVertical ? (measurement.height > h) : (measurement.width > w);
 
-          if (this._isVertical) {
-            labelPosition.x = x + w / 2 - measurement.width / 2;
-          } else {
-            labelPosition.y = y + h / 2 - measurement.height / 2;
-            if (!positive) {
-              labelPosition.x = x + w - measurement.width;
-            } else {
-              labelPosition.x = x;
-            }
-          }
+        let offset = Math.min((primary - primarySpace) / 2, Bar._LABEL_VERTICAL_PADDING);
+        let positive = originalPositionFn(d, i, dataset) <= scaledBaseline;
+        if (!positive) { offset = offset * -1; }
 
-          if (labelPosition.x < 0 || labelPosition.x + measurement.width > this.width() ||
-              labelPosition.y < 0 || labelPosition.y + measurement.height > this.height()) {
-            showLabel = false;
+        let getY = () => {
+          let addend = 0;
+          if (this._isVertical)  {
+              addend += offset;
+              if (showLabelOffBar && positive) {
+                  addend += (offset - h);
+              }
+              if (showLabelOffBar && !positive) {
+                  addend += measurement.height;
+              };
           }
+          return baseY + addend;
+        };
 
-          let g = labelArea.append("g").attr("transform", "translate(" + x + "," + y + ")");
-          let className = dark ? "dark-label" : "light-label";
-          g.classed(className, true);
-          g.style("visibility", showLabel ? "inherit" : "hidden");
-          let xAlign: string;
-          let yAlign: string;
-          if (this._isVertical) {
-            xAlign = "center";
-            yAlign = positive ? "top" : "bottom";
-          } else {
-            xAlign = positive ? "left" : "right";
-            yAlign = "center";
+        let getX = () => {
+          let addend = 0;
+          if (!this._isVertical)  {
+              addend += offset;
+              if (showLabelOffBar && positive) {
+                  addend += (offset - w - Bar._LABEL_HORIZONTAL_PADDING);
+              }
+              if (showLabelOffBar && !positive) {
+                  addend += measurement.width;
+              };
           }
-          let writeOptions = {
-              selection: g,
-              xAlign: xAlign,
-              yAlign: yAlign,
-              textRotation: 0
-          };
-          writer.write(text, w, h, writeOptions);
+          return baseX + addend;
+        };
+
+        let x = getX();
+        let y = getY();
+        let g = labelArea.append("g").attr("transform", "translate(" + x + "," + y + ")");
+
+        let labelPositioningClassName = showLabelOffBar ? "off-bar-label" : "on-bar-label";
+        g.classed(labelPositioningClassName, true);
+
+        let color = attrToProjector["fill"](d, i, dataset);
+        let dark = Utils.Color.contrast("white", color) * 1.6 < Utils.Color.contrast("black", color);
+        g.classed(dark ? "dark-label" : "light-label", true);
+
+        let showLabel = true;
+
+        let labelPosition = {
+          x: x,
+          y: positive ? y : y + h - measurement.height
+        };
+
+        if (this._isVertical) {
+          labelPosition.x = baseX + w / 2 - measurement.width / 2;
+        } else {
+          labelPosition.y = baseY + h / 2 - measurement.height / 2;
+          if (!positive) {
+            labelPosition.x = baseX + offset + w - measurement.width;
+          } else {
+            labelPosition.x = baseX + offset;
+          }
         }
+
+        if (labelPosition.x < 0 || labelPosition.x + measurement.width > this.width() ||
+            labelPosition.y < 0 || labelPosition.y + measurement.height > this.height()) {
+          showLabel = false;
+        }
+
+        g.style("visibility", showLabel ? "inherit" : "hidden");
+
+        let xAlign: string;
+        let yAlign: string;
+        if (this._isVertical) {
+          xAlign = "center";
+          yAlign = positive ? "top" : "bottom";
+        } else {
+          xAlign = positive ? "left" : "right";
+          yAlign = "center";
+        }
+        let writeOptions = {
+            selection: g,
+            xAlign: xAlign,
+            yAlign: yAlign,
+            textRotation: 0
+        };
+        writer.write(text, w, h, writeOptions);
         return tooWide;
       });
       return labelTooWide.some((d: boolean) => d);
