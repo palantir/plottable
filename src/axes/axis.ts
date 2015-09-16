@@ -273,7 +273,7 @@ export class Axis<D> extends Component {
     if (annotationTierCount == null) {
       return this._annotationTierCount;
     }
-    if (annotationTierCount < 0){
+    if (annotationTierCount < 0) {
       throw new Error(`annotationTierCount ${annotationTierCount} is not valid, should be positive or 0`);
     }
     this._annotationTierCount = annotationTierCount;
