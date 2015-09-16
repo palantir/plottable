@@ -269,11 +269,13 @@ describe("BaseAxis", () => {
 
       it("throws an error when annotation tier count is not valid", () => {
         let axis = new Plottable.Axis(new Plottable.Scale<{}, number>(), "bottom");
-        let annotationTierCount = [-1, -100];
-        annotationTierCount.forEach(function(tierCount) {
-          let currentTierCount = axis.annotationTierCount();
-          assert.throw(() => axis.annotationTierCount(tierCount), `annotationTierCount ${tierCount} is not valid, should be positive or 0`);
-          assert.strictEqual(axis.annotationTierCount(), currentTierCount, "annotationTierCound should not be changed to invalid values");
+        let invalidAnnotationTierCounts = [-1, -100];
+        invalidAnnotationTierCounts.forEach(function(annotationTierCount) {
+          let currentAnnotationTierCount = axis.annotationTierCount();
+          assert.throws(() => axis.annotationTierCount(annotationTierCount),
+          `annotationTierCount ${annotationTierCount} cannot be negative`);
+          assert.strictEqual(axis.annotationTierCount(), currentAnnotationTierCount,
+          "annotationTierCound should not be changed to invalid values");
         });
       });
     });

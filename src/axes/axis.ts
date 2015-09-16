@@ -274,7 +274,7 @@ export class Axis<D> extends Component {
       return this._annotationTierCount;
     }
     if (annotationTierCount < 0) {
-      throw new Error(`annotationTierCount ${annotationTierCount} is not valid, should be positive or 0`);
+      throw new Error(`annotationTierCount ${annotationTierCount} cannot be negative`);
     }
     this._annotationTierCount = annotationTierCount;
     this.redraw();
