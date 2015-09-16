@@ -818,26 +818,29 @@ describe("Component", () => {
     });
 
     it("updates the clipPath reference when render()-ed", () => {
-      if (window.history && window.history.replaceState) { // not supported on IE9 (http://caniuse.com/#feat=history)
-        clippedComponent.renderTo(svg);
-
-        let originalState = window.history.state;
-        let originalTitle = document.title;
-        let originalLocation = document.location.href;
-        window.history.replaceState(null, null, "clipPathTest");
-        clippedComponent.render();
-
-        let clipPathId = (<any> clippedComponent)._boxContainer[0][0].firstChild.id;
-        let expectedPrefix = /MSIE [5-9]/.test(navigator.userAgent) ? "" : document.location.href;
-        expectedPrefix = expectedPrefix.replace(/#.*/g, "");
-        let expectedClipPathURL = "url(" + expectedPrefix + "#" + clipPathId + ")";
-
-        window.history.replaceState(originalState, originalTitle, originalLocation);
-
-        let normalizeClipPath = (s: string) => s.replace(/"/g, "");
-        assert.strictEqual(normalizeClipPath((<any> clippedComponent)._element.attr("clip-path")), expectedClipPathURL,
-          "the clipPath reference was updated");
+      if (window.history == null ||  window.history.replaceState == null) { // not supported on IE9 (http://caniuse.com/#feat=history)
+        svg.remove();
+        return;
       }
+
+      clippedComponent.renderTo(svg);
+
+      let originalState = window.history.state;
+      let originalTitle = document.title;
+      let originalLocation = document.location.href;
+      window.history.replaceState(null, null, "clipPathTest");
+      clippedComponent.render();
+
+      let clipPathId = (<any> clippedComponent)._boxContainer[0][0].firstChild.id;
+      let expectedPrefix = /MSIE [5-9]/.test(navigator.userAgent) ? "" : document.location.href;
+      expectedPrefix = expectedPrefix.replace(/#.*/g, "");
+      let expectedClipPathURL = "url(" + expectedPrefix + "#" + clipPathId + ")";
+
+      window.history.replaceState(originalState, originalTitle, originalLocation);
+
+      let normalizeClipPath = (s: string) => s.replace(/"/g, "");
+      assert.strictEqual(normalizeClipPath((<any> clippedComponent)._element.attr("clip-path")), expectedClipPathURL,
+        "the clipPath reference was updated");
       svg.remove();
     });
   });
