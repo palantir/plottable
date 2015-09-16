@@ -798,8 +798,7 @@ describe("Component", () => {
     let svg: d3.Selection<void>;
 
     beforeEach(() => {
-      clippedComponent = new Plottable.Component();
-      (<any> clippedComponent)._clipPathEnabled = true;
+      clippedComponent = new Mocks.ClippedComponent();
       svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
     });
 

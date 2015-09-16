@@ -26,4 +26,8 @@ module Mocks {
       return true;
     }
   }
+
+  export class ClippedComponent extends Plottable.Component {
+    protected _clipPathEnabled = true;
+  }
 }
