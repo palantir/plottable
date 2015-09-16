@@ -438,7 +438,7 @@ export module Components {
     }
 
     public detach() {
-      this._resetBound();
+      this._resetState();
       this._dragInteraction.detachFrom(this);
       return super.detach();
     }
@@ -448,7 +448,7 @@ export module Components {
       return super.anchor(selection);
     }
 
-    private _resetBound() {
+    private _resetState() {
       this.bounds({
         topLeft: { x: 0, y: 0 },
         bottomRight: { x: 0, y: 0 }

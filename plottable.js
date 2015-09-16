@@ -12207,7 +12207,7 @@ var Plottable;
                 this._disconnectInteraction();
             };
             DragBoxLayer.prototype.detach = function () {
-                this._resetBound();
+                this._resetState();
                 this._dragInteraction.detachFrom(this);
                 return _super.prototype.detach.call(this);
             };
@@ -12215,7 +12215,7 @@ var Plottable;
                 this._dragInteraction.attachTo(this);
                 return _super.prototype.anchor.call(this, selection);
             };
-            DragBoxLayer.prototype._resetBound = function () {
+            DragBoxLayer.prototype._resetState = function () {
                 this.bounds({
                     topLeft: { x: 0, y: 0 },
                     bottomRight: { x: 0, y: 0 }
