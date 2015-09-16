@@ -8700,11 +8700,15 @@ var Plottable;
                     var x = getX();
                     var y = getY();
                     var g = labelArea.append("g").attr("transform", "translate(" + x + "," + y + ")");
-                    var labelPositioningClassName = showLabelOffBar ? "off-bar-label" : "on-bar-label";
-                    g.classed(labelPositioningClassName, true);
-                    var color = attrToProjector["fill"](d, i, dataset);
-                    var dark = Plottable.Utils.Color.contrast("white", color) * 1.6 < Plottable.Utils.Color.contrast("black", color);
-                    g.classed(dark ? "dark-label" : "light-label", true);
+                    if (showLabelOffBar) {
+                        g.classed("off-bar-label", true);
+                    }
+                    else {
+                        g.classed("on-bar-label", true);
+                        var color = attrToProjector["fill"](d, i, dataset);
+                        var dark = Plottable.Utils.Color.contrast("white", color) * 1.6 < Plottable.Utils.Color.contrast("black", color);
+                        g.classed(dark ? "dark-label" : "light-label", true);
+                    }
                     var showLabel = true;
                     var labelPosition = {
                         x: x,
