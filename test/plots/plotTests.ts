@@ -134,22 +134,22 @@ describe("Plots", () => {
     });
 
     it("sets the domain automatically when attaching a Scale to an attr", () => {
-      let dataset = new Plottable.Dataset([{x: 5}, {x: 10}]);
+      let xMin = 5;
+      let xMax = 10;
+      let dataset = new Plottable.Dataset([{x: xMin}, {x: xMax}]);
       let plot = new Plottable.Plot();
       let svg = TestMethods.generateSVG();
       (<any> plot)._createDrawer = (dataset: Plottable.Dataset) => createMockDrawer(dataset);
       plot.addDataset(dataset);
 
-      let scale = new Plottable.Scales.Linear();
-      let defaultDomain = [0, 1];
+      let scale = new Plottable.Scales.Linear().padProportion(0).snappingDomainEnabled(false);
 
       plot.attr("x", (d) => d.x);
       plot.attr("y", (d) => 1);
       plot.renderTo(svg);
-      assert.deepEqual(scale.domain(), defaultDomain, "scale domain scale is same as default");
 
       plot.attr("x", (d) => d.x, scale);
-      assert.deepEqual(scale.domain(), [4.5, 10.5], "scale domain scale is auto updated");
+      assert.deepEqual(scale.domain(), [xMin, xMax], "scale domain scale is auto updated");
       svg.remove();
     });
 
