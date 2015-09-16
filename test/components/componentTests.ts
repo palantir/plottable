@@ -799,6 +799,8 @@ describe("Component", () => {
 
     beforeEach(() => {
       clippedComponent = new Plottable.Component();
+      // HACKHACK #2777: Can't use a Mocks Compnoent here because they descend from a different Plottable,
+      // which has the wrong RenderPolicy in coverage.html
       (<any> clippedComponent)._clipPathEnabled = true;
       svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
     });
