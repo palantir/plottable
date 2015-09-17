@@ -152,19 +152,17 @@ describe("TimeAxis", () => {
   it("tick labels do not overlap with tick marks in top orientation", () => {
      let svg = TestMethods.generateSVG(400, 100);
       scale = new Plottable.Scales.Time();
-      scale.domain([new Date("2015-09-02"), new Date("2015-09-05")]);
+      scale.domain([new Date("2015-09-02"), new Date("2015-09-03")]);
       axis = new Plottable.Axes.Time(scale, "top");
 
       function checkTierDisplayPosition (tierDisplayPositions: any[]) {
         axis.tierLabelPositions(tierDisplayPositions);
         axis.renderTo(svg);
 
-        let tickMarks = d3.selectAll(`.${Plottable.Axis.TICK_MARK_CLASS}`);
+        let tickMarks = d3.selectAll(`.${Plottable.Axis.TICK_MARK_CLASS}:not(.${Plottable.Axis.END_TICK_MARK_CLASS})`);
         assert.operator(tickMarks.size(), ">=", 1, "There are more than one tick marks in the test");
 
-        let tickLabels = d3.selectAll(`.${Plottable.Axis.TICK_LABEL_CLASS}`).filter(function(d: Element, i: number) {
-          return d3.select(this).style("visibility") === "visible";
-        });
+        let tickLabels = d3.selectAll(`.${Plottable.Axis.TICK_LABEL_CLASS}`);
         assert.operator(tickLabels.size(), ">=", 1, "There are more than one tick marks in the test");
 
         tickMarks.each(function(tickMark) {
@@ -172,7 +170,7 @@ describe("TimeAxis", () => {
           tickLabels.each(function(tickLabel) {
             let tickLabelRect = this.getBoundingClientRect();
             let isOverlap = Plottable.Utils.DOM.clientRectsOverlap(tickMarkRect, tickLabelRect);
-            assert.isFalse(isOverlap, `Tick marks do not overlap with tick labels ${this.textContent} `);
+            assert.isFalse(isOverlap, `Tick marks "${tickMark}" should not overlap with tick labels "${this.textContent}" `);
           });
         });
       }
