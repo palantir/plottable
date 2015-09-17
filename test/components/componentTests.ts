@@ -78,6 +78,13 @@ describe("Component", () => {
       svg.remove();
     });
 
+    it("remove old DOM Element when switching element", () => {
+      c.anchor(svg);
+      assert.strictEqual((<Node> svg.node()).childNodes.length, 1, "length wrong before switching");
+      let svg2 = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+      c.anchor(svg2);
+      assert.strictEqual((<Node> svg.node()).childNodes.length, 1, "length wrong after switiching");
+    });
     it("can undergo set behavior upon anchoring", () => {
       let callbackCalled = false;
       let passedComponent: Plottable.Component;
@@ -160,7 +167,6 @@ describe("Component", () => {
       assert.isTrue((<Node> svg.node()).hasChildNodes(), "the svg has children");
       c.detach();
       assert.isFalse((<Node> svg.node()).hasChildNodes(), "the svg has no children");
-
       c.destroy();
       svg.remove();
     });

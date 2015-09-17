@@ -3005,6 +3005,9 @@ var Plottable;
             if (this._destroyed) {
                 throw new Error("Can't reuse destroy()-ed Components!");
             }
+            if (this._isAnchored) {
+                this.detach();
+            }
             if (selection.node().nodeName.toLowerCase() === "svg") {
                 // svg node gets the "plottable" CSS class
                 this._rootSVG = selection;
