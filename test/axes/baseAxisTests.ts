@@ -273,7 +273,7 @@ describe("BaseAxis", () => {
         invalidAnnotationTierCounts.forEach(function(annotationTierCount) {
           let currentAnnotationTierCount = axis.annotationTierCount();
           assert.throws(() => axis.annotationTierCount(annotationTierCount),
-          `annotationTierCount ${annotationTierCount} cannot be negative`);
+          `annotationTierCount cannot be negative`);
           assert.strictEqual(axis.annotationTierCount(), currentAnnotationTierCount,
           "annotationTierCount should not be changed to invalid values");
         });
