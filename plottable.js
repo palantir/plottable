@@ -7010,7 +7010,7 @@ var Plottable;
         Plot.prototype._generateDrawSteps = function () {
             return [{ attrToProjector: this._generateAttrToProjector(), animator: new Plottable.Animators.Null() }];
         };
-        Plot.prototype._additionalPaint = function (time) {
+        Plot.prototype._additionalPaint = function (time, dataToDraw) {
             // no-op
         };
         Plot.prototype._getDataToDraw = function () {
@@ -7025,7 +7025,7 @@ var Plottable;
             this.datasets().forEach(function (ds, i) { return drawers[i].draw(dataToDraw.get(ds), drawSteps); });
             var times = this.datasets().map(function (ds, i) { return drawers[i].totalDrawTime(dataToDraw.get(ds), drawSteps); });
             var maxTime = Plottable.Utils.Math.max(times, 0);
-            this._additionalPaint(maxTime);
+            this._additionalPaint(maxTime, dataToDraw);
         };
         /**
          * Retrieves Selections of this Plot for the specified Datasets.
@@ -9145,6 +9145,7 @@ var Plottable;
                 };
             };
             Line.prototype._getDataToDraw = function () {
+                console.log("called");
                 var dataToDraw = new Plottable.Utils.Map();
                 var xScale = this.x().scale;
                 var domain = xScale.domain();
@@ -9155,7 +9156,7 @@ var Plottable;
                         shouldShow = shouldShow || dataset[i + 1] && domain[0] <= dataset[i + 1].x && dataset[i + 1].x <= domain[1];
                         return shouldShow;
                     });
-                    var rez = [];
+                    var downSampledData = [];
                     var lastSampleBucket = -1;
                     for (var i = 0; i < reducedData.length;) {
                         var min = Infinity;
@@ -9176,19 +9177,18 @@ var Plottable;
                             i++;
                         }
                         var p4 = reducedData[i - 1];
-                        rez.push(p1);
+                        downSampledData.push(p1);
                         if (p2 !== p1) {
-                            rez.push(p2);
+                            downSampledData.push(p2);
                         }
                         if (p3 !== p2 && p3 !== p1) {
-                            rez.push(p3);
+                            downSampledData.push(p3);
                         }
                         if (p4 !== p3 && p4 !== p2 && p4 != p1) {
-                            rez.push(p4);
+                            downSampledData.push(p4);
                         }
                     }
-                    // console.log(rez);
-                    dataToDraw.set(dataset, [rez]);
+                    dataToDraw.set(dataset, [downSampledData]);
                 });
                 // this.datasets().forEach((dataset) => dataToDraw.set(dataset, [dataset.data()]));
                 return dataToDraw;
@@ -9281,10 +9281,10 @@ var Plottable;
                 _super.prototype._removeDatasetNodes.call(this, dataset);
                 this._lineDrawers.get(dataset).remove();
             };
-            Area.prototype._additionalPaint = function () {
+            Area.prototype._additionalPaint = function (time, dataToDraw) {
                 var _this = this;
                 var drawSteps = this._generateLineDrawSteps();
-                var dataToDraw = this._getDataToDraw();
+                // let dataToDraw = this._getDataToDraw();
                 this.datasets().forEach(function (dataset) { return _this._lineDrawers.get(dataset).draw(dataToDraw.get(dataset), drawSteps); });
             };
             Area.prototype._generateLineDrawSteps = function () {

@@ -348,6 +348,8 @@ export module Plots {
     }
 
     protected _getDataToDraw() {
+      console.log("called")
+
       let dataToDraw = new Utils.Map<Dataset, any[]> ();
       var xScale: any = this.x().scale;
 
@@ -364,7 +366,7 @@ export module Plots {
           return shouldShow;
         });
 
-        let rez: any[] = [];
+        let downSampledData: any[] = [];
         let lastSampleBucket = -1;
 
         for (let i = 0; i < reducedData.length; ) {
@@ -387,23 +389,22 @@ export module Plots {
           }
           let p4 = reducedData[i - 1];
 
-          rez.push(p1);
+          downSampledData.push(p1);
 
           if (p2 !== p1) {
-            rez.push(p2);
+            downSampledData.push(p2);
           }
 
           if (p3 !== p2 && p3 !== p1) {
-            rez.push(p3);
+            downSampledData.push(p3);
           }
 
           if (p4 !== p3 && p4 !== p2 && p4 != p1) {
-            rez.push(p4);
+            downSampledData.push(p4);
           }
         }
 
-        // console.log(rez);
-        dataToDraw.set(dataset, [rez]);
+        dataToDraw.set(dataset, [downSampledData]);
       });
 
       // this.datasets().forEach((dataset) => dataToDraw.set(dataset, [dataset.data()]));

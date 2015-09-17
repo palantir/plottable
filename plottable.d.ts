@@ -2709,7 +2709,7 @@ declare module Plottable {
         datasets(datasets: Dataset[]): Plot;
         protected _getDrawersInOrder(): Drawer[];
         protected _generateDrawSteps(): Drawers.DrawStep[];
-        protected _additionalPaint(time: number): void;
+        protected _additionalPaint(time: number, dataToDraw: Utils.Map<Dataset, any>): void;
         protected _getDataToDraw(): Utils.Map<Dataset, any[]>;
         /**
          * Retrieves Selections of this Plot for the specified Datasets.
@@ -3437,7 +3437,7 @@ declare module Plottable {
             addDataset(dataset: Dataset): Area<X>;
             protected _addDataset(dataset: Dataset): Area<X>;
             protected _removeDatasetNodes(dataset: Dataset): void;
-            protected _additionalPaint(): void;
+            protected _additionalPaint(time: any, dataToDraw: Utils.Map<Dataset, any>): void;
             protected _createDrawer(dataset: Dataset): Drawers.Area;
             protected _generateDrawSteps(): Drawers.DrawStep[];
             protected _updateYScale(): void;
