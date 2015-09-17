@@ -114,7 +114,8 @@ describe("Interactive Components", () => {
 
         sbl.boxVisible(true);
         sbl.anchor(svg);
-        assert.throws(() => sbl.renderImmediately(), "have not been properly set");
+        // HACKHACK #2614: chai-assert.d.ts has the wrong signature
+        (<any> assert).throws(() => sbl.renderImmediately(), "bounds have not been properly set", "cannot set invalid bounds");
 
         sbl.destroy();
         svg.remove();
