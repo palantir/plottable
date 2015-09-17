@@ -167,8 +167,8 @@ describe("TimeAxis", () => {
           return window.getComputedStyle(this).visibility !== "hidden";
         });
         assert.operator(tickLabels.size(), ">=", 1, "There are more than one tick marks in the test");
-        
-        function myclientRectsOverlap(clientRectA:ClientRect, clientRectB:ClientRect) {
+
+        function myclientRectsOverlap(clientRectA: ClientRect, clientRectB: ClientRect) {
                 if (clientRectA.right < clientRectB.left + window.Pixel_CloseTo_Requirement) {
                     return false;
                 }
@@ -183,7 +183,7 @@ describe("TimeAxis", () => {
                 }
                 return true;
             }
-            
+
         tickMarks.each(function(tickMark) {
           let tickMarkRect = this.getBoundingClientRect();
           tickLabels.each(function(tickLabel) {
