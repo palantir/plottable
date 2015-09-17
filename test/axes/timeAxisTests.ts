@@ -162,7 +162,10 @@ describe("TimeAxis", () => {
         let tickMarks = d3.selectAll(`.${Plottable.Axis.TICK_MARK_CLASS}:not(.${Plottable.Axis.END_TICK_MARK_CLASS})`);
         assert.operator(tickMarks.size(), ">=", 1, "There are more than one tick marks in the test");
 
-        let tickLabels = d3.selectAll(`.${Plottable.Axis.TICK_LABEL_CLASS}`);
+        let tickLabels = d3.selectAll(`.${Plottable.Axis.TICK_LABEL_CLASS}`)
+        .filter(function(d: Element, i: number){
+          return window.getComputedStyle(this).visibility === "visible";
+        });
         assert.operator(tickLabels.size(), ">=", 1, "There are more than one tick marks in the test");
 
         tickMarks.each(function(tickMark) {
@@ -175,7 +178,7 @@ describe("TimeAxis", () => {
         });
       }
 
-    //  checkTierDisplayPosition(["between", "between"]);
+      checkTierDisplayPosition(["between", "between"]);
       checkTierDisplayPosition(["center", "center"]);
       svg.remove();
   });
