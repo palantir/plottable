@@ -152,7 +152,7 @@ describe("TimeAxis", () => {
   it("tick labels do not overlap with tick marks in top orientation", () => {
      let svg = TestMethods.generateSVG(400, 100);
       scale = new Plottable.Scales.Time();
-      scale.domain([new Date(2015, 8, 2), new Date(2015, 8, 3)]);
+      scale.domain([new Date("2015-09-02"), new Date("2015-09-03")]);
       axis = new Plottable.Axes.Time(scale, "top");
 
       function checkTierDisplayPosition (tierDisplayPositions: any[]) {
@@ -164,7 +164,7 @@ describe("TimeAxis", () => {
 
         let tickLabels = d3.selectAll(`.${Plottable.Axis.TICK_LABEL_CLASS}`)
         .filter(function(d: Element, i: number){
-          return window.getComputedStyle(this).visibility === "visible";
+          return window.getComputedStyle(this).visibility !== "hidden";
         });
         assert.operator(tickLabels.size(), ">=", 1, "There are more than one tick marks in the test");
 
