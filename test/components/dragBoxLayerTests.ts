@@ -1,6 +1,6 @@
 ///<reference path="../testReference.ts" />
 
-describe("Interactive Components", () => {
+describe("Layer Components", () => {
   describe("DragBoxLayer", () => {
 
     describe("Basics usage", () => {
@@ -103,6 +103,72 @@ describe("Interactive Components", () => {
 
       it("does not error on destroy() if scales are not added", () => {
         assert.doesNotThrow(() => dbl.destroy(), Error, "can destroy");
+        svg.remove();
+      });
+
+      it("does not call callbacks when dragBoxLayer is destroy()-ed", () => {
+        // rendered in a Group so that drag sequence can be simulated on Group background after DragBoxLayer is destroyed
+        let group = new Plottable.Components.Group([dbl]).renderTo(svg);
+        let target = group.background();
+        let onDragStartCallbackCalled = false;
+        let onDragCallbackCalled = false;
+        let onDragEndcallbackCalled = false;
+        dbl.onDragStart(() => onDragStartCallbackCalled = true);
+        dbl.onDrag(() => onDragCallbackCalled = true);
+        dbl.onDragEnd(() => onDragEndcallbackCalled = true);
+
+        TestMethods.triggerFakeDragSequence(target, quarterPoint, halfPoint);
+        assert.isTrue(onDragStartCallbackCalled, "onDragStart callback is called");
+        assert.isTrue(onDragCallbackCalled, "onDrag callback is called");
+        assert.isTrue(onDragEndcallbackCalled, "onDragEnd callback is called");
+
+        onDragStartCallbackCalled = false;
+        onDragCallbackCalled = false;
+        onDragEndcallbackCalled = false;
+        dbl.destroy();
+
+        TestMethods.triggerFakeDragSequence(target, quarterPoint, halfPoint);
+        assert.isFalse(onDragStartCallbackCalled, "onDragStart callback is not called");
+        assert.isFalse(onDragCallbackCalled, "onDrag callback is not called");
+        assert.isFalse(onDragEndcallbackCalled, "onDragEnd callback is not called");
+
+        svg.remove();
+      });
+
+      it("does not call callbacks when dragBoxLayer is detach()-ed", () => {
+        // rendered in a Group so that drag sequence can be simulated on Group background after DragBoxLayer is destroyed
+        let group = new Plottable.Components.Group([dbl]);
+        group.renderTo(svg);
+        let target = group.background();
+        let onDragStartCallbackCalled = false;
+        let onDragCallbackCalled = false;
+        let onDragEndcallbackCalled = false;
+        dbl.onDragStart(() => onDragStartCallbackCalled = true);
+        dbl.onDrag(() => onDragCallbackCalled = true);
+        dbl.onDragEnd(() => onDragEndcallbackCalled = true);
+
+        TestMethods.triggerFakeDragSequence(target, quarterPoint, halfPoint);
+        assert.isTrue(onDragStartCallbackCalled, "onDragStart callback is called");
+        assert.isTrue(onDragCallbackCalled, "onDrag callback is called");
+        assert.isTrue(onDragEndcallbackCalled, "onDragEnd callback is called");
+
+        onDragStartCallbackCalled = false;
+        onDragCallbackCalled = false;
+        onDragEndcallbackCalled = false;
+        dbl.detach();
+
+        TestMethods.triggerFakeDragSequence(target, quarterPoint, halfPoint);
+        assert.isFalse(onDragStartCallbackCalled, "onDragStart callback is not called");
+        assert.isFalse(onDragCallbackCalled, "onDrag callback is not called");
+        assert.isFalse(onDragEndcallbackCalled, "onDragEnd callback is not called");
+
+        group.append(dbl);
+        TestMethods.triggerFakeDragSequence(target, quarterPoint, halfPoint);
+        assert.isTrue(onDragStartCallbackCalled, "onDragStart callback is called when re-anchor()");
+        assert.isTrue(onDragCallbackCalled, "onDrag callback is called when re-anchor()");
+        assert.isTrue(onDragEndcallbackCalled, "onDragEnd callback is called when re-anchor()");
+
+        dbl.destroy();
         svg.remove();
       });
 

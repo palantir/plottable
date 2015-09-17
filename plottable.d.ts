@@ -4616,6 +4616,9 @@ declare module Plottable {
              * Gets the enabled state.
              */
             enabled(): boolean;
+            destroy(): void;
+            detach(): Component;
+            anchor(selection: d3.Selection<void>): Component;
         }
     }
 }

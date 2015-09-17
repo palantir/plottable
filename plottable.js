@@ -11932,7 +11932,7 @@ var Plottable;
                     move: 2
                 };
                 var mode = DRAG_MODES.newBox;
-                this._dragInteraction.onDragStart(function (startPoint) {
+                var onDragStartCallback = function (startPoint) {
                     resizingEdges = _this._getResizingEdges(startPoint);
                     var bounds = _this.bounds();
                     var isInsideBox = bounds.topLeft.x <= startPoint.x && startPoint.x <= bounds.bottomRight.x &&
@@ -11957,8 +11957,8 @@ var Plottable;
                     bottomRight = { x: bounds.bottomRight.x, y: bounds.bottomRight.y };
                     lastEndPoint = startPoint;
                     _this._dragStartCallbacks.callCallbacks(bounds);
-                });
-                this._dragInteraction.onDrag(function (startPoint, endPoint) {
+                };
+                var onDragCallback = function (startPoint, endPoint) {
                     switch (mode) {
                         case DRAG_MODES.newBox:
                             bottomRight.x = endPoint.x;
@@ -11993,13 +11993,22 @@ var Plottable;
                         bottomRight: bottomRight
                     });
                     _this._dragCallbacks.callCallbacks(_this.bounds());
-                });
-                this._dragInteraction.onDragEnd(function (startPoint, endPoint) {
+                };
+                var onDragEndCallback = function (startPoint, endPoint) {
                     if (mode === DRAG_MODES.newBox && startPoint.x === endPoint.x && startPoint.y === endPoint.y) {
                         _this.boxVisible(false);
                     }
                     _this._dragEndCallbacks.callCallbacks(_this.bounds());
-                });
+                };
+                this._dragInteraction.onDragStart(onDragStartCallback);
+                this._dragInteraction.onDrag(onDragCallback);
+                this._dragInteraction.onDragEnd(onDragEndCallback);
+                this._disconnectInteraction = function () {
+                    _this._dragInteraction.offDragStart(onDragStartCallback);
+                    _this._dragInteraction.offDrag(onDragCallback);
+                    _this._dragInteraction.offDragEnd(onDragEndCallback);
+                    _this._dragInteraction.detachFrom(_this);
+                };
             };
             DragBoxLayer.prototype._setup = function () {
                 var _this = this;
@@ -12205,6 +12214,29 @@ var Plottable;
                 this._setResizableClasses(this.resizable());
                 this._setMovableClass();
                 return this;
+            };
+            DragBoxLayer.prototype.destroy = function () {
+                var _this = this;
+                _super.prototype.destroy.call(this);
+                this._dragStartCallbacks.forEach(function (callback) { return _this._dragCallbacks.delete(callback); });
+                this._dragCallbacks.forEach(function (callback) { return _this._dragCallbacks.delete(callback); });
+                this._dragEndCallbacks.forEach(function (callback) { return _this._dragEndCallbacks.delete(callback); });
+                this._disconnectInteraction();
+            };
+            DragBoxLayer.prototype.detach = function () {
+                this._resetState();
+                this._dragInteraction.detachFrom(this);
+                return _super.prototype.detach.call(this);
+            };
+            DragBoxLayer.prototype.anchor = function (selection) {
+                this._dragInteraction.attachTo(this);
+                return _super.prototype.anchor.call(this, selection);
+            };
+            DragBoxLayer.prototype._resetState = function () {
+                this.bounds({
+                    topLeft: { x: 0, y: 0 },
+                    bottomRight: { x: 0, y: 0 }
+                });
             };
             return DragBoxLayer;
         })(Components.SelectionBoxLayer);
