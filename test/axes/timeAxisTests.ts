@@ -167,12 +167,28 @@ describe("TimeAxis", () => {
           return window.getComputedStyle(this).visibility !== "hidden";
         });
         assert.operator(tickLabels.size(), ">=", 1, "There are more than one tick marks in the test");
-
+        
+        function myclientRectsOverlap(clientRectA:ClientRect, clientRectB:ClientRect) {
+                if (clientRectA.right < clientRectB.left + window.Pixel_CloseTo_Requirement) {
+                    return false;
+                }
+                if ( window.Pixel_CloseTo_Requirement + clientRectA.left > clientRectB.right) {
+                    return false;
+                }
+                if (clientRectA.bottom < clientRectB.top + window.Pixel_CloseTo_Requirement) {
+                    return false;
+                }
+                if (window.Pixel_CloseTo_Requirement + clientRectA.top > clientRectB.bottom) {
+                    return false;
+                }
+                return true;
+            }
+            
         tickMarks.each(function(tickMark) {
           let tickMarkRect = this.getBoundingClientRect();
           tickLabels.each(function(tickLabel) {
             let tickLabelRect = this.getBoundingClientRect();
-            let isOverlap = Plottable.Utils.DOM.clientRectsOverlap(tickMarkRect, tickLabelRect);
+            let isOverlap = myclientRectsOverlap(tickMarkRect, tickLabelRect);
             assert.isFalse(isOverlap, `Tick marks "${tickMark}" should not overlap with tick labels "${this.textContent}" `);
           });
         });
