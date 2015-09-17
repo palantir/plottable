@@ -46,7 +46,7 @@ export class Component {
   private _height: number;
   private _cssClasses = new Utils.Set<string>();
   private _destroyed = false;
-  private _updateClipPath: () => void;
+  private _clipPathID: string;
   private _onAnchorCallbacks = new Utils.CallbackSet<ComponentCallback>();
   private _onDetachCallbacks = new Utils.CallbackSet<ComponentCallback>();
 
@@ -235,7 +235,7 @@ export class Component {
    * Renders the Component without waiting for the next frame.
    */
   public renderImmediately() {
-    if (this._clipPathEnabled && this._updateClipPath != null) {
+    if (this._clipPathEnabled) {
       this._updateClipPath();
     }
     return this;
@@ -360,17 +360,18 @@ export class Component {
 
   private _generateClipPath() {
     // The clip path will prevent content from overflowing its Component space.
-    let clipPathId = Utils.DOM.generateUniqueClipPathId();
-    let clipPathParent = this._boxContainer.append("clipPath").attr("id", clipPathId);
+    this._clipPathID = Utils.DOM.generateUniqueClipPathId();
+    let clipPathParent = this._boxContainer.append("clipPath").attr("id", this._clipPathID);
     this._addBox("clip-rect", clipPathParent);
-    this._updateClipPath = () => {
-      // HACKHACK: IE <= 9 does not respect the HTML base element in SVG.
-      // They don't need the current URL in the clip path reference.
-      let prefix = /MSIE [5-9]/.test(navigator.userAgent) ? "" : document.location.href;
-      prefix = prefix.split("#")[0]; // To fix cases where an anchor tag was used
-      this._element.attr("clip-path", "url(\"" + prefix + "#" + clipPathId + "\")");
-    };
     this._updateClipPath();
+  }
+
+  private _updateClipPath() {
+    // HACKHACK: IE <= 9 does not respect the HTML base element in SVG.
+    // They don't need the current URL in the clip path reference.
+    let prefix = /MSIE [5-9]/.test(navigator.userAgent) ? "" : document.location.href;
+    prefix = prefix.split("#")[0]; // To fix cases where an anchor tag was used
+    this._element.attr("clip-path", "url(\"" + prefix + "#" + this._clipPathID + "\")");
   }
 
   /**
