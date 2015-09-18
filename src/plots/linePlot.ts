@@ -348,20 +348,32 @@ export module Plots {
     }
 
     protected _getDataToDraw() {
-      console.log("called")
+      // console.log("called")
 
       let dataToDraw = new Utils.Map<Dataset, any[]> ();
       var xScale: any = this.x().scale;
+
+      var xAccessor = this.x().accessor;
+      var yAccessor = this.y().accessor;
 
 
       var domain = xScale.domain();
 
       this.datasets().forEach((dataset) => {
 
-        let reducedData = dataset.data().filter((d, i, dataset) => {
-          var shouldShow = domain[0] <= dataset[i].x && dataset[i].x <= domain[1];
-          shouldShow = shouldShow || dataset[i - 1] && domain[0] <= dataset[i - 1].x && dataset[i - 1].x <= domain[1];
-          shouldShow = shouldShow || dataset[i + 1] && domain[0] <= dataset[i + 1].x && dataset[i + 1].x <= domain[1];
+        let reducedData = dataset.data().filter((d, i, data) => {
+          let currPoint = xAccessor(data[i], i, dataset);
+          var shouldShow = domain[0] <= currPoint && currPoint <= domain[1];
+
+          if (data[i - 1]) {
+            let prevPoint = xAccessor(data[i - 1], i - 1, dataset);
+            shouldShow = shouldShow || domain[0] <= prevPoint && prevPoint <= domain[1];
+          }
+
+          if (data[i + 1]) {
+            let nextPoint = xAccessor(data[i + 1], i + 1, dataset);
+            shouldShow = shouldShow || domain[0] <= nextPoint && nextPoint <= domain[1];
+          }
 
           return shouldShow;
         });
@@ -372,17 +384,18 @@ export module Plots {
         for (let i = 0; i < reducedData.length; ) {
           let min = Infinity;
           let max = -Infinity;
-          let currBucket = Math.floor(xScale.scale(reducedData[i].x));
+          let currBucket = Math.floor(xScale.scale(xAccessor(reducedData[i], i, dataset)));
           let p1 = reducedData[i];
           let p2 = reducedData[i];
           let p3 = reducedData[i];
-          while (i < reducedData.length && Math.floor(xScale.scale(reducedData[i].x)) === currBucket) {
-            if (reducedData[i].y > max) {
-              max = reducedData[i].y;
+          while (i < reducedData.length && Math.floor(xScale.scale(xAccessor(reducedData[i], i, dataset))) === currBucket) {
+            let currPointY = yAccessor(reducedData[i], i, dataset);
+            if (currPointY > max) {
+              max = currPointY;
               p2 = reducedData[i];
             }
-            if (reducedData[i].y < min) {
-              min = reducedData[i].y;
+            if (currPointY < min) {
+              min = currPointY;
               p3 = reducedData[i];
             }
             i++;

@@ -9145,15 +9145,24 @@ var Plottable;
                 };
             };
             Line.prototype._getDataToDraw = function () {
-                console.log("called");
+                // console.log("called")
                 var dataToDraw = new Plottable.Utils.Map();
                 var xScale = this.x().scale;
+                var xAccessor = this.x().accessor;
+                var yAccessor = this.y().accessor;
                 var domain = xScale.domain();
                 this.datasets().forEach(function (dataset) {
-                    var reducedData = dataset.data().filter(function (d, i, dataset) {
-                        var shouldShow = domain[0] <= dataset[i].x && dataset[i].x <= domain[1];
-                        shouldShow = shouldShow || dataset[i - 1] && domain[0] <= dataset[i - 1].x && dataset[i - 1].x <= domain[1];
-                        shouldShow = shouldShow || dataset[i + 1] && domain[0] <= dataset[i + 1].x && dataset[i + 1].x <= domain[1];
+                    var reducedData = dataset.data().filter(function (d, i, data) {
+                        var currPoint = xAccessor(data[i], i, dataset);
+                        var shouldShow = domain[0] <= currPoint && currPoint <= domain[1];
+                        if (data[i - 1]) {
+                            var prevPoint = xAccessor(data[i - 1], i - 1, dataset);
+                            shouldShow = shouldShow || domain[0] <= prevPoint && prevPoint <= domain[1];
+                        }
+                        if (data[i + 1]) {
+                            var nextPoint = xAccessor(data[i + 1], i + 1, dataset);
+                            shouldShow = shouldShow || domain[0] <= nextPoint && nextPoint <= domain[1];
+                        }
                         return shouldShow;
                     });
                     var downSampledData = [];
@@ -9161,17 +9170,18 @@ var Plottable;
                     for (var i = 0; i < reducedData.length;) {
                         var min = Infinity;
                         var max = -Infinity;
-                        var currBucket = Math.floor(xScale.scale(reducedData[i].x));
+                        var currBucket = Math.floor(xScale.scale(xAccessor(reducedData[i], i, dataset)));
                         var p1 = reducedData[i];
                         var p2 = reducedData[i];
                         var p3 = reducedData[i];
-                        while (i < reducedData.length && Math.floor(xScale.scale(reducedData[i].x)) === currBucket) {
-                            if (reducedData[i].y > max) {
-                                max = reducedData[i].y;
+                        while (i < reducedData.length && Math.floor(xScale.scale(xAccessor(reducedData[i], i, dataset))) === currBucket) {
+                            var currPointY = yAccessor(reducedData[i], i, dataset);
+                            if (currPointY > max) {
+                                max = currPointY;
                                 p2 = reducedData[i];
                             }
-                            if (reducedData[i].y < min) {
-                                min = reducedData[i].y;
+                            if (currPointY < min) {
+                                min = currPointY;
                                 p3 = reducedData[i];
                             }
                             i++;
