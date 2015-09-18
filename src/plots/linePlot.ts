@@ -382,7 +382,7 @@ export module Plots {
       return dataToDraw;
     }
 
-    private _cropToViewPort(dataset: Dataset, allData: number[]): number[] {
+    private _cropToViewPort(dataset: Dataset, indices: number[]): number[] {
       var xScale: any = this.x().scale;
       var xAccessor = this.x().accessor;
 
@@ -391,30 +391,30 @@ export module Plots {
       let data = dataset.data();
       let rez: any[] = [];
 
-      for (let i = 0; i < allData.length; i++) {
-        let initialIndex = allData[i];
+      for (let i = 0; i < indices.length; i++) {
+        let initialIndex = indices[i];
 
-        let currPoint = xAccessor(data[allData[i]], allData[i], dataset);
+        let currPoint = xAccessor(data[indices[i]], indices[i], dataset);
         var shouldShow = domain[0] <= currPoint && currPoint <= domain[1];
 
-        if (allData[i - 1] && data[allData[i - 1]]) {
-          let prevPoint = xAccessor(data[allData[i - 1]], allData[i - 1], dataset);
+        if (indices[i - 1] && data[indices[i - 1]]) {
+          let prevPoint = xAccessor(data[indices[i - 1]], indices[i - 1], dataset);
           shouldShow = shouldShow || domain[0] <= prevPoint && prevPoint <= domain[1];
         }
 
-        if (allData[i + 1] && data[allData[i + 1]]) {
-          let nextPoint = xAccessor(data[allData[i + 1]], allData[i + 1], dataset);
+        if (indices[i + 1] && data[indices[i + 1]]) {
+          let nextPoint = xAccessor(data[indices[i + 1]], indices[i + 1], dataset);
           shouldShow = shouldShow || domain[0] <= nextPoint && nextPoint <= domain[1];
         }
 
         if (shouldShow) {
-          rez.push(allData[i]);
+          rez.push(indices[i]);
         }
       }
       return rez;
     }
 
-    private _downsample(dataset: Dataset, allData: number[]): number[] {
+    private _downsample(dataset: Dataset, indices: number[]): number[] {
       var xScale: any = this.x().scale;
       var xAccessor = this.x().accessor;
       var yAccessor = this.y().accessor;
@@ -424,26 +424,26 @@ export module Plots {
 
       let lastSampleBucket = -Infinity;
 
-      for (let i = 0; i < allData.length; ) {
+      for (let i = 0; i < indices.length; ) {
         let min = Infinity;
         let max = -Infinity;
-        let currBucket = Math.floor(xScale.scale(xAccessor(data[allData[i]], allData[i], dataset)));
-        let p1 = allData[i];
-        let p2 = allData[i];
-        let p3 = allData[i];
-        while (i < allData.length && Math.floor(xScale.scale(xAccessor(data[allData[i]], allData[i], dataset))) === currBucket) {
-          let currPointY = yAccessor(data[allData[i]], allData[i], dataset);
+        let currBucket = Math.floor(xScale.scale(xAccessor(data[indices[i]], indices[i], dataset)));
+        let p1 = indices[i];
+        let p2 = indices[i];
+        let p3 = indices[i];
+        while (i < indices.length && Math.floor(xScale.scale(xAccessor(data[indices[i]], indices[i], dataset))) === currBucket) {
+          let currPointY = yAccessor(data[indices[i]], indices[i], dataset);
           if (currPointY > max) {
             max = currPointY;
-            p2 = allData[i];
+            p2 = indices[i];
           }
           if (currPointY < min) {
             min = currPointY;
-            p3 = allData[i];
+            p3 = indices[i];
           }
           i++;
         }
-        let p4 = allData[i - 1];
+        let p4 = indices[i - 1];
 
         rez.push(p1);
 

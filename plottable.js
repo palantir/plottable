@@ -9167,57 +9167,57 @@ var Plottable;
                 // this.datasets().forEach((dataset) => dataToDraw.set(dataset, [dataset.data()]));
                 return dataToDraw;
             };
-            Line.prototype._cropToViewPort = function (dataset, allData) {
+            Line.prototype._cropToViewPort = function (dataset, indices) {
                 var xScale = this.x().scale;
                 var xAccessor = this.x().accessor;
                 var domain = xScale.domain();
                 var data = dataset.data();
                 var rez = [];
-                for (var i = 0; i < allData.length; i++) {
-                    var initialIndex = allData[i];
-                    var currPoint = xAccessor(data[allData[i]], allData[i], dataset);
+                for (var i = 0; i < indices.length; i++) {
+                    var initialIndex = indices[i];
+                    var currPoint = xAccessor(data[indices[i]], indices[i], dataset);
                     var shouldShow = domain[0] <= currPoint && currPoint <= domain[1];
-                    if (allData[i - 1] && data[allData[i - 1]]) {
-                        var prevPoint = xAccessor(data[allData[i - 1]], allData[i - 1], dataset);
+                    if (indices[i - 1] && data[indices[i - 1]]) {
+                        var prevPoint = xAccessor(data[indices[i - 1]], indices[i - 1], dataset);
                         shouldShow = shouldShow || domain[0] <= prevPoint && prevPoint <= domain[1];
                     }
-                    if (allData[i + 1] && data[allData[i + 1]]) {
-                        var nextPoint = xAccessor(data[allData[i + 1]], allData[i + 1], dataset);
+                    if (indices[i + 1] && data[indices[i + 1]]) {
+                        var nextPoint = xAccessor(data[indices[i + 1]], indices[i + 1], dataset);
                         shouldShow = shouldShow || domain[0] <= nextPoint && nextPoint <= domain[1];
                     }
                     if (shouldShow) {
-                        rez.push(allData[i]);
+                        rez.push(indices[i]);
                     }
                 }
                 return rez;
             };
-            Line.prototype._downsample = function (dataset, allData) {
+            Line.prototype._downsample = function (dataset, indices) {
                 var xScale = this.x().scale;
                 var xAccessor = this.x().accessor;
                 var yAccessor = this.y().accessor;
                 var data = dataset.data();
                 var rez = [];
                 var lastSampleBucket = -Infinity;
-                for (var i = 0; i < allData.length;) {
+                for (var i = 0; i < indices.length;) {
                     var min = Infinity;
                     var max = -Infinity;
-                    var currBucket = Math.floor(xScale.scale(xAccessor(data[allData[i]], allData[i], dataset)));
-                    var p1 = allData[i];
-                    var p2 = allData[i];
-                    var p3 = allData[i];
-                    while (i < allData.length && Math.floor(xScale.scale(xAccessor(data[allData[i]], allData[i], dataset))) === currBucket) {
-                        var currPointY = yAccessor(data[allData[i]], allData[i], dataset);
+                    var currBucket = Math.floor(xScale.scale(xAccessor(data[indices[i]], indices[i], dataset)));
+                    var p1 = indices[i];
+                    var p2 = indices[i];
+                    var p3 = indices[i];
+                    while (i < indices.length && Math.floor(xScale.scale(xAccessor(data[indices[i]], indices[i], dataset))) === currBucket) {
+                        var currPointY = yAccessor(data[indices[i]], indices[i], dataset);
                         if (currPointY > max) {
                             max = currPointY;
-                            p2 = allData[i];
+                            p2 = indices[i];
                         }
                         if (currPointY < min) {
                             min = currPointY;
-                            p3 = allData[i];
+                            p3 = indices[i];
                         }
                         i++;
                     }
-                    var p4 = allData[i - 1];
+                    var p4 = indices[i - 1];
                     rez.push(p1);
                     if (p2 !== p1) {
                         rez.push(p2);
