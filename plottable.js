@@ -9145,7 +9145,6 @@ var Plottable;
                 };
             };
             Line.prototype._getDataToDraw = function () {
-                // console.log("called")
                 var _this = this;
                 var dataToDraw = new Plottable.Utils.Map();
                 var xScale = this.x().scale;
@@ -9153,16 +9152,11 @@ var Plottable;
                 var yAccessor = this.y().accessor;
                 var domain = xScale.domain();
                 this.datasets().forEach(function (dataset) {
-                    var allData = Array.apply(null, Array(dataset.data().length)).map(function (d, i) {
-                        return i;
-                    });
-                    var reducedDataIndices = _this._cropToViewPort(dataset, allData);
-                    reducedDataIndices = _this._downsample(dataset, reducedDataIndices);
                     var data = dataset.data();
-                    var downSampledData = reducedDataIndices.map(function (d) {
-                        return data[d];
-                    });
-                    dataToDraw.set(dataset, [downSampledData]);
+                    var allDataIndices = data.map(function (d, i) { return i; });
+                    var reducedDataIndices = _this._cropToViewPort(dataset, allDataIndices);
+                    reducedDataIndices = _this._downsample(dataset, reducedDataIndices);
+                    dataToDraw.set(dataset, [reducedDataIndices.map(function (d) { return data[d]; })]);
                 });
                 // this.datasets().forEach((dataset) => dataToDraw.set(dataset, [dataset.data()]));
                 return dataToDraw;
@@ -9172,7 +9166,7 @@ var Plottable;
                 var xAccessor = this.x().accessor;
                 var domain = xScale.domain();
                 var data = dataset.data();
-                var rez = [];
+                var filteredDataIndices = [];
                 for (var i = 0; i < indices.length; i++) {
                     var initialIndex = indices[i];
                     var currPoint = xAccessor(data[indices[i]], indices[i], dataset);
@@ -9186,17 +9180,17 @@ var Plottable;
                         shouldShow = shouldShow || domain[0] <= nextPoint && nextPoint <= domain[1];
                     }
                     if (shouldShow) {
-                        rez.push(indices[i]);
+                        filteredDataIndices.push(indices[i]);
                     }
                 }
-                return rez;
+                return filteredDataIndices;
             };
             Line.prototype._downsample = function (dataset, indices) {
                 var xScale = this.x().scale;
                 var xAccessor = this.x().accessor;
                 var yAccessor = this.y().accessor;
                 var data = dataset.data();
-                var rez = [];
+                var filteredDataIndices = [];
                 var lastSampleBucket = -Infinity;
                 for (var i = 0; i < indices.length;) {
                     var min = Infinity;
@@ -9218,18 +9212,18 @@ var Plottable;
                         i++;
                     }
                     var p4 = indices[i - 1];
-                    rez.push(p1);
+                    filteredDataIndices.push(p1);
                     if (p2 !== p1) {
-                        rez.push(p2);
+                        filteredDataIndices.push(p2);
                     }
                     if (p3 !== p2 && p3 !== p1) {
-                        rez.push(p3);
+                        filteredDataIndices.push(p3);
                     }
                     if (p4 !== p3 && p4 !== p2 && p4 != p1) {
-                        rez.push(p4);
+                        filteredDataIndices.push(p4);
                     }
                 }
-                return rez;
+                return filteredDataIndices;
             };
             return Line;
         })(Plottable.XYPlot);

@@ -348,8 +348,6 @@ export module Plots {
     }
 
     protected _getDataToDraw() {
-      // console.log("called")
-
       let dataToDraw = new Utils.Map<Dataset, any[]> ();
       var xScale: any = this.x().scale;
 
@@ -361,20 +359,13 @@ export module Plots {
 
       this.datasets().forEach((dataset) => {
 
-        let allData = Array.apply(null, Array(dataset.data().length)).map(function(d: any, i: any) {
-          return i;
-        })
+        let data = dataset.data();
+        let allDataIndices = data.map((d, i) => i);
 
-        let reducedDataIndices = this._cropToViewPort(dataset, allData);
+        let reducedDataIndices = this._cropToViewPort(dataset, allDataIndices);
         reducedDataIndices = this._downsample(dataset, reducedDataIndices);
 
-        let data = dataset.data();
-
-        let downSampledData = reducedDataIndices.map(function(d) {
-          return data[d];
-        });
-
-        dataToDraw.set(dataset, [downSampledData]);
+        dataToDraw.set(dataset, [reducedDataIndices.map((d) => data[d])]);
       });
 
       // this.datasets().forEach((dataset) => dataToDraw.set(dataset, [dataset.data()]));
@@ -385,11 +376,10 @@ export module Plots {
     private _cropToViewPort(dataset: Dataset, indices: number[]): number[] {
       var xScale: any = this.x().scale;
       var xAccessor = this.x().accessor;
-
       var domain = xScale.domain();
 
       let data = dataset.data();
-      let rez: any[] = [];
+      let filteredDataIndices: any[] = [];
 
       for (let i = 0; i < indices.length; i++) {
         let initialIndex = indices[i];
@@ -408,10 +398,10 @@ export module Plots {
         }
 
         if (shouldShow) {
-          rez.push(indices[i]);
+          filteredDataIndices.push(indices[i]);
         }
       }
-      return rez;
+      return filteredDataIndices;
     }
 
     private _downsample(dataset: Dataset, indices: number[]): number[] {
@@ -420,7 +410,7 @@ export module Plots {
       var yAccessor = this.y().accessor;
 
       let data = dataset.data();
-      let rez: any[] = [];
+      let filteredDataIndices: any[] = [];
 
       let lastSampleBucket = -Infinity;
 
@@ -445,22 +435,22 @@ export module Plots {
         }
         let p4 = indices[i - 1];
 
-        rez.push(p1);
+        filteredDataIndices.push(p1);
 
         if (p2 !== p1) {
-          rez.push(p2);
+          filteredDataIndices.push(p2);
         }
 
         if (p3 !== p2 && p3 !== p1) {
-          rez.push(p3);
+          filteredDataIndices.push(p3);
         }
 
         if (p4 !== p3 && p4 !== p2 && p4 != p1) {
-          rez.push(p4);
+          filteredDataIndices.push(p4);
         }
       }
 
-      return rez;
+      return filteredDataIndices;
 
     }
 
