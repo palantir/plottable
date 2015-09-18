@@ -2,6 +2,7 @@
 
 module Plottable {
 export module Components {
+  export enum PropertyMode { VALUE, PIXEL };
   export class SelectionBoxLayer extends Component {
     protected _box: d3.Selection<void>;
     private _boxArea: d3.Selection<void>;
@@ -10,29 +11,22 @@ export module Components {
       topLeft: { x: 0, y: 0 },
       bottomRight: { x: 0, y: 0 }
     };
-    private _boxLeftDataValue: number | { valueOf(): number };
-    private _boxRightDataValue: number | { valueOf(): number };
-    private _boxTopDataValue: number | { valueOf(): number };
-    private _boxBottomDataValue: number | { valueOf(): number };
+    private _xExtent: (number | { valueOf(): number })[];
+    private _yExtent: (number | { valueOf(): number })[];
     private _xScale: QuantitativeScale<number | { valueOf(): number }>;
     private _yScale: QuantitativeScale<number | { valueOf(): number }>;
     private _adjustBoundsCallback: ScaleCallback<QuantitativeScale<number | { valueOf(): number }>>;
+    protected _xBoundsMode = PropertyMode.PIXEL;
+    protected _yBoundsMode = PropertyMode.PIXEL;
 
     constructor() {
       super();
       this.addClass("selection-box-layer");
       this._adjustBoundsCallback = () => {
-        this.bounds({
-          topLeft: {
-            x: this._xScale ? this._xScale.scale(this._boxLeftDataValue) : this._boxBounds.topLeft.x,
-            y: this._yScale ? this._yScale.scale(this._boxTopDataValue) : this._boxBounds.topLeft.y
-          },
-          bottomRight: {
-            x: this._xScale ? this._xScale.scale(this._boxRightDataValue) : this._boxBounds.bottomRight.x,
-            y: this._yScale ? this._yScale.scale(this._boxBottomDataValue) : this._boxBounds.bottomRight.y
-          }
-        });
+        this.render();
       };
+      this._xExtent = [undefined, undefined];
+      this._yExtent = [undefined, undefined];
     }
 
     protected _setup() {
@@ -62,10 +56,12 @@ export module Components {
     public bounds(newBounds: Bounds): SelectionBoxLayer;
     public bounds(newBounds?: Bounds): any {
       if (newBounds == null) {
-        return this._boxBounds;
+        return this._getBounds();
       }
 
       this._setBounds(newBounds);
+      this._xBoundsMode = PropertyMode.PIXEL;
+      this._yBoundsMode = PropertyMode.PIXEL;
       this.render();
       return this;
     }
@@ -83,15 +79,51 @@ export module Components {
         topLeft: topLeft,
         bottomRight: bottomRight
       };
-      this._bindBoxDataValues();
+    }
+
+    private _getBounds(): Bounds {
+      return {
+        topLeft: {
+          x: this._xBoundsMode === PropertyMode.PIXEL ?
+            this._boxBounds.topLeft.x :
+            (this._xScale == null ?
+              0 :
+              Math.min(this.xScale().scale(this.xExtent()[0]), this.xScale().scale(this.xExtent()[1]))),
+          y: this._yBoundsMode === PropertyMode.PIXEL ?
+            this._boxBounds.topLeft.y :
+            (this._yScale == null ?
+              0 :
+              Math.min(this.yScale().scale(this.yExtent()[0]), this.yScale().scale(this.yExtent()[1])))
+        },
+        bottomRight: {
+          x: this._xBoundsMode === PropertyMode.PIXEL ?
+               this._boxBounds.bottomRight.x :
+               (this._xScale == null ?
+                 0 :
+                 Math.max(this.xScale().scale(this.xExtent()[0]), this.xScale().scale(this.xExtent()[1]))),
+          y: this._yBoundsMode === PropertyMode.PIXEL ?
+               this._boxBounds.bottomRight.y :
+               (this._yScale == null ?
+                 0 :
+                 Math.max(this.yScale().scale(this.yExtent()[0]), this.yScale().scale(this.yExtent()[1])))
+        }
+      };
     }
 
     public renderImmediately() {
       if (this._boxVisible) {
-        let t = this._boxBounds.topLeft.y;
-        let b = this._boxBounds.bottomRight.y;
-        let l = this._boxBounds.topLeft.x;
-        let r = this._boxBounds.bottomRight.x;
+        let bounds = this.bounds();
+        let t = bounds.topLeft.y;
+        let b = bounds.bottomRight.y;
+        let l = bounds.topLeft.x;
+        let r = bounds.bottomRight.x;
+
+        if (!(Utils.Math.isValidNumber(t) &&
+            Utils.Math.isValidNumber(b) &&
+            Utils.Math.isValidNumber(l) &&
+            Utils.Math.isValidNumber(r))) {
+          throw new Error("bounds have not been properly set");
+        }
 
         this._boxArea.attr({
           x: l, y: t, width: r - l, height: b - t
@@ -150,8 +182,9 @@ export module Components {
         this._xScale.offUpdate(this._adjustBoundsCallback);
       }
       this._xScale = xScale;
+      this._xBoundsMode = PropertyMode.VALUE;
       this._xScale.onUpdate(this._adjustBoundsCallback);
-      this._bindBoxDataValues();
+      this.render();
       return this;
     }
 
@@ -173,8 +206,9 @@ export module Components {
         this._yScale.offUpdate(this._adjustBoundsCallback);
       }
       this._yScale = yScale;
+      this._yBoundsMode = PropertyMode.VALUE;
       this._yScale.onUpdate(this._adjustBoundsCallback);
-      this._bindBoxDataValues();
+      this.render();
       return this;
     }
 
@@ -183,9 +217,33 @@ export module Components {
      *
      * Returns an undefined array if the edges are not backed by a scale.
      */
-    public xExtent(): (number | { valueOf(): number })[] {
+    public xExtent(): (number | { valueOf(): number })[];
+    /**
+     * Sets the data values backing the left and right edges of the box.
+     */
+    public xExtent(xExtent: (number | { valueOf(): number })[]): SelectionBoxLayer;
+    public xExtent(xExtent?: (number | { valueOf(): number })[]): any {
       // Explicit typing for Typescript 1.4
-      return [this._boxLeftDataValue, this._boxRightDataValue];
+      if (xExtent == null) {
+        return this._getXExtent();
+      }
+      this._setXExtent(xExtent);
+      this._xBoundsMode = PropertyMode.VALUE;
+      this.render();
+      return this;
+    }
+
+    private _getXExtent(): (number | { valueOf(): number })[] {
+      return this._xBoundsMode === PropertyMode.VALUE ?
+        this._xExtent :
+        (this._xScale == null ?
+          [undefined, undefined] :
+          [this._xScale.invert(this._boxBounds.topLeft.x),
+          this._xScale.invert(this._boxBounds.bottomRight.x)]);
+    }
+
+    protected _setXExtent(xExtent: (number | { valueOf(): number })[]) {
+      this._xExtent = xExtent;
     }
 
     /**
@@ -193,16 +251,33 @@ export module Components {
      *
      * Returns an undefined array if the edges are not backed by a scale.
      */
-    public yExtent(): (number | { valueOf(): number })[] {
+    public yExtent(): (number | { valueOf(): number })[];
+    /**
+     * Sets the data values backing the top and bottom edges of the box.
+     */
+    public yExtent(yExtent: (number | { valueOf(): number })[]): SelectionBoxLayer;
+    public yExtent(yExtent?: (number | { valueOf(): number })[]): any {
       // Explicit typing for Typescript 1.4
-      return [this._boxTopDataValue, this._boxBottomDataValue];
+      if (yExtent == null) {
+        return this._getYExtent();
+      }
+      this._setYExtent(yExtent);
+      this._yBoundsMode = PropertyMode.VALUE;
+      this.render();
+      return this;
     }
 
-    private _bindBoxDataValues() {
-      this._boxLeftDataValue = this._xScale ? this._xScale.invert(this._boxBounds.topLeft.x) : null;
-      this._boxTopDataValue = this._yScale ? this._yScale.invert(this._boxBounds.topLeft.y) : null;
-      this._boxRightDataValue = this._xScale ? this._xScale.invert(this._boxBounds.bottomRight.x) : null;
-      this._boxBottomDataValue = this._yScale ? this._yScale.invert(this._boxBounds.bottomRight.y) : null;
+    private _getYExtent(): (number | { valueOf(): number })[] {
+      return this._yBoundsMode === PropertyMode.VALUE ?
+        this._yExtent :
+        (this._yScale == null ?
+          [undefined, undefined] :
+          [this._yScale.invert(this._boxBounds.topLeft.y),
+          this._yScale.invert(this._boxBounds.bottomRight.y)]);
+    }
+
+    protected _setYExtent(yExtent: (number | { valueOf(): number })[]) {
+      this._yExtent = yExtent;
     }
 
     public destroy() {
