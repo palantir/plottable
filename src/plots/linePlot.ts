@@ -379,7 +379,7 @@ export module Plots {
         });
 
         let downSampledData: any[] = [];
-        let lastSampleBucket = -1;
+        let lastSampleBucket = -Infinity;
 
         for (let i = 0; i < reducedData.length; ) {
           let min = Infinity;

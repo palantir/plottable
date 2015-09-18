@@ -9166,7 +9166,7 @@ var Plottable;
                         return shouldShow;
                     });
                     var downSampledData = [];
-                    var lastSampleBucket = -1;
+                    var lastSampleBucket = -Infinity;
                     for (var i = 0; i < reducedData.length;) {
                         var min = Infinity;
                         var max = -Infinity;
