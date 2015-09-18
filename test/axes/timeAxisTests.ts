@@ -155,6 +155,10 @@ describe("TimeAxis", () => {
       scale.domain([new Date("2010-01-01"), new Date("2014-01-01")]);
       axis = new Plottable.Axes.Time(scale, "top");
 
+      let style = (<any> axis)._element.append("style");
+      style.attr("type", "text/css");
+      style.text(".plottable .axis.time-axis text { font-family: Arial; }");
+
       function checkTierDisplayPosition (tierDisplayPositions: any[]) {
         axis.tierLabelPositions(tierDisplayPositions);
         axis.renderTo(svg);
