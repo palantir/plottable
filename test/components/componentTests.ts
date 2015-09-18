@@ -78,7 +78,7 @@ describe("Component", () => {
       svg.remove();
     });
 
-    it("remove DOM elements in previous svg when anchoring to a different svg", () => {
+    it("removes DOM elements in previous svg when anchoring to a different svg", () => {
       c.anchor(svg);
       let svg2 = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
       c.anchor(svg2);
