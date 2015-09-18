@@ -171,6 +171,7 @@ describe("Component", () => {
       assert.isTrue((<Node> svg.node()).hasChildNodes(), "the svg has children");
       c.detach();
       assert.isFalse((<Node> svg.node()).hasChildNodes(), "the svg has no children");
+
       c.destroy();
       svg.remove();
     });
