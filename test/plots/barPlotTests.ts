@@ -727,6 +727,7 @@ describe("Plots", () => {
       let yScale: Plottable.Scales.Linear;
       let xScale: Plottable.Scales.Linear;
       let barPlot: Plottable.Plots.Bar<number, number>;
+      let dataset: Plottable.Dataset;
       beforeEach(() => {
         svg = TestMethods.generateSVG(600, 400);
         yScale = new Plottable.Scales.Linear();
@@ -738,7 +739,8 @@ describe("Plots", () => {
         ];
 
         barPlot = new Plottable.Plots.Bar<number, number>(Plottable.Plots.Bar.ORIENTATION_HORIZONTAL);
-        barPlot.addDataset(new Plottable.Dataset(data));
+        dataset = new Plottable.Dataset(data);
+        barPlot.addDataset(dataset);
         barPlot.x((d) => d.x, xScale);
         barPlot.y((d) => d.y, yScale);
         barPlot.labelsEnabled(true);
@@ -786,6 +788,20 @@ describe("Plots", () => {
 
         let onBarLabelCount = d3.selectAll(".on-bar-label")[0].length;
         assert.strictEqual(onBarLabelCount, 1, "There should be 1 labels rendered inside the bar");
+        svg.remove();
+      });
+
+      it("shows labels for bars with value = baseline on the \"positive\" side of the baseline", () => {
+        let zeroOnlyData = [ { x: 0, y: 0 }];
+        dataset.data(zeroOnlyData);
+        barPlot.labelsEnabled(true);
+        barPlot.renderTo(svg);
+
+        let labels = barPlot.content().selectAll("text");
+        assert.strictEqual(labels.size(), 1, "one label drawn for data point");
+        let labelPosition = (<SVGElement> labels.node()).getBoundingClientRect().left + window.Pixel_CloseTo_Requirement;
+        let linePosition = (<SVGElement> barPlot.content().select(".baseline").node()).getBoundingClientRect().right;
+        assert.operator(labelPosition, ">=", linePosition, "label with value=baseline is drawn to the right of the baseline");
         svg.remove();
       });
 
@@ -924,6 +940,20 @@ describe("Plots", () => {
 
         let onBarLabelCount = d3.selectAll(".on-bar-label")[0].length;
         assert.strictEqual(onBarLabelCount, 2, "There should be 2 labels rendered inside the bar");
+        svg.remove();
+      });
+
+      it("shows labels for bars with value = baseline on the \"positive\" side of the baseline", () => {
+        let zeroOnlyData = [ { x: "foo", y: 0 }];
+        dataset.data(zeroOnlyData);
+        plot.labelsEnabled(true);
+        plot.renderTo(svg);
+
+        let labels = plot.content().selectAll("text");
+        assert.strictEqual(labels.size(), 1, "one label drawn for data point");
+        let labelPosition = (<SVGElement> labels.node()).getBoundingClientRect().bottom - window.Pixel_CloseTo_Requirement;
+        let linePosition = (<SVGElement> plot.content().select(".baseline").node()).getBoundingClientRect().top;
+        assert.operator(labelPosition, "<=", linePosition, "label with value=baseline is drawn above the baseline");
         svg.remove();
       });
 

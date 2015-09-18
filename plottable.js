@@ -8649,9 +8649,6 @@ var Plottable;
                 var writer = labelConfig.writer;
                 var labelTooWide = data.map(function (d, i) {
                     var primaryAccessor = _this._isVertical ? _this.y().accessor : _this.x().accessor;
-                    var originalPositionFn = _this._isVertical ? Plottable.Plot._scaledAccessor(_this.y()) : Plottable.Plot._scaledAccessor(_this.x());
-                    var primaryScale = _this._isVertical ? _this.y().scale : _this.x().scale;
-                    var scaledBaseline = primaryScale.scale(_this.baselineValue());
                     var text = _this._labelFormatter(primaryAccessor(d, i, dataset)).toString();
                     var w = attrToProjector["width"](d, i, dataset);
                     var h = attrToProjector["height"](d, i, dataset);
@@ -8665,18 +8662,19 @@ var Plottable;
                     var tooWide = secondaryAttrTextSpace + 2 * Bar._LABEL_HORIZONTAL_PADDING > secondaryAttrAvailableSpace;
                     var showLabelOffBar = _this._isVertical ? (measurement.height > h) : (measurement.width > w);
                     var offset = Math.min((primary - primarySpace) / 2, Bar._LABEL_VERTICAL_PADDING);
-                    var positive = originalPositionFn(d, i, dataset) <= scaledBaseline;
-                    if (!positive) {
+                    var valueIsNegative = primaryAccessor(d, i, dataset) < _this.baselineValue();
+                    var positiveShift = _this._isVertical ? !valueIsNegative : valueIsNegative;
+                    if (!positiveShift) {
                         offset = offset * -1;
                     }
                     var getY = function () {
                         var addend = 0;
                         if (_this._isVertical) {
                             addend += offset;
-                            if (showLabelOffBar && positive) {
+                            if (showLabelOffBar && positiveShift) {
                                 addend += (offset - h);
                             }
-                            if (showLabelOffBar && !positive) {
+                            if (showLabelOffBar && !positiveShift) {
                                 addend += measurement.height;
                             }
                             ;
@@ -8687,10 +8685,10 @@ var Plottable;
                         var addend = 0;
                         if (!_this._isVertical) {
                             addend += offset;
-                            if (showLabelOffBar && positive) {
+                            if (showLabelOffBar && positiveShift) {
                                 addend += (offset - w - Bar._LABEL_HORIZONTAL_PADDING);
                             }
-                            if (showLabelOffBar && !positive) {
+                            if (showLabelOffBar && !positiveShift) {
                                 addend += measurement.width;
                             }
                             ;
@@ -8712,14 +8710,14 @@ var Plottable;
                     var showLabel = true;
                     var labelPosition = {
                         x: x,
-                        y: positive ? y : y + h - measurement.height
+                        y: positiveShift ? y : y + h - measurement.height
                     };
                     if (_this._isVertical) {
                         labelPosition.x = baseX + w / 2 - measurement.width / 2;
                     }
                     else {
                         labelPosition.y = baseY + h / 2 - measurement.height / 2;
-                        if (!positive) {
+                        if (!positiveShift) {
                             labelPosition.x = baseX + offset + w - measurement.width;
                         }
                         else {
@@ -8735,10 +8733,10 @@ var Plottable;
                     var yAlign;
                     if (_this._isVertical) {
                         xAlign = "center";
-                        yAlign = positive ? "top" : "bottom";
+                        yAlign = positiveShift ? "top" : "bottom";
                     }
                     else {
-                        xAlign = positive ? "left" : "right";
+                        xAlign = positiveShift ? "left" : "right";
                         yAlign = "center";
                     }
                     var writeOptions = {

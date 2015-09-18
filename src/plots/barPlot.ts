@@ -470,9 +470,6 @@ export module Plots {
       let writer = labelConfig.writer;
       let labelTooWide: boolean[] = data.map((d, i) => {
         let primaryAccessor = this._isVertical ? this.y().accessor : this.x().accessor;
-        let originalPositionFn = this._isVertical ? Plot._scaledAccessor(this.y()) : Plot._scaledAccessor(this.x());
-        let primaryScale: Scale<any, number> = this._isVertical ? this.y().scale : this.x().scale;
-        let scaledBaseline = primaryScale.scale(this.baselineValue());
         let text = this._labelFormatter(primaryAccessor(d, i, dataset)).toString();
         let w = attrToProjector["width"](d, i, dataset);
         let h = attrToProjector["height"](d, i, dataset);
@@ -487,17 +484,18 @@ export module Plots {
         let showLabelOffBar = this._isVertical ? (measurement.height > h) : (measurement.width > w);
 
         let offset = Math.min((primary - primarySpace) / 2, Bar._LABEL_VERTICAL_PADDING);
-        let positive = originalPositionFn(d, i, dataset) <= scaledBaseline;
-        if (!positive) { offset = offset * -1; }
+        let valueIsNegative = primaryAccessor(d, i, dataset) < this.baselineValue();
+        let positiveShift = this._isVertical ? !valueIsNegative : valueIsNegative;
+        if (!positiveShift) { offset = offset * -1; }
 
         let getY = () => {
           let addend = 0;
           if (this._isVertical)  {
               addend += offset;
-              if (showLabelOffBar && positive) {
+              if (showLabelOffBar && positiveShift) {
                   addend += (offset - h);
               }
-              if (showLabelOffBar && !positive) {
+              if (showLabelOffBar && !positiveShift) {
                   addend += measurement.height;
               };
           }
@@ -508,10 +506,10 @@ export module Plots {
           let addend = 0;
           if (!this._isVertical)  {
               addend += offset;
-              if (showLabelOffBar && positive) {
+              if (showLabelOffBar && positiveShift) {
                   addend += (offset - w - Bar._LABEL_HORIZONTAL_PADDING);
               }
-              if (showLabelOffBar && !positive) {
+              if (showLabelOffBar && !positiveShift) {
                   addend += measurement.width;
               };
           }
@@ -535,14 +533,14 @@ export module Plots {
 
         let labelPosition = {
           x: x,
-          y: positive ? y : y + h - measurement.height
+          y: positiveShift ? y : y + h - measurement.height
         };
 
         if (this._isVertical) {
           labelPosition.x = baseX + w / 2 - measurement.width / 2;
         } else {
           labelPosition.y = baseY + h / 2 - measurement.height / 2;
-          if (!positive) {
+          if (!positiveShift) {
             labelPosition.x = baseX + offset + w - measurement.width;
           } else {
             labelPosition.x = baseX + offset;
@@ -560,9 +558,9 @@ export module Plots {
         let yAlign: string;
         if (this._isVertical) {
           xAlign = "center";
-          yAlign = positive ? "top" : "bottom";
+          yAlign = positiveShift ? "top" : "bottom";
         } else {
-          xAlign = positive ? "left" : "right";
+          xAlign = positiveShift ? "left" : "right";
           yAlign = "center";
         }
         let writeOptions = {
