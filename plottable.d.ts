@@ -2160,6 +2160,17 @@ declare module Plottable {
             constructor(colorScale: Scales.Color);
             protected _setup(): void;
             /**
+             * Gets the Formatter for the text.
+             */
+            formatter(): Formatter;
+            /**
+             * Sets the Formatter for the text.
+             *
+             * @param {Formatter} formatter
+             * @returns {Legend} The calling Legend.
+             */
+            formatter(formatter: Formatter): Legend;
+            /**
              * Gets the maximum number of entries per row.
              *
              * @returns {number}

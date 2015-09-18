@@ -18,6 +18,7 @@ export module Components {
 
     private _padding = 5;
     private _colorScale: Scales.Color;
+    private _formatter: Formatter;
     private _maxEntriesPerRow: number;
     private _comparator: (a: string, b: string) => number;
     private _measurer: SVGTypewriter.Measurers.Measurer;
@@ -45,7 +46,7 @@ export module Components {
       this._colorScale = colorScale;
       this._redrawCallback = (scale) => this.redraw();
       this._colorScale.onUpdate(this._redrawCallback);
-
+      this._formatter = Formatters.identity();
       this.xAlignment("right").yAlignment("top");
       this.comparator((a: string, b: string) => this._colorScale.domain().indexOf(a) - this._colorScale.domain().indexOf(b));
       this._symbolFactoryAccessor = () => SymbolFactories.circle();
@@ -62,6 +63,25 @@ export module Components {
       this._writer = new SVGTypewriter.Writers.Writer(this._measurer, this._wrapper).addTitleElement(Configs.ADD_TITLE_ELEMENTS);
     }
 
+    /**
+     * Gets the Formatter for the text.
+     */
+    public formatter(): Formatter;
+    /**
+     * Sets the Formatter for the text.
+     *
+     * @param {Formatter} formatter
+     * @returns {Legend} The calling Legend.
+     */
+    public formatter(formatter: Formatter): Legend;
+    public formatter(formatter?: Formatter): any {
+      if (formatter === null) {
+        return this._formatter;
+      }
+      this._formatter = formatter;
+      this.redraw();
+      return this;
+    }
     /**
      * Gets the maximum number of entries per row.
      *
@@ -150,7 +170,7 @@ export module Components {
       let entryLengths: d3.Map<number> = d3.map<number>();
       let untruncatedEntryLengths: d3.Map<number> = d3.map<number>();
       entryNames.forEach((entryName) => {
-        let untruncatedEntryLength = textHeight + this._measurer.measure(entryName).width + this._padding;
+        let untruncatedEntryLength = textHeight + this._measurer.measure(this._formatter(entryName)).width + this._padding;
         let entryLength = Math.min(untruncatedEntryLength, availableWidthForEntries);
         entryLengths.set(entryName, entryLength);
         untruncatedEntryLengths.set(entryName, untruncatedEntryLength);
@@ -299,8 +319,7 @@ export module Components {
                         yAlign: "top",
                         textRotation: 0
                       };
-
-                      self._writer.write(value, maxTextLength, self.height(), writeOptions);
+                      self._writer.write(self._formatter(value), maxTextLength, self.height(), writeOptions);
                     });
       return this;
     }
