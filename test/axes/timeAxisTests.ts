@@ -161,7 +161,7 @@ describe("TimeAxis", () => {
 
         let style = (<any>axis)._element.append("style");
         style.attr("type", "text/css");
-        style.text(".plottable .axis.time-axis text { font-family: Arial; }");
+        style.text(".plottable .axis.time-axis text { font-family: Serif; }");
 
         let tickMarks = d3.selectAll(`.${Plottable.Axis.TICK_MARK_CLASS}:not(.${Plottable.Axis.END_TICK_MARK_CLASS})`);
         assert.operator(tickMarks.size(), ">=", 1, "There are more than one tick marks in the test");
