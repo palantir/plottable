@@ -66,7 +66,6 @@ describe("Component", () => {
 
     it("can switch which element it is anchored to", () => {
       c.anchor(svg);
-
       let svg2 = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
       c.anchor(svg2);
       assert.notStrictEqual(Plottable.Utils.DOM.boundingSVG(<SVGElement> c.content().node()),
@@ -78,13 +77,17 @@ describe("Component", () => {
       svg.remove();
     });
 
-    it("remove old DOM Element when switching element", () => {
+    it("remove dom elements in previous svg element when switching element", () => {
       c.anchor(svg);
-      assert.strictEqual((<Node> svg.node()).childNodes.length, 1, "length wrong before switching");
       let svg2 = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
       c.anchor(svg2);
-      assert.strictEqual((<Node> svg.node()).childNodes.length, 1, "length wrong after switiching");
+      assert.isFalse((<Element>svg.node()).hasChildNodes(), "previous svg elements should not have any child nodes");
+      assert.isTrue((<Element>svg2.node()).hasChildNodes(), "new svg elements should have child nodes.");
+      c.destroy();
+      svg.remove();
+      svg2.remove();
     });
+
     it("can undergo set behavior upon anchoring", () => {
       let callbackCalled = false;
       let passedComponent: Plottable.Component;
