@@ -9219,7 +9219,7 @@ var Plottable;
                     if (p3 !== p2 && p3 !== p1) {
                         filteredDataIndices.push(p3);
                     }
-                    if (p4 !== p3 && p4 !== p2 && p4 != p1) {
+                    if (p4 && p4 !== p3 && p4 !== p2 && p4 != p1) {
                         filteredDataIndices.push(p4);
                     }
                 }

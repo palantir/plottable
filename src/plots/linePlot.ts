@@ -373,13 +373,13 @@ export module Plots {
       return dataToDraw;
     }
 
-    private _cropToViewPort(dataset: Dataset, indices: number[]): number[] {
-      var xScale: any = this.x().scale;
+    private _cropToViewPort(dataset: Dataset, indices: number[]) {
+      var xScale = this.x().scale;
       var xAccessor = this.x().accessor;
       var domain = xScale.domain();
 
       let data = dataset.data();
-      let filteredDataIndices: any[] = [];
+      let filteredDataIndices: number[] = [];
 
       for (let i = 0; i < indices.length; i++) {
         let initialIndex = indices[i];
@@ -404,13 +404,13 @@ export module Plots {
       return filteredDataIndices;
     }
 
-    private _downsample(dataset: Dataset, indices: number[]): number[] {
-      var xScale: any = this.x().scale;
+    private _downsample(dataset: Dataset, indices: number[]) {
+      var xScale = this.x().scale;
       var xAccessor = this.x().accessor;
       var yAccessor = this.y().accessor;
 
       let data = dataset.data();
-      let filteredDataIndices: any[] = [];
+      let filteredDataIndices: number[] = [];
 
       let lastSampleBucket = -Infinity;
 
@@ -445,7 +445,7 @@ export module Plots {
           filteredDataIndices.push(p3);
         }
 
-        if (p4 !== p3 && p4 !== p2 && p4 != p1) {
+        if (p4 && p4 !== p3 && p4 !== p2 && p4 != p1) {
           filteredDataIndices.push(p4);
         }
       }
