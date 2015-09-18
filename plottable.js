@@ -9146,62 +9146,90 @@ var Plottable;
             };
             Line.prototype._getDataToDraw = function () {
                 // console.log("called")
+                var _this = this;
                 var dataToDraw = new Plottable.Utils.Map();
                 var xScale = this.x().scale;
                 var xAccessor = this.x().accessor;
                 var yAccessor = this.y().accessor;
                 var domain = xScale.domain();
                 this.datasets().forEach(function (dataset) {
-                    var reducedData = dataset.data().filter(function (d, i, data) {
-                        var currPoint = xAccessor(data[i], i, dataset);
-                        var shouldShow = domain[0] <= currPoint && currPoint <= domain[1];
-                        if (data[i - 1]) {
-                            var prevPoint = xAccessor(data[i - 1], i - 1, dataset);
-                            shouldShow = shouldShow || domain[0] <= prevPoint && prevPoint <= domain[1];
-                        }
-                        if (data[i + 1]) {
-                            var nextPoint = xAccessor(data[i + 1], i + 1, dataset);
-                            shouldShow = shouldShow || domain[0] <= nextPoint && nextPoint <= domain[1];
-                        }
-                        return shouldShow;
+                    var allData = Array.apply(null, Array(dataset.data().length)).map(function (d, i) {
+                        return i;
                     });
-                    var downSampledData = [];
-                    var lastSampleBucket = -Infinity;
-                    for (var i = 0; i < reducedData.length;) {
-                        var min = Infinity;
-                        var max = -Infinity;
-                        var currBucket = Math.floor(xScale.scale(xAccessor(reducedData[i], i, dataset)));
-                        var p1 = reducedData[i];
-                        var p2 = reducedData[i];
-                        var p3 = reducedData[i];
-                        while (i < reducedData.length && Math.floor(xScale.scale(xAccessor(reducedData[i], i, dataset))) === currBucket) {
-                            var currPointY = yAccessor(reducedData[i], i, dataset);
-                            if (currPointY > max) {
-                                max = currPointY;
-                                p2 = reducedData[i];
-                            }
-                            if (currPointY < min) {
-                                min = currPointY;
-                                p3 = reducedData[i];
-                            }
-                            i++;
-                        }
-                        var p4 = reducedData[i - 1];
-                        downSampledData.push(p1);
-                        if (p2 !== p1) {
-                            downSampledData.push(p2);
-                        }
-                        if (p3 !== p2 && p3 !== p1) {
-                            downSampledData.push(p3);
-                        }
-                        if (p4 !== p3 && p4 !== p2 && p4 != p1) {
-                            downSampledData.push(p4);
-                        }
-                    }
+                    var reducedDataIndices = _this._cropToViewPort(dataset, allData);
+                    reducedDataIndices = _this._downsample(dataset, reducedDataIndices);
+                    var data = dataset.data();
+                    var downSampledData = reducedDataIndices.map(function (d) {
+                        return data[d];
+                    });
                     dataToDraw.set(dataset, [downSampledData]);
                 });
                 // this.datasets().forEach((dataset) => dataToDraw.set(dataset, [dataset.data()]));
                 return dataToDraw;
+            };
+            Line.prototype._cropToViewPort = function (dataset, allData) {
+                var xScale = this.x().scale;
+                var xAccessor = this.x().accessor;
+                var domain = xScale.domain();
+                var data = dataset.data();
+                var rez = [];
+                for (var i = 0; i < allData.length; i++) {
+                    var initialIndex = allData[i];
+                    var currPoint = xAccessor(data[allData[i]], allData[i], dataset);
+                    var shouldShow = domain[0] <= currPoint && currPoint <= domain[1];
+                    if (allData[i - 1] && data[allData[i - 1]]) {
+                        var prevPoint = xAccessor(data[allData[i - 1]], allData[i - 1], dataset);
+                        shouldShow = shouldShow || domain[0] <= prevPoint && prevPoint <= domain[1];
+                    }
+                    if (allData[i + 1] && data[allData[i + 1]]) {
+                        var nextPoint = xAccessor(data[allData[i + 1]], allData[i + 1], dataset);
+                        shouldShow = shouldShow || domain[0] <= nextPoint && nextPoint <= domain[1];
+                    }
+                    if (shouldShow) {
+                        rez.push(allData[i]);
+                    }
+                }
+                return rez;
+            };
+            Line.prototype._downsample = function (dataset, allData) {
+                var xScale = this.x().scale;
+                var xAccessor = this.x().accessor;
+                var yAccessor = this.y().accessor;
+                var data = dataset.data();
+                var rez = [];
+                var lastSampleBucket = -Infinity;
+                for (var i = 0; i < allData.length;) {
+                    var min = Infinity;
+                    var max = -Infinity;
+                    var currBucket = Math.floor(xScale.scale(xAccessor(data[allData[i]], allData[i], dataset)));
+                    var p1 = allData[i];
+                    var p2 = allData[i];
+                    var p3 = allData[i];
+                    while (i < allData.length && Math.floor(xScale.scale(xAccessor(data[allData[i]], allData[i], dataset))) === currBucket) {
+                        var currPointY = yAccessor(data[allData[i]], allData[i], dataset);
+                        if (currPointY > max) {
+                            max = currPointY;
+                            p2 = allData[i];
+                        }
+                        if (currPointY < min) {
+                            min = currPointY;
+                            p3 = allData[i];
+                        }
+                        i++;
+                    }
+                    var p4 = allData[i - 1];
+                    rez.push(p1);
+                    if (p2 !== p1) {
+                        rez.push(p2);
+                    }
+                    if (p3 !== p2 && p3 !== p1) {
+                        rez.push(p3);
+                    }
+                    if (p4 !== p3 && p4 !== p2 && p4 != p1) {
+                        rez.push(p4);
+                    }
+                }
+                return rez;
             };
             return Line;
         })(Plottable.XYPlot);
