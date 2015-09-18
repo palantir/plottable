@@ -78,6 +78,17 @@ describe("Component", () => {
       svg.remove();
     });
 
+    it("removes DOM elements in previous svg when anchoring to a different svg", () => {
+      c.anchor(svg);
+      let svg2 = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+      c.anchor(svg2);
+      assert.isTrue(svg.select("g").empty(), "previous svg element should not have any group child nodes");
+      assert.isFalse(svg2.select("g").empty(), "new svg element should have group child nodes");
+      c.destroy();
+      svg.remove();
+      svg2.remove();
+    });
+
     it("can undergo set behavior upon anchoring", () => {
       let callbackCalled = false;
       let passedComponent: Plottable.Component;
