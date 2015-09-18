@@ -155,13 +155,13 @@ describe("TimeAxis", () => {
       scale.domain([new Date("2010-01-01"), new Date("2014-01-01")]);
       axis = new Plottable.Axes.Time(scale, "top");
 
-      let style = (<any> axis)._element.append("style");
-      style.attr("type", "text/css");
-      style.text(".plottable .axis.time-axis text { font-family: Arial; }");
-
       function checkTierDisplayPosition (tierDisplayPositions: any[]) {
         axis.tierLabelPositions(tierDisplayPositions);
         axis.renderTo(svg);
+
+        let style = (<any>axis)._element.append("style");
+        style.attr("type", "text/css");
+        style.text(".plottable .axis.time-axis text { font-family: Arial; }");
 
         let tickMarks = d3.selectAll(`.${Plottable.Axis.TICK_MARK_CLASS}:not(.${Plottable.Axis.END_TICK_MARK_CLASS})`);
         assert.operator(tickMarks.size(), ">=", 1, "There are more than one tick marks in the test");
