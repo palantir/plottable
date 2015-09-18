@@ -17,7 +17,8 @@ export module Components {
 
     public computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number) {
       super.computeLayout(origin, availableWidth, availableHeight);
-      this.bounds(this.bounds()); // set correct bounds when width/height changes
+      // set correct bounds when width/height changes
+      this._setBounds(this.bounds());
       return this;
     }
 
@@ -40,15 +41,19 @@ export module Components {
     public yScale<D extends number | { valueOf(): number }>(yScale: QuantitativeScale<D>): SelectionBoxLayer;
     public yScale<D extends number | { valueOf(): number }>(yScale?: QuantitativeScale<D>): any {
       if (yScale == null) {
-        throw new Error("XDragBoxLayer has no yScale");
+        return super.yScale();
       }
       throw new Error("yScales cannot be set on an XDragBoxLayer");
     }
 
-    public yExtent(): (number | { valueOf(): number })[] {
+    public yExtent(): (number | { valueOf(): number })[];
+    public yExtent(yExtent: (number | { valueOf(): number })[]): SelectionBoxLayer;
+    public yExtent(yExtent?: (number | { valueOf(): number })[]): any {
+      if (yExtent == null) {
+        return super.yExtent();
+      }
       throw new Error("XDragBoxLayer has no yExtent");
     }
-
   }
 }
 }

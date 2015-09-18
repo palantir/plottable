@@ -1,6 +1,6 @@
 ///<reference path="../testReference.ts" />
 
-describe("Interactive Components", () => {
+describe("Layer Components", () => {
   describe("DragBoxLayer", () => {
 
     describe("Basics usage", () => {
@@ -62,6 +62,33 @@ describe("Interactive Components", () => {
         svg.remove();
       });
 
+      it("updates the clipPath reference when render()-ed", () => {
+        if (window.history == null ||  window.history.replaceState == null) { // not supported on IE9 (http://caniuse.com/#feat=history)
+          svg.remove();
+          return;
+        }
+
+        dbl.renderTo(svg);
+
+        let originalState = window.history.state;
+        let originalTitle = document.title;
+        let originalLocation = document.location.href;
+        window.history.replaceState(null, null, "clipPathTest");
+        dbl.render();
+
+        let clipPathId = (<any> dbl)._boxContainer[0][0].firstChild.id;
+        let expectedPrefix = /MSIE [5-9]/.test(navigator.userAgent) ? "" : document.location.href;
+        expectedPrefix = expectedPrefix.replace(/#.*/g, "");
+        let expectedClipPathURL = "url(" + expectedPrefix + "#" + clipPathId + ")";
+
+        window.history.replaceState(originalState, originalTitle, originalLocation);
+
+        let normalizeClipPath = (s: string) => s.replace(/"/g, "");
+        assert.strictEqual(normalizeClipPath((<any> dbl)._element.attr("clip-path")), expectedClipPathURL,
+          "the clipPath reference was updated");
+        svg.remove();
+      });
+
       it("can get and set the detection radius", () => {
         assert.strictEqual(dbl.detectionRadius(), 3, "there is a default detection radius");
         assert.doesNotThrow(() => dbl.detectionRadius(4), Error, "can set detection radius before anchoring");
@@ -103,6 +130,72 @@ describe("Interactive Components", () => {
 
       it("does not error on destroy() if scales are not added", () => {
         assert.doesNotThrow(() => dbl.destroy(), Error, "can destroy");
+        svg.remove();
+      });
+
+      it("does not call callbacks when dragBoxLayer is destroy()-ed", () => {
+        // rendered in a Group so that drag sequence can be simulated on Group background after DragBoxLayer is destroyed
+        let group = new Plottable.Components.Group([dbl]).renderTo(svg);
+        let target = group.background();
+        let onDragStartCallbackCalled = false;
+        let onDragCallbackCalled = false;
+        let onDragEndcallbackCalled = false;
+        dbl.onDragStart(() => onDragStartCallbackCalled = true);
+        dbl.onDrag(() => onDragCallbackCalled = true);
+        dbl.onDragEnd(() => onDragEndcallbackCalled = true);
+
+        TestMethods.triggerFakeDragSequence(target, quarterPoint, halfPoint);
+        assert.isTrue(onDragStartCallbackCalled, "onDragStart callback is called");
+        assert.isTrue(onDragCallbackCalled, "onDrag callback is called");
+        assert.isTrue(onDragEndcallbackCalled, "onDragEnd callback is called");
+
+        onDragStartCallbackCalled = false;
+        onDragCallbackCalled = false;
+        onDragEndcallbackCalled = false;
+        dbl.destroy();
+
+        TestMethods.triggerFakeDragSequence(target, quarterPoint, halfPoint);
+        assert.isFalse(onDragStartCallbackCalled, "onDragStart callback is not called");
+        assert.isFalse(onDragCallbackCalled, "onDrag callback is not called");
+        assert.isFalse(onDragEndcallbackCalled, "onDragEnd callback is not called");
+
+        svg.remove();
+      });
+
+      it("does not call callbacks when dragBoxLayer is detach()-ed", () => {
+        // rendered in a Group so that drag sequence can be simulated on Group background after DragBoxLayer is destroyed
+        let group = new Plottable.Components.Group([dbl]);
+        group.renderTo(svg);
+        let target = group.background();
+        let onDragStartCallbackCalled = false;
+        let onDragCallbackCalled = false;
+        let onDragEndcallbackCalled = false;
+        dbl.onDragStart(() => onDragStartCallbackCalled = true);
+        dbl.onDrag(() => onDragCallbackCalled = true);
+        dbl.onDragEnd(() => onDragEndcallbackCalled = true);
+
+        TestMethods.triggerFakeDragSequence(target, quarterPoint, halfPoint);
+        assert.isTrue(onDragStartCallbackCalled, "onDragStart callback is called");
+        assert.isTrue(onDragCallbackCalled, "onDrag callback is called");
+        assert.isTrue(onDragEndcallbackCalled, "onDragEnd callback is called");
+
+        onDragStartCallbackCalled = false;
+        onDragCallbackCalled = false;
+        onDragEndcallbackCalled = false;
+        dbl.detach();
+
+        TestMethods.triggerFakeDragSequence(target, quarterPoint, halfPoint);
+        assert.isFalse(onDragStartCallbackCalled, "onDragStart callback is not called");
+        assert.isFalse(onDragCallbackCalled, "onDrag callback is not called");
+        assert.isFalse(onDragEndcallbackCalled, "onDragEnd callback is not called");
+
+        group.append(dbl);
+        TestMethods.triggerFakeDragSequence(target, quarterPoint, halfPoint);
+        assert.isTrue(onDragStartCallbackCalled, "onDragStart callback is called when re-anchor()");
+        assert.isTrue(onDragCallbackCalled, "onDrag callback is called when re-anchor()");
+        assert.isTrue(onDragEndcallbackCalled, "onDragEnd callback is called when re-anchor()");
+
+        dbl.destroy();
         svg.remove();
       });
 
