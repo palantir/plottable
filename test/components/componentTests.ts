@@ -66,6 +66,7 @@ describe("Component", () => {
 
     it("can switch which element it is anchored to", () => {
       c.anchor(svg);
+
       let svg2 = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
       c.anchor(svg2);
       assert.notStrictEqual(Plottable.Utils.DOM.boundingSVG(<SVGElement> c.content().node()),
