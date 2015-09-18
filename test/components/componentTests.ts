@@ -82,8 +82,8 @@ describe("Component", () => {
       c.anchor(svg);
       let svg2 = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
       c.anchor(svg2);
-      assert.isFalse((<Element>svg.node()).hasChildNodes(), "previous svg elements should not have any child nodes");
-      assert.isTrue((<Element>svg2.node()).hasChildNodes(), "new svg elements should have child nodes.");
+      assert.isFalse((<Element>svg.node()).hasChildNodes(), "previous svg element should not have any childnodes");
+      assert.isTrue((<Element>svg2.node()).hasChildNodes(), "new svg element should have childnodes.");
       c.destroy();
       svg.remove();
       svg2.remove();
