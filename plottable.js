@@ -3165,6 +3165,9 @@ var Plottable;
          * Renders the Component without waiting for the next frame.
          */
         Component.prototype.renderImmediately = function () {
+            if (this._clipPathEnabled) {
+                this._updateClipPath();
+            }
             return this;
         };
         /**
@@ -3261,15 +3264,17 @@ var Plottable;
         };
         Component.prototype._generateClipPath = function () {
             // The clip path will prevent content from overflowing its Component space.
-            // HACKHACK: IE <=9 does not respect the HTML base element in SVG.
+            this._clipPathID = Plottable.Utils.DOM.generateUniqueClipPathId();
+            var clipPathParent = this._boxContainer.append("clipPath").attr("id", this._clipPathID);
+            this._addBox("clip-rect", clipPathParent);
+            this._updateClipPath();
+        };
+        Component.prototype._updateClipPath = function () {
+            // HACKHACK: IE <= 9 does not respect the HTML base element in SVG.
             // They don't need the current URL in the clip path reference.
             var prefix = /MSIE [5-9]/.test(navigator.userAgent) ? "" : document.location.href;
             prefix = prefix.split("#")[0]; // To fix cases where an anchor tag was used
-            var clipPathId = Plottable.Utils.DOM.generateUniqueClipPathId();
-            this._element.attr("clip-path", "url(\"" + prefix + "#" + clipPathId + "\")");
-            var clipPathParent = this._boxContainer.append("clipPath")
-                .attr("id", clipPathId);
-            this._addBox("clip-rect", clipPathParent);
+            this._element.attr("clip-path", "url(\"" + prefix + "#" + this._clipPathID + "\")");
         };
         /**
          * Checks if the Component has a given CSS class.
@@ -6490,6 +6495,7 @@ var Plottable;
                 };
             };
             SelectionBoxLayer.prototype.renderImmediately = function () {
+                _super.prototype.renderImmediately.call(this);
                 if (this._boxVisible) {
                     var bounds = this.bounds();
                     var t = bounds.topLeft.y;
@@ -6888,6 +6894,7 @@ var Plottable;
             return h;
         };
         Plot.prototype.renderImmediately = function () {
+            _super.prototype.renderImmediately.call(this);
             if (this._isAnchored) {
                 this._paint();
                 this._dataChanged = false;

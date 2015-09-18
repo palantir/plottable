@@ -111,6 +111,7 @@ export module Components {
     }
 
     public renderImmediately() {
+      super.renderImmediately();
       if (this._boxVisible) {
         let bounds = this.bounds();
         let t = bounds.topLeft.y;
@@ -170,7 +171,7 @@ export module Components {
     public xScale(): QuantitativeScale<number | { valueOf(): number }>;
     /**
      * Sets the x scale for this SelectionBoxLayer.
-     * 
+     *
      * @returns {SelectionBoxLayer} The calling SelectionBoxLayer.
      */
     public xScale(xScale: QuantitativeScale<number | { valueOf(): number }>): SelectionBoxLayer;
@@ -194,7 +195,7 @@ export module Components {
     public yScale(): QuantitativeScale<number | { valueOf(): number }>;
     /**
      * Sets the y scale for this SelectionBoxLayer.
-     * 
+     *
      * @returns {SelectionBoxLayer} The calling SelectionBoxLayer.
      */
     public yScale(yScale: QuantitativeScale<number | { valueOf(): number }>): SelectionBoxLayer;
