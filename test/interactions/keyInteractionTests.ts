@@ -107,7 +107,7 @@ describe("Interactions", () => {
         svg.remove();
       });
 
-      it("can remove only the specified keypress callbacks", () => {
+      it("removes only the specified callback", () => {
         let aKeyCodeCallback1Called = false;
         let aKeyCodeCallback1 = () => aKeyCodeCallback1Called = true;
         let aKeyCodeCallback2Called = false;
@@ -145,7 +145,7 @@ describe("Interactions", () => {
         svg.remove();
       });
 
-      it("does not fire the callback if the key is pressed and held down outside, then the mouse moved inside", () => {
+      it("does not fire the callback when component is initially out of focus", () => {
         keyInteraction.onKeyPress(aKeyCode, aKeyCodeCallback);
         keyInteraction.attachTo(component);
 
@@ -179,6 +179,20 @@ describe("Interactions", () => {
         component.renderTo(svg);
       });
 
+      it("fires the callback upon releasing the key", () => {
+        keyInteraction.onKeyRelease(aKeyCode, aKeyCodeCallback);
+        keyInteraction.attachTo(component);
+
+        TestMethods.triggerFakeMouseEvent("mouseover", component.background(), 100, 100);
+        TestMethods.triggerFakeKeyboardEvent("keydown", component.background(), aKeyCode);
+        assert.isFalse(aKeyCodeCallbackCalled, "callback for \"a\" was not called before releasing the key");
+        TestMethods.triggerFakeKeyboardEvent("keyup", component.background(), aKeyCode);
+        assert.isTrue(aKeyCodeCallbackCalled, "callback for \"a\" was called when \"a\" key was released");
+
+        keyInteraction.offKeyRelease(aKeyCode, aKeyCodeCallback);
+        svg.remove();
+      });
+
       it("doesn't fire callback if key was released without being pressed", () => {
         assert.strictEqual(keyInteraction.onKeyRelease(aKeyCode, aKeyCodeCallback), keyInteraction,
           "setting the keyRelease callback returns the interaction");
@@ -191,18 +205,6 @@ describe("Interactions", () => {
         svg.remove();
       });
 
-      it("fires callback if key was released after being pressed", () => {
-        keyInteraction.onKeyRelease(aKeyCode, aKeyCodeCallback);
-        keyInteraction.attachTo(component);
-
-        TestMethods.triggerFakeMouseEvent("mouseover", component.background(), 100, 100);
-        TestMethods.triggerFakeKeyboardEvent("keydown", component.background(), aKeyCode);
-        TestMethods.triggerFakeKeyboardEvent("keyup", component.background(), aKeyCode);
-        assert.isTrue(aKeyCodeCallbackCalled, "callback for \"a\" was called when \"a\" key was released");
-
-        keyInteraction.offKeyRelease(aKeyCode, aKeyCodeCallback);
-        svg.remove();
-      });
 
       it("only fires callback for key that has been released", () => {
         let bKeyCode = 66;
