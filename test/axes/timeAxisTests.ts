@@ -167,14 +167,30 @@ describe("TimeAxis", () => {
           return window.getComputedStyle(this).visibility !== "hidden";
         });
       assert.operator(tickLabels.size(), ">=", 1, "There are at least one tick labels in the test");
+
+      function clientRectsOverlap(clientRectA: ClientRect, clientRectB: ClientRect) {
+        if (clientRectA.right < clientRectB.left + window.Pixel_CloseTo_Requirement) {
+          return false;
+        } else if (window.Pixel_CloseTo_Requirement + clientRectA.left > clientRectB.right) {
+          return false;
+        } else if (clientRectA.bottom < clientRectB.top + window.Pixel_CloseTo_Requirement) {
+          return false;
+        } else if (window.Pixel_CloseTo_Requirement + clientRectA.top > clientRectB.bottom) {
+          return false;
+        } else { 
+          return true;
+        }
+      }
+
       tickMarks.each(function(tickMark) {
         let tickMarkRect = this.getBoundingClientRect();
         tickLabels.each(function(tickLabel) {
           let tickLabelRect = this.getBoundingClientRect();
-          assert.isFalse(Plottable.Utils.DOM.clientRectsOverlap(tickMarkRect, tickLabelRect),
+          assert.isFalse(clientRectsOverlap(tickMarkRect, tickLabelRect), 
             `Tick marks "${tickMark}" should not overlap with tick labels "${this.textContent}" `);
         });
       });
+    style.remove();
     }
 
     checkTierDisplayPosition(["between", "between"]);
