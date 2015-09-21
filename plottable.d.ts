@@ -2443,8 +2443,14 @@ declare module Plottable {
 
 declare module Plottable {
     module Components {
+        enum PropertyMode {
+            VALUE = 0,
+            PIXEL = 1,
+        }
         class SelectionBoxLayer extends Component {
             protected _box: d3.Selection<void>;
+            protected _xBoundsMode: PropertyMode;
+            protected _yBoundsMode: PropertyMode;
             constructor();
             protected _setup(): void;
             protected _sizeFromOffer(availableWidth: number, availableHeight: number): {
@@ -2514,6 +2520,15 @@ declare module Plottable {
                 valueOf(): number;
             })[];
             /**
+             * Sets the data values backing the left and right edges of the box.
+             */
+            xExtent(xExtent: (number | {
+                valueOf(): number;
+            })[]): SelectionBoxLayer;
+            protected _setXExtent(xExtent: (number | {
+                valueOf(): number;
+            })[]): void;
+            /**
              * Gets the data values backing the top and bottom edges of the box.
              *
              * Returns an undefined array if the edges are not backed by a scale.
@@ -2521,6 +2536,15 @@ declare module Plottable {
             yExtent(): (number | {
                 valueOf(): number;
             })[];
+            /**
+             * Sets the data values backing the top and bottom edges of the box.
+             */
+            yExtent(yExtent: (number | {
+                valueOf(): number;
+            })[]): SelectionBoxLayer;
+            protected _setYExtent(yExtent: (number | {
+                valueOf(): number;
+            })[]): void;
             destroy(): void;
         }
     }
@@ -4616,6 +4640,9 @@ declare module Plottable {
              * Gets the enabled state.
              */
             enabled(): boolean;
+            destroy(): void;
+            detach(): Component;
+            anchor(selection: d3.Selection<void>): Component;
         }
     }
 }
@@ -4640,6 +4667,12 @@ declare module Plottable {
             yScale<D extends number | {
                 valueOf(): number;
             }>(yScale: QuantitativeScale<D>): SelectionBoxLayer;
+            yExtent(): (number | {
+                valueOf(): number;
+            })[];
+            yExtent(yExtent: (number | {
+                valueOf(): number;
+            })[]): SelectionBoxLayer;
         }
     }
 }
@@ -4664,6 +4697,12 @@ declare module Plottable {
             xScale<D extends number | {
                 valueOf(): number;
             }>(xScale: QuantitativeScale<D>): SelectionBoxLayer;
+            xExtent(): (number | {
+                valueOf(): number;
+            })[];
+            xExtent(xExtent: (number | {
+                valueOf(): number;
+            })[]): SelectionBoxLayer;
         }
     }
 }

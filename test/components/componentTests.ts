@@ -78,6 +78,17 @@ describe("Component", () => {
       svg.remove();
     });
 
+    it("removes DOM elements in previous svg when anchoring to a different svg", () => {
+      c.anchor(svg);
+      let svg2 = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+      c.anchor(svg2);
+      assert.isTrue(svg.select("g").empty(), "previous svg element should not have any group child nodes");
+      assert.isFalse(svg2.select("g").empty(), "new svg element should have group child nodes");
+      c.destroy();
+      svg.remove();
+      svg2.remove();
+    });
+
     it("can undergo set behavior upon anchoring", () => {
       let callbackCalled = false;
       let passedComponent: Plottable.Component;
@@ -794,20 +805,55 @@ describe("Component", () => {
 
   describe("restricting rendering through clipPath", () => {
 
-    let c: Plottable.Component;
+    let clippedComponent: Plottable.Component;
     let svg: d3.Selection<void>;
 
     beforeEach(() => {
-      c = new Plottable.Component();
+      clippedComponent = new Plottable.Component();
+      // HACKHACK #2777: Can't use a Mocks Compnoent here because they descend from a different Plottable,
+      // which has the wrong RenderPolicy in coverage.html
+      (<any> clippedComponent)._clipPathEnabled = true;
       svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
     });
 
     it("generates a clipPath element if it is enabled", () => {
-      (<any> c)._clipPathEnabled = true;
-      c.anchor(svg);
+      clippedComponent.anchor(svg);
       let componentElement = svg.select(".component");
       assert.isNotNull(componentElement.attr("clip-path"), "clip-path attribute set");
-      c.destroy();
+      clippedComponent.destroy();
+      svg.remove();
+    });
+
+    it("uses the correct clipPath", () => {
+      clippedComponent.renderTo(svg);
+      TestMethods.verifyClipPath(clippedComponent);
+      svg.remove();
+    });
+
+    it("updates the clipPath reference when render()-ed", () => {
+      if (window.history == null ||  window.history.replaceState == null) { // not supported on IE9 (http://caniuse.com/#feat=history)
+        svg.remove();
+        return;
+      }
+
+      clippedComponent.renderTo(svg);
+
+      let originalState = window.history.state;
+      let originalTitle = document.title;
+      let originalLocation = document.location.href;
+      window.history.replaceState(null, null, "clipPathTest");
+      clippedComponent.render();
+
+      let clipPathId = (<any> clippedComponent)._boxContainer[0][0].firstChild.id;
+      let expectedPrefix = /MSIE [5-9]/.test(navigator.userAgent) ? "" : document.location.href;
+      expectedPrefix = expectedPrefix.replace(/#.*/g, "");
+      let expectedClipPathURL = "url(" + expectedPrefix + "#" + clipPathId + ")";
+
+      window.history.replaceState(originalState, originalTitle, originalLocation);
+
+      let normalizeClipPath = (s: string) => s.replace(/"/g, "");
+      assert.strictEqual(normalizeClipPath((<any> clippedComponent)._element.attr("clip-path")), expectedClipPathURL,
+        "the clipPath reference was updated");
       svg.remove();
     });
   });

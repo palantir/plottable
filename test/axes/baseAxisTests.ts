@@ -266,6 +266,18 @@ describe("BaseAxis", () => {
         assert.strictEqual(axis.annotationTierCount(annotationTierCount), axis, "setting annotation tier count returns calling axis");
         assert.deepEqual(axis.annotationTierCount(), annotationTierCount, "can set the annotation tier count");
       });
+
+      it("throws an error when annotation tier count is not valid", () => {
+        let axis = new Plottable.Axis(new Plottable.Scale<{}, number>(), "bottom");
+        let invalidAnnotationTierCounts = [-1, -100];
+        invalidAnnotationTierCounts.forEach(function(annotationTierCount) {
+          let currentAnnotationTierCount = axis.annotationTierCount();
+          assert.throws(() => axis.annotationTierCount(annotationTierCount),
+          `annotationTierCount cannot be negative`);
+          assert.strictEqual(axis.annotationTierCount(), currentAnnotationTierCount,
+          "annotationTierCount should not be changed to invalid values");
+        });
+      });
     });
 
     describe("rendering annotations", () => {
