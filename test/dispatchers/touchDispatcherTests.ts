@@ -267,7 +267,7 @@ describe("Dispatchers", () => {
           width: SVG_WIDTH + "px",
           position: "absolute",
           top: position.y + "px",
-          left: position.x + "px",
+          left: position.x + "px"
         });
 
         callbackWasCalled = false;
