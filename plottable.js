@@ -6859,23 +6859,28 @@ var Plottable;
             return this;
         };
         Plot.prototype._bindProperty = function (property, value, scale) {
-            this._bind(property, value, scale, this._propertyBindings, this._propertyExtents);
-            this._updateExtentsForProperty(property);
-        };
-        Plot.prototype._bindAttr = function (attr, value, scale) {
-            this._bind(attr, value, scale, this._attrBindings, this._attrExtents);
-            this._updateExtentsForAttr(attr);
-        };
-        Plot.prototype._bind = function (key, value, scale, bindings, extents) {
-            var binding = bindings.get(key);
+            var binding = this._propertyBindings.get(property);
             var oldScale = binding != null ? binding.scale : null;
+            this._propertyBindings.set(property, { accessor: d3.functor(value), scale: scale });
+            this._updateExtentsForProperty(property);
             if (oldScale != null) {
-                this._uninstallScaleForKey(oldScale, key);
+                this._uninstallScaleForKey(oldScale, property);
             }
             if (scale != null) {
-                this._installScaleForKey(scale, key);
+                this._installScaleForKey(scale, property);
             }
-            bindings.set(key, { accessor: d3.functor(value), scale: scale });
+        };
+        Plot.prototype._bindAttr = function (attr, value, scale) {
+            var binding = this._attrBindings.get(attr);
+            var oldScale = binding != null ? binding.scale : null;
+            this._attrBindings.set(attr, { accessor: d3.functor(value), scale: scale });
+            this._updateExtentsForAttr(attr);
+            if (oldScale != null) {
+                this._uninstallScaleForKey(oldScale, attr);
+            }
+            if (scale != null) {
+                this._installScaleForKey(scale, attr);
+            }
         };
         Plot.prototype._generateAttrToProjector = function () {
             var h = {};
@@ -7664,6 +7669,10 @@ var Plottable;
                 return this._propertyBindings.get(XYPlot._X_KEY);
             }
             this._bindProperty(XYPlot._X_KEY, x, xScale);
+            var width = this.width();
+            if (xScale != null && width != null) {
+                xScale.range([0, width]);
+            }
             if (this._autoAdjustYScaleDomain) {
                 this._updateYExtentsAndAutodomain();
             }
@@ -7675,6 +7684,15 @@ var Plottable;
                 return this._propertyBindings.get(XYPlot._Y_KEY);
             }
             this._bindProperty(XYPlot._Y_KEY, y, yScale);
+            var height = this.height();
+            if (yScale != null && height != null) {
+                if (yScale instanceof Plottable.Scales.Category) {
+                    yScale.range([0, height]);
+                }
+                else {
+                    yScale.range([height, 0]);
+                }
+            }
             if (this._autoAdjustXScaleDomain) {
                 this._updateXExtentsAndAutodomain();
             }
@@ -7766,11 +7784,11 @@ var Plottable;
             var yBinding = this.y();
             var yScale = yBinding && yBinding.scale;
             if (yScale != null) {
-                if (this.y().scale instanceof Plottable.Scales.Category) {
-                    this.y().scale.range([0, this.height()]);
+                if (yScale instanceof Plottable.Scales.Category) {
+                    yScale.range([0, this.height()]);
                 }
                 else {
-                    this.y().scale.range([this.height(), 0]);
+                    yScale.range([this.height(), 0]);
                 }
             }
             return this;
