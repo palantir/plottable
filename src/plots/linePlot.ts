@@ -451,7 +451,6 @@ export module Plots {
       }
 
       return filteredDataIndices;
-
     }
 
   }
