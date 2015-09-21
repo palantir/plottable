@@ -154,12 +154,12 @@ describe("TimeAxis", () => {
     scale.domain([new Date("2010-01-01"), new Date("2014-01-01")]);
     axis = new Plottable.Axes.Time(scale, "top");
 
-    function checkTierDisplayPosition(tierDisplayPositions: any[]) {
+    function checkTierDisplayPosition (tierDisplayPositions: any[]) {
       axis.tierLabelPositions(tierDisplayPositions);
       axis.renderTo(svg);
       let style = (<any>axis)._element.append("style");
       style.attr("type", "text/css");
-      style.text(".plottable .axis .time-axis text { font-family: Arial; }");
+      style.text(".plottable .axis.time-axis text { font-family: Arial; }");
       let tickMarks = d3.selectAll(`.${Plottable.Axis.TICK_MARK_CLASS}:not(.${Plottable.Axis.END_TICK_MARK_CLASS})`);
       assert.operator(tickMarks.size(), ">=", 1, "There are at least one tick marks in the test");
       let tickLabels = d3.selectAll(`.${Plottable.Axis.TICK_LABEL_CLASS}`)
@@ -168,31 +168,32 @@ describe("TimeAxis", () => {
         });
       assert.operator(tickLabels.size(), ">=", 1, "There are at least one tick labels in the test");
 
-      function clientRectsOverlap(clientRectA: ClientRect, clientRectB: ClientRect) {
+      function myclientRectsOverlap(clientRectA: ClientRect, clientRectB: ClientRect) {
         if (clientRectA.right < clientRectB.left + window.Pixel_CloseTo_Requirement) {
           return false;
-        } else if (window.Pixel_CloseTo_Requirement + clientRectA.left > clientRectB.right) {
-          return false;
-        } else if (clientRectA.bottom < clientRectB.top + window.Pixel_CloseTo_Requirement) {
-          return false;
-        } else if (window.Pixel_CloseTo_Requirement + clientRectA.top > clientRectB.bottom) {
-          return false;
-        } else {
-          return true;
         }
-      }
+        if (window.Pixel_CloseTo_Requirement + clientRectA.left > clientRectB.right) {
+          return false;
+        }
+        if (clientRectA.bottom < clientRectB.top + window.Pixel_CloseTo_Requirement) {
+          return false;
+        }
+        if (window.Pixel_CloseTo_Requirement + clientRectA.top > clientRectB.bottom) {
+          return false;
+        }
+        return true;
+        }
 
       tickMarks.each(function(tickMark) {
         let tickMarkRect = this.getBoundingClientRect();
         tickLabels.each(function(tickLabel) {
           let tickLabelRect = this.getBoundingClientRect();
-          assert.isFalse(clientRectsOverlap(tickMarkRect, tickLabelRect),
-            `Tick marks "${tickMark}" should not overlap with tick labels "${this.textContent}" `);
+          let isOverlap = myclientRectsOverlap(tickMarkRect, tickLabelRect);
+          assert.isFalse(isOverlap, `Tick marks "${tickMark}" should not overlap with tick labels "${this.textContent}" `);
         });
       });
-    style.remove();
+      style.remove();
     }
-
     checkTierDisplayPosition(["between", "between"]);
     checkTierDisplayPosition(["center", "center"]);
     svg.remove();
