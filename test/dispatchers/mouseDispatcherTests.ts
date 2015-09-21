@@ -242,6 +242,7 @@ describe("Dispatchers", () => {
           callbackWasCalled = true;
           TestMethods.assertPointsClose(point, expectedPoint, 0.5, "mouse position is correct");
           assert.isNotNull(event, "mouse event was passed to the callback");
+          assert.isTrue(event instanceof MouseEvent, "the event passed is an instance of MouseEvent");
         };
 
         mouseDispatcher.onMouseMove(callback);
