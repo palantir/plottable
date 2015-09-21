@@ -128,6 +128,63 @@ describe("Plots", () => {
       });
     });
 
+    describe("Automatic domain and range adjustment for X and Y Scales", () => {
+      let SVG_HEIGHT = 400;
+      let SVG_WIDTH = 400;
+      let svg: d3.Selection<void>;
+      let xScale: Plottable.Scales.Linear;
+      let yScale: Plottable.Scales.Linear;
+      let plot: Plottable.XYPlot<number, number>;
+      let dataset: Plottable.Dataset;
+      let defaultInterval = [0, 1];
+
+      beforeEach(() => {
+        svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+        xScale = new Plottable.Scales.Linear();
+        yScale = new Plottable.Scales.Linear();
+        dataset = new Plottable.Dataset([
+          { a: -6, b: 6 },
+          { a: -2, b: 2 },
+          { a: 2, b: -2 },
+          { a: 6, b: -6 }
+        ]);
+        plot = new Plottable.XYPlot<number, number>();
+        (<any> plot)._createDrawer = (dataset: Plottable.Dataset) => createMockDrawer(dataset);
+        plot.addDataset(dataset);
+      });
+
+      it("automatically adjusts domain and range after rendering to DOM", () => {
+        plot.x((d: any) => d.a, xScale)
+            .y((d: any) => d.b, yScale);
+        assert.deepEqual(xScale.domain(), defaultInterval, "X domain is not changed before rendering");
+        assert.deepEqual(xScale.range(), defaultInterval, "X range is not changed before rendering");
+        assert.deepEqual(yScale.domain(), defaultInterval, "Y domain is not changed before rendering");
+        assert.deepEqual(yScale.range(), defaultInterval, "Y range is not changed before rendering");
+
+        plot.renderTo(svg);
+        assert.deepEqual(xScale.domain(), [-7, 7], "X domain has been set automatically after rendering");
+        assert.deepEqual(xScale.range(), [0, SVG_WIDTH], "X range has been set automatically after rendering");
+        assert.deepEqual(yScale.domain(), [-7, 7], "Y domain has been set automatically after rendering");
+        assert.deepEqual(yScale.range(), [SVG_HEIGHT, 0], "Y range has been set automatically after rendering");
+        svg.remove();
+      });
+
+      it("automatically adjusts range when a Scale is attached after rendering", () => {
+        plot.x((d: any) => d.a)
+            .y((d: any) => d.b);
+
+        plot.renderTo(svg);
+        plot.x((d: any) => d.a, xScale)
+            .y((d: any) => d.b, yScale);
+
+        assert.deepEqual(xScale.domain(), [-7, 7], "X domain has been set automatically");
+        assert.deepEqual(xScale.range(), [0, SVG_WIDTH], "X range has been set automatically");
+        assert.deepEqual(yScale.domain(), [-7, 7], "Y domain has been set automatically");
+        assert.deepEqual(yScale.range(), [SVG_HEIGHT, 0], "Y range has been set automatically");
+        svg.remove();
+      });
+    });
+
     describe("Deferred Rendering", () => {
       let svg: d3.Selection<void>;
       let xScale: Plottable.Scales.Linear;

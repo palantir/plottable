@@ -31,6 +31,7 @@ export module Components {
     private _dragStartCallbacks: Utils.CallbackSet<DragBoxCallback>;
     private _dragCallbacks: Utils.CallbackSet<DragBoxCallback>;
     private _dragEndCallbacks: Utils.CallbackSet<DragBoxCallback>;
+    private _disconnectInteraction: () => void;
 
     /**
      * Constructs a DragBoxLayer.
@@ -74,7 +75,7 @@ export module Components {
       };
       let mode = DRAG_MODES.newBox;
 
-      this._dragInteraction.onDragStart((startPoint: Point) => {
+      let onDragStartCallback = (startPoint: Point) => {
         resizingEdges = this._getResizingEdges(startPoint);
 
         let bounds = this.bounds();
@@ -87,10 +88,17 @@ export module Components {
           mode = DRAG_MODES.move;
         } else {
           mode = DRAG_MODES.newBox;
-          this.bounds({
+          this._setBounds({
             topLeft: startPoint,
             bottomRight: startPoint
           });
+          if (this._xBoundsMode === PropertyMode.VALUE && this.xScale() != null) {
+            this._setXExtent([this.xScale().invert(startPoint.x), this.xScale().invert(startPoint.x)]);
+          }
+          if (this._yBoundsMode === PropertyMode.VALUE && this.yScale() != null) {
+            this._setYExtent([this.yScale().invert(startPoint.y), this.yScale().invert(startPoint.y)]);
+          }
+          this.render();
         }
 
         this.boxVisible(true);
@@ -100,9 +108,9 @@ export module Components {
         bottomRight = { x: bounds.bottomRight.x, y: bounds.bottomRight.y };
         lastEndPoint = startPoint;
         this._dragStartCallbacks.callCallbacks(bounds);
-      });
+      };
 
-      this._dragInteraction.onDrag((startPoint: Point, endPoint: Point) => {
+      let onDragCallback = (startPoint: Point, endPoint: Point) => {
         switch (mode) {
           case DRAG_MODES.newBox:
             bottomRight.x = endPoint.x;
@@ -132,21 +140,39 @@ export module Components {
             break;
         }
 
-        this.bounds({
+        this._setBounds({
           topLeft: topLeft,
           bottomRight: bottomRight
         });
+        if (this._xBoundsMode === PropertyMode.VALUE && this.xScale() != null) {
+          this._setXExtent([this.xScale().invert(topLeft.x), this.xScale().invert(bottomRight.x)]);
+        }
+        if (this._yBoundsMode === PropertyMode.VALUE && this.yScale() != null) {
+          this._setYExtent([this.yScale().invert(topLeft.y), this.yScale().invert(bottomRight.y)]);
+        }
+        this.render();
 
         this._dragCallbacks.callCallbacks(this.bounds());
-      });
+      };
 
-      this._dragInteraction.onDragEnd((startPoint: Point, endPoint: Point) => {
+      let onDragEndCallback = (startPoint: Point, endPoint: Point) => {
         if (mode === DRAG_MODES.newBox && startPoint.x === endPoint.x && startPoint.y === endPoint.y) {
           this.boxVisible(false);
         }
 
         this._dragEndCallbacks.callCallbacks(this.bounds());
-      });
+      };
+
+      this._dragInteraction.onDragStart(onDragStartCallback);
+      this._dragInteraction.onDrag(onDragCallback);
+      this._dragInteraction.onDragEnd(onDragEndCallback);
+
+      this._disconnectInteraction = () => {
+        this._dragInteraction.offDragStart(onDragStartCallback);
+        this._dragInteraction.offDrag(onDragCallback);
+        this._dragInteraction.offDragEnd(onDragEndCallback);
+        this._dragInteraction.detachFrom(this);
+      };
     }
 
     protected _setup() {
@@ -415,6 +441,32 @@ export module Components {
       this._setResizableClasses(this.resizable());
       this._setMovableClass();
       return this;
+    }
+
+    public destroy() {
+      super.destroy();
+      this._dragStartCallbacks.forEach((callback) => this._dragCallbacks.delete(callback));
+      this._dragCallbacks.forEach((callback) => this._dragCallbacks.delete(callback));
+      this._dragEndCallbacks.forEach((callback) => this._dragEndCallbacks.delete(callback));
+      this._disconnectInteraction();
+    }
+
+    public detach() {
+      this._resetState();
+      this._dragInteraction.detachFrom(this);
+      return super.detach();
+    }
+
+    public anchor(selection: d3.Selection<void>) {
+      this._dragInteraction.attachTo(this);
+      return super.anchor(selection);
+    }
+
+    private _resetState() {
+      this.bounds({
+        topLeft: { x: 0, y: 0 },
+        bottomRight: { x: 0, y: 0 }
+      });
     }
   }
 }

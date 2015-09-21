@@ -631,13 +631,13 @@ declare module Plottable {
         function fixed(precision?: number): (d: any) => string;
         /**
          * Creates a formatter that formats numbers to show no more than
-         * [precision] decimal places. All other values are stringified.
+         * [maxNumberOfDecimalPlaces] decimal places. All other values are stringified.
          *
-         * @param {number} [precision] The number of decimal places to show (default 3).
+         * @param {number} [maxNumberOfDecimalPlaces] The number of decimal places to show (default 3).
          *
          * @returns {Formatter} A formatter for general values.
          */
-        function general(precision?: number): (d: any) => string;
+        function general(maxNumberOfDecimalPlaces?: number): (d: any) => string;
         /**
          * Creates a formatter that stringifies its input.
          *
@@ -654,14 +654,14 @@ declare module Plottable {
          */
         function percentage(precision?: number): (d: any) => string;
         /**
-         * Creates a formatter for values that displays [precision] significant figures
+         * Creates a formatter for values that displays [numberOfSignificantFigures] significant figures
          * and puts SI notation.
          *
-         * @param {number} [precision] The number of significant figures to show (default 3).
+         * @param {number} [numberOfSignificantFigures] The number of significant figures to show (default 3).
          *
          * @returns {Formatter} A formatter for SI values.
          */
-        function siSuffix(precision?: number): (d: any) => string;
+        function siSuffix(numberOfSignificantFigures?: number): (d: any) => string;
         /**
          * Creates a formatter for values that displays abbreviated values
          * and uses standard short scale suffixes
@@ -2443,8 +2443,14 @@ declare module Plottable {
 
 declare module Plottable {
     module Components {
+        enum PropertyMode {
+            VALUE = 0,
+            PIXEL = 1,
+        }
         class SelectionBoxLayer extends Component {
             protected _box: d3.Selection<void>;
+            protected _xBoundsMode: PropertyMode;
+            protected _yBoundsMode: PropertyMode;
             constructor();
             protected _setup(): void;
             protected _sizeFromOffer(availableWidth: number, availableHeight: number): {
@@ -2514,6 +2520,15 @@ declare module Plottable {
                 valueOf(): number;
             })[];
             /**
+             * Sets the data values backing the left and right edges of the box.
+             */
+            xExtent(xExtent: (number | {
+                valueOf(): number;
+            })[]): SelectionBoxLayer;
+            protected _setXExtent(xExtent: (number | {
+                valueOf(): number;
+            })[]): void;
+            /**
              * Gets the data values backing the top and bottom edges of the box.
              *
              * Returns an undefined array if the edges are not backed by a scale.
@@ -2521,6 +2536,15 @@ declare module Plottable {
             yExtent(): (number | {
                 valueOf(): number;
             })[];
+            /**
+             * Sets the data values backing the top and bottom edges of the box.
+             */
+            yExtent(yExtent: (number | {
+                valueOf(): number;
+            })[]): SelectionBoxLayer;
+            protected _setYExtent(yExtent: (number | {
+                valueOf(): number;
+            })[]): void;
             destroy(): void;
         }
     }
@@ -4616,6 +4640,9 @@ declare module Plottable {
              * Gets the enabled state.
              */
             enabled(): boolean;
+            destroy(): void;
+            detach(): Component;
+            anchor(selection: d3.Selection<void>): Component;
         }
     }
 }
@@ -4643,6 +4670,9 @@ declare module Plottable {
             yExtent(): (number | {
                 valueOf(): number;
             })[];
+            yExtent(yExtent: (number | {
+                valueOf(): number;
+            })[]): SelectionBoxLayer;
         }
     }
 }
@@ -4670,6 +4700,9 @@ declare module Plottable {
             xExtent(): (number | {
                 valueOf(): number;
             })[];
+            xExtent(xExtent: (number | {
+                valueOf(): number;
+            })[]): SelectionBoxLayer;
         }
     }
 }

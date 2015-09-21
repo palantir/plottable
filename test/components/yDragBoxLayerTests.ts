@@ -88,8 +88,8 @@ describe("Layer Components", () => {
         svg.remove();
       });
 
-      it("throws error on getting x scale", () => {
-        assert.throws(() => dbl.xScale(), "no xScale");
+      it("does not error on getting x scale", () => {
+        assert.doesNotThrow(() => dbl.xScale(), Error, "getting xScale should not error");
         svg.remove();
       });
 
@@ -98,8 +98,8 @@ describe("Layer Components", () => {
         svg.remove();
       });
 
-      it("throws error on getting x extent", () => {
-        assert.throws(() => dbl.xExtent(), "no xExtent");
+      it("does not error on getting x extent", () => {
+        assert.doesNotThrow(() => dbl.xExtent(), Error, "getting xExtent should not error");
         svg.remove();
       });
 
