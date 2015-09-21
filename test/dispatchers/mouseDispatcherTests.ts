@@ -5,22 +5,24 @@ describe("Dispatchers", () => {
 
     describe("Basic usage", () => {
       let svg: d3.Selection<void>;
+      let svgNode: SVGElement;
 
       beforeEach(() => {
         svg = TestMethods.generateSVG();
+        svgNode = <SVGElement>svg.node();
       });
 
       it("creates only one Dispatcher.Mouse per <svg> using getDispatcher() ", () => {
-        let dispatcher1 = Plottable.Dispatchers.Mouse.getDispatcher(<SVGElement> svg.node());
+        let dispatcher1 = Plottable.Dispatchers.Mouse.getDispatcher(svgNode);
         assert.isNotNull(dispatcher1, "created a new Dispatcher on an SVG");
-        let dispatcher2 = Plottable.Dispatchers.Mouse.getDispatcher(<SVGElement> svg.node());
+        let dispatcher2 = Plottable.Dispatchers.Mouse.getDispatcher(svgNode);
         assert.strictEqual(dispatcher1, dispatcher2, "returned the existing Dispatcher if called again with same <svg>");
 
         svg.remove();
       });
 
       it("returns non-null value for default lastMousePosition()", () => {
-        let mouseDispatcher = Plottable.Dispatchers.Mouse.getDispatcher(<SVGElement> svg.node());
+        let mouseDispatcher = Plottable.Dispatchers.Mouse.getDispatcher(svgNode);
         let point = mouseDispatcher.lastMousePosition();
         assert.isNotNull(point, "returns a value after initialization");
         assert.isNotNull(point.x, "x value is set");
@@ -57,6 +59,7 @@ describe("Dispatchers", () => {
           callbackWasCalled = true;
           TestMethods.assertPointsClose(point, expectedPoint, 0.5, "mouse position is correct");
           assert.isNotNull(event, "mouse event was passed to the callback");
+          assert.isTrue(event instanceof MouseEvent, "the event passed is an instance of MouseEvent");
         };
 
         assert.strictEqual(mouseDispatcher.onMouseDown(callback), mouseDispatcher,
@@ -81,6 +84,7 @@ describe("Dispatchers", () => {
           callbackWasCalled = true;
           TestMethods.assertPointsClose(point, expectedPoint, 0.5, "mouse position is correct");
           assert.isNotNull(event, "mouse event was passed to the callback");
+          assert.isTrue(event instanceof MouseEvent, "the event passed is an instance of MouseEvent");
         };
 
         assert.strictEqual(mouseDispatcher.onMouseUp(callback), mouseDispatcher,
@@ -115,6 +119,7 @@ describe("Dispatchers", () => {
           assert.strictEqual(event.deltaY, targetDeltaY, "deltaY value was passed to callback");
           TestMethods.assertPointsClose(point, expectedPoint, 0.5, "mouse position is correct");
           assert.isNotNull(event, "mouse event was passed to the callback");
+          assert.isTrue(event instanceof MouseEvent, "the event passed is an instance of MouseEvent");
         };
 
         assert.strictEqual(mouseDispatcher.onWheel(callback), mouseDispatcher,
@@ -139,6 +144,7 @@ describe("Dispatchers", () => {
           callbackWasCalled = true;
           TestMethods.assertPointsClose(point, expectedPoint, 0.5, "mouse position is correct");
           assert.isNotNull(event, "mouse event was passed to the callback");
+          assert.isTrue(event instanceof MouseEvent, "the event passed is an instance of MouseEvent");
         };
 
         assert.strictEqual(mouseDispatcher.onDblClick(callback), mouseDispatcher,
@@ -176,6 +182,7 @@ describe("Dispatchers", () => {
         assert.isFalse(cb1Called, "callback was not called after blanking");
         assert.isTrue(cb2Called, "callback 2 was still called");
 
+        mouseDispatcher.offMouseMove(cb2);
         svg.remove();
       });
 
@@ -204,19 +211,20 @@ describe("Dispatchers", () => {
         assert.isTrue(callbackWasCalled, "callback was called on mousedown");
 
         let element = <HTMLElement> svg[0][0];
-        let position = { x: 0, y: 0 };
+        // Getting the absolute coordinates of the SVG in order to place the overlay at the right location
+        let topLeftCorner = { x: 0, y: 0 };
         while (element != null) {
-          position.x += (element.offsetLeft || element.clientLeft || 0);
-          position.y += (element.offsetTop || element.clientTop || 0);
+          topLeftCorner.x += (element.offsetLeft || element.clientLeft || 0);
+          topLeftCorner.y += (element.offsetTop || element.clientTop || 0);
           element = <HTMLElement> (element.offsetParent || element.parentNode);
         }
 
         let overlay = TestMethods.getSVGParent().append("div").style({
           height: "400px",
           width: "400px",
-          position: "absolute",
-          top: position.y + "px",
-          left: position.x + "px"
+          topLeftCorner: "absolute",
+          top: topLeftCorner.y + "px",
+          left: topLeftCorner.x + "px"
         });
 
         callbackWasCalled = false;
@@ -228,7 +236,7 @@ describe("Dispatchers", () => {
         overlay.remove();
       });
 
-      it("calls callbacks on mouseover, mousemove, and mouseout", () => {
+      it("calls mouseMove callback on mouseover, mousemove, and mouseout", () => {
         let callbackWasCalled = false;
         let callback = (point: Plottable.Point, event: MouseEvent) => {
           callbackWasCalled = true;
@@ -248,6 +256,15 @@ describe("Dispatchers", () => {
         assert.isTrue(callbackWasCalled, "callback was called on mouseout");
 
         mouseDispatcher.offMouseMove(callback);
+
+        callbackWasCalled = false;
+        TestMethods.triggerFakeMouseEvent("mouseover", svg, targetX, targetY);
+        assert.isFalse(callbackWasCalled, "disconnected dispatcher callback not called on mouseover");
+        TestMethods.triggerFakeMouseEvent("mousemove", svg, targetX, targetY);
+        assert.isFalse(callbackWasCalled, "disconnected dispatcher callback not called on mousemove");
+        TestMethods.triggerFakeMouseEvent("mouseout", svg, targetX, targetY);
+        assert.isFalse(callbackWasCalled, "disconnected dispatcher callback not called on mouseout");
+
         svg.remove();
       });
     });
