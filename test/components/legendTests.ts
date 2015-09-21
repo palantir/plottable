@@ -277,7 +277,6 @@ describe("Legend", () => {
 
       let expectedEntity: Plottable.Entity<Plottable.Components.Legend> = {
         datum: "AA",
-        index: 0,
         position: computeExpectedSymbolPosition(legend, 0, 0),
         selection: d3.select(entries[0][0]),
         component: legend
@@ -287,7 +286,6 @@ describe("Legend", () => {
       entities = legend.entitiesAt({x: 10, y: 30});
       expectedEntity = {
         datum: "BB",
-        index: 1,
         position: computeExpectedSymbolPosition(legend, 1, 0),
         selection: d3.select(entries[0][1]),
         component: legend
@@ -309,7 +307,6 @@ describe("Legend", () => {
       let entries = legend.content().selectAll(entrySelector);
       let expectedEntity: Plottable.Entity<Plottable.Components.Legend> = {
         datum: "AA",
-        index: 0,
         position: computeExpectedSymbolPosition(legend, 0, 0),
         selection: d3.select(entries[0][0]),
         component: legend
@@ -319,7 +316,6 @@ describe("Legend", () => {
       entities = legend.entitiesAt({x: 50, y: 10});
       expectedEntity = {
         datum: "BB",
-        index: 1,
         position: computeExpectedSymbolPosition(legend, 0, 1),
         selection: d3.select(entries[0][1]),
         component: legend
