@@ -171,7 +171,7 @@ describe("TimeAxis", () => {
         let tickMarkRect = this.getBoundingClientRect();
         tickLabels.each(function(tickLabel) {
           let tickLabelRect = this.getBoundingClientRect();
-          assert.isFalse(Plottable.Utils.DOM.clientRectsOverlap(tickMarkRect, tickLabelRect), 
+          assert.isFalse(Plottable.Utils.DOM.clientRectsOverlap(tickMarkRect, tickLabelRect),
             `Tick marks "${tickMark}" should not overlap with tick labels "${this.textContent}" `);
         });
       });
