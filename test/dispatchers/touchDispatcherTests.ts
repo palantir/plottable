@@ -20,9 +20,10 @@ describe("Dispatchers", () => {
       let svg: d3.Selection<void>;
       let touchDispatcher: Plottable.Dispatchers.Touch;
 
+      let SVG_WIDTH = 400;
+      let SVG_HEIGHT = 400;
+
       beforeEach(() => {
-        let SVG_WIDTH = 400;
-        let SVG_HEIGHT = 400;
 
         svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
         // HACKHACK: PhantomJS can't measure SVGs unless they have something in them occupying space
@@ -238,9 +239,9 @@ describe("Dispatchers", () => {
       it("doesn't call callbacks if obscured by overlay", () => {
         let targetXs = [17, 18, 12, 23, 44];
         let targetYs = [77, 78, 52, 43, 14];
-        let expectedPoints = targetXs.map((targetX, i) => {
+        let expectedPoints = targetXs.map((d, i) => {
           return {
-            x: targetX,
+            x: targetXs[i],
             y: targetYs[i]
           };
         });
@@ -252,6 +253,7 @@ describe("Dispatchers", () => {
         touchDispatcher.onTouchStart(callback);
         TestMethods.triggerFakeTouchEvent("touchstart", svg, expectedPoints, ids);
         assert.isTrue(callbackWasCalled, "callback was called on touchstart");
+        TestMethods.triggerFakeTouchEvent("touchend", svg, expectedPoints, ids);
 
         let element = <HTMLElement> svg[0][0];
         let position = { x: 0, y: 0 };
@@ -261,22 +263,26 @@ describe("Dispatchers", () => {
           element = <HTMLElement> (element.offsetParent || element.parentNode);
         }
 
-        let overlay = TestMethods.getSVGParent().append("div")
-              .style({
-                height: "400px",
-                width: "400px",
-                position: "absolute",
-                top: position.y + "px",
-                left: position.x + "px"
-              });
+        let overlay = TestMethods.getSVGParent().append("div").style({
+          height: SVG_HEIGHT + "px",
+          width: SVG_WIDTH + "px",
+          position: "absolute",
+          top: position.y + "px",
+          left: position.x + "px",
+          background: "#f00"
+        });
 
         callbackWasCalled = false;
-        TestMethods.triggerFakeTouchEvent("touchmove", svg, expectedPoints, ids);
-        assert.isFalse(callbackWasCalled, "callback was not called on touchstart on overlay");
+        TestMethods.triggerFakeTouchEvent("touchstart", svg, expectedPoints, ids);
+
+        try {
+          assert.isFalse(callbackWasCalled, "callback was not called on touchstart on overlay");
+        } finally {
+          overlay.remove();
+        }
 
         touchDispatcher.offTouchStart(callback);
         svg.remove();
-        overlay.remove();
       });
     });
   });
