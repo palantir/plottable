@@ -236,7 +236,8 @@ describe("Dispatchers", () => {
         touchDispatcher.offTouchMove(callback);
       });
 
-      it("doesn't call callbacks if obscured by overlay", () => {
+      // #2789
+      it.skip("doesn't call callbacks if obscured by overlay", () => {
         let targetXs = [17, 18, 12, 23, 44];
         let targetYs = [77, 78, 52, 43, 14];
         let expectedPoints = targetXs.map((d, i) => {
@@ -245,15 +246,13 @@ describe("Dispatchers", () => {
             y: targetYs[i]
           };
         });
-        let ids = targetXs.map((targetX, i) => i);
 
         let callbackWasCalled = false;
         let callback = () => callbackWasCalled = true;
 
         touchDispatcher.onTouchStart(callback);
-        TestMethods.triggerFakeTouchEvent("touchstart", svg, expectedPoints, ids);
+        TestMethods.triggerFakeTouchEvent("touchstart", svg, expectedPoints);
         assert.isTrue(callbackWasCalled, "callback was called on touchstart");
-        TestMethods.triggerFakeTouchEvent("touchend", svg, expectedPoints, ids);
 
         let element = <HTMLElement> svg[0][0];
         let position = { x: 0, y: 0 };
@@ -269,11 +268,10 @@ describe("Dispatchers", () => {
           position: "absolute",
           top: position.y + "px",
           left: position.x + "px",
-          background: "#f00"
         });
 
         callbackWasCalled = false;
-        TestMethods.triggerFakeTouchEvent("touchstart", svg, expectedPoints, ids);
+        TestMethods.triggerFakeTouchEvent("touchstart", svg, expectedPoints);
 
         try {
           assert.isFalse(callbackWasCalled, "callback was not called on touchstart on overlay");

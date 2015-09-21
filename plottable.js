@@ -1,23 +1,3 @@
-/*!
-Plottable 1.11.0 (https://github.com/palantir/plottable)
-Copyright 2014-2015 Palantir Technologies
-Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
-*/
-
-(function(root, factory) {
-    if(typeof exports === 'object') {
-        module.exports = factory(require, exports, module);
-    }
-    else if(typeof define === 'function' && define.amd) {
-        define(['require', 'exports', 'module'], factory);
-    }
-    else {
-        var req = function(id) {return root[id];},
-            exp = root,
-            mod = {exports: exp};
-        root['Plottable'] = factory(req, exp, mod);
-    }
-}(this, function(require, exports, module) {
 ///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
@@ -909,7 +889,7 @@ var Plottable;
 ///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
-    Plottable.version = "1.11.0";
+    Plottable.version = "@VERSION";
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
@@ -13484,6 +13464,3 @@ var SVGTypewriter;
         Measurers.CacheCharacterMeasurer = CacheCharacterMeasurer;
     })(Measurers = SVGTypewriter.Measurers || (SVGTypewriter.Measurers = {}));
 })(SVGTypewriter || (SVGTypewriter = {}));
-
-return Plottable;
-}));
