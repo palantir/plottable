@@ -161,14 +161,14 @@ describe("TimeAxis", () => {
 
         let style = (<any>axis)._element.append("style");
         style.attr("type", "text/css");
-        style.text(".plottable .axis.time-axis text { font-family: Serif; }");
+        style.text(".plottable .axis.time-axis text { font-family: Arial; }");
 
         let tickMarks = d3.selectAll(`.${Plottable.Axis.TICK_MARK_CLASS}:not(.${Plottable.Axis.END_TICK_MARK_CLASS})`);
         assert.operator(tickMarks.size(), ">=", 1, "There are more than one tick marks in the test");
 
         let tickLabels = d3.selectAll(`.${Plottable.Axis.TICK_LABEL_CLASS}`)
         .filter(function(d: Element, i: number){
-          return window.getComputedStyle(this).visibility === "visible";
+          return window.getComputedStyle(this).visibility !== "hidden";
         });
         assert.operator(tickLabels.size(), ">=", 1, "There are more than one tick labels in the test");
 
