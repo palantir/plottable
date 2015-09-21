@@ -205,7 +205,6 @@ describe("Interactions", () => {
         svg.remove();
       });
 
-
       it("only fires callback for key that has been released", () => {
         let bKeyCode = 66;
         let bKeyCodeCallbackCalled = false;
