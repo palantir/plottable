@@ -177,7 +177,7 @@ describe("TimeAxis", () => {
           return false;
         } else if (window.Pixel_CloseTo_Requirement + clientRectA.top > clientRectB.bottom) {
           return false;
-        } else { 
+        } else {
           return true;
         }
       }
@@ -186,7 +186,7 @@ describe("TimeAxis", () => {
         let tickMarkRect = this.getBoundingClientRect();
         tickLabels.each(function(tickLabel) {
           let tickLabelRect = this.getBoundingClientRect();
-          assert.isFalse(clientRectsOverlap(tickMarkRect, tickLabelRect), 
+          assert.isFalse(clientRectsOverlap(tickMarkRect, tickLabelRect),
             `Tick marks "${tickMark}" should not overlap with tick labels "${this.textContent}" `);
         });
       });
