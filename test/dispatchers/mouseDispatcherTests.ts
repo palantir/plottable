@@ -163,6 +163,39 @@ describe("Dispatchers", () => {
         svg.remove();
       });
 
+      it("calls mouseMove callback on mouseover, mousemove, and mouseout", () => {
+        let callbackWasCalled = false;
+        let callback = (point: Plottable.Point, event: MouseEvent) => {
+          callbackWasCalled = true;
+          TestMethods.assertPointsClose(point, expectedPoint, 0.5, "mouse position is correct");
+          assert.isNotNull(event, "mouse event was passed to the callback");
+          assert.isTrue(event instanceof MouseEvent, "the event passed is an instance of MouseEvent");
+        };
+
+        mouseDispatcher.onMouseMove(callback);
+
+        TestMethods.triggerFakeMouseEvent("mouseover", svg, targetX, targetY);
+        assert.isTrue(callbackWasCalled, "callback was called on mouseover");
+        callbackWasCalled = false;
+        TestMethods.triggerFakeMouseEvent("mousemove", svg, targetX, targetY);
+        assert.isTrue(callbackWasCalled, "callback was called on mousemove");
+        callbackWasCalled = false;
+        TestMethods.triggerFakeMouseEvent("mouseout", svg, targetX, targetY);
+        assert.isTrue(callbackWasCalled, "callback was called on mouseout");
+
+        mouseDispatcher.offMouseMove(callback);
+
+        callbackWasCalled = false;
+        TestMethods.triggerFakeMouseEvent("mouseover", svg, targetX, targetY);
+        assert.isFalse(callbackWasCalled, "disconnected dispatcher callback not called on mouseover");
+        TestMethods.triggerFakeMouseEvent("mousemove", svg, targetX, targetY);
+        assert.isFalse(callbackWasCalled, "disconnected dispatcher callback not called on mousemove");
+        TestMethods.triggerFakeMouseEvent("mouseout", svg, targetX, targetY);
+        assert.isFalse(callbackWasCalled, "disconnected dispatcher callback not called on mouseout");
+
+        svg.remove();
+      });
+
       it("can register two callbacks for the samme mouse dispatcher", () => {
         let cb1Called = false;
         let cb1 = () => cb1Called = true;
@@ -234,39 +267,6 @@ describe("Dispatchers", () => {
         mouseDispatcher.offMouseDown(callback);
         svg.remove();
         overlay.remove();
-      });
-
-      it("calls mouseMove callback on mouseover, mousemove, and mouseout", () => {
-        let callbackWasCalled = false;
-        let callback = (point: Plottable.Point, event: MouseEvent) => {
-          callbackWasCalled = true;
-          TestMethods.assertPointsClose(point, expectedPoint, 0.5, "mouse position is correct");
-          assert.isNotNull(event, "mouse event was passed to the callback");
-          assert.isTrue(event instanceof MouseEvent, "the event passed is an instance of MouseEvent");
-        };
-
-        mouseDispatcher.onMouseMove(callback);
-
-        TestMethods.triggerFakeMouseEvent("mouseover", svg, targetX, targetY);
-        assert.isTrue(callbackWasCalled, "callback was called on mouseover");
-        callbackWasCalled = false;
-        TestMethods.triggerFakeMouseEvent("mousemove", svg, targetX, targetY);
-        assert.isTrue(callbackWasCalled, "callback was called on mousemove");
-        callbackWasCalled = false;
-        TestMethods.triggerFakeMouseEvent("mouseout", svg, targetX, targetY);
-        assert.isTrue(callbackWasCalled, "callback was called on mouseout");
-
-        mouseDispatcher.offMouseMove(callback);
-
-        callbackWasCalled = false;
-        TestMethods.triggerFakeMouseEvent("mouseover", svg, targetX, targetY);
-        assert.isFalse(callbackWasCalled, "disconnected dispatcher callback not called on mouseover");
-        TestMethods.triggerFakeMouseEvent("mousemove", svg, targetX, targetY);
-        assert.isFalse(callbackWasCalled, "disconnected dispatcher callback not called on mousemove");
-        TestMethods.triggerFakeMouseEvent("mouseout", svg, targetX, targetY);
-        assert.isFalse(callbackWasCalled, "disconnected dispatcher callback not called on mouseout");
-
-        svg.remove();
       });
     });
 
