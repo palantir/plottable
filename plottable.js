@@ -5503,8 +5503,12 @@ var Plottable;
                 var _this = this;
                 var textHeight = this._measurer.measure().height;
                 var availableWidthForEntries = Math.max(0, (availableWidth - this._padding));
-                var entryNames = this._colorScale.domain().slice();
-                entryNames.sort(this.comparator());
+                var entryLabels = d3.map();
+                this._colorScale.domain().slice().forEach(function (d) {
+                    entryLabels.set(_this._formatter(d), d);
+                });
+                var entryNames = entryLabels.keys();
+                entryNames = entryNames.sort(this.comparator()).map(function (d) { return entryLabels.get(d); });
                 var entryLengths = d3.map();
                 var untruncatedEntryLengths = d3.map();
                 entryNames.forEach(function (entryName) {

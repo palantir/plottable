@@ -268,7 +268,7 @@ describe("Legend", () => {
       let expectText = formatter(legend.colorScale().domain()[i]);
       assert.strictEqual(this.text(), expectText, `formatter output ${this.text} should be displayed`);
     });
-     svg.remove();
+    svg.remove();
   });
 
 it("can get formatter of the legend using formatter()", () => {
