@@ -256,7 +256,7 @@ describe("Legend", () => {
 
   it("can set which formatter to use to change how entry labels are displayed", () => {
     color.domain(["jtao", "mschafer", "kfalter"]);
-    let data : { [id: string]: string; } = {"jtao":"Joy", "mschafer":"Mark", "kfalter":"Kelsey"};
+    let data: { [id: string]: string; } = {"jtao": "Joy", "mschafer":  "Mark", "kfalter": "Kelsey"};
     let formatter = (id: string) => {
         return data[id];
     };
@@ -264,16 +264,16 @@ describe("Legend", () => {
     legend.renderTo(svg);
 
     let legendRows = svg.selectAll(".legend_row");
-    legendRows.each(function(d:Element, i:number){
+    legendRows.each(function(d: Element, i: number){
       let expectText = formatter(legend.colorScale().domain()[i]);
-      assert.strictEqual(this.text(), expectText,`formatter ${this.text} show correctly`);
-    })
+      assert.strictEqual(this.text(), expectText, `formatter output ${this.text} should be displayed`);
+    });
      svg.remove();
   });
-  
+
 it("can get formatter of the legend using formatter()", () => {
     color.domain(["jtao", "mschafer", "kfalter"]);
-    let data : { [id: string]: string; } = {"jtao":"Joy", "mschafer":"Mark", "kfalter":"Kelsey"};
+    let data: { [id: string]: string; } = {"jtao": "Joy", "mschafer": "Mark", "kfalter": "Kelsey"};
     let formatter = (id: string) => {
         return data[id];
     };
