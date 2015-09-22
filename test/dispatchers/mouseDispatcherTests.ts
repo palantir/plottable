@@ -59,7 +59,7 @@ describe("Dispatchers", () => {
           callbackWasCalled = true;
           TestMethods.assertPointsClose(point, expectedPoint, 0.5, "mouse position is correct");
           assert.isNotNull(event, "mouse event was passed to the callback");
-          assert.isTrue(event instanceof MouseEvent, "the event passed is an instance of MouseEvent");
+          assert.instanceOf(event, MouseEvent, "the event passed is an instance of MouseEvent");
         };
 
         assert.strictEqual(mouseDispatcher.onMouseDown(callback), mouseDispatcher,
@@ -84,7 +84,7 @@ describe("Dispatchers", () => {
           callbackWasCalled = true;
           TestMethods.assertPointsClose(point, expectedPoint, 0.5, "mouse position is correct");
           assert.isNotNull(event, "mouse event was passed to the callback");
-          assert.isTrue(event instanceof MouseEvent, "the event passed is an instance of MouseEvent");
+          assert.instanceOf(event, MouseEvent, "the event passed is an instance of MouseEvent");
         };
 
         assert.strictEqual(mouseDispatcher.onMouseUp(callback), mouseDispatcher,
@@ -119,7 +119,7 @@ describe("Dispatchers", () => {
           assert.strictEqual(event.deltaY, targetDeltaY, "deltaY value was passed to callback");
           TestMethods.assertPointsClose(point, expectedPoint, 0.5, "mouse position is correct");
           assert.isNotNull(event, "mouse event was passed to the callback");
-          assert.isTrue(event instanceof MouseEvent, "the event passed is an instance of MouseEvent");
+          assert.instanceOf(event, MouseEvent, "the event passed is an instance of MouseEvent");
         };
 
         assert.strictEqual(mouseDispatcher.onWheel(callback), mouseDispatcher,
@@ -144,7 +144,7 @@ describe("Dispatchers", () => {
           callbackWasCalled = true;
           TestMethods.assertPointsClose(point, expectedPoint, 0.5, "mouse position is correct");
           assert.isNotNull(event, "mouse event was passed to the callback");
-          assert.isTrue(event instanceof MouseEvent, "the event passed is an instance of MouseEvent");
+          assert.instanceOf(event, MouseEvent, "the event passed is an instance of MouseEvent");
         };
 
         assert.strictEqual(mouseDispatcher.onDblClick(callback), mouseDispatcher,
@@ -169,7 +169,7 @@ describe("Dispatchers", () => {
           callbackWasCalled = true;
           TestMethods.assertPointsClose(point, expectedPoint, 0.5, "mouse position is correct");
           assert.isNotNull(event, "mouse event was passed to the callback");
-          assert.isTrue(event instanceof MouseEvent, "the event passed is an instance of MouseEvent");
+          assert.instanceOf(event, MouseEvent, "the event passed is an instance of MouseEvent");
         };
 
         mouseDispatcher.onMouseMove(callback);
