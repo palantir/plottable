@@ -892,113 +892,138 @@ describe("Plots", () => {
     });
 
     describe("Vertical Bar Plot With Bar Labels", () => {
-      let plot: Plottable.Plots.Bar<string, number>;
-      let data: any[];
-      let dataset: Plottable.Dataset;
-      let xScale: Plottable.Scales.Category;
-      let yScale: Plottable.Scales.Linear;
       let svg: d3.Selection<void>;
+      let yScale: Plottable.Scales.Linear;
+      let xScale: Plottable.Scales.Linear;
+      let DEFAULT_DOMAIN = [-5, 5];
+      let barPlot: Plottable.Plots.Bar<number, number>;
+      let dataset: Plottable.Dataset;
+
+      let getCenterOfText = (textNode: SVGElement) => {
+        let plotBoundingClientRect = (<SVGElement> barPlot.background().node()).getBoundingClientRect();
+        let labelBoundingClientRect = textNode.getBoundingClientRect();
+
+        return {
+          x: (labelBoundingClientRect.left + labelBoundingClientRect.right) / 2 - plotBoundingClientRect.left,
+          y: (labelBoundingClientRect.top + labelBoundingClientRect.bottom) / 2 - plotBoundingClientRect.top
+        };
+      };
 
       beforeEach(() => {
         svg = TestMethods.generateSVG();
-        data = [{x: "foo", y: 5}, {x: "bar", y: 640}, {x: "zoo", y: 12345}];
-        xScale = new Plottable.Scales.Category();
         yScale = new Plottable.Scales.Linear();
+        yScale.domain(DEFAULT_DOMAIN);
+        xScale = new Plottable.Scales.Linear();
+        xScale.domain(DEFAULT_DOMAIN);
+
+        let data = [
+          { x: -4, y: -4 },
+          { x: -2, y: -0.1},
+          { x: 0, y: 0 },
+          { x: 2, y: 0.1 },
+          { x: 4, y: 4 }
+        ];
+
+        barPlot = new Plottable.Plots.Bar<number, number>(Plottable.Plots.Bar.ORIENTATION_VERTICAL);
         dataset = new Plottable.Dataset(data);
-        plot = new Plottable.Plots.Bar<string, number>();
-        plot.addDataset(dataset);
-        plot.x((d) => d.x, xScale);
-        plot.y((d) => d.y, yScale);
+        barPlot.addDataset(dataset);
+        barPlot.x((d) => d.x, xScale);
+        barPlot.y((d) => d.y, yScale);
+        barPlot.renderTo(svg);
       });
 
+
       it("bar labels disabled by default", () => {
-        plot.renderTo(svg);
-        let texts = svg.selectAll("text")[0].map((n: any) => d3.select(n).text());
-        assert.lengthOf(texts, 0, "by default, no texts are drawn");
+        barPlot.renderTo(svg);
+        let texts = barPlot.content().selectAll("text");
+        assert.strictEqual(texts.size(), 0, "by default, no texts are drawn");
         svg.remove();
       });
 
       it("bar labels render properly", () => {
-        plot.renderTo(svg);
-        plot.labelsEnabled(true);
-        let texts = svg.selectAll("text")[0].map((n: any) => d3.select(n).text());
-        assert.lengthOf(texts, 3, "all texts drawn");
-        assert.strictEqual(texts[0], "5", "first label is 5");
-        assert.strictEqual(texts[1], "640", "first label is 640");
-        assert.strictEqual(texts[2], "12345", "first label is 12345");
+        barPlot.renderTo(svg);
+        barPlot.labelsEnabled(true);
+        let texts = barPlot.content().selectAll("text");
+        let data = dataset.data();
+        assert.strictEqual(texts.size(), data.length, "one label drawn per datum");
+        texts.each(function(d, i) {
+          assert.strictEqual(d3.select(this).text(), data[i].y.toString(), `by default, label text is the bar's value (index ${i})`);
+        });
         svg.remove();
       });
 
       it("bar labels hide if bars too skinny", () => {
-        plot.labelsEnabled(true);
-        plot.renderTo(svg);
-        plot.labelFormatter((n: number) => n.toString() + (n === 12345 ? "looong" : ""));
-        let texts = svg.selectAll("text")[0].map((n: any) => d3.select(n).text());
-        assert.lengthOf(texts, 0, "no text drawn");
+        svg.attr("width", 100);
+        barPlot.labelsEnabled(true);
+        barPlot.renderTo(svg);
+        let texts = barPlot.content().selectAll("text");
+        assert.strictEqual(texts.size(), 0, "no labels drawn");
         svg.remove();
       });
 
       it("formatters are used properly", () => {
-        plot.labelsEnabled(true);
-        plot.labelFormatter((n: number) => n.toString() + "%");
-        plot.renderTo(svg);
-        let texts = svg.selectAll("text")[0].map((n: any) => d3.select(n).text());
-        assert.lengthOf(texts, 3, "all texts drawn");
-        assert.strictEqual(texts[0], "5%", "first label is 5%");
-        assert.strictEqual(texts[1], "640%", "first label is 640%");
-        assert.strictEqual(texts[2], "12345%", "first label is 12345%");
+        barPlot.labelsEnabled(true);
+        let formatter = (n: number) => n.toString() + "%";
+        barPlot.labelFormatter(formatter);
+        barPlot.renderTo(svg);
+        let texts = barPlot.content().selectAll("text");
+        assert.strictEqual(texts.size(), dataset.data().length, "one label drawn per datum");
+        let expectedTexts = dataset.data().map((d) => formatter(d.y));
+        texts.each(function(d, i) {
+          assert.strictEqual(d3.select(this).text(), expectedTexts[i], `formatter is applied to the displayed value (index ${i})`);
+        });
         svg.remove();
       });
 
       it("bar labels are shown inside or outside the bar as appropriate", () => {
-        plot.labelsEnabled(true);
-        plot.renderTo(svg);
+        barPlot.labelsEnabled(true);
+        barPlot.renderTo(svg);
 
-        let texts = svg.selectAll("text")[0].map((n: any) => d3.select(n).text());
-        assert.lengthOf(texts, 3, "both texts drawn");
+        let texts = barPlot.content().selectAll("text");
+        assert.strictEqual(texts.size(), dataset.data().length, "one label drawn per datum");
 
-        let offBarLabelCount = d3.selectAll(".off-bar-label")[0].length;
-        assert.strictEqual(offBarLabelCount, 1, "There should be 1 label rendered outside the bar");
+        let offBarLabels = barPlot.content().selectAll(".off-bar-label");
+        assert.strictEqual(offBarLabels.size(), 3, "there are 3 off-bar labels");
 
-        let onBarLabelCount = d3.selectAll(".on-bar-label")[0].length;
-        assert.strictEqual(onBarLabelCount, 2, "There should be 2 labels rendered inside the bar");
+        let onBarLabels = barPlot.content().selectAll(".on-bar-label");
+        assert.strictEqual(onBarLabels.size(), 2, "there are 2 on-bar labels");
         svg.remove();
       });
 
       it("shows labels for bars with value = baseline on the \"positive\" side of the baseline", () => {
-        let zeroOnlyData = [ { x: "foo", y: 0 }];
+        let zeroOnlyData = [ { x: 0, y: 0 }];
         dataset.data(zeroOnlyData);
-        plot.labelsEnabled(true);
-        plot.renderTo(svg);
+        barPlot.labelsEnabled(true);
+        barPlot.renderTo(svg);
 
-        let labels = plot.content().selectAll("text");
+        let labels = barPlot.content().selectAll("text");
         assert.strictEqual(labels.size(), 1, "one label drawn for data point");
         let labelPosition = (<SVGElement> labels.node()).getBoundingClientRect().bottom - window.Pixel_CloseTo_Requirement;
-        let linePosition = (<SVGElement> plot.content().select(".baseline").node()).getBoundingClientRect().top;
+        let linePosition = (<SVGElement> barPlot.content().select(".baseline").node()).getBoundingClientRect().top;
         assert.operator(labelPosition, "<=", linePosition, "label with value=baseline is drawn above the baseline");
         svg.remove();
       });
 
       it("bar labels are removed instantly on dataset change", (done) => {
-        plot.labelsEnabled(true);
-        plot.renderTo(svg);
-        let texts = svg.selectAll("text")[0].map((n: any) => d3.select(n).text());
-        assert.lengthOf(texts, 3, "all texts drawn");
-        let originalDrawLabels = (<any> plot)._drawLabels;
+        barPlot.labelsEnabled(true);
+        barPlot.renderTo(svg);
+        let texts = barPlot.content().selectAll("text");
+        assert.strictEqual(texts.size(), dataset.data().length, "one label drawn per datum");
+        let originalDrawLabels = (<any> barPlot)._drawLabels;
         let called = false;
-        (<any> plot)._drawLabels = () => {
+        (<any> barPlot)._drawLabels = () => {
           if (!called) {
-            originalDrawLabels.apply(plot);
-            texts = svg.selectAll("text")[0].map((n: any) => d3.select(n).text());
-            assert.lengthOf(texts, 3, "texts were repopulated by drawLabels after the update");
+            originalDrawLabels.apply(barPlot);
+            texts = barPlot.content().selectAll("text");
+            assert.strictEqual(texts.size(), dataset.data().length, "texts were repopulated by drawLabels after the update");
             svg.remove();
             called = true; // for some reason, in phantomJS, `done` was being called multiple times and this caused the test to fail.
             done();
           }
         };
-        dataset.data(data);
-        texts = svg.selectAll("text")[0].map((n: any) => d3.select(n).text());
-        assert.lengthOf(texts, 0, "texts were immediately removed");
+        dataset.data(dataset.data());
+        texts = barPlot.content().selectAll("text");
+        assert.strictEqual(texts.size(), 0, "texts were immediately removed");
       });
     });
 
