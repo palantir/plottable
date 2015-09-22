@@ -8708,7 +8708,7 @@ var Plottable;
                     var scaledBaseline = valueScale != null ? valueScale.scale(_this.baselineValue()) : _this.baselineValue();
                     var barWidth = attrToProjector["width"](d, i, dataset);
                     var barHeight = attrToProjector["height"](d, i, dataset);
-                    var text = _this._labelFormatter(valueAccessor(d, i, dataset)).toString();
+                    var text = _this._labelFormatter(valueAccessor(d, i, dataset));
                     var measurement = measurer.measure(text);
                     var xAlignment = "center";
                     var yAlignment = "center";

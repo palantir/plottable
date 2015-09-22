@@ -962,7 +962,7 @@ describe("Plots", () => {
 
       it("formatters are used properly", () => {
         barPlot.labelsEnabled(true);
-        let formatter = (n: number) => n.toString() + "%";
+        let formatter = (n: number) => `${n}%`;
         barPlot.labelFormatter(formatter);
         barPlot.renderTo(svg);
         let texts = barPlot.content().selectAll("text");
@@ -974,7 +974,7 @@ describe("Plots", () => {
         svg.remove();
       });
 
-      it("bar labels are shown inside or outside the bar as appropriate", () => {
+      it("shows labels inside or outside the bar as appropriate", () => {
         barPlot.labelsEnabled(true);
         barPlot.renderTo(svg);
 
