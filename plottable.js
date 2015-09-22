@@ -6751,7 +6751,7 @@ var Plottable;
     (function (Components) {
         var DragZoomLayer = (function (_super) {
             __extends(DragZoomLayer, _super);
-            /* Constructs a SelectionBoxLayer with an attached DragInteraction and ClickInteraction.
+            /* Constructs a SelectionBoxLayer with an attached DragInteraction and DoubleClickInteraction.
              * On drag, it triggers an animated zoom into the box that was dragged.
              * On double click, it zooms back out to the original view, before any zooming.
              * The zoom animation uses an easing function (default d3.ease("cubic-in-out")) and is customizable.
@@ -6777,7 +6777,7 @@ var Plottable;
                 this._dragInteraction.onDragStart(function (startPoint) {
                     _this.bounds({
                         topLeft: startPoint,
-                        bottomRight: startPoint,
+                        bottomRight: startPoint
                     });
                 });
                 this._dragInteraction.onDrag(function (startPoint, endPoint) {
@@ -6793,7 +6793,7 @@ var Plottable;
                     }
                     dragging = false;
                 });
-                this._doubleClickInteraction.onDoubleClick(this.unzoom.bind(this));
+                this._doubleClickInteraction.onDoubleClick(function () { return _this.unzoom(); });
             };
             DragZoomLayer.prototype.animationTime = function (animationTime) {
                 if (animationTime == null) {
@@ -6853,7 +6853,9 @@ var Plottable;
                 var y1s = this._yScale.domain()[1].valueOf();
                 // Copy a ref to the ease fn, so that changing ease wont affect zooms in progress
                 var ease = this.easeFn;
-                var interpolator = function (a, b, p) { return d3.interpolateNumber(a, b)(ease(p)); };
+                var interpolator = function (a, b, p) {
+                    return d3.interpolateNumber(a.valueOf(), b.valueOf())(ease(p));
+                };
                 this.isZooming(true);
                 var start = Date.now();
                 var draw = function () {

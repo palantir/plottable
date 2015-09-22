@@ -2625,12 +2625,11 @@ declare module Plottable {
 
 declare module Plottable {
     module Components {
+        type Numeric = number | {
+            valueOf(): number;
+        };
         class DragZoomLayer extends Components.SelectionBoxLayer {
-            constructor(xScale: QuantitativeScale<number | {
-                valueOf(): number;
-            }>, yScale: QuantitativeScale<number | {
-                valueOf(): number;
-            }>);
+            constructor(xScale: QuantitativeScale<Numeric>, yScale: QuantitativeScale<Numeric>);
             animationTime(): number;
             animationTime(animationTime: number): DragZoomLayer;
             ease(fn: (t: number) => number): DragZoomLayer;
