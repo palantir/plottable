@@ -2449,6 +2449,12 @@ declare module Plottable {
         }
         class SelectionBoxLayer extends Component {
             protected _box: d3.Selection<void>;
+            protected _xScale: QuantitativeScale<number | {
+                valueOf(): number;
+            }>;
+            protected _yScale: QuantitativeScale<number | {
+                valueOf(): number;
+            }>;
             protected _xBoundsMode: PropertyMode;
             protected _yBoundsMode: PropertyMode;
             constructor();
@@ -2612,6 +2618,22 @@ declare module Plottable {
              */
             pixelPosition(pixelPosition: number): GuideLineLayer<D>;
             destroy(): void;
+        }
+    }
+}
+
+
+declare module Plottable {
+    module Components {
+        class DragZoomLayer extends Components.SelectionBoxLayer {
+            constructor(xScale: QuantitativeScale<number | {
+                valueOf(): number;
+            }>, yScale: QuantitativeScale<number | {
+                valueOf(): number;
+            }>);
+            animationTime(): number;
+            animationTime(animationTime: number): DragZoomLayer;
+            ease(fn: (t: number) => number): DragZoomLayer;
         }
     }
 }
