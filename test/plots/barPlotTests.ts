@@ -747,6 +747,20 @@ describe("Plots", () => {
         barPlot.renderTo(svg);
       });
 
+      it("shows both inner and outer labels", () => {
+        barPlot.renderTo(svg);
+
+        let texts = svg.selectAll("text");
+        assert.strictEqual(texts.size(), 2, "There should be two labels rendered");
+
+        let offBarLabelCount = d3.selectAll(".off-bar-label")[0].length;
+        assert.strictEqual(offBarLabelCount, 1, "There should be 1 labels rendered outside the bar");
+
+        let onBarLabelCount = d3.selectAll(".on-bar-label")[0].length;
+        assert.strictEqual(onBarLabelCount, 1, "There should be 1 labels rendered inside the bar");
+        svg.remove();
+      });
+
       it("hides labels properly on the right", () => {
         xScale.domainMax(0.95);
         let texts = svg.selectAll("text");
@@ -774,20 +788,6 @@ describe("Plots", () => {
         assert.strictEqual(label1.style("visibility"), "hidden", "label 2 is not visible");
         assert.include(["visible", "inherit"], label2.style("visibility"), "label 1 is visible");
 
-        svg.remove();
-      });
-
-      it("shows both inner and outer labels", () => {
-        barPlot.renderTo(svg);
-
-        let texts = svg.selectAll("text");
-        assert.strictEqual(texts.size(), 2, "There should be two labels rendered");
-
-        let offBarLabelCount = d3.selectAll(".off-bar-label")[0].length;
-        assert.strictEqual(offBarLabelCount, 1, "There should be 1 labels rendered outside the bar");
-
-        let onBarLabelCount = d3.selectAll(".on-bar-label")[0].length;
-        assert.strictEqual(onBarLabelCount, 1, "There should be 1 labels rendered inside the bar");
         svg.remove();
       });
 
