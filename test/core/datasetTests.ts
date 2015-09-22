@@ -56,4 +56,23 @@ describe("Dataset", () => {
     ds.data(newData2);
     assert.isFalse(callbackCalled, "callback was called when the data was changed");
   });
+  describe("key", () => {
+    it("Updates listeners when the key is changed", () => {
+      let ds = new Plottable.Dataset();
+
+      let newKey = (d: any, i: number) => { return i * i; };
+
+      let callbackCalled = false;
+      let callback = (listenable: Plottable.Dataset) => {
+        assert.strictEqual(listenable, ds, "Callback received the Dataset as the first argument");
+        assert.deepEqual(ds.key(), newKey, "Dataset arrives with correct key");
+        callbackCalled = true;
+      };
+      ds.onUpdate(callback);
+
+      ds.key(newKey);
+      assert.isTrue(callbackCalled, "callback was called when the key was changed");
+    });
+
+  });
 });
