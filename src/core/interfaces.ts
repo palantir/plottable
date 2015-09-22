@@ -72,4 +72,7 @@ export interface Entity<C extends Component> {
   selection: d3.Selection<any>;
   component: C;
 }
+
+export type Numeric = number | {valueOf(): number};
+
 }

@@ -595,6 +595,9 @@ declare module Plottable {
         selection: d3.Selection<any>;
         component: C;
     }
+    type Numeric = number | {
+        valueOf(): number;
+    };
 }
 
 
@@ -2625,9 +2628,6 @@ declare module Plottable {
 
 declare module Plottable {
     module Components {
-        type Numeric = number | {
-            valueOf(): number;
-        };
         class DragZoomLayer extends Components.SelectionBoxLayer {
             constructor(xScale: QuantitativeScale<Numeric>, yScale: QuantitativeScale<Numeric>);
             animationTime(): number;
