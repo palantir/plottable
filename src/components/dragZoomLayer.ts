@@ -2,7 +2,6 @@
 
 module Plottable {
 export module Components {
-  export type Numeric = number | {valueOf(): number};
   export class DragZoomLayer extends Components.SelectionBoxLayer {
     private _dragInteraction: Interactions.Drag;
     private _doubleClickInteraction: Interactions.DoubleClick;
