@@ -2,24 +2,25 @@
 
 module Plottable {
 export module Components {
+  export type Numeric = number | {valueOf(): number};
   export class DragZoomLayer extends Components.SelectionBoxLayer {
     private _dragInteraction: Interactions.Drag;
     private _doubleClickInteraction: Interactions.DoubleClick;
-    private xDomainToRestore: any[];
-    private yDomainToRestore: any[];
+    private xDomainToRestore: Numeric[];
+    private yDomainToRestore: Numeric[];
     private isZoomed = false;
     private easeFn: (t: number) => number = d3.ease("cubic-in-out");
     private _animationTime = 750;
 
-    /* Constructs a SelectionBoxLayer with an attached DragInteraction and ClickInteraction.
+    /* Constructs a SelectionBoxLayer with an attached DragInteraction and DoubleClickInteraction.
      * On drag, it triggers an animated zoom into the box that was dragged.
      * On double click, it zooms back out to the original view, before any zooming.
      * The zoom animation uses an easing function (default d3.ease("cubic-in-out")) and is customizable.
      * Usage: Construct the selection box layer and attach x and y scales, and then add the layer
      * over the plot you are zooming on using a Component Group.
      */
-    constructor(xScale: QuantitativeScale<number | { valueOf(): number }>,
-                yScale: QuantitativeScale<number | { valueOf(): number }>) {
+    constructor(xScale: QuantitativeScale<Numeric>,
+                yScale: QuantitativeScale<Numeric>) {
       super();
       this.xScale(xScale);
       this.yScale(yScale);
@@ -35,7 +36,7 @@ export module Components {
       this._dragInteraction.onDragStart((startPoint: Point) => {
         this.bounds({
           topLeft: startPoint,
-          bottomRight: startPoint,
+          bottomRight: startPoint
         });
       });
       this._dragInteraction.onDrag((startPoint, endPoint) => {
@@ -52,7 +53,7 @@ export module Components {
         dragging = false;
       });
 
-      this._doubleClickInteraction.onDoubleClick(this.unzoom.bind(this));
+      this._doubleClickInteraction.onDoubleClick(() => this.unzoom());
     }
 
     /* Set the time (in ms) over which the zoom will interpolate.
@@ -118,7 +119,7 @@ export module Components {
       this._doubleClickInteraction.enabled(!isZooming);
     }
 
-    private interpolateZoom(x0f: number, x1f: number, y0f: number, y1f: number) {
+    private interpolateZoom(x0f: Numeric, x1f: Numeric, y0f: Numeric, y1f: Numeric) {
       let x0s: number = this._xScale.domain()[0].valueOf();
       let x1s: number = this._xScale.domain()[1].valueOf();
       let y0s: number = this._yScale.domain()[0].valueOf();
@@ -126,8 +127,9 @@ export module Components {
 
       // Copy a ref to the ease fn, so that changing ease wont affect zooms in progress
       let ease = this.easeFn;
-      let interpolator = (a: number, b: number, p: number) => d3.interpolateNumber(a, b)(ease(p));
-
+      let interpolator = (a: Numeric, b: Numeric, p: number): number => {
+        return d3.interpolateNumber(a.valueOf(), b.valueOf())(ease(p));
+      };
       this.isZooming(true);
       let start = Date.now();
       let draw = () => {

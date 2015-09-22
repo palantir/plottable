@@ -15,9 +15,19 @@ describe("Interactive Components", () => {
 
     beforeEach(() => {
       svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+
       xScale = new Plottable.Scales.Linear();
       yScale = new Plottable.Scales.Linear();
+      xScale.domain([0, 1]);
+      yScale.domain([0, 1]);
+      xScale.range([0, SVG_WIDTH]);
+      yScale.range([SVG_HEIGHT, 0]);
+
       dzl = new Plottable.Components.DragZoomLayer(xScale, yScale);
+      dzl.animationTime(0);
+      dzl.renderTo(svg);
+      target = dzl.background();
+
       quarterPoint = {
         x: SVG_WIDTH / 4,
         y: SVG_HEIGHT / 4
@@ -26,13 +36,6 @@ describe("Interactive Components", () => {
         x: SVG_WIDTH / 2,
         y: SVG_HEIGHT / 2
       };
-      dzl.renderTo(svg);
-      dzl.animationTime(0);
-      target = dzl.background();
-      xScale.domain([0, 1]);
-      yScale.domain([0, 1]);
-      xScale.range([0, SVG_WIDTH]);
-      yScale.range([SVG_HEIGHT, 0]);
     });
 
     it("zooms on drag", () => {
@@ -79,7 +82,7 @@ describe("Interactive Components", () => {
         if (domain[0] === 0.25 && domain[1] === 0.5) {
           assert.operator(interpolations, ">", 1, "multiple interpolation steps occured");
           svg.remove();
-          done()
+          done();
         }
       };
       xScale.onUpdate(step);
@@ -92,7 +95,7 @@ describe("Interactive Components", () => {
         let domain = xScale.domain();
         if (domain[0] === 0.25 && domain[1] === 0.5) {
           svg.remove();
-          done()
+          done();
         }
       };
       xScale.onUpdate(step);
@@ -112,11 +115,18 @@ describe("Interactive Components", () => {
         let domain = xScale.domain();
         if (domain[0] === 0 && domain[1] === 1) {
           svg.remove();
-          done()
+          done();
         }
       };
       xScale.onUpdate(step);
       doubleClick(target, halfPoint);
+    });
+
+    it("complains if an invalid ease fn is used", () => {
+      let badEase = (x: number) => 2 * x;
+      let invalid = () => dzl.ease(badEase);
+      TestMethods.assertWarns(invalid, "Easing function does not maintain invariant", "should get warning");
+      svg.remove();
     });
 
     function doubleClick(target: d3.Selection<void>, point: Plottable.Point) {

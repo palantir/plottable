@@ -32,10 +32,10 @@
 ///<reference path="components/selectionBoxLayerTests.ts" />
 ///<reference path="components/groupTests.ts" />
 ///<reference path="components/componentTests.ts" />
-///<reference path="components/dragZoomLayerTests.ts" />
 ///<reference path="components/tableTests.ts" />
 ///<reference path="components/guideLineLayerTests.ts" />
 ///<reference path="components/plotGroupTests.ts" />
+
 ///<reference path="plots/plotTests.ts" />
 ///<reference path="plots/xyPlotTests.ts" />
 ///<reference path="plots/piePlotTests.ts" />
