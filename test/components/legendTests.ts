@@ -256,7 +256,7 @@ describe("Legend", () => {
 
   it("can set which formatter to use to change how entry labels are displayed", () => {
     color.domain(["jtao", "mschafer", "kfalter"]);
-    let data: { [id: string]: string; } = {"jtao": "Joy", "mschafer":  "Mark", "kfalter": "Kelsey"};
+    let data: {[id: string]: string; } = {"jtao": "Joy", "mschafer":  "Mark", "kfalter": "Kelsey"};
     let formatter = (id: string) => {
         return data[id];
     };
@@ -271,9 +271,9 @@ describe("Legend", () => {
     svg.remove();
   });
 
-it("can get formatter of the legend using formatter()", () => {
+  it("can get formatter of the legend using formatter()", () => {
     color.domain(["jtao", "mschafer", "kfalter"]);
-    let data: { [id: string]: string; } = {"jtao": "Joy", "mschafer": "Mark", "kfalter": "Kelsey"};
+    let data: {[id: string]: string; } = {"jtao": "Joy", "mschafer": "Mark", "kfalter": "Kelsey"};
     let formatter = (id: string) => {
         return data[id];
     };
@@ -281,7 +281,7 @@ it("can get formatter of the legend using formatter()", () => {
     legend.renderTo(svg);
     assert.strictEqual(legend.formatter(), formatter, "formatter() return the formatter of legend correctly");
     svg.remove();
-});
+  });
 
   describe("entitiesAt()", () => {
     function computeExpectedSymbolPosition(legend: Plottable.Components.Legend, rowIndex: number, entryIndexWithinRow: number) {
