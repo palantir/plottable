@@ -104,7 +104,7 @@ module Plottable {
     /**
      * Sets the key.
      *
-     * @param {any} key
+     * @param { (d: any, i: number) => any} key
      * @returns {Dataset} The calling Dataset.
      */
     public key(key: (datum: any, index: number) => any): Dataset;
