@@ -726,16 +726,33 @@ describe("Plots", () => {
       let svg: d3.Selection<void>;
       let yScale: Plottable.Scales.Linear;
       let xScale: Plottable.Scales.Linear;
+      let DEFAULT_DOMAIN = [-5, 5];
       let barPlot: Plottable.Plots.Bar<number, number>;
       let dataset: Plottable.Dataset;
+
+      let getCenterOfText = (textNode: SVGElement) => {
+        let plotBoundingClientRect = (<SVGElement> barPlot.background().node()).getBoundingClientRect();
+        let labelBoundingClientRect = textNode.getBoundingClientRect();
+
+        return {
+          x: (labelBoundingClientRect.left + labelBoundingClientRect.right) / 2 - plotBoundingClientRect.left,
+          y: (labelBoundingClientRect.top + labelBoundingClientRect.bottom) / 2 - plotBoundingClientRect.top
+        };
+      };
+
       beforeEach(() => {
-        svg = TestMethods.generateSVG(600, 400);
+        svg = TestMethods.generateSVG();
         yScale = new Plottable.Scales.Linear();
+        yScale.domain(DEFAULT_DOMAIN);
         xScale = new Plottable.Scales.Linear();
+        xScale.domain(DEFAULT_DOMAIN);
 
         let data = [
-          {y: 1, x: -1.5},
-          {y: 2, x: 100}
+          { y: -4, x: -4 },
+          { y: -2, x: -0.1},
+          { y: 0, x: 0 },
+          { y: 2, x: 0.1 },
+          { y: 4, x: 4 }
         ];
 
         barPlot = new Plottable.Plots.Bar<number, number>(Plottable.Plots.Bar.ORIENTATION_HORIZONTAL);
@@ -750,49 +767,71 @@ describe("Plots", () => {
       it("shows both inner and outer labels", () => {
         barPlot.renderTo(svg);
 
-        let texts = svg.selectAll("text");
-        assert.strictEqual(texts.size(), 2, "There should be two labels rendered");
+        let texts = barPlot.content().selectAll("text");
+        assert.strictEqual(texts.size(), dataset.data().length, "one label drawn per datum");
 
-        let offBarLabelCount = d3.selectAll(".off-bar-label")[0].length;
-        assert.strictEqual(offBarLabelCount, 1, "There should be 1 labels rendered outside the bar");
+        let offBarLabels = barPlot.content().selectAll(".off-bar-label");
+        assert.strictEqual(offBarLabels.size(), 3, "there are 3 off-bar labels");
 
-        let onBarLabelCount = d3.selectAll(".on-bar-label")[0].length;
-        assert.strictEqual(onBarLabelCount, 1, "There should be 1 labels rendered inside the bar");
+        let onBarLabels = barPlot.content().selectAll(".on-bar-label");
+        assert.strictEqual(onBarLabels.size(), 2, "there are 2 on-bar labels");
         svg.remove();
       });
 
-      it("hides labels properly on the right", () => {
-        xScale.domainMax(0.95);
-        let texts = svg.selectAll("text");
+      it("hides labels cut off by the right edge", () => {
+        dataset.data().forEach((d, i) => {
+          let texts = svg.selectAll("text");
+          let centerOfText = getCenterOfText(<SVGElement> texts[0][i]);
+          let centerXValue = xScale.invert(centerOfText.x);
+          xScale.domain([centerXValue - (DEFAULT_DOMAIN[1] - DEFAULT_DOMAIN[0]), centerXValue]);
 
-        assert.strictEqual(texts.size(), 2, "There should be two labels rendered");
-
-        let label1 = d3.select(texts[0][0]);
-        let label2 = d3.select(texts[0][1]);
-
-        assert.include(["visible", "inherit"], label1.style("visibility"), "label 1 is visible");
-        assert.strictEqual(label2.style("visibility"), "hidden", "label 2 is not visible");
-
+          texts = svg.selectAll("text"); // re-select after rendering
+          assert.strictEqual(d3.select(texts[0][i]).style("visibility"), "hidden", `label for bar with index ${i} is hidden`);
+        })
         svg.remove();
       });
 
-      it("hides labels properly on the left", () => {
-        xScale.domainMin(-1.4);
-        let texts = svg.selectAll("text");
+      it("hides labels cut off by the left edge", () => {
+        dataset.data().forEach((d, i) => {
+          let texts = svg.selectAll("text");
+          let centerOfText = getCenterOfText(<SVGElement> texts[0][i]);
+          let centerXValue = xScale.invert(centerOfText.x);
+          xScale.domain([centerXValue, centerXValue + (DEFAULT_DOMAIN[1] - DEFAULT_DOMAIN[0])]);
 
-        assert.strictEqual(texts.size(), 2, "There should be two labels rendered");
+          texts = svg.selectAll("text"); // re-select after rendering
+          assert.strictEqual(d3.select(texts[0][i]).style("visibility"), "hidden", `label for bar with index ${i} is hidden`);
+        });
+        svg.remove();
+      });
 
-        let label1 = d3.select(texts[0][0]);
-        let label2 = d3.select(texts[0][1]);
+      it("hides labels cut off by the top edge", () => {
+        dataset.data().forEach((d, i) => {
+          let texts = svg.selectAll("text");
+          let centerOfText = getCenterOfText(<SVGElement> texts[0][i]);
+          let centerYValue = yScale.invert(centerOfText.y);
+          yScale.domain([centerYValue - (DEFAULT_DOMAIN[1] - DEFAULT_DOMAIN[0]), centerYValue]);
 
-        assert.strictEqual(label1.style("visibility"), "hidden", "label 2 is not visible");
-        assert.include(["visible", "inherit"], label2.style("visibility"), "label 1 is visible");
+          texts = svg.selectAll("text"); // re-select after rendering
+          assert.strictEqual(d3.select(texts[0][i]).style("visibility"), "hidden", `label for bar with index ${i} is hidden`);
+        })
+        svg.remove();
+      });
 
+      it("hides labels cut off by the bottom edge", () => {
+        dataset.data().forEach((d, i) => {
+          let texts = svg.selectAll("text");
+          let centerOfText = getCenterOfText(<SVGElement> texts[0][i]);
+          let centerYValue = yScale.invert(centerOfText.y);
+          yScale.domain([centerYValue, centerYValue + (DEFAULT_DOMAIN[1] - DEFAULT_DOMAIN[0])]);
+
+          texts = svg.selectAll("text"); // re-select after rendering
+          assert.strictEqual(d3.select(texts[0][i]).style("visibility"), "hidden", `label for bar with index ${i} is hidden`);
+        })
         svg.remove();
       });
 
       it("shows labels for bars with value = baseline on the \"positive\" side of the baseline", () => {
-        let zeroOnlyData = [ { x: 0, y: 0 }];
+        let zeroOnlyData = [ { x: 0, y: 0 } ];
         dataset.data(zeroOnlyData);
         barPlot.labelsEnabled(true);
         barPlot.renderTo(svg);
@@ -802,23 +841,6 @@ describe("Plots", () => {
         let labelPosition = (<SVGElement> labels.node()).getBoundingClientRect().left + window.Pixel_CloseTo_Requirement;
         let linePosition = (<SVGElement> barPlot.content().select(".baseline").node()).getBoundingClientRect().right;
         assert.operator(labelPosition, ">=", linePosition, "label with value=baseline is drawn to the right of the baseline");
-        svg.remove();
-      });
-
-      it("hides labels that are partially cut off in y", () => {
-        yScale.domain([1, 2]);
-        let texts = barPlot.content().selectAll("text");
-
-        assert.strictEqual(texts.size(), 2, "There should be two labels rendered");
-
-        texts.each(function(d, i) {
-          let textBounding = (<Element> this).getBoundingClientRect();
-          let svgBounding = (<Element> barPlot.background().node()).getBoundingClientRect();
-          let isLabelCutOff = (textBounding.top < svgBounding.top && textBounding.bottom > svgBounding.top)
-            || (textBounding.top < svgBounding.bottom && textBounding.bottom > svgBounding.bottom);
-          assert.isTrue(isLabelCutOff, `label ${i} is partially cut off`);
-          assert.strictEqual(d3.select(this).style("visibility"), "hidden", `label ${i} is not visible`);
-        });
         svg.remove();
       });
     });
