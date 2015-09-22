@@ -196,7 +196,7 @@ describe("Dispatchers", () => {
         svg.remove();
       });
 
-      it("can register two callbacks for the samme mouse dispatcher", () => {
+      it("can register two callbacks for the same mouse dispatcher", () => {
         let cb1Called = false;
         let cb1 = () => cb1Called = true;
         let cb2Called = false;
