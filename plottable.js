@@ -5456,7 +5456,7 @@ var Plottable;
                 this._writer = new SVGTypewriter.Writers.Writer(this._measurer, this._wrapper).addTitleElement(Plottable.Configs.ADD_TITLE_ELEMENTS);
             };
             Legend.prototype.formatter = function (formatter) {
-                if (formatter === null) {
+                if (formatter === undefined) {
                     return this._formatter;
                 }
                 this._formatter = formatter;
@@ -5735,7 +5735,7 @@ var Plottable;
                 this._scale.offUpdate(this._redrawCallback);
             };
             InterpolatedColorLegend.prototype.formatter = function (formatter) {
-                if (formatter === null) {
+                if (formatter === undefined) {
                     return this._formatter;
                 }
                 this._formatter = formatter;

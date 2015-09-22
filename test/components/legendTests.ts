@@ -254,33 +254,34 @@ describe("Legend", () => {
     svg.remove();
   });
 
-  it("accept formatter and show entity labels correcly", () => {
+  it("can set which formatter to use to change how entry labels are displayed", () => {
     color.domain(["jtao", "mschafer", "kfalter"]);
-    let data = [
-      {id: "jtao", name: "Joy Tao", score: 13},
-      {id: "mschafer", name: "Mark Schafer", score: 15},
-      {id: "kfalter", name: "Kelsey Falter", score: 11}
-    ];
-    let f = (id: string) => {
-      let pickedEntity = data.filter(function(d) {return (d.id === id); });
-      if (pickedEntity.length > 0) {
-          return pickedEntity[0].name;
-        }else {
-          return "NA";
-        }
+    let data : { [id: string]: string; } = {"jtao":"Joy", "mschafer":"Mark", "kfalter":"Kelsey"};
+    let formatter = (id: string) => {
+        return data[id];
     };
-    legend.formatter(f);
+    legend.formatter(formatter);
     legend.renderTo(svg);
 
-    let texts = svg.selectAll("title")[0].map(function(text: Element) {return text.textContent; });
-    data.forEach(function(d, i) {
-      let idExist = (texts.indexOf(d.id) !== -1);
-      let nameExist = (texts.indexOf(d.name) !== -1);
-      assert.isTrue(nameExist, `formatter output ${d.name} should be drawn`);
-      assert.isFalse(idExist, ` formatter input ${d.id} should not be drawn`);
-    });
+    let legendRows = svg.selectAll(".legend_row");
+    legendRows.each(function(d:Element, i:number){
+      let expectText = formatter(legend.colorScale().domain()[i]);
+      assert.strictEqual(this.text(), expectText,`formatter ${this.text} show correctly`);
+    })
      svg.remove();
   });
+  
+it("can get formatter of the legend using formatter()", () => {
+    color.domain(["jtao", "mschafer", "kfalter"]);
+    let data : { [id: string]: string; } = {"jtao":"Joy", "mschafer":"Mark", "kfalter":"Kelsey"};
+    let formatter = (id: string) => {
+        return data[id];
+    };
+    legend.formatter(formatter);
+    legend.renderTo(svg);
+    assert.strictEqual(legend.formatter(), formatter, "formatter() return the formatter of legend correctly");
+    svg.remove();
+});
 
   describe("entitiesAt()", () => {
     function computeExpectedSymbolPosition(legend: Plottable.Components.Legend, rowIndex: number, entryIndexWithinRow: number) {
