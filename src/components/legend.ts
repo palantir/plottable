@@ -75,7 +75,7 @@ export module Components {
      */
     public formatter(formatter: Formatter): Legend;
     public formatter(formatter?: Formatter): any {
-      if (formatter === undefined) {
+      if (formatter == null) {
         return this._formatter;
       }
       this._formatter = formatter;
