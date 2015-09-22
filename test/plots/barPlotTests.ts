@@ -764,17 +764,23 @@ describe("Plots", () => {
         barPlot.renderTo(svg);
       });
 
-      it("shows both inner and outer labels", () => {
+      it("shows labels inside or outside the bar as appropriate", () => {
         barPlot.renderTo(svg);
 
-        let texts = barPlot.content().selectAll("text");
-        assert.strictEqual(texts.size(), dataset.data().length, "one label drawn per datum");
+        let labels = barPlot.content().selectAll(".on-bar-label, .off-bar-label");
+        assert.strictEqual(labels.size(), dataset.data().length, "one label drawn per datum");
 
-        let offBarLabels = barPlot.content().selectAll(".off-bar-label");
-        assert.strictEqual(offBarLabels.size(), 3, "there are 3 off-bar labels");
+        let bars = barPlot.content().select(".bar-area").selectAll("rect");
+        labels.each((d, i) => {
+          let labelBoundingClientRect = (<SVGElement> labels[0][i]).getBoundingClientRect();
+          let barBoundingClientRect = (<SVGElement> bars[0][i]).getBoundingClientRect();
+          if (labelBoundingClientRect.width > barBoundingClientRect.width) {
+            assert.isTrue(d3.select(labels[0][i]).classed("off-bar-label"), `label with index ${i} doesn't fit and carries the off-bar class`);
+          } else {
+            assert.isTrue(d3.select(labels[0][i]).classed("on-bar-label"), `label with index ${i} fits and carries the on-bar class`);
+          }
+        });
 
-        let onBarLabels = barPlot.content().selectAll(".on-bar-label");
-        assert.strictEqual(onBarLabels.size(), 2, "there are 2 on-bar labels");
         svg.remove();
       });
 
@@ -978,14 +984,20 @@ describe("Plots", () => {
         barPlot.labelsEnabled(true);
         barPlot.renderTo(svg);
 
-        let texts = barPlot.content().selectAll("text");
-        assert.strictEqual(texts.size(), dataset.data().length, "one label drawn per datum");
+        let labels = barPlot.content().selectAll(".on-bar-label, .off-bar-label");
+        assert.strictEqual(labels.size(), dataset.data().length, "one label drawn per datum");
 
-        let offBarLabels = barPlot.content().selectAll(".off-bar-label");
-        assert.strictEqual(offBarLabels.size(), 3, "there are 3 off-bar labels");
+        let bars = barPlot.content().select(".bar-area").selectAll("rect");
+        labels.each((d, i) => {
+          let labelBoundingClientRect = (<SVGElement> labels[0][i]).getBoundingClientRect();
+          let barBoundingClientRect = (<SVGElement> bars[0][i]).getBoundingClientRect();
+          if (labelBoundingClientRect.height > barBoundingClientRect.height) {
+            assert.isTrue(d3.select(labels[0][i]).classed("off-bar-label"), `label with index ${i} doesn't fit and carries the off-bar class`);
+          } else {
+            assert.isTrue(d3.select(labels[0][i]).classed("on-bar-label"), `label with index ${i} fits and carries the on-bar class`);
+          }
+        });
 
-        let onBarLabels = barPlot.content().selectAll(".on-bar-label");
-        assert.strictEqual(onBarLabels.size(), 2, "there are 2 on-bar labels");
         svg.remove();
       });
 
