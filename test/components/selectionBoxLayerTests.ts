@@ -59,7 +59,7 @@ describe("Interactive Components", () => {
       });
 
       it("updates the clipPath reference when render()-ed", () => {
-        // HACKHACK not supported on IE9 (http://caniuse.com/#feat=history)
+        // HACKHACK: History and history API not supported on IE9 (http://caniuse.com/#feat=history)
         if (window.history == null ||  window.history.replaceState == null) {
           svg.remove();
           return;
