@@ -4428,17 +4428,15 @@ var Plottable;
                 var tickLabelsEnter = tickLabels.enter().append("g").classed(Plottable.Axis.TICK_LABEL_CLASS, true);
                 tickLabelsEnter.append("text");
                 var xTranslate = (this._tierLabelPositions[index] === "center" || config.step === 1) ? 0 : this.tickLabelPadding();
-                var yTranslate = 0;
+                var yTranslate;
                 if (this.orientation() === "bottom") {
                     yTranslate = d3.sum(this._tierHeights.slice(0, index + 1)) - this.tickLabelPadding();
                 }
+                else if (this._tierLabelPositions[index] === "center") {
+                    yTranslate = this.height() - d3.sum(this._tierHeights.slice(0, index)) - this.tickLabelPadding() - this.innerTickLength();
+                }
                 else {
-                    if (this._tierLabelPositions[index] === "center") {
-                        yTranslate = this.height() - d3.sum(this._tierHeights.slice(0, index)) - this.tickLabelPadding() - this.innerTickLength();
-                    }
-                    else {
-                        yTranslate = this.height() - d3.sum(this._tierHeights.slice(0, index)) - this.tickLabelPadding();
-                    }
+                    yTranslate = this.height() - d3.sum(this._tierHeights.slice(0, index)) - this.tickLabelPadding();
                 }
                 var textSelection = tickLabels.selectAll("text");
                 if (textSelection.size() > 0) {

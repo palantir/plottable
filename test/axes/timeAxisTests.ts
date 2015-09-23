@@ -152,7 +152,7 @@ describe("TimeAxis", () => {
   it("tick labels do not overlap with tick marks in top orientation", () => {
     let svg = TestMethods.generateSVG(400, 100);
     scale.domain([new Date("2010-01-01"), new Date("2014-01-01")]);
-    axis = new Plottable.Axes.Time(scale, "top");
+    axis.orientation("top");
 
     function checkTierDisplayPosition (tierDisplayPositions: string[]) {
       axis.tierLabelPositions(tierDisplayPositions);
@@ -161,34 +161,25 @@ describe("TimeAxis", () => {
       style.attr("type", "text/css");
       style.text(".plottable .axis.time-axis text { font-family: Arial; }");
       let tickMarks = d3.selectAll(`.${Plottable.Axis.TICK_MARK_CLASS}:not(.${Plottable.Axis.END_TICK_MARK_CLASS})`);
-      assert.operator(tickMarks.size(), ">=", 1, "There are at least one tick marks in the test");
-      let tickLabels = d3.selectAll(`.${Plottable.Axis.TICK_LABEL_CLASS}`)
-      .filter(function(d, i){
+      assert.operator(tickMarks.size(), ">=", 1, "There is at least one tick mark in the test");
+      let tickLabels = d3.selectAll(`.${Plottable.Axis.TICK_LABEL_CLASS}`).filter(function(d, i){
         return window.getComputedStyle(this).visibility !== "hidden";
       });
-      assert.operator(tickLabels.size(), ">=", 1, `There are at least one tick labels in the test`);
+      assert.operator(tickLabels.size(), ">=", 1, `There is at least one tick label in the test`);
 
       function clientRectsOverlap(clientRectA: ClientRect, clientRectB: ClientRect) {
-        if (clientRectA.right < clientRectB.left + window.Pixel_CloseTo_Requirement) {
-            return false;
-        }
-        if (window.Pixel_CloseTo_Requirement + clientRectA.left > clientRectB.right) {
-            return false;
-        }
-        if (clientRectA.bottom < clientRectB.top + window.Pixel_CloseTo_Requirement) {
-            return false;
-        }
-        if (window.Pixel_CloseTo_Requirement + clientRectA.top > clientRectB.bottom) {
-            return false;
-        }
-        return true;
-      }
+        return !(clientRectA.right < clientRectB.left + window.Pixel_CloseTo_Requirement)
+               && !(window.Pixel_CloseTo_Requirement + clientRectA.left > clientRectB.right)
+               && !(clientRectA.bottom < clientRectB.top + window.Pixel_CloseTo_Requirement)
+               && !(window.Pixel_CloseTo_Requirement + clientRectA.top > clientRectB.bottom);
+     }
+
       tickMarks.each(function(tickMark) {
         let tickMarkRect = this.getBoundingClientRect();
         tickLabels.each(function(tickLabel) {
           let tickLabelRect = this.getBoundingClientRect();
-          let isOverlap = clientRectsOverlap(tickMarkRect, tickLabelRect);
-          assert.isFalse(isOverlap, `Tick marks "${tickMark}" should not overlap with tick labels "${this.textContent}"`);
+          assert.isFalse(clientRectsOverlap(tickMarkRect, tickLabelRect),
+            `Tick marks [${tickMark}] should not overlap with tick labels [${this.textContent}]`);
         });
       });
     }
