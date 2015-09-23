@@ -4,14 +4,14 @@ describe("Interactive Components", () => {
   describe("SelectionBoxLayer", () => {
 
     describe("Basic Usage", () => {
-      let svgWidth = 500;
-      let svgHeight = 500;
+      let SVG_WIDTH = 500;
+      let SVG_HEIGHT = 500;
 
       let svg: d3.Selection<void>;
       let sbl: Plottable.Components.SelectionBoxLayer;
 
       beforeEach(() => {
-        svg = TestMethods.generateSVG(svgWidth, svgHeight);
+        svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
         sbl = new Plottable.Components.SelectionBoxLayer();
       });
 
@@ -45,6 +45,44 @@ describe("Interactive Components", () => {
         assert.isTrue(selectionBox.empty(), "box is removed from DOM when not showing");
 
         sbl.destroy();
+        svg.remove();
+      });
+
+      it("generates the correct clipPath", () => {
+        sbl.renderTo(svg);
+
+        TestMethods.verifyClipPath(sbl);
+        let clipRect = (<any> sbl)._boxContainer.select(".clip-rect");
+        assert.strictEqual(TestMethods.numAttr(clipRect, "width"), SVG_WIDTH, "the clipRect has an appropriate width");
+        assert.strictEqual(TestMethods.numAttr(clipRect, "height"), SVG_HEIGHT, "the clipRect has an appropriate height");
+        svg.remove();
+      });
+
+      it("updates the clipPath reference when render()-ed", () => {
+        // HACKHACK not supported on IE9 (http://caniuse.com/#feat=history)
+        if (window.history == null ||  window.history.replaceState == null) {
+          svg.remove();
+          return;
+        }
+
+        sbl.renderTo(svg);
+
+        let originalState = window.history.state;
+        let originalTitle = document.title;
+        let originalLocation = document.location.href;
+        window.history.replaceState(null, null, "clipPathTest");
+        sbl.render();
+
+        let clipPathId = (<any> sbl)._boxContainer[0][0].firstChild.id;
+        let expectedPrefix = /MSIE [5-9]/.test(navigator.userAgent) ? "" : document.location.href;
+        expectedPrefix = expectedPrefix.replace(/#.*/g, "");
+        let expectedClipPathURL = "url(" + expectedPrefix + "#" + clipPathId + ")";
+
+        window.history.replaceState(originalState, originalTitle, originalLocation);
+
+        let normalizeClipPath = (s: string) => s.replace(/"/g, "");
+        assert.strictEqual(normalizeClipPath((<any> sbl)._element.attr("clip-path")), expectedClipPathURL,
+          "the clipPath reference was updated");
         svg.remove();
       });
 
@@ -163,7 +201,7 @@ describe("Interactive Components", () => {
       it("can set the xScale() property", () => {
         let xScale = new Plottable.Scales.Linear();
         xScale.domain([0, 2000]);
-        xScale.range([0, svgWidth]);
+        xScale.range([0, SVG_WIDTH]);
 
         assert.isUndefined(sbl.xScale(), "no xScale is specified by default");
         assert.strictEqual(sbl.xScale(xScale), sbl, "setting the xScale returns the selection box layer");
@@ -188,7 +226,7 @@ describe("Interactive Components", () => {
       it("can set the data values of the left and right sides directly", () => {
         let xScale = new Plottable.Scales.Linear();
         xScale.domain([0, 2000]);
-        xScale.range([0, svgWidth]);
+        xScale.range([0, SVG_WIDTH]);
 
         sbl.boxVisible(true);
         sbl.xScale(xScale);
@@ -216,7 +254,7 @@ describe("Interactive Components", () => {
       it("uses the data values for the left and right sides if they were set last", () => {
         let xScale = new Plottable.Scales.Linear();
         xScale.domain([0, 2000]);
-        xScale.range([0, svgWidth]);
+        xScale.range([0, SVG_WIDTH]);
         sbl.xScale(xScale);
 
         let bounds = {
@@ -245,7 +283,7 @@ describe("Interactive Components", () => {
       it("updates left and right edge pixel positions if in VALUE mode and scale is switched", () => {
         let xScale = new Plottable.Scales.Linear();
         xScale.domain([0, 2000]);
-        xScale.range([0, svgHeight]);
+        xScale.range([0, SVG_HEIGHT]);
         sbl.xScale(xScale);
 
         let xExtent = [100, 250];
@@ -257,7 +295,7 @@ describe("Interactive Components", () => {
 
         let xScale2 = new Plottable.Scales.ModifiedLog();
         xScale2.domain([0, 1000]);
-        xScale2.range([0, svgHeight]);
+        xScale2.range([0, SVG_HEIGHT]);
 
         sbl.xScale(xScale2);
         assert.notStrictEqual(sbl.bounds().topLeft.x, leftPosition, "left pixel position changed");
@@ -272,7 +310,7 @@ describe("Interactive Components", () => {
       it("updates left and right edge pixel positions if in VALUE mode and scale updates", () => {
         let xScale = new Plottable.Scales.Linear();
         xScale.domain([0, 2000]);
-        xScale.range([0, svgHeight]);
+        xScale.range([0, SVG_HEIGHT]);
         sbl.xScale(xScale);
 
         let xExtent = [100, 250];
@@ -296,7 +334,7 @@ describe("Interactive Components", () => {
       it("can set the yScale() property", () => {
         let yScale = new Plottable.Scales.Linear();
         yScale.domain([0, 2000]);
-        yScale.range([0, svgHeight]);
+        yScale.range([0, SVG_HEIGHT]);
 
         assert.isUndefined(sbl.yScale(), "no yScale is specified by default");
         assert.strictEqual(sbl.yScale(yScale), sbl, "setting the yScale returns the selection box layer");
@@ -322,7 +360,7 @@ describe("Interactive Components", () => {
       it("can set the data values of the top and bottom sides directly", () => {
         let yScale = new Plottable.Scales.Linear();
         yScale.domain([0, 2000]);
-        yScale.range([0, svgHeight]);
+        yScale.range([0, SVG_HEIGHT]);
 
         sbl.boxVisible(true);
         sbl.yScale(yScale);
@@ -350,7 +388,7 @@ describe("Interactive Components", () => {
       it("uses the data values for the top and bottom sides if they were set last", () => {
         let yScale = new Plottable.Scales.Linear();
         yScale.domain([0, 2000]);
-        yScale.range([0, svgHeight]);
+        yScale.range([0, SVG_HEIGHT]);
         sbl.yScale(yScale);
 
         let bounds = {
@@ -379,7 +417,7 @@ describe("Interactive Components", () => {
       it("updates top and bottom edge pixel positions if in VALUE mode and scale is switched", () => {
         let yScale = new Plottable.Scales.Linear();
         yScale.domain([0, 2000]);
-        yScale.range([0, svgHeight]);
+        yScale.range([0, SVG_HEIGHT]);
         sbl.yScale(yScale);
 
         let yExtent = [100, 250];
@@ -391,7 +429,7 @@ describe("Interactive Components", () => {
 
         let yScale2 = new Plottable.Scales.ModifiedLog();
         yScale2.domain([0, 1000]);
-        yScale2.range([0, svgHeight]);
+        yScale2.range([0, SVG_HEIGHT]);
 
         sbl.yScale(yScale2);
         assert.notStrictEqual(sbl.bounds().topLeft.y, topPosition, "top pixel position changed");
@@ -406,7 +444,7 @@ describe("Interactive Components", () => {
       it("updates top and bottom edge pixel positions if in VALUE mode and scale updates", () => {
         let yScale = new Plottable.Scales.Linear();
         yScale.domain([0, 2000]);
-        yScale.range([0, svgHeight]);
+        yScale.range([0, SVG_HEIGHT]);
         sbl.yScale(yScale);
 
         let yExtent = [100, 250];
