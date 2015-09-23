@@ -513,11 +513,7 @@ export module Plots {
               yAlignment = "bottom";
               labelOrigin.y = barY + containerHeight - offset - measurement.height;
             }
-
-            showLabelOnBar = showLabelOnBar && labelOrigin.y >= 0 && labelOrigin.y + measurement.height <= this.height();
-          }
-
-          if (!showLabelOnBar) { // show label off bar
+          } else { // show label off bar
             let offset = Bar._LABEL_VERTICAL_PADDING;
             containerHeight = barHeight + offset + measurement.height;
             if (scaledValue <= scaledBaseline) {
@@ -543,11 +539,7 @@ export module Plots {
               xAlignment = "right";
               labelOrigin.x = barX + containerWidth - offset - measurement.width;
             }
-
-            showLabelOnBar = showLabelOnBar && labelOrigin.x >= 0 && labelOrigin.x + measurement.width <= this.width();
-          }
-
-          if (!showLabelOnBar) { // show label off bar
+          } else { // show label off bar
             let offset = Bar._LABEL_HORIZONTAL_PADDING;
             containerWidth = barWidth + offset + measurement.width;
             if (scaledValue < scaledBaseline) {
