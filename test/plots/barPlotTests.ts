@@ -775,9 +775,11 @@ describe("Plots", () => {
           let labelBoundingClientRect = (<SVGElement> labels[0][i]).getBoundingClientRect();
           let barBoundingClientRect = (<SVGElement> bars[0][i]).getBoundingClientRect();
           if (labelBoundingClientRect.width > barBoundingClientRect.width) {
-            assert.isTrue(d3.select(labels[0][i]).classed("off-bar-label"), `label with index ${i} doesn't fit and carries the off-bar class`);
+            assert.isTrue(d3.select(labels[0][i]).classed("off-bar-label"),
+              `label with index ${i} doesn't fit and carries the off-bar class`);
           } else {
-            assert.isTrue(d3.select(labels[0][i]).classed("on-bar-label"), `label with index ${i} fits and carries the on-bar class`);
+            assert.isTrue(d3.select(labels[0][i]).classed("on-bar-label"),
+              `label with index ${i} fits and carries the on-bar class`);
           }
         });
 
@@ -992,9 +994,11 @@ describe("Plots", () => {
           let labelBoundingClientRect = (<SVGElement> labels[0][i]).getBoundingClientRect();
           let barBoundingClientRect = (<SVGElement> bars[0][i]).getBoundingClientRect();
           if (labelBoundingClientRect.height > barBoundingClientRect.height) {
-            assert.isTrue(d3.select(labels[0][i]).classed("off-bar-label"), `label with index ${i} doesn't fit and carries the off-bar class`);
+            assert.isTrue(d3.select(labels[0][i]).classed("off-bar-label"),
+              `label with index ${i} doesn't fit and carries the off-bar class`);
           } else {
-            assert.isTrue(d3.select(labels[0][i]).classed("on-bar-label"), `label with index ${i} fits and carries the on-bar class`);
+            assert.isTrue(d3.select(labels[0][i]).classed("on-bar-label"),
+              `label with index ${i} fits and carries the on-bar class`);
           }
         });
 
