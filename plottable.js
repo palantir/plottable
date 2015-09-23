@@ -8722,11 +8722,18 @@ var Plottable;
                         x: labelContainerOrigin.x,
                         y: labelContainerOrigin.y
                     };
-                    var showLabelOnBar = _this._isVertical ? (measurement.height <= barHeight) : (measurement.width <= barWidth);
+                    var showLabelOnBar = true;
                     if (_this._isVertical) {
                         labelOrigin.x += containerWidth / 2 - measurement.width / 2;
+                        var barY = attrToProjector["y"](d, i, dataset);
+                        var effectiveBarHeight = Plottable.Utils.Math.min([
+                            _this.height() - barY,
+                            barY + barHeight,
+                            barHeight
+                        ], 0);
+                        var offset = Bar._LABEL_VERTICAL_PADDING;
+                        showLabelOnBar = measurement.height + 2 * offset <= effectiveBarHeight;
                         if (showLabelOnBar) {
-                            var offset = Math.min((barHeight - measurement.height) / 2, Bar._LABEL_VERTICAL_PADDING);
                             if (scaledValue < scaledBaseline) {
                                 labelContainerOrigin.y += offset;
                                 yAlignment = "top";
@@ -8739,7 +8746,6 @@ var Plottable;
                             }
                         }
                         else {
-                            var offset = Bar._LABEL_VERTICAL_PADDING;
                             containerHeight = barHeight + offset + measurement.height;
                             if (scaledValue <= scaledBaseline) {
                                 labelContainerOrigin.y -= offset + measurement.height;
@@ -8754,8 +8760,15 @@ var Plottable;
                     }
                     else {
                         labelOrigin.y += containerHeight / 2 - measurement.height / 2;
+                        var barX = attrToProjector["x"](d, i, dataset);
+                        var effectiveBarWidth = Plottable.Utils.Math.min([
+                            _this.width() - barX,
+                            barX + barWidth,
+                            barWidth
+                        ], 0);
+                        var offset = Bar._LABEL_HORIZONTAL_PADDING;
+                        showLabelOnBar = measurement.width + 2 * offset <= effectiveBarWidth;
                         if (showLabelOnBar) {
-                            var offset = Math.min((barWidth - measurement.width) / 2, Bar._LABEL_HORIZONTAL_PADDING);
                             if (scaledValue < scaledBaseline) {
                                 labelContainerOrigin.x += offset;
                                 xAlignment = "left";
@@ -8768,7 +8781,6 @@ var Plottable;
                             }
                         }
                         else {
-                            var offset = Bar._LABEL_HORIZONTAL_PADDING;
                             containerWidth = barWidth + offset + measurement.width;
                             if (scaledValue < scaledBaseline) {
                                 labelContainerOrigin.x -= offset + measurement.width;

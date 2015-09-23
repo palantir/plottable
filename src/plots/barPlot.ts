@@ -495,13 +495,21 @@ export module Plots {
           y: labelContainerOrigin.y
         };
 
-        let showLabelOnBar = this._isVertical ? (measurement.height <= barHeight) : (measurement.width <= barWidth);
+        let showLabelOnBar = true;
 
         if (this._isVertical) {
           labelOrigin.x += containerWidth / 2 - measurement.width / 2;
 
+          let barY = attrToProjector["y"](d, i, dataset);
+          let effectiveBarHeight = Utils.Math.min([
+            this.height() - barY,
+            barY + barHeight,
+            barHeight
+          ], 0);
+          let offset = Bar._LABEL_VERTICAL_PADDING;
+          showLabelOnBar = measurement.height + 2 * offset <= effectiveBarHeight;
+
           if (showLabelOnBar) {
-            let offset = Math.min( (barHeight - measurement.height ) / 2, Bar._LABEL_VERTICAL_PADDING);
             if (scaledValue < scaledBaseline) {
               labelContainerOrigin.y += offset;
               yAlignment = "top";
@@ -512,7 +520,6 @@ export module Plots {
               labelOrigin.y += containerHeight - offset - measurement.height;
             }
           } else { // show label off bar
-            let offset = Bar._LABEL_VERTICAL_PADDING;
             containerHeight = barHeight + offset + measurement.height;
             if (scaledValue <= scaledBaseline) {
               labelContainerOrigin.y -= offset + measurement.height;
@@ -526,8 +533,16 @@ export module Plots {
         } else { // horizontal
           labelOrigin.y += containerHeight / 2 - measurement.height / 2;
 
+          let barX = attrToProjector["x"](d, i, dataset);
+          let effectiveBarWidth = Utils.Math.min([
+            this.width() - barX,
+            barX + barWidth,
+            barWidth
+          ], 0);
+          let offset = Bar._LABEL_HORIZONTAL_PADDING;
+          showLabelOnBar = measurement.width + 2 * offset <= effectiveBarWidth;
+
           if (showLabelOnBar) {
-            let offset = Math.min( (barWidth - measurement.width ) / 2, Bar._LABEL_HORIZONTAL_PADDING);
             if (scaledValue < scaledBaseline) {
               labelContainerOrigin.x += offset;
               xAlignment = "left";
@@ -538,7 +553,6 @@ export module Plots {
               labelOrigin.x += containerWidth - offset - measurement.width;
             }
           } else { // show label off bar
-            let offset = Bar._LABEL_HORIZONTAL_PADDING;
             containerWidth = barWidth + offset + measurement.width;
             if (scaledValue < scaledBaseline) {
               labelContainerOrigin.x -= offset + measurement.width;

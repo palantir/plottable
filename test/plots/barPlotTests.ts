@@ -787,27 +787,43 @@ describe("Plots", () => {
       });
 
       it("hides labels cut off by the right edge", () => {
-        dataset.data().forEach((d, i) => {
-          let texts = svg.selectAll("text");
-          let centerOfText = getCenterOfText(<SVGElement> texts[0][i]);
-          let centerXValue = xScale.invert(centerOfText.x);
-          xScale.domain([centerXValue - (DEFAULT_DOMAIN[1] - DEFAULT_DOMAIN[0]), centerXValue]);
+        barPlot.labelsEnabled(true);
+        let labels = barPlot.content().selectAll(".on-bar-label, .off-bar-label");
+        let centerXValues = labels.select("text")[0].map((textNode) => xScale.invert(getCenterOfText(<SVGElement> textNode).x));
+        let wasOriginallyOnBar = labels[0].map((label) => d3.select(label).classed("on-bar-label"));
 
-          texts = svg.selectAll("text"); // re-select after rendering
-          assert.strictEqual(d3.select(texts[0][i]).style("visibility"), "hidden", `label for bar with index ${i} is hidden`);
+        dataset.data().forEach((d, i) => {
+          let centerXValue = centerXValues[i];
+          xScale.domain([centerXValue - (DEFAULT_DOMAIN[1] - DEFAULT_DOMAIN[0]), centerXValue]);
+          labels = barPlot.content().selectAll(".on-bar-label, .off-bar-label"); // re-select after rendering
+          if (wasOriginallyOnBar[i] && d.x < 0) {
+            assert.isTrue(d3.select(labels[0][i]).classed("off-bar-label"),
+              `cut off on-bar label was switched to off-bar (index ${i})`);
+          } else {
+            let textNode = labels.select("text")[0][i];
+            assert.strictEqual(d3.select(textNode).style("visibility"), "hidden", `label for bar with index ${i} is hidden`);
+          }
         });
         svg.remove();
       });
 
       it("hides labels cut off by the left edge", () => {
-        dataset.data().forEach((d, i) => {
-          let texts = svg.selectAll("text");
-          let centerOfText = getCenterOfText(<SVGElement> texts[0][i]);
-          let centerXValue = xScale.invert(centerOfText.x);
-          xScale.domain([centerXValue, centerXValue + (DEFAULT_DOMAIN[1] - DEFAULT_DOMAIN[0])]);
+        barPlot.labelsEnabled(true);
+        let labels = barPlot.content().selectAll(".on-bar-label, .off-bar-label");
+        let centerXValues = labels.select("text")[0].map((textNode) => xScale.invert(getCenterOfText(<SVGElement> textNode).x));
+        let wasOriginallyOnBar = labels[0].map((label) => d3.select(label).classed("on-bar-label"));
 
-          texts = svg.selectAll("text"); // re-select after rendering
-          assert.strictEqual(d3.select(texts[0][i]).style("visibility"), "hidden", `label for bar with index ${i} is hidden`);
+        dataset.data().forEach((d, i) => {
+          let centerXValue = centerXValues[i];
+          xScale.domain([centerXValue, centerXValue + (DEFAULT_DOMAIN[1] - DEFAULT_DOMAIN[0])]);
+          labels = barPlot.content().selectAll(".on-bar-label, .off-bar-label"); // re-select after rendering
+          if (wasOriginallyOnBar[i] && d.x > 0) {
+            assert.isTrue(d3.select(labels[0][i]).classed("off-bar-label"),
+              `cut off on-bar label was switched to off-bar (index ${i})`);
+          } else {
+            let textNode = labels.select("text")[0][i];
+            assert.strictEqual(d3.select(textNode).style("visibility"), "hidden", `label for bar with index ${i} is hidden`);
+          }
         });
         svg.remove();
       });
@@ -1069,30 +1085,44 @@ describe("Plots", () => {
         svg.remove();
       });
 
-      it("hides labels cut off by the top edge", () => {
+      it("hides or shifts labels cut off by the top edge", () => {
         barPlot.labelsEnabled(true);
-        dataset.data().forEach((d, i) => {
-          let texts = svg.selectAll("text");
-          let centerOfText = getCenterOfText(<SVGElement> texts[0][i]);
-          let centerYValue = yScale.invert(centerOfText.y);
-          yScale.domain([centerYValue - (DEFAULT_DOMAIN[1] - DEFAULT_DOMAIN[0]), centerYValue]);
+        let labels = barPlot.content().selectAll(".on-bar-label, .off-bar-label");
+        let centerYValues = labels.select("text")[0].map((textNode) => yScale.invert(getCenterOfText(<SVGElement> textNode).y));
+        let wasOriginallyOnBar = labels[0].map((label) => d3.select(label).classed("on-bar-label"));
 
-          texts = svg.selectAll("text"); // re-select after rendering
-          assert.strictEqual(d3.select(texts[0][i]).style("visibility"), "hidden", `label for bar with index ${i} is hidden`);
+        dataset.data().forEach((d, i) => {
+          let centerYValue = centerYValues[i];
+          yScale.domain([centerYValue - (DEFAULT_DOMAIN[1] - DEFAULT_DOMAIN[0]), centerYValue]);
+          labels = barPlot.content().selectAll(".on-bar-label, .off-bar-label"); // re-select after rendering
+          if (wasOriginallyOnBar[i] && d.y < 0) {
+            assert.isTrue(d3.select(labels[0][i]).classed("off-bar-label"),
+              `cut off on-bar label was switched to off-bar (index ${i})`);
+          } else {
+            let textNode = labels.select("text")[0][i];
+            assert.strictEqual(d3.select(textNode).style("visibility"), "hidden", `label for bar with index ${i} is hidden`);
+          }
         });
         svg.remove();
       });
 
       it("hides labels cut off by the bottom edge", () => {
         barPlot.labelsEnabled(true);
-        dataset.data().forEach((d, i) => {
-          let texts = svg.selectAll("text");
-          let centerOfText = getCenterOfText(<SVGElement> texts[0][i]);
-          let centerYValue = yScale.invert(centerOfText.y);
-          yScale.domain([centerYValue, centerYValue + (DEFAULT_DOMAIN[1] - DEFAULT_DOMAIN[0])]);
+        let labels = barPlot.content().selectAll(".on-bar-label, .off-bar-label");
+        let centerYValues = labels.select("text")[0].map((textNode) => yScale.invert(getCenterOfText(<SVGElement> textNode).y));
+        let wasOriginallyOnBar = labels[0].map((label) => d3.select(label).classed("on-bar-label"));
 
-          texts = svg.selectAll("text"); // re-select after rendering
-          assert.strictEqual(d3.select(texts[0][i]).style("visibility"), "hidden", `label for bar with index ${i} is hidden`);
+        dataset.data().forEach((d, i) => {
+          let centerYValue = centerYValues[i];
+          yScale.domain([centerYValue, centerYValue + (DEFAULT_DOMAIN[1] - DEFAULT_DOMAIN[0])]);
+          labels = barPlot.content().selectAll(".on-bar-label, .off-bar-label"); // re-select after rendering
+          if (wasOriginallyOnBar[i] && d.y > 0) {
+            assert.isTrue(d3.select(labels[0][i]).classed("off-bar-label"),
+              `cut off on-bar label was switched to off-bar (index ${i})`);
+          } else {
+            let textNode = labels.select("text")[0][i];
+            assert.strictEqual(d3.select(textNode).style("visibility"), "hidden", `label for bar with index ${i} is hidden`);
+          }
         });
         svg.remove();
       });
