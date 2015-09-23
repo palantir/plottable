@@ -25,6 +25,7 @@ export module Components {
       this._adjustBoundsCallback = () => {
         this.render();
       };
+      this._clipPathEnabled = true;
       this._xExtent = [undefined, undefined];
       this._yExtent = [undefined, undefined];
     }
