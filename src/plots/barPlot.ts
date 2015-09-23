@@ -483,70 +483,72 @@ export module Plots {
 
         let xAlignment = "center";
         let yAlignment = "center";
+        let barX = attrToProjector["x"](d, i, dataset);
+        let barY = attrToProjector["y"](d, i, dataset);
         let labelContainerOrigin = {
-          x: attrToProjector["x"](d, i, dataset),
-          y: attrToProjector["y"](d, i, dataset)
+          x: barX,
+          y: barY
         };
         let containerWidth = barWidth;
         let containerHeight = barHeight;
 
         let labelOrigin = {
-          x: labelContainerOrigin.x,
-          y: labelContainerOrigin.y
+          x: barX,
+          y: barY
         };
 
         let showLabelOnBar = this._isVertical ? (measurement.height <= barHeight) : (measurement.width <= barWidth);
 
         if (this._isVertical) {
-          labelOrigin.x += containerWidth / 2 - measurement.width / 2;
+          labelOrigin.x = barX + containerWidth / 2 - measurement.width / 2;
 
           if (showLabelOnBar) {
             let offset = Math.min( (barHeight - measurement.height ) / 2, Bar._LABEL_VERTICAL_PADDING);
             if (scaledValue < scaledBaseline) {
-              labelContainerOrigin.y += offset;
+              labelContainerOrigin.y = barY + offset;
               yAlignment = "top";
-              labelOrigin.y += offset;
+              labelOrigin.y = barY + offset;
             } else {
-              labelContainerOrigin.y -= offset;
+              labelContainerOrigin.y = barY - offset;
               yAlignment = "bottom";
-              labelOrigin.y += containerHeight - offset - measurement.height;
+              labelOrigin.y = barY + containerHeight - offset - measurement.height;
             }
           } else { // show label off bar
             let offset = Bar._LABEL_VERTICAL_PADDING;
             containerHeight = barHeight + offset + measurement.height;
             if (scaledValue <= scaledBaseline) {
-              labelContainerOrigin.y -= offset + measurement.height;
+              labelContainerOrigin.y = barY - (offset + measurement.height);
               yAlignment = "top";
-              labelOrigin.y -= offset + measurement.height;
+              labelOrigin.y = barY - (offset + measurement.height);
             } else {
               yAlignment = "bottom";
-              labelOrigin.y += barHeight + offset;
+              labelOrigin.y = barY + barHeight + offset;
             }
           }
         } else { // horizontal
-          labelOrigin.y += containerHeight / 2 - measurement.height / 2;
+          labelOrigin.y = barY + containerHeight / 2 - measurement.height / 2;
 
           if (showLabelOnBar) {
             let offset = Math.min( (barWidth - measurement.width ) / 2, Bar._LABEL_HORIZONTAL_PADDING);
             if (scaledValue < scaledBaseline) {
-              labelContainerOrigin.x += offset;
+              labelContainerOrigin.x = barX + offset;
               xAlignment = "left";
-              labelOrigin.x += offset;
+              labelOrigin.x = barX + offset;
             } else {
-              labelContainerOrigin.x -= offset;
+              labelContainerOrigin.x = barX - offset;
               xAlignment = "right";
-              labelOrigin.x += containerWidth - offset - measurement.width;
+              labelOrigin.x = barX + containerWidth - offset - measurement.width;
             }
           } else { // show label off bar
             let offset = Bar._LABEL_HORIZONTAL_PADDING;
             containerWidth = barWidth + offset + measurement.width;
             if (scaledValue < scaledBaseline) {
-              labelContainerOrigin.x -= offset + measurement.width;
+              labelContainerOrigin.x = barX - (offset + measurement.width);
               xAlignment = "left";
-              labelOrigin.x -= offset + measurement.width;
+              labelOrigin.x = barX - (offset + measurement.width);
             } else {
               xAlignment = "right";
-              labelOrigin.x += barWidth + offset;
+              labelOrigin.x = barX + barWidth + offset;
             }
           }
         }
