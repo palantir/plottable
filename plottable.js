@@ -9162,19 +9162,24 @@ var Plottable;
                 };
             };
             Line.prototype._getDataToDraw = function () {
+                var _this = this;
                 var dataToDraw = new Plottable.Utils.Map();
-                var xScale = this.x().scale;
-                var xAccessor = this.x().accessor;
-                var yAccessor = this.y().accessor;
-                var domain = xScale.domain();
-                this.datasets().forEach(function (dataset) {
-                    var data = dataset.data();
-                    var filteredDataIndices = data.map(function (d, i) { return i; });
-                    // filteredDataIndices = this._filterDataCropToViewport(dataset, filteredDataIndices);
-                    // filteredDataIndices = this._filterDataDownsample(dataset, filteredDataIndices);
-                    dataToDraw.set(dataset, [filteredDataIndices.map(function (d, i) { return data[i]; })]);
-                });
-                // this.datasets().forEach((dataset) => dataToDraw.set(dataset, [dataset.data()]));
+                if (this._downsample || this._croppedRendering) {
+                    this.datasets().forEach(function (dataset) {
+                        var data = dataset.data();
+                        var filteredDataIndices = data.map(function (d, i) { return i; });
+                        if (_this._croppedRendering) {
+                            filteredDataIndices = _this._filterDataCropToViewport(dataset, filteredDataIndices);
+                        }
+                        if (_this._downsample) {
+                            filteredDataIndices = _this._filterDataDownsample(dataset, filteredDataIndices);
+                        }
+                        dataToDraw.set(dataset, [filteredDataIndices.map(function (d, i) { return data[i]; })]);
+                    });
+                }
+                else {
+                    this.datasets().forEach(function (dataset) { return dataToDraw.set(dataset, [dataset.data()]); });
+                }
                 return dataToDraw;
             };
             Line.prototype._filterDataCropToViewport = function (dataset, indices) {
