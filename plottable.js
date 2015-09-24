@@ -8968,6 +8968,7 @@ var Plottable;
                     return this._croppedRendering;
                 }
                 this._croppedRendering = croppedRendering;
+                this.render();
                 return this;
             };
             Line.prototype.downsampleEnabled = function (downsample) {
@@ -8975,6 +8976,7 @@ var Plottable;
                     return this._downsample;
                 }
                 this._downsample = downsample;
+                // this.render();
                 return this;
             };
             Line.prototype._createDrawer = function (dataset) {

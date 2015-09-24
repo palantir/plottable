@@ -149,6 +149,7 @@ export module Plots {
         return this._croppedRendering;
       }
       this._croppedRendering = croppedRendering;
+      this.render();
       return this;
     }
 
