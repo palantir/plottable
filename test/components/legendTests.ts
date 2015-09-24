@@ -265,7 +265,7 @@ describe("Legend", () => {
     legendRows.each(function(d: Element, i: number){
       let expectText = formatter(legend.colorScale().domain()[i]);
       assert.strictEqual(d3.select(this).select("text").text(), expectText,
-        `formatter output ${d3.select(this).select("text").text()} should be displayed`);
+        `formatter output ${expectText} should be displayed`);
     });
     svg.remove();
   });

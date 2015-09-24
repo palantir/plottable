@@ -5507,8 +5507,7 @@ var Plottable;
                 this._colorScale.domain().slice().forEach(function (d) {
                     entryLabels.set(_this._formatter(d), d);
                 });
-                var entryNames = entryLabels.keys();
-                entryNames = entryNames.sort(this.comparator()).map(function (d) { return entryLabels.get(d); });
+                var entryNames = entryLabels.keys().sort(this.comparator()).map(function (d) { return entryLabels.get(d); });
                 var entryLengths = d3.map();
                 var untruncatedEntryLengths = d3.map();
                 entryNames.forEach(function (entryName) {

@@ -168,9 +168,8 @@ export module Components {
       this._colorScale.domain().slice().forEach((d) => {
         entryLabels.set(this._formatter(d), d);
       });
-      let entryNames = entryLabels.keys();
-      entryNames = entryNames.sort(this.comparator()).map((d) => entryLabels.get(d));
-
+      let formattedEntryNames = entryLabels.keys();
+      let entryNames = formattedEntryNames.sort(this.comparator()).map((d) => entryLabels.get(d));
       let entryLengths: d3.Map<number> = d3.map<number>();
       let untruncatedEntryLengths: d3.Map<number> = d3.map<number>();
       entryNames.forEach((entryName) => {
