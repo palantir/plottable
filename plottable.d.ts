@@ -3386,7 +3386,18 @@ declare module Plottable {
             interpolator(interpolator: "cardinal-open"): Line<X>;
             interpolator(interpolator: "cardinal-closed"): Line<X>;
             interpolator(interpolator: "monotone"): Line<X>;
+            /**
+             * Gets the croppedRendering preformance option state.
+             *
+             * When croppedRendering option is enabled, lines that will not be visible in the viewport will not be
+             * drawn anymore (will not have corresponding SVG nodes). If only part of the data is in the viewport,
+             * then this option will boost of rendering. However, if all the data is rendered anyway, having this
+             * option enabled will cause a small overhead that can be noticed in the total render time.
+             */
             croppedRenderingEnabled(): boolean;
+            /**
+             * Sets the croppedRendering performance option.
+             */
             croppedRenderingEnabled(croppedRendering: boolean): Plots.Line<X>;
             downsampleEnabled(): boolean;
             downsampleEnabled(downsample: boolean): Plots.Line<X>;
