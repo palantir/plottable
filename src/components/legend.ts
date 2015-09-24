@@ -48,7 +48,7 @@ export module Components {
       this._colorScale.onUpdate(this._redrawCallback);
       this._formatter = Formatters.identity();
       this.xAlignment("right").yAlignment("top");
-      this.comparator((a: string, b: string) => this._colorScale.domain().indexOf(a) - this._colorScale.domain().indexOf(b));
+      this.comparator((a: string, b: string) => 0);
       this._symbolFactoryAccessor = () => SymbolFactories.circle();
       this._symbolOpacityAccessor = () => 1;
     }
