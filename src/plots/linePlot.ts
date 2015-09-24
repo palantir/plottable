@@ -386,20 +386,20 @@ export module Plots {
         let filteredDataIndices = data.map((d, i) => i);
 
         if (this._croppedRendering) {
-          filteredDataIndices = this._filterDataCropToViewport(dataset, filteredDataIndices);
+          filteredDataIndices = this._filterCroppedRendering(dataset, filteredDataIndices);
         }
 
         if (this._downsample) {
-          filteredDataIndices = this._filterDataDownsample(dataset, filteredDataIndices);
+          filteredDataIndices = this._filterDownsample(dataset, filteredDataIndices);
         }
 
-        dataToDraw.set(dataset, [filteredDataIndices.map((d, i) => data[i])]);
+        dataToDraw.set(dataset, [filteredDataIndices.map((d, i) => data[d])]);
       });
 
       return dataToDraw;
     }
 
-    private _filterDataCropToViewport(dataset: Dataset, indices: number[]) {
+    private _filterCroppedRendering(dataset: Dataset, indices: number[]) {
       let xScale = this.x().scale;
       let xAccessor = this.x().accessor;
       let domain = xScale.domain();
@@ -407,16 +407,20 @@ export module Plots {
       let data = dataset.data();
       let filteredDataIndices: number[] = [];
 
+      console.log(1);
+
+
+
       for (let i = 0; i < indices.length; i++) {
         let currPoint = xAccessor(data[indices[i]], indices[i], dataset);
         let shouldShow = domain[0] <= currPoint && currPoint <= domain[1];
 
-        if (indices[i - 1] && data[indices[i - 1]]) {
+        if (indices[i - 1] != null && data[indices[i - 1]] != null) {
           let prevPoint = xAccessor(data[indices[i - 1]], indices[i - 1], dataset);
           shouldShow = shouldShow || domain[0] <= prevPoint && prevPoint <= domain[1];
         }
 
-        if (indices[i + 1] && data[indices[i + 1]]) {
+        if (indices[i + 1] != null && data[indices[i + 1]] != null) {
           let nextPoint = xAccessor(data[indices[i + 1]], indices[i + 1], dataset);
           shouldShow = shouldShow || domain[0] <= nextPoint && nextPoint <= domain[1];
         }
@@ -428,7 +432,7 @@ export module Plots {
       return filteredDataIndices;
     }
 
-    private _filterDataDownsample(dataset: Dataset, indices: number[]) {
+    private _filterDownsample(dataset: Dataset, indices: number[]) {
       let xScale = this.x().scale;
       let xAccessor = this.x().accessor;
       let yAccessor = this.y().accessor;

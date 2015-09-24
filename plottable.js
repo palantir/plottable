@@ -9172,29 +9172,30 @@ var Plottable;
                     }
                     var filteredDataIndices = data.map(function (d, i) { return i; });
                     if (_this._croppedRendering) {
-                        filteredDataIndices = _this._filterDataCropToViewport(dataset, filteredDataIndices);
+                        filteredDataIndices = _this._filterCroppedRendering(dataset, filteredDataIndices);
                     }
                     if (_this._downsample) {
-                        filteredDataIndices = _this._filterDataDownsample(dataset, filteredDataIndices);
+                        filteredDataIndices = _this._filterDownsample(dataset, filteredDataIndices);
                     }
-                    dataToDraw.set(dataset, [filteredDataIndices.map(function (d, i) { return data[i]; })]);
+                    dataToDraw.set(dataset, [filteredDataIndices.map(function (d, i) { return data[d]; })]);
                 });
                 return dataToDraw;
             };
-            Line.prototype._filterDataCropToViewport = function (dataset, indices) {
+            Line.prototype._filterCroppedRendering = function (dataset, indices) {
                 var xScale = this.x().scale;
                 var xAccessor = this.x().accessor;
                 var domain = xScale.domain();
                 var data = dataset.data();
                 var filteredDataIndices = [];
+                console.log(1);
                 for (var i = 0; i < indices.length; i++) {
                     var currPoint = xAccessor(data[indices[i]], indices[i], dataset);
                     var shouldShow = domain[0] <= currPoint && currPoint <= domain[1];
-                    if (indices[i - 1] && data[indices[i - 1]]) {
+                    if (indices[i - 1] != null && data[indices[i - 1]] != null) {
                         var prevPoint = xAccessor(data[indices[i - 1]], indices[i - 1], dataset);
                         shouldShow = shouldShow || domain[0] <= prevPoint && prevPoint <= domain[1];
                     }
-                    if (indices[i + 1] && data[indices[i + 1]]) {
+                    if (indices[i + 1] != null && data[indices[i + 1]] != null) {
                         var nextPoint = xAccessor(data[indices[i + 1]], indices[i + 1], dataset);
                         shouldShow = shouldShow || domain[0] <= nextPoint && nextPoint <= domain[1];
                     }
@@ -9204,7 +9205,7 @@ var Plottable;
                 }
                 return filteredDataIndices;
             };
-            Line.prototype._filterDataDownsample = function (dataset, indices) {
+            Line.prototype._filterDownsample = function (dataset, indices) {
                 var xScale = this.x().scale;
                 var xAccessor = this.x().accessor;
                 var yAccessor = this.y().accessor;
