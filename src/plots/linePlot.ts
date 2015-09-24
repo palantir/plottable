@@ -398,18 +398,16 @@ export module Plots {
     }
 
     private _filterDataCropToViewport(dataset: Dataset, indices: number[]) {
-      var xScale = this.x().scale;
-      var xAccessor = this.x().accessor;
-      var domain = xScale.domain();
+      let xScale = this.x().scale;
+      let xAccessor = this.x().accessor;
+      let domain = xScale.domain();
 
       let data = dataset.data();
       let filteredDataIndices: number[] = [];
 
       for (let i = 0; i < indices.length; i++) {
-        let initialIndex = indices[i];
-
         let currPoint = xAccessor(data[indices[i]], indices[i], dataset);
-        var shouldShow = domain[0] <= currPoint && currPoint <= domain[1];
+        let shouldShow = domain[0] <= currPoint && currPoint <= domain[1];
 
         if (indices[i - 1] && data[indices[i - 1]]) {
           let prevPoint = xAccessor(data[indices[i - 1]], indices[i - 1], dataset);
@@ -429,14 +427,12 @@ export module Plots {
     }
 
     private _filterDataDownsample(dataset: Dataset, indices: number[]) {
-      var xScale = this.x().scale;
-      var xAccessor = this.x().accessor;
-      var yAccessor = this.y().accessor;
+      let xScale = this.x().scale;
+      let xAccessor = this.x().accessor;
+      let yAccessor = this.y().accessor;
 
       let data = dataset.data();
       let filteredDataIndices: number[] = [];
-
-      let lastSampleBucket = -Infinity;
 
       for (let i = 0; i < indices.length; ) {
         let min = Infinity;
@@ -469,7 +465,7 @@ export module Plots {
           filteredDataIndices.push(p3);
         }
 
-        if (p4 && p4 !== p3 && p4 !== p2 && p4 != p1) {
+        if (p4 && p4 !== p3 && p4 !== p2 && p4 !== p1) {
           filteredDataIndices.push(p4);
         }
       }

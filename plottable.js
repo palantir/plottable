@@ -9189,7 +9189,6 @@ var Plottable;
                 var data = dataset.data();
                 var filteredDataIndices = [];
                 for (var i = 0; i < indices.length; i++) {
-                    var initialIndex = indices[i];
                     var currPoint = xAccessor(data[indices[i]], indices[i], dataset);
                     var shouldShow = domain[0] <= currPoint && currPoint <= domain[1];
                     if (indices[i - 1] && data[indices[i - 1]]) {
@@ -9212,7 +9211,6 @@ var Plottable;
                 var yAccessor = this.y().accessor;
                 var data = dataset.data();
                 var filteredDataIndices = [];
-                var lastSampleBucket = -Infinity;
                 for (var i = 0; i < indices.length;) {
                     var min = Infinity;
                     var max = -Infinity;
@@ -9240,7 +9238,7 @@ var Plottable;
                     if (p3 !== p2 && p3 !== p1) {
                         filteredDataIndices.push(p3);
                     }
-                    if (p4 && p4 !== p3 && p4 !== p2 && p4 != p1) {
+                    if (p4 && p4 !== p3 && p4 !== p2 && p4 !== p1) {
                         filteredDataIndices.push(p4);
                     }
                 }
