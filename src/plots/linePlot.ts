@@ -375,24 +375,26 @@ export module Plots {
     protected _getDataToDraw() {
       let dataToDraw = new Utils.Map<Dataset, any[]> ();
 
-      if (this._downsample || this._croppedRendering) {
-        this.datasets().forEach((dataset) => {
-          let data = dataset.data();
-          let filteredDataIndices = data.map((d, i) => i);
+      this.datasets().forEach((dataset) => {
+        let data = dataset.data();
 
-          if (this._croppedRendering) {
-            filteredDataIndices = this._filterDataCropToViewport(dataset, filteredDataIndices);
-          }
+        if (!this._downsample && !this._croppedRendering) {
+          dataToDraw.set(dataset, [data]);
+          return;
+        }
 
-          if (this._downsample) {
-            filteredDataIndices = this._filterDataDownsample(dataset, filteredDataIndices);
-          }
+        let filteredDataIndices = data.map((d, i) => i);
 
-          dataToDraw.set(dataset, [filteredDataIndices.map((d, i) => data[i])]);
-        });
-      } else {
-        this.datasets().forEach((dataset) => dataToDraw.set(dataset, [dataset.data()]));
-      }
+        if (this._croppedRendering) {
+          filteredDataIndices = this._filterDataCropToViewport(dataset, filteredDataIndices);
+        }
+
+        if (this._downsample) {
+          filteredDataIndices = this._filterDataDownsample(dataset, filteredDataIndices);
+        }
+
+        dataToDraw.set(dataset, [filteredDataIndices.map((d, i) => data[i])]);
+      });
 
       return dataToDraw;
     }
