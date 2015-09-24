@@ -820,12 +820,15 @@ describe("Plots", () => {
       function checkPathForDataPoints(path: string, data: any[]) {
         let EPSILON = 0.0001;
 
-        let lineEdges = path.match(/(\-?d*\.?-?\d*),(-?\d*\.?-?\d*)/g);
+        let lineEdges = path.match(/(\-?\d+\.?\d*)(,|\s)(-?\d+\.?\d*)/g);
+
+        console.log(lineEdges);
+        console.log(path);
 
         assert.strictEqual(lineEdges.length, data.length, "correct number of edges drawn");
 
         lineEdges.forEach((edge, i) => {
-          let coordinates = edge.split(",");
+          let coordinates = edge.split(/,|\s/);
 
           assert.strictEqual(coordinates.length, 2, "There is an x coordinate and a y coordinate");
           assert.closeTo(xScale.invert(+coordinates[0]), data[i].x, EPSILON,
