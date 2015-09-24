@@ -2,7 +2,7 @@
 
 module Plottable {
 
-  export type DatasetCallback = (dataset: Dataset) => void;
+export type DatasetCallback = (dataset: Dataset) => void;
 
 
   export class KeyFunctions {
