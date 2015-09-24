@@ -8722,15 +8722,17 @@ var Plottable;
                         x: labelContainerOrigin.x,
                         y: labelContainerOrigin.y
                     };
-                    var showLabelOnBar = true;
+                    var showLabelOnBar;
                     if (_this._isVertical) {
                         labelOrigin.x += containerWidth / 2 - measurement.width / 2;
                         var barY = attrToProjector["y"](d, i, dataset);
-                        var effectiveBarHeight = Plottable.Utils.Math.min([
-                            _this.height() - barY,
-                            barY + barHeight,
-                            barHeight
-                        ], 0);
+                        var effectiveBarHeight = barHeight;
+                        if (barY + barHeight > _this.height()) {
+                            effectiveBarHeight = _this.height() - barY;
+                        }
+                        else if (barY < 0) {
+                            effectiveBarHeight = barY + barHeight;
+                        }
                         var offset = Bar._LABEL_VERTICAL_PADDING;
                         showLabelOnBar = measurement.height + 2 * offset <= effectiveBarHeight;
                         if (showLabelOnBar) {
@@ -8761,11 +8763,13 @@ var Plottable;
                     else {
                         labelOrigin.y += containerHeight / 2 - measurement.height / 2;
                         var barX = attrToProjector["x"](d, i, dataset);
-                        var effectiveBarWidth = Plottable.Utils.Math.min([
-                            _this.width() - barX,
-                            barX + barWidth,
-                            barWidth
-                        ], 0);
+                        var effectiveBarWidth = barWidth;
+                        if (barX + barWidth > _this.width()) {
+                            effectiveBarWidth = _this.width() - barX;
+                        }
+                        else if (barX < 0) {
+                            effectiveBarWidth = barX + barWidth;
+                        }
                         var offset = Bar._LABEL_HORIZONTAL_PADDING;
                         showLabelOnBar = measurement.width + 2 * offset <= effectiveBarWidth;
                         if (showLabelOnBar) {

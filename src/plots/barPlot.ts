@@ -495,17 +495,18 @@ export module Plots {
           y: labelContainerOrigin.y
         };
 
-        let showLabelOnBar = true;
+        let showLabelOnBar: boolean;
 
         if (this._isVertical) {
           labelOrigin.x += containerWidth / 2 - measurement.width / 2;
 
           let barY = attrToProjector["y"](d, i, dataset);
-          let effectiveBarHeight = Utils.Math.min([
-            this.height() - barY,
-            barY + barHeight,
-            barHeight
-          ], 0);
+          let effectiveBarHeight = barHeight;
+          if (barY + barHeight > this.height()) {
+            effectiveBarHeight = this.height() - barY;
+          } else if (barY < 0) {
+            effectiveBarHeight = barY + barHeight;
+          }
           let offset = Bar._LABEL_VERTICAL_PADDING;
           showLabelOnBar = measurement.height + 2 * offset <= effectiveBarHeight;
 
@@ -534,11 +535,12 @@ export module Plots {
           labelOrigin.y += containerHeight / 2 - measurement.height / 2;
 
           let barX = attrToProjector["x"](d, i, dataset);
-          let effectiveBarWidth = Utils.Math.min([
-            this.width() - barX,
-            barX + barWidth,
-            barWidth
-          ], 0);
+          let effectiveBarWidth = barWidth;
+          if (barX + barWidth > this.width()) {
+            effectiveBarWidth = this.width() - barX;
+          } else if (barX < 0) {
+            effectiveBarWidth = barX + barWidth;
+          }
           let offset = Bar._LABEL_HORIZONTAL_PADDING;
           showLabelOnBar = measurement.width + 2 * offset <= effectiveBarWidth;
 
