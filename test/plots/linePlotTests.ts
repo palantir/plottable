@@ -774,12 +774,13 @@ describe("Plots", () => {
           {x: 1, y: 5}
         ];
         plot.addDataset(new Plottable.Dataset(data));
+        xScale.padProportion(0);
 
         // Only middle point is in viewport
         yScale.domain([2.5, 3.5]);
 
-        plot.renderTo(svg);
         plot.croppedRenderingEnabled(true);
+        plot.renderTo(svg);
 
         let path = plot.content().select("path.line").attr("d");
         let expectedRenderedData = [1, 2, 3].map((d) => data[d]);
@@ -834,9 +835,7 @@ describe("Plots", () => {
           assert.closeTo(yScale.invert(+coordinates[1]), data[i].y, EPSILON,
             `Point ${i} drawn, has correct y coordinate`);
         });
-
       }
-
     });
 
     describe("Downsampling Performance", () => {
