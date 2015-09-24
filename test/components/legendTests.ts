@@ -254,15 +254,14 @@ describe("Legend", () => {
     svg.remove();
   });
 
-  it("can set which formatter to use to change how entry labels are displayed", () => {
+  it("can set formatter and change how entry labels are displayed", () => {
     color.domain(["jtao", "mschafer", "kfalter"]);
     let data: {[id: string]: string; } = {"jtao": "Joy", "mschafer":  "Mark", "kfalter": "Kelsey"};
-    let formatter = (id: string) => {
-        return data[id];
-    };
+    let formatter = (id: string) => data[id];
     legend.formatter(formatter);
     legend.renderTo(svg);
     let legendRows = svg.selectAll(entrySelector);
+    assert.operator(legendRows, ">=", 1, "There is at least one entry in the test");
     legendRows.each(function(d: Element, i: number){
       let expectText = formatter(legend.colorScale().domain()[i]);
       assert.strictEqual(d3.select(this).select("text").text(), expectText,
@@ -274,11 +273,9 @@ describe("Legend", () => {
   it("can get formatter of the legend using formatter()", () => {
     color.domain(["jtao", "mschafer", "kfalter"]);
     let data: {[id: string]: string; } = {"jtao": "Joy", "mschafer": "Mark", "kfalter": "Kelsey"};
-    let formatter = (id: string) => {
-        return data[id];
-    };
+    let formatter = (id: string) => data[id];
     legend.formatter(formatter);
-    assert.strictEqual(legend.formatter(), formatter, "formatter() return the formatter of legend correctly");
+    assert.strictEqual(legend.formatter(), formatter, "formatter() returns the formatter of legend correctly");
     svg.remove();
   });
 
@@ -293,7 +290,7 @@ describe("Legend", () => {
     legend.renderTo(svg);
     let entryTexts = svg.selectAll(entrySelector)[0].map((node: Element) => d3.select(node).select("text").text());
     expectedTexts.sort(comparator);
-    assert.deepEqual(expectedTexts, entryTexts, "formatted entry has been sorted as expected");
+    assert.deepEqual(expectedTexts, entryTexts, "formatted entries have been sorted as expected");
     svg.remove();
   });
 
