@@ -731,6 +731,7 @@ describe("Plots", () => {
 
         // Only middle point is in viewport
         xScale.domain([2.5, 3.5]);
+        let expectedRemainingDataIndices = [1, 2, 3];
 
         plot.croppedRenderingEnabled(true);
 
@@ -742,17 +743,16 @@ describe("Plots", () => {
         assert.strictEqual(lineEdges.length, 3, "2 out of 4 lines have been drawn (3 end points)")
 
         lineEdges.forEach((edge, i) => {
-          // expecting to skip first point in the dataset
-          let expectedPoint = i + 1;
-
           let coordinates = edge.split(",");
 
           assert.strictEqual(coordinates.length, 2, "There is an x coordinate and a y coordinate");
-          assert.closeTo(xScale.invert(+coordinates[0]), data[expectedPoint].x, 0.01,
-            `Point ${expectedPoint}, has correct x coordinate`);
-          assert.closeTo(yScale.invert(+coordinates[1]), data[expectedPoint].y, 0.01,
-            `Point ${expectedPoint}, has correct y coordinate`);
+          assert.closeTo(xScale.invert(+coordinates[0]), data[expectedRemainingDataIndices[i]].x, 0.01,
+            `Point ${expectedRemainingDataIndices[i]}, has correct x coordinate`);
+          assert.closeTo(yScale.invert(+coordinates[1]), data[expectedRemainingDataIndices[i]].y, 0.01,
+            `Point ${expectedRemainingDataIndices[i]}, has correct y coordinate`);
         });
+
+        svg.remove();
       });
 
     });
