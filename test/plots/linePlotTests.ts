@@ -684,7 +684,6 @@ describe("Plots", () => {
     });
   });
 
-
   describe("Line Plot", () => {
     describe("Cropped Rendering Performance", () => {
 
@@ -818,13 +817,12 @@ describe("Plots", () => {
         svg.remove();
       });
 
-
       function checkPathForDataPoints(path: string, data: any[]) {
         let EPSILON = 0.0001;
 
         let lineEdges = path.match(/(\-?d*\.?-?\d*),(-?\d*\.?-?\d*)/g);
 
-        assert.strictEqual(lineEdges.length, data.length, "correct number of edges drawn")
+        assert.strictEqual(lineEdges.length, data.length, "correct number of edges drawn");
 
         lineEdges.forEach((edge, i) => {
           let coordinates = edge.split(",");
@@ -866,9 +864,7 @@ describe("Plots", () => {
         svg.remove();
       });
 
-
     });
-
-  })
+  });
 
 });
