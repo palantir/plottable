@@ -8701,81 +8701,129 @@ var Plottable;
                 var labelArea = labelConfig.labelArea;
                 var measurer = labelConfig.measurer;
                 var writer = labelConfig.writer;
-                var labelTooWide = data.map(function (d, i) {
-                    var primaryAccessor = _this._isVertical ? _this.y().accessor : _this.x().accessor;
-                    var originalPositionFn = _this._isVertical ? Plottable.Plot._scaledAccessor(_this.y()) : Plottable.Plot._scaledAccessor(_this.x());
-                    var primaryScale = _this._isVertical ? _this.y().scale : _this.x().scale;
-                    var scaledBaseline = primaryScale.scale(_this.baselineValue());
-                    var text = _this._labelFormatter(primaryAccessor(d, i, dataset)).toString();
-                    var w = attrToProjector["width"](d, i, dataset);
-                    var h = attrToProjector["height"](d, i, dataset);
-                    var x = attrToProjector["x"](d, i, dataset);
-                    var y = attrToProjector["y"](d, i, dataset);
-                    var positive = originalPositionFn(d, i, dataset) <= scaledBaseline;
+                var drawLabel = function (d, i) {
+                    var valueAccessor = _this._isVertical ? _this.y().accessor : _this.x().accessor;
+                    var value = valueAccessor(d, i, dataset);
+                    var valueScale = _this._isVertical ? _this.y().scale : _this.x().scale;
+                    var scaledValue = valueScale != null ? valueScale.scale(value) : value;
+                    var scaledBaseline = valueScale != null ? valueScale.scale(_this.baselineValue()) : _this.baselineValue();
+                    var barWidth = attrToProjector["width"](d, i, dataset);
+                    var barHeight = attrToProjector["height"](d, i, dataset);
+                    var text = _this._labelFormatter(valueAccessor(d, i, dataset));
                     var measurement = measurer.measure(text);
-                    var color = attrToProjector["fill"](d, i, dataset);
-                    var dark = Plottable.Utils.Color.contrast("white", color) * 1.6 < Plottable.Utils.Color.contrast("black", color);
-                    var primary = _this._isVertical ? h : w;
-                    var primarySpace = _this._isVertical ? measurement.height : measurement.width;
-                    var secondaryAttrTextSpace = _this._isVertical ? measurement.width : measurement.height;
-                    var secondaryAttrAvailableSpace = _this._isVertical ? w : h;
-                    var tooWide = secondaryAttrTextSpace + 2 * Bar._LABEL_HORIZONTAL_PADDING > secondaryAttrAvailableSpace;
-                    if (measurement.height <= h && measurement.width <= w) {
-                        var offset = Math.min((primary - primarySpace) / 2, Bar._LABEL_VERTICAL_PADDING);
-                        if (!positive) {
-                            offset = offset * -1;
+                    var xAlignment = "center";
+                    var yAlignment = "center";
+                    var labelContainerOrigin = {
+                        x: attrToProjector["x"](d, i, dataset),
+                        y: attrToProjector["y"](d, i, dataset)
+                    };
+                    var containerWidth = barWidth;
+                    var containerHeight = barHeight;
+                    var labelOrigin = {
+                        x: labelContainerOrigin.x,
+                        y: labelContainerOrigin.y
+                    };
+                    var showLabelOnBar;
+                    if (_this._isVertical) {
+                        labelOrigin.x += containerWidth / 2 - measurement.width / 2;
+                        var barY = attrToProjector["y"](d, i, dataset);
+                        var effectiveBarHeight = barHeight;
+                        if (barY + barHeight > _this.height()) {
+                            effectiveBarHeight = _this.height() - barY;
                         }
-                        if (_this._isVertical) {
-                            y += offset;
+                        else if (barY < 0) {
+                            effectiveBarHeight = barY + barHeight;
                         }
-                        else {
-                            x += offset;
-                        }
-                        var showLabel = true;
-                        var labelPosition = {
-                            x: x,
-                            y: positive ? y : y + h - measurement.height
-                        };
-                        if (_this._isVertical) {
-                            labelPosition.x = x + w / 2 - measurement.width / 2;
-                        }
-                        else {
-                            labelPosition.y = y + h / 2 - measurement.height / 2;
-                            if (!positive) {
-                                labelPosition.x = x + w - measurement.width;
+                        var offset = Bar._LABEL_VERTICAL_PADDING;
+                        showLabelOnBar = measurement.height + 2 * offset <= effectiveBarHeight;
+                        if (showLabelOnBar) {
+                            if (scaledValue < scaledBaseline) {
+                                labelContainerOrigin.y += offset;
+                                yAlignment = "top";
+                                labelOrigin.y += offset;
                             }
                             else {
-                                labelPosition.x = x;
+                                labelContainerOrigin.y -= offset;
+                                yAlignment = "bottom";
+                                labelOrigin.y += containerHeight - offset - measurement.height;
                             }
                         }
-                        if (labelPosition.x < 0 || labelPosition.x + measurement.width > _this.width() ||
-                            labelPosition.y < 0 || labelPosition.y + measurement.height > _this.height()) {
-                            showLabel = false;
+                        else {
+                            containerHeight = barHeight + offset + measurement.height;
+                            if (scaledValue <= scaledBaseline) {
+                                labelContainerOrigin.y -= offset + measurement.height;
+                                yAlignment = "top";
+                                labelOrigin.y -= offset + measurement.height;
+                            }
+                            else {
+                                yAlignment = "bottom";
+                                labelOrigin.y += barHeight + offset;
+                            }
                         }
-                        var g = labelArea.append("g").attr("transform", "translate(" + x + "," + y + ")");
-                        var className = dark ? "dark-label" : "light-label";
-                        g.classed(className, true);
-                        g.style("visibility", showLabel ? "inherit" : "hidden");
-                        var xAlign;
-                        var yAlign;
-                        if (_this._isVertical) {
-                            xAlign = "center";
-                            yAlign = positive ? "top" : "bottom";
+                    }
+                    else {
+                        labelOrigin.y += containerHeight / 2 - measurement.height / 2;
+                        var barX = attrToProjector["x"](d, i, dataset);
+                        var effectiveBarWidth = barWidth;
+                        if (barX + barWidth > _this.width()) {
+                            effectiveBarWidth = _this.width() - barX;
+                        }
+                        else if (barX < 0) {
+                            effectiveBarWidth = barX + barWidth;
+                        }
+                        var offset = Bar._LABEL_HORIZONTAL_PADDING;
+                        showLabelOnBar = measurement.width + 2 * offset <= effectiveBarWidth;
+                        if (showLabelOnBar) {
+                            if (scaledValue < scaledBaseline) {
+                                labelContainerOrigin.x += offset;
+                                xAlignment = "left";
+                                labelOrigin.x += offset;
+                            }
+                            else {
+                                labelContainerOrigin.x -= offset;
+                                xAlignment = "right";
+                                labelOrigin.x += containerWidth - offset - measurement.width;
+                            }
                         }
                         else {
-                            xAlign = positive ? "left" : "right";
-                            yAlign = "center";
+                            containerWidth = barWidth + offset + measurement.width;
+                            if (scaledValue < scaledBaseline) {
+                                labelContainerOrigin.x -= offset + measurement.width;
+                                xAlignment = "left";
+                                labelOrigin.x -= offset + measurement.width;
+                            }
+                            else {
+                                xAlignment = "right";
+                                labelOrigin.x += barWidth + offset;
+                            }
                         }
-                        var writeOptions = {
-                            selection: g,
-                            xAlign: xAlign,
-                            yAlign: yAlign,
-                            textRotation: 0
-                        };
-                        writer.write(text, w, h, writeOptions);
                     }
+                    var labelContainer = labelArea.append("g").attr("transform", "translate(" + labelContainerOrigin.x + ", " + labelContainerOrigin.y + ")");
+                    if (showLabelOnBar) {
+                        labelContainer.classed("on-bar-label", true);
+                        var color = attrToProjector["fill"](d, i, dataset);
+                        var dark = Plottable.Utils.Color.contrast("white", color) * 1.6 < Plottable.Utils.Color.contrast("black", color);
+                        labelContainer.classed(dark ? "dark-label" : "light-label", true);
+                    }
+                    else {
+                        labelContainer.classed("off-bar-label", true);
+                    }
+                    var hideLabel = labelOrigin.x < 0 ||
+                        labelOrigin.y < 0 ||
+                        labelOrigin.x + measurement.width > _this.width() ||
+                        labelOrigin.y + measurement.height > _this.height();
+                    labelContainer.style("visibility", hideLabel ? "hidden" : "inherit");
+                    var writeOptions = {
+                        selection: labelContainer,
+                        xAlign: xAlignment,
+                        yAlign: yAlignment,
+                        textRotation: 0
+                    };
+                    writer.write(text, containerWidth, containerHeight, writeOptions);
+                    var tooWide = _this._isVertical ? barWidth < measurement.width : barHeight < measurement.height;
                     return tooWide;
-                });
+                };
+                var labelTooWide = data.map(drawLabel);
                 return labelTooWide.some(function (d) { return d; });
             };
             Bar.prototype._generateDrawSteps = function () {

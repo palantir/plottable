@@ -55,7 +55,7 @@ describe("Layer Components", () => {
       it("can get and set the detection radius", () => {
         assert.strictEqual(dbl.detectionRadius(), 3, "there is a default detection radius");
         assert.doesNotThrow(() => dbl.detectionRadius(4), Error, "can set detection radius before anchoring");
-        dbl.renderTo("svg");
+        dbl.renderTo(svg);
 
         assert.strictEqual(dbl.detectionRadius(), 4, "detection radius did not change upon rendering");
         assert.strictEqual(dbl.detectionRadius(5), dbl, "setting the detection radius returns the drag box layer");
@@ -66,7 +66,7 @@ describe("Layer Components", () => {
       });
 
       it("applies the given detection radius property", () => {
-        dbl.renderTo("svg");
+        dbl.renderTo(svg);
 
         let radius = 5;
         dbl.detectionRadius(radius);
