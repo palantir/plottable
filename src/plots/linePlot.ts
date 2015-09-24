@@ -14,6 +14,10 @@ export module Plots {
 
     private _autorangeSmooth = false;
 
+    // Performance options
+    private _croppedRendering = false;
+    private _downsample = false;
+
     /**
      * A Line Plot draws line segments starting from the first data point to the next.
      *
@@ -135,6 +139,27 @@ export module Plots {
       }
       this._interpolator = interpolator;
       this.render();
+      return this;
+    }
+
+    public croppedRenderingEnabled(): boolean;
+    public croppedRenderingEnabled(croppedRendering: boolean): Plots.Line<X>;
+    public croppedRenderingEnabled(croppedRendering?: boolean): any {
+      if (croppedRendering == null) {
+        return this._croppedRendering;
+      }
+      this._croppedRendering = croppedRendering;
+      return this;
+    }
+
+    public downsampleEnabled(): boolean;
+    public downsampleEnabled(downsample: boolean): Plots.Line<X>;
+    public downsampleEnabled(downsample?: boolean): any {
+      if (downsample == null) {
+        return this._downsample;
+      }
+
+      this._downsample = downsample;
       return this;
     }
 
@@ -360,12 +385,11 @@ export module Plots {
       this.datasets().forEach((dataset) => {
 
         let data = dataset.data();
-        let allDataIndices = data.map((d, i) => i);
+        let filteredDataIndices = data.map((d, i) => i);
+        // filteredDataIndices = this._filterDataCropToViewport(dataset, filteredDataIndices);
+        // filteredDataIndices = this._filterDataDownsample(dataset, filteredDataIndices);
 
-        let reducedDataIndices = this._cropToViewPort(dataset, allDataIndices);
-        reducedDataIndices = this._downsample(dataset, reducedDataIndices);
-
-        dataToDraw.set(dataset, [reducedDataIndices.map((d) => data[d])]);
+        dataToDraw.set(dataset, [filteredDataIndices.map((d, i) => data[i])]);
       });
 
       // this.datasets().forEach((dataset) => dataToDraw.set(dataset, [dataset.data()]));
@@ -373,7 +397,7 @@ export module Plots {
       return dataToDraw;
     }
 
-    private _cropToViewPort(dataset: Dataset, indices: number[]) {
+    private _filterDataCropToViewport(dataset: Dataset, indices: number[]) {
       var xScale = this.x().scale;
       var xAccessor = this.x().accessor;
       var domain = xScale.domain();
@@ -404,7 +428,7 @@ export module Plots {
       return filteredDataIndices;
     }
 
-    private _downsample(dataset: Dataset, indices: number[]) {
+    private _filterDataDownsample(dataset: Dataset, indices: number[]) {
       var xScale = this.x().scale;
       var xAccessor = this.x().accessor;
       var yAccessor = this.y().accessor;

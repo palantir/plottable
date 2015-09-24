@@ -207,7 +207,7 @@ describe("Plots", () => {
       svg.remove();
     });
 
-    describe("selections()", () => {
+    describe("selections", () => {
       it("retrieves all dataset selections with no args", () => {
         let dataset3 = new Plottable.Dataset([
           { foo: 0, bar: 1 },

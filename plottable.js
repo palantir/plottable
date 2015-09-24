@@ -8894,6 +8894,9 @@ var Plottable;
                 _super.call(this);
                 this._interpolator = "linear";
                 this._autorangeSmooth = false;
+                // Performance options
+                this._croppedRendering = false;
+                this._downsample = false;
                 this.addClass("line-plot");
                 var animator = new Plottable.Animators.Easing();
                 animator.stepDuration(Plottable.Plot._ANIMATION_MAX_DURATION);
@@ -8958,6 +8961,20 @@ var Plottable;
                 }
                 this._interpolator = interpolator;
                 this.render();
+                return this;
+            };
+            Line.prototype.croppedRenderingEnabled = function (croppedRendering) {
+                if (croppedRendering == null) {
+                    return this._croppedRendering;
+                }
+                this._croppedRendering = croppedRendering;
+                return this;
+            };
+            Line.prototype.downsampleEnabled = function (downsample) {
+                if (downsample == null) {
+                    return this._downsample;
+                }
+                this._downsample = downsample;
                 return this;
             };
             Line.prototype._createDrawer = function (dataset) {
@@ -9145,7 +9162,6 @@ var Plottable;
                 };
             };
             Line.prototype._getDataToDraw = function () {
-                var _this = this;
                 var dataToDraw = new Plottable.Utils.Map();
                 var xScale = this.x().scale;
                 var xAccessor = this.x().accessor;
@@ -9153,15 +9169,15 @@ var Plottable;
                 var domain = xScale.domain();
                 this.datasets().forEach(function (dataset) {
                     var data = dataset.data();
-                    var allDataIndices = data.map(function (d, i) { return i; });
-                    var reducedDataIndices = _this._cropToViewPort(dataset, allDataIndices);
-                    reducedDataIndices = _this._downsample(dataset, reducedDataIndices);
-                    dataToDraw.set(dataset, [reducedDataIndices.map(function (d) { return data[d]; })]);
+                    var filteredDataIndices = data.map(function (d, i) { return i; });
+                    // filteredDataIndices = this._filterDataCropToViewport(dataset, filteredDataIndices);
+                    // filteredDataIndices = this._filterDataDownsample(dataset, filteredDataIndices);
+                    dataToDraw.set(dataset, [filteredDataIndices.map(function (d, i) { return data[i]; })]);
                 });
                 // this.datasets().forEach((dataset) => dataToDraw.set(dataset, [dataset.data()]));
                 return dataToDraw;
             };
-            Line.prototype._cropToViewPort = function (dataset, indices) {
+            Line.prototype._filterDataCropToViewport = function (dataset, indices) {
                 var xScale = this.x().scale;
                 var xAccessor = this.x().accessor;
                 var domain = xScale.domain();
@@ -9185,7 +9201,7 @@ var Plottable;
                 }
                 return filteredDataIndices;
             };
-            Line.prototype._downsample = function (dataset, indices) {
+            Line.prototype._filterDataDownsample = function (dataset, indices) {
                 var xScale = this.x().scale;
                 var xAccessor = this.x().accessor;
                 var yAccessor = this.y().accessor;

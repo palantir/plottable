@@ -3386,6 +3386,10 @@ declare module Plottable {
             interpolator(interpolator: "cardinal-open"): Line<X>;
             interpolator(interpolator: "cardinal-closed"): Line<X>;
             interpolator(interpolator: "monotone"): Line<X>;
+            croppedRenderingEnabled(): boolean;
+            croppedRenderingEnabled(croppedRendering: boolean): Plots.Line<X>;
+            downsampleEnabled(): boolean;
+            downsampleEnabled(downsample: boolean): Plots.Line<X>;
             protected _createDrawer(dataset: Dataset): Drawer;
             protected _extentsForProperty(property: string): any[];
             protected _getResetYFunction(): (d: any, i: number, dataset: Dataset) => number;
