@@ -731,12 +731,12 @@ describe("Plots", () => {
 
         // Only middle point is in viewport
         xScale.domain([2.5, 3.5]);
-        let expectedRenderedData = [1, 2, 3].map((d) => data[d]);
 
         plot.croppedRenderingEnabled(true);
         plot.renderTo(svg);
 
         let path = plot.content().select("path.line").attr("d");
+        let expectedRenderedData = [1, 2, 3].map((d) => data[d]);
         checkPathForDataPoints(path, expectedRenderedData);
 
         svg.remove();
@@ -754,22 +754,67 @@ describe("Plots", () => {
 
         // Only middle point is in viewport
         xScale.domain([2.5, 3.5]);
-        let expectedRenderedData = [1, 2, 3].map((d) => data[d]);
 
         plot.renderTo(svg);
         plot.croppedRenderingEnabled(true);
 
         let path = plot.content().select("path.line").attr("d");
+        let expectedRenderedData = [1, 2, 3].map((d) => data[d]);
         checkPathForDataPoints(path, expectedRenderedData);
 
         svg.remove();
-
       });
 
       it("works for vertical line plots", () => {
+        let data = [
+          {x: 1, y: 1},
+          {x: 2, y: 2},
+          {x: 1, y: 3},
+          {x: 2, y: 4},
+          {x: 1, y: 5}
+        ];
+        plot.addDataset(new Plottable.Dataset(data));
+
+        // Only middle point is in viewport
+        yScale.domain([2.5, 3.5]);
+
+        plot.renderTo(svg);
+        plot.croppedRenderingEnabled(true);
+
+        let path = plot.content().select("path.line").attr("d");
+        let expectedRenderedData = [1, 2, 3].map((d) => data[d]);
+        checkPathForDataPoints(path, expectedRenderedData);
 
         svg.remove();
+      });
 
+      it("adapts to scale changes", () => {
+        let data = [
+          {x: 1, y: 1},
+          {x: 2, y: 2},
+          {x: 3, y: 1},
+          {x: 4, y: 2},
+          {x: 5, y: 1}
+        ];
+        plot.addDataset(new Plottable.Dataset(data));
+
+        plot.croppedRenderingEnabled(true);
+        plot.renderTo(svg);
+
+        let path = plot.content().select("path.line").attr("d");
+        checkPathForDataPoints(path, [0, 1, 2, 3, 4].map((d) => data[d]));
+
+        // Only middle point is in viewport
+        xScale.domain([2.5, 3.5]);
+        path = plot.content().select("path.line").attr("d");
+        checkPathForDataPoints(path, [1, 2, 3].map((d) => data[d]));
+
+        // Only first point is in viewport
+        xScale.domain([-0.5, 1.5]);
+        path = plot.content().select("path.line").attr("d");
+        checkPathForDataPoints(path, [0, 1].map((d) => data[d]));
+
+        svg.remove();
       });
 
 

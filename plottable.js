@@ -8976,7 +8976,6 @@ var Plottable;
                     return this._downsample;
                 }
                 this._downsample = downsample;
-                // this.render();
                 return this;
             };
             Line.prototype._createDrawer = function (dataset) {
@@ -9185,21 +9184,29 @@ var Plottable;
             };
             Line.prototype._filterCroppedRendering = function (dataset, indices) {
                 var xScale = this.x().scale;
+                var yScale = this.y().scale;
                 var xAccessor = this.x().accessor;
-                var domain = xScale.domain();
+                var yAccessor = this.y().accessor;
+                var xDomain = xScale.domain();
+                var yDomain = yScale.domain();
                 var data = dataset.data();
                 var filteredDataIndices = [];
-                console.log(1);
                 for (var i = 0; i < indices.length; i++) {
-                    var currPoint = xAccessor(data[indices[i]], indices[i], dataset);
-                    var shouldShow = domain[0] <= currPoint && currPoint <= domain[1];
-                    if (indices[i - 1] != null && data[indices[i - 1]] != null) {
-                        var prevPoint = xAccessor(data[indices[i - 1]], indices[i - 1], dataset);
-                        shouldShow = shouldShow || domain[0] <= prevPoint && prevPoint <= domain[1];
+                    var currXPoint = xAccessor(data[indices[i]], indices[i], dataset);
+                    var currYPoint = yAccessor(data[indices[i]], indices[i], dataset);
+                    var shouldShow = xDomain[0] <= currXPoint && currXPoint <= xDomain[1] &&
+                        yDomain[0] <= currYPoint && currYPoint <= yDomain[1];
+                    if (!shouldShow && indices[i - 1] != null && data[indices[i - 1]] != null) {
+                        var prevXPoint = xAccessor(data[indices[i - 1]], indices[i - 1], dataset);
+                        var prevYPoint = yAccessor(data[indices[i - 1]], indices[i - 1], dataset);
+                        shouldShow = shouldShow || xDomain[0] <= prevXPoint && prevXPoint <= xDomain[1] &&
+                            yDomain[0] <= prevYPoint && prevYPoint <= yDomain[1];
                     }
-                    if (indices[i + 1] != null && data[indices[i + 1]] != null) {
-                        var nextPoint = xAccessor(data[indices[i + 1]], indices[i + 1], dataset);
-                        shouldShow = shouldShow || domain[0] <= nextPoint && nextPoint <= domain[1];
+                    if (!shouldShow && indices[i + 1] != null && data[indices[i + 1]] != null) {
+                        var nextXPoint = xAccessor(data[indices[i + 1]], indices[i + 1], dataset);
+                        var nextYPoint = yAccessor(data[indices[i + 1]], indices[i + 1], dataset);
+                        shouldShow = shouldShow || xDomain[0] <= nextXPoint && nextXPoint <= xDomain[1] &&
+                            yDomain[0] <= nextYPoint && nextYPoint <= yDomain[1];
                     }
                     if (shouldShow) {
                         filteredDataIndices.push(indices[i]);

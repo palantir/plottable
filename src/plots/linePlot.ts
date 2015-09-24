@@ -402,28 +402,33 @@ export module Plots {
 
     private _filterCroppedRendering(dataset: Dataset, indices: number[]) {
       let xScale = this.x().scale;
+      let yScale = this.y().scale;
       let xAccessor = this.x().accessor;
-      let domain = xScale.domain();
+      let yAccessor = this.y().accessor;
+      let xDomain = xScale.domain();
+      let yDomain = yScale.domain();
 
       let data = dataset.data();
       let filteredDataIndices: number[] = [];
 
-      console.log(1);
-
-
-
       for (let i = 0; i < indices.length; i++) {
-        let currPoint = xAccessor(data[indices[i]], indices[i], dataset);
-        let shouldShow = domain[0] <= currPoint && currPoint <= domain[1];
+        let currXPoint = xAccessor(data[indices[i]], indices[i], dataset);
+        let currYPoint = yAccessor(data[indices[i]], indices[i], dataset);
+        let shouldShow = xDomain[0] <= currXPoint && currXPoint <= xDomain[1] &&
+          yDomain[0] <= currYPoint && currYPoint <= yDomain[1];
 
-        if (indices[i - 1] != null && data[indices[i - 1]] != null) {
-          let prevPoint = xAccessor(data[indices[i - 1]], indices[i - 1], dataset);
-          shouldShow = shouldShow || domain[0] <= prevPoint && prevPoint <= domain[1];
+        if (!shouldShow && indices[i - 1] != null && data[indices[i - 1]] != null) {
+          let prevXPoint = xAccessor(data[indices[i - 1]], indices[i - 1], dataset);
+          let prevYPoint = yAccessor(data[indices[i - 1]], indices[i - 1], dataset);
+          shouldShow = shouldShow || xDomain[0] <= prevXPoint && prevXPoint <= xDomain[1] &&
+            yDomain[0] <= prevYPoint && prevYPoint <= yDomain[1];
         }
 
-        if (indices[i + 1] != null && data[indices[i + 1]] != null) {
-          let nextPoint = xAccessor(data[indices[i + 1]], indices[i + 1], dataset);
-          shouldShow = shouldShow || domain[0] <= nextPoint && nextPoint <= domain[1];
+        if (!shouldShow && indices[i + 1] != null && data[indices[i + 1]] != null) {
+          let nextXPoint = xAccessor(data[indices[i + 1]], indices[i + 1], dataset);
+          let nextYPoint = yAccessor(data[indices[i + 1]], indices[i + 1], dataset);
+          shouldShow = shouldShow || xDomain[0] <= nextXPoint && nextXPoint <= xDomain[1] &&
+            yDomain[0] <= nextYPoint && nextYPoint <= yDomain[1];
         }
 
         if (shouldShow) {
