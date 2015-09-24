@@ -630,7 +630,8 @@ var Plottable;
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    __.prototype = b.prototype;
+    d.prototype = new __();
 };
 var Plottable;
 (function (Plottable) {
@@ -1601,7 +1602,8 @@ var Plottable;
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    __.prototype = b.prototype;
+    d.prototype = new __();
 };
 var Plottable;
 (function (Plottable) {
@@ -1838,7 +1840,8 @@ var Plottable;
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    __.prototype = b.prototype;
+    d.prototype = new __();
 };
 var Plottable;
 (function (Plottable) {
@@ -1896,7 +1899,8 @@ var Plottable;
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    __.prototype = b.prototype;
+    d.prototype = new __();
 };
 var Plottable;
 (function (Plottable) {
@@ -2087,7 +2091,8 @@ var Plottable;
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    __.prototype = b.prototype;
+    d.prototype = new __();
 };
 var Plottable;
 (function (Plottable) {
@@ -2201,7 +2206,8 @@ var Plottable;
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    __.prototype = b.prototype;
+    d.prototype = new __();
 };
 var Plottable;
 (function (Plottable) {
@@ -2319,7 +2325,8 @@ var Plottable;
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    __.prototype = b.prototype;
+    d.prototype = new __();
 };
 var Plottable;
 (function (Plottable) {
@@ -2434,7 +2441,8 @@ var Plottable;
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    __.prototype = b.prototype;
+    d.prototype = new __();
 };
 var Plottable;
 (function (Plottable) {
@@ -2770,7 +2778,8 @@ var Plottable;
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    __.prototype = b.prototype;
+    d.prototype = new __();
 };
 var Plottable;
 (function (Plottable) {
@@ -2800,7 +2809,8 @@ var Plottable;
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    __.prototype = b.prototype;
+    d.prototype = new __();
 };
 var Plottable;
 (function (Plottable) {
@@ -2830,7 +2840,8 @@ var Plottable;
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    __.prototype = b.prototype;
+    d.prototype = new __();
 };
 var Plottable;
 (function (Plottable) {
@@ -2852,7 +2863,8 @@ var Plottable;
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    __.prototype = b.prototype;
+    d.prototype = new __();
 };
 var Plottable;
 (function (Plottable) {
@@ -2879,7 +2891,8 @@ var Plottable;
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    __.prototype = b.prototype;
+    d.prototype = new __();
 };
 var Plottable;
 (function (Plottable) {
@@ -2906,7 +2919,8 @@ var Plottable;
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    __.prototype = b.prototype;
+    d.prototype = new __();
 };
 var Plottable;
 (function (Plottable) {
@@ -2929,7 +2943,8 @@ var Plottable;
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    __.prototype = b.prototype;
+    d.prototype = new __();
 };
 var Plottable;
 (function (Plottable) {
@@ -3469,7 +3484,8 @@ var Plottable;
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    __.prototype = b.prototype;
+    d.prototype = new __();
 };
 var Plottable;
 (function (Plottable) {
@@ -3550,7 +3566,8 @@ var Plottable;
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    __.prototype = b.prototype;
+    d.prototype = new __();
 };
 var Plottable;
 (function (Plottable) {
@@ -3648,7 +3665,8 @@ var Plottable;
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    __.prototype = b.prototype;
+    d.prototype = new __();
 };
 var Plottable;
 (function (Plottable) {
@@ -4218,7 +4236,8 @@ var Plottable;
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    __.prototype = b.prototype;
+    d.prototype = new __();
 };
 var Plottable;
 (function (Plottable) {
@@ -4687,7 +4706,8 @@ var Plottable;
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    __.prototype = b.prototype;
+    d.prototype = new __();
 };
 var Plottable;
 (function (Plottable) {
@@ -5024,7 +5044,8 @@ var Plottable;
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    __.prototype = b.prototype;
+    d.prototype = new __();
 };
 var Plottable;
 (function (Plottable) {
@@ -5235,7 +5256,8 @@ var Plottable;
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    __.prototype = b.prototype;
+    d.prototype = new __();
 };
 var Plottable;
 (function (Plottable) {
@@ -5391,7 +5413,8 @@ var Plottable;
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    __.prototype = b.prototype;
+    d.prototype = new __();
 };
 var Plottable;
 (function (Plottable) {
@@ -5663,7 +5686,8 @@ var Plottable;
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    __.prototype = b.prototype;
+    d.prototype = new __();
 };
 var Plottable;
 (function (Plottable) {
@@ -5905,7 +5929,8 @@ var Plottable;
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    __.prototype = b.prototype;
+    d.prototype = new __();
 };
 var Plottable;
 (function (Plottable) {
@@ -6009,7 +6034,8 @@ var Plottable;
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    __.prototype = b.prototype;
+    d.prototype = new __();
 };
 var Plottable;
 (function (Plottable) {
@@ -6373,7 +6399,8 @@ var Plottable;
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    __.prototype = b.prototype;
+    d.prototype = new __();
 };
 var Plottable;
 (function (Plottable) {
@@ -6593,7 +6620,8 @@ var Plottable;
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    __.prototype = b.prototype;
+    d.prototype = new __();
 };
 var Plottable;
 (function (Plottable) {
@@ -6744,7 +6772,8 @@ var Plottable;
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    __.prototype = b.prototype;
+    d.prototype = new __();
 };
 var Plottable;
 (function (Plottable) {
@@ -7209,7 +7238,8 @@ var Plottable;
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    __.prototype = b.prototype;
+    d.prototype = new __();
 };
 var Plottable;
 (function (Plottable) {
@@ -7537,7 +7567,8 @@ var Plottable;
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    __.prototype = b.prototype;
+    d.prototype = new __();
 };
 var Plottable;
 (function (Plottable) {
@@ -7842,7 +7873,8 @@ var Plottable;
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    __.prototype = b.prototype;
+    d.prototype = new __();
 };
 var Plottable;
 (function (Plottable) {
@@ -8196,7 +8228,8 @@ var Plottable;
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    __.prototype = b.prototype;
+    d.prototype = new __();
 };
 var Plottable;
 (function (Plottable) {
@@ -8350,7 +8383,8 @@ var Plottable;
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    __.prototype = b.prototype;
+    d.prototype = new __();
 };
 var Plottable;
 (function (Plottable) {
@@ -8976,7 +9010,8 @@ var Plottable;
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    __.prototype = b.prototype;
+    d.prototype = new __();
 };
 var Plottable;
 (function (Plottable) {
@@ -8993,6 +9028,8 @@ var Plottable;
                 _super.call(this);
                 this._interpolator = "linear";
                 this._autorangeSmooth = false;
+                // Performance options
+                this._croppedRendering = false;
                 this.addClass("line-plot");
                 var animator = new Plottable.Animators.Easing();
                 animator.stepDuration(Plottable.Plot._ANIMATION_MAX_DURATION);
@@ -9056,6 +9093,14 @@ var Plottable;
                     return this._interpolator;
                 }
                 this._interpolator = interpolator;
+                this.render();
+                return this;
+            };
+            Line.prototype.croppedRenderingEnabled = function (croppedRendering) {
+                if (croppedRendering == null) {
+                    return this._croppedRendering;
+                }
+                this._croppedRendering = croppedRendering;
                 this.render();
                 return this;
             };
@@ -9244,9 +9289,53 @@ var Plottable;
                 };
             };
             Line.prototype._getDataToDraw = function () {
+                var _this = this;
                 var dataToDraw = new Plottable.Utils.Map();
-                this.datasets().forEach(function (dataset) { return dataToDraw.set(dataset, [dataset.data()]); });
+                this.datasets().forEach(function (dataset) {
+                    var data = dataset.data();
+                    if (!_this._croppedRendering) {
+                        dataToDraw.set(dataset, [data]);
+                        return;
+                    }
+                    var filteredDataIndices = data.map(function (d, i) { return i; });
+                    if (_this._croppedRendering) {
+                        filteredDataIndices = _this._filterCroppedRendering(dataset, filteredDataIndices);
+                    }
+                    dataToDraw.set(dataset, [filteredDataIndices.map(function (d, i) { return data[d]; })]);
+                });
                 return dataToDraw;
+            };
+            Line.prototype._filterCroppedRendering = function (dataset, indices) {
+                var xScale = this.x().scale;
+                var yScale = this.y().scale;
+                var xAccessor = this.x().accessor;
+                var yAccessor = this.y().accessor;
+                var xDomain = xScale.domain();
+                var yDomain = yScale.domain();
+                var data = dataset.data();
+                var filteredDataIndices = [];
+                for (var i = 0; i < indices.length; i++) {
+                    var currXPoint = xAccessor(data[indices[i]], indices[i], dataset);
+                    var currYPoint = yAccessor(data[indices[i]], indices[i], dataset);
+                    var shouldShow = xDomain[0] <= currXPoint && currXPoint <= xDomain[1] &&
+                        yDomain[0] <= currYPoint && currYPoint <= yDomain[1];
+                    if (!shouldShow && indices[i - 1] != null && data[indices[i - 1]] != null) {
+                        var prevXPoint = xAccessor(data[indices[i - 1]], indices[i - 1], dataset);
+                        var prevYPoint = yAccessor(data[indices[i - 1]], indices[i - 1], dataset);
+                        shouldShow = shouldShow || xDomain[0] <= prevXPoint && prevXPoint <= xDomain[1] &&
+                            yDomain[0] <= prevYPoint && prevYPoint <= yDomain[1];
+                    }
+                    if (!shouldShow && indices[i + 1] != null && data[indices[i + 1]] != null) {
+                        var nextXPoint = xAccessor(data[indices[i + 1]], indices[i + 1], dataset);
+                        var nextYPoint = yAccessor(data[indices[i + 1]], indices[i + 1], dataset);
+                        shouldShow = shouldShow || xDomain[0] <= nextXPoint && nextXPoint <= xDomain[1] &&
+                            yDomain[0] <= nextYPoint && nextYPoint <= yDomain[1];
+                    }
+                    if (shouldShow) {
+                        filteredDataIndices.push(indices[i]);
+                    }
+                }
+                return filteredDataIndices;
             };
             return Line;
         })(Plottable.XYPlot);
@@ -9258,7 +9347,8 @@ var Plottable;
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    __.prototype = b.prototype;
+    d.prototype = new __();
 };
 var Plottable;
 (function (Plottable) {
@@ -9433,7 +9523,8 @@ var Plottable;
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    __.prototype = b.prototype;
+    d.prototype = new __();
 };
 var Plottable;
 (function (Plottable) {
@@ -9498,7 +9589,8 @@ var Plottable;
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    __.prototype = b.prototype;
+    d.prototype = new __();
 };
 var Plottable;
 (function (Plottable) {
@@ -9664,7 +9756,8 @@ var Plottable;
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    __.prototype = b.prototype;
+    d.prototype = new __();
 };
 var Plottable;
 (function (Plottable) {
@@ -9786,7 +9879,8 @@ var Plottable;
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    __.prototype = b.prototype;
+    d.prototype = new __();
 };
 var Plottable;
 (function (Plottable) {
@@ -9962,7 +10056,8 @@ var Plottable;
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    __.prototype = b.prototype;
+    d.prototype = new __();
 };
 var Plottable;
 (function (Plottable) {
@@ -10166,7 +10261,8 @@ var Plottable;
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    __.prototype = b.prototype;
+    d.prototype = new __();
 };
 var Plottable;
 (function (Plottable) {
@@ -10513,7 +10609,8 @@ var Plottable;
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    __.prototype = b.prototype;
+    d.prototype = new __();
 };
 var Plottable;
 (function (Plottable) {
@@ -10700,7 +10797,8 @@ var Plottable;
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    __.prototype = b.prototype;
+    d.prototype = new __();
 };
 var Plottable;
 (function (Plottable) {
@@ -10864,7 +10962,8 @@ var Plottable;
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    __.prototype = b.prototype;
+    d.prototype = new __();
 };
 var Plottable;
 (function (Plottable) {
@@ -11051,7 +11150,8 @@ var Plottable;
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    __.prototype = b.prototype;
+    d.prototype = new __();
 };
 var Plottable;
 (function (Plottable) {
@@ -11133,7 +11233,8 @@ var Plottable;
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    __.prototype = b.prototype;
+    d.prototype = new __();
 };
 var Plottable;
 (function (Plottable) {
@@ -11246,7 +11347,8 @@ var Plottable;
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    __.prototype = b.prototype;
+    d.prototype = new __();
 };
 var Plottable;
 (function (Plottable) {
@@ -11365,7 +11467,8 @@ var Plottable;
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    __.prototype = b.prototype;
+    d.prototype = new __();
 };
 var Plottable;
 (function (Plottable) {
@@ -11482,7 +11585,8 @@ var Plottable;
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    __.prototype = b.prototype;
+    d.prototype = new __();
 };
 var Plottable;
 (function (Plottable) {
@@ -11806,7 +11910,8 @@ var Plottable;
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    __.prototype = b.prototype;
+    d.prototype = new __();
 };
 var Plottable;
 (function (Plottable) {
@@ -11964,7 +12069,8 @@ var Plottable;
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    __.prototype = b.prototype;
+    d.prototype = new __();
 };
 var Plottable;
 (function (Plottable) {
@@ -12337,7 +12443,8 @@ var Plottable;
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    __.prototype = b.prototype;
+    d.prototype = new __();
 };
 var Plottable;
 (function (Plottable) {
@@ -12398,7 +12505,8 @@ var Plottable;
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    __.prototype = b.prototype;
+    d.prototype = new __();
 };
 var Plottable;
 (function (Plottable) {
@@ -12459,7 +12567,8 @@ var Plottable;
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    __.prototype = b.prototype;
+    d.prototype = new __();
 };
 var Plottable;
 (function (Plottable) {
