@@ -748,11 +748,10 @@ describe("Plots", () => {
           let coordinates = edge.split(",");
 
           assert.strictEqual(coordinates.length, 2, "There is an x coordinate and a y coordinate");
-
           assert.closeTo(xScale.invert(+coordinates[0]), data[expectedPoint].x, 0.01,
-            `Point ${expectedPoint}, coordinate x is as expected`);
+            `Point ${expectedPoint}, has correct x coordinate`);
           assert.closeTo(yScale.invert(+coordinates[1]), data[expectedPoint].y, 0.01,
-            `Point ${expectedPoint}, coordinate y is as expected`);
+            `Point ${expectedPoint}, has correct y coordinate`);
         });
       });
 
