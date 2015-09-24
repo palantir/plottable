@@ -129,32 +129,28 @@ describe("TimeAxis", () => {
     assert.isTrue(lastTick.classed(Plottable.Axis.END_TICK_MARK_CLASS), "last end tick has the end-tick-mark class");
     svg.remove();
   });
-
-  it("tick labels do not overlap with tick marks", () => {
-    let svg = TestMethods.generateSVG(400, 100);
-    scale = new Plottable.Scales.Time();
-    scale.domain([new Date("2009-12-20"), new Date("2011-01-01")]);
-    axis = new Plottable.Axes.Time(scale, "bottom");
-    axis.renderTo(svg);
-    let tickRects = d3.selectAll("." + Plottable.Axis.TICK_MARK_CLASS)[0].map((mark: Element) => mark.getBoundingClientRect());
-    let labelRects = d3.selectAll("." + Plottable.Axis.TICK_LABEL_CLASS)
-        .filter(function(d: Element, i: number) {
-          return d3.select(this).style("visibility") === "visible";
-        })[0].map((label: Element) => label.getBoundingClientRect());
-    labelRects.forEach(function(labelRect: ClientRect) {
-      tickRects.forEach(function(tickRect: ClientRect) {
-        assert.isFalse(Plottable.Utils.DOM.clientRectsOverlap(labelRect, tickRect), "visible label does not overlap with a tick");
+  describe("tick labels and tick marks locations", () => {
+    it("tick labels do not overlap with tick marks", () => {
+      let svg = TestMethods.generateSVG(400, 100);
+      scale = new Plottable.Scales.Time();
+      scale.domain([new Date("2009-12-20"), new Date("2011-01-01")]);
+      axis = new Plottable.Axes.Time(scale, "bottom");
+      axis.renderTo(svg);
+      let tickRects = d3.selectAll("." + Plottable.Axis.TICK_MARK_CLASS)[0].map((mark: Element) => mark.getBoundingClientRect());
+      let labelRects = d3.selectAll("." + Plottable.Axis.TICK_LABEL_CLASS)
+          .filter(function(d: Element, i: number) {
+            return d3.select(this).style("visibility") === "visible";
+          })[0].map((label: Element) => label.getBoundingClientRect());
+      labelRects.forEach(function(labelRect: ClientRect) {
+        tickRects.forEach(function(tickRect: ClientRect) {
+          assert.isFalse(Plottable.Utils.DOM.clientRectsOverlap(labelRect, tickRect), "visible label does not overlap with a tick");
+        });
       });
+      svg.remove();
     });
-    svg.remove();
-  });
-
-  it("tick labels do not overlap with tick marks in top orientation", () => {
-    let svg = TestMethods.generateSVG(400, 100);
-    scale.domain([new Date("2010-01-01"), new Date("2014-01-01")]);
-    axis.orientation("top");
 
     function checkTierDisplayPosition (tierDisplayPositions: string[]) {
+      let svg = TestMethods.generateSVG(400, 100);
       axis.tierLabelPositions(tierDisplayPositions);
       axis.renderTo(svg);
       let style = (<any>axis)._element.append("style");
@@ -167,25 +163,28 @@ describe("TimeAxis", () => {
       });
       assert.operator(tickLabels.size(), ">=", 1, `There is at least one tick label in the test`);
 
-      function clientRectsOverlap(clientRectA: ClientRect, clientRectB: ClientRect) {
-        return !(clientRectA.right < clientRectB.left + window.Pixel_CloseTo_Requirement)
-               && !(window.Pixel_CloseTo_Requirement + clientRectA.left > clientRectB.right)
-               && !(clientRectA.bottom < clientRectB.top + window.Pixel_CloseTo_Requirement)
-               && !(window.Pixel_CloseTo_Requirement + clientRectA.top > clientRectB.bottom);
-     }
-
       tickMarks.each(function(tickMark) {
         let tickMarkRect = this.getBoundingClientRect();
         tickLabels.each(function(tickLabel) {
           let tickLabelRect = this.getBoundingClientRect();
-          assert.isFalse(clientRectsOverlap(tickMarkRect, tickLabelRect),
+          assert.isFalse(Plottable.Utils.DOM.clientRectsOverlap(tickMarkRect, tickLabelRect),
             `Tick marks [${tickMark}] should not overlap with tick labels [${this.textContent}]`);
         });
       });
+      svg.remove();
     }
-    checkTierDisplayPosition(["between", "between"]);
-    checkTierDisplayPosition(["center", "center"]);
-    svg.remove();
+
+    it("tick labels do not overlap with tick marks in top orientation", () => {
+      scale.domain([new Date("2010-01-01"), new Date("2014-01-01")]);
+      axis.orientation("top");
+      checkTierDisplayPosition(["between", "between"]);
+    });
+
+    it("tick labels do not overlap with tick marks in top orientation", () => {
+      scale.domain([new Date("2010-01-01"), new Date("2014-01-01")]);
+      axis.orientation("top");
+      checkTierDisplayPosition(["center", "center"]);
+    });
   });
 
   it("if the time only uses one tier, there should be no space left for the second tier", () => {
