@@ -2160,11 +2160,11 @@ declare module Plottable {
             constructor(colorScale: Scales.Color);
             protected _setup(): void;
             /**
-             * Gets the Formatter for the text.
+             * Gets the Formatter for the entry texts.
              */
             formatter(): Formatter;
             /**
-             * Sets the Formatter for the text.
+             * Sets the Formatter for the entry texts.
              *
              * @param {Formatter} formatter
              * @returns {Legend} The calling Legend.

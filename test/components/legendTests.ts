@@ -262,11 +262,11 @@ describe("Legend", () => {
     };
     legend.formatter(formatter);
     legend.renderTo(svg);
-
-    let legendRows = svg.selectAll(".legend_row");
+    let legendRows = svg.selectAll(entrySelector);
     legendRows.each(function(d: Element, i: number){
       let expectText = formatter(legend.colorScale().domain()[i]);
-      assert.strictEqual(this.text(), expectText, `formatter output ${this.text} should be displayed`);
+      assert.strictEqual(d3.select(this).select("text").text(), expectText,
+        `formatter output ${d3.select(this).select("text").text()} should be displayed`);
     });
     svg.remove();
   });
@@ -278,8 +278,22 @@ describe("Legend", () => {
         return data[id];
     };
     legend.formatter(formatter);
-    legend.renderTo(svg);
     assert.strictEqual(legend.formatter(), formatter, "formatter() return the formatter of legend correctly");
+    svg.remove();
+  });
+
+  it("comparator() works as expected when customized formatter is applied", () => {
+    let colorDomain = ["A", "B", "C"];
+    color.domain(colorDomain);
+    let expectedTexts = ["Z", "Y", "X"];
+    let formatter = (d: string) => expectedTexts[colorDomain.indexOf(d)];
+    legend.formatter(formatter);
+    let comparator = (a: string, b: string) => a.localeCompare(b);
+    legend.comparator(comparator);
+    legend.renderTo(svg);
+    let entryTexts = svg.selectAll(entrySelector)[0].map((node: Element) => d3.select(node).select("text").text());
+    expectedTexts.sort(comparator);
+    assert.deepEqual(expectedTexts, entryTexts, "formatted entry has been sorted as expected");
     svg.remove();
   });
 
