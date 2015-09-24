@@ -683,4 +683,17 @@ describe("Plots", () => {
 
     });
   });
+
+
+  describe("Line Plot", () => {
+    describe("Cropped Rendering Performance", () => {
+
+    });
+
+    describe("Downsampling Performance", () => {
+
+    });
+
+  })
+
 });
