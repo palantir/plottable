@@ -254,9 +254,9 @@ describe("Legend", () => {
     svg.remove();
   });
 
-  it("can set formatter and change how entry labels are displayed", () => {
+  it("can set formatter to change how entry labels are displayed", () => {
     color.domain(["A", "B", "C"]);
-    let formatter = (id: string) => String.fromCharCode(id.charCodeAt(0) + 1);
+    let formatter = (id: string) => `${id}foo`;
     legend.formatter(formatter);
     legend.renderTo(svg);
     let legendRows = svg.selectAll(entrySelector);
