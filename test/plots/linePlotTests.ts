@@ -742,8 +742,40 @@ describe("Plots", () => {
         svg.remove();
       });
 
+      it("works when the performance option is set after rendering to svg", () => {
+        let data = [
+          {x: 1, y: 1},
+          {x: 2, y: 2},
+          {x: 3, y: 1},
+          {x: 4, y: 2},
+          {x: 5, y: 1}
+        ];
+        plot.addDataset(new Plottable.Dataset(data));
+
+        // Only middle point is in viewport
+        xScale.domain([2.5, 3.5]);
+        let expectedRenderedData = [1, 2, 3].map((d) => data[d]);
+
+        plot.renderTo(svg);
+        plot.croppedRenderingEnabled(true);
+
+        let path = plot.content().select("path.line").attr("d");
+        checkPathForDataPoints(path, expectedRenderedData);
+
+        svg.remove();
+
+      });
+
+      it("works for vertical line plots", () => {
+
+        svg.remove();
+
+      });
+
 
       function checkPathForDataPoints(path: string, data: any[]) {
+        let EPSILON = 0.0001;
+
         let lineEdges = path.match(/(\-?d*\.?-?\d*),(-?\d*\.?-?\d*)/g);
 
         assert.strictEqual(lineEdges.length, data.length, "correct number of edges drawn")
@@ -752,9 +784,9 @@ describe("Plots", () => {
           let coordinates = edge.split(",");
 
           assert.strictEqual(coordinates.length, 2, "There is an x coordinate and a y coordinate");
-          assert.closeTo(xScale.invert(+coordinates[0]), data[i].x, 0.01,
+          assert.closeTo(xScale.invert(+coordinates[0]), data[i].x, EPSILON,
             `Point ${i} drawn, has correct x coordinate`);
-          assert.closeTo(yScale.invert(+coordinates[1]), data[i].y, 0.01,
+          assert.closeTo(yScale.invert(+coordinates[1]), data[i].y, EPSILON,
             `Point ${i} drawn, has correct y coordinate`);
         });
 
