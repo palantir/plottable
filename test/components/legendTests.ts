@@ -261,7 +261,7 @@ describe("Legend", () => {
     legend.formatter(formatter);
     legend.renderTo(svg);
     let legendRows = svg.selectAll(entrySelector);
-    assert.operator(legendRows, ">=", 1, "There is at least one entry in the test");
+    assert.operator(legendRows.size(), ">=", 1, "There is at least one entry in the test");
     legendRows.each(function(d: Element, i: number){
       let expectText = formatter(legend.colorScale().domain()[i]);
       assert.strictEqual(d3.select(this).select("text").text(), expectText,
