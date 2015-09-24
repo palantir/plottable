@@ -261,7 +261,7 @@ describe("Legend", () => {
     legend.renderTo(svg);
     let legendRows = svg.selectAll(entrySelector);
     assert.operator(legendRows.size(), ">=", 1, "There is at least one entry in the test");
-    legendRows.each(function(d: Element, i: number){
+    legendRows.each(function(d, i){
       let expectText = formatter(legend.colorScale().domain()[i]);
       assert.strictEqual(d3.select(this).select("text").text(), expectText,
         `formatter output ${expectText} should be displayed`);
@@ -276,7 +276,7 @@ describe("Legend", () => {
     svg.remove();
   });
 
-  it("can sort entry texts by displayed texts using comparator", () => {
+  it("can sort displayed texts using comparator()", () => {
     let colorDomain = ["A", "B", "C"];
     color.domain(colorDomain);
     let expectedTexts = ["Z", "Y", "X"];
