@@ -270,7 +270,7 @@ describe("Legend", () => {
   });
 
   it("can get formatter of the legend using formatter()", () => {
-    let formatter = (id: string) => String.fromCharCode(id.charCodeAt(0) + 1);
+    let formatter = (id: string) => `${id}foo`;
     legend.formatter(formatter);
     assert.strictEqual(legend.formatter(), formatter, "formatter() returns the formatter of legend correctly");
     svg.remove();
