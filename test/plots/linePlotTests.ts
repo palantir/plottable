@@ -731,29 +731,34 @@ describe("Plots", () => {
 
         // Only middle point is in viewport
         xScale.domain([2.5, 3.5]);
-        let expectedRemainingDataIndices = [1, 2, 3];
+        let expectedRenderedData = [1, 2, 3].map((d) => data[d]);
 
         plot.croppedRenderingEnabled(true);
-
         plot.renderTo(svg);
 
         let path = plot.content().select("path.line").attr("d");
+        checkPathForDataPoints(path, expectedRenderedData);
+
+        svg.remove();
+      });
+
+
+      function checkPathForDataPoints(path: string, data: any[]) {
         let lineEdges = path.match(/(\-?d*\.?-?\d*),(-?\d*\.?-?\d*)/g);
 
-        assert.strictEqual(lineEdges.length, 3, "2 out of 4 lines have been drawn (3 end points)")
+        assert.strictEqual(lineEdges.length, data.length, "correct number of edges drawn")
 
         lineEdges.forEach((edge, i) => {
           let coordinates = edge.split(",");
 
           assert.strictEqual(coordinates.length, 2, "There is an x coordinate and a y coordinate");
-          assert.closeTo(xScale.invert(+coordinates[0]), data[expectedRemainingDataIndices[i]].x, 0.01,
-            `Point ${expectedRemainingDataIndices[i]}, has correct x coordinate`);
-          assert.closeTo(yScale.invert(+coordinates[1]), data[expectedRemainingDataIndices[i]].y, 0.01,
-            `Point ${expectedRemainingDataIndices[i]}, has correct y coordinate`);
+          assert.closeTo(xScale.invert(+coordinates[0]), data[i].x, 0.01,
+            `Point ${i} drawn, has correct x coordinate`);
+          assert.closeTo(yScale.invert(+coordinates[1]), data[i].y, 0.01,
+            `Point ${i} drawn, has correct y coordinate`);
         });
 
-        svg.remove();
-      });
+      }
 
     });
 
