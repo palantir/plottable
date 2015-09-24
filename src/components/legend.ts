@@ -164,7 +164,7 @@ export module Components {
 
       let availableWidthForEntries = Math.max(0, (availableWidth - this._padding));
 
-      let entryNames = this._colorScale.domain().slice().sort((a,b) => this._comparator(this._formatter(a), this._formatter(b)));
+      let entryNames = this._colorScale.domain().slice().sort((a, b) => this._comparator(this._formatter(a), this._formatter(b)));
       let entryLengths: d3.Map<number> = d3.map<number>();
       let untruncatedEntryLengths: d3.Map<number> = d3.map<number>();
       entryNames.forEach((entryName) => {
