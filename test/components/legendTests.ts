@@ -255,9 +255,8 @@ describe("Legend", () => {
   });
 
   it("can set formatter and change how entry labels are displayed", () => {
-    color.domain(["jtao", "mschafer", "kfalter"]);
-    let data: {[id: string]: string; } = {"jtao": "Joy", "mschafer":  "Mark", "kfalter": "Kelsey"};
-    let formatter = (id: string) => data[id];
+    color.domain(["A", "B", "C"]);
+    let formatter = (id: string) => String.fromCharCode(id.charCodeAt(0) + 1);
     legend.formatter(formatter);
     legend.renderTo(svg);
     let legendRows = svg.selectAll(entrySelector);
@@ -271,26 +270,24 @@ describe("Legend", () => {
   });
 
   it("can get formatter of the legend using formatter()", () => {
-    color.domain(["jtao", "mschafer", "kfalter"]);
-    let data: {[id: string]: string; } = {"jtao": "Joy", "mschafer": "Mark", "kfalter": "Kelsey"};
-    let formatter = (id: string) => data[id];
+    let formatter = (id: string) => String.fromCharCode(id.charCodeAt(0) + 1);
     legend.formatter(formatter);
     assert.strictEqual(legend.formatter(), formatter, "formatter() returns the formatter of legend correctly");
     svg.remove();
   });
 
-  it("comparator() works as expected when customized formatter is applied", () => {
+  it("can sort entry texts by displayed texts using comparator", () => {
     let colorDomain = ["A", "B", "C"];
     color.domain(colorDomain);
     let expectedTexts = ["Z", "Y", "X"];
     let formatter = (d: string) => expectedTexts[colorDomain.indexOf(d)];
     legend.formatter(formatter);
-    let comparator = (a: string, b: string) => a.localeCompare(b);
+    let comparator = (a: string, b: string) => a.charCodeAt(0) - b.charCodeAt(0);
     legend.comparator(comparator);
     legend.renderTo(svg);
     let entryTexts = svg.selectAll(entrySelector)[0].map((node: Element) => d3.select(node).select("text").text());
     expectedTexts.sort(comparator);
-    assert.deepEqual(expectedTexts, entryTexts, "formatted entries have been sorted as expected");
+    assert.deepEqual(expectedTexts, entryTexts, "displayed texts should be sorted in alphabetic order");
     svg.remove();
   });
 

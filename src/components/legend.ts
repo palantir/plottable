@@ -164,12 +164,7 @@ export module Components {
 
       let availableWidthForEntries = Math.max(0, (availableWidth - this._padding));
 
-      let entryLabels: d3.Map<string> = d3.map<string>();
-      this._colorScale.domain().slice().forEach((d) => {
-        entryLabels.set(this._formatter(d), d);
-      });
-      let formattedEntryNames = entryLabels.keys();
-      let entryNames = formattedEntryNames.sort(this.comparator()).map((d) => entryLabels.get(d));
+      let entryNames = this._colorScale.domain().slice().sort((a,b) => this._comparator(this._formatter(a), this._formatter(b)));
       let entryLengths: d3.Map<number> = d3.map<number>();
       let untruncatedEntryLengths: d3.Map<number> = d3.map<number>();
       entryNames.forEach((entryName) => {
