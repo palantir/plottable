@@ -49,6 +49,14 @@ describe("Scales", () => {
         assert.operator(scale.domain()[1].getTime(), ">", unpaddedDomain[1].getTime(), "right side of domain was padded");
       });
 
+      it("has a consistent default domain", () => {
+        let scale2 = new Plottable.Scales.Time();
+        assert.strictEqual(scale.domain()[0].getTime(), scale2.domain()[0].getTime(),
+          "both scales have the same default left side of domain");
+        assert.strictEqual(scale.domain()[1].getTime(), scale2.domain()[1].getTime(),
+          "both scales have the same default right side of domain");
+      });
+
       it("respects padding exceptions", () => {
         let minValue = new Date(2000, 5, 4);
         let maxValue = new Date(2000, 5, 6);

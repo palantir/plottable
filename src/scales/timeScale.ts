@@ -12,6 +12,7 @@ export module Scales {
     constructor() {
       super();
       this._d3Scale = d3.time.scale();
+      this.autoDomain();
     }
 
     /**
@@ -38,11 +39,7 @@ export module Scales {
     }
 
     protected _defaultExtent(): Date[] {
-      let now = new Date();
-      let endTimeValue = now.valueOf();
-      now.setDate(now.getDate() - 1);
-      let startTimeValue = now.valueOf();
-      return [new Date(startTimeValue), new Date(endTimeValue)];
+      return [new Date("1970-01-01"), new Date("1970-01-02")];
     }
 
     protected _expandSingleValueDomain(singleValueDomain: Date[]): Date[] {
