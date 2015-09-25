@@ -4020,6 +4020,7 @@ declare module Plottable {
              * @return {Dispatchers.Mouse} The calling Mouse Dispatcher.
              */
             offDblClick(callback: MouseCallback): Dispatchers.Mouse;
+            eventInsideSVG(event: MouseEvent): boolean;
             /**
              * Returns the last computed mouse position in <svg> coordinate space.
              *
@@ -4108,6 +4109,7 @@ declare module Plottable {
              * @return {Dispatchers.Touch} The calling Touch Dispatcher.
              */
             offTouchCancel(callback: TouchCallback): Dispatchers.Touch;
+            eventInsideSVG(event: TouchEvent): boolean;
         }
     }
 }
