@@ -2335,6 +2335,7 @@ var Plottable;
             function Time() {
                 _super.call(this);
                 this._d3Scale = d3.time.scale();
+                this.autoDomain();
             }
             /**
              * Returns an array of ticks values separated by the specified interval.
@@ -2358,11 +2359,7 @@ var Plottable;
                 return _super.prototype._setDomain.call(this, values);
             };
             Time.prototype._defaultExtent = function () {
-                var now = new Date();
-                var endTimeValue = now.valueOf();
-                now.setDate(now.getDate() - 1);
-                var startTimeValue = now.valueOf();
-                return [new Date(startTimeValue), new Date(endTimeValue)];
+                return [new Date("1970-01-01"), new Date("1970-01-02")];
             };
             Time.prototype._expandSingleValueDomain = function (singleValueDomain) {
                 var startTime = singleValueDomain[0].getTime();
