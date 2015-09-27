@@ -92,7 +92,7 @@ module.exports = function(grunt) {
   // on each recompile
   var updateTsFiles = function() {
     tsFiles = grunt.file.read("src/reference.ts")
-      .replace(/\r\n/g,"\n")
+      .replace(/\r\n/g, "\n")
       .split("\n")
       .filter(function(s) {
         return s !== "";
