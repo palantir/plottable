@@ -4,9 +4,18 @@ module Plottable {
 
 export type DatasetCallback = (dataset: Dataset) => void;
 
+
+export class KeyFunctions {
+  protected static counter: number = 0;
+  public static NoConstancy: (d: any, i: number) => any = (d: any) => { return KeyFunctions.counter++; };
+  public static ByIndex: (d: any, i: number) => any = (d: any, i: number) => { return i; };
+}
+
+
 export class Dataset {
   private _data: any[];
   private _metadata: any;
+  private _key: (datum: any, index: number) => any = KeyFunctions.NoConstancy;
   private _callbacks: Utils.CallbackSet<DatasetCallback>;
 
   /**
@@ -86,6 +95,24 @@ export class Dataset {
       return this._metadata;
     } else {
       this._metadata = metadata;
+      this._callbacks.callCallbacks(this);
+      return this;
+    }
+  }
+
+  public key(): (datum: any, index: number) => any;
+  /**
+   * Sets the key.
+   *
+   * @param { (d: any, i: number) => any} key
+   * @returns {Dataset} The calling Dataset.
+   */
+  public key(key: (datum: any, index: number) => any): Dataset;
+  public key(key?: (datum: any, index: number) => any): any {
+    if (key == null) {
+      return this._key;
+    } else {
+      this._key = key;
       this._callbacks.callCallbacks(this);
       return this;
     }
