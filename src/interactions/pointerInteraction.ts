@@ -8,8 +8,7 @@ export module Interactions {
   export class Pointer extends Interaction {
     private _mouseDispatcher: Dispatchers.Mouse;
     private _touchDispatcher: Dispatchers.Touch;
-    private _overComponent = false;
-    private _insideSVG = false;
+    private _insideComponent = false;
     private _pointerEnterCallbacks = new Utils.CallbackSet<PointerCallback>();
     private _pointerMoveCallbacks = new Utils.CallbackSet<PointerCallback>();
     private _pointerExitCallbacks = new Utils.CallbackSet<PointerCallback>();
@@ -50,17 +49,15 @@ export module Interactions {
       let overComponent = this._isInsideComponent(translatedP);
 
       if (overComponent && insideSVG) {
-        if (!this._overComponent || !this._insideSVG) {
+        if (!this._insideComponent) {
           this._pointerEnterCallbacks.callCallbacks(translatedP);
         }
         this._pointerMoveCallbacks.callCallbacks(translatedP);
-      } else if (this._overComponent && this._insideSVG) {
-        this._overComponent = false;
+      } else if (this._insideComponent) {
         this._pointerExitCallbacks.callCallbacks(translatedP);
       }
 
-      this._overComponent = overComponent;
-      this._insideSVG = insideSVG;
+      this._insideComponent = overComponent && insideSVG;
     }
 
     /**
