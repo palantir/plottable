@@ -52,10 +52,10 @@ function run(svg, data, Plottable) {
   .annotationTierCount(2)
   .annotationFormatter(function(val){
     if(+val === maxX){
-      return "max";
+      return "Y Max";
     }
     else{
-      return "min";
+      return "Y Min";
     }
   });
 
@@ -112,17 +112,17 @@ function run(svg, data, Plottable) {
     plots.push(segmentPlot);
   }
 
-  var maxXLine = new Plottable.Components.GuideLineLayer("vertical")
-  .scale(xScale)
-  .value(maxX)
+  var maxYLine = new Plottable.Components.GuideLineLayer("horizontal")
+  .scale(yScale)
+  .value(maxY)
   .addClass("green");
-  plots.push(maxXLine);
+  plots.push(maxYLine);
 
-  var minXLine = new Plottable.Components.GuideLineLayer("vertical")
-  .scale(xScale)
-  .value(minX)
+  var minYLine = new Plottable.Components.GuideLineLayer("horizontal")
+  .scale(yScale)
+  .value(minY)
   .addClass("red");
-  plots.push(minXLine);
+  plots.push(minYLine);
 
   var group = new Plottable.Components.Group(plots);
 
