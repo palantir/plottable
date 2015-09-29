@@ -27,11 +27,46 @@ function makeData() {
 
 function run(svg, data, Plottable) {
   "use strict";
-  var xScale = new Plottable.Scales.Linear();
-  var xAxis = new Plottable.Axes.Numeric(xScale, "bottom");
+  var d = data[0];
+  var maxX = d[0].x;
+  var minX = d[0].x;
+  var maxY = d[0].y;
+  var minY = d[0].y;
+  for (var ds = 0; ds < data.length; ds ++){
+    var d = data[ds];
+    for (var i = 0; i < d.length; i++){
+      if (d[i].y > maxY) {
+        maxX = d[i].x + 12 * ds;
+        maxY = d[i].y;
+      }
+      if (d[i].y < minY) {
+        minX = d[i].x + 12 * ds;
+        minY = d[i].y;
+      }
+    }
+  }
 
-  var yScale = new Plottable.Scales.Linear();
-  var yAxis = new Plottable.Axes.Numeric(yScale, "left");
+
+  var xScale = new Plottable.Scales.Linear();
+  var xAxis = new Plottable.Axes.Numeric(xScale, "bottom")
+  .annotationsEnabled(true)
+  .annotatedTicks([minX, maxX])
+  .annotationTierCount(2)
+  .annotationFormatter(function(d){
+    if(+d === maxX){
+      return "max";
+    }
+    else{
+      return "min";
+    }
+  });
+
+  var yScale = new Plottable.Scales.Linear()
+  .padProportion(1);
+  var yAxis = new Plottable.Axes.Numeric(yScale, "left")
+  .annotationsEnabled(true)
+  .annotationTierCount(2)
+  .annotatedTicks([minY.toFixed(1), maxY.toFixed(1)]);
 
    var yearFormatter = function(d) { return Math.floor(d / 12) + 1999; };
    xAxis.formatter(yearFormatter);
@@ -72,12 +107,24 @@ function run(svg, data, Plottable) {
       .y(getY, yScale)
       .x2(getX2, xScale)
       .addDataset(new Plottable.Dataset(segmentData))
-      .attr("stroke", "#ff0000")
+      .attr("stroke", "#888888")
       .attr("stroke-width", 4)
       .attr("stroke-dasharray", 4)
       .animated(true);
     plots.push(segmentPlot);
   }
+
+  var maxXLine = new Plottable.Components.GuideLineLayer("vertical")
+  .scale(xScale)
+  .value(maxX)
+  .addClass("green");
+  plots.push(maxXLine);
+
+  var minXLine = new Plottable.Components.GuideLineLayer("vertical")
+  .scale(xScale)
+  .value(minX)
+  .addClass("red");
+  plots.push(minXLine);
 
   var group = new Plottable.Components.Group(plots);
 
