@@ -46,7 +46,9 @@ function run(svg, data, Plottable) {
       .attr("fill", function(d) { return d.percent; }, cs);
 
   var label = new Plottable.Components.Label("Born in hospital?", 0);
-  var legend = new Plottable.Components.InterpolatedColorLegend(cs).xAlignment("center");
+  var legend = new Plottable.Components.InterpolatedColorLegend(cs)
+  .xAlignment("center")
+  .expands(true);
 
   var table = new Plottable.Components.Table([[null, legend],
                                               [null, label],

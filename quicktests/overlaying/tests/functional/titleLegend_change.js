@@ -94,7 +94,10 @@ function run(svg, data, Plottable) {
   //title + legend
   var title1 = new Plottable.Components.TitleLabel("Two Data Series", 0);
   var legend1 = new Plottable.Components.Legend(colorScale1);
-  legend1.maxEntriesPerRow(1);
+  legend1.maxEntriesPerRow(3);
+  legend1.formatter(function(d){
+    return (d + "x").substr(3, 7);
+  });
   var titleTable = new Plottable.Components.Table([[title1, legend1]]);
 
   function emptyTitle() {

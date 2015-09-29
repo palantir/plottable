@@ -27,7 +27,16 @@ function run(svg, data, Plottable) {
   plot.autorangeMode("x")
       .autorangeSmooth(true);
 
-  var table = new Plottable.Components.Table([[yAxis, plot],
+  var sbl = new Plottable.Components.SelectionBoxLayer()
+  .boxVisible(true)
+  .xScale(xScale)
+  .yScale(yScale)
+  .xExtent([0.6, 1.0])
+  .yExtent([0.3, 0.5]);
+
+  var group = new Plottable.Components.Group([plot, sbl]);
+
+  var table = new Plottable.Components.Table([[yAxis, group],
                                              [null, xAxis]]);
   table.renderTo(svg);
 
