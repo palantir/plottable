@@ -292,7 +292,7 @@ export module Plots {
           // compute this bar's min and max along the secondary axis
           let barMinSecondary: number;
           let barMaxSecondary: number;
-          if(this._isVertical){
+          if (this._isVertical) {
             barMinSecondary = barBBox.y - (entity.datum.y > this.baselineValue() ? 0 : barBBox.height);
             barMaxSecondary = barBBox.y + (entity.datum.y > this.baselineValue() ? barBBox.height : 0);
           }else {
@@ -711,15 +711,15 @@ export module Plots {
       let rectY = attrToProjector["y"](datum, index, dataset);
       let rectWidth = attrToProjector["width"](datum, index, dataset);
       let rectHeight = attrToProjector["height"](datum, index, dataset);
-      let x: number;
-      let y: number;
+      let x: any;
+      let y: any;
       let originalPosition = (this._isVertical ? Plot._scaledAccessor(this.y()) : Plot._scaledAccessor(this.x()))(datum, index, dataset);
       let scaledBaseline = (<Scale<any, any>> (this._isVertical ? this.y().scale : this.x().scale)).scale(this.baselineValue());
-      if(this._isVertical){
+      if (this._isVertical) {
         x = rectX + rectWidth / 2;
         y = originalPosition <= scaledBaseline ? rectY : rectY + rectHeight;
       }else {
-        x = originalPosition >= scaledBaseline ? rectX + rectWidth: rectX;
+        x = originalPosition >= scaledBaseline ? rectX + rectWidth : rectX;
         y = rectY + rectHeight / 2;
       }
       return { x: x, y: y };
