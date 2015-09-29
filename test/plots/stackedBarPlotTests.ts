@@ -90,6 +90,20 @@ describe("Plots", () => {
       svg.remove();
     });
 
+    // HACKHACK #2795: correct off-bar label logic to be implemented
+    it("doesn't show any off-bar labels", () => {
+      renderer.labelsEnabled(true);
+      yScale.domain([0, 30]);
+      let offBarLabels = renderer.content().selectAll(".off-bar-label");
+      assert.operator(offBarLabels.size(), ">", 0, "some off-bar labels are drawn");
+      let offBarLabelVisibilities: string[] = [];
+      offBarLabels.each(function() {
+        offBarLabelVisibilities.push(d3.select(this).style("visibility"));
+      });
+      assert.isTrue(offBarLabelVisibilities.every((visibility) => visibility === "hidden"), "all off-bar labels are hidden");
+      svg.remove();
+    });
+
     it("considers lying within a bar's y-range to mean it is closest", () => {
       let bars = (<any> renderer)._renderArea.selectAll("rect");
 
@@ -375,6 +389,20 @@ describe("Plots", () => {
       assert.closeTo(TestMethods.numAttr(bar1, "x"), 0, 0.01, "x is correct for bar1");
       assert.closeTo(TestMethods.numAttr(bar2, "x"), 0, 0.01, "x is correct for bar2");
       assert.closeTo(TestMethods.numAttr(bar3, "x"), rendererWidth / 3, 0.01, "x is correct for bar3");
+      svg.remove();
+    });
+
+    // HACKHACK #2795: correct off-bar label logic to be implemented
+    it("doesn't show any off-bar labels", () => {
+      renderer.labelsEnabled(true);
+      xScale.domain([0, 50]);
+      let offBarLabels = renderer.content().selectAll(".off-bar-label");
+      assert.operator(offBarLabels.size(), ">", 0, "some off-bar labels are drawn");
+      let offBarLabelVisibilities: string[] = [];
+      offBarLabels.each(function() {
+        offBarLabelVisibilities.push(d3.select(this).style("visibility"));
+      });
+      assert.isTrue(offBarLabelVisibilities.every((visibility) => visibility === "hidden"), "all off-bar labels are hidden");
       svg.remove();
     });
   });

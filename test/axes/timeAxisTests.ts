@@ -294,6 +294,38 @@ describe("TimeAxis", () => {
     svg.remove();
   });
 
+  it("tick labels show correctly when display format is set to 'center'", () => {
+    let svg = TestMethods.generateSVG(400, 100);
+    scale.domain([new Date("2015-09-02"), new Date("2015-09-03")]);
+    axis.tierLabelPositions(["center", "center"]);
+    axis.renderTo(svg);
+
+    let labels = axis.content().selectAll(`.${Plottable.Axis.TICK_LABEL_CLASS}`);
+    assert.operator(labels.size(), ">=", 1, "At least one label is selected in testing");
+
+    let axisBoundingRect: ClientRect = (<Element>axis.background().node()).getBoundingClientRect();
+    let isInsideAxisBoundingRect = function(innerRect: ClientRect) {
+        return (
+          Math.floor(axisBoundingRect.left) <= Math.ceil(innerRect.left) &&
+          Math.floor(axisBoundingRect.top) <= Math.ceil(innerRect.top) &&
+          Math.floor(innerRect.right) <= Math.ceil(axisBoundingRect.right) &&
+          Math.floor(innerRect.bottom) <= Math.ceil(axisBoundingRect.bottom)
+        );
+    };
+
+    labels.each(function(d, i) {
+      let labelVisibility = window.getComputedStyle(this).visibility;
+      let boundingClientRect = this.getBoundingClientRect();
+      let isInside = isInsideAxisBoundingRect(boundingClientRect);
+      if (labelVisibility === "hidden") {
+        assert.isFalse(isInside, `label ${i} "${this.textContent}" is hidden, should be visible as it is inside the axis bounding box`);
+      } else {
+        assert.isTrue(isInside, `label ${i} "${this.textContent}" is visible, should be hidden as it is outside the axis bounding box`);
+      }
+    });
+    svg.remove();
+  });
+
   describe("axis annotations", () => {
     describe("formatting annotation ticks", () => {
       it("formats the dates to [{{abbreviated weekday}} {{abbreviated month}} {{day of month}}, {{year}}] by default", () => {

@@ -18,6 +18,11 @@ module TestMethods {
     }
   }
 
+  export function isInDOM(component: Plottable.Component) {
+    let contentNode = component.content().node();
+    return contentNode != null && Plottable.Utils.DOM.boundingSVG(<SVGElement> contentNode) != null;
+  };
+
   export function verifySpaceRequest(sr: Plottable.SpaceRequest, expectedMinWidth: number, expectedMinHeight: number, message: string) {
     assert.strictEqual(sr.minWidth, expectedMinWidth, message + " (space request: minWidth)");
     assert.strictEqual(sr.minHeight, expectedMinHeight, message + " (space request: minHeight)");
@@ -331,6 +336,18 @@ module TestMethods {
       }
 
       return "#" + redHex + greenHex + blueHex;
+  }
+
+  export function assertWarns(fn: Function, warningMessage: string, assertMessage: string) {
+    let receivedWarning = "";
+    let oldWarn = Plottable.Utils.Window.warn;
+    Plottable.Utils.Window.warn = (msg: string) => receivedWarning = msg;
+    try {
+      fn.call(this);
+    } finally {
+      Plottable.Utils.Window.warn = oldWarn;
+    }
+    assert.include(receivedWarning, warningMessage, assertMessage);
   }
 
 }

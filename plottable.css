@@ -46,6 +46,7 @@ svg.plottable {
 
 .plottable .background-fill {
   fill: none;
+  pointer-events: none;
 }
 
 .plottable .bounding-box {
@@ -76,6 +77,15 @@ svg.plottable {
 
 .plottable .dark-label text {
   fill: #32313F;
+}
+
+.plottable .off-bar-label text {
+  fill: #32313F;
+}
+
+.plottable .stacked-bar-plot .off-bar-label {
+  /* HACKHACK #2795: correct off-bar label logic to be implemented on StackedBar */
+  visibility: hidden !important;
 }
 
 .plottable .axis-label text {

@@ -273,6 +273,9 @@ export class Axis<D> extends Component {
     if (annotationTierCount == null) {
       return this._annotationTierCount;
     }
+    if (annotationTierCount < 0) {
+      throw new Error(`annotationTierCount cannot be negative`);
+    }
     this._annotationTierCount = annotationTierCount;
     this.redraw();
     return this;
@@ -582,7 +585,7 @@ export class Axis<D> extends Component {
   }
 
   /**
-   * @deprecated As of release 1.3, replaced by innerTickLength()
+   * @deprecated As of release v1.3.0, replaced by innerTickLength()
    *
    * Gets the tick mark length in pixels.
    */
