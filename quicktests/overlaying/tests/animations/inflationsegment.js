@@ -46,7 +46,6 @@ function run(svg, data, Plottable) {
     }
   }
 
-
   var xScale = new Plottable.Scales.Linear();
   var xAxis = new Plottable.Axes.Numeric(xScale, "bottom")
   .annotationsEnabled(true)
