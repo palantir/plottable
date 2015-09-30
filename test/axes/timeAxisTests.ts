@@ -131,8 +131,7 @@ describe("TimeAxis", () => {
   });
 
   it("end ticks' lengths equal to endTickLength() when tierLabelPosition is set to center", () => {
-    let width = 500;
-    let svg = TestMethods.generateSVG(width, 100);
+    let svg = TestMethods.generateSVG(400, 100);
     axis.tierLabelPositions(["center", "center"]);
     scale.domain([new Date("2010-01-01"), new Date("2014-01-01")]);
     axis.renderTo(svg);
