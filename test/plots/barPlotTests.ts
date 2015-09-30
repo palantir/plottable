@@ -255,10 +255,10 @@ describe("Plots", () => {
           it("entities().position returns the position of data point", () => {
             let entities = barPlot.entities();
             entities.forEach((entity) => {
-              let dataX = (<any> Plottable.Plot)._scaledAccessor(barPlot.x())(entity.datum, entity.index, entity.dataset);
-              let dataY = (<any> Plottable.Plot)._scaledAccessor(barPlot.y())(entity.datum, entity.index, entity.dataset);
+              let dataX = barPlot.x().scale.scale(entity.datum.x);
+              let dataY = barPlot.y().scale.scale(entity.datum.y);
               assert.strictEqual(dataX, entity.position.x, "pixelPoint and entities().position should have same x value");
-              assert.strictEqual(dataY, entity.position.y, "pixelPoint and entities().position should have same x value");
+              assert.strictEqual(dataY, entity.position.y, "pixelPoint and entities().position should have same y value");
             });
             svg.remove();
           });
