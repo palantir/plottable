@@ -3357,8 +3357,8 @@ declare module Plottable {
             protected _getBarPixelWidth(): number;
             entities(datasets?: Dataset[]): PlotEntity[];
             protected _pixelPoint(datum: any, index: number, dataset: Dataset): {
-                x: any;
-                y: any;
+                x: number;
+                y: number;
             };
             protected _uninstallScaleForKey(scale: Scale<any, number>, key: string): void;
             protected _getDataToDraw(): Utils.Map<Dataset, any[]>;

@@ -290,15 +290,8 @@ export module Plots {
           primaryDist = Math.abs(queryPtPrimary - plotPtPrimary);
 
           // compute this bar's min and max along the secondary axis
-          let barMinSecondary: number;
-          let barMaxSecondary: number;
-          if (this._isVertical) {
-            barMinSecondary = barBBox.y - (entity.datum.y > this.baselineValue() ? 0 : barBBox.height);
-            barMaxSecondary = barBBox.y + (entity.datum.y > this.baselineValue() ? barBBox.height : 0);
-          }else {
-            barMinSecondary = barBBox.x - (entity.datum.x < this.baselineValue() ? 0 : barBBox.width);
-            barMaxSecondary = barBBox.x + (entity.datum.x < this.baselineValue() ? barBBox.width : 0);
-          }
+          let barMinSecondary = this._isVertical ? barBBox.y : barBBox.x;
+          let barMaxSecondary = barMinSecondary + (this._isVertical ? barBBox.height : barBBox.width);
 
           if (queryPtSecondary >= barMinSecondary - tolerance && queryPtSecondary <= barMaxSecondary + tolerance) {
             // if we're within a bar's secondary axis span, it is closest in that direction
@@ -711,8 +704,8 @@ export module Plots {
       let rectY = attrToProjector["y"](datum, index, dataset);
       let rectWidth = attrToProjector["width"](datum, index, dataset);
       let rectHeight = attrToProjector["height"](datum, index, dataset);
-      let x: any;
-      let y: any;
+      let x: number;
+      let y: number;
       let originalPosition = (this._isVertical ? Plot._scaledAccessor(this.y()) : Plot._scaledAccessor(this.x()))(datum, index, dataset);
       let scaledBaseline = (<Scale<any, any>> (this._isVertical ? this.y().scale : this.x().scale)).scale(this.baselineValue());
       if (this._isVertical) {

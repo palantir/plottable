@@ -8559,16 +8559,8 @@ var Plottable;
                         var plotPtPrimary = _this._isVertical ? plotPt.x : plotPt.y;
                         primaryDist = Math.abs(queryPtPrimary - plotPtPrimary);
                         // compute this bar's min and max along the secondary axis
-                        var barMinSecondary;
-                        var barMaxSecondary;
-                        if (_this._isVertical) {
-                            barMinSecondary = barBBox.y - (entity.datum.y > _this.baselineValue() ? 0 : barBBox.height);
-                            barMaxSecondary = barBBox.y + (entity.datum.y > _this.baselineValue() ? barBBox.height : 0);
-                        }
-                        else {
-                            barMinSecondary = barBBox.x - (entity.datum.x < _this.baselineValue() ? 0 : barBBox.width);
-                            barMaxSecondary = barBBox.x + (entity.datum.x < _this.baselineValue() ? barBBox.width : 0);
-                        }
+                        var barMinSecondary = _this._isVertical ? barBBox.y : barBBox.x;
+                        var barMaxSecondary = barMinSecondary + (_this._isVertical ? barBBox.height : barBBox.width);
                         if (queryPtSecondary >= barMinSecondary - tolerance && queryPtSecondary <= barMaxSecondary + tolerance) {
                             // if we're within a bar's secondary axis span, it is closest in that direction
                             secondaryDist = 0;
