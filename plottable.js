@@ -4443,13 +4443,15 @@ var Plottable;
                 tickMarks.attr(attr);
                 if (this.orientation() === "bottom") {
                     attr["y1"] = offset;
-                    attr["y2"] = offset + this._tierHeights[index];
+                    attr["y2"] = offset + (this._tierLabelPositions[index] === "center" ? this.endTickLength() : this._tierHeights[index]);
                 }
                 else {
                     attr["y1"] = this.height() - offset;
-                    attr["y2"] = this.height() - (offset + this._tierHeights[index]);
+                    attr["y2"] = this.height() - (offset + (this._tierLabelPositions[index] === "center" ?
+                        this.endTickLength() : this._tierHeights[index]));
                 }
                 d3.select(tickMarks[0][0]).attr(attr);
+                d3.select(tickMarks[0][tickMarks.size() - 1]).attr(attr);
                 // Add end-tick classes to first and last tick for CSS customization purposes
                 d3.select(tickMarks[0][0]).classed(Plottable.Axis.END_TICK_MARK_CLASS, true);
                 d3.select(tickMarks[0][tickMarks.size() - 1]).classed(Plottable.Axis.END_TICK_MARK_CLASS, true);
