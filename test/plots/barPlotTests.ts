@@ -252,8 +252,27 @@ describe("Plots", () => {
             svg.remove();
           });
 
-        });
+          it("entities().position and pixelPoint() return the same point", () => {
+            let entities = barPlot.entities();
+            entities.forEach((entity) => {
+              let pixelPoint = (<any> barPlot)._pixelPoint(entity.datum, entity.index, entity.dataset);
+              assert.strictEqual(pixelPoint.x, entity.position.x, "pixelPoint and entities().position should have same x value");
+              assert.strictEqual(pixelPoint.y, entity.position.y, "pixelPoint and entities().position should have same y value");
+            });
+            svg.remove();
+          });
 
+          it("entities().position returns the position of data point", () => {
+            let entities = barPlot.entities();
+            entities.forEach((entity) => {
+              let dataX = (<any> Plottable.Plot)._scaledAccessor(barPlot.x())(entity.datum, entity.index, entity.dataset);
+              let dataY = (<any> Plottable.Plot)._scaledAccessor(barPlot.y())(entity.datum, entity.index, entity.dataset);
+              assert.strictEqual(dataX, entity.position.x, "pixelPoint and entities().position should have same x value");
+              assert.strictEqual(dataY, entity.position.y, "pixelPoint and entities().position should have same x value");
+            });
+            svg.remove();
+          });
+        });
       });
 
       describe("entityNearest()", () => {
