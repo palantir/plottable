@@ -155,28 +155,33 @@ export class Plot extends Component {
   }
 
   protected _bindProperty(property: string, value: any, scale: Scale<any, any>) {
-    this._bind(property, value, scale, this._propertyBindings, this._propertyExtents);
+    let binding = this._propertyBindings.get(property);
+    let oldScale = binding != null ? binding.scale : null;
+
+    this._propertyBindings.set(property, { accessor: d3.functor(value), scale: scale });
     this._updateExtentsForProperty(property);
+
+    if (oldScale != null) {
+      this._uninstallScaleForKey(oldScale, property);
+    }
+    if (scale != null) {
+      this._installScaleForKey(scale, property);
+    }
   }
 
   private _bindAttr(attr: string, value: any, scale: Scale<any, any>) {
-    this._bind(attr, value, scale, this._attrBindings, this._attrExtents);
-    this._updateExtentsForAttr(attr);
-  }
-
-  private _bind(key: string, value: any, scale: Scale<any, any>,
-                    bindings: d3.Map<Plots.AccessorScaleBinding<any, any>>, extents: d3.Map<any[]>) {
-    let binding = bindings.get(key);
+    let binding = this._attrBindings.get(attr);
     let oldScale = binding != null ? binding.scale : null;
 
+    this._attrBindings.set(attr, { accessor: d3.functor(value), scale: scale });
+    this._updateExtentsForAttr(attr);
+
     if (oldScale != null) {
-      this._uninstallScaleForKey(oldScale, key);
+      this._uninstallScaleForKey(oldScale, attr);
     }
     if (scale != null) {
-      this._installScaleForKey(scale, key);
+      this._installScaleForKey(scale, attr);
     }
-
-    bindings.set(key, { accessor: d3.functor(value), scale: scale });
   }
 
   protected _generateAttrToProjector(): AttributeToProjector {
@@ -197,6 +202,7 @@ export class Plot extends Component {
   }
 
   public renderImmediately() {
+    super.renderImmediately();
     if (this._isAnchored) {
       this._paint();
       this._dataChanged = false;
@@ -544,8 +550,11 @@ export class Plot extends Component {
     return this._lightweightPlotEntityToPlotEntity(closestPointEntity);
   }
 
+  /**
+   * @deprecated As of release v1.1.0, replaced by _entityVisibleOnPlot()
+   */
   protected _visibleOnPlot(datum: any, pixelPoint: Point, selection: d3.Selection<void>): boolean {
-    Utils.Window.deprecated("Plot._visibleOnPlot()", "v1.1.0");
+    Utils.Window.deprecated("Plot._visibleOnPlot()", "v1.1.0", "replaced by _entityVisibleOnPlot()");
     return !(pixelPoint.x < 0 || pixelPoint.y < 0 ||
       pixelPoint.x > this.width() || pixelPoint.y > this.height());
   }

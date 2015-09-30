@@ -254,6 +254,43 @@ describe("Legend", () => {
     svg.remove();
   });
 
+  it("can set formatter to change how entry labels are displayed", () => {
+    color.domain(["A", "B", "C"]);
+    let formatter = (id: string) => `${id}foo`;
+    legend.formatter(formatter);
+    legend.renderTo(svg);
+    let legendRows = svg.selectAll(entrySelector);
+    assert.operator(legendRows.size(), ">=", 1, "There is at least one entry in the test");
+    legendRows.each(function(d, i){
+      let expectedText = formatter(legend.colorScale().domain()[i]);
+      assert.strictEqual(d3.select(this).select("text").text(), expectedText,
+        `formatter output ${expectedText} should be displayed`);
+    });
+    svg.remove();
+  });
+
+  it("can get formatter of the legend using formatter()", () => {
+    let formatter = (id: string) => `${id}foo`;
+    legend.formatter(formatter);
+    assert.strictEqual(legend.formatter(), formatter, "formatter() returns the formatter of legend correctly");
+    svg.remove();
+  });
+
+  it("can sort displayed texts using comparator()", () => {
+    let colorDomain = ["A", "B", "C"];
+    color.domain(colorDomain);
+    let expectedTexts = ["Z", "Y", "X"];
+    let formatter = (d: string) => expectedTexts[colorDomain.indexOf(d)];
+    legend.formatter(formatter);
+    let comparator = (a: string, b: string) => a.charCodeAt(0) - b.charCodeAt(0);
+    legend.comparator(comparator);
+    legend.renderTo(svg);
+    let entryTexts = svg.selectAll(entrySelector)[0].map((node: Element) => d3.select(node).select("text").text());
+    expectedTexts.sort(comparator);
+    assert.deepEqual(expectedTexts, entryTexts, "displayed texts should be sorted in alphabetic order");
+    svg.remove();
+  });
+
   describe("entitiesAt()", () => {
     function computeExpectedSymbolPosition(legend: Plottable.Components.Legend, rowIndex: number, entryIndexWithinRow: number) {
       let row = d3.select(legend.content().selectAll(rowSelector)[0][rowIndex]);
@@ -277,7 +314,6 @@ describe("Legend", () => {
 
       let expectedEntity: Plottable.Entity<Plottable.Components.Legend> = {
         datum: "AA",
-        index: 0,
         position: computeExpectedSymbolPosition(legend, 0, 0),
         selection: d3.select(entries[0][0]),
         component: legend
@@ -287,7 +323,6 @@ describe("Legend", () => {
       entities = legend.entitiesAt({x: 10, y: 30});
       expectedEntity = {
         datum: "BB",
-        index: 1,
         position: computeExpectedSymbolPosition(legend, 1, 0),
         selection: d3.select(entries[0][1]),
         component: legend
@@ -309,7 +344,6 @@ describe("Legend", () => {
       let entries = legend.content().selectAll(entrySelector);
       let expectedEntity: Plottable.Entity<Plottable.Components.Legend> = {
         datum: "AA",
-        index: 0,
         position: computeExpectedSymbolPosition(legend, 0, 0),
         selection: d3.select(entries[0][0]),
         component: legend
@@ -319,7 +353,6 @@ describe("Legend", () => {
       entities = legend.entitiesAt({x: 50, y: 10});
       expectedEntity = {
         datum: "BB",
-        index: 1,
         position: computeExpectedSymbolPosition(legend, 0, 1),
         selection: d3.select(entries[0][1]),
         component: legend
