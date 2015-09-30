@@ -130,6 +130,21 @@ describe("TimeAxis", () => {
     svg.remove();
   });
 
+  it("end ticks' lengths equal to endTickLength() when tierLabelPosition is set to center", () => {
+    let width = 500;
+    let svg = TestMethods.generateSVG(width, 100);
+    axis.tierLabelPositions(["center", "center"]);
+    scale.domain([new Date("2010-01-01"), new Date("2014-01-01")]);
+    axis.renderTo(svg);
+    let endTicks = axis.content().selectAll(`.${Plottable.Axis.END_TICK_MARK_CLASS}`);
+    assert.operator(endTicks.size(), ">=", 1, "At least one end tick mark is selected in the test");
+    endTicks.each(function(d, i){
+      let tickLength = Math.abs(+this.getAttribute("y1") - +this.getAttribute("y2"));
+      assert.strictEqual(tickLength, axis.endTickLength(), "end tick marks's length should equal to endTickLength()");
+    });
+    svg.remove();
+  });
+
   it("tick labels do not overlap with tick marks", () => {
     let svg = TestMethods.generateSVG(400, 100);
     scale = new Plottable.Scales.Time();
