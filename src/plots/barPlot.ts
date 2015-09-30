@@ -698,7 +698,7 @@ export module Plots {
       return entities;
     }
 
-    protected _pixelPoint(datum: any, index: number, dataset: Dataset) {
+    protected _pixelPoint(datum: any, index: number, dataset: Dataset): Point {
       let attrToProjector = this._generateAttrToProjector();
       let rectX = attrToProjector["x"](datum, index, dataset);
       let rectY = attrToProjector["y"](datum, index, dataset);
