@@ -263,6 +263,7 @@ describe("Plots", () => {
             svg.remove();
           });
         });
+
       });
 
       describe("entityNearest()", () => {
