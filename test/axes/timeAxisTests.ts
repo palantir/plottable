@@ -138,8 +138,10 @@ describe("TimeAxis", () => {
     let endTicks = axis.content().selectAll(`.${Plottable.Axis.END_TICK_MARK_CLASS}`);
     assert.operator(endTicks.size(), ">=", 1, "At least one end tick mark is selected in the test");
     endTicks.each(function(d, i){
-      let tickLength = Math.abs(+this.getAttribute("y1") - +this.getAttribute("y2"));
-      assert.strictEqual(tickLength, axis.endTickLength(), "end tick marks's length should equal to endTickLength()");
+      let endTick = d3.select(this);
+      let tickLength = Math.abs(TestMethods.numAttr(endTick, "y1") - TestMethods.numAttr(endTick, "y2"));
+      assert.closeTo(tickLength, axis.endTickLength(), window.Pixel_CloseTo_Requirement,
+        "end tick marks's length should equal to endTickLength()");
     });
     svg.remove();
   });
