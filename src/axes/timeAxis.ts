@@ -392,9 +392,14 @@ export module Axes {
       let tickLabelsEnter = tickLabels.enter().append("g").classed(Axis.TICK_LABEL_CLASS, true);
       tickLabelsEnter.append("text");
       let xTranslate = (this._tierLabelPositions[index] === "center" || config.step === 1) ? 0 : this.tickLabelPadding();
-      let yTranslate = this.orientation() === "bottom" ?
-          d3.sum(this._tierHeights.slice(0, index + 1)) - this.tickLabelPadding() :
-          this.height() - d3.sum(this._tierHeights.slice(0, index)) - this.tickLabelPadding();
+      let yTranslate: number;
+      if (this.orientation() === "bottom") {
+        yTranslate = d3.sum(this._tierHeights.slice(0, index + 1)) - this.tickLabelPadding();
+      } else if (this._tierLabelPositions[index] === "center") {
+          yTranslate = this.height() - d3.sum(this._tierHeights.slice(0, index)) - this.tickLabelPadding() - this._maxLabelTickLength();
+      } else {
+          yTranslate = this.height() - d3.sum(this._tierHeights.slice(0, index)) - this.tickLabelPadding();
+      }
 
       let textSelection = tickLabels.selectAll("text");
       if (textSelection.size() > 0) {
@@ -546,9 +551,26 @@ export module Axes {
         let tickLabel = d3.select(this);
         let leadingTickMark = visibleTickMarkRects[i];
         let trailingTickMark = visibleTickMarkRects[i + 1];
+        
+        
+                function myclientRectsOverlap(clientRectA: ClientRect, clientRectB: ClientRect) {
+                if (clientRectA.right < clientRectB.left + 5) {
+                    return false;
+                }
+                if ( 5 + clientRectA.left > clientRectB.right) {
+                    return false;
+                }
+                if (clientRectA.bottom < clientRectB.top + 5) {
+                    return false;
+                }
+                if (5 + clientRectA.top > clientRectB.bottom) {
+                    return false;
+                }
+                return true;
+            }
 
-        let isOverlappingLastLabel = (lastLabelClientRect != null && Utils.DOM.clientRectsOverlap(clientRect, lastLabelClientRect));
-        let isOverlappingLeadingTickMark = (leadingTickMark != null && Utils.DOM.clientRectsOverlap(clientRect, leadingTickMark));
+        let isOverlappingLastLabel = (lastLabelClientRect != null &&  Utils.DOM.clientRectsOverlap(clientRect, lastLabelClientRect));
+        let isOverlappingLeadingTickMark = (leadingTickMark != null &&  Utils.DOM.clientRectsOverlap(clientRect, leadingTickMark));
         let isOverlappingTrailingTickMark = (trailingTickMark != null && Utils.DOM.clientRectsOverlap(clientRect, trailingTickMark));
 
         if (!isInsideBBox(clientRect) || isOverlappingLastLabel || isOverlappingLeadingTickMark || isOverlappingTrailingTickMark) {
