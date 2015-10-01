@@ -9061,7 +9061,7 @@ var Plottable;
                 this.render();
                 return this;
             };
-            Line.prototype.croppedRenderingEnabled = function (croppedRendering) {
+            Line.prototype.croppedRendering = function (croppedRendering) {
                 if (croppedRendering == null) {
                     return this._croppedRendering;
                 }
