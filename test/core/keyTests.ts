@@ -7,7 +7,7 @@ describe("DatasetKey", () => {
     ds.key(key);
     assert.deepEqual(ds.key(), key, "key is passed to dataset");
   });
-  it(" may accept NoConstancy predefined key function", () => {
+  it(" may accept noConstancy predefined key function", () => {
     let ds: Plottable.Dataset = new Plottable.Dataset();
     ds.key(Plottable.KeyFunctions.noConstancy);
     let d: any = { foo: "bar" };
@@ -15,9 +15,9 @@ describe("DatasetKey", () => {
     let b: number = ds.key()(d, 1);
     assert.isTrue(b - a === 1, "invocations give numerically increasing results");
   });
-  it(" defaults to NoConstancy predefined key function", () => {
+  it(" defaults to noConstancy predefined key function", () => {
     let ds: Plottable.Dataset = new Plottable.Dataset();
-    assert.isTrue(ds.key() === Plottable.KeyFunctions.noConstancy, "NoConstancy is default");
+    assert.isTrue(ds.key() === Plottable.KeyFunctions.noConstancy, "noConstancy is default");
   });
   it(" may accept ByIndex predefined key function", () => {
     let ds: Plottable.Dataset = new Plottable.Dataset();
@@ -28,9 +28,9 @@ describe("DatasetKey", () => {
     assert.isTrue(a === 1, "invocations return index");
     assert.isTrue(b === 2, "invocations return index");
   });
-  describe("DatasetKey NoConstancy", () => {
+  describe("DatasetKey noConstancy", () => {
     it("generates a different value each time invoked", () => {
-      let key = Plottable.KeyFunctions.NoConstancy;
+      let key = Plottable.KeyFunctions.noConstancy;
       let d: any = { foo: "bar" };
       let a: number = key(d, 1);
       let b: number = key(d, 1);
