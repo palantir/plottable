@@ -9,8 +9,6 @@ describe("Plots", () => {
       let xScale: Plottable.Scales.Category;
       let yScale: Plottable.Scales.Linear;
       let plot: Plottable.Plots.Waterfall<string, number>;
-      let SVG_WIDTH = 600;
-      let SVG_HEIGHT = 400;
       let growthBarData = [
         { x: "A", y: 0 },
         { x: "B", y: 5 },
@@ -20,7 +18,7 @@ describe("Plots", () => {
       let growthClass = "waterfall-growth";
 
       beforeEach(() => {
-        svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+        svg = TestMethods.generateSVG();
         dataset = new Plottable.Dataset(growthBarData);
         xScale = new Plottable.Scales.Category();
         yScale = new Plottable.Scales.Linear();
@@ -73,8 +71,6 @@ describe("Plots", () => {
       let xScale: Plottable.Scales.Category;
       let yScale: Plottable.Scales.Linear;
       let plot: Plottable.Plots.Waterfall<string, number>;
-      let SVG_WIDTH = 600;
-      let SVG_HEIGHT = 400;
       let declineBarData = [
         { x: "A", y: 0 },
         { x: "B", y: -5 },
@@ -84,7 +80,7 @@ describe("Plots", () => {
       ];
 
       beforeEach(() => {
-        svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+        svg = TestMethods.generateSVG();
         dataset = new Plottable.Dataset(declineBarData);
         xScale = new Plottable.Scales.Category();
         yScale = new Plottable.Scales.Linear();
@@ -136,8 +132,6 @@ describe("Plots", () => {
       let xScale: Plottable.Scales.Category;
       let yScale: Plottable.Scales.Linear;
       let plot: Plottable.Plots.Waterfall<string, number>;
-      let SVG_WIDTH = 600;
-      let SVG_HEIGHT = 400;
       let data = [
         { x: "A", y: 20, t: true },
         { x: "B", y: 5, t: false },
@@ -147,7 +141,7 @@ describe("Plots", () => {
       ];
 
       beforeEach(() => {
-        svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+        svg = TestMethods.generateSVG();
         dataset = new Plottable.Dataset(data);
         xScale = new Plottable.Scales.Category();
         yScale = new Plottable.Scales.Linear();
@@ -188,8 +182,6 @@ describe("Plots", () => {
       let xScale: Plottable.Scales.Category;
       let yScale: Plottable.Scales.Linear;
       let plot: Plottable.Plots.Waterfall<string, number>;
-      let SVG_WIDTH = 600;
-      let SVG_HEIGHT = 400;
       let data = [
         { x: "A", y: 20, t: true },
         { x: "B", y: 5, t: false },
@@ -199,7 +191,7 @@ describe("Plots", () => {
       ];
 
       beforeEach(() => {
-        svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+        svg = TestMethods.generateSVG();
         dataset = new Plottable.Dataset(data);
         xScale = new Plottable.Scales.Category();
         yScale = new Plottable.Scales.Linear();
