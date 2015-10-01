@@ -17,6 +17,7 @@ describe("Plots", () => {
         { x: "C", y: 10 },
         { x: "D", y: 100}
       ];
+      let growthClass = "waterfall-growth";
 
       beforeEach(() => {
         svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
@@ -33,20 +34,20 @@ describe("Plots", () => {
 
       it("classes growth bars", () => {
         let bars = plot.content().selectAll("rect");
-        assert.strictEqual(bars.size(), growthBarData.length, "all bars are growth except for first");
+        assert.strictEqual(bars.size(), growthBarData.length, "same number of bars as data points");
         bars.each(function(d, i) {
           if (i === 0) {
             return;
           }
           let bar = d3.select(this);
-          assert.isTrue(bar.classed("waterfall-growth"), "bar classed as growth bar");
+          assert.isTrue(bar.classed(growthClass), "bar classed as growth bar");
         });
         plot.destroy();
         svg.remove();
       });
 
-      it("bars placed at current sum", () => {
-        let bars = plot.content().selectAll("rect.waterfall-growth");
+      it("places bars at current sum", () => {
+        let bars = plot.content().selectAll(`rect.${growthClass}`);
         assert.strictEqual(bars.size(), growthBarData.length - 1, "all bars are growth except for first");
         let yAccessor = plot.y().accessor;
         let sum = 0;
@@ -54,10 +55,10 @@ describe("Plots", () => {
           let dataY = yAccessor(d, i, dataset);
           let bar = d3.select(this);
           assert.closeTo(numAttr(bar, "y") + numAttr(bar, "height"), yScale.scale(sum),
-            window.Pixel_CloseTo_Requirement, "growth bar top at final sum");
+            window.Pixel_CloseTo_Requirement, "growth bar bottom at previous sum");
           sum += dataY;
           assert.closeTo(numAttr(bar, "y"), yScale.scale(sum),
-            window.Pixel_CloseTo_Requirement, "growth bar bottom at previous sum");
+            window.Pixel_CloseTo_Requirement, "growth bar top at final sum");
         });
 
         plot.destroy();
