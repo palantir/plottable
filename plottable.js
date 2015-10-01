@@ -1,5 +1,5 @@
 /*!
-Plottable 1.13.0 (https://github.com/palantir/plottable)
+Plottable 1.12.0 (https://github.com/palantir/plottable)
 Copyright 2014-2015 Palantir Technologies
 Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
 */
@@ -908,7 +908,7 @@ var Plottable;
 ///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
-    Plottable.version = "1.13.0";
+    Plottable.version = "1.12.0";
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
@@ -9268,30 +9268,26 @@ var Plottable;
                 return dataToDraw;
             };
             Line.prototype._filterCroppedRendering = function (dataset, indices) {
-                var xScale = this.x().scale;
-                var yScale = this.y().scale;
-                var xAccessor = this.x().accessor;
-                var yAccessor = this.y().accessor;
-                var xDomain = xScale.domain();
-                var yDomain = yScale.domain();
+                var xProjector = Plottable.Plot._scaledAccessor(this.x());
+                var yProjector = Plottable.Plot._scaledAccessor(this.y());
                 var data = dataset.data();
                 var filteredDataIndices = [];
                 for (var i = 0; i < indices.length; i++) {
-                    var currXPoint = xAccessor(data[indices[i]], indices[i], dataset);
-                    var currYPoint = yAccessor(data[indices[i]], indices[i], dataset);
-                    var shouldShow = xDomain[0] <= currXPoint && currXPoint <= xDomain[1] &&
-                        yDomain[0] <= currYPoint && currYPoint <= yDomain[1];
+                    var currXPoint = xProjector(data[indices[i]], indices[i], dataset);
+                    var currYPoint = yProjector(data[indices[i]], indices[i], dataset);
+                    var shouldShow = 0 <= currXPoint && currXPoint <= this.width() &&
+                        0 <= currYPoint && currYPoint <= this.height();
                     if (!shouldShow && indices[i - 1] != null && data[indices[i - 1]] != null) {
-                        var prevXPoint = xAccessor(data[indices[i - 1]], indices[i - 1], dataset);
-                        var prevYPoint = yAccessor(data[indices[i - 1]], indices[i - 1], dataset);
-                        shouldShow = shouldShow || xDomain[0] <= prevXPoint && prevXPoint <= xDomain[1] &&
-                            yDomain[0] <= prevYPoint && prevYPoint <= yDomain[1];
+                        var prevXPoint = xProjector(data[indices[i - 1]], indices[i - 1], dataset);
+                        var prevYPoint = yProjector(data[indices[i - 1]], indices[i - 1], dataset);
+                        shouldShow = shouldShow || 0 <= prevXPoint && prevXPoint <= this.width() &&
+                            0 <= prevYPoint && prevYPoint <= this.height();
                     }
                     if (!shouldShow && indices[i + 1] != null && data[indices[i + 1]] != null) {
-                        var nextXPoint = xAccessor(data[indices[i + 1]], indices[i + 1], dataset);
-                        var nextYPoint = yAccessor(data[indices[i + 1]], indices[i + 1], dataset);
-                        shouldShow = shouldShow || xDomain[0] <= nextXPoint && nextXPoint <= xDomain[1] &&
-                            yDomain[0] <= nextYPoint && nextYPoint <= yDomain[1];
+                        var nextXPoint = xProjector(data[indices[i + 1]], indices[i + 1], dataset);
+                        var nextYPoint = yProjector(data[indices[i + 1]], indices[i + 1], dataset);
+                        shouldShow = shouldShow || 0 <= nextXPoint && nextXPoint <= this.width() &&
+                            0 <= nextYPoint && nextYPoint <= this.height();
                     }
                     if (shouldShow) {
                         filteredDataIndices.push(indices[i]);

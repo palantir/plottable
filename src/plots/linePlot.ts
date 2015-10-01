@@ -393,34 +393,30 @@ export module Plots {
     }
 
     private _filterCroppedRendering(dataset: Dataset, indices: number[]) {
-      let xScale = this.x().scale;
-      let yScale = this.y().scale;
-      let xAccessor = this.x().accessor;
-      let yAccessor = this.y().accessor;
-      let xDomain = xScale.domain();
-      let yDomain = yScale.domain();
+      let xProjector = Plot._scaledAccessor(this.x());
+      let yProjector = Plot._scaledAccessor(this.y());
 
       let data = dataset.data();
       let filteredDataIndices: number[] = [];
 
       for (let i = 0; i < indices.length; i++) {
-        let currXPoint = xAccessor(data[indices[i]], indices[i], dataset);
-        let currYPoint = yAccessor(data[indices[i]], indices[i], dataset);
-        let shouldShow = xDomain[0] <= currXPoint && currXPoint <= xDomain[1] &&
-          yDomain[0] <= currYPoint && currYPoint <= yDomain[1];
+        let currXPoint = xProjector(data[indices[i]], indices[i], dataset);
+        let currYPoint = yProjector(data[indices[i]], indices[i], dataset);
+        let shouldShow = 0 <= currXPoint && currXPoint <= this.width() &&
+          0 <= currYPoint && currYPoint <= this.height();
 
         if (!shouldShow && indices[i - 1] != null && data[indices[i - 1]] != null) {
-          let prevXPoint = xAccessor(data[indices[i - 1]], indices[i - 1], dataset);
-          let prevYPoint = yAccessor(data[indices[i - 1]], indices[i - 1], dataset);
-          shouldShow = shouldShow || xDomain[0] <= prevXPoint && prevXPoint <= xDomain[1] &&
-            yDomain[0] <= prevYPoint && prevYPoint <= yDomain[1];
+          let prevXPoint = xProjector(data[indices[i - 1]], indices[i - 1], dataset);
+          let prevYPoint = yProjector(data[indices[i - 1]], indices[i - 1], dataset);
+          shouldShow = shouldShow || 0 <= prevXPoint && prevXPoint <= this.width() &&
+            0 <= prevYPoint && prevYPoint <= this.height();
         }
 
         if (!shouldShow && indices[i + 1] != null && data[indices[i + 1]] != null) {
-          let nextXPoint = xAccessor(data[indices[i + 1]], indices[i + 1], dataset);
-          let nextYPoint = yAccessor(data[indices[i + 1]], indices[i + 1], dataset);
-          shouldShow = shouldShow || xDomain[0] <= nextXPoint && nextXPoint <= xDomain[1] &&
-            yDomain[0] <= nextYPoint && nextYPoint <= yDomain[1];
+          let nextXPoint = xProjector(data[indices[i + 1]], indices[i + 1], dataset);
+          let nextYPoint = yProjector(data[indices[i + 1]], indices[i + 1], dataset);
+          shouldShow = shouldShow || 0 <= nextXPoint && nextXPoint <= this.width() &&
+            0 <= nextYPoint && nextYPoint <= this.height();
         }
 
         if (shouldShow) {
