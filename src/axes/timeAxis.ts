@@ -551,23 +551,6 @@ export module Axes {
         let tickLabel = d3.select(this);
         let leadingTickMark = visibleTickMarkRects[i];
         let trailingTickMark = visibleTickMarkRects[i + 1];
-        
-        
-                function myclientRectsOverlap(clientRectA: ClientRect, clientRectB: ClientRect) {
-                if (clientRectA.right < clientRectB.left + 5) {
-                    return false;
-                }
-                if ( 5 + clientRectA.left > clientRectB.right) {
-                    return false;
-                }
-                if (clientRectA.bottom < clientRectB.top + 5) {
-                    return false;
-                }
-                if (5 + clientRectA.top > clientRectB.bottom) {
-                    return false;
-                }
-                return true;
-            }
 
         let isOverlappingLastLabel = (lastLabelClientRect != null &&  Utils.DOM.clientRectsOverlap(clientRect, lastLabelClientRect));
         let isOverlappingLeadingTickMark = (leadingTickMark != null &&  Utils.DOM.clientRectsOverlap(clientRect, leadingTickMark));

@@ -4419,7 +4419,7 @@ var Plottable;
                     yTranslate = d3.sum(this._tierHeights.slice(0, index + 1)) - this.tickLabelPadding();
                 }
                 else if (this._tierLabelPositions[index] === "center") {
-                    yTranslate = this.height() - d3.sum(this._tierHeights.slice(0, index)) - this.tickLabelPadding() - this.innerTickLength();
+                    yTranslate = this.height() - d3.sum(this._tierHeights.slice(0, index)) - this.tickLabelPadding() - this._maxLabelTickLength();
                 }
                 else {
                     yTranslate = this.height() - d3.sum(this._tierHeights.slice(0, index)) - this.tickLabelPadding();

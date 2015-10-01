@@ -210,8 +210,6 @@ describe("TimeAxis", () => {
     });
   });
 
-
-
   it("if the time only uses one tier, there should be no space left for the second tier", () => {
     let svg = TestMethods.generateSVG();
     let xScale = new Plottable.Scales.Time();
