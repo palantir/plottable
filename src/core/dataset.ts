@@ -13,7 +13,7 @@ export class KeyFunctions {
 export class Dataset {
   private _data: any[];
   private _metadata: any;
-  private _key: (datum: any, index: number) => any = KeyFunctions.NoConstancy;
+  private _key: (datum: any, index: number) => any = KeyFunctions.noConstancy;
   private _callbacks: Utils.CallbackSet<DatasetCallback>;
 
   /**
