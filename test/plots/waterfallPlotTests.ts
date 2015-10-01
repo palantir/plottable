@@ -158,10 +158,9 @@ describe("Plots", () => {
 
         plot.addDataset(dataset);
         plot.renderTo(svg);
-        let bars = plot.content().selectAll("rect");
-        let totalBarIndices = data.map((d, i) => i).filter((index) => accessor(data[index]));
-        totalBarIndices.forEach((totalBarIndex) => {
-          let totalBar = d3.select(bars[0][totalBarIndex]);
+        let bars = plot.content().selectAll("rect").filter((d) => accessor(d));
+        bars.each(function(d) {
+          let totalBar = d3.select(this);
           assert.isTrue(totalBar.classed(totalClass));
         });
         plot.destroy();
