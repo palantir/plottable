@@ -147,7 +147,7 @@ describe("TimeAxis", () => {
         });
       });
     }
-    
+
     it("tick labels do not overlap with tick marks in bottom orientation when tier label position is set to between", () => {
       let svg = TestMethods.generateSVG(400, 100);
       scale.domain([new Date("2010-01-01"), new Date("2014-01-01")]);
@@ -157,7 +157,7 @@ describe("TimeAxis", () => {
       assertTickMarksAndLabelsDoNotOverlap();
       svg.remove();
     });
-    
+
     it("tick labels do not overlap with tick marks in bottom orientation when tier label position is set to center", () => {
       let svg = TestMethods.generateSVG(400, 100);
       scale.domain([new Date("2010-01-01"), new Date("2014-01-01")]);
