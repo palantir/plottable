@@ -4555,21 +4555,6 @@ var Plottable;
                     var tickLabel = d3.select(this);
                     var leadingTickMark = visibleTickMarkRects[i];
                     var trailingTickMark = visibleTickMarkRects[i + 1];
-                    function myclientRectsOverlap(clientRectA, clientRectB) {
-                        if (clientRectA.right < clientRectB.left + 5) {
-                            return false;
-                        }
-                        if (5 + clientRectA.left > clientRectB.right) {
-                            return false;
-                        }
-                        if (clientRectA.bottom < clientRectB.top + 5) {
-                            return false;
-                        }
-                        if (5 + clientRectA.top > clientRectB.bottom) {
-                            return false;
-                        }
-                        return true;
-                    }
                     var isOverlappingLastLabel = (lastLabelClientRect != null && Plottable.Utils.DOM.clientRectsOverlap(clientRect, lastLabelClientRect));
                     var isOverlappingLeadingTickMark = (leadingTickMark != null && Plottable.Utils.DOM.clientRectsOverlap(clientRect, leadingTickMark));
                     var isOverlappingTrailingTickMark = (trailingTickMark != null && Plottable.Utils.DOM.clientRectsOverlap(clientRect, trailingTickMark));
