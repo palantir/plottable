@@ -4,13 +4,11 @@ module Plottable {
 
 export type DatasetCallback = (dataset: Dataset) => void;
 
-
 export class KeyFunctions {
   protected static counter: number = 0;
-  public static NoConstancy: (d: any, i: number) => any = (d: any) => { return KeyFunctions.counter++; };
-  public static ByIndex: (d: any, i: number) => any = (d: any, i: number) => { return i; };
+  public static noConstancy: (d: any, i: number) => any = (d: any) => { return KeyFunctions.counter++; };
+  public static byIndex: (d: any, i: number) => any = (d: any, i: number) => { return i; };
 }
-
 
 export class Dataset {
   private _data: any[];
