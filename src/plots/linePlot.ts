@@ -398,25 +398,26 @@ export module Plots {
 
       let data = dataset.data();
       let filteredDataIndices: number[] = [];
+      let pointInViewport = (x: number, y: number) => {
+        return Utils.Math.inRange(x, 0, this.width()) &&
+          Utils.Math.inRange(y, 0, this.height());
+      };
 
       for (let i = 0; i < indices.length; i++) {
         let currXPoint = xProjector(data[indices[i]], indices[i], dataset);
         let currYPoint = yProjector(data[indices[i]], indices[i], dataset);
-        let shouldShow = 0 <= currXPoint && currXPoint <= this.width() &&
-          0 <= currYPoint && currYPoint <= this.height();
+        let shouldShow = pointInViewport(currXPoint, currYPoint);
 
         if (!shouldShow && indices[i - 1] != null && data[indices[i - 1]] != null) {
           let prevXPoint = xProjector(data[indices[i - 1]], indices[i - 1], dataset);
           let prevYPoint = yProjector(data[indices[i - 1]], indices[i - 1], dataset);
-          shouldShow = shouldShow || 0 <= prevXPoint && prevXPoint <= this.width() &&
-            0 <= prevYPoint && prevYPoint <= this.height();
+          shouldShow = shouldShow || pointInViewport(prevXPoint, prevYPoint);
         }
 
         if (!shouldShow && indices[i + 1] != null && data[indices[i + 1]] != null) {
           let nextXPoint = xProjector(data[indices[i + 1]], indices[i + 1], dataset);
           let nextYPoint = yProjector(data[indices[i + 1]], indices[i + 1], dataset);
-          shouldShow = shouldShow || 0 <= nextXPoint && nextXPoint <= this.width() &&
-            0 <= nextYPoint && nextYPoint <= this.height();
+          shouldShow = shouldShow || pointInViewport(nextXPoint, nextYPoint);
         }
 
         if (shouldShow) {

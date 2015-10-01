@@ -9268,26 +9268,28 @@ var Plottable;
                 return dataToDraw;
             };
             Line.prototype._filterCroppedRendering = function (dataset, indices) {
+                var _this = this;
                 var xProjector = Plottable.Plot._scaledAccessor(this.x());
                 var yProjector = Plottable.Plot._scaledAccessor(this.y());
                 var data = dataset.data();
                 var filteredDataIndices = [];
+                var pointInViewport = function (x, y) {
+                    return Plottable.Utils.Math.inRange(x, 0, _this.width()) &&
+                        Plottable.Utils.Math.inRange(y, 0, _this.height());
+                };
                 for (var i = 0; i < indices.length; i++) {
                     var currXPoint = xProjector(data[indices[i]], indices[i], dataset);
                     var currYPoint = yProjector(data[indices[i]], indices[i], dataset);
-                    var shouldShow = 0 <= currXPoint && currXPoint <= this.width() &&
-                        0 <= currYPoint && currYPoint <= this.height();
+                    var shouldShow = pointInViewport(currXPoint, currYPoint);
                     if (!shouldShow && indices[i - 1] != null && data[indices[i - 1]] != null) {
                         var prevXPoint = xProjector(data[indices[i - 1]], indices[i - 1], dataset);
                         var prevYPoint = yProjector(data[indices[i - 1]], indices[i - 1], dataset);
-                        shouldShow = shouldShow || 0 <= prevXPoint && prevXPoint <= this.width() &&
-                            0 <= prevYPoint && prevYPoint <= this.height();
+                        shouldShow = shouldShow || pointInViewport(prevXPoint, prevYPoint);
                     }
                     if (!shouldShow && indices[i + 1] != null && data[indices[i + 1]] != null) {
                         var nextXPoint = xProjector(data[indices[i + 1]], indices[i + 1], dataset);
                         var nextYPoint = yProjector(data[indices[i + 1]], indices[i + 1], dataset);
-                        shouldShow = shouldShow || 0 <= nextXPoint && nextXPoint <= this.width() &&
-                            0 <= nextYPoint && nextYPoint <= this.height();
+                        shouldShow = shouldShow || pointInViewport(nextXPoint, nextYPoint);
                     }
                     if (shouldShow) {
                         filteredDataIndices.push(indices[i]);
