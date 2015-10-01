@@ -139,9 +139,9 @@ describe("TimeAxis", () => {
       axis.renderTo(svg);
       let tickRects = d3.selectAll("." + Plottable.Axis.TICK_MARK_CLASS)[0].map((mark: Element) => mark.getBoundingClientRect());
       let labelRects = d3.selectAll("." + Plottable.Axis.TICK_LABEL_CLASS)
-          .filter(function(d, i) {
-            return d3.select(this).style("visibility") === "visible";
-          })[0].map((label: Element) => label.getBoundingClientRect());
+        .filter(function(d, i) {
+          return d3.select(this).style("visibility") === "visible";
+        })[0].map((label: Element) => label.getBoundingClientRect());
       labelRects.forEach(function(labelRect: ClientRect) {
         tickRects.forEach(function(tickRect: ClientRect) {
           assert.isFalse(Plottable.Utils.DOM.clientRectsOverlap(labelRect, tickRect), "visible label does not overlap with a tick");
@@ -150,19 +150,19 @@ describe("TimeAxis", () => {
       svg.remove();
     });
 
-    function TickMarkAndLabelOverlap() {
+    function assertTickMarksAndLabelsDoNotOverlap() {
       let tickMarks = d3.selectAll(`.${Plottable.Axis.TICK_MARK_CLASS}:not(.${Plottable.Axis.END_TICK_MARK_CLASS})`);
       assert.operator(tickMarks.size(), ">=", 1, "There is at least one tick mark in the test");
       let tickLabels = d3.selectAll(`.${Plottable.Axis.TICK_LABEL_CLASS}`).filter(function(d, i) {
           return window.getComputedStyle(this).visibility !== "hidden";
       });
       assert.operator(tickLabels.size(), ">=", 1, "There is at least one tick label in the test");
-      tickMarks.each(function(d, i) {
+      tickMarks.each(function(tickMark, i) {
         let tickMarkRect = this.getBoundingClientRect();
-        tickLabels.each(function(e, j) {
+        tickLabels.each(function(tickLabel, j) {
           let tickLabelRect = this.getBoundingClientRect();
           let isOverlap = Plottable.Utils.DOM.clientRectsOverlap(tickMarkRect, tickLabelRect);
-          assert.isFalse(isOverlap, `Tick mark "${d}" should not overlap with tick label "${this.textContent}"`);
+          assert.isFalse(isOverlap, `Tick mark "${tickMark}" should not overlap with tick label "${this.textContent}"`);
         });
       });
     }
@@ -173,7 +173,7 @@ describe("TimeAxis", () => {
       axis = new Plottable.Axes.Time(scale, "top");
       axis.tierLabelPositions(["between", "between"]);
       axis.renderTo(svg);
-      TickMarkAndLabelOverlap();
+      assertTickMarksAndLabelsDoNotOverlap();
       svg.remove();
     });
 
@@ -183,7 +183,7 @@ describe("TimeAxis", () => {
       axis = new Plottable.Axes.Time(scale, "top");
       axis.tierLabelPositions(["center", "center"]);
       axis.renderTo(svg);
-      TickMarkAndLabelOverlap();
+      assertTickMarksAndLabelsDoNotOverlap();
       svg.remove();
     });
   });
