@@ -142,16 +142,17 @@ export module Plots {
     }
 
     /**
-     * Gets the croppedRendering preformance option state.
+     * Gets if croppedRendering is enabled
      *
-     * When croppedRendering option is enabled, lines that will not be visible in the viewport will not be
-     * drawn anymore (will not have corresponding SVG nodes). If only part of the data is in the viewport,
-     * then this option will boost of rendering. However, if all the data is rendered anyway, having this
-     * option enabled will cause a small overhead that can be noticed in the total render time.
+     * When croppedRendering is enabled, lines that will not be visible in the viewport will not be drawn.
+     * Thus if only part of the data is in the viewport, then this option will boost of rendering.
+     * However if all the data will render, enabling will cause an insignificant overhead.
      */
     public croppedRenderingEnabled(): boolean;
     /**
-     * Sets the croppedRendering performance option.
+     * Sets if croppedRendering is enabled
+     *
+     * @returns {Plots.Line} The calling Plots.Line
      */
     public croppedRenderingEnabled(croppedRendering: boolean): Plots.Line<X>;
     public croppedRenderingEnabled(croppedRendering?: boolean): any {
