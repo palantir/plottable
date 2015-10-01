@@ -433,7 +433,7 @@ export class Plot extends Component {
     return [{attrToProjector: this._generateAttrToProjector(), animator: new Animators.Null()}];
   }
 
-  protected _additionalPaint(time: number) {
+  protected _additionalPaint(time: number, dataToDraw: Utils.Map<Dataset, any>) {
     // no-op
   }
 
@@ -452,7 +452,7 @@ export class Plot extends Component {
 
     let times = this.datasets().map((ds, i) => drawers[i].totalDrawTime(dataToDraw.get(ds), drawSteps));
     let maxTime = Utils.Math.max(times, 0);
-    this._additionalPaint(maxTime);
+    this._additionalPaint(maxTime, dataToDraw);
   }
 
   /**

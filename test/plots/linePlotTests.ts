@@ -207,7 +207,7 @@ describe("Plots", () => {
       svg.remove();
     });
 
-    describe("selections()", () => {
+    describe("selections", () => {
       it("retrieves all dataset selections with no args", () => {
         let dataset3 = new Plottable.Dataset([
           { foo: 0, bar: 1 },
@@ -683,4 +683,191 @@ describe("Plots", () => {
 
     });
   });
+
+  describe("Line Plot", () => {
+    describe("Cropped Rendering Performance", () => {
+
+      let svg: d3.Selection<void>;
+      let plot: Plottable.Plots.Line<number>;
+
+      let xScale: Plottable.Scales.Linear;
+      let yScale: Plottable.Scales.Linear;
+
+      let SVG_WIDTH = 400;
+      let SVG_HEIGHT = 400;
+
+      beforeEach(() => {
+        svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+        xScale = new Plottable.Scales.Linear();
+        yScale = new Plottable.Scales.Linear();
+        plot = new Plottable.Plots.Line<number>();
+        plot.x((d) => d.x, xScale).y((d) => d.y, yScale);
+      });
+
+      it("can set the croppedRendering option", () => {
+        plot.renderTo(svg);
+
+        assert.isFalse(plot.croppedRenderingEnabled(), "croppedRendering is not enabled by default");
+
+        assert.strictEqual(plot.croppedRenderingEnabled(true), plot, "enabling the croppedRendering option returns the plot");
+        assert.isTrue(plot.croppedRenderingEnabled(), "can enable the croppedRendering option");
+
+        plot.croppedRenderingEnabled(false);
+        assert.isFalse(plot.croppedRenderingEnabled(), "can disable the croppedRendering option");
+
+        svg.remove();
+      });
+
+      it("does not render lines that are outside the viewport", () => {
+        let data = [
+          {x: 1, y: 1},
+          {x: 2, y: 2},
+          {x: 3, y: 1},
+          {x: 4, y: 2},
+          {x: 5, y: 1}
+        ];
+        plot.addDataset(new Plottable.Dataset(data));
+
+        // Only middle point is in viewport
+        xScale.domain([2.5, 3.5]);
+
+        plot.croppedRenderingEnabled(true);
+        plot.renderTo(svg);
+
+        let path = plot.content().select("path.line").attr("d");
+        let expectedRenderedData = [1, 2, 3].map((d) => data[d]);
+        checkPathForDataPoints(path, expectedRenderedData);
+
+        svg.remove();
+      });
+
+      it("works when the performance option is set after rendering to svg", () => {
+        let data = [
+          {x: 1, y: 1},
+          {x: 2, y: 2},
+          {x: 3, y: 1},
+          {x: 4, y: 2},
+          {x: 5, y: 1}
+        ];
+        plot.addDataset(new Plottable.Dataset(data));
+
+        // Only middle point is in viewport
+        xScale.domain([2.5, 3.5]);
+
+        plot.renderTo(svg);
+        plot.croppedRenderingEnabled(true);
+
+        let path = plot.content().select("path.line").attr("d");
+        let expectedRenderedData = [1, 2, 3].map((d) => data[d]);
+        checkPathForDataPoints(path, expectedRenderedData);
+
+        svg.remove();
+      });
+
+      it("works for vertical line plots", () => {
+        let data = [
+          {x: 1, y: 1},
+          {x: 2, y: 2},
+          {x: 1, y: 3},
+          {x: 2, y: 4},
+          {x: 1, y: 5}
+        ];
+        plot.addDataset(new Plottable.Dataset(data));
+        xScale.padProportion(0);
+
+        // Only middle point is in viewport
+        yScale.domain([2.5, 3.5]);
+
+        plot.croppedRenderingEnabled(true);
+        plot.renderTo(svg);
+
+        let path = plot.content().select("path.line").attr("d");
+        let expectedRenderedData = [1, 2, 3].map((d) => data[d]);
+        checkPathForDataPoints(path, expectedRenderedData);
+
+        svg.remove();
+      });
+
+      it("adapts to scale changes", () => {
+        let data = [
+          {x: 1, y: 1},
+          {x: 2, y: 2},
+          {x: 3, y: 1},
+          {x: 4, y: 2},
+          {x: 5, y: 1}
+        ];
+        plot.addDataset(new Plottable.Dataset(data));
+
+        plot.croppedRenderingEnabled(true);
+        plot.renderTo(svg);
+
+        let path = plot.content().select("path.line").attr("d");
+        checkPathForDataPoints(path, [0, 1, 2, 3, 4].map((d) => data[d]));
+
+        // Only middle point is in viewport
+        xScale.domain([2.5, 3.5]);
+        path = plot.content().select("path.line").attr("d");
+        checkPathForDataPoints(path, [1, 2, 3].map((d) => data[d]));
+
+        // Only first point is in viewport
+        xScale.domain([-0.5, 1.5]);
+        path = plot.content().select("path.line").attr("d");
+        checkPathForDataPoints(path, [0, 1].map((d) => data[d]));
+
+        svg.remove();
+      });
+
+      function checkPathForDataPoints(path: string, data: any[]) {
+        let EPSILON = 0.0001;
+
+        let lineEdges = path.match(/(\-?\d+\.?\d*)(,|\s)(-?\d+\.?\d*)/g);
+
+        console.log(lineEdges);
+        console.log(path);
+
+        assert.strictEqual(lineEdges.length, data.length, "correct number of edges drawn");
+
+        lineEdges.forEach((edge, i) => {
+          let coordinates = edge.split(/,|\s/);
+
+          assert.strictEqual(coordinates.length, 2, "There is an x coordinate and a y coordinate");
+          assert.closeTo(xScale.invert(+coordinates[0]), data[i].x, EPSILON,
+            `Point ${i} drawn, has correct x coordinate`);
+          assert.closeTo(yScale.invert(+coordinates[1]), data[i].y, EPSILON,
+            `Point ${i} drawn, has correct y coordinate`);
+        });
+      }
+    });
+
+    describe("Downsampling Performance", () => {
+
+      let svg: d3.Selection<void>;
+      let plot: Plottable.Plots.Line<number>;
+
+      let SVG_WIDTH = 400;
+      let SVG_HEIGHT = 400;
+
+      beforeEach(() => {
+        svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+        plot = new Plottable.Plots.Line<number>();
+        plot.x((d) => d.x).y((d) => d.y);
+      });
+
+      it("can set the downsampling option", () => {
+        plot.renderTo(svg);
+
+        assert.isFalse(plot.downsampleEnabled(), "downsample is not enabled by default");
+
+        assert.strictEqual(plot.downsampleEnabled(true), plot, "enabling the downsample option returns the plot");
+        assert.isTrue(plot.downsampleEnabled(), "can enable the downsample option");
+
+        plot.downsampleEnabled(false);
+        assert.isFalse(plot.downsampleEnabled(), "can disable the downsample option");
+
+        svg.remove();
+      });
+
+    });
+  });
+
 });

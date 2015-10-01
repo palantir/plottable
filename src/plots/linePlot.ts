@@ -14,6 +14,10 @@ export module Plots {
 
     private _autorangeSmooth = false;
 
+    // Performance options
+    private _croppedRendering = false;
+    private _downsample = false;
+
     /**
      * A Line Plot draws line segments starting from the first data point to the next.
      *
@@ -135,6 +139,39 @@ export module Plots {
       }
       this._interpolator = interpolator;
       this.render();
+      return this;
+    }
+
+    /**
+     * Gets the croppedRendering preformance option state.
+     *
+     * When croppedRendering option is enabled, lines that will not be visible in the viewport will not be
+     * drawn anymore (will not have corresponding SVG nodes). If only part of the data is in the viewport,
+     * then this option will boost of rendering. However, if all the data is rendered anyway, having this
+     * option enabled will cause a small overhead that can be noticed in the total render time.
+     */
+    public croppedRenderingEnabled(): boolean;
+    /**
+     * Sets the croppedRendering performance option.
+     */
+    public croppedRenderingEnabled(croppedRendering: boolean): Plots.Line<X>;
+    public croppedRenderingEnabled(croppedRendering?: boolean): any {
+      if (croppedRendering == null) {
+        return this._croppedRendering;
+      }
+      this._croppedRendering = croppedRendering;
+      this.render();
+      return this;
+    }
+
+    public downsampleEnabled(): boolean;
+    public downsampleEnabled(downsample: boolean): Plots.Line<X>;
+    public downsampleEnabled(downsample?: boolean): any {
+      if (downsample == null) {
+        return this._downsample;
+      }
+
+      this._downsample = downsample;
       return this;
     }
 
@@ -349,8 +386,114 @@ export module Plots {
 
     protected _getDataToDraw() {
       let dataToDraw = new Utils.Map<Dataset, any[]> ();
-      this.datasets().forEach((dataset) => dataToDraw.set(dataset, [dataset.data()]));
+
+      this.datasets().forEach((dataset) => {
+        let data = dataset.data();
+
+        if (!this._downsample && !this._croppedRendering) {
+          dataToDraw.set(dataset, [data]);
+          return;
+        }
+
+        let filteredDataIndices = data.map((d, i) => i);
+
+        if (this._croppedRendering) {
+          filteredDataIndices = this._filterCroppedRendering(dataset, filteredDataIndices);
+        }
+
+        if (this._downsample) {
+          filteredDataIndices = this._filterDownsample(dataset, filteredDataIndices);
+        }
+
+        dataToDraw.set(dataset, [filteredDataIndices.map((d, i) => data[d])]);
+      });
+
       return dataToDraw;
+    }
+
+    private _filterCroppedRendering(dataset: Dataset, indices: number[]) {
+      let xScale = this.x().scale;
+      let yScale = this.y().scale;
+      let xAccessor = this.x().accessor;
+      let yAccessor = this.y().accessor;
+      let xDomain = xScale.domain();
+      let yDomain = yScale.domain();
+
+      let data = dataset.data();
+      let filteredDataIndices: number[] = [];
+
+      for (let i = 0; i < indices.length; i++) {
+        let currXPoint = xAccessor(data[indices[i]], indices[i], dataset);
+        let currYPoint = yAccessor(data[indices[i]], indices[i], dataset);
+        let shouldShow = xDomain[0] <= currXPoint && currXPoint <= xDomain[1] &&
+          yDomain[0] <= currYPoint && currYPoint <= yDomain[1];
+
+        if (!shouldShow && indices[i - 1] != null && data[indices[i - 1]] != null) {
+          let prevXPoint = xAccessor(data[indices[i - 1]], indices[i - 1], dataset);
+          let prevYPoint = yAccessor(data[indices[i - 1]], indices[i - 1], dataset);
+          shouldShow = shouldShow || xDomain[0] <= prevXPoint && prevXPoint <= xDomain[1] &&
+            yDomain[0] <= prevYPoint && prevYPoint <= yDomain[1];
+        }
+
+        if (!shouldShow && indices[i + 1] != null && data[indices[i + 1]] != null) {
+          let nextXPoint = xAccessor(data[indices[i + 1]], indices[i + 1], dataset);
+          let nextYPoint = yAccessor(data[indices[i + 1]], indices[i + 1], dataset);
+          shouldShow = shouldShow || xDomain[0] <= nextXPoint && nextXPoint <= xDomain[1] &&
+            yDomain[0] <= nextYPoint && nextYPoint <= yDomain[1];
+        }
+
+        if (shouldShow) {
+          filteredDataIndices.push(indices[i]);
+        }
+      }
+      return filteredDataIndices;
+    }
+
+    private _filterDownsample(dataset: Dataset, indices: number[]) {
+      let xScale = this.x().scale;
+      let xAccessor = this.x().accessor;
+      let yAccessor = this.y().accessor;
+
+      let data = dataset.data();
+      let filteredDataIndices: number[] = [];
+
+      for (let i = 0; i < indices.length; ) {
+        let min = Infinity;
+        let max = -Infinity;
+        let currBucket = Math.floor(xScale.scale(xAccessor(data[indices[i]], indices[i], dataset)));
+        let p1 = indices[i];
+        let p2 = indices[i];
+        let p3 = indices[i];
+        while (i < indices.length && Math.floor(xScale.scale(xAccessor(data[indices[i]], indices[i], dataset))) === currBucket) {
+          let currPointY = yAccessor(data[indices[i]], indices[i], dataset);
+          if (currPointY > max) {
+            max = currPointY;
+            p2 = indices[i];
+          }
+          if (currPointY < min) {
+            min = currPointY;
+            p3 = indices[i];
+          }
+          i++;
+        }
+        let p4 = indices[i - 1];
+
+        filteredDataIndices.push(p1);
+
+        if (p2 !== p1) {
+          filteredDataIndices.push(p2);
+        }
+
+        if (p3 !== p2 && p3 !== p1) {
+          filteredDataIndices.push(p3);
+        }
+
+        if (p4 && p4 !== p3 && p4 !== p2 && p4 !== p1) {
+          filteredDataIndices.push(p4);
+        }
+      }
+
+      return filteredDataIndices;
     }
 
   }

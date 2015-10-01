@@ -100,9 +100,9 @@ export module Plots {
       this._lineDrawers.get(dataset).remove();
     }
 
-    protected _additionalPaint() {
+    protected _additionalPaint(time: any, dataToDraw: Utils.Map<Dataset, any>) {
       let drawSteps = this._generateLineDrawSteps();
-      let dataToDraw = this._getDataToDraw();
+      // let dataToDraw = this._getDataToDraw();
       this.datasets().forEach((dataset) => this._lineDrawers.get(dataset).draw(dataToDraw.get(dataset), drawSteps));
     }
 
