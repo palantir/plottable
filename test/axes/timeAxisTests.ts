@@ -199,7 +199,7 @@ describe("TimeAxis", () => {
     });
 
     it("tick labels do not overlap with tick marks in top orientation when tier label position is set to center", () => {
-     let svg = TestMethods.generateSVG(400, 100);
+      let svg = TestMethods.generateSVG(400, 100);
       scale = new Plottable.Scales.Time();
       scale.domain([new Date("2010-01-01"), new Date("2014-01-01")]);
       axis = new Plottable.Axes.Time(scale, "top");
