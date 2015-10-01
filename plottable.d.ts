@@ -3414,8 +3414,6 @@ declare module Plottable {
              * Gets if croppedRendering is enabled
              *
              * When croppedRendering is enabled, lines that will not be visible in the viewport will not be drawn.
-             * Thus if only part of the data is in the viewport, then this option will boost of rendering.
-             * However if all the data will render, enabling will cause an insignificant overhead.
              */
             croppedRenderingEnabled(): boolean;
             /**
