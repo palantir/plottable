@@ -682,9 +682,7 @@ describe("Plots", () => {
       });
 
     });
-  });
 
-  describe("Line Plot", () => {
     describe("Cropped Rendering Performance", () => {
 
       let svg: d3.Selection<void>;
@@ -693,11 +691,8 @@ describe("Plots", () => {
       let xScale: Plottable.Scales.Linear;
       let yScale: Plottable.Scales.Linear;
 
-      let SVG_WIDTH = 400;
-      let SVG_HEIGHT = 400;
-
       beforeEach(() => {
-        svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+        svg = TestMethods.generateSVG();
         xScale = new Plottable.Scales.Linear();
         yScale = new Plottable.Scales.Linear();
         plot = new Plottable.Plots.Line<number>();
