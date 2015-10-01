@@ -707,13 +707,13 @@ describe("Plots", () => {
       it("can set the croppedRendering option", () => {
         plot.renderTo(svg);
 
-        assert.isFalse(plot.croppedRendering(), "croppedRendering is not enabled by default");
+        assert.isFalse(plot.croppedRenderingEnabled(), "croppedRendering is not enabled by default");
 
-        assert.strictEqual(plot.croppedRendering(true), plot, "enabling the croppedRendering option returns the plot");
-        assert.isTrue(plot.croppedRendering(), "can enable the croppedRendering option");
+        assert.strictEqual(plot.croppedRenderingEnabled(true), plot, "enabling the croppedRendering option returns the plot");
+        assert.isTrue(plot.croppedRenderingEnabled(), "can enable the croppedRendering option");
 
-        plot.croppedRendering(false);
-        assert.isFalse(plot.croppedRendering(), "can disable the croppedRendering option");
+        plot.croppedRenderingEnabled(false);
+        assert.isFalse(plot.croppedRenderingEnabled(), "can disable the croppedRendering option");
 
         svg.remove();
       });
@@ -731,7 +731,7 @@ describe("Plots", () => {
         // Only middle point is in viewport
         xScale.domain([2.5, 3.5]);
 
-        plot.croppedRendering(true);
+        plot.croppedRenderingEnabled(true);
         plot.renderTo(svg);
 
         let path = plot.content().select("path.line").attr("d");
@@ -755,7 +755,7 @@ describe("Plots", () => {
         xScale.domain([2.5, 3.5]);
 
         plot.renderTo(svg);
-        plot.croppedRendering(true);
+        plot.croppedRenderingEnabled(true);
 
         let path = plot.content().select("path.line").attr("d");
         let expectedRenderedData = [1, 2, 3].map((d) => data[d]);
@@ -778,7 +778,7 @@ describe("Plots", () => {
         // Only middle point is in viewport
         yScale.domain([2.5, 3.5]);
 
-        plot.croppedRendering(true);
+        plot.croppedRenderingEnabled(true);
         plot.renderTo(svg);
 
         let path = plot.content().select("path.line").attr("d");
@@ -798,7 +798,7 @@ describe("Plots", () => {
         ];
         plot.addDataset(new Plottable.Dataset(data));
 
-        plot.croppedRendering(true);
+        plot.croppedRenderingEnabled(true);
         plot.renderTo(svg);
 
         let path = plot.content().select("path.line").attr("d");

@@ -3417,13 +3417,13 @@ declare module Plottable {
              * Thus if only part of the data is in the viewport, then this option will boost of rendering.
              * However if all the data will render, enabling will cause an insignificant overhead.
              */
-            croppedRendering(): boolean;
+            croppedRenderingEnabled(): boolean;
             /**
              * Sets if croppedRendering is enabled
              *
              * @returns {Plots.Line} The calling Plots.Line
              */
-            croppedRendering(croppedRendering: boolean): Plots.Line<X>;
+            croppedRenderingEnabled(croppedRendering: boolean): Plots.Line<X>;
             protected _createDrawer(dataset: Dataset): Drawer;
             protected _extentsForProperty(property: string): any[];
             protected _getResetYFunction(): (d: any, i: number, dataset: Dataset) => number;

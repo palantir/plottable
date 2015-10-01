@@ -146,14 +146,14 @@ export module Plots {
      * Thus if only part of the data is in the viewport, then this option will boost of rendering.
      * However if all the data will render, enabling will cause an insignificant overhead.
      */
-    public croppedRendering(): boolean;
+    public croppedRenderingEnabled(): boolean;
     /**
      * Sets if croppedRendering is enabled
      *
      * @returns {Plots.Line} The calling Plots.Line
      */
-    public croppedRendering(croppedRendering: boolean): Plots.Line<X>;
-    public croppedRendering(croppedRendering?: boolean): any {
+    public croppedRenderingEnabled(croppedRendering: boolean): Plots.Line<X>;
+    public croppedRenderingEnabled(croppedRendering?: boolean): any {
       if (croppedRendering == null) {
         return this._croppedRendering;
       }

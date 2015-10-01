@@ -9060,7 +9060,7 @@ var Plottable;
                 this.render();
                 return this;
             };
-            Line.prototype.croppedRendering = function (croppedRendering) {
+            Line.prototype.croppedRenderingEnabled = function (croppedRendering) {
                 if (croppedRendering == null) {
                     return this._croppedRendering;
                 }
