@@ -78,6 +78,7 @@ describe("Plots", () => {
         { x: "D", y: -10 },
         { x: "E", y: -15 }
       ];
+      let declineClass = "waterfall-decline";
 
       beforeEach(() => {
         svg = TestMethods.generateSVG();
@@ -94,20 +95,20 @@ describe("Plots", () => {
 
       it("classes decline bars", () => {
         let bars = plot.content().selectAll("rect");
-        assert.strictEqual(bars.size(), declineBarData.length, "all bars are growth except for first");
+        assert.strictEqual(bars.size(), declineBarData.length, "same number of bars as data points");
         bars.each(function(d, i) {
           if (i === 0) {
             return;
           }
           let bar = d3.select(this);
-          assert.isTrue(bar.classed("waterfall-decline"), "bar classed as growth bar");
+          assert.isTrue(bar.classed(declineClass), "bar classed as decline bars");
         });
         plot.destroy();
         svg.remove();
       });
 
       it("bars placed at current sum", () => {
-        let bars = plot.content().selectAll("rect.waterfall-decline");
+        let bars = plot.content().selectAll(`rect.${declineClass}`);
         assert.strictEqual(bars.size(), declineBarData.length - 1, "all bars are decline except for first");
         let yAccessor = plot.y().accessor;
         let sum = 0;
@@ -139,6 +140,7 @@ describe("Plots", () => {
         { x: "D", y: -10, t: false },
         { x: "E", y: 15, t: true }
       ];
+      let totalClass = "waterfall-total";
 
       beforeEach(() => {
         svg = TestMethods.generateSVG();
@@ -160,7 +162,7 @@ describe("Plots", () => {
         let totalBarIndices = data.map((d, i) => i).filter((index) => accessor(data[index]));
         totalBarIndices.forEach((totalBarIndex) => {
           let totalBar = d3.select(bars[0][totalBarIndex]);
-          assert.isTrue(totalBar.classed("waterfall-total"));
+          assert.isTrue(totalBar.classed(totalClass));
         });
         plot.destroy();
         svg.remove();
@@ -202,13 +204,8 @@ describe("Plots", () => {
         plot.addDataset(dataset);
       });
 
-      it("does not have connectors enabled by default", () => {
-        assert.isFalse(plot.connectorsEnabled(), "no connectors by default");
-        plot.destroy();
-        svg.remove();
-      });
-
       it("can set if connectors are enabled", () => {
+        assert.isFalse(plot.connectorsEnabled(), "no connectors by default");
         assert.strictEqual(plot.connectorsEnabled(true), plot, "setter returns calling object");
         plot.renderTo(svg);
         let bars = plot.content().selectAll("rect");
