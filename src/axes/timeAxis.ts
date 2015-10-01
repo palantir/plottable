@@ -552,8 +552,8 @@ export module Axes {
         let leadingTickMark = visibleTickMarkRects[i];
         let trailingTickMark = visibleTickMarkRects[i + 1];
 
-        let isOverlappingLastLabel = (lastLabelClientRect != null &&  Utils.DOM.clientRectsOverlap(clientRect, lastLabelClientRect));
-        let isOverlappingLeadingTickMark = (leadingTickMark != null &&  Utils.DOM.clientRectsOverlap(clientRect, leadingTickMark));
+        let isOverlappingLastLabel = (lastLabelClientRect != null && Utils.DOM.clientRectsOverlap(clientRect, lastLabelClientRect));
+        let isOverlappingLeadingTickMark = (leadingTickMark != null && Utils.DOM.clientRectsOverlap(clientRect, leadingTickMark));
         let isOverlappingTrailingTickMark = (trailingTickMark != null && Utils.DOM.clientRectsOverlap(clientRect, trailingTickMark));
 
         if (!isInsideBBox(clientRect) || isOverlappingLastLabel || isOverlappingLeadingTickMark || isOverlappingTrailingTickMark) {
