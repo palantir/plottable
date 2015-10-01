@@ -149,8 +149,8 @@ describe("TimeAxis", () => {
     svg.remove();
   });
 
-  describe("tick labels and tick marks do not overlaps", () => {
-    it("tick labels do not overlap with tick marks", () => {
+  describe("tick labels and tick marks do not overlap", () => {
+    it("tick labels do not overlap with tick marks in bottom orientation", () => {
       let svg = TestMethods.generateSVG(400, 100);
       scale = new Plottable.Scales.Time();
       scale.domain([new Date("2009-12-20"), new Date("2011-01-01")]);
@@ -169,7 +169,7 @@ describe("TimeAxis", () => {
       svg.remove();
     });
 
-    function checkTierDisplayPosition () {
+    function TickMarkAndLabelOverlap () {
       let tickMarks = d3.selectAll(`.${Plottable.Axis.TICK_MARK_CLASS}:not(.${Plottable.Axis.END_TICK_MARK_CLASS})`);
       assert.operator(tickMarks.size(), ">=", 1, "There is at least one tick mark in the test");
       let tickLabels = d3.selectAll(`.${Plottable.Axis.TICK_LABEL_CLASS}`)
@@ -182,7 +182,7 @@ describe("TimeAxis", () => {
         tickLabels.each(function(e, j) {
           let tickLabelRect = this.getBoundingClientRect();
           let isOverlap = Plottable.Utils.DOM.clientRectsOverlap(tickMarkRect, tickLabelRect);
-          assert.isFalse(isOverlap, `Tick mark "${d}" should not overlap with tick label "${this.textContent}" `);
+          assert.isFalse(isOverlap, `Tick mark "${d}" should not overlap with tick label "${this.textContent}"`);
         });
       });
     }
@@ -194,7 +194,7 @@ describe("TimeAxis", () => {
       axis = new Plottable.Axes.Time(scale, "top");
       axis.tierLabelPositions(["between", "between"]);
       axis.renderTo(svg);
-      checkTierDisplayPosition();
+      TickMarkAndLabelOverlap();
       svg.remove();
     });
 
@@ -205,7 +205,7 @@ describe("TimeAxis", () => {
       axis = new Plottable.Axes.Time(scale, "top");
       axis.tierLabelPositions(["center", "center"]);
       axis.renderTo(svg);
-      checkTierDisplayPosition();
+      TickMarkAndLabelOverlap();
       svg.remove();
     });
   });
