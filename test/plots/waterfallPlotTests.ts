@@ -107,7 +107,7 @@ describe("Plots", () => {
         svg.remove();
       });
 
-      it("bars placed at current sum", () => {
+      it("places bars at current sum", () => {
         let bars = plot.content().selectAll(`rect.${declineClass}`);
         assert.strictEqual(bars.size(), declineBarData.length - 1, "all bars are decline except for first");
         let yAccessor = plot.y().accessor;
