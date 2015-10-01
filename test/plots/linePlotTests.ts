@@ -817,10 +817,10 @@ describe("Plots", () => {
         svg.remove();
       });
 
-      function checkPathForDataPoints(path: string, data: any[]) {
+      function checkPathForDataPoints(path: string, data: {x: number, y: number}[]) {
         let EPSILON = 0.0001;
 
-        let lineEdges = path.match(/(\-?\d+\.?\d*)(,|\s)(-?\d+\.?\d*)/g);
+        let lineEdges = TestMethods.normalizePath(path).match(/(\-?\d+\.?\d*)(,|\s)(-?\d+\.?\d*)/g);
 
         assert.strictEqual(lineEdges.length, data.length, "correct number of edges drawn");
 
