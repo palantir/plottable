@@ -13,8 +13,6 @@ export module Plots {
     private _interpolator: string | ((points: Array<[number, number]>) => string) = "linear";
 
     private _autorangeSmooth = false;
-
-    // Performance options
     private _croppedRendering = false;
 
     /**
@@ -386,9 +384,7 @@ export module Plots {
 
         let filteredDataIndices = data.map((d, i) => i);
 
-        if (this._croppedRendering) {
-          filteredDataIndices = this._filterCroppedRendering(dataset, filteredDataIndices);
-        }
+        filteredDataIndices = this._filterCroppedRendering(dataset, filteredDataIndices);
 
         dataToDraw.set(dataset, [filteredDataIndices.map((d, i) => data[d])]);
       });

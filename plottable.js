@@ -1,5 +1,5 @@
 /*!
-Plottable 1.12.0 (https://github.com/palantir/plottable)
+Plottable 1.13.0 (https://github.com/palantir/plottable)
 Copyright 2014-2015 Palantir Technologies
 Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
 */
@@ -908,7 +908,7 @@ var Plottable;
 ///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
-    Plottable.version = "1.12.0";
+    Plottable.version = "1.13.0";
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
@@ -8993,7 +8993,6 @@ var Plottable;
                 _super.call(this);
                 this._interpolator = "linear";
                 this._autorangeSmooth = false;
-                // Performance options
                 this._croppedRendering = false;
                 this.addClass("line-plot");
                 var animator = new Plottable.Animators.Easing();
@@ -9263,9 +9262,7 @@ var Plottable;
                         return;
                     }
                     var filteredDataIndices = data.map(function (d, i) { return i; });
-                    if (_this._croppedRendering) {
-                        filteredDataIndices = _this._filterCroppedRendering(dataset, filteredDataIndices);
-                    }
+                    filteredDataIndices = _this._filterCroppedRendering(dataset, filteredDataIndices);
                     dataToDraw.set(dataset, [filteredDataIndices.map(function (d, i) { return data[d]; })]);
                 });
                 return dataToDraw;
