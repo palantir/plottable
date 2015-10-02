@@ -1,5 +1,5 @@
 /*!
-Plottable 1.13.0 (https://github.com/palantir/plottable)
+Plottable 1.12.0 (https://github.com/palantir/plottable)
 Copyright 2014-2015 Palantir Technologies
 Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
 */
@@ -908,7 +908,7 @@ var Plottable;
 ///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
-    Plottable.version = "1.13.0";
+    Plottable.version = "1.12.0";
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
@@ -8993,7 +8993,7 @@ var Plottable;
                 _super.call(this);
                 this._interpolator = "linear";
                 this._autorangeSmooth = false;
-                this._croppedRendering = false;
+                this._croppedRenderingEnabled = false;
                 this.addClass("line-plot");
                 var animator = new Plottable.Animators.Easing();
                 animator.stepDuration(Plottable.Plot._ANIMATION_MAX_DURATION);
@@ -9062,9 +9062,9 @@ var Plottable;
             };
             Line.prototype.croppedRenderingEnabled = function (croppedRendering) {
                 if (croppedRendering == null) {
-                    return this._croppedRendering;
+                    return this._croppedRenderingEnabled;
                 }
-                this._croppedRendering = croppedRendering;
+                this._croppedRenderingEnabled = croppedRendering;
                 this.render();
                 return this;
             };
@@ -9257,7 +9257,7 @@ var Plottable;
                 var dataToDraw = new Plottable.Utils.Map();
                 this.datasets().forEach(function (dataset) {
                     var data = dataset.data();
-                    if (!_this._croppedRendering) {
+                    if (!_this._croppedRenderingEnabled) {
                         dataToDraw.set(dataset, [data]);
                         return;
                     }

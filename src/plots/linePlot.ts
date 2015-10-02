@@ -13,7 +13,7 @@ export module Plots {
     private _interpolator: string | ((points: Array<[number, number]>) => string) = "linear";
 
     private _autorangeSmooth = false;
-    private _croppedRendering = false;
+    private _croppedRenderingEnabled = false;
 
     /**
      * A Line Plot draws line segments starting from the first data point to the next.
@@ -153,9 +153,9 @@ export module Plots {
     public croppedRenderingEnabled(croppedRendering: boolean): Plots.Line<X>;
     public croppedRenderingEnabled(croppedRendering?: boolean): any {
       if (croppedRendering == null) {
-        return this._croppedRendering;
+        return this._croppedRenderingEnabled;
       }
-      this._croppedRendering = croppedRendering;
+      this._croppedRenderingEnabled = croppedRendering;
       this.render();
       return this;
     }
@@ -375,7 +375,7 @@ export module Plots {
       this.datasets().forEach((dataset) => {
         let data = dataset.data();
 
-        if (!this._croppedRendering) {
+        if (!this._croppedRenderingEnabled) {
           dataToDraw.set(dataset, [data]);
           return;
         }
