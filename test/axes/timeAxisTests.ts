@@ -130,6 +130,22 @@ describe("TimeAxis", () => {
     svg.remove();
   });
 
+  it("end ticks' lengths equal to endTickLength() when tierLabelPosition is set to center", () => {
+    let svg = TestMethods.generateSVG(400, 100);
+    axis.tierLabelPositions(["center", "center"]);
+    scale.domain([new Date("2010-01-01"), new Date("2014-01-01")]);
+    axis.renderTo(svg);
+    let endTicks = axis.content().selectAll(`.${Plottable.Axis.END_TICK_MARK_CLASS}`);
+    assert.operator(endTicks.size(), ">=", 1, "At least one end tick mark is selected in the test");
+    endTicks.each(function(d, i){
+      let endTick = d3.select(this);
+      let tickLength = Math.abs(TestMethods.numAttr(endTick, "y1") - TestMethods.numAttr(endTick, "y2"));
+      assert.closeTo(tickLength, axis.endTickLength(), window.Pixel_CloseTo_Requirement,
+        "end tick marks's length should equal to endTickLength()");
+    });
+    svg.remove();
+  });
+
   it("tick labels do not overlap with tick marks", () => {
     let svg = TestMethods.generateSVG(400, 100);
     scale = new Plottable.Scales.Time();
@@ -291,6 +307,38 @@ describe("TimeAxis", () => {
     xAxis.computeLayout({ x: 0, y: 0}, 400, 400);
     let minimumHeight = xAxis.tickLabelPadding() + xAxis.margin() + xAxis.innerTickLength();
     assert.operator(xAxis.height(), ">=", minimumHeight, "height includes all relevant pieces");
+    svg.remove();
+  });
+
+  it("tick labels show correctly when display format is set to 'center'", () => {
+    let svg = TestMethods.generateSVG(400, 100);
+    scale.domain([new Date("2015-09-02"), new Date("2015-09-03")]);
+    axis.tierLabelPositions(["center", "center"]);
+    axis.renderTo(svg);
+
+    let labels = axis.content().selectAll(`.${Plottable.Axis.TICK_LABEL_CLASS}`);
+    assert.operator(labels.size(), ">=", 1, "At least one label is selected in testing");
+
+    let axisBoundingRect: ClientRect = (<Element>axis.background().node()).getBoundingClientRect();
+    let isInsideAxisBoundingRect = function(innerRect: ClientRect) {
+        return (
+          Math.floor(axisBoundingRect.left) <= Math.ceil(innerRect.left) &&
+          Math.floor(axisBoundingRect.top) <= Math.ceil(innerRect.top) &&
+          Math.floor(innerRect.right) <= Math.ceil(axisBoundingRect.right) &&
+          Math.floor(innerRect.bottom) <= Math.ceil(axisBoundingRect.bottom)
+        );
+    };
+
+    labels.each(function(d, i) {
+      let labelVisibility = window.getComputedStyle(this).visibility;
+      let boundingClientRect = this.getBoundingClientRect();
+      let isInside = isInsideAxisBoundingRect(boundingClientRect);
+      if (labelVisibility === "hidden") {
+        assert.isFalse(isInside, `label ${i} "${this.textContent}" is hidden, should be visible as it is inside the axis bounding box`);
+      } else {
+        assert.isTrue(isInside, `label ${i} "${this.textContent}" is visible, should be hidden as it is outside the axis bounding box`);
+      }
+    });
     svg.remove();
   });
 

@@ -422,12 +422,14 @@ export module Axes {
       tickMarks.attr(attr);
       if (this.orientation() === "bottom") {
         attr["y1"] = offset;
-        attr["y2"] = offset + this._tierHeights[index];
+        attr["y2"] = offset + (this._tierLabelPositions[index] === "center" ? this.endTickLength() : this._tierHeights[index]);
       } else {
         attr["y1"] = this.height() - offset;
-        attr["y2"] = this.height() - (offset + this._tierHeights[index]);
+        attr["y2"] = this.height() - (offset + (this._tierLabelPositions[index] === "center" ?
+                                                  this.endTickLength() : this._tierHeights[index]));
       }
       d3.select(tickMarks[0][0]).attr(attr);
+      d3.select(tickMarks[0][tickMarks.size() - 1]).attr(attr);
 
       // Add end-tick classes to first and last tick for CSS customization purposes
       d3.select(tickMarks[0][0]).classed(Axis.END_TICK_MARK_CLASS, true);
@@ -546,8 +548,12 @@ export module Axes {
         let tickLabel = d3.select(this);
         let leadingTickMark = visibleTickMarkRects[i];
         let trailingTickMark = visibleTickMarkRects[i + 1];
-        if (!isInsideBBox(clientRect) || (lastLabelClientRect != null && Utils.DOM.clientRectsOverlap(clientRect, lastLabelClientRect))
-            || (leadingTickMark.right > clientRect.left || trailingTickMark.left < clientRect.right)) {
+
+        let isOverlappingLastLabel = (lastLabelClientRect != null && Utils.DOM.clientRectsOverlap(clientRect, lastLabelClientRect));
+        let isOverlappingLeadingTickMark = (leadingTickMark != null && Utils.DOM.clientRectsOverlap(clientRect, leadingTickMark));
+        let isOverlappingTrailingTickMark = (trailingTickMark != null && Utils.DOM.clientRectsOverlap(clientRect, trailingTickMark));
+
+        if (!isInsideBBox(clientRect) || isOverlappingLastLabel || isOverlappingLeadingTickMark || isOverlappingTrailingTickMark) {
           tickLabel.style("visibility", "hidden");
         } else {
           lastLabelClientRect = clientRect;
