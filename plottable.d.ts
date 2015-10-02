@@ -2058,7 +2058,7 @@ declare module Plottable {
              */
             tickLabelAngle(angle: number): Category;
             renderImmediately(): Category;
-            computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number): Axis<string>;
+            computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number): Category;
         }
     }
 }

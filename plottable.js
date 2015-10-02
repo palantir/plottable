@@ -5222,7 +5222,9 @@ var Plottable;
                 // on everyone, including this. Since CSS or something might have
                 // affected the size of the characters, clear the cache.
                 this._measurer.reset();
-                return _super.prototype.computeLayout.call(this, origin, availableWidth, availableHeight);
+                _super.prototype.computeLayout.call(this, origin, availableWidth, availableHeight);
+                this._scale.range([0, this.height()]);
+                return this;
             };
             return Category;
         })(Plottable.Axis);
