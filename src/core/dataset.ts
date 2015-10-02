@@ -4,7 +4,6 @@ module Plottable {
 
 export type DatasetCallback = (dataset: Dataset) => void;
 
-
 export class KeyFunctions {
   protected static counter: number = 0;
   public static noConstancy: (d: any, i: number) => any = (d: any, i: number) => {
