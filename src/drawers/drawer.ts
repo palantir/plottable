@@ -78,7 +78,7 @@ export class Drawer {
   private _bindSelectionData(data: any[]) {
     // if the dataset has a key, use it when binding the data   
     let dataElements: d3.selection.Update<any>;
-    if (this._dataset && this._dataset.key) {
+    if (this._dataset && this._dataset.key()) {
       dataElements = this.selection().data(data, this._dataset.key());
     } else {
       dataElements = this.selection().data(data);
