@@ -3420,12 +3420,16 @@ declare module Plottable {
             interpolator(interpolator: "monotone"): Line<X>;
             /**
              * Gets the downsampling performance option state
+             *
+             * When downsampling is enabled, lines whose two ends have the same scaled x/y values will not be drawn on top of each other.
              */
-            downsampleEnabled(): boolean;
+            downsamplingEnabled(): boolean;
             /**
-             * Sets downsampling performance option is enabled.
+             * Sets if the downsampling performance option is enabled
+             *
+             * @returns {Plots.Line} The calling Plots.Line
              */
-            downsampleEnabled(downsample: boolean): Plots.Line<X>;
+            downsamplingEnabled(downsample: boolean): Plots.Line<X>;
             protected _createDrawer(dataset: Dataset): Drawer;
             protected _extentsForProperty(property: string): any[];
             protected _getResetYFunction(): (d: any, i: number, dataset: Dataset) => number;

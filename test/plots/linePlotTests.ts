@@ -700,32 +700,32 @@ describe("Plots", () => {
       it("can set the downsampling option", () => {
         plot.renderTo(svg);
 
-        assert.isFalse(plot.downsampleEnabled(), "downsampling is not enabled by default");
+        assert.isFalse(plot.downsamplingEnabled(), "downsampling is not enabled by default");
 
-        assert.strictEqual(plot.downsampleEnabled(true), plot, "enabling the downsampling option returns the plot");
-        assert.isTrue(plot.downsampleEnabled(), "can enable the downsampling option");
+        assert.strictEqual(plot.downsamplingEnabled(true), plot, "enabling the downsampling option returns the plot");
+        assert.isTrue(plot.downsamplingEnabled(), "can enable the downsampling option");
 
-        plot.downsampleEnabled(false);
-        assert.isFalse(plot.downsampleEnabled(), "can disable the downsampling option");
+        plot.downsamplingEnabled(false);
+        assert.isFalse(plot.downsamplingEnabled(), "can disable the downsampling option");
 
         svg.remove();
       });
 
-      it("does not render points that have same scaled values", () => {
+      it("does not render points that should be removed in downsampling", () => {
         let data = [
-          {x: -50, y: -1}, // last element in previous bucket
+          {x: -10, y: -1}, // last element in previous bucket
           {x: 0, y: 2}, // first element in current bucket
-          {x: 0.5, y: 1.5}, // point to be removed 
+          {x: 0.5, y: 1.5}, // the point to be removed 
           {x: 1, y: 1}, // minimum y in current bucket
           {x: 2, y: 4}, // maximum y in current bucket
           {x: 3, y: 3}, // last elemnt in current bucket 
-          {x: 50, y: 2}, // first element in next bucket
+          {x: 10, y: 2}, // first element in next bucket
         ];
         plot.addDataset(new Plottable.Dataset(data));
 
         xScale.domain([-200, 200]);
 
-        plot.downsampleEnabled(true);
+        plot.downsamplingEnabled(true);
         plot.renderTo(svg);
 
         let path = plot.content().select("path.line").attr("d");
@@ -735,21 +735,21 @@ describe("Plots", () => {
         svg.remove();
       });
 
-      it("does not render points that have same scaled values in vertical line plots", () => {
+      it("does not render points that should be removed in downsampling in vertical line plots", () => {
         let data = [
-          {x: -1, y: -50},
-          {x: 2, y: 1},
-          {x: 1.5, y: 1.5},
-          {x: 1, y: 2},
-          {x: 4, y: 3},
-          {x: 3, y: 4},
-          {x: 2, y: 100},
+          {x: -1, y: -50}, // last element in previous bucket
+          {x: 2, y: 1}, // first element in current bucket
+          {x: 1.5, y: 1.5}, // the point to be removed
+          {x: 1, y: 2}, // minimum x in current bucket
+          {x: 4, y: 3}, // maximum x in current bucket
+          {x: 3, y: 4}, // last elemnt in current bucket
+          {x: 2, y: 100}, // first element in next bucket
         ];
         plot.addDataset(new Plottable.Dataset(data));
 
         yScale.domain([-200, 200]);
 
-        plot.downsampleEnabled(true);
+        plot.downsamplingEnabled(true);
         plot.renderTo(svg);
 
         let path = plot.content().select("path.line").attr("d");
@@ -761,14 +761,10 @@ describe("Plots", () => {
 
       function checkPathForDataPoints(path: string, data: {x: number, y: number}[]) {
         let EPSILON = 0.0001;
-
         let lineEdges = TestMethods.normalizePath(path).match(/(\-?\d+\.?\d*)(,|\s)(-?\d+\.?\d*)/g);
-
         assert.strictEqual(lineEdges.length, data.length, "correct number of edges drawn");
-
         lineEdges.forEach((edge, i) => {
           let coordinates = edge.split(/,|\s/);
-
           assert.strictEqual(coordinates.length, 2, "There is an x coordinate and a y coordinate");
           assert.closeTo(xScale.invert(+coordinates[0]), data[i].x, EPSILON,
             `Point ${i} drawn, has correct x coordinate`);

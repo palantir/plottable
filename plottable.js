@@ -9059,7 +9059,7 @@ var Plottable;
                 this.render();
                 return this;
             };
-            Line.prototype.downsampleEnabled = function (downsample) {
+            Line.prototype.downsamplingEnabled = function (downsample) {
                 if (downsample == null) {
                     return this._downsampleEnabled;
                 }

@@ -141,17 +141,20 @@ export module Plots {
     }
     /**
      * Gets the downsampling performance option state
+     * 
+     * When downsampling is enabled, lines whose two ends have the same scaled x/y values will not be drawn on top of each other.
      */
-    public downsampleEnabled(): boolean;
-     /**
-      * Sets downsampling performance option is enabled.
-      */
-    public downsampleEnabled(downsample: boolean): Plots.Line<X>;
-    public downsampleEnabled(downsample?: boolean): any {
+    public downsamplingEnabled(): boolean;
+    /**
+     * Sets if the downsampling performance option is enabled
+     * 
+     * @returns {Plots.Line} The calling Plots.Line
+     */
+    public downsamplingEnabled(downsample: boolean): Plots.Line<X>;
+    public downsamplingEnabled(downsample?: boolean): any {
       if (downsample == null) {
         return this._downsampleEnabled;
       }
-
       this._downsampleEnabled = downsample;
       return this;
     }
@@ -425,7 +428,6 @@ export module Plots {
       }
         return filteredIndices;
     }
-
   }
 }
 }
