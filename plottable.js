@@ -8992,6 +8992,7 @@ var Plottable;
                 _super.call(this);
                 this._interpolator = "linear";
                 this._autorangeSmooth = false;
+                this._croppedRenderingEnabled = false;
                 this.addClass("line-plot");
                 var animator = new Plottable.Animators.Easing();
                 animator.stepDuration(Plottable.Plot._ANIMATION_MAX_DURATION);
@@ -9055,6 +9056,14 @@ var Plottable;
                     return this._interpolator;
                 }
                 this._interpolator = interpolator;
+                this.render();
+                return this;
+            };
+            Line.prototype.croppedRenderingEnabled = function (croppedRendering) {
+                if (croppedRendering == null) {
+                    return this._croppedRenderingEnabled;
+                }
+                this._croppedRenderingEnabled = croppedRendering;
                 this.render();
                 return this;
             };
@@ -9243,9 +9252,49 @@ var Plottable;
                 };
             };
             Line.prototype._getDataToDraw = function () {
+                var _this = this;
                 var dataToDraw = new Plottable.Utils.Map();
-                this.datasets().forEach(function (dataset) { return dataToDraw.set(dataset, [dataset.data()]); });
+                this.datasets().forEach(function (dataset) {
+                    var data = dataset.data();
+                    if (!_this._croppedRenderingEnabled) {
+                        dataToDraw.set(dataset, [data]);
+                        return;
+                    }
+                    var filteredDataIndices = data.map(function (d, i) { return i; });
+                    filteredDataIndices = _this._filterCroppedRendering(dataset, filteredDataIndices);
+                    dataToDraw.set(dataset, [filteredDataIndices.map(function (d, i) { return data[d]; })]);
+                });
                 return dataToDraw;
+            };
+            Line.prototype._filterCroppedRendering = function (dataset, indices) {
+                var _this = this;
+                var xProjector = Plottable.Plot._scaledAccessor(this.x());
+                var yProjector = Plottable.Plot._scaledAccessor(this.y());
+                var data = dataset.data();
+                var filteredDataIndices = [];
+                var pointInViewport = function (x, y) {
+                    return Plottable.Utils.Math.inRange(x, 0, _this.width()) &&
+                        Plottable.Utils.Math.inRange(y, 0, _this.height());
+                };
+                for (var i = 0; i < indices.length; i++) {
+                    var currXPoint = xProjector(data[indices[i]], indices[i], dataset);
+                    var currYPoint = yProjector(data[indices[i]], indices[i], dataset);
+                    var shouldShow = pointInViewport(currXPoint, currYPoint);
+                    if (!shouldShow && indices[i - 1] != null && data[indices[i - 1]] != null) {
+                        var prevXPoint = xProjector(data[indices[i - 1]], indices[i - 1], dataset);
+                        var prevYPoint = yProjector(data[indices[i - 1]], indices[i - 1], dataset);
+                        shouldShow = shouldShow || pointInViewport(prevXPoint, prevYPoint);
+                    }
+                    if (!shouldShow && indices[i + 1] != null && data[indices[i + 1]] != null) {
+                        var nextXPoint = xProjector(data[indices[i + 1]], indices[i + 1], dataset);
+                        var nextYPoint = yProjector(data[indices[i + 1]], indices[i + 1], dataset);
+                        shouldShow = shouldShow || pointInViewport(nextXPoint, nextYPoint);
+                    }
+                    if (shouldShow) {
+                        filteredDataIndices.push(indices[i]);
+                    }
+                }
+                return filteredDataIndices;
             };
             return Line;
         })(Plottable.XYPlot);
