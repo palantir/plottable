@@ -13,7 +13,7 @@ export module Plots {
     private _interpolator: string | ((points: Array<[number, number]>) => string) = "linear";
 
     private _autorangeSmooth = false;
-    private _croppedRenderingEnabled = false;
+    private _croppedRenderingEnabled = true;
 
     /**
      * A Line Plot draws line segments starting from the first data point to the next.

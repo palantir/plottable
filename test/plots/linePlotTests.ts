@@ -230,8 +230,8 @@ describe("Plots", () => {
 
         let allLines = linePlot.selections([dataset3]);
         assert.strictEqual(allLines.size(), 1, "all lines retrieved");
-        let selectionData = allLines.data();
-        assert.include(selectionData, dataset3.data(), "third dataset data in selection data");
+        let selectionData = allLines.data()[0];
+        assert.deepEqual(selectionData, dataset3.data(), "third dataset data in selection data");
 
         svg.remove();
       });
@@ -246,8 +246,8 @@ describe("Plots", () => {
 
         let allLines = linePlot.selections([dataset3, dummyDataset]);
         assert.strictEqual(allLines.size(), 1, "all lines retrieved");
-        let selectionData = allLines.data();
-        assert.include(selectionData, dataset3.data(), "third dataset data in selection data");
+        let selectionData = allLines.data()[0];
+        assert.deepEqual(selectionData, dataset3.data(), "third dataset data in selection data");
 
         svg.remove();
       });
@@ -702,7 +702,7 @@ describe("Plots", () => {
       it("can set the croppedRendering option", () => {
         plot.renderTo(svg);
 
-        assert.isFalse(plot.croppedRenderingEnabled(), "croppedRendering is not enabled by default");
+        assert.isTrue(plot.croppedRenderingEnabled(), "croppedRendering is not enabled by default");
 
         assert.strictEqual(plot.croppedRenderingEnabled(true), plot, "enabling the croppedRendering option returns the plot");
         assert.isTrue(plot.croppedRenderingEnabled(), "can enable the croppedRendering option");
