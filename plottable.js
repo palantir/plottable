@@ -8992,6 +8992,7 @@ var Plottable;
                 _super.call(this);
                 this._interpolator = "linear";
                 this._autorangeSmooth = false;
+                this._downsampleEnabled = false;
                 this.addClass("line-plot");
                 var animator = new Plottable.Animators.Easing();
                 animator.stepDuration(Plottable.Plot._ANIMATION_MAX_DURATION);
@@ -9056,6 +9057,13 @@ var Plottable;
                 }
                 this._interpolator = interpolator;
                 this.render();
+                return this;
+            };
+            Line.prototype.downsampleEnabled = function (downsample) {
+                if (downsample == null) {
+                    return this._downsampleEnabled;
+                }
+                this._downsampleEnabled = downsample;
                 return this;
             };
             Line.prototype._createDrawer = function (dataset) {
@@ -9243,9 +9251,62 @@ var Plottable;
                 };
             };
             Line.prototype._getDataToDraw = function () {
+                var _this = this;
                 var dataToDraw = new Plottable.Utils.Map();
-                this.datasets().forEach(function (dataset) { return dataToDraw.set(dataset, [dataset.data()]); });
+                this.datasets().forEach(function (dataset) {
+                    var data = dataset.data();
+                    if (!_this._downsampleEnabled) {
+                        dataToDraw.set(dataset, [data]);
+                        return;
+                    }
+                    var filteredDataIndices = data.map(function (d, i) { return i; });
+                    filteredDataIndices = _this._filterDownsampling(dataset, filteredDataIndices);
+                    dataToDraw.set(dataset, [filteredDataIndices.map(function (d, i) { return data[d]; })]);
+                });
                 return dataToDraw;
+            };
+            Line.prototype._filterDownsampling = function (dataset, indices) {
+                var xAccessor = this.x().accessor;
+                var yAccessor = this.y().accessor;
+                var filteredIndices = this._filterDownsamplingInOneScale(dataset, indices, this.x().scale, xAccessor, yAccessor);
+                filteredIndices = this._filterDownsamplingInOneScale(dataset, filteredIndices, this.y().scale, yAccessor, xAccessor);
+                return filteredIndices;
+            };
+            Line.prototype._filterDownsamplingInOneScale = function (dataset, indices, scale, primaryAccessor, secondaryAccessor) {
+                var data = dataset.data();
+                var filteredIndices = [];
+                for (var i = 0; i < indices.length;) {
+                    var min = Infinity;
+                    var max = -Infinity;
+                    var currBucket = Math.floor(scale.scale(primaryAccessor(data[indices[i]], indices[i], dataset)));
+                    var pFirst = indices[i];
+                    var pMin = indices[i];
+                    var pMax = indices[i];
+                    while (i < indices.length && Math.floor(scale.scale(primaryAccessor(data[indices[i]], indices[i], dataset))) === currBucket) {
+                        var currPoint = secondaryAccessor(data[indices[i]], indices[i], dataset);
+                        if (currPoint > max) {
+                            max = currPoint;
+                            pMax = indices[i];
+                        }
+                        if (currPoint < min) {
+                            min = currPoint;
+                            pMin = indices[i];
+                        }
+                        i++;
+                    }
+                    var pLast = indices[i - 1];
+                    filteredIndices.push(pFirst);
+                    if (filteredIndices.indexOf(pMin) < 0) {
+                        filteredIndices.push(pMin);
+                    }
+                    if (filteredIndices.indexOf(pMax) < 0) {
+                        filteredIndices.push(pMax);
+                    }
+                    if (pLast && filteredIndices.indexOf(pLast) < 0) {
+                        filteredIndices.push(pLast);
+                    }
+                }
+                return filteredIndices;
             };
             return Line;
         })(Plottable.XYPlot);

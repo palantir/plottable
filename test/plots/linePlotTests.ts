@@ -681,6 +681,102 @@ describe("Plots", () => {
         assert.deepEqual(xScale.domain(), [-2, -1], "no changes for autoranging smooth with same edge points (smooth)");
       });
 
+    describe("Downsampling Performance", () => {
+
+      let svg: d3.Selection<void>;
+      let plot: Plottable.Plots.Line<number>;
+
+      let xScale: Plottable.Scales.Linear;
+      let yScale: Plottable.Scales.Linear;
+
+      beforeEach(() => {
+        svg = TestMethods.generateSVG(50, 50);
+        xScale = new Plottable.Scales.Linear();
+        yScale = new Plottable.Scales.Linear();
+        plot = new Plottable.Plots.Line<number>();
+        plot.x((d) => d.x, xScale).y((d) => d.y, yScale);
+      });
+
+      it("can set the downsampling option", () => {
+        plot.renderTo(svg);
+
+        assert.isFalse(plot.downsampleEnabled(), "downsampling is not enabled by default");
+
+        assert.strictEqual(plot.downsampleEnabled(true), plot, "enabling the downsampling option returns the plot");
+        assert.isTrue(plot.downsampleEnabled(), "can enable the downsampling option");
+
+        plot.downsampleEnabled(false);
+        assert.isFalse(plot.downsampleEnabled(), "can disable the downsampling option");
+
+        svg.remove();
+      });
+
+      it("does not render points that have same scaled values", () => {
+        let data = [
+          {x: -50, y: -1}, // last element in previous bucket
+          {x: 0, y: 2}, // first element in current bucket
+          {x: 0.5, y: 1.5}, // point to be removed 
+          {x: 1, y: 1}, // minimum y in current bucket
+          {x: 2, y: 4}, // maximum y in current bucket
+          {x: 3, y: 3}, // last elemnt in current bucket 
+          {x: 50, y: 2}, // first element in next bucket
+        ];
+        plot.addDataset(new Plottable.Dataset(data));
+
+        xScale.domain([-200, 200]);
+
+        plot.downsampleEnabled(true);
+        plot.renderTo(svg);
+
+        let path = plot.content().select("path.line").attr("d");
+        let expectedRenderedData = [0, 1, 3, 4, 5, 6].map((d) => data[d]);
+        checkPathForDataPoints(path, expectedRenderedData);
+
+        svg.remove();
+      });
+
+      it("does not render points that have same scaled values in vertical line plots", () => {
+        let data = [
+          {x: -1, y: -50},
+          {x: 2, y: 1},
+          {x: 1.5, y: 1.5},
+          {x: 1, y: 2},
+          {x: 4, y: 3},
+          {x: 3, y: 4},
+          {x: 2, y: 100},
+        ];
+        plot.addDataset(new Plottable.Dataset(data));
+
+        yScale.domain([-200, 200]);
+
+        plot.downsampleEnabled(true);
+        plot.renderTo(svg);
+
+        let path = plot.content().select("path.line").attr("d");
+        let expectedRenderedData = [0, 1, 3, 4, 5, 6].map((d) => data[d]);
+        checkPathForDataPoints(path, expectedRenderedData);
+
+        svg.remove();
+      });
+
+      function checkPathForDataPoints(path: string, data: {x: number, y: number}[]) {
+        let EPSILON = 0.0001;
+
+        let lineEdges = TestMethods.normalizePath(path).match(/(\-?\d+\.?\d*)(,|\s)(-?\d+\.?\d*)/g);
+
+        assert.strictEqual(lineEdges.length, data.length, "correct number of edges drawn");
+
+        lineEdges.forEach((edge, i) => {
+          let coordinates = edge.split(/,|\s/);
+
+          assert.strictEqual(coordinates.length, 2, "There is an x coordinate and a y coordinate");
+          assert.closeTo(xScale.invert(+coordinates[0]), data[i].x, EPSILON,
+            `Point ${i} drawn, has correct x coordinate`);
+          assert.closeTo(yScale.invert(+coordinates[1]), data[i].y, EPSILON,
+            `Point ${i} drawn, has correct y coordinate`);
+        });
+      }
+    });
     });
   });
 });

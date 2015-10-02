@@ -14,6 +14,8 @@ export module Plots {
 
     private _autorangeSmooth = false;
 
+    private _downsampleEnabled = false;
+
     /**
      * A Line Plot draws line segments starting from the first data point to the next.
      *
@@ -135,6 +137,22 @@ export module Plots {
       }
       this._interpolator = interpolator;
       this.render();
+      return this;
+    }
+    /**
+     * Gets the downsampling performance option state
+     */
+    public downsampleEnabled(): boolean;
+     /**
+      * Sets downsampling performance option is enabled.
+      */
+    public downsampleEnabled(downsample: boolean): Plots.Line<X>;
+    public downsampleEnabled(downsample?: boolean): any {
+      if (downsample == null) {
+        return this._downsampleEnabled;
+      }
+
+      this._downsampleEnabled = downsample;
       return this;
     }
 
@@ -349,8 +367,63 @@ export module Plots {
 
     protected _getDataToDraw() {
       let dataToDraw = new Utils.Map<Dataset, any[]> ();
-      this.datasets().forEach((dataset) => dataToDraw.set(dataset, [dataset.data()]));
+      this.datasets().forEach((dataset) => {
+        let data = dataset.data();
+        if (!this._downsampleEnabled) {
+          dataToDraw.set(dataset, [data]);
+          return;
+        }
+        let filteredDataIndices = data.map((d, i) => i);
+        filteredDataIndices = this._filterDownsampling(dataset, filteredDataIndices);
+        dataToDraw.set(dataset, [filteredDataIndices.map((d, i) => data[d])]);
+      });
       return dataToDraw;
+    }
+
+     private _filterDownsampling(dataset: Dataset, indices: number[]) {
+      let xAccessor = this.x().accessor;
+      let yAccessor = this.y().accessor;
+      let filteredIndices = this._filterDownsamplingInOneScale(dataset, indices, this.x().scale, xAccessor, yAccessor);
+      filteredIndices = this._filterDownsamplingInOneScale(dataset, filteredIndices, this.y().scale, yAccessor, xAccessor);
+      return filteredIndices;
+    }
+
+    private _filterDownsamplingInOneScale(dataset: Dataset, indices: number[],
+      scale: Scale<any, number>, primaryAccessor: Accessor<any>, secondaryAccessor: Accessor<any>) {
+      let data = dataset.data();
+      let filteredIndices: number[] = [];
+      for (let i = 0; i < indices.length; ) {
+        let min = Infinity;
+        let max = -Infinity;
+        let currBucket = Math.floor(scale.scale(primaryAccessor(data[indices[i]], indices[i], dataset)));
+        let pFirst = indices[i];
+        let pMin = indices[i];
+        let pMax = indices[i];
+        while (i < indices.length && Math.floor(scale.scale(primaryAccessor(data[indices[i]], indices[i], dataset))) === currBucket) {
+          let currPoint = secondaryAccessor(data[indices[i]], indices[i], dataset);
+          if (currPoint > max) {
+            max = currPoint;
+            pMax = indices[i];
+          }
+          if (currPoint < min) {
+            min = currPoint;
+            pMin = indices[i];
+          }
+          i++;
+        }
+        let pLast = indices[i - 1];
+        filteredIndices.push(pFirst);
+        if (filteredIndices.indexOf(pMin) < 0) {
+          filteredIndices.push(pMin);
+        }
+        if (filteredIndices.indexOf(pMax) < 0) {
+          filteredIndices.push(pMax);
+        }
+        if (pLast && filteredIndices.indexOf(pLast) < 0) {
+          filteredIndices.push(pLast);
+        }
+      }
+        return filteredIndices;
     }
 
   }
