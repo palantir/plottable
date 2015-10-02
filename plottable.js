@@ -5223,7 +5223,9 @@ var Plottable;
                 // affected the size of the characters, clear the cache.
                 this._measurer.reset();
                 _super.prototype.computeLayout.call(this, origin, availableWidth, availableHeight);
-                this._scale.range([0, this.height()]);
+                if (!this._isHorizontal()) {
+                    this._scale.range([0, this.height()]);
+                }
                 return this;
             };
             return Category;
