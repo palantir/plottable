@@ -1,7 +1,7 @@
 {
   "name": "plottable",
   "description": "A modular charting library built on D3",
-  "version": "1.13.0",
+  "version": "1.14.0",
   "main": ["plottable.js", "plottable.css"],
   "typescript": {
     "definition": "plottable.d.ts"
