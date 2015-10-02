@@ -2160,6 +2160,17 @@ declare module Plottable {
             constructor(colorScale: Scales.Color);
             protected _setup(): void;
             /**
+             * Gets the Formatter for the entry texts.
+             */
+            formatter(): Formatter;
+            /**
+             * Sets the Formatter for the entry texts.
+             *
+             * @param {Formatter} formatter
+             * @returns {Legend} The calling Legend.
+             */
+            formatter(formatter: Formatter): Legend;
+            /**
              * Gets the maximum number of entries per row.
              *
              * @returns {number}
@@ -3345,10 +3356,7 @@ declare module Plottable {
              */
             protected _getBarPixelWidth(): number;
             entities(datasets?: Dataset[]): PlotEntity[];
-            protected _pixelPoint(datum: any, index: number, dataset: Dataset): {
-                x: any;
-                y: any;
-            };
+            protected _pixelPoint(datum: any, index: number, dataset: Dataset): Point;
             protected _uninstallScaleForKey(scale: Scale<any, number>, key: string): void;
             protected _getDataToDraw(): Utils.Map<Dataset, any[]>;
         }
@@ -3410,6 +3418,18 @@ declare module Plottable {
             interpolator(interpolator: "cardinal-open"): Line<X>;
             interpolator(interpolator: "cardinal-closed"): Line<X>;
             interpolator(interpolator: "monotone"): Line<X>;
+            /**
+             * Gets if croppedRendering is enabled
+             *
+             * When croppedRendering is enabled, lines that will not be visible in the viewport will not be drawn.
+             */
+            croppedRenderingEnabled(): boolean;
+            /**
+             * Sets if croppedRendering is enabled
+             *
+             * @returns {Plots.Line} The calling Plots.Line
+             */
+            croppedRenderingEnabled(croppedRendering: boolean): Plots.Line<X>;
             protected _createDrawer(dataset: Dataset): Drawer;
             protected _extentsForProperty(property: string): any[];
             protected _getResetYFunction(): (d: any, i: number, dataset: Dataset) => number;
@@ -4009,6 +4029,7 @@ declare module Plottable {
              * @return {Dispatchers.Mouse} The calling Mouse Dispatcher.
              */
             offDblClick(callback: MouseCallback): Dispatchers.Mouse;
+            eventInsideSVG(event: MouseEvent): boolean;
             /**
              * Returns the last computed mouse position in <svg> coordinate space.
              *
@@ -4097,6 +4118,7 @@ declare module Plottable {
              * @return {Dispatchers.Touch} The calling Touch Dispatcher.
              */
             offTouchCancel(callback: TouchCallback): Dispatchers.Touch;
+            eventInsideSVG(event: TouchEvent): boolean;
         }
     }
 }

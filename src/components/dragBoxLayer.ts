@@ -44,13 +44,6 @@ export module Components {
      */
     constructor() {
       super();
-      /*
-       * Enable clipPath to hide _detectionEdge s and _detectionCorner s
-       * that overlap with the edge of the DragBoxLayer. This prevents the
-       * user's cursor from changing outside the DragBoxLayer, where they
-       * wouldn't be able to grab the edges or corners for resizing.
-       */
-      this._clipPathEnabled = true;
       this.addClass("drag-box-layer");
 
       this._dragInteraction = new Interactions.Drag();

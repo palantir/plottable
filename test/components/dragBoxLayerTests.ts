@@ -52,47 +52,10 @@ describe("Layer Components", () => {
         svg.remove();
       });
 
-      it("generates the correct clipPath", () => {
-        dbl.renderTo(svg);
-
-        TestMethods.verifyClipPath(dbl);
-        let clipRect = (<any> dbl)._boxContainer.select(".clip-rect");
-        assert.strictEqual(TestMethods.numAttr(clipRect, "width"), SVG_WIDTH, "the clipRect has an appropriate width");
-        assert.strictEqual(TestMethods.numAttr(clipRect, "height"), SVG_HEIGHT, "the clipRect has an appropriate height");
-        svg.remove();
-      });
-
-      it("updates the clipPath reference when render()-ed", () => {
-        if (window.history == null ||  window.history.replaceState == null) { // not supported on IE9 (http://caniuse.com/#feat=history)
-          svg.remove();
-          return;
-        }
-
-        dbl.renderTo(svg);
-
-        let originalState = window.history.state;
-        let originalTitle = document.title;
-        let originalLocation = document.location.href;
-        window.history.replaceState(null, null, "clipPathTest");
-        dbl.render();
-
-        let clipPathId = (<any> dbl)._boxContainer[0][0].firstChild.id;
-        let expectedPrefix = /MSIE [5-9]/.test(navigator.userAgent) ? "" : document.location.href;
-        expectedPrefix = expectedPrefix.replace(/#.*/g, "");
-        let expectedClipPathURL = "url(" + expectedPrefix + "#" + clipPathId + ")";
-
-        window.history.replaceState(originalState, originalTitle, originalLocation);
-
-        let normalizeClipPath = (s: string) => s.replace(/"/g, "");
-        assert.strictEqual(normalizeClipPath((<any> dbl)._element.attr("clip-path")), expectedClipPathURL,
-          "the clipPath reference was updated");
-        svg.remove();
-      });
-
       it("can get and set the detection radius", () => {
         assert.strictEqual(dbl.detectionRadius(), 3, "there is a default detection radius");
         assert.doesNotThrow(() => dbl.detectionRadius(4), Error, "can set detection radius before anchoring");
-        dbl.renderTo("svg");
+        dbl.renderTo(svg);
 
         assert.strictEqual(dbl.detectionRadius(), 4, "detection radius did not change upon rendering");
         assert.strictEqual(dbl.detectionRadius(5), dbl, "setting the detection radius returns the drag box layer");
@@ -103,7 +66,7 @@ describe("Layer Components", () => {
       });
 
       it("applies the given detection radius property", () => {
-        dbl.renderTo("svg");
+        dbl.renderTo(svg);
 
         let radius = 5;
         dbl.detectionRadius(radius);
