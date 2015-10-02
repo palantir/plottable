@@ -41,45 +41,44 @@ describe("Interactions", () => {
 
       });
 
-      it("can add set the xScales in batch", () => {
+      it("can set the xScales in batch", () => {
         let xScale2 = new Plottable.Scales.Linear();
-
+        let expectedXScales = [xScale, xScale2];
         panZoomInteraction.addXScale(xScale);
         panZoomInteraction.addXScale(xScale2);
-        let xScales = panZoomInteraction.xScales();
+        assert.deepEqual(panZoomInteraction.xScales(), expectedXScales);
 
-        panZoomInteraction.xScales([]);
+        assert.deepEqual(panZoomInteraction.xScales([]), panZoomInteraction, "returns the calling interaction");
         assert.deepEqual(panZoomInteraction.xScales(), [], "scales can be removed with the xScales call");
 
         panZoomInteraction.xScales([xScale, xScale2]);
-        assert.deepEqual(xScales, panZoomInteraction.xScales(), "setting and adding x scales result in the same behavior");
+        assert.deepEqual(panZoomInteraction.xScales(), expectedXScales, "setting and adding x scales result in the same behavior");
       });
 
-      it("can add the yScales in batch", () => {
+      it("can set the yScales in batch", () => {
         let yScale2 = new Plottable.Scales.Linear();
+        let expectedYScales = [yScale, yScale2];
         panZoomInteraction.addYScale(yScale);
         panZoomInteraction.addYScale(yScale2);
-        let yScales = panZoomInteraction.yScales();
+        assert.deepEqual(panZoomInteraction.yScales(), expectedYScales);
 
-        panZoomInteraction.yScales([]);
+        assert.deepEqual(panZoomInteraction.yScales([]), panZoomInteraction, "returns the calling interaction");
         assert.deepEqual(panZoomInteraction.yScales(), [], "scales can be removed with the yScales call");
 
         panZoomInteraction.yScales([yScale, yScale2]);
-        assert.deepEqual(yScales, panZoomInteraction.yScales(), "setting and adding y scales result in the same behavior");
+        assert.deepEqual(panZoomInteraction.yScales(), expectedYScales, "setting and adding y scales result in the same behavior");
       });
 
-      it("silently fails on adding an already existent xScale", () => {
+      it("does not create duplicate for an already existent xScale", () => {
         panZoomInteraction.addXScale(xScale);
-        let oldXScaleNumber = panZoomInteraction.xScales().length;
         panZoomInteraction.addXScale(panZoomInteraction.xScales()[0]);
-        assert.lengthOf(panZoomInteraction.xScales(), oldXScaleNumber, "the number of x scales is maintained");
+        assert.deepEqual(panZoomInteraction.xScales(), [xScale], "there is exactly one copy of xScale");
       });
 
-      it("silently fails on adding an already existent yScale", () => {
+      it("does not create duplicate for an already existent yScale", () => {
         panZoomInteraction.addYScale(yScale);
-        let oldYScaleNumber = panZoomInteraction.yScales().length;
         panZoomInteraction.addYScale(panZoomInteraction.yScales()[0]);
-        assert.lengthOf(panZoomInteraction.yScales(), oldYScaleNumber, "the number of y scales is maintained");
+        assert.deepEqual(panZoomInteraction.yScales(), [yScale], "there is exactly one copy of yScale");
       });
     });
 
@@ -113,25 +112,29 @@ describe("Interactions", () => {
         eventTarget = component.background();
       });
 
-      it("translates the scale correctly on draging (mouse)", () => {
+      it("translates the scale correctly on dragging (mouse)", () => {
         let startPoint = { x: SVG_WIDTH / 4, y: SVG_HEIGHT / 4 };
         let endPoint = { x: SVG_WIDTH / 2, y: SVG_HEIGHT * 3 / 4 };
+        let expectedXDomain = domainAfterPan(startPoint, endPoint, xScale, true);
+        let expectedYDomain = domainAfterPan(startPoint, endPoint, yScale, false);
         TestMethods.triggerFakeMouseEvent("mousedown", eventTarget, startPoint.x, startPoint.y);
         TestMethods.triggerFakeMouseEvent("mousemove", eventTarget, endPoint.x, endPoint.y);
         TestMethods.triggerFakeMouseEvent("mouseend", eventTarget, endPoint.x, endPoint.y);
-        assert.deepEqual(xScale.domain(), [-SVG_WIDTH / 8, SVG_WIDTH * 3 / 8], "xScale pans to the correct domain via drag (mouse)");
-        assert.deepEqual(yScale.domain(), [-SVG_HEIGHT / 4, SVG_HEIGHT / 4], "yScale pans to the correct domain via drag (mouse)");
+        assert.deepEqual(xScale.domain(), expectedXDomain, "xScale pans to the correct domain via drag (mouse)");
+        assert.deepEqual(yScale.domain(), expectedYDomain, "yScale pans to the correct domain via drag (mouse)");
         svg.remove();
       });
 
       it("translates the scale correctly on dragging to outside of the component (mouse)", () => {
         let startPoint = { x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2 };
         let endPoint = { x: -SVG_WIDTH / 2, y: -SVG_HEIGHT / 2 };
+        let expectedXDomain = domainAfterPan(startPoint, endPoint, xScale, true);
+        let expectedYDomain = domainAfterPan(startPoint, endPoint, yScale, false);
         TestMethods.triggerFakeMouseEvent("mousedown", eventTarget, startPoint.x, startPoint.y);
         TestMethods.triggerFakeMouseEvent("mousemove", eventTarget, endPoint.x, endPoint.y);
         TestMethods.triggerFakeMouseEvent("mouseend", eventTarget, endPoint.x, endPoint.y);
-        assert.deepEqual(xScale.domain(), [SVG_WIDTH / 2, SVG_WIDTH], "xScale pans to the correct domain via drag (mouse)");
-        assert.deepEqual(yScale.domain(), [SVG_HEIGHT / 2, SVG_HEIGHT], "yScale pans to the correct domain via drag (mouse)");
+        assert.deepEqual(xScale.domain(), expectedXDomain, "xScale pans to the correct domain via drag (mouse)");
+        assert.deepEqual(yScale.domain(), expectedYDomain, "yScale pans to the correct domain via drag (mouse)");
         svg.remove();
       });
 
@@ -141,33 +144,39 @@ describe("Interactions", () => {
         panZoomInteraction.addXScale(xScale2);
         let startPoint = { x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2 };
         let endPoint = { x: -SVG_WIDTH / 2, y: -SVG_HEIGHT / 2 };
+        let expectedXDomain = domainAfterPan(startPoint, endPoint, xScale, true);
+        let expectedXDomain2 = domainAfterPan(startPoint, endPoint, xScale2, true);
         TestMethods.triggerFakeMouseEvent("mousedown", eventTarget, startPoint.x, startPoint.y);
         TestMethods.triggerFakeMouseEvent("mousemove", eventTarget, endPoint.x, endPoint.y);
         TestMethods.triggerFakeMouseEvent("mouseend", eventTarget, endPoint.x, endPoint.y);
-        assert.deepEqual(xScale.domain(), [SVG_WIDTH / 2, SVG_WIDTH], "xScale pans to the correct domain via drag (mouse)");
-        assert.deepEqual(xScale2.domain(), [SVG_WIDTH * 2, SVG_WIDTH * 4], "xScale2 pans to the correct domain via drag (mouse)");
+        assert.deepEqual(xScale.domain(), expectedXDomain, "xScale pans to the correct domain via drag (mouse)");
+        assert.deepEqual(xScale2.domain(), expectedXDomain2, "xScale2 pans to the correct domain via drag (mouse)");
         svg.remove();
       });
 
-      it("translates the scale correctly on draging (touch)", () => {
+      it("translates the scale correctly on dragging (touch)", () => {
         let startPoint = { x: SVG_WIDTH / 4, y: SVG_HEIGHT / 4 };
         let endPoint = { x: SVG_WIDTH / 2, y: SVG_HEIGHT * 3 / 4 };
+        let expectedXDomain = domainAfterPan(startPoint, endPoint, xScale, true);
+        let expectedYDomain = domainAfterPan(startPoint, endPoint, yScale, false);
         TestMethods.triggerFakeTouchEvent("touchstart", eventTarget, [startPoint]);
         TestMethods.triggerFakeTouchEvent("touchmove", eventTarget, [endPoint]);
         TestMethods.triggerFakeTouchEvent("touchend", eventTarget, [endPoint]);
-        assert.deepEqual(xScale.domain(), [-SVG_WIDTH / 8, SVG_WIDTH * 3 / 8], "xScale pans to the correct domain via drag (touch)");
-        assert.deepEqual(yScale.domain(), [-SVG_HEIGHT / 4, SVG_HEIGHT / 4], "yScale pans to the correct domain via drag (touch)");
+        assert.deepEqual(xScale.domain(), expectedXDomain, "xScale pans to the correct domain via drag (touch)");
+        assert.deepEqual(yScale.domain(), expectedYDomain, "yScale pans to the correct domain via drag (touch)");
         svg.remove();
       });
 
       it("translates the scale correctly on dragging to outside of the component (touch)", () => {
         let startPoint = { x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2 };
         let endPoint = { x: -SVG_WIDTH / 2, y: -SVG_HEIGHT / 2 };
+        let expectedXDomain = domainAfterPan(startPoint, endPoint, xScale, true);
+        let expectedYDomain = domainAfterPan(startPoint, endPoint, yScale, false);
         TestMethods.triggerFakeTouchEvent("touchstart", eventTarget, [startPoint]);
         TestMethods.triggerFakeTouchEvent("touchmove", eventTarget, [endPoint]);
         TestMethods.triggerFakeTouchEvent("touchend", eventTarget, [endPoint]);
-        assert.deepEqual(xScale.domain(), [SVG_WIDTH / 2, SVG_WIDTH], "xScale pans to the correct domain via drag (touch)");
-        assert.deepEqual(yScale.domain(), [SVG_HEIGHT / 2, SVG_HEIGHT], "yScale pans to the correct domain via drag (touch)");
+        assert.deepEqual(xScale.domain(), expectedXDomain, "xScale pans to the correct domain via drag (touch)");
+        assert.deepEqual(yScale.domain(), expectedYDomain, "yScale pans to the correct domain via drag (touch)");
         svg.remove();
       });
 
@@ -177,13 +186,24 @@ describe("Interactions", () => {
         panZoomInteraction.addXScale(xScale2);
         let startPoint = { x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2 };
         let endPoint = { x: -SVG_WIDTH / 2, y: -SVG_HEIGHT / 2 };
+        let expectedXDomain = domainAfterPan(startPoint, endPoint, xScale, true);
+        let expectedXDomain2 = domainAfterPan(startPoint, endPoint, xScale2, false);
         TestMethods.triggerFakeTouchEvent("touchstart", eventTarget, [startPoint]);
         TestMethods.triggerFakeTouchEvent("touchmove", eventTarget, [endPoint]);
         TestMethods.triggerFakeTouchEvent("touchend", eventTarget, [endPoint]);
-        assert.deepEqual(xScale.domain(), [SVG_WIDTH / 2, SVG_WIDTH], "xScale pans to the correct domain via drag (touch)");
-        assert.deepEqual(xScale2.domain(), [SVG_WIDTH * 2, SVG_WIDTH * 4], "xScale2 pans to the correct domain via drag (touch)");
+        assert.deepEqual(xScale.domain(), expectedXDomain, "xScale pans to the correct domain via drag (touch)");
+        assert.deepEqual(xScale2.domain(), expectedXDomain2, "xScale2 pans to the correct domain via drag (touch)");
         svg.remove();
       });
+
+      function domainAfterPan(startPoint: Plottable.Point, endPoint: Plottable.Point,
+                              scale: Plottable.QuantitativeScale<number>, x: boolean) {
+        let delta = x ? endPoint.x - startPoint.x : endPoint.y - startPoint.y;
+        let domain = scale.domain();
+        let range = x ? SVG_WIDTH : SVG_HEIGHT;
+        let diff = delta / range * (domain[1] - domain[0]);
+        return domain.map((v) => v - diff);
+      }
     });
 
     describe("Zooming", () => {
@@ -227,11 +247,13 @@ describe("Interactions", () => {
 
         let scrollPoint = { x: SVG_WIDTH / 4, y: SVG_HEIGHT / 4 };
         let deltaY = 500;
+        let expectedXDomain = domainAfterWheel(deltaY, scrollPoint, xScale, true);
+        let expectedYDomain = domainAfterWheel(deltaY, scrollPoint, yScale, true);
 
         TestMethods.triggerFakeWheelEvent("wheel", svg, scrollPoint.x, scrollPoint.y, deltaY);
 
-        assert.deepEqual(xScale.domain(), [-SVG_WIDTH / 8, SVG_WIDTH * 7 / 8], "xScale zooms to the correct domain via scroll");
-        assert.deepEqual(yScale.domain(), [-SVG_HEIGHT / 8, SVG_HEIGHT * 7 / 8], "yScale zooms to the correct domain via scroll");
+        assert.deepEqual(xScale.domain(), expectedXDomain, "xScale zooms to the correct domain via scroll");
+        assert.deepEqual(yScale.domain(), expectedYDomain, "yScale zooms to the correct domain via scroll");
         svg.remove();
       });
 
@@ -248,24 +270,28 @@ describe("Interactions", () => {
 
         let scrollPoint = { x: SVG_WIDTH / 4, y: SVG_HEIGHT / 4 };
         let deltaY = 500;
+        let expectedXDomain = domainAfterWheel(deltaY, scrollPoint, xScale, true);
+        let expectedXDomain2 = domainAfterWheel(deltaY, scrollPoint, xScale2, true);
 
         TestMethods.triggerFakeWheelEvent( "wheel", svg, scrollPoint.x, scrollPoint.y, deltaY );
 
-        assert.deepEqual(xScale.domain(), [-SVG_WIDTH / 8, SVG_WIDTH * 7 / 8], "xScale zooms to the correct domain via scroll");
-        assert.deepEqual(xScale2.domain(), [-SVG_WIDTH / 2, SVG_WIDTH * 7 / 2], "xScale2 zooms to the correct domain via scroll");
+        assert.deepEqual(xScale.domain(), expectedXDomain, "xScale zooms to the correct domain via scroll");
+        assert.deepEqual(xScale2.domain(), expectedXDomain2, "xScale2 zooms to the correct domain via scroll");
         svg.remove();
       });
 
       it("magnifies the scale correctly (pinching)", () => {
         let startPoint = { x: SVG_WIDTH / 4, y: SVG_HEIGHT / 4 };
         let startPoint2 = { x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2 };
-        TestMethods.triggerFakeTouchEvent( "touchstart", eventTarget, [startPoint, startPoint2], [0, 1] );
-
         let endPoint = { x: SVG_WIDTH * 3 / 4, y: SVG_HEIGHT * 3 / 4 };
+        let expectedXDomain = domainAfterZoom(startPoint, startPoint2, endPoint, xScale, true);
+        let expectedYDomain = domainAfterZoom(startPoint, startPoint2, endPoint, yScale, true);
+
+        TestMethods.triggerFakeTouchEvent( "touchstart", eventTarget, [startPoint, startPoint2], [0, 1] );
         TestMethods.triggerFakeTouchEvent("touchmove", eventTarget, [endPoint], [1] );
         TestMethods.triggerFakeTouchEvent("touchend", eventTarget, [endPoint], [1] );
-        assert.deepEqual(xScale.domain(), [SVG_WIDTH / 16, SVG_WIDTH * 5 / 16], "xScale transforms to the correct domain via pinch");
-        assert.deepEqual(yScale.domain(), [SVG_HEIGHT / 16, SVG_HEIGHT * 5 / 16], "yScale transforms to the correct domain via pinch");
+        assert.deepEqual(xScale.domain(), expectedXDomain, "xScale transforms to the correct domain via pinch");
+        assert.deepEqual(yScale.domain(), expectedYDomain, "yScale transforms to the correct domain via pinch");
         svg.remove();
       });
 
@@ -275,13 +301,15 @@ describe("Interactions", () => {
         panZoomInteraction.addXScale(xScale2);
         let startPoint = { x: SVG_WIDTH / 4, y: SVG_HEIGHT / 4 };
         let startPoint2 = { x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2 };
-        TestMethods.triggerFakeTouchEvent( "touchstart", eventTarget, [startPoint, startPoint2], [0, 1] );
-
         let endPoint = { x: SVG_WIDTH * 3 / 4, y: SVG_HEIGHT * 3 / 4 };
+        let expectedXDomain = domainAfterZoom(startPoint, startPoint2, endPoint, xScale, true);
+        let expectedXDomain2 = domainAfterZoom(startPoint, startPoint2, endPoint, xScale2, true);
+
+        TestMethods.triggerFakeTouchEvent( "touchstart", eventTarget, [startPoint, startPoint2], [0, 1] );
         TestMethods.triggerFakeTouchEvent("touchmove", eventTarget, [endPoint], [1] );
         TestMethods.triggerFakeTouchEvent("touchend", eventTarget, [endPoint], [1] );
-        assert.deepEqual(xScale.domain(), [SVG_WIDTH / 16, SVG_WIDTH * 5 / 16], "xScale transforms to the correct domain via pinch");
-        assert.deepEqual(xScale2.domain(), [SVG_WIDTH / 4, SVG_WIDTH * 5 / 4], "xScale2 transforms to the correct domain via pinch");
+        assert.deepEqual(xScale.domain(), expectedXDomain, "xScale transforms to the correct domain via pinch");
+        assert.deepEqual(xScale2.domain(), expectedXDomain2, "xScale2 transforms to the correct domain via pinch");
         svg.remove();
       });
 
@@ -301,15 +329,36 @@ describe("Interactions", () => {
 
         let startPoint = { x: SVG_WIDTH / 4, y: SVG_HEIGHT / 2 };
         let startPoint2 = { x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2 };
-        TestMethods.triggerFakeTouchEvent( "touchstart", eventTarget, [startPoint, startPoint2], [0, 1] );
-
         let endPoint = { x: SVG_WIDTH * 3 / 4, y: SVG_HEIGHT / 2 };
+        let expectedXDomain = domainAfterZoom(startPoint, startPoint2, endPoint, xScale, true);
+
+        TestMethods.triggerFakeTouchEvent( "touchstart", eventTarget, [startPoint, startPoint2], [0, 1] );
         TestMethods.triggerFakeTouchEvent("touchmove", eventTarget, [endPoint], [1] );
         TestMethods.triggerFakeTouchEvent("touchend", eventTarget, [endPoint], [1] );
-        assert.deepEqual(xScale.domain(), [SVG_WIDTH / 16, SVG_WIDTH * 5 / 16], "xScale inside target component transforms via pinch");
+        assert.deepEqual(xScale.domain(), expectedXDomain, "xScale inside target component transforms via pinch");
         assert.deepEqual(xScale2.domain(), initialDomain, "xScale outside of target component does not transform via pinch");
         svg.remove();
       });
+
+      function domainAfterZoom(startPoint1: Plottable.Point, startPoint2: Plottable.Point, endPoint: Plottable.Point,
+                               scale: Plottable.QuantitativeScale<number>, x: boolean) {
+        let oldDistance = x ? startPoint2.x - startPoint1.x : startPoint2.y - startPoint1.y;
+        let newDistance = x ? endPoint.x - startPoint1.x : endPoint.y - startPoint1.y;
+        let delta = x ? endPoint.x - startPoint2.x : endPoint.y - startPoint2.y;
+        let zoomAmount = oldDistance / newDistance;
+
+        let domain = scale.domain();
+        let range = x ? SVG_WIDTH : SVG_HEIGHT;
+        let diff = delta / range * (domain[1] - domain[0]);
+        return domain.map((v, i) => (v - domain[0] + diff) * zoomAmount + domain[0]);
+      }
+
+      function domainAfterWheel(deltaY: number,  scrollPoint: Plottable.Point, scale: Plottable.QuantitativeScale<number>, x: boolean) {
+        let zoomAmount = Math.pow(2, deltaY * .002);
+        let domain = scale.domain();
+        let diff = (x ? scrollPoint.x / SVG_WIDTH : scrollPoint.y / SVG_HEIGHT) * (domain[1] - domain[0]);
+        return domain.map(function (v, i) { return (v - domain[0] - diff) * zoomAmount + domain[0] + diff; });
+      }
     });
 
     describe("Setting minDomainExtent", () => {
@@ -350,7 +399,8 @@ describe("Interactions", () => {
       });
 
       it("rejects negative extents", () => {
-        (<any>assert).throws(() => panZoomInteraction.minDomainExtent(xScale, -1), Error, "extent must be non-negative",
+        // HACKHACK #2661: Cannot assert errors being thrown with description
+        (<any> assert).throws(() => panZoomInteraction.minDomainExtent(xScale, -1), Error, "extent must be non-negative",
           "Correctly rejects -1");
         svg.remove();
       });
@@ -360,7 +410,8 @@ describe("Interactions", () => {
         panZoomInteraction.maxDomainExtent(xScale, maximumDomainExtent);
 
         let tooBigMinimumDomainExtent = maximumDomainExtent * 2;
-        (<any>assert).throws(() => panZoomInteraction.minDomainExtent(xScale, tooBigMinimumDomainExtent), Error,
+        // HACKHACK #2661: Cannot assert errors being thrown with description
+        (<any> assert).throws(() => panZoomInteraction.minDomainExtent(xScale, tooBigMinimumDomainExtent), Error,
           "minDomainExtent must be smaller than maxDomainExtent for the same Scale",
           "cannot have minDomainExtent larger than maxDomainExtent");
         svg.remove();
@@ -375,29 +426,43 @@ describe("Interactions", () => {
         }
 
         let minimumDomainExtent = SVG_WIDTH / 4;
-        panZoomInteraction.minDomainExtent(xScale, minimumDomainExtent);
-
         let scrollPoint = { x: SVG_WIDTH / 4, y: SVG_HEIGHT / 4 };
         let deltaY = -3000;
-
         TestMethods.triggerFakeWheelEvent("wheel", svg, scrollPoint.x, scrollPoint.y, deltaY);
         let domainExtent = Math.abs(xScale.domain()[1] - xScale.domain()[0]);
+        assert.operator(domainExtent, "<", minimumDomainExtent, "there is no zoom limit before setting minimun extent via scroll");
+
+        panZoomInteraction.minDomainExtent(xScale, minimumDomainExtent);
+        xScale.domain([0, SVG_WIDTH / 2]);
+        TestMethods.triggerFakeWheelEvent("wheel", svg, scrollPoint.x, scrollPoint.y, deltaY);
+        domainExtent = Math.abs(xScale.domain()[1] - xScale.domain()[0]);
         assert.strictEqual(domainExtent, minimumDomainExtent, "xScale zooms to the correct domain via scroll");
         svg.remove();
       });
 
       it("cannot go beyond the specified domainExtent (pitching)", () => {
         let minimumDomainExtent = SVG_WIDTH / 4;
-        panZoomInteraction.minDomainExtent(xScale, minimumDomainExtent);
 
         let startPoint = { x: SVG_WIDTH / 4, y: SVG_HEIGHT / 4 };
         let startPoint2 = { x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2 };
-        TestMethods.triggerFakeTouchEvent( "touchstart", eventTarget, [startPoint, startPoint2], [0, 1]);
+        let zoomAmount = 6;
+        let endX = (startPoint2.x - startPoint.x) * zoomAmount + startPoint.x;
+        let endY = (startPoint2.y - startPoint.y) * zoomAmount + startPoint.y;
+        let endPoint = { x: endX, y: endY };
 
-        let endPoint = { x: SVG_WIDTH, y: SVG_HEIGHT };
+        TestMethods.triggerFakeTouchEvent( "touchstart", eventTarget, [startPoint, startPoint2], [0, 1]);
         TestMethods.triggerFakeTouchEvent("touchmove", eventTarget, [endPoint], [1]);
         TestMethods.triggerFakeTouchEvent("touchend", eventTarget, [endPoint], [1]);
+
         let domainExtent = Math.abs(xScale.domain()[1] - xScale.domain()[0]);
+        assert.operator(domainExtent, "<", minimumDomainExtent, "there is no zoom limit before setting minimun extent via pinch");
+
+        panZoomInteraction.minDomainExtent(xScale, minimumDomainExtent);
+        xScale.domain([0, SVG_WIDTH / 2]);
+        TestMethods.triggerFakeTouchEvent( "touchstart", eventTarget, [startPoint, startPoint2], [0, 1]);
+        TestMethods.triggerFakeTouchEvent("touchmove", eventTarget, [endPoint], [1]);
+        TestMethods.triggerFakeTouchEvent("touchend", eventTarget, [endPoint], [1]);
+        domainExtent = Math.abs(xScale.domain()[1] - xScale.domain()[0]);
         assert.strictEqual(domainExtent, minimumDomainExtent, "xScale zooms to the correct domain via pinch");
         svg.remove();
       });
@@ -441,9 +506,11 @@ describe("Interactions", () => {
       });
 
       it("rejects non-positive extents", () => {
-        (<any>assert).throws(() => panZoomInteraction.maxDomainExtent(xScale, -1), Error, "extent must be positive",
+        // HACKHACK #2661: Cannot assert errors being thrown with description
+        (<any> assert).throws(() => panZoomInteraction.maxDomainExtent(xScale, -1), Error, "extent must be positive",
           "Correctly rejects -1");
-        (<any>assert).throws(() => panZoomInteraction.maxDomainExtent(xScale, 0), Error, "extent must be positive",
+        // HACKHACK #2661: Cannot assert errors being thrown with description
+        (<any> assert).throws(() => panZoomInteraction.maxDomainExtent(xScale, 0), Error, "extent must be positive",
           "Correctly rejects 0");
         svg.remove();
       });
@@ -452,7 +519,8 @@ describe("Interactions", () => {
         let minimumDomainExtent = SVG_WIDTH / 2;
         panZoomInteraction.minDomainExtent(xScale, minimumDomainExtent);
         let tooSmallMaximumDomainExtent = minimumDomainExtent / 2;
-        (<any>assert).throws(() => panZoomInteraction.maxDomainExtent(xScale, tooSmallMaximumDomainExtent), Error,
+        // HACKHACK #2661: Cannot assert errors being thrown with description
+        (<any> assert).throws(() => panZoomInteraction.maxDomainExtent(xScale, tooSmallMaximumDomainExtent), Error,
           "maxDomainExtent must be larger than minDomainExtent for the same Scale",
           "cannot have maxDomainExtent smaller than minDomainExtent");
 
@@ -468,29 +536,44 @@ describe("Interactions", () => {
         }
 
         let maximumDomainExtent = SVG_WIDTH;
-        panZoomInteraction.maxDomainExtent(xScale, maximumDomainExtent);
-
         let scrollPoint = { x: SVG_WIDTH / 4, y: SVG_HEIGHT / 4 };
         let deltaY = 3000;
-
         TestMethods.triggerFakeWheelEvent("wheel", svg, scrollPoint.x, scrollPoint.y, deltaY);
         let domainExtent = Math.abs(xScale.domain()[1] - xScale.domain()[0]);
+        assert.operator(domainExtent, ">", maximumDomainExtent, "there is no zoom limit before setting maximun extent via scroll");
+
+        xScale.domain([0, SVG_WIDTH / 2]);
+        panZoomInteraction.maxDomainExtent(xScale, maximumDomainExtent);
+
+        TestMethods.triggerFakeWheelEvent("wheel", svg, scrollPoint.x, scrollPoint.y, deltaY);
+        domainExtent = Math.abs(xScale.domain()[1] - xScale.domain()[0]);
         assert.strictEqual(domainExtent, maximumDomainExtent, "xScale zooms to the correct domain via scroll");
         svg.remove();
       });
 
       it("cannot go beyond the specified domainExtent (pitching)", () => {
         let maximumDomainExtent = SVG_WIDTH;
-        panZoomInteraction.maxDomainExtent(xScale, maximumDomainExtent);
 
         let startPoint = { x: SVG_WIDTH / 4, y: SVG_HEIGHT / 4 };
         let startPoint2 = { x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2 };
-        TestMethods.triggerFakeTouchEvent( "touchstart", eventTarget, [startPoint, startPoint2], [0, 1]);
+        let zoomAmount = 1 / 6;
+        let endX = (startPoint2.x - startPoint.x) * zoomAmount + startPoint.x;
+        let endY = (startPoint2.y - startPoint.y) * zoomAmount + startPoint.y;
+        let endPoint = { x: endX, y: endY };
 
-        let endPoint = { x: 5 * SVG_WIDTH / 16, y: 5 * SVG_HEIGHT / 16 };
+        TestMethods.triggerFakeTouchEvent( "touchstart", eventTarget, [startPoint, startPoint2], [0, 1]);
         TestMethods.triggerFakeTouchEvent("touchmove", eventTarget, [endPoint], [1]);
         TestMethods.triggerFakeTouchEvent("touchend", eventTarget, [endPoint], [1]);
         let domainExtent = Math.abs(xScale.domain()[1] - xScale.domain()[0]);
+        assert.operator(domainExtent, ">", maximumDomainExtent, "there is no zoom limit before setting maximun extent via pinch");
+
+        xScale.domain([0, SVG_WIDTH / 2]);
+        panZoomInteraction.maxDomainExtent(xScale, maximumDomainExtent);
+        TestMethods.triggerFakeTouchEvent( "touchstart", eventTarget, [startPoint, startPoint2], [0, 1]);
+        TestMethods.triggerFakeTouchEvent("touchmove", eventTarget, [endPoint], [1]);
+        TestMethods.triggerFakeTouchEvent("touchend", eventTarget, [endPoint], [1]);
+
+        domainExtent = Math.abs(xScale.domain()[1] - xScale.domain()[0]);
         assert.strictEqual(domainExtent, maximumDomainExtent, "xScale zooms to the correct domain via pinch");
         svg.remove();
       });
