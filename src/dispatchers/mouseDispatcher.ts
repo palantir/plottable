@@ -182,13 +182,17 @@ export module Dispatchers {
       if (scope !== "page" && scope !== "element") {
         throw new Error("Invalid scope '" + scope + "', must be 'element' or 'page'");
       }
-      if (scope === "page" || this._translator.insideSVG(event)) {
+      if (scope === "page" || this.eventInsideSVG(event)) {
         let newMousePosition = this._translator.computePosition(event.clientX, event.clientY);
         if (newMousePosition != null) {
           this._lastMousePosition = newMousePosition;
           callbackSet.callCallbacks(this.lastMousePosition(), event);
         }
       }
+    }
+
+    public eventInsideSVG(event: MouseEvent) {
+      return this._translator.insideSVG(event);
     }
 
     /**

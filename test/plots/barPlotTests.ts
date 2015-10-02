@@ -252,6 +252,16 @@ describe("Plots", () => {
             svg.remove();
           });
 
+          it("entities().position returns the position of data point", () => {
+            let entities = barPlot.entities();
+            entities.forEach((entity) => {
+              let dataX = barPlot.x().scale.scale(entity.datum.x);
+              let dataY = barPlot.y().scale.scale(entity.datum.y);
+              assert.strictEqual(dataX, entity.position.x, "entities().position.x should equal to scaled x value");
+              assert.strictEqual(dataY, entity.position.y, "entities().position.y should equal to scaled y value");
+            });
+            svg.remove();
+          });
         });
 
       });
