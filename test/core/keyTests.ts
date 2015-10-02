@@ -15,9 +15,9 @@ describe("DatasetKey", () => {
     let b: number = ds.key()(d, 1);
     assert.isTrue(b - a === 1, "invocations give numerically increasing results");
   });
-  it(" defaults to noConstancy predefined key function", () => {
+  it(" defaults to byIndex predefined key function", () => {
     let ds: Plottable.Dataset = new Plottable.Dataset();
-    assert.isTrue(ds.key() === Plottable.KeyFunctions.noConstancy, "noConstancy is default");
+    assert.isTrue(ds.key() === Plottable.KeyFunctions.byIndex, "byIndex is default");
   });
   it(" may accept ByIndex predefined key function", () => {
     let ds: Plottable.Dataset = new Plottable.Dataset();

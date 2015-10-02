@@ -6,9 +6,8 @@ export type DatasetCallback = (dataset: Dataset) => void;
 
 
 export class KeyFunctions {
-  public static counter: number = 0;
+  protected static counter: number = 0;
   public static noConstancy: (d: any, i: number) => any = (d: any, i: number) => {
-
     return KeyFunctions.counter++;
   };
   public static byIndex: (d: any, i: number) => any = (d: any, i: number) => {
@@ -19,7 +18,7 @@ export class KeyFunctions {
 export class Dataset {
   private _data: any[];
   private _metadata: any;
-  private _key: (datum: any, index: number) => any = KeyFunctions.noConstancy;
+  private _key: (datum: any, index: number) => any = KeyFunctions.byIndex;
   private _callbacks: Utils.CallbackSet<DatasetCallback>;
 
   /**
