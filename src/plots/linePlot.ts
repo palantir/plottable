@@ -13,6 +13,7 @@ export module Plots {
     private _interpolator: string | ((points: Array<[number, number]>) => string) = "linear";
 
     private _autorangeSmooth = false;
+    private _croppedRenderingEnabled = true;
 
     private _downsampleEnabled = false;
 
@@ -156,6 +157,27 @@ export module Plots {
         return this._downsampleEnabled;
       }
       this._downsampleEnabled = downsample;
+      return this;
+    }
+
+    /**
+     * Gets if croppedRendering is enabled
+     *
+     * When croppedRendering is enabled, lines that will not be visible in the viewport will not be drawn.
+     */
+    public croppedRenderingEnabled(): boolean;
+    /**
+     * Sets if croppedRendering is enabled
+     *
+     * @returns {Plots.Line} The calling Plots.Line
+     */
+    public croppedRenderingEnabled(croppedRendering: boolean): Plots.Line<X>;
+    public croppedRenderingEnabled(croppedRendering?: boolean): any {
+      if (croppedRendering == null) {
+        return this._croppedRenderingEnabled;
+      }
+      this._croppedRenderingEnabled = croppedRendering;
+      this.render();
       return this;
     }
 
@@ -370,24 +392,69 @@ export module Plots {
 
     protected _getDataToDraw() {
       let dataToDraw = new Utils.Map<Dataset, any[]> ();
+
       this.datasets().forEach((dataset) => {
         let data = dataset.data();
-        if (!this._downsampleEnabled) {
+
+        if (!this._croppedRenderingEnabled && !this._downsampleEnabled) {
           dataToDraw.set(dataset, [data]);
           return;
         }
+
         let filteredDataIndices = data.map((d, i) => i);
-        filteredDataIndices = this._filterDownsampling(dataset, filteredDataIndices);
+        if(this._croppedRenderingEnabled){
+        filteredDataIndices = this._filterCroppedRendering(dataset, filteredDataIndices);
+        }
+        if(this._downsampleEnabled){
+          filteredDataIndices = this._filterDownsampling(dataset, filteredDataIndices);
+        }
+
         dataToDraw.set(dataset, [filteredDataIndices.map((d, i) => data[d])]);
       });
+
       return dataToDraw;
     }
 
-     private _filterDownsampling(dataset: Dataset, indices: number[]) {
+    private _filterCroppedRendering(dataset: Dataset, indices: number[]) {
+      let xProjector = Plot._scaledAccessor(this.x());
+      let yProjector = Plot._scaledAccessor(this.y());
+
+      let data = dataset.data();
+      let filteredDataIndices: number[] = [];
+      let pointInViewport = (x: number, y: number) => {
+        return Utils.Math.inRange(x, 0, this.width()) &&
+          Utils.Math.inRange(y, 0, this.height());
+      };
+
+      for (let i = 0; i < indices.length; i++) {
+        let currXPoint = xProjector(data[indices[i]], indices[i], dataset);
+        let currYPoint = yProjector(data[indices[i]], indices[i], dataset);
+        let shouldShow = pointInViewport(currXPoint, currYPoint);
+
+        if (!shouldShow && indices[i - 1] != null && data[indices[i - 1]] != null) {
+          let prevXPoint = xProjector(data[indices[i - 1]], indices[i - 1], dataset);
+          let prevYPoint = yProjector(data[indices[i - 1]], indices[i - 1], dataset);
+          shouldShow = shouldShow || pointInViewport(prevXPoint, prevYPoint);
+        }
+
+        if (!shouldShow && indices[i + 1] != null && data[indices[i + 1]] != null) {
+          let nextXPoint = xProjector(data[indices[i + 1]], indices[i + 1], dataset);
+          let nextYPoint = yProjector(data[indices[i + 1]], indices[i + 1], dataset);
+          shouldShow = shouldShow || pointInViewport(nextXPoint, nextYPoint);
+        }
+
+        if (shouldShow) {
+          filteredDataIndices.push(indices[i]);
+        }
+      }
+      return filteredDataIndices;
+    }
+
+private _filterDownsampling(dataset: Dataset, indices: number[]) {
       let xAccessor = this.x().accessor;
       let yAccessor = this.y().accessor;
       let filteredIndices = this._filterDownsamplingSlope(dataset, indices, this.x().scale, this.y().scale, xAccessor, yAccessor);
-      //console.log(filteredIndices);
+       //console.log(filteredIndices);
        //let filteredIndices = this._filterDownsamplingInOneScale(dataset, indices, this.x().scale, xAccessor, yAccessor);
        //filteredIndices = this._filterDownsamplingInOneScale(dataset, filteredIndices, this.y().scale, yAccessor, xAccessor);
       console.log(`${indices.length}, ${filteredIndices.length}`);
@@ -503,7 +570,6 @@ export module Plots {
       }
         return filteredIndices;
     }
-    
   }
 }
 }
