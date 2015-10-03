@@ -9268,41 +9268,74 @@ var Plottable;
             Line.prototype._filterDownsampling = function (dataset, indices) {
                 var xAccessor = this.x().accessor;
                 var yAccessor = this.y().accessor;
-                var filteredIndices = this._filterDownsamplingInOneScale(dataset, indices, this.x().scale, xAccessor, yAccessor);
-                filteredIndices = this._filterDownsamplingInOneScale(dataset, filteredIndices, this.y().scale, yAccessor, xAccessor);
+                var filteredIndices = this._filterDownsamplingInOneScale(dataset, indices, this.x().scale, this.y().scale, xAccessor, yAccessor);
+                //filteredIndices = this._filterDownsamplingInOneScale(dataset, filteredIndices, this.y().scale, yAccessor, xAccessor);
+                console.log(filteredIndices);
                 return filteredIndices;
             };
-            Line.prototype._filterDownsamplingInOneScale = function (dataset, indices, scale, primaryAccessor, secondaryAccessor) {
+            /**
+             * get the first two element i, i + 1 add first element and last element
+             * get the slope
+             * for i+1 and i + 2 ..
+             * if slope equals, test if it's minimum x or minimum y or y z
+             *
+             */
+            Line.prototype._filterDownsamplingInOneScale = function (dataset, indices, xScale, yScale, xAcessor, yAcessor) {
                 var data = dataset.data();
                 var filteredIndices = [];
-                for (var i = 0; i < indices.length;) {
-                    var min = Infinity;
-                    var max = -Infinity;
-                    var currBucket = Math.floor(scale.scale(primaryAccessor(data[indices[i]], indices[i], dataset)));
+                var min;
+                var max;
+                var currentSlope;
+                if (indices.length === 0) {
+                    return filteredIndices;
+                }
+                filteredIndices.push(indices[0]);
+                function belongToCurBucket(i) {
+                    var p1x = xScale.scale(xAcessor(data[indices[i]], indices[i], dataset));
+                    var p1y = yScale.scale(yAcessor(data[indices[i]], indices[i], dataset));
+                    var p2x = xScale.scale(xAcessor(data[indices[i + 1]], indices[i + 1], dataset));
+                    var p2y = yScale.scale(yAcessor(data[indices[i + 1]], indices[i + 1], dataset));
+                    if (currentSlope == null) {
+                        currentSlope = (p2y - p1y) / (p2x - p1x);
+                        min = currentSlope === Infinity ? yAcessor(data[indices[i]], indices[i], dataset) : xAcessor(data[indices[i]], indices[i], dataset);
+                        max = currentSlope === Infinity ? yAcessor(data[indices[i]], indices[i], dataset) : xAcessor(data[indices[i]], indices[i], dataset);
+                        return true;
+                    }
+                    if (currentSlope === Infinity) {
+                        return Math.floor(p1x) === Math.floor(p2x);
+                    }
+                    else {
+                        var expectedP2y = p1y + (p2x - p1x) * currentSlope;
+                        return Math.floor(p2y) === Math.floor(expectedP2y);
+                    }
+                }
+                for (var i = 0; i < indices.length - 1;) {
+                    currentSlope = null;
                     var pFirst = indices[i];
                     var pMin = indices[i];
                     var pMax = indices[i];
-                    while (i < indices.length && Math.floor(scale.scale(primaryAccessor(data[indices[i]], indices[i], dataset))) === currBucket) {
-                        var currPoint = secondaryAccessor(data[indices[i]], indices[i], dataset);
+                    var bucketIndices = [];
+                    while (i < indices.length - 1 && belongToCurBucket(i)) {
+                        var currPoint = (currentSlope === Infinity ? yAcessor(data[indices[i + 1]], indices[i + 1], dataset) : xAcessor(data[indices[i + 1]], indices[i + 1], dataset));
                         if (currPoint > max) {
                             max = currPoint;
-                            pMax = indices[i];
+                            pMax = indices[i + 1];
                         }
                         if (currPoint < min) {
                             min = currPoint;
-                            pMin = indices[i];
+                            pMin = indices[i + 1];
                         }
                         i++;
                     }
-                    var pLast = indices[i - 1];
-                    filteredIndices.push(pFirst);
-                    if (filteredIndices.indexOf(pMin) < 0) {
+                    var pLast = indices[i];
+                    console.log(currentSlope + "min" + pMin + ", max" + pMax + ", first" + pFirst + ", last" + pLast);
+                    if (pMin != pFirst) {
                         filteredIndices.push(pMin);
                     }
-                    if (filteredIndices.indexOf(pMax) < 0) {
+                    if (pMax != pMin && pMax != pFirst) {
                         filteredIndices.push(pMax);
                     }
-                    if (pLast && filteredIndices.indexOf(pLast) < 0) {
+                    if (pLast && pLast != pFirst && pLast != pMin && pLast != pMax) {
                         filteredIndices.push(pLast);
                     }
                 }
