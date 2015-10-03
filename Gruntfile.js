@@ -50,9 +50,9 @@ module.exports = function(grunt) {
       prereleaseName: "rc"
     }
   };
-     
-  var regexLF = (grunt.util.linefeed == "\r\n" ? "(\\u000D\\n)" : "\\n"); //get the correct Lf for the operating system
-  var prefixMatch = "\\n *(function |var |static )?".replace("\\n",regexLF);
+
+  var regexLF = (grunt.util.linefeed === "\r\n" ? "(\\u000D\\n)" : "\\n"); //get the correct Lf for the operating system
+  var prefixMatch = "\\n *(function |var |static )?".replace("\\n", regexLF);
   var varNameMatch = "[^(:;]*(\\([^)]*\\))?"; // catch function args too
   var nestedBraceMatch = ": \\{[^{}]*\\}";
   var typeNameMatch = ": [^;]*";
