@@ -386,9 +386,11 @@ export module Plots {
      private _filterDownsampling(dataset: Dataset, indices: number[]) {
       let xAccessor = this.x().accessor;
       let yAccessor = this.y().accessor;
-      let filteredIndices = this._filterDownsamplingInOneScale(dataset, indices, this.x().scale, this.y().scale, xAccessor, yAccessor);
-      //filteredIndices = this._filterDownsamplingInOneScale(dataset, filteredIndices, this.y().scale, yAccessor, xAccessor);
-      console.log(filteredIndices);
+      let filteredIndices = this._filterDownsamplingSlope(dataset, indices, this.x().scale, this.y().scale, xAccessor, yAccessor);
+      //console.log(filteredIndices);
+       //let filteredIndices = this._filterDownsamplingInOneScale(dataset, indices, this.x().scale, xAccessor, yAccessor);
+       //filteredIndices = this._filterDownsamplingInOneScale(dataset, filteredIndices, this.y().scale, yAccessor, xAccessor);
+      console.log(`${indices.length}, ${filteredIndices.length}`);
       return filteredIndices;
     }
 
@@ -400,7 +402,7 @@ export module Plots {
  * if slope equals, test if it's minimum x or minimum y or y z
  * 
  */
-    private _filterDownsamplingInOneScale(dataset: Dataset, indices: number[],
+    private _filterDownsamplingSlope(dataset: Dataset, indices: number[],
       xScale: Scale<any, number>, yScale: Scale<any, number>, xAcessor: Accessor<any>, yAcessor: Accessor<any>) {
       let data = dataset.data();
       let filteredIndices: number[] = [];
@@ -417,7 +419,7 @@ export module Plots {
         let p2x = xScale.scale(xAcessor(data[indices[i + 1]], indices[i + 1], dataset));
         let p2y = yScale.scale(yAcessor(data[indices[i + 1]], indices[i + 1], dataset));
         if(currentSlope == null){
-          currentSlope = (p2y - p1y)/(p2x - p1x);
+          currentSlope = (Math.floor(Math.abs(p2x - p1x)) == 0 ? Infinity : Math.floor(p2y - p1y)/Math.floor(p2x - p1x));
           min = currentSlope === Infinity ? yAcessor(data[indices[i]], indices[i], dataset): xAcessor(data[indices[i]], indices[i], dataset);
           max = currentSlope === Infinity ? yAcessor(data[indices[i]], indices[i], dataset): xAcessor(data[indices[i]], indices[i], dataset);
           return true;
@@ -426,7 +428,7 @@ export module Plots {
           return Math.floor(p1x) === Math.floor(p2x);
         }else{
           let expectedP2y = p1y + (p2x - p1x) * currentSlope;
-          return Math.floor(p2y) === Math.floor(expectedP2y);
+          return Math.floor(Math.abs(p2y - expectedP2y)) === 0 ||  Math.floor(p2y - p1y)/Math.floor(p2x - p1x) === currentSlope;
         }
       }
       for (let i = 0; i < indices.length - 1; ) {
@@ -448,7 +450,7 @@ export module Plots {
           i++;
         }
         let pLast = indices[i];
-        console.log(`${currentSlope}min${pMin}, max${pMax}, first${pFirst}, last${pLast}`);
+       console.log(`${currentSlope}min${pMin}, max${pMax}, first${pFirst}, last${pLast}`);
         if (pMin != pFirst) {
           filteredIndices.push(pMin);
         }
@@ -461,6 +463,47 @@ export module Plots {
       }
         return filteredIndices;
     }
+    
+    
+    
+    private _filterDownsamplingInOneScale(dataset: Dataset, indices: number[],
+      scale: Scale<any, number>, primaryAccessor: Accessor<any>, secondaryAccessor: Accessor<any>) {
+      let data = dataset.data();
+      let filteredIndices: number[] = [];
+      for (let i = 0; i < indices.length; ) {
+        let min = Infinity;
+        let max = -Infinity;
+        let currBucket = Math.floor(scale.scale(primaryAccessor(data[indices[i]], indices[i], dataset)));
+        let pFirst = indices[i];
+        let pMin = indices[i];
+        let pMax = indices[i];
+        while (i < indices.length && Math.floor(scale.scale(primaryAccessor(data[indices[i]], indices[i], dataset))) === currBucket) {
+          let currPoint = secondaryAccessor(data[indices[i]], indices[i], dataset);
+          if (currPoint > max) {
+            max = currPoint;
+            pMax = indices[i];
+          }
+          if (currPoint < min) {
+            min = currPoint;
+            pMin = indices[i];
+          }
+          i++;
+        }
+        let pLast = indices[i - 1];
+        filteredIndices.push(pFirst);
+        if (filteredIndices.indexOf(pMin) < 0) {
+          filteredIndices.push(pMin);
+        }
+        if (filteredIndices.indexOf(pMax) < 0) {
+          filteredIndices.push(pMax);
+        }
+        if (pLast && filteredIndices.indexOf(pLast) < 0) {
+          filteredIndices.push(pLast);
+        }
+      }
+        return filteredIndices;
+    }
+    
   }
 }
 }
