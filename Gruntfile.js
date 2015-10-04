@@ -50,16 +50,14 @@ module.exports = function(grunt) {
       prereleaseName: "rc"
     }
   };
- 
-    
-  var regexLF = (grunt.util.linefeed == "\r\n" ? "(\\u000D\\n)" : "\\n");
-  var prefixMatch = "\\n *(function |var |static )?".replace("\\n",regexLF);
+
+  var prefixMatch = "\\n *(function |var |static )?";
   var varNameMatch = "[^(:;]*(\\([^)]*\\))?"; // catch function args too
   var nestedBraceMatch = ": \\{[^{}]*\\}";
   var typeNameMatch = ": [^;]*";
-  var finalMatch = "((" + nestedBraceMatch + ")|(" + typeNameMatch + "))?\\n?;".replace("\\n", regexLF);
-  var jsdocInit = "\\n *\\/\\*\\* *\\n".replace("\\n", regexLF);
-  var jsdocMid = "( *\\*[^\\n]*\\n)+".replace("\\n", regexLF);
+  var finalMatch = "((" + nestedBraceMatch + ")|(" + typeNameMatch + "))?\\n?;";
+  var jsdocInit = "\\n *\\/\\*\\* *\\n";
+  var jsdocMid = "( *\\*[^\\n]*\\n)+";
   var jsdocEnd = " *\\*\\/ *";
   var jsdoc = "(" + jsdocInit + jsdocMid + jsdocEnd + ")?";
 
@@ -94,7 +92,7 @@ module.exports = function(grunt) {
   // on each recompile
   var updateTsFiles = function() {
     tsFiles = grunt.file.read("src/reference.ts")
-      .split(grunt.util.linefeed)
+      .split("\n")
       .filter(function(s) {
         return s !== "";
       }).map(function(s) {
@@ -106,7 +104,7 @@ module.exports = function(grunt) {
   var testTsFiles;
   var updateTestTsFiles = function() {
     testTsFiles = grunt.file.read("test/testReference.ts")
-      .split(grunt.util.linefeed)
+      .split("\n")
       .filter(function(s) {
         return s !== "";
       }).map(function(s) {
