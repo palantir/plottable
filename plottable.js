@@ -918,8 +918,12 @@ var Plottable;
         function KeyFunctions() {
         }
         KeyFunctions.counter = 0;
-        KeyFunctions.noConstancy = function (d) { return KeyFunctions.counter++; };
-        KeyFunctions.byIndex = function (d, i) { return i; };
+        KeyFunctions.noConstancy = function (d, i) {
+            return KeyFunctions.counter++;
+        };
+        KeyFunctions.byIndex = function (d, i) {
+            return i;
+        };
         return KeyFunctions;
     })();
     Plottable.KeyFunctions = KeyFunctions;
@@ -935,7 +939,7 @@ var Plottable;
         function Dataset(data, metadata) {
             if (data === void 0) { data = []; }
             if (metadata === void 0) { metadata = {}; }
-            this._key = KeyFunctions.noConstancy;
+            this._key = KeyFunctions.byIndex;
             this._data = data;
             this._metadata = metadata;
             this._callbacks = new Plottable.Utils.CallbackSet();
@@ -2686,7 +2690,7 @@ var Plottable;
         Drawer.prototype._bindSelectionData = function (data) {
             // if the dataset has a key, use it when binding the data   
             var dataElements;
-            if (this._dataset && this._dataset.key) {
+            if (this._dataset && this._dataset.key()) {
                 dataElements = this.selection().data(data, this._dataset.key());
             }
             else {
