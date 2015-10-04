@@ -13,6 +13,7 @@ export module Plots {
     private _interpolator: string | ((points: Array<[number, number]>) => string) = "linear";
 
     private _autorangeSmooth = false;
+    private _croppedRenderingEnabled = true;
 
     /**
      * A Line Plot draws line segments starting from the first data point to the next.
@@ -134,6 +135,27 @@ export module Plots {
         return this._interpolator;
       }
       this._interpolator = interpolator;
+      this.render();
+      return this;
+    }
+
+    /**
+     * Gets if croppedRendering is enabled
+     *
+     * When croppedRendering is enabled, lines that will not be visible in the viewport will not be drawn.
+     */
+    public croppedRenderingEnabled(): boolean;
+    /**
+     * Sets if croppedRendering is enabled
+     *
+     * @returns {Plots.Line} The calling Plots.Line
+     */
+    public croppedRenderingEnabled(croppedRendering: boolean): Plots.Line<X>;
+    public croppedRenderingEnabled(croppedRendering?: boolean): any {
+      if (croppedRendering == null) {
+        return this._croppedRenderingEnabled;
+      }
+      this._croppedRenderingEnabled = croppedRendering;
       this.render();
       return this;
     }
@@ -349,8 +371,58 @@ export module Plots {
 
     protected _getDataToDraw() {
       let dataToDraw = new Utils.Map<Dataset, any[]> ();
-      this.datasets().forEach((dataset) => dataToDraw.set(dataset, [dataset.data()]));
+
+      this.datasets().forEach((dataset) => {
+        let data = dataset.data();
+
+        if (!this._croppedRenderingEnabled) {
+          dataToDraw.set(dataset, [data]);
+          return;
+        }
+
+        let filteredDataIndices = data.map((d, i) => i);
+
+        filteredDataIndices = this._filterCroppedRendering(dataset, filteredDataIndices);
+
+        dataToDraw.set(dataset, [filteredDataIndices.map((d, i) => data[d])]);
+      });
+
       return dataToDraw;
+    }
+
+    private _filterCroppedRendering(dataset: Dataset, indices: number[]) {
+      let xProjector = Plot._scaledAccessor(this.x());
+      let yProjector = Plot._scaledAccessor(this.y());
+
+      let data = dataset.data();
+      let filteredDataIndices: number[] = [];
+      let pointInViewport = (x: number, y: number) => {
+        return Utils.Math.inRange(x, 0, this.width()) &&
+          Utils.Math.inRange(y, 0, this.height());
+      };
+
+      for (let i = 0; i < indices.length; i++) {
+        let currXPoint = xProjector(data[indices[i]], indices[i], dataset);
+        let currYPoint = yProjector(data[indices[i]], indices[i], dataset);
+        let shouldShow = pointInViewport(currXPoint, currYPoint);
+
+        if (!shouldShow && indices[i - 1] != null && data[indices[i - 1]] != null) {
+          let prevXPoint = xProjector(data[indices[i - 1]], indices[i - 1], dataset);
+          let prevYPoint = yProjector(data[indices[i - 1]], indices[i - 1], dataset);
+          shouldShow = shouldShow || pointInViewport(prevXPoint, prevYPoint);
+        }
+
+        if (!shouldShow && indices[i + 1] != null && data[indices[i + 1]] != null) {
+          let nextXPoint = xProjector(data[indices[i + 1]], indices[i + 1], dataset);
+          let nextYPoint = yProjector(data[indices[i + 1]], indices[i + 1], dataset);
+          shouldShow = shouldShow || pointInViewport(nextXPoint, nextYPoint);
+        }
+
+        if (shouldShow) {
+          filteredDataIndices.push(indices[i]);
+        }
+      }
+      return filteredDataIndices;
     }
 
   }
