@@ -829,7 +829,7 @@ describe("Plots", () => {
         });
       }
     });
-    
+
     describe("Downsampling Performance", () => {
       let svg: d3.Selection<void>;
       let plot: Plottable.Plots.Line<number>;
@@ -906,7 +906,7 @@ describe("Plots", () => {
 
         svg.remove();
       });
-      
+
       it("does not render points that are on the same line except for the first, the last, the largest and the smallest points", () => {
         let data = [
           {x: 2, y: 2}, // first element in the bucket
