@@ -57,11 +57,6 @@ module.exports = function(grunt) {
       replacement: "",
       path: "build/plottable.d.ts"
     },
-    sublime: {
-      pattern: "(.*\\.ts)",
-      replacement: '/// <reference path="../$1" />',
-      path: "build/sublime.d.ts"
-    },
     versionNumber: {
       pattern: "@VERSION",
       replacement: "<%= pkg.version %>",
@@ -256,12 +251,6 @@ module.exports = function(grunt) {
     }
   };
 
-  var shellConfig = {
-    sublime: {
-      command: "(echo 'src/reference.ts'; find typings -name '*.d.ts') > build/sublime.d.ts"
-    }
-  };
-
   var saucelabsMochaConfig = {
     all: {
       options: {
@@ -310,7 +299,6 @@ module.exports = function(grunt) {
     gitcommit: gitcommitConfig,
     compress: compressConfig,
     uglify: uglifyConfig,
-    shell: shellConfig,
     "saucelabs-mocha": saucelabsMochaConfig
   });
 
@@ -374,9 +362,6 @@ module.exports = function(grunt) {
   } else {
     grunt.registerTask("test-travis", ["dev-compile", "test-local"]);
   }
-
-  // Tooling
-  grunt.registerTask("sublime", ["shell:sublime", "sed:sublime"]);
 
   grunt.registerTask("update-quicktests", function() {
     var qtJSON = [];
