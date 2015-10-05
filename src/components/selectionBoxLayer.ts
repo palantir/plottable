@@ -13,8 +13,8 @@ export module Components {
     };
     private _xExtent: (number | { valueOf(): number })[];
     private _yExtent: (number | { valueOf(): number })[];
-    private _xScale: QuantitativeScale<number | { valueOf(): number }>;
-    private _yScale: QuantitativeScale<number | { valueOf(): number }>;
+    protected _xScale: QuantitativeScale<number | { valueOf(): number }>;
+    protected _yScale: QuantitativeScale<number | { valueOf(): number }>;
     private _adjustBoundsCallback: ScaleCallback<QuantitativeScale<number | { valueOf(): number }>>;
     protected _xBoundsMode = PropertyMode.PIXEL;
     protected _yBoundsMode = PropertyMode.PIXEL;
