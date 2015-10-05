@@ -15,7 +15,7 @@ export module Plots {
     private _autorangeSmooth = false;
     private _croppedRenderingEnabled = true;
 
-    private _downsampleEnabled = false;
+    private _downsamplingEnabled = false;
 
     /**
      * A Line Plot draws line segments starting from the first data point to the next.
@@ -154,9 +154,9 @@ export module Plots {
     public downsamplingEnabled(downsample: boolean): Plots.Line<X>;
     public downsamplingEnabled(downsample?: boolean): any {
       if (downsample == null) {
-        return this._downsampleEnabled;
+        return this._downsamplingEnabled;
       }
-      this._downsampleEnabled = downsample;
+      this._downsamplingEnabled = downsample;
       return this;
     }
 
@@ -396,7 +396,7 @@ export module Plots {
       this.datasets().forEach((dataset) => {
         let data = dataset.data();
 
-        if (!this._croppedRenderingEnabled && !this._downsampleEnabled) {
+        if (!this._croppedRenderingEnabled && !this._downsamplingEnabled) {
           dataToDraw.set(dataset, [data]);
           return;
         }
@@ -405,7 +405,7 @@ export module Plots {
         if (this._croppedRenderingEnabled) {
         filteredDataIndices = this._filterCroppedRendering(dataset, filteredDataIndices);
         }
-        if (this._downsampleEnabled) {
+        if (this._downsamplingEnabled) {
           filteredDataIndices = this._filterDownsampling(dataset, filteredDataIndices);
         }
 
@@ -450,7 +450,7 @@ export module Plots {
       return filteredDataIndices;
     }
 
-private _filterDownsampling(dataset: Dataset, indices: number[]) {
+    private _filterDownsampling(dataset: Dataset, indices: number[]) {
       let xAccessor = this.x().accessor;
       let yAccessor = this.y().accessor;
       let filteredIndices = this._filterDownsamplingSlope(dataset, indices, this.x().scale, this.y().scale, xAccessor, yAccessor);
@@ -474,18 +474,17 @@ private _filterDownsampling(dataset: Dataset, indices: number[]) {
         let p2x = xScale.scale(xAcessor(data[indices[i + 1]], indices[i + 1], dataset));
         let p2y = yScale.scale(yAcessor(data[indices[i + 1]], indices[i + 1], dataset));
         if (currentSlope == null) {
-          currentSlope = (Math.floor(Math.abs(p2x - p1x)) === 0 ? Infinity : Math.floor(p2y - p1y) / Math.floor(p2x - p1x));
-          min = currentSlope === Infinity ? yAcessor(data[indices[i]], indices[i], dataset) :
+          currentSlope = (Math.floor(p1x) === Math.floor(p2x)) ? Infinity : (p2y - p1y) / (p2x - p1x);
+          min = (currentSlope === Infinity) ? yAcessor(data[indices[i]], indices[i], dataset) :
             xAcessor(data[indices[i]], indices[i], dataset);
-          max = currentSlope === Infinity ? yAcessor(data[indices[i]], indices[i], dataset) :
-            xAcessor(data[indices[i]], indices[i], dataset);
+          max = min;
           return true;
         }
         if (currentSlope === Infinity) {
           return Math.floor(p1x) === Math.floor(p2x);
         }else {
           let expectedP2y = p1y + (p2x - p1x) * currentSlope;
-          return Math.floor(Math.abs(p2y - expectedP2y)) === 0 ||  Math.floor(p2y - p1y) / Math.floor(p2x - p1x) === currentSlope;
+          return Math.floor(p2y) === Math.floor(expectedP2y);
         }
       }
       for (let i = 0; i < indices.length - 1; ) {

@@ -8993,7 +8993,7 @@ var Plottable;
                 this._interpolator = "linear";
                 this._autorangeSmooth = false;
                 this._croppedRenderingEnabled = true;
-                this._downsampleEnabled = false;
+                this._downsamplingEnabled = false;
                 this.addClass("line-plot");
                 var animator = new Plottable.Animators.Easing();
                 animator.stepDuration(Plottable.Plot._ANIMATION_MAX_DURATION);
@@ -9062,9 +9062,9 @@ var Plottable;
             };
             Line.prototype.downsamplingEnabled = function (downsample) {
                 if (downsample == null) {
-                    return this._downsampleEnabled;
+                    return this._downsamplingEnabled;
                 }
-                this._downsampleEnabled = downsample;
+                this._downsamplingEnabled = downsample;
                 return this;
             };
             Line.prototype.croppedRenderingEnabled = function (croppedRendering) {
@@ -9264,7 +9264,7 @@ var Plottable;
                 var dataToDraw = new Plottable.Utils.Map();
                 this.datasets().forEach(function (dataset) {
                     var data = dataset.data();
-                    if (!_this._croppedRenderingEnabled && !_this._downsampleEnabled) {
+                    if (!_this._croppedRenderingEnabled && !_this._downsamplingEnabled) {
                         dataToDraw.set(dataset, [data]);
                         return;
                     }
@@ -9272,7 +9272,7 @@ var Plottable;
                     if (_this._croppedRenderingEnabled) {
                         filteredDataIndices = _this._filterCroppedRendering(dataset, filteredDataIndices);
                     }
-                    if (_this._downsampleEnabled) {
+                    if (_this._downsamplingEnabled) {
                         filteredDataIndices = _this._filterDownsampling(dataset, filteredDataIndices);
                     }
                     dataToDraw.set(dataset, [filteredDataIndices.map(function (d, i) { return data[d]; })]);
@@ -9331,11 +9331,10 @@ var Plottable;
                     var p2x = xScale.scale(xAcessor(data[indices[i + 1]], indices[i + 1], dataset));
                     var p2y = yScale.scale(yAcessor(data[indices[i + 1]], indices[i + 1], dataset));
                     if (currentSlope == null) {
-                        currentSlope = (Math.floor(Math.abs(p2x - p1x)) === 0 ? Infinity : Math.floor(p2y - p1y) / Math.floor(p2x - p1x));
-                        min = currentSlope === Infinity ? yAcessor(data[indices[i]], indices[i], dataset) :
+                        currentSlope = (Math.floor(p1x) === Math.floor(p2x)) ? Infinity : (p2y - p1y) / (p2x - p1x);
+                        min = (currentSlope === Infinity) ? yAcessor(data[indices[i]], indices[i], dataset) :
                             xAcessor(data[indices[i]], indices[i], dataset);
-                        max = currentSlope === Infinity ? yAcessor(data[indices[i]], indices[i], dataset) :
-                            xAcessor(data[indices[i]], indices[i], dataset);
+                        max = min;
                         return true;
                     }
                     if (currentSlope === Infinity) {
@@ -9343,7 +9342,7 @@ var Plottable;
                     }
                     else {
                         var expectedP2y = p1y + (p2x - p1x) * currentSlope;
-                        return Math.floor(Math.abs(p2y - expectedP2y)) === 0 || Math.floor(p2y - p1y) / Math.floor(p2x - p1x) === currentSlope;
+                        return Math.floor(p2y) === Math.floor(expectedP2y);
                     }
                 }
                 for (var i = 0; i < indices.length - 1;) {
