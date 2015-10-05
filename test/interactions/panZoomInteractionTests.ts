@@ -46,7 +46,7 @@ describe("Interactions", () => {
         let expectedXScales = [xScale, xScale2];
         panZoomInteraction.addXScale(xScale);
         panZoomInteraction.addXScale(xScale2);
-        assert.deepEqual(panZoomInteraction.xScales(), expectedXScales);
+        assert.deepEqual(panZoomInteraction.xScales(), expectedXScales, "interaction contains the 2 xScales added");
 
         assert.deepEqual(panZoomInteraction.xScales([]), panZoomInteraction, "returns the calling interaction");
         assert.deepEqual(panZoomInteraction.xScales(), [], "scales can be removed with the xScales call");
@@ -60,7 +60,7 @@ describe("Interactions", () => {
         let expectedYScales = [yScale, yScale2];
         panZoomInteraction.addYScale(yScale);
         panZoomInteraction.addYScale(yScale2);
-        assert.deepEqual(panZoomInteraction.yScales(), expectedYScales);
+        assert.deepEqual(panZoomInteraction.yScales(), expectedYScales, "interaction contains the 2 yScales added");
 
         assert.deepEqual(panZoomInteraction.yScales([]), panZoomInteraction, "returns the calling interaction");
         assert.deepEqual(panZoomInteraction.yScales(), [], "scales can be removed with the yScales call");
@@ -71,13 +71,13 @@ describe("Interactions", () => {
 
       it("does not create duplicate for an already existent xScale", () => {
         panZoomInteraction.addXScale(xScale);
-        panZoomInteraction.addXScale(panZoomInteraction.xScales()[0]);
+        panZoomInteraction.addXScale(xScale);
         assert.deepEqual(panZoomInteraction.xScales(), [xScale], "there is exactly one copy of xScale");
       });
 
       it("does not create duplicate for an already existent yScale", () => {
         panZoomInteraction.addYScale(yScale);
-        panZoomInteraction.addYScale(panZoomInteraction.yScales()[0]);
+        panZoomInteraction.addYScale(yScale);
         assert.deepEqual(panZoomInteraction.yScales(), [yScale], "there is exactly one copy of yScale");
       });
     });
@@ -197,10 +197,10 @@ describe("Interactions", () => {
       });
 
       function domainAfterPan(startPoint: Plottable.Point, endPoint: Plottable.Point,
-                              scale: Plottable.QuantitativeScale<number>, x: boolean) {
-        let delta = x ? endPoint.x - startPoint.x : endPoint.y - startPoint.y;
+                              scale: Plottable.QuantitativeScale<number>, isHorizontal: boolean) {
+        let delta = isHorizontal ? endPoint.x - startPoint.x : endPoint.y - startPoint.y;
         let domain = scale.domain();
-        let range = x ? SVG_WIDTH : SVG_HEIGHT;
+        let range = isHorizontal ? SVG_WIDTH : SVG_HEIGHT;
         let diff = delta / range * (domain[1] - domain[0]);
         return domain.map((v) => v - diff);
       }
@@ -273,7 +273,7 @@ describe("Interactions", () => {
         let expectedXDomain = domainAfterWheel(deltaY, scrollPoint, xScale, true);
         let expectedXDomain2 = domainAfterWheel(deltaY, scrollPoint, xScale2, true);
 
-        TestMethods.triggerFakeWheelEvent( "wheel", svg, scrollPoint.x, scrollPoint.y, deltaY );
+        TestMethods.triggerFakeWheelEvent("wheel", svg, scrollPoint.x, scrollPoint.y, deltaY );
 
         assert.deepEqual(xScale.domain(), expectedXDomain, "xScale zooms to the correct domain via scroll");
         assert.deepEqual(xScale2.domain(), expectedXDomain2, "xScale2 zooms to the correct domain via scroll");
@@ -284,10 +284,10 @@ describe("Interactions", () => {
         let startPoint = { x: SVG_WIDTH / 4, y: SVG_HEIGHT / 4 };
         let startPoint2 = { x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2 };
         let endPoint = { x: SVG_WIDTH * 3 / 4, y: SVG_HEIGHT * 3 / 4 };
-        let expectedXDomain = domainAfterZoom(startPoint, startPoint2, endPoint, xScale, true);
-        let expectedYDomain = domainAfterZoom(startPoint, startPoint2, endPoint, yScale, true);
+        let expectedXDomain = domainAfterPinch(startPoint, startPoint2, startPoint, endPoint, xScale, true);
+        let expectedYDomain = domainAfterPinch(startPoint, startPoint2, startPoint, endPoint, yScale, true);
 
-        TestMethods.triggerFakeTouchEvent( "touchstart", eventTarget, [startPoint, startPoint2], [0, 1] );
+        TestMethods.triggerFakeTouchEvent("touchstart", eventTarget, [startPoint, startPoint2], [0, 1] );
         TestMethods.triggerFakeTouchEvent("touchmove", eventTarget, [endPoint], [1] );
         TestMethods.triggerFakeTouchEvent("touchend", eventTarget, [endPoint], [1] );
         assert.deepEqual(xScale.domain(), expectedXDomain, "xScale transforms to the correct domain via pinch");
@@ -302,10 +302,10 @@ describe("Interactions", () => {
         let startPoint = { x: SVG_WIDTH / 4, y: SVG_HEIGHT / 4 };
         let startPoint2 = { x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2 };
         let endPoint = { x: SVG_WIDTH * 3 / 4, y: SVG_HEIGHT * 3 / 4 };
-        let expectedXDomain = domainAfterZoom(startPoint, startPoint2, endPoint, xScale, true);
-        let expectedXDomain2 = domainAfterZoom(startPoint, startPoint2, endPoint, xScale2, true);
+        let expectedXDomain = domainAfterPinch(startPoint, startPoint2, startPoint, endPoint, xScale, true);
+        let expectedXDomain2 = domainAfterPinch(startPoint, startPoint2, startPoint, endPoint, xScale2, true);
 
-        TestMethods.triggerFakeTouchEvent( "touchstart", eventTarget, [startPoint, startPoint2], [0, 1] );
+        TestMethods.triggerFakeTouchEvent("touchstart", eventTarget, [startPoint, startPoint2], [0, 1] );
         TestMethods.triggerFakeTouchEvent("touchmove", eventTarget, [endPoint], [1] );
         TestMethods.triggerFakeTouchEvent("touchend", eventTarget, [endPoint], [1] );
         assert.deepEqual(xScale.domain(), expectedXDomain, "xScale transforms to the correct domain via pinch");
@@ -313,7 +313,7 @@ describe("Interactions", () => {
         svg.remove();
       });
 
-      it("can pitch inside one component and not affect another component", () => {
+      it("can pinch inside one component and not affect another component", () => {
         let xScale2 = new Plottable.Scales.Linear();
         let initialDomain = [0, SVG_WIDTH / 2];
         xScale2.domain(initialDomain).range([0, SVG_WIDTH]);
@@ -330,9 +330,9 @@ describe("Interactions", () => {
         let startPoint = { x: SVG_WIDTH / 4, y: SVG_HEIGHT / 2 };
         let startPoint2 = { x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2 };
         let endPoint = { x: SVG_WIDTH * 3 / 4, y: SVG_HEIGHT / 2 };
-        let expectedXDomain = domainAfterZoom(startPoint, startPoint2, endPoint, xScale, true);
+        let expectedXDomain = domainAfterPinch(startPoint, startPoint2, startPoint, endPoint, xScale, true);
 
-        TestMethods.triggerFakeTouchEvent( "touchstart", eventTarget, [startPoint, startPoint2], [0, 1] );
+        TestMethods.triggerFakeTouchEvent("touchstart", eventTarget, [startPoint, startPoint2], [0, 1] );
         TestMethods.triggerFakeTouchEvent("touchmove", eventTarget, [endPoint], [1] );
         TestMethods.triggerFakeTouchEvent("touchend", eventTarget, [endPoint], [1] );
         assert.deepEqual(xScale.domain(), expectedXDomain, "xScale inside target component transforms via pinch");
@@ -340,23 +340,25 @@ describe("Interactions", () => {
         svg.remove();
       });
 
-      function domainAfterZoom(startPoint1: Plottable.Point, startPoint2: Plottable.Point, endPoint: Plottable.Point,
-                               scale: Plottable.QuantitativeScale<number>, x: boolean) {
-        let oldDistance = x ? startPoint2.x - startPoint1.x : startPoint2.y - startPoint1.y;
-        let newDistance = x ? endPoint.x - startPoint1.x : endPoint.y - startPoint1.y;
-        let delta = x ? endPoint.x - startPoint2.x : endPoint.y - startPoint2.y;
+      function domainAfterPinch(startPoint: Plottable.Point, startPoint2: Plottable.Point,
+                                endPoint: Plottable.Point, endPoint2: Plottable.Point,
+                                scale: Plottable.QuantitativeScale<number>, isHorizontal: boolean) {
+        let oldDistance = isHorizontal ? startPoint2.x - startPoint.x : startPoint2.y - startPoint.y;
+        let newDistance = isHorizontal ? endPoint2.x - endPoint.x : endPoint2.y - endPoint.y;
+        let delta = isHorizontal ? endPoint2.x - startPoint2.x : endPoint2.y - startPoint2.y;
         let zoomAmount = oldDistance / newDistance;
 
         let domain = scale.domain();
-        let range = x ? SVG_WIDTH : SVG_HEIGHT;
+        let range = isHorizontal ? SVG_WIDTH : SVG_HEIGHT;
         let diff = delta / range * (domain[1] - domain[0]);
         return domain.map((v, i) => (v - domain[0] + diff) * zoomAmount + domain[0]);
       }
 
-      function domainAfterWheel(deltaY: number,  scrollPoint: Plottable.Point, scale: Plottable.QuantitativeScale<number>, x: boolean) {
+      function domainAfterWheel(deltaY: number,  scrollPoint: Plottable.Point,
+                                scale: Plottable.QuantitativeScale<number>, isHorizontal: boolean) {
         let zoomAmount = Math.pow(2, deltaY * .002);
         let domain = scale.domain();
-        let diff = (x ? scrollPoint.x / SVG_WIDTH : scrollPoint.y / SVG_HEIGHT) * (domain[1] - domain[0]);
+        let diff = (isHorizontal ? scrollPoint.x / SVG_WIDTH : scrollPoint.y / SVG_HEIGHT) * (domain[1] - domain[0]);
         return domain.map(function (v, i) { return (v - domain[0] - diff) * zoomAmount + domain[0] + diff; });
       }
     });
@@ -440,7 +442,7 @@ describe("Interactions", () => {
         svg.remove();
       });
 
-      it("cannot go beyond the specified domainExtent (pitching)", () => {
+      it("cannot go beyond the specified domainExtent (pinching)", () => {
         let minimumDomainExtent = SVG_WIDTH / 4;
 
         let startPoint = { x: SVG_WIDTH / 4, y: SVG_HEIGHT / 4 };
@@ -450,7 +452,7 @@ describe("Interactions", () => {
         let endY = (startPoint2.y - startPoint.y) * zoomAmount + startPoint.y;
         let endPoint = { x: endX, y: endY };
 
-        TestMethods.triggerFakeTouchEvent( "touchstart", eventTarget, [startPoint, startPoint2], [0, 1]);
+        TestMethods.triggerFakeTouchEvent("touchstart", eventTarget, [startPoint, startPoint2], [0, 1]);
         TestMethods.triggerFakeTouchEvent("touchmove", eventTarget, [endPoint], [1]);
         TestMethods.triggerFakeTouchEvent("touchend", eventTarget, [endPoint], [1]);
 
@@ -459,7 +461,7 @@ describe("Interactions", () => {
 
         panZoomInteraction.minDomainExtent(xScale, minimumDomainExtent);
         xScale.domain([0, SVG_WIDTH / 2]);
-        TestMethods.triggerFakeTouchEvent( "touchstart", eventTarget, [startPoint, startPoint2], [0, 1]);
+        TestMethods.triggerFakeTouchEvent("touchstart", eventTarget, [startPoint, startPoint2], [0, 1]);
         TestMethods.triggerFakeTouchEvent("touchmove", eventTarget, [endPoint], [1]);
         TestMethods.triggerFakeTouchEvent("touchend", eventTarget, [endPoint], [1]);
         domainExtent = Math.abs(xScale.domain()[1] - xScale.domain()[0]);
@@ -551,7 +553,7 @@ describe("Interactions", () => {
         svg.remove();
       });
 
-      it("cannot go beyond the specified domainExtent (pitching)", () => {
+      it("cannot go beyond the specified domainExtent (pinching)", () => {
         let maximumDomainExtent = SVG_WIDTH;
 
         let startPoint = { x: SVG_WIDTH / 4, y: SVG_HEIGHT / 4 };
@@ -561,7 +563,7 @@ describe("Interactions", () => {
         let endY = (startPoint2.y - startPoint.y) * zoomAmount + startPoint.y;
         let endPoint = { x: endX, y: endY };
 
-        TestMethods.triggerFakeTouchEvent( "touchstart", eventTarget, [startPoint, startPoint2], [0, 1]);
+        TestMethods.triggerFakeTouchEvent("touchstart", eventTarget, [startPoint, startPoint2], [0, 1]);
         TestMethods.triggerFakeTouchEvent("touchmove", eventTarget, [endPoint], [1]);
         TestMethods.triggerFakeTouchEvent("touchend", eventTarget, [endPoint], [1]);
         let domainExtent = Math.abs(xScale.domain()[1] - xScale.domain()[0]);
@@ -569,7 +571,7 @@ describe("Interactions", () => {
 
         xScale.domain([0, SVG_WIDTH / 2]);
         panZoomInteraction.maxDomainExtent(xScale, maximumDomainExtent);
-        TestMethods.triggerFakeTouchEvent( "touchstart", eventTarget, [startPoint, startPoint2], [0, 1]);
+        TestMethods.triggerFakeTouchEvent("touchstart", eventTarget, [startPoint, startPoint2], [0, 1]);
         TestMethods.triggerFakeTouchEvent("touchmove", eventTarget, [endPoint], [1]);
         TestMethods.triggerFakeTouchEvent("touchend", eventTarget, [endPoint], [1]);
 
