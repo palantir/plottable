@@ -925,7 +925,6 @@ describe("Plots", () => {
         let path = plot.content().select("path.line").attr("d");
         let expectedRenderedData = [0, 1, 2, 4].map((d) => data[d]);
         checkPathForDataPoints(path, expectedRenderedData);
-        console.log(path);
 
         svg.remove();
       });
