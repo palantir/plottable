@@ -79,7 +79,6 @@
 ///<reference path="interactions/dragInteractionTests.ts" />
 ///<reference path="interactions/panZoomInteractionTests.ts" />
 
-///<reference path="dispatchers/dispatcherTests.ts" />
 ///<reference path="dispatchers/mouseDispatcherTests.ts" />
 ///<reference path="dispatchers/touchDispatcherTests.ts" />
 ///<reference path="dispatchers/keyDispatcherTests.ts" />
