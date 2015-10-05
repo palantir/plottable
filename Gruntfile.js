@@ -51,22 +51,7 @@ module.exports = function(grunt) {
     }
   };
 
-  var prefixMatch = "\\n *(function |var |static )?";
-  var varNameMatch = "[^(:;]*(\\([^)]*\\))?"; // catch function args too
-  var nestedBraceMatch = ": \\{[^{}]*\\}";
-  var typeNameMatch = ": [^;]*";
-  var finalMatch = "((" + nestedBraceMatch + ")|(" + typeNameMatch + "))?\\n?;";
-  var jsdocInit = "\\n *\\/\\*\\* *\\n";
-  var jsdocMid = "( *\\*[^\\n]*\\n)+";
-  var jsdocEnd = " *\\*\\/ *";
-  var jsdoc = "(" + jsdocInit + jsdocMid + jsdocEnd + ")?";
-
   var sedConfig = {
-    privateDefinitions: {
-      pattern: jsdoc + prefixMatch + "private " + varNameMatch + finalMatch,
-      replacement: "",
-      path: "build/plottable.d.ts"
-    },
     definitions: {
       pattern: '/// *<reference path=[\'"].*[\'"] */>',
       replacement: "",
@@ -356,7 +341,6 @@ module.exports = function(grunt) {
     "concat:svgtypewriter",
     "concat:definitions",
     "sed:definitions",
-    "sed:privateDefinitions",
     "umd:all",
     "concat:header",
     "sed:versionNumber",
