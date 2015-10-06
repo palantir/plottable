@@ -5427,7 +5427,10 @@ var Plottable;
                 this._colorScale.onUpdate(this._redrawCallback);
                 this._formatter = Plottable.Formatters.identity();
                 this.xAlignment("right").yAlignment("top");
-                this.comparator(function (a, b) { return 0; });
+                this.comparator(function (a, b) {
+                    var formattedText = _this._colorScale.domain().slice().map(function (d) { return _this._formatter(d); });
+                    return formattedText.indexOf(a) - formattedText.indexOf(b);
+                });
                 this._symbolFactoryAccessor = function () { return Plottable.SymbolFactories.circle(); };
                 this._symbolOpacityAccessor = function () { return 1; };
             }
