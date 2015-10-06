@@ -118,7 +118,6 @@ var Plottable;
         })(Math = Utils.Math || (Utils.Math = {}));
     })(Utils = Plottable.Utils || (Plottable.Utils = {}));
 })(Plottable || (Plottable = {}));
-
 ///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
@@ -204,7 +203,6 @@ var Plottable;
         Utils.Map = Map;
     })(Utils = Plottable.Utils || (Plottable.Utils = {}));
 })(Plottable || (Plottable = {}));
-
 ///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
@@ -272,7 +270,6 @@ var Plottable;
         Utils.Set = Set;
     })(Utils = Plottable.Utils || (Plottable.Utils = {}));
 })(Plottable || (Plottable = {}));
-
 ///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
@@ -476,7 +473,6 @@ var Plottable;
         })(DOM = Utils.DOM || (Utils.DOM = {}));
     })(Utils = Plottable.Utils || (Plottable.Utils = {}));
 })(Plottable || (Plottable = {}));
-
 ///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
@@ -557,7 +553,6 @@ var Plottable;
         })(Color = Utils.Color || (Utils.Color = {}));
     })(Utils = Plottable.Utils || (Plottable.Utils = {}));
 })(Plottable || (Plottable = {}));
-
 ///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
@@ -625,7 +620,6 @@ var Plottable;
         })(Array = Utils.Array || (Utils.Array = {}));
     })(Utils = Plottable.Utils || (Plottable.Utils = {}));
 })(Plottable || (Plottable = {}));
-
 ///<reference path="../reference.ts" />
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
@@ -662,7 +656,6 @@ var Plottable;
         Utils.CallbackSet = CallbackSet;
     })(Utils = Plottable.Utils || (Plottable.Utils = {}));
 })(Plottable || (Plottable = {}));
-
 ///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
@@ -745,7 +738,6 @@ var Plottable;
         })(Stacking = Utils.Stacking || (Utils.Stacking = {}));
     })(Utils = Plottable.Utils || (Plottable.Utils = {}));
 })(Plottable || (Plottable = {}));
-
 ///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
@@ -815,7 +807,6 @@ var Plottable;
         })(Window = Utils.Window || (Utils.Window = {}));
     })(Utils = Plottable.Utils || (Plottable.Utils = {}));
 })(Plottable || (Plottable = {}));
-
 ///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
@@ -888,7 +879,6 @@ var Plottable;
         Utils.ClientToSVGTranslator = ClientToSVGTranslator;
     })(Utils = Plottable.Utils || (Plottable.Utils = {}));
 })(Plottable || (Plottable = {}));
-
 ///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
@@ -904,13 +894,11 @@ var Plottable;
         Configs.ADD_TITLE_ELEMENTS = true;
     })(Configs = Plottable.Configs || (Plottable.Configs = {}));
 })(Plottable || (Plottable = {}));
-
 ///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
     Plottable.version = "1.14.0";
 })(Plottable || (Plottable = {}));
-
 ///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
@@ -974,7 +962,6 @@ var Plottable;
     })();
     Plottable.Dataset = Dataset;
 })(Plottable || (Plottable = {}));
-
 ///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
@@ -1023,7 +1010,6 @@ var Plottable;
         RenderPolicies.Timeout = Timeout;
     })(RenderPolicies = Plottable.RenderPolicies || (Plottable.RenderPolicies = {}));
 })(Plottable || (Plottable = {}));
-
 ///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
@@ -1139,8 +1125,6 @@ var Plottable;
         RenderController.flush = flush;
     })(RenderController = Plottable.RenderController || (Plottable.RenderController = {}));
 })(Plottable || (Plottable = {}));
-
-
 ///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
@@ -1415,7 +1399,6 @@ var Plottable;
         }
     })(Formatters = Plottable.Formatters || (Plottable.Formatters = {}));
 })(Plottable || (Plottable = {}));
-
 ///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
@@ -1447,7 +1430,6 @@ var Plottable;
         SymbolFactories.triangleDown = triangleDown;
     })(SymbolFactories = Plottable.SymbolFactories || (Plottable.SymbolFactories = {}));
 })(Plottable || (Plottable = {}));
-
 ///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
@@ -1596,13 +1578,7 @@ var Plottable;
     })();
     Plottable.Scale = Scale;
 })(Plottable || (Plottable = {}));
-
 ///<reference path="../reference.ts" />
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
 var Plottable;
 (function (Plottable) {
     var QuantitativeScale = (function (_super) {
@@ -1833,13 +1809,7 @@ var Plottable;
     })(Plottable.Scale);
     Plottable.QuantitativeScale = QuantitativeScale;
 })(Plottable || (Plottable = {}));
-
 ///<reference path="../reference.ts" />
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
 var Plottable;
 (function (Plottable) {
     var Scales;
@@ -1891,13 +1861,7 @@ var Plottable;
         Scales.Linear = Linear;
     })(Scales = Plottable.Scales || (Plottable.Scales = {}));
 })(Plottable || (Plottable = {}));
-
 ///<reference path="../reference.ts" />
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
 var Plottable;
 (function (Plottable) {
     var Scales;
@@ -2082,13 +2046,7 @@ var Plottable;
         Scales.ModifiedLog = ModifiedLog;
     })(Scales = Plottable.Scales || (Plottable.Scales = {}));
 })(Plottable || (Plottable = {}));
-
 ///<reference path="../reference.ts" />
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
 var Plottable;
 (function (Plottable) {
     var Scales;
@@ -2196,13 +2154,7 @@ var Plottable;
         Scales.Category = Category;
     })(Scales = Plottable.Scales || (Plottable.Scales = {}));
 })(Plottable || (Plottable = {}));
-
 ///<reference path="../reference.ts" />
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
 var Plottable;
 (function (Plottable) {
     var Scales;
@@ -2314,13 +2266,7 @@ var Plottable;
         Scales.Color = Color;
     })(Scales = Plottable.Scales || (Plottable.Scales = {}));
 })(Plottable || (Plottable = {}));
-
 ///<reference path="../reference.ts" />
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
 var Plottable;
 (function (Plottable) {
     var Scales;
@@ -2426,13 +2372,7 @@ var Plottable;
         Scales.Time = Time;
     })(Scales = Plottable.Scales || (Plottable.Scales = {}));
 })(Plottable || (Plottable = {}));
-
 ///<reference path="../reference.ts" />
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
 var Plottable;
 (function (Plottable) {
     var Scales;
@@ -2579,7 +2519,6 @@ var Plottable;
         Scales.InterpolatedColor = InterpolatedColor;
     })(Scales = Plottable.Scales || (Plottable.Scales = {}));
 })(Plottable || (Plottable = {}));
-
 ///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
@@ -2627,7 +2566,6 @@ var Plottable;
         })(TickGenerators = Scales.TickGenerators || (Scales.TickGenerators = {}));
     })(Scales = Plottable.Scales || (Plottable.Scales = {}));
 })(Plottable || (Plottable = {}));
-
 ///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
@@ -2762,13 +2700,7 @@ var Plottable;
     })();
     Plottable.Drawer = Drawer;
 })(Plottable || (Plottable = {}));
-
 ///<reference path="../reference.ts" />
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
 var Plottable;
 (function (Plottable) {
     var Drawers;
@@ -2792,13 +2724,7 @@ var Plottable;
         Drawers.Line = Line;
     })(Drawers = Plottable.Drawers || (Plottable.Drawers = {}));
 })(Plottable || (Plottable = {}));
-
 ///<reference path="../reference.ts" />
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
 var Plottable;
 (function (Plottable) {
     var Drawers;
@@ -2822,13 +2748,7 @@ var Plottable;
         Drawers.Area = Area;
     })(Drawers = Plottable.Drawers || (Plottable.Drawers = {}));
 })(Plottable || (Plottable = {}));
-
 ///<reference path="../reference.ts" />
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
 var Plottable;
 (function (Plottable) {
     var Drawers;
@@ -2844,13 +2764,7 @@ var Plottable;
         Drawers.Rectangle = Rectangle;
     })(Drawers = Plottable.Drawers || (Plottable.Drawers = {}));
 })(Plottable || (Plottable = {}));
-
 ///<reference path="../reference.ts" />
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
 var Plottable;
 (function (Plottable) {
     var Drawers;
@@ -2871,13 +2785,7 @@ var Plottable;
         Drawers.Arc = Arc;
     })(Drawers = Plottable.Drawers || (Plottable.Drawers = {}));
 })(Plottable || (Plottable = {}));
-
 ///<reference path="../reference.ts" />
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
 var Plottable;
 (function (Plottable) {
     var Drawers;
@@ -2898,13 +2806,7 @@ var Plottable;
         Drawers.ArcOutline = ArcOutline;
     })(Drawers = Plottable.Drawers || (Plottable.Drawers = {}));
 })(Plottable || (Plottable = {}));
-
 ///<reference path="../reference.ts" />
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
 var Plottable;
 (function (Plottable) {
     var Drawers;
@@ -2921,13 +2823,7 @@ var Plottable;
         Drawers.Symbol = Symbol;
     })(Drawers = Plottable.Drawers || (Plottable.Drawers = {}));
 })(Plottable || (Plottable = {}));
-
 ///<reference path="../reference.ts" />
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
 var Plottable;
 (function (Plottable) {
     var Drawers;
@@ -2943,7 +2839,6 @@ var Plottable;
         Drawers.Segment = Segment;
     })(Drawers = Plottable.Drawers || (Plottable.Drawers = {}));
 })(Plottable || (Plottable = {}));
-
 ///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
@@ -3461,13 +3356,7 @@ var Plottable;
     })();
     Plottable.Component = Component;
 })(Plottable || (Plottable = {}));
-
 ///<reference path="../reference.ts" />
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
 var Plottable;
 (function (Plottable) {
     /*
@@ -3542,13 +3431,7 @@ var Plottable;
     })(Plottable.Component);
     Plottable.ComponentContainer = ComponentContainer;
 })(Plottable || (Plottable = {}));
-
 ///<reference path="../reference.ts" />
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
 var Plottable;
 (function (Plottable) {
     var Components;
@@ -3640,13 +3523,7 @@ var Plottable;
         Components.Group = Group;
     })(Components = Plottable.Components || (Plottable.Components = {}));
 })(Plottable || (Plottable = {}));
-
 ///<reference path="../reference.ts" />
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
 var Plottable;
 (function (Plottable) {
     var Axis = (function (_super) {
@@ -4210,13 +4087,7 @@ var Plottable;
     })(Plottable.Component);
     Plottable.Axis = Axis;
 })(Plottable || (Plottable = {}));
-
 ///<reference path="../reference.ts" />
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
 var Plottable;
 (function (Plottable) {
     var TimeInterval;
@@ -4681,13 +4552,7 @@ var Plottable;
         Axes.Time = Time;
     })(Axes = Plottable.Axes || (Plottable.Axes = {}));
 })(Plottable || (Plottable = {}));
-
 ///<reference path="../reference.ts" />
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
 var Plottable;
 (function (Plottable) {
     var Axes;
@@ -5018,13 +4883,7 @@ var Plottable;
         Axes.Numeric = Numeric;
     })(Axes = Plottable.Axes || (Plottable.Axes = {}));
 })(Plottable || (Plottable = {}));
-
 ///<reference path="../reference.ts" />
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
 var Plottable;
 (function (Plottable) {
     var Axes;
@@ -5229,13 +5088,7 @@ var Plottable;
         Axes.Category = Category;
     })(Axes = Plottable.Axes || (Plottable.Axes = {}));
 })(Plottable || (Plottable = {}));
-
 ///<reference path="../reference.ts" />
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
 var Plottable;
 (function (Plottable) {
     var Components;
@@ -5385,13 +5238,7 @@ var Plottable;
         Components.AxisLabel = AxisLabel;
     })(Components = Plottable.Components || (Plottable.Components = {}));
 })(Plottable || (Plottable = {}));
-
 ///<reference path="../reference.ts" />
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
 var Plottable;
 (function (Plottable) {
     var Components;
@@ -5665,13 +5512,7 @@ var Plottable;
         Components.Legend = Legend;
     })(Components = Plottable.Components || (Plottable.Components = {}));
 })(Plottable || (Plottable = {}));
-
 ///<reference path="../reference.ts" />
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
 var Plottable;
 (function (Plottable) {
     var Components;
@@ -5907,13 +5748,7 @@ var Plottable;
         Components.InterpolatedColorLegend = InterpolatedColorLegend;
     })(Components = Plottable.Components || (Plottable.Components = {}));
 })(Plottable || (Plottable = {}));
-
 ///<reference path="../reference.ts" />
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
 var Plottable;
 (function (Plottable) {
     var Components;
@@ -6011,13 +5846,7 @@ var Plottable;
         Components.Gridlines = Gridlines;
     })(Components = Plottable.Components || (Plottable.Components = {}));
 })(Plottable || (Plottable = {}));
-
 ///<reference path="../reference.ts" />
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
 var Plottable;
 (function (Plottable) {
     var Components;
@@ -6375,13 +6204,7 @@ var Plottable;
         Components.Table = Table;
     })(Components = Plottable.Components || (Plottable.Components = {}));
 })(Plottable || (Plottable = {}));
-
 ///<reference path="../reference.ts" />
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
 var Plottable;
 (function (Plottable) {
     var Components;
@@ -6595,13 +6418,7 @@ var Plottable;
         Components.SelectionBoxLayer = SelectionBoxLayer;
     })(Components = Plottable.Components || (Plottable.Components = {}));
 })(Plottable || (Plottable = {}));
-
 ///<reference path="../reference.ts" />
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
 var Plottable;
 (function (Plottable) {
     var Components;
@@ -6746,13 +6563,7 @@ var Plottable;
         Components.GuideLineLayer = GuideLineLayer;
     })(Components = Plottable.Components || (Plottable.Components = {}));
 })(Plottable || (Plottable = {}));
-
 ///<reference path="../reference.ts" />
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
 var Plottable;
 (function (Plottable) {
     var Plots;
@@ -7211,13 +7022,7 @@ var Plottable;
     })(Plottable.Component);
     Plottable.Plot = Plot;
 })(Plottable || (Plottable = {}));
-
 ///<reference path="../reference.ts" />
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
 var Plottable;
 (function (Plottable) {
     var Plots;
@@ -7539,13 +7344,7 @@ var Plottable;
         Plots.Pie = Pie;
     })(Plots = Plottable.Plots || (Plottable.Plots = {}));
 })(Plottable || (Plottable = {}));
-
 ///<reference path="../reference.ts" />
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
 var Plottable;
 (function (Plottable) {
     var XYPlot = (function (_super) {
@@ -7844,13 +7643,7 @@ var Plottable;
     })(Plottable.Plot);
     Plottable.XYPlot = XYPlot;
 })(Plottable || (Plottable = {}));
-
 ///<reference path="../reference.ts" />
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
 var Plottable;
 (function (Plottable) {
     var Plots;
@@ -8198,13 +7991,7 @@ var Plottable;
         Plots.Rectangle = Rectangle;
     })(Plots = Plottable.Plots || (Plottable.Plots = {}));
 })(Plottable || (Plottable = {}));
-
 ///<reference path="../reference.ts" />
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
 var Plottable;
 (function (Plottable) {
     var Plots;
@@ -8352,13 +8139,7 @@ var Plottable;
         Plots.Scatter = Scatter;
     })(Plots = Plottable.Plots || (Plottable.Plots = {}));
 })(Plottable || (Plottable = {}));
-
 ///<reference path="../reference.ts" />
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
 var Plottable;
 (function (Plottable) {
     var Plots;
@@ -8970,13 +8751,7 @@ var Plottable;
         Plots.Bar = Bar;
     })(Plots = Plottable.Plots || (Plottable.Plots = {}));
 })(Plottable || (Plottable = {}));
-
 ///<reference path="../reference.ts" />
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
 var Plottable;
 (function (Plottable) {
     var Plots;
@@ -9301,13 +9076,7 @@ var Plottable;
         Plots.Line = Line;
     })(Plots = Plottable.Plots || (Plottable.Plots = {}));
 })(Plottable || (Plottable = {}));
-
 ///<reference path="../reference.ts" />
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
 var Plottable;
 (function (Plottable) {
     var Plots;
@@ -9476,13 +9245,7 @@ var Plottable;
         Plots.Area = Area;
     })(Plots = Plottable.Plots || (Plottable.Plots = {}));
 })(Plottable || (Plottable = {}));
-
 ///<reference path="../reference.ts" />
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
 var Plottable;
 (function (Plottable) {
     var Plots;
@@ -9541,13 +9304,7 @@ var Plottable;
         Plots.ClusteredBar = ClusteredBar;
     })(Plots = Plottable.Plots || (Plottable.Plots = {}));
 })(Plottable || (Plottable = {}));
-
 ///<reference path="../reference.ts" />
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
 var Plottable;
 (function (Plottable) {
     var Plots;
@@ -9707,13 +9464,7 @@ var Plottable;
         Plots.StackedArea = StackedArea;
     })(Plots = Plottable.Plots || (Plottable.Plots = {}));
 })(Plottable || (Plottable = {}));
-
 ///<reference path="../reference.ts" />
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
 var Plottable;
 (function (Plottable) {
     var Plots;
@@ -9829,13 +9580,7 @@ var Plottable;
         Plots.StackedBar = StackedBar;
     })(Plots = Plottable.Plots || (Plottable.Plots = {}));
 })(Plottable || (Plottable = {}));
-
 ///<reference path="../reference.ts" />
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
 var Plottable;
 (function (Plottable) {
     var Plots;
@@ -10005,13 +9750,7 @@ var Plottable;
         Plots.Segment = Segment;
     })(Plots = Plottable.Plots || (Plottable.Plots = {}));
 })(Plottable || (Plottable = {}));
-
 ///<reference path="../reference.ts" />
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
 var Plottable;
 (function (Plottable) {
     var Plots;
@@ -10209,13 +9948,7 @@ var Plottable;
         Plots.Waterfall = Waterfall;
     })(Plots = Plottable.Plots || (Plottable.Plots = {}));
 })(Plottable || (Plottable = {}));
-
 ///<reference path="../reference.ts" />
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
 var Plottable;
 (function (Plottable) {
     var Plots;
@@ -10369,9 +10102,6 @@ var Plottable;
         Plots.Wheel = Wheel;
     })(Plots = Plottable.Plots || (Plottable.Plots = {}));
 })(Plottable || (Plottable = {}));
-
-///<reference path="../reference.ts" />
-
 ///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
@@ -10395,7 +10125,6 @@ var Plottable;
         Animators.Null = Null;
     })(Animators = Plottable.Animators || (Plottable.Animators = {}));
 })(Plottable || (Plottable = {}));
-
 ///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
@@ -10510,7 +10239,6 @@ var Plottable;
         Animators.Easing = Easing;
     })(Animators = Plottable.Animators || (Plottable.Animators = {}));
 })(Plottable || (Plottable = {}));
-
 ///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
@@ -10556,13 +10284,7 @@ var Plottable;
     })();
     Plottable.Dispatcher = Dispatcher;
 })(Plottable || (Plottable = {}));
-
 ///<reference path="../reference.ts" />
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
 var Plottable;
 (function (Plottable) {
     var Dispatchers;
@@ -10746,13 +10468,7 @@ var Plottable;
         Dispatchers.Mouse = Mouse;
     })(Dispatchers = Plottable.Dispatchers || (Plottable.Dispatchers = {}));
 })(Plottable || (Plottable = {}));
-
 ///<reference path="../reference.ts" />
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
 var Plottable;
 (function (Plottable) {
     var Dispatchers;
@@ -10913,13 +10629,7 @@ var Plottable;
         Dispatchers.Touch = Touch;
     })(Dispatchers = Plottable.Dispatchers || (Plottable.Dispatchers = {}));
 })(Plottable || (Plottable = {}));
-
 ///<reference path="../reference.ts" />
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
 var Plottable;
 (function (Plottable) {
     var Dispatchers;
@@ -11005,7 +10715,6 @@ var Plottable;
         Dispatchers.Key = Key;
     })(Dispatchers = Plottable.Dispatchers || (Plottable.Dispatchers = {}));
 })(Plottable || (Plottable = {}));
-
 ///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
@@ -11100,13 +10809,7 @@ var Plottable;
     })();
     Plottable.Interaction = Interaction;
 })(Plottable || (Plottable = {}));
-
 ///<reference path="../reference.ts" />
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
 var Plottable;
 (function (Plottable) {
     var Interactions;
@@ -11182,13 +10885,7 @@ var Plottable;
         Interactions.Click = Click;
     })(Interactions = Plottable.Interactions || (Plottable.Interactions = {}));
 })(Plottable || (Plottable = {}));
-
 ///<reference path="../reference.ts" />
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
 var Plottable;
 (function (Plottable) {
     var Interactions;
@@ -11295,13 +10992,7 @@ var Plottable;
         Interactions.DoubleClick = DoubleClick;
     })(Interactions = Plottable.Interactions || (Plottable.Interactions = {}));
 })(Plottable || (Plottable = {}));
-
 ///<reference path="../reference.ts" />
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
 var Plottable;
 (function (Plottable) {
     var Interactions;
@@ -11414,13 +11105,7 @@ var Plottable;
         Interactions.Key = Key;
     })(Interactions = Plottable.Interactions || (Plottable.Interactions = {}));
 })(Plottable || (Plottable = {}));
-
 ///<reference path="../reference.ts" />
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
 var Plottable;
 (function (Plottable) {
     var Interactions;
@@ -11538,13 +11223,7 @@ var Plottable;
         Interactions.Pointer = Pointer;
     })(Interactions = Plottable.Interactions || (Plottable.Interactions = {}));
 })(Plottable || (Plottable = {}));
-
 ///<reference path="../reference.ts" />
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
 var Plottable;
 (function (Plottable) {
     var Interactions;
@@ -11862,13 +11541,7 @@ var Plottable;
         Interactions.PanZoom = PanZoom;
     })(Interactions = Plottable.Interactions || (Plottable.Interactions = {}));
 })(Plottable || (Plottable = {}));
-
 ///<reference path="../reference.ts" />
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
 var Plottable;
 (function (Plottable) {
     var Interactions;
@@ -12020,13 +11693,7 @@ var Plottable;
         Interactions.Drag = Drag;
     })(Interactions = Plottable.Interactions || (Plottable.Interactions = {}));
 })(Plottable || (Plottable = {}));
-
 ///<reference path="../reference.ts" />
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
 var Plottable;
 (function (Plottable) {
     var Components;
@@ -12393,13 +12060,7 @@ var Plottable;
         Components.DragBoxLayer = DragBoxLayer;
     })(Components = Plottable.Components || (Plottable.Components = {}));
 })(Plottable || (Plottable = {}));
-
 ///<reference path="../reference.ts" />
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
 var Plottable;
 (function (Plottable) {
     var Components;
@@ -12454,13 +12115,7 @@ var Plottable;
         Components.XDragBoxLayer = XDragBoxLayer;
     })(Components = Plottable.Components || (Plottable.Components = {}));
 })(Plottable || (Plottable = {}));
-
 ///<reference path="../reference.ts" />
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
 var Plottable;
 (function (Plottable) {
     var Components;
@@ -12515,13 +12170,7 @@ var Plottable;
         Components.YDragBoxLayer = YDragBoxLayer;
     })(Components = Plottable.Components || (Plottable.Components = {}));
 })(Plottable || (Plottable = {}));
-
 ///<reference path="../reference.ts" />
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
 var Plottable;
 (function (Plottable) {
     ;
@@ -12698,6 +12347,90 @@ var Plottable;
         Components.DragLineLayer = DragLineLayer;
     })(Components = Plottable.Components || (Plottable.Components = {}));
 })(Plottable || (Plottable = {}));
+/// <reference path="../typings/d3/d3.d.ts" />
+/// <reference path="../bower_components/svg-typewriter/svgtypewriter.d.ts" />
+/// <reference path="utils/mathUtils.ts" />
+/// <reference path="utils/map.ts" />
+/// <reference path="utils/set.ts" />
+/// <reference path="utils/domUtils.ts" />
+/// <reference path="utils/colorUtils.ts" />
+/// <reference path="utils/arrayUtils.ts" />
+/// <reference path="utils/callbackSet.ts" />
+/// <reference path="utils/stackingUtils.ts" />
+/// <reference path="utils/windowUtils.ts" />
+/// <reference path="utils/clientToSVGTranslator.ts" />
+/// <reference path="core/config.ts" />
+/// <reference path="core/version.ts" />
+/// <reference path="core/dataset.ts" />
+/// <reference path="core/renderPolicy.ts" />
+/// <reference path="core/renderController.ts" />
+/// <reference path="core/interfaces.ts" />
+/// <reference path="core/formatters.ts" />
+/// <reference path="core/symbolFactories.ts" />
+/// <reference path="scales/scale.ts" />
+/// <reference path="scales/quantitativeScale.ts" />
+/// <reference path="scales/linearScale.ts" />
+/// <reference path="scales/modifiedLogScale.ts" />
+/// <reference path="scales/categoryScale.ts" />
+/// <reference path="scales/colorScale.ts" />
+/// <reference path="scales/timeScale.ts" />
+/// <reference path="scales/interpolatedColorScale.ts" />
+/// <reference path="scales/tickGenerators.ts" />
+/// <reference path="drawers/drawer.ts" />
+/// <reference path="drawers/lineDrawer.ts" />
+/// <reference path="drawers/areaDrawer.ts" />
+/// <reference path="drawers/rectangleDrawer.ts" />
+/// <reference path="drawers/arcDrawer.ts" />
+/// <reference path="drawers/arcOutlineDrawer.ts" />
+/// <reference path="drawers/symbolDrawer.ts" />
+/// <reference path="drawers/segmentDrawer.ts" />
+/// <reference path="components/component.ts" />
+/// <reference path="components/componentContainer.ts" />
+/// <reference path="components/group.ts" />
+/// <reference path="axes/axis.ts" />
+/// <reference path="axes/timeAxis.ts" />
+/// <reference path="axes/numericAxis.ts" />
+/// <reference path="axes/categoryAxis.ts" />
+/// <reference path="components/label.ts" />
+/// <reference path="components/legend.ts" />
+/// <reference path="components/interpolatedColorLegend.ts" />
+/// <reference path="components/gridlines.ts" />
+/// <reference path="components/table.ts" />
+/// <reference path="components/selectionBoxLayer.ts" />
+/// <reference path="components/guideLineLayer.ts" />
+/// <reference path="plots/plot.ts" />
+/// <reference path="plots/piePlot.ts" />
+/// <reference path="plots/xyPlot.ts" />
+/// <reference path="plots/rectanglePlot.ts" />
+/// <reference path="plots/scatterPlot.ts" />
+/// <reference path="plots/barPlot.ts" />
+/// <reference path="plots/linePlot.ts" />
+/// <reference path="plots/areaPlot.ts" />
+/// <reference path="plots/clusteredBarPlot.ts" />
+/// <reference path="plots/stackedAreaPlot.ts" />
+/// <reference path="plots/stackedBarPlot.ts" />
+/// <reference path="plots/segmentPlot.ts" />
+/// <reference path="plots/waterfallPlot.ts" />
+/// <reference path="plots/wheelPlot.ts" />
+/// <reference path="animators/animator.ts" />
+/// <reference path="animators/nullAnimator.ts" />
+/// <reference path="animators/easingAnimator.ts" />
+/// <reference path="dispatchers/dispatcher.ts" />
+/// <reference path="dispatchers/mouseDispatcher.ts" />
+/// <reference path="dispatchers/touchDispatcher.ts" />
+/// <reference path="dispatchers/keyDispatcher.ts" />
+/// <reference path="interactions/interaction.ts" />
+/// <reference path="interactions/clickInteraction.ts" />
+/// <reference path="interactions/doubleClickInteraction.ts" />
+/// <reference path="interactions/keyInteraction.ts" />
+/// <reference path="interactions/pointerInteraction.ts" />
+/// <reference path="interactions/panZoomInteraction.ts" />
+/// <reference path="interactions/dragInteraction.ts" />
+/// <reference path="components/dragBoxLayer.ts" />
+/// <reference path="components/xDragBoxLayer.ts" />
+/// <reference path="components/yDragBoxLayer.ts" />
+/// <reference path="components/dragLineLayer.ts" />
+///<reference path="../reference.ts" />
 
 /*!
 SVG Typewriter 0.3.0 (https://github.com/palantir/svg-typewriter)
