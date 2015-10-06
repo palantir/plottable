@@ -476,7 +476,7 @@ export module Plots {
         }
         if (currentSlope === Infinity) {
           return Math.floor(p1x) === Math.floor(p2x);
-        }else {
+        } else {
           let expectedP2y = p1y + (p2x - p1x) * currentSlope;
           return Math.floor(p2y) === Math.floor(expectedP2y);
         }
