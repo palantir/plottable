@@ -48,7 +48,7 @@ export module Components {
       this._colorScale.onUpdate(this._redrawCallback);
       this._formatter = Formatters.identity();
       this.xAlignment("right").yAlignment("top");
-      this.comparator(function(a: string, b: string) {
+      this.comparator((a: string, b: string) => {
         let formattedText = this._colorScale.domain().slice().map((d: string) => this._formatter(d));
         return formattedText.indexOf(a) - formattedText.indexOf(b);
       });

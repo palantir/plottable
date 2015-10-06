@@ -5419,8 +5419,7 @@ var Plottable;
                 this._formatter = Plottable.Formatters.identity();
                 this.xAlignment("right").yAlignment("top");
                 this.comparator(function (a, b) {
-                    var _this = this;
-                    var formattedText = this._colorScale.domain().slice().map(function (d) { return _this._formatter(d); });
+                    var formattedText = _this._colorScale.domain().slice().map(function (d) { return _this._formatter(d); });
                     return formattedText.indexOf(a) - formattedText.indexOf(b);
                 });
                 this._symbolFactoryAccessor = function () { return Plottable.SymbolFactories.circle(); };

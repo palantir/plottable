@@ -295,7 +295,7 @@ describe("Legend", () => {
     let colorDomain = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k"];
     color.domain(colorDomain);
     legend.renderTo(svg);
-    let entryTexts = svg.selectAll(entrySelector)[0].map((node: Element) => d3.select(node).select("text").text());
+    let entryTexts = legend.content().selectAll(entrySelector).data();
     assert.deepEqual(colorDomain, entryTexts, "displayed texts should have the same order as the legend domain");
     svg.remove();
   });
