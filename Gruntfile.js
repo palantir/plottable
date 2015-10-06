@@ -51,32 +51,11 @@ module.exports = function(grunt) {
     }
   };
 
-  var regexLF = (grunt.util.linefeed === "\r\n" ? "(\\u000D\\n)" : "\\n"); //get the correct Lf for the operating system
-  var prefixMatch = "\\n *(function |var |static )?".replace("\\n", regexLF);
-  var varNameMatch = "[^(:;]*(\\([^)]*\\))?"; // catch function args too
-  var nestedBraceMatch = ": \\{[^{}]*\\}";
-  var typeNameMatch = ": [^;]*";
-  var finalMatch = "((" + nestedBraceMatch + ")|(" + typeNameMatch + "))?\\n?;".replace("\\n", regexLF);
-  var jsdocInit = "\\n *\\/\\*\\* *\\n".replace("\\n", regexLF);
-  var jsdocMid = "( *\\*[^\\n]*\\n)+".replace("\\n", regexLF);
-  var jsdocEnd = " *\\*\\/ *";
-  var jsdoc = "(" + jsdocInit + jsdocMid + jsdocEnd + ")?";
-
   var sedConfig = {
-    privateDefinitions: {
-      pattern: jsdoc + prefixMatch + "private " + varNameMatch + finalMatch,
-      replacement: "",
-      path: "build/plottable.d.ts"
-    },
     definitions: {
       pattern: '/// *<reference path=[\'"].*[\'"] */>',
       replacement: "",
       path: "build/plottable.d.ts"
-    },
-    sublime: {
-      pattern: "(.*\\.ts)",
-      replacement: '/// <reference path="../$1" />',
-      path: "build/sublime.d.ts"
     },
     versionNumber: {
       pattern: "@VERSION",
@@ -93,7 +72,7 @@ module.exports = function(grunt) {
   // on each recompile
   var updateTsFiles = function() {
     tsFiles = grunt.file.read("src/reference.ts")
-      .split(grunt.util.linefeed)
+      .split("\n")
       .filter(function(s) {
         return s !== "";
       }).map(function(s) {
@@ -105,7 +84,7 @@ module.exports = function(grunt) {
   var testTsFiles;
   var updateTestTsFiles = function() {
     testTsFiles = grunt.file.read("test/testReference.ts")
-      .split(grunt.util.linefeed)
+      .split("\n")
       .filter(function(s) {
         return s !== "";
       }).map(function(s) {
@@ -272,12 +251,6 @@ module.exports = function(grunt) {
     }
   };
 
-  var shellConfig = {
-    sublime: {
-      command: "(echo 'src/reference.ts'; find typings -name '*.d.ts') > build/sublime.d.ts"
-    }
-  };
-
   var saucelabsMochaConfig = {
     all: {
       options: {
@@ -326,7 +299,6 @@ module.exports = function(grunt) {
     gitcommit: gitcommitConfig,
     compress: compressConfig,
     uglify: uglifyConfig,
-    shell: shellConfig,
     "saucelabs-mocha": saucelabsMochaConfig
   });
 
@@ -357,7 +329,6 @@ module.exports = function(grunt) {
     "concat:svgtypewriter",
     "concat:definitions",
     "sed:definitions",
-    "sed:privateDefinitions",
     "umd:all",
     "concat:header",
     "sed:versionNumber",
@@ -391,9 +362,6 @@ module.exports = function(grunt) {
   } else {
     grunt.registerTask("test-travis", ["dev-compile", "test-local"]);
   }
-
-  // Tooling
-  grunt.registerTask("sublime", ["shell:sublime", "sed:sublime"]);
 
   grunt.registerTask("update-quicktests", function() {
     var qtJSON = [];

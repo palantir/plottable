@@ -147,7 +147,7 @@ select, input:not([type=checkbox]) {
 }
 
 .sidebar-quicktest{
-  padding-left: 10px; 
+  padding-left: 10px;
   list-style-type: none;
   font-size: 13px;
 }
@@ -169,4 +169,14 @@ select, input:not([type=checkbox]) {
 ol{
   padding: 0px;
   margin: 0px;
+}
+
+.plottable .guide-line-layer.red line.guide-line {
+    stroke: #F00;
+    stroke-width: 1px;
+}
+
+.plottable .guide-line-layer.green line.guide-line {
+    stroke: #0F0;
+    stroke-width: 1px;
 }

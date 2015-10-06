@@ -47,7 +47,7 @@ export module Dispatchers {
       this._cancelCallbacks = new Utils.CallbackSet<TouchCallback>();
       this._callbacks = [this._moveCallbacks, this._startCallbacks, this._endCallbacks, this._cancelCallbacks];
 
-      this._eventToCallback["touchstart"] = (e: TouchEvent) => this._measureAndDispatch(e, this._startCallbacks);
+      this._eventToCallback["touchstart"] = (e: TouchEvent) => this._measureAndDispatch(e, this._startCallbacks, "page");
       this._eventToCallback["touchmove"] = (e: TouchEvent) => this._measureAndDispatch(e, this._moveCallbacks, "page");
       this._eventToCallback["touchend"] = (e: TouchEvent) => this._measureAndDispatch(e, this._endCallbacks, "page");
       this._eventToCallback["touchcancel"] = (e: TouchEvent) => this._measureAndDispatch(e, this._cancelCallbacks, "page");
@@ -149,7 +149,7 @@ export module Dispatchers {
       if (scope !== "page" && scope !== "element") {
         throw new Error("Invalid scope '" + scope + "', must be 'element' or 'page'");
       }
-      if (scope === "element" && !this._translator.insideSVG(event)) {
+      if (scope === "element" && !this.eventInsideSVG(event)) {
         return;
       }
       let touches = event.changedTouches;
@@ -167,6 +167,10 @@ export module Dispatchers {
       if (touchIdentifiers.length > 0) {
         callbackSet.callCallbacks(touchIdentifiers, touchPositions, event);
       }
+    }
+
+    public eventInsideSVG(event: TouchEvent) {
+      return this._translator.insideSVG(event);
     }
   }
 }
