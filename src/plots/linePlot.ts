@@ -143,7 +143,7 @@ export module Plots {
     /**
      * Gets the downsampling performance option state
      * 
-     * When downsampling is enabled, lines whose two ends have the same scaled x/y values will not be drawn on top of each other.
+     * When downsampling is enabled, two consecutive lines with the same loop will be merged to one line.
      */
     public downsamplingEnabled(): boolean;
     /**
@@ -151,12 +151,12 @@ export module Plots {
      * 
      * @returns {Plots.Line} The calling Plots.Line
      */
-    public downsamplingEnabled(downsample: boolean): Plots.Line<X>;
-    public downsamplingEnabled(downsample?: boolean): any {
-      if (downsample == null) {
+    public downsamplingEnabled(downsampling: boolean): Plots.Line<X>;
+    public downsamplingEnabled(downsampling?: boolean): any {
+      if (downsampling == null) {
         return this._downsamplingEnabled;
       }
-      this._downsamplingEnabled = downsample;
+      this._downsamplingEnabled = downsampling;
       return this;
     }
 
@@ -403,12 +403,11 @@ export module Plots {
 
         let filteredDataIndices = data.map((d, i) => i);
         if (this._croppedRenderingEnabled) {
-        filteredDataIndices = this._filterCroppedRendering(dataset, filteredDataIndices);
+          filteredDataIndices = this._filterCroppedRendering(dataset, filteredDataIndices);
         }
         if (this._downsamplingEnabled) {
           filteredDataIndices = this._filterDownsampling(dataset, filteredDataIndices);
         }
-
         dataToDraw.set(dataset, [filteredDataIndices.map((d, i) => data[d])]);
       });
 
@@ -451,32 +450,28 @@ export module Plots {
     }
 
     private _filterDownsampling(dataset: Dataset, indices: number[]) {
-      let xAccessor = this.x().accessor;
-      let yAccessor = this.y().accessor;
-      let filteredIndices = this._filterDownsamplingSlope(dataset, indices, this.x().scale, this.y().scale, xAccessor, yAccessor);
-      return filteredIndices;
-    }
-
-    private _filterDownsamplingSlope(dataset: Dataset, indices: number[],
-      xScale: Scale<any, number>, yScale: Scale<any, number>, xAcessor: Accessor<any>, yAcessor: Accessor<any>) {
       let data = dataset.data();
       let filteredIndices: number[] = [];
       let min: number;
       let max: number;
       let currentSlope: number;
+      let scaledXAcessor = Plot._scaledAccessor(this.x());
+      let scaledYAcessor = Plot._scaledAccessor(this.y());
+
       if (indices.length === 0) {
         return filteredIndices;
       }
       filteredIndices.push(indices[0]);
+
+      let plot = this;
       function belongToCurBucket(i: number) {
-        let p1x = xScale.scale(xAcessor(data[indices[i]], indices[i], dataset));
-        let p1y = yScale.scale(yAcessor(data[indices[i]], indices[i], dataset));
-        let p2x = xScale.scale(xAcessor(data[indices[i + 1]], indices[i + 1], dataset));
-        let p2y = yScale.scale(yAcessor(data[indices[i + 1]], indices[i + 1], dataset));
+        let p1x = scaledXAcessor(data[indices[i]], indices[i], dataset);
+        let p1y = scaledYAcessor(data[indices[i]], indices[i], dataset);
+        let p2x = scaledXAcessor(data[indices[i + 1]], indices[i + 1], dataset);
+        let p2y = scaledYAcessor(data[indices[i + 1]], indices[i + 1], dataset);
         if (currentSlope == null) {
           currentSlope = (Math.floor(p1x) === Math.floor(p2x)) ? Infinity : (p2y - p1y) / (p2x - p1x);
-          min = (currentSlope === Infinity) ? yAcessor(data[indices[i]], indices[i], dataset) :
-            xAcessor(data[indices[i]], indices[i], dataset);
+          min = (currentSlope === Infinity) ? p1y : p1x;
           max = min;
           return true;
         }
@@ -493,8 +488,8 @@ export module Plots {
         let pMin = indices[i];
         let pMax = indices[i];
         while (i < indices.length - 1 && belongToCurBucket(i)) {
-          let currPoint = (currentSlope === Infinity ? yAcessor(data[indices[i + 1]], indices[i + 1], dataset) :
-            xAcessor(data[indices[i + 1]], indices[i + 1], dataset));
+          let currPoint = (currentSlope === Infinity ? scaledYAcessor(data[indices[i + 1]], indices[i + 1], dataset) :
+            scaledXAcessor(data[indices[i + 1]], indices[i + 1], dataset));å
           if (currPoint > max) {
             max = currPoint;
             pMax = indices[i + 1];
@@ -512,11 +507,11 @@ export module Plots {
         if (pMax !== pMin && pMax !== pFirst) {
           filteredIndices.push(pMax);
         }
-        if (pLast && pLast !== pFirst && pLast !== pMin && pLast !== pMax) {
+        if (pLast !== pFirst && pLast !== pMin && pLast !== pMax) {
           filteredIndices.push(pLast);
         }
       }
-        return filteredIndices;
+      return filteredIndices;
     }
   }
 }

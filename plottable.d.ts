@@ -3421,7 +3421,7 @@ declare module Plottable {
             /**
              * Gets the downsampling performance option state
              *
-             * When downsampling is enabled, lines whose two ends have the same scaled x/y values will not be drawn on top of each other.
+             * When downsampling is enabled, two consecutive lines with the same loop will be merged to one line.
              */
             downsamplingEnabled(): boolean;
             /**
@@ -3429,7 +3429,7 @@ declare module Plottable {
              *
              * @returns {Plots.Line} The calling Plots.Line
              */
-            downsamplingEnabled(downsample: boolean): Plots.Line<X>;
+            downsamplingEnabled(downsampling: boolean): Plots.Line<X>;
             /**
              * Gets if croppedRendering is enabled
              *

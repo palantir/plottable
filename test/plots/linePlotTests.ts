@@ -859,7 +859,7 @@ describe("Plots", () => {
         svg.remove();
       });
 
-      it("does not render points that should be removed in downsampling", () => {
+      it("does not render points that should be removed in downsampling in horizontal line plots" , () => {
         let data = [
           {x: -10, y: -1}, // last element in previous bucket
           {x: 0, y: 2}, // first element in current bucket
@@ -877,7 +877,7 @@ describe("Plots", () => {
         plot.renderTo(svg);
 
         let path = plot.content().select("path.line").attr("d");
-        let expectedRenderedData = [0, 1, 3, 4, 5, 6].map((d) => data[d]);
+        let expectedRenderedData = [0, 1, 4, 3, 5, 6].map((d) => data[d]);
         checkPathForDataPoints(path, expectedRenderedData);
 
         svg.remove();
@@ -909,11 +909,13 @@ describe("Plots", () => {
 
       it("does not render points that are on the same line except for the first, the last, the largest and the smallest points", () => {
         let data = [
+          {x: 3, y: 1}, // last element in previous bucket
           {x: 2, y: 2}, // first element in the bucket
           {x: 1, y: 1}, // minimum element in the bucket
           {x: 10, y: 10}, // maximum element in the bucket
           {x: 2.5, y: 2.5}, // the point to be removed
           {x: 3, y: 3}, // last element in the bucket
+          {x: 3, y: 1}, // first element in next bucket
         ];
         plot.addDataset(new Plottable.Dataset(data));
 
@@ -923,7 +925,7 @@ describe("Plots", () => {
         plot.renderTo(svg);
 
         let path = plot.content().select("path.line").attr("d");
-        let expectedRenderedData = [0, 1, 2, 4].map((d) => data[d]);
+        let expectedRenderedData = [0, 1, 2, 3, 5, 6].map((d) => data[d]);
         checkPathForDataPoints(path, expectedRenderedData);
 
         svg.remove();
