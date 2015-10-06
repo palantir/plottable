@@ -50,6 +50,7 @@
 ///<reference path="core/renderControllerTests.ts" />
 ///<reference path="core/datasetTests.ts" />
 ///<reference path="core/formattersTests.ts" />
+///<reference path="core/symbolFactoriesTests.ts" />
 
 ///<reference path="scales/scaleTests.ts" />
 ///<reference path="scales/categoryScaleTests.ts" />
