@@ -276,8 +276,7 @@ export module Axes {
                               ((this._tierLabelPositions[i]) === "between" ? 0 : this._maxLabelTickLength()));
       }
 
-      this._computedHeight = d3.sum(this._tierHeights);
-      return this._computedHeight;
+      return d3.sum(this._tierHeights);
     }
 
     private _getIntervalLength(config: TimeAxisTierConfiguration) {

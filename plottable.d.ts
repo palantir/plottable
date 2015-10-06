@@ -1840,8 +1840,6 @@ declare module Plottable {
         protected _scale: Scale<D, number>;
         private _formatter;
         private _orientation;
-        protected _computedWidth: number;
-        protected _computedHeight: number;
         private _endTickLength;
         private _innerTickLength;
         private _tickLabelPadding;
@@ -1933,7 +1931,6 @@ declare module Plottable {
         protected _generateTickMarkAttrHash(isEndTickMark?: boolean): {
             [key: string]: number | ((d: any) => number);
         };
-        redraw(): Component;
         protected _setDefaultAlignment(): void;
         /**
          * Gets the Formatter on the Axis. Tick values are passed through the

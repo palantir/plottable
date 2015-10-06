@@ -3697,32 +3697,24 @@ var Plottable;
         };
         Axis.prototype._computeWidth = function () {
             // to be overridden by subclass logic
-            this._computedWidth = this._maxLabelTickLength();
-            return this._computedWidth;
+            return this._maxLabelTickLength();
         };
         Axis.prototype._computeHeight = function () {
             // to be overridden by subclass logic
-            this._computedHeight = this._maxLabelTickLength();
-            return this._computedHeight;
+            return this._maxLabelTickLength();
         };
         Axis.prototype.requestedSpace = function (offeredWidth, offeredHeight) {
             var requestedWidth = 0;
             var requestedHeight = 0;
             if (this._isHorizontal()) {
-                if (this._computedHeight == null) {
-                    this._computeHeight();
-                }
-                requestedHeight = this._computedHeight + this._margin;
+                requestedHeight = this._computeHeight() + this._margin;
                 if (this.annotationsEnabled()) {
                     var tierHeight = this._annotationMeasurer.measure().height + 2 * Axis._ANNOTATION_LABEL_PADDING;
                     requestedHeight += tierHeight * this.annotationTierCount();
                 }
             }
             else {
-                if (this._computedWidth == null) {
-                    this._computeWidth();
-                }
-                requestedWidth = this._computedWidth + this._margin;
+                requestedWidth = this._computeWidth() + this._margin;
                 if (this.annotationsEnabled()) {
                     var tierHeight = this._annotationMeasurer.measure().height + 2 * Axis._ANNOTATION_LABEL_PADDING;
                     requestedWidth += tierHeight * this.annotationTierCount();
@@ -3954,7 +3946,7 @@ var Plottable;
          */
         Axis.prototype._coreSize = function () {
             var relevantDimension = this._isHorizontal() ? this.height() : this.width();
-            var axisHeightWithoutMargin = this._isHorizontal() ? this._computedHeight : this._computedWidth;
+            var axisHeightWithoutMargin = this._isHorizontal() ? this._computeHeight() : this._computeWidth();
             return Math.min(axisHeightWithoutMargin, relevantDimension);
         };
         Axis.prototype._annotationTierHeight = function () {
@@ -4058,11 +4050,6 @@ var Plottable;
                     break;
             }
             return tickMarkAttrHash;
-        };
-        Axis.prototype.redraw = function () {
-            this._computedWidth = null;
-            this._computedHeight = null;
-            return _super.prototype.redraw.call(this);
         };
         Axis.prototype._setDefaultAlignment = function () {
             switch (this._orientation) {
@@ -4314,8 +4301,7 @@ var Plottable;
                     this._tierHeights.push(textHeight + this.tickLabelPadding() +
                         ((this._tierLabelPositions[i]) === "between" ? 0 : this._maxLabelTickLength()));
                 }
-                this._computedHeight = d3.sum(this._tierHeights);
-                return this._computedHeight;
+                return d3.sum(this._tierHeights);
             };
             Time.prototype._getIntervalLength = function (config) {
                 var startDate = this._scale.domain()[0];
@@ -4717,12 +4703,11 @@ var Plottable;
             Numeric.prototype._computeWidth = function () {
                 var maxTextWidth = this._usesTextWidthApproximation ? this._computeApproximateTextWidth() : this._computeExactTextWidth();
                 if (this._tickLabelPositioning === "center") {
-                    this._computedWidth = this._maxLabelTickLength() + this.tickLabelPadding() + maxTextWidth;
+                    return this._maxLabelTickLength() + this.tickLabelPadding() + maxTextWidth;
                 }
                 else {
-                    this._computedWidth = Math.max(this._maxLabelTickLength(), this.tickLabelPadding() + maxTextWidth);
+                    return Math.max(this._maxLabelTickLength(), this.tickLabelPadding() + maxTextWidth);
                 }
-                return this._computedWidth;
             };
             Numeric.prototype._computeExactTextWidth = function () {
                 var _this = this;
@@ -4746,12 +4731,11 @@ var Plottable;
             Numeric.prototype._computeHeight = function () {
                 var textHeight = this._measurer.measure().height;
                 if (this._tickLabelPositioning === "center") {
-                    this._computedHeight = this._maxLabelTickLength() + this.tickLabelPadding() + textHeight;
+                    return this._maxLabelTickLength() + this.tickLabelPadding() + textHeight;
                 }
                 else {
-                    this._computedHeight = Math.max(this._maxLabelTickLength(), this.tickLabelPadding() + textHeight);
+                    return Math.max(this._maxLabelTickLength(), this.tickLabelPadding() + textHeight);
                 }
-                return this._computedHeight;
             };
             Numeric.prototype._getTickValues = function () {
                 var scale = this._scale;
