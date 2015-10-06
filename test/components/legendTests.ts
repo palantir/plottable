@@ -291,7 +291,7 @@ describe("Legend", () => {
     svg.remove();
   });
 
-  it("do not change the order of legend entries when using default comparator", () => {
+  it("does not change the order of legend entries when using default comparator", () => {
     let colorDomain = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k"];
     color.domain(colorDomain);
     legend.renderTo(svg);
