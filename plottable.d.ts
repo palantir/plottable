@@ -3419,13 +3419,13 @@ declare module Plottable {
             interpolator(interpolator: "cardinal-closed"): Line<X>;
             interpolator(interpolator: "monotone"): Line<X>;
             /**
-             * Gets the downsampling performance option state
+             * Gets if downsampling is enabled
              *
-             * When downsampling is enabled, two consecutive lines with the same loop will be merged to one line.
+             * When downsampling is enabled, two consecutive lines with the same slope will be merged to one line.
              */
             downsamplingEnabled(): boolean;
             /**
-             * Sets if the downsampling performance option is enabled
+             * Sets if downsampling is enabled
              *
              * @returns {Plots.Line} The calling Plots.Line
              */

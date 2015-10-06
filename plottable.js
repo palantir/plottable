@@ -9312,24 +9312,24 @@ var Plottable;
             Line.prototype._filterDownsampling = function (dataset, indices) {
                 var data = dataset.data();
                 var filteredIndices = [];
-                var min;
-                var max;
+                var minScaledValue;
+                var maxScaledValue;
                 var currentSlope;
-                var scaledXAcessor = Plottable.Plot._scaledAccessor(this.x());
-                var scaledYAcessor = Plottable.Plot._scaledAccessor(this.y());
+                var scaledXAccessor = Plottable.Plot._scaledAccessor(this.x());
+                var scaledYAccessor = Plottable.Plot._scaledAccessor(this.y());
                 if (indices.length === 0) {
                     return filteredIndices;
                 }
                 filteredIndices.push(indices[0]);
-                function belongToCurBucket(i) {
-                    var p1x = scaledXAcessor(data[indices[i]], indices[i], dataset);
-                    var p1y = scaledYAcessor(data[indices[i]], indices[i], dataset);
-                    var p2x = scaledXAcessor(data[indices[i + 1]], indices[i + 1], dataset);
-                    var p2y = scaledYAcessor(data[indices[i + 1]], indices[i + 1], dataset);
+                var belongingToCurrentBucket = function (i) {
+                    var p1x = scaledXAccessor(data[indices[i]], indices[i], dataset);
+                    var p1y = scaledYAccessor(data[indices[i]], indices[i], dataset);
+                    var p2x = scaledXAccessor(data[indices[i + 1]], indices[i + 1], dataset);
+                    var p2y = scaledYAccessor(data[indices[i + 1]], indices[i + 1], dataset);
                     if (currentSlope == null) {
                         currentSlope = (Math.floor(p1x) === Math.floor(p2x)) ? Infinity : (p2y - p1y) / (p2x - p1x);
-                        min = (currentSlope === Infinity) ? p1y : p1x;
-                        max = min;
+                        minScaledValue = (currentSlope === Infinity) ? p1y : p1x;
+                        maxScaledValue = minScaledValue;
                         return true;
                     }
                     if (currentSlope === Infinity) {
@@ -9339,34 +9339,34 @@ var Plottable;
                         var expectedP2y = p1y + (p2x - p1x) * currentSlope;
                         return Math.floor(p2y) === Math.floor(expectedP2y);
                     }
-                }
+                };
                 for (var i = 0; i < indices.length - 1;) {
                     currentSlope = null;
-                    var pFirst = indices[i];
-                    var pMin = indices[i];
-                    var pMax = indices[i];
-                    while (i < indices.length - 1 && belongToCurBucket(i)) {
-                        var currPoint = (currentSlope === Infinity ? scaledYAcessor(data[indices[i + 1]], indices[i + 1], dataset) :
-                            scaledXAcessor(data[indices[i + 1]], indices[i + 1], dataset));
-                        if (currPoint > max) {
-                            max = currPoint;
-                            pMax = indices[i + 1];
+                    var indexFirst = indices[i];
+                    var indexMin = indices[i];
+                    var indexMax = indices[i];
+                    while (i < indices.length - 1 && belongingToCurrentBucket(i)) {
+                        var currPoint = currentSlope === Infinity ? scaledYAccessor(data[indices[i + 1]], indices[i + 1], dataset) :
+                            scaledXAccessor(data[indices[i + 1]], indices[i + 1], dataset);
+                        if (currPoint > maxScaledValue) {
+                            maxScaledValue = currPoint;
+                            indexMax = indices[i + 1];
                         }
-                        if (currPoint < min) {
-                            min = currPoint;
-                            pMin = indices[i + 1];
+                        if (currPoint < minScaledValue) {
+                            minScaledValue = currPoint;
+                            indexMax = indices[i + 1];
                         }
                         i++;
                     }
-                    var pLast = indices[i];
-                    if (pMin !== pFirst) {
-                        filteredIndices.push(pMin);
+                    var indexLast = indices[i];
+                    if (indexMin !== indexFirst) {
+                        filteredIndices.push(indexMin);
                     }
-                    if (pMax !== pMin && pMax !== pFirst) {
-                        filteredIndices.push(pMax);
+                    if (indexMax !== indexMin && indexMax !== indexFirst) {
+                        filteredIndices.push(indexMax);
                     }
-                    if (pLast !== pFirst && pLast !== pMin && pLast !== pMax) {
-                        filteredIndices.push(pLast);
+                    if (indexLast !== indexFirst && indexLast !== indexMin && indexLast !== indexMax) {
+                        filteredIndices.push(indexLast);
                     }
                 }
                 return filteredIndices;

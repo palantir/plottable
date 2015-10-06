@@ -878,7 +878,7 @@ describe("Plots", () => {
 
         let path = plot.content().select("path.line").attr("d");
         let expectedRenderedData = [0, 1, 4, 3, 5, 6].map((d) => data[d]);
-        checkPathForDataPoints(path, expectedRenderedData);
+        TestMethods.assertLinePathEqualToDataPoints(path, expectedRenderedData, xScale, yScale);
 
         svg.remove();
       });
@@ -902,7 +902,7 @@ describe("Plots", () => {
 
         let path = plot.content().select("path.line").attr("d");
         let expectedRenderedData = [0, 1, 3, 4, 5, 6].map((d) => data[d]);
-        checkPathForDataPoints(path, expectedRenderedData);
+        TestMethods.assertLinePathEqualToDataPoints(path, expectedRenderedData, xScale, yScale);
 
         svg.remove();
       });
@@ -926,24 +926,10 @@ describe("Plots", () => {
 
         let path = plot.content().select("path.line").attr("d");
         let expectedRenderedData = [0, 1, 2, 3, 5, 6].map((d) => data[d]);
-        checkPathForDataPoints(path, expectedRenderedData);
+        TestMethods.assertLinePathEqualToDataPoints(path, expectedRenderedData, xScale, yScale);
 
         svg.remove();
       });
-
-      function checkPathForDataPoints(path: string, data: {x: number, y: number}[]) {
-        let EPSILON = 0.0001;
-        let lineEdges = TestMethods.normalizePath(path).match(/(\-?\d+\.?\d*)(,|\s)(-?\d+\.?\d*)/g);
-        assert.strictEqual(lineEdges.length, data.length, "correct number of edges drawn");
-        lineEdges.forEach((edge, i) => {
-          let coordinates = edge.split(/,|\s/);
-          assert.strictEqual(coordinates.length, 2, "There is an x coordinate and a y coordinate");
-          assert.closeTo(xScale.invert(+coordinates[0]), data[i].x, EPSILON,
-            `Point ${i} drawn, has correct x coordinate`);
-          assert.closeTo(yScale.invert(+coordinates[1]), data[i].y, EPSILON,
-            `Point ${i} drawn, has correct y coordinate`);
-        });
-      }
     });
   });
 });

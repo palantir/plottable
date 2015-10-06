@@ -141,13 +141,13 @@ export module Plots {
       return this;
     }
     /**
-     * Gets the downsampling performance option state
+     * Gets if downsampling is enabled
      * 
-     * When downsampling is enabled, two consecutive lines with the same loop will be merged to one line.
+     * When downsampling is enabled, two consecutive lines with the same slope will be merged to one line.
      */
     public downsamplingEnabled(): boolean;
     /**
-     * Sets if the downsampling performance option is enabled
+     * Sets if downsampling is enabled
      * 
      * @returns {Plots.Line} The calling Plots.Line
      */
@@ -452,26 +452,26 @@ export module Plots {
     private _filterDownsampling(dataset: Dataset, indices: number[]) {
       let data = dataset.data();
       let filteredIndices: number[] = [];
-      let min: number;
-      let max: number;
+      let minScaledValue: number;
+      let maxScaledValue: number;
       let currentSlope: number;
-      let scaledXAcessor = Plot._scaledAccessor(this.x());
-      let scaledYAcessor = Plot._scaledAccessor(this.y());
+      let scaledXAccessor = Plot._scaledAccessor(this.x());
+      let scaledYAccessor = Plot._scaledAccessor(this.y());
 
       if (indices.length === 0) {
         return filteredIndices;
       }
       filteredIndices.push(indices[0]);
 
-      function belongToCurBucket(i: number) {
-        let p1x = scaledXAcessor(data[indices[i]], indices[i], dataset);
-        let p1y = scaledYAcessor(data[indices[i]], indices[i], dataset);
-        let p2x = scaledXAcessor(data[indices[i + 1]], indices[i + 1], dataset);
-        let p2y = scaledYAcessor(data[indices[i + 1]], indices[i + 1], dataset);
+      let belongingToCurrentBucket = (i: number) => {
+        let p1x = scaledXAccessor(data[indices[i]], indices[i], dataset);
+        let p1y = scaledYAccessor(data[indices[i]], indices[i], dataset);
+        let p2x = scaledXAccessor(data[indices[i + 1]], indices[i + 1], dataset);
+        let p2y = scaledYAccessor(data[indices[i + 1]], indices[i + 1], dataset);
         if (currentSlope == null) {
           currentSlope = (Math.floor(p1x) === Math.floor(p2x)) ? Infinity : (p2y - p1y) / (p2x - p1x);
-          min = (currentSlope === Infinity) ? p1y : p1x;
-          max = min;
+          minScaledValue = (currentSlope === Infinity) ? p1y : p1x;
+          maxScaledValue = minScaledValue;
           return true;
         }
         if (currentSlope === Infinity) {
@@ -480,34 +480,37 @@ export module Plots {
           let expectedP2y = p1y + (p2x - p1x) * currentSlope;
           return Math.floor(p2y) === Math.floor(expectedP2y);
         }
-      }
+      };
+
       for (let i = 0; i < indices.length - 1; ) {
         currentSlope = null;
-        let pFirst = indices[i];
-        let pMin = indices[i];
-        let pMax = indices[i];
-        while (i < indices.length - 1 && belongToCurBucket(i)) {
-          let currPoint = (currentSlope === Infinity ? scaledYAcessor(data[indices[i + 1]], indices[i + 1], dataset) :
-            scaledXAcessor(data[indices[i + 1]], indices[i + 1], dataset));
-          if (currPoint > max) {
-            max = currPoint;
-            pMax = indices[i + 1];
+        let indexFirst = indices[i];
+        let indexMin = indices[i];
+        let indexMax = indices[i];
+
+        while (i < indices.length - 1 && belongingToCurrentBucket(i)) {
+          let currPoint = currentSlope === Infinity ? scaledYAccessor(data[indices[i + 1]], indices[i + 1], dataset) :
+            scaledXAccessor(data[indices[i + 1]], indices[i + 1], dataset);
+          if (currPoint > maxScaledValue) {
+            maxScaledValue = currPoint;
+            indexMax = indices[i + 1];
           }
-          if (currPoint < min) {
-            min = currPoint;
-            pMin = indices[i + 1];
+          if (currPoint < minScaledValue) {
+            minScaledValue = currPoint;
+            indexMax = indices[i + 1];
           }
           i++;
         }
-        let pLast = indices[i];
-        if (pMin !== pFirst) {
-          filteredIndices.push(pMin);
+
+        let indexLast = indices[i];
+        if (indexMin !== indexFirst) {
+          filteredIndices.push(indexMin);
         }
-        if (pMax !== pMin && pMax !== pFirst) {
-          filteredIndices.push(pMax);
+        if (indexMax !== indexMin && indexMax !== indexFirst) {
+          filteredIndices.push(indexMax);
         }
-        if (pLast !== pFirst && pLast !== pMin && pLast !== pMax) {
-          filteredIndices.push(pLast);
+        if (indexLast !== indexFirst && indexLast !== indexMin && indexLast !== indexMax) {
+          filteredIndices.push(indexLast);
         }
       }
       return filteredIndices;
