@@ -497,7 +497,7 @@ export module Plots {
           }
           if (currPoint < minScaledValue) {
             minScaledValue = currPoint;
-            indexMax = indices[i + 1];
+            indexMin = indices[i + 1];
           }
           i++;
         }

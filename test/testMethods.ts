@@ -362,6 +362,6 @@ module TestMethods {
         `Point ${i} drawn, has correct x coordinate`);
       assert.closeTo(yScale.invert(+coordinates[1]), data[i].y, EPSILON,
         `Point ${i} drawn, has correct y coordinate`);
-      });
+    });
   }
 }
