@@ -1,7 +1,7 @@
 ///<reference path="../testReference.ts" />
 
 describe("SymbolFactory", () => {
-  describe("SymbolFactory generates correct path", () => {
+  describe("Generates correct path", () => {
     let svg: d3.Selection<void>;
     let symbolSize = 5;
 
@@ -15,8 +15,8 @@ describe("SymbolFactory", () => {
       let d = circleFactory(symbolSize);
       let expectedD = d3.svg.symbol().type("circle").size(actualSize)(null);
       assert.strictEqual(d, expectedD, "a circle of set size is generated");
-      svg.append("path").attr("d", d);
-      let bbox = Plottable.Utils.DOM.elementBBox(svg.select("path"));
+      let path = svg.append("path").attr("d", d);
+      let bbox = Plottable.Utils.DOM.elementBBox(path);
       assert.strictEqual(bbox.height, symbolSize, "height is as set");
       assert.strictEqual(bbox.width, symbolSize, "width is as set");
       assert.strictEqual(bbox.x, -bbox.width / 2, "x is centered in the middle");
@@ -30,9 +30,9 @@ describe("SymbolFactory", () => {
       let d = squareFactory(symbolSize);
       let expectedD = d3.svg.symbol().type("square").size(actualSize)(null);
       assert.strictEqual(d, expectedD, "a square of set size is generated");
-      svg.append("path").attr("d", d);
-      let bbox = Plottable.Utils.DOM.elementBBox(svg.select("path"));
-      assert.strictEqual(bbox.height, symbolSize, "height is as set");
+      let path = svg.append("path").attr("d", d);
+      let bbox = Plottable.Utils.DOM.elementBBox(path);
+      assert.strictEqual(bbox.height, symbolSize, " is as set");
       assert.strictEqual(bbox.width, symbolSize, "width is as set");
       assert.strictEqual(bbox.x, -bbox.width / 2, "x is centered in the middle");
       assert.strictEqual(bbox.y, -bbox.height / 2, "y is centered in the middle");
@@ -45,9 +45,8 @@ describe("SymbolFactory", () => {
       let d = crossFactory(symbolSize);
       let expectedD = d3.svg.symbol().type("cross").size(actualSize)(null);
       assert.strictEqual(d, expectedD, "a cross of set size is generated");
-      svg.append("path").attr("d", d);
-      svg.append("path").data([{"d": d}]).attr("d", (d) => d.d).enter();
-      let bbox = Plottable.Utils.DOM.elementBBox(svg.select("path"));
+      let path = svg.append("path").attr("d", d);
+      let bbox = Plottable.Utils.DOM.elementBBox(path);
       assert.strictEqual(bbox.height, symbolSize, "height is as set");
       assert.strictEqual(bbox.width, symbolSize, "width is as set");
       assert.strictEqual(bbox.x, -bbox.width / 2, "x is centered in the middle");
@@ -61,8 +60,8 @@ describe("SymbolFactory", () => {
       let d = diamondFactory(symbolSize);
       let expectedD = d3.svg.symbol().type("diamond").size(actualSize)(null);
       assert.strictEqual(d, expectedD, "a diamond of set size is generated");
-      svg.append("path").attr("d", d);
-      let bbox = Plottable.Utils.DOM.elementBBox(svg.select("path"));
+      let path = svg.append("path").attr("d", d);
+      let bbox = Plottable.Utils.DOM.elementBBox(path);
       assert.strictEqual(bbox.height, symbolSize, "height is as set");
       assert.operator(bbox.width, "<", symbolSize, "width is as set");
       assert.strictEqual(bbox.x, -bbox.width / 2, "x is centered in the middle");
@@ -76,8 +75,8 @@ describe("SymbolFactory", () => {
       let d = triangleUpFactory(symbolSize);
       let expectedD = d3.svg.symbol().type("triangle-up").size(actualSize)(null);
       assert.strictEqual(d, expectedD, "a up triangle of set size is generated");
-      svg.append("path").attr("d", d);
-      let bbox = Plottable.Utils.DOM.elementBBox(svg.select("path"));
+      let path = svg.append("path").attr("d", d);
+      let bbox = Plottable.Utils.DOM.elementBBox(path);
       assert.operator(bbox.height, "<", symbolSize, "height is as set");
       assert.strictEqual(bbox.width, symbolSize, "width is as set");
       assert.strictEqual(bbox.x, -bbox.width / 2, "x is centered in the middle");
@@ -91,8 +90,8 @@ describe("SymbolFactory", () => {
       let d = triangleDownFactory(symbolSize);
       let expectedD = d3.svg.symbol().type("triangle-down").size(actualSize)(null);
       assert.strictEqual(d, expectedD, "a down triangle of set size is generated");
-      svg.append("path").attr("d", d);
-      let bbox = Plottable.Utils.DOM.elementBBox(svg.select("path"));
+      let path = svg.append("path").attr("d", d);
+      let bbox = Plottable.Utils.DOM.elementBBox(path);
       assert.operator(bbox.height, "<", symbolSize, "height is as set");
       assert.strictEqual(bbox.width, symbolSize, "width is as set");
       assert.strictEqual(bbox.x, -bbox.width / 2, "x is centered in the middle");
