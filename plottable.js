@@ -9321,7 +9321,6 @@ var Plottable;
                     return filteredIndices;
                 }
                 filteredIndices.push(indices[0]);
-                var plot = this;
                 function belongToCurBucket(i) {
                     var p1x = scaledXAcessor(data[indices[i]], indices[i], dataset);
                     var p1y = scaledYAcessor(data[indices[i]], indices[i], dataset);
@@ -9349,7 +9348,6 @@ var Plottable;
                     while (i < indices.length - 1 && belongToCurBucket(i)) {
                         var currPoint = (currentSlope === Infinity ? scaledYAcessor(data[indices[i + 1]], indices[i + 1], dataset) :
                             scaledXAcessor(data[indices[i + 1]], indices[i + 1], dataset));
-                        console.log(indices[i + 1] + ":" + currPoint);
                         if (currPoint > max) {
                             max = currPoint;
                             pMax = indices[i + 1];

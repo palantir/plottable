@@ -463,7 +463,6 @@ export module Plots {
       }
       filteredIndices.push(indices[0]);
 
-      let plot = this;
       function belongToCurBucket(i: number) {
         let p1x = scaledXAcessor(data[indices[i]], indices[i], dataset);
         let p1y = scaledYAcessor(data[indices[i]], indices[i], dataset);
@@ -489,7 +488,7 @@ export module Plots {
         let pMax = indices[i];
         while (i < indices.length - 1 && belongToCurBucket(i)) {
           let currPoint = (currentSlope === Infinity ? scaledYAcessor(data[indices[i + 1]], indices[i + 1], dataset) :
-            scaledXAcessor(data[indices[i + 1]], indices[i + 1], dataset));å
+            scaledXAcessor(data[indices[i + 1]], indices[i + 1], dataset));
           if (currPoint > max) {
             max = currPoint;
             pMax = indices[i + 1];
