@@ -1213,5 +1213,26 @@ describe("Plots", () => {
       assert.deepEqual(yScale.domain(), [-2.5, 2.5], "domain has been adjusted to visible points");
       svg.remove();
     });
+
+    it("plot auto domain works when there is one bar", () => {
+      let svg = TestMethods.generateSVG();
+
+      let xScale = new Plottable.Scales.Linear();
+      let yScale = new Plottable.Scales.Linear();
+      let xPoint = (xScale.domain()[0] + xScale.domain()[1]) / 2 + 10;
+      let data = [{x: xPoint, y: 10}];
+      let dataset = new Plottable.Dataset(data);
+
+      let barPlot = new Plottable.Plots.Bar();
+      barPlot.datasets([dataset]);
+      barPlot.x(function(d) { return d.x; }, xScale);
+      barPlot.y(function(d) { return d.y; }, yScale);
+
+      barPlot.renderTo(svg);
+      let xScaleDomain = xScale.domain();
+      assert.operator(xPoint, ">=", xScaleDomain[0], "x value greater than new domain min");
+      assert.operator(xPoint, "<=", xScaleDomain[1], "x value less than new domain max");
+      svg.remove();
+    });
   });
 });

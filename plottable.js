@@ -8440,8 +8440,9 @@ var Plottable;
                 return this._isVertical ? Bar.ORIENTATION_VERTICAL : Bar.ORIENTATION_HORIZONTAL;
             };
             Bar.prototype.render = function () {
-                _super.prototype.render.call(this);
                 this._updateBarPixelWidth();
+                this._updateExtents();
+                _super.prototype.render.call(this);
                 return this;
             };
             Bar.prototype._createDrawer = function (dataset) {

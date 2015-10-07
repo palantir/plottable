@@ -99,8 +99,9 @@ export module Plots {
     }
 
     public render() {
-      super.render();
       this._updateBarPixelWidth();
+      this._updateExtents();
+      super.render();
       return this;
     }
 
