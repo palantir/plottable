@@ -938,18 +938,18 @@ describe("Plots", () => {
         ];
         plot.addDataset(new Plottable.Dataset(data));
 
-        let expectedYValue = (p1, p2, slope) => {
+        let expectedYValue = (p1: any, p2: any, slope: number) => {
           return p1.y + (p2.x - p1.x) * slope;
         };
 
         let lineCurrentSlope = (data[2].y - data[1].y) / (data[2].x - data[1].x);
-        assert.notStrictEqual(Math.floor(expectedYValue(data[0], data[0], lineCurrentSlope)), Math.floor(data[0].y),
+        assert.notStrictEqual(Math.floor(expectedYValue(data[1], data[0], lineCurrentSlope)), Math.floor(data[0].y),
           `point(${data[0].x},${data[0].y}) is not on the line with slope ${lineCurrentSlope}`);
         data.slice(1, 6).forEach((d, i) => {
-          assert.strictEqual(Math.floor(expectedYValue(data[0], d, lineCurrentSlope)), Math.floor(d.y),
+          assert.strictEqual(Math.floor(expectedYValue(data[1], d, lineCurrentSlope)), Math.floor(d.y),
             `point(${d.x},${d.y}) is on the line with slope ${lineCurrentSlope}`);
         });
-        assert.notStrictEqual(Math.floor(expectedYValue(data[0], data[6], lineCurrentSlope)), Math.floor(data[6].y),
+        assert.notStrictEqual(Math.floor(expectedYValue(data[1], data[6], lineCurrentSlope)), Math.floor(data[6].y),
           `point(${data[6].x},${data[6].y}) is not on the line with slope ${lineCurrentSlope}`);
 
         plot.downsamplingEnabled(true);
