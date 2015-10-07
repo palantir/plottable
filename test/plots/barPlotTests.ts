@@ -1214,7 +1214,7 @@ describe("Plots", () => {
       svg.remove();
     });
 
-    it("updates the scale extent correctly when there is one bar", () => {
+    it("updates the scale extent correctly when there is one bar (vertical)", () => {
       let svg = TestMethods.generateSVG();
 
       let xScale = new Plottable.Scales.Linear();
@@ -1232,6 +1232,27 @@ describe("Plots", () => {
       let xScaleDomain = xScale.domain();
       assert.operator(xPoint, ">=", xScaleDomain[0], "x value greater than new domain min");
       assert.operator(xPoint, "<=", xScaleDomain[1], "x value less than new domain max");
+      svg.remove();
+    });
+
+    it("updates the scale extent correctly when there is one bar (horizontal)", () => {
+      let svg = TestMethods.generateSVG();
+
+      let xScale = new Plottable.Scales.Linear();
+      let yScale = new Plottable.Scales.Linear();
+      let yPoint = Math.max(xScale.domain()[0], xScale.domain()[1]) + 10;
+      let data = [{x: 10, y: yPoint}];
+      let dataset = new Plottable.Dataset(data);
+
+      let barPlot = new Plottable.Plots.Bar(Plottable.Plots.Bar.ORIENTATION_HORIZONTAL);
+      barPlot.datasets([dataset]);
+      barPlot.x(function(d) { return d.x; }, xScale);
+      barPlot.y(function(d) { return d.y; }, yScale);
+
+      barPlot.renderTo(svg);
+      let yScaleDomain = yScale.domain();
+      assert.operator(yPoint, ">=", yScaleDomain[0], "x value greater than new domain min");
+      assert.operator(yPoint, "<=", yScaleDomain[1], "x value less than new domain max");
       svg.remove();
     });
   });
