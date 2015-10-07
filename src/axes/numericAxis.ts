@@ -31,11 +31,14 @@ export module Axes {
 
     protected _computeWidth() {
       let maxTextWidth = this._usesTextWidthApproximation ? this._computeApproximateTextWidth() : this._computeExactTextWidth();
+
       if (this._tickLabelPositioning === "center") {
-        return this._maxLabelTickLength() + this.tickLabelPadding() + maxTextWidth;
+        this._computedWidth = this._maxLabelTickLength() + this.tickLabelPadding() + maxTextWidth;
       } else {
-        return Math.max(this._maxLabelTickLength(), this.tickLabelPadding() + maxTextWidth);
+        this._computedWidth = Math.max(this._maxLabelTickLength(), this.tickLabelPadding() + maxTextWidth);
       }
+
+      return this._computedWidth;
     }
 
     private _computeExactTextWidth(): number {
@@ -63,10 +66,12 @@ export module Axes {
       let textHeight = this._measurer.measure().height;
 
       if (this._tickLabelPositioning === "center") {
-        return this._maxLabelTickLength() + this.tickLabelPadding() + textHeight;
+        this._computedHeight = this._maxLabelTickLength() + this.tickLabelPadding() + textHeight;
       } else {
-        return Math.max(this._maxLabelTickLength(), this.tickLabelPadding() + textHeight);
+        this._computedHeight = Math.max(this._maxLabelTickLength(), this.tickLabelPadding() + textHeight);
       }
+
+      return this._computedHeight;
     }
 
     protected _getTickValues() {

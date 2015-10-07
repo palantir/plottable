@@ -37,6 +37,10 @@ export class Axis<D> extends Component {
   protected _scale: Scale<D, number>;
   private _formatter: Formatter;
   private _orientation: string;
+  // @deprecated As of release v1.15.0, replaced by _computeWidth()
+  protected _computedWidth: number;
+  // @deprecated As of release v1.15.0, replaced by _computeHeight()
+  protected _computedHeight: number;
   private _endTickLength = 5;
   private _innerTickLength = 5;
   private _tickLabelPadding = 10;
@@ -93,12 +97,14 @@ export class Axis<D> extends Component {
 
   protected _computeWidth() {
     // to be overridden by subclass logic
-    return this._maxLabelTickLength();
+    this._computedWidth = this._maxLabelTickLength();
+    return this._computedWidth;
   }
 
   protected _computeHeight() {
     // to be overridden by subclass logic
-    return this._maxLabelTickLength();
+    this._computedHeight = this._maxLabelTickLength();
+    return this._computedHeight;
   }
 
   public requestedSpace(offeredWidth: number, offeredHeight: number): SpaceRequest {
@@ -524,6 +530,13 @@ export class Axis<D> extends Component {
     }
 
     return tickMarkAttrHash;
+  }
+
+  // @deprecated As of release v1.15.0
+  public redraw() {
+    this._computedWidth = null;
+    this._computedHeight = null;
+    return super.redraw();
   }
 
   protected _setDefaultAlignment() {
