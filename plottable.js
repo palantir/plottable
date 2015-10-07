@@ -9312,26 +9312,17 @@ var Plottable;
             Line.prototype._filterDownsampling = function (dataset, indices) {
                 var data = dataset.data();
                 var filteredIndices = [];
-                var minScaledValue;
-                var maxScaledValue;
-                var currentSlope;
                 var scaledXAccessor = Plottable.Plot._scaledAccessor(this.x());
                 var scaledYAccessor = Plottable.Plot._scaledAccessor(this.y());
                 if (indices.length === 0) {
                     return filteredIndices;
                 }
                 filteredIndices.push(indices[0]);
-                var belongingToCurrentBucket = function (i) {
+                var indexBelongsToCurrentBucket = function (i, currentSlope) {
                     var p1x = scaledXAccessor(data[indices[i]], indices[i], dataset);
                     var p1y = scaledYAccessor(data[indices[i]], indices[i], dataset);
                     var p2x = scaledXAccessor(data[indices[i + 1]], indices[i + 1], dataset);
                     var p2y = scaledYAccessor(data[indices[i + 1]], indices[i + 1], dataset);
-                    if (currentSlope == null) {
-                        currentSlope = (Math.floor(p1x) === Math.floor(p2x)) ? Infinity : (p2y - p1y) / (p2x - p1x);
-                        minScaledValue = (currentSlope === Infinity) ? p1y : p1x;
-                        maxScaledValue = minScaledValue;
-                        return true;
-                    }
                     if (currentSlope === Infinity) {
                         return Math.floor(p1x) === Math.floor(p2x);
                     }
@@ -9341,11 +9332,17 @@ var Plottable;
                     }
                 };
                 for (var i = 0; i < indices.length - 1;) {
-                    currentSlope = null;
                     var indexFirst = indices[i];
+                    var p1x = scaledXAccessor(data[indices[i]], indices[i], dataset);
+                    var p1y = scaledYAccessor(data[indices[i]], indices[i], dataset);
+                    var p2x = scaledXAccessor(data[indices[i + 1]], indices[i + 1], dataset);
+                    var p2y = scaledYAccessor(data[indices[i + 1]], indices[i + 1], dataset);
+                    var currentSlope = (Math.floor(p1x) === Math.floor(p2x)) ? Infinity : (p2y - p1y) / (p2x - p1x);
                     var indexMin = indices[i];
-                    var indexMax = indices[i];
-                    while (i < indices.length - 1 && belongingToCurrentBucket(i)) {
+                    var minScaledValue = (currentSlope === Infinity) ? p1y : p1x;
+                    var indexMax = indexMin;
+                    var maxScaledValue = minScaledValue;
+                    while (i < indices.length - 1 && indexBelongsToCurrentBucket(i, currentSlope)) {
                         var currPoint = currentSlope === Infinity ? scaledYAccessor(data[indices[i + 1]], indices[i + 1], dataset) :
                             scaledXAccessor(data[indices[i + 1]], indices[i + 1], dataset);
                         if (currPoint > maxScaledValue) {

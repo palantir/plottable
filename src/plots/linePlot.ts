@@ -452,9 +452,7 @@ export module Plots {
     private _filterDownsampling(dataset: Dataset, indices: number[]) {
       let data = dataset.data();
       let filteredIndices: number[] = [];
-      let minScaledValue: number;
-      let maxScaledValue: number;
-      let currentSlope: number;
+
       let scaledXAccessor = Plot._scaledAccessor(this.x());
       let scaledYAccessor = Plot._scaledAccessor(this.y());
 
@@ -463,17 +461,11 @@ export module Plots {
       }
       filteredIndices.push(indices[0]);
 
-      let belongingToCurrentBucket = (i: number) => {
+      let indexBelongsToCurrentBucket = (i: number, currentSlope: number) => {
         let p1x = scaledXAccessor(data[indices[i]], indices[i], dataset);
         let p1y = scaledYAccessor(data[indices[i]], indices[i], dataset);
         let p2x = scaledXAccessor(data[indices[i + 1]], indices[i + 1], dataset);
         let p2y = scaledYAccessor(data[indices[i + 1]], indices[i + 1], dataset);
-        if (currentSlope == null) {
-          currentSlope = (Math.floor(p1x) === Math.floor(p2x)) ? Infinity : (p2y - p1y) / (p2x - p1x);
-          minScaledValue = (currentSlope === Infinity) ? p1y : p1x;
-          maxScaledValue = minScaledValue;
-          return true;
-        }
         if (currentSlope === Infinity) {
           return Math.floor(p1x) === Math.floor(p2x);
         } else {
@@ -481,14 +473,20 @@ export module Plots {
           return Math.floor(p2y) === Math.floor(expectedP2y);
         }
       };
-
+      
       for (let i = 0; i < indices.length - 1; ) {
-        currentSlope = null;
-        let indexFirst = indices[i];
+        let indexFirst = indices[i]; 
+        let p1x = scaledXAccessor(data[indices[i]], indices[i], dataset);
+        let p1y = scaledYAccessor(data[indices[i]], indices[i], dataset);
+        let p2x = scaledXAccessor(data[indices[i + 1]], indices[i + 1], dataset);
+        let p2y = scaledYAccessor(data[indices[i + 1]], indices[i + 1], dataset); 
+        let currentSlope = (Math.floor(p1x) === Math.floor(p2x)) ? Infinity : (p2y - p1y) / (p2x - p1x);
         let indexMin = indices[i];
-        let indexMax = indices[i];
+        let minScaledValue = (currentSlope === Infinity) ? p1y : p1x;
+        let indexMax = indexMin;
+        let maxScaledValue = minScaledValue;
 
-        while (i < indices.length - 1 && belongingToCurrentBucket(i)) {
+        while (i < indices.length - 1 && indexBelongsToCurrentBucket(i, currentSlope)) {
           let currPoint = currentSlope === Infinity ? scaledYAccessor(data[indices[i + 1]], indices[i + 1], dataset) :
             scaledXAccessor(data[indices[i + 1]], indices[i + 1], dataset);
           if (currPoint > maxScaledValue) {
@@ -503,6 +501,7 @@ export module Plots {
         }
 
         let indexLast = indices[i];
+
         if (indexMin !== indexFirst) {
           filteredIndices.push(indexMin);
         }
