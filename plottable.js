@@ -9311,12 +9311,12 @@ var Plottable;
             };
             Line.prototype._filterDownsampling = function (dataset, indices) {
                 var data = dataset.data();
-                var filteredIndices = [];
                 var scaledXAccessor = Plottable.Plot._scaledAccessor(this.x());
                 var scaledYAccessor = Plottable.Plot._scaledAccessor(this.y());
                 if (indices.length === 0) {
-                    return filteredIndices;
+                    return [];
                 }
+                var filteredIndices = [];
                 filteredIndices.push(indices[0]);
                 var indexBelongsToCurrentBucket = function (i, currentSlope) {
                     var p1x = scaledXAccessor(data[indices[i]], indices[i], dataset);

@@ -451,14 +451,13 @@ export module Plots {
 
     private _filterDownsampling(dataset: Dataset, indices: number[]) {
       let data = dataset.data();
-      let filteredIndices: number[] = [];
-
       let scaledXAccessor = Plot._scaledAccessor(this.x());
       let scaledYAccessor = Plot._scaledAccessor(this.y());
 
       if (indices.length === 0) {
-        return filteredIndices;
+        return [];
       }
+      let filteredIndices: number[] = [];
       filteredIndices.push(indices[0]);
 
       let indexBelongsToCurrentBucket = (i: number, currentSlope: number) => {
