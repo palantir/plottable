@@ -1214,12 +1214,12 @@ describe("Plots", () => {
       svg.remove();
     });
 
-    it("plot auto domain works when there is one bar", () => {
+    it("updates the scale extent correctly when there is one bar", () => {
       let svg = TestMethods.generateSVG();
 
       let xScale = new Plottable.Scales.Linear();
       let yScale = new Plottable.Scales.Linear();
-      let xPoint = (xScale.domain()[0] + xScale.domain()[1]) / 2 + 10;
+      let xPoint = Math.max(xScale.domain()[0], xScale.domain()[1]) + 10;
       let data = [{x: xPoint, y: 10}];
       let dataset = new Plottable.Dataset(data);
 
