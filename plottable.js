@@ -370,16 +370,16 @@ var Plottable;
              * @returns {boolean} If the ClientRects overlap each other.
              */
             function clientRectsOverlap(clientRectA, clientRectB) {
-                if (clientRectA.right < clientRectB.left) {
+                if (nativeMath.floor(clientRectA.right) <= nativeMath.ceil(clientRectB.left)) {
                     return false;
                 }
-                if (clientRectA.left > clientRectB.right) {
+                if (nativeMath.ceil(clientRectA.left) >= nativeMath.floor(clientRectB.right)) {
                     return false;
                 }
-                if (clientRectA.bottom < clientRectB.top) {
+                if (nativeMath.floor(clientRectA.bottom) <= nativeMath.ceil(clientRectB.top)) {
                     return false;
                 }
-                if (clientRectA.top > clientRectB.bottom) {
+                if (nativeMath.ceil(clientRectA.top) >= nativeMath.floor(clientRectB.bottom)) {
                     return false;
                 }
                 return true;
@@ -4445,9 +4445,18 @@ var Plottable;
                 var tickLabelsEnter = tickLabels.enter().append("g").classed(Plottable.Axis.TICK_LABEL_CLASS, true);
                 tickLabelsEnter.append("text");
                 var xTranslate = (this._tierLabelPositions[index] === "center" || config.step === 1) ? 0 : this.tickLabelPadding();
-                var yTranslate = this.orientation() === "bottom" ?
-                    d3.sum(this._tierHeights.slice(0, index + 1)) - this.tickLabelPadding() :
-                    this.height() - d3.sum(this._tierHeights.slice(0, index)) - this.tickLabelPadding();
+                var yTranslate;
+                if (this.orientation() === "bottom") {
+                    yTranslate = d3.sum(this._tierHeights.slice(0, index + 1)) - this.tickLabelPadding();
+                }
+                else {
+                    if (this._tierLabelPositions[index] === "center") {
+                        yTranslate = this.height() - d3.sum(this._tierHeights.slice(0, index)) - this.tickLabelPadding() - this._maxLabelTickLength();
+                    }
+                    else {
+                        yTranslate = this.height() - d3.sum(this._tierHeights.slice(0, index)) - this.tickLabelPadding();
+                    }
+                }
                 var textSelection = tickLabels.selectAll("text");
                 if (textSelection.size() > 0) {
                     Plottable.Utils.DOM.translate(textSelection, xTranslate, yTranslate);
@@ -5449,7 +5458,10 @@ var Plottable;
                 this._colorScale.onUpdate(this._redrawCallback);
                 this._formatter = Plottable.Formatters.identity();
                 this.xAlignment("right").yAlignment("top");
-                this.comparator(function (a, b) { return 0; });
+                this.comparator(function (a, b) {
+                    var formattedText = _this._colorScale.domain().slice().map(function (d) { return _this._formatter(d); });
+                    return formattedText.indexOf(a) - formattedText.indexOf(b);
+                });
                 this._symbolFactoryAccessor = function () { return Plottable.SymbolFactories.circle(); };
                 this._symbolOpacityAccessor = function () { return 1; };
             }
