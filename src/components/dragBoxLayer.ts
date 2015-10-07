@@ -227,8 +227,8 @@ export module Components {
       return edges;
     }
 
-    public renderImmediately() {
-      super.renderImmediately();
+    protected _renderImmediately() {
+      super._renderImmediately();
       if (this.boxVisible()) {
         let bounds = this.bounds();
         let t = bounds.topLeft.y;

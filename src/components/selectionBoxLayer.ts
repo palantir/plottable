@@ -111,8 +111,8 @@ export module Components {
       };
     }
 
-    public renderImmediately() {
-      super.renderImmediately();
+    protected _renderImmediately() {
+      super._renderImmediately();
       if (this._boxVisible) {
         let bounds = this.bounds();
         let t = bounds.topLeft.y;

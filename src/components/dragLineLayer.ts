@@ -82,8 +82,8 @@ export module Components {
                             }).classed("drag-edge", true);
     }
 
-    public renderImmediately() {
-      super.renderImmediately();
+    protected _renderImmediately() {
+      super._renderImmediately();
       this._detectionEdge.attr({
         x1: this._isVertical() ? this.pixelPosition() : 0,
         y1: this._isVertical() ? 0 : this.pixelPosition(),

@@ -201,8 +201,8 @@ export class Plot extends Component {
     return h;
   }
 
-  public renderImmediately() {
-    super.renderImmediately();
+  protected _renderImmediately() {
+    super._renderImmediately();
     if (this._isAnchored) {
       this._paint();
       this._dataChanged = false;

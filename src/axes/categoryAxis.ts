@@ -202,8 +202,8 @@ export module Axes {
       };
     }
 
-    public renderImmediately() {
-      super.renderImmediately();
+    protected _renderImmediately() {
+      super._renderImmediately();
       let catScale = <Scales.Category> this._scale;
       let tickLabels = this._tickLabelContainer.selectAll("." + Axis.TICK_LABEL_CLASS).data(this._scale.domain(), (d) => d);
 

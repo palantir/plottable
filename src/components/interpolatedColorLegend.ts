@@ -187,8 +187,8 @@ export module Components {
       return this._orientation !== "horizontal";
     }
 
-    public renderImmediately() {
-      super.renderImmediately();
+    protected _renderImmediately() {
+      super._renderImmediately();
 
       let domain = this._scale.domain();
 

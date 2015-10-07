@@ -49,6 +49,7 @@ export class Component {
   private _clipPathID: string;
   private _onAnchorCallbacks = new Utils.CallbackSet<ComponentCallback>();
   private _onDetachCallbacks = new Utils.CallbackSet<ComponentCallback>();
+  private _onRenderCallbacks = new Utils.CallbackSet<ComponentCallback>();
 
   public constructor() {
     this._cssClasses.add("component");
@@ -238,7 +239,13 @@ export class Component {
     if (this._clipPathEnabled) {
       this._updateClipPath();
     }
+    this._renderImmediately();
+    this._onRenderCallbacks.callCallbacks(this);
     return this;
+  }
+
+  protected _renderImmediately() {
+    // DO NOTHING
   }
 
   /**
@@ -593,6 +600,16 @@ export class Component {
    */
   public background(): d3.Selection<void> {
     return this._backgroundContainer;
+  }
+
+  public onRender(callback: ComponentCallback) {
+    this._onRenderCallbacks.add(callback);
+    return this;
+  }
+
+  public offRender(callback: ComponentCallback) {
+    this._onRenderCallbacks.delete(callback);
+    return this;
   }
 }
 }

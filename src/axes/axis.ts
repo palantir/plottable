@@ -183,7 +183,7 @@ export class Axis<D> extends Component {
     return [];
   }
 
-  public renderImmediately() {
+  protected _renderImmediately() {
     let tickMarkValues = this._getTickValues();
     let tickMarks = this._tickMarkContainer.selectAll("." + Axis.TICK_MARK_CLASS).data(tickMarkValues);
     tickMarks.enter().append("line").classed(Axis.TICK_MARK_CLASS, true);

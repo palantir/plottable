@@ -271,8 +271,8 @@ export module Components {
       return entities;
     }
 
-    public renderImmediately() {
-      super.renderImmediately();
+    protected _renderImmediately() {
+      super._renderImmediately();
 
       let layout = this._calculateLayoutInfo(this.width(), this.height());
 
