@@ -473,13 +473,13 @@ export module Plots {
           return Math.floor(p2y) === Math.floor(expectedP2y);
         }
       };
-      
+
       for (let i = 0; i < indices.length - 1; ) {
-        let indexFirst = indices[i]; 
+        let indexFirst = indices[i];
         let p1x = scaledXAccessor(data[indices[i]], indices[i], dataset);
         let p1y = scaledYAccessor(data[indices[i]], indices[i], dataset);
         let p2x = scaledXAccessor(data[indices[i + 1]], indices[i + 1], dataset);
-        let p2y = scaledYAccessor(data[indices[i + 1]], indices[i + 1], dataset); 
+        let p2y = scaledYAccessor(data[indices[i + 1]], indices[i + 1], dataset);
         let currentSlope = (Math.floor(p1x) === Math.floor(p2x)) ? Infinity : (p2y - p1y) / (p2x - p1x);
         let indexMin = indices[i];
         let minScaledValue = (currentSlope === Infinity) ? p1y : p1x;
