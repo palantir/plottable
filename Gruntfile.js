@@ -42,11 +42,6 @@ module.exports = function(grunt) {
   };
 
   var sedConfig = {
-    definitions: {
-      pattern: '/// *<reference path=[\'"].*[\'"] */>',
-      replacement: "",
-      path: "plottable.d.ts"
-    },
     versionNumber: {
       pattern: "@VERSION",
       replacement: "<%= pkg.version %>",
@@ -260,7 +255,6 @@ module.exports = function(grunt) {
 
   grunt.registerTask("generateJS", [
     "concat:svgtypewriter",
-    "sed:definitions",
     "umd:all",
     "concat:header",
     "sed:versionNumber"
