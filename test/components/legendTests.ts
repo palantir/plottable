@@ -291,6 +291,15 @@ describe("Legend", () => {
     svg.remove();
   });
 
+  it("does not change the order of legend entries when using default comparator", () => {
+    let colorDomain = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k"];
+    color.domain(colorDomain);
+    legend.renderTo(svg);
+    let entryTexts = legend.content().selectAll(entrySelector).data();
+    assert.deepEqual(colorDomain, entryTexts, "displayed texts should have the same order as the legend domain");
+    svg.remove();
+  });
+
   describe("entitiesAt()", () => {
     function computeExpectedSymbolPosition(legend: Plottable.Components.Legend, rowIndex: number, entryIndexWithinRow: number) {
       let row = d3.select(legend.content().selectAll(rowSelector)[0][rowIndex]);
