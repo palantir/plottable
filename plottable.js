@@ -9310,15 +9310,14 @@ var Plottable;
                 return filteredDataIndices;
             };
             Line.prototype._filterDownsampling = function (dataset, indices) {
-                var data = dataset.data();
-                var scaledXAccessor = Plottable.Plot._scaledAccessor(this.x());
-                var scaledYAccessor = Plottable.Plot._scaledAccessor(this.y());
                 if (indices.length === 0) {
                     return [];
                 }
-                var filteredIndices = [];
-                filteredIndices.push(indices[0]);
-                var indexBelongsToCurrentBucket = function (i, currentSlope) {
+                var data = dataset.data();
+                var scaledXAccessor = Plottable.Plot._scaledAccessor(this.x());
+                var scaledYAccessor = Plottable.Plot._scaledAccessor(this.y());
+                var filteredIndices = [indices[0]];
+                var indexOnCurrentSlope = function (i, currentSlope) {
                     var p1x = scaledXAccessor(data[indices[i]], indices[i], dataset);
                     var p1y = scaledYAccessor(data[indices[i]], indices[i], dataset);
                     var p2x = scaledXAccessor(data[indices[i + 1]], indices[i + 1], dataset);
@@ -9342,7 +9341,7 @@ var Plottable;
                     var minScaledValue = (currentSlope === Infinity) ? p1y : p1x;
                     var indexMax = indexMin;
                     var maxScaledValue = minScaledValue;
-                    while (i < indices.length - 1 && indexBelongsToCurrentBucket(i, currentSlope)) {
+                    while (i < indices.length - 1 && indexOnCurrentSlope(i, currentSlope)) {
                         i++;
                         var currScaledValue = currentSlope === Infinity ? scaledYAccessor(data[indices[i]], indices[i], dataset) :
                             scaledXAccessor(data[indices[i]], indices[i], dataset);

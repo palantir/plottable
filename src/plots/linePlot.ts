@@ -450,17 +450,15 @@ export module Plots {
     }
 
     private _filterDownsampling(dataset: Dataset, indices: number[]) {
-      let data = dataset.data();
-      let scaledXAccessor = Plot._scaledAccessor(this.x());
-      let scaledYAccessor = Plot._scaledAccessor(this.y());
-
       if (indices.length === 0) {
         return [];
       }
-      let filteredIndices: number[] = [];
-      filteredIndices.push(indices[0]);
+      let data = dataset.data();
+      let scaledXAccessor = Plot._scaledAccessor(this.x());
+      let scaledYAccessor = Plot._scaledAccessor(this.y());
+      let filteredIndices: number[] = [indices[0]];
 
-      let indexBelongsToCurrentBucket = (i: number, currentSlope: number) => {
+      let indexOnCurrentSlope = (i: number, currentSlope: number) => {
         let p1x = scaledXAccessor(data[indices[i]], indices[i], dataset);
         let p1y = scaledYAccessor(data[indices[i]], indices[i], dataset);
         let p2x = scaledXAccessor(data[indices[i + 1]], indices[i + 1], dataset);
@@ -485,7 +483,7 @@ export module Plots {
         let indexMax = indexMin;
         let maxScaledValue = minScaledValue;
 
-        while (i < indices.length - 1 && indexBelongsToCurrentBucket(i, currentSlope)) {
+        while (i < indices.length - 1 && indexOnCurrentSlope(i, currentSlope)) {
           i++;
           let currScaledValue = currentSlope === Infinity ? scaledYAccessor(data[indices[i]], indices[i], dataset) :
             scaledXAccessor(data[indices[i]], indices[i], dataset);
