@@ -5,15 +5,7 @@ module.exports = function(grunt) {
 
   var tsConfig = {
     dev: {
-      src: ["src/**/*.ts"],
-      out: "plottable.js",
-      options: {
-        target: "es5",
-        noImplicitAny: true,
-        sourceMap: false,
-        declaration: true,
-        removeComments: false
-      }
+      tsconfig: true
     },
     test: {
       src: ["test/**/*.ts"],
@@ -142,7 +134,8 @@ module.exports = function(grunt) {
         port: 9999,
         hostname: "*",
         base: "",
-        livereload: true
+        livereload: true,
+        keepalive: true
       }
     }
   };
