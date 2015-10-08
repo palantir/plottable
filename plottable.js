@@ -3709,20 +3709,14 @@ var Plottable;
             var requestedWidth = 0;
             var requestedHeight = 0;
             if (this._isHorizontal()) {
-                if (this._computedHeight == null) {
-                    this._computeHeight();
-                }
-                requestedHeight = this._computedHeight + this._margin;
+                requestedHeight = this._computeHeight() + this._margin;
                 if (this.annotationsEnabled()) {
                     var tierHeight = this._annotationMeasurer.measure().height + 2 * Axis._ANNOTATION_LABEL_PADDING;
                     requestedHeight += tierHeight * this.annotationTierCount();
                 }
             }
             else {
-                if (this._computedWidth == null) {
-                    this._computeWidth();
-                }
-                requestedWidth = this._computedWidth + this._margin;
+                requestedWidth = this._computeWidth() + this._margin;
                 if (this.annotationsEnabled()) {
                     var tierHeight = this._annotationMeasurer.measure().height + 2 * Axis._ANNOTATION_LABEL_PADDING;
                     requestedWidth += tierHeight * this.annotationTierCount();
@@ -3954,7 +3948,7 @@ var Plottable;
          */
         Axis.prototype._coreSize = function () {
             var relevantDimension = this._isHorizontal() ? this.height() : this.width();
-            var axisHeightWithoutMargin = this._isHorizontal() ? this._computedHeight : this._computedWidth;
+            var axisHeightWithoutMargin = this._isHorizontal() ? this._computeHeight() : this._computeWidth();
             return Math.min(axisHeightWithoutMargin, relevantDimension);
         };
         Axis.prototype._annotationTierHeight = function () {
@@ -4058,11 +4052,6 @@ var Plottable;
                     break;
             }
             return tickMarkAttrHash;
-        };
-        Axis.prototype.redraw = function () {
-            this._computedWidth = null;
-            this._computedHeight = null;
-            return _super.prototype.redraw.call(this);
         };
         Axis.prototype._setDefaultAlignment = function () {
             switch (this._orientation) {
