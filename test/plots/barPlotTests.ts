@@ -1240,7 +1240,7 @@ describe("Plots", () => {
 
       let xScale = new Plottable.Scales.Linear();
       let yScale = new Plottable.Scales.Linear();
-      let yPoint = Math.max(xScale.domain()[0], xScale.domain()[1]) + 10;
+      let yPoint = Math.max(yScale.domain()[0], yScale.domain()[1]) + 10;
       let data = [{x: 10, y: yPoint}];
       let dataset = new Plottable.Dataset(data);
 
@@ -1251,8 +1251,8 @@ describe("Plots", () => {
 
       barPlot.renderTo(svg);
       let yScaleDomain = yScale.domain();
-      assert.operator(yPoint, ">=", yScaleDomain[0], "x value greater than new domain min");
-      assert.operator(yPoint, "<=", yScaleDomain[1], "x value less than new domain max");
+      assert.operator(yPoint, ">=", yScaleDomain[0], "y value greater than new domain min");
+      assert.operator(yPoint, "<=", yScaleDomain[1], "y value less than new domain max");
       svg.remove();
     });
   });
