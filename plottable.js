@@ -9343,17 +9343,17 @@ var Plottable;
                     var indexMax = indexMin;
                     var maxScaledValue = minScaledValue;
                     while (i < indices.length - 1 && indexBelongsToCurrentBucket(i, currentSlope)) {
-                        var currPoint = currentSlope === Infinity ? scaledYAccessor(data[indices[i + 1]], indices[i + 1], dataset) :
-                            scaledXAccessor(data[indices[i + 1]], indices[i + 1], dataset);
-                        if (currPoint > maxScaledValue) {
-                            maxScaledValue = currPoint;
-                            indexMax = indices[i + 1];
-                        }
-                        if (currPoint < minScaledValue) {
-                            minScaledValue = currPoint;
-                            indexMin = indices[i + 1];
-                        }
                         i++;
+                        var currScaledValue = currentSlope === Infinity ? scaledYAccessor(data[indices[i]], indices[i], dataset) :
+                            scaledXAccessor(data[indices[i]], indices[i], dataset);
+                        if (currScaledValue > maxScaledValue) {
+                            maxScaledValue = currScaledValue;
+                            indexMax = indices[i];
+                        }
+                        if (currScaledValue < minScaledValue) {
+                            minScaledValue = currScaledValue;
+                            indexMin = indices[i];
+                        }
                     }
                     var indexLast = indices[i];
                     if (indexMin !== indexFirst) {
