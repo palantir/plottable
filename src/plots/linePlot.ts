@@ -456,7 +456,7 @@ export module Plots {
       let data = dataset.data();
       let scaledXAccessor = Plot._scaledAccessor(this.x());
       let scaledYAccessor = Plot._scaledAccessor(this.y());
-      let filteredIndices: number[] = [indices[0]];
+      let filteredIndices = [indices[0]];
 
       let indexOnCurrentSlope = (i: number, currentSlope: number) => {
         let p1x = scaledXAccessor(data[indices[i]], indices[i], dataset);
@@ -471,7 +471,7 @@ export module Plots {
         }
       };
 
-      for (let i = 0; i < indices.length - 1;) {
+      for (let i = 0; i < indices.length - 1; ) {
         let indexFirst = indices[i];
         let p1x = scaledXAccessor(data[indices[i]], indices[i], dataset);
         let p1y = scaledYAccessor(data[indices[i]], indices[i], dataset);
