@@ -9,15 +9,18 @@ export class KeyFunctions {
   public static noConstancy: (d: any, i: number) => any = (d: any, i: number) => {
     return KeyFunctions.counter++;
   };
-  public static byIndex: (d: any, i: number) => any = (d: any, i: number) => {
+  public static useIndex: (d: any, i: number) => any = (d: any, i: number) => {
     return i;
+  };
+  public static useProperty(propertyname: string) {
+    return (d: any, i: number) => { return d[propertyname] };
   };
 }
 
 export class Dataset {
   private _data: any[];
   private _metadata: any;
-  private _key: (datum: any, index: number) => any = KeyFunctions.byIndex;
+  private _key: (datum: any, index: number) => any = KeyFunctions.useIndex;
   private _callbacks: Utils.CallbackSet<DatasetCallback>;
 
   /**
