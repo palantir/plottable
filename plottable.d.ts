@@ -1933,7 +1933,6 @@ declare module Plottable {
         protected _generateTickMarkAttrHash(isEndTickMark?: boolean): {
             [key: string]: number | ((d: any) => number);
         };
-        redraw(): Component;
         protected _setDefaultAlignment(): void;
         /**
          * Gets the Formatter on the Axis. Tick values are passed through the

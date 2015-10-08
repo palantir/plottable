@@ -4053,12 +4053,6 @@ var Plottable;
             }
             return tickMarkAttrHash;
         };
-        // @deprecated As of release v1.15.0
-        Axis.prototype.redraw = function () {
-            this._computedWidth = null;
-            this._computedHeight = null;
-            return _super.prototype.redraw.call(this);
-        };
         Axis.prototype._setDefaultAlignment = function () {
             switch (this._orientation) {
                 case "bottom":

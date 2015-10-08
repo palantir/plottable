@@ -37,9 +37,9 @@ export class Axis<D> extends Component {
   protected _scale: Scale<D, number>;
   private _formatter: Formatter;
   private _orientation: string;
-  // @deprecated As of release v1.15.0, replaced by _computeWidth()
+  // @deprecated As of release v1.15.0, removed as premature optimization, use _computeWidth() directly instead
   protected _computedWidth: number;
-  // @deprecated As of release v1.15.0, replaced by _computeHeight()
+  // @deprecated As of release v1.15.0, removed as premature optimization, use _computeHeight() directly instead
   protected _computedHeight: number;
   private _endTickLength = 5;
   private _innerTickLength = 5;
@@ -530,13 +530,6 @@ export class Axis<D> extends Component {
     }
 
     return tickMarkAttrHash;
-  }
-
-  // @deprecated As of release v1.15.0
-  public redraw() {
-    this._computedWidth = null;
-    this._computedHeight = null;
-    return super.redraw();
   }
 
   protected _setDefaultAlignment() {
