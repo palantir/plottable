@@ -471,7 +471,7 @@ export module Plots {
         }
       };
 
-      for (let i = 0; i < indices.length - 1; ) {
+      for (let i = 0; i < indices.length - 1;) {
         let indexFirst = indices[i];
         let p1x = scaledXAccessor(data[indices[i]], indices[i], dataset);
         let p1y = scaledYAccessor(data[indices[i]], indices[i], dataset);
