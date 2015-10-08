@@ -350,4 +350,19 @@ module TestMethods {
     assert.include(receivedWarning, warningMessage, assertMessage);
   }
 
+  export function assertLinePathEqualToDataPoints(path: string, data: {x: number, y: number}[],
+    xScale: Plottable.QuantitativeScale<any>, yScale: Plottable.QuantitativeScale<any>) {
+    let EPSILON = 0.0001;
+    let lineEdges = TestMethods.normalizePath(path).match(/(\-?\d+\.?\d*)(,|\s)(-?\d+\.?\d*)/g);
+    assert.strictEqual(lineEdges.length, data.length, "correct number of edges drawn");
+    lineEdges.forEach((edge, i) => {
+      let coordinates = edge.split(/,|\s/);
+      assert.strictEqual(coordinates.length, 2, "There is an x coordinate and a y coordinate");
+      assert.closeTo(xScale.invert(+coordinates[0]), data[i].x, EPSILON,
+        `Point ${i} drawn, has correct x coordinate`);
+      assert.closeTo(yScale.invert(+coordinates[1]), data[i].y, EPSILON,
+        `Point ${i} drawn, has correct y coordinate`);
+    });
+  }
+
 }
