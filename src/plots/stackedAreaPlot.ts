@@ -66,12 +66,12 @@ export module Plots {
 
       return this;
     }
-    
+
     public downsamplingEnabled(downsampling?: boolean): any {
       if (downsampling == null) {
         return super.downsamplingEnabled();
       }
-      if(downsampling === true) {
+      if (downsampling === true) {
         Utils.Window.warn("Warning: Stacked Area Plot does not support downsampling");
       }
       super.downsamplingEnabled(false);
