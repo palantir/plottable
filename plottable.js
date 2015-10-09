@@ -8995,6 +8995,7 @@ var Plottable;
                 this._interpolator = "linear";
                 this._autorangeSmooth = false;
                 this._croppedRenderingEnabled = true;
+                this._downsamplingEnabled = false;
                 this.addClass("line-plot");
                 var animator = new Plottable.Animators.Easing();
                 animator.stepDuration(Plottable.Plot._ANIMATION_MAX_DURATION);
@@ -9059,6 +9060,13 @@ var Plottable;
                 }
                 this._interpolator = interpolator;
                 this.render();
+                return this;
+            };
+            Line.prototype.downsamplingEnabled = function (downsampling) {
+                if (downsampling == null) {
+                    return this._downsamplingEnabled;
+                }
+                this._downsamplingEnabled = downsampling;
                 return this;
             };
             Line.prototype.croppedRenderingEnabled = function (croppedRendering) {
@@ -9258,12 +9266,17 @@ var Plottable;
                 var dataToDraw = new Plottable.Utils.Map();
                 this.datasets().forEach(function (dataset) {
                     var data = dataset.data();
-                    if (!_this._croppedRenderingEnabled) {
+                    if (!_this._croppedRenderingEnabled && !_this._downsamplingEnabled) {
                         dataToDraw.set(dataset, [data]);
                         return;
                     }
                     var filteredDataIndices = data.map(function (d, i) { return i; });
-                    filteredDataIndices = _this._filterCroppedRendering(dataset, filteredDataIndices);
+                    if (_this._croppedRenderingEnabled) {
+                        filteredDataIndices = _this._filterCroppedRendering(dataset, filteredDataIndices);
+                    }
+                    if (_this._downsamplingEnabled) {
+                        filteredDataIndices = _this._filterDownsampling(dataset, filteredDataIndices);
+                    }
                     dataToDraw.set(dataset, [filteredDataIndices.map(function (d, i) { return data[d]; })]);
                 });
                 return dataToDraw;
@@ -9297,6 +9310,66 @@ var Plottable;
                     }
                 }
                 return filteredDataIndices;
+            };
+            Line.prototype._filterDownsampling = function (dataset, indices) {
+                if (indices.length === 0) {
+                    return [];
+                }
+                var data = dataset.data();
+                var scaledXAccessor = Plottable.Plot._scaledAccessor(this.x());
+                var scaledYAccessor = Plottable.Plot._scaledAccessor(this.y());
+                var filteredIndices = [indices[0]];
+                var indexOnCurrentSlope = function (i, currentSlope) {
+                    var p1x = scaledXAccessor(data[indices[i]], indices[i], dataset);
+                    var p1y = scaledYAccessor(data[indices[i]], indices[i], dataset);
+                    var p2x = scaledXAccessor(data[indices[i + 1]], indices[i + 1], dataset);
+                    var p2y = scaledYAccessor(data[indices[i + 1]], indices[i + 1], dataset);
+                    if (currentSlope === Infinity) {
+                        return Math.floor(p1x) === Math.floor(p2x);
+                    }
+                    else {
+                        var expectedP2y = p1y + (p2x - p1x) * currentSlope;
+                        return Math.floor(p2y) === Math.floor(expectedP2y);
+                    }
+                };
+                for (var i = 0; i < indices.length - 1;) {
+                    var indexFirst = indices[i];
+                    var p1x = scaledXAccessor(data[indices[i]], indices[i], dataset);
+                    var p1y = scaledYAccessor(data[indices[i]], indices[i], dataset);
+                    var p2x = scaledXAccessor(data[indices[i + 1]], indices[i + 1], dataset);
+                    var p2y = scaledYAccessor(data[indices[i + 1]], indices[i + 1], dataset);
+                    var currentSlope = (Math.floor(p1x) === Math.floor(p2x)) ? Infinity : (p2y - p1y) / (p2x - p1x);
+                    var indexMin = indices[i];
+                    var minScaledValue = (currentSlope === Infinity) ? p1y : p1x;
+                    var indexMax = indexMin;
+                    var maxScaledValue = minScaledValue;
+                    var firstIndexOnCurrentSlope = true;
+                    while (i < indices.length - 1 && (firstIndexOnCurrentSlope || indexOnCurrentSlope(i, currentSlope))) {
+                        i++;
+                        firstIndexOnCurrentSlope = false;
+                        var currScaledValue = currentSlope === Infinity ? scaledYAccessor(data[indices[i]], indices[i], dataset) :
+                            scaledXAccessor(data[indices[i]], indices[i], dataset);
+                        if (currScaledValue > maxScaledValue) {
+                            maxScaledValue = currScaledValue;
+                            indexMax = indices[i];
+                        }
+                        if (currScaledValue < minScaledValue) {
+                            minScaledValue = currScaledValue;
+                            indexMin = indices[i];
+                        }
+                    }
+                    var indexLast = indices[i];
+                    if (indexMin !== indexFirst) {
+                        filteredIndices.push(indexMin);
+                    }
+                    if (indexMax !== indexMin && indexMax !== indexFirst) {
+                        filteredIndices.push(indexMax);
+                    }
+                    if (indexLast !== indexFirst && indexLast !== indexMin && indexLast !== indexMax) {
+                        filteredIndices.push(indexLast);
+                    }
+                }
+                return filteredIndices;
             };
             return Line;
         })(Plottable.XYPlot);
@@ -9600,6 +9673,13 @@ var Plottable;
                     _super.prototype.y.call(this, y, yScale);
                 }
                 this._updateStackExtentsAndOffsets();
+                return this;
+            };
+            StackedArea.prototype.downsamplingEnabled = function (downsampling) {
+                if (downsampling == null) {
+                    return _super.prototype.downsamplingEnabled.call(this);
+                }
+                Plottable.Utils.Window.warn("Warning: Stacked Area Plot does not support downsampling");
                 return this;
             };
             StackedArea.prototype._additionalPaint = function () {

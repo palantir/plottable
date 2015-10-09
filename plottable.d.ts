@@ -3792,6 +3792,18 @@ declare module Plottable {
             interpolator(interpolator: "cardinal-closed"): Line<X>;
             interpolator(interpolator: "monotone"): Line<X>;
             /**
+             * Gets if downsampling is enabled
+             *
+             * When downsampling is enabled, two consecutive lines with the same slope will be merged to one line.
+             */
+            downsamplingEnabled(): boolean;
+            /**
+             * Sets if downsampling is enabled
+             *
+             * @returns {Plots.Line} The calling Plots.Line
+             */
+            downsamplingEnabled(downsampling: boolean): Plots.Line<X>;
+            /**
              * Gets if croppedRendering is enabled
              *
              * When croppedRendering is enabled, lines that will not be visible in the viewport will not be drawn.
@@ -3918,6 +3930,19 @@ declare module Plottable {
             y(): Plots.AccessorScaleBinding<number, number>;
             y(y: number | Accessor<number>): StackedArea<X>;
             y(y: number | Accessor<number>, yScale: QuantitativeScale<number>): StackedArea<X>;
+            /**
+             * Gets if downsampling is enabled
+             *
+             * When downsampling is enabled, two consecutive lines with the same slope will be merged to one line.
+             */
+            downsamplingEnabled(): boolean;
+            /**
+             * Sets if downsampling is enabled
+             *
+             * For now, downsampling is always disabled in stacked area plot
+             * @returns {Plots.StackedArea} The calling Plots.StackedArea
+             */
+            downsamplingEnabled(downsampling: boolean): Plots.Line<X>;
             protected _additionalPaint(): void;
             protected _updateYScale(): void;
             protected _onDatasetUpdate(): StackedArea<X>;
