@@ -9341,8 +9341,10 @@ var Plottable;
                     var minScaledValue = (currentSlope === Infinity) ? p1y : p1x;
                     var indexMax = indexMin;
                     var maxScaledValue = minScaledValue;
-                    while (i < indices.length - 1 && indexOnCurrentSlope(i, currentSlope)) {
+                    var FirstIndexOnCurrentSlope = true;
+                    while (i < indices.length - 1 && (FirstIndexOnCurrentSlope || indexOnCurrentSlope(i, currentSlope))) {
                         i++;
+                        FirstIndexOnCurrentSlope = false;
                         var currScaledValue = currentSlope === Infinity ? scaledYAccessor(data[indices[i]], indices[i], dataset) :
                             scaledXAccessor(data[indices[i]], indices[i], dataset);
                         if (currScaledValue > maxScaledValue) {

@@ -482,9 +482,11 @@ export module Plots {
         let minScaledValue = (currentSlope === Infinity) ? p1y : p1x;
         let indexMax = indexMin;
         let maxScaledValue = minScaledValue;
+        let FirstIndexOnCurrentSlope = true;
 
-        while (i < indices.length - 1 && indexOnCurrentSlope(i, currentSlope)) {
+        while (i < indices.length - 1 && (FirstIndexOnCurrentSlope || indexOnCurrentSlope(i, currentSlope))) {
           i++;
+          FirstIndexOnCurrentSlope = false;
           let currScaledValue = currentSlope === Infinity ? scaledYAccessor(data[indices[i]], indices[i], dataset) :
             scaledXAccessor(data[indices[i]], indices[i], dataset);
           if (currScaledValue > maxScaledValue) {
