@@ -67,6 +67,12 @@ describe("Plots", () => {
       svg.remove();
     });
 
+    it("disables downsampling", () => {
+      assert.strictEqual(renderer.downsamplingEnabled, false, "downsampling is disabled by default");
+      renderer.downsamplingEnabled(true);
+      assert.strictEqual(renderer.downsamplingEnabled, false, "downsampling will not be enabled by user");
+    });
+
   });
 
   describe("Stacked Area Plot no data", () => {

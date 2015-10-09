@@ -9677,10 +9677,7 @@ var Plottable;
                 if (downsampling == null) {
                     return _super.prototype.downsamplingEnabled.call(this);
                 }
-                if (downsampling === true) {
-                    Plottable.Utils.Window.warn("Warning: Stacked Area Plot does not support downsampling");
-                }
-                _super.prototype.downsamplingEnabled.call(this, false);
+                Plottable.Utils.Window.warn("Warning: Stacked Area Plot does not support downsampling");
                 return this;
             };
             StackedArea.prototype._additionalPaint = function () {

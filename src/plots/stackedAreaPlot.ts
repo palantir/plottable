@@ -67,14 +67,24 @@ export module Plots {
       return this;
     }
 
+    /**
+     * Gets if downsampling is enabled
+     * 
+     * When downsampling is enabled, two consecutive lines with the same slope will be merged to one line.
+     */
+    public downsamplingEnabled(): boolean;
+    /**
+     * Sets if downsampling is enabled
+     * 
+     * For now, downsampling is always disabled in stacked area plot
+     * @returns {Plots.StackedArea} The calling Plots.StackedArea
+     */
+    public downsamplingEnabled(downsampling: boolean): Plots.Line<X>;
     public downsamplingEnabled(downsampling?: boolean): any {
-      if (downsampling == null) {
-        return super.downsamplingEnabled();
-      }
-      if (downsampling === true) {
-        Utils.Window.warn("Warning: Stacked Area Plot does not support downsampling");
-      }
-      super.downsamplingEnabled(false);
+       if (downsampling == null) {
+         return super.downsamplingEnabled();
+       }
+      Utils.Window.warn("Warning: Stacked Area Plot does not support downsampling");
       return this;
     }
 
