@@ -9341,10 +9341,10 @@ var Plottable;
                     var minScaledValue = (currentSlope === Infinity) ? p1y : p1x;
                     var indexMax = indexMin;
                     var maxScaledValue = minScaledValue;
-                    var FirstIndexOnCurrentSlope = true;
-                    while (i < indices.length - 1 && (FirstIndexOnCurrentSlope || indexOnCurrentSlope(i, currentSlope))) {
+                    var firstIndexOnCurrentSlope = true;
+                    while (i < indices.length - 1 && (firstIndexOnCurrentSlope || indexOnCurrentSlope(i, currentSlope))) {
                         i++;
-                        FirstIndexOnCurrentSlope = false;
+                        firstIndexOnCurrentSlope = false;
                         var currScaledValue = currentSlope === Infinity ? scaledYAccessor(data[indices[i]], indices[i], dataset) :
                             scaledXAccessor(data[indices[i]], indices[i], dataset);
                         if (currScaledValue > maxScaledValue) {
@@ -9671,6 +9671,16 @@ var Plottable;
                     _super.prototype.y.call(this, y, yScale);
                 }
                 this._updateStackExtentsAndOffsets();
+                return this;
+            };
+            StackedArea.prototype.downsamplingEnabled = function (downsampling) {
+                if (downsampling == null) {
+                    return _super.prototype.downsamplingEnabled.call(this);
+                }
+                if (downsampling === true) {
+                    Plottable.Utils.Window.warn("Warning: Stacked Area Plot does not support downsampling");
+                }
+                _super.prototype.downsamplingEnabled.call(this, false);
                 return this;
             };
             StackedArea.prototype._additionalPaint = function () {
