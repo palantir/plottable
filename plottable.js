@@ -3,6 +3,7 @@ Plottable 1.14.0 (https://github.com/palantir/plottable)
 Copyright 2014-2015 Palantir Technologies
 Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
 */
+
 (function(root, factory) {
     if(typeof exports === 'object') {
         module.exports = factory(require, exports, module);

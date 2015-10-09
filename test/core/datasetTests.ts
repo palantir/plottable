@@ -56,6 +56,7 @@ describe("Dataset", () => {
     ds.data(newData2);
     assert.isFalse(callbackCalled, "callback was called when the data was changed");
   });
+
   describe("keyFunction", () => {
     it("Updates listeners when the keyFunction is changed", () => {
       let ds = new Plottable.Dataset();

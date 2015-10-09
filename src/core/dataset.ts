@@ -112,7 +112,7 @@ export class Dataset {
    * to generate a unique identifier for each datum. When data is updated, d3 uses this identifier to
    * determine which data points have entered or exited the visualisation.
    *
-   * @param { (d: any, i: number) => any} key
+   * @param { (d: any, i: number) => any} keyFunction
    * @returns {Dataset} The calling Dataset.
    */
   public keyFunction(keyFunction: (datum: any, index: number) => any): Dataset;
