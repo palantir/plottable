@@ -68,9 +68,9 @@ describe("Plots", () => {
     });
 
     it("disables downsampling", () => {
-      assert.strictEqual(renderer.downsamplingEnabled, false, "downsampling is disabled by default");
+      assert.strictEqual(renderer.downsamplingEnabled(), false, "downsampling is disabled by default");
       renderer.downsamplingEnabled(true);
-      assert.strictEqual(renderer.downsamplingEnabled, false, "downsampling will not be enabled by user");
+      assert.strictEqual(renderer.downsamplingEnabled(), false, "downsampling will not be enabled by user");
     });
 
   });
