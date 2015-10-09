@@ -3739,6 +3739,7 @@ declare module Plottable {
             private _interpolator;
             private _autorangeSmooth;
             private _croppedRenderingEnabled;
+            private _downsamplingEnabled;
             /**
              * A Line Plot draws line segments starting from the first data point to the next.
              *
@@ -3834,6 +3835,7 @@ declare module Plottable {
             protected _constructLineProjector(xProjector: Projector, yProjector: Projector): (datum: any, index: number, dataset: Dataset) => string;
             protected _getDataToDraw(): Utils.Map<Dataset, any[]>;
             private _filterCroppedRendering(dataset, indices);
+            private _filterDownsampling(dataset, indices);
         }
     }
 }
