@@ -398,9 +398,9 @@ declare module Plottable {
 declare module Plottable {
     type DatasetCallback = (dataset: Dataset) => void;
     class KeyFunctions {
-        protected static counter: number;
-        static noConstancy: (d: any, i: number) => any;
-        static useIndex: (d: any, i: number) => any;
+        private static counter;
+        static noConstancy: (d: any, i: number) => number;
+        static useIndex: (d: any, i: number) => number;
         static useProperty(propertyname: string): (d: any, i: number) => any;
     }
     class Dataset {
@@ -459,7 +459,10 @@ declare module Plottable {
         metadata(metadata: any): Dataset;
         keyFunction(): (datum: any, index: number) => any;
         /**
-         * Sets the key.
+         * Sets the keyFunction.
+         * in d3, when binding data using selection.data(), a keyFunction may be supplied
+         * to generate a unique identifier for each datum. When data is updated, d3 uses this identifier to
+         * determine which data points have entered or exited the visualisation.
          *
          * @param { (d: any, i: number) => any} key
          * @returns {Dataset} The calling Dataset.
