@@ -3,7 +3,7 @@ Plottable 1.14.0 (https://github.com/palantir/plottable)
 Copyright 2014-2015 Palantir Technologies
 Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
 */
-
+//# sourceURL=plottable.js
 (function(root, factory) {
     if(typeof exports === 'object') {
         module.exports = factory(require, exports, module);
@@ -917,11 +917,15 @@ var Plottable;
     var KeyFunctions = (function () {
         function KeyFunctions() {
         }
+        KeyFunctions.useProperty = function (propertyname) {
+            return function (d, i) { return d[propertyname]; };
+        };
+        ;
         KeyFunctions.counter = 0;
         KeyFunctions.noConstancy = function (d, i) {
             return KeyFunctions.counter++;
         };
-        KeyFunctions.byIndex = function (d, i) {
+        KeyFunctions.useIndex = function (d, i) {
             return i;
         };
         return KeyFunctions;
@@ -939,7 +943,7 @@ var Plottable;
         function Dataset(data, metadata) {
             if (data === void 0) { data = []; }
             if (metadata === void 0) { metadata = {}; }
-            this._key = KeyFunctions.byIndex;
+            this._keyFunction = KeyFunctions.useIndex;
             this._data = data;
             this._metadata = metadata;
             this._callbacks = new Plottable.Utils.CallbackSet();
@@ -984,12 +988,12 @@ var Plottable;
                 return this;
             }
         };
-        Dataset.prototype.key = function (key) {
-            if (key == null) {
-                return this._key;
+        Dataset.prototype.keyFunction = function (keyFunction) {
+            if (keyFunction == null) {
+                return this._keyFunction;
             }
             else {
-                this._key = key;
+                this._keyFunction = keyFunction;
                 this._callbacks.callCallbacks(this);
                 return this;
             }
@@ -2690,8 +2694,8 @@ var Plottable;
         Drawer.prototype._bindSelectionData = function (data) {
             // if the dataset has a key, use it when binding the data   
             var dataElements;
-            if (this._dataset && this._dataset.key()) {
-                dataElements = this.selection().data(data, this._dataset.key());
+            if (this._dataset && this._dataset.keyFunction()) {
+                dataElements = this.selection().data(data, this._dataset.keyFunction());
             }
             else {
                 dataElements = this.selection().data(data);

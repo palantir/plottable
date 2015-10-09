@@ -397,9 +397,16 @@ declare module Plottable {
 
 declare module Plottable {
     type DatasetCallback = (dataset: Dataset) => void;
+    class KeyFunctions {
+        protected static counter: number;
+        static noConstancy: (d: any, i: number) => any;
+        static useIndex: (d: any, i: number) => any;
+        static useProperty(propertyname: string): (d: any, i: number) => any;
+    }
     class Dataset {
         private _data;
         private _metadata;
+        private _keyFunction;
         private _callbacks;
         /**
          * A Dataset contains an array of data and some metadata.
@@ -450,6 +457,14 @@ declare module Plottable {
          * @returns {Dataset} The calling Dataset.
          */
         metadata(metadata: any): Dataset;
+        keyFunction(): (datum: any, index: number) => any;
+        /**
+         * Sets the key.
+         *
+         * @param { (d: any, i: number) => any} key
+         * @returns {Dataset} The calling Dataset.
+         */
+        keyFunction(keyFunction: (datum: any, index: number) => any): Dataset;
     }
 }
 

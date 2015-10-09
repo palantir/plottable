@@ -13,14 +13,14 @@ export class KeyFunctions {
     return i;
   };
   public static useProperty(propertyname: string) {
-    return (d: any, i: number) => { return d[propertyname] };
+    return (d: any, i: number) => { return d[propertyname]; };
   };
 }
 
 export class Dataset {
   private _data: any[];
   private _metadata: any;
-  private _key: (datum: any, index: number) => any = KeyFunctions.useIndex;
+  private _keyFunction: (datum: any, index: number) => any = KeyFunctions.useIndex;
   private _callbacks: Utils.CallbackSet<DatasetCallback>;
 
   /**
@@ -105,19 +105,19 @@ export class Dataset {
     }
   }
 
-  public key(): (datum: any, index: number) => any;
+  public keyFunction(): (datum: any, index: number) => any;
   /**
    * Sets the key.
    *
    * @param { (d: any, i: number) => any} key
    * @returns {Dataset} The calling Dataset.
    */
-  public key(key: (datum: any, index: number) => any): Dataset;
-  public key(key?: (datum: any, index: number) => any): any {
-    if (key == null) {
-      return this._key;
+  public keyFunction(keyFunction: (datum: any, index: number) => any): Dataset;
+  public keyFunction(keyFunction?: (datum: any, index: number) => any): any {
+    if (keyFunction == null) {
+      return this._keyFunction;
     } else {
-      this._key = key;
+      this._keyFunction = keyFunction;
       this._callbacks.callCallbacks(this);
       return this;
     }
