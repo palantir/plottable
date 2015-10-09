@@ -397,16 +397,9 @@ declare module Plottable {
 
 declare module Plottable {
     type DatasetCallback = (dataset: Dataset) => void;
-    class KeyFunctions {
-        private static counter;
-        static noConstancy: (d: any, i: number) => number;
-        static useIndex: (d: any, i: number) => number;
-        static useProperty(propertyname: string): (d: any, i: number) => any;
-    }
     class Dataset {
         private _data;
         private _metadata;
-        private _keyFunction;
         private _callbacks;
         /**
          * A Dataset contains an array of data and some metadata.
@@ -457,17 +450,6 @@ declare module Plottable {
          * @returns {Dataset} The calling Dataset.
          */
         metadata(metadata: any): Dataset;
-        keyFunction(): (datum: any, index: number) => any;
-        /**
-         * Sets the keyFunction.
-         * in d3, when binding data using selection.data(), a keyFunction may be supplied
-         * to generate a unique identifier for each datum. When data is updated, d3 uses this identifier to
-         * determine which data points have entered or exited the visualisation.
-         *
-         * @param { (d: any, i: number) => any} key
-         * @returns {Dataset} The calling Dataset.
-         */
-        keyFunction(keyFunction: (datum: any, index: number) => any): Dataset;
     }
 }
 
@@ -3757,6 +3739,7 @@ declare module Plottable {
             private _interpolator;
             private _autorangeSmooth;
             private _croppedRenderingEnabled;
+            private _downsamplingEnabled;
             /**
              * A Line Plot draws line segments starting from the first data point to the next.
              *
@@ -3810,6 +3793,18 @@ declare module Plottable {
             interpolator(interpolator: "cardinal-closed"): Line<X>;
             interpolator(interpolator: "monotone"): Line<X>;
             /**
+             * Gets if downsampling is enabled
+             *
+             * When downsampling is enabled, two consecutive lines with the same slope will be merged to one line.
+             */
+            downsamplingEnabled(): boolean;
+            /**
+             * Sets if downsampling is enabled
+             *
+             * @returns {Plots.Line} The calling Plots.Line
+             */
+            downsamplingEnabled(downsampling: boolean): Plots.Line<X>;
+            /**
              * Gets if croppedRendering is enabled
              *
              * When croppedRendering is enabled, lines that will not be visible in the viewport will not be drawn.
@@ -3840,6 +3835,7 @@ declare module Plottable {
             protected _constructLineProjector(xProjector: Projector, yProjector: Projector): (datum: any, index: number, dataset: Dataset) => string;
             protected _getDataToDraw(): Utils.Map<Dataset, any[]>;
             private _filterCroppedRendering(dataset, indices);
+            private _filterDownsampling(dataset, indices);
         }
     }
 }
@@ -3936,6 +3932,19 @@ declare module Plottable {
             y(): Plots.AccessorScaleBinding<number, number>;
             y(y: number | Accessor<number>): StackedArea<X>;
             y(y: number | Accessor<number>, yScale: QuantitativeScale<number>): StackedArea<X>;
+            /**
+             * Gets if downsampling is enabled
+             *
+             * When downsampling is enabled, two consecutive lines with the same slope will be merged to one line.
+             */
+            downsamplingEnabled(): boolean;
+            /**
+             * Sets if downsampling is enabled
+             *
+             * For now, downsampling is always disabled in stacked area plot
+             * @returns {Plots.StackedArea} The calling Plots.StackedArea
+             */
+            downsamplingEnabled(downsampling: boolean): Plots.Line<X>;
             protected _additionalPaint(): void;
             protected _updateYScale(): void;
             protected _onDatasetUpdate(): StackedArea<X>;
