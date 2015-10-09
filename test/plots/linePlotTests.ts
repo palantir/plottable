@@ -680,7 +680,6 @@ describe("Plots", () => {
         line.autorangeSmooth(true);
         assert.deepEqual(xScale.domain(), [-2, -1], "no changes for autoranging smooth with same edge points (smooth)");
       });
-
     });
 
     describe("Cropped Rendering Performance", () => {
@@ -808,6 +807,139 @@ describe("Plots", () => {
         xScale.domain([-0.5, 1.5]);
         path = plot.content().select("path.line").attr("d");
         TestMethods.assertLinePathEqualToDataPoints(path, [0, 1].map((d) => data[d]), xScale, yScale);
+
+        svg.remove();
+      });
+    });
+
+    describe("Downsampling Performance", () => {
+      let svg: d3.Selection<void>;
+      let plot: Plottable.Plots.Line<number>;
+
+      let xScale: Plottable.Scales.Linear;
+      let yScale: Plottable.Scales.Linear;
+
+      beforeEach(() => {
+        svg = TestMethods.generateSVG(50, 50);
+        xScale = new Plottable.Scales.Linear();
+        yScale = new Plottable.Scales.Linear();
+        plot = new Plottable.Plots.Line<number>();
+        plot.x((d) => d.x, xScale).y((d) => d.y, yScale);
+      });
+
+      it("can set the downsampling option", () => {
+        plot.renderTo(svg);
+
+        assert.isFalse(plot.downsamplingEnabled(), "downsampling is not enabled by default");
+
+        assert.strictEqual(plot.downsamplingEnabled(true), plot, "enabling the downsampling option returns the plot");
+        assert.isTrue(plot.downsamplingEnabled(), "can enable the downsampling option");
+
+        plot.downsamplingEnabled(false);
+        assert.isFalse(plot.downsamplingEnabled(), "can disable the downsampling option");
+
+        svg.remove();
+      });
+
+      it("does not render points that should be removed in downsampling in horizontal line plots" , () => {
+        let data = [
+          {x: -100, y: -1}, // last element in previous bucket
+          {x: 0, y: 2}, // first element in current bucket
+          {x: 0.5, y: 1.5}, // the point to be removed 
+          {x: 1, y: 1}, // minimum y in current bucket
+          {x: 2, y: 4}, // maximum y in current bucket
+          {x: 3, y: 3}, // last elemnt in current bucket 
+          {x: 100, y: 2}, // first element in next bucket
+        ];
+        plot.addDataset(new Plottable.Dataset(data));
+        xScale.domain([-100, 100]);
+
+        plot.downsamplingEnabled(true);
+        plot.renderTo(svg);
+
+        let lineScaledXValue = Math.floor(xScale.scale(data[1].x));
+        assert.notStrictEqual(Math.floor(xScale.scale(data[0].x)), lineScaledXValue,
+          `point(${data[0].x},${data[0].y}) should not have the same scaled x value as the horizontal line`);
+        data.slice(1, 6).forEach((d, i) => {
+          assert.strictEqual(Math.floor(xScale.scale(d.x)), lineScaledXValue,
+            `point(${d.x},${d.y} should have the same scaled x value as the horizontal line`);
+        });
+        assert.notStrictEqual(Math.floor(xScale.scale(data[6].x)), lineScaledXValue,
+          `point(${data[6].x},${data[6].y}) should not have the same scaled x value as the horizontal line`);
+
+        let path = plot.content().select("path.line").attr("d");
+        let expectedRenderedData = [0, 1, 4, 3, 5, 6].map((d) => data[d]);
+        TestMethods.assertLinePathEqualToDataPoints(path, expectedRenderedData, xScale, yScale);
+
+        svg.remove();
+      });
+
+      it("does not render points that should be removed in downsampling in vertical line plots", () => {
+        let data = [
+          {x: -1, y: -50}, // last element in previous bucket
+          {x: 2, y: 1}, // first element in current bucket
+          {x: 1.5, y: 1.5}, // the point to be removed
+          {x: 1, y: 2}, // minimum x in current bucket
+          {x: 4, y: 3}, // maximum x in current bucket
+          {x: 3, y: 4}, // last elemnt in current bucket
+          {x: 2, y: 100}, // first element in next bucket
+        ];
+        plot.addDataset(new Plottable.Dataset(data));
+
+        yScale.domain([-200, 200]);
+
+        plot.downsamplingEnabled(true);
+        plot.renderTo(svg);
+
+        let lineScaledYValue = Math.floor(yScale.scale(data[1].y));
+        assert.notStrictEqual(Math.floor(yScale.scale(data[0].y)), lineScaledYValue,
+          `point(${data[0].x},${data[0].y}) should not have the same scaled y value as the vertical line`);
+        data.slice(1, 6).forEach((d, i) => {
+          assert.strictEqual(Math.floor(yScale.scale(d.y)), lineScaledYValue,
+            `point(${d.x},${d.y}) should have the same scaled y value as the vertical line`);
+        });
+        assert.notStrictEqual(Math.floor(yScale.scale(data[6].y)), lineScaledYValue,
+          `point(${data[6].x},${data[6].y}) should not have the same scaled y value as the vertical line`);
+
+        let path = plot.content().select("path.line").attr("d");
+        let expectedRenderedData = [0, 1, 3, 4, 5, 6].map((d) => data[d]);
+        TestMethods.assertLinePathEqualToDataPoints(path, expectedRenderedData, xScale, yScale);
+
+        svg.remove();
+      });
+
+      it("does not render points that are on the same line except for the first, the last, the largest and the smallest points", () => {
+        let data = [
+          {x: 3, y: 1}, // last element in previous bucket
+          {x: 2, y: 2}, // first element in the bucket
+          {x: 1, y: 1}, // minimum element in the bucket
+          {x: 10, y: 10}, // maximum element in the bucket
+          {x: 2.5, y: 2.5}, // the point to be removed
+          {x: 3, y: 3}, // last element in the bucket
+          {x: 3, y: 1}, // first element in next bucket
+        ];
+        plot.addDataset(new Plottable.Dataset(data));
+
+        let expectedYValue = (p1: any, p2: any, slope: number) => {
+          return p1.y + (p2.x - p1.x) * slope;
+        };
+
+        let lineCurrentSlope = (data[2].y - data[1].y) / (data[2].x - data[1].x);
+        assert.notStrictEqual(Math.floor(expectedYValue(data[1], data[0], lineCurrentSlope)), Math.floor(data[0].y),
+          `point(${data[0].x},${data[0].y}) is not on the line with slope ${lineCurrentSlope}`);
+        data.slice(1, 6).forEach((d, i) => {
+          assert.strictEqual(Math.floor(expectedYValue(data[1], d, lineCurrentSlope)), Math.floor(d.y),
+            `point(${d.x},${d.y}) is on the line with slope ${lineCurrentSlope}`);
+        });
+        assert.notStrictEqual(Math.floor(expectedYValue(data[1], data[6], lineCurrentSlope)), Math.floor(data[6].y),
+          `point(${data[6].x},${data[6].y}) is not on the line with slope ${lineCurrentSlope}`);
+
+        plot.downsamplingEnabled(true);
+        plot.renderTo(svg);
+
+        let path = plot.content().select("path.line").attr("d");
+        let expectedRenderedData = [0, 1, 2, 3, 5, 6].map((d) => data[d]);
+        TestMethods.assertLinePathEqualToDataPoints(path, expectedRenderedData, xScale, yScale);
 
         svg.remove();
       });

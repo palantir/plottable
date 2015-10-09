@@ -364,5 +364,4 @@ module TestMethods {
         `Point ${i} drawn, has correct y coordinate`);
     });
   }
-
 }

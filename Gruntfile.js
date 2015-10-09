@@ -72,7 +72,7 @@ module.exports = function(grunt) {
   // on each recompile
   var updateTsFiles = function() {
     tsFiles = grunt.file.read("src/reference.ts")
-      .split("\n")
+      .split(grunt.util.linefeed)
       .filter(function(s) {
         return s !== "";
       }).map(function(s) {
@@ -84,7 +84,7 @@ module.exports = function(grunt) {
   var testTsFiles;
   var updateTestTsFiles = function() {
     testTsFiles = grunt.file.read("test/testReference.ts")
-      .split("\n")
+      .split(grunt.util.linefeed)
       .filter(function(s) {
         return s !== "";
       }).map(function(s) {
