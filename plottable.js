@@ -8287,6 +8287,11 @@ var Plottable;
             };
             Scatter.prototype._generateDrawSteps = function () {
                 var drawSteps = [];
+                if (this._animateOnNextRender()) {
+                    var resetAttrToProjector = this._generateAttrToProjector();
+                    resetAttrToProjector["d"] = function () { return ""; };
+                    drawSteps.push({ attrToProjector: resetAttrToProjector, animator: this._getAnimator(Plots.Animator.RESET) });
+                }
                 drawSteps.push({ attrToProjector: this._generateAttrToProjector(), animator: this._getAnimator(Plots.Animator.MAIN) });
                 return drawSteps;
             };
