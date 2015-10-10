@@ -13,7 +13,7 @@ export interface Animator {
    *     transition object so that plots may chain the transitions between
    *     animators.
    */
-  animate(selection: d3.Selection<any>, attrToAppliedProjector: AttributeToAppliedProjector): d3.Selection<any> | d3.Transition<any>;
+  animate(selection: d3.Selection<any>, attrToAppliedProjector: AttributeToAppliedProjector, drawingTarget?: Drawers.DrawingTarget): d3.Selection<any> | d3.Transition<any>;
 
   /**
    * Given the number of elements, return the total time the animation requires

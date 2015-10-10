@@ -20,6 +20,16 @@ export module Drawers {
     animator: Animator;
   };
 
+  /**
+  * A DrawingTarget contains the selections that are the results of binding data.
+  * DrawingTarget is contructed by Drawer, and passed to animators to allow rich animation of each selection
+  */
+  export type DrawingTarget = {
+    enter: d3.Selection<any>|d3.Transition<any>,  // new data elements current not bound to a DOM element
+    update: d3.selection.Update<any>|d3.Transition<any>, // data elements currently bound to a DOM element still in the data set
+    exit: d3.Selection<any>|d3.Transition<any>,   // DOM elements bound to a datum that is no longer in the data set
+    merge: d3.Selection<any>|d3.Transition<any>   // enter and update combined
+  };
 }
 
 export class Drawer {
@@ -30,6 +40,8 @@ export class Drawer {
 
   private _cachedSelectionValid = false;
   private _cachedSelection: d3.Selection<any>;
+
+  private _drawingTarget: Drawers.DrawingTarget;
 
   /**
    * A Drawer draws svg elements based on the input Dataset.
@@ -83,9 +95,18 @@ export class Drawer {
     } else {
       dataElements = this.selection().data(data);
     }
-
-    dataElements.enter().append(this._svgElementName);
-    dataElements.exit().remove();
+    this._drawingTarget = {
+      update: dataElements.filter(() => {
+        return true;
+      }),
+      enter: null,
+      exit: null,
+      merge: null
+    };
+    this._drawingTarget.enter = dataElements.enter()
+      .append(this._svgElementName);
+    this._drawingTarget.exit = dataElements.exit();   // the animator becomes responsbile for reomving these
+    this._drawingTarget.merge = dataElements;   // after enter() is called, this contains new elements
     this._applyDefaultAttributes(dataElements);
   }
 
@@ -108,7 +129,7 @@ export class Drawer {
         selection.attr(colorAttribute, step.attrToAppliedProjector[colorAttribute]);
       }
     });
-    step.animator.animate(selection, step.attrToAppliedProjector);
+    step.animator.animate(selection, step.attrToAppliedProjector, this._drawingTarget);
     if (this._className != null) {
       this.selection().classed(this._className, true);
     }
