@@ -2,72 +2,76 @@
 
 describe("Plots", () => {
   describe("AreaPlot", () => {
-    it("renders correctly with no data", () => {
+    describe("Basic Usage", () => {
       let SVG_WIDTH = 400;
       let SVG_HEIGHT = 500;
-      let svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
-      let xScale = new Plottable.Scales.Linear();
-      let yScale = new Plottable.Scales.Linear();
-      let plot = new Plottable.Plots.Area();
-      plot.x((d) => d.x, xScale);
-      plot.y((d) => d.y, yScale);
-      assert.doesNotThrow(() => plot.renderTo(svg), Error);
-      assert.strictEqual(plot.width(), SVG_WIDTH, "was allocated width");
-      assert.strictEqual(plot.height(), SVG_HEIGHT, "was allocated height");
-      svg.remove();
-    });
+      let svg: d3.Selection<void>;
+      let xScale: Plottable.Scales.Linear;
+      let yScale: Plottable.Scales.Linear;
+      let plot: Plottable.Plots.Area<{}>;
 
-    it("adds a padding exception to the y scale at the constant y0 value", () => {
-      let svg = TestMethods.generateSVG();
-      let xScale = new Plottable.Scales.Linear();
-      let yScale = new Plottable.Scales.Linear();
-      let plot = new Plottable.Plots.Area();
-      plot.x((d) => d.x, xScale);
-      plot.y((d) => d.y, yScale);
-      yScale.padProportion(0.1);
-      let constantY0 = 30;
-      yScale.addIncludedValuesProvider((scale: Plottable.Scales.Linear) => [constantY0, constantY0 + 10]);
-      plot.y0(constantY0);
-      plot.addDataset(new Plottable.Dataset([{ x: 0, y: constantY0 + 5 }]));
-      plot.renderTo(svg);
-      assert.strictEqual(yScale.domain()[0], constantY0, "y Scale doesn't pad beyond 0 when used in a Plots.Area");
-      svg.remove();
+      beforeEach(() => {
+        svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+        xScale = new Plottable.Scales.Linear();
+        yScale = new Plottable.Scales.Linear();
+        plot = new Plottable.Plots.Area();
+        plot.x((d) => d.x, xScale);
+        plot.y((d) => d.y, yScale);
+      });
+
+      it("renders correctly with no data", () => {
+        assert.doesNotThrow(() => plot.renderTo(svg), Error);
+        assert.strictEqual(plot.width(), SVG_WIDTH, "was allocated width");
+        assert.strictEqual(plot.height(), SVG_HEIGHT, "was allocated height");
+        svg.remove();
+      });
+
+      it("adds a padding exception to the y scale at the constant y0 value", () => {
+        yScale.padProportion(0.1);
+        let constantY0 = 30;
+        yScale.addIncludedValuesProvider((scale: Plottable.Scales.Linear) => [constantY0, constantY0 + 10]);
+        plot.y0(constantY0);
+        plot.addDataset(new Plottable.Dataset([{ x: 0, y: constantY0 + 5 }]));
+        plot.renderTo(svg);
+        assert.strictEqual(yScale.domain()[0], constantY0, "y Scale doesn't pad beyond 0 when used in a Plots.Area");
+        svg.remove();
+      });
     });
 
     describe("Rendering", () => {
       let svg: d3.Selection<void>;
       let xScale: Plottable.Scales.Linear;
       let yScale: Plottable.Scales.Linear;
-      let twoPointData = [{x: 0, y: 0}, {x: 1, y: 1}];
-      let simpleDataset: Plottable.Dataset;
       let areaPlot: Plottable.Plots.Area<number>;
-      let renderArea: d3.Selection<void>;
+      let fill = "steelblue";
 
       beforeEach(() => {
         xScale = new Plottable.Scales.Linear();
         yScale = new Plottable.Scales.Linear();
         svg = TestMethods.generateSVG();
-        simpleDataset = new Plottable.Dataset(twoPointData);
+        let twoPointData = [{x: 0, y: 0}, {x: 1, y: 1}];
+        let simpleDataset = new Plottable.Dataset(twoPointData);
         areaPlot = new Plottable.Plots.Area<number>();
         areaPlot.addDataset(simpleDataset);
         areaPlot.x((d: any) => d.x, xScale)
                 .y((d: any) => d.y, yScale);
         areaPlot.y0(() => 0)
-                .attr("fill", () => "steelblue")
+                .attr("fill", () => fill)
                 .attr("stroke", (d, i) => d3.rgb(d.x, d.y, i).toString())
                 .renderTo(svg);
-        renderArea = areaPlot.content();
       });
 
       it("draws area and line correctly", () => {
-        let areaPath = renderArea.select(".area");
-        let pointsInArea = getPointsInArea(areaPlot, twoPointData);
+        let content = areaPlot.content();
+        let areaPath = content.select(".area");
+        let data = areaPlot.datasets()[0].data();
+        let pointsInArea = getPointsInArea(areaPlot, data);
         TestMethods.assertLinePathEqualToDataPoints(areaPath.attr("d"), pointsInArea, xScale, yScale);
-        assert.strictEqual(areaPath.attr("fill"), "steelblue", "area fill was set correctly");
+        assert.strictEqual(areaPath.attr("fill"), fill, "area fill was set correctly");
         assert.strictEqual(areaPath.style("stroke"), "none", "area stroke renders as \"none\"");
 
-        let linePath = renderArea.select(".line");
-        TestMethods.assertLinePathEqualToDataPoints(linePath.attr("d"), twoPointData, xScale, yScale);
+        let linePath = content.select(".line");
+        TestMethods.assertLinePathEqualToDataPoints(linePath.attr("d"), data, xScale, yScale);
         assert.strictEqual(linePath.attr("stroke"), "#000000", "line stroke was set correctly");
         assert.strictEqual(linePath.style("fill"), "none", "line fill renders as \"none\"");
         svg.remove();
@@ -76,23 +80,26 @@ describe("Plots", () => {
       it("fills for non-zero floor values appropriately", () => {
         areaPlot.y0((d) => d.y / 2);
         areaPlot.renderTo(svg);
-        let areaPath = renderArea.select(".area");
-        let pointsInArea = getPointsInArea(areaPlot, twoPointData);
+        let data = areaPlot.datasets()[0].data();
+        let areaPath = areaPlot.content().select(".area");
+        let pointsInArea = getPointsInArea(areaPlot, data);
         TestMethods.assertLinePathEqualToDataPoints(areaPath.attr("d"), pointsInArea, xScale, yScale);
         svg.remove();
       });
 
-      it("appends before line", () => {
-        let paths = renderArea.selectAll("path")[0];
-        let areaSelection = renderArea.select(".area")[0][0];
-        let lineSelection = renderArea.select(".line")[0][0];
+      it("places the area before line", () => {
+        let content = areaPlot.content();
+        let paths = content.selectAll("path")[0];
+        let areaSelection = content.select(".area")[0][0];
+        let lineSelection = content.select(".line")[0][0];
         assert.operator(paths.indexOf(areaSelection), "<", paths.indexOf(lineSelection), "area appended before line");
         svg.remove();
       });
 
       it("cleans up correctly when removing Datasets", () => {
         areaPlot.renderTo(svg);
-        areaPlot.removeDataset(simpleDataset);
+        let dataset = areaPlot.datasets()[0];
+        areaPlot.removeDataset(dataset);
         let paths = areaPlot.content().selectAll("path");
         assert.strictEqual(paths.size(), 0, "removing a Dataset cleans up all <path>s associated with it");
         svg.remove();
@@ -107,37 +114,36 @@ describe("Plots", () => {
           { x: 0.8, y: 0.8 }
         ];
 
-        let areaPath = renderArea.select(".area");
-
+        let areaPath = areaPlot.content().select(".area");
+        let dataset = areaPlot.datasets()[0];
         let dataWithNaN = areaData.slice();
         dataWithNaN[2] = { x: 0.4, y: NaN };
-        simpleDataset.data(dataWithNaN);
+        dataset.data(dataWithNaN);
 
         let pointsInArea = getPointsInArea(areaPlot, dataWithNaN.slice(0, 2)).concat(getPointsInArea(areaPlot, dataWithNaN.slice(3, 5)));
         TestMethods.assertLinePathEqualToDataPoints(areaPath.attr("d"), pointsInArea, xScale, yScale);
 
         dataWithNaN[2] = { x: NaN, y: 0.4 };
-        simpleDataset.data(dataWithNaN);
+        dataset.data(dataWithNaN);
 
         TestMethods.assertLinePathEqualToDataPoints(areaPath.attr("d"), pointsInArea, xScale, yScale);
 
         let dataWithUndefined = areaData.slice();
         dataWithUndefined[2] = { x: 0.4, y: undefined };
-        simpleDataset.data(dataWithUndefined);
+        dataset.data(dataWithUndefined);
 
         TestMethods.assertLinePathEqualToDataPoints(areaPath.attr("d"), pointsInArea, xScale, yScale);
 
         dataWithUndefined[2] = { x: undefined, y: 0.4 };
-        simpleDataset.data(dataWithUndefined);
+        dataset.data(dataWithUndefined);
 
         TestMethods.assertLinePathEqualToDataPoints(areaPath.attr("d"), pointsInArea, xScale, yScale);
 
         svg.remove();
       });
 
-      it("retains original classes when class is projected", () => {
-        let newClassProjector = () => "pink";
-        areaPlot.attr("class", newClassProjector);
+      it("retains original classes when setting css class via attr", () => {
+        areaPlot.attr("class", () => "pink");
         areaPlot.renderTo(svg);
         let areaPath = areaPlot.content().select(".area");
         assert.isTrue(areaPath.classed("pink"));
@@ -150,8 +156,6 @@ describe("Plots", () => {
       let svg: d3.Selection<void>;
       let xScale: Plottable.Scales.Linear;
       let yScale: Plottable.Scales.Linear;
-      let twoPointData = [{x: 0, y: 0}, {x: 1, y: 1}];
-      let simpleDataset: Plottable.Dataset;
       let areaPlot: Plottable.Plots.Area<number>;
       let renderArea: d3.Selection<void>;
 
@@ -159,7 +163,7 @@ describe("Plots", () => {
         xScale = new Plottable.Scales.Linear();
         yScale = new Plottable.Scales.Linear();
         svg = TestMethods.generateSVG();
-        simpleDataset = new Plottable.Dataset(twoPointData);
+        let simpleDataset = new Plottable.Dataset([{x: 0, y: 0}, {x: 1, y: 1}]);
         areaPlot = new Plottable.Plots.Area<number>();
         areaPlot.addDataset(simpleDataset);
         areaPlot.x((d: any) => d.x, xScale)
