@@ -1,0 +1,594 @@
+﻿{
+  "wc2006": [
+    {
+      "name": "Italy",
+      "R": 1,
+      "GF": 12,
+      "GA": 2
+    },
+    {
+      "name": "France",
+      "R": 2,
+      "GF": 9,
+      "GA": 3
+    },
+    {
+      "name": "Germany",
+      "R": 3,
+      "GF": 14,
+      "GA": 6
+    },
+    {
+      "name": "Portugal",
+      "R": 4,
+      "GF": 7,
+      "GA": 5
+    },
+
+    {
+      "name": "Brazil",
+      "R": 5,
+      "GF": 10,
+      "GA": 2
+    },
+    {
+      "name": "Argentina",
+      "R": 6,
+      "GF": 11,
+      "GA": 3
+    },
+    {
+      "name": "England",
+      "R": 7,
+      "GF": 6,
+      "GA": 2
+    },
+    {
+      "name": "Ukraine",
+      "R": 8,
+      "GF": 5,
+      "GA": 7
+    },
+
+    {
+      "name": "Spain",
+      "R": 9,
+      "GF": 9,
+      "GA": 4
+    },
+    {
+      "name": "Switzerland",
+      "R": 10,
+      "GF": 4,
+      "GA": 0
+    },
+    {
+      "name": "Netherlands",
+      "R": 11,
+      "GF": 3,
+      "GA": 2
+    },
+    {
+      "name": "Ecuador",
+      "R": 12,
+      "GF": 5,
+      "GA": 4
+    },
+    {
+      "name": "Ghana",
+      "R": 13,
+      "GF": 4,
+      "GA": 6
+    },
+    {
+      "name": "Sweden",
+      "R": 14,
+      "GF": 3,
+      "GA": 4
+    },
+    {
+      "name": "Mexico",
+      "R": 15,
+      "GF": 5,
+      "GA": 5
+    },
+    {
+      "name": "Australia",
+      "R": 16,
+      "GF": 5,
+      "GA": 6
+    },
+
+    {
+      "name": "South Korea",
+      "R": 17,
+      "GF": 3,
+      "GA": 4
+    },
+    {
+      "name": "Paraguay",
+      "R": 18,
+      "GF": 2,
+      "GA": 2
+    },
+    {
+      "name": "Ivory Coast",
+      "R": 19,
+      "GF": 5,
+      "GA": 6
+    },
+    {
+      "name": "Czech Republic",
+      "R": 20,
+      "GF": 3,
+      "GA": 4
+    },
+    {
+      "name": "Poland",
+      "R": 21,
+      "GF": 2,
+      "GA": 4
+    },
+    {
+      "name": "Croatia",
+      "R": 22,
+      "GF": 2,
+      "GA": 3
+    },
+    {
+      "name": "Angola",
+      "R": 23,
+      "GF": 1,
+      "GA": 2
+    },
+    {
+      "name": "Tunisia",
+      "R": 24,
+      "GF": 3,
+      "GA": 6
+    },
+    {
+      "name": "Iran",
+      "R": 25,
+      "GF": 2,
+      "GA": 6
+    },
+    {
+      "name": "United States",
+      "R": 26,
+      "GF": 2,
+      "GA": 6
+    },
+    {
+      "name": "Trinidad and Tobago",
+      "R": 27,
+      "GF": 0,
+      "GA": 4
+    },
+    {
+      "name": "Japan",
+      "R": 28,
+      "GF": 2,
+      "GA": 7
+    },
+    {
+      "name": "Saudi Arabia",
+      "R": 29,
+      "GF": 2,
+      "GA": 7
+    },
+    {
+      "name": "Togo",
+      "R": 30,
+      "GF": 1,
+      "GA": 6
+    },
+    {
+      "name": "Costa Rica",
+      "R": 31,
+      "GF": 3,
+      "GA": 9
+    },
+    {
+      "name": "Serbia and Montenegro",
+      "R": 32,
+      "GF": 2,
+      "GA": 10
+    }
+  ],
+
+  "wc2010": [
+    {
+      "name": "Spain",
+      "R": 1,
+      "GF": 8,
+      "GA": 2
+    },
+    {
+      "name": "Netherlands",
+      "R": 2,
+      "GF": 12,
+      "GA": 6
+    },
+    {
+      "name": "Germany",
+      "R": 3,
+      "GF": 16,
+      "GA": 5
+    },
+    {
+      "name": "Uruguay",
+      "R": 4,
+      "GF": 11,
+      "GA": 8
+    },
+
+    {
+      "name": "Argentina",
+      "R": 5,
+      "GF": 10,
+      "GA": 6
+    },
+    {
+      "name": "Brazil",
+      "R": 6,
+      "GF": 9,
+      "GA": 4
+    },
+    {
+      "name": "Ghana",
+      "R": 7,
+      "GF": 5,
+      "GA": 4
+    },
+    {
+      "name": "Paraguay",
+      "R": 8,
+      "GF": 3,
+      "GA": 2
+    },
+
+    {
+      "name": "Japan",
+      "R": 9,
+      "GF": 4,
+      "GA": 2
+    },
+    {
+      "name": "Chile",
+      "R": 10,
+      "GF": 3,
+      "GA": 5
+    },
+    {
+      "name": "Portugal",
+      "R": 11,
+      "GF": 7,
+      "GA": 1
+    },
+    {
+      "name": "United States",
+      "R": 12,
+      "GF": 5,
+      "GA": 5
+    },
+    {
+      "name": "England",
+      "R": 13,
+      "GF": 3,
+      "GA": 5
+    },
+    {
+      "name": "Mexico",
+      "R": 14,
+      "GF": 4,
+      "GA": 5
+    },
+    {
+      "name": "South Korea",
+      "R": 15,
+      "GF": 6,
+      "GA": 8
+    },
+    {
+      "name": "Slovakia",
+      "R": 16,
+      "GF": 5,
+      "GA": 7
+    },
+
+    {
+      "name": "Ivory Coast",
+      "R": 17,
+      "GF": 4,
+      "GA": 3
+    },
+    {
+      "name": "Slovenia",
+      "R": 18,
+      "GF": 3,
+      "GA": 3
+    },
+    {
+      "name": "Switzerland",
+      "R": 19,
+      "GF": 1,
+      "GA": 1
+    },
+    {
+      "name": "South Africa",
+      "R": 20,
+      "GF": 3,
+      "GA": 5
+    },
+    {
+      "name": "Australia",
+      "R": 21,
+      "GF": 3,
+      "GA": 6
+    },
+    {
+      "name": "New Zealand",
+      "R": 22,
+      "GF": 2,
+      "GA": 2
+    },
+    {
+      "name": "Serbia",
+      "R": 23,
+      "GF": 2,
+      "GA": 3
+    },
+    {
+      "name": "Denmark",
+      "R": 24,
+      "GF": 3,
+      "GA": 6
+    },
+    {
+      "name": "Greece",
+      "R": 25,
+      "GF": 2,
+      "GA": 5
+    },
+    {
+      "name": "Italy",
+      "R": 26,
+      "GF": 4,
+      "GA": 5
+    },
+    {
+      "name": "Nigeria",
+      "R": 27,
+      "GF": 3,
+      "GA": 5
+    },
+    {
+      "name": "Algeria",
+      "R": 28,
+      "GF": 0,
+      "GA": 2
+    },
+    {
+      "name": "France",
+      "R": 29,
+      "GF": 1,
+      "GA": 4
+    },
+    {
+      "name": "Honduras",
+      "R": 30,
+      "GF": 0,
+      "GA": 3
+    },
+    {
+      "name": "Cameroon",
+      "R": 31,
+      "GF": 2,
+      "GA": 5
+    },
+    {
+      "name": "North Korea",
+      "R": 32,
+      "GF": 1,
+      "GA": 12
+    }
+  ],
+  "wc2014": [
+    {
+      "name": "Germany",
+      "R": 1,
+      "GF": 19,
+      "GA": 18
+    },
+    {
+      "name": "Argentina",
+      "R": 2,
+      "GF": 16,
+      "GA": 8
+    },
+    {
+      "name": "Netherlands",
+      "R": 3,
+      "GF": 17,
+      "GA": 15
+    },
+    {
+      "name": "Brazil",
+      "R": 4,
+      "GF": 11,
+      "GA": 11
+    },
+
+    {
+      "name": "Colombia",
+      "R": 5,
+      "GF": 12,
+      "GA": 12
+    },
+    {
+      "name": "Belgium",
+      "R": 6,
+      "GF": 12,
+      "GA": 6
+    },
+    {
+      "name": "France",
+      "R": 7,
+      "GF": 10,
+      "GA": 10
+    },
+    {
+      "name": "Costa Rica",
+      "R": 8,
+      "GF": 9,
+      "GA": 5
+    },
+
+    {
+      "name": "Chile",
+      "R": 9,
+      "GF": 7,
+      "GA": 6
+    },
+    {
+      "name": "Mexico",
+      "R": 10,
+      "GF": 7,
+      "GA": 5
+    },
+    {
+      "name": "Switzerland",
+      "R": 11,
+      "GF": 6,
+      "GA": 7
+    },
+    {
+      "name": "Uruguay",
+      "R": 12,
+      "GF": 6,
+      "GA": 4
+    },
+    {
+      "name": "Greece",
+      "R": 13,
+      "GF": 5,
+      "GA": 3
+    },
+    {
+      "name": "Algeria",
+      "R": 14,
+      "GF": 4,
+      "GA": 7
+    },
+    {
+      "name": "United States",
+      "R": 15,
+      "GF": 4,
+      "GA": 5
+    },
+    {
+      "name": "Nigeria",
+      "R": 16,
+      "GF": 4,
+      "GA": 3
+    },
+
+    {
+      "name": "Ecuador",
+      "R": 17,
+      "GF": 4,
+      "GA": 3
+    },
+    {
+      "name": "Portugal",
+      "R": 18,
+      "GF": 4,
+      "GA": 4
+    },
+    {
+      "name": "Croatia",
+      "R": 19,
+      "GF": 3,
+      "GA": 6
+    },
+    {
+      "name": "Bosnia and Herzegovina",
+      "R": 20,
+      "GF": 3,
+      "GA": 4
+    },
+    {
+      "name": "Ivory Coast",
+      "R": 21,
+      "GF": 3,
+      "GA": 4
+    },
+    {
+      "name": "Italy",
+      "R": 22,
+      "GF": 3,
+      "GA": 2
+    },
+    {
+      "name": "Spain",
+      "R": 23,
+      "GF": 3,
+      "GA": 4
+    },
+    {
+      "name": "Russia",
+      "R": 24,
+      "GF": 2,
+      "GA": 2
+    },
+    {
+      "name": "Ghana",
+      "R": 25,
+      "GF": 1,
+      "GA": 4
+    },
+    {
+      "name": "England",
+      "R": 26,
+      "GF": 1,
+      "GA": 2
+    },
+    {
+      "name": "South Korea",
+      "R": 27,
+      "GF": 1,
+      "GA": 3
+    },
+    {
+      "name": "Iran",
+      "R": 28,
+      "GF": 1,
+      "GA": 1
+    },
+    {
+      "name": "Japan",
+      "R": 29,
+      "GF": 1,
+      "GA": 2
+    },
+    {
+      "name": "Australia",
+      "R": 30,
+      "GF": 0,
+      "GA": 3
+    },
+    {
+      "name": "Honduras",
+      "R": 31,
+      "GF": 0,
+      "GA": 1
+    },
+    {
+      "name": "Cameroon",
+      "R": 32,
+      "GF": 0,
+      "GA": 1
+    }
+  ]
+}

@@ -189,11 +189,7 @@ export class Drawer {
   }
 
   public selection() {
-    if (!this._cachedSelectionValid) {
-      this._cachedSelection = this.renderArea().selectAll(this.selector());
-      this._cachedSelectionValid = true;
-    }
-    return this._cachedSelection;
+    return this.renderArea().selectAll(this.selector());
   }
 
   /**

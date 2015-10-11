@@ -33,6 +33,7 @@ module Plottable {
             private _stepDelay: number;
             private _maxTotalDuration: number;
             private _easingMode: string;
+            private _xScale: string;
 
             /**
              * Constructs the default animator
@@ -102,10 +103,14 @@ module Plottable {
              *
              */
             protected mergeAttrs(attr1: AttributeToAppliedProjector, attr2: AttributeToAppliedProjector): AttributeToAppliedProjector {
-              for (var attrName in attr2) {
-                attr1[attrName] = attr2[attrName];
+              let a: AttributeToAppliedProjector = {};
+              for (var attrName in attr1) {
+                a[attrName] = attr1[attrName];
               }
-              return attr1;
+              for (var attrName in attr2) {
+                a[attrName] = attr2[attrName];
+              }
+              return a;
             }
 
             /**
@@ -233,7 +238,7 @@ module Plottable {
              * @param {string} easingMode The desired easing mode.
              * @returns {Easing} The calling Easing Animator.
              */
-            public easingMode(easingMode: string): Easing;
+            public easingMode(easingMode: string): Base;
             public easingMode(easingMode?: string): any {
                 if (easingMode == null) {
                     return this._easingMode;
@@ -244,6 +249,27 @@ module Plottable {
             }
 
             /**
+              * Gets the current easing mode of the animation.
+              *
+              * @returns {string} the current easing mode.
+              */
+            public xScale(): string;
+            /**
+             * Sets the easing mode of the animation.
+             *
+             * @param {string} xScale The desired easing mode.
+             * @returns {Easing} The calling Easing Animator.
+             */
+            public xScale(xScale: string): Base;
+            public xScale(xScale?: string): any {
+              if (xScale == null) {
+                return this._xScale;
+              } else {
+                this._xScale = xScale;
+                return this;
+              }
+            }   
+                   /**
              * Adjust the iterative delay, such that it takes into account the maxTotalDuration constraint
              */
             private _getAdjustedIterativeDelay(numberOfSteps: number) {

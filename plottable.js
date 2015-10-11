@@ -3,7 +3,7 @@ Plottable 1.14.0 (https://github.com/palantir/plottable)
 Copyright 2014-2015 Palantir Technologies
 Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
 */
-
+//# sourceURL=plottable.js
 (function(root, factory) {
     if(typeof exports === 'object') {
         module.exports = factory(require, exports, module);
@@ -2700,8 +2700,18 @@ var Plottable;
             else {
                 dataElements = this.selection().data(data);
             }
-            dataElements.enter().append(this._svgElementName);
-            dataElements.exit().remove();
+            this._drawingTarget = {
+                update: dataElements.filter(function () {
+                    return true;
+                }),
+                enter: null,
+                exit: null,
+                merge: null
+            };
+            this._drawingTarget.enter = dataElements.enter()
+                .append(this._svgElementName);
+            this._drawingTarget.exit = dataElements.exit(); // the animator becomes responsbile for reomving these
+            this._drawingTarget.merge = dataElements; // after enter() is called, this contains new elements
             this._applyDefaultAttributes(dataElements);
         };
         Drawer.prototype._applyDefaultAttributes = function (selection) {
@@ -2722,7 +2732,7 @@ var Plottable;
                     selection.attr(colorAttribute, step.attrToAppliedProjector[colorAttribute]);
                 }
             });
-            step.animator.animate(selection, step.attrToAppliedProjector);
+            step.animator.animate(selection, step.attrToAppliedProjector, this._drawingTarget);
             if (this._className != null) {
                 this.selection().classed(this._className, true);
             }
@@ -2775,11 +2785,7 @@ var Plottable;
             return this;
         };
         Drawer.prototype.selection = function () {
-            if (!this._cachedSelectionValid) {
-                this._cachedSelection = this.renderArea().selectAll(this.selector());
-                this._cachedSelectionValid = true;
-            }
-            return this._cachedSelection;
+            return this.renderArea().selectAll(this.selector());
         };
         /**
          * Returns the CSS selector for this Drawer's visual elements.
@@ -8287,11 +8293,6 @@ var Plottable;
             };
             Scatter.prototype._generateDrawSteps = function () {
                 var drawSteps = [];
-                if (this._animateOnNextRender()) {
-                    var resetAttrToProjector = this._generateAttrToProjector();
-                    resetAttrToProjector["d"] = function () { return ""; };
-                    drawSteps.push({ attrToProjector: resetAttrToProjector, animator: this._getAnimator(Plots.Animator.RESET) });
-                }
                 drawSteps.push({ attrToProjector: this._generateAttrToProjector(), animator: this._getAnimator(Plots.Animator.MAIN) });
                 return drawSteps;
             };
@@ -10625,6 +10626,241 @@ var Plottable;
             return Easing;
         })();
         Animators.Easing = Easing;
+    })(Animators = Plottable.Animators || (Plottable.Animators = {}));
+})(Plottable || (Plottable = {}));
+
+///<reference path="../reference.ts" />
+var Plottable;
+(function (Plottable) {
+    var Animators;
+    (function (Animators) {
+        /**
+         * An Animator with easing and configurable durations and delays.
+         */
+        var Base = (function () {
+            /**
+             * Constructs the default animator
+             *
+             * @constructor
+             */
+            function Base() {
+                this._startDelay = Base._DEFAULT_START_DELAY_MILLISECONDS;
+                this._stepDuration = Base._DEFAULT_STEP_DURATION_MILLISECONDS;
+                this._stepDelay = Base._DEFAULT_ITERATIVE_DELAY_MILLISECONDS;
+                this._maxTotalDuration = Base._DEFAULT_MAX_TOTAL_DURATION_MILLISECONDS;
+                this._easingMode = Base._DEFAULT_EASING_MODE;
+            }
+            Base.prototype.totalTime = function (numberOfSteps) {
+                var adjustedIterativeDelay = this._getAdjustedIterativeDelay(numberOfSteps);
+                return this.startDelay() + adjustedIterativeDelay * (Math.max(numberOfSteps - 1, 0)) + this.stepDuration();
+            };
+            Base.prototype.animate = function (selection, attrToAppliedProjector, drawingTarget) {
+                var _this = this;
+                var numberOfSteps = selection[0].length;
+                var adjustedIterativeDelay = this._getAdjustedIterativeDelay(numberOfSteps);
+                // set all the properties on the merge , save the transition returned
+                drawingTarget.merge = this.getTransition(drawingTarget.merge, this.stepDuration(), function (d, i) { return _this.startDelay() + adjustedIterativeDelay * i; })
+                    .attr(attrToAppliedProjector);
+                // remove the exiting elements
+                drawingTarget.exit
+                    .remove();
+                return drawingTarget.merge;
+            };
+            /**
+             * return a transition from the selection, with the requested duration
+             * and (possibly) delay. As a convenience, this may return the selection itself
+             * without applying a transition if durection = 0
+             *
+             */
+            Base.prototype.getTransition = function (selection, duration, delay) {
+                // if the duration is 0, just return the selection
+                if (duration === 0)
+                    return selection;
+                var selectionIsTransition = false;
+                if (selectionIsTransition) {
+                    // if the selection is already a transition, create a new transition, but let d3 supply the default
+                    // delay, that way they will "chain"
+                    return selection.transition()
+                        .ease(this.easingMode())
+                        .duration(duration);
+                }
+                else {
+                    // otherwise is the selection is NOT a transition, create a new transition setting up the delay
+                    return selection.transition()
+                        .ease(this.easingMode())
+                        .duration(duration)
+                        .delay(delay);
+                }
+            };
+            /**
+             *  return the combined AtributeToAppliedProjector
+             *
+             */
+            Base.prototype.mergeAttrs = function (attr1, attr2) {
+                var a = {};
+                for (var attrName in attr1) {
+                    a[attrName] = attr1[attrName];
+                }
+                for (var attrName in attr2) {
+                    a[attrName] = attr2[attrName];
+                }
+                return a;
+            };
+            /**
+             *  return the AtributeToAppliedProjector comprising only those attributes listed in names
+             *
+             */
+            Base.prototype.pluckAttrs = function (attr, names) {
+                //let out = 
+                return attr;
+            };
+            Base.prototype.delay = function (selection) {
+                var _this = this;
+                var dom = selection[0];
+                var numberOfSteps = selection[0].length;
+                var adjustedIterativeDelay = this._getAdjustedIterativeDelay(numberOfSteps);
+                return function (d, i) { return _this.startDelay() + adjustedIterativeDelay * i; };
+            };
+            Base.prototype.startDelay = function (startDelay) {
+                if (startDelay == null) {
+                    return this._startDelay;
+                }
+                else {
+                    this._startDelay = startDelay;
+                    return this;
+                }
+            };
+            Base.prototype.stepDuration = function (stepDuration) {
+                if (stepDuration == null) {
+                    return Math.min(this._stepDuration, this._maxTotalDuration);
+                }
+                else {
+                    this._stepDuration = stepDuration;
+                    return this;
+                }
+            };
+            Base.prototype.stepDelay = function (stepDelay) {
+                if (stepDelay == null) {
+                    return this._stepDelay;
+                }
+                else {
+                    this._stepDelay = stepDelay;
+                    return this;
+                }
+            };
+            Base.prototype.maxTotalDuration = function (maxTotalDuration) {
+                if (maxTotalDuration == null) {
+                    return this._maxTotalDuration;
+                }
+                else {
+                    this._maxTotalDuration = maxTotalDuration;
+                    return this;
+                }
+            };
+            Base.prototype.easingMode = function (easingMode) {
+                if (easingMode == null) {
+                    return this._easingMode;
+                }
+                else {
+                    this._easingMode = easingMode;
+                    return this;
+                }
+            };
+            Base.prototype.xScale = function (xScale) {
+                if (xScale == null) {
+                    return this._xScale;
+                }
+                else {
+                    this._xScale = xScale;
+                    return this;
+                }
+            };
+            /**
+      * Adjust the iterative delay, such that it takes into account the maxTotalDuration constraint
+      */
+            Base.prototype._getAdjustedIterativeDelay = function (numberOfSteps) {
+                var stepStartTimeInterval = this.maxTotalDuration() - this.stepDuration();
+                stepStartTimeInterval = Math.max(stepStartTimeInterval, 0);
+                var maxPossibleIterativeDelay = stepStartTimeInterval / Math.max(numberOfSteps - 1, 1);
+                return Math.min(this.stepDelay(), maxPossibleIterativeDelay);
+            };
+            /**
+             * The default starting delay of the animation in milliseconds
+             */
+            Base._DEFAULT_START_DELAY_MILLISECONDS = 0;
+            /**
+             * The default duration of one animation step in milliseconds
+             */
+            Base._DEFAULT_STEP_DURATION_MILLISECONDS = 300;
+            /**
+             * The default maximum start delay between each step of an animation
+             */
+            Base._DEFAULT_ITERATIVE_DELAY_MILLISECONDS = 15;
+            /**
+             * The default maximum total animation duration
+             */
+            Base._DEFAULT_MAX_TOTAL_DURATION_MILLISECONDS = Infinity;
+            /**
+             * The default easing of the animation
+             */
+            Base._DEFAULT_EASING_MODE = "exp-out";
+            return Base;
+        })();
+        Animators.Base = Base;
+    })(Animators = Plottable.Animators || (Plottable.Animators = {}));
+})(Plottable || (Plottable = {}));
+
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
+///<reference path="../reference.ts" />
+var Plottable;
+(function (Plottable) {
+    var Animators;
+    (function (Animators) {
+        /**
+         * Base for animators that animate specific attributes, such as Opacity, height... .
+         */
+        var Attr = (function (_super) {
+            __extends(Attr, _super);
+            function Attr() {
+                _super.apply(this, arguments);
+            }
+            Attr.prototype.animate = function (selection, attrToAppliedProjector, drawingTarget) {
+                // first make the attr to apply to the enter selection before transition
+                // this is attrToAppliedProjector + _start
+                var startProjector = this.mergeAttrs(attrToAppliedProjector, this.startAttrs());
+                var endProjector = this.endAttrs() || this.startAttrs();
+                drawingTarget.enter = this.getTransition(drawingTarget.enter, 0)
+                    .attr(startProjector);
+                drawingTarget.exit = this.getTransition(drawingTarget.exit, this.stepDuration(), this.delay(drawingTarget.exit))
+                    .attr(endProjector);
+                // now we can call the base class which will append the remove() to the end of the exit transition
+                return _super.prototype.animate.call(this, selection, attrToAppliedProjector, drawingTarget);
+            };
+            Attr.prototype.startAttrs = function (startAttrs) {
+                if (startAttrs == null) {
+                    return this._startAttrs;
+                }
+                else {
+                    this._startAttrs = startAttrs;
+                    return this;
+                }
+            };
+            Attr.prototype.endAttrs = function (endAttrs) {
+                if (endAttrs == null) {
+                    return this._endAttrs;
+                }
+                else {
+                    this._endAttrs = endAttrs;
+                    return this;
+                }
+            };
+            return Attr;
+        })(Animators.Base);
+        Animators.Attr = Attr;
     })(Animators = Plottable.Animators || (Plottable.Animators = {}));
 })(Plottable || (Plottable = {}));
 
