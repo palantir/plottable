@@ -272,7 +272,7 @@ module Plottable {
                    /**
              * Adjust the iterative delay, such that it takes into account the maxTotalDuration constraint
              */
-            private _getAdjustedIterativeDelay(numberOfSteps: number) {
+            protected _getAdjustedIterativeDelay(numberOfSteps: number) {
                 let stepStartTimeInterval = this.maxTotalDuration() - this.stepDuration();
                 stepStartTimeInterval = Math.max(stepStartTimeInterval, 0);
                 let maxPossibleIterativeDelay = stepStartTimeInterval / Math.max(numberOfSteps - 1, 1);
