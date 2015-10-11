@@ -603,16 +603,6 @@ export module Plots {
 
     protected _generateDrawSteps(): Drawers.DrawStep[] {
       let drawSteps: Drawers.DrawStep[] = [];
-      if (this._animateOnNextRender()) {
-        let resetAttrToProjector = this._generateAttrToProjector();
-        let primaryScale: Scale<any, number> = this._isVertical ? this.y().scale : this.x().scale;
-        let scaledBaseline = primaryScale.scale(this.baselineValue());
-        let positionAttr = this._isVertical ? "y" : "x";
-        let dimensionAttr = this._isVertical ? "height" : "width";
-        resetAttrToProjector[positionAttr] = () => scaledBaseline;
-        resetAttrToProjector[dimensionAttr] = () => 0;
-        drawSteps.push({attrToProjector: resetAttrToProjector, animator: this._getAnimator(Plots.Animator.RESET)});
-      }
       drawSteps.push({attrToProjector: this._generateAttrToProjector(), animator: this._getAnimator(Plots.Animator.MAIN)});
       return drawSteps;
     }
