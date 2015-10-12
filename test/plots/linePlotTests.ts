@@ -1,412 +1,299 @@
 ///<reference path="../testReference.ts" />
 
 describe("Plots", () => {
-  // HACKHACK #1798: beforeEach being used below
   describe("LinePlot", () => {
-    it("entities() with NaN in data", () => {
-      let svg = TestMethods.generateSVG(500, 500);
-      let dataWithNaN = [
-        { foo: 0.0, bar: 0.0 },
-        { foo: 0.2, bar: 0.2 },
-        { foo: 0.4, bar: NaN },
-        { foo: 0.6, bar: 0.6 },
-        { foo: 0.8, bar: 0.8 }
-      ];
+    describe("Basic Usage", () => {
+      let svg: d3.Selection<void>;
+      let xScale: Plottable.Scales.Linear;
+      let yScale: Plottable.Scales.Linear;
+      let linePlot: Plottable.Plots.Line<number>;
+      let data = [{x: 0, y: 0}, {x: 1, y: 1}];
+      let dataset: Plottable.Dataset;
 
-      let xScale = new Plottable.Scales.Linear();
-      xScale.domain([0, 1]);
-      let yScale = new Plottable.Scales.Linear();
-      yScale.domain([0, 1]);
-
-      let linePlot = new Plottable.Plots.Line();
-      linePlot.addDataset(new Plottable.Dataset(dataWithNaN));
-      linePlot.x((d: any) => d.foo, xScale);
-      linePlot.y((d: any) => d.bar, yScale);
-      linePlot.renderTo(svg);
-
-      let entities = linePlot.entities();
-
-      let expectedLength = dataWithNaN.length - 1;
-      assert.lengthOf(entities, expectedLength, "NaN data was not returned");
-
-      svg.remove();
-    });
-
-    describe("interpolation", () => {
-      it("interpolator() get / set", () => {
-        let linePlot = new Plottable.Plots.Line();
-        assert.strictEqual(linePlot.interpolator(), "linear", "the default interpolation mode is linear");
-        assert.strictEqual(linePlot.interpolator("step"), linePlot, "setting an interpolation mode returns the plot");
-        assert.strictEqual(linePlot.interpolator(), "step", "setting an interpolation mode works");
+      beforeEach(() => {
+        svg = TestMethods.generateSVG();
+        xScale = new Plottable.Scales.Linear();
+        yScale = new Plottable.Scales.Linear();
+        linePlot = new Plottable.Plots.Line<number>();
+        linePlot.x((d: any) => d.x, xScale);
+        linePlot.y((d: any) => d.y, yScale);
+        linePlot.attr("stroke", (d: any, i: number, m: any) => d3.rgb(d.x, d.y, i).toString());
+        dataset = new Plottable.Dataset(data);
       });
 
-      it("interpolator() behavior for the step function", () => {
-        let svg = TestMethods.generateSVG(400, 400);
-        let data = [
-          {"x": 0.0, "y": 0},
-          {"x": 0.8, "y": 0.717},
-          {"x": 1.6, "y": 0.999},
-          {"x": 2.4, "y": 0.675},
-          {"x": 3.2, "y": -0.058},
-          {"x": 4.0, "y": -0.756},
-          {"x": 4.8, "y": -0.996},
-          {"x": 5.6, "y": -0.631},
+      it("does not throw error when given NaN values", () => {
+        let dataWithNaN = [
+          { x: 0.0, y: 0.0 },
+          { x: 0.2, y: 0.2 },
+          { x: 0.4, y: NaN },
+          { x: 0.6, y: 0.6 },
+          { x: 0.8, y: 0.8 }
         ];
 
-        let xScale = new Plottable.Scales.Linear();
-        let yScale = new Plottable.Scales.Linear();
-        let linePlot = new Plottable.Plots.Line();
-        linePlot.addDataset(new Plottable.Dataset(data));
-        linePlot.x((d) => d.x, xScale);
-        linePlot.y((d) => d.y, yScale);
+        linePlot.addDataset(new Plottable.Dataset(dataWithNaN));
+        assert.doesNotThrow(() => linePlot.renderTo(svg), Error, "does not throw error with NaN data");
 
+        let entities = linePlot.entities();
+        let expectedLength = dataWithNaN.length - 1;
+        assert.lengthOf(entities, expectedLength, "NaN data was not returned");
+
+        svg.remove();
+      });
+
+      it("does not throw error when rendering without data", () => {
+        assert.doesNotThrow(() => linePlot.renderTo(svg), Error, "does not throw error rendering without data");
+        svg.remove();
+      });
+
+      it("retains original classes when setting class with attr", () => {
+        let cssClass = "pink";
+        linePlot.attr("class", cssClass);
+        linePlot.renderTo(svg);
+        linePlot.addDataset(dataset);
+
+        let linePath = linePlot.content().select(".line");
+        assert.isTrue(linePath.classed(cssClass), "custom class is applied");
+        assert.isTrue(linePath.classed("line"), "default class is retained");
+        svg.remove();
+      });
+
+      it("draws a line with correct data points and fill and stroke settings", () => {
+        linePlot.addDataset(dataset);
         linePlot.renderTo(svg);
 
-        let svgPath: string;
-        svgPath = linePlot.content().select("path").attr("d");
-        assert.lengthOf(svgPath.match(/L/g), data.length - 1, "one line for each pair of consecutive points");
-        assert.isNull(svgPath.match(/V/g), "no vertical lines");
-        assert.isNull(svgPath.match(/H/g), "no horizontal lines");
+        let linePath = linePlot.content().select(".line");
+        TestMethods.assertLinePathEqualToDataPoints(linePath.attr("d"), data, xScale, yScale);
+        assert.strictEqual(linePath.style("fill"), "none", "line fill renders as \"none\"");
+        assert.strictEqual(linePath.attr("stroke"), "#000000", "stroke set correctly");
+        svg.remove();
+      });
 
-        linePlot.interpolator("step");
+      it("can set attributes and render accordingly", () => {
+        linePlot.addDataset(dataset);
+        linePlot.renderTo(svg);
 
-        svgPath = linePlot.content().select("path").attr("d");
-        assert.lengthOf(svgPath.match(/V/g), data.length - 1, "one vertical line for each pair of consecutive points");
-        assert.lengthOf(svgPath.match(/H/g), data.length, "one horizontal line for each point");
-        assert.isNull(svgPath.match(/L/g), "no other lines");
+        let newColor = "pink";
+        linePlot.attr("stroke", newColor);
+        linePlot.render();
+        let linePath = linePlot.content().select(".line");
+        assert.strictEqual(linePath.attr("stroke"), newColor, "stroke changed correctly");
+        svg.remove();
+      });
+
+      it("skips NaN and undefined x and y values", () => {
+        let lineData = [
+          { x: 0.0, y: 0.0 },
+          { x: 0.2, y: 0.2 },
+          { x: 0.4, y: 0.4 },
+          { x: 0.6, y: 0.6 },
+          { x: 0.8, y: 0.8 }
+        ];
+        let dataset = new Plottable.Dataset(lineData);
+        linePlot.addDataset(dataset);
+        linePlot.renderTo(svg);
+
+        let linePath = linePlot.content().select(".line");
+        let validPoints = lineData.slice(0, 2).concat(lineData.slice(3, 5));
+        let dataWithNaN = lineData.slice();
+
+        dataWithNaN[2] = { x: 0.4, y: NaN };
+        dataset.data(dataWithNaN);
+        linePlot.render();
+        TestMethods.assertLinePathEqualToDataPoints(linePath.attr("d"), validPoints, xScale, yScale);
+
+        dataWithNaN[2] = { x: NaN, y: 0.4 };
+        dataset.data(dataWithNaN);
+        TestMethods.assertLinePathEqualToDataPoints(linePath.attr("d"), validPoints, xScale, yScale);
+
+        let dataWithUndefined = lineData.slice();
+        dataWithUndefined[2] = { x: 0.4, y: undefined };
+        dataset.data(dataWithUndefined);
+        TestMethods.assertLinePathEqualToDataPoints(linePath.attr("d"), validPoints, xScale, yScale);
+
+        dataWithUndefined[2] = { x: undefined, y: 0.4 };
+        dataset.data(dataWithUndefined);
+        TestMethods.assertLinePathEqualToDataPoints(linePath.attr("d"), validPoints, xScale, yScale);
 
         svg.remove();
       });
     });
-  });
 
-  describe("LinePlot", () => {
-    // HACKHACK #1798: beforeEach being used below
-    it("renders correctly with no data", () => {
-      let svg = TestMethods.generateSVG(400, 400);
-      let xScale = new Plottable.Scales.Linear();
-      let yScale = new Plottable.Scales.Linear();
-      let plot = new Plottable.Plots.Line();
-      plot.x((d: any) => d.x, xScale);
-      plot.y((d: any) => d.y, yScale);
-      assert.doesNotThrow(() => plot.renderTo(svg), Error);
-      assert.strictEqual(plot.width(), 400, "was allocated width");
-      assert.strictEqual(plot.height(), 400, "was allocated height");
-      svg.remove();
-    });
-  });
+    describe("interpolation", () => {
+      let svg: d3.Selection<void>;
+      let xScale: Plottable.Scales.Linear;
+      let yScale: Plottable.Scales.Linear;
+      let linePlot: Plottable.Plots.Line<number>;
 
-  describe("LinePlot", () => {
-    let svg: d3.Selection<void>;
-    let xScale: Plottable.Scales.Linear;
-    let yScale: Plottable.Scales.Linear;
-    let xAccessor: any;
-    let yAccessor: any;
-    let colorAccessor: any;
-    let twoPointData = [{foo: 0, bar: 0}, {foo: 1, bar: 1}];
-    let simpleDataset: Plottable.Dataset;
-    let linePlot: Plottable.Plots.Line<number>;
-    let renderArea: d3.Selection<void>;
+      beforeEach(() => {
+        svg = TestMethods.generateSVG();
+        xScale = new Plottable.Scales.Linear();
+        yScale = new Plottable.Scales.Linear();
+        linePlot = new Plottable.Plots.Line<number>();
+        linePlot.x((d: any) => d.x, xScale);
+        linePlot.y((d: any) => d.y, yScale);
+      });
 
-    before(() => {
-      xScale = new Plottable.Scales.Linear();
-      xScale.domain([0, 1]);
-      yScale = new Plottable.Scales.Linear();
-      yScale.domain([0, 1]);
-      xAccessor = (d: any) => d.foo;
-      yAccessor = (d: any) => d.bar;
-      colorAccessor = (d: any, i: number, m: any) => d3.rgb(d.foo, d.bar, i).toString();
-    });
+      it("sets interploation correctly", () => {
+        assert.strictEqual(linePlot.interpolator(), "linear", "the default interpolation mode is linear");
+        assert.strictEqual(linePlot.interpolator("step"), linePlot, "setting an interpolation mode returns the plot");
+        assert.strictEqual(linePlot.interpolator(), "step", "setting an interpolation mode works");
 
-    beforeEach(() => {
-      svg = TestMethods.generateSVG(500, 500);
-      simpleDataset = new Plottable.Dataset(twoPointData);
-      linePlot = new Plottable.Plots.Line<number>();
-      linePlot.addDataset(simpleDataset);
-      linePlot.x(xAccessor, xScale)
-              .y(yAccessor, yScale)
-              .attr("stroke", colorAccessor)
-              .renderTo(svg);
-      renderArea = (<any> linePlot)._renderArea;
-    });
+        svg.remove();
+      });
 
-    it("draws a line correctly", () => {
-      let linePath = renderArea.select(".line");
-      assert.strictEqual(TestMethods.normalizePath(linePath.attr("d")), "M0,500L500,0", "line d was set correctly");
-      assert.strictEqual(linePath.style("fill"), "none", "line fill renders as \"none\"");
-      svg.remove();
-    });
+      it("draws step function when interpolator is set to step", () => {
+        let data = [
+          {x: 0.0, y: 0},
+          {x: 0.8, y: 0.717},
+          {x: 1.6, y: 0.999},
+          {x: 2.4, y: 0.675},
+          {x: 3.2, y: -0.058},
+          {x: 4.0, y: -0.756},
+          {x: 4.8, y: -0.996},
+          {x: 5.6, y: -0.631},
+        ];
 
-    it("attributes set appropriately from accessor", () => {
-      let areaPath = renderArea.select(".line");
-      assert.strictEqual(areaPath.attr("stroke"), "#000000", "stroke set correctly");
-      svg.remove();
-    });
+        linePlot.addDataset(new Plottable.Dataset(data));
+        linePlot.renderTo(svg);
 
-    it("attributes can be changed by projecting new accessor and re-render appropriately", () => {
-      let newColorAccessor = () => "pink";
-      linePlot.attr("stroke", newColorAccessor);
-      linePlot.renderTo(svg);
-      let linePath = renderArea.select(".line");
-      assert.strictEqual(linePath.attr("stroke"), "pink", "stroke changed correctly");
-      svg.remove();
-    });
+        let svgPath = linePlot.content().select("path").attr("d");
+        TestMethods.assertLinePathEqualToDataPoints(svgPath, data, xScale, yScale);
 
-    it("attributes can be changed by projecting attribute accessor (sets to first datum attribute)", () => {
-      let data = JSON.parse(JSON.stringify(twoPointData)); // deep copy to not affect other tests
-      data.forEach(function(d: any) { d.stroke = "pink"; });
-      simpleDataset.data(data);
-      linePlot.attr("stroke", (d) => d.stroke);
-      let linePath = renderArea.select(".line");
-      assert.strictEqual(linePath.attr("stroke"), "pink", "stroke set to uniform stroke color");
+        linePlot.interpolator("step");
 
-      data[0].stroke = "green";
-      simpleDataset.data(data);
-      assert.strictEqual(linePath.attr("stroke"), "green", "stroke set to first datum stroke color");
-      svg.remove();
-    });
+        svgPath = linePlot.content().select("path").attr("d");
+        let stepPoints = [data[0]];
+        for (let i = 1; i < data.length; i ++ ) {
+          let p1 = data[i - 1];
+          let p2 = data[i];
+          stepPoints.push({ x: (p1.x + p2.x) / 2, y: p1.y });
+          stepPoints.push({ x: (p1.x + p2.x) / 2, y: p2.y });
+        }
+        stepPoints.push({ x: data[data.length - 1].x, y:  data[data.length - 1].y });
+        TestMethods.assertLinePathEqualToDataPoints(svgPath, stepPoints, xScale, yScale);
 
-    it("correctly handles NaN and undefined x and y values", () => {
-      let lineData = [
-        { foo: 0.0, bar: 0.0 },
-        { foo: 0.2, bar: 0.2 },
-        { foo: 0.4, bar: 0.4 },
-        { foo: 0.6, bar: 0.6 },
-        { foo: 0.8, bar: 0.8 }
-      ];
-      simpleDataset.data(lineData);
-      let linePath = renderArea.select(".line");
-      let dOriginal = TestMethods.normalizePath(linePath.attr("d"));
-
-      function assertCorrectPathSplitting(msgPrefix: string) {
-        let d = TestMethods.normalizePath(linePath.attr("d"));
-        let pathSegements = d.split("M").filter((segment) => segment !== "");
-        assert.lengthOf(pathSegements, 2, msgPrefix + " split path into two segments");
-        let firstSegmentContained = dOriginal.indexOf(pathSegements[0]) >= 0;
-        assert.isTrue(firstSegmentContained, "first path segment is a subpath of the original path");
-        let secondSegmentContained = dOriginal.indexOf(pathSegements[1]) >= 0;
-        assert.isTrue(secondSegmentContained, "second path segment is a subpath of the original path");
-      }
-
-      let dataWithNaN = lineData.slice();
-      dataWithNaN[2] = { foo: 0.4, bar: NaN };
-      simpleDataset.data(dataWithNaN);
-      assertCorrectPathSplitting("y=NaN");
-      dataWithNaN[2] = { foo: NaN, bar: 0.4 };
-      simpleDataset.data(dataWithNaN);
-      assertCorrectPathSplitting("x=NaN");
-
-      let dataWithUndefined = lineData.slice();
-      dataWithUndefined[2] = { foo: 0.4, bar: undefined };
-      simpleDataset.data(dataWithUndefined);
-      assertCorrectPathSplitting("y=undefined");
-      dataWithUndefined[2] = { foo: undefined, bar: 0.4 };
-      simpleDataset.data(dataWithUndefined);
-      assertCorrectPathSplitting("x=undefined");
-
-      svg.remove();
+        svg.remove();
+      });
     });
 
     describe("selections", () => {
-      it("retrieves all dataset selections with no args", () => {
-        let dataset3 = new Plottable.Dataset([
-          { foo: 0, bar: 1 },
-          { foo: 1, bar: 0.95 }
-        ]);
-        linePlot.addDataset(dataset3);
+      let svg: d3.Selection<void>;
+      let xScale: Plottable.Scales.Linear;
+      let yScale: Plottable.Scales.Linear;
+      let data = [{ x: 0, y: 0.75 }, { x: 1, y: 0.25 }];
+      let data2 = [{ x: 0, y: 1 }, { x: 1, y: 0.95 }];
+      let dataset: Plottable.Dataset;
+      let dataset2: Plottable.Dataset;
+      let linePlot: Plottable.Plots.Line<number>;
 
+      beforeEach(() => {
+        svg = TestMethods.generateSVG();
+        xScale = new Plottable.Scales.Linear();
+        yScale = new Plottable.Scales.Linear();
+        dataset = new Plottable.Dataset(data);
+        dataset2 = new Plottable.Dataset(data2);
+        linePlot = new Plottable.Plots.Line<number>();
+        linePlot.x((d) => d.x, xScale);
+        linePlot.y((d) => d.y, yScale);
+        linePlot.attr("stroke", (d, i, m) => d3.rgb(d.x, d.y, i).toString());
+        linePlot.addDataset(dataset);
+        linePlot.renderTo(svg);
+      });
+
+      it("retrieves all dataset selections with no args", () => {
+        linePlot.addDataset(dataset2);
         let allLines = linePlot.selections();
         assert.strictEqual(allLines.size(), 2, "all lines retrieved");
 
         svg.remove();
       });
 
-      it("retrieves correct selections", () => {
-        let dataset3 = new Plottable.Dataset([
-          { foo: 0, bar: 1 },
-          { foo: 1, bar: 0.95 }
-        ]);
-        linePlot.addDataset(dataset3);
-
-        let allLines = linePlot.selections([dataset3]);
+      it("retrieves selections for selected dataset", () => {
+        linePlot.addDataset(dataset2);
+        let allLines = linePlot.selections([dataset]);
         assert.strictEqual(allLines.size(), 1, "all lines retrieved");
         let selectionData = allLines.data()[0];
-        assert.deepEqual(selectionData, dataset3.data(), "third dataset data in selection data");
+        assert.deepEqual(selectionData, dataset.data(), "third dataset data in selection data");
 
         svg.remove();
       });
 
       it("skips invalid Dataset", () => {
-        let dataset3 = new Plottable.Dataset([
-          { foo: 0, bar: 1 },
-          { foo: 1, bar: 0.95 }
-        ]);
-        linePlot.addDataset(dataset3);
         let dummyDataset = new Plottable.Dataset([]);
 
-        let allLines = linePlot.selections([dataset3, dummyDataset]);
+        let allLines = linePlot.selections([dataset, dummyDataset]);
         assert.strictEqual(allLines.size(), 1, "all lines retrieved");
         let selectionData = allLines.data()[0];
-        assert.deepEqual(selectionData, dataset3.data(), "third dataset data in selection data");
+        assert.deepEqual(selectionData, dataset.data(), "third dataset data in selection data");
 
         svg.remove();
       });
 
-    });
+      it("can retrieve the nearest Entity", () => {
+        let px = xScale.scale(data[0].x);
+        let py = yScale.scale(data[0].y);
+        let closest = linePlot.entityNearest({x: px, y: py + 1});
+        assert.strictEqual(closest.datum, data[0], "it retrieves the closest point from above");
 
-    describe("entities()", () => {
-      it("retrieves correct data", () => {
-        let dataset3 = new Plottable.Dataset([
-          { foo: 0, bar: 1 },
-          { foo: 1, bar: 0.95 }
-        ]);
-        linePlot.addDataset(dataset3);
+        closest = linePlot.entityNearest({x: px, y: py - 1});
+        assert.strictEqual(closest.datum, data[0], "it retrieves the closest point from below");
 
-        let nodes = linePlot.entities().map((entity) => entity.selection.node());
-        let uniqueNodes: EventTarget[] = [];
-        nodes.forEach((node) => {
-          if (uniqueNodes.indexOf(node) === -1) {
-            uniqueNodes.push(node);
-          }
-        });
-        assert.lengthOf(uniqueNodes, linePlot.datasets().length, "one Element per Dataset");
-        svg.remove();
-      });
-    });
+        px = xScale.scale(data[1].x);
+        py = yScale.scale(data[1].y);
 
-    describe("entityNearest()", () => {
-      let lines: d3.Selection<void>;
-      let d0: any, d1: any;
-      let d0Px: Plottable.Point, d1Px: Plottable.Point;
-      let dataset2: Plottable.Dataset;
+        closest = linePlot.entityNearest({x: px + 1, y: py});
+        assert.strictEqual(closest.datum, data[1], "it retrieves the closest point from the right");
 
-      beforeEach(() => {
-        dataset2 = new Plottable.Dataset([
-          { foo: 0, bar: 0.75 },
-          { foo: 1, bar: 0.25 }
-        ]);
-
-        linePlot.addDataset(dataset2);
-
-        lines = d3.selectAll(".line-plot .line");
-        d0 = dataset2.data()[0];
-        d0Px = {
-          x: xScale.scale(xAccessor(d0)),
-          y: yScale.scale(yAccessor(d0))
-        };
-
-        d1 = dataset2.data()[1];
-        d1Px = {
-          x: xScale.scale(xAccessor(d1)),
-          y: yScale.scale(yAccessor(d1))
-        };
-      });
-
-      it("returns nearest Entity", () => {
-        let expected: Plottable.Plots.PlotEntity = {
-          datum: d0,
-          index: 0,
-          dataset: dataset2,
-          position: d0Px,
-          selection: d3.selectAll([lines[0][1]]),
-          component: linePlot
-        };
-
-        let closest = linePlot.entityNearest({x: d0Px.x, y: d0Px.y - 1});
-        TestMethods.assertPlotEntitiesEqual(closest, expected, "if above a point, it is closest");
-
-        closest = linePlot.entityNearest({x: d0Px.x, y: d0Px.y + 1});
-        TestMethods.assertPlotEntitiesEqual(closest, expected, "if below a point, it is closest");
-
-        closest = linePlot.entityNearest({x: d0Px.x + 1, y: d0Px.y + 1});
-        TestMethods.assertPlotEntitiesEqual(closest, expected, "if right of a point, it is closest");
-
-        expected = {
-          datum: d1,
-          index: 1,
-          dataset: dataset2,
-          position: d1Px,
-          selection: d3.selectAll([lines[0][1]]),
-          component: linePlot
-        };
-
-        closest = linePlot.entityNearest({x: d1Px.x - 1, y: d1Px.y});
-        TestMethods.assertPlotEntitiesEqual(closest, expected, "if left of a point, it is closest");
+        closest = linePlot.entityNearest({x: px - 1, y: py});
+        assert.strictEqual(closest.datum, data[1], "it retrieves the closest point from the left");
 
         svg.remove();
       });
 
-      it("considers only in-view points", () => {
+      it("considers only in-view points for the nearest Entity", () => {
         xScale.domain([0.25, 1]);
 
-        let expected: Plottable.Plots.PlotEntity = {
-          datum: d1,
-          index: 1,
-          dataset: dataset2,
-          position: {
-            x: xScale.scale(xAccessor(d1)),
-            y: yScale.scale(yAccessor(d1))
-          },
-          selection: d3.selectAll([lines[0][1]]),
-          component: linePlot
-        };
-
-        let closest = linePlot.entityNearest({ x: xScale.scale(0.25), y: d1Px.y });
-        TestMethods.assertPlotEntitiesEqual(closest, expected, "only in-view points are considered");
+        let closest = linePlot.entityNearest({ x: xScale.scale(data[0].x), y: yScale.scale(data[0].y) });
+        assert.strictEqual(closest.datum, data[1], "it retrieves the closest point in-view");
 
         svg.remove();
       });
 
       it("returns undefined if no Entities are visible", () => {
-        linePlot = new Plottable.Plots.Line<number>();
-        let closest = linePlot.entityNearest({ x: d0Px.x, y: d0Px.y });
+        dataset.data([]);
+        let closest = linePlot.entityNearest({ x: 0, y: 0 });
         assert.isUndefined(closest, "returns undefined if no Entity can be found");
         svg.remove();
       });
     });
 
-    it("retains original classes when class is projected", () => {
-      let newClassProjector = () => "pink";
-      linePlot.attr("class", newClassProjector);
-      linePlot.renderTo(svg);
-      let linePath = renderArea.select(".line");
-      assert.isTrue(linePath.classed("pink"), "'pink' class is applied");
-      assert.isTrue(linePath.classed("line"), "'line' class is retained");
-      svg.remove();
-    });
-  });
-
-  describe("Line Plot", () => {
     describe("smooth autoranging", () => {
 
       let svg: d3.Selection<void>;
       let xScale: Plottable.Scales.Linear;
       let yScale: Plottable.Scales.Linear;
+      let data = [
+        {x: 0.0, y: -1},
+        {x: 1.8, y: -2}
+      ];
+      let dataset: Plottable.Dataset;
+      let line: Plottable.Plots.Line<number>;
 
       beforeEach(() => {
-        svg = TestMethods.generateSVG(500, 500);
+        svg = TestMethods.generateSVG();
         xScale = new Plottable.Scales.Linear();
         yScale = new Plottable.Scales.Linear();
-      });
-
-      afterEach(() => {
-        svg.remove();
-      });
-
-      it("smooth autoranging works", () => {
         xScale.domain([0.1, 1.1]);
 
-        let data = [
-          {"x": 0.0, "y": -1},
-          {"x": 1.8, "y": -2}
-        ];
-
-        let line = new Plottable.Plots.Line();
+        line = new Plottable.Plots.Line<number>();
         line.x(function(d) { return d.x; }, xScale);
         line.y(function(d) { return d.y; }, yScale);
-        line.addDataset(new Plottable.Dataset(data));
-        line.autorangeMode("y");
+        dataset = new Plottable.Dataset(data);
+      });
 
+      it("handles autoranging smoothly ", () => {
+        line.addDataset(dataset);
+        line.autorangeMode("y");
         xScale.padProportion(0);
         yScale.padProportion(0);
         line.renderTo(svg);
@@ -435,23 +322,17 @@ describe("Plots", () => {
 
         line.autorangeSmooth(true);
         assert.deepEqual(yScale.domain(), [-2, -1], "no changes for autoranging smooth with same edge points (smooth)");
+
+        svg.remove();
       });
 
-      it("smooth autoranging works (called before accessors)", () => {
-        xScale.domain([0.1, 1.1]);
-
-        let data = [
-          {"x": 0.0, "y": -1},
-          {"x": 1.8, "y": -2}
-        ];
-
-        let line = new Plottable.Plots.Line();
+      it("handles autoranging smoothly when autorangeSmooth set before accessors", () => {
+        line = new Plottable.Plots.Line<number>();
         line.autorangeSmooth(true);
         line.x(function(d) { return d.x; }, xScale);
         line.y(function(d) { return d.y; }, yScale);
-        line.addDataset(new Plottable.Dataset(data));
+        line.addDataset(dataset);
         line.autorangeMode("y");
-
         line.renderTo(svg);
 
         let base = data[0].y;
@@ -465,23 +346,14 @@ describe("Plots", () => {
 
         assert.closeTo(yScale.domain()[0], expectedBottom, 0.001, "smooth autoranging forces the domain to include the line (left)");
         assert.closeTo(yScale.domain()[1], expectedTop, 0.001, "smooth autoranging forces the domain to include the line (right)");
+
+        svg.remove();
       });
 
-      it("smooth autoranging works (called before autorangeMode)", () => {
-        xScale.domain([0.1, 1.1]);
-
-        let data = [
-          {"x": 0.0, "y": -1},
-          {"x": 1.8, "y": -2}
-        ];
-
-        let line = new Plottable.Plots.Line();
-        line.x(function(d) { return d.x; }, xScale);
-        line.y(function(d) { return d.y; }, yScale);
-        line.addDataset(new Plottable.Dataset(data));
+      it("handles autoranging smoothly when autorangeSmooth set before autorangeMode", () => {
+        line.addDataset(dataset);
         line.autorangeSmooth(true);
         line.autorangeMode("y");
-
         line.renderTo(svg);
 
         let base = data[0].y;
@@ -495,22 +367,13 @@ describe("Plots", () => {
 
         assert.closeTo(yScale.domain()[0], expectedBottom, 0.001, "smooth autoranging forces the domain to include the line (left)");
         assert.closeTo(yScale.domain()[1], expectedTop, 0.001, "smooth autoranging forces the domain to include the line (right)");
+
+        svg.remove();
       });
 
-      it("smooth autoranging works (called before rendering)", () => {
-        xScale.domain([0.1, 1.1]);
-
-        let data = [
-          {"x": 0.0, "y": -1},
-          {"x": 1.8, "y": -2}
-        ];
-
-        let line = new Plottable.Plots.Line();
-        line.x(function(d) { return d.x; }, xScale);
-        line.y(function(d) { return d.y; }, yScale);
-        line.addDataset(new Plottable.Dataset(data));
+      it("handles autoranging smoothly when autorangeSmooth set before rendering", () => {
+        line.addDataset(dataset);
         line.autorangeMode("y");
-
         line.autorangeSmooth(true);
         line.renderTo(svg);
 
@@ -525,22 +388,13 @@ describe("Plots", () => {
 
         assert.closeTo(yScale.domain()[0], expectedBottom, 0.001, "smooth autoranging forces the domain to include the line (left)");
         assert.closeTo(yScale.domain()[1], expectedTop, 0.001, "smooth autoranging forces the domain to include the line (right)");
+
+        svg.remove();
       });
 
-      it("smooth autoranging works (called after rendering)", () => {
-        xScale.domain([0.1, 1.1]);
-
-        let data = [
-          {"x": 0.0, "y": -1},
-          {"x": 1.8, "y": -2}
-        ];
-
-        let line = new Plottable.Plots.Line();
-        line.x(function(d) { return d.x; }, xScale);
-        line.y(function(d) { return d.y; }, yScale);
-        line.addDataset(new Plottable.Dataset(data));
+      it("handles autoranging smoothly when autorangeSmooth set after rendering", () => {
+        line.addDataset(dataset);
         line.autorangeMode("y");
-
         line.renderTo(svg);
         line.autorangeSmooth(true);
 
@@ -555,21 +409,12 @@ describe("Plots", () => {
 
         assert.closeTo(yScale.domain()[0], expectedBottom, 0.001, "smooth autoranging forces the domain to include the line (left)");
         assert.closeTo(yScale.domain()[1], expectedTop, 0.001, "smooth autoranging forces the domain to include the line (right)");
+
+        svg.remove();
       });
 
-      it("smooth autoranging works (called after rendering, before autorangeMode)", () => {
-        xScale.domain([0.1, 1.1]);
-
-        let data = [
-          {"x": 0.0, "y": -1},
-          {"x": 1.8, "y": -2}
-        ];
-
-        let line = new Plottable.Plots.Line();
-        line.x(function(d) { return d.x; }, xScale);
-        line.y(function(d) { return d.y; }, yScale);
-        line.addDataset(new Plottable.Dataset(data));
-
+      it("handles autoranging smoothly when autorangeSmooth set after rendering, before autorangeMode", () => {
+        line.addDataset(dataset);
         line.renderTo(svg);
 
         line.autorangeSmooth(true);
@@ -586,68 +431,51 @@ describe("Plots", () => {
 
         assert.closeTo(yScale.domain()[0], expectedBottom, 0.001, "smooth autoranging forces the domain to include the line (left)");
         assert.closeTo(yScale.domain()[1], expectedTop, 0.001, "smooth autoranging forces the domain to include the line (right)");
+
+        svg.remove();
       });
 
-      it("autoDomaining works with smooth autoranging (before rendering)", () => {
-        xScale.domain([-0.1, 0.2]);
-
-        let data = [
-          {"x": 0.0, "y": -1},
-          {"x": 1.8, "y": -2}
-        ];
-
-        let line = new Plottable.Plots.Line();
-        line.x(function(d) { return d.x; }, xScale);
-        line.y(function(d) { return d.y; }, yScale);
-        line.addDataset(new Plottable.Dataset(data));
+      it("handles autoDomain correcly with and without autorangeSmooth", () => {
+        let expectedDomain = [-0.2, 2];
+        xScale.domain([-0.2, 2]);
+        line.addDataset(dataset);
         line.autorangeMode("y");
 
         line.autorangeSmooth(true);
         xScale.autoDomain();
         line.renderTo(svg);
 
-        assert.deepEqual(xScale.domain(), [-0.2, 2], "autoDomain works even when autoranging is done smoothly");
+        assert.deepEqual(xScale.domain(), expectedDomain, "autoDomain works even when autoranging is done smoothly");
 
         line.autorangeSmooth(false);
-        assert.deepEqual(xScale.domain(), [-0.2, 2], "autoDomain works when smooth autoranging is disabled back");
+        assert.deepEqual(xScale.domain(), expectedDomain, "autoDomain works when smooth autoranging is disabled back");
+
+        svg.remove();
       });
 
-      it("autoDomaining works with smooth autoranging (after rendering)", () => {
-        xScale.domain([-0.1, 0.2]);
-
-        let data = [
-          {"x": 0.0, "y": -1},
-          {"x": 1.8, "y": -2}
-        ];
-
-        let line = new Plottable.Plots.Line();
-        line.x(function(d) { return d.x; }, xScale);
-        line.y(function(d) { return d.y; }, yScale);
-        line.addDataset(new Plottable.Dataset(data));
-        line.autorangeMode("y");
-
+      it("handles autoDomain correcly with smooth autoranging set after rendering", () => {
+        let expectedDomain = [-0.2, 2];
+        xScale.domain([-0.2, 2]);
+        line.addDataset(dataset);
         line.renderTo(svg);
 
         line.autorangeSmooth(true);
         xScale.autoDomain();
 
-        assert.deepEqual(xScale.domain(), [-0.2, 2], "autoDomain works even when autoranging is done smoothly");
+        assert.deepEqual(xScale.domain(), expectedDomain, "autoDomain works even when autoranging is done smoothly");
 
         line.autorangeSmooth(false);
-        assert.deepEqual(xScale.domain(), [-0.2, 2], "autoDomain works when smooth autoranging is disabled back");
+        assert.deepEqual(xScale.domain(), expectedDomain, "autoDomain works when smooth autoranging is disabled back");
+
+        svg.remove();
       });
 
-      it("smooth autoranging works for vertical lines", () => {
+      it("handles autorange smoothly for vertical lines", () => {
         yScale.domain([0.1, 1.1]);
-
         let data = [
-          {"x": -2, "y": 1.8},
-          {"x": -1, "y": 0.0}
+          {x: -2, y: 1.8},
+          {x: -1, y: 0.0}
         ];
-
-        let line = new Plottable.Plots.Line();
-        line.x(function(d) { return d.x; }, xScale);
-        line.y(function(d) { return d.y; }, yScale);
         line.addDataset(new Plottable.Dataset(data));
         line.autorangeMode("x");
 
@@ -679,11 +507,12 @@ describe("Plots", () => {
 
         line.autorangeSmooth(true);
         assert.deepEqual(xScale.domain(), [-2, -1], "no changes for autoranging smooth with same edge points (smooth)");
+
+        svg.remove();
       });
     });
 
     describe("Cropped Rendering Performance", () => {
-
       let svg: d3.Selection<void>;
       let plot: Plottable.Plots.Line<number>;
 
@@ -701,13 +530,13 @@ describe("Plots", () => {
       it("can set the croppedRendering option", () => {
         plot.renderTo(svg);
 
-        assert.isTrue(plot.croppedRenderingEnabled(), "croppedRendering is not enabled by default");
+        assert.isTrue(plot.croppedRenderingEnabled(), "croppedRendering is enabled by default");
 
-        assert.strictEqual(plot.croppedRenderingEnabled(true), plot, "enabling the croppedRendering option returns the plot");
-        assert.isTrue(plot.croppedRenderingEnabled(), "can enable the croppedRendering option");
-
-        plot.croppedRenderingEnabled(false);
+        assert.strictEqual(plot.croppedRenderingEnabled(false), plot, "setting the croppedRendering option returns the plot");
         assert.isFalse(plot.croppedRenderingEnabled(), "can disable the croppedRendering option");
+
+        assert.strictEqual(plot.croppedRenderingEnabled(true), plot, "setting the croppedRendering option returns the plot");
+        assert.isTrue(plot.croppedRenderingEnabled(), "can enable the croppedRendering option");
 
         svg.remove();
       });
@@ -730,7 +559,7 @@ describe("Plots", () => {
 
         let path = plot.content().select("path.line").attr("d");
         let expectedRenderedData = [1, 2, 3].map((d) => data[d]);
-        checkPathForDataPoints(path, expectedRenderedData);
+        TestMethods.assertLinePathEqualToDataPoints(path, expectedRenderedData, xScale, yScale);
 
         svg.remove();
       });
@@ -753,7 +582,7 @@ describe("Plots", () => {
 
         let path = plot.content().select("path.line").attr("d");
         let expectedRenderedData = [1, 2, 3].map((d) => data[d]);
-        checkPathForDataPoints(path, expectedRenderedData);
+        TestMethods.assertLinePathEqualToDataPoints(path, expectedRenderedData, xScale, yScale);
 
         svg.remove();
       });
@@ -777,7 +606,7 @@ describe("Plots", () => {
 
         let path = plot.content().select("path.line").attr("d");
         let expectedRenderedData = [1, 2, 3].map((d) => data[d]);
-        checkPathForDataPoints(path, expectedRenderedData);
+        TestMethods.assertLinePathEqualToDataPoints(path, expectedRenderedData, xScale, yScale);
 
         svg.remove();
       });
@@ -796,38 +625,20 @@ describe("Plots", () => {
         plot.renderTo(svg);
 
         let path = plot.content().select("path.line").attr("d");
-        checkPathForDataPoints(path, [0, 1, 2, 3, 4].map((d) => data[d]));
+        TestMethods.assertLinePathEqualToDataPoints(path, [0, 1, 2, 3, 4].map((d) => data[d]), xScale, yScale);
 
         // Only middle point is in viewport
         xScale.domain([2.5, 3.5]);
         path = plot.content().select("path.line").attr("d");
-        checkPathForDataPoints(path, [1, 2, 3].map((d) => data[d]));
+        TestMethods.assertLinePathEqualToDataPoints(path, [1, 2, 3].map((d) => data[d]), xScale, yScale);
 
         // Only first point is in viewport
         xScale.domain([-0.5, 1.5]);
         path = plot.content().select("path.line").attr("d");
-        checkPathForDataPoints(path, [0, 1].map((d) => data[d]));
+        TestMethods.assertLinePathEqualToDataPoints(path, [0, 1].map((d) => data[d]), xScale, yScale);
 
         svg.remove();
       });
-
-      function checkPathForDataPoints(path: string, data: {x: number, y: number}[]) {
-        let EPSILON = 0.0001;
-
-        let lineEdges = TestMethods.normalizePath(path).match(/(\-?\d+\.?\d*)(,|\s)(-?\d+\.?\d*)/g);
-
-        assert.strictEqual(lineEdges.length, data.length, "correct number of edges drawn");
-
-        lineEdges.forEach((edge, i) => {
-          let coordinates = edge.split(/,|\s/);
-
-          assert.strictEqual(coordinates.length, 2, "There is an x coordinate and a y coordinate");
-          assert.closeTo(xScale.invert(+coordinates[0]), data[i].x, EPSILON,
-            `Point ${i} drawn, has correct x coordinate`);
-          assert.closeTo(yScale.invert(+coordinates[1]), data[i].y, EPSILON,
-            `Point ${i} drawn, has correct y coordinate`);
-        });
-      }
     });
 
     describe("Downsampling Performance", () => {
@@ -863,10 +674,10 @@ describe("Plots", () => {
         let data = [
           {x: -100, y: -1}, // last element in previous bucket
           {x: 0, y: 2}, // first element in current bucket
-          {x: 0.5, y: 1.5}, // the point to be removed 
+          {x: 0.5, y: 1.5}, // the point to be removed
           {x: 1, y: 1}, // minimum y in current bucket
           {x: 2, y: 4}, // maximum y in current bucket
-          {x: 3, y: 3}, // last elemnt in current bucket 
+          {x: 3, y: 3}, // last elemnt in current bucket
           {x: 100, y: 2}, // first element in next bucket
         ];
         plot.addDataset(new Plottable.Dataset(data));

@@ -353,15 +353,30 @@ module TestMethods {
   export function assertLinePathEqualToDataPoints(path: string, data: {x: number, y: number}[],
     xScale: Plottable.Scales.Linear, yScale: Plottable.Scales.Linear) {
     let EPSILON = 0.0001;
-    let lineEdges = TestMethods.normalizePath(path).match(/(\-?\d+\.?\d*)(,|\s)(-?\d+\.?\d*)/g);
+    let lineEdges = TestMethods.normalizePath(path).match(/([MmLl](\-?\d+\.?\d*)(,|\s)(-?\d+\.?\d*)|([HhVv](\-?\d+\.?\d*)))/g);
     assert.strictEqual(lineEdges.length, data.length, "correct number of edges drawn");
     lineEdges.forEach((edge, i) => {
-      let coordinates = edge.split(/,|\s/);
-      assert.strictEqual(coordinates.length, 2, "There is an x coordinate and a y coordinate");
-      assert.closeTo(xScale.invert(+coordinates[0]), data[i].x, EPSILON,
-        `Point ${i} drawn, has correct x coordinate`);
-      assert.closeTo(yScale.invert(+coordinates[1]), data[i].y, EPSILON,
-        `Point ${i} drawn, has correct y coordinate`);
+      let command = edge[0];
+      let coordinates = edge.slice(1).split(/,|\s/);
+      switch (command) {
+        case "M": case "m": case "L": case "l":
+          assert.strictEqual(coordinates.length, 2, "There is an x coordinate and a y coordinate");
+          assert.closeTo(xScale.invert(+coordinates[0]), data[i].x, EPSILON,
+            `Point ${i} drawn, has correct x coordinate`);
+          assert.closeTo(yScale.invert(+coordinates[1]), data[i].y, EPSILON,
+            `Point ${i} drawn, has correct y coordinate`);
+          break;
+        case "H": case "h":
+          assert.strictEqual(coordinates.length, 1, "There is an x coordinate");
+          assert.closeTo(xScale.invert(+coordinates[0]), data[i].x, EPSILON,
+            `Point ${i} drawn, has correct x coordinate`);
+          break;
+        case "V": case "v":
+          assert.strictEqual(coordinates.length, 1, "There is a y coordinate");
+          assert.closeTo(yScale.invert(+coordinates[0]), data[i].y, EPSILON,
+            `Point ${i} drawn, has correct y coordinate`);
+          break;
+      }
     });
   }
 }
