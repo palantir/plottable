@@ -245,7 +245,7 @@ describe("Plots", () => {
 
     describe("fail safe tests", () => {
 
-      it("non-numbers should default to 0 when calculating stack offsets", () => {
+      it("should default to 0 when calculating stack offsets with non-numbers", () => {
         let svg = TestMethods.generateSVG();
         let data1 = [
           { x: "A", y: "s"},
