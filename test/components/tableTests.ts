@@ -78,23 +78,13 @@ describe("Tables", () => {
       assert.throw(() => table.add(null, 0, 0), "Cannot add null to a table cell");
     });
 
-    it("add()-ing a Component to the Table should detach() it from its current location", () => {
+    it("detaches a Component from its previous location before adding it", () => {
       let c1 = new Plottable.Component;
       let svg = TestMethods.generateSVG();
       c1.renderTo(svg);
       let table = new Plottable.Components.Table();
       table.add(c1, 0, 0);
       assert.isFalse((<Node> svg.node()).hasChildNodes(), "Component was detach()-ed");
-      svg.remove();
-    });
-
-    it("add() works even if a component is added with a high column and low row index", () => {
-      // Solves #180, a weird bug
-      let t = new Plottable.Components.Table();
-      let svg = TestMethods.generateSVG();
-      t.add(new Plottable.Component(), 1, 0);
-      t.add(new Plottable.Component(), 0, 2);
-      t.renderTo(svg); // would throw an error without the fix (tested);
       svg.remove();
     });
   });
