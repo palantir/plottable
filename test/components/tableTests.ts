@@ -66,18 +66,16 @@ describe("Tables", () => {
       assert.isNull(rows[1][0], "component at (1, 0) is null");
     });
 
-    it("adding a Component where one already exists throws an Error", () => {
+    it("throws an Error on trying to add a Component to an occupied cell", () => {
       let c1 = new Plottable.Component();
-      let t = new Plottable.Components.Table([[c1]]);
+      let table = new Plottable.Components.Table([[c1]]);
       let c2 = new Plottable.Component();
-      assert.throws(() => t.add(c2, 0, 0), Error, "occupied");
+      assert.throws(() => table.add(c2, 0, 0), Error, "occupied");
     });
 
-    it("adding null to a table cell should throw an error", () => {
-      let c1 = new Plottable.Component();
-      let t = new Plottable.Components.Table([[c1]]);
-
-      assert.throw(() => t.add(null, 0, 0), "Cannot add null to a table cell");
+    it("throws an Error on trying to add null to the Table", () => {
+      let table = new Plottable.Components.Table();
+      assert.throw(() => table.add(null, 0, 0), "Cannot add null to a table cell");
     });
 
     it("add()-ing a Component to the Table should detach() it from its current location", () => {
