@@ -1,7 +1,32 @@
 ///<reference path="../reference.ts" />
 
 module Plottable {
+export class EasingFunctions {
+  public static atStart = (t: number) => {
+    return 1;
+  };
+  public static atEnd = (t: number) => {
+    if (t < 1) return 0;
+    return 1;
+  };
+  public static squEase(easingFunction: string, end: number, start?: number) {
+    return (t: number) => {
+      if (start === undefined) start = 0;
+      let tbar: number;
+      if (t < start)
+        tbar = 0;
+      else {
+        if (t > end) {
+          tbar = 1;
+        } else {
+          tbar = (t - start) / (end - start);
+        }
 
+        return d3.ease(easingFunction)(tbar);
+      }
+    };
+  }
+};
 export interface Animator {
   /**
    * Applies the supplied attributes to a d3.Selection with some animation.

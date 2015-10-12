@@ -26,15 +26,15 @@ module Plottable {
             /**
              * The default easing of the animation
              */
-            private static _DEFAULT_EASING_MODE = "exp-out";
+            private static _DEFAULT_EASING_MODE = "linear-in-out";
 
             private _startDelay: number;
             private _stepDuration: number;
             private _stepDelay: number;
             private _maxTotalDuration: number;
             private _easingMode: string;
-            private _xScale: string;
-
+            private _xScale: Plottable.Scale<any, any>;
+            private _yScale: Plottable.Scale<any, any>;
             /**
              * Constructs the default animator
              *
@@ -54,7 +54,7 @@ module Plottable {
             }
 
             public animate(selection: d3.Selection<any>, attrToAppliedProjector: AttributeToAppliedProjector, drawingTarget?: Drawers.DrawingTarget): d3.Selection<any> | d3.Transition<any> {
-              let numberOfSteps = selection[0].length;
+              let numberOfSteps = (<any>drawingTarget.merge)[0].length;
               let adjustedIterativeDelay = this._getAdjustedIterativeDelay(numberOfSteps);
 
               // set all the properties on the merge , save the transition returned
@@ -73,25 +73,23 @@ module Plottable {
              * without applying a transition if durection = 0
              *
              */
-            protected getTransition(selection: d3.Selection<any>|d3.Transition<any>|d3.selection.Update<any>, duration: number, delay?: (d: any, i: number) => number): any {
+            protected getTransition(selection: d3.Selection<any>|d3.Transition<any>|d3.selection.Update<any>, duration: number, delay?: (d: any, i: number) => number, easing?: any): any {
                 // if the duration is 0, just return the selection
                 if (duration === 0)
                 return selection;
 
-                
-                let selectionIsTransition: boolean = false;
-
-                if (selectionIsTransition) {
+                easing = easing || this.easingMode();
+                if (this.isTransition(selection) || delay === undefined) {
                 // if the selection is already a transition, create a new transition, but let d3 supply the default
                 // delay, that way they will "chain"
                   return selection.transition()
-                    .ease(this.easingMode())
+                    .ease(easing)
                     .duration(duration);
 
                 } else {
                 // otherwise is the selection is NOT a transition, create a new transition setting up the delay
                   return selection.transition()
-                    .ease(this.easingMode())
+                    .ease(easing)
                     .duration(duration)
                     .delay(delay);
 
@@ -99,9 +97,14 @@ module Plottable {
             }
 
             /**
-             *  return the combined AtributeToAppliedProjector
+             * @isTransition
+             *
+             *  return true if the d3 object passed in is a transition
              *
              */
+            protected isTransition(selection: any): boolean {
+              return (selection.namespace === "__transition__"? true: false);
+            }
             protected mergeAttrs(attr1: AttributeToAppliedProjector, attr2: AttributeToAppliedProjector): AttributeToAppliedProjector {
               let a: AttributeToAppliedProjector = {};
               for (var attrName in attr1) {
@@ -249,19 +252,19 @@ module Plottable {
             }
 
             /**
-              * Gets the current easing mode of the animation.
-              *
-              * @returns {string} the current easing mode.
+              * xScale -- a referene to the xScale used by the owning plot
+              * the animator can use this to calculate positions
+              * @returns {Plottable.Scale<any, any>} the xScale.
               */
-            public xScale(): string;
+            public xScale(): Plottable.Scale<any, any>;
             /**
              * Sets the easing mode of the animation.
              *
-             * @param {string} xScale The desired easing mode.
-             * @returns {Easing} The calling Easing Animator.
+             * @param {Plottable.Scale<any, any} xScale The desired easing mode.
+             * @returns {Base} The calling Animator.
              */
-            public xScale(xScale: string): Base;
-            public xScale(xScale?: string): any {
+            public xScale(xScale: Plottable.Scale<any, any>): Base;
+            public xScale(xScale?: Plottable.Scale<any, any>): any {
               if (xScale == null) {
                 return this._xScale;
               } else {
@@ -269,7 +272,33 @@ module Plottable {
                 return this;
               }
             }   
-                   /**
+
+            /**
+             * yScale -- a referene to the yScale used by the owning plot
+             * the animator can use this to calculate positions
+             * @returns {Plottable.Scale<any, any>} the yScale.
+             */
+            public yScale(): Plottable.Scale<any, any>;
+            /**
+             * a yScale available to the animator for converting rendering 'logical' y values.
+             *
+             * @param {Plottable.Scale<any, any} yScale The desired easing mode.
+             * @returns {Base} The calling Animator.
+             */
+            public yScale(yScale: Plottable.Scale<any, any>): Base;
+            public yScale(yScale?: Plottable.Scale<any, any>): any {
+              if (yScale == null) {
+                return this._yScale;
+              } else {
+                this._yScale = yScale;
+                return this;
+              }
+            }
+
+            /* easing functions
+             * the Base animator provides easing functions 
+
+            /**
              * Adjust the iterative delay, such that it takes into account the maxTotalDuration constraint
              */
             protected _getAdjustedIterativeDelay(numberOfSteps: number) {

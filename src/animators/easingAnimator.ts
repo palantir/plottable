@@ -26,7 +26,7 @@ export module Animators {
     /**
      * The default easing of the animation
      */
-    private static _DEFAULT_EASING_MODE = "exp-out";
+    private static _DEFAULT_EASING_MODE = "linear-in-out";
 
     private _startDelay: number;
     private _stepDuration: number;
@@ -52,15 +52,29 @@ export module Animators {
       return this.startDelay() + adjustedIterativeDelay * (Math.max(numberOfSteps - 1, 0)) + this.stepDuration();
     }
 
-    public animate(selection: d3.Selection<any>, attrToAppliedProjector: AttributeToAppliedProjector) {
-      let numberOfSteps = selection[0].length;
-      let adjustedIterativeDelay = this._getAdjustedIterativeDelay(numberOfSteps);
+    public animate(selection: d3.Selection<any>, attrToAppliedProjector: AttributeToAppliedProjector, drawingTarget?: Drawers.DrawingTarget) {
 
-      return selection.transition()
-        .ease(this.easingMode())
-        .duration(this.stepDuration())
-        .delay((d: any, i: number) => this.startDelay() + adjustedIterativeDelay * i)
-        .attr(attrToAppliedProjector);
+      if (drawingTarget) {
+        let numberOfSteps: number = (<any>drawingTarget.merge)[0].length;
+        let adjustedIterativeDelay = this._getAdjustedIterativeDelay(numberOfSteps);
+        drawingTarget.merge = drawingTarget.merge
+          .transition()
+          .ease(this.easingMode())
+          .duration(this.stepDuration())
+          .delay((d: any, i: number) => this.startDelay() + adjustedIterativeDelay * i)
+          .attr(attrToAppliedProjector);
+        drawingTarget.exit
+          .remove();
+      } else {
+        let numberOfSteps = selection[0].length;
+        let adjustedIterativeDelay = this._getAdjustedIterativeDelay(numberOfSteps);
+
+        return selection.transition()
+          .ease(this.easingMode())
+          .duration(this.stepDuration())
+          .delay((d: any, i: number) => this.startDelay() + adjustedIterativeDelay * i)
+          .attr(attrToAppliedProjector);
+      }
     }
 
     /**

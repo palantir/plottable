@@ -79,6 +79,7 @@
 /// <reference path="animators/easingAnimator.ts" />
 /// <reference path="animators/baseAnimator.ts" />
 /// <reference path="animators/attrAnimator.ts" />
+/// <reference path="animators/barAnimator.ts" />
 
 /// <reference path="dispatchers/dispatcher.ts" />
 /// <reference path="dispatchers/mouseDispatcher.ts" />

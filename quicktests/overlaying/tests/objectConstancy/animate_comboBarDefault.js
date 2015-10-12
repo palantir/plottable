@@ -24,7 +24,8 @@ function run(svg, data, Plottable) {
         data = json;
         var ds = new Plottable.Dataset(data.wc2014);
         var keyFunction = function (d, i) { return d.name; };
-        ds.keyFunction(keyFunction);
+        // to get the previous behaviour, use noConstancy
+        ds.keyFunction(Plottable.KeyFunctions.noConstancy);
 
 
         var attrAnimator = new Plottable.Animators.Attr();
@@ -44,18 +45,15 @@ function run(svg, data, Plottable) {
         attrAnimator
             //.yScale(yScale)
             //.xScale(xScale)
-            .stepDuration(500)
+            .stepDuration(3000)
             .stepDelay(0)
             .startAttrs(proj)
             .endAttrs(endproj);
 
-        var barAnimator = new Plottable.Animators.Bar()
-            .stepDuration(2100)
-            .yScale(yScale)
-            .xScale(xScale);
+      
         var verticalBarPlot = new Plottable.Plots.Bar("vertical")
             .addDataset(ds)
-            .animator(Plottable.Plots.Animator.MAIN, barAnimator)
+            //.animator(Plottable.Plots.Animator.MAIN, attrAnimator)
             .x(function (d) { return d.R; }, xScale)
             .y(function (d) { return d.GF; }, yScale)
             .attr("opacity", .9)

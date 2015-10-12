@@ -21,7 +21,14 @@ function run(svg, data, Plottable) {
     //var proj = { height: function () { return 0; } };
     // this is a circle size 16: M0,8A8,8 0 1,1 0,-8A8,8 0 1,1 0,8Z
     // make a size 0 circle that can get animated
-    var proj = {transform: "translate(0,0)" };
+    var getTransform = function (x, y, xScale, yScale) {
+        var x0 = xScale.scale(x);
+        var y0 = yScale.scale(y);
+        return "translate(%1,%2)".replace("%1", x0.toString()).replace("%2", y0.toString());
+    }
+    var proj = {
+        transform: function (d) { return getTransform(0, 0, xScale, yScale); }
+    };
     var endproj = { d: "M0,8A8,8 0 1,1 0,-8A8,8 0 1,1 0,8Z" };
     attrAnimator 
         .stepDuration(3000)

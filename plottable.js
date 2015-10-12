@@ -8873,16 +8873,6 @@ var Plottable;
             };
             Bar.prototype._generateDrawSteps = function () {
                 var drawSteps = [];
-                if (this._animateOnNextRender()) {
-                    var resetAttrToProjector = this._generateAttrToProjector();
-                    var primaryScale = this._isVertical ? this.y().scale : this.x().scale;
-                    var scaledBaseline = primaryScale.scale(this.baselineValue());
-                    var positionAttr = this._isVertical ? "y" : "x";
-                    var dimensionAttr = this._isVertical ? "height" : "width";
-                    resetAttrToProjector[positionAttr] = function () { return scaledBaseline; };
-                    resetAttrToProjector[dimensionAttr] = function () { return 0; };
-                    drawSteps.push({ attrToProjector: resetAttrToProjector, animator: this._getAnimator(Plots.Animator.RESET) });
-                }
                 drawSteps.push({ attrToProjector: this._generateAttrToProjector(), animator: this._getAnimator(Plots.Animator.MAIN) });
                 return drawSteps;
             };
@@ -10489,6 +10479,42 @@ var Plottable;
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
+var Plottable;
+(function (Plottable) {
+    var EasingFunctions = (function () {
+        function EasingFunctions() {
+        }
+        EasingFunctions.squEase = function (easingFunction, end, start) {
+            return function (t) {
+                if (start === undefined)
+                    start = 0;
+                var tbar;
+                if (t < start)
+                    tbar = 0;
+                else {
+                    if (t > end) {
+                        tbar = 1;
+                    }
+                    else {
+                        tbar = (t - start) / (end - start);
+                    }
+                    return d3.ease(easingFunction)(tbar);
+                }
+            };
+        };
+        EasingFunctions.atStart = function (t) {
+            return 1;
+        };
+        EasingFunctions.atEnd = function (t) {
+            if (t < 1)
+                return 0;
+            return 1;
+        };
+        return EasingFunctions;
+    })();
+    Plottable.EasingFunctions = EasingFunctions;
+    ;
+})(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
 var Plottable;
@@ -10505,8 +10531,17 @@ var Plottable;
             Null.prototype.totalTime = function (selection) {
                 return 0;
             };
-            Null.prototype.animate = function (selection, attrToAppliedProjector) {
-                return selection.attr(attrToAppliedProjector);
+            Null.prototype.animate = function (selection, attrToAppliedProjector, drawingTarget) {
+                if (drawingTarget) {
+                    drawingTarget.exit
+                        .remove();
+                    return drawingTarget.merge
+                        .attr(attrToAppliedProjector);
+                }
+                else {
+                    // legacy compatibility
+                    return selection.attr(attrToAppliedProjector);
+                }
             };
             return Null;
         })();
@@ -10539,15 +10574,29 @@ var Plottable;
                 var adjustedIterativeDelay = this._getAdjustedIterativeDelay(numberOfSteps);
                 return this.startDelay() + adjustedIterativeDelay * (Math.max(numberOfSteps - 1, 0)) + this.stepDuration();
             };
-            Easing.prototype.animate = function (selection, attrToAppliedProjector) {
+            Easing.prototype.animate = function (selection, attrToAppliedProjector, drawingTarget) {
                 var _this = this;
-                var numberOfSteps = selection[0].length;
-                var adjustedIterativeDelay = this._getAdjustedIterativeDelay(numberOfSteps);
-                return selection.transition()
-                    .ease(this.easingMode())
-                    .duration(this.stepDuration())
-                    .delay(function (d, i) { return _this.startDelay() + adjustedIterativeDelay * i; })
-                    .attr(attrToAppliedProjector);
+                if (drawingTarget) {
+                    var numberOfSteps = drawingTarget.merge[0].length;
+                    var adjustedIterativeDelay = this._getAdjustedIterativeDelay(numberOfSteps);
+                    drawingTarget.merge = drawingTarget.merge
+                        .transition()
+                        .ease(this.easingMode())
+                        .duration(this.stepDuration())
+                        .delay(function (d, i) { return _this.startDelay() + adjustedIterativeDelay * i; })
+                        .attr(attrToAppliedProjector);
+                    drawingTarget.exit
+                        .remove();
+                }
+                else {
+                    var numberOfSteps = selection[0].length;
+                    var adjustedIterativeDelay = this._getAdjustedIterativeDelay(numberOfSteps);
+                    return selection.transition()
+                        .ease(this.easingMode())
+                        .duration(this.stepDuration())
+                        .delay(function (d, i) { return _this.startDelay() + adjustedIterativeDelay * i; })
+                        .attr(attrToAppliedProjector);
+                }
             };
             Easing.prototype.startDelay = function (startDelay) {
                 if (startDelay == null) {
@@ -10622,7 +10671,7 @@ var Plottable;
             /**
              * The default easing of the animation
              */
-            Easing._DEFAULT_EASING_MODE = "exp-out";
+            Easing._DEFAULT_EASING_MODE = "linear-in-out";
             return Easing;
         })();
         Animators.Easing = Easing;
@@ -10656,7 +10705,7 @@ var Plottable;
             };
             Base.prototype.animate = function (selection, attrToAppliedProjector, drawingTarget) {
                 var _this = this;
-                var numberOfSteps = selection[0].length;
+                var numberOfSteps = drawingTarget.merge[0].length;
                 var adjustedIterativeDelay = this._getAdjustedIterativeDelay(numberOfSteps);
                 // set all the properties on the merge , save the transition returned
                 drawingTarget.merge = this.getTransition(drawingTarget.merge, this.stepDuration(), function (d, i) { return _this.startDelay() + adjustedIterativeDelay * i; })
@@ -10672,30 +10721,35 @@ var Plottable;
              * without applying a transition if durection = 0
              *
              */
-            Base.prototype.getTransition = function (selection, duration, delay) {
+            Base.prototype.getTransition = function (selection, duration, delay, easing) {
                 // if the duration is 0, just return the selection
                 if (duration === 0)
                     return selection;
-                var selectionIsTransition = false;
-                if (selectionIsTransition) {
+                easing = easing || this.easingMode();
+                if (this.isTransition(selection) || delay === undefined) {
                     // if the selection is already a transition, create a new transition, but let d3 supply the default
                     // delay, that way they will "chain"
                     return selection.transition()
-                        .ease(this.easingMode())
+                        .ease(easing)
                         .duration(duration);
                 }
                 else {
                     // otherwise is the selection is NOT a transition, create a new transition setting up the delay
                     return selection.transition()
-                        .ease(this.easingMode())
+                        .ease(easing)
                         .duration(duration)
                         .delay(delay);
                 }
             };
             /**
-             *  return the combined AtributeToAppliedProjector
+             * @isTransition
+             *
+             *  return true if the d3 object passed in is a transition
              *
              */
+            Base.prototype.isTransition = function (selection) {
+                return (selection.namespace === "__transition__" ? true : false);
+            };
             Base.prototype.mergeAttrs = function (attr1, attr2) {
                 var a = {};
                 for (var attrName in attr1) {
@@ -10775,9 +10829,21 @@ var Plottable;
                     return this;
                 }
             };
+            Base.prototype.yScale = function (yScale) {
+                if (yScale == null) {
+                    return this._yScale;
+                }
+                else {
+                    this._yScale = yScale;
+                    return this;
+                }
+            };
+            /* easing functions
+             * the Base animator provides easing functions
+
             /**
-      * Adjust the iterative delay, such that it takes into account the maxTotalDuration constraint
-      */
+             * Adjust the iterative delay, such that it takes into account the maxTotalDuration constraint
+             */
             Base.prototype._getAdjustedIterativeDelay = function (numberOfSteps) {
                 var stepStartTimeInterval = this.maxTotalDuration() - this.stepDuration();
                 stepStartTimeInterval = Math.max(stepStartTimeInterval, 0);
@@ -10803,7 +10869,7 @@ var Plottable;
             /**
              * The default easing of the animation
              */
-            Base._DEFAULT_EASING_MODE = "exp-out";
+            Base._DEFAULT_EASING_MODE = "linear-in-out";
             return Base;
         })();
         Animators.Base = Base;
@@ -10821,8 +10887,8 @@ var Plottable;
     var Animators;
     (function (Animators) {
         /**
-         * Base for animators that animate specific attributes, such as Opacity, height... .
-         */
+          * Base for animators that animate specific attributes, such as Opacity, height... .
+          */
         var Attr = (function (_super) {
             __extends(Attr, _super);
             function Attr() {
@@ -10861,6 +10927,83 @@ var Plottable;
             return Attr;
         })(Animators.Base);
         Animators.Attr = Attr;
+    })(Animators = Plottable.Animators || (Plottable.Animators = {}));
+})(Plottable || (Plottable = {}));
+
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
+///<reference path="../reference.ts" />
+var Plottable;
+(function (Plottable) {
+    var Animators;
+    (function (Animators) {
+        /**
+          * Base for animators that animate specific attributes, such as Opacity, height... .
+          */
+        var Bar = (function (_super) {
+            __extends(Bar, _super);
+            function Bar() {
+                _super.call(this);
+                var proj = {
+                    height: 0,
+                    y: function () { return this.yScale().scale(0); }
+                };
+            }
+            Bar.prototype.animate = function (selection, attrToAppliedProjector, drawingTarget) {
+                var yScale = this.yScale();
+                var xScale = this.xScale();
+                var proj = {
+                    height: function () { return 0; },
+                    y: function (d, i) { return yScale.scale(0); }
+                };
+                // set up timings
+                var stageDuration = this.stepDuration() / 7;
+                var exitStageDuration = (drawingTarget.exit.size() > 0 ? stageDuration * 2 : 0);
+                var updateStageDuration = (drawingTarget.update.size() > 0 ? stageDuration * 2 : 0);
+                var enterStageDuration = (drawingTarget.enter.size() > 0 ? stageDuration : 0);
+                var squeezer = Plottable.EasingFunctions.squEase("linear-in-out", .5);
+                // first kill the exiting  
+                drawingTarget.exit = this.getTransition(drawingTarget.exit, exitStageDuration, undefined, squeezer)
+                    .attr(proj)
+                    .remove();
+                var proj2 = {
+                    height: attrToAppliedProjector["height"],
+                    y: attrToAppliedProjector["y"]
+                };
+                //drawingTarget.update = this.getTransition(drawingTarget.update, exitStageDuration, undefined, Plottable.EasingFunctions.atEnd)
+                //  .attr({ "opacity": .6 });
+                //drawingTarget.update = this.getTransition(drawingTarget.update, updateStageDuration, undefined, squeezer)
+                //  .attr(proj2);
+                //var proj3: AttributeToAppliedProjector = this.mergeAttrs(attrToAppliedProjector, { "opacity": () => { return .6; } });
+                //drawingTarget.update = this.getTransition(drawingTarget.update, updateStageDuration, undefined, squeezer)
+                //  .attr(proj3);
+                //drawingTarget.update = this.getTransition(drawingTarget.update, 50)
+                //  .attr(attrToAppliedProjector);
+                drawingTarget.update = this.getTransition(drawingTarget.update, exitStageDuration);
+                drawingTarget.update = this.getTransition(drawingTarget.update, updateStageDuration, undefined, squeezer)
+                    .attr(proj2);
+                drawingTarget.update = this.getTransition(drawingTarget.update, updateStageDuration / 4)
+                    .attr({ "opacity": .6 });
+                var proj3 = this.mergeAttrs(attrToAppliedProjector, { "opacity": function () { return .6; } });
+                drawingTarget.update = this.getTransition(drawingTarget.update, updateStageDuration, undefined, squeezer)
+                    .attr(proj3);
+                drawingTarget.update = this.getTransition(drawingTarget.update, 50)
+                    .attr(attrToAppliedProjector);
+                var proj4 = this.mergeAttrs(attrToAppliedProjector, proj);
+                (drawingTarget.enter)
+                    .attr(proj4);
+                drawingTarget.enter = this.getTransition(drawingTarget.enter, exitStageDuration + 2.25 * updateStageDuration);
+                drawingTarget.enter = this.getTransition(drawingTarget.enter, enterStageDuration)
+                    .attr(attrToAppliedProjector);
+                // set all the properties on the merge , save the transition returned
+                return drawingTarget.merge;
+            };
+            return Bar;
+        })(Animators.Attr);
+        Animators.Bar = Bar;
     })(Animators = Plottable.Animators || (Plottable.Animators = {}));
 })(Plottable || (Plottable = {}));
 
