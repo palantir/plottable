@@ -220,7 +220,7 @@ describe("Plots", () => {
 
     describe("rendering on edge case scenarios", () => {
       it("renders nothing when no data", () => {
-        let svg = TestMethods.generateSVG(300, 400);
+        let svg = TestMethods.generateSVG();
         let stackedAreaPlot = new Plottable.Plots.StackedArea();
         stackedAreaPlot.x(() => null);
         // HACKHACK https://github.com/palantir/plottable/issues/2712 y scale must be set.
