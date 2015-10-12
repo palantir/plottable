@@ -1,5 +1,3 @@
-///<reference path="../reference.ts" />
-
 module Plottable {
 
 export interface DragLineCallback<D> { (dragLineLayer: Components.DragLineLayer<D>): void; };

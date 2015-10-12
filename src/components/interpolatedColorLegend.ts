@@ -1,5 +1,3 @@
-///<reference path="../reference.ts" />
-
 module Plottable {
 export module Components {
   export class InterpolatedColorLegend extends Component {
