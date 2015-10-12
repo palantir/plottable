@@ -75,15 +75,15 @@ describe("Tables", () => {
 
     it("throws an Error on trying to add null to the Table", () => {
       let table = new Plottable.Components.Table();
-      assert.throw(() => table.add(null, 0, 0), "Cannot add null to a table cell");
+      assert.throws(() => table.add(null, 0, 0), "Cannot add null to a table cell");
     });
 
     it("detaches a Component from its previous location before adding it", () => {
-      let c1 = new Plottable.Component;
+      let component = new Plottable.Component();
       let svg = TestMethods.generateSVG();
-      c1.renderTo(svg);
+      component.renderTo(svg);
       let table = new Plottable.Components.Table();
-      table.add(c1, 0, 0);
+      table.add(component, 0, 0);
       assert.isFalse((<Node> svg.node()).hasChildNodes(), "Component was detach()-ed");
       svg.remove();
     });
