@@ -1,5 +1,3 @@
-///<reference path="../reference.ts" />
-
 module Plottable {
 export module Scales {
   export class Time extends QuantitativeScale<Date> {
