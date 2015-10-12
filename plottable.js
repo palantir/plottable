@@ -5693,6 +5693,7 @@ var Plottable;
                 var _this = this;
                 _super.call(this);
                 this._padding = 5;
+                this._endPadding = 5;
                 if (interpolatedColorScale == null) {
                     throw new Error("InterpolatedColorLegend requires a interpolatedColorScale");
                 }
@@ -5719,9 +5720,9 @@ var Plottable;
             };
             InterpolatedColorLegend.prototype.endPadding = function (padding) {
                 if (padding === undefined) {
-                    return this._padding;
+                    return this._endPadding;
                 }
-                this._padding = padding;
+                this._endPadding = padding;
                 this.redraw();
                 return this;
             };
@@ -5789,13 +5790,13 @@ var Plottable;
                 if (this._isVertical()) {
                     var longestWidth = Plottable.Utils.Math.max(labelWidths, 0);
                     desiredWidth = this._padding + textHeight + this._padding + longestWidth + this._padding;
-                    desiredHeight = this._padding + numSwatches * textHeight + this._padding;
+                    desiredHeight = this._endPadding + numSwatches * textHeight + this._endPadding;
                 }
                 else {
                     desiredHeight = this._padding + textHeight + this._padding;
-                    desiredWidth = this._padding + labelWidths[0] + this._padding
+                    desiredWidth = this._endPadding + labelWidths[0] + this._endPadding
                         + numSwatches * textHeight
-                        + this._padding + labelWidths[1] + this._padding;
+                        + this._endPadding + labelWidths[1] + this._endPadding;
                 }
                 return {
                     minWidth: desiredWidth,
@@ -5814,6 +5815,7 @@ var Plottable;
                 var text1 = this._formatter(domain[1]);
                 var text1Width = this._measurer.measure(text1).width;
                 var padding = this._padding;
+                var endPadding = this._endPadding;
                 var upperLabelShift = { x: 0, y: 0 };
                 var lowerLabelShift = { x: 0, y: 0 };
                 var lowerWriteOptions = {
@@ -5848,12 +5850,12 @@ var Plottable;
                 if (this._isVertical()) {
                     var longestTextWidth = Math.max(text0Width, text1Width);
                     swatchWidth = Math.max((this.width() - 3 * padding - longestTextWidth), 0);
-                    swatchHeight = Math.max(((this.height() - 2 * padding) / numSwatches), 0);
+                    swatchHeight = Math.max(((this.height() - 2 * endPadding) / numSwatches), 0);
                     swatchY = function (d, i) { return padding + (numSwatches - (i + 1)) * swatchHeight; };
                     upperWriteOptions.yAlign = "top";
-                    upperLabelShift.y = padding;
+                    upperLabelShift.y = endPadding;
                     lowerWriteOptions.yAlign = "bottom";
-                    lowerLabelShift.y = -padding;
+                    lowerLabelShift.y = -endPadding;
                     if (this._orientation === "left") {
                         swatchX = function (d, i) { return padding + longestTextWidth + padding; };
                         upperWriteOptions.xAlign = "right";

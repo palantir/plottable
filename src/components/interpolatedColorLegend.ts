@@ -11,6 +11,7 @@ export module Components {
     private _scale: Scales.InterpolatedColor;
     private _orientation: String ;
     private _padding = 5;
+    private _endPadding = 5;
     private _formatter: Formatter;
     private _expands: boolean;
 
@@ -89,9 +90,9 @@ export module Components {
     public endPadding(padding: number): InterpolatedColorLegend;
     public endPadding(padding?: number): any {
       if (padding === undefined) {
-        return this._padding;
+        return this._endPadding;
       }
-      this._padding = padding;
+      this._endPadding = padding;
       this.redraw();
       return this;
     }
@@ -189,12 +190,12 @@ export module Components {
       if (this._isVertical()) {
         let longestWidth = Utils.Math.max(labelWidths, 0);
         desiredWidth = this._padding + textHeight + this._padding + longestWidth + this._padding;
-        desiredHeight = this._padding + numSwatches * textHeight + this._padding;
+        desiredHeight = this._endPadding + numSwatches * textHeight + this._endPadding;
       } else {
         desiredHeight = this._padding + textHeight + this._padding;
-        desiredWidth = this._padding + labelWidths[0] + this._padding
+        desiredWidth = this._endPadding + labelWidths[0] + this._endPadding
                         + numSwatches * textHeight
-                        + this._padding + labelWidths[1] + this._padding;
+                        + this._endPadding + labelWidths[1] + this._endPadding;
       }
 
       return {
@@ -218,6 +219,7 @@ export module Components {
       let text1Width = this._measurer.measure(text1).width;
 
       let padding = this._padding;
+      let endPadding = this._endPadding;
 
       let upperLabelShift: Point = { x: 0, y: 0 };
       let lowerLabelShift: Point = { x: 0, y: 0 };
@@ -257,13 +259,13 @@ export module Components {
       if (this._isVertical()) {
         let longestTextWidth = Math.max(text0Width, text1Width);
         swatchWidth = Math.max( (this.width() - 3 * padding - longestTextWidth), 0);
-        swatchHeight = Math.max( ((this.height() - 2 * padding) / numSwatches), 0);
+        swatchHeight = Math.max( ((this.height() - 2 * endPadding) / numSwatches), 0);
         swatchY = (d: any, i: number) => padding + (numSwatches - (i + 1)) * swatchHeight;
 
         upperWriteOptions.yAlign = "top";
-        upperLabelShift.y = padding;
+        upperLabelShift.y = endPadding;
         lowerWriteOptions.yAlign = "bottom";
-        lowerLabelShift.y = -padding;
+        lowerLabelShift.y = -endPadding;
 
         if (this._orientation === "left") {
           swatchX = (d: any, i: number) => padding + longestTextWidth + padding;

@@ -2500,6 +2500,7 @@ declare module Plottable {
             private _scale;
             private _orientation;
             private _padding;
+            private _endPadding;
             private _formatter;
             private _expands;
             private _swatchContainer;
