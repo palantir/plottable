@@ -329,5 +329,19 @@ describe("Plots", () => {
         svg.remove();
       });
     });
+
+    describe("downsampling", () => {
+      let stackedAreaPlot: Plottable.Plots.StackedArea<any>;
+
+      beforeEach(() => {
+        stackedAreaPlot = new Plottable.Plots.StackedArea();
+      });
+
+      it("disables downsampling", () => {
+        assert.strictEqual(stackedAreaPlot.downsamplingEnabled(), false, "downsampling is disabled by default");
+        stackedAreaPlot.downsamplingEnabled(true);
+        assert.strictEqual(stackedAreaPlot.downsamplingEnabled(), false, "downsampling will not be enabled by user");
+      });
+    });
   });
 });
