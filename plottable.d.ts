@@ -2624,6 +2624,14 @@ declare module Plottable {
              */
             has(component: Component): boolean;
             /**
+             * Returns the Component at the specified row and column index.
+             *
+             * @param {number} rowIndex
+             * @param {number} columnIndex
+             * @returns {Component} The Component at the specified position, or null if no Component is there.
+             */
+            componentAt(rowIndex: number, columnIndex: number): Component;
+            /**
              * Adds a Component in the specified row and column position.
              *
              * For example, instead of calling `new Table([[a, b], [null, c]])`, you
