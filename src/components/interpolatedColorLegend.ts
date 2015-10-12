@@ -77,6 +77,26 @@ export module Components {
     }
 
     /**
+    * Gets the Padding on the legend.
+    */
+    public endPadding(): number;
+    /**
+    * Sets the Padding on the legend.
+    *
+    * @param Number
+    * @returns {InterpolatedColorLegend} The calling InterpolatedColorLegend.
+    */
+    public endPadding(padding: number): InterpolatedColorLegend;
+    public endPadding(padding?: number): any {
+      if (padding === undefined) {
+        return this._padding;
+      }
+      this._padding = padding;
+      this.redraw();
+      return this;
+    }
+
+    /**
      * Gets whether the InterpolatedColorLegend expands to occupy all offered space in the long direction
      */
     public expands(): boolean;

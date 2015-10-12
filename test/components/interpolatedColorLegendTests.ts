@@ -279,4 +279,27 @@ describe("InterpolatedColorLegend", () => {
     });
     svg.remove();
   });
+
+  it("does not have padding on vertical legends when endPadding set to 0", () => {
+    let legend = new Plottable.Components.InterpolatedColorLegend(colorScale);
+    legend.renderTo(svg);
+    let orientations = ["left", "right"];
+    orientations.forEach((orientation) => {
+      legend.orientation(orientation).expands(true).endPadding(0);
+      let height = (<Element> legend.content().select(".swatch-container").node()).getBoundingClientRect().height;
+      assert.strictEqual(height, SVG_HEIGHT, "actual height is SVG_HEIGHT");
+
+    });
+    svg.remove();
+  });
+
+  it("does not have padding on horizontal legends when endPadding set to 0", () => {
+    let legend = new Plottable.Components.InterpolatedColorLegend(colorScale);
+    legend.renderTo(svg);
+    legend.orientation("horizontal").expands(true);
+    let width = (<Element> legend.content().select(".swatch-container").node()).getBoundingClientRect().width;
+    assert.strictEqual(width, SVG_WIDTH, "actual width is SVG_WIDTH");
+
+    svg.remove();
+  });
 });

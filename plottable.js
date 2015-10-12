@@ -5717,6 +5717,14 @@ var Plottable;
                 this.redraw();
                 return this;
             };
+            InterpolatedColorLegend.prototype.endPadding = function (padding) {
+                if (padding === undefined) {
+                    return this._padding;
+                }
+                this._padding = padding;
+                this.redraw();
+                return this;
+            };
             InterpolatedColorLegend.prototype.expands = function (expands) {
                 if (expands == null) {
                     return this._expands;
