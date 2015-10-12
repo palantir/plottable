@@ -1,5 +1,3 @@
-///<reference path="../reference.ts" />
-
 module Plottable {
 export class Dispatcher {
   protected _eventToCallback: { [eventName: string]: (e: Event) => any; } = {};

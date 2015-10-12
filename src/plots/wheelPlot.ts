@@ -1,5 +1,3 @@
-///<reference path="../reference.ts" />
-
 module Plottable {
 export module Plots {
   export class Wheel<R, T> extends Plot {
