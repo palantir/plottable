@@ -243,7 +243,7 @@ export module Components {
 
       let boundingBoxAttr: { [key: string]: number } = {
         x: 0,
-        y: padding,
+        y: this._isVertical() ? endPadding : padding,
         width: 0,
         height: 0
       };
@@ -260,7 +260,7 @@ export module Components {
         let longestTextWidth = Math.max(text0Width, text1Width);
         swatchWidth = Math.max( (this.width() - 3 * padding - longestTextWidth), 0);
         swatchHeight = Math.max( ((this.height() - 2 * endPadding) / numSwatches), 0);
-        swatchY = (d: any, i: number) => padding + (numSwatches - (i + 1)) * swatchHeight;
+        swatchY = (d: any, i: number) => endPadding + (numSwatches - (i + 1)) * swatchHeight;
 
         upperWriteOptions.yAlign = "top";
         upperLabelShift.y = endPadding;
@@ -283,15 +283,15 @@ export module Components {
         boundingBoxAttr["width"] = swatchWidth;
         boundingBoxAttr["height"] = numSwatches * swatchHeight;
       } else { // horizontal
-        swatchWidth = Math.max( ((this.width() - 4 * padding - text0Width - text1Width) / numSwatches), 0);
+        swatchWidth = Math.max( ((this.width() - 2 * endPadding - 2 * padding - text0Width - text1Width) / numSwatches), 0);
         swatchHeight = Math.max( (this.height() - 2 * padding), 0);
-        swatchX = (d: any, i: number) => (padding + text0Width + padding) + i * swatchWidth;
+        swatchX = (d: any, i: number) => (endPadding + text0Width + padding) + i * swatchWidth;
         swatchY = (d: any, i: number) => padding;
 
         upperWriteOptions.xAlign = "right";
-        upperLabelShift.x = -padding;
+        upperLabelShift.x = -endPadding;
         lowerWriteOptions.xAlign = "left";
-        lowerLabelShift.x = padding;
+        lowerLabelShift.x = endPadding;
 
         boundingBoxAttr["width"] = numSwatches * swatchWidth;
         boundingBoxAttr["height"] = swatchHeight;
