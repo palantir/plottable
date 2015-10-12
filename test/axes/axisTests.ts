@@ -1,221 +1,237 @@
 ///<reference path="../testReference.ts" />
 
-describe("BaseAxis", () => {
-  it("orientation", () => {
+describe("Axis", () => {
+  it("throws an error when setting an invalid orientation", () => {
     let scale = new Plottable.Scales.Linear();
     assert.throws(() => new Plottable.Axis(scale, "blargh"), "unsupported");
   });
 
-  it("tickLabelPadding() rejects negative values", () => {
+  it("throws an error when setting a negative tickLabelPadding", () => {
     let scale = new Plottable.Scales.Linear();
-    let baseAxis = new Plottable.Axis(scale, "bottom");
+    let axis = new Plottable.Axis(scale, "bottom");
 
-    assert.throws(() => baseAxis.tickLabelPadding(-1), "must be positive");
+    assert.throws(() => axis.tickLabelPadding(-1), "must be positive");
+    axis.destroy();
   });
 
-  it("margin() rejects negative values", () => {
+  it("throws an error when setting a negative margin", () => {
     let scale = new Plottable.Scales.Linear();
     let axis = new Plottable.Axis(scale, "right");
 
     assert.throws(() => axis.margin(-1), "must be positive");
+    axis.destroy();
   });
 
-  it("width() + margin()", () => {
-    let SVG_WIDTH = 100;
-    let SVG_HEIGHT = 500;
-    let svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
-    let scale = new Plottable.Scales.Linear();
-    let verticalAxis = new Plottable.Axis(scale, "right");
-    verticalAxis.renderTo(svg);
+  describe("right-oriented", () => {
+    it("defaults to left alignment", () => {
+      let scale = new Plottable.Scales.Linear();
+      let axis = new Plottable.Axis(scale, "right");
+      assert.strictEqual(axis.xAlignment(), "left", "x alignment defaults to left for right axis");
+      axis.destroy();
+    });
 
-    let defaultWidth = verticalAxis.innerTickLength() + verticalAxis.margin();
-    assert.strictEqual(verticalAxis.width(), defaultWidth, "calling width() with no arguments returns currently used width");
+    it("updates the layout when updating the margin after rendering", () => {
+      let svg = TestMethods.generateSVG();
+      let scale = new Plottable.Scales.Linear();
+      let axis = new Plottable.Axis(scale, "right");
+      axis.renderTo(svg);
 
-    verticalAxis.margin(20);
-    defaultWidth = verticalAxis.innerTickLength() + verticalAxis.margin();
-    assert.strictEqual(verticalAxis.width(), defaultWidth, "changing the margin size updates the width");
+      let axisWidth = axis.innerTickLength() + axis.margin();
+      assert.strictEqual(axis.width(), axisWidth, "calling width() with no arguments returns currently used width");
 
-    svg.remove();
+      let newMargin = 20;
+      axis.margin(newMargin);
+      axisWidth = axis.innerTickLength() + axis.margin();
+      assert.strictEqual(axis.width(), axisWidth, "changing the margin size updates the width");
+
+      axis.destroy();
+      svg.remove();
+    });
+
+    it("draws the baseline", () => {
+      let svg = TestMethods.generateSVG();
+      let svgHeight = svg.attr("height");
+      let scale = new Plottable.Scales.Linear();
+      let axis = new Plottable.Axis(scale, "right");
+      axis.renderTo(svg);
+
+      let baseline = svg.select(".baseline");
+      assert.isFalse(baseline.empty(), "baseline exists");
+      assert.strictEqual(baseline.attr("x1"), "0");
+      assert.strictEqual(baseline.attr("x2"), "0");
+      assert.strictEqual(baseline.attr("y1"), "0");
+      assert.strictEqual(baseline.attr("y2"), svgHeight);
+
+      axis.destroy();
+      svg.remove();
+    });
   });
 
-  it("height() + margin()", () => {
-    let SVG_WIDTH = 500;
-    let SVG_HEIGHT = 100;
-    let svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
-    let scale = new Plottable.Scales.Linear();
-    let horizontalAxis = new Plottable.Axis(scale, "bottom");
-    horizontalAxis.renderTo(svg);
+  describe("left-oriented", () => {
+    it("defaults to right alignment", () => {
+      let scale = new Plottable.Scales.Linear();
+      let axis = new Plottable.Axis(scale, "left");
+      assert.strictEqual(axis.xAlignment(), "right", "x alignment defaults to right for left axis");
+      axis.destroy();
+    });
 
-    let defaultHeight = horizontalAxis.innerTickLength() + horizontalAxis.margin();
-    assert.strictEqual(horizontalAxis.height(), defaultHeight, "calling height() with no arguments returns currently used height");
+    it("draws the baseline", () => {
+      let svg = TestMethods.generateSVG();
+      let svgHeight = svg.attr("height");
+      let scale = new Plottable.Scales.Linear();
+      let axis = new Plottable.Axis(scale, "left");
+      axis.renderTo(svg);
 
-    horizontalAxis.margin(20);
-    defaultHeight = horizontalAxis.innerTickLength() + horizontalAxis.margin();
-    assert.strictEqual(horizontalAxis.height(), defaultHeight, "changing the margin size updates the height");
+      let baseline = svg.select(".baseline");
+      assert.isFalse(baseline.empty(), "baseline exists");
+      assert.strictEqual(baseline.attr("x1"), String(axis.width()));
+      assert.strictEqual(baseline.attr("x2"), String(axis.width()));
+      assert.strictEqual(baseline.attr("y1"), "0");
+      assert.strictEqual(baseline.attr("y2"), svgHeight);
 
-    svg.remove();
+      axis.destroy();
+      svg.remove();
+    });
   });
 
-  it("draws ticks and baseline (horizontal)", () => {
-    let SVG_WIDTH = 500;
-    let SVG_HEIGHT = 100;
-    let svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
-    let scale = new Plottable.Scales.Linear();
-    scale.domain([0, 10]);
-    scale.range([0, SVG_WIDTH]);
-    let baseAxis = new Plottable.Axis(scale, "bottom");
-    let tickValues = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
-    (<any> baseAxis)._getTickValues = function() { return tickValues; };
-    baseAxis.renderTo(svg);
+  describe("bottom-oriented", () => {
+    it("defaults to top alignment", () => {
+      let scale = new Plottable.Scales.Linear();
+      let axis = new Plottable.Axis(scale, "bottom");
+      assert.strictEqual(axis.yAlignment(), "top", "y alignment defaults to top for bottom axis");
+      axis.destroy();
+    });
 
-    let tickMarks = svg.selectAll("." + Plottable.Axis.TICK_MARK_CLASS);
-    assert.strictEqual(tickMarks[0].length, tickValues.length, "A tick mark was created for each value");
-    let baseline = svg.select(".baseline");
+    it("updates the layout when updating the margin after rendering", () => {
+      let svg = TestMethods.generateSVG();
+      let scale = new Plottable.Scales.Linear();
+      let axis = new Plottable.Axis(scale, "bottom");
+      axis.renderTo(svg);
 
-    assert.isNotNull(baseline.node(), "baseline was drawn");
-    assert.strictEqual(baseline.attr("x1"), "0");
-    assert.strictEqual(baseline.attr("x2"), String(SVG_WIDTH));
-    assert.strictEqual(baseline.attr("y1"), "0");
-    assert.strictEqual(baseline.attr("y2"), "0");
+      let defaultHeight = axis.innerTickLength() + axis.margin();
+      assert.strictEqual(axis.height(), defaultHeight, "calling height() with no arguments returns currently used height");
 
-    baseAxis.orientation("top");
-    assert.isNotNull(baseline.node(), "baseline was drawn");
-    assert.strictEqual(baseline.attr("x1"), "0");
-    assert.strictEqual(baseline.attr("x2"), String(SVG_WIDTH));
-    assert.strictEqual(baseline.attr("y1"), String(baseAxis.height()));
-    assert.strictEqual(baseline.attr("y2"), String(baseAxis.height()));
+      let newMargin = 20;
+      axis.margin(newMargin);
+      defaultHeight = axis.innerTickLength() + axis.margin();
+      assert.strictEqual(axis.height(), defaultHeight, "changing the margin size updates the height");
 
-    svg.remove();
+      axis.destroy();
+      svg.remove();
+    });
+
+    it("draws the baseline", () => {
+      let svg = TestMethods.generateSVG();
+      let svgWidth = svg.attr("width");
+      let scale = new Plottable.Scales.Linear();
+      let axis = new Plottable.Axis(scale, "bottom");
+      axis.renderTo(svg);
+
+      let baseline = svg.select(".baseline");
+      assert.isFalse(baseline.empty(), "baseline exists");
+      assert.strictEqual(baseline.attr("x1"), "0");
+      assert.strictEqual(baseline.attr("x2"), svgWidth);
+      assert.strictEqual(baseline.attr("y1"), "0");
+      assert.strictEqual(baseline.attr("y2"), "0");
+
+      axis.destroy();
+      svg.remove();
+    });
   });
 
-  it("draws ticks and baseline (vertical)", () => {
-    let SVG_WIDTH = 100;
-    let SVG_HEIGHT = 500;
-    let svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
-    let scale = new Plottable.Scales.Linear();
-    scale.domain([0, 10]);
-    scale.range([0, SVG_HEIGHT]);
-    let baseAxis = new Plottable.Axis(scale, "left");
-    let tickValues = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
-    (<any> baseAxis)._getTickValues = function() { return tickValues; };
-    baseAxis.renderTo(svg);
+  describe("top-oriented", () => {
+    it("defaults to bottom alignment", () => {
+      let scale = new Plottable.Scales.Linear();
+      let axis = new Plottable.Axis(scale, "top");
+      assert.strictEqual(axis.yAlignment(), "bottom", "y alignment defaults to bottom for top axis");
+      axis.destroy();
+    });
 
-    let tickMarks = svg.selectAll("." + Plottable.Axis.TICK_MARK_CLASS);
-    assert.strictEqual(tickMarks[0].length, tickValues.length, "A tick mark was created for each value");
-    let baseline = svg.select(".baseline");
+    it("draws the baseline", () => {
+      let svg = TestMethods.generateSVG();
+      let svgWidth = svg.attr("width");
+      let scale = new Plottable.Scales.Linear();
+      let baseAxis = new Plottable.Axis(scale, "top");
+      baseAxis.renderTo(svg);
 
-    assert.isNotNull(baseline.node(), "baseline was drawn");
-    assert.strictEqual(baseline.attr("x1"), String(baseAxis.width()));
-    assert.strictEqual(baseline.attr("x2"), String(baseAxis.width()));
-    assert.strictEqual(baseline.attr("y1"), "0");
-    assert.strictEqual(baseline.attr("y2"), String(SVG_HEIGHT));
+      let baseline = svg.select(".baseline");
+      assert.isFalse(baseline.empty(), "baseline exists");
+      assert.strictEqual(baseline.attr("x1"), "0");
+      assert.strictEqual(baseline.attr("x2"), svgWidth);
+      assert.strictEqual(baseline.attr("y1"), String(baseAxis.height()));
+      assert.strictEqual(baseline.attr("y2"), String(baseAxis.height()));
 
-    baseAxis.orientation("right");
-    assert.isNotNull(baseline.node(), "baseline was drawn");
-    assert.strictEqual(baseline.attr("x1"), "0");
-    assert.strictEqual(baseline.attr("x2"), "0");
-    assert.strictEqual(baseline.attr("y1"), "0");
-    assert.strictEqual(baseline.attr("y2"), String(SVG_HEIGHT));
-
-    svg.remove();
+      baseAxis.destroy();
+      svg.remove();
+    });
   });
 
-  it("innerTickLength()", () => {
-    let SVG_WIDTH = 500;
-    let SVG_HEIGHT = 100;
-    let svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
-    let scale = new Plottable.Scales.Linear();
-    scale.domain([0, 10]);
-    scale.range([0, SVG_WIDTH]);
-    let baseAxis = new Plottable.Axis(scale, "bottom");
-    let tickValues = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
-    (<any> baseAxis)._getTickValues = function() { return tickValues; };
-    baseAxis.renderTo(svg);
-    let secondTickMark = svg.selectAll("." + Plottable.Axis.TICK_MARK_CLASS + ":nth-child(2)");
-    assert.strictEqual(secondTickMark.attr("x1"), "50");
-    assert.strictEqual(secondTickMark.attr("x2"), "50");
-    assert.strictEqual(secondTickMark.attr("y1"), "0");
-    assert.strictEqual(secondTickMark.attr("y2"), String(baseAxis.innerTickLength()));
+  describe("setting the length of the tick marks", () => {
+    it("can set for inner", () => {
+      let scale = new Plottable.Scales.Linear();
+      let axis = new Plottable.Axis(scale, "bottom");
+      let tickLength = 10;
+      assert.strictEqual(axis.innerTickLength(tickLength), axis, "setting returns calling object");
+      assert.strictEqual(axis.innerTickLength(), tickLength, "retrieves set tick length");
+      assert.throws(() => axis.innerTickLength(-1), "must be positive");
+      axis.destroy();
+    });
 
-    baseAxis.innerTickLength(10);
-    assert.strictEqual(secondTickMark.attr("y2"), String(baseAxis.innerTickLength()), "inner tick length was updated");
+    it("can set for ends", () => {
+      let scale = new Plottable.Scales.Linear();
+      let axis = new Plottable.Axis(scale, "bottom");
+      let tickLength = 10;
+      assert.strictEqual(axis.endTickLength(tickLength), axis, "setting returns calling object");
+      assert.strictEqual(axis.endTickLength(), tickLength, "retrieves set tick length");
+      assert.throws(() => axis.endTickLength(-1), "must be positive");
+      axis.destroy();
+    });
 
-    assert.throws(() => baseAxis.innerTickLength(-1), "must be positive");
+    it("adjusts the height to the greater of innerTickLength and endTickLength", () => {
+      let svg = TestMethods.generateSVG();
+      let scale = new Plottable.Scales.Linear();
+      let baseAxis = new Plottable.Axis(scale, "bottom");
+      baseAxis.showEndTickLabels(true);
+      baseAxis.renderTo(svg);
 
-    svg.remove();
-  });
+      let expectedHeight = Math.max(baseAxis.innerTickLength(), baseAxis.endTickLength()) + baseAxis.margin();
+      assert.strictEqual(baseAxis.height(), expectedHeight, "height should be equal to the maximum of the two");
 
-  it("endTickLength()", () => {
-    let SVG_WIDTH = 500;
-    let SVG_HEIGHT = 100;
-    let svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
-    let scale = new Plottable.Scales.Linear();
-    scale.domain([0, 10]);
-    scale.range([0, SVG_WIDTH]);
-    let baseAxis = new Plottable.Axis(scale, "bottom");
-    let tickValues = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
-    (<any> baseAxis)._getTickValues = () => tickValues;
-    baseAxis.renderTo(svg);
+      let increasingInnerTickLength = baseAxis.endTickLength() + 10;
+      baseAxis.innerTickLength(increasingInnerTickLength);
+      assert.strictEqual(baseAxis.height(), increasingInnerTickLength + baseAxis.margin(), "height should increase to inner tick length");
 
-    let firstTickMark = svg.selectAll("." + Plottable.Axis.END_TICK_MARK_CLASS);
-    assert.strictEqual(firstTickMark.attr("x1"), "0");
-    assert.strictEqual(firstTickMark.attr("x2"), "0");
-    assert.strictEqual(firstTickMark.attr("y1"), "0");
-    assert.strictEqual(firstTickMark.attr("y2"), String(baseAxis.endTickLength()));
+      let increasingEndTickLength = baseAxis.innerTickLength() + 10;
+      baseAxis.endTickLength(increasingEndTickLength);
+      assert.strictEqual(baseAxis.height(), increasingEndTickLength + baseAxis.margin(), "height should increase to end tick length");
 
-    baseAxis.endTickLength(10);
-    assert.strictEqual(firstTickMark.attr("y2"), String(baseAxis.endTickLength()), "end tick length was updated");
+      let decreasingInnerTickLength = baseAxis.endTickLength() - 10;
+      baseAxis.innerTickLength(decreasingInnerTickLength);
+      assert.strictEqual(baseAxis.height(), increasingEndTickLength + baseAxis.margin(), "height should not decrease");
 
-    assert.throws(() => baseAxis.endTickLength(-1), "must be positive");
-
-    svg.remove();
-  });
-
-  it("height is adjusted to greater of innerTickLength or endTickLength", () => {
-    let SVG_WIDTH = 500;
-    let SVG_HEIGHT = 100;
-    let svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
-    let scale = new Plottable.Scales.Linear();
-    let baseAxis = new Plottable.Axis(scale, "bottom");
-    baseAxis.showEndTickLabels(true);
-    baseAxis.renderTo(svg);
-
-    let expectedHeight = Math.max(baseAxis.innerTickLength(), baseAxis.endTickLength()) + baseAxis.margin();
-    assert.strictEqual(baseAxis.height(), expectedHeight, "height should be equal to the maximum of the two");
-
-    baseAxis.innerTickLength(20);
-    assert.strictEqual(baseAxis.height(), 20 + baseAxis.margin(), "height should increase to inner tick length");
-
-    baseAxis.endTickLength(30);
-    assert.strictEqual(baseAxis.height(), 30 + baseAxis.margin(), "height should increase to end tick length");
-
-    baseAxis.innerTickLength(10);
-    assert.strictEqual(baseAxis.height(), 30 + baseAxis.margin(), "height should not decrease");
-
-    svg.remove();
-  });
-
-  it("default alignment based on orientation", () => {
-    let scale = new Plottable.Scales.Linear();
-    let baseAxis = new Plottable.Axis(scale, "bottom");
-    assert.strictEqual(baseAxis.yAlignment(), "top", "y alignment defaults to \"top\" for bottom axis");
-    baseAxis = new Plottable.Axis(scale, "top");
-    assert.strictEqual(baseAxis.yAlignment(), "bottom", "y alignment defaults to \"bottom\" for top axis");
-    baseAxis = new Plottable.Axis(scale, "left");
-    assert.strictEqual(baseAxis.xAlignment(), "right", "x alignment defaults to \"right\" for left axis");
-    baseAxis = new Plottable.Axis(scale, "right");
-    assert.strictEqual(baseAxis.xAlignment(), "left", "x alignment defaults to \"left\" for right axis");
+      baseAxis.destroy();
+      svg.remove();
+    });
   });
 
   describe("axis annotations", () => {
     describe("enabling annotations", () => {
+
+      let axis: Plottable.Axis<{}>;
+
+      beforeEach(() => {
+        axis = new Plottable.Axis(new Plottable.Scale<{}, number>(), "bottom");
+      });
+
+      afterEach(() => {
+        axis.destroy();
+      });
+
       it("has annotations disabled by default", () => {
-        let axis = new Plottable.Axis(new Plottable.Scale<{}, number>(), "bottom");
         assert.isFalse(axis.annotationsEnabled(), "annotations are disabled by default");
       });
 
       it("can set if annotations are enabled", () => {
-        let axis = new Plottable.Axis(new Plottable.Scale<{}, number>(), "bottom");
         let annotationsEnabled = axis.annotationsEnabled();
         assert.strictEqual(axis.annotationsEnabled(!annotationsEnabled), axis, "enabling/disabling annotations returns calling axis");
         assert.strictEqual(axis.annotationsEnabled(), !annotationsEnabled, "can set if annotations are enabled");
@@ -223,13 +239,22 @@ describe("BaseAxis", () => {
     });
 
     describe("annotating ticks", () => {
+
+      let axis: Plottable.Axis<{}>;
+
+      beforeEach(() => {
+        axis = new Plottable.Axis(new Plottable.Scale<{}, number>(), "bottom");
+      });
+
+      afterEach(() => {
+        axis.destroy();
+      });
+
       it("has no annotated ticks by default", () => {
-        let axis = new Plottable.Axis(new Plottable.Scale<{}, number>(), "bottom");
         assert.deepEqual(axis.annotatedTicks(), [], "no annotated ticks by default");
       });
 
       it("can set the annotated ticks", () => {
-        let axis = new Plottable.Axis(new Plottable.Scale<{}, number>(), "bottom");
         let annotatedTicks = [20, 30, 40];
         assert.strictEqual(axis.annotatedTicks(annotatedTicks), axis, "setting annotated ticks returns calling axis");
         assert.deepEqual(axis.annotatedTicks(), annotatedTicks, "can set the annotated ticks");
@@ -237,8 +262,18 @@ describe("BaseAxis", () => {
     });
 
     describe("formatting annotation ticks", () => {
+
+      let axis: Plottable.Axis<{}>;
+
+      beforeEach(() => {
+        axis = new Plottable.Axis(new Plottable.Scale<{}, number>(), "bottom");
+      });
+
+      afterEach(() => {
+        axis.destroy();
+      });
+
       it("uses the identity formatter by default", () => {
-        let axis = new Plottable.Axis(new Plottable.Scale<{}, number>(), "bottom");
         let annotationFormatter = axis.annotationFormatter();
         let identityFormatter = Plottable.Formatters.identity();
         let test = "testString";
@@ -246,7 +281,6 @@ describe("BaseAxis", () => {
       });
 
       it("can set the annotation formatter", () => {
-        let axis = new Plottable.Axis(new Plottable.Scale<{}, number>(), "bottom");
         let annotationFormatter = (d: any) => "";
         assert.strictEqual(axis.annotationFormatter(annotationFormatter), axis, "setting annotation formatter returns calling axis");
         let test = "testString";
@@ -255,20 +289,28 @@ describe("BaseAxis", () => {
     });
 
     describe("annotation tier count", () => {
+
+      let axis: Plottable.Axis<{}>;
+
+      beforeEach(() => {
+        axis = new Plottable.Axis(new Plottable.Scale<{}, number>(), "bottom");
+      });
+
+      afterEach(() => {
+        axis.destroy();
+      });
+
       it("one annotation tier by default", () => {
-        let axis = new Plottable.Axis(new Plottable.Scale<{}, number>(), "bottom");
         assert.deepEqual(axis.annotationTierCount(), 1, "one annotation tier by default");
       });
 
       it("can set the annotation tier count", () => {
-        let axis = new Plottable.Axis(new Plottable.Scale<{}, number>(), "bottom");
         let annotationTierCount = 5;
         assert.strictEqual(axis.annotationTierCount(annotationTierCount), axis, "setting annotation tier count returns calling axis");
         assert.deepEqual(axis.annotationTierCount(), annotationTierCount, "can set the annotation tier count");
       });
 
       it("throws an error when annotation tier count is not valid", () => {
-        let axis = new Plottable.Axis(new Plottable.Scale<{}, number>(), "bottom");
         let invalidAnnotationTierCounts = [-1, -100];
         invalidAnnotationTierCounts.forEach(function(annotationTierCount) {
           let currentAnnotationTierCount = axis.annotationTierCount();
@@ -282,14 +324,26 @@ describe("BaseAxis", () => {
 
     describe("rendering annotations", () => {
       describe("label content", () => {
-        it("re-renders when the annotation formatter is changed", () => {
-          let annotatedTicks = [new Date(1994, 11, 17), new Date(1995, 11, 17)];
+
+        let annotatedTicks: Date[];
+        let axis: Plottable.Axis<Date>;
+        let svg: d3.Selection<void>;
+
+        beforeEach(() => {
+          annotatedTicks = [new Date(1994, 11, 17), new Date(1995, 11, 17)];
           let scale = new Plottable.Scales.Time();
           scale.domain([new Date(1994, 11, 17), new Date(1995, 11, 17)]);
-          let axis = new Plottable.Axis(scale, "bottom");
+          axis = new Plottable.Axis(scale, "bottom");
+          svg = TestMethods.generateSVG();
+        });
+
+        afterEach(() => {
+          axis.destroy();
+        });
+
+        it("re-renders when the annotation formatter is changed", () => {
           axis.annotationsEnabled(true);
           axis.annotatedTicks(annotatedTicks);
-          let svg = TestMethods.generateSVG(300, 300);
           axis.renderTo(svg);
 
           assert.strictEqual(axis.content().selectAll(`.${Plottable.Axis.ANNOTATION_LABEL_CLASS}`).size(),
@@ -309,12 +363,7 @@ describe("BaseAxis", () => {
         });
 
         it("can enable annotations after render", () => {
-          let annotatedTicks = [new Date(1994, 11, 17), new Date(1995, 11, 17)];
-          let scale = new Plottable.Scales.Time();
-          scale.domain([new Date(1994, 11, 17), new Date(1995, 11, 17)]);
-          let axis = new Plottable.Axis(scale, "bottom");
           axis.annotatedTicks(annotatedTicks);
-          let svg = TestMethods.generateSVG(300, 300);
           axis.renderTo(svg);
 
           assert.strictEqual(axis.content().selectAll(`.${Plottable.Axis.ANNOTATION_LABEL_CLASS}`).size(),
@@ -329,13 +378,8 @@ describe("BaseAxis", () => {
         });
 
         it("can disable annotations after render", () => {
-          let annotatedTicks = [new Date(1994, 11, 17), new Date(1995, 11, 17)];
-          let scale = new Plottable.Scales.Time();
-          scale.domain([new Date(1994, 11, 17), new Date(1995, 11, 17)]);
-          let axis = new Plottable.Axis(scale, "bottom");
           axis.annotationsEnabled(true);
           axis.annotatedTicks(annotatedTicks);
-          let svg = TestMethods.generateSVG(300, 300);
           axis.renderTo(svg);
 
           assert.strictEqual(axis.content().selectAll(`.${Plottable.Axis.ANNOTATION_LABEL_CLASS}`).size(),
@@ -350,12 +394,7 @@ describe("BaseAxis", () => {
         });
 
         it("re-renders when annotated ticks are set after render", () => {
-          let annotatedTicks = [new Date(1994, 11, 17), new Date(1995, 11, 17)];
-          let scale = new Plottable.Scales.Time();
-          scale.domain([new Date(1994, 11, 17), new Date(1995, 11, 17)]);
-          let axis = new Plottable.Axis(scale, "bottom");
           axis.annotationsEnabled(true);
-          let svg = TestMethods.generateSVG(300, 300);
           axis.renderTo(svg);
 
           assert.strictEqual(axis.content().selectAll(`.${Plottable.Axis.ANNOTATION_LABEL_CLASS}`).size(),
@@ -378,6 +417,7 @@ describe("BaseAxis", () => {
 
       describe("element placement in relation to annotation rectangle", () => {
 
+        let svg: d3.Selection<void>;
         let scale: Plottable.Scales.ModifiedLog;
         let annotatedTicks: number[];
 
@@ -385,14 +425,13 @@ describe("BaseAxis", () => {
           scale = new Plottable.Scales.ModifiedLog();
           annotatedTicks = [3, 100, 250];
           scale.domain([0, 300]);
+          svg = TestMethods.generateSVG();
         });
 
         it("renders annotations at the axis baseline extending downwards with a bottom orientation axis", () => {
           let axis = new Plottable.Axis(scale, "bottom");
           axis.annotatedTicks(annotatedTicks);
           axis.annotationsEnabled(true);
-
-          let svg = TestMethods.generateSVG(300, 300);
           axis.renderTo(svg);
 
           let annotationRects = axis.content().selectAll(`.${Plottable.Axis.ANNOTATION_RECT_CLASS}`);
@@ -434,6 +473,7 @@ describe("BaseAxis", () => {
             let surroundingRect = d3.select(annotationRects[0][i]);
             TestMethods.assertBBoxInclusion(surroundingRect, annotationLabel);
           });
+          axis.destroy();
           svg.remove();
         });
 
@@ -442,7 +482,6 @@ describe("BaseAxis", () => {
           axis.annotatedTicks(annotatedTicks);
           axis.annotationsEnabled(true);
 
-          let svg = TestMethods.generateSVG(300, 300);
           axis.renderTo(svg);
 
           let annotationRects = axis.content().selectAll(`.${Plottable.Axis.ANNOTATION_RECT_CLASS}`);
@@ -487,6 +526,7 @@ describe("BaseAxis", () => {
             let surroundingRect = d3.select(annotationRects[0][i]);
             TestMethods.assertBBoxInclusion(surroundingRect, annotationLabel);
           });
+          axis.destroy();
           svg.remove();
         });
 
@@ -495,7 +535,6 @@ describe("BaseAxis", () => {
           axis.annotatedTicks(annotatedTicks);
           axis.annotationsEnabled(true);
 
-          let svg = TestMethods.generateSVG(300, 300);
           axis.renderTo(svg);
 
           let annotationRects = axis.content().selectAll(`.${Plottable.Axis.ANNOTATION_RECT_CLASS}`);
@@ -539,6 +578,7 @@ describe("BaseAxis", () => {
             let surroundingRect = d3.select(annotationRects[0][i]);
             TestMethods.assertBBoxInclusion(surroundingRect, annotationLabel);
           });
+          axis.destroy();
           svg.remove();
         });
 
@@ -547,7 +587,6 @@ describe("BaseAxis", () => {
           axis.annotatedTicks(annotatedTicks);
           axis.annotationsEnabled(true);
 
-          let svg = TestMethods.generateSVG(300, 300);
           axis.renderTo(svg);
 
           let annotationRects = axis.content().selectAll(`.${Plottable.Axis.ANNOTATION_RECT_CLASS}`);
@@ -589,15 +628,19 @@ describe("BaseAxis", () => {
             let surroundingRect = d3.select(annotationRects[0][i]);
             TestMethods.assertBBoxInclusion(surroundingRect, annotationLabel);
           });
+          axis.destroy();
           svg.remove();
         });
       });
 
       describe("annotation rectangle placement", () => {
+
+        let svg: d3.Selection<void>;
         let scale: Plottable.Scales.Linear;
         let annotatedTicks: number[];
 
         beforeEach(() => {
+          svg = TestMethods.generateSVG(300, 300);
           scale = new Plottable.Scales.Linear();
           annotatedTicks = [50, 100, 150];
           scale.domain([0, 300]);
@@ -608,8 +651,6 @@ describe("BaseAxis", () => {
             let axis = new Plottable.Axis(scale, "bottom");
             axis.annotatedTicks(annotatedTicks);
             axis.annotationsEnabled(true);
-
-            let svg = TestMethods.generateSVG(300, 300);
             axis.renderTo(svg);
 
             let annotationRects = axis.content().selectAll(`.${Plottable.Axis.ANNOTATION_RECT_CLASS}`);
@@ -621,6 +662,7 @@ describe("BaseAxis", () => {
               assert.closeTo(TestMethods.numAttr(annotationRect, "x"), scale.scale(d),
                 window.Pixel_CloseTo_Requirement, `rectangle ${i} positioned correctly`);
             });
+            axis.destroy();
             svg.remove();
           });
 
@@ -628,8 +670,6 @@ describe("BaseAxis", () => {
             let axis = new Plottable.Axis(scale, "top");
             axis.annotatedTicks(annotatedTicks);
             axis.annotationsEnabled(true);
-
-            let svg = TestMethods.generateSVG(300, 300);
             axis.renderTo(svg);
 
             let annotationRects = axis.content().selectAll(`.${Plottable.Axis.ANNOTATION_RECT_CLASS}`);
@@ -641,6 +681,7 @@ describe("BaseAxis", () => {
               assert.closeTo(TestMethods.numAttr(annotationRect, "x"), scale.scale(d),
                 window.Pixel_CloseTo_Requirement, `rectangle ${i} positioned correctly`);
             });
+            axis.destroy();
             svg.remove();
           });
 
@@ -648,8 +689,6 @@ describe("BaseAxis", () => {
             let axis = new Plottable.Axis(scale, "left");
             axis.annotatedTicks(annotatedTicks);
             axis.annotationsEnabled(true);
-
-            let svg = TestMethods.generateSVG(300, 300);
             axis.renderTo(svg);
 
             let annotationRects = axis.content().selectAll(`.${Plottable.Axis.ANNOTATION_RECT_CLASS}`);
@@ -661,6 +700,7 @@ describe("BaseAxis", () => {
               assert.closeTo(TestMethods.numAttr(annotationRect, "y"), scale.scale(d),
                 window.Pixel_CloseTo_Requirement, `rectangle ${i} positioned correctly`);
             });
+            axis.destroy();
             svg.remove();
           });
 
@@ -668,8 +708,6 @@ describe("BaseAxis", () => {
             let axis = new Plottable.Axis(scale, "right");
             axis.annotatedTicks(annotatedTicks);
             axis.annotationsEnabled(true);
-
-            let svg = TestMethods.generateSVG(300, 300);
             axis.renderTo(svg);
 
             let annotationRects = axis.content().selectAll(`.${Plottable.Axis.ANNOTATION_RECT_CLASS}`);
@@ -681,6 +719,7 @@ describe("BaseAxis", () => {
               assert.closeTo(TestMethods.numAttr(annotationRect, "y"), scale.scale(d), window.Pixel_CloseTo_Requirement,
                 `rectangle ${i} positioned correctly`);
             });
+            axis.destroy();
             svg.remove();
           });
         });
@@ -690,13 +729,12 @@ describe("BaseAxis", () => {
             let axis = new Plottable.Axis(scale, "bottom");
             axis.annotatedTicks(annotatedTicks);
             axis.annotationsEnabled(true);
-
-            let svg = TestMethods.generateSVG(300, 300);
             axis.renderTo(svg);
 
             let firstAnnotationRect = axis.content().select(`.${Plottable.Axis.ANNOTATION_RECT_CLASS}`);
             assert.closeTo(TestMethods.numAttr(firstAnnotationRect, "y") + TestMethods.numAttr(firstAnnotationRect, "height"),
               axis.height() - axis.margin(), window.Pixel_CloseTo_Requirement, "rectangle positioned correctly");
+            axis.destroy();
             svg.remove();
           });
 
@@ -705,12 +743,12 @@ describe("BaseAxis", () => {
             axis.annotatedTicks(annotatedTicks);
             axis.annotationsEnabled(true);
 
-            let svg = TestMethods.generateSVG(300, 300);
             axis.renderTo(svg);
 
             let firstAnnotationRect = axis.content().select(`.${Plottable.Axis.ANNOTATION_RECT_CLASS}`);
             assert.closeTo(TestMethods.numAttr(firstAnnotationRect, "y"),
               axis.margin(), window.Pixel_CloseTo_Requirement, "rectangle positioned correctly");
+            axis.destroy();
             svg.remove();
           });
 
@@ -718,13 +756,12 @@ describe("BaseAxis", () => {
             let axis = new Plottable.Axis(scale, "left");
             axis.annotatedTicks(annotatedTicks);
             axis.annotationsEnabled(true);
-
-            let svg = TestMethods.generateSVG(300, 300);
             axis.renderTo(svg);
 
             let firstAnnotationRect = axis.content().select(`.${Plottable.Axis.ANNOTATION_RECT_CLASS}`);
             assert.closeTo(TestMethods.numAttr(firstAnnotationRect, "x"),
               axis.margin(), window.Pixel_CloseTo_Requirement, "rectangle positioned correctly");
+            axis.destroy();
             svg.remove();
           });
 
@@ -732,13 +769,12 @@ describe("BaseAxis", () => {
             let axis = new Plottable.Axis(scale, "right");
             axis.annotatedTicks(annotatedTicks);
             axis.annotationsEnabled(true);
-
-            let svg = TestMethods.generateSVG(300, 300);
             axis.renderTo(svg);
 
             let firstAnnotationRect = axis.content().select(`.${Plottable.Axis.ANNOTATION_RECT_CLASS}`);
             assert.closeTo(TestMethods.numAttr(firstAnnotationRect, "x") + TestMethods.numAttr(firstAnnotationRect, "width"),
               axis.width() - axis.margin(), window.Pixel_CloseTo_Requirement, "rectangle positioned correctly");
+            axis.destroy();
             svg.remove();
           });
         });
@@ -748,8 +784,6 @@ describe("BaseAxis", () => {
             let axis = new Plottable.Axis(scale, "bottom");
             axis.annotatedTicks([50, 51]);
             axis.annotationsEnabled(true);
-
-            let svg = TestMethods.generateSVG(300, 300);
             axis.renderTo(svg);
 
             let annotationRects = axis.content().selectAll(`.${Plottable.Axis.ANNOTATION_RECT_CLASS}`);
@@ -757,6 +791,7 @@ describe("BaseAxis", () => {
             let secondAnnotationRect = d3.select(annotationRects[0][1]);
             assert.strictEqual(TestMethods.numAttr(secondAnnotationRect, "y") - TestMethods.numAttr(firstAnnotationRect, "y"),
               TestMethods.numAttr(firstAnnotationRect, "height"), "rectangle offset by previous rectangle");
+            axis.destroy();
             svg.remove();
           });
 
@@ -764,8 +799,6 @@ describe("BaseAxis", () => {
             let axis = new Plottable.Axis(scale, "top");
             axis.annotatedTicks([50, 51]);
             axis.annotationsEnabled(true);
-
-            let svg = TestMethods.generateSVG(300, 300);
             axis.renderTo(svg);
 
             let annotationRects = axis.content().selectAll(`.${Plottable.Axis.ANNOTATION_RECT_CLASS}`);
@@ -773,6 +806,7 @@ describe("BaseAxis", () => {
             let secondAnnotationRect = d3.select(annotationRects[0][1]);
             assert.strictEqual(TestMethods.numAttr(firstAnnotationRect, "y") - TestMethods.numAttr(secondAnnotationRect, "y"),
               TestMethods.numAttr(firstAnnotationRect, "height"), "rectangle offset by previous rectangle");
+            axis.destroy();
             svg.remove();
           });
 
@@ -780,8 +814,6 @@ describe("BaseAxis", () => {
             let axis = new Plottable.Axis(scale, "left");
             axis.annotatedTicks([50, 51]);
             axis.annotationsEnabled(true);
-
-            let svg = TestMethods.generateSVG(300, 300);
             axis.renderTo(svg);
 
             let annotationRects = axis.content().selectAll(`.${Plottable.Axis.ANNOTATION_RECT_CLASS}`);
@@ -789,6 +821,7 @@ describe("BaseAxis", () => {
             let secondAnnotationRect = d3.select(annotationRects[0][1]);
             assert.strictEqual(TestMethods.numAttr(firstAnnotationRect, "x") - TestMethods.numAttr(secondAnnotationRect, "x"),
               TestMethods.numAttr(firstAnnotationRect, "width"), "rectangle offset by previous rectangle");
+            axis.destroy();
             svg.remove();
           });
 
@@ -796,8 +829,6 @@ describe("BaseAxis", () => {
             let axis = new Plottable.Axis(scale, "right");
             axis.annotatedTicks([50, 51]);
             axis.annotationsEnabled(true);
-
-            let svg = TestMethods.generateSVG(300, 300);
             axis.renderTo(svg);
 
             let annotationRects = axis.content().selectAll(`.${Plottable.Axis.ANNOTATION_RECT_CLASS}`);
@@ -805,6 +836,7 @@ describe("BaseAxis", () => {
             let secondAnnotationRect = d3.select(annotationRects[0][1]);
             assert.strictEqual(TestMethods.numAttr(secondAnnotationRect, "x") - TestMethods.numAttr(firstAnnotationRect, "x"),
               TestMethods.numAttr(firstAnnotationRect, "width"), "rectangle offset by previous rectangle");
+            axis.destroy();
             svg.remove();
           });
         });
@@ -812,11 +844,11 @@ describe("BaseAxis", () => {
       });
 
       it("hides annotations if rectangles are outside the annotation area", () => {
-        let mockScale = new Plottable.Scales.Linear;
+        let scale = new Plottable.Scales.Linear;
         let annotatedTicks = [50, 51, 150];
-        mockScale.domain([0, 300]);
+        scale.domain([0, 300]);
 
-        let axis = new Plottable.Axis(mockScale, "bottom");
+        let axis = new Plottable.Axis(scale, "bottom");
         axis.annotatedTicks(annotatedTicks);
         axis.annotationsEnabled(true);
 
@@ -839,15 +871,16 @@ describe("BaseAxis", () => {
             assert.strictEqual(annotationRect.attr("visibility"), "hidden", `rect ${i} outside margin area should be not visible`);
           }
         });
+        axis.destroy();
         svg.remove();
       });
 
       it("shows annotation circles are not hidden regardless if rectangles are hidden", () => {
-        let mockScale = new Plottable.Scales.Linear;
+        let scale = new Plottable.Scales.Linear;
         let annotatedTicks = [50, 51, 150];
-        mockScale.domain([0, 300]);
+        scale.domain([0, 300]);
 
-        let axis = new Plottable.Axis(mockScale, "bottom");
+        let axis = new Plottable.Axis(scale, "bottom");
         axis.annotatedTicks(annotatedTicks);
         axis.annotationsEnabled(true);
 
@@ -862,6 +895,7 @@ describe("BaseAxis", () => {
           let annotationCircle = d3.select(this);
           assert.notStrictEqual(annotationCircle.attr("visibility"), "hidden", `circle ${i} inside margin area should be visible`);
         });
+        axis.destroy();
         svg.remove();
       });
 
@@ -878,6 +912,7 @@ describe("BaseAxis", () => {
 
         assert.strictEqual(axis.content().selectAll(`.${Plottable.Axis.ANNOTATION_LABEL_CLASS}`).size(), 0, "no annotated ticks");
 
+        axis.destroy();
         svg.remove();
       });
 
@@ -899,6 +934,7 @@ describe("BaseAxis", () => {
         assert.strictEqual(axis.content().selectAll(`.${Plottable.Axis.ANNOTATION_LABEL_CLASS}`).size(),
           annotatedTickSet.size, "only unique annotations rendered");
 
+        axis.destroy();
         svg.remove();
       });
 
@@ -920,6 +956,7 @@ describe("BaseAxis", () => {
         assert.closeTo(TestMethods.numAttr(annotationRect, "y") + TestMethods.numAttr(annotationRect, "height"),
           axis.height() - axis.margin(), window.Pixel_CloseTo_Requirement, "rectangle positioned correctly");
 
+        axis.destroy();
         svg.remove();
       });
     });
