@@ -16,17 +16,20 @@ describe("Category Axes", () => {
       axis.tickLabelAngle(90);
       text = ticks[0].map((d: any) => d3.select(d).text());
       assert.deepEqual(text, domain, "text displayed correctly when horizontal");
-      assert.strictEqual(d3.transform(axis.content().selectAll(".text-area").attr("transform")).rotate, 90, "the ticks were rotated right");
+      assert.closeTo(d3.transform(axis.content().selectAll(".text-area").attr("transform")).rotate, 90,
+        window.Pixel_CloseTo_Requirement, "the ticks were rotated right");
 
       axis.tickLabelAngle(0);
       text = ticks[0].map((d: any) => d3.select(d).text());
       assert.deepEqual(text, domain, "text displayed correctly when horizontal");
-      assert.strictEqual(d3.transform(axis.content().selectAll(".text-area").attr("transform")).rotate, 0, "the ticks were rotated right");
+      assert.closeTo(d3.transform(axis.content().selectAll(".text-area").attr("transform")).rotate, 0,
+        window.Pixel_CloseTo_Requirement, "the ticks were rotated right");
 
       axis.tickLabelAngle(-90);
       text = ticks[0].map((d: any) => d3.select(d).text());
       assert.deepEqual(text, domain, "text displayed correctly when horizontal");
-      assert.strictEqual(d3.transform(axis.content().selectAll(".text-area").attr("transform")).rotate, -90, "the ticks were rotated left");
+      assert.closeTo(d3.transform(axis.content().selectAll(".text-area").attr("transform")).rotate, -90,
+        window.Pixel_CloseTo_Requirement, "the ticks were rotated left");
 
       svg.remove();
     });
