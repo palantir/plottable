@@ -87,7 +87,7 @@ describe("Category Axes", () => {
     });
   });
 
-  describe("requesting space", () => {
+  describe("requesting space when bottom oriented", () => {
 
     let svg: d3.Selection<void>;
     let axis: Plottable.Axes.Category;
@@ -137,6 +137,64 @@ describe("Category Axes", () => {
       assert.operator(flatHeight, "<", requestedSpace.minHeight, "axis should request more height when tick labels are rotated");
       svg.remove();
     });
+
+    it("accounts for margin, innerTickLength, and padding when calculating for height", () => {
+      let scale = new Plottable.Scales.Category().domain(["foo", "bar", "baz"]);
+      let axis = new Plottable.Axes.Category(scale, "bottom");
+      axis.anchor(svg);
+
+      let svgWidth = TestMethods.numAttr(svg, "width");
+      let svgHeight = TestMethods.numAttr(svg, "height");
+
+      let axisRequestedHeight = () => axis.requestedSpace(svgWidth, svgHeight).minHeight;
+
+      let oldHeight = axisRequestedHeight();
+      let increaseAmount = 5;
+      axis.tickLabelPadding(axis.tickLabelPadding() + increaseAmount);
+      assert.strictEqual(axisRequestedHeight(), oldHeight + increaseAmount, "increasing tickLabelPadding increases height");
+
+      oldHeight = axisRequestedHeight();
+      axis.margin(axis.margin() + increaseAmount);
+      assert.strictEqual(axisRequestedHeight(), oldHeight + increaseAmount, "increasing margin increases height");
+
+      oldHeight = axisRequestedHeight();
+      axis.innerTickLength(axis.innerTickLength() + increaseAmount);
+      assert.strictEqual(axisRequestedHeight(), oldHeight + increaseAmount, "increasing innerTickLength increases height");
+
+      axis.destroy();
+      svg.remove();
+    });
+  });
+
+  describe("requesting space on left oriented axes", () => {
+
+    it("accounts for margin, innerTickLength, and padding when calculating for width", () => {
+      let svg = TestMethods.generateSVG();
+      let scale = new Plottable.Scales.Category().domain(["foo", "bar", "baz"]);
+      let axis = new Plottable.Axes.Category(scale, "left");
+      axis.anchor(svg);
+
+      let svgWidth = TestMethods.numAttr(svg, "width");
+      let svgHeight = TestMethods.numAttr(svg, "height");
+
+      let axisRequestedWidth = () => axis.requestedSpace(svgWidth, svgHeight).minWidth;
+
+      let oldWidth = axisRequestedWidth();
+      let increaseAmount = 5;
+      axis.tickLabelPadding(axis.tickLabelPadding() + increaseAmount);
+      assert.strictEqual(axisRequestedWidth(), oldWidth + increaseAmount, "increasing tickLabelPadding increases width");
+
+      oldWidth = axisRequestedWidth();
+      axis.margin(axis.margin() + increaseAmount);
+      assert.strictEqual(axisRequestedWidth(), oldWidth + increaseAmount, "increasing margin increases width");
+
+      oldWidth = axisRequestedWidth();
+      axis.innerTickLength(axis.innerTickLength() + increaseAmount);
+      assert.strictEqual(axisRequestedWidth(), oldWidth + increaseAmount, "increasing innerTickLength increases width");
+
+      axis.destroy();
+      svg.remove();
+    });
   });
 
   describe("coercing", () => {
@@ -167,54 +225,6 @@ describe("Category Axes", () => {
         let actualText = d3.select(this).text();
         assert.strictEqual(actualText, expectedTexts[i], "formatter was applied");
       });
-      axis.destroy();
-      svg.remove();
-    });
-  });
-
-  describe("computing the size", () => {
-
-    it("accounts for margin. innerTickLength, and padding when calculating for width when vertical", () => {
-      let svg = TestMethods.generateSVG();
-      let scale = new Plottable.Scales.Category().domain(["foo", "bar", "baz"]);
-      let axis = new Plottable.Axes.Category(scale, "left");
-      axis.renderTo(svg);
-
-      let axisWidth = axis.width();
-      let increaseAmount = 5;
-      axis.tickLabelPadding(axis.tickLabelPadding() + increaseAmount);
-      assert.strictEqual(axis.width(), axisWidth + increaseAmount, "increasing tickLabelPadding increases width");
-
-      axisWidth = axis.width();
-      axis.margin(axis.margin() + increaseAmount);
-      assert.strictEqual(axis.width(), axisWidth + increaseAmount, "increasing margin increases width");
-
-      axisWidth = axis.width();
-      axis.innerTickLength(axis.innerTickLength() + increaseAmount);
-      assert.strictEqual(axis.width(), axisWidth + increaseAmount, "increasing innerTickLength increases width");
-
-      axis.destroy();
-      svg.remove();
-    });
-
-    it("accounts for margin. innerTickLength, and padding when calculating for height when vertical", () => {
-      let svg = TestMethods.generateSVG();
-      let scale = new Plottable.Scales.Category().domain(["foo", "bar", "baz"]);
-      let axis = new Plottable.Axes.Category(scale, "bottom");
-      axis.renderTo(svg);
-
-      let axisHeight = axis.height();
-      axis.tickLabelPadding(axis.tickLabelPadding() + 5);
-      assert.closeTo(axis.height(), axisHeight + 5, 2, "increasing tickLabelPadding increases height");
-
-      axisHeight = axis.height();
-      axis.margin(axis.margin() + 5);
-      assert.closeTo(axis.height(), axisHeight + 5, 2, "increasing margin increases height");
-
-      axisHeight = axis.height();
-      axis.innerTickLength(axis.innerTickLength() + 5);
-      assert.closeTo(axis.height(), axisHeight + 5, 2, "increasing innerTickLength increases height");
-
       axis.destroy();
       svg.remove();
     });
