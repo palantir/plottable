@@ -40,7 +40,7 @@ describe("Plots", () => {
           let areaVertices = TestMethods.areaVertices(stackedAreaSelection);
           let areaXs = areaVertices.map((areaVertex) => areaVertex.x).slice(0, -2);
           d.forEach((datum: any, index: number) => {
-            assert.closeTo(areaXs[index], constantValue, window.Pixel_CloseTo_Requirement, "cools");
+            assert.closeTo(areaXs[index], constantValue, window.Pixel_CloseTo_Requirement, "x pixel value correctly set");
           });
         });
         stackedAreaPlot.destroy();
