@@ -9,14 +9,14 @@ describe("Plots", () => {
       beforeEach(() => {
         svg = TestMethods.generateSVG();
         let data1 = [
-          {foo: 1},
-          {foo: 3}
+          {x: 1},
+          {x: 3}
         ];
         let dataset1 = new Plottable.Dataset(data1);
         dataset1.metadata({ bar: 7 });
         let data2 = [
-          {foo: 1},
-          {foo: 3}
+          {x: 1},
+          {x: 3}
         ];
         let dataset2 = new Plottable.Dataset(data2);
         dataset2.metadata({ bar: 10 });
@@ -48,7 +48,7 @@ describe("Plots", () => {
       });
 
       it("can set the x property accessor to be dependent on the input data", () => {
-        let accessor = (d: {foo: number}, i: number, ds: Plottable.Dataset) => d.foo * 100 + i * 10 + ds.metadata().bar;
+        let accessor = (d: {x: number}, i: number, ds: Plottable.Dataset) => d.x * 100 + i * 10 + ds.metadata().bar;
         assert.strictEqual(stackedAreaPlot.x(accessor), stackedAreaPlot, "setter returns calling object");
         assert.strictEqual(stackedAreaPlot.x().accessor, accessor, `property set for datum`);
         stackedAreaPlot.renderTo(svg);
@@ -63,7 +63,7 @@ describe("Plots", () => {
           let areaXs = areaVertices.map((areaVertex) => areaVertex.x).slice(0, -2);
           data.forEach((datum: any, datumIndex: number) => {
             let x = accessor(datum, datumIndex, stackedAreaPlot.datasets()[i]);
-            assert.closeTo(areaXs[datumIndex], x, window.Pixel_CloseTo_Requirement, "cools");
+            assert.closeTo(areaXs[datumIndex], x, window.Pixel_CloseTo_Requirement, "x pixel value correctly set");
           });
         });
         stackedAreaPlot.destroy();
@@ -71,7 +71,7 @@ describe("Plots", () => {
       });
 
       it("can set the x property scale", () => {
-        let accessor = (d: {foo: number}) => d.foo;
+        let accessor = (d: {x: number}) => d.x;
         let linearScale = new Plottable.Scales.Linear();
         assert.strictEqual(stackedAreaPlot.x(accessor, linearScale), stackedAreaPlot, "setter returns calling object");
         assert.strictEqual(stackedAreaPlot.x().accessor, accessor, `property set for datum`);
@@ -102,14 +102,14 @@ describe("Plots", () => {
       beforeEach(() => {
         svg = TestMethods.generateSVG();
         let data1 = [
-          {foo: 1},
-          {foo: 3}
+          {y: 1},
+          {y: 3}
         ];
         let dataset1 = new Plottable.Dataset(data1);
         dataset1.metadata({ bar: 7 });
         let data2 = [
-          {foo: 5},
-          {foo: 3}
+          {y: 5},
+          {y: 3}
         ];
         let dataset2 = new Plottable.Dataset(data2);
         dataset2.metadata({ bar: 10 });
@@ -142,7 +142,7 @@ describe("Plots", () => {
       });
 
       it("can set to be dependent on the input data", () => {
-        let accessor = (d: {foo: number}, i: number, ds: Plottable.Dataset) => d.foo * 100 + i * 10 + ds.metadata().bar;
+        let accessor = (d: {y: number}, i: number, ds: Plottable.Dataset) => d.y * 100 + i * 10 + ds.metadata().bar;
         assert.strictEqual(stackedAreaPlot.y(accessor), stackedAreaPlot, "setter returns calling object");
         assert.strictEqual(stackedAreaPlot.y().accessor, accessor, "accessor set");
         stackedAreaPlot.destroy();
@@ -150,7 +150,7 @@ describe("Plots", () => {
       });
 
       it("can set the property scale", () => {
-        let accessor = (d: {foo: number}) => d.foo;
+        let accessor = (d: {y: number}) => d.y;
         let linearScale = new Plottable.Scales.Linear();
         assert.strictEqual(stackedAreaPlot.y(accessor, linearScale), stackedAreaPlot, "setter returns calling object");
         assert.strictEqual(stackedAreaPlot.y().accessor, accessor, "accessor set");
@@ -167,7 +167,7 @@ describe("Plots", () => {
           let areaYs = areaVertices.map((areaVertex) => areaVertex.y).slice(0, -2);
           data.forEach((datum: any, datumIndex: number) => {
             let y = linearScale.scale(stackedYs[index][datumIndex]);
-            assert.closeTo(areaYs[datumIndex], y, window.Pixel_CloseTo_Requirement, "cools");
+            assert.closeTo(areaYs[datumIndex], y, window.Pixel_CloseTo_Requirement, "y pixel value correctly set");
           });
         });
         stackedAreaPlot.destroy();
@@ -226,7 +226,7 @@ describe("Plots", () => {
         // HACKHACK https://github.com/palantir/plottable/issues/2712 y scale must be set.
         stackedAreaPlot.y(() => null, new Plottable.Scales.Linear());
         stackedAreaPlot.renderTo(svg);
-        assert.strictEqual(stackedAreaPlot.selections().size(), 0, "test");
+        assert.strictEqual(stackedAreaPlot.selections().size(), 0, "no areas rendered");
         stackedAreaPlot.destroy();
         svg.remove();
       });
