@@ -305,7 +305,8 @@ describe("InterpolatedColorLegend", () => {
     let swatchEdge = swatchBoundingRect.right;
     let legendEdge = legendBoundingRect.right;
     let padding = legendEdge - swatchEdge;
-    assert.closeTo(swatchWidth, padding, window.Pixel_CloseTo_Requirement, "padding is approximately equal to swatch width");
+    assert.closeTo(swatchWidth, padding, window.Pixel_CloseTo_Requirement,
+      "padding is approximately equal to swatch width");
     legend.expands(true);
     swatchBoundingRect = (<Element> legend.content().select(".swatch-container").node()).getBoundingClientRect();
     legendBoundingRect = (<Element> legend.background().select(".background-fill").node()).getBoundingClientRect();
@@ -313,7 +314,8 @@ describe("InterpolatedColorLegend", () => {
     swatchEdge = swatchBoundingRect.right;
     legendEdge = legendBoundingRect.right;
     padding = legendEdge - swatchEdge;
-    assert.closeTo(swatchWidth, padding, window.Pixel_CloseTo_Requirement, "padding is approximately equal to swatch width when expanded");
+    assert.closeTo(swatchWidth, padding, window.Pixel_CloseTo_Requirement,
+      "padding is approximately equal to swatch width when expanded");
     svg.remove();
   });
 
@@ -326,7 +328,8 @@ describe("InterpolatedColorLegend", () => {
     let swatchEdge = swatchBoundingRect.left;
     let legendEdge = legendBoundingRect.left;
     let padding = swatchEdge - legendEdge;
-    assert.closeTo(swatchWidth, padding, window.Pixel_CloseTo_Requirement, "padding is approximately equal to swatch width");
+    assert.closeTo(swatchWidth, padding, window.Pixel_CloseTo_Requirement,
+      "padding is approximately equal to swatch width");
     legend.expands(true);
     swatchBoundingRect = (<Element> legend.content().select(".swatch-container").node()).getBoundingClientRect();
     legendBoundingRect = (<Element> legend.background().select(".background-fill").node()).getBoundingClientRect();
@@ -334,7 +337,8 @@ describe("InterpolatedColorLegend", () => {
     swatchEdge = swatchBoundingRect.left;
     legendEdge = legendBoundingRect.left;
     padding = swatchEdge - legendEdge;
-    assert.closeTo(swatchWidth, padding, window.Pixel_CloseTo_Requirement, "padding is approximately equal to swatch width when expanded");
+    assert.closeTo(swatchWidth, padding, window.Pixel_CloseTo_Requirement,
+      "padding is approximately equal to swatch width when expanded");
     svg.remove();
   });
 
@@ -347,7 +351,8 @@ describe("InterpolatedColorLegend", () => {
     let swatchEdge = swatchBoundingRect.bottom;
     let legendEdge = legendBoundingRect.bottom;
     let padding = legendEdge - swatchEdge;
-    assert.closeTo(swatchHeight, padding, window.Pixel_CloseTo_Requirement, "padding is approximately equal to swatch height");
+    assert.closeTo(swatchHeight, padding, window.Pixel_CloseTo_Requirement,
+      "padding is approximately equal to swatch height");
     legend.expands(true);
     swatchBoundingRect = (<Element> legend.content().select(".swatch-container").node()).getBoundingClientRect();
     legendBoundingRect = (<Element> legend.background().select(".background-fill").node()).getBoundingClientRect();
@@ -355,7 +360,8 @@ describe("InterpolatedColorLegend", () => {
     swatchEdge = swatchBoundingRect.bottom;
     legendEdge = legendBoundingRect.bottom;
     padding = legendEdge - swatchEdge;
-    assert.closeTo(swatchHeight, padding, window.Pixel_CloseTo_Requirement, "padding is approximately equal to swatch height when expanded");
+    assert.closeTo(swatchHeight, padding, window.Pixel_CloseTo_Requirement,
+      "padding is approximately equal to swatch height when expanded");
     svg.remove();
   });
 });
