@@ -10,27 +10,27 @@ describe("Category Axes", () => {
       axis.renderTo(svg);
 
       let ticks = axis.content().selectAll("text");
-      let text = ticks[0].map((tick: any) => d3.select(tick).text());
-      assert.deepEqual(text, domain, "text displayed correctly when horizontal");
+      let texts = ticks[0].map((tick: any) => d3.select(tick).text());
+      assert.deepEqual(texts, domain, "text displayed correctly when horizontal");
 
       axis.tickLabelAngle(90);
       ticks = axis.content().selectAll("text");
-      text = ticks[0].map((d: any) => d3.select(d).text());
-      assert.deepEqual(text, domain, "text displayed correctly when horizontal");
+      texts = ticks[0].map((d: any) => d3.select(d).text());
+      assert.deepEqual(texts, domain, "text displayed correctly when horizontal");
       assert.closeTo(d3.transform(axis.content().selectAll(".text-area").attr("transform")).rotate, 90,
         window.Pixel_CloseTo_Requirement, "the ticks were rotated right");
 
       axis.tickLabelAngle(0);
       ticks = axis.content().selectAll("text");
-      text = ticks[0].map((d: any) => d3.select(d).text());
-      assert.deepEqual(text, domain, "text displayed correctly when horizontal");
+      texts = ticks[0].map((d: any) => d3.select(d).text());
+      assert.deepEqual(texts, domain, "text displayed correctly when horizontal");
       assert.closeTo(d3.transform(axis.content().selectAll(".text-area").attr("transform")).rotate, 0,
         window.Pixel_CloseTo_Requirement, "the ticks were rotated right");
 
       axis.tickLabelAngle(-90);
       ticks = axis.content().selectAll("text");
-      text = ticks[0].map((d: any) => d3.select(d).text());
-      assert.deepEqual(text, domain, "text displayed correctly when horizontal");
+      texts = ticks[0].map((d: any) => d3.select(d).text());
+      assert.deepEqual(texts, domain, "text displayed correctly when horizontal");
       assert.closeTo(d3.transform(axis.content().selectAll(".text-area").attr("transform")).rotate, -90,
         window.Pixel_CloseTo_Requirement, "the ticks were rotated left");
 
