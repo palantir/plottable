@@ -62,7 +62,7 @@ describe("Category Axes", () => {
       svg.remove();
     });
 
-    it("does not overlap axis labels with tick labels", () => {
+    it("does not overlap labels with tick marks", () => {
 
       function verifyTickLabelOverlaps(tickLabels: d3.Selection<void>, tickMarks: d3.Selection<void>) {
           for (let i = 0; i < tickLabels[0].length; i++) {
@@ -124,7 +124,7 @@ describe("Category Axes", () => {
       svg.remove();
     });
 
-    it("requests more space when rotated than not rotated", () => {
+    it("requests more space for rotated text", () => {
       let domain = ["label1", "label2", "label100"];
       scale.domain(domain);
       axis.renderTo(svg);
