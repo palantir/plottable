@@ -231,15 +231,15 @@ describe("Plots", () => {
         svg.remove();
       });
 
-      it("0 as a string coerces correctly and is not subject to off by one errors", () => {
+      it("coerces strings to numbers for calculating offsets", () => {
         let svg = TestMethods.generateSVG();
         let data0 = [
-          { x: 2, y: 2 },
+          { x: 2, y: "2" },
           { x: 3, y: 2 }
         ];
         let data1 = [
           { x: 2, y: "0" },
-          { x: 3, y: 2 }
+          { x: 3, y: "2" }
         ];
         let data2 = [
           { x: 2, y: 2 },
@@ -270,17 +270,17 @@ describe("Plots", () => {
         let areaVertices2 = TestMethods.areaVertices(stackedAreaSelection2);
         let areaYs2 = areaVertices2.map((areaVertex) => areaVertex.y).slice(0, -2);
 
-        assert.closeTo(areaYs0[0], yScale.scale(data0[0].y), window.Pixel_CloseTo_Requirement,
+        assert.closeTo(areaYs0[0], yScale.scale(<any> data0[0].y), window.Pixel_CloseTo_Requirement,
           "dataset0 should have no offset");
-        assert.closeTo(areaYs1[0], yScale.scale(data0[0].y), window.Pixel_CloseTo_Requirement,
+        assert.closeTo(areaYs1[0], yScale.scale(<any> data0[0].y), window.Pixel_CloseTo_Requirement,
           "dataset1 should be offset with dataset0");
-        assert.closeTo(areaYs2[0], yScale.scale(data2[0].y + data0[0].y), window.Pixel_CloseTo_Requirement,
+        assert.closeTo(areaYs2[0], yScale.scale(data2[0].y + parseInt(<any> data0[0].y, 10)), window.Pixel_CloseTo_Requirement,
           "dataset2 should be offset with only dataset0");
         plot.destroy();
         svg.remove();
       });
 
-      it("null defaults to 0", () => {
+      it("coerces null to 0 for calculating offsets", () => {
         let svg = TestMethods.generateSVG();
         let data0 = [
           { x: 2, y: 2 },
