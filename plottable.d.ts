@@ -2501,6 +2501,7 @@ declare module Plottable {
             private _orientation;
             private _padding;
             private _endPadding;
+            private _textPadding;
             private _formatter;
             private _expands;
             private _swatchContainer;

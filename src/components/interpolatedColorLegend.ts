@@ -10,8 +10,9 @@ export module Components {
     private _writer: SVGTypewriter.Writers.Writer;
     private _scale: Scales.InterpolatedColor;
     private _orientation: String ;
-    private _padding = 5;
+    private _padding = 15;
     private _endPadding = 5;
+    private _textPadding = 5;
     private _formatter: Formatter;
     private _expands: boolean;
 
@@ -220,6 +221,7 @@ export module Components {
 
       let padding = this._padding;
       let endPadding = this._endPadding;
+      let textPadding = this._textPadding;
 
       let upperLabelShift: Point = { x: 0, y: 0 };
       let lowerLabelShift: Point = { x: 0, y: 0 };
@@ -251,14 +253,14 @@ export module Components {
       let numSwatches = InterpolatedColorLegend._DEFAULT_NUM_SWATCHES;
       let textHeight = this._measurer.measure().height;
       if (this.expands() && textHeight > 0) {
-        let offset = this._isVertical() ? 2 * padding :  4 * padding - text0Width - text1Width;
+        let offset = this._isVertical() ? 2 * padding :  2 * endPadding + 2 * textPadding - text0Width - text1Width;
         let fullLength = this._isVertical() ? this.height() : this.width();
         numSwatches = Math.max(Math.floor((fullLength - offset) / textHeight), numSwatches);
       }
 
       if (this._isVertical()) {
         let longestTextWidth = Math.max(text0Width, text1Width);
-        swatchWidth = Math.max( (this.width() - 3 * padding - longestTextWidth), 0);
+        swatchWidth = Math.max( (this.width() - 2 * padding - 1 * textPadding - longestTextWidth), 0);
         swatchHeight = Math.max( ((this.height() - 2 * endPadding) / numSwatches), 0);
         swatchY = (d: any, i: number) => endPadding + (numSwatches - (i + 1)) * swatchHeight;
 
@@ -268,24 +270,24 @@ export module Components {
         lowerLabelShift.y = -endPadding;
 
         if (this._orientation === "left") {
-          swatchX = (d: any, i: number) => padding + longestTextWidth + padding;
+          swatchX = (d: any, i: number) => padding + longestTextWidth + textPadding;
           upperWriteOptions.xAlign = "right";
-          upperLabelShift.x = -(padding + swatchWidth + padding);
+          upperLabelShift.x = -(padding + swatchWidth + textPadding);
           lowerWriteOptions.xAlign = "right";
-          lowerLabelShift.x = -(padding + swatchWidth + padding);
+          lowerLabelShift.x = -(padding + swatchWidth + textPadding);
         } else { // right
           swatchX = (d: any, i: number) => padding;
           upperWriteOptions.xAlign = "left";
-          upperLabelShift.x = padding + swatchWidth + padding;
+          upperLabelShift.x = padding + swatchWidth + textPadding;
           lowerWriteOptions.xAlign = "left";
-          lowerLabelShift.x = padding + swatchWidth + padding;
+          lowerLabelShift.x = padding + swatchWidth + textPadding;
         }
         boundingBoxAttr["width"] = swatchWidth;
         boundingBoxAttr["height"] = numSwatches * swatchHeight;
       } else { // horizontal
-        swatchWidth = Math.max( ((this.width() - 2 * endPadding - 2 * padding - text0Width - text1Width) / numSwatches), 0);
+        swatchWidth = Math.max( ((this.width() - 2 * endPadding - 2 * textPadding - text0Width - text1Width) / numSwatches), 0);
         swatchHeight = Math.max( (this.height() - 2 * padding), 0);
-        swatchX = (d: any, i: number) => (endPadding + text0Width + padding) + i * swatchWidth;
+        swatchX = (d: any, i: number) => (endPadding + text0Width + textPadding) + i * swatchWidth;
         swatchY = (d: any, i: number) => padding;
 
         upperWriteOptions.xAlign = "right";
