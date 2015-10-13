@@ -1,5 +1,4 @@
-﻿///<reference path="../reference.ts" />
-module Plottable {
+﻿module Plottable {
 export module Animators {
 
   /**

@@ -83,11 +83,11 @@
       "src/plots/wheelPlot.ts",
 
       "src/animators/animator.ts",
-      "src/animators/nullAnimator.ts",
-      "src/animators/easingAnimator.ts",
       "src/animators/baseAnimator.ts",
       "src/animators/attrAnimator.ts",
       "src/animators/barAnimator.ts",
+      "src/animators/nullAnimator.ts",
+      "src/animators/easingAnimator.ts",
 
       "src/dispatchers/dispatcher.ts",
       "src/dispatchers/mouseDispatcher.ts",
