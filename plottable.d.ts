@@ -2537,17 +2537,6 @@ declare module Plottable {
              */
             formatter(formatter: Formatter): InterpolatedColorLegend;
             /**
-            * Gets the Padding on the legend.
-            */
-            endPadding(): number;
-            /**
-            * Sets the Padding on the legend.
-            *
-            * @param Number
-            * @returns {InterpolatedColorLegend} The calling InterpolatedColorLegend.
-            */
-            endPadding(padding: number): InterpolatedColorLegend;
-            /**
              * Gets whether the InterpolatedColorLegend expands to occupy all offered space in the long direction
              */
             expands(): boolean;

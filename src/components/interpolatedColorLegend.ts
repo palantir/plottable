@@ -11,7 +11,7 @@ export module Components {
     private _scale: Scales.InterpolatedColor;
     private _orientation: String ;
     private _padding = 20;
-    private _endPadding = 5;
+    private _endPadding = 0;
     private _textPadding = 5;
     private _formatter: Formatter;
     private _expands: boolean;
@@ -74,26 +74,6 @@ export module Components {
         return this._formatter;
       }
       this._formatter = formatter;
-      this.redraw();
-      return this;
-    }
-
-    /**
-    * Gets the Padding on the legend.
-    */
-    public endPadding(): number;
-    /**
-    * Sets the Padding on the legend.
-    *
-    * @param Number
-    * @returns {InterpolatedColorLegend} The calling InterpolatedColorLegend.
-    */
-    public endPadding(padding: number): InterpolatedColorLegend;
-    public endPadding(padding?: number): any {
-      if (padding === undefined) {
-        return this._endPadding;
-      }
-      this._endPadding = padding;
       this.redraw();
       return this;
     }
@@ -181,6 +161,7 @@ export module Components {
 
     public requestedSpace(offeredWidth: number, offeredHeight: number): SpaceRequest {
       let textHeight = this._measurer.measure().height;
+      let padding = textHeight;
 
       let domain = this._scale.domain();
       let labelWidths = domain.map((d: number) => this._measurer.measure(this._formatter(d)).width);
@@ -190,10 +171,10 @@ export module Components {
       let numSwatches = InterpolatedColorLegend._DEFAULT_NUM_SWATCHES;
       if (this._isVertical()) {
         let longestWidth = Utils.Math.max(labelWidths, 0);
-        desiredWidth = this._padding + textHeight + this._textPadding + longestWidth + this._padding;
+        desiredWidth = padding + textHeight + this._textPadding + longestWidth + padding;
         desiredHeight = this._endPadding + numSwatches * textHeight + this._endPadding;
       } else {
-        desiredHeight = this._padding + textHeight + this._padding;
+        desiredHeight = padding + textHeight + padding;
         desiredWidth = this._endPadding + labelWidths[0] + this._endPadding
                         + numSwatches * textHeight
                         + this._endPadding + labelWidths[1] + this._endPadding;
@@ -219,7 +200,8 @@ export module Components {
       let text1 = this._formatter(domain[1]);
       let text1Width = this._measurer.measure(text1).width;
 
-      let padding = this._padding;
+      let textHeight = this._measurer.measure().height;
+      let padding = textHeight;
       let endPadding = this._endPadding;
       let textPadding = this._textPadding;
 
@@ -251,7 +233,7 @@ export module Components {
       };
 
       let numSwatches = InterpolatedColorLegend._DEFAULT_NUM_SWATCHES;
-      let textHeight = this._measurer.measure().height;
+
       if (this.expands() && textHeight > 0) {
         let offset = this._isVertical() ? 2 * endPadding :  2 * padding + 2 * endPadding - text0Width - text1Width;
         let fullLength = this._isVertical() ? this.height() : this.width();

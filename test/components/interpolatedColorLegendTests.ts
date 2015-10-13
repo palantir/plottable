@@ -280,12 +280,12 @@ describe("InterpolatedColorLegend", () => {
     svg.remove();
   });
 
-  it("does not have padding on vertical legends when endPadding set to 0", () => {
+  it("does not have padding on ends of vertical legends", () => {
     let legend = new Plottable.Components.InterpolatedColorLegend(colorScale);
     legend.renderTo(svg);
     let orientations = ["left", "right"];
     orientations.forEach((orientation) => {
-      legend.orientation(orientation).expands(true).endPadding(0);
+      legend.orientation(orientation).expands(true);
       let height = (<Element> legend.content().select(".swatch-container").node()).getBoundingClientRect().height;
       assert.strictEqual(height, SVG_HEIGHT, "actual height is SVG_HEIGHT");
 
@@ -293,13 +293,66 @@ describe("InterpolatedColorLegend", () => {
     svg.remove();
   });
 
-  it("does not have padding on horizontal legends when endPadding set to 0", () => {
-    let legend = new Plottable.Components.InterpolatedColorLegend(colorScale);
+  it("pads left-oriented legends correctly", () => {
+    let legend = new Plottable.Components.InterpolatedColorLegend(colorScale).orientation("left");
     legend.renderTo(svg);
-    legend.orientation("horizontal").expands(true);
-    let width = (<Element> legend.content().select(".swatch-container").node()).getBoundingClientRect().width;
-    assert.strictEqual(width, SVG_WIDTH, "actual width is SVG_WIDTH");
+    let swatchBoundingRect = (<Element> legend.content().select(".swatch-container").node()).getBoundingClientRect();
+    let legendBoundingRect = (<Element> legend.background().select(".background-fill").node()).getBoundingClientRect();
+    let swatchWidth = swatchBoundingRect.width;
+    let swatchEdge = swatchBoundingRect.right;
+    let legendEdge = legendBoundingRect.right;
+    let padding = legendEdge - swatchEdge;
+    assert.closeTo(swatchWidth, padding, window.Pixel_CloseTo_Requirement, "padding is approximately equal to swatch width");
+    legend.expands(true);
+    swatchBoundingRect = (<Element> legend.content().select(".swatch-container").node()).getBoundingClientRect();
+    legendBoundingRect = (<Element> legend.background().select(".background-fill").node()).getBoundingClientRect();
+    swatchWidth = swatchBoundingRect.width;
+    swatchEdge = swatchBoundingRect.right;
+    legendEdge = legendBoundingRect.right;
+    padding = legendEdge - swatchEdge;
+    assert.closeTo(swatchWidth, padding, window.Pixel_CloseTo_Requirement, "padding is approximately equal to swatch width");
+    svg.remove();
+  });
 
+  it("pads right-oriented legends correctly", () => {
+    let legend = new Plottable.Components.InterpolatedColorLegend(colorScale).orientation("right");
+    legend.renderTo(svg);
+    let swatchBoundingRect = (<Element> legend.content().select(".swatch-container").node()).getBoundingClientRect();
+    let legendBoundingRect = (<Element> legend.background().select(".background-fill").node()).getBoundingClientRect();
+    let swatchWidth = swatchBoundingRect.width;
+    let swatchEdge = swatchBoundingRect.left;
+    let legendEdge = legendBoundingRect.left;
+    let padding = swatchEdge - legendEdge;
+    assert.closeTo(swatchWidth, padding, window.Pixel_CloseTo_Requirement, "padding is approximately equal to swatch width");
+    legend.expands(true);
+    swatchBoundingRect = (<Element> legend.content().select(".swatch-container").node()).getBoundingClientRect();
+    legendBoundingRect = (<Element> legend.background().select(".background-fill").node()).getBoundingClientRect();
+    swatchWidth = swatchBoundingRect.width;
+    swatchEdge = swatchBoundingRect.left;
+    legendEdge = legendBoundingRect.left;
+    padding = swatchEdge - legendEdge;
+    assert.closeTo(swatchWidth, padding, window.Pixel_CloseTo_Requirement, "padding is approximately equal to swatch width");
+    svg.remove();
+  });
+
+  it("pads horizontal legends correctly", () => {
+    let legend = new Plottable.Components.InterpolatedColorLegend(colorScale).orientation("horizontal");
+    legend.renderTo(svg);
+    let swatchBoundingRect = (<Element> legend.content().select(".swatch-container").node()).getBoundingClientRect();
+    let legendBoundingRect = (<Element> legend.background().select(".background-fill").node()).getBoundingClientRect();
+    let swatchHeight = swatchBoundingRect.height;
+    let swatchEdge = swatchBoundingRect.bottom;
+    let legendEdge = legendBoundingRect.bottom;
+    let padding = legendEdge - swatchEdge;
+    assert.closeTo(swatchHeight, padding, window.Pixel_CloseTo_Requirement, "padding is approximately equal to swatch height");
+    legend.expands(true);
+    swatchBoundingRect = (<Element> legend.content().select(".swatch-container").node()).getBoundingClientRect();
+    legendBoundingRect = (<Element> legend.background().select(".background-fill").node()).getBoundingClientRect();
+    swatchHeight = swatchBoundingRect.height;
+    swatchEdge = swatchBoundingRect.bottom;
+    legendEdge = legendBoundingRect.bottom;
+    padding = legendEdge - swatchEdge;
+    assert.closeTo(swatchHeight, padding, window.Pixel_CloseTo_Requirement, "padding is approximately equal to swatch height");
     svg.remove();
   });
 });
