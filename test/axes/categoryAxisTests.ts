@@ -1,180 +1,248 @@
 ///<reference path="../testReference.ts" />
 
 describe("Category Axes", () => {
-  it("re-renders appropriately when data is changed", () => {
-    let svg = TestMethods.generateSVG(400, 400);
-    let xScale = new Plottable.Scales.Category().domain(["foo", "bar", "baz"]).range([400, 0]);
-    let ca = new Plottable.Axes.Category(xScale, "left");
-    ca.renderTo(svg);
-    assert.deepEqual((<any> ca)._tickLabelContainer.selectAll(".tick-label").data(), xScale.domain(), "tick labels render domain");
-    assert.doesNotThrow(() => xScale.domain(["bar", "baz", "bam"]));
-    assert.deepEqual((<any> ca)._tickLabelContainer.selectAll(".tick-label").data(), xScale.domain(), "tick labels render domain");
-    svg.remove();
-  });
+  describe("rendering the tick labels", () => {
+    it("renders short words fully", () => {
+      let svg = TestMethods.generateSVG();
+      let domain = ["2000", "2001", "2002", "2003"];
+      let scale = new Plottable.Scales.Category().domain(domain);
+      let axis = new Plottable.Axes.Category(scale, "bottom");
+      axis.renderTo(svg);
 
-  it("requests appropriate space when the scale has no domain", () => {
-    let svg = TestMethods.generateSVG(400, 400);
-    let scale = new Plottable.Scales.Category();
-    let ca = new Plottable.Axes.Category(scale, "bottom");
-    ca.anchor(svg);
-    let s = ca.requestedSpace(400, 400);
-    assert.operator(s.minWidth, ">=", 0, "it requested 0 or more width");
-    assert.operator(s.minHeight, ">=", 0, "it requested 0 or more height");
-    svg.remove();
-  });
+      let ticks = axis.content().selectAll("text");
+      let text = ticks[0].map((d: any) => d3.select(d).text());
+      assert.deepEqual(text, domain, "text displayed correctly when horizontal");
 
-  it("doesnt blow up for non-string data", () => {
-    let svg = TestMethods.generateSVG(1000, 400);
-    let domain: any[] = [null, undefined, true, 2, "foo"];
-    let scale = new Plottable.Scales.Category().domain(domain);
-    let axis = new Plottable.Axes.Category(scale, "bottom");
-    axis.renderTo(svg);
-    let texts = svg.selectAll("text")[0].map((s: any) => d3.select(s).text());
-    assert.deepEqual(texts, ["null", "undefined", "true", "2", "foo"]);
-    svg.remove();
-  });
+      axis.tickLabelAngle(90);
+      text = ticks[0].map((d: any) => d3.select(d).text());
+      assert.deepEqual(text, domain, "text displayed correctly when horizontal");
+      assert.strictEqual(d3.transform(axis.content().selectAll(".text-area").attr("transform")).rotate, 90, "the ticks were rotated right");
 
-  it("uses the formatter if supplied", () => {
-    let svg = TestMethods.generateSVG(400, 400);
-    let domain = ["Air", "Bi", "Sea"];
-    let scale = new Plottable.Scales.Category().domain(domain);
-    let axis = new Plottable.Axes.Category(scale, "bottom");
-    let addPlane = (l: string) => l + "plane";
-    axis.formatter(addPlane);
-    axis.renderTo(svg);
-    let expectedTexts = domain.map(addPlane);
-    svg.selectAll("text").each(function(d, i) {
-      let actualText = d3.select(this).text();
-      assert.strictEqual(actualText, expectedTexts[i], "formatter was applied");
+      axis.tickLabelAngle(0);
+      text = ticks[0].map((d: any) => d3.select(d).text());
+      assert.deepEqual(text, domain, "text displayed correctly when horizontal");
+      assert.strictEqual(d3.transform(axis.content().selectAll(".text-area").attr("transform")).rotate, 0, "the ticks were rotated right");
+
+      axis.tickLabelAngle(-90);
+      text = ticks[0].map((d: any) => d3.select(d).text());
+      assert.deepEqual(text, domain, "text displayed correctly when horizontal");
+      assert.strictEqual(d3.transform(axis.content().selectAll(".text-area").attr("transform")).rotate, -90, "the ticks were rotated left");
+
+      svg.remove();
     });
-    svg.remove();
+
+    it("re-renders with the new domain when the category scale's domain changes", () => {
+      let svg = TestMethods.generateSVG();
+      let domain = ["foo", "bar", "baz"];
+      let scale = new Plottable.Scales.Category().domain(domain);
+      let axis = new Plottable.Axes.Category(scale, "left");
+      axis.renderTo(svg);
+      assert.deepEqual(axis.content().selectAll(".tick-label").data(), scale.domain(), "tick labels render domain");
+      let changedDomain = ["bar", "baz", "bam"];
+      scale.domain(changedDomain);
+      assert.deepEqual(axis.content().selectAll(".tick-label").data(), scale.domain(), "tick labels render domain");
+      svg.remove();
+    });
+
+    it("does not overlap axis labels with tick labels", () => {
+
+      function verifyTickLabelOverlaps(tickLabels: d3.Selection<void>, tickMarks: d3.Selection<void>) {
+          for (let i = 0; i < tickLabels[0].length; i++) {
+            let tickLabelRect = (<Element> tickLabels[0][i]).getBoundingClientRect();
+            let tickMarkRect = (<Element> tickMarks[0][i]).getBoundingClientRect();
+            assert.isFalse(Plottable.Utils.DOM.clientRectsOverlap(tickLabelRect, tickMarkRect), "tick label and rect do not overlap");
+          }
+      }
+
+      let svg = TestMethods.generateSVG();
+      let scale = new Plottable.Scales.Category();
+      let axis = new Plottable.Axes.Category(scale, "left");
+      scale.domain(["A", "B", "C"]);
+      axis.renderTo(svg);
+
+      let tickLabels = axis.content().selectAll(".tick-label");
+      let tickMarks = axis.content().selectAll(".tick-mark");
+      verifyTickLabelOverlaps(tickLabels, tickMarks);
+      axis.orientation("right");
+      verifyTickLabelOverlaps(tickLabels, tickMarks);
+      svg.remove();
+    });
   });
 
-  it("width accounts for margin. innerTickLength, and padding on vertical axes", () => {
-    let svg = TestMethods.generateSVG(400, 400);
-    let xScale = new Plottable.Scales.Category().domain(["foo", "bar", "baz"]).range([400, 0]);
-    let ca = new Plottable.Axes.Category(xScale, "left");
-    ca.renderTo(svg);
+  describe("requesting space", () => {
 
-    let axisWidth = ca.width();
-    ca.tickLabelPadding(ca.tickLabelPadding() + 5);
-    assert.closeTo(ca.width(), axisWidth + 5, 2, "increasing tickLabelPadding increases width");
+    let svg: d3.Selection<void>;
+    let axis: Plottable.Axes.Category;
+    let scale: Plottable.Scales.Category;
 
-    axisWidth = ca.width();
-    ca.margin(ca.margin() + 5);
-    assert.closeTo(ca.width(), axisWidth + 5, 2, "increasing margin increases width");
+    beforeEach(() => {
+      svg = TestMethods.generateSVG();
+      scale = new Plottable.Scales.Category();
+      axis = new Plottable.Axes.Category(scale, "bottom");
+    });
 
-    axisWidth = ca.width();
-    ca.innerTickLength(ca.innerTickLength() + 5);
-    assert.closeTo(ca.width(), axisWidth + 5, 2, "increasing innerTickLength increases width");
+    afterEach(() => {
+      axis.destroy();
+    });
 
-    svg.remove();
+    it("requests no space when the scale has no domain", () => {
+      axis.anchor(svg);
+      let space = axis.requestedSpace(TestMethods.numAttr(svg, "width"), TestMethods.numAttr(svg, "height"));
+      assert.strictEqual(space.minWidth, 0, "requested no width");
+      assert.strictEqual(space.minHeight, 0, "requested no height");
+      svg.remove();
+    });
+
+    it("requests more space if not enough space to fit the text", () => {
+      let domain = ["2000", "2001", "2002", "2003"];
+      scale.domain(domain);
+      axis.renderTo(svg);
+      let smallDimension = 10;
+      let spaceRequest = axis.requestedSpace(300, smallDimension);
+      assert.operator(spaceRequest.minHeight, ">", smallDimension, "horizontal axis requested more height if constrained");
+      axis.orientation("left");
+      spaceRequest = axis.requestedSpace(smallDimension, 300);
+      assert.operator(spaceRequest.minWidth, ">", smallDimension, "vertical axis requested more width if constrained");
+      svg.remove();
+    });
+
+    it("requests more space when rotated than not rotated", () => {
+      let domain = ["label1", "label2", "label100"];
+      scale.domain(domain);
+      axis.renderTo(svg);
+
+      let requestedSpace = axis.requestedSpace(TestMethods.numAttr(svg, "width"), 50);
+      let flatHeight = requestedSpace.minHeight;
+
+      axis.tickLabelAngle(-90);
+      requestedSpace = axis.requestedSpace(TestMethods.numAttr(svg, "width"), 50);
+      assert.operator(flatHeight, "<", requestedSpace.minHeight, "axis should request more height when tick labels are rotated");
+      svg.remove();
+    });
   });
 
-  it("height accounts for margin. innerTickLength, and padding on horizontal axes", () => {
-    let svg = TestMethods.generateSVG(400, 400);
-    let xScale = new Plottable.Scales.Category().domain(["foo", "bar", "baz"]).range([400, 0]);
-    let ca = new Plottable.Axes.Category(xScale, "bottom");
-    ca.renderTo(svg);
-
-    let axisHeight = ca.height();
-    ca.tickLabelPadding(ca.tickLabelPadding() + 5);
-    assert.closeTo(ca.height(), axisHeight + 5, 2, "increasing tickLabelPadding increases height");
-
-    axisHeight = ca.height();
-    ca.margin(ca.margin() + 5);
-    assert.closeTo(ca.height(), axisHeight + 5, 2, "increasing margin increases height");
-
-    axisHeight = ca.height();
-    ca.innerTickLength(ca.innerTickLength() + 5);
-    assert.closeTo(ca.height(), axisHeight + 5, 2, "increasing innerTickLength increases height");
-
-    svg.remove();
+  describe("coercing", () => {
+    it("does not blow up for non-string data", () => {
+      let svg = TestMethods.generateSVG();
+      let domain: any[] = [null, undefined, true, 2, "foo"];
+      let scale = new Plottable.Scales.Category().domain(domain);
+      let axis = new Plottable.Axes.Category(scale, "bottom");
+      axis.renderTo(svg);
+      let texts = svg.selectAll("text")[0].map((s: any) => d3.select(s).text());
+      assert.deepEqual(texts, domain.map((d) => String(d)));
+      axis.destroy();
+      svg.remove();
+    });
   });
 
-  it("vertically aligns short words properly", () => {
-    let SVG_WIDTH = 400;
-    let svg = TestMethods.generateSVG(SVG_WIDTH, 100);
-    let years = ["2000", "2001", "2002", "2003"];
-    let scale = new Plottable.Scales.Category().domain(years).range([0, SVG_WIDTH]);
-    let axis = new Plottable.Axes.Category(scale, "bottom");
-    axis.renderTo(svg);
-
-    let ticks = (<any> axis)._content.selectAll("text");
-    let text = ticks[0].map((d: any) => d3.select(d).text());
-    assert.deepEqual(text, years, "text displayed correctly when horizontal");
-
-    axis.tickLabelAngle(90);
-    text = ticks[0].map((d: any) => d3.select(d).text());
-    assert.deepEqual(text, years, "text displayed correctly when horizontal");
-    assert.include((<any>axis)._content.selectAll(".text-area").attr("transform"), 90, "the ticks were rotated right");
-
-    axis.tickLabelAngle(0);
-    text = ticks[0].map((d: any) => d3.select(d).text());
-    assert.deepEqual(text, years, "text displayed correctly when horizontal");
-    assert.include((<any>axis)._content.selectAll(".text-area").attr("transform"), 0, "the ticks were rotated right");
-
-    axis.tickLabelAngle(-90);
-    text = ticks[0].map((d: any) => d3.select(d).text());
-    assert.deepEqual(text, years, "text displayed correctly when horizontal");
-    assert.include((<any>axis)._content.selectAll(".text-area").attr("transform"), -90, "the ticks were rotated left");
-
-    svg.remove();
+  describe("formatting the text", () => {
+    it("uses the formatter if supplied", () => {
+      let svg = TestMethods.generateSVG();
+      let domain = ["Air", "Bi", "Sea"];
+      let scale = new Plottable.Scales.Category().domain(domain);
+      let axis = new Plottable.Axes.Category(scale, "bottom");
+      let addPlane = (l: string) => l + "plane";
+      axis.formatter(addPlane);
+      axis.renderTo(svg);
+      let expectedTexts = domain.map(addPlane);
+      axis.content().selectAll("text").each(function(d, i) {
+        let actualText = d3.select(this).text();
+        assert.strictEqual(actualText, expectedTexts[i], "formatter was applied");
+      });
+      axis.destroy();
+      svg.remove();
+    });
   });
 
-  it("axis should request more space if there's not enough space to fit the text", () => {
-    let svg = TestMethods.generateSVG(300, 300);
-    let years = ["2000", "2001", "2002", "2003"];
-    let scale = new Plottable.Scales.Category().domain(years);
-    let axis = new Plottable.Axes.Category(scale, "bottom");
-    axis.renderTo(svg);
-    let smallDimension = 10;
-    let spaceRequest = axis.requestedSpace(300, smallDimension);
-    assert.operator(spaceRequest.minHeight, ">", smallDimension, "horizontal axis requested more height if constrained");
-    axis.orientation("left");
-    spaceRequest = axis.requestedSpace(smallDimension, 300);
-    assert.operator(spaceRequest.minWidth, ">", smallDimension, "vertical axis requested more width if constrained");
-    svg.remove();
+  describe("computing the size", () => {
+
+    it("accounts for margin. innerTickLength, and padding when calculating for width when vertical", () => {
+      let svg = TestMethods.generateSVG();
+      let scale = new Plottable.Scales.Category().domain(["foo", "bar", "baz"]);
+      let axis = new Plottable.Axes.Category(scale, "left");
+      axis.renderTo(svg);
+
+      let axisWidth = axis.width();
+      let increaseAmount = 5;
+      axis.tickLabelPadding(axis.tickLabelPadding() + increaseAmount);
+      assert.strictEqual(axis.width(), axisWidth + increaseAmount, "increasing tickLabelPadding increases width");
+
+      axisWidth = axis.width();
+      axis.margin(axis.margin() + increaseAmount);
+      assert.strictEqual(axis.width(), axisWidth + increaseAmount, "increasing margin increases width");
+
+      axisWidth = axis.width();
+      axis.innerTickLength(axis.innerTickLength() + increaseAmount);
+      assert.strictEqual(axis.width(), axisWidth + increaseAmount, "increasing innerTickLength increases width");
+
+      axis.destroy();
+      svg.remove();
+    });
+
+    it("accounts for margin. innerTickLength, and padding when calculating for height when vertical", () => {
+      let svg = TestMethods.generateSVG();
+      let scale = new Plottable.Scales.Category().domain(["foo", "bar", "baz"]);
+      let axis = new Plottable.Axes.Category(scale, "bottom");
+      axis.renderTo(svg);
+
+      let axisHeight = axis.height();
+      axis.tickLabelPadding(axis.tickLabelPadding() + 5);
+      assert.closeTo(axis.height(), axisHeight + 5, 2, "increasing tickLabelPadding increases height");
+
+      axisHeight = axis.height();
+      axis.margin(axis.margin() + 5);
+      assert.closeTo(axis.height(), axisHeight + 5, 2, "increasing margin increases height");
+
+      axisHeight = axis.height();
+      axis.innerTickLength(axis.innerTickLength() + 5);
+      assert.closeTo(axis.height(), axisHeight + 5, 2, "increasing innerTickLength increases height");
+
+      axis.destroy();
+      svg.remove();
+    });
   });
 
-  it("axis labels respect tick labels", () => {
+  describe("setting the tick lengths", () => {
+    it("draws inner ticks with the specified length", () => {
+      let svg = TestMethods.generateSVG();
+      let scale = new Plottable.Scales.Category().domain(["foo", "bar", "baz", "blue", "red"]);
+      let axis = new Plottable.Axes.Category(scale, "bottom");
+      let innerTickLength = 20;
+      axis.innerTickLength(innerTickLength);
+      axis.renderTo(svg);
 
-    function verifyTickLabelOverlaps(tickLabels: d3.Selection<void>, tickMarks: d3.Selection<void>) {
-        for (let i = 0; i < tickLabels[0].length; i++) {
-          let tickLabelRect = (<Element> tickLabels[0][i]).getBoundingClientRect();
-          let tickMarkRect = (<Element> tickMarks[0][i]).getBoundingClientRect();
-          assert.isFalse(Plottable.Utils.DOM.clientRectsOverlap(tickLabelRect, tickMarkRect), "tick label and box do not overlap");
-        }
-    }
+      let innerTickMarks = axis.content().selectAll(`.${Plottable.Axis.TICK_MARK_CLASS}:not(.${Plottable.Axis.END_TICK_MARK_CLASS})`);
+      assert.strictEqual(innerTickMarks.size(), scale.domain().length - 2, "same number of inner ticks as domain entries minus 2");
 
-    let svg = TestMethods.generateSVG(400, 300);
-    let yScale = new Plottable.Scales.Category();
-    let axis = new Plottable.Axes.Category(yScale, "left");
-    yScale.domain(["A", "B", "C"]);
-    axis.renderTo(svg);
+      innerTickMarks.each(function(d, i) {
+        let innerTickMark = d3.select(this);
+        let innerTickMarkLength = Math.abs(TestMethods.numAttr(innerTickMark, "y1") - TestMethods.numAttr(innerTickMark, "y2"));
+        assert.closeTo(innerTickMarkLength, innerTickLength, window.Pixel_CloseTo_Requirement, "tick mark of specified length");
+      });
 
-    let tickLabels = (<any> axis)._content.selectAll(".tick-label");
-    let tickMarks = (<any> axis)._content.selectAll(".tick-mark");
-    verifyTickLabelOverlaps(tickLabels, tickMarks);
-    axis.orientation("right");
-    verifyTickLabelOverlaps(tickLabels, tickMarks);
-    svg.remove();
-  });
+      axis.destroy();
+      svg.remove();
+    });
 
-  it("axis should request more space when rotated than not rotated", () => {
-    let svg = TestMethods.generateSVG(300, 300);
-    let labels = ["label1", "label2", "label100"];
-    let scale = new Plottable.Scales.Category().domain(labels);
-    let axis = new Plottable.Axes.Category(scale, "bottom");
-    axis.renderTo(svg);
+    it("draws end ticks with the specified length", () => {
+      let svg = TestMethods.generateSVG();
+      let scale = new Plottable.Scales.Category().domain(["foo", "bar", "baz", "blue", "red"]);
+      let axis = new Plottable.Axes.Category(scale, "bottom");
+      let endTickLength = 20;
+      axis.endTickLength(endTickLength);
+      axis.renderTo(svg);
 
-    let requestedSpace = axis.requestedSpace(300, 50);
-    let flatHeight = requestedSpace.minHeight;
+      let endTickMarks = axis.content().selectAll(`.${Plottable.Axis.END_TICK_MARK_CLASS}`);
+      assert.strictEqual(endTickMarks.size(), 2, "2 end ticks");
 
-    axis.tickLabelAngle(-90);
-    requestedSpace = axis.requestedSpace(300, 50);
-    assert.isTrue(flatHeight < requestedSpace.minHeight, "axis should request more height when tick labels are rotated");
+      endTickMarks.each(function(d, i) {
+        let endTickMark = d3.select(this);
+        let endTickMarkLength = Math.abs(TestMethods.numAttr(endTickMark, "y1") - TestMethods.numAttr(endTickMark, "y2"));
+        assert.closeTo(endTickMarkLength, endTickLength, window.Pixel_CloseTo_Requirement, "tick mark of specified length");
+      });
 
-    svg.remove();
+      axis.destroy();
+      svg.remove();
+    });
   });
 });
