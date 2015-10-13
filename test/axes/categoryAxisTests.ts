@@ -43,10 +43,22 @@ describe("Category Axes", () => {
       let scale = new Plottable.Scales.Category().domain(domain);
       let axis = new Plottable.Axes.Category(scale, "left");
       axis.renderTo(svg);
-      assert.deepEqual(axis.content().selectAll(".tick-label").data(), scale.domain(), "tick labels render domain");
+      let tickLabels = axis.content().selectAll(".tick-label");
+      assert.strictEqual(tickLabels.size(), domain.length, "same number of tick labels as domain entries");
+      tickLabels.each(function(d, i) {
+        let tickLabel = d3.select(this);
+        assert.strictEqual(tickLabel.text(), domain[i], "tick labels render domain");
+      });
+
       let changedDomain = ["bar", "baz", "bam"];
       scale.domain(changedDomain);
-      assert.deepEqual(axis.content().selectAll(".tick-label").data(), scale.domain(), "tick labels render domain");
+
+      tickLabels = axis.content().selectAll(".tick-label");
+      assert.strictEqual(tickLabels.size(), changedDomain.length, "same number of tick labels as changed domain entries");
+      tickLabels.each(function(d, i) {
+        let tickLabel = d3.select(this);
+        assert.strictEqual(tickLabel.text(), changedDomain[i], "tick labels render changed domain");
+      });
       svg.remove();
     });
 
