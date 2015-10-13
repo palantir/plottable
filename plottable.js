@@ -10148,9 +10148,6 @@ var Plottable;
         Plots.Wheel = Wheel;
     })(Plots = Plottable.Plots || (Plottable.Plots = {}));
 })(Plottable || (Plottable = {}));
-<<<<<<< HEAD
-
-///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
     var EasingFunctions = (function () {
@@ -10186,168 +10183,6 @@ var Plottable;
     })();
     Plottable.EasingFunctions = EasingFunctions;
     ;
-})(Plottable || (Plottable = {}));
-
-///<reference path="../reference.ts" />
-=======
->>>>>>> objectConstancy
-var Plottable;
-(function (Plottable) {
-    var Animators;
-    (function (Animators) {
-        /**
-         * An animator implementation with no animation. The attributes are
-         * immediately set on the selection.
-         */
-        var Null = (function () {
-            function Null() {
-            }
-            Null.prototype.totalTime = function (selection) {
-                return 0;
-            };
-            Null.prototype.animate = function (selection, attrToAppliedProjector, drawingTarget) {
-                if (drawingTarget) {
-                    drawingTarget.exit
-                        .remove();
-                    return drawingTarget.merge
-                        .attr(attrToAppliedProjector);
-                }
-                else {
-                    // legacy compatibility
-                    return selection.attr(attrToAppliedProjector);
-                }
-            };
-            return Null;
-        })();
-        Animators.Null = Null;
-    })(Animators = Plottable.Animators || (Plottable.Animators = {}));
-})(Plottable || (Plottable = {}));
-var Plottable;
-(function (Plottable) {
-    var Animators;
-    (function (Animators) {
-        /**
-         * An Animator with easing and configurable durations and delays.
-         */
-        var Easing = (function () {
-            /**
-             * Constructs the default animator
-             *
-             * @constructor
-             */
-            function Easing() {
-                this._startDelay = Easing._DEFAULT_START_DELAY_MILLISECONDS;
-                this._stepDuration = Easing._DEFAULT_STEP_DURATION_MILLISECONDS;
-                this._stepDelay = Easing._DEFAULT_ITERATIVE_DELAY_MILLISECONDS;
-                this._maxTotalDuration = Easing._DEFAULT_MAX_TOTAL_DURATION_MILLISECONDS;
-                this._easingMode = Easing._DEFAULT_EASING_MODE;
-            }
-            Easing.prototype.totalTime = function (numberOfSteps) {
-                var adjustedIterativeDelay = this._getAdjustedIterativeDelay(numberOfSteps);
-                return this.startDelay() + adjustedIterativeDelay * (Math.max(numberOfSteps - 1, 0)) + this.stepDuration();
-            };
-            Easing.prototype.animate = function (selection, attrToAppliedProjector, drawingTarget) {
-                var _this = this;
-                if (drawingTarget) {
-                    var numberOfSteps = drawingTarget.merge[0].length;
-                    var adjustedIterativeDelay = this._getAdjustedIterativeDelay(numberOfSteps);
-                    drawingTarget.merge = drawingTarget.merge
-                        .transition()
-                        .ease(this.easingMode())
-                        .duration(this.stepDuration())
-                        .delay(function (d, i) { return _this.startDelay() + adjustedIterativeDelay * i; })
-                        .attr(attrToAppliedProjector);
-                    drawingTarget.exit
-                        .remove();
-                }
-                else {
-                    var numberOfSteps = selection[0].length;
-                    var adjustedIterativeDelay = this._getAdjustedIterativeDelay(numberOfSteps);
-                    return selection.transition()
-                        .ease(this.easingMode())
-                        .duration(this.stepDuration())
-                        .delay(function (d, i) { return _this.startDelay() + adjustedIterativeDelay * i; })
-                        .attr(attrToAppliedProjector);
-                }
-            };
-            Easing.prototype.startDelay = function (startDelay) {
-                if (startDelay == null) {
-                    return this._startDelay;
-                }
-                else {
-                    this._startDelay = startDelay;
-                    return this;
-                }
-            };
-            Easing.prototype.stepDuration = function (stepDuration) {
-                if (stepDuration == null) {
-                    return Math.min(this._stepDuration, this._maxTotalDuration);
-                }
-                else {
-                    this._stepDuration = stepDuration;
-                    return this;
-                }
-            };
-            Easing.prototype.stepDelay = function (stepDelay) {
-                if (stepDelay == null) {
-                    return this._stepDelay;
-                }
-                else {
-                    this._stepDelay = stepDelay;
-                    return this;
-                }
-            };
-            Easing.prototype.maxTotalDuration = function (maxTotalDuration) {
-                if (maxTotalDuration == null) {
-                    return this._maxTotalDuration;
-                }
-                else {
-                    this._maxTotalDuration = maxTotalDuration;
-                    return this;
-                }
-            };
-            Easing.prototype.easingMode = function (easingMode) {
-                if (easingMode == null) {
-                    return this._easingMode;
-                }
-                else {
-                    this._easingMode = easingMode;
-                    return this;
-                }
-            };
-            /**
-             * Adjust the iterative delay, such that it takes into account the maxTotalDuration constraint
-             */
-            Easing.prototype._getAdjustedIterativeDelay = function (numberOfSteps) {
-                var stepStartTimeInterval = this.maxTotalDuration() - this.stepDuration();
-                stepStartTimeInterval = Math.max(stepStartTimeInterval, 0);
-                var maxPossibleIterativeDelay = stepStartTimeInterval / Math.max(numberOfSteps - 1, 1);
-                return Math.min(this.stepDelay(), maxPossibleIterativeDelay);
-            };
-            /**
-             * The default starting delay of the animation in milliseconds
-             */
-            Easing._DEFAULT_START_DELAY_MILLISECONDS = 0;
-            /**
-             * The default duration of one animation step in milliseconds
-             */
-            Easing._DEFAULT_STEP_DURATION_MILLISECONDS = 300;
-            /**
-             * The default maximum start delay between each step of an animation
-             */
-            Easing._DEFAULT_ITERATIVE_DELAY_MILLISECONDS = 15;
-            /**
-             * The default maximum total animation duration
-             */
-            Easing._DEFAULT_MAX_TOTAL_DURATION_MILLISECONDS = Infinity;
-            /**
-             * The default easing of the animation
-             */
-            Easing._DEFAULT_EASING_MODE = "linear-in-out";
-            return Easing;
-        })();
-        Animators.Easing = Easing;
-    })(Animators = Plottable.Animators || (Plottable.Animators = {}));
 })(Plottable || (Plottable = {}));
 var Plottable;
 (function (Plottable) {
@@ -10545,20 +10380,13 @@ var Plottable;
         Animators.Base = Base;
     })(Animators = Plottable.Animators || (Plottable.Animators = {}));
 })(Plottable || (Plottable = {}));
-
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
-///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
     var Animators;
     (function (Animators) {
         /**
-          * Base for animators that animate specific attributes, such as Opacity, height... .
-          */
+         * Base for animators that animate specific attributes, such as Opacity, height... .
+         */
         var Attr = (function (_super) {
             __extends(Attr, _super);
             function Attr() {
@@ -10599,13 +10427,6 @@ var Plottable;
         Animators.Attr = Attr;
     })(Animators = Plottable.Animators || (Plottable.Animators = {}));
 })(Plottable || (Plottable = {}));
-
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
-///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
     var Animators;
@@ -10676,8 +10497,164 @@ var Plottable;
         Animators.Bar = Bar;
     })(Animators = Plottable.Animators || (Plottable.Animators = {}));
 })(Plottable || (Plottable = {}));
-
-///<reference path="../reference.ts" />
+var Plottable;
+(function (Plottable) {
+    var Animators;
+    (function (Animators) {
+        /**
+         * An animator implementation with no animation. The attributes are
+         * immediately set on the selection.
+         */
+        var Null = (function () {
+            function Null() {
+            }
+            Null.prototype.totalTime = function (selection) {
+                return 0;
+            };
+            Null.prototype.animate = function (selection, attrToAppliedProjector, drawingTarget) {
+                if (drawingTarget) {
+                    drawingTarget.exit
+                        .remove();
+                    return drawingTarget.merge
+                        .attr(attrToAppliedProjector);
+                }
+                else {
+                    // legacy compatibility
+                    return selection.attr(attrToAppliedProjector);
+                }
+            };
+            return Null;
+        })();
+        Animators.Null = Null;
+    })(Animators = Plottable.Animators || (Plottable.Animators = {}));
+})(Plottable || (Plottable = {}));
+var Plottable;
+(function (Plottable) {
+    var Animators;
+    (function (Animators) {
+        /**
+         * An Animator with easing and configurable durations and delays.
+         */
+        var Easing = (function () {
+            /**
+             * Constructs the default animator
+             *
+             * @constructor
+             */
+            function Easing() {
+                this._startDelay = Easing._DEFAULT_START_DELAY_MILLISECONDS;
+                this._stepDuration = Easing._DEFAULT_STEP_DURATION_MILLISECONDS;
+                this._stepDelay = Easing._DEFAULT_ITERATIVE_DELAY_MILLISECONDS;
+                this._maxTotalDuration = Easing._DEFAULT_MAX_TOTAL_DURATION_MILLISECONDS;
+                this._easingMode = Easing._DEFAULT_EASING_MODE;
+            }
+            Easing.prototype.totalTime = function (numberOfSteps) {
+                var adjustedIterativeDelay = this._getAdjustedIterativeDelay(numberOfSteps);
+                return this.startDelay() + adjustedIterativeDelay * (Math.max(numberOfSteps - 1, 0)) + this.stepDuration();
+            };
+            Easing.prototype.animate = function (selection, attrToAppliedProjector, drawingTarget) {
+                var _this = this;
+                if (drawingTarget) {
+                    var numberOfSteps = drawingTarget.merge[0].length;
+                    var adjustedIterativeDelay = this._getAdjustedIterativeDelay(numberOfSteps);
+                    drawingTarget.merge = drawingTarget.merge
+                        .transition()
+                        .ease(this.easingMode())
+                        .duration(this.stepDuration())
+                        .delay(function (d, i) { return _this.startDelay() + adjustedIterativeDelay * i; })
+                        .attr(attrToAppliedProjector);
+                    drawingTarget.exit
+                        .remove();
+                }
+                else {
+                    var numberOfSteps = selection[0].length;
+                    var adjustedIterativeDelay = this._getAdjustedIterativeDelay(numberOfSteps);
+                    return selection.transition()
+                        .ease(this.easingMode())
+                        .duration(this.stepDuration())
+                        .delay(function (d, i) { return _this.startDelay() + adjustedIterativeDelay * i; })
+                        .attr(attrToAppliedProjector);
+                }
+            };
+            Easing.prototype.startDelay = function (startDelay) {
+                if (startDelay == null) {
+                    return this._startDelay;
+                }
+                else {
+                    this._startDelay = startDelay;
+                    return this;
+                }
+            };
+            Easing.prototype.stepDuration = function (stepDuration) {
+                if (stepDuration == null) {
+                    return Math.min(this._stepDuration, this._maxTotalDuration);
+                }
+                else {
+                    this._stepDuration = stepDuration;
+                    return this;
+                }
+            };
+            Easing.prototype.stepDelay = function (stepDelay) {
+                if (stepDelay == null) {
+                    return this._stepDelay;
+                }
+                else {
+                    this._stepDelay = stepDelay;
+                    return this;
+                }
+            };
+            Easing.prototype.maxTotalDuration = function (maxTotalDuration) {
+                if (maxTotalDuration == null) {
+                    return this._maxTotalDuration;
+                }
+                else {
+                    this._maxTotalDuration = maxTotalDuration;
+                    return this;
+                }
+            };
+            Easing.prototype.easingMode = function (easingMode) {
+                if (easingMode == null) {
+                    return this._easingMode;
+                }
+                else {
+                    this._easingMode = easingMode;
+                    return this;
+                }
+            };
+            /**
+             * Adjust the iterative delay, such that it takes into account the maxTotalDuration constraint
+             */
+            Easing.prototype._getAdjustedIterativeDelay = function (numberOfSteps) {
+                var stepStartTimeInterval = this.maxTotalDuration() - this.stepDuration();
+                stepStartTimeInterval = Math.max(stepStartTimeInterval, 0);
+                var maxPossibleIterativeDelay = stepStartTimeInterval / Math.max(numberOfSteps - 1, 1);
+                return Math.min(this.stepDelay(), maxPossibleIterativeDelay);
+            };
+            /**
+             * The default starting delay of the animation in milliseconds
+             */
+            Easing._DEFAULT_START_DELAY_MILLISECONDS = 0;
+            /**
+             * The default duration of one animation step in milliseconds
+             */
+            Easing._DEFAULT_STEP_DURATION_MILLISECONDS = 300;
+            /**
+             * The default maximum start delay between each step of an animation
+             */
+            Easing._DEFAULT_ITERATIVE_DELAY_MILLISECONDS = 15;
+            /**
+             * The default maximum total animation duration
+             */
+            Easing._DEFAULT_MAX_TOTAL_DURATION_MILLISECONDS = Infinity;
+            /**
+             * The default easing of the animation
+             */
+            Easing._DEFAULT_EASING_MODE = "linear-in-out";
+            return Easing;
+        })();
+        Animators.Easing = Easing;
+    })(Animators = Plottable.Animators || (Plottable.Animators = {}));
+})(Plottable || (Plottable = {}));
 var Plottable;
 (function (Plottable) {
     var Dispatcher = (function () {

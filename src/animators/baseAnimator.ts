@@ -51,14 +51,16 @@
               return this.startDelay() + adjustedIterativeDelay * (Math.max(numberOfSteps - 1, 0)) + this.stepDuration();
             }
 
-            public animate(selection: d3.Selection<any>, attrToAppliedProjector: AttributeToAppliedProjector, drawingTarget?: Drawers.DrawingTarget): d3.Selection<any> | d3.Transition<any> {
+            public animate(selection: d3.Selection<any>, attrToAppliedProjector: AttributeToAppliedProjector,
+              drawingTarget?: Drawers.DrawingTarget): d3.Selection<any> | d3.Transition<any> {
               let numberOfSteps = (<any>drawingTarget.merge)[0].length;
               let adjustedIterativeDelay = this._getAdjustedIterativeDelay(numberOfSteps);
 
               // set all the properties on the merge , save the transition returned
-              drawingTarget.merge = this.getTransition(drawingTarget.merge, this.stepDuration(), (d: any, i: number) => this.startDelay() + adjustedIterativeDelay * i)
+              drawingTarget.merge = this.getTransition(drawingTarget.merge, this.stepDuration(),
+                (d: any, i: number) => this.startDelay() + adjustedIterativeDelay * i)
                 .attr(attrToAppliedProjector);
-              
+            
               // remove the exiting elements
               drawingTarget.exit
                 .remove();
@@ -101,7 +103,7 @@
              *
              */
             protected isTransition(selection: any): boolean {
-              return (selection.namespace === "__transition__"? true: false);
+              return (selection.namespace === "__transition__" ? true : false);
             }
             protected mergeAttrs(attr1: AttributeToAppliedProjector, attr2: AttributeToAppliedProjector): AttributeToAppliedProjector {
               let a: AttributeToAppliedProjector = {};
@@ -130,7 +132,7 @@
 
               return (d: any, i: number) => this.startDelay() + adjustedIterativeDelay * i;
             }
-         
+
             /**
              * Gets the start delay of the animation in milliseconds.
              *
@@ -250,10 +252,10 @@
             }
 
             /**
-              * xScale -- a referene to the xScale used by the owning plot
-              * the animator can use this to calculate positions
-              * @returns {Plottable.Scale<any, any>} the xScale.
-              */
+             * xScale -- a referene to the xScale used by the owning plot
+             * the animator can use this to calculate positions
+             * @returns {Plottable.Scale<any, any>} the xScale.
+             */
             public xScale(): Plottable.Scale<any, any>;
             /**
              * Sets the easing mode of the animation.
@@ -269,7 +271,7 @@
                 this._xScale = xScale;
                 return this;
               }
-            }   
+            }
 
             /**
              * yScale -- a referene to the yScale used by the owning plot

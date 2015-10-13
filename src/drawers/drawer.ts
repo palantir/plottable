@@ -19,9 +19,9 @@ export module Drawers {
   };
 
   /**
-  * A DrawingTarget contains the selections that are the results of binding data.
-  * DrawingTarget is contructed by Drawer, and passed to animators to allow rich animation of each selection
-  */
+   * A DrawingTarget contains the selections that are the results of binding data.
+   * DrawingTarget is contructed by Drawer, and passed to animators to allow rich animation of each selection
+   */
   export type DrawingTarget = {
     enter: d3.Selection<any>|d3.Transition<any>,  // new data elements current not bound to a DOM element
     update: d3.selection.Update<any>|d3.Transition<any>, // data elements currently bound to a DOM element still in the data set
