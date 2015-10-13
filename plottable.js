@@ -893,11 +893,11 @@ var Plottable;
         function KeyFunctions() {
         }
         KeyFunctions.useProperty = function (propertyname) {
-            return function (d, i) { return d[propertyname]; };
+            return function (d) { return d[propertyname]; };
         };
         ;
         KeyFunctions.counter = 0;
-        KeyFunctions.noConstancy = function (d, i) {
+        KeyFunctions.noConstancy = function () {
             return KeyFunctions.counter++;
         };
         KeyFunctions.useIndex = function (d, i) {

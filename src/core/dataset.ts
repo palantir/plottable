@@ -4,14 +4,14 @@ export type DatasetCallback = (dataset: Dataset) => void;
 
 export class KeyFunctions {
   private static counter: number = 0;
-  public static noConstancy = (d: any, i: number) => {
+  public static noConstancy = () => {
     return KeyFunctions.counter++;
   };
   public static useIndex = (d: any, i: number) => {
     return i;
   };
   public static useProperty(propertyname: string) {
-    return (d: any, i: number) => { return d[propertyname]; };
+    return (d: any) => { return d[propertyname]; };
   };
 }
 
@@ -106,8 +106,8 @@ export class Dataset {
   public keyFunction(): (datum: any, index: number) => any;
   /**
    * Sets the keyFunction.
-   * in d3, when binding data using selection.data(), a keyFunction may be supplied
-   * to generate a unique identifier for each datum. When data is updated, d3 uses this identifier to
+   * in D3, when binding data using selection.data(), a keyFunction may be supplied
+   * to generate a unique identifier for each datum. When data is updated, D3 uses this identifier to
    * determine which data points have entered or exited the visualisation.
    *
    * @param { (d: any, i: number) => any} keyFunction
