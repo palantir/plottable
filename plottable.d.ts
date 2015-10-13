@@ -1,4 +1,3 @@
-
 declare module Plottable {
     module Utils {
         module Math {
@@ -58,8 +57,6 @@ declare module Plottable {
         }
     }
 }
-
-
 declare module Plottable {
     module Utils {
         /**
@@ -78,8 +75,6 @@ declare module Plottable {
         }
     }
 }
-
-
 declare module Plottable {
     module Utils {
         /**
@@ -98,8 +93,6 @@ declare module Plottable {
         }
     }
 }
-
-
 declare module Plottable {
     module Utils {
         module DOM {
@@ -196,8 +189,6 @@ declare module Plottable {
         }
     }
 }
-
-
 declare module Plottable {
     module Utils {
         module Color {
@@ -226,8 +217,6 @@ declare module Plottable {
         }
     }
 }
-
-
 declare module Plottable {
     module Utils {
         module Array {
@@ -263,8 +252,6 @@ declare module Plottable {
         }
     }
 }
-
-
 declare module Plottable {
     module Utils {
         /**
@@ -277,8 +264,6 @@ declare module Plottable {
         }
     }
 }
-
-
 declare module Plottable {
     module Utils {
         module Stacking {
@@ -315,8 +300,6 @@ declare module Plottable {
         }
     }
 }
-
-
 declare module Plottable {
     module Utils {
         module Window {
@@ -349,8 +332,6 @@ declare module Plottable {
         }
     }
 }
-
-
 declare module Plottable {
     module Utils {
         class ClientToSVGTranslator {
@@ -374,8 +355,6 @@ declare module Plottable {
         }
     }
 }
-
-
 declare module Plottable {
     module Configs {
         /**
@@ -388,13 +367,9 @@ declare module Plottable {
         var ADD_TITLE_ELEMENTS: boolean;
     }
 }
-
-
 declare module Plottable {
     var version: string;
 }
-
-
 declare module Plottable {
     type DatasetCallback = (dataset: Dataset) => void;
     class Dataset {
@@ -452,8 +427,6 @@ declare module Plottable {
         metadata(metadata: any): Dataset;
     }
 }
-
-
 declare module Plottable {
     module RenderPolicies {
         /**
@@ -487,8 +460,6 @@ declare module Plottable {
         }
     }
 }
-
-
 declare module Plottable {
     /**
      * The RenderController is responsible for enqueueing and synchronizing
@@ -535,7 +506,6 @@ declare module Plottable {
         function flush(): void;
     }
 }
-
 declare module Plottable {
     /**
      * Accesses a specific datum property.
@@ -607,8 +577,6 @@ declare module Plottable {
         component: C;
     }
 }
-
-
 declare module Plottable {
     type Formatter = (d: any) => string;
     /**
@@ -719,8 +687,6 @@ declare module Plottable {
         function relativeDate(baseValue?: number, increment?: number, label?: string): (d: any) => string;
     }
 }
-
-
 declare module Plottable {
     /**
      * A SymbolFactory is a function that takes in a symbolSize which is the edge length of the render area
@@ -736,8 +702,6 @@ declare module Plottable {
         function triangleDown(): SymbolFactory;
     }
 }
-
-
 declare module Plottable {
     interface ScaleCallback<S extends Scale<any, any>> {
         (scale: S): any;
@@ -860,8 +824,6 @@ declare module Plottable {
         removeIncludedValuesProvider(provider: Scales.IncludedValuesProvider<D>): Scale<D, R>;
     }
 }
-
-
 declare module Plottable {
     class QuantitativeScale<D> extends Scale<D, number> {
         protected static _DEFAULT_NUM_TICKS: number;
@@ -984,8 +946,6 @@ declare module Plottable {
         tickGenerator(generator: Scales.TickGenerators.TickGenerator<D>): QuantitativeScale<D>;
     }
 }
-
-
 declare module Plottable {
     module Scales {
         class Linear extends QuantitativeScale<number> {
@@ -1007,8 +967,6 @@ declare module Plottable {
         }
     }
 }
-
-
 declare module Plottable {
     module Scales {
         class ModifiedLog extends QuantitativeScale<number> {
@@ -1082,8 +1040,6 @@ declare module Plottable {
         }
     }
 }
-
-
 declare module Plottable {
     module Scales {
         class Category extends Scale<string, number> {
@@ -1164,8 +1120,6 @@ declare module Plottable {
         }
     }
 }
-
-
 declare module Plottable {
     module Scales {
         class Color extends Scale<string, string> {
@@ -1201,8 +1155,6 @@ declare module Plottable {
         }
     }
 }
-
-
 declare module Plottable {
     module Scales {
         class Time extends QuantitativeScale<Date> {
@@ -1240,8 +1192,6 @@ declare module Plottable {
         }
     }
 }
-
-
 declare module Plottable {
     module Scales {
         class InterpolatedColor extends Scale<number, string> {
@@ -1276,8 +1226,6 @@ declare module Plottable {
         }
     }
 }
-
-
 declare module Plottable {
     module Scales {
         module TickGenerators {
@@ -1308,8 +1256,6 @@ declare module Plottable {
         }
     }
 }
-
-
 declare module Plottable {
     module Drawers {
         /**
@@ -1398,8 +1344,6 @@ declare module Plottable {
         selectionForIndex(index: number): d3.Selection<any>;
     }
 }
-
-
 declare module Plottable {
     module Drawers {
         class Line extends Drawer {
@@ -1409,8 +1353,6 @@ declare module Plottable {
         }
     }
 }
-
-
 declare module Plottable {
     module Drawers {
         class Area extends Drawer {
@@ -1420,8 +1362,6 @@ declare module Plottable {
         }
     }
 }
-
-
 declare module Plottable {
     module Drawers {
         class Rectangle extends Drawer {
@@ -1429,8 +1369,6 @@ declare module Plottable {
         }
     }
 }
-
-
 declare module Plottable {
     module Drawers {
         class Arc extends Drawer {
@@ -1439,8 +1377,6 @@ declare module Plottable {
         }
     }
 }
-
-
 declare module Plottable {
     module Drawers {
         class ArcOutline extends Drawer {
@@ -1449,8 +1385,6 @@ declare module Plottable {
         }
     }
 }
-
-
 declare module Plottable {
     module Drawers {
         class Symbol extends Drawer {
@@ -1458,8 +1392,6 @@ declare module Plottable {
         }
     }
 }
-
-
 declare module Plottable {
     module Drawers {
         class Segment extends Drawer {
@@ -1467,8 +1399,6 @@ declare module Plottable {
         }
     }
 }
-
-
 declare module Plottable {
     type ComponentCallback = (component: Component) => void;
     module Components {
@@ -1725,8 +1655,6 @@ declare module Plottable {
         background(): d3.Selection<void>;
     }
 }
-
-
 declare module Plottable {
     class ComponentContainer extends Component {
         private _detachCallback;
@@ -1759,8 +1687,6 @@ declare module Plottable {
         destroy(): void;
     }
 }
-
-
 declare module Plottable {
     module Components {
         class Group extends ComponentContainer {
@@ -1801,8 +1727,6 @@ declare module Plottable {
         }
     }
 }
-
-
 declare module Plottable {
     class Axis<D> extends Component {
         /**
@@ -2033,8 +1957,6 @@ declare module Plottable {
         showEndTickLabels(show: boolean): Axis<D>;
     }
 }
-
-
 declare module Plottable {
     module TimeInterval {
         var second: string;
@@ -2146,8 +2068,6 @@ declare module Plottable {
         }
     }
 }
-
-
 declare module Plottable {
     module Axes {
         class Numeric extends Axis<number> {
@@ -2225,8 +2145,6 @@ declare module Plottable {
         }
     }
 }
-
-
 declare module Plottable {
     module Axes {
         class Category extends Axis<string> {
@@ -2278,8 +2196,6 @@ declare module Plottable {
         }
     }
 }
-
-
 declare module Plottable {
     module Components {
         class Label extends Component {
@@ -2357,8 +2273,6 @@ declare module Plottable {
         }
     }
 }
-
-
 declare module Plottable {
     module Components {
         class Legend extends Component {
@@ -2488,8 +2402,6 @@ declare module Plottable {
         }
     }
 }
-
-
 declare module Plottable {
     module Components {
         class InterpolatedColorLegend extends Component {
@@ -2567,8 +2479,6 @@ declare module Plottable {
         }
     }
 }
-
-
 declare module Plottable {
     module Components {
         class Gridlines extends Component {
@@ -2592,8 +2502,6 @@ declare module Plottable {
         }
     }
 }
-
-
 declare module Plottable {
     module Components {
         class Table extends ComponentContainer {
@@ -2724,8 +2632,6 @@ declare module Plottable {
         }
     }
 }
-
-
 declare module Plottable {
     module Components {
         enum PropertyMode {
@@ -2845,8 +2751,6 @@ declare module Plottable {
         }
     }
 }
-
-
 declare module Plottable {
     module Components {
         class GuideLineLayer<D> extends Component {
@@ -2919,8 +2823,6 @@ declare module Plottable {
         }
     }
 }
-
-
 declare module Plottable {
     module Plots {
         interface PlotEntity extends Entity<Plot> {
@@ -3095,8 +2997,6 @@ declare module Plottable {
         protected _animateOnNextRender(): boolean;
     }
 }
-
-
 declare module Plottable {
     module Plots {
         class Pie extends Plot {
@@ -3223,8 +3123,6 @@ declare module Plottable {
         }
     }
 }
-
-
 declare module Plottable {
     class XYPlot<X, Y> extends Plot {
         protected static _X_KEY: string;
@@ -3336,8 +3234,6 @@ declare module Plottable {
         protected _getDataToDraw(): Utils.Map<Dataset, any[]>;
     }
 }
-
-
 declare module Plottable {
     module Plots {
         class Rectangle<X, Y> extends XYPlot<X, Y> {
@@ -3493,8 +3389,6 @@ declare module Plottable {
         }
     }
 }
-
-
 declare module Plottable {
     module Plots {
         class Scatter<X, Y> extends XYPlot<X, Y> {
@@ -3572,8 +3466,6 @@ declare module Plottable {
         }
     }
 }
-
-
 declare module Plottable {
     module Plots {
         class Bar<X, Y> extends XYPlot<X, Y> {
@@ -3731,8 +3623,6 @@ declare module Plottable {
         }
     }
 }
-
-
 declare module Plottable {
     module Plots {
         class Line<X> extends XYPlot<X, number> {
@@ -3839,8 +3729,6 @@ declare module Plottable {
         }
     }
 }
-
-
 declare module Plottable {
     module Plots {
         class Area<X> extends Line<X> {
@@ -3886,8 +3774,6 @@ declare module Plottable {
         }
     }
 }
-
-
 declare module Plottable {
     module Plots {
         class ClusteredBar<X, Y> extends Bar<X, Y> {
@@ -3910,8 +3796,6 @@ declare module Plottable {
         }
     }
 }
-
-
 declare module Plottable {
     module Plots {
         class StackedArea<X> extends Area<X> {
@@ -3967,8 +3851,6 @@ declare module Plottable {
         }
     }
 }
-
-
 declare module Plottable {
     module Plots {
         class StackedBar<X, Y> extends Bar<X, Y> {
@@ -4001,8 +3883,6 @@ declare module Plottable {
         }
     }
 }
-
-
 declare module Plottable {
     module Plots {
         class Segment<X, Y> extends XYPlot<X, Y> {
@@ -4104,8 +3984,6 @@ declare module Plottable {
         }
     }
 }
-
-
 declare module Plottable {
     module Plots {
         class Waterfall<X, Y> extends Bar<X, number> {
@@ -4157,8 +4035,6 @@ declare module Plottable {
         }
     }
 }
-
-
 declare module Plottable {
     module Plots {
         class Wheel<R, T> extends Plot {
@@ -4248,8 +4124,6 @@ declare module Plottable {
         }
     }
 }
-
-
 declare module Plottable {
     interface Animator {
         /**
@@ -4272,8 +4146,6 @@ declare module Plottable {
         totalTime(numberOfIterations: number): number;
     }
 }
-
-
 declare module Plottable {
     module Animators {
         /**
@@ -4286,8 +4158,6 @@ declare module Plottable {
         }
     }
 }
-
-
 declare module Plottable {
     module Animators {
         /**
@@ -4407,8 +4277,6 @@ declare module Plottable {
         }
     }
 }
-
-
 declare module Plottable {
     class Dispatcher {
         protected _eventToCallback: {
@@ -4423,8 +4291,6 @@ declare module Plottable {
         protected _unsetCallback(callbackSet: Utils.CallbackSet<Function>, callback: Function): void;
     }
 }
-
-
 declare module Plottable {
     module Dispatchers {
         type MouseCallback = (p: Point, event: MouseEvent) => void;
@@ -4537,8 +4403,6 @@ declare module Plottable {
         }
     }
 }
-
-
 declare module Plottable {
     module Dispatchers {
         type TouchCallback = (ids: number[], idToPoint: {
@@ -4631,8 +4495,6 @@ declare module Plottable {
         }
     }
 }
-
-
 declare module Plottable {
     module Dispatchers {
         type KeyCallback = (keyCode: number, event: KeyboardEvent) => void;
@@ -4685,8 +4547,6 @@ declare module Plottable {
         }
     }
 }
-
-
 declare module Plottable {
     class Interaction {
         protected _componentAttachedTo: Component;
@@ -4740,8 +4600,6 @@ declare module Plottable {
         protected _isInsideComponent(p: Point): boolean;
     }
 }
-
-
 declare module Plottable {
     type ClickCallback = (point: Point) => void;
     module Interactions {
@@ -4776,8 +4634,6 @@ declare module Plottable {
         }
     }
 }
-
-
 declare module Plottable {
     module Interactions {
         class DoubleClick extends Interaction {
@@ -4817,8 +4673,6 @@ declare module Plottable {
         }
     }
 }
-
-
 declare module Plottable {
     type KeyCallback = (keyCode: number) => void;
     module Interactions {
@@ -4878,8 +4732,6 @@ declare module Plottable {
         }
     }
 }
-
-
 declare module Plottable {
     type PointerCallback = (point: Point) => void;
     module Interactions {
@@ -4942,8 +4794,6 @@ declare module Plottable {
         }
     }
 }
-
-
 declare module Plottable {
     module Interactions {
         class PanZoom extends Interaction {
@@ -5079,8 +4929,6 @@ declare module Plottable {
         }
     }
 }
-
-
 declare module Plottable {
     type DragCallback = (start: Point, end: Point) => void;
     module Interactions {
@@ -5173,8 +5021,6 @@ declare module Plottable {
         }
     }
 }
-
-
 declare module Plottable {
     type DragBoxCallback = (bounds: Bounds) => void;
     module Components {
@@ -5306,8 +5152,6 @@ declare module Plottable {
         }
     }
 }
-
-
 declare module Plottable {
     module Components {
         class XDragBoxLayer extends DragBoxLayer {
@@ -5336,8 +5180,6 @@ declare module Plottable {
         }
     }
 }
-
-
 declare module Plottable {
     module Components {
         class YDragBoxLayer extends DragBoxLayer {
@@ -5366,8 +5208,6 @@ declare module Plottable {
         }
     }
 }
-
-
 declare module Plottable {
     interface DragLineCallback<D> {
         (dragLineLayer: Components.DragLineLayer<D>): void;
