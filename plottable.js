@@ -5692,7 +5692,7 @@ var Plottable;
             function InterpolatedColorLegend(interpolatedColorScale) {
                 var _this = this;
                 _super.call(this);
-                this._padding = 15;
+                this._padding = 20;
                 this._endPadding = 5;
                 this._textPadding = 5;
                 if (interpolatedColorScale == null) {
@@ -5845,13 +5845,13 @@ var Plottable;
                 var numSwatches = InterpolatedColorLegend._DEFAULT_NUM_SWATCHES;
                 var textHeight = this._measurer.measure().height;
                 if (this.expands() && textHeight > 0) {
-                    var offset = this._isVertical() ? 2 * padding : 2 * endPadding + 2 * textPadding - text0Width - text1Width;
+                    var offset = this._isVertical() ? 2 * padding : 4 * padding - text0Width - text1Width;
                     var fullLength = this._isVertical() ? this.height() : this.width();
                     numSwatches = Math.max(Math.floor((fullLength - offset) / textHeight), numSwatches);
                 }
                 if (this._isVertical()) {
                     var longestTextWidth = Math.max(text0Width, text1Width);
-                    swatchWidth = Math.max((this.width() - 2 * padding - 1 * textPadding - longestTextWidth), 0);
+                    swatchWidth = Math.max((this.width() - 3 * padding - longestTextWidth), 0);
                     swatchHeight = Math.max(((this.height() - 2 * endPadding) / numSwatches), 0);
                     swatchY = function (d, i) { return endPadding + (numSwatches - (i + 1)) * swatchHeight; };
                     upperWriteOptions.yAlign = "top";
@@ -5859,18 +5859,18 @@ var Plottable;
                     lowerWriteOptions.yAlign = "bottom";
                     lowerLabelShift.y = -endPadding;
                     if (this._orientation === "left") {
-                        swatchX = function (d, i) { return padding + longestTextWidth + textPadding; };
+                        swatchX = function (d, i) { return padding + longestTextWidth + padding; };
                         upperWriteOptions.xAlign = "right";
-                        upperLabelShift.x = -(padding + swatchWidth + textPadding);
+                        upperLabelShift.x = -(padding + swatchWidth + padding);
                         lowerWriteOptions.xAlign = "right";
-                        lowerLabelShift.x = -(padding + swatchWidth + textPadding);
+                        lowerLabelShift.x = -(padding + swatchWidth + padding);
                     }
                     else {
                         swatchX = function (d, i) { return padding; };
                         upperWriteOptions.xAlign = "left";
-                        upperLabelShift.x = padding + swatchWidth + textPadding;
+                        upperLabelShift.x = padding + swatchWidth + padding;
                         lowerWriteOptions.xAlign = "left";
-                        lowerLabelShift.x = padding + swatchWidth + textPadding;
+                        lowerLabelShift.x = padding + swatchWidth + padding;
                     }
                     boundingBoxAttr["width"] = swatchWidth;
                     boundingBoxAttr["height"] = numSwatches * swatchHeight;

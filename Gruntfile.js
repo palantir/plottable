@@ -189,6 +189,7 @@ module.exports = function(grunt) {
     server: {
       options: {
         port: 9999,
+        //protocol: "https",
         hostname: "*",
         base: "",
         livereload: true
