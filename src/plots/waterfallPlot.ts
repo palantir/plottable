@@ -1,5 +1,3 @@
-///<reference path="../reference.ts" />
-
 module Plottable {
 export module Plots {
   export class Waterfall<X, Y> extends Bar<X, number> {
@@ -21,13 +19,13 @@ export module Plots {
 
     /**
      * Gets whether connectors are enabled.
-     * 
+     *
      * @returns {boolean} Whether connectors should be shown or not.
      */
     public connectorsEnabled(): boolean;
     /**
      * Sets whether connectors are enabled.
-     * 
+     *
      * @param {boolean} enabled
      * @returns {Plots.Waterfall} The calling Waterfall Plot.
      */
@@ -46,7 +44,7 @@ export module Plots {
     public total<T>(): Plots.AccessorScaleBinding<T, boolean>;
     /**
      * Sets total to a constant number or the result of an Accessor
-     * 
+     *
      * @param {Accessor<boolean>}
      * @returns {Plots.Waterfall} The calling Waterfall Plot.
      */

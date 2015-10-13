@@ -313,13 +313,46 @@ describe("Tables", () => {
     });
   });
 
-  it("has()", () => {
-    let c0 = new Plottable.Component();
-    let table = new Plottable.Components.Table([[c0]]);
-    assert.isTrue(table.has(c0), "correctly checks that Component is in the Table");
-    table.remove(c0);
-    assert.isFalse(table.has(c0), "correctly checks that Component is no longer in the Table");
-    table.add(c0, 1, 1);
-    assert.isTrue(table.has(c0), "correctly checks that Component is in the Table again");
+  describe("checking Table contents", () => {
+    it("has()", () => {
+      let c0 = new Plottable.Component();
+      let table = new Plottable.Components.Table([[c0]]);
+      assert.isTrue(table.has(c0), "correctly checks that Component is in the Table");
+      table.remove(c0);
+      assert.isFalse(table.has(c0), "correctly checks that Component is no longer in the Table");
+      table.add(c0, 1, 1);
+      assert.isTrue(table.has(c0), "correctly checks that Component is in the Table again");
+    });
+
+    it("can retrieve the Component at a given row, column index", () => {
+      let c00 = new Plottable.Component();
+      let c01 = new Plottable.Component();
+      let c10 = new Plottable.Component();
+      let c11 = new Plottable.Component();
+      let table = new Plottable.Components.Table([
+        [c00, c01],
+        [c10, c11]
+      ]);
+
+      assert.strictEqual(table.componentAt(0, 0), c00, "retrieves the Component at [0, 0]");
+      assert.strictEqual(table.componentAt(0, 1), c01, "retrieves the Component at [0, 1]");
+      assert.strictEqual(table.componentAt(1, 0), c10, "retrieves the Component at [1, 0]");
+      assert.strictEqual(table.componentAt(1, 1), c11, "retrieves the Component at [1, 1]");
+    });
+
+    it("returns null when no Component exists at the specified row, column index", () => {
+      let c00 = new Plottable.Component();
+      let c11 = new Plottable.Component();
+
+      let table = new Plottable.Components.Table();
+      table.add(c00, 0, 0);
+      table.add(c11, 1, 1);
+
+      assert.isNull(table.componentAt(0, 1), "returns null if an empty cell is queried");
+      assert.isNull(table.componentAt(-1, 0), "returns null if a negative row index is passed in");
+      assert.isNull(table.componentAt(0, -1), "returns null if a negative column index is passed in");
+      assert.isNull(table.componentAt(9001, 0), "returns null if a row index larger than the number of rows is passed in");
+      assert.isNull(table.componentAt(0, 9001), "returns null if a column index larger than the number of columns is passed in");
+    });
   });
 });
