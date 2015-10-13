@@ -328,7 +328,8 @@ describe("InterpolatedColorLegend", () => {
     let swatchEdge = swatchBoundingRect.left;
     let legendEdge = legendBoundingRect.left;
     let padding = swatchEdge - legendEdge;
-    assert.closeTo(swatchWidth, padding, window.Pixel_CloseTo_Requirement,
+    // HACKHACK #2122: two measurement errors in IE combine, and total error = 2
+    assert.closeTo(swatchWidth, padding, 2,
       "padding is approximately equal to swatch width");
     legend.expands(true);
     swatchBoundingRect = (<Element> legend.content().select(".swatch-container").node()).getBoundingClientRect();
@@ -337,7 +338,8 @@ describe("InterpolatedColorLegend", () => {
     swatchEdge = swatchBoundingRect.left;
     legendEdge = legendBoundingRect.left;
     padding = swatchEdge - legendEdge;
-    assert.closeTo(swatchWidth, padding, window.Pixel_CloseTo_Requirement,
+    // HACKHACK #2122: two measurement errors in IE combine, and total error = 2
+    assert.closeTo(swatchWidth, padding, 2,
       "padding is approximately equal to swatch width when expanded");
     svg.remove();
   });
@@ -351,8 +353,7 @@ describe("InterpolatedColorLegend", () => {
     let swatchEdge = swatchBoundingRect.bottom;
     let legendEdge = legendBoundingRect.bottom;
     let padding = legendEdge - swatchEdge;
-    // HACKHACK #2122: two measurement errors in IE combine, and total error = 2
-    assert.closeTo(swatchHeight, padding, 2,
+    assert.closeTo(swatchHeight, padding, window.Pixel_CloseTo_Requirement,
       "padding is approximately equal to swatch height");
     legend.expands(true);
     swatchBoundingRect = (<Element> legend.content().select(".swatch-container").node()).getBoundingClientRect();
