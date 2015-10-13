@@ -5692,7 +5692,6 @@ var Plottable;
             function InterpolatedColorLegend(interpolatedColorScale) {
                 var _this = this;
                 _super.call(this);
-                this._padding = 20;
                 this._endPadding = 0;
                 this._textPadding = 5;
                 if (interpolatedColorScale == null) {

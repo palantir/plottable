@@ -10,7 +10,6 @@ export module Components {
     private _writer: SVGTypewriter.Writers.Writer;
     private _scale: Scales.InterpolatedColor;
     private _orientation: String ;
-    private _padding = 20;
     private _endPadding = 0;
     private _textPadding = 5;
     private _formatter: Formatter;
