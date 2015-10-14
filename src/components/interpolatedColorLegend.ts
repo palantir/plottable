@@ -231,15 +231,15 @@ export module Components {
       let numSwatches = InterpolatedColorLegend._DEFAULT_NUM_SWATCHES;
 
       if (this.expands() && textHeight > 0) {
-        let offset = this._isVertical() ? 0 :  2 * padding - text0Width - text1Width;
+        let offset = this._isVertical() ? 0 :  2 * textPadding - text0Width - text1Width;
         let fullLength = this._isVertical() ? this.height() : this.width();
         numSwatches = Math.max(Math.floor((fullLength - offset) / textHeight), numSwatches);
       }
 
       if (this._isVertical()) {
         let longestTextWidth = Math.max(text0Width, text1Width);
-        swatchWidth = Math.max( (this.width() - 2 * padding - textPadding - longestTextWidth), 0);
-        swatchHeight = Math.max( (this.height() / numSwatches), 0);
+        swatchWidth = Math.max(this.width() - 2 * padding - textPadding - longestTextWidth, 0);
+        swatchHeight = Math.max(this.height() / numSwatches, 0);
         swatchY = (d: any, i: number) => (numSwatches - (i + 1)) * swatchHeight;
 
         upperWriteOptions.yAlign = "top";
