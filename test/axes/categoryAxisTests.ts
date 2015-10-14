@@ -57,7 +57,7 @@ describe("Category Axes", () => {
       assert.strictEqual(tickLabels.size(), changedDomain.length, "same number of tick labels as changed domain entries");
       tickLabels.each(function(d, i) {
         let tickLabel = d3.select(this);
-        assert.strictEqual(tickLabel.text(), changedDomain[i], "tick labels render changed domain");
+        assert.strictEqual(tickLabel.text(), changedDomain[i], `tick label ${i} renders after changing domain`);
       });
       svg.remove();
     });
@@ -245,7 +245,7 @@ describe("Category Axes", () => {
       innerTickMarks.each(function(d, i) {
         let innerTickMark = d3.select(this);
         let innerTickMarkLength = Math.abs(TestMethods.numAttr(innerTickMark, "y1") - TestMethods.numAttr(innerTickMark, "y2"));
-        assert.closeTo(innerTickMarkLength, innerTickLength, window.Pixel_CloseTo_Requirement, "tick mark of specified length");
+        assert.closeTo(innerTickMarkLength, innerTickLength, window.Pixel_CloseTo_Requirement, `tick mark ${i} of specified length`);
       });
 
       axis.destroy();
@@ -266,7 +266,7 @@ describe("Category Axes", () => {
       endTickMarks.each(function(d, i) {
         let endTickMark = d3.select(this);
         let endTickMarkLength = Math.abs(TestMethods.numAttr(endTickMark, "y1") - TestMethods.numAttr(endTickMark, "y2"));
-        assert.closeTo(endTickMarkLength, endTickLength, window.Pixel_CloseTo_Requirement, "tick mark of specified length");
+        assert.closeTo(endTickMarkLength, endTickLength, window.Pixel_CloseTo_Requirement, `tick mark ${i} of specified length`);
       });
 
       axis.destroy();
