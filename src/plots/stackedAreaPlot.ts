@@ -67,27 +67,6 @@ export module Plots {
       return this;
     }
 
-    /**
-     * Gets if downsampling is enabled
-     * 
-     * When downsampling is enabled, two consecutive lines with the same slope will be merged to one line.
-     */
-    public downsamplingEnabled(): boolean;
-    /**
-     * Sets if downsampling is enabled
-     * 
-     * For now, downsampling is always disabled in stacked area plot
-     * @returns {Plots.StackedArea} The calling Plots.StackedArea
-     */
-    public downsamplingEnabled(downsampling: boolean): Plots.Line<X>;
-    public downsamplingEnabled(downsampling?: boolean): any {
-       if (downsampling == null) {
-         return super.downsamplingEnabled();
-       }
-      Utils.Window.warn("Warning: Stacked Area Plot does not support downsampling");
-      return this;
-    }
-
     protected _additionalPaint() {
       let scaledBaseline = this.y().scale.scale(this._baselineValue);
       let baselineAttr: any = {
@@ -202,6 +181,33 @@ export module Plots {
       return { x: pixelPoint.x, y: scaledYValue };
     }
 
+    protected _getDataToDraw() {
+      if (super.downsamplingEnabled() === false) {
+        return super._getDataToDraw();
+      }
+      let dataToDraw = new Utils.Map<Dataset, any[]> ();
+      if (this.datasets.length === 0) {
+        return dataToDraw;
+      }
+      let overallfilteredDataIndices: number[] = [];
+      this.datasets().forEach((dataset, i) => {
+        let data = dataset.data();
+        let filteredDataIndices = data.map((d, i) => i);
+        if (super.croppedRenderingEnabled()) {
+          filteredDataIndices = super._filterCroppedRendering(dataset, filteredDataIndices);
+        }
+        if (super.downsamplingEnabled()) {
+          filteredDataIndices = super._filterDownsampling(dataset, filteredDataIndices);
+        }
+        overallfilteredDataIndices = overallfilteredDataIndices.concat(filteredDataIndices
+          .filter((index) => {return overallfilteredDataIndices.indexOf(index) < 0; }));
+      });
+      this.datasets().forEach((dataset, i) => {
+        let data = dataset.data();
+        dataToDraw.set(dataset, [overallfilteredDataIndices.sort((a, b) => a - b).map((d, i) => data[d])]);
+      });
+      return dataToDraw;
+    }
   }
 }
 }

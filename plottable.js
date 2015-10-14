@@ -9675,13 +9675,6 @@ var Plottable;
                 this._updateStackExtentsAndOffsets();
                 return this;
             };
-            StackedArea.prototype.downsamplingEnabled = function (downsampling) {
-                if (downsampling == null) {
-                    return _super.prototype.downsamplingEnabled.call(this);
-                }
-                Plottable.Utils.Window.warn("Warning: Stacked Area Plot does not support downsampling");
-                return this;
-            };
             StackedArea.prototype._additionalPaint = function () {
                 var scaledBaseline = this.y().scale.scale(this._baselineValue);
                 var baselineAttr = {
@@ -9783,6 +9776,34 @@ var Plottable;
                 var yValue = this.y().accessor(datum, index, dataset);
                 var scaledYValue = this.y().scale.scale(+yValue + this._stackingResult.get(dataset).get(Plottable.Utils.Stacking.normalizeKey(xValue)).offset);
                 return { x: pixelPoint.x, y: scaledYValue };
+            };
+            StackedArea.prototype._getDataToDraw = function () {
+                var _this = this;
+                if (_super.prototype.downsamplingEnabled.call(this) === false) {
+                    return _super.prototype._getDataToDraw.call(this);
+                }
+                var dataToDraw = new Plottable.Utils.Map();
+                if (this.datasets.length === 0) {
+                    return dataToDraw;
+                }
+                var overallfilteredDataIndices = [];
+                this.datasets().forEach(function (dataset, i) {
+                    var data = dataset.data();
+                    var filteredDataIndices = data.map(function (d, i) { return i; });
+                    if (_super.prototype.croppedRenderingEnabled.call(_this)) {
+                        filteredDataIndices = _super.prototype._filterCroppedRendering.call(_this, dataset, filteredDataIndices);
+                    }
+                    if (_super.prototype.downsamplingEnabled.call(_this)) {
+                        filteredDataIndices = _super.prototype._filterDownsampling.call(_this, dataset, filteredDataIndices);
+                    }
+                    overallfilteredDataIndices = overallfilteredDataIndices.concat(filteredDataIndices
+                        .filter(function (index) { return overallfilteredDataIndices.indexOf(index) < 0; }));
+                });
+                this.datasets().forEach(function (dataset, i) {
+                    var data = dataset.data();
+                    dataToDraw.set(dataset, [overallfilteredDataIndices.sort(function (a, b) { return a - b; }).map(function (d, i) { return data[d]; })]);
+                });
+                return dataToDraw;
             };
             return StackedArea;
         })(Plots.Area);

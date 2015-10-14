@@ -414,7 +414,7 @@ export module Plots {
       return dataToDraw;
     }
 
-    private _filterCroppedRendering(dataset: Dataset, indices: number[]) {
+    protected _filterCroppedRendering(dataset: Dataset, indices: number[]) {
       let xProjector = Plot._scaledAccessor(this.x());
       let yProjector = Plot._scaledAccessor(this.y());
 
@@ -449,7 +449,7 @@ export module Plots {
       return filteredDataIndices;
     }
 
-    private _filterDownsampling(dataset: Dataset, indices: number[]) {
+    protected _filterDownsampling(dataset: Dataset, indices: number[]) {
       if (indices.length === 0) {
         return [];
       }

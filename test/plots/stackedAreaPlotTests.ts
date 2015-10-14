@@ -67,13 +67,14 @@ describe("Plots", () => {
       svg.remove();
     });
 
-    it("disables downsampling", () => {
+    it("enables and disables downsampling", () => {
       assert.strictEqual(renderer.downsamplingEnabled(), false, "downsampling is disabled by default");
       renderer.downsamplingEnabled(true);
-      assert.strictEqual(renderer.downsamplingEnabled(), false, "downsampling will not be enabled by user");
+      assert.strictEqual(renderer.downsamplingEnabled(), true, "downsampling can be enabled by user");
+      renderer.downsamplingEnabled(false);
+      assert.strictEqual(renderer.downsamplingEnabled(), false, "downsampling can be disabled by user");
       svg.remove();
     });
-
   });
 
   describe("Stacked Area Plot no data", () => {
@@ -396,7 +397,66 @@ describe("Plots", () => {
       assert.strictEqual(area1.attr("check"), "b", "projector has been applied to second area");
       svg.remove();
     });
+  });
 
+  describe("downsampling", () => {
+    it("renders correctly when downsampling is enabled", () => {
+      let svg = TestMethods.generateSVG(5, 10);
+      let xScale = new Plottable.Scales.Linear();
+      xScale.domain([0, 5]);
+      let yScale = new Plottable.Scales.Linear();
+      yScale.domain([0, 5]);
+      let data1 = [
+        { x: 1, y: 1}, // start point should not be removed
+        { x: 2, y: 1}, // points should be removed
+        { x: 3, y: 1}, // points should not be removed
+        { x: 4, y: 1}, // end point should not be removed
+      ];
+
+      let data2 = [
+        { x: 1, y: 1},
+        { x: 2, y: 2},
+        { x: 3, y: 3},
+        { x: 4, y: 2},
+      ];
+
+      let renderer = new Plottable.Plots.StackedArea<number>();
+      renderer.y((d) => d.y, yScale);
+      renderer.x((d) => d.x, xScale);
+      renderer.addDataset(new Plottable.Dataset(data1));
+      renderer.addDataset(new Plottable.Dataset(data2));
+      renderer.downsamplingEnabled(true);
+      let xAxis = new Plottable.Axes.Numeric(xScale, "bottom");
+      new Plottable.Components.Table([[renderer], [xAxis]]).renderTo(svg);
+      let areas = (<any> renderer)._renderArea.selectAll(".area");
+
+      let expectedRenderIndex = [0, 2, 3];
+
+      let dataset = [data1, data2];
+      let EPSILON = 0.05;
+      assert.strictEqual(areas[0].length, dataset.length, "correct number of areas are drawn.");
+
+      let previousAreaValue = expectedRenderIndex.map((d) => 0);
+
+      dataset.forEach((d, i) => {
+        let area = d3.select(areas[0][i]);
+        let expectedAreaData = expectedRenderIndex.map((d) => dataset[i][d]);
+        let areaPoints = TestMethods.normalizePath(area.attr("d")).match(/(\-?\d+\.?\d*)(,|\s)(-?\d+\.?\d*)/g);
+        assert.strictEqual(areaPoints.length, expectedRenderIndex.length * 2, `correct number of points in area are drawn in area ${i}`);
+        let topPoints = areaPoints.slice(0, areaPoints.length / 2);
+        let bottomPoints = areaPoints.slice(areaPoints.length / 2, areaPoints.length).reverse();
+        topPoints.forEach((point, i) => {
+          let topCoordinates = topPoints[i].split(/,|\s/);
+          let bottomCoordinates = bottomPoints[i].split(/,|\s/);
+          let height = yScale.invert(+topCoordinates[1]) - yScale.invert(+bottomCoordinates[1]);
+          assert.closeTo(height, expectedAreaData[i].y, EPSILON, `the height of area with (x: ${+topCoordinates[0]}) are correct`);
+          assert.closeTo(yScale.invert(+topCoordinates[1]), previousAreaValue[i] + expectedAreaData[i].y, EPSILON,
+            `the top y value of area with (x: ${+topCoordinates[0]}) are correct`);
+          previousAreaValue[i] = previousAreaValue[i] + expectedAreaData[i].y;
+        });
+      });
+      svg.remove();
+    });
   });
 
   describe("fail safe tests", () => {
