@@ -290,7 +290,7 @@ describe("InterpolatedColorLegend", () => {
     orientations.forEach((orientation) => {
       legend.orientation(orientation).expands(true);
       let height = (<Element> legend.content().select(".swatch-container").node()).getBoundingClientRect().height;
-      assert.closeTo(height, SVG_HEIGHT, window.Pixel_CloseTo_Requirement, "actual height is SVG_HEIGHT");
+      assert.closeTo(height, SVG_HEIGHT, window.Pixel_CloseTo_Requirement, "actual height is SVG_HEIGHT with orientation: " + orientation);
     });
     svg.remove();
   });
