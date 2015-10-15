@@ -198,7 +198,6 @@ export module Components {
       let text1Width = this._measurer.measure(text1).width;
 
       let textHeight = this._measurer.measure().height;
-      let padding = textHeight;
       let textPadding = this._textPadding;
 
       let upperLabelShift: Point = { x: 0, y: 0 };
@@ -223,10 +222,12 @@ export module Components {
 
       let boundingBoxAttr: { [key: string]: number } = {
         x: 0,
-        y: this._isVertical() ? 0 : padding,
+        y: 0,
         width: 0,
         height: 0
       };
+
+      let padding: number;
 
       let numSwatches = InterpolatedColorLegend._DEFAULT_NUM_SWATCHES;
 
@@ -237,6 +238,7 @@ export module Components {
       }
 
       if (this._isVertical()) {
+        padding = (this.width() - Math.max(text0Width, text1Width) - 2 * this._textPadding) / 2;
         let longestTextWidth = Math.max(text0Width, text1Width);
         swatchWidth = Math.max(this.width() - padding - 2 * textPadding - longestTextWidth, 0);
         swatchHeight = Math.max(this.height() / numSwatches, 0);
@@ -263,6 +265,7 @@ export module Components {
         boundingBoxAttr["width"] = swatchWidth;
         boundingBoxAttr["height"] = numSwatches * swatchHeight;
       } else { // horizontal
+        padding = textHeight;
         swatchWidth = Math.max( ((this.width() - 2 * textPadding - text0Width - text1Width) / numSwatches), 0);
         swatchHeight = Math.max( (this.height() - 2 * padding), 0);
         swatchX = (d: any, i: number) => (text0Width + textPadding) + i * swatchWidth;
@@ -273,6 +276,7 @@ export module Components {
         lowerWriteOptions.xAlign = "left";
         lowerLabelShift.x = 0;
 
+        boundingBoxAttr["y"] = padding;
         boundingBoxAttr["width"] = numSwatches * swatchWidth;
         boundingBoxAttr["height"] = swatchHeight;
       }

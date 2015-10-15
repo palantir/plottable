@@ -5806,7 +5806,6 @@ var Plottable;
                 var text1 = this._formatter(domain[1]);
                 var text1Width = this._measurer.measure(text1).width;
                 var textHeight = this._measurer.measure().height;
-                var padding = textHeight;
                 var textPadding = this._textPadding;
                 var upperLabelShift = { x: 0, y: 0 };
                 var lowerLabelShift = { x: 0, y: 0 };
@@ -5828,10 +5827,11 @@ var Plottable;
                 var swatchY;
                 var boundingBoxAttr = {
                     x: 0,
-                    y: this._isVertical() ? 0 : padding,
+                    y: 0,
                     width: 0,
                     height: 0
                 };
+                var padding;
                 var numSwatches = InterpolatedColorLegend._DEFAULT_NUM_SWATCHES;
                 if (this.expands() && textHeight > 0) {
                     var offset = this._isVertical() ? 0 : 2 * textPadding - text0Width - text1Width;
@@ -5839,6 +5839,7 @@ var Plottable;
                     numSwatches = Math.max(Math.floor((fullLength - offset) / textHeight), numSwatches);
                 }
                 if (this._isVertical()) {
+                    padding = (this.width() - Math.max(text0Width, text1Width) - 2 * this._textPadding) / 2;
                     var longestTextWidth = Math.max(text0Width, text1Width);
                     swatchWidth = Math.max(this.width() - padding - 2 * textPadding - longestTextWidth, 0);
                     swatchHeight = Math.max(this.height() / numSwatches, 0);
@@ -5865,6 +5866,7 @@ var Plottable;
                     boundingBoxAttr["height"] = numSwatches * swatchHeight;
                 }
                 else {
+                    padding = textHeight;
                     swatchWidth = Math.max(((this.width() - 2 * textPadding - text0Width - text1Width) / numSwatches), 0);
                     swatchHeight = Math.max((this.height() - 2 * padding), 0);
                     swatchX = function (d, i) { return (text0Width + textPadding) + i * swatchWidth; };
@@ -5873,6 +5875,7 @@ var Plottable;
                     upperLabelShift.x = 0;
                     lowerWriteOptions.xAlign = "left";
                     lowerLabelShift.x = 0;
+                    boundingBoxAttr["y"] = padding;
                     boundingBoxAttr["width"] = numSwatches * swatchWidth;
                     boundingBoxAttr["height"] = swatchHeight;
                 }
