@@ -169,7 +169,7 @@ export module Components {
       let numSwatches = InterpolatedColorLegend._DEFAULT_NUM_SWATCHES;
       if (this._isVertical()) {
         let longestWidth = Utils.Math.max(labelWidths, 0);
-        desiredWidth = padding + textHeight + this._textPadding + longestWidth + padding;
+        desiredWidth = padding + textHeight + this._textPadding + longestWidth + this._textPadding;
         desiredHeight = numSwatches * textHeight;
       } else {
         desiredHeight = padding + textHeight + padding;
@@ -238,7 +238,7 @@ export module Components {
 
       if (this._isVertical()) {
         let longestTextWidth = Math.max(text0Width, text1Width);
-        swatchWidth = Math.max(this.width() - 2 * padding - textPadding - longestTextWidth, 0);
+        swatchWidth = Math.max(this.width() - padding - 2 * textPadding - longestTextWidth, 0);
         swatchHeight = Math.max(this.height() / numSwatches, 0);
         swatchY = (d: any, i: number) => (numSwatches - (i + 1)) * swatchHeight;
 
@@ -248,7 +248,7 @@ export module Components {
         lowerLabelShift.y = 0;
 
         if (this._orientation === "left") {
-          swatchX = (d: any, i: number) => padding + longestTextWidth + textPadding;
+          swatchX = (d: any, i: number) => textPadding + longestTextWidth + textPadding;
           upperWriteOptions.xAlign = "right";
           upperLabelShift.x = -(padding + swatchWidth + textPadding);
           lowerWriteOptions.xAlign = "right";

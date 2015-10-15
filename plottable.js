@@ -5781,7 +5781,7 @@ var Plottable;
                 var numSwatches = InterpolatedColorLegend._DEFAULT_NUM_SWATCHES;
                 if (this._isVertical()) {
                     var longestWidth = Plottable.Utils.Math.max(labelWidths, 0);
-                    desiredWidth = padding + textHeight + this._textPadding + longestWidth + padding;
+                    desiredWidth = padding + textHeight + this._textPadding + longestWidth + this._textPadding;
                     desiredHeight = numSwatches * textHeight;
                 }
                 else {
@@ -5840,7 +5840,7 @@ var Plottable;
                 }
                 if (this._isVertical()) {
                     var longestTextWidth = Math.max(text0Width, text1Width);
-                    swatchWidth = Math.max(this.width() - 2 * padding - textPadding - longestTextWidth, 0);
+                    swatchWidth = Math.max(this.width() - padding - 2 * textPadding - longestTextWidth, 0);
                     swatchHeight = Math.max(this.height() / numSwatches, 0);
                     swatchY = function (d, i) { return (numSwatches - (i + 1)) * swatchHeight; };
                     upperWriteOptions.yAlign = "top";
@@ -5848,7 +5848,7 @@ var Plottable;
                     lowerWriteOptions.yAlign = "bottom";
                     lowerLabelShift.y = 0;
                     if (this._orientation === "left") {
-                        swatchX = function (d, i) { return padding + longestTextWidth + textPadding; };
+                        swatchX = function (d, i) { return textPadding + longestTextWidth + textPadding; };
                         upperWriteOptions.xAlign = "right";
                         upperLabelShift.x = -(padding + swatchWidth + textPadding);
                         lowerWriteOptions.xAlign = "right";
