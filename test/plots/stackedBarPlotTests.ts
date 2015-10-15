@@ -85,39 +85,22 @@ describe("Plots", () => {
         let bars = stackedBarPlot.content().selectAll("rect");
 
         let d0 = stackedBarPlot.datasets()[0].data()[0];
-        let d0Px = {
+        let d0Point = {
           x: xScale.scale(d0.x),
           y: yScale.scale(d0.y)
         };
 
         let d1 = stackedBarPlot.datasets()[1].data()[0];
-        let d1Px = {
+        let d1Point = {
           x: xScale.scale(d1.x),
           y: yScale.scale(d0.y + d1.y)
         };
 
-        let expected: Plottable.Plots.PlotEntity = {
-          datum: d0,
-          index: 0,
-          dataset: stackedBarPlot.datasets()[0],
-          position: d0Px,
-          selection: d3.selectAll([bars[0][0]]),
-          component: stackedBarPlot
-        };
+        let closestEntity = stackedBarPlot.entityNearest({ x: 0, y: d0Point.y + 1 });
+        assert.strictEqual(closestEntity.datum, d0, "bottom bar is closest when within its range");
 
-        let closest = stackedBarPlot.entityNearest({ x: 0, y: d0Px.y + 1 });
-        TestMethods.assertPlotEntitiesEqual(closest, expected, "bottom bar is closest when within its range");
-
-        expected = {
-          datum: d1,
-          index: 0,
-          dataset: stackedBarPlot.datasets()[1],
-          position: d1Px,
-          selection: d3.selectAll([bars[0][2]]),
-          component: stackedBarPlot
-        };
-        closest = stackedBarPlot.entityNearest({ x: 0, y: d0Px.y - 1 });
-        TestMethods.assertPlotEntitiesEqual(closest, expected, "top bar is closest when within its range");
+        closestEntity = stackedBarPlot.entityNearest({ x: 0, y: d0Point.y - 1 });
+        assert.strictEqual(closestEntity.datum, d1, "top bar is closest when within its range");
 
         svg.remove();
       });
