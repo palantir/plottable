@@ -122,21 +122,20 @@ export module Plots {
     }
 
     protected _createDrawer(dataset: Dataset) {
-      return new Plottable.Drawers.Area(dataset);
+      return new Plottable.Drawers.Area(dataset)
+        .initializer(this._areaInitializer.bind(this));
     }
 
+    private _areaInitializer() {
+      let attrToProjector = this._generateAttrToProjector();
+      attrToProjector["d"] = this._constructAreaProjector(Plot._scaledAccessor(this.x()),
+        this._getResetYFunction(),
+        Plot._scaledAccessor(this.y0()));
+      return attrToProjector;
+    }
     protected _generateDrawSteps(): Drawers.DrawStep[] {
       let drawSteps: Drawers.DrawStep[] = [];
-      if (this._animateOnNextRender()) {
-        let attrToProjector = this._generateAttrToProjector();
-        attrToProjector["d"] = this._constructAreaProjector(Plot._scaledAccessor(this.x()),
-                                                            this._getResetYFunction(),
-                                                            Plot._scaledAccessor(this.y0()));
-        drawSteps.push({attrToProjector: attrToProjector, animator: this._getAnimator(Plots.Animator.RESET)});
-      }
-
       drawSteps.push({attrToProjector: this._generateAttrToProjector(), animator: this._getAnimator(Plots.Animator.MAIN)});
-
       return drawSteps;
     }
 

@@ -9,12 +9,14 @@ export module Animators {
     private _startAttrs: AttributeToAppliedProjector;
     private _endAttrs: AttributeToAppliedProjector;
 
-    public animate(selection: d3.Selection<any>, attrToAppliedProjector: AttributeToAppliedProjector, drawingTarget?: Drawers.DrawingTarget): d3.Selection<any> | d3.Transition<any> {
+    public animate(selection: d3.Selection<any>,
+      attrToAppliedProjector: AttributeToAppliedProjector
+      , drawingTarget?: Drawers.DrawingTarget): d3.Selection<any> | d3.Transition<any> {
 
       // first make the attr to apply to the enter selection before transition
       // this is attrToAppliedProjector + _start
       let startProjector: AttributeToAppliedProjector = this.mergeAttrs(attrToAppliedProjector, this.startAttrs());
-      let endProjector: AttributeToAppliedProjector = this.endAttrs()||this.startAttrs();
+      let endProjector: AttributeToAppliedProjector = this.endAttrs() || this.startAttrs();
       drawingTarget.enter = this.getTransition(drawingTarget.enter, 0)
         .attr(startProjector);
 
@@ -54,13 +56,13 @@ export module Animators {
      */
     public endAttrs(): AttributeToAppliedProjector;
     /**
-      * Sets the attributes for entering elements. 
-      *
-      * @param {endAttrs} A collection of attribuets applied to entering elements.
-      * These are applied over the top of the attributes pass to the animate method
-      * Any attribute passed to endAttrs will transition to its final value
-      * @returns {Attr} The calling Attr Animator.
-    */
+     * Sets the attributes for entering elements. 
+     *
+     * @param {endAttrs} A collection of attribuets applied to entering elements.
+     * These are applied over the top of the attributes pass to the animate method
+     * Any attribute passed to endAttrs will transition to its final value
+     * @returns {Attr} The calling Attr Animator.
+     */
     public endAttrs(endAttrs: AttributeToAppliedProjector): Attr;
     public endAttrs(endAttrs?: AttributeToAppliedProjector): any {
       if (endAttrs == null) {

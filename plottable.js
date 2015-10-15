@@ -3,7 +3,13 @@ Plottable 1.15.0 (https://github.com/palantir/plottable)
 Copyright 2014-2015 Palantir Technologies
 Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
 */
-//# sourceURL=plottable.js
+// include bind polyfill since bind is not supported in phantomjs versions 1.x.x
+Function.prototype.bind = Function.prototype.bind ||
+function (b) {
+    if (typeof this !== "function") {
+        throw new TypeError("Function.prototype.bind - what is trying to be bound is not callable");
+    } var a = Array.prototype.slice, f = a.call(arguments, 1), e = this, c = function () { }, d = function () { return e.apply(this instanceof c ? this : b || window, f.concat(a.call(arguments))); }; c.prototype = this.prototype; d.prototype = new c(); return d;
+};
 (function(root, factory) {
     if(typeof exports === 'object') {
         module.exports = factory(require, exports, module);
@@ -2580,6 +2586,7 @@ var Plottable;
         function Drawer(dataset) {
             this._cachedSelectionValid = false;
             this._dataset = dataset;
+            this._initializer = function () { return {}; };
         }
         Drawer.prototype.renderArea = function (area) {
             if (area == null) {
@@ -2587,6 +2594,13 @@ var Plottable;
             }
             this._renderArea = area;
             this._cachedSelectionValid = false;
+            return this;
+        };
+        Drawer.prototype.initializer = function (fnattrToAppliedProjector) {
+            if (fnattrToAppliedProjector == null) {
+                return this._initializer;
+            }
+            this._initializer = fnattrToAppliedProjector;
             return this;
         };
         /**
@@ -2620,7 +2634,8 @@ var Plottable;
                 merge: null
             };
             this._drawingTarget.enter = dataElements.enter()
-                .append(this._svgElementName);
+                .append(this._svgElementName)
+                .attr(this.initializer()());
             this._drawingTarget.exit = dataElements.exit(); // the animator becomes responsbile for reomving these
             this._drawingTarget.merge = dataElements; // after enter() is called, this contains new elements
             this._applyDefaultAttributes(dataElements);
@@ -8198,7 +8213,8 @@ var Plottable;
                 return this;
             };
             Bar.prototype._createDrawer = function (dataset) {
-                return new Plottable.Drawers.Rectangle(dataset);
+                return new Plottable.Drawers.Rectangle(dataset)
+                    .initializer(this._initializer.bind(this));
             };
             Bar.prototype._setup = function () {
                 _super.prototype._setup.call(this);
@@ -8598,6 +8614,16 @@ var Plottable;
                 var labelTooWide = data.map(drawLabel);
                 return labelTooWide.some(function (d) { return d; });
             };
+            Bar.prototype._initializer = function () {
+                var resetAttrToProjector = this._generateAttrToProjector();
+                var primaryScale = this._isVertical ? this.y().scale : this.x().scale;
+                var scaledBaseline = primaryScale.scale(this.baselineValue());
+                var positionAttr = this._isVertical ? "y" : "x";
+                var dimensionAttr = this._isVertical ? "height" : "width";
+                resetAttrToProjector[positionAttr] = function () { return scaledBaseline; };
+                resetAttrToProjector[dimensionAttr] = function () { return 0; };
+                return resetAttrToProjector;
+            };
             Bar.prototype._generateDrawSteps = function () {
                 var drawSteps = [];
                 drawSteps.push({ attrToProjector: this._generateAttrToProjector(), animator: this._getAnimator(Plots.Animator.MAIN) });
@@ -8824,7 +8850,8 @@ var Plottable;
                 return this;
             };
             Line.prototype._createDrawer = function (dataset) {
-                return new Plottable.Drawers.Line(dataset);
+                return new Plottable.Drawers.Line(dataset)
+                    .initializer(this._initializer.bind(this));
             };
             Line.prototype._extentsForProperty = function (property) {
                 var extents = _super.prototype._extentsForProperty.call(this, property);
@@ -8938,13 +8965,16 @@ var Plottable;
                 var scaledStartValue = this.y().scale.scale(startValue);
                 return function (d, i, dataset) { return scaledStartValue; };
             };
+            /**
+             * function returning getAttrToProjector
+             */
+            Line.prototype._initializer = function () {
+                var attrToProjector = this._generateAttrToProjector();
+                attrToProjector["d"] = this._constructLineProjector(Plottable.Plot._scaledAccessor(this.x()), this._getResetYFunction());
+                return attrToProjector;
+            };
             Line.prototype._generateDrawSteps = function () {
                 var drawSteps = [];
-                if (this._animateOnNextRender()) {
-                    var attrToProjector = this._generateAttrToProjector();
-                    attrToProjector["d"] = this._constructLineProjector(Plottable.Plot._scaledAccessor(this.x()), this._getResetYFunction());
-                    drawSteps.push({ attrToProjector: attrToProjector, animator: this._getAnimator(Plots.Animator.RESET) });
-                }
                 drawSteps.push({ attrToProjector: this._generateAttrToProjector(), animator: this._getAnimator(Plots.Animator.MAIN) });
                 return drawSteps;
             };
@@ -9219,15 +9249,16 @@ var Plottable;
                 return lineAttrToProjector;
             };
             Area.prototype._createDrawer = function (dataset) {
-                return new Plottable.Drawers.Area(dataset);
+                return new Plottable.Drawers.Area(dataset)
+                    .initializer(this._areaInitializer.bind(this));
+            };
+            Area.prototype._areaInitializer = function () {
+                var attrToProjector = this._generateAttrToProjector();
+                attrToProjector["d"] = this._constructAreaProjector(Plottable.Plot._scaledAccessor(this.x()), this._getResetYFunction(), Plottable.Plot._scaledAccessor(this.y0()));
+                return attrToProjector;
             };
             Area.prototype._generateDrawSteps = function () {
                 var drawSteps = [];
-                if (this._animateOnNextRender()) {
-                    var attrToProjector = this._generateAttrToProjector();
-                    attrToProjector["d"] = this._constructAreaProjector(Plottable.Plot._scaledAccessor(this.x()), this._getResetYFunction(), Plottable.Plot._scaledAccessor(this.y0()));
-                    drawSteps.push({ attrToProjector: attrToProjector, animator: this._getAnimator(Plots.Animator.RESET) });
-                }
                 drawSteps.push({ attrToProjector: this._generateAttrToProjector(), animator: this._getAnimator(Plots.Animator.MAIN) });
                 return drawSteps;
             };
@@ -10155,11 +10186,14 @@ var Plottable;
         }
         EasingFunctions.squEase = function (easingFunction, end, start) {
             return function (t) {
-                if (start === undefined)
+                if (start === undefined) {
                     start = 0;
+                }
+                ;
                 var tbar;
-                if (t < start)
+                if (t < start) {
                     tbar = 0;
+                }
                 else {
                     if (t > end) {
                         tbar = 1;
@@ -10175,8 +10209,10 @@ var Plottable;
             return 1;
         };
         EasingFunctions.atEnd = function (t) {
-            if (t < 1)
+            if (t < 1) {
                 return 0;
+            }
+            ;
             return 1;
         };
         return EasingFunctions;
@@ -10228,8 +10264,9 @@ var Plottable;
              */
             Base.prototype.getTransition = function (selection, duration, delay, easing) {
                 // if the duration is 0, just return the selection
-                if (duration === 0)
+                if (duration === 0) {
                     return selection;
+                }
                 easing = easing || this.easingMode();
                 if (this.isTransition(selection) || delay === undefined) {
                     // if the selection is already a transition, create a new transition, but let d3 supply the default
@@ -10270,12 +10307,14 @@ var Plottable;
              *
              */
             Base.prototype.pluckAttrs = function (attr, names) {
-                //let out = 
-                return attr;
+                var result = {};
+                names.forEach(function (name) {
+                    result[name] = attr[name];
+                });
+                return result;
             };
             Base.prototype.delay = function (selection) {
                 var _this = this;
-                var dom = selection[0];
                 var numberOfSteps = selection[0].length;
                 var adjustedIterativeDelay = this._getAdjustedIterativeDelay(numberOfSteps);
                 return function (d, i) { return _this.startDelay() + adjustedIterativeDelay * i; };
@@ -10432,20 +10471,16 @@ var Plottable;
     var Animators;
     (function (Animators) {
         /**
-          * Base for animators that animate specific attributes, such as Opacity, height... .
-          */
+         * Base for animators that animate specific attributes, such as Opacity, height... .
+         */
         var Bar = (function (_super) {
             __extends(Bar, _super);
             function Bar() {
                 _super.call(this);
-                var proj = {
-                    height: 0,
-                    y: function () { return this.yScale().scale(0); }
-                };
             }
+            ;
             Bar.prototype.animate = function (selection, attrToAppliedProjector, drawingTarget) {
                 var yScale = this.yScale();
-                var xScale = this.xScale();
                 var proj = {
                     height: function () { return 0; },
                     y: function (d, i) { return yScale.scale(0); }
@@ -10464,15 +10499,6 @@ var Plottable;
                     height: attrToAppliedProjector["height"],
                     y: attrToAppliedProjector["y"]
                 };
-                //drawingTarget.update = this.getTransition(drawingTarget.update, exitStageDuration, undefined, Plottable.EasingFunctions.atEnd)
-                //  .attr({ "opacity": .6 });
-                //drawingTarget.update = this.getTransition(drawingTarget.update, updateStageDuration, undefined, squeezer)
-                //  .attr(proj2);
-                //var proj3: AttributeToAppliedProjector = this.mergeAttrs(attrToAppliedProjector, { "opacity": () => { return .6; } });
-                //drawingTarget.update = this.getTransition(drawingTarget.update, updateStageDuration, undefined, squeezer)
-                //  .attr(proj3);
-                //drawingTarget.update = this.getTransition(drawingTarget.update, 50)
-                //  .attr(attrToAppliedProjector);
                 drawingTarget.update = this.getTransition(drawingTarget.update, exitStageDuration);
                 drawingTarget.update = this.getTransition(drawingTarget.update, updateStageDuration, undefined, squeezer)
                     .attr(proj2);

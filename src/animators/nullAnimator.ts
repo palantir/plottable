@@ -10,7 +10,8 @@ export module Animators {
     public totalTime(selection: any) {
       return 0;
     }
-    public animate(selection: d3.Selection<any>, attrToAppliedProjector: AttributeToAppliedProjector, drawingTarget?: Drawers.DrawingTarget): d3.Selection<any> | d3.Transition<any> {
+    public animate(selection: d3.Selection<any>,
+      attrToAppliedProjector: AttributeToAppliedProjector, drawingTarget?: Drawers.DrawingTarget): d3.Selection<any> | d3.Transition<any> {
 
       if (drawingTarget) {
         drawingTarget.exit

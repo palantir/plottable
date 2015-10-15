@@ -60,7 +60,7 @@
               drawingTarget.merge = this.getTransition(drawingTarget.merge, this.stepDuration(),
                 (d: any, i: number) => this.startDelay() + adjustedIterativeDelay * i)
                 .attr(attrToAppliedProjector);
-            
+          
               // remove the exiting elements
               drawingTarget.exit
                 .remove();
@@ -73,27 +73,28 @@
              * without applying a transition if durection = 0
              *
              */
-            protected getTransition(selection: d3.Selection<any>|d3.Transition<any>|d3.selection.Update<any>, duration: number, delay?: (d: any, i: number) => number, easing?: any): any {
-                // if the duration is 0, just return the selection
-                if (duration === 0)
+            protected getTransition(selection: d3.Selection<any>|d3.Transition<any>|d3.selection.Update<any>,
+              duration: number, delay?: (d: any, i: number) => number, easing?: any): any {
+              // if the duration is 0, just return the selection
+              if (duration === 0) {
                 return selection;
+              }
+              easing = easing || this.easingMode();
+              if (this.isTransition(selection) || delay === undefined) {
+              // if the selection is already a transition, create a new transition, but let d3 supply the default
+              // delay, that way they will "chain"
+                return selection.transition()
+                  .ease(easing)
+                  .duration(duration);
 
-                easing = easing || this.easingMode();
-                if (this.isTransition(selection) || delay === undefined) {
-                // if the selection is already a transition, create a new transition, but let d3 supply the default
-                // delay, that way they will "chain"
-                  return selection.transition()
-                    .ease(easing)
-                    .duration(duration);
+              } else {
+              // otherwise is the selection is NOT a transition, create a new transition setting up the delay
+                return selection.transition()
+                  .ease(easing)
+                  .duration(duration)
+                  .delay(delay);
 
-                } else {
-                // otherwise is the selection is NOT a transition, create a new transition setting up the delay
-                  return selection.transition()
-                    .ease(easing)
-                    .duration(duration)
-                    .delay(delay);
-
-                }
+              }
             }
 
             /**
@@ -121,12 +122,14 @@
              *
              */
             protected pluckAttrs(attr: AttributeToAppliedProjector, names: string[]): AttributeToAppliedProjector {
-              //let out = 
-              return attr;
+              let result: AttributeToAppliedProjector = {};
+              names.forEach((name: string) => {
+                result[name] = attr[name];
+              });
+              return result;
             }
 
             protected delay(selection: any): (d: any, i: number) => number {
-              let dom: any[] = selection[0];
               let numberOfSteps: number = selection[0].length;
               let adjustedIterativeDelay: number = this._getAdjustedIterativeDelay(numberOfSteps);
 

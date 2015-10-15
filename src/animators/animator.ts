@@ -4,22 +4,25 @@ export class EasingFunctions {
     return 1;
   };
   public static atEnd = (t: number) => {
-    if (t < 1) return 0;
+    if (t < 1) {
+      return 0;
+    };
     return 1;
   };
   public static squEase(easingFunction: string, end: number, start?: number) {
     return (t: number) => {
-      if (start === undefined) start = 0;
+      if (start === undefined) {
+        start = 0;
+      };
       let tbar: number;
-      if (t < start)
+      if (t < start) {
         tbar = 0;
-      else {
+      } else {
         if (t > end) {
           tbar = 1;
         } else {
           tbar = (t - start) / (end - start);
         }
-
         return d3.ease(easingFunction)(tbar);
       }
     };
@@ -36,7 +39,8 @@ export interface Animator {
    *     transition object so that plots may chain the transitions between
    *     animators.
    */
-  animate(selection: d3.Selection<any>, attrToAppliedProjector: AttributeToAppliedProjector, drawingTarget?: Drawers.DrawingTarget): d3.Selection<any> | d3.Transition<any>;
+  animate(selection: d3.Selection<any>, attrToAppliedProjector: AttributeToAppliedProjector,
+    drawingTarget?: Drawers.DrawingTarget): d3.Selection<any> | d3.Transition<any>;
 
   /**
    * Given the number of elements, return the total time the animation requires

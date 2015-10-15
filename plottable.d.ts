@@ -1297,10 +1297,10 @@ declare module Plottable {
          * DrawingTarget is contructed by Drawer, and passed to animators to allow rich animation of each selection
          */
         type DrawingTarget = {
-            enter: d3.Selection<any> | d3.Transition<any>;
-            update: d3.selection.Update<any> | d3.Transition<any>;
-            exit: d3.Selection<any> | d3.Transition<any>;
-            merge: d3.Selection<any> | d3.Transition<any>;
+            enter?: d3.Selection<any> | d3.Transition<any>;
+            update?: d3.selection.Update<any> | d3.Transition<any>;
+            exit?: d3.Selection<any> | d3.Transition<any>;
+            merge: d3.Selection<any> | d3.Transition<any> | d3.Selection<void>;
         };
     }
     class Drawer {
@@ -1311,6 +1311,7 @@ declare module Plottable {
         private _cachedSelectionValid;
         private _cachedSelection;
         private _drawingTarget;
+        private _initializer;
         /**
          * A Drawer draws svg elements based on the input Dataset.
          *
@@ -1329,6 +1330,21 @@ declare module Plottable {
          * @returns {Drawer} The calling Drawer.
          */
         renderArea(area: d3.Selection<void>): Drawer;
+        /**
+         * Retieves a function that can supply initial settings to entering elements.
+         * this function is typically supplied by the plot using the Drawer
+         */
+        initializer(): () => AttributeToAppliedProjector;
+        /**
+         * Sets the initializer function for the Drawer.
+         * This function returns an AttributeToAppliedProjector that is applied
+         * to the new elements appended to the enter() selection
+         * Typically set from _createDrawer in the plot
+         *
+         * @param {() => AttributeToAppliedProjector} the function.
+         * @returns {Drawer} The calling Drawer.
+         */
+        initializer(fnattrToAppliedProjector: () => AttributeToAppliedProjector): Drawer;
         /**
          * Removes the Drawer and its renderArea
          */
@@ -3536,7 +3552,7 @@ declare module Plottable {
              */
             orientation(): string;
             render(): Bar<X, Y>;
-            protected _createDrawer(dataset: Dataset): Drawers.Rectangle;
+            protected _createDrawer(dataset: Dataset): Drawer;
             protected _setup(): void;
             /**
              * Gets the baseline value.
@@ -3632,6 +3648,7 @@ declare module Plottable {
             protected _extentsForProperty(property: string): any[];
             private _drawLabels();
             private _drawLabel(data, dataset);
+            private _initializer();
             protected _generateDrawSteps(): Drawers.DrawStep[];
             protected _generateAttrToProjector(): {
                 [attr: string]: (datum: any, index: number, dataset: Dataset) => any;
@@ -3739,6 +3756,10 @@ declare module Plottable {
             protected _extentsForProperty(property: string): any[];
             private _getEdgeIntersectionPoints();
             protected _getResetYFunction(): (d: any, i: number, dataset: Dataset) => number;
+            /**
+             * function returning getAttrToProjector
+             */
+            private _initializer();
             protected _generateDrawSteps(): Drawers.DrawStep[];
             protected _generateAttrToProjector(): {
                 [attr: string]: (datum: any, index: number, dataset: Dataset) => any;
@@ -3793,7 +3814,8 @@ declare module Plottable {
             protected _additionalPaint(): void;
             private _generateLineDrawSteps();
             private _generateLineAttrToProjector();
-            protected _createDrawer(dataset: Dataset): Drawers.Area;
+            protected _createDrawer(dataset: Dataset): Drawer;
+            private _areaInitializer();
             protected _generateDrawSteps(): Drawers.DrawStep[];
             protected _updateYScale(): void;
             protected _getResetYFunction(): Accessor<any>;
@@ -4376,13 +4398,13 @@ declare module Plottable {
              */
             endAttrs(): AttributeToAppliedProjector;
             /**
-              * Sets the attributes for entering elements.
-              *
-              * @param {endAttrs} A collection of attribuets applied to entering elements.
-              * These are applied over the top of the attributes pass to the animate method
-              * Any attribute passed to endAttrs will transition to its final value
-              * @returns {Attr} The calling Attr Animator.
-            */
+             * Sets the attributes for entering elements.
+             *
+             * @param {endAttrs} A collection of attribuets applied to entering elements.
+             * These are applied over the top of the attributes pass to the animate method
+             * Any attribute passed to endAttrs will transition to its final value
+             * @returns {Attr} The calling Attr Animator.
+             */
             endAttrs(endAttrs: AttributeToAppliedProjector): Attr;
         }
     }
@@ -4390,8 +4412,8 @@ declare module Plottable {
 declare module Plottable {
     module Animators {
         /**
-          * Base for animators that animate specific attributes, such as Opacity, height... .
-          */
+         * Base for animators that animate specific attributes, such as Opacity, height... .
+         */
         class Bar extends Attr implements Animator {
             constructor();
             animate(selection: d3.Selection<any>, attrToAppliedProjector: AttributeToAppliedProjector, drawingTarget?: Drawers.DrawingTarget): d3.Selection<any> | d3.Transition<any>;

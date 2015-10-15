@@ -23,10 +23,10 @@ export module Drawers {
    * DrawingTarget is contructed by Drawer, and passed to animators to allow rich animation of each selection
    */
   export type DrawingTarget = {
-    enter: d3.Selection<any>|d3.Transition<any>,  // new data elements current not bound to a DOM element
-    update: d3.selection.Update<any>|d3.Transition<any>, // data elements currently bound to a DOM element still in the data set
-    exit: d3.Selection<any>|d3.Transition<any>,   // DOM elements bound to a datum that is no longer in the data set
-    merge: d3.Selection<any>|d3.Transition<any>   // enter and update combined
+    enter?: d3.Selection<any>|d3.Transition<any>,  // new data elements current not bound to a DOM element
+    update?: d3.selection.Update<any>|d3.Transition<any>, // data elements currently bound to a DOM element still in the data set
+    exit?: d3.Selection<any>|d3.Transition<any>,   // DOM elements bound to a datum that is no longer in the data set
+    merge: d3.Selection<any>|d3.Transition<any>|d3.Selection<void>   // enter and update combined
   };
 }
 
@@ -40,6 +40,7 @@ export class Drawer {
   private _cachedSelection: d3.Selection<any>;
 
   private _drawingTarget: Drawers.DrawingTarget;
+  private _initializer: () => AttributeToAppliedProjector;
 
   /**
    * A Drawer draws svg elements based on the input Dataset.
@@ -49,6 +50,7 @@ export class Drawer {
    */
   constructor(dataset: Dataset) {
     this._dataset = dataset;
+    this._initializer = () => <AttributeToAppliedProjector>{};
   }
 
   /**
@@ -71,6 +73,28 @@ export class Drawer {
     return this;
   }
 
+  /**
+   * Retieves a function that can supply initial settings to entering elements.
+   * this function is typically supplied by the plot using the Drawer
+   */
+  public initializer(): () => AttributeToAppliedProjector;
+  /**
+   * Sets the initializer function for the Drawer.
+   * This function returns an AttributeToAppliedProjector that is applied
+   * to the new elements appended to the enter() selection
+   * Typically set from _createDrawer in the plot
+   *
+   * @param {() => AttributeToAppliedProjector} the function.
+   * @returns {Drawer} The calling Drawer.
+   */
+  public initializer(fnattrToAppliedProjector: () => AttributeToAppliedProjector): Drawer;
+  public initializer(fnattrToAppliedProjector?: () => AttributeToAppliedProjector): any {
+    if (fnattrToAppliedProjector == null) {
+      return this._initializer;
+    }
+    this._initializer = fnattrToAppliedProjector;
+    return this;
+  }
   /**
    * Removes the Drawer and its renderArea
    */
@@ -102,7 +126,8 @@ export class Drawer {
       merge: null
     };
     this._drawingTarget.enter = dataElements.enter()
-      .append(this._svgElementName);
+      .append(this._svgElementName)
+      .attr(this.initializer()());
     this._drawingTarget.exit = dataElements.exit();   // the animator becomes responsbile for reomving these
     this._drawingTarget.merge = dataElements;   // after enter() is called, this contains new elements
     this._applyDefaultAttributes(dataElements);

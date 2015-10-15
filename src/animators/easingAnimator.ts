@@ -50,7 +50,8 @@ export module Animators {
       return this.startDelay() + adjustedIterativeDelay * (Math.max(numberOfSteps - 1, 0)) + this.stepDuration();
     }
 
-    public animate(selection: d3.Selection<any>, attrToAppliedProjector: AttributeToAppliedProjector, drawingTarget?: Drawers.DrawingTarget) {
+    public animate(selection: d3.Selection<any>,
+      attrToAppliedProjector: AttributeToAppliedProjector, drawingTarget?: Drawers.DrawingTarget) {
 
       if (drawingTarget) {
         let numberOfSteps: number = (<any>drawingTarget.merge)[0].length;
