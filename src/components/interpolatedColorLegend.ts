@@ -173,8 +173,8 @@ export module Components {
         desiredHeight = numSwatches * textHeight;
       } else {
         desiredHeight = padding + textHeight + padding;
-        desiredWidth = labelWidths[0] + numSwatches * textHeight
-                       + labelWidths[1];
+        desiredWidth = this._textPadding + labelWidths[0] + numSwatches * textHeight
+                       + labelWidths[1] + this._textPadding;
       }
 
       return {
@@ -266,15 +266,15 @@ export module Components {
         boundingBoxAttr["height"] = numSwatches * swatchHeight;
       } else { // horizontal
         padding = Math.max(textPadding, (this.height() - textHeight) / 2);
-        swatchWidth = Math.max( ((this.width() - 2 * textPadding - text0Width - text1Width) / numSwatches), 0);
+        swatchWidth = Math.max( ((this.width() - 4 * textPadding - text0Width - text1Width) / numSwatches), 0);
         swatchHeight = Math.max( (this.height() - 2 * padding), 0);
-        swatchX = (d: any, i: number) => (text0Width + textPadding) + i * swatchWidth;
+        swatchX = (d: any, i: number) => (text0Width + 2 * textPadding) + i * swatchWidth;
         swatchY = (d: any, i: number) => padding;
 
         upperWriteOptions.xAlign = "right";
-        upperLabelShift.x = 0;
+        upperLabelShift.x = -textPadding;
         lowerWriteOptions.xAlign = "left";
-        lowerLabelShift.x = 0;
+        lowerLabelShift.x = textPadding;
 
         boundingBoxAttr["y"] = padding;
         boundingBoxAttr["width"] = numSwatches * swatchWidth;

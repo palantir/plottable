@@ -5786,8 +5786,8 @@ var Plottable;
                 }
                 else {
                     desiredHeight = padding + textHeight + padding;
-                    desiredWidth = labelWidths[0] + numSwatches * textHeight
-                        + labelWidths[1];
+                    desiredWidth = this._textPadding + labelWidths[0] + numSwatches * textHeight
+                        + labelWidths[1] + this._textPadding;
                 }
                 return {
                     minWidth: desiredWidth,
@@ -5867,14 +5867,14 @@ var Plottable;
                 }
                 else {
                     padding = Math.max(textPadding, (this.height() - textHeight) / 2);
-                    swatchWidth = Math.max(((this.width() - 2 * textPadding - text0Width - text1Width) / numSwatches), 0);
+                    swatchWidth = Math.max(((this.width() - 4 * textPadding - text0Width - text1Width) / numSwatches), 0);
                     swatchHeight = Math.max((this.height() - 2 * padding), 0);
-                    swatchX = function (d, i) { return (text0Width + textPadding) + i * swatchWidth; };
+                    swatchX = function (d, i) { return (text0Width + 2 * textPadding) + i * swatchWidth; };
                     swatchY = function (d, i) { return padding; };
                     upperWriteOptions.xAlign = "right";
-                    upperLabelShift.x = 0;
+                    upperLabelShift.x = -textPadding;
                     lowerWriteOptions.xAlign = "left";
-                    lowerLabelShift.x = 0;
+                    lowerLabelShift.x = textPadding;
                     boundingBoxAttr["y"] = padding;
                     boundingBoxAttr["width"] = numSwatches * swatchWidth;
                     boundingBoxAttr["height"] = swatchHeight;
