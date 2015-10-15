@@ -2605,7 +2605,7 @@ var Plottable;
         Drawer.prototype._bindSelectionData = function (data) {
             // if the dataset has a key, use it when binding the data   
             var dataElements;
-            if (this._dataset && this._dataset.keyFunction()) {
+            if (this._dataset) {
                 dataElements = this.selection().data(data, this._dataset.keyFunction());
             }
             else {
