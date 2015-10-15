@@ -2192,7 +2192,7 @@ declare module Plottable {
              */
             private _measureTicks(axisWidth, axisHeight, scale, ticks);
             renderImmediately(): Category;
-            computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number): Axis<string>;
+            computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number): Category;
         }
     }
 }
