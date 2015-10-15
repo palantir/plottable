@@ -125,127 +125,172 @@ describe("Tables", () => {
     });
   });
 
-  it("basic table with 2 rows 2 cols lays out properly", () => {
-    let tableAndcomponents = generateBasicTable(2, 2);
-    let table = tableAndcomponents.table;
-    let components = tableAndcomponents.components;
-
-    let svg = TestMethods.generateSVG();
-    table.renderTo(svg);
-
-    let elements = components.map((r) => (<any> r)._element);
-    let translates = elements.map((e) => TestMethods.getTranslate(e));
-    assert.deepEqual(translates[0], [0, 0], "first element is centered at origin");
-    assert.deepEqual(translates[1], [200, 0], "second element is located properly");
-    assert.deepEqual(translates[2], [0, 200], "third element is located properly");
-    assert.deepEqual(translates[3], [200, 200], "fourth element is located properly");
-    let bboxes = elements.map((e) => Plottable.Utils.DOM.elementBBox(e));
-    bboxes.forEach((b) => {
-      assert.strictEqual(b.width, 200, "bbox is 200 pixels wide");
-      assert.strictEqual(b.height, 200, "bbox is 200 pixels tall");
-      });
-    svg.remove();
-  });
-
-  it("table with 2 rows 2 cols and margin/padding lays out properly", () => {
-    let tableAndcomponents = generateBasicTable(2, 2);
-    let table = tableAndcomponents.table;
-    let components = tableAndcomponents.components;
-    table.rowPadding(5).columnPadding(5);
-
-    let svg = TestMethods.generateSVG(415, 415);
-    table.renderTo(svg);
-
-    let elements = components.map((r) => (<any> r)._element);
-    let translates = elements.map((e) => TestMethods.getTranslate(e));
-    let bboxes = elements.map((e) => Plottable.Utils.DOM.elementBBox(e));
-    assert.deepEqual(translates[0], [0, 0], "first element is centered properly");
-    assert.deepEqual(translates[1], [210, 0], "second element is located properly");
-    assert.deepEqual(translates[2], [0, 210], "third element is located properly");
-    assert.deepEqual(translates[3], [210, 210], "fourth element is located properly");
-    bboxes.forEach((b) => {
-      assert.strictEqual(b.width, 205, "bbox is 205 pixels wide");
-      assert.strictEqual(b.height, 205, "bbox is 205 pixels tall");
-      });
-    svg.remove();
-  });
-
-  it("table with fixed-size objects on every side lays out properly", () => {
-    let svg = TestMethods.generateSVG();
+  describe("remove()", () => {
+    let c1 = new Plottable.Component();
+    let c2 = new Plottable.Component();
+    let c3 = new Plottable.Component();
     let c4 = new Plottable.Component();
-    // [0 1 2] \\
-    // [3 4 5] \\
-    // [6 7 8] \\
-    // give the axis-like objects a minimum
-    let c1 = TestMethods.makeFixedSizeComponent(null, 30);
-    let c7 = TestMethods.makeFixedSizeComponent(null, 30);
-    let c3 = TestMethods.makeFixedSizeComponent(50, null);
-    let c5 = TestMethods.makeFixedSizeComponent(50, null);
-    let table = new Plottable.Components.Table([
-      [null, c1, null],
-      [c3, c4, c5],
-      [null, c7, null]]);
+    let c5 = new Plottable.Component();
+    let c6 = new Plottable.Component();
+    let table: Plottable.Components.Table;
 
-    let components = [c1, c3, c4, c5, c7];
+    it("removes the specified Component", () => {
+      table = new Plottable.Components.Table([[c1, c2], [c3, c4], [c5, c6]]);
+      table.remove(c4);
+      assertTableRows(table, [[c1, c2], [c3, null], [c5, c6]], "the requested element was removed");
+      assert.isNull(c4.parent(), "Component disconnected from the Table");
+    });
 
-    table.renderTo(svg);
+    it("does nothing when component is not found", () => {
+      table = new Plottable.Components.Table([[c1, c2], [c3, c4]]);
+      table.remove(c5);
+      assertTableRows(table, [[c1, c2], [c3, c4]], "removing a nonexistent Component does not affect the table");
+    });
 
-    let elements = components.map((r) => (<any> r)._element);
-    let translates = elements.map((e) => TestMethods.getTranslate(e));
-    let bboxes = elements.map((e) => Plottable.Utils.DOM.elementBBox(e));
-    // test the translates
-    assert.deepEqual(translates[0], [50, 0] , "top axis translate");
-    assert.deepEqual(translates[4], [50, 370], "bottom axis translate");
-    assert.deepEqual(translates[1], [0, 30] , "left axis translate");
-    assert.deepEqual(translates[3], [350, 30], "right axis translate");
-    assert.deepEqual(translates[2], [50, 30] , "plot translate");
-    // test the bboxes
-    TestMethods.assertBBoxEquivalence(bboxes[0], [300, 30], "top axis bbox");
-    TestMethods.assertBBoxEquivalence(bboxes[4], [300, 30], "bottom axis bbox");
-    TestMethods.assertBBoxEquivalence(bboxes[1], [50, 340], "left axis bbox");
-    TestMethods.assertBBoxEquivalence(bboxes[3], [50, 340], "right axis bbox");
-    TestMethods.assertBBoxEquivalence(bboxes[2], [300, 340], "plot bbox");
-    svg.remove();
+    it("has no further effect when called a second time with the same Component", () => {
+      table = new Plottable.Components.Table([[c1, c2, c3], [c4, c5, c6]]);
+
+      let expectedRows = [[null, c2, c3], [c4, c5, c6]];
+
+      table.remove(c1);
+      assertTableRows(table, expectedRows, "Component was removed")
+      table.remove(c1);
+      assertTableRows(table, expectedRows, "removing Component again has no further effect");
+    });
+
+    it("removes a Component from the Table if the Component becomes detached", () => {
+      table = new Plottable.Components.Table([[c1]]);
+      c1.detach();
+      assert.isNull(table.componentAt(0, 0), "calling detach() on the Component removes it from the Table");
+      assert.isNull(c1.parent(), "Component disconnected from the Table");
+    });
   });
 
-  it("table space fixity calculates properly", () => {
-    let tableAndcomponents = generateBasicTable(3, 3);
-    let table = tableAndcomponents.table;
-    let components = tableAndcomponents.components;
-    components.forEach((c) => TestMethods.fixComponentSize(c, 10, 10));
-    assert.isTrue(table.fixedWidth(), "fixed width when all subcomponents fixed width");
-    assert.isTrue(table.fixedHeight(), "fixedHeight when all subcomponents fixed height");
-    TestMethods.fixComponentSize(components[0], null, 10);
-    assert.isFalse(table.fixedWidth(), "width not fixed when some subcomponent width not fixed");
-    assert.isTrue(table.fixedHeight(), "the height is still fixed when some subcomponent width not fixed");
-    TestMethods.fixComponentSize(components[8], 10, null);
-    TestMethods.fixComponentSize(components[0], 10, 10);
-    assert.isTrue(table.fixedWidth(), "width fixed again once no subcomponent width not fixed");
-    assert.isFalse(table.fixedHeight(), "height unfixed now that a subcomponent has unfixed height");
+  describe("requesting space", () => {
+    it("table space fixity calculates properly", () => {
+      let tableAndcomponents = generateBasicTable(3, 3);
+      let table = tableAndcomponents.table;
+      let components = tableAndcomponents.components;
+      components.forEach((c) => TestMethods.fixComponentSize(c, 10, 10));
+      assert.isTrue(table.fixedWidth(), "fixed width when all subcomponents fixed width");
+      assert.isTrue(table.fixedHeight(), "fixedHeight when all subcomponents fixed height");
+      TestMethods.fixComponentSize(components[0], null, 10);
+      assert.isFalse(table.fixedWidth(), "width not fixed when some subcomponent width not fixed");
+      assert.isTrue(table.fixedHeight(), "the height is still fixed when some subcomponent width not fixed");
+      TestMethods.fixComponentSize(components[8], 10, null);
+      TestMethods.fixComponentSize(components[0], 10, 10);
+      assert.isTrue(table.fixedWidth(), "width fixed again once no subcomponent width not fixed");
+      assert.isFalse(table.fixedHeight(), "height unfixed now that a subcomponent has unfixed height");
+    });
+
+    it("table.requestedSpace works properly", () => {
+      let c0 = new Plottable.Component();
+      let c1 = TestMethods.makeFixedSizeComponent(50, 50);
+      let c2 = TestMethods.makeFixedSizeComponent(20, 50);
+      let c3 = TestMethods.makeFixedSizeComponent(20, 20);
+
+      let table = new Plottable.Components.Table([
+        [c0, c1],
+        [c2, c3]
+      ]);
+
+      let spaceRequest = table.requestedSpace(30, 30);
+      TestMethods.verifySpaceRequest(spaceRequest, 70, 100, "1");
+
+      spaceRequest = table.requestedSpace(50, 50);
+      TestMethods.verifySpaceRequest(spaceRequest, 70, 100, "2");
+
+      spaceRequest = table.requestedSpace(90, 90);
+      TestMethods.verifySpaceRequest(spaceRequest, 70, 100, "3");
+
+      spaceRequest = table.requestedSpace(200, 200);
+      TestMethods.verifySpaceRequest(spaceRequest, 70, 100, "4");
+    });
   });
 
-  it("table.requestedSpace works properly", () => {
-    let c0 = new Plottable.Component();
-    let c1 = TestMethods.makeFixedSizeComponent(50, 50);
-    let c2 = TestMethods.makeFixedSizeComponent(20, 50);
-    let c3 = TestMethods.makeFixedSizeComponent(20, 20);
+  describe("layout of constituent Components", () => {
+    it("basic table with 2 rows 2 cols lays out properly", () => {
+      let tableAndcomponents = generateBasicTable(2, 2);
+      let table = tableAndcomponents.table;
+      let components = tableAndcomponents.components;
 
-    let table = new Plottable.Components.Table([
-      [c0, c1],
-      [c2, c3]
-    ]);
+      let svg = TestMethods.generateSVG();
+      table.renderTo(svg);
 
-    let spaceRequest = table.requestedSpace(30, 30);
-    TestMethods.verifySpaceRequest(spaceRequest, 70, 100, "1");
+      let elements = components.map((r) => (<any> r)._element);
+      let translates = elements.map((e) => TestMethods.getTranslate(e));
+      assert.deepEqual(translates[0], [0, 0], "first element is centered at origin");
+      assert.deepEqual(translates[1], [200, 0], "second element is located properly");
+      assert.deepEqual(translates[2], [0, 200], "third element is located properly");
+      assert.deepEqual(translates[3], [200, 200], "fourth element is located properly");
+      let bboxes = elements.map((e) => Plottable.Utils.DOM.elementBBox(e));
+      bboxes.forEach((b) => {
+        assert.strictEqual(b.width, 200, "bbox is 200 pixels wide");
+        assert.strictEqual(b.height, 200, "bbox is 200 pixels tall");
+        });
+      svg.remove();
+    });
 
-    spaceRequest = table.requestedSpace(50, 50);
-    TestMethods.verifySpaceRequest(spaceRequest, 70, 100, "2");
+    it("table with 2 rows 2 cols and margin/padding lays out properly", () => {
+      let tableAndcomponents = generateBasicTable(2, 2);
+      let table = tableAndcomponents.table;
+      let components = tableAndcomponents.components;
+      table.rowPadding(5).columnPadding(5);
 
-    spaceRequest = table.requestedSpace(90, 90);
-    TestMethods.verifySpaceRequest(spaceRequest, 70, 100, "3");
+      let svg = TestMethods.generateSVG(415, 415);
+      table.renderTo(svg);
 
-    spaceRequest = table.requestedSpace(200, 200);
-    TestMethods.verifySpaceRequest(spaceRequest, 70, 100, "4");
+      let elements = components.map((r) => (<any> r)._element);
+      let translates = elements.map((e) => TestMethods.getTranslate(e));
+      let bboxes = elements.map((e) => Plottable.Utils.DOM.elementBBox(e));
+      assert.deepEqual(translates[0], [0, 0], "first element is centered properly");
+      assert.deepEqual(translates[1], [210, 0], "second element is located properly");
+      assert.deepEqual(translates[2], [0, 210], "third element is located properly");
+      assert.deepEqual(translates[3], [210, 210], "fourth element is located properly");
+      bboxes.forEach((b) => {
+        assert.strictEqual(b.width, 205, "bbox is 205 pixels wide");
+        assert.strictEqual(b.height, 205, "bbox is 205 pixels tall");
+        });
+      svg.remove();
+    });
+
+    it("table with fixed-size objects on every side lays out properly", () => {
+      let svg = TestMethods.generateSVG();
+      let c4 = new Plottable.Component();
+      // [0 1 2] \\
+      // [3 4 5] \\
+      // [6 7 8] \\
+      // give the axis-like objects a minimum
+      let c1 = TestMethods.makeFixedSizeComponent(null, 30);
+      let c7 = TestMethods.makeFixedSizeComponent(null, 30);
+      let c3 = TestMethods.makeFixedSizeComponent(50, null);
+      let c5 = TestMethods.makeFixedSizeComponent(50, null);
+      let table = new Plottable.Components.Table([
+        [null, c1, null],
+        [c3, c4, c5],
+        [null, c7, null]]);
+
+      let components = [c1, c3, c4, c5, c7];
+
+      table.renderTo(svg);
+
+      let elements = components.map((r) => (<any> r)._element);
+      let translates = elements.map((e) => TestMethods.getTranslate(e));
+      let bboxes = elements.map((e) => Plottable.Utils.DOM.elementBBox(e));
+      // test the translates
+      assert.deepEqual(translates[0], [50, 0] , "top axis translate");
+      assert.deepEqual(translates[4], [50, 370], "bottom axis translate");
+      assert.deepEqual(translates[1], [0, 30] , "left axis translate");
+      assert.deepEqual(translates[3], [350, 30], "right axis translate");
+      assert.deepEqual(translates[2], [50, 30] , "plot translate");
+      // test the bboxes
+      TestMethods.assertBBoxEquivalence(bboxes[0], [300, 30], "top axis bbox");
+      TestMethods.assertBBoxEquivalence(bboxes[4], [300, 30], "bottom axis bbox");
+      TestMethods.assertBBoxEquivalence(bboxes[1], [50, 340], "left axis bbox");
+      TestMethods.assertBBoxEquivalence(bboxes[3], [50, 340], "right axis bbox");
+      TestMethods.assertBBoxEquivalence(bboxes[2], [300, 340], "plot bbox");
+      svg.remove();
+    });
   });
 
   describe("table._iterateLayout works properly", () => {
@@ -307,47 +352,6 @@ describe("Tables", () => {
       result = (<any> table)._iterateLayout(120, 120);
       // If there is extra space in a fixed-size table, the extra space should not be allocated to proportional space
       verifyLayoutResult(result, [0, 0], [0, 0], [50, 50], [50, 50], false, false, "when there's extra space");
-    });
-  });
-
-  describe("remove()", () => {
-    let c1 = new Plottable.Component();
-    let c2 = new Plottable.Component();
-    let c3 = new Plottable.Component();
-    let c4 = new Plottable.Component();
-    let c5 = new Plottable.Component();
-    let c6 = new Plottable.Component();
-    let table: Plottable.Components.Table;
-
-    it("removes the specified Component", () => {
-      table = new Plottable.Components.Table([[c1, c2], [c3, c4], [c5, c6]]);
-      table.remove(c4);
-      assertTableRows(table, [[c1, c2], [c3, null], [c5, c6]], "the requested element was removed");
-      assert.isNull(c4.parent(), "Component disconnected from the Table");
-    });
-
-    it("does nothing when component is not found", () => {
-      table = new Plottable.Components.Table([[c1, c2], [c3, c4]]);
-      table.remove(c5);
-      assertTableRows(table, [[c1, c2], [c3, c4]], "removing a nonexistent Component does not affect the table");
-    });
-
-    it("has no further effect when called a second time with the same Component", () => {
-      table = new Plottable.Components.Table([[c1, c2, c3], [c4, c5, c6]]);
-
-      let expectedRows = [[null, c2, c3], [c4, c5, c6]];
-
-      table.remove(c1);
-      assertTableRows(table, expectedRows, "Component was removed")
-      table.remove(c1);
-      assertTableRows(table, expectedRows, "removing Component again has no further effect");
-    });
-
-    it("removes a Component from the Table if the Component becomes detached", () => {
-      table = new Plottable.Components.Table([[c1]]);
-      c1.detach();
-      assert.isNull(table.componentAt(0, 0), "calling detach() on the Component removes it from the Table");
-      assert.isNull(c1.parent(), "Component disconnected from the Table");
     });
   });
 });
