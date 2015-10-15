@@ -238,8 +238,8 @@ export module Components {
       }
 
       if (this._isVertical()) {
-        padding = (this.width() - Math.max(text0Width, text1Width) - 2 * this._textPadding) / 2;
         let longestTextWidth = Math.max(text0Width, text1Width);
+        padding = (this.width() - longestTextWidth - 2 * this._textPadding) / 2;
         swatchWidth = Math.max(this.width() - padding - 2 * textPadding - longestTextWidth, 0);
         swatchHeight = Math.max(this.height() / numSwatches, 0);
         swatchY = (d: any, i: number) => (numSwatches - (i + 1)) * swatchHeight;

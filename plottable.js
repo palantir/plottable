@@ -5839,8 +5839,8 @@ var Plottable;
                     numSwatches = Math.max(Math.floor((fullLength - offset) / textHeight), numSwatches);
                 }
                 if (this._isVertical()) {
-                    padding = (this.width() - Math.max(text0Width, text1Width) - 2 * this._textPadding) / 2;
                     var longestTextWidth = Math.max(text0Width, text1Width);
+                    padding = (this.width() - longestTextWidth - 2 * this._textPadding) / 2;
                     swatchWidth = Math.max(this.width() - padding - 2 * textPadding - longestTextWidth, 0);
                     swatchHeight = Math.max(this.height() / numSwatches, 0);
                     swatchY = function (d, i) { return (numSwatches - (i + 1)) * swatchHeight; };
