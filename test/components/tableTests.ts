@@ -16,37 +16,41 @@ function generateBasicTable(nRows: number, nCols: number) {
 }
 
 describe("Tables", () => {
+  function assertTableRows(table: Plottable.Components.Table, expectedRows: Plottable.Component[][], message: string) {
+    expectedRows.forEach((row, rowIndex) => {
+      row.forEach((component, columnIndex) => {
+        assert.strictEqual(table.componentAt(rowIndex, columnIndex), component,
+          message + ` contains the correct entry at [${rowIndex}, ${columnIndex}]`);
+      });
+    });
+  }
+
   it("has the correct CSS class", () => {
     let table = new Plottable.Components.Table();
     assert.isTrue(table.hasClass("table"));
   });
 
   it("table constructor can take a list of lists of components", () => {
-    let c0 = new Plottable.Component();
-    let row1 = [null, c0];
-    let row2 = [new Plottable.Component(), null];
-    let table = new Plottable.Components.Table([row1, row2]);
-    assert.strictEqual((<any> table)._rows[0][1], c0, "the component is in the right spot");
-    let c1 = new Plottable.Component();
-    table.add(c1, 2, 2);
-    assert.strictEqual((<any> table)._rows[2][2], c1, "the inserted component went to the right spot");
+    let c00 = new Plottable.Component();
+    let c11 = new Plottable.Component();
+    let rows = [
+      [c00, null],
+      [null, c11]
+    ];
+    let table = new Plottable.Components.Table(rows);
+
+    assertTableRows(table, rows, "constructor initialized Table correctly");
   });
 
   describe("add()", () => {
     it("adds Component and pads out other empty cells with null", () => {
       let table = new Plottable.Components.Table();
-      let c1 = new Plottable.Component();
-      let c2 = new Plottable.Component();
-      table.add(c1, 0, 0);
-      table.add(c2, 1, 1);
-      let rows = (<any> table)._rows;
-      assert.lengthOf(rows, 2, "there are two rows");
-      assert.lengthOf(rows[0], 2, "two cols in first row");
-      assert.lengthOf(rows[1], 2, "two cols in second row");
-      assert.strictEqual(rows[0][0], c1, "first component added correctly");
-      assert.strictEqual(rows[1][1], c2, "second component added correctly");
-      assert.isNull(rows[0][1], "component at (0, 1) is null");
-      assert.isNull(rows[1][0], "component at (1, 0) is null");
+      let c11 = new Plottable.Component();
+      table.add(c11, 1, 1);
+      assert.strictEqual(table.componentAt(1, 1), c11, "Component was added at the correct position");
+      assert.isNull(table.componentAt(0, 0), "Table padded [0, 0] with null");
+      assert.isNull(table.componentAt(0, 1), "Table padded [0, 1] with null");
+      assert.isNull(table.componentAt(1, 0), "Table padded [1, 0] with null");
     });
 
     it("throws an Error on trying to add a Component to an occupied cell", () => {
@@ -265,33 +269,35 @@ describe("Tables", () => {
     let c5 = new Plottable.Component();
     let c6 = new Plottable.Component();
     let table: Plottable.Components.Table;
+
     it("works in basic case", () => {
       table = new Plottable.Components.Table([[c1, c2], [c3, c4], [c5, c6]]);
       table.remove(c4);
-      assert.deepEqual((<any> table)._rows, [[c1, c2], [c3, null], [c5, c6]], "remove one element");
+      assertTableRows(table, [[c1, c2], [c3, null], [c5, c6]], "the requested element was removed");
+      assert.isNull(c4.parent(), "Component disconnected from the Table");
     });
 
     it("does nothing when component is not found", () => {
       table = new Plottable.Components.Table([[c1, c2], [c3, c4]]);
       table.remove(c5);
-
-      assert.deepEqual((<any> table)._rows, [[c1, c2], [c3, c4]], "remove nonexistent component");
+      assertTableRows(table, [[c1, c2], [c3, c4]], "removing a nonexistent Component does not affect the table");
     });
 
     it("removing component twice should have same effect as removing it once", () => {
       table = new Plottable.Components.Table([[c1, c2, c3], [c4, c5, c6]]);
 
-      table.remove(c1);
-      assert.deepEqual((<any> table)._rows, [[null, c2, c3], [c4, c5, c6]], "item twice");
+      let expectedRows = [[null, c2, c3], [c4, c5, c6]];
 
       table.remove(c1);
-      assert.deepEqual((<any> table)._rows, [[null, c2, c3], [c4, c5, c6]], "item twice");
+      assertTableRows(table, expectedRows, "Component was removed")
+      table.remove(c1);
+      assertTableRows(table, expectedRows, "removing Component again has no further effect");
     });
 
     it("detach()-ing a Component removes it from the Table", () => {
       table = new Plottable.Components.Table([[c1]]);
       c1.detach();
-      assert.deepEqual((<any> table)._rows, [[null]], "calling detach() on the Component removed it from the Table");
+      assert.isNull(table.componentAt(0, 0), "calling detach() on the Component removes it from the Table");
       assert.isNull(c1.parent(), "Component disconnected from the Table");
     });
   });
