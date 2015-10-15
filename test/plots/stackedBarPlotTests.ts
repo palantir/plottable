@@ -73,11 +73,10 @@ describe("Plots", () => {
         yScale.domain([0, 30]);
         let offBarLabels = stackedBarPlot.content().selectAll(".off-bar-label");
         assert.operator(offBarLabels.size(), ">", 0, "some off-bar labels are drawn");
-        let offBarLabelVisibilities: string[] = [];
-        offBarLabels.each(function() {
-          offBarLabelVisibilities.push(d3.select(this).style("visibility"));
+        offBarLabels.each(function(d, i) {
+          assert.isTrue(d3.select(this).style("visibility") === "hidden", `off-bar label ${i} is hidden`);
         });
-        assert.isTrue(offBarLabelVisibilities.every((visibility) => visibility === "hidden"), "all off-bar labels are hidden");
+
         stackedBarPlot.destroy();
         svg.remove();
       });
