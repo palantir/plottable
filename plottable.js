@@ -9779,29 +9779,29 @@ var Plottable;
             };
             StackedArea.prototype._getDataToDraw = function () {
                 var _this = this;
-                if (_super.prototype.downsamplingEnabled.call(this) === false) {
+                if (!this.downsamplingEnabled()) {
                     return _super.prototype._getDataToDraw.call(this);
                 }
                 var dataToDraw = new Plottable.Utils.Map();
-                if (this.datasets.length === 0) {
+                if (this.datasets().length === 0) {
                     return dataToDraw;
                 }
-                var overallfilteredDataIndices = [];
+                var overallFilteredDataIndices = [];
                 this.datasets().forEach(function (dataset, i) {
                     var data = dataset.data();
                     var filteredDataIndices = data.map(function (d, i) { return i; });
-                    if (_super.prototype.croppedRenderingEnabled.call(_this)) {
-                        filteredDataIndices = _super.prototype._filterCroppedRendering.call(_this, dataset, filteredDataIndices);
+                    if (_this.croppedRenderingEnabled()) {
+                        filteredDataIndices = _this._filterCroppedRendering(dataset, filteredDataIndices);
                     }
-                    if (_super.prototype.downsamplingEnabled.call(_this)) {
-                        filteredDataIndices = _super.prototype._filterDownsampling.call(_this, dataset, filteredDataIndices);
+                    if (_this.downsamplingEnabled()) {
+                        filteredDataIndices = _this._filterDownsampling(dataset, filteredDataIndices);
                     }
-                    overallfilteredDataIndices = overallfilteredDataIndices.concat(filteredDataIndices
-                        .filter(function (index) { return overallfilteredDataIndices.indexOf(index) < 0; }));
+                    overallFilteredDataIndices = overallFilteredDataIndices.concat(filteredDataIndices
+                        .filter(function (index) { return overallFilteredDataIndices.indexOf(index) < 0; }));
                 });
                 this.datasets().forEach(function (dataset, i) {
                     var data = dataset.data();
-                    dataToDraw.set(dataset, [overallfilteredDataIndices.sort(function (a, b) { return a - b; }).map(function (d, i) { return data[d]; })]);
+                    dataToDraw.set(dataset, [overallFilteredDataIndices.sort(function (a, b) { return a - b; }).map(function (d, i) { return data[d]; })]);
                 });
                 return dataToDraw;
             };

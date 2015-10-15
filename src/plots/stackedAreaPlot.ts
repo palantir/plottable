@@ -182,29 +182,29 @@ export module Plots {
     }
 
     protected _getDataToDraw() {
-      if (super.downsamplingEnabled() === false) {
+      if (!this.downsamplingEnabled()) {
         return super._getDataToDraw();
       }
       let dataToDraw = new Utils.Map<Dataset, any[]> ();
-      if (this.datasets.length === 0) {
+      if (this.datasets().length === 0) {
         return dataToDraw;
       }
-      let overallfilteredDataIndices: number[] = [];
+      let overallFilteredDataIndices: number[] = [];
       this.datasets().forEach((dataset, i) => {
         let data = dataset.data();
         let filteredDataIndices = data.map((d, i) => i);
-        if (super.croppedRenderingEnabled()) {
-          filteredDataIndices = super._filterCroppedRendering(dataset, filteredDataIndices);
+        if (this.croppedRenderingEnabled()) {
+          filteredDataIndices = this._filterCroppedRendering(dataset, filteredDataIndices);
         }
-        if (super.downsamplingEnabled()) {
-          filteredDataIndices = super._filterDownsampling(dataset, filteredDataIndices);
+        if (this.downsamplingEnabled()) {
+          filteredDataIndices = this._filterDownsampling(dataset, filteredDataIndices);
         }
-        overallfilteredDataIndices = overallfilteredDataIndices.concat(filteredDataIndices
-          .filter((index) => {return overallfilteredDataIndices.indexOf(index) < 0; }));
+        overallFilteredDataIndices = overallFilteredDataIndices.concat(filteredDataIndices
+          .filter((index) => {return overallFilteredDataIndices.indexOf(index) < 0; }));
       });
       this.datasets().forEach((dataset, i) => {
         let data = dataset.data();
-        dataToDraw.set(dataset, [overallfilteredDataIndices.sort((a, b) => a - b).map((d, i) => data[d])]);
+        dataToDraw.set(dataset, [overallFilteredDataIndices.sort((a, b) => a - b).map((d, i) => data[d])]);
       });
       return dataToDraw;
     }

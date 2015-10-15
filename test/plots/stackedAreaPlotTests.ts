@@ -428,7 +428,7 @@ describe("Plots", () => {
       renderer.downsamplingEnabled(true);
       let xAxis = new Plottable.Axes.Numeric(xScale, "bottom");
       new Plottable.Components.Table([[renderer], [xAxis]]).renderTo(svg);
-      let areas = (<any> renderer)._renderArea.selectAll(".area");
+      let areas = renderer.content().selectAll(".area");
 
       let expectedRenderIndex = [0, 2, 3];
 
