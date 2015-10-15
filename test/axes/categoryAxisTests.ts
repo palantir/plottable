@@ -203,4 +203,30 @@ describe("Category Axes", () => {
 
     svg.remove();
   });
+
+  it("renders the domain from left to right on a horizontal axis", () => {
+    let svg = TestMethods.generateSVG();
+    let domain = ["label1", "label2", "label100"];
+    let scale = new Plottable.Scales.Category().domain(domain);
+    let axis = new Plottable.Axes.Category(scale, "bottom");
+    axis.renderTo(svg);
+
+    let tickLabels = axis.content().selectAll(".tick-label");
+    assert.deepEqual(tickLabels.data(), domain, "tick label per datum in given order");
+
+    let getXTransform = (selection: d3.Selection<any>) => {
+      return d3.transform(selection.attr("transform")).translate[0];
+    };
+
+    tickLabels.each(function(d, i) {
+      if (i === tickLabels.size() - 1) {
+        return;
+      }
+      let tickLabel = d3.select(this);
+      let nextTickLabel = d3.select(tickLabels[0][i + 1]);
+      assert.operator(getXTransform(tickLabel), "<", getXTransform(nextTickLabel), "labels render from left to right");
+    });
+
+    svg.remove();
+  });
 });
