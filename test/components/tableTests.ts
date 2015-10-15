@@ -21,23 +21,6 @@ describe("Tables", () => {
     assert.isTrue(table.hasClass("table"));
   });
 
-  it("padTableToSize works properly", () => {
-    let t = new Plottable.Components.Table();
-    assert.deepEqual((<any> t)._rows, [], "the table rows is an empty list");
-    (<any> t)._padTableToSize(1, 1);
-    let rows = (<any> t)._rows;
-    let row = rows[0];
-    let firstComponent = row[0];
-    assert.lengthOf(rows, 1, "there is one row");
-    assert.lengthOf(row, 1, "the row has one element");
-    assert.isNull(firstComponent, "the row only has a null component");
-
-    (<any> t)._padTableToSize(5, 2);
-    assert.lengthOf(rows, 5, "there are five rows");
-    rows.forEach((r: Plottable.Component[]) => assert.lengthOf(r, 2, "there are two columns per row"));
-    assert.strictEqual(rows[0][0], firstComponent, "the first component is unchanged");
-  });
-
   it("table constructor can take a list of lists of components", () => {
     let c0 = new Plottable.Component();
     let row1 = [null, c0];
