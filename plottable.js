@@ -5866,7 +5866,7 @@ var Plottable;
                     boundingBoxAttr["height"] = numSwatches * swatchHeight;
                 }
                 else {
-                    padding = textHeight;
+                    padding = Math.max(textPadding, (this.height() - textHeight) / 2);
                     swatchWidth = Math.max(((this.width() - 2 * textPadding - text0Width - text1Width) / numSwatches), 0);
                     swatchHeight = Math.max((this.height() - 2 * padding), 0);
                     swatchX = function (d, i) { return (text0Width + textPadding) + i * swatchWidth; };
