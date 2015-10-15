@@ -25,21 +25,23 @@ describe("Tables", () => {
     });
   }
 
-  it("has the correct CSS class", () => {
-    let table = new Plottable.Components.Table();
-    assert.isTrue(table.hasClass("table"));
-  });
+  describe("constructor behavior", () => {
+    it("adds the correct CSS class", () => {
+      let table = new Plottable.Components.Table();
+      assert.isTrue(table.hasClass("table"));
+    });
 
-  it("can take a list of lists of Components in the constructor", () => {
-    let c00 = new Plottable.Component();
-    let c11 = new Plottable.Component();
-    let rows = [
-      [c00, null],
-      [null, c11]
-    ];
-    let table = new Plottable.Components.Table(rows);
+    it("can take a list of lists of Components in the constructor", () => {
+      let c00 = new Plottable.Component();
+      let c11 = new Plottable.Component();
+      let rows = [
+        [c00, null],
+        [null, c11]
+      ];
+      let table = new Plottable.Components.Table(rows);
 
-    assertTableRows(table, rows, "constructor initialized Table correctly");
+      assertTableRows(table, rows, "constructor initialized Table correctly");
+    });
   });
 
   describe("add()", () => {
@@ -283,7 +285,7 @@ describe("Tables", () => {
       assertTableRows(table, [[c1, c2], [c3, c4]], "removing a nonexistent Component does not affect the table");
     });
 
-    it("has no further effect when called a second dime with the same Component", () => {
+    it("has no further effect when called a second time with the same Component", () => {
       table = new Plottable.Components.Table([[c1, c2, c3], [c4, c5, c6]]);
 
       let expectedRows = [[null, c2, c3], [c4, c5, c6]];
