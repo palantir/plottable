@@ -16,7 +16,7 @@ function generateBasicTable(nRows: number, nCols: number) {
 }
 
 describe("Tables", () => {
-  it("tables are classed properly", () => {
+  it("has the correct CSS class", () => {
     let table = new Plottable.Components.Table();
     assert.isTrue(table.hasClass("table"));
   });
