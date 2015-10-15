@@ -365,4 +365,54 @@ describe("InterpolatedColorLegend", () => {
       "padding is approximately equal to swatch height when expanded");
     svg.remove();
   });
+
+  describe("Constrained situations", () => {
+    it("horizontal legends degrade padding when height is constrained", () => {
+      let legend = new Plottable.Components.InterpolatedColorLegend(colorScale).orientation("horizontal");
+      legend.renderTo(svg);
+      let swatchBoundingRect = (<Element> legend.content().select(".swatch-container").node()).getBoundingClientRect();
+      let unconstrainedSwatchHeight = swatchBoundingRect.height;
+      let textHeight = unconstrainedSwatchHeight;
+      let constrainedHeight = textHeight;
+      svg.attr("height", constrainedHeight);
+      legend.redraw();
+      let legendBoundingRect = (<Element> legend.background().select(".background-fill").node()).getBoundingClientRect();
+      swatchBoundingRect = (<Element> legend.content().select(".swatch-container").node()).getBoundingClientRect();
+      let topPadding = swatchBoundingRect.top - legendBoundingRect.top;
+      let bottomPadding = legendBoundingRect.bottom - swatchBoundingRect.bottom;
+      assert.operator(topPadding, "<", textHeight, "top padding degrades to be smaller than textHeight");
+      assert.operator(bottomPadding, "<", textHeight, "bottom padding degrades to be smaller than textHeight");
+      svg.remove();
+    });
+    it("left legends degrade padding when width is constrained", () => {
+      let legend = new Plottable.Components.InterpolatedColorLegend(colorScale).orientation("left");
+      legend.renderTo(svg);
+      let swatchBoundingRect = (<Element> legend.content().select(".swatch-container").node()).getBoundingClientRect();
+      let unconstrainedSwatchWidth = swatchBoundingRect.width;
+      let textHeight = unconstrainedSwatchWidth;
+      let constrainedWidth = textHeight * 2;
+      svg.attr("width", constrainedWidth);
+      legend.redraw();
+      let legendBoundingRect = (<Element> legend.background().select(".background-fill").node()).getBoundingClientRect();
+      swatchBoundingRect = (<Element> legend.content().select(".swatch-container").node()).getBoundingClientRect();
+      let leftPadding = legendBoundingRect.right - swatchBoundingRect.right;
+      assert.operator(leftPadding, "<", textHeight, "right-side padding degrades to be smaller than textHeight");
+      svg.remove();
+    });
+    it("right legends degrade padding when width is constrained", () => {
+      let legend = new Plottable.Components.InterpolatedColorLegend(colorScale).orientation("right");
+      legend.renderTo(svg);
+      let swatchBoundingRect = (<Element> legend.content().select(".swatch-container").node()).getBoundingClientRect();
+      let unconstrainedSwatchWidth = swatchBoundingRect.width;
+      let textHeight = unconstrainedSwatchWidth;
+      let constrainedWidth = textHeight * 2;
+      svg.attr("width", constrainedWidth);
+      legend.redraw();
+      let legendBoundingRect = (<Element> legend.background().select(".background-fill").node()).getBoundingClientRect();
+      swatchBoundingRect = (<Element> legend.content().select(".swatch-container").node()).getBoundingClientRect();
+      let leftPadding = swatchBoundingRect.left - legendBoundingRect.left;
+      assert.operator(leftPadding, "<", textHeight, "left-side padding degrades to be smaller than textHeight");
+      svg.remove();
+    });
+  });
 });
