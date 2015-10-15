@@ -82,24 +82,13 @@ describe("Plots", () => {
       });
 
       it("considers lying within a bar's y-range to mean it is closest", () => {
-        let bars = stackedBarPlot.content().selectAll("rect");
-
         let d0 = stackedBarPlot.datasets()[0].data()[0];
-        let d0Point = {
-          x: xScale.scale(d0.x),
-          y: yScale.scale(d0.y)
-        };
-
         let d1 = stackedBarPlot.datasets()[1].data()[0];
-        let d1Point = {
-          x: xScale.scale(d1.x),
-          y: yScale.scale(d0.y + d1.y)
-        };
 
-        let closestEntity = stackedBarPlot.entityNearest({ x: 0, y: d0Point.y + 1 });
+        let closestEntity = stackedBarPlot.entityNearest({ x: 0, y: yScale.scale(d0.y) + 1 });
         assert.strictEqual(closestEntity.datum, d0, "bottom bar is closest when within its range");
 
-        closestEntity = stackedBarPlot.entityNearest({ x: 0, y: d0Point.y - 1 });
+        closestEntity = stackedBarPlot.entityNearest({ x: 0, y: yScale.scale(d0.y) - 1 });
         assert.strictEqual(closestEntity.datum, d1, "top bar is closest when within its range");
 
         svg.remove();
@@ -229,20 +218,35 @@ describe("Plots", () => {
 
       it("should default to 0 when calculating stack offsets with non-numbers", () => {
         let svg = TestMethods.generateSVG();
-        let data1 = [
+        let stringData = [
           { x: "A", y: "s"},
         ];
-        let data2 = [
+        let nullData = [
+          { x: "A", y: <any> null},
+        ];
+        let undefinedData = [
+          { x: "A", y: <any> undefined},
+        ];
+        let naNData = [
+          { x: "A", y: NaN},
+        ];
+        let validData = [
           { x: "A", y: 1},
         ];
         let xScale = new Plottable.Scales.Category();
         let yScale = new Plottable.Scales.Linear();
 
         let stackedBarPlot = new Plottable.Plots.StackedBar<string, number>();
-        let ds1 = new Plottable.Dataset(data1);
-        let ds2 = new Plottable.Dataset(data2);
+        let ds1 = new Plottable.Dataset(stringData);
+        let ds2 = new Plottable.Dataset(nullData);
+        let ds3 = new Plottable.Dataset(undefinedData);
+        let ds4 = new Plottable.Dataset(naNData);
+        let ds5 = new Plottable.Dataset(validData);
         stackedBarPlot.addDataset(ds1);
         stackedBarPlot.addDataset(ds2);
+        stackedBarPlot.addDataset(ds3);
+        stackedBarPlot.addDataset(ds4);
+        stackedBarPlot.addDataset(ds5);
         stackedBarPlot.x((d: any) => d.x, xScale).y((d: any) => d.y, yScale);
         stackedBarPlot.renderTo(svg);
 
@@ -385,6 +389,51 @@ describe("Plots", () => {
               TestMethods.numAttr(d3.select(aBarPair[1]), "x"), "previous dataset bar under second");
           });
         });
+        stackedBarPlot.destroy();
+        svg.remove();
+      });
+    });
+
+    describe("fail safe tests", () => {
+
+      it("should default to 0 when calculating stack offsets with non-numbers", () => {
+        let svg = TestMethods.generateSVG();
+        let stringData = [
+          { x: "s", y: "A"},
+        ];
+        let nullData = [
+          { x: <any> null, y: "A"},
+        ];
+        let undefinedData = [
+          { x: <any> undefined, y: "A"},
+        ];
+        let naNData = [
+          { x: NaN, y: "A"},
+        ];
+        let validData = [
+          { x: 1, y: "A"},
+        ];
+        let xScale = new Plottable.Scales.Linear();
+        let yScale = new Plottable.Scales.Category();
+
+        let stackedBarPlot = new Plottable.Plots.StackedBar<number, string>(Plottable.Plots.Bar.ORIENTATION_HORIZONTAL);
+        let ds1 = new Plottable.Dataset(stringData);
+        let ds2 = new Plottable.Dataset(nullData);
+        let ds3 = new Plottable.Dataset(undefinedData);
+        let ds4 = new Plottable.Dataset(naNData);
+        let ds5 = new Plottable.Dataset(validData);
+        stackedBarPlot.addDataset(ds1);
+        stackedBarPlot.addDataset(ds2);
+        stackedBarPlot.addDataset(ds3);
+        stackedBarPlot.addDataset(ds4);
+        stackedBarPlot.addDataset(ds5);
+        stackedBarPlot.x((d: any) => d.x, xScale).y((d: any) => d.y, yScale);
+        stackedBarPlot.renderTo(svg);
+
+        let validBar = stackedBarPlot.content().selectAll("rect").filter((d) => d.x === 1);
+        assert.closeTo(TestMethods.numAttr(validBar, "x"), xScale.scale(0),
+          window.Pixel_CloseTo_Requirement, "bar stacks from 0");
+
         stackedBarPlot.destroy();
         svg.remove();
       });
