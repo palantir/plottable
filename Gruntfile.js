@@ -5,26 +5,16 @@ module.exports = function(grunt) {
 
   var tsConfig = {
     dev: {
-      src: ["src/**/*.ts", "typings/**/*.d.ts"],
-      outDir: "build/src/",
-      options: {
-        target: "es5",
-        noImplicitAny: true,
-        sourceMap: false,
-        declaration: true,
-        compiler: "./node_modules/typescript/bin/tsc",
-        removeComments: false
-      }
+      tsconfig: true
     },
     test: {
-      src: ["test/**/*.ts", "typings/**/*.d.ts", "build/plottable.d.ts"],
-      outDir: "build/test/",
+      src: ["test/**/*.ts"],
+      out: "test/tests.js",
       options: {
         target: "es5",
         sourceMap: false,
         noImplicitAny: true,
         declaration: false,
-        compiler: "./node_modules/typescript/bin/tsc",
         removeComments: false
       }
     },
@@ -51,67 +41,13 @@ module.exports = function(grunt) {
     }
   };
 
-  var prefixMatch = "\\n *(function |var |static )?";
-  var varNameMatch = "[^(:;]*(\\([^)]*\\))?"; // catch function args too
-  var nestedBraceMatch = ": \\{[^{}]*\\}";
-  var typeNameMatch = ": [^;]*";
-  var finalMatch = "((" + nestedBraceMatch + ")|(" + typeNameMatch + "))?\\n?;";
-  var jsdocInit = "\\n *\\/\\*\\* *\\n";
-  var jsdocMid = "( *\\*[^\\n]*\\n)+";
-  var jsdocEnd = " *\\*\\/ *";
-  var jsdoc = "(" + jsdocInit + jsdocMid + jsdocEnd + ")?";
-
   var sedConfig = {
-    privateDefinitions: {
-      pattern: jsdoc + prefixMatch + "private " + varNameMatch + finalMatch,
-      replacement: "",
-      path: "build/plottable.d.ts"
-    },
-    definitions: {
-      pattern: '/// *<reference path=[\'"].*[\'"] */>',
-      replacement: "",
-      path: "build/plottable.d.ts"
-    },
-    sublime: {
-      pattern: "(.*\\.ts)",
-      replacement: '/// <reference path="../$1" />',
-      path: "build/sublime.d.ts"
-    },
     versionNumber: {
       pattern: "@VERSION",
       replacement: "<%= pkg.version %>",
       path: "plottable.js"
     }
   };
-
-  // e.g. ["components/foo.ts", ...]
-  // the important thing is that they are sorted by hierarchy,
-  // leaves first, roots last
-  var tsFiles;
-  // since src/reference.ts might have changed, I need to update this
-  // on each recompile
-  var updateTsFiles = function() {
-    tsFiles = grunt.file.read("src/reference.ts")
-      .split("\n")
-      .filter(function(s) {
-        return s !== "";
-      }).map(function(s) {
-        return s.match(/"(.*\.ts)"/)[1];
-      });
-  };
-  updateTsFiles();
-
-  var testTsFiles;
-  var updateTestTsFiles = function() {
-    testTsFiles = grunt.file.read("test/testReference.ts")
-      .split("\n")
-      .filter(function(s) {
-        return s !== "";
-      }).map(function(s) {
-        return s.match(/"(.*\.ts)"/)[1];
-      });
-  };
-  updateTestTsFiles();
 
   var umdConfig = {
     all: {
@@ -125,24 +61,6 @@ module.exports = function(grunt) {
     header: {
       src: ["license_header.txt", "plottable.js"],
       dest: "plottable.js"
-    },
-    plottable: {
-      src: tsFiles.map(function(s) {
-        return "build/src/" + s.replace(".ts", ".js");
-      }),
-      dest: "plottable.js"
-    },
-    tests: {
-      src: testTsFiles.map(function(s) {
-        return "build/test/" + s.replace(".ts", ".js");
-      }),
-      dest: "test/tests.js"
-    },
-    definitions: {
-      src: tsFiles.map(function(s) {
-        return "build/src/" + s.replace(".ts", ".d.ts");
-      }),
-      dest: "build/plottable.d.ts"
     },
     svgtypewriter: {
       src: ["plottable.js", "bower_components/svg-typewriter/svgtypewriter.js"],
@@ -271,12 +189,6 @@ module.exports = function(grunt) {
     }
   };
 
-  var shellConfig = {
-    sublime: {
-      command: "(echo 'src/reference.ts'; find typings -name '*.d.ts') > build/sublime.d.ts"
-    }
-  };
-
   var saucelabsMochaConfig = {
     all: {
       options: {
@@ -325,26 +237,16 @@ module.exports = function(grunt) {
     gitcommit: gitcommitConfig,
     compress: compressConfig,
     uglify: uglifyConfig,
-    shell: shellConfig,
     "saucelabs-mocha": saucelabsMochaConfig
   });
 
   // Loads the tasks specified in package.json
   require("load-grunt-tasks")(grunt);
 
-  grunt.registerTask("update_ts_files", updateTsFiles);
-  grunt.registerTask("update_test_ts_files", updateTestTsFiles);
-
-  grunt.registerTask("definitions_prod", function() {
-    grunt.file.copy("build/plottable.d.ts", "plottable.d.ts");
-  });
-
-  grunt.registerTask("test-compile", ["ts:test", "concat:tests"]);
+  grunt.registerTask("test-compile", ["ts:test"]);
   grunt.registerTask("src-compile", ["ts:dev", "generateJS"]);
 
   grunt.registerTask("dev-compile", [
-    "update_ts_files",
-    "update_test_ts_files",
     "src-compile",
     "test-compile",
     "clean:tscommand",
@@ -352,15 +254,10 @@ module.exports = function(grunt) {
   ]);
 
   grunt.registerTask("generateJS", [
-    "concat:plottable",
     "concat:svgtypewriter",
-    "concat:definitions",
-    "sed:definitions",
-    "sed:privateDefinitions",
     "umd:all",
     "concat:header",
-    "sed:versionNumber",
-    "definitions_prod"
+    "sed:versionNumber"
   ]);
 
   grunt.registerTask("release:patch", ["bump:patch", "dist-compile", "gitcommit:version"]);
@@ -390,9 +287,6 @@ module.exports = function(grunt) {
   } else {
     grunt.registerTask("test-travis", ["dev-compile", "test-local"]);
   }
-
-  // Tooling
-  grunt.registerTask("sublime", ["shell:sublime", "sed:sublime"]);
 
   grunt.registerTask("update-quicktests", function() {
     var qtJSON = [];

@@ -1,5 +1,3 @@
-///<reference path="../reference.ts" />
-
 module Plottable {
 export class Axis<D> extends Component {
   /**
@@ -37,7 +35,9 @@ export class Axis<D> extends Component {
   protected _scale: Scale<D, number>;
   private _formatter: Formatter;
   private _orientation: string;
+  // @deprecated As of release v1.15.0, removed as premature optimization, use _computeWidth() directly instead
   protected _computedWidth: number;
+  // @deprecated As of release v1.15.0, removed as premature optimization, use _computeHeight() directly instead
   protected _computedHeight: number;
   private _endTickLength = 5;
   private _innerTickLength = 5;
@@ -110,19 +110,13 @@ export class Axis<D> extends Component {
     let requestedHeight = 0;
 
     if (this._isHorizontal()) {
-      if (this._computedHeight == null) {
-        this._computeHeight();
-      }
-      requestedHeight = this._computedHeight + this._margin;
+      requestedHeight = this._computeHeight() + this._margin;
       if (this.annotationsEnabled()) {
         let tierHeight = this._annotationMeasurer.measure().height + 2 * Axis._ANNOTATION_LABEL_PADDING;
         requestedHeight += tierHeight * this.annotationTierCount();
       }
     } else { // vertical
-      if (this._computedWidth == null) {
-        this._computeWidth();
-      }
-      requestedWidth = this._computedWidth + this._margin;
+      requestedWidth = this._computeWidth() + this._margin;
       if (this.annotationsEnabled()) {
         let tierHeight = this._annotationMeasurer.measure().height + 2 * Axis._ANNOTATION_LABEL_PADDING;
         requestedWidth += tierHeight * this.annotationTierCount();
@@ -417,7 +411,7 @@ export class Axis<D> extends Component {
    */
   protected _coreSize() {
     let relevantDimension = this._isHorizontal() ? this.height() : this.width();
-    let axisHeightWithoutMargin = this._isHorizontal() ? this._computedHeight : this._computedWidth;
+    let axisHeightWithoutMargin = this._isHorizontal() ? this._computeHeight() : this._computeWidth();
     return Math.min(axisHeightWithoutMargin, relevantDimension);
   }
 
@@ -534,12 +528,6 @@ export class Axis<D> extends Component {
     }
 
     return tickMarkAttrHash;
-  }
-
-  public redraw() {
-    this._computedWidth = null;
-    this._computedHeight = null;
-    return super.redraw();
   }
 
   protected _setDefaultAlignment() {

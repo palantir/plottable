@@ -97,7 +97,7 @@ describe("NumericAxis", () => {
       let markCenter = (markBB.top + markBB.bottom) / 2;
       labelBB = tickLabels[0][i].getBoundingClientRect();
       let labelCenter = (labelBB.top + labelBB.bottom) / 2;
-      assert.closeTo(labelCenter, markCenter, 1, "tick label is centered on mark");
+      assert.closeTo(labelCenter, markCenter, 1.5, "tick label is centered on mark");
     }
 
     // labels to top

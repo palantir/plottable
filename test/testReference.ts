@@ -3,12 +3,12 @@
 ///<reference path="../typings/d3/d3.d.ts" />
 ///<reference path="../typings/jquery/jquery.d.ts" />
 ///<reference path="../typings/jquery.simulate/jquery.simulate.d.ts" />
-///<reference path="../build/plottable.d.ts" />
+///<reference path="../plottable.d.ts" />
 ///<reference path="../bower_components/svg-typewriter/svgtypewriter.d.ts" />
-///<reference path="testMethods.ts" />
 ///<reference path="mocks.ts" />
 
 ///<reference path="globalInitialization.ts" />
+///<reference path="testMethods.ts" />
 
 ///<reference path="drawers/drawerTests.ts" />
 ///<reference path="drawers/lineDrawerTests.ts" />
@@ -50,6 +50,7 @@
 ///<reference path="core/renderControllerTests.ts" />
 ///<reference path="core/datasetTests.ts" />
 ///<reference path="core/formattersTests.ts" />
+///<reference path="core/symbolFactoriesTests.ts" />
 
 ///<reference path="scales/scaleTests.ts" />
 ///<reference path="scales/categoryScaleTests.ts" />

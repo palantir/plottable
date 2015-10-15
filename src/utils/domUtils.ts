@@ -1,5 +1,3 @@
-///<reference path="../reference.ts" />
-
 module Plottable {
 export module Utils {
   export module DOM {
@@ -111,10 +109,10 @@ export module Utils {
      * @returns {boolean} If the ClientRects overlap each other.
      */
     export function clientRectsOverlap(clientRectA: ClientRect, clientRectB: ClientRect) {
-      if (clientRectA.right < clientRectB.left) { return false; }
-      if (clientRectA.left > clientRectB.right) { return false; }
-      if (clientRectA.bottom < clientRectB.top) { return false; }
-      if (clientRectA.top > clientRectB.bottom) { return false; }
+      if (nativeMath.floor(clientRectA.right) <= nativeMath.ceil(clientRectB.left)) { return false; }
+      if (nativeMath.ceil(clientRectA.left) >= nativeMath.floor(clientRectB.right)) { return false; }
+      if (nativeMath.floor(clientRectA.bottom) <= nativeMath.ceil(clientRectB.top)) { return false; }
+      if (nativeMath.ceil(clientRectA.top) >= nativeMath.floor(clientRectB.bottom)) { return false; }
       return true;
     }
 

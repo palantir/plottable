@@ -1,5 +1,3 @@
-///<reference path="../reference.ts" />
-
 module Plottable {
 /*
  * ComponentContainer class encapsulates Table and ComponentGroup's shared functionality.

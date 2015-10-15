@@ -1,5 +1,3 @@
-///<reference path="../reference.ts" />
-
 module Plottable {
 export module Plots {
   type EdgeIntersections = {
@@ -13,6 +11,9 @@ export module Plots {
     private _interpolator: string | ((points: Array<[number, number]>) => string) = "linear";
 
     private _autorangeSmooth = false;
+    private _croppedRenderingEnabled = true;
+
+    private _downsamplingEnabled = false;
 
     /**
      * A Line Plot draws line segments starting from the first data point to the next.
@@ -134,6 +135,46 @@ export module Plots {
         return this._interpolator;
       }
       this._interpolator = interpolator;
+      this.render();
+      return this;
+    }
+    /**
+     * Gets if downsampling is enabled
+     * 
+     * When downsampling is enabled, two consecutive lines with the same slope will be merged to one line.
+     */
+    public downsamplingEnabled(): boolean;
+    /**
+     * Sets if downsampling is enabled
+     * 
+     * @returns {Plots.Line} The calling Plots.Line
+     */
+    public downsamplingEnabled(downsampling: boolean): Plots.Line<X>;
+    public downsamplingEnabled(downsampling?: boolean): any {
+      if (downsampling == null) {
+        return this._downsamplingEnabled;
+      }
+      this._downsamplingEnabled = downsampling;
+      return this;
+    }
+
+    /**
+     * Gets if croppedRendering is enabled
+     *
+     * When croppedRendering is enabled, lines that will not be visible in the viewport will not be drawn.
+     */
+    public croppedRenderingEnabled(): boolean;
+    /**
+     * Sets if croppedRendering is enabled
+     *
+     * @returns {Plots.Line} The calling Plots.Line
+     */
+    public croppedRenderingEnabled(croppedRendering: boolean): Plots.Line<X>;
+    public croppedRenderingEnabled(croppedRendering?: boolean): any {
+      if (croppedRendering == null) {
+        return this._croppedRenderingEnabled;
+      }
+      this._croppedRenderingEnabled = croppedRendering;
       this.render();
       return this;
     }
@@ -349,10 +390,127 @@ export module Plots {
 
     protected _getDataToDraw() {
       let dataToDraw = new Utils.Map<Dataset, any[]> ();
-      this.datasets().forEach((dataset) => dataToDraw.set(dataset, [dataset.data()]));
+
+      this.datasets().forEach((dataset) => {
+        let data = dataset.data();
+
+        if (!this._croppedRenderingEnabled && !this._downsamplingEnabled) {
+          dataToDraw.set(dataset, [data]);
+          return;
+        }
+
+        let filteredDataIndices = data.map((d, i) => i);
+        if (this._croppedRenderingEnabled) {
+          filteredDataIndices = this._filterCroppedRendering(dataset, filteredDataIndices);
+        }
+        if (this._downsamplingEnabled) {
+          filteredDataIndices = this._filterDownsampling(dataset, filteredDataIndices);
+        }
+        dataToDraw.set(dataset, [filteredDataIndices.map((d, i) => data[d])]);
+      });
+
       return dataToDraw;
     }
 
+    private _filterCroppedRendering(dataset: Dataset, indices: number[]) {
+      let xProjector = Plot._scaledAccessor(this.x());
+      let yProjector = Plot._scaledAccessor(this.y());
+
+      let data = dataset.data();
+      let filteredDataIndices: number[] = [];
+      let pointInViewport = (x: number, y: number) => {
+        return Utils.Math.inRange(x, 0, this.width()) &&
+          Utils.Math.inRange(y, 0, this.height());
+      };
+
+      for (let i = 0; i < indices.length; i++) {
+        let currXPoint = xProjector(data[indices[i]], indices[i], dataset);
+        let currYPoint = yProjector(data[indices[i]], indices[i], dataset);
+        let shouldShow = pointInViewport(currXPoint, currYPoint);
+
+        if (!shouldShow && indices[i - 1] != null && data[indices[i - 1]] != null) {
+          let prevXPoint = xProjector(data[indices[i - 1]], indices[i - 1], dataset);
+          let prevYPoint = yProjector(data[indices[i - 1]], indices[i - 1], dataset);
+          shouldShow = shouldShow || pointInViewport(prevXPoint, prevYPoint);
+        }
+
+        if (!shouldShow && indices[i + 1] != null && data[indices[i + 1]] != null) {
+          let nextXPoint = xProjector(data[indices[i + 1]], indices[i + 1], dataset);
+          let nextYPoint = yProjector(data[indices[i + 1]], indices[i + 1], dataset);
+          shouldShow = shouldShow || pointInViewport(nextXPoint, nextYPoint);
+        }
+
+        if (shouldShow) {
+          filteredDataIndices.push(indices[i]);
+        }
+      }
+      return filteredDataIndices;
+    }
+
+    private _filterDownsampling(dataset: Dataset, indices: number[]) {
+      if (indices.length === 0) {
+        return [];
+      }
+      let data = dataset.data();
+      let scaledXAccessor = Plot._scaledAccessor(this.x());
+      let scaledYAccessor = Plot._scaledAccessor(this.y());
+      let filteredIndices = [indices[0]];
+
+      let indexOnCurrentSlope = (i: number, currentSlope: number) => {
+        let p1x = scaledXAccessor(data[indices[i]], indices[i], dataset);
+        let p1y = scaledYAccessor(data[indices[i]], indices[i], dataset);
+        let p2x = scaledXAccessor(data[indices[i + 1]], indices[i + 1], dataset);
+        let p2y = scaledYAccessor(data[indices[i + 1]], indices[i + 1], dataset);
+        if (currentSlope === Infinity) {
+          return Math.floor(p1x) === Math.floor(p2x);
+        } else {
+          let expectedP2y = p1y + (p2x - p1x) * currentSlope;
+          return Math.floor(p2y) === Math.floor(expectedP2y);
+        }
+      };
+
+      for (let i = 0; i < indices.length - 1; ) {
+        let indexFirst = indices[i];
+        let p1x = scaledXAccessor(data[indices[i]], indices[i], dataset);
+        let p1y = scaledYAccessor(data[indices[i]], indices[i], dataset);
+        let p2x = scaledXAccessor(data[indices[i + 1]], indices[i + 1], dataset);
+        let p2y = scaledYAccessor(data[indices[i + 1]], indices[i + 1], dataset);
+        let currentSlope = (Math.floor(p1x) === Math.floor(p2x)) ? Infinity : (p2y - p1y) / (p2x - p1x);
+        let indexMin = indices[i];
+        let minScaledValue = (currentSlope === Infinity) ? p1y : p1x;
+        let indexMax = indexMin;
+        let maxScaledValue = minScaledValue;
+        let firstIndexOnCurrentSlope = true;
+
+        while (i < indices.length - 1 && (firstIndexOnCurrentSlope || indexOnCurrentSlope(i, currentSlope))) {
+          i++;
+          firstIndexOnCurrentSlope = false;
+          let currScaledValue = currentSlope === Infinity ? scaledYAccessor(data[indices[i]], indices[i], dataset) :
+            scaledXAccessor(data[indices[i]], indices[i], dataset);
+          if (currScaledValue > maxScaledValue) {
+            maxScaledValue = currScaledValue;
+            indexMax = indices[i];
+          }
+          if (currScaledValue < minScaledValue) {
+            minScaledValue = currScaledValue;
+            indexMin = indices[i];
+          }
+        }
+
+        let indexLast = indices[i];
+
+        if (indexMin !== indexFirst) {
+          filteredIndices.push(indexMin);
+        }
+        if (indexMax !== indexMin && indexMax !== indexFirst) {
+          filteredIndices.push(indexMax);
+        }
+        if (indexLast !== indexFirst && indexLast !== indexMin && indexLast !== indexMax) {
+          filteredIndices.push(indexLast);
+        }
+      }
+      return filteredIndices;
+    }
   }
 }
 }

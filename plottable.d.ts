@@ -1,4 +1,3 @@
-
 declare module Plottable {
     module Utils {
         module Math {
@@ -58,8 +57,6 @@ declare module Plottable {
         }
     }
 }
-
-
 declare module Plottable {
     module Utils {
         /**
@@ -67,6 +64,8 @@ declare module Plottable {
          * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map
          */
         class Map<K, V> {
+            private _keyValuePairs;
+            private _es6Map;
             constructor();
             set(key: K, value: V): Map<K, V>;
             get(key: K): V;
@@ -76,8 +75,6 @@ declare module Plottable {
         }
     }
 }
-
-
 declare module Plottable {
     module Utils {
         /**
@@ -86,6 +83,8 @@ declare module Plottable {
          */
         class Set<T> {
             size: number;
+            private _values;
+            private _es6Set;
             constructor();
             add(value: T): Set<T>;
             delete(value: T): boolean;
@@ -94,8 +93,6 @@ declare module Plottable {
         }
     }
 }
-
-
 declare module Plottable {
     module Utils {
         module DOM {
@@ -192,8 +189,6 @@ declare module Plottable {
         }
     }
 }
-
-
 declare module Plottable {
     module Utils {
         module Color {
@@ -222,8 +217,6 @@ declare module Plottable {
         }
     }
 }
-
-
 declare module Plottable {
     module Utils {
         module Array {
@@ -259,8 +252,6 @@ declare module Plottable {
         }
     }
 }
-
-
 declare module Plottable {
     module Utils {
         /**
@@ -273,8 +264,6 @@ declare module Plottable {
         }
     }
 }
-
-
 declare module Plottable {
     module Utils {
         module Stacking {
@@ -311,8 +300,6 @@ declare module Plottable {
         }
     }
 }
-
-
 declare module Plottable {
     module Utils {
         module Window {
@@ -345,11 +332,12 @@ declare module Plottable {
         }
     }
 }
-
-
 declare module Plottable {
     module Utils {
         class ClientToSVGTranslator {
+            private static _TRANSLATOR_KEY;
+            private _svg;
+            private _measureRect;
             /**
              * Returns the ClientToSVGTranslator for the <svg> containing elem.
              * If one already exists on that <svg>, it will be returned; otherwise, a new one will be created.
@@ -367,8 +355,6 @@ declare module Plottable {
         }
     }
 }
-
-
 declare module Plottable {
     module Configs {
         /**
@@ -381,16 +367,15 @@ declare module Plottable {
         var ADD_TITLE_ELEMENTS: boolean;
     }
 }
-
-
 declare module Plottable {
     var version: string;
 }
-
-
 declare module Plottable {
     type DatasetCallback = (dataset: Dataset) => void;
     class Dataset {
+        private _data;
+        private _metadata;
+        private _callbacks;
         /**
          * A Dataset contains an array of data and some metadata.
          * Changes to the data or metadata will cause anything subscribed to the Dataset to update.
@@ -442,8 +427,6 @@ declare module Plottable {
         metadata(metadata: any): Dataset;
     }
 }
-
-
 declare module Plottable {
     module RenderPolicies {
         /**
@@ -472,12 +455,11 @@ declare module Plottable {
          * but useful for browsers that don't suppoort `requestAnimationFrame`.
          */
         class Timeout implements RenderPolicy {
+            private _timeoutMsec;
             render(): void;
         }
     }
 }
-
-
 declare module Plottable {
     /**
      * The RenderController is responsible for enqueueing and synchronizing
@@ -524,7 +506,6 @@ declare module Plottable {
         function flush(): void;
     }
 }
-
 declare module Plottable {
     /**
      * Accesses a specific datum property.
@@ -596,8 +577,6 @@ declare module Plottable {
         component: C;
     }
 }
-
-
 declare module Plottable {
     type Formatter = (d: any) => string;
     /**
@@ -708,8 +687,6 @@ declare module Plottable {
         function relativeDate(baseValue?: number, increment?: number, label?: string): (d: any) => string;
     }
 }
-
-
 declare module Plottable {
     /**
      * A SymbolFactory is a function that takes in a symbolSize which is the edge length of the render area
@@ -725,8 +702,6 @@ declare module Plottable {
         function triangleDown(): SymbolFactory;
     }
 }
-
-
 declare module Plottable {
     interface ScaleCallback<S extends Scale<any, any>> {
         (scale: S): any;
@@ -754,6 +729,10 @@ declare module Plottable {
         }
     }
     class Scale<D, R> {
+        private _callbacks;
+        private _autoDomainAutomatically;
+        private _domainModificationInProgress;
+        private _includedValuesProviders;
         /**
          * A Scale is a function (in the mathematical sense) that maps values from a domain to a range.
          *
@@ -845,11 +824,15 @@ declare module Plottable {
         removeIncludedValuesProvider(provider: Scales.IncludedValuesProvider<D>): Scale<D, R>;
     }
 }
-
-
 declare module Plottable {
     class QuantitativeScale<D> extends Scale<D, number> {
         protected static _DEFAULT_NUM_TICKS: number;
+        private _tickGenerator;
+        private _padProportion;
+        private _paddingExceptionsProviders;
+        private _domainMin;
+        private _domainMax;
+        private _snappingDomainEnabled;
         /**
          * A QuantitativeScale is a Scale that maps number-like values to numbers.
          * It is invertible and continuous.
@@ -889,6 +872,7 @@ declare module Plottable {
          * @returns {QuantitativeScale} The calling QuantitativeScale.
          */
         padProportion(padProportion: number): QuantitativeScale<D>;
+        private _padDomain(domain);
         /**
          * Gets whether or not the scale snaps its domain to nice values.
          */
@@ -962,11 +946,10 @@ declare module Plottable {
         tickGenerator(generator: Scales.TickGenerators.TickGenerator<D>): QuantitativeScale<D>;
     }
 }
-
-
 declare module Plottable {
     module Scales {
         class Linear extends QuantitativeScale<number> {
+            private _d3Scale;
             /**
              * @constructor
              */
@@ -984,11 +967,13 @@ declare module Plottable {
         }
     }
 }
-
-
 declare module Plottable {
     module Scales {
         class ModifiedLog extends QuantitativeScale<number> {
+            private _base;
+            private _d3Scale;
+            private _pivot;
+            private _untransformedDomain;
             /**
              * A ModifiedLog Scale acts as a regular log scale for large numbers.
              * As it approaches 0, it gradually becomes linear.
@@ -1008,12 +993,44 @@ declare module Plottable {
              *        For negative values, scale(-x) = -scale(x).
              */
             constructor(base?: number);
+            /**
+             * Returns an adjusted log10 value for graphing purposes.  The first
+             * adjustment is that negative values are changed to positive during
+             * the calculations, and then the answer is negated at the end.  The
+             * second is that, for values less than 10, an increasingly large
+             * (0 to 1) scaling factor is added such that at 0 the value is
+             * adjusted to 1, resulting in a returned result of 0.
+             */
+            private _adjustedLog(x);
+            private _invertedAdjustedLog(x);
             scale(x: number): number;
             invert(x: number): number;
             protected _getDomain(): number[];
             protected _setDomain(values: number[]): void;
             protected _setBackingScaleDomain(values: number[]): void;
             ticks(): number[];
+            /**
+             * Return an appropriate number of ticks from lower to upper.
+             *
+             * This will first try to fit as many powers of this.base as it can from
+             * lower to upper.
+             *
+             * If it still has ticks after that, it will generate ticks in "clusters",
+             * e.g. [20, 30, ... 90, 100] would be a cluster, [200, 300, ... 900, 1000]
+             * would be another cluster.
+             *
+             * This function will generate clusters as large as it can while not
+             * drastically exceeding its number of ticks.
+             */
+            private _logTicks(lower, upper);
+            /**
+             * How many ticks does the range [lower, upper] deserve?
+             *
+             * e.g. if your domain was [10, 1000] and I asked _howManyTicks(10, 100),
+             * I would get 1/2 of the ticks. The range 10, 100 takes up 1/2 of the
+             * distance when plotted.
+             */
+            private _howManyTicks(lower, upper);
             protected _niceDomain(domain: number[], count?: number): number[];
             protected _defaultExtent(): number[];
             protected _expandSingleValueDomain(singleValueDomain: number[]): number[];
@@ -1023,11 +1040,13 @@ declare module Plottable {
         }
     }
 }
-
-
 declare module Plottable {
     module Scales {
         class Category extends Scale<string, number> {
+            private _d3Scale;
+            private _range;
+            private _innerPadding;
+            private _outerPadding;
             /**
              * A Category Scale maps strings to numbers.
              *
@@ -1041,6 +1060,8 @@ declare module Plottable {
             protected _setDomain(values: string[]): void;
             range(): [number, number];
             range(values: [number, number]): Category;
+            private static _convertToPlottableInnerPadding(d3InnerPadding);
+            private static _convertToPlottableOuterPadding(d3OuterPadding, d3InnerPadding);
             /**
              * Returns the width of the range band.
              *
@@ -1099,11 +1120,13 @@ declare module Plottable {
         }
     }
 }
-
-
 declare module Plottable {
     module Scales {
         class Color extends Scale<string, string> {
+            private static _LOOP_LIGHTEN_FACTOR;
+            private static _MAXIMUM_COLORS_FROM_CSS;
+            private static _plottableColorCache;
+            private _d3Scale;
             /**
              * A Color Scale maps string values to color hex values expressed as a string.
              *
@@ -1116,6 +1139,7 @@ declare module Plottable {
             extentOfValues(values: string[]): string[];
             protected _getExtent(): string[];
             static invalidateColorCache(): void;
+            private static _getPlottableColors();
             /**
              * Returns the color-string corresponding to a given string.
              * If there are not enough colors in the range(), a lightened version of an existing color will be used.
@@ -1131,11 +1155,10 @@ declare module Plottable {
         }
     }
 }
-
-
 declare module Plottable {
     module Scales {
         class Time extends QuantitativeScale<Date> {
+            private _d3Scale;
             /**
              * A Time Scale maps Date objects to numbers.
              *
@@ -1169,14 +1192,15 @@ declare module Plottable {
         }
     }
 }
-
-
 declare module Plottable {
     module Scales {
         class InterpolatedColor extends Scale<number, string> {
             static REDS: string[];
             static BLUES: string[];
             static POSNEG: string[];
+            private _colorRange;
+            private _colorScale;
+            private _d3Scale;
             /**
              * An InterpolatedColor Scale maps numbers to color hex values, expressed as strings.
              *
@@ -1184,6 +1208,15 @@ declare module Plottable {
              */
             constructor(scaleType?: string);
             extentOfValues(values: number[]): number[];
+            /**
+             * Generates the converted QuantitativeScale.
+             */
+            private _d3InterpolatedScale();
+            /**
+             * Generates the d3 interpolator for colors.
+             */
+            private _interpolateColors();
+            private _resetScale();
             autoDomain(): InterpolatedColor;
             scale(value: number): string;
             protected _getDomain(): number[];
@@ -1193,8 +1226,6 @@ declare module Plottable {
         }
     }
 }
-
-
 declare module Plottable {
     module Scales {
         module TickGenerators {
@@ -1225,8 +1256,6 @@ declare module Plottable {
         }
     }
 }
-
-
 declare module Plottable {
     module Drawers {
         /**
@@ -1247,8 +1276,12 @@ declare module Plottable {
         };
     }
     class Drawer {
+        private _renderArea;
         protected _svgElementName: string;
         protected _className: string;
+        private _dataset;
+        private _cachedSelectionValid;
+        private _cachedSelection;
         /**
          * A Drawer draws svg elements based on the input Dataset.
          *
@@ -1271,7 +1304,20 @@ declare module Plottable {
          * Removes the Drawer and its renderArea
          */
         remove(): void;
+        /**
+         * Binds data to selection
+         *
+         * @param{any[]} data The data to be drawn
+         */
+        private _bindSelectionData(data);
         protected _applyDefaultAttributes(selection: d3.Selection<any>): void;
+        /**
+         * Draws data using one step
+         *
+         * @param{AppliedDrawStep} step The step, how data should be drawn.
+         */
+        private _drawStep(step);
+        private _appliedProjectors(attrToProjector);
         /**
          * Calculates the total time it takes to use the input drawSteps to draw the input data
          *
@@ -1298,8 +1344,6 @@ declare module Plottable {
         selectionForIndex(index: number): d3.Selection<any>;
     }
 }
-
-
 declare module Plottable {
     module Drawers {
         class Line extends Drawer {
@@ -1309,8 +1353,6 @@ declare module Plottable {
         }
     }
 }
-
-
 declare module Plottable {
     module Drawers {
         class Area extends Drawer {
@@ -1320,8 +1362,6 @@ declare module Plottable {
         }
     }
 }
-
-
 declare module Plottable {
     module Drawers {
         class Rectangle extends Drawer {
@@ -1329,8 +1369,6 @@ declare module Plottable {
         }
     }
 }
-
-
 declare module Plottable {
     module Drawers {
         class Arc extends Drawer {
@@ -1339,8 +1377,6 @@ declare module Plottable {
         }
     }
 }
-
-
 declare module Plottable {
     module Drawers {
         class ArcOutline extends Drawer {
@@ -1349,8 +1385,6 @@ declare module Plottable {
         }
     }
 }
-
-
 declare module Plottable {
     module Drawers {
         class Symbol extends Drawer {
@@ -1358,8 +1392,6 @@ declare module Plottable {
         }
     }
 }
-
-
 declare module Plottable {
     module Drawers {
         class Segment extends Drawer {
@@ -1367,8 +1399,6 @@ declare module Plottable {
         }
     }
 }
-
-
 declare module Plottable {
     type ComponentCallback = (component: Component) => void;
     module Components {
@@ -1381,10 +1411,31 @@ declare module Plottable {
         }
     }
     class Component {
+        private _element;
+        private _content;
         protected _boundingBox: d3.Selection<void>;
+        private _backgroundContainer;
+        private _foregroundContainer;
         protected _clipPathEnabled: boolean;
+        private _origin;
+        private _parent;
+        private _xAlignment;
+        private static _xAlignToProportion;
+        private _yAlignment;
+        private static _yAlignToProportion;
         protected _isSetup: boolean;
         protected _isAnchored: boolean;
+        private _boxes;
+        private _boxContainer;
+        private _rootSVG;
+        private _isTopLevelComponent;
+        private _width;
+        private _height;
+        private _cssClasses;
+        private _destroyed;
+        private _clipPathID;
+        private _onAnchorCallbacks;
+        private _onDetachCallbacks;
         constructor();
         /**
          * Attaches the Component as a child of a given d3 Selection.
@@ -1444,6 +1495,7 @@ declare module Plottable {
          * @returns {Component} The calling Component.
          */
         render(): Component;
+        private _scheduleComputeLayout();
         /**
          * Renders the Component without waiting for the next frame.
          */
@@ -1486,6 +1538,9 @@ declare module Plottable {
          * @returns {Component} The calling Component.
          */
         yAlignment(yAlignment: string): Component;
+        private _addBox(className?, parentElement?);
+        private _generateClipPath();
+        private _updateClipPath();
         /**
          * Checks if the Component has a given CSS class.
          *
@@ -1600,10 +1655,9 @@ declare module Plottable {
         background(): d3.Selection<void>;
     }
 }
-
-
 declare module Plottable {
     class ComponentContainer extends Component {
+        private _detachCallback;
         constructor();
         anchor(selection: d3.Selection<void>): ComponentContainer;
         render(): ComponentContainer;
@@ -1633,11 +1687,10 @@ declare module Plottable {
         destroy(): void;
     }
 }
-
-
 declare module Plottable {
     module Components {
         class Group extends ComponentContainer {
+            private _components;
             /**
              * Constructs a Group.
              *
@@ -1674,8 +1727,6 @@ declare module Plottable {
         }
     }
 }
-
-
 declare module Plottable {
     class Axis<D> extends Component {
         /**
@@ -1706,12 +1757,28 @@ declare module Plottable {
          * The css class applied to each annotation label, which shows the formatted annotation text.
          */
         static ANNOTATION_LABEL_CLASS: string;
+        private static _ANNOTATION_LABEL_PADDING;
         protected _tickMarkContainer: d3.Selection<void>;
         protected _tickLabelContainer: d3.Selection<void>;
         protected _baseline: d3.Selection<void>;
         protected _scale: Scale<D, number>;
+        private _formatter;
+        private _orientation;
         protected _computedWidth: number;
         protected _computedHeight: number;
+        private _endTickLength;
+        private _innerTickLength;
+        private _tickLabelPadding;
+        private _margin;
+        private _showEndTickLabels;
+        private _rescaleCallback;
+        private _annotatedTicks;
+        private _annotationFormatter;
+        private _annotationsEnabled;
+        private _annotationTierCount;
+        private _annotationContainer;
+        private _annotationMeasurer;
+        private _annotationWriter;
         /**
          * Constructs an Axis.
          * An Axis is a visual representation of a Scale.
@@ -1774,6 +1841,7 @@ declare module Plottable {
          */
         annotationTierCount(annotationTierCount: number): Axis<D>;
         protected _drawAnnotations(): void;
+        private _annotatedTicksToRender();
         /**
          * Retrieves the size of the core pieces.
          *
@@ -1781,6 +1849,7 @@ declare module Plottable {
          */
         protected _coreSize(): number;
         protected _annotationTierHeight(): number;
+        private _annotationToTier(measurements);
         protected _removeAnnotations(): void;
         protected _generateBaselineAttrHash(): {
             [key: string]: number;
@@ -1788,7 +1857,6 @@ declare module Plottable {
         protected _generateTickMarkAttrHash(isEndTickMark?: boolean): {
             [key: string]: number | ((d: any) => number);
         };
-        redraw(): Component;
         protected _setDefaultAlignment(): void;
         /**
          * Gets the Formatter on the Axis. Tick values are passed through the
@@ -1889,8 +1957,6 @@ declare module Plottable {
         showEndTickLabels(show: boolean): Axis<D>;
     }
 }
-
-
 declare module Plottable {
     module TimeInterval {
         var second: string;
@@ -1925,6 +1991,17 @@ declare module Plottable {
              * The CSS class applied to each Time Axis tier
              */
             static TIME_AXIS_TIER_CLASS: string;
+            private static _DEFAULT_TIME_AXIS_CONFIGURATIONS;
+            private _tierLabelContainers;
+            private _tierMarkContainers;
+            private _tierBaselines;
+            private _tierHeights;
+            private _possibleTimeAxisConfigurations;
+            private _numTiers;
+            private _measurer;
+            private _mostPreciseConfigIndex;
+            private _tierLabelPositions;
+            private static _LONG_DATE;
             /**
              * Constructs a Time Axis.
              *
@@ -1958,24 +2035,46 @@ declare module Plottable {
              * @returns {Axes.Time} The calling Time Axis.
              */
             axisConfigurations(configurations: TimeAxisConfiguration[]): Time;
+            /**
+             * Gets the index of the most precise TimeAxisConfiguration that will fit in the current width.
+             */
+            private _getMostPreciseConfigurationIndex();
             orientation(): string;
             orientation(orientation: string): Time;
             protected _computeHeight(): number;
+            private _getIntervalLength(config);
+            private _maxWidthForInterval(config);
+            /**
+             * Check if tier configuration fits in the current width.
+             */
+            private _checkTimeAxisTierConfigurationWidth(config);
             protected _sizeFromOffer(availableWidth: number, availableHeight: number): {
                 width: number;
                 height: number;
             };
             protected _setup(): void;
+            private _setupDomElements();
+            private _getTickIntervalValues(config);
             protected _getTickValues(): any[];
+            private _cleanTiers();
+            private _getTickValuesForConfiguration(config);
+            private _renderTierLabels(container, config, index);
+            private _renderTickMarks(tickValues, index);
+            private _renderLabellessTickMarks(tickValues);
+            private _generateLabellessTicks();
             renderImmediately(): Time;
+            private _hideOverflowingTiers();
+            private _hideOverlappingAndCutOffLabels(index);
         }
     }
 }
-
-
 declare module Plottable {
     module Axes {
         class Numeric extends Axis<number> {
+            private _tickLabelPositioning;
+            private _usesTextWidthApproximation;
+            private _measurer;
+            private _wrapper;
             /**
              * Constructs a Numeric Axis.
              *
@@ -1988,10 +2087,17 @@ declare module Plottable {
             constructor(scale: QuantitativeScale<number>, orientation: string);
             protected _setup(): void;
             protected _computeWidth(): number;
+            private _computeExactTextWidth();
+            private _computeApproximateTextWidth();
             protected _computeHeight(): number;
             protected _getTickValues(): number[];
             protected _rescale(): void;
             renderImmediately(): Numeric;
+            private _showAllTickMarks();
+            /**
+             * Hides the Tick Marks which have no corresponding Tick Labels
+             */
+            private _hideTickMarksWithoutLabel();
             /**
              * Gets the tick label position relative to the tick marks.
              *
@@ -2022,14 +2128,30 @@ declare module Plottable {
              * @returns {Axes.Numeric} The calling Axes.Numeric.
              */
             usesTextWidthApproximation(enable: boolean): Axes.Numeric;
+            private _hideEndTickLabels();
+            private _hideOverflowingTickLabels();
+            private _hideOverlappingTickLabels();
+            /**
+             * The method is responsible for evenly spacing the labels on the axis.
+             * @return test to see if taking every `interval` recrangle from `rects`
+             *         will result in labels not overlapping
+             *
+             * For top, bottom, left, right positioning of the thicks, we want the padding
+             * between the labels to be 3x, such that the label will be  `padding` distance
+             * from the tick and 2 * `padding` distance (or more) from the next tick
+             *
+             */
+            private _hasOverlapWithInterval(interval, rects);
         }
     }
 }
-
-
 declare module Plottable {
     module Axes {
         class Category extends Axis<string> {
+            private _tickLabelAngle;
+            private _measurer;
+            private _wrapper;
+            private _writer;
             /**
              * Constructs a Category Axis.
              *
@@ -2057,16 +2179,33 @@ declare module Plottable {
              * @returns {Category} The calling Category Axis.
              */
             tickLabelAngle(angle: number): Category;
+            /**
+             * Measures the size of the ticks while also writing them to the DOM.
+             * @param {d3.Selection} ticks The tick elements to be written to.
+             */
+            private _drawTicks(axisWidth, axisHeight, scale, ticks);
+            /**
+             * Measures the size of the ticks without making any (permanent) DOM
+             * changes.
+             *
+             * @param {string[]} ticks The strings that will be printed on the ticks.
+             */
+            private _measureTicks(axisWidth, axisHeight, scale, ticks);
             renderImmediately(): Category;
             computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number): Category;
         }
     }
 }
-
-
 declare module Plottable {
     module Components {
         class Label extends Component {
+            private _textContainer;
+            private _text;
+            private _angle;
+            private _measurer;
+            private _wrapper;
+            private _writer;
+            private _padding;
             /**
              * A Label is a Component that displays a single line of text.
              *
@@ -2134,8 +2273,6 @@ declare module Plottable {
         }
     }
 }
-
-
 declare module Plottable {
     module Components {
         class Legend extends Component {
@@ -2151,6 +2288,17 @@ declare module Plottable {
              * The css class applied to each legend symbol
              */
             static LEGEND_SYMBOL_CLASS: string;
+            private _padding;
+            private _colorScale;
+            private _formatter;
+            private _maxEntriesPerRow;
+            private _comparator;
+            private _measurer;
+            private _wrapper;
+            private _writer;
+            private _symbolFactoryAccessor;
+            private _symbolOpacityAccessor;
+            private _redrawCallback;
             /**
              * The Legend consists of a series of entries, each with a color and label taken from the Color Scale.
              *
@@ -2211,7 +2359,9 @@ declare module Plottable {
              */
             colorScale(colorScale: Scales.Color): Legend;
             destroy(): void;
+            private _calculateLayoutInfo(availableWidth, availableHeight);
             requestedSpace(offeredWidth: number, offeredHeight: number): SpaceRequest;
+            private _packRows(availableWidth, entries, entryLengths);
             /**
              * Gets the Entities (representing Legend entries) at a particular point.
              * Returns an empty array if no Entities are present at that location.
@@ -2252,11 +2402,23 @@ declare module Plottable {
         }
     }
 }
-
-
 declare module Plottable {
     module Components {
         class InterpolatedColorLegend extends Component {
+            private static _DEFAULT_NUM_SWATCHES;
+            private _measurer;
+            private _wrapper;
+            private _writer;
+            private _scale;
+            private _orientation;
+            private _padding;
+            private _formatter;
+            private _expands;
+            private _swatchContainer;
+            private _swatchBoundingBox;
+            private _lowerLabel;
+            private _upperLabel;
+            private _redrawCallback;
             /**
              * The css class applied to the legend labels.
              */
@@ -2295,6 +2457,7 @@ declare module Plottable {
              * @returns {InterpolatedColorLegend} The calling InterpolatedColorLegend.
              */
             expands(expands: boolean): InterpolatedColorLegend;
+            private static _ensureOrientation(orientation);
             /**
              * Gets the orientation.
              */
@@ -2308,17 +2471,22 @@ declare module Plottable {
             orientation(orientation: string): InterpolatedColorLegend;
             fixedWidth(): boolean;
             fixedHeight(): boolean;
+            private _generateTicks(numSwatches?);
             protected _setup(): void;
             requestedSpace(offeredWidth: number, offeredHeight: number): SpaceRequest;
+            private _isVertical();
             renderImmediately(): InterpolatedColorLegend;
         }
     }
 }
-
-
 declare module Plottable {
     module Components {
         class Gridlines extends Component {
+            private _xScale;
+            private _yScale;
+            private _xLinesContainer;
+            private _yLinesContainer;
+            private _renderCallback;
             /**
              * @constructor
              * @param {QuantitativeScale} xScale The scale to base the x gridlines on. Pass null if no gridlines are desired.
@@ -2329,14 +2497,22 @@ declare module Plottable {
             protected _setup(): void;
             renderImmediately(): Gridlines;
             computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number): Gridlines;
+            private _redrawXLines();
+            private _redrawYLines();
         }
     }
 }
-
-
 declare module Plottable {
     module Components {
         class Table extends ComponentContainer {
+            private _rowPadding;
+            private _columnPadding;
+            private _rows;
+            private _rowWeights;
+            private _columnWeights;
+            private _nRows;
+            private _nCols;
+            private _calculatedLayout;
             /**
              * A Table combines Components in the form of a grid. A
              * common case is combining a y-axis, x-axis, and the plotted data via
@@ -2356,6 +2532,14 @@ declare module Plottable {
              */
             has(component: Component): boolean;
             /**
+             * Returns the Component at the specified row and column index.
+             *
+             * @param {number} rowIndex
+             * @param {number} columnIndex
+             * @returns {Component} The Component at the specified position, or null if no Component is there.
+             */
+            componentAt(rowIndex: number, columnIndex: number): Component;
+            /**
              * Adds a Component in the specified row and column position.
              *
              * For example, instead of calling `new Table([[a, b], [null, c]])`, you
@@ -2372,6 +2556,8 @@ declare module Plottable {
              */
             add(component: Component, row: number, col: number): Table;
             protected _remove(component: Component): boolean;
+            private _iterateLayout(availableWidth, availableHeight, isFinalOffer?);
+            private _determineGuarantees(offeredWidths, offeredHeights, isFinalOffer?);
             requestedSpace(offeredWidth: number, offeredHeight: number): SpaceRequest;
             computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number): Table;
             /**
@@ -2447,11 +2633,13 @@ declare module Plottable {
             columnWeight(index: number, weight: number): Table;
             fixedWidth(): boolean;
             fixedHeight(): boolean;
+            private _padTableToSize(nRows, nCols);
+            private static _calcComponentWeights(setWeights, componentGroups, fixityAccessor);
+            private static _calcProportionalSpace(weights, freeSpace);
+            private static _fixedSpace(componentGroup, fixityAccessor);
         }
     }
 }
-
-
 declare module Plottable {
     module Components {
         enum PropertyMode {
@@ -2460,6 +2648,14 @@ declare module Plottable {
         }
         class SelectionBoxLayer extends Component {
             protected _box: d3.Selection<void>;
+            private _boxArea;
+            private _boxVisible;
+            private _boxBounds;
+            private _xExtent;
+            private _yExtent;
+            private _xScale;
+            private _yScale;
+            private _adjustBoundsCallback;
             protected _xBoundsMode: PropertyMode;
             protected _yBoundsMode: PropertyMode;
             constructor();
@@ -2480,6 +2676,7 @@ declare module Plottable {
              */
             bounds(newBounds: Bounds): SelectionBoxLayer;
             protected _setBounds(newBounds: Bounds): void;
+            private _getBounds();
             renderImmediately(): SelectionBoxLayer;
             /**
              * Gets whether the box is being shown.
@@ -2536,6 +2733,7 @@ declare module Plottable {
             xExtent(xExtent: (number | {
                 valueOf(): number;
             })[]): SelectionBoxLayer;
+            private _getXExtent();
             protected _setXExtent(xExtent: (number | {
                 valueOf(): number;
             })[]): void;
@@ -2553,6 +2751,7 @@ declare module Plottable {
             yExtent(yExtent: (number | {
                 valueOf(): number;
             })[]): SelectionBoxLayer;
+            private _getYExtent();
             protected _setYExtent(yExtent: (number | {
                 valueOf(): number;
             })[]): void;
@@ -2560,13 +2759,18 @@ declare module Plottable {
         }
     }
 }
-
-
 declare module Plottable {
     module Components {
         class GuideLineLayer<D> extends Component {
             static ORIENTATION_VERTICAL: string;
             static ORIENTATION_HORIZONTAL: string;
+            private _orientation;
+            private _value;
+            private _scale;
+            private _pixelPosition;
+            private _scaleUpdateCallback;
+            private _guideLine;
+            private _mode;
             constructor(orientation: string);
             protected _setup(): void;
             protected _sizeFromOffer(availableWidth: number, availableHeight: number): {
@@ -2578,6 +2782,7 @@ declare module Plottable {
             fixedHeight(): boolean;
             computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number): GuideLineLayer<D>;
             renderImmediately(): GuideLineLayer<D>;
+            private _syncPixelPositionAndValue();
             protected _setPixelPositionWithoutChangingMode(pixelPosition: number): void;
             /**
              * Gets the QuantitativeScale on the GuideLineLayer.
@@ -2626,8 +2831,6 @@ declare module Plottable {
         }
     }
 }
-
-
 declare module Plottable {
     module Plots {
         interface PlotEntity extends Entity<Plot> {
@@ -2646,8 +2849,16 @@ declare module Plottable {
     }
     class Plot extends Component {
         protected static _ANIMATION_MAX_DURATION: number;
+        private _dataChanged;
+        private _datasetToDrawer;
         protected _renderArea: d3.Selection<void>;
+        private _attrBindings;
+        private _attrExtents;
+        private _includedValuesProvider;
+        private _animate;
+        private _animators;
         protected _renderCallback: ScaleCallback<Scale<any, any>>;
+        private _onDatasetUpdateCallback;
         protected _propertyExtents: d3.Map<any[]>;
         protected _propertyBindings: d3.Map<Plots.AccessorScaleBinding<any, any>>;
         /**
@@ -2688,6 +2899,7 @@ declare module Plottable {
          */
         attr<A>(attr: string, attrValue: A | Accessor<A>, scale: Scale<A, number | string>): Plot;
         protected _bindProperty(property: string, value: any, scale: Scale<any, any>): void;
+        private _bindAttr(attr, value, scale);
         protected _generateAttrToProjector(): AttributeToProjector;
         renderImmediately(): Plot;
         /**
@@ -2700,15 +2912,23 @@ declare module Plottable {
         animated(willAnimate: boolean): Plot;
         detach(): Plot;
         /**
+         * @returns {Scale[]} A unique array of all scales currently used by the Plot.
+         */
+        private _scales();
+        /**
          * Updates the extents associated with each attribute, then autodomains all scales the Plot uses.
          */
         protected _updateExtents(): void;
+        private _updateExtentsForAttr(attr);
         protected _updateExtentsForProperty(property: string): void;
         protected _filterForProperty(property: string): Accessor<boolean>;
+        private _updateExtentsForKey(key, bindings, extents, filter);
+        private _computeExtent(dataset, accScaleBinding, filter);
         /**
          * Override in subclass to add special extents, such as included values
          */
         protected _extentsForProperty(property: string): any[];
+        private _includedValuesForScale<D>(scale);
         /**
          * Get the Animator associated with the specified Animator key.
          *
@@ -2746,6 +2966,7 @@ declare module Plottable {
         protected _generateDrawSteps(): Drawers.DrawStep[];
         protected _additionalPaint(time: number): void;
         protected _getDataToDraw(): Utils.Map<Dataset, any[]>;
+        private _paint();
         /**
          * Retrieves Selections of this Plot for the specified Datasets.
          *
@@ -2762,6 +2983,8 @@ declare module Plottable {
          * @return {Plots.PlotEntity[]}
          */
         entities(datasets?: Dataset[]): Plots.PlotEntity[];
+        private _lightweightEntities(datasets?);
+        private _lightweightPlotEntityToPlotEntity(entity);
         /**
          * Returns the PlotEntity nearest to the query point by the Euclidian norm, or undefined if no PlotEntity can be found.
          *
@@ -2782,11 +3005,17 @@ declare module Plottable {
         protected _animateOnNextRender(): boolean;
     }
 }
-
-
 declare module Plottable {
     module Plots {
         class Pie extends Plot {
+            private static _INNER_RADIUS_KEY;
+            private static _OUTER_RADIUS_KEY;
+            private static _SECTOR_VALUE_KEY;
+            private _startAngles;
+            private _endAngles;
+            private _labelFormatter;
+            private _labelsEnabled;
+            private _strokeDrawers;
             /**
              * @constructor
              */
@@ -2888,6 +3117,7 @@ declare module Plottable {
             labelFormatter(formatter: Formatter): Pie;
             entitiesAt(queryPoint: Point): PlotEntity[];
             protected _propertyProjectors(): AttributeToProjector;
+            private _updatePieAngles();
             protected _getDataToDraw(): Utils.Map<Dataset, any[]>;
             protected static _isValidData(value: any): boolean;
             protected _pixelPoint(datum: any, index: number, dataset: Dataset): {
@@ -2895,15 +3125,23 @@ declare module Plottable {
                 y: number;
             };
             protected _additionalPaint(time: number): void;
+            private _generateStrokeDrawSteps();
+            private _sliceIndexForPoint(p);
+            private _drawLabels();
         }
     }
 }
-
-
 declare module Plottable {
     class XYPlot<X, Y> extends Plot {
         protected static _X_KEY: string;
         protected static _Y_KEY: string;
+        private _autoAdjustXScaleDomain;
+        private _autoAdjustYScaleDomain;
+        private _adjustYDomainOnChangeFromXCallback;
+        private _adjustXDomainOnChangeFromYCallback;
+        private _deferredRendering;
+        private _cachedDomainX;
+        private _cachedDomainY;
         /**
          * An XYPlot is a Plot that displays data along two primary directions, X and Y.
          *
@@ -2968,6 +3206,7 @@ declare module Plottable {
          */
         y(y: Y | Accessor<Y>, yScale: Scale<Y, number>): XYPlot<X, Y>;
         protected _filterForProperty(property: string): (datum: any, index: number, dataset: Dataset) => boolean;
+        private _makeFilterByProperty(property);
         protected _uninstallScaleForKey(scale: Scale<any, any>, key: string): void;
         protected _installScaleForKey(scale: Scale<any, any>, key: string): void;
         destroy(): XYPlot<X, Y>;
@@ -2987,6 +3226,8 @@ declare module Plottable {
          */
         autorangeMode(autorangeMode: string): XYPlot<X, Y>;
         computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number): XYPlot<X, Y>;
+        private _updateXExtentsAndAutodomain();
+        private _updateYExtentsAndAutodomain();
         /**
          * Adjusts the domains of both X and Y scales to show all data.
          * This call does not override the autorange() behavior.
@@ -2994,16 +3235,20 @@ declare module Plottable {
          * @returns {XYPlot} The calling XYPlot.
          */
         showAllData(): XYPlot<X, Y>;
+        private _adjustYDomainOnChangeFromX();
+        private _adjustXDomainOnChangeFromY();
         protected _projectorsReady(): boolean;
         protected _pixelPoint(datum: any, index: number, dataset: Dataset): Point;
         protected _getDataToDraw(): Utils.Map<Dataset, any[]>;
     }
 }
-
-
 declare module Plottable {
     module Plots {
         class Rectangle<X, Y> extends XYPlot<X, Y> {
+            private static _X2_KEY;
+            private static _Y2_KEY;
+            private _labelsEnabled;
+            private _label;
             /**
              * A Rectangle Plot displays rectangles based on the data.
              * The left and right edges of each rectangle can be set with x() and x2().
@@ -3109,6 +3354,8 @@ declare module Plottable {
              * @returns {PlotEntity[]}
              */
             entitiesIn(xRange: Range, yRange: Range): PlotEntity[];
+            private _entityBBox(datum, index, dataset, attrToProjector);
+            private _entitiesIntersecting(xValOrRange, yValOrRange);
             /**
              * Gets the accessor for labels.
              *
@@ -3141,16 +3388,20 @@ declare module Plottable {
                 x: any;
                 y: any;
             };
+            private _rectangleWidth(scale);
             protected _getDataToDraw(): Utils.Map<Dataset, any[]>;
             protected _additionalPaint(time: number): void;
+            private _drawLabels();
+            private _drawLabel(dataToDraw, dataset, datasetIndex);
+            private _overlayLabel(labelXRange, labelYRange, datumIndex, datasetIndex, dataToDraw);
         }
     }
 }
-
-
 declare module Plottable {
     module Plots {
         class Scatter<X, Y> extends XYPlot<X, Y> {
+            private static _SIZE_KEY;
+            private static _SYMBOL_KEY;
             /**
              * A Scatter Plot draws a symbol at each data point.
              *
@@ -3223,14 +3474,27 @@ declare module Plottable {
         }
     }
 }
-
-
 declare module Plottable {
     module Plots {
         class Bar<X, Y> extends XYPlot<X, Y> {
             static ORIENTATION_VERTICAL: string;
             static ORIENTATION_HORIZONTAL: string;
+            private static _BAR_WIDTH_RATIO;
+            private static _SINGLE_BAR_DIMENSION_RATIO;
+            private static _BAR_AREA_CLASS;
+            private static _LABEL_AREA_CLASS;
+            private static _LABEL_VERTICAL_PADDING;
+            private static _LABEL_HORIZONTAL_PADDING;
+            private _baseline;
+            private _baselineValue;
             protected _isVertical: boolean;
+            private _labelFormatter;
+            private _labelsEnabled;
+            private _hideBarsIfAnyAreTooWide;
+            private _labelConfig;
+            private _baselineValueProvider;
+            private _barPixelWidth;
+            private _updateBarPixelWidthCallback;
             /**
              * A Bar Plot draws bars growing out from a baseline to some value
              *
@@ -3338,11 +3602,15 @@ declare module Plottable {
              * @returns {PlotEntity[]}
              */
             entitiesIn(xRange: Range, yRange: Range): PlotEntity[];
+            private _entitiesIntersecting(xValOrRange, yValOrRange);
+            private _updateValueScale();
             protected _additionalPaint(time: number): void;
             /**
              * Makes sure the extent takes into account the widths of the bars
              */
             protected _extentsForProperty(property: string): any[];
+            private _drawLabels();
+            private _drawLabel(data, dataset);
             protected _generateDrawSteps(): Drawers.DrawStep[];
             protected _generateAttrToProjector(): {
                 [attr: string]: (datum: any, index: number, dataset: Dataset) => any;
@@ -3355,6 +3623,7 @@ declare module Plottable {
              * two adjacent data points, padded for visualisation.
              */
             protected _getBarPixelWidth(): number;
+            private _updateBarPixelWidth();
             entities(datasets?: Dataset[]): PlotEntity[];
             protected _pixelPoint(datum: any, index: number, dataset: Dataset): Point;
             protected _uninstallScaleForKey(scale: Scale<any, number>, key: string): void;
@@ -3362,11 +3631,13 @@ declare module Plottable {
         }
     }
 }
-
-
 declare module Plottable {
     module Plots {
         class Line<X> extends XYPlot<X, number> {
+            private _interpolator;
+            private _autorangeSmooth;
+            private _croppedRenderingEnabled;
+            private _downsamplingEnabled;
             /**
              * A Line Plot draws line segments starting from the first data point to the next.
              *
@@ -3392,6 +3663,7 @@ declare module Plottable {
              * and deactivating the nice domain feature on the scales
              */
             autorangeSmooth(autorangeSmooth: boolean): Plots.Line<X>;
+            private _setScaleSnapping();
             /**
              * Gets the interpolation function associated with the plot.
              *
@@ -3418,8 +3690,33 @@ declare module Plottable {
             interpolator(interpolator: "cardinal-open"): Line<X>;
             interpolator(interpolator: "cardinal-closed"): Line<X>;
             interpolator(interpolator: "monotone"): Line<X>;
+            /**
+             * Gets if downsampling is enabled
+             *
+             * When downsampling is enabled, two consecutive lines with the same slope will be merged to one line.
+             */
+            downsamplingEnabled(): boolean;
+            /**
+             * Sets if downsampling is enabled
+             *
+             * @returns {Plots.Line} The calling Plots.Line
+             */
+            downsamplingEnabled(downsampling: boolean): Plots.Line<X>;
+            /**
+             * Gets if croppedRendering is enabled
+             *
+             * When croppedRendering is enabled, lines that will not be visible in the viewport will not be drawn.
+             */
+            croppedRenderingEnabled(): boolean;
+            /**
+             * Sets if croppedRendering is enabled
+             *
+             * @returns {Plots.Line} The calling Plots.Line
+             */
+            croppedRenderingEnabled(croppedRendering: boolean): Plots.Line<X>;
             protected _createDrawer(dataset: Dataset): Drawer;
             protected _extentsForProperty(property: string): any[];
+            private _getEdgeIntersectionPoints();
             protected _getResetYFunction(): (d: any, i: number, dataset: Dataset) => number;
             protected _generateDrawSteps(): Drawers.DrawStep[];
             protected _generateAttrToProjector(): {
@@ -3435,14 +3732,17 @@ declare module Plottable {
             protected _propertyProjectors(): AttributeToProjector;
             protected _constructLineProjector(xProjector: Projector, yProjector: Projector): (datum: any, index: number, dataset: Dataset) => string;
             protected _getDataToDraw(): Utils.Map<Dataset, any[]>;
+            private _filterCroppedRendering(dataset, indices);
+            private _filterDownsampling(dataset, indices);
         }
     }
 }
-
-
 declare module Plottable {
     module Plots {
         class Area<X> extends Line<X> {
+            private static _Y0_KEY;
+            private _lineDrawers;
+            private _constantBaselineValueProvider;
             /**
              * An Area Plot draws a filled region (area) between Y and Y0.
              *
@@ -3470,6 +3770,8 @@ declare module Plottable {
             protected _addDataset(dataset: Dataset): Area<X>;
             protected _removeDatasetNodes(dataset: Dataset): void;
             protected _additionalPaint(): void;
+            private _generateLineDrawSteps();
+            private _generateLineAttrToProjector();
             protected _createDrawer(dataset: Dataset): Drawers.Area;
             protected _generateDrawSteps(): Drawers.DrawStep[];
             protected _updateYScale(): void;
@@ -3480,11 +3782,10 @@ declare module Plottable {
         }
     }
 }
-
-
 declare module Plottable {
     module Plots {
         class ClusteredBar<X, Y> extends Bar<X, Y> {
+            private _clusterOffsets;
             /**
              * A ClusteredBar Plot groups bars across Datasets based on the primary value of the bars.
              *   On a vertical ClusteredBar Plot, the bars with the same X value are grouped.
@@ -3497,15 +3798,20 @@ declare module Plottable {
             protected _generateAttrToProjector(): {
                 [attr: string]: (datum: any, index: number, dataset: Dataset) => any;
             };
+            private _updateClusterPosition();
+            private _makeInnerScale();
             protected _getDataToDraw(): Utils.Map<Dataset, any[]>;
         }
     }
 }
-
-
 declare module Plottable {
     module Plots {
         class StackedArea<X> extends Area<X> {
+            private _stackingResult;
+            private _stackedExtent;
+            private _baseline;
+            private _baselineValue;
+            private _baselineValueProvider;
             /**
              * @constructor
              */
@@ -3518,21 +3824,46 @@ declare module Plottable {
             y(): Plots.AccessorScaleBinding<number, number>;
             y(y: number | Accessor<number>): StackedArea<X>;
             y(y: number | Accessor<number>, yScale: QuantitativeScale<number>): StackedArea<X>;
+            /**
+             * Gets if downsampling is enabled
+             *
+             * When downsampling is enabled, two consecutive lines with the same slope will be merged to one line.
+             */
+            downsamplingEnabled(): boolean;
+            /**
+             * Sets if downsampling is enabled
+             *
+             * For now, downsampling is always disabled in stacked area plot
+             * @returns {Plots.StackedArea} The calling Plots.StackedArea
+             */
+            downsamplingEnabled(downsampling: boolean): Plots.Line<X>;
             protected _additionalPaint(): void;
             protected _updateYScale(): void;
             protected _onDatasetUpdate(): StackedArea<X>;
             protected _updateExtentsForProperty(property: string): void;
             protected _extentsForProperty(attr: string): any[];
+            private _updateStackExtentsAndOffsets();
+            private _checkSameDomain(datasets, keyAccessor);
+            /**
+             * Given an array of Datasets and the accessor function for the key, computes the
+             * set reunion (no duplicates) of the domain of each Dataset. The keys are stringified
+             * before being returned.
+             *
+             * @param {Dataset[]} datasets The Datasets for which we extract the domain keys
+             * @param {Accessor<any>} keyAccessor The accessor for the key of the data
+             * @return {string[]} An array of stringified keys
+             */
+            private static _domainKeys(datasets, keyAccessor);
             protected _propertyProjectors(): AttributeToProjector;
             protected _pixelPoint(datum: any, index: number, dataset: Dataset): Point;
         }
     }
 }
-
-
 declare module Plottable {
     module Plots {
         class StackedBar<X, Y> extends Bar<X, Y> {
+            private _stackingResult;
+            private _stackedExtent;
             /**
              * A StackedBar Plot stacks bars across Datasets based on the primary value of the bars.
              *   On a vertical StackedBar Plot, the bars with the same X value are stacked.
@@ -3556,14 +3887,15 @@ declare module Plottable {
             protected _onDatasetUpdate(): StackedBar<X, Y>;
             protected _updateExtentsForProperty(property: string): void;
             protected _extentsForProperty(attr: string): any[];
+            private _updateStackExtentsAndOffsets();
         }
     }
 }
-
-
 declare module Plottable {
     module Plots {
         class Segment<X, Y> extends XYPlot<X, Y> {
+            private static _X2_KEY;
+            private static _Y2_KEY;
             /**
              * A Segment Plot displays line segments based on the data.
              *
@@ -3654,14 +3986,25 @@ declare module Plottable {
              * @returns {PlotEntity[]}
              */
             entitiesIn(xRange: Range, yRange: Range): PlotEntity[];
+            private _entitiesIntersecting(xRange, yRange);
+            private _lineIntersectsBox(entity, xRange, yRange, attrToProjector);
+            private _lineIntersectsSegment(point1, point2, point3, point4);
         }
     }
 }
-
-
 declare module Plottable {
     module Plots {
         class Waterfall<X, Y> extends Bar<X, number> {
+            private static _BAR_DECLINE_CLASS;
+            private static _BAR_GROWTH_CLASS;
+            private static _BAR_TOTAL_CLASS;
+            private static _CONNECTOR_CLASS;
+            private static _CONNECTOR_AREA_CLASS;
+            private static _TOTAL_KEY;
+            private _connectorArea;
+            private _connectorsEnabled;
+            private _extent;
+            private _subtotals;
             constructor();
             /**
              * Gets whether connectors are enabled.
@@ -3694,14 +4037,19 @@ declare module Plottable {
                 [attr: string]: (datum: any, index: number, dataset: Dataset) => any;
             };
             protected _onDatasetUpdate(): Waterfall<X, Y>;
+            private _calculateSubtotalsAndExtent(dataset);
+            private _drawConnectors();
+            private _updateSubtotals();
         }
     }
 }
-
-
 declare module Plottable {
     module Plots {
         class Wheel<R, T> extends Plot {
+            private static _R_KEY;
+            private static _R2_KEY;
+            private static _T_KEY;
+            private static _T2_KEY;
             /**
              * @constructor
              */
@@ -3784,8 +4132,6 @@ declare module Plottable {
         }
     }
 }
-
-
 declare module Plottable {
     interface Animator {
         /**
@@ -3808,8 +4154,6 @@ declare module Plottable {
         totalTime(numberOfIterations: number): number;
     }
 }
-
-
 declare module Plottable {
     module Animators {
         /**
@@ -3822,14 +4166,37 @@ declare module Plottable {
         }
     }
 }
-
-
 declare module Plottable {
     module Animators {
         /**
          * An Animator with easing and configurable durations and delays.
          */
         class Easing implements Animator {
+            /**
+             * The default starting delay of the animation in milliseconds
+             */
+            private static _DEFAULT_START_DELAY_MILLISECONDS;
+            /**
+             * The default duration of one animation step in milliseconds
+             */
+            private static _DEFAULT_STEP_DURATION_MILLISECONDS;
+            /**
+             * The default maximum start delay between each step of an animation
+             */
+            private static _DEFAULT_ITERATIVE_DELAY_MILLISECONDS;
+            /**
+             * The default maximum total animation duration
+             */
+            private static _DEFAULT_MAX_TOTAL_DURATION_MILLISECONDS;
+            /**
+             * The default easing of the animation
+             */
+            private static _DEFAULT_EASING_MODE;
+            private _startDelay;
+            private _stepDuration;
+            private _stepDelay;
+            private _maxTotalDuration;
+            private _easingMode;
             /**
              * Constructs the default animator
              *
@@ -3911,27 +4278,39 @@ declare module Plottable {
              * @returns {Easing} The calling Easing Animator.
              */
             easingMode(easingMode: string): Easing;
+            /**
+             * Adjust the iterative delay, such that it takes into account the maxTotalDuration constraint
+             */
+            private _getAdjustedIterativeDelay(numberOfSteps);
         }
     }
 }
-
-
 declare module Plottable {
     class Dispatcher {
         protected _eventToCallback: {
             [eventName: string]: (e: Event) => any;
         };
         protected _callbacks: Utils.CallbackSet<Function>[];
+        private _connected;
+        private _hasNoListeners();
+        private _connect();
+        private _disconnect();
         protected _setCallback(callbackSet: Utils.CallbackSet<Function>, callback: Function): void;
         protected _unsetCallback(callbackSet: Utils.CallbackSet<Function>, callback: Function): void;
     }
 }
-
-
 declare module Plottable {
     module Dispatchers {
         type MouseCallback = (p: Point, event: MouseEvent) => void;
         class Mouse extends Dispatcher {
+            private static _DISPATCHER_KEY;
+            private _translator;
+            private _lastMousePosition;
+            private _moveCallbacks;
+            private _downCallbacks;
+            private _upCallbacks;
+            private _wheelCallbacks;
+            private _dblClickCallbacks;
             /**
              * Get a Mouse Dispatcher for the <svg> containing elem.
              * If one already exists on that <svg>, it will be returned; otherwise, a new one will be created.
@@ -4017,6 +4396,11 @@ declare module Plottable {
              * @return {Dispatchers.Mouse} The calling Mouse Dispatcher.
              */
             offDblClick(callback: MouseCallback): Dispatchers.Mouse;
+            /**
+             * Computes the mouse position from the given event, and if successful
+             * calls all the callbacks in the provided callbackSet.
+             */
+            private _measureAndDispatch(event, callbackSet, scope?);
             eventInsideSVG(event: MouseEvent): boolean;
             /**
              * Returns the last computed mouse position in <svg> coordinate space.
@@ -4027,14 +4411,18 @@ declare module Plottable {
         }
     }
 }
-
-
 declare module Plottable {
     module Dispatchers {
         type TouchCallback = (ids: number[], idToPoint: {
             [id: number]: Point;
         }, event: TouchEvent) => void;
         class Touch extends Dispatcher {
+            private static _DISPATCHER_KEY;
+            private _translator;
+            private _startCallbacks;
+            private _moveCallbacks;
+            private _endCallbacks;
+            private _cancelCallbacks;
             /**
              * Gets a Touch Dispatcher for the <svg> containing elem.
              * If one already exists on that <svg>, it will be returned; otherwise, a new one will be created.
@@ -4106,16 +4494,22 @@ declare module Plottable {
              * @return {Dispatchers.Touch} The calling Touch Dispatcher.
              */
             offTouchCancel(callback: TouchCallback): Dispatchers.Touch;
+            /**
+             * Computes the Touch position from the given event, and if successful
+             * calls all the callbacks in the provided callbackSet.
+             */
+            private _measureAndDispatch(event, callbackSet, scope?);
             eventInsideSVG(event: TouchEvent): boolean;
         }
     }
 }
-
-
 declare module Plottable {
     module Dispatchers {
         type KeyCallback = (keyCode: number, event: KeyboardEvent) => void;
         class Key extends Dispatcher {
+            private static _DISPATCHER_KEY;
+            private _keydownCallbacks;
+            private _keyupCallbacks;
             /**
              * Gets a Key Dispatcher. If one already exists it will be returned;
              * otherwise, a new one will be created.
@@ -4156,14 +4550,17 @@ declare module Plottable {
              * @return {Dispatchers.Key} The calling Key Dispatcher.
              */
             offKeyUp(callback: KeyCallback): Key;
+            private _processKeydown(event);
+            private _processKeyup(event);
         }
     }
 }
-
-
 declare module Plottable {
     class Interaction {
         protected _componentAttachedTo: Component;
+        private _anchorCallback;
+        private _isAnchored;
+        private _enabled;
         protected _anchor(component: Component): void;
         protected _unanchor(): void;
         /**
@@ -4174,6 +4571,7 @@ declare module Plottable {
          * @returns {Interaction} The calling Interaction.
          */
         attachTo(component: Component): Interaction;
+        private _connect();
         /**
          * Detaches this Interaction from the Component.
          * This Interaction can be reused.
@@ -4182,6 +4580,7 @@ declare module Plottable {
          * @returns {Interaction} The calling Interaction.
          */
         detachFrom(component: Component): Interaction;
+        private _disconnect();
         /**
          * Gets whether this Interaction is enabled.
          */
@@ -4209,14 +4608,23 @@ declare module Plottable {
         protected _isInsideComponent(p: Point): boolean;
     }
 }
-
-
 declare module Plottable {
     type ClickCallback = (point: Point) => void;
     module Interactions {
         class Click extends Interaction {
+            private _mouseDispatcher;
+            private _touchDispatcher;
+            private _clickedDown;
+            private _onClickCallbacks;
+            private _mouseDownCallback;
+            private _mouseUpCallback;
+            private _touchStartCallback;
+            private _touchEndCallback;
+            private _touchCancelCallback;
             protected _anchor(component: Component): void;
             protected _unanchor(): void;
+            private _handleClickDown(p);
+            private _handleClickUp(p);
             /**
              * Adds a callback to be called when the Component is clicked.
              *
@@ -4234,13 +4642,28 @@ declare module Plottable {
         }
     }
 }
-
-
 declare module Plottable {
     module Interactions {
         class DoubleClick extends Interaction {
+            private _mouseDispatcher;
+            private _touchDispatcher;
+            private _clickState;
+            private _clickedDown;
+            private _clickedPoint;
+            private _onDoubleClickCallbacks;
+            private _mouseDownCallback;
+            private _mouseUpCallback;
+            private _dblClickCallback;
+            private _touchStartCallback;
+            private _touchEndCallback;
+            private _touchCancelCallback;
             protected _anchor(component: Component): void;
             protected _unanchor(): void;
+            private _handleClickDown(p);
+            private _handleClickUp(p);
+            private _handleDblClick();
+            private _handleClickCancel();
+            private static _pointsEqual(p1, p2);
             /**
              * Adds a callback to be called when the Component is double-clicked.
              *
@@ -4258,14 +4681,26 @@ declare module Plottable {
         }
     }
 }
-
-
 declare module Plottable {
     type KeyCallback = (keyCode: number) => void;
     module Interactions {
         class Key extends Interaction {
+            /**
+             * A Key Interaction listens to key events that occur while the Component is
+             * moused over.
+             */
+            private _positionDispatcher;
+            private _keyDispatcher;
+            private _keyPressCallbacks;
+            private _keyReleaseCallbacks;
+            private _mouseMoveCallback;
+            private _downedKeys;
+            private _keyDownCallback;
+            private _keyUpCallback;
             protected _anchor(component: Component): void;
             protected _unanchor(): void;
+            private _handleKeyDownEvent(keyCode, event);
+            private _handleKeyUpEvent(keyCode);
             /**
              * Adds a callback to be called when the key with the given keyCode is
              * pressed and the user is moused over the Component.
@@ -4305,14 +4740,23 @@ declare module Plottable {
         }
     }
 }
-
-
 declare module Plottable {
     type PointerCallback = (point: Point) => void;
     module Interactions {
         class Pointer extends Interaction {
+            private _mouseDispatcher;
+            private _touchDispatcher;
+            private _insideComponent;
+            private _pointerEnterCallbacks;
+            private _pointerMoveCallbacks;
+            private _pointerExitCallbacks;
+            private _mouseMoveCallback;
+            private _touchStartCallback;
             protected _anchor(component: Component): void;
             protected _unanchor(): void;
+            private _handleMouseEvent(p, e);
+            private _handleTouchEvent(p, e);
+            private _handlePointerEvent(p, insideSVG);
             /**
              * Adds a callback to be called when the pointer enters the Component.
              *
@@ -4358,11 +4802,26 @@ declare module Plottable {
         }
     }
 }
-
-
 declare module Plottable {
     module Interactions {
         class PanZoom extends Interaction {
+            /**
+             * The number of pixels occupied in a line.
+             */
+            private static _PIXELS_PER_LINE;
+            private _xScales;
+            private _yScales;
+            private _dragInteraction;
+            private _mouseDispatcher;
+            private _touchDispatcher;
+            private _touchIds;
+            private _wheelCallback;
+            private _touchStartCallback;
+            private _touchMoveCallback;
+            private _touchEndCallback;
+            private _touchCancelCallback;
+            private _minDomainExtents;
+            private _maxDomainExtents;
             /**
              * A PanZoom Interaction updates the domains of an x-scale and/or a y-scale
              * in response to the user panning or zooming.
@@ -4374,6 +4833,17 @@ declare module Plottable {
             constructor(xScale?: QuantitativeScale<any>, yScale?: QuantitativeScale<any>);
             protected _anchor(component: Component): void;
             protected _unanchor(): void;
+            private _handleTouchStart(ids, idToPoint, e);
+            private _handlePinch(ids, idToPoint, e);
+            private static _centerPoint(point1, point2);
+            private static _pointDistance(point1, point2);
+            private _handleTouchEnd(ids, idToPoint, e);
+            private _magnifyScale<D>(scale, magnifyAmount, centerValue);
+            private _translateScale<D>(scale, translateAmount);
+            private _handleWheelEvent(p, e);
+            private _constrainedZoomAmount(scale, zoomAmount);
+            private _setupDragInteraction();
+            private _nonLinearScaleWithExtents(scale);
             /**
              * Gets the x scales for this PanZoom Interaction.
              */
@@ -4467,14 +4937,30 @@ declare module Plottable {
         }
     }
 }
-
-
 declare module Plottable {
     type DragCallback = (start: Point, end: Point) => void;
     module Interactions {
         class Drag extends Interaction {
+            private _dragging;
+            private _constrainedToComponent;
+            private _mouseDispatcher;
+            private _touchDispatcher;
+            private _dragOrigin;
+            private _dragStartCallbacks;
+            private _dragCallbacks;
+            private _dragEndCallbacks;
+            private _mouseDownCallback;
+            private _mouseMoveCallback;
+            private _mouseUpCallback;
+            private _touchStartCallback;
+            private _touchMoveCallback;
+            private _touchEndCallback;
             protected _anchor(component: Component): void;
             protected _unanchor(): void;
+            private _translateAndConstrain(p);
+            private _startDrag(point, event);
+            private _doDrag(point, event);
+            private _endDrag(point, event);
             /**
              * Gets whether the Drag Interaction constrains Points passed to its
              * callbacks to lie inside its Component.
@@ -4543,13 +5029,27 @@ declare module Plottable {
         }
     }
 }
-
-
 declare module Plottable {
     type DragBoxCallback = (bounds: Bounds) => void;
     module Components {
         class DragBoxLayer extends Components.SelectionBoxLayer {
+            private _dragInteraction;
+            private _detectionEdgeT;
+            private _detectionEdgeB;
+            private _detectionEdgeL;
+            private _detectionEdgeR;
+            private _detectionCornerTL;
+            private _detectionCornerTR;
+            private _detectionCornerBL;
+            private _detectionCornerBR;
+            private _detectionRadius;
+            private _resizable;
+            private _movable;
             protected _hasCorners: boolean;
+            private _dragStartCallbacks;
+            private _dragCallbacks;
+            private _dragEndCallbacks;
+            private _disconnectInteraction;
             /**
              * Constructs a DragBoxLayer.
              *
@@ -4560,7 +5060,9 @@ declare module Plottable {
              * @constructor
              */
             constructor();
+            private _setUpCallbacks();
             protected _setup(): void;
+            private _getResizingEdges(p);
             renderImmediately(): DragBoxLayer;
             /**
              * Gets the detection radius of the drag box in pixels.
@@ -4596,6 +5098,7 @@ declare module Plottable {
              * @return {DragBoxLayer} The calling DragBoxLayer.
              */
             movable(movable: boolean): DragBoxLayer;
+            private _setMovableClass();
             /**
              * Sets the callback to be called when dragging starts.
              *
@@ -4653,11 +5156,10 @@ declare module Plottable {
             destroy(): void;
             detach(): Component;
             anchor(selection: d3.Selection<void>): Component;
+            private _resetState();
         }
     }
 }
-
-
 declare module Plottable {
     module Components {
         class XDragBoxLayer extends DragBoxLayer {
@@ -4686,8 +5188,6 @@ declare module Plottable {
         }
     }
 }
-
-
 declare module Plottable {
     module Components {
         class YDragBoxLayer extends DragBoxLayer {
@@ -4716,14 +5216,20 @@ declare module Plottable {
         }
     }
 }
-
-
 declare module Plottable {
     interface DragLineCallback<D> {
         (dragLineLayer: Components.DragLineLayer<D>): void;
     }
     module Components {
         class DragLineLayer<D> extends GuideLineLayer<D> {
+            private _dragInteraction;
+            private _detectionRadius;
+            private _detectionEdge;
+            private _enabled;
+            private _dragStartCallbacks;
+            private _dragCallbacks;
+            private _dragEndCallbacks;
+            private _disconnectInteraction;
             constructor(orientation: string);
             protected _setup(): void;
             renderImmediately(): DragLineLayer<D>;
