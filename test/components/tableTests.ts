@@ -261,7 +261,7 @@ describe("Tables", () => {
       svg.remove();
     });
 
-    it("gives width to full-width Components, then divides remainder between non-fixed-width Components", () => {
+    it("gives width to fixed-width Components, then divides remainder between non-fixed-width Components", () => {
       const svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
 
       const FIXED_COMPONENT_SIZE = 50;
@@ -305,7 +305,7 @@ describe("Tables", () => {
       svg.remove();
     });
 
-    it("gives height to full-height Components, then divides remainder between non-fixed-height Components", () => {
+    it("gives height to fixed-height Components, then divides remainder between non-fixed-height Components", () => {
       const svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
 
       const FIXED_COMPONENT_SIZE = 50;
