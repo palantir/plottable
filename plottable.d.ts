@@ -2411,7 +2411,7 @@ declare module Plottable {
             private _writer;
             private _scale;
             private _orientation;
-            private _padding;
+            private _textPadding;
             private _formatter;
             private _expands;
             private _swatchContainer;
