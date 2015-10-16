@@ -341,28 +341,6 @@ describe("Tables", () => {
       svg.remove();
     });
 
-    it.skip("basic table with 2 rows 2 cols lays out properly", () => {
-      let tableAndcomponents = generateBasicTable(2, 2);
-      let table = tableAndcomponents.table;
-      let components = tableAndcomponents.components;
-
-      let svg = TestMethods.generateSVG();
-      table.renderTo(svg);
-
-      let elements = components.map((r) => (<any> r)._element);
-      let translates = elements.map((e) => TestMethods.getTranslate(e));
-      assert.deepEqual(translates[0], [0, 0], "first element is centered at origin");
-      assert.deepEqual(translates[1], [200, 0], "second element is located properly");
-      assert.deepEqual(translates[2], [0, 200], "third element is located properly");
-      assert.deepEqual(translates[3], [200, 200], "fourth element is located properly");
-      let bboxes = elements.map((e) => Plottable.Utils.DOM.elementBBox(e));
-      bboxes.forEach((b) => {
-        assert.strictEqual(b.width, 200, "bbox is 200 pixels wide");
-        assert.strictEqual(b.height, 200, "bbox is 200 pixels tall");
-        });
-      svg.remove();
-    });
-
     it.skip("table with 2 rows 2 cols and margin/padding lays out properly", () => {
       let tableAndcomponents = generateBasicTable(2, 2);
       let table = tableAndcomponents.table;
