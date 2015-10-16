@@ -1,5 +1,3 @@
-///<reference path="../reference.ts" />
-
 module Plottable {
 export module Axes {
   export class Category extends Axis<string> {
@@ -232,7 +230,11 @@ export module Axes {
       // on everyone, including this. Since CSS or something might have
       // affected the size of the characters, clear the cache.
       this._measurer.reset();
-      return super.computeLayout(origin, availableWidth, availableHeight);
+      super.computeLayout(origin, availableWidth, availableHeight);
+      if (!this._isHorizontal()) {
+        this._scale.range([0, this.height()]);
+      }
+      return this;
     }
   }
 }
