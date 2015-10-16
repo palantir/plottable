@@ -1,20 +1,5 @@
 ///<reference path="../testReference.ts" />
 
-function generateBasicTable(nRows: number, nCols: number) {
-  // makes a table with exactly nRows * nCols children in a regular grid, with each
-  // child being a basic component
-  let table = new Plottable.Components.Table();
-  let components: Plottable.Component[] = [];
-  for (let i = 0; i < nRows; i++) {
-    for (let j = 0; j < nCols; j++) {
-      let r = new Plottable.Component();
-      table.add(r, i, j);
-      components.push(r);
-    }
-  }
-  return {"table": table, "components": components};
-}
-
 describe("Tables", () => {
   function assertTableRows(table: Plottable.Components.Table, expectedRows: Plottable.Component[][], message: string) {
     expectedRows.forEach((row, rowIndex) => {
