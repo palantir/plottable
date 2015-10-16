@@ -227,6 +227,82 @@ describe("Tables", () => {
   });
 
   describe("layout of constituent Components", () => {
+    const SVG_WIDTH = 300;
+    const SVG_HEIGHT = 300;
+
+    function verifySingleRowOrigins(row: Plottable.Component[]) {
+      let expectedOrigin = {
+        x: 0,
+        y: 0
+      };
+      row.forEach((component, columnIndex) => {
+        TestMethods.assertPointsClose(component.origin(), expectedOrigin, 0, `Component in column ${columnIndex} has the correct origin`);
+        expectedOrigin.x += component.width();
+      });
+    }
+
+    function verifySingleColumnOrigins(column: Plottable.Component[]) {
+      let expectedOrigin = {
+        x: 0,
+        y: 0
+      };
+      column.forEach((component, rowIndex) => {
+        TestMethods.assertPointsClose(component.origin(), expectedOrigin, 0, `Component in row ${rowIndex} has the correct origin`);
+        expectedOrigin.y += component.height();
+      });
+    }
+
+    it("divides available width evenly between non-fixed-width Components", () => {
+      const svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+
+      const component1 = new Plottable.Component();
+      const component2 = new Plottable.Component();
+      let table = new Plottable.Components.Table([[component1, component2]]);
+      table.renderTo(svg);
+      const twoColumnExpectedWidth = SVG_WIDTH / 2;
+      assert.strictEqual(component1.width(), twoColumnExpectedWidth, "first Component received half the available width");
+      assert.strictEqual(component2.width(), twoColumnExpectedWidth, "second Component received half the available width");
+      verifySingleRowOrigins([component1, component2]);
+
+      const component3 = new Plottable.Component();
+      table.add(component3, 0, 2);
+      const threeColumnExpectedWidth = SVG_WIDTH / 3;
+      assert.strictEqual(component1.width(), threeColumnExpectedWidth, "first Component received one-third of the available width");
+      assert.strictEqual(component2.width(), threeColumnExpectedWidth, "second Component received one-third of the available width");
+      assert.strictEqual(component3.width(), threeColumnExpectedWidth, "third Component received one-third of the available width");
+      verifySingleRowOrigins([component1, component2, component3]);
+
+      table.destroy();
+      svg.remove();
+    });
+
+    it("divides available height evenly between non-fixed-height Components", () => {
+      const svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+
+      const component1 = new Plottable.Component();
+      const component2 = new Plottable.Component();
+      let table = new Plottable.Components.Table([
+        [component1],
+        [component2]
+      ]);
+      table.renderTo(svg);
+      let twoRowExpectedHeight = SVG_HEIGHT / 2;
+      assert.strictEqual(component1.height(), twoRowExpectedHeight, "first Component received half the available height");
+      assert.strictEqual(component2.height(), twoRowExpectedHeight, "second Component received half the available height");
+      verifySingleColumnOrigins([component1, component2]);
+
+      const component3 = new Plottable.Component();
+      table.add(component3, 2, 0);
+      let threeRowExpectedHeight = SVG_HEIGHT / 3;
+      assert.strictEqual(component1.height(), threeRowExpectedHeight, "first Component received one-third of the available height");
+      assert.strictEqual(component2.height(), threeRowExpectedHeight, "second Component received one-third of the available height");
+      assert.strictEqual(component3.height(), threeRowExpectedHeight, "third Component received one-third of the available height");
+      verifySingleColumnOrigins([component1, component2, component3]);
+
+      table.destroy();
+      svg.remove();
+    });
+
     it("basic table with 2 rows 2 cols lays out properly", () => {
       let tableAndcomponents = generateBasicTable(2, 2);
       let table = tableAndcomponents.table;
