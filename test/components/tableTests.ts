@@ -230,25 +230,25 @@ describe("Tables", () => {
     const SVG_WIDTH = 300;
     const SVG_HEIGHT = 300;
 
-    function verifySingleRowOrigins(row: Plottable.Component[]) {
+    function verifySingleRowOrigins(row: Plottable.Component[], columnPadding = 0) {
       let expectedOrigin = {
         x: 0,
         y: 0
       };
       row.forEach((component, columnIndex) => {
         TestMethods.assertPointsClose(component.origin(), expectedOrigin, 0, `Component in column ${columnIndex} has the correct origin`);
-        expectedOrigin.x += component.width();
+        expectedOrigin.x += component.width() + columnPadding;
       });
     }
 
-    function verifySingleColumnOrigins(column: Plottable.Component[]) {
+    function verifySingleColumnOrigins(column: Plottable.Component[], rowPadding = 0) {
       let expectedOrigin = {
         x: 0,
         y: 0
       };
       column.forEach((component, rowIndex) => {
         TestMethods.assertPointsClose(component.origin(), expectedOrigin, 0, `Component in row ${rowIndex} has the correct origin`);
-        expectedOrigin.y += component.height();
+        expectedOrigin.y += component.height() + rowPadding;
       });
     }
 
@@ -341,26 +341,44 @@ describe("Tables", () => {
       svg.remove();
     });
 
-    it.skip("table with 2 rows 2 cols and margin/padding lays out properly", () => {
-      let tableAndcomponents = generateBasicTable(2, 2);
-      let table = tableAndcomponents.table;
-      let components = tableAndcomponents.components;
-      table.rowPadding(5).columnPadding(5);
+    it("adds row padding between rows", () => {
+      const svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
 
-      let svg = TestMethods.generateSVG(415, 415);
+      const component1 = new Plottable.Component();
+      const component2 = new Plottable.Component();
+      const table = new Plottable.Components.Table([
+        [component1],
+        [component2]
+      ]);
+      const rowPadding = 10;
+      table.rowPadding(rowPadding);
       table.renderTo(svg);
 
-      let elements = components.map((r) => (<any> r)._element);
-      let translates = elements.map((e) => TestMethods.getTranslate(e));
-      let bboxes = elements.map((e) => Plottable.Utils.DOM.elementBBox(e));
-      assert.deepEqual(translates[0], [0, 0], "first element is centered properly");
-      assert.deepEqual(translates[1], [210, 0], "second element is located properly");
-      assert.deepEqual(translates[2], [0, 210], "third element is located properly");
-      assert.deepEqual(translates[3], [210, 210], "fourth element is located properly");
-      bboxes.forEach((b) => {
-        assert.strictEqual(b.width, 205, "bbox is 205 pixels wide");
-        assert.strictEqual(b.height, 205, "bbox is 205 pixels tall");
-        });
+      const expectedHeight = (SVG_HEIGHT - rowPadding) / 2;
+      assert.strictEqual(component1.height(), expectedHeight, "first non-fixed-height Component received half the remaining height");
+      assert.strictEqual(component2.height(), expectedHeight, "second non-fixed-height Component received half the remaining height");
+      verifySingleColumnOrigins([component1, component2], rowPadding);
+
+      table.destroy();
+      svg.remove();
+    });
+
+    it("adds column padding between columns", () => {
+      const svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+
+      const component1 = new Plottable.Component();
+      const component2 = new Plottable.Component();
+      const table = new Plottable.Components.Table([[component1, component2]]);
+      const columnPadding = 10;
+      table.columnPadding(columnPadding);
+      table.renderTo(svg);
+
+      const expectedWidth = (SVG_HEIGHT - columnPadding) / 2;
+      assert.strictEqual(component1.width(), expectedWidth, "first non-fixed-width Component received half the remaining width");
+      assert.strictEqual(component2.width(), expectedWidth, "second non-fixed-width Component received half the remaining width");
+      verifySingleRowOrigins([component1, component2], columnPadding);
+
+      table.destroy();
       svg.remove();
     });
 
