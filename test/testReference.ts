@@ -1,5 +1,6 @@
 ///<reference path="../typings/chai/chai.d.ts" />
 ///<reference path="../typings/mocha/mocha.d.ts" />
+///<reference path="../typings/sinon/sinon.d.ts" />
 ///<reference path="../typings/d3/d3.d.ts" />
 ///<reference path="../typings/jquery/jquery.d.ts" />
 ///<reference path="../typings/jquery.simulate/jquery.simulate.d.ts" />
