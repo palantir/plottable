@@ -167,20 +167,32 @@ describe("Tables", () => {
   });
 
   describe("requesting space", () => {
-    it("table space fixity calculates properly", () => {
-      let tableAndcomponents = generateBasicTable(3, 3);
-      let table = tableAndcomponents.table;
-      let components = tableAndcomponents.components;
-      components.forEach((c) => TestMethods.fixComponentSize(c, 10, 10));
-      assert.isTrue(table.fixedWidth(), "fixed width when all subcomponents fixed width");
-      assert.isTrue(table.fixedHeight(), "fixedHeight when all subcomponents fixed height");
-      TestMethods.fixComponentSize(components[0], null, 10);
-      assert.isFalse(table.fixedWidth(), "width not fixed when some subcomponent width not fixed");
-      assert.isTrue(table.fixedHeight(), "the height is still fixed when some subcomponent width not fixed");
-      TestMethods.fixComponentSize(components[8], 10, null);
-      TestMethods.fixComponentSize(components[0], 10, 10);
-      assert.isTrue(table.fixedWidth(), "width fixed again once no subcomponent width not fixed");
-      assert.isFalse(table.fixedHeight(), "height unfixed now that a subcomponent has unfixed height");
+    it("is fixed-width if all columns contain only fixed-width Components, non-fixed otherwise", () => {
+      let fixedNullsTable = new Plottable.Components.Table([
+        [new Mocks.FixedSizeComponent(), null],
+        [null, new Mocks.FixedSizeComponent()]
+      ]);
+      assert.isTrue(fixedNullsTable.fixedWidth(), "width is fixed if all columns contain fixed-width Components or null");
+
+      let someUnfixedTable = new Plottable.Components.Table([
+        [new Mocks.FixedSizeComponent(), new Mocks.FixedSizeComponent()],
+        [new Plottable.Component(), null]
+      ]);
+      assert.isFalse(someUnfixedTable.fixedWidth(), "width is not fixed if any column contains a non-fixed-width Component");
+    });
+
+    it("is fixed-height if all rows contain only fixed-height Components, non-fixed otherwise", () => {
+      let fixedNullsTable = new Plottable.Components.Table([
+        [new Mocks.FixedSizeComponent(), null],
+        [null, new Mocks.FixedSizeComponent()]
+      ]);
+      assert.isTrue(fixedNullsTable.fixedHeight(), "height is fixed if all columns contain fixed-height Components or null");
+
+      let someUnfixedTable = new Plottable.Components.Table([
+        [new Mocks.FixedSizeComponent(), new Plottable.Component()],
+        [new Mocks.FixedSizeComponent(), null]
+      ]);
+      assert.isFalse(someUnfixedTable.fixedHeight(), "height is not fixed if any row contains a non-fixed-height Component");
     });
 
     it("table.requestedSpace works properly", () => {
