@@ -168,13 +168,13 @@ describe("Tables", () => {
 
   describe("requesting space", () => {
     it("is fixed-width if all columns contain only fixed-width Components, non-fixed otherwise", () => {
-      let fixedNullsTable = new Plottable.Components.Table([
+      const fixedNullsTable = new Plottable.Components.Table([
         [new Mocks.FixedSizeComponent(), null],
         [null, new Mocks.FixedSizeComponent()]
       ]);
       assert.isTrue(fixedNullsTable.fixedWidth(), "width is fixed if all columns contain fixed-width Components or null");
 
-      let someUnfixedTable = new Plottable.Components.Table([
+      const someUnfixedTable = new Plottable.Components.Table([
         [new Mocks.FixedSizeComponent(), new Mocks.FixedSizeComponent()],
         [new Plottable.Component(), null]
       ]);
@@ -182,41 +182,47 @@ describe("Tables", () => {
     });
 
     it("is fixed-height if all rows contain only fixed-height Components, non-fixed otherwise", () => {
-      let fixedNullsTable = new Plottable.Components.Table([
+      const fixedNullsTable = new Plottable.Components.Table([
         [new Mocks.FixedSizeComponent(), null],
         [null, new Mocks.FixedSizeComponent()]
       ]);
       assert.isTrue(fixedNullsTable.fixedHeight(), "height is fixed if all columns contain fixed-height Components or null");
 
-      let someUnfixedTable = new Plottable.Components.Table([
+      const someUnfixedTable = new Plottable.Components.Table([
         [new Mocks.FixedSizeComponent(), new Plottable.Component()],
         [new Mocks.FixedSizeComponent(), null]
       ]);
       assert.isFalse(someUnfixedTable.fixedHeight(), "height is not fixed if any row contains a non-fixed-height Component");
     });
 
-    it("table.requestedSpace works properly", () => {
-      let c0 = new Plottable.Component();
-      let c1 = TestMethods.makeFixedSizeComponent(50, 50);
-      let c2 = TestMethods.makeFixedSizeComponent(20, 50);
-      let c3 = TestMethods.makeFixedSizeComponent(20, 20);
+    it("requests enough space for largest fixed-size Component in each row and column", () => {
+      const BIG_COMPONENT_SIZE = 50;
+      const SMALL_COMPONENT_SIZE = 20;
 
-      let table = new Plottable.Components.Table([
-        [c0, c1],
-        [c2, c3]
+      const unfixedComponent = new Plottable.Component();
+      const bigFixedComponent01 = new Mocks.FixedSizeComponent(BIG_COMPONENT_SIZE, BIG_COMPONENT_SIZE);
+      const bigFixedComponent10 = new Mocks.FixedSizeComponent(BIG_COMPONENT_SIZE, BIG_COMPONENT_SIZE);
+      const smallFixedComponent = new Mocks.FixedSizeComponent(SMALL_COMPONENT_SIZE, SMALL_COMPONENT_SIZE);
+
+      const table = new Plottable.Components.Table([
+        [unfixedComponent, bigFixedComponent01],
+        [bigFixedComponent10, smallFixedComponent]
       ]);
 
-      let spaceRequest = table.requestedSpace(30, 30);
-      TestMethods.verifySpaceRequest(spaceRequest, 70, 100, "1");
+      const expectedMinWidth = 2 * BIG_COMPONENT_SIZE;
+      const expectedMinHeight = 2 * BIG_COMPONENT_SIZE;
 
-      spaceRequest = table.requestedSpace(50, 50);
-      TestMethods.verifySpaceRequest(spaceRequest, 70, 100, "2");
+      const constrainedSpaceRequest = table.requestedSpace(0, 0);
+      TestMethods.verifySpaceRequest(constrainedSpaceRequest, expectedMinWidth, expectedMinHeight,
+        "requests enough space for all fixed-size Components when space is constrained");
 
-      spaceRequest = table.requestedSpace(90, 90);
-      TestMethods.verifySpaceRequest(spaceRequest, 70, 100, "3");
+      const exactlyEnoughSpaceRequest = table.requestedSpace(expectedMinWidth, expectedMinHeight);
+      TestMethods.verifySpaceRequest(exactlyEnoughSpaceRequest, expectedMinWidth, expectedMinHeight,
+        "requests enough space for all fixed-size Components when given exactly enough space");
 
-      spaceRequest = table.requestedSpace(200, 200);
-      TestMethods.verifySpaceRequest(spaceRequest, 70, 100, "4");
+      const extraSpaceRequest = table.requestedSpace(2 * expectedMinWidth, 2 * expectedMinHeight);
+      TestMethods.verifySpaceRequest(extraSpaceRequest, expectedMinWidth, expectedMinHeight,
+        "requests enough space for all fixed-size Components when given extra space");
     });
   });
 
