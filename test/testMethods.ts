@@ -259,22 +259,26 @@ module TestMethods {
     e.shiftKey = false;
     target.node().dispatchEvent(e);
   }
-    
+
   export enum InteractionMode {
     Mouse,
     Touch
   };
-  
+
   export enum InteractionType {
     Start,
     Move,
     End
   }
 
-  export function triggerFakeInteractionEvent(mode: InteractionMode, type: InteractionType, target: d3.Selection<void>, relativeX: number, relativeY: number) {
+  export function triggerFakeInteractionEvent(mode: InteractionMode,
+                                              type: InteractionType,
+                                              target: d3.Selection<void>,
+                                              relativeX: number,
+                                              relativeY: number) {
     const typeString = getInteractionTypeString(mode, type);
-    switch(mode) {
-      case InteractionMode.Mouse:    
+    switch (mode) {
+      case InteractionMode.Mouse:
         TestMethods.triggerFakeMouseEvent(typeString, target, relativeX, relativeY);
         break;
       case InteractionMode.Touch:
@@ -284,9 +288,9 @@ module TestMethods {
         throw new Error("Unrecognized enum value: " + mode);
     }
   }
-  
+
   function getInteractionTypeString(mode: InteractionMode, type: InteractionType) {
-    switch(mode) {
+    switch (mode) {
       case InteractionMode.Mouse:
         switch (type) {
           case InteractionType.Start:
@@ -310,6 +314,7 @@ module TestMethods {
           default:
             throw new Error("Unrecognized enum value: " + type);
         }
+        break;
       default:
         throw new Error("Unrecognized enum value: " + mode);
     }
