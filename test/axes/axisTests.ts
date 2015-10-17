@@ -628,7 +628,7 @@ describe("Axis", () => {
     svg.remove();
   });
 
-  it("renders a duplicate tick in the first tier it can fit in", () => {
+  it("places the tick at the top most row even if it is a duplicated tick", () => {
     let annotatedTicks = [150, 150];
     let scale = new Plottable.Scales.Linear();
     scale.domain([100, 200]);
