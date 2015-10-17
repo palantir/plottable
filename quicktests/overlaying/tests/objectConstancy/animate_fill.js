@@ -1,7 +1,6 @@
-﻿//# sourceURL=scatter2.js
+
 function makeData() {
     "use strict";
-
     return [makeRandomData(20), makeRandomData(20)];
 }
 
@@ -11,7 +10,7 @@ function run(svg, data, Plottable) {
     var xScale = new Plottable.Scales.Linear();
     var xAxis = new Plottable.Axes.Numeric(xScale, "bottom");
 
-    var yScale = new Plottable.Scales.Linear().domain([0,2.2]);
+    var yScale = new Plottable.Scales.Linear().domain([0, 2.2]);
     var yAxis = new Plottable.Axes.Numeric(yScale, "left");
 
     var d1 = new Plottable.Dataset(data[0]);
@@ -20,8 +19,8 @@ function run(svg, data, Plottable) {
     var attrAnimator = new Plottable.Animators.Attr();
     //var proj = { height: function () { return 0; } };
     var proj = { fill: "#D00" };
-    var endproj = { fill: "#DDD" , opacity:.1};
-    attrAnimator 
+    var endproj = { fill: "#DDD", opacity: .1};
+    attrAnimator
         .stepDuration(1000)
         .stepDelay(0)
         .startAttrs(proj)
@@ -49,3 +48,4 @@ function run(svg, data, Plottable) {
 
     new Plottable.Interactions.Click().onClick(cb).attachTo(circleRenderer);
 }
+//# sourceURL=objectconstancy/animate_fill.js

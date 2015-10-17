@@ -1,33 +1,37 @@
 module Plottable {
-export class EasingFunctions {
-  public static atStart = (t: number) => {
-    return 1;
-  };
-  public static atEnd = (t: number) => {
-    if (t < 1) {
-      return 0;
+export module Animators {
+  export type EasingFunction = (t: number) => number;
+  export type EasingFunctionSpecifier = string|EasingFunction;
+  export class EasingFunctions {
+    public static atStart = (t: number) => {
+      return 1;
     };
-    return 1;
-  };
-  public static squEase(easingFunction: string, end: number, start?: number) {
-    return (t: number) => {
-      if (start === undefined) {
-        start = 0;
+    public static atEnd = (t: number) => {
+      if (t < 1) {
+        return 0;
       };
-      let tbar: number;
-      if (t < start) {
-        tbar = 0;
-      } else {
-        if (t > end) {
-          tbar = 1;
-        } else {
-          tbar = (t - start) / (end - start);
-        }
-        return d3.ease(easingFunction)(tbar);
-      }
+      return 1;
     };
+    public static squEase(easingFunction: EasingFunctionSpecifier, start: number, end: number): EasingFunction {
+      return (t: number) => {
+        if (start === undefined) {
+          start = 0;
+        };
+        if (t >= end) {
+            return 1;
+        }
+        if (t <= start) {
+          return 0;
+        }
+        let tbar = (t - start) / (end - start);
+        if (typeof (easingFunction) === "string") {
+          easingFunction = d3.ease(<string>easingFunction);
+        }
+        return (<EasingFunction>easingFunction)(tbar);
+      };
+    }
   }
-};
+}
 export interface Animator {
   /**
    * Applies the supplied attributes to a d3.Selection with some animation.
@@ -40,7 +44,7 @@ export interface Animator {
    *     animators.
    */
   animate(selection: d3.Selection<any>, attrToAppliedProjector: AttributeToAppliedProjector,
-    drawingTarget?: Drawers.DrawingTarget): d3.Selection<any> | d3.Transition<any>;
+    drawingTarget?: Drawers.DrawingTarget, drawer?: Drawer): d3.Selection<any> | d3.Transition<any>;
 
   /**
    * Given the number of elements, return the total time the animation requires

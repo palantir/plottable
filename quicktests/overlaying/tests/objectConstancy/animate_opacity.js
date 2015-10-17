@@ -1,7 +1,6 @@
-﻿//# sourceURL=objectConstancy/animate_opacity.js
+
 function makeData() {
     "use strict";
-
     return [makeRandomData(20), makeRandomData(20)];
 }
 
@@ -11,26 +10,22 @@ function run(svg, data, Plottable) {
     var xScale = new Plottable.Scales.Linear();
     var xAxis = new Plottable.Axes.Numeric(xScale, "bottom");
 
-    var yScale = new Plottable.Scales.Linear().domain([0,2.2]);
+    var yScale = new Plottable.Scales.Linear().domain([0, 2.2]);
     var yAxis = new Plottable.Axes.Numeric(yScale, "left");
 
     var d1 = new Plottable.Dataset(data[0]);
     var d2 = new Plottable.Dataset(data[1]);
 
-    var attrAnimator = new Plottable.Animators.Attr();
-    //var proj = { height: function () { return 0; } };
-    var proj = { opacity: .1 };
-    var endproj = { opacity: .1};
-    attrAnimator 
+    var animator = new Plottable.Animators.Opacity(0, 0)
         .stepDuration(1000)
         .stepDelay(0)
-        .startAttrs(proj)
-        .endAttrs(endproj);
+        .easingMode(Plottable.Animators.EasingFunctions.squEase("linear-in-out", .1, 1))
+        .exitEasingMode(Plottable.Animators.EasingFunctions.squEase("linear-in-out", 0, .1));
 
     d1.keyFunction(Plottable.KeyFunctions.noConstancy);
     d2.keyFunction(Plottable.KeyFunctions.noConstancy);
     var circleRenderer = new Plottable.Plots.Scatter().addDataset(d1)
-                .animator(Plottable.Plots.Animator.MAIN, attrAnimator)
+                .animator(Plottable.Plots.Animator.MAIN, animator)
                 .size(16)
                 .x(function (d) { return d.x; }, xScale)
                 .y(function (d) { return d.y; }, yScale)
@@ -49,3 +44,4 @@ function run(svg, data, Plottable) {
 
     new Plottable.Interactions.Click().onClick(cb).attachTo(circleRenderer);
 }
+//# sourceURL=objectConstancy/animate_opacity.js

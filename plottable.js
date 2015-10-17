@@ -2584,7 +2584,6 @@ var Plottable;
          * @param {Dataset} dataset The dataset associated with this Drawer
          */
         function Drawer(dataset) {
-            this._cachedSelectionValid = false;
             this._dataset = dataset;
             this._initializer = function () { return {}; };
         }
@@ -2593,15 +2592,22 @@ var Plottable;
                 return this._renderArea;
             }
             this._renderArea = area;
-            this._cachedSelectionValid = false;
             return this;
         };
-        Drawer.prototype.initializer = function (fnattrToAppliedProjector) {
-            if (fnattrToAppliedProjector == null) {
+        Drawer.prototype.initializer = function (fnattrToProjector) {
+            if (fnattrToProjector == null) {
                 return this._initializer;
             }
-            this._initializer = fnattrToAppliedProjector;
+            this._initializer = fnattrToProjector;
             return this;
+        };
+        /*
+         * Return the AttrToAppliedProjector generated from the initializer
+         *
+         * @returns {AttrToAppliedProjector} .
+         */
+        Drawer.prototype.appliedInitializer = function () {
+            return this._appliedProjectors(this.initializer()());
         };
         /**
          * Removes the Drawer and its renderArea
@@ -2635,7 +2641,7 @@ var Plottable;
             };
             this._drawingTarget.enter = dataElements.enter()
                 .append(this._svgElementName)
-                .attr(this.initializer()());
+                .attr(this.appliedInitializer());
             this._drawingTarget.exit = dataElements.exit(); // the animator becomes responsbile for reomving these
             this._drawingTarget.merge = dataElements; // after enter() is called, this contains new elements
             this._applyDefaultAttributes(dataElements);
@@ -2658,7 +2664,7 @@ var Plottable;
                     selection.attr(colorAttribute, step.attrToAppliedProjector[colorAttribute]);
                 }
             });
-            step.animator.animate(selection, step.attrToAppliedProjector, this._drawingTarget);
+            step.animator.animate(selection, step.attrToAppliedProjector, this._drawingTarget, this);
             if (this._className != null) {
                 this.selection().classed(this._className, true);
             }
@@ -2702,10 +2708,10 @@ var Plottable;
                 };
             });
             this._bindSelectionData(data);
-            this._cachedSelectionValid = false;
             var delay = 0;
             appliedDrawSteps.forEach(function (drawStep, i) {
                 Plottable.Utils.Window.setTimeout(function () { return _this._drawStep(drawStep); }, delay);
+                // this._drawStep(drawStep);
                 delay += drawStep.animator.totalTime(data.length);
             });
             return this;
@@ -8022,7 +8028,8 @@ var Plottable;
                 this.symbol(function () { return circleSymbolFactory; });
             }
             Scatter.prototype._createDrawer = function (dataset) {
-                return new Plottable.Drawers.Symbol(dataset);
+                return new Plottable.Drawers.Symbol(dataset)
+                    .initializer(this._initializer.bind(this));
             };
             Scatter.prototype.size = function (size, scale) {
                 if (size == null) {
@@ -8039,6 +8046,11 @@ var Plottable;
                 this._propertyBindings.set(Scatter._SYMBOL_KEY, { accessor: symbol });
                 this.render();
                 return this;
+            };
+            Scatter.prototype._initializer = function () {
+                var resetAttrToProjector = this._generateAttrToProjector();
+                resetAttrToProjector["d"] = function () { return ""; };
+                return resetAttrToProjector;
             };
             Scatter.prototype._generateDrawSteps = function () {
                 var drawSteps = [];
@@ -10181,44 +10193,44 @@ var Plottable;
 })(Plottable || (Plottable = {}));
 var Plottable;
 (function (Plottable) {
-    var EasingFunctions = (function () {
-        function EasingFunctions() {
-        }
-        EasingFunctions.squEase = function (easingFunction, end, start) {
-            return function (t) {
-                if (start === undefined) {
-                    start = 0;
+    var Animators;
+    (function (Animators) {
+        var EasingFunctions = (function () {
+            function EasingFunctions() {
+            }
+            EasingFunctions.squEase = function (easingFunction, start, end) {
+                return function (t) {
+                    if (start === undefined) {
+                        start = 0;
+                    }
+                    ;
+                    if (t >= end) {
+                        return 1;
+                    }
+                    if (t <= start) {
+                        return 0;
+                    }
+                    var tbar = (t - start) / (end - start);
+                    if (typeof (easingFunction) === "string") {
+                        easingFunction = d3.ease(easingFunction);
+                    }
+                    return easingFunction(tbar);
+                };
+            };
+            EasingFunctions.atStart = function (t) {
+                return 1;
+            };
+            EasingFunctions.atEnd = function (t) {
+                if (t < 1) {
+                    return 0;
                 }
                 ;
-                var tbar;
-                if (t < start) {
-                    tbar = 0;
-                }
-                else {
-                    if (t > end) {
-                        tbar = 1;
-                    }
-                    else {
-                        tbar = (t - start) / (end - start);
-                    }
-                    return d3.ease(easingFunction)(tbar);
-                }
+                return 1;
             };
-        };
-        EasingFunctions.atStart = function (t) {
-            return 1;
-        };
-        EasingFunctions.atEnd = function (t) {
-            if (t < 1) {
-                return 0;
-            }
-            ;
-            return 1;
-        };
-        return EasingFunctions;
-    })();
-    Plottable.EasingFunctions = EasingFunctions;
-    ;
+            return EasingFunctions;
+        })();
+        Animators.EasingFunctions = EasingFunctions;
+    })(Animators = Plottable.Animators || (Plottable.Animators = {}));
 })(Plottable || (Plottable = {}));
 var Plottable;
 (function (Plottable) {
@@ -10292,14 +10304,15 @@ var Plottable;
             Base.prototype.isTransition = function (selection) {
                 return (selection.namespace === "__transition__" ? true : false);
             };
+            ;
             Base.prototype.mergeAttrs = function (attr1, attr2) {
                 var a = {};
-                for (var attrName in attr1) {
-                    a[attrName] = attr1[attrName];
-                }
-                for (var attrName in attr2) {
-                    a[attrName] = attr2[attrName];
-                }
+                Object.keys(attr1).forEach(function (attr) {
+                    a[attr] = attr1[attr];
+                });
+                Object.keys(attr2).forEach(function (attr) {
+                    a[attr] = attr2[attr];
+                });
                 return a;
             };
             /**
@@ -10382,9 +10395,6 @@ var Plottable;
                     return this;
                 }
             };
-            /* easing functions
-             * the Base animator provides easing functions
-
             /**
              * Adjust the iterative delay, such that it takes into account the maxTotalDuration constraint
              */
@@ -10438,7 +10448,7 @@ var Plottable;
                 var endProjector = this.endAttrs() || this.startAttrs();
                 drawingTarget.enter = this.getTransition(drawingTarget.enter, 0)
                     .attr(startProjector);
-                drawingTarget.exit = this.getTransition(drawingTarget.exit, this.stepDuration(), this.delay(drawingTarget.exit))
+                drawingTarget.exit = this.getTransition(drawingTarget.exit, this.stepDuration(), this.delay(drawingTarget.exit), this.exitEasingMode())
                     .attr(endProjector);
                 // now we can call the base class which will append the remove() to the end of the exit transition
                 return _super.prototype.animate.call(this, selection, attrToAppliedProjector, drawingTarget);
@@ -10458,6 +10468,15 @@ var Plottable;
                 }
                 else {
                     this._endAttrs = endAttrs;
+                    return this;
+                }
+            };
+            Attr.prototype.exitEasingMode = function (exitEasingMode) {
+                if (exitEasingMode == null) {
+                    return this._exitEasingMode;
+                }
+                else {
+                    this._exitEasingMode = exitEasingMode;
                     return this;
                 }
             };
@@ -10490,7 +10509,7 @@ var Plottable;
                 var exitStageDuration = (drawingTarget.exit.size() > 0 ? stageDuration * 2 : 0);
                 var updateStageDuration = (drawingTarget.update.size() > 0 ? stageDuration * 2 : 0);
                 var enterStageDuration = (drawingTarget.enter.size() > 0 ? stageDuration : 0);
-                var squeezer = Plottable.EasingFunctions.squEase("linear-in-out", .5);
+                var squeezer = Plottable.Animators.EasingFunctions.squEase("linear-in-out", 0, .5);
                 // first kill the exiting  
                 drawingTarget.exit = this.getTransition(drawingTarget.exit, exitStageDuration, undefined, squeezer)
                     .attr(proj)
@@ -10521,6 +10540,47 @@ var Plottable;
             return Bar;
         })(Animators.Attr);
         Animators.Bar = Bar;
+    })(Animators = Plottable.Animators || (Plottable.Animators = {}));
+})(Plottable || (Plottable = {}));
+var Plottable;
+(function (Plottable) {
+    var Animators;
+    (function (Animators) {
+        /**
+         * Base for animators that animate specific attributes, such as Opacity, height... .
+         */
+        var Reset = (function (_super) {
+            __extends(Reset, _super);
+            function Reset() {
+                _super.apply(this, arguments);
+            }
+            Reset.prototype.animate = function (selection, attrToAppliedProjector, drawingTarget, drawer) {
+                drawingTarget.merge
+                    .attr(drawer.appliedInitializer());
+                // now we can call the base class which will append the remove() to the end of the exit transition
+                return _super.prototype.animate.call(this, selection, attrToAppliedProjector, drawingTarget);
+            };
+            Reset.prototype.startAttrs = function (startAttrs) {
+                if (startAttrs == null) {
+                    return this._startAttrs;
+                }
+                else {
+                    this._startAttrs = startAttrs;
+                    return this;
+                }
+            };
+            Reset.prototype.endAttrs = function (endAttrs) {
+                if (endAttrs == null) {
+                    return this._endAttrs;
+                }
+                else {
+                    this._endAttrs = endAttrs;
+                    return this;
+                }
+            };
+            return Reset;
+        })(Animators.Base);
+        Animators.Reset = Reset;
     })(Animators = Plottable.Animators || (Plottable.Animators = {}));
 })(Plottable || (Plottable = {}));
 var Plottable;
@@ -10679,6 +10739,47 @@ var Plottable;
             return Easing;
         })();
         Animators.Easing = Easing;
+    })(Animators = Plottable.Animators || (Plottable.Animators = {}));
+})(Plottable || (Plottable = {}));
+var Plottable;
+(function (Plottable) {
+    var Animators;
+    (function (Animators) {
+        /**
+         * Fade in  fade out the entering  exiting elements by transitioning opacity
+         */
+        var Opacity = (function (_super) {
+            __extends(Opacity, _super);
+            function Opacity(startOpacity, endOpacity) {
+                _super.call(this);
+                startOpacity = startOpacity || 0;
+                this.startOpacity(startOpacity);
+                endOpacity = endOpacity || 0;
+                this.endOpacity(endOpacity);
+            }
+            Opacity.prototype.startOpacity = function (startOpacity) {
+                if (startOpacity == null) {
+                    return this._startOpacity;
+                }
+                else {
+                    this._startOpacity = startOpacity;
+                    this.startAttrs({ opacity: function () { return startOpacity; } });
+                    return this;
+                }
+            };
+            Opacity.prototype.endOpacity = function (endOpacity) {
+                if (endOpacity == null) {
+                    return this._endOpacity;
+                }
+                else {
+                    this._endOpacity = endOpacity;
+                    this.endAttrs({ opacity: function () { return endOpacity; } });
+                    return this;
+                }
+            };
+            return Opacity;
+        })(Animators.Attr);
+        Animators.Opacity = Opacity;
     })(Animators = Plottable.Animators || (Plottable.Animators = {}));
 })(Plottable || (Plottable = {}));
 var Plottable;

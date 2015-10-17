@@ -1,4 +1,4 @@
-﻿//# sourceURL=objectConstancy/animate_size.js
+//# sourceURL=objectConstancy/animate_size.js
 function makeData() {
     "use strict";
 
@@ -11,7 +11,7 @@ function run(svg, data, Plottable) {
     var xScale = new Plottable.Scales.Linear();
     var xAxis = new Plottable.Axes.Numeric(xScale, "bottom");
 
-    var yScale = new Plottable.Scales.Linear().domain([0,2.2]);
+    var yScale = new Plottable.Scales.Linear().domain([0, 2.2]);
     var yAxis = new Plottable.Axes.Numeric(yScale, "left");
 
     var d1 = new Plottable.Dataset(data[0]);
@@ -22,8 +22,7 @@ function run(svg, data, Plottable) {
     // this is a circle size 16: M0,8A8,8 0 1,1 0,-8A8,8 0 1,1 0,8Z
     // make a size 0 circle that can get animated
     var proj = { d: "M0,0A0,0 0 1,1 0,-0A0,0 0 1,1 0,0Z" };
-    var endproj = { d: "M0,8A8,8 0 1,1 0,-8A8,8 0 1,1 0,8Z" };
-    attrAnimator 
+    attrAnimator
         .stepDuration(3000)
         .stepDelay(0)
         .startAttrs(proj)

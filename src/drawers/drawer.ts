@@ -20,13 +20,13 @@ export module Drawers {
 
   /**
    * A DrawingTarget contains the selections that are the results of binding data.
-   * DrawingTarget is contructed by Drawer, and passed to animators to allow rich animation of each selection
+   * DrawingTarget is contructed by Drawer, and passed to animators to allow animation of each selection
    */
   export type DrawingTarget = {
-    enter?: d3.Selection<any>|d3.Transition<any>,  // new data elements current not bound to a DOM element
-    update?: d3.selection.Update<any>|d3.Transition<any>, // data elements currently bound to a DOM element still in the data set
-    exit?: d3.Selection<any>|d3.Transition<any>,   // DOM elements bound to a datum that is no longer in the data set
-    merge: d3.Selection<any>|d3.Transition<any>|d3.Selection<void>   // enter and update combined
+    enter: d3.Selection<any>|d3.Transition<any>,  // new DOM elements created from the enter() selection
+    update: d3.selection.Update<any>|d3.Transition<any>, // data elements currently bound to a DOM element still in the data set
+    exit: d3.Selection<any>|d3.Transition<any>,   // DOM elements bound to a datum that is no longer in the data set
+    merge: d3.selection.Update<any>|d3.Transition<any>   // enter and update combined
   };
 }
 
@@ -36,11 +36,8 @@ export class Drawer {
   protected _className: string;
   private _dataset: Dataset;
 
-  private _cachedSelectionValid = false;
-  private _cachedSelection: d3.Selection<any>;
-
   private _drawingTarget: Drawers.DrawingTarget;
-  private _initializer: () => AttributeToAppliedProjector;
+  private _initializer: () => AttributeToProjector;
 
   /**
    * A Drawer draws svg elements based on the input Dataset.
@@ -50,7 +47,7 @@ export class Drawer {
    */
   constructor(dataset: Dataset) {
     this._dataset = dataset;
-    this._initializer = () => <AttributeToAppliedProjector>{};
+    this._initializer = () => <AttributeToProjector>{};
   }
 
   /**
@@ -69,7 +66,6 @@ export class Drawer {
       return this._renderArea;
     }
     this._renderArea = area;
-    this._cachedSelectionValid = false;
     return this;
   }
 
@@ -77,23 +73,32 @@ export class Drawer {
    * Retieves a function that can supply initial settings to entering elements.
    * this function is typically supplied by the plot using the Drawer
    */
-  public initializer(): () => AttributeToAppliedProjector;
+  public initializer(): () => AttributeToProjector;
   /**
    * Sets the initializer function for the Drawer.
-   * This function returns an AttributeToAppliedProjector that is applied
+   * This function returns an AttributeToProjector that is applied
    * to the new elements appended to the enter() selection
    * Typically set from _createDrawer in the plot
    *
-   * @param {() => AttributeToAppliedProjector} the function.
+   * @param {() => AttributeToProjector} the function.
    * @returns {Drawer} The calling Drawer.
    */
-  public initializer(fnattrToAppliedProjector: () => AttributeToAppliedProjector): Drawer;
-  public initializer(fnattrToAppliedProjector?: () => AttributeToAppliedProjector): any {
-    if (fnattrToAppliedProjector == null) {
+  public initializer(fnattrToProjector: () => AttributeToProjector): Drawer;
+  public initializer(fnattrToProjector?: () => AttributeToProjector): any {
+    if (fnattrToProjector == null) {
       return this._initializer;
     }
-    this._initializer = fnattrToAppliedProjector;
+    this._initializer = fnattrToProjector;
     return this;
+  }
+
+  /*
+   * Return the AttrToAppliedProjector generated from the initializer
+   * 
+   * @returns {AttrToAppliedProjector} .
+   */
+  public appliedInitializer() {
+    return this._appliedProjectors(this.initializer()());
   }
   /**
    * Removes the Drawer and its renderArea
@@ -127,7 +132,7 @@ export class Drawer {
     };
     this._drawingTarget.enter = dataElements.enter()
       .append(this._svgElementName)
-      .attr(this.initializer()());
+      .attr(this.appliedInitializer());
     this._drawingTarget.exit = dataElements.exit();   // the animator becomes responsbile for reomving these
     this._drawingTarget.merge = dataElements;   // after enter() is called, this contains new elements
     this._applyDefaultAttributes(dataElements);
@@ -152,7 +157,7 @@ export class Drawer {
         selection.attr(colorAttribute, step.attrToAppliedProjector[colorAttribute]);
       }
     });
-    step.animator.animate(selection, step.attrToAppliedProjector, this._drawingTarget);
+    step.animator.animate(selection, step.attrToAppliedProjector, this._drawingTarget, this);
     if (this._className != null) {
       this.selection().classed(this._className, true);
     }
@@ -200,11 +205,11 @@ export class Drawer {
     });
 
     this._bindSelectionData(data);
-    this._cachedSelectionValid = false;
 
     let delay = 0;
     appliedDrawSteps.forEach((drawStep, i) => {
       Utils.Window.setTimeout(() => this._drawStep(drawStep), delay);
+      // this._drawStep(drawStep);
       delay += drawStep.animator.totalTime(data.length);
     });
 

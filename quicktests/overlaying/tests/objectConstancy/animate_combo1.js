@@ -1,19 +1,18 @@
-﻿//# sourceURL=objectConstancy/animate_Combo1.js
+
 function makeData() {
     "use strict";
-
-   
 }
-var colorFcn = function (d) {
-    if (d.name == 'France') return 'blue';
-    if (d.name == 'Germany') return 'red';
-    if (d.name == 'Uruguay') return 'green';
-    return 'gray';
-};
+
 function run(svg, data, Plottable) {
     "use strict";
-    var data;
     var dataIndex = 0;
+    var colorFcn = function (d) {
+        if (d.name === "France") { return "blue"; }
+        if (d.name === "Germany") { return "red"; }
+        if (d.name === "Uruguay") { return "green"; }
+        return "gray";
+    };
+
     d3.json("/quicktests/overlaying/data/worldcup.json", function (json) {
         var xScale = new Plottable.Scales.Linear().domain([0, 20]);
         var xAxis = new Plottable.Axes.Numeric(xScale, "bottom");
@@ -23,9 +22,8 @@ function run(svg, data, Plottable) {
 
         data = json;
         var ds = new Plottable.Dataset(data.wc2014);
-        var keyFunction = function (d, i) { return d.name; };
+        var keyFunction = function (d) { return d.name; };
         ds.keyFunction(keyFunction);
-
 
         var attrAnimator = new Plottable.Animators.Attr();
         //var proj = { height: function () { return 0; } };
@@ -33,7 +31,7 @@ function run(svg, data, Plottable) {
         // make a size 0 circle that can get animated
         var proj = {
             transform: "translate(0,0)",
-            d: "M0,0A0,0 0 1,1 0,-0A0,0 0 1,1 0,0Z",
+            d: "M0,0A0,0 0 1,1 0,-0A0,0 0 1,1 0,0Z"
         };
         var endproj = {
             d: "M0,0A0,0 0 1,1 0,-0A0,0 0 1,1 0,0Z",
@@ -46,7 +44,6 @@ function run(svg, data, Plottable) {
             .startAttrs(proj)
             .endAttrs(endproj);
 
-      
         var circleRenderer = new Plottable.Plots.Scatter().addDataset(ds)
                     .animator(Plottable.Plots.Animator.MAIN, attrAnimator)
                     .size(16)
@@ -54,7 +51,7 @@ function run(svg, data, Plottable) {
                     .y(function (d) { return d.GF; }, yScale)
                     .attr("opacity", .9)
                     .animated(true)
-                    .attr("fill",colorFcn);
+                    .attr("fill", colorFcn);
 
         var circleChart = new Plottable.Components.Table([[yAxis, circleRenderer],
          [null, xAxis]]);
@@ -75,11 +72,10 @@ function run(svg, data, Plottable) {
                     ds.data(data.wc2014);
                     dataIndex = 0;
                     break;
-
             }
-           
         };
 
         new Plottable.Interactions.Click().onClick(cb).attachTo(circleRenderer);
     });
 }
+//# sourceURL=objectConstancy/animate_Combo1.js

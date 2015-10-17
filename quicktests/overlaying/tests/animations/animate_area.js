@@ -18,11 +18,11 @@ function run(svg, data, Plottable) {
   var yScale = new Plottable.Scales.Linear();
   var yAxis = new Plottable.Axes.Numeric(yScale, "left");
 
-  var dataset = new Plottable.Dataset(data)
+  var dataset = new Plottable.Dataset(data);
   if (dataset.keyFunction) {
       dataset
         .keyFunction(Plottable.KeyFunctions.noConstancy);
-  };
+  }
   var areaRenderer = new Plottable.Plots.Area()
             .addDataset(dataset)
             .attr("opacity", 0.75)

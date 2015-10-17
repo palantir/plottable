@@ -20,7 +20,7 @@ function run(svg, data, Plottable) {
     dataset
       .keyFunction(Plottable.KeyFunctions.noConstancy);
   }
-    
+
   var verticalBarPlot = new Plottable.Plots.Bar("vertical")
                               .addDataset(dataset)
                               .x(function(d) { return d.x; }, xScale)

@@ -1,19 +1,18 @@
-﻿//# sourceURL=objectConstancy/animate_ComboBar.js
+
 function makeData() {
     "use strict";
-
-   
 }
-var colorFcn = function (d) {
-    if (d.name == 'France') return 'blue';
-    if (d.name == 'Germany') return 'red';
-    if (d.name == 'Uruguay') return 'green';
-    return 'gray';
-};
+
 function run(svg, data, Plottable) {
     "use strict";
-    var data;
     var dataIndex = 0;
+    var colorFcn = function (d) {
+        if (d.name === "France") { return "blue"; }
+        if (d.name === "Germany") { return "red"; }
+        if (d.name === "Uruguay") { return "green"; }
+        return "gray";
+    };
+
     d3.json("/quicktests/overlaying/data/worldcup.json", function (json) {
         var xScale = new Plottable.Scales.Linear().domain([0, 32]);
         var xAxis = new Plottable.Axes.Numeric(xScale, "bottom");
@@ -23,24 +22,19 @@ function run(svg, data, Plottable) {
 
         data = json;
         var ds = new Plottable.Dataset(data.wc2014);
-        var keyFunction = function (d, i) { return d.name; };
         // to get the previous behaviour, use noConstancy
         ds.keyFunction(Plottable.KeyFunctions.noConstancy);
 
-
         var attrAnimator = new Plottable.Animators.Attr();
-        //var proj = { height: function () { return 0; } };
-        // this is a circle size 16: M0,8A8,8 0 1,1 0,-8A8,8 0 1,1 0,8Z
-        // make a size 0 circle that can get animated
         var proj = {
             height: 0,
-            y: function(d,i) { return yScale.scale(0);}
+            y: function() { return yScale.scale(0); }
         };
         var endproj = {
             opacity: .3,
             fill: "#DDD",
             height: 0,
-            y:0
+            y: function () { return yScale.scale(0); }
         };
         attrAnimator
             //.yScale(yScale)
@@ -50,7 +44,6 @@ function run(svg, data, Plottable) {
             .startAttrs(proj)
             .endAttrs(endproj);
 
-      
         var verticalBarPlot = new Plottable.Plots.Bar("vertical")
             .addDataset(ds)
             //.animator(Plottable.Plots.Animator.MAIN, attrAnimator)
@@ -58,7 +51,7 @@ function run(svg, data, Plottable) {
             .y(function (d) { return d.GF; }, yScale)
             .attr("opacity", .9)
             .animated(true)
-            .attr("fill",colorFcn);
+            .attr("fill", colorFcn);
 
         var chart = new Plottable.Components.Table([[yAxis, verticalBarPlot],
          [null, xAxis]]);
@@ -79,11 +72,10 @@ function run(svg, data, Plottable) {
                     ds.data(data.wc2014);
                     dataIndex = 0;
                     break;
-
             }
-           
         };
 
         new Plottable.Interactions.Click().onClick(cb).attachTo(verticalBarPlot);
     });
 }
+//# sourceURL=objectConstancy/animate_ComboBarDefault.js

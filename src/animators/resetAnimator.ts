@@ -4,26 +4,18 @@ export module Animators {
   /**
    * Base for animators that animate specific attributes, such as Opacity, height... .
    */
-  export class Attr extends Base implements Animator {
+  export class Reset extends Base implements Animator {
 
     private _startAttrs: AttributeToAppliedProjector;
     private _endAttrs: AttributeToAppliedProjector;
-    private _exitEasingMode: EasingFunctionSpecifier;
 
     public animate(selection: d3.Selection<any>,
       attrToAppliedProjector: AttributeToAppliedProjector
-      , drawingTarget?: Drawers.DrawingTarget): d3.Selection<any> | d3.Transition<any> {
+      , drawingTarget?: Drawers.DrawingTarget
+      , drawer?: Drawer): d3.Selection<any> | d3.Transition<any> {
 
-      // first make the attr to apply to the enter selection before transition
-      // this is attrToAppliedProjector + _start
-      let startProjector: AttributeToAppliedProjector = this.mergeAttrs(attrToAppliedProjector, this.startAttrs());
-      let endProjector: AttributeToAppliedProjector = this.endAttrs() || this.startAttrs();
-      drawingTarget.enter = this.getTransition(drawingTarget.enter, 0)
-        .attr(startProjector);
-
-      drawingTarget.exit = this.getTransition(drawingTarget.exit, this.stepDuration(),
-        this.delay(drawingTarget.exit), this.exitEasingMode())
-        .attr(endProjector);
+      drawingTarget.merge
+        .attr(drawer.appliedInitializer());
 
       // now we can call the base class which will append the remove() to the end of the exit transition
       return super.animate(selection, attrToAppliedProjector, drawingTarget);
@@ -74,32 +66,6 @@ export module Animators {
         return this;
       }
     }
-
-    /**
-     * gets the easing mode for exiting elements. 
-     * Existing elements will transition out using this easing mode before being removed
-     * if not specified, easingMode() is used
-     * @returns {EasingFunctionSpecifier} The current exiting Easing mode.
-     */
-    public exitEasingMode(): EasingFunctionSpecifier;
-    /**
-     * Sets the attributes for entering elements. 
-     *
-     * @param {exitEasingMode} A collection of attribuets applied to entering elements.
-     * These are applied over the top of the attributes pass to the animate method
-     * Any attribute passed to exitEasingMode will transition to its final value
-     * @returns {Attr} The calling Attr Animator.
-     */
-    public exitEasingMode(exitEasingMode: EasingFunctionSpecifier): Attr;
-    public exitEasingMode(exitEasingMode?: EasingFunctionSpecifier): any {
-      if (exitEasingMode == null) {
-        return this._exitEasingMode;
-      } else {
-        this._exitEasingMode = exitEasingMode;
-        return this;
-      }
-    }
-
   }
 }
 }

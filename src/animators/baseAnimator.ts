@@ -30,7 +30,7 @@
             private _stepDuration: number;
             private _stepDelay: number;
             private _maxTotalDuration: number;
-            private _easingMode: string;
+            private _easingMode: EasingFunctionSpecifier;
             private _xScale: Plottable.Scale<any, any>;
             private _yScale: Plottable.Scale<any, any>;
             /**
@@ -60,7 +60,7 @@
               drawingTarget.merge = this.getTransition(drawingTarget.merge, this.stepDuration(),
                 (d: any, i: number) => this.startDelay() + adjustedIterativeDelay * i)
                 .attr(attrToAppliedProjector);
-          
+
               // remove the exiting elements
               drawingTarget.exit
                 .remove();
@@ -73,8 +73,9 @@
              * without applying a transition if durection = 0
              *
              */
+
             protected getTransition(selection: d3.Selection<any>|d3.Transition<any>|d3.selection.Update<any>,
-              duration: number, delay?: (d: any, i: number) => number, easing?: any): any {
+              duration: number, delay?: (d: any, i: number) => number, easing?: EasingFunctionSpecifier): any {
               // if the duration is 0, just return the selection
               if (duration === 0) {
                 return selection;
@@ -84,16 +85,14 @@
               // if the selection is already a transition, create a new transition, but let d3 supply the default
               // delay, that way they will "chain"
                 return selection.transition()
-                  .ease(easing)
+                  .ease(<EasingFunction>easing)
                   .duration(duration);
-
               } else {
               // otherwise is the selection is NOT a transition, create a new transition setting up the delay
                 return selection.transition()
-                  .ease(easing)
+                  .ease(<EasingFunction>easing)
                   .duration(duration)
                   .delay(delay);
-
               }
             }
 
@@ -105,18 +104,17 @@
              */
             protected isTransition(selection: any): boolean {
               return (selection.namespace === "__transition__" ? true : false);
-            }
+            };
             protected mergeAttrs(attr1: AttributeToAppliedProjector, attr2: AttributeToAppliedProjector): AttributeToAppliedProjector {
               let a: AttributeToAppliedProjector = {};
-              for (var attrName in attr1) {
-                a[attrName] = attr1[attrName];
-              }
-              for (var attrName in attr2) {
-                a[attrName] = attr2[attrName];
-              }
+              Object.keys(attr1).forEach((attr: string) => {
+                a[attr] = attr1[attr];
+              });
+              Object.keys(attr2).forEach((attr: string) => {
+                a[attr] = attr2[attr];
+              });
               return a;
             }
-
             /**
              *  return the AtributeToAppliedProjector comprising only those attributes listed in names
              *
@@ -168,7 +166,7 @@
              * Sets the duration of one animation step in milliseconds.
              *
              * @param {number} stepDuration The duration in milliseconds.
-             * @returns {Easing} The calling Easing Animator.
+             * @returns {Base} The calling Animator.
              */
             public stepDuration(stepDuration: number): Easing;
             public stepDuration(stepDuration?: number): any {
@@ -255,7 +253,7 @@
             }
 
             /**
-             * xScale -- a referene to the xScale used by the owning plot
+             * xScale -- a reference to the xScale used by the owning plot
              * the animator can use this to calculate positions
              * @returns {Plottable.Scale<any, any>} the xScale.
              */
@@ -263,7 +261,7 @@
             /**
              * Sets the easing mode of the animation.
              *
-             * @param {Plottable.Scale<any, any} xScale The desired easing mode.
+             * @param {Plottable.Scale<any, any} xScale.
              * @returns {Base} The calling Animator.
              */
             public xScale(xScale: Plottable.Scale<any, any>): Base;
@@ -277,15 +275,15 @@
             }
 
             /**
-             * yScale -- a referene to the yScale used by the owning plot
+             * yScale - a reference to the yScale used by the owning plot
              * the animator can use this to calculate positions
              * @returns {Plottable.Scale<any, any>} the yScale.
              */
             public yScale(): Plottable.Scale<any, any>;
             /**
-             * a yScale available to the animator for converting rendering 'logical' y values.
-             *
-             * @param {Plottable.Scale<any, any} yScale The desired easing mode.
+             * a yScale available to the animator for rendering 'logical' y values.
+             * 
+             * @param {Plottable.Scale<any, any} yScale.
              * @returns {Base} The calling Animator.
              */
             public yScale(yScale: Plottable.Scale<any, any>): Base;
@@ -297,10 +295,6 @@
                 return this;
               }
             }
-
-            /* easing functions
-             * the Base animator provides easing functions 
-
             /**
              * Adjust the iterative delay, such that it takes into account the maxTotalDuration constraint
              */

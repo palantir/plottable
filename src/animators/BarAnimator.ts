@@ -23,7 +23,7 @@ export module Animators {
       let updateStageDuration: number = (drawingTarget.update.size() > 0 ? stageDuration * 2 : 0);
       let enterStageDuration: number = (drawingTarget.enter.size() > 0 ? stageDuration : 0);
 
-      let squeezer = Plottable.EasingFunctions.squEase("linear-in-out", .5);
+      let squeezer = Plottable.Animators.EasingFunctions.squEase("linear-in-out", 0, .5);
       // first kill the exiting  
       drawingTarget.exit = this.getTransition(drawingTarget.exit, exitStageDuration, undefined, squeezer)
         .attr(proj)

@@ -1294,13 +1294,13 @@ declare module Plottable {
         };
         /**
          * A DrawingTarget contains the selections that are the results of binding data.
-         * DrawingTarget is contructed by Drawer, and passed to animators to allow rich animation of each selection
+         * DrawingTarget is contructed by Drawer, and passed to animators to allow animation of each selection
          */
         type DrawingTarget = {
-            enter?: d3.Selection<any> | d3.Transition<any>;
-            update?: d3.selection.Update<any> | d3.Transition<any>;
-            exit?: d3.Selection<any> | d3.Transition<any>;
-            merge: d3.Selection<any> | d3.Transition<any> | d3.Selection<void>;
+            enter: d3.Selection<any> | d3.Transition<any>;
+            update: d3.selection.Update<any> | d3.Transition<any>;
+            exit: d3.Selection<any> | d3.Transition<any>;
+            merge: d3.selection.Update<any> | d3.Transition<any>;
         };
     }
     class Drawer {
@@ -1308,8 +1308,6 @@ declare module Plottable {
         protected _svgElementName: string;
         protected _className: string;
         private _dataset;
-        private _cachedSelectionValid;
-        private _cachedSelection;
         private _drawingTarget;
         private _initializer;
         /**
@@ -1334,17 +1332,20 @@ declare module Plottable {
          * Retieves a function that can supply initial settings to entering elements.
          * this function is typically supplied by the plot using the Drawer
          */
-        initializer(): () => AttributeToAppliedProjector;
+        initializer(): () => AttributeToProjector;
         /**
          * Sets the initializer function for the Drawer.
-         * This function returns an AttributeToAppliedProjector that is applied
+         * This function returns an AttributeToProjector that is applied
          * to the new elements appended to the enter() selection
          * Typically set from _createDrawer in the plot
          *
-         * @param {() => AttributeToAppliedProjector} the function.
+         * @param {() => AttributeToProjector} the function.
          * @returns {Drawer} The calling Drawer.
          */
-        initializer(fnattrToAppliedProjector: () => AttributeToAppliedProjector): Drawer;
+        initializer(fnattrToProjector: () => AttributeToProjector): Drawer;
+        appliedInitializer(): {
+            [attr: string]: (datum: any, index: number) => any;
+        };
         /**
          * Removes the Drawer and its renderArea
          */
@@ -3445,7 +3446,7 @@ declare module Plottable {
              * @constructor
              */
             constructor();
-            protected _createDrawer(dataset: Dataset): Drawers.Symbol;
+            protected _createDrawer(dataset: Dataset): Drawer;
             /**
              * Gets the AccessorScaleBinding for the size property of the plot.
              * The size property corresponds to the area of the symbol.
@@ -3479,6 +3480,7 @@ declare module Plottable {
              * @returns {Plots.Scatter} The calling Scatter Plot.
              */
             symbol(symbol: Accessor<SymbolFactory>): Plots.Scatter<X, Y>;
+            private _initializer();
             protected _generateDrawSteps(): Drawers.DrawStep[];
             /**
              * @deprecated As of release v1.1.0, replaced by _entityVisibleOnPlot()
@@ -4176,10 +4178,14 @@ declare module Plottable {
     }
 }
 declare module Plottable {
-    class EasingFunctions {
-        static atStart: (t: number) => number;
-        static atEnd: (t: number) => number;
-        static squEase(easingFunction: string, end: number, start?: number): (t: number) => number;
+    module Animators {
+        type EasingFunction = (t: number) => number;
+        type EasingFunctionSpecifier = string | EasingFunction;
+        class EasingFunctions {
+            static atStart: (t: number) => number;
+            static atEnd: (t: number) => number;
+            static squEase(easingFunction: EasingFunctionSpecifier, start: number, end: number): EasingFunction;
+        }
     }
     interface Animator {
         /**
@@ -4192,7 +4198,7 @@ declare module Plottable {
          *     transition object so that plots may chain the transitions between
          *     animators.
          */
-        animate(selection: d3.Selection<any>, attrToAppliedProjector: AttributeToAppliedProjector, drawingTarget?: Drawers.DrawingTarget): d3.Selection<any> | d3.Transition<any>;
+        animate(selection: d3.Selection<any>, attrToAppliedProjector: AttributeToAppliedProjector, drawingTarget?: Drawers.DrawingTarget, drawer?: Drawer): d3.Selection<any> | d3.Transition<any>;
         /**
          * Given the number of elements, return the total time the animation requires
          *
@@ -4249,7 +4255,7 @@ declare module Plottable {
              * without applying a transition if durection = 0
              *
              */
-            protected getTransition(selection: d3.Selection<any> | d3.Transition<any> | d3.selection.Update<any>, duration: number, delay?: (d: any, i: number) => number, easing?: any): any;
+            protected getTransition(selection: d3.Selection<any> | d3.Transition<any> | d3.selection.Update<any>, duration: number, delay?: (d: any, i: number) => number, easing?: EasingFunctionSpecifier): any;
             /**
              * @isTransition
              *
@@ -4287,7 +4293,7 @@ declare module Plottable {
              * Sets the duration of one animation step in milliseconds.
              *
              * @param {number} stepDuration The duration in milliseconds.
-             * @returns {Easing} The calling Easing Animator.
+             * @returns {Base} The calling Animator.
              */
             stepDuration(stepDuration: number): Easing;
             /**
@@ -4338,7 +4344,7 @@ declare module Plottable {
              */
             easingMode(easingMode: string): Base;
             /**
-             * xScale -- a referene to the xScale used by the owning plot
+             * xScale -- a reference to the xScale used by the owning plot
              * the animator can use this to calculate positions
              * @returns {Plottable.Scale<any, any>} the xScale.
              */
@@ -4346,23 +4352,26 @@ declare module Plottable {
             /**
              * Sets the easing mode of the animation.
              *
-             * @param {Plottable.Scale<any, any} xScale The desired easing mode.
+             * @param {Plottable.Scale<any, any} xScale.
              * @returns {Base} The calling Animator.
              */
             xScale(xScale: Plottable.Scale<any, any>): Base;
             /**
-             * yScale -- a referene to the yScale used by the owning plot
+             * yScale - a reference to the yScale used by the owning plot
              * the animator can use this to calculate positions
              * @returns {Plottable.Scale<any, any>} the yScale.
              */
             yScale(): Plottable.Scale<any, any>;
             /**
-             * a yScale available to the animator for converting rendering 'logical' y values.
+             * a yScale available to the animator for rendering 'logical' y values.
              *
-             * @param {Plottable.Scale<any, any} yScale The desired easing mode.
+             * @param {Plottable.Scale<any, any} yScale.
              * @returns {Base} The calling Animator.
              */
             yScale(yScale: Plottable.Scale<any, any>): Base;
+            /**
+             * Adjust the iterative delay, such that it takes into account the maxTotalDuration constraint
+             */
             protected _getAdjustedIterativeDelay(numberOfSteps: number): number;
         }
     }
@@ -4375,6 +4384,7 @@ declare module Plottable {
         class Attr extends Base implements Animator {
             private _startAttrs;
             private _endAttrs;
+            private _exitEasingMode;
             animate(selection: d3.Selection<any>, attrToAppliedProjector: AttributeToAppliedProjector, drawingTarget?: Drawers.DrawingTarget): d3.Selection<any> | d3.Transition<any>;
             /**
              * Gets the attributes for entering elements. These are overlaid over
@@ -4406,6 +4416,22 @@ declare module Plottable {
              * @returns {Attr} The calling Attr Animator.
              */
             endAttrs(endAttrs: AttributeToAppliedProjector): Attr;
+            /**
+             * gets the easing mode for exiting elements.
+             * Existing elements will transition out using this easing mode before being removed
+             * if not specified, easingMode() is used
+             * @returns {EasingFunctionSpecifier} The current exiting Easing mode.
+             */
+            exitEasingMode(): EasingFunctionSpecifier;
+            /**
+             * Sets the attributes for entering elements.
+             *
+             * @param {exitEasingMode} A collection of attribuets applied to entering elements.
+             * These are applied over the top of the attributes pass to the animate method
+             * Any attribute passed to exitEasingMode will transition to its final value
+             * @returns {Attr} The calling Attr Animator.
+             */
+            exitEasingMode(exitEasingMode: EasingFunctionSpecifier): Attr;
         }
     }
 }
@@ -4417,6 +4443,48 @@ declare module Plottable {
         class Bar extends Attr implements Animator {
             constructor();
             animate(selection: d3.Selection<any>, attrToAppliedProjector: AttributeToAppliedProjector, drawingTarget?: Drawers.DrawingTarget): d3.Selection<any> | d3.Transition<any>;
+        }
+    }
+}
+declare module Plottable {
+    module Animators {
+        /**
+         * Base for animators that animate specific attributes, such as Opacity, height... .
+         */
+        class Reset extends Base implements Animator {
+            private _startAttrs;
+            private _endAttrs;
+            animate(selection: d3.Selection<any>, attrToAppliedProjector: AttributeToAppliedProjector, drawingTarget?: Drawers.DrawingTarget, drawer?: Drawer): d3.Selection<any> | d3.Transition<any>;
+            /**
+             * Gets the attributes for entering elements. These are overlaid over
+             * the target atr and
+             * @returns {number} The current start delay.
+             */
+            startAttrs(): AttributeToAppliedProjector;
+            /**
+             * Sets the attributes for entering elements.
+             *
+             * @param {startAttrs} A collection of attribuets applied to entering elements.
+             * These are applied over the top of the attributes pass to the animate method
+             * Any attribute passed to startAttrs will transition to its final value
+             * @returns {Attr} The calling Attr Animator.
+             */
+            startAttrs(startAttrs: AttributeToAppliedProjector): Attr;
+            /**
+             * Gets the attributes for exiting elements.
+             * Exisitng elements will transition to these attribuest before being removed
+             * @returns {AttributeToAppliedProjector} The current exiting attributes.
+             */
+            endAttrs(): AttributeToAppliedProjector;
+            /**
+             * Sets the attributes for entering elements.
+             *
+             * @param {endAttrs} A collection of attribuets applied to entering elements.
+             * These are applied over the top of the attributes pass to the animate method
+             * Any attribute passed to endAttrs will transition to its final value
+             * @returns {Attr} The calling Attr Animator.
+             */
+            endAttrs(endAttrs: AttributeToAppliedProjector): Attr;
         }
     }
 }
@@ -4548,6 +4616,44 @@ declare module Plottable {
              * Adjust the iterative delay, such that it takes into account the maxTotalDuration constraint
              */
             private _getAdjustedIterativeDelay(numberOfSteps);
+        }
+    }
+}
+declare module Plottable {
+    module Animators {
+        /**
+         * Fade in  fade out the entering  exiting elements by transitioning opacity
+         */
+        class Opacity extends Attr implements Animator {
+            private _startOpacity;
+            private _endOpacity;
+            constructor(startOpacity?: number, endOpacity?: number);
+            /**
+             * Sets the starting opacity for entering elements.
+             *
+             * @returns {number} The current start opacity.
+             */
+            startOpacity(): number;
+            /**
+             * Sets the starting opacity for entering elements.
+             *
+             * @param {number} startOpacity The opacity to apply to new elements.
+             * @returns {Opacity} The calling Animator.
+             */
+            startOpacity(startOpacity: number): Opacity;
+            /**
+             * Sets the ending opacity for exiting elements.
+             *
+             * @returns {number} The current end opacity.
+             */
+            endOpacity(): number;
+            /**
+             * Sets the ending opacity for entering elements.
+             *
+             * @param {number} endOpacity The opacity to transition to exiting elements.
+             * @returns {Opacity} The calling Animator.
+             */
+            endOpacity(endOpacity: number): Opacity;
         }
     }
 }

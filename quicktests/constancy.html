@@ -1,0 +1,282 @@
+﻿!DOCTYPE html>
+<html class="ocks-org do-not-copy">
+<meta charset="utf-8">
+<title>Object Constancy</title>
+<style>
+    @import url(../style.css?aea6f0a);
+
+    svg {
+        font: 10px sans-serif;
+    }
+
+    .bar rect {
+        fill: steelblue;
+    }
+
+    .bar:hover rect {
+        fill: brown;
+    }
+
+    .value {
+        fill: white;
+    }
+
+    .axis {
+        shape-rendering: crispEdges;
+    }
+
+        .axis path {
+            stroke: none;
+        }
+
+    .x.axis line {
+        stroke: #fff;
+        stroke-opacity: .8;
+    }
+
+    .y.axis path {
+        stroke: black;
+    }
+</style>
+
+<header>
+    <aside>May 16, 2012</aside>
+    <a href="../" rel="author">Mike Bostock</a>
+</header>
+
+<h1>Object Constancy</h1>
+
+<p id="chart">
+
+    <aside>Source: <a href="http://www.census.gov/popest/archives/2000s/vintage_2008/" target="_blank">Census Bureau</a></aside>
+
+<p id="menu">
+    <b>Top States by Age Bracket, 2008</b><br>Age: <select></select>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/2.10.0/d3.v2.min.js" charset="utf-8"></script>
+    <script>
+
+var margin = {top: 20, right: 40, bottom: 10, left: 40},
+    width = 960,
+    height = 250 - margin.top - margin.bottom;
+
+var format = d3.format(".1%"),
+    states,
+    age;
+
+var x = d3.scale.linear()
+    .range([0, width]);
+
+var y = d3.scale.ordinal()
+    .rangeRoundBands([0, height], .1);
+
+var xAxis = d3.svg.axis()
+    .scale(x)
+    .orient("top")
+    .tickSize(-height - margin.bottom)
+    .tickFormat(format);
+
+var svg = d3.select("#chart").append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+    .style("margin-left", -margin.left + "px")
+  .append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+svg.append("g")
+    .attr("class", "x axis");
+
+svg.append("g")
+    .attr("class", "y axis")
+  .append("line")
+    .attr("class", "domain")
+    .attr("y2", height);
+
+var menu = d3.select("#menu select")
+    .on("change", change);
+
+d3.csv("states-age.csv", function(data) {
+  states = data;
+
+  var ages = d3.keys(states[0]).filter(function(key) {
+    return key != "State" && key != "Total";
+  });
+
+  states.forEach(function(state) {
+    ages.forEach(function(age) {
+      state[age] = state[age] / state.Total;
+    });
+  });
+
+  menu.selectAll("option")
+      .data(ages)
+    .enter().append("option")
+      .text(function(d) { return d; });
+
+  menu.property("value", "18 to 24 Years");
+
+  redraw();
+});
+
+var altKey;
+
+d3.select(window)
+    .on("keydown", function() { altKey = d3.event.altKey; })
+    .on("keyup", function() { altKey = false; });
+
+function change() {
+  clearTimeout(timeout);
+
+  d3.transition()
+      .duration(altKey ? 7500 : 750)
+      .each(redraw);
+}
+
+function redraw() {
+  var age1 = menu.property("value"),
+      top = states.sort(function(a, b) { return b[age1] - a[age1]; }).slice(0, 10);
+
+  y.domain(top.map(function(d) { return d.State; }));
+
+  var bar = svg.selectAll(".bar")
+      .data(top, function(d) { return d.State; });
+
+  var barEnter = bar.enter().insert("g", ".axis")
+      .attr("class", "bar")
+      .attr("transform", function(d) { return "translate(0," + (y(d.State) + height) + ")"; })
+      .style("fill-opacity", 0);
+
+  barEnter.append("rect")
+      .attr("width", age && function(d) { return x(d[age]); })
+      .attr("height", y.rangeBand());
+
+  barEnter.append("text")
+      .attr("class", "label")
+      .attr("x", -3)
+      .attr("y", y.rangeBand() / 2)
+      .attr("dy", ".35em")
+      .attr("text-anchor", "end")
+      .text(function(d) { return d.State; });
+
+  barEnter.append("text")
+      .attr("class", "value")
+      .attr("x", age && function(d) { return x(d[age]) - 3; })
+      .attr("y", y.rangeBand() / 2)
+      .attr("dy", ".35em")
+      .attr("text-anchor", "end");
+
+  x.domain([0, top[0][age = age1]]);
+
+  var barUpdate = d3.transition(bar)
+      .attr("transform", function(d) { return "translate(0," + (d.y0 = y(d.State)) + ")"; })
+      .style("fill-opacity", 1);
+
+  barUpdate.select("rect")
+      .attr("width", function(d) { return x(d[age]); });
+
+  barUpdate.select(".value")
+      .attr("x", function(d) { return x(d[age]) - 3; })
+      .text(function(d) { return format(d[age]); });
+
+  var barExit = d3.transition(bar.exit())
+      .attr("transform", function(d) { return "translate(0," + (d.y0 + height) + ")"; })
+      .style("fill-opacity", 0)
+      .remove();
+
+  barExit.select("rect")
+      .attr("width", function(d) { return x(d[age]); });
+
+  barExit.select(".value")
+      .attr("x", function(d) { return x(d[age]) - 3; })
+      .text(function(d) { return format(d[age]); });
+
+  d3.transition(svg).select(".x.axis")
+      .call(xAxis);
+}
+
+var timeout = setTimeout(function() {
+  menu.property("value", "65 Years and Over").node().focus();
+  change();
+}, 5000);
+
+    </script>
+
+<p>This bar chart shows the top ten states for a given age bracket, sorted by population percentage. For example, Utah’s burgeoning youth population earns it the top spot in the <a href="javascript:javascript:menu.property('value', '5 to 13 Years'),change()">5 to 13</a> (15.1%) and <a href="javascript:javascript:menu.property('value', 'Under 5 Years'),change()">under 5</a> (9.8%) brackets, while Florida is <a href="javascript:menu.property('value', '65 Years and Over'),change()">popular with retirees</a> (17.4%).
+
+<p>The chart shows multiple slices of a dataset, transitioning smoothly when the age bracket changes. The <i>x</i>-axis rescales to accommodate the change in maximum value, while bars reshuffle along the <i>y</i>-axis to preserve sorted order. Graphical elements enter and exit: Hawaii enters the top ten for the 65 and older age brackets, but fades out in younger ones. The axis ticks change suitably, from whole percentages to fifths. Old values fade-out while the new values fade-in, both translating to preserve a valid display across the transition.
+
+<p>
+    Animated transitions are pretty, but they also serve a purpose: they make it easier to follow the data. This is known as <i>object constancy</i>: a graphical element that represents a particular data point (such as Ohio) can be tracked visually through the transition. This lessens the cognitive burden by using preattentive processing of motion rather than sequential scanning of labels.
+
+    <h2><a href="#key-functions" name="key-functions">#</a>Key Functions</h2>
+
+<p>
+    To achieve object constancy with <a href="http://d3js.org">D3.js</a>, specify a <b>key function</b> as the second argument to <a href="https://github.com/mbostock/d3/wiki/Selections#wiki-data">selection.data</a>. This function takes a data point as input and returns a corresponding key: a string, such as a name, that uniquely identifies the data point. For example, the bar chart above defines data as objects:
+
+<pre><code>{
+  "State": "ND",
+  "Total": 641481,
+  "Under 5 Years": 0.065,
+  "5 to 13 Years": 0.105,
+  "14 to 17 Years": 0.053,
+  "18 to 24 Years": 0.129,
+  "16 Years and Over": 0.804,
+  "18 Years and Over": 0.777,
+  "15 to 44 Years": 0.410,
+  "45 to 64 Years": 0.260,
+  "65 Years and Over": 0.147,
+  "85 Years and Over": 0.028
+}</code></pre>
+
+<p>
+    A suitable key function for this data returns the <code>State</code> property, a <a href="http://www.itl.nist.gov/fipspubs/fip5-2.htm">FIPS code</a>:
+
+<pre><code>function key(d) {
+  return d.State;
+}</code></pre>
+
+<p>
+    When you join the top-ten states to the bars, three selections are returned:
+
+<pre><code>var bar = svg.selectAll(".bar")
+    .data(top, function(d) { return d.State; });</code></pre>
+
+<p>The selection <code>bar</code> is the <i>update</i> selection: states that persist across the transition. The selections <code>bar.enter()</code> and <code>bar.exit()</code> are the <i>enter</i> and <i>exit</i> selections: states that are incoming or outgoing, respectively. For more on these three selections, see <a href="../join/">Thinking with Joins</a>.
+
+<p>
+    For example, when changing from the 18-24 bracket to 14-17, Alaska moves from spot #5 to #1. Since it is in the top ten in both age brackets, it is in the update selection. An update transition interpolates the transform attribute to translate Alaska smoothly to its new position. Simultaneous subtransitions resize the bar and reposition the associated label:
+
+<pre><code>var barUpdate = d3.transition(bar)
+    .attr("transform", function(d) { return "translate(0," + y(d.State) + ")"; });
+barUpdate.select("rect")
+    .attr("width", function(d) { return x(d[age]); });
+barUpdate.select("text")
+    .attr("x", function(d) { return x(d[age]) - 3; })
+    .text(function(d) { return format(d[age]); });</code></pre>
+
+<p>Transitions are also used to fade entering and exiting elements. For the full code, <a href="view-source:http://bost.ocks.org/mike/constancy/">view source</a>.
+
+<p>
+    Key functions can be useful for improving performance independent of transitions. For example, if you filter a large table, you can use a key function to reduce the number of DOM modifications: reorder DOM elements in the update selection rather than regenerating them. We used this technique at Square to improve the performance of <a href="http://corner.squareup.com/2012/04/building-analytics.html">merchant analytics</a>, and it’s one of the reasons that D3 is faster than most template frameworks.
+
+    <h2><a href="#when-constancy-matter" name="when-constancy-matter">#</a>When Constancy Matters</h2>
+
+<p>Above all, animation should be meaningful. While it may be visually impressive for bars to fly around the screen during transitions, animation should only be used when it enhances understanding. Transitions between unrelated datasets or dimensions (<i>e.g.</i>, from temperature to stock price) should use a simpler cross-fade or cut rather than gratuitous, nonsensical movement.
+
+<p>
+    Use a key function whenever you want to follow graphical elements through animation and interaction: filtering (adding or removing elements), reordering (sorting), switching dimensions within multivariate data, <i>etc.</i> If you forget to specify a key function, the default join-by-index can be misleading! Assist your viewers by maintaining object constancy.
+
+    <footer>
+        <aside>May 16, 2012</aside>
+        <a href="../" rel="author">Mike Bostock</a>
+    </footer>
+
+    <script>
+
+GoogleAnalyticsObject = "ga", ga = function() { ga.q.push(arguments); }, ga.q = [], ga.l = +new Date;
+ga("create", "UA-48272912-3", "ocks.org");
+ga("send", "pageview");
+
+    </script>
+    <script async src="../highlight.min.js"></script>
+    <script async src="//www.google-analytics.com/analytics.js"></script>

@@ -25,7 +25,8 @@ export module Plots {
     }
 
     protected _createDrawer(dataset: Dataset) {
-      return new Plottable.Drawers.Symbol(dataset);
+      return new Plottable.Drawers.Symbol(dataset)
+        .initializer(this._initializer.bind(this));
     }
 
     /**
@@ -79,6 +80,11 @@ export module Plots {
       return this;
     }
 
+    private _initializer() {
+      let resetAttrToProjector = this._generateAttrToProjector();
+      resetAttrToProjector["d"] = () => "";
+      return resetAttrToProjector;
+    }
     protected _generateDrawSteps(): Drawers.DrawStep[] {
       let drawSteps: Drawers.DrawStep[] = [];
       drawSteps.push({attrToProjector: this._generateAttrToProjector(), animator: this._getAnimator(Plots.Animator.MAIN)});
