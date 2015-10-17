@@ -3835,7 +3835,7 @@ declare module Plottable {
             protected _constructLineProjector(xProjector: Projector, yProjector: Projector): (datum: any, index: number, dataset: Dataset) => string;
             protected _getDataToDraw(): Utils.Map<Dataset, any[]>;
             protected _filterCroppedRendering(dataset: Dataset, indices: number[]): number[];
-            private _filterDownsampling(dataset, indices);
+            protected _filterDownsampling(dataset: Dataset, indices: number[]): number[];
         }
     }
 }

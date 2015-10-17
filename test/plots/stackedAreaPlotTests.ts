@@ -420,15 +420,14 @@ describe("Plots", () => {
         { x: 4, y: 2},
       ];
 
-      let renderer = new Plottable.Plots.StackedArea<number>();
-      renderer.y((d) => d.y, yScale);
-      renderer.x((d) => d.x, xScale);
-      renderer.addDataset(new Plottable.Dataset(data1));
-      renderer.addDataset(new Plottable.Dataset(data2));
-      renderer.downsamplingEnabled(true);
-      let xAxis = new Plottable.Axes.Numeric(xScale, "bottom");
-      new Plottable.Components.Table([[renderer], [xAxis]]).renderTo(svg);
-      let areas = renderer.content().selectAll(".area");
+      let plot = new Plottable.Plots.StackedArea<number>();
+      plot.y((d) => d.y, yScale);
+      plot.x((d) => d.x, xScale);
+      plot.addDataset(new Plottable.Dataset(data1));
+      plot.addDataset(new Plottable.Dataset(data2));
+      plot.downsamplingEnabled(true);
+      new Plottable.Components.Table([[plot]]).renderTo(svg);
+      let areas = plot.content().selectAll(".area");
 
       let expectedRenderIndex = [0, 2, 3];
 

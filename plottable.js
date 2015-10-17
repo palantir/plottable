@@ -9787,7 +9787,7 @@ var Plottable;
                     return dataToDraw;
                 }
                 var overallFilteredDataIndices = [];
-                this.datasets().forEach(function (dataset, i) {
+                this.datasets().forEach(function (dataset) {
                     var data = dataset.data();
                     var filteredDataIndices = data.map(function (d, i) { return i; });
                     if (_this.croppedRenderingEnabled()) {
@@ -9797,11 +9797,11 @@ var Plottable;
                         filteredDataIndices = _this._filterDownsampling(dataset, filteredDataIndices);
                     }
                     overallFilteredDataIndices = overallFilteredDataIndices.concat(filteredDataIndices
-                        .filter(function (index) { return overallFilteredDataIndices.indexOf(index) < 0; }));
+                        .filter(function (d) { return overallFilteredDataIndices.indexOf(d) < 0; }));
                 });
-                this.datasets().forEach(function (dataset, i) {
+                this.datasets().forEach(function (dataset) {
                     var data = dataset.data();
-                    dataToDraw.set(dataset, [overallFilteredDataIndices.sort(function (a, b) { return a - b; }).map(function (d, i) { return data[d]; })]);
+                    dataToDraw.set(dataset, [overallFilteredDataIndices.sort(function (a, b) { return a - b; }).map(function (d) { return data[d]; })]);
                 });
                 return dataToDraw;
             };

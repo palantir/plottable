@@ -190,7 +190,7 @@ export module Plots {
         return dataToDraw;
       }
       let overallFilteredDataIndices: number[] = [];
-      this.datasets().forEach((dataset, i) => {
+      this.datasets().forEach((dataset) => {
         let data = dataset.data();
         let filteredDataIndices = data.map((d, i) => i);
         if (this.croppedRenderingEnabled()) {
@@ -200,11 +200,11 @@ export module Plots {
           filteredDataIndices = this._filterDownsampling(dataset, filteredDataIndices);
         }
         overallFilteredDataIndices = overallFilteredDataIndices.concat(filteredDataIndices
-          .filter((index) => {return overallFilteredDataIndices.indexOf(index) < 0; }));
+          .filter((d) => {return overallFilteredDataIndices.indexOf(d) < 0; }));
       });
-      this.datasets().forEach((dataset, i) => {
+      this.datasets().forEach((dataset) => {
         let data = dataset.data();
-        dataToDraw.set(dataset, [overallFilteredDataIndices.sort((a, b) => a - b).map((d, i) => data[d])]);
+        dataToDraw.set(dataset, [overallFilteredDataIndices.sort((a, b) => a - b).map((d) => data[d])]);
       });
       return dataToDraw;
     }
