@@ -1,5 +1,4 @@
-module Plottable {
-export module Plots {
+module Plottable.Plots {
   export class Pie extends Plot {
 
     private static _INNER_RADIUS_KEY = "inner-radius";
@@ -419,5 +418,4 @@ export module Plots {
       });
     }
   }
-}
 }

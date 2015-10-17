@@ -1,5 +1,4 @@
-module Plottable {
-export module Axes {
+module Plottable.Axes {
   export class Category extends Axis<string> {
     private _tickLabelAngle = 0;
     private _measurer: SVGTypewriter.Measurers.CacheCharacterMeasurer;
@@ -237,5 +236,4 @@ export module Axes {
       return this;
     }
   }
-}
 }

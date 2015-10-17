@@ -10,7 +10,9 @@ export module TimeInterval {
   export var year = "year";
 };
 
-export module Axes {
+}
+
+module Plottable.Axes {
   /**
    * Defines a configuration for a Time Axis tier.
    * For details on how ticks are generated see: https://github.com/mbostock/d3/wiki/Time-Scales#ticks
@@ -568,5 +570,4 @@ export module Axes {
     }
 
   }
-}
 }

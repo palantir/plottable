@@ -1,5 +1,4 @@
-module Plottable {
-export module Drawers {
+module Plottable.Drawers {
   export class Symbol extends Drawer {
 
     constructor(dataset: Dataset) {
@@ -9,5 +8,4 @@ export module Drawers {
     }
 
   }
-}
 }
