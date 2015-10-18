@@ -215,25 +215,20 @@ describe("Tables", () => {
     const SVG_WIDTH = 300;
     const SVG_HEIGHT = 300;
 
-    function verifySingleRowOrigins(row: Plottable.Component[], columnPadding = 0) {
+    function verifyOrigins(rows: Plottable.Component[][], rowPadding = 0, columnPadding = 0) {
       let expectedOrigin = {
         x: 0,
         y: 0
       };
-      row.forEach((component, columnIndex) => {
-        TestMethods.assertPointsClose(component.origin(), expectedOrigin, 0, `Component in column ${columnIndex} has the correct origin`);
-        expectedOrigin.x += component.width() + columnPadding;
-      });
-    }
-
-    function verifySingleColumnOrigins(column: Plottable.Component[], rowPadding = 0) {
-      let expectedOrigin = {
-        x: 0,
-        y: 0
-      };
-      column.forEach((component, rowIndex) => {
-        TestMethods.assertPointsClose(component.origin(), expectedOrigin, 0, `Component in row ${rowIndex} has the correct origin`);
-        expectedOrigin.y += component.height() + rowPadding;
+      rows.forEach((row, r) => {
+        let maxHeight = 0;
+        expectedOrigin.x = 0;
+        row.forEach((component, c) => {
+          TestMethods.assertPointsClose(component.origin(), expectedOrigin, 0, `Component at [${r}, ${c}] has the correct origin`);
+          expectedOrigin.x += component.width() + columnPadding;
+          maxHeight = maxHeight > component.height() ? maxHeight : component.height();
+        });
+        expectedOrigin.y += maxHeight + rowPadding;
       });
     }
 
@@ -242,20 +237,22 @@ describe("Tables", () => {
 
       const component1 = new Plottable.Component();
       const component2 = new Plottable.Component();
-      const table = new Plottable.Components.Table([[component1, component2]]);
+      let tableRows = [[component1, component2]];
+      const table = new Plottable.Components.Table(tableRows);
       table.renderTo(svg);
       const twoColumnExpectedWidth = SVG_WIDTH / 2;
       assert.strictEqual(component1.width(), twoColumnExpectedWidth, "first Component received half the available width");
       assert.strictEqual(component2.width(), twoColumnExpectedWidth, "second Component received half the available width");
-      verifySingleRowOrigins([component1, component2]);
+      verifyOrigins(tableRows);
 
       const component3 = new Plottable.Component();
       table.add(component3, 0, 2);
+      tableRows[0].push(component3);
       const threeColumnExpectedWidth = SVG_WIDTH / 3;
       assert.strictEqual(component1.width(), threeColumnExpectedWidth, "first Component received one-third of the available width");
       assert.strictEqual(component2.width(), threeColumnExpectedWidth, "second Component received one-third of the available width");
       assert.strictEqual(component3.width(), threeColumnExpectedWidth, "third Component received one-third of the available width");
-      verifySingleRowOrigins([component1, component2, component3]);
+      verifyOrigins(tableRows);
 
       table.destroy();
       svg.remove();
@@ -283,23 +280,25 @@ describe("Tables", () => {
 
       const component1 = new Plottable.Component();
       const component2 = new Plottable.Component();
-      const table = new Plottable.Components.Table([
+      let tableRows = [
         [component1],
         [component2]
-      ]);
+      ];
+      const table = new Plottable.Components.Table(tableRows);
       table.renderTo(svg);
       const twoRowExpectedHeight = SVG_HEIGHT / 2;
       assert.strictEqual(component1.height(), twoRowExpectedHeight, "first Component received half the available height");
       assert.strictEqual(component2.height(), twoRowExpectedHeight, "second Component received half the available height");
-      verifySingleColumnOrigins([component1, component2]);
+      verifyOrigins(tableRows);
 
       const component3 = new Plottable.Component();
       table.add(component3, 2, 0);
+      tableRows.push([component3]);
       const threeRowExpectedHeight = SVG_HEIGHT / 3;
       assert.strictEqual(component1.height(), threeRowExpectedHeight, "first Component received one-third of the available height");
       assert.strictEqual(component2.height(), threeRowExpectedHeight, "second Component received one-third of the available height");
       assert.strictEqual(component3.height(), threeRowExpectedHeight, "third Component received one-third of the available height");
-      verifySingleColumnOrigins([component1, component2, component3]);
+      verifyOrigins(tableRows);
 
       table.destroy();
       svg.remove();
@@ -331,10 +330,11 @@ describe("Tables", () => {
 
       const component1 = new Plottable.Component();
       const component2 = new Plottable.Component();
-      const table = new Plottable.Components.Table([
+      const tableRows = [
         [component1],
         [component2]
-      ]);
+      ];
+      const table = new Plottable.Components.Table(tableRows);
       const rowPadding = 10;
       table.rowPadding(rowPadding);
       table.renderTo(svg);
@@ -342,7 +342,7 @@ describe("Tables", () => {
       const expectedHeight = (SVG_HEIGHT - rowPadding) / 2;
       assert.strictEqual(component1.height(), expectedHeight, "first non-fixed-height Component received half the remaining height");
       assert.strictEqual(component2.height(), expectedHeight, "second non-fixed-height Component received half the remaining height");
-      verifySingleColumnOrigins([component1, component2], rowPadding);
+      verifyOrigins(tableRows, rowPadding, 0);
 
       table.destroy();
       svg.remove();
@@ -353,7 +353,8 @@ describe("Tables", () => {
 
       const component1 = new Plottable.Component();
       const component2 = new Plottable.Component();
-      const table = new Plottable.Components.Table([[component1, component2]]);
+      const tableRows = [[component1, component2]];
+      const table = new Plottable.Components.Table(tableRows);
       const columnPadding = 10;
       table.columnPadding(columnPadding);
       table.renderTo(svg);
@@ -361,7 +362,50 @@ describe("Tables", () => {
       const expectedWidth = (SVG_HEIGHT - columnPadding) / 2;
       assert.strictEqual(component1.width(), expectedWidth, "first non-fixed-width Component received half the remaining width");
       assert.strictEqual(component2.width(), expectedWidth, "second non-fixed-width Component received half the remaining width");
-      verifySingleRowOrigins([component1, component2], columnPadding);
+      verifyOrigins(tableRows, 0, columnPadding);
+
+      table.destroy();
+      svg.remove();
+    });
+
+    it("allocates height to unfixed rows according to row weights", () => {
+      const svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+
+      const component0 = new Plottable.Component();
+      const component1 = new Plottable.Component();
+      const table = new Plottable.Components.Table([
+        [component0],
+        [component1]
+      ]);
+      const row0Weight = 1;
+      table.rowWeight(0, row0Weight);
+      const row1Weight = 2;
+      table.rowWeight(1, row1Weight);
+      const totalRowWeight = row0Weight + row1Weight;
+      table.renderTo(svg);
+
+      assert.strictEqual(component0.height(), SVG_WIDTH * row0Weight / totalRowWeight, "row 0 received height according to its weight");
+      assert.strictEqual(component1.height(), SVG_WIDTH * row1Weight / totalRowWeight, "row 1 received height according to its weight");
+
+      table.destroy();
+      svg.remove();
+    });
+
+    it("allocates width to unfixed columns according to column weights", () => {
+      const svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+
+      const component0 = new Plottable.Component();
+      const component1 = new Plottable.Component();
+      const table = new Plottable.Components.Table([[component0, component1]]);
+      const column0Weight = 1;
+      table.columnWeight(0, column0Weight);
+      const column1Weight = 2;
+      table.columnWeight(1, column1Weight);
+      const totalColumnWeight = column0Weight + column1Weight;
+      table.renderTo(svg);
+
+      assert.strictEqual(component0.width(), SVG_WIDTH * column0Weight / totalColumnWeight, "column 0 received width according to its weight");
+      assert.strictEqual(component1.width(), SVG_WIDTH * column1Weight / totalColumnWeight, "column 1 received width according to its weight");
 
       table.destroy();
       svg.remove();
