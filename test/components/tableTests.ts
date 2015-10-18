@@ -138,7 +138,7 @@ describe("Tables", () => {
       let expectedRows = [[null, c2, c3], [c4, c5, c6]];
 
       table.remove(c1);
-      assertTableRows(table, expectedRows, "Component was removed")
+      assertTableRows(table, expectedRows, "Component was removed");
       table.remove(c1);
       assertTableRows(table, expectedRows, "removing Component again has no further effect");
     });
@@ -268,8 +268,10 @@ describe("Tables", () => {
       const table = new Plottable.Components.Table([[fixedSizeComponent, unfixedComponent1, unfixedComponent2]]);
       table.renderTo(svg);
       const expectedUnfixedWidth = (SVG_WIDTH - FIXED_COMPONENT_SIZE) / 2;
-      assert.strictEqual(unfixedComponent1.width(), expectedUnfixedWidth, "first non-fixed-width Component received half the remaining width");
-      assert.strictEqual(unfixedComponent2.width(), expectedUnfixedWidth, "second non-fixed-width Component received half the remaining width");
+      assert.strictEqual(unfixedComponent1.width(), expectedUnfixedWidth,
+        "first non-fixed-width Component received half the remaining width");
+      assert.strictEqual(unfixedComponent2.width(), expectedUnfixedWidth,
+        "second non-fixed-width Component received half the remaining width");
 
       table.destroy();
       svg.remove();
@@ -318,8 +320,10 @@ describe("Tables", () => {
       ]);
       table.renderTo(svg);
       const expectedUnfixedHeight = (SVG_HEIGHT - FIXED_COMPONENT_SIZE) / 2;
-      assert.strictEqual(unfixedComponent1.height(), expectedUnfixedHeight, "first non-fixed-height Component received half the remaining height");
-      assert.strictEqual(unfixedComponent2.height(), expectedUnfixedHeight, "second non-fixed-height Component received half the remaining height");
+      assert.strictEqual(unfixedComponent1.height(), expectedUnfixedHeight,
+        "first non-fixed-height Component received half the remaining height");
+      assert.strictEqual(unfixedComponent2.height(), expectedUnfixedHeight,
+        "second non-fixed-height Component received half the remaining height");
 
       table.destroy();
       svg.remove();
@@ -446,8 +450,10 @@ describe("Tables", () => {
         const totalColumnWeight = column0Weight + column1Weight;
         table.renderTo(svg);
 
-        assert.strictEqual(component0.width(), SVG_WIDTH * column0Weight / totalColumnWeight, "column 0 received width according to its weight");
-        assert.strictEqual(component1.width(), SVG_WIDTH * column1Weight / totalColumnWeight, "column 1 received width according to its weight");
+        assert.strictEqual(component0.width(), SVG_WIDTH * column0Weight / totalColumnWeight,
+          "column 0 received width according to its weight");
+        assert.strictEqual(component1.width(), SVG_WIDTH * column1Weight / totalColumnWeight,
+          "column 1 received width according to its weight");
 
         table.destroy();
         svg.remove();
