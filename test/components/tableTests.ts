@@ -410,44 +410,6 @@ describe("Tables", () => {
       table.destroy();
       svg.remove();
     });
-
-    it.skip("table with fixed-size objects on every side lays out properly", () => {
-      let svg = TestMethods.generateSVG();
-      let c4 = new Plottable.Component();
-      // [0 1 2] \\
-      // [3 4 5] \\
-      // [6 7 8] \\
-      // give the axis-like objects a minimum
-      let c1 = TestMethods.makeFixedSizeComponent(null, 30);
-      let c7 = TestMethods.makeFixedSizeComponent(null, 30);
-      let c3 = TestMethods.makeFixedSizeComponent(50, null);
-      let c5 = TestMethods.makeFixedSizeComponent(50, null);
-      let table = new Plottable.Components.Table([
-        [null, c1, null],
-        [c3, c4, c5],
-        [null, c7, null]]);
-
-      let components = [c1, c3, c4, c5, c7];
-
-      table.renderTo(svg);
-
-      let elements = components.map((r) => (<any> r)._element);
-      let translates = elements.map((e) => TestMethods.getTranslate(e));
-      let bboxes = elements.map((e) => Plottable.Utils.DOM.elementBBox(e));
-      // test the translates
-      assert.deepEqual(translates[0], [50, 0] , "top axis translate");
-      assert.deepEqual(translates[4], [50, 370], "bottom axis translate");
-      assert.deepEqual(translates[1], [0, 30] , "left axis translate");
-      assert.deepEqual(translates[3], [350, 30], "right axis translate");
-      assert.deepEqual(translates[2], [50, 30] , "plot translate");
-      // test the bboxes
-      TestMethods.assertBBoxEquivalence(bboxes[0], [300, 30], "top axis bbox");
-      TestMethods.assertBBoxEquivalence(bboxes[4], [300, 30], "bottom axis bbox");
-      TestMethods.assertBBoxEquivalence(bboxes[1], [50, 340], "left axis bbox");
-      TestMethods.assertBBoxEquivalence(bboxes[3], [50, 340], "right axis bbox");
-      TestMethods.assertBBoxEquivalence(bboxes[2], [300, 340], "plot bbox");
-      svg.remove();
-    });
   });
 
   describe("table._iterateLayout works properly", () => {
