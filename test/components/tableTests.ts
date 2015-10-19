@@ -12,18 +12,18 @@ describe("Tables", () => {
 
   describe("constructor behavior", () => {
     it("adds the \"table\" CSS class", () => {
-      let table = new Plottable.Components.Table();
+      const table = new Plottable.Components.Table();
       assert.isTrue(table.hasClass("table"));
     });
 
     it("can take a 2-D array of Components in the constructor", () => {
-      let c00 = new Plottable.Component();
-      let c11 = new Plottable.Component();
-      let rows = [
+      const c00 = new Plottable.Component();
+      const c11 = new Plottable.Component();
+      const rows = [
         [c00, null],
         [null, c11]
       ];
-      let table = new Plottable.Components.Table(rows);
+      const table = new Plottable.Components.Table(rows);
 
       assertTableRows(table, rows, "constructor initialized Table correctly");
     });
@@ -31,8 +31,8 @@ describe("Tables", () => {
 
   describe("checking Table contents", () => {
     it("can check if a given Component is in the Table", () => {
-      let c0 = new Plottable.Component();
-      let table = new Plottable.Components.Table([[c0]]);
+      const c0 = new Plottable.Component();
+      const table = new Plottable.Components.Table([[c0]]);
       assert.isTrue(table.has(c0), "correctly checks that Component is in the Table");
       table.remove(c0);
       assert.isFalse(table.has(c0), "correctly checks that Component is no longer in the Table");
@@ -41,11 +41,11 @@ describe("Tables", () => {
     });
 
     it("can retrieve the Component at a given row, column index", () => {
-      let c00 = new Plottable.Component();
-      let c01 = new Plottable.Component();
-      let c10 = new Plottable.Component();
-      let c11 = new Plottable.Component();
-      let table = new Plottable.Components.Table([
+      const c00 = new Plottable.Component();
+      const c01 = new Plottable.Component();
+      const c10 = new Plottable.Component();
+      const c11 = new Plottable.Component();
+      const table = new Plottable.Components.Table([
         [c00, c01],
         [c10, c11]
       ]);
@@ -57,10 +57,10 @@ describe("Tables", () => {
     });
 
     it("returns null when no Component exists at the specified row, column index", () => {
-      let c00 = new Plottable.Component();
-      let c11 = new Plottable.Component();
+      const c00 = new Plottable.Component();
+      const c11 = new Plottable.Component();
 
-      let table = new Plottable.Components.Table();
+      const table = new Plottable.Components.Table();
       table.add(c00, 0, 0);
       table.add(c11, 1, 1);
 
@@ -74,8 +74,8 @@ describe("Tables", () => {
 
   describe("adding Components", () => {
     it("adds the Component and pads out other empty cells with null", () => {
-      let table = new Plottable.Components.Table();
-      let c11 = new Plottable.Component();
+      const table = new Plottable.Components.Table();
+      const c11 = new Plottable.Component();
       table.add(c11, 1, 1);
       assert.strictEqual(table.componentAt(1, 1), c11, "Component was added at the correct position");
       assert.isNull(table.componentAt(0, 0), "Table padded [0, 0] with null");
@@ -84,22 +84,22 @@ describe("Tables", () => {
     });
 
     it("throws an Error on trying to add a Component to an occupied cell", () => {
-      let c1 = new Plottable.Component();
-      let table = new Plottable.Components.Table([[c1]]);
-      let c2 = new Plottable.Component();
+      const c1 = new Plottable.Component();
+      const table = new Plottable.Components.Table([[c1]]);
+      const c2 = new Plottable.Component();
       assert.throws(() => table.add(c2, 0, 0), Error, "occupied");
     });
 
     it("throws an Error on trying to add null to the Table", () => {
-      let table = new Plottable.Components.Table();
+      const table = new Plottable.Components.Table();
       assert.throws(() => table.add(null, 0, 0), "Cannot add null to a table cell");
     });
 
     it("detaches a Component from its previous location before adding it", () => {
-      let component = new Plottable.Component();
-      let svg = TestMethods.generateSVG();
+      const component = new Plottable.Component();
+      const svg = TestMethods.generateSVG();
       component.renderTo(svg);
-      let table = new Plottable.Components.Table();
+      const table = new Plottable.Components.Table();
       table.add(component, 0, 0);
       assert.isFalse((<Node> svg.node()).hasChildNodes(), "Component was detach()-ed");
       svg.remove();
@@ -107,12 +107,12 @@ describe("Tables", () => {
   });
 
   describe("removing Components", () => {
-    let c1 = new Plottable.Component();
-    let c2 = new Plottable.Component();
-    let c3 = new Plottable.Component();
-    let c4 = new Plottable.Component();
-    let c5 = new Plottable.Component();
-    let c6 = new Plottable.Component();
+    const c1 = new Plottable.Component();
+    const c2 = new Plottable.Component();
+    const c3 = new Plottable.Component();
+    const c4 = new Plottable.Component();
+    const c5 = new Plottable.Component();
+    const c6 = new Plottable.Component();
     let table: Plottable.Components.Table;
 
     it("removes the specified Component", () => {
@@ -131,7 +131,7 @@ describe("Tables", () => {
     it("has no further effect when called a second time with the same Component", () => {
       table = new Plottable.Components.Table([[c1, c2, c3], [c4, c5, c6]]);
 
-      let expectedRows = [[null, c2, c3], [c4, c5, c6]];
+      const expectedRows = [[null, c2, c3], [c4, c5, c6]];
 
       table.remove(c1);
       assertTableRows(table, expectedRows, "Component was removed");
