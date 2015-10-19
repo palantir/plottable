@@ -1310,6 +1310,8 @@ declare module Plottable {
         private _dataset;
         private _drawingTarget;
         private _initializer;
+        private _cachedSelectionValid;
+        private _cachedSelection;
         /**
          * A Drawer draws svg elements based on the input Dataset.
          *
@@ -4179,6 +4181,7 @@ declare module Plottable {
 }
 declare module Plottable {
     module Animators {
+        type d3SelectionOrTransition = d3.Selection<any> | d3.Transition<any>;
         type EasingFunction = (t: number) => number;
         type EasingFunctionSpecifier = string | EasingFunction;
         class EasingFunctions {
@@ -4198,7 +4201,7 @@ declare module Plottable {
          *     transition object so that plots may chain the transitions between
          *     animators.
          */
-        animate(selection: d3.Selection<any>, attrToAppliedProjector: AttributeToAppliedProjector, drawingTarget?: Drawers.DrawingTarget, drawer?: Drawer): d3.Selection<any> | d3.Transition<any>;
+        animate(selection: d3.Selection<any> | d3.Transition<any>, attrToAppliedProjector: AttributeToAppliedProjector, drawingTarget?: Drawers.DrawingTarget, drawer?: Drawer): d3.Selection<any> | d3.Transition<any>;
         /**
          * Given the number of elements, return the total time the animation requires
          *
@@ -4211,7 +4214,8 @@ declare module Plottable {
 declare module Plottable {
     module Animators {
         /**
-         * An Animator with easing and configurable durations and delays.
+         * Base class for animators. Equivalent behaviour to Easing animator
+         * Provides helper functions for subclassed animators
          */
         class Base implements Animator {
             /**
@@ -4248,7 +4252,7 @@ declare module Plottable {
              */
             constructor();
             totalTime(numberOfSteps: number): number;
-            animate(selection: d3.Selection<any>, attrToAppliedProjector: AttributeToAppliedProjector, drawingTarget?: Drawers.DrawingTarget): d3.Selection<any> | d3.Transition<any>;
+            animate(selection: d3.Selection<any>, attrToAppliedProjector: AttributeToAppliedProjector, drawingTarget?: Drawers.DrawingTarget, drawer?: Drawer): d3.Selection<any> | d3.Transition<any>;
             /**
              * return a transition from the selection, with the requested duration
              * and (possibly) delay. As a convenience, this may return the selection itself
@@ -4280,9 +4284,9 @@ declare module Plottable {
              * Sets the start delay of the animation in milliseconds.
              *
              * @param {number} startDelay The start delay in milliseconds.
-             * @returns {Easing} The calling Easing Animator.
+             * @returns {Base} The calling Animator.
              */
-            startDelay(startDelay: number): Easing;
+            startDelay(startDelay: number): Base;
             /**
              * Gets the duration of one animation step in milliseconds.
              *
@@ -4295,7 +4299,7 @@ declare module Plottable {
              * @param {number} stepDuration The duration in milliseconds.
              * @returns {Base} The calling Animator.
              */
-            stepDuration(stepDuration: number): Easing;
+            stepDuration(stepDuration: number): Base;
             /**
              * Gets the maximum start delay between animation steps in milliseconds.
              *
@@ -4306,9 +4310,9 @@ declare module Plottable {
              * Sets the maximum start delay between animation steps in milliseconds.
              *
              * @param {number} stepDelay The maximum iterative delay in milliseconds.
-             * @returns {Easing} The calling Easing Animator.
+             * @returns {Base} The calling Animator.
              */
-            stepDelay(stepDelay: number): Easing;
+            stepDelay(stepDelay: number): Base;
             /**
              * Gets the maximum total animation duration constraint in milliseconds.
              *
@@ -4327,9 +4331,9 @@ declare module Plottable {
              * the specified time.
              *
              * @param {number} maxTotalDuration The maximum total animation duration in milliseconds.
-             * @returns {Easing} The calling Easing Animator.
+             * @returns {Base} The calling Animator.
              */
-            maxTotalDuration(maxTotalDuration: number): Easing;
+            maxTotalDuration(maxTotalDuration: number): Base;
             /**
              * Gets the current easing mode of the animation.
              *
@@ -4340,7 +4344,7 @@ declare module Plottable {
              * Sets the easing mode of the animation.
              *
              * @param {string} easingMode The desired easing mode.
-             * @returns {Easing} The calling Easing Animator.
+             * @returns {Base} The calling Animator.
              */
             easingMode(easingMode: string): Base;
             /**
@@ -4538,7 +4542,7 @@ declare module Plottable {
              */
             constructor();
             totalTime(numberOfSteps: number): number;
-            animate(selection: d3.Selection<any>, attrToAppliedProjector: AttributeToAppliedProjector, drawingTarget?: Drawers.DrawingTarget): d3.Transition<any>;
+            animate(selection: d3.Selection<any>, attrToAppliedProjector: AttributeToAppliedProjector, drawingTarget?: Drawers.DrawingTarget): d3.selection.Update<any> | d3.Transition<any>;
             /**
              * Gets the start delay of the animation in milliseconds.
              *
@@ -4654,6 +4658,47 @@ declare module Plottable {
              * @returns {Opacity} The calling Animator.
              */
             endOpacity(endOpacity: number): Opacity;
+        }
+    }
+}
+declare module Plottable {
+    module Animators {
+        type AnimateCallback = (selection: d3.Selection<any>, attrToAppliedProjector: AttributeToAppliedProjector, drawingTarget?: Drawers.DrawingTarget, drawer?: Drawer) => d3.Selection<any> | d3.Transition<any>;
+        /**
+         * Allows the implementation of animate to be passed as a callback function
+         * Provides javascript clients build custom animations with full access to the drawing target
+         */
+        class Callback extends Base implements Animator {
+            private _callback;
+            private _innerAnimator;
+            constructor();
+            animate(selection: d3.Selection<any>, attrToAppliedProjector: AttributeToAppliedProjector, drawingTarget?: Drawers.DrawingTarget, drawer?: Drawer): d3.Selection<any> | d3.Transition<any>;
+            /**
+             * Gets the callback animate function.
+             * @returns {Callback} The calling Callback Animator.
+             */
+            callback(): AnimateCallback;
+            /**
+             * Sets the attributes for entering elements.
+             *
+             * @param {callback} a function implementing Animator.animate
+             * @returns {Callback} The calling Callback Animator.
+             */
+            callback(callback: AnimateCallback): Callback;
+            /**
+             * Gets an inner animator.
+             * callback functions may use this animator
+             * @returns {innerAnimator} The current innerAnimator.
+             */
+            innerAnimator(): Animator;
+            /**
+             * Sets the attributes for entering elements.
+             *
+             * @param {innerAnimator} a function implementing Animator.animate
+             * @returns {innerAnimator} The calling innerAnimator Animator.
+             */
+            innerAnimator(innerAnimator: Animator): Attr;
+            InnerAnimate(selection: d3.Selection<any>, attrToAppliedProjector: AttributeToAppliedProjector, drawingTarget?: Drawers.DrawingTarget, drawer?: Drawer): d3.Selection<any> | d3.Transition<any>;
         }
     }
 }

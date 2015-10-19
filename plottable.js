@@ -3,13 +3,7 @@ Plottable 1.15.0 (https://github.com/palantir/plottable)
 Copyright 2014-2015 Palantir Technologies
 Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
 */
-// include bind polyfill since bind is not supported in phantomjs versions 1.x.x
-Function.prototype.bind = Function.prototype.bind ||
-function (b) {
-    if (typeof this !== "function") {
-        throw new TypeError("Function.prototype.bind - what is trying to be bound is not callable");
-    } var a = Array.prototype.slice, f = a.call(arguments, 1), e = this, c = function () { }, d = function () { return e.apply(this instanceof c ? this : b || window, f.concat(a.call(arguments))); }; c.prototype = this.prototype; d.prototype = new c(); return d;
-};
+
 (function(root, factory) {
     if(typeof exports === 'object') {
         module.exports = factory(require, exports, module);
@@ -2584,6 +2578,7 @@ var Plottable;
          * @param {Dataset} dataset The dataset associated with this Drawer
          */
         function Drawer(dataset) {
+            this._cachedSelectionValid = false;
             this._dataset = dataset;
             this._initializer = function () { return {}; };
         }
@@ -2592,6 +2587,7 @@ var Plottable;
                 return this._renderArea;
             }
             this._renderArea = area;
+            this._cachedSelectionValid = false;
             return this;
         };
         Drawer.prototype.initializer = function (fnattrToProjector) {
@@ -2625,11 +2621,12 @@ var Plottable;
         Drawer.prototype._bindSelectionData = function (data) {
             // if the dataset has a key, use it when binding the data   
             var dataElements;
+            var selection = this.renderArea().selectAll(this.selector());
             if (this._dataset) {
-                dataElements = this.selection().data(data, this._dataset.keyFunction());
+                dataElements = selection.data(data, this._dataset.keyFunction());
             }
             else {
-                dataElements = this.selection().data(data);
+                dataElements = selection.data(data);
             }
             this._drawingTarget = {
                 update: dataElements.filter(function () {
@@ -2642,9 +2639,10 @@ var Plottable;
             this._drawingTarget.enter = dataElements.enter()
                 .append(this._svgElementName)
                 .attr(this.appliedInitializer());
+            this._applyDefaultAttributes(this._drawingTarget.enter); // others already have it
             this._drawingTarget.exit = dataElements.exit(); // the animator becomes responsbile for reomving these
-            this._drawingTarget.merge = dataElements; // after enter() is called, this contains new elements
-            this._applyDefaultAttributes(dataElements);
+            this._drawingTarget.merge = this._cachedSelection = dataElements; // after enter() is called, this contains new elements
+            this._cachedSelectionValid = true;
         };
         Drawer.prototype._applyDefaultAttributes = function (selection) {
             if (this._className != null) {
@@ -2666,7 +2664,7 @@ var Plottable;
             });
             step.animator.animate(selection, step.attrToAppliedProjector, this._drawingTarget, this);
             if (this._className != null) {
-                this.selection().classed(this._className, true);
+                selection.classed(this._className, true);
             }
         };
         Drawer.prototype._appliedProjectors = function (attrToProjector) {
@@ -2711,13 +2709,16 @@ var Plottable;
             var delay = 0;
             appliedDrawSteps.forEach(function (drawStep, i) {
                 Plottable.Utils.Window.setTimeout(function () { return _this._drawStep(drawStep); }, delay);
-                // this._drawStep(drawStep);
                 delay += drawStep.animator.totalTime(data.length);
             });
             return this;
         };
         Drawer.prototype.selection = function () {
-            return this.renderArea().selectAll(this.selector());
+            if (!this._cachedSelectionValid) {
+                this._cachedSelection = this.renderArea().selectAll(this.selector());
+                this._cachedSelectionValid = true;
+            }
+            return this._cachedSelection;
         };
         /**
          * Returns the CSS selector for this Drawer's visual elements.
@@ -10237,7 +10238,8 @@ var Plottable;
     var Animators;
     (function (Animators) {
         /**
-         * An Animator with easing and configurable durations and delays.
+         * Base class for animators. Equivalent behaviour to Easing animator
+         * Provides helper functions for subclassed animators
          */
         var Base = (function () {
             /**
@@ -10256,7 +10258,7 @@ var Plottable;
                 var adjustedIterativeDelay = this._getAdjustedIterativeDelay(numberOfSteps);
                 return this.startDelay() + adjustedIterativeDelay * (Math.max(numberOfSteps - 1, 0)) + this.stepDuration();
             };
-            Base.prototype.animate = function (selection, attrToAppliedProjector, drawingTarget) {
+            Base.prototype.animate = function (selection, attrToAppliedProjector, drawingTarget, drawer) {
                 var _this = this;
                 var numberOfSteps = drawingTarget.merge[0].length;
                 var adjustedIterativeDelay = this._getAdjustedIterativeDelay(numberOfSteps);
@@ -10289,7 +10291,7 @@ var Plottable;
                 }
                 else {
                     // otherwise is the selection is NOT a transition, create a new transition setting up the delay
-                    return selection.transition()
+                    return selection = selection.transition()
                         .ease(easing)
                         .duration(duration)
                         .delay(delay);
@@ -10305,6 +10307,9 @@ var Plottable;
                 return (selection.namespace === "__transition__" ? true : false);
             };
             ;
+            /*
+             *
+             */
             Base.prototype.mergeAttrs = function (attr1, attr2) {
                 var a = {};
                 Object.keys(attr1).forEach(function (attr) {
@@ -10651,9 +10656,10 @@ var Plottable;
                         .attr(attrToAppliedProjector);
                     drawingTarget.exit
                         .remove();
+                    return drawingTarget.merge;
                 }
                 else {
-                    var numberOfSteps = selection[0].length;
+                    var numberOfSteps = selection.size();
                     var adjustedIterativeDelay = this._getAdjustedIterativeDelay(numberOfSteps);
                     return selection.transition()
                         .ease(this.easingMode())
@@ -10780,6 +10786,54 @@ var Plottable;
             return Opacity;
         })(Animators.Attr);
         Animators.Opacity = Opacity;
+    })(Animators = Plottable.Animators || (Plottable.Animators = {}));
+})(Plottable || (Plottable = {}));
+var Plottable;
+(function (Plottable) {
+    var Animators;
+    (function (Animators) {
+        /**
+         * Allows the implementation of animate to be passed as a callback function
+         * Provides javascript clients build custom animations with full access to the drawing target
+         */
+        var Callback = (function (_super) {
+            __extends(Callback, _super);
+            function Callback() {
+                _super.call(this);
+                this._callback = function (selection, attrToAppliedProjector, drawingTarget) { return drawingTarget.merge; };
+            }
+            Callback.prototype.animate = function (selection, attrToAppliedProjector, drawingTarget, drawer) {
+                return this.callback().call(this, selection, attrToAppliedProjector, drawingTarget, drawer);
+            };
+            Callback.prototype.callback = function (callback) {
+                if (callback == null) {
+                    return this._callback;
+                }
+                else {
+                    this._callback = callback;
+                    return this;
+                }
+            };
+            Callback.prototype.innerAnimator = function (innerAnimator) {
+                if (innerAnimator == null) {
+                    return this._innerAnimator;
+                }
+                else {
+                    this._innerAnimator = innerAnimator;
+                    return this;
+                }
+            };
+            Callback.prototype.InnerAnimate = function (selection, attrToAppliedProjector, drawingTarget, drawer) {
+                if (this.innerAnimator) {
+                    return this.innerAnimator().animate(selection, attrToAppliedProjector, drawingTarget, drawer);
+                }
+                else {
+                    return _super.prototype.animate.call(this, selection, attrToAppliedProjector, drawingTarget, drawer);
+                }
+            };
+            return Callback;
+        })(Animators.Base);
+        Animators.Callback = Callback;
     })(Animators = Plottable.Animators || (Plottable.Animators = {}));
 })(Plottable || (Plottable = {}));
 var Plottable;

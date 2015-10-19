@@ -64,8 +64,9 @@ export module Animators {
           .attr(attrToAppliedProjector);
         drawingTarget.exit
           .remove();
+        return drawingTarget.merge;
       } else {
-        let numberOfSteps = selection[0].length;
+        let numberOfSteps = selection.size();
         let adjustedIterativeDelay = this._getAdjustedIterativeDelay(numberOfSteps);
 
         return selection.transition()

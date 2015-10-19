@@ -90,6 +90,7 @@
       "src/animators/nullAnimator.ts",
       "src/animators/easingAnimator.ts",
       "src/animators/opacityAnimator.ts",
+      "src/animators/callbackAnimator.ts",
 
       "src/dispatchers/dispatcher.ts",
       "src/dispatchers/mouseDispatcher.ts",

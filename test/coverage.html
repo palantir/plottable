@@ -8,7 +8,15 @@
     <link href="tests.css" type="text/css" rel="stylesheet" />
 
     <script>
-      window.PlottableTestCode = true;
+        window.PlottableTestCode = true;
+        // include bind polyfill since bind is not supported in phantomjs versions 1.x.x
+        // sourced ffrom: https://gist.github.com/dsingleton/1312328
+        Function.prototype.bind = Function.prototype.bind ||
+        function (b) {
+            if (typeof this !== "function") {
+                throw new TypeError("Function.prototype.bind - what is trying to be bound is not callable");
+            } var a = Array.prototype.slice, f = a.call(arguments, 1), e = this, c = function () { }, d = function () { return e.apply(this instanceof c ? this : b || window, f.concat(a.call(arguments))); }; c.prototype = this.prototype; d.prototype = new c(); return d;
+        };
     </script>
     <script src="../bower_components/d3/d3.min.js"></script>
     <script src="../bower_components/svg-typewriter/svgtypewriter.js" charset="utf-8"></script>

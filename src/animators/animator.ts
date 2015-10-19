@@ -1,5 +1,7 @@
 module Plottable {
 export module Animators {
+  export type d3SelectionOrTransition = d3.Selection<any>|d3.Transition<any>;
+
   export type EasingFunction = (t: number) => number;
   export type EasingFunctionSpecifier = string|EasingFunction;
   export class EasingFunctions {
@@ -43,7 +45,7 @@ export interface Animator {
    *     transition object so that plots may chain the transitions between
    *     animators.
    */
-  animate(selection: d3.Selection<any>, attrToAppliedProjector: AttributeToAppliedProjector,
+  animate(selection: d3.Selection<any>|d3.Transition<any>, attrToAppliedProjector: AttributeToAppliedProjector,
     drawingTarget?: Drawers.DrawingTarget, drawer?: Drawer): d3.Selection<any> | d3.Transition<any>;
 
   /**

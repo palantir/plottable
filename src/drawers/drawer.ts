@@ -34,10 +34,13 @@ export class Drawer {
   private _renderArea: d3.Selection<void>;
   protected _svgElementName: string;
   protected _className: string;
+
   private _dataset: Dataset;
 
   private _drawingTarget: Drawers.DrawingTarget;
   private _initializer: () => AttributeToProjector;
+  private _cachedSelectionValid = false;
+  private _cachedSelection: d3.Selection<any>;
 
   /**
    * A Drawer draws svg elements based on the input Dataset.
@@ -66,6 +69,7 @@ export class Drawer {
       return this._renderArea;
     }
     this._renderArea = area;
+    this._cachedSelectionValid = false;
     return this;
   }
 
@@ -94,7 +98,7 @@ export class Drawer {
 
   /*
    * Return the AttrToAppliedProjector generated from the initializer
-   * 
+   *
    * @returns {AttrToAppliedProjector} .
    */
   public appliedInitializer() {
@@ -115,12 +119,13 @@ export class Drawer {
    * @param{any[]} data The data to be drawn
    */
   private _bindSelectionData(data: any[]) {
-    // if the dataset has a key, use it when binding the data   
+    // if the dataset has a key, use it when binding the data
     let dataElements: d3.selection.Update<any>;
+    let selection = this.renderArea().selectAll(this.selector());
     if (this._dataset) {
-      dataElements = this.selection().data(data, this._dataset.keyFunction());
+      dataElements = selection.data(data, this._dataset.keyFunction());
     } else {
-      dataElements = this.selection().data(data);
+      dataElements = selection.data(data);
     }
     this._drawingTarget = {
       update: dataElements.filter(() => {
@@ -133,9 +138,10 @@ export class Drawer {
     this._drawingTarget.enter = dataElements.enter()
       .append(this._svgElementName)
       .attr(this.appliedInitializer());
+    this._applyDefaultAttributes(<d3.Selection<any>>this._drawingTarget.enter);  // others already have it
     this._drawingTarget.exit = dataElements.exit();   // the animator becomes responsbile for reomving these
-    this._drawingTarget.merge = dataElements;   // after enter() is called, this contains new elements
-    this._applyDefaultAttributes(dataElements);
+    this._drawingTarget.merge = this._cachedSelection = dataElements;   // after enter() is called, this contains new elements
+    this._cachedSelectionValid = true;
   }
 
   protected _applyDefaultAttributes(selection: d3.Selection<any>) {
@@ -159,7 +165,7 @@ export class Drawer {
     });
     step.animator.animate(selection, step.attrToAppliedProjector, this._drawingTarget, this);
     if (this._className != null) {
-      this.selection().classed(this._className, true);
+      selection.classed(this._className, true);
     }
   }
 
@@ -209,15 +215,17 @@ export class Drawer {
     let delay = 0;
     appliedDrawSteps.forEach((drawStep, i) => {
       Utils.Window.setTimeout(() => this._drawStep(drawStep), delay);
-      // this._drawStep(drawStep);
       delay += drawStep.animator.totalTime(data.length);
     });
-
     return this;
   }
 
   public selection() {
-    return this.renderArea().selectAll(this.selector());
+    if (!this._cachedSelectionValid) {
+      this._cachedSelection = this.renderArea().selectAll(this.selector());
+      this._cachedSelectionValid = true;
+    }
+    return this._cachedSelection;
   }
 
   /**
@@ -233,6 +241,5 @@ export class Drawer {
   public selectionForIndex(index: number): d3.Selection<any> {
     return d3.select(this.selection()[0][index]);
   }
-
 }
 }
