@@ -129,10 +129,10 @@ describe("Tables", () => {
       table.remove(c11);
       const expectedRows = [
         [c00, c01],
-        [c01, null]
+        [c10, null]
       ];
       assertTableRows(table, expectedRows, "the requested element was removed");
-      assert.isNull(c10.parent(), "Component disconnected from the Table");
+      assert.isNull(c11.parent(), "Component disconnected from the Table");
     });
 
     it("does nothing when component is not found", () => {
