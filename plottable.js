@@ -889,6 +889,23 @@ var Plottable;
 })(Plottable || (Plottable = {}));
 var Plottable;
 (function (Plottable) {
+    var KeyFunctions = (function () {
+        function KeyFunctions() {
+        }
+        KeyFunctions.useProperty = function (propertyname) {
+            return function (d) { return d[propertyname]; };
+        };
+        ;
+        KeyFunctions.counter = 0;
+        KeyFunctions.noConstancy = function () {
+            return KeyFunctions.counter++;
+        };
+        KeyFunctions.useIndex = function (d, i) {
+            return i;
+        };
+        return KeyFunctions;
+    })();
+    Plottable.KeyFunctions = KeyFunctions;
     var Dataset = (function () {
         /**
          * A Dataset contains an array of data and some metadata.
@@ -901,6 +918,7 @@ var Plottable;
         function Dataset(data, metadata) {
             if (data === void 0) { data = []; }
             if (metadata === void 0) { metadata = {}; }
+            this._keyFunction = KeyFunctions.useIndex;
             this._data = data;
             this._metadata = metadata;
             this._callbacks = new Plottable.Utils.CallbackSet();
@@ -941,6 +959,16 @@ var Plottable;
             }
             else {
                 this._metadata = metadata;
+                this._callbacks.callCallbacks(this);
+                return this;
+            }
+        };
+        Dataset.prototype.keyFunction = function (keyFunction) {
+            if (keyFunction == null) {
+                return this._keyFunction;
+            }
+            else {
+                this._keyFunction = keyFunction;
                 this._callbacks.callCallbacks(this);
                 return this;
             }
@@ -2575,7 +2603,14 @@ var Plottable;
          * @param{any[]} data The data to be drawn
          */
         Drawer.prototype._bindSelectionData = function (data) {
-            var dataElements = this.selection().data(data);
+            // if the dataset has a key, use it when binding the data   
+            var dataElements;
+            if (this._dataset) {
+                dataElements = this.selection().data(data, this._dataset.keyFunction());
+            }
+            else {
+                dataElements = this.selection().data(data);
+            }
             dataElements.enter().append(this._svgElementName);
             dataElements.exit().remove();
             this._applyDefaultAttributes(dataElements);

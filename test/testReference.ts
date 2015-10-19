@@ -49,6 +49,7 @@
 ///<reference path="core/metadataTests.ts" />
 ///<reference path="core/renderControllerTests.ts" />
 ///<reference path="core/datasetTests.ts" />
+///<reference path="core/keyTests.ts" />
 ///<reference path="core/formattersTests.ts" />
 ///<reference path="core/symbolFactoriesTests.ts" />
 

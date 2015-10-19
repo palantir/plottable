@@ -2,9 +2,23 @@ module Plottable {
 
 export type DatasetCallback = (dataset: Dataset) => void;
 
+export class KeyFunctions {
+  private static counter: number = 0;
+  public static noConstancy = () => {
+    return KeyFunctions.counter++;
+  };
+  public static useIndex = (d: any, i: number) => {
+    return i;
+  };
+  public static useProperty(propertyname: string) {
+    return (d: any) => { return d[propertyname]; };
+  };
+}
+
 export class Dataset {
   private _data: any[];
   private _metadata: any;
+  private _keyFunction = KeyFunctions.useIndex;
   private _callbacks: Utils.CallbackSet<DatasetCallback>;
 
   /**
@@ -84,6 +98,27 @@ export class Dataset {
       return this._metadata;
     } else {
       this._metadata = metadata;
+      this._callbacks.callCallbacks(this);
+      return this;
+    }
+  }
+
+  public keyFunction(): (datum: any, index: number) => any;
+  /**
+   * Sets the keyFunction.
+   * in D3, when binding data using selection.data(), a keyFunction may be supplied
+   * to generate a unique identifier for each datum. When data is updated, D3 uses this identifier to
+   * determine which data points have entered or exited the visualisation.
+   *
+   * @param { (d: any, i: number) => any} keyFunction
+   * @returns {Dataset} The calling Dataset.
+   */
+  public keyFunction(keyFunction: (datum: any, index: number) => any): Dataset;
+  public keyFunction(keyFunction?: (datum: any, index: number) => any): any {
+    if (keyFunction == null) {
+      return this._keyFunction;
+    } else {
+      this._keyFunction = keyFunction;
       this._callbacks.callCallbacks(this);
       return this;
     }

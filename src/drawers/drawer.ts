@@ -74,7 +74,14 @@ export class Drawer {
    * @param{any[]} data The data to be drawn
    */
   private _bindSelectionData(data: any[]) {
-    let dataElements = this.selection().data(data);
+    // if the dataset has a key, use it when binding the data   
+    let dataElements: d3.selection.Update<any>;
+    if (this._dataset) {
+      dataElements = this.selection().data(data, this._dataset.keyFunction());
+    } else {
+      dataElements = this.selection().data(data);
+    }
+
     dataElements.enter().append(this._svgElementName);
     dataElements.exit().remove();
     this._applyDefaultAttributes(dataElements);
