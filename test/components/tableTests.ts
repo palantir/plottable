@@ -107,72 +107,67 @@ describe("Tables", () => {
   });
 
   describe("removing Components", () => {
-    let c1: Plottable.Component;
-    let c2: Plottable.Component;
-    let c3: Plottable.Component;
-    let c4: Plottable.Component;
-    let c5: Plottable.Component;
-    let c6: Plottable.Component;
+    let c00: Plottable.Component;
+    let c01: Plottable.Component;
+    let c10: Plottable.Component;
+    let c11: Plottable.Component;
     let table: Plottable.Components.Table;
 
     beforeEach(() => {
-      c1 = new Plottable.Component();
-      c2 = new Plottable.Component();
-      c3 = new Plottable.Component();
-      c4 = new Plottable.Component();
-      c5 = new Plottable.Component();
-      c6 = new Plottable.Component();
+      c00 = new Plottable.Component();
+      c01 = new Plottable.Component();
+      c10 = new Plottable.Component();
+      c11 = new Plottable.Component();
     });
 
     it("removes the specified Component", () => {
       const tableRows = [
-        [c1, c2],
-        [c3, c4],
-        [c5, c6]
+        [c00, c01],
+        [c10, c11]
       ];
       table = new Plottable.Components.Table(tableRows);
-      table.remove(c4);
+      table.remove(c11);
       const expectedRows = [
-        [c1, c2],
-        [c3, null],
-        [c5, c6]
+        [c00, c01],
+        [c01, null]
       ];
       assertTableRows(table, expectedRows, "the requested element was removed");
-      assert.isNull(c4.parent(), "Component disconnected from the Table");
+      assert.isNull(c10.parent(), "Component disconnected from the Table");
     });
 
     it("does nothing when component is not found", () => {
       const tableRows = [
-        [c1, c2],
-        [c3, c4]
+        [c00, c01],
+        [c10, c11]
       ];
       table = new Plottable.Components.Table(tableRows);
       const expectedRows = tableRows;
-      table.remove(c5);
+      const notInTable = new Plottable.Component();
+      table.remove(notInTable);
       assertTableRows(table, expectedRows, "removing a nonexistent Component does not affect the table");
     });
 
     it("has no further effect when called a second time with the same Component", () => {
       const tableRows = [
-        [c1, c2, c3],
-        [c4, c5, c6]
+        [c00, c01],
+        [c10, c11]
       ];
       table = new Plottable.Components.Table(tableRows);
       const expectedRows = [
-        [null, c2, c3],
-        [c4, c5, c6]
+        [null, c01],
+        [c10, c11]
       ];
-      table.remove(c1);
+      table.remove(c00);
       assertTableRows(table, expectedRows, "Component was removed");
-      table.remove(c1);
+      table.remove(c00);
       assertTableRows(table, expectedRows, "removing Component again has no further effect");
     });
 
     it("removes a Component from the Table if the Component becomes detached", () => {
-      table = new Plottable.Components.Table([[c1]]);
-      c1.detach();
+      table = new Plottable.Components.Table([[c00]]);
+      c00.detach();
       assert.isNull(table.componentAt(0, 0), "calling detach() on the Component removes it from the Table");
-      assert.isNull(c1.parent(), "Component disconnected from the Table");
+      assert.isNull(c00.parent(), "Component disconnected from the Table");
     });
   });
 
