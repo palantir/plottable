@@ -730,7 +730,7 @@ describe("Plots", () => {
 
         let path = plot.content().select("path.line").attr("d");
         let expectedRenderedData = [1, 2, 3].map((d) => data[d]);
-        TestMethods.assertLinePathEqualToDataPoints(path, expectedRenderedData, xScale, yScale);
+        TestMethods.assertPathEqualToDataPoints(path, expectedRenderedData, xScale, yScale);
 
         svg.remove();
       });
@@ -753,7 +753,7 @@ describe("Plots", () => {
 
         let path = plot.content().select("path.line").attr("d");
         let expectedRenderedData = [1, 2, 3].map((d) => data[d]);
-        TestMethods.assertLinePathEqualToDataPoints(path, expectedRenderedData, xScale, yScale);
+        TestMethods.assertPathEqualToDataPoints(path, expectedRenderedData, xScale, yScale);
 
         svg.remove();
       });
@@ -777,7 +777,7 @@ describe("Plots", () => {
 
         let path = plot.content().select("path.line").attr("d");
         let expectedRenderedData = [1, 2, 3].map((d) => data[d]);
-        TestMethods.assertLinePathEqualToDataPoints(path, expectedRenderedData, xScale, yScale);
+        TestMethods.assertPathEqualToDataPoints(path, expectedRenderedData, xScale, yScale);
 
         svg.remove();
       });
@@ -796,17 +796,17 @@ describe("Plots", () => {
         plot.renderTo(svg);
 
         let path = plot.content().select("path.line").attr("d");
-        TestMethods.assertLinePathEqualToDataPoints(path, [0, 1, 2, 3, 4].map((d) => data[d]), xScale, yScale);
+        TestMethods.assertPathEqualToDataPoints(path, [0, 1, 2, 3, 4].map((d) => data[d]), xScale, yScale);
 
         // Only middle point is in viewport
         xScale.domain([2.5, 3.5]);
         path = plot.content().select("path.line").attr("d");
-        TestMethods.assertLinePathEqualToDataPoints(path, [1, 2, 3].map((d) => data[d]), xScale, yScale);
+        TestMethods.assertPathEqualToDataPoints(path, [1, 2, 3].map((d) => data[d]), xScale, yScale);
 
         // Only first point is in viewport
         xScale.domain([-0.5, 1.5]);
         path = plot.content().select("path.line").attr("d");
-        TestMethods.assertLinePathEqualToDataPoints(path, [0, 1].map((d) => data[d]), xScale, yScale);
+        TestMethods.assertPathEqualToDataPoints(path, [0, 1].map((d) => data[d]), xScale, yScale);
 
         svg.remove();
       });
@@ -845,10 +845,10 @@ describe("Plots", () => {
         let data = [
           {x: -100, y: -1}, // last element in previous bucket
           {x: 0, y: 2}, // first element in current bucket
-          {x: 0.5, y: 1.5}, // the point to be removed 
+          {x: 0.5, y: 1.5}, // the point to be removed
           {x: 1, y: 1}, // minimum y in current bucket
           {x: 2, y: 4}, // maximum y in current bucket
-          {x: 3, y: 3}, // last elemnt in current bucket 
+          {x: 3, y: 3}, // last elemnt in current bucket
           {x: 100, y: 2}, // first element in next bucket
         ];
         plot.addDataset(new Plottable.Dataset(data));
@@ -869,7 +869,7 @@ describe("Plots", () => {
 
         let path = plot.content().select("path.line").attr("d");
         let expectedRenderedData = [0, 1, 4, 3, 5, 6].map((d) => data[d]);
-        TestMethods.assertLinePathEqualToDataPoints(path, expectedRenderedData, xScale, yScale);
+        TestMethods.assertPathEqualToDataPoints(path, expectedRenderedData, xScale, yScale);
 
         svg.remove();
       });
@@ -903,7 +903,7 @@ describe("Plots", () => {
 
         let path = plot.content().select("path.line").attr("d");
         let expectedRenderedData = [0, 1, 3, 4, 5, 6].map((d) => data[d]);
-        TestMethods.assertLinePathEqualToDataPoints(path, expectedRenderedData, xScale, yScale);
+        TestMethods.assertPathEqualToDataPoints(path, expectedRenderedData, xScale, yScale);
 
         svg.remove();
       });
@@ -939,7 +939,7 @@ describe("Plots", () => {
 
         let path = plot.content().select("path.line").attr("d");
         let expectedRenderedData = [0, 1, 2, 3, 5, 6].map((d) => data[d]);
-        TestMethods.assertLinePathEqualToDataPoints(path, expectedRenderedData, xScale, yScale);
+        TestMethods.assertPathEqualToDataPoints(path, expectedRenderedData, xScale, yScale);
 
         svg.remove();
       });

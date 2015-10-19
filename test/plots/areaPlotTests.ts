@@ -57,32 +57,32 @@ describe("Plots", () => {
                 .renderTo(svg);
       });
 
-      it("draws area and line correctly", () => {
+      it("draws area and line with correct data points and correct fill and stroke attributes", () => {
         let content = areaPlot.content();
         let areaPath = content.select(".area");
         areaPlot.datasets().forEach((dataset: Plottable.Dataset) => {
           let data = dataset.data();
           let pointsInArea = getPointsInArea(areaPlot, data);
-          TestMethods.assertLinePathEqualToDataPoints(areaPath.attr("d"), pointsInArea, xScale, yScale);
+          TestMethods.assertPathEqualToDataPoints(areaPath.attr("d"), pointsInArea, xScale, yScale);
           assert.strictEqual(areaPath.attr("fill"), fill, "area fill was set correctly");
           assert.strictEqual(areaPath.style("stroke"), "none", "area stroke renders as \"none\"");
 
           let linePath = content.select(".line");
-          TestMethods.assertLinePathEqualToDataPoints(linePath.attr("d"), data, xScale, yScale);
+          TestMethods.assertPathEqualToDataPoints(linePath.attr("d"), data, xScale, yScale);
           assert.strictEqual(linePath.attr("stroke"), "#000000", "line stroke was set correctly");
           assert.strictEqual(linePath.style("fill"), "none", "line fill renders as \"none\"");
         });
         svg.remove();
       });
 
-      it("fills for non-zero floor values appropriately", () => {
+      it("draws area appropriately with non-constant y0 values", () => {
         areaPlot.y0((d) => d.y / 2);
         areaPlot.renderTo(svg);
         areaPlot.datasets().forEach((dataset: Plottable.Dataset) => {
           let data = dataset.data();
           let areaPath = areaPlot.content().select(".area");
           let pointsInArea = getPointsInArea(areaPlot, data);
-          TestMethods.assertLinePathEqualToDataPoints(areaPath.attr("d"), pointsInArea, xScale, yScale);
+          TestMethods.assertPathEqualToDataPoints(areaPath.attr("d"), pointsInArea, xScale, yScale);
         });
         svg.remove();
       });
@@ -96,7 +96,7 @@ describe("Plots", () => {
         svg.remove();
       });
 
-      it("cleans up correctly when removing Datasets", () => {
+      it("removes the plot svg elements when removing Datasets", () => {
         areaPlot.renderTo(svg);
         let paths = areaPlot.content().selectAll("path");
         let pathSize = paths.size();
@@ -123,32 +123,33 @@ describe("Plots", () => {
         dataset.data(dataWithNaN);
 
         let pointsInArea = getPointsInArea(areaPlot, dataWithNaN.slice(0, 2)).concat(getPointsInArea(areaPlot, dataWithNaN.slice(3, 5)));
-        TestMethods.assertLinePathEqualToDataPoints(areaPath.attr("d"), pointsInArea, xScale, yScale);
+        TestMethods.assertPathEqualToDataPoints(areaPath.attr("d"), pointsInArea, xScale, yScale);
 
         dataWithNaN[2] = { x: NaN, y: 0.4 };
         dataset.data(dataWithNaN);
 
-        TestMethods.assertLinePathEqualToDataPoints(areaPath.attr("d"), pointsInArea, xScale, yScale);
+        TestMethods.assertPathEqualToDataPoints(areaPath.attr("d"), pointsInArea, xScale, yScale);
 
         let dataWithUndefined = areaData.slice();
         dataWithUndefined[2] = { x: 0.4, y: undefined };
         dataset.data(dataWithUndefined);
 
-        TestMethods.assertLinePathEqualToDataPoints(areaPath.attr("d"), pointsInArea, xScale, yScale);
+        TestMethods.assertPathEqualToDataPoints(areaPath.attr("d"), pointsInArea, xScale, yScale);
 
         dataWithUndefined[2] = { x: undefined, y: 0.4 };
         dataset.data(dataWithUndefined);
 
-        TestMethods.assertLinePathEqualToDataPoints(areaPath.attr("d"), pointsInArea, xScale, yScale);
+        TestMethods.assertPathEqualToDataPoints(areaPath.attr("d"), pointsInArea, xScale, yScale);
 
         svg.remove();
       });
 
-      it("retains original classes when setting css class via attr", () => {
-        areaPlot.attr("class", "pink");
+      it("retains the area class. when setting css class via attr", () => {
+        let cssClass = "pink";
+        areaPlot.attr("class", cssClass);
         areaPlot.renderTo(svg);
         let areaPath = areaPlot.content().select(".area");
-        assert.isTrue(areaPath.classed("pink"), "it has css class set via attr");
+        assert.isTrue(areaPath.classed(cssClass), "it has css class set via attr");
         assert.isTrue(areaPath.classed("area"), "it has default css class");
         svg.remove();
       });
