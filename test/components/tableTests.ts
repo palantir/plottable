@@ -107,13 +107,22 @@ describe("Tables", () => {
   });
 
   describe("removing Components", () => {
-    const c1 = new Plottable.Component();
-    const c2 = new Plottable.Component();
-    const c3 = new Plottable.Component();
-    const c4 = new Plottable.Component();
-    const c5 = new Plottable.Component();
-    const c6 = new Plottable.Component();
+    let c1: Plottable.Component;
+    let c2: Plottable.Component;
+    let c3: Plottable.Component;
+    let c4: Plottable.Component;
+    let c5: Plottable.Component;
+    let c6: Plottable.Component;
     let table: Plottable.Components.Table;
+
+    beforeEach(() => {
+      c1 = new Plottable.Component();
+      c2 = new Plottable.Component();
+      c3 = new Plottable.Component();
+      c4 = new Plottable.Component();
+      c5 = new Plottable.Component();
+      c6 = new Plottable.Component();
+    });
 
     it("removes the specified Component", () => {
       const tableRows = [
