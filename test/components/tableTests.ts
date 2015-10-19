@@ -5,18 +5,18 @@ describe("Tables", () => {
     expectedRows.forEach((row, rowIndex) => {
       row.forEach((component, columnIndex) => {
         assert.strictEqual(table.componentAt(rowIndex, columnIndex), component,
-          message + ` contains the correct entry at [${rowIndex}, ${columnIndex}]`);
+          `${message} contains the correct entry at [${rowIndex}, ${columnIndex}]`);
       });
     });
   }
 
   describe("constructor behavior", () => {
-    it("adds the correct CSS class", () => {
+    it("adds the \"table\" CSS class", () => {
       let table = new Plottable.Components.Table();
       assert.isTrue(table.hasClass("table"));
     });
 
-    it("can take a list of lists of Components in the constructor", () => {
+    it("can take a 2-D array of Components in the constructor", () => {
       let c00 = new Plottable.Component();
       let c11 = new Plottable.Component();
       let rows = [
@@ -30,53 +30,49 @@ describe("Tables", () => {
   });
 
   describe("checking Table contents", () => {
-    describe("has()", () => {
-      it("can check if a given Component is in the Table", () => {
-        let c0 = new Plottable.Component();
-        let table = new Plottable.Components.Table([[c0]]);
-        assert.isTrue(table.has(c0), "correctly checks that Component is in the Table");
-        table.remove(c0);
-        assert.isFalse(table.has(c0), "correctly checks that Component is no longer in the Table");
-        table.add(c0, 1, 1);
-        assert.isTrue(table.has(c0), "correctly checks that Component is in the Table again");
-      });
+    it("can check if a given Component is in the Table", () => {
+      let c0 = new Plottable.Component();
+      let table = new Plottable.Components.Table([[c0]]);
+      assert.isTrue(table.has(c0), "correctly checks that Component is in the Table");
+      table.remove(c0);
+      assert.isFalse(table.has(c0), "correctly checks that Component is no longer in the Table");
+      table.add(c0, 1, 1);
+      assert.isTrue(table.has(c0), "correctly checks that Component is in the Table again");
     });
 
-    describe("componentAt()", () => {
-      it("can retrieve the Component at a given row, column index", () => {
-        let c00 = new Plottable.Component();
-        let c01 = new Plottable.Component();
-        let c10 = new Plottable.Component();
-        let c11 = new Plottable.Component();
-        let table = new Plottable.Components.Table([
-          [c00, c01],
-          [c10, c11]
-        ]);
+    it("can retrieve the Component at a given row, column index", () => {
+      let c00 = new Plottable.Component();
+      let c01 = new Plottable.Component();
+      let c10 = new Plottable.Component();
+      let c11 = new Plottable.Component();
+      let table = new Plottable.Components.Table([
+        [c00, c01],
+        [c10, c11]
+      ]);
 
-        assert.strictEqual(table.componentAt(0, 0), c00, "retrieves the Component at [0, 0]");
-        assert.strictEqual(table.componentAt(0, 1), c01, "retrieves the Component at [0, 1]");
-        assert.strictEqual(table.componentAt(1, 0), c10, "retrieves the Component at [1, 0]");
-        assert.strictEqual(table.componentAt(1, 1), c11, "retrieves the Component at [1, 1]");
-      });
+      assert.strictEqual(table.componentAt(0, 0), c00, "retrieves the Component at [0, 0]");
+      assert.strictEqual(table.componentAt(0, 1), c01, "retrieves the Component at [0, 1]");
+      assert.strictEqual(table.componentAt(1, 0), c10, "retrieves the Component at [1, 0]");
+      assert.strictEqual(table.componentAt(1, 1), c11, "retrieves the Component at [1, 1]");
+    });
 
-      it("returns null when no Component exists at the specified row, column index", () => {
-        let c00 = new Plottable.Component();
-        let c11 = new Plottable.Component();
+    it("returns null when no Component exists at the specified row, column index", () => {
+      let c00 = new Plottable.Component();
+      let c11 = new Plottable.Component();
 
-        let table = new Plottable.Components.Table();
-        table.add(c00, 0, 0);
-        table.add(c11, 1, 1);
+      let table = new Plottable.Components.Table();
+      table.add(c00, 0, 0);
+      table.add(c11, 1, 1);
 
-        assert.isNull(table.componentAt(0, 1), "returns null if an empty cell is queried");
-        assert.isNull(table.componentAt(-1, 0), "returns null if a negative row index is passed in");
-        assert.isNull(table.componentAt(0, -1), "returns null if a negative column index is passed in");
-        assert.isNull(table.componentAt(9001, 0), "returns null if a row index larger than the number of rows is passed in");
-        assert.isNull(table.componentAt(0, 9001), "returns null if a column index larger than the number of columns is passed in");
-      });
+      assert.isNull(table.componentAt(0, 1), "returns null if an empty cell is queried");
+      assert.isNull(table.componentAt(-1, 0), "returns null if a negative row index is passed in");
+      assert.isNull(table.componentAt(0, -1), "returns null if a negative column index is passed in");
+      assert.isNull(table.componentAt(9001, 0), "returns null if a row index larger than the number of rows is passed in");
+      assert.isNull(table.componentAt(0, 9001), "returns null if a column index larger than the number of columns is passed in");
     });
   });
 
-  describe("add()", () => {
+  describe("adding Components", () => {
     it("adds the Component and pads out other empty cells with null", () => {
       let table = new Plottable.Components.Table();
       let c11 = new Plottable.Component();
@@ -110,7 +106,7 @@ describe("Tables", () => {
     });
   });
 
-  describe("remove()", () => {
+  describe("removing Components", () => {
     let c1 = new Plottable.Component();
     let c2 = new Plottable.Component();
     let c3 = new Plottable.Component();
