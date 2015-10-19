@@ -2619,7 +2619,7 @@ var Plottable;
          * @param{any[]} data The data to be drawn
          */
         Drawer.prototype._bindSelectionData = function (data) {
-            // if the dataset has a key, use it when binding the data   
+            // if the dataset has a key, use it when binding the data
             var dataElements;
             var selection = this.renderArea().selectAll(this.selector());
             if (this._dataset) {

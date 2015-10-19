@@ -72,10 +72,10 @@ export module Animators {
     }
 
     /**
-     * return a transition from the selection, with the requested duration 
+     * return a transition from the selection, with the requested duration
      * and (possibly) delay. As a convenience, this may return the selection itself
      * without applying a transition if durection = 0
-     * 
+     *
      */
     protected getTransition(selection: d3.Selection<any>|d3.Transition<any>|d3.selection.Update<any>,
       duration: number, delay?: (d: any, i: number) => number, easing?: EasingFunctionSpecifier): any {
@@ -212,13 +212,13 @@ export module Animators {
      * If the animation time would exceed the specified time, the duration of each step
      * and the delay between each step will be reduced until the animation fits within
      * the specified time.
-     * 
+     *
      * @returns {number} The current maximum total animation duration.
      */
     public maxTotalDuration(): number;
     /**
      * Sets the maximum total animation duration constraint in miliseconds.
-     * 
+     *
      * If the animation time would exceed the specified time, the duration of each step
      * and the delay between each step will be reduced until the animation fits within
      * the specified time.
@@ -288,7 +288,7 @@ export module Animators {
     public yScale(): Plottable.Scale<any, any>;
     /**
      * a yScale available to the animator for rendering 'logical' y values.
-     * 
+     *
      * @param {Plottable.Scale<any, any} yScale.
      * @returns {Base} The calling Animator.
      */

@@ -13,8 +13,17 @@ function makeData() {
 
 function run(svg, data, Plottable) {
   "use strict";
+  var set = "a";
+  var d0 = new Plottable.Dataset();
+  var d1 = new Plottable.Dataset();
+  var d2 = new Plottable.Dataset();
+  if (Plottable.KeyFunctions) {
+      d0.keyFunction(Plottable.KeyFunctions.useProperty("name"));
+      d1.keyFunction(Plottable.KeyFunctions.useProperty("name"));
+      d2.keyFunction(Plottable.KeyFunctions.useProperty("name"));
+  }
   var cb = function () {
-      let currentdata;
+      var currentdata;
       if (set === "a") {
           set = "b";
       } else {
@@ -25,20 +34,10 @@ function run(svg, data, Plottable) {
       d1.data(currentdata[1]);
       d2.data(currentdata[2]);
   };
-  var xScale = new Plottable.Scales.Category().domain(["jon","dan","zoo"]);
+  cb();
+  var xScale = new Plottable.Scales.Category().domain(["jon", "dan", "zoo"]);
   var yScale = new Plottable.Scales.Linear();
   var colorScale = new Plottable.Scales.Color("10");
-
-  var d0 = new Plottable.Dataset()
-  var d1 = new Plottable.Dataset()
-  var d2 = new Plottable.Dataset()
-  if (Plottable.KeyFunctions) {
-      d0.keyFunction(Plottable.KeyFunctions.useProperty("name"));
-      d1.keyFunction(Plottable.KeyFunctions.useProperty("name"));
-      d2.keyFunction(Plottable.KeyFunctions.useProperty("name"));
-  }
-  var set = "a";
-  cb();
 
   var xAxis = new Plottable.Axes.Category(xScale, "bottom");
   var yAxis = new Plottable.Axes.Numeric(yScale, "left");
@@ -62,7 +61,7 @@ function run(svg, data, Plottable) {
     .attr("fill", function(d) { return d.type; }, colorScale)
     .attr("type", function(d) { return d.type; })
     .attr("yval", function (d) { return d.y; })
-    .attr("opacity", function (d) { return .8; })
+    .attr("opacity", function () { return .8; })
     .labelsEnabled(true);
 
   var center = new Plottable.Components.Group([barRenderer, new Plottable.Components.Legend(colorScale)]);
@@ -70,8 +69,7 @@ function run(svg, data, Plottable) {
   new Plottable.Components.Table([
     [yAxis, center], [null, xAxis]
   ]).renderTo(svg);
- 
 
   new Plottable.Interactions.Click().onClick(cb).attachTo(barRenderer);
 }
-//# sourceURL=basic/missing_clustered_bar.js
+//# sourceURL=barAnimations/stacked_opacity.js
