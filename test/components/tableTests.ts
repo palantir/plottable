@@ -228,6 +228,8 @@ describe("Tables", () => {
   });
 
   describe("layout of constituent Components", () => {
+    const FIXED_COMPONENT_SIZE = 50;
+
     function verifyOrigins(rows: Plottable.Component[][], rowPadding = 0, columnPadding = 0) {
       let expectedOrigin = {
         x: 0,
@@ -273,8 +275,6 @@ describe("Tables", () => {
 
     it("gives width to fixed-width Components, then divides remainder between non-fixed-width Components", () => {
       const svg = TestMethods.generateSVG();
-
-      const FIXED_COMPONENT_SIZE = 50;
       const fixedSizeComponent = new Mocks.FixedSizeComponent(FIXED_COMPONENT_SIZE, FIXED_COMPONENT_SIZE);
       const unfixedComponent1 = new Plottable.Component();
       const unfixedComponent2 = new Plottable.Component();
@@ -321,8 +321,6 @@ describe("Tables", () => {
 
     it("gives height to fixed-height Components, then divides remainder between non-fixed-height Components", () => {
       const svg = TestMethods.generateSVG();
-
-      const FIXED_COMPONENT_SIZE = 50;
       const fixedSizeComponent = new Mocks.FixedSizeComponent(FIXED_COMPONENT_SIZE, FIXED_COMPONENT_SIZE);
       const unfixedComponent1 = new Plottable.Component();
       const unfixedComponent2 = new Plottable.Component();
@@ -343,8 +341,6 @@ describe("Tables", () => {
     });
 
     it("divides width evenly if there isn't enough width to go around", () => {
-      const FIXED_COMPONENT_SIZE = 50;
-
       const svg = TestMethods.generateSVG(FIXED_COMPONENT_SIZE, FIXED_COMPONENT_SIZE);
       const fixedComponent1 = new Mocks.FixedSizeComponent(FIXED_COMPONENT_SIZE, FIXED_COMPONENT_SIZE);
       const fixedComponent2 = new Mocks.FixedSizeComponent(FIXED_COMPONENT_SIZE, FIXED_COMPONENT_SIZE);
@@ -362,8 +358,6 @@ describe("Tables", () => {
     });
 
     it("divides height evenly if there isn't enough hieght to go around", () => {
-      const FIXED_COMPONENT_SIZE = 50;
-
       const svg = TestMethods.generateSVG(FIXED_COMPONENT_SIZE, FIXED_COMPONENT_SIZE);
       const fixedComponent1 = new Mocks.FixedSizeComponent(FIXED_COMPONENT_SIZE, FIXED_COMPONENT_SIZE);
       const fixedComponent2 = new Mocks.FixedSizeComponent(FIXED_COMPONENT_SIZE, FIXED_COMPONENT_SIZE);
