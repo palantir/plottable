@@ -208,9 +208,6 @@ describe("Tables", () => {
   });
 
   describe("layout of constituent Components", () => {
-    const SVG_WIDTH = 300;
-    const SVG_HEIGHT = 300;
-
     function verifyOrigins(rows: Plottable.Component[][], rowPadding = 0, columnPadding = 0) {
       let expectedOrigin = {
         x: 0,
@@ -229,14 +226,14 @@ describe("Tables", () => {
     }
 
     it("divides available width evenly between non-fixed-width Components", () => {
-      const svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+      const svg = TestMethods.generateSVG();
 
       const component1 = new Plottable.Component();
       const component2 = new Plottable.Component();
       let tableRows = [[component1, component2]];
       const table = new Plottable.Components.Table(tableRows);
       table.renderTo(svg);
-      const twoColumnExpectedWidth = SVG_WIDTH / 2;
+      const twoColumnExpectedWidth = TestMethods.numAttr(svg, "width") / 2;
       assert.strictEqual(component1.width(), twoColumnExpectedWidth, "first Component received half the available width");
       assert.strictEqual(component2.width(), twoColumnExpectedWidth, "second Component received half the available width");
       verifyOrigins(tableRows);
@@ -244,7 +241,7 @@ describe("Tables", () => {
       const component3 = new Plottable.Component();
       table.add(component3, 0, 2);
       tableRows[0].push(component3);
-      const threeColumnExpectedWidth = SVG_WIDTH / 3;
+      const threeColumnExpectedWidth = TestMethods.numAttr(svg, "width") / 3;
       assert.strictEqual(component1.width(), threeColumnExpectedWidth, "first Component received one-third of the available width");
       assert.strictEqual(component2.width(), threeColumnExpectedWidth, "second Component received one-third of the available width");
       assert.strictEqual(component3.width(), threeColumnExpectedWidth, "third Component received one-third of the available width");
@@ -255,7 +252,7 @@ describe("Tables", () => {
     });
 
     it("gives width to fixed-width Components, then divides remainder between non-fixed-width Components", () => {
-      const svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+      const svg = TestMethods.generateSVG();
 
       const FIXED_COMPONENT_SIZE = 50;
       const fixedSizeComponent = new Mocks.FixedSizeComponent(FIXED_COMPONENT_SIZE, FIXED_COMPONENT_SIZE);
@@ -263,7 +260,7 @@ describe("Tables", () => {
       const unfixedComponent2 = new Plottable.Component();
       const table = new Plottable.Components.Table([[fixedSizeComponent, unfixedComponent1, unfixedComponent2]]);
       table.renderTo(svg);
-      const expectedUnfixedWidth = (SVG_WIDTH - FIXED_COMPONENT_SIZE) / 2;
+      const expectedUnfixedWidth = (TestMethods.numAttr(svg, "width") - FIXED_COMPONENT_SIZE) / 2;
       assert.strictEqual(unfixedComponent1.width(), expectedUnfixedWidth,
         "first non-fixed-width Component received half the remaining width");
       assert.strictEqual(unfixedComponent2.width(), expectedUnfixedWidth,
@@ -274,7 +271,7 @@ describe("Tables", () => {
     });
 
     it("divides available height evenly between non-fixed-height Components", () => {
-      const svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+      const svg = TestMethods.generateSVG();
 
       const component1 = new Plottable.Component();
       const component2 = new Plottable.Component();
@@ -284,7 +281,7 @@ describe("Tables", () => {
       ];
       const table = new Plottable.Components.Table(tableRows);
       table.renderTo(svg);
-      const twoRowExpectedHeight = SVG_HEIGHT / 2;
+      const twoRowExpectedHeight = TestMethods.numAttr(svg, "height") / 2;
       assert.strictEqual(component1.height(), twoRowExpectedHeight, "first Component received half the available height");
       assert.strictEqual(component2.height(), twoRowExpectedHeight, "second Component received half the available height");
       verifyOrigins(tableRows);
@@ -292,7 +289,7 @@ describe("Tables", () => {
       const component3 = new Plottable.Component();
       table.add(component3, 2, 0);
       tableRows.push([component3]);
-      const threeRowExpectedHeight = SVG_HEIGHT / 3;
+      const threeRowExpectedHeight = TestMethods.numAttr(svg, "height") / 3;
       assert.strictEqual(component1.height(), threeRowExpectedHeight, "first Component received one-third of the available height");
       assert.strictEqual(component2.height(), threeRowExpectedHeight, "second Component received one-third of the available height");
       assert.strictEqual(component3.height(), threeRowExpectedHeight, "third Component received one-third of the available height");
@@ -303,7 +300,7 @@ describe("Tables", () => {
     });
 
     it("gives height to fixed-height Components, then divides remainder between non-fixed-height Components", () => {
-      const svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+      const svg = TestMethods.generateSVG();
 
       const FIXED_COMPONENT_SIZE = 50;
       const fixedSizeComponent = new Mocks.FixedSizeComponent(FIXED_COMPONENT_SIZE, FIXED_COMPONENT_SIZE);
@@ -315,7 +312,7 @@ describe("Tables", () => {
         [unfixedComponent2]
       ]);
       table.renderTo(svg);
-      const expectedUnfixedHeight = (SVG_HEIGHT - FIXED_COMPONENT_SIZE) / 2;
+      const expectedUnfixedHeight = (TestMethods.numAttr(svg, "height") - FIXED_COMPONENT_SIZE) / 2;
       assert.strictEqual(unfixedComponent1.height(), expectedUnfixedHeight,
         "first non-fixed-height Component received half the remaining height");
       assert.strictEqual(unfixedComponent2.height(), expectedUnfixedHeight,
@@ -368,7 +365,7 @@ describe("Tables", () => {
 
     describe("layout with padding and weights", () => {
       it("adds row padding between rows", () => {
-        const svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+        const svg = TestMethods.generateSVG();
 
         const component1 = new Plottable.Component();
         const component2 = new Plottable.Component();
@@ -381,7 +378,7 @@ describe("Tables", () => {
         table.rowPadding(rowPadding);
         table.renderTo(svg);
 
-        const expectedHeight = (SVG_HEIGHT - rowPadding) / 2;
+        const expectedHeight = (TestMethods.numAttr(svg, "height") - rowPadding) / 2;
         assert.strictEqual(component1.height(), expectedHeight, "first non-fixed-height Component received half the remaining height");
         assert.strictEqual(component2.height(), expectedHeight, "second non-fixed-height Component received half the remaining height");
         verifyOrigins(tableRows, rowPadding, 0);
@@ -391,7 +388,7 @@ describe("Tables", () => {
       });
 
       it("adds column padding between columns", () => {
-        const svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+        const svg = TestMethods.generateSVG();
 
         const component1 = new Plottable.Component();
         const component2 = new Plottable.Component();
@@ -401,7 +398,7 @@ describe("Tables", () => {
         table.columnPadding(columnPadding);
         table.renderTo(svg);
 
-        const expectedWidth = (SVG_HEIGHT - columnPadding) / 2;
+        const expectedWidth = (TestMethods.numAttr(svg, "height") - columnPadding) / 2;
         assert.strictEqual(component1.width(), expectedWidth, "first non-fixed-width Component received half the remaining width");
         assert.strictEqual(component2.width(), expectedWidth, "second non-fixed-width Component received half the remaining width");
         verifyOrigins(tableRows, 0, columnPadding);
@@ -411,7 +408,7 @@ describe("Tables", () => {
       });
 
       it("allocates height to unfixed rows according to row weights", () => {
-        const svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+        const svg = TestMethods.generateSVG();
 
         const component0 = new Plottable.Component();
         const component1 = new Plottable.Component();
@@ -426,15 +423,15 @@ describe("Tables", () => {
         const totalRowWeight = row0Weight + row1Weight;
         table.renderTo(svg);
 
-        assert.strictEqual(component0.height(), SVG_WIDTH * row0Weight / totalRowWeight, "row 0 received height according to its weight");
-        assert.strictEqual(component1.height(), SVG_WIDTH * row1Weight / totalRowWeight, "row 1 received height according to its weight");
+        assert.strictEqual(component0.height(), TestMethods.numAttr(svg, "width") * row0Weight / totalRowWeight, "row 0 received height according to its weight");
+        assert.strictEqual(component1.height(), TestMethods.numAttr(svg, "width") * row1Weight / totalRowWeight, "row 1 received height according to its weight");
 
         table.destroy();
         svg.remove();
       });
 
       it("allocates width to unfixed columns according to column weights", () => {
-        const svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+        const svg = TestMethods.generateSVG();
 
         const component0 = new Plottable.Component();
         const component1 = new Plottable.Component();
@@ -446,9 +443,9 @@ describe("Tables", () => {
         const totalColumnWeight = column0Weight + column1Weight;
         table.renderTo(svg);
 
-        assert.strictEqual(component0.width(), SVG_WIDTH * column0Weight / totalColumnWeight,
+        assert.strictEqual(component0.width(), TestMethods.numAttr(svg, "width") * column0Weight / totalColumnWeight,
           "column 0 received width according to its weight");
-        assert.strictEqual(component1.width(), SVG_WIDTH * column1Weight / totalColumnWeight,
+        assert.strictEqual(component1.width(), TestMethods.numAttr(svg, "width") * column1Weight / totalColumnWeight,
           "column 1 received width according to its weight");
 
         table.destroy();
