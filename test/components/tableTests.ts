@@ -437,8 +437,10 @@ describe("Tables", () => {
         const totalRowWeight = row0Weight + row1Weight;
         table.renderTo(svg);
 
-        assert.strictEqual(component0.height(), TestMethods.numAttr(svg, "width") * row0Weight / totalRowWeight, "row 0 received height according to its weight");
-        assert.strictEqual(component1.height(), TestMethods.numAttr(svg, "width") * row1Weight / totalRowWeight, "row 1 received height according to its weight");
+        assert.strictEqual(component0.height(), TestMethods.numAttr(svg, "width") * row0Weight / totalRowWeight,
+          "row 0 received height according to its weight");
+        assert.strictEqual(component1.height(), TestMethods.numAttr(svg, "width") * row1Weight / totalRowWeight,
+          "row 1 received height according to its weight");
 
         table.destroy();
         svg.remove();
