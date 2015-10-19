@@ -116,23 +116,43 @@ describe("Tables", () => {
     let table: Plottable.Components.Table;
 
     it("removes the specified Component", () => {
-      table = new Plottable.Components.Table([[c1, c2], [c3, c4], [c5, c6]]);
+      const tableRows = [
+        [c1, c2],
+        [c3, c4],
+        [c5, c6]
+      ];
+      table = new Plottable.Components.Table(tableRows);
       table.remove(c4);
-      assertTableRows(table, [[c1, c2], [c3, null], [c5, c6]], "the requested element was removed");
+      const expectedRows = [
+        [c1, c2],
+        [c3, null],
+        [c5, c6]
+      ];
+      assertTableRows(table, expectedRows, "the requested element was removed");
       assert.isNull(c4.parent(), "Component disconnected from the Table");
     });
 
     it("does nothing when component is not found", () => {
-      table = new Plottable.Components.Table([[c1, c2], [c3, c4]]);
+      const tableRows = [
+        [c1, c2],
+        [c3, c4]
+      ];
+      table = new Plottable.Components.Table(tableRows);
+      const expectedRows = tableRows;
       table.remove(c5);
-      assertTableRows(table, [[c1, c2], [c3, c4]], "removing a nonexistent Component does not affect the table");
+      assertTableRows(table, expectedRows, "removing a nonexistent Component does not affect the table");
     });
 
     it("has no further effect when called a second time with the same Component", () => {
-      table = new Plottable.Components.Table([[c1, c2, c3], [c4, c5, c6]]);
-
-      const expectedRows = [[null, c2, c3], [c4, c5, c6]];
-
+      const tableRows = [
+        [c1, c2, c3],
+        [c4, c5, c6]
+      ];
+      table = new Plottable.Components.Table(tableRows);
+      const expectedRows = [
+        [null, c2, c3],
+        [c4, c5, c6]
+      ];
       table.remove(c1);
       assertTableRows(table, expectedRows, "Component was removed");
       table.remove(c1);
