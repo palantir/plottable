@@ -16,7 +16,7 @@
 
 ///<reference path="animators/easingAnimatorTests.ts" />
 
-///<reference path="axes/baseAxisTests.ts" />
+///<reference path="axes/axisTests.ts" />
 ///<reference path="axes/timeAxisTests.ts" />
 ///<reference path="axes/numericAxisTests.ts" />
 ///<reference path="axes/categoryAxisTests.ts" />
