@@ -50,6 +50,9 @@ module Plottable.Animators {
       return this.startDelay() + adjustedIterativeDelay * (Math.max(numberOfSteps - 1, 0)) + this.stepDuration();
     }
 
+    /**
+     * implementation of animate
+     */
     public animate(selection: d3.Selection<any>
       , attrToAppliedProjector: AttributeToAppliedProjector
       , drawingTarget?: Drawers.DrawingTarget
@@ -72,8 +75,15 @@ module Plottable.Animators {
     /**
      * return a transition from the selection, with the requested duration
      * and (possibly) delay. As a convenience, this may return the selection itself
-     * without applying a transition if durection = 0
-     *
+     * without applying a transition if duration = 0
+     * If the selection passed in is a transition a subtransition is created. This subtransition
+     * will use the default delay calculated by d3, so any delay passed to this function is ignored
+     * @param { d3.Selection<any>|d3.Transition<any>|d3.selection.Update<any>} the d3 selection or transition
+     * @param { number } duration The duration required for the transition. If 0, no transition is created
+     * @param { number? } delay The delay to apply to the transition. If creating a subtransition, this is ignored.
+     * @param { EasingFunctionSpecifier } easing An easing function, or the name of a predefined d3 easing function
+     * to use on the transition. If not supplied, the easingMode of the calling Animator is used.
+     * returns { any } The transition created, or , when duration = 0 the original selection is returned.
      */
     protected getTransition(selection: d3.Selection<any>|d3.Transition<any>|d3.selection.Update<any>,
       duration: number, delay?: (d: any, i: number) => number, easing?: EasingFunctionSpecifier): any {
@@ -89,7 +99,7 @@ module Plottable.Animators {
           .ease(<EasingFunction>easing)
           .duration(duration);
       } else {
-      // otherwise is the selection is NOT a transition, create a new transition setting up the delay
+      // otherwise if the selection is NOT a transition, create a new transition setting up the delay
         return selection = selection.transition()
           .ease(<EasingFunction>easing)
           .duration(duration)
@@ -98,16 +108,19 @@ module Plottable.Animators {
     }
 
     /**
-     * @isTransition
-     *
      *  return true if the d3 object passed in is a transition
-     *
      */
     protected isTransition(selection: any): boolean {
       return (selection.namespace === "__transition__" ? true : false);
     };
-
     /*
+     * Merge two sets of attributes together. Properties of the second object
+     * will override or be added to those in the first. Neither object is modified.
+     * Animators can use this function to construct new sets of attributes to apply
+     * in transitions
+     *
+     * @param {AttributeToAppliedProjector} attr1 The first set of attributes
+     * @param {AttributeToAppliedProjector} attr2 The second set of attributes
      *
      */
     protected mergeAttrs(attr1: AttributeToAppliedProjector, attr2: AttributeToAppliedProjector): AttributeToAppliedProjector {
@@ -121,8 +134,13 @@ module Plottable.Animators {
       return a;
     }
     /**
-     *  return the AtributeToAppliedProjector comprising only those attributes listed in names
+     * Return the AtributeToAppliedProjector comprising only those attributes listed in names
+     * An Animator may use this function to create an intermediate collection of attributes to
+     * use in a transition.
+     * @param {AttributeToAppliedProjector} attr
+     * @param {string[]} names The names of the required attributes
      *
+     * @returns {AttributeToAppliedProjector} A new collection, compresing only thos attribuest listed in names[].
      */
     protected pluckAttrs(attr: AttributeToAppliedProjector, names: string[]): AttributeToAppliedProjector {
       let result: AttributeToAppliedProjector = {};

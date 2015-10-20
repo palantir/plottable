@@ -60,3 +60,4 @@ function run(svg, data, Plottable, keyfunction) {
 
     new Plottable.Interactions.Click().onClick(cb).attachTo(circleRenderer);
 }
+//# sourceURL=scatterAnimations/animate_size.js

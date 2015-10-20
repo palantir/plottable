@@ -58,4 +58,4 @@ function run(svg, data, Plottable) {
         new Plottable.Interactions.Click().onClick(cb).attachTo(verticalBarPlot);
     });
 }
-//# sourceURL=barAnimations/animate_barReset.js
+//# sourceURL=barAnimations/animate_reset.js

@@ -78,4 +78,4 @@ function run(svg, data, Plottable, keyFunction) {
         new Plottable.Interactions.Click().onClick(cb).attachTo(circleRenderer);
     });
 }
-//# sourceURL=objectConstancy/animate_Combo1.js
+//# sourceURL=scatterAnimations/animate_attrCombo.js

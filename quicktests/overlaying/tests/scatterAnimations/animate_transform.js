@@ -69,4 +69,4 @@ function run(svg, data, Plottable, keyFunction) {
 
     new Plottable.Interactions.Click().onClick(cb).attachTo(circleRenderer);
 }
-//# sourceURL=objectConstancy/animate_transform.js
+//# sourceURL=scatterAnimations/animate_transform.js

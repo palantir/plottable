@@ -36,7 +36,8 @@ function run(svg, data, Plottable, keyfunction) {
   };
   cb();
   var xScale = new Plottable.Scales.Category().domain(["jon", "dan", "zoo"]);
-  var yScale = new Plottable.Scales.Linear();
+  var yScale = new Plottable.Scales.Linear()
+                    .domain([ -5, 20]);
   var colorScale = new Plottable.Scales.Color("10");
 
   var xAxis = new Plottable.Axes.Category(xScale, "bottom");
@@ -46,6 +47,13 @@ function run(svg, data, Plottable, keyfunction) {
   if (Plottable.Animators.Opacity) {
       animator = new Plottable.Animators.Opacity()
           .stepDuration(300);
+      if (keyfunction === Plottable.KeyFunctions.noConstancy) {
+        // if everything is going out and in, stage the fades
+        animator
+          .stepDuration(2000)
+          .exitEasingMode(Plottable.Animators.EasingFunctions.squEase("linear", 0, .5))
+          .easingMode(Plottable.Animators.EasingFunctions.squEase("linear", .5, 1));
+      }
   } else {
       animator = new Plottable.Animators.Easing()
         .stepDuration(500);
@@ -72,4 +80,4 @@ function run(svg, data, Plottable, keyfunction) {
 
   new Plottable.Interactions.Click().onClick(cb).attachTo(barRenderer);
 }
-//# sourceURL=barAnimations/stacked_opacity.js
+//# sourceURL=barAnimations/clustered_opacity.js

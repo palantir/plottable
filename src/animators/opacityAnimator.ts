@@ -1,11 +1,19 @@
 module Plottable.Animators {
   /**
-   * Fade in  fade out the entering  exiting elements by transitioning opacity
+   * Fade in - fade out the entering - exiting elements by transitioning opacity
    */
   export class Opacity extends Attr implements Animator {
     private _startOpacity: number;
     private _endOpacity: number;
 
+    /**
+     *  @Constructor
+     *  @param {number} startOpacity the initial opacity for entering elements
+     *                   defaults to 0
+     *
+     *  @param {number} endOpacity the final opacity for exiting elements
+     *                   defaults to 0
+     */
     constructor(startOpacity?: number, endOpacity?: number) {
       super();
       startOpacity = startOpacity || 0;

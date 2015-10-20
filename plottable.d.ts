@@ -4147,25 +4147,37 @@ declare module Plottable.Animators {
          */
         constructor();
         totalTime(numberOfSteps: number): number;
+        /**
+         * implementation of animate
+         */
         animate(selection: d3.Selection<any>, attrToAppliedProjector: AttributeToAppliedProjector, drawingTarget?: Drawers.DrawingTarget, drawer?: Drawer): d3.Selection<any> | d3.Transition<any>;
         /**
          * return a transition from the selection, with the requested duration
          * and (possibly) delay. As a convenience, this may return the selection itself
-         * without applying a transition if durection = 0
-         *
+         * without applying a transition if duration = 0
+         * If the selection passed in is a transition a subtransition is created. This subtransition
+         * will use the default delay calculated by d3, so any delay passed to this function is ignored
+         * @param { d3.Selection<any>|d3.Transition<any>|d3.selection.Update<any>} the d3 selection or transition
+         * @param { number } duration The duration required for the transition. If 0, no transition is created
+         * @param { number? } delay The delay to apply to the transition. If creating a subtransition, this is ignored.
+         * @param { EasingFunctionSpecifier } easing An easing function, or the name of a predefined d3 easing function
+         * to use on the transition. If not supplied, the easingMode of the calling Animator is used.
+         * returns { any } The transition created, or , when duration = 0 the original selection is returned.
          */
         protected getTransition(selection: d3.Selection<any> | d3.Transition<any> | d3.selection.Update<any>, duration: number, delay?: (d: any, i: number) => number, easing?: EasingFunctionSpecifier): any;
         /**
-         * @isTransition
-         *
          *  return true if the d3 object passed in is a transition
-         *
          */
         protected isTransition(selection: any): boolean;
         protected mergeAttrs(attr1: AttributeToAppliedProjector, attr2: AttributeToAppliedProjector): AttributeToAppliedProjector;
         /**
-         *  return the AtributeToAppliedProjector comprising only those attributes listed in names
+         * Return the AtributeToAppliedProjector comprising only those attributes listed in names
+         * An Animator may use this function to create an intermediate collection of attributes to
+         * use in a transition.
+         * @param {AttributeToAppliedProjector} attr
+         * @param {string[]} names The names of the required attributes
          *
+         * @returns {AttributeToAppliedProjector} A new collection, compresing only thos attribuest listed in names[].
          */
         protected pluckAttrs(attr: AttributeToAppliedProjector, names: string[]): AttributeToAppliedProjector;
         protected delay(selection: any): (d: any, i: number) => number;
@@ -4321,11 +4333,12 @@ declare module Plottable.Animators {
          */
         exitEasingMode(): EasingFunctionSpecifier;
         /**
-         * Sets the attributes for entering elements.
+         * easing mode for exiting elements
          *
-         * @param {exitEasingMode} A collection of attribuets applied to entering elements.
-         * These are applied over the top of the attributes pass to the animate method
-         * Any attribute passed to exitEasingMode will transition to its final value
+         * @param {EasingFunctionSpecifier} The easing function, or d3 easing function name.
+         * Animations may separate the activity on entering and easing elements by using
+         * the squEase easing function over different intervals.
+         *
          * @returns {Attr} The calling Attr Animator.
          */
         exitEasingMode(exitEasingMode: EasingFunctionSpecifier): Attr;
@@ -4333,10 +4346,36 @@ declare module Plottable.Animators {
 }
 declare module Plottable.Animators {
     /**
-     * Base for animators that animate specific attributes, such as Opacity, height... .
+     * A "staged" animation specific for bar charts
+     * Animates exit, update and enter in sequence
      */
     class Bar extends Attr implements Animator {
+        private _rhythm;
+        private _stageUpdate;
         constructor();
+        /**
+         * Sets the relationship between activity and waits in the major steps in the animation (0 to 1)
+         * Applied using a squEase easing function
+         *
+         * @returns {number} The current rhythm.
+         */
+        rhythm(): number;
+        /**
+         * @param {number} rhythm the rhythm to apply to the major steps in the animation.
+         * @returns {Bar} The calling Animator.
+         */
+        rhythm(rhythm: number): Bar;
+        /**
+         * Specify whether to split the rendering of the Update selection into two stages
+         *
+         * @returns {boolean} The current setting.
+         */
+        stageUpdate(): boolean;
+        /**
+         * @param {boolean} stageUpdate split the Update into two stages
+         * @returns {Bar} The calling Animator.
+         */
+        stageUpdate(stageUpdate: boolean): Bar;
         animate(selection: d3.Selection<any>, attrToAppliedProjector: AttributeToAppliedProjector, drawingTarget?: Drawers.DrawingTarget): d3.Selection<any> | d3.Transition<any>;
     }
 }
@@ -4511,11 +4550,19 @@ declare module Plottable.Animators {
 }
 declare module Plottable.Animators {
     /**
-     * Fade in  fade out the entering  exiting elements by transitioning opacity
+     * Fade in - fade out the entering - exiting elements by transitioning opacity
      */
     class Opacity extends Attr implements Animator {
         private _startOpacity;
         private _endOpacity;
+        /**
+         *  @Constructor
+         *  @param {number} startOpacity the initial opacity for entering elements
+         *                   defaults to 0
+         *
+         *  @param {number} endOpacity the final opacity for exiting elements
+         *                   defaults to 0
+         */
         constructor(startOpacity?: number, endOpacity?: number);
         /**
          * Sets the starting opacity for entering elements.
@@ -4555,6 +4602,9 @@ declare module Plottable.Animators {
         private _callback;
         private _innerAnimator;
         constructor();
+        /**
+         * animate implementation delegates to the callback
+         */
         animate(selection: d3.Selection<any>, attrToAppliedProjector: AttributeToAppliedProjector, drawingTarget?: Drawers.DrawingTarget, drawer?: Drawer): d3.Selection<any> | d3.Transition<any>;
         /**
          * Gets the callback animate function.
@@ -4564,21 +4614,22 @@ declare module Plottable.Animators {
         /**
          * Sets the attributes for entering elements.
          *
-         * @param {callback} a function implementing Animator.animate
+         * @param {AnimateCallback} a function implementing Animator.animate
          * @returns {Callback} The calling Callback Animator.
          */
         callback(callback: AnimateCallback): Callback;
         /**
          * Gets an inner animator.
-         * callback functions may use this animator
+         * callback functions have access to this animator, so callbacks may be designed to
+         * wrap another animator
          * @returns {innerAnimator} The current innerAnimator.
          */
         innerAnimator(): Animator;
         /**
          * Sets the attributes for entering elements.
          *
-         * @param {innerAnimator} a function implementing Animator.animate
-         * @returns {innerAnimator} The calling innerAnimator Animator.
+         * @param {Animator} a function implementing Animator.animate
+         * @returns {Callback} The calling innerAnimator Animator.
          */
         innerAnimator(innerAnimator: Animator): Attr;
         InnerAnimate(selection: d3.Selection<any>, attrToAppliedProjector: AttributeToAppliedProjector, drawingTarget?: Drawers.DrawingTarget, drawer?: Drawer): d3.Selection<any> | d3.Transition<any>;

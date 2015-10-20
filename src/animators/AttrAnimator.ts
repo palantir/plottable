@@ -81,11 +81,12 @@
      */
     public exitEasingMode(): EasingFunctionSpecifier;
     /**
-     * Sets the attributes for entering elements.
+     * easing mode for exiting elements
      *
-     * @param {exitEasingMode} A collection of attribuets applied to entering elements.
-     * These are applied over the top of the attributes pass to the animate method
-     * Any attribute passed to exitEasingMode will transition to its final value
+     * @param {EasingFunctionSpecifier} The easing function, or d3 easing function name.
+     * Animations may separate the activity on entering and easing elements by using
+     * the squEase easing function over different intervals.
+     *
      * @returns {Attr} The calling Attr Animator.
      */
     public exitEasingMode(exitEasingMode: EasingFunctionSpecifier): Attr;

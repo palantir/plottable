@@ -16,6 +16,9 @@
     constructor() {
       super();
     }
+    /**
+     * animate implementation delegates to the callback
+     */
     public animate(selection: d3.Selection<any>
       , attrToAppliedProjector: AttributeToAppliedProjector
       , drawingTarget?: Drawers.DrawingTarget
@@ -30,7 +33,7 @@
     /**
      * Sets the attributes for entering elements.
      *
-     * @param {callback} a function implementing Animator.animate
+     * @param {AnimateCallback} a function implementing Animator.animate
      * @returns {Callback} The calling Callback Animator.
      */
     public callback(callback: AnimateCallback): Callback;
@@ -44,15 +47,16 @@
     }
     /**
      * Gets an inner animator.
-     * callback functions may use this animator
+     * callback functions have access to this animator, so callbacks may be designed to
+     * wrap another animator
      * @returns {innerAnimator} The current innerAnimator.
      */
     public innerAnimator(): Animator;
     /**
      * Sets the attributes for entering elements.
      *
-     * @param {innerAnimator} a function implementing Animator.animate
-     * @returns {innerAnimator} The calling innerAnimator Animator.
+     * @param {Animator} a function implementing Animator.animate
+     * @returns {Callback} The calling innerAnimator Animator.
      */
     public innerAnimator(innerAnimator: Animator): Attr;
     public innerAnimator(innerAnimator?: Animator): any {

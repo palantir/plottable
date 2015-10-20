@@ -10289,6 +10289,9 @@ var Plottable;
                 var adjustedIterativeDelay = this._getAdjustedIterativeDelay(numberOfSteps);
                 return this.startDelay() + adjustedIterativeDelay * (Math.max(numberOfSteps - 1, 0)) + this.stepDuration();
             };
+            /**
+             * implementation of animate
+             */
             Base.prototype.animate = function (selection, attrToAppliedProjector, drawingTarget, drawer) {
                 var _this = this;
                 var numberOfSteps = drawingTarget.merge[0].length;
@@ -10304,8 +10307,15 @@ var Plottable;
             /**
              * return a transition from the selection, with the requested duration
              * and (possibly) delay. As a convenience, this may return the selection itself
-             * without applying a transition if durection = 0
-             *
+             * without applying a transition if duration = 0
+             * If the selection passed in is a transition a subtransition is created. This subtransition
+             * will use the default delay calculated by d3, so any delay passed to this function is ignored
+             * @param { d3.Selection<any>|d3.Transition<any>|d3.selection.Update<any>} the d3 selection or transition
+             * @param { number } duration The duration required for the transition. If 0, no transition is created
+             * @param { number? } delay The delay to apply to the transition. If creating a subtransition, this is ignored.
+             * @param { EasingFunctionSpecifier } easing An easing function, or the name of a predefined d3 easing function
+             * to use on the transition. If not supplied, the easingMode of the calling Animator is used.
+             * returns { any } The transition created, or , when duration = 0 the original selection is returned.
              */
             Base.prototype.getTransition = function (selection, duration, delay, easing) {
                 // if the duration is 0, just return the selection
@@ -10321,7 +10331,7 @@ var Plottable;
                         .duration(duration);
                 }
                 else {
-                    // otherwise is the selection is NOT a transition, create a new transition setting up the delay
+                    // otherwise if the selection is NOT a transition, create a new transition setting up the delay
                     return selection = selection.transition()
                         .ease(easing)
                         .duration(duration)
@@ -10329,16 +10339,20 @@ var Plottable;
                 }
             };
             /**
-             * @isTransition
-             *
              *  return true if the d3 object passed in is a transition
-             *
              */
             Base.prototype.isTransition = function (selection) {
                 return (selection.namespace === "__transition__" ? true : false);
             };
             ;
             /*
+             * Merge two sets of attributes together. Properties of the second object
+             * will override or be added to those in the first. Neither object is modified.
+             * Animators can use this function to construct new sets of attributes to apply
+             * in transitions
+             *
+             * @param {AttributeToAppliedProjector} attr1 The first set of attributes
+             * @param {AttributeToAppliedProjector} attr2 The second set of attributes
              *
              */
             Base.prototype.mergeAttrs = function (attr1, attr2) {
@@ -10352,8 +10366,13 @@ var Plottable;
                 return a;
             };
             /**
-             *  return the AtributeToAppliedProjector comprising only those attributes listed in names
+             * Return the AtributeToAppliedProjector comprising only those attributes listed in names
+             * An Animator may use this function to create an intermediate collection of attributes to
+             * use in a transition.
+             * @param {AttributeToAppliedProjector} attr
+             * @param {string[]} names The names of the required attributes
              *
+             * @returns {AttributeToAppliedProjector} A new collection, compresing only thos attribuest listed in names[].
              */
             Base.prototype.pluckAttrs = function (attr, names) {
                 var result = {};
@@ -10526,51 +10545,111 @@ var Plottable;
     var Animators;
     (function (Animators) {
         /**
-         * Base for animators that animate specific attributes, such as Opacity, height... .
+         * A "staged" animation specific for bar charts
+         * Animates exit, update and enter in sequence
          */
         var Bar = (function (_super) {
             __extends(Bar, _super);
             function Bar() {
                 _super.call(this);
+                this._rhythm = .5;
+                this._stageUpdate = true;
             }
             ;
+            Bar.prototype.rhythm = function (rhythm) {
+                if (rhythm == null) {
+                    return this._rhythm;
+                }
+                else {
+                    this._rhythm = rhythm;
+                    return this;
+                }
+            };
+            Bar.prototype.stageUpdate = function (stageUpdate) {
+                if (stageUpdate == null) {
+                    return this._stageUpdate;
+                }
+                else {
+                    this._stageUpdate = stageUpdate;
+                    return this;
+                }
+            };
             Bar.prototype.animate = function (selection, attrToAppliedProjector, drawingTarget) {
+                var _this = this;
                 var yScale = this.yScale();
-                var proj = {
+                // a projector to set bar height and y-origin to 0
+                var zeroProj = {
                     height: function () { return 0; },
                     y: function (d, i) { return yScale.scale(0); }
                 };
-                // set up timings
-                var stageDuration = this.stepDuration() / 7;
-                var exitStageDuration = (drawingTarget.exit.size() > 0 ? stageDuration * 2 : 0);
-                var updateStageDuration = (drawingTarget.update.size() > 0 ? stageDuration * 2 : 0);
-                var enterStageDuration = (drawingTarget.enter.size() > 0 ? stageDuration : 0);
-                var squeezer = Plottable.Animators.EasingFunctions.squEase("linear-in-out", 0, .5);
-                // first deal with the exiting elements
-                drawingTarget.exit = this.getTransition(drawingTarget.exit, exitStageDuration, undefined, squeezer)
-                    .attr(proj)
+                // durations for the stages - by checking the size() of the relevant selection, a stage may be
+                // suppressed if it is not needed. this means that the actual overall duration of the transition
+                // can be shorter than the requested duration
+                // the steps, it all executed have these relative lengths
+                // exiting bars shrink        :   4
+                // update bars resize         :   4   (this step may be ommitted by setting stageUpdate = false;)
+                // update bars reduce opacity :   1
+                // update bars move on x axis :   4
+                // update bars restore opacity:   1
+                // entering bars expand       :   4
+                var stepRelativeDurations = [4, (this.stageUpdate() ? 4 : 0), 1, 4, 1, 4];
+                var totalRelativeDurations = stepRelativeDurations.reduce(function (a, b) {
+                    return a + b;
+                });
+                // decide which steps are needed
+                var exitStageOn = (drawingTarget.exit.size() > 0 ? 1 : 0);
+                var updateStageOn = (drawingTarget.update.size() > 0 ? 1 : 0);
+                var enterStageOn = (drawingTarget.enter.size() > 0 ? 1 : 0);
+                var stepOn = [exitStageOn, updateStageOn, updateStageOn, updateStageOn, updateStageOn, enterStageOn];
+                // final actual durations for each step, based on relative durations and whether step is needed
+                // the animation is confined to the first part of this time interval by the squEase easing function
+                var stepDurations = stepRelativeDurations.map(function (duration, index) {
+                    return _this.stepDuration() * (duration / totalRelativeDurations) * stepOn[index];
+                });
+                // delay before the beginning of enter step - for convenience
+                var enterStepDelay = 0;
+                for (var i = 0; i < 5; i++) {
+                    enterStepDelay += stepDurations[i];
+                }
+                ;
+                // defines the 'rhythm' between movement and pause in each major step 0 - 1
+                var squeezer = Plottable.Animators.EasingFunctions.squEase("linear-in-out", 0, this.rhythm());
+                // Exit processing
+                // STEP 0: Transition the bar height  to 0 (taking care to adjust the y origin), when done, remove
+                drawingTarget.exit = this.getTransition(drawingTarget.exit, stepDurations[0], undefined, squeezer)
+                    .attr(zeroProj)
                     .remove();
-                var proj2 = {
-                    height: attrToAppliedProjector["height"],
-                    y: attrToAppliedProjector["y"]
-                };
-                drawingTarget.update = this.getTransition(drawingTarget.update, exitStageDuration);
-                drawingTarget.update = this.getTransition(drawingTarget.update, updateStageDuration, undefined, squeezer)
-                    .attr(proj2);
-                drawingTarget.update = this.getTransition(drawingTarget.update, updateStageDuration / 4)
+                // Update processing
+                // update waits for the exit to finish with an empty transition
+                drawingTarget.update = this.getTransition(drawingTarget.update, stepDurations[0]);
+                // STEP 1: extract height and y from the attrToAppliedProjector - these two are applied first
+                var heightProj = this.pluckAttrs(attrToAppliedProjector, ["height", "y"]);
+                drawingTarget.update = this.getTransition(drawingTarget.update, stepDurations[1], undefined, squeezer)
+                    .attr(heightProj);
+                // STEP 2: quickly fade before the next step - to reduce "occlusion" as bars move across each other
+                // and so make visual tracking easier
+                drawingTarget.update = this.getTransition(drawingTarget.update, stepDurations[2])
                     .attr({ "opacity": .6 });
+                // STEP 3: apply all the remaining attributes, while maintaining the reduced opacity
                 var proj3 = this.mergeAttrs(attrToAppliedProjector, { "opacity": function () { return .6; } });
-                drawingTarget.update = this.getTransition(drawingTarget.update, updateStageDuration, undefined, squeezer)
+                drawingTarget.update = this.getTransition(drawingTarget.update, stepDurations[3], undefined, squeezer)
                     .attr(proj3);
-                drawingTarget.update = this.getTransition(drawingTarget.update, 50)
+                // STEP 4: quickly apply all the remaining attributes, including opacity - restores opacity to the required value
+                // don;t use the squeeze on this transition
+                drawingTarget.update = this.getTransition(drawingTarget.update, stepDurations[4])
                     .attr(attrToAppliedProjector);
-                var proj4 = this.mergeAttrs(attrToAppliedProjector, proj);
-                (drawingTarget.enter)
-                    .attr(proj4);
-                drawingTarget.enter = this.getTransition(drawingTarget.enter, exitStageDuration + 2.25 * updateStageDuration);
-                drawingTarget.enter = this.getTransition(drawingTarget.enter, enterStageDuration)
+                // Enter
+                // initialise the entering elements - all the target attributes are applied, but height and y are overridden to 0
+                var enterInitProj = this.mergeAttrs(attrToAppliedProjector, zeroProj);
+                drawingTarget.enter
+                    .attr(enterInitProj);
+                // wait for the Exit and Update to finish - steps 0 to 4
+                drawingTarget.enter = this.getTransition(drawingTarget.enter, enterStepDelay);
+                // STEP 5: apply all attributes to the enter selection - this will transition height and y back to their final values
+                // the squeeze is applied to keep a constant rhythm, even though this leaves a "wait" at the end of the transition
+                drawingTarget.enter = this.getTransition(drawingTarget.enter, stepDurations[5], undefined, squeezer)
                     .attr(attrToAppliedProjector);
-                // set all the properties on the merge , save the transition returned
+                // return the merge selection
                 return drawingTarget.merge;
             };
             return Bar;
@@ -10783,10 +10862,18 @@ var Plottable;
     var Animators;
     (function (Animators) {
         /**
-         * Fade in  fade out the entering  exiting elements by transitioning opacity
+         * Fade in - fade out the entering - exiting elements by transitioning opacity
          */
         var Opacity = (function (_super) {
             __extends(Opacity, _super);
+            /**
+             *  @Constructor
+             *  @param {number} startOpacity the initial opacity for entering elements
+             *                   defaults to 0
+             *
+             *  @param {number} endOpacity the final opacity for exiting elements
+             *                   defaults to 0
+             */
             function Opacity(startOpacity, endOpacity) {
                 _super.call(this);
                 startOpacity = startOpacity || 0;
@@ -10833,6 +10920,9 @@ var Plottable;
                 _super.call(this);
                 this._callback = function (selection, attrToAppliedProjector, drawingTarget) { return drawingTarget.merge; };
             }
+            /**
+             * animate implementation delegates to the callback
+             */
             Callback.prototype.animate = function (selection, attrToAppliedProjector, drawingTarget, drawer) {
                 return this.callback().call(this, selection, attrToAppliedProjector, drawingTarget, drawer);
             };

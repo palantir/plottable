@@ -72,4 +72,4 @@ function run(svg, data, Plottable) {
 
   new Plottable.Interactions.Click().onClick(cb).attachTo(barRenderer);
 }
-//# sourceURL=barAnimations/stacked_opacity.js
+//# sourceURL=barAnimations/stacked_reset.js

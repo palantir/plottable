@@ -1,3 +1,4 @@
+
 function makeData() {
   "use strict";
 
@@ -36,4 +37,3 @@ function run(svg, data, Plottable) {
 
   new Plottable.Interactions.Click().onClick(cb).attachTo(circleRenderer);
 }
-// @sourceURL=animations/animate_scatter.js

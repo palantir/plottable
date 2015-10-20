@@ -48,4 +48,4 @@ function run(svg, data, Plottable) {
 
     new Plottable.Interactions.Click().onClick(cb).attachTo(circleRenderer);
 }
-//# sourceURL=objectconstancy/animate_fill.js
+//# sourceURL=scatterAnimations/animate_fill.js
