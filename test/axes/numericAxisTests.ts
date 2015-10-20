@@ -184,8 +184,9 @@ describe("NumericAxis", () => {
 
       axis.renderTo(svg);
 
-      let labelContainer = axis.content().select(".tick-label-container");
-      axis.content().selectAll(".tick-label").each(function() {
+      let tickLabelContainerClass = "tick-label-container";
+      let labelContainer = axis.content().select(`.${tickLabelContainerClass}`);
+      axis.content().selectAll(`.${Plottable.Axis.TICK_LABEL_CLASS}`).each(function() {
         TestMethods.assertBBoxInclusion(labelContainer, d3.select(this));
       });
       svg.remove();
@@ -198,7 +199,7 @@ describe("NumericAxis", () => {
       let axis = new Plottable.Axes.Numeric(scale, "bottom");
       axis.renderTo(svg);
 
-      let visibleTickLabels = applyVisibleFilter(axis.content().selectAll(".tick-label"));
+      let visibleTickLabels = applyVisibleFilter(axis.content().selectAll(`.${Plottable.Axis.TICK_LABEL_CLASS}`));
 
       let visibleTickLabelRects = visibleTickLabels[0].map((label: Element) => label.getBoundingClientRect());
 
@@ -222,7 +223,7 @@ describe("NumericAxis", () => {
       let axis = new Plottable.Axes.Numeric(scale, "bottom");
       axis.renderTo(svg);
 
-      let tickLabels = applyVisibleFilter(axis.content().selectAll(".tick-label"));
+      let tickLabels = applyVisibleFilter(axis.content().selectAll(`.${Plottable.Axis.TICK_LABEL_CLASS}`));
       assert.operator(tickLabels.size(), ">", 1, "more than one tick label is shown");
 
       let tickLabelElementPairs = d3.pairs(tickLabels[0]);
