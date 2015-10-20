@@ -261,57 +261,16 @@ describe("NumericAxis", () => {
     });
   });
 
-  describe("allocating space when left oriented", () => {
-    it("allocates enough width to show short tick labels when vertical", () => {
+  orientations.forEach((orientation) => {
+    it(`allocates enough height to show all tick labels for orientation ${orientation}`, () => {
       let svg = TestMethods.generateSVG();
       let scale = new Plottable.Scales.Linear();
       scale.domain([5, -5]);
 
       let formatter = (d: any) => (d === 0) ? "ZERO" : String(d);
 
-      let axis = new Plottable.Axes.Numeric(scale, "left");
+      let axis = new Plottable.Axes.Numeric(scale, orientation);
       axis.formatter(formatter);
-      axis.renderTo(svg);
-
-      let visibleTickLabels = applyVisibleFilter(axis.content()
-        .selectAll(`.${Plottable.Axis.TICK_LABEL_CLASS}`));
-      let boundingBox = (<Element> svg.select(".axis").select(".bounding-box").node()).getBoundingClientRect();
-      visibleTickLabels.each(function(d, i) {
-        let visibleTickLabelRect = this.getBoundingClientRect();
-        assert.isTrue(boxIsInside(visibleTickLabelRect, boundingBox), `tick label ${i} is inside the bounding box`);
-      });
-      svg.remove();
-    });
-
-    it("allocates enough width to show long tick labels when vertical", () => {
-      let svg = TestMethods.generateSVG();
-      let scale = new Plottable.Scales.Linear();
-      scale.domain([50000000000, -50000000000]);
-
-      let formatter = (d: any) => (d === 0) ? "ZERO" : String(d);
-
-      let axis = new Plottable.Axes.Numeric(scale, "left");
-      axis.formatter(formatter);
-      axis.renderTo(svg);
-
-      let visibleTickLabels = applyVisibleFilter(axis.content()
-        .selectAll(`.${Plottable.Axis.TICK_LABEL_CLASS}`));
-      let boundingBox = (<Element> svg.select(".axis").select(".bounding-box").node()).getBoundingClientRect();
-      visibleTickLabels.each(function(d, i) {
-        let visibleTickLabelRect = this.getBoundingClientRect();
-        assertBoxInside(visibleTickLabelRect, boundingBox, 0, `long tick label ${i} is inside the bounding box`);
-      });
-      svg.remove();
-    });
-  });
-
-  describe("allocating space when bottom oriented", () => {
-    it("allocates enough height to show all tick labels when horizontal", () => {
-      let svg = TestMethods.generateSVG();
-      let scale = new Plottable.Scales.Linear();
-      scale.domain([5, -5]);
-
-      let axis = new Plottable.Axes.Numeric(scale, "bottom");
       axis.renderTo(svg);
 
       let visibleTickLabels = applyVisibleFilter(axis.content()
@@ -322,6 +281,29 @@ describe("NumericAxis", () => {
         assert.isTrue(boxIsInside(visibleTickLabelRect, boundingBox, 0.5), `tick label ${i} is inside the bounding box`);
       });
 
+      svg.remove();
+    });
+  });
+
+  verticalOrientations.forEach((verticalOrientation) => {
+    it(`allocates enough width to show long tick labels for orientation ${verticalOrientation}`, () => {
+      let svg = TestMethods.generateSVG();
+      let scale = new Plottable.Scales.Linear();
+      scale.domain([50000000000, -50000000000]);
+
+      let formatter = (d: any) => (d === 0) ? "ZERO" : String(d);
+
+      let axis = new Plottable.Axes.Numeric(scale, verticalOrientation);
+      axis.formatter(formatter);
+      axis.renderTo(svg);
+
+      let visibleTickLabels = applyVisibleFilter(axis.content()
+        .selectAll(`.${Plottable.Axis.TICK_LABEL_CLASS}`));
+      let boundingBox = (<Element> svg.select(".axis").select(".bounding-box").node()).getBoundingClientRect();
+      visibleTickLabels.each(function(d, i) {
+        let visibleTickLabelRect = this.getBoundingClientRect();
+        assertBoxInside(visibleTickLabelRect, boundingBox, 0, `long tick label ${i} is inside the bounding box`);
+      });
       svg.remove();
     });
   });
