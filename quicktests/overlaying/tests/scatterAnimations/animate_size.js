@@ -2,12 +2,21 @@
 function makeData() {
     "use strict";
 
-    return [makeRandomData(20), makeRandomData(20)];
+    return [makeRandomNamedData(20), makeRandomNamedData(20)];
 }
 
-function run(svg, data, Plottable) {
+function run(svg, data, Plottable, keyfunction) {
     "use strict";
-
+    var colorFcn = function (d) {
+        if (d.name === "A") { return "blue"; }
+        if (d.name === "B") { return "red"; }
+        if (d.name === "C") { return "green"; }
+        if (d.name === "D") { return "orange"; }
+        if (d.name === "E") { return "purple"; }
+        if (d.name === "F") { return "pink"; }
+        if (d.name === "G") { return "yellow"; }
+        return "gray";
+    };
     var xScale = new Plottable.Scales.Linear();
     var xAxis = new Plottable.Axes.Numeric(xScale, "bottom");
 
@@ -28,14 +37,15 @@ function run(svg, data, Plottable) {
         .startAttrs(proj)
         .endAttrs(proj);
 
-    d1.keyFunction(Plottable.KeyFunctions.noConstancy);
-    d2.keyFunction(Plottable.KeyFunctions.noConstancy);
+    d1.keyFunction(keyfunction);
+    d2.keyFunction(keyfunction);
     var circleRenderer = new Plottable.Plots.Scatter().addDataset(d1)
                 .animator(Plottable.Plots.Animator.MAIN, attrAnimator)
                 .size(16)
                 .x(function (d) { return d.x; }, xScale)
                 .y(function (d) { return d.y; }, yScale)
                 .attr("opacity", .9)
+                .attr("fill", colorFcn)
                 .animated(true);
 
     var circleChart = new Plottable.Components.Table([[yAxis, circleRenderer],

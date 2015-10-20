@@ -3,7 +3,7 @@ function makeData() {
     "use strict";
 }
 
-function run(svg, data, Plottable) {
+function run(svg, data, Plottable, keyFunction) {
     "use strict";
     var dataIndex = 0;
     var colorFcn = function (d) {
@@ -22,9 +22,9 @@ function run(svg, data, Plottable) {
 
         data = json;
         var ds = new Plottable.Dataset(data.wc2014);
-        var keyFunction = function (d) { return d.name; };
-        ds.keyFunction(keyFunction);
-
+        if (ds.keyFunction) {
+            ds.keyFunction(keyFunction);
+        };
         var attrAnimator = new Plottable.Animators.Attr();
         //var proj = { height: function () { return 0; } };
         // this is a circle size 16: M0,8A8,8 0 1,1 0,-8A8,8 0 1,1 0,8Z

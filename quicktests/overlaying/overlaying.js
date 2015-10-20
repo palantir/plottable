@@ -206,8 +206,10 @@ function setTestBoxDimensions(){
 //run a single quicktest
 function runQuickTest(result, svg, data, branch){
   try {
-    result.run(svg, data, plottableBranches[branch]);
+    var keyfunction = getKeyFunction(plottableBranches[branch]);
+    result.run(svg, data, plottableBranches[branch], keyfunction);
     setTestBoxDimensions();
+
   } catch (err) {
     setTimeout(function() {throw err; }, 0);
   }
@@ -231,7 +233,7 @@ function loadAllQuickTests(quicktestsPaths, firstQTBranch, secondQTBranch){
       var firstsvg = div.append("div").attr("class", "first").append("svg").attr({width: svgWidth, height: svgHeight});
       var secondsvg = div.append("div").attr("class", "second").append("svg").attr({width: svgWidth, height: svgHeight});
       var data = result.makeData();
-
+      var keyfunction =
       runQuickTest(result, firstsvg, data, firstQTBranch);
       runQuickTest(result, secondsvg, data, secondQTBranch);
     });
@@ -381,3 +383,23 @@ var button = document.getElementById("render");
 button.onclick = initialize;
 
 })();
+
+function getKeyFunction(Plottable) {
+
+    if (Plottable.KeyFunctions) {
+        var dropdown = $("#keyFunction")[0];
+        if (!dropdown) {
+            return null;
+        }
+        var keyfunctionname = dropdown.options[dropdown.selectedIndex].value;
+        switch (keyfunctionname) {
+            case "noconstancy":
+                return Plottable.KeyFunctions.noConstancy;
+            case "index":
+                return Plottable.KeyFunctions.useIndex;
+            case "constancy":
+                return function (d) { return d.name };
+        }
+    }
+    return null;
+}

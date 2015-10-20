@@ -21,13 +21,13 @@ export module Animators {
       return super.animate(selection, attrToAppliedProjector, drawingTarget);
     }
     /**
-     * Gets the attributes for entering elements. These are overlaid over 
-     * the target atr and 
+     * Gets the attributes for entering elements. These are overlaid over
+     * the target atr and
      * @returns {number} The current start delay.
      */
     public startAttrs(): AttributeToAppliedProjector;
     /**
-     * Sets the attributes for entering elements. 
+     * Sets the attributes for entering elements.
      *
      * @param {startAttrs} A collection of attribuets applied to entering elements.
      * These are applied over the top of the attributes pass to the animate method
@@ -44,13 +44,13 @@ export module Animators {
       }
     }
     /**
-     * Gets the attributes for exiting elements. 
+     * Gets the attributes for exiting elements.
      * Exisitng elements will transition to these attribuest before being removed
      * @returns {AttributeToAppliedProjector} The current exiting attributes.
      */
     public endAttrs(): AttributeToAppliedProjector;
     /**
-     * Sets the attributes for entering elements. 
+     * Sets the attributes for entering elements.
      *
      * @param {endAttrs} A collection of attribuets applied to entering elements.
      * These are applied over the top of the attributes pass to the animate method

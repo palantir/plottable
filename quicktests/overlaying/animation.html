@@ -23,15 +23,11 @@
     <div class="control-knobs">
       <a id="expand-sidebar" onclick="toggleSidebar()" href="#">&#9776;</a>
       <label>Category:</label>
-      <select type="text" id="category" name="category">
-        <option value="all">All</option>
-        <option value="animations">Animations</option>
-        <option value="basic">Basic</option>
-        <option value="functional">Functional</option>
-        <option value="interactions">Interactions</option>
-        <option value="color">Color</option>
-        <option value="realistic">Realistic</option>
+       <select type="text" id="category" name="category">
+        <option value="scatterAnimations">Scatter Animations</option>
+        <option value="barAnimations">Bar Animations</option>
       </select>
+
       <input type="text" id="branch1" name="branch1" value="develop" placeholder="1st branch (default develop)">
       <input type="text" id="branch2" name="branch2" value="#local" placeholder="2nd branch (default #local)">
       <input id="render" type="submit" class="button" value="Compare!">
@@ -42,7 +38,13 @@
   </div>
 
   <div class="size-controls">
+
     <div class="control-knobs">
+        <select type="text" id="keyFunction" name="keyFunction">
+            <option value="constancy">Constancy</option>
+            <option value="noconstancy">No constancy</option>
+            <option value="index">Use index</option>
+        </select>
       <input type="text" id="width" name="width" value="500" placeholder="svg width">
 
       <input type="text" id="height" name="height" value="400" placeholder="svg height">
