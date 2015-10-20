@@ -77,7 +77,6 @@ describe("Plots", () => {
 
       it("draws area appropriately with non-constant y0 values", () => {
         areaPlot.y0((d) => d.y / 2);
-        areaPlot.renderTo(svg);
         areaPlot.datasets().forEach((dataset: Plottable.Dataset) => {
           let data = dataset.data();
           let areaPath = areaPlot.content().select(".area");
@@ -144,7 +143,7 @@ describe("Plots", () => {
         svg.remove();
       });
 
-      it("retains the area class. when setting css class via attr", () => {
+      it("retains the area class when setting css class via attr", () => {
         let cssClass = "pink";
         areaPlot.attr("class", cssClass);
         areaPlot.renderTo(svg);
