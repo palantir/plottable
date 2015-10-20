@@ -2192,7 +2192,7 @@ declare module Plottable {
              */
             private _measureTicks(axisWidth, axisHeight, scale, ticks);
             renderImmediately(): Category;
-            computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number): Axis<string>;
+            computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number): Category;
         }
     }
 }
@@ -2411,7 +2411,7 @@ declare module Plottable {
             private _writer;
             private _scale;
             private _orientation;
-            private _padding;
+            private _textPadding;
             private _formatter;
             private _expands;
             private _swatchContainer;
@@ -2531,6 +2531,14 @@ declare module Plottable {
              * Checks whether the specified Component is in the Table.
              */
             has(component: Component): boolean;
+            /**
+             * Returns the Component at the specified row and column index.
+             *
+             * @param {number} rowIndex
+             * @param {number} columnIndex
+             * @returns {Component} The Component at the specified position, or null if no Component is there.
+             */
+            componentAt(rowIndex: number, columnIndex: number): Component;
             /**
              * Adds a Component in the specified row and column position.
              *
