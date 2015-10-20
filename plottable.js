@@ -5639,13 +5639,14 @@ var Plottable;
                     height: 0
                 };
                 var padding;
-                var numSwatches = InterpolatedColorLegend._DEFAULT_NUM_SWATCHES;
+                var numSwatches;
                 if (this.expands() && textHeight > 0) {
                     var offset = this._isVertical() ? 0 : 2 * textPadding - text0Width - text1Width;
                     var fullLength = this._isVertical() ? this.height() : this.width();
                     numSwatches = Math.max(Math.floor((fullLength - offset) / textHeight), numSwatches);
                 }
                 if (this._isVertical()) {
+                    numSwatches = this.height();
                     var longestTextWidth = Math.max(text0Width, text1Width);
                     padding = (this.width() - longestTextWidth - 2 * this._textPadding) / 2;
                     swatchWidth = Math.max(this.width() - padding - 2 * textPadding - longestTextWidth, 0);
@@ -5674,9 +5675,10 @@ var Plottable;
                 }
                 else {
                     padding = Math.max(textPadding, (this.height() - textHeight) / 2);
-                    swatchWidth = Math.max(((this.width() - 4 * textPadding - text0Width - text1Width) / numSwatches), 0);
+                    numSwatches = this.width() - textPadding * 4 - text0Width - text1Width;
+                    swatchWidth = 1;
                     swatchHeight = Math.max((this.height() - 2 * padding), 0);
-                    swatchX = function (d, i) { return (text0Width + 2 * textPadding) + i * swatchWidth; };
+                    swatchX = function (d, i) { return Math.floor((text0Width + 2 * textPadding) + i); };
                     swatchY = function (d, i) { return padding; };
                     upperWriteOptions.xAlign = "right";
                     upperLabelShift.x = -textPadding;
@@ -5705,7 +5707,8 @@ var Plottable;
                     "width": swatchWidth,
                     "height": swatchHeight,
                     "x": swatchX,
-                    "y": swatchY
+                    "y": swatchY,
+                    "shape-rendering": "crispEdges"
                 });
                 return this;
             };

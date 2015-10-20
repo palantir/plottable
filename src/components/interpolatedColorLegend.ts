@@ -226,7 +226,7 @@ module Plottable.Components {
 
       let padding: number;
 
-      let numSwatches = InterpolatedColorLegend._DEFAULT_NUM_SWATCHES;
+      let numSwatches: number;
 
       if (this.expands() && textHeight > 0) {
         let offset = this._isVertical() ? 0 :  2 * textPadding - text0Width - text1Width;
@@ -235,6 +235,7 @@ module Plottable.Components {
       }
 
       if (this._isVertical()) {
+        numSwatches = this.height();
         let longestTextWidth = Math.max(text0Width, text1Width);
         padding = (this.width() - longestTextWidth - 2 * this._textPadding) / 2;
         swatchWidth = Math.max(this.width() - padding - 2 * textPadding - longestTextWidth, 0);
@@ -263,9 +264,10 @@ module Plottable.Components {
         boundingBoxAttr["height"] = numSwatches * swatchHeight;
       } else { // horizontal
         padding = Math.max(textPadding, (this.height() - textHeight) / 2);
-        swatchWidth = Math.max( ((this.width() - 4 * textPadding - text0Width - text1Width) / numSwatches), 0);
+        numSwatches = this.width() - textPadding * 4 - text0Width - text1Width;
+        swatchWidth = 1;
         swatchHeight = Math.max( (this.height() - 2 * padding), 0);
-        swatchX = (d: any, i: number) => (text0Width + 2 * textPadding) + i * swatchWidth;
+        swatchX = (d: any, i: number) => Math.floor((text0Width + 2 * textPadding) + i);
         swatchY = (d: any, i: number) => padding;
 
         upperWriteOptions.xAlign = "right";
@@ -300,7 +302,8 @@ module Plottable.Components {
         "width": swatchWidth,
         "height": swatchHeight,
         "x": swatchX,
-        "y": swatchY
+        "y": swatchY,
+        "shape-rendering": "crispEdges"
       });
       return this;
     }
