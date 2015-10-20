@@ -5640,18 +5640,13 @@ var Plottable;
                 };
                 var padding;
                 var numSwatches;
-                if (this.expands() && textHeight > 0) {
-                    var offset = this._isVertical() ? 0 : 2 * textPadding - text0Width - text1Width;
-                    var fullLength = this._isVertical() ? this.height() : this.width();
-                    numSwatches = Math.max(Math.floor((fullLength - offset) / textHeight), numSwatches);
-                }
                 if (this._isVertical()) {
-                    numSwatches = this.height();
+                    numSwatches = Math.floor(this.height());
                     var longestTextWidth = Math.max(text0Width, text1Width);
                     padding = (this.width() - longestTextWidth - 2 * this._textPadding) / 2;
                     swatchWidth = Math.max(this.width() - padding - 2 * textPadding - longestTextWidth, 0);
-                    swatchHeight = Math.max(this.height() / numSwatches, 0);
-                    swatchY = function (d, i) { return (numSwatches - (i + 1)) * swatchHeight; };
+                    swatchHeight = 1;
+                    swatchY = function (d, i) { return (_this.height() - (i + 1)); };
                     upperWriteOptions.yAlign = "top";
                     upperLabelShift.y = 0;
                     lowerWriteOptions.yAlign = "bottom";
@@ -5675,10 +5670,10 @@ var Plottable;
                 }
                 else {
                     padding = Math.max(textPadding, (this.height() - textHeight) / 2);
-                    numSwatches = this.width() - textPadding * 4 - text0Width - text1Width;
+                    numSwatches = Math.floor(this.width() - textPadding * 4 - text0Width - text1Width);
                     swatchWidth = 1;
                     swatchHeight = Math.max((this.height() - 2 * padding), 0);
-                    swatchX = function (d, i) { return Math.floor((text0Width + 2 * textPadding) + i); };
+                    swatchX = function (d, i) { return Math.floor(text0Width + 2 * textPadding) + i; };
                     swatchY = function (d, i) { return padding; };
                     upperWriteOptions.xAlign = "right";
                     upperLabelShift.x = -textPadding;

@@ -228,19 +228,13 @@ module Plottable.Components {
 
       let numSwatches: number;
 
-      if (this.expands() && textHeight > 0) {
-        let offset = this._isVertical() ? 0 :  2 * textPadding - text0Width - text1Width;
-        let fullLength = this._isVertical() ? this.height() : this.width();
-        numSwatches = Math.max(Math.floor((fullLength - offset) / textHeight), numSwatches);
-      }
-
       if (this._isVertical()) {
-        numSwatches = this.height();
+        numSwatches = Math.floor(this.height());
         let longestTextWidth = Math.max(text0Width, text1Width);
         padding = (this.width() - longestTextWidth - 2 * this._textPadding) / 2;
         swatchWidth = Math.max(this.width() - padding - 2 * textPadding - longestTextWidth, 0);
-        swatchHeight = Math.max(this.height() / numSwatches, 0);
-        swatchY = (d: any, i: number) => (numSwatches - (i + 1)) * swatchHeight;
+        swatchHeight = 1;
+        swatchY = (d: any, i: number) => (this.height() - (i + 1));
 
         upperWriteOptions.yAlign = "top";
         upperLabelShift.y = 0;
@@ -264,10 +258,10 @@ module Plottable.Components {
         boundingBoxAttr["height"] = numSwatches * swatchHeight;
       } else { // horizontal
         padding = Math.max(textPadding, (this.height() - textHeight) / 2);
-        numSwatches = this.width() - textPadding * 4 - text0Width - text1Width;
+        numSwatches = Math.floor(this.width() - textPadding * 4 - text0Width - text1Width);
         swatchWidth = 1;
         swatchHeight = Math.max( (this.height() - 2 * padding), 0);
-        swatchX = (d: any, i: number) => Math.floor((text0Width + 2 * textPadding) + i);
+        swatchX = (d: any, i: number) => Math.floor(text0Width + 2 * textPadding) + i;
         swatchY = (d: any, i: number) => padding;
 
         upperWriteOptions.xAlign = "right";

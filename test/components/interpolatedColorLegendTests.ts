@@ -41,7 +41,7 @@ describe("InterpolatedColorLegend", () => {
     assert.deepEqual(labelTexts, formattedDomainValues, "formatter is used to format label text");
   }
 
-  it("renders correctly (orientation: horizontal)", () => {
+  it("renders correctly orientation: horizontal", () => {
     let legend = new Plottable.Components.InterpolatedColorLegend(colorScale);
     legend.renderTo(svg);
 
@@ -60,7 +60,7 @@ describe("InterpolatedColorLegend", () => {
     svg.remove();
   });
 
-  it("renders correctly (orientation: right)", () => {
+  it("renders correctly when oriented right", () => {
     let legend = new Plottable.Components.InterpolatedColorLegend(colorScale);
     legend.orientation("right");
     legend.renderTo(svg);
@@ -81,7 +81,7 @@ describe("InterpolatedColorLegend", () => {
     svg.remove();
   });
 
-  it("renders correctly (orientation: left)", () => {
+  it("renders correctly when oriented left", () => {
     let legend = new Plottable.Components.InterpolatedColorLegend(colorScale);
     legend.orientation("left");
     legend.renderTo(svg);
@@ -171,7 +171,7 @@ describe("InterpolatedColorLegend", () => {
     svg.remove();
   });
 
-  it("renders correctly when width is constrained (orientation: right)", () => {
+  it("renders correctly when width is constrained when oriented right", () => {
     let constrainedWidth = 45;
     svg.attr("width", constrainedWidth);
     let legend = new Plottable.Components.InterpolatedColorLegend(colorScale);
@@ -181,7 +181,7 @@ describe("InterpolatedColorLegend", () => {
     svg.remove();
   });
 
-  it("renders correctly when height is constrained (orientation: right)", () => {
+  it("renders correctly when height is constrained when oriented right", () => {
     svg.attr("height", 100);
     let legend = new Plottable.Components.InterpolatedColorLegend(colorScale);
     legend.orientation("right");
