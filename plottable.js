@@ -5708,7 +5708,7 @@ var Plottable;
                     "y": swatchY
                 });
                 if (Plottable.Configs.ADD_TITLE_ELEMENTS) {
-                    rects.append("title").text(function (d) { return String(d); });
+                    rects.append("title").text(function (d) { return _this._formatter(d); });
                 }
                 return this;
             };

@@ -303,7 +303,7 @@ module Plottable.Components {
         "y": swatchY
       });
       if (Configs.ADD_TITLE_ELEMENTS) {
-        rects.append("title").text((d) => String(d));
+        rects.append("title").text((d) => this._formatter(d));
       }
       return this;
     }

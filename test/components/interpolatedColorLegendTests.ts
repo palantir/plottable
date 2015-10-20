@@ -417,15 +417,17 @@ describe("InterpolatedColorLegend", () => {
   });
 
   describe("title", () => {
-    it("adds title element to each swatch", () => {
+    it("adds formatted title element to each swatch", () => {
       let legend = new Plottable.Components.InterpolatedColorLegend(colorScale);
+      let formatter = Plottable.Formatters.percentage(2);
+      legend.formatter(formatter);
       legend.renderTo(svg);
 
       let entries = legend.content().selectAll("rect.swatch");
       assert.operator(entries.size(), ">=", 11, "there is at least 11 swatches");
       entries.each(function(d, i) {
         let swatch = d3.select(this);
-        assert.strictEqual(swatch.select("title").text(), String(d));
+        assert.strictEqual(swatch.select("title").text(), formatter(d));
       });
       svg.remove();
     });
