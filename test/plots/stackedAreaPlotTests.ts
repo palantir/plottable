@@ -35,13 +35,16 @@ describe("Plots", () => {
         assert.strictEqual(stackedAreas.size(),
           stackedAreaPlot.datasets().length, "same number of area selections as datasets");
 
-        stackedAreas.each(function(d, i) {
+        stackedAreas.each(function(data, i) {
           let stackedAreaSelection = d3.select(this);
           let areaVertices = TestMethods.areaVertices(stackedAreaSelection);
           let areaXs = areaVertices.map((areaVertex) => areaVertex.x).slice(0, -2);
-          d.forEach((datum: any, index: number) => {
-            assert.closeTo(areaXs[index], constantValue, window.Pixel_CloseTo_Requirement, "x pixel value correctly set");
+          data.forEach((datum: any, index: number) => {
+            assert.closeTo(areaXs[index], constantValue, window.Pixel_CloseTo_Requirement, `x pixel value at index ${i} correctly set`);
           });
+          let areaEdgeXs = areaVertices.map((areaVertex) => areaVertex.x).slice(-2).reverse();
+          assert.closeTo(areaEdgeXs[0], constantValue, window.Pixel_CloseTo_Requirement, "left edge x pixel value correctly set");
+          assert.closeTo(areaEdgeXs[1], constantValue, window.Pixel_CloseTo_Requirement, "right edge x pixel value correctly set");
         });
         stackedAreaPlot.destroy();
         svg.remove();
@@ -63,8 +66,13 @@ describe("Plots", () => {
           let areaXs = areaVertices.map((areaVertex) => areaVertex.x).slice(0, -2);
           data.forEach((datum: any, datumIndex: number) => {
             let x = accessor(datum, datumIndex, stackedAreaPlot.datasets()[i]);
-            assert.closeTo(areaXs[datumIndex], x, window.Pixel_CloseTo_Requirement, "x pixel value correctly set");
+            assert.closeTo(areaXs[datumIndex], x, window.Pixel_CloseTo_Requirement, `x pixel value at index ${i} correctly set`);
           });
+          let areaEdgeXs = areaVertices.map((areaVertex) => areaVertex.x).slice(-2).reverse();
+          assert.closeTo(areaEdgeXs[0], accessor(data[0], 0, stackedAreaPlot.datasets()[i]),
+            window.Pixel_CloseTo_Requirement, "left edge x pixel value correctly set");
+          assert.closeTo(areaEdgeXs[1], accessor(data[data.length - 1], data.length - 1, stackedAreaPlot.datasets()[i]),
+            window.Pixel_CloseTo_Requirement, "right edge x pixel value correctly set");
         });
         stackedAreaPlot.destroy();
         svg.remove();
@@ -81,14 +89,19 @@ describe("Plots", () => {
         assert.strictEqual(stackedAreas.size(),
           stackedAreaPlot.datasets().length, "same number of area selections as datasets");
 
-        stackedAreas.each(function(d, i) {
+        stackedAreas.each(function(data, i) {
           let stackedAreaSelection = d3.select(this);
           let areaVertices = TestMethods.areaVertices(stackedAreaSelection);
           let areaXs = areaVertices.map((areaVertex) => areaVertex.x).slice(0, -2);
-          d.forEach((datum: any, index: number) => {
+          data.forEach((datum: any, index: number) => {
             let x = linearScale.scale(accessor(datum));
-            assert.closeTo(areaXs[index], x, window.Pixel_CloseTo_Requirement, "x pixel value correctly set");
+            assert.closeTo(areaXs[index], x, window.Pixel_CloseTo_Requirement, `x pixel value at index ${i} correctly set`);
           });
+          let areaEdgeXs = areaVertices.map((areaVertex) => areaVertex.x).slice(-2).reverse();
+          assert.closeTo(areaEdgeXs[0], linearScale.scale(accessor(data[0])),
+            window.Pixel_CloseTo_Requirement, "left edge x pixel value correctly set");
+          assert.closeTo(areaEdgeXs[1], linearScale.scale(accessor(data[data.length - 1])),
+            window.Pixel_CloseTo_Requirement, "right edge x pixel value correctly set");
         });
         stackedAreaPlot.destroy();
         svg.remove();
@@ -161,14 +174,27 @@ describe("Plots", () => {
           stackedAreaPlot.datasets().length, "same number of area selections as datasets");
 
         let stackedYs = calculateStackedYs(accessor);
-        stackedAreas.each(function(data, index) {
+        stackedAreas.each(function(data, i) {
           let stackedAreaSelection = d3.select(this);
           let areaVertices = TestMethods.areaVertices(stackedAreaSelection);
           let areaYs = areaVertices.map((areaVertex) => areaVertex.y).slice(0, -2);
           data.forEach((datum: any, datumIndex: number) => {
-            let y = linearScale.scale(stackedYs[index][datumIndex]);
-            assert.closeTo(areaYs[datumIndex], y, window.Pixel_CloseTo_Requirement, "y pixel value correctly set");
+            let y = linearScale.scale(stackedYs[i][datumIndex]);
+            assert.closeTo(areaYs[datumIndex], y, window.Pixel_CloseTo_Requirement, `y pixel value at index ${i} correctly set`);
           });
+          let areaEdgeYs = areaVertices.map((areaVertex) => areaVertex.y).slice(-2).reverse();
+          if (i === 0) {
+            assert.closeTo(areaEdgeYs[0], linearScale.scale(0),
+              window.Pixel_CloseTo_Requirement, "left edge y pixel value correctly set");
+            assert.closeTo(areaEdgeYs[1], linearScale.scale(0),
+              window.Pixel_CloseTo_Requirement, "right edge y pixel value correctly set");
+          } else {
+            assert.closeTo(areaEdgeYs[0], linearScale.scale(stackedYs[i - 1][0]),
+              window.Pixel_CloseTo_Requirement, "left edge y pixel value correctly set");
+            assert.closeTo(areaEdgeYs[1], linearScale.scale(stackedYs[i - 1][data.length - 1]),
+              window.Pixel_CloseTo_Requirement, "right edge y pixel value correctly set");
+          }
+
         });
         stackedAreaPlot.destroy();
         svg.remove();
