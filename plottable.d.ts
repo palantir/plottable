@@ -1587,7 +1587,20 @@ declare module Plottable {
          * @return {d3.Selection} background selection for the Component
          */
         background(): d3.Selection<void>;
+        /**
+         * Adds a callback to be called on rendering the Component.
+         *
+         * @param {ComponentCallback} callback
+         * @return {Component}
+         */
         onRender(callback: ComponentCallback): Component;
+        /**
+         * Removes a callback that would be called on rendering the Component.
+         * The callback is identified by reference equality.
+         *
+         * @param {ComponentCallback} callback
+         * @return {Component}
+         */
         offRender(callback: ComponentCallback): Component;
     }
 }

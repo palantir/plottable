@@ -600,11 +600,24 @@ export class Component {
     return this._backgroundContainer;
   }
 
+  /**
+   * Adds a callback to be called on rendering the Component.
+   *
+   * @param {ComponentCallback} callback
+   * @return {Component}
+   */
   public onRender(callback: ComponentCallback) {
     this._onRenderCallbacks.add(callback);
     return this;
   }
 
+  /**
+   * Removes a callback that would be called on rendering the Component.
+   * The callback is identified by reference equality.
+   *
+   * @param {ComponentCallback} callback
+   * @return {Component}
+   */
   public offRender(callback: ComponentCallback) {
     this._onRenderCallbacks.delete(callback);
     return this;

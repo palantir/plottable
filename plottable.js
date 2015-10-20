@@ -3316,10 +3316,23 @@ var Plottable;
         Component.prototype.background = function () {
             return this._backgroundContainer;
         };
+        /**
+         * Adds a callback to be called on rendering the Component.
+         *
+         * @param {ComponentCallback} callback
+         * @return {Component}
+         */
         Component.prototype.onRender = function (callback) {
             this._onRenderCallbacks.add(callback);
             return this;
         };
+        /**
+         * Removes a callback that would be called on rendering the Component.
+         * The callback is identified by reference equality.
+         *
+         * @param {ComponentCallback} callback
+         * @return {Component}
+         */
         Component.prototype.offRender = function (callback) {
             this._onRenderCallbacks.delete(callback);
             return this;
