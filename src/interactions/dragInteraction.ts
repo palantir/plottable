@@ -2,7 +2,9 @@ module Plottable {
 
 export type DragCallback = (start: Point, end: Point) => void;
 
-export module Interactions {
+}
+
+module Plottable.Interactions {
   export class Drag extends Interaction {
     private _dragging = false;
     private _constrainedToComponent = true;
@@ -184,5 +186,4 @@ export module Interactions {
       return this;
     }
   }
-}
 }

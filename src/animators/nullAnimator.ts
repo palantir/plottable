@@ -1,5 +1,4 @@
-module Plottable {
-export module Animators {
+module Plottable.Animators {
 
    /**
     * An animator implementation with no animation. The attributes are
@@ -24,5 +23,4 @@ export module Animators {
       }
     }
   }
-}
 }

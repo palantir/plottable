@@ -1,5 +1,4 @@
-module Plottable {
-export module Drawers {
+module Plottable.Drawers {
 
   export class ArcOutline extends Drawer {
 
@@ -14,5 +13,4 @@ export module Drawers {
       selection.style("fill", "none");
     }
   }
-}
 }

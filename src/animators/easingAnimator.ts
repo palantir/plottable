@@ -1,5 +1,4 @@
-module Plottable {
-export module Animators {
+module Plottable.Animators {
 
   /**
    * An Animator with easing and configurable durations and delays.
@@ -205,5 +204,4 @@ export module Animators {
       return Math.min(this.stepDelay(), maxPossibleIterativeDelay);
     }
   }
-}
 }
