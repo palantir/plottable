@@ -1,5 +1,4 @@
-﻿module Plottable {
-export module Animators {
+﻿module Plottable.Animators {
 
   /**
    * Execute a set of animators in sequence.
@@ -20,7 +19,7 @@ export module Animators {
      */
     public frames(): Animator[];
     /**
-     * Sets the attributes for entering elements. 
+     * Sets the attributes for entering elements.
      *
      * @param {frame} A collection of attribuets applied to entering elements.
      * These are applied over the top of the attributes pass to the animate method
@@ -37,5 +36,4 @@ export module Animators {
       }
     }
   }
-}
 }

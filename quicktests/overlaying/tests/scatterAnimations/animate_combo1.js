@@ -24,7 +24,7 @@ function run(svg, data, Plottable, keyFunction) {
         var ds = new Plottable.Dataset(data.wc2014);
         if (ds.keyFunction) {
             ds.keyFunction(keyFunction);
-        };
+        }
         var attrAnimator = new Plottable.Animators.Attr();
         //var proj = { height: function () { return 0; } };
         // this is a circle size 16: M0,8A8,8 0 1,1 0,-8A8,8 0 1,1 0,8Z

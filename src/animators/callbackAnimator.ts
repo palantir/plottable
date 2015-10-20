@@ -1,5 +1,4 @@
-﻿module Plottable {
-export module Animators {
+﻿module Plottable.Animators {
   export type AnimateCallback = (selection: d3.Selection<any>
     , attrToAppliedProjector: AttributeToAppliedProjector
     , drawingTarget?: Drawers.DrawingTarget
@@ -24,12 +23,12 @@ export module Animators {
         return this.callback().call(this, selection, attrToAppliedProjector, drawingTarget, drawer);
     }
     /**
-     * Gets the callback animate function. 
+     * Gets the callback animate function.
      * @returns {Callback} The calling Callback Animator.
      */
     public callback(): AnimateCallback;
     /**
-     * Sets the attributes for entering elements. 
+     * Sets the attributes for entering elements.
      *
      * @param {callback} a function implementing Animator.animate
      * @returns {Callback} The calling Callback Animator.
@@ -44,13 +43,13 @@ export module Animators {
       }
     }
     /**
-     * Gets an inner animator. 
-     * callback functions may use this animator 
+     * Gets an inner animator.
+     * callback functions may use this animator
      * @returns {innerAnimator} The current innerAnimator.
      */
     public innerAnimator(): Animator;
     /**
-     * Sets the attributes for entering elements. 
+     * Sets the attributes for entering elements.
      *
      * @param {innerAnimator} a function implementing Animator.animate
      * @returns {innerAnimator} The calling innerAnimator Animator.
@@ -77,5 +76,4 @@ export module Animators {
       }
     }
   }
-}
 }

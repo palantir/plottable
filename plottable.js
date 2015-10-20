@@ -10546,7 +10546,7 @@ var Plottable;
                 var updateStageDuration = (drawingTarget.update.size() > 0 ? stageDuration * 2 : 0);
                 var enterStageDuration = (drawingTarget.enter.size() > 0 ? stageDuration : 0);
                 var squeezer = Plottable.Animators.EasingFunctions.squEase("linear-in-out", 0, .5);
-                // first kill the exiting  
+                // first deal with the exiting elements
                 drawingTarget.exit = this.getTransition(drawingTarget.exit, exitStageDuration, undefined, squeezer)
                     .attr(proj)
                     .remove();

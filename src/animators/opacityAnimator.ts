@@ -1,5 +1,4 @@
-module Plottable {
-export module Animators {
+module Plottable.Animators {
   /**
    * Fade in  fade out the entering  exiting elements by transitioning opacity
    */
@@ -61,5 +60,4 @@ export module Animators {
       }
     }
   }
-}
 }

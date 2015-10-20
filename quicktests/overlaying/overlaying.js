@@ -233,7 +233,7 @@ function loadAllQuickTests(quicktestsPaths, firstQTBranch, secondQTBranch){
       var firstsvg = div.append("div").attr("class", "first").append("svg").attr({width: svgWidth, height: svgHeight});
       var secondsvg = div.append("div").attr("class", "second").append("svg").attr({width: svgWidth, height: svgHeight});
       var data = result.makeData();
-      var keyfunction =
+
       runQuickTest(result, firstsvg, data, firstQTBranch);
       runQuickTest(result, secondsvg, data, secondQTBranch);
     });
@@ -385,7 +385,7 @@ button.onclick = initialize;
 })();
 
 function getKeyFunction(Plottable) {
-
+    "use strict";
     if (Plottable.KeyFunctions) {
         var dropdown = $("#keyFunction")[0];
         if (!dropdown) {
@@ -398,7 +398,7 @@ function getKeyFunction(Plottable) {
             case "index":
                 return Plottable.KeyFunctions.useIndex;
             case "constancy":
-                return function (d) { return d.name };
+                return function (d) { return d.name; };
         }
     }
     return null;

@@ -1,6 +1,4 @@
-module Plottable {
-export module Animators {
-
+module Plottable.Animators {
   /**
    * Base class for animators. Equivalent behaviour to Easing animator
    * Provides helper functions for subclassed animators
@@ -311,5 +309,4 @@ export module Animators {
       return Math.min(this.stepDelay(), maxPossibleIterativeDelay);
     }
   }
-}
 }

@@ -1,6 +1,4 @@
-﻿module Plottable {
-export module Animators {
-
+﻿module Plottable.Animators {
   /**
    * Base for animators that animate specific attributes, such as Opacity, height... .
    */
@@ -24,7 +22,7 @@ export module Animators {
       let enterStageDuration: number = (drawingTarget.enter.size() > 0 ? stageDuration : 0);
 
       let squeezer = Plottable.Animators.EasingFunctions.squEase("linear-in-out", 0, .5);
-      // first kill the exiting  
+      // first deal with the exiting elements
       drawingTarget.exit = this.getTransition(drawingTarget.exit, exitStageDuration, undefined, squeezer)
         .attr(proj)
         .remove();
@@ -57,5 +55,4 @@ export module Animators {
       return drawingTarget.merge;
     }
   }
-}
 }

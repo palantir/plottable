@@ -14,35 +14,34 @@ function makeRandomData(numPoints, scaleFactor) {
 }
 // from http://bost.ocks.org/mike/shuffle/
 function shuffle(array) {
-    var m = array.length, t, i;
+  "use strict";
+  var m = array.length, t, i;
+  // While there remain elements to shuffle…
+  while (m) {
+    // Pick a remaining element…
+    i = Math.floor(Math.random() * m--);
 
-    // While there remain elements to shuffle…
-    while (m) {
-
-        // Pick a remaining element…
-        i = Math.floor(Math.random() * m--);
-
-        // And swap it with the current element.
-        t = array[m];
-        array[m] = array[i];
-        array[i] = t;
-    }
-
-    return array;
+    // And swap it with the current element.
+    t = array[m];
+    array[m] = array[i];
+    array[i] = t;
+  }
+  return array;
 }
+
 function makeRandomNamedData(numPoints, scaleFactor, namerange) {
     "use strict";
     if (namerange === undefined) {
         namerange = [];
         for(var i = 1; i <= 26; i++) {
-            namerange.push(String.fromCharCode(64+i))
+            namerange.push(String.fromCharCode(64 + i));
         }
     }
     var data = makeRandomData(numPoints, scaleFactor);
-    var namerange = shuffle(namerange);
+    namerange = shuffle(namerange);
     var out = [];
-    for (var i = 0; i < numPoints; i++) {
-        var x = { name: namerange[i], x: data[i].x, y: data[i].y }
+    for (i = 0; i < numPoints; i++) {
+        var x = { name: namerange[i], x: data[i].x, y: data[i].y };
         out.push(x);
     }
     return out;
