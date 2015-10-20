@@ -1,5 +1,4 @@
-module Plottable {
-export module Utils {
+module Plottable.Utils {
   /**
    * Shim for ES6 map.
    * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map
@@ -88,5 +87,4 @@ export module Utils {
       return false;
     }
   }
-}
 }

@@ -1,5 +1,4 @@
-module Plottable {
-export module Plots {
+module Plottable.Plots {
   export class Waterfall<X, Y> extends Bar<X, number> {
     private static _BAR_DECLINE_CLASS = "waterfall-decline";
     private static _BAR_GROWTH_CLASS = "waterfall-growth";
@@ -221,5 +220,4 @@ export module Plots {
       }
     }
   }
-}
 }
