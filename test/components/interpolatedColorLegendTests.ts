@@ -283,6 +283,36 @@ describe("InterpolatedColorLegend", () => {
     svg.remove();
   });
 
+  it("has the same number of swatches as its height, when vertical", () => {
+    let legend = new Plottable.Components.InterpolatedColorLegend(colorScale);
+    legend.renderTo(svg);
+    legend.orientation("left").expands(false);
+    let numSwatches = legend.content().selectAll(".swatch").size();
+    let swatchContainer = (<any> legend)._element.select(".swatch-container");
+    let swatchContainerHeight = (<Element> swatchContainer.node()).getBoundingClientRect().height;
+    legend.expands(true);
+    let newNumSwatches = legend.content().selectAll(".swatch").size();
+    let swatchContainerExpandedHeight = (<Element> swatchContainer.node()).getBoundingClientRect().height;
+    assert.closeTo(numSwatches, swatchContainerHeight, 1, "non-expanded left legend has one swatch per pixel");
+    assert.closeTo(newNumSwatches, swatchContainerExpandedHeight, 1, "expanded left legend has one swatch per pixel");
+    svg.remove();
+  });
+
+  it("has the same number of swatches as its width, when horizontal", () => {
+    let legend = new Plottable.Components.InterpolatedColorLegend(colorScale);
+    legend.renderTo(svg);
+    legend.orientation("horizontal").expands(false);
+    let numSwatches = legend.content().selectAll(".swatch").size();
+    let swatchContainer = (<any> legend)._element.select(".swatch-container");
+    let swatchContainerWidth = (<Element> swatchContainer.node()).getBoundingClientRect().width;
+    legend.expands(true);
+    let newNumSwatches = legend.content().selectAll(".swatch").size();
+    let swatchContainerExpandedWidth = (<Element> swatchContainer.node()).getBoundingClientRect().width;
+    assert.closeTo(numSwatches, swatchContainerWidth, 1, "non-expanded left legend has one swatch per pixel");
+    assert.closeTo(newNumSwatches, swatchContainerExpandedWidth, 1, "expanded left legend has one swatch per pixel");
+    svg.remove();
+  });
+
   it("does not have padding on ends of vertical legends", () => {
     let legend = new Plottable.Components.InterpolatedColorLegend(colorScale);
     legend.renderTo(svg);
