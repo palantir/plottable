@@ -5761,7 +5761,7 @@ var Plottable;
                 this._swatchBoundingBox.attr(boundingBoxAttr);
                 var ticks = this._generateTicks(numSwatches);
                 var swatches = this._swatchContainer.selectAll("rect.swatch").data(ticks);
-                swatches.enter().append("rect").classed("swatch", true);
+                var rects = swatches.enter().append("rect").classed("swatch", true);
                 swatches.exit().remove();
                 swatches.attr({
                     "fill": function (d, i) { return _this._scale.scale(d); },
@@ -5770,6 +5770,9 @@ var Plottable;
                     "x": swatchX,
                     "y": swatchY
                 });
+                if (Plottable.Configs.ADD_TITLE_ELEMENTS) {
+                    rects.append("title").text(function (d) { return _this._formatter(d); });
+                }
                 return this;
             };
             InterpolatedColorLegend._DEFAULT_NUM_SWATCHES = 11;
