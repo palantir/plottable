@@ -12,4 +12,5 @@ env:
     - secure: D/VxpQ0fvxqD75Qgwa0HcxbQYNsIv+D7RJ+khiAwNlsluY9VKH84O0hmCQ1ijHKrUTGbSEqAkbNS+D0hvngmSfLCgsNhZyDVTZ0s2kzjV2v5jXrvppr7TmBsCUcp6+5CEgoL/0UL3w+Me3bq9WioMDD0AkmAwAdR/B2LJojEsEY=
     - secure: nheXBjAUmb2i5zjf39xYKs3LJH17YzlHWSYdRbe35LO3zHcp55qsgzx0ycKMoe84PLRJHdzHmMFWUOMj+JsOirhHngGdXXxDsqDv+2LKzryYxOvEdHOBDmGsuk17gbabcLAI/WC2JOkGA7GvK03xSdCREPQJhht/a6i3jSXgK+Y=
 before_script:
+  - npm install -g bower
   - bower install
