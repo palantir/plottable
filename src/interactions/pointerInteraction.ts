@@ -1,10 +1,10 @@
-///<reference path="../reference.ts" />
-
 module Plottable {
 
 export type PointerCallback = (point: Point) => void;
 
-export module Interactions {
+}
+
+module Plottable.Interactions {
   export class Pointer extends Interaction {
     private _mouseDispatcher: Dispatchers.Mouse;
     private _touchDispatcher: Dispatchers.Touch;
@@ -126,5 +126,4 @@ export module Interactions {
       return this;
     }
   }
-}
 }

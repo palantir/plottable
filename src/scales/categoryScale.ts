@@ -1,7 +1,4 @@
-///<reference path="../reference.ts" />
-
-module Plottable {
-export module Scales {
+module Plottable.Scales {
   export class Category extends Scale<string, number> {
     private _d3Scale: d3.scale.Ordinal<string, number>;
     private _range = [0, 1];
@@ -160,5 +157,4 @@ export module Scales {
       this._d3Scale.range(values);
     }
   }
-}
 }

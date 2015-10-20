@@ -1,7 +1,4 @@
-///<reference path="../reference.ts" />
-
-module Plottable {
-export module Dispatchers {
+module Plottable.Dispatchers {
   export type TouchCallback = (ids: number[], idToPoint: { [id: number]: Point; }, event: TouchEvent) => void;
 
   export class Touch extends Dispatcher {
@@ -173,5 +170,4 @@ export module Dispatchers {
       return this._translator.insideSVG(event);
     }
   }
-}
 }

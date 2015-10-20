@@ -1,5 +1,3 @@
-///<reference path="../reference.ts" />
-
 module Plottable {
 
 export type Formatter = (d: any) => string;
@@ -14,8 +12,9 @@ export type Formatter = (d: any) => string;
  *
  */
 export var MILLISECONDS_IN_ONE_DAY = 24 * 60 * 60 * 1000;
+}
 
-export module Formatters {
+module Plottable.Formatters {
 
   interface TimeFilterFormat {
     format: string;
@@ -272,5 +271,4 @@ export module Formatters {
     }
   }
 
-}
 }

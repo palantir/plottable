@@ -1,7 +1,4 @@
-///<reference path="../reference.ts" />
-
-module Plottable {
-export module Drawers {
+module Plottable.Drawers {
   export class Rectangle extends Drawer {
 
     constructor(dataset: Dataset) {
@@ -10,5 +7,4 @@ export module Drawers {
     }
 
   }
-}
 }

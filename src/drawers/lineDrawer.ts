@@ -1,7 +1,4 @@
-///<reference path="../reference.ts" />
-
-module Plottable {
-export module Drawers {
+module Plottable.Drawers {
   export class Line extends Drawer {
 
     constructor(dataset: Dataset) {
@@ -19,5 +16,4 @@ export module Drawers {
       return d3.select(this.selection()[0][0]);
     }
   }
-}
 }

@@ -1,7 +1,7 @@
 {
   "name": "plottable",
   "description": "A modular charting library built on D3",
-  "version": "1.14.0",
+  "version": "1.16.0",
   "main": ["plottable.js", "plottable.css"],
   "typescript": {
     "definition": "plottable.d.ts"
@@ -44,6 +44,7 @@
     "mocha": "2.2.5",
     "jQuery": "2.1.0",
     "jquery.simulate": "1.2.0",
-    "requirejs": "2.1.18"
+    "requirejs": "2.1.18",
+    "sinon": "1.16.1"
   }
 }

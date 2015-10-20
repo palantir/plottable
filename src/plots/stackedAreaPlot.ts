@@ -1,7 +1,4 @@
-///<reference path="../reference.ts" />
-
-module Plottable {
-export module Plots {
+module Plottable.Plots {
   export class StackedArea<X> extends Area<X> {
     private _stackingResult: Utils.Stacking.StackingResult;
     private _stackedExtent: number[];
@@ -64,6 +61,27 @@ export module Plots {
 
       this._updateStackExtentsAndOffsets();
 
+      return this;
+    }
+
+    /**
+     * Gets if downsampling is enabled
+     *
+     * When downsampling is enabled, two consecutive lines with the same slope will be merged to one line.
+     */
+    public downsamplingEnabled(): boolean;
+    /**
+     * Sets if downsampling is enabled
+     *
+     * For now, downsampling is always disabled in stacked area plot
+     * @returns {Plots.StackedArea} The calling Plots.StackedArea
+     */
+    public downsamplingEnabled(downsampling: boolean): Plots.Line<X>;
+    public downsamplingEnabled(downsampling?: boolean): any {
+       if (downsampling == null) {
+         return super.downsamplingEnabled();
+       }
+      Utils.Window.warn("Warning: Stacked Area Plot does not support downsampling");
       return this;
     }
 
@@ -182,5 +200,4 @@ export module Plots {
     }
 
   }
-}
 }

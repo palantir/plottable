@@ -1,7 +1,4 @@
-///<reference path="../reference.ts" />
-
-module Plottable {
-export module Components {
+module Plottable.Components {
   export class Legend extends Component {
     /**
      * The css class applied to each legend row
@@ -381,5 +378,4 @@ export module Components {
       return true;
     }
   }
-}
 }

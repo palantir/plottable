@@ -1,7 +1,4 @@
-///<reference path="../reference.ts" />
-
-module Plottable {
-export module Utils {
+module Plottable.Utils {
   /**
    * Shim for ES6 set.
    * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Set
@@ -72,5 +69,4 @@ export module Utils {
     }
 
   }
-}
 }

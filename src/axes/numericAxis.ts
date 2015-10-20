@@ -1,7 +1,4 @@
-///<reference path="../reference.ts" />
-
-module Plottable {
-export module Axes {
+module Plottable.Axes {
   export class Numeric extends Axis<number> {
 
     private _tickLabelPositioning = "center";
@@ -394,5 +391,4 @@ export module Axes {
     }
 
   }
-}
 }

@@ -1,7 +1,4 @@
-///<reference path="../reference.ts" />
-
-module Plottable {
-export module Animators {
+module Plottable.Animators {
 
   /**
    * An Animator with easing and configurable durations and delays.
@@ -135,13 +132,13 @@ export module Animators {
      * If the animation time would exceed the specified time, the duration of each step
      * and the delay between each step will be reduced until the animation fits within
      * the specified time.
-     * 
+     *
      * @returns {number} The current maximum total animation duration.
      */
     public maxTotalDuration(): number;
     /**
      * Sets the maximum total animation duration constraint in miliseconds.
-     * 
+     *
      * If the animation time would exceed the specified time, the duration of each step
      * and the delay between each step will be reduced until the animation fits within
      * the specified time.
@@ -191,5 +188,4 @@ export module Animators {
       return Math.min(this.stepDelay(), maxPossibleIterativeDelay);
     }
   }
-}
 }

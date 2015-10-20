@@ -1,7 +1,4 @@
-///<reference path="../reference.ts" />
-
-module Plottable {
-export module Dispatchers {
+module Plottable.Dispatchers {
   export type MouseCallback = (p: Point, event: MouseEvent) => void;
 
   export class Mouse extends Dispatcher {
@@ -204,5 +201,4 @@ export module Dispatchers {
       return this._lastMousePosition;
     }
   }
-}
 }

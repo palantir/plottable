@@ -1,7 +1,4 @@
-///<reference path="../reference.ts" />
-
-module Plottable {
-export module Components {
+module Plottable.Components {
   enum PropertyMode { VALUE, PIXEL };
   export class GuideLineLayer<D> extends Component {
     public static ORIENTATION_VERTICAL = "vertical";
@@ -192,5 +189,4 @@ export module Components {
       }
     }
   }
-}
 }

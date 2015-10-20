@@ -1,7 +1,4 @@
-///<reference path="../reference.ts" />
-
-module Plottable {
-export module Interactions {
+module Plottable.Interactions {
   enum ClickState {NotClicked, SingleClicked, DoubleClicked};
   export class DoubleClick extends Interaction {
 
@@ -106,5 +103,4 @@ export module Interactions {
       return this;
     }
   }
-}
 }
