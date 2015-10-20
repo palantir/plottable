@@ -210,7 +210,7 @@ describe("NumericAxis", () => {
       let interval = getClientRectCenter(visibleTickLabelRects[1]) - getClientRectCenter(visibleTickLabelRects[0]);
       d3.pairs(visibleTickLabelRects).forEach((rects, i) => {
         assert.closeTo(getClientRectCenter(rects[1]) - getClientRectCenter(rects[0]),
-          interval, 0.5, `tick label pair ${i} is spaced the same as the first pair`);
+          interval, window.Pixel_CloseTo_Requirement, `tick label pair ${i} is spaced the same as the first pair`);
       });
 
       svg.remove();
