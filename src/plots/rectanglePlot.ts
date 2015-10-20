@@ -1,5 +1,4 @@
-module Plottable {
-export module Plots {
+module Plottable.Plots {
   export class Rectangle<X, Y> extends XYPlot<X, Y> {
     private static _X2_KEY = "x2";
     private static _Y2_KEY = "y2";
@@ -481,5 +480,4 @@ export module Plots {
       return false;
     }
   }
-}
 }

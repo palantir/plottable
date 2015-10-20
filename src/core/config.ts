@@ -1,5 +1,4 @@
-module Plottable {
-export module Configs {
+module Plottable.Configs {
   /**
    * Specifies if Plottable should show warnings.
    */
@@ -9,5 +8,4 @@ export module Configs {
    * Specifies if Plottable should add <title> elements to text.
    */
   export var ADD_TITLE_ELEMENTS = true;
-}
 }

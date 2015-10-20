@@ -350,8 +350,8 @@ module TestMethods {
     assert.include(receivedWarning, warningMessage, assertMessage);
   }
 
-  export function assertLinePathEqualToDataPoints(path: string, data: {x: number, y: number}[],
-    xScale: Plottable.Scales.Linear, yScale: Plottable.Scales.Linear) {
+  export function assertPathEqualToDataPoints(path: string, data: {x: number, y: number}[],
+    xScale: Plottable.QuantitativeScale<any>, yScale: Plottable.QuantitativeScale<any>) {
     let EPSILON = 0.0001;
     let lineEdges = TestMethods.normalizePath(path).match(/([MmLl](\-?\d+\.?\d*)(,|\s)(-?\d+\.?\d*)|([HhVv](\-?\d+\.?\d*)))/g);
     assert.strictEqual(lineEdges.length, data.length, "correct number of edges drawn");
