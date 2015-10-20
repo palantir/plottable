@@ -23,105 +23,57 @@ describe("NumericAxis", () => {
     });
   }
 
-  describe("setting the position of the tick labels when bottom oriented", () => {
+  const horizontalOrientations = ["bottom", "top"];
+  const verticalOrientations = ["left", "right"];
+  const orientations = horizontalOrientations.concat(verticalOrientations);
 
-    let axis: Plottable.Axes.Numeric;
+  const isHorizontalOrientation = (orientation: string) => horizontalOrientations.indexOf(orientation) >= 0;
 
-    beforeEach(() => {
-      let scale = new Plottable.Scales.Linear();
-      axis = new Plottable.Axes.Numeric(scale, "bottom");
-    });
-
-    it("throws an error when setting an invalid position", () => {
-      assert.throws(() => axis.tickLabelPosition("top"), "horizontal");
-      assert.throws(() => axis.tickLabelPosition("bottom"), "horizontal");
-    });
-
-    it("draws tick labels left of the corresponding mark if specified", () => {
-      let svg = TestMethods.generateSVG();
-      axis.tickLabelPosition("left");
-      axis.renderTo(svg);
-
-      let tickLabels = axis.content().selectAll(`.${Plottable.Axis.TICK_LABEL_CLASS}`);
-      let tickMarks = axis.content().selectAll(`.${Plottable.Axis.TICK_MARK_CLASS}`);
-      assert.operator(tickLabels.size(), ">=", 2, "at least two tick labels were drawn");
-      assert.strictEqual(tickLabels.size(), tickMarks.size(), "there is one label per mark");
-
-      tickLabels.each(function(d, i) {
-        let tickLabelClientRect = this.getBoundingClientRect();
-        let tickMarkClientRect = (<Element> tickMarks[0][i]).getBoundingClientRect();
-        assert.operator(tickLabelClientRect.left, "<=", tickMarkClientRect.right, `tick label ${i} is to left of mark`);
+  horizontalOrientations.forEach((orientation) => {
+    const verticalTickLabelPositions = ["top", "bottom"];
+    it(`throws an error when setting an invalid position on orientation ${orientation}`, () => {
+      const scale = new Plottable.Scales.Linear();
+      const axis = new Plottable.Axes.Numeric(scale, orientation);
+      verticalTickLabelPositions.forEach((position) => {
+        (<any> assert).throws(() => axis.tickLabelPosition(position), "horizontal", "cannot set position");
       });
-      svg.remove();
-    });
-
-    it("draws tick labels right of the corresponding mark if specified", () => {
-      let svg = TestMethods.generateSVG();
-      axis.tickLabelPosition("right");
-      axis.renderTo(svg);
-
-      let tickLabels = axis.content().selectAll(`.${Plottable.Axis.TICK_LABEL_CLASS}`);
-      let tickMarks = axis.content().selectAll(`.${Plottable.Axis.TICK_MARK_CLASS}`);
-      assert.operator(tickLabels.size(), ">=", 2, "at least two tick labels were drawn");
-      assert.strictEqual(tickLabels.size(), tickMarks.size(), "there is one label per mark");
-
-      tickLabels.each(function(d, i) {
-        let tickLabelClientRect = this.getBoundingClientRect();
-        let tickMarkClientRect = (<Element> tickMarks[0][i]).getBoundingClientRect();
-        assert.operator(tickMarkClientRect.right, "<=", tickLabelClientRect.left, `tick label ${i} is to right of mark`);
-      });
-      svg.remove();
     });
   });
 
-  describe("setting the position of the tick labels when left oriented", () => {
-
-    let axis: Plottable.Axes.Numeric;
-
-    beforeEach(() => {
-      let scale = new Plottable.Scales.Linear();
-      axis = new Plottable.Axes.Numeric(scale, "left");
-    });
-
-    it("throws an error when setting an invalid position", () => {
-      assert.throws(() => axis.tickLabelPosition("left"), "vertical");
-      assert.throws(() => axis.tickLabelPosition("right"), "vertical");
-    });
-
-    it("draws tick labels top of the corresponding mark if specified", () => {
-      let svg = TestMethods.generateSVG();
-      axis.tickLabelPosition("top");
-      axis.renderTo(svg);
-
-      let tickLabels = axis.content().selectAll(`.${Plottable.Axis.TICK_LABEL_CLASS}`);
-      let tickMarks = axis.content().selectAll(`.${Plottable.Axis.TICK_MARK_CLASS}`);
-      assert.operator(tickLabels.size(), ">=", 2, "at least two tick labels were drawn");
-      assert.strictEqual(tickLabels.size(), tickMarks.size(), "there is one label per mark");
-
-      tickLabels.each(function(d, i) {
-        let tickLabelClientRect = this.getBoundingClientRect();
-        let tickMarkClientRect = (<Element> tickMarks[0][i]).getBoundingClientRect();
-        assert.operator(tickLabelClientRect.bottom, "<=", tickMarkClientRect.top, `tick label ${i} is above mark`);
+  verticalOrientations.forEach((orientation) => {
+    const horizontalTickLabelPositions = ["left", "right"];
+    it(`throws an error when setting an invalid position on orientation ${orientation}`, () => {
+      const scale = new Plottable.Scales.Linear();
+      const axis = new Plottable.Axes.Numeric(scale, orientation);
+      horizontalTickLabelPositions.forEach((position) => {
+        (<any> assert).throws(() => axis.tickLabelPosition(position), "vertical", "cannot set position");
       });
-      svg.remove();
     });
+  });
 
-    it("draws tick labels bottom of the corresponding mark if specified", () => {
-      let svg = TestMethods.generateSVG();
-      axis.tickLabelPosition("bottom");
-      axis.renderTo(svg);
+  orientations.forEach((orientation) => {
+    const verticalTickLabelPositions = ["top", "bottom"];
+    const horizontalTickLabelPositions = ["left", "right"];
 
-      let tickLabels = axis.content().selectAll(`.${Plottable.Axis.TICK_LABEL_CLASS}`);
-      let tickMarks = axis.content().selectAll(`.${Plottable.Axis.TICK_MARK_CLASS}`);
-      assert.operator(tickLabels.size(), ">=", 2, "at least two tick labels were drawn");
-      assert.strictEqual(tickLabels.size(), tickMarks.size(), "there is one label per mark");
+    const labelPositions = isHorizontalOrientation(orientation) ? horizontalTickLabelPositions : verticalTickLabelPositions;
+    labelPositions.forEach((labelPosition) => {
+      it(`draws tick labels ${labelPosition} of the corresponding mark if specified for orientation ${orientation}`, () => {
+        const scale = new Plottable.Scales.Linear();
+        const axis = new Plottable.Axes.Numeric(scale, orientation);
+        const svg = TestMethods.generateSVG();
+        axis.tickLabelPosition(labelPosition);
+        axis.renderTo(svg);
 
-      tickLabels.each(function(d, i) {
-        let tickLabelClientRect = this.getBoundingClientRect();
-        let tickMarkClientRect = (<Element> tickMarks[0][i]).getBoundingClientRect();
-        assert.operator(tickMarkClientRect.bottom, "<=", tickLabelClientRect.top, `tick label ${i} is below mark`);
+        const tickLabels = axis.content().selectAll(`.${Plottable.Axis.TICK_LABEL_CLASS}`);
+        const tickMarks = axis.content().selectAll(`.${Plottable.Axis.TICK_MARK_CLASS}`);
+        assert.operator(tickLabels.size(), ">=", 2, "at least two tick labels were drawn");
+        assert.strictEqual(tickLabels.size(), tickMarks.size(), "there is one label per mark");
+
+        tickLabels.each(function(d, i) {
+          TestMethods.assertBBoxNonIntersection(d3.select(this), d3.select(tickMarks[0][i]));
+        });
+        svg.remove();
       });
-      svg.remove();
     });
   });
 
