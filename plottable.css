@@ -211,6 +211,7 @@ svg.plottable {
   fill: none;
   stroke: #CCC;
   stroke-width: 1px;
+  pointer-events: visiblestroke;
 }
 
 .plottable .waterfall-plot line.connector {

@@ -415,4 +415,31 @@ describe("InterpolatedColorLegend", () => {
       svg.remove();
     });
   });
+
+  describe("title", () => {
+    it("adds title element to each swatch", () => {
+      let legend = new Plottable.Components.InterpolatedColorLegend(colorScale);
+      legend.renderTo(svg);
+
+      let entries = legend.content().selectAll("rect.swatch");
+      assert.operator(entries.size(), ">=", 11, "there is at least 11 swatches");
+      entries.each(function(d, i) {
+        let swatch = d3.select(this);
+        assert.strictEqual(swatch.select("title").text(), String(d));
+      });
+      svg.remove();
+    });
+
+    it("does not create title elements if configuration is set to false", () => {
+      let legend = new Plottable.Components.InterpolatedColorLegend(colorScale);
+      Plottable.Configs.ADD_TITLE_ELEMENTS = false;
+      legend.renderTo(svg);
+
+      let entries = legend.content().selectAll("rect.swatch");
+      assert.operator(entries.size(), ">=", 11, "there is at least 11 swatches");
+      let titles = entries.selectAll("title");
+      assert.strictEqual(titles.size(), 0, "no titles should be rendered");
+      svg.remove();
+    });
+  });
 });
