@@ -221,11 +221,11 @@ describe("Plots", () => {
         let stringData = [
           { x: "A", y: "s"},
         ];
-        let nullData = [
-          { x: "A", y: <any> null},
+        let nullData: {x: string, y: number}[] = [
+          { x: "A", y: null},
         ];
-        let undefinedData = [
-          { x: "A", y: <any> undefined},
+        let undefinedData: {x: string, y: number}[] = [
+          { x: "A", y: undefined},
         ];
         let naNData = [
           { x: "A", y: NaN},
@@ -399,11 +399,11 @@ describe("Plots", () => {
         let stringData = [
           { x: "s", y: "A"},
         ];
-        let nullData = [
-          { x: <any> null, y: "A"},
+        let nullData: {x: number, y: string}[] = [
+          { x: null, y: "A"},
         ];
-        let undefinedData = [
-          { x: <any> undefined, y: "A"},
+        let undefinedData: {x: number, y: string}[] = [
+          { x: undefined, y: "A"},
         ];
         let naNData = [
           { x: NaN, y: "A"},
