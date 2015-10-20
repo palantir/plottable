@@ -85,27 +85,6 @@ describe("NumericAxis", () => {
       svg = TestMethods.generateSVG();
     });
 
-    it("draws ticks labels centered with the corresponding tick mark", () => {
-      let scale = new Plottable.Scales.Linear();
-      let numericAxis = new Plottable.Axes.Numeric(scale, "bottom");
-      numericAxis.renderTo(svg);
-
-      let tickLabels = numericAxis.content().selectAll(`.${Plottable.Axis.TICK_LABEL_CLASS}`);
-      assert.operator(tickLabels.size(), ">=", 2, "at least two tick labels were drawn");
-      let tickMarks = numericAxis.content().selectAll(`.${Plottable.Axis.TICK_MARK_CLASS}`);
-      assert.strictEqual(tickLabels.size(), tickMarks.size(), "there is one label per mark");
-
-      tickLabels.each(function(d, i) {
-        let tickLabelClientRect = this.getBoundingClientRect();
-        let tickMarkClientRect = (<Element> tickMarks[0][i]).getBoundingClientRect();
-        let labelCenter = (tickLabelClientRect.left + tickLabelClientRect.right) / 2;
-        let markCenter = (tickMarkClientRect.left + tickMarkClientRect.right) / 2;
-        assert.closeTo(labelCenter, markCenter, window.Pixel_CloseTo_Requirement, `tick label ${i} is centered on mark`);
-      });
-
-      svg.remove();
-    });
-
     it("does not overlap tick labels in a constrained space", () => {
       let constrainedWidth = 50;
       let constrainedHeight = 50;
@@ -191,11 +170,11 @@ describe("NumericAxis", () => {
     });
   });
 
-  describe("drawing tick labels when left oriented", () => {
-    it("draws ticks labels centered with the corresponding tick mark", () => {
+  orientations.forEach((orientation) => {
+    it(`draws ticks labels centered with the corresponding tick mark for orientation ${orientation}`, () => {
       let svg = TestMethods.generateSVG();
       let scale = new Plottable.Scales.Linear();
-      let numericAxis = new Plottable.Axes.Numeric(scale, "left");
+      let numericAxis = new Plottable.Axes.Numeric(scale, orientation);
       numericAxis.renderTo(svg);
 
       let tickLabels = numericAxis.content().selectAll(`.${Plottable.Axis.TICK_LABEL_CLASS}`);
@@ -206,37 +185,41 @@ describe("NumericAxis", () => {
       tickLabels.each(function(d, i) {
         let tickLabelClientRect = this.getBoundingClientRect();
         let tickMarkClientRect = (<Element> tickMarks[0][i]).getBoundingClientRect();
-        let labelCenter = (tickLabelClientRect.top + tickLabelClientRect.bottom) / 2;
-        let markCenter = (tickMarkClientRect.top + tickMarkClientRect.bottom) / 2;
+        let labelCenter = isHorizontalOrientation(orientation) ?
+          (tickLabelClientRect.left + tickLabelClientRect.right) / 2 :
+          (tickLabelClientRect.top + tickLabelClientRect.bottom) / 2;
+        let markCenter = isHorizontalOrientation(orientation) ?
+          (tickMarkClientRect.left + tickMarkClientRect.right) / 2 :
+          (tickMarkClientRect.top + tickMarkClientRect.bottom) / 2;
         assert.closeTo(labelCenter, markCenter, 1.5, `tick label ${i} is centered on mark`);
       });
 
       svg.remove();
     });
+  });
 
-    it("does not overlap tick marks with tick labels", () => {
-      let svg = TestMethods.generateSVG();
+  it("does not overlap tick marks with tick labels", () => {
+    let svg = TestMethods.generateSVG();
 
-      let scale = new Plottable.Scales.Linear();
-      scale.domain([175, 185]);
-      let axis = new Plottable.Axes.Numeric(scale, "left")
-                                    .innerTickLength(50);
-      axis.renderTo(svg);
+    let scale = new Plottable.Scales.Linear();
+    scale.domain([175, 185]);
+    let axis = new Plottable.Axes.Numeric(scale, "left")
+                                  .innerTickLength(50);
+    axis.renderTo(svg);
 
-      let tickLabels = applyVisibleFilter(axis.content().selectAll("." + Plottable.Axis.TICK_LABEL_CLASS));
+    let tickLabels = applyVisibleFilter(axis.content().selectAll("." + Plottable.Axis.TICK_LABEL_CLASS));
 
-      let tickMarks = applyVisibleFilter(axis.content().selectAll("." + Plottable.Axis.TICK_MARK_CLASS));
+    let tickMarks = applyVisibleFilter(axis.content().selectAll("." + Plottable.Axis.TICK_MARK_CLASS));
 
-      tickLabels.each(function(d, i) {
-        let tickLabelRect = this.getBoundingClientRect();
-        tickMarks.each(function(d2, i2) {
-          let tickMarkRect = this.getBoundingClientRect();
-            assert.isFalse(Plottable.Utils.DOM.clientRectsOverlap(tickLabelRect, tickMarkRect),
-              `tickMark ${i} and tickLabel ${i2} should not overlap`);
-        });
+    tickLabels.each(function(d, i) {
+      let tickLabelRect = this.getBoundingClientRect();
+      tickMarks.each(function(d2, i2) {
+        let tickMarkRect = this.getBoundingClientRect();
+          assert.isFalse(Plottable.Utils.DOM.clientRectsOverlap(tickLabelRect, tickMarkRect),
+            `tickMark ${i} and tickLabel ${i2} should not overlap`);
       });
-      svg.remove();
     });
+    svg.remove();
   });
 
   describe("formatting the labels", () => {
