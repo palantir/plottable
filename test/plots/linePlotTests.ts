@@ -677,7 +677,7 @@ describe("Plots", () => {
           {x: 0.5, y: 1.5}, // the point to be removed
           {x: 1, y: 1}, // minimum y in current bucket
           {x: 2, y: 4}, // maximum y in current bucket
-          {x: 3, y: 3}, // last elemnt in current bucket
+          {x: 3, y: 3}, // last element in current bucket
           {x: 100, y: 2}, // first element in next bucket
         ];
         plot.addDataset(new Plottable.Dataset(data));
@@ -710,7 +710,7 @@ describe("Plots", () => {
           {x: 1.5, y: 1.5}, // the point to be removed
           {x: 1, y: 2}, // minimum x in current bucket
           {x: 4, y: 3}, // maximum x in current bucket
-          {x: 3, y: 4}, // last elemnt in current bucket
+          {x: 3, y: 4}, // last element in current bucket
           {x: 2, y: 100}, // first element in next bucket
         ];
         plot.addDataset(new Plottable.Dataset(data));

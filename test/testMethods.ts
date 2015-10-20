@@ -361,10 +361,8 @@ module TestMethods {
       switch (command) {
         case "M": case "m": case "L": case "l":
           assert.strictEqual(coordinates.length, 2, "There is an x coordinate and a y coordinate");
-          assert.closeTo(xScale.invert(+coordinates[0]), data[i].x, EPSILON,
-            `Point ${i} drawn, has correct x coordinate`);
-          assert.closeTo(yScale.invert(+coordinates[1]), data[i].y, EPSILON,
-            `Point ${i} drawn, has correct y coordinate`);
+          assertPointsClose({ x: xScale.invert(+coordinates[0]), y: yScale.invert(+coordinates[1])},
+            data[i], EPSILON, `Point ${i} drawn, has correct coordinates`);
           break;
         case "H": case "h":
           assert.strictEqual(coordinates.length, 1, "There is an x coordinate");
