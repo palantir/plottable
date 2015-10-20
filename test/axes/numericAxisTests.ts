@@ -16,6 +16,13 @@ describe("NumericAxis", () => {
     assert.operator(inner.bottom, "<", outer.bottom + epsilon, message + " (box inside (bottom))");
   }
 
+  function applyVisibleFilter(selection: d3.Selection<any>) {
+    return selection.filter(function() {
+      let visibilityAttr =  d3.select(this).style("visibility");
+      return visibilityAttr === "visible" || visibilityAttr === "inherit";
+    });
+  }
+
   describe("setting the position of the tick labels when bottom oriented", () => {
 
     let axis: Plottable.Axes.Numeric;
@@ -156,11 +163,8 @@ describe("NumericAxis", () => {
       let numericAxis = new Plottable.Axes.Numeric(scale, "bottom");
       numericAxis.renderTo(svg);
 
-      let visibleTickLabels = numericAxis.content()
-        .selectAll(`.${Plottable.Axis.TICK_LABEL_CLASS}`)
-        .filter(function() {
-          return d3.select(this).style("visibility") === "visible";
-        });
+      let visibleTickLabels = applyVisibleFilter(numericAxis.content()
+        .selectAll(`.${Plottable.Axis.TICK_LABEL_CLASS}`));
 
       visibleTickLabels.each(function(d, i) {
         let labelRect = this.getBoundingClientRect();
@@ -194,11 +198,7 @@ describe("NumericAxis", () => {
       let axis = new Plottable.Axes.Numeric(scale, "bottom");
       axis.renderTo(svg);
 
-      let visibleTickLabels = axis.content().selectAll(".tick-label")
-        .filter(function(d: any, i: number) {
-          let visibility = d3.select(this).style("visibility");
-          return (visibility === "visible") || (visibility === "inherit");
-        });
+      let visibleTickLabels = applyVisibleFilter(axis.content().selectAll(".tick-label"));
 
       let visibleTickLabelRects = visibleTickLabels[0].map((label: Element) => label.getBoundingClientRect());
 
@@ -222,11 +222,7 @@ describe("NumericAxis", () => {
       let axis = new Plottable.Axes.Numeric(scale, "bottom");
       axis.renderTo(svg);
 
-      let tickLabels = axis.content().selectAll(".tick-label")
-          .filter(function(d: any, i: number) {
-            let visibility = d3.select(this).style("visibility");
-            return (visibility === "visible") || (visibility === "inherit");
-          });
+      let tickLabels = applyVisibleFilter(axis.content().selectAll(".tick-label"));
       assert.operator(tickLabels.size(), ">", 1, "more than one tick label is shown");
 
       let tickLabelElementPairs = d3.pairs(tickLabels[0]);
@@ -274,17 +270,9 @@ describe("NumericAxis", () => {
                                     .innerTickLength(50);
       axis.renderTo(svg);
 
-      let tickLabels = axis.content().selectAll("." + Plottable.Axis.TICK_LABEL_CLASS)
-          .filter(function(d: any, i: number) {
-            let visibility = d3.select(this).style("visibility");
-            return (visibility === "visible") || (visibility === "inherit");
-          });
+      let tickLabels = applyVisibleFilter(axis.content().selectAll("." + Plottable.Axis.TICK_LABEL_CLASS));
 
-      let tickMarks = axis.content().selectAll("." + Plottable.Axis.TICK_MARK_CLASS)
-          .filter(function(d: any, i: number) {
-            let visibility = d3.select(this).style("visibility");
-            return (visibility === "visible") || (visibility === "inherit");
-          });
+      let tickMarks = applyVisibleFilter(axis.content().selectAll("." + Plottable.Axis.TICK_MARK_CLASS));
 
       tickLabels.each(function(d, i) {
         let tickLabelRect = this.getBoundingClientRect();
@@ -332,11 +320,8 @@ describe("NumericAxis", () => {
       axis.formatter(formatter);
       axis.renderTo(svg);
 
-      let visibleTickLabels = axis.content()
-        .selectAll(`.${Plottable.Axis.TICK_LABEL_CLASS}`)
-        .filter(function() {
-          return d3.select(this).style("visibility") === "visible";
-        });
+      let visibleTickLabels = applyVisibleFilter(axis.content()
+        .selectAll(`.${Plottable.Axis.TICK_LABEL_CLASS}`));
       let boundingBox = (<Element> svg.select(".axis").select(".bounding-box").node()).getBoundingClientRect();
       visibleTickLabels.each(function(d, i) {
         let visibleTickLabelRect = this.getBoundingClientRect();
@@ -356,11 +341,8 @@ describe("NumericAxis", () => {
       axis.formatter(formatter);
       axis.renderTo(svg);
 
-      let visibleTickLabels = axis.content()
-        .selectAll(`.${Plottable.Axis.TICK_LABEL_CLASS}`)
-        .filter(function() {
-          return d3.select(this).style("visibility") === "visible";
-        });
+      let visibleTickLabels = applyVisibleFilter(axis.content()
+        .selectAll(`.${Plottable.Axis.TICK_LABEL_CLASS}`));
       let boundingBox = (<Element> svg.select(".axis").select(".bounding-box").node()).getBoundingClientRect();
       visibleTickLabels.each(function(d, i) {
         let visibleTickLabelRect = this.getBoundingClientRect();
@@ -379,11 +361,8 @@ describe("NumericAxis", () => {
       let axis = new Plottable.Axes.Numeric(scale, "bottom");
       axis.renderTo(svg);
 
-      let visibleTickLabels = axis.content()
-        .selectAll(`.${Plottable.Axis.TICK_LABEL_CLASS}`)
-        .filter(function() {
-          return d3.select(this).style("visibility") === "visible";
-        });
+      let visibleTickLabels = applyVisibleFilter(axis.content()
+        .selectAll(`.${Plottable.Axis.TICK_LABEL_CLASS}`));
       let boundingBox = (<Element> svg.select(".axis").select(".bounding-box").node()).getBoundingClientRect();
       visibleTickLabels.each(function(d, i) {
         let visibleTickLabelRect = this.getBoundingClientRect();
