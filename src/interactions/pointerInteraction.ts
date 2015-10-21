@@ -8,13 +8,13 @@ module Plottable.Interactions {
   export class Pointer extends Interaction {
     private _mouseDispatcher: Dispatchers.Mouse;
     private _touchDispatcher: Dispatchers.Touch;
-    private _insideComponent = false;
+    private _overComponent = false;
     private _pointerEnterCallbacks = new Utils.CallbackSet<PointerCallback>();
     private _pointerMoveCallbacks = new Utils.CallbackSet<PointerCallback>();
     private _pointerExitCallbacks = new Utils.CallbackSet<PointerCallback>();
 
-    private _mouseMoveCallback = (p: Point, e: MouseEvent) => this._handleMouseEvent(p, e);
-    private _touchStartCallback = (ids: number[], idToPoint: Point[], e: TouchEvent) => this._handleTouchEvent(idToPoint[ids[0]], e);
+    private _mouseMoveCallback = (p: Point) => this._handlePointerEvent(p);
+    private _touchStartCallback = (ids: number[], idToPoint: Point[]) => this._handlePointerEvent(idToPoint[ids[0]]);
 
     protected _anchor(component: Component) {
       super._anchor(component);
@@ -34,30 +34,20 @@ module Plottable.Interactions {
       this._touchDispatcher = null;
     }
 
-    private _handleMouseEvent(p: Point, e: MouseEvent) {
-      let insideSVG = this._mouseDispatcher.eventInsideSVG(e);
-      this._handlePointerEvent(p, insideSVG);
-    }
-
-    private _handleTouchEvent(p: Point, e: TouchEvent) {
-      let insideSVG = this._touchDispatcher.eventInsideSVG(e);
-      this._handlePointerEvent(p, insideSVG);
-    }
-
-    private _handlePointerEvent(p: Point, insideSVG: boolean) {
+    private _handlePointerEvent(p: Point) {
       let translatedP = this._translateToComponentSpace(p);
       let overComponent = this._isInsideComponent(translatedP);
 
-      if (overComponent && insideSVG) {
-        if (!this._insideComponent) {
+      if (overComponent) {
+        if (!this._overComponent) {
           this._pointerEnterCallbacks.callCallbacks(translatedP);
         }
         this._pointerMoveCallbacks.callCallbacks(translatedP);
-      } else if (this._insideComponent) {
+      } else if (this._overComponent) {
         this._pointerExitCallbacks.callCallbacks(translatedP);
       }
 
-      this._insideComponent = overComponent && insideSVG;
+      this._overComponent = overComponent;
     }
 
     /**

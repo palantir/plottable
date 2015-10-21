@@ -4623,7 +4623,7 @@ declare module Plottable.Interactions {
     class Pointer extends Interaction {
         private _mouseDispatcher;
         private _touchDispatcher;
-        private _insideComponent;
+        private _overComponent;
         private _pointerEnterCallbacks;
         private _pointerMoveCallbacks;
         private _pointerExitCallbacks;
@@ -4631,9 +4631,7 @@ declare module Plottable.Interactions {
         private _touchStartCallback;
         protected _anchor(component: Component): void;
         protected _unanchor(): void;
-        private _handleMouseEvent(p, e);
-        private _handleTouchEvent(p, e);
-        private _handlePointerEvent(p, insideSVG);
+        private _handlePointerEvent(p);
         /**
          * Adds a callback to be called when the pointer enters the Component.
          *
