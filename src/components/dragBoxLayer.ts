@@ -1,8 +1,8 @@
 module Plottable {
-
 export type DragBoxCallback = (bounds: Bounds) => void;
+}
 
-export module Components {
+module Plottable.Components {
   type _EdgeIndicator = {
     top: boolean;
     bottom: boolean;
@@ -460,5 +460,4 @@ export module Components {
       });
     }
   }
-}
 }

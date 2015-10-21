@@ -1,5 +1,4 @@
-module Plottable {
-export module Axes {
+module Plottable.Axes {
   export class Category extends Axis<string> {
     private _tickLabelAngle = 0;
     private _measurer: SVGTypewriter.Measurers.CacheCharacterMeasurer;
@@ -230,8 +229,11 @@ export module Axes {
       // on everyone, including this. Since CSS or something might have
       // affected the size of the characters, clear the cache.
       this._measurer.reset();
-      return super.computeLayout(origin, availableWidth, availableHeight);
+      super.computeLayout(origin, availableWidth, availableHeight);
+      if (!this._isHorizontal()) {
+        this._scale.range([0, this.height()]);
+      }
+      return this;
     }
   }
-}
 }

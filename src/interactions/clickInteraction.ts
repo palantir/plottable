@@ -2,7 +2,9 @@ module Plottable {
 
 export type ClickCallback = (point: Point) => void;
 
-export module Interactions {
+}
+
+module Plottable.Interactions {
   export class Click extends Interaction {
 
     private _mouseDispatcher: Plottable.Dispatchers.Mouse;
@@ -79,5 +81,4 @@ export module Interactions {
       return this;
     }
   }
-}
 }
