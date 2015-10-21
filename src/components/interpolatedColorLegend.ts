@@ -234,7 +234,7 @@ module Plottable.Components {
         padding = (this.width() - longestTextWidth - 2 * this._textPadding) / 2;
         swatchWidth = Math.max(this.width() - padding - 2 * textPadding - longestTextWidth, 0);
         swatchHeight = 1;
-        swatchY = (d: any, i: number) => (this.height() - (i + 1));
+        swatchY = (d: any, i: number) => this.height() - (i + 1);
 
         upperWriteOptions.yAlign = "top";
         upperLabelShift.y = 0;

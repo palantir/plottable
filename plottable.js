@@ -5646,7 +5646,7 @@ var Plottable;
                     padding = (this.width() - longestTextWidth - 2 * this._textPadding) / 2;
                     swatchWidth = Math.max(this.width() - padding - 2 * textPadding - longestTextWidth, 0);
                     swatchHeight = 1;
-                    swatchY = function (d, i) { return (_this.height() - (i + 1)); };
+                    swatchY = function (d, i) { return _this.height() - (i + 1); };
                     upperWriteOptions.yAlign = "top";
                     upperLabelShift.y = 0;
                     lowerWriteOptions.yAlign = "bottom";

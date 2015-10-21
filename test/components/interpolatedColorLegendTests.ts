@@ -41,7 +41,7 @@ describe("InterpolatedColorLegend", () => {
     assert.deepEqual(labelTexts, formattedDomainValues, "formatter is used to format label text");
   }
 
-  it("renders correctly orientation: horizontal", () => {
+  it("renders correctly when horizontal", () => {
     let legend = new Plottable.Components.InterpolatedColorLegend(colorScale);
     legend.renderTo(svg);
 
@@ -283,12 +283,12 @@ describe("InterpolatedColorLegend", () => {
     svg.remove();
   });
 
-  it("has the same number of swatches as its height, when vertical", () => {
+  it("has the same number of swatches as its height when vertical", () => {
     let legend = new Plottable.Components.InterpolatedColorLegend(colorScale);
     legend.renderTo(svg);
     legend.orientation("left").expands(false);
     let numSwatches = legend.content().selectAll(".swatch").size();
-    let swatchContainer = (<any> legend)._element.select(".swatch-container");
+    let swatchContainer = legend.content().select(".swatch-container");
     let swatchContainerHeight = (<Element> swatchContainer.node()).getBoundingClientRect().height;
     legend.expands(true);
     let newNumSwatches = legend.content().selectAll(".swatch").size();
@@ -298,12 +298,12 @@ describe("InterpolatedColorLegend", () => {
     svg.remove();
   });
 
-  it("has the same number of swatches as its width, when horizontal", () => {
+  it("has the same number of swatches as its width when horizontal", () => {
     let legend = new Plottable.Components.InterpolatedColorLegend(colorScale);
     legend.renderTo(svg);
     legend.orientation("horizontal").expands(false);
     let numSwatches = legend.content().selectAll(".swatch").size();
-    let swatchContainer = (<any> legend)._element.select(".swatch-container");
+    let swatchContainer = legend.content().select(".swatch-container");
     let swatchContainerWidth = (<Element> swatchContainer.node()).getBoundingClientRect().width;
     legend.expands(true);
     let newNumSwatches = legend.content().selectAll(".swatch").size();
