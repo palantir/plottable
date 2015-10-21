@@ -289,7 +289,7 @@ module Plottable.Components {
 
       let ticks = this._generateTicks(numSwatches);
       let swatches = this._swatchContainer.selectAll("rect.swatch").data(ticks);
-      swatches.enter().append("rect").classed("swatch", true);
+      let rects = swatches.enter().append("rect").classed("swatch", true);
       swatches.exit().remove();
       swatches.attr({
         "fill": (d: any, i: number) => this._scale.scale(d),
@@ -299,6 +299,9 @@ module Plottable.Components {
         "y": swatchY,
         "shape-rendering": "crispEdges"
       });
+      if (Configs.ADD_TITLE_ELEMENTS) {
+        rects.append("title").text((d) => this._formatter(d));
+      }
       return this;
     }
 
