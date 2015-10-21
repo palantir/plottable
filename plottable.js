@@ -5670,7 +5670,7 @@ var Plottable;
                 }
                 else {
                     padding = Math.max(textPadding, (this.height() - textHeight) / 2);
-                    numSwatches = Math.floor(this.width() - textPadding * 4 - text0Width - text1Width);
+                    numSwatches = Math.max(Math.floor(this.width() - textPadding * 4 - text0Width - text1Width), 0);
                     swatchWidth = 1;
                     swatchHeight = Math.max((this.height() - 2 * padding), 0);
                     swatchX = function (d, i) { return Math.floor(text0Width + 2 * textPadding) + i; };

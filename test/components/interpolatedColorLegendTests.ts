@@ -190,7 +190,7 @@ describe("InterpolatedColorLegend", () => {
     svg.remove();
   });
 
-  it("renders correctly when width is constrained (orientation: left)", () => {
+  it("renders correctly when width is constrained when oriented left", () => {
     let constrainedWidth = 45;
     svg.attr("width", constrainedWidth);
     let legend = new Plottable.Components.InterpolatedColorLegend(colorScale);
@@ -200,7 +200,7 @@ describe("InterpolatedColorLegend", () => {
     svg.remove();
   });
 
-  it("renders correctly when height is constrained (orientation: left)", () => {
+  it("renders correctly when height is constrained when oriented left", () => {
     svg.attr("height", 100);
     let legend = new Plottable.Components.InterpolatedColorLegend(colorScale);
     legend.orientation("left");
@@ -414,6 +414,7 @@ describe("InterpolatedColorLegend", () => {
       assert.operator(bottomPadding, "<", textHeight, "bottom padding degrades to be smaller than textHeight");
       svg.remove();
     });
+
     it("left legends degrade padding when width is constrained", () => {
       let legend = new Plottable.Components.InterpolatedColorLegend(colorScale).orientation("left");
       legend.renderTo(svg);
@@ -429,6 +430,7 @@ describe("InterpolatedColorLegend", () => {
       assert.operator(leftPadding, "<", textHeight, "right-side padding degrades to be smaller than textHeight");
       svg.remove();
     });
+
     it("right legends degrade padding when width is constrained", () => {
       let legend = new Plottable.Components.InterpolatedColorLegend(colorScale).orientation("right");
       legend.renderTo(svg);
@@ -444,6 +446,17 @@ describe("InterpolatedColorLegend", () => {
       assert.operator(leftPadding, "<", textHeight, "left-side padding degrades to be smaller than textHeight");
       svg.remove();
     });
+    it("degrades gracefully when width is very constrained", () => {
+      let legend = new Plottable.Components.InterpolatedColorLegend(colorScale).orientation("horizontal");
+      legend.renderTo(svg);
+      let constrainedWidth = 30;
+      svg.attr("width", constrainedWidth);
+      assert.doesNotThrow(() => legend.redraw(), Error, "rendering in a small space should not error");
+      let numSwatches = legend.content().selectAll(".swatch").size();
+      assert.strictEqual(0, numSwatches, "no swatches are drawn");
+      svg.remove();
+    });
+
   });
 
   describe("title", () => {

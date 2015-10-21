@@ -258,7 +258,7 @@ module Plottable.Components {
         boundingBoxAttr["height"] = numSwatches * swatchHeight;
       } else { // horizontal
         padding = Math.max(textPadding, (this.height() - textHeight) / 2);
-        numSwatches = Math.floor(this.width() - textPadding * 4 - text0Width - text1Width);
+        numSwatches = Math.max(Math.floor(this.width() - textPadding * 4 - text0Width - text1Width), 0);
         swatchWidth = 1;
         swatchHeight = Math.max( (this.height() - 2 * padding), 0);
         swatchX = (d: any, i: number) => Math.floor(text0Width + 2 * textPadding) + i;
