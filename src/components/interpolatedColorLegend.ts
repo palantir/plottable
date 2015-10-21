@@ -1,5 +1,4 @@
-module Plottable {
-export module Components {
+module Plottable.Components {
   export class InterpolatedColorLegend extends Component {
     private static _DEFAULT_NUM_SWATCHES = 11;
 
@@ -294,7 +293,7 @@ export module Components {
 
       let ticks = this._generateTicks(numSwatches);
       let swatches = this._swatchContainer.selectAll("rect.swatch").data(ticks);
-      swatches.enter().append("rect").classed("swatch", true);
+      let rects = swatches.enter().append("rect").classed("swatch", true);
       swatches.exit().remove();
       swatches.attr({
         "fill": (d: any, i: number) => this._scale.scale(d),
@@ -303,9 +302,11 @@ export module Components {
         "x": swatchX,
         "y": swatchY
       });
+      if (Configs.ADD_TITLE_ELEMENTS) {
+        rects.append("title").text((d) => this._formatter(d));
+      }
       return this;
     }
 
   }
-}
 }

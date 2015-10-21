@@ -1,5 +1,4 @@
-module Plottable {
-export module Plots {
+module Plottable.Plots {
   export class StackedBar<X, Y> extends Bar<X, Y> {
     private _stackingResult: Utils.Stacking.StackingResult;
     private _stackedExtent: number[];
@@ -120,5 +119,4 @@ export module Plots {
       this._stackedExtent = Utils.Stacking.stackedExtent(this._stackingResult, keyAccessor, filter);
     }
   }
-}
 }

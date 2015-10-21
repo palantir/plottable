@@ -1,4 +1,3 @@
-module Plottable {
 /**
  * The RenderController is responsible for enqueueing and synchronizing
  * layout and render calls for Components.
@@ -15,7 +14,7 @@ module Plottable {
  * );
  * ```
  */
-export module RenderController {
+module Plottable.RenderController {
   let _componentsNeedingRender = new Utils.Set<Component>();
   let _componentsNeedingComputeLayout = new Utils.Set<Component>();
   let _animationRequested = false;
@@ -111,5 +110,4 @@ export module RenderController {
       _isCurrentlyFlushing = false;
     }
   }
-}
 }

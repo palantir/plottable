@@ -1,5 +1,4 @@
-module Plottable {
-export module Plots {
+module Plottable.Plots {
   export class ClusteredBar<X, Y> extends Bar<X, Y> {
 
     private _clusterOffsets: Utils.Map<Dataset, number>;
@@ -55,5 +54,4 @@ export module Plots {
       return super._getDataToDraw();
     }
   }
-}
 }
