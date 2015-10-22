@@ -238,8 +238,12 @@ export class Component {
       this._updateClipPath();
     }
     this._renderImmediately();
-    this._onRenderCallbacks.callCallbacks(this);
+    Utils.Window.setTimeout(() => this._onRenderCallbacks.callCallbacks(this), this._deferredTotalDrawTime());
     return this;
+  }
+
+  protected _deferredTotalDrawTime() {
+    return 0;
   }
 
   protected _renderImmediately() {

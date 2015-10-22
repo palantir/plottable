@@ -3011,12 +3011,16 @@ var Plottable;
          * Renders the Component without waiting for the next frame.
          */
         Component.prototype.renderImmediately = function () {
+            var _this = this;
             if (this._clipPathEnabled) {
                 this._updateClipPath();
             }
             this._renderImmediately();
-            this._onRenderCallbacks.callCallbacks(this);
+            Plottable.Utils.Window.setTimeout(function () { return _this._onRenderCallbacks.callCallbacks(_this); }, this._deferredTotalDrawTime());
             return this;
+        };
+        Component.prototype._deferredTotalDrawTime = function () {
+            return 0;
         };
         Component.prototype._renderImmediately = function () {
             // DO NOTHING
@@ -6892,12 +6896,19 @@ var Plottable;
         };
         Plot.prototype._paint = function () {
             var drawSteps = this._generateDrawSteps();
+            this._paintedDrawSteps = drawSteps;
             var dataToDraw = this._getDataToDraw();
             var drawers = this._getDrawersInOrder();
             this.datasets().forEach(function (ds, i) { return drawers[i].draw(dataToDraw.get(ds), drawSteps); });
             var times = this.datasets().map(function (ds, i) { return drawers[i].totalDrawTime(dataToDraw.get(ds), drawSteps); });
             var maxTime = Plottable.Utils.Math.max(times, 0);
             this._additionalPaint(maxTime);
+        };
+        Plot.prototype._deferredTotalDrawTime = function () {
+            var drawSteps = this._paintedDrawSteps;
+            var dataToDraw = this._getDataToDraw();
+            var drawers = this._getDrawersInOrder();
+            return Plottable.Utils.Math.max(this.datasets().map(function (ds, i) { return drawers[i].totalDrawTime(dataToDraw.get(ds), drawSteps); }), 0);
         };
         /**
          * Retrieves Selections of this Plot for the specified Datasets.

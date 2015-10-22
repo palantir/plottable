@@ -1433,6 +1433,7 @@ declare module Plottable {
          * Renders the Component without waiting for the next frame.
          */
         renderImmediately(): Component;
+        protected _deferredTotalDrawTime(): number;
         protected _renderImmediately(): void;
         /**
          * Causes the Component to re-layout and render.
@@ -2790,6 +2791,7 @@ declare module Plottable {
         private _onDatasetUpdateCallback;
         protected _propertyExtents: d3.Map<any[]>;
         protected _propertyBindings: d3.Map<Plots.AccessorScaleBinding<any, any>>;
+        private _paintedDrawSteps;
         /**
          * A Plot draws some visualization of the inputted Datasets.
          *
@@ -2896,6 +2898,7 @@ declare module Plottable {
         protected _additionalPaint(time: number): void;
         protected _getDataToDraw(): Utils.Map<Dataset, any[]>;
         private _paint();
+        protected _deferredTotalDrawTime(): number;
         /**
          * Retrieves Selections of this Plot for the specified Datasets.
          *

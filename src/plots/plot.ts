@@ -52,6 +52,8 @@ export class Plot extends Component {
   protected _propertyExtents: d3.Map<any[]>;
   protected _propertyBindings: d3.Map<Plots.AccessorScaleBinding<any, any>>;
 
+  private _paintedDrawSteps: Drawers.DrawStep[];
+
   /**
    * A Plot draws some visualization of the inputted Datasets.
    *
@@ -442,6 +444,7 @@ export class Plot extends Component {
 
   private _paint() {
     let drawSteps = this._generateDrawSteps();
+    this._paintedDrawSteps = drawSteps;
     let dataToDraw = this._getDataToDraw();
     let drawers = this._getDrawersInOrder();
 
@@ -450,6 +453,13 @@ export class Plot extends Component {
     let times = this.datasets().map((ds, i) => drawers[i].totalDrawTime(dataToDraw.get(ds), drawSteps));
     let maxTime = Utils.Math.max(times, 0);
     this._additionalPaint(maxTime);
+  }
+
+  protected _deferredTotalDrawTime() {
+    let drawSteps = this._paintedDrawSteps;
+    let dataToDraw = this._getDataToDraw();
+    let drawers = this._getDrawersInOrder();
+    return Utils.Math.max(this.datasets().map((ds, i) => drawers[i].totalDrawTime(dataToDraw.get(ds), drawSteps)), 0);
   }
 
   /**
