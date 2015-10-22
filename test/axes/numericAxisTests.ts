@@ -76,8 +76,8 @@ describe("Axes", () => {
       });
     });
 
-    horizontalOrientations.forEach((orientation) => {
-      it(`does not overlap tick labels in a constrained space for horizontal orientation ${orientation}`, () => {
+    orientations.forEach((orientation) => {
+      it(`does not overlap tick labels in a constrained space for orientation ${orientation}`, () => {
         let svg = TestMethods.generateSVG();
         let constrainedWidth = 50;
         let constrainedHeight = 50;
@@ -102,8 +102,8 @@ describe("Axes", () => {
       });
     });
 
-    horizontalOrientations.forEach((orientation) => {
-      it("separates tick labels with the same spacing", () => {
+    orientations.forEach((orientation) => {
+      it(`separates tick labels with the same spacing for orientation ${orientation}`, () => {
         let svg = TestMethods.generateSVG();
         let scale = new Plottable.Scales.Linear();
         scale.domain([-2500000, 2500000]);
@@ -116,7 +116,7 @@ describe("Axes", () => {
         let visibleTickLabelRects = visibleTickLabels[0].map((label: Element) => label.getBoundingClientRect());
 
         function getClientRectCenter(rect: ClientRect) {
-          return rect.left + rect.width / 2;
+          return isHorizontalOrientation(orientation) ? rect.left + rect.width / 2 : rect.top + rect.height / 2;
         }
 
         let interval = getClientRectCenter(visibleTickLabelRects[1]) - getClientRectCenter(visibleTickLabelRects[0]);
@@ -129,8 +129,8 @@ describe("Axes", () => {
       });
     });
 
-    horizontalOrientations.forEach((orientation) => {
-      it("renders numbers in order with a reversed domain", () => {
+    orientations.forEach((orientation) => {
+      it(`renders numbers in order with a reversed domain for orientation ${orientation}`, () => {
         let svg = TestMethods.generateSVG();
         let scale = new Plottable.Scales.Linear();
         scale.domain([3, 0]);
@@ -237,8 +237,7 @@ describe("Axes", () => {
         let tickLabels = axis.content().selectAll(`.${Plottable.Axis.TICK_LABEL_CLASS}`);
         tickLabels.each(function(d, i) {
           let labelText = d3.select(this).text();
-          let formattedValue = formatter(d);
-          assert.strictEqual(labelText, formattedValue, `formatter used to format tick label ${i}`);
+          assert.strictEqual(labelText, formatter(d), `formatter used to format tick label ${i}`);
         });
 
         svg.remove();
