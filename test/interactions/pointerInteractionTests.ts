@@ -195,7 +195,7 @@ describe("Interactions", () => {
 
         assert.isFalse(enterCallback1Called, "callback 1 was disconnected from pointer enter interaction");
         assert.isTrue(enterCallback2Called, "callback 2 is still connected to the pointer enter interaction");
-        pointerInteraction.offPointerEnter(enterCallback2);
+
         svg.remove();
       });
     });
@@ -219,7 +219,7 @@ describe("Interactions", () => {
           height: SVG_HEIGHT + "px",
           width: SVG_WIDTH + "px",
           position: "relative",
-          top: -SVG_HEIGHT / 2 + "px",
+          top: SVG_HEIGHT / 2 + "px",
           left: SVG_WIDTH / 2 + "px",
           background: "black"
         });
