@@ -179,8 +179,11 @@ module Plottable.Plots {
     }
 
     protected _createDrawer(dataset: Dataset): Drawer {
-      return new Plottable.Drawers.Line(dataset)
-        .initializer(this._initializer.bind(this));
+      return <Plottable.Drawers.Line>new Plottable.Drawers.Line(dataset)
+      // fat arrow wrapper ensures that 'this' is the plot when called
+        .initializer(() => {
+          return this._initializer();
+        });
     }
 
     protected _extentsForProperty(property: string) {

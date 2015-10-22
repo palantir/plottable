@@ -8063,8 +8063,9 @@ var Plottable;
                 this.symbol(function () { return circleSymbolFactory; });
             }
             Scatter.prototype._createDrawer = function (dataset) {
+                var _this = this;
                 return new Plottable.Drawers.Symbol(dataset)
-                    .initializer(this._initializer.bind(this));
+                    .initializer(function () { return _this._initializer(); });
             };
             Scatter.prototype.size = function (size, scale) {
                 if (size == null) {
@@ -8260,8 +8261,12 @@ var Plottable;
                 return this;
             };
             Bar.prototype._createDrawer = function (dataset) {
+                var _this = this;
+                // Drawer.initializer returns a Drawer, so cast to return the correct type from this method
                 return new Plottable.Drawers.Rectangle(dataset)
-                    .initializer(this._initializer.bind(this));
+                    .initializer(function () {
+                    return _this._initializer();
+                });
             };
             Bar.prototype._setup = function () {
                 _super.prototype._setup.call(this);
@@ -8897,8 +8902,11 @@ var Plottable;
                 return this;
             };
             Line.prototype._createDrawer = function (dataset) {
+                var _this = this;
                 return new Plottable.Drawers.Line(dataset)
-                    .initializer(this._initializer.bind(this));
+                    .initializer(function () {
+                    return _this._initializer();
+                });
             };
             Line.prototype._extentsForProperty = function (property) {
                 var extents = _super.prototype._extentsForProperty.call(this, property);
@@ -9262,7 +9270,11 @@ var Plottable;
                 return this;
             };
             Area.prototype._addDataset = function (dataset) {
-                var lineDrawer = new Plottable.Drawers.Line(dataset);
+                var _this = this;
+                var lineDrawer = new Plottable.Drawers.Line(dataset)
+                    .initializer(function () {
+                    return _this._lineInitializer();
+                });
                 if (this._isSetup) {
                     lineDrawer.renderArea(this._renderArea.append("g"));
                 }
@@ -9280,13 +9292,13 @@ var Plottable;
                 var dataToDraw = this._getDataToDraw();
                 this.datasets().forEach(function (dataset) { return _this._lineDrawers.get(dataset).draw(dataToDraw.get(dataset), drawSteps); });
             };
+            Area.prototype._lineInitializer = function () {
+                var attrToProjector = this._generateLineAttrToProjector();
+                attrToProjector["d"] = this._constructLineProjector(Plottable.Plot._scaledAccessor(this.x()), this._getResetYFunction());
+                return attrToProjector;
+            };
             Area.prototype._generateLineDrawSteps = function () {
                 var drawSteps = [];
-                if (this._animateOnNextRender()) {
-                    var attrToProjector = this._generateLineAttrToProjector();
-                    attrToProjector["d"] = this._constructLineProjector(Plottable.Plot._scaledAccessor(this.x()), this._getResetYFunction());
-                    drawSteps.push({ attrToProjector: attrToProjector, animator: this._getAnimator(Plots.Animator.RESET) });
-                }
                 drawSteps.push({ attrToProjector: this._generateLineAttrToProjector(), animator: this._getAnimator(Plots.Animator.MAIN) });
                 return drawSteps;
             };
@@ -9296,8 +9308,11 @@ var Plottable;
                 return lineAttrToProjector;
             };
             Area.prototype._createDrawer = function (dataset) {
+                var _this = this;
                 return new Plottable.Drawers.Area(dataset)
-                    .initializer(this._areaInitializer.bind(this));
+                    .initializer(function () {
+                    return _this._areaInitializer();
+                });
             };
             Area.prototype._areaInitializer = function () {
                 var attrToProjector = this._generateAttrToProjector();

@@ -3363,7 +3363,7 @@ declare module Plottable.Plots {
          * @constructor
          */
         constructor();
-        protected _createDrawer(dataset: Dataset): Drawer;
+        protected _createDrawer(dataset: Dataset): Drawers.Symbol;
         /**
          * Gets the AccessorScaleBinding for the size property of the plot.
          * The size property corresponds to the area of the symbol.
@@ -3469,7 +3469,7 @@ declare module Plottable.Plots {
          */
         orientation(): string;
         render(): Bar<X, Y>;
-        protected _createDrawer(dataset: Dataset): Drawer;
+        protected _createDrawer(dataset: Dataset): Drawers.Rectangle;
         protected _setup(): void;
         /**
          * Gets the baseline value.
@@ -3725,9 +3725,10 @@ declare module Plottable.Plots {
         protected _addDataset(dataset: Dataset): Area<X>;
         protected _removeDatasetNodes(dataset: Dataset): void;
         protected _additionalPaint(): void;
+        private _lineInitializer();
         private _generateLineDrawSteps();
         private _generateLineAttrToProjector();
-        protected _createDrawer(dataset: Dataset): Drawer;
+        protected _createDrawer(dataset: Dataset): Drawers.Area;
         private _areaInitializer();
         protected _generateDrawSteps(): Drawers.DrawStep[];
         protected _updateYScale(): void;

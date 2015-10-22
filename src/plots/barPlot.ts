@@ -102,8 +102,11 @@ module Plottable.Plots {
     }
 
     protected _createDrawer(dataset: Dataset) {
-      return new Plottable.Drawers.Rectangle(dataset)
-        .initializer(this._initializer.bind(this));
+      // Drawer.initializer returns a Drawer, so cast to return the correct type from this method
+      return <Plottable.Drawers.Rectangle>new Plottable.Drawers.Rectangle(dataset)
+        .initializer(() => {
+          return this._initializer();
+        });
 
     }
 

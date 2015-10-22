@@ -24,8 +24,8 @@ module Plottable.Plots {
     }
 
     protected _createDrawer(dataset: Dataset) {
-      return new Plottable.Drawers.Symbol(dataset)
-        .initializer(this._initializer.bind(this));
+      return <Plottable.Drawers.Symbol>new Plottable.Drawers.Symbol(dataset)
+        .initializer(() => { return this._initializer(); });
     }
 
     /**

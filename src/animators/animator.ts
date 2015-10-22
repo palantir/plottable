@@ -34,6 +34,7 @@ export module Animators {
     }
   }
 }
+
 export interface Animator {
   /**
    * Applies the supplied attributes to a d3.Selection with some animation.
