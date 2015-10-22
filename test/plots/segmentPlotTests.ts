@@ -2,83 +2,80 @@
 
 describe("Plots", () => {
   describe("SegmentPlot", () => {
-
-    describe("Basic Usage", () => {
+    describe("rendering", () => {
       let svg: d3.Selection<void>;
       let xScale: Plottable.Scales.Linear;
       let yScale: Plottable.Scales.Linear;
-      let data = [
-        { x: 1, y: 1, x2: 4, y2: 4 },
-        { x: 2, y: 2, x2: 3, y2: 5 },
-        { x: 3, y: 3, x2: 5, y2: 2 }
-      ];
+      let plot: Plottable.Plots.Segment<number, number>;
 
       beforeEach(() => {
-        svg = TestMethods.generateSVG(500, 500);
+        plot = new Plottable.Plots.Segment<number, number>();
+        svg = TestMethods.generateSVG();
         xScale = new Plottable.Scales.Linear();
         yScale = new Plottable.Scales.Linear();
+        const data = [
+          { x: 1, y: 1, x2: 4, y2: 4 },
+          { x: 2, y: 2, x2: 3, y2: 5 },
+          { x: 3, y: 3, x2: 5, y2: 2 }
+        ];
+        plot.addDataset(new Plottable.Dataset(data));
+        plot.x((d) => d.x, xScale);
+        plot.y((d) => d.y, yScale);
       });
 
       it("renders a line properly", () => {
-        let plot = new Plottable.Plots.Segment();
-        plot.x((d) => d.x, xScale);
         plot.x2((d) => d.x2);
-        plot.y((d) => d.y, yScale);
         plot.y2((d) => d.y2);
-        plot.addDataset(new Plottable.Dataset([data[0]]));
         plot.renderTo(svg);
 
-        let line = plot.content().selectAll("line");
-        assert.strictEqual(line.size(), 1, "exactly one line has been rendered");
-        assert.strictEqual(+line.attr("x1"), 62.5, "x1 is correct");
-        assert.strictEqual(+line.attr("x2"), 437.5, "x2 is correct");
-        assert.strictEqual(+line.attr("y1"), 437.5, "y1 is correct");
-        assert.strictEqual(+line.attr("y2"), 62.5, "y2 is correct");
+        const lines = plot.content().selectAll("line");
+        assert.strictEqual(lines.size(), plot.datasets()[0].data().length, "line for each datum");
+        lines.each(function(d, i) {
+          const line = d3.select(this);
+          assert.strictEqual(TestMethods.numAttr(line, "x1"), xScale.scale(d.x), `x1 for line ${i}`);
+          assert.strictEqual(TestMethods.numAttr(line, "x2"), xScale.scale(d.x2), `x2 for line ${i}`);
+          assert.strictEqual(TestMethods.numAttr(line, "y1"), yScale.scale(d.y), `y1 for line ${i}`);
+          assert.strictEqual(TestMethods.numAttr(line, "y2"), yScale.scale(d.y2), `y2 for line ${i}`);
+        });
         svg.remove();
       });
 
       it("renders vertical lines when x2 is not set", () => {
-        let plot = new Plottable.Plots.Segment();
-        plot.x((d) => d.x, xScale);
-        plot.y((d) => d.y, yScale);
         plot.y2((d) => d.y2);
-        plot.addDataset(new Plottable.Dataset(data));
         plot.renderTo(svg);
 
-        let lines = plot.content().selectAll("line");
-        assert.strictEqual(lines.size(), data.length, "correct number of lines has been drawn");
-        lines.each(function() {
-          let lineSelection = d3.select(this);
-          assert.strictEqual(lineSelection.attr("x1"), lineSelection.attr("x2"), "line is vertical");
+        const lines = plot.content().selectAll("line");
+        assert.strictEqual(lines.size(), plot.datasets()[0].data().length, "line for each datum");
+        lines.each(function(d, i) {
+          const line = d3.select(this);
+          assert.strictEqual(TestMethods.numAttr(line, "x1"), TestMethods.numAttr(line, "x2"), `same x for line ${i}`);
         });
         svg.remove();
       });
 
       it("renders horizontal lines when y2 is not set", () => {
-        let plot = new Plottable.Plots.Segment();
-        plot.x((d) => d.x, xScale);
         plot.x2((d) => d.x2);
-        plot.y((d) => d.y, yScale);
-        plot.addDataset(new Plottable.Dataset(data));
         plot.renderTo(svg);
 
-        let lines = plot.content().selectAll("line");
-        assert.strictEqual(lines.size(), data.length, "correct number of lines has been drawn");
-        lines.each(function() {
-          let lineSelection = d3.select(this);
-          assert.strictEqual(lineSelection.attr("y1"), lineSelection.attr("y2"), "line is horizontal");
+        const lines = plot.content().selectAll("line");
+        assert.strictEqual(lines.size(), plot.datasets()[0].data().length, "line for each datum");
+        lines.each(function(d, i) {
+          const line = d3.select(this);
+          assert.strictEqual(TestMethods.numAttr(line, "y1"), TestMethods.numAttr(line, "y2"), `same y for line ${i}`);
         });
         svg.remove();
       });
     });
 
-    describe("autorangeMode", () => {
+    describe("autoranging", () => {
       let svg: d3.Selection<void>;
       let xScale: Plottable.Scales.Linear;
       let yScale: Plottable.Scales.Linear;
+      let plot: Plottable.Plots.Segment<number, number>;
 
       beforeEach(() => {
-        svg = TestMethods.generateSVG(500, 500);
+        svg = TestMethods.generateSVG();
+        plot = new Plottable.Plots.Segment<number, number>();
         xScale = new Plottable.Scales.Linear();
         yScale = new Plottable.Scales.Linear();
         xScale.padProportion(0);
@@ -86,12 +83,11 @@ describe("Plots", () => {
       });
 
       it("adjusts the xScale domain with respect to the yScale domain when autorangeMode is set to x", () => {
-        let staggeredData = [
+        const staggeredData = [
           { y: 0, x: 0, x2: 1 },
           { y: 1, x: 1, x2: 2 }
         ];
 
-        let plot = new Plottable.Plots.Segment();
         plot.x((d) => d.x, xScale);
         plot.x2((d) => d.x2);
         plot.y((d) => d.y, yScale);
@@ -111,12 +107,11 @@ describe("Plots", () => {
       });
 
       it("adjusts the yScale domain with respect to the xScale domain when autorangeMode is set to y", () => {
-        let staggeredData = [
+        const staggeredData = [
           { x: 0, y: 0, y2: 1 },
           { x: 1, y: 1, y2: 2 }
         ];
 
-        let plot = new Plottable.Plots.Segment();
         plot.x((d) => d.x, xScale);
         plot.y((d) => d.y, yScale);
         plot.y2((d) => d.y2);
@@ -136,31 +131,30 @@ describe("Plots", () => {
       });
     });
 
-    describe("entitiesIn()", () => {
-      let data = [
-        { x: 1, x2: 1, y: 1, y2: 4 },
-        { x: 2, x2: 3, y: 4, y2: 3 },
-        { x: 4, x2: 5, y: 2, y2: 4 },
-        { x: 2, x2: 4, y: 1, y2: 1 }
-      ];
-
+    describe("retrieving the entities in a specified area", () => {
       let svg: d3.Selection<void>;
       let xScale: Plottable.Scales.Linear;
       let yScale: Plottable.Scales.Linear;
       let plot: Plottable.Plots.Segment<number, number>;
 
       beforeEach(() => {
-        svg = TestMethods.generateSVG(500, 500);
+        svg = TestMethods.generateSVG();
         xScale = new Plottable.Scales.Linear();
         yScale = new Plottable.Scales.Linear();
         plot = new Plottable.Plots.Segment<number, number>()
           .x((d) => d.x, xScale).x2((d) => d.x2)
           .y((d) => d.y, yScale).y2((d) => d.y2);
+        const data = [
+          { x: 1, x2: 1, y: 1, y2: 4 },
+          { x: 2, x2: 3, y: 4, y2: 3 },
+          { x: 4, x2: 5, y: 2, y2: 4 },
+          { x: 2, x2: 4, y: 1, y2: 1 }
+        ];
         plot.addDataset(new Plottable.Dataset(data)).renderTo(svg);
       });
 
       it("retrieves the entities that intersect with the bounding box", () => {
-        let entities = plot.entitiesIn({
+        const entities = plot.entitiesIn({
           topLeft: { x: xScale.scale(0), y: yScale.scale(4.5) },
           bottomRight: { x: xScale.scale(2.5), y: yScale.scale(3) }
         });
@@ -171,7 +165,7 @@ describe("Plots", () => {
       });
 
       it("retrieves the entities that intersect with given ranges", () => {
-        let entities = plot.entitiesIn(
+        const entities = plot.entitiesIn(
           { min: xScale.scale(2.5), max: xScale.scale(4.5) },
           { min: yScale.scale(4.5), max: yScale.scale(2.5) }
         );
@@ -231,7 +225,7 @@ describe("Plots", () => {
       });
 
       it("returns empty array when no entities intersect with the ranges", () => {
-        let entities = plot.entitiesIn(
+        const entities = plot.entitiesIn(
           { min: xScale.scale(1.5), max: xScale.scale(2.5) },
           { min: yScale.scale(2.5), max: yScale.scale(1.5) }
         );
@@ -241,7 +235,7 @@ describe("Plots", () => {
 
       function checkEntitiesInRange(plot: Plottable.Plots.Segment<any, any>, index: number,
                                     x1: number, x2: number, y1: number, y2: number) {
-        let entities = plot.entitiesIn(
+        const entities = plot.entitiesIn(
           { min: xScale.scale(x1), max: xScale.scale(x2) },
           { min: yScale.scale(y1), max: yScale.scale(y2) }
         );
