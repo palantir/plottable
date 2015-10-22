@@ -219,7 +219,7 @@ describe("Interactions", () => {
           height: SVG_HEIGHT + "px",
           width: SVG_WIDTH + "px",
           position: "relative",
-          top: SVG_HEIGHT / 2 + "px",
+          top: -SVG_HEIGHT / 2 + "px",
           left: SVG_WIDTH / 2 + "px",
           background: "black"
         });
@@ -239,10 +239,6 @@ describe("Interactions", () => {
         };
       });
 
-      afterEach(() => {
-        overlay.remove();
-      });
-
       it("does not call the onPointerEnter moving from within overlay with mouse", () => {
         pointerInteraction.onPointerEnter(callback);
 
@@ -260,6 +256,7 @@ describe("Interactions", () => {
 
         pointerInteraction.offPointerEnter(callback);
         svg.remove();
+        overlay.remove();
       });
 
       it("does not call the onPointerEnter moving from within overlay with touch", () => {
@@ -279,6 +276,7 @@ describe("Interactions", () => {
 
         pointerInteraction.offPointerEnter(callback);
         svg.remove();
+        overlay.remove();
       });
 
       it("calls the onPointerMove callback under overlay with mouse", () => {
@@ -293,6 +291,7 @@ describe("Interactions", () => {
 
         pointerInteraction.offPointerMove(callback);
         svg.remove();
+        overlay.remove();
       });
 
       it("calls the onPointerMove callback under overlay with touch", () => {
@@ -307,6 +306,7 @@ describe("Interactions", () => {
 
         pointerInteraction.offPointerMove(callback);
         svg.remove();
+        overlay.remove();
       });
 
       it("does not the onPointerExit callback moving into overlay with mouse", () => {
@@ -325,6 +325,7 @@ describe("Interactions", () => {
 
         pointerInteraction.offPointerExit(callback);
         svg.remove();
+        overlay.remove();
       });
 
       it("does not the onPointerExit callback moving into overlay with touch", () => {
@@ -339,6 +340,7 @@ describe("Interactions", () => {
 
         pointerInteraction.offPointerExit(callback);
         svg.remove();
+        overlay.remove();
       });
 
     });
