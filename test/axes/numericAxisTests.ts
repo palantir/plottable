@@ -250,10 +250,7 @@ describe("Axes", () => {
         let scale = new Plottable.Scales.Linear();
         scale.domain([5, -5]);
 
-        let formatter = (d: any) => (d === 0) ? "ZERO" : String(d);
-
         let axis = new Plottable.Axes.Numeric(scale, orientation);
-        axis.formatter(formatter);
         axis.renderTo(svg);
 
         let visibleTickLabels = applyVisibleFilter(axis.content().selectAll(`.${Plottable.Axis.TICK_LABEL_CLASS}`));
@@ -273,10 +270,7 @@ describe("Axes", () => {
         let scale = new Plottable.Scales.Linear();
         scale.domain([50000000000, -50000000000]);
 
-        let formatter = (d: any) => (d === 0) ? "ZERO" : String(d);
-
         let axis = new Plottable.Axes.Numeric(scale, verticalOrientation);
-        axis.formatter(formatter);
         axis.renderTo(svg);
 
         let visibleTickLabels = applyVisibleFilter(axis.content().selectAll(`.${Plottable.Axis.TICK_LABEL_CLASS}`));
