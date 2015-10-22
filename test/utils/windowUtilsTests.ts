@@ -13,7 +13,7 @@ describe("Utils.Window", () => {
       Plottable.Utils.Window.warn = oldWarn;
     });
 
-    it("deprecated() issues a warning", () => {
+    it("issues a warning", () => {
       let warningTriggered = false;
       Plottable.Utils.Window.warn = (msg: string) => {
         warningTriggered = true;
@@ -23,7 +23,7 @@ describe("Utils.Window", () => {
       assert.isTrue(warningTriggered, "the warning has been triggered");
     });
 
-    it("deprecated() calling method name, version and message are correct", () => {
+    it("displays the calling method name, deprecation version, and message", () => {
       let callingMethod = "reallyOutdatedCallerMethod";
       let version = "v0.77.2";
       let message = "hadoop is doopey";
