@@ -2,7 +2,9 @@
 
 describe("Utils.Window", () => {
   describe("warn()", () => {
-    it("uses console.warn if available, console.log otherwise", () => {
+    const runTest = console != null ? it : it.skip;
+
+    runTest("uses console.warn if available, console.log otherwise", () => {
       const originalWindowWarn = console.warn;
       let receivedWarning: string = null;
       const replacementWarn = (warning: string) => receivedWarning = warning;
@@ -28,7 +30,7 @@ describe("Utils.Window", () => {
       assert.strictEqual(receivedMessage, expectedWarning, "used console.log as a fallback");
     });
 
-    it("does not emit warnings if Configs.SHOW_WARNINGS is set to false", () => {
+    runTest("does not emit warnings if Configs.SHOW_WARNINGS is set to false", () => {
       const originalWindowWarn = console.warn;
       let windowWarnWasCalled = false;
       const replacementWarn = (warning: string) => windowWarnWasCalled = true;
