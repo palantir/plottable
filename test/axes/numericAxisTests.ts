@@ -76,25 +76,18 @@ describe("Axes", () => {
       });
     });
 
-    describe("drawing tick labels when bottom oriented", () => {
-
-      let svg: d3.Selection<void>;
-
-      beforeEach(() => {
-        svg = TestMethods.generateSVG();
-      });
-
-      it("does not overlap tick labels in a constrained space", () => {
+    horizontalOrientations.forEach((orientation) => {
+      it(`does not overlap tick labels in a constrained space for horizontal orientation ${orientation}`, () => {
+        let svg = TestMethods.generateSVG();
         let constrainedWidth = 50;
         let constrainedHeight = 50;
         svg.attr("width", constrainedWidth);
         svg.attr("height", constrainedHeight);
         let scale = new Plottable.Scales.Linear();
-        let axis = new Plottable.Axes.Numeric(scale, "bottom");
+        let axis = new Plottable.Axes.Numeric(scale, orientation);
         axis.renderTo(svg);
 
-        let visibleTickLabels = applyVisibleFilter(axis.content()
-          .selectAll(`.${Plottable.Axis.TICK_LABEL_CLASS}`));
+        let visibleTickLabels = applyVisibleFilter(axis.content().selectAll(`.${Plottable.Axis.TICK_LABEL_CLASS}`));
 
         visibleTickLabels.each(function(d, i) {
           let labelRect = this.getBoundingClientRect();
@@ -107,26 +100,15 @@ describe("Axes", () => {
 
         svg.remove();
       });
+    });
 
-      it("ensures that long labels are contained", () => {
-        let scale = new Plottable.Scales.Linear().domain([400000000, 500000000]);
-        let axis = new Plottable.Axes.Numeric(scale, "left");
-
-        axis.renderTo(svg);
-
-        let tickLabelContainerClass = "tick-label-container";
-        let labelContainer = axis.content().select(`.${tickLabelContainerClass}`);
-        axis.content().selectAll(`.${Plottable.Axis.TICK_LABEL_CLASS}`).each(function() {
-          TestMethods.assertBBoxInclusion(labelContainer, d3.select(this));
-        });
-        svg.remove();
-      });
-
+    horizontalOrientations.forEach((orientation) => {
       it("separates tick labels with the same spacing", () => {
+        let svg = TestMethods.generateSVG();
         let scale = new Plottable.Scales.Linear();
         scale.domain([-2500000, 2500000]);
 
-        let axis = new Plottable.Axes.Numeric(scale, "bottom");
+        let axis = new Plottable.Axes.Numeric(scale, orientation);
         axis.renderTo(svg);
 
         let visibleTickLabels = applyVisibleFilter(axis.content().selectAll(`.${Plottable.Axis.TICK_LABEL_CLASS}`));
@@ -145,12 +127,15 @@ describe("Axes", () => {
 
         svg.remove();
       });
+    });
 
+    horizontalOrientations.forEach((orientation) => {
       it("renders numbers in order with a reversed domain", () => {
+        let svg = TestMethods.generateSVG();
         let scale = new Plottable.Scales.Linear();
         scale.domain([3, 0]);
 
-        let axis = new Plottable.Axes.Numeric(scale, "bottom");
+        let axis = new Plottable.Axes.Numeric(scale, orientation);
         axis.renderTo(svg);
 
         let tickLabels = applyVisibleFilter(axis.content().selectAll(`.${Plottable.Axis.TICK_LABEL_CLASS}`));
@@ -168,6 +153,23 @@ describe("Axes", () => {
         svg.remove();
       });
     });
+
+    verticalOrientations.forEach((orientation) => {
+        it(`ensures that long labels are contained for vertical orientation ${orientation}`, () => {
+          let scale = new Plottable.Scales.Linear().domain([400000000, 500000000]);
+          let axis = new Plottable.Axes.Numeric(scale, orientation);
+
+          let svg = TestMethods.generateSVG();
+          axis.renderTo(svg);
+
+          let tickLabelContainerClass = "tick-label-container";
+          let labelContainer = axis.content().select(`.${tickLabelContainerClass}`);
+          axis.content().selectAll(`.${Plottable.Axis.TICK_LABEL_CLASS}`).each(function() {
+            TestMethods.assertBBoxInclusion(labelContainer, d3.select(this));
+          });
+          svg.remove();
+        });
+      });
 
     orientations.forEach((orientation) => {
       it(`draws ticks labels centered with the corresponding tick mark for orientation ${orientation}`, () => {
@@ -255,8 +257,7 @@ describe("Axes", () => {
         axis.formatter(formatter);
         axis.renderTo(svg);
 
-        let visibleTickLabels = applyVisibleFilter(axis.content()
-          .selectAll(`.${Plottable.Axis.TICK_LABEL_CLASS}`));
+        let visibleTickLabels = applyVisibleFilter(axis.content().selectAll(`.${Plottable.Axis.TICK_LABEL_CLASS}`));
         let boundingBox = (<Element> svg.select(".axis").select(".bounding-box").node()).getBoundingClientRect();
         visibleTickLabels.each(function(d, i) {
           let visibleTickLabelRect = this.getBoundingClientRect();
@@ -279,8 +280,7 @@ describe("Axes", () => {
         axis.formatter(formatter);
         axis.renderTo(svg);
 
-        let visibleTickLabels = applyVisibleFilter(axis.content()
-          .selectAll(`.${Plottable.Axis.TICK_LABEL_CLASS}`));
+        let visibleTickLabels = applyVisibleFilter(axis.content().selectAll(`.${Plottable.Axis.TICK_LABEL_CLASS}`));
         let boundingBox = (<Element> svg.select(".axis").select(".bounding-box").node()).getBoundingClientRect();
         visibleTickLabels.each(function(d, i) {
           let visibleTickLabelRect = this.getBoundingClientRect();
