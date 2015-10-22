@@ -30,21 +30,21 @@ function shuffle(array) {
 }
 
 function makeRandomNamedData(numPoints, scaleFactor, namerange) {
-    "use strict";
-    if (namerange === undefined) {
-        namerange = [];
-        for(var i = 1; i <= 26; i++) {
-            namerange.push(String.fromCharCode(64 + i));
-        }
+  "use strict";
+  if (namerange === undefined) {
+    namerange = [];
+    for (var i = 1; i <= 26; i++) {
+      namerange.push(String.fromCharCode(64 + i));
     }
-    var data = makeRandomData(numPoints, scaleFactor);
-    namerange = shuffle(namerange);
-    var out = [];
-    for (i = 0; i < numPoints; i++) {
-        var x = { name: namerange[i], x: data[i].x, y: data[i].y };
-        out.push(x);
-    }
-    return out;
+  }
+  var data = makeRandomData(numPoints, scaleFactor);
+  namerange = shuffle(namerange);
+  var out = [];
+  for (i = 0; i < numPoints; i++) {
+    var x = { name: namerange[i], x: data[i].x, y: data[i].y };
+    out.push(x);
+  }
+  return out;
 }
 function makeSinusoidalData(min, max, delta) {
   "use strict";
