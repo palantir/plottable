@@ -32,10 +32,14 @@ describe("Plots", () => {
         assert.strictEqual(lines.size(), plot.datasets()[0].data().length, "line for each datum");
         lines.each(function(d, i) {
           const line = d3.select(this);
-          assert.strictEqual(TestMethods.numAttr(line, "x1"), xScale.scale(d.x), `x1 for line ${i}`);
-          assert.strictEqual(TestMethods.numAttr(line, "x2"), xScale.scale(d.x2), `x2 for line ${i}`);
-          assert.strictEqual(TestMethods.numAttr(line, "y1"), yScale.scale(d.y), `y1 for line ${i}`);
-          assert.strictEqual(TestMethods.numAttr(line, "y2"), yScale.scale(d.y2), `y2 for line ${i}`);
+          assert.closeTo(TestMethods.numAttr(line, "x1"), xScale.scale(d.x),
+            window.Pixel_CloseTo_Requirement, `x1 for line ${i}`);
+          assert.closeTo(TestMethods.numAttr(line, "x2"), xScale.scale(d.x2),
+            window.Pixel_CloseTo_Requirement, `x2 for line ${i}`);
+          assert.closeTo(TestMethods.numAttr(line, "y1"), yScale.scale(d.y),
+            window.Pixel_CloseTo_Requirement, `y1 for line ${i}`);
+          assert.closeTo(TestMethods.numAttr(line, "y2"), yScale.scale(d.y2),
+            window.Pixel_CloseTo_Requirement, `y2 for line ${i}`);
         });
         svg.remove();
       });
