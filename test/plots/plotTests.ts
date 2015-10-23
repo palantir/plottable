@@ -40,7 +40,7 @@ describe("Plots", () => {
       it("can remove a dataset", () => {
         const dataset = new Plottable.Dataset();
         plot.addDataset(dataset);
-        assert.strictEqual(plot.removeDataset(dataset), "removing a dataset returns the plot");
+        assert.strictEqual(plot.removeDataset(dataset), plot, "removing a dataset returns the plot");
         assert.deepEqual(plot.datasets(), [], "dataset has been removed");
       });
 
@@ -94,6 +94,24 @@ describe("Plots", () => {
 
         svg.remove();
       });
+
+      it("updates the scale extents in dataset order", () => {
+        const categoryScale = new Plottable.Scales.Category();
+        const data = ["A"];
+        const dataset = new Plottable.Dataset(data);
+        const data2 = ["B"];
+        const dataset2 = new Plottable.Dataset(data2);
+
+        plot.addDataset(dataset2);
+        plot.addDataset(dataset);
+        plot.attr("key", (d) => d, categoryScale);
+
+        let svg = TestMethods.generateSVG();
+        plot.anchor(svg);
+
+        assert.deepEqual(categoryScale.domain(), data2.concat(data), "extent in the right order");
+        svg.remove();
+      });
     });
 
     it("can set if the plot will animate", () => {
@@ -123,188 +141,83 @@ describe("Plots", () => {
       it("can set the animator for a key", () => {
         const animator = new Plottable.Animators.Easing();
         const animatorKey = "foo";
-        assert.strictEqual(plot.animator(animatorKey, animator), "setting an animator returns the plot");
-        assert.strictEqual(plot.animator(animatorKey), animator, "can set the animator for a given key")
+        assert.strictEqual(plot.animator(animatorKey, animator), plot, "setting an animator returns the plot");
+        assert.strictEqual(plot.animator(animatorKey), animator, "can set the animator for a given key");
       });
     });
 
-    it("destroy() disconnects plots from its scales", () => {
-      let plot2 = new Plottable.Plot();
-      let scale = new Plottable.Scales.Linear();
-      plot2.attr("attr", (d) => d.a, scale);
-      plot2.destroy();
-      assert.strictEqual((<any> scale)._callbacks.size, 0, "the plot is no longer attached to the scale");
-    });
+    it("disconnects the data extents from the scales when destroyed", () => {
+      const plot = new Plottable.Plot();
+      const scale = new Plottable.Scales.Linear();
+      plot.attr("attr", (d) => d, scale);
 
-    it("Plots default correctly", () => {
-      let svg = TestMethods.generateSVG(400, 300);
-      let r = new Plottable.Plot();
-      (<any> r)._createDrawer = (dataset: Plottable.Dataset) => createMockDrawer(dataset);
-      r.renderTo(svg);
-      TestMethods.verifyClipPath(r);
-      svg.remove();
-    });
-
-    it("Base Plot functionality works", () => {
-      let svg = TestMethods.generateSVG(400, 300);
-      let r = new Plottable.Plot();
-      (<any> r)._createDrawer = (dataset: Plottable.Dataset) => createMockDrawer(dataset);
-      r.anchor(svg);
-      r.computeLayout();
-      let renderArea = (<any> r)._content.select(".render-area");
-      assert.isNotNull(renderArea.node(), "there is a render-area");
-      svg.remove();
-    });
-
-    it("sets the domain automatically when attaching a Scale to an attr", () => {
-      let xMin = 5;
-      let xMax = 10;
-      let dataset = new Plottable.Dataset([{x: xMin}, {x: xMax}]);
-      let plot = new Plottable.Plot();
-      let svg = TestMethods.generateSVG();
-      (<any> plot)._createDrawer = (dataset: Plottable.Dataset) => createMockDrawer(dataset);
+      const data = [5, -5, 10];
+      const dataset = new Plottable.Dataset(data);
       plot.addDataset(dataset);
 
-      let scale = new Plottable.Scales.Linear().padProportion(0).snappingDomainEnabled(false);
+      const oldDomain = scale.domain();
 
-      plot.attr("x", (d) => d.x);
-      plot.attr("y", (d) => 1);
-      plot.renderTo(svg);
+      const svg = TestMethods.generateSVG();
+      plot.anchor(svg);
 
-      plot.attr("x", (d) => d.x, scale);
-      assert.deepEqual(scale.domain(), [xMin, xMax], "scale domain scale is auto updated");
+      plot.destroy();
+      assert.deepEqual(scale.domain(), oldDomain, "destroying the plot removes its extents from the scale");
       svg.remove();
     });
 
-    it("Plot.project works as intended", () => {
-      let r = new Plottable.Plot();
-      (<any> r)._createDrawer = (dataset: Plottable.Dataset) => createMockDrawer(dataset);
-      let s = new Plottable.Scales.Linear().domain([0, 1]).range([0, 10]);
-      r.attr("attr", (d) => d.a, s);
-      let attrToProjector = (<any> r)._generateAttrToProjector();
-      let projector = attrToProjector["attr"];
-      assert.strictEqual(projector({"a": 0.5}, 0, null, null), 5, "projector works as intended");
-    });
+    it("disconnects the data extents from the scales when destroyed", () => {
+      const plot = new Plottable.Plot();
+      const scale = new Plottable.Scales.Linear();
+      plot.attr("attr", (d) => d, scale);
 
-    it("extent registration works as intended", () => {
-      let scale1 = new Plottable.Scales.Linear().padProportion(0);
-      let scale2 = new Plottable.Scales.Linear().padProportion(0);
+      const data = [5, -5, 10];
+      const dataset = new Plottable.Dataset(data);
+      plot.addDataset(dataset);
 
-      let d1 = new Plottable.Dataset([1, 2, 3]);
-      let d2 = new Plottable.Dataset([4, 99, 999]);
-      let d3 = new Plottable.Dataset([-1, -2, -3]);
+      const oldDomain = scale.domain();
 
-      let id = (d: number) => d;
-      let plot1 = new Plottable.Plot();
-      let plot2 = new Plottable.Plot();
-      let svg = TestMethods.generateSVG(400, 400);
-      (<any> plot1)._createDrawer = (dataset: Plottable.Dataset) => createMockDrawer(dataset);
-      (<any> plot2)._createDrawer = (dataset: Plottable.Dataset) => createMockDrawer(dataset);
-      plot1.attr("null", id, scale1);
-      plot2.attr("null", id, scale1);
-      plot1.renderTo(svg);
-      plot2.renderTo(svg);
+      const svg = TestMethods.generateSVG();
+      plot.anchor(svg);
 
-      function assertDomainIsClose(actualDomain: number[], expectedDomain: number[], msg: string) {
-        // to avoid floating point issues:/
-        assert.closeTo(actualDomain[0], expectedDomain[0], 0.01, msg);
-        assert.closeTo(actualDomain[1], expectedDomain[1], 0.01, msg);
-      }
-
-      plot1.addDataset(d1);
-      assertDomainIsClose(scale1.domain(), [1, 3], "scale includes plot1 projected data");
-
-      plot2.addDataset(d2);
-      assertDomainIsClose(scale1.domain(), [1, 999], "scale extent includes plot1 and plot2");
-
-      plot2.addDataset(d3);
-      assertDomainIsClose(scale1.domain(), [-3, 999], "extent widens further if we add more data to plot2");
-
-      plot2.removeDataset(d3);
-      assertDomainIsClose(scale1.domain(), [1, 999], "extent shrinks if we remove dataset");
-
-      plot2.attr("null", id, scale2);
-      assertDomainIsClose(scale1.domain(), [1, 3], "extent shrinks further if we project plot2 away");
-
-      svg.remove();
-    });
-
-    it("additionalPaint timing works properly", () => {
-      let animator = new Plottable.Animators.Easing()
-        .startDelay(10)
-        .stepDuration(10)
-        .stepDelay(0);
-      let x = new Plottable.Scales.Linear();
-      let y = new Plottable.Scales.Linear();
-      let plot = new Plottable.Plots.Bar();
-      plot.addDataset(new Plottable.Dataset([])).animated(true);
-      let recordedTime = -1;
-      let additionalPaint = (x: number) => {
-        recordedTime = Math.max(x, recordedTime);
-      };
-      (<any> plot)._additionalPaint = additionalPaint;
-      plot.animator(Plottable.Plots.Animator.MAIN, animator);
-      let svg = TestMethods.generateSVG();
-      plot.x((d: any) => d.x, x);
-      plot.y((d: any) => d.y, y);
-      plot.renderTo(svg);
-      assert.strictEqual(recordedTime, 20, "additionalPaint passed appropriate time argument");
-      svg.remove();
-    });
-
-    it("extent calculation done in correct dataset order", () => {
-      let categoryScale = new Plottable.Scales.Category();
-      let dataset1 = new Plottable.Dataset([{key: "A"}]);
-      let dataset2 = new Plottable.Dataset([{key: "B"}]);
-      let plot = new Plottable.Plot();
-      (<any> plot)._createDrawer = (dataset: Plottable.Dataset) => createMockDrawer(dataset);
-      plot.addDataset(dataset2);
-      plot.addDataset(dataset1);
-      plot.attr("key", (d) => d.key, categoryScale);
-
-      let svg = TestMethods.generateSVG();
-      plot.renderTo(svg);
-
-      assert.deepEqual(categoryScale.domain(), ["B", "A"], "extent is in the right order");
+      plot.detach();
+      assert.deepEqual(scale.domain(), oldDomain, "detaching the plot removes its extents from the scale");
       svg.remove();
     });
 
     describe("clipPath", () => {
       it("uses the correct clipPath", () => {
-        let svg = TestMethods.generateSVG();
-        let plot = new Plottable.Plot();
+        const svg = TestMethods.generateSVG();
+        const plot = new Plottable.Plot();
         plot.renderTo(svg);
         TestMethods.verifyClipPath(plot);
         svg.remove();
       });
 
-      it("updates the clipPath reference when render()-ed", () => {
-        if (window.history == null || window.history.replaceState == null) { // not supported on IE9 (http://caniuse.com/#feat=history)
-          return;
-        }
+      // not supported on IE9 (http://caniuse.com/#feat=history)
+      if (window.history == null || window.history.replaceState == null) {
+        it("updates the clipPath reference when rendered", () => {
+          const svg = TestMethods.generateSVG();
+          const plot = new Plottable.Plot();
+          plot.renderTo(svg);
 
-        let svg = TestMethods.generateSVG();
-        let plot = new Plottable.Plot();
-        plot.renderTo(svg);
+          const originalState = window.history.state;
+          const originalTitle = document.title;
+          const originalLocation = document.location.href;
+          window.history.replaceState(null, null, "clipPathTest");
+          plot.render();
 
-        let originalState = window.history.state;
-        let originalTitle = document.title;
-        let originalLocation = document.location.href;
-        window.history.replaceState(null, null, "clipPathTest");
-        plot.render();
+          const clipPathId = (<any> plot)._boxContainer[0][0].firstChild.id;
+          const expectedPrefix = (/MSIE [5-9]/.test(navigator.userAgent) ? "" : document.location.href).replace(/#.*/g, "");
+          const expectedClipPathURL = "url(" + expectedPrefix + "#" + clipPathId + ")";
 
-        let clipPathId = (<any> plot)._boxContainer[0][0].firstChild.id;
-        let expectedPrefix = /MSIE [5-9]/.test(navigator.userAgent) ? "" : document.location.href;
-        expectedPrefix = expectedPrefix.replace(/#.*/g, "");
-        let expectedClipPathURL = "url(" + expectedPrefix + "#" + clipPathId + ")";
+          window.history.replaceState(originalState, originalTitle, originalLocation);
 
-        window.history.replaceState(originalState, originalTitle, originalLocation);
-
-        let normalizeClipPath = (s: string) => s.replace(/"/g, "");
-        assert.strictEqual(normalizeClipPath((<any> plot)._element.attr("clip-path")), expectedClipPathURL,
-          "the clipPath reference was updated");
-        svg.remove();
-      });
+          const normalizeClipPath = (s: string) => s.replace(/"/g, "");
+          assert.strictEqual(normalizeClipPath((<any> plot)._element.attr("clip-path")), expectedClipPathURL,
+            "the clipPath reference was updated");
+          svg.remove();
+        });
+      }
     });
   });
 });
