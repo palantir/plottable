@@ -98,8 +98,11 @@ export class Drawer {
 
   /*
    * Return the AttrToAppliedProjector generated from the initializer
-   *
-   * @returns {AttrToAppliedProjector} .
+   * The function supplied to initializer is executed, and the resulting AttributeToProjector
+   * is used to generate this AttrToAppliedProjector
+   * When applied to a selection, this AttrToAppliedProjector sets an "initial state" relevant to the
+   * owning plot.
+   * @returns {AttrToAppliedProjector}
    */
   public appliedInitializer() {
     return this._appliedProjectors(this.initializer()());

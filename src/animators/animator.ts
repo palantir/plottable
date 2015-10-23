@@ -1,33 +1,63 @@
-module Plottable {
-export module Animators {
-  export type d3SelectionOrTransition = d3.Selection<any>|d3.Transition<any>;
+module Plottable.Animators {
+  export type d3SelectionOrTransition = d3.Selection<any> | d3.Transition<any>;
 
   export type EasingFunction = (t: number) => number;
-  export type EasingFunctionSpecifier = string|EasingFunction;
+  export type EasingFunctionSpecifier = string | EasingFunction;
+  /**
+   * Custom easing functions. these are designed to co-ordinate the timing of
+   * actvities on two or more transitions that are active simulataneously
+   * (on different selections)
+   * These are designed to help animators schedule animations between
+   * the enter, update and exit selections - each can have a transition of the same duration,
+   * but the actual timing of activity will be determined by the easing function.
+   */
   export class EasingFunctions {
+    /**
+     * atStart
+     * An EasingFunction that applies all attributes at once at the start of the transition;
+     * ie this creates a "wait" after applying the attributes.
+     */
     public static atStart = (t: number) => {
       return 1;
     };
+    /**
+     * atEnd
+     * An EasingFunction that applies all attributes at once at the end of the transition;
+     * ie this creates a "wait" before applying the attributes.
+     */
     public static atEnd = (t: number) => {
       if (t < 1) {
         return 0;
       };
       return 1;
     };
+    /**
+     * squEase
+     * squEase ("squeezing ease") applies the transition squeezed into a subinterval [a,b] where 0 <= a <= b <= 1.
+     * The actual easing to apply in that interval is passed as an argument.
+     * @param easingFunction {EasingFunctionSpecifier} an easing function, or the string descriptor
+     * of a d3 built-in easing function ( as used by d3.ease())
+     * @param start {number} value between 0 and 1 at which the animation starts
+     * @param end  {end} value between start and 1 at which the animation ends
+     * Note that if start == end, the are applied instanteously at that point and the
+     * easingFunction parameter is not relevant. In particular start == end == 0 is the
+     * same as atStart
+     * @returns {EasingFunction} An easing function that can be applied to a d3 transition.
+     */
     public static squEase(easingFunction: EasingFunctionSpecifier, start: number, end: number): EasingFunction {
       return (t: number) => {
         if (start === undefined) {
           start = 0;
         };
         if (t >= end) {
-            return 1;
+          return 1;
         }
         if (t <= start) {
           return 0;
         }
         let tbar = (t - start) / (end - start);
-        if (typeof (easingFunction) === "string") {
-          easingFunction = d3.ease(<string>easingFunction);
+        if (typeof easingFunction === "string") {
+          return d3.ease(easingFunction)(tbar);
         }
         return (<EasingFunction>easingFunction)(tbar);
       };
@@ -35,27 +65,27 @@ export module Animators {
   }
 }
 
-export interface Animator {
-  /**
-   * Applies the supplied attributes to a d3.Selection with some animation.
-   *
-   * @param {d3.Selection} selection The update selection or transition selection that we wish to animate.
-   * @param {AttributeToAppliedProjector} attrToAppliedProjector The set of
-   *     AppliedProjectors that we will use to set attributes on the selection.
-   * @return {any} Animators should return the selection or
-   *     transition object so that plots may chain the transitions between
-   *     animators.
-   */
-  animate(selection: d3.Selection<any>|d3.Transition<any>, attrToAppliedProjector: AttributeToAppliedProjector,
-    drawingTarget?: Drawers.DrawingTarget, drawer?: Drawer): d3.Selection<any> | d3.Transition<any>;
+module Plottable {
+  export interface Animator {
+    /**
+     * Applies the supplied attributes to a d3.Selection with some animation.
+     *
+     * @param {d3.Selection} selection The update selection or transition selection that we wish to animate.
+     * @param {AttributeToAppliedProjector} attrToAppliedProjector The set of
+     *     AppliedProjectors that we will use to set attributes on the selection.
+     * @return {any} Animators should return the selection or
+     *     transition object so that plots may chain the transitions between
+     *     animators.
+     */
+    animate(selection: d3.Selection<any>|d3.Transition<any>, attrToAppliedProjector: AttributeToAppliedProjector,
+      drawingTarget?: Drawers.DrawingTarget, drawer?: Drawer): d3.Selection<any> | d3.Transition<any>;
 
-  /**
-   * Given the number of elements, return the total time the animation requires
-   *
-   * @param {number} numberofIterations The number of elements that will be drawn
-   * @returns {number}
-   */
-  totalTime(numberOfIterations: number): number;
-}
-
+    /**
+     * Given the number of elements, return the total time the animation requires
+     *
+     * @param {number} numberofIterations The number of elements that will be drawn
+     * @returns {number}
+     */
+    totalTime(numberOfIterations: number): number;
+  }
 }

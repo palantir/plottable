@@ -2602,8 +2602,11 @@ var Plottable;
         };
         /*
          * Return the AttrToAppliedProjector generated from the initializer
-         *
-         * @returns {AttrToAppliedProjector} .
+         * The function supplied to initializer is executed, and the resulting AttributeToProjector
+         * is used to generate this AttrToAppliedProjector
+         * When applied to a selection, this AttrToAppliedProjector sets an "initial state" relevant to the
+         * owning plot.
+         * @returns {AttrToAppliedProjector}
          */
         Drawer.prototype.appliedInitializer = function () {
             return this._appliedProjectors(this.initializer()());
@@ -10223,9 +10226,30 @@ var Plottable;
 (function (Plottable) {
     var Animators;
     (function (Animators) {
+        /**
+         * Custom easing functions. these are designed to co-ordinate the timing of
+         * actvities on two or more transitions that are active simulataneously
+         * (on different selections)
+         * These are designed to help animators schedule animations between
+         * the enter, update and exit selections - each can have a transition of the same duration,
+         * but the actual timing of activity will be determined by the easing function.
+         */
         var EasingFunctions = (function () {
             function EasingFunctions() {
             }
+            /**
+             * squEase
+             * squEase ("squeezing ease") applies the transition squeezed into a subinterval [a,b] where 0 <= a <= b <= 1.
+             * The actual easing to apply in that interval is passed as an argument.
+             * @param easingFunction {EasingFunctionSpecifier} an easing function, or the string descriptor
+             * of a d3 built-in easing function ( as used by d3.ease())
+             * @param start {number} value between 0 and 1 at which the animation starts
+             * @param end  {end} value between start and 1 at which the animation ends
+             * Note that if start == end, the are applied instanteously at that point and the
+             * easingFunction parameter is not relevant. In particular start == end == 0 is the
+             * same as atStart
+             * @returns {EasingFunction} An easing function that can be applied to a d3 transition.
+             */
             EasingFunctions.squEase = function (easingFunction, start, end) {
                 return function (t) {
                     if (start === undefined) {
@@ -10239,15 +10263,25 @@ var Plottable;
                         return 0;
                     }
                     var tbar = (t - start) / (end - start);
-                    if (typeof (easingFunction) === "string") {
-                        easingFunction = d3.ease(easingFunction);
+                    if (typeof easingFunction === "string") {
+                        return d3.ease(easingFunction)(tbar);
                     }
                     return easingFunction(tbar);
                 };
             };
+            /**
+             * atStart
+             * An EasingFunction that applies all attributes at once at the start of the transition;
+             * ie this creates a "wait" after applying the attributes.
+             */
             EasingFunctions.atStart = function (t) {
                 return 1;
             };
+            /**
+             * atEnd
+             * An EasingFunction that applies all attributes at once at the end of the transition;
+             * ie this creates a "wait" before applying the attributes.
+             */
             EasingFunctions.atEnd = function (t) {
                 if (t < 1) {
                     return 0;
