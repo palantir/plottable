@@ -178,7 +178,7 @@ describe("Plots", () => {
       });
 
       // not supported on IE9 (http://caniuse.com/#feat=history)
-      if (window.history == null || window.history.replaceState == null) {
+      if (window.history != null && window.history.replaceState != null) {
         it("updates the clipPath reference when rendered", () => {
           const svg = TestMethods.generateSVG();
           const plot = new Plottable.Plot();
