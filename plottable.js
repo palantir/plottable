@@ -11567,6 +11567,34 @@ var Plottable;
                 this._maxDomainExtents.set(quantitativeScale, maxDomainExtent);
                 return this;
             };
+            PanZoom.prototype.minDomainValue = function (quantitativeScale, minDomainValue) {
+                if (minDomainValue == null) {
+                    return this._minDomainValues.get(quantitativeScale);
+                }
+                var maxDomainValue = this.maxDomainValue(quantitativeScale);
+                if (maxDomainValue != null && maxDomainValue.valueOf() < minDomainValue.valueOf()) {
+                    throw new Error("maxDomainValue must be larger than minDomainValue for the same Scale");
+                }
+                if (this._nonLinearScaleWithExtents(quantitativeScale)) {
+                    Plottable.Utils.Window.warn("Panning and zooming with extents on a nonlinear scale may have unintended behavior.");
+                }
+                this._minDomainValues.set(quantitativeScale, minDomainValue);
+                return this;
+            };
+            PanZoom.prototype.maxDomainValue = function (quantitativeScale, maxDomainValue) {
+                if (maxDomainValue == null) {
+                    return this._maxDomainValues.get(quantitativeScale);
+                }
+                var minDomainValue = this.minDomainValue(quantitativeScale);
+                if (minDomainValue != null && maxDomainValue.valueOf() < minDomainValue.valueOf()) {
+                    throw new Error("maxDomainValue must be larger than minDomainValue for the same Scale");
+                }
+                if (this._nonLinearScaleWithExtents(quantitativeScale)) {
+                    Plottable.Utils.Window.warn("Panning and zooming with extents on a nonlinear scale may have unintended behavior.");
+                }
+                this._maxDomainValues.set(quantitativeScale, maxDomainValue);
+                return this;
+            };
             /**
              * The number of pixels occupied in a line.
              */
