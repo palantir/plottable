@@ -1,4 +1,39 @@
 module Plottable {
+export module Animators {
+  export type d3SelectionOrTransition = d3.Selection<any>|d3.Transition<any>;
+
+  export type EasingFunction = (t: number) => number;
+  export type EasingFunctionSpecifier = string|EasingFunction;
+  export class EasingFunctions {
+    public static atStart = (t: number) => {
+      return 1;
+    };
+    public static atEnd = (t: number) => {
+      if (t < 1) {
+        return 0;
+      };
+      return 1;
+    };
+    public static squEase(easingFunction: EasingFunctionSpecifier, start: number, end: number): EasingFunction {
+      return (t: number) => {
+        if (start === undefined) {
+          start = 0;
+        };
+        if (t >= end) {
+            return 1;
+        }
+        if (t <= start) {
+          return 0;
+        }
+        let tbar = (t - start) / (end - start);
+        if (typeof (easingFunction) === "string") {
+          easingFunction = d3.ease(<string>easingFunction);
+        }
+        return (<EasingFunction>easingFunction)(tbar);
+      };
+    }
+  }
+}
 
 export interface Animator {
   /**
@@ -11,7 +46,8 @@ export interface Animator {
    *     transition object so that plots may chain the transitions between
    *     animators.
    */
-  animate(selection: d3.Selection<any>, attrToAppliedProjector: AttributeToAppliedProjector): d3.Selection<any> | d3.Transition<any>;
+  animate(selection: d3.Selection<any>|d3.Transition<any>, attrToAppliedProjector: AttributeToAppliedProjector,
+    drawingTarget?: Drawers.DrawingTarget, drawer?: Drawer): d3.Selection<any> | d3.Transition<any>;
 
   /**
    * Given the number of elements, return the total time the animation requires

@@ -35,9 +35,8 @@ describe("DatasetKeyFunction", () => {
   describe("DatasetKey noConstancy", () => {
     it("generates a different value each time invoked", () => {
       let keyFunction = Plottable.KeyFunctions.noConstancy;
-      let datum = { foo: "bar" };
-      let keyValue1 = keyFunction(datum, 1);
-      let keyValue2 = keyFunction(datum, 1);
+      let keyValue1 = keyFunction();
+      let keyValue2 = keyFunction();
       assert.strictEqual(keyValue2, keyValue1 + 1, "invocations give numerically increasing results");
 
     });
