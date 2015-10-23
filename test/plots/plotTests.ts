@@ -17,6 +17,85 @@ class CountingPlot extends Plottable.Plot {
 
 describe("Plots", () => {
   describe("Plot", () => {
+
+    it("adds a \"plot\" css class by default", () => {
+      const plot = new Plottable.Plot();
+      assert.isTrue(plot.hasClass("plot"), "plot class added by default");
+    });
+
+    describe("managing datasets", () => {
+      let plot: Plottable.Plot;
+
+      beforeEach(() => {
+        plot = new Plottable.Plot();
+      });
+
+      it("can add a dataset", () => {
+        const dataset = new Plottable.Dataset();
+        plot.addDataset(dataset);
+
+        assert.deepEqual(plot.datasets(), [dataset], "dataset has been added");
+      });
+
+      it("can remove a dataset", () => {
+        const dataset = new Plottable.Dataset();
+        plot.addDataset(dataset);
+        plot.removeDataset(dataset);
+        assert.deepEqual(plot.datasets(), [], "dataset has been removed");
+      });
+
+      it("can set the datasets", () => {
+        const datasetCount = 5;
+        const datasets = Plottable.Utils.Math.range(0, datasetCount).map(() => new Plottable.Dataset());
+        plot.datasets(datasets);
+        assert.deepEqual(plot.datasets(), datasets, "datasets have been set");
+      });
+
+      it("adds a g element for each dataset to the render area", () => {
+        const datasetCount = 5;
+        const datasets = Plottable.Utils.Math.range(0, datasetCount).map(() => new Plottable.Dataset());
+        plot.datasets(datasets);
+
+        const svg = TestMethods.generateSVG();
+        plot.anchor(svg);
+
+        assert.strictEqual(plot.content().select(".render-area").selectAll("g").size(), datasetCount, "g for each dataset");
+
+        svg.remove();
+      });
+
+      it("updates the scales extents when the datasets get updated", () => {
+        const scale = new Plottable.Scales.Linear();
+
+        const data = [5, -5, 10];
+        const dataset = new Plottable.Dataset(data);
+
+        plot.attr("foo", (d) => d, scale);
+        plot.addDataset(dataset);
+
+        const oldDomain = scale.domain();
+
+        const svg = TestMethods.generateSVG();
+        plot.anchor(svg);
+
+        assert.operator(scale.domainMin(), "<=", Math.min.apply(null, data), "domainMin extended to at least minimum");
+        assert.operator(scale.domainMax(), ">=", Math.max.apply(null, data), "domainMax extended to at least maximum");
+
+        plot.removeDataset(dataset);
+
+        assert.deepEqual(scale.domain(), oldDomain, "domain does not include dataset if removed");
+
+        const data2 = [7, -7, 8];
+        const dataset2 = new Plottable.Dataset(data2);
+        plot.datasets([dataset, dataset2]);
+
+        assert.operator(scale.domainMin(), "<=", Math.min.apply(null, data.concat(data2)), "domainMin includes new dataset");
+        assert.operator(scale.domainMax(), ">=", Math.max.apply(null, data.concat(data2)), "domainMax includes new dataset");
+
+        svg.remove();
+      });
+    });
+
     it("Plots default correctly", () => {
       let svg = TestMethods.generateSVG(400, 300);
       let r = new Plottable.Plot();
@@ -35,102 +114,6 @@ describe("Plots", () => {
       let renderArea = (<any> r)._content.select(".render-area");
       assert.isNotNull(renderArea.node(), "there is a render-area");
       svg.remove();
-    });
-
-    it("Changes Dataset listeners when the Dataset is changed", () => {
-      let dFoo = new Plottable.Dataset(["foo"], {cssClass: "bar"});
-      let dBar = new Plottable.Dataset(["bar"], {cssClass: "boo"});
-      let r = new CountingPlot();
-      r.addDataset(dFoo);
-
-      assert.strictEqual(1, r.renders, "initial render due to addDataset");
-
-      dFoo.data(dFoo.data());
-      assert.strictEqual(2, r.renders, "we re-render when our dataset changes");
-
-      r.addDataset(dBar);
-      assert.strictEqual(3, r.renders, "we should redraw when we add a dataset");
-
-      dFoo.data(dFoo.data());
-      assert.strictEqual(4, r.renders, "we should still listen to the first dataset");
-
-      dFoo.data(dFoo.data());
-      assert.strictEqual(5, r.renders, "we should listen to the new dataset");
-
-      r.removeDataset(dFoo);
-      assert.strictEqual(6, r.renders, "we re-render on dataset removal");
-      dFoo.data(dFoo.data());
-      assert.strictEqual(6, r.renders, "we don't listen to removed datasets");
-    });
-
-    it("datasets()", () => {
-      let dataset1 = new Plottable.Dataset([]);
-      let dataset2 = new Plottable.Dataset([]);
-
-      let plot = new Plottable.Plot();
-      (<any> plot)._createDrawer = (dataset: Plottable.Dataset) => createMockDrawer(dataset);
-      plot.addDataset(dataset1);
-      plot.addDataset(dataset2);
-      assert.deepEqual(plot.datasets(), [dataset1, dataset2], "retrieved Datasets in order they were added");
-
-      plot.datasets([dataset2, dataset1]);
-      assert.deepEqual(plot.datasets(), [dataset2, dataset1], "order of Datasets was changed");
-
-      let dataset3 = new Plottable.Dataset([]);
-      plot.addDataset(dataset3);
-      assert.deepEqual(plot.datasets(), [dataset2, dataset1, dataset3], "adding further Datasets respects the order");
-
-      plot.removeDataset(dataset1);
-      assert.deepEqual(plot.datasets(), [dataset2, dataset3], "removing a Dataset leaves the remainder in the same order");
-
-      plot.datasets([]);
-      assert.deepEqual(plot.datasets(), [], "the datasets() call first removes all the datasets");
-    });
-
-    it("Updates its projectors when the Dataset is changed", () => {
-      let d1 = new Plottable.Dataset([{x: 5, y: 6}], {cssClass: "bar"});
-      let r = new Plottable.Plot();
-      (<any> r)._createDrawer = (dataset: Plottable.Dataset) => createMockDrawer(dataset);
-      r.addDataset(d1);
-
-      let xScaleCalls: number = 0;
-      let yScaleCalls: number = 0;
-      let xScale = new Plottable.Scales.Linear();
-      let yScale = new Plottable.Scales.Linear();
-      let metadataProjector = (d: any, i: number, m: any) => m.cssClass;
-      r.attr("x", (d) => d.x, xScale);
-      r.attr("y", (d) => d.y, yScale);
-      r.attr("meta", metadataProjector);
-      xScale.onUpdate((listenable: Plottable.Scales.Linear) => {
-        assert.strictEqual(listenable, xScale, "Callback received the calling scale as the first argument");
-        ++xScaleCalls;
-      });
-      yScale.onUpdate((listenable: Plottable.Scales.Linear) => {
-        assert.strictEqual(listenable, yScale, "Callback received the calling scale as the first argument");
-        ++yScaleCalls;
-      });
-
-      assert.strictEqual(0, xScaleCalls, "initially hasn't made any X callbacks");
-      assert.strictEqual(0, yScaleCalls, "initially hasn't made any Y callbacks");
-
-      d1.data(d1.data());
-      assert.strictEqual(1, xScaleCalls, "X scale was wired up to datasource correctly");
-      assert.strictEqual(1, yScaleCalls, "Y scale was wired up to datasource correctly");
-
-      let d2 = new Plottable.Dataset([{x: 7, y: 8}], {cssClass: "boo"});
-      r.removeDataset(d1);
-      r.addDataset(d2);
-      assert.strictEqual(3, xScaleCalls, "Changing datasource fires X scale listeners (but doesn't coalesce callbacks)");
-      assert.strictEqual(3, yScaleCalls, "Changing datasource fires Y scale listeners (but doesn't coalesce callbacks)");
-
-      d1.data(d1.data());
-      assert.strictEqual(3, xScaleCalls, "X scale was unhooked from old datasource");
-      assert.strictEqual(3, yScaleCalls, "Y scale was unhooked from old datasource");
-
-      d2.data(d2.data());
-      assert.strictEqual(4, xScaleCalls, "X scale was hooked into new datasource");
-      assert.strictEqual(4, yScaleCalls, "Y scale was hooked into new datasource");
-
     });
 
     it("sets the domain automatically when attaching a Scale to an attr", () => {
@@ -161,29 +144,6 @@ describe("Plots", () => {
       let attrToProjector = (<any> r)._generateAttrToProjector();
       let projector = attrToProjector["attr"];
       assert.strictEqual(projector({"a": 0.5}, 0, null, null), 5, "projector works as intended");
-    });
-
-    it("Changing Plot.dataset().data to [] causes scale to contract", () => {
-      let ds1 = new Plottable.Dataset([0, 1, 2]);
-      let ds2 = new Plottable.Dataset([1, 2, 3]);
-      let s = new Plottable.Scales.Linear().padProportion(0);
-      let svg1 = TestMethods.generateSVG(100, 100);
-      let svg2 = TestMethods.generateSVG(100, 100);
-      let plot1 = new Plottable.Plot();
-      (<any> plot1)._createDrawer = (dataset: Plottable.Dataset) => createMockDrawer(dataset);
-      plot1.addDataset(ds1)
-           .attr("x", (x: number) => x, s)
-           .renderTo(svg1);
-      let plot2 = new Plottable.Plot();
-      (<any> plot2)._createDrawer = (dataset: Plottable.Dataset) => createMockDrawer(dataset);
-      plot2.addDataset(ds2)
-           .attr("x", (x: number) => x, s)
-           .renderTo(svg2);
-      assert.deepEqual(s.domain(), [0, 3], "Simple domain combining");
-      ds1.data([]);
-      assert.deepEqual(s.domain(), [1, 3], "Contracting domain due to projection becoming empty");
-      svg1.remove();
-      svg2.remove();
     });
 
     it("selections() with dataset retrieval", () => {
@@ -415,34 +375,6 @@ describe("Plots", () => {
       assert.deepEqual(nearestEntity.position, {x: 1, y: 10}, "retrieves the closest point across datasets");
 
       svg.remove();
-    });
-
-    describe("Dataset removal", () => {
-      let plot: Plottable.Plot;
-      let d1: Plottable.Dataset;
-      let d2: Plottable.Dataset;
-
-      beforeEach(() => {
-        plot = new Plottable.Plot();
-        d1 = new Plottable.Dataset();
-        d2 = new Plottable.Dataset();
-        plot.addDataset(d1);
-        plot.addDataset(d2);
-        assert.deepEqual(plot.datasets(), [d1, d2], "datasets as expected");
-      });
-
-      it("removeDataset()", () => {
-        plot.removeDataset(d2);
-        assert.deepEqual(plot.datasets(), [d1], "second dataset removed");
-        plot.removeDataset(d1);
-        assert.deepEqual(plot.datasets(), [], "all datasets removed");
-      });
-
-      it("removeDataset ignores Datasets not in the Plot", () => {
-        let d3 = new Plottable.Dataset();
-        plot.removeDataset(d3);
-        assert.deepEqual(plot.datasets(), [d1, d2], "datasets as expected");
-      });
     });
 
     it("destroy() disconnects plots from its scales", () => {
