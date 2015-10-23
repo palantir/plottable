@@ -4808,6 +4808,44 @@ declare module Plottable {
              * @returns {Interactions.PanZoom} The calling PanZoom Interaction.
              */
             maxDomainExtent<D>(quantitativeScale: QuantitativeScale<D>, maxDomainExtent: D): Interactions.PanZoom;
+            /**
+             * Gets the minimum allowable domain value for the scale.
+             *
+             * Note that this will mainly work on scales that work linearly like Linear Scale and Time Scale.
+             *
+             * @param {QuantitativeScale<any>} quantitativeScale The scale to query
+             * @returns {D} The minimum domain value for the scale.
+             */
+            minDomainValue<D>(quantitativeScale: QuantitativeScale<D>): D;
+            /**
+             * Sets the minimum allowable domain value for the scale.
+             *
+             * Note that this will mainly work on scales that work linearly like Linear Scale and Time Scale.
+             *
+             * @param {QuantitativeScale<any>} quantitativeScale The scale to query
+             * @param {D} minDomainValue The minimum domain value for the scale.
+             * @returns {Interactions.PanZoom} The calling PanZoom Interaction.
+             */
+            minDomainValue<D>(quantitativeScale: QuantitativeScale<D>, minDomainValue: D): Interactions.PanZoom;
+            /**
+             * Gets the maximum allowable domain value for the scale.
+             *
+             * Note that this will mainly work on scales that work linearly like Linear Scale and Time Scale.
+             *
+             * @param {QuantitativeScale<any>} quantitativeScale The scale to query
+             * @returns {D} The maximum domain value for the scale.
+             */
+            maxDomainValue<D>(quantitativeScale: QuantitativeScale<D>): D;
+            /**
+             * Sets the maximum allowable domain value for the scale.
+             *
+             * Note that this will mainly work on scales that work linearly like Linear Scale and Time Scale.
+             *
+             * @param {QuantitativeScale<any>} quantitativeScale The scale to query
+             * @param {D} maxDomainExtent The maximum domain value for the scale.
+             * @returns {Interactions.PanZoom} The calling PanZoom Interaction.
+             */
+            maxDomainValue<D>(quantitativeScale: QuantitativeScale<D>, maxDomainValue: D): Interactions.PanZoom;
         }
     }
 }

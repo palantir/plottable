@@ -23,6 +23,9 @@ export module Interactions {
     private _minDomainExtents: Utils.Map<QuantitativeScale<any>, any>;
     private _maxDomainExtents: Utils.Map<QuantitativeScale<any>, any>;
 
+    private _minDomainValues: Utils.Map<QuantitativeScale<any>, any>;
+    private _maxDomainValues: Utils.Map<QuantitativeScale<any>, any>;
+
     /**
      * A PanZoom Interaction updates the domains of an x-scale and/or a y-scale
      * in response to the user panning or zooming.
@@ -40,6 +43,8 @@ export module Interactions {
       this._touchIds = d3.map<Point>();
       this._minDomainExtents = new Utils.Map<QuantitativeScale<any>, number>();
       this._maxDomainExtents = new Utils.Map<QuantitativeScale<any>, number>();
+      this._minDomainValues = new Utils.Map<QuantitativeScale<any>, number>();
+      this._maxDomainValues = new Utils.Map<QuantitativeScale<any>, number>();
       if (xScale != null) {
         this.addXScale(xScale);
       }
@@ -120,12 +125,36 @@ export module Interactions {
         return { x: (point.x - oldPoints[i].x) / magnifyAmount, y: (point.y - oldPoints[i].y) / magnifyAmount };
       });
 
+      let oldCenterPoint = PanZoom._centerPoint(oldPoints[0], oldPoints[1]);
+
+      let constrainedPinchAmountUsingValueLimits = (scale: QuantitativeScale<any>, center: number) => {
+        if (magnifyAmount <= 1) {
+          return;
+        }
+        let minDomain = Math.min(scale.domain()[0], scale.domain()[1]);
+        let maxDomain = Math.max(scale.domain()[1], scale.domain()[0]);
+        let maxDomainValue = this.maxDomainValue(scale);
+        if (maxDomainValue == null) {
+          maxDomainValue = Infinity;
+        }
+        let minDomainValue = this.minDomainValue(scale);
+        if (minDomainValue == null) {
+          minDomainValue = -Infinity;
+        }
+        let centerDataValue = scale.invert(center);
+        magnifyAmount = Math.min(magnifyAmount,
+          (minDomainValue - centerDataValue) / (minDomain - centerDataValue),
+          (maxDomainValue - centerDataValue) / (maxDomain - centerDataValue));
+      };
+
       this.xScales().forEach((xScale) => {
-        magnifyAmount = this._constrainedZoomAmount(xScale, magnifyAmount);
+        magnifyAmount = this._constrainedZoomAmountUsingExtent(xScale, magnifyAmount);
+        constrainedPinchAmountUsingValueLimits(xScale, oldCenterPoint.x);
       });
 
       this.yScales().forEach((yScale) => {
-        magnifyAmount = this._constrainedZoomAmount(yScale, magnifyAmount);
+        magnifyAmount = this._constrainedZoomAmountUsingExtent(yScale, magnifyAmount);
+        constrainedPinchAmountUsingValueLimits(yScale, oldCenterPoint.y);
       });
 
       let constrainedPoints = oldPoints.map((oldPoint, i) => {
@@ -134,8 +163,6 @@ export module Interactions {
           y: normalizedPointDiffs[i].y * magnifyAmount + oldPoint.y
         };
       });
-
-      let oldCenterPoint = PanZoom._centerPoint(oldPoints[0], oldPoints[1]);
 
       let translateAmountX = oldCenterPoint.x - ((constrainedPoints[0].x + constrainedPoints[1].x) / 2);
       this.xScales().forEach((xScale) => {
@@ -193,11 +220,13 @@ export module Interactions {
         let zoomAmount = Math.pow(2, deltaPixelAmount * .002);
 
         this.xScales().forEach((xScale) => {
-          zoomAmount = this._constrainedZoomAmount(xScale, zoomAmount);
+          zoomAmount = this._constrainedZoomAmountUsingExtent(xScale, zoomAmount);
+          zoomAmount = this._constrainedZoomAmountUsingValueLimits(xScale, zoomAmount, translatedP.x);
         });
 
         this.yScales().forEach((yScale) => {
-          zoomAmount = this._constrainedZoomAmount(yScale, zoomAmount);
+          zoomAmount = this._constrainedZoomAmountUsingExtent(yScale, zoomAmount);
+          zoomAmount = this._constrainedZoomAmountUsingValueLimits(yScale, zoomAmount, translatedP.y);
         });
 
         this.xScales().forEach((xScale) => {
@@ -209,7 +238,7 @@ export module Interactions {
       }
     }
 
-    private _constrainedZoomAmount(scale: QuantitativeScale<any>, zoomAmount: number) {
+    private _constrainedZoomAmountUsingExtent(scale: QuantitativeScale<any>, zoomAmount: number) {
       let extentIncreasing = zoomAmount > 1;
 
       let boundingDomainExtent = extentIncreasing ? this.maxDomainExtent(scale) : this.minDomainExtent(scale);
@@ -219,6 +248,22 @@ export module Interactions {
       let domainExtent = Math.abs(scaleDomain[1] - scaleDomain[0]);
       let compareF = extentIncreasing ? Math.min : Math.max;
       return compareF(zoomAmount, boundingDomainExtent / domainExtent);
+    }
+
+    private _constrainedZoomAmountUsingValueLimits(scale: QuantitativeScale<any>, zoomAmount: number, zoomCenter: number) {
+      if (zoomAmount <= 1) {
+        return zoomAmount;
+      }
+      let zoomLimitForDomainValue = (domainLimit: any, domainValue: any) => {
+        return domainLimit == null ? Infinity : (scale.scale(domainLimit) - zoomCenter) / (scale.scale(domainValue) - zoomCenter);
+      };
+      let minDomain = Math.min(scale.domain()[0], scale.domain()[1]);
+      let maxDomain = Math.max(scale.domain()[0], scale.domain()[1]);
+      let minDomainLimit = this.minDomainValue(scale);
+      let maxDomainLimit = this.maxDomainValue(scale);
+      let zoomLimitOnMin = zoomLimitForDomainValue(minDomainLimit, minDomain);
+      let zoomLimitOnMax = zoomLimitForDomainValue(maxDomainLimit, maxDomain);
+      return Math.min(zoomAmount, zoomLimitOnMin, zoomLimitOnMax);
     }
 
     private _setupDragInteraction() {
@@ -233,10 +278,36 @@ export module Interactions {
         let translateAmountX = (lastDragPoint == null ? startPoint.x : lastDragPoint.x) - endPoint.x;
 
         this.xScales().forEach((xScale) => {
+          let domainIncreasing = xScale.domain()[1] > xScale.domain()[0];
+          let positiveTranslate = translateAmountX > 0;
+          let positiveDataTranslate = domainIncreasing === positiveTranslate;
+          let limitingDomainValue = positiveDataTranslate ? this.maxDomainValue(xScale) : this.minDomainValue(xScale);
+          if (limitingDomainValue == null) {
+            return;
+          }
+          let relevantRangeValue = positiveTranslate ? xScale.range()[1] : xScale.range()[0];
+          let limiter = positiveTranslate ? Math.min : Math.max;
+          translateAmountX = limiter(translateAmountX, xScale.scale(limitingDomainValue) - relevantRangeValue);
+        });
+
+        this.xScales().forEach((xScale) => {
           this._translateScale(xScale, translateAmountX);
         });
 
         let translateAmountY = (lastDragPoint == null ? startPoint.y : lastDragPoint.y) - endPoint.y;
+
+        this.yScales().forEach((yScale) => {
+          let domainIncreasing = yScale.domain()[1] > yScale.domain()[0];
+          let positiveTranslate = translateAmountY < 0;
+          let positiveDataTranslate = domainIncreasing === positiveTranslate;
+          let limitingDomainValue = positiveDataTranslate ? this.maxDomainValue(yScale) : this.minDomainValue(yScale);
+          if (limitingDomainValue == null) {
+            return;
+          }
+          let relevantRangeValue = positiveTranslate ? yScale.range()[1] : yScale.range()[0];
+          let limiter = positiveTranslate ? Math.max : Math.min;
+          translateAmountY = limiter(translateAmountY, yScale.scale(limitingDomainValue) - relevantRangeValue);
+        });
 
         this.yScales().forEach((yScale) => {
           this._translateScale(yScale, translateAmountY);
@@ -423,6 +494,74 @@ export module Interactions {
         Utils.Window.warn("Panning and zooming with extents on a nonlinear scale may have unintended behavior.");
       }
       this._maxDomainExtents.set(quantitativeScale, maxDomainExtent);
+      return this;
+    }
+
+    /**
+     * Gets the minimum allowable domain value for the scale.
+     *
+     * Note that this will mainly work on scales that work linearly like Linear Scale and Time Scale.
+     *
+     * @param {QuantitativeScale<any>} quantitativeScale The scale to query
+     * @returns {D} The minimum domain value for the scale.
+     */
+    public minDomainValue<D>(quantitativeScale: QuantitativeScale<D>): D;
+    /**
+     * Sets the minimum allowable domain value for the scale.
+     *
+     * Note that this will mainly work on scales that work linearly like Linear Scale and Time Scale.
+     *
+     * @param {QuantitativeScale<any>} quantitativeScale The scale to query
+     * @param {D} minDomainValue The minimum domain value for the scale.
+     * @returns {Interactions.PanZoom} The calling PanZoom Interaction.
+     */
+    public minDomainValue<D>(quantitativeScale: QuantitativeScale<D>, minDomainValue: D): Interactions.PanZoom;
+    public minDomainValue<D>(quantitativeScale: QuantitativeScale<D>, minDomainValue?: D): any {
+      if (minDomainValue == null) {
+        return this._minDomainValues.get(quantitativeScale);
+      }
+      const maxDomainValue = this.maxDomainValue(quantitativeScale);
+      if (maxDomainValue != null && maxDomainValue.valueOf() < minDomainValue.valueOf()) {
+        throw new Error("maxDomainValue must be larger than minDomainValue for the same Scale");
+      }
+      if (this._nonLinearScaleWithExtents(quantitativeScale)) {
+        Utils.Window.warn("Panning and zooming with extents on a nonlinear scale may have unintended behavior.");
+      }
+      this._minDomainValues.set(quantitativeScale, minDomainValue);
+      return this;
+    }
+
+    /**
+     * Gets the maximum allowable domain value for the scale.
+     *
+     * Note that this will mainly work on scales that work linearly like Linear Scale and Time Scale.
+     *
+     * @param {QuantitativeScale<any>} quantitativeScale The scale to query
+     * @returns {D} The maximum domain value for the scale.
+     */
+    public maxDomainValue<D>(quantitativeScale: QuantitativeScale<D>): D;
+    /**
+     * Sets the maximum allowable domain value for the scale.
+     *
+     * Note that this will mainly work on scales that work linearly like Linear Scale and Time Scale.
+     *
+     * @param {QuantitativeScale<any>} quantitativeScale The scale to query
+     * @param {D} maxDomainExtent The maximum domain value for the scale.
+     * @returns {Interactions.PanZoom} The calling PanZoom Interaction.
+     */
+    public maxDomainValue<D>(quantitativeScale: QuantitativeScale<D>, maxDomainValue: D): Interactions.PanZoom;
+    public maxDomainValue<D>(quantitativeScale: QuantitativeScale<D>, maxDomainValue?: D): any {
+      if (maxDomainValue == null) {
+        return this._maxDomainValues.get(quantitativeScale);
+      }
+      const minDomainValue = this.minDomainValue(quantitativeScale);
+      if (minDomainValue != null && maxDomainValue.valueOf() < minDomainValue.valueOf()) {
+        throw new Error("maxDomainValue must be larger than minDomainValue for the same Scale");
+      }
+      if (this._nonLinearScaleWithExtents(quantitativeScale)) {
+        Utils.Window.warn("Panning and zooming with extents on a nonlinear scale may have unintended behavior.");
+      }
+      this._maxDomainValues.set(quantitativeScale, maxDomainValue);
       return this;
     }
   }
