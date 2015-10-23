@@ -5560,6 +5560,9 @@ var Plottable;
             InterpolatedColorLegend.prototype._generateTicks = function (numSwatches) {
                 if (numSwatches === void 0) { numSwatches = InterpolatedColorLegend._DEFAULT_NUM_SWATCHES; }
                 var domain = this._scale.domain();
+                if (numSwatches === 1) {
+                    return [domain[0]];
+                }
                 var slope = (domain[1] - domain[0]) / (numSwatches - 1);
                 var ticks = [];
                 for (var i = 0; i < numSwatches; i++) {
@@ -5639,18 +5642,14 @@ var Plottable;
                     height: 0
                 };
                 var padding;
-                var numSwatches = InterpolatedColorLegend._DEFAULT_NUM_SWATCHES;
-                if (this.expands() && textHeight > 0) {
-                    var offset = this._isVertical() ? 0 : 2 * textPadding - text0Width - text1Width;
-                    var fullLength = this._isVertical() ? this.height() : this.width();
-                    numSwatches = Math.max(Math.floor((fullLength - offset) / textHeight), numSwatches);
-                }
+                var numSwatches;
                 if (this._isVertical()) {
+                    numSwatches = Math.floor(this.height());
                     var longestTextWidth = Math.max(text0Width, text1Width);
                     padding = (this.width() - longestTextWidth - 2 * this._textPadding) / 2;
                     swatchWidth = Math.max(this.width() - padding - 2 * textPadding - longestTextWidth, 0);
-                    swatchHeight = Math.max(this.height() / numSwatches, 0);
-                    swatchY = function (d, i) { return (numSwatches - (i + 1)) * swatchHeight; };
+                    swatchHeight = 1;
+                    swatchY = function (d, i) { return _this.height() - (i + 1); };
                     upperWriteOptions.yAlign = "top";
                     upperLabelShift.y = 0;
                     lowerWriteOptions.yAlign = "bottom";
@@ -5674,9 +5673,10 @@ var Plottable;
                 }
                 else {
                     padding = Math.max(textPadding, (this.height() - textHeight) / 2);
-                    swatchWidth = Math.max(((this.width() - 4 * textPadding - text0Width - text1Width) / numSwatches), 0);
+                    numSwatches = Math.max(Math.floor(this.width() - textPadding * 4 - text0Width - text1Width), 0);
+                    swatchWidth = 1;
                     swatchHeight = Math.max((this.height() - 2 * padding), 0);
-                    swatchX = function (d, i) { return (text0Width + 2 * textPadding) + i * swatchWidth; };
+                    swatchX = function (d, i) { return Math.floor(text0Width + 2 * textPadding) + i; };
                     swatchY = function (d, i) { return padding; };
                     upperWriteOptions.xAlign = "right";
                     upperLabelShift.x = -textPadding;
@@ -5705,7 +5705,8 @@ var Plottable;
                     "width": swatchWidth,
                     "height": swatchHeight,
                     "x": swatchX,
-                    "y": swatchY
+                    "y": swatchY,
+                    "shape-rendering": "crispEdges"
                 });
                 if (Plottable.Configs.ADD_TITLE_ELEMENTS) {
                     rects.append("title").text(function (d) { return _this._formatter(d); });
