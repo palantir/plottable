@@ -1,9 +1,4 @@
-module Plottable {
-export interface ScaleCallback<S extends Scale<any, any>> {
-  (scale: S): any;
-}
-
-export module Scales {
+module Plottable.Scales {
 
   /**
    * A function that supplies domain values to be included into a Scale.
@@ -26,6 +21,12 @@ export module Scales {
   export interface PaddingExceptionsProvider<D> {
     (scale: QuantitativeScale<D>): D[];
   }
+}
+
+module Plottable {
+
+export interface ScaleCallback<S extends Scale<any, any>> {
+  (scale: S): any;
 }
 
 export class Scale<D, R> {

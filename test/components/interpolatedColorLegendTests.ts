@@ -41,7 +41,7 @@ describe("InterpolatedColorLegend", () => {
     assert.deepEqual(labelTexts, formattedDomainValues, "formatter is used to format label text");
   }
 
-  it("renders correctly (orientation: horizontal)", () => {
+  it("renders correctly when horizontal", () => {
     let legend = new Plottable.Components.InterpolatedColorLegend(colorScale);
     legend.renderTo(svg);
 
@@ -60,7 +60,7 @@ describe("InterpolatedColorLegend", () => {
     svg.remove();
   });
 
-  it("renders correctly (orientation: right)", () => {
+  it("renders correctly when oriented right", () => {
     let legend = new Plottable.Components.InterpolatedColorLegend(colorScale);
     legend.orientation("right");
     legend.renderTo(svg);
@@ -81,7 +81,7 @@ describe("InterpolatedColorLegend", () => {
     svg.remove();
   });
 
-  it("renders correctly (orientation: left)", () => {
+  it("renders correctly when oriented left", () => {
     let legend = new Plottable.Components.InterpolatedColorLegend(colorScale);
     legend.orientation("left");
     legend.renderTo(svg);
@@ -171,7 +171,7 @@ describe("InterpolatedColorLegend", () => {
     svg.remove();
   });
 
-  it("renders correctly when width is constrained (orientation: right)", () => {
+  it("renders correctly when width is constrained when oriented right", () => {
     let constrainedWidth = 45;
     svg.attr("width", constrainedWidth);
     let legend = new Plottable.Components.InterpolatedColorLegend(colorScale);
@@ -181,7 +181,7 @@ describe("InterpolatedColorLegend", () => {
     svg.remove();
   });
 
-  it("renders correctly when height is constrained (orientation: right)", () => {
+  it("renders correctly when height is constrained when oriented right", () => {
     svg.attr("height", 100);
     let legend = new Plottable.Components.InterpolatedColorLegend(colorScale);
     legend.orientation("right");
@@ -190,7 +190,7 @@ describe("InterpolatedColorLegend", () => {
     svg.remove();
   });
 
-  it("renders correctly when width is constrained (orientation: left)", () => {
+  it("renders correctly when width is constrained when oriented left", () => {
     let constrainedWidth = 45;
     svg.attr("width", constrainedWidth);
     let legend = new Plottable.Components.InterpolatedColorLegend(colorScale);
@@ -200,7 +200,7 @@ describe("InterpolatedColorLegend", () => {
     svg.remove();
   });
 
-  it("renders correctly when height is constrained (orientation: left)", () => {
+  it("renders correctly when height is constrained when oriented left", () => {
     svg.attr("height", 100);
     let legend = new Plottable.Components.InterpolatedColorLegend(colorScale);
     legend.orientation("left");
@@ -280,6 +280,36 @@ describe("InterpolatedColorLegend", () => {
       let newNumSwatches = legend.content().selectAll(".swatch").size();
       assert.operator(newNumSwatches, ">", numSwatches, `there are more swatches when expanded (orientation: ${orientation})`);
     });
+    svg.remove();
+  });
+
+  it("has the same number of swatches as its height when vertical", () => {
+    let legend = new Plottable.Components.InterpolatedColorLegend(colorScale);
+    legend.renderTo(svg);
+    legend.orientation("left").expands(false);
+    let numSwatches = legend.content().selectAll(".swatch").size();
+    let swatchContainer = legend.content().select(".swatch-container");
+    let swatchContainerHeight = (<Element> swatchContainer.node()).getBoundingClientRect().height;
+    legend.expands(true);
+    let newNumSwatches = legend.content().selectAll(".swatch").size();
+    let swatchContainerExpandedHeight = (<Element> swatchContainer.node()).getBoundingClientRect().height;
+    assert.closeTo(numSwatches, swatchContainerHeight, 1, "non-expanded left legend has one swatch per pixel");
+    assert.closeTo(newNumSwatches, swatchContainerExpandedHeight, 1, "expanded left legend has one swatch per pixel");
+    svg.remove();
+  });
+
+  it("has the same number of swatches as its width when horizontal", () => {
+    let legend = new Plottable.Components.InterpolatedColorLegend(colorScale);
+    legend.renderTo(svg);
+    legend.orientation("horizontal").expands(false);
+    let numSwatches = legend.content().selectAll(".swatch").size();
+    let swatchContainer = legend.content().select(".swatch-container");
+    let swatchContainerWidth = (<Element> swatchContainer.node()).getBoundingClientRect().width;
+    legend.expands(true);
+    let newNumSwatches = legend.content().selectAll(".swatch").size();
+    let swatchContainerExpandedWidth = (<Element> swatchContainer.node()).getBoundingClientRect().width;
+    assert.closeTo(numSwatches, swatchContainerWidth, 1, "non-expanded left legend has one swatch per pixel");
+    assert.closeTo(newNumSwatches, swatchContainerExpandedWidth, 1, "expanded left legend has one swatch per pixel");
     svg.remove();
   });
 
@@ -384,6 +414,7 @@ describe("InterpolatedColorLegend", () => {
       assert.operator(bottomPadding, "<", textHeight, "bottom padding degrades to be smaller than textHeight");
       svg.remove();
     });
+
     it("left legends degrade padding when width is constrained", () => {
       let legend = new Plottable.Components.InterpolatedColorLegend(colorScale).orientation("left");
       legend.renderTo(svg);
@@ -399,6 +430,7 @@ describe("InterpolatedColorLegend", () => {
       assert.operator(leftPadding, "<", textHeight, "right-side padding degrades to be smaller than textHeight");
       svg.remove();
     });
+
     it("right legends degrade padding when width is constrained", () => {
       let legend = new Plottable.Components.InterpolatedColorLegend(colorScale).orientation("right");
       legend.renderTo(svg);
@@ -412,6 +444,46 @@ describe("InterpolatedColorLegend", () => {
       swatchBoundingRect = (<Element> legend.content().select(".swatch-container").node()).getBoundingClientRect();
       let leftPadding = swatchBoundingRect.left - legendBoundingRect.left;
       assert.operator(leftPadding, "<", textHeight, "left-side padding degrades to be smaller than textHeight");
+      svg.remove();
+    });
+    it("degrades gracefully when width is very constrained", () => {
+      let legend = new Plottable.Components.InterpolatedColorLegend(colorScale).orientation("horizontal");
+      legend.renderTo(svg);
+      let constrainedWidth = 30;
+      svg.attr("width", constrainedWidth);
+      assert.doesNotThrow(() => legend.redraw(), Error, "rendering in a small space should not error");
+      let numSwatches = legend.content().selectAll(".swatch").size();
+      assert.strictEqual(0, numSwatches, "no swatches are drawn");
+      svg.remove();
+    });
+
+  });
+
+  describe("title", () => {
+    it("adds formatted title element to each swatch", () => {
+      let legend = new Plottable.Components.InterpolatedColorLegend(colorScale);
+      let formatter = Plottable.Formatters.percentage(2);
+      legend.formatter(formatter);
+      legend.renderTo(svg);
+
+      let entries = legend.content().selectAll("rect.swatch");
+      assert.operator(entries.size(), ">=", 11, "there is at least 11 swatches");
+      entries.each(function(d, i) {
+        let swatch = d3.select(this);
+        assert.strictEqual(swatch.select("title").text(), formatter(d));
+      });
+      svg.remove();
+    });
+
+    it("does not create title elements if configuration is set to false", () => {
+      let legend = new Plottable.Components.InterpolatedColorLegend(colorScale);
+      Plottable.Configs.ADD_TITLE_ELEMENTS = false;
+      legend.renderTo(svg);
+
+      let entries = legend.content().selectAll("rect.swatch");
+      assert.operator(entries.size(), ">=", 11, "there is at least 11 swatches");
+      let titles = entries.selectAll("title");
+      assert.strictEqual(titles.size(), 0, "no titles should be rendered");
       svg.remove();
     });
   });

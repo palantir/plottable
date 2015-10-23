@@ -1,5 +1,4 @@
-module Plottable {
-export module Components {
+module Plottable.Components {
   export class InterpolatedColorLegend extends Component {
     private static _DEFAULT_NUM_SWATCHES = 11;
 
@@ -134,6 +133,9 @@ export module Components {
 
     private _generateTicks(numSwatches = InterpolatedColorLegend._DEFAULT_NUM_SWATCHES) {
       let domain = this._scale.domain();
+      if (numSwatches === 1) {
+        return [domain[0]];
+      }
       let slope = (domain[1] - domain[0]) / (numSwatches - 1);
       let ticks: number[] = [];
       for (let i = 0; i < numSwatches; i++) {
@@ -227,20 +229,15 @@ export module Components {
 
       let padding: number;
 
-      let numSwatches = InterpolatedColorLegend._DEFAULT_NUM_SWATCHES;
-
-      if (this.expands() && textHeight > 0) {
-        let offset = this._isVertical() ? 0 :  2 * textPadding - text0Width - text1Width;
-        let fullLength = this._isVertical() ? this.height() : this.width();
-        numSwatches = Math.max(Math.floor((fullLength - offset) / textHeight), numSwatches);
-      }
+      let numSwatches: number;
 
       if (this._isVertical()) {
+        numSwatches = Math.floor(this.height());
         let longestTextWidth = Math.max(text0Width, text1Width);
         padding = (this.width() - longestTextWidth - 2 * this._textPadding) / 2;
         swatchWidth = Math.max(this.width() - padding - 2 * textPadding - longestTextWidth, 0);
-        swatchHeight = Math.max(this.height() / numSwatches, 0);
-        swatchY = (d: any, i: number) => (numSwatches - (i + 1)) * swatchHeight;
+        swatchHeight = 1;
+        swatchY = (d: any, i: number) => this.height() - (i + 1);
 
         upperWriteOptions.yAlign = "top";
         upperLabelShift.y = 0;
@@ -264,9 +261,10 @@ export module Components {
         boundingBoxAttr["height"] = numSwatches * swatchHeight;
       } else { // horizontal
         padding = Math.max(textPadding, (this.height() - textHeight) / 2);
-        swatchWidth = Math.max( ((this.width() - 4 * textPadding - text0Width - text1Width) / numSwatches), 0);
+        numSwatches = Math.max(Math.floor(this.width() - textPadding * 4 - text0Width - text1Width), 0);
+        swatchWidth = 1;
         swatchHeight = Math.max( (this.height() - 2 * padding), 0);
-        swatchX = (d: any, i: number) => (text0Width + 2 * textPadding) + i * swatchWidth;
+        swatchX = (d: any, i: number) => Math.floor(text0Width + 2 * textPadding) + i;
         swatchY = (d: any, i: number) => padding;
 
         upperWriteOptions.xAlign = "right";
@@ -294,18 +292,21 @@ export module Components {
 
       let ticks = this._generateTicks(numSwatches);
       let swatches = this._swatchContainer.selectAll("rect.swatch").data(ticks);
-      swatches.enter().append("rect").classed("swatch", true);
+      let rects = swatches.enter().append("rect").classed("swatch", true);
       swatches.exit().remove();
       swatches.attr({
         "fill": (d: any, i: number) => this._scale.scale(d),
         "width": swatchWidth,
         "height": swatchHeight,
         "x": swatchX,
-        "y": swatchY
+        "y": swatchY,
+        "shape-rendering": "crispEdges"
       });
+      if (Configs.ADD_TITLE_ELEMENTS) {
+        rects.append("title").text((d) => this._formatter(d));
+      }
       return this;
     }
 
   }
-}
 }

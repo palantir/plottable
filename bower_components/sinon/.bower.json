@@ -1,0 +1,14 @@
+{
+  "name": "sinon",
+  "homepage": "https://github.com/cjohansen/Sinon.JS",
+  "version": "1.16.1",
+  "_release": "1.16.1",
+  "_resolution": {
+    "type": "version",
+    "tag": "v1.16.1",
+    "commit": "38799cceb076a8190f60a41da234dcef0292ef64"
+  },
+  "_source": "git://github.com/cjohansen/Sinon.JS.git",
+  "_target": "1.16.1",
+  "_originalSource": "sinon"
+}
