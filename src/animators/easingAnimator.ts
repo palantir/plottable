@@ -23,7 +23,7 @@ module Plottable.Animators {
     /**
      * The default easing of the animation
      */
-    private static _DEFAULT_EASING_MODE = "linear-in-out";
+    private static _DEFAULT_EASING_MODE = "exp-out";
 
     private _startDelay: number;
     private _stepDuration: number;
