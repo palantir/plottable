@@ -1,23 +1,7 @@
 ///<reference path="../testReference.ts" />
 
-class CountingPlot extends Plottable.Plot {
-  public renders: number = 0;
-
-  public render() {
-    ++this.renders;
-    return super.render();
-  }
-
-  protected _createDrawer(dataset: Plottable.Dataset) {
-    let drawer = new Plottable.Drawer(dataset);
-    (<any> drawer)._svgElement = "g";
-    return drawer;
-  }
-}
-
 describe("Plots", () => {
   describe("Plot", () => {
-
     it("adds a \"plot\" css class by default", () => {
       const plot = new Plottable.Plot();
       assert.isTrue(plot.hasClass("plot"), "plot class added by default");
@@ -218,6 +202,103 @@ describe("Plots", () => {
           svg.remove();
         });
       }
+    });
+
+    describe("setting the attribute of plot elements", () => {
+      let plot: Plottable.Plot;
+
+      beforeEach(() => {
+        plot = new Plottable.Plot();
+      });
+
+      it("can set the attribute to a constant value", () => {
+        const constantNumber = 10;
+        assert.strictEqual(plot.attr("foo", constantNumber), plot, "setting the attribute returns the calling plot");
+        assert.strictEqual(plot.attr("foo").accessor(null, 0, null), constantNumber, "can set the attribute to a constant number");
+
+        const constantString = "one";
+        plot.attr("foo", constantString);
+        assert.strictEqual(plot.attr("foo").accessor(null, 0, null), constantString, "can set the attribute to a constant string");
+      });
+
+      it("can set the attribute based on the input data", () => {
+        const data = [1, 2, 3, 4, 5];
+        const dataset = new Plottable.Dataset(data);
+        plot.addDataset(dataset);
+
+        const numberAccessor = (d: any, i: number) => d + i * 10;
+        assert.strictEqual(plot.attr("foo", numberAccessor), plot, "setting the attribute returns the calling plot");
+
+        let attrAccessor = plot.attr("foo").accessor;
+        plot.datasets().forEach((dataset, datasetIndex) => {
+          dataset.data().forEach((datum, index) => {
+            assert.strictEqual(attrAccessor(datum, index, dataset), numberAccessor(datum, index),
+              `can set attribute for number datum ${index} in dataset ${datasetIndex}`);
+          });
+        });
+
+        const stringAccessor = (d: any, i: number) => `${d + i * 10} foo`;
+        assert.strictEqual(plot.attr("foo", stringAccessor), plot, "setting the attribute returns the calling plot");
+
+        attrAccessor = plot.attr("foo").accessor;
+        plot.datasets().forEach((dataset, datasetIndex) => {
+          dataset.data().forEach((datum, index) => {
+            assert.strictEqual(attrAccessor(datum, index, dataset), stringAccessor(datum, index),
+              `can set attribute for string datum ${index} in dataset ${datasetIndex}`);
+          });
+        });
+      });
+
+      it("can set the attribute based on the scaled input data", () => {
+        const data = [1, 2, 3, 4, 5];
+        const dataset = new Plottable.Dataset(data);
+        plot.addDataset(dataset);
+
+        const numberAccessor = (d: any, i: number) => d + i * 10;
+        const linearScale = new Plottable.Scales.Linear();
+        assert.strictEqual(plot.attr("foo", numberAccessor, linearScale), plot, "setting the attribute returns the calling plot");
+
+        let attrAccessor = plot.attr("foo").accessor;
+        let attrScale = plot.attr("foo").scale;
+        plot.datasets().forEach((dataset, datasetIndex) => {
+          dataset.data().forEach((datum, index) => {
+            assert.strictEqual(attrScale.scale(attrAccessor(datum, index, dataset)), linearScale.scale(numberAccessor(datum, index)),
+              `can set based on scaled version of number datum ${index} in dataset ${datasetIndex}`);
+          });
+        });
+
+        const stringAccessor = (d: any, i: number) => `${d + i * 10} foo`;
+        const categoryScale = new Plottable.Scales.Category();
+        categoryScale.domain(data.map(stringAccessor));
+        assert.strictEqual(plot.attr("foo", stringAccessor, categoryScale), plot, "setting the attribute returns the calling plot");
+
+        attrAccessor = plot.attr("foo").accessor;
+        attrScale = plot.attr("foo").scale;
+        plot.datasets().forEach((dataset, datasetIndex) => {
+          dataset.data().forEach((datum, index) => {
+            assert.strictEqual(attrScale.scale(attrAccessor(datum, index, dataset)), categoryScale.scale(stringAccessor(datum, index)),
+              `can set based on scaled version of string datum ${index} in dataset ${datasetIndex}`);
+          });
+        });
+      });
+
+      it("updates the scales extents when an attribute is set", () => {
+        const scale = new Plottable.Scales.Linear();
+
+        const data = [5, -5, 10];
+        const dataset = new Plottable.Dataset(data);
+        plot.addDataset(dataset);
+
+        plot.attr("foo", (d) => d, scale);
+
+        const svg = TestMethods.generateSVG();
+        plot.anchor(svg);
+
+        assert.operator(scale.domainMin(), "<=", Math.min.apply(null, data), "domainMin extended to at least minimum");
+        assert.operator(scale.domainMax(), ">=", Math.max.apply(null, data), "domainMax extended to at least maximum");
+
+        svg.remove();
+      });
     });
   });
 });
