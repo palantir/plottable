@@ -2583,6 +2583,7 @@ var Plottable;
         function Drawer(dataset) {
             this._cachedSelectionValid = false;
             this._dataset = dataset;
+            this._initializer = function () { return {}; };
         }
         Drawer.prototype.renderArea = function (area) {
             if (area == null) {
@@ -2591,6 +2592,21 @@ var Plottable;
             this._renderArea = area;
             this._cachedSelectionValid = false;
             return this;
+        };
+        Drawer.prototype.initializer = function (fnattrToProjector) {
+            if (fnattrToProjector == null) {
+                return this._initializer;
+            }
+            this._initializer = fnattrToProjector;
+            return this;
+        };
+        /*
+         * Return the AttrToAppliedProjector generated from the initializer
+         *
+         * @returns {AttrToAppliedProjector} .
+         */
+        Drawer.prototype.appliedInitializer = function () {
+            return this._appliedProjectors(this.initializer()());
         };
         /**
          * Removes the Drawer and its renderArea
@@ -2606,17 +2622,30 @@ var Plottable;
          * @param{any[]} data The data to be drawn
          */
         Drawer.prototype._bindSelectionData = function (data) {
-            // if the dataset has a key, use it when binding the data   
+            // if the dataset has a key, use it when binding the data
             var dataElements;
+            var selection = this.renderArea().selectAll(this.selector());
             if (this._dataset) {
-                dataElements = this.selection().data(data, this._dataset.keyFunction());
+                dataElements = selection.data(data, this._dataset.keyFunction());
             }
             else {
-                dataElements = this.selection().data(data);
+                dataElements = selection.data(data);
             }
-            dataElements.enter().append(this._svgElementName);
-            dataElements.exit().remove();
-            this._applyDefaultAttributes(dataElements);
+            this._drawingTarget = {
+                update: dataElements.filter(function () {
+                    return true;
+                }),
+                enter: null,
+                exit: null,
+                merge: null
+            };
+            this._drawingTarget.enter = dataElements.enter()
+                .append(this._svgElementName)
+                .attr(this.appliedInitializer());
+            this._applyDefaultAttributes(this._drawingTarget.enter); // others already have it
+            this._drawingTarget.exit = dataElements.exit(); // the animator becomes responsbile for reomving these
+            this._drawingTarget.merge = this._cachedSelection = dataElements; // after enter() is called, this contains new elements
+            this._cachedSelectionValid = true;
         };
         Drawer.prototype._applyDefaultAttributes = function (selection) {
             if (this._className != null) {
@@ -2636,9 +2665,9 @@ var Plottable;
                     selection.attr(colorAttribute, step.attrToAppliedProjector[colorAttribute]);
                 }
             });
-            step.animator.animate(selection, step.attrToAppliedProjector);
+            step.animator.animate(selection, step.attrToAppliedProjector, this._drawingTarget, this);
             if (this._className != null) {
-                this.selection().classed(this._className, true);
+                selection.classed(this._className, true);
             }
         };
         Drawer.prototype._appliedProjectors = function (attrToProjector) {
@@ -2680,7 +2709,6 @@ var Plottable;
                 };
             });
             this._bindSelectionData(data);
-            this._cachedSelectionValid = false;
             var delay = 0;
             appliedDrawSteps.forEach(function (drawStep, i) {
                 Plottable.Utils.Window.setTimeout(function () { return _this._drawStep(drawStep); }, delay);
@@ -10195,6 +10223,47 @@ var Plottable;
 (function (Plottable) {
     var Animators;
     (function (Animators) {
+        var EasingFunctions = (function () {
+            function EasingFunctions() {
+            }
+            EasingFunctions.squEase = function (easingFunction, start, end) {
+                return function (t) {
+                    if (start === undefined) {
+                        start = 0;
+                    }
+                    ;
+                    if (t >= end) {
+                        return 1;
+                    }
+                    if (t <= start) {
+                        return 0;
+                    }
+                    var tbar = (t - start) / (end - start);
+                    if (typeof (easingFunction) === "string") {
+                        easingFunction = d3.ease(easingFunction);
+                    }
+                    return easingFunction(tbar);
+                };
+            };
+            EasingFunctions.atStart = function (t) {
+                return 1;
+            };
+            EasingFunctions.atEnd = function (t) {
+                if (t < 1) {
+                    return 0;
+                }
+                ;
+                return 1;
+            };
+            return EasingFunctions;
+        })();
+        Animators.EasingFunctions = EasingFunctions;
+    })(Animators = Plottable.Animators || (Plottable.Animators = {}));
+})(Plottable || (Plottable = {}));
+var Plottable;
+(function (Plottable) {
+    var Animators;
+    (function (Animators) {
         /**
          * An animator implementation with no animation. The attributes are
          * immediately set on the selection.
@@ -10205,8 +10274,17 @@ var Plottable;
             Null.prototype.totalTime = function (selection) {
                 return 0;
             };
-            Null.prototype.animate = function (selection, attrToAppliedProjector) {
-                return selection.attr(attrToAppliedProjector);
+            Null.prototype.animate = function (selection, attrToAppliedProjector, drawingTarget) {
+                if (drawingTarget) {
+                    drawingTarget.exit
+                        .remove();
+                    return drawingTarget.merge
+                        .attr(attrToAppliedProjector);
+                }
+                else {
+                    // legacy compatibility
+                    return selection.attr(attrToAppliedProjector);
+                }
             };
             return Null;
         })();
@@ -10237,15 +10315,30 @@ var Plottable;
                 var adjustedIterativeDelay = this._getAdjustedIterativeDelay(numberOfSteps);
                 return this.startDelay() + adjustedIterativeDelay * (Math.max(numberOfSteps - 1, 0)) + this.stepDuration();
             };
-            Easing.prototype.animate = function (selection, attrToAppliedProjector) {
+            Easing.prototype.animate = function (selection, attrToAppliedProjector, drawingTarget) {
                 var _this = this;
-                var numberOfSteps = selection[0].length;
-                var adjustedIterativeDelay = this._getAdjustedIterativeDelay(numberOfSteps);
-                return selection.transition()
-                    .ease(this.easingMode())
-                    .duration(this.stepDuration())
-                    .delay(function (d, i) { return _this.startDelay() + adjustedIterativeDelay * i; })
-                    .attr(attrToAppliedProjector);
+                if (drawingTarget) {
+                    var numberOfSteps = drawingTarget.merge[0].length;
+                    var adjustedIterativeDelay = this._getAdjustedIterativeDelay(numberOfSteps);
+                    drawingTarget.merge = drawingTarget.merge
+                        .transition()
+                        .ease(this.easingMode())
+                        .duration(this.stepDuration())
+                        .delay(function (d, i) { return _this.startDelay() + adjustedIterativeDelay * i; })
+                        .attr(attrToAppliedProjector);
+                    drawingTarget.exit
+                        .remove();
+                    return drawingTarget.merge;
+                }
+                else {
+                    var numberOfSteps = selection.size();
+                    var adjustedIterativeDelay = this._getAdjustedIterativeDelay(numberOfSteps);
+                    return selection.transition()
+                        .ease(this.easingMode())
+                        .duration(this.stepDuration())
+                        .delay(function (d, i) { return _this.startDelay() + adjustedIterativeDelay * i; })
+                        .attr(attrToAppliedProjector);
+                }
             };
             Easing.prototype.startDelay = function (startDelay) {
                 if (startDelay == null) {

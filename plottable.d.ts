@@ -1238,12 +1238,24 @@ declare module Plottable {
             attrToAppliedProjector: AttributeToAppliedProjector;
             animator: Animator;
         };
+        /**
+         * A DrawingTarget contains the selections that are the results of binding data.
+         * DrawingTarget is contructed by Drawer, and passed to animators to allow animation of each selection
+         */
+        type DrawingTarget = {
+            enter: d3.Selection<any> | d3.Transition<any>;
+            update: d3.selection.Update<any> | d3.Transition<any>;
+            exit: d3.Selection<any> | d3.Transition<any>;
+            merge: d3.selection.Update<any> | d3.Transition<any>;
+        };
     }
     class Drawer {
         private _renderArea;
         protected _svgElementName: string;
         protected _className: string;
         private _dataset;
+        private _drawingTarget;
+        private _initializer;
         private _cachedSelectionValid;
         private _cachedSelection;
         /**
@@ -1264,6 +1276,24 @@ declare module Plottable {
          * @returns {Drawer} The calling Drawer.
          */
         renderArea(area: d3.Selection<void>): Drawer;
+        /**
+         * Retieves a function that can supply initial settings to entering elements.
+         * this function is typically supplied by the plot using the Drawer
+         */
+        initializer(): () => AttributeToProjector;
+        /**
+         * Sets the initializer function for the Drawer.
+         * This function returns an AttributeToProjector that is applied
+         * to the new elements appended to the enter() selection
+         * Typically set from _createDrawer in the plot
+         *
+         * @param {() => AttributeToProjector} the function.
+         * @returns {Drawer} The calling Drawer.
+         */
+        initializer(fnattrToProjector: () => AttributeToProjector): Drawer;
+        appliedInitializer(): {
+            [attr: string]: (datum: any, index: number) => any;
+        };
         /**
          * Removes the Drawer and its renderArea
          */
@@ -4039,6 +4069,16 @@ declare module Plottable.Plots {
     }
 }
 declare module Plottable {
+    module Animators {
+        type d3SelectionOrTransition = d3.Selection<any> | d3.Transition<any>;
+        type EasingFunction = (t: number) => number;
+        type EasingFunctionSpecifier = string | EasingFunction;
+        class EasingFunctions {
+            static atStart: (t: number) => number;
+            static atEnd: (t: number) => number;
+            static squEase(easingFunction: EasingFunctionSpecifier, start: number, end: number): EasingFunction;
+        }
+    }
     interface Animator {
         /**
          * Applies the supplied attributes to a d3.Selection with some animation.
@@ -4050,7 +4090,7 @@ declare module Plottable {
          *     transition object so that plots may chain the transitions between
          *     animators.
          */
-        animate(selection: d3.Selection<any>, attrToAppliedProjector: AttributeToAppliedProjector): d3.Selection<any> | d3.Transition<any>;
+        animate(selection: d3.Selection<any> | d3.Transition<any>, attrToAppliedProjector: AttributeToAppliedProjector, drawingTarget?: Drawers.DrawingTarget, drawer?: Drawer): d3.Selection<any> | d3.Transition<any>;
         /**
          * Given the number of elements, return the total time the animation requires
          *
@@ -4067,7 +4107,7 @@ declare module Plottable.Animators {
      */
     class Null implements Animator {
         totalTime(selection: any): number;
-        animate(selection: d3.Selection<any>, attrToAppliedProjector: AttributeToAppliedProjector): d3.Selection<any>;
+        animate(selection: d3.Selection<any>, attrToAppliedProjector: AttributeToAppliedProjector, drawingTarget?: Drawers.DrawingTarget): d3.Selection<any> | d3.Transition<any>;
     }
 }
 declare module Plottable.Animators {
@@ -4107,7 +4147,7 @@ declare module Plottable.Animators {
          */
         constructor();
         totalTime(numberOfSteps: number): number;
-        animate(selection: d3.Selection<any>, attrToAppliedProjector: AttributeToAppliedProjector): d3.Transition<any>;
+        animate(selection: d3.Selection<any>, attrToAppliedProjector: AttributeToAppliedProjector, drawingTarget?: Drawers.DrawingTarget): d3.selection.Update<any> | d3.Transition<any>;
         /**
          * Gets the start delay of the animation in milliseconds.
          *
