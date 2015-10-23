@@ -133,6 +133,9 @@ module Plottable.Components {
 
     private _generateTicks(numSwatches = InterpolatedColorLegend._DEFAULT_NUM_SWATCHES) {
       let domain = this._scale.domain();
+      if(numSwatches === 1){
+        return [domain[0]];
+      }
       let slope = (domain[1] - domain[0]) / (numSwatches - 1);
       let ticks: number[] = [];
       for (let i = 0; i < numSwatches; i++) {

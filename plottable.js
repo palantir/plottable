@@ -5560,6 +5560,9 @@ var Plottable;
             InterpolatedColorLegend.prototype._generateTicks = function (numSwatches) {
                 if (numSwatches === void 0) { numSwatches = InterpolatedColorLegend._DEFAULT_NUM_SWATCHES; }
                 var domain = this._scale.domain();
+                if (numSwatches === 1) {
+                    return [domain[0]];
+                }
                 var slope = (domain[1] - domain[0]) / (numSwatches - 1);
                 var ticks = [];
                 for (var i = 0; i < numSwatches; i++) {
