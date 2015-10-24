@@ -11,7 +11,11 @@ class MockAnimator implements Plottable.Animator {
   public totalTime(numberOfIterations: number) {
     return this._time;
   }
-
+  public animateJoin(joinResult: Plottable.Drawers.JoinResult, attrToProjector: Plottable.AttributeToProjector): void {
+    if (this._callback) {
+      this._callback();
+    }
+  }
   public animate(selection: any, attrToProjector: Plottable.AttributeToProjector): any {
     if (this._callback) {
       this._callback();

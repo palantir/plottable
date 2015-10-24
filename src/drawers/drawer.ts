@@ -19,10 +19,10 @@ export module Drawers {
   };
 
   /**
-   * A DrawingTarget contains the selections that are the results of binding data.
-   * DrawingTarget is contructed by Drawer, and passed to animators to allow animation of each selection
+   * A JoinResult contains the selections that are the results of binding data.
+   * JoinResult is contructed by Drawer, and passed to animators to allow animation of each selection
    */
-  export type DrawingTarget = {
+  export type JoinResult = {
     enter: d3.Selection<any>|d3.Transition<any>,  // new DOM elements created from the enter() selection
     update: d3.selection.Update<any>|d3.Transition<any>, // data elements currently bound to a DOM element still in the data set
     exit: d3.Selection<any>|d3.Transition<any>,   // DOM elements bound to a datum that is no longer in the data set
@@ -37,7 +37,7 @@ export class Drawer {
 
   private _dataset: Dataset;
 
-  private _drawingTarget: Drawers.DrawingTarget;
+  private _joinResult: Drawers.JoinResult;
   private _initializer: () => AttributeToProjector;
   private _cachedSelectionValid = false;
   private _cachedSelection: d3.Selection<any>;
@@ -130,7 +130,7 @@ export class Drawer {
     } else {
       dataElements = selection.data(data);
     }
-    this._drawingTarget = {
+    this._joinResult = {
       update: dataElements.filter(() => {
         return true;
       }),
@@ -138,12 +138,12 @@ export class Drawer {
       exit: null,
       merge: null
     };
-    this._drawingTarget.enter = dataElements.enter()
+    this._joinResult.enter = dataElements.enter()
       .append(this._svgElementName)
       .attr(this.appliedInitializer());
-    this._applyDefaultAttributes(<d3.Selection<any>>this._drawingTarget.enter);  // others already have it
-    this._drawingTarget.exit = dataElements.exit();   // the animator becomes responsbile for reomving these
-    this._drawingTarget.merge = this._cachedSelection = dataElements;   // after enter() is called, this contains new elements
+    this._applyDefaultAttributes(<d3.Selection<any>>this._joinResult.enter);  // others already have it
+    this._joinResult.exit = dataElements.exit();   // the animator becomes responsbile for reomving these
+    this._joinResult.merge = this._cachedSelection = dataElements;   // after enter() is called, this contains new elements
     this._cachedSelectionValid = true;
   }
 
@@ -166,7 +166,7 @@ export class Drawer {
         selection.attr(colorAttribute, step.attrToAppliedProjector[colorAttribute]);
       }
     });
-    step.animator.animate(this._drawingTarget, step.attrToAppliedProjector, this);
+    step.animator.animateJoin(this._joinResult, step.attrToAppliedProjector, this);
      if (this._className != null) {
       selection.classed(this._className, true);
     }

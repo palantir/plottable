@@ -49,36 +49,30 @@ module Plottable.Animators {
       return this.startDelay() + adjustedIterativeDelay * (Math.max(numberOfSteps - 1, 0)) + this.stepDuration();
     }
 
-    public animate(drawingTarget: Drawers.DrawingTarget, attrToAppliedProjector: AttributeToAppliedProjector, drawer: Drawer): void;
-    public animate(selection: d3.Selection<any>
-      , attrToAppliedProjector: AttributeToAppliedProjector): d3.Selection<any> | d3.Transition<any>;
-
-    public animate(drawingTarget: any, attrToAppliedProjector: AttributeToAppliedProjector): any {
-
-      if (!Array.isArray(drawingTarget)) {
-        let numberOfSteps: number = (<any>drawingTarget.merge)[0].length;
-        let adjustedIterativeDelay = this._getAdjustedIterativeDelay(numberOfSteps);
-        drawingTarget.merge = drawingTarget.merge
-          .transition()
-          .ease(this.easingMode())
-          .duration(this.stepDuration())
-          .delay((d: any, i: number) => this.startDelay() + adjustedIterativeDelay * i)
-          .attr(attrToAppliedProjector);
-        drawingTarget.exit
-          .remove();
-        return drawingTarget.merge;
-      } else {
-        let numberOfSteps = drawingTarget.size();
-        let adjustedIterativeDelay = this._getAdjustedIterativeDelay(numberOfSteps);
-
-        return drawingTarget.transition()
-          .ease(this.easingMode())
-          .duration(this.stepDuration())
-          .delay((d: any, i: number) => this.startDelay() + adjustedIterativeDelay * i)
-          .attr(attrToAppliedProjector);
-      }
+    public animateJoin(joinResult: Drawers.JoinResult, attrToAppliedProjector: AttributeToAppliedProjector, drawer: Drawer): void {
+      let numberOfSteps: number = (<any>joinResult.merge)[0].length;
+      let adjustedIterativeDelay = this._getAdjustedIterativeDelay(numberOfSteps);
+      joinResult.merge = joinResult.merge
+        .transition()
+        .ease(this.easingMode())
+        .duration(this.stepDuration())
+        .delay((d: any, i: number) => this.startDelay() + adjustedIterativeDelay * i)
+        .attr(attrToAppliedProjector);
+      joinResult.exit
+        .remove();
     }
 
+    public animate(selection: d3.Selection<any>
+      , attrToAppliedProjector: AttributeToAppliedProjector): d3.Selection<any> | d3.Transition<any> {
+        let numberOfSteps = selection.size();
+        let adjustedIterativeDelay = this._getAdjustedIterativeDelay(numberOfSteps);
+
+        return selection.transition()
+          .ease(this.easingMode())
+          .duration(this.stepDuration())
+          .delay((d: any, i: number) => this.startDelay() + adjustedIterativeDelay * i)
+          .attr(attrToAppliedProjector);
+    }
     /**
      * Gets the start delay of the animation in milliseconds.
      *

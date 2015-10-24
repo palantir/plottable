@@ -2634,7 +2634,7 @@ var Plottable;
             else {
                 dataElements = selection.data(data);
             }
-            this._drawingTarget = {
+            this._joinResult = {
                 update: dataElements.filter(function () {
                     return true;
                 }),
@@ -2642,12 +2642,12 @@ var Plottable;
                 exit: null,
                 merge: null
             };
-            this._drawingTarget.enter = dataElements.enter()
+            this._joinResult.enter = dataElements.enter()
                 .append(this._svgElementName)
                 .attr(this.appliedInitializer());
-            this._applyDefaultAttributes(this._drawingTarget.enter); // others already have it
-            this._drawingTarget.exit = dataElements.exit(); // the animator becomes responsbile for reomving these
-            this._drawingTarget.merge = this._cachedSelection = dataElements; // after enter() is called, this contains new elements
+            this._applyDefaultAttributes(this._joinResult.enter); // others already have it
+            this._joinResult.exit = dataElements.exit(); // the animator becomes responsbile for reomving these
+            this._joinResult.merge = this._cachedSelection = dataElements; // after enter() is called, this contains new elements
             this._cachedSelectionValid = true;
         };
         Drawer.prototype._applyDefaultAttributes = function (selection) {
@@ -2668,7 +2668,7 @@ var Plottable;
                     selection.attr(colorAttribute, step.attrToAppliedProjector[colorAttribute]);
                 }
             });
-            step.animator.animate(this._drawingTarget, step.attrToAppliedProjector, this);
+            step.animator.animateJoin(this._joinResult, step.attrToAppliedProjector, this);
             if (this._className != null) {
                 selection.classed(this._className, true);
             }
@@ -10308,17 +10308,14 @@ var Plottable;
             Null.prototype.totalTime = function (selection) {
                 return 0;
             };
-            Null.prototype.animate = function (drawingTarget, attrToAppliedProjector) {
-                if (!Array.isArray(drawingTarget)) {
-                    drawingTarget.exit
-                        .remove();
-                    return drawingTarget.merge
-                        .attr(attrToAppliedProjector);
-                }
-                else {
-                    // legacy compatibility
-                    return drawingTarget.attr(attrToAppliedProjector);
-                }
+            Null.prototype.animateJoin = function (joinResult, attrToAppliedProjector, drawer) {
+                joinResult.exit
+                    .remove();
+                joinResult.merge
+                    .attr(attrToAppliedProjector);
+            };
+            Null.prototype.animate = function (selection, attrToAppliedProjector) {
+                return selection.attr(attrToAppliedProjector);
             };
             return Null;
         })();
@@ -10349,30 +10346,28 @@ var Plottable;
                 var adjustedIterativeDelay = this._getAdjustedIterativeDelay(numberOfSteps);
                 return this.startDelay() + adjustedIterativeDelay * (Math.max(numberOfSteps - 1, 0)) + this.stepDuration();
             };
-            Easing.prototype.animate = function (drawingTarget, attrToAppliedProjector) {
+            Easing.prototype.animateJoin = function (joinResult, attrToAppliedProjector, drawer) {
                 var _this = this;
-                if (!Array.isArray(drawingTarget)) {
-                    var numberOfSteps = drawingTarget.merge[0].length;
-                    var adjustedIterativeDelay = this._getAdjustedIterativeDelay(numberOfSteps);
-                    drawingTarget.merge = drawingTarget.merge
-                        .transition()
-                        .ease(this.easingMode())
-                        .duration(this.stepDuration())
-                        .delay(function (d, i) { return _this.startDelay() + adjustedIterativeDelay * i; })
-                        .attr(attrToAppliedProjector);
-                    drawingTarget.exit
-                        .remove();
-                    return drawingTarget.merge;
-                }
-                else {
-                    var numberOfSteps = drawingTarget.size();
-                    var adjustedIterativeDelay = this._getAdjustedIterativeDelay(numberOfSteps);
-                    return drawingTarget.transition()
-                        .ease(this.easingMode())
-                        .duration(this.stepDuration())
-                        .delay(function (d, i) { return _this.startDelay() + adjustedIterativeDelay * i; })
-                        .attr(attrToAppliedProjector);
-                }
+                var numberOfSteps = joinResult.merge[0].length;
+                var adjustedIterativeDelay = this._getAdjustedIterativeDelay(numberOfSteps);
+                joinResult.merge = joinResult.merge
+                    .transition()
+                    .ease(this.easingMode())
+                    .duration(this.stepDuration())
+                    .delay(function (d, i) { return _this.startDelay() + adjustedIterativeDelay * i; })
+                    .attr(attrToAppliedProjector);
+                joinResult.exit
+                    .remove();
+            };
+            Easing.prototype.animate = function (selection, attrToAppliedProjector) {
+                var _this = this;
+                var numberOfSteps = selection.size();
+                var adjustedIterativeDelay = this._getAdjustedIterativeDelay(numberOfSteps);
+                return selection.transition()
+                    .ease(this.easingMode())
+                    .duration(this.stepDuration())
+                    .delay(function (d, i) { return _this.startDelay() + adjustedIterativeDelay * i; })
+                    .attr(attrToAppliedProjector);
             };
             Easing.prototype.startDelay = function (startDelay) {
                 if (startDelay == null) {

@@ -3,16 +3,16 @@ module Plottable {
     /**
      * Applies attributes to the 'enter update exit' selections created by the Drawer when binding data
      * Drawer invokes Animators using this signature:
-     * @param {DrawingTarget} drawingTarget DrawingTarget object - its enter update exit and merge ( enter + update)
+     * @param {JoinResult} joinResult JoinResult object - its enter update exit and merge ( enter + update)
      *  properties provide access to the selections.
      * @param {AttributeToAppliedProjector} attrToAppliedProjector The set of
      *     AppliedProjectors that we will use to set attributes on the selection.
      * @param {Drawer} drawer the calling Drawer.
-     * An animator that derives a transition from any property of drawingTarget must update that
+     * An animator that derives a transition from any property of joinResult must update that
      * property with the resulting transition object.
-     * Animators are responsible for removing exiting elements by ensuring that remove() is called on drawingTarget.exit
+     * Animators are responsible for removing exiting elements by ensuring that remove() is called on joinResult.exit
      */
-    animate(drawingTarget: Drawers.DrawingTarget, attrToAppliedProjector: AttributeToAppliedProjector, drawer: Drawer): void;
+    animateJoin(joinResult: Drawers.JoinResult, attrToAppliedProjector: AttributeToAppliedProjector, drawer: Drawer): void;
     /**
      * Applies the supplied attributes to a d3.Selection with some animation.
      * @param {D3.Selection<any>} selection The update selection or transition selection that we wish to animate.

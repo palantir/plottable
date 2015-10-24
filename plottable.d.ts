@@ -1239,10 +1239,10 @@ declare module Plottable {
             animator: Animator;
         };
         /**
-         * A DrawingTarget contains the selections that are the results of binding data.
-         * DrawingTarget is contructed by Drawer, and passed to animators to allow animation of each selection
+         * A JoinResult contains the selections that are the results of binding data.
+         * JoinResult is contructed by Drawer, and passed to animators to allow animation of each selection
          */
-        type DrawingTarget = {
+        type JoinResult = {
             enter: d3.Selection<any> | d3.Transition<any>;
             update: d3.selection.Update<any> | d3.Transition<any>;
             exit: d3.Selection<any> | d3.Transition<any>;
@@ -1254,7 +1254,7 @@ declare module Plottable {
         protected _svgElementName: string;
         protected _className: string;
         private _dataset;
-        private _drawingTarget;
+        private _joinResult;
         private _initializer;
         private _cachedSelectionValid;
         private _cachedSelection;
@@ -4114,16 +4114,16 @@ declare module Plottable {
         /**
          * Applies attributes to the 'enter update exit' selections created by the Drawer when binding data
          * Drawer invokes Animators using this signature:
-         * @param {DrawingTarget} drawingTarget DrawingTarget object - its enter update exit and merge ( enter + update)
+         * @param {JoinResult} joinResult JoinResult object - its enter update exit and merge ( enter + update)
          *  properties provide access to the selections.
          * @param {AttributeToAppliedProjector} attrToAppliedProjector The set of
          *     AppliedProjectors that we will use to set attributes on the selection.
          * @param {Drawer} drawer the calling Drawer.
-         * An animator that derives a transition from any property of drawingTarget must update that
+         * An animator that derives a transition from any property of joinResult must update that
          * property with the resulting transition object.
-         * Animators are responsible for removing exiting elements by ensuring that remove() is called on drawingTarget.exit
+         * Animators are responsible for removing exiting elements by ensuring that remove() is called on joinResult.exit
          */
-        animate(drawingTarget: Drawers.DrawingTarget, attrToAppliedProjector: AttributeToAppliedProjector, drawer: Drawer): void;
+        animateJoin(joinResult: Drawers.JoinResult, attrToAppliedProjector: AttributeToAppliedProjector, drawer: Drawer): void;
         /**
          * Applies the supplied attributes to a d3.Selection with some animation.
          * @param {D3.Selection<any>} selection The update selection or transition selection that we wish to animate.
@@ -4150,7 +4150,7 @@ declare module Plottable.Animators {
      */
     class Null implements Animator {
         totalTime(selection: any): number;
-        animate(drawingTarget: Drawers.DrawingTarget, attrToAppliedProjector: AttributeToAppliedProjector, drawer: Drawer): void;
+        animateJoin(joinResult: Drawers.JoinResult, attrToAppliedProjector: AttributeToAppliedProjector, drawer: Drawer): void;
         animate(selection: d3.Selection<any>, attrToAppliedProjector: AttributeToAppliedProjector): d3.Selection<any> | d3.Transition<any>;
     }
 }
@@ -4191,7 +4191,7 @@ declare module Plottable.Animators {
          */
         constructor();
         totalTime(numberOfSteps: number): number;
-        animate(drawingTarget: Drawers.DrawingTarget, attrToAppliedProjector: AttributeToAppliedProjector, drawer: Drawer): void;
+        animateJoin(joinResult: Drawers.JoinResult, attrToAppliedProjector: AttributeToAppliedProjector, drawer: Drawer): void;
         animate(selection: d3.Selection<any>, attrToAppliedProjector: AttributeToAppliedProjector): d3.Selection<any> | d3.Transition<any>;
         /**
          * Gets the start delay of the animation in milliseconds.
