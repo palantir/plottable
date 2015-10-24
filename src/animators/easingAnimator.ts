@@ -49,10 +49,13 @@ module Plottable.Animators {
       return this.startDelay() + adjustedIterativeDelay * (Math.max(numberOfSteps - 1, 0)) + this.stepDuration();
     }
 
-    public animate(selection: d3.Selection<any>,
-      attrToAppliedProjector: AttributeToAppliedProjector, drawingTarget?: Drawers.DrawingTarget) {
+    public animate(drawingTarget: Drawers.DrawingTarget, attrToAppliedProjector: AttributeToAppliedProjector, drawer: Drawer): void;
+    public animate(selection: d3.Selection<any>
+      , attrToAppliedProjector: AttributeToAppliedProjector): d3.Selection<any> | d3.Transition<any>;
 
-      if (drawingTarget) {
+    public animate(drawingTarget: any, attrToAppliedProjector: AttributeToAppliedProjector): any {
+
+      if (!Array.isArray(drawingTarget)) {
         let numberOfSteps: number = (<any>drawingTarget.merge)[0].length;
         let adjustedIterativeDelay = this._getAdjustedIterativeDelay(numberOfSteps);
         drawingTarget.merge = drawingTarget.merge
@@ -65,10 +68,10 @@ module Plottable.Animators {
           .remove();
         return drawingTarget.merge;
       } else {
-        let numberOfSteps = selection.size();
+        let numberOfSteps = drawingTarget.size();
         let adjustedIterativeDelay = this._getAdjustedIterativeDelay(numberOfSteps);
 
-        return selection.transition()
+        return drawingTarget.transition()
           .ease(this.easingMode())
           .duration(this.stepDuration())
           .delay((d: any, i: number) => this.startDelay() + adjustedIterativeDelay * i)

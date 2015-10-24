@@ -9,17 +9,20 @@ module Plottable.Animators {
     public totalTime(selection: any) {
       return 0;
     }
-    public animate(selection: d3.Selection<any>,
-      attrToAppliedProjector: AttributeToAppliedProjector, drawingTarget?: Drawers.DrawingTarget): d3.Selection<any> | d3.Transition<any> {
+    public animate(drawingTarget: Drawers.DrawingTarget, attrToAppliedProjector: AttributeToAppliedProjector, drawer: Drawer): void;
+    public animate(selection: d3.Selection<any>
+      , attrToAppliedProjector: AttributeToAppliedProjector): d3.Selection<any> | d3.Transition<any>;
 
-      if (drawingTarget) {
+    public animate(drawingTarget: any, attrToAppliedProjector: AttributeToAppliedProjector): any {
+
+      if (!Array.isArray(drawingTarget)) {
         drawingTarget.exit
           .remove();
         return drawingTarget.merge
           .attr(attrToAppliedProjector);
       } else {
         // legacy compatibility
-        return selection.attr(attrToAppliedProjector);
+        return drawingTarget.attr(attrToAppliedProjector);
       }
     }
   }

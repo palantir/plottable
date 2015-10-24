@@ -166,8 +166,8 @@ export class Drawer {
         selection.attr(colorAttribute, step.attrToAppliedProjector[colorAttribute]);
       }
     });
-    step.animator.animate(selection, step.attrToAppliedProjector, this._drawingTarget, this);
-    if (this._className != null) {
+    step.animator.animate(this._drawingTarget, step.attrToAppliedProjector, this);
+     if (this._className != null) {
       selection.classed(this._className, true);
     }
   }

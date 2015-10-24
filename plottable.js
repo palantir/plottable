@@ -2668,7 +2668,7 @@ var Plottable;
                     selection.attr(colorAttribute, step.attrToAppliedProjector[colorAttribute]);
                 }
             });
-            step.animator.animate(selection, step.attrToAppliedProjector, this._drawingTarget, this);
+            step.animator.animate(this._drawingTarget, step.attrToAppliedProjector, this);
             if (this._className != null) {
                 selection.classed(this._className, true);
             }
@@ -10308,8 +10308,8 @@ var Plottable;
             Null.prototype.totalTime = function (selection) {
                 return 0;
             };
-            Null.prototype.animate = function (selection, attrToAppliedProjector, drawingTarget) {
-                if (drawingTarget) {
+            Null.prototype.animate = function (drawingTarget, attrToAppliedProjector) {
+                if (!Array.isArray(drawingTarget)) {
                     drawingTarget.exit
                         .remove();
                     return drawingTarget.merge
@@ -10317,7 +10317,7 @@ var Plottable;
                 }
                 else {
                     // legacy compatibility
-                    return selection.attr(attrToAppliedProjector);
+                    return drawingTarget.attr(attrToAppliedProjector);
                 }
             };
             return Null;
@@ -10349,9 +10349,9 @@ var Plottable;
                 var adjustedIterativeDelay = this._getAdjustedIterativeDelay(numberOfSteps);
                 return this.startDelay() + adjustedIterativeDelay * (Math.max(numberOfSteps - 1, 0)) + this.stepDuration();
             };
-            Easing.prototype.animate = function (selection, attrToAppliedProjector, drawingTarget) {
+            Easing.prototype.animate = function (drawingTarget, attrToAppliedProjector) {
                 var _this = this;
-                if (drawingTarget) {
+                if (!Array.isArray(drawingTarget)) {
                     var numberOfSteps = drawingTarget.merge[0].length;
                     var adjustedIterativeDelay = this._getAdjustedIterativeDelay(numberOfSteps);
                     drawingTarget.merge = drawingTarget.merge
@@ -10365,9 +10365,9 @@ var Plottable;
                     return drawingTarget.merge;
                 }
                 else {
-                    var numberOfSteps = selection.size();
+                    var numberOfSteps = drawingTarget.size();
                     var adjustedIterativeDelay = this._getAdjustedIterativeDelay(numberOfSteps);
-                    return selection.transition()
+                    return drawingTarget.transition()
                         .ease(this.easingMode())
                         .duration(this.stepDuration())
                         .delay(function (d, i) { return _this.startDelay() + adjustedIterativeDelay * i; })
