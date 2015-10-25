@@ -6,7 +6,7 @@ describe("Drawers", () => {
   let dr: Plottable.Drawer = null;
   let data: any[];
   let data2: any[];
-  let animatefcn: Plottable.Animators.AnimateJoinCallback;
+  let animatefcn: any; // Plottable.Animators.AnimateJoinCallback ...when defined
   before(() => {
     // callback implementation of animator to be used by CallbackAnimator
     // note that to have
