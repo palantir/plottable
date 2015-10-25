@@ -19,7 +19,9 @@ export module Drawers {
   };
 
   /**
-   * A JoinResult contains the selections that are the results of binding data.
+   * A JoinResult contains the enter, update and exit selections that are produced when
+   * joining data to a collection of elements using the d3 data() method
+   * (see http://bost.ocks.org/mike/join/ for detailed explanation)
    * JoinResult is contructed by Drawer, and passed to animators to allow animation of each selection
    */
   export type JoinResult = {
