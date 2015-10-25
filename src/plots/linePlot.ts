@@ -179,7 +179,11 @@ module Plottable.Plots {
     }
 
     protected _createDrawer(dataset: Dataset): Drawer {
-      return new Plottable.Drawers.Line(dataset);
+      return <Plottable.Drawers.Line>new Plottable.Drawers.Line(dataset)
+      // fat arrow wrapper ensures that 'this' is the plot when called
+        .initializer(() => {
+          return this._initializer();
+        });
     }
 
     protected _extentsForProperty(property: string) {
@@ -312,15 +316,17 @@ module Plottable.Plots {
       let scaledStartValue = this.y().scale.scale(startValue);
       return (d: any, i: number, dataset: Dataset) => scaledStartValue;
     }
+    /**
+     * function returning getAttrToProjector
+     */
+    private _initializer() {
+      let attrToProjector = this._generateAttrToProjector();
+      attrToProjector["d"] = this._constructLineProjector(Plot._scaledAccessor(this.x()), this._getResetYFunction());
+      return attrToProjector;
+    }
 
     protected _generateDrawSteps(): Drawers.DrawStep[] {
       let drawSteps: Drawers.DrawStep[] = [];
-      if (this._animateOnNextRender()) {
-        let attrToProjector = this._generateAttrToProjector();
-        attrToProjector["d"] = this._constructLineProjector(Plot._scaledAccessor(this.x()), this._getResetYFunction());
-        drawSteps.push({attrToProjector: attrToProjector, animator: this._getAnimator(Plots.Animator.RESET)});
-      }
-
       drawSteps.push({attrToProjector: this._generateAttrToProjector(), animator: this._getAnimator(Plots.Animator.MAIN)});
 
       return drawSteps;

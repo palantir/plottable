@@ -16,6 +16,10 @@ function run(svg, data, Plottable) {
   var yAxis = new Plottable.Axes.Numeric(yScale, "left");
 
   var dataset = new Plottable.Dataset(data);
+  if (dataset.keyFunction) {
+      dataset
+        .keyFunction(Plottable.KeyFunctions.noConstancy);
+  }
 
   var hBarRenderer = new Plottable.Plots.Bar("horizontal");
   hBarRenderer.addDataset(dataset);

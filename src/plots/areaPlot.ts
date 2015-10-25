@@ -83,7 +83,10 @@ module Plottable.Plots {
     }
 
     protected _addDataset(dataset: Dataset) {
-      let lineDrawer = new Drawers.Line(dataset);
+      let lineDrawer = <Drawers.Line>new Drawers.Line(dataset)
+        .initializer(() => {
+          return this._lineInitializer();
+        });
       if (this._isSetup) {
         lineDrawer.renderArea(this._renderArea.append("g"));
       }
@@ -103,13 +106,13 @@ module Plottable.Plots {
       this.datasets().forEach((dataset) => this._lineDrawers.get(dataset).draw(dataToDraw.get(dataset), drawSteps));
     }
 
+    private _lineInitializer() {
+      let attrToProjector = this._generateLineAttrToProjector();
+      attrToProjector["d"] = this._constructLineProjector(Plot._scaledAccessor(this.x()), this._getResetYFunction());
+      return attrToProjector;
+    }
     private _generateLineDrawSteps() {
       let drawSteps: Drawers.DrawStep[] = [];
-      if (this._animateOnNextRender()) {
-        let attrToProjector = this._generateLineAttrToProjector();
-        attrToProjector["d"] = this._constructLineProjector(Plot._scaledAccessor(this.x()), this._getResetYFunction());
-        drawSteps.push({attrToProjector: attrToProjector, animator: this._getAnimator(Plots.Animator.RESET)});
-      }
       drawSteps.push({attrToProjector: this._generateLineAttrToProjector(), animator: this._getAnimator(Plots.Animator.MAIN)});
       return drawSteps;
     }
@@ -121,21 +124,23 @@ module Plottable.Plots {
     }
 
     protected _createDrawer(dataset: Dataset) {
-      return new Plottable.Drawers.Area(dataset);
+      return <Plottable.Drawers.Area>new Plottable.Drawers.Area(dataset)
+      // fat arrow wrapper ensures that 'this' is the plot when called
+        .initializer(() => {
+          return this._areaInitializer();
+        });
     }
 
+    private _areaInitializer() {
+      let attrToProjector = this._generateAttrToProjector();
+      attrToProjector["d"] = this._constructAreaProjector(Plot._scaledAccessor(this.x()),
+        this._getResetYFunction(),
+        Plot._scaledAccessor(this.y0()));
+      return attrToProjector;
+    }
     protected _generateDrawSteps(): Drawers.DrawStep[] {
       let drawSteps: Drawers.DrawStep[] = [];
-      if (this._animateOnNextRender()) {
-        let attrToProjector = this._generateAttrToProjector();
-        attrToProjector["d"] = this._constructAreaProjector(Plot._scaledAccessor(this.x()),
-                                                            this._getResetYFunction(),
-                                                            Plot._scaledAccessor(this.y0()));
-        drawSteps.push({attrToProjector: attrToProjector, animator: this._getAnimator(Plots.Animator.RESET)});
-      }
-
       drawSteps.push({attrToProjector: this._generateAttrToProjector(), animator: this._getAnimator(Plots.Animator.MAIN)});
-
       return drawSteps;
     }
 

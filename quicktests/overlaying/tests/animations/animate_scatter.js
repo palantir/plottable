@@ -1,3 +1,4 @@
+
 function makeData() {
   "use strict";
 
@@ -28,7 +29,7 @@ function run(svg, data, Plottable) {
    [null,  xAxis]]);
   circleChart.renderTo(svg);
 
-  var cb = function() {
+  var cb = function () {
     var tmp = d1.data();
     d1.data(d2.data());
     d2.data(tmp);

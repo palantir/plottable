@@ -24,7 +24,8 @@ module Plottable.Plots {
     }
 
     protected _createDrawer(dataset: Dataset) {
-      return new Plottable.Drawers.Symbol(dataset);
+      return <Plottable.Drawers.Symbol>new Plottable.Drawers.Symbol(dataset)
+        .initializer(() => { return this._initializer(); });
     }
 
     /**
@@ -78,14 +79,13 @@ module Plottable.Plots {
       return this;
     }
 
+    private _initializer() {
+      let resetAttrToProjector = this._generateAttrToProjector();
+      resetAttrToProjector["d"] = () => "";
+      return resetAttrToProjector;
+    }
     protected _generateDrawSteps(): Drawers.DrawStep[] {
       let drawSteps: Drawers.DrawStep[] = [];
-      if (this._animateOnNextRender()) {
-        let resetAttrToProjector = this._generateAttrToProjector();
-        resetAttrToProjector["d"] = () => "";
-        drawSteps.push({attrToProjector: resetAttrToProjector, animator: this._getAnimator(Plots.Animator.RESET)});
-      }
-
       drawSteps.push({attrToProjector: this._generateAttrToProjector(), animator: this._getAnimator(Plots.Animator.MAIN)});
       return drawSteps;
     }

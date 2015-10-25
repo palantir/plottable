@@ -102,7 +102,12 @@ module Plottable.Plots {
     }
 
     protected _createDrawer(dataset: Dataset) {
-      return new Plottable.Drawers.Rectangle(dataset);
+      // Drawer.initializer returns a Drawer, so cast to return the correct type from this method
+      return <Plottable.Drawers.Rectangle>new Plottable.Drawers.Rectangle(dataset)
+        .initializer(() => {
+          return this._initializer();
+        });
+
     }
 
     protected _setup() {
@@ -409,7 +414,6 @@ module Plottable.Plots {
         "x2": this._isVertical ? this.width() : scaledBaseline,
         "y2": this._isVertical ? scaledBaseline : this.height()
       };
-
       this._getAnimator("baseline").animate(this._baseline, baselineAttr);
 
       this.datasets().forEach((dataset) => this._labelConfig.get(dataset).labelArea.selectAll("g").remove());
@@ -597,18 +601,18 @@ module Plottable.Plots {
       return labelTooWide.some((d: boolean) => d);
     }
 
+    private _initializer() {
+      let resetAttrToProjector = this._generateAttrToProjector();
+      let primaryScale: Scale<any, number> = this._isVertical ? this.y().scale : this.x().scale;
+      let scaledBaseline = primaryScale.scale(this.baselineValue());
+      let positionAttr = this._isVertical ? "y" : "x";
+      let dimensionAttr = this._isVertical ? "height" : "width";
+      resetAttrToProjector[positionAttr] = () => scaledBaseline;
+      resetAttrToProjector[dimensionAttr] = () => 0;
+      return resetAttrToProjector;
+    }
     protected _generateDrawSteps(): Drawers.DrawStep[] {
       let drawSteps: Drawers.DrawStep[] = [];
-      if (this._animateOnNextRender()) {
-        let resetAttrToProjector = this._generateAttrToProjector();
-        let primaryScale: Scale<any, number> = this._isVertical ? this.y().scale : this.x().scale;
-        let scaledBaseline = primaryScale.scale(this.baselineValue());
-        let positionAttr = this._isVertical ? "y" : "x";
-        let dimensionAttr = this._isVertical ? "height" : "width";
-        resetAttrToProjector[positionAttr] = () => scaledBaseline;
-        resetAttrToProjector[dimensionAttr] = () => 0;
-        drawSteps.push({attrToProjector: resetAttrToProjector, animator: this._getAnimator(Plots.Animator.RESET)});
-      }
       drawSteps.push({attrToProjector: this._generateAttrToProjector(), animator: this._getAnimator(Plots.Animator.MAIN)});
       return drawSteps;
     }

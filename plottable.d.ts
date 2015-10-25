@@ -3397,6 +3397,7 @@ declare module Plottable.Plots {
          * @returns {Plots.Scatter} The calling Scatter Plot.
          */
         symbol(symbol: Accessor<SymbolFactory>): Plots.Scatter<X, Y>;
+        private _initializer();
         protected _generateDrawSteps(): Drawers.DrawStep[];
         /**
          * @deprecated As of release v1.1.0, replaced by _entityVisibleOnPlot()
@@ -3564,6 +3565,7 @@ declare module Plottable.Plots {
         protected _extentsForProperty(property: string): any[];
         private _drawLabels();
         private _drawLabel(data, dataset);
+        private _initializer();
         protected _generateDrawSteps(): Drawers.DrawStep[];
         protected _generateAttrToProjector(): {
             [attr: string]: (datum: any, index: number, dataset: Dataset) => any;
@@ -3669,6 +3671,10 @@ declare module Plottable.Plots {
         protected _extentsForProperty(property: string): any[];
         private _getEdgeIntersectionPoints();
         protected _getResetYFunction(): (d: any, i: number, dataset: Dataset) => number;
+        /**
+         * function returning getAttrToProjector
+         */
+        private _initializer();
         protected _generateDrawSteps(): Drawers.DrawStep[];
         protected _generateAttrToProjector(): {
             [attr: string]: (datum: any, index: number, dataset: Dataset) => any;
@@ -3719,9 +3725,11 @@ declare module Plottable.Plots {
         protected _addDataset(dataset: Dataset): Area<X>;
         protected _removeDatasetNodes(dataset: Dataset): void;
         protected _additionalPaint(): void;
+        private _lineInitializer();
         private _generateLineDrawSteps();
         private _generateLineAttrToProjector();
         protected _createDrawer(dataset: Dataset): Drawers.Area;
+        private _areaInitializer();
         protected _generateDrawSteps(): Drawers.DrawStep[];
         protected _updateYScale(): void;
         protected _getResetYFunction(): Accessor<any>;
@@ -4145,6 +4153,293 @@ declare module Plottable {
 }
 declare module Plottable.Animators {
     /**
+     * Base class for animators. Equivalent behaviour to Easing animator
+     * Provides helper functions for subclassed animators
+     */
+    class Base implements Animator {
+        /**
+         * The default starting delay of the animation in milliseconds
+         */
+        private static _DEFAULT_START_DELAY_MILLISECONDS;
+        /**
+         * The default duration of one animation step in milliseconds
+         */
+        private static _DEFAULT_STEP_DURATION_MILLISECONDS;
+        /**
+         * The default maximum start delay between each step of an animation
+         */
+        private static _DEFAULT_ITERATIVE_DELAY_MILLISECONDS;
+        /**
+         * The default maximum total animation duration
+         */
+        private static _DEFAULT_MAX_TOTAL_DURATION_MILLISECONDS;
+        /**
+         * The default easing of the animation
+         */
+        private static _DEFAULT_EASING_MODE;
+        private _startDelay;
+        private _stepDuration;
+        private _stepDelay;
+        private _maxTotalDuration;
+        private _easingMode;
+        private _xScale;
+        private _yScale;
+        /**
+         * Constructs the default animator
+         *
+         * @constructor
+         */
+        constructor();
+        totalTime(numberOfSteps: number): number;
+        animateJoin(joinResult: Drawers.JoinResult, attrToAppliedProjector: AttributeToAppliedProjector, drawer: Drawer): void;
+        animate(selection: d3.Selection<any>, attrToAppliedProjector: AttributeToAppliedProjector): d3.Selection<any> | d3.Transition<any>;
+        /**
+         * return a transition from the selection, with the requested duration
+         * and (possibly) delay. As a convenience, this may return the selection itself
+         * without applying a transition if duration = 0
+         * If the selection passed in is a transition a subtransition is created. This subtransition
+         * will use the default delay calculated by d3, so any delay passed to this function is ignored
+         * @param { d3.Selection<any>|d3.Transition<any>|d3.selection.Update<any>} the d3 selection or transition
+         * @param { number } duration The duration required for the transition. If 0, no transition is created
+         * @param { number? } delay The delay to apply to the transition. If creating a subtransition, this is ignored.
+         * @param { EasingFunctionSpecifier } easing An easing function, or the name of a predefined d3 easing function
+         * to use on the transition. If not supplied, the easingMode of the calling Animator is used.
+         * @return { any } The transition created, or , when duration = 0 the original selection is returned.
+         */
+        protected getTransition(selection: d3.Selection<any> | d3.Transition<any> | d3.selection.Update<any>, duration: number, delay?: (d: any, i: number) => number, easing?: EasingFunctionSpecifier): any;
+        /**
+         *  return true if the d3 object passed in is a transition
+         */
+        protected isTransition(selection: any): boolean;
+        protected mergeAttrs(attr1: AttributeToAppliedProjector, attr2: AttributeToAppliedProjector): AttributeToAppliedProjector;
+        /**
+         * Return the AtributeToAppliedProjector comprising only those attributes listed in names
+         * An Animator may use this function to create an intermediate collection of attributes to
+         * use in a transition.
+         * @param {AttributeToAppliedProjector} attr
+         * @param {string[]} names The names of the required attributes
+         *
+         * @returns {AttributeToAppliedProjector} A new collection, compresing only thos attribuest listed in names[].
+         */
+        protected pluckAttrs(attr: AttributeToAppliedProjector, names: string[]): AttributeToAppliedProjector;
+        /**
+         * Return a delay function, using the current startDelay and stepDelay,
+         * potentially adjusted to fit within the maxTotalDuration
+         * @param selection selection on which the transition will be based
+         * @returns delay function that may be passed to a transition
+         */
+        protected delay(selection: any): (d: any, i: number) => number;
+        /**
+         * Gets the start delay of the animation in milliseconds.
+         *
+         * @returns {number} The current start delay.
+         */
+        startDelay(): number;
+        /**
+         * Sets the start delay of the animation in milliseconds.
+         *
+         * @param {number} startDelay The start delay in milliseconds.
+         * @returns {Base} The calling Animator.
+         */
+        startDelay(startDelay: number): Base;
+        /**
+         * Gets the duration of one animation step in milliseconds.
+         *
+         * @returns {number} The current duration.
+         */
+        stepDuration(): number;
+        /**
+         * Sets the duration of one animation step in milliseconds.
+         *
+         * @param {number} stepDuration The duration in milliseconds.
+         * @returns {Base} The calling Animator.
+         */
+        stepDuration(stepDuration: number): Base;
+        /**
+         * Gets the maximum start delay between animation steps in milliseconds.
+         *
+         * @returns {number} The current maximum iterative delay.
+         */
+        stepDelay(): number;
+        /**
+         * Sets the maximum start delay between animation steps in milliseconds.
+         *
+         * @param {number} stepDelay The maximum iterative delay in milliseconds.
+         * @returns {Base} The calling Animator.
+         */
+        stepDelay(stepDelay: number): Base;
+        /**
+         * Gets the maximum total animation duration constraint in milliseconds.
+         *
+         * If the animation time would exceed the specified time, the duration of each step
+         * and the delay between each step will be reduced until the animation fits within
+         * the specified time.
+         *
+         * @returns {number} The current maximum total animation duration.
+         */
+        maxTotalDuration(): number;
+        /**
+         * Sets the maximum total animation duration constraint in miliseconds.
+         *
+         * If the animation time would exceed the specified time, the duration of each step
+         * and the delay between each step will be reduced until the animation fits within
+         * the specified time.
+         *
+         * @param {number} maxTotalDuration The maximum total animation duration in milliseconds.
+         * @returns {Base} The calling Animator.
+         */
+        maxTotalDuration(maxTotalDuration: number): Base;
+        /**
+         * Gets the current easing mode of the animation.
+         *
+         * @returns {string} the current easing mode.
+         */
+        easingMode(): string;
+        /**
+         * Sets the easing mode of the animation.
+         *
+         * @param {string} easingMode The desired easing mode.
+         * @returns {Base} The calling Animator.
+         */
+        easingMode(easingMode: string): Base;
+        /**
+         * xScale -- a reference to the xScale used by the owning plot
+         * the animator can use this to calculate positions
+         * @returns {Plottable.Scale<any, any>} the xScale.
+         */
+        xScale(): Plottable.Scale<any, any>;
+        /**
+         * Sets the easing mode of the animation.
+         *
+         * @param {Plottable.Scale<any, any} xScale.
+         * @returns {Base} The calling Animator.
+         */
+        xScale(xScale: Plottable.Scale<any, any>): Base;
+        /**
+         * yScale - a reference to the yScale used by the owning plot
+         * the animator can use this to calculate positions
+         * @returns {Plottable.Scale<any, any>} the yScale.
+         */
+        yScale(): Plottable.Scale<any, any>;
+        /**
+         * a yScale available to the animator for rendering 'logical' y values.
+         *
+         * @param {Plottable.Scale<any, any} yScale.
+         * @returns {Base} The calling Animator.
+         */
+        yScale(yScale: Plottable.Scale<any, any>): Base;
+        /**
+         * Adjust the iterative delay, such that it takes into account the maxTotalDuration constraint
+         */
+        protected _getAdjustedIterativeDelay(numberOfSteps: number): number;
+    }
+}
+declare module Plottable.Animators {
+    /**
+     * Base for animators that animate specific attributes, such as Opacity, height... .
+     */
+    class Attr extends Base implements Animator {
+        private _startAttrs;
+        private _endAttrs;
+        private _exitEasingMode;
+        animateJoin(joinResult: Drawers.JoinResult, attrToAppliedProjector: AttributeToAppliedProjector, drawer: Drawer): void;
+        animate(selection: d3.Selection<any>, attrToAppliedProjector: AttributeToAppliedProjector): d3.Selection<any> | d3.Transition<any>;
+        /**
+         * Gets the attributes for entering elements. These are overlaid over
+         * the target atr and
+         * @returns {number} The current start delay.
+         */
+        startAttrs(): AttributeToAppliedProjector;
+        /**
+         * Sets the attributes for entering elements.
+         *
+         * @param {startAttrs} A collection of attribuets applied to entering elements.
+         * These are applied over the top of the attributes pass to the animate method
+         * Any attribute passed to startAttrs will transition to its final value
+         * @returns {Attr} The calling Attr Animator.
+         */
+        startAttrs(startAttrs: AttributeToAppliedProjector): Attr;
+        /**
+         * Gets the attributes for exiting elements.
+         * Exisitng elements will transition to these attribuest before being removed
+         * @returns {AttributeToAppliedProjector} The current exiting attributes.
+         */
+        endAttrs(): AttributeToAppliedProjector;
+        /**
+         * Sets the attributes for entering elements.
+         *
+         * @param {endAttrs} A collection of attribuets applied to entering elements.
+         * These are applied over the top of the attributes pass to the animate method
+         * Any attribute passed to endAttrs will transition to its final value
+         * @returns {Attr} The calling Attr Animator.
+         */
+        endAttrs(endAttrs: AttributeToAppliedProjector): Attr;
+        /**
+         * gets the easing mode for exiting elements.
+         * Existing elements will transition out using this easing mode before being removed
+         * if not specified, easingMode() is used
+         * @returns {EasingFunctionSpecifier} The current exiting Easing mode.
+         */
+        exitEasingMode(): EasingFunctionSpecifier;
+        /**
+         * easing mode for exiting elements
+         *
+         * @param {EasingFunctionSpecifier} The easing function, or d3 easing function name.
+         * Animations may separate the activity on entering and easing elements by using
+         * the squEase easing function over different intervals.
+         *
+         * @returns {Attr} The calling Attr Animator.
+         */
+        exitEasingMode(exitEasingMode: EasingFunctionSpecifier): Attr;
+    }
+}
+declare module Plottable.Animators {
+    /**
+     * A "staged" animation specific for bar charts
+     * Animates exit, update and enter in sequence
+     */
+    class Bar extends Attr implements Animator {
+        private _rhythm;
+        private _stageUpdate;
+        constructor();
+        /**
+         * Sets the relationship between activity and waits in the major steps in the animation (0 to 1)
+         * Applied using a squEase easing function
+         *
+         * @returns {number} The current rhythm.
+         */
+        rhythm(): number;
+        /**
+         * @param {number} rhythm the rhythm to apply to the major steps in the animation.
+         * @returns {Bar} The calling Animator.
+         */
+        rhythm(rhythm: number): Bar;
+        /**
+         * Specify whether to split the rendering of the Update selection into two stages
+         *
+         * @returns {boolean} The current setting.
+         */
+        stageUpdate(): boolean;
+        /**
+         * @param {boolean} stageUpdate split the Update into two stages
+         * @returns {Bar} The calling Animator.
+         */
+        stageUpdate(stageUpdate: boolean): Bar;
+        animate(joinResult: Drawers.JoinResult, attrToAppliedProjector: AttributeToAppliedProjector, drawer: Drawer): void;
+        animate(selection: d3.Selection<any>, attrToAppliedProjector: AttributeToAppliedProjector): d3.Selection<any> | d3.Transition<any>;
+    }
+}
+declare module Plottable.Animators {
+    /**
+     * Base for animators that animate specific attributes, such as Opacity, height... .
+     */
+    class Reset extends Base implements Animator {
+        animateJoin(joinResult: Drawers.JoinResult, attrToAppliedProjector: AttributeToAppliedProjector, drawer: Drawer): void;
+        animate(selection: d3.Selection<any>, attrToAppliedProjector: AttributeToAppliedProjector): d3.Selection<any> | d3.Transition<any>;
+    }
+}
+declare module Plottable.Animators {
+    /**
      * An animator implementation with no animation. The attributes are
      * immediately set on the selection.
      */
@@ -4270,6 +4565,95 @@ declare module Plottable.Animators {
          * Adjust the iterative delay, such that it takes into account the maxTotalDuration constraint
          */
         private _getAdjustedIterativeDelay(numberOfSteps);
+    }
+}
+declare module Plottable.Animators {
+    /**
+     * Fade in - fade out the entering - exiting elements by transitioning opacity
+     */
+    class Opacity extends Attr implements Animator {
+        private _startOpacity;
+        private _endOpacity;
+        /**
+         *  @Constructor
+         *  @param {number} startOpacity the initial opacity for entering elements
+         *                   defaults to 0
+         *
+         *  @param {number} endOpacity the final opacity for exiting elements
+         *                   defaults to 0
+         */
+        constructor(startOpacity?: number, endOpacity?: number);
+        /**
+         * Sets the starting opacity for entering elements.
+         *
+         * @returns {number} The current start opacity.
+         */
+        startOpacity(): number;
+        /**
+         * Sets the starting opacity for entering elements.
+         *
+         * @param {number} startOpacity The opacity to apply to new elements.
+         * @returns {Opacity} The calling Animator.
+         */
+        startOpacity(startOpacity: number): Opacity;
+        /**
+         * Sets the ending opacity for exiting elements.
+         *
+         * @returns {number} The current end opacity.
+         */
+        endOpacity(): number;
+        /**
+         * Sets the ending opacity for entering elements.
+         *
+         * @param {number} endOpacity The opacity to transition to exiting elements.
+         * @returns {Opacity} The calling Animator.
+         */
+        endOpacity(endOpacity: number): Opacity;
+    }
+}
+declare module Plottable.Animators {
+    type AnimateJoinCallback = (joinResult: Drawers.JoinResult, attrToAppliedProjector: AttributeToAppliedProjector, drawer: Drawer) => void;
+    /**
+     * Allows the implementation of animate to be passed as a callback function
+     * Provides javascript clients that build custom animations
+     * with full access to the drawing target and properties of the Drawer (appliedIntializer)
+     */
+    class Callback extends Base implements Animator {
+        private _callback;
+        private _innerAnimator;
+        constructor();
+        /**
+         * animateJoin implementation delegates to the callback
+         */
+        animateJoin(joinResult: Drawers.JoinResult, attrToAppliedProjector: AttributeToAppliedProjector, drawer: Drawer): void;
+        animate(selection: d3.Selection<any>, attrToAppliedProjector: AttributeToAppliedProjector): d3.Selection<any> | d3.Transition<any>;
+        /**
+         * Gets the callback animate function.
+         * @returns {Callback} The calling Callback Animator.
+         */
+        callback(): AnimateJoinCallback;
+        /**
+         * Sets the attributes for entering elements.
+         *
+         * @param {AnimateCallback} a function implementing Animator.animate
+         * @returns {Callback} The calling Callback Animator.
+         */
+        callback(callback: AnimateJoinCallback): Callback;
+        /**
+         * Gets an inner animator.
+         * callback functions have access to this animator, so callbacks may be designed to
+         * wrap another animator
+         * @returns {innerAnimator} The current innerAnimator.
+         */
+        innerAnimator(): Animator;
+        /**
+         * Sets the attributes for entering elements.
+         *
+         * @param {Animator} an Animator
+         * @returns {Callback} The calling Animator.
+         */
+        innerAnimator(innerAnimator: Animator): Attr;
+        innerAnimate(joinResult: Drawers.JoinResult, attrToAppliedProjector: AttributeToAppliedProjector, drawer: Drawer): void;
     }
 }
 declare module Plottable {

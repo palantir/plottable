@@ -19,11 +19,16 @@ function run(svg, data, Plottable) {
   var yAxis = new Plottable.Axes.Numeric(yScale, "left");
 
   var dataset = new Plottable.Dataset(data);
+  //if (dataset.keyFunction) {
+  //    dataset
+  //      .keyFunction(Plottable.KeyFunctions.noConstancy);
+  //}
   var lineRenderer = new Plottable.Plots.Line()
               .addDataset(dataset)
               .x(function(d) { return d.x; }, xScale)
               .y(function(d) { return d.y; }, yScale)
               .attr("opacity", 0.75)
+              .animator(Plottable.Plots.Animator.MAIN, new Plottable.Animators.Reset())
               .animated(doAnimate);
 
   var lineChart = new Plottable.Components.Table([[yAxis, lineRenderer],
@@ -37,3 +42,4 @@ function run(svg, data, Plottable) {
 
   new Plottable.Interactions.Click().onClick(cb).attachTo(lineRenderer);
 }
+//# sourceURL=animations/animate_line.js
