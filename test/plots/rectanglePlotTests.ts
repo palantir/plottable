@@ -1,7 +1,7 @@
 ///<reference path="../testReference.ts" />
 
 describe("Plots", () => {
-  describe("RectanglePlots", () => {
+  describe("RectanglePlot", () => {
     describe("drawing", () => {
       it("draws rectangles with the input x1, x2, y1, y2 edges", () => {
         const data = [
