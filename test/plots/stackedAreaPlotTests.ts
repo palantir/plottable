@@ -1,7 +1,7 @@
 ///<reference path="../testReference.ts" />
 
 describe("Plots", () => {
-  describe("Stacked Area Plot", () => {
+  describe("StackedAreaPlot", () => {
     describe("setting the x property", () => {
       let svg: d3.Selection<void>;
       let stackedAreaPlot: Plottable.Plots.StackedArea<number>;
