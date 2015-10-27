@@ -2,6 +2,24 @@
 
 describe("Plots", () => {
   describe("Bar Plot", () => {
+    describe ("orientations", () => {
+      it("rejects invalid orientations", () => {
+        assert.throws(() => new Plottable.Plots.Bar("diagonal"), Error);
+      });
+
+      it("defaults to vertical", () => {
+        let defaultPlot = new Plottable.Plots.Bar<number, number>();
+        assert.strictEqual(defaultPlot.orientation(), "vertical", "default Plots.Bar() are vertical");
+      });
+
+      it("sets orientation on construction", () => {
+        let verticalPlot = new Plottable.Plots.Bar<number, number>("vertical");
+        assert.strictEqual(verticalPlot.orientation(), "vertical", "vertical Plots.Bar()");
+
+        let horizontalPlot = new Plottable.Plots.Bar<number, number>("horizontal");
+        assert.strictEqual(horizontalPlot.orientation(), "horizontal", "horizontal Plots.Bar()");
+      });
+    });
 
     // HACKHACK #1798: beforeEach being used below
     it("renders correctly with no data", () => {
@@ -15,21 +33,6 @@ describe("Plots", () => {
       assert.strictEqual(plot.width(), 400, "was allocated width");
       assert.strictEqual(plot.height(), 400, "was allocated height");
       svg.remove();
-    });
-
-    it("rejects invalid orientations", () => {
-      assert.throws(() => new Plottable.Plots.Bar("diagonal"), Error);
-    });
-
-    it("orientation() works as expected", () => {
-      let defaultPlot = new Plottable.Plots.Bar<number, number>();
-      assert.strictEqual(defaultPlot.orientation(), "vertical", "default Plots.Bar() are vertical");
-
-      let verticalPlot = new Plottable.Plots.Bar<number, number>("vertical");
-      assert.strictEqual(verticalPlot.orientation(), "vertical", "vertical Plots.Bar()");
-
-      let horizontalPlot = new Plottable.Plots.Bar<number, number>("horizontal");
-      assert.strictEqual(horizontalPlot.orientation(), "horizontal", "horizontal Plots.Bar()");
     });
 
     it("gets the nearest Entity when any part of the bar is visible (vertical)", () => {
