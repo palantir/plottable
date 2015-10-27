@@ -196,7 +196,7 @@ module.exports = function(grunt) {
         testname: "Plottable Sauce Unit Tests",
         pollInterval: 5000,
         statusCheckAttempts: 60,
-        maxRetries: 5,
+        maxRetries: 1,
         browsers: [{
           browserName: "firefox",
           platform: "linux"
