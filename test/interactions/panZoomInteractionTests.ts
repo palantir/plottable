@@ -581,5 +581,34 @@ describe("Interactions", () => {
       });
     });
 
+    describe("enforcing the maximum domain value for the interaction", () => {
+      let interaction: Plottable.Interactions.PanZoom;
+
+      beforeEach(() => {
+        interaction = new Plottable.Interactions.PanZoom();
+      });
+
+      it("can set the maximum domain value", () => {
+        const scale = new Plottable.Scales.Linear();
+        const maxDomainValue = 10;
+        assert.strictEqual(interaction.maxDomainValue(scale, maxDomainValue), interaction, "setting the value returns interaction");
+        assert.strictEqual(interaction.maxDomainValue(scale), maxDomainValue, "max domain value set");
+      });
+    });
+
+    describe("enforcing the minimum domain value for the interaction", () => {
+      let interaction: Plottable.Interactions.PanZoom;
+
+      beforeEach(() => {
+        interaction = new Plottable.Interactions.PanZoom();
+      });
+
+      it("can set the minimum domain value", () => {
+        const scale = new Plottable.Scales.Linear();
+        const minDomainValue = 10;
+        assert.strictEqual(interaction.minDomainValue(scale, minDomainValue), interaction, "setting the value returns interaction");
+        assert.strictEqual(interaction.minDomainValue(scale), minDomainValue, "min domain value set");
+      });
+    });
   });
 });

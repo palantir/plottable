@@ -22,6 +22,9 @@ module Plottable.Interactions {
     private _minDomainExtents: Utils.Map<QuantitativeScale<any>, any>;
     private _maxDomainExtents: Utils.Map<QuantitativeScale<any>, any>;
 
+    private _minDomainValues: Utils.Map<QuantitativeScale<any>, any>;
+    private _maxDomainValues: Utils.Map<QuantitativeScale<any>, any>;
+
     /**
      * A PanZoom Interaction updates the domains of an x-scale and/or a y-scale
      * in response to the user panning or zooming.
@@ -39,6 +42,8 @@ module Plottable.Interactions {
       this._touchIds = d3.map<Point>();
       this._minDomainExtents = new Utils.Map<QuantitativeScale<any>, number>();
       this._maxDomainExtents = new Utils.Map<QuantitativeScale<any>, number>();
+      this._minDomainValues = new Utils.Map<QuantitativeScale<any>, number>();
+      this._maxDomainValues = new Utils.Map<QuantitativeScale<any>, number>();
       if (xScale != null) {
         this.addXScale(xScale);
       }
@@ -422,6 +427,74 @@ module Plottable.Interactions {
         Utils.Window.warn("Panning and zooming with extents on a nonlinear scale may have unintended behavior.");
       }
       this._maxDomainExtents.set(quantitativeScale, maxDomainExtent);
+      return this;
+    }
+
+    /**
+     * Gets the minimum allowable domain value for the scale.
+     *
+     * Note that this will mainly work on scales that work linearly like Linear Scale and Time Scale.
+     *
+     * @param {QuantitativeScale<any>} quantitativeScale The scale to query
+     * @returns {D} The minimum domain value for the scale.
+     */
+    public minDomainValue<D>(quantitativeScale: QuantitativeScale<D>): D;
+    /**
+     * Sets the minimum allowable domain value for the scale.
+     *
+     * Note that this will mainly work on scales that work linearly like Linear Scale and Time Scale.
+     *
+     * @param {QuantitativeScale<any>} quantitativeScale The scale to query
+     * @param {D} minDomainValue The minimum domain value for the scale.
+     * @returns {Interactions.PanZoom} The calling PanZoom Interaction.
+     */
+    public minDomainValue<D>(quantitativeScale: QuantitativeScale<D>, minDomainValue: D): Interactions.PanZoom;
+    public minDomainValue<D>(quantitativeScale: QuantitativeScale<D>, minDomainValue?: D): any {
+      if (minDomainValue == null) {
+        return this._minDomainValues.get(quantitativeScale);
+      }
+      const maxDomainValue = this.maxDomainValue(quantitativeScale);
+      if (maxDomainValue != null && maxDomainValue.valueOf() < minDomainValue.valueOf()) {
+        throw new Error("maxDomainValue must be larger than minDomainValue for the same Scale");
+      }
+      if (this._nonLinearScaleWithExtents(quantitativeScale)) {
+        Utils.Window.warn("Panning and zooming with extents on a nonlinear scale may have unintended behavior.");
+      }
+      this._minDomainValues.set(quantitativeScale, minDomainValue);
+      return this;
+    }
+
+    /**
+     * Gets the maximum allowable domain value for the scale.
+     *
+     * Note that this will mainly work on scales that work linearly like Linear Scale and Time Scale.
+     *
+     * @param {QuantitativeScale<any>} quantitativeScale The scale to query
+     * @returns {D} The maximum domain value for the scale.
+     */
+    public maxDomainValue<D>(quantitativeScale: QuantitativeScale<D>): D;
+    /**
+     * Sets the maximum allowable domain value for the scale.
+     *
+     * Note that this will mainly work on scales that work linearly like Linear Scale and Time Scale.
+     *
+     * @param {QuantitativeScale<any>} quantitativeScale The scale to query
+     * @param {D} maxDomainExtent The maximum domain value for the scale.
+     * @returns {Interactions.PanZoom} The calling PanZoom Interaction.
+     */
+    public maxDomainValue<D>(quantitativeScale: QuantitativeScale<D>, maxDomainValue: D): Interactions.PanZoom;
+    public maxDomainValue<D>(quantitativeScale: QuantitativeScale<D>, maxDomainValue?: D): any {
+      if (maxDomainValue == null) {
+        return this._maxDomainValues.get(quantitativeScale);
+      }
+      const minDomainValue = this.minDomainValue(quantitativeScale);
+      if (minDomainValue != null && maxDomainValue.valueOf() < minDomainValue.valueOf()) {
+        throw new Error("maxDomainValue must be larger than minDomainValue for the same Scale");
+      }
+      if (this._nonLinearScaleWithExtents(quantitativeScale)) {
+        Utils.Window.warn("Panning and zooming with extents on a nonlinear scale may have unintended behavior.");
+      }
+      this._maxDomainValues.set(quantitativeScale, maxDomainValue);
       return this;
     }
   }
