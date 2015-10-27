@@ -121,6 +121,24 @@ describe("Plots", () => {
           svg.remove();
         });
 
+        it("can autorange value scale based on visible points on base scale", () => {
+          const firstTwoBaseValues = [data[0].base, data[1].base ];
+          valueScale.padProportion(0);
+          baseScale.domain(firstTwoBaseValues);
+          barPlot.addDataset(dataset);
+          barPlot.autorangeMode(valuePositionAttr);
+          barPlot.renderTo(svg);
+
+          const valueScaleDomain = valueScale.domain();
+          const expectedValueDomainMin = Math.min(data[0].value, data[1].value);
+          const expectedValueDomainMax = Math.max(data[0].value, data[1].value);
+          assert.strictEqual(valueScaleDomain[0], expectedValueDomainMin, "lower bound of domain set based on visible points");
+          assert.strictEqual(valueScaleDomain[1], expectedValueDomainMax, "upper bound of domain set based on visible points");
+
+          barPlot.destroy();
+          svg.remove();
+        });
+
         it("doesn't show values from outside the base scale's domain", () => {
           baseScale.domain(["-A"]);
           barPlot.addDataset(dataset);
@@ -1203,25 +1221,6 @@ describe("Plots", () => {
         svg.remove();
       });
 
-    });
-
-    it("plot auto domain scale to visible points on Category scale", () => {
-      let svg = TestMethods.generateSVG(500, 500);
-      let xAccessor = (d: any, i: number, dataset: Plottable.Dataset) => d.a;
-      let yAccessor = (d: any, i: number, dataset: Plottable.Dataset) => d.b + dataset.metadata().foo;
-      let simpleDataset = new Plottable.Dataset([{a: "a", b: 6}, {a: "b", b: 2}, {a: "c", b: -2}, {a: "d", b: -6}], {foo: 0});
-      let xScale = new Plottable.Scales.Category();
-      let yScale = new Plottable.Scales.Linear();
-      let plot = new Plottable.Plots.Bar<string, number>();
-      plot.addDataset(simpleDataset);
-      plot.x(xAccessor, xScale)
-          .y(yAccessor, yScale)
-          .renderTo(svg);
-      xScale.domain(["b", "c"]);
-      assert.deepEqual(yScale.domain(), [-7, 7], "domain has not been adjusted to visible points");
-      plot.autorangeMode("y");
-      assert.deepEqual(yScale.domain(), [-2.5, 2.5], "domain has been adjusted to visible points");
-      svg.remove();
     });
 
     it("updates the scale extent correctly when there is one bar (vertical)", () => {
