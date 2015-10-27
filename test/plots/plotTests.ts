@@ -149,7 +149,7 @@ describe("Plots", () => {
       svg.remove();
     });
 
-    it("disconnects the data extents from the scales when destroyed", () => {
+    it("disconnects the data extents from the scales when detached", () => {
       const plot = new Plottable.Plot();
       const scale = new Plottable.Scales.Linear();
       plot.attr("attr", (d) => d, scale);
@@ -204,7 +204,7 @@ describe("Plots", () => {
       }
     });
 
-    describe("setting the attribute of plot elements", () => {
+    describe("setting attributes with attr()", () => {
       let plot: Plottable.Plot;
 
       beforeEach(() => {
@@ -249,7 +249,7 @@ describe("Plots", () => {
         });
       });
 
-      it("can set the attribute based on the scaled input data", () => {
+      it("can apply a scale to the returned values", () => {
         const data = [1, 2, 3, 4, 5];
         const dataset = new Plottable.Dataset(data);
         plot.addDataset(dataset);
@@ -282,7 +282,7 @@ describe("Plots", () => {
         });
       });
 
-      it("updates the scales extents when an attribute is set", () => {
+      it("updates the scales extents associated with an attribute when that attribute is set", () => {
         const scale = new Plottable.Scales.Linear();
 
         const data = [5, -5, 10];
