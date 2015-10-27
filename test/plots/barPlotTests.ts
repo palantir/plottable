@@ -21,34 +21,88 @@ describe("Plots", () => {
       });
     });
 
-    const orientations = ["vertical", "horizontal"];
+    const orientations = [Plottable.Plots.Bar.ORIENTATION_VERTICAL, Plottable.Plots.Bar.ORIENTATION_HORIZONTAL];
     orientations.forEach((orientation) => {
       describe(`rendering in ${orientation} orientation`, () => {
+        const data = [
+          { base: "A", value: 1 },
+          { base: "B", value: 0 },
+          { base: "C", value: -1 }
+        ];
+        const isVertical = orientation === Plottable.Plots.Bar.ORIENTATION_VERTICAL;
+        const basePositionAttr = isVertical ? "x" : "y";
+        const baseSizeAttr = isVertical ? "width" : "height";
+        const valuePositionAttr = isVertical ? "y" : "x";
+        const valueSizeAttr = isVertical ? "height" : "width";
+
         let svg: d3.Selection<void>;
-        let plot: Plottable.Plots.Bar<string | number, number | string>;
+        let barPlot: Plottable.Plots.Bar<string | number, number | string>;
         let baseScale: Plottable.Scales.Category;
         let valueScale: Plottable.Scales.Linear;
+        let dataset: Plottable.Dataset;
 
         beforeEach(() => {
           svg = TestMethods.generateSVG();
-          plot = new Plottable.Plots.Bar<string | number, number | string>(orientation);
+          barPlot = new Plottable.Plots.Bar<string | number, number | string>(orientation);
           baseScale = new Plottable.Scales.Category();
           valueScale = new Plottable.Scales.Linear();
           if (orientation === "vertical") {
-            plot.x((d: any) => d.base, baseScale);
-            plot.y((d: any) => d.value, valueScale);
+            barPlot.x((d: any) => d.base, baseScale);
+            barPlot.y((d: any) => d.value, valueScale);
           } else {
-            plot.y((d: any) => d.base, baseScale);
-            plot.x((d: any) => d.value, valueScale);
+            barPlot.y((d: any) => d.base, baseScale);
+            barPlot.x((d: any) => d.value, valueScale);
           }
+          dataset = new Plottable.Dataset(data);
         });
 
-        it("renders correctly with no data", () => {
-          assert.doesNotThrow(() => plot.renderTo(svg), Error);
-          assert.strictEqual(plot.width(), TestMethods.numAttr(svg, "width"), "was allocated width");
-          assert.strictEqual(plot.height(), TestMethods.numAttr(svg, "height"), "was allocated height");
+        it("renders with no data", () => {
+          assert.doesNotThrow(() => barPlot.renderTo(svg), Error);
+          assert.strictEqual(barPlot.width(), TestMethods.numAttr(svg, "width"), "was allocated width");
+          assert.strictEqual(barPlot.height(), TestMethods.numAttr(svg, "height"), "was allocated height");
 
-          plot.destroy();
+          barPlot.destroy();
+          svg.remove();
+        });
+
+        it("draws bars and baseline in correct positions", () => {
+          barPlot.addDataset(dataset);
+          barPlot.renderTo(svg);
+
+          const baseline = barPlot.content().select(".baseline");
+          const scaledBaselineValue = valueScale.scale(<number> barPlot.baselineValue());
+          assert.strictEqual(TestMethods.numAttr(baseline, valuePositionAttr + "1"), scaledBaselineValue,
+            `baseline ${valuePositionAttr + "1"} is correct`);
+          assert.strictEqual(TestMethods.numAttr(baseline, valuePositionAttr + "2"), scaledBaselineValue,
+            `baseline ${valuePositionAttr + "2"} is correct`);
+          assert.strictEqual(TestMethods.numAttr(baseline, basePositionAttr + "1"), 0,
+            `baseline ${basePositionAttr + "1"} is correct`);
+          assert.strictEqual(TestMethods.numAttr(baseline, basePositionAttr + "2"), TestMethods.numAttr(svg, baseSizeAttr),
+            `baseline ${basePositionAttr + "2"} is correct`);
+
+          const bars = barPlot.content().selectAll("rect");
+          assert.strictEqual(bars.size(), data.length, "One bar was created per data point");
+          bars.each(function(datum, index) {
+            const bar = d3.select(this);
+            const baseSize = TestMethods.numAttr(bar, baseSizeAttr);
+            assert.closeTo(baseSize, baseScale.rangeBand(), window.Pixel_CloseTo_Requirement, `bar ${baseSizeAttr} is correct (index ${index})`);
+
+            const valueSize = TestMethods.numAttr(bar, valueSizeAttr);
+            assert.closeTo(valueSize, Math.abs(valueScale.scale(datum.value) - scaledBaselineValue),
+              window.Pixel_CloseTo_Requirement, `bar ${valueSizeAttr} is correct (index ${index})`);
+
+            const basePosition = TestMethods.numAttr(bar, basePositionAttr);
+            assert.closeTo(basePosition, baseScale.scale(datum.base) - 0.5 * baseSize, window.Pixel_CloseTo_Requirement,
+              `bar ${basePositionAttr} is correct (index ${index})`);
+
+            const valuePosition = TestMethods.numAttr(bar, valuePositionAttr);
+            const isShifted = isVertical ? (datum.value > barPlot.baselineValue()) : (datum.value < barPlot.baselineValue());
+            const expectedValuePosition = (isShifted) ? scaledBaselineValue - valueSize : scaledBaselineValue;
+            assert.closeTo(valuePosition, expectedValuePosition, window.Pixel_CloseTo_Requirement,
+              `bar ${valuePositionAttr} is correct (index ${index})`);
+          });
+
+          barPlot.destroy();
           svg.remove();
         });
       });
@@ -172,29 +226,6 @@ describe("Plots", () => {
         barPlot.x((d) => d.x, xScale);
         barPlot.y((d) => d.y, yScale);
         barPlot.renderTo(svg);
-      });
-
-      it("renders correctly", () => {
-        let renderArea = (<any> barPlot)._renderArea;
-        let bars = renderArea.selectAll("rect");
-        assert.lengthOf(bars[0], 3, "One bar was created per data point");
-        let bar0 = d3.select(bars[0][0]);
-        let bar1 = d3.select(bars[0][1]);
-        assert.closeTo(TestMethods.numAttr(bar0, "width"), xScale.rangeBand(), 1, "bar0 width is correct");
-        assert.closeTo(TestMethods.numAttr(bar1, "width"), xScale.rangeBand(), 1, "bar1 width is correct");
-        assert.strictEqual(bar0.attr("height"), "100", "bar0 height is correct");
-        assert.strictEqual(bar1.attr("height"), "150", "bar1 height is correct");
-        assert.closeTo(TestMethods.numAttr(bar0, "x"), 111, 1, "bar0 x is correct");
-        assert.closeTo(TestMethods.numAttr(bar1, "x"), 333, 1, "bar1 x is correct");
-        assert.strictEqual(bar0.attr("y"), "100", "bar0 y is correct");
-        assert.strictEqual(bar1.attr("y"), "200", "bar1 y is correct");
-
-        let baseline = renderArea.select(".baseline");
-        assert.strictEqual(baseline.attr("y1"), "200", "the baseline is in the correct vertical position");
-        assert.strictEqual(baseline.attr("y2"), "200", "the baseline is in the correct vertical position");
-        assert.strictEqual(baseline.attr("x1"), "0", "the baseline starts at the edge of the chart");
-        assert.strictEqual(baseline.attr("x2"), String(SVG_WIDTH), "the baseline ends at the edge of the chart");
-        svg.remove();
       });
 
       it("baseline value can be changed; barPlot updates appropriately", () => {
@@ -587,29 +618,6 @@ describe("Plots", () => {
         barPlot.x((d) => d.x, xScale);
         barPlot.y((d) => d.y, yScale);
         barPlot.renderTo(svg);
-      });
-
-      it("renders correctly", () => {
-        let renderArea = (<any> barPlot)._renderArea;
-        let bars = renderArea.selectAll("rect");
-        assert.lengthOf(bars[0], 3, "One bar was created per data point");
-        let bar0 = d3.select(bars[0][0]);
-        let bar1 = d3.select(bars[0][1]);
-        assert.closeTo(TestMethods.numAttr(bar0, "height"), yScale.rangeBand(), 1, "bar0 height is correct");
-        assert.closeTo(TestMethods.numAttr(bar1, "height"), yScale.rangeBand(), 1, "bar1 height is correct");
-        assert.strictEqual(bar0.attr("width"), "100", "bar0 width is correct");
-        assert.strictEqual(bar1.attr("width"), "150", "bar1 width is correct");
-        assert.closeTo(TestMethods.numAttr(bar0, "y"), 74, 1, "bar0 y is correct");
-        assert.closeTo(TestMethods.numAttr(bar1, "y"), 222, 1, "bar1 y is correct");
-        assert.strictEqual(bar0.attr("x"), "300", "bar0 x is correct");
-        assert.strictEqual(bar1.attr("x"), "150", "bar1 x is correct");
-
-        let baseline = renderArea.select(".baseline");
-        assert.strictEqual(baseline.attr("x1"), "300", "the baseline is in the correct horizontal position");
-        assert.strictEqual(baseline.attr("x2"), "300", "the baseline is in the correct horizontal position");
-        assert.strictEqual(baseline.attr("y1"), "0", "the baseline starts at the top of the chart");
-        assert.strictEqual(baseline.attr("y2"), String(SVG_HEIGHT), "the baseline ends at the bottom of the chart");
-        svg.remove();
       });
 
       it("baseline value can be changed; barPlot updates appropriately", () => {
