@@ -21,20 +21,40 @@ describe("Plots", () => {
       });
     });
 
-    // HACKHACK #1798: beforeEach being used below
-    it("renders correctly with no data", () => {
-      let svg = TestMethods.generateSVG(400, 400);
-      let xScale = new Plottable.Scales.Linear();
-      let yScale = new Plottable.Scales.Linear();
-      let plot = new Plottable.Plots.Bar<number, number>();
-      plot.x((d: any) => d.x, xScale);
-      plot.y((d: any) => d.y, yScale);
-      assert.doesNotThrow(() => plot.renderTo(svg), Error);
-      assert.strictEqual(plot.width(), 400, "was allocated width");
-      assert.strictEqual(plot.height(), 400, "was allocated height");
-      svg.remove();
+    const orientations = ["vertical", "horizontal"];
+    orientations.forEach((orientation) => {
+      describe(`rendering in ${orientation} orientation`, () => {
+        let svg: d3.Selection<void>;
+        let plot: Plottable.Plots.Bar<string | number, number | string>;
+        let baseScale: Plottable.Scales.Category;
+        let valueScale: Plottable.Scales.Linear;
+
+        beforeEach(() => {
+          svg = TestMethods.generateSVG();
+          plot = new Plottable.Plots.Bar<string | number, number | string>(orientation);
+          baseScale = new Plottable.Scales.Category();
+          valueScale = new Plottable.Scales.Linear();
+          if (orientation === "vertical") {
+            plot.x((d: any) => d.base, baseScale);
+            plot.y((d: any) => d.value, valueScale);
+          } else {
+            plot.y((d: any) => d.base, baseScale);
+            plot.x((d: any) => d.value, valueScale);
+          }
+        });
+
+        it("renders correctly with no data", () => {
+          assert.doesNotThrow(() => plot.renderTo(svg), Error);
+          assert.strictEqual(plot.width(), TestMethods.numAttr(svg, "width"), "was allocated width");
+          assert.strictEqual(plot.height(), TestMethods.numAttr(svg, "height"), "was allocated height");
+
+          plot.destroy();
+          svg.remove();
+        });
+      });
     });
 
+    // HACKHACK #1798: beforeEach being used below
     it("gets the nearest Entity when any part of the bar is visible (vertical)", () => {
       let SVG_WIDTH = 600;
       let SVG_HEIGHT = 400;
