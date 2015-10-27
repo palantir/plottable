@@ -120,6 +120,17 @@ describe("Plots", () => {
           barPlot.destroy();
           svg.remove();
         });
+
+        it("doesn't show values from outside the base scale's domain", () => {
+          baseScale.domain(["-A"]);
+          barPlot.addDataset(dataset);
+          barPlot.renderTo(svg);
+
+          assert.strictEqual(barPlot.content().selectAll("rect").size(), 0, "draws no bars when the domain contains no data points");
+
+          barPlot.destroy();
+          svg.remove();
+        });
       });
     });
 
@@ -241,13 +252,6 @@ describe("Plots", () => {
         barPlot.x((d) => d.x, xScale);
         barPlot.y((d) => d.y, yScale);
         barPlot.renderTo(svg);
-      });
-
-      it("don't show points from outside of domain", () => {
-        xScale.domain(["C"]);
-        let bars = (<any> barPlot)._renderArea.selectAll("rect");
-        assert.lengthOf(bars[0], 0, "no bars have been rendered");
-        svg.remove();
       });
 
       it("entitiesAt()", () => {
