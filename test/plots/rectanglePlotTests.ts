@@ -59,13 +59,23 @@ describe("Plots", () => {
 
       function createNonIntersectingRectangleData(count: number) {
         return Plottable.Utils.Math.range(0, count).map((rectangleNumber) => {
-          return { x: rectangleNumber, y: rectangleNumber, x2: rectangleNumber + 1, y2: rectangleNumber + 1 };
+          return {
+            x: rectangleNumber,
+            y: rectangleNumber,
+            x2: rectangleNumber + 1,
+            y2: rectangleNumber + 1
+          };
         });
       }
 
       function createIntersectingRectangleData(count: number) {
         return Plottable.Utils.Math.range(0, count).map((rectangleNumber) => {
-          return { x: rectangleNumber, y: rectangleNumber, x2: rectangleNumber + 1.5, y2: rectangleNumber + 1.5 };
+          return {
+            x: rectangleNumber,
+            y: rectangleNumber,
+            x2: rectangleNumber + 1.5,
+            y2: rectangleNumber + 1.5
+          };
         });
       }
 
