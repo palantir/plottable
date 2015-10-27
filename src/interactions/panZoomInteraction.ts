@@ -42,6 +42,8 @@ module Plottable.Interactions {
       this._touchIds = d3.map<Point>();
       this._minDomainExtents = new Utils.Map<QuantitativeScale<any>, number>();
       this._maxDomainExtents = new Utils.Map<QuantitativeScale<any>, number>();
+      this._minDomainValues = new Utils.Map<QuantitativeScale<any>, number>();
+      this._maxDomainValues = new Utils.Map<QuantitativeScale<any>, number>();
       if (xScale != null) {
         this.addXScale(xScale);
       }

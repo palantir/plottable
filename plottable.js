@@ -11288,6 +11288,8 @@ var Plottable;
                 this._touchIds = d3.map();
                 this._minDomainExtents = new Plottable.Utils.Map();
                 this._maxDomainExtents = new Plottable.Utils.Map();
+                this._minDomainValues = new Plottable.Utils.Map();
+                this._maxDomainValues = new Plottable.Utils.Map();
                 if (xScale != null) {
                     this.addXScale(xScale);
                 }
