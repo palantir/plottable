@@ -56,19 +56,7 @@ describe("Plots", () => {
           dataset = new Plottable.Dataset(data);
         });
 
-        it("renders with no data", () => {
-          assert.doesNotThrow(() => barPlot.renderTo(svg), Error);
-          assert.strictEqual(barPlot.width(), TestMethods.numAttr(svg, "width"), "was allocated width");
-          assert.strictEqual(barPlot.height(), TestMethods.numAttr(svg, "height"), "was allocated height");
-
-          barPlot.destroy();
-          svg.remove();
-        });
-
-        it("draws bars and baseline in correct positions", () => {
-          barPlot.addDataset(dataset);
-          barPlot.renderTo(svg);
-
+        function assertCorrectRendering() {
           const baseline = barPlot.content().select(".baseline");
           const scaledBaselineValue = valueScale.scale(<number> barPlot.baselineValue());
           assert.strictEqual(TestMethods.numAttr(baseline, valuePositionAttr + "1"), scaledBaselineValue,
@@ -101,6 +89,33 @@ describe("Plots", () => {
             assert.closeTo(valuePosition, expectedValuePosition, window.Pixel_CloseTo_Requirement,
               `bar ${valuePositionAttr} is correct (index ${index})`);
           });
+        }
+
+        it("renders with no data", () => {
+          assert.doesNotThrow(() => barPlot.renderTo(svg), Error);
+          assert.strictEqual(barPlot.width(), TestMethods.numAttr(svg, "width"), "was allocated width");
+          assert.strictEqual(barPlot.height(), TestMethods.numAttr(svg, "height"), "was allocated height");
+
+          barPlot.destroy();
+          svg.remove();
+        });
+
+        it("draws bars and baseline in correct positions", () => {
+          barPlot.addDataset(dataset);
+          barPlot.renderTo(svg);
+
+          assertCorrectRendering();
+
+          barPlot.destroy();
+          svg.remove();
+        });
+
+        it("rerenders correctly when the baseline value is changed", () => {
+          barPlot.addDataset(dataset);
+          barPlot.renderTo(svg);
+
+          barPlot.baselineValue(1);
+          assertCorrectRendering();
 
           barPlot.destroy();
           svg.remove();
@@ -226,26 +241,6 @@ describe("Plots", () => {
         barPlot.x((d) => d.x, xScale);
         barPlot.y((d) => d.y, yScale);
         barPlot.renderTo(svg);
-      });
-
-      it("baseline value can be changed; barPlot updates appropriately", () => {
-        barPlot.baselineValue(-1);
-
-        let renderArea = (<any> barPlot)._renderArea;
-        let bars = renderArea.selectAll("rect");
-        let bar0 = d3.select(bars[0][0]);
-        let bar1 = d3.select(bars[0][1]);
-        assert.strictEqual(bar0.attr("height"), "200", "bar0 height is correct");
-        assert.strictEqual(bar1.attr("height"), "50", "bar1 height is correct");
-        assert.strictEqual(bar0.attr("y"), "100", "bar0 y is correct");
-        assert.strictEqual(bar1.attr("y"), "300", "bar1 y is correct");
-
-        let baseline = renderArea.select(".baseline");
-        assert.strictEqual(baseline.attr("y1"), "300", "the baseline is in the correct vertical position");
-        assert.strictEqual(baseline.attr("y2"), "300", "the baseline is in the correct vertical position");
-        assert.strictEqual(baseline.attr("x1"), "0", "the baseline starts at the edge of the chart");
-        assert.strictEqual(baseline.attr("x2"), String(SVG_WIDTH), "the baseline ends at the edge of the chart");
-        svg.remove();
       });
 
       it("don't show points from outside of domain", () => {
@@ -618,26 +613,6 @@ describe("Plots", () => {
         barPlot.x((d) => d.x, xScale);
         barPlot.y((d) => d.y, yScale);
         barPlot.renderTo(svg);
-      });
-
-      it("baseline value can be changed; barPlot updates appropriately", () => {
-        barPlot.baselineValue(-1);
-
-        let renderArea = (<any> barPlot)._renderArea;
-        let bars = renderArea.selectAll("rect");
-        let bar0 = d3.select(bars[0][0]);
-        let bar1 = d3.select(bars[0][1]);
-        assert.strictEqual(bar0.attr("width"), "200", "bar0 width is correct");
-        assert.strictEqual(bar1.attr("width"), "50", "bar1 width is correct");
-        assert.strictEqual(bar0.attr("x"), "200", "bar0 x is correct");
-        assert.strictEqual(bar1.attr("x"), "150", "bar1 x is correct");
-
-        let baseline = renderArea.select(".baseline");
-        assert.strictEqual(baseline.attr("x1"), "200", "the baseline is in the correct horizontal position");
-        assert.strictEqual(baseline.attr("x2"), "200", "the baseline is in the correct horizontal position");
-        assert.strictEqual(baseline.attr("y1"), "0", "the baseline starts at the top of the chart");
-        assert.strictEqual(baseline.attr("y2"), String(SVG_HEIGHT), "the baseline ends at the bottom of the chart");
-        svg.remove();
       });
 
       it("width projector may be overwritten, and calling project queues rerender", () => {
