@@ -2,8 +2,8 @@
 
 describe("Plots", () => {
   describe("RectanglePlot", () => {
-    describe("drawing", () => {
-      it("draws rectangles with the input x1, x2, y1, y2 edges", () => {
+    describe("rendering", () => {
+      it("renders rectangles with the input x1, x2, y1, y2 edges", () => {
         const data = [
           { x: 0, y: 0, x2: 1, y2: 1 },
           { x: 1, y: 1, x2: 2, y2: 2 },
@@ -261,7 +261,7 @@ describe("Plots", () => {
         plot.y((d: any) => d.y, yScale);
       });
 
-      it("renders correctly", () => {
+      it("renders rectangles with the correct x, y, width, and ehgiht", () => {
         const data = [
           {x: "A", y: "U"},
           {x: "B", y: "U"},
@@ -286,7 +286,7 @@ describe("Plots", () => {
         svg.remove();
       });
 
-      it("renders correctly when data is set after construction", () => {
+      it("renders rectangles when data is set after construction", () => {
         const dataset = new Plottable.Dataset();
         plot.addDataset(dataset);
         plot.renderTo(svg);
@@ -311,7 +311,7 @@ describe("Plots", () => {
         svg.remove();
       });
 
-      it("renders correctly when there isn't data for every spot", () => {
+      it("renders rectangles even when there isn't data for every spot", () => {
         const data = [
           {x: "A", y: "W"},
           {x: "B", y: "X"},
@@ -336,7 +336,7 @@ describe("Plots", () => {
         svg.remove();
       });
 
-      it("can invert y axis correctly", () => {
+      it("renders rectangles in the correct x and y locations even with a reversed y domain", () => {
         const data = [
           {x: "A", y: "U"},
           {x: "B", y: "U"},
@@ -346,7 +346,7 @@ describe("Plots", () => {
         plot.addDataset(new Plottable.Dataset(data));
         plot.renderTo(svg);
 
-        yScale.domain(["U", "V"]);
+        yScale.domain(yScale.domain().reverse());
 
         const rects = plot.content().selectAll("rect");
         assert.strictEqual(rects.size(), data.length, "rect for each datum");
