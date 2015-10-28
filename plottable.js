@@ -3012,9 +3012,6 @@ var Plottable;
          */
         Component.prototype.renderImmediately = function () {
             var _this = this;
-            if (this._clipPathEnabled) {
-                this._updateClipPath();
-            }
             this._renderImmediately();
             Plottable.Utils.Window.setTimeout(function () { return _this._onRenderCallbacks.callCallbacks(_this); }, this._deferredTotalDrawTime());
             return this;
@@ -3023,7 +3020,9 @@ var Plottable;
             return 0;
         };
         Component.prototype._renderImmediately = function () {
-            // DO NOTHING
+            if (this._clipPathEnabled) {
+                this._updateClipPath();
+            }
         };
         /**
          * Causes the Component to re-layout and render.

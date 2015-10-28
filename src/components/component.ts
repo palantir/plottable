@@ -234,9 +234,6 @@ export class Component {
    * Renders the Component without waiting for the next frame.
    */
   public renderImmediately() {
-    if (this._clipPathEnabled) {
-      this._updateClipPath();
-    }
     this._renderImmediately();
     Utils.Window.setTimeout(() => this._onRenderCallbacks.callCallbacks(this), this._deferredTotalDrawTime());
     return this;
@@ -247,7 +244,9 @@ export class Component {
   }
 
   protected _renderImmediately() {
-    // DO NOTHING
+    if (this._clipPathEnabled) {
+      this._updateClipPath();
+    }
   }
 
   /**
