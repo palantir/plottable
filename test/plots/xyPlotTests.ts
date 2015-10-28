@@ -129,13 +129,9 @@ describe("Plots", () => {
     });
 
     describe("deferred rendering", () => {
-      let xScale: Plottable.Scales.Linear;
-      let yScale: Plottable.Scales.Linear;
       let plot: Plottable.XYPlot<number, number>;
 
       beforeEach(() => {
-        xScale = new Plottable.Scales.Linear();
-        yScale = new Plottable.Scales.Linear();
         plot = new Plottable.XYPlot<number, number>();
       });
 
@@ -145,6 +141,39 @@ describe("Plots", () => {
         assert.strictEqual(plot.deferredRendering(), true, "deferred rendering can be turned on");
         plot.deferredRendering(false);
         assert.strictEqual(plot.deferredRendering(), false, "deferred rendering can be turned off");
+      });
+
+      it("immediately translates the render area when the scale domain is translated", () => {
+        plot.deferredRendering(true);
+        const svg = TestMethods.generateSVG();
+        plot.anchor(svg);
+
+        const xScale = new Plottable.Scales.Linear();
+        plot.x(0, xScale);
+
+        const translateAmount = 1;
+        xScale.domain(xScale.domain().map((d) => d + translateAmount));
+        const renderAreaTranslate = d3.transform(plot.content().select(".render-area").attr("transform")).translate;
+        assert.deepEqual(renderAreaTranslate[0], -translateAmount, "translates with the same amount as domain shift");
+
+        svg.remove();
+      });
+
+      it("immediately scales the render area when the scale domain is scaled", () => {
+        const svg = TestMethods.generateSVG();
+        plot.anchor(svg);
+
+        const xScale = new Plottable.Scales.Linear();
+        plot.x(0, xScale);
+        plot.deferredRendering(true);
+        plot.computeLayout();
+
+        const magnifyAmount = 2;
+        xScale.domain(xScale.domain().map((d) => d * magnifyAmount));
+        const renderAreaScale = d3.transform(plot.content().select(".render-area").attr("transform")).scale;
+        assert.deepEqual(renderAreaScale[0], 1 / magnifyAmount, "translates with the same amount as domain shift");
+
+        svg.remove();
       });
     });
 
