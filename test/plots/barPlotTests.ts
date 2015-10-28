@@ -398,6 +398,33 @@ describe("Plots", () => {
           });
         });
 
+        it("hides labels cut off by lower end of base scale", () => {
+          barPlot.labelsEnabled(true);
+          data.forEach((d, i) => {
+            let texts = barPlot.content().selectAll("text");
+            const centerOfText = getCenterOfText(<SVGElement> texts[0][i]);
+            const centerValue = baseScale.invert(isVertical ? centerOfText.x : centerOfText.y);
+            baseScale.domain([centerValue, centerValue + (DEFAULT_DOMAIN[1] - DEFAULT_DOMAIN[0])]);
+
+            texts = barPlot.content().selectAll("text"); // re-select after rendering
+            assert.strictEqual(d3.select(texts[0][i]).style("visibility"), "hidden", `label for bar with index ${i} is hidden`);
+          });
+          svg.remove();
+        });
+
+        it("hides labels cut off by upper end of base scale", () => {
+          barPlot.labelsEnabled(true);
+          data.forEach((d, i) => {
+            let texts = barPlot.content().selectAll("text");
+            const centerOfText = getCenterOfText(<SVGElement> texts[0][i]);
+            const centerValue = baseScale.invert(isVertical ? centerOfText.x : centerOfText.y);
+            baseScale.domain([centerValue - (DEFAULT_DOMAIN[1] - DEFAULT_DOMAIN[0]), centerValue]);
+
+            texts = barPlot.content().selectAll("text"); // re-select after rendering
+            assert.strictEqual(d3.select(texts[0][i]).style("visibility"), "hidden", `label for bar with index ${i} is hidden`);
+          });
+        });
+
         afterEach(function() {
           if (this.currentTest.state === "passed") {
             barPlot.destroy();
@@ -921,32 +948,6 @@ describe("Plots", () => {
         svg.remove();
       });
 
-      it("hides labels cut off by the top edge", () => {
-        dataset.data().forEach((d, i) => {
-          let texts = svg.selectAll("text");
-          let centerOfText = getCenterOfText(<SVGElement> texts[0][i]);
-          let centerYValue = yScale.invert(centerOfText.y);
-          yScale.domain([centerYValue - (DEFAULT_DOMAIN[1] - DEFAULT_DOMAIN[0]), centerYValue]);
-
-          texts = svg.selectAll("text"); // re-select after rendering
-          assert.strictEqual(d3.select(texts[0][i]).style("visibility"), "hidden", `label for bar with index ${i} is hidden`);
-        });
-        svg.remove();
-      });
-
-      it("hides labels cut off by the bottom edge", () => {
-        dataset.data().forEach((d, i) => {
-          let texts = svg.selectAll("text");
-          let centerOfText = getCenterOfText(<SVGElement> texts[0][i]);
-          let centerYValue = yScale.invert(centerOfText.y);
-          yScale.domain([centerYValue, centerYValue + (DEFAULT_DOMAIN[1] - DEFAULT_DOMAIN[0])]);
-
-          texts = svg.selectAll("text"); // re-select after rendering
-          assert.strictEqual(d3.select(texts[0][i]).style("visibility"), "hidden", `label for bar with index ${i} is hidden`);
-        });
-        svg.remove();
-      });
-
       it("shows labels for bars with value = baseline on the \"positive\" side of the baseline", () => {
         let zeroOnlyData = [ { x: 0, y: 0 } ];
         dataset.data(zeroOnlyData);
@@ -1083,34 +1084,6 @@ describe("Plots", () => {
         dataset.data(dataset.data());
         texts = barPlot.content().selectAll("text");
         assert.strictEqual(texts.size(), 0, "texts were immediately removed");
-      });
-
-      it("hides labels cut off by the right edge", () => {
-        barPlot.labelsEnabled(true);
-        dataset.data().forEach((d, i) => {
-          let texts = svg.selectAll("text");
-          let centerOfText = getCenterOfText(<SVGElement> texts[0][i]);
-          let centerXValue = xScale.invert(centerOfText.x);
-          xScale.domain([centerXValue - (DEFAULT_DOMAIN[1] - DEFAULT_DOMAIN[0]), centerXValue]);
-
-          texts = svg.selectAll("text"); // re-select after rendering
-          assert.strictEqual(d3.select(texts[0][i]).style("visibility"), "hidden", `label for bar with index ${i} is hidden`);
-        });
-        svg.remove();
-      });
-
-      it("hides labels cut off by the left edge", () => {
-        barPlot.labelsEnabled(true);
-        dataset.data().forEach((d, i) => {
-          let texts = svg.selectAll("text");
-          let centerOfText = getCenterOfText(<SVGElement> texts[0][i]);
-          let centerXValue = xScale.invert(centerOfText.x);
-          xScale.domain([centerXValue, centerXValue + (DEFAULT_DOMAIN[1] - DEFAULT_DOMAIN[0])]);
-
-          texts = svg.selectAll("text"); // re-select after rendering
-          assert.strictEqual(d3.select(texts[0][i]).style("visibility"), "hidden", `label for bar with index ${i} is hidden`);
-        });
-        svg.remove();
       });
 
       it("hides or shifts labels cut off by the top edge", () => {
