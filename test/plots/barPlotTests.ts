@@ -144,7 +144,7 @@ describe("Plots", () => {
         });
       });
 
-      describe(`auto width calculation in ${orientation} orientation`, () => {
+      describe(`auto bar width calculation in ${orientation} orientation`, () => {
         const scaleTypes = ["linear"];
         scaleTypes.forEach((scaleType) => {
           describe(`using a ${scaleType} base Scale`, () => {
@@ -168,17 +168,85 @@ describe("Plots", () => {
               }
               dataset = new Plottable.Dataset();
               barPlot.addDataset(dataset);
+              barPlot.renderTo(svg);
             });
 
-            it("computes a sensible width", () => {});
+            it("computes a sensible width", () => {
+              const data = [
+                { base: 1, value: 5 },
+                { base: 10, value: 2 },
+                { base: 100, value: 4 }
+              ];
+              dataset.data(data);
 
-            it("does not crash when given bad data", () => {});
+              const closestSeparation = Math.abs(baseScale.scale(data[1].base) - baseScale.scale(data[0].base));
+              const bars = barPlot.content().selectAll("rect");
+              assert.strictEqual(bars.size(), data.length, "one bar was drawn per datum");
+              bars.each(function() {
+                const bar = d3.select(this);
+                const barSize = TestMethods.numAttr(bar, baseSizeAttr)
+                assert.operator(barSize, "<=", closestSeparation, "bar width is less than the closest distance between values");
+                assert.operator(barSize, ">=", 0.5 * closestSeparation, "bar width is greater than half the closest distance between values");
+              });
+            });
 
-            it("computes a sensible width when given only one datum", () => {});
+            it("does not crash when given bad data", () => {
+              const badData = [
+                {},
+                { base: null, value: null}
+              ]
+              assert.doesNotThrow(() => dataset.data(badData), Error);
+            });
 
-            it("computes a sensible width when given repeated data", () => {});
+            it("computes a sensible width when given only one datum", () => {
+              const singleDatumData = [
+                { base: 1, value: 5 }
+              ];
+              dataset.data(singleDatumData);
 
-            it("computes a sensible width when given unsorted data", () => {});
+              const bar = barPlot.content().select("rect");
+              const barSize = TestMethods.numAttr(bar, baseSizeAttr);
+              const svgSize = TestMethods.numAttr(svg, baseSizeAttr);
+              assert.operator(barSize, ">=", svgSize / 4, "bar is larger than 1/4 of the available space");
+              assert.operator(barSize, "<=", svgSize / 2, "bar is smaller than half the available space");
+            });
+
+            it("computes a sensible width when given repeated base value", () => {
+              const repeatedBaseData = [
+                { base: 1, value: 5 },
+                { base: 1, value: -5 }
+              ];
+              dataset.data(repeatedBaseData);
+
+              const bars = barPlot.content().selectAll("rect");
+              assert.strictEqual(bars.size(), repeatedBaseData.length, "one bar was drawn per datum");
+              const svgSize = TestMethods.numAttr(svg, baseSizeAttr);
+              bars.each(function() {
+                const bar = d3.select(this);
+                const barSize = TestMethods.numAttr(bar, baseSizeAttr)
+                assert.operator(barSize, ">=", svgSize / 4, "bar is larger than 1/4 of the available space");
+                assert.operator(barSize, "<=", svgSize / 2, "bar is smaller than half the available space");
+              });
+            });
+
+            it("computes a sensible width when given unsorted data", () => {
+              const unsortedData = [
+                { base: 10, value: 2 },
+                { base: 1, value: 5 },
+                { base: 100, value: 4 }
+              ];
+              dataset.data(unsortedData);
+
+              const closestSeparation = Math.abs(baseScale.scale(unsortedData[1].base) - baseScale.scale(unsortedData[0].base));
+              const bars = barPlot.content().selectAll("rect");
+              assert.strictEqual(bars.size(), unsortedData.length, "one bar was drawn per datum");
+              bars.each(function() {
+                const bar = d3.select(this);
+                const barSize = TestMethods.numAttr(bar, baseSizeAttr)
+                assert.operator(barSize, "<=", closestSeparation, "bar width is less than the closest distance between values");
+                assert.operator(barSize, ">=", 0.5 * closestSeparation, "bar width is greater than half the closest distance between values");
+              });
+            });
 
             afterEach(function() {
               if (this.currentTest.state === "passed") {
@@ -536,82 +604,6 @@ describe("Plots", () => {
         assert.closeTo(xScale.domain()[0], left, 0.0001, "Left side domain includes the first bar");
         assert.closeTo(xScale.domain()[1], right, 0.0001, "Right side includes the entire third bar");
 
-        svg.remove();
-      });
-    });
-
-    describe("Vertical Bar Plot linear scale", () => {
-      let svg: d3.Selection<void>;
-      let dataset: Plottable.Dataset;
-      let xScale: Plottable.Scales.Linear;
-      let yScale: Plottable.Scales.Linear;
-      let barPlot: Plottable.Plots.Bar<number, number>;
-      let SVG_WIDTH = 600;
-      let SVG_HEIGHT = 400;
-
-      beforeEach(() => {
-        svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
-        xScale = new Plottable.Scales.Linear();
-        yScale = new Plottable.Scales.Linear();
-        let data = [
-          {x: 2, y: 1},
-          {x: 10, y: -1.5},
-          {x: 100, y: 1}
-        ];
-        barPlot = new Plottable.Plots.Bar<number, number>();
-        dataset = new Plottable.Dataset(data);
-        barPlot.addDataset(dataset);
-        barPlot.baselineValue(0);
-        barPlot.x((d) => d.x, xScale);
-        barPlot.y((d) => d.y, yScale);
-        barPlot.renderTo(svg);
-      });
-
-      it("calculating width does not crash if handed invalid values", () => {
-        let errMsg = /TypeError: Cannot read property \'valueOf\' of undefined/;
-        (<any> assert).doesNotThrow(() => barPlot.x((d) => d.a, xScale), errMsg, "barPixelWidth does not crash on invalid values");
-        svg.remove();
-      });
-
-      it("bar width takes an appropriate value", () => {
-        assert.strictEqual((<any> barPlot)._barPixelWidth, (xScale.scale(10) - xScale.scale(2)) * 0.95);
-        svg.remove();
-      });
-
-      it("bar widths are equal to barPixelWidth", () => {
-        let renderArea = (<any> barPlot)._renderArea;
-        let bars = renderArea.selectAll("rect");
-        assert.lengthOf(bars[0], 3, "One bar was created per data point");
-
-        let barPixelWidth = (<any> barPlot)._barPixelWidth;
-        let bar0 = d3.select(bars[0][0]);
-        let bar1 = d3.select(bars[0][1]);
-        let bar2 = d3.select(bars[0][2]);
-        assert.closeTo(TestMethods.numAttr(bar0, "width"), barPixelWidth, 0.1, "bar0 width is correct");
-        assert.closeTo(TestMethods.numAttr(bar1, "width"), barPixelWidth, 0.1, "bar1 width is correct");
-        assert.closeTo(TestMethods.numAttr(bar2, "width"), barPixelWidth, 0.1, "bar2 width is correct");
-        svg.remove();
-      });
-
-      it("sensible bar width one datum", () => {
-        barPlot.removeDataset(dataset);
-        barPlot.addDataset(new Plottable.Dataset([{x: 10, y: 2}]));
-        assert.closeTo((<any> barPlot)._barPixelWidth, 228, 0.1, "sensible bar width for only one datum");
-        svg.remove();
-      });
-
-      it("sensible bar width same datum", () => {
-        barPlot.removeDataset(dataset);
-        barPlot.addDataset(new Plottable.Dataset([{x: 10, y: 2}, {x: 10, y: 2}]));
-        assert.closeTo((<any> barPlot)._barPixelWidth, 228, 0.1, "uses the width sensible for one datum");
-        svg.remove();
-      });
-
-      it("sensible bar width unsorted data", () => {
-        barPlot.removeDataset(dataset);
-        barPlot.addDataset(new Plottable.Dataset([{x: 2, y: 2}, {x: 20, y: 2}, {x: 5, y: 2}]));
-        let expectedBarPixelWidth = (xScale.scale(5) - xScale.scale(2)) * 0.95;
-        assert.closeTo((<any> barPlot)._barPixelWidth, expectedBarPixelWidth, 0.1, "bar width uses closest sorted x values");
         svg.remove();
       });
     });
