@@ -145,37 +145,42 @@ describe("Plots", () => {
       });
 
       describe(`auto bar width calculation in ${orientation} orientation`, () => {
-        const scaleTypes = ["linear", "modifiedLog"];
+        const scaleTypes = ["Linear", "ModifiedLog", "Time"];
         scaleTypes.forEach((scaleType) => {
           describe(`using a ${scaleType} base Scale`, () => {
             let svg: d3.Selection<void>;
-            let barPlot: Plottable.Plots.Bar<number, number>;
-            let baseScale: Plottable.QuantitativeScale<number>;
+            let barPlot: Plottable.Plots.Bar<number | Date, number | Date>;
+            let baseScale: Plottable.QuantitativeScale<number | Date>;
             let valueScale: Plottable.Scales.Linear;
             let dataset: Plottable.Dataset;
 
             beforeEach(() => {
               svg = TestMethods.generateSVG();
-              barPlot = new Plottable.Plots.Bar<number, number>(orientation);
+              barPlot = new Plottable.Plots.Bar<number | Date, number | Date>(orientation);
 
               switch (scaleType) {
-                case "linear":
+                case "Linear":
                   baseScale = new Plottable.Scales.Linear();
                   break;
-                case "modifiedLog":
+                case "ModifiedLog":
                   baseScale = new Plottable.Scales.ModifiedLog();
+                  break;
+                case "Time":
+                  baseScale = new Plottable.Scales.Time();
                   break;
                 default:
                   throw new Error("unexpected base Scale type");
               }
-
               valueScale = new Plottable.Scales.Linear();
+
+              const baseAccessor = (scaleType === "Time") ? (d: any) => new Date(d.base) : (d: any) => d.base;
+              const valueAccessor = (d: any) => d.value;
               if (orientation === Plottable.Plots.Bar.ORIENTATION_VERTICAL) {
-                barPlot.x((d: any) => d.base, baseScale);
-                barPlot.y((d: any) => d.value, valueScale);
+                barPlot.x(baseAccessor, baseScale);
+                barPlot.y(valueAccessor, valueScale);
               } else {
-                barPlot.y((d: any) => d.base, baseScale);
-                barPlot.x((d: any) => d.value, valueScale);
+                barPlot.y(baseAccessor, baseScale);
+                barPlot.x(valueAccessor, valueScale);
               }
               dataset = new Plottable.Dataset();
               barPlot.addDataset(dataset);
@@ -568,37 +573,6 @@ describe("Plots", () => {
           svg.remove();
         });
       });
-    });
-
-    describe("Vertical Bar Plot time scale", () => {
-      let svg: d3.Selection<void>;
-      let barPlot: Plottable.Plots.Bar<Date, number>;
-      let xScale: Plottable.Scales.Time;
-
-      beforeEach(() => {
-        svg = TestMethods.generateSVG(600, 400);
-        let data = [{ x: "12/01/92", y: 0, type: "a" },
-          { x: "12/01/93", y: 1, type: "a" },
-          { x: "12/01/94", y: 1, type: "a" },
-          { x: "12/01/95", y: 2, type: "a" },
-          { x: "12/01/96", y: 2, type: "a" },
-          { x: "12/01/97", y: 2, type: "a" }];
-        xScale = new Plottable.Scales.Time();
-        let yScale = new Plottable.Scales.Linear();
-        barPlot = new Plottable.Plots.Bar<Date, number>();
-        barPlot.addDataset(new Plottable.Dataset(data));
-        barPlot.x((d: any) => d3.time.format("%m/%d/%y").parse(d.x), xScale)
-               .y((d) => d.y, yScale)
-               .renderTo(svg);
-      });
-
-      it("bar width takes an appropriate value", () => {
-        let timeFormatter = d3.time.format("%m/%d/%y");
-        let expectedBarWidth = (xScale.scale(timeFormatter.parse("12/01/94")) - xScale.scale(timeFormatter.parse("12/01/93"))) * 0.95;
-        assert.closeTo((<any> barPlot)._barPixelWidth, expectedBarWidth, 0.1, "width is difference between two dates");
-        svg.remove();
-      });
-
     });
 
     describe("Horizontal Bar Plot", () => {
