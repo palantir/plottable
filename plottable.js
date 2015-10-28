@@ -1,5 +1,5 @@
 /*!
-Plottable 1.16.0 (https://github.com/palantir/plottable)
+Plottable 1.16.1 (https://github.com/palantir/plottable)
 Copyright 2014-2015 Palantir Technologies
 Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
 */
@@ -885,7 +885,7 @@ var Plottable;
 })(Plottable || (Plottable = {}));
 var Plottable;
 (function (Plottable) {
-    Plottable.version = "1.16.0";
+    Plottable.version = "1.16.1";
 })(Plottable || (Plottable = {}));
 var Plottable;
 (function (Plottable) {
@@ -3012,8 +3012,8 @@ var Plottable;
          */
         Component.prototype.renderImmediately = function () {
             var _this = this;
-            this._renderImmediately();
             Plottable.Utils.Window.setTimeout(function () { return _this._onRenderCallbacks.callCallbacks(_this); }, this._deferredTotalDrawTime());
+            this._renderImmediately();
             return this;
         };
         Component.prototype._deferredTotalDrawTime = function () {
@@ -6895,7 +6895,6 @@ var Plottable;
         };
         Plot.prototype._paint = function () {
             var drawSteps = this._generateDrawSteps();
-            this._paintedDrawSteps = drawSteps;
             var dataToDraw = this._getDataToDraw();
             var drawers = this._getDrawersInOrder();
             this.datasets().forEach(function (ds, i) { return drawers[i].draw(dataToDraw.get(ds), drawSteps); });
@@ -6904,7 +6903,7 @@ var Plottable;
             this._additionalPaint(maxTime);
         };
         Plot.prototype._deferredTotalDrawTime = function () {
-            var drawSteps = this._paintedDrawSteps;
+            var drawSteps = this._generateDrawSteps();
             var dataToDraw = this._getDataToDraw();
             var drawers = this._getDrawersInOrder();
             return Plottable.Utils.Math.max(this.datasets().map(function (ds, i) { return drawers[i].totalDrawTime(dataToDraw.get(ds), drawSteps); }), 0);

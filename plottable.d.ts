@@ -2791,7 +2791,6 @@ declare module Plottable {
         private _onDatasetUpdateCallback;
         protected _propertyExtents: d3.Map<any[]>;
         protected _propertyBindings: d3.Map<Plots.AccessorScaleBinding<any, any>>;
-        private _paintedDrawSteps;
         /**
          * A Plot draws some visualization of the inputted Datasets.
          *
