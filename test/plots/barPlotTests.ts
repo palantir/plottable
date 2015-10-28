@@ -29,7 +29,7 @@ describe("Plots", () => {
       const valuePositionAttr = isVertical ? "y" : "x";
       const valueSizeAttr = isVertical ? "height" : "width";
 
-      describe(`rendering in ${orientation} orientation`, () => {
+      describe(`rendering when ${orientation}`, () => {
         const data = [
           { base: "A", value: 1 },
           { base: "B", value: 0 },
@@ -144,7 +144,7 @@ describe("Plots", () => {
         });
       });
 
-      describe(`auto bar width calculation in ${orientation} orientation`, () => {
+      describe(`auto bar width calculation when ${orientation}`, () => {
         const scaleTypes = ["Linear", "ModifiedLog", "Time"];
         scaleTypes.forEach((scaleType) => {
           describe(`using a ${scaleType} base Scale`, () => {
@@ -1131,63 +1131,6 @@ describe("Plots", () => {
         });
         svg.remove();
       });
-    });
-
-    describe("selections()", () => {
-      let verticalBarPlot: Plottable.Plots.Bar<string, number>;
-      let dataset: Plottable.Dataset;
-      let svg: d3.Selection<void>;
-
-      beforeEach(() => {
-        svg = TestMethods.generateSVG();
-        dataset = new Plottable.Dataset();
-        let xScale = new Plottable.Scales.Category();
-        let yScale = new Plottable.Scales.Linear();
-        verticalBarPlot = new Plottable.Plots.Bar<string, number>();
-        verticalBarPlot.x((d) => d.x, xScale);
-        verticalBarPlot.y((d) => d.y, yScale);
-      });
-
-      it("retrieves all dataset selections with no args", () => {
-        let barData = [{ x: "foo", y: 5 }, { x: "bar", y: 640 }, { x: "zoo", y: 12345 }];
-        verticalBarPlot.addDataset(new Plottable.Dataset(barData));
-        verticalBarPlot.renderTo(svg);
-
-        let allBars = verticalBarPlot.selections();
-        assert.strictEqual(allBars.size(), 3, "retrieved all bars");
-
-        svg.remove();
-      });
-
-      it("retrieves correct selections for supplied Datasets", () => {
-        let dataset1 = new Plottable.Dataset([{ x: "foo", y: 5 }, { x: "bar", y: 640 }, { x: "zoo", y: 12345 }]);
-        let dataset2 = new Plottable.Dataset([{ x: "one", y: 5 }, { x: "two", y: 640 }, { x: "three", y: 12345 }]);
-        verticalBarPlot.addDataset(dataset1);
-        verticalBarPlot.addDataset(dataset2);
-        verticalBarPlot.renderTo(svg);
-
-        let allBars = verticalBarPlot.selections([dataset1]);
-        assert.strictEqual(allBars.size(), 3, "all bars retrieved");
-        let selectionData = allBars.data();
-        assert.includeMembers(selectionData, dataset1.data(), "first dataset data in selection data");
-
-        svg.remove();
-      });
-
-      it("skips invalid Datasets", () => {
-        let dataset1 = new Plottable.Dataset([{ x: "foo", y: 5 }, { x: "bar", y: 640 }, { x: "zoo", y: 12345 }]);
-        let notAddedDataset = new Plottable.Dataset([{ x: "one", y: 5 }, { x: "two", y: 640 }, { x: "three", y: 12345 }]);
-        verticalBarPlot.addDataset(dataset1);
-        verticalBarPlot.renderTo(svg);
-
-        let allBars = verticalBarPlot.selections([dataset1, notAddedDataset]);
-        assert.strictEqual(allBars.size(), 3, "all bars retrieved");
-        let selectionData = allBars.data();
-        assert.includeMembers(selectionData, dataset1.data(), "first dataset data in selection data");
-
-        svg.remove();
-      });
-
     });
 
     it("updates the scale extent correctly when there is one bar (vertical)", () => {
