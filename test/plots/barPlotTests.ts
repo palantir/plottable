@@ -491,6 +491,28 @@ describe("Plots", () => {
           });
         });
 
+        // HACKHACK: This test is a bit hacky, but it seems to be testing for a bug fixed in
+        // https://github.com/palantir/plottable/pull/1240 . Leaving it until we find a better way to test for it.
+        it("removes labels instantly on dataset change", (done) => {
+          barPlot.labelsEnabled(true);
+          let texts = barPlot.content().selectAll("text");
+          assert.strictEqual(texts.size(), dataset.data().length, "one label drawn per datum");
+          const originalDrawLabels = (<any> barPlot)._drawLabels;
+          let called = false;
+          (<any> barPlot)._drawLabels = () => {
+            if (!called) {
+              originalDrawLabels.apply(barPlot);
+              texts = barPlot.content().selectAll("text");
+              assert.strictEqual(texts.size(), dataset.data().length, "texts were repopulated by drawLabels after the update");
+              called = true; // for some reason, in phantomJS, `done` was being called multiple times and this caused the test to fail.
+              done();
+            }
+          };
+          dataset.data(dataset.data());
+          texts = barPlot.content().selectAll("text");
+          assert.strictEqual(texts.size(), 0, "texts were immediately removed");
+        });
+
         afterEach(function() {
           if (this.currentTest.state === "passed") {
             barPlot.destroy();
@@ -973,70 +995,6 @@ describe("Plots", () => {
         assert.deepEqual(initialYScaleDomain, yScale.domain(), "The domain did not change");
 
         svg.remove();
-      });
-    });
-
-    describe("Vertical Bar Plot With Bar Labels", () => {
-      let svg: d3.Selection<void>;
-      let yScale: Plottable.Scales.Linear;
-      let xScale: Plottable.Scales.Linear;
-      let DEFAULT_DOMAIN = [-5, 5];
-      let barPlot: Plottable.Plots.Bar<number, number>;
-      let dataset: Plottable.Dataset;
-
-      let getCenterOfText = (textNode: SVGElement) => {
-        let plotBoundingClientRect = (<SVGElement> barPlot.background().node()).getBoundingClientRect();
-        let labelBoundingClientRect = textNode.getBoundingClientRect();
-
-        return {
-          x: (labelBoundingClientRect.left + labelBoundingClientRect.right) / 2 - plotBoundingClientRect.left,
-          y: (labelBoundingClientRect.top + labelBoundingClientRect.bottom) / 2 - plotBoundingClientRect.top
-        };
-      };
-
-      beforeEach(() => {
-        svg = TestMethods.generateSVG();
-        yScale = new Plottable.Scales.Linear();
-        yScale.domain(DEFAULT_DOMAIN);
-        xScale = new Plottable.Scales.Linear();
-        xScale.domain(DEFAULT_DOMAIN);
-
-        let data = [
-          { x: -4, y: -4 },
-          { x: -2, y: -0.1},
-          { x: 0, y: 0 },
-          { x: 2, y: 0.1 },
-          { x: 4, y: 4 }
-        ];
-
-        barPlot = new Plottable.Plots.Bar<number, number>(Plottable.Plots.Bar.ORIENTATION_VERTICAL);
-        dataset = new Plottable.Dataset(data);
-        barPlot.addDataset(dataset);
-        barPlot.x((d) => d.x, xScale);
-        barPlot.y((d) => d.y, yScale);
-        barPlot.renderTo(svg);
-      });
-
-      it("bar labels are removed instantly on dataset change", (done) => {
-        barPlot.labelsEnabled(true);
-        barPlot.renderTo(svg);
-        let texts = barPlot.content().selectAll("text");
-        assert.strictEqual(texts.size(), dataset.data().length, "one label drawn per datum");
-        let originalDrawLabels = (<any> barPlot)._drawLabels;
-        let called = false;
-        (<any> barPlot)._drawLabels = () => {
-          if (!called) {
-            originalDrawLabels.apply(barPlot);
-            texts = barPlot.content().selectAll("text");
-            assert.strictEqual(texts.size(), dataset.data().length, "texts were repopulated by drawLabels after the update");
-            svg.remove();
-            called = true; // for some reason, in phantomJS, `done` was being called multiple times and this caused the test to fail.
-            done();
-          }
-        };
-        dataset.data(dataset.data());
-        texts = barPlot.content().selectAll("text");
-        assert.strictEqual(texts.size(), 0, "texts were immediately removed");
       });
     });
 
