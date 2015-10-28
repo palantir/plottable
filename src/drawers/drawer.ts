@@ -174,7 +174,7 @@ export class Drawer {
     if (step.animator.animateJoin) {
       step.animator.animateJoin(this._joinResult, step.attrToAppliedProjector, this);
     } else {
-      // an old animator won't deal remove exit
+      // an old animator won't remove exit
       this._joinResult.exit
         .remove();
       step.animator.animate(selection, step.attrToAppliedProjector);
