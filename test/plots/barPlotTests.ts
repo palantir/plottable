@@ -145,7 +145,7 @@ describe("Plots", () => {
       });
 
       describe(`auto bar width calculation in ${orientation} orientation`, () => {
-        const scaleTypes = ["linear"];
+        const scaleTypes = ["linear", "modifiedLog"];
         scaleTypes.forEach((scaleType) => {
           describe(`using a ${scaleType} base Scale`, () => {
             let svg: d3.Selection<void>;
@@ -157,7 +157,18 @@ describe("Plots", () => {
             beforeEach(() => {
               svg = TestMethods.generateSVG();
               barPlot = new Plottable.Plots.Bar<number, number>(orientation);
-              baseScale = new Plottable.Scales.Linear();
+
+              switch (scaleType) {
+                case "linear":
+                  baseScale = new Plottable.Scales.Linear();
+                  break;
+                case "modifiedLog":
+                  baseScale = new Plottable.Scales.ModifiedLog();
+                  break;
+                default:
+                  throw new Error("unexpected base Scale type");
+              }
+
               valueScale = new Plottable.Scales.Linear();
               if (orientation === Plottable.Plots.Bar.ORIENTATION_VERTICAL) {
                 barPlot.x((d: any) => d.base, baseScale);
@@ -191,7 +202,7 @@ describe("Plots", () => {
             });
 
             it("does not crash when given bad data", () => {
-              const badData = [
+              const badData: any = [
                 {},
                 { base: null, value: null}
               ]
