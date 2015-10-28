@@ -249,12 +249,28 @@ describe("Plots", () => {
         });
       });
 
+      it("passes the correct index to the Accessor", () => {
+        const data = ["A", "B", "C"];
+        const dataset = new Plottable.Dataset(data);
+        plot.addDataset(dataset);
+        const indexCheckAccessor = (datum: any, index: number) => {
+          assert.strictEqual(index, data.indexOf(datum), "was passed correct index");
+          return datum;
+        };
+        const scale = new Plottable.Scales.Category();
+        plot.attr("foo", indexCheckAccessor, scale);
+
+        const svg = TestMethods.generateSVG();
+        plot.anchor(svg);
+        svg.remove();
+      });
+
       it("can apply a scale to the returned values", () => {
         const data = [1, 2, 3, 4, 5];
         const dataset = new Plottable.Dataset(data);
         plot.addDataset(dataset);
 
-        const numberAccessor = (d: any, i: number) => d + i * 10;
+        const numberAccessor = (d: any, i: number) => d;
         const linearScale = new Plottable.Scales.Linear();
         assert.strictEqual(plot.attr("foo", numberAccessor, linearScale), plot, "setting the attribute returns the calling plot");
 
@@ -267,7 +283,7 @@ describe("Plots", () => {
           });
         });
 
-        const stringAccessor = (d: any, i: number) => `${d + i * 10} foo`;
+        const stringAccessor = (d: any, i: number) => `${d} foo`;
         const categoryScale = new Plottable.Scales.Category();
         categoryScale.domain(data.map(stringAccessor));
         assert.strictEqual(plot.attr("foo", stringAccessor, categoryScale), plot, "setting the attribute returns the calling plot");
