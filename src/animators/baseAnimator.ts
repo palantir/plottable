@@ -258,15 +258,16 @@ module Plottable.Animators {
      *
      * @returns {string} the current easing mode.
      */
-    public easingMode(): string;
+    public easingMode(): EasingFunctionSpecifier;
     /**
      * Sets the easing mode of the animation.
      *
-     * @param {string} easingMode The desired easing mode.
+     * @param {EasingFunctionSpecifier} easingMode The desired easing mode.
+     *   Can be any valid easing function, or the name of a d3 built-in easing function
      * @returns {Base} The calling Animator.
      */
-    public easingMode(easingMode: string): Base;
-    public easingMode(easingMode?: string): any {
+    public easingMode(easingMode: EasingFunctionSpecifier): Base;
+    public easingMode(easingMode?: EasingFunctionSpecifier): any {
       if (easingMode == null) {
         return this._easingMode;
       } else {
