@@ -23,7 +23,7 @@ module Plottable.Animators {
     /**
      * The default easing of the animation
      */
-    private static _DEFAULT_EASING_MODE = "linear-in-out";
+    private static _DEFAULT_EASING_MODE = "exp-out";
 
     private _startDelay: number;
     private _stepDuration: number;
@@ -49,22 +49,21 @@ module Plottable.Animators {
       return this.startDelay() + adjustedIterativeDelay * (Math.max(numberOfSteps - 1, 0)) + this.stepDuration();
     }
 
-    public animate(selection: d3.Selection<any>,
-      attrToAppliedProjector: AttributeToAppliedProjector, drawingTarget?: Drawers.DrawingTarget) {
+    public animateJoin(joinResult: Drawers.JoinResult, attrToAppliedProjector: AttributeToAppliedProjector, drawer: Drawer): void {
+      let numberOfSteps: number = (<any>joinResult.merge)[0].length;
+      let adjustedIterativeDelay = this._getAdjustedIterativeDelay(numberOfSteps);
+      joinResult.merge = joinResult.merge
+        .transition()
+        .ease(this.easingMode())
+        .duration(this.stepDuration())
+        .delay((d: any, i: number) => this.startDelay() + adjustedIterativeDelay * i)
+        .attr(attrToAppliedProjector);
+      joinResult.exit
+        .remove();
+    }
 
-      if (drawingTarget) {
-        let numberOfSteps: number = (<any>drawingTarget.merge)[0].length;
-        let adjustedIterativeDelay = this._getAdjustedIterativeDelay(numberOfSteps);
-        drawingTarget.merge = drawingTarget.merge
-          .transition()
-          .ease(this.easingMode())
-          .duration(this.stepDuration())
-          .delay((d: any, i: number) => this.startDelay() + adjustedIterativeDelay * i)
-          .attr(attrToAppliedProjector);
-        drawingTarget.exit
-          .remove();
-        return drawingTarget.merge;
-      } else {
+    public animate(selection: d3.Selection<any>
+      , attrToAppliedProjector: AttributeToAppliedProjector): d3.Selection<any> | d3.Transition<any> {
         let numberOfSteps = selection.size();
         let adjustedIterativeDelay = this._getAdjustedIterativeDelay(numberOfSteps);
 
@@ -73,9 +72,7 @@ module Plottable.Animators {
           .duration(this.stepDuration())
           .delay((d: any, i: number) => this.startDelay() + adjustedIterativeDelay * i)
           .attr(attrToAppliedProjector);
-      }
     }
-
     /**
      * Gets the start delay of the animation in milliseconds.
      *

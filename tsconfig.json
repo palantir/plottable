@@ -82,6 +82,7 @@
       "src/plots/waterfallPlot.ts",
       "src/plots/wheelPlot.ts",
 
+      "src/animators/easingFunctions.ts",
       "src/animators/animator.ts",
       "src/animators/baseAnimator.ts",
       "src/animators/attrAnimator.ts",

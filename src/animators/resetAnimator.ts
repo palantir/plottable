@@ -1,71 +1,20 @@
-﻿module Plottable {
-export module Animators {
+﻿module Plottable.Animators {
 
   /**
    * Base for animators that animate specific attributes, such as Opacity, height... .
    */
   export class Reset extends Base implements Animator {
 
-    private _startAttrs: AttributeToAppliedProjector;
-    private _endAttrs: AttributeToAppliedProjector;
-
-    public animate(selection: d3.Selection<any>,
-      attrToAppliedProjector: AttributeToAppliedProjector
-      , drawingTarget?: Drawers.DrawingTarget
-      , drawer?: Drawer): d3.Selection<any> | d3.Transition<any> {
-
-      drawingTarget.merge
+    public animateJoin(joinResult: Drawers.JoinResult, attrToAppliedProjector: AttributeToAppliedProjector, drawer: Drawer): void {
+      joinResult.merge
         .attr(drawer.appliedInitializer());
-
       // now we can call the base class which will append the remove() to the end of the exit transition
-      return super.animate(selection, attrToAppliedProjector, drawingTarget);
+      super.animateJoin(joinResult, attrToAppliedProjector, drawer);
     }
-    /**
-     * Gets the attributes for entering elements. These are overlaid over
-     * the target atr and
-     * @returns {number} The current start delay.
-     */
-    public startAttrs(): AttributeToAppliedProjector;
-    /**
-     * Sets the attributes for entering elements.
-     *
-     * @param {startAttrs} A collection of attribuets applied to entering elements.
-     * These are applied over the top of the attributes pass to the animate method
-     * Any attribute passed to startAttrs will transition to its final value
-     * @returns {Attr} The calling Attr Animator.
-     */
-    public startAttrs(startAttrs: AttributeToAppliedProjector): Attr;
-    public startAttrs(startAttrs?: AttributeToAppliedProjector): any {
-      if (startAttrs == null) {
-        return this._startAttrs;
-      } else {
-        this._startAttrs = startAttrs;
-        return this;
-      }
-    }
-    /**
-     * Gets the attributes for exiting elements.
-     * Exisitng elements will transition to these attribuest before being removed
-     * @returns {AttributeToAppliedProjector} The current exiting attributes.
-     */
-    public endAttrs(): AttributeToAppliedProjector;
-    /**
-     * Sets the attributes for entering elements.
-     *
-     * @param {endAttrs} A collection of attribuets applied to entering elements.
-     * These are applied over the top of the attributes pass to the animate method
-     * Any attribute passed to endAttrs will transition to its final value
-     * @returns {Attr} The calling Attr Animator.
-     */
-    public endAttrs(endAttrs: AttributeToAppliedProjector): Attr;
-    public endAttrs(endAttrs?: AttributeToAppliedProjector): any {
-      if (endAttrs == null) {
-        return this._endAttrs;
-      } else {
-        this._endAttrs = endAttrs;
-        return this;
-      }
+    public animate(selection: d3.Selection<any>
+      , attrToAppliedProjector: AttributeToAppliedProjector): d3.Selection<any> | d3.Transition<any> {
+        // can't do anything special
+        return super.animate(selection, attrToAppliedProjector);
     }
   }
-}
 }

@@ -2602,8 +2602,11 @@ var Plottable;
         };
         /*
          * Return the AttrToAppliedProjector generated from the initializer
-         *
-         * @returns {AttrToAppliedProjector} .
+         * The function supplied to initializer is executed, and the resulting AttributeToProjector
+         * is used to generate this AttrToAppliedProjector
+         * When applied to a selection, this AttrToAppliedProjector sets an "initial state" relevant to the
+         * owning plot.
+         * @returns {AttrToAppliedProjector}
          */
         Drawer.prototype.appliedInitializer = function () {
             return this._appliedProjectors(this.initializer()());
@@ -2631,7 +2634,7 @@ var Plottable;
             else {
                 dataElements = selection.data(data);
             }
-            this._drawingTarget = {
+            this._joinResult = {
                 update: dataElements.filter(function () {
                     return true;
                 }),
@@ -2639,12 +2642,12 @@ var Plottable;
                 exit: null,
                 merge: null
             };
-            this._drawingTarget.enter = dataElements.enter()
+            this._joinResult.enter = dataElements.enter()
                 .append(this._svgElementName)
                 .attr(this.appliedInitializer());
-            this._applyDefaultAttributes(this._drawingTarget.enter); // others already have it
-            this._drawingTarget.exit = dataElements.exit(); // the animator becomes responsbile for reomving these
-            this._drawingTarget.merge = this._cachedSelection = dataElements; // after enter() is called, this contains new elements
+            this._applyDefaultAttributes(this._joinResult.enter); // others already have it
+            this._joinResult.exit = dataElements.exit(); // the animator becomes responsbile for reomving these
+            this._joinResult.merge = this._cachedSelection = dataElements; // after enter() is called, this contains new elements
             this._cachedSelectionValid = true;
         };
         Drawer.prototype._applyDefaultAttributes = function (selection) {
@@ -2665,7 +2668,18 @@ var Plottable;
                     selection.attr(colorAttribute, step.attrToAppliedProjector[colorAttribute]);
                 }
             });
-            step.animator.animate(selection, step.attrToAppliedProjector, this._drawingTarget, this);
+            // this is a temporary workaround to ensure that any existing custom animators
+            // (using the 'legacy' api point 'animate') continue to work as before
+            // this test should be removed if and when semver = 2.0.0
+            if (step.animator.animateJoin) {
+                step.animator.animateJoin(this._joinResult, step.attrToAppliedProjector, this);
+            }
+            else {
+                // an old animator won't remove exit
+                this._joinResult.exit
+                    .remove();
+                step.animator.animate(selection, step.attrToAppliedProjector);
+            }
             if (this._className != null) {
                 selection.classed(this._className, true);
             }
@@ -10245,9 +10259,30 @@ var Plottable;
 (function (Plottable) {
     var Animators;
     (function (Animators) {
+        /**
+         * Custom easing functions. these are designed to co-ordinate the timing of
+         * actvities on two or more transitions that are active simulataneously
+         * (on different selections)
+         * These are designed to help animators schedule animations between
+         * the enter, update and exit selections - each can have a transition of the same duration,
+         * but the actual timing of activity will be determined by the easing function.
+         */
         var EasingFunctions = (function () {
             function EasingFunctions() {
             }
+            /**
+             * squEase
+             * squEase ("squeezing ease") applies the transition squeezed into a subinterval [a,b] where 0 <= a <= b <= 1.
+             * The actual easing to apply in that interval is passed as an argument.
+             * @param easingFunction {EasingFunctionSpecifier} an easing function, or the string descriptor
+             * of a d3 built-in easing function ( as used by d3.ease())
+             * @param start {number} value between 0 and 1 at which the animation starts
+             * @param end  {end} value between start and 1 at which the animation ends
+             * Note that if start == end, the are applied instanteously at that point and the
+             * easingFunction parameter is not relevant. In particular start == end == 0 is the
+             * same as atStart
+             * @returns {EasingFunction} An easing function that can be applied to a d3 transition.
+             */
             EasingFunctions.squEase = function (easingFunction, start, end) {
                 return function (t) {
                     if (start === undefined) {
@@ -10261,15 +10296,25 @@ var Plottable;
                         return 0;
                     }
                     var tbar = (t - start) / (end - start);
-                    if (typeof (easingFunction) === "string") {
-                        easingFunction = d3.ease(easingFunction);
+                    if (typeof easingFunction === "string") {
+                        return d3.ease(easingFunction)(tbar);
                     }
                     return easingFunction(tbar);
                 };
             };
+            /**
+             * atStart
+             * An EasingFunction that applies all attributes at once at the start of the transition;
+             * ie this creates a "wait" after applying the attributes.
+             */
             EasingFunctions.atStart = function (t) {
                 return 1;
             };
+            /**
+             * atEnd
+             * An EasingFunction that applies all attributes at once at the end of the transition;
+             * ie this creates a "wait" before applying the attributes.
+             */
             EasingFunctions.atEnd = function (t) {
                 if (t < 1) {
                     return 0;
@@ -10307,20 +10352,18 @@ var Plottable;
                 var adjustedIterativeDelay = this._getAdjustedIterativeDelay(numberOfSteps);
                 return this.startDelay() + adjustedIterativeDelay * (Math.max(numberOfSteps - 1, 0)) + this.stepDuration();
             };
-            /**
-             * implementation of animate
-             */
-            Base.prototype.animate = function (selection, attrToAppliedProjector, drawingTarget, drawer) {
-                var _this = this;
-                var numberOfSteps = drawingTarget.merge[0].length;
-                var adjustedIterativeDelay = this._getAdjustedIterativeDelay(numberOfSteps);
+            Base.prototype.animateJoin = function (joinResult, attrToAppliedProjector, drawer) {
                 // set all the properties on the merge , save the transition returned
-                drawingTarget.merge = this.getTransition(drawingTarget.merge, this.stepDuration(), function (d, i) { return _this.startDelay() + adjustedIterativeDelay * i; })
+                joinResult.merge = this.getTransition(joinResult.merge, this.stepDuration(), this.delay(joinResult.merge))
                     .attr(attrToAppliedProjector);
                 // remove the exiting elements
-                drawingTarget.exit
+                joinResult.exit
                     .remove();
-                return drawingTarget.merge;
+            };
+            Base.prototype.animate = function (selection, attrToAppliedProjector) {
+                // a selection or transition
+                return this.getTransition(selection, this.stepDuration(), this.delay(selection))
+                    .attr(attrToAppliedProjector);
             };
             /**
              * return a transition from the selection, with the requested duration
@@ -10333,7 +10376,7 @@ var Plottable;
              * @param { number? } delay The delay to apply to the transition. If creating a subtransition, this is ignored.
              * @param { EasingFunctionSpecifier } easing An easing function, or the name of a predefined d3 easing function
              * to use on the transition. If not supplied, the easingMode of the calling Animator is used.
-             * returns { any } The transition created, or , when duration = 0 the original selection is returned.
+             * @return { any } The transition created, or , when duration = 0 the original selection is returned.
              */
             Base.prototype.getTransition = function (selection, duration, delay, easing) {
                 // if the duration is 0, just return the selection
@@ -10372,6 +10415,7 @@ var Plottable;
              * @param {AttributeToAppliedProjector} attr1 The first set of attributes
              * @param {AttributeToAppliedProjector} attr2 The second set of attributes
              *
+             * @returns {AttributeToAppliedProjector}
              */
             Base.prototype.mergeAttrs = function (attr1, attr2) {
                 var a = {};
@@ -10399,6 +10443,12 @@ var Plottable;
                 });
                 return result;
             };
+            /**
+             * Return a delay function, using the current startDelay and stepDelay,
+             * potentially adjusted to fit within the maxTotalDuration
+             * @param selection selection on which the transition will be based
+             * @returns delay function that may be passed to a transition
+             */
             Base.prototype.delay = function (selection) {
                 var _this = this;
                 var numberOfSteps = selection[0].length;
@@ -10514,17 +10564,21 @@ var Plottable;
             function Attr() {
                 _super.apply(this, arguments);
             }
-            Attr.prototype.animate = function (selection, attrToAppliedProjector, drawingTarget) {
+            Attr.prototype.animateJoin = function (joinResult, attrToAppliedProjector, drawer) {
                 // first make the attr to apply to the enter selection before transition
                 // this is attrToAppliedProjector + _start
                 var startProjector = this.mergeAttrs(attrToAppliedProjector, this.startAttrs());
                 var endProjector = this.endAttrs() || this.startAttrs();
-                drawingTarget.enter = this.getTransition(drawingTarget.enter, 0)
+                joinResult.enter = this.getTransition(joinResult.enter, 0)
                     .attr(startProjector);
-                drawingTarget.exit = this.getTransition(drawingTarget.exit, this.stepDuration(), this.delay(drawingTarget.exit), this.exitEasingMode())
+                joinResult.exit = this.getTransition(joinResult.exit, this.stepDuration(), this.delay(joinResult.exit), this.exitEasingMode())
                     .attr(endProjector);
                 // now we can call the base class which will append the remove() to the end of the exit transition
-                return _super.prototype.animate.call(this, selection, attrToAppliedProjector, drawingTarget);
+                _super.prototype.animateJoin.call(this, joinResult, attrToAppliedProjector, drawer);
+            };
+            Attr.prototype.animate = function (selection, attrToAppliedProjector) {
+                // legacy format - there is no enter or exit to animate so just delegate to Base
+                return _super.prototype.animate.call(this, selection, attrToAppliedProjector);
             };
             Attr.prototype.startAttrs = function (startAttrs) {
                 if (startAttrs == null) {
@@ -10592,7 +10646,10 @@ var Plottable;
                     return this;
                 }
             };
-            Bar.prototype.animate = function (selection, attrToAppliedProjector, drawingTarget) {
+            /**
+             * animateJoin implementation
+             */
+            Bar.prototype.animateJoin = function (joinResult, attrToAppliedProjector, drawer) {
                 var _this = this;
                 var yScale = this.yScale();
                 // a projector to set bar height and y-origin to 0
@@ -10615,9 +10672,9 @@ var Plottable;
                     return a + b;
                 });
                 // decide which steps are needed
-                var exitStageOn = (drawingTarget.exit.size() > 0 ? 1 : 0);
-                var updateStageOn = (drawingTarget.update.size() > 0 ? 1 : 0);
-                var enterStageOn = (drawingTarget.enter.size() > 0 ? 1 : 0);
+                var exitStageOn = (joinResult.exit.size() > 0 ? 1 : 0);
+                var updateStageOn = (joinResult.update.size() > 0 ? 1 : 0);
+                var enterStageOn = (joinResult.enter.size() > 0 ? 1 : 0);
                 var stepOn = [exitStageOn, updateStageOn, updateStageOn, updateStageOn, updateStageOn, enterStageOn];
                 // final actual durations for each step, based on relative durations and whether step is needed
                 // the animation is confined to the first part of this time interval by the squEase easing function
@@ -10634,41 +10691,43 @@ var Plottable;
                 var squeezer = Plottable.Animators.EasingFunctions.squEase("linear-in-out", 0, this.rhythm());
                 // Exit processing
                 // STEP 0: Transition the bar height  to 0 (taking care to adjust the y origin), when done, remove
-                drawingTarget.exit = this.getTransition(drawingTarget.exit, stepDurations[0], undefined, squeezer)
+                joinResult.exit = this.getTransition(joinResult.exit, stepDurations[0], undefined, squeezer)
                     .attr(zeroProj)
                     .remove();
                 // Update processing
                 // update waits for the exit to finish with an empty transition
-                drawingTarget.update = this.getTransition(drawingTarget.update, stepDurations[0]);
+                joinResult.update = this.getTransition(joinResult.update, stepDurations[0]);
                 // STEP 1: extract height and y from the attrToAppliedProjector - these two are applied first
                 var heightProj = this.pluckAttrs(attrToAppliedProjector, ["height", "y"]);
-                drawingTarget.update = this.getTransition(drawingTarget.update, stepDurations[1], undefined, squeezer)
+                joinResult.update = this.getTransition(joinResult.update, stepDurations[1], undefined, squeezer)
                     .attr(heightProj);
                 // STEP 2: quickly fade before the next step - to reduce "occlusion" as bars move across each other
                 // and so make visual tracking easier
-                drawingTarget.update = this.getTransition(drawingTarget.update, stepDurations[2])
+                joinResult.update = this.getTransition(joinResult.update, stepDurations[2])
                     .attr({ "opacity": .6 });
                 // STEP 3: apply all the remaining attributes, while maintaining the reduced opacity
                 var proj3 = this.mergeAttrs(attrToAppliedProjector, { "opacity": function () { return .6; } });
-                drawingTarget.update = this.getTransition(drawingTarget.update, stepDurations[3], undefined, squeezer)
+                joinResult.update = this.getTransition(joinResult.update, stepDurations[3], undefined, squeezer)
                     .attr(proj3);
                 // STEP 4: quickly apply all the remaining attributes, including opacity - restores opacity to the required value
                 // don;t use the squeeze on this transition
-                drawingTarget.update = this.getTransition(drawingTarget.update, stepDurations[4])
+                joinResult.update = this.getTransition(joinResult.update, stepDurations[4])
                     .attr(attrToAppliedProjector);
                 // Enter
                 // initialise the entering elements - all the target attributes are applied, but height and y are overridden to 0
                 var enterInitProj = this.mergeAttrs(attrToAppliedProjector, zeroProj);
-                drawingTarget.enter
+                joinResult.enter
                     .attr(enterInitProj);
                 // wait for the Exit and Update to finish - steps 0 to 4
-                drawingTarget.enter = this.getTransition(drawingTarget.enter, enterStepDelay);
+                joinResult.enter = this.getTransition(joinResult.enter, enterStepDelay);
                 // STEP 5: apply all attributes to the enter selection - this will transition height and y back to their final values
                 // the squeeze is applied to keep a constant rhythm, even though this leaves a "wait" at the end of the transition
-                drawingTarget.enter = this.getTransition(drawingTarget.enter, stepDurations[5], undefined, squeezer)
+                joinResult.enter = this.getTransition(joinResult.enter, stepDurations[5], undefined, squeezer)
                     .attr(attrToAppliedProjector);
-                // return the merge selection
-                return drawingTarget.merge;
+            };
+            Bar.prototype.animate = function (selection, attrToAppliedProjector) {
+                // legacy format - there is no enter or exit to animate so just delegate to Base
+                return _super.prototype.animate.call(this, selection, attrToAppliedProjector);
             };
             return Bar;
         })(Animators.Attr);
@@ -10687,29 +10746,15 @@ var Plottable;
             function Reset() {
                 _super.apply(this, arguments);
             }
-            Reset.prototype.animate = function (selection, attrToAppliedProjector, drawingTarget, drawer) {
-                drawingTarget.merge
+            Reset.prototype.animateJoin = function (joinResult, attrToAppliedProjector, drawer) {
+                joinResult.merge
                     .attr(drawer.appliedInitializer());
                 // now we can call the base class which will append the remove() to the end of the exit transition
-                return _super.prototype.animate.call(this, selection, attrToAppliedProjector, drawingTarget);
+                _super.prototype.animateJoin.call(this, joinResult, attrToAppliedProjector, drawer);
             };
-            Reset.prototype.startAttrs = function (startAttrs) {
-                if (startAttrs == null) {
-                    return this._startAttrs;
-                }
-                else {
-                    this._startAttrs = startAttrs;
-                    return this;
-                }
-            };
-            Reset.prototype.endAttrs = function (endAttrs) {
-                if (endAttrs == null) {
-                    return this._endAttrs;
-                }
-                else {
-                    this._endAttrs = endAttrs;
-                    return this;
-                }
+            Reset.prototype.animate = function (selection, attrToAppliedProjector) {
+                // can't do anything special
+                return _super.prototype.animate.call(this, selection, attrToAppliedProjector);
             };
             return Reset;
         })(Animators.Base);
@@ -10730,17 +10775,14 @@ var Plottable;
             Null.prototype.totalTime = function (selection) {
                 return 0;
             };
-            Null.prototype.animate = function (selection, attrToAppliedProjector, drawingTarget) {
-                if (drawingTarget) {
-                    drawingTarget.exit
-                        .remove();
-                    return drawingTarget.merge
-                        .attr(attrToAppliedProjector);
-                }
-                else {
-                    // legacy compatibility
-                    return selection.attr(attrToAppliedProjector);
-                }
+            Null.prototype.animateJoin = function (joinResult, attrToAppliedProjector, drawer) {
+                joinResult.exit
+                    .remove();
+                joinResult.merge
+                    .attr(attrToAppliedProjector);
+            };
+            Null.prototype.animate = function (selection, attrToAppliedProjector) {
+                return selection.attr(attrToAppliedProjector);
             };
             return Null;
         })();
@@ -10771,30 +10813,28 @@ var Plottable;
                 var adjustedIterativeDelay = this._getAdjustedIterativeDelay(numberOfSteps);
                 return this.startDelay() + adjustedIterativeDelay * (Math.max(numberOfSteps - 1, 0)) + this.stepDuration();
             };
-            Easing.prototype.animate = function (selection, attrToAppliedProjector, drawingTarget) {
+            Easing.prototype.animateJoin = function (joinResult, attrToAppliedProjector, drawer) {
                 var _this = this;
-                if (drawingTarget) {
-                    var numberOfSteps = drawingTarget.merge[0].length;
-                    var adjustedIterativeDelay = this._getAdjustedIterativeDelay(numberOfSteps);
-                    drawingTarget.merge = drawingTarget.merge
-                        .transition()
-                        .ease(this.easingMode())
-                        .duration(this.stepDuration())
-                        .delay(function (d, i) { return _this.startDelay() + adjustedIterativeDelay * i; })
-                        .attr(attrToAppliedProjector);
-                    drawingTarget.exit
-                        .remove();
-                    return drawingTarget.merge;
-                }
-                else {
-                    var numberOfSteps = selection.size();
-                    var adjustedIterativeDelay = this._getAdjustedIterativeDelay(numberOfSteps);
-                    return selection.transition()
-                        .ease(this.easingMode())
-                        .duration(this.stepDuration())
-                        .delay(function (d, i) { return _this.startDelay() + adjustedIterativeDelay * i; })
-                        .attr(attrToAppliedProjector);
-                }
+                var numberOfSteps = joinResult.merge[0].length;
+                var adjustedIterativeDelay = this._getAdjustedIterativeDelay(numberOfSteps);
+                joinResult.merge = joinResult.merge
+                    .transition()
+                    .ease(this.easingMode())
+                    .duration(this.stepDuration())
+                    .delay(function (d, i) { return _this.startDelay() + adjustedIterativeDelay * i; })
+                    .attr(attrToAppliedProjector);
+                joinResult.exit
+                    .remove();
+            };
+            Easing.prototype.animate = function (selection, attrToAppliedProjector) {
+                var _this = this;
+                var numberOfSteps = selection.size();
+                var adjustedIterativeDelay = this._getAdjustedIterativeDelay(numberOfSteps);
+                return selection.transition()
+                    .ease(this.easingMode())
+                    .duration(this.stepDuration())
+                    .delay(function (d, i) { return _this.startDelay() + adjustedIterativeDelay * i; })
+                    .attr(attrToAppliedProjector);
             };
             Easing.prototype.startDelay = function (startDelay) {
                 if (startDelay == null) {
@@ -10869,7 +10909,7 @@ var Plottable;
             /**
              * The default easing of the animation
              */
-            Easing._DEFAULT_EASING_MODE = "linear-in-out";
+            Easing._DEFAULT_EASING_MODE = "exp-out";
             return Easing;
         })();
         Animators.Easing = Easing;
@@ -10930,19 +10970,24 @@ var Plottable;
     (function (Animators) {
         /**
          * Allows the implementation of animate to be passed as a callback function
-         * Provides javascript clients build custom animations with full access to the drawing target
+         * Provides javascript clients that build custom animations
+         * with full access to the drawing target and properties of the Drawer (appliedIntializer)
          */
         var Callback = (function (_super) {
             __extends(Callback, _super);
             function Callback() {
                 _super.call(this);
-                this._callback = function (selection, attrToAppliedProjector, drawingTarget) { return drawingTarget.merge; };
+                this._callback = function (joinResult, attrToAppliedProjector, drawer) { return; };
             }
             /**
-             * animate implementation delegates to the callback
+             * animateJoin implementation delegates to the callback
              */
-            Callback.prototype.animate = function (selection, attrToAppliedProjector, drawingTarget, drawer) {
-                return this.callback().call(this, selection, attrToAppliedProjector, drawingTarget, drawer);
+            Callback.prototype.animateJoin = function (joinResult, attrToAppliedProjector, drawer) {
+                this.callback().call(this, joinResult, attrToAppliedProjector, drawer);
+            };
+            // delegate to base in legacy case
+            Callback.prototype.animate = function (selection, attrToAppliedProjector) {
+                return _super.prototype.animate.call(this, selection, attrToAppliedProjector);
             };
             Callback.prototype.callback = function (callback) {
                 if (callback == null) {
@@ -10962,12 +11007,12 @@ var Plottable;
                     return this;
                 }
             };
-            Callback.prototype.InnerAnimate = function (selection, attrToAppliedProjector, drawingTarget, drawer) {
+            Callback.prototype.innerAnimate = function (joinResult, attrToAppliedProjector, drawer) {
                 if (this.innerAnimator) {
-                    return this.innerAnimator().animate(selection, attrToAppliedProjector, drawingTarget, drawer);
+                    return this.innerAnimator().animateJoin(joinResult, attrToAppliedProjector, drawer);
                 }
                 else {
-                    return _super.prototype.animate.call(this, selection, attrToAppliedProjector, drawingTarget, drawer);
+                    return _super.prototype.animateJoin.call(this, joinResult, attrToAppliedProjector, drawer);
                 }
             };
             return Callback;

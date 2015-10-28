@@ -8,23 +8,25 @@
     private _endAttrs: AttributeToAppliedProjector;
     private _exitEasingMode: EasingFunctionSpecifier;
 
-    public animate(selection: d3.Selection<any>,
-      attrToAppliedProjector: AttributeToAppliedProjector
-      , drawingTarget?: Drawers.DrawingTarget): d3.Selection<any> | d3.Transition<any> {
-
+    public animateJoin(joinResult: Drawers.JoinResult, attrToAppliedProjector: AttributeToAppliedProjector, drawer: Drawer): void {
       // first make the attr to apply to the enter selection before transition
       // this is attrToAppliedProjector + _start
       let startProjector: AttributeToAppliedProjector = this.mergeAttrs(attrToAppliedProjector, this.startAttrs());
       let endProjector: AttributeToAppliedProjector = this.endAttrs() || this.startAttrs();
-      drawingTarget.enter = this.getTransition(drawingTarget.enter, 0)
+      joinResult.enter = this.getTransition(joinResult.enter, 0)
         .attr(startProjector);
 
-      drawingTarget.exit = this.getTransition(drawingTarget.exit, this.stepDuration(),
-        this.delay(drawingTarget.exit), this.exitEasingMode())
+      joinResult.exit = this.getTransition(joinResult.exit, this.stepDuration(),
+        this.delay(joinResult.exit), this.exitEasingMode())
         .attr(endProjector);
 
       // now we can call the base class which will append the remove() to the end of the exit transition
-      return super.animate(selection, attrToAppliedProjector, drawingTarget);
+      super.animateJoin(joinResult, attrToAppliedProjector, drawer);
+    }
+    public animate(selection: d3.Selection<any>
+      , attrToAppliedProjector: AttributeToAppliedProjector): d3.Selection<any> | d3.Transition<any> {
+        // legacy format - there is no enter or exit to animate so just delegate to Base
+        return super.animate(selection, attrToAppliedProjector);
     }
     /**
      * Gets the attributes for entering elements. These are overlaid over

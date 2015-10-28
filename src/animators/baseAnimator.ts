@@ -50,28 +50,22 @@ module Plottable.Animators {
       return this.startDelay() + adjustedIterativeDelay * (Math.max(numberOfSteps - 1, 0)) + this.stepDuration();
     }
 
-    /**
-     * implementation of animate
-     */
-    public animate(selection: d3.Selection<any>
-      , attrToAppliedProjector: AttributeToAppliedProjector
-      , drawingTarget?: Drawers.DrawingTarget
-      , drawer?: Drawer): d3.Selection<any> | d3.Transition<any> {
-
-      let numberOfSteps = (<any>drawingTarget.merge)[0].length;
-      let adjustedIterativeDelay = this._getAdjustedIterativeDelay(numberOfSteps);
-
+    public animateJoin(joinResult: Drawers.JoinResult, attrToAppliedProjector: AttributeToAppliedProjector, drawer: Drawer): void {
       // set all the properties on the merge , save the transition returned
-      drawingTarget.merge = this.getTransition(drawingTarget.merge, this.stepDuration(),
-        (d: any, i: number) => this.startDelay() + adjustedIterativeDelay * i)
+      joinResult.merge = this.getTransition(joinResult.merge, this.stepDuration(),
+        this.delay(joinResult.merge))
         .attr(attrToAppliedProjector);
 
       // remove the exiting elements
-      drawingTarget.exit
+      joinResult.exit
         .remove();
-      return drawingTarget.merge;
     }
-
+    public animate(selection: d3.Selection<any>
+      , attrToAppliedProjector: AttributeToAppliedProjector): d3.Selection<any> | d3.Transition<any> {
+        // a selection or transition
+        return this.getTransition(selection, this.stepDuration(), this.delay(selection))
+          .attr(attrToAppliedProjector);
+    }
     /**
      * return a transition from the selection, with the requested duration
      * and (possibly) delay. As a convenience, this may return the selection itself
@@ -83,7 +77,7 @@ module Plottable.Animators {
      * @param { number? } delay The delay to apply to the transition. If creating a subtransition, this is ignored.
      * @param { EasingFunctionSpecifier } easing An easing function, or the name of a predefined d3 easing function
      * to use on the transition. If not supplied, the easingMode of the calling Animator is used.
-     * returns { any } The transition created, or , when duration = 0 the original selection is returned.
+     * @return { any } The transition created, or , when duration = 0 the original selection is returned.
      */
     protected getTransition(selection: d3.Selection<any>|d3.Transition<any>|d3.selection.Update<any>,
       duration: number, delay?: (d: any, i: number) => number, easing?: EasingFunctionSpecifier): any {
@@ -122,6 +116,7 @@ module Plottable.Animators {
      * @param {AttributeToAppliedProjector} attr1 The first set of attributes
      * @param {AttributeToAppliedProjector} attr2 The second set of attributes
      *
+     * @returns {AttributeToAppliedProjector}
      */
     protected mergeAttrs(attr1: AttributeToAppliedProjector, attr2: AttributeToAppliedProjector): AttributeToAppliedProjector {
       let a: AttributeToAppliedProjector = {};
@@ -150,6 +145,12 @@ module Plottable.Animators {
       return result;
     }
 
+    /**
+     * Return a delay function, using the current startDelay and stepDelay,
+     * potentially adjusted to fit within the maxTotalDuration
+     * @param selection selection on which the transition will be based
+     * @returns delay function that may be passed to a transition
+     */
     protected delay(selection: any): (d: any, i: number) => number {
       let numberOfSteps: number = selection[0].length;
       let adjustedIterativeDelay: number = this._getAdjustedIterativeDelay(numberOfSteps);
@@ -257,15 +258,16 @@ module Plottable.Animators {
      *
      * @returns {string} the current easing mode.
      */
-    public easingMode(): string;
+    public easingMode(): EasingFunctionSpecifier;
     /**
      * Sets the easing mode of the animation.
      *
-     * @param {string} easingMode The desired easing mode.
+     * @param {EasingFunctionSpecifier} easingMode The desired easing mode.
+     *   Can be any valid easing function, or the name of a d3 built-in easing function
      * @returns {Base} The calling Animator.
      */
-    public easingMode(easingMode: string): Base;
-    public easingMode(easingMode?: string): any {
+    public easingMode(easingMode: EasingFunctionSpecifier): Base;
+    public easingMode(easingMode?: EasingFunctionSpecifier): any {
       if (easingMode == null) {
         return this._easingMode;
       } else {

@@ -1239,10 +1239,12 @@ declare module Plottable {
             animator: Animator;
         };
         /**
-         * A DrawingTarget contains the selections that are the results of binding data.
-         * DrawingTarget is contructed by Drawer, and passed to animators to allow animation of each selection
+         * A JoinResult contains the enter, update and exit selections that are produced when
+         * joining data to a collection of elements using the d3 data() method
+         * (see http://bost.ocks.org/mike/join/ for detailed explanation)
+         * JoinResult is contructed by Drawer, and passed to animators to allow animation of each selection
          */
-        type DrawingTarget = {
+        type JoinResult = {
             enter: d3.Selection<any> | d3.Transition<any>;
             update: d3.selection.Update<any> | d3.Transition<any>;
             exit: d3.Selection<any> | d3.Transition<any>;
@@ -1254,7 +1256,7 @@ declare module Plottable {
         protected _svgElementName: string;
         protected _className: string;
         private _dataset;
-        private _drawingTarget;
+        private _joinResult;
         private _initializer;
         private _cachedSelectionValid;
         private _cachedSelection;
@@ -4076,29 +4078,77 @@ declare module Plottable.Plots {
         };
     }
 }
-declare module Plottable {
-    module Animators {
-        type d3SelectionOrTransition = d3.Selection<any> | d3.Transition<any>;
-        type EasingFunction = (t: number) => number;
-        type EasingFunctionSpecifier = string | EasingFunction;
-        class EasingFunctions {
-            static atStart: (t: number) => number;
-            static atEnd: (t: number) => number;
-            static squEase(easingFunction: EasingFunctionSpecifier, start: number, end: number): EasingFunction;
-        }
+declare module Plottable.Animators {
+    type d3SelectionOrTransition = d3.Selection<any> | d3.Transition<any>;
+    type EasingFunction = (t: number) => number;
+    type EasingFunctionSpecifier = string | EasingFunction;
+    /**
+     * Custom easing functions. these are designed to co-ordinate the timing of
+     * actvities on two or more transitions that are active simulataneously
+     * (on different selections)
+     * These are designed to help animators schedule animations between
+     * the enter, update and exit selections - each can have a transition of the same duration,
+     * but the actual timing of activity will be determined by the easing function.
+     */
+    class EasingFunctions {
+        /**
+         * atStart
+         * An EasingFunction that applies all attributes at once at the start of the transition;
+         * ie this creates a "wait" after applying the attributes.
+         */
+        static atStart: (t: number) => number;
+        /**
+         * atEnd
+         * An EasingFunction that applies all attributes at once at the end of the transition;
+         * ie this creates a "wait" before applying the attributes.
+         */
+        static atEnd: (t: number) => number;
+        /**
+         * squEase
+         * squEase ("squeezing ease") applies the transition squeezed into a subinterval [a,b] where 0 <= a <= b <= 1.
+         * The actual easing to apply in that interval is passed as an argument.
+         * @param easingFunction {EasingFunctionSpecifier} an easing function, or the string descriptor
+         * of a d3 built-in easing function ( as used by d3.ease())
+         * @param start {number} value between 0 and 1 at which the animation starts
+         * @param end  {end} value between start and 1 at which the animation ends
+         * Note that if start == end, the are applied instanteously at that point and the
+         * easingFunction parameter is not relevant. In particular start == end == 0 is the
+         * same as atStart
+         * @returns {EasingFunction} An easing function that can be applied to a d3 transition.
+         */
+        static squEase(easingFunction: EasingFunctionSpecifier, start: number, end: number): EasingFunction;
     }
+}
+declare module Plottable {
     interface Animator {
         /**
-         * Applies the supplied attributes to a d3.Selection with some animation.
+         * Applies attributes to the 'enter update exit' selections created when binding new data into
+         * the selection of DOM elements bound to the plot's current data (if any).
+         * (see http://bost.ocks.org/mike/join/)
+         * This method is invoked on the animator assigned to the plot by Drawer when drawing the plot data.
          *
-         * @param {d3.Selection} selection The update selection or transition selection that we wish to animate.
+         * @param {JoinResult} joinResult JoinResult object - its enter, update, exit
+         *     and merge (enter + update) properties provide access to the selections
+         *     created by the data join.
          * @param {AttributeToAppliedProjector} attrToAppliedProjector The set of
          *     AppliedProjectors that we will use to set attributes on the selection.
-         * @return {any} Animators should return the selection or
-         *     transition object so that plots may chain the transitions between
+         * @param {Drawer} drawer the calling Drawer.
+         * An animator that derives a transition from any property of joinResult must update that
+         * property with the resulting transition object.
+         * Animators are responsible for removing exiting elements by ensuring that remove() is called on joinResult.exit
+         */
+        animateJoin(joinResult: Drawers.JoinResult, attrToAppliedProjector: AttributeToAppliedProjector, drawer: Drawer): void;
+        /**
+         * Applies the supplied attributes to a specified d3.Selection with some animation.
+         * animate is not used internally by plottable - animateJoin is used when rendering data in a plot.
+         * @param {D3.Selection<any>} selection The update selection or transition selection that we wish to animate.
+         * @param {AttributeToAppliedProjector} attrToAppliedProjector The set of
+         *     AppliedProjectors that we will use to set attributes on the selection.
+         * @return {any} Animators can return the selection or
+         *     transition object so that the caller may chain the transitions between
          *     animators.
          */
-        animate(selection: d3.Selection<any> | d3.Transition<any>, attrToAppliedProjector: AttributeToAppliedProjector, drawingTarget?: Drawers.DrawingTarget, drawer?: Drawer): d3.Selection<any> | d3.Transition<any>;
+        animate(selection: d3.Selection<any>, attrToAppliedProjector: AttributeToAppliedProjector): d3.Selection<any> | d3.Transition<any>;
         /**
          * Given the number of elements, return the total time the animation requires
          *
@@ -4148,10 +4198,8 @@ declare module Plottable.Animators {
          */
         constructor();
         totalTime(numberOfSteps: number): number;
-        /**
-         * implementation of animate
-         */
-        animate(selection: d3.Selection<any>, attrToAppliedProjector: AttributeToAppliedProjector, drawingTarget?: Drawers.DrawingTarget, drawer?: Drawer): d3.Selection<any> | d3.Transition<any>;
+        animateJoin(joinResult: Drawers.JoinResult, attrToAppliedProjector: AttributeToAppliedProjector, drawer: Drawer): void;
+        animate(selection: d3.Selection<any>, attrToAppliedProjector: AttributeToAppliedProjector): d3.Selection<any> | d3.Transition<any>;
         /**
          * return a transition from the selection, with the requested duration
          * and (possibly) delay. As a convenience, this may return the selection itself
@@ -4163,7 +4211,7 @@ declare module Plottable.Animators {
          * @param { number? } delay The delay to apply to the transition. If creating a subtransition, this is ignored.
          * @param { EasingFunctionSpecifier } easing An easing function, or the name of a predefined d3 easing function
          * to use on the transition. If not supplied, the easingMode of the calling Animator is used.
-         * returns { any } The transition created, or , when duration = 0 the original selection is returned.
+         * @return { any } The transition created, or , when duration = 0 the original selection is returned.
          */
         protected getTransition(selection: d3.Selection<any> | d3.Transition<any> | d3.selection.Update<any>, duration: number, delay?: (d: any, i: number) => number, easing?: EasingFunctionSpecifier): any;
         /**
@@ -4181,6 +4229,12 @@ declare module Plottable.Animators {
          * @returns {AttributeToAppliedProjector} A new collection, compresing only thos attribuest listed in names[].
          */
         protected pluckAttrs(attr: AttributeToAppliedProjector, names: string[]): AttributeToAppliedProjector;
+        /**
+         * Return a delay function, using the current startDelay and stepDelay,
+         * potentially adjusted to fit within the maxTotalDuration
+         * @param selection selection on which the transition will be based
+         * @returns delay function that may be passed to a transition
+         */
         protected delay(selection: any): (d: any, i: number) => number;
         /**
          * Gets the start delay of the animation in milliseconds.
@@ -4247,14 +4301,15 @@ declare module Plottable.Animators {
          *
          * @returns {string} the current easing mode.
          */
-        easingMode(): string;
+        easingMode(): EasingFunctionSpecifier;
         /**
          * Sets the easing mode of the animation.
          *
-         * @param {string} easingMode The desired easing mode.
+         * @param {EasingFunctionSpecifier} easingMode The desired easing mode.
+         *   Can be any valid easing function, or the name of a d3 built-in easing function
          * @returns {Base} The calling Animator.
          */
-        easingMode(easingMode: string): Base;
+        easingMode(easingMode: EasingFunctionSpecifier): Base;
         /**
          * xScale -- a reference to the xScale used by the owning plot
          * the animator can use this to calculate positions
@@ -4295,7 +4350,8 @@ declare module Plottable.Animators {
         private _startAttrs;
         private _endAttrs;
         private _exitEasingMode;
-        animate(selection: d3.Selection<any>, attrToAppliedProjector: AttributeToAppliedProjector, drawingTarget?: Drawers.DrawingTarget): d3.Selection<any> | d3.Transition<any>;
+        animateJoin(joinResult: Drawers.JoinResult, attrToAppliedProjector: AttributeToAppliedProjector, drawer: Drawer): void;
+        animate(selection: d3.Selection<any>, attrToAppliedProjector: AttributeToAppliedProjector): d3.Selection<any> | d3.Transition<any>;
         /**
          * Gets the attributes for entering elements. These are overlaid over
          * the target atr and
@@ -4377,49 +4433,20 @@ declare module Plottable.Animators {
          * @returns {Bar} The calling Animator.
          */
         stageUpdate(stageUpdate: boolean): Bar;
-        animate(selection: d3.Selection<any>, attrToAppliedProjector: AttributeToAppliedProjector, drawingTarget?: Drawers.DrawingTarget): d3.Selection<any> | d3.Transition<any>;
+        /**
+         * animateJoin implementation
+         */
+        animateJoin(joinResult: Drawers.JoinResult, attrToAppliedProjector: AttributeToAppliedProjector, drawer: Drawer): void;
+        animate(selection: d3.Selection<any>, attrToAppliedProjector: AttributeToAppliedProjector): d3.Selection<any> | d3.Transition<any>;
     }
 }
-declare module Plottable {
-    module Animators {
-        /**
-         * Base for animators that animate specific attributes, such as Opacity, height... .
-         */
-        class Reset extends Base implements Animator {
-            private _startAttrs;
-            private _endAttrs;
-            animate(selection: d3.Selection<any>, attrToAppliedProjector: AttributeToAppliedProjector, drawingTarget?: Drawers.DrawingTarget, drawer?: Drawer): d3.Selection<any> | d3.Transition<any>;
-            /**
-             * Gets the attributes for entering elements. These are overlaid over
-             * the target atr and
-             * @returns {number} The current start delay.
-             */
-            startAttrs(): AttributeToAppliedProjector;
-            /**
-             * Sets the attributes for entering elements.
-             *
-             * @param {startAttrs} A collection of attribuets applied to entering elements.
-             * These are applied over the top of the attributes pass to the animate method
-             * Any attribute passed to startAttrs will transition to its final value
-             * @returns {Attr} The calling Attr Animator.
-             */
-            startAttrs(startAttrs: AttributeToAppliedProjector): Attr;
-            /**
-             * Gets the attributes for exiting elements.
-             * Exisitng elements will transition to these attribuest before being removed
-             * @returns {AttributeToAppliedProjector} The current exiting attributes.
-             */
-            endAttrs(): AttributeToAppliedProjector;
-            /**
-             * Sets the attributes for entering elements.
-             *
-             * @param {endAttrs} A collection of attribuets applied to entering elements.
-             * These are applied over the top of the attributes pass to the animate method
-             * Any attribute passed to endAttrs will transition to its final value
-             * @returns {Attr} The calling Attr Animator.
-             */
-            endAttrs(endAttrs: AttributeToAppliedProjector): Attr;
-        }
+declare module Plottable.Animators {
+    /**
+     * Base for animators that animate specific attributes, such as Opacity, height... .
+     */
+    class Reset extends Base implements Animator {
+        animateJoin(joinResult: Drawers.JoinResult, attrToAppliedProjector: AttributeToAppliedProjector, drawer: Drawer): void;
+        animate(selection: d3.Selection<any>, attrToAppliedProjector: AttributeToAppliedProjector): d3.Selection<any> | d3.Transition<any>;
     }
 }
 declare module Plottable.Animators {
@@ -4429,7 +4456,8 @@ declare module Plottable.Animators {
      */
     class Null implements Animator {
         totalTime(selection: any): number;
-        animate(selection: d3.Selection<any>, attrToAppliedProjector: AttributeToAppliedProjector, drawingTarget?: Drawers.DrawingTarget): d3.Selection<any> | d3.Transition<any>;
+        animateJoin(joinResult: Drawers.JoinResult, attrToAppliedProjector: AttributeToAppliedProjector, drawer: Drawer): void;
+        animate(selection: d3.Selection<any>, attrToAppliedProjector: AttributeToAppliedProjector): d3.Selection<any> | d3.Transition<any>;
     }
 }
 declare module Plottable.Animators {
@@ -4469,7 +4497,8 @@ declare module Plottable.Animators {
          */
         constructor();
         totalTime(numberOfSteps: number): number;
-        animate(selection: d3.Selection<any>, attrToAppliedProjector: AttributeToAppliedProjector, drawingTarget?: Drawers.DrawingTarget): d3.selection.Update<any> | d3.Transition<any>;
+        animateJoin(joinResult: Drawers.JoinResult, attrToAppliedProjector: AttributeToAppliedProjector, drawer: Drawer): void;
+        animate(selection: d3.Selection<any>, attrToAppliedProjector: AttributeToAppliedProjector): d3.Selection<any> | d3.Transition<any>;
         /**
          * Gets the start delay of the animation in milliseconds.
          *
@@ -4594,31 +4623,33 @@ declare module Plottable.Animators {
     }
 }
 declare module Plottable.Animators {
-    type AnimateCallback = (selection: d3.Selection<any>, attrToAppliedProjector: AttributeToAppliedProjector, drawingTarget?: Drawers.DrawingTarget, drawer?: Drawer) => d3.Selection<any> | d3.Transition<any>;
+    type AnimateJoinCallback = (joinResult: Drawers.JoinResult, attrToAppliedProjector: AttributeToAppliedProjector, drawer: Drawer) => void;
     /**
      * Allows the implementation of animate to be passed as a callback function
-     * Provides javascript clients build custom animations with full access to the drawing target
+     * Provides javascript clients that build custom animations
+     * with full access to the drawing target and properties of the Drawer (appliedIntializer)
      */
     class Callback extends Base implements Animator {
         private _callback;
         private _innerAnimator;
         constructor();
         /**
-         * animate implementation delegates to the callback
+         * animateJoin implementation delegates to the callback
          */
-        animate(selection: d3.Selection<any>, attrToAppliedProjector: AttributeToAppliedProjector, drawingTarget?: Drawers.DrawingTarget, drawer?: Drawer): d3.Selection<any> | d3.Transition<any>;
+        animateJoin(joinResult: Drawers.JoinResult, attrToAppliedProjector: AttributeToAppliedProjector, drawer: Drawer): void;
+        animate(selection: d3.Selection<any>, attrToAppliedProjector: AttributeToAppliedProjector): d3.Selection<any> | d3.Transition<any>;
         /**
          * Gets the callback animate function.
          * @returns {Callback} The calling Callback Animator.
          */
-        callback(): AnimateCallback;
+        callback(): AnimateJoinCallback;
         /**
          * Sets the attributes for entering elements.
          *
          * @param {AnimateCallback} a function implementing Animator.animate
          * @returns {Callback} The calling Callback Animator.
          */
-        callback(callback: AnimateCallback): Callback;
+        callback(callback: AnimateJoinCallback): Callback;
         /**
          * Gets an inner animator.
          * callback functions have access to this animator, so callbacks may be designed to
@@ -4629,11 +4660,11 @@ declare module Plottable.Animators {
         /**
          * Sets the attributes for entering elements.
          *
-         * @param {Animator} a function implementing Animator.animate
-         * @returns {Callback} The calling innerAnimator Animator.
+         * @param {Animator} an Animator
+         * @returns {Callback} The calling Animator.
          */
         innerAnimator(innerAnimator: Animator): Attr;
-        InnerAnimate(selection: d3.Selection<any>, attrToAppliedProjector: AttributeToAppliedProjector, drawingTarget?: Drawers.DrawingTarget, drawer?: Drawer): d3.Selection<any> | d3.Transition<any>;
+        innerAnimate(joinResult: Drawers.JoinResult, attrToAppliedProjector: AttributeToAppliedProjector, drawer: Drawer): void;
     }
 }
 declare module Plottable {

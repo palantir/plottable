@@ -53,9 +53,10 @@
         return this;
       }
     }
-    public animate(selection: d3.Selection<any>,
-      attrToAppliedProjector: AttributeToAppliedProjector,
-      drawingTarget?: Drawers.DrawingTarget): d3.Selection<any> | d3.Transition<any> {
+    /**
+     * animateJoin implementation
+     */
+    public animateJoin(joinResult: Drawers.JoinResult, attrToAppliedProjector: AttributeToAppliedProjector, drawer: Drawer): void {
       let yScale = this.yScale();
 
       // a projector to set bar height and y-origin to 0
@@ -79,9 +80,9 @@
       });
 
       // decide which steps are needed
-      let exitStageOn: number = (drawingTarget.exit.size() > 0 ? 1 : 0);
-      let updateStageOn: number = (drawingTarget.update.size() > 0 ? 1 : 0);
-      let enterStageOn: number = (drawingTarget.enter.size() > 0 ? 1 : 0);
+      let exitStageOn: number = (joinResult.exit.size() > 0 ? 1 : 0);
+      let updateStageOn: number = (joinResult.update.size() > 0 ? 1 : 0);
+      let enterStageOn: number = (joinResult.enter.size() > 0 ? 1 : 0);
 
       let stepOn = [exitStageOn, updateStageOn, updateStageOn, updateStageOn, updateStageOn, enterStageOn];
 
@@ -100,47 +101,50 @@
       let squeezer = Plottable.Animators.EasingFunctions.squEase("linear-in-out", 0, this.rhythm());
       // Exit processing
       // STEP 0: Transition the bar height  to 0 (taking care to adjust the y origin), when done, remove
-      drawingTarget.exit = this.getTransition(drawingTarget.exit, stepDurations[0], undefined, squeezer)
+      joinResult.exit = this.getTransition(joinResult.exit, stepDurations[0], undefined, squeezer)
         .attr(zeroProj)
         .remove();
 
       // Update processing
       // update waits for the exit to finish with an empty transition
-      drawingTarget.update = this.getTransition(drawingTarget.update, stepDurations[0]);
+      joinResult.update = this.getTransition(joinResult.update, stepDurations[0]);
       // STEP 1: extract height and y from the attrToAppliedProjector - these two are applied first
       let heightProj: AttributeToAppliedProjector = this.pluckAttrs(attrToAppliedProjector, ["height", "y"]);
-      drawingTarget.update = this.getTransition(drawingTarget.update, stepDurations[1], undefined, squeezer)
+      joinResult.update = this.getTransition(joinResult.update, stepDurations[1], undefined, squeezer)
         .attr(heightProj);
       // STEP 2: quickly fade before the next step - to reduce "occlusion" as bars move across each other
       // and so make visual tracking easier
-      drawingTarget.update = this.getTransition(drawingTarget.update, stepDurations[2])
+      joinResult.update = this.getTransition(joinResult.update, stepDurations[2])
           .attr({ "opacity": .6 });
 
       // STEP 3: apply all the remaining attributes, while maintaining the reduced opacity
       let proj3: AttributeToAppliedProjector = this.mergeAttrs(attrToAppliedProjector, { "opacity": () => { return .6; } });
-      drawingTarget.update = this.getTransition(drawingTarget.update, stepDurations[3], undefined, squeezer)
+      joinResult.update = this.getTransition(joinResult.update, stepDurations[3], undefined, squeezer)
         .attr(proj3);
 
       // STEP 4: quickly apply all the remaining attributes, including opacity - restores opacity to the required value
       // don;t use the squeeze on this transition
-      drawingTarget.update = this.getTransition(drawingTarget.update, stepDurations[4])
+      joinResult.update = this.getTransition(joinResult.update, stepDurations[4])
         .attr(attrToAppliedProjector);
 
       // Enter
       // initialise the entering elements - all the target attributes are applied, but height and y are overridden to 0
       let enterInitProj: AttributeToAppliedProjector = this.mergeAttrs(attrToAppliedProjector, zeroProj);
-      (<d3.Selection<any>>drawingTarget.enter)
+      (<d3.Selection<any>>joinResult.enter)
         .attr(enterInitProj);
 
       // wait for the Exit and Update to finish - steps 0 to 4
-      drawingTarget.enter = this.getTransition(drawingTarget.enter, enterStepDelay);
+      joinResult.enter = this.getTransition(joinResult.enter, enterStepDelay);
       // STEP 5: apply all attributes to the enter selection - this will transition height and y back to their final values
       // the squeeze is applied to keep a constant rhythm, even though this leaves a "wait" at the end of the transition
-      drawingTarget.enter = this.getTransition(drawingTarget.enter, stepDurations[5], undefined, squeezer )
+      joinResult.enter = this.getTransition(joinResult.enter, stepDurations[5], undefined, squeezer )
         .attr(attrToAppliedProjector);
+    }
 
-      // return the merge selection
-      return drawingTarget.merge;
+    public animate(selection: d3.Selection<any>
+      , attrToAppliedProjector: AttributeToAppliedProjector): d3.Selection<any> | d3.Transition<any> {
+      // legacy format - there is no enter or exit to animate so just delegate to Base
+      return super.animate(selection, attrToAppliedProjector);
     }
   }
 }

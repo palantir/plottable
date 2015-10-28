@@ -1,43 +1,46 @@
 ﻿module Plottable.Animators {
-  export type AnimateCallback = (selection: d3.Selection<any>
+  export type AnimateJoinCallback = (joinResult: Drawers.JoinResult
     , attrToAppliedProjector: AttributeToAppliedProjector
-    , drawingTarget?: Drawers.DrawingTarget
-    , drawer?: Drawer) => d3.Selection<any> | d3.Transition<any>;
+    , drawer: Drawer) => void;
   /**
    * Allows the implementation of animate to be passed as a callback function
-   * Provides javascript clients build custom animations with full access to the drawing target
+   * Provides javascript clients that build custom animations
+   * with full access to the drawing target and properties of the Drawer (appliedIntializer)
    */
   export class Callback extends Base implements Animator {
-    private _callback: AnimateCallback = (selection: d3.Selection<any>,
-      attrToAppliedProjector: AttributeToAppliedProjector
-      , drawingTarget?: Drawers.DrawingTarget) => { return drawingTarget.merge; };
+    private _callback: AnimateJoinCallback = (joinResult: Drawers.JoinResult
+      , attrToAppliedProjector: AttributeToAppliedProjector
+      , drawer: Drawer) => { return; };
     private _innerAnimator: Animator;
 
     constructor() {
       super();
     }
     /**
-     * animate implementation delegates to the callback
+     * animateJoin implementation delegates to the callback
      */
+    public animateJoin(joinResult: Drawers.JoinResult, attrToAppliedProjector: AttributeToAppliedProjector, drawer: Drawer): void {
+      this.callback().call(this, joinResult, attrToAppliedProjector, drawer);
+    }
+
+    // delegate to base in legacy case
     public animate(selection: d3.Selection<any>
-      , attrToAppliedProjector: AttributeToAppliedProjector
-      , drawingTarget?: Drawers.DrawingTarget
-      , drawer?: Drawer): d3.Selection<any> | d3.Transition<any> {
-        return this.callback().call(this, selection, attrToAppliedProjector, drawingTarget, drawer);
+      , attrToAppliedProjector: AttributeToAppliedProjector): d3.Selection<any> | d3.Transition<any> {
+      return super.animate(selection, attrToAppliedProjector);
     }
     /**
      * Gets the callback animate function.
      * @returns {Callback} The calling Callback Animator.
      */
-    public callback(): AnimateCallback;
+    public callback(): AnimateJoinCallback;
     /**
      * Sets the attributes for entering elements.
      *
      * @param {AnimateCallback} a function implementing Animator.animate
      * @returns {Callback} The calling Callback Animator.
      */
-    public callback(callback: AnimateCallback): Callback;
-    public callback(callback?: AnimateCallback): any {
+    public callback(callback: AnimateJoinCallback): Callback;
+    public callback(callback?: AnimateJoinCallback): any {
       if (callback == null) {
         return this._callback;
       } else {
@@ -55,8 +58,8 @@
     /**
      * Sets the attributes for entering elements.
      *
-     * @param {Animator} a function implementing Animator.animate
-     * @returns {Callback} The calling innerAnimator Animator.
+     * @param {Animator} an Animator
+     * @returns {Callback} The calling Animator.
      */
     public innerAnimator(innerAnimator: Animator): Attr;
     public innerAnimator(innerAnimator?: Animator): any {
@@ -68,15 +71,14 @@
       }
     }
 
-    public InnerAnimate(selection: d3.Selection<any>
+    public innerAnimate(joinResult: Drawers.JoinResult
       , attrToAppliedProjector: AttributeToAppliedProjector
-      , drawingTarget?: Drawers.DrawingTarget
-      , drawer?: Drawer): d3.Selection<any> | d3.Transition < any > {
+      , drawer: Drawer): void {
 
       if (this.innerAnimator) {
-        return this.innerAnimator().animate(selection, attrToAppliedProjector, drawingTarget, drawer);
+        return this.innerAnimator().animateJoin(joinResult, attrToAppliedProjector, drawer);
       } else {
-        return super.animate(selection, attrToAppliedProjector, drawingTarget, drawer);
+        return super.animateJoin(joinResult, attrToAppliedProjector, drawer);
       }
     }
   }
