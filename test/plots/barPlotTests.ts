@@ -96,9 +96,6 @@ describe("Plots", () => {
           assert.doesNotThrow(() => barPlot.renderTo(svg), Error);
           assert.strictEqual(barPlot.width(), TestMethods.numAttr(svg, "width"), "was allocated width");
           assert.strictEqual(barPlot.height(), TestMethods.numAttr(svg, "height"), "was allocated height");
-
-          barPlot.destroy();
-          svg.remove();
         });
 
         it("draws bars and baseline in correct positions", () => {
@@ -106,9 +103,6 @@ describe("Plots", () => {
           barPlot.renderTo(svg);
 
           assertCorrectRendering();
-
-          barPlot.destroy();
-          svg.remove();
         });
 
         it("rerenders correctly when the baseline value is changed", () => {
@@ -117,9 +111,6 @@ describe("Plots", () => {
 
           barPlot.baselineValue(1);
           assertCorrectRendering();
-
-          barPlot.destroy();
-          svg.remove();
         });
 
         it("can autorange value scale based on visible points on base scale", () => {
@@ -135,9 +126,6 @@ describe("Plots", () => {
           const expectedValueDomainMax = Math.max(data[0].value, data[1].value);
           assert.strictEqual(valueScaleDomain[0], expectedValueDomainMin, "lower bound of domain set based on visible points");
           assert.strictEqual(valueScaleDomain[1], expectedValueDomainMax, "upper bound of domain set based on visible points");
-
-          barPlot.destroy();
-          svg.remove();
         });
 
         it("doesn't show values from outside the base scale's domain", () => {
@@ -146,9 +134,13 @@ describe("Plots", () => {
           barPlot.renderTo(svg);
 
           assert.strictEqual(barPlot.content().selectAll("rect").size(), 0, "draws no bars when the domain contains no data points");
+        });
 
-          barPlot.destroy();
-          svg.remove();
+        afterEach(function() {
+          if (this.currentTest.state === "passed") {
+            barPlot.destroy();
+            svg.remove();
+          }
         });
       });
 
@@ -187,6 +179,13 @@ describe("Plots", () => {
             it("computes a sensible width when given repeated data", () => {});
 
             it("computes a sensible width when given unsorted data", () => {});
+
+            afterEach(function() {
+              if (this.currentTest.state === "passed") {
+                barPlot.destroy();
+                svg.remove();
+              }
+            });
           });
         });
       });
