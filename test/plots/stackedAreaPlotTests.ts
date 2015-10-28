@@ -299,9 +299,9 @@ describe("Plots", () => {
         assert.closeTo(areaYs0[0], yScale.scale(<any> data0[0].y), window.Pixel_CloseTo_Requirement,
           "dataset0 should have no offset");
         assert.closeTo(areaYs1[0], yScale.scale(<any> data0[0].y), window.Pixel_CloseTo_Requirement,
-          "dataset1 should be offset with dataset0");
+          "dataset1 should be offset with previous datasets");
         assert.closeTo(areaYs2[0], yScale.scale(data2[0].y + parseInt(<any> data0[0].y, 10)), window.Pixel_CloseTo_Requirement,
-          "dataset2 should be offset with only dataset0");
+          "dataset2 should be offset with previous datasets");
         plot.destroy();
         svg.remove();
       });
