@@ -295,6 +295,116 @@ describe("Plots", () => {
           });
         });
       });
+
+      describe(`labels when ${orientation}`, () => {
+        const data = [
+          { base: -4, value: -4 },
+          { base: -2, value: -0.1},
+          { base: 0, value: 0 },
+          { base: 2, value: 0.1 },
+          { base: 4, value: 4 }
+        ];
+        const DEFAULT_DOMAIN = [-5, 5];
+
+        let svg: d3.Selection<void>;
+        let baseScale: Plottable.Scales.Linear;
+        let valueScale: Plottable.Scales.Linear;
+        let barPlot: Plottable.Plots.Bar<number, number>;
+        let dataset: Plottable.Dataset;
+
+        beforeEach(() => {
+          svg = TestMethods.generateSVG();
+          barPlot = new Plottable.Plots.Bar<number, number>(orientation);
+          baseScale = new Plottable.Scales.Linear();
+          baseScale.domain(DEFAULT_DOMAIN);
+          valueScale = new Plottable.Scales.Linear();
+          valueScale.domain(DEFAULT_DOMAIN);
+          if (orientation === Plottable.Plots.Bar.ORIENTATION_VERTICAL) {
+            barPlot.x((d: any) => d.base, baseScale);
+            barPlot.y((d: any) => d.value, valueScale);
+          } else {
+            barPlot.y((d: any) => d.base, baseScale);
+            barPlot.x((d: any) => d.value, valueScale);
+          }
+          dataset = new Plottable.Dataset(data);
+          barPlot.addDataset(dataset);
+          barPlot.renderTo(svg);
+        });
+
+        function getCenterOfText(textNode: SVGElement) {
+          const plotBoundingClientRect = (<SVGElement> barPlot.background().node()).getBoundingClientRect();
+          const labelBoundingClientRect = textNode.getBoundingClientRect();
+
+          return {
+            x: (labelBoundingClientRect.left + labelBoundingClientRect.right) / 2 - plotBoundingClientRect.left,
+            y: (labelBoundingClientRect.top + labelBoundingClientRect.bottom) / 2 - plotBoundingClientRect.top
+          };
+        };
+
+        it("does not show labels by default", () => {
+          const texts = barPlot.content().selectAll("text");
+          assert.strictEqual(texts.size(), 0, "by default, no texts are drawn");
+        });
+
+        it("draws one label per datum", () => {
+          barPlot.labelsEnabled(true);
+          barPlot.labelsEnabled(true);
+          const texts = barPlot.content().selectAll("text");
+          assert.strictEqual(texts.size(), data.length, "one label drawn per datum");
+          texts.each(function(d, i) {
+            assert.strictEqual(d3.select(this).text(), data[i].value.toString(), `by default, label text is the bar's value (index ${i})`);
+          });
+        });
+
+        it("hides the labels if bars are too thin to show them", () => {
+          svg.attr(baseSizeAttr, TestMethods.numAttr(svg, baseSizeAttr) / 10);
+          barPlot.redraw();
+          barPlot.labelsEnabled(true);
+
+          const texts = barPlot.content().selectAll("text");
+          assert.strictEqual(texts.size(), 0, "no labels drawn");
+        });
+
+        it("can apply a formatter to the labels", () => {
+          barPlot.labelsEnabled(true);
+          const formatter = (n: number) => `${n}%`;
+          barPlot.labelFormatter(formatter);
+
+          const texts = barPlot.content().selectAll("text");
+          assert.strictEqual(texts.size(), data.length, "one label drawn per datum");
+          const expectedTexts = data.map((d) => formatter(d.value));
+          texts.each(function(d, i) {
+            assert.strictEqual(d3.select(this).text(), expectedTexts[i], `formatter is applied to the displayed value (index ${i})`);
+          });
+        });
+
+        it("shows labels inside or outside the bar as appropriate", () => {
+          barPlot.labelsEnabled(true);
+
+          const labels = barPlot.content().selectAll(".on-bar-label, .off-bar-label");
+          assert.strictEqual(labels.size(), data.length, "one label drawn per datum");
+
+          const bars = barPlot.content().select(".bar-area").selectAll("rect");
+          labels.each((d, i) => {
+            const labelBoundingClientRect = <any> (<SVGElement> labels[0][i]).getBoundingClientRect();
+            const barBoundingClientRect = <any> (<SVGElement> bars[0][i]).getBoundingClientRect();
+            if (labelBoundingClientRect[valueSizeAttr] > barBoundingClientRect[valueSizeAttr]) {
+              assert.isTrue(d3.select(labels[0][i]).classed("off-bar-label"),
+                `label with index ${i} doesn't fit and carries the off-bar class`);
+            } else {
+              assert.isTrue(d3.select(labels[0][i]).classed("on-bar-label"),
+                `label with index ${i} fits and carries the on-bar class`);
+            }
+          });
+        });
+
+        afterEach(function() {
+          if (this.currentTest.state === "passed") {
+            barPlot.destroy();
+            svg.remove();
+          }
+        });
+      });
     });
 
     // HACKHACK #1798: beforeEach being used below
@@ -769,28 +879,6 @@ describe("Plots", () => {
         barPlot.renderTo(svg);
       });
 
-      it("shows labels inside or outside the bar as appropriate", () => {
-        barPlot.renderTo(svg);
-
-        let labels = barPlot.content().selectAll(".on-bar-label, .off-bar-label");
-        assert.strictEqual(labels.size(), dataset.data().length, "one label drawn per datum");
-
-        let bars = barPlot.content().select(".bar-area").selectAll("rect");
-        labels.each((d, i) => {
-          let labelBoundingClientRect = (<SVGElement> labels[0][i]).getBoundingClientRect();
-          let barBoundingClientRect = (<SVGElement> bars[0][i]).getBoundingClientRect();
-          if (labelBoundingClientRect.width > barBoundingClientRect.width) {
-            assert.isTrue(d3.select(labels[0][i]).classed("off-bar-label"),
-              `label with index ${i} doesn't fit and carries the off-bar class`);
-          } else {
-            assert.isTrue(d3.select(labels[0][i]).classed("on-bar-label"),
-              `label with index ${i} fits and carries the on-bar class`);
-          }
-        });
-
-        svg.remove();
-      });
-
       it("hides labels cut off by the right edge", () => {
         barPlot.labelsEnabled(true);
         let labels = barPlot.content().selectAll(".on-bar-label, .off-bar-label");
@@ -959,71 +1047,6 @@ describe("Plots", () => {
         barPlot.x((d) => d.x, xScale);
         barPlot.y((d) => d.y, yScale);
         barPlot.renderTo(svg);
-      });
-
-      it("bar labels disabled by default", () => {
-        barPlot.renderTo(svg);
-        let texts = barPlot.content().selectAll("text");
-        assert.strictEqual(texts.size(), 0, "by default, no texts are drawn");
-        svg.remove();
-      });
-
-      it("bar labels render properly", () => {
-        barPlot.renderTo(svg);
-        barPlot.labelsEnabled(true);
-        let texts = barPlot.content().selectAll("text");
-        let data = dataset.data();
-        assert.strictEqual(texts.size(), data.length, "one label drawn per datum");
-        texts.each(function(d, i) {
-          assert.strictEqual(d3.select(this).text(), data[i].y.toString(), `by default, label text is the bar's value (index ${i})`);
-        });
-        svg.remove();
-      });
-
-      it("bar labels hide if bars too skinny", () => {
-        svg.attr("width", 100);
-        barPlot.labelsEnabled(true);
-        barPlot.renderTo(svg);
-        let texts = barPlot.content().selectAll("text");
-        assert.strictEqual(texts.size(), 0, "no labels drawn");
-        svg.remove();
-      });
-
-      it("formatters are used properly", () => {
-        barPlot.labelsEnabled(true);
-        let formatter = (n: number) => `${n}%`;
-        barPlot.labelFormatter(formatter);
-        barPlot.renderTo(svg);
-        let texts = barPlot.content().selectAll("text");
-        assert.strictEqual(texts.size(), dataset.data().length, "one label drawn per datum");
-        let expectedTexts = dataset.data().map((d) => formatter(d.y));
-        texts.each(function(d, i) {
-          assert.strictEqual(d3.select(this).text(), expectedTexts[i], `formatter is applied to the displayed value (index ${i})`);
-        });
-        svg.remove();
-      });
-
-      it("shows labels inside or outside the bar as appropriate", () => {
-        barPlot.labelsEnabled(true);
-        barPlot.renderTo(svg);
-
-        let labels = barPlot.content().selectAll(".on-bar-label, .off-bar-label");
-        assert.strictEqual(labels.size(), dataset.data().length, "one label drawn per datum");
-
-        let bars = barPlot.content().select(".bar-area").selectAll("rect");
-        labels.each((d, i) => {
-          let labelBoundingClientRect = (<SVGElement> labels[0][i]).getBoundingClientRect();
-          let barBoundingClientRect = (<SVGElement> bars[0][i]).getBoundingClientRect();
-          if (labelBoundingClientRect.height > barBoundingClientRect.height) {
-            assert.isTrue(d3.select(labels[0][i]).classed("off-bar-label"),
-              `label with index ${i} doesn't fit and carries the off-bar class`);
-          } else {
-            assert.isTrue(d3.select(labels[0][i]).classed("on-bar-label"),
-              `label with index ${i} fits and carries the on-bar class`);
-          }
-        });
-
-        svg.remove();
       });
 
       it("shows labels for bars with value = baseline on the \"positive\" side of the baseline", () => {
