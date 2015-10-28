@@ -2,14 +2,6 @@
 
 describe("Axes", () => {
   describe("NumericAxis", () => {
-    function boxIsInside(inner: ClientRect, outer: ClientRect, epsilon = 0) {
-      if (inner.left < outer.left - epsilon) { return false; }
-      if (inner.right > outer.right + epsilon) { return false; }
-      if (inner.top < outer.top - epsilon) { return false; }
-      if (inner.bottom > outer.bottom + epsilon) { return false; }
-      return true;
-    }
-
     function assertBoxInside(inner: ClientRect, outer: ClientRect, epsilon = 0, message = "") {
       assert.operator(inner.left, ">", outer.left - epsilon, message + " (box inside (left))");
       assert.operator(inner.right, "<", outer.right + epsilon, message + " (box inside (right))");
@@ -257,7 +249,7 @@ describe("Axes", () => {
         let boundingBox = (<Element> svg.select(".axis").select(".bounding-box").node()).getBoundingClientRect();
         visibleTickLabels.each(function(d, i) {
           let visibleTickLabelRect = this.getBoundingClientRect();
-          assert.isTrue(boxIsInside(visibleTickLabelRect, boundingBox, 0.5), `tick label ${i} is inside the bounding box`);
+          assertBoxInside(visibleTickLabelRect, boundingBox, 0.5, `tick label ${i} is inside the bounding box`);
         });
 
         svg.remove();
