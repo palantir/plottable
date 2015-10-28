@@ -10647,9 +10647,9 @@ var Plottable;
                 }
             };
             /**
-             * animate implementation
+             * animateJoin implementation
              */
-            Bar.prototype.animate = function (joinResult, attrToAppliedProjector) {
+            Bar.prototype.animateJoin = function (joinResult, attrToAppliedProjector, drawer) {
                 var _this = this;
                 var yScale = this.yScale();
                 // a projector to set bar height and y-origin to 0
@@ -10724,8 +10724,10 @@ var Plottable;
                 // the squeeze is applied to keep a constant rhythm, even though this leaves a "wait" at the end of the transition
                 joinResult.enter = this.getTransition(joinResult.enter, stepDurations[5], undefined, squeezer)
                     .attr(attrToAppliedProjector);
-                // return the merge selection
-                return joinResult.merge;
+            };
+            Bar.prototype.animate = function (selection, attrToAppliedProjector) {
+                // legacy format - there is no enter or exit to animate so just delegate to Base
+                return _super.prototype.animate.call(this, selection, attrToAppliedProjector);
             };
             return Bar;
         })(Animators.Attr);
@@ -10983,8 +10985,9 @@ var Plottable;
             Callback.prototype.animateJoin = function (joinResult, attrToAppliedProjector, drawer) {
                 this.callback().call(this, joinResult, attrToAppliedProjector, drawer);
             };
-            Callback.prototype.animate = function (joinResult, attrToAppliedProjector, drawer) {
-                return;
+            // delegate to base in legacy case
+            Callback.prototype.animate = function (selection, attrToAppliedProjector) {
+                return _super.prototype.animate.call(this, selection, attrToAppliedProjector);
             };
             Callback.prototype.callback = function (callback) {
                 if (callback == null) {

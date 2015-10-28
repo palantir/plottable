@@ -22,11 +22,11 @@
     public animateJoin(joinResult: Drawers.JoinResult, attrToAppliedProjector: AttributeToAppliedProjector, drawer: Drawer): void {
       this.callback().call(this, joinResult, attrToAppliedProjector, drawer);
     }
-    public animate(selection: d3.Selection<any>
-      , attrToAppliedProjector: AttributeToAppliedProjector): d3.Selection<any> | d3.Transition<any>;
 
-    public animate(joinResult: any, attrToAppliedProjector: AttributeToAppliedProjector, drawer?: Drawer): any {
-        return ;
+    // delegate to base in legacy case
+    public animate(selection: d3.Selection<any>
+      , attrToAppliedProjector: AttributeToAppliedProjector): d3.Selection<any> | d3.Transition<any> {
+      return super.animate(selection, attrToAppliedProjector);
     }
     /**
      * Gets the callback animate function.

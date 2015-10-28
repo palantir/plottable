@@ -53,13 +53,10 @@
         return this;
       }
     }
-    public animate(joinResult: Drawers.JoinResult, attrToAppliedProjector: AttributeToAppliedProjector, drawer: Drawer): void;
-    public animate(selection: d3.Selection<any>
-      , attrToAppliedProjector: AttributeToAppliedProjector): d3.Selection<any> | d3.Transition<any>;
     /**
-     * animate implementation
+     * animateJoin implementation
      */
-    public animate(joinResult: any, attrToAppliedProjector: AttributeToAppliedProjector): any {
+    public animateJoin(joinResult: Drawers.JoinResult, attrToAppliedProjector: AttributeToAppliedProjector, drawer: Drawer): void {
       let yScale = this.yScale();
 
       // a projector to set bar height and y-origin to 0
@@ -142,9 +139,12 @@
       // the squeeze is applied to keep a constant rhythm, even though this leaves a "wait" at the end of the transition
       joinResult.enter = this.getTransition(joinResult.enter, stepDurations[5], undefined, squeezer )
         .attr(attrToAppliedProjector);
+    }
 
-      // return the merge selection
-      return joinResult.merge;
+    public animate(selection: d3.Selection<any>
+      , attrToAppliedProjector: AttributeToAppliedProjector): d3.Selection<any> | d3.Transition<any> {
+      // legacy format - there is no enter or exit to animate so just delegate to Base
+      return super.animate(selection, attrToAppliedProjector);
     }
   }
 }

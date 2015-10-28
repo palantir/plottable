@@ -4301,14 +4301,15 @@ declare module Plottable.Animators {
          *
          * @returns {string} the current easing mode.
          */
-        easingMode(): string;
+        easingMode(): EasingFunctionSpecifier;
         /**
          * Sets the easing mode of the animation.
          *
-         * @param {string} easingMode The desired easing mode.
+         * @param {EasingFunctionSpecifier} easingMode The desired easing mode.
+         *   Can be any valid easing function, or the name of a d3 built-in easing function
          * @returns {Base} The calling Animator.
          */
-        easingMode(easingMode: string): Base;
+        easingMode(easingMode: EasingFunctionSpecifier): Base;
         /**
          * xScale -- a reference to the xScale used by the owning plot
          * the animator can use this to calculate positions
@@ -4432,7 +4433,10 @@ declare module Plottable.Animators {
          * @returns {Bar} The calling Animator.
          */
         stageUpdate(stageUpdate: boolean): Bar;
-        animate(joinResult: Drawers.JoinResult, attrToAppliedProjector: AttributeToAppliedProjector, drawer: Drawer): void;
+        /**
+         * animateJoin implementation
+         */
+        animateJoin(joinResult: Drawers.JoinResult, attrToAppliedProjector: AttributeToAppliedProjector, drawer: Drawer): void;
         animate(selection: d3.Selection<any>, attrToAppliedProjector: AttributeToAppliedProjector): d3.Selection<any> | d3.Transition<any>;
     }
 }
