@@ -520,6 +520,56 @@ describe("Plots", () => {
           }
         });
       });
+
+      describe(`retrieving Entities when ${orientation}`, () => {
+        const data = [
+          { base: "A", value: 1 },
+          { base: "B", value: 0 },
+          { base: "C", value: -1 }
+        ];
+
+        let svg: d3.Selection<void>;
+        let barPlot: Plottable.Plots.Bar<string | number, number | string>;
+        let baseScale: Plottable.Scales.Category;
+        let valueScale: Plottable.Scales.Linear;
+        let dataset: Plottable.Dataset;
+
+        beforeEach(() => {
+          svg = TestMethods.generateSVG();
+          barPlot = new Plottable.Plots.Bar<string | number, number | string>(orientation);
+          baseScale = new Plottable.Scales.Category();
+          valueScale = new Plottable.Scales.Linear();
+          if (orientation === Plottable.Plots.Bar.ORIENTATION_VERTICAL) {
+            barPlot.x((d: any) => d.base, baseScale);
+            barPlot.y((d: any) => d.value, valueScale);
+          } else {
+            barPlot.y((d: any) => d.base, baseScale);
+            barPlot.x((d: any) => d.value, valueScale);
+          }
+          dataset = new Plottable.Dataset(data);
+          barPlot.addDataset(dataset);
+          barPlot.renderTo(svg);
+        });
+
+        it("returns the correct position for each Entity", () => {
+          const entities = barPlot.entities();
+          entities.forEach((entity, index) => {
+            const xBinding = barPlot.x();
+            const yBinding = barPlot.y();
+            const scaledDataX = xBinding.scale.scale(xBinding.accessor(entity.datum, index, dataset));
+            const scaledDataY = yBinding.scale.scale(yBinding.accessor(entity.datum, index, dataset));
+            assert.strictEqual(scaledDataX, entity.position.x, "entities().position.x is equal to scaled x value");
+            assert.strictEqual(scaledDataY, entity.position.y, "entities().position.y is equal to scaled y value");
+          });
+        });
+
+        afterEach(function() {
+          if (this.currentTest.state === "passed") {
+            barPlot.destroy();
+            svg.remove();
+          }
+        });
+      });
     });
 
     // HACKHACK #1798: beforeEach being used below
@@ -677,36 +727,6 @@ describe("Plots", () => {
         svg.remove();
       });
 
-      describe("entities()", () => {
-        describe("position", () => {
-          it("entities() pixel points corrected for negative-valued bars", () => {
-            let entities = barPlot.entities();
-            entities.forEach((entity) => {
-              let barSelection = entity.selection;
-              let pixelPointY = entity.position.y;
-              if (entity.datum.y < 0) {
-                assert.strictEqual(pixelPointY, +barSelection.attr("y") + +barSelection.attr("height"), "negative on bottom");
-              } else {
-                assert.strictEqual(pixelPointY, +barSelection.attr("y"), "positive on top");
-              }
-            });
-            svg.remove();
-          });
-
-          it("entities().position returns the position of data point", () => {
-            let entities = barPlot.entities();
-            entities.forEach((entity) => {
-              let dataX = barPlot.x().scale.scale(entity.datum.x);
-              let dataY = barPlot.y().scale.scale(entity.datum.y);
-              assert.strictEqual(dataX, entity.position.x, "entities().position.x should equal to scaled x value");
-              assert.strictEqual(dataY, entity.position.y, "entities().position.y should equal to scaled y value");
-            });
-            svg.remove();
-          });
-        });
-
-      });
-
       describe("entityNearest()", () => {
         let bars: d3.Selection<void>;
         let zeroY: number;
@@ -843,26 +863,6 @@ describe("Plots", () => {
         assert.closeTo(TestMethods.numAttr(bar0, "y"), yScale.scale(bar0y) - TestMethods.numAttr(bar0, "height") / 2, 0.01, "bar0 ypos");
         assert.closeTo(TestMethods.numAttr(bar1, "y"), yScale.scale(bar1y) - TestMethods.numAttr(bar1, "height") / 2, 0.01, "bar1 ypos");
         svg.remove();
-      });
-
-      describe("entities()", () => {
-        describe("position", () => {
-          it("entities() pixel points corrected for negative-valued bars", () => {
-            let entities = barPlot.entities();
-            entities.forEach((entity) => {
-              let barSelection = entity.selection;
-              let pixelPointX = entity.position.x;
-              if (entity.datum.x < 0) {
-                assert.strictEqual(pixelPointX, +barSelection.attr("x"), "negative on left");
-              } else {
-                assert.strictEqual(pixelPointX, +barSelection.attr("x") + +barSelection.attr("width"), "positive on right");
-              }
-            });
-            svg.remove();
-          });
-
-        });
-
       });
 
       describe("entityNearest()", () => {
