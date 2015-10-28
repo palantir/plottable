@@ -195,16 +195,38 @@ describe("Plots", () => {
               assert.strictEqual(bars.size(), data.length, "one bar was drawn per datum");
               bars.each(function() {
                 const bar = d3.select(this);
-                const barSize = TestMethods.numAttr(bar, baseSizeAttr)
+                const barSize = TestMethods.numAttr(bar, baseSizeAttr);
                 assert.operator(barSize, "<=", closestSeparation, "bar width is less than the closest distance between values");
                 assert.operator(barSize, ">=", 0.5 * closestSeparation, "bar width is greater than half the closest distance between values");
+              });
+            });
+
+            it("accounts for the bar width when autoDomaining the base scale", () => {
+              const data = [
+                { base: 1, value: 5 },
+                { base: 10, value: 2 },
+                { base: 100, value: 4 }
+              ];
+              dataset.data(data);
+
+              const bars = barPlot.content().selectAll("rect");
+              assert.strictEqual(bars.size(), data.length, "one bar was drawn per datum");
+              const svgSize = TestMethods.numAttr(svg, baseSizeAttr);
+              bars.each(function() {
+                const bar = d3.select(this);
+                const barPosition = TestMethods.numAttr(bar, basePositionAttr);
+                const barSize = TestMethods.numAttr(bar, baseSizeAttr);
+                assert.operator(barPosition, ">=", 0, `bar is within visible area (${basePositionAttr})`);
+                assert.operator(barPosition, "<=", svgSize, `bar is within visible area (${basePositionAttr})`);
+                assert.operator(barPosition + barSize, ">=", 0, `bar is within visible area (${baseSizeAttr})`);
+                assert.operator(barPosition + barSize, "<=", svgSize, `bar is within visible area (${baseSizeAttr})`);
               });
             });
 
             it("does not crash when given bad data", () => {
               const badData: any = [
                 {},
-                { base: null, value: null}
+                { base: null, value: null }
               ]
               assert.doesNotThrow(() => dataset.data(badData), Error);
             });
