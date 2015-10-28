@@ -17,7 +17,6 @@ describe("Plots", () => {
         linePlot = new Plottable.Plots.Line<number>();
         linePlot.x((d: any) => d.x, xScale);
         linePlot.y((d: any) => d.y, yScale);
-        linePlot.attr("stroke", (d: any, i: number, m: any) => d3.rgb(d.x, d.y, i).toString());
         dataset = new Plottable.Dataset(data);
       });
 
@@ -59,6 +58,7 @@ describe("Plots", () => {
 
       it("draws a line with correct data points and fill and stroke settings", () => {
         linePlot.addDataset(dataset);
+        linePlot.attr("stroke", (d, i, m) => d3.rgb(d.x, d.y, i).toString());
         linePlot.renderTo(svg);
 
         let linePath = linePlot.content().select(".line");
@@ -195,7 +195,6 @@ describe("Plots", () => {
         linePlot = new Plottable.Plots.Line<number>();
         linePlot.x((d) => d.x, xScale);
         linePlot.y((d) => d.y, yScale);
-        linePlot.attr("stroke", (d, i, m) => d3.rgb(d.x, d.y, i).toString());
         linePlot.addDataset(dataset);
         linePlot.renderTo(svg);
       });
