@@ -7,8 +7,8 @@ describe("Plots", () => {
       let xScale: Plottable.Scales.Linear;
       let yScale: Plottable.Scales.Linear;
       let plot: Plottable.XYPlot<number, number>;
-      let xAccessor = (d: any) => d.a;
-      let yAccessor = (d: any) => d.b;
+      let xAccessor = (d: any) => d.x;
+      let yAccessor = (d: any) => d.y;
       const yTransform = (d: number) => Math.pow(d, 2);
       const xTransform = (d: number) => Math.pow(d, 0.5);
 
@@ -29,8 +29,8 @@ describe("Plots", () => {
       function generateYTransformData(count: number) {
         return Plottable.Utils.Math.range(0, count).map((datumNumber: number) => {
           return {
-            a: datumNumber,
-            b: yTransform(datumNumber)
+            x: datumNumber,
+            y: yTransform(datumNumber)
           };
         });
       };
@@ -116,7 +116,7 @@ describe("Plots", () => {
         svg.remove();
       });
 
-      it("autoranging stops occuring after the plot is destroyed", () => {
+      it("stops autoranging after the plot is destroyed", () => {
         plot.autorangeMode("y");
         plot.destroy();
 
@@ -167,7 +167,7 @@ describe("Plots", () => {
         svg.remove();
       });
 
-      it("extends the y scale range from the component height", () => {
+      it("sets the y scale range to start from the bottom for non-Category scales", () => {
         const yScale = new Plottable.Scales.Linear();
         const plot = new Plottable.XYPlot<number, number>();
         plot.y(0, yScale);
@@ -179,7 +179,7 @@ describe("Plots", () => {
         svg.remove();
       });
 
-      it("extends the y scale range to the component height if it is a Category scale", () => {
+      it("sets the y scale range to start from the top if it is a Category scale", () => {
         const yScale = new Plottable.Scales.Category();
         const plot = new Plottable.XYPlot<number, string>();
         plot.y("one", yScale);
