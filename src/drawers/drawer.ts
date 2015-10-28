@@ -168,8 +168,19 @@ export class Drawer {
         selection.attr(colorAttribute, step.attrToAppliedProjector[colorAttribute]);
       }
     });
-    step.animator.animateJoin(this._joinResult, step.attrToAppliedProjector, this);
-     if (this._className != null) {
+    // this is a temporary workaround to ensure that any existing custom animators
+    // (using the 'legacy' api point 'animate') continue to work as before
+    // this test should be removed if and when semver = 2.0.0
+    if (step.animator.animateJoin) {
+      step.animator.animateJoin(this._joinResult, step.attrToAppliedProjector, this);
+    } else {
+      // an old animator won't remove exit
+      this._joinResult.exit
+        .remove();
+      step.animator.animate(selection, step.attrToAppliedProjector);
+    }
+
+    if (this._className != null) {
       selection.classed(this._className, true);
     }
   }
