@@ -23,17 +23,18 @@ describe("Plots", () => {
 
     const orientations = [Plottable.Plots.Bar.ORIENTATION_VERTICAL, Plottable.Plots.Bar.ORIENTATION_HORIZONTAL];
     orientations.forEach((orientation) => {
+      const isVertical = orientation === Plottable.Plots.Bar.ORIENTATION_VERTICAL;
+      const basePositionAttr = isVertical ? "x" : "y";
+      const baseSizeAttr = isVertical ? "width" : "height";
+      const valuePositionAttr = isVertical ? "y" : "x";
+      const valueSizeAttr = isVertical ? "height" : "width";
+
       describe(`rendering in ${orientation} orientation`, () => {
         const data = [
           { base: "A", value: 1 },
           { base: "B", value: 0 },
           { base: "C", value: -1 }
         ];
-        const isVertical = orientation === Plottable.Plots.Bar.ORIENTATION_VERTICAL;
-        const basePositionAttr = isVertical ? "x" : "y";
-        const baseSizeAttr = isVertical ? "width" : "height";
-        const valuePositionAttr = isVertical ? "y" : "x";
-        const valueSizeAttr = isVertical ? "height" : "width";
 
         let svg: d3.Selection<void>;
         let barPlot: Plottable.Plots.Bar<string | number, number | string>;
@@ -46,7 +47,7 @@ describe("Plots", () => {
           barPlot = new Plottable.Plots.Bar<string | number, number | string>(orientation);
           baseScale = new Plottable.Scales.Category();
           valueScale = new Plottable.Scales.Linear();
-          if (orientation === "vertical") {
+          if (orientation === Plottable.Plots.Bar.ORIENTATION_VERTICAL) {
             barPlot.x((d: any) => d.base, baseScale);
             barPlot.y((d: any) => d.value, valueScale);
           } else {
@@ -148,6 +149,45 @@ describe("Plots", () => {
 
           barPlot.destroy();
           svg.remove();
+        });
+      });
+
+      describe(`auto width calculation in ${orientation} orientation`, () => {
+        const scaleTypes = ["linear"];
+        scaleTypes.forEach((scaleType) => {
+          describe(`using a ${scaleType} base Scale`, () => {
+            let svg: d3.Selection<void>;
+            let barPlot: Plottable.Plots.Bar<number, number>;
+            let baseScale: Plottable.QuantitativeScale<number>;
+            let valueScale: Plottable.Scales.Linear;
+            let dataset: Plottable.Dataset;
+
+            beforeEach(() => {
+              svg = TestMethods.generateSVG();
+              barPlot = new Plottable.Plots.Bar<number, number>(orientation);
+              baseScale = new Plottable.Scales.Linear();
+              valueScale = new Plottable.Scales.Linear();
+              if (orientation === Plottable.Plots.Bar.ORIENTATION_VERTICAL) {
+                barPlot.x((d: any) => d.base, baseScale);
+                barPlot.y((d: any) => d.value, valueScale);
+              } else {
+                barPlot.y((d: any) => d.base, baseScale);
+                barPlot.x((d: any) => d.value, valueScale);
+              }
+              dataset = new Plottable.Dataset();
+              barPlot.addDataset(dataset);
+            });
+
+            it("computes a sensible width", () => {});
+
+            it("does not crash when given bad data", () => {});
+
+            it("computes a sensible width when given only one datum", () => {});
+
+            it("computes a sensible width when given repeated data", () => {});
+
+            it("computes a sensible width when given unsorted data", () => {});
+          });
         });
       });
     });
