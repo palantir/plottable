@@ -523,21 +523,21 @@ describe("Plots", () => {
 
       describe(`retrieving Entities when ${orientation}`, () => {
         const data = [
-          { base: "A", value: 1 },
-          { base: "B", value: 0 },
-          { base: "C", value: -1 }
+          { base: 1, value: 1 },
+          { base: 0, value: 0 },
+          { base: -1, value: -1 }
         ];
 
         let svg: d3.Selection<void>;
-        let barPlot: Plottable.Plots.Bar<string | number, number | string>;
-        let baseScale: Plottable.Scales.Category;
+        let barPlot: Plottable.Plots.Bar<number, number>;
+        let baseScale: Plottable.Scales.Linear;
         let valueScale: Plottable.Scales.Linear;
         let dataset: Plottable.Dataset;
 
         beforeEach(() => {
           svg = TestMethods.generateSVG();
-          barPlot = new Plottable.Plots.Bar<string | number, number | string>(orientation);
-          baseScale = new Plottable.Scales.Category();
+          barPlot = new Plottable.Plots.Bar<number, number>(orientation);
+          baseScale = new Plottable.Scales.Linear();
           valueScale = new Plottable.Scales.Linear();
           if (orientation === Plottable.Plots.Bar.ORIENTATION_VERTICAL) {
             barPlot.x((d: any) => d.base, baseScale);
