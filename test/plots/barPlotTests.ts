@@ -708,6 +708,9 @@ describe("Plots", () => {
         describe("retrieving the Entities at a given point", () => {
           it("returns the Entity at a given point, or an empty array if no bars are there", () => {
             data.forEach((datum, index) => {
+              if (datum.value === barPlot.baselineValue()) {
+                return; // bar has no height
+              }
               const expectedEntity = expectedEntityForIndex(index);
 
               const barBasePosition = baseScale.scale(datum.base);
@@ -715,8 +718,9 @@ describe("Plots", () => {
               const halfwayValuePosition = valueScale.scale((barPlot.baselineValue() + datum.value) / 2);
               const pointInsideBar = getPointFromBaseAndValuePositions(barBasePosition, halfwayValuePosition);
               const entitiesAtPointInside = barPlot.entitiesAt(pointInsideBar);
-              assert.lengthOf(entitiesAtPointInside, 1, "exactly 1 Entity was returned");
-              TestMethods.assertPlotEntitiesEqual(entitiesAtPointInside[0], expectedEntity, "retrieves the Entity for a bar if inside the bar");
+              assert.lengthOf(entitiesAtPointInside, 1, `exactly 1 Entity was returned (index ${index})`);
+              TestMethods.assertPlotEntitiesEqual(entitiesAtPointInside[0], expectedEntity,
+                `retrieves the Entity for a bar if inside the bar (index ${index})`);
             });
 
             const pointOutsideBars = { x: -1, y: -1 };
@@ -727,11 +731,12 @@ describe("Plots", () => {
 
         describe("retrieving the Entities in a given range", () => {
           it("returns the Entities for any bars that intersect the range", () => {
-            const bar0BasePosition = baseScale.scale(data[0].base);
-            const bar1BasePosition = baseScale.scale(data[1].base);
+            const bar0 = barPlot.content().select("rect");
+            const bar0Edge = TestMethods.numAttr(bar0, basePositionAttr);
+            const bar0FarEdge = TestMethods.numAttr(bar0, basePositionAttr) + TestMethods.numAttr(bar0, baseSizeAttr);
             const baseRange = {
-              min: Math.min(bar0BasePosition, bar1BasePosition),
-              max: Math.max(bar0BasePosition, bar1BasePosition)
+              min: bar0Edge,
+              max: bar0FarEdge
             };
             const fullSizeValueRange = {
               min: -Infinity,
@@ -740,12 +745,11 @@ describe("Plots", () => {
 
             const entitiesInRange = isVertical ? barPlot.entitiesIn(baseRange, fullSizeValueRange)
                                                : barPlot.entitiesIn(fullSizeValueRange, baseRange);
-            assert.lengthOf(entitiesInRange, 2, "retrieved two Entities when range intersects two bars");
-            TestMethods.assertPlotEntitiesEqual(entitiesInRange[0], expectedEntityForIndex(0), "first Entity corresponds to bar 0");
-            TestMethods.assertPlotEntitiesEqual(entitiesInRange[1], expectedEntityForIndex(1), "second Entity corresponds to bar 1");
+            assert.lengthOf(entitiesInRange, 1, "retrieved two Entities when range intersects one bar");
+            TestMethods.assertPlotEntitiesEqual(entitiesInRange[0], expectedEntityForIndex(0), "Entity corresponds to bar 0");
           });
 
-          it("returns the Entity even if the range includes any part of the bar", () => {
+          it("returns the Entity if the range includes any part of the bar", () => {
             const quarterUpBar0 = valueScale.scale(data[0].value / 4);
             const halfUpBar0 = valueScale.scale(data[0].value / 2);
             const valueRange = {
