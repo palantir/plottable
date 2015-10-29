@@ -5,7 +5,7 @@ module Plottable.Animators {
   export type EasingFunctionSpecifier = string | EasingFunction;
   /**
    * Custom easing functions. these are designed to co-ordinate the timing of
-   * actvities on two or more transitions that are active simulataneously
+   * actvities on two or more transitions that are active simultaneously
    * (on different selections)
    * These are designed to help animators schedule animations between
    * the enter, update and exit selections - each can have a transition of the same duration,

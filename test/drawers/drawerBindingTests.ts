@@ -43,14 +43,31 @@ describe("Drawers", () => {
       drawer.draw(data, steps);
       assert.isNotNull(jr, "JoinResult received by animator");
     });
-    it("passes itself animators", () => {
+    it("passes itself to animators", () => {
       dataset.keyFunction(Plottable.KeyFunctions.useProperty("n"));
       let ds1: Plottable.Drawers.DrawStep = { attrToProjector: {}, animator: a1 };
       let steps = [ds1];
       drawer.draw(data, steps);
       assert.isNotNull(dr, "Drawer received by animator");
     });
-
+    it("supports legacy animators", () => {
+      // try to simulate the javascript
+      // a 'legacy' animator does not implement animateJoin
+      let flag = 0;
+      class Legacy {
+        public animate = function(selection: any, attrs: any) {
+          flag = 1;
+          selection.attr(attrs);
+        };
+        public totalTime = function(n: any) { return 0; };
+      }
+      let a2: any = new Legacy();
+      dataset.keyFunction(Plottable.KeyFunctions.useProperty("n"));
+      let ds1: Plottable.Drawers.DrawStep = { attrToProjector: {}, animator: a2 };
+      let steps = [ds1];
+      drawer.draw(data, steps);
+      assert.strictEqual(flag, 1, "Drawer called legacy animator");
+    });
     describe("useProperty key", () => {
       it("matches elements based on the specified property name", () => {
         dataset.keyFunction(Plottable.KeyFunctions.useProperty("n"));
