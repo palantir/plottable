@@ -179,6 +179,20 @@ describe("Plots", () => {
           assert.operator(baseScaleDomain[1], ">=", singlePointData[0].base, "upper end of base domain is greater than the value");
         });
 
+        it("base scale domain does not change when autoDomain is called more than once", () => {
+          const data = [
+            { base: 0, value: 1 },
+            { base: 1, value: 2 }
+          ];
+          barPlot.addDataset(new Plottable.Dataset(data));
+          barPlot.renderTo(svg);
+
+          const baseDomainAfterRendering = baseScale.domain();
+          baseScale.autoDomain();
+          const baseDomainAfterAutoDomaining = baseScale.domain();
+          assert.deepEqual(baseDomainAfterRendering, baseDomainAfterAutoDomaining, "calling autoDomain() again does not change the domain");
+        });
+
         afterEach(function() {
           if (this.currentTest.state === "passed") {
             barPlot.destroy();
@@ -800,52 +814,6 @@ describe("Plots", () => {
         assert.closeTo(TestMethods.numAttr(bar1, "width"), 150, 0.01, "bar1 width");
         assert.closeTo(TestMethods.numAttr(bar0, "y"), yScale.scale(bar0y) - TestMethods.numAttr(bar0, "height") / 2, 0.01, "bar0 ypos");
         assert.closeTo(TestMethods.numAttr(bar1, "y"), yScale.scale(bar1y) - TestMethods.numAttr(bar1, "height") / 2, 0.01, "bar1 ypos");
-        svg.remove();
-      });
-    });
-
-    describe("Horizontal Bar Plot extent calculation", () => {
-
-      let svg: d3.Selection<void>;
-      let xScale: Plottable.Scales.Linear;
-      let yScale: Plottable.Scales.Linear;
-      let plot: Plottable.Plots.Bar<number, number>;
-
-      beforeEach(() => {
-        svg = TestMethods.generateSVG();
-
-        xScale = new Plottable.Scales.Linear();
-        yScale = new Plottable.Scales.Linear();
-
-        plot = new Plottable.Plots.Bar<number, number>(Plottable.Plots.Bar.ORIENTATION_HORIZONTAL);
-        plot.x((d) => d.x, xScale);
-        plot.y((d) => d.y, yScale);
-      });
-
-      it("pads the domain in the correct direction", () => {
-        let data = Array.apply(null, Array(10)).map((d: any, i: number) => {
-          return { x: i + 1, y: i + 1 };
-        });
-        plot.addDataset(new Plottable.Dataset(data));
-        plot.renderTo(svg);
-
-        assert.operator(yScale.domain()[0], "<", data[0].y, "lower end of the domain is padded");
-        assert.operator(yScale.domain()[1], ">", data[data.length - 1].y, "higher end of the domain is padded");
-
-        svg.remove();
-      });
-
-      it("computes the correct extent when autoDomain()-ing right after render", () => {
-        let data = Array.apply(null, Array(10)).map((d: any, i: number) => {
-          return { x: i + 1, y: i + 1 };
-        });
-        plot.addDataset(new Plottable.Dataset(data));
-        plot.renderTo(svg);
-
-        let initialYScaleDomain = yScale.domain();
-        yScale.autoDomain();
-        assert.deepEqual(initialYScaleDomain, yScale.domain(), "The domain did not change");
-
         svg.remove();
       });
     });
