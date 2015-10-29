@@ -8,15 +8,15 @@ describe("Plots", () => {
       });
 
       it("defaults to vertical", () => {
-        let defaultPlot = new Plottable.Plots.Bar<number, number>();
+        const defaultPlot = new Plottable.Plots.Bar<number, number>();
         assert.strictEqual(defaultPlot.orientation(), "vertical", "default Plots.Bar() are vertical");
       });
 
       it("sets orientation on construction", () => {
-        let verticalPlot = new Plottable.Plots.Bar<number, number>("vertical");
+        const verticalPlot = new Plottable.Plots.Bar<number, number>("vertical");
         assert.strictEqual(verticalPlot.orientation(), "vertical", "vertical Plots.Bar()");
 
-        let horizontalPlot = new Plottable.Plots.Bar<number, number>("horizontal");
+        const horizontalPlot = new Plottable.Plots.Bar<number, number>("horizontal");
         assert.strictEqual(horizontalPlot.orientation(), "horizontal", "horizontal Plots.Bar()");
       });
     });
@@ -60,14 +60,14 @@ describe("Plots", () => {
         function assertCorrectRendering() {
           const baseline = barPlot.content().select(".baseline");
           const scaledBaselineValue = valueScale.scale(<number> barPlot.baselineValue());
-          assert.strictEqual(TestMethods.numAttr(baseline, valuePositionAttr + "1"), scaledBaselineValue,
-            `baseline ${valuePositionAttr + "1"} is correct`);
-          assert.strictEqual(TestMethods.numAttr(baseline, valuePositionAttr + "2"), scaledBaselineValue,
-            `baseline ${valuePositionAttr + "2"} is correct`);
-          assert.strictEqual(TestMethods.numAttr(baseline, basePositionAttr + "1"), 0,
-            `baseline ${basePositionAttr + "1"} is correct`);
-          assert.strictEqual(TestMethods.numAttr(baseline, basePositionAttr + "2"), TestMethods.numAttr(svg, baseSizeAttr),
-            `baseline ${basePositionAttr + "2"} is correct`);
+          assert.strictEqual(TestMethods.numAttr(baseline, `${valuePositionAttr}1`), scaledBaselineValue,
+            `baseline ${valuePositionAttr}1 is correct`);
+          assert.strictEqual(TestMethods.numAttr(baseline, `${valuePositionAttr}2`), scaledBaselineValue,
+            `baseline ${valuePositionAttr}2 is correct`);
+          assert.strictEqual(TestMethods.numAttr(baseline, `${basePositionAttr}1`), 0,
+            `baseline ${basePositionAttr}1 is correct`);
+          assert.strictEqual(TestMethods.numAttr(baseline, `${basePositionAttr}2`), TestMethods.numAttr(svg, baseSizeAttr),
+            `baseline ${basePositionAttr}2 is correct`);
 
           const bars = barPlot.content().selectAll("rect");
           assert.strictEqual(bars.size(), data.length, "One bar was created per data point");
@@ -87,7 +87,7 @@ describe("Plots", () => {
 
             const valuePosition = TestMethods.numAttr(bar, valuePositionAttr);
             const isShifted = isVertical ? (datum.value > barPlot.baselineValue()) : (datum.value < barPlot.baselineValue());
-            const expectedValuePosition = (isShifted) ? scaledBaselineValue - valueSize : scaledBaselineValue;
+            const expectedValuePosition = isShifted ? scaledBaselineValue - valueSize : scaledBaselineValue;
             assert.closeTo(valuePosition, expectedValuePosition, window.Pixel_CloseTo_Requirement,
               `bar ${valuePositionAttr} is correct (index ${index})`);
           });
@@ -115,7 +115,7 @@ describe("Plots", () => {
         });
 
         it("can autorange value scale based on visible points on base scale", () => {
-          const firstTwoBaseValues = [data[0].base, data[1].base ];
+          const firstTwoBaseValues = [ data[0].base, data[1].base ];
           valueScale.padProportion(0);
           baseScale.domain(firstTwoBaseValues);
           barPlot.addDataset(dataset);
@@ -230,7 +230,7 @@ describe("Plots", () => {
               }
               valueScale = new Plottable.Scales.Linear();
 
-              const baseAccessor = (scaleType === "Time") ? (d: any) => new Date(d.base) : (d: any) => d.base;
+              const baseAccessor = scaleType === "Time" ? (d: any) => new Date(d.base) : (d: any) => d.base;
               const valueAccessor = (d: any) => d.value;
               if (orientation === Plottable.Plots.Bar.ORIENTATION_VERTICAL) {
                 barPlot.x(baseAccessor, baseScale);
@@ -304,7 +304,7 @@ describe("Plots", () => {
               const barSize = TestMethods.numAttr(bar, baseSizeAttr);
               const svgSize = TestMethods.numAttr(svg, baseSizeAttr);
               assert.operator(barSize, ">=", svgSize / 4, "bar is larger than 1/4 of the available space");
-              assert.operator(barSize, "<=", svgSize / 2, "bar is smaller than half the available space");
+              assert.operator(barSize, "<=", svgSize / 2, "bar is smaller than 1/2 of the available space");
             });
 
             it("computes a sensible width when given repeated base value", () => {
@@ -321,7 +321,7 @@ describe("Plots", () => {
                 const bar = d3.select(this);
                 const barSize = TestMethods.numAttr(bar, baseSizeAttr);
                 assert.operator(barSize, ">=", svgSize / 4, "bar is larger than 1/4 of the available space");
-                assert.operator(barSize, "<=", svgSize / 2, "bar is smaller than half the available space");
+                assert.operator(barSize, "<=", svgSize / 2, "bar is smaller than 1/2 of the available space");
               });
             });
 
@@ -406,7 +406,6 @@ describe("Plots", () => {
         });
 
         it("draws one label per datum", () => {
-          barPlot.labelsEnabled(true);
           barPlot.labelsEnabled(true);
           const texts = barPlot.content().selectAll("text");
           assert.strictEqual(texts.size(), data.length, "one label drawn per datum");
