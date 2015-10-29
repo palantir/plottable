@@ -144,6 +144,49 @@ describe("Plots", () => {
         });
       });
 
+      describe(`autodomaining when ${orientation}`, () => {
+        let svg: d3.Selection<void>;
+        let baseScale: Plottable.Scales.Linear;
+        let valueScale: Plottable.Scales.Linear;
+        let barPlot: Plottable.Plots.Bar<number, number>;
+        let dataset: Plottable.Dataset;
+
+        const baseAccessor = (d: any) => d.base;
+        const valueAccessor = (d: any) => d.value;
+
+        beforeEach(() => {
+          svg = TestMethods.generateSVG();
+          barPlot = new Plottable.Plots.Bar<number, number>(orientation);
+          baseScale = new Plottable.Scales.Linear();
+          valueScale = new Plottable.Scales.Linear();
+          if (orientation === Plottable.Plots.Bar.ORIENTATION_VERTICAL) {
+            barPlot.x(baseAccessor, baseScale);
+            barPlot.y(valueAccessor, valueScale);
+          } else {
+            barPlot.y(baseAccessor, baseScale);
+            barPlot.x(valueAccessor, valueScale);
+          }
+        });
+
+        it("computes the base scale domain correctly when there is only one data point", () => {
+          const singlePointData = [
+            { base: baseScale.domain()[1] + 10, value: 5 }
+          ];
+          barPlot.addDataset(new Plottable.Dataset(singlePointData));
+          barPlot.renderTo(svg);
+          const baseScaleDomain = baseScale.domain();
+          assert.operator(baseScaleDomain[0], "<=", singlePointData[0].base, "lower end of base domain is less than the value");
+          assert.operator(baseScaleDomain[1], ">=", singlePointData[0].base, "upper end of base domain is greater than the value");
+        });
+
+        afterEach(function() {
+          if (this.currentTest.state === "passed") {
+            barPlot.destroy();
+            svg.remove();
+          }
+        });
+      });
+
       describe(`auto bar width calculation when ${orientation}`, () => {
         const scaleTypes = ["Linear", "ModifiedLog", "Time"];
         scaleTypes.forEach((scaleType) => {
@@ -805,48 +848,6 @@ describe("Plots", () => {
 
         svg.remove();
       });
-    });
-
-    it("updates the scale extent correctly when there is one bar (vertical)", () => {
-      let svg = TestMethods.generateSVG();
-
-      let xScale = new Plottable.Scales.Linear();
-      let yScale = new Plottable.Scales.Linear();
-      let xPoint = Math.max(xScale.domain()[0], xScale.domain()[1]) + 10;
-      let data = [{x: xPoint, y: 10}];
-      let dataset = new Plottable.Dataset(data);
-
-      let barPlot = new Plottable.Plots.Bar();
-      barPlot.datasets([dataset]);
-      barPlot.x(function(d) { return d.x; }, xScale);
-      barPlot.y(function(d) { return d.y; }, yScale);
-
-      barPlot.renderTo(svg);
-      let xScaleDomain = xScale.domain();
-      assert.operator(xPoint, ">=", xScaleDomain[0], "x value greater than new domain min");
-      assert.operator(xPoint, "<=", xScaleDomain[1], "x value less than new domain max");
-      svg.remove();
-    });
-
-    it("updates the scale extent correctly when there is one bar (horizontal)", () => {
-      let svg = TestMethods.generateSVG();
-
-      let xScale = new Plottable.Scales.Linear();
-      let yScale = new Plottable.Scales.Linear();
-      let yPoint = Math.max(yScale.domain()[0], yScale.domain()[1]) + 10;
-      let data = [{x: 10, y: yPoint}];
-      let dataset = new Plottable.Dataset(data);
-
-      let barPlot = new Plottable.Plots.Bar(Plottable.Plots.Bar.ORIENTATION_HORIZONTAL);
-      barPlot.datasets([dataset]);
-      barPlot.x(function(d) { return d.x; }, xScale);
-      barPlot.y(function(d) { return d.y; }, yScale);
-
-      barPlot.renderTo(svg);
-      let yScaleDomain = yScale.domain();
-      assert.operator(yPoint, ">=", yScaleDomain[0], "y value greater than new domain min");
-      assert.operator(yPoint, "<=", yScaleDomain[1], "y value less than new domain max");
-      svg.remove();
     });
   });
 });
