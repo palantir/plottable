@@ -299,12 +299,12 @@ describe("Plots", () => {
     });
 
     describe("managing the y property", () => {
-      let plot: Plottable.XYPlot<number, number>;
+      let plot: Plottable.XYPlot<number, any>;
 
       beforeEach(() => {
-        plot = new Plottable.XYPlot<number, number>();
+        plot = new Plottable.XYPlot<number, any>();
 
-        // HACKHACK: Must install y scale https://github.com/palantir/plottable/issues/2934
+        // HACKHACK: Must install x scale https://github.com/palantir/plottable/issues/2934
         plot.x(0, new Plottable.Scales.Linear());
       });
 
@@ -357,6 +357,19 @@ describe("Plots", () => {
         svg.remove();
       });
 
+      it("sets the range to be reversed on the input Category scale if the plot has a height", () => {
+        const svg = TestMethods.generateSVG();
+        plot.anchor(svg);
+        plot.computeLayout();
+
+        const scale = new Plottable.Scales.Category();
+        assert.strictEqual(plot.y(0, scale), plot, "setting the y property returns the plot");
+
+        assert.deepEqual(scale.range(), [0, plot.height()], "range goes to height on scale");
+
+        svg.remove();
+      });
+
       it("can install its extent onto the input scale", () => {
         const svg = TestMethods.generateSVG();
         const data = [0, 1, 2, 3, 4];
@@ -366,7 +379,7 @@ describe("Plots", () => {
 
         const scale = new Plottable.Scales.Linear();
         scale.padProportion(0);
-        assert.strictEqual(plot.y((d) => d, scale), plot, "setting the y property returns the plot");
+        assert.strictEqual(plot.y((d: number) => d, scale), plot, "setting the y property returns the plot");
 
         const mathUtils = Plottable.Utils.Math;
         assert.deepEqual(scale.domain(), [mathUtils.min(data, 0), mathUtils.max(data, 0)], "range goes to width on scale");
