@@ -1,8 +1,52 @@
 ///<reference path="../testReference.ts" />
 
 describe("Utils.Window", () => {
-  describe("deprecated()", () => {
+  describe("warn()", () => {
+    if (console != null) { // console not defined in IE unless it's opened
+      it("uses console.warn if available, console.log otherwise", () => {
+        const originalWindowWarn = console.warn;
+        let receivedWarning: string = null;
+        const replacementWarn = (warning: string) => receivedWarning = warning;
+        console.warn = replacementWarn;
 
+        const expectedWarning = "BEEP BOOP";
+        Plottable.Utils.Window.warn(expectedWarning);
+        console.warn = originalWindowWarn;
+        assert.strictEqual(receivedWarning, expectedWarning, "console.warn was passed the expected message");
+
+        const originalWindowLog = console.log;
+        let receivedMessage: string = null;
+        const replacementLog = (warning: string) => receivedMessage = warning;
+        console.warn = null;
+        console.log = replacementLog;
+        receivedWarning = null;
+
+        Plottable.Utils.Window.warn(expectedWarning);
+        console.warn = originalWindowWarn;
+        console.log = originalWindowLog;
+
+        assert.isNull(receivedWarning, "console.warn was not invoked if it doesn't exist");
+        assert.strictEqual(receivedMessage, expectedWarning, "used console.log as a fallback");
+      });
+
+      it("does not emit warnings if Configs.SHOW_WARNINGS is set to false", () => {
+        const originalWindowWarn = console.warn;
+        let windowWarnWasCalled = false;
+        const replacementWarn = (warning: string) => windowWarnWasCalled = true;
+        console.warn = replacementWarn;
+
+        const originalShowWarnings = Plottable.Configs.SHOW_WARNINGS;
+        Plottable.Configs.SHOW_WARNINGS = false;
+        Plottable.Utils.Window.warn("BEEP BOOP");
+        console.warn = originalWindowWarn;
+        Plottable.Configs.SHOW_WARNINGS = originalShowWarnings;
+
+        assert.isFalse(windowWarnWasCalled, "no warning was logged if SHOW_WARNINGS was set to false");
+      });
+    }
+  });
+
+  describe("deprecated()", () => {
     let oldWarn: (warning: string) => void;
 
     before(() => {
@@ -13,7 +57,7 @@ describe("Utils.Window", () => {
       Plottable.Utils.Window.warn = oldWarn;
     });
 
-    it("deprecated() issues a warning", () => {
+    it("issues a warning", () => {
       let warningTriggered = false;
       Plottable.Utils.Window.warn = (msg: string) => {
         warningTriggered = true;
@@ -23,7 +67,7 @@ describe("Utils.Window", () => {
       assert.isTrue(warningTriggered, "the warning has been triggered");
     });
 
-    it("deprecated() calling method name, version and message are correct", () => {
+    it("displays the calling method name, deprecation version, and message", () => {
       let callingMethod = "reallyOutdatedCallerMethod";
       let version = "v0.77.2";
       let message = "hadoop is doopey";
