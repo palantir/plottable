@@ -234,8 +234,9 @@ export class Component {
    * Renders the Component without waiting for the next frame.
    */
   public renderImmediately() {
-    Utils.Window.setTimeout(() => this._onRenderCallbacks.callCallbacks(this), this._deferredTotalDrawTime());
+    const deferredTotalDrawTime = this._deferredTotalDrawTime();
     this._renderImmediately();
+    Utils.Window.setTimeout(() => this._onRenderCallbacks.callCallbacks(this), deferredTotalDrawTime);
     return this;
   }
 

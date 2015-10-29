@@ -3012,8 +3012,9 @@ var Plottable;
          */
         Component.prototype.renderImmediately = function () {
             var _this = this;
-            Plottable.Utils.Window.setTimeout(function () { return _this._onRenderCallbacks.callCallbacks(_this); }, this._deferredTotalDrawTime());
+            var deferredTotalDrawTime = this._deferredTotalDrawTime();
             this._renderImmediately();
+            Plottable.Utils.Window.setTimeout(function () { return _this._onRenderCallbacks.callCallbacks(_this); }, deferredTotalDrawTime);
             return this;
         };
         Component.prototype._deferredTotalDrawTime = function () {
