@@ -202,9 +202,9 @@ describe("Plots", () => {
       });
 
       describe(`auto bar width calculation when ${orientation}`, () => {
-        const scaleTypes = ["Linear", "ModifiedLog", "Time"];
+        const scaleTypes = [Plottable.Scales.Linear, Plottable.Scales.ModifiedLog, Plottable.Scales.Time];
         scaleTypes.forEach((scaleType) => {
-          describe(`using a ${scaleType} base Scale`, () => {
+          describe(`using a ${(<any> scaleType).name} base Scale`, () => {
             let svg: d3.Selection<void>;
             let barPlot: Plottable.Plots.Bar<number | Date, number | Date>;
             let baseScale: Plottable.QuantitativeScale<number | Date>;
@@ -214,23 +214,9 @@ describe("Plots", () => {
             beforeEach(() => {
               svg = TestMethods.generateSVG();
               barPlot = new Plottable.Plots.Bar<number | Date, number | Date>(orientation);
-
-              switch (scaleType) {
-                case "Linear":
-                  baseScale = new Plottable.Scales.Linear();
-                  break;
-                case "ModifiedLog":
-                  baseScale = new Plottable.Scales.ModifiedLog();
-                  break;
-                case "Time":
-                  baseScale = new Plottable.Scales.Time();
-                  break;
-                default:
-                  throw new Error("unexpected base Scale type");
-              }
+              baseScale = new scaleType();
               valueScale = new Plottable.Scales.Linear();
-
-              const baseAccessor = scaleType === "Time" ? (d: any) => new Date(d.base) : (d: any) => d.base;
+              const baseAccessor = scaleType === Plottable.Scales.Time ? (d: any) => new Date(d.base) : (d: any) => d.base;
               const valueAccessor = (d: any) => d.value;
               if (orientation === Plottable.Plots.Bar.ORIENTATION_VERTICAL) {
                 barPlot.x(baseAccessor, baseScale);
