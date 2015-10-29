@@ -196,6 +196,7 @@ module.exports = function(grunt) {
         testname: "Plottable Sauce Unit Tests",
         pollInterval: 5000,
         statusCheckAttempts: 60,
+        maxRetries: 1,
         browsers: [{
           browserName: "firefox",
           platform: "linux"
@@ -212,9 +213,7 @@ module.exports = function(grunt) {
           version: "8.0",
           deviceName: "iPad Simulator",
           deviceOrientation: "portrait"
-        }],
-        build: process.env.TRAVIS_JOB_ID,
-        "tunnel-identifier": process.env.TRAVIS_JOB_NUMBER
+        }]
       }
     }
   };
