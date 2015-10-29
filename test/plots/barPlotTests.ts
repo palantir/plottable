@@ -74,7 +74,8 @@ describe("Plots", () => {
           bars.each(function(datum, index) {
             const bar = d3.select(this);
             const baseSize = TestMethods.numAttr(bar, baseSizeAttr);
-            assert.closeTo(baseSize, baseScale.rangeBand(), window.Pixel_CloseTo_Requirement, `bar ${baseSizeAttr} is correct (index ${index})`);
+            assert.closeTo(baseSize, baseScale.rangeBand(), window.Pixel_CloseTo_Requirement,
+              `bar ${baseSizeAttr} is correct (index ${index})`);
 
             const valueSize = TestMethods.numAttr(bar, valueSizeAttr);
             assert.closeTo(valueSize, Math.abs(valueScale.scale(datum.value) - scaledBaselineValue),
@@ -149,7 +150,6 @@ describe("Plots", () => {
         let baseScale: Plottable.Scales.Linear;
         let valueScale: Plottable.Scales.Linear;
         let barPlot: Plottable.Plots.Bar<number, number>;
-        let dataset: Plottable.Dataset;
 
         const baseAccessor = (d: any) => d.base;
         const valueAccessor = (d: any) => d.value;
@@ -259,7 +259,8 @@ describe("Plots", () => {
                 const bar = d3.select(this);
                 const barSize = TestMethods.numAttr(bar, baseSizeAttr);
                 assert.operator(barSize, "<=", closestSeparation, "bar width is less than the closest distance between values");
-                assert.operator(barSize, ">=", 0.5 * closestSeparation, "bar width is greater than half the closest distance between values");
+                assert.operator(barSize, ">=", 0.5 * closestSeparation,
+                  "bar width is greater than half the closest distance between values");
               });
             });
 
@@ -289,7 +290,7 @@ describe("Plots", () => {
               const badData: any = [
                 {},
                 { base: null, value: null }
-              ]
+              ];
               assert.doesNotThrow(() => dataset.data(badData), Error);
             });
 
@@ -318,7 +319,7 @@ describe("Plots", () => {
               const svgSize = TestMethods.numAttr(svg, baseSizeAttr);
               bars.each(function() {
                 const bar = d3.select(this);
-                const barSize = TestMethods.numAttr(bar, baseSizeAttr)
+                const barSize = TestMethods.numAttr(bar, baseSizeAttr);
                 assert.operator(barSize, ">=", svgSize / 4, "bar is larger than 1/4 of the available space");
                 assert.operator(barSize, "<=", svgSize / 2, "bar is smaller than half the available space");
               });
@@ -337,9 +338,10 @@ describe("Plots", () => {
               assert.strictEqual(bars.size(), unsortedData.length, "one bar was drawn per datum");
               bars.each(function() {
                 const bar = d3.select(this);
-                const barSize = TestMethods.numAttr(bar, baseSizeAttr)
+                const barSize = TestMethods.numAttr(bar, baseSizeAttr);
                 assert.operator(barSize, "<=", closestSeparation, "bar width is less than the closest distance between values");
-                assert.operator(barSize, ">=", 0.5 * closestSeparation, "bar width is greater than half the closest distance between values");
+                assert.operator(barSize, ">=", 0.5 * closestSeparation,
+                  "bar width is greater than half the closest distance between values");
               });
             });
 
@@ -659,7 +661,8 @@ describe("Plots", () => {
               const abovePosition = valueScale.scale(2 * datum.value);
               const pointAboveBar = getPointFromBaseAndValuePositions(barBasePosition, abovePosition);
               const nearestAboveBar = barPlot.entityNearest(pointAboveBar);
-              TestMethods.assertPlotEntitiesEqual(nearestAboveBar, expectedEntity, "retrieves the Entity for a bar if beyond the end of the bar");
+              TestMethods.assertPlotEntitiesEqual(nearestAboveBar, expectedEntity,
+                "retrieves the Entity for a bar if beyond the end of the bar");
 
               const belowPosition = valueScale.scale(-datum.value);
               const pointBelowBar = getPointFromBaseAndValuePositions(barBasePosition, belowPosition);
