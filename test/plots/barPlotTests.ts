@@ -523,9 +523,9 @@ describe("Plots", () => {
 
       describe(`retrieving Entities when ${orientation}`, () => {
         const data = [
-          { base: 1, value: 1 },
+          { base: -1, value: -1 },
           { base: 0, value: 0 },
-          { base: -1, value: -1 }
+          { base: 1, value: 1 }
         ];
         const DEFAULT_DOMAIN = [-2, 2];
 
@@ -617,7 +617,8 @@ describe("Plots", () => {
           });
 
           it("returns the closest visible bar", () => {
-            baseScale.domain([DEFAULT_DOMAIN[0], 0.5]);
+            const baseValuebetweenBars = (data[0].base + data[1].base) / 2;
+            baseScale.domain([baseValuebetweenBars , DEFAULT_DOMAIN[1]]); // cuts off bar 0
             const bar0BasePosition = baseScale.scale(data[0].base);
             const baselineValuePosition = valueScale.scale(barPlot.baselineValue());
 
@@ -647,77 +648,70 @@ describe("Plots", () => {
           });
         });
 
+        describe("retrieving the Entities at a given point", () => {
+          it("returns the Entity at a given point, or an empty array if no bars are there", () => {
+            data.forEach((datum, index) => {
+              const expectedEntity = expectedEntityForIndex(index);
+
+              const barBasePosition = baseScale.scale(datum.base);
+
+              const halfwayValuePosition = valueScale.scale((barPlot.baselineValue() + datum.value) / 2);
+              const pointInsideBar = getPointFromBaseAndValuePositions(barBasePosition, halfwayValuePosition);
+              const entitiesAtPointInside = barPlot.entitiesAt(pointInsideBar);
+              assert.lengthOf(entitiesAtPointInside, 1, "exactly 1 Entity was returned");
+              TestMethods.assertPlotEntitiesEqual(entitiesAtPointInside[0], expectedEntity, "retrieves the Entity for a bar if inside the bar");
+            });
+
+            const pointOutsideBars = { x: -1, y: -1 };
+            const entitiesAtPointOutside = barPlot.entitiesAt(pointOutsideBars);
+            assert.lengthOf(entitiesAtPointOutside, 0, "no Entities returned if no bars at query point");
+          });
+        });
+
+        describe("retrieving the Entities in a given range", () => {
+          it("returns the Entities for any bars that intersect the range", () => {
+            const bar0BasePosition = baseScale.scale(data[0].base);
+            const bar1BasePosition = baseScale.scale(data[1].base);
+            const baseRange = {
+              min: Math.min(bar0BasePosition, bar1BasePosition),
+              max: Math.max(bar0BasePosition, bar1BasePosition)
+            };
+            const fullSizeValueRange = {
+              min: -Infinity,
+              max: Infinity
+            };
+
+            const entitiesInRange = isVertical ? barPlot.entitiesIn(baseRange, fullSizeValueRange)
+                                               : barPlot.entitiesIn(fullSizeValueRange, baseRange);
+            assert.lengthOf(entitiesInRange, 2, "retrieved two Entities when range intersects two bars");
+            TestMethods.assertPlotEntitiesEqual(entitiesInRange[0], expectedEntityForIndex(0), "first Entity corresponds to bar 0");
+            TestMethods.assertPlotEntitiesEqual(entitiesInRange[1], expectedEntityForIndex(1), "second Entity corresponds to bar 1");
+          });
+
+          it("returns the Entity even if the range includes any part of the bar", () => {
+            const quarterUpBar0 = valueScale.scale(data[0].value / 4);
+            const halfUpBar0 = valueScale.scale(data[0].value / 2);
+            const valueRange = {
+              min: Math.min(quarterUpBar0, halfUpBar0),
+              max: Math.max(quarterUpBar0, halfUpBar0)
+            };
+            const fullSizeBaseRange = {
+              min: -Infinity,
+              max: Infinity
+            };
+            const entitiesInRange = isVertical ? barPlot.entitiesIn(fullSizeBaseRange, valueRange)
+                                               : barPlot.entitiesIn(valueRange, fullSizeBaseRange);
+            assert.lengthOf(entitiesInRange, 1, "retrieved one entity when range intersects one bar");
+            TestMethods.assertPlotEntitiesEqual(entitiesInRange[0], expectedEntityForIndex(0), "Entity corresponds to bar 0");
+          });
+        });
+
         afterEach(function() {
           if (this.currentTest.state === "passed") {
             barPlot.destroy();
             svg.remove();
           }
         });
-      });
-    });
-
-    describe("Vertical Bar Plot", () => {
-      let svg: d3.Selection<void>;
-      let dataset: Plottable.Dataset;
-      let xScale: Plottable.Scales.Category;
-      let yScale: Plottable.Scales.Linear;
-      let barPlot: Plottable.Plots.Bar<string, number>;
-      let SVG_WIDTH = 600;
-      let SVG_HEIGHT = 400;
-
-      beforeEach(() => {
-        svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
-        xScale = new Plottable.Scales.Category().domain(["A", "B"]);
-        yScale = new Plottable.Scales.Linear();
-        let data = [
-          {x: "A", y: 1},
-          {x: "B", y: -1.5},
-          {x: "B", y: 1} // duplicate X-value
-        ];
-        dataset = new Plottable.Dataset(data);
-        barPlot = new Plottable.Plots.Bar<string, number>();
-        barPlot.addDataset(dataset);
-        barPlot.animated(false);
-        barPlot.baselineValue(0);
-        yScale.domain([-2, 2]);
-        barPlot.x((d) => d.x, xScale);
-        barPlot.y((d) => d.y, yScale);
-        barPlot.renderTo(svg);
-      });
-
-      it("entitiesAt()", () => {
-        let bars = barPlot.entitiesAt({x: 155, y: 150}); // in the middle of bar 0
-
-        assert.lengthOf(bars, 1, "entitiesAt() returns an Entity for the bar at the given location");
-        assert.strictEqual(bars[0].datum, dataset.data()[0], "the data in the bar matches the data from the datasource");
-
-        bars = barPlot.entitiesAt({x: -1, y: -1}); // no bars here
-        assert.lengthOf(bars, 0, "returns empty array if no bars at query point");
-
-        bars = barPlot.entitiesAt({x: 200, y: 50}); // between the two bars
-        assert.lengthOf(bars, 0, "returns empty array if no bars at query point");
-
-        bars = barPlot.entitiesAt({x: 155, y: 10}); // above bar 0
-        assert.lengthOf(bars, 0, "returns empty array if no bars at query point");
-        svg.remove();
-      });
-
-      it("entitiesIn()", () => {
-        // the bars are now (140,100),(150,300) and (440,300),(450,350) - the
-        // origin is at the top left!
-
-        let bars = barPlot.entitiesIn({min: 155, max: 455}, {min: 150, max: 150});
-        assert.lengthOf(bars, 2, "selected 2 bars (not the negative one)");
-        assert.strictEqual(bars[0].datum, dataset.data()[bars[0].index], "the data in bar 0 matches the datasource");
-        assert.strictEqual(bars[1].datum, dataset.data()[bars[1].index], "the data in bar 1 matches the datasource");
-
-        bars = barPlot.entitiesIn({min: 155, max: 455}, {min: 150, max: 350});
-        assert.lengthOf(bars, 3, "selected all the bars");
-        assert.strictEqual(bars[0].datum, dataset.data()[bars[0].index], "the data in bar 0 matches the datasource");
-        assert.strictEqual(bars[1].datum, dataset.data()[bars[1].index], "the data in bar 1 matches the datasource");
-        assert.strictEqual(bars[2].datum, dataset.data()[bars[2].index], "the data in bar 2 matches the datasource");
-
-        svg.remove();
       });
     });
 
