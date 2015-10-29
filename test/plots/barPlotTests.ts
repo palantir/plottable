@@ -772,50 +772,5 @@ describe("Plots", () => {
       });
     });
 
-    describe("Horizontal Bar Plot", () => {
-      let svg: d3.Selection<void>;
-      let dataset: Plottable.Dataset;
-      let yScale: Plottable.Scales.Category;
-      let xScale: Plottable.Scales.Linear;
-      let barPlot: Plottable.Plots.Bar<number, string>;
-      let SVG_WIDTH = 600;
-      let SVG_HEIGHT = 400;
-      beforeEach(() => {
-        svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
-        yScale = new Plottable.Scales.Category().domain(["A", "B"]);
-        xScale = new Plottable.Scales.Linear();
-        xScale.domain([-3, 3]);
-
-        let data = [
-          {y: "A", x: 1},
-          {y: "B", x: -1.5},
-          {y: "B", x: 1} // duplicate Y-value
-        ];
-        dataset = new Plottable.Dataset(data);
-        barPlot = new Plottable.Plots.Bar<number, string>(Plottable.Plots.Bar.ORIENTATION_HORIZONTAL);
-        barPlot.addDataset(dataset);
-        barPlot.animated(false);
-        barPlot.baselineValue(0);
-        barPlot.x((d) => d.x, xScale);
-        barPlot.y((d) => d.y, yScale);
-        barPlot.renderTo(svg);
-      });
-
-      it("width projector may be overwritten, and calling project queues rerender", () => {
-        let bars = (<any> barPlot)._renderArea.selectAll("rect");
-        let bar0 = d3.select(bars[0][0]);
-        let bar1 = d3.select(bars[0][1]);
-        let bar0y = bar0.data()[0].y;
-        let bar1y = bar1.data()[0].y;
-        barPlot.attr("width", 10);
-        assert.closeTo(TestMethods.numAttr(bar0, "height"), 10, 0.01, "bar0 height");
-        assert.closeTo(TestMethods.numAttr(bar1, "height"), 10, 0.01, "bar1 height");
-        assert.closeTo(TestMethods.numAttr(bar0, "width"), 100, 0.01, "bar0 width");
-        assert.closeTo(TestMethods.numAttr(bar1, "width"), 150, 0.01, "bar1 width");
-        assert.closeTo(TestMethods.numAttr(bar0, "y"), yScale.scale(bar0y) - TestMethods.numAttr(bar0, "height") / 2, 0.01, "bar0 ypos");
-        assert.closeTo(TestMethods.numAttr(bar1, "y"), yScale.scale(bar1y) - TestMethods.numAttr(bar1, "height") / 2, 0.01, "bar1 ypos");
-        svg.remove();
-      });
-    });
   });
 });
