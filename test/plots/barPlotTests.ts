@@ -57,6 +57,13 @@ describe("Plots", () => {
           dataset = new Plottable.Dataset(data);
         });
 
+        afterEach(function() {
+          if (this.currentTest.state === "passed") {
+            barPlot.destroy();
+            svg.remove();
+          }
+        });
+
         function assertCorrectRendering() {
           const baseline = barPlot.content().select(".baseline");
           const scaledBaselineValue = valueScale.scale(<number> barPlot.baselineValue());
@@ -136,13 +143,6 @@ describe("Plots", () => {
 
           assert.strictEqual(barPlot.content().selectAll("rect").size(), 0, "draws no bars when the domain contains no data points");
         });
-
-        afterEach(function() {
-          if (this.currentTest.state === "passed") {
-            barPlot.destroy();
-            svg.remove();
-          }
-        });
       });
 
       describe(`autodomaining when ${orientation}`, () => {
@@ -165,6 +165,13 @@ describe("Plots", () => {
           } else {
             barPlot.y(baseAccessor, baseScale);
             barPlot.x(valueAccessor, valueScale);
+          }
+        });
+
+        afterEach(function() {
+          if (this.currentTest.state === "passed") {
+            barPlot.destroy();
+            svg.remove();
           }
         });
 
@@ -191,13 +198,6 @@ describe("Plots", () => {
           baseScale.autoDomain();
           const baseDomainAfterAutoDomaining = baseScale.domain();
           assert.deepEqual(baseDomainAfterRendering, baseDomainAfterAutoDomaining, "calling autoDomain() again does not change the domain");
-        });
-
-        afterEach(function() {
-          if (this.currentTest.state === "passed") {
-            barPlot.destroy();
-            svg.remove();
-          }
         });
       });
 
@@ -242,6 +242,13 @@ describe("Plots", () => {
               dataset = new Plottable.Dataset();
               barPlot.addDataset(dataset);
               barPlot.renderTo(svg);
+            });
+
+            afterEach(function() {
+              if (this.currentTest.state === "passed") {
+                barPlot.destroy();
+                svg.remove();
+              }
             });
 
             it("computes a sensible width", () => {
@@ -344,13 +351,6 @@ describe("Plots", () => {
                   "bar width is greater than half the closest distance between values");
               });
             });
-
-            afterEach(function() {
-              if (this.currentTest.state === "passed") {
-                barPlot.destroy();
-                svg.remove();
-              }
-            });
           });
         });
       });
@@ -388,6 +388,13 @@ describe("Plots", () => {
           dataset = new Plottable.Dataset(data);
           barPlot.addDataset(dataset);
           barPlot.renderTo(svg);
+        });
+
+        afterEach(function() {
+          if (this.currentTest.state === "passed") {
+            barPlot.destroy();
+            svg.remove();
+          }
         });
 
         function getCenterOfText(textNode: SVGElement) {
@@ -570,13 +577,6 @@ describe("Plots", () => {
           texts = barPlot.content().selectAll("text");
           assert.strictEqual(texts.size(), 0, "texts were immediately removed");
         });
-
-        afterEach(function() {
-          if (this.currentTest.state === "passed") {
-            barPlot.destroy();
-            svg.remove();
-          }
-        });
       });
 
       describe(`retrieving Entities when ${orientation}`, () => {
@@ -610,6 +610,13 @@ describe("Plots", () => {
           dataset = new Plottable.Dataset(data);
           barPlot.addDataset(dataset);
           barPlot.renderTo(svg);
+        });
+
+        afterEach(function() {
+          if (this.currentTest.state === "passed") {
+            barPlot.destroy();
+            svg.remove();
+          }
         });
 
         it("returns the correct position for each Entity", () => {
@@ -767,13 +774,6 @@ describe("Plots", () => {
             assert.lengthOf(entitiesInRange, 1, "retrieved one entity when range intersects one bar");
             TestMethods.assertPlotEntitiesEqual(entitiesInRange[0], expectedEntityForIndex(0), "Entity corresponds to bar 0");
           });
-        });
-
-        afterEach(function() {
-          if (this.currentTest.state === "passed") {
-            barPlot.destroy();
-            svg.remove();
-          }
         });
       });
     });
