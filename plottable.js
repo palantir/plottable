@@ -5507,7 +5507,7 @@ var Plottable;
                 this._redrawCallback = function (scale) { return _this.redraw(); };
                 this._scale.onUpdate(this._redrawCallback);
                 this._formatter = Plottable.Formatters.general();
-                this._orientation = "horizontal";
+                this._orientation = "bottom";
                 this._expands = false;
                 this.addClass("legend");
                 this.addClass("interpolated-color-legend");
@@ -5534,8 +5534,11 @@ var Plottable;
             };
             InterpolatedColorLegend._ensureOrientation = function (orientation) {
                 orientation = orientation.toLowerCase();
-                if (orientation === "horizontal" || orientation === "left" || orientation === "right") {
+                if (orientation === "top" || orientation === "bottom" || orientation === "left" || orientation === "right") {
                     return orientation;
+                }
+                else if (orientation === "horizontal") {
+                    return "bottom";
                 }
                 else {
                     throw new Error("\"" + orientation + "\" is not a valid orientation for InterpolatedColorLegend");
@@ -5595,9 +5598,8 @@ var Plottable;
                     desiredHeight = numSwatches * textHeight;
                 }
                 else {
-                    desiredHeight = padding + textHeight + padding;
-                    desiredWidth = this._textPadding + labelWidths[0] + numSwatches * textHeight
-                        + labelWidths[1] + this._textPadding;
+                    desiredHeight = padding + textHeight + this._textPadding + textHeight + this._textPadding;
+                    desiredWidth = numSwatches * textHeight;
                 }
                 return {
                     minWidth: desiredWidth,
@@ -5605,7 +5607,7 @@ var Plottable;
                 };
             };
             InterpolatedColorLegend.prototype._isVertical = function () {
-                return this._orientation !== "horizontal";
+                return this._orientation !== "bottom" && this._orientation !== "top";
             };
             InterpolatedColorLegend.prototype.renderImmediately = function () {
                 var _this = this;
@@ -5615,7 +5617,7 @@ var Plottable;
                 var text0Width = this._measurer.measure(text0).width;
                 var text1 = this._formatter(domain[1]);
                 var text1Width = this._measurer.measure(text1).width;
-                var textHeight = this._measurer.measure().height;
+                var textHeight = this._measurer.measure(text0).height;
                 var textPadding = this._textPadding;
                 var upperLabelShift = { x: 0, y: 0 };
                 var lowerLabelShift = { x: 0, y: 0 };
@@ -5646,8 +5648,8 @@ var Plottable;
                 if (this._isVertical()) {
                     numSwatches = Math.floor(this.height());
                     var longestTextWidth = Math.max(text0Width, text1Width);
-                    padding = (this.width() - longestTextWidth - 2 * this._textPadding) / 2;
-                    swatchWidth = Math.max(this.width() - padding - 2 * textPadding - longestTextWidth, 0);
+                    padding = Math.max((this.width() - longestTextWidth - 2 * textPadding) / 2, 0);
+                    swatchWidth = Math.max((this.width() - longestTextWidth - 2 * textPadding) / 2, 0);
                     swatchHeight = 1;
                     swatchY = function (d, i) { return _this.height() - (i + 1); };
                     upperWriteOptions.yAlign = "top";
@@ -5672,21 +5674,34 @@ var Plottable;
                     boundingBoxAttr["height"] = numSwatches * swatchHeight;
                 }
                 else {
-                    padding = Math.max(textPadding, (this.height() - textHeight) / 2);
-                    numSwatches = Math.max(Math.floor(this.width() - textPadding * 4 - text0Width - text1Width), 0);
+                    numSwatches = Math.floor(this.width());
                     swatchWidth = 1;
-                    swatchHeight = Math.max((this.height() - 2 * padding), 0);
-                    swatchX = function (d, i) { return Math.floor(text0Width + 2 * textPadding) + i; };
-                    swatchY = function (d, i) { return padding; };
+                    padding = Math.max((this.height() - textHeight - 2 * textPadding) / 2, 0);
+                    swatchHeight = Math.max((this.height() - textHeight - 2 * textPadding) / 2, 0);
+                    swatchX = function (d, i) { return i; };
                     upperWriteOptions.xAlign = "right";
-                    upperLabelShift.x = -textPadding;
+                    upperLabelShift.x = 0;
                     lowerWriteOptions.xAlign = "left";
-                    lowerLabelShift.x = textPadding;
-                    boundingBoxAttr["y"] = padding;
+                    lowerLabelShift.x = 0;
+                    if (this._orientation === "top") {
+                        swatchY = function (d, i) { return textPadding + textHeight + textPadding; };
+                        upperWriteOptions.yAlign = "bottom";
+                        upperLabelShift.y = -(padding + swatchHeight + textPadding);
+                        lowerWriteOptions.yAlign = "bottom";
+                        lowerLabelShift.y = -(padding + swatchHeight + textPadding);
+                    }
+                    else {
+                        swatchY = function (d, i) { return padding; };
+                        upperWriteOptions.yAlign = "top";
+                        upperLabelShift.y = padding + swatchHeight + textPadding;
+                        lowerWriteOptions.yAlign = "top";
+                        lowerLabelShift.y = padding + swatchHeight + textPadding;
+                    }
                     boundingBoxAttr["width"] = numSwatches * swatchWidth;
                     boundingBoxAttr["height"] = swatchHeight;
                 }
                 boundingBoxAttr["x"] = swatchX(null, 0); // position of the first swatch
+                boundingBoxAttr["y"] = swatchY(null, numSwatches - 1); // position of the topmost swatch
                 this._upperLabel.text(""); // clear the upper label
                 this._writer.write(text1, this.width(), this.height(), upperWriteOptions);
                 var upperTranslateString = "translate(" + upperLabelShift.x + ", " + upperLabelShift.y + ")";

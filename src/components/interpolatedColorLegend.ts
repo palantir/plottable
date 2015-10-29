@@ -41,7 +41,7 @@ module Plottable.Components {
       this._redrawCallback = (scale) => this.redraw();
       this._scale.onUpdate(this._redrawCallback);
       this._formatter = Formatters.general();
-      this._orientation = "horizontal";
+      this._orientation = "bottom";
       this._expands = false;
 
       this.addClass("legend");
@@ -95,8 +95,10 @@ module Plottable.Components {
 
     private static _ensureOrientation(orientation: string) {
       orientation = orientation.toLowerCase();
-      if (orientation === "horizontal" || orientation === "left" || orientation === "right") {
+      if (orientation === "top" || orientation === "bottom" || orientation === "left" || orientation === "right") {
         return orientation;
+      } else if (orientation === "horizontal") {
+        return "bottom";
       } else {
         throw new Error("\"" + orientation + "\" is not a valid orientation for InterpolatedColorLegend");
       }
@@ -172,9 +174,8 @@ module Plottable.Components {
         desiredWidth = padding + textHeight + this._textPadding + longestWidth + this._textPadding;
         desiredHeight = numSwatches * textHeight;
       } else {
-        desiredHeight = padding + textHeight + padding;
-        desiredWidth = this._textPadding + labelWidths[0] + numSwatches * textHeight
-                       + labelWidths[1] + this._textPadding;
+        desiredHeight = padding + textHeight + this._textPadding + textHeight + this._textPadding;
+        desiredWidth =  numSwatches * textHeight;
       }
 
       return {
@@ -184,7 +185,7 @@ module Plottable.Components {
     }
 
     private _isVertical() {
-      return this._orientation !== "horizontal";
+      return this._orientation !== "bottom" && this._orientation !== "top";
     }
 
     public renderImmediately() {
@@ -197,7 +198,7 @@ module Plottable.Components {
       let text1 = this._formatter(domain[1]);
       let text1Width = this._measurer.measure(text1).width;
 
-      let textHeight = this._measurer.measure().height;
+      let textHeight = this._measurer.measure(text0).height;
       let textPadding = this._textPadding;
 
       let upperLabelShift: Point = { x: 0, y: 0 };
@@ -228,14 +229,13 @@ module Plottable.Components {
       };
 
       let padding: number;
-
       let numSwatches: number;
 
       if (this._isVertical()) {
         numSwatches = Math.floor(this.height());
         let longestTextWidth = Math.max(text0Width, text1Width);
-        padding = (this.width() - longestTextWidth - 2 * this._textPadding) / 2;
-        swatchWidth = Math.max(this.width() - padding - 2 * textPadding - longestTextWidth, 0);
+        padding = Math.max((this.width() - longestTextWidth - 2 * textPadding) / 2, 0);
+        swatchWidth = Math.max((this.width() - longestTextWidth - 2 * textPadding) / 2, 0);
         swatchHeight = 1;
         swatchY = (d: any, i: number) => this.height() - (i + 1);
 
@@ -260,23 +260,36 @@ module Plottable.Components {
         boundingBoxAttr["width"] = swatchWidth;
         boundingBoxAttr["height"] = numSwatches * swatchHeight;
       } else { // horizontal
-        padding = Math.max(textPadding, (this.height() - textHeight) / 2);
-        numSwatches = Math.max(Math.floor(this.width() - textPadding * 4 - text0Width - text1Width), 0);
+        numSwatches = Math.floor(this.width());
         swatchWidth = 1;
-        swatchHeight = Math.max( (this.height() - 2 * padding), 0);
-        swatchX = (d: any, i: number) => Math.floor(text0Width + 2 * textPadding) + i;
-        swatchY = (d: any, i: number) => padding;
+        padding = Math.max((this.height() - textHeight - 2 * textPadding) / 2, 0);
+        swatchHeight = Math.max((this.height() - textHeight - 2 * textPadding) / 2, 0);
+        swatchX = (d: any, i: number) => i;
 
         upperWriteOptions.xAlign = "right";
-        upperLabelShift.x = -textPadding;
+        upperLabelShift.x = 0;
         lowerWriteOptions.xAlign = "left";
-        lowerLabelShift.x = textPadding;
+        lowerLabelShift.x = 0;
 
-        boundingBoxAttr["y"] = padding;
+        if (this._orientation === "top") {
+          swatchY = (d: any, i: number) => textPadding + textHeight + textPadding;
+          upperWriteOptions.yAlign = "bottom";
+          upperLabelShift.y = -(padding + swatchHeight + textPadding);
+          lowerWriteOptions.yAlign = "bottom";
+          lowerLabelShift.y = -(padding + swatchHeight + textPadding);
+
+        } else { // bottom
+          swatchY = (d: any, i: number) => padding;
+          upperWriteOptions.yAlign = "top";
+          upperLabelShift.y = padding + swatchHeight + textPadding;
+          lowerWriteOptions.yAlign = "top";
+          lowerLabelShift.y = padding + swatchHeight + textPadding;
+        }
         boundingBoxAttr["width"] = numSwatches * swatchWidth;
         boundingBoxAttr["height"] = swatchHeight;
       }
       boundingBoxAttr["x"] = swatchX(null, 0); // position of the first swatch
+      boundingBoxAttr["y"] = swatchY(null, numSwatches - 1); // position of the topmost swatch
 
       this._upperLabel.text(""); // clear the upper label
       this._writer.write(text1, this.width(), this.height(), upperWriteOptions);
