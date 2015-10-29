@@ -3740,6 +3740,7 @@ declare module Plottable {
             private _autorangeSmooth;
             private _croppedRenderingEnabled;
             private _downsamplingEnabled;
+            protected _datasetsIndexConsistent: boolean;
             /**
              * A Line Plot draws line segments starting from the first data point to the next.
              *
@@ -3834,8 +3835,9 @@ declare module Plottable {
             protected _propertyProjectors(): AttributeToProjector;
             protected _constructLineProjector(xProjector: Projector, yProjector: Projector): (datum: any, index: number, dataset: Dataset) => string;
             protected _getDataToDraw(): Utils.Map<Dataset, any[]>;
-            protected _filterCroppedRendering(dataset: Dataset, indices: number[]): number[];
-            protected _filterDownsampling(dataset: Dataset, indices: number[]): number[];
+            private _filterDataset(data, dataset);
+            private _filterCroppedRendering(dataset, indices);
+            private _filterDownsampling(dataset, indices);
         }
     }
 }
@@ -3951,7 +3953,6 @@ declare module Plottable {
             private static _domainKeys(datasets, keyAccessor);
             protected _propertyProjectors(): AttributeToProjector;
             protected _pixelPoint(datum: any, index: number, dataset: Dataset): Point;
-            protected _getDataToDraw(): Utils.Map<Dataset, any[]>;
         }
     }
 }

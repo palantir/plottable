@@ -20,6 +20,7 @@ export module Plots {
       this._stackingResult = new Utils.Map<Dataset, Utils.Map<string, Utils.Stacking.StackedDatum>>();
       this._stackedExtent = [];
       this._baselineValueProvider = () => [this._baselineValue];
+      this._datasetsIndexConsistent = true;
     }
 
     protected _getAnimator(key: string): Animator {
@@ -179,34 +180,6 @@ export module Plots {
       let yValue = this.y().accessor(datum, index, dataset);
       let scaledYValue = this.y().scale.scale(+yValue + this._stackingResult.get(dataset).get(Utils.Stacking.normalizeKey(xValue)).offset);
       return { x: pixelPoint.x, y: scaledYValue };
-    }
-
-    protected _getDataToDraw() {
-      if (!this.downsamplingEnabled()) {
-        return super._getDataToDraw();
-      }
-      let dataToDraw = new Utils.Map<Dataset, any[]> ();
-      if (this.datasets().length === 0) {
-        return dataToDraw;
-      }
-      let overallFilteredDataIndices: number[] = [];
-      this.datasets().forEach((dataset) => {
-        let data = dataset.data();
-        let filteredDataIndices = data.map((d, i) => i);
-        if (this.croppedRenderingEnabled()) {
-          filteredDataIndices = this._filterCroppedRendering(dataset, filteredDataIndices);
-        }
-        if (this.downsamplingEnabled()) {
-          filteredDataIndices = this._filterDownsampling(dataset, filteredDataIndices);
-        }
-        overallFilteredDataIndices = overallFilteredDataIndices.concat(filteredDataIndices
-          .filter((d) => {return overallFilteredDataIndices.indexOf(d) < 0; }));
-      });
-      this.datasets().forEach((dataset) => {
-        let data = dataset.data();
-        dataToDraw.set(dataset, [overallFilteredDataIndices.sort((a, b) => a - b).map((d) => data[d])]);
-      });
-      return dataToDraw;
     }
   }
 }

@@ -8996,6 +8996,7 @@ var Plottable;
                 this._autorangeSmooth = false;
                 this._croppedRenderingEnabled = true;
                 this._downsamplingEnabled = false;
+                this._datasetsIndexConsistent = false;
                 this.addClass("line-plot");
                 var animator = new Plottable.Animators.Easing();
                 animator.stepDuration(Plottable.Plot._ANIMATION_MAX_DURATION);
@@ -9264,22 +9265,41 @@ var Plottable;
             Line.prototype._getDataToDraw = function () {
                 var _this = this;
                 var dataToDraw = new Plottable.Utils.Map();
-                this.datasets().forEach(function (dataset) {
-                    var data = dataset.data();
-                    if (!_this._croppedRenderingEnabled && !_this._downsamplingEnabled) {
-                        dataToDraw.set(dataset, [data]);
-                        return;
-                    }
-                    var filteredDataIndices = data.map(function (d, i) { return i; });
-                    if (_this._croppedRenderingEnabled) {
-                        filteredDataIndices = _this._filterCroppedRendering(dataset, filteredDataIndices);
-                    }
-                    if (_this._downsamplingEnabled) {
-                        filteredDataIndices = _this._filterDownsampling(dataset, filteredDataIndices);
-                    }
-                    dataToDraw.set(dataset, [filteredDataIndices.map(function (d, i) { return data[d]; })]);
-                });
+                if (!this._datasetsIndexConsistent || (!this._croppedRenderingEnabled && !this._downsamplingEnabled)) {
+                    this.datasets().forEach(function (dataset) {
+                        var data = dataset.data();
+                        if (!_this._croppedRenderingEnabled && !_this._downsamplingEnabled) {
+                            dataToDraw.set(dataset, [data]);
+                        }
+                        else {
+                            var filteredDataIndices = _this._filterDataset(data, dataset);
+                            dataToDraw.set(dataset, [filteredDataIndices.map(function (d, i) { return data[d]; })]);
+                        }
+                    });
+                }
+                else {
+                    var overallFilteredDataIndices = [];
+                    this.datasets().forEach(function (dataset) {
+                        var data = dataset.data();
+                        var filteredDataIndices = _this._filterDataset(data, dataset);
+                        overallFilteredDataIndices = overallFilteredDataIndices.concat(filteredDataIndices.filter(function (d) { return overallFilteredDataIndices.indexOf(d) < 0; }));
+                    });
+                    this.datasets().forEach(function (dataset) {
+                        var data = dataset.data();
+                        dataToDraw.set(dataset, [overallFilteredDataIndices.sort(function (a, b) { return a - b; }).map(function (d) { return data[d]; })]);
+                    });
+                }
                 return dataToDraw;
+            };
+            Line.prototype._filterDataset = function (data, dataset) {
+                var filteredDataIndices = data.map(function (d, i) { return i; });
+                if (this._croppedRenderingEnabled) {
+                    filteredDataIndices = this._filterCroppedRendering(dataset, filteredDataIndices);
+                }
+                if (this._downsamplingEnabled) {
+                    filteredDataIndices = this._filterDownsampling(dataset, filteredDataIndices);
+                }
+                return filteredDataIndices;
             };
             Line.prototype._filterCroppedRendering = function (dataset, indices) {
                 var _this = this;
@@ -9641,6 +9661,7 @@ var Plottable;
                 this._stackingResult = new Plottable.Utils.Map();
                 this._stackedExtent = [];
                 this._baselineValueProvider = function () { return [_this._baselineValue]; };
+                this._datasetsIndexConsistent = true;
             }
             StackedArea.prototype._getAnimator = function (key) {
                 return new Plottable.Animators.Null();
@@ -9776,34 +9797,6 @@ var Plottable;
                 var yValue = this.y().accessor(datum, index, dataset);
                 var scaledYValue = this.y().scale.scale(+yValue + this._stackingResult.get(dataset).get(Plottable.Utils.Stacking.normalizeKey(xValue)).offset);
                 return { x: pixelPoint.x, y: scaledYValue };
-            };
-            StackedArea.prototype._getDataToDraw = function () {
-                var _this = this;
-                if (!this.downsamplingEnabled()) {
-                    return _super.prototype._getDataToDraw.call(this);
-                }
-                var dataToDraw = new Plottable.Utils.Map();
-                if (this.datasets().length === 0) {
-                    return dataToDraw;
-                }
-                var overallFilteredDataIndices = [];
-                this.datasets().forEach(function (dataset) {
-                    var data = dataset.data();
-                    var filteredDataIndices = data.map(function (d, i) { return i; });
-                    if (_this.croppedRenderingEnabled()) {
-                        filteredDataIndices = _this._filterCroppedRendering(dataset, filteredDataIndices);
-                    }
-                    if (_this.downsamplingEnabled()) {
-                        filteredDataIndices = _this._filterDownsampling(dataset, filteredDataIndices);
-                    }
-                    overallFilteredDataIndices = overallFilteredDataIndices.concat(filteredDataIndices
-                        .filter(function (d) { return overallFilteredDataIndices.indexOf(d) < 0; }));
-                });
-                this.datasets().forEach(function (dataset) {
-                    var data = dataset.data();
-                    dataToDraw.set(dataset, [overallFilteredDataIndices.sort(function (a, b) { return a - b; }).map(function (d) { return data[d]; })]);
-                });
-                return dataToDraw;
             };
             return StackedArea;
         })(Plots.Area);
