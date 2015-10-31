@@ -1,7 +1,4 @@
-///<reference path="../reference.ts" />
-
-module Plottable {
-export module Components {
+module Plottable.Components {
   export enum PropertyMode { VALUE, PIXEL };
   export class SelectionBoxLayer extends Component {
     protected _box: d3.Selection<void>;
@@ -292,5 +289,4 @@ export module Components {
       }
     }
   }
-}
 }

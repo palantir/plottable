@@ -1,5 +1,5 @@
 /*!
-Plottable 1.15.0 (https://github.com/palantir/plottable)
+Plottable 1.16.1 (https://github.com/palantir/plottable)
 Copyright 2014-2015 Palantir Technologies
 Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
 */
@@ -18,7 +18,266 @@ Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
         root['Plottable'] = factory(req, exp, mod);
     }
 }(this, function(require, exports, module) {
-///<reference path="../reference.ts" />
+/*!
+Plottable 1.16.1 (https://github.com/palantir/plottable)
+Copyright 2014-2015 Palantir Technologies
+Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
+*/
+
+(function(root, factory) {
+    if(typeof exports === 'object') {
+        module.exports = factory(require, exports, module);
+    }
+    else if(typeof define === 'function' && define.amd) {
+        define(['require', 'exports', 'module'], factory);
+    }
+    else {
+        var req = function(id) {return root[id];},
+            exp = root,
+            mod = {exports: exp};
+        root['Plottable'] = factory(req, exp, mod);
+    }
+}(this, function(require, exports, module) {
+/*!
+Plottable 1.16.1 (https://github.com/palantir/plottable)
+Copyright 2014-2015 Palantir Technologies
+Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
+*/
+
+(function(root, factory) {
+    if(typeof exports === 'object') {
+        module.exports = factory(require, exports, module);
+    }
+    else if(typeof define === 'function' && define.amd) {
+        define(['require', 'exports', 'module'], factory);
+    }
+    else {
+        var req = function(id) {return root[id];},
+            exp = root,
+            mod = {exports: exp};
+        root['Plottable'] = factory(req, exp, mod);
+    }
+}(this, function(require, exports, module) {
+/*!
+Plottable 1.16.1 (https://github.com/palantir/plottable)
+Copyright 2014-2015 Palantir Technologies
+Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
+*/
+
+(function(root, factory) {
+    if(typeof exports === 'object') {
+        module.exports = factory(require, exports, module);
+    }
+    else if(typeof define === 'function' && define.amd) {
+        define(['require', 'exports', 'module'], factory);
+    }
+    else {
+        var req = function(id) {return root[id];},
+            exp = root,
+            mod = {exports: exp};
+        root['Plottable'] = factory(req, exp, mod);
+    }
+}(this, function(require, exports, module) {
+/*!
+Plottable 1.16.1 (https://github.com/palantir/plottable)
+Copyright 2014-2015 Palantir Technologies
+Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
+*/
+
+(function(root, factory) {
+    if(typeof exports === 'object') {
+        module.exports = factory(require, exports, module);
+    }
+    else if(typeof define === 'function' && define.amd) {
+        define(['require', 'exports', 'module'], factory);
+    }
+    else {
+        var req = function(id) {return root[id];},
+            exp = root,
+            mod = {exports: exp};
+        root['Plottable'] = factory(req, exp, mod);
+    }
+}(this, function(require, exports, module) {
+/*!
+Plottable 1.16.1 (https://github.com/palantir/plottable)
+Copyright 2014-2015 Palantir Technologies
+Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
+*/
+
+(function(root, factory) {
+    if(typeof exports === 'object') {
+        module.exports = factory(require, exports, module);
+    }
+    else if(typeof define === 'function' && define.amd) {
+        define(['require', 'exports', 'module'], factory);
+    }
+    else {
+        var req = function(id) {return root[id];},
+            exp = root,
+            mod = {exports: exp};
+        root['Plottable'] = factory(req, exp, mod);
+    }
+}(this, function(require, exports, module) {
+/*!
+Plottable 1.16.1 (https://github.com/palantir/plottable)
+Copyright 2014-2015 Palantir Technologies
+Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
+*/
+
+(function(root, factory) {
+    if(typeof exports === 'object') {
+        module.exports = factory(require, exports, module);
+    }
+    else if(typeof define === 'function' && define.amd) {
+        define(['require', 'exports', 'module'], factory);
+    }
+    else {
+        var req = function(id) {return root[id];},
+            exp = root,
+            mod = {exports: exp};
+        root['Plottable'] = factory(req, exp, mod);
+    }
+}(this, function(require, exports, module) {
+/*!
+Plottable 1.16.1 (https://github.com/palantir/plottable)
+Copyright 2014-2015 Palantir Technologies
+Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
+*/
+
+(function(root, factory) {
+    if(typeof exports === 'object') {
+        module.exports = factory(require, exports, module);
+    }
+    else if(typeof define === 'function' && define.amd) {
+        define(['require', 'exports', 'module'], factory);
+    }
+    else {
+        var req = function(id) {return root[id];},
+            exp = root,
+            mod = {exports: exp};
+        root['Plottable'] = factory(req, exp, mod);
+    }
+}(this, function(require, exports, module) {
+/*!
+Plottable 1.16.1 (https://github.com/palantir/plottable)
+Copyright 2014-2015 Palantir Technologies
+Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
+*/
+
+(function(root, factory) {
+    if(typeof exports === 'object') {
+        module.exports = factory(require, exports, module);
+    }
+    else if(typeof define === 'function' && define.amd) {
+        define(['require', 'exports', 'module'], factory);
+    }
+    else {
+        var req = function(id) {return root[id];},
+            exp = root,
+            mod = {exports: exp};
+        root['Plottable'] = factory(req, exp, mod);
+    }
+}(this, function(require, exports, module) {
+/*!
+Plottable 1.16.1 (https://github.com/palantir/plottable)
+Copyright 2014-2015 Palantir Technologies
+Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
+*/
+
+(function(root, factory) {
+    if(typeof exports === 'object') {
+        module.exports = factory(require, exports, module);
+    }
+    else if(typeof define === 'function' && define.amd) {
+        define(['require', 'exports', 'module'], factory);
+    }
+    else {
+        var req = function(id) {return root[id];},
+            exp = root,
+            mod = {exports: exp};
+        root['Plottable'] = factory(req, exp, mod);
+    }
+}(this, function(require, exports, module) {
+/*!
+Plottable 1.16.1 (https://github.com/palantir/plottable)
+Copyright 2014-2015 Palantir Technologies
+Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
+*/
+
+(function(root, factory) {
+    if(typeof exports === 'object') {
+        module.exports = factory(require, exports, module);
+    }
+    else if(typeof define === 'function' && define.amd) {
+        define(['require', 'exports', 'module'], factory);
+    }
+    else {
+        var req = function(id) {return root[id];},
+            exp = root,
+            mod = {exports: exp};
+        root['Plottable'] = factory(req, exp, mod);
+    }
+}(this, function(require, exports, module) {
+/*!
+Plottable 1.16.1 (https://github.com/palantir/plottable)
+Copyright 2014-2015 Palantir Technologies
+Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
+*/
+
+(function(root, factory) {
+    if(typeof exports === 'object') {
+        module.exports = factory(require, exports, module);
+    }
+    else if(typeof define === 'function' && define.amd) {
+        define(['require', 'exports', 'module'], factory);
+    }
+    else {
+        var req = function(id) {return root[id];},
+            exp = root,
+            mod = {exports: exp};
+        root['Plottable'] = factory(req, exp, mod);
+    }
+}(this, function(require, exports, module) {
+/*!
+Plottable 1.16.1 (https://github.com/palantir/plottable)
+Copyright 2014-2015 Palantir Technologies
+Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
+*/
+
+(function(root, factory) {
+    if(typeof exports === 'object') {
+        module.exports = factory(require, exports, module);
+    }
+    else if(typeof define === 'function' && define.amd) {
+        define(['require', 'exports', 'module'], factory);
+    }
+    else {
+        var req = function(id) {return root[id];},
+            exp = root,
+            mod = {exports: exp};
+        root['Plottable'] = factory(req, exp, mod);
+    }
+}(this, function(require, exports, module) {
+/*!
+Plottable 1.16.1 (https://github.com/palantir/plottable)
+Copyright 2014-2015 Palantir Technologies
+Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
+*/
+
+(function(root, factory) {
+    if(typeof exports === 'object') {
+        module.exports = factory(require, exports, module);
+    }
+    else if(typeof define === 'function' && define.amd) {
+        define(['require', 'exports', 'module'], factory);
+    }
+    else {
+        var req = function(id) {return root[id];},
+            exp = root,
+            mod = {exports: exp};
+        root['Plottable'] = factory(req, exp, mod);
+    }
+}(this, function(require, exports, module) {
 var Plottable;
 (function (Plottable) {
     var Utils;
@@ -118,8 +377,6 @@ var Plottable;
         })(Math = Utils.Math || (Utils.Math = {}));
     })(Utils = Plottable.Utils || (Plottable.Utils = {}));
 })(Plottable || (Plottable = {}));
-
-///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
     var Utils;
@@ -204,8 +461,6 @@ var Plottable;
         Utils.Map = Map;
     })(Utils = Plottable.Utils || (Plottable.Utils = {}));
 })(Plottable || (Plottable = {}));
-
-///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
     var Utils;
@@ -272,8 +527,6 @@ var Plottable;
         Utils.Set = Set;
     })(Utils = Plottable.Utils || (Plottable.Utils = {}));
 })(Plottable || (Plottable = {}));
-
-///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
     var Utils;
@@ -476,8 +729,6 @@ var Plottable;
         })(DOM = Utils.DOM || (Utils.DOM = {}));
     })(Utils = Plottable.Utils || (Plottable.Utils = {}));
 })(Plottable || (Plottable = {}));
-
-///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
     var Utils;
@@ -557,8 +808,6 @@ var Plottable;
         })(Color = Utils.Color || (Utils.Color = {}));
     })(Utils = Plottable.Utils || (Plottable.Utils = {}));
 })(Plottable || (Plottable = {}));
-
-///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
     var Utils;
@@ -625,8 +874,6 @@ var Plottable;
         })(Array = Utils.Array || (Utils.Array = {}));
     })(Utils = Plottable.Utils || (Plottable.Utils = {}));
 })(Plottable || (Plottable = {}));
-
-///<reference path="../reference.ts" />
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
@@ -662,8 +909,6 @@ var Plottable;
         Utils.CallbackSet = CallbackSet;
     })(Utils = Plottable.Utils || (Plottable.Utils = {}));
 })(Plottable || (Plottable = {}));
-
-///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
     var Utils;
@@ -745,8 +990,6 @@ var Plottable;
         })(Stacking = Utils.Stacking || (Utils.Stacking = {}));
     })(Utils = Plottable.Utils || (Plottable.Utils = {}));
 })(Plottable || (Plottable = {}));
-
-///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
     var Utils;
@@ -815,8 +1058,6 @@ var Plottable;
         })(Window = Utils.Window || (Utils.Window = {}));
     })(Utils = Plottable.Utils || (Plottable.Utils = {}));
 })(Plottable || (Plottable = {}));
-
-///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
     var Utils;
@@ -888,8 +1129,6 @@ var Plottable;
         Utils.ClientToSVGTranslator = ClientToSVGTranslator;
     })(Utils = Plottable.Utils || (Plottable.Utils = {}));
 })(Plottable || (Plottable = {}));
-
-///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
     var Configs;
@@ -904,14 +1143,10 @@ var Plottable;
         Configs.ADD_TITLE_ELEMENTS = true;
     })(Configs = Plottable.Configs || (Plottable.Configs = {}));
 })(Plottable || (Plottable = {}));
-
-///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
-    Plottable.version = "1.15.0";
+    Plottable.version = "1.16.1";
 })(Plottable || (Plottable = {}));
-
-///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
     var Dataset = (function () {
@@ -974,8 +1209,6 @@ var Plottable;
     })();
     Plottable.Dataset = Dataset;
 })(Plottable || (Plottable = {}));
-
-///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
     var RenderPolicies;
@@ -1023,26 +1256,24 @@ var Plottable;
         RenderPolicies.Timeout = Timeout;
     })(RenderPolicies = Plottable.RenderPolicies || (Plottable.RenderPolicies = {}));
 })(Plottable || (Plottable = {}));
-
-///<reference path="../reference.ts" />
+/**
+ * The RenderController is responsible for enqueueing and synchronizing
+ * layout and render calls for Components.
+ *
+ * Layout and render calls occur inside an animation callback
+ * (window.requestAnimationFrame if available).
+ *
+ * RenderController.flush() immediately lays out and renders all Components currently enqueued.
+ *
+ * To always have immediate rendering (useful for debugging), call
+ * ```typescript
+ * Plottable.RenderController.setRenderPolicy(
+ *   new Plottable.RenderPolicies.Immediate()
+ * );
+ * ```
+ */
 var Plottable;
 (function (Plottable) {
-    /**
-     * The RenderController is responsible for enqueueing and synchronizing
-     * layout and render calls for Components.
-     *
-     * Layout and render calls occur inside an animation callback
-     * (window.requestAnimationFrame if available).
-     *
-     * RenderController.flush() immediately lays out and renders all Components currently enqueued.
-     *
-     * To always have immediate rendering (useful for debugging), call
-     * ```typescript
-     * Plottable.RenderController.setRenderPolicy(
-     *   new Plottable.RenderPolicies.Immediate()
-     * );
-     * ```
-     */
     var RenderController;
     (function (RenderController) {
         var _componentsNeedingRender = new Plottable.Utils.Set();
@@ -1139,9 +1370,6 @@ var Plottable;
         RenderController.flush = flush;
     })(RenderController = Plottable.RenderController || (Plottable.RenderController = {}));
 })(Plottable || (Plottable = {}));
-
-
-///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
     /**
@@ -1154,6 +1382,9 @@ var Plottable;
      *
      */
     Plottable.MILLISECONDS_IN_ONE_DAY = 24 * 60 * 60 * 1000;
+})(Plottable || (Plottable = {}));
+var Plottable;
+(function (Plottable) {
     var Formatters;
     (function (Formatters) {
         /**
@@ -1415,8 +1646,6 @@ var Plottable;
         }
     })(Formatters = Plottable.Formatters || (Plottable.Formatters = {}));
 })(Plottable || (Plottable = {}));
-
-///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
     var SymbolFactories;
@@ -1447,8 +1676,6 @@ var Plottable;
         SymbolFactories.triangleDown = triangleDown;
     })(SymbolFactories = Plottable.SymbolFactories || (Plottable.SymbolFactories = {}));
 })(Plottable || (Plottable = {}));
-
-///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
     var Scale = (function () {
@@ -1596,13 +1823,6 @@ var Plottable;
     })();
     Plottable.Scale = Scale;
 })(Plottable || (Plottable = {}));
-
-///<reference path="../reference.ts" />
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
 var Plottable;
 (function (Plottable) {
     var QuantitativeScale = (function (_super) {
@@ -1833,13 +2053,6 @@ var Plottable;
     })(Plottable.Scale);
     Plottable.QuantitativeScale = QuantitativeScale;
 })(Plottable || (Plottable = {}));
-
-///<reference path="../reference.ts" />
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
 var Plottable;
 (function (Plottable) {
     var Scales;
@@ -1891,13 +2104,6 @@ var Plottable;
         Scales.Linear = Linear;
     })(Scales = Plottable.Scales || (Plottable.Scales = {}));
 })(Plottable || (Plottable = {}));
-
-///<reference path="../reference.ts" />
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
 var Plottable;
 (function (Plottable) {
     var Scales;
@@ -2082,13 +2288,6 @@ var Plottable;
         Scales.ModifiedLog = ModifiedLog;
     })(Scales = Plottable.Scales || (Plottable.Scales = {}));
 })(Plottable || (Plottable = {}));
-
-///<reference path="../reference.ts" />
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
 var Plottable;
 (function (Plottable) {
     var Scales;
@@ -2196,13 +2395,6 @@ var Plottable;
         Scales.Category = Category;
     })(Scales = Plottable.Scales || (Plottable.Scales = {}));
 })(Plottable || (Plottable = {}));
-
-///<reference path="../reference.ts" />
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
 var Plottable;
 (function (Plottable) {
     var Scales;
@@ -2314,13 +2506,6 @@ var Plottable;
         Scales.Color = Color;
     })(Scales = Plottable.Scales || (Plottable.Scales = {}));
 })(Plottable || (Plottable = {}));
-
-///<reference path="../reference.ts" />
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
 var Plottable;
 (function (Plottable) {
     var Scales;
@@ -2426,13 +2611,6 @@ var Plottable;
         Scales.Time = Time;
     })(Scales = Plottable.Scales || (Plottable.Scales = {}));
 })(Plottable || (Plottable = {}));
-
-///<reference path="../reference.ts" />
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
 var Plottable;
 (function (Plottable) {
     var Scales;
@@ -2579,8 +2757,6 @@ var Plottable;
         Scales.InterpolatedColor = InterpolatedColor;
     })(Scales = Plottable.Scales || (Plottable.Scales = {}));
 })(Plottable || (Plottable = {}));
-
-///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
     var Scales;
@@ -2627,8 +2803,6 @@ var Plottable;
         })(TickGenerators = Scales.TickGenerators || (Scales.TickGenerators = {}));
     })(Scales = Plottable.Scales || (Plottable.Scales = {}));
 })(Plottable || (Plottable = {}));
-
-///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
     var Drawer = (function () {
@@ -2762,13 +2936,6 @@ var Plottable;
     })();
     Plottable.Drawer = Drawer;
 })(Plottable || (Plottable = {}));
-
-///<reference path="../reference.ts" />
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
 var Plottable;
 (function (Plottable) {
     var Drawers;
@@ -2792,13 +2959,6 @@ var Plottable;
         Drawers.Line = Line;
     })(Drawers = Plottable.Drawers || (Plottable.Drawers = {}));
 })(Plottable || (Plottable = {}));
-
-///<reference path="../reference.ts" />
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
 var Plottable;
 (function (Plottable) {
     var Drawers;
@@ -2822,13 +2982,6 @@ var Plottable;
         Drawers.Area = Area;
     })(Drawers = Plottable.Drawers || (Plottable.Drawers = {}));
 })(Plottable || (Plottable = {}));
-
-///<reference path="../reference.ts" />
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
 var Plottable;
 (function (Plottable) {
     var Drawers;
@@ -2844,13 +2997,6 @@ var Plottable;
         Drawers.Rectangle = Rectangle;
     })(Drawers = Plottable.Drawers || (Plottable.Drawers = {}));
 })(Plottable || (Plottable = {}));
-
-///<reference path="../reference.ts" />
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
 var Plottable;
 (function (Plottable) {
     var Drawers;
@@ -2871,13 +3017,6 @@ var Plottable;
         Drawers.Arc = Arc;
     })(Drawers = Plottable.Drawers || (Plottable.Drawers = {}));
 })(Plottable || (Plottable = {}));
-
-///<reference path="../reference.ts" />
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
 var Plottable;
 (function (Plottable) {
     var Drawers;
@@ -2898,13 +3037,6 @@ var Plottable;
         Drawers.ArcOutline = ArcOutline;
     })(Drawers = Plottable.Drawers || (Plottable.Drawers = {}));
 })(Plottable || (Plottable = {}));
-
-///<reference path="../reference.ts" />
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
 var Plottable;
 (function (Plottable) {
     var Drawers;
@@ -2921,13 +3053,6 @@ var Plottable;
         Drawers.Symbol = Symbol;
     })(Drawers = Plottable.Drawers || (Plottable.Drawers = {}));
 })(Plottable || (Plottable = {}));
-
-///<reference path="../reference.ts" />
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
 var Plottable;
 (function (Plottable) {
     var Drawers;
@@ -2943,8 +3068,6 @@ var Plottable;
         Drawers.Segment = Segment;
     })(Drawers = Plottable.Drawers || (Plottable.Drawers = {}));
 })(Plottable || (Plottable = {}));
-
-///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
     var Components;
@@ -3461,13 +3584,6 @@ var Plottable;
     })();
     Plottable.Component = Component;
 })(Plottable || (Plottable = {}));
-
-///<reference path="../reference.ts" />
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
 var Plottable;
 (function (Plottable) {
     /*
@@ -3542,13 +3658,6 @@ var Plottable;
     })(Plottable.Component);
     Plottable.ComponentContainer = ComponentContainer;
 })(Plottable || (Plottable = {}));
-
-///<reference path="../reference.ts" />
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
 var Plottable;
 (function (Plottable) {
     var Components;
@@ -3640,13 +3749,6 @@ var Plottable;
         Components.Group = Group;
     })(Components = Plottable.Components || (Plottable.Components = {}));
 })(Plottable || (Plottable = {}));
-
-///<reference path="../reference.ts" />
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
 var Plottable;
 (function (Plottable) {
     var Axis = (function (_super) {
@@ -4199,13 +4301,6 @@ var Plottable;
     })(Plottable.Component);
     Plottable.Axis = Axis;
 })(Plottable || (Plottable = {}));
-
-///<reference path="../reference.ts" />
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
 var Plottable;
 (function (Plottable) {
     var TimeInterval;
@@ -4219,6 +4314,9 @@ var Plottable;
         TimeInterval.year = "year";
     })(TimeInterval = Plottable.TimeInterval || (Plottable.TimeInterval = {}));
     ;
+})(Plottable || (Plottable = {}));
+var Plottable;
+(function (Plottable) {
     var Axes;
     (function (Axes) {
         var Time = (function (_super) {
@@ -4566,111 +4664,111 @@ var Plottable;
             Time.TIME_AXIS_TIER_CLASS = "time-axis-tier";
             Time._DEFAULT_TIME_AXIS_CONFIGURATIONS = [
                 [
-                    { interval: TimeInterval.second, step: 1, formatter: Plottable.Formatters.time("%I:%M:%S %p") },
-                    { interval: TimeInterval.day, step: 1, formatter: Plottable.Formatters.time("%B %e, %Y") }
+                    { interval: Plottable.TimeInterval.second, step: 1, formatter: Plottable.Formatters.time("%I:%M:%S %p") },
+                    { interval: Plottable.TimeInterval.day, step: 1, formatter: Plottable.Formatters.time("%B %e, %Y") }
                 ],
                 [
-                    { interval: TimeInterval.second, step: 5, formatter: Plottable.Formatters.time("%I:%M:%S %p") },
-                    { interval: TimeInterval.day, step: 1, formatter: Plottable.Formatters.time("%B %e, %Y") }
+                    { interval: Plottable.TimeInterval.second, step: 5, formatter: Plottable.Formatters.time("%I:%M:%S %p") },
+                    { interval: Plottable.TimeInterval.day, step: 1, formatter: Plottable.Formatters.time("%B %e, %Y") }
                 ],
                 [
-                    { interval: TimeInterval.second, step: 10, formatter: Plottable.Formatters.time("%I:%M:%S %p") },
-                    { interval: TimeInterval.day, step: 1, formatter: Plottable.Formatters.time("%B %e, %Y") }
+                    { interval: Plottable.TimeInterval.second, step: 10, formatter: Plottable.Formatters.time("%I:%M:%S %p") },
+                    { interval: Plottable.TimeInterval.day, step: 1, formatter: Plottable.Formatters.time("%B %e, %Y") }
                 ],
                 [
-                    { interval: TimeInterval.second, step: 15, formatter: Plottable.Formatters.time("%I:%M:%S %p") },
-                    { interval: TimeInterval.day, step: 1, formatter: Plottable.Formatters.time("%B %e, %Y") }
+                    { interval: Plottable.TimeInterval.second, step: 15, formatter: Plottable.Formatters.time("%I:%M:%S %p") },
+                    { interval: Plottable.TimeInterval.day, step: 1, formatter: Plottable.Formatters.time("%B %e, %Y") }
                 ],
                 [
-                    { interval: TimeInterval.second, step: 30, formatter: Plottable.Formatters.time("%I:%M:%S %p") },
-                    { interval: TimeInterval.day, step: 1, formatter: Plottable.Formatters.time("%B %e, %Y") }
+                    { interval: Plottable.TimeInterval.second, step: 30, formatter: Plottable.Formatters.time("%I:%M:%S %p") },
+                    { interval: Plottable.TimeInterval.day, step: 1, formatter: Plottable.Formatters.time("%B %e, %Y") }
                 ],
                 [
-                    { interval: TimeInterval.minute, step: 1, formatter: Plottable.Formatters.time("%I:%M %p") },
-                    { interval: TimeInterval.day, step: 1, formatter: Plottable.Formatters.time("%B %e, %Y") }
+                    { interval: Plottable.TimeInterval.minute, step: 1, formatter: Plottable.Formatters.time("%I:%M %p") },
+                    { interval: Plottable.TimeInterval.day, step: 1, formatter: Plottable.Formatters.time("%B %e, %Y") }
                 ],
                 [
-                    { interval: TimeInterval.minute, step: 5, formatter: Plottable.Formatters.time("%I:%M %p") },
-                    { interval: TimeInterval.day, step: 1, formatter: Plottable.Formatters.time("%B %e, %Y") }
+                    { interval: Plottable.TimeInterval.minute, step: 5, formatter: Plottable.Formatters.time("%I:%M %p") },
+                    { interval: Plottable.TimeInterval.day, step: 1, formatter: Plottable.Formatters.time("%B %e, %Y") }
                 ],
                 [
-                    { interval: TimeInterval.minute, step: 10, formatter: Plottable.Formatters.time("%I:%M %p") },
-                    { interval: TimeInterval.day, step: 1, formatter: Plottable.Formatters.time("%B %e, %Y") }
+                    { interval: Plottable.TimeInterval.minute, step: 10, formatter: Plottable.Formatters.time("%I:%M %p") },
+                    { interval: Plottable.TimeInterval.day, step: 1, formatter: Plottable.Formatters.time("%B %e, %Y") }
                 ],
                 [
-                    { interval: TimeInterval.minute, step: 15, formatter: Plottable.Formatters.time("%I:%M %p") },
-                    { interval: TimeInterval.day, step: 1, formatter: Plottable.Formatters.time("%B %e, %Y") }
+                    { interval: Plottable.TimeInterval.minute, step: 15, formatter: Plottable.Formatters.time("%I:%M %p") },
+                    { interval: Plottable.TimeInterval.day, step: 1, formatter: Plottable.Formatters.time("%B %e, %Y") }
                 ],
                 [
-                    { interval: TimeInterval.minute, step: 30, formatter: Plottable.Formatters.time("%I:%M %p") },
-                    { interval: TimeInterval.day, step: 1, formatter: Plottable.Formatters.time("%B %e, %Y") }
+                    { interval: Plottable.TimeInterval.minute, step: 30, formatter: Plottable.Formatters.time("%I:%M %p") },
+                    { interval: Plottable.TimeInterval.day, step: 1, formatter: Plottable.Formatters.time("%B %e, %Y") }
                 ],
                 [
-                    { interval: TimeInterval.hour, step: 1, formatter: Plottable.Formatters.time("%I %p") },
-                    { interval: TimeInterval.day, step: 1, formatter: Plottable.Formatters.time("%B %e, %Y") }
+                    { interval: Plottable.TimeInterval.hour, step: 1, formatter: Plottable.Formatters.time("%I %p") },
+                    { interval: Plottable.TimeInterval.day, step: 1, formatter: Plottable.Formatters.time("%B %e, %Y") }
                 ],
                 [
-                    { interval: TimeInterval.hour, step: 3, formatter: Plottable.Formatters.time("%I %p") },
-                    { interval: TimeInterval.day, step: 1, formatter: Plottable.Formatters.time("%B %e, %Y") }
+                    { interval: Plottable.TimeInterval.hour, step: 3, formatter: Plottable.Formatters.time("%I %p") },
+                    { interval: Plottable.TimeInterval.day, step: 1, formatter: Plottable.Formatters.time("%B %e, %Y") }
                 ],
                 [
-                    { interval: TimeInterval.hour, step: 6, formatter: Plottable.Formatters.time("%I %p") },
-                    { interval: TimeInterval.day, step: 1, formatter: Plottable.Formatters.time("%B %e, %Y") }
+                    { interval: Plottable.TimeInterval.hour, step: 6, formatter: Plottable.Formatters.time("%I %p") },
+                    { interval: Plottable.TimeInterval.day, step: 1, formatter: Plottable.Formatters.time("%B %e, %Y") }
                 ],
                 [
-                    { interval: TimeInterval.hour, step: 12, formatter: Plottable.Formatters.time("%I %p") },
-                    { interval: TimeInterval.day, step: 1, formatter: Plottable.Formatters.time("%B %e, %Y") }
+                    { interval: Plottable.TimeInterval.hour, step: 12, formatter: Plottable.Formatters.time("%I %p") },
+                    { interval: Plottable.TimeInterval.day, step: 1, formatter: Plottable.Formatters.time("%B %e, %Y") }
                 ],
                 [
-                    { interval: TimeInterval.day, step: 1, formatter: Plottable.Formatters.time("%a %e") },
-                    { interval: TimeInterval.month, step: 1, formatter: Plottable.Formatters.time("%B %Y") }
+                    { interval: Plottable.TimeInterval.day, step: 1, formatter: Plottable.Formatters.time("%a %e") },
+                    { interval: Plottable.TimeInterval.month, step: 1, formatter: Plottable.Formatters.time("%B %Y") }
                 ],
                 [
-                    { interval: TimeInterval.day, step: 1, formatter: Plottable.Formatters.time("%e") },
-                    { interval: TimeInterval.month, step: 1, formatter: Plottable.Formatters.time("%B %Y") }
+                    { interval: Plottable.TimeInterval.day, step: 1, formatter: Plottable.Formatters.time("%e") },
+                    { interval: Plottable.TimeInterval.month, step: 1, formatter: Plottable.Formatters.time("%B %Y") }
                 ],
                 [
-                    { interval: TimeInterval.month, step: 1, formatter: Plottable.Formatters.time("%B") },
-                    { interval: TimeInterval.year, step: 1, formatter: Plottable.Formatters.time("%Y") }
+                    { interval: Plottable.TimeInterval.month, step: 1, formatter: Plottable.Formatters.time("%B") },
+                    { interval: Plottable.TimeInterval.year, step: 1, formatter: Plottable.Formatters.time("%Y") }
                 ],
                 [
-                    { interval: TimeInterval.month, step: 1, formatter: Plottable.Formatters.time("%b") },
-                    { interval: TimeInterval.year, step: 1, formatter: Plottable.Formatters.time("%Y") }
+                    { interval: Plottable.TimeInterval.month, step: 1, formatter: Plottable.Formatters.time("%b") },
+                    { interval: Plottable.TimeInterval.year, step: 1, formatter: Plottable.Formatters.time("%Y") }
                 ],
                 [
-                    { interval: TimeInterval.month, step: 3, formatter: Plottable.Formatters.time("%b") },
-                    { interval: TimeInterval.year, step: 1, formatter: Plottable.Formatters.time("%Y") }
+                    { interval: Plottable.TimeInterval.month, step: 3, formatter: Plottable.Formatters.time("%b") },
+                    { interval: Plottable.TimeInterval.year, step: 1, formatter: Plottable.Formatters.time("%Y") }
                 ],
                 [
-                    { interval: TimeInterval.month, step: 6, formatter: Plottable.Formatters.time("%b") },
-                    { interval: TimeInterval.year, step: 1, formatter: Plottable.Formatters.time("%Y") }
+                    { interval: Plottable.TimeInterval.month, step: 6, formatter: Plottable.Formatters.time("%b") },
+                    { interval: Plottable.TimeInterval.year, step: 1, formatter: Plottable.Formatters.time("%Y") }
                 ],
                 [
-                    { interval: TimeInterval.year, step: 1, formatter: Plottable.Formatters.time("%Y") }
+                    { interval: Plottable.TimeInterval.year, step: 1, formatter: Plottable.Formatters.time("%Y") }
                 ],
                 [
-                    { interval: TimeInterval.year, step: 1, formatter: Plottable.Formatters.time("%y") }
+                    { interval: Plottable.TimeInterval.year, step: 1, formatter: Plottable.Formatters.time("%y") }
                 ],
                 [
-                    { interval: TimeInterval.year, step: 5, formatter: Plottable.Formatters.time("%Y") }
+                    { interval: Plottable.TimeInterval.year, step: 5, formatter: Plottable.Formatters.time("%Y") }
                 ],
                 [
-                    { interval: TimeInterval.year, step: 25, formatter: Plottable.Formatters.time("%Y") }
+                    { interval: Plottable.TimeInterval.year, step: 25, formatter: Plottable.Formatters.time("%Y") }
                 ],
                 [
-                    { interval: TimeInterval.year, step: 50, formatter: Plottable.Formatters.time("%Y") }
+                    { interval: Plottable.TimeInterval.year, step: 50, formatter: Plottable.Formatters.time("%Y") }
                 ],
                 [
-                    { interval: TimeInterval.year, step: 100, formatter: Plottable.Formatters.time("%Y") }
+                    { interval: Plottable.TimeInterval.year, step: 100, formatter: Plottable.Formatters.time("%Y") }
                 ],
                 [
-                    { interval: TimeInterval.year, step: 200, formatter: Plottable.Formatters.time("%Y") }
+                    { interval: Plottable.TimeInterval.year, step: 200, formatter: Plottable.Formatters.time("%Y") }
                 ],
                 [
-                    { interval: TimeInterval.year, step: 500, formatter: Plottable.Formatters.time("%Y") }
+                    { interval: Plottable.TimeInterval.year, step: 500, formatter: Plottable.Formatters.time("%Y") }
                 ],
                 [
-                    { interval: TimeInterval.year, step: 1000, formatter: Plottable.Formatters.time("%Y") }
+                    { interval: Plottable.TimeInterval.year, step: 1000, formatter: Plottable.Formatters.time("%Y") }
                 ]
             ];
             Time._LONG_DATE = new Date(9999, 8, 29, 12, 59, 9999);
@@ -4679,13 +4777,6 @@ var Plottable;
         Axes.Time = Time;
     })(Axes = Plottable.Axes || (Plottable.Axes = {}));
 })(Plottable || (Plottable = {}));
-
-///<reference path="../reference.ts" />
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
 var Plottable;
 (function (Plottable) {
     var Axes;
@@ -5016,13 +5107,6 @@ var Plottable;
         Axes.Numeric = Numeric;
     })(Axes = Plottable.Axes || (Plottable.Axes = {}));
 })(Plottable || (Plottable = {}));
-
-///<reference path="../reference.ts" />
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
 var Plottable;
 (function (Plottable) {
     var Axes;
@@ -5220,20 +5304,17 @@ var Plottable;
                 // on everyone, including this. Since CSS or something might have
                 // affected the size of the characters, clear the cache.
                 this._measurer.reset();
-                return _super.prototype.computeLayout.call(this, origin, availableWidth, availableHeight);
+                _super.prototype.computeLayout.call(this, origin, availableWidth, availableHeight);
+                if (!this._isHorizontal()) {
+                    this._scale.range([0, this.height()]);
+                }
+                return this;
             };
             return Category;
         })(Plottable.Axis);
         Axes.Category = Category;
     })(Axes = Plottable.Axes || (Plottable.Axes = {}));
 })(Plottable || (Plottable = {}));
-
-///<reference path="../reference.ts" />
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
 var Plottable;
 (function (Plottable) {
     var Components;
@@ -5383,13 +5464,6 @@ var Plottable;
         Components.AxisLabel = AxisLabel;
     })(Components = Plottable.Components || (Plottable.Components = {}));
 })(Plottable || (Plottable = {}));
-
-///<reference path="../reference.ts" />
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
 var Plottable;
 (function (Plottable) {
     var Components;
@@ -5666,13 +5740,6 @@ var Plottable;
         Components.Legend = Legend;
     })(Components = Plottable.Components || (Plottable.Components = {}));
 })(Plottable || (Plottable = {}));
-
-///<reference path="../reference.ts" />
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
 var Plottable;
 (function (Plottable) {
     var Components;
@@ -5692,7 +5759,7 @@ var Plottable;
             function InterpolatedColorLegend(interpolatedColorScale) {
                 var _this = this;
                 _super.call(this);
-                this._padding = 5;
+                this._textPadding = 5;
                 if (interpolatedColorScale == null) {
                     throw new Error("InterpolatedColorLegend requires a interpolatedColorScale");
                 }
@@ -5753,6 +5820,9 @@ var Plottable;
             InterpolatedColorLegend.prototype._generateTicks = function (numSwatches) {
                 if (numSwatches === void 0) { numSwatches = InterpolatedColorLegend._DEFAULT_NUM_SWATCHES; }
                 var domain = this._scale.domain();
+                if (numSwatches === 1) {
+                    return [domain[0]];
+                }
                 var slope = (domain[1] - domain[0]) / (numSwatches - 1);
                 var ticks = [];
                 for (var i = 0; i < numSwatches; i++) {
@@ -5773,6 +5843,7 @@ var Plottable;
             InterpolatedColorLegend.prototype.requestedSpace = function (offeredWidth, offeredHeight) {
                 var _this = this;
                 var textHeight = this._measurer.measure().height;
+                var padding = textHeight;
                 var domain = this._scale.domain();
                 var labelWidths = domain.map(function (d) { return _this._measurer.measure(_this._formatter(d)).width; });
                 var desiredHeight;
@@ -5780,14 +5851,13 @@ var Plottable;
                 var numSwatches = InterpolatedColorLegend._DEFAULT_NUM_SWATCHES;
                 if (this._isVertical()) {
                     var longestWidth = Plottable.Utils.Math.max(labelWidths, 0);
-                    desiredWidth = this._padding + textHeight + this._padding + longestWidth + this._padding;
-                    desiredHeight = this._padding + numSwatches * textHeight + this._padding;
+                    desiredWidth = padding + textHeight + this._textPadding + longestWidth + this._textPadding;
+                    desiredHeight = numSwatches * textHeight;
                 }
                 else {
-                    desiredHeight = this._padding + textHeight + this._padding;
-                    desiredWidth = this._padding + labelWidths[0] + this._padding
-                        + numSwatches * textHeight
-                        + this._padding + labelWidths[1] + this._padding;
+                    desiredHeight = padding + textHeight + padding;
+                    desiredWidth = this._textPadding + labelWidths[0] + numSwatches * textHeight
+                        + labelWidths[1] + this._textPadding;
                 }
                 return {
                     minWidth: desiredWidth,
@@ -5805,7 +5875,8 @@ var Plottable;
                 var text0Width = this._measurer.measure(text0).width;
                 var text1 = this._formatter(domain[1]);
                 var text1Width = this._measurer.measure(text1).width;
-                var padding = this._padding;
+                var textHeight = this._measurer.measure().height;
+                var textPadding = this._textPadding;
                 var upperLabelShift = { x: 0, y: 0 };
                 var lowerLabelShift = { x: 0, y: 0 };
                 var lowerWriteOptions = {
@@ -5826,52 +5897,52 @@ var Plottable;
                 var swatchY;
                 var boundingBoxAttr = {
                     x: 0,
-                    y: padding,
+                    y: 0,
                     width: 0,
                     height: 0
                 };
-                var numSwatches = InterpolatedColorLegend._DEFAULT_NUM_SWATCHES;
-                var textHeight = this._measurer.measure().height;
-                if (this.expands() && textHeight > 0) {
-                    var offset = this._isVertical() ? 2 * padding : 4 * padding - text0Width - text1Width;
-                    var fullLength = this._isVertical() ? this.height() : this.width();
-                    numSwatches = Math.max(Math.floor((fullLength - offset) / textHeight), numSwatches);
-                }
+                var padding;
+                var numSwatches;
                 if (this._isVertical()) {
+                    numSwatches = Math.floor(this.height());
                     var longestTextWidth = Math.max(text0Width, text1Width);
-                    swatchWidth = Math.max((this.width() - 3 * padding - longestTextWidth), 0);
-                    swatchHeight = Math.max(((this.height() - 2 * padding) / numSwatches), 0);
-                    swatchY = function (d, i) { return padding + (numSwatches - (i + 1)) * swatchHeight; };
+                    padding = (this.width() - longestTextWidth - 2 * this._textPadding) / 2;
+                    swatchWidth = Math.max(this.width() - padding - 2 * textPadding - longestTextWidth, 0);
+                    swatchHeight = 1;
+                    swatchY = function (d, i) { return _this.height() - (i + 1); };
                     upperWriteOptions.yAlign = "top";
-                    upperLabelShift.y = padding;
+                    upperLabelShift.y = 0;
                     lowerWriteOptions.yAlign = "bottom";
-                    lowerLabelShift.y = -padding;
+                    lowerLabelShift.y = 0;
                     if (this._orientation === "left") {
-                        swatchX = function (d, i) { return padding + longestTextWidth + padding; };
+                        swatchX = function (d, i) { return textPadding + longestTextWidth + textPadding; };
                         upperWriteOptions.xAlign = "right";
-                        upperLabelShift.x = -(padding + swatchWidth + padding);
+                        upperLabelShift.x = -(padding + swatchWidth + textPadding);
                         lowerWriteOptions.xAlign = "right";
-                        lowerLabelShift.x = -(padding + swatchWidth + padding);
+                        lowerLabelShift.x = -(padding + swatchWidth + textPadding);
                     }
                     else {
                         swatchX = function (d, i) { return padding; };
                         upperWriteOptions.xAlign = "left";
-                        upperLabelShift.x = padding + swatchWidth + padding;
+                        upperLabelShift.x = padding + swatchWidth + textPadding;
                         lowerWriteOptions.xAlign = "left";
-                        lowerLabelShift.x = padding + swatchWidth + padding;
+                        lowerLabelShift.x = padding + swatchWidth + textPadding;
                     }
                     boundingBoxAttr["width"] = swatchWidth;
                     boundingBoxAttr["height"] = numSwatches * swatchHeight;
                 }
                 else {
-                    swatchWidth = Math.max(((this.width() - 4 * padding - text0Width - text1Width) / numSwatches), 0);
+                    padding = Math.max(textPadding, (this.height() - textHeight) / 2);
+                    numSwatches = Math.max(Math.floor(this.width() - textPadding * 4 - text0Width - text1Width), 0);
+                    swatchWidth = 1;
                     swatchHeight = Math.max((this.height() - 2 * padding), 0);
-                    swatchX = function (d, i) { return (padding + text0Width + padding) + i * swatchWidth; };
+                    swatchX = function (d, i) { return Math.floor(text0Width + 2 * textPadding) + i; };
                     swatchY = function (d, i) { return padding; };
                     upperWriteOptions.xAlign = "right";
-                    upperLabelShift.x = -padding;
+                    upperLabelShift.x = -textPadding;
                     lowerWriteOptions.xAlign = "left";
-                    lowerLabelShift.x = padding;
+                    lowerLabelShift.x = textPadding;
+                    boundingBoxAttr["y"] = padding;
                     boundingBoxAttr["width"] = numSwatches * swatchWidth;
                     boundingBoxAttr["height"] = swatchHeight;
                 }
@@ -5887,15 +5958,19 @@ var Plottable;
                 this._swatchBoundingBox.attr(boundingBoxAttr);
                 var ticks = this._generateTicks(numSwatches);
                 var swatches = this._swatchContainer.selectAll("rect.swatch").data(ticks);
-                swatches.enter().append("rect").classed("swatch", true);
+                var rects = swatches.enter().append("rect").classed("swatch", true);
                 swatches.exit().remove();
                 swatches.attr({
                     "fill": function (d, i) { return _this._scale.scale(d); },
                     "width": swatchWidth,
                     "height": swatchHeight,
                     "x": swatchX,
-                    "y": swatchY
+                    "y": swatchY,
+                    "shape-rendering": "crispEdges"
                 });
+                if (Plottable.Configs.ADD_TITLE_ELEMENTS) {
+                    rects.append("title").text(function (d) { return _this._formatter(d); });
+                }
                 return this;
             };
             InterpolatedColorLegend._DEFAULT_NUM_SWATCHES = 11;
@@ -5908,13 +5983,6 @@ var Plottable;
         Components.InterpolatedColorLegend = InterpolatedColorLegend;
     })(Components = Plottable.Components || (Plottable.Components = {}));
 })(Plottable || (Plottable = {}));
-
-///<reference path="../reference.ts" />
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
 var Plottable;
 (function (Plottable) {
     var Components;
@@ -6012,13 +6080,6 @@ var Plottable;
         Components.Gridlines = Gridlines;
     })(Components = Plottable.Components || (Plottable.Components = {}));
 })(Plottable || (Plottable = {}));
-
-///<reference path="../reference.ts" />
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
 var Plottable;
 (function (Plottable) {
     var Components;
@@ -6080,6 +6141,20 @@ var Plottable;
                 }
                 return false;
             };
+            /**
+             * Returns the Component at the specified row and column index.
+             *
+             * @param {number} rowIndex
+             * @param {number} columnIndex
+             * @returns {Component} The Component at the specified position, or null if no Component is there.
+             */
+            Table.prototype.componentAt = function (rowIndex, columnIndex) {
+                if (rowIndex < 0 || rowIndex >= this._nRows || columnIndex < 0 || columnIndex >= this._nCols) {
+                    return null;
+                }
+                return this._rows[rowIndex][columnIndex];
+            };
+            ;
             /**
              * Adds a Component in the specified row and column position.
              *
@@ -6376,13 +6451,6 @@ var Plottable;
         Components.Table = Table;
     })(Components = Plottable.Components || (Plottable.Components = {}));
 })(Plottable || (Plottable = {}));
-
-///<reference path="../reference.ts" />
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
 var Plottable;
 (function (Plottable) {
     var Components;
@@ -6596,13 +6664,6 @@ var Plottable;
         Components.SelectionBoxLayer = SelectionBoxLayer;
     })(Components = Plottable.Components || (Plottable.Components = {}));
 })(Plottable || (Plottable = {}));
-
-///<reference path="../reference.ts" />
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
 var Plottable;
 (function (Plottable) {
     var Components;
@@ -6747,13 +6808,6 @@ var Plottable;
         Components.GuideLineLayer = GuideLineLayer;
     })(Components = Plottable.Components || (Plottable.Components = {}));
 })(Plottable || (Plottable = {}));
-
-///<reference path="../reference.ts" />
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
 var Plottable;
 (function (Plottable) {
     var Plots;
@@ -6764,6 +6818,9 @@ var Plottable;
             Animator.RESET = "reset";
         })(Animator = Plots.Animator || (Plots.Animator = {}));
     })(Plots = Plottable.Plots || (Plottable.Plots = {}));
+})(Plottable || (Plottable = {}));
+var Plottable;
+(function (Plottable) {
     var Plot = (function (_super) {
         __extends(Plot, _super);
         /**
@@ -6788,8 +6845,8 @@ var Plottable;
             this._propertyBindings = d3.map();
             this._propertyExtents = d3.map();
             var mainAnimator = new Plottable.Animators.Easing().maxTotalDuration(Plot._ANIMATION_MAX_DURATION);
-            this.animator(Plots.Animator.MAIN, mainAnimator);
-            this.animator(Plots.Animator.RESET, new Plottable.Animators.Null());
+            this.animator(Plottable.Plots.Animator.MAIN, mainAnimator);
+            this.animator(Plottable.Plots.Animator.RESET, new Plottable.Animators.Null());
         }
         Plot.prototype.anchor = function (selection) {
             _super.prototype.anchor.call(this, selection);
@@ -7212,13 +7269,6 @@ var Plottable;
     })(Plottable.Component);
     Plottable.Plot = Plot;
 })(Plottable || (Plottable = {}));
-
-///<reference path="../reference.ts" />
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
 var Plottable;
 (function (Plottable) {
     var Plots;
@@ -7540,13 +7590,6 @@ var Plottable;
         Plots.Pie = Pie;
     })(Plots = Plottable.Plots || (Plottable.Plots = {}));
 })(Plottable || (Plottable = {}));
-
-///<reference path="../reference.ts" />
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
 var Plottable;
 (function (Plottable) {
     var XYPlot = (function (_super) {
@@ -7845,13 +7888,6 @@ var Plottable;
     })(Plottable.Plot);
     Plottable.XYPlot = XYPlot;
 })(Plottable || (Plottable = {}));
-
-///<reference path="../reference.ts" />
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
 var Plottable;
 (function (Plottable) {
     var Plots;
@@ -8199,13 +8235,6 @@ var Plottable;
         Plots.Rectangle = Rectangle;
     })(Plots = Plottable.Plots || (Plottable.Plots = {}));
 })(Plottable || (Plottable = {}));
-
-///<reference path="../reference.ts" />
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
 var Plottable;
 (function (Plottable) {
     var Plots;
@@ -8353,13 +8382,6 @@ var Plottable;
         Plots.Scatter = Scatter;
     })(Plots = Plottable.Plots || (Plottable.Plots = {}));
 })(Plottable || (Plottable = {}));
-
-///<reference path="../reference.ts" />
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
 var Plottable;
 (function (Plottable) {
     var Plots;
@@ -8972,13 +8994,6 @@ var Plottable;
         Plots.Bar = Bar;
     })(Plots = Plottable.Plots || (Plottable.Plots = {}));
 })(Plottable || (Plottable = {}));
-
-///<reference path="../reference.ts" />
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
 var Plottable;
 (function (Plottable) {
     var Plots;
@@ -9396,13 +9411,6 @@ var Plottable;
         Plots.Line = Line;
     })(Plots = Plottable.Plots || (Plottable.Plots = {}));
 })(Plottable || (Plottable = {}));
-
-///<reference path="../reference.ts" />
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
 var Plottable;
 (function (Plottable) {
     var Plots;
@@ -9571,13 +9579,6 @@ var Plottable;
         Plots.Area = Area;
     })(Plots = Plottable.Plots || (Plottable.Plots = {}));
 })(Plottable || (Plottable = {}));
-
-///<reference path="../reference.ts" />
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
 var Plottable;
 (function (Plottable) {
     var Plots;
@@ -9636,13 +9637,6 @@ var Plottable;
         Plots.ClusteredBar = ClusteredBar;
     })(Plots = Plottable.Plots || (Plottable.Plots = {}));
 })(Plottable || (Plottable = {}));
-
-///<reference path="../reference.ts" />
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
 var Plottable;
 (function (Plottable) {
     var Plots;
@@ -9803,13 +9797,6 @@ var Plottable;
         Plots.StackedArea = StackedArea;
     })(Plots = Plottable.Plots || (Plottable.Plots = {}));
 })(Plottable || (Plottable = {}));
-
-///<reference path="../reference.ts" />
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
 var Plottable;
 (function (Plottable) {
     var Plots;
@@ -9925,13 +9912,6 @@ var Plottable;
         Plots.StackedBar = StackedBar;
     })(Plots = Plottable.Plots || (Plottable.Plots = {}));
 })(Plottable || (Plottable = {}));
-
-///<reference path="../reference.ts" />
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
 var Plottable;
 (function (Plottable) {
     var Plots;
@@ -10101,13 +10081,6 @@ var Plottable;
         Plots.Segment = Segment;
     })(Plots = Plottable.Plots || (Plottable.Plots = {}));
 })(Plottable || (Plottable = {}));
-
-///<reference path="../reference.ts" />
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
 var Plottable;
 (function (Plottable) {
     var Plots;
@@ -10305,13 +10278,6 @@ var Plottable;
         Plots.Waterfall = Waterfall;
     })(Plots = Plottable.Plots || (Plottable.Plots = {}));
 })(Plottable || (Plottable = {}));
-
-///<reference path="../reference.ts" />
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
 var Plottable;
 (function (Plottable) {
     var Plots;
@@ -10465,10 +10431,6 @@ var Plottable;
         Plots.Wheel = Wheel;
     })(Plots = Plottable.Plots || (Plottable.Plots = {}));
 })(Plottable || (Plottable = {}));
-
-///<reference path="../reference.ts" />
-
-///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
     var Animators;
@@ -10491,8 +10453,6 @@ var Plottable;
         Animators.Null = Null;
     })(Animators = Plottable.Animators || (Plottable.Animators = {}));
 })(Plottable || (Plottable = {}));
-
-///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
     var Animators;
@@ -10606,8 +10566,6 @@ var Plottable;
         Animators.Easing = Easing;
     })(Animators = Plottable.Animators || (Plottable.Animators = {}));
 })(Plottable || (Plottable = {}));
-
-///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
     var Dispatcher = (function () {
@@ -10652,13 +10610,6 @@ var Plottable;
     })();
     Plottable.Dispatcher = Dispatcher;
 })(Plottable || (Plottable = {}));
-
-///<reference path="../reference.ts" />
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
 var Plottable;
 (function (Plottable) {
     var Dispatchers;
@@ -10842,13 +10793,6 @@ var Plottable;
         Dispatchers.Mouse = Mouse;
     })(Dispatchers = Plottable.Dispatchers || (Plottable.Dispatchers = {}));
 })(Plottable || (Plottable = {}));
-
-///<reference path="../reference.ts" />
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
 var Plottable;
 (function (Plottable) {
     var Dispatchers;
@@ -11009,13 +10953,6 @@ var Plottable;
         Dispatchers.Touch = Touch;
     })(Dispatchers = Plottable.Dispatchers || (Plottable.Dispatchers = {}));
 })(Plottable || (Plottable = {}));
-
-///<reference path="../reference.ts" />
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
 var Plottable;
 (function (Plottable) {
     var Dispatchers;
@@ -11101,8 +11038,6 @@ var Plottable;
         Dispatchers.Key = Key;
     })(Dispatchers = Plottable.Dispatchers || (Plottable.Dispatchers = {}));
 })(Plottable || (Plottable = {}));
-
-///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
     var Interaction = (function () {
@@ -11196,13 +11131,6 @@ var Plottable;
     })();
     Plottable.Interaction = Interaction;
 })(Plottable || (Plottable = {}));
-
-///<reference path="../reference.ts" />
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
 var Plottable;
 (function (Plottable) {
     var Interactions;
@@ -11278,13 +11206,6 @@ var Plottable;
         Interactions.Click = Click;
     })(Interactions = Plottable.Interactions || (Plottable.Interactions = {}));
 })(Plottable || (Plottable = {}));
-
-///<reference path="../reference.ts" />
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
 var Plottable;
 (function (Plottable) {
     var Interactions;
@@ -11391,13 +11312,6 @@ var Plottable;
         Interactions.DoubleClick = DoubleClick;
     })(Interactions = Plottable.Interactions || (Plottable.Interactions = {}));
 })(Plottable || (Plottable = {}));
-
-///<reference path="../reference.ts" />
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
 var Plottable;
 (function (Plottable) {
     var Interactions;
@@ -11510,13 +11424,6 @@ var Plottable;
         Interactions.Key = Key;
     })(Interactions = Plottable.Interactions || (Plottable.Interactions = {}));
 })(Plottable || (Plottable = {}));
-
-///<reference path="../reference.ts" />
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
 var Plottable;
 (function (Plottable) {
     var Interactions;
@@ -11526,12 +11433,12 @@ var Plottable;
             function Pointer() {
                 var _this = this;
                 _super.apply(this, arguments);
-                this._insideComponent = false;
+                this._overComponent = false;
                 this._pointerEnterCallbacks = new Plottable.Utils.CallbackSet();
                 this._pointerMoveCallbacks = new Plottable.Utils.CallbackSet();
                 this._pointerExitCallbacks = new Plottable.Utils.CallbackSet();
-                this._mouseMoveCallback = function (p, e) { return _this._handleMouseEvent(p, e); };
-                this._touchStartCallback = function (ids, idToPoint, e) { return _this._handleTouchEvent(idToPoint[ids[0]], e); };
+                this._mouseMoveCallback = function (p) { return _this._handlePointerEvent(p); };
+                this._touchStartCallback = function (ids, idToPoint) { return _this._handlePointerEvent(idToPoint[ids[0]]); };
             }
             Pointer.prototype._anchor = function (component) {
                 _super.prototype._anchor.call(this, component);
@@ -11547,27 +11454,19 @@ var Plottable;
                 this._touchDispatcher.offTouchStart(this._touchStartCallback);
                 this._touchDispatcher = null;
             };
-            Pointer.prototype._handleMouseEvent = function (p, e) {
-                var insideSVG = this._mouseDispatcher.eventInsideSVG(e);
-                this._handlePointerEvent(p, insideSVG);
-            };
-            Pointer.prototype._handleTouchEvent = function (p, e) {
-                var insideSVG = this._touchDispatcher.eventInsideSVG(e);
-                this._handlePointerEvent(p, insideSVG);
-            };
-            Pointer.prototype._handlePointerEvent = function (p, insideSVG) {
+            Pointer.prototype._handlePointerEvent = function (p) {
                 var translatedP = this._translateToComponentSpace(p);
                 var overComponent = this._isInsideComponent(translatedP);
-                if (overComponent && insideSVG) {
-                    if (!this._insideComponent) {
+                if (overComponent) {
+                    if (!this._overComponent) {
                         this._pointerEnterCallbacks.callCallbacks(translatedP);
                     }
                     this._pointerMoveCallbacks.callCallbacks(translatedP);
                 }
-                else if (this._insideComponent) {
+                else if (this._overComponent) {
                     this._pointerExitCallbacks.callCallbacks(translatedP);
                 }
-                this._insideComponent = overComponent && insideSVG;
+                this._overComponent = overComponent;
             };
             /**
              * Adds a callback to be called when the pointer enters the Component.
@@ -11634,13 +11533,6 @@ var Plottable;
         Interactions.Pointer = Pointer;
     })(Interactions = Plottable.Interactions || (Plottable.Interactions = {}));
 })(Plottable || (Plottable = {}));
-
-///<reference path="../reference.ts" />
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
 var Plottable;
 (function (Plottable) {
     var Interactions;
@@ -11958,13 +11850,6 @@ var Plottable;
         Interactions.PanZoom = PanZoom;
     })(Interactions = Plottable.Interactions || (Plottable.Interactions = {}));
 })(Plottable || (Plottable = {}));
-
-///<reference path="../reference.ts" />
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
 var Plottable;
 (function (Plottable) {
     var Interactions;
@@ -12116,13 +12001,6 @@ var Plottable;
         Interactions.Drag = Drag;
     })(Interactions = Plottable.Interactions || (Plottable.Interactions = {}));
 })(Plottable || (Plottable = {}));
-
-///<reference path="../reference.ts" />
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
 var Plottable;
 (function (Plottable) {
     var Components;
@@ -12489,13 +12367,6 @@ var Plottable;
         Components.DragBoxLayer = DragBoxLayer;
     })(Components = Plottable.Components || (Plottable.Components = {}));
 })(Plottable || (Plottable = {}));
-
-///<reference path="../reference.ts" />
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
 var Plottable;
 (function (Plottable) {
     var Components;
@@ -12550,13 +12421,6 @@ var Plottable;
         Components.XDragBoxLayer = XDragBoxLayer;
     })(Components = Plottable.Components || (Plottable.Components = {}));
 })(Plottable || (Plottable = {}));
-
-///<reference path="../reference.ts" />
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
 var Plottable;
 (function (Plottable) {
     var Components;
@@ -12611,16 +12475,12 @@ var Plottable;
         Components.YDragBoxLayer = YDragBoxLayer;
     })(Components = Plottable.Components || (Plottable.Components = {}));
 })(Plottable || (Plottable = {}));
-
-///<reference path="../reference.ts" />
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
 var Plottable;
 (function (Plottable) {
     ;
+})(Plottable || (Plottable = {}));
+var Plottable;
+(function (Plottable) {
     var Components;
     (function (Components) {
         var DragLineLayer = (function (_super) {
@@ -12794,6 +12654,12720 @@ var Plottable;
         Components.DragLineLayer = DragLineLayer;
     })(Components = Plottable.Components || (Plottable.Components = {}));
 })(Plottable || (Plottable = {}));
+
+/*!
+SVG Typewriter 0.3.0 (https://github.com/palantir/svg-typewriter)
+Copyright 2014 Palantir Technologies
+Licensed under MIT (https://github.com/palantir/svg-typewriter/blob/develop/LICENSE)
+*/
+
+///<reference path="../reference.ts" />
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Utils;
+    (function (Utils) {
+        var Methods;
+        (function (Methods) {
+            /**
+             * Check if two arrays are equal by strict equality.
+             */
+            function arrayEq(a, b) {
+                // Technically, null and undefined are arrays too
+                if (a == null || b == null) {
+                    return a === b;
+                }
+                if (a.length !== b.length) {
+                    return false;
+                }
+                for (var i = 0; i < a.length; i++) {
+                    if (a[i] !== b[i]) {
+                        return false;
+                    }
+                }
+                return true;
+            }
+            Methods.arrayEq = arrayEq;
+            /**
+             * @param {any} a Object to check against b for equality.
+             * @param {any} b Object to check against a for equality.
+             *
+             * @returns {boolean} whether or not two objects share the same keys, and
+             *          values associated with those keys. Values will be compared
+             *          with ===.
+             */
+            function objEq(a, b) {
+                if (a == null || b == null) {
+                    return a === b;
+                }
+                var keysA = Object.keys(a).sort();
+                var keysB = Object.keys(b).sort();
+                var valuesA = keysA.map(function (k) { return a[k]; });
+                var valuesB = keysB.map(function (k) { return b[k]; });
+                return arrayEq(keysA, keysB) && arrayEq(valuesA, valuesB);
+            }
+            Methods.objEq = objEq;
+        })(Methods = Utils.Methods || (Utils.Methods = {}));
+    })(Utils = SVGTypewriter.Utils || (SVGTypewriter.Utils = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Utils;
+    (function (Utils) {
+        var DOM;
+        (function (DOM) {
+            function transform(s, x, y) {
+                var xform = d3.transform(s.attr("transform"));
+                if (x == null) {
+                    return xform.translate;
+                }
+                else {
+                    y = (y == null) ? 0 : y;
+                    xform.translate[0] = x;
+                    xform.translate[1] = y;
+                    s.attr("transform", xform.toString());
+                    return s;
+                }
+            }
+            DOM.transform = transform;
+            function getBBox(element) {
+                var bbox;
+                try {
+                    bbox = element.node().getBBox();
+                }
+                catch (err) {
+                    bbox = {
+                        x: 0,
+                        y: 0,
+                        width: 0,
+                        height: 0
+                    };
+                }
+                return bbox;
+            }
+            DOM.getBBox = getBBox;
+        })(DOM = Utils.DOM || (Utils.DOM = {}));
+    })(Utils = SVGTypewriter.Utils || (SVGTypewriter.Utils = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+///<reference path="../reference.ts" />
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Utils;
+    (function (Utils) {
+        var Cache = (function () {
+            /**
+             * @constructor
+             *
+             * @param {string} compute The function whose results will be cached.
+             * @param {(v: T, w: T) => boolean} [valueEq]
+             *        Used to determine if the value of canonicalKey has changed.
+             *        If omitted, defaults to === comparision.
+             */
+            function Cache(compute, valueEq) {
+                if (valueEq === void 0) { valueEq = function (v, w) { return v === w; }; }
+                this.cache = d3.map();
+                this.compute = compute;
+                this.valueEq = valueEq;
+            }
+            /**
+             * Attempt to look up k in the cache, computing the result if it isn't
+             * found.
+             *
+             * @param {string} k The key to look up in the cache.
+             * @return {T} The value associated with k; the result of compute(k).
+             */
+            Cache.prototype.get = function (k) {
+                if (!this.cache.has(k)) {
+                    this.cache.set(k, this.compute(k));
+                }
+                return this.cache.get(k);
+            };
+            /**
+             * Reset the cache empty.
+             *
+             * @return {Cache<T>} The calling Cache.
+             */
+            Cache.prototype.clear = function () {
+                this.cache = d3.map();
+                return this;
+            };
+            return Cache;
+        })();
+        Utils.Cache = Cache;
+    })(Utils = SVGTypewriter.Utils || (SVGTypewriter.Utils = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+///<reference path="../reference.ts" />
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Utils;
+    (function (Utils) {
+        var Tokenizer = (function () {
+            function Tokenizer() {
+                this.WordDividerRegExp = new RegExp("\\W");
+                this.WhitespaceRegExp = new RegExp("\\s");
+            }
+            Tokenizer.prototype.tokenize = function (line) {
+                var _this = this;
+                return line.split("").reduce(function (tokens, c) { return tokens.slice(0, -1).concat(_this.shouldCreateNewToken(tokens[tokens.length - 1], c)); }, [""]);
+            };
+            Tokenizer.prototype.shouldCreateNewToken = function (token, newCharacter) {
+                if (!token) {
+                    return [newCharacter];
+                }
+                var lastCharacter = token[token.length - 1];
+                if (this.WhitespaceRegExp.test(lastCharacter) && this.WhitespaceRegExp.test(newCharacter)) {
+                    return [token + newCharacter];
+                }
+                else if (this.WhitespaceRegExp.test(lastCharacter) || this.WhitespaceRegExp.test(newCharacter)) {
+                    return [token, newCharacter];
+                }
+                else if (!(this.WordDividerRegExp.test(lastCharacter) || this.WordDividerRegExp.test(newCharacter))) {
+                    return [token + newCharacter];
+                }
+                else if (lastCharacter === newCharacter) {
+                    return [token + newCharacter];
+                }
+                else {
+                    return [token, newCharacter];
+                }
+            };
+            return Tokenizer;
+        })();
+        Utils.Tokenizer = Tokenizer;
+    })(Utils = SVGTypewriter.Utils || (SVGTypewriter.Utils = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+///<reference path="../reference.ts" />
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Utils;
+    (function (Utils) {
+        var StringMethods;
+        (function (StringMethods) {
+            /**
+             * Treat all sequences of consecutive whitespace as a single " ".
+             */
+            function combineWhitespace(str) {
+                return str.replace(/\s+/g, " ");
+            }
+            StringMethods.combineWhitespace = combineWhitespace;
+            function isNotEmptyString(str) {
+                return str && str.trim() !== "";
+            }
+            StringMethods.isNotEmptyString = isNotEmptyString;
+            function trimStart(str, c) {
+                if (!str) {
+                    return str;
+                }
+                var chars = str.split("");
+                var reduceFunction = c ? function (s) { return s.split(c).some(isNotEmptyString); } : isNotEmptyString;
+                return chars.reduce(function (s, c) { return reduceFunction(s + c) ? s + c : s; }, "");
+            }
+            StringMethods.trimStart = trimStart;
+            function trimEnd(str, c) {
+                if (!str) {
+                    return str;
+                }
+                var reversedChars = str.split("");
+                reversedChars.reverse();
+                reversedChars = trimStart(reversedChars.join(""), c).split("");
+                reversedChars.reverse();
+                return reversedChars.join("");
+            }
+            StringMethods.trimEnd = trimEnd;
+        })(StringMethods = Utils.StringMethods || (Utils.StringMethods = {}));
+    })(Utils = SVGTypewriter.Utils || (SVGTypewriter.Utils = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+///<reference path="../reference.ts" />
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Animators;
+    (function (Animators) {
+        var BaseAnimator = (function () {
+            function BaseAnimator() {
+                this.duration(BaseAnimator.DEFAULT_DURATION_MILLISECONDS);
+                this.delay(0);
+                this.easing(BaseAnimator.DEFAULT_EASING);
+                this.moveX(0);
+                this.moveY(0);
+            }
+            BaseAnimator.prototype.animate = function (selection) {
+                var xForm = d3.transform("");
+                xForm.translate = [this.moveX(), this.moveY()];
+                selection.attr("transform", xForm.toString());
+                xForm.translate = [0, 0];
+                return this._animate(selection, { transform: xForm.toString() });
+            };
+            BaseAnimator.prototype._animate = function (selection, attr) {
+                return selection.transition().ease(this.easing()).duration(this.duration()).delay(this.delay()).attr(attr);
+            };
+            BaseAnimator.prototype.duration = function (duration) {
+                if (duration == null) {
+                    return this._duration;
+                }
+                else {
+                    this._duration = duration;
+                    return this;
+                }
+            };
+            BaseAnimator.prototype.moveX = function (shift) {
+                if (shift == null) {
+                    return this._moveX;
+                }
+                else {
+                    this._moveX = shift;
+                    return this;
+                }
+            };
+            BaseAnimator.prototype.moveY = function (shift) {
+                if (shift == null) {
+                    return this._moveY;
+                }
+                else {
+                    this._moveY = shift;
+                    return this;
+                }
+            };
+            BaseAnimator.prototype.delay = function (delay) {
+                if (delay == null) {
+                    return this._delay;
+                }
+                else {
+                    this._delay = delay;
+                    return this;
+                }
+            };
+            BaseAnimator.prototype.easing = function (easing) {
+                if (easing == null) {
+                    return this._easing;
+                }
+                else {
+                    this._easing = easing;
+                    return this;
+                }
+            };
+            /**
+             * The default duration of the animation in milliseconds
+             */
+            BaseAnimator.DEFAULT_DURATION_MILLISECONDS = 300;
+            /**
+             * The default easing of the animation
+             */
+            BaseAnimator.DEFAULT_EASING = "exp-out";
+            return BaseAnimator;
+        })();
+        Animators.BaseAnimator = BaseAnimator;
+    })(Animators = SVGTypewriter.Animators || (SVGTypewriter.Animators = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+///<reference path="../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Animators;
+    (function (Animators) {
+        var UnveilAnimator = (function (_super) {
+            __extends(UnveilAnimator, _super);
+            function UnveilAnimator() {
+                this.direction("bottom");
+                _super.call(this);
+            }
+            UnveilAnimator.prototype.direction = function (direction) {
+                if (direction == null) {
+                    return this._direction;
+                }
+                else {
+                    if (UnveilAnimator.SupportedDirections.indexOf(direction) === -1) {
+                        throw new Error("unsupported direction - " + direction);
+                    }
+                    this._direction = direction;
+                    return this;
+                }
+            };
+            UnveilAnimator.prototype.animate = function (selection) {
+                var attr = SVGTypewriter.Utils.DOM.getBBox(selection);
+                var mask = selection.select(".clip-rect");
+                mask.attr("width", 0);
+                mask.attr("height", 0);
+                switch (this._direction) {
+                    case "top":
+                        mask.attr("y", attr.y + attr.height);
+                        mask.attr("x", attr.x);
+                        mask.attr("width", attr.width);
+                        break;
+                    case "bottom":
+                        mask.attr("y", attr.y);
+                        mask.attr("x", attr.x);
+                        mask.attr("width", attr.width);
+                        break;
+                    case "left":
+                        mask.attr("y", attr.y);
+                        mask.attr("x", attr.x);
+                        mask.attr("height", attr.height);
+                        break;
+                    case "right":
+                        mask.attr("y", attr.y);
+                        mask.attr("x", attr.x + attr.width);
+                        mask.attr("height", attr.height);
+                        break;
+                }
+                this._animate(mask, attr);
+                return _super.prototype.animate.call(this, selection);
+            };
+            UnveilAnimator.SupportedDirections = ["top", "bottom", "left", "right"];
+            return UnveilAnimator;
+        })(Animators.BaseAnimator);
+        Animators.UnveilAnimator = UnveilAnimator;
+    })(Animators = SVGTypewriter.Animators || (SVGTypewriter.Animators = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+///<reference path="../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Animators;
+    (function (Animators) {
+        var OpacityAnimator = (function (_super) {
+            __extends(OpacityAnimator, _super);
+            function OpacityAnimator() {
+                _super.apply(this, arguments);
+            }
+            OpacityAnimator.prototype.animate = function (selection) {
+                var area = selection.select(".text-area");
+                area.attr("opacity", 0);
+                var attr = {
+                    opacity: 1
+                };
+                this._animate(area, attr);
+                return _super.prototype.animate.call(this, selection);
+            };
+            return OpacityAnimator;
+        })(Animators.BaseAnimator);
+        Animators.OpacityAnimator = OpacityAnimator;
+    })(Animators = SVGTypewriter.Animators || (SVGTypewriter.Animators = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+///<reference path="../reference.ts" />
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Wrappers;
+    (function (Wrappers) {
+        var Wrapper = (function () {
+            function Wrapper() {
+                this.maxLines(Infinity);
+                this.textTrimming("ellipsis");
+                this.allowBreakingWords(true);
+                this._tokenizer = new SVGTypewriter.Utils.Tokenizer();
+                this._breakingCharacter = "-";
+            }
+            Wrapper.prototype.maxLines = function (noLines) {
+                if (noLines == null) {
+                    return this._maxLines;
+                }
+                else {
+                    this._maxLines = noLines;
+                    return this;
+                }
+            };
+            Wrapper.prototype.textTrimming = function (option) {
+                if (option == null) {
+                    return this._textTrimming;
+                }
+                else {
+                    if (option !== "ellipsis" && option !== "none") {
+                        throw new Error(option + " - unsupported text trimming option.");
+                    }
+                    this._textTrimming = option;
+                    return this;
+                }
+            };
+            Wrapper.prototype.allowBreakingWords = function (allow) {
+                if (allow == null) {
+                    return this._allowBreakingWords;
+                }
+                else {
+                    this._allowBreakingWords = allow;
+                    return this;
+                }
+            };
+            Wrapper.prototype.wrap = function (text, measurer, width, height) {
+                var _this = this;
+                if (height === void 0) { height = Infinity; }
+                var initialWrappingResult = {
+                    originalText: text,
+                    wrappedText: "",
+                    noLines: 0,
+                    noBrokeWords: 0,
+                    truncatedText: ""
+                };
+                var state = {
+                    wrapping: initialWrappingResult,
+                    currentLine: "",
+                    availableWidth: width,
+                    availableLines: Math.min(Math.floor(height / measurer.measure().height), this._maxLines),
+                    canFitText: true
+                };
+                var lines = text.split("\n");
+                return lines.reduce(function (state, line, i) { return _this.breakLineToFitWidth(state, line, i !== lines.length - 1, measurer); }, state).wrapping;
+            };
+            Wrapper.prototype.breakLineToFitWidth = function (state, line, hasNextLine, measurer) {
+                var _this = this;
+                if (!state.canFitText && state.wrapping.truncatedText !== "") {
+                    state.wrapping.truncatedText += "\n";
+                }
+                var tokens = this._tokenizer.tokenize(line);
+                state = tokens.reduce(function (state, token) { return _this.wrapNextToken(token, state, measurer); }, state);
+                var wrappedText = SVGTypewriter.Utils.StringMethods.trimEnd(state.currentLine);
+                state.wrapping.noLines += +(wrappedText !== "");
+                if (state.wrapping.noLines === state.availableLines && this._textTrimming !== "none" && hasNextLine) {
+                    var ellipsisResult = this.addEllipsis(wrappedText, state.availableWidth, measurer);
+                    state.wrapping.wrappedText += ellipsisResult.wrappedToken;
+                    state.wrapping.truncatedText += ellipsisResult.remainingToken;
+                    state.canFitText = false;
+                }
+                else {
+                    state.wrapping.wrappedText += wrappedText;
+                }
+                state.currentLine = "\n";
+                return state;
+            };
+            Wrapper.prototype.canFitToken = function (token, width, measurer) {
+                var _this = this;
+                var possibleBreaks = this._allowBreakingWords ? token.split("").map(function (c, i) { return (i !== token.length - 1) ? c + _this._breakingCharacter : c; }) : [token];
+                return (measurer.measure(token).width <= width) || possibleBreaks.every(function (c) { return measurer.measure(c).width <= width; });
+            };
+            Wrapper.prototype.addEllipsis = function (line, width, measurer) {
+                if (this._textTrimming === "none") {
+                    return {
+                        wrappedToken: line,
+                        remainingToken: ""
+                    };
+                }
+                var truncatedLine = line.substring(0).trim();
+                var lineWidth = measurer.measure(truncatedLine).width;
+                var ellipsesWidth = measurer.measure("...").width;
+                var prefix = (line.length > 0 && line[0] === "\n") ? "\n" : "";
+                if (width <= ellipsesWidth) {
+                    var periodWidth = ellipsesWidth / 3;
+                    var numPeriodsThatFit = Math.floor(width / periodWidth);
+                    return {
+                        wrappedToken: prefix + "...".substr(0, numPeriodsThatFit),
+                        remainingToken: line
+                    };
+                }
+                while (lineWidth + ellipsesWidth > width) {
+                    truncatedLine = SVGTypewriter.Utils.StringMethods.trimEnd(truncatedLine.substr(0, truncatedLine.length - 1));
+                    lineWidth = measurer.measure(truncatedLine).width;
+                }
+                return {
+                    wrappedToken: prefix + truncatedLine + "...",
+                    remainingToken: SVGTypewriter.Utils.StringMethods.trimEnd(line.substring(truncatedLine.length), "-").trim()
+                };
+            };
+            Wrapper.prototype.wrapNextToken = function (token, state, measurer) {
+                if (!state.canFitText || state.availableLines === state.wrapping.noLines || !this.canFitToken(token, state.availableWidth, measurer)) {
+                    return this.finishWrapping(token, state, measurer);
+                }
+                var remainingToken = token;
+                while (remainingToken) {
+                    var result = this.breakTokenToFitInWidth(remainingToken, state.currentLine, state.availableWidth, measurer);
+                    state.currentLine = result.line;
+                    remainingToken = result.remainingToken;
+                    if (remainingToken != null) {
+                        state.wrapping.noBrokeWords += +result.breakWord;
+                        ++state.wrapping.noLines;
+                        if (state.availableLines === state.wrapping.noLines) {
+                            var ellipsisResult = this.addEllipsis(state.currentLine, state.availableWidth, measurer);
+                            state.wrapping.wrappedText += ellipsisResult.wrappedToken;
+                            state.wrapping.truncatedText += ellipsisResult.remainingToken + remainingToken;
+                            state.currentLine = "\n";
+                            return state;
+                        }
+                        else {
+                            state.wrapping.wrappedText += SVGTypewriter.Utils.StringMethods.trimEnd(state.currentLine);
+                            state.currentLine = "\n";
+                        }
+                    }
+                }
+                return state;
+            };
+            Wrapper.prototype.finishWrapping = function (token, state, measurer) {
+                // Token is really long, but we have a space to put part of the word.
+                if (state.canFitText && state.availableLines !== state.wrapping.noLines && this._allowBreakingWords && this._textTrimming !== "none") {
+                    var res = this.addEllipsis(state.currentLine + token, state.availableWidth, measurer);
+                    state.wrapping.wrappedText += res.wrappedToken;
+                    state.wrapping.truncatedText += res.remainingToken;
+                    state.wrapping.noBrokeWords += +(res.remainingToken.length < token.length);
+                    state.wrapping.noLines += +(res.wrappedToken.length > 0);
+                    state.currentLine = "";
+                }
+                else {
+                    state.wrapping.truncatedText += token;
+                }
+                state.canFitText = false;
+                return state;
+            };
+            /**
+             * Breaks single token to fit current line.
+             * If token contains only whitespaces then they will not be populated to next line.
+             */
+            Wrapper.prototype.breakTokenToFitInWidth = function (token, line, availableWidth, measurer, breakingCharacter) {
+                if (breakingCharacter === void 0) { breakingCharacter = this._breakingCharacter; }
+                if (measurer.measure(line + token).width <= availableWidth) {
+                    return {
+                        remainingToken: null,
+                        line: line + token,
+                        breakWord: false
+                    };
+                }
+                if (token.trim() === "") {
+                    return {
+                        remainingToken: "",
+                        line: line,
+                        breakWord: false
+                    };
+                }
+                if (!this._allowBreakingWords) {
+                    return {
+                        remainingToken: token,
+                        line: line,
+                        breakWord: false
+                    };
+                }
+                var fitTokenLength = 0;
+                while (fitTokenLength < token.length) {
+                    if (measurer.measure(line + token.substring(0, fitTokenLength + 1) + breakingCharacter).width <= availableWidth) {
+                        ++fitTokenLength;
+                    }
+                    else {
+                        break;
+                    }
+                }
+                var suffix = "";
+                if (fitTokenLength > 0) {
+                    suffix = breakingCharacter;
+                }
+                return {
+                    remainingToken: token.substring(fitTokenLength),
+                    line: line + token.substring(0, fitTokenLength) + suffix,
+                    breakWord: fitTokenLength > 0
+                };
+            };
+            return Wrapper;
+        })();
+        Wrappers.Wrapper = Wrapper;
+    })(Wrappers = SVGTypewriter.Wrappers || (SVGTypewriter.Wrappers = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+///<reference path="../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Wrappers;
+    (function (Wrappers) {
+        var SingleLineWrapper = (function (_super) {
+            __extends(SingleLineWrapper, _super);
+            function SingleLineWrapper() {
+                _super.apply(this, arguments);
+            }
+            SingleLineWrapper.prototype.wrap = function (text, measurer, width, height) {
+                var _this = this;
+                if (height === void 0) { height = Infinity; }
+                var lines = text.split("\n");
+                if (lines.length > 1) {
+                    throw new Error("SingleLineWrapper is designed to work only on single line");
+                }
+                var wrapFN = function (w) { return _super.prototype.wrap.call(_this, text, measurer, w, height); };
+                var result = wrapFN(width);
+                if (result.noLines < 2) {
+                    return result;
+                }
+                var left = 0;
+                var right = width;
+                for (var i = 0; i < SingleLineWrapper.NO_WRAP_ITERATIONS && right > left; ++i) {
+                    var currentWidth = (right + left) / 2;
+                    var currentResult = wrapFN(currentWidth);
+                    if (this.areSameResults(result, currentResult)) {
+                        right = currentWidth;
+                        result = currentResult;
+                    }
+                    else {
+                        left = currentWidth;
+                    }
+                }
+                return result;
+            };
+            SingleLineWrapper.prototype.areSameResults = function (one, two) {
+                return one.noLines === two.noLines && one.truncatedText === two.truncatedText;
+            };
+            SingleLineWrapper.NO_WRAP_ITERATIONS = 5;
+            return SingleLineWrapper;
+        })(Wrappers.Wrapper);
+        Wrappers.SingleLineWrapper = SingleLineWrapper;
+    })(Wrappers = SVGTypewriter.Wrappers || (SVGTypewriter.Wrappers = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+///<reference path="reference.ts" />
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Writers;
+    (function (Writers) {
+        var Writer = (function () {
+            function Writer(measurer, wrapper) {
+                this._writerID = Writer.nextID++;
+                this._elementID = 0;
+                this.measurer(measurer);
+                if (wrapper) {
+                    this.wrapper(wrapper);
+                }
+                this.addTitleElement(false);
+            }
+            Writer.prototype.measurer = function (newMeasurer) {
+                this._measurer = newMeasurer;
+                return this;
+            };
+            Writer.prototype.wrapper = function (newWrapper) {
+                this._wrapper = newWrapper;
+                return this;
+            };
+            Writer.prototype.addTitleElement = function (add) {
+                this._addTitleElement = add;
+                return this;
+            };
+            Writer.prototype.writeLine = function (line, g, width, xAlign, yOffset) {
+                var textEl = g.append("text");
+                textEl.text(line);
+                var xOffset = width * Writer.XOffsetFactor[xAlign];
+                var anchor = Writer.AnchorConverter[xAlign];
+                textEl.attr("text-anchor", anchor).classed("text-line", true);
+                SVGTypewriter.Utils.DOM.transform(textEl, xOffset, yOffset).attr("y", "-0.25em");
+                ;
+            };
+            Writer.prototype.writeText = function (text, writingArea, width, height, xAlign, yAlign) {
+                var _this = this;
+                var lines = text.split("\n");
+                var lineHeight = this._measurer.measure().height;
+                var yOffset = Writer.YOffsetFactor[yAlign] * (height - lines.length * lineHeight);
+                lines.forEach(function (line, i) {
+                    _this.writeLine(line, writingArea, width, xAlign, (i + 1) * lineHeight + yOffset);
+                });
+            };
+            Writer.prototype.write = function (text, width, height, options) {
+                if (Writer.SupportedRotation.indexOf(options.textRotation) === -1) {
+                    throw new Error("unsupported rotation - " + options.textRotation);
+                }
+                var orientHorizontally = Math.abs(Math.abs(options.textRotation) - 90) > 45;
+                var primaryDimension = orientHorizontally ? width : height;
+                var secondaryDimension = orientHorizontally ? height : width;
+                var textContainer = options.selection.append("g").classed("text-container", true);
+                if (this._addTitleElement) {
+                    textContainer.append("title").text(text);
+                }
+                var textArea = textContainer.append("g").classed("text-area", true);
+                var wrappedText = this._wrapper ? this._wrapper.wrap(text, this._measurer, primaryDimension, secondaryDimension).wrappedText : text;
+                this.writeText(wrappedText, textArea, primaryDimension, secondaryDimension, options.xAlign, options.yAlign);
+                var xForm = d3.transform("");
+                var xForm2 = d3.transform("");
+                xForm.rotate = options.textRotation;
+                switch (options.textRotation) {
+                    case 90:
+                        xForm.translate = [width, 0];
+                        xForm2.rotate = -90;
+                        xForm2.translate = [0, 200];
+                        break;
+                    case -90:
+                        xForm.translate = [0, height];
+                        xForm2.rotate = 90;
+                        xForm2.translate = [width, 0];
+                        break;
+                    case 180:
+                        xForm.translate = [width, height];
+                        xForm2.translate = [width, height];
+                        xForm2.rotate = 180;
+                        break;
+                }
+                textArea.attr("transform", xForm.toString());
+                this.addClipPath(textContainer, xForm2);
+                if (options.animator) {
+                    options.animator.animate(textContainer);
+                }
+            };
+            Writer.prototype.addClipPath = function (selection, transform) {
+                var elementID = this._elementID++;
+                var prefix = /MSIE [5-9]/.test(navigator.userAgent) ? "" : document.location.href;
+                prefix = prefix.split("#")[0]; // To fix cases where an anchor tag was used
+                var clipPathID = "clipPath" + this._writerID + "_" + elementID;
+                selection.select(".text-area").attr("clip-path", "url(\"" + prefix + "#" + clipPathID + "\")");
+                var clipPathParent = selection.append("clipPath").attr("id", clipPathID);
+                var bboxAttrs = SVGTypewriter.Utils.DOM.getBBox(selection.select(".text-area"));
+                var box = clipPathParent.append("rect");
+                box.classed("clip-rect", true).attr({
+                    x: bboxAttrs.x,
+                    y: bboxAttrs.y,
+                    width: bboxAttrs.width,
+                    height: bboxAttrs.height
+                });
+            };
+            Writer.nextID = 0;
+            Writer.SupportedRotation = [-90, 0, 180, 90];
+            Writer.AnchorConverter = {
+                left: "start",
+                center: "middle",
+                right: "end"
+            };
+            Writer.XOffsetFactor = {
+                left: 0,
+                center: 0.5,
+                right: 1
+            };
+            Writer.YOffsetFactor = {
+                top: 0,
+                center: 0.5,
+                bottom: 1
+            };
+            return Writer;
+        })();
+        Writers.Writer = Writer;
+    })(Writers = SVGTypewriter.Writers || (SVGTypewriter.Writers = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+///<reference path="../reference.ts" />
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Measurers;
+    (function (Measurers) {
+        ;
+        var AbstractMeasurer = (function () {
+            function AbstractMeasurer(area, className) {
+                this.textMeasurer = this.getTextMeasurer(area, className);
+            }
+            AbstractMeasurer.prototype.checkSelectionIsText = function (d) {
+                return d[0][0].tagName === "text" || !d.select("text").empty();
+            };
+            AbstractMeasurer.prototype.getTextMeasurer = function (area, className) {
+                var _this = this;
+                if (!this.checkSelectionIsText(area)) {
+                    var textElement = area.append("text");
+                    if (className) {
+                        textElement.classed(className, true);
+                    }
+                    textElement.remove();
+                    return function (text) {
+                        area.node().appendChild(textElement.node());
+                        var areaDimension = _this.measureBBox(textElement, text);
+                        textElement.remove();
+                        return areaDimension;
+                    };
+                }
+                else {
+                    var parentNode = area.node().parentNode;
+                    var textSelection;
+                    if (area[0][0].tagName === "text") {
+                        textSelection = area;
+                    }
+                    else {
+                        textSelection = area.select("text");
+                    }
+                    area.remove();
+                    return function (text) {
+                        parentNode.appendChild(area.node());
+                        var areaDimension = _this.measureBBox(textSelection, text);
+                        area.remove();
+                        return areaDimension;
+                    };
+                }
+            };
+            AbstractMeasurer.prototype.measureBBox = function (d, text) {
+                d.text(text);
+                var bb = SVGTypewriter.Utils.DOM.getBBox(d);
+                return { width: bb.width, height: bb.height };
+            };
+            AbstractMeasurer.prototype.measure = function (text) {
+                if (text === void 0) { text = AbstractMeasurer.HEIGHT_TEXT; }
+                return this.textMeasurer(text);
+            };
+            AbstractMeasurer.HEIGHT_TEXT = "bqpdl";
+            return AbstractMeasurer;
+        })();
+        Measurers.AbstractMeasurer = AbstractMeasurer;
+    })(Measurers = SVGTypewriter.Measurers || (SVGTypewriter.Measurers = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+///<reference path="../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Measurers;
+    (function (Measurers) {
+        var Measurer = (function (_super) {
+            __extends(Measurer, _super);
+            function Measurer(area, className, useGuards) {
+                if (className === void 0) { className = null; }
+                if (useGuards === void 0) { useGuards = false; }
+                _super.call(this, area, className);
+                this.useGuards = useGuards;
+            }
+            // Guards assures same line height and width of whitespaces on both ends.
+            Measurer.prototype._addGuards = function (text) {
+                return Measurers.AbstractMeasurer.HEIGHT_TEXT + text + Measurers.AbstractMeasurer.HEIGHT_TEXT;
+            };
+            Measurer.prototype.getGuardWidth = function () {
+                if (this.guardWidth == null) {
+                    this.guardWidth = _super.prototype.measure.call(this).width;
+                }
+                return this.guardWidth;
+            };
+            Measurer.prototype._measureLine = function (line) {
+                var measuredLine = this.useGuards ? this._addGuards(line) : line;
+                var measuredLineDimensions = _super.prototype.measure.call(this, measuredLine);
+                measuredLineDimensions.width -= this.useGuards ? (2 * this.getGuardWidth()) : 0;
+                return measuredLineDimensions;
+            };
+            Measurer.prototype.measure = function (text) {
+                var _this = this;
+                if (text === void 0) { text = Measurers.AbstractMeasurer.HEIGHT_TEXT; }
+                if (text.trim() === "") {
+                    return { width: 0, height: 0 };
+                }
+                var linesDimensions = text.trim().split("\n").map(function (line) { return _this._measureLine(line); });
+                return {
+                    width: d3.max(linesDimensions, function (dim) { return dim.width; }),
+                    height: d3.sum(linesDimensions, function (dim) { return dim.height; })
+                };
+            };
+            return Measurer;
+        })(Measurers.AbstractMeasurer);
+        Measurers.Measurer = Measurer;
+    })(Measurers = SVGTypewriter.Measurers || (SVGTypewriter.Measurers = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+///<reference path="../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Measurers;
+    (function (Measurers) {
+        var CharacterMeasurer = (function (_super) {
+            __extends(CharacterMeasurer, _super);
+            function CharacterMeasurer() {
+                _super.apply(this, arguments);
+            }
+            CharacterMeasurer.prototype._measureCharacter = function (c) {
+                return _super.prototype._measureLine.call(this, c);
+            };
+            CharacterMeasurer.prototype._measureLine = function (line) {
+                var _this = this;
+                var charactersDimensions = line.split("").map(function (c) { return _this._measureCharacter(c); });
+                return {
+                    width: d3.sum(charactersDimensions, function (dim) { return dim.width; }),
+                    height: d3.max(charactersDimensions, function (dim) { return dim.height; })
+                };
+            };
+            return CharacterMeasurer;
+        })(Measurers.Measurer);
+        Measurers.CharacterMeasurer = CharacterMeasurer;
+    })(Measurers = SVGTypewriter.Measurers || (SVGTypewriter.Measurers = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+///<reference path="../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Measurers;
+    (function (Measurers) {
+        var CacheCharacterMeasurer = (function (_super) {
+            __extends(CacheCharacterMeasurer, _super);
+            function CacheCharacterMeasurer(area, className) {
+                var _this = this;
+                _super.call(this, area, className);
+                this.cache = new SVGTypewriter.Utils.Cache(function (c) { return _this._measureCharacterNotFromCache(c); }, SVGTypewriter.Utils.Methods.objEq);
+            }
+            CacheCharacterMeasurer.prototype._measureCharacterNotFromCache = function (c) {
+                return _super.prototype._measureCharacter.call(this, c);
+            };
+            CacheCharacterMeasurer.prototype._measureCharacter = function (c) {
+                return this.cache.get(c);
+            };
+            CacheCharacterMeasurer.prototype.reset = function () {
+                this.cache.clear();
+            };
+            return CacheCharacterMeasurer;
+        })(Measurers.CharacterMeasurer);
+        Measurers.CacheCharacterMeasurer = CacheCharacterMeasurer;
+    })(Measurers = SVGTypewriter.Measurers || (SVGTypewriter.Measurers = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+return Plottable;
+}));
+
+/*!
+SVG Typewriter 0.3.0 (https://github.com/palantir/svg-typewriter)
+Copyright 2014 Palantir Technologies
+Licensed under MIT (https://github.com/palantir/svg-typewriter/blob/develop/LICENSE)
+*/
+
+///<reference path="../reference.ts" />
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Utils;
+    (function (Utils) {
+        var Methods;
+        (function (Methods) {
+            /**
+             * Check if two arrays are equal by strict equality.
+             */
+            function arrayEq(a, b) {
+                // Technically, null and undefined are arrays too
+                if (a == null || b == null) {
+                    return a === b;
+                }
+                if (a.length !== b.length) {
+                    return false;
+                }
+                for (var i = 0; i < a.length; i++) {
+                    if (a[i] !== b[i]) {
+                        return false;
+                    }
+                }
+                return true;
+            }
+            Methods.arrayEq = arrayEq;
+            /**
+             * @param {any} a Object to check against b for equality.
+             * @param {any} b Object to check against a for equality.
+             *
+             * @returns {boolean} whether or not two objects share the same keys, and
+             *          values associated with those keys. Values will be compared
+             *          with ===.
+             */
+            function objEq(a, b) {
+                if (a == null || b == null) {
+                    return a === b;
+                }
+                var keysA = Object.keys(a).sort();
+                var keysB = Object.keys(b).sort();
+                var valuesA = keysA.map(function (k) { return a[k]; });
+                var valuesB = keysB.map(function (k) { return b[k]; });
+                return arrayEq(keysA, keysB) && arrayEq(valuesA, valuesB);
+            }
+            Methods.objEq = objEq;
+        })(Methods = Utils.Methods || (Utils.Methods = {}));
+    })(Utils = SVGTypewriter.Utils || (SVGTypewriter.Utils = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Utils;
+    (function (Utils) {
+        var DOM;
+        (function (DOM) {
+            function transform(s, x, y) {
+                var xform = d3.transform(s.attr("transform"));
+                if (x == null) {
+                    return xform.translate;
+                }
+                else {
+                    y = (y == null) ? 0 : y;
+                    xform.translate[0] = x;
+                    xform.translate[1] = y;
+                    s.attr("transform", xform.toString());
+                    return s;
+                }
+            }
+            DOM.transform = transform;
+            function getBBox(element) {
+                var bbox;
+                try {
+                    bbox = element.node().getBBox();
+                }
+                catch (err) {
+                    bbox = {
+                        x: 0,
+                        y: 0,
+                        width: 0,
+                        height: 0
+                    };
+                }
+                return bbox;
+            }
+            DOM.getBBox = getBBox;
+        })(DOM = Utils.DOM || (Utils.DOM = {}));
+    })(Utils = SVGTypewriter.Utils || (SVGTypewriter.Utils = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+///<reference path="../reference.ts" />
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Utils;
+    (function (Utils) {
+        var Cache = (function () {
+            /**
+             * @constructor
+             *
+             * @param {string} compute The function whose results will be cached.
+             * @param {(v: T, w: T) => boolean} [valueEq]
+             *        Used to determine if the value of canonicalKey has changed.
+             *        If omitted, defaults to === comparision.
+             */
+            function Cache(compute, valueEq) {
+                if (valueEq === void 0) { valueEq = function (v, w) { return v === w; }; }
+                this.cache = d3.map();
+                this.compute = compute;
+                this.valueEq = valueEq;
+            }
+            /**
+             * Attempt to look up k in the cache, computing the result if it isn't
+             * found.
+             *
+             * @param {string} k The key to look up in the cache.
+             * @return {T} The value associated with k; the result of compute(k).
+             */
+            Cache.prototype.get = function (k) {
+                if (!this.cache.has(k)) {
+                    this.cache.set(k, this.compute(k));
+                }
+                return this.cache.get(k);
+            };
+            /**
+             * Reset the cache empty.
+             *
+             * @return {Cache<T>} The calling Cache.
+             */
+            Cache.prototype.clear = function () {
+                this.cache = d3.map();
+                return this;
+            };
+            return Cache;
+        })();
+        Utils.Cache = Cache;
+    })(Utils = SVGTypewriter.Utils || (SVGTypewriter.Utils = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+///<reference path="../reference.ts" />
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Utils;
+    (function (Utils) {
+        var Tokenizer = (function () {
+            function Tokenizer() {
+                this.WordDividerRegExp = new RegExp("\\W");
+                this.WhitespaceRegExp = new RegExp("\\s");
+            }
+            Tokenizer.prototype.tokenize = function (line) {
+                var _this = this;
+                return line.split("").reduce(function (tokens, c) { return tokens.slice(0, -1).concat(_this.shouldCreateNewToken(tokens[tokens.length - 1], c)); }, [""]);
+            };
+            Tokenizer.prototype.shouldCreateNewToken = function (token, newCharacter) {
+                if (!token) {
+                    return [newCharacter];
+                }
+                var lastCharacter = token[token.length - 1];
+                if (this.WhitespaceRegExp.test(lastCharacter) && this.WhitespaceRegExp.test(newCharacter)) {
+                    return [token + newCharacter];
+                }
+                else if (this.WhitespaceRegExp.test(lastCharacter) || this.WhitespaceRegExp.test(newCharacter)) {
+                    return [token, newCharacter];
+                }
+                else if (!(this.WordDividerRegExp.test(lastCharacter) || this.WordDividerRegExp.test(newCharacter))) {
+                    return [token + newCharacter];
+                }
+                else if (lastCharacter === newCharacter) {
+                    return [token + newCharacter];
+                }
+                else {
+                    return [token, newCharacter];
+                }
+            };
+            return Tokenizer;
+        })();
+        Utils.Tokenizer = Tokenizer;
+    })(Utils = SVGTypewriter.Utils || (SVGTypewriter.Utils = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+///<reference path="../reference.ts" />
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Utils;
+    (function (Utils) {
+        var StringMethods;
+        (function (StringMethods) {
+            /**
+             * Treat all sequences of consecutive whitespace as a single " ".
+             */
+            function combineWhitespace(str) {
+                return str.replace(/\s+/g, " ");
+            }
+            StringMethods.combineWhitespace = combineWhitespace;
+            function isNotEmptyString(str) {
+                return str && str.trim() !== "";
+            }
+            StringMethods.isNotEmptyString = isNotEmptyString;
+            function trimStart(str, c) {
+                if (!str) {
+                    return str;
+                }
+                var chars = str.split("");
+                var reduceFunction = c ? function (s) { return s.split(c).some(isNotEmptyString); } : isNotEmptyString;
+                return chars.reduce(function (s, c) { return reduceFunction(s + c) ? s + c : s; }, "");
+            }
+            StringMethods.trimStart = trimStart;
+            function trimEnd(str, c) {
+                if (!str) {
+                    return str;
+                }
+                var reversedChars = str.split("");
+                reversedChars.reverse();
+                reversedChars = trimStart(reversedChars.join(""), c).split("");
+                reversedChars.reverse();
+                return reversedChars.join("");
+            }
+            StringMethods.trimEnd = trimEnd;
+        })(StringMethods = Utils.StringMethods || (Utils.StringMethods = {}));
+    })(Utils = SVGTypewriter.Utils || (SVGTypewriter.Utils = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+///<reference path="../reference.ts" />
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Animators;
+    (function (Animators) {
+        var BaseAnimator = (function () {
+            function BaseAnimator() {
+                this.duration(BaseAnimator.DEFAULT_DURATION_MILLISECONDS);
+                this.delay(0);
+                this.easing(BaseAnimator.DEFAULT_EASING);
+                this.moveX(0);
+                this.moveY(0);
+            }
+            BaseAnimator.prototype.animate = function (selection) {
+                var xForm = d3.transform("");
+                xForm.translate = [this.moveX(), this.moveY()];
+                selection.attr("transform", xForm.toString());
+                xForm.translate = [0, 0];
+                return this._animate(selection, { transform: xForm.toString() });
+            };
+            BaseAnimator.prototype._animate = function (selection, attr) {
+                return selection.transition().ease(this.easing()).duration(this.duration()).delay(this.delay()).attr(attr);
+            };
+            BaseAnimator.prototype.duration = function (duration) {
+                if (duration == null) {
+                    return this._duration;
+                }
+                else {
+                    this._duration = duration;
+                    return this;
+                }
+            };
+            BaseAnimator.prototype.moveX = function (shift) {
+                if (shift == null) {
+                    return this._moveX;
+                }
+                else {
+                    this._moveX = shift;
+                    return this;
+                }
+            };
+            BaseAnimator.prototype.moveY = function (shift) {
+                if (shift == null) {
+                    return this._moveY;
+                }
+                else {
+                    this._moveY = shift;
+                    return this;
+                }
+            };
+            BaseAnimator.prototype.delay = function (delay) {
+                if (delay == null) {
+                    return this._delay;
+                }
+                else {
+                    this._delay = delay;
+                    return this;
+                }
+            };
+            BaseAnimator.prototype.easing = function (easing) {
+                if (easing == null) {
+                    return this._easing;
+                }
+                else {
+                    this._easing = easing;
+                    return this;
+                }
+            };
+            /**
+             * The default duration of the animation in milliseconds
+             */
+            BaseAnimator.DEFAULT_DURATION_MILLISECONDS = 300;
+            /**
+             * The default easing of the animation
+             */
+            BaseAnimator.DEFAULT_EASING = "exp-out";
+            return BaseAnimator;
+        })();
+        Animators.BaseAnimator = BaseAnimator;
+    })(Animators = SVGTypewriter.Animators || (SVGTypewriter.Animators = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+///<reference path="../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Animators;
+    (function (Animators) {
+        var UnveilAnimator = (function (_super) {
+            __extends(UnveilAnimator, _super);
+            function UnveilAnimator() {
+                this.direction("bottom");
+                _super.call(this);
+            }
+            UnveilAnimator.prototype.direction = function (direction) {
+                if (direction == null) {
+                    return this._direction;
+                }
+                else {
+                    if (UnveilAnimator.SupportedDirections.indexOf(direction) === -1) {
+                        throw new Error("unsupported direction - " + direction);
+                    }
+                    this._direction = direction;
+                    return this;
+                }
+            };
+            UnveilAnimator.prototype.animate = function (selection) {
+                var attr = SVGTypewriter.Utils.DOM.getBBox(selection);
+                var mask = selection.select(".clip-rect");
+                mask.attr("width", 0);
+                mask.attr("height", 0);
+                switch (this._direction) {
+                    case "top":
+                        mask.attr("y", attr.y + attr.height);
+                        mask.attr("x", attr.x);
+                        mask.attr("width", attr.width);
+                        break;
+                    case "bottom":
+                        mask.attr("y", attr.y);
+                        mask.attr("x", attr.x);
+                        mask.attr("width", attr.width);
+                        break;
+                    case "left":
+                        mask.attr("y", attr.y);
+                        mask.attr("x", attr.x);
+                        mask.attr("height", attr.height);
+                        break;
+                    case "right":
+                        mask.attr("y", attr.y);
+                        mask.attr("x", attr.x + attr.width);
+                        mask.attr("height", attr.height);
+                        break;
+                }
+                this._animate(mask, attr);
+                return _super.prototype.animate.call(this, selection);
+            };
+            UnveilAnimator.SupportedDirections = ["top", "bottom", "left", "right"];
+            return UnveilAnimator;
+        })(Animators.BaseAnimator);
+        Animators.UnveilAnimator = UnveilAnimator;
+    })(Animators = SVGTypewriter.Animators || (SVGTypewriter.Animators = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+///<reference path="../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Animators;
+    (function (Animators) {
+        var OpacityAnimator = (function (_super) {
+            __extends(OpacityAnimator, _super);
+            function OpacityAnimator() {
+                _super.apply(this, arguments);
+            }
+            OpacityAnimator.prototype.animate = function (selection) {
+                var area = selection.select(".text-area");
+                area.attr("opacity", 0);
+                var attr = {
+                    opacity: 1
+                };
+                this._animate(area, attr);
+                return _super.prototype.animate.call(this, selection);
+            };
+            return OpacityAnimator;
+        })(Animators.BaseAnimator);
+        Animators.OpacityAnimator = OpacityAnimator;
+    })(Animators = SVGTypewriter.Animators || (SVGTypewriter.Animators = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+///<reference path="../reference.ts" />
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Wrappers;
+    (function (Wrappers) {
+        var Wrapper = (function () {
+            function Wrapper() {
+                this.maxLines(Infinity);
+                this.textTrimming("ellipsis");
+                this.allowBreakingWords(true);
+                this._tokenizer = new SVGTypewriter.Utils.Tokenizer();
+                this._breakingCharacter = "-";
+            }
+            Wrapper.prototype.maxLines = function (noLines) {
+                if (noLines == null) {
+                    return this._maxLines;
+                }
+                else {
+                    this._maxLines = noLines;
+                    return this;
+                }
+            };
+            Wrapper.prototype.textTrimming = function (option) {
+                if (option == null) {
+                    return this._textTrimming;
+                }
+                else {
+                    if (option !== "ellipsis" && option !== "none") {
+                        throw new Error(option + " - unsupported text trimming option.");
+                    }
+                    this._textTrimming = option;
+                    return this;
+                }
+            };
+            Wrapper.prototype.allowBreakingWords = function (allow) {
+                if (allow == null) {
+                    return this._allowBreakingWords;
+                }
+                else {
+                    this._allowBreakingWords = allow;
+                    return this;
+                }
+            };
+            Wrapper.prototype.wrap = function (text, measurer, width, height) {
+                var _this = this;
+                if (height === void 0) { height = Infinity; }
+                var initialWrappingResult = {
+                    originalText: text,
+                    wrappedText: "",
+                    noLines: 0,
+                    noBrokeWords: 0,
+                    truncatedText: ""
+                };
+                var state = {
+                    wrapping: initialWrappingResult,
+                    currentLine: "",
+                    availableWidth: width,
+                    availableLines: Math.min(Math.floor(height / measurer.measure().height), this._maxLines),
+                    canFitText: true
+                };
+                var lines = text.split("\n");
+                return lines.reduce(function (state, line, i) { return _this.breakLineToFitWidth(state, line, i !== lines.length - 1, measurer); }, state).wrapping;
+            };
+            Wrapper.prototype.breakLineToFitWidth = function (state, line, hasNextLine, measurer) {
+                var _this = this;
+                if (!state.canFitText && state.wrapping.truncatedText !== "") {
+                    state.wrapping.truncatedText += "\n";
+                }
+                var tokens = this._tokenizer.tokenize(line);
+                state = tokens.reduce(function (state, token) { return _this.wrapNextToken(token, state, measurer); }, state);
+                var wrappedText = SVGTypewriter.Utils.StringMethods.trimEnd(state.currentLine);
+                state.wrapping.noLines += +(wrappedText !== "");
+                if (state.wrapping.noLines === state.availableLines && this._textTrimming !== "none" && hasNextLine) {
+                    var ellipsisResult = this.addEllipsis(wrappedText, state.availableWidth, measurer);
+                    state.wrapping.wrappedText += ellipsisResult.wrappedToken;
+                    state.wrapping.truncatedText += ellipsisResult.remainingToken;
+                    state.canFitText = false;
+                }
+                else {
+                    state.wrapping.wrappedText += wrappedText;
+                }
+                state.currentLine = "\n";
+                return state;
+            };
+            Wrapper.prototype.canFitToken = function (token, width, measurer) {
+                var _this = this;
+                var possibleBreaks = this._allowBreakingWords ? token.split("").map(function (c, i) { return (i !== token.length - 1) ? c + _this._breakingCharacter : c; }) : [token];
+                return (measurer.measure(token).width <= width) || possibleBreaks.every(function (c) { return measurer.measure(c).width <= width; });
+            };
+            Wrapper.prototype.addEllipsis = function (line, width, measurer) {
+                if (this._textTrimming === "none") {
+                    return {
+                        wrappedToken: line,
+                        remainingToken: ""
+                    };
+                }
+                var truncatedLine = line.substring(0).trim();
+                var lineWidth = measurer.measure(truncatedLine).width;
+                var ellipsesWidth = measurer.measure("...").width;
+                var prefix = (line.length > 0 && line[0] === "\n") ? "\n" : "";
+                if (width <= ellipsesWidth) {
+                    var periodWidth = ellipsesWidth / 3;
+                    var numPeriodsThatFit = Math.floor(width / periodWidth);
+                    return {
+                        wrappedToken: prefix + "...".substr(0, numPeriodsThatFit),
+                        remainingToken: line
+                    };
+                }
+                while (lineWidth + ellipsesWidth > width) {
+                    truncatedLine = SVGTypewriter.Utils.StringMethods.trimEnd(truncatedLine.substr(0, truncatedLine.length - 1));
+                    lineWidth = measurer.measure(truncatedLine).width;
+                }
+                return {
+                    wrappedToken: prefix + truncatedLine + "...",
+                    remainingToken: SVGTypewriter.Utils.StringMethods.trimEnd(line.substring(truncatedLine.length), "-").trim()
+                };
+            };
+            Wrapper.prototype.wrapNextToken = function (token, state, measurer) {
+                if (!state.canFitText || state.availableLines === state.wrapping.noLines || !this.canFitToken(token, state.availableWidth, measurer)) {
+                    return this.finishWrapping(token, state, measurer);
+                }
+                var remainingToken = token;
+                while (remainingToken) {
+                    var result = this.breakTokenToFitInWidth(remainingToken, state.currentLine, state.availableWidth, measurer);
+                    state.currentLine = result.line;
+                    remainingToken = result.remainingToken;
+                    if (remainingToken != null) {
+                        state.wrapping.noBrokeWords += +result.breakWord;
+                        ++state.wrapping.noLines;
+                        if (state.availableLines === state.wrapping.noLines) {
+                            var ellipsisResult = this.addEllipsis(state.currentLine, state.availableWidth, measurer);
+                            state.wrapping.wrappedText += ellipsisResult.wrappedToken;
+                            state.wrapping.truncatedText += ellipsisResult.remainingToken + remainingToken;
+                            state.currentLine = "\n";
+                            return state;
+                        }
+                        else {
+                            state.wrapping.wrappedText += SVGTypewriter.Utils.StringMethods.trimEnd(state.currentLine);
+                            state.currentLine = "\n";
+                        }
+                    }
+                }
+                return state;
+            };
+            Wrapper.prototype.finishWrapping = function (token, state, measurer) {
+                // Token is really long, but we have a space to put part of the word.
+                if (state.canFitText && state.availableLines !== state.wrapping.noLines && this._allowBreakingWords && this._textTrimming !== "none") {
+                    var res = this.addEllipsis(state.currentLine + token, state.availableWidth, measurer);
+                    state.wrapping.wrappedText += res.wrappedToken;
+                    state.wrapping.truncatedText += res.remainingToken;
+                    state.wrapping.noBrokeWords += +(res.remainingToken.length < token.length);
+                    state.wrapping.noLines += +(res.wrappedToken.length > 0);
+                    state.currentLine = "";
+                }
+                else {
+                    state.wrapping.truncatedText += token;
+                }
+                state.canFitText = false;
+                return state;
+            };
+            /**
+             * Breaks single token to fit current line.
+             * If token contains only whitespaces then they will not be populated to next line.
+             */
+            Wrapper.prototype.breakTokenToFitInWidth = function (token, line, availableWidth, measurer, breakingCharacter) {
+                if (breakingCharacter === void 0) { breakingCharacter = this._breakingCharacter; }
+                if (measurer.measure(line + token).width <= availableWidth) {
+                    return {
+                        remainingToken: null,
+                        line: line + token,
+                        breakWord: false
+                    };
+                }
+                if (token.trim() === "") {
+                    return {
+                        remainingToken: "",
+                        line: line,
+                        breakWord: false
+                    };
+                }
+                if (!this._allowBreakingWords) {
+                    return {
+                        remainingToken: token,
+                        line: line,
+                        breakWord: false
+                    };
+                }
+                var fitTokenLength = 0;
+                while (fitTokenLength < token.length) {
+                    if (measurer.measure(line + token.substring(0, fitTokenLength + 1) + breakingCharacter).width <= availableWidth) {
+                        ++fitTokenLength;
+                    }
+                    else {
+                        break;
+                    }
+                }
+                var suffix = "";
+                if (fitTokenLength > 0) {
+                    suffix = breakingCharacter;
+                }
+                return {
+                    remainingToken: token.substring(fitTokenLength),
+                    line: line + token.substring(0, fitTokenLength) + suffix,
+                    breakWord: fitTokenLength > 0
+                };
+            };
+            return Wrapper;
+        })();
+        Wrappers.Wrapper = Wrapper;
+    })(Wrappers = SVGTypewriter.Wrappers || (SVGTypewriter.Wrappers = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+///<reference path="../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Wrappers;
+    (function (Wrappers) {
+        var SingleLineWrapper = (function (_super) {
+            __extends(SingleLineWrapper, _super);
+            function SingleLineWrapper() {
+                _super.apply(this, arguments);
+            }
+            SingleLineWrapper.prototype.wrap = function (text, measurer, width, height) {
+                var _this = this;
+                if (height === void 0) { height = Infinity; }
+                var lines = text.split("\n");
+                if (lines.length > 1) {
+                    throw new Error("SingleLineWrapper is designed to work only on single line");
+                }
+                var wrapFN = function (w) { return _super.prototype.wrap.call(_this, text, measurer, w, height); };
+                var result = wrapFN(width);
+                if (result.noLines < 2) {
+                    return result;
+                }
+                var left = 0;
+                var right = width;
+                for (var i = 0; i < SingleLineWrapper.NO_WRAP_ITERATIONS && right > left; ++i) {
+                    var currentWidth = (right + left) / 2;
+                    var currentResult = wrapFN(currentWidth);
+                    if (this.areSameResults(result, currentResult)) {
+                        right = currentWidth;
+                        result = currentResult;
+                    }
+                    else {
+                        left = currentWidth;
+                    }
+                }
+                return result;
+            };
+            SingleLineWrapper.prototype.areSameResults = function (one, two) {
+                return one.noLines === two.noLines && one.truncatedText === two.truncatedText;
+            };
+            SingleLineWrapper.NO_WRAP_ITERATIONS = 5;
+            return SingleLineWrapper;
+        })(Wrappers.Wrapper);
+        Wrappers.SingleLineWrapper = SingleLineWrapper;
+    })(Wrappers = SVGTypewriter.Wrappers || (SVGTypewriter.Wrappers = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+///<reference path="reference.ts" />
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Writers;
+    (function (Writers) {
+        var Writer = (function () {
+            function Writer(measurer, wrapper) {
+                this._writerID = Writer.nextID++;
+                this._elementID = 0;
+                this.measurer(measurer);
+                if (wrapper) {
+                    this.wrapper(wrapper);
+                }
+                this.addTitleElement(false);
+            }
+            Writer.prototype.measurer = function (newMeasurer) {
+                this._measurer = newMeasurer;
+                return this;
+            };
+            Writer.prototype.wrapper = function (newWrapper) {
+                this._wrapper = newWrapper;
+                return this;
+            };
+            Writer.prototype.addTitleElement = function (add) {
+                this._addTitleElement = add;
+                return this;
+            };
+            Writer.prototype.writeLine = function (line, g, width, xAlign, yOffset) {
+                var textEl = g.append("text");
+                textEl.text(line);
+                var xOffset = width * Writer.XOffsetFactor[xAlign];
+                var anchor = Writer.AnchorConverter[xAlign];
+                textEl.attr("text-anchor", anchor).classed("text-line", true);
+                SVGTypewriter.Utils.DOM.transform(textEl, xOffset, yOffset).attr("y", "-0.25em");
+                ;
+            };
+            Writer.prototype.writeText = function (text, writingArea, width, height, xAlign, yAlign) {
+                var _this = this;
+                var lines = text.split("\n");
+                var lineHeight = this._measurer.measure().height;
+                var yOffset = Writer.YOffsetFactor[yAlign] * (height - lines.length * lineHeight);
+                lines.forEach(function (line, i) {
+                    _this.writeLine(line, writingArea, width, xAlign, (i + 1) * lineHeight + yOffset);
+                });
+            };
+            Writer.prototype.write = function (text, width, height, options) {
+                if (Writer.SupportedRotation.indexOf(options.textRotation) === -1) {
+                    throw new Error("unsupported rotation - " + options.textRotation);
+                }
+                var orientHorizontally = Math.abs(Math.abs(options.textRotation) - 90) > 45;
+                var primaryDimension = orientHorizontally ? width : height;
+                var secondaryDimension = orientHorizontally ? height : width;
+                var textContainer = options.selection.append("g").classed("text-container", true);
+                if (this._addTitleElement) {
+                    textContainer.append("title").text(text);
+                }
+                var textArea = textContainer.append("g").classed("text-area", true);
+                var wrappedText = this._wrapper ? this._wrapper.wrap(text, this._measurer, primaryDimension, secondaryDimension).wrappedText : text;
+                this.writeText(wrappedText, textArea, primaryDimension, secondaryDimension, options.xAlign, options.yAlign);
+                var xForm = d3.transform("");
+                var xForm2 = d3.transform("");
+                xForm.rotate = options.textRotation;
+                switch (options.textRotation) {
+                    case 90:
+                        xForm.translate = [width, 0];
+                        xForm2.rotate = -90;
+                        xForm2.translate = [0, 200];
+                        break;
+                    case -90:
+                        xForm.translate = [0, height];
+                        xForm2.rotate = 90;
+                        xForm2.translate = [width, 0];
+                        break;
+                    case 180:
+                        xForm.translate = [width, height];
+                        xForm2.translate = [width, height];
+                        xForm2.rotate = 180;
+                        break;
+                }
+                textArea.attr("transform", xForm.toString());
+                this.addClipPath(textContainer, xForm2);
+                if (options.animator) {
+                    options.animator.animate(textContainer);
+                }
+            };
+            Writer.prototype.addClipPath = function (selection, transform) {
+                var elementID = this._elementID++;
+                var prefix = /MSIE [5-9]/.test(navigator.userAgent) ? "" : document.location.href;
+                prefix = prefix.split("#")[0]; // To fix cases where an anchor tag was used
+                var clipPathID = "clipPath" + this._writerID + "_" + elementID;
+                selection.select(".text-area").attr("clip-path", "url(\"" + prefix + "#" + clipPathID + "\")");
+                var clipPathParent = selection.append("clipPath").attr("id", clipPathID);
+                var bboxAttrs = SVGTypewriter.Utils.DOM.getBBox(selection.select(".text-area"));
+                var box = clipPathParent.append("rect");
+                box.classed("clip-rect", true).attr({
+                    x: bboxAttrs.x,
+                    y: bboxAttrs.y,
+                    width: bboxAttrs.width,
+                    height: bboxAttrs.height
+                });
+            };
+            Writer.nextID = 0;
+            Writer.SupportedRotation = [-90, 0, 180, 90];
+            Writer.AnchorConverter = {
+                left: "start",
+                center: "middle",
+                right: "end"
+            };
+            Writer.XOffsetFactor = {
+                left: 0,
+                center: 0.5,
+                right: 1
+            };
+            Writer.YOffsetFactor = {
+                top: 0,
+                center: 0.5,
+                bottom: 1
+            };
+            return Writer;
+        })();
+        Writers.Writer = Writer;
+    })(Writers = SVGTypewriter.Writers || (SVGTypewriter.Writers = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+///<reference path="../reference.ts" />
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Measurers;
+    (function (Measurers) {
+        ;
+        var AbstractMeasurer = (function () {
+            function AbstractMeasurer(area, className) {
+                this.textMeasurer = this.getTextMeasurer(area, className);
+            }
+            AbstractMeasurer.prototype.checkSelectionIsText = function (d) {
+                return d[0][0].tagName === "text" || !d.select("text").empty();
+            };
+            AbstractMeasurer.prototype.getTextMeasurer = function (area, className) {
+                var _this = this;
+                if (!this.checkSelectionIsText(area)) {
+                    var textElement = area.append("text");
+                    if (className) {
+                        textElement.classed(className, true);
+                    }
+                    textElement.remove();
+                    return function (text) {
+                        area.node().appendChild(textElement.node());
+                        var areaDimension = _this.measureBBox(textElement, text);
+                        textElement.remove();
+                        return areaDimension;
+                    };
+                }
+                else {
+                    var parentNode = area.node().parentNode;
+                    var textSelection;
+                    if (area[0][0].tagName === "text") {
+                        textSelection = area;
+                    }
+                    else {
+                        textSelection = area.select("text");
+                    }
+                    area.remove();
+                    return function (text) {
+                        parentNode.appendChild(area.node());
+                        var areaDimension = _this.measureBBox(textSelection, text);
+                        area.remove();
+                        return areaDimension;
+                    };
+                }
+            };
+            AbstractMeasurer.prototype.measureBBox = function (d, text) {
+                d.text(text);
+                var bb = SVGTypewriter.Utils.DOM.getBBox(d);
+                return { width: bb.width, height: bb.height };
+            };
+            AbstractMeasurer.prototype.measure = function (text) {
+                if (text === void 0) { text = AbstractMeasurer.HEIGHT_TEXT; }
+                return this.textMeasurer(text);
+            };
+            AbstractMeasurer.HEIGHT_TEXT = "bqpdl";
+            return AbstractMeasurer;
+        })();
+        Measurers.AbstractMeasurer = AbstractMeasurer;
+    })(Measurers = SVGTypewriter.Measurers || (SVGTypewriter.Measurers = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+///<reference path="../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Measurers;
+    (function (Measurers) {
+        var Measurer = (function (_super) {
+            __extends(Measurer, _super);
+            function Measurer(area, className, useGuards) {
+                if (className === void 0) { className = null; }
+                if (useGuards === void 0) { useGuards = false; }
+                _super.call(this, area, className);
+                this.useGuards = useGuards;
+            }
+            // Guards assures same line height and width of whitespaces on both ends.
+            Measurer.prototype._addGuards = function (text) {
+                return Measurers.AbstractMeasurer.HEIGHT_TEXT + text + Measurers.AbstractMeasurer.HEIGHT_TEXT;
+            };
+            Measurer.prototype.getGuardWidth = function () {
+                if (this.guardWidth == null) {
+                    this.guardWidth = _super.prototype.measure.call(this).width;
+                }
+                return this.guardWidth;
+            };
+            Measurer.prototype._measureLine = function (line) {
+                var measuredLine = this.useGuards ? this._addGuards(line) : line;
+                var measuredLineDimensions = _super.prototype.measure.call(this, measuredLine);
+                measuredLineDimensions.width -= this.useGuards ? (2 * this.getGuardWidth()) : 0;
+                return measuredLineDimensions;
+            };
+            Measurer.prototype.measure = function (text) {
+                var _this = this;
+                if (text === void 0) { text = Measurers.AbstractMeasurer.HEIGHT_TEXT; }
+                if (text.trim() === "") {
+                    return { width: 0, height: 0 };
+                }
+                var linesDimensions = text.trim().split("\n").map(function (line) { return _this._measureLine(line); });
+                return {
+                    width: d3.max(linesDimensions, function (dim) { return dim.width; }),
+                    height: d3.sum(linesDimensions, function (dim) { return dim.height; })
+                };
+            };
+            return Measurer;
+        })(Measurers.AbstractMeasurer);
+        Measurers.Measurer = Measurer;
+    })(Measurers = SVGTypewriter.Measurers || (SVGTypewriter.Measurers = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+///<reference path="../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Measurers;
+    (function (Measurers) {
+        var CharacterMeasurer = (function (_super) {
+            __extends(CharacterMeasurer, _super);
+            function CharacterMeasurer() {
+                _super.apply(this, arguments);
+            }
+            CharacterMeasurer.prototype._measureCharacter = function (c) {
+                return _super.prototype._measureLine.call(this, c);
+            };
+            CharacterMeasurer.prototype._measureLine = function (line) {
+                var _this = this;
+                var charactersDimensions = line.split("").map(function (c) { return _this._measureCharacter(c); });
+                return {
+                    width: d3.sum(charactersDimensions, function (dim) { return dim.width; }),
+                    height: d3.max(charactersDimensions, function (dim) { return dim.height; })
+                };
+            };
+            return CharacterMeasurer;
+        })(Measurers.Measurer);
+        Measurers.CharacterMeasurer = CharacterMeasurer;
+    })(Measurers = SVGTypewriter.Measurers || (SVGTypewriter.Measurers = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+///<reference path="../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Measurers;
+    (function (Measurers) {
+        var CacheCharacterMeasurer = (function (_super) {
+            __extends(CacheCharacterMeasurer, _super);
+            function CacheCharacterMeasurer(area, className) {
+                var _this = this;
+                _super.call(this, area, className);
+                this.cache = new SVGTypewriter.Utils.Cache(function (c) { return _this._measureCharacterNotFromCache(c); }, SVGTypewriter.Utils.Methods.objEq);
+            }
+            CacheCharacterMeasurer.prototype._measureCharacterNotFromCache = function (c) {
+                return _super.prototype._measureCharacter.call(this, c);
+            };
+            CacheCharacterMeasurer.prototype._measureCharacter = function (c) {
+                return this.cache.get(c);
+            };
+            CacheCharacterMeasurer.prototype.reset = function () {
+                this.cache.clear();
+            };
+            return CacheCharacterMeasurer;
+        })(Measurers.CharacterMeasurer);
+        Measurers.CacheCharacterMeasurer = CacheCharacterMeasurer;
+    })(Measurers = SVGTypewriter.Measurers || (SVGTypewriter.Measurers = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+return Plottable;
+}));
+
+/*!
+SVG Typewriter 0.3.0 (https://github.com/palantir/svg-typewriter)
+Copyright 2014 Palantir Technologies
+Licensed under MIT (https://github.com/palantir/svg-typewriter/blob/develop/LICENSE)
+*/
+
+///<reference path="../reference.ts" />
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Utils;
+    (function (Utils) {
+        var Methods;
+        (function (Methods) {
+            /**
+             * Check if two arrays are equal by strict equality.
+             */
+            function arrayEq(a, b) {
+                // Technically, null and undefined are arrays too
+                if (a == null || b == null) {
+                    return a === b;
+                }
+                if (a.length !== b.length) {
+                    return false;
+                }
+                for (var i = 0; i < a.length; i++) {
+                    if (a[i] !== b[i]) {
+                        return false;
+                    }
+                }
+                return true;
+            }
+            Methods.arrayEq = arrayEq;
+            /**
+             * @param {any} a Object to check against b for equality.
+             * @param {any} b Object to check against a for equality.
+             *
+             * @returns {boolean} whether or not two objects share the same keys, and
+             *          values associated with those keys. Values will be compared
+             *          with ===.
+             */
+            function objEq(a, b) {
+                if (a == null || b == null) {
+                    return a === b;
+                }
+                var keysA = Object.keys(a).sort();
+                var keysB = Object.keys(b).sort();
+                var valuesA = keysA.map(function (k) { return a[k]; });
+                var valuesB = keysB.map(function (k) { return b[k]; });
+                return arrayEq(keysA, keysB) && arrayEq(valuesA, valuesB);
+            }
+            Methods.objEq = objEq;
+        })(Methods = Utils.Methods || (Utils.Methods = {}));
+    })(Utils = SVGTypewriter.Utils || (SVGTypewriter.Utils = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Utils;
+    (function (Utils) {
+        var DOM;
+        (function (DOM) {
+            function transform(s, x, y) {
+                var xform = d3.transform(s.attr("transform"));
+                if (x == null) {
+                    return xform.translate;
+                }
+                else {
+                    y = (y == null) ? 0 : y;
+                    xform.translate[0] = x;
+                    xform.translate[1] = y;
+                    s.attr("transform", xform.toString());
+                    return s;
+                }
+            }
+            DOM.transform = transform;
+            function getBBox(element) {
+                var bbox;
+                try {
+                    bbox = element.node().getBBox();
+                }
+                catch (err) {
+                    bbox = {
+                        x: 0,
+                        y: 0,
+                        width: 0,
+                        height: 0
+                    };
+                }
+                return bbox;
+            }
+            DOM.getBBox = getBBox;
+        })(DOM = Utils.DOM || (Utils.DOM = {}));
+    })(Utils = SVGTypewriter.Utils || (SVGTypewriter.Utils = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+///<reference path="../reference.ts" />
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Utils;
+    (function (Utils) {
+        var Cache = (function () {
+            /**
+             * @constructor
+             *
+             * @param {string} compute The function whose results will be cached.
+             * @param {(v: T, w: T) => boolean} [valueEq]
+             *        Used to determine if the value of canonicalKey has changed.
+             *        If omitted, defaults to === comparision.
+             */
+            function Cache(compute, valueEq) {
+                if (valueEq === void 0) { valueEq = function (v, w) { return v === w; }; }
+                this.cache = d3.map();
+                this.compute = compute;
+                this.valueEq = valueEq;
+            }
+            /**
+             * Attempt to look up k in the cache, computing the result if it isn't
+             * found.
+             *
+             * @param {string} k The key to look up in the cache.
+             * @return {T} The value associated with k; the result of compute(k).
+             */
+            Cache.prototype.get = function (k) {
+                if (!this.cache.has(k)) {
+                    this.cache.set(k, this.compute(k));
+                }
+                return this.cache.get(k);
+            };
+            /**
+             * Reset the cache empty.
+             *
+             * @return {Cache<T>} The calling Cache.
+             */
+            Cache.prototype.clear = function () {
+                this.cache = d3.map();
+                return this;
+            };
+            return Cache;
+        })();
+        Utils.Cache = Cache;
+    })(Utils = SVGTypewriter.Utils || (SVGTypewriter.Utils = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+///<reference path="../reference.ts" />
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Utils;
+    (function (Utils) {
+        var Tokenizer = (function () {
+            function Tokenizer() {
+                this.WordDividerRegExp = new RegExp("\\W");
+                this.WhitespaceRegExp = new RegExp("\\s");
+            }
+            Tokenizer.prototype.tokenize = function (line) {
+                var _this = this;
+                return line.split("").reduce(function (tokens, c) { return tokens.slice(0, -1).concat(_this.shouldCreateNewToken(tokens[tokens.length - 1], c)); }, [""]);
+            };
+            Tokenizer.prototype.shouldCreateNewToken = function (token, newCharacter) {
+                if (!token) {
+                    return [newCharacter];
+                }
+                var lastCharacter = token[token.length - 1];
+                if (this.WhitespaceRegExp.test(lastCharacter) && this.WhitespaceRegExp.test(newCharacter)) {
+                    return [token + newCharacter];
+                }
+                else if (this.WhitespaceRegExp.test(lastCharacter) || this.WhitespaceRegExp.test(newCharacter)) {
+                    return [token, newCharacter];
+                }
+                else if (!(this.WordDividerRegExp.test(lastCharacter) || this.WordDividerRegExp.test(newCharacter))) {
+                    return [token + newCharacter];
+                }
+                else if (lastCharacter === newCharacter) {
+                    return [token + newCharacter];
+                }
+                else {
+                    return [token, newCharacter];
+                }
+            };
+            return Tokenizer;
+        })();
+        Utils.Tokenizer = Tokenizer;
+    })(Utils = SVGTypewriter.Utils || (SVGTypewriter.Utils = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+///<reference path="../reference.ts" />
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Utils;
+    (function (Utils) {
+        var StringMethods;
+        (function (StringMethods) {
+            /**
+             * Treat all sequences of consecutive whitespace as a single " ".
+             */
+            function combineWhitespace(str) {
+                return str.replace(/\s+/g, " ");
+            }
+            StringMethods.combineWhitespace = combineWhitespace;
+            function isNotEmptyString(str) {
+                return str && str.trim() !== "";
+            }
+            StringMethods.isNotEmptyString = isNotEmptyString;
+            function trimStart(str, c) {
+                if (!str) {
+                    return str;
+                }
+                var chars = str.split("");
+                var reduceFunction = c ? function (s) { return s.split(c).some(isNotEmptyString); } : isNotEmptyString;
+                return chars.reduce(function (s, c) { return reduceFunction(s + c) ? s + c : s; }, "");
+            }
+            StringMethods.trimStart = trimStart;
+            function trimEnd(str, c) {
+                if (!str) {
+                    return str;
+                }
+                var reversedChars = str.split("");
+                reversedChars.reverse();
+                reversedChars = trimStart(reversedChars.join(""), c).split("");
+                reversedChars.reverse();
+                return reversedChars.join("");
+            }
+            StringMethods.trimEnd = trimEnd;
+        })(StringMethods = Utils.StringMethods || (Utils.StringMethods = {}));
+    })(Utils = SVGTypewriter.Utils || (SVGTypewriter.Utils = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+///<reference path="../reference.ts" />
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Animators;
+    (function (Animators) {
+        var BaseAnimator = (function () {
+            function BaseAnimator() {
+                this.duration(BaseAnimator.DEFAULT_DURATION_MILLISECONDS);
+                this.delay(0);
+                this.easing(BaseAnimator.DEFAULT_EASING);
+                this.moveX(0);
+                this.moveY(0);
+            }
+            BaseAnimator.prototype.animate = function (selection) {
+                var xForm = d3.transform("");
+                xForm.translate = [this.moveX(), this.moveY()];
+                selection.attr("transform", xForm.toString());
+                xForm.translate = [0, 0];
+                return this._animate(selection, { transform: xForm.toString() });
+            };
+            BaseAnimator.prototype._animate = function (selection, attr) {
+                return selection.transition().ease(this.easing()).duration(this.duration()).delay(this.delay()).attr(attr);
+            };
+            BaseAnimator.prototype.duration = function (duration) {
+                if (duration == null) {
+                    return this._duration;
+                }
+                else {
+                    this._duration = duration;
+                    return this;
+                }
+            };
+            BaseAnimator.prototype.moveX = function (shift) {
+                if (shift == null) {
+                    return this._moveX;
+                }
+                else {
+                    this._moveX = shift;
+                    return this;
+                }
+            };
+            BaseAnimator.prototype.moveY = function (shift) {
+                if (shift == null) {
+                    return this._moveY;
+                }
+                else {
+                    this._moveY = shift;
+                    return this;
+                }
+            };
+            BaseAnimator.prototype.delay = function (delay) {
+                if (delay == null) {
+                    return this._delay;
+                }
+                else {
+                    this._delay = delay;
+                    return this;
+                }
+            };
+            BaseAnimator.prototype.easing = function (easing) {
+                if (easing == null) {
+                    return this._easing;
+                }
+                else {
+                    this._easing = easing;
+                    return this;
+                }
+            };
+            /**
+             * The default duration of the animation in milliseconds
+             */
+            BaseAnimator.DEFAULT_DURATION_MILLISECONDS = 300;
+            /**
+             * The default easing of the animation
+             */
+            BaseAnimator.DEFAULT_EASING = "exp-out";
+            return BaseAnimator;
+        })();
+        Animators.BaseAnimator = BaseAnimator;
+    })(Animators = SVGTypewriter.Animators || (SVGTypewriter.Animators = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+///<reference path="../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Animators;
+    (function (Animators) {
+        var UnveilAnimator = (function (_super) {
+            __extends(UnveilAnimator, _super);
+            function UnveilAnimator() {
+                this.direction("bottom");
+                _super.call(this);
+            }
+            UnveilAnimator.prototype.direction = function (direction) {
+                if (direction == null) {
+                    return this._direction;
+                }
+                else {
+                    if (UnveilAnimator.SupportedDirections.indexOf(direction) === -1) {
+                        throw new Error("unsupported direction - " + direction);
+                    }
+                    this._direction = direction;
+                    return this;
+                }
+            };
+            UnveilAnimator.prototype.animate = function (selection) {
+                var attr = SVGTypewriter.Utils.DOM.getBBox(selection);
+                var mask = selection.select(".clip-rect");
+                mask.attr("width", 0);
+                mask.attr("height", 0);
+                switch (this._direction) {
+                    case "top":
+                        mask.attr("y", attr.y + attr.height);
+                        mask.attr("x", attr.x);
+                        mask.attr("width", attr.width);
+                        break;
+                    case "bottom":
+                        mask.attr("y", attr.y);
+                        mask.attr("x", attr.x);
+                        mask.attr("width", attr.width);
+                        break;
+                    case "left":
+                        mask.attr("y", attr.y);
+                        mask.attr("x", attr.x);
+                        mask.attr("height", attr.height);
+                        break;
+                    case "right":
+                        mask.attr("y", attr.y);
+                        mask.attr("x", attr.x + attr.width);
+                        mask.attr("height", attr.height);
+                        break;
+                }
+                this._animate(mask, attr);
+                return _super.prototype.animate.call(this, selection);
+            };
+            UnveilAnimator.SupportedDirections = ["top", "bottom", "left", "right"];
+            return UnveilAnimator;
+        })(Animators.BaseAnimator);
+        Animators.UnveilAnimator = UnveilAnimator;
+    })(Animators = SVGTypewriter.Animators || (SVGTypewriter.Animators = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+///<reference path="../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Animators;
+    (function (Animators) {
+        var OpacityAnimator = (function (_super) {
+            __extends(OpacityAnimator, _super);
+            function OpacityAnimator() {
+                _super.apply(this, arguments);
+            }
+            OpacityAnimator.prototype.animate = function (selection) {
+                var area = selection.select(".text-area");
+                area.attr("opacity", 0);
+                var attr = {
+                    opacity: 1
+                };
+                this._animate(area, attr);
+                return _super.prototype.animate.call(this, selection);
+            };
+            return OpacityAnimator;
+        })(Animators.BaseAnimator);
+        Animators.OpacityAnimator = OpacityAnimator;
+    })(Animators = SVGTypewriter.Animators || (SVGTypewriter.Animators = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+///<reference path="../reference.ts" />
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Wrappers;
+    (function (Wrappers) {
+        var Wrapper = (function () {
+            function Wrapper() {
+                this.maxLines(Infinity);
+                this.textTrimming("ellipsis");
+                this.allowBreakingWords(true);
+                this._tokenizer = new SVGTypewriter.Utils.Tokenizer();
+                this._breakingCharacter = "-";
+            }
+            Wrapper.prototype.maxLines = function (noLines) {
+                if (noLines == null) {
+                    return this._maxLines;
+                }
+                else {
+                    this._maxLines = noLines;
+                    return this;
+                }
+            };
+            Wrapper.prototype.textTrimming = function (option) {
+                if (option == null) {
+                    return this._textTrimming;
+                }
+                else {
+                    if (option !== "ellipsis" && option !== "none") {
+                        throw new Error(option + " - unsupported text trimming option.");
+                    }
+                    this._textTrimming = option;
+                    return this;
+                }
+            };
+            Wrapper.prototype.allowBreakingWords = function (allow) {
+                if (allow == null) {
+                    return this._allowBreakingWords;
+                }
+                else {
+                    this._allowBreakingWords = allow;
+                    return this;
+                }
+            };
+            Wrapper.prototype.wrap = function (text, measurer, width, height) {
+                var _this = this;
+                if (height === void 0) { height = Infinity; }
+                var initialWrappingResult = {
+                    originalText: text,
+                    wrappedText: "",
+                    noLines: 0,
+                    noBrokeWords: 0,
+                    truncatedText: ""
+                };
+                var state = {
+                    wrapping: initialWrappingResult,
+                    currentLine: "",
+                    availableWidth: width,
+                    availableLines: Math.min(Math.floor(height / measurer.measure().height), this._maxLines),
+                    canFitText: true
+                };
+                var lines = text.split("\n");
+                return lines.reduce(function (state, line, i) { return _this.breakLineToFitWidth(state, line, i !== lines.length - 1, measurer); }, state).wrapping;
+            };
+            Wrapper.prototype.breakLineToFitWidth = function (state, line, hasNextLine, measurer) {
+                var _this = this;
+                if (!state.canFitText && state.wrapping.truncatedText !== "") {
+                    state.wrapping.truncatedText += "\n";
+                }
+                var tokens = this._tokenizer.tokenize(line);
+                state = tokens.reduce(function (state, token) { return _this.wrapNextToken(token, state, measurer); }, state);
+                var wrappedText = SVGTypewriter.Utils.StringMethods.trimEnd(state.currentLine);
+                state.wrapping.noLines += +(wrappedText !== "");
+                if (state.wrapping.noLines === state.availableLines && this._textTrimming !== "none" && hasNextLine) {
+                    var ellipsisResult = this.addEllipsis(wrappedText, state.availableWidth, measurer);
+                    state.wrapping.wrappedText += ellipsisResult.wrappedToken;
+                    state.wrapping.truncatedText += ellipsisResult.remainingToken;
+                    state.canFitText = false;
+                }
+                else {
+                    state.wrapping.wrappedText += wrappedText;
+                }
+                state.currentLine = "\n";
+                return state;
+            };
+            Wrapper.prototype.canFitToken = function (token, width, measurer) {
+                var _this = this;
+                var possibleBreaks = this._allowBreakingWords ? token.split("").map(function (c, i) { return (i !== token.length - 1) ? c + _this._breakingCharacter : c; }) : [token];
+                return (measurer.measure(token).width <= width) || possibleBreaks.every(function (c) { return measurer.measure(c).width <= width; });
+            };
+            Wrapper.prototype.addEllipsis = function (line, width, measurer) {
+                if (this._textTrimming === "none") {
+                    return {
+                        wrappedToken: line,
+                        remainingToken: ""
+                    };
+                }
+                var truncatedLine = line.substring(0).trim();
+                var lineWidth = measurer.measure(truncatedLine).width;
+                var ellipsesWidth = measurer.measure("...").width;
+                var prefix = (line.length > 0 && line[0] === "\n") ? "\n" : "";
+                if (width <= ellipsesWidth) {
+                    var periodWidth = ellipsesWidth / 3;
+                    var numPeriodsThatFit = Math.floor(width / periodWidth);
+                    return {
+                        wrappedToken: prefix + "...".substr(0, numPeriodsThatFit),
+                        remainingToken: line
+                    };
+                }
+                while (lineWidth + ellipsesWidth > width) {
+                    truncatedLine = SVGTypewriter.Utils.StringMethods.trimEnd(truncatedLine.substr(0, truncatedLine.length - 1));
+                    lineWidth = measurer.measure(truncatedLine).width;
+                }
+                return {
+                    wrappedToken: prefix + truncatedLine + "...",
+                    remainingToken: SVGTypewriter.Utils.StringMethods.trimEnd(line.substring(truncatedLine.length), "-").trim()
+                };
+            };
+            Wrapper.prototype.wrapNextToken = function (token, state, measurer) {
+                if (!state.canFitText || state.availableLines === state.wrapping.noLines || !this.canFitToken(token, state.availableWidth, measurer)) {
+                    return this.finishWrapping(token, state, measurer);
+                }
+                var remainingToken = token;
+                while (remainingToken) {
+                    var result = this.breakTokenToFitInWidth(remainingToken, state.currentLine, state.availableWidth, measurer);
+                    state.currentLine = result.line;
+                    remainingToken = result.remainingToken;
+                    if (remainingToken != null) {
+                        state.wrapping.noBrokeWords += +result.breakWord;
+                        ++state.wrapping.noLines;
+                        if (state.availableLines === state.wrapping.noLines) {
+                            var ellipsisResult = this.addEllipsis(state.currentLine, state.availableWidth, measurer);
+                            state.wrapping.wrappedText += ellipsisResult.wrappedToken;
+                            state.wrapping.truncatedText += ellipsisResult.remainingToken + remainingToken;
+                            state.currentLine = "\n";
+                            return state;
+                        }
+                        else {
+                            state.wrapping.wrappedText += SVGTypewriter.Utils.StringMethods.trimEnd(state.currentLine);
+                            state.currentLine = "\n";
+                        }
+                    }
+                }
+                return state;
+            };
+            Wrapper.prototype.finishWrapping = function (token, state, measurer) {
+                // Token is really long, but we have a space to put part of the word.
+                if (state.canFitText && state.availableLines !== state.wrapping.noLines && this._allowBreakingWords && this._textTrimming !== "none") {
+                    var res = this.addEllipsis(state.currentLine + token, state.availableWidth, measurer);
+                    state.wrapping.wrappedText += res.wrappedToken;
+                    state.wrapping.truncatedText += res.remainingToken;
+                    state.wrapping.noBrokeWords += +(res.remainingToken.length < token.length);
+                    state.wrapping.noLines += +(res.wrappedToken.length > 0);
+                    state.currentLine = "";
+                }
+                else {
+                    state.wrapping.truncatedText += token;
+                }
+                state.canFitText = false;
+                return state;
+            };
+            /**
+             * Breaks single token to fit current line.
+             * If token contains only whitespaces then they will not be populated to next line.
+             */
+            Wrapper.prototype.breakTokenToFitInWidth = function (token, line, availableWidth, measurer, breakingCharacter) {
+                if (breakingCharacter === void 0) { breakingCharacter = this._breakingCharacter; }
+                if (measurer.measure(line + token).width <= availableWidth) {
+                    return {
+                        remainingToken: null,
+                        line: line + token,
+                        breakWord: false
+                    };
+                }
+                if (token.trim() === "") {
+                    return {
+                        remainingToken: "",
+                        line: line,
+                        breakWord: false
+                    };
+                }
+                if (!this._allowBreakingWords) {
+                    return {
+                        remainingToken: token,
+                        line: line,
+                        breakWord: false
+                    };
+                }
+                var fitTokenLength = 0;
+                while (fitTokenLength < token.length) {
+                    if (measurer.measure(line + token.substring(0, fitTokenLength + 1) + breakingCharacter).width <= availableWidth) {
+                        ++fitTokenLength;
+                    }
+                    else {
+                        break;
+                    }
+                }
+                var suffix = "";
+                if (fitTokenLength > 0) {
+                    suffix = breakingCharacter;
+                }
+                return {
+                    remainingToken: token.substring(fitTokenLength),
+                    line: line + token.substring(0, fitTokenLength) + suffix,
+                    breakWord: fitTokenLength > 0
+                };
+            };
+            return Wrapper;
+        })();
+        Wrappers.Wrapper = Wrapper;
+    })(Wrappers = SVGTypewriter.Wrappers || (SVGTypewriter.Wrappers = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+///<reference path="../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Wrappers;
+    (function (Wrappers) {
+        var SingleLineWrapper = (function (_super) {
+            __extends(SingleLineWrapper, _super);
+            function SingleLineWrapper() {
+                _super.apply(this, arguments);
+            }
+            SingleLineWrapper.prototype.wrap = function (text, measurer, width, height) {
+                var _this = this;
+                if (height === void 0) { height = Infinity; }
+                var lines = text.split("\n");
+                if (lines.length > 1) {
+                    throw new Error("SingleLineWrapper is designed to work only on single line");
+                }
+                var wrapFN = function (w) { return _super.prototype.wrap.call(_this, text, measurer, w, height); };
+                var result = wrapFN(width);
+                if (result.noLines < 2) {
+                    return result;
+                }
+                var left = 0;
+                var right = width;
+                for (var i = 0; i < SingleLineWrapper.NO_WRAP_ITERATIONS && right > left; ++i) {
+                    var currentWidth = (right + left) / 2;
+                    var currentResult = wrapFN(currentWidth);
+                    if (this.areSameResults(result, currentResult)) {
+                        right = currentWidth;
+                        result = currentResult;
+                    }
+                    else {
+                        left = currentWidth;
+                    }
+                }
+                return result;
+            };
+            SingleLineWrapper.prototype.areSameResults = function (one, two) {
+                return one.noLines === two.noLines && one.truncatedText === two.truncatedText;
+            };
+            SingleLineWrapper.NO_WRAP_ITERATIONS = 5;
+            return SingleLineWrapper;
+        })(Wrappers.Wrapper);
+        Wrappers.SingleLineWrapper = SingleLineWrapper;
+    })(Wrappers = SVGTypewriter.Wrappers || (SVGTypewriter.Wrappers = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+///<reference path="reference.ts" />
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Writers;
+    (function (Writers) {
+        var Writer = (function () {
+            function Writer(measurer, wrapper) {
+                this._writerID = Writer.nextID++;
+                this._elementID = 0;
+                this.measurer(measurer);
+                if (wrapper) {
+                    this.wrapper(wrapper);
+                }
+                this.addTitleElement(false);
+            }
+            Writer.prototype.measurer = function (newMeasurer) {
+                this._measurer = newMeasurer;
+                return this;
+            };
+            Writer.prototype.wrapper = function (newWrapper) {
+                this._wrapper = newWrapper;
+                return this;
+            };
+            Writer.prototype.addTitleElement = function (add) {
+                this._addTitleElement = add;
+                return this;
+            };
+            Writer.prototype.writeLine = function (line, g, width, xAlign, yOffset) {
+                var textEl = g.append("text");
+                textEl.text(line);
+                var xOffset = width * Writer.XOffsetFactor[xAlign];
+                var anchor = Writer.AnchorConverter[xAlign];
+                textEl.attr("text-anchor", anchor).classed("text-line", true);
+                SVGTypewriter.Utils.DOM.transform(textEl, xOffset, yOffset).attr("y", "-0.25em");
+                ;
+            };
+            Writer.prototype.writeText = function (text, writingArea, width, height, xAlign, yAlign) {
+                var _this = this;
+                var lines = text.split("\n");
+                var lineHeight = this._measurer.measure().height;
+                var yOffset = Writer.YOffsetFactor[yAlign] * (height - lines.length * lineHeight);
+                lines.forEach(function (line, i) {
+                    _this.writeLine(line, writingArea, width, xAlign, (i + 1) * lineHeight + yOffset);
+                });
+            };
+            Writer.prototype.write = function (text, width, height, options) {
+                if (Writer.SupportedRotation.indexOf(options.textRotation) === -1) {
+                    throw new Error("unsupported rotation - " + options.textRotation);
+                }
+                var orientHorizontally = Math.abs(Math.abs(options.textRotation) - 90) > 45;
+                var primaryDimension = orientHorizontally ? width : height;
+                var secondaryDimension = orientHorizontally ? height : width;
+                var textContainer = options.selection.append("g").classed("text-container", true);
+                if (this._addTitleElement) {
+                    textContainer.append("title").text(text);
+                }
+                var textArea = textContainer.append("g").classed("text-area", true);
+                var wrappedText = this._wrapper ? this._wrapper.wrap(text, this._measurer, primaryDimension, secondaryDimension).wrappedText : text;
+                this.writeText(wrappedText, textArea, primaryDimension, secondaryDimension, options.xAlign, options.yAlign);
+                var xForm = d3.transform("");
+                var xForm2 = d3.transform("");
+                xForm.rotate = options.textRotation;
+                switch (options.textRotation) {
+                    case 90:
+                        xForm.translate = [width, 0];
+                        xForm2.rotate = -90;
+                        xForm2.translate = [0, 200];
+                        break;
+                    case -90:
+                        xForm.translate = [0, height];
+                        xForm2.rotate = 90;
+                        xForm2.translate = [width, 0];
+                        break;
+                    case 180:
+                        xForm.translate = [width, height];
+                        xForm2.translate = [width, height];
+                        xForm2.rotate = 180;
+                        break;
+                }
+                textArea.attr("transform", xForm.toString());
+                this.addClipPath(textContainer, xForm2);
+                if (options.animator) {
+                    options.animator.animate(textContainer);
+                }
+            };
+            Writer.prototype.addClipPath = function (selection, transform) {
+                var elementID = this._elementID++;
+                var prefix = /MSIE [5-9]/.test(navigator.userAgent) ? "" : document.location.href;
+                prefix = prefix.split("#")[0]; // To fix cases where an anchor tag was used
+                var clipPathID = "clipPath" + this._writerID + "_" + elementID;
+                selection.select(".text-area").attr("clip-path", "url(\"" + prefix + "#" + clipPathID + "\")");
+                var clipPathParent = selection.append("clipPath").attr("id", clipPathID);
+                var bboxAttrs = SVGTypewriter.Utils.DOM.getBBox(selection.select(".text-area"));
+                var box = clipPathParent.append("rect");
+                box.classed("clip-rect", true).attr({
+                    x: bboxAttrs.x,
+                    y: bboxAttrs.y,
+                    width: bboxAttrs.width,
+                    height: bboxAttrs.height
+                });
+            };
+            Writer.nextID = 0;
+            Writer.SupportedRotation = [-90, 0, 180, 90];
+            Writer.AnchorConverter = {
+                left: "start",
+                center: "middle",
+                right: "end"
+            };
+            Writer.XOffsetFactor = {
+                left: 0,
+                center: 0.5,
+                right: 1
+            };
+            Writer.YOffsetFactor = {
+                top: 0,
+                center: 0.5,
+                bottom: 1
+            };
+            return Writer;
+        })();
+        Writers.Writer = Writer;
+    })(Writers = SVGTypewriter.Writers || (SVGTypewriter.Writers = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+///<reference path="../reference.ts" />
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Measurers;
+    (function (Measurers) {
+        ;
+        var AbstractMeasurer = (function () {
+            function AbstractMeasurer(area, className) {
+                this.textMeasurer = this.getTextMeasurer(area, className);
+            }
+            AbstractMeasurer.prototype.checkSelectionIsText = function (d) {
+                return d[0][0].tagName === "text" || !d.select("text").empty();
+            };
+            AbstractMeasurer.prototype.getTextMeasurer = function (area, className) {
+                var _this = this;
+                if (!this.checkSelectionIsText(area)) {
+                    var textElement = area.append("text");
+                    if (className) {
+                        textElement.classed(className, true);
+                    }
+                    textElement.remove();
+                    return function (text) {
+                        area.node().appendChild(textElement.node());
+                        var areaDimension = _this.measureBBox(textElement, text);
+                        textElement.remove();
+                        return areaDimension;
+                    };
+                }
+                else {
+                    var parentNode = area.node().parentNode;
+                    var textSelection;
+                    if (area[0][0].tagName === "text") {
+                        textSelection = area;
+                    }
+                    else {
+                        textSelection = area.select("text");
+                    }
+                    area.remove();
+                    return function (text) {
+                        parentNode.appendChild(area.node());
+                        var areaDimension = _this.measureBBox(textSelection, text);
+                        area.remove();
+                        return areaDimension;
+                    };
+                }
+            };
+            AbstractMeasurer.prototype.measureBBox = function (d, text) {
+                d.text(text);
+                var bb = SVGTypewriter.Utils.DOM.getBBox(d);
+                return { width: bb.width, height: bb.height };
+            };
+            AbstractMeasurer.prototype.measure = function (text) {
+                if (text === void 0) { text = AbstractMeasurer.HEIGHT_TEXT; }
+                return this.textMeasurer(text);
+            };
+            AbstractMeasurer.HEIGHT_TEXT = "bqpdl";
+            return AbstractMeasurer;
+        })();
+        Measurers.AbstractMeasurer = AbstractMeasurer;
+    })(Measurers = SVGTypewriter.Measurers || (SVGTypewriter.Measurers = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+///<reference path="../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Measurers;
+    (function (Measurers) {
+        var Measurer = (function (_super) {
+            __extends(Measurer, _super);
+            function Measurer(area, className, useGuards) {
+                if (className === void 0) { className = null; }
+                if (useGuards === void 0) { useGuards = false; }
+                _super.call(this, area, className);
+                this.useGuards = useGuards;
+            }
+            // Guards assures same line height and width of whitespaces on both ends.
+            Measurer.prototype._addGuards = function (text) {
+                return Measurers.AbstractMeasurer.HEIGHT_TEXT + text + Measurers.AbstractMeasurer.HEIGHT_TEXT;
+            };
+            Measurer.prototype.getGuardWidth = function () {
+                if (this.guardWidth == null) {
+                    this.guardWidth = _super.prototype.measure.call(this).width;
+                }
+                return this.guardWidth;
+            };
+            Measurer.prototype._measureLine = function (line) {
+                var measuredLine = this.useGuards ? this._addGuards(line) : line;
+                var measuredLineDimensions = _super.prototype.measure.call(this, measuredLine);
+                measuredLineDimensions.width -= this.useGuards ? (2 * this.getGuardWidth()) : 0;
+                return measuredLineDimensions;
+            };
+            Measurer.prototype.measure = function (text) {
+                var _this = this;
+                if (text === void 0) { text = Measurers.AbstractMeasurer.HEIGHT_TEXT; }
+                if (text.trim() === "") {
+                    return { width: 0, height: 0 };
+                }
+                var linesDimensions = text.trim().split("\n").map(function (line) { return _this._measureLine(line); });
+                return {
+                    width: d3.max(linesDimensions, function (dim) { return dim.width; }),
+                    height: d3.sum(linesDimensions, function (dim) { return dim.height; })
+                };
+            };
+            return Measurer;
+        })(Measurers.AbstractMeasurer);
+        Measurers.Measurer = Measurer;
+    })(Measurers = SVGTypewriter.Measurers || (SVGTypewriter.Measurers = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+///<reference path="../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Measurers;
+    (function (Measurers) {
+        var CharacterMeasurer = (function (_super) {
+            __extends(CharacterMeasurer, _super);
+            function CharacterMeasurer() {
+                _super.apply(this, arguments);
+            }
+            CharacterMeasurer.prototype._measureCharacter = function (c) {
+                return _super.prototype._measureLine.call(this, c);
+            };
+            CharacterMeasurer.prototype._measureLine = function (line) {
+                var _this = this;
+                var charactersDimensions = line.split("").map(function (c) { return _this._measureCharacter(c); });
+                return {
+                    width: d3.sum(charactersDimensions, function (dim) { return dim.width; }),
+                    height: d3.max(charactersDimensions, function (dim) { return dim.height; })
+                };
+            };
+            return CharacterMeasurer;
+        })(Measurers.Measurer);
+        Measurers.CharacterMeasurer = CharacterMeasurer;
+    })(Measurers = SVGTypewriter.Measurers || (SVGTypewriter.Measurers = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+///<reference path="../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Measurers;
+    (function (Measurers) {
+        var CacheCharacterMeasurer = (function (_super) {
+            __extends(CacheCharacterMeasurer, _super);
+            function CacheCharacterMeasurer(area, className) {
+                var _this = this;
+                _super.call(this, area, className);
+                this.cache = new SVGTypewriter.Utils.Cache(function (c) { return _this._measureCharacterNotFromCache(c); }, SVGTypewriter.Utils.Methods.objEq);
+            }
+            CacheCharacterMeasurer.prototype._measureCharacterNotFromCache = function (c) {
+                return _super.prototype._measureCharacter.call(this, c);
+            };
+            CacheCharacterMeasurer.prototype._measureCharacter = function (c) {
+                return this.cache.get(c);
+            };
+            CacheCharacterMeasurer.prototype.reset = function () {
+                this.cache.clear();
+            };
+            return CacheCharacterMeasurer;
+        })(Measurers.CharacterMeasurer);
+        Measurers.CacheCharacterMeasurer = CacheCharacterMeasurer;
+    })(Measurers = SVGTypewriter.Measurers || (SVGTypewriter.Measurers = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+return Plottable;
+}));
+
+/*!
+SVG Typewriter 0.3.0 (https://github.com/palantir/svg-typewriter)
+Copyright 2014 Palantir Technologies
+Licensed under MIT (https://github.com/palantir/svg-typewriter/blob/develop/LICENSE)
+*/
+
+///<reference path="../reference.ts" />
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Utils;
+    (function (Utils) {
+        var Methods;
+        (function (Methods) {
+            /**
+             * Check if two arrays are equal by strict equality.
+             */
+            function arrayEq(a, b) {
+                // Technically, null and undefined are arrays too
+                if (a == null || b == null) {
+                    return a === b;
+                }
+                if (a.length !== b.length) {
+                    return false;
+                }
+                for (var i = 0; i < a.length; i++) {
+                    if (a[i] !== b[i]) {
+                        return false;
+                    }
+                }
+                return true;
+            }
+            Methods.arrayEq = arrayEq;
+            /**
+             * @param {any} a Object to check against b for equality.
+             * @param {any} b Object to check against a for equality.
+             *
+             * @returns {boolean} whether or not two objects share the same keys, and
+             *          values associated with those keys. Values will be compared
+             *          with ===.
+             */
+            function objEq(a, b) {
+                if (a == null || b == null) {
+                    return a === b;
+                }
+                var keysA = Object.keys(a).sort();
+                var keysB = Object.keys(b).sort();
+                var valuesA = keysA.map(function (k) { return a[k]; });
+                var valuesB = keysB.map(function (k) { return b[k]; });
+                return arrayEq(keysA, keysB) && arrayEq(valuesA, valuesB);
+            }
+            Methods.objEq = objEq;
+        })(Methods = Utils.Methods || (Utils.Methods = {}));
+    })(Utils = SVGTypewriter.Utils || (SVGTypewriter.Utils = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Utils;
+    (function (Utils) {
+        var DOM;
+        (function (DOM) {
+            function transform(s, x, y) {
+                var xform = d3.transform(s.attr("transform"));
+                if (x == null) {
+                    return xform.translate;
+                }
+                else {
+                    y = (y == null) ? 0 : y;
+                    xform.translate[0] = x;
+                    xform.translate[1] = y;
+                    s.attr("transform", xform.toString());
+                    return s;
+                }
+            }
+            DOM.transform = transform;
+            function getBBox(element) {
+                var bbox;
+                try {
+                    bbox = element.node().getBBox();
+                }
+                catch (err) {
+                    bbox = {
+                        x: 0,
+                        y: 0,
+                        width: 0,
+                        height: 0
+                    };
+                }
+                return bbox;
+            }
+            DOM.getBBox = getBBox;
+        })(DOM = Utils.DOM || (Utils.DOM = {}));
+    })(Utils = SVGTypewriter.Utils || (SVGTypewriter.Utils = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+///<reference path="../reference.ts" />
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Utils;
+    (function (Utils) {
+        var Cache = (function () {
+            /**
+             * @constructor
+             *
+             * @param {string} compute The function whose results will be cached.
+             * @param {(v: T, w: T) => boolean} [valueEq]
+             *        Used to determine if the value of canonicalKey has changed.
+             *        If omitted, defaults to === comparision.
+             */
+            function Cache(compute, valueEq) {
+                if (valueEq === void 0) { valueEq = function (v, w) { return v === w; }; }
+                this.cache = d3.map();
+                this.compute = compute;
+                this.valueEq = valueEq;
+            }
+            /**
+             * Attempt to look up k in the cache, computing the result if it isn't
+             * found.
+             *
+             * @param {string} k The key to look up in the cache.
+             * @return {T} The value associated with k; the result of compute(k).
+             */
+            Cache.prototype.get = function (k) {
+                if (!this.cache.has(k)) {
+                    this.cache.set(k, this.compute(k));
+                }
+                return this.cache.get(k);
+            };
+            /**
+             * Reset the cache empty.
+             *
+             * @return {Cache<T>} The calling Cache.
+             */
+            Cache.prototype.clear = function () {
+                this.cache = d3.map();
+                return this;
+            };
+            return Cache;
+        })();
+        Utils.Cache = Cache;
+    })(Utils = SVGTypewriter.Utils || (SVGTypewriter.Utils = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+///<reference path="../reference.ts" />
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Utils;
+    (function (Utils) {
+        var Tokenizer = (function () {
+            function Tokenizer() {
+                this.WordDividerRegExp = new RegExp("\\W");
+                this.WhitespaceRegExp = new RegExp("\\s");
+            }
+            Tokenizer.prototype.tokenize = function (line) {
+                var _this = this;
+                return line.split("").reduce(function (tokens, c) { return tokens.slice(0, -1).concat(_this.shouldCreateNewToken(tokens[tokens.length - 1], c)); }, [""]);
+            };
+            Tokenizer.prototype.shouldCreateNewToken = function (token, newCharacter) {
+                if (!token) {
+                    return [newCharacter];
+                }
+                var lastCharacter = token[token.length - 1];
+                if (this.WhitespaceRegExp.test(lastCharacter) && this.WhitespaceRegExp.test(newCharacter)) {
+                    return [token + newCharacter];
+                }
+                else if (this.WhitespaceRegExp.test(lastCharacter) || this.WhitespaceRegExp.test(newCharacter)) {
+                    return [token, newCharacter];
+                }
+                else if (!(this.WordDividerRegExp.test(lastCharacter) || this.WordDividerRegExp.test(newCharacter))) {
+                    return [token + newCharacter];
+                }
+                else if (lastCharacter === newCharacter) {
+                    return [token + newCharacter];
+                }
+                else {
+                    return [token, newCharacter];
+                }
+            };
+            return Tokenizer;
+        })();
+        Utils.Tokenizer = Tokenizer;
+    })(Utils = SVGTypewriter.Utils || (SVGTypewriter.Utils = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+///<reference path="../reference.ts" />
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Utils;
+    (function (Utils) {
+        var StringMethods;
+        (function (StringMethods) {
+            /**
+             * Treat all sequences of consecutive whitespace as a single " ".
+             */
+            function combineWhitespace(str) {
+                return str.replace(/\s+/g, " ");
+            }
+            StringMethods.combineWhitespace = combineWhitespace;
+            function isNotEmptyString(str) {
+                return str && str.trim() !== "";
+            }
+            StringMethods.isNotEmptyString = isNotEmptyString;
+            function trimStart(str, c) {
+                if (!str) {
+                    return str;
+                }
+                var chars = str.split("");
+                var reduceFunction = c ? function (s) { return s.split(c).some(isNotEmptyString); } : isNotEmptyString;
+                return chars.reduce(function (s, c) { return reduceFunction(s + c) ? s + c : s; }, "");
+            }
+            StringMethods.trimStart = trimStart;
+            function trimEnd(str, c) {
+                if (!str) {
+                    return str;
+                }
+                var reversedChars = str.split("");
+                reversedChars.reverse();
+                reversedChars = trimStart(reversedChars.join(""), c).split("");
+                reversedChars.reverse();
+                return reversedChars.join("");
+            }
+            StringMethods.trimEnd = trimEnd;
+        })(StringMethods = Utils.StringMethods || (Utils.StringMethods = {}));
+    })(Utils = SVGTypewriter.Utils || (SVGTypewriter.Utils = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+///<reference path="../reference.ts" />
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Animators;
+    (function (Animators) {
+        var BaseAnimator = (function () {
+            function BaseAnimator() {
+                this.duration(BaseAnimator.DEFAULT_DURATION_MILLISECONDS);
+                this.delay(0);
+                this.easing(BaseAnimator.DEFAULT_EASING);
+                this.moveX(0);
+                this.moveY(0);
+            }
+            BaseAnimator.prototype.animate = function (selection) {
+                var xForm = d3.transform("");
+                xForm.translate = [this.moveX(), this.moveY()];
+                selection.attr("transform", xForm.toString());
+                xForm.translate = [0, 0];
+                return this._animate(selection, { transform: xForm.toString() });
+            };
+            BaseAnimator.prototype._animate = function (selection, attr) {
+                return selection.transition().ease(this.easing()).duration(this.duration()).delay(this.delay()).attr(attr);
+            };
+            BaseAnimator.prototype.duration = function (duration) {
+                if (duration == null) {
+                    return this._duration;
+                }
+                else {
+                    this._duration = duration;
+                    return this;
+                }
+            };
+            BaseAnimator.prototype.moveX = function (shift) {
+                if (shift == null) {
+                    return this._moveX;
+                }
+                else {
+                    this._moveX = shift;
+                    return this;
+                }
+            };
+            BaseAnimator.prototype.moveY = function (shift) {
+                if (shift == null) {
+                    return this._moveY;
+                }
+                else {
+                    this._moveY = shift;
+                    return this;
+                }
+            };
+            BaseAnimator.prototype.delay = function (delay) {
+                if (delay == null) {
+                    return this._delay;
+                }
+                else {
+                    this._delay = delay;
+                    return this;
+                }
+            };
+            BaseAnimator.prototype.easing = function (easing) {
+                if (easing == null) {
+                    return this._easing;
+                }
+                else {
+                    this._easing = easing;
+                    return this;
+                }
+            };
+            /**
+             * The default duration of the animation in milliseconds
+             */
+            BaseAnimator.DEFAULT_DURATION_MILLISECONDS = 300;
+            /**
+             * The default easing of the animation
+             */
+            BaseAnimator.DEFAULT_EASING = "exp-out";
+            return BaseAnimator;
+        })();
+        Animators.BaseAnimator = BaseAnimator;
+    })(Animators = SVGTypewriter.Animators || (SVGTypewriter.Animators = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+///<reference path="../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Animators;
+    (function (Animators) {
+        var UnveilAnimator = (function (_super) {
+            __extends(UnveilAnimator, _super);
+            function UnveilAnimator() {
+                this.direction("bottom");
+                _super.call(this);
+            }
+            UnveilAnimator.prototype.direction = function (direction) {
+                if (direction == null) {
+                    return this._direction;
+                }
+                else {
+                    if (UnveilAnimator.SupportedDirections.indexOf(direction) === -1) {
+                        throw new Error("unsupported direction - " + direction);
+                    }
+                    this._direction = direction;
+                    return this;
+                }
+            };
+            UnveilAnimator.prototype.animate = function (selection) {
+                var attr = SVGTypewriter.Utils.DOM.getBBox(selection);
+                var mask = selection.select(".clip-rect");
+                mask.attr("width", 0);
+                mask.attr("height", 0);
+                switch (this._direction) {
+                    case "top":
+                        mask.attr("y", attr.y + attr.height);
+                        mask.attr("x", attr.x);
+                        mask.attr("width", attr.width);
+                        break;
+                    case "bottom":
+                        mask.attr("y", attr.y);
+                        mask.attr("x", attr.x);
+                        mask.attr("width", attr.width);
+                        break;
+                    case "left":
+                        mask.attr("y", attr.y);
+                        mask.attr("x", attr.x);
+                        mask.attr("height", attr.height);
+                        break;
+                    case "right":
+                        mask.attr("y", attr.y);
+                        mask.attr("x", attr.x + attr.width);
+                        mask.attr("height", attr.height);
+                        break;
+                }
+                this._animate(mask, attr);
+                return _super.prototype.animate.call(this, selection);
+            };
+            UnveilAnimator.SupportedDirections = ["top", "bottom", "left", "right"];
+            return UnveilAnimator;
+        })(Animators.BaseAnimator);
+        Animators.UnveilAnimator = UnveilAnimator;
+    })(Animators = SVGTypewriter.Animators || (SVGTypewriter.Animators = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+///<reference path="../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Animators;
+    (function (Animators) {
+        var OpacityAnimator = (function (_super) {
+            __extends(OpacityAnimator, _super);
+            function OpacityAnimator() {
+                _super.apply(this, arguments);
+            }
+            OpacityAnimator.prototype.animate = function (selection) {
+                var area = selection.select(".text-area");
+                area.attr("opacity", 0);
+                var attr = {
+                    opacity: 1
+                };
+                this._animate(area, attr);
+                return _super.prototype.animate.call(this, selection);
+            };
+            return OpacityAnimator;
+        })(Animators.BaseAnimator);
+        Animators.OpacityAnimator = OpacityAnimator;
+    })(Animators = SVGTypewriter.Animators || (SVGTypewriter.Animators = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+///<reference path="../reference.ts" />
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Wrappers;
+    (function (Wrappers) {
+        var Wrapper = (function () {
+            function Wrapper() {
+                this.maxLines(Infinity);
+                this.textTrimming("ellipsis");
+                this.allowBreakingWords(true);
+                this._tokenizer = new SVGTypewriter.Utils.Tokenizer();
+                this._breakingCharacter = "-";
+            }
+            Wrapper.prototype.maxLines = function (noLines) {
+                if (noLines == null) {
+                    return this._maxLines;
+                }
+                else {
+                    this._maxLines = noLines;
+                    return this;
+                }
+            };
+            Wrapper.prototype.textTrimming = function (option) {
+                if (option == null) {
+                    return this._textTrimming;
+                }
+                else {
+                    if (option !== "ellipsis" && option !== "none") {
+                        throw new Error(option + " - unsupported text trimming option.");
+                    }
+                    this._textTrimming = option;
+                    return this;
+                }
+            };
+            Wrapper.prototype.allowBreakingWords = function (allow) {
+                if (allow == null) {
+                    return this._allowBreakingWords;
+                }
+                else {
+                    this._allowBreakingWords = allow;
+                    return this;
+                }
+            };
+            Wrapper.prototype.wrap = function (text, measurer, width, height) {
+                var _this = this;
+                if (height === void 0) { height = Infinity; }
+                var initialWrappingResult = {
+                    originalText: text,
+                    wrappedText: "",
+                    noLines: 0,
+                    noBrokeWords: 0,
+                    truncatedText: ""
+                };
+                var state = {
+                    wrapping: initialWrappingResult,
+                    currentLine: "",
+                    availableWidth: width,
+                    availableLines: Math.min(Math.floor(height / measurer.measure().height), this._maxLines),
+                    canFitText: true
+                };
+                var lines = text.split("\n");
+                return lines.reduce(function (state, line, i) { return _this.breakLineToFitWidth(state, line, i !== lines.length - 1, measurer); }, state).wrapping;
+            };
+            Wrapper.prototype.breakLineToFitWidth = function (state, line, hasNextLine, measurer) {
+                var _this = this;
+                if (!state.canFitText && state.wrapping.truncatedText !== "") {
+                    state.wrapping.truncatedText += "\n";
+                }
+                var tokens = this._tokenizer.tokenize(line);
+                state = tokens.reduce(function (state, token) { return _this.wrapNextToken(token, state, measurer); }, state);
+                var wrappedText = SVGTypewriter.Utils.StringMethods.trimEnd(state.currentLine);
+                state.wrapping.noLines += +(wrappedText !== "");
+                if (state.wrapping.noLines === state.availableLines && this._textTrimming !== "none" && hasNextLine) {
+                    var ellipsisResult = this.addEllipsis(wrappedText, state.availableWidth, measurer);
+                    state.wrapping.wrappedText += ellipsisResult.wrappedToken;
+                    state.wrapping.truncatedText += ellipsisResult.remainingToken;
+                    state.canFitText = false;
+                }
+                else {
+                    state.wrapping.wrappedText += wrappedText;
+                }
+                state.currentLine = "\n";
+                return state;
+            };
+            Wrapper.prototype.canFitToken = function (token, width, measurer) {
+                var _this = this;
+                var possibleBreaks = this._allowBreakingWords ? token.split("").map(function (c, i) { return (i !== token.length - 1) ? c + _this._breakingCharacter : c; }) : [token];
+                return (measurer.measure(token).width <= width) || possibleBreaks.every(function (c) { return measurer.measure(c).width <= width; });
+            };
+            Wrapper.prototype.addEllipsis = function (line, width, measurer) {
+                if (this._textTrimming === "none") {
+                    return {
+                        wrappedToken: line,
+                        remainingToken: ""
+                    };
+                }
+                var truncatedLine = line.substring(0).trim();
+                var lineWidth = measurer.measure(truncatedLine).width;
+                var ellipsesWidth = measurer.measure("...").width;
+                var prefix = (line.length > 0 && line[0] === "\n") ? "\n" : "";
+                if (width <= ellipsesWidth) {
+                    var periodWidth = ellipsesWidth / 3;
+                    var numPeriodsThatFit = Math.floor(width / periodWidth);
+                    return {
+                        wrappedToken: prefix + "...".substr(0, numPeriodsThatFit),
+                        remainingToken: line
+                    };
+                }
+                while (lineWidth + ellipsesWidth > width) {
+                    truncatedLine = SVGTypewriter.Utils.StringMethods.trimEnd(truncatedLine.substr(0, truncatedLine.length - 1));
+                    lineWidth = measurer.measure(truncatedLine).width;
+                }
+                return {
+                    wrappedToken: prefix + truncatedLine + "...",
+                    remainingToken: SVGTypewriter.Utils.StringMethods.trimEnd(line.substring(truncatedLine.length), "-").trim()
+                };
+            };
+            Wrapper.prototype.wrapNextToken = function (token, state, measurer) {
+                if (!state.canFitText || state.availableLines === state.wrapping.noLines || !this.canFitToken(token, state.availableWidth, measurer)) {
+                    return this.finishWrapping(token, state, measurer);
+                }
+                var remainingToken = token;
+                while (remainingToken) {
+                    var result = this.breakTokenToFitInWidth(remainingToken, state.currentLine, state.availableWidth, measurer);
+                    state.currentLine = result.line;
+                    remainingToken = result.remainingToken;
+                    if (remainingToken != null) {
+                        state.wrapping.noBrokeWords += +result.breakWord;
+                        ++state.wrapping.noLines;
+                        if (state.availableLines === state.wrapping.noLines) {
+                            var ellipsisResult = this.addEllipsis(state.currentLine, state.availableWidth, measurer);
+                            state.wrapping.wrappedText += ellipsisResult.wrappedToken;
+                            state.wrapping.truncatedText += ellipsisResult.remainingToken + remainingToken;
+                            state.currentLine = "\n";
+                            return state;
+                        }
+                        else {
+                            state.wrapping.wrappedText += SVGTypewriter.Utils.StringMethods.trimEnd(state.currentLine);
+                            state.currentLine = "\n";
+                        }
+                    }
+                }
+                return state;
+            };
+            Wrapper.prototype.finishWrapping = function (token, state, measurer) {
+                // Token is really long, but we have a space to put part of the word.
+                if (state.canFitText && state.availableLines !== state.wrapping.noLines && this._allowBreakingWords && this._textTrimming !== "none") {
+                    var res = this.addEllipsis(state.currentLine + token, state.availableWidth, measurer);
+                    state.wrapping.wrappedText += res.wrappedToken;
+                    state.wrapping.truncatedText += res.remainingToken;
+                    state.wrapping.noBrokeWords += +(res.remainingToken.length < token.length);
+                    state.wrapping.noLines += +(res.wrappedToken.length > 0);
+                    state.currentLine = "";
+                }
+                else {
+                    state.wrapping.truncatedText += token;
+                }
+                state.canFitText = false;
+                return state;
+            };
+            /**
+             * Breaks single token to fit current line.
+             * If token contains only whitespaces then they will not be populated to next line.
+             */
+            Wrapper.prototype.breakTokenToFitInWidth = function (token, line, availableWidth, measurer, breakingCharacter) {
+                if (breakingCharacter === void 0) { breakingCharacter = this._breakingCharacter; }
+                if (measurer.measure(line + token).width <= availableWidth) {
+                    return {
+                        remainingToken: null,
+                        line: line + token,
+                        breakWord: false
+                    };
+                }
+                if (token.trim() === "") {
+                    return {
+                        remainingToken: "",
+                        line: line,
+                        breakWord: false
+                    };
+                }
+                if (!this._allowBreakingWords) {
+                    return {
+                        remainingToken: token,
+                        line: line,
+                        breakWord: false
+                    };
+                }
+                var fitTokenLength = 0;
+                while (fitTokenLength < token.length) {
+                    if (measurer.measure(line + token.substring(0, fitTokenLength + 1) + breakingCharacter).width <= availableWidth) {
+                        ++fitTokenLength;
+                    }
+                    else {
+                        break;
+                    }
+                }
+                var suffix = "";
+                if (fitTokenLength > 0) {
+                    suffix = breakingCharacter;
+                }
+                return {
+                    remainingToken: token.substring(fitTokenLength),
+                    line: line + token.substring(0, fitTokenLength) + suffix,
+                    breakWord: fitTokenLength > 0
+                };
+            };
+            return Wrapper;
+        })();
+        Wrappers.Wrapper = Wrapper;
+    })(Wrappers = SVGTypewriter.Wrappers || (SVGTypewriter.Wrappers = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+///<reference path="../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Wrappers;
+    (function (Wrappers) {
+        var SingleLineWrapper = (function (_super) {
+            __extends(SingleLineWrapper, _super);
+            function SingleLineWrapper() {
+                _super.apply(this, arguments);
+            }
+            SingleLineWrapper.prototype.wrap = function (text, measurer, width, height) {
+                var _this = this;
+                if (height === void 0) { height = Infinity; }
+                var lines = text.split("\n");
+                if (lines.length > 1) {
+                    throw new Error("SingleLineWrapper is designed to work only on single line");
+                }
+                var wrapFN = function (w) { return _super.prototype.wrap.call(_this, text, measurer, w, height); };
+                var result = wrapFN(width);
+                if (result.noLines < 2) {
+                    return result;
+                }
+                var left = 0;
+                var right = width;
+                for (var i = 0; i < SingleLineWrapper.NO_WRAP_ITERATIONS && right > left; ++i) {
+                    var currentWidth = (right + left) / 2;
+                    var currentResult = wrapFN(currentWidth);
+                    if (this.areSameResults(result, currentResult)) {
+                        right = currentWidth;
+                        result = currentResult;
+                    }
+                    else {
+                        left = currentWidth;
+                    }
+                }
+                return result;
+            };
+            SingleLineWrapper.prototype.areSameResults = function (one, two) {
+                return one.noLines === two.noLines && one.truncatedText === two.truncatedText;
+            };
+            SingleLineWrapper.NO_WRAP_ITERATIONS = 5;
+            return SingleLineWrapper;
+        })(Wrappers.Wrapper);
+        Wrappers.SingleLineWrapper = SingleLineWrapper;
+    })(Wrappers = SVGTypewriter.Wrappers || (SVGTypewriter.Wrappers = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+///<reference path="reference.ts" />
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Writers;
+    (function (Writers) {
+        var Writer = (function () {
+            function Writer(measurer, wrapper) {
+                this._writerID = Writer.nextID++;
+                this._elementID = 0;
+                this.measurer(measurer);
+                if (wrapper) {
+                    this.wrapper(wrapper);
+                }
+                this.addTitleElement(false);
+            }
+            Writer.prototype.measurer = function (newMeasurer) {
+                this._measurer = newMeasurer;
+                return this;
+            };
+            Writer.prototype.wrapper = function (newWrapper) {
+                this._wrapper = newWrapper;
+                return this;
+            };
+            Writer.prototype.addTitleElement = function (add) {
+                this._addTitleElement = add;
+                return this;
+            };
+            Writer.prototype.writeLine = function (line, g, width, xAlign, yOffset) {
+                var textEl = g.append("text");
+                textEl.text(line);
+                var xOffset = width * Writer.XOffsetFactor[xAlign];
+                var anchor = Writer.AnchorConverter[xAlign];
+                textEl.attr("text-anchor", anchor).classed("text-line", true);
+                SVGTypewriter.Utils.DOM.transform(textEl, xOffset, yOffset).attr("y", "-0.25em");
+                ;
+            };
+            Writer.prototype.writeText = function (text, writingArea, width, height, xAlign, yAlign) {
+                var _this = this;
+                var lines = text.split("\n");
+                var lineHeight = this._measurer.measure().height;
+                var yOffset = Writer.YOffsetFactor[yAlign] * (height - lines.length * lineHeight);
+                lines.forEach(function (line, i) {
+                    _this.writeLine(line, writingArea, width, xAlign, (i + 1) * lineHeight + yOffset);
+                });
+            };
+            Writer.prototype.write = function (text, width, height, options) {
+                if (Writer.SupportedRotation.indexOf(options.textRotation) === -1) {
+                    throw new Error("unsupported rotation - " + options.textRotation);
+                }
+                var orientHorizontally = Math.abs(Math.abs(options.textRotation) - 90) > 45;
+                var primaryDimension = orientHorizontally ? width : height;
+                var secondaryDimension = orientHorizontally ? height : width;
+                var textContainer = options.selection.append("g").classed("text-container", true);
+                if (this._addTitleElement) {
+                    textContainer.append("title").text(text);
+                }
+                var textArea = textContainer.append("g").classed("text-area", true);
+                var wrappedText = this._wrapper ? this._wrapper.wrap(text, this._measurer, primaryDimension, secondaryDimension).wrappedText : text;
+                this.writeText(wrappedText, textArea, primaryDimension, secondaryDimension, options.xAlign, options.yAlign);
+                var xForm = d3.transform("");
+                var xForm2 = d3.transform("");
+                xForm.rotate = options.textRotation;
+                switch (options.textRotation) {
+                    case 90:
+                        xForm.translate = [width, 0];
+                        xForm2.rotate = -90;
+                        xForm2.translate = [0, 200];
+                        break;
+                    case -90:
+                        xForm.translate = [0, height];
+                        xForm2.rotate = 90;
+                        xForm2.translate = [width, 0];
+                        break;
+                    case 180:
+                        xForm.translate = [width, height];
+                        xForm2.translate = [width, height];
+                        xForm2.rotate = 180;
+                        break;
+                }
+                textArea.attr("transform", xForm.toString());
+                this.addClipPath(textContainer, xForm2);
+                if (options.animator) {
+                    options.animator.animate(textContainer);
+                }
+            };
+            Writer.prototype.addClipPath = function (selection, transform) {
+                var elementID = this._elementID++;
+                var prefix = /MSIE [5-9]/.test(navigator.userAgent) ? "" : document.location.href;
+                prefix = prefix.split("#")[0]; // To fix cases where an anchor tag was used
+                var clipPathID = "clipPath" + this._writerID + "_" + elementID;
+                selection.select(".text-area").attr("clip-path", "url(\"" + prefix + "#" + clipPathID + "\")");
+                var clipPathParent = selection.append("clipPath").attr("id", clipPathID);
+                var bboxAttrs = SVGTypewriter.Utils.DOM.getBBox(selection.select(".text-area"));
+                var box = clipPathParent.append("rect");
+                box.classed("clip-rect", true).attr({
+                    x: bboxAttrs.x,
+                    y: bboxAttrs.y,
+                    width: bboxAttrs.width,
+                    height: bboxAttrs.height
+                });
+            };
+            Writer.nextID = 0;
+            Writer.SupportedRotation = [-90, 0, 180, 90];
+            Writer.AnchorConverter = {
+                left: "start",
+                center: "middle",
+                right: "end"
+            };
+            Writer.XOffsetFactor = {
+                left: 0,
+                center: 0.5,
+                right: 1
+            };
+            Writer.YOffsetFactor = {
+                top: 0,
+                center: 0.5,
+                bottom: 1
+            };
+            return Writer;
+        })();
+        Writers.Writer = Writer;
+    })(Writers = SVGTypewriter.Writers || (SVGTypewriter.Writers = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+///<reference path="../reference.ts" />
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Measurers;
+    (function (Measurers) {
+        ;
+        var AbstractMeasurer = (function () {
+            function AbstractMeasurer(area, className) {
+                this.textMeasurer = this.getTextMeasurer(area, className);
+            }
+            AbstractMeasurer.prototype.checkSelectionIsText = function (d) {
+                return d[0][0].tagName === "text" || !d.select("text").empty();
+            };
+            AbstractMeasurer.prototype.getTextMeasurer = function (area, className) {
+                var _this = this;
+                if (!this.checkSelectionIsText(area)) {
+                    var textElement = area.append("text");
+                    if (className) {
+                        textElement.classed(className, true);
+                    }
+                    textElement.remove();
+                    return function (text) {
+                        area.node().appendChild(textElement.node());
+                        var areaDimension = _this.measureBBox(textElement, text);
+                        textElement.remove();
+                        return areaDimension;
+                    };
+                }
+                else {
+                    var parentNode = area.node().parentNode;
+                    var textSelection;
+                    if (area[0][0].tagName === "text") {
+                        textSelection = area;
+                    }
+                    else {
+                        textSelection = area.select("text");
+                    }
+                    area.remove();
+                    return function (text) {
+                        parentNode.appendChild(area.node());
+                        var areaDimension = _this.measureBBox(textSelection, text);
+                        area.remove();
+                        return areaDimension;
+                    };
+                }
+            };
+            AbstractMeasurer.prototype.measureBBox = function (d, text) {
+                d.text(text);
+                var bb = SVGTypewriter.Utils.DOM.getBBox(d);
+                return { width: bb.width, height: bb.height };
+            };
+            AbstractMeasurer.prototype.measure = function (text) {
+                if (text === void 0) { text = AbstractMeasurer.HEIGHT_TEXT; }
+                return this.textMeasurer(text);
+            };
+            AbstractMeasurer.HEIGHT_TEXT = "bqpdl";
+            return AbstractMeasurer;
+        })();
+        Measurers.AbstractMeasurer = AbstractMeasurer;
+    })(Measurers = SVGTypewriter.Measurers || (SVGTypewriter.Measurers = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+///<reference path="../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Measurers;
+    (function (Measurers) {
+        var Measurer = (function (_super) {
+            __extends(Measurer, _super);
+            function Measurer(area, className, useGuards) {
+                if (className === void 0) { className = null; }
+                if (useGuards === void 0) { useGuards = false; }
+                _super.call(this, area, className);
+                this.useGuards = useGuards;
+            }
+            // Guards assures same line height and width of whitespaces on both ends.
+            Measurer.prototype._addGuards = function (text) {
+                return Measurers.AbstractMeasurer.HEIGHT_TEXT + text + Measurers.AbstractMeasurer.HEIGHT_TEXT;
+            };
+            Measurer.prototype.getGuardWidth = function () {
+                if (this.guardWidth == null) {
+                    this.guardWidth = _super.prototype.measure.call(this).width;
+                }
+                return this.guardWidth;
+            };
+            Measurer.prototype._measureLine = function (line) {
+                var measuredLine = this.useGuards ? this._addGuards(line) : line;
+                var measuredLineDimensions = _super.prototype.measure.call(this, measuredLine);
+                measuredLineDimensions.width -= this.useGuards ? (2 * this.getGuardWidth()) : 0;
+                return measuredLineDimensions;
+            };
+            Measurer.prototype.measure = function (text) {
+                var _this = this;
+                if (text === void 0) { text = Measurers.AbstractMeasurer.HEIGHT_TEXT; }
+                if (text.trim() === "") {
+                    return { width: 0, height: 0 };
+                }
+                var linesDimensions = text.trim().split("\n").map(function (line) { return _this._measureLine(line); });
+                return {
+                    width: d3.max(linesDimensions, function (dim) { return dim.width; }),
+                    height: d3.sum(linesDimensions, function (dim) { return dim.height; })
+                };
+            };
+            return Measurer;
+        })(Measurers.AbstractMeasurer);
+        Measurers.Measurer = Measurer;
+    })(Measurers = SVGTypewriter.Measurers || (SVGTypewriter.Measurers = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+///<reference path="../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Measurers;
+    (function (Measurers) {
+        var CharacterMeasurer = (function (_super) {
+            __extends(CharacterMeasurer, _super);
+            function CharacterMeasurer() {
+                _super.apply(this, arguments);
+            }
+            CharacterMeasurer.prototype._measureCharacter = function (c) {
+                return _super.prototype._measureLine.call(this, c);
+            };
+            CharacterMeasurer.prototype._measureLine = function (line) {
+                var _this = this;
+                var charactersDimensions = line.split("").map(function (c) { return _this._measureCharacter(c); });
+                return {
+                    width: d3.sum(charactersDimensions, function (dim) { return dim.width; }),
+                    height: d3.max(charactersDimensions, function (dim) { return dim.height; })
+                };
+            };
+            return CharacterMeasurer;
+        })(Measurers.Measurer);
+        Measurers.CharacterMeasurer = CharacterMeasurer;
+    })(Measurers = SVGTypewriter.Measurers || (SVGTypewriter.Measurers = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+///<reference path="../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Measurers;
+    (function (Measurers) {
+        var CacheCharacterMeasurer = (function (_super) {
+            __extends(CacheCharacterMeasurer, _super);
+            function CacheCharacterMeasurer(area, className) {
+                var _this = this;
+                _super.call(this, area, className);
+                this.cache = new SVGTypewriter.Utils.Cache(function (c) { return _this._measureCharacterNotFromCache(c); }, SVGTypewriter.Utils.Methods.objEq);
+            }
+            CacheCharacterMeasurer.prototype._measureCharacterNotFromCache = function (c) {
+                return _super.prototype._measureCharacter.call(this, c);
+            };
+            CacheCharacterMeasurer.prototype._measureCharacter = function (c) {
+                return this.cache.get(c);
+            };
+            CacheCharacterMeasurer.prototype.reset = function () {
+                this.cache.clear();
+            };
+            return CacheCharacterMeasurer;
+        })(Measurers.CharacterMeasurer);
+        Measurers.CacheCharacterMeasurer = CacheCharacterMeasurer;
+    })(Measurers = SVGTypewriter.Measurers || (SVGTypewriter.Measurers = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+return Plottable;
+}));
+
+/*!
+SVG Typewriter 0.3.0 (https://github.com/palantir/svg-typewriter)
+Copyright 2014 Palantir Technologies
+Licensed under MIT (https://github.com/palantir/svg-typewriter/blob/develop/LICENSE)
+*/
+
+///<reference path="../reference.ts" />
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Utils;
+    (function (Utils) {
+        var Methods;
+        (function (Methods) {
+            /**
+             * Check if two arrays are equal by strict equality.
+             */
+            function arrayEq(a, b) {
+                // Technically, null and undefined are arrays too
+                if (a == null || b == null) {
+                    return a === b;
+                }
+                if (a.length !== b.length) {
+                    return false;
+                }
+                for (var i = 0; i < a.length; i++) {
+                    if (a[i] !== b[i]) {
+                        return false;
+                    }
+                }
+                return true;
+            }
+            Methods.arrayEq = arrayEq;
+            /**
+             * @param {any} a Object to check against b for equality.
+             * @param {any} b Object to check against a for equality.
+             *
+             * @returns {boolean} whether or not two objects share the same keys, and
+             *          values associated with those keys. Values will be compared
+             *          with ===.
+             */
+            function objEq(a, b) {
+                if (a == null || b == null) {
+                    return a === b;
+                }
+                var keysA = Object.keys(a).sort();
+                var keysB = Object.keys(b).sort();
+                var valuesA = keysA.map(function (k) { return a[k]; });
+                var valuesB = keysB.map(function (k) { return b[k]; });
+                return arrayEq(keysA, keysB) && arrayEq(valuesA, valuesB);
+            }
+            Methods.objEq = objEq;
+        })(Methods = Utils.Methods || (Utils.Methods = {}));
+    })(Utils = SVGTypewriter.Utils || (SVGTypewriter.Utils = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Utils;
+    (function (Utils) {
+        var DOM;
+        (function (DOM) {
+            function transform(s, x, y) {
+                var xform = d3.transform(s.attr("transform"));
+                if (x == null) {
+                    return xform.translate;
+                }
+                else {
+                    y = (y == null) ? 0 : y;
+                    xform.translate[0] = x;
+                    xform.translate[1] = y;
+                    s.attr("transform", xform.toString());
+                    return s;
+                }
+            }
+            DOM.transform = transform;
+            function getBBox(element) {
+                var bbox;
+                try {
+                    bbox = element.node().getBBox();
+                }
+                catch (err) {
+                    bbox = {
+                        x: 0,
+                        y: 0,
+                        width: 0,
+                        height: 0
+                    };
+                }
+                return bbox;
+            }
+            DOM.getBBox = getBBox;
+        })(DOM = Utils.DOM || (Utils.DOM = {}));
+    })(Utils = SVGTypewriter.Utils || (SVGTypewriter.Utils = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+///<reference path="../reference.ts" />
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Utils;
+    (function (Utils) {
+        var Cache = (function () {
+            /**
+             * @constructor
+             *
+             * @param {string} compute The function whose results will be cached.
+             * @param {(v: T, w: T) => boolean} [valueEq]
+             *        Used to determine if the value of canonicalKey has changed.
+             *        If omitted, defaults to === comparision.
+             */
+            function Cache(compute, valueEq) {
+                if (valueEq === void 0) { valueEq = function (v, w) { return v === w; }; }
+                this.cache = d3.map();
+                this.compute = compute;
+                this.valueEq = valueEq;
+            }
+            /**
+             * Attempt to look up k in the cache, computing the result if it isn't
+             * found.
+             *
+             * @param {string} k The key to look up in the cache.
+             * @return {T} The value associated with k; the result of compute(k).
+             */
+            Cache.prototype.get = function (k) {
+                if (!this.cache.has(k)) {
+                    this.cache.set(k, this.compute(k));
+                }
+                return this.cache.get(k);
+            };
+            /**
+             * Reset the cache empty.
+             *
+             * @return {Cache<T>} The calling Cache.
+             */
+            Cache.prototype.clear = function () {
+                this.cache = d3.map();
+                return this;
+            };
+            return Cache;
+        })();
+        Utils.Cache = Cache;
+    })(Utils = SVGTypewriter.Utils || (SVGTypewriter.Utils = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+///<reference path="../reference.ts" />
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Utils;
+    (function (Utils) {
+        var Tokenizer = (function () {
+            function Tokenizer() {
+                this.WordDividerRegExp = new RegExp("\\W");
+                this.WhitespaceRegExp = new RegExp("\\s");
+            }
+            Tokenizer.prototype.tokenize = function (line) {
+                var _this = this;
+                return line.split("").reduce(function (tokens, c) { return tokens.slice(0, -1).concat(_this.shouldCreateNewToken(tokens[tokens.length - 1], c)); }, [""]);
+            };
+            Tokenizer.prototype.shouldCreateNewToken = function (token, newCharacter) {
+                if (!token) {
+                    return [newCharacter];
+                }
+                var lastCharacter = token[token.length - 1];
+                if (this.WhitespaceRegExp.test(lastCharacter) && this.WhitespaceRegExp.test(newCharacter)) {
+                    return [token + newCharacter];
+                }
+                else if (this.WhitespaceRegExp.test(lastCharacter) || this.WhitespaceRegExp.test(newCharacter)) {
+                    return [token, newCharacter];
+                }
+                else if (!(this.WordDividerRegExp.test(lastCharacter) || this.WordDividerRegExp.test(newCharacter))) {
+                    return [token + newCharacter];
+                }
+                else if (lastCharacter === newCharacter) {
+                    return [token + newCharacter];
+                }
+                else {
+                    return [token, newCharacter];
+                }
+            };
+            return Tokenizer;
+        })();
+        Utils.Tokenizer = Tokenizer;
+    })(Utils = SVGTypewriter.Utils || (SVGTypewriter.Utils = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+///<reference path="../reference.ts" />
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Utils;
+    (function (Utils) {
+        var StringMethods;
+        (function (StringMethods) {
+            /**
+             * Treat all sequences of consecutive whitespace as a single " ".
+             */
+            function combineWhitespace(str) {
+                return str.replace(/\s+/g, " ");
+            }
+            StringMethods.combineWhitespace = combineWhitespace;
+            function isNotEmptyString(str) {
+                return str && str.trim() !== "";
+            }
+            StringMethods.isNotEmptyString = isNotEmptyString;
+            function trimStart(str, c) {
+                if (!str) {
+                    return str;
+                }
+                var chars = str.split("");
+                var reduceFunction = c ? function (s) { return s.split(c).some(isNotEmptyString); } : isNotEmptyString;
+                return chars.reduce(function (s, c) { return reduceFunction(s + c) ? s + c : s; }, "");
+            }
+            StringMethods.trimStart = trimStart;
+            function trimEnd(str, c) {
+                if (!str) {
+                    return str;
+                }
+                var reversedChars = str.split("");
+                reversedChars.reverse();
+                reversedChars = trimStart(reversedChars.join(""), c).split("");
+                reversedChars.reverse();
+                return reversedChars.join("");
+            }
+            StringMethods.trimEnd = trimEnd;
+        })(StringMethods = Utils.StringMethods || (Utils.StringMethods = {}));
+    })(Utils = SVGTypewriter.Utils || (SVGTypewriter.Utils = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+///<reference path="../reference.ts" />
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Animators;
+    (function (Animators) {
+        var BaseAnimator = (function () {
+            function BaseAnimator() {
+                this.duration(BaseAnimator.DEFAULT_DURATION_MILLISECONDS);
+                this.delay(0);
+                this.easing(BaseAnimator.DEFAULT_EASING);
+                this.moveX(0);
+                this.moveY(0);
+            }
+            BaseAnimator.prototype.animate = function (selection) {
+                var xForm = d3.transform("");
+                xForm.translate = [this.moveX(), this.moveY()];
+                selection.attr("transform", xForm.toString());
+                xForm.translate = [0, 0];
+                return this._animate(selection, { transform: xForm.toString() });
+            };
+            BaseAnimator.prototype._animate = function (selection, attr) {
+                return selection.transition().ease(this.easing()).duration(this.duration()).delay(this.delay()).attr(attr);
+            };
+            BaseAnimator.prototype.duration = function (duration) {
+                if (duration == null) {
+                    return this._duration;
+                }
+                else {
+                    this._duration = duration;
+                    return this;
+                }
+            };
+            BaseAnimator.prototype.moveX = function (shift) {
+                if (shift == null) {
+                    return this._moveX;
+                }
+                else {
+                    this._moveX = shift;
+                    return this;
+                }
+            };
+            BaseAnimator.prototype.moveY = function (shift) {
+                if (shift == null) {
+                    return this._moveY;
+                }
+                else {
+                    this._moveY = shift;
+                    return this;
+                }
+            };
+            BaseAnimator.prototype.delay = function (delay) {
+                if (delay == null) {
+                    return this._delay;
+                }
+                else {
+                    this._delay = delay;
+                    return this;
+                }
+            };
+            BaseAnimator.prototype.easing = function (easing) {
+                if (easing == null) {
+                    return this._easing;
+                }
+                else {
+                    this._easing = easing;
+                    return this;
+                }
+            };
+            /**
+             * The default duration of the animation in milliseconds
+             */
+            BaseAnimator.DEFAULT_DURATION_MILLISECONDS = 300;
+            /**
+             * The default easing of the animation
+             */
+            BaseAnimator.DEFAULT_EASING = "exp-out";
+            return BaseAnimator;
+        })();
+        Animators.BaseAnimator = BaseAnimator;
+    })(Animators = SVGTypewriter.Animators || (SVGTypewriter.Animators = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+///<reference path="../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Animators;
+    (function (Animators) {
+        var UnveilAnimator = (function (_super) {
+            __extends(UnveilAnimator, _super);
+            function UnveilAnimator() {
+                this.direction("bottom");
+                _super.call(this);
+            }
+            UnveilAnimator.prototype.direction = function (direction) {
+                if (direction == null) {
+                    return this._direction;
+                }
+                else {
+                    if (UnveilAnimator.SupportedDirections.indexOf(direction) === -1) {
+                        throw new Error("unsupported direction - " + direction);
+                    }
+                    this._direction = direction;
+                    return this;
+                }
+            };
+            UnveilAnimator.prototype.animate = function (selection) {
+                var attr = SVGTypewriter.Utils.DOM.getBBox(selection);
+                var mask = selection.select(".clip-rect");
+                mask.attr("width", 0);
+                mask.attr("height", 0);
+                switch (this._direction) {
+                    case "top":
+                        mask.attr("y", attr.y + attr.height);
+                        mask.attr("x", attr.x);
+                        mask.attr("width", attr.width);
+                        break;
+                    case "bottom":
+                        mask.attr("y", attr.y);
+                        mask.attr("x", attr.x);
+                        mask.attr("width", attr.width);
+                        break;
+                    case "left":
+                        mask.attr("y", attr.y);
+                        mask.attr("x", attr.x);
+                        mask.attr("height", attr.height);
+                        break;
+                    case "right":
+                        mask.attr("y", attr.y);
+                        mask.attr("x", attr.x + attr.width);
+                        mask.attr("height", attr.height);
+                        break;
+                }
+                this._animate(mask, attr);
+                return _super.prototype.animate.call(this, selection);
+            };
+            UnveilAnimator.SupportedDirections = ["top", "bottom", "left", "right"];
+            return UnveilAnimator;
+        })(Animators.BaseAnimator);
+        Animators.UnveilAnimator = UnveilAnimator;
+    })(Animators = SVGTypewriter.Animators || (SVGTypewriter.Animators = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+///<reference path="../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Animators;
+    (function (Animators) {
+        var OpacityAnimator = (function (_super) {
+            __extends(OpacityAnimator, _super);
+            function OpacityAnimator() {
+                _super.apply(this, arguments);
+            }
+            OpacityAnimator.prototype.animate = function (selection) {
+                var area = selection.select(".text-area");
+                area.attr("opacity", 0);
+                var attr = {
+                    opacity: 1
+                };
+                this._animate(area, attr);
+                return _super.prototype.animate.call(this, selection);
+            };
+            return OpacityAnimator;
+        })(Animators.BaseAnimator);
+        Animators.OpacityAnimator = OpacityAnimator;
+    })(Animators = SVGTypewriter.Animators || (SVGTypewriter.Animators = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+///<reference path="../reference.ts" />
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Wrappers;
+    (function (Wrappers) {
+        var Wrapper = (function () {
+            function Wrapper() {
+                this.maxLines(Infinity);
+                this.textTrimming("ellipsis");
+                this.allowBreakingWords(true);
+                this._tokenizer = new SVGTypewriter.Utils.Tokenizer();
+                this._breakingCharacter = "-";
+            }
+            Wrapper.prototype.maxLines = function (noLines) {
+                if (noLines == null) {
+                    return this._maxLines;
+                }
+                else {
+                    this._maxLines = noLines;
+                    return this;
+                }
+            };
+            Wrapper.prototype.textTrimming = function (option) {
+                if (option == null) {
+                    return this._textTrimming;
+                }
+                else {
+                    if (option !== "ellipsis" && option !== "none") {
+                        throw new Error(option + " - unsupported text trimming option.");
+                    }
+                    this._textTrimming = option;
+                    return this;
+                }
+            };
+            Wrapper.prototype.allowBreakingWords = function (allow) {
+                if (allow == null) {
+                    return this._allowBreakingWords;
+                }
+                else {
+                    this._allowBreakingWords = allow;
+                    return this;
+                }
+            };
+            Wrapper.prototype.wrap = function (text, measurer, width, height) {
+                var _this = this;
+                if (height === void 0) { height = Infinity; }
+                var initialWrappingResult = {
+                    originalText: text,
+                    wrappedText: "",
+                    noLines: 0,
+                    noBrokeWords: 0,
+                    truncatedText: ""
+                };
+                var state = {
+                    wrapping: initialWrappingResult,
+                    currentLine: "",
+                    availableWidth: width,
+                    availableLines: Math.min(Math.floor(height / measurer.measure().height), this._maxLines),
+                    canFitText: true
+                };
+                var lines = text.split("\n");
+                return lines.reduce(function (state, line, i) { return _this.breakLineToFitWidth(state, line, i !== lines.length - 1, measurer); }, state).wrapping;
+            };
+            Wrapper.prototype.breakLineToFitWidth = function (state, line, hasNextLine, measurer) {
+                var _this = this;
+                if (!state.canFitText && state.wrapping.truncatedText !== "") {
+                    state.wrapping.truncatedText += "\n";
+                }
+                var tokens = this._tokenizer.tokenize(line);
+                state = tokens.reduce(function (state, token) { return _this.wrapNextToken(token, state, measurer); }, state);
+                var wrappedText = SVGTypewriter.Utils.StringMethods.trimEnd(state.currentLine);
+                state.wrapping.noLines += +(wrappedText !== "");
+                if (state.wrapping.noLines === state.availableLines && this._textTrimming !== "none" && hasNextLine) {
+                    var ellipsisResult = this.addEllipsis(wrappedText, state.availableWidth, measurer);
+                    state.wrapping.wrappedText += ellipsisResult.wrappedToken;
+                    state.wrapping.truncatedText += ellipsisResult.remainingToken;
+                    state.canFitText = false;
+                }
+                else {
+                    state.wrapping.wrappedText += wrappedText;
+                }
+                state.currentLine = "\n";
+                return state;
+            };
+            Wrapper.prototype.canFitToken = function (token, width, measurer) {
+                var _this = this;
+                var possibleBreaks = this._allowBreakingWords ? token.split("").map(function (c, i) { return (i !== token.length - 1) ? c + _this._breakingCharacter : c; }) : [token];
+                return (measurer.measure(token).width <= width) || possibleBreaks.every(function (c) { return measurer.measure(c).width <= width; });
+            };
+            Wrapper.prototype.addEllipsis = function (line, width, measurer) {
+                if (this._textTrimming === "none") {
+                    return {
+                        wrappedToken: line,
+                        remainingToken: ""
+                    };
+                }
+                var truncatedLine = line.substring(0).trim();
+                var lineWidth = measurer.measure(truncatedLine).width;
+                var ellipsesWidth = measurer.measure("...").width;
+                var prefix = (line.length > 0 && line[0] === "\n") ? "\n" : "";
+                if (width <= ellipsesWidth) {
+                    var periodWidth = ellipsesWidth / 3;
+                    var numPeriodsThatFit = Math.floor(width / periodWidth);
+                    return {
+                        wrappedToken: prefix + "...".substr(0, numPeriodsThatFit),
+                        remainingToken: line
+                    };
+                }
+                while (lineWidth + ellipsesWidth > width) {
+                    truncatedLine = SVGTypewriter.Utils.StringMethods.trimEnd(truncatedLine.substr(0, truncatedLine.length - 1));
+                    lineWidth = measurer.measure(truncatedLine).width;
+                }
+                return {
+                    wrappedToken: prefix + truncatedLine + "...",
+                    remainingToken: SVGTypewriter.Utils.StringMethods.trimEnd(line.substring(truncatedLine.length), "-").trim()
+                };
+            };
+            Wrapper.prototype.wrapNextToken = function (token, state, measurer) {
+                if (!state.canFitText || state.availableLines === state.wrapping.noLines || !this.canFitToken(token, state.availableWidth, measurer)) {
+                    return this.finishWrapping(token, state, measurer);
+                }
+                var remainingToken = token;
+                while (remainingToken) {
+                    var result = this.breakTokenToFitInWidth(remainingToken, state.currentLine, state.availableWidth, measurer);
+                    state.currentLine = result.line;
+                    remainingToken = result.remainingToken;
+                    if (remainingToken != null) {
+                        state.wrapping.noBrokeWords += +result.breakWord;
+                        ++state.wrapping.noLines;
+                        if (state.availableLines === state.wrapping.noLines) {
+                            var ellipsisResult = this.addEllipsis(state.currentLine, state.availableWidth, measurer);
+                            state.wrapping.wrappedText += ellipsisResult.wrappedToken;
+                            state.wrapping.truncatedText += ellipsisResult.remainingToken + remainingToken;
+                            state.currentLine = "\n";
+                            return state;
+                        }
+                        else {
+                            state.wrapping.wrappedText += SVGTypewriter.Utils.StringMethods.trimEnd(state.currentLine);
+                            state.currentLine = "\n";
+                        }
+                    }
+                }
+                return state;
+            };
+            Wrapper.prototype.finishWrapping = function (token, state, measurer) {
+                // Token is really long, but we have a space to put part of the word.
+                if (state.canFitText && state.availableLines !== state.wrapping.noLines && this._allowBreakingWords && this._textTrimming !== "none") {
+                    var res = this.addEllipsis(state.currentLine + token, state.availableWidth, measurer);
+                    state.wrapping.wrappedText += res.wrappedToken;
+                    state.wrapping.truncatedText += res.remainingToken;
+                    state.wrapping.noBrokeWords += +(res.remainingToken.length < token.length);
+                    state.wrapping.noLines += +(res.wrappedToken.length > 0);
+                    state.currentLine = "";
+                }
+                else {
+                    state.wrapping.truncatedText += token;
+                }
+                state.canFitText = false;
+                return state;
+            };
+            /**
+             * Breaks single token to fit current line.
+             * If token contains only whitespaces then they will not be populated to next line.
+             */
+            Wrapper.prototype.breakTokenToFitInWidth = function (token, line, availableWidth, measurer, breakingCharacter) {
+                if (breakingCharacter === void 0) { breakingCharacter = this._breakingCharacter; }
+                if (measurer.measure(line + token).width <= availableWidth) {
+                    return {
+                        remainingToken: null,
+                        line: line + token,
+                        breakWord: false
+                    };
+                }
+                if (token.trim() === "") {
+                    return {
+                        remainingToken: "",
+                        line: line,
+                        breakWord: false
+                    };
+                }
+                if (!this._allowBreakingWords) {
+                    return {
+                        remainingToken: token,
+                        line: line,
+                        breakWord: false
+                    };
+                }
+                var fitTokenLength = 0;
+                while (fitTokenLength < token.length) {
+                    if (measurer.measure(line + token.substring(0, fitTokenLength + 1) + breakingCharacter).width <= availableWidth) {
+                        ++fitTokenLength;
+                    }
+                    else {
+                        break;
+                    }
+                }
+                var suffix = "";
+                if (fitTokenLength > 0) {
+                    suffix = breakingCharacter;
+                }
+                return {
+                    remainingToken: token.substring(fitTokenLength),
+                    line: line + token.substring(0, fitTokenLength) + suffix,
+                    breakWord: fitTokenLength > 0
+                };
+            };
+            return Wrapper;
+        })();
+        Wrappers.Wrapper = Wrapper;
+    })(Wrappers = SVGTypewriter.Wrappers || (SVGTypewriter.Wrappers = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+///<reference path="../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Wrappers;
+    (function (Wrappers) {
+        var SingleLineWrapper = (function (_super) {
+            __extends(SingleLineWrapper, _super);
+            function SingleLineWrapper() {
+                _super.apply(this, arguments);
+            }
+            SingleLineWrapper.prototype.wrap = function (text, measurer, width, height) {
+                var _this = this;
+                if (height === void 0) { height = Infinity; }
+                var lines = text.split("\n");
+                if (lines.length > 1) {
+                    throw new Error("SingleLineWrapper is designed to work only on single line");
+                }
+                var wrapFN = function (w) { return _super.prototype.wrap.call(_this, text, measurer, w, height); };
+                var result = wrapFN(width);
+                if (result.noLines < 2) {
+                    return result;
+                }
+                var left = 0;
+                var right = width;
+                for (var i = 0; i < SingleLineWrapper.NO_WRAP_ITERATIONS && right > left; ++i) {
+                    var currentWidth = (right + left) / 2;
+                    var currentResult = wrapFN(currentWidth);
+                    if (this.areSameResults(result, currentResult)) {
+                        right = currentWidth;
+                        result = currentResult;
+                    }
+                    else {
+                        left = currentWidth;
+                    }
+                }
+                return result;
+            };
+            SingleLineWrapper.prototype.areSameResults = function (one, two) {
+                return one.noLines === two.noLines && one.truncatedText === two.truncatedText;
+            };
+            SingleLineWrapper.NO_WRAP_ITERATIONS = 5;
+            return SingleLineWrapper;
+        })(Wrappers.Wrapper);
+        Wrappers.SingleLineWrapper = SingleLineWrapper;
+    })(Wrappers = SVGTypewriter.Wrappers || (SVGTypewriter.Wrappers = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+///<reference path="reference.ts" />
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Writers;
+    (function (Writers) {
+        var Writer = (function () {
+            function Writer(measurer, wrapper) {
+                this._writerID = Writer.nextID++;
+                this._elementID = 0;
+                this.measurer(measurer);
+                if (wrapper) {
+                    this.wrapper(wrapper);
+                }
+                this.addTitleElement(false);
+            }
+            Writer.prototype.measurer = function (newMeasurer) {
+                this._measurer = newMeasurer;
+                return this;
+            };
+            Writer.prototype.wrapper = function (newWrapper) {
+                this._wrapper = newWrapper;
+                return this;
+            };
+            Writer.prototype.addTitleElement = function (add) {
+                this._addTitleElement = add;
+                return this;
+            };
+            Writer.prototype.writeLine = function (line, g, width, xAlign, yOffset) {
+                var textEl = g.append("text");
+                textEl.text(line);
+                var xOffset = width * Writer.XOffsetFactor[xAlign];
+                var anchor = Writer.AnchorConverter[xAlign];
+                textEl.attr("text-anchor", anchor).classed("text-line", true);
+                SVGTypewriter.Utils.DOM.transform(textEl, xOffset, yOffset).attr("y", "-0.25em");
+                ;
+            };
+            Writer.prototype.writeText = function (text, writingArea, width, height, xAlign, yAlign) {
+                var _this = this;
+                var lines = text.split("\n");
+                var lineHeight = this._measurer.measure().height;
+                var yOffset = Writer.YOffsetFactor[yAlign] * (height - lines.length * lineHeight);
+                lines.forEach(function (line, i) {
+                    _this.writeLine(line, writingArea, width, xAlign, (i + 1) * lineHeight + yOffset);
+                });
+            };
+            Writer.prototype.write = function (text, width, height, options) {
+                if (Writer.SupportedRotation.indexOf(options.textRotation) === -1) {
+                    throw new Error("unsupported rotation - " + options.textRotation);
+                }
+                var orientHorizontally = Math.abs(Math.abs(options.textRotation) - 90) > 45;
+                var primaryDimension = orientHorizontally ? width : height;
+                var secondaryDimension = orientHorizontally ? height : width;
+                var textContainer = options.selection.append("g").classed("text-container", true);
+                if (this._addTitleElement) {
+                    textContainer.append("title").text(text);
+                }
+                var textArea = textContainer.append("g").classed("text-area", true);
+                var wrappedText = this._wrapper ? this._wrapper.wrap(text, this._measurer, primaryDimension, secondaryDimension).wrappedText : text;
+                this.writeText(wrappedText, textArea, primaryDimension, secondaryDimension, options.xAlign, options.yAlign);
+                var xForm = d3.transform("");
+                var xForm2 = d3.transform("");
+                xForm.rotate = options.textRotation;
+                switch (options.textRotation) {
+                    case 90:
+                        xForm.translate = [width, 0];
+                        xForm2.rotate = -90;
+                        xForm2.translate = [0, 200];
+                        break;
+                    case -90:
+                        xForm.translate = [0, height];
+                        xForm2.rotate = 90;
+                        xForm2.translate = [width, 0];
+                        break;
+                    case 180:
+                        xForm.translate = [width, height];
+                        xForm2.translate = [width, height];
+                        xForm2.rotate = 180;
+                        break;
+                }
+                textArea.attr("transform", xForm.toString());
+                this.addClipPath(textContainer, xForm2);
+                if (options.animator) {
+                    options.animator.animate(textContainer);
+                }
+            };
+            Writer.prototype.addClipPath = function (selection, transform) {
+                var elementID = this._elementID++;
+                var prefix = /MSIE [5-9]/.test(navigator.userAgent) ? "" : document.location.href;
+                prefix = prefix.split("#")[0]; // To fix cases where an anchor tag was used
+                var clipPathID = "clipPath" + this._writerID + "_" + elementID;
+                selection.select(".text-area").attr("clip-path", "url(\"" + prefix + "#" + clipPathID + "\")");
+                var clipPathParent = selection.append("clipPath").attr("id", clipPathID);
+                var bboxAttrs = SVGTypewriter.Utils.DOM.getBBox(selection.select(".text-area"));
+                var box = clipPathParent.append("rect");
+                box.classed("clip-rect", true).attr({
+                    x: bboxAttrs.x,
+                    y: bboxAttrs.y,
+                    width: bboxAttrs.width,
+                    height: bboxAttrs.height
+                });
+            };
+            Writer.nextID = 0;
+            Writer.SupportedRotation = [-90, 0, 180, 90];
+            Writer.AnchorConverter = {
+                left: "start",
+                center: "middle",
+                right: "end"
+            };
+            Writer.XOffsetFactor = {
+                left: 0,
+                center: 0.5,
+                right: 1
+            };
+            Writer.YOffsetFactor = {
+                top: 0,
+                center: 0.5,
+                bottom: 1
+            };
+            return Writer;
+        })();
+        Writers.Writer = Writer;
+    })(Writers = SVGTypewriter.Writers || (SVGTypewriter.Writers = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+///<reference path="../reference.ts" />
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Measurers;
+    (function (Measurers) {
+        ;
+        var AbstractMeasurer = (function () {
+            function AbstractMeasurer(area, className) {
+                this.textMeasurer = this.getTextMeasurer(area, className);
+            }
+            AbstractMeasurer.prototype.checkSelectionIsText = function (d) {
+                return d[0][0].tagName === "text" || !d.select("text").empty();
+            };
+            AbstractMeasurer.prototype.getTextMeasurer = function (area, className) {
+                var _this = this;
+                if (!this.checkSelectionIsText(area)) {
+                    var textElement = area.append("text");
+                    if (className) {
+                        textElement.classed(className, true);
+                    }
+                    textElement.remove();
+                    return function (text) {
+                        area.node().appendChild(textElement.node());
+                        var areaDimension = _this.measureBBox(textElement, text);
+                        textElement.remove();
+                        return areaDimension;
+                    };
+                }
+                else {
+                    var parentNode = area.node().parentNode;
+                    var textSelection;
+                    if (area[0][0].tagName === "text") {
+                        textSelection = area;
+                    }
+                    else {
+                        textSelection = area.select("text");
+                    }
+                    area.remove();
+                    return function (text) {
+                        parentNode.appendChild(area.node());
+                        var areaDimension = _this.measureBBox(textSelection, text);
+                        area.remove();
+                        return areaDimension;
+                    };
+                }
+            };
+            AbstractMeasurer.prototype.measureBBox = function (d, text) {
+                d.text(text);
+                var bb = SVGTypewriter.Utils.DOM.getBBox(d);
+                return { width: bb.width, height: bb.height };
+            };
+            AbstractMeasurer.prototype.measure = function (text) {
+                if (text === void 0) { text = AbstractMeasurer.HEIGHT_TEXT; }
+                return this.textMeasurer(text);
+            };
+            AbstractMeasurer.HEIGHT_TEXT = "bqpdl";
+            return AbstractMeasurer;
+        })();
+        Measurers.AbstractMeasurer = AbstractMeasurer;
+    })(Measurers = SVGTypewriter.Measurers || (SVGTypewriter.Measurers = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+///<reference path="../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Measurers;
+    (function (Measurers) {
+        var Measurer = (function (_super) {
+            __extends(Measurer, _super);
+            function Measurer(area, className, useGuards) {
+                if (className === void 0) { className = null; }
+                if (useGuards === void 0) { useGuards = false; }
+                _super.call(this, area, className);
+                this.useGuards = useGuards;
+            }
+            // Guards assures same line height and width of whitespaces on both ends.
+            Measurer.prototype._addGuards = function (text) {
+                return Measurers.AbstractMeasurer.HEIGHT_TEXT + text + Measurers.AbstractMeasurer.HEIGHT_TEXT;
+            };
+            Measurer.prototype.getGuardWidth = function () {
+                if (this.guardWidth == null) {
+                    this.guardWidth = _super.prototype.measure.call(this).width;
+                }
+                return this.guardWidth;
+            };
+            Measurer.prototype._measureLine = function (line) {
+                var measuredLine = this.useGuards ? this._addGuards(line) : line;
+                var measuredLineDimensions = _super.prototype.measure.call(this, measuredLine);
+                measuredLineDimensions.width -= this.useGuards ? (2 * this.getGuardWidth()) : 0;
+                return measuredLineDimensions;
+            };
+            Measurer.prototype.measure = function (text) {
+                var _this = this;
+                if (text === void 0) { text = Measurers.AbstractMeasurer.HEIGHT_TEXT; }
+                if (text.trim() === "") {
+                    return { width: 0, height: 0 };
+                }
+                var linesDimensions = text.trim().split("\n").map(function (line) { return _this._measureLine(line); });
+                return {
+                    width: d3.max(linesDimensions, function (dim) { return dim.width; }),
+                    height: d3.sum(linesDimensions, function (dim) { return dim.height; })
+                };
+            };
+            return Measurer;
+        })(Measurers.AbstractMeasurer);
+        Measurers.Measurer = Measurer;
+    })(Measurers = SVGTypewriter.Measurers || (SVGTypewriter.Measurers = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+///<reference path="../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Measurers;
+    (function (Measurers) {
+        var CharacterMeasurer = (function (_super) {
+            __extends(CharacterMeasurer, _super);
+            function CharacterMeasurer() {
+                _super.apply(this, arguments);
+            }
+            CharacterMeasurer.prototype._measureCharacter = function (c) {
+                return _super.prototype._measureLine.call(this, c);
+            };
+            CharacterMeasurer.prototype._measureLine = function (line) {
+                var _this = this;
+                var charactersDimensions = line.split("").map(function (c) { return _this._measureCharacter(c); });
+                return {
+                    width: d3.sum(charactersDimensions, function (dim) { return dim.width; }),
+                    height: d3.max(charactersDimensions, function (dim) { return dim.height; })
+                };
+            };
+            return CharacterMeasurer;
+        })(Measurers.Measurer);
+        Measurers.CharacterMeasurer = CharacterMeasurer;
+    })(Measurers = SVGTypewriter.Measurers || (SVGTypewriter.Measurers = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+///<reference path="../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Measurers;
+    (function (Measurers) {
+        var CacheCharacterMeasurer = (function (_super) {
+            __extends(CacheCharacterMeasurer, _super);
+            function CacheCharacterMeasurer(area, className) {
+                var _this = this;
+                _super.call(this, area, className);
+                this.cache = new SVGTypewriter.Utils.Cache(function (c) { return _this._measureCharacterNotFromCache(c); }, SVGTypewriter.Utils.Methods.objEq);
+            }
+            CacheCharacterMeasurer.prototype._measureCharacterNotFromCache = function (c) {
+                return _super.prototype._measureCharacter.call(this, c);
+            };
+            CacheCharacterMeasurer.prototype._measureCharacter = function (c) {
+                return this.cache.get(c);
+            };
+            CacheCharacterMeasurer.prototype.reset = function () {
+                this.cache.clear();
+            };
+            return CacheCharacterMeasurer;
+        })(Measurers.CharacterMeasurer);
+        Measurers.CacheCharacterMeasurer = CacheCharacterMeasurer;
+    })(Measurers = SVGTypewriter.Measurers || (SVGTypewriter.Measurers = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+return Plottable;
+}));
+
+/*!
+SVG Typewriter 0.3.0 (https://github.com/palantir/svg-typewriter)
+Copyright 2014 Palantir Technologies
+Licensed under MIT (https://github.com/palantir/svg-typewriter/blob/develop/LICENSE)
+*/
+
+///<reference path="../reference.ts" />
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Utils;
+    (function (Utils) {
+        var Methods;
+        (function (Methods) {
+            /**
+             * Check if two arrays are equal by strict equality.
+             */
+            function arrayEq(a, b) {
+                // Technically, null and undefined are arrays too
+                if (a == null || b == null) {
+                    return a === b;
+                }
+                if (a.length !== b.length) {
+                    return false;
+                }
+                for (var i = 0; i < a.length; i++) {
+                    if (a[i] !== b[i]) {
+                        return false;
+                    }
+                }
+                return true;
+            }
+            Methods.arrayEq = arrayEq;
+            /**
+             * @param {any} a Object to check against b for equality.
+             * @param {any} b Object to check against a for equality.
+             *
+             * @returns {boolean} whether or not two objects share the same keys, and
+             *          values associated with those keys. Values will be compared
+             *          with ===.
+             */
+            function objEq(a, b) {
+                if (a == null || b == null) {
+                    return a === b;
+                }
+                var keysA = Object.keys(a).sort();
+                var keysB = Object.keys(b).sort();
+                var valuesA = keysA.map(function (k) { return a[k]; });
+                var valuesB = keysB.map(function (k) { return b[k]; });
+                return arrayEq(keysA, keysB) && arrayEq(valuesA, valuesB);
+            }
+            Methods.objEq = objEq;
+        })(Methods = Utils.Methods || (Utils.Methods = {}));
+    })(Utils = SVGTypewriter.Utils || (SVGTypewriter.Utils = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Utils;
+    (function (Utils) {
+        var DOM;
+        (function (DOM) {
+            function transform(s, x, y) {
+                var xform = d3.transform(s.attr("transform"));
+                if (x == null) {
+                    return xform.translate;
+                }
+                else {
+                    y = (y == null) ? 0 : y;
+                    xform.translate[0] = x;
+                    xform.translate[1] = y;
+                    s.attr("transform", xform.toString());
+                    return s;
+                }
+            }
+            DOM.transform = transform;
+            function getBBox(element) {
+                var bbox;
+                try {
+                    bbox = element.node().getBBox();
+                }
+                catch (err) {
+                    bbox = {
+                        x: 0,
+                        y: 0,
+                        width: 0,
+                        height: 0
+                    };
+                }
+                return bbox;
+            }
+            DOM.getBBox = getBBox;
+        })(DOM = Utils.DOM || (Utils.DOM = {}));
+    })(Utils = SVGTypewriter.Utils || (SVGTypewriter.Utils = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+///<reference path="../reference.ts" />
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Utils;
+    (function (Utils) {
+        var Cache = (function () {
+            /**
+             * @constructor
+             *
+             * @param {string} compute The function whose results will be cached.
+             * @param {(v: T, w: T) => boolean} [valueEq]
+             *        Used to determine if the value of canonicalKey has changed.
+             *        If omitted, defaults to === comparision.
+             */
+            function Cache(compute, valueEq) {
+                if (valueEq === void 0) { valueEq = function (v, w) { return v === w; }; }
+                this.cache = d3.map();
+                this.compute = compute;
+                this.valueEq = valueEq;
+            }
+            /**
+             * Attempt to look up k in the cache, computing the result if it isn't
+             * found.
+             *
+             * @param {string} k The key to look up in the cache.
+             * @return {T} The value associated with k; the result of compute(k).
+             */
+            Cache.prototype.get = function (k) {
+                if (!this.cache.has(k)) {
+                    this.cache.set(k, this.compute(k));
+                }
+                return this.cache.get(k);
+            };
+            /**
+             * Reset the cache empty.
+             *
+             * @return {Cache<T>} The calling Cache.
+             */
+            Cache.prototype.clear = function () {
+                this.cache = d3.map();
+                return this;
+            };
+            return Cache;
+        })();
+        Utils.Cache = Cache;
+    })(Utils = SVGTypewriter.Utils || (SVGTypewriter.Utils = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+///<reference path="../reference.ts" />
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Utils;
+    (function (Utils) {
+        var Tokenizer = (function () {
+            function Tokenizer() {
+                this.WordDividerRegExp = new RegExp("\\W");
+                this.WhitespaceRegExp = new RegExp("\\s");
+            }
+            Tokenizer.prototype.tokenize = function (line) {
+                var _this = this;
+                return line.split("").reduce(function (tokens, c) { return tokens.slice(0, -1).concat(_this.shouldCreateNewToken(tokens[tokens.length - 1], c)); }, [""]);
+            };
+            Tokenizer.prototype.shouldCreateNewToken = function (token, newCharacter) {
+                if (!token) {
+                    return [newCharacter];
+                }
+                var lastCharacter = token[token.length - 1];
+                if (this.WhitespaceRegExp.test(lastCharacter) && this.WhitespaceRegExp.test(newCharacter)) {
+                    return [token + newCharacter];
+                }
+                else if (this.WhitespaceRegExp.test(lastCharacter) || this.WhitespaceRegExp.test(newCharacter)) {
+                    return [token, newCharacter];
+                }
+                else if (!(this.WordDividerRegExp.test(lastCharacter) || this.WordDividerRegExp.test(newCharacter))) {
+                    return [token + newCharacter];
+                }
+                else if (lastCharacter === newCharacter) {
+                    return [token + newCharacter];
+                }
+                else {
+                    return [token, newCharacter];
+                }
+            };
+            return Tokenizer;
+        })();
+        Utils.Tokenizer = Tokenizer;
+    })(Utils = SVGTypewriter.Utils || (SVGTypewriter.Utils = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+///<reference path="../reference.ts" />
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Utils;
+    (function (Utils) {
+        var StringMethods;
+        (function (StringMethods) {
+            /**
+             * Treat all sequences of consecutive whitespace as a single " ".
+             */
+            function combineWhitespace(str) {
+                return str.replace(/\s+/g, " ");
+            }
+            StringMethods.combineWhitespace = combineWhitespace;
+            function isNotEmptyString(str) {
+                return str && str.trim() !== "";
+            }
+            StringMethods.isNotEmptyString = isNotEmptyString;
+            function trimStart(str, c) {
+                if (!str) {
+                    return str;
+                }
+                var chars = str.split("");
+                var reduceFunction = c ? function (s) { return s.split(c).some(isNotEmptyString); } : isNotEmptyString;
+                return chars.reduce(function (s, c) { return reduceFunction(s + c) ? s + c : s; }, "");
+            }
+            StringMethods.trimStart = trimStart;
+            function trimEnd(str, c) {
+                if (!str) {
+                    return str;
+                }
+                var reversedChars = str.split("");
+                reversedChars.reverse();
+                reversedChars = trimStart(reversedChars.join(""), c).split("");
+                reversedChars.reverse();
+                return reversedChars.join("");
+            }
+            StringMethods.trimEnd = trimEnd;
+        })(StringMethods = Utils.StringMethods || (Utils.StringMethods = {}));
+    })(Utils = SVGTypewriter.Utils || (SVGTypewriter.Utils = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+///<reference path="../reference.ts" />
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Animators;
+    (function (Animators) {
+        var BaseAnimator = (function () {
+            function BaseAnimator() {
+                this.duration(BaseAnimator.DEFAULT_DURATION_MILLISECONDS);
+                this.delay(0);
+                this.easing(BaseAnimator.DEFAULT_EASING);
+                this.moveX(0);
+                this.moveY(0);
+            }
+            BaseAnimator.prototype.animate = function (selection) {
+                var xForm = d3.transform("");
+                xForm.translate = [this.moveX(), this.moveY()];
+                selection.attr("transform", xForm.toString());
+                xForm.translate = [0, 0];
+                return this._animate(selection, { transform: xForm.toString() });
+            };
+            BaseAnimator.prototype._animate = function (selection, attr) {
+                return selection.transition().ease(this.easing()).duration(this.duration()).delay(this.delay()).attr(attr);
+            };
+            BaseAnimator.prototype.duration = function (duration) {
+                if (duration == null) {
+                    return this._duration;
+                }
+                else {
+                    this._duration = duration;
+                    return this;
+                }
+            };
+            BaseAnimator.prototype.moveX = function (shift) {
+                if (shift == null) {
+                    return this._moveX;
+                }
+                else {
+                    this._moveX = shift;
+                    return this;
+                }
+            };
+            BaseAnimator.prototype.moveY = function (shift) {
+                if (shift == null) {
+                    return this._moveY;
+                }
+                else {
+                    this._moveY = shift;
+                    return this;
+                }
+            };
+            BaseAnimator.prototype.delay = function (delay) {
+                if (delay == null) {
+                    return this._delay;
+                }
+                else {
+                    this._delay = delay;
+                    return this;
+                }
+            };
+            BaseAnimator.prototype.easing = function (easing) {
+                if (easing == null) {
+                    return this._easing;
+                }
+                else {
+                    this._easing = easing;
+                    return this;
+                }
+            };
+            /**
+             * The default duration of the animation in milliseconds
+             */
+            BaseAnimator.DEFAULT_DURATION_MILLISECONDS = 300;
+            /**
+             * The default easing of the animation
+             */
+            BaseAnimator.DEFAULT_EASING = "exp-out";
+            return BaseAnimator;
+        })();
+        Animators.BaseAnimator = BaseAnimator;
+    })(Animators = SVGTypewriter.Animators || (SVGTypewriter.Animators = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+///<reference path="../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Animators;
+    (function (Animators) {
+        var UnveilAnimator = (function (_super) {
+            __extends(UnveilAnimator, _super);
+            function UnveilAnimator() {
+                this.direction("bottom");
+                _super.call(this);
+            }
+            UnveilAnimator.prototype.direction = function (direction) {
+                if (direction == null) {
+                    return this._direction;
+                }
+                else {
+                    if (UnveilAnimator.SupportedDirections.indexOf(direction) === -1) {
+                        throw new Error("unsupported direction - " + direction);
+                    }
+                    this._direction = direction;
+                    return this;
+                }
+            };
+            UnveilAnimator.prototype.animate = function (selection) {
+                var attr = SVGTypewriter.Utils.DOM.getBBox(selection);
+                var mask = selection.select(".clip-rect");
+                mask.attr("width", 0);
+                mask.attr("height", 0);
+                switch (this._direction) {
+                    case "top":
+                        mask.attr("y", attr.y + attr.height);
+                        mask.attr("x", attr.x);
+                        mask.attr("width", attr.width);
+                        break;
+                    case "bottom":
+                        mask.attr("y", attr.y);
+                        mask.attr("x", attr.x);
+                        mask.attr("width", attr.width);
+                        break;
+                    case "left":
+                        mask.attr("y", attr.y);
+                        mask.attr("x", attr.x);
+                        mask.attr("height", attr.height);
+                        break;
+                    case "right":
+                        mask.attr("y", attr.y);
+                        mask.attr("x", attr.x + attr.width);
+                        mask.attr("height", attr.height);
+                        break;
+                }
+                this._animate(mask, attr);
+                return _super.prototype.animate.call(this, selection);
+            };
+            UnveilAnimator.SupportedDirections = ["top", "bottom", "left", "right"];
+            return UnveilAnimator;
+        })(Animators.BaseAnimator);
+        Animators.UnveilAnimator = UnveilAnimator;
+    })(Animators = SVGTypewriter.Animators || (SVGTypewriter.Animators = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+///<reference path="../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Animators;
+    (function (Animators) {
+        var OpacityAnimator = (function (_super) {
+            __extends(OpacityAnimator, _super);
+            function OpacityAnimator() {
+                _super.apply(this, arguments);
+            }
+            OpacityAnimator.prototype.animate = function (selection) {
+                var area = selection.select(".text-area");
+                area.attr("opacity", 0);
+                var attr = {
+                    opacity: 1
+                };
+                this._animate(area, attr);
+                return _super.prototype.animate.call(this, selection);
+            };
+            return OpacityAnimator;
+        })(Animators.BaseAnimator);
+        Animators.OpacityAnimator = OpacityAnimator;
+    })(Animators = SVGTypewriter.Animators || (SVGTypewriter.Animators = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+///<reference path="../reference.ts" />
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Wrappers;
+    (function (Wrappers) {
+        var Wrapper = (function () {
+            function Wrapper() {
+                this.maxLines(Infinity);
+                this.textTrimming("ellipsis");
+                this.allowBreakingWords(true);
+                this._tokenizer = new SVGTypewriter.Utils.Tokenizer();
+                this._breakingCharacter = "-";
+            }
+            Wrapper.prototype.maxLines = function (noLines) {
+                if (noLines == null) {
+                    return this._maxLines;
+                }
+                else {
+                    this._maxLines = noLines;
+                    return this;
+                }
+            };
+            Wrapper.prototype.textTrimming = function (option) {
+                if (option == null) {
+                    return this._textTrimming;
+                }
+                else {
+                    if (option !== "ellipsis" && option !== "none") {
+                        throw new Error(option + " - unsupported text trimming option.");
+                    }
+                    this._textTrimming = option;
+                    return this;
+                }
+            };
+            Wrapper.prototype.allowBreakingWords = function (allow) {
+                if (allow == null) {
+                    return this._allowBreakingWords;
+                }
+                else {
+                    this._allowBreakingWords = allow;
+                    return this;
+                }
+            };
+            Wrapper.prototype.wrap = function (text, measurer, width, height) {
+                var _this = this;
+                if (height === void 0) { height = Infinity; }
+                var initialWrappingResult = {
+                    originalText: text,
+                    wrappedText: "",
+                    noLines: 0,
+                    noBrokeWords: 0,
+                    truncatedText: ""
+                };
+                var state = {
+                    wrapping: initialWrappingResult,
+                    currentLine: "",
+                    availableWidth: width,
+                    availableLines: Math.min(Math.floor(height / measurer.measure().height), this._maxLines),
+                    canFitText: true
+                };
+                var lines = text.split("\n");
+                return lines.reduce(function (state, line, i) { return _this.breakLineToFitWidth(state, line, i !== lines.length - 1, measurer); }, state).wrapping;
+            };
+            Wrapper.prototype.breakLineToFitWidth = function (state, line, hasNextLine, measurer) {
+                var _this = this;
+                if (!state.canFitText && state.wrapping.truncatedText !== "") {
+                    state.wrapping.truncatedText += "\n";
+                }
+                var tokens = this._tokenizer.tokenize(line);
+                state = tokens.reduce(function (state, token) { return _this.wrapNextToken(token, state, measurer); }, state);
+                var wrappedText = SVGTypewriter.Utils.StringMethods.trimEnd(state.currentLine);
+                state.wrapping.noLines += +(wrappedText !== "");
+                if (state.wrapping.noLines === state.availableLines && this._textTrimming !== "none" && hasNextLine) {
+                    var ellipsisResult = this.addEllipsis(wrappedText, state.availableWidth, measurer);
+                    state.wrapping.wrappedText += ellipsisResult.wrappedToken;
+                    state.wrapping.truncatedText += ellipsisResult.remainingToken;
+                    state.canFitText = false;
+                }
+                else {
+                    state.wrapping.wrappedText += wrappedText;
+                }
+                state.currentLine = "\n";
+                return state;
+            };
+            Wrapper.prototype.canFitToken = function (token, width, measurer) {
+                var _this = this;
+                var possibleBreaks = this._allowBreakingWords ? token.split("").map(function (c, i) { return (i !== token.length - 1) ? c + _this._breakingCharacter : c; }) : [token];
+                return (measurer.measure(token).width <= width) || possibleBreaks.every(function (c) { return measurer.measure(c).width <= width; });
+            };
+            Wrapper.prototype.addEllipsis = function (line, width, measurer) {
+                if (this._textTrimming === "none") {
+                    return {
+                        wrappedToken: line,
+                        remainingToken: ""
+                    };
+                }
+                var truncatedLine = line.substring(0).trim();
+                var lineWidth = measurer.measure(truncatedLine).width;
+                var ellipsesWidth = measurer.measure("...").width;
+                var prefix = (line.length > 0 && line[0] === "\n") ? "\n" : "";
+                if (width <= ellipsesWidth) {
+                    var periodWidth = ellipsesWidth / 3;
+                    var numPeriodsThatFit = Math.floor(width / periodWidth);
+                    return {
+                        wrappedToken: prefix + "...".substr(0, numPeriodsThatFit),
+                        remainingToken: line
+                    };
+                }
+                while (lineWidth + ellipsesWidth > width) {
+                    truncatedLine = SVGTypewriter.Utils.StringMethods.trimEnd(truncatedLine.substr(0, truncatedLine.length - 1));
+                    lineWidth = measurer.measure(truncatedLine).width;
+                }
+                return {
+                    wrappedToken: prefix + truncatedLine + "...",
+                    remainingToken: SVGTypewriter.Utils.StringMethods.trimEnd(line.substring(truncatedLine.length), "-").trim()
+                };
+            };
+            Wrapper.prototype.wrapNextToken = function (token, state, measurer) {
+                if (!state.canFitText || state.availableLines === state.wrapping.noLines || !this.canFitToken(token, state.availableWidth, measurer)) {
+                    return this.finishWrapping(token, state, measurer);
+                }
+                var remainingToken = token;
+                while (remainingToken) {
+                    var result = this.breakTokenToFitInWidth(remainingToken, state.currentLine, state.availableWidth, measurer);
+                    state.currentLine = result.line;
+                    remainingToken = result.remainingToken;
+                    if (remainingToken != null) {
+                        state.wrapping.noBrokeWords += +result.breakWord;
+                        ++state.wrapping.noLines;
+                        if (state.availableLines === state.wrapping.noLines) {
+                            var ellipsisResult = this.addEllipsis(state.currentLine, state.availableWidth, measurer);
+                            state.wrapping.wrappedText += ellipsisResult.wrappedToken;
+                            state.wrapping.truncatedText += ellipsisResult.remainingToken + remainingToken;
+                            state.currentLine = "\n";
+                            return state;
+                        }
+                        else {
+                            state.wrapping.wrappedText += SVGTypewriter.Utils.StringMethods.trimEnd(state.currentLine);
+                            state.currentLine = "\n";
+                        }
+                    }
+                }
+                return state;
+            };
+            Wrapper.prototype.finishWrapping = function (token, state, measurer) {
+                // Token is really long, but we have a space to put part of the word.
+                if (state.canFitText && state.availableLines !== state.wrapping.noLines && this._allowBreakingWords && this._textTrimming !== "none") {
+                    var res = this.addEllipsis(state.currentLine + token, state.availableWidth, measurer);
+                    state.wrapping.wrappedText += res.wrappedToken;
+                    state.wrapping.truncatedText += res.remainingToken;
+                    state.wrapping.noBrokeWords += +(res.remainingToken.length < token.length);
+                    state.wrapping.noLines += +(res.wrappedToken.length > 0);
+                    state.currentLine = "";
+                }
+                else {
+                    state.wrapping.truncatedText += token;
+                }
+                state.canFitText = false;
+                return state;
+            };
+            /**
+             * Breaks single token to fit current line.
+             * If token contains only whitespaces then they will not be populated to next line.
+             */
+            Wrapper.prototype.breakTokenToFitInWidth = function (token, line, availableWidth, measurer, breakingCharacter) {
+                if (breakingCharacter === void 0) { breakingCharacter = this._breakingCharacter; }
+                if (measurer.measure(line + token).width <= availableWidth) {
+                    return {
+                        remainingToken: null,
+                        line: line + token,
+                        breakWord: false
+                    };
+                }
+                if (token.trim() === "") {
+                    return {
+                        remainingToken: "",
+                        line: line,
+                        breakWord: false
+                    };
+                }
+                if (!this._allowBreakingWords) {
+                    return {
+                        remainingToken: token,
+                        line: line,
+                        breakWord: false
+                    };
+                }
+                var fitTokenLength = 0;
+                while (fitTokenLength < token.length) {
+                    if (measurer.measure(line + token.substring(0, fitTokenLength + 1) + breakingCharacter).width <= availableWidth) {
+                        ++fitTokenLength;
+                    }
+                    else {
+                        break;
+                    }
+                }
+                var suffix = "";
+                if (fitTokenLength > 0) {
+                    suffix = breakingCharacter;
+                }
+                return {
+                    remainingToken: token.substring(fitTokenLength),
+                    line: line + token.substring(0, fitTokenLength) + suffix,
+                    breakWord: fitTokenLength > 0
+                };
+            };
+            return Wrapper;
+        })();
+        Wrappers.Wrapper = Wrapper;
+    })(Wrappers = SVGTypewriter.Wrappers || (SVGTypewriter.Wrappers = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+///<reference path="../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Wrappers;
+    (function (Wrappers) {
+        var SingleLineWrapper = (function (_super) {
+            __extends(SingleLineWrapper, _super);
+            function SingleLineWrapper() {
+                _super.apply(this, arguments);
+            }
+            SingleLineWrapper.prototype.wrap = function (text, measurer, width, height) {
+                var _this = this;
+                if (height === void 0) { height = Infinity; }
+                var lines = text.split("\n");
+                if (lines.length > 1) {
+                    throw new Error("SingleLineWrapper is designed to work only on single line");
+                }
+                var wrapFN = function (w) { return _super.prototype.wrap.call(_this, text, measurer, w, height); };
+                var result = wrapFN(width);
+                if (result.noLines < 2) {
+                    return result;
+                }
+                var left = 0;
+                var right = width;
+                for (var i = 0; i < SingleLineWrapper.NO_WRAP_ITERATIONS && right > left; ++i) {
+                    var currentWidth = (right + left) / 2;
+                    var currentResult = wrapFN(currentWidth);
+                    if (this.areSameResults(result, currentResult)) {
+                        right = currentWidth;
+                        result = currentResult;
+                    }
+                    else {
+                        left = currentWidth;
+                    }
+                }
+                return result;
+            };
+            SingleLineWrapper.prototype.areSameResults = function (one, two) {
+                return one.noLines === two.noLines && one.truncatedText === two.truncatedText;
+            };
+            SingleLineWrapper.NO_WRAP_ITERATIONS = 5;
+            return SingleLineWrapper;
+        })(Wrappers.Wrapper);
+        Wrappers.SingleLineWrapper = SingleLineWrapper;
+    })(Wrappers = SVGTypewriter.Wrappers || (SVGTypewriter.Wrappers = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+///<reference path="reference.ts" />
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Writers;
+    (function (Writers) {
+        var Writer = (function () {
+            function Writer(measurer, wrapper) {
+                this._writerID = Writer.nextID++;
+                this._elementID = 0;
+                this.measurer(measurer);
+                if (wrapper) {
+                    this.wrapper(wrapper);
+                }
+                this.addTitleElement(false);
+            }
+            Writer.prototype.measurer = function (newMeasurer) {
+                this._measurer = newMeasurer;
+                return this;
+            };
+            Writer.prototype.wrapper = function (newWrapper) {
+                this._wrapper = newWrapper;
+                return this;
+            };
+            Writer.prototype.addTitleElement = function (add) {
+                this._addTitleElement = add;
+                return this;
+            };
+            Writer.prototype.writeLine = function (line, g, width, xAlign, yOffset) {
+                var textEl = g.append("text");
+                textEl.text(line);
+                var xOffset = width * Writer.XOffsetFactor[xAlign];
+                var anchor = Writer.AnchorConverter[xAlign];
+                textEl.attr("text-anchor", anchor).classed("text-line", true);
+                SVGTypewriter.Utils.DOM.transform(textEl, xOffset, yOffset).attr("y", "-0.25em");
+                ;
+            };
+            Writer.prototype.writeText = function (text, writingArea, width, height, xAlign, yAlign) {
+                var _this = this;
+                var lines = text.split("\n");
+                var lineHeight = this._measurer.measure().height;
+                var yOffset = Writer.YOffsetFactor[yAlign] * (height - lines.length * lineHeight);
+                lines.forEach(function (line, i) {
+                    _this.writeLine(line, writingArea, width, xAlign, (i + 1) * lineHeight + yOffset);
+                });
+            };
+            Writer.prototype.write = function (text, width, height, options) {
+                if (Writer.SupportedRotation.indexOf(options.textRotation) === -1) {
+                    throw new Error("unsupported rotation - " + options.textRotation);
+                }
+                var orientHorizontally = Math.abs(Math.abs(options.textRotation) - 90) > 45;
+                var primaryDimension = orientHorizontally ? width : height;
+                var secondaryDimension = orientHorizontally ? height : width;
+                var textContainer = options.selection.append("g").classed("text-container", true);
+                if (this._addTitleElement) {
+                    textContainer.append("title").text(text);
+                }
+                var textArea = textContainer.append("g").classed("text-area", true);
+                var wrappedText = this._wrapper ? this._wrapper.wrap(text, this._measurer, primaryDimension, secondaryDimension).wrappedText : text;
+                this.writeText(wrappedText, textArea, primaryDimension, secondaryDimension, options.xAlign, options.yAlign);
+                var xForm = d3.transform("");
+                var xForm2 = d3.transform("");
+                xForm.rotate = options.textRotation;
+                switch (options.textRotation) {
+                    case 90:
+                        xForm.translate = [width, 0];
+                        xForm2.rotate = -90;
+                        xForm2.translate = [0, 200];
+                        break;
+                    case -90:
+                        xForm.translate = [0, height];
+                        xForm2.rotate = 90;
+                        xForm2.translate = [width, 0];
+                        break;
+                    case 180:
+                        xForm.translate = [width, height];
+                        xForm2.translate = [width, height];
+                        xForm2.rotate = 180;
+                        break;
+                }
+                textArea.attr("transform", xForm.toString());
+                this.addClipPath(textContainer, xForm2);
+                if (options.animator) {
+                    options.animator.animate(textContainer);
+                }
+            };
+            Writer.prototype.addClipPath = function (selection, transform) {
+                var elementID = this._elementID++;
+                var prefix = /MSIE [5-9]/.test(navigator.userAgent) ? "" : document.location.href;
+                prefix = prefix.split("#")[0]; // To fix cases where an anchor tag was used
+                var clipPathID = "clipPath" + this._writerID + "_" + elementID;
+                selection.select(".text-area").attr("clip-path", "url(\"" + prefix + "#" + clipPathID + "\")");
+                var clipPathParent = selection.append("clipPath").attr("id", clipPathID);
+                var bboxAttrs = SVGTypewriter.Utils.DOM.getBBox(selection.select(".text-area"));
+                var box = clipPathParent.append("rect");
+                box.classed("clip-rect", true).attr({
+                    x: bboxAttrs.x,
+                    y: bboxAttrs.y,
+                    width: bboxAttrs.width,
+                    height: bboxAttrs.height
+                });
+            };
+            Writer.nextID = 0;
+            Writer.SupportedRotation = [-90, 0, 180, 90];
+            Writer.AnchorConverter = {
+                left: "start",
+                center: "middle",
+                right: "end"
+            };
+            Writer.XOffsetFactor = {
+                left: 0,
+                center: 0.5,
+                right: 1
+            };
+            Writer.YOffsetFactor = {
+                top: 0,
+                center: 0.5,
+                bottom: 1
+            };
+            return Writer;
+        })();
+        Writers.Writer = Writer;
+    })(Writers = SVGTypewriter.Writers || (SVGTypewriter.Writers = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+///<reference path="../reference.ts" />
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Measurers;
+    (function (Measurers) {
+        ;
+        var AbstractMeasurer = (function () {
+            function AbstractMeasurer(area, className) {
+                this.textMeasurer = this.getTextMeasurer(area, className);
+            }
+            AbstractMeasurer.prototype.checkSelectionIsText = function (d) {
+                return d[0][0].tagName === "text" || !d.select("text").empty();
+            };
+            AbstractMeasurer.prototype.getTextMeasurer = function (area, className) {
+                var _this = this;
+                if (!this.checkSelectionIsText(area)) {
+                    var textElement = area.append("text");
+                    if (className) {
+                        textElement.classed(className, true);
+                    }
+                    textElement.remove();
+                    return function (text) {
+                        area.node().appendChild(textElement.node());
+                        var areaDimension = _this.measureBBox(textElement, text);
+                        textElement.remove();
+                        return areaDimension;
+                    };
+                }
+                else {
+                    var parentNode = area.node().parentNode;
+                    var textSelection;
+                    if (area[0][0].tagName === "text") {
+                        textSelection = area;
+                    }
+                    else {
+                        textSelection = area.select("text");
+                    }
+                    area.remove();
+                    return function (text) {
+                        parentNode.appendChild(area.node());
+                        var areaDimension = _this.measureBBox(textSelection, text);
+                        area.remove();
+                        return areaDimension;
+                    };
+                }
+            };
+            AbstractMeasurer.prototype.measureBBox = function (d, text) {
+                d.text(text);
+                var bb = SVGTypewriter.Utils.DOM.getBBox(d);
+                return { width: bb.width, height: bb.height };
+            };
+            AbstractMeasurer.prototype.measure = function (text) {
+                if (text === void 0) { text = AbstractMeasurer.HEIGHT_TEXT; }
+                return this.textMeasurer(text);
+            };
+            AbstractMeasurer.HEIGHT_TEXT = "bqpdl";
+            return AbstractMeasurer;
+        })();
+        Measurers.AbstractMeasurer = AbstractMeasurer;
+    })(Measurers = SVGTypewriter.Measurers || (SVGTypewriter.Measurers = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+///<reference path="../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Measurers;
+    (function (Measurers) {
+        var Measurer = (function (_super) {
+            __extends(Measurer, _super);
+            function Measurer(area, className, useGuards) {
+                if (className === void 0) { className = null; }
+                if (useGuards === void 0) { useGuards = false; }
+                _super.call(this, area, className);
+                this.useGuards = useGuards;
+            }
+            // Guards assures same line height and width of whitespaces on both ends.
+            Measurer.prototype._addGuards = function (text) {
+                return Measurers.AbstractMeasurer.HEIGHT_TEXT + text + Measurers.AbstractMeasurer.HEIGHT_TEXT;
+            };
+            Measurer.prototype.getGuardWidth = function () {
+                if (this.guardWidth == null) {
+                    this.guardWidth = _super.prototype.measure.call(this).width;
+                }
+                return this.guardWidth;
+            };
+            Measurer.prototype._measureLine = function (line) {
+                var measuredLine = this.useGuards ? this._addGuards(line) : line;
+                var measuredLineDimensions = _super.prototype.measure.call(this, measuredLine);
+                measuredLineDimensions.width -= this.useGuards ? (2 * this.getGuardWidth()) : 0;
+                return measuredLineDimensions;
+            };
+            Measurer.prototype.measure = function (text) {
+                var _this = this;
+                if (text === void 0) { text = Measurers.AbstractMeasurer.HEIGHT_TEXT; }
+                if (text.trim() === "") {
+                    return { width: 0, height: 0 };
+                }
+                var linesDimensions = text.trim().split("\n").map(function (line) { return _this._measureLine(line); });
+                return {
+                    width: d3.max(linesDimensions, function (dim) { return dim.width; }),
+                    height: d3.sum(linesDimensions, function (dim) { return dim.height; })
+                };
+            };
+            return Measurer;
+        })(Measurers.AbstractMeasurer);
+        Measurers.Measurer = Measurer;
+    })(Measurers = SVGTypewriter.Measurers || (SVGTypewriter.Measurers = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+///<reference path="../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Measurers;
+    (function (Measurers) {
+        var CharacterMeasurer = (function (_super) {
+            __extends(CharacterMeasurer, _super);
+            function CharacterMeasurer() {
+                _super.apply(this, arguments);
+            }
+            CharacterMeasurer.prototype._measureCharacter = function (c) {
+                return _super.prototype._measureLine.call(this, c);
+            };
+            CharacterMeasurer.prototype._measureLine = function (line) {
+                var _this = this;
+                var charactersDimensions = line.split("").map(function (c) { return _this._measureCharacter(c); });
+                return {
+                    width: d3.sum(charactersDimensions, function (dim) { return dim.width; }),
+                    height: d3.max(charactersDimensions, function (dim) { return dim.height; })
+                };
+            };
+            return CharacterMeasurer;
+        })(Measurers.Measurer);
+        Measurers.CharacterMeasurer = CharacterMeasurer;
+    })(Measurers = SVGTypewriter.Measurers || (SVGTypewriter.Measurers = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+///<reference path="../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Measurers;
+    (function (Measurers) {
+        var CacheCharacterMeasurer = (function (_super) {
+            __extends(CacheCharacterMeasurer, _super);
+            function CacheCharacterMeasurer(area, className) {
+                var _this = this;
+                _super.call(this, area, className);
+                this.cache = new SVGTypewriter.Utils.Cache(function (c) { return _this._measureCharacterNotFromCache(c); }, SVGTypewriter.Utils.Methods.objEq);
+            }
+            CacheCharacterMeasurer.prototype._measureCharacterNotFromCache = function (c) {
+                return _super.prototype._measureCharacter.call(this, c);
+            };
+            CacheCharacterMeasurer.prototype._measureCharacter = function (c) {
+                return this.cache.get(c);
+            };
+            CacheCharacterMeasurer.prototype.reset = function () {
+                this.cache.clear();
+            };
+            return CacheCharacterMeasurer;
+        })(Measurers.CharacterMeasurer);
+        Measurers.CacheCharacterMeasurer = CacheCharacterMeasurer;
+    })(Measurers = SVGTypewriter.Measurers || (SVGTypewriter.Measurers = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+return Plottable;
+}));
+
+/*!
+SVG Typewriter 0.3.0 (https://github.com/palantir/svg-typewriter)
+Copyright 2014 Palantir Technologies
+Licensed under MIT (https://github.com/palantir/svg-typewriter/blob/develop/LICENSE)
+*/
+
+///<reference path="../reference.ts" />
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Utils;
+    (function (Utils) {
+        var Methods;
+        (function (Methods) {
+            /**
+             * Check if two arrays are equal by strict equality.
+             */
+            function arrayEq(a, b) {
+                // Technically, null and undefined are arrays too
+                if (a == null || b == null) {
+                    return a === b;
+                }
+                if (a.length !== b.length) {
+                    return false;
+                }
+                for (var i = 0; i < a.length; i++) {
+                    if (a[i] !== b[i]) {
+                        return false;
+                    }
+                }
+                return true;
+            }
+            Methods.arrayEq = arrayEq;
+            /**
+             * @param {any} a Object to check against b for equality.
+             * @param {any} b Object to check against a for equality.
+             *
+             * @returns {boolean} whether or not two objects share the same keys, and
+             *          values associated with those keys. Values will be compared
+             *          with ===.
+             */
+            function objEq(a, b) {
+                if (a == null || b == null) {
+                    return a === b;
+                }
+                var keysA = Object.keys(a).sort();
+                var keysB = Object.keys(b).sort();
+                var valuesA = keysA.map(function (k) { return a[k]; });
+                var valuesB = keysB.map(function (k) { return b[k]; });
+                return arrayEq(keysA, keysB) && arrayEq(valuesA, valuesB);
+            }
+            Methods.objEq = objEq;
+        })(Methods = Utils.Methods || (Utils.Methods = {}));
+    })(Utils = SVGTypewriter.Utils || (SVGTypewriter.Utils = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Utils;
+    (function (Utils) {
+        var DOM;
+        (function (DOM) {
+            function transform(s, x, y) {
+                var xform = d3.transform(s.attr("transform"));
+                if (x == null) {
+                    return xform.translate;
+                }
+                else {
+                    y = (y == null) ? 0 : y;
+                    xform.translate[0] = x;
+                    xform.translate[1] = y;
+                    s.attr("transform", xform.toString());
+                    return s;
+                }
+            }
+            DOM.transform = transform;
+            function getBBox(element) {
+                var bbox;
+                try {
+                    bbox = element.node().getBBox();
+                }
+                catch (err) {
+                    bbox = {
+                        x: 0,
+                        y: 0,
+                        width: 0,
+                        height: 0
+                    };
+                }
+                return bbox;
+            }
+            DOM.getBBox = getBBox;
+        })(DOM = Utils.DOM || (Utils.DOM = {}));
+    })(Utils = SVGTypewriter.Utils || (SVGTypewriter.Utils = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+///<reference path="../reference.ts" />
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Utils;
+    (function (Utils) {
+        var Cache = (function () {
+            /**
+             * @constructor
+             *
+             * @param {string} compute The function whose results will be cached.
+             * @param {(v: T, w: T) => boolean} [valueEq]
+             *        Used to determine if the value of canonicalKey has changed.
+             *        If omitted, defaults to === comparision.
+             */
+            function Cache(compute, valueEq) {
+                if (valueEq === void 0) { valueEq = function (v, w) { return v === w; }; }
+                this.cache = d3.map();
+                this.compute = compute;
+                this.valueEq = valueEq;
+            }
+            /**
+             * Attempt to look up k in the cache, computing the result if it isn't
+             * found.
+             *
+             * @param {string} k The key to look up in the cache.
+             * @return {T} The value associated with k; the result of compute(k).
+             */
+            Cache.prototype.get = function (k) {
+                if (!this.cache.has(k)) {
+                    this.cache.set(k, this.compute(k));
+                }
+                return this.cache.get(k);
+            };
+            /**
+             * Reset the cache empty.
+             *
+             * @return {Cache<T>} The calling Cache.
+             */
+            Cache.prototype.clear = function () {
+                this.cache = d3.map();
+                return this;
+            };
+            return Cache;
+        })();
+        Utils.Cache = Cache;
+    })(Utils = SVGTypewriter.Utils || (SVGTypewriter.Utils = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+///<reference path="../reference.ts" />
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Utils;
+    (function (Utils) {
+        var Tokenizer = (function () {
+            function Tokenizer() {
+                this.WordDividerRegExp = new RegExp("\\W");
+                this.WhitespaceRegExp = new RegExp("\\s");
+            }
+            Tokenizer.prototype.tokenize = function (line) {
+                var _this = this;
+                return line.split("").reduce(function (tokens, c) { return tokens.slice(0, -1).concat(_this.shouldCreateNewToken(tokens[tokens.length - 1], c)); }, [""]);
+            };
+            Tokenizer.prototype.shouldCreateNewToken = function (token, newCharacter) {
+                if (!token) {
+                    return [newCharacter];
+                }
+                var lastCharacter = token[token.length - 1];
+                if (this.WhitespaceRegExp.test(lastCharacter) && this.WhitespaceRegExp.test(newCharacter)) {
+                    return [token + newCharacter];
+                }
+                else if (this.WhitespaceRegExp.test(lastCharacter) || this.WhitespaceRegExp.test(newCharacter)) {
+                    return [token, newCharacter];
+                }
+                else if (!(this.WordDividerRegExp.test(lastCharacter) || this.WordDividerRegExp.test(newCharacter))) {
+                    return [token + newCharacter];
+                }
+                else if (lastCharacter === newCharacter) {
+                    return [token + newCharacter];
+                }
+                else {
+                    return [token, newCharacter];
+                }
+            };
+            return Tokenizer;
+        })();
+        Utils.Tokenizer = Tokenizer;
+    })(Utils = SVGTypewriter.Utils || (SVGTypewriter.Utils = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+///<reference path="../reference.ts" />
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Utils;
+    (function (Utils) {
+        var StringMethods;
+        (function (StringMethods) {
+            /**
+             * Treat all sequences of consecutive whitespace as a single " ".
+             */
+            function combineWhitespace(str) {
+                return str.replace(/\s+/g, " ");
+            }
+            StringMethods.combineWhitespace = combineWhitespace;
+            function isNotEmptyString(str) {
+                return str && str.trim() !== "";
+            }
+            StringMethods.isNotEmptyString = isNotEmptyString;
+            function trimStart(str, c) {
+                if (!str) {
+                    return str;
+                }
+                var chars = str.split("");
+                var reduceFunction = c ? function (s) { return s.split(c).some(isNotEmptyString); } : isNotEmptyString;
+                return chars.reduce(function (s, c) { return reduceFunction(s + c) ? s + c : s; }, "");
+            }
+            StringMethods.trimStart = trimStart;
+            function trimEnd(str, c) {
+                if (!str) {
+                    return str;
+                }
+                var reversedChars = str.split("");
+                reversedChars.reverse();
+                reversedChars = trimStart(reversedChars.join(""), c).split("");
+                reversedChars.reverse();
+                return reversedChars.join("");
+            }
+            StringMethods.trimEnd = trimEnd;
+        })(StringMethods = Utils.StringMethods || (Utils.StringMethods = {}));
+    })(Utils = SVGTypewriter.Utils || (SVGTypewriter.Utils = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+///<reference path="../reference.ts" />
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Animators;
+    (function (Animators) {
+        var BaseAnimator = (function () {
+            function BaseAnimator() {
+                this.duration(BaseAnimator.DEFAULT_DURATION_MILLISECONDS);
+                this.delay(0);
+                this.easing(BaseAnimator.DEFAULT_EASING);
+                this.moveX(0);
+                this.moveY(0);
+            }
+            BaseAnimator.prototype.animate = function (selection) {
+                var xForm = d3.transform("");
+                xForm.translate = [this.moveX(), this.moveY()];
+                selection.attr("transform", xForm.toString());
+                xForm.translate = [0, 0];
+                return this._animate(selection, { transform: xForm.toString() });
+            };
+            BaseAnimator.prototype._animate = function (selection, attr) {
+                return selection.transition().ease(this.easing()).duration(this.duration()).delay(this.delay()).attr(attr);
+            };
+            BaseAnimator.prototype.duration = function (duration) {
+                if (duration == null) {
+                    return this._duration;
+                }
+                else {
+                    this._duration = duration;
+                    return this;
+                }
+            };
+            BaseAnimator.prototype.moveX = function (shift) {
+                if (shift == null) {
+                    return this._moveX;
+                }
+                else {
+                    this._moveX = shift;
+                    return this;
+                }
+            };
+            BaseAnimator.prototype.moveY = function (shift) {
+                if (shift == null) {
+                    return this._moveY;
+                }
+                else {
+                    this._moveY = shift;
+                    return this;
+                }
+            };
+            BaseAnimator.prototype.delay = function (delay) {
+                if (delay == null) {
+                    return this._delay;
+                }
+                else {
+                    this._delay = delay;
+                    return this;
+                }
+            };
+            BaseAnimator.prototype.easing = function (easing) {
+                if (easing == null) {
+                    return this._easing;
+                }
+                else {
+                    this._easing = easing;
+                    return this;
+                }
+            };
+            /**
+             * The default duration of the animation in milliseconds
+             */
+            BaseAnimator.DEFAULT_DURATION_MILLISECONDS = 300;
+            /**
+             * The default easing of the animation
+             */
+            BaseAnimator.DEFAULT_EASING = "exp-out";
+            return BaseAnimator;
+        })();
+        Animators.BaseAnimator = BaseAnimator;
+    })(Animators = SVGTypewriter.Animators || (SVGTypewriter.Animators = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+///<reference path="../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Animators;
+    (function (Animators) {
+        var UnveilAnimator = (function (_super) {
+            __extends(UnveilAnimator, _super);
+            function UnveilAnimator() {
+                this.direction("bottom");
+                _super.call(this);
+            }
+            UnveilAnimator.prototype.direction = function (direction) {
+                if (direction == null) {
+                    return this._direction;
+                }
+                else {
+                    if (UnveilAnimator.SupportedDirections.indexOf(direction) === -1) {
+                        throw new Error("unsupported direction - " + direction);
+                    }
+                    this._direction = direction;
+                    return this;
+                }
+            };
+            UnveilAnimator.prototype.animate = function (selection) {
+                var attr = SVGTypewriter.Utils.DOM.getBBox(selection);
+                var mask = selection.select(".clip-rect");
+                mask.attr("width", 0);
+                mask.attr("height", 0);
+                switch (this._direction) {
+                    case "top":
+                        mask.attr("y", attr.y + attr.height);
+                        mask.attr("x", attr.x);
+                        mask.attr("width", attr.width);
+                        break;
+                    case "bottom":
+                        mask.attr("y", attr.y);
+                        mask.attr("x", attr.x);
+                        mask.attr("width", attr.width);
+                        break;
+                    case "left":
+                        mask.attr("y", attr.y);
+                        mask.attr("x", attr.x);
+                        mask.attr("height", attr.height);
+                        break;
+                    case "right":
+                        mask.attr("y", attr.y);
+                        mask.attr("x", attr.x + attr.width);
+                        mask.attr("height", attr.height);
+                        break;
+                }
+                this._animate(mask, attr);
+                return _super.prototype.animate.call(this, selection);
+            };
+            UnveilAnimator.SupportedDirections = ["top", "bottom", "left", "right"];
+            return UnveilAnimator;
+        })(Animators.BaseAnimator);
+        Animators.UnveilAnimator = UnveilAnimator;
+    })(Animators = SVGTypewriter.Animators || (SVGTypewriter.Animators = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+///<reference path="../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Animators;
+    (function (Animators) {
+        var OpacityAnimator = (function (_super) {
+            __extends(OpacityAnimator, _super);
+            function OpacityAnimator() {
+                _super.apply(this, arguments);
+            }
+            OpacityAnimator.prototype.animate = function (selection) {
+                var area = selection.select(".text-area");
+                area.attr("opacity", 0);
+                var attr = {
+                    opacity: 1
+                };
+                this._animate(area, attr);
+                return _super.prototype.animate.call(this, selection);
+            };
+            return OpacityAnimator;
+        })(Animators.BaseAnimator);
+        Animators.OpacityAnimator = OpacityAnimator;
+    })(Animators = SVGTypewriter.Animators || (SVGTypewriter.Animators = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+///<reference path="../reference.ts" />
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Wrappers;
+    (function (Wrappers) {
+        var Wrapper = (function () {
+            function Wrapper() {
+                this.maxLines(Infinity);
+                this.textTrimming("ellipsis");
+                this.allowBreakingWords(true);
+                this._tokenizer = new SVGTypewriter.Utils.Tokenizer();
+                this._breakingCharacter = "-";
+            }
+            Wrapper.prototype.maxLines = function (noLines) {
+                if (noLines == null) {
+                    return this._maxLines;
+                }
+                else {
+                    this._maxLines = noLines;
+                    return this;
+                }
+            };
+            Wrapper.prototype.textTrimming = function (option) {
+                if (option == null) {
+                    return this._textTrimming;
+                }
+                else {
+                    if (option !== "ellipsis" && option !== "none") {
+                        throw new Error(option + " - unsupported text trimming option.");
+                    }
+                    this._textTrimming = option;
+                    return this;
+                }
+            };
+            Wrapper.prototype.allowBreakingWords = function (allow) {
+                if (allow == null) {
+                    return this._allowBreakingWords;
+                }
+                else {
+                    this._allowBreakingWords = allow;
+                    return this;
+                }
+            };
+            Wrapper.prototype.wrap = function (text, measurer, width, height) {
+                var _this = this;
+                if (height === void 0) { height = Infinity; }
+                var initialWrappingResult = {
+                    originalText: text,
+                    wrappedText: "",
+                    noLines: 0,
+                    noBrokeWords: 0,
+                    truncatedText: ""
+                };
+                var state = {
+                    wrapping: initialWrappingResult,
+                    currentLine: "",
+                    availableWidth: width,
+                    availableLines: Math.min(Math.floor(height / measurer.measure().height), this._maxLines),
+                    canFitText: true
+                };
+                var lines = text.split("\n");
+                return lines.reduce(function (state, line, i) { return _this.breakLineToFitWidth(state, line, i !== lines.length - 1, measurer); }, state).wrapping;
+            };
+            Wrapper.prototype.breakLineToFitWidth = function (state, line, hasNextLine, measurer) {
+                var _this = this;
+                if (!state.canFitText && state.wrapping.truncatedText !== "") {
+                    state.wrapping.truncatedText += "\n";
+                }
+                var tokens = this._tokenizer.tokenize(line);
+                state = tokens.reduce(function (state, token) { return _this.wrapNextToken(token, state, measurer); }, state);
+                var wrappedText = SVGTypewriter.Utils.StringMethods.trimEnd(state.currentLine);
+                state.wrapping.noLines += +(wrappedText !== "");
+                if (state.wrapping.noLines === state.availableLines && this._textTrimming !== "none" && hasNextLine) {
+                    var ellipsisResult = this.addEllipsis(wrappedText, state.availableWidth, measurer);
+                    state.wrapping.wrappedText += ellipsisResult.wrappedToken;
+                    state.wrapping.truncatedText += ellipsisResult.remainingToken;
+                    state.canFitText = false;
+                }
+                else {
+                    state.wrapping.wrappedText += wrappedText;
+                }
+                state.currentLine = "\n";
+                return state;
+            };
+            Wrapper.prototype.canFitToken = function (token, width, measurer) {
+                var _this = this;
+                var possibleBreaks = this._allowBreakingWords ? token.split("").map(function (c, i) { return (i !== token.length - 1) ? c + _this._breakingCharacter : c; }) : [token];
+                return (measurer.measure(token).width <= width) || possibleBreaks.every(function (c) { return measurer.measure(c).width <= width; });
+            };
+            Wrapper.prototype.addEllipsis = function (line, width, measurer) {
+                if (this._textTrimming === "none") {
+                    return {
+                        wrappedToken: line,
+                        remainingToken: ""
+                    };
+                }
+                var truncatedLine = line.substring(0).trim();
+                var lineWidth = measurer.measure(truncatedLine).width;
+                var ellipsesWidth = measurer.measure("...").width;
+                var prefix = (line.length > 0 && line[0] === "\n") ? "\n" : "";
+                if (width <= ellipsesWidth) {
+                    var periodWidth = ellipsesWidth / 3;
+                    var numPeriodsThatFit = Math.floor(width / periodWidth);
+                    return {
+                        wrappedToken: prefix + "...".substr(0, numPeriodsThatFit),
+                        remainingToken: line
+                    };
+                }
+                while (lineWidth + ellipsesWidth > width) {
+                    truncatedLine = SVGTypewriter.Utils.StringMethods.trimEnd(truncatedLine.substr(0, truncatedLine.length - 1));
+                    lineWidth = measurer.measure(truncatedLine).width;
+                }
+                return {
+                    wrappedToken: prefix + truncatedLine + "...",
+                    remainingToken: SVGTypewriter.Utils.StringMethods.trimEnd(line.substring(truncatedLine.length), "-").trim()
+                };
+            };
+            Wrapper.prototype.wrapNextToken = function (token, state, measurer) {
+                if (!state.canFitText || state.availableLines === state.wrapping.noLines || !this.canFitToken(token, state.availableWidth, measurer)) {
+                    return this.finishWrapping(token, state, measurer);
+                }
+                var remainingToken = token;
+                while (remainingToken) {
+                    var result = this.breakTokenToFitInWidth(remainingToken, state.currentLine, state.availableWidth, measurer);
+                    state.currentLine = result.line;
+                    remainingToken = result.remainingToken;
+                    if (remainingToken != null) {
+                        state.wrapping.noBrokeWords += +result.breakWord;
+                        ++state.wrapping.noLines;
+                        if (state.availableLines === state.wrapping.noLines) {
+                            var ellipsisResult = this.addEllipsis(state.currentLine, state.availableWidth, measurer);
+                            state.wrapping.wrappedText += ellipsisResult.wrappedToken;
+                            state.wrapping.truncatedText += ellipsisResult.remainingToken + remainingToken;
+                            state.currentLine = "\n";
+                            return state;
+                        }
+                        else {
+                            state.wrapping.wrappedText += SVGTypewriter.Utils.StringMethods.trimEnd(state.currentLine);
+                            state.currentLine = "\n";
+                        }
+                    }
+                }
+                return state;
+            };
+            Wrapper.prototype.finishWrapping = function (token, state, measurer) {
+                // Token is really long, but we have a space to put part of the word.
+                if (state.canFitText && state.availableLines !== state.wrapping.noLines && this._allowBreakingWords && this._textTrimming !== "none") {
+                    var res = this.addEllipsis(state.currentLine + token, state.availableWidth, measurer);
+                    state.wrapping.wrappedText += res.wrappedToken;
+                    state.wrapping.truncatedText += res.remainingToken;
+                    state.wrapping.noBrokeWords += +(res.remainingToken.length < token.length);
+                    state.wrapping.noLines += +(res.wrappedToken.length > 0);
+                    state.currentLine = "";
+                }
+                else {
+                    state.wrapping.truncatedText += token;
+                }
+                state.canFitText = false;
+                return state;
+            };
+            /**
+             * Breaks single token to fit current line.
+             * If token contains only whitespaces then they will not be populated to next line.
+             */
+            Wrapper.prototype.breakTokenToFitInWidth = function (token, line, availableWidth, measurer, breakingCharacter) {
+                if (breakingCharacter === void 0) { breakingCharacter = this._breakingCharacter; }
+                if (measurer.measure(line + token).width <= availableWidth) {
+                    return {
+                        remainingToken: null,
+                        line: line + token,
+                        breakWord: false
+                    };
+                }
+                if (token.trim() === "") {
+                    return {
+                        remainingToken: "",
+                        line: line,
+                        breakWord: false
+                    };
+                }
+                if (!this._allowBreakingWords) {
+                    return {
+                        remainingToken: token,
+                        line: line,
+                        breakWord: false
+                    };
+                }
+                var fitTokenLength = 0;
+                while (fitTokenLength < token.length) {
+                    if (measurer.measure(line + token.substring(0, fitTokenLength + 1) + breakingCharacter).width <= availableWidth) {
+                        ++fitTokenLength;
+                    }
+                    else {
+                        break;
+                    }
+                }
+                var suffix = "";
+                if (fitTokenLength > 0) {
+                    suffix = breakingCharacter;
+                }
+                return {
+                    remainingToken: token.substring(fitTokenLength),
+                    line: line + token.substring(0, fitTokenLength) + suffix,
+                    breakWord: fitTokenLength > 0
+                };
+            };
+            return Wrapper;
+        })();
+        Wrappers.Wrapper = Wrapper;
+    })(Wrappers = SVGTypewriter.Wrappers || (SVGTypewriter.Wrappers = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+///<reference path="../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Wrappers;
+    (function (Wrappers) {
+        var SingleLineWrapper = (function (_super) {
+            __extends(SingleLineWrapper, _super);
+            function SingleLineWrapper() {
+                _super.apply(this, arguments);
+            }
+            SingleLineWrapper.prototype.wrap = function (text, measurer, width, height) {
+                var _this = this;
+                if (height === void 0) { height = Infinity; }
+                var lines = text.split("\n");
+                if (lines.length > 1) {
+                    throw new Error("SingleLineWrapper is designed to work only on single line");
+                }
+                var wrapFN = function (w) { return _super.prototype.wrap.call(_this, text, measurer, w, height); };
+                var result = wrapFN(width);
+                if (result.noLines < 2) {
+                    return result;
+                }
+                var left = 0;
+                var right = width;
+                for (var i = 0; i < SingleLineWrapper.NO_WRAP_ITERATIONS && right > left; ++i) {
+                    var currentWidth = (right + left) / 2;
+                    var currentResult = wrapFN(currentWidth);
+                    if (this.areSameResults(result, currentResult)) {
+                        right = currentWidth;
+                        result = currentResult;
+                    }
+                    else {
+                        left = currentWidth;
+                    }
+                }
+                return result;
+            };
+            SingleLineWrapper.prototype.areSameResults = function (one, two) {
+                return one.noLines === two.noLines && one.truncatedText === two.truncatedText;
+            };
+            SingleLineWrapper.NO_WRAP_ITERATIONS = 5;
+            return SingleLineWrapper;
+        })(Wrappers.Wrapper);
+        Wrappers.SingleLineWrapper = SingleLineWrapper;
+    })(Wrappers = SVGTypewriter.Wrappers || (SVGTypewriter.Wrappers = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+///<reference path="reference.ts" />
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Writers;
+    (function (Writers) {
+        var Writer = (function () {
+            function Writer(measurer, wrapper) {
+                this._writerID = Writer.nextID++;
+                this._elementID = 0;
+                this.measurer(measurer);
+                if (wrapper) {
+                    this.wrapper(wrapper);
+                }
+                this.addTitleElement(false);
+            }
+            Writer.prototype.measurer = function (newMeasurer) {
+                this._measurer = newMeasurer;
+                return this;
+            };
+            Writer.prototype.wrapper = function (newWrapper) {
+                this._wrapper = newWrapper;
+                return this;
+            };
+            Writer.prototype.addTitleElement = function (add) {
+                this._addTitleElement = add;
+                return this;
+            };
+            Writer.prototype.writeLine = function (line, g, width, xAlign, yOffset) {
+                var textEl = g.append("text");
+                textEl.text(line);
+                var xOffset = width * Writer.XOffsetFactor[xAlign];
+                var anchor = Writer.AnchorConverter[xAlign];
+                textEl.attr("text-anchor", anchor).classed("text-line", true);
+                SVGTypewriter.Utils.DOM.transform(textEl, xOffset, yOffset).attr("y", "-0.25em");
+                ;
+            };
+            Writer.prototype.writeText = function (text, writingArea, width, height, xAlign, yAlign) {
+                var _this = this;
+                var lines = text.split("\n");
+                var lineHeight = this._measurer.measure().height;
+                var yOffset = Writer.YOffsetFactor[yAlign] * (height - lines.length * lineHeight);
+                lines.forEach(function (line, i) {
+                    _this.writeLine(line, writingArea, width, xAlign, (i + 1) * lineHeight + yOffset);
+                });
+            };
+            Writer.prototype.write = function (text, width, height, options) {
+                if (Writer.SupportedRotation.indexOf(options.textRotation) === -1) {
+                    throw new Error("unsupported rotation - " + options.textRotation);
+                }
+                var orientHorizontally = Math.abs(Math.abs(options.textRotation) - 90) > 45;
+                var primaryDimension = orientHorizontally ? width : height;
+                var secondaryDimension = orientHorizontally ? height : width;
+                var textContainer = options.selection.append("g").classed("text-container", true);
+                if (this._addTitleElement) {
+                    textContainer.append("title").text(text);
+                }
+                var textArea = textContainer.append("g").classed("text-area", true);
+                var wrappedText = this._wrapper ? this._wrapper.wrap(text, this._measurer, primaryDimension, secondaryDimension).wrappedText : text;
+                this.writeText(wrappedText, textArea, primaryDimension, secondaryDimension, options.xAlign, options.yAlign);
+                var xForm = d3.transform("");
+                var xForm2 = d3.transform("");
+                xForm.rotate = options.textRotation;
+                switch (options.textRotation) {
+                    case 90:
+                        xForm.translate = [width, 0];
+                        xForm2.rotate = -90;
+                        xForm2.translate = [0, 200];
+                        break;
+                    case -90:
+                        xForm.translate = [0, height];
+                        xForm2.rotate = 90;
+                        xForm2.translate = [width, 0];
+                        break;
+                    case 180:
+                        xForm.translate = [width, height];
+                        xForm2.translate = [width, height];
+                        xForm2.rotate = 180;
+                        break;
+                }
+                textArea.attr("transform", xForm.toString());
+                this.addClipPath(textContainer, xForm2);
+                if (options.animator) {
+                    options.animator.animate(textContainer);
+                }
+            };
+            Writer.prototype.addClipPath = function (selection, transform) {
+                var elementID = this._elementID++;
+                var prefix = /MSIE [5-9]/.test(navigator.userAgent) ? "" : document.location.href;
+                prefix = prefix.split("#")[0]; // To fix cases where an anchor tag was used
+                var clipPathID = "clipPath" + this._writerID + "_" + elementID;
+                selection.select(".text-area").attr("clip-path", "url(\"" + prefix + "#" + clipPathID + "\")");
+                var clipPathParent = selection.append("clipPath").attr("id", clipPathID);
+                var bboxAttrs = SVGTypewriter.Utils.DOM.getBBox(selection.select(".text-area"));
+                var box = clipPathParent.append("rect");
+                box.classed("clip-rect", true).attr({
+                    x: bboxAttrs.x,
+                    y: bboxAttrs.y,
+                    width: bboxAttrs.width,
+                    height: bboxAttrs.height
+                });
+            };
+            Writer.nextID = 0;
+            Writer.SupportedRotation = [-90, 0, 180, 90];
+            Writer.AnchorConverter = {
+                left: "start",
+                center: "middle",
+                right: "end"
+            };
+            Writer.XOffsetFactor = {
+                left: 0,
+                center: 0.5,
+                right: 1
+            };
+            Writer.YOffsetFactor = {
+                top: 0,
+                center: 0.5,
+                bottom: 1
+            };
+            return Writer;
+        })();
+        Writers.Writer = Writer;
+    })(Writers = SVGTypewriter.Writers || (SVGTypewriter.Writers = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+///<reference path="../reference.ts" />
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Measurers;
+    (function (Measurers) {
+        ;
+        var AbstractMeasurer = (function () {
+            function AbstractMeasurer(area, className) {
+                this.textMeasurer = this.getTextMeasurer(area, className);
+            }
+            AbstractMeasurer.prototype.checkSelectionIsText = function (d) {
+                return d[0][0].tagName === "text" || !d.select("text").empty();
+            };
+            AbstractMeasurer.prototype.getTextMeasurer = function (area, className) {
+                var _this = this;
+                if (!this.checkSelectionIsText(area)) {
+                    var textElement = area.append("text");
+                    if (className) {
+                        textElement.classed(className, true);
+                    }
+                    textElement.remove();
+                    return function (text) {
+                        area.node().appendChild(textElement.node());
+                        var areaDimension = _this.measureBBox(textElement, text);
+                        textElement.remove();
+                        return areaDimension;
+                    };
+                }
+                else {
+                    var parentNode = area.node().parentNode;
+                    var textSelection;
+                    if (area[0][0].tagName === "text") {
+                        textSelection = area;
+                    }
+                    else {
+                        textSelection = area.select("text");
+                    }
+                    area.remove();
+                    return function (text) {
+                        parentNode.appendChild(area.node());
+                        var areaDimension = _this.measureBBox(textSelection, text);
+                        area.remove();
+                        return areaDimension;
+                    };
+                }
+            };
+            AbstractMeasurer.prototype.measureBBox = function (d, text) {
+                d.text(text);
+                var bb = SVGTypewriter.Utils.DOM.getBBox(d);
+                return { width: bb.width, height: bb.height };
+            };
+            AbstractMeasurer.prototype.measure = function (text) {
+                if (text === void 0) { text = AbstractMeasurer.HEIGHT_TEXT; }
+                return this.textMeasurer(text);
+            };
+            AbstractMeasurer.HEIGHT_TEXT = "bqpdl";
+            return AbstractMeasurer;
+        })();
+        Measurers.AbstractMeasurer = AbstractMeasurer;
+    })(Measurers = SVGTypewriter.Measurers || (SVGTypewriter.Measurers = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+///<reference path="../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Measurers;
+    (function (Measurers) {
+        var Measurer = (function (_super) {
+            __extends(Measurer, _super);
+            function Measurer(area, className, useGuards) {
+                if (className === void 0) { className = null; }
+                if (useGuards === void 0) { useGuards = false; }
+                _super.call(this, area, className);
+                this.useGuards = useGuards;
+            }
+            // Guards assures same line height and width of whitespaces on both ends.
+            Measurer.prototype._addGuards = function (text) {
+                return Measurers.AbstractMeasurer.HEIGHT_TEXT + text + Measurers.AbstractMeasurer.HEIGHT_TEXT;
+            };
+            Measurer.prototype.getGuardWidth = function () {
+                if (this.guardWidth == null) {
+                    this.guardWidth = _super.prototype.measure.call(this).width;
+                }
+                return this.guardWidth;
+            };
+            Measurer.prototype._measureLine = function (line) {
+                var measuredLine = this.useGuards ? this._addGuards(line) : line;
+                var measuredLineDimensions = _super.prototype.measure.call(this, measuredLine);
+                measuredLineDimensions.width -= this.useGuards ? (2 * this.getGuardWidth()) : 0;
+                return measuredLineDimensions;
+            };
+            Measurer.prototype.measure = function (text) {
+                var _this = this;
+                if (text === void 0) { text = Measurers.AbstractMeasurer.HEIGHT_TEXT; }
+                if (text.trim() === "") {
+                    return { width: 0, height: 0 };
+                }
+                var linesDimensions = text.trim().split("\n").map(function (line) { return _this._measureLine(line); });
+                return {
+                    width: d3.max(linesDimensions, function (dim) { return dim.width; }),
+                    height: d3.sum(linesDimensions, function (dim) { return dim.height; })
+                };
+            };
+            return Measurer;
+        })(Measurers.AbstractMeasurer);
+        Measurers.Measurer = Measurer;
+    })(Measurers = SVGTypewriter.Measurers || (SVGTypewriter.Measurers = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+///<reference path="../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Measurers;
+    (function (Measurers) {
+        var CharacterMeasurer = (function (_super) {
+            __extends(CharacterMeasurer, _super);
+            function CharacterMeasurer() {
+                _super.apply(this, arguments);
+            }
+            CharacterMeasurer.prototype._measureCharacter = function (c) {
+                return _super.prototype._measureLine.call(this, c);
+            };
+            CharacterMeasurer.prototype._measureLine = function (line) {
+                var _this = this;
+                var charactersDimensions = line.split("").map(function (c) { return _this._measureCharacter(c); });
+                return {
+                    width: d3.sum(charactersDimensions, function (dim) { return dim.width; }),
+                    height: d3.max(charactersDimensions, function (dim) { return dim.height; })
+                };
+            };
+            return CharacterMeasurer;
+        })(Measurers.Measurer);
+        Measurers.CharacterMeasurer = CharacterMeasurer;
+    })(Measurers = SVGTypewriter.Measurers || (SVGTypewriter.Measurers = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+///<reference path="../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Measurers;
+    (function (Measurers) {
+        var CacheCharacterMeasurer = (function (_super) {
+            __extends(CacheCharacterMeasurer, _super);
+            function CacheCharacterMeasurer(area, className) {
+                var _this = this;
+                _super.call(this, area, className);
+                this.cache = new SVGTypewriter.Utils.Cache(function (c) { return _this._measureCharacterNotFromCache(c); }, SVGTypewriter.Utils.Methods.objEq);
+            }
+            CacheCharacterMeasurer.prototype._measureCharacterNotFromCache = function (c) {
+                return _super.prototype._measureCharacter.call(this, c);
+            };
+            CacheCharacterMeasurer.prototype._measureCharacter = function (c) {
+                return this.cache.get(c);
+            };
+            CacheCharacterMeasurer.prototype.reset = function () {
+                this.cache.clear();
+            };
+            return CacheCharacterMeasurer;
+        })(Measurers.CharacterMeasurer);
+        Measurers.CacheCharacterMeasurer = CacheCharacterMeasurer;
+    })(Measurers = SVGTypewriter.Measurers || (SVGTypewriter.Measurers = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+return Plottable;
+}));
+
+/*!
+SVG Typewriter 0.3.0 (https://github.com/palantir/svg-typewriter)
+Copyright 2014 Palantir Technologies
+Licensed under MIT (https://github.com/palantir/svg-typewriter/blob/develop/LICENSE)
+*/
+
+///<reference path="../reference.ts" />
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Utils;
+    (function (Utils) {
+        var Methods;
+        (function (Methods) {
+            /**
+             * Check if two arrays are equal by strict equality.
+             */
+            function arrayEq(a, b) {
+                // Technically, null and undefined are arrays too
+                if (a == null || b == null) {
+                    return a === b;
+                }
+                if (a.length !== b.length) {
+                    return false;
+                }
+                for (var i = 0; i < a.length; i++) {
+                    if (a[i] !== b[i]) {
+                        return false;
+                    }
+                }
+                return true;
+            }
+            Methods.arrayEq = arrayEq;
+            /**
+             * @param {any} a Object to check against b for equality.
+             * @param {any} b Object to check against a for equality.
+             *
+             * @returns {boolean} whether or not two objects share the same keys, and
+             *          values associated with those keys. Values will be compared
+             *          with ===.
+             */
+            function objEq(a, b) {
+                if (a == null || b == null) {
+                    return a === b;
+                }
+                var keysA = Object.keys(a).sort();
+                var keysB = Object.keys(b).sort();
+                var valuesA = keysA.map(function (k) { return a[k]; });
+                var valuesB = keysB.map(function (k) { return b[k]; });
+                return arrayEq(keysA, keysB) && arrayEq(valuesA, valuesB);
+            }
+            Methods.objEq = objEq;
+        })(Methods = Utils.Methods || (Utils.Methods = {}));
+    })(Utils = SVGTypewriter.Utils || (SVGTypewriter.Utils = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Utils;
+    (function (Utils) {
+        var DOM;
+        (function (DOM) {
+            function transform(s, x, y) {
+                var xform = d3.transform(s.attr("transform"));
+                if (x == null) {
+                    return xform.translate;
+                }
+                else {
+                    y = (y == null) ? 0 : y;
+                    xform.translate[0] = x;
+                    xform.translate[1] = y;
+                    s.attr("transform", xform.toString());
+                    return s;
+                }
+            }
+            DOM.transform = transform;
+            function getBBox(element) {
+                var bbox;
+                try {
+                    bbox = element.node().getBBox();
+                }
+                catch (err) {
+                    bbox = {
+                        x: 0,
+                        y: 0,
+                        width: 0,
+                        height: 0
+                    };
+                }
+                return bbox;
+            }
+            DOM.getBBox = getBBox;
+        })(DOM = Utils.DOM || (Utils.DOM = {}));
+    })(Utils = SVGTypewriter.Utils || (SVGTypewriter.Utils = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+///<reference path="../reference.ts" />
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Utils;
+    (function (Utils) {
+        var Cache = (function () {
+            /**
+             * @constructor
+             *
+             * @param {string} compute The function whose results will be cached.
+             * @param {(v: T, w: T) => boolean} [valueEq]
+             *        Used to determine if the value of canonicalKey has changed.
+             *        If omitted, defaults to === comparision.
+             */
+            function Cache(compute, valueEq) {
+                if (valueEq === void 0) { valueEq = function (v, w) { return v === w; }; }
+                this.cache = d3.map();
+                this.compute = compute;
+                this.valueEq = valueEq;
+            }
+            /**
+             * Attempt to look up k in the cache, computing the result if it isn't
+             * found.
+             *
+             * @param {string} k The key to look up in the cache.
+             * @return {T} The value associated with k; the result of compute(k).
+             */
+            Cache.prototype.get = function (k) {
+                if (!this.cache.has(k)) {
+                    this.cache.set(k, this.compute(k));
+                }
+                return this.cache.get(k);
+            };
+            /**
+             * Reset the cache empty.
+             *
+             * @return {Cache<T>} The calling Cache.
+             */
+            Cache.prototype.clear = function () {
+                this.cache = d3.map();
+                return this;
+            };
+            return Cache;
+        })();
+        Utils.Cache = Cache;
+    })(Utils = SVGTypewriter.Utils || (SVGTypewriter.Utils = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+///<reference path="../reference.ts" />
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Utils;
+    (function (Utils) {
+        var Tokenizer = (function () {
+            function Tokenizer() {
+                this.WordDividerRegExp = new RegExp("\\W");
+                this.WhitespaceRegExp = new RegExp("\\s");
+            }
+            Tokenizer.prototype.tokenize = function (line) {
+                var _this = this;
+                return line.split("").reduce(function (tokens, c) { return tokens.slice(0, -1).concat(_this.shouldCreateNewToken(tokens[tokens.length - 1], c)); }, [""]);
+            };
+            Tokenizer.prototype.shouldCreateNewToken = function (token, newCharacter) {
+                if (!token) {
+                    return [newCharacter];
+                }
+                var lastCharacter = token[token.length - 1];
+                if (this.WhitespaceRegExp.test(lastCharacter) && this.WhitespaceRegExp.test(newCharacter)) {
+                    return [token + newCharacter];
+                }
+                else if (this.WhitespaceRegExp.test(lastCharacter) || this.WhitespaceRegExp.test(newCharacter)) {
+                    return [token, newCharacter];
+                }
+                else if (!(this.WordDividerRegExp.test(lastCharacter) || this.WordDividerRegExp.test(newCharacter))) {
+                    return [token + newCharacter];
+                }
+                else if (lastCharacter === newCharacter) {
+                    return [token + newCharacter];
+                }
+                else {
+                    return [token, newCharacter];
+                }
+            };
+            return Tokenizer;
+        })();
+        Utils.Tokenizer = Tokenizer;
+    })(Utils = SVGTypewriter.Utils || (SVGTypewriter.Utils = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+///<reference path="../reference.ts" />
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Utils;
+    (function (Utils) {
+        var StringMethods;
+        (function (StringMethods) {
+            /**
+             * Treat all sequences of consecutive whitespace as a single " ".
+             */
+            function combineWhitespace(str) {
+                return str.replace(/\s+/g, " ");
+            }
+            StringMethods.combineWhitespace = combineWhitespace;
+            function isNotEmptyString(str) {
+                return str && str.trim() !== "";
+            }
+            StringMethods.isNotEmptyString = isNotEmptyString;
+            function trimStart(str, c) {
+                if (!str) {
+                    return str;
+                }
+                var chars = str.split("");
+                var reduceFunction = c ? function (s) { return s.split(c).some(isNotEmptyString); } : isNotEmptyString;
+                return chars.reduce(function (s, c) { return reduceFunction(s + c) ? s + c : s; }, "");
+            }
+            StringMethods.trimStart = trimStart;
+            function trimEnd(str, c) {
+                if (!str) {
+                    return str;
+                }
+                var reversedChars = str.split("");
+                reversedChars.reverse();
+                reversedChars = trimStart(reversedChars.join(""), c).split("");
+                reversedChars.reverse();
+                return reversedChars.join("");
+            }
+            StringMethods.trimEnd = trimEnd;
+        })(StringMethods = Utils.StringMethods || (Utils.StringMethods = {}));
+    })(Utils = SVGTypewriter.Utils || (SVGTypewriter.Utils = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+///<reference path="../reference.ts" />
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Animators;
+    (function (Animators) {
+        var BaseAnimator = (function () {
+            function BaseAnimator() {
+                this.duration(BaseAnimator.DEFAULT_DURATION_MILLISECONDS);
+                this.delay(0);
+                this.easing(BaseAnimator.DEFAULT_EASING);
+                this.moveX(0);
+                this.moveY(0);
+            }
+            BaseAnimator.prototype.animate = function (selection) {
+                var xForm = d3.transform("");
+                xForm.translate = [this.moveX(), this.moveY()];
+                selection.attr("transform", xForm.toString());
+                xForm.translate = [0, 0];
+                return this._animate(selection, { transform: xForm.toString() });
+            };
+            BaseAnimator.prototype._animate = function (selection, attr) {
+                return selection.transition().ease(this.easing()).duration(this.duration()).delay(this.delay()).attr(attr);
+            };
+            BaseAnimator.prototype.duration = function (duration) {
+                if (duration == null) {
+                    return this._duration;
+                }
+                else {
+                    this._duration = duration;
+                    return this;
+                }
+            };
+            BaseAnimator.prototype.moveX = function (shift) {
+                if (shift == null) {
+                    return this._moveX;
+                }
+                else {
+                    this._moveX = shift;
+                    return this;
+                }
+            };
+            BaseAnimator.prototype.moveY = function (shift) {
+                if (shift == null) {
+                    return this._moveY;
+                }
+                else {
+                    this._moveY = shift;
+                    return this;
+                }
+            };
+            BaseAnimator.prototype.delay = function (delay) {
+                if (delay == null) {
+                    return this._delay;
+                }
+                else {
+                    this._delay = delay;
+                    return this;
+                }
+            };
+            BaseAnimator.prototype.easing = function (easing) {
+                if (easing == null) {
+                    return this._easing;
+                }
+                else {
+                    this._easing = easing;
+                    return this;
+                }
+            };
+            /**
+             * The default duration of the animation in milliseconds
+             */
+            BaseAnimator.DEFAULT_DURATION_MILLISECONDS = 300;
+            /**
+             * The default easing of the animation
+             */
+            BaseAnimator.DEFAULT_EASING = "exp-out";
+            return BaseAnimator;
+        })();
+        Animators.BaseAnimator = BaseAnimator;
+    })(Animators = SVGTypewriter.Animators || (SVGTypewriter.Animators = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+///<reference path="../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Animators;
+    (function (Animators) {
+        var UnveilAnimator = (function (_super) {
+            __extends(UnveilAnimator, _super);
+            function UnveilAnimator() {
+                this.direction("bottom");
+                _super.call(this);
+            }
+            UnveilAnimator.prototype.direction = function (direction) {
+                if (direction == null) {
+                    return this._direction;
+                }
+                else {
+                    if (UnveilAnimator.SupportedDirections.indexOf(direction) === -1) {
+                        throw new Error("unsupported direction - " + direction);
+                    }
+                    this._direction = direction;
+                    return this;
+                }
+            };
+            UnveilAnimator.prototype.animate = function (selection) {
+                var attr = SVGTypewriter.Utils.DOM.getBBox(selection);
+                var mask = selection.select(".clip-rect");
+                mask.attr("width", 0);
+                mask.attr("height", 0);
+                switch (this._direction) {
+                    case "top":
+                        mask.attr("y", attr.y + attr.height);
+                        mask.attr("x", attr.x);
+                        mask.attr("width", attr.width);
+                        break;
+                    case "bottom":
+                        mask.attr("y", attr.y);
+                        mask.attr("x", attr.x);
+                        mask.attr("width", attr.width);
+                        break;
+                    case "left":
+                        mask.attr("y", attr.y);
+                        mask.attr("x", attr.x);
+                        mask.attr("height", attr.height);
+                        break;
+                    case "right":
+                        mask.attr("y", attr.y);
+                        mask.attr("x", attr.x + attr.width);
+                        mask.attr("height", attr.height);
+                        break;
+                }
+                this._animate(mask, attr);
+                return _super.prototype.animate.call(this, selection);
+            };
+            UnveilAnimator.SupportedDirections = ["top", "bottom", "left", "right"];
+            return UnveilAnimator;
+        })(Animators.BaseAnimator);
+        Animators.UnveilAnimator = UnveilAnimator;
+    })(Animators = SVGTypewriter.Animators || (SVGTypewriter.Animators = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+///<reference path="../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Animators;
+    (function (Animators) {
+        var OpacityAnimator = (function (_super) {
+            __extends(OpacityAnimator, _super);
+            function OpacityAnimator() {
+                _super.apply(this, arguments);
+            }
+            OpacityAnimator.prototype.animate = function (selection) {
+                var area = selection.select(".text-area");
+                area.attr("opacity", 0);
+                var attr = {
+                    opacity: 1
+                };
+                this._animate(area, attr);
+                return _super.prototype.animate.call(this, selection);
+            };
+            return OpacityAnimator;
+        })(Animators.BaseAnimator);
+        Animators.OpacityAnimator = OpacityAnimator;
+    })(Animators = SVGTypewriter.Animators || (SVGTypewriter.Animators = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+///<reference path="../reference.ts" />
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Wrappers;
+    (function (Wrappers) {
+        var Wrapper = (function () {
+            function Wrapper() {
+                this.maxLines(Infinity);
+                this.textTrimming("ellipsis");
+                this.allowBreakingWords(true);
+                this._tokenizer = new SVGTypewriter.Utils.Tokenizer();
+                this._breakingCharacter = "-";
+            }
+            Wrapper.prototype.maxLines = function (noLines) {
+                if (noLines == null) {
+                    return this._maxLines;
+                }
+                else {
+                    this._maxLines = noLines;
+                    return this;
+                }
+            };
+            Wrapper.prototype.textTrimming = function (option) {
+                if (option == null) {
+                    return this._textTrimming;
+                }
+                else {
+                    if (option !== "ellipsis" && option !== "none") {
+                        throw new Error(option + " - unsupported text trimming option.");
+                    }
+                    this._textTrimming = option;
+                    return this;
+                }
+            };
+            Wrapper.prototype.allowBreakingWords = function (allow) {
+                if (allow == null) {
+                    return this._allowBreakingWords;
+                }
+                else {
+                    this._allowBreakingWords = allow;
+                    return this;
+                }
+            };
+            Wrapper.prototype.wrap = function (text, measurer, width, height) {
+                var _this = this;
+                if (height === void 0) { height = Infinity; }
+                var initialWrappingResult = {
+                    originalText: text,
+                    wrappedText: "",
+                    noLines: 0,
+                    noBrokeWords: 0,
+                    truncatedText: ""
+                };
+                var state = {
+                    wrapping: initialWrappingResult,
+                    currentLine: "",
+                    availableWidth: width,
+                    availableLines: Math.min(Math.floor(height / measurer.measure().height), this._maxLines),
+                    canFitText: true
+                };
+                var lines = text.split("\n");
+                return lines.reduce(function (state, line, i) { return _this.breakLineToFitWidth(state, line, i !== lines.length - 1, measurer); }, state).wrapping;
+            };
+            Wrapper.prototype.breakLineToFitWidth = function (state, line, hasNextLine, measurer) {
+                var _this = this;
+                if (!state.canFitText && state.wrapping.truncatedText !== "") {
+                    state.wrapping.truncatedText += "\n";
+                }
+                var tokens = this._tokenizer.tokenize(line);
+                state = tokens.reduce(function (state, token) { return _this.wrapNextToken(token, state, measurer); }, state);
+                var wrappedText = SVGTypewriter.Utils.StringMethods.trimEnd(state.currentLine);
+                state.wrapping.noLines += +(wrappedText !== "");
+                if (state.wrapping.noLines === state.availableLines && this._textTrimming !== "none" && hasNextLine) {
+                    var ellipsisResult = this.addEllipsis(wrappedText, state.availableWidth, measurer);
+                    state.wrapping.wrappedText += ellipsisResult.wrappedToken;
+                    state.wrapping.truncatedText += ellipsisResult.remainingToken;
+                    state.canFitText = false;
+                }
+                else {
+                    state.wrapping.wrappedText += wrappedText;
+                }
+                state.currentLine = "\n";
+                return state;
+            };
+            Wrapper.prototype.canFitToken = function (token, width, measurer) {
+                var _this = this;
+                var possibleBreaks = this._allowBreakingWords ? token.split("").map(function (c, i) { return (i !== token.length - 1) ? c + _this._breakingCharacter : c; }) : [token];
+                return (measurer.measure(token).width <= width) || possibleBreaks.every(function (c) { return measurer.measure(c).width <= width; });
+            };
+            Wrapper.prototype.addEllipsis = function (line, width, measurer) {
+                if (this._textTrimming === "none") {
+                    return {
+                        wrappedToken: line,
+                        remainingToken: ""
+                    };
+                }
+                var truncatedLine = line.substring(0).trim();
+                var lineWidth = measurer.measure(truncatedLine).width;
+                var ellipsesWidth = measurer.measure("...").width;
+                var prefix = (line.length > 0 && line[0] === "\n") ? "\n" : "";
+                if (width <= ellipsesWidth) {
+                    var periodWidth = ellipsesWidth / 3;
+                    var numPeriodsThatFit = Math.floor(width / periodWidth);
+                    return {
+                        wrappedToken: prefix + "...".substr(0, numPeriodsThatFit),
+                        remainingToken: line
+                    };
+                }
+                while (lineWidth + ellipsesWidth > width) {
+                    truncatedLine = SVGTypewriter.Utils.StringMethods.trimEnd(truncatedLine.substr(0, truncatedLine.length - 1));
+                    lineWidth = measurer.measure(truncatedLine).width;
+                }
+                return {
+                    wrappedToken: prefix + truncatedLine + "...",
+                    remainingToken: SVGTypewriter.Utils.StringMethods.trimEnd(line.substring(truncatedLine.length), "-").trim()
+                };
+            };
+            Wrapper.prototype.wrapNextToken = function (token, state, measurer) {
+                if (!state.canFitText || state.availableLines === state.wrapping.noLines || !this.canFitToken(token, state.availableWidth, measurer)) {
+                    return this.finishWrapping(token, state, measurer);
+                }
+                var remainingToken = token;
+                while (remainingToken) {
+                    var result = this.breakTokenToFitInWidth(remainingToken, state.currentLine, state.availableWidth, measurer);
+                    state.currentLine = result.line;
+                    remainingToken = result.remainingToken;
+                    if (remainingToken != null) {
+                        state.wrapping.noBrokeWords += +result.breakWord;
+                        ++state.wrapping.noLines;
+                        if (state.availableLines === state.wrapping.noLines) {
+                            var ellipsisResult = this.addEllipsis(state.currentLine, state.availableWidth, measurer);
+                            state.wrapping.wrappedText += ellipsisResult.wrappedToken;
+                            state.wrapping.truncatedText += ellipsisResult.remainingToken + remainingToken;
+                            state.currentLine = "\n";
+                            return state;
+                        }
+                        else {
+                            state.wrapping.wrappedText += SVGTypewriter.Utils.StringMethods.trimEnd(state.currentLine);
+                            state.currentLine = "\n";
+                        }
+                    }
+                }
+                return state;
+            };
+            Wrapper.prototype.finishWrapping = function (token, state, measurer) {
+                // Token is really long, but we have a space to put part of the word.
+                if (state.canFitText && state.availableLines !== state.wrapping.noLines && this._allowBreakingWords && this._textTrimming !== "none") {
+                    var res = this.addEllipsis(state.currentLine + token, state.availableWidth, measurer);
+                    state.wrapping.wrappedText += res.wrappedToken;
+                    state.wrapping.truncatedText += res.remainingToken;
+                    state.wrapping.noBrokeWords += +(res.remainingToken.length < token.length);
+                    state.wrapping.noLines += +(res.wrappedToken.length > 0);
+                    state.currentLine = "";
+                }
+                else {
+                    state.wrapping.truncatedText += token;
+                }
+                state.canFitText = false;
+                return state;
+            };
+            /**
+             * Breaks single token to fit current line.
+             * If token contains only whitespaces then they will not be populated to next line.
+             */
+            Wrapper.prototype.breakTokenToFitInWidth = function (token, line, availableWidth, measurer, breakingCharacter) {
+                if (breakingCharacter === void 0) { breakingCharacter = this._breakingCharacter; }
+                if (measurer.measure(line + token).width <= availableWidth) {
+                    return {
+                        remainingToken: null,
+                        line: line + token,
+                        breakWord: false
+                    };
+                }
+                if (token.trim() === "") {
+                    return {
+                        remainingToken: "",
+                        line: line,
+                        breakWord: false
+                    };
+                }
+                if (!this._allowBreakingWords) {
+                    return {
+                        remainingToken: token,
+                        line: line,
+                        breakWord: false
+                    };
+                }
+                var fitTokenLength = 0;
+                while (fitTokenLength < token.length) {
+                    if (measurer.measure(line + token.substring(0, fitTokenLength + 1) + breakingCharacter).width <= availableWidth) {
+                        ++fitTokenLength;
+                    }
+                    else {
+                        break;
+                    }
+                }
+                var suffix = "";
+                if (fitTokenLength > 0) {
+                    suffix = breakingCharacter;
+                }
+                return {
+                    remainingToken: token.substring(fitTokenLength),
+                    line: line + token.substring(0, fitTokenLength) + suffix,
+                    breakWord: fitTokenLength > 0
+                };
+            };
+            return Wrapper;
+        })();
+        Wrappers.Wrapper = Wrapper;
+    })(Wrappers = SVGTypewriter.Wrappers || (SVGTypewriter.Wrappers = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+///<reference path="../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Wrappers;
+    (function (Wrappers) {
+        var SingleLineWrapper = (function (_super) {
+            __extends(SingleLineWrapper, _super);
+            function SingleLineWrapper() {
+                _super.apply(this, arguments);
+            }
+            SingleLineWrapper.prototype.wrap = function (text, measurer, width, height) {
+                var _this = this;
+                if (height === void 0) { height = Infinity; }
+                var lines = text.split("\n");
+                if (lines.length > 1) {
+                    throw new Error("SingleLineWrapper is designed to work only on single line");
+                }
+                var wrapFN = function (w) { return _super.prototype.wrap.call(_this, text, measurer, w, height); };
+                var result = wrapFN(width);
+                if (result.noLines < 2) {
+                    return result;
+                }
+                var left = 0;
+                var right = width;
+                for (var i = 0; i < SingleLineWrapper.NO_WRAP_ITERATIONS && right > left; ++i) {
+                    var currentWidth = (right + left) / 2;
+                    var currentResult = wrapFN(currentWidth);
+                    if (this.areSameResults(result, currentResult)) {
+                        right = currentWidth;
+                        result = currentResult;
+                    }
+                    else {
+                        left = currentWidth;
+                    }
+                }
+                return result;
+            };
+            SingleLineWrapper.prototype.areSameResults = function (one, two) {
+                return one.noLines === two.noLines && one.truncatedText === two.truncatedText;
+            };
+            SingleLineWrapper.NO_WRAP_ITERATIONS = 5;
+            return SingleLineWrapper;
+        })(Wrappers.Wrapper);
+        Wrappers.SingleLineWrapper = SingleLineWrapper;
+    })(Wrappers = SVGTypewriter.Wrappers || (SVGTypewriter.Wrappers = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+///<reference path="reference.ts" />
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Writers;
+    (function (Writers) {
+        var Writer = (function () {
+            function Writer(measurer, wrapper) {
+                this._writerID = Writer.nextID++;
+                this._elementID = 0;
+                this.measurer(measurer);
+                if (wrapper) {
+                    this.wrapper(wrapper);
+                }
+                this.addTitleElement(false);
+            }
+            Writer.prototype.measurer = function (newMeasurer) {
+                this._measurer = newMeasurer;
+                return this;
+            };
+            Writer.prototype.wrapper = function (newWrapper) {
+                this._wrapper = newWrapper;
+                return this;
+            };
+            Writer.prototype.addTitleElement = function (add) {
+                this._addTitleElement = add;
+                return this;
+            };
+            Writer.prototype.writeLine = function (line, g, width, xAlign, yOffset) {
+                var textEl = g.append("text");
+                textEl.text(line);
+                var xOffset = width * Writer.XOffsetFactor[xAlign];
+                var anchor = Writer.AnchorConverter[xAlign];
+                textEl.attr("text-anchor", anchor).classed("text-line", true);
+                SVGTypewriter.Utils.DOM.transform(textEl, xOffset, yOffset).attr("y", "-0.25em");
+                ;
+            };
+            Writer.prototype.writeText = function (text, writingArea, width, height, xAlign, yAlign) {
+                var _this = this;
+                var lines = text.split("\n");
+                var lineHeight = this._measurer.measure().height;
+                var yOffset = Writer.YOffsetFactor[yAlign] * (height - lines.length * lineHeight);
+                lines.forEach(function (line, i) {
+                    _this.writeLine(line, writingArea, width, xAlign, (i + 1) * lineHeight + yOffset);
+                });
+            };
+            Writer.prototype.write = function (text, width, height, options) {
+                if (Writer.SupportedRotation.indexOf(options.textRotation) === -1) {
+                    throw new Error("unsupported rotation - " + options.textRotation);
+                }
+                var orientHorizontally = Math.abs(Math.abs(options.textRotation) - 90) > 45;
+                var primaryDimension = orientHorizontally ? width : height;
+                var secondaryDimension = orientHorizontally ? height : width;
+                var textContainer = options.selection.append("g").classed("text-container", true);
+                if (this._addTitleElement) {
+                    textContainer.append("title").text(text);
+                }
+                var textArea = textContainer.append("g").classed("text-area", true);
+                var wrappedText = this._wrapper ? this._wrapper.wrap(text, this._measurer, primaryDimension, secondaryDimension).wrappedText : text;
+                this.writeText(wrappedText, textArea, primaryDimension, secondaryDimension, options.xAlign, options.yAlign);
+                var xForm = d3.transform("");
+                var xForm2 = d3.transform("");
+                xForm.rotate = options.textRotation;
+                switch (options.textRotation) {
+                    case 90:
+                        xForm.translate = [width, 0];
+                        xForm2.rotate = -90;
+                        xForm2.translate = [0, 200];
+                        break;
+                    case -90:
+                        xForm.translate = [0, height];
+                        xForm2.rotate = 90;
+                        xForm2.translate = [width, 0];
+                        break;
+                    case 180:
+                        xForm.translate = [width, height];
+                        xForm2.translate = [width, height];
+                        xForm2.rotate = 180;
+                        break;
+                }
+                textArea.attr("transform", xForm.toString());
+                this.addClipPath(textContainer, xForm2);
+                if (options.animator) {
+                    options.animator.animate(textContainer);
+                }
+            };
+            Writer.prototype.addClipPath = function (selection, transform) {
+                var elementID = this._elementID++;
+                var prefix = /MSIE [5-9]/.test(navigator.userAgent) ? "" : document.location.href;
+                prefix = prefix.split("#")[0]; // To fix cases where an anchor tag was used
+                var clipPathID = "clipPath" + this._writerID + "_" + elementID;
+                selection.select(".text-area").attr("clip-path", "url(\"" + prefix + "#" + clipPathID + "\")");
+                var clipPathParent = selection.append("clipPath").attr("id", clipPathID);
+                var bboxAttrs = SVGTypewriter.Utils.DOM.getBBox(selection.select(".text-area"));
+                var box = clipPathParent.append("rect");
+                box.classed("clip-rect", true).attr({
+                    x: bboxAttrs.x,
+                    y: bboxAttrs.y,
+                    width: bboxAttrs.width,
+                    height: bboxAttrs.height
+                });
+            };
+            Writer.nextID = 0;
+            Writer.SupportedRotation = [-90, 0, 180, 90];
+            Writer.AnchorConverter = {
+                left: "start",
+                center: "middle",
+                right: "end"
+            };
+            Writer.XOffsetFactor = {
+                left: 0,
+                center: 0.5,
+                right: 1
+            };
+            Writer.YOffsetFactor = {
+                top: 0,
+                center: 0.5,
+                bottom: 1
+            };
+            return Writer;
+        })();
+        Writers.Writer = Writer;
+    })(Writers = SVGTypewriter.Writers || (SVGTypewriter.Writers = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+///<reference path="../reference.ts" />
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Measurers;
+    (function (Measurers) {
+        ;
+        var AbstractMeasurer = (function () {
+            function AbstractMeasurer(area, className) {
+                this.textMeasurer = this.getTextMeasurer(area, className);
+            }
+            AbstractMeasurer.prototype.checkSelectionIsText = function (d) {
+                return d[0][0].tagName === "text" || !d.select("text").empty();
+            };
+            AbstractMeasurer.prototype.getTextMeasurer = function (area, className) {
+                var _this = this;
+                if (!this.checkSelectionIsText(area)) {
+                    var textElement = area.append("text");
+                    if (className) {
+                        textElement.classed(className, true);
+                    }
+                    textElement.remove();
+                    return function (text) {
+                        area.node().appendChild(textElement.node());
+                        var areaDimension = _this.measureBBox(textElement, text);
+                        textElement.remove();
+                        return areaDimension;
+                    };
+                }
+                else {
+                    var parentNode = area.node().parentNode;
+                    var textSelection;
+                    if (area[0][0].tagName === "text") {
+                        textSelection = area;
+                    }
+                    else {
+                        textSelection = area.select("text");
+                    }
+                    area.remove();
+                    return function (text) {
+                        parentNode.appendChild(area.node());
+                        var areaDimension = _this.measureBBox(textSelection, text);
+                        area.remove();
+                        return areaDimension;
+                    };
+                }
+            };
+            AbstractMeasurer.prototype.measureBBox = function (d, text) {
+                d.text(text);
+                var bb = SVGTypewriter.Utils.DOM.getBBox(d);
+                return { width: bb.width, height: bb.height };
+            };
+            AbstractMeasurer.prototype.measure = function (text) {
+                if (text === void 0) { text = AbstractMeasurer.HEIGHT_TEXT; }
+                return this.textMeasurer(text);
+            };
+            AbstractMeasurer.HEIGHT_TEXT = "bqpdl";
+            return AbstractMeasurer;
+        })();
+        Measurers.AbstractMeasurer = AbstractMeasurer;
+    })(Measurers = SVGTypewriter.Measurers || (SVGTypewriter.Measurers = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+///<reference path="../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Measurers;
+    (function (Measurers) {
+        var Measurer = (function (_super) {
+            __extends(Measurer, _super);
+            function Measurer(area, className, useGuards) {
+                if (className === void 0) { className = null; }
+                if (useGuards === void 0) { useGuards = false; }
+                _super.call(this, area, className);
+                this.useGuards = useGuards;
+            }
+            // Guards assures same line height and width of whitespaces on both ends.
+            Measurer.prototype._addGuards = function (text) {
+                return Measurers.AbstractMeasurer.HEIGHT_TEXT + text + Measurers.AbstractMeasurer.HEIGHT_TEXT;
+            };
+            Measurer.prototype.getGuardWidth = function () {
+                if (this.guardWidth == null) {
+                    this.guardWidth = _super.prototype.measure.call(this).width;
+                }
+                return this.guardWidth;
+            };
+            Measurer.prototype._measureLine = function (line) {
+                var measuredLine = this.useGuards ? this._addGuards(line) : line;
+                var measuredLineDimensions = _super.prototype.measure.call(this, measuredLine);
+                measuredLineDimensions.width -= this.useGuards ? (2 * this.getGuardWidth()) : 0;
+                return measuredLineDimensions;
+            };
+            Measurer.prototype.measure = function (text) {
+                var _this = this;
+                if (text === void 0) { text = Measurers.AbstractMeasurer.HEIGHT_TEXT; }
+                if (text.trim() === "") {
+                    return { width: 0, height: 0 };
+                }
+                var linesDimensions = text.trim().split("\n").map(function (line) { return _this._measureLine(line); });
+                return {
+                    width: d3.max(linesDimensions, function (dim) { return dim.width; }),
+                    height: d3.sum(linesDimensions, function (dim) { return dim.height; })
+                };
+            };
+            return Measurer;
+        })(Measurers.AbstractMeasurer);
+        Measurers.Measurer = Measurer;
+    })(Measurers = SVGTypewriter.Measurers || (SVGTypewriter.Measurers = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+///<reference path="../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Measurers;
+    (function (Measurers) {
+        var CharacterMeasurer = (function (_super) {
+            __extends(CharacterMeasurer, _super);
+            function CharacterMeasurer() {
+                _super.apply(this, arguments);
+            }
+            CharacterMeasurer.prototype._measureCharacter = function (c) {
+                return _super.prototype._measureLine.call(this, c);
+            };
+            CharacterMeasurer.prototype._measureLine = function (line) {
+                var _this = this;
+                var charactersDimensions = line.split("").map(function (c) { return _this._measureCharacter(c); });
+                return {
+                    width: d3.sum(charactersDimensions, function (dim) { return dim.width; }),
+                    height: d3.max(charactersDimensions, function (dim) { return dim.height; })
+                };
+            };
+            return CharacterMeasurer;
+        })(Measurers.Measurer);
+        Measurers.CharacterMeasurer = CharacterMeasurer;
+    })(Measurers = SVGTypewriter.Measurers || (SVGTypewriter.Measurers = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+///<reference path="../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Measurers;
+    (function (Measurers) {
+        var CacheCharacterMeasurer = (function (_super) {
+            __extends(CacheCharacterMeasurer, _super);
+            function CacheCharacterMeasurer(area, className) {
+                var _this = this;
+                _super.call(this, area, className);
+                this.cache = new SVGTypewriter.Utils.Cache(function (c) { return _this._measureCharacterNotFromCache(c); }, SVGTypewriter.Utils.Methods.objEq);
+            }
+            CacheCharacterMeasurer.prototype._measureCharacterNotFromCache = function (c) {
+                return _super.prototype._measureCharacter.call(this, c);
+            };
+            CacheCharacterMeasurer.prototype._measureCharacter = function (c) {
+                return this.cache.get(c);
+            };
+            CacheCharacterMeasurer.prototype.reset = function () {
+                this.cache.clear();
+            };
+            return CacheCharacterMeasurer;
+        })(Measurers.CharacterMeasurer);
+        Measurers.CacheCharacterMeasurer = CacheCharacterMeasurer;
+    })(Measurers = SVGTypewriter.Measurers || (SVGTypewriter.Measurers = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+return Plottable;
+}));
+
+/*!
+SVG Typewriter 0.3.0 (https://github.com/palantir/svg-typewriter)
+Copyright 2014 Palantir Technologies
+Licensed under MIT (https://github.com/palantir/svg-typewriter/blob/develop/LICENSE)
+*/
+
+///<reference path="../reference.ts" />
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Utils;
+    (function (Utils) {
+        var Methods;
+        (function (Methods) {
+            /**
+             * Check if two arrays are equal by strict equality.
+             */
+            function arrayEq(a, b) {
+                // Technically, null and undefined are arrays too
+                if (a == null || b == null) {
+                    return a === b;
+                }
+                if (a.length !== b.length) {
+                    return false;
+                }
+                for (var i = 0; i < a.length; i++) {
+                    if (a[i] !== b[i]) {
+                        return false;
+                    }
+                }
+                return true;
+            }
+            Methods.arrayEq = arrayEq;
+            /**
+             * @param {any} a Object to check against b for equality.
+             * @param {any} b Object to check against a for equality.
+             *
+             * @returns {boolean} whether or not two objects share the same keys, and
+             *          values associated with those keys. Values will be compared
+             *          with ===.
+             */
+            function objEq(a, b) {
+                if (a == null || b == null) {
+                    return a === b;
+                }
+                var keysA = Object.keys(a).sort();
+                var keysB = Object.keys(b).sort();
+                var valuesA = keysA.map(function (k) { return a[k]; });
+                var valuesB = keysB.map(function (k) { return b[k]; });
+                return arrayEq(keysA, keysB) && arrayEq(valuesA, valuesB);
+            }
+            Methods.objEq = objEq;
+        })(Methods = Utils.Methods || (Utils.Methods = {}));
+    })(Utils = SVGTypewriter.Utils || (SVGTypewriter.Utils = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Utils;
+    (function (Utils) {
+        var DOM;
+        (function (DOM) {
+            function transform(s, x, y) {
+                var xform = d3.transform(s.attr("transform"));
+                if (x == null) {
+                    return xform.translate;
+                }
+                else {
+                    y = (y == null) ? 0 : y;
+                    xform.translate[0] = x;
+                    xform.translate[1] = y;
+                    s.attr("transform", xform.toString());
+                    return s;
+                }
+            }
+            DOM.transform = transform;
+            function getBBox(element) {
+                var bbox;
+                try {
+                    bbox = element.node().getBBox();
+                }
+                catch (err) {
+                    bbox = {
+                        x: 0,
+                        y: 0,
+                        width: 0,
+                        height: 0
+                    };
+                }
+                return bbox;
+            }
+            DOM.getBBox = getBBox;
+        })(DOM = Utils.DOM || (Utils.DOM = {}));
+    })(Utils = SVGTypewriter.Utils || (SVGTypewriter.Utils = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+///<reference path="../reference.ts" />
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Utils;
+    (function (Utils) {
+        var Cache = (function () {
+            /**
+             * @constructor
+             *
+             * @param {string} compute The function whose results will be cached.
+             * @param {(v: T, w: T) => boolean} [valueEq]
+             *        Used to determine if the value of canonicalKey has changed.
+             *        If omitted, defaults to === comparision.
+             */
+            function Cache(compute, valueEq) {
+                if (valueEq === void 0) { valueEq = function (v, w) { return v === w; }; }
+                this.cache = d3.map();
+                this.compute = compute;
+                this.valueEq = valueEq;
+            }
+            /**
+             * Attempt to look up k in the cache, computing the result if it isn't
+             * found.
+             *
+             * @param {string} k The key to look up in the cache.
+             * @return {T} The value associated with k; the result of compute(k).
+             */
+            Cache.prototype.get = function (k) {
+                if (!this.cache.has(k)) {
+                    this.cache.set(k, this.compute(k));
+                }
+                return this.cache.get(k);
+            };
+            /**
+             * Reset the cache empty.
+             *
+             * @return {Cache<T>} The calling Cache.
+             */
+            Cache.prototype.clear = function () {
+                this.cache = d3.map();
+                return this;
+            };
+            return Cache;
+        })();
+        Utils.Cache = Cache;
+    })(Utils = SVGTypewriter.Utils || (SVGTypewriter.Utils = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+///<reference path="../reference.ts" />
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Utils;
+    (function (Utils) {
+        var Tokenizer = (function () {
+            function Tokenizer() {
+                this.WordDividerRegExp = new RegExp("\\W");
+                this.WhitespaceRegExp = new RegExp("\\s");
+            }
+            Tokenizer.prototype.tokenize = function (line) {
+                var _this = this;
+                return line.split("").reduce(function (tokens, c) { return tokens.slice(0, -1).concat(_this.shouldCreateNewToken(tokens[tokens.length - 1], c)); }, [""]);
+            };
+            Tokenizer.prototype.shouldCreateNewToken = function (token, newCharacter) {
+                if (!token) {
+                    return [newCharacter];
+                }
+                var lastCharacter = token[token.length - 1];
+                if (this.WhitespaceRegExp.test(lastCharacter) && this.WhitespaceRegExp.test(newCharacter)) {
+                    return [token + newCharacter];
+                }
+                else if (this.WhitespaceRegExp.test(lastCharacter) || this.WhitespaceRegExp.test(newCharacter)) {
+                    return [token, newCharacter];
+                }
+                else if (!(this.WordDividerRegExp.test(lastCharacter) || this.WordDividerRegExp.test(newCharacter))) {
+                    return [token + newCharacter];
+                }
+                else if (lastCharacter === newCharacter) {
+                    return [token + newCharacter];
+                }
+                else {
+                    return [token, newCharacter];
+                }
+            };
+            return Tokenizer;
+        })();
+        Utils.Tokenizer = Tokenizer;
+    })(Utils = SVGTypewriter.Utils || (SVGTypewriter.Utils = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+///<reference path="../reference.ts" />
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Utils;
+    (function (Utils) {
+        var StringMethods;
+        (function (StringMethods) {
+            /**
+             * Treat all sequences of consecutive whitespace as a single " ".
+             */
+            function combineWhitespace(str) {
+                return str.replace(/\s+/g, " ");
+            }
+            StringMethods.combineWhitespace = combineWhitespace;
+            function isNotEmptyString(str) {
+                return str && str.trim() !== "";
+            }
+            StringMethods.isNotEmptyString = isNotEmptyString;
+            function trimStart(str, c) {
+                if (!str) {
+                    return str;
+                }
+                var chars = str.split("");
+                var reduceFunction = c ? function (s) { return s.split(c).some(isNotEmptyString); } : isNotEmptyString;
+                return chars.reduce(function (s, c) { return reduceFunction(s + c) ? s + c : s; }, "");
+            }
+            StringMethods.trimStart = trimStart;
+            function trimEnd(str, c) {
+                if (!str) {
+                    return str;
+                }
+                var reversedChars = str.split("");
+                reversedChars.reverse();
+                reversedChars = trimStart(reversedChars.join(""), c).split("");
+                reversedChars.reverse();
+                return reversedChars.join("");
+            }
+            StringMethods.trimEnd = trimEnd;
+        })(StringMethods = Utils.StringMethods || (Utils.StringMethods = {}));
+    })(Utils = SVGTypewriter.Utils || (SVGTypewriter.Utils = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+///<reference path="../reference.ts" />
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Animators;
+    (function (Animators) {
+        var BaseAnimator = (function () {
+            function BaseAnimator() {
+                this.duration(BaseAnimator.DEFAULT_DURATION_MILLISECONDS);
+                this.delay(0);
+                this.easing(BaseAnimator.DEFAULT_EASING);
+                this.moveX(0);
+                this.moveY(0);
+            }
+            BaseAnimator.prototype.animate = function (selection) {
+                var xForm = d3.transform("");
+                xForm.translate = [this.moveX(), this.moveY()];
+                selection.attr("transform", xForm.toString());
+                xForm.translate = [0, 0];
+                return this._animate(selection, { transform: xForm.toString() });
+            };
+            BaseAnimator.prototype._animate = function (selection, attr) {
+                return selection.transition().ease(this.easing()).duration(this.duration()).delay(this.delay()).attr(attr);
+            };
+            BaseAnimator.prototype.duration = function (duration) {
+                if (duration == null) {
+                    return this._duration;
+                }
+                else {
+                    this._duration = duration;
+                    return this;
+                }
+            };
+            BaseAnimator.prototype.moveX = function (shift) {
+                if (shift == null) {
+                    return this._moveX;
+                }
+                else {
+                    this._moveX = shift;
+                    return this;
+                }
+            };
+            BaseAnimator.prototype.moveY = function (shift) {
+                if (shift == null) {
+                    return this._moveY;
+                }
+                else {
+                    this._moveY = shift;
+                    return this;
+                }
+            };
+            BaseAnimator.prototype.delay = function (delay) {
+                if (delay == null) {
+                    return this._delay;
+                }
+                else {
+                    this._delay = delay;
+                    return this;
+                }
+            };
+            BaseAnimator.prototype.easing = function (easing) {
+                if (easing == null) {
+                    return this._easing;
+                }
+                else {
+                    this._easing = easing;
+                    return this;
+                }
+            };
+            /**
+             * The default duration of the animation in milliseconds
+             */
+            BaseAnimator.DEFAULT_DURATION_MILLISECONDS = 300;
+            /**
+             * The default easing of the animation
+             */
+            BaseAnimator.DEFAULT_EASING = "exp-out";
+            return BaseAnimator;
+        })();
+        Animators.BaseAnimator = BaseAnimator;
+    })(Animators = SVGTypewriter.Animators || (SVGTypewriter.Animators = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+///<reference path="../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Animators;
+    (function (Animators) {
+        var UnveilAnimator = (function (_super) {
+            __extends(UnveilAnimator, _super);
+            function UnveilAnimator() {
+                this.direction("bottom");
+                _super.call(this);
+            }
+            UnveilAnimator.prototype.direction = function (direction) {
+                if (direction == null) {
+                    return this._direction;
+                }
+                else {
+                    if (UnveilAnimator.SupportedDirections.indexOf(direction) === -1) {
+                        throw new Error("unsupported direction - " + direction);
+                    }
+                    this._direction = direction;
+                    return this;
+                }
+            };
+            UnveilAnimator.prototype.animate = function (selection) {
+                var attr = SVGTypewriter.Utils.DOM.getBBox(selection);
+                var mask = selection.select(".clip-rect");
+                mask.attr("width", 0);
+                mask.attr("height", 0);
+                switch (this._direction) {
+                    case "top":
+                        mask.attr("y", attr.y + attr.height);
+                        mask.attr("x", attr.x);
+                        mask.attr("width", attr.width);
+                        break;
+                    case "bottom":
+                        mask.attr("y", attr.y);
+                        mask.attr("x", attr.x);
+                        mask.attr("width", attr.width);
+                        break;
+                    case "left":
+                        mask.attr("y", attr.y);
+                        mask.attr("x", attr.x);
+                        mask.attr("height", attr.height);
+                        break;
+                    case "right":
+                        mask.attr("y", attr.y);
+                        mask.attr("x", attr.x + attr.width);
+                        mask.attr("height", attr.height);
+                        break;
+                }
+                this._animate(mask, attr);
+                return _super.prototype.animate.call(this, selection);
+            };
+            UnveilAnimator.SupportedDirections = ["top", "bottom", "left", "right"];
+            return UnveilAnimator;
+        })(Animators.BaseAnimator);
+        Animators.UnveilAnimator = UnveilAnimator;
+    })(Animators = SVGTypewriter.Animators || (SVGTypewriter.Animators = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+///<reference path="../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Animators;
+    (function (Animators) {
+        var OpacityAnimator = (function (_super) {
+            __extends(OpacityAnimator, _super);
+            function OpacityAnimator() {
+                _super.apply(this, arguments);
+            }
+            OpacityAnimator.prototype.animate = function (selection) {
+                var area = selection.select(".text-area");
+                area.attr("opacity", 0);
+                var attr = {
+                    opacity: 1
+                };
+                this._animate(area, attr);
+                return _super.prototype.animate.call(this, selection);
+            };
+            return OpacityAnimator;
+        })(Animators.BaseAnimator);
+        Animators.OpacityAnimator = OpacityAnimator;
+    })(Animators = SVGTypewriter.Animators || (SVGTypewriter.Animators = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+///<reference path="../reference.ts" />
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Wrappers;
+    (function (Wrappers) {
+        var Wrapper = (function () {
+            function Wrapper() {
+                this.maxLines(Infinity);
+                this.textTrimming("ellipsis");
+                this.allowBreakingWords(true);
+                this._tokenizer = new SVGTypewriter.Utils.Tokenizer();
+                this._breakingCharacter = "-";
+            }
+            Wrapper.prototype.maxLines = function (noLines) {
+                if (noLines == null) {
+                    return this._maxLines;
+                }
+                else {
+                    this._maxLines = noLines;
+                    return this;
+                }
+            };
+            Wrapper.prototype.textTrimming = function (option) {
+                if (option == null) {
+                    return this._textTrimming;
+                }
+                else {
+                    if (option !== "ellipsis" && option !== "none") {
+                        throw new Error(option + " - unsupported text trimming option.");
+                    }
+                    this._textTrimming = option;
+                    return this;
+                }
+            };
+            Wrapper.prototype.allowBreakingWords = function (allow) {
+                if (allow == null) {
+                    return this._allowBreakingWords;
+                }
+                else {
+                    this._allowBreakingWords = allow;
+                    return this;
+                }
+            };
+            Wrapper.prototype.wrap = function (text, measurer, width, height) {
+                var _this = this;
+                if (height === void 0) { height = Infinity; }
+                var initialWrappingResult = {
+                    originalText: text,
+                    wrappedText: "",
+                    noLines: 0,
+                    noBrokeWords: 0,
+                    truncatedText: ""
+                };
+                var state = {
+                    wrapping: initialWrappingResult,
+                    currentLine: "",
+                    availableWidth: width,
+                    availableLines: Math.min(Math.floor(height / measurer.measure().height), this._maxLines),
+                    canFitText: true
+                };
+                var lines = text.split("\n");
+                return lines.reduce(function (state, line, i) { return _this.breakLineToFitWidth(state, line, i !== lines.length - 1, measurer); }, state).wrapping;
+            };
+            Wrapper.prototype.breakLineToFitWidth = function (state, line, hasNextLine, measurer) {
+                var _this = this;
+                if (!state.canFitText && state.wrapping.truncatedText !== "") {
+                    state.wrapping.truncatedText += "\n";
+                }
+                var tokens = this._tokenizer.tokenize(line);
+                state = tokens.reduce(function (state, token) { return _this.wrapNextToken(token, state, measurer); }, state);
+                var wrappedText = SVGTypewriter.Utils.StringMethods.trimEnd(state.currentLine);
+                state.wrapping.noLines += +(wrappedText !== "");
+                if (state.wrapping.noLines === state.availableLines && this._textTrimming !== "none" && hasNextLine) {
+                    var ellipsisResult = this.addEllipsis(wrappedText, state.availableWidth, measurer);
+                    state.wrapping.wrappedText += ellipsisResult.wrappedToken;
+                    state.wrapping.truncatedText += ellipsisResult.remainingToken;
+                    state.canFitText = false;
+                }
+                else {
+                    state.wrapping.wrappedText += wrappedText;
+                }
+                state.currentLine = "\n";
+                return state;
+            };
+            Wrapper.prototype.canFitToken = function (token, width, measurer) {
+                var _this = this;
+                var possibleBreaks = this._allowBreakingWords ? token.split("").map(function (c, i) { return (i !== token.length - 1) ? c + _this._breakingCharacter : c; }) : [token];
+                return (measurer.measure(token).width <= width) || possibleBreaks.every(function (c) { return measurer.measure(c).width <= width; });
+            };
+            Wrapper.prototype.addEllipsis = function (line, width, measurer) {
+                if (this._textTrimming === "none") {
+                    return {
+                        wrappedToken: line,
+                        remainingToken: ""
+                    };
+                }
+                var truncatedLine = line.substring(0).trim();
+                var lineWidth = measurer.measure(truncatedLine).width;
+                var ellipsesWidth = measurer.measure("...").width;
+                var prefix = (line.length > 0 && line[0] === "\n") ? "\n" : "";
+                if (width <= ellipsesWidth) {
+                    var periodWidth = ellipsesWidth / 3;
+                    var numPeriodsThatFit = Math.floor(width / periodWidth);
+                    return {
+                        wrappedToken: prefix + "...".substr(0, numPeriodsThatFit),
+                        remainingToken: line
+                    };
+                }
+                while (lineWidth + ellipsesWidth > width) {
+                    truncatedLine = SVGTypewriter.Utils.StringMethods.trimEnd(truncatedLine.substr(0, truncatedLine.length - 1));
+                    lineWidth = measurer.measure(truncatedLine).width;
+                }
+                return {
+                    wrappedToken: prefix + truncatedLine + "...",
+                    remainingToken: SVGTypewriter.Utils.StringMethods.trimEnd(line.substring(truncatedLine.length), "-").trim()
+                };
+            };
+            Wrapper.prototype.wrapNextToken = function (token, state, measurer) {
+                if (!state.canFitText || state.availableLines === state.wrapping.noLines || !this.canFitToken(token, state.availableWidth, measurer)) {
+                    return this.finishWrapping(token, state, measurer);
+                }
+                var remainingToken = token;
+                while (remainingToken) {
+                    var result = this.breakTokenToFitInWidth(remainingToken, state.currentLine, state.availableWidth, measurer);
+                    state.currentLine = result.line;
+                    remainingToken = result.remainingToken;
+                    if (remainingToken != null) {
+                        state.wrapping.noBrokeWords += +result.breakWord;
+                        ++state.wrapping.noLines;
+                        if (state.availableLines === state.wrapping.noLines) {
+                            var ellipsisResult = this.addEllipsis(state.currentLine, state.availableWidth, measurer);
+                            state.wrapping.wrappedText += ellipsisResult.wrappedToken;
+                            state.wrapping.truncatedText += ellipsisResult.remainingToken + remainingToken;
+                            state.currentLine = "\n";
+                            return state;
+                        }
+                        else {
+                            state.wrapping.wrappedText += SVGTypewriter.Utils.StringMethods.trimEnd(state.currentLine);
+                            state.currentLine = "\n";
+                        }
+                    }
+                }
+                return state;
+            };
+            Wrapper.prototype.finishWrapping = function (token, state, measurer) {
+                // Token is really long, but we have a space to put part of the word.
+                if (state.canFitText && state.availableLines !== state.wrapping.noLines && this._allowBreakingWords && this._textTrimming !== "none") {
+                    var res = this.addEllipsis(state.currentLine + token, state.availableWidth, measurer);
+                    state.wrapping.wrappedText += res.wrappedToken;
+                    state.wrapping.truncatedText += res.remainingToken;
+                    state.wrapping.noBrokeWords += +(res.remainingToken.length < token.length);
+                    state.wrapping.noLines += +(res.wrappedToken.length > 0);
+                    state.currentLine = "";
+                }
+                else {
+                    state.wrapping.truncatedText += token;
+                }
+                state.canFitText = false;
+                return state;
+            };
+            /**
+             * Breaks single token to fit current line.
+             * If token contains only whitespaces then they will not be populated to next line.
+             */
+            Wrapper.prototype.breakTokenToFitInWidth = function (token, line, availableWidth, measurer, breakingCharacter) {
+                if (breakingCharacter === void 0) { breakingCharacter = this._breakingCharacter; }
+                if (measurer.measure(line + token).width <= availableWidth) {
+                    return {
+                        remainingToken: null,
+                        line: line + token,
+                        breakWord: false
+                    };
+                }
+                if (token.trim() === "") {
+                    return {
+                        remainingToken: "",
+                        line: line,
+                        breakWord: false
+                    };
+                }
+                if (!this._allowBreakingWords) {
+                    return {
+                        remainingToken: token,
+                        line: line,
+                        breakWord: false
+                    };
+                }
+                var fitTokenLength = 0;
+                while (fitTokenLength < token.length) {
+                    if (measurer.measure(line + token.substring(0, fitTokenLength + 1) + breakingCharacter).width <= availableWidth) {
+                        ++fitTokenLength;
+                    }
+                    else {
+                        break;
+                    }
+                }
+                var suffix = "";
+                if (fitTokenLength > 0) {
+                    suffix = breakingCharacter;
+                }
+                return {
+                    remainingToken: token.substring(fitTokenLength),
+                    line: line + token.substring(0, fitTokenLength) + suffix,
+                    breakWord: fitTokenLength > 0
+                };
+            };
+            return Wrapper;
+        })();
+        Wrappers.Wrapper = Wrapper;
+    })(Wrappers = SVGTypewriter.Wrappers || (SVGTypewriter.Wrappers = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+///<reference path="../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Wrappers;
+    (function (Wrappers) {
+        var SingleLineWrapper = (function (_super) {
+            __extends(SingleLineWrapper, _super);
+            function SingleLineWrapper() {
+                _super.apply(this, arguments);
+            }
+            SingleLineWrapper.prototype.wrap = function (text, measurer, width, height) {
+                var _this = this;
+                if (height === void 0) { height = Infinity; }
+                var lines = text.split("\n");
+                if (lines.length > 1) {
+                    throw new Error("SingleLineWrapper is designed to work only on single line");
+                }
+                var wrapFN = function (w) { return _super.prototype.wrap.call(_this, text, measurer, w, height); };
+                var result = wrapFN(width);
+                if (result.noLines < 2) {
+                    return result;
+                }
+                var left = 0;
+                var right = width;
+                for (var i = 0; i < SingleLineWrapper.NO_WRAP_ITERATIONS && right > left; ++i) {
+                    var currentWidth = (right + left) / 2;
+                    var currentResult = wrapFN(currentWidth);
+                    if (this.areSameResults(result, currentResult)) {
+                        right = currentWidth;
+                        result = currentResult;
+                    }
+                    else {
+                        left = currentWidth;
+                    }
+                }
+                return result;
+            };
+            SingleLineWrapper.prototype.areSameResults = function (one, two) {
+                return one.noLines === two.noLines && one.truncatedText === two.truncatedText;
+            };
+            SingleLineWrapper.NO_WRAP_ITERATIONS = 5;
+            return SingleLineWrapper;
+        })(Wrappers.Wrapper);
+        Wrappers.SingleLineWrapper = SingleLineWrapper;
+    })(Wrappers = SVGTypewriter.Wrappers || (SVGTypewriter.Wrappers = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+///<reference path="reference.ts" />
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Writers;
+    (function (Writers) {
+        var Writer = (function () {
+            function Writer(measurer, wrapper) {
+                this._writerID = Writer.nextID++;
+                this._elementID = 0;
+                this.measurer(measurer);
+                if (wrapper) {
+                    this.wrapper(wrapper);
+                }
+                this.addTitleElement(false);
+            }
+            Writer.prototype.measurer = function (newMeasurer) {
+                this._measurer = newMeasurer;
+                return this;
+            };
+            Writer.prototype.wrapper = function (newWrapper) {
+                this._wrapper = newWrapper;
+                return this;
+            };
+            Writer.prototype.addTitleElement = function (add) {
+                this._addTitleElement = add;
+                return this;
+            };
+            Writer.prototype.writeLine = function (line, g, width, xAlign, yOffset) {
+                var textEl = g.append("text");
+                textEl.text(line);
+                var xOffset = width * Writer.XOffsetFactor[xAlign];
+                var anchor = Writer.AnchorConverter[xAlign];
+                textEl.attr("text-anchor", anchor).classed("text-line", true);
+                SVGTypewriter.Utils.DOM.transform(textEl, xOffset, yOffset).attr("y", "-0.25em");
+                ;
+            };
+            Writer.prototype.writeText = function (text, writingArea, width, height, xAlign, yAlign) {
+                var _this = this;
+                var lines = text.split("\n");
+                var lineHeight = this._measurer.measure().height;
+                var yOffset = Writer.YOffsetFactor[yAlign] * (height - lines.length * lineHeight);
+                lines.forEach(function (line, i) {
+                    _this.writeLine(line, writingArea, width, xAlign, (i + 1) * lineHeight + yOffset);
+                });
+            };
+            Writer.prototype.write = function (text, width, height, options) {
+                if (Writer.SupportedRotation.indexOf(options.textRotation) === -1) {
+                    throw new Error("unsupported rotation - " + options.textRotation);
+                }
+                var orientHorizontally = Math.abs(Math.abs(options.textRotation) - 90) > 45;
+                var primaryDimension = orientHorizontally ? width : height;
+                var secondaryDimension = orientHorizontally ? height : width;
+                var textContainer = options.selection.append("g").classed("text-container", true);
+                if (this._addTitleElement) {
+                    textContainer.append("title").text(text);
+                }
+                var textArea = textContainer.append("g").classed("text-area", true);
+                var wrappedText = this._wrapper ? this._wrapper.wrap(text, this._measurer, primaryDimension, secondaryDimension).wrappedText : text;
+                this.writeText(wrappedText, textArea, primaryDimension, secondaryDimension, options.xAlign, options.yAlign);
+                var xForm = d3.transform("");
+                var xForm2 = d3.transform("");
+                xForm.rotate = options.textRotation;
+                switch (options.textRotation) {
+                    case 90:
+                        xForm.translate = [width, 0];
+                        xForm2.rotate = -90;
+                        xForm2.translate = [0, 200];
+                        break;
+                    case -90:
+                        xForm.translate = [0, height];
+                        xForm2.rotate = 90;
+                        xForm2.translate = [width, 0];
+                        break;
+                    case 180:
+                        xForm.translate = [width, height];
+                        xForm2.translate = [width, height];
+                        xForm2.rotate = 180;
+                        break;
+                }
+                textArea.attr("transform", xForm.toString());
+                this.addClipPath(textContainer, xForm2);
+                if (options.animator) {
+                    options.animator.animate(textContainer);
+                }
+            };
+            Writer.prototype.addClipPath = function (selection, transform) {
+                var elementID = this._elementID++;
+                var prefix = /MSIE [5-9]/.test(navigator.userAgent) ? "" : document.location.href;
+                prefix = prefix.split("#")[0]; // To fix cases where an anchor tag was used
+                var clipPathID = "clipPath" + this._writerID + "_" + elementID;
+                selection.select(".text-area").attr("clip-path", "url(\"" + prefix + "#" + clipPathID + "\")");
+                var clipPathParent = selection.append("clipPath").attr("id", clipPathID);
+                var bboxAttrs = SVGTypewriter.Utils.DOM.getBBox(selection.select(".text-area"));
+                var box = clipPathParent.append("rect");
+                box.classed("clip-rect", true).attr({
+                    x: bboxAttrs.x,
+                    y: bboxAttrs.y,
+                    width: bboxAttrs.width,
+                    height: bboxAttrs.height
+                });
+            };
+            Writer.nextID = 0;
+            Writer.SupportedRotation = [-90, 0, 180, 90];
+            Writer.AnchorConverter = {
+                left: "start",
+                center: "middle",
+                right: "end"
+            };
+            Writer.XOffsetFactor = {
+                left: 0,
+                center: 0.5,
+                right: 1
+            };
+            Writer.YOffsetFactor = {
+                top: 0,
+                center: 0.5,
+                bottom: 1
+            };
+            return Writer;
+        })();
+        Writers.Writer = Writer;
+    })(Writers = SVGTypewriter.Writers || (SVGTypewriter.Writers = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+///<reference path="../reference.ts" />
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Measurers;
+    (function (Measurers) {
+        ;
+        var AbstractMeasurer = (function () {
+            function AbstractMeasurer(area, className) {
+                this.textMeasurer = this.getTextMeasurer(area, className);
+            }
+            AbstractMeasurer.prototype.checkSelectionIsText = function (d) {
+                return d[0][0].tagName === "text" || !d.select("text").empty();
+            };
+            AbstractMeasurer.prototype.getTextMeasurer = function (area, className) {
+                var _this = this;
+                if (!this.checkSelectionIsText(area)) {
+                    var textElement = area.append("text");
+                    if (className) {
+                        textElement.classed(className, true);
+                    }
+                    textElement.remove();
+                    return function (text) {
+                        area.node().appendChild(textElement.node());
+                        var areaDimension = _this.measureBBox(textElement, text);
+                        textElement.remove();
+                        return areaDimension;
+                    };
+                }
+                else {
+                    var parentNode = area.node().parentNode;
+                    var textSelection;
+                    if (area[0][0].tagName === "text") {
+                        textSelection = area;
+                    }
+                    else {
+                        textSelection = area.select("text");
+                    }
+                    area.remove();
+                    return function (text) {
+                        parentNode.appendChild(area.node());
+                        var areaDimension = _this.measureBBox(textSelection, text);
+                        area.remove();
+                        return areaDimension;
+                    };
+                }
+            };
+            AbstractMeasurer.prototype.measureBBox = function (d, text) {
+                d.text(text);
+                var bb = SVGTypewriter.Utils.DOM.getBBox(d);
+                return { width: bb.width, height: bb.height };
+            };
+            AbstractMeasurer.prototype.measure = function (text) {
+                if (text === void 0) { text = AbstractMeasurer.HEIGHT_TEXT; }
+                return this.textMeasurer(text);
+            };
+            AbstractMeasurer.HEIGHT_TEXT = "bqpdl";
+            return AbstractMeasurer;
+        })();
+        Measurers.AbstractMeasurer = AbstractMeasurer;
+    })(Measurers = SVGTypewriter.Measurers || (SVGTypewriter.Measurers = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+///<reference path="../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Measurers;
+    (function (Measurers) {
+        var Measurer = (function (_super) {
+            __extends(Measurer, _super);
+            function Measurer(area, className, useGuards) {
+                if (className === void 0) { className = null; }
+                if (useGuards === void 0) { useGuards = false; }
+                _super.call(this, area, className);
+                this.useGuards = useGuards;
+            }
+            // Guards assures same line height and width of whitespaces on both ends.
+            Measurer.prototype._addGuards = function (text) {
+                return Measurers.AbstractMeasurer.HEIGHT_TEXT + text + Measurers.AbstractMeasurer.HEIGHT_TEXT;
+            };
+            Measurer.prototype.getGuardWidth = function () {
+                if (this.guardWidth == null) {
+                    this.guardWidth = _super.prototype.measure.call(this).width;
+                }
+                return this.guardWidth;
+            };
+            Measurer.prototype._measureLine = function (line) {
+                var measuredLine = this.useGuards ? this._addGuards(line) : line;
+                var measuredLineDimensions = _super.prototype.measure.call(this, measuredLine);
+                measuredLineDimensions.width -= this.useGuards ? (2 * this.getGuardWidth()) : 0;
+                return measuredLineDimensions;
+            };
+            Measurer.prototype.measure = function (text) {
+                var _this = this;
+                if (text === void 0) { text = Measurers.AbstractMeasurer.HEIGHT_TEXT; }
+                if (text.trim() === "") {
+                    return { width: 0, height: 0 };
+                }
+                var linesDimensions = text.trim().split("\n").map(function (line) { return _this._measureLine(line); });
+                return {
+                    width: d3.max(linesDimensions, function (dim) { return dim.width; }),
+                    height: d3.sum(linesDimensions, function (dim) { return dim.height; })
+                };
+            };
+            return Measurer;
+        })(Measurers.AbstractMeasurer);
+        Measurers.Measurer = Measurer;
+    })(Measurers = SVGTypewriter.Measurers || (SVGTypewriter.Measurers = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+///<reference path="../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Measurers;
+    (function (Measurers) {
+        var CharacterMeasurer = (function (_super) {
+            __extends(CharacterMeasurer, _super);
+            function CharacterMeasurer() {
+                _super.apply(this, arguments);
+            }
+            CharacterMeasurer.prototype._measureCharacter = function (c) {
+                return _super.prototype._measureLine.call(this, c);
+            };
+            CharacterMeasurer.prototype._measureLine = function (line) {
+                var _this = this;
+                var charactersDimensions = line.split("").map(function (c) { return _this._measureCharacter(c); });
+                return {
+                    width: d3.sum(charactersDimensions, function (dim) { return dim.width; }),
+                    height: d3.max(charactersDimensions, function (dim) { return dim.height; })
+                };
+            };
+            return CharacterMeasurer;
+        })(Measurers.Measurer);
+        Measurers.CharacterMeasurer = CharacterMeasurer;
+    })(Measurers = SVGTypewriter.Measurers || (SVGTypewriter.Measurers = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+///<reference path="../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Measurers;
+    (function (Measurers) {
+        var CacheCharacterMeasurer = (function (_super) {
+            __extends(CacheCharacterMeasurer, _super);
+            function CacheCharacterMeasurer(area, className) {
+                var _this = this;
+                _super.call(this, area, className);
+                this.cache = new SVGTypewriter.Utils.Cache(function (c) { return _this._measureCharacterNotFromCache(c); }, SVGTypewriter.Utils.Methods.objEq);
+            }
+            CacheCharacterMeasurer.prototype._measureCharacterNotFromCache = function (c) {
+                return _super.prototype._measureCharacter.call(this, c);
+            };
+            CacheCharacterMeasurer.prototype._measureCharacter = function (c) {
+                return this.cache.get(c);
+            };
+            CacheCharacterMeasurer.prototype.reset = function () {
+                this.cache.clear();
+            };
+            return CacheCharacterMeasurer;
+        })(Measurers.CharacterMeasurer);
+        Measurers.CacheCharacterMeasurer = CacheCharacterMeasurer;
+    })(Measurers = SVGTypewriter.Measurers || (SVGTypewriter.Measurers = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+return Plottable;
+}));
+
+/*!
+SVG Typewriter 0.3.0 (https://github.com/palantir/svg-typewriter)
+Copyright 2014 Palantir Technologies
+Licensed under MIT (https://github.com/palantir/svg-typewriter/blob/develop/LICENSE)
+*/
+
+///<reference path="../reference.ts" />
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Utils;
+    (function (Utils) {
+        var Methods;
+        (function (Methods) {
+            /**
+             * Check if two arrays are equal by strict equality.
+             */
+            function arrayEq(a, b) {
+                // Technically, null and undefined are arrays too
+                if (a == null || b == null) {
+                    return a === b;
+                }
+                if (a.length !== b.length) {
+                    return false;
+                }
+                for (var i = 0; i < a.length; i++) {
+                    if (a[i] !== b[i]) {
+                        return false;
+                    }
+                }
+                return true;
+            }
+            Methods.arrayEq = arrayEq;
+            /**
+             * @param {any} a Object to check against b for equality.
+             * @param {any} b Object to check against a for equality.
+             *
+             * @returns {boolean} whether or not two objects share the same keys, and
+             *          values associated with those keys. Values will be compared
+             *          with ===.
+             */
+            function objEq(a, b) {
+                if (a == null || b == null) {
+                    return a === b;
+                }
+                var keysA = Object.keys(a).sort();
+                var keysB = Object.keys(b).sort();
+                var valuesA = keysA.map(function (k) { return a[k]; });
+                var valuesB = keysB.map(function (k) { return b[k]; });
+                return arrayEq(keysA, keysB) && arrayEq(valuesA, valuesB);
+            }
+            Methods.objEq = objEq;
+        })(Methods = Utils.Methods || (Utils.Methods = {}));
+    })(Utils = SVGTypewriter.Utils || (SVGTypewriter.Utils = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Utils;
+    (function (Utils) {
+        var DOM;
+        (function (DOM) {
+            function transform(s, x, y) {
+                var xform = d3.transform(s.attr("transform"));
+                if (x == null) {
+                    return xform.translate;
+                }
+                else {
+                    y = (y == null) ? 0 : y;
+                    xform.translate[0] = x;
+                    xform.translate[1] = y;
+                    s.attr("transform", xform.toString());
+                    return s;
+                }
+            }
+            DOM.transform = transform;
+            function getBBox(element) {
+                var bbox;
+                try {
+                    bbox = element.node().getBBox();
+                }
+                catch (err) {
+                    bbox = {
+                        x: 0,
+                        y: 0,
+                        width: 0,
+                        height: 0
+                    };
+                }
+                return bbox;
+            }
+            DOM.getBBox = getBBox;
+        })(DOM = Utils.DOM || (Utils.DOM = {}));
+    })(Utils = SVGTypewriter.Utils || (SVGTypewriter.Utils = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+///<reference path="../reference.ts" />
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Utils;
+    (function (Utils) {
+        var Cache = (function () {
+            /**
+             * @constructor
+             *
+             * @param {string} compute The function whose results will be cached.
+             * @param {(v: T, w: T) => boolean} [valueEq]
+             *        Used to determine if the value of canonicalKey has changed.
+             *        If omitted, defaults to === comparision.
+             */
+            function Cache(compute, valueEq) {
+                if (valueEq === void 0) { valueEq = function (v, w) { return v === w; }; }
+                this.cache = d3.map();
+                this.compute = compute;
+                this.valueEq = valueEq;
+            }
+            /**
+             * Attempt to look up k in the cache, computing the result if it isn't
+             * found.
+             *
+             * @param {string} k The key to look up in the cache.
+             * @return {T} The value associated with k; the result of compute(k).
+             */
+            Cache.prototype.get = function (k) {
+                if (!this.cache.has(k)) {
+                    this.cache.set(k, this.compute(k));
+                }
+                return this.cache.get(k);
+            };
+            /**
+             * Reset the cache empty.
+             *
+             * @return {Cache<T>} The calling Cache.
+             */
+            Cache.prototype.clear = function () {
+                this.cache = d3.map();
+                return this;
+            };
+            return Cache;
+        })();
+        Utils.Cache = Cache;
+    })(Utils = SVGTypewriter.Utils || (SVGTypewriter.Utils = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+///<reference path="../reference.ts" />
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Utils;
+    (function (Utils) {
+        var Tokenizer = (function () {
+            function Tokenizer() {
+                this.WordDividerRegExp = new RegExp("\\W");
+                this.WhitespaceRegExp = new RegExp("\\s");
+            }
+            Tokenizer.prototype.tokenize = function (line) {
+                var _this = this;
+                return line.split("").reduce(function (tokens, c) { return tokens.slice(0, -1).concat(_this.shouldCreateNewToken(tokens[tokens.length - 1], c)); }, [""]);
+            };
+            Tokenizer.prototype.shouldCreateNewToken = function (token, newCharacter) {
+                if (!token) {
+                    return [newCharacter];
+                }
+                var lastCharacter = token[token.length - 1];
+                if (this.WhitespaceRegExp.test(lastCharacter) && this.WhitespaceRegExp.test(newCharacter)) {
+                    return [token + newCharacter];
+                }
+                else if (this.WhitespaceRegExp.test(lastCharacter) || this.WhitespaceRegExp.test(newCharacter)) {
+                    return [token, newCharacter];
+                }
+                else if (!(this.WordDividerRegExp.test(lastCharacter) || this.WordDividerRegExp.test(newCharacter))) {
+                    return [token + newCharacter];
+                }
+                else if (lastCharacter === newCharacter) {
+                    return [token + newCharacter];
+                }
+                else {
+                    return [token, newCharacter];
+                }
+            };
+            return Tokenizer;
+        })();
+        Utils.Tokenizer = Tokenizer;
+    })(Utils = SVGTypewriter.Utils || (SVGTypewriter.Utils = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+///<reference path="../reference.ts" />
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Utils;
+    (function (Utils) {
+        var StringMethods;
+        (function (StringMethods) {
+            /**
+             * Treat all sequences of consecutive whitespace as a single " ".
+             */
+            function combineWhitespace(str) {
+                return str.replace(/\s+/g, " ");
+            }
+            StringMethods.combineWhitespace = combineWhitespace;
+            function isNotEmptyString(str) {
+                return str && str.trim() !== "";
+            }
+            StringMethods.isNotEmptyString = isNotEmptyString;
+            function trimStart(str, c) {
+                if (!str) {
+                    return str;
+                }
+                var chars = str.split("");
+                var reduceFunction = c ? function (s) { return s.split(c).some(isNotEmptyString); } : isNotEmptyString;
+                return chars.reduce(function (s, c) { return reduceFunction(s + c) ? s + c : s; }, "");
+            }
+            StringMethods.trimStart = trimStart;
+            function trimEnd(str, c) {
+                if (!str) {
+                    return str;
+                }
+                var reversedChars = str.split("");
+                reversedChars.reverse();
+                reversedChars = trimStart(reversedChars.join(""), c).split("");
+                reversedChars.reverse();
+                return reversedChars.join("");
+            }
+            StringMethods.trimEnd = trimEnd;
+        })(StringMethods = Utils.StringMethods || (Utils.StringMethods = {}));
+    })(Utils = SVGTypewriter.Utils || (SVGTypewriter.Utils = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+///<reference path="../reference.ts" />
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Animators;
+    (function (Animators) {
+        var BaseAnimator = (function () {
+            function BaseAnimator() {
+                this.duration(BaseAnimator.DEFAULT_DURATION_MILLISECONDS);
+                this.delay(0);
+                this.easing(BaseAnimator.DEFAULT_EASING);
+                this.moveX(0);
+                this.moveY(0);
+            }
+            BaseAnimator.prototype.animate = function (selection) {
+                var xForm = d3.transform("");
+                xForm.translate = [this.moveX(), this.moveY()];
+                selection.attr("transform", xForm.toString());
+                xForm.translate = [0, 0];
+                return this._animate(selection, { transform: xForm.toString() });
+            };
+            BaseAnimator.prototype._animate = function (selection, attr) {
+                return selection.transition().ease(this.easing()).duration(this.duration()).delay(this.delay()).attr(attr);
+            };
+            BaseAnimator.prototype.duration = function (duration) {
+                if (duration == null) {
+                    return this._duration;
+                }
+                else {
+                    this._duration = duration;
+                    return this;
+                }
+            };
+            BaseAnimator.prototype.moveX = function (shift) {
+                if (shift == null) {
+                    return this._moveX;
+                }
+                else {
+                    this._moveX = shift;
+                    return this;
+                }
+            };
+            BaseAnimator.prototype.moveY = function (shift) {
+                if (shift == null) {
+                    return this._moveY;
+                }
+                else {
+                    this._moveY = shift;
+                    return this;
+                }
+            };
+            BaseAnimator.prototype.delay = function (delay) {
+                if (delay == null) {
+                    return this._delay;
+                }
+                else {
+                    this._delay = delay;
+                    return this;
+                }
+            };
+            BaseAnimator.prototype.easing = function (easing) {
+                if (easing == null) {
+                    return this._easing;
+                }
+                else {
+                    this._easing = easing;
+                    return this;
+                }
+            };
+            /**
+             * The default duration of the animation in milliseconds
+             */
+            BaseAnimator.DEFAULT_DURATION_MILLISECONDS = 300;
+            /**
+             * The default easing of the animation
+             */
+            BaseAnimator.DEFAULT_EASING = "exp-out";
+            return BaseAnimator;
+        })();
+        Animators.BaseAnimator = BaseAnimator;
+    })(Animators = SVGTypewriter.Animators || (SVGTypewriter.Animators = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+///<reference path="../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Animators;
+    (function (Animators) {
+        var UnveilAnimator = (function (_super) {
+            __extends(UnveilAnimator, _super);
+            function UnveilAnimator() {
+                this.direction("bottom");
+                _super.call(this);
+            }
+            UnveilAnimator.prototype.direction = function (direction) {
+                if (direction == null) {
+                    return this._direction;
+                }
+                else {
+                    if (UnveilAnimator.SupportedDirections.indexOf(direction) === -1) {
+                        throw new Error("unsupported direction - " + direction);
+                    }
+                    this._direction = direction;
+                    return this;
+                }
+            };
+            UnveilAnimator.prototype.animate = function (selection) {
+                var attr = SVGTypewriter.Utils.DOM.getBBox(selection);
+                var mask = selection.select(".clip-rect");
+                mask.attr("width", 0);
+                mask.attr("height", 0);
+                switch (this._direction) {
+                    case "top":
+                        mask.attr("y", attr.y + attr.height);
+                        mask.attr("x", attr.x);
+                        mask.attr("width", attr.width);
+                        break;
+                    case "bottom":
+                        mask.attr("y", attr.y);
+                        mask.attr("x", attr.x);
+                        mask.attr("width", attr.width);
+                        break;
+                    case "left":
+                        mask.attr("y", attr.y);
+                        mask.attr("x", attr.x);
+                        mask.attr("height", attr.height);
+                        break;
+                    case "right":
+                        mask.attr("y", attr.y);
+                        mask.attr("x", attr.x + attr.width);
+                        mask.attr("height", attr.height);
+                        break;
+                }
+                this._animate(mask, attr);
+                return _super.prototype.animate.call(this, selection);
+            };
+            UnveilAnimator.SupportedDirections = ["top", "bottom", "left", "right"];
+            return UnveilAnimator;
+        })(Animators.BaseAnimator);
+        Animators.UnveilAnimator = UnveilAnimator;
+    })(Animators = SVGTypewriter.Animators || (SVGTypewriter.Animators = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+///<reference path="../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Animators;
+    (function (Animators) {
+        var OpacityAnimator = (function (_super) {
+            __extends(OpacityAnimator, _super);
+            function OpacityAnimator() {
+                _super.apply(this, arguments);
+            }
+            OpacityAnimator.prototype.animate = function (selection) {
+                var area = selection.select(".text-area");
+                area.attr("opacity", 0);
+                var attr = {
+                    opacity: 1
+                };
+                this._animate(area, attr);
+                return _super.prototype.animate.call(this, selection);
+            };
+            return OpacityAnimator;
+        })(Animators.BaseAnimator);
+        Animators.OpacityAnimator = OpacityAnimator;
+    })(Animators = SVGTypewriter.Animators || (SVGTypewriter.Animators = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+///<reference path="../reference.ts" />
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Wrappers;
+    (function (Wrappers) {
+        var Wrapper = (function () {
+            function Wrapper() {
+                this.maxLines(Infinity);
+                this.textTrimming("ellipsis");
+                this.allowBreakingWords(true);
+                this._tokenizer = new SVGTypewriter.Utils.Tokenizer();
+                this._breakingCharacter = "-";
+            }
+            Wrapper.prototype.maxLines = function (noLines) {
+                if (noLines == null) {
+                    return this._maxLines;
+                }
+                else {
+                    this._maxLines = noLines;
+                    return this;
+                }
+            };
+            Wrapper.prototype.textTrimming = function (option) {
+                if (option == null) {
+                    return this._textTrimming;
+                }
+                else {
+                    if (option !== "ellipsis" && option !== "none") {
+                        throw new Error(option + " - unsupported text trimming option.");
+                    }
+                    this._textTrimming = option;
+                    return this;
+                }
+            };
+            Wrapper.prototype.allowBreakingWords = function (allow) {
+                if (allow == null) {
+                    return this._allowBreakingWords;
+                }
+                else {
+                    this._allowBreakingWords = allow;
+                    return this;
+                }
+            };
+            Wrapper.prototype.wrap = function (text, measurer, width, height) {
+                var _this = this;
+                if (height === void 0) { height = Infinity; }
+                var initialWrappingResult = {
+                    originalText: text,
+                    wrappedText: "",
+                    noLines: 0,
+                    noBrokeWords: 0,
+                    truncatedText: ""
+                };
+                var state = {
+                    wrapping: initialWrappingResult,
+                    currentLine: "",
+                    availableWidth: width,
+                    availableLines: Math.min(Math.floor(height / measurer.measure().height), this._maxLines),
+                    canFitText: true
+                };
+                var lines = text.split("\n");
+                return lines.reduce(function (state, line, i) { return _this.breakLineToFitWidth(state, line, i !== lines.length - 1, measurer); }, state).wrapping;
+            };
+            Wrapper.prototype.breakLineToFitWidth = function (state, line, hasNextLine, measurer) {
+                var _this = this;
+                if (!state.canFitText && state.wrapping.truncatedText !== "") {
+                    state.wrapping.truncatedText += "\n";
+                }
+                var tokens = this._tokenizer.tokenize(line);
+                state = tokens.reduce(function (state, token) { return _this.wrapNextToken(token, state, measurer); }, state);
+                var wrappedText = SVGTypewriter.Utils.StringMethods.trimEnd(state.currentLine);
+                state.wrapping.noLines += +(wrappedText !== "");
+                if (state.wrapping.noLines === state.availableLines && this._textTrimming !== "none" && hasNextLine) {
+                    var ellipsisResult = this.addEllipsis(wrappedText, state.availableWidth, measurer);
+                    state.wrapping.wrappedText += ellipsisResult.wrappedToken;
+                    state.wrapping.truncatedText += ellipsisResult.remainingToken;
+                    state.canFitText = false;
+                }
+                else {
+                    state.wrapping.wrappedText += wrappedText;
+                }
+                state.currentLine = "\n";
+                return state;
+            };
+            Wrapper.prototype.canFitToken = function (token, width, measurer) {
+                var _this = this;
+                var possibleBreaks = this._allowBreakingWords ? token.split("").map(function (c, i) { return (i !== token.length - 1) ? c + _this._breakingCharacter : c; }) : [token];
+                return (measurer.measure(token).width <= width) || possibleBreaks.every(function (c) { return measurer.measure(c).width <= width; });
+            };
+            Wrapper.prototype.addEllipsis = function (line, width, measurer) {
+                if (this._textTrimming === "none") {
+                    return {
+                        wrappedToken: line,
+                        remainingToken: ""
+                    };
+                }
+                var truncatedLine = line.substring(0).trim();
+                var lineWidth = measurer.measure(truncatedLine).width;
+                var ellipsesWidth = measurer.measure("...").width;
+                var prefix = (line.length > 0 && line[0] === "\n") ? "\n" : "";
+                if (width <= ellipsesWidth) {
+                    var periodWidth = ellipsesWidth / 3;
+                    var numPeriodsThatFit = Math.floor(width / periodWidth);
+                    return {
+                        wrappedToken: prefix + "...".substr(0, numPeriodsThatFit),
+                        remainingToken: line
+                    };
+                }
+                while (lineWidth + ellipsesWidth > width) {
+                    truncatedLine = SVGTypewriter.Utils.StringMethods.trimEnd(truncatedLine.substr(0, truncatedLine.length - 1));
+                    lineWidth = measurer.measure(truncatedLine).width;
+                }
+                return {
+                    wrappedToken: prefix + truncatedLine + "...",
+                    remainingToken: SVGTypewriter.Utils.StringMethods.trimEnd(line.substring(truncatedLine.length), "-").trim()
+                };
+            };
+            Wrapper.prototype.wrapNextToken = function (token, state, measurer) {
+                if (!state.canFitText || state.availableLines === state.wrapping.noLines || !this.canFitToken(token, state.availableWidth, measurer)) {
+                    return this.finishWrapping(token, state, measurer);
+                }
+                var remainingToken = token;
+                while (remainingToken) {
+                    var result = this.breakTokenToFitInWidth(remainingToken, state.currentLine, state.availableWidth, measurer);
+                    state.currentLine = result.line;
+                    remainingToken = result.remainingToken;
+                    if (remainingToken != null) {
+                        state.wrapping.noBrokeWords += +result.breakWord;
+                        ++state.wrapping.noLines;
+                        if (state.availableLines === state.wrapping.noLines) {
+                            var ellipsisResult = this.addEllipsis(state.currentLine, state.availableWidth, measurer);
+                            state.wrapping.wrappedText += ellipsisResult.wrappedToken;
+                            state.wrapping.truncatedText += ellipsisResult.remainingToken + remainingToken;
+                            state.currentLine = "\n";
+                            return state;
+                        }
+                        else {
+                            state.wrapping.wrappedText += SVGTypewriter.Utils.StringMethods.trimEnd(state.currentLine);
+                            state.currentLine = "\n";
+                        }
+                    }
+                }
+                return state;
+            };
+            Wrapper.prototype.finishWrapping = function (token, state, measurer) {
+                // Token is really long, but we have a space to put part of the word.
+                if (state.canFitText && state.availableLines !== state.wrapping.noLines && this._allowBreakingWords && this._textTrimming !== "none") {
+                    var res = this.addEllipsis(state.currentLine + token, state.availableWidth, measurer);
+                    state.wrapping.wrappedText += res.wrappedToken;
+                    state.wrapping.truncatedText += res.remainingToken;
+                    state.wrapping.noBrokeWords += +(res.remainingToken.length < token.length);
+                    state.wrapping.noLines += +(res.wrappedToken.length > 0);
+                    state.currentLine = "";
+                }
+                else {
+                    state.wrapping.truncatedText += token;
+                }
+                state.canFitText = false;
+                return state;
+            };
+            /**
+             * Breaks single token to fit current line.
+             * If token contains only whitespaces then they will not be populated to next line.
+             */
+            Wrapper.prototype.breakTokenToFitInWidth = function (token, line, availableWidth, measurer, breakingCharacter) {
+                if (breakingCharacter === void 0) { breakingCharacter = this._breakingCharacter; }
+                if (measurer.measure(line + token).width <= availableWidth) {
+                    return {
+                        remainingToken: null,
+                        line: line + token,
+                        breakWord: false
+                    };
+                }
+                if (token.trim() === "") {
+                    return {
+                        remainingToken: "",
+                        line: line,
+                        breakWord: false
+                    };
+                }
+                if (!this._allowBreakingWords) {
+                    return {
+                        remainingToken: token,
+                        line: line,
+                        breakWord: false
+                    };
+                }
+                var fitTokenLength = 0;
+                while (fitTokenLength < token.length) {
+                    if (measurer.measure(line + token.substring(0, fitTokenLength + 1) + breakingCharacter).width <= availableWidth) {
+                        ++fitTokenLength;
+                    }
+                    else {
+                        break;
+                    }
+                }
+                var suffix = "";
+                if (fitTokenLength > 0) {
+                    suffix = breakingCharacter;
+                }
+                return {
+                    remainingToken: token.substring(fitTokenLength),
+                    line: line + token.substring(0, fitTokenLength) + suffix,
+                    breakWord: fitTokenLength > 0
+                };
+            };
+            return Wrapper;
+        })();
+        Wrappers.Wrapper = Wrapper;
+    })(Wrappers = SVGTypewriter.Wrappers || (SVGTypewriter.Wrappers = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+///<reference path="../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Wrappers;
+    (function (Wrappers) {
+        var SingleLineWrapper = (function (_super) {
+            __extends(SingleLineWrapper, _super);
+            function SingleLineWrapper() {
+                _super.apply(this, arguments);
+            }
+            SingleLineWrapper.prototype.wrap = function (text, measurer, width, height) {
+                var _this = this;
+                if (height === void 0) { height = Infinity; }
+                var lines = text.split("\n");
+                if (lines.length > 1) {
+                    throw new Error("SingleLineWrapper is designed to work only on single line");
+                }
+                var wrapFN = function (w) { return _super.prototype.wrap.call(_this, text, measurer, w, height); };
+                var result = wrapFN(width);
+                if (result.noLines < 2) {
+                    return result;
+                }
+                var left = 0;
+                var right = width;
+                for (var i = 0; i < SingleLineWrapper.NO_WRAP_ITERATIONS && right > left; ++i) {
+                    var currentWidth = (right + left) / 2;
+                    var currentResult = wrapFN(currentWidth);
+                    if (this.areSameResults(result, currentResult)) {
+                        right = currentWidth;
+                        result = currentResult;
+                    }
+                    else {
+                        left = currentWidth;
+                    }
+                }
+                return result;
+            };
+            SingleLineWrapper.prototype.areSameResults = function (one, two) {
+                return one.noLines === two.noLines && one.truncatedText === two.truncatedText;
+            };
+            SingleLineWrapper.NO_WRAP_ITERATIONS = 5;
+            return SingleLineWrapper;
+        })(Wrappers.Wrapper);
+        Wrappers.SingleLineWrapper = SingleLineWrapper;
+    })(Wrappers = SVGTypewriter.Wrappers || (SVGTypewriter.Wrappers = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+///<reference path="reference.ts" />
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Writers;
+    (function (Writers) {
+        var Writer = (function () {
+            function Writer(measurer, wrapper) {
+                this._writerID = Writer.nextID++;
+                this._elementID = 0;
+                this.measurer(measurer);
+                if (wrapper) {
+                    this.wrapper(wrapper);
+                }
+                this.addTitleElement(false);
+            }
+            Writer.prototype.measurer = function (newMeasurer) {
+                this._measurer = newMeasurer;
+                return this;
+            };
+            Writer.prototype.wrapper = function (newWrapper) {
+                this._wrapper = newWrapper;
+                return this;
+            };
+            Writer.prototype.addTitleElement = function (add) {
+                this._addTitleElement = add;
+                return this;
+            };
+            Writer.prototype.writeLine = function (line, g, width, xAlign, yOffset) {
+                var textEl = g.append("text");
+                textEl.text(line);
+                var xOffset = width * Writer.XOffsetFactor[xAlign];
+                var anchor = Writer.AnchorConverter[xAlign];
+                textEl.attr("text-anchor", anchor).classed("text-line", true);
+                SVGTypewriter.Utils.DOM.transform(textEl, xOffset, yOffset).attr("y", "-0.25em");
+                ;
+            };
+            Writer.prototype.writeText = function (text, writingArea, width, height, xAlign, yAlign) {
+                var _this = this;
+                var lines = text.split("\n");
+                var lineHeight = this._measurer.measure().height;
+                var yOffset = Writer.YOffsetFactor[yAlign] * (height - lines.length * lineHeight);
+                lines.forEach(function (line, i) {
+                    _this.writeLine(line, writingArea, width, xAlign, (i + 1) * lineHeight + yOffset);
+                });
+            };
+            Writer.prototype.write = function (text, width, height, options) {
+                if (Writer.SupportedRotation.indexOf(options.textRotation) === -1) {
+                    throw new Error("unsupported rotation - " + options.textRotation);
+                }
+                var orientHorizontally = Math.abs(Math.abs(options.textRotation) - 90) > 45;
+                var primaryDimension = orientHorizontally ? width : height;
+                var secondaryDimension = orientHorizontally ? height : width;
+                var textContainer = options.selection.append("g").classed("text-container", true);
+                if (this._addTitleElement) {
+                    textContainer.append("title").text(text);
+                }
+                var textArea = textContainer.append("g").classed("text-area", true);
+                var wrappedText = this._wrapper ? this._wrapper.wrap(text, this._measurer, primaryDimension, secondaryDimension).wrappedText : text;
+                this.writeText(wrappedText, textArea, primaryDimension, secondaryDimension, options.xAlign, options.yAlign);
+                var xForm = d3.transform("");
+                var xForm2 = d3.transform("");
+                xForm.rotate = options.textRotation;
+                switch (options.textRotation) {
+                    case 90:
+                        xForm.translate = [width, 0];
+                        xForm2.rotate = -90;
+                        xForm2.translate = [0, 200];
+                        break;
+                    case -90:
+                        xForm.translate = [0, height];
+                        xForm2.rotate = 90;
+                        xForm2.translate = [width, 0];
+                        break;
+                    case 180:
+                        xForm.translate = [width, height];
+                        xForm2.translate = [width, height];
+                        xForm2.rotate = 180;
+                        break;
+                }
+                textArea.attr("transform", xForm.toString());
+                this.addClipPath(textContainer, xForm2);
+                if (options.animator) {
+                    options.animator.animate(textContainer);
+                }
+            };
+            Writer.prototype.addClipPath = function (selection, transform) {
+                var elementID = this._elementID++;
+                var prefix = /MSIE [5-9]/.test(navigator.userAgent) ? "" : document.location.href;
+                prefix = prefix.split("#")[0]; // To fix cases where an anchor tag was used
+                var clipPathID = "clipPath" + this._writerID + "_" + elementID;
+                selection.select(".text-area").attr("clip-path", "url(\"" + prefix + "#" + clipPathID + "\")");
+                var clipPathParent = selection.append("clipPath").attr("id", clipPathID);
+                var bboxAttrs = SVGTypewriter.Utils.DOM.getBBox(selection.select(".text-area"));
+                var box = clipPathParent.append("rect");
+                box.classed("clip-rect", true).attr({
+                    x: bboxAttrs.x,
+                    y: bboxAttrs.y,
+                    width: bboxAttrs.width,
+                    height: bboxAttrs.height
+                });
+            };
+            Writer.nextID = 0;
+            Writer.SupportedRotation = [-90, 0, 180, 90];
+            Writer.AnchorConverter = {
+                left: "start",
+                center: "middle",
+                right: "end"
+            };
+            Writer.XOffsetFactor = {
+                left: 0,
+                center: 0.5,
+                right: 1
+            };
+            Writer.YOffsetFactor = {
+                top: 0,
+                center: 0.5,
+                bottom: 1
+            };
+            return Writer;
+        })();
+        Writers.Writer = Writer;
+    })(Writers = SVGTypewriter.Writers || (SVGTypewriter.Writers = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+///<reference path="../reference.ts" />
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Measurers;
+    (function (Measurers) {
+        ;
+        var AbstractMeasurer = (function () {
+            function AbstractMeasurer(area, className) {
+                this.textMeasurer = this.getTextMeasurer(area, className);
+            }
+            AbstractMeasurer.prototype.checkSelectionIsText = function (d) {
+                return d[0][0].tagName === "text" || !d.select("text").empty();
+            };
+            AbstractMeasurer.prototype.getTextMeasurer = function (area, className) {
+                var _this = this;
+                if (!this.checkSelectionIsText(area)) {
+                    var textElement = area.append("text");
+                    if (className) {
+                        textElement.classed(className, true);
+                    }
+                    textElement.remove();
+                    return function (text) {
+                        area.node().appendChild(textElement.node());
+                        var areaDimension = _this.measureBBox(textElement, text);
+                        textElement.remove();
+                        return areaDimension;
+                    };
+                }
+                else {
+                    var parentNode = area.node().parentNode;
+                    var textSelection;
+                    if (area[0][0].tagName === "text") {
+                        textSelection = area;
+                    }
+                    else {
+                        textSelection = area.select("text");
+                    }
+                    area.remove();
+                    return function (text) {
+                        parentNode.appendChild(area.node());
+                        var areaDimension = _this.measureBBox(textSelection, text);
+                        area.remove();
+                        return areaDimension;
+                    };
+                }
+            };
+            AbstractMeasurer.prototype.measureBBox = function (d, text) {
+                d.text(text);
+                var bb = SVGTypewriter.Utils.DOM.getBBox(d);
+                return { width: bb.width, height: bb.height };
+            };
+            AbstractMeasurer.prototype.measure = function (text) {
+                if (text === void 0) { text = AbstractMeasurer.HEIGHT_TEXT; }
+                return this.textMeasurer(text);
+            };
+            AbstractMeasurer.HEIGHT_TEXT = "bqpdl";
+            return AbstractMeasurer;
+        })();
+        Measurers.AbstractMeasurer = AbstractMeasurer;
+    })(Measurers = SVGTypewriter.Measurers || (SVGTypewriter.Measurers = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+///<reference path="../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Measurers;
+    (function (Measurers) {
+        var Measurer = (function (_super) {
+            __extends(Measurer, _super);
+            function Measurer(area, className, useGuards) {
+                if (className === void 0) { className = null; }
+                if (useGuards === void 0) { useGuards = false; }
+                _super.call(this, area, className);
+                this.useGuards = useGuards;
+            }
+            // Guards assures same line height and width of whitespaces on both ends.
+            Measurer.prototype._addGuards = function (text) {
+                return Measurers.AbstractMeasurer.HEIGHT_TEXT + text + Measurers.AbstractMeasurer.HEIGHT_TEXT;
+            };
+            Measurer.prototype.getGuardWidth = function () {
+                if (this.guardWidth == null) {
+                    this.guardWidth = _super.prototype.measure.call(this).width;
+                }
+                return this.guardWidth;
+            };
+            Measurer.prototype._measureLine = function (line) {
+                var measuredLine = this.useGuards ? this._addGuards(line) : line;
+                var measuredLineDimensions = _super.prototype.measure.call(this, measuredLine);
+                measuredLineDimensions.width -= this.useGuards ? (2 * this.getGuardWidth()) : 0;
+                return measuredLineDimensions;
+            };
+            Measurer.prototype.measure = function (text) {
+                var _this = this;
+                if (text === void 0) { text = Measurers.AbstractMeasurer.HEIGHT_TEXT; }
+                if (text.trim() === "") {
+                    return { width: 0, height: 0 };
+                }
+                var linesDimensions = text.trim().split("\n").map(function (line) { return _this._measureLine(line); });
+                return {
+                    width: d3.max(linesDimensions, function (dim) { return dim.width; }),
+                    height: d3.sum(linesDimensions, function (dim) { return dim.height; })
+                };
+            };
+            return Measurer;
+        })(Measurers.AbstractMeasurer);
+        Measurers.Measurer = Measurer;
+    })(Measurers = SVGTypewriter.Measurers || (SVGTypewriter.Measurers = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+///<reference path="../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Measurers;
+    (function (Measurers) {
+        var CharacterMeasurer = (function (_super) {
+            __extends(CharacterMeasurer, _super);
+            function CharacterMeasurer() {
+                _super.apply(this, arguments);
+            }
+            CharacterMeasurer.prototype._measureCharacter = function (c) {
+                return _super.prototype._measureLine.call(this, c);
+            };
+            CharacterMeasurer.prototype._measureLine = function (line) {
+                var _this = this;
+                var charactersDimensions = line.split("").map(function (c) { return _this._measureCharacter(c); });
+                return {
+                    width: d3.sum(charactersDimensions, function (dim) { return dim.width; }),
+                    height: d3.max(charactersDimensions, function (dim) { return dim.height; })
+                };
+            };
+            return CharacterMeasurer;
+        })(Measurers.Measurer);
+        Measurers.CharacterMeasurer = CharacterMeasurer;
+    })(Measurers = SVGTypewriter.Measurers || (SVGTypewriter.Measurers = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+///<reference path="../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Measurers;
+    (function (Measurers) {
+        var CacheCharacterMeasurer = (function (_super) {
+            __extends(CacheCharacterMeasurer, _super);
+            function CacheCharacterMeasurer(area, className) {
+                var _this = this;
+                _super.call(this, area, className);
+                this.cache = new SVGTypewriter.Utils.Cache(function (c) { return _this._measureCharacterNotFromCache(c); }, SVGTypewriter.Utils.Methods.objEq);
+            }
+            CacheCharacterMeasurer.prototype._measureCharacterNotFromCache = function (c) {
+                return _super.prototype._measureCharacter.call(this, c);
+            };
+            CacheCharacterMeasurer.prototype._measureCharacter = function (c) {
+                return this.cache.get(c);
+            };
+            CacheCharacterMeasurer.prototype.reset = function () {
+                this.cache.clear();
+            };
+            return CacheCharacterMeasurer;
+        })(Measurers.CharacterMeasurer);
+        Measurers.CacheCharacterMeasurer = CacheCharacterMeasurer;
+    })(Measurers = SVGTypewriter.Measurers || (SVGTypewriter.Measurers = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+return Plottable;
+}));
+
+/*!
+SVG Typewriter 0.3.0 (https://github.com/palantir/svg-typewriter)
+Copyright 2014 Palantir Technologies
+Licensed under MIT (https://github.com/palantir/svg-typewriter/blob/develop/LICENSE)
+*/
+
+///<reference path="../reference.ts" />
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Utils;
+    (function (Utils) {
+        var Methods;
+        (function (Methods) {
+            /**
+             * Check if two arrays are equal by strict equality.
+             */
+            function arrayEq(a, b) {
+                // Technically, null and undefined are arrays too
+                if (a == null || b == null) {
+                    return a === b;
+                }
+                if (a.length !== b.length) {
+                    return false;
+                }
+                for (var i = 0; i < a.length; i++) {
+                    if (a[i] !== b[i]) {
+                        return false;
+                    }
+                }
+                return true;
+            }
+            Methods.arrayEq = arrayEq;
+            /**
+             * @param {any} a Object to check against b for equality.
+             * @param {any} b Object to check against a for equality.
+             *
+             * @returns {boolean} whether or not two objects share the same keys, and
+             *          values associated with those keys. Values will be compared
+             *          with ===.
+             */
+            function objEq(a, b) {
+                if (a == null || b == null) {
+                    return a === b;
+                }
+                var keysA = Object.keys(a).sort();
+                var keysB = Object.keys(b).sort();
+                var valuesA = keysA.map(function (k) { return a[k]; });
+                var valuesB = keysB.map(function (k) { return b[k]; });
+                return arrayEq(keysA, keysB) && arrayEq(valuesA, valuesB);
+            }
+            Methods.objEq = objEq;
+        })(Methods = Utils.Methods || (Utils.Methods = {}));
+    })(Utils = SVGTypewriter.Utils || (SVGTypewriter.Utils = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Utils;
+    (function (Utils) {
+        var DOM;
+        (function (DOM) {
+            function transform(s, x, y) {
+                var xform = d3.transform(s.attr("transform"));
+                if (x == null) {
+                    return xform.translate;
+                }
+                else {
+                    y = (y == null) ? 0 : y;
+                    xform.translate[0] = x;
+                    xform.translate[1] = y;
+                    s.attr("transform", xform.toString());
+                    return s;
+                }
+            }
+            DOM.transform = transform;
+            function getBBox(element) {
+                var bbox;
+                try {
+                    bbox = element.node().getBBox();
+                }
+                catch (err) {
+                    bbox = {
+                        x: 0,
+                        y: 0,
+                        width: 0,
+                        height: 0
+                    };
+                }
+                return bbox;
+            }
+            DOM.getBBox = getBBox;
+        })(DOM = Utils.DOM || (Utils.DOM = {}));
+    })(Utils = SVGTypewriter.Utils || (SVGTypewriter.Utils = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+///<reference path="../reference.ts" />
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Utils;
+    (function (Utils) {
+        var Cache = (function () {
+            /**
+             * @constructor
+             *
+             * @param {string} compute The function whose results will be cached.
+             * @param {(v: T, w: T) => boolean} [valueEq]
+             *        Used to determine if the value of canonicalKey has changed.
+             *        If omitted, defaults to === comparision.
+             */
+            function Cache(compute, valueEq) {
+                if (valueEq === void 0) { valueEq = function (v, w) { return v === w; }; }
+                this.cache = d3.map();
+                this.compute = compute;
+                this.valueEq = valueEq;
+            }
+            /**
+             * Attempt to look up k in the cache, computing the result if it isn't
+             * found.
+             *
+             * @param {string} k The key to look up in the cache.
+             * @return {T} The value associated with k; the result of compute(k).
+             */
+            Cache.prototype.get = function (k) {
+                if (!this.cache.has(k)) {
+                    this.cache.set(k, this.compute(k));
+                }
+                return this.cache.get(k);
+            };
+            /**
+             * Reset the cache empty.
+             *
+             * @return {Cache<T>} The calling Cache.
+             */
+            Cache.prototype.clear = function () {
+                this.cache = d3.map();
+                return this;
+            };
+            return Cache;
+        })();
+        Utils.Cache = Cache;
+    })(Utils = SVGTypewriter.Utils || (SVGTypewriter.Utils = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+///<reference path="../reference.ts" />
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Utils;
+    (function (Utils) {
+        var Tokenizer = (function () {
+            function Tokenizer() {
+                this.WordDividerRegExp = new RegExp("\\W");
+                this.WhitespaceRegExp = new RegExp("\\s");
+            }
+            Tokenizer.prototype.tokenize = function (line) {
+                var _this = this;
+                return line.split("").reduce(function (tokens, c) { return tokens.slice(0, -1).concat(_this.shouldCreateNewToken(tokens[tokens.length - 1], c)); }, [""]);
+            };
+            Tokenizer.prototype.shouldCreateNewToken = function (token, newCharacter) {
+                if (!token) {
+                    return [newCharacter];
+                }
+                var lastCharacter = token[token.length - 1];
+                if (this.WhitespaceRegExp.test(lastCharacter) && this.WhitespaceRegExp.test(newCharacter)) {
+                    return [token + newCharacter];
+                }
+                else if (this.WhitespaceRegExp.test(lastCharacter) || this.WhitespaceRegExp.test(newCharacter)) {
+                    return [token, newCharacter];
+                }
+                else if (!(this.WordDividerRegExp.test(lastCharacter) || this.WordDividerRegExp.test(newCharacter))) {
+                    return [token + newCharacter];
+                }
+                else if (lastCharacter === newCharacter) {
+                    return [token + newCharacter];
+                }
+                else {
+                    return [token, newCharacter];
+                }
+            };
+            return Tokenizer;
+        })();
+        Utils.Tokenizer = Tokenizer;
+    })(Utils = SVGTypewriter.Utils || (SVGTypewriter.Utils = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+///<reference path="../reference.ts" />
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Utils;
+    (function (Utils) {
+        var StringMethods;
+        (function (StringMethods) {
+            /**
+             * Treat all sequences of consecutive whitespace as a single " ".
+             */
+            function combineWhitespace(str) {
+                return str.replace(/\s+/g, " ");
+            }
+            StringMethods.combineWhitespace = combineWhitespace;
+            function isNotEmptyString(str) {
+                return str && str.trim() !== "";
+            }
+            StringMethods.isNotEmptyString = isNotEmptyString;
+            function trimStart(str, c) {
+                if (!str) {
+                    return str;
+                }
+                var chars = str.split("");
+                var reduceFunction = c ? function (s) { return s.split(c).some(isNotEmptyString); } : isNotEmptyString;
+                return chars.reduce(function (s, c) { return reduceFunction(s + c) ? s + c : s; }, "");
+            }
+            StringMethods.trimStart = trimStart;
+            function trimEnd(str, c) {
+                if (!str) {
+                    return str;
+                }
+                var reversedChars = str.split("");
+                reversedChars.reverse();
+                reversedChars = trimStart(reversedChars.join(""), c).split("");
+                reversedChars.reverse();
+                return reversedChars.join("");
+            }
+            StringMethods.trimEnd = trimEnd;
+        })(StringMethods = Utils.StringMethods || (Utils.StringMethods = {}));
+    })(Utils = SVGTypewriter.Utils || (SVGTypewriter.Utils = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+///<reference path="../reference.ts" />
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Animators;
+    (function (Animators) {
+        var BaseAnimator = (function () {
+            function BaseAnimator() {
+                this.duration(BaseAnimator.DEFAULT_DURATION_MILLISECONDS);
+                this.delay(0);
+                this.easing(BaseAnimator.DEFAULT_EASING);
+                this.moveX(0);
+                this.moveY(0);
+            }
+            BaseAnimator.prototype.animate = function (selection) {
+                var xForm = d3.transform("");
+                xForm.translate = [this.moveX(), this.moveY()];
+                selection.attr("transform", xForm.toString());
+                xForm.translate = [0, 0];
+                return this._animate(selection, { transform: xForm.toString() });
+            };
+            BaseAnimator.prototype._animate = function (selection, attr) {
+                return selection.transition().ease(this.easing()).duration(this.duration()).delay(this.delay()).attr(attr);
+            };
+            BaseAnimator.prototype.duration = function (duration) {
+                if (duration == null) {
+                    return this._duration;
+                }
+                else {
+                    this._duration = duration;
+                    return this;
+                }
+            };
+            BaseAnimator.prototype.moveX = function (shift) {
+                if (shift == null) {
+                    return this._moveX;
+                }
+                else {
+                    this._moveX = shift;
+                    return this;
+                }
+            };
+            BaseAnimator.prototype.moveY = function (shift) {
+                if (shift == null) {
+                    return this._moveY;
+                }
+                else {
+                    this._moveY = shift;
+                    return this;
+                }
+            };
+            BaseAnimator.prototype.delay = function (delay) {
+                if (delay == null) {
+                    return this._delay;
+                }
+                else {
+                    this._delay = delay;
+                    return this;
+                }
+            };
+            BaseAnimator.prototype.easing = function (easing) {
+                if (easing == null) {
+                    return this._easing;
+                }
+                else {
+                    this._easing = easing;
+                    return this;
+                }
+            };
+            /**
+             * The default duration of the animation in milliseconds
+             */
+            BaseAnimator.DEFAULT_DURATION_MILLISECONDS = 300;
+            /**
+             * The default easing of the animation
+             */
+            BaseAnimator.DEFAULT_EASING = "exp-out";
+            return BaseAnimator;
+        })();
+        Animators.BaseAnimator = BaseAnimator;
+    })(Animators = SVGTypewriter.Animators || (SVGTypewriter.Animators = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+///<reference path="../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Animators;
+    (function (Animators) {
+        var UnveilAnimator = (function (_super) {
+            __extends(UnveilAnimator, _super);
+            function UnveilAnimator() {
+                this.direction("bottom");
+                _super.call(this);
+            }
+            UnveilAnimator.prototype.direction = function (direction) {
+                if (direction == null) {
+                    return this._direction;
+                }
+                else {
+                    if (UnveilAnimator.SupportedDirections.indexOf(direction) === -1) {
+                        throw new Error("unsupported direction - " + direction);
+                    }
+                    this._direction = direction;
+                    return this;
+                }
+            };
+            UnveilAnimator.prototype.animate = function (selection) {
+                var attr = SVGTypewriter.Utils.DOM.getBBox(selection);
+                var mask = selection.select(".clip-rect");
+                mask.attr("width", 0);
+                mask.attr("height", 0);
+                switch (this._direction) {
+                    case "top":
+                        mask.attr("y", attr.y + attr.height);
+                        mask.attr("x", attr.x);
+                        mask.attr("width", attr.width);
+                        break;
+                    case "bottom":
+                        mask.attr("y", attr.y);
+                        mask.attr("x", attr.x);
+                        mask.attr("width", attr.width);
+                        break;
+                    case "left":
+                        mask.attr("y", attr.y);
+                        mask.attr("x", attr.x);
+                        mask.attr("height", attr.height);
+                        break;
+                    case "right":
+                        mask.attr("y", attr.y);
+                        mask.attr("x", attr.x + attr.width);
+                        mask.attr("height", attr.height);
+                        break;
+                }
+                this._animate(mask, attr);
+                return _super.prototype.animate.call(this, selection);
+            };
+            UnveilAnimator.SupportedDirections = ["top", "bottom", "left", "right"];
+            return UnveilAnimator;
+        })(Animators.BaseAnimator);
+        Animators.UnveilAnimator = UnveilAnimator;
+    })(Animators = SVGTypewriter.Animators || (SVGTypewriter.Animators = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+///<reference path="../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Animators;
+    (function (Animators) {
+        var OpacityAnimator = (function (_super) {
+            __extends(OpacityAnimator, _super);
+            function OpacityAnimator() {
+                _super.apply(this, arguments);
+            }
+            OpacityAnimator.prototype.animate = function (selection) {
+                var area = selection.select(".text-area");
+                area.attr("opacity", 0);
+                var attr = {
+                    opacity: 1
+                };
+                this._animate(area, attr);
+                return _super.prototype.animate.call(this, selection);
+            };
+            return OpacityAnimator;
+        })(Animators.BaseAnimator);
+        Animators.OpacityAnimator = OpacityAnimator;
+    })(Animators = SVGTypewriter.Animators || (SVGTypewriter.Animators = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+///<reference path="../reference.ts" />
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Wrappers;
+    (function (Wrappers) {
+        var Wrapper = (function () {
+            function Wrapper() {
+                this.maxLines(Infinity);
+                this.textTrimming("ellipsis");
+                this.allowBreakingWords(true);
+                this._tokenizer = new SVGTypewriter.Utils.Tokenizer();
+                this._breakingCharacter = "-";
+            }
+            Wrapper.prototype.maxLines = function (noLines) {
+                if (noLines == null) {
+                    return this._maxLines;
+                }
+                else {
+                    this._maxLines = noLines;
+                    return this;
+                }
+            };
+            Wrapper.prototype.textTrimming = function (option) {
+                if (option == null) {
+                    return this._textTrimming;
+                }
+                else {
+                    if (option !== "ellipsis" && option !== "none") {
+                        throw new Error(option + " - unsupported text trimming option.");
+                    }
+                    this._textTrimming = option;
+                    return this;
+                }
+            };
+            Wrapper.prototype.allowBreakingWords = function (allow) {
+                if (allow == null) {
+                    return this._allowBreakingWords;
+                }
+                else {
+                    this._allowBreakingWords = allow;
+                    return this;
+                }
+            };
+            Wrapper.prototype.wrap = function (text, measurer, width, height) {
+                var _this = this;
+                if (height === void 0) { height = Infinity; }
+                var initialWrappingResult = {
+                    originalText: text,
+                    wrappedText: "",
+                    noLines: 0,
+                    noBrokeWords: 0,
+                    truncatedText: ""
+                };
+                var state = {
+                    wrapping: initialWrappingResult,
+                    currentLine: "",
+                    availableWidth: width,
+                    availableLines: Math.min(Math.floor(height / measurer.measure().height), this._maxLines),
+                    canFitText: true
+                };
+                var lines = text.split("\n");
+                return lines.reduce(function (state, line, i) { return _this.breakLineToFitWidth(state, line, i !== lines.length - 1, measurer); }, state).wrapping;
+            };
+            Wrapper.prototype.breakLineToFitWidth = function (state, line, hasNextLine, measurer) {
+                var _this = this;
+                if (!state.canFitText && state.wrapping.truncatedText !== "") {
+                    state.wrapping.truncatedText += "\n";
+                }
+                var tokens = this._tokenizer.tokenize(line);
+                state = tokens.reduce(function (state, token) { return _this.wrapNextToken(token, state, measurer); }, state);
+                var wrappedText = SVGTypewriter.Utils.StringMethods.trimEnd(state.currentLine);
+                state.wrapping.noLines += +(wrappedText !== "");
+                if (state.wrapping.noLines === state.availableLines && this._textTrimming !== "none" && hasNextLine) {
+                    var ellipsisResult = this.addEllipsis(wrappedText, state.availableWidth, measurer);
+                    state.wrapping.wrappedText += ellipsisResult.wrappedToken;
+                    state.wrapping.truncatedText += ellipsisResult.remainingToken;
+                    state.canFitText = false;
+                }
+                else {
+                    state.wrapping.wrappedText += wrappedText;
+                }
+                state.currentLine = "\n";
+                return state;
+            };
+            Wrapper.prototype.canFitToken = function (token, width, measurer) {
+                var _this = this;
+                var possibleBreaks = this._allowBreakingWords ? token.split("").map(function (c, i) { return (i !== token.length - 1) ? c + _this._breakingCharacter : c; }) : [token];
+                return (measurer.measure(token).width <= width) || possibleBreaks.every(function (c) { return measurer.measure(c).width <= width; });
+            };
+            Wrapper.prototype.addEllipsis = function (line, width, measurer) {
+                if (this._textTrimming === "none") {
+                    return {
+                        wrappedToken: line,
+                        remainingToken: ""
+                    };
+                }
+                var truncatedLine = line.substring(0).trim();
+                var lineWidth = measurer.measure(truncatedLine).width;
+                var ellipsesWidth = measurer.measure("...").width;
+                var prefix = (line.length > 0 && line[0] === "\n") ? "\n" : "";
+                if (width <= ellipsesWidth) {
+                    var periodWidth = ellipsesWidth / 3;
+                    var numPeriodsThatFit = Math.floor(width / periodWidth);
+                    return {
+                        wrappedToken: prefix + "...".substr(0, numPeriodsThatFit),
+                        remainingToken: line
+                    };
+                }
+                while (lineWidth + ellipsesWidth > width) {
+                    truncatedLine = SVGTypewriter.Utils.StringMethods.trimEnd(truncatedLine.substr(0, truncatedLine.length - 1));
+                    lineWidth = measurer.measure(truncatedLine).width;
+                }
+                return {
+                    wrappedToken: prefix + truncatedLine + "...",
+                    remainingToken: SVGTypewriter.Utils.StringMethods.trimEnd(line.substring(truncatedLine.length), "-").trim()
+                };
+            };
+            Wrapper.prototype.wrapNextToken = function (token, state, measurer) {
+                if (!state.canFitText || state.availableLines === state.wrapping.noLines || !this.canFitToken(token, state.availableWidth, measurer)) {
+                    return this.finishWrapping(token, state, measurer);
+                }
+                var remainingToken = token;
+                while (remainingToken) {
+                    var result = this.breakTokenToFitInWidth(remainingToken, state.currentLine, state.availableWidth, measurer);
+                    state.currentLine = result.line;
+                    remainingToken = result.remainingToken;
+                    if (remainingToken != null) {
+                        state.wrapping.noBrokeWords += +result.breakWord;
+                        ++state.wrapping.noLines;
+                        if (state.availableLines === state.wrapping.noLines) {
+                            var ellipsisResult = this.addEllipsis(state.currentLine, state.availableWidth, measurer);
+                            state.wrapping.wrappedText += ellipsisResult.wrappedToken;
+                            state.wrapping.truncatedText += ellipsisResult.remainingToken + remainingToken;
+                            state.currentLine = "\n";
+                            return state;
+                        }
+                        else {
+                            state.wrapping.wrappedText += SVGTypewriter.Utils.StringMethods.trimEnd(state.currentLine);
+                            state.currentLine = "\n";
+                        }
+                    }
+                }
+                return state;
+            };
+            Wrapper.prototype.finishWrapping = function (token, state, measurer) {
+                // Token is really long, but we have a space to put part of the word.
+                if (state.canFitText && state.availableLines !== state.wrapping.noLines && this._allowBreakingWords && this._textTrimming !== "none") {
+                    var res = this.addEllipsis(state.currentLine + token, state.availableWidth, measurer);
+                    state.wrapping.wrappedText += res.wrappedToken;
+                    state.wrapping.truncatedText += res.remainingToken;
+                    state.wrapping.noBrokeWords += +(res.remainingToken.length < token.length);
+                    state.wrapping.noLines += +(res.wrappedToken.length > 0);
+                    state.currentLine = "";
+                }
+                else {
+                    state.wrapping.truncatedText += token;
+                }
+                state.canFitText = false;
+                return state;
+            };
+            /**
+             * Breaks single token to fit current line.
+             * If token contains only whitespaces then they will not be populated to next line.
+             */
+            Wrapper.prototype.breakTokenToFitInWidth = function (token, line, availableWidth, measurer, breakingCharacter) {
+                if (breakingCharacter === void 0) { breakingCharacter = this._breakingCharacter; }
+                if (measurer.measure(line + token).width <= availableWidth) {
+                    return {
+                        remainingToken: null,
+                        line: line + token,
+                        breakWord: false
+                    };
+                }
+                if (token.trim() === "") {
+                    return {
+                        remainingToken: "",
+                        line: line,
+                        breakWord: false
+                    };
+                }
+                if (!this._allowBreakingWords) {
+                    return {
+                        remainingToken: token,
+                        line: line,
+                        breakWord: false
+                    };
+                }
+                var fitTokenLength = 0;
+                while (fitTokenLength < token.length) {
+                    if (measurer.measure(line + token.substring(0, fitTokenLength + 1) + breakingCharacter).width <= availableWidth) {
+                        ++fitTokenLength;
+                    }
+                    else {
+                        break;
+                    }
+                }
+                var suffix = "";
+                if (fitTokenLength > 0) {
+                    suffix = breakingCharacter;
+                }
+                return {
+                    remainingToken: token.substring(fitTokenLength),
+                    line: line + token.substring(0, fitTokenLength) + suffix,
+                    breakWord: fitTokenLength > 0
+                };
+            };
+            return Wrapper;
+        })();
+        Wrappers.Wrapper = Wrapper;
+    })(Wrappers = SVGTypewriter.Wrappers || (SVGTypewriter.Wrappers = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+///<reference path="../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Wrappers;
+    (function (Wrappers) {
+        var SingleLineWrapper = (function (_super) {
+            __extends(SingleLineWrapper, _super);
+            function SingleLineWrapper() {
+                _super.apply(this, arguments);
+            }
+            SingleLineWrapper.prototype.wrap = function (text, measurer, width, height) {
+                var _this = this;
+                if (height === void 0) { height = Infinity; }
+                var lines = text.split("\n");
+                if (lines.length > 1) {
+                    throw new Error("SingleLineWrapper is designed to work only on single line");
+                }
+                var wrapFN = function (w) { return _super.prototype.wrap.call(_this, text, measurer, w, height); };
+                var result = wrapFN(width);
+                if (result.noLines < 2) {
+                    return result;
+                }
+                var left = 0;
+                var right = width;
+                for (var i = 0; i < SingleLineWrapper.NO_WRAP_ITERATIONS && right > left; ++i) {
+                    var currentWidth = (right + left) / 2;
+                    var currentResult = wrapFN(currentWidth);
+                    if (this.areSameResults(result, currentResult)) {
+                        right = currentWidth;
+                        result = currentResult;
+                    }
+                    else {
+                        left = currentWidth;
+                    }
+                }
+                return result;
+            };
+            SingleLineWrapper.prototype.areSameResults = function (one, two) {
+                return one.noLines === two.noLines && one.truncatedText === two.truncatedText;
+            };
+            SingleLineWrapper.NO_WRAP_ITERATIONS = 5;
+            return SingleLineWrapper;
+        })(Wrappers.Wrapper);
+        Wrappers.SingleLineWrapper = SingleLineWrapper;
+    })(Wrappers = SVGTypewriter.Wrappers || (SVGTypewriter.Wrappers = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+///<reference path="reference.ts" />
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Writers;
+    (function (Writers) {
+        var Writer = (function () {
+            function Writer(measurer, wrapper) {
+                this._writerID = Writer.nextID++;
+                this._elementID = 0;
+                this.measurer(measurer);
+                if (wrapper) {
+                    this.wrapper(wrapper);
+                }
+                this.addTitleElement(false);
+            }
+            Writer.prototype.measurer = function (newMeasurer) {
+                this._measurer = newMeasurer;
+                return this;
+            };
+            Writer.prototype.wrapper = function (newWrapper) {
+                this._wrapper = newWrapper;
+                return this;
+            };
+            Writer.prototype.addTitleElement = function (add) {
+                this._addTitleElement = add;
+                return this;
+            };
+            Writer.prototype.writeLine = function (line, g, width, xAlign, yOffset) {
+                var textEl = g.append("text");
+                textEl.text(line);
+                var xOffset = width * Writer.XOffsetFactor[xAlign];
+                var anchor = Writer.AnchorConverter[xAlign];
+                textEl.attr("text-anchor", anchor).classed("text-line", true);
+                SVGTypewriter.Utils.DOM.transform(textEl, xOffset, yOffset).attr("y", "-0.25em");
+                ;
+            };
+            Writer.prototype.writeText = function (text, writingArea, width, height, xAlign, yAlign) {
+                var _this = this;
+                var lines = text.split("\n");
+                var lineHeight = this._measurer.measure().height;
+                var yOffset = Writer.YOffsetFactor[yAlign] * (height - lines.length * lineHeight);
+                lines.forEach(function (line, i) {
+                    _this.writeLine(line, writingArea, width, xAlign, (i + 1) * lineHeight + yOffset);
+                });
+            };
+            Writer.prototype.write = function (text, width, height, options) {
+                if (Writer.SupportedRotation.indexOf(options.textRotation) === -1) {
+                    throw new Error("unsupported rotation - " + options.textRotation);
+                }
+                var orientHorizontally = Math.abs(Math.abs(options.textRotation) - 90) > 45;
+                var primaryDimension = orientHorizontally ? width : height;
+                var secondaryDimension = orientHorizontally ? height : width;
+                var textContainer = options.selection.append("g").classed("text-container", true);
+                if (this._addTitleElement) {
+                    textContainer.append("title").text(text);
+                }
+                var textArea = textContainer.append("g").classed("text-area", true);
+                var wrappedText = this._wrapper ? this._wrapper.wrap(text, this._measurer, primaryDimension, secondaryDimension).wrappedText : text;
+                this.writeText(wrappedText, textArea, primaryDimension, secondaryDimension, options.xAlign, options.yAlign);
+                var xForm = d3.transform("");
+                var xForm2 = d3.transform("");
+                xForm.rotate = options.textRotation;
+                switch (options.textRotation) {
+                    case 90:
+                        xForm.translate = [width, 0];
+                        xForm2.rotate = -90;
+                        xForm2.translate = [0, 200];
+                        break;
+                    case -90:
+                        xForm.translate = [0, height];
+                        xForm2.rotate = 90;
+                        xForm2.translate = [width, 0];
+                        break;
+                    case 180:
+                        xForm.translate = [width, height];
+                        xForm2.translate = [width, height];
+                        xForm2.rotate = 180;
+                        break;
+                }
+                textArea.attr("transform", xForm.toString());
+                this.addClipPath(textContainer, xForm2);
+                if (options.animator) {
+                    options.animator.animate(textContainer);
+                }
+            };
+            Writer.prototype.addClipPath = function (selection, transform) {
+                var elementID = this._elementID++;
+                var prefix = /MSIE [5-9]/.test(navigator.userAgent) ? "" : document.location.href;
+                prefix = prefix.split("#")[0]; // To fix cases where an anchor tag was used
+                var clipPathID = "clipPath" + this._writerID + "_" + elementID;
+                selection.select(".text-area").attr("clip-path", "url(\"" + prefix + "#" + clipPathID + "\")");
+                var clipPathParent = selection.append("clipPath").attr("id", clipPathID);
+                var bboxAttrs = SVGTypewriter.Utils.DOM.getBBox(selection.select(".text-area"));
+                var box = clipPathParent.append("rect");
+                box.classed("clip-rect", true).attr({
+                    x: bboxAttrs.x,
+                    y: bboxAttrs.y,
+                    width: bboxAttrs.width,
+                    height: bboxAttrs.height
+                });
+            };
+            Writer.nextID = 0;
+            Writer.SupportedRotation = [-90, 0, 180, 90];
+            Writer.AnchorConverter = {
+                left: "start",
+                center: "middle",
+                right: "end"
+            };
+            Writer.XOffsetFactor = {
+                left: 0,
+                center: 0.5,
+                right: 1
+            };
+            Writer.YOffsetFactor = {
+                top: 0,
+                center: 0.5,
+                bottom: 1
+            };
+            return Writer;
+        })();
+        Writers.Writer = Writer;
+    })(Writers = SVGTypewriter.Writers || (SVGTypewriter.Writers = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+///<reference path="../reference.ts" />
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Measurers;
+    (function (Measurers) {
+        ;
+        var AbstractMeasurer = (function () {
+            function AbstractMeasurer(area, className) {
+                this.textMeasurer = this.getTextMeasurer(area, className);
+            }
+            AbstractMeasurer.prototype.checkSelectionIsText = function (d) {
+                return d[0][0].tagName === "text" || !d.select("text").empty();
+            };
+            AbstractMeasurer.prototype.getTextMeasurer = function (area, className) {
+                var _this = this;
+                if (!this.checkSelectionIsText(area)) {
+                    var textElement = area.append("text");
+                    if (className) {
+                        textElement.classed(className, true);
+                    }
+                    textElement.remove();
+                    return function (text) {
+                        area.node().appendChild(textElement.node());
+                        var areaDimension = _this.measureBBox(textElement, text);
+                        textElement.remove();
+                        return areaDimension;
+                    };
+                }
+                else {
+                    var parentNode = area.node().parentNode;
+                    var textSelection;
+                    if (area[0][0].tagName === "text") {
+                        textSelection = area;
+                    }
+                    else {
+                        textSelection = area.select("text");
+                    }
+                    area.remove();
+                    return function (text) {
+                        parentNode.appendChild(area.node());
+                        var areaDimension = _this.measureBBox(textSelection, text);
+                        area.remove();
+                        return areaDimension;
+                    };
+                }
+            };
+            AbstractMeasurer.prototype.measureBBox = function (d, text) {
+                d.text(text);
+                var bb = SVGTypewriter.Utils.DOM.getBBox(d);
+                return { width: bb.width, height: bb.height };
+            };
+            AbstractMeasurer.prototype.measure = function (text) {
+                if (text === void 0) { text = AbstractMeasurer.HEIGHT_TEXT; }
+                return this.textMeasurer(text);
+            };
+            AbstractMeasurer.HEIGHT_TEXT = "bqpdl";
+            return AbstractMeasurer;
+        })();
+        Measurers.AbstractMeasurer = AbstractMeasurer;
+    })(Measurers = SVGTypewriter.Measurers || (SVGTypewriter.Measurers = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+///<reference path="../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Measurers;
+    (function (Measurers) {
+        var Measurer = (function (_super) {
+            __extends(Measurer, _super);
+            function Measurer(area, className, useGuards) {
+                if (className === void 0) { className = null; }
+                if (useGuards === void 0) { useGuards = false; }
+                _super.call(this, area, className);
+                this.useGuards = useGuards;
+            }
+            // Guards assures same line height and width of whitespaces on both ends.
+            Measurer.prototype._addGuards = function (text) {
+                return Measurers.AbstractMeasurer.HEIGHT_TEXT + text + Measurers.AbstractMeasurer.HEIGHT_TEXT;
+            };
+            Measurer.prototype.getGuardWidth = function () {
+                if (this.guardWidth == null) {
+                    this.guardWidth = _super.prototype.measure.call(this).width;
+                }
+                return this.guardWidth;
+            };
+            Measurer.prototype._measureLine = function (line) {
+                var measuredLine = this.useGuards ? this._addGuards(line) : line;
+                var measuredLineDimensions = _super.prototype.measure.call(this, measuredLine);
+                measuredLineDimensions.width -= this.useGuards ? (2 * this.getGuardWidth()) : 0;
+                return measuredLineDimensions;
+            };
+            Measurer.prototype.measure = function (text) {
+                var _this = this;
+                if (text === void 0) { text = Measurers.AbstractMeasurer.HEIGHT_TEXT; }
+                if (text.trim() === "") {
+                    return { width: 0, height: 0 };
+                }
+                var linesDimensions = text.trim().split("\n").map(function (line) { return _this._measureLine(line); });
+                return {
+                    width: d3.max(linesDimensions, function (dim) { return dim.width; }),
+                    height: d3.sum(linesDimensions, function (dim) { return dim.height; })
+                };
+            };
+            return Measurer;
+        })(Measurers.AbstractMeasurer);
+        Measurers.Measurer = Measurer;
+    })(Measurers = SVGTypewriter.Measurers || (SVGTypewriter.Measurers = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+///<reference path="../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Measurers;
+    (function (Measurers) {
+        var CharacterMeasurer = (function (_super) {
+            __extends(CharacterMeasurer, _super);
+            function CharacterMeasurer() {
+                _super.apply(this, arguments);
+            }
+            CharacterMeasurer.prototype._measureCharacter = function (c) {
+                return _super.prototype._measureLine.call(this, c);
+            };
+            CharacterMeasurer.prototype._measureLine = function (line) {
+                var _this = this;
+                var charactersDimensions = line.split("").map(function (c) { return _this._measureCharacter(c); });
+                return {
+                    width: d3.sum(charactersDimensions, function (dim) { return dim.width; }),
+                    height: d3.max(charactersDimensions, function (dim) { return dim.height; })
+                };
+            };
+            return CharacterMeasurer;
+        })(Measurers.Measurer);
+        Measurers.CharacterMeasurer = CharacterMeasurer;
+    })(Measurers = SVGTypewriter.Measurers || (SVGTypewriter.Measurers = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+///<reference path="../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Measurers;
+    (function (Measurers) {
+        var CacheCharacterMeasurer = (function (_super) {
+            __extends(CacheCharacterMeasurer, _super);
+            function CacheCharacterMeasurer(area, className) {
+                var _this = this;
+                _super.call(this, area, className);
+                this.cache = new SVGTypewriter.Utils.Cache(function (c) { return _this._measureCharacterNotFromCache(c); }, SVGTypewriter.Utils.Methods.objEq);
+            }
+            CacheCharacterMeasurer.prototype._measureCharacterNotFromCache = function (c) {
+                return _super.prototype._measureCharacter.call(this, c);
+            };
+            CacheCharacterMeasurer.prototype._measureCharacter = function (c) {
+                return this.cache.get(c);
+            };
+            CacheCharacterMeasurer.prototype.reset = function () {
+                this.cache.clear();
+            };
+            return CacheCharacterMeasurer;
+        })(Measurers.CharacterMeasurer);
+        Measurers.CacheCharacterMeasurer = CacheCharacterMeasurer;
+    })(Measurers = SVGTypewriter.Measurers || (SVGTypewriter.Measurers = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+return Plottable;
+}));
+
+/*!
+SVG Typewriter 0.3.0 (https://github.com/palantir/svg-typewriter)
+Copyright 2014 Palantir Technologies
+Licensed under MIT (https://github.com/palantir/svg-typewriter/blob/develop/LICENSE)
+*/
+
+///<reference path="../reference.ts" />
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Utils;
+    (function (Utils) {
+        var Methods;
+        (function (Methods) {
+            /**
+             * Check if two arrays are equal by strict equality.
+             */
+            function arrayEq(a, b) {
+                // Technically, null and undefined are arrays too
+                if (a == null || b == null) {
+                    return a === b;
+                }
+                if (a.length !== b.length) {
+                    return false;
+                }
+                for (var i = 0; i < a.length; i++) {
+                    if (a[i] !== b[i]) {
+                        return false;
+                    }
+                }
+                return true;
+            }
+            Methods.arrayEq = arrayEq;
+            /**
+             * @param {any} a Object to check against b for equality.
+             * @param {any} b Object to check against a for equality.
+             *
+             * @returns {boolean} whether or not two objects share the same keys, and
+             *          values associated with those keys. Values will be compared
+             *          with ===.
+             */
+            function objEq(a, b) {
+                if (a == null || b == null) {
+                    return a === b;
+                }
+                var keysA = Object.keys(a).sort();
+                var keysB = Object.keys(b).sort();
+                var valuesA = keysA.map(function (k) { return a[k]; });
+                var valuesB = keysB.map(function (k) { return b[k]; });
+                return arrayEq(keysA, keysB) && arrayEq(valuesA, valuesB);
+            }
+            Methods.objEq = objEq;
+        })(Methods = Utils.Methods || (Utils.Methods = {}));
+    })(Utils = SVGTypewriter.Utils || (SVGTypewriter.Utils = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Utils;
+    (function (Utils) {
+        var DOM;
+        (function (DOM) {
+            function transform(s, x, y) {
+                var xform = d3.transform(s.attr("transform"));
+                if (x == null) {
+                    return xform.translate;
+                }
+                else {
+                    y = (y == null) ? 0 : y;
+                    xform.translate[0] = x;
+                    xform.translate[1] = y;
+                    s.attr("transform", xform.toString());
+                    return s;
+                }
+            }
+            DOM.transform = transform;
+            function getBBox(element) {
+                var bbox;
+                try {
+                    bbox = element.node().getBBox();
+                }
+                catch (err) {
+                    bbox = {
+                        x: 0,
+                        y: 0,
+                        width: 0,
+                        height: 0
+                    };
+                }
+                return bbox;
+            }
+            DOM.getBBox = getBBox;
+        })(DOM = Utils.DOM || (Utils.DOM = {}));
+    })(Utils = SVGTypewriter.Utils || (SVGTypewriter.Utils = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+///<reference path="../reference.ts" />
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Utils;
+    (function (Utils) {
+        var Cache = (function () {
+            /**
+             * @constructor
+             *
+             * @param {string} compute The function whose results will be cached.
+             * @param {(v: T, w: T) => boolean} [valueEq]
+             *        Used to determine if the value of canonicalKey has changed.
+             *        If omitted, defaults to === comparision.
+             */
+            function Cache(compute, valueEq) {
+                if (valueEq === void 0) { valueEq = function (v, w) { return v === w; }; }
+                this.cache = d3.map();
+                this.compute = compute;
+                this.valueEq = valueEq;
+            }
+            /**
+             * Attempt to look up k in the cache, computing the result if it isn't
+             * found.
+             *
+             * @param {string} k The key to look up in the cache.
+             * @return {T} The value associated with k; the result of compute(k).
+             */
+            Cache.prototype.get = function (k) {
+                if (!this.cache.has(k)) {
+                    this.cache.set(k, this.compute(k));
+                }
+                return this.cache.get(k);
+            };
+            /**
+             * Reset the cache empty.
+             *
+             * @return {Cache<T>} The calling Cache.
+             */
+            Cache.prototype.clear = function () {
+                this.cache = d3.map();
+                return this;
+            };
+            return Cache;
+        })();
+        Utils.Cache = Cache;
+    })(Utils = SVGTypewriter.Utils || (SVGTypewriter.Utils = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+///<reference path="../reference.ts" />
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Utils;
+    (function (Utils) {
+        var Tokenizer = (function () {
+            function Tokenizer() {
+                this.WordDividerRegExp = new RegExp("\\W");
+                this.WhitespaceRegExp = new RegExp("\\s");
+            }
+            Tokenizer.prototype.tokenize = function (line) {
+                var _this = this;
+                return line.split("").reduce(function (tokens, c) { return tokens.slice(0, -1).concat(_this.shouldCreateNewToken(tokens[tokens.length - 1], c)); }, [""]);
+            };
+            Tokenizer.prototype.shouldCreateNewToken = function (token, newCharacter) {
+                if (!token) {
+                    return [newCharacter];
+                }
+                var lastCharacter = token[token.length - 1];
+                if (this.WhitespaceRegExp.test(lastCharacter) && this.WhitespaceRegExp.test(newCharacter)) {
+                    return [token + newCharacter];
+                }
+                else if (this.WhitespaceRegExp.test(lastCharacter) || this.WhitespaceRegExp.test(newCharacter)) {
+                    return [token, newCharacter];
+                }
+                else if (!(this.WordDividerRegExp.test(lastCharacter) || this.WordDividerRegExp.test(newCharacter))) {
+                    return [token + newCharacter];
+                }
+                else if (lastCharacter === newCharacter) {
+                    return [token + newCharacter];
+                }
+                else {
+                    return [token, newCharacter];
+                }
+            };
+            return Tokenizer;
+        })();
+        Utils.Tokenizer = Tokenizer;
+    })(Utils = SVGTypewriter.Utils || (SVGTypewriter.Utils = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+///<reference path="../reference.ts" />
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Utils;
+    (function (Utils) {
+        var StringMethods;
+        (function (StringMethods) {
+            /**
+             * Treat all sequences of consecutive whitespace as a single " ".
+             */
+            function combineWhitespace(str) {
+                return str.replace(/\s+/g, " ");
+            }
+            StringMethods.combineWhitespace = combineWhitespace;
+            function isNotEmptyString(str) {
+                return str && str.trim() !== "";
+            }
+            StringMethods.isNotEmptyString = isNotEmptyString;
+            function trimStart(str, c) {
+                if (!str) {
+                    return str;
+                }
+                var chars = str.split("");
+                var reduceFunction = c ? function (s) { return s.split(c).some(isNotEmptyString); } : isNotEmptyString;
+                return chars.reduce(function (s, c) { return reduceFunction(s + c) ? s + c : s; }, "");
+            }
+            StringMethods.trimStart = trimStart;
+            function trimEnd(str, c) {
+                if (!str) {
+                    return str;
+                }
+                var reversedChars = str.split("");
+                reversedChars.reverse();
+                reversedChars = trimStart(reversedChars.join(""), c).split("");
+                reversedChars.reverse();
+                return reversedChars.join("");
+            }
+            StringMethods.trimEnd = trimEnd;
+        })(StringMethods = Utils.StringMethods || (Utils.StringMethods = {}));
+    })(Utils = SVGTypewriter.Utils || (SVGTypewriter.Utils = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+///<reference path="../reference.ts" />
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Animators;
+    (function (Animators) {
+        var BaseAnimator = (function () {
+            function BaseAnimator() {
+                this.duration(BaseAnimator.DEFAULT_DURATION_MILLISECONDS);
+                this.delay(0);
+                this.easing(BaseAnimator.DEFAULT_EASING);
+                this.moveX(0);
+                this.moveY(0);
+            }
+            BaseAnimator.prototype.animate = function (selection) {
+                var xForm = d3.transform("");
+                xForm.translate = [this.moveX(), this.moveY()];
+                selection.attr("transform", xForm.toString());
+                xForm.translate = [0, 0];
+                return this._animate(selection, { transform: xForm.toString() });
+            };
+            BaseAnimator.prototype._animate = function (selection, attr) {
+                return selection.transition().ease(this.easing()).duration(this.duration()).delay(this.delay()).attr(attr);
+            };
+            BaseAnimator.prototype.duration = function (duration) {
+                if (duration == null) {
+                    return this._duration;
+                }
+                else {
+                    this._duration = duration;
+                    return this;
+                }
+            };
+            BaseAnimator.prototype.moveX = function (shift) {
+                if (shift == null) {
+                    return this._moveX;
+                }
+                else {
+                    this._moveX = shift;
+                    return this;
+                }
+            };
+            BaseAnimator.prototype.moveY = function (shift) {
+                if (shift == null) {
+                    return this._moveY;
+                }
+                else {
+                    this._moveY = shift;
+                    return this;
+                }
+            };
+            BaseAnimator.prototype.delay = function (delay) {
+                if (delay == null) {
+                    return this._delay;
+                }
+                else {
+                    this._delay = delay;
+                    return this;
+                }
+            };
+            BaseAnimator.prototype.easing = function (easing) {
+                if (easing == null) {
+                    return this._easing;
+                }
+                else {
+                    this._easing = easing;
+                    return this;
+                }
+            };
+            /**
+             * The default duration of the animation in milliseconds
+             */
+            BaseAnimator.DEFAULT_DURATION_MILLISECONDS = 300;
+            /**
+             * The default easing of the animation
+             */
+            BaseAnimator.DEFAULT_EASING = "exp-out";
+            return BaseAnimator;
+        })();
+        Animators.BaseAnimator = BaseAnimator;
+    })(Animators = SVGTypewriter.Animators || (SVGTypewriter.Animators = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+///<reference path="../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Animators;
+    (function (Animators) {
+        var UnveilAnimator = (function (_super) {
+            __extends(UnveilAnimator, _super);
+            function UnveilAnimator() {
+                this.direction("bottom");
+                _super.call(this);
+            }
+            UnveilAnimator.prototype.direction = function (direction) {
+                if (direction == null) {
+                    return this._direction;
+                }
+                else {
+                    if (UnveilAnimator.SupportedDirections.indexOf(direction) === -1) {
+                        throw new Error("unsupported direction - " + direction);
+                    }
+                    this._direction = direction;
+                    return this;
+                }
+            };
+            UnveilAnimator.prototype.animate = function (selection) {
+                var attr = SVGTypewriter.Utils.DOM.getBBox(selection);
+                var mask = selection.select(".clip-rect");
+                mask.attr("width", 0);
+                mask.attr("height", 0);
+                switch (this._direction) {
+                    case "top":
+                        mask.attr("y", attr.y + attr.height);
+                        mask.attr("x", attr.x);
+                        mask.attr("width", attr.width);
+                        break;
+                    case "bottom":
+                        mask.attr("y", attr.y);
+                        mask.attr("x", attr.x);
+                        mask.attr("width", attr.width);
+                        break;
+                    case "left":
+                        mask.attr("y", attr.y);
+                        mask.attr("x", attr.x);
+                        mask.attr("height", attr.height);
+                        break;
+                    case "right":
+                        mask.attr("y", attr.y);
+                        mask.attr("x", attr.x + attr.width);
+                        mask.attr("height", attr.height);
+                        break;
+                }
+                this._animate(mask, attr);
+                return _super.prototype.animate.call(this, selection);
+            };
+            UnveilAnimator.SupportedDirections = ["top", "bottom", "left", "right"];
+            return UnveilAnimator;
+        })(Animators.BaseAnimator);
+        Animators.UnveilAnimator = UnveilAnimator;
+    })(Animators = SVGTypewriter.Animators || (SVGTypewriter.Animators = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+///<reference path="../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Animators;
+    (function (Animators) {
+        var OpacityAnimator = (function (_super) {
+            __extends(OpacityAnimator, _super);
+            function OpacityAnimator() {
+                _super.apply(this, arguments);
+            }
+            OpacityAnimator.prototype.animate = function (selection) {
+                var area = selection.select(".text-area");
+                area.attr("opacity", 0);
+                var attr = {
+                    opacity: 1
+                };
+                this._animate(area, attr);
+                return _super.prototype.animate.call(this, selection);
+            };
+            return OpacityAnimator;
+        })(Animators.BaseAnimator);
+        Animators.OpacityAnimator = OpacityAnimator;
+    })(Animators = SVGTypewriter.Animators || (SVGTypewriter.Animators = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+///<reference path="../reference.ts" />
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Wrappers;
+    (function (Wrappers) {
+        var Wrapper = (function () {
+            function Wrapper() {
+                this.maxLines(Infinity);
+                this.textTrimming("ellipsis");
+                this.allowBreakingWords(true);
+                this._tokenizer = new SVGTypewriter.Utils.Tokenizer();
+                this._breakingCharacter = "-";
+            }
+            Wrapper.prototype.maxLines = function (noLines) {
+                if (noLines == null) {
+                    return this._maxLines;
+                }
+                else {
+                    this._maxLines = noLines;
+                    return this;
+                }
+            };
+            Wrapper.prototype.textTrimming = function (option) {
+                if (option == null) {
+                    return this._textTrimming;
+                }
+                else {
+                    if (option !== "ellipsis" && option !== "none") {
+                        throw new Error(option + " - unsupported text trimming option.");
+                    }
+                    this._textTrimming = option;
+                    return this;
+                }
+            };
+            Wrapper.prototype.allowBreakingWords = function (allow) {
+                if (allow == null) {
+                    return this._allowBreakingWords;
+                }
+                else {
+                    this._allowBreakingWords = allow;
+                    return this;
+                }
+            };
+            Wrapper.prototype.wrap = function (text, measurer, width, height) {
+                var _this = this;
+                if (height === void 0) { height = Infinity; }
+                var initialWrappingResult = {
+                    originalText: text,
+                    wrappedText: "",
+                    noLines: 0,
+                    noBrokeWords: 0,
+                    truncatedText: ""
+                };
+                var state = {
+                    wrapping: initialWrappingResult,
+                    currentLine: "",
+                    availableWidth: width,
+                    availableLines: Math.min(Math.floor(height / measurer.measure().height), this._maxLines),
+                    canFitText: true
+                };
+                var lines = text.split("\n");
+                return lines.reduce(function (state, line, i) { return _this.breakLineToFitWidth(state, line, i !== lines.length - 1, measurer); }, state).wrapping;
+            };
+            Wrapper.prototype.breakLineToFitWidth = function (state, line, hasNextLine, measurer) {
+                var _this = this;
+                if (!state.canFitText && state.wrapping.truncatedText !== "") {
+                    state.wrapping.truncatedText += "\n";
+                }
+                var tokens = this._tokenizer.tokenize(line);
+                state = tokens.reduce(function (state, token) { return _this.wrapNextToken(token, state, measurer); }, state);
+                var wrappedText = SVGTypewriter.Utils.StringMethods.trimEnd(state.currentLine);
+                state.wrapping.noLines += +(wrappedText !== "");
+                if (state.wrapping.noLines === state.availableLines && this._textTrimming !== "none" && hasNextLine) {
+                    var ellipsisResult = this.addEllipsis(wrappedText, state.availableWidth, measurer);
+                    state.wrapping.wrappedText += ellipsisResult.wrappedToken;
+                    state.wrapping.truncatedText += ellipsisResult.remainingToken;
+                    state.canFitText = false;
+                }
+                else {
+                    state.wrapping.wrappedText += wrappedText;
+                }
+                state.currentLine = "\n";
+                return state;
+            };
+            Wrapper.prototype.canFitToken = function (token, width, measurer) {
+                var _this = this;
+                var possibleBreaks = this._allowBreakingWords ? token.split("").map(function (c, i) { return (i !== token.length - 1) ? c + _this._breakingCharacter : c; }) : [token];
+                return (measurer.measure(token).width <= width) || possibleBreaks.every(function (c) { return measurer.measure(c).width <= width; });
+            };
+            Wrapper.prototype.addEllipsis = function (line, width, measurer) {
+                if (this._textTrimming === "none") {
+                    return {
+                        wrappedToken: line,
+                        remainingToken: ""
+                    };
+                }
+                var truncatedLine = line.substring(0).trim();
+                var lineWidth = measurer.measure(truncatedLine).width;
+                var ellipsesWidth = measurer.measure("...").width;
+                var prefix = (line.length > 0 && line[0] === "\n") ? "\n" : "";
+                if (width <= ellipsesWidth) {
+                    var periodWidth = ellipsesWidth / 3;
+                    var numPeriodsThatFit = Math.floor(width / periodWidth);
+                    return {
+                        wrappedToken: prefix + "...".substr(0, numPeriodsThatFit),
+                        remainingToken: line
+                    };
+                }
+                while (lineWidth + ellipsesWidth > width) {
+                    truncatedLine = SVGTypewriter.Utils.StringMethods.trimEnd(truncatedLine.substr(0, truncatedLine.length - 1));
+                    lineWidth = measurer.measure(truncatedLine).width;
+                }
+                return {
+                    wrappedToken: prefix + truncatedLine + "...",
+                    remainingToken: SVGTypewriter.Utils.StringMethods.trimEnd(line.substring(truncatedLine.length), "-").trim()
+                };
+            };
+            Wrapper.prototype.wrapNextToken = function (token, state, measurer) {
+                if (!state.canFitText || state.availableLines === state.wrapping.noLines || !this.canFitToken(token, state.availableWidth, measurer)) {
+                    return this.finishWrapping(token, state, measurer);
+                }
+                var remainingToken = token;
+                while (remainingToken) {
+                    var result = this.breakTokenToFitInWidth(remainingToken, state.currentLine, state.availableWidth, measurer);
+                    state.currentLine = result.line;
+                    remainingToken = result.remainingToken;
+                    if (remainingToken != null) {
+                        state.wrapping.noBrokeWords += +result.breakWord;
+                        ++state.wrapping.noLines;
+                        if (state.availableLines === state.wrapping.noLines) {
+                            var ellipsisResult = this.addEllipsis(state.currentLine, state.availableWidth, measurer);
+                            state.wrapping.wrappedText += ellipsisResult.wrappedToken;
+                            state.wrapping.truncatedText += ellipsisResult.remainingToken + remainingToken;
+                            state.currentLine = "\n";
+                            return state;
+                        }
+                        else {
+                            state.wrapping.wrappedText += SVGTypewriter.Utils.StringMethods.trimEnd(state.currentLine);
+                            state.currentLine = "\n";
+                        }
+                    }
+                }
+                return state;
+            };
+            Wrapper.prototype.finishWrapping = function (token, state, measurer) {
+                // Token is really long, but we have a space to put part of the word.
+                if (state.canFitText && state.availableLines !== state.wrapping.noLines && this._allowBreakingWords && this._textTrimming !== "none") {
+                    var res = this.addEllipsis(state.currentLine + token, state.availableWidth, measurer);
+                    state.wrapping.wrappedText += res.wrappedToken;
+                    state.wrapping.truncatedText += res.remainingToken;
+                    state.wrapping.noBrokeWords += +(res.remainingToken.length < token.length);
+                    state.wrapping.noLines += +(res.wrappedToken.length > 0);
+                    state.currentLine = "";
+                }
+                else {
+                    state.wrapping.truncatedText += token;
+                }
+                state.canFitText = false;
+                return state;
+            };
+            /**
+             * Breaks single token to fit current line.
+             * If token contains only whitespaces then they will not be populated to next line.
+             */
+            Wrapper.prototype.breakTokenToFitInWidth = function (token, line, availableWidth, measurer, breakingCharacter) {
+                if (breakingCharacter === void 0) { breakingCharacter = this._breakingCharacter; }
+                if (measurer.measure(line + token).width <= availableWidth) {
+                    return {
+                        remainingToken: null,
+                        line: line + token,
+                        breakWord: false
+                    };
+                }
+                if (token.trim() === "") {
+                    return {
+                        remainingToken: "",
+                        line: line,
+                        breakWord: false
+                    };
+                }
+                if (!this._allowBreakingWords) {
+                    return {
+                        remainingToken: token,
+                        line: line,
+                        breakWord: false
+                    };
+                }
+                var fitTokenLength = 0;
+                while (fitTokenLength < token.length) {
+                    if (measurer.measure(line + token.substring(0, fitTokenLength + 1) + breakingCharacter).width <= availableWidth) {
+                        ++fitTokenLength;
+                    }
+                    else {
+                        break;
+                    }
+                }
+                var suffix = "";
+                if (fitTokenLength > 0) {
+                    suffix = breakingCharacter;
+                }
+                return {
+                    remainingToken: token.substring(fitTokenLength),
+                    line: line + token.substring(0, fitTokenLength) + suffix,
+                    breakWord: fitTokenLength > 0
+                };
+            };
+            return Wrapper;
+        })();
+        Wrappers.Wrapper = Wrapper;
+    })(Wrappers = SVGTypewriter.Wrappers || (SVGTypewriter.Wrappers = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+///<reference path="../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Wrappers;
+    (function (Wrappers) {
+        var SingleLineWrapper = (function (_super) {
+            __extends(SingleLineWrapper, _super);
+            function SingleLineWrapper() {
+                _super.apply(this, arguments);
+            }
+            SingleLineWrapper.prototype.wrap = function (text, measurer, width, height) {
+                var _this = this;
+                if (height === void 0) { height = Infinity; }
+                var lines = text.split("\n");
+                if (lines.length > 1) {
+                    throw new Error("SingleLineWrapper is designed to work only on single line");
+                }
+                var wrapFN = function (w) { return _super.prototype.wrap.call(_this, text, measurer, w, height); };
+                var result = wrapFN(width);
+                if (result.noLines < 2) {
+                    return result;
+                }
+                var left = 0;
+                var right = width;
+                for (var i = 0; i < SingleLineWrapper.NO_WRAP_ITERATIONS && right > left; ++i) {
+                    var currentWidth = (right + left) / 2;
+                    var currentResult = wrapFN(currentWidth);
+                    if (this.areSameResults(result, currentResult)) {
+                        right = currentWidth;
+                        result = currentResult;
+                    }
+                    else {
+                        left = currentWidth;
+                    }
+                }
+                return result;
+            };
+            SingleLineWrapper.prototype.areSameResults = function (one, two) {
+                return one.noLines === two.noLines && one.truncatedText === two.truncatedText;
+            };
+            SingleLineWrapper.NO_WRAP_ITERATIONS = 5;
+            return SingleLineWrapper;
+        })(Wrappers.Wrapper);
+        Wrappers.SingleLineWrapper = SingleLineWrapper;
+    })(Wrappers = SVGTypewriter.Wrappers || (SVGTypewriter.Wrappers = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+///<reference path="reference.ts" />
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Writers;
+    (function (Writers) {
+        var Writer = (function () {
+            function Writer(measurer, wrapper) {
+                this._writerID = Writer.nextID++;
+                this._elementID = 0;
+                this.measurer(measurer);
+                if (wrapper) {
+                    this.wrapper(wrapper);
+                }
+                this.addTitleElement(false);
+            }
+            Writer.prototype.measurer = function (newMeasurer) {
+                this._measurer = newMeasurer;
+                return this;
+            };
+            Writer.prototype.wrapper = function (newWrapper) {
+                this._wrapper = newWrapper;
+                return this;
+            };
+            Writer.prototype.addTitleElement = function (add) {
+                this._addTitleElement = add;
+                return this;
+            };
+            Writer.prototype.writeLine = function (line, g, width, xAlign, yOffset) {
+                var textEl = g.append("text");
+                textEl.text(line);
+                var xOffset = width * Writer.XOffsetFactor[xAlign];
+                var anchor = Writer.AnchorConverter[xAlign];
+                textEl.attr("text-anchor", anchor).classed("text-line", true);
+                SVGTypewriter.Utils.DOM.transform(textEl, xOffset, yOffset).attr("y", "-0.25em");
+                ;
+            };
+            Writer.prototype.writeText = function (text, writingArea, width, height, xAlign, yAlign) {
+                var _this = this;
+                var lines = text.split("\n");
+                var lineHeight = this._measurer.measure().height;
+                var yOffset = Writer.YOffsetFactor[yAlign] * (height - lines.length * lineHeight);
+                lines.forEach(function (line, i) {
+                    _this.writeLine(line, writingArea, width, xAlign, (i + 1) * lineHeight + yOffset);
+                });
+            };
+            Writer.prototype.write = function (text, width, height, options) {
+                if (Writer.SupportedRotation.indexOf(options.textRotation) === -1) {
+                    throw new Error("unsupported rotation - " + options.textRotation);
+                }
+                var orientHorizontally = Math.abs(Math.abs(options.textRotation) - 90) > 45;
+                var primaryDimension = orientHorizontally ? width : height;
+                var secondaryDimension = orientHorizontally ? height : width;
+                var textContainer = options.selection.append("g").classed("text-container", true);
+                if (this._addTitleElement) {
+                    textContainer.append("title").text(text);
+                }
+                var textArea = textContainer.append("g").classed("text-area", true);
+                var wrappedText = this._wrapper ? this._wrapper.wrap(text, this._measurer, primaryDimension, secondaryDimension).wrappedText : text;
+                this.writeText(wrappedText, textArea, primaryDimension, secondaryDimension, options.xAlign, options.yAlign);
+                var xForm = d3.transform("");
+                var xForm2 = d3.transform("");
+                xForm.rotate = options.textRotation;
+                switch (options.textRotation) {
+                    case 90:
+                        xForm.translate = [width, 0];
+                        xForm2.rotate = -90;
+                        xForm2.translate = [0, 200];
+                        break;
+                    case -90:
+                        xForm.translate = [0, height];
+                        xForm2.rotate = 90;
+                        xForm2.translate = [width, 0];
+                        break;
+                    case 180:
+                        xForm.translate = [width, height];
+                        xForm2.translate = [width, height];
+                        xForm2.rotate = 180;
+                        break;
+                }
+                textArea.attr("transform", xForm.toString());
+                this.addClipPath(textContainer, xForm2);
+                if (options.animator) {
+                    options.animator.animate(textContainer);
+                }
+            };
+            Writer.prototype.addClipPath = function (selection, transform) {
+                var elementID = this._elementID++;
+                var prefix = /MSIE [5-9]/.test(navigator.userAgent) ? "" : document.location.href;
+                prefix = prefix.split("#")[0]; // To fix cases where an anchor tag was used
+                var clipPathID = "clipPath" + this._writerID + "_" + elementID;
+                selection.select(".text-area").attr("clip-path", "url(\"" + prefix + "#" + clipPathID + "\")");
+                var clipPathParent = selection.append("clipPath").attr("id", clipPathID);
+                var bboxAttrs = SVGTypewriter.Utils.DOM.getBBox(selection.select(".text-area"));
+                var box = clipPathParent.append("rect");
+                box.classed("clip-rect", true).attr({
+                    x: bboxAttrs.x,
+                    y: bboxAttrs.y,
+                    width: bboxAttrs.width,
+                    height: bboxAttrs.height
+                });
+            };
+            Writer.nextID = 0;
+            Writer.SupportedRotation = [-90, 0, 180, 90];
+            Writer.AnchorConverter = {
+                left: "start",
+                center: "middle",
+                right: "end"
+            };
+            Writer.XOffsetFactor = {
+                left: 0,
+                center: 0.5,
+                right: 1
+            };
+            Writer.YOffsetFactor = {
+                top: 0,
+                center: 0.5,
+                bottom: 1
+            };
+            return Writer;
+        })();
+        Writers.Writer = Writer;
+    })(Writers = SVGTypewriter.Writers || (SVGTypewriter.Writers = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+///<reference path="../reference.ts" />
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Measurers;
+    (function (Measurers) {
+        ;
+        var AbstractMeasurer = (function () {
+            function AbstractMeasurer(area, className) {
+                this.textMeasurer = this.getTextMeasurer(area, className);
+            }
+            AbstractMeasurer.prototype.checkSelectionIsText = function (d) {
+                return d[0][0].tagName === "text" || !d.select("text").empty();
+            };
+            AbstractMeasurer.prototype.getTextMeasurer = function (area, className) {
+                var _this = this;
+                if (!this.checkSelectionIsText(area)) {
+                    var textElement = area.append("text");
+                    if (className) {
+                        textElement.classed(className, true);
+                    }
+                    textElement.remove();
+                    return function (text) {
+                        area.node().appendChild(textElement.node());
+                        var areaDimension = _this.measureBBox(textElement, text);
+                        textElement.remove();
+                        return areaDimension;
+                    };
+                }
+                else {
+                    var parentNode = area.node().parentNode;
+                    var textSelection;
+                    if (area[0][0].tagName === "text") {
+                        textSelection = area;
+                    }
+                    else {
+                        textSelection = area.select("text");
+                    }
+                    area.remove();
+                    return function (text) {
+                        parentNode.appendChild(area.node());
+                        var areaDimension = _this.measureBBox(textSelection, text);
+                        area.remove();
+                        return areaDimension;
+                    };
+                }
+            };
+            AbstractMeasurer.prototype.measureBBox = function (d, text) {
+                d.text(text);
+                var bb = SVGTypewriter.Utils.DOM.getBBox(d);
+                return { width: bb.width, height: bb.height };
+            };
+            AbstractMeasurer.prototype.measure = function (text) {
+                if (text === void 0) { text = AbstractMeasurer.HEIGHT_TEXT; }
+                return this.textMeasurer(text);
+            };
+            AbstractMeasurer.HEIGHT_TEXT = "bqpdl";
+            return AbstractMeasurer;
+        })();
+        Measurers.AbstractMeasurer = AbstractMeasurer;
+    })(Measurers = SVGTypewriter.Measurers || (SVGTypewriter.Measurers = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+///<reference path="../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Measurers;
+    (function (Measurers) {
+        var Measurer = (function (_super) {
+            __extends(Measurer, _super);
+            function Measurer(area, className, useGuards) {
+                if (className === void 0) { className = null; }
+                if (useGuards === void 0) { useGuards = false; }
+                _super.call(this, area, className);
+                this.useGuards = useGuards;
+            }
+            // Guards assures same line height and width of whitespaces on both ends.
+            Measurer.prototype._addGuards = function (text) {
+                return Measurers.AbstractMeasurer.HEIGHT_TEXT + text + Measurers.AbstractMeasurer.HEIGHT_TEXT;
+            };
+            Measurer.prototype.getGuardWidth = function () {
+                if (this.guardWidth == null) {
+                    this.guardWidth = _super.prototype.measure.call(this).width;
+                }
+                return this.guardWidth;
+            };
+            Measurer.prototype._measureLine = function (line) {
+                var measuredLine = this.useGuards ? this._addGuards(line) : line;
+                var measuredLineDimensions = _super.prototype.measure.call(this, measuredLine);
+                measuredLineDimensions.width -= this.useGuards ? (2 * this.getGuardWidth()) : 0;
+                return measuredLineDimensions;
+            };
+            Measurer.prototype.measure = function (text) {
+                var _this = this;
+                if (text === void 0) { text = Measurers.AbstractMeasurer.HEIGHT_TEXT; }
+                if (text.trim() === "") {
+                    return { width: 0, height: 0 };
+                }
+                var linesDimensions = text.trim().split("\n").map(function (line) { return _this._measureLine(line); });
+                return {
+                    width: d3.max(linesDimensions, function (dim) { return dim.width; }),
+                    height: d3.sum(linesDimensions, function (dim) { return dim.height; })
+                };
+            };
+            return Measurer;
+        })(Measurers.AbstractMeasurer);
+        Measurers.Measurer = Measurer;
+    })(Measurers = SVGTypewriter.Measurers || (SVGTypewriter.Measurers = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+///<reference path="../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Measurers;
+    (function (Measurers) {
+        var CharacterMeasurer = (function (_super) {
+            __extends(CharacterMeasurer, _super);
+            function CharacterMeasurer() {
+                _super.apply(this, arguments);
+            }
+            CharacterMeasurer.prototype._measureCharacter = function (c) {
+                return _super.prototype._measureLine.call(this, c);
+            };
+            CharacterMeasurer.prototype._measureLine = function (line) {
+                var _this = this;
+                var charactersDimensions = line.split("").map(function (c) { return _this._measureCharacter(c); });
+                return {
+                    width: d3.sum(charactersDimensions, function (dim) { return dim.width; }),
+                    height: d3.max(charactersDimensions, function (dim) { return dim.height; })
+                };
+            };
+            return CharacterMeasurer;
+        })(Measurers.Measurer);
+        Measurers.CharacterMeasurer = CharacterMeasurer;
+    })(Measurers = SVGTypewriter.Measurers || (SVGTypewriter.Measurers = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+///<reference path="../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Measurers;
+    (function (Measurers) {
+        var CacheCharacterMeasurer = (function (_super) {
+            __extends(CacheCharacterMeasurer, _super);
+            function CacheCharacterMeasurer(area, className) {
+                var _this = this;
+                _super.call(this, area, className);
+                this.cache = new SVGTypewriter.Utils.Cache(function (c) { return _this._measureCharacterNotFromCache(c); }, SVGTypewriter.Utils.Methods.objEq);
+            }
+            CacheCharacterMeasurer.prototype._measureCharacterNotFromCache = function (c) {
+                return _super.prototype._measureCharacter.call(this, c);
+            };
+            CacheCharacterMeasurer.prototype._measureCharacter = function (c) {
+                return this.cache.get(c);
+            };
+            CacheCharacterMeasurer.prototype.reset = function () {
+                this.cache.clear();
+            };
+            return CacheCharacterMeasurer;
+        })(Measurers.CharacterMeasurer);
+        Measurers.CacheCharacterMeasurer = CacheCharacterMeasurer;
+    })(Measurers = SVGTypewriter.Measurers || (SVGTypewriter.Measurers = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+return Plottable;
+}));
+
+/*!
+SVG Typewriter 0.3.0 (https://github.com/palantir/svg-typewriter)
+Copyright 2014 Palantir Technologies
+Licensed under MIT (https://github.com/palantir/svg-typewriter/blob/develop/LICENSE)
+*/
+
+///<reference path="../reference.ts" />
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Utils;
+    (function (Utils) {
+        var Methods;
+        (function (Methods) {
+            /**
+             * Check if two arrays are equal by strict equality.
+             */
+            function arrayEq(a, b) {
+                // Technically, null and undefined are arrays too
+                if (a == null || b == null) {
+                    return a === b;
+                }
+                if (a.length !== b.length) {
+                    return false;
+                }
+                for (var i = 0; i < a.length; i++) {
+                    if (a[i] !== b[i]) {
+                        return false;
+                    }
+                }
+                return true;
+            }
+            Methods.arrayEq = arrayEq;
+            /**
+             * @param {any} a Object to check against b for equality.
+             * @param {any} b Object to check against a for equality.
+             *
+             * @returns {boolean} whether or not two objects share the same keys, and
+             *          values associated with those keys. Values will be compared
+             *          with ===.
+             */
+            function objEq(a, b) {
+                if (a == null || b == null) {
+                    return a === b;
+                }
+                var keysA = Object.keys(a).sort();
+                var keysB = Object.keys(b).sort();
+                var valuesA = keysA.map(function (k) { return a[k]; });
+                var valuesB = keysB.map(function (k) { return b[k]; });
+                return arrayEq(keysA, keysB) && arrayEq(valuesA, valuesB);
+            }
+            Methods.objEq = objEq;
+        })(Methods = Utils.Methods || (Utils.Methods = {}));
+    })(Utils = SVGTypewriter.Utils || (SVGTypewriter.Utils = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Utils;
+    (function (Utils) {
+        var DOM;
+        (function (DOM) {
+            function transform(s, x, y) {
+                var xform = d3.transform(s.attr("transform"));
+                if (x == null) {
+                    return xform.translate;
+                }
+                else {
+                    y = (y == null) ? 0 : y;
+                    xform.translate[0] = x;
+                    xform.translate[1] = y;
+                    s.attr("transform", xform.toString());
+                    return s;
+                }
+            }
+            DOM.transform = transform;
+            function getBBox(element) {
+                var bbox;
+                try {
+                    bbox = element.node().getBBox();
+                }
+                catch (err) {
+                    bbox = {
+                        x: 0,
+                        y: 0,
+                        width: 0,
+                        height: 0
+                    };
+                }
+                return bbox;
+            }
+            DOM.getBBox = getBBox;
+        })(DOM = Utils.DOM || (Utils.DOM = {}));
+    })(Utils = SVGTypewriter.Utils || (SVGTypewriter.Utils = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+///<reference path="../reference.ts" />
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Utils;
+    (function (Utils) {
+        var Cache = (function () {
+            /**
+             * @constructor
+             *
+             * @param {string} compute The function whose results will be cached.
+             * @param {(v: T, w: T) => boolean} [valueEq]
+             *        Used to determine if the value of canonicalKey has changed.
+             *        If omitted, defaults to === comparision.
+             */
+            function Cache(compute, valueEq) {
+                if (valueEq === void 0) { valueEq = function (v, w) { return v === w; }; }
+                this.cache = d3.map();
+                this.compute = compute;
+                this.valueEq = valueEq;
+            }
+            /**
+             * Attempt to look up k in the cache, computing the result if it isn't
+             * found.
+             *
+             * @param {string} k The key to look up in the cache.
+             * @return {T} The value associated with k; the result of compute(k).
+             */
+            Cache.prototype.get = function (k) {
+                if (!this.cache.has(k)) {
+                    this.cache.set(k, this.compute(k));
+                }
+                return this.cache.get(k);
+            };
+            /**
+             * Reset the cache empty.
+             *
+             * @return {Cache<T>} The calling Cache.
+             */
+            Cache.prototype.clear = function () {
+                this.cache = d3.map();
+                return this;
+            };
+            return Cache;
+        })();
+        Utils.Cache = Cache;
+    })(Utils = SVGTypewriter.Utils || (SVGTypewriter.Utils = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+///<reference path="../reference.ts" />
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Utils;
+    (function (Utils) {
+        var Tokenizer = (function () {
+            function Tokenizer() {
+                this.WordDividerRegExp = new RegExp("\\W");
+                this.WhitespaceRegExp = new RegExp("\\s");
+            }
+            Tokenizer.prototype.tokenize = function (line) {
+                var _this = this;
+                return line.split("").reduce(function (tokens, c) { return tokens.slice(0, -1).concat(_this.shouldCreateNewToken(tokens[tokens.length - 1], c)); }, [""]);
+            };
+            Tokenizer.prototype.shouldCreateNewToken = function (token, newCharacter) {
+                if (!token) {
+                    return [newCharacter];
+                }
+                var lastCharacter = token[token.length - 1];
+                if (this.WhitespaceRegExp.test(lastCharacter) && this.WhitespaceRegExp.test(newCharacter)) {
+                    return [token + newCharacter];
+                }
+                else if (this.WhitespaceRegExp.test(lastCharacter) || this.WhitespaceRegExp.test(newCharacter)) {
+                    return [token, newCharacter];
+                }
+                else if (!(this.WordDividerRegExp.test(lastCharacter) || this.WordDividerRegExp.test(newCharacter))) {
+                    return [token + newCharacter];
+                }
+                else if (lastCharacter === newCharacter) {
+                    return [token + newCharacter];
+                }
+                else {
+                    return [token, newCharacter];
+                }
+            };
+            return Tokenizer;
+        })();
+        Utils.Tokenizer = Tokenizer;
+    })(Utils = SVGTypewriter.Utils || (SVGTypewriter.Utils = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+///<reference path="../reference.ts" />
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Utils;
+    (function (Utils) {
+        var StringMethods;
+        (function (StringMethods) {
+            /**
+             * Treat all sequences of consecutive whitespace as a single " ".
+             */
+            function combineWhitespace(str) {
+                return str.replace(/\s+/g, " ");
+            }
+            StringMethods.combineWhitespace = combineWhitespace;
+            function isNotEmptyString(str) {
+                return str && str.trim() !== "";
+            }
+            StringMethods.isNotEmptyString = isNotEmptyString;
+            function trimStart(str, c) {
+                if (!str) {
+                    return str;
+                }
+                var chars = str.split("");
+                var reduceFunction = c ? function (s) { return s.split(c).some(isNotEmptyString); } : isNotEmptyString;
+                return chars.reduce(function (s, c) { return reduceFunction(s + c) ? s + c : s; }, "");
+            }
+            StringMethods.trimStart = trimStart;
+            function trimEnd(str, c) {
+                if (!str) {
+                    return str;
+                }
+                var reversedChars = str.split("");
+                reversedChars.reverse();
+                reversedChars = trimStart(reversedChars.join(""), c).split("");
+                reversedChars.reverse();
+                return reversedChars.join("");
+            }
+            StringMethods.trimEnd = trimEnd;
+        })(StringMethods = Utils.StringMethods || (Utils.StringMethods = {}));
+    })(Utils = SVGTypewriter.Utils || (SVGTypewriter.Utils = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+///<reference path="../reference.ts" />
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Animators;
+    (function (Animators) {
+        var BaseAnimator = (function () {
+            function BaseAnimator() {
+                this.duration(BaseAnimator.DEFAULT_DURATION_MILLISECONDS);
+                this.delay(0);
+                this.easing(BaseAnimator.DEFAULT_EASING);
+                this.moveX(0);
+                this.moveY(0);
+            }
+            BaseAnimator.prototype.animate = function (selection) {
+                var xForm = d3.transform("");
+                xForm.translate = [this.moveX(), this.moveY()];
+                selection.attr("transform", xForm.toString());
+                xForm.translate = [0, 0];
+                return this._animate(selection, { transform: xForm.toString() });
+            };
+            BaseAnimator.prototype._animate = function (selection, attr) {
+                return selection.transition().ease(this.easing()).duration(this.duration()).delay(this.delay()).attr(attr);
+            };
+            BaseAnimator.prototype.duration = function (duration) {
+                if (duration == null) {
+                    return this._duration;
+                }
+                else {
+                    this._duration = duration;
+                    return this;
+                }
+            };
+            BaseAnimator.prototype.moveX = function (shift) {
+                if (shift == null) {
+                    return this._moveX;
+                }
+                else {
+                    this._moveX = shift;
+                    return this;
+                }
+            };
+            BaseAnimator.prototype.moveY = function (shift) {
+                if (shift == null) {
+                    return this._moveY;
+                }
+                else {
+                    this._moveY = shift;
+                    return this;
+                }
+            };
+            BaseAnimator.prototype.delay = function (delay) {
+                if (delay == null) {
+                    return this._delay;
+                }
+                else {
+                    this._delay = delay;
+                    return this;
+                }
+            };
+            BaseAnimator.prototype.easing = function (easing) {
+                if (easing == null) {
+                    return this._easing;
+                }
+                else {
+                    this._easing = easing;
+                    return this;
+                }
+            };
+            /**
+             * The default duration of the animation in milliseconds
+             */
+            BaseAnimator.DEFAULT_DURATION_MILLISECONDS = 300;
+            /**
+             * The default easing of the animation
+             */
+            BaseAnimator.DEFAULT_EASING = "exp-out";
+            return BaseAnimator;
+        })();
+        Animators.BaseAnimator = BaseAnimator;
+    })(Animators = SVGTypewriter.Animators || (SVGTypewriter.Animators = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+///<reference path="../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Animators;
+    (function (Animators) {
+        var UnveilAnimator = (function (_super) {
+            __extends(UnveilAnimator, _super);
+            function UnveilAnimator() {
+                this.direction("bottom");
+                _super.call(this);
+            }
+            UnveilAnimator.prototype.direction = function (direction) {
+                if (direction == null) {
+                    return this._direction;
+                }
+                else {
+                    if (UnveilAnimator.SupportedDirections.indexOf(direction) === -1) {
+                        throw new Error("unsupported direction - " + direction);
+                    }
+                    this._direction = direction;
+                    return this;
+                }
+            };
+            UnveilAnimator.prototype.animate = function (selection) {
+                var attr = SVGTypewriter.Utils.DOM.getBBox(selection);
+                var mask = selection.select(".clip-rect");
+                mask.attr("width", 0);
+                mask.attr("height", 0);
+                switch (this._direction) {
+                    case "top":
+                        mask.attr("y", attr.y + attr.height);
+                        mask.attr("x", attr.x);
+                        mask.attr("width", attr.width);
+                        break;
+                    case "bottom":
+                        mask.attr("y", attr.y);
+                        mask.attr("x", attr.x);
+                        mask.attr("width", attr.width);
+                        break;
+                    case "left":
+                        mask.attr("y", attr.y);
+                        mask.attr("x", attr.x);
+                        mask.attr("height", attr.height);
+                        break;
+                    case "right":
+                        mask.attr("y", attr.y);
+                        mask.attr("x", attr.x + attr.width);
+                        mask.attr("height", attr.height);
+                        break;
+                }
+                this._animate(mask, attr);
+                return _super.prototype.animate.call(this, selection);
+            };
+            UnveilAnimator.SupportedDirections = ["top", "bottom", "left", "right"];
+            return UnveilAnimator;
+        })(Animators.BaseAnimator);
+        Animators.UnveilAnimator = UnveilAnimator;
+    })(Animators = SVGTypewriter.Animators || (SVGTypewriter.Animators = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+///<reference path="../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Animators;
+    (function (Animators) {
+        var OpacityAnimator = (function (_super) {
+            __extends(OpacityAnimator, _super);
+            function OpacityAnimator() {
+                _super.apply(this, arguments);
+            }
+            OpacityAnimator.prototype.animate = function (selection) {
+                var area = selection.select(".text-area");
+                area.attr("opacity", 0);
+                var attr = {
+                    opacity: 1
+                };
+                this._animate(area, attr);
+                return _super.prototype.animate.call(this, selection);
+            };
+            return OpacityAnimator;
+        })(Animators.BaseAnimator);
+        Animators.OpacityAnimator = OpacityAnimator;
+    })(Animators = SVGTypewriter.Animators || (SVGTypewriter.Animators = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+///<reference path="../reference.ts" />
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Wrappers;
+    (function (Wrappers) {
+        var Wrapper = (function () {
+            function Wrapper() {
+                this.maxLines(Infinity);
+                this.textTrimming("ellipsis");
+                this.allowBreakingWords(true);
+                this._tokenizer = new SVGTypewriter.Utils.Tokenizer();
+                this._breakingCharacter = "-";
+            }
+            Wrapper.prototype.maxLines = function (noLines) {
+                if (noLines == null) {
+                    return this._maxLines;
+                }
+                else {
+                    this._maxLines = noLines;
+                    return this;
+                }
+            };
+            Wrapper.prototype.textTrimming = function (option) {
+                if (option == null) {
+                    return this._textTrimming;
+                }
+                else {
+                    if (option !== "ellipsis" && option !== "none") {
+                        throw new Error(option + " - unsupported text trimming option.");
+                    }
+                    this._textTrimming = option;
+                    return this;
+                }
+            };
+            Wrapper.prototype.allowBreakingWords = function (allow) {
+                if (allow == null) {
+                    return this._allowBreakingWords;
+                }
+                else {
+                    this._allowBreakingWords = allow;
+                    return this;
+                }
+            };
+            Wrapper.prototype.wrap = function (text, measurer, width, height) {
+                var _this = this;
+                if (height === void 0) { height = Infinity; }
+                var initialWrappingResult = {
+                    originalText: text,
+                    wrappedText: "",
+                    noLines: 0,
+                    noBrokeWords: 0,
+                    truncatedText: ""
+                };
+                var state = {
+                    wrapping: initialWrappingResult,
+                    currentLine: "",
+                    availableWidth: width,
+                    availableLines: Math.min(Math.floor(height / measurer.measure().height), this._maxLines),
+                    canFitText: true
+                };
+                var lines = text.split("\n");
+                return lines.reduce(function (state, line, i) { return _this.breakLineToFitWidth(state, line, i !== lines.length - 1, measurer); }, state).wrapping;
+            };
+            Wrapper.prototype.breakLineToFitWidth = function (state, line, hasNextLine, measurer) {
+                var _this = this;
+                if (!state.canFitText && state.wrapping.truncatedText !== "") {
+                    state.wrapping.truncatedText += "\n";
+                }
+                var tokens = this._tokenizer.tokenize(line);
+                state = tokens.reduce(function (state, token) { return _this.wrapNextToken(token, state, measurer); }, state);
+                var wrappedText = SVGTypewriter.Utils.StringMethods.trimEnd(state.currentLine);
+                state.wrapping.noLines += +(wrappedText !== "");
+                if (state.wrapping.noLines === state.availableLines && this._textTrimming !== "none" && hasNextLine) {
+                    var ellipsisResult = this.addEllipsis(wrappedText, state.availableWidth, measurer);
+                    state.wrapping.wrappedText += ellipsisResult.wrappedToken;
+                    state.wrapping.truncatedText += ellipsisResult.remainingToken;
+                    state.canFitText = false;
+                }
+                else {
+                    state.wrapping.wrappedText += wrappedText;
+                }
+                state.currentLine = "\n";
+                return state;
+            };
+            Wrapper.prototype.canFitToken = function (token, width, measurer) {
+                var _this = this;
+                var possibleBreaks = this._allowBreakingWords ? token.split("").map(function (c, i) { return (i !== token.length - 1) ? c + _this._breakingCharacter : c; }) : [token];
+                return (measurer.measure(token).width <= width) || possibleBreaks.every(function (c) { return measurer.measure(c).width <= width; });
+            };
+            Wrapper.prototype.addEllipsis = function (line, width, measurer) {
+                if (this._textTrimming === "none") {
+                    return {
+                        wrappedToken: line,
+                        remainingToken: ""
+                    };
+                }
+                var truncatedLine = line.substring(0).trim();
+                var lineWidth = measurer.measure(truncatedLine).width;
+                var ellipsesWidth = measurer.measure("...").width;
+                var prefix = (line.length > 0 && line[0] === "\n") ? "\n" : "";
+                if (width <= ellipsesWidth) {
+                    var periodWidth = ellipsesWidth / 3;
+                    var numPeriodsThatFit = Math.floor(width / periodWidth);
+                    return {
+                        wrappedToken: prefix + "...".substr(0, numPeriodsThatFit),
+                        remainingToken: line
+                    };
+                }
+                while (lineWidth + ellipsesWidth > width) {
+                    truncatedLine = SVGTypewriter.Utils.StringMethods.trimEnd(truncatedLine.substr(0, truncatedLine.length - 1));
+                    lineWidth = measurer.measure(truncatedLine).width;
+                }
+                return {
+                    wrappedToken: prefix + truncatedLine + "...",
+                    remainingToken: SVGTypewriter.Utils.StringMethods.trimEnd(line.substring(truncatedLine.length), "-").trim()
+                };
+            };
+            Wrapper.prototype.wrapNextToken = function (token, state, measurer) {
+                if (!state.canFitText || state.availableLines === state.wrapping.noLines || !this.canFitToken(token, state.availableWidth, measurer)) {
+                    return this.finishWrapping(token, state, measurer);
+                }
+                var remainingToken = token;
+                while (remainingToken) {
+                    var result = this.breakTokenToFitInWidth(remainingToken, state.currentLine, state.availableWidth, measurer);
+                    state.currentLine = result.line;
+                    remainingToken = result.remainingToken;
+                    if (remainingToken != null) {
+                        state.wrapping.noBrokeWords += +result.breakWord;
+                        ++state.wrapping.noLines;
+                        if (state.availableLines === state.wrapping.noLines) {
+                            var ellipsisResult = this.addEllipsis(state.currentLine, state.availableWidth, measurer);
+                            state.wrapping.wrappedText += ellipsisResult.wrappedToken;
+                            state.wrapping.truncatedText += ellipsisResult.remainingToken + remainingToken;
+                            state.currentLine = "\n";
+                            return state;
+                        }
+                        else {
+                            state.wrapping.wrappedText += SVGTypewriter.Utils.StringMethods.trimEnd(state.currentLine);
+                            state.currentLine = "\n";
+                        }
+                    }
+                }
+                return state;
+            };
+            Wrapper.prototype.finishWrapping = function (token, state, measurer) {
+                // Token is really long, but we have a space to put part of the word.
+                if (state.canFitText && state.availableLines !== state.wrapping.noLines && this._allowBreakingWords && this._textTrimming !== "none") {
+                    var res = this.addEllipsis(state.currentLine + token, state.availableWidth, measurer);
+                    state.wrapping.wrappedText += res.wrappedToken;
+                    state.wrapping.truncatedText += res.remainingToken;
+                    state.wrapping.noBrokeWords += +(res.remainingToken.length < token.length);
+                    state.wrapping.noLines += +(res.wrappedToken.length > 0);
+                    state.currentLine = "";
+                }
+                else {
+                    state.wrapping.truncatedText += token;
+                }
+                state.canFitText = false;
+                return state;
+            };
+            /**
+             * Breaks single token to fit current line.
+             * If token contains only whitespaces then they will not be populated to next line.
+             */
+            Wrapper.prototype.breakTokenToFitInWidth = function (token, line, availableWidth, measurer, breakingCharacter) {
+                if (breakingCharacter === void 0) { breakingCharacter = this._breakingCharacter; }
+                if (measurer.measure(line + token).width <= availableWidth) {
+                    return {
+                        remainingToken: null,
+                        line: line + token,
+                        breakWord: false
+                    };
+                }
+                if (token.trim() === "") {
+                    return {
+                        remainingToken: "",
+                        line: line,
+                        breakWord: false
+                    };
+                }
+                if (!this._allowBreakingWords) {
+                    return {
+                        remainingToken: token,
+                        line: line,
+                        breakWord: false
+                    };
+                }
+                var fitTokenLength = 0;
+                while (fitTokenLength < token.length) {
+                    if (measurer.measure(line + token.substring(0, fitTokenLength + 1) + breakingCharacter).width <= availableWidth) {
+                        ++fitTokenLength;
+                    }
+                    else {
+                        break;
+                    }
+                }
+                var suffix = "";
+                if (fitTokenLength > 0) {
+                    suffix = breakingCharacter;
+                }
+                return {
+                    remainingToken: token.substring(fitTokenLength),
+                    line: line + token.substring(0, fitTokenLength) + suffix,
+                    breakWord: fitTokenLength > 0
+                };
+            };
+            return Wrapper;
+        })();
+        Wrappers.Wrapper = Wrapper;
+    })(Wrappers = SVGTypewriter.Wrappers || (SVGTypewriter.Wrappers = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+///<reference path="../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Wrappers;
+    (function (Wrappers) {
+        var SingleLineWrapper = (function (_super) {
+            __extends(SingleLineWrapper, _super);
+            function SingleLineWrapper() {
+                _super.apply(this, arguments);
+            }
+            SingleLineWrapper.prototype.wrap = function (text, measurer, width, height) {
+                var _this = this;
+                if (height === void 0) { height = Infinity; }
+                var lines = text.split("\n");
+                if (lines.length > 1) {
+                    throw new Error("SingleLineWrapper is designed to work only on single line");
+                }
+                var wrapFN = function (w) { return _super.prototype.wrap.call(_this, text, measurer, w, height); };
+                var result = wrapFN(width);
+                if (result.noLines < 2) {
+                    return result;
+                }
+                var left = 0;
+                var right = width;
+                for (var i = 0; i < SingleLineWrapper.NO_WRAP_ITERATIONS && right > left; ++i) {
+                    var currentWidth = (right + left) / 2;
+                    var currentResult = wrapFN(currentWidth);
+                    if (this.areSameResults(result, currentResult)) {
+                        right = currentWidth;
+                        result = currentResult;
+                    }
+                    else {
+                        left = currentWidth;
+                    }
+                }
+                return result;
+            };
+            SingleLineWrapper.prototype.areSameResults = function (one, two) {
+                return one.noLines === two.noLines && one.truncatedText === two.truncatedText;
+            };
+            SingleLineWrapper.NO_WRAP_ITERATIONS = 5;
+            return SingleLineWrapper;
+        })(Wrappers.Wrapper);
+        Wrappers.SingleLineWrapper = SingleLineWrapper;
+    })(Wrappers = SVGTypewriter.Wrappers || (SVGTypewriter.Wrappers = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+///<reference path="reference.ts" />
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Writers;
+    (function (Writers) {
+        var Writer = (function () {
+            function Writer(measurer, wrapper) {
+                this._writerID = Writer.nextID++;
+                this._elementID = 0;
+                this.measurer(measurer);
+                if (wrapper) {
+                    this.wrapper(wrapper);
+                }
+                this.addTitleElement(false);
+            }
+            Writer.prototype.measurer = function (newMeasurer) {
+                this._measurer = newMeasurer;
+                return this;
+            };
+            Writer.prototype.wrapper = function (newWrapper) {
+                this._wrapper = newWrapper;
+                return this;
+            };
+            Writer.prototype.addTitleElement = function (add) {
+                this._addTitleElement = add;
+                return this;
+            };
+            Writer.prototype.writeLine = function (line, g, width, xAlign, yOffset) {
+                var textEl = g.append("text");
+                textEl.text(line);
+                var xOffset = width * Writer.XOffsetFactor[xAlign];
+                var anchor = Writer.AnchorConverter[xAlign];
+                textEl.attr("text-anchor", anchor).classed("text-line", true);
+                SVGTypewriter.Utils.DOM.transform(textEl, xOffset, yOffset).attr("y", "-0.25em");
+                ;
+            };
+            Writer.prototype.writeText = function (text, writingArea, width, height, xAlign, yAlign) {
+                var _this = this;
+                var lines = text.split("\n");
+                var lineHeight = this._measurer.measure().height;
+                var yOffset = Writer.YOffsetFactor[yAlign] * (height - lines.length * lineHeight);
+                lines.forEach(function (line, i) {
+                    _this.writeLine(line, writingArea, width, xAlign, (i + 1) * lineHeight + yOffset);
+                });
+            };
+            Writer.prototype.write = function (text, width, height, options) {
+                if (Writer.SupportedRotation.indexOf(options.textRotation) === -1) {
+                    throw new Error("unsupported rotation - " + options.textRotation);
+                }
+                var orientHorizontally = Math.abs(Math.abs(options.textRotation) - 90) > 45;
+                var primaryDimension = orientHorizontally ? width : height;
+                var secondaryDimension = orientHorizontally ? height : width;
+                var textContainer = options.selection.append("g").classed("text-container", true);
+                if (this._addTitleElement) {
+                    textContainer.append("title").text(text);
+                }
+                var textArea = textContainer.append("g").classed("text-area", true);
+                var wrappedText = this._wrapper ? this._wrapper.wrap(text, this._measurer, primaryDimension, secondaryDimension).wrappedText : text;
+                this.writeText(wrappedText, textArea, primaryDimension, secondaryDimension, options.xAlign, options.yAlign);
+                var xForm = d3.transform("");
+                var xForm2 = d3.transform("");
+                xForm.rotate = options.textRotation;
+                switch (options.textRotation) {
+                    case 90:
+                        xForm.translate = [width, 0];
+                        xForm2.rotate = -90;
+                        xForm2.translate = [0, 200];
+                        break;
+                    case -90:
+                        xForm.translate = [0, height];
+                        xForm2.rotate = 90;
+                        xForm2.translate = [width, 0];
+                        break;
+                    case 180:
+                        xForm.translate = [width, height];
+                        xForm2.translate = [width, height];
+                        xForm2.rotate = 180;
+                        break;
+                }
+                textArea.attr("transform", xForm.toString());
+                this.addClipPath(textContainer, xForm2);
+                if (options.animator) {
+                    options.animator.animate(textContainer);
+                }
+            };
+            Writer.prototype.addClipPath = function (selection, transform) {
+                var elementID = this._elementID++;
+                var prefix = /MSIE [5-9]/.test(navigator.userAgent) ? "" : document.location.href;
+                prefix = prefix.split("#")[0]; // To fix cases where an anchor tag was used
+                var clipPathID = "clipPath" + this._writerID + "_" + elementID;
+                selection.select(".text-area").attr("clip-path", "url(\"" + prefix + "#" + clipPathID + "\")");
+                var clipPathParent = selection.append("clipPath").attr("id", clipPathID);
+                var bboxAttrs = SVGTypewriter.Utils.DOM.getBBox(selection.select(".text-area"));
+                var box = clipPathParent.append("rect");
+                box.classed("clip-rect", true).attr({
+                    x: bboxAttrs.x,
+                    y: bboxAttrs.y,
+                    width: bboxAttrs.width,
+                    height: bboxAttrs.height
+                });
+            };
+            Writer.nextID = 0;
+            Writer.SupportedRotation = [-90, 0, 180, 90];
+            Writer.AnchorConverter = {
+                left: "start",
+                center: "middle",
+                right: "end"
+            };
+            Writer.XOffsetFactor = {
+                left: 0,
+                center: 0.5,
+                right: 1
+            };
+            Writer.YOffsetFactor = {
+                top: 0,
+                center: 0.5,
+                bottom: 1
+            };
+            return Writer;
+        })();
+        Writers.Writer = Writer;
+    })(Writers = SVGTypewriter.Writers || (SVGTypewriter.Writers = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+///<reference path="../reference.ts" />
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Measurers;
+    (function (Measurers) {
+        ;
+        var AbstractMeasurer = (function () {
+            function AbstractMeasurer(area, className) {
+                this.textMeasurer = this.getTextMeasurer(area, className);
+            }
+            AbstractMeasurer.prototype.checkSelectionIsText = function (d) {
+                return d[0][0].tagName === "text" || !d.select("text").empty();
+            };
+            AbstractMeasurer.prototype.getTextMeasurer = function (area, className) {
+                var _this = this;
+                if (!this.checkSelectionIsText(area)) {
+                    var textElement = area.append("text");
+                    if (className) {
+                        textElement.classed(className, true);
+                    }
+                    textElement.remove();
+                    return function (text) {
+                        area.node().appendChild(textElement.node());
+                        var areaDimension = _this.measureBBox(textElement, text);
+                        textElement.remove();
+                        return areaDimension;
+                    };
+                }
+                else {
+                    var parentNode = area.node().parentNode;
+                    var textSelection;
+                    if (area[0][0].tagName === "text") {
+                        textSelection = area;
+                    }
+                    else {
+                        textSelection = area.select("text");
+                    }
+                    area.remove();
+                    return function (text) {
+                        parentNode.appendChild(area.node());
+                        var areaDimension = _this.measureBBox(textSelection, text);
+                        area.remove();
+                        return areaDimension;
+                    };
+                }
+            };
+            AbstractMeasurer.prototype.measureBBox = function (d, text) {
+                d.text(text);
+                var bb = SVGTypewriter.Utils.DOM.getBBox(d);
+                return { width: bb.width, height: bb.height };
+            };
+            AbstractMeasurer.prototype.measure = function (text) {
+                if (text === void 0) { text = AbstractMeasurer.HEIGHT_TEXT; }
+                return this.textMeasurer(text);
+            };
+            AbstractMeasurer.HEIGHT_TEXT = "bqpdl";
+            return AbstractMeasurer;
+        })();
+        Measurers.AbstractMeasurer = AbstractMeasurer;
+    })(Measurers = SVGTypewriter.Measurers || (SVGTypewriter.Measurers = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+///<reference path="../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Measurers;
+    (function (Measurers) {
+        var Measurer = (function (_super) {
+            __extends(Measurer, _super);
+            function Measurer(area, className, useGuards) {
+                if (className === void 0) { className = null; }
+                if (useGuards === void 0) { useGuards = false; }
+                _super.call(this, area, className);
+                this.useGuards = useGuards;
+            }
+            // Guards assures same line height and width of whitespaces on both ends.
+            Measurer.prototype._addGuards = function (text) {
+                return Measurers.AbstractMeasurer.HEIGHT_TEXT + text + Measurers.AbstractMeasurer.HEIGHT_TEXT;
+            };
+            Measurer.prototype.getGuardWidth = function () {
+                if (this.guardWidth == null) {
+                    this.guardWidth = _super.prototype.measure.call(this).width;
+                }
+                return this.guardWidth;
+            };
+            Measurer.prototype._measureLine = function (line) {
+                var measuredLine = this.useGuards ? this._addGuards(line) : line;
+                var measuredLineDimensions = _super.prototype.measure.call(this, measuredLine);
+                measuredLineDimensions.width -= this.useGuards ? (2 * this.getGuardWidth()) : 0;
+                return measuredLineDimensions;
+            };
+            Measurer.prototype.measure = function (text) {
+                var _this = this;
+                if (text === void 0) { text = Measurers.AbstractMeasurer.HEIGHT_TEXT; }
+                if (text.trim() === "") {
+                    return { width: 0, height: 0 };
+                }
+                var linesDimensions = text.trim().split("\n").map(function (line) { return _this._measureLine(line); });
+                return {
+                    width: d3.max(linesDimensions, function (dim) { return dim.width; }),
+                    height: d3.sum(linesDimensions, function (dim) { return dim.height; })
+                };
+            };
+            return Measurer;
+        })(Measurers.AbstractMeasurer);
+        Measurers.Measurer = Measurer;
+    })(Measurers = SVGTypewriter.Measurers || (SVGTypewriter.Measurers = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+///<reference path="../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Measurers;
+    (function (Measurers) {
+        var CharacterMeasurer = (function (_super) {
+            __extends(CharacterMeasurer, _super);
+            function CharacterMeasurer() {
+                _super.apply(this, arguments);
+            }
+            CharacterMeasurer.prototype._measureCharacter = function (c) {
+                return _super.prototype._measureLine.call(this, c);
+            };
+            CharacterMeasurer.prototype._measureLine = function (line) {
+                var _this = this;
+                var charactersDimensions = line.split("").map(function (c) { return _this._measureCharacter(c); });
+                return {
+                    width: d3.sum(charactersDimensions, function (dim) { return dim.width; }),
+                    height: d3.max(charactersDimensions, function (dim) { return dim.height; })
+                };
+            };
+            return CharacterMeasurer;
+        })(Measurers.Measurer);
+        Measurers.CharacterMeasurer = CharacterMeasurer;
+    })(Measurers = SVGTypewriter.Measurers || (SVGTypewriter.Measurers = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+///<reference path="../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var SVGTypewriter;
+(function (SVGTypewriter) {
+    var Measurers;
+    (function (Measurers) {
+        var CacheCharacterMeasurer = (function (_super) {
+            __extends(CacheCharacterMeasurer, _super);
+            function CacheCharacterMeasurer(area, className) {
+                var _this = this;
+                _super.call(this, area, className);
+                this.cache = new SVGTypewriter.Utils.Cache(function (c) { return _this._measureCharacterNotFromCache(c); }, SVGTypewriter.Utils.Methods.objEq);
+            }
+            CacheCharacterMeasurer.prototype._measureCharacterNotFromCache = function (c) {
+                return _super.prototype._measureCharacter.call(this, c);
+            };
+            CacheCharacterMeasurer.prototype._measureCharacter = function (c) {
+                return this.cache.get(c);
+            };
+            CacheCharacterMeasurer.prototype.reset = function () {
+                this.cache.clear();
+            };
+            return CacheCharacterMeasurer;
+        })(Measurers.CharacterMeasurer);
+        Measurers.CacheCharacterMeasurer = CacheCharacterMeasurer;
+    })(Measurers = SVGTypewriter.Measurers || (SVGTypewriter.Measurers = {}));
+})(SVGTypewriter || (SVGTypewriter = {}));
+
+return Plottable;
+}));
 
 /*!
 SVG Typewriter 0.3.0 (https://github.com/palantir/svg-typewriter)

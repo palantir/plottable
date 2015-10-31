@@ -1,7 +1,4 @@
-///<reference path="../reference.ts" />
-
-module Plottable {
-export module Scales {
+module Plottable.Scales {
   export class Linear extends QuantitativeScale<number> {
     private _d3Scale: d3.scale.Linear<number, number>;
 
@@ -56,5 +53,4 @@ export module Scales {
       return this._d3Scale.copy().domain(domain).nice(count).domain();
     }
   }
-}
 }

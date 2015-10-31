@@ -1,5 +1,3 @@
-///<reference path="../reference.ts" />
-
 module Plottable {
 
 /**
@@ -7,8 +5,9 @@ module Plottable {
  * and returns a string representing the 'd' attribute of the resultant 'path' element
  */
 export type SymbolFactory = (symbolSize: number) => string;
+}
 
-export module SymbolFactories {
+module Plottable.SymbolFactories {
 
   export function circle(): SymbolFactory {
     return (symbolSize: number) => d3.svg.symbol().type("circle").size(Math.PI * Math.pow(symbolSize / 2, 2))(null);
@@ -34,5 +33,4 @@ export module SymbolFactories {
     return (symbolSize: number) => d3.svg.symbol().type("triangle-down").size(Math.sqrt(3) * Math.pow(symbolSize / 2, 2))(null);
   }
 
-}
 }

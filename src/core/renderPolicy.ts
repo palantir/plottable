@@ -1,7 +1,4 @@
-///<reference path="../reference.ts" />
-
-module Plottable {
-export module RenderPolicies {
+module Plottable.RenderPolicies {
   /**
    * A policy for rendering Components.
    */
@@ -41,5 +38,4 @@ export module RenderPolicies {
       setTimeout(RenderController.flush, this._timeoutMsec);
     }
   }
-}
 }

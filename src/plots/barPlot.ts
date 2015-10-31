@@ -1,14 +1,10 @@
-///<reference path="../reference.ts" />
+module Plottable.Plots {
+  type LabelConfig = {
+    labelArea: d3.Selection<void>;
+    measurer: SVGTypewriter.Measurers.Measurer;
+    writer: SVGTypewriter.Writers.Writer;
+  };
 
-module Plottable {
-
-type LabelConfig = {
-  labelArea: d3.Selection<void>;
-  measurer: SVGTypewriter.Measurers.Measurer;
-  writer: SVGTypewriter.Writers.Writer;
-};
-
-export module Plots {
   export class Bar<X, Y> extends XYPlot<X, Y> {
     public static ORIENTATION_VERTICAL = "vertical";
     public static ORIENTATION_HORIZONTAL = "horizontal";
@@ -737,5 +733,4 @@ export module Plots {
       return dataToDraw;
     }
   }
-}
 }

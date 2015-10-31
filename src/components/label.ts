@@ -1,7 +1,4 @@
-///<reference path="../reference.ts" />
-
-module Plottable {
-export module Components {
+module Plottable.Components {
   export class Label extends Component {
     private _textContainer: d3.Selection<void>;
     private _text: string; // text assigned to the Label; may not be the actual text displayed due to truncation
@@ -181,5 +178,4 @@ export module Components {
       this.addClass(AxisLabel.AXIS_LABEL_CLASS);
     }
   }
-}
 }

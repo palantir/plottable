@@ -1,21 +1,22 @@
 ///<reference path="../typings/chai/chai.d.ts" />
 ///<reference path="../typings/mocha/mocha.d.ts" />
+///<reference path="../typings/sinon/sinon.d.ts" />
 ///<reference path="../typings/d3/d3.d.ts" />
 ///<reference path="../typings/jquery/jquery.d.ts" />
 ///<reference path="../typings/jquery.simulate/jquery.simulate.d.ts" />
-///<reference path="../build/plottable.d.ts" />
+///<reference path="../plottable.d.ts" />
 ///<reference path="../bower_components/svg-typewriter/svgtypewriter.d.ts" />
-///<reference path="testMethods.ts" />
 ///<reference path="mocks.ts" />
 
 ///<reference path="globalInitialization.ts" />
+///<reference path="testMethods.ts" />
 
 ///<reference path="drawers/drawerTests.ts" />
 ///<reference path="drawers/lineDrawerTests.ts" />
 
 ///<reference path="animators/easingAnimatorTests.ts" />
 
-///<reference path="axes/baseAxisTests.ts" />
+///<reference path="axes/axisTests.ts" />
 ///<reference path="axes/timeAxisTests.ts" />
 ///<reference path="axes/numericAxisTests.ts" />
 ///<reference path="axes/categoryAxisTests.ts" />

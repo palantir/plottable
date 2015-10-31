@@ -1,7 +1,4 @@
-///<reference path="../reference.ts" />
-
-module Plottable {
-export module Plots {
+module Plottable.Plots {
   export class Wheel<R, T> extends Plot {
 
     private static _R_KEY = "r";
@@ -230,5 +227,4 @@ export module Plots {
     }
 
   }
-}
 }

@@ -1,7 +1,4 @@
-///<reference path="../reference.ts" />
-
-module Plottable {
-export module Plots {
+module Plottable.Plots {
   export class Scatter<X, Y> extends XYPlot<X, Y> {
     private static _SIZE_KEY = "size";
     private static _SYMBOL_KEY = "symbol";
@@ -205,5 +202,4 @@ export module Plots {
       });
     }
   }
-}
 }

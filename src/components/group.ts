@@ -1,7 +1,4 @@
-///<reference path="../reference.ts" />
-
-module Plottable {
-export module Components {
+module Plottable.Components {
   export class Group extends ComponentContainer {
     private _components: Component[] = [];
 
@@ -93,5 +90,4 @@ export module Components {
     }
 
   }
-}
 }

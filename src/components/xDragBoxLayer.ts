@@ -1,7 +1,4 @@
-///<reference path="../reference.ts" />
-
-module Plottable {
-export module Components {
+module Plottable.Components {
   export class XDragBoxLayer extends DragBoxLayer {
     /**
      * An XDragBoxLayer is a DragBoxLayer whose size can only be set in the X-direction.
@@ -55,5 +52,4 @@ export module Components {
       throw new Error("XDragBoxLayer has no yExtent");
     }
   }
-}
 }

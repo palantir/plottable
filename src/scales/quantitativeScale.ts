@@ -1,5 +1,3 @@
-///<reference path="../reference.ts" />
-
 module Plottable {
 export class QuantitativeScale<D> extends Scale<D, number> {
   protected static _DEFAULT_NUM_TICKS = 10;

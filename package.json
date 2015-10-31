@@ -1,7 +1,7 @@
 {
   "name": "plottable.js",
   "description": "A modular charting library built on D3",
-  "version": "1.15.0",
+  "version": "1.16.1",
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -16,7 +16,7 @@
     "grunt-cli": "0.1.6",
     "grunt-contrib-watch": "~0.5.3",
     "load-grunt-tasks": "~0.2.0",
-    "grunt-ts": "4.2.0",
+    "grunt-ts": "5.0.0",
     "grunt-tslint": "2.4.0",
     "grunt-contrib-concat": "~0.3.0",
     "grunt-mocha-phantomjs": "0.6.1",

@@ -1,7 +1,4 @@
-///<reference path="../reference.ts" />
-
-module Plottable {
-export module Plots {
+module Plottable.Plots {
   export class Area<X> extends Line<X> {
     private static _Y0_KEY = "y0";
     private _lineDrawers: Utils.Map<Dataset, Drawers.Line>;
@@ -202,5 +199,4 @@ export module Plots {
       };
     }
   }
-}
 }

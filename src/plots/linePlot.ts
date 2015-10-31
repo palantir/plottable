@@ -1,7 +1,4 @@
-///<reference path="../reference.ts" />
-
-module Plottable {
-export module Plots {
+module Plottable.Plots {
   type EdgeIntersections = {
     left: Point[],
     right: Point[],
@@ -143,13 +140,13 @@ export module Plots {
     }
     /**
      * Gets if downsampling is enabled
-     * 
+     *
      * When downsampling is enabled, two consecutive lines with the same slope will be merged to one line.
      */
     public downsamplingEnabled(): boolean;
     /**
      * Sets if downsampling is enabled
-     * 
+     *
      * @returns {Plots.Line} The calling Plots.Line
      */
     public downsamplingEnabled(downsampling: boolean): Plots.Line<X>;
@@ -530,5 +527,4 @@ export module Plots {
       return filteredIndices;
     }
   }
-}
 }

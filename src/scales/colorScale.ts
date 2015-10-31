@@ -1,7 +1,4 @@
-///<reference path="../reference.ts" />
-
-module Plottable {
-export module Scales {
+module Plottable.Scales {
   export class Color extends Scale<string, string> {
 
     private static _LOOP_LIGHTEN_FACTOR = 1.6;
@@ -120,5 +117,4 @@ export module Scales {
       this._d3Scale.range(values);
     }
   }
-}
 }

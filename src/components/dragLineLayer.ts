@@ -1,10 +1,8 @@
-///<reference path="../reference.ts" />
-
 module Plottable {
+  export interface DragLineCallback<D> { (dragLineLayer: Components.DragLineLayer<D>): void; };
+}
 
-export interface DragLineCallback<D> { (dragLineLayer: Components.DragLineLayer<D>): void; };
-
-export module Components {
+module Plottable.Components {
   export class DragLineLayer<D> extends GuideLineLayer<D> {
     private _dragInteraction: Interactions.Drag;
     private _detectionRadius = 3;
@@ -219,5 +217,4 @@ export module Components {
       this._disconnectInteraction();
     }
   }
-}
 }

@@ -1,7 +1,4 @@
-///<reference path="../reference.ts" />
-
-module Plottable {
-export module Dispatchers {
+module Plottable.Dispatchers {
   export type KeyCallback = (keyCode: number, event: KeyboardEvent) => void;
 
   export class Key extends Dispatcher {
@@ -90,5 +87,4 @@ export module Dispatchers {
       this._keyupCallbacks.callCallbacks(event.keyCode, event);
     }
   }
-}
 }

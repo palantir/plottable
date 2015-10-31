@@ -1,7 +1,4 @@
-///<reference path="../reference.ts" />
-
-module Plottable {
-export module Drawers {
+module Plottable.Drawers {
   export class Arc extends Drawer {
 
     constructor(dataset: Dataset) {
@@ -15,5 +12,4 @@ export module Drawers {
       selection.style("stroke", "none");
     }
   }
-}
 }

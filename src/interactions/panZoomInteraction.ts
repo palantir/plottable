@@ -1,7 +1,4 @@
-///<reference path="../reference.ts" />
-
-module Plottable {
-export module Interactions {
+module Plottable.Interactions {
   export class PanZoom extends Interaction {
     /**
      * The number of pixels occupied in a line.
@@ -428,5 +425,4 @@ export module Interactions {
       return this;
     }
   }
-}
 }

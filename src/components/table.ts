@@ -1,7 +1,4 @@
-///<reference path="../reference.ts" />
-
-module Plottable {
-export module Components {
+module Plottable.Components {
   type _LayoutAllocation = {
     guaranteedWidths: number[];
     guaranteedHeights: number[];
@@ -79,6 +76,20 @@ export module Components {
       }
       return false;
     }
+
+    /**
+     * Returns the Component at the specified row and column index.
+     *
+     * @param {number} rowIndex
+     * @param {number} columnIndex
+     * @returns {Component} The Component at the specified position, or null if no Component is there.
+     */
+    public componentAt(rowIndex: number, columnIndex: number) {
+      if (rowIndex < 0 || rowIndex >= this._nRows || columnIndex < 0 || columnIndex >= this._nCols) {
+        return null;
+      }
+      return this._rows[rowIndex][columnIndex];
+    };
 
     /**
      * Adds a Component in the specified row and column position.
@@ -477,5 +488,4 @@ export module Components {
       return all(componentGroup.map(groupIsFixed));
     }
   }
-}
 }
