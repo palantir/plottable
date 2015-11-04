@@ -6968,6 +6968,9 @@ var Plottable;
                     closestPointEntity = entity;
                 }
             });
+            if (closestPointEntity === undefined) {
+                return undefined;
+            }
             return this._lightweightPlotEntityToPlotEntity(closestPointEntity);
         };
         /**

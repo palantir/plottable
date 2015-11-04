@@ -142,6 +142,17 @@ describe("Plots", () => {
         assert.strictEqual(entities[1].index, 2, "the entity of index 2 is retrieved");
         svg.remove();
       });
+
+      it("retrieves undefined from entityNearest() when no entities are rendered", () => {
+        plot.addDataset(new Plottable.Dataset([]));
+        plot.renderTo(svg);
+        let closest = plot.entityNearest({
+          x: xScale.scale(1),
+          y: xScale.scale(1)
+        });
+        assert.strictEqual(closest, undefined, "no datum has been retrieved");
+        svg.remove();
+      });
     });
 
     describe("autoranging the x and y scales", () => {

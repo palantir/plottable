@@ -464,6 +464,17 @@ describe("Plots", () => {
         assert.lengthOf(entitiesOutsideOuterRadius, 0, "no entities returned when clicking outside outerRadius()");
         svg.remove();
       });
+
+      it("returns undefined for entitiesNearest when no entities rendered", () => {
+        piePlot.datasets([new Plottable.Dataset([])]);
+        piePlot.renderTo(svg);
+        let closest = piePlot.entityNearest({
+          x: 1,
+          y: 1
+        });
+        assert.strictEqual(closest, undefined, "no datum has been retrieved");
+        svg.remove();
+      });
     });
 
     describe("Fail safe tests", () => {

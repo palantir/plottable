@@ -237,6 +237,17 @@ describe("Plots", () => {
         svg.remove();
       });
 
+      it("retrieves undefined from entityNearest when no entities are rendered", () => {
+        plot.datasets([new Plottable.Dataset([])]);
+        plot.renderTo(svg);
+        let closest = plot.entityNearest({
+          x: xScale.scale(1),
+          y: xScale.scale(1)
+        });
+        assert.strictEqual(closest, undefined, "no datum has been retrieved");
+        svg.remove();
+      });
+
       function checkEntitiesInRange(plot: Plottable.Plots.Segment<any, any>, index: number,
                                     x1: number, x2: number, y1: number, y2: number) {
         const entities = plot.entitiesIn(
