@@ -2,7 +2,7 @@
 
 describe("Plots", () => {
   describe("Bar Plot", () => {
-    describe ("orientations", () => {
+    describe ("setting orientation", () => {
       it("rejects invalid orientations", () => {
         assert.throws(() => new Plottable.Plots.Bar("diagonal"), Error);
       });
@@ -451,9 +451,9 @@ describe("Plots", () => {
 
           const bars = barPlot.content().select(".bar-area").selectAll("rect");
           labels.each((d, i) => {
-            const labelBoundingClientRect = <any> (<SVGElement> labels[0][i]).getBoundingClientRect();
-            const barBoundingClientRect = <any> (<SVGElement> bars[0][i]).getBoundingClientRect();
-            if (labelBoundingClientRect[valueSizeAttr] > barBoundingClientRect[valueSizeAttr]) {
+            const labelBoundingClientRect = (<SVGElement> labels[0][i]).getBoundingClientRect();
+            const barBoundingClientRect = (<SVGElement> bars[0][i]).getBoundingClientRect();
+            if ((<any> labelBoundingClientRect)[valueSizeAttr] > (<any> barBoundingClientRect)[valueSizeAttr]) {
               assert.isTrue(d3.select(labels[0][i]).classed("off-bar-label"),
                 `label with index ${i} doesn't fit and carries the off-bar class`);
             } else {
@@ -485,13 +485,14 @@ describe("Plots", () => {
         it("hides labels cut off by lower end of base scale", () => {
           barPlot.labelsEnabled(true);
           data.forEach((d, i) => {
-            let texts = barPlot.content().selectAll("text");
-            const centerOfText = getCenterOfText(<SVGElement> texts[0][i]);
+            const textsBeforeRendering = barPlot.content().selectAll("text");
+            const centerOfText = getCenterOfText(<SVGElement> textsBeforeRendering[0][i]);
             const centerValue = baseScale.invert(isVertical ? centerOfText.x : centerOfText.y);
             baseScale.domain([centerValue, centerValue + (DEFAULT_DOMAIN[1] - DEFAULT_DOMAIN[0])]);
 
-            texts = barPlot.content().selectAll("text"); // re-select after rendering
-            assert.strictEqual(d3.select(texts[0][i]).style("visibility"), "hidden", `label for bar with index ${i} is hidden`);
+            const textsAfterRendering = barPlot.content().selectAll("text");
+            assert.strictEqual(d3.select(textsAfterRendering[0][i]).style("visibility"), "hidden",
+              `label for bar with index ${i} is hidden`);
           });
           svg.remove();
         });
@@ -499,29 +500,30 @@ describe("Plots", () => {
         it("hides labels cut off by upper end of base scale", () => {
           barPlot.labelsEnabled(true);
           data.forEach((d, i) => {
-            let texts = barPlot.content().selectAll("text");
-            const centerOfText = getCenterOfText(<SVGElement> texts[0][i]);
+            const textsBeforeRendering = barPlot.content().selectAll("text");
+            const centerOfText = getCenterOfText(<SVGElement> textsBeforeRendering[0][i]);
             const centerValue = baseScale.invert(isVertical ? centerOfText.x : centerOfText.y);
             baseScale.domain([centerValue - (DEFAULT_DOMAIN[1] - DEFAULT_DOMAIN[0]), centerValue]);
 
-            texts = barPlot.content().selectAll("text"); // re-select after rendering
-            assert.strictEqual(d3.select(texts[0][i]).style("visibility"), "hidden", `label for bar with index ${i} is hidden`);
+            const textsAfterRendering = barPlot.content().selectAll("text");
+            assert.strictEqual(d3.select(textsAfterRendering[0][i]).style("visibility"), "hidden",
+              `label for bar with index ${i} is hidden`);
           });
         });
 
         it("hides or shifts labels cut off by lower end of value scale", () => {
           barPlot.labelsEnabled(true);
-          let labels = barPlot.content().selectAll(".on-bar-label, .off-bar-label");
-          const centerValues = labels.select("text")[0].map((textNode) => {
+          const labelsBeforeRendering = barPlot.content().selectAll(".on-bar-label, .off-bar-label");
+          const centerValues = labelsBeforeRendering.select("text")[0].map((textNode) => {
             const centerOfText = getCenterOfText(<SVGElement> textNode);
             return valueScale.invert(isVertical ? centerOfText.y : centerOfText.x);
           });
-          const wasOriginallyOnBar = labels[0].map((label) => d3.select(label).classed("on-bar-label"));
+          const wasOriginallyOnBar = labelsBeforeRendering[0].map((label) => d3.select(label).classed("on-bar-label"));
 
           data.forEach((d, i) => {
             const centerValue = centerValues[i];
             valueScale.domain([centerValue, centerValue + (DEFAULT_DOMAIN[1] - DEFAULT_DOMAIN[0])]);
-            labels = barPlot.content().selectAll(".on-bar-label, .off-bar-label"); // re-select after rendering
+            const labels = barPlot.content().selectAll(".on-bar-label, .off-bar-label");
             if (wasOriginallyOnBar[i] && d.value > 0) {
               assert.isTrue(d3.select(labels[0][i]).classed("off-bar-label"),
                 `cut off on-bar label was switched to off-bar (index ${i})`);
@@ -535,17 +537,17 @@ describe("Plots", () => {
 
         it("hides or shifts labels cut off by upper end of value scale", () => {
           barPlot.labelsEnabled(true);
-          let labels = barPlot.content().selectAll(".on-bar-label, .off-bar-label");
-          const centerValues = labels.select("text")[0].map((textNode) => {
+          const labelsBeforeRendering = barPlot.content().selectAll(".on-bar-label, .off-bar-label");
+          const centerValues = labelsBeforeRendering.select("text")[0].map((textNode) => {
             const centerOfText = getCenterOfText(<SVGElement> textNode);
             return valueScale.invert(isVertical ? centerOfText.y : centerOfText.x);
           });
-          const wasOriginallyOnBar = labels[0].map((label) => d3.select(label).classed("on-bar-label"));
+          const wasOriginallyOnBar = labelsBeforeRendering[0].map((label) => d3.select(label).classed("on-bar-label"));
 
           data.forEach((d, i) => {
             const centerValue = centerValues[i];
             valueScale.domain([centerValue - (DEFAULT_DOMAIN[1] - DEFAULT_DOMAIN[0]), centerValue]);
-            labels = barPlot.content().selectAll(".on-bar-label, .off-bar-label"); // re-select after rendering
+            const labels = barPlot.content().selectAll(".on-bar-label, .off-bar-label");
             if (wasOriginallyOnBar[i] && d.value < 0) {
               assert.isTrue(d3.select(labels[0][i]).classed("off-bar-label"),
                 `cut-off on-bar label was switched to off-bar (index ${i})`);
