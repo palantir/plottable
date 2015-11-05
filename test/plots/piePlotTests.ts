@@ -465,7 +465,7 @@ describe("Plots", () => {
         svg.remove();
       });
 
-      it("returns undefined for entitiesNearest when no entities rendered", () => {
+      it("retrieves undefined for entitiesNearest when no entities rendered", () => {
         piePlot.datasets([new Plottable.Dataset([])]);
         piePlot.renderTo(svg);
         let closest = piePlot.entityNearest({
