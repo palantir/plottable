@@ -275,7 +275,7 @@ describe("Plots", () => {
         svg.remove();
       });
 
-      it("retrieves undefined from nearestEntity when no scatter points are in view", () => {
+      it("retrieves undefined from entityNearest when no scatter points are in view", () => {
         yScale.domain([-2, -1]);
         xScale.domain([-2, -1]);
         plot.renderTo(svg);

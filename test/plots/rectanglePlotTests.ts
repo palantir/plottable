@@ -143,7 +143,7 @@ describe("Plots", () => {
         svg.remove();
       });
 
-      it("retrieves undefined from entityNearest() when no entities are rendered", () => {
+      it("retrieves undefined from entityNearest when no entities are rendered", () => {
         plot.addDataset(new Plottable.Dataset([]));
         plot.renderTo(svg);
         let closest = plot.entityNearest({
