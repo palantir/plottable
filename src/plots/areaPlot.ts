@@ -17,7 +17,7 @@ module Plottable.Plots {
       this.attr("fill", new Scales.Color().range()[0]);
 
       this._lineDrawers = new Utils.Map<Dataset, Drawers.Line>();
-  }
+    }
 
     protected _setup() {
       super._setup();
