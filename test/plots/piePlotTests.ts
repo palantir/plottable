@@ -469,8 +469,8 @@ describe("Plots", () => {
         piePlot.datasets([new Plottable.Dataset([])]);
         piePlot.renderTo(svg);
         let closest = piePlot.entityNearest({
-          x: 1,
-          y: 1
+          x: piePlot.width() / 2,
+          y: piePlot.height() / 2
         });
         assert.strictEqual(closest, undefined, "no datum has been retrieved");
         svg.remove();
