@@ -363,14 +363,14 @@ describe("Plots", () => {
         stackedAreaPlot = new Plottable.Plots.StackedArea();
       });
 
-      it("disables downsampling", () => {
+      it("enables and disables downsampling", () => {
         assert.strictEqual(stackedAreaPlot.downsamplingEnabled(), false, "downsampling is disabled by default");
         stackedAreaPlot.downsamplingEnabled(true);
         assert.strictEqual(stackedAreaPlot.downsamplingEnabled(), true, "downsampling can be enabled by user");
         stackedAreaPlot.downsamplingEnabled(false);
         assert.strictEqual(stackedAreaPlot.downsamplingEnabled(), false, "downsampling can be disabled by user");
       });
-      
+
       it("renders correctly when downsampling is enabled", () => {
         let svg = TestMethods.generateSVG(5, 10);
         let xScale = new Plottable.Scales.Linear();
@@ -383,14 +383,14 @@ describe("Plots", () => {
           { x: 3, y: 1}, // points should not be removed
           { x: 4, y: 1}, // end point should not be removed
         ];
-  
+
         let data2 = [
           { x: 1, y: 1},
           { x: 2, y: 2},
           { x: 3, y: 3},
           { x: 4, y: 2},
         ];
-  
+
         let plot = new Plottable.Plots.StackedArea<number>();
         plot.y((d) => d.y, yScale);
         plot.x((d) => d.x, xScale);
@@ -399,15 +399,15 @@ describe("Plots", () => {
         plot.downsamplingEnabled(true);
         new Plottable.Components.Table([[plot]]).renderTo(svg);
         let areas = plot.content().selectAll(".area");
-  
+
         let expectedRenderIndex = [0, 2, 3];
-  
+
         let dataset = [data1, data2];
         let EPSILON = 0.05;
         assert.strictEqual(areas[0].length, dataset.length, "correct number of areas are drawn.");
-  
+
         let previousAreaValue = expectedRenderIndex.map((d) => 0);
-  
+
         dataset.forEach((d, i) => {
           let area = d3.select(areas[0][i]);
           let expectedAreaData = expectedRenderIndex.map((d) => dataset[i][d]);
