@@ -281,8 +281,8 @@ describe("Plots", () => {
         plot.renderTo(svg);
 
         let closest = plot.entityNearest({
-          x: xScale.scale(1),
-          y: xScale.scale(2)
+          x: plot.width()/2,
+          y: plot.height()/2
         });
         assert.strictEqual(closest, undefined, "no datum has been retrieved");
         svg.remove();
