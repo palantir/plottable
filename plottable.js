@@ -1,5 +1,5 @@
 /*!
-Plottable 1.16.1 (https://github.com/palantir/plottable)
+Plottable 1.16.2 (https://github.com/palantir/plottable)
 Copyright 2014-2015 Palantir Technologies
 Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
 */
@@ -885,7 +885,7 @@ var Plottable;
 })(Plottable || (Plottable = {}));
 var Plottable;
 (function (Plottable) {
-    Plottable.version = "1.16.1";
+    Plottable.version = "1.16.2";
 })(Plottable || (Plottable = {}));
 var Plottable;
 (function (Plottable) {
@@ -6968,6 +6968,9 @@ var Plottable;
                     closestPointEntity = entity;
                 }
             });
+            if (closestPointEntity === undefined) {
+                return undefined;
+            }
             return this._lightweightPlotEntityToPlotEntity(closestPointEntity);
         };
         /**
