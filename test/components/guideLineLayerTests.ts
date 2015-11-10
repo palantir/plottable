@@ -209,7 +209,8 @@ describe("GuideLineLayer", () => {
       });
 
       it("renders correctly given a pixel position", () => {
-        const expectedPosition1 = SVG_WIDTH / 2;
+        const range = (orientation === "vertical" ? SVG_WIDTH : SVG_HEIGHT);
+        const expectedPosition1 = range / 2;
         const gll = new Plottable.Components.GuideLineLayer<number>(orientation);
         gll.pixelPosition(expectedPosition1);
         gll.renderTo(svg);
@@ -219,7 +220,7 @@ describe("GuideLineLayer", () => {
         const expectedAttrs1 = getExpectedAttr(expectedPosition1);
         TestMethods.assertLineAttrs(line, expectedAttrs1, "the line was drawn at the specified position");
 
-        const expectedPosition2 = SVG_WIDTH * 3 / 4;
+        const expectedPosition2 = range * 3 / 4;
         gll.pixelPosition(expectedPosition2);
         assert.strictEqual(gll.content().selectAll(GUIDE_LINE_CLASS).size(), 1, "exactly one line is drawn");
         const line2 = gll.content().select(GUIDE_LINE_CLASS);
