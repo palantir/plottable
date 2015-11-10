@@ -10972,7 +10972,8 @@ var Plottable;
         /**
          * Allows the implementation of animate to be passed as a callback function
          * Provides javascript clients that build custom animations
-         * with full access to the drawing target and properties of the Drawer (appliedIntializer)
+         * with full access to the drawing target, properties of the Drawer (appliedIntializer)
+         * and the utility methods provided by Animators.Base
          */
         var Callback = (function (_super) {
             __extends(Callback, _super);
@@ -10982,6 +10983,7 @@ var Plottable;
             }
             /**
              * animateJoin implementation delegates to the callback
+             * When Callback invokes the function, 'this' is set to the Callback animator itself
              */
             Callback.prototype.animateJoin = function (joinResult, attrToAppliedProjector, drawer) {
                 this.callback().call(this, joinResult, attrToAppliedProjector, drawer);
@@ -11008,6 +11010,15 @@ var Plottable;
                     return this;
                 }
             };
+            /**
+             * Invoke animateJoin on the specified innerAnimator.
+             * If no innerAnimator is specified, delegates to Callback's base class
+             * (Plottable.Animators.Base)
+             *
+             * @param {Drawers.JoinResult} joinResult
+             * @param {AttributeToAppliedProjector} attrToAppliedProjector
+             * @param {Drawer} drawer
+             */
             Callback.prototype.innerAnimate = function (joinResult, attrToAppliedProjector, drawer) {
                 if (this.innerAnimator) {
                     return this.innerAnimator().animateJoin(joinResult, attrToAppliedProjector, drawer);

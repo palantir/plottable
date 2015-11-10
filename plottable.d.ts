@@ -4627,7 +4627,8 @@ declare module Plottable.Animators {
     /**
      * Allows the implementation of animate to be passed as a callback function
      * Provides javascript clients that build custom animations
-     * with full access to the drawing target and properties of the Drawer (appliedIntializer)
+     * with full access to the drawing target, properties of the Drawer (appliedIntializer)
+     * and the utility methods provided by Animators.Base
      */
     class Callback extends Base implements Animator {
         private _callback;
@@ -4635,18 +4636,19 @@ declare module Plottable.Animators {
         constructor();
         /**
          * animateJoin implementation delegates to the callback
+         * When Callback invokes the function, 'this' is set to the Callback animator itself
          */
         animateJoin(joinResult: Drawers.JoinResult, attrToAppliedProjector: AttributeToAppliedProjector, drawer: Drawer): void;
         animate(selection: d3.Selection<any>, attrToAppliedProjector: AttributeToAppliedProjector): d3.Selection<any> | d3.Transition<any>;
         /**
-         * Gets the callback animate function.
+         * Gets the callback animateJoin function.
          * @returns {Callback} The calling Callback Animator.
          */
         callback(): AnimateJoinCallback;
         /**
-         * Sets the attributes for entering elements.
+         * Sets the callback animateJoin function.
          *
-         * @param {AnimateCallback} a function implementing Animator.animate
+         * @param {AnimateCallback} a function implementing Animator.animateJoin
          * @returns {Callback} The calling Callback Animator.
          */
         callback(callback: AnimateJoinCallback): Callback;
@@ -4654,16 +4656,26 @@ declare module Plottable.Animators {
          * Gets an inner animator.
          * callback functions have access to this animator, so callbacks may be designed to
          * wrap another animator
+         *
          * @returns {innerAnimator} The current innerAnimator.
          */
         innerAnimator(): Animator;
         /**
-         * Sets the attributes for entering elements.
+         * Sets the inner anmator.
          *
          * @param {Animator} an Animator
          * @returns {Callback} The calling Animator.
          */
-        innerAnimator(innerAnimator: Animator): Attr;
+        innerAnimator(innerAnimator: Animator): Callback;
+        /**
+         * Invoke animateJoin on the specified innerAnimator.
+         * If no innerAnimator is specified, delegates to Callback's base class
+         * (Plottable.Animators.Base)
+         *
+         * @param {Drawers.JoinResult} joinResult
+         * @param {AttributeToAppliedProjector} attrToAppliedProjector
+         * @param {Drawer} drawer
+         */
         innerAnimate(joinResult: Drawers.JoinResult, attrToAppliedProjector: AttributeToAppliedProjector, drawer: Drawer): void;
     }
 }
