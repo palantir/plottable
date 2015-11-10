@@ -1,23 +1,14 @@
 ///<reference path="../testReference.ts" />
 
-describe("Layer Components", () => {
+describe("SelectionBoxLayer", () => {
   describe("XDragBoxLayer", () => {
     describe("Basic Usage", () => {
-      let SVG_WIDTH = 400;
-      let SVG_HEIGHT = 300;
+      const SVG_WIDTH = 400;
+      const SVG_HEIGHT = 300;
 
-      let quarterTopLeftPoint = {
-        x: SVG_WIDTH / 4,
-        y: SVG_HEIGHT / 4
-      };
-      let middlePoint = {
-        x: SVG_WIDTH / 2,
-        y: SVG_HEIGHT / 2
-      };
-      let quarterBottomRightPoint = {
-        x: SVG_WIDTH * 3 / 4,
-        y: SVG_HEIGHT * 3 / 4
-      };
+      const quarterTopLeftPoint = { x: SVG_WIDTH / 4, y: SVG_HEIGHT / 4 };
+      const middlePoint = { x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2 };
+      const quarterBottomRightPoint = { x: SVG_WIDTH * 3 / 4, y: SVG_HEIGHT * 3 / 4 };
 
       let svg: d3.Selection<void>;
       let dbl: Plottable.Components.XDragBoxLayer;
@@ -27,7 +18,7 @@ describe("Layer Components", () => {
         dbl = new Plottable.Components.XDragBoxLayer();
       });
 
-      it("has bounds() that extend across full SVG height", () => {
+      it("has bounds that extend across full SVG height", () => {
         dbl.boxVisible(true);
         dbl.renderTo(svg);
 
@@ -36,7 +27,7 @@ describe("Layer Components", () => {
           bottomRight: middlePoint
         });
 
-        let actualBounds = dbl.bounds();
+        const actualBounds = dbl.bounds();
         assert.strictEqual(actualBounds.topLeft.y, 0, "box starts at top");
         assert.strictEqual(actualBounds.topLeft.x, quarterTopLeftPoint.x, "left edge set correctly");
         assert.strictEqual(actualBounds.bottomRight.y, SVG_HEIGHT, "box ends at bottom");
@@ -49,15 +40,11 @@ describe("Layer Components", () => {
         dbl.boxVisible(true);
         dbl.resizable(true);
         dbl.renderTo(svg);
+        const bounds = { topLeft: quarterTopLeftPoint, bottomRight: middlePoint };
+        dbl.bounds(bounds);
 
-        dbl.bounds({
-          topLeft: quarterTopLeftPoint,
-          bottomRight: middlePoint
-        });
-
-        let actualBounds = dbl.bounds();
-        TestMethods.triggerFakeDragSequence(dbl.background(), actualBounds.bottomRight, quarterBottomRightPoint);
-        actualBounds = dbl.bounds();
+        TestMethods.triggerFakeDragSequence(dbl.background(), bounds.bottomRight, quarterBottomRightPoint);
+        const actualBounds = dbl.bounds();
         assert.strictEqual(actualBounds.bottomRight.x, quarterBottomRightPoint.x, "resized in x");
         assert.strictEqual(actualBounds.topLeft.y, 0, "box still starts at top");
         assert.strictEqual(actualBounds.bottomRight.y, SVG_HEIGHT, "box still ends at bottom");
@@ -74,13 +61,15 @@ describe("Layer Components", () => {
           bottomRight: middlePoint
         });
 
-        let heightBefore = dbl.height();
-        let boundsBefore = dbl.bounds();
-        svg.attr("height", 2 * SVG_HEIGHT);
-        dbl.redraw();
-        assert.notStrictEqual(dbl.height(), heightBefore, "component changed size");
+        const boundsBefore = dbl.bounds();
+        const newHeight = 2 * SVG_HEIGHT;
+        assert.strictEqual(dbl.height(), SVG_HEIGHT, "box has same height as SVG");
 
-        let boundsAfter = dbl.bounds();
+        svg.attr("height", newHeight);
+        dbl.redraw();
+        assert.strictEqual(dbl.height(), newHeight, "box changes height to the new SVG height");
+
+        const boundsAfter = dbl.bounds();
         assert.strictEqual(boundsAfter.topLeft.x, boundsBefore.topLeft.x, "box keeps same left edge");
         assert.strictEqual(boundsAfter.topLeft.y, 0, "box still starts at top");
         assert.strictEqual(boundsAfter.bottomRight.x, boundsBefore.bottomRight.x, "box keeps same right edge");
@@ -94,7 +83,7 @@ describe("Layer Components", () => {
       });
 
       it("throws error on setting y scale", () => {
-        assert.throws(() => dbl.yScale(new Plottable.Scales.Linear()), "yScales cannot be set");
+        (<any> assert).throws(() => dbl.yScale(new Plottable.Scales.Linear()), Error, "yScales cannot be set", "fails on setting yScale");
         svg.remove();
       });
 
@@ -103,24 +92,26 @@ describe("Layer Components", () => {
         svg.remove();
       });
 
+      it("throws error on setting y extent", () => {
+        (<any> assert).throws(() => dbl.yExtent([0]), Error, "XDragBoxLayer has no yExtent", "fails on setting yExtent");
+        svg.remove();
+      });
+
       it("moves only in x", () => {
         dbl.boxVisible(true);
         dbl.movable(true);
         dbl.renderTo(svg);
 
-        dbl.bounds({
-          topLeft: quarterTopLeftPoint,
-          bottomRight: quarterBottomRightPoint
-        });
+        const boundsBefore = { topLeft: quarterTopLeftPoint, bottomRight: quarterBottomRightPoint };
+        dbl.bounds(boundsBefore);
 
-        let boundsBefore = dbl.bounds();
-        let dragDistance = 10;
+        const dragDistance = 10;
         TestMethods.triggerFakeDragSequence(dbl.background(),
           { x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2 },
           { x: SVG_WIDTH / 2 + dragDistance, y: SVG_HEIGHT / 2 + dragDistance }
         );
 
-        let boundsAfter = dbl.bounds();
+        const boundsAfter = dbl.bounds();
         assert.strictEqual(boundsAfter.topLeft.x, boundsBefore.topLeft.x + dragDistance, "left edge moved");
         assert.strictEqual(boundsAfter.topLeft.y, 0, "box still starts at top");
         assert.strictEqual(boundsAfter.bottomRight.x, boundsBefore.bottomRight.x + dragDistance, "right edge moved");
@@ -129,21 +120,26 @@ describe("Layer Components", () => {
         svg.remove();
       });
 
-      it("does not have resizable CSS class when enabled(false)", () => {
+      it("does not have resizable CSS class when disabled", () => {
+        const xResizableClass = "x-resizable";
+        const yResizableClass = "y-resizable";
         dbl.resizable(true);
-        assert.isTrue(dbl.hasClass("x-resizable"), "carries \"x-resizable\" class if resizable");
+        assert.isTrue(dbl.hasClass(xResizableClass), "carries \"x-resizable\" class if resizable");
+        assert.isFalse(dbl.hasClass(yResizableClass), "does not carry \"y-resizable\" class even if resizable");
         dbl.enabled(false);
-        assert.isFalse(dbl.hasClass("x-resizable"), "does not carry \"x-resizable\" class if resizable, but not enabled");
+        assert.isFalse(dbl.hasClass(xResizableClass), "does not carry \"x-resizable\" class if resizable, but not enabled");
+        assert.isFalse(dbl.hasClass(xResizableClass), "does not carry \"y-resizable\" class if resizable, but not enabled");
         dbl.resizable(false);
         dbl.enabled(true);
-        assert.isFalse(dbl.hasClass("x-resizable"), "does not carry \"x-resizable\" class if enabled, but not resizable");
+        assert.isFalse(dbl.hasClass(xResizableClass), "does not carry \"x-resizable\" class if enabled, but not resizable");
+        assert.isFalse(dbl.hasClass(xResizableClass), "does not carry \"y-resizable\" class if enabled, but not resizable");
 
         svg.remove();
       });
 
-      it("does not error on destroy() when scales are not inputted", () => {
+      it("does not error on destroy when scales are not inputted", () => {
         dbl.renderTo(svg);
-        assert.doesNotThrow(() => dbl.destroy(), Error, "can destroy");
+        assert.doesNotThrow(() => dbl.destroy(), Error, "can destroy without scales");
         svg.remove();
       });
     });
