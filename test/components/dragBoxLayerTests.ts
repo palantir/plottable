@@ -82,6 +82,7 @@ describe("SelectionBoxLayer", () => {
         assert.strictEqual(dbl.detectionRadius(5), dbl, "setting the detection radius returns the drag box layer");
         assert.strictEqual(dbl.detectionRadius(), 5, "can retrieve the detection radius");
 
+        // HACKHACK #2661: Cannot assert errors being thrown with description
         (<any> assert).throws(() => dbl.detectionRadius(-1), Error, "detection radius cannot be negative", "fails to set negative radius");
         svg.remove();
       });
