@@ -6,9 +6,18 @@ describe("SelectionBoxLayer", () => {
       const SVG_WIDTH = 400;
       const SVG_HEIGHT = 300;
 
-      const quarterTopLeftPoint = { x: SVG_WIDTH / 4, y: SVG_HEIGHT / 4 };
-      const middlePoint = { x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2 };
-      const quarterBottomRightPoint = { x: SVG_WIDTH * 3 / 4, y: SVG_HEIGHT * 3 / 4 };
+      const quarterTopLeftPoint = {
+        x: SVG_WIDTH / 4,
+        y: SVG_HEIGHT / 4
+      };
+      const middlePoint = {
+        x: SVG_WIDTH / 2,
+        y: SVG_HEIGHT / 2
+      };
+      const quarterBottomRightPoint = {
+        x: SVG_WIDTH * 3 / 4,
+        y: SVG_HEIGHT * 3 / 4
+      };
 
       let svg: d3.Selection<void>;
       let dbl: Plottable.Components.XDragBoxLayer;
