@@ -337,7 +337,7 @@ module Plottable.Components {
       if (rowPadding == null) {
         return this._rowPadding;
       }
-      if (rowPadding == Infinity || rowPadding < 0) {
+      if (rowPadding === Infinity || rowPadding < 0) {
         throw Error("rowPadding must be a positive finite value");
       }
       this._rowPadding = rowPadding;
@@ -360,7 +360,7 @@ module Plottable.Components {
       if (columnPadding == null) {
         return this._columnPadding;
       }
-      if (columnPadding == Infinity || columnPadding < 0) {
+      if (columnPadding === Infinity || columnPadding < 0) {
         throw Error("columnPadding must be a positive finite value");
       }
       this._columnPadding = columnPadding;
@@ -404,7 +404,7 @@ module Plottable.Components {
       if (weight == null) {
         return this._rowWeights[index];
       }
-      if (weight == Infinity || weight < 0) {
+      if (weight === Infinity || weight < 0) {
         throw Error("rowWeight must be a positive finite value");
       }
       this._rowWeights[index] = weight;
@@ -433,7 +433,7 @@ module Plottable.Components {
       if (weight == null) {
         return this._columnWeights[index];
       }
-      if (weight == Infinity || weight < 0) {
+      if (weight === Infinity || weight < 0) {
         throw Error("columnWeight must be a positive finite value");
       }
       this._columnWeights[index] = weight;
