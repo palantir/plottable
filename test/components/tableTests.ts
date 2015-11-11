@@ -471,6 +471,36 @@ describe("Tables", () => {
         table.destroy();
         svg.remove();
       });
+      it("rowPadding and columnPadding error on invalid input", () => {
+        const svg = TestMethods.generateSVG();
+        const component0 = new Plottable.Component();
+        const component1 = new Plottable.Component();
+        const component2 = new Plottable.Component();
+        const component3 = new Plottable.Component();
+        const table = new Plottable.Components.Table([[component0, component1],
+                                                      [component2, component3]]);
+        assert.throws(() => table.columnPadding(-1), "columnPadding can not be a negative number");
+        assert.throws(() => table.columnPadding(-1), "columnPadding can not be Infinity");
+        assert.throws(() => table.rowPadding(-1), "rowPadding can not be a negative number");
+        assert.throws(() => table.rowPadding(-1), "rowPadding can not be Infinity");
+        table.destroy();
+        svg.remove();
     });
+    it("rowWidth and columnWidth error on invalid input", () => {
+        const svg = TestMethods.generateSVG();
+        const component0 = new Plottable.Component();
+        const component1 = new Plottable.Component();
+        const component2 = new Plottable.Component();
+        const component3 = new Plottable.Component();
+        const table = new Plottable.Components.Table([[component0, component1],
+                                                      [component2, component3]]);
+        assert.throws(() => table.columnWidth(-1), "columnWidth can not be a negative number");
+        assert.throws(() => table.columnWidth(-1), "columnWidth can not be Infinity");
+        assert.throws(() => table.rowPadding(-1), "rowWidth can not be a negative number");
+        assert.throws(() => table.rowPadding(-1), "rowWidth can not be Infinity");
+        table.destroy();
+        svg.remove();
+    });
+  });
   });
 });
