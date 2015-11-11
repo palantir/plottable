@@ -478,7 +478,7 @@ describe("Tables", () => {
                                                       [new Plottable.Component(), new Plottable.Component()]]);
         assert.throws(() => table.columnPadding(-1), "columnPadding must be a non-negative finite value");
         assert.throws(() => table.columnPadding(Infinity), "columnPadding must be a non-negative finite value");
-        assert.throws(() => table.rowPadding(-1), "rowPadding must be a non-negative finite value");
+        assert.throws(() => table.rowPadding(-1.5), "rowPadding must be a non-negative finite value");
         assert.throws(() => table.rowPadding(Infinity), "rowPadding must be a non-negative finite value");
         table.destroy();
         svg.remove();
@@ -490,7 +490,7 @@ describe("Tables", () => {
                                                       [new Plottable.Component(), new Plottable.Component()]]);
         assert.throws(() => table.columnWeight(0, -1), "columnWeight must be a non-negative finite value");
         assert.throws(() => table.columnWeight(1, Infinity), "columnWeight must be a non-negative finite value");
-        assert.throws(() => table.rowWeight(1, -1), "rowWeight must be a non-negative finite value");
+        assert.throws(() => table.rowWeight(1, -1.5), "rowWeight must be a non-negative finite value");
         assert.throws(() => table.rowWeight(0, Infinity), "rowWeight must be a non-negative finite value");
         table.destroy();
         svg.remove();
