@@ -474,32 +474,24 @@ describe("Tables", () => {
 
       it("rowPadding and columnPadding error on invalid input", () => {
         const svg = TestMethods.generateSVG();
-        const component0 = new Plottable.Component();
-        const component1 = new Plottable.Component();
-        const component2 = new Plottable.Component();
-        const component3 = new Plottable.Component();
-        const table = new Plottable.Components.Table([[component0, component1],
-                                                      [component2, component3]]);
-        assert.throws(() => table.columnPadding(-1), "columnPadding must be a positive finite value");
-        assert.throws(() => table.columnPadding(Infinity), "columnPadding must be a positive finite value");
-        assert.throws(() => table.rowPadding(-1), "rowPadding must be a positive finite value");
-        assert.throws(() => table.rowPadding(Infinity), "rowPadding must be a positive finite value");
+        const table = new Plottable.Components.Table([[new Plottable.Component(), new Plottable.Component()],
+                                                      [new Plottable.Component()new Plottable.Component(), component3]]);
+        assert.throws(() => table.columnPadding(-1), "columnPadding must be a non-negative finite value");
+        assert.throws(() => table.columnPadding(Infinity), "columnPadding must be a non-negative finite value");
+        assert.throws(() => table.rowPadding(-1), "rowPadding must be a non-negative finite value");
+        assert.throws(() => table.rowPadding(Infinity), "rowPadding must be a non-negative finite value");
         table.destroy();
         svg.remove();
       });
 
       it("rowWeight and columnWeight error on invalid input", () => {
         const svg = TestMethods.generateSVG();
-        const component0 = new Plottable.Component();
-        const component1 = new Plottable.Component();
-        const component2 = new Plottable.Component();
-        const component3 = new Plottable.Component();
-        const table = new Plottable.Components.Table([[component0, component1],
-                                                      [component2, component3]]);
-        assert.throws(() => table.columnWeight(0, -1), "columnWeight must be a positive finite value");
-        assert.throws(() => table.columnWeight(1, Infinity), "columnWeight must be a positive finite value");
-        assert.throws(() => table.rowWeight(1, -1), "rowWeight must be a positive finite value");
-        assert.throws(() => table.rowWeight(0, Infinity), "rowWeight must be a positive finite value");
+        const table = new Plottable.Components.Table([[new Plottable.Component(), new Plottable.Component()],
+                                                      [new Plottable.Component(), new Plottable.Component()]]);
+        assert.throws(() => table.columnWeight(0, -1), "columnWeight must be a non-negative finite value");
+        assert.throws(() => table.columnWeight(1, Infinity), "columnWeight must be a non-negative finite value");
+        assert.throws(() => table.rowWeight(1, -1), "rowWeight must be a non-negative finite value");
+        assert.throws(() => table.rowWeight(0, Infinity), "rowWeight must be a non-negative finite value");
         table.destroy();
         svg.remove();
       });
