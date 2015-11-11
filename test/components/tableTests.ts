@@ -475,7 +475,7 @@ describe("Tables", () => {
       it("rowPadding and columnPadding error on invalid input", () => {
         const svg = TestMethods.generateSVG();
         const table = new Plottable.Components.Table([[new Plottable.Component(), new Plottable.Component()],
-                                                      [new Plottable.Component()new Plottable.Component(), component3]]);
+                                                      [new Plottable.Component(), new Plottable.Component()]]);
         assert.throws(() => table.columnPadding(-1), "columnPadding must be a non-negative finite value");
         assert.throws(() => table.columnPadding(Infinity), "columnPadding must be a non-negative finite value");
         assert.throws(() => table.rowPadding(-1), "rowPadding must be a non-negative finite value");
