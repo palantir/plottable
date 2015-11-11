@@ -142,7 +142,14 @@ module Plottable.Scales {
     }
 
     protected _getDomain() {
-      return this._d3Scale.domain();
+      let newlineRemover = function(domain) {
+        if (typeof domain !== "string") {
+          return domain;
+        }
+        return domain.replace(/\n/g, " ");
+      };
+
+      return this._d3Scale.domain().map(newlineRemover);
     }
 
     protected _setBackingScaleDomain(values: string[]) {

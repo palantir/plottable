@@ -2,6 +2,21 @@
 
 describe("Category Axes", () => {
   describe("rendering the tick labels", () => {
+    it("removes newlines", () => {
+      let svg = TestMethods.generateSVG();
+      let domain = ["Johannes\nGensfleisch\nGutenberg"];
+      let scale = new Plottable.Scales.Category().domain(domain);
+      let axis = new Plottable.Axes.Category(scale, "bottom");
+      axis.renderTo(svg);
+
+      let ticks = axis.content().selectAll("text");
+      let texts = ticks[0].map((tick: any) => d3.select(tick).text());
+      let sanitizedDomain = ["Johannes Gensfleisch Gutenberg"];
+      assert.deepEqual(texts, sanitizedDomain, "newlines are removed from domain strings");
+
+      svg.remove();
+    });
+
     it("renders short words fully", () => {
       let svg = TestMethods.generateSVG();
       let domain = ["2000", "2001", "2002", "2003"];

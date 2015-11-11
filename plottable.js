@@ -2119,7 +2119,13 @@ var Plottable;
                 return this._d3Scale(value) + this.rangeBand() / 2;
             };
             Category.prototype._getDomain = function () {
-                return this._d3Scale.domain();
+                var newlineRemover = function (domain) {
+                    if (typeof domain !== "string") {
+                        return domain;
+                    }
+                    return domain.replace(/\n/g, " ");
+                };
+                return this._d3Scale.domain().map(newlineRemover);
             };
             Category.prototype._setBackingScaleDomain = function (values) {
                 this._d3Scale.domain(values);

@@ -1070,7 +1070,7 @@ declare module Plottable.Scales {
          */
         outerPadding(outerPadding: number): Category;
         scale(value: string): number;
-        protected _getDomain(): string[];
+        protected _getDomain(): any[];
         protected _setBackingScaleDomain(values: string[]): void;
         protected _getRange(): number[];
         protected _setRange(values: number[]): void;
