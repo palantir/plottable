@@ -5517,7 +5517,7 @@ var Plottable;
                 this._scale.offUpdate(this._redrawCallback);
             };
             InterpolatedColorLegend.prototype.formatter = function (formatter) {
-                if (formatter === undefined) {
+                if (formatter === undefined || formatter === null) {
                     return this._formatter;
                 }
                 this._formatter = formatter;

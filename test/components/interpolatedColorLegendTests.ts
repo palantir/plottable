@@ -128,6 +128,18 @@ describe("InterpolatedColorLegend", () => {
     svg.remove();
   });
 
+  it("returns same formatter if setting null formatter", () => {
+    let legend = new Plottable.Components.InterpolatedColorLegend(new Plottable.Scales.InterpolatedColor());
+    let formatter = Plottable.Formatters.percentage(2);
+    legend.formatter(formatter);
+    legend.renderTo(svg);
+
+    let returnedFormatter = legend.formatter(null);
+    assert.strictEqual(formatter, returnedFormatter, "passing null to formatter() should not change formatter");
+
+    svg.remove();
+  });
+
   it("orientation() input-checking", () => {
     let legend = new Plottable.Components.InterpolatedColorLegend(colorScale);
 

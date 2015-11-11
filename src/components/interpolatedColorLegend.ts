@@ -65,7 +65,7 @@ module Plottable.Components {
      */
     public formatter(formatter: Formatter): InterpolatedColorLegend;
     public formatter(formatter?: Formatter): any {
-      if (formatter === undefined) {
+      if (formatter === undefined || formatter === null) {
         return this._formatter;
       }
       this._formatter = formatter;
