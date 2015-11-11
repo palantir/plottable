@@ -2,7 +2,7 @@ module Plottable.Axes {
   export class Category extends Axis<string> {
     private _tickLabelAngle = 0;
     private _measurer: SVGTypewriter.Measurers.CacheCharacterMeasurer;
-    private _wrapper: SVGTypewriter.Wrappers.SingleLineWrapper;
+    private _wrapper: SVGTypewriter.Wrappers.Wrapper;
     private _writer: SVGTypewriter.Writers.Writer;
 
     /**
@@ -22,7 +22,7 @@ module Plottable.Axes {
     protected _setup() {
       super._setup();
       this._measurer = new SVGTypewriter.Measurers.CacheCharacterMeasurer(this._tickLabelContainer);
-      this._wrapper = new SVGTypewriter.Wrappers.SingleLineWrapper();
+      this._wrapper = new SVGTypewriter.Wrappers.Wrapper();
       this._writer = new SVGTypewriter.Writers.Writer(this._measurer, this._wrapper);
     }
 
