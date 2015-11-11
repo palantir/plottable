@@ -6106,6 +6106,9 @@ var Plottable;
                 if (rowPadding == null) {
                     return this._rowPadding;
                 }
+                if (rowPadding == Infinity || rowPadding < 0) {
+                    throw Error("rowPadding must be a positive finite value");
+                }
                 this._rowPadding = rowPadding;
                 this.redraw();
                 return this;
@@ -6113,6 +6116,9 @@ var Plottable;
             Table.prototype.columnPadding = function (columnPadding) {
                 if (columnPadding == null) {
                     return this._columnPadding;
+                }
+                if (columnPadding == Infinity || columnPadding < 0) {
+                    throw Error("columnPadding must be a positive finite value");
                 }
                 this._columnPadding = columnPadding;
                 this.redraw();
@@ -6122,6 +6128,9 @@ var Plottable;
                 if (weight == null) {
                     return this._rowWeights[index];
                 }
+                if (weight == Infinity || weight < 0) {
+                    throw Error("rowWeight must be a positive finite value");
+                }
                 this._rowWeights[index] = weight;
                 this.redraw();
                 return this;
@@ -6129,6 +6138,9 @@ var Plottable;
             Table.prototype.columnWeight = function (index, weight) {
                 if (weight == null) {
                     return this._columnWeights[index];
+                }
+                if (weight == Infinity || weight < 0) {
+                    throw Error("columnWeight must be a positive finite value");
                 }
                 this._columnWeights[index] = weight;
                 this.redraw();
