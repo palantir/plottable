@@ -19,8 +19,10 @@ describe("DoubleClick Interaction", () => {
     clickedPoint = {x: svgWidth / 2, y: svgHeight / 2};
   });
 
-  afterEach(() => {
-    svg.remove();
+  afterEach(function() {
+    if (this.currentTest.state === "passed") {
+      svg.remove();
+    }
   });
 
   describe("onDoubleClick/offDoubleClick", () => {

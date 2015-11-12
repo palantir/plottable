@@ -81,8 +81,10 @@ describe("Drag Interaction", () => {
     dragInteraction.attachTo(component);
   });
 
-  afterEach(() => {
-    svg.remove();
+  afterEach(function() {
+    if (this.currentTest.state === "passed") {
+      svg.remove();
+    }
   });
 
   describe("onDragStart/offDragStart", () => {

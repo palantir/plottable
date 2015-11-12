@@ -17,8 +17,10 @@ describe("Click Interaction", () => {
     clickInteraction.attachTo(component);
   });
 
-  afterEach(() => {
-    svg.remove();
+  afterEach(function() {
+    if (this.currentTest.state === "passed") {
+      svg.remove();
+    }
   });
 
   describe("onClick/offClick", () => {
