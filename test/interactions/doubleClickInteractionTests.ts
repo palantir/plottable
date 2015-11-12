@@ -25,6 +25,58 @@ describe("DoubleClick Interaction", () => {
     }
   });
 
+  class TestClickCallback {
+    private called: boolean;
+    private lastPoint: Plottable.Point;
+
+    constructor() {
+      this.called = false;
+    }
+
+    public call(point?: Plottable.Point) {
+      this.called = true;
+      this.lastPoint = point;
+    }
+
+    public getCalled() {
+      return this.called;
+    }
+
+    public getLastPoint() {
+      return this.lastPoint;
+    }
+  }
+
+  function doubleClickPoint(mode: TestMethods.InteractionMode = TestMethods.InteractionMode.Mouse) {
+    doubleClickPointWithMove(clickedPoint, clickedPoint, mode);
+  }
+
+  function doubleClickPointWithMove(firstClickPoint: Plottable.Point,
+                                    secondClickPoint: Plottable.Point,
+                                    mode: TestMethods.InteractionMode) {
+    TestMethods.triggerFakeInteractionEvent(mode,
+                                            TestMethods.InteractionType.Start,
+                                            component.content(),
+                                            firstClickPoint.x,
+                                            firstClickPoint.y);
+    TestMethods.triggerFakeInteractionEvent(mode,
+                                            TestMethods.InteractionType.End,
+                                            component.content(),
+                                            firstClickPoint.x,
+                                            firstClickPoint.y);
+    TestMethods.triggerFakeInteractionEvent(mode,
+                                            TestMethods.InteractionType.Start,
+                                            component.content(),
+                                            secondClickPoint.x,
+                                            secondClickPoint.y);
+    TestMethods.triggerFakeInteractionEvent(mode,
+                                            TestMethods.InteractionType.End,
+                                            component.content(),
+                                            secondClickPoint.x,
+                                            secondClickPoint.y);
+    TestMethods.triggerFakeMouseEvent("dblclick", component.content(), secondClickPoint.x, secondClickPoint.y);
+  }
+  
   describe("onDoubleClick/offDoubleClick", () => {
     describe("registration", () => {
       it("registers callback using onDoubleClick", () => {
@@ -127,56 +179,4 @@ describe("DoubleClick Interaction", () => {
       });
     });
   });
-
-  class TestClickCallback {
-    private called: boolean;
-    private lastPoint: Plottable.Point;
-
-    constructor() {
-      this.called = false;
-    }
-
-    public call(point?: Plottable.Point) {
-      this.called = true;
-      this.lastPoint = point;
-    }
-
-    public getCalled() {
-      return this.called;
-    }
-
-    public getLastPoint() {
-      return this.lastPoint;
-    }
-  }
-
-  function doubleClickPoint(mode: TestMethods.InteractionMode = TestMethods.InteractionMode.Mouse) {
-    doubleClickPointWithMove(clickedPoint, clickedPoint, mode);
-  }
-
-  function doubleClickPointWithMove(firstClickPoint: Plottable.Point,
-                                    secondClickPoint: Plottable.Point,
-                                    mode: TestMethods.InteractionMode) {
-    TestMethods.triggerFakeInteractionEvent(mode,
-                                            TestMethods.InteractionType.Start,
-                                            component.content(),
-                                            firstClickPoint.x,
-                                            firstClickPoint.y);
-    TestMethods.triggerFakeInteractionEvent(mode,
-                                            TestMethods.InteractionType.End,
-                                            component.content(),
-                                            firstClickPoint.x,
-                                            firstClickPoint.y);
-    TestMethods.triggerFakeInteractionEvent(mode,
-                                            TestMethods.InteractionType.Start,
-                                            component.content(),
-                                            secondClickPoint.x,
-                                            secondClickPoint.y);
-    TestMethods.triggerFakeInteractionEvent(mode,
-                                            TestMethods.InteractionType.End,
-                                            component.content(),
-                                            secondClickPoint.x,
-                                            secondClickPoint.y);
-    TestMethods.triggerFakeMouseEvent("dblclick", component.content(), secondClickPoint.x, secondClickPoint.y);
-  }
 });

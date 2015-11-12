@@ -23,6 +23,47 @@ describe("Click Interaction", () => {
     }
   });
 
+  class TestClickCallback {
+    private called: boolean;
+    private lastPoint: Plottable.Point;
+
+    constructor() {
+      this.called = false;
+    }
+
+    public call(point?: Plottable.Point) {
+      this.called = true;
+      this.lastPoint = point;
+    }
+
+    public getCalled() {
+      return this.called;
+    }
+
+    public getLastPoint() {
+      return this.lastPoint;
+    }
+  }
+
+  function clickPoint(point: Plottable.Point, mode: TestMethods.InteractionMode = TestMethods.InteractionMode.Mouse) {
+      clickPointWithMove(point, point, mode);
+  }
+
+  function clickPointWithMove(clickStartPoint: Plottable.Point,
+                              clickEndPoint: Plottable.Point,
+                              mode: TestMethods.InteractionMode) {
+      TestMethods.triggerFakeInteractionEvent(mode,
+                                              TestMethods.InteractionType.Start,
+                                              component.content(),
+                                              clickStartPoint.x,
+                                              clickStartPoint.y);
+      TestMethods.triggerFakeInteractionEvent(mode,
+                                              TestMethods.InteractionType.End,
+                                              component.content(),
+                                              clickEndPoint.x,
+                                              clickEndPoint.y);
+  }
+
   describe("onClick/offClick", () => {
     describe("registration", () => {
       const testPoint = {x: 0, y: 0};
@@ -166,45 +207,4 @@ describe("Click Interaction", () => {
       });
     });
   });
-
-  class TestClickCallback {
-    private called: boolean;
-    private lastPoint: Plottable.Point;
-
-    constructor() {
-      this.called = false;
-    }
-
-    public call(point?: Plottable.Point) {
-      this.called = true;
-      this.lastPoint = point;
-    }
-
-    public getCalled() {
-      return this.called;
-    }
-
-    public getLastPoint() {
-      return this.lastPoint;
-    }
-  }
-
-  function clickPoint(point: Plottable.Point, mode: TestMethods.InteractionMode = TestMethods.InteractionMode.Mouse) {
-      clickPointWithMove(point, point, mode);
-  }
-
-  function clickPointWithMove(clickStartPoint: Plottable.Point,
-                              clickEndPoint: Plottable.Point,
-                              mode: TestMethods.InteractionMode) {
-      TestMethods.triggerFakeInteractionEvent(mode,
-                                              TestMethods.InteractionType.Start,
-                                              component.content(),
-                                              clickStartPoint.x,
-                                              clickStartPoint.y);
-      TestMethods.triggerFakeInteractionEvent(mode,
-                                              TestMethods.InteractionType.End,
-                                              component.content(),
-                                              clickEndPoint.x,
-                                              clickEndPoint.y);
-  }
 });
