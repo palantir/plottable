@@ -25,26 +25,25 @@ describe("DoubleClick Interaction", () => {
     }
   });
 
-  class TestClickCallback {
-    private called: boolean;
-    private lastPoint: Plottable.Point;
+  type ClickTestCallback = {
+    (p?: Plottable.Point): void;
+    lastPoint: Plottable.Point;
+    called: boolean;
+    reset: () => void;
+  };
 
-    constructor() {
-      this.called = false;
+  function makeClickCallback() {
+    let callback: ClickTestCallback;
+    callback = <any> function(p?: Plottable.Point) {
+      callback.lastPoint = p;
+      callback.called = true;
     }
-
-    public call(point?: Plottable.Point) {
-      this.called = true;
-      this.lastPoint = point;
+    callback.called = false;
+    callback.reset = () => {
+      callback.lastPoint = null;
+      callback.called = false;
     }
-
-    public getCalled() {
-      return this.called;
-    }
-
-    public getLastPoint() {
-      return this.lastPoint;
-    }
+    return callback;
   }
 
   function doubleClickPoint(mode: TestMethods.InteractionMode = TestMethods.InteractionMode.Mouse) {
@@ -76,59 +75,51 @@ describe("DoubleClick Interaction", () => {
                                             secondClickPoint.y);
     TestMethods.triggerFakeMouseEvent("dblclick", component.content(), secondClickPoint.x, secondClickPoint.y);
   }
-  
+
   describe("onDoubleClick/offDoubleClick", () => {
     describe("registration", () => {
       it("registers callback using onDoubleClick", () => {
-        const callback = new TestClickCallback();
-        const call = () => callback.call();
+        const callback = makeClickCallback();
 
-        doubleClickInteraction.onDoubleClick(call);
+        doubleClickInteraction.onDoubleClick(callback);
         doubleClickPoint();
 
-        assert.isTrue(callback.getCalled(), "Interaction should trigger the callback");
+        assert.isTrue(callback.called, "Interaction should trigger the callback");
       });
 
       it("unregisters callback using offDoubleClick", () => {
-        const callback = new TestClickCallback();
-        const call = () => callback.call();
+        const callback = makeClickCallback();
 
-        doubleClickInteraction.onDoubleClick(call);
-        doubleClickInteraction.offDoubleClick(call);
+        doubleClickInteraction.onDoubleClick(callback);
+        doubleClickInteraction.offDoubleClick(callback);
         doubleClickPoint();
 
-        assert.isFalse(callback.getCalled(), "Callback should be disconnected from the interaction");
+        assert.isFalse(callback.called, "Callback should be disconnected from the interaction");
       });
 
       it("can register multiple onDoubleClick callbacks", () => {
-        const callback1 = new TestClickCallback();
-        const call1 = () => callback1.call();
+        const callback1 = makeClickCallback();
+        const callback2 = makeClickCallback();
 
-        const callback2 = new TestClickCallback();
-        const call2 = () => callback2.call();
-
-        doubleClickInteraction.onDoubleClick(call1);
-        doubleClickInteraction.onDoubleClick(call2);
+        doubleClickInteraction.onDoubleClick(callback1);
+        doubleClickInteraction.onDoubleClick(callback2);
         doubleClickPoint();
 
-        assert.isTrue(callback1.getCalled(), "Interaction should trigger the first callback");
-        assert.isTrue(callback2.getCalled(), "Interaction should trigger the second callback");
+        assert.isTrue(callback1.called, "Interaction should trigger the first callback");
+        assert.isTrue(callback2.called, "Interaction should trigger the second callback");
       });
 
       it("can register multiple onDoubleClick callbacks and unregister one", () => {
-        const callback1 = new TestClickCallback();
-        const call1 = () => callback1.call();
+        const callback1 = makeClickCallback();
+        const callback2 = makeClickCallback();
 
-        const callback2 = new TestClickCallback();
-        const call2 = () => callback2.call();
-
-        doubleClickInteraction.onDoubleClick(call1);
-        doubleClickInteraction.onDoubleClick(call2);
-        doubleClickInteraction.offDoubleClick(call1);
+        doubleClickInteraction.onDoubleClick(callback1);
+        doubleClickInteraction.onDoubleClick(callback2);
+        doubleClickInteraction.offDoubleClick(callback1);
         doubleClickPoint();
 
-        assert.isFalse(callback1.getCalled(), "Callback1 should be disconnected from the click interaction");
-        assert.isTrue(callback2.getCalled(), "Callback2 should still exist on the click interaction");
+        assert.isFalse(callback1.called, "Callback1 should be disconnected from the click interaction");
+        assert.isTrue(callback2.called, "Callback2 should still exist on the click interaction");
       });
 
       it("onDoubleClick returns this", () => {
@@ -143,24 +134,24 @@ describe("DoubleClick Interaction", () => {
     });
 
     describe("callbacks", () => {
-      let callback: TestClickCallback;
+      let callback: ClickTestCallback;
 
       beforeEach(() => {
-        callback = new TestClickCallback();
-        doubleClickInteraction.onDoubleClick((point: Plottable.Point) => callback.call(point));
+        callback = makeClickCallback();
+        doubleClickInteraction.onDoubleClick(callback);
       });
 
       [TestMethods.InteractionMode.Mouse, TestMethods.InteractionMode.Touch].forEach((mode: TestMethods.InteractionMode) => {
         it("calls callback and passes correct click position for " + TestMethods.InteractionMode[mode], () => {
           doubleClickPoint(mode);
 
-          assert.deepEqual(callback.getLastPoint(), clickedPoint, "was passed correct point");
+          assert.deepEqual(callback.lastPoint, clickedPoint, "was passed correct point");
         });
 
         it("does not call callback if clicked in different locations for " + TestMethods.InteractionMode[mode], () => {
           doubleClickPointWithMove(clickedPoint, {x: clickedPoint.x + 10, y: clickedPoint.y + 10}, mode);
 
-          assert.isFalse(callback.getCalled(), "callback was not called");
+          assert.isFalse(callback.called, "callback was not called");
         });
       });
 
