@@ -106,7 +106,7 @@ describe("GuideLineLayer", () => {
           return {
             x: orientation === "vertical" ? value : halfPoint.x,
             y: orientation === "vertical" ? halfPoint.y : value
-          }
+          };
         };
 
         function getRelventAttrFromPoint(point: Plottable.Point) {
@@ -137,7 +137,8 @@ describe("GuideLineLayer", () => {
             getDragPoint(startPosition),
             getDragPoint(endPosition)
           );
-          TestMethods.assertLineAttrs(dll.content().select(GUIDE_LINE_CSSCLASS), getExpectedAttr(endPosition), "line was dragged to the final location");
+          TestMethods.assertLineAttrs(dll.content().select(GUIDE_LINE_CSSCLASS), getExpectedAttr(endPosition),
+            "line was dragged to the final location");
           assert.strictEqual(dll.pixelPosition(), endPosition, "pixelPosition was updated correctly");
           svg.remove();
         });
@@ -152,7 +153,8 @@ describe("GuideLineLayer", () => {
             getDragPoint(startPosition + dll.detectionRadius()),
             getDragPoint(endPosition)
           );
-          TestMethods.assertLineAttrs(dll.content().select(GUIDE_LINE_CSSCLASS), getExpectedAttr(endPosition), "line was dragged to the final location");
+          TestMethods.assertLineAttrs(dll.content().select(GUIDE_LINE_CSSCLASS), getExpectedAttr(endPosition),
+            "line was dragged to the final location");
           assert.strictEqual(dll.pixelPosition(), endPosition, "pixelPosition was updated correctly");
           svg.remove();
         });
@@ -258,7 +260,8 @@ describe("GuideLineLayer", () => {
         svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
         dll.pixelPosition(startPosition);
         dll.renderTo(svg);
-      })
+      });
+
       it("calls callback onDragStart", () => {
         assert.strictEqual(dll.onDragStart(callback), dll, "onDragStart() returns the calling DragLineLayer");
         dll.renderTo(svg);
