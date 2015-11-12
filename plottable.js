@@ -4870,7 +4870,7 @@ var Plottable;
             Category.prototype._setup = function () {
                 _super.prototype._setup.call(this);
                 this._measurer = new SVGTypewriter.Measurers.CacheCharacterMeasurer(this._tickLabelContainer);
-                this._wrapper = new SVGTypewriter.Wrappers.SingleLineWrapper();
+                this._wrapper = new SVGTypewriter.Wrappers.Wrapper();
                 this._writer = new SVGTypewriter.Writers.Writer(this._measurer, this._wrapper);
             };
             Category.prototype._rescale = function () {
