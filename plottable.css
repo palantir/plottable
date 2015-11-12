@@ -207,6 +207,10 @@ svg.plottable {
   line-height: normal;
 }
 
+.plottable .legend.interpolated-color-legend text {
+  font-weight: normal;
+}
+
 .plottable .interpolated-color-legend rect.swatch-bounding-box {
   fill: none;
   stroke: #CCC;
