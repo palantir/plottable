@@ -5,7 +5,6 @@ describe("SelectionBoxLayer", () => {
     const SVG_WIDTH = 500;
     const SVG_HEIGHT = 500;
     const SELECTION_BOX_CLASSNAME = ".selection-box";
-    const SELECTION_AREA_CLASSNAME = ".selection-area";
     let svg: d3.Selection<void>;
     let sbl: Plottable.Components.SelectionBoxLayer;
 
@@ -195,12 +194,25 @@ describe("SelectionBoxLayer", () => {
       sbl.destroy();
       svg.remove();
     });
+  });
+
+  describe("X scale binding", () => {
+    const SVG_WIDTH = 500;
+    const SVG_HEIGHT = 500;
+    const SELECTION_AREA_CLASSNAME = ".selection-area";
+    let svg: d3.Selection<void>;
+    let sbl: Plottable.Components.SelectionBoxLayer;
+    let xScale: Plottable.Scales.Linear;
+
+    beforeEach(() => {
+      svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+      sbl = new Plottable.Components.SelectionBoxLayer();
+      xScale = new Plottable.Scales.Linear();
+      xScale.domain([0, 2000]);
+      xScale.range([0, SVG_HEIGHT]);
+    });
 
     it("can set the xScale property", () => {
-      const xScale = new Plottable.Scales.Linear();
-      xScale.domain([0, 2000]);
-      xScale.range([0, SVG_WIDTH]);
-
       assert.isUndefined(sbl.xScale(), "no xScale is specified by default");
       assert.strictEqual(sbl.xScale(xScale), sbl, "setting the xScale returns the selection box layer");
       assert.strictEqual(sbl.xScale(), xScale, "The getter returns the correct scale");
@@ -222,10 +234,6 @@ describe("SelectionBoxLayer", () => {
     });
 
     it("can set the data values of the left and right sides directly", () => {
-      const xScale = new Plottable.Scales.Linear();
-      xScale.domain([0, 2000]);
-      xScale.range([0, SVG_WIDTH]);
-
       sbl.boxVisible(true);
       sbl.xScale(xScale);
 
@@ -250,9 +258,6 @@ describe("SelectionBoxLayer", () => {
     });
 
     it("uses the data values for the left and right sides if they were set last", () => {
-      const xScale = new Plottable.Scales.Linear();
-      xScale.domain([0, 2000]);
-      xScale.range([0, SVG_WIDTH]);
       sbl.xScale(xScale);
 
       const bounds = {
@@ -279,9 +284,6 @@ describe("SelectionBoxLayer", () => {
     });
 
     it("updates left and right edge pixel positions if in VALUE mode and xScale is switched", () => {
-      const xScale = new Plottable.Scales.Linear();
-      xScale.domain([0, 2000]);
-      xScale.range([0, SVG_HEIGHT]);
       sbl.xScale(xScale);
 
       const xExtent = [100, 250];
@@ -306,9 +308,6 @@ describe("SelectionBoxLayer", () => {
     });
 
     it("updates left and right edge pixel positions if in VALUE mode and xScale updates", () => {
-      const xScale = new Plottable.Scales.Linear();
-      xScale.domain([0, 2000]);
-      xScale.range([0, SVG_HEIGHT]);
       sbl.xScale(xScale);
 
       const xExtent = [100, 250];
@@ -328,12 +327,25 @@ describe("SelectionBoxLayer", () => {
       sbl.destroy();
       svg.remove();
     });
+  });
 
-    it("can set the yScale property", () => {
-      const yScale = new Plottable.Scales.Linear();
+  describe("Y scale binding", () => {
+    const SVG_WIDTH = 500;
+    const SVG_HEIGHT = 500;
+    const SELECTION_AREA_CLASSNAME = ".selection-area";
+    let svg: d3.Selection<void>;
+    let sbl: Plottable.Components.SelectionBoxLayer;
+    let yScale: Plottable.Scales.Linear;
+
+    beforeEach(() => {
+      svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+      sbl = new Plottable.Components.SelectionBoxLayer();
+      yScale = new Plottable.Scales.Linear();
       yScale.domain([0, 2000]);
       yScale.range([0, SVG_HEIGHT]);
+    });
 
+    it("can set the yScale property", () => {
       assert.isUndefined(sbl.yScale(), "no yScale is specified by default");
       assert.strictEqual(sbl.yScale(yScale), sbl, "setting the yScale returns the selection box layer");
       assert.strictEqual(sbl.yScale(), yScale, "The getter returns the correct scale");
@@ -356,10 +368,6 @@ describe("SelectionBoxLayer", () => {
     });
 
     it("can set the data values of the top and bottom sides directly", () => {
-      const yScale = new Plottable.Scales.Linear();
-      yScale.domain([0, 2000]);
-      yScale.range([0, SVG_HEIGHT]);
-
       sbl.boxVisible(true);
       sbl.yScale(yScale);
 
@@ -384,9 +392,6 @@ describe("SelectionBoxLayer", () => {
     });
 
     it("uses the data values for the top and bottom sides if they were set last", () => {
-      const yScale = new Plottable.Scales.Linear();
-      yScale.domain([0, 2000]);
-      yScale.range([0, SVG_HEIGHT]);
       sbl.yScale(yScale);
 
       const bounds = {
@@ -413,9 +418,6 @@ describe("SelectionBoxLayer", () => {
     });
 
     it("updates top and bottom edge pixel positions if in VALUE mode and yScale is switched", () => {
-      const yScale = new Plottable.Scales.Linear();
-      yScale.domain([0, 2000]);
-      yScale.range([0, SVG_HEIGHT]);
       sbl.yScale(yScale);
 
       const yExtent = [100, 250];
@@ -440,9 +442,6 @@ describe("SelectionBoxLayer", () => {
     });
 
     it("updates top and bottom edge pixel positions if in VALUE mode and yScale updates", () => {
-      const yScale = new Plottable.Scales.Linear();
-      yScale.domain([0, 2000]);
-      yScale.range([0, SVG_HEIGHT]);
       sbl.yScale(yScale);
 
       const yExtent = [100, 250];
