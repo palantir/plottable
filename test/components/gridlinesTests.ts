@@ -25,41 +25,7 @@ describe("Gridlines", () => {
     svg.remove();
   });
 
-  it("uses the TickGenerators of its Scales", () => {
-    let xAxis = new Plottable.Axes.Numeric(xScale, "bottom");
-    let yAxis = new Plottable.Axes.Numeric(yScale, "left");
-
-    let basicTable = new Plottable.Components.Table().add(yAxis, 0, 0)
-                                          .add(gridlines, 0, 1)
-                                          .add(xAxis, 1, 1);
-
-    basicTable.anchor(svg);
-    basicTable.computeLayout();
-    basicTable.render();
-
-    const xAxisTickMarks = xAxis.content().selectAll("." + Plottable.Axis.TICK_MARK_CLASS);
-    const xGridlines = gridlines.content().select(".x-gridlines").selectAll("line");
-    assert.strictEqual(xAxisTickMarks.length, xGridlines.length, "There is an x gridline for each x tick");
-    xAxisTickMarks.each(function(tickMark, i) {
-      let xTickMarkRect = this.getBoundingClientRect();
-      let xGridlineRect = (<Element> xGridlines[0][i]).getBoundingClientRect();
-      assert.closeTo(xTickMarkRect.left, xGridlineRect.left, 1, "x tick and gridline align");
-    });
-
-    let yAxisTickMarks = yAxis.content().selectAll("." + Plottable.Axis.TICK_MARK_CLASS);
-    let yGridlines = gridlines.content().select(".y-gridlines").selectAll("line");
-    assert.strictEqual(yAxisTickMarks.length, yGridlines.length, "There is an x gridline for each x tick");
-
-    yAxisTickMarks.each(function(tickMark, i) {
-      let yTickMarkRect = this.getBoundingClientRect();
-      let yGridlineRect = (<Element> yGridlines[0][i]).getBoundingClientRect();
-      assert.closeTo(yTickMarkRect.top, yGridlineRect.top, 1, "y tick and gridline align");
-    });
-
-    svg.remove();
-  });
-
-  it("updates gridlines when scales update", () => {
+  it("draws gridlines on ticks of its scales and updates when scale update", () => {
     gridlines.renderTo(svg);
 
     let xGridlines = gridlines.content().select(".x-gridlines").selectAll("line");
@@ -67,7 +33,7 @@ describe("Gridlines", () => {
     assert.strictEqual(xGridlines.size(), xTicks.length, "There is an x gridline for each x tick");
     xGridlines.each(function(gridline, i) {
       const x = TestMethods.numAttr(d3.select(this), "x1");
-      assert.closeTo(x, xScale.scale(xTicks[i]), 1, "x gridline drawn on ticks");
+      assert.closeTo(x, xScale.scale(xTicks[i]), window.Pixel_CloseTo_Requirement, "x gridline drawn on ticks");
     });
 
     let yGridlines = gridlines.content().select(".y-gridlines").selectAll("line");
@@ -75,7 +41,7 @@ describe("Gridlines", () => {
     assert.strictEqual(yGridlines.size(), yTicks.length, "There is a y gridline for each y tick");
     yGridlines.each(function(gridline, i) {
       const y = TestMethods.numAttr(d3.select(this), "y1");
-      assert.closeTo(y, yScale.scale(yTicks[i]), 1, "y gridline drawn on ticks");
+      assert.closeTo(y, yScale.scale(yTicks[i]), window.Pixel_CloseTo_Requirement, "y gridline drawn on ticks");
     });
 
     xScale.domain([0, 8]);
@@ -85,14 +51,14 @@ describe("Gridlines", () => {
     xTicks = xScale.ticks();
     xGridlines.each(function(gridline, i) {
       const x = TestMethods.numAttr(d3.select(this), "x1");
-      assert.closeTo(x, xScale.scale(xTicks[i]), 1, "x gridline is updated");
+      assert.closeTo(x, xScale.scale(xTicks[i]), window.Pixel_CloseTo_Requirement, "x gridline is updated");
     });
 
     yGridlines = gridlines.content().select(".y-gridlines").selectAll("line");
     yTicks = yScale.ticks();
     yGridlines.each(function(gridline, i) {
       const y = TestMethods.numAttr(d3.select(this), "y1");
-      assert.closeTo(y, yScale.scale(yTicks[i]), 1, "y gridline is updated");
+      assert.closeTo(y, yScale.scale(yTicks[i]), window.Pixel_CloseTo_Requirement, "y gridline is updated");
     });
     svg.remove();
   });
@@ -101,15 +67,15 @@ describe("Gridlines", () => {
     const categoryScale = new Plottable.Scales.Category();
     // HACKHACK #2661: Cannot assert errors being thrown with description
     (<any> assert).throw(() => new Plottable.Components.Gridlines(<any> categoryScale, null), Error,
-      "xScale needs to inherit from Scale.QuantitativeScale", "can't not set xScale to category scale");
+      "xScale needs to inherit from Scale.QuantitativeScale", "can't set xScale to category scale");
     (<any> assert).throw(() => new Plottable.Components.Gridlines(null, <any> categoryScale), Error,
-      "yScale needs to inherit from Scale.QuantitativeScale", "can't not set yScale to category scale");
+      "yScale needs to inherit from Scale.QuantitativeScale", "can't set yScale to category scale");
 
     const colorScale = new Plottable.Scales.Color();
     (<any> assert).throw(() => new Plottable.Components.Gridlines(<any> colorScale, null), Error,
-      "xScale needs to inherit from Scale.QuantitativeScale", "can't not set xScale to color scale");
+      "xScale needs to inherit from Scale.QuantitativeScale", "can't set xScale to color scale");
     (<any> assert).throw(() => new Plottable.Components.Gridlines(null, <any> colorScale), Error,
-      "yScale needs to inherit from Scale.QuantitativeScale", "can't not set yScale to color scale");
+      "yScale needs to inherit from Scale.QuantitativeScale", "can't set yScale to color scale");
 
      svg.remove();
   });
