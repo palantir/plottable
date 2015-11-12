@@ -275,6 +275,19 @@ describe("Plots", () => {
         svg.remove();
       });
 
+      it("retrieves undefined from entityNearest when no scatter points are in view", () => {
+        yScale.domain([-2, -1]);
+        xScale.domain([-2, -1]);
+        plot.renderTo(svg);
+
+        let closest = plot.entityNearest({
+          x: plot.width() / 2,
+          y: plot.height() / 2
+        });
+        assert.strictEqual(closest, undefined, "no datum has been retrieved");
+        svg.remove();
+      });
+
       it("can retrieve Entities in a certain range", () => {
         plot.renderTo(svg);
 

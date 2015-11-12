@@ -1,5 +1,4 @@
-module Plottable {
-export module Components {
+module Plottable.Components {
   type _LayoutAllocation = {
     guaranteedWidths: number[];
     guaranteedHeights: number[];
@@ -489,5 +488,4 @@ export module Components {
       return all(componentGroup.map(groupIsFixed));
     }
   }
-}
 }

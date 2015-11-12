@@ -1,5 +1,5 @@
 /*!
-Plottable 1.15.0 (https://github.com/palantir/plottable)
+Plottable 1.16.2 (https://github.com/palantir/plottable)
 Copyright 2014-2015 Palantir Technologies
 Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
 */
@@ -885,7 +885,7 @@ var Plottable;
 })(Plottable || (Plottable = {}));
 var Plottable;
 (function (Plottable) {
-    Plottable.version = "1.15.0";
+    Plottable.version = "1.16.2";
 })(Plottable || (Plottable = {}));
 var Plottable;
 (function (Plottable) {
@@ -996,24 +996,24 @@ var Plottable;
         RenderPolicies.Timeout = Timeout;
     })(RenderPolicies = Plottable.RenderPolicies || (Plottable.RenderPolicies = {}));
 })(Plottable || (Plottable = {}));
+/**
+ * The RenderController is responsible for enqueueing and synchronizing
+ * layout and render calls for Components.
+ *
+ * Layout and render calls occur inside an animation callback
+ * (window.requestAnimationFrame if available).
+ *
+ * RenderController.flush() immediately lays out and renders all Components currently enqueued.
+ *
+ * To always have immediate rendering (useful for debugging), call
+ * ```typescript
+ * Plottable.RenderController.setRenderPolicy(
+ *   new Plottable.RenderPolicies.Immediate()
+ * );
+ * ```
+ */
 var Plottable;
 (function (Plottable) {
-    /**
-     * The RenderController is responsible for enqueueing and synchronizing
-     * layout and render calls for Components.
-     *
-     * Layout and render calls occur inside an animation callback
-     * (window.requestAnimationFrame if available).
-     *
-     * RenderController.flush() immediately lays out and renders all Components currently enqueued.
-     *
-     * To always have immediate rendering (useful for debugging), call
-     * ```typescript
-     * Plottable.RenderController.setRenderPolicy(
-     *   new Plottable.RenderPolicies.Immediate()
-     * );
-     * ```
-     */
     var RenderController;
     (function (RenderController) {
         var _componentsNeedingRender = new Plottable.Utils.Set();
@@ -1122,6 +1122,9 @@ var Plottable;
      *
      */
     Plottable.MILLISECONDS_IN_ONE_DAY = 24 * 60 * 60 * 1000;
+})(Plottable || (Plottable = {}));
+var Plottable;
+(function (Plottable) {
     var Formatters;
     (function (Formatters) {
         /**
@@ -4051,6 +4054,9 @@ var Plottable;
         TimeInterval.year = "year";
     })(TimeInterval = Plottable.TimeInterval || (Plottable.TimeInterval = {}));
     ;
+})(Plottable || (Plottable = {}));
+var Plottable;
+(function (Plottable) {
     var Axes;
     (function (Axes) {
         var Time = (function (_super) {
@@ -4398,111 +4404,111 @@ var Plottable;
             Time.TIME_AXIS_TIER_CLASS = "time-axis-tier";
             Time._DEFAULT_TIME_AXIS_CONFIGURATIONS = [
                 [
-                    { interval: TimeInterval.second, step: 1, formatter: Plottable.Formatters.time("%I:%M:%S %p") },
-                    { interval: TimeInterval.day, step: 1, formatter: Plottable.Formatters.time("%B %e, %Y") }
+                    { interval: Plottable.TimeInterval.second, step: 1, formatter: Plottable.Formatters.time("%I:%M:%S %p") },
+                    { interval: Plottable.TimeInterval.day, step: 1, formatter: Plottable.Formatters.time("%B %e, %Y") }
                 ],
                 [
-                    { interval: TimeInterval.second, step: 5, formatter: Plottable.Formatters.time("%I:%M:%S %p") },
-                    { interval: TimeInterval.day, step: 1, formatter: Plottable.Formatters.time("%B %e, %Y") }
+                    { interval: Plottable.TimeInterval.second, step: 5, formatter: Plottable.Formatters.time("%I:%M:%S %p") },
+                    { interval: Plottable.TimeInterval.day, step: 1, formatter: Plottable.Formatters.time("%B %e, %Y") }
                 ],
                 [
-                    { interval: TimeInterval.second, step: 10, formatter: Plottable.Formatters.time("%I:%M:%S %p") },
-                    { interval: TimeInterval.day, step: 1, formatter: Plottable.Formatters.time("%B %e, %Y") }
+                    { interval: Plottable.TimeInterval.second, step: 10, formatter: Plottable.Formatters.time("%I:%M:%S %p") },
+                    { interval: Plottable.TimeInterval.day, step: 1, formatter: Plottable.Formatters.time("%B %e, %Y") }
                 ],
                 [
-                    { interval: TimeInterval.second, step: 15, formatter: Plottable.Formatters.time("%I:%M:%S %p") },
-                    { interval: TimeInterval.day, step: 1, formatter: Plottable.Formatters.time("%B %e, %Y") }
+                    { interval: Plottable.TimeInterval.second, step: 15, formatter: Plottable.Formatters.time("%I:%M:%S %p") },
+                    { interval: Plottable.TimeInterval.day, step: 1, formatter: Plottable.Formatters.time("%B %e, %Y") }
                 ],
                 [
-                    { interval: TimeInterval.second, step: 30, formatter: Plottable.Formatters.time("%I:%M:%S %p") },
-                    { interval: TimeInterval.day, step: 1, formatter: Plottable.Formatters.time("%B %e, %Y") }
+                    { interval: Plottable.TimeInterval.second, step: 30, formatter: Plottable.Formatters.time("%I:%M:%S %p") },
+                    { interval: Plottable.TimeInterval.day, step: 1, formatter: Plottable.Formatters.time("%B %e, %Y") }
                 ],
                 [
-                    { interval: TimeInterval.minute, step: 1, formatter: Plottable.Formatters.time("%I:%M %p") },
-                    { interval: TimeInterval.day, step: 1, formatter: Plottable.Formatters.time("%B %e, %Y") }
+                    { interval: Plottable.TimeInterval.minute, step: 1, formatter: Plottable.Formatters.time("%I:%M %p") },
+                    { interval: Plottable.TimeInterval.day, step: 1, formatter: Plottable.Formatters.time("%B %e, %Y") }
                 ],
                 [
-                    { interval: TimeInterval.minute, step: 5, formatter: Plottable.Formatters.time("%I:%M %p") },
-                    { interval: TimeInterval.day, step: 1, formatter: Plottable.Formatters.time("%B %e, %Y") }
+                    { interval: Plottable.TimeInterval.minute, step: 5, formatter: Plottable.Formatters.time("%I:%M %p") },
+                    { interval: Plottable.TimeInterval.day, step: 1, formatter: Plottable.Formatters.time("%B %e, %Y") }
                 ],
                 [
-                    { interval: TimeInterval.minute, step: 10, formatter: Plottable.Formatters.time("%I:%M %p") },
-                    { interval: TimeInterval.day, step: 1, formatter: Plottable.Formatters.time("%B %e, %Y") }
+                    { interval: Plottable.TimeInterval.minute, step: 10, formatter: Plottable.Formatters.time("%I:%M %p") },
+                    { interval: Plottable.TimeInterval.day, step: 1, formatter: Plottable.Formatters.time("%B %e, %Y") }
                 ],
                 [
-                    { interval: TimeInterval.minute, step: 15, formatter: Plottable.Formatters.time("%I:%M %p") },
-                    { interval: TimeInterval.day, step: 1, formatter: Plottable.Formatters.time("%B %e, %Y") }
+                    { interval: Plottable.TimeInterval.minute, step: 15, formatter: Plottable.Formatters.time("%I:%M %p") },
+                    { interval: Plottable.TimeInterval.day, step: 1, formatter: Plottable.Formatters.time("%B %e, %Y") }
                 ],
                 [
-                    { interval: TimeInterval.minute, step: 30, formatter: Plottable.Formatters.time("%I:%M %p") },
-                    { interval: TimeInterval.day, step: 1, formatter: Plottable.Formatters.time("%B %e, %Y") }
+                    { interval: Plottable.TimeInterval.minute, step: 30, formatter: Plottable.Formatters.time("%I:%M %p") },
+                    { interval: Plottable.TimeInterval.day, step: 1, formatter: Plottable.Formatters.time("%B %e, %Y") }
                 ],
                 [
-                    { interval: TimeInterval.hour, step: 1, formatter: Plottable.Formatters.time("%I %p") },
-                    { interval: TimeInterval.day, step: 1, formatter: Plottable.Formatters.time("%B %e, %Y") }
+                    { interval: Plottable.TimeInterval.hour, step: 1, formatter: Plottable.Formatters.time("%I %p") },
+                    { interval: Plottable.TimeInterval.day, step: 1, formatter: Plottable.Formatters.time("%B %e, %Y") }
                 ],
                 [
-                    { interval: TimeInterval.hour, step: 3, formatter: Plottable.Formatters.time("%I %p") },
-                    { interval: TimeInterval.day, step: 1, formatter: Plottable.Formatters.time("%B %e, %Y") }
+                    { interval: Plottable.TimeInterval.hour, step: 3, formatter: Plottable.Formatters.time("%I %p") },
+                    { interval: Plottable.TimeInterval.day, step: 1, formatter: Plottable.Formatters.time("%B %e, %Y") }
                 ],
                 [
-                    { interval: TimeInterval.hour, step: 6, formatter: Plottable.Formatters.time("%I %p") },
-                    { interval: TimeInterval.day, step: 1, formatter: Plottable.Formatters.time("%B %e, %Y") }
+                    { interval: Plottable.TimeInterval.hour, step: 6, formatter: Plottable.Formatters.time("%I %p") },
+                    { interval: Plottable.TimeInterval.day, step: 1, formatter: Plottable.Formatters.time("%B %e, %Y") }
                 ],
                 [
-                    { interval: TimeInterval.hour, step: 12, formatter: Plottable.Formatters.time("%I %p") },
-                    { interval: TimeInterval.day, step: 1, formatter: Plottable.Formatters.time("%B %e, %Y") }
+                    { interval: Plottable.TimeInterval.hour, step: 12, formatter: Plottable.Formatters.time("%I %p") },
+                    { interval: Plottable.TimeInterval.day, step: 1, formatter: Plottable.Formatters.time("%B %e, %Y") }
                 ],
                 [
-                    { interval: TimeInterval.day, step: 1, formatter: Plottable.Formatters.time("%a %e") },
-                    { interval: TimeInterval.month, step: 1, formatter: Plottable.Formatters.time("%B %Y") }
+                    { interval: Plottable.TimeInterval.day, step: 1, formatter: Plottable.Formatters.time("%a %e") },
+                    { interval: Plottable.TimeInterval.month, step: 1, formatter: Plottable.Formatters.time("%B %Y") }
                 ],
                 [
-                    { interval: TimeInterval.day, step: 1, formatter: Plottable.Formatters.time("%e") },
-                    { interval: TimeInterval.month, step: 1, formatter: Plottable.Formatters.time("%B %Y") }
+                    { interval: Plottable.TimeInterval.day, step: 1, formatter: Plottable.Formatters.time("%e") },
+                    { interval: Plottable.TimeInterval.month, step: 1, formatter: Plottable.Formatters.time("%B %Y") }
                 ],
                 [
-                    { interval: TimeInterval.month, step: 1, formatter: Plottable.Formatters.time("%B") },
-                    { interval: TimeInterval.year, step: 1, formatter: Plottable.Formatters.time("%Y") }
+                    { interval: Plottable.TimeInterval.month, step: 1, formatter: Plottable.Formatters.time("%B") },
+                    { interval: Plottable.TimeInterval.year, step: 1, formatter: Plottable.Formatters.time("%Y") }
                 ],
                 [
-                    { interval: TimeInterval.month, step: 1, formatter: Plottable.Formatters.time("%b") },
-                    { interval: TimeInterval.year, step: 1, formatter: Plottable.Formatters.time("%Y") }
+                    { interval: Plottable.TimeInterval.month, step: 1, formatter: Plottable.Formatters.time("%b") },
+                    { interval: Plottable.TimeInterval.year, step: 1, formatter: Plottable.Formatters.time("%Y") }
                 ],
                 [
-                    { interval: TimeInterval.month, step: 3, formatter: Plottable.Formatters.time("%b") },
-                    { interval: TimeInterval.year, step: 1, formatter: Plottable.Formatters.time("%Y") }
+                    { interval: Plottable.TimeInterval.month, step: 3, formatter: Plottable.Formatters.time("%b") },
+                    { interval: Plottable.TimeInterval.year, step: 1, formatter: Plottable.Formatters.time("%Y") }
                 ],
                 [
-                    { interval: TimeInterval.month, step: 6, formatter: Plottable.Formatters.time("%b") },
-                    { interval: TimeInterval.year, step: 1, formatter: Plottable.Formatters.time("%Y") }
+                    { interval: Plottable.TimeInterval.month, step: 6, formatter: Plottable.Formatters.time("%b") },
+                    { interval: Plottable.TimeInterval.year, step: 1, formatter: Plottable.Formatters.time("%Y") }
                 ],
                 [
-                    { interval: TimeInterval.year, step: 1, formatter: Plottable.Formatters.time("%Y") }
+                    { interval: Plottable.TimeInterval.year, step: 1, formatter: Plottable.Formatters.time("%Y") }
                 ],
                 [
-                    { interval: TimeInterval.year, step: 1, formatter: Plottable.Formatters.time("%y") }
+                    { interval: Plottable.TimeInterval.year, step: 1, formatter: Plottable.Formatters.time("%y") }
                 ],
                 [
-                    { interval: TimeInterval.year, step: 5, formatter: Plottable.Formatters.time("%Y") }
+                    { interval: Plottable.TimeInterval.year, step: 5, formatter: Plottable.Formatters.time("%Y") }
                 ],
                 [
-                    { interval: TimeInterval.year, step: 25, formatter: Plottable.Formatters.time("%Y") }
+                    { interval: Plottable.TimeInterval.year, step: 25, formatter: Plottable.Formatters.time("%Y") }
                 ],
                 [
-                    { interval: TimeInterval.year, step: 50, formatter: Plottable.Formatters.time("%Y") }
+                    { interval: Plottable.TimeInterval.year, step: 50, formatter: Plottable.Formatters.time("%Y") }
                 ],
                 [
-                    { interval: TimeInterval.year, step: 100, formatter: Plottable.Formatters.time("%Y") }
+                    { interval: Plottable.TimeInterval.year, step: 100, formatter: Plottable.Formatters.time("%Y") }
                 ],
                 [
-                    { interval: TimeInterval.year, step: 200, formatter: Plottable.Formatters.time("%Y") }
+                    { interval: Plottable.TimeInterval.year, step: 200, formatter: Plottable.Formatters.time("%Y") }
                 ],
                 [
-                    { interval: TimeInterval.year, step: 500, formatter: Plottable.Formatters.time("%Y") }
+                    { interval: Plottable.TimeInterval.year, step: 500, formatter: Plottable.Formatters.time("%Y") }
                 ],
                 [
-                    { interval: TimeInterval.year, step: 1000, formatter: Plottable.Formatters.time("%Y") }
+                    { interval: Plottable.TimeInterval.year, step: 1000, formatter: Plottable.Formatters.time("%Y") }
                 ]
             ];
             Time._LONG_DATE = new Date(9999, 8, 29, 12, 59, 9999);
@@ -4864,7 +4870,7 @@ var Plottable;
             Category.prototype._setup = function () {
                 _super.prototype._setup.call(this);
                 this._measurer = new SVGTypewriter.Measurers.CacheCharacterMeasurer(this._tickLabelContainer);
-                this._wrapper = new SVGTypewriter.Wrappers.SingleLineWrapper();
+                this._wrapper = new SVGTypewriter.Wrappers.Wrapper();
                 this._writer = new SVGTypewriter.Writers.Writer(this._measurer, this._wrapper);
             };
             Category.prototype._rescale = function () {
@@ -5038,7 +5044,11 @@ var Plottable;
                 // on everyone, including this. Since CSS or something might have
                 // affected the size of the characters, clear the cache.
                 this._measurer.reset();
-                return _super.prototype.computeLayout.call(this, origin, availableWidth, availableHeight);
+                _super.prototype.computeLayout.call(this, origin, availableWidth, availableHeight);
+                if (!this._isHorizontal()) {
+                    this._scale.range([0, this.height()]);
+                }
+                return this;
             };
             return Category;
         })(Plottable.Axis);
@@ -5489,7 +5499,7 @@ var Plottable;
             function InterpolatedColorLegend(interpolatedColorScale) {
                 var _this = this;
                 _super.call(this);
-                this._padding = 5;
+                this._textPadding = 5;
                 if (interpolatedColorScale == null) {
                     throw new Error("InterpolatedColorLegend requires a interpolatedColorScale");
                 }
@@ -5550,6 +5560,9 @@ var Plottable;
             InterpolatedColorLegend.prototype._generateTicks = function (numSwatches) {
                 if (numSwatches === void 0) { numSwatches = InterpolatedColorLegend._DEFAULT_NUM_SWATCHES; }
                 var domain = this._scale.domain();
+                if (numSwatches === 1) {
+                    return [domain[0]];
+                }
                 var slope = (domain[1] - domain[0]) / (numSwatches - 1);
                 var ticks = [];
                 for (var i = 0; i < numSwatches; i++) {
@@ -5570,6 +5583,7 @@ var Plottable;
             InterpolatedColorLegend.prototype.requestedSpace = function (offeredWidth, offeredHeight) {
                 var _this = this;
                 var textHeight = this._measurer.measure().height;
+                var padding = textHeight;
                 var domain = this._scale.domain();
                 var labelWidths = domain.map(function (d) { return _this._measurer.measure(_this._formatter(d)).width; });
                 var desiredHeight;
@@ -5577,14 +5591,13 @@ var Plottable;
                 var numSwatches = InterpolatedColorLegend._DEFAULT_NUM_SWATCHES;
                 if (this._isVertical()) {
                     var longestWidth = Plottable.Utils.Math.max(labelWidths, 0);
-                    desiredWidth = this._padding + textHeight + this._padding + longestWidth + this._padding;
-                    desiredHeight = this._padding + numSwatches * textHeight + this._padding;
+                    desiredWidth = padding + textHeight + this._textPadding + longestWidth + this._textPadding;
+                    desiredHeight = numSwatches * textHeight;
                 }
                 else {
-                    desiredHeight = this._padding + textHeight + this._padding;
-                    desiredWidth = this._padding + labelWidths[0] + this._padding
-                        + numSwatches * textHeight
-                        + this._padding + labelWidths[1] + this._padding;
+                    desiredHeight = padding + textHeight + padding;
+                    desiredWidth = this._textPadding + labelWidths[0] + numSwatches * textHeight
+                        + labelWidths[1] + this._textPadding;
                 }
                 return {
                     minWidth: desiredWidth,
@@ -5602,7 +5615,8 @@ var Plottable;
                 var text0Width = this._measurer.measure(text0).width;
                 var text1 = this._formatter(domain[1]);
                 var text1Width = this._measurer.measure(text1).width;
-                var padding = this._padding;
+                var textHeight = this._measurer.measure().height;
+                var textPadding = this._textPadding;
                 var upperLabelShift = { x: 0, y: 0 };
                 var lowerLabelShift = { x: 0, y: 0 };
                 var lowerWriteOptions = {
@@ -5623,52 +5637,52 @@ var Plottable;
                 var swatchY;
                 var boundingBoxAttr = {
                     x: 0,
-                    y: padding,
+                    y: 0,
                     width: 0,
                     height: 0
                 };
-                var numSwatches = InterpolatedColorLegend._DEFAULT_NUM_SWATCHES;
-                var textHeight = this._measurer.measure().height;
-                if (this.expands() && textHeight > 0) {
-                    var offset = this._isVertical() ? 2 * padding : 4 * padding - text0Width - text1Width;
-                    var fullLength = this._isVertical() ? this.height() : this.width();
-                    numSwatches = Math.max(Math.floor((fullLength - offset) / textHeight), numSwatches);
-                }
+                var padding;
+                var numSwatches;
                 if (this._isVertical()) {
+                    numSwatches = Math.floor(this.height());
                     var longestTextWidth = Math.max(text0Width, text1Width);
-                    swatchWidth = Math.max((this.width() - 3 * padding - longestTextWidth), 0);
-                    swatchHeight = Math.max(((this.height() - 2 * padding) / numSwatches), 0);
-                    swatchY = function (d, i) { return padding + (numSwatches - (i + 1)) * swatchHeight; };
+                    padding = (this.width() - longestTextWidth - 2 * this._textPadding) / 2;
+                    swatchWidth = Math.max(this.width() - padding - 2 * textPadding - longestTextWidth, 0);
+                    swatchHeight = 1;
+                    swatchY = function (d, i) { return _this.height() - (i + 1); };
                     upperWriteOptions.yAlign = "top";
-                    upperLabelShift.y = padding;
+                    upperLabelShift.y = 0;
                     lowerWriteOptions.yAlign = "bottom";
-                    lowerLabelShift.y = -padding;
+                    lowerLabelShift.y = 0;
                     if (this._orientation === "left") {
-                        swatchX = function (d, i) { return padding + longestTextWidth + padding; };
+                        swatchX = function (d, i) { return textPadding + longestTextWidth + textPadding; };
                         upperWriteOptions.xAlign = "right";
-                        upperLabelShift.x = -(padding + swatchWidth + padding);
+                        upperLabelShift.x = -(padding + swatchWidth + textPadding);
                         lowerWriteOptions.xAlign = "right";
-                        lowerLabelShift.x = -(padding + swatchWidth + padding);
+                        lowerLabelShift.x = -(padding + swatchWidth + textPadding);
                     }
                     else {
                         swatchX = function (d, i) { return padding; };
                         upperWriteOptions.xAlign = "left";
-                        upperLabelShift.x = padding + swatchWidth + padding;
+                        upperLabelShift.x = padding + swatchWidth + textPadding;
                         lowerWriteOptions.xAlign = "left";
-                        lowerLabelShift.x = padding + swatchWidth + padding;
+                        lowerLabelShift.x = padding + swatchWidth + textPadding;
                     }
                     boundingBoxAttr["width"] = swatchWidth;
                     boundingBoxAttr["height"] = numSwatches * swatchHeight;
                 }
                 else {
-                    swatchWidth = Math.max(((this.width() - 4 * padding - text0Width - text1Width) / numSwatches), 0);
+                    padding = Math.max(textPadding, (this.height() - textHeight) / 2);
+                    numSwatches = Math.max(Math.floor(this.width() - textPadding * 4 - text0Width - text1Width), 0);
+                    swatchWidth = 1;
                     swatchHeight = Math.max((this.height() - 2 * padding), 0);
-                    swatchX = function (d, i) { return (padding + text0Width + padding) + i * swatchWidth; };
+                    swatchX = function (d, i) { return Math.floor(text0Width + 2 * textPadding) + i; };
                     swatchY = function (d, i) { return padding; };
                     upperWriteOptions.xAlign = "right";
-                    upperLabelShift.x = -padding;
+                    upperLabelShift.x = -textPadding;
                     lowerWriteOptions.xAlign = "left";
-                    lowerLabelShift.x = padding;
+                    lowerLabelShift.x = textPadding;
+                    boundingBoxAttr["y"] = padding;
                     boundingBoxAttr["width"] = numSwatches * swatchWidth;
                     boundingBoxAttr["height"] = swatchHeight;
                 }
@@ -5684,15 +5698,19 @@ var Plottable;
                 this._swatchBoundingBox.attr(boundingBoxAttr);
                 var ticks = this._generateTicks(numSwatches);
                 var swatches = this._swatchContainer.selectAll("rect.swatch").data(ticks);
-                swatches.enter().append("rect").classed("swatch", true);
+                var rects = swatches.enter().append("rect").classed("swatch", true);
                 swatches.exit().remove();
                 swatches.attr({
                     "fill": function (d, i) { return _this._scale.scale(d); },
                     "width": swatchWidth,
                     "height": swatchHeight,
                     "x": swatchX,
-                    "y": swatchY
+                    "y": swatchY,
+                    "shape-rendering": "crispEdges"
                 });
+                if (Plottable.Configs.ADD_TITLE_ELEMENTS) {
+                    rects.append("title").text(function (d) { return _this._formatter(d); });
+                }
                 return this;
             };
             InterpolatedColorLegend._DEFAULT_NUM_SWATCHES = 11;
@@ -6540,6 +6558,9 @@ var Plottable;
             Animator.RESET = "reset";
         })(Animator = Plots.Animator || (Plots.Animator = {}));
     })(Plots = Plottable.Plots || (Plottable.Plots = {}));
+})(Plottable || (Plottable = {}));
+var Plottable;
+(function (Plottable) {
     var Plot = (function (_super) {
         __extends(Plot, _super);
         /**
@@ -6564,8 +6585,8 @@ var Plottable;
             this._propertyBindings = d3.map();
             this._propertyExtents = d3.map();
             var mainAnimator = new Plottable.Animators.Easing().maxTotalDuration(Plot._ANIMATION_MAX_DURATION);
-            this.animator(Plots.Animator.MAIN, mainAnimator);
-            this.animator(Plots.Animator.RESET, new Plottable.Animators.Null());
+            this.animator(Plottable.Plots.Animator.MAIN, mainAnimator);
+            this.animator(Plottable.Plots.Animator.RESET, new Plottable.Animators.Null());
         }
         Plot.prototype.anchor = function (selection) {
             _super.prototype.anchor.call(this, selection);
@@ -6947,6 +6968,9 @@ var Plottable;
                     closestPointEntity = entity;
                 }
             });
+            if (closestPointEntity === undefined) {
+                return undefined;
+            }
             return this._lightweightPlotEntityToPlotEntity(closestPointEntity);
         };
         /**
@@ -11138,12 +11162,12 @@ var Plottable;
             function Pointer() {
                 var _this = this;
                 _super.apply(this, arguments);
-                this._insideComponent = false;
+                this._overComponent = false;
                 this._pointerEnterCallbacks = new Plottable.Utils.CallbackSet();
                 this._pointerMoveCallbacks = new Plottable.Utils.CallbackSet();
                 this._pointerExitCallbacks = new Plottable.Utils.CallbackSet();
-                this._mouseMoveCallback = function (p, e) { return _this._handleMouseEvent(p, e); };
-                this._touchStartCallback = function (ids, idToPoint, e) { return _this._handleTouchEvent(idToPoint[ids[0]], e); };
+                this._mouseMoveCallback = function (p) { return _this._handlePointerEvent(p); };
+                this._touchStartCallback = function (ids, idToPoint) { return _this._handlePointerEvent(idToPoint[ids[0]]); };
             }
             Pointer.prototype._anchor = function (component) {
                 _super.prototype._anchor.call(this, component);
@@ -11159,27 +11183,19 @@ var Plottable;
                 this._touchDispatcher.offTouchStart(this._touchStartCallback);
                 this._touchDispatcher = null;
             };
-            Pointer.prototype._handleMouseEvent = function (p, e) {
-                var insideSVG = this._mouseDispatcher.eventInsideSVG(e);
-                this._handlePointerEvent(p, insideSVG);
-            };
-            Pointer.prototype._handleTouchEvent = function (p, e) {
-                var insideSVG = this._touchDispatcher.eventInsideSVG(e);
-                this._handlePointerEvent(p, insideSVG);
-            };
-            Pointer.prototype._handlePointerEvent = function (p, insideSVG) {
+            Pointer.prototype._handlePointerEvent = function (p) {
                 var translatedP = this._translateToComponentSpace(p);
                 var overComponent = this._isInsideComponent(translatedP);
-                if (overComponent && insideSVG) {
-                    if (!this._insideComponent) {
+                if (overComponent) {
+                    if (!this._overComponent) {
                         this._pointerEnterCallbacks.callCallbacks(translatedP);
                     }
                     this._pointerMoveCallbacks.callCallbacks(translatedP);
                 }
-                else if (this._insideComponent) {
+                else if (this._overComponent) {
                     this._pointerExitCallbacks.callCallbacks(translatedP);
                 }
-                this._insideComponent = overComponent && insideSVG;
+                this._overComponent = overComponent;
             };
             /**
              * Adds a callback to be called when the pointer enters the Component.
@@ -12191,6 +12207,9 @@ var Plottable;
 var Plottable;
 (function (Plottable) {
     ;
+})(Plottable || (Plottable = {}));
+var Plottable;
+(function (Plottable) {
     var Components;
     (function (Components) {
         var DragLineLayer = (function (_super) {

@@ -1,5 +1,4 @@
-module Plottable {
-export module Scales {
+module Plottable.Scales {
   export class ModifiedLog extends QuantitativeScale<number> {
     private _base: number;
     private _d3Scale: d3.scale.Linear<number, number>;
@@ -201,5 +200,4 @@ export module Scales {
       return this._d3Scale.ticks(Scales.ModifiedLog._DEFAULT_NUM_TICKS);
     }
   }
-}
 }
