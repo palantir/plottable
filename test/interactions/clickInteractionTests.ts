@@ -38,7 +38,7 @@ describe("Click Interaction", () => {
     }
     callback.called = false;
     callback.reset = () => {
-      callback.lastPoint = null;
+      callback.lastPoint = undefined;
       callback.called = false;
     }
     return callback;
