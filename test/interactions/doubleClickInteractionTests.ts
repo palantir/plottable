@@ -27,15 +27,14 @@ describe("Interactions", () => {
     });
 
     type ClickTestCallback = {
-      (p?: Plottable.Point): void;
       lastPoint: Plottable.Point;
       called: boolean;
       reset: () => void;
-    };
+      (p: Plottable.Point): void;
+    }
 
     function makeClickCallback() {
-      let callback: ClickTestCallback;
-      callback = <any> function(p?: Plottable.Point) {
+      let callback = <ClickTestCallback> function(p: Plottable.Point) {
         callback.lastPoint = p;
         callback.called = true;
       };
