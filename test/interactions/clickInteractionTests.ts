@@ -96,7 +96,6 @@ describe("Interactions", () => {
 
       it("can deregister a callback without affecting the other ones", () => {
         const callback1 = makeClickCallback();
-
         const callback2 = makeClickCallback();
 
         clickInteraction.onClick(callback1);

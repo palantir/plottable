@@ -126,7 +126,7 @@ describe("Interactions", () => {
           assert.isTrue(callback2.getCalled(), "Interaction should trigger the second callback");
         });
 
-        it("can register multiple onDragStart callbacks and unregister one", () => {
+        it("can deregister an onDragStart callback without affecting the other ones", () => {
           const callback1 = new TestDragCallback();
           const call1 = (start: Plottable.Point, end: Plottable.Point) => callback1.call(start, end);
 
@@ -143,39 +143,34 @@ describe("Interactions", () => {
         });
       });
 
-      describe("callbacks", () => {
-        let callback: TestDragCallback;
+      [TestMethods.InteractionMode.Mouse, TestMethods.InteractionMode.Touch].forEach((mode) => {
+        describe(`invoking with ${TestMethods.InteractionMode[mode]} events`, () => {
+          let callback: TestDragCallback;
 
-        beforeEach(() => {
-          callback = new TestDragCallback();
-          dragInteraction.onDragStart((start: Plottable.Point, end: Plottable.Point) => callback.call(start, end));
-        });
+          beforeEach(() => {
+            callback = new TestDragCallback();
+            dragInteraction.onDragStart((start: Plottable.Point, end: Plottable.Point) => callback.call(start, end));
+          });
 
-        [TestMethods.InteractionMode.Mouse, TestMethods.InteractionMode.Touch].forEach((mode: TestMethods.InteractionMode) => {
-          it("invokes onDragStart callback on single click for " + TestMethods.InteractionMode[mode], () => {
+          it("invokes onDragStart callback on start event", () => {
             dragStart(startPoint, mode);
-
             assert.isTrue(callback.getCalled(), "callback was called on beginning drag");
             assert.deepEqual(callback.getStartPoint(), startPoint, "was passed the correct point");
           });
 
-          it("does not invoke callback if drag starts outside Component (positive)", () => {
+          it("does not invoke callback if drag starts outside Component", () => {
             dragStart(positiveOutsidePoint, mode);
-
             assert.isFalse(callback.getCalled(), "does not trigger callback if drag starts outside the Component (positive)");
-          });
-
-          it("does not invoke callback if drag starts outside Component (negative)", () => {
             dragStart(negativeOutsidePoint, mode);
-
-            assert.isFalse(callback.getCalled(), "does not trigger callback if drag starts outside the Component (positive)");
+            assert.isFalse(callback.getCalled(), "does not trigger callback if drag starts outside the Component (negative)");
           });
-        });
 
-        it("does not invoke onDragStart on right click", () => {
-          TestMethods.triggerFakeMouseEvent("mousedown", component.background(), startPoint.x, startPoint.y, 2);
-
-          assert.isFalse(callback.getCalled(), "callback is not called on right-click");
+          if (mode === TestMethods.InteractionMode.Mouse) {
+            it("does not invoke onDragStart on right click", () => {
+              TestMethods.triggerFakeMouseEvent("mousedown", component.background(), startPoint.x, startPoint.y, 2);
+              assert.isFalse(callback.getCalled(), "callback is not called on right-click");
+            });
+          }
         });
       });
     });
@@ -218,7 +213,7 @@ describe("Interactions", () => {
           assert.isTrue(callback2.getCalled(), "Interaction should trigger the second callback");
         });
 
-        it("can register multiple onDrag callbacks and unregister one", () => {
+        it("can deregister an onDrag callback without affecting the other ones", () => {
           const callback1 = new TestDragCallback();
           const call1 = (start: Plottable.Point, end: Plottable.Point) => callback1.call(start, end);
 
@@ -235,7 +230,7 @@ describe("Interactions", () => {
         });
       });
 
-      describe("callbacks", () => {
+      describe("invoking", () => {
         let callback: TestDragCallback;
 
         beforeEach(() => {
@@ -308,7 +303,7 @@ describe("Interactions", () => {
           assert.isTrue(callback2.getCalled(), "Interaction should trigger the second callback");
         });
 
-        it("can register multiple onDragEnd callbacks and unregister one", () => {
+        it("can deregister an onDragEnd callback without affecting the other ones", () => {
           const callback1 = new TestDragCallback();
           const call1 = (start: Plottable.Point, end: Plottable.Point) => callback1.call(start, end);
 
@@ -325,7 +320,7 @@ describe("Interactions", () => {
         });
       });
 
-      describe("callbacks", () => {
+      describe("invoking", () => {
         let callback: TestDragCallback;
 
         beforeEach(() => {
@@ -334,7 +329,7 @@ describe("Interactions", () => {
         });
 
         [TestMethods.InteractionMode.Mouse, TestMethods.InteractionMode.Touch].forEach((mode: TestMethods.InteractionMode) => {
-          it("passes correct start and end point on drag ending for " + TestMethods.InteractionMode[mode], () => {
+          it(`passes correct start and end point on drag ending for ${TestMethods.InteractionMode[mode]}`, () => {
             dragEnd(startPoint, endPoint);
 
             assert.isTrue(callback.getCalled(), "callback was called on drag ending");
@@ -342,7 +337,7 @@ describe("Interactions", () => {
             assert.deepEqual(callback.getEndPoint(), endPoint, "was passed the correct current point");
           });
 
-          it("supports multiple start/move/end drag callbacks at the same time", () => {
+          it(`supports multiple start/move/end drag callbacks at the same time for ${TestMethods.InteractionMode[mode]}`, () => {
             const startCallback = new TestDragCallback();
             const moveCallback = new TestDragCallback();
             const endCallback = new TestDragCallback();
@@ -384,23 +379,18 @@ describe("Interactions", () => {
       });
     });
 
-    describe("constrained to component behavior", () => {
-      it("constrains drag interaction by default", () => {
+    describe("constrainedToComponent", () => {
+      it("is true by default", () => {
         assert.isTrue(dragInteraction.constrainedToComponent(), "constrains by default");
       });
 
-      it("sets constrained to component to false", () => {
-        dragInteraction.constrainedToComponent(false);
+      it("can be set to false", () => {
+        assert.strictEqual(dragInteraction.constrainedToComponent(false), dragInteraction, "setter returns calling Drag Interaction");
         assert.isFalse(dragInteraction.constrainedToComponent(), "constrains set to false");
       });
 
-      it("constrainedToComponent returns this", () => {
-        const value = dragInteraction.constrainedToComponent(false);
-        assert.strictEqual(value, dragInteraction, "returns this");
-      });
-
-      describe("callbacks when constrain is enabled", () => {
-        [TestMethods.InteractionMode.Mouse, TestMethods.InteractionMode.Touch].forEach((mode: TestMethods.InteractionMode) => {
+      [TestMethods.InteractionMode.Mouse, TestMethods.InteractionMode.Touch].forEach((mode) => {
+        describe(`invoking callbacks with ${TestMethods.InteractionMode[mode]} events when not constrained`, () => {
           let callback: TestDragCallback;
 
           beforeEach(() => {
@@ -410,38 +400,28 @@ describe("Interactions", () => {
             dragInteraction.onDragEnd((start: Plottable.Point, end: Plottable.Point) => callback.call(start, end));
           });
 
-          it("does not constrain dragging for onDrag outside Component in positive direction for " +
-              TestMethods.InteractionMode[mode], () => {
+          it("does not constrain dragging for onDrag outside Component in positive direction", () => {
             dragMove(startPoint, positiveOutsidePoint);
-
             assert.deepEqual(callback.getEndPoint(), positiveOutsidePoint, "was passed the correct end point");
           });
 
-          it("does not constrain dragging for onDrag outside Component in negative direction for " +
-              TestMethods.InteractionMode[mode], () => {
+          it("does not constrain dragging for onDrag outside Component in negative direction", () => {
             dragMove(startPoint, negativeOutsidePoint);
-
             assert.deepEqual(callback.getEndPoint(), negativeOutsidePoint, "was passed the correct end point");
           });
 
-          it("does not constrain dragging for onDragEnd outside Component in positive direction for " +
-              TestMethods.InteractionMode[mode], () => {
+          it("does not constrain dragging for onDragEnd outside Component in positive direction", () => {
             dragEnd(startPoint, positiveOutsidePoint);
-
             assert.deepEqual(callback.getEndPoint(), positiveOutsidePoint, "was passed the correct end point");
           });
 
-          it("does not constrain dragging for onDragEnd outside Component in negative direction for " +
-              TestMethods.InteractionMode[mode], () => {
+          it("does not constrain dragging for onDragEnd outside Component in negative direction", () => {
             dragEnd(startPoint, negativeOutsidePoint);
-
             assert.deepEqual(callback.getEndPoint(), negativeOutsidePoint, "was passed the correct end point");
           });
         });
-      });
 
-      describe("callbacks when constrain is disabled", () => {
-        [TestMethods.InteractionMode.Mouse, TestMethods.InteractionMode.Touch].forEach((mode: TestMethods.InteractionMode) => {
+        describe(`invoking callbacks with ${TestMethods.InteractionMode[mode]} events when constrained`, () => {
           const constrainedPos = { x: SVG_WIDTH, y: SVG_HEIGHT };
           const constrainedNeg = { x: 0, y: 0 };
 
@@ -453,27 +433,23 @@ describe("Interactions", () => {
             dragInteraction.onDragEnd((start: Plottable.Point, end: Plottable.Point) => callback.call(start, end));
           });
 
-          it("constrains dragging for onDrag outside Component in positive direction for " + TestMethods.InteractionMode[mode], () => {
+          it("constrains dragging for onDrag outside Component in positive direction", () => {
             dragMove(startPoint, positiveOutsidePoint);
-
             assert.deepEqual(callback.getEndPoint(), constrainedPos, "was passed the correct end point");
           });
 
-          it("constrains dragging for onDrag outside Component in negative direction for " + TestMethods.InteractionMode[mode], () => {
+          it("constrains dragging for onDrag outside Component in negative direction", () => {
             dragMove(startPoint, negativeOutsidePoint);
-
             assert.deepEqual(callback.getEndPoint(), constrainedNeg, "was passed the correct end point");
           });
 
-          it("constrains dragging for onDragEnd outside Component in positive direction for " + TestMethods.InteractionMode[mode], () => {
+          it("constrains dragging for onDragEnd outside Component in positive direction", () => {
             dragEnd(startPoint, positiveOutsidePoint);
-
             assert.deepEqual(callback.getEndPoint(), constrainedPos, "was passed the correct end point");
           });
 
-          it("constrains dragging for onDragEnd outside Component in negative direction for " + TestMethods.InteractionMode[mode], () => {
+          it("constrains dragging for onDragEnd outside Component in negative direction", () => {
             dragEnd(startPoint, negativeOutsidePoint);
-
             assert.deepEqual(callback.getEndPoint(), constrainedNeg, "was passed the correct end point");
           });
         });
