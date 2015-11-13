@@ -94,18 +94,18 @@ describe("Interactions", () => {
           const callback = new TestDragCallback();
           const call = (start: Plottable.Point, end: Plottable.Point) => callback.call(start, end);
 
-          dragInteraction.onDragStart(call);
+          assert.strictEqual(dragInteraction.onDragStart(call), dragInteraction, "registration returns the calling Interaction");
           dragStart(startPoint);
 
           assert.isTrue(callback.getCalled(), "Interaction should trigger the callback");
         });
 
-        it("unregisters callback using offDragStart", () => {
+        it("deregisters callback using offDragStart", () => {
           const callback = new TestDragCallback();
           const call = (start: Plottable.Point, end: Plottable.Point) => callback.call(start, end);
 
           dragInteraction.onDragStart(call);
-          dragInteraction.offDragStart(call);
+          assert.strictEqual(dragInteraction.offDragStart(call), dragInteraction, "deregistration returns the calling Interaction");
           dragStart(startPoint);
 
           assert.isFalse(callback.getCalled(), "Callback should be disconnected from the interaction");
@@ -140,16 +140,6 @@ describe("Interactions", () => {
 
           assert.isFalse(callback1.getCalled(), "Callback1 should be disconnected from the click interaction");
           assert.isTrue(callback2.getCalled(), "Callback2 should still exist on the click interaction");
-        });
-
-        it("onDragStart returns this", () => {
-          const value = dragInteraction.onDragStart();
-          assert.strictEqual(value, dragInteraction);
-        });
-
-        it("offDragStart returns this", () => {
-          const value = dragInteraction.offDragStart();
-          assert.strictEqual(value, dragInteraction);
         });
       });
 
@@ -196,18 +186,18 @@ describe("Interactions", () => {
           const callback = new TestDragCallback();
           const call = (start: Plottable.Point, end: Plottable.Point) => callback.call(start, end);
 
-          dragInteraction.onDrag(call);
+          assert.strictEqual(dragInteraction.onDrag(call), dragInteraction, "registration returns the calling Interaction");
           dragMove(startPoint, endPoint);
 
           assert.isTrue(callback.getCalled(), "Interaction should trigger the callback");
         });
 
-        it("unregisters callback using offDrag", () => {
+        it("deregisters callback using offDrag", () => {
           const callback = new TestDragCallback();
           const call = (start: Plottable.Point, end: Plottable.Point) => callback.call(start, end);
 
           dragInteraction.onDrag(call);
-          dragInteraction.offDrag(call);
+          assert.strictEqual(dragInteraction.offDrag(call), dragInteraction, "deregistration returns the calling Interaction");
           dragMove(startPoint, endPoint);
 
           assert.isFalse(callback.getCalled(), "Callback should be disconnected from the interaction");
@@ -242,16 +232,6 @@ describe("Interactions", () => {
 
           assert.isFalse(callback1.getCalled(), "Callback1 should be disconnected from the click interaction");
           assert.isTrue(callback2.getCalled(), "Callback2 should still exist on the click interaction");
-        });
-
-        it("onDrag returns this", () => {
-          const value = dragInteraction.onDrag();
-          assert.strictEqual(value, dragInteraction);
-        });
-
-        it("offDrag returns this", () => {
-          const value = dragInteraction.offDrag();
-          assert.strictEqual(value, dragInteraction);
         });
       });
 
@@ -296,18 +276,18 @@ describe("Interactions", () => {
           const callback = new TestDragCallback();
           const call = (start: Plottable.Point, end: Plottable.Point) => callback.call(start, end);
 
-          dragInteraction.onDragEnd(call);
+          assert.strictEqual(dragInteraction.onDragEnd(call), dragInteraction, "registration returns the calling Interaction");
           dragEnd(startPoint, endPoint);
 
           assert.isTrue(callback.getCalled(), "Interaction should trigger the callback");
         });
 
-        it("unregisters callback using offDragEnd", () => {
+        it("deregisters callback using offDragEnd", () => {
           const callback = new TestDragCallback();
           const call = (start: Plottable.Point, end: Plottable.Point) => callback.call(start, end);
 
           dragInteraction.onDragEnd(call);
-          dragInteraction.offDragEnd(call);
+          assert.strictEqual(dragInteraction.offDragEnd(call), dragInteraction, "deregistration returns the calling Interaction");
           dragEnd(startPoint, endPoint);
 
           assert.isFalse(callback.getCalled(), "Callback should be disconnected from the interaction");
@@ -342,16 +322,6 @@ describe("Interactions", () => {
 
           assert.isFalse(callback1.getCalled(), "Callback1 should be disconnected from the click interaction");
           assert.isTrue(callback2.getCalled(), "Callback2 should still exist on the click interaction");
-        });
-
-        it("onDragEnd returns this", () => {
-          const value = dragInteraction.onDragEnd();
-          assert.strictEqual(value, dragInteraction);
-        });
-
-        it("offDragEnd returns this", () => {
-          const value = dragInteraction.offDragEnd();
-          assert.strictEqual(value, dragInteraction);
         });
       });
 
