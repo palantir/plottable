@@ -36,12 +36,12 @@ describe("Interactions", () => {
       callback = <any> function(p?: Plottable.Point) {
         callback.lastPoint = p;
         callback.called = true;
-      }
+      };
       callback.called = false;
       callback.reset = () => {
         callback.lastPoint = undefined;
         callback.called = false;
-      }
+      };
       return callback;
     }
 
