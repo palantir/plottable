@@ -111,6 +111,9 @@ describe("Interactions", () => {
     [TestMethods.InteractionMode.Mouse, TestMethods.InteractionMode.Touch].forEach((mode) => {
       describe(`invoking callbacks with ${TestMethods.InteractionMode[mode]} events`, () => {
         let callback: ClickTestCallback;
+        const quarterPoint = {x: SVG_WIDTH / 4, y: SVG_HEIGHT / 4};
+        const halfPoint = {x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2};
+        const outsidePoint = {x: SVG_WIDTH * 2, y: SVG_HEIGHT * 2};
 
         beforeEach(() => {
           callback = makeClickCallback();
@@ -118,39 +121,24 @@ describe("Interactions", () => {
         });
 
         it("invokes onClick callback on single location click", () => {
-          const point = {x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2};
-
-          clickPoint(point, mode);
-
+          clickPoint(halfPoint, mode);
           assert.isTrue(callback.called, "callback called on clicking Component without moving pointer");
-          assert.deepEqual(callback.lastPoint, point, "was passed correct point");
+          assert.deepEqual(callback.lastPoint, halfPoint, "was passed correct point");
         });
 
         it("provides correct release point to onClick callback on click", () => {
-          const startPoint = {x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2};
-          const endPoint = {x: SVG_WIDTH / 4, y: SVG_HEIGHT / 4};
-
-          clickPointWithMove(startPoint, endPoint, mode);
-
+          clickPointWithMove(halfPoint, quarterPoint, mode);
           assert.isTrue(callback.called, "callback called on clicking and releasing inside the Component");
-          assert.deepEqual(callback.lastPoint, endPoint, "was passed mouseup point");
+          assert.deepEqual(callback.lastPoint, quarterPoint, "was passed mouseup point");
         });
 
         it("does not invoke callback if click is released outside Component", () => {
-          const startPoint = {x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2};
-          const endPoint = {x: SVG_WIDTH * 2, y: SVG_HEIGHT * 2};
-
-          clickPointWithMove(startPoint, endPoint, mode);
-
+          clickPointWithMove(halfPoint, outsidePoint, mode);
           assert.isFalse(callback.called, "callback not called if click is released outside Component");
         });
 
         it("does not invoke callback if click is started outside Component", () => {
-          const startPoint = {x: SVG_WIDTH * 2, y: SVG_HEIGHT * 2};
-          const endPoint = {x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2};
-
-          clickPointWithMove(startPoint, endPoint, mode);
-
+          clickPointWithMove(outsidePoint, halfPoint, mode);
           assert.isFalse(callback.called, "callback not called if click was started outside Component");
         });
 
@@ -176,9 +164,9 @@ describe("Interactions", () => {
 
         if (mode === TestMethods.InteractionMode.Touch) {
           it("does not trigger callback if touch event is cancelled", () => {
-            TestMethods.triggerFakeTouchEvent("touchstart", component.content(), [{x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2}]);
-            TestMethods.triggerFakeTouchEvent("touchcancel", component.content(), [{x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2}]);
-            TestMethods.triggerFakeTouchEvent("touchend", component.content(), [{x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2}]);
+            TestMethods.triggerFakeTouchEvent("touchstart", component.content(), [halfPoint]);
+            TestMethods.triggerFakeTouchEvent("touchcancel", component.content(), [halfPoint]);
+            TestMethods.triggerFakeTouchEvent("touchend", component.content(), [halfPoint]);
             assert.isFalse(callback.called, "callback not called if touch was cancelled");
           });
         }

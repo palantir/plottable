@@ -147,11 +147,11 @@ describe("Interactions", () => {
           it("does not trigger callback when touch event is cancelled", () => {
             doubleClickInteraction.onDoubleClick(callback);
 
-            TestMethods.triggerFakeTouchEvent("touchstart", component.content(), [{x: clickedPoint.x, y: clickedPoint.y}]);
-            TestMethods.triggerFakeTouchEvent("touchend", component.content(), [{x: clickedPoint.x, y: clickedPoint.y}]);
-            TestMethods.triggerFakeTouchEvent("touchstart", component.content(), [{x: clickedPoint.x, y: clickedPoint.y}]);
-            TestMethods.triggerFakeTouchEvent("touchend", component.content(), [{x: clickedPoint.x, y: clickedPoint.y}]);
-            TestMethods.triggerFakeTouchEvent("touchcancel", component.content(), [{x: clickedPoint.x, y: clickedPoint.y}]);
+            TestMethods.triggerFakeTouchEvent("touchstart", component.content(), [clickedPoint]);
+            TestMethods.triggerFakeTouchEvent("touchend", component.content(), [clickedPoint]);
+            TestMethods.triggerFakeTouchEvent("touchstart", component.content(), [clickedPoint]);
+            TestMethods.triggerFakeTouchEvent("touchend", component.content(), [clickedPoint]);
+            TestMethods.triggerFakeTouchEvent("touchcancel", component.content(), [clickedPoint]);
             TestMethods.triggerFakeMouseEvent("dblclick", component.content(), clickedPoint.x, clickedPoint.y);
             assert.isUndefined(callback.lastPoint, "point never set");
           });
