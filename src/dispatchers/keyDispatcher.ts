@@ -3,8 +3,8 @@ module Plottable.Dispatchers {
 
   export class Key extends Dispatcher {
     private static _DISPATCHER_KEY = "__Plottable_Dispatcher_Key";
-    private _keydownCallbacks: Utils.CallbackSet<KeyCallback>;
-    private _keyupCallbacks: Utils.CallbackSet<KeyCallback>;
+    private static _KEYDOWN_EVENT_NAME = "keydown";
+    private static _KEYUP_EVENT_NAME = "keyup";
 
     /**
      * Gets a Key Dispatcher. If one already exists it will be returned;
@@ -29,11 +29,17 @@ module Plottable.Dispatchers {
     constructor() {
       super();
 
-      this._eventToCallback["keydown"] = (e: KeyboardEvent) => this._processKeydown(e);
-      this._eventToCallback["keyup"] = (e: KeyboardEvent) => this._processKeyup(e);
-      this._keydownCallbacks = new Utils.CallbackSet<KeyCallback>();
-      this._keyupCallbacks = new Utils.CallbackSet<KeyCallback>();
-      this._callbacks = [this._keydownCallbacks, this._keyupCallbacks];
+      this._eventToCallback[Key._KEYDOWN_EVENT_NAME] = (e: KeyboardEvent) => this._processKeydown(e);
+      this._eventToCallback[Key._KEYUP_EVENT_NAME] = (e: KeyboardEvent) => this._processKeyup(e);
+    }
+
+
+    private _processKeydown(event: KeyboardEvent) {
+      this._callCallbacksForEvent(Key._KEYDOWN_EVENT_NAME, event.keyCode, event);
+    }
+
+    private _processKeyup(event: KeyboardEvent) {
+      this._callCallbacksForEvent(Key._KEYUP_EVENT_NAME, event.keyCode, event);
     }
 
     /**
@@ -43,7 +49,7 @@ module Plottable.Dispatchers {
      * @return {Dispatchers.Key} The calling Key Dispatcher.
      */
     public onKeyDown(callback: KeyCallback): Key {
-      this._setCallback(this._keydownCallbacks, callback);
+      this._addCallbackForEvent(Key._KEYDOWN_EVENT_NAME, callback);
       return this;
     }
 
@@ -54,7 +60,7 @@ module Plottable.Dispatchers {
      * @return {Dispatchers.Key} The calling Key Dispatcher.
      */
     public offKeyDown(callback: KeyCallback): Key {
-      this._unsetCallback(this._keydownCallbacks, callback);
+      this._removeCallbackForEvent(Key._KEYDOWN_EVENT_NAME, callback);
       return this;
     }
 
@@ -64,7 +70,7 @@ module Plottable.Dispatchers {
      * @return {Dispatchers.Key} The calling Key Dispatcher.
      */
     public onKeyUp(callback: KeyCallback): Key {
-      this._setCallback(this._keyupCallbacks, callback);
+      this._addCallbackForEvent(Key._KEYUP_EVENT_NAME, callback);
       return this;
     }
 
@@ -75,16 +81,8 @@ module Plottable.Dispatchers {
      * @return {Dispatchers.Key} The calling Key Dispatcher.
      */
     public offKeyUp(callback: KeyCallback): Key {
-      this._unsetCallback(this._keyupCallbacks, callback);
+      this._removeCallbackForEvent(Key._KEYUP_EVENT_NAME, callback);
       return this;
-    }
-
-    private _processKeydown(event: KeyboardEvent) {
-      this._keydownCallbacks.callCallbacks(event.keyCode, event);
-    }
-
-    private _processKeyup(event: KeyboardEvent) {
-      this._keyupCallbacks.callCallbacks(event.keyCode, event);
     }
   }
 }

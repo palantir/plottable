@@ -5,12 +5,13 @@ module Plottable.Dispatchers {
     private static _DISPATCHER_KEY = "__Plottable_Dispatcher_Mouse";
     private _translator: Utils.ClientToSVGTranslator;
     private _lastMousePosition: Point;
-
-    private _moveCallbacks: Utils.CallbackSet<MouseCallback>;
-    private _downCallbacks: Utils.CallbackSet<MouseCallback>;
-    private _upCallbacks: Utils.CallbackSet<MouseCallback>;
-    private _wheelCallbacks: Utils.CallbackSet<MouseCallback>;
-    private _dblClickCallbacks: Utils.CallbackSet<MouseCallback>;
+    private static _MOUSEOVER_EVENT_NAME = "mouseover";
+    private static _MOUSEMOVE_EVENT_NAME = "mousemove";
+    private static _MOUSEOUT_EVENT_NAME = "mouseout";
+    private static _MOUSEDOWN_EVENT_NAME = "mousedown";
+    private static _MOUSEUP_EVENT_NAME = "mouseup";
+    private static _WHEEL_EVENT_NAME = "wheel";
+    private static _DBLCLICK_EVENT_NAME = "dblclick";
 
     /**
      * Get a Mouse Dispatcher for the <svg> containing elem.
@@ -43,22 +44,14 @@ module Plottable.Dispatchers {
 
       this._lastMousePosition = { x: -1, y: -1 };
 
-      this._moveCallbacks = new Plottable.Utils.CallbackSet<MouseCallback>();
-      this._downCallbacks = new Plottable.Utils.CallbackSet<MouseCallback>();
-      this._upCallbacks = new Plottable.Utils.CallbackSet<MouseCallback>();
-      this._wheelCallbacks = new Plottable.Utils.CallbackSet<MouseCallback>();
-      this._dblClickCallbacks = new Plottable.Utils.CallbackSet<MouseCallback>();
-      this._callbacks = [this._moveCallbacks, this._downCallbacks, this._upCallbacks, this._wheelCallbacks,
-                         this._dblClickCallbacks];
-
-      let processMoveCallback = (e: MouseEvent) => this._measureAndDispatch(e, this._moveCallbacks, "page");
-      this._eventToCallback["mouseover"] = processMoveCallback;
-      this._eventToCallback["mousemove"] = processMoveCallback;
-      this._eventToCallback["mouseout"] = processMoveCallback;
-      this._eventToCallback["mousedown"] = (e: MouseEvent) => this._measureAndDispatch(e, this._downCallbacks);
-      this._eventToCallback["mouseup"] = (e: MouseEvent) => this._measureAndDispatch(e, this._upCallbacks, "page");
-      this._eventToCallback["wheel"] = (e: WheelEvent) => this._measureAndDispatch(e, this._wheelCallbacks);
-      this._eventToCallback["dblclick"] = (e: MouseEvent) => this._measureAndDispatch(e, this._dblClickCallbacks);
+      let processMoveCallback = (e: MouseEvent) => this._measureAndDispatch(e, Mouse._MOUSEMOVE_EVENT_NAME, "page");
+      this._eventToCallback[Mouse._MOUSEOVER_EVENT_NAME] = processMoveCallback;
+      this._eventToCallback[Mouse._MOUSEMOVE_EVENT_NAME] = processMoveCallback;
+      this._eventToCallback[Mouse._MOUSEOUT_EVENT_NAME] = processMoveCallback;
+      this._eventToCallback[Mouse._MOUSEDOWN_EVENT_NAME] = (e: MouseEvent) => this._measureAndDispatch(e, Mouse._MOUSEDOWN_EVENT_NAME);
+      this._eventToCallback[Mouse._MOUSEUP_EVENT_NAME] = (e: MouseEvent) => this._measureAndDispatch(e, Mouse._MOUSEUP_EVENT_NAME, "page");
+      this._eventToCallback[Mouse._WHEEL_EVENT_NAME] = (e: WheelEvent) => this._measureAndDispatch(e, Mouse._WHEEL_EVENT_NAME);
+      this._eventToCallback[Mouse._DBLCLICK_EVENT_NAME] = (e: MouseEvent) => this._measureAndDispatch(e, Mouse._DBLCLICK_EVENT_NAME);
     }
 
     /**
@@ -68,7 +61,7 @@ module Plottable.Dispatchers {
      * @return {Dispatchers.Mouse} The calling Mouse Dispatcher.
      */
     public onMouseMove(callback: MouseCallback): Dispatchers.Mouse {
-      this._setCallback(this._moveCallbacks, callback);
+      this._addCallbackForEvent(Mouse._MOUSEMOVE_EVENT_NAME, callback)
       return this;
     }
 
@@ -79,7 +72,7 @@ module Plottable.Dispatchers {
      * @return {Dispatchers.Mouse} The calling Mouse Dispatcher.
      */
     public offMouseMove(callback: MouseCallback): Dispatchers.Mouse {
-      this._unsetCallback(this._moveCallbacks, callback);
+      this._removeCallbackForEvent(Mouse._MOUSEMOVE_EVENT_NAME, callback);
       return this;
     }
 
@@ -90,7 +83,7 @@ module Plottable.Dispatchers {
      * @return {Dispatchers.Mouse} The calling Mouse Dispatcher.
      */
     public onMouseDown(callback: MouseCallback): Dispatchers.Mouse {
-      this._setCallback(this._downCallbacks, callback);
+      this._addCallbackForEvent(Mouse._MOUSEDOWN_EVENT_NAME, callback);
       return this;
     }
 
@@ -101,7 +94,7 @@ module Plottable.Dispatchers {
      * @return {Dispatchers.Mouse} The calling Mouse Dispatcher.
      */
     public offMouseDown(callback: MouseCallback): Dispatchers.Mouse {
-      this._unsetCallback(this._downCallbacks, callback);
+      this._removeCallbackForEvent(Mouse._MOUSEDOWN_EVENT_NAME, callback);
       return this;
     }
 
@@ -112,7 +105,7 @@ module Plottable.Dispatchers {
      * @return {Dispatchers.Mouse} The calling Mouse Dispatcher.
      */
     public onMouseUp(callback: MouseCallback): Dispatchers.Mouse {
-      this._setCallback(this._upCallbacks, callback);
+      this._addCallbackForEvent(Mouse._MOUSEUP_EVENT_NAME, callback);
       return this;
     }
 
@@ -123,7 +116,7 @@ module Plottable.Dispatchers {
      * @return {Dispatchers.Mouse} The calling Mouse Dispatcher.
      */
     public offMouseUp(callback: MouseCallback): Dispatchers.Mouse {
-      this._unsetCallback(this._upCallbacks, callback);
+      this._removeCallbackForEvent(Mouse._MOUSEUP_EVENT_NAME, callback);
       return this;
     }
 
@@ -134,7 +127,7 @@ module Plottable.Dispatchers {
      * @return {Dispatchers.Mouse} The calling Mouse Dispatcher.
      */
     public onWheel(callback: MouseCallback): Dispatchers.Mouse {
-      this._setCallback(this._wheelCallbacks, callback);
+      this._addCallbackForEvent(Mouse._WHEEL_EVENT_NAME, callback);
       return this;
     }
 
@@ -145,7 +138,7 @@ module Plottable.Dispatchers {
      * @return {Dispatchers.Mouse} The calling Mouse Dispatcher.
      */
     public offWheel(callback: MouseCallback): Dispatchers.Mouse {
-      this._unsetCallback(this._wheelCallbacks, callback);
+      this._removeCallbackForEvent(Mouse._WHEEL_EVENT_NAME, callback);
       return this;
     }
 
@@ -156,7 +149,7 @@ module Plottable.Dispatchers {
      * @return {Dispatchers.Mouse} The calling Mouse Dispatcher.
      */
     public onDblClick(callback: MouseCallback): Dispatchers.Mouse {
-      this._setCallback(this._dblClickCallbacks, callback);
+      this._addCallbackForEvent(Mouse._DBLCLICK_EVENT_NAME, callback);
       return this;
     }
 
@@ -167,7 +160,7 @@ module Plottable.Dispatchers {
      * @return {Dispatchers.Mouse} The calling Mouse Dispatcher.
      */
     public offDblClick(callback: MouseCallback): Dispatchers.Mouse {
-      this._unsetCallback(this._dblClickCallbacks, callback);
+      this._removeCallbackForEvent(Mouse._DBLCLICK_EVENT_NAME, callback);
       return this;
     }
 
@@ -175,7 +168,7 @@ module Plottable.Dispatchers {
      * Computes the mouse position from the given event, and if successful
      * calls all the callbacks in the provided callbackSet.
      */
-    private _measureAndDispatch(event: MouseEvent, callbackSet: Utils.CallbackSet<MouseCallback>, scope: string = "element") {
+    private _measureAndDispatch(event: MouseEvent, eventName: string, scope: string = "element") {
       if (scope !== "page" && scope !== "element") {
         throw new Error("Invalid scope '" + scope + "', must be 'element' or 'page'");
       }
@@ -183,7 +176,7 @@ module Plottable.Dispatchers {
         let newMousePosition = this._translator.computePosition(event.clientX, event.clientY);
         if (newMousePosition != null) {
           this._lastMousePosition = newMousePosition;
-          callbackSet.callCallbacks(this.lastMousePosition(), event);
+          this._callCallbacksForEvent(eventName, this._lastMousePosition, event);
         }
       }
     }

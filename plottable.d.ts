@@ -4106,11 +4106,13 @@ declare module Plottable.Dispatchers {
         private static _DISPATCHER_KEY;
         private _translator;
         private _lastMousePosition;
-        private _moveCallbacks;
-        private _downCallbacks;
-        private _upCallbacks;
-        private _wheelCallbacks;
-        private _dblClickCallbacks;
+        private static _MOUSEOVER_EVENT_NAME;
+        private static _MOUSEMOVE_EVENT_NAME;
+        private static _MOUSEOUT_EVENT_NAME;
+        private static _MOUSEDOWN_EVENT_NAME;
+        private static _MOUSEUP_EVENT_NAME;
+        private static _WHEEL_EVENT_NAME;
+        private static _DBLCLICK_EVENT_NAME;
         /**
          * Get a Mouse Dispatcher for the <svg> containing elem.
          * If one already exists on that <svg>, it will be returned; otherwise, a new one will be created.
@@ -4200,7 +4202,7 @@ declare module Plottable.Dispatchers {
          * Computes the mouse position from the given event, and if successful
          * calls all the callbacks in the provided callbackSet.
          */
-        private _measureAndDispatch(event, callbackSet, scope?);
+        private _measureAndDispatch(event, eventName, scope?);
         eventInsideSVG(event: MouseEvent): boolean;
         /**
          * Returns the last computed mouse position in <svg> coordinate space.
@@ -4216,11 +4218,11 @@ declare module Plottable.Dispatchers {
     }, event: TouchEvent) => void;
     class Touch extends Dispatcher {
         private static _DISPATCHER_KEY;
+        private static _TOUCHSTART_EVENT_NAME;
+        private static _TOUCHMOVE_EVENT_NAME;
+        private static _TOUCHEND_EVENT_NAME;
+        private static _TOUCHCANCEL_EVENT_NAME;
         private _translator;
-        private _startCallbacks;
-        private _moveCallbacks;
-        private _endCallbacks;
-        private _cancelCallbacks;
         /**
          * Gets a Touch Dispatcher for the <svg> containing elem.
          * If one already exists on that <svg>, it will be returned; otherwise, a new one will be created.
@@ -4296,7 +4298,7 @@ declare module Plottable.Dispatchers {
          * Computes the Touch position from the given event, and if successful
          * calls all the callbacks in the provided callbackSet.
          */
-        private _measureAndDispatch(event, callbackSet, scope?);
+        private _measureAndDispatch(event, eventName, scope?);
         eventInsideSVG(event: TouchEvent): boolean;
     }
 }
@@ -4304,8 +4306,8 @@ declare module Plottable.Dispatchers {
     type KeyCallback = (keyCode: number, event: KeyboardEvent) => void;
     class Key extends Dispatcher {
         private static _DISPATCHER_KEY;
-        private _keydownCallbacks;
-        private _keyupCallbacks;
+        private static _KEYDOWN_EVENT_NAME;
+        private static _KEYUP_EVENT_NAME;
         /**
          * Gets a Key Dispatcher. If one already exists it will be returned;
          * otherwise, a new one will be created.
@@ -4319,6 +4321,8 @@ declare module Plottable.Dispatchers {
          * @constructor
          */
         constructor();
+        private _processKeydown(event);
+        private _processKeyup(event);
         /**
          * Registers a callback to be called whenever a key is pressed.
          *
@@ -4346,8 +4350,6 @@ declare module Plottable.Dispatchers {
          * @return {Dispatchers.Key} The calling Key Dispatcher.
          */
         offKeyUp(callback: KeyCallback): Key;
-        private _processKeydown(event);
-        private _processKeyup(event);
     }
 }
 declare module Plottable {
