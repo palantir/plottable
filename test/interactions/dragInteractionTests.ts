@@ -83,125 +83,128 @@ describe("Interactions", () => {
       }
     });
 
-    describe("onDragStart/offDragStart", () => {
-      describe("registration", () => {
-        it("registers callback using onDragStart", () => {
-          const callback = makeDragCallback();
-          assert.strictEqual(dragInteraction.onDragStart(callback), dragInteraction, "registration returns the calling Interaction");
-
-          triggerFakeDragStart(startPoint);
-          assert.isTrue(callback.called, "Interaction should trigger the callback");
-        });
-
-        it("deregisters callback using offDragStart", () => {
-          const callback = makeDragCallback();
-          dragInteraction.onDragStart(callback);
-          assert.strictEqual(dragInteraction.offDragStart(callback), dragInteraction, "deregistration returns the calling Interaction");
-
-          triggerFakeDragStart(startPoint);
-          assert.isFalse(callback.called, "Callback should be disconnected from the interaction");
-        });
-
-        it("can register multiple onDragStart callbacks", () => {
-          const callback1 = makeDragCallback();
-          const callback2 = makeDragCallback();
-          dragInteraction.onDragStart(callback1);
-          dragInteraction.onDragStart(callback2);
-
-          triggerFakeDragStart(startPoint);
-          assert.isTrue(callback1.called, "Interaction should trigger the first callback");
-          assert.isTrue(callback2.called, "Interaction should trigger the second callback");
-        });
-
-        it("can deregister an onDragStart callback without affecting the other ones", () => {
-          const callback1 = makeDragCallback();
-          const callback2 = makeDragCallback();
-          dragInteraction.onDragStart(callback1);
-          dragInteraction.onDragStart(callback2);
-          dragInteraction.offDragStart(callback1);
-
-          triggerFakeDragStart(startPoint);
-          assert.isFalse(callback1.called, "Callback1 should be disconnected from the click interaction");
-          assert.isTrue(callback2.called, "Callback2 should still exist on the click interaction");
-        });
-      });
-
-      [TestMethods.InteractionMode.Mouse, TestMethods.InteractionMode.Touch].forEach((mode) => {
-        describe(`invoking with ${TestMethods.InteractionMode[mode]} events`, () => {
-          let callback: DragTestCallback;
-
-          beforeEach(() => {
-            callback = makeDragCallback();
-            dragInteraction.onDragStart(callback);
-          });
-
-          it("invokes onDragStart callback on start event", () => {
-            triggerFakeDragStart(startPoint, mode);
-            assert.isTrue(callback.called, "callback was called on beginning drag");
-            assert.deepEqual(callback.lastStartPoint, startPoint, "was passed the correct point");
-          });
-
-          it("does not invoke callback if drag starts outside Component", () => {
-            triggerFakeDragStart(positiveOutsidePoint, mode);
-            assert.isFalse(callback.called, "does not trigger callback if drag starts outside the Component (positive)");
-            triggerFakeDragStart(negativeOutsidePoint, mode);
-            assert.isFalse(callback.called, "does not trigger callback if drag starts outside the Component (negative)");
-          });
-
-          if (mode === TestMethods.InteractionMode.Mouse) {
-            it("does not invoke onDragStart on right click", () => {
-              TestMethods.triggerFakeMouseEvent("mousedown", component.background(), startPoint.x, startPoint.y, 2);
-              assert.isFalse(callback.called, "callback is not called on right-click");
-            });
+    describe("registering and dergistering callbacks", () => {
+      ["DragStart", "Drag", "DragEnd"].forEach((eventName) => {
+        function register(callback: Plottable.DragCallback) {
+          switch (eventName) {
+            case "DragStart":
+              return dragInteraction.onDragStart(callback);
+            case "Drag":
+              return dragInteraction.onDrag(callback);
+            case "DragEnd":
+              return dragInteraction.onDragEnd(callback);
+            default:
+              throw new Error(`unrecognized event type "${eventName}"`);
           }
+        }
+
+        function deregister(callback: Plottable.DragCallback) {
+          switch (eventName) {
+            case "DragStart":
+              return dragInteraction.offDragStart(callback);
+            case "Drag":
+              return dragInteraction.offDrag(callback);
+            case "DragEnd":
+              return dragInteraction.offDragEnd(callback);
+            default:
+              throw new Error(`unrecognized event type "${eventName}"`);
+          }
+        }
+        function triggerAppropriateFakeEvent(startPoint: Plottable.Point, endPoint: Plottable.Point) {
+          switch (eventName) {
+            case "DragStart":
+              triggerFakeDragStart(startPoint);
+              break;
+            case "Drag":
+              triggerFakeDragMove(startPoint, endPoint);
+              break;
+            case "DragEnd":
+              triggerFakeDragEnd(startPoint, endPoint);
+              break;
+            default:
+              throw new Error(`unrecognized event type "${eventName}"`);
+          }
+        }
+
+        describe(`for ${eventName}`, () => {
+          it(`registers callback using on${eventName}`, () => {
+            const callback = makeDragCallback();
+            assert.strictEqual(register(callback), dragInteraction, "registration returns the calling Interaction");
+
+            triggerAppropriateFakeEvent(startPoint, endPoint);
+            assert.isTrue(callback.called, "Interaction correctly triggers the callback");
+          });
+
+          it(`deregisters callback using off${eventName}`, () => {
+            const callback = makeDragCallback();
+            register(callback);
+            assert.strictEqual(deregister(callback), dragInteraction, "deregistration returns the calling Interaction");
+
+            triggerAppropriateFakeEvent(startPoint, endPoint);
+            assert.isFalse(callback.called, "callback should be disconnected from the Interaction");
+          });
+
+          it(`can register multiple on${eventName} callbacks`, () => {
+            const callback1 = makeDragCallback();
+            const callback2 = makeDragCallback();
+            register(callback1);
+            register(callback2);
+
+            triggerAppropriateFakeEvent(startPoint, endPoint);
+            assert.isTrue(callback1.called, "Interaction should trigger the first callback");
+            assert.isTrue(callback2.called, "Interaction should trigger the second callback");
+          });
+
+          it(`can deregister a on${eventName} callback without affecting the other ones`, () => {
+            const callback1 = makeDragCallback();
+            const callback2 = makeDragCallback();
+            register(callback1);
+            register(callback2);
+            deregister(callback1);
+
+            triggerAppropriateFakeEvent(startPoint, endPoint);
+            assert.isFalse(callback1.called, "Callback1 should be disconnected from the Interaction");
+            assert.isTrue(callback2.called, "Callback2 should still exist on the Interaction");
+          });
         });
       });
     });
 
-    describe("onDrag/offDrag", () => {
-      describe("registration", () => {
-        it("registers callback using onDrag", () => {
-          const callback = makeDragCallback();
-          assert.strictEqual(dragInteraction.onDrag(callback), dragInteraction, "registration returns the calling Interaction");
+    describe("invoking callbacks", () => {
+      describe("for DragStart", () => {
+        [TestMethods.InteractionMode.Mouse, TestMethods.InteractionMode.Touch].forEach((mode) => {
+          describe(`with ${TestMethods.InteractionMode[mode]} events`, () => {
+            let callback: DragTestCallback;
 
-          triggerFakeDragMove(startPoint, endPoint);
-          assert.isTrue(callback.called, "Interaction should trigger the callback");
-        });
+            beforeEach(() => {
+              callback = makeDragCallback();
+              dragInteraction.onDragStart(callback);
+            });
 
-        it("deregisters callback using offDrag", () => {
-          const callback = makeDragCallback();
-          dragInteraction.onDrag(callback);
-          assert.strictEqual(dragInteraction.offDrag(callback), dragInteraction, "deregistration returns the calling Interaction");
+            it("invokes onDragStart callback on start event", () => {
+              triggerFakeDragStart(startPoint, mode);
+              assert.isTrue(callback.called, "callback was called on beginning drag");
+              assert.deepEqual(callback.lastStartPoint, startPoint, "was passed the correct point");
+            });
 
-          triggerFakeDragMove(startPoint, endPoint);
-          assert.isFalse(callback.called, "Callback should be disconnected from the interaction");
-        });
+            it("does not invoke callback if drag starts outside Component", () => {
+              triggerFakeDragStart(positiveOutsidePoint, mode);
+              assert.isFalse(callback.called, "does not trigger callback if drag starts outside the Component (positive)");
+              triggerFakeDragStart(negativeOutsidePoint, mode);
+              assert.isFalse(callback.called, "does not trigger callback if drag starts outside the Component (negative)");
+            });
 
-        it("can register multiple onDrag callbacks", () => {
-          const callback1 = makeDragCallback();
-          const callback2 = makeDragCallback();
-          dragInteraction.onDrag(callback1);
-          dragInteraction.onDrag(callback2);
-
-          triggerFakeDragMove(startPoint, endPoint);
-          assert.isTrue(callback1.called, "Interaction should trigger the first callback");
-          assert.isTrue(callback2.called, "Interaction should trigger the second callback");
-        });
-
-        it("can deregister an onDrag callback without affecting the other ones", () => {
-          const callback1 = makeDragCallback();
-          const callback2 = makeDragCallback();
-          dragInteraction.onDrag(callback1);
-          dragInteraction.onDrag(callback2);
-          dragInteraction.offDrag(callback1);
-
-          triggerFakeDragMove(startPoint, endPoint);
-          assert.isFalse(callback1.called, "Callback1 should be disconnected from the click interaction");
-          assert.isTrue(callback2.called, "Callback2 should still exist on the click interaction");
+            if (mode === TestMethods.InteractionMode.Mouse) {
+              it("does not invoke onDragStart on right click", () => {
+                TestMethods.triggerFakeMouseEvent("mousedown", component.background(), startPoint.x, startPoint.y, 2);
+                assert.isFalse(callback.called, "callback is not called on right-click");
+              });
+            }
+          });
         });
       });
 
-      describe("invoking", () => {
+      describe("for Drag", () => {
         let callback: DragTestCallback;
 
         beforeEach(() => {
@@ -232,52 +235,8 @@ describe("Interactions", () => {
           assert.deepEqual(callback.lastEndPoint, {x: endPoint.x - 10, y: endPoint.y - 10}, "2");
         });
       });
-    });
 
-    describe("onDragEnd/offDragEnd", () => {
-      describe("registration", () => {
-        it("registers callback using onDragEnd", () => {
-          const callback = makeDragCallback();
-          assert.strictEqual(dragInteraction.onDragEnd(callback), dragInteraction, "registration returns the calling Interaction");
-
-          triggerFakeDragEnd(startPoint, endPoint);
-          assert.isTrue(callback.called, "Interaction should trigger the callback");
-        });
-
-        it("deregisters callback using offDragEnd", () => {
-          const callback = makeDragCallback();
-          dragInteraction.onDragEnd(callback);
-          assert.strictEqual(dragInteraction.offDragEnd(callback), dragInteraction, "deregistration returns the calling Interaction");
-
-          triggerFakeDragEnd(startPoint, endPoint);
-          assert.isFalse(callback.called, "Callback should be disconnected from the interaction");
-        });
-
-        it("can register multiple onDragEnd callbacks", () => {
-          const callback1 = makeDragCallback();
-          const callback2 = makeDragCallback();
-          dragInteraction.onDragEnd(callback1);
-          dragInteraction.onDragEnd(callback2);
-
-          triggerFakeDragEnd(startPoint, endPoint);
-          assert.isTrue(callback1.called, "Interaction should trigger the first callback");
-          assert.isTrue(callback2.called, "Interaction should trigger the second callback");
-        });
-
-        it("can deregister an onDragEnd callback without affecting the other ones", () => {
-          const callback1 = makeDragCallback();
-          const callback2 = makeDragCallback();
-          dragInteraction.onDragEnd(callback1);
-          dragInteraction.onDragEnd(callback2);
-          dragInteraction.offDragEnd(callback1);
-
-          triggerFakeDragEnd(startPoint, endPoint);
-          assert.isFalse(callback1.called, "Callback1 should be disconnected from the click interaction");
-          assert.isTrue(callback2.called, "Callback2 should still exist on the click interaction");
-        });
-      });
-
-      describe("invoking", () => {
+      describe("for DragEnd", () => {
         let callback: DragTestCallback;
 
         beforeEach(() => {
