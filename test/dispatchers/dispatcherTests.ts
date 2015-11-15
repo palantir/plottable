@@ -2,6 +2,23 @@
 
 describe("Dispatchers", () => {
   describe("Dispatcher", () => {
+    class InstrumentedDispatcher extends Plottable.Dispatcher {
+      public static EVENT_NAME = "instrumented";
+
+      constructor() {
+        super();
+        this._eventToCallback[InstrumentedDispatcher.EVENT_NAME] = () => this._callCallbacksForEvent(InstrumentedDispatcher.EVENT_NAME);
+      }
+
+      public addCallback(callback: Function) {
+        this._addCallbackForEvent(InstrumentedDispatcher.EVENT_NAME, callback);
+      }
+
+      public removeCallback(callback: Function) {
+        this._removeCallbackForEvent(InstrumentedDispatcher.EVENT_NAME, callback);
+      }
+    }
+
     const TEST_EVENT_NAME = "test";
 
     it("connects and disconnects correctly", () => {
