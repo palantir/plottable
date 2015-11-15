@@ -10160,10 +10160,20 @@ var Plottable;
         function Dispatcher() {
             this._eventToCallback = {};
             this._callbacks = [];
+            this._eventNameToCallbackSet = {};
             this._connected = false;
         }
-        Dispatcher.prototype._hasNoListeners = function () {
-            return this._callbacks.every(function (cbs) { return cbs.size === 0; });
+        Dispatcher.prototype._hasNoCallbacks = function () {
+            if (this._callbacks.some(function (callbackSet) { return callbackSet.size > 0; })) {
+                return false;
+            }
+            var eventNames = Object.keys(this._eventNameToCallbackSet);
+            for (var i = 0; i < eventNames.length; i++) {
+                if (this._eventNameToCallbackSet[eventNames[i]].size !== 0) {
+                    return false;
+                }
+            }
+            return true;
         };
         Dispatcher.prototype._connect = function () {
             var _this = this;
@@ -10178,7 +10188,7 @@ var Plottable;
         };
         Dispatcher.prototype._disconnect = function () {
             var _this = this;
-            if (this._connected && this._hasNoListeners()) {
+            if (this._connected && this._hasNoCallbacks()) {
                 Object.keys(this._eventToCallback).forEach(function (event) {
                     var callback = _this._eventToCallback[event];
                     document.removeEventListener(event, callback);
@@ -10186,9 +10196,32 @@ var Plottable;
                 this._connected = false;
             }
         };
-        Dispatcher.prototype._setCallback = function (callbackSet, callback) {
+        Dispatcher.prototype._addCallbackForEvent = function (eventName, callback) {
+            if (this._eventNameToCallbackSet[eventName] == null) {
+                this._eventNameToCallbackSet[eventName] = new Plottable.Utils.CallbackSet();
+            }
+            this._eventNameToCallbackSet[eventName].add(callback);
             this._connect();
+        };
+        Dispatcher.prototype._removeCallbackForEvent = function (eventName, callback) {
+            if (this._eventNameToCallbackSet[eventName] != null) {
+                this._eventNameToCallbackSet[eventName].delete(callback);
+            }
+            this._disconnect();
+        };
+        Dispatcher.prototype._callCallbacksForEvent = function (eventName) {
+            var args = [];
+            for (var _i = 1; _i < arguments.length; _i++) {
+                args[_i - 1] = arguments[_i];
+            }
+            var callbackSet = this._eventNameToCallbackSet[eventName];
+            if (callbackSet != null) {
+                callbackSet.callCallbacks.apply(callbackSet, args);
+            }
+        };
+        Dispatcher.prototype._setCallback = function (callbackSet, callback) {
             callbackSet.add(callback);
+            this._connect();
         };
         Dispatcher.prototype._unsetCallback = function (callbackSet, callback) {
             callbackSet.delete(callback);
