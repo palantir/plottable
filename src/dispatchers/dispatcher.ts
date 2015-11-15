@@ -1,14 +1,10 @@
 module Plottable {
 export class Dispatcher {
   protected _eventToCallback: { [eventName: string]: (e: Event) => any; } = {};
-  protected _callbacks: Utils.CallbackSet<Function>[] = [];
   private _eventNameToCallbackSet: { [eventName: string]: Utils.CallbackSet<Function>; } = {};
   private _connected = false;
 
   private _hasNoCallbacks() {
-    if (this._callbacks.some((callbackSet) => callbackSet.size > 0)) {
-      return false;
-    }
     const eventNames = Object.keys(this._eventNameToCallbackSet);
     for (let i = 0; i < eventNames.length; i++) { // for-loop so return can break out
       if (this._eventNameToCallbackSet[eventNames[i]].size !== 0) {
@@ -59,16 +55,6 @@ export class Dispatcher {
     if (callbackSet != null) {
       callbackSet.callCallbacks.apply(callbackSet, args);
     }
-  }
-
-  protected _setCallback(callbackSet: Utils.CallbackSet<Function>, callback: Function) {
-    callbackSet.add(callback);
-    this._connect();
-  }
-
-  protected _unsetCallback(callbackSet: Utils.CallbackSet<Function>, callback: Function) {
-    callbackSet.delete(callback);
-    this._disconnect();
   }
 }
 }

@@ -4087,7 +4087,6 @@ declare module Plottable {
         protected _eventToCallback: {
             [eventName: string]: (e: Event) => any;
         };
-        protected _callbacks: Utils.CallbackSet<Function>[];
         private _eventNameToCallbackSet;
         private _connected;
         private _hasNoCallbacks();
@@ -4096,8 +4095,6 @@ declare module Plottable {
         protected _addCallbackForEvent(eventName: string, callback: Function): void;
         protected _removeCallbackForEvent(eventName: string, callback: Function): void;
         protected _callCallbacksForEvent(eventName: string, ...args: any[]): void;
-        protected _setCallback(callbackSet: Utils.CallbackSet<Function>, callback: Function): void;
-        protected _unsetCallback(callbackSet: Utils.CallbackSet<Function>, callback: Function): void;
     }
 }
 declare module Plottable.Dispatchers {

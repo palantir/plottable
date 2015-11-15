@@ -44,49 +44,47 @@ describe("Dispatchers", () => {
     });
 
     it("won't disconnect if it still has listeners", () => {
-      const dispatcher = new Plottable.Dispatcher();
+      const dispatcher = new InstrumentedDispatcher();
 
-      let callbackWasCalled = false;
-      (<any> dispatcher)._eventToCallback[TEST_EVENT_NAME] = () => callbackWasCalled = true;
+      let processingFunctionWasCalled = false;
+      (<any> dispatcher)._eventToCallback[TEST_EVENT_NAME] = () => processingFunctionWasCalled = true;
 
       const callback = () => { return; };
-      const callbackSet = new Plottable.Utils.CallbackSet<Function>();
-      callbackSet.add(callback);
-      (<any> dispatcher)._callbacks = [callbackSet];
+      dispatcher.addCallback(callback);
 
       const d3document = d3.select(document);
       (<any> dispatcher)._connect();
 
       TestMethods.triggerFakeUIEvent(TEST_EVENT_NAME, d3document);
-      assert.isTrue(callbackWasCalled, "connected correctly (callback was called)");
+      assert.isTrue(processingFunctionWasCalled, "connected correctly (processing function was called)");
 
       (<any> dispatcher)._disconnect();
-      callbackWasCalled = false;
+      processingFunctionWasCalled = false;
       TestMethods.triggerFakeUIEvent(TEST_EVENT_NAME, d3document);
-      assert.isTrue(callbackWasCalled, "didn't disconnect while dispatcher had listener");
+      assert.isTrue(processingFunctionWasCalled, "didn't disconnect while dispatcher had listener");
 
-      callbackSet.delete(callback);
+      dispatcher.removeCallback(callback);
       (<any> dispatcher)._disconnect();
-      callbackWasCalled = false;
+      processingFunctionWasCalled = false;
       TestMethods.triggerFakeUIEvent(TEST_EVENT_NAME, d3document);
-      assert.isFalse(callbackWasCalled, "disconnected when dispatcher had no listeners");
+      assert.isFalse(processingFunctionWasCalled, "disconnected when dispatcher had no listeners");
     });
 
     it("can set and unset callbacks", () => {
-      const dispatcher = new Plottable.Dispatcher();
-      const callbackSet = new Plottable.Utils.CallbackSet<Function>();
+      const dispatcher = new InstrumentedDispatcher();
 
       let callbackWasCalled = false;
       const callback = () => callbackWasCalled = true;
+      dispatcher.addCallback(callback);
 
-      (<any> dispatcher)._setCallback(callbackSet, callback);
-      callbackSet.callCallbacks();
-      assert.isTrue(callbackWasCalled, "callback was called after setting with _setCallback()");
+      const d3document = d3.select(document);
+      TestMethods.triggerFakeUIEvent(InstrumentedDispatcher.EVENT_NAME, d3document);
+      assert.isTrue(callbackWasCalled, "callback was called after being added");
 
-      (<any> dispatcher)._unsetCallback(callbackSet, callback);
+      dispatcher.removeCallback(callback);
       callbackWasCalled = false;
-      callbackSet.callCallbacks();
-      assert.isFalse(callbackWasCalled, "callback was removed by calling _unsetCallback()");
+      TestMethods.triggerFakeUIEvent(InstrumentedDispatcher.EVENT_NAME, d3document);
+      assert.isFalse(callbackWasCalled, "callback was not called after removal");
     });
   });
 });

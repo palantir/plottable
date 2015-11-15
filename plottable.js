@@ -10159,14 +10159,10 @@ var Plottable;
     var Dispatcher = (function () {
         function Dispatcher() {
             this._eventToCallback = {};
-            this._callbacks = [];
             this._eventNameToCallbackSet = {};
             this._connected = false;
         }
         Dispatcher.prototype._hasNoCallbacks = function () {
-            if (this._callbacks.some(function (callbackSet) { return callbackSet.size > 0; })) {
-                return false;
-            }
             var eventNames = Object.keys(this._eventNameToCallbackSet);
             for (var i = 0; i < eventNames.length; i++) {
                 if (this._eventNameToCallbackSet[eventNames[i]].size !== 0) {
@@ -10218,14 +10214,6 @@ var Plottable;
             if (callbackSet != null) {
                 callbackSet.callCallbacks.apply(callbackSet, args);
             }
-        };
-        Dispatcher.prototype._setCallback = function (callbackSet, callback) {
-            callbackSet.add(callback);
-            this._connect();
-        };
-        Dispatcher.prototype._unsetCallback = function (callbackSet, callback) {
-            callbackSet.delete(callback);
-            this._disconnect();
         };
         return Dispatcher;
     })();
