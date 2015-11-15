@@ -61,7 +61,7 @@ module Plottable.Dispatchers {
      * @return {Dispatchers.Mouse} The calling Mouse Dispatcher.
      */
     public onMouseMove(callback: MouseCallback): Dispatchers.Mouse {
-      this._addCallbackForEvent(Mouse._MOUSEMOVE_EVENT_NAME, callback)
+      this._addCallbackForEvent(Mouse._MOUSEMOVE_EVENT_NAME, callback);
       return this;
     }
 

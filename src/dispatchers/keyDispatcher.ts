@@ -33,7 +33,6 @@ module Plottable.Dispatchers {
       this._eventToCallback[Key._KEYUP_EVENT_NAME] = (e: KeyboardEvent) => this._processKeyup(e);
     }
 
-
     private _processKeydown(event: KeyboardEvent) {
       this._callCallbacksForEvent(Key._KEYDOWN_EVENT_NAME, event.keyCode, event);
     }

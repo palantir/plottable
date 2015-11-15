@@ -10418,10 +10418,14 @@ var Plottable;
                 var _this = this;
                 _super.call(this);
                 this._translator = Plottable.Utils.ClientToSVGTranslator.getTranslator(svg);
-                this._eventToCallback[Touch._TOUCHSTART_EVENT_NAME] = function (e) { return _this._measureAndDispatch(e, Touch._TOUCHSTART_EVENT_NAME, "page"); };
-                this._eventToCallback[Touch._TOUCHMOVE_EVENT_NAME] = function (e) { return _this._measureAndDispatch(e, Touch._TOUCHMOVE_EVENT_NAME, "page"); };
-                this._eventToCallback[Touch._TOUCHEND_EVENT_NAME] = function (e) { return _this._measureAndDispatch(e, Touch._TOUCHEND_EVENT_NAME, "page"); };
-                this._eventToCallback[Touch._TOUCHCANCEL_EVENT_NAME] = function (e) { return _this._measureAndDispatch(e, Touch._TOUCHCANCEL_EVENT_NAME, "page"); };
+                this._eventToCallback[Touch._TOUCHSTART_EVENT_NAME] =
+                    function (e) { return _this._measureAndDispatch(e, Touch._TOUCHSTART_EVENT_NAME, "page"); };
+                this._eventToCallback[Touch._TOUCHMOVE_EVENT_NAME] =
+                    function (e) { return _this._measureAndDispatch(e, Touch._TOUCHMOVE_EVENT_NAME, "page"); };
+                this._eventToCallback[Touch._TOUCHEND_EVENT_NAME] =
+                    function (e) { return _this._measureAndDispatch(e, Touch._TOUCHEND_EVENT_NAME, "page"); };
+                this._eventToCallback[Touch._TOUCHCANCEL_EVENT_NAME] =
+                    function (e) { return _this._measureAndDispatch(e, Touch._TOUCHCANCEL_EVENT_NAME, "page"); };
             }
             /**
              * Gets a Touch Dispatcher for the <svg> containing elem.
