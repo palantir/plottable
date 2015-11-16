@@ -102,11 +102,11 @@ describe("Legend", () => {
         const fill = d3.select(this).select(SYMBOL_SELECTOR).attr("fill");
         assert.strictEqual(fill, color.scale(d), "the fill was set properly");
       });
-      assert.strictEqual(legend.content().selectAll(ROW_SELECTOR).size(), 5, "there are the right number of legend elements");
+      assert.strictEqual(legend.content().selectAll(ENTRY_SELECTOR).size(), 5, "there are the right number of legend elements");
       svg.remove();
     });
 
-    it("can replace domain with legend.scale", () => {
+    it("updates domain when the scale is replaced", () => {
       color.domain(["foo", "bar", "baz"]);
       legend.renderTo(svg);
 
@@ -126,7 +126,7 @@ describe("Legend", () => {
       svg.remove();
     });
 
-    it("reregisters listeners on legend.scale", () => {
+    it("reregisters listeners when scale is replaced", () => {
       color.domain(["foo", "bar", "baz"]);
       legend.renderTo(svg);
 
@@ -147,7 +147,7 @@ describe("Legend", () => {
       svg.remove();
     });
 
-    it("can get maximun number of entries per row", () => {
+    it("can set maximun number of entries per row", () => {
       color.domain(["AA", "BB", "CC", "DD", "EE", "FF"]);
       legend.renderTo(svg);
 
@@ -237,8 +237,9 @@ describe("Legend", () => {
     });
 
     it("renders with correct opacity for each symbol when specified", () => {
+      const opacity = 0.5;
       color.domain(["foo", "bar", "baz"]);
-      legend.symbolOpacity(0.5);
+      legend.symbolOpacity(opacity);
       legend.renderTo(svg);
 
       let rows = legend.content().selectAll(ENTRY_SELECTOR);
@@ -246,7 +247,7 @@ describe("Legend", () => {
       rows.each(function(d: any, i: number) {
         const row = d3.select(this);
         const symbol = row.select(SYMBOL_SELECTOR);
-        assert.strictEqual(symbol.attr("opacity"), "0.5", "the symbol's opacity is set to a constant");
+        assert.strictEqual(TestMethods.numAttr(symbol, "opacity"), opacity, "the symbol's opacity is set to a constant");
       });
 
       const opacityFunction = (d: any, i: number) => {
