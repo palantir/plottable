@@ -231,6 +231,69 @@ describe("Tables", () => {
     });
   });
 
+  describe("error checking on padding and weights", () => {
+    let table: Plottable.Components.Table;
+
+    beforeEach(() => {
+      table = new Plottable.Components.Table([
+        [new Plottable.Component(), new Plottable.Component()],
+        [new Plottable.Component(), new Plottable.Component()]
+      ]);
+    });
+
+    afterEach(() => {
+      table.destroy();
+    });
+
+    it("rejects invalid input to rowPadding", () => {
+      // HACKHACK #2661: Cannot assert errors being thrown with description
+      (<any> assert).throws(() => table.rowPadding(-1), Error,
+        "rowPadding must be a non-negative finite value", "rowPadding rejects negative numbers");
+      (<any> assert).throws(() => table.rowPadding(Infinity), Error,
+        "rowPadding must be a non-negative finite value", "rowPadding rejects Infinity");
+      (<any> assert).throws(() => table.rowPadding(NaN), Error,
+        "rowPadding must be a non-negative finite value", "rowPadding rejects NaN");
+      (<any> assert).throws(() => table.rowPadding(<any> "4"), Error,
+        "rowPadding must be a non-negative finite value", "rowPadding rejects string numbers");
+    });
+
+    it("rejects invalid input to columnPadding", () => {
+      // HACKHACK #2661: Cannot assert errors being thrown with description
+      (<any> assert).throws(() => table.columnPadding(-1), Error,
+        "columnPadding must be a non-negative finite value", "columnPadding rejects negative numbers");
+      (<any> assert).throws(() => table.columnPadding(Infinity), Error,
+        "columnPadding must be a non-negative finite value", "columnPadding rejects Infinity");
+      (<any> assert).throws(() => table.columnPadding(NaN), Error,
+        "columnPadding must be a non-negative finite value", "columnPadding rejects NaN");
+      (<any> assert).throws(() => table.columnPadding(<any> "4"), Error,
+        "columnPadding must be a non-negative finite value", "columnPadding rejects string numbers");
+    });
+
+    it("rejects invalid input to rowWeight", () => {
+      // HACKHACK #2661: Cannot assert errors being thrown with description
+      (<any> assert).throws(() => table.rowWeight(0, -1), Error,
+        "rowWeight must be a non-negative finite value", "rowWeight rejects negative numbers");
+      (<any> assert).throws(() => table.rowWeight(1, Infinity), Error,
+        "rowWeight must be a non-negative finite value", "rowWeight rejects Infinity");
+      (<any> assert).throws(() => table.rowWeight(0, NaN), Error,
+        "rowWeight must be a non-negative finite value", "rowWeight rejects NaN");
+      (<any> assert).throws(() => table.rowWeight(1, <any> "4"), Error,
+        "rowWeight must be a non-negative finite value", "rowWeight rejects string numbers");
+    });
+
+    it("rejects invalid input to columnWeight", () => {
+      // HACKHACK #2661: Cannot assert errors being thrown with description
+      (<any> assert).throws(() => table.columnWeight(1, -1), Error,
+        "columnWeight must be a non-negative finite value", "columnWeight rejects negative numbers");
+      (<any> assert).throws(() => table.columnWeight(0, Infinity), Error,
+        "columnWeight must be a non-negative finite value", "columnWeight rejects Infinity");
+      (<any> assert).throws(() => table.columnWeight(1, NaN), Error,
+        "columnWeight must be a non-negative finite value", "columnWeight rejects NaN");
+      (<any> assert).throws(() => table.columnWeight(0, <any> "4"), Error,
+        "columnWeight must be a non-negative finite value", "columnWeight rejects string numbers");
+    });
+  });
+
   describe("layout of constituent Components", () => {
     const FIXED_COMPONENT_SIZE = 50;
 
