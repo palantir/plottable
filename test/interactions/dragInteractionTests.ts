@@ -226,13 +226,17 @@ describe("Interactions", () => {
           dragInteraction.onDrag(callback);
 
           let target = component.background();
-          TestMethods.triggerFakeTouchEvent("touchstart", target, [{x: startPoint.x, y: startPoint.y}]);
-          TestMethods.triggerFakeTouchEvent("touchmove", target, [{x: endPoint.x - 10, y: endPoint.y - 10}]);
-          TestMethods.triggerFakeTouchEvent("touchcancel", target, [{x: endPoint.x - 10, y: endPoint.y - 10}]);
-          TestMethods.triggerFakeTouchEvent("touchend", target, [{x: endPoint.x, y: endPoint.y}]);
+          const tenFromEndPoint = {
+            x: endPoint.x - 10,
+            y: endPoint.y - 10
+          };
+          TestMethods.triggerFakeTouchEvent("touchstart", target, [startPoint]);
+          TestMethods.triggerFakeTouchEvent("touchmove", target, [tenFromEndPoint]);
+          TestMethods.triggerFakeTouchEvent("touchcancel", target, [tenFromEndPoint]);
+          TestMethods.triggerFakeTouchEvent("touchend", target, [endPoint]);
           assert.isTrue(callback.called, "the callback is called");
-          assert.deepEqual(callback.lastStartPoint, {x: startPoint.x, y: startPoint.y}, "1");
-          assert.deepEqual(callback.lastEndPoint, {x: endPoint.x - 10, y: endPoint.y - 10}, "2");
+          assert.deepEqual(callback.lastStartPoint, startPoint, "start point is correct");
+          assert.deepEqual(callback.lastEndPoint, tenFromEndPoint, "end point is last known location when cancelled");
         });
       });
 
