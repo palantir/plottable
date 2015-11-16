@@ -2,10 +2,30 @@
 
 describe("Scales", () => {
   describe("Scale", () => {
+    class MockScale<D, R> extends Plottable.Scale<D, R> {
+      private _domain: D[] = [];
+      private _range: R[] = [];
+
+      protected _getDomain() {
+        return this._domain;
+      }
+
+      protected _setBackingScaleDomain(values: D[]) {
+        this._domain = values;
+      }
+
+      protected _getRange() {
+        return this._range;
+      }
+
+      protected _setRange(values: R[]) {
+        this._range = values;
+      }
+    }
+
     describe("onUpdate", () => {
       it("alerts listeners when its domain is updated", () => {
-        const scale = new Plottable.Scale();
-        (<any> scale)._setBackingScaleDomain = () => { return; };
+        const scale = new MockScale();
 
         let callbackWasCalled = false;
         const testCallback = (listenable: Plottable.Scale<any, any>) => {
@@ -18,8 +38,7 @@ describe("Scales", () => {
       });
 
       it("can disconnect listeners", () => {
-        const scale = new Plottable.Scale();
-        (<any> scale)._setBackingScaleDomain = () => { return; };
+        const scale = new MockScale();
 
         let callbackWasCalled = false;
         const testCallback = (listenable: Plottable.Scale<any, any>) => {
