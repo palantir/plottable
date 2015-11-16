@@ -5,6 +5,16 @@ describe("Scales", () => {
     class MockScale<D, R> extends Plottable.Scale<D, R> {
       private _domain: D[] = [];
       private _range: R[] = [];
+      private _autodomainCallback: () => D[];
+
+      constructor(autodomainCallback = ():D[] => []) {
+        super();
+        this._autodomainCallback = autodomainCallback;
+      }
+
+      protected _getExtent() {
+        return this._autodomainCallback();
+      }
 
       protected _getDomain() {
         return this._domain;
@@ -82,7 +92,7 @@ describe("Scales", () => {
     describe("included values", () => {
       it("adding or removing an IncludedValuesProvider returns the Scale", () => {
         const scale = new MockScale<number, number>();
-        const valueProvider = () => [];
+        const valueProvider = (): any[] => [];
         assert.strictEqual(scale.addIncludedValuesProvider(valueProvider), scale, "adding the provider returns the Scale");
         assert.strictEqual(scale.removeIncludedValuesProvider(valueProvider), scale, "removing the provider returns the Scale");
       });
@@ -128,6 +138,46 @@ describe("Scales", () => {
 
         const expectedIncludedValues = [providerValue];
         assert.deepEqual(scale.includedValues(), expectedIncludedValues, "only includes the value once");
+      });
+    });
+
+    describe("autodomaining", () => {
+      it("overrides a set domain if explicitly autodomained", () => {
+        const expectedDomain = [{}];
+        const autodomainCallback = () => expectedDomain;
+        const scale = new MockScale(autodomainCallback);
+        scale.domain([0, 1]);
+        scale.autoDomain();
+        assert.deepEqual(scale.domain(), expectedDomain, "returns the autodomain value by default");
+      });
+
+      it("autodomains when adding or removing an IncludedValuesProvider if in auto mode", () => {
+        let autodomainCalls = 0;
+        const autodomainCallback = (): any[] => {
+          autodomainCalls++;
+          return [];
+        };
+        const scale = new MockScale(autodomainCallback);
+        const provider = (): any[] => [];
+        scale.addIncludedValuesProvider(provider);
+        assert.strictEqual(autodomainCalls, 1, "scale autodomained when a provider was added");
+        scale.removeIncludedValuesProvider(provider);
+        assert.strictEqual(autodomainCalls, 2, "scale autodomained when a provider was removed");
+      });
+
+      it("does not autodomain when adding or removing an IncludedValuesProvider if NOT in auto mode", () => {
+        let autodomainCalls = 0;
+        const autodomainCallback = (): any[] => {
+          autodomainCalls++;
+          return [];
+        };
+        const scale = new MockScale(autodomainCallback);
+        scale.domain([0, 1]);
+        const provider = (): any[] => [];
+        scale.addIncludedValuesProvider(provider);
+        assert.strictEqual(autodomainCalls, 0, "scale did not autodomain when a provider was added");
+        scale.removeIncludedValuesProvider(provider);
+        assert.strictEqual(autodomainCalls, 0, "scale dit not autodomain when a provider was removed");
       });
     });
   });
