@@ -2,63 +2,65 @@
 
 describe("Dispatchers", () => {
   describe("Dispatcher", () => {
-    it("_connect() and _disconnect()", () => {
-      let dispatcher = new Plottable.Dispatcher();
+    const TEST_EVENT_NAME = "test";
 
-      let callbackCalls = 0;
-      (<any> dispatcher)._eventToCallback["click"] = () => callbackCalls++;
+    it("connects and disconnects correctly", () => {
+      const dispatcher = new Plottable.Dispatcher();
+
+      let callbackCalled = false;
+      (<any> dispatcher)._eventToCallback[TEST_EVENT_NAME] = () => callbackCalled = true;
 
       let d3document = d3.select(document);
       (<any> dispatcher)._connect();
-      TestMethods.triggerFakeUIEvent("click", d3document);
-      assert.strictEqual(callbackCalls, 1, "connected correctly (callback was called)");
+      TestMethods.triggerFakeUIEvent(TEST_EVENT_NAME, d3document);
+      assert.isTrue(callbackCalled, "connected correctly (callback was called)");
 
       (<any> dispatcher)._connect();
-      callbackCalls = 0;
-      TestMethods.triggerFakeUIEvent("click", d3document);
-      assert.strictEqual(callbackCalls, 1, "can't double-connect (callback only called once)");
+      callbackCalled = false;
+      TestMethods.triggerFakeUIEvent(TEST_EVENT_NAME, d3document);
+      assert.isTrue(callbackCalled, "can't double-connect (callback only called once)");
 
       (<any> dispatcher)._disconnect();
-      callbackCalls = 0;
-      TestMethods.triggerFakeUIEvent("click", d3document);
-      assert.strictEqual(callbackCalls, 0, "disconnected correctly (callback not called)");
+      callbackCalled = false;
+      TestMethods.triggerFakeUIEvent(TEST_EVENT_NAME, d3document);
+      assert.isFalse(callbackCalled, "disconnected correctly (callback not called)");
     });
 
-    it("won't _disconnect() if dispatcher still have listeners", () => {
-      let dispatcher = new Plottable.Dispatcher();
+    it("won't disconnect if it still has listeners", () => {
+      const dispatcher = new Plottable.Dispatcher();
 
       let callbackWasCalled = false;
-      (<any> dispatcher)._eventToCallback["click"] = () => callbackWasCalled = true;
+      (<any> dispatcher)._eventToCallback[TEST_EVENT_NAME] = () => callbackWasCalled = true;
 
-      let callback = () => { return; };
-      let callbackSet = new Plottable.Utils.CallbackSet<Function>();
+      const callback = () => { return; };
+      const callbackSet = new Plottable.Utils.CallbackSet<Function>();
       callbackSet.add(callback);
       (<any> dispatcher)._callbacks = [callbackSet];
 
-      let d3document = d3.select(document);
+      const d3document = d3.select(document);
       (<any> dispatcher)._connect();
 
-      TestMethods.triggerFakeUIEvent("click", d3document);
+      TestMethods.triggerFakeUIEvent(TEST_EVENT_NAME, d3document);
       assert.isTrue(callbackWasCalled, "connected correctly (callback was called)");
 
       (<any> dispatcher)._disconnect();
       callbackWasCalled = false;
-      TestMethods.triggerFakeUIEvent("click", d3document);
+      TestMethods.triggerFakeUIEvent(TEST_EVENT_NAME, d3document);
       assert.isTrue(callbackWasCalled, "didn't disconnect while dispatcher had listener");
 
       callbackSet.delete(callback);
       (<any> dispatcher)._disconnect();
       callbackWasCalled = false;
-      TestMethods.triggerFakeUIEvent("click", d3document);
+      TestMethods.triggerFakeUIEvent(TEST_EVENT_NAME, d3document);
       assert.isFalse(callbackWasCalled, "disconnected when dispatcher had no listeners");
     });
 
-    it("_setCallback()", () => {
-      let dispatcher = new Plottable.Dispatcher();
-      let callbackSet = new Plottable.Utils.CallbackSet<Function>();
+    it("can set and unset callbacks", () => {
+      const dispatcher = new Plottable.Dispatcher();
+      const callbackSet = new Plottable.Utils.CallbackSet<Function>();
 
       let callbackWasCalled = false;
-      let callback = () => callbackWasCalled = true;
+      const callback = () => callbackWasCalled = true;
 
       (<any> dispatcher)._setCallback(callbackSet, callback);
       callbackSet.callCallbacks();
