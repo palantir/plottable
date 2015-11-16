@@ -126,33 +126,6 @@ describe("Legend", () => {
       svg.remove();
     });
 
-    it("renders with correct opacity for each symbol when specified", () => {
-      color.domain(["foo", "bar", "baz"]);
-      legend.symbolOpacity(0.5);
-      legend.renderTo(svg);
-
-      let rows = legend.content().selectAll(ENTRY_SELECTOR);
-
-      rows.each(function(d: any, i: number) {
-        const row = d3.select(this);
-        const symbol = row.select(SYMBOL_SELECTOR);
-        assert.strictEqual(symbol.attr("opacity"), "0.5", "the symbol's opacity is set to a constant");
-      });
-
-      const opacityFunction = (d: any, i: number) => {
-        return (d === "foo") ? 0.2 : 0.8;
-      };
-      legend.symbolOpacity(opacityFunction).redraw();
-      rows = legend.content().selectAll(ENTRY_SELECTOR);
-
-      rows.each(function(d: any, i: number) {
-        const row = d3.select(this);
-        const symbol = row.select(SYMBOL_SELECTOR);
-        assert.strictEqual(symbol.attr("opacity"), String(opacityFunction(d, i)), "the symbol's opacity follows the provided function.");
-      });
-      svg.remove();
-    });
-
     it("reregisters listeners on legend.scale", () => {
       color.domain(["foo", "bar", "baz"]);
       legend.renderTo(svg);
@@ -171,36 +144,6 @@ describe("Legend", () => {
         const fill = d3.select(this).select(SYMBOL_SELECTOR).attr("fill");
         assert.strictEqual(fill, newColorScale.scale(d), "the fill was set properly");
       });
-      svg.remove();
-    });
-
-    it("scales icon sizes properly with font size", () => {
-      color.domain(["foo"]);
-      legend.renderTo(svg);
-      const style = svg.append("style");
-      style.attr("type", "text/css");
-
-      function verifySymbolHeight() {
-        const text = legend.content().select("text");
-        const icon = legend.content().select(SYMBOL_SELECTOR);
-        const textHeight = Plottable.Utils.DOM.elementBBox(text).height;
-        const symbolHeight = (<Element> icon.node()).getBoundingClientRect().height;
-        assert.operator(symbolHeight, "<", textHeight, "icons too small: symbolHeight < textHeight");
-        assert.operator(symbolHeight, ">", textHeight / 2, "icons too big: textHeight / 2 > symbolHeight");
-      }
-
-      verifySymbolHeight();
-
-      style.text(".plottable .legend text { font-size: 60px; }");
-      legend.computeLayout();
-      legend.render();
-      verifySymbolHeight();
-
-      style.text(".plottable .legend text { font-size: 10px; }");
-      legend.computeLayout();
-      legend.render();
-      verifySymbolHeight();
-
       svg.remove();
     });
 
@@ -256,6 +199,187 @@ describe("Legend", () => {
       svg.remove();
     });
 
+    it("truncates and hides entries if space is constrained for a horizontal legend", () => {
+      svg.remove();
+      svg = TestMethods.generateSVG(70, 400);
+      legend.maxEntriesPerRow(Infinity);
+      legend.renderTo(svg);
+
+      let textEls = legend.content().selectAll("text");
+      textEls.each(function(d: any) {
+        const textEl = d3.select(this);
+        TestMethods.assertBBoxInclusion(legend.content(), textEl);
+      });
+
+      legend.detach();
+      svg.remove();
+      svg = TestMethods.generateSVG(100, 50);
+      legend.renderTo(svg);
+      textEls = legend.content().selectAll("text");
+      textEls.each(function(d: any) {
+        let textEl = d3.select(this);
+        TestMethods.assertBBoxInclusion(legend.content(), textEl);
+      });
+
+      svg.remove();
+    });
+  });
+
+  describe("Symbols", () => {
+    let svg: d3.Selection<void>;
+    let color: Plottable.Scales.Color;
+    let legend: Plottable.Components.Legend;
+
+    beforeEach(() => {
+      svg = TestMethods.generateSVG();
+      color = new Plottable.Scales.Color();
+      legend = new Plottable.Components.Legend(color);
+    });
+
+    it("renders with correct opacity for each symbol when specified", () => {
+      color.domain(["foo", "bar", "baz"]);
+      legend.symbolOpacity(0.5);
+      legend.renderTo(svg);
+
+      let rows = legend.content().selectAll(ENTRY_SELECTOR);
+
+      rows.each(function(d: any, i: number) {
+        const row = d3.select(this);
+        const symbol = row.select(SYMBOL_SELECTOR);
+        assert.strictEqual(symbol.attr("opacity"), "0.5", "the symbol's opacity is set to a constant");
+      });
+
+      const opacityFunction = (d: any, i: number) => {
+        return (d === "foo") ? 0.2 : 0.8;
+      };
+      legend.symbolOpacity(opacityFunction).redraw();
+      rows = legend.content().selectAll(ENTRY_SELECTOR);
+
+      rows.each(function(d: any, i: number) {
+        const row = d3.select(this);
+        const symbol = row.select(SYMBOL_SELECTOR);
+        assert.strictEqual(symbol.attr("opacity"), String(opacityFunction(d, i)), "the symbol's opacity follows the provided function.");
+      });
+      svg.remove();
+    });
+
+    it("scales icon sizes properly with font size", () => {
+      color.domain(["foo"]);
+      legend.renderTo(svg);
+      const style = svg.append("style");
+      style.attr("type", "text/css");
+
+      function verifySymbolHeight() {
+        const text = legend.content().select("text");
+        const icon = legend.content().select(SYMBOL_SELECTOR);
+        const textHeight = Plottable.Utils.DOM.elementBBox(text).height;
+        const symbolHeight = (<Element> icon.node()).getBoundingClientRect().height;
+        assert.operator(symbolHeight, "<", textHeight, "icons too small: symbolHeight < textHeight");
+        assert.operator(symbolHeight, ">", textHeight / 2, "icons too big: textHeight / 2 > symbolHeight");
+      }
+
+      verifySymbolHeight();
+
+      style.text(".plottable .legend text { font-size: 60px; }");
+      legend.computeLayout();
+      legend.render();
+      verifySymbolHeight();
+
+      style.text(".plottable .legend text { font-size: 10px; }");
+      legend.computeLayout();
+      legend.render();
+      verifySymbolHeight();
+
+      svg.remove();
+    });
+
+    it("passes correct index in symobl", () => {
+      const domain = ["AA", "BB", "CC"];
+      color.domain(domain);
+
+      let expectedIndex = 0;
+      const symbolChecker = (d: any, index: number) => {
+        assert.strictEqual(index, expectedIndex, "index passed in is correct");
+        expectedIndex++;
+        return (size: number) => "";
+      };
+      legend.symbol(symbolChecker);
+
+      legend.renderTo(svg);
+      svg.remove();
+    });
+
+    it("passes correct index in symbolOpacity", () => {
+      const domain = ["AA", "BB", "CC"];
+      color.domain(domain);
+
+      let expectedIndex = 0;
+      let symbolOpacityChecker = (d: any, index: number) => {
+        assert.strictEqual(index, expectedIndex, "index passed in is correct");
+        expectedIndex++;
+        return 0.5;
+      };
+      legend.symbolOpacity(symbolOpacityChecker);
+
+      legend.renderTo(svg);
+      svg.remove();
+    });
+  });
+
+  describe("Title Elements", () => {
+    let svg: d3.Selection<void>;
+    let color: Plottable.Scales.Color;
+    let legend: Plottable.Components.Legend;
+
+    beforeEach(() => {
+      svg = TestMethods.generateSVG();
+      color = new Plottable.Scales.Color();
+      legend = new Plottable.Components.Legend(color);
+    });
+
+    it("create title elements by default", () => {
+      color.domain(["foo", "bar", "baz"]);
+      legend.renderTo(svg);
+
+      const entries = legend.content().selectAll(ENTRY_SELECTOR);
+      const titles = entries.selectAll("title");
+      assert.strictEqual(titles.size(), color.domain().length, "same number of title tags as legend entries");
+
+      entries.each(function(d: any, i: number) {
+        const entry = d3.select(this);
+        const text = entry.select("text").text();
+        const titles = entry.selectAll("title");
+        assert.strictEqual(titles.size(), 1, "only one title node per legend entry should be present");
+        assert.strictEqual(text, titles.text(), "the text and title node have the same text");
+      });
+      svg.remove();
+    });
+
+    it("does not create title elements if configuration is set to false", () => {
+      color.domain(["foo", "bar", "baz"]);
+      const originalSetting = Plottable.Configs.ADD_TITLE_ELEMENTS;
+      Plottable.Configs.ADD_TITLE_ELEMENTS = false;
+      legend.renderTo(svg);
+      Plottable.Configs.ADD_TITLE_ELEMENTS = originalSetting;
+
+      const entries = legend.content().selectAll(ENTRY_SELECTOR);
+      const titles = entries.selectAll("title");
+      assert.strictEqual(titles.size(), 0, "no titles should be rendered");
+      svg.remove();
+    });
+  });
+
+  describe("Formatting and Sorting", () => {
+    let svg: d3.Selection<void>;
+    let color: Plottable.Scales.Color;
+    let legend: Plottable.Components.Legend;
+
+    beforeEach(() => {
+      svg = TestMethods.generateSVG();
+      color = new Plottable.Scales.Color();
+      legend = new Plottable.Components.Legend(color);
+    });
+
     it("can set formatter to change how entry labels are displayed", () => {
       color.domain(["A", "B", "C"]);
       const formatter = (id: string) => `${id}foo`;
@@ -302,7 +426,7 @@ describe("Legend", () => {
       svg.remove();
       });
 
-    it("sorts symobl by comparator", () => {
+    it("sorts entries by comparator", () => {
       const newDomain = ["F", "E", "D", "C", "B", "A"];
       color.domain(newDomain);
       legend.renderTo(svg);
@@ -319,97 +443,9 @@ describe("Legend", () => {
 
       svg.remove();
     });
-
-    it("truncates and hides entries if space is constrained for a horizontal legend", () => {
-      svg.remove();
-      svg = TestMethods.generateSVG(70, 400);
-      legend.maxEntriesPerRow(Infinity);
-      legend.renderTo(svg);
-
-      let textEls = legend.content().selectAll("text");
-      textEls.each(function(d: any) {
-        const textEl = d3.select(this);
-        TestMethods.assertBBoxInclusion(legend.content(), textEl);
-      });
-
-      legend.detach();
-      svg.remove();
-      svg = TestMethods.generateSVG(100, 50);
-      legend.renderTo(svg);
-      textEls = legend.content().selectAll("text");
-      textEls.each(function(d: any) {
-        let textEl = d3.select(this);
-        TestMethods.assertBBoxInclusion(legend.content(), textEl);
-      });
-
-      svg.remove();
-    });
-
-    it("passes correct index in symobl", () => {
-      const domain = ["AA", "BB", "CC"];
-      color.domain(domain);
-
-      let expectedIndex = 0;
-      const symbolChecker = (d: any, index: number) => {
-        assert.strictEqual(index, expectedIndex, "index passed in is correct");
-        expectedIndex++;
-        return (size: number) => "";
-      };
-      legend.symbol(symbolChecker);
-
-      legend.renderTo(svg);
-      svg.remove();
-    });
-
-    it("passes correct index in symbolOpacity", () => {
-      const domain = ["AA", "BB", "CC"];
-      color.domain(domain);
-
-      let expectedIndex = 0;
-      let symbolOpacityChecker = (d: any, index: number) => {
-        assert.strictEqual(index, expectedIndex, "index passed in is correct");
-        expectedIndex++;
-        return 0.5;
-      };
-      legend.symbolOpacity(symbolOpacityChecker);
-
-      legend.renderTo(svg);
-      svg.remove();
-    });
-
-    it("create title elements by default", () => {
-      color.domain(["foo", "bar", "baz"]);
-      legend.renderTo(svg);
-
-      const entries = legend.content().selectAll(ENTRY_SELECTOR);
-      const titles = entries.selectAll("title");
-      assert.strictEqual(titles.size(), color.domain().length, "same number of title tags as legend entries");
-
-      entries.each(function(d: any, i: number) {
-        const entry = d3.select(this);
-        const text = entry.select("text").text();
-        const titles = entry.selectAll("title");
-        assert.strictEqual(titles.size(), 1, "only one title node per legend entry should be present");
-        assert.strictEqual(text, titles.text(), "the text and title node have the same text");
-      });
-      svg.remove();
-    });
-
-    it("does not create title elements if configuration is set to false", () => {
-      color.domain(["foo", "bar", "baz"]);
-      const originalSetting = Plottable.Configs.ADD_TITLE_ELEMENTS;
-      Plottable.Configs.ADD_TITLE_ELEMENTS = false;
-      legend.renderTo(svg);
-      Plottable.Configs.ADD_TITLE_ELEMENTS = originalSetting;
-
-      const entries = legend.content().selectAll(ENTRY_SELECTOR);
-      const titles = entries.selectAll("title");
-      assert.strictEqual(titles.size(), 0, "no titles should be rendered");
-      svg.remove();
-    });
   });
 
-  describe("entitiesAt", () => {
+  describe("Selection", () => {
     let svg: d3.Selection<void>;
     let color: Plottable.Scales.Color;
     let legend: Plottable.Components.Legend;
