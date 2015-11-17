@@ -37,6 +37,13 @@ describe("Scales", () => {
       });
     });
 
+    describe("padding", () => {
+      it("rejects negative values for padding", () => {
+        const scale = new Plottable.QuantitativeScale();
+        assert.throws(() => scale.padProportion(-0.05), Error);
+      });
+    })
+
     describe("tick generation", () => {
       it("can set an get a TickGenerator", () => {
         const scale = new Plottable.QuantitativeScale();
