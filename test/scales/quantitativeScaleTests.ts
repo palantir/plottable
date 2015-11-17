@@ -9,7 +9,7 @@ describe("Scales", () => {
         const scale = new Plottable.QuantitativeScale();
         const computedExtent = scale.extentOfValues(values);
 
-        assert.deepEqual(computedExtent, ["1", "11"], "the extent is the miminum and the maximum value in the domain");
+        assert.deepEqual(computedExtent, ["1", "11"], "the extent is the miminum and the maximum values");
       });
 
       it("gives the minimum and maxiumum when the domain is numeric", () => {
@@ -17,7 +17,23 @@ describe("Scales", () => {
         const scale = new Plottable.QuantitativeScale();
         const computedExtent = scale.extentOfValues(values);
 
-        assert.deepEqual(computedExtent, [1, 11], "the extent is the miminum and the maximum value in the domain");
+        assert.deepEqual(computedExtent, [1, 11], "the extent is the miminum and the maximum values");
+      });
+
+      it("ignores NaN, null, and undefined values when computing the extent", () => {
+        const values = [NaN, null, undefined, 1, 11];
+        const scale = new Plottable.QuantitativeScale();
+        const computedExtent = scale.extentOfValues(values);
+
+        assert.deepEqual(computedExtent, [1, 11], "the extent is the minimum and the maximum values");
+      })
+
+      it("ignores infinite values when computing the extent", () => {
+        const values = [Infinity, -Infinity, 1, 11];
+        const scale = new Plottable.QuantitativeScale();
+        const computedExtent = scale.extentOfValues(values);
+
+        assert.deepEqual(computedExtent, [1, 11], "the extent is the minimum and the maximum values");
       });
     });
 
