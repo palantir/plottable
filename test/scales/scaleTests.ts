@@ -7,7 +7,7 @@ describe("Scales", () => {
       private _range: R[] = [];
       private _autodomainCallback: () => D[];
 
-      constructor(autodomainCallback = ():D[] => []) {
+      constructor(autodomainCallback = (): D[] => []) {
         super();
         this._autodomainCallback = autodomainCallback;
       }

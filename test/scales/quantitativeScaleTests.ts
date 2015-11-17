@@ -26,7 +26,7 @@ describe("Scales", () => {
         const computedExtent = scale.extentOfValues(values);
 
         assert.deepEqual(computedExtent, [1, 11], "the extent is the minimum and the maximum values");
-      })
+      });
 
       it("ignores infinite values when computing the extent", () => {
         const values = [Infinity, -Infinity, 1, 11];
@@ -42,7 +42,7 @@ describe("Scales", () => {
         const scale = new Plottable.QuantitativeScale();
         assert.throws(() => scale.padProportion(-0.05), Error);
       });
-    })
+    });
 
     describe("tick generation", () => {
       it("can set an get a TickGenerator", () => {
