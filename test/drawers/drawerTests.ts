@@ -138,6 +138,8 @@ describe("Drawers", () => {
       beforeEach(() => {
         timings = [];
         svg = TestMethods.generateSVG();
+        drawer = new Plottable.Drawer(null); // HACKHACK #2777: have to create a Plottable.Drawer to avoid "two Plottables" issue
+        (<any> drawer)._svgElementName = MockDrawer.ELEMENT_NAME;
         drawer.renderArea(svg);
       });
 
