@@ -62,6 +62,26 @@ describe("Drawers", () => {
       assert.isFalse(document.body.contains(<any> svg.node()), "renderArea was removed from the DOM");
     });
 
+    it("correctly computes the total draw time", () => {
+      function makeFixedTimeAnimator(totalTime: number) {
+        return <Plottable.Animator> {
+          animate: () => null,
+          totalTime: () => totalTime
+        };
+      }
+
+      const animationTimes = [10, 20];
+      const drawSteps = animationTimes.map((time) => {
+        return {
+          attrToProjector: <Plottable.AttributeToProjector> {},
+          animator: makeFixedTimeAnimator(time)
+        };
+      });
+      const totalTime = drawer.totalDrawTime([], drawSteps);
+      const expectedTotalTime = d3.sum(animationTimes);
+      assert.strictEqual(totalTime, expectedTotalTime, "returned the total time taken by all Animators");
+    });
+
     it("draws elements accoding to a specified drawStep", () => {
       const svg = TestMethods.generateSVG();
       const data = ["A", "B", "C"];
@@ -180,36 +200,6 @@ describe("Drawers", () => {
       circles.enter().append("circle").attr("cx", (datum: any) => datum.one).attr("cy", (datum: any) => datum.two).attr("r", 10);
       let selection = drawer.selectionForIndex(1);
       assert.strictEqual(selection.node(), circles[0][1], "correct selection gotten");
-      svg.remove();
-    });
-
-    it("totalDrawTime()", () => {
-      let svg = TestMethods.generateSVG(300, 300);
-      let drawer = createMockDrawer(null);
-
-      let dataObjects = 9;
-      let stepDuration = 987;
-      let stepDelay = 133;
-      let startDelay = 245;
-
-      let expectedAnimationDuration = startDelay + (dataObjects - 1) * stepDelay + stepDuration;
-
-      let data = Plottable.Utils.Array.createFilledArray({}, dataObjects);
-
-      let attrToProjector: Plottable.AttributeToProjector = null;
-
-      let animator = new Plottable.Animators.Easing();
-      animator.maxTotalDuration(Infinity);
-      animator.stepDuration(stepDuration);
-      animator.stepDelay(stepDelay);
-      animator.startDelay(startDelay);
-
-      let mockDrawStep = [{attrToProjector: attrToProjector, animator: animator}];
-
-      let drawTime = drawer.totalDrawTime(data, mockDrawStep);
-
-      assert.strictEqual(drawTime, expectedAnimationDuration, "Total Draw time");
-
       svg.remove();
     });
   });
