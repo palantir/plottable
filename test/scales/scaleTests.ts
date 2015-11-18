@@ -143,10 +143,11 @@ describe("Scales", () => {
 
     describe("autodomaining", () => {
       it("overrides a set domain if explicitly autodomained", () => {
-        const expectedDomain = [{}];
+        const expectedDomain = [0, 99];
         const autodomainCallback = () => expectedDomain;
         const scale = new MockScale(autodomainCallback);
-        scale.domain([0, 1]);
+        const explicitlySetDomain = [0, 1];
+        scale.domain(explicitlySetDomain);
         scale.autoDomain();
         assert.deepEqual(scale.domain(), expectedDomain, "returns the autodomain value by default");
       });

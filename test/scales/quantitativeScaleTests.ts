@@ -40,12 +40,12 @@ describe("Scales", () => {
     describe("padding", () => {
       it("rejects negative values for padding", () => {
         const scale = new Plottable.QuantitativeScale();
-        assert.throws(() => scale.padProportion(-0.05), Error);
+        assert.throws(() => scale.padProportion(-0.05), Error, "must be non-negative");
       });
     });
 
     describe("tick generation", () => {
-      it("can set an get a TickGenerator", () => {
+      it("can set and get a TickGenerator", () => {
         const scale = new Plottable.QuantitativeScale();
         const tickGenerator = (): any[] => [];
         assert.strictEqual(scale.tickGenerator(tickGenerator), scale, "setting the TickGenerator returns the QuantitativeScale");
