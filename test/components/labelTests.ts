@@ -2,7 +2,7 @@
 
 describe("Labels", () => {
   const LABEL_CLASS = "label";
-  let CLOSETO_REQUIRMENT;
+  let CLOSETO_REQUIRMENT: number;
   before(() => {
     CLOSETO_REQUIRMENT = window.Pixel_CloseTo_Requirement;
     // HACKHACK #2422: use an open source web font by default for Plottable
