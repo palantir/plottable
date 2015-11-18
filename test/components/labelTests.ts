@@ -5,6 +5,7 @@ describe("Labels", () => {
   let CLOSETO_REQUIRMENT;
   before(() => {
     CLOSETO_REQUIRMENT = window.Pixel_CloseTo_Requirement;
+    // HACKHACK #2422: use an open source web font by default for Plottable
     window.Pixel_CloseTo_Requirement = 2;
   });
   after(() => {
@@ -12,7 +13,6 @@ describe("Labels", () => {
   });
 
   describe("Label", () => {
-
     describe("Basic Usage", () => {
       const BBOX_SELECTOR = ".bounding-box";
       let svg: d3.Selection<void>;
@@ -25,11 +25,11 @@ describe("Labels", () => {
         const label = new Plottable.Components.Label("a");
         label.renderTo(svg);
         assert.strictEqual(label.content().select("text").text(), "a", "the text starts at the specified string");
-        assert.operator(label.height(), ">", 0, "rowMin is > 0 for non-empty string");
+        assert.operator(label.height(), ">", 0, "height is positive for non-empty string");
         label.text("hello world");
         label.renderTo(svg);
         assert.strictEqual(label.content().select("text").text(), "hello world", "the label text updated properly");
-        assert.operator(label.height(), ">", 0, "rowMin is > 0 for non-empty string");
+        assert.operator(label.height(), ">", 0, "height is positive for non-empty string");
         svg.remove();
       });
 
@@ -161,7 +161,7 @@ describe("Labels", () => {
       label = new Plottable.Components.Label("testing label").padding(PADDING);
       });
 
-      it("pads reacts under left alignment", () => {
+      it("adds padding for label accordingly under left alignment", () => {
         label.xAlignment("left").renderTo(svg);
         const testTextRect = (<Element> label.content().select("text").node()).getBoundingClientRect();
         const elementRect = (<any> label)._element.node().getBoundingClientRect();
@@ -171,7 +171,7 @@ describe("Labels", () => {
         svg.remove();
       });
 
-      it("pads reacts under right alignment", () => {
+      it("adds padding for label accordingly under right alignment", () => {
         label.xAlignment("right").renderTo(svg);
         const testTextRect = (<Element> label.content().select("text").node()).getBoundingClientRect();
         const elementRect = (<any> label)._element.node().getBoundingClientRect();
@@ -181,7 +181,7 @@ describe("Labels", () => {
         svg.remove();
       });
 
-      it("pads reacts under top alignment", () => {
+      it("adds padding for label accordingly under top alignment", () => {
         label.yAlignment("top").renderTo(svg);
         const testTextRect = (<Element> label.content().select("text").node()).getBoundingClientRect();
         const elementRect = (<any> label)._element.node().getBoundingClientRect();
@@ -191,7 +191,7 @@ describe("Labels", () => {
         svg.remove();
       });
 
-      it("pads reacts under bottom alignment", () => {
+      it("adds padding for label accordingly under bottom alignment", () => {
         label.yAlignment("bottom").renderTo(svg);
         const testTextRect = (<Element> label.content().select("text").node()).getBoundingClientRect();
         const elementRect = (<any> label)._element.node().getBoundingClientRect();
@@ -219,9 +219,9 @@ describe("Labels", () => {
       const label = new Plottable.Components.TitleLabel("A CHART TITLE");
       const svg = TestMethods.generateSVG();
       label.renderTo(svg);
-      const element = (<any> label)._element;
-      assert.isTrue(element.classed(LABEL_CLASS), "element has label css class");
-      assert.isTrue(element.classed(Plottable.Components.TitleLabel.TITLE_LABEL_CLASS), "element has title-label css class");
+
+      assert.isTrue(label.hasClass(LABEL_CLASS), "element has label css class");
+      assert.isTrue(label.hasClass(Plottable.Components.TitleLabel.TITLE_LABEL_CLASS), "element has title-label css class");
       svg.remove();
     });
   });
@@ -231,9 +231,9 @@ describe("Labels", () => {
       const label = new Plottable.Components.AxisLabel("Axis Label");
       const svg = TestMethods.generateSVG();
       label.renderTo(svg);
-      const element = (<any> label)._element;
-      assert.isTrue(element.classed(LABEL_CLASS), "element has label css class");
-      assert.isTrue(element.classed(Plottable.Components.AxisLabel.AXIS_LABEL_CLASS), "title element has axis-label css class");
+
+      assert.isTrue(label.hasClass(LABEL_CLASS), "element has label css class");
+      assert.isTrue(label.hasClass(Plottable.Components.AxisLabel.AXIS_LABEL_CLASS), "title element has axis-label css class");
       svg.remove();
     });
   });
