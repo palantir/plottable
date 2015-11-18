@@ -1,58 +1,185 @@
 ///<reference path="../testReference.ts" />
 
 describe("Scales", () => {
-  it("Scale alerts listeners when its domain is updated", () => {
-    let scale = new Plottable.Scale();
-    (<any> scale)._d3Scale = d3.scale.identity();
+  describe("Scale", () => {
+    class MockScale<D, R> extends Plottable.Scale<D, R> {
+      private _domain: D[] = [];
+      private _range: R[] = [];
+      private _autodomainCallback: () => D[];
 
-    let callbackWasCalled = false;
-    let testCallback = (listenable: Plottable.Scale<any, any>) => {
-      assert.strictEqual(listenable, scale, "Callback received the calling scale as the first argument");
-      callbackWasCalled = true;
-    };
-    scale.onUpdate(testCallback);
-    (<any> scale)._setBackingScaleDomain = () => { return; };
-    scale.domain([0, 10]);
-    assert.isTrue(callbackWasCalled, "The registered callback was called");
-  });
+      constructor(autodomainCallback = (): D[] => []) {
+        super();
+        this._autodomainCallback = autodomainCallback;
+      }
 
-  it("Scale update listeners can be turned off", () => {
-    let scale = new Plottable.Scale();
-    (<any> scale)._d3Scale = d3.scale.identity();
-    (<any> scale)._setBackingScaleDomain = () => { return; };
+      protected _getExtent() {
+        return this._autodomainCallback();
+      }
 
-    let callbackWasCalled = false;
-    let testCallback = (listenable: Plottable.Scale<any, any>) => {
-      assert.strictEqual(listenable, scale, "Callback received the calling scale as the first argument");
-      callbackWasCalled = true;
-    };
-    scale.onUpdate(testCallback);
-    scale.domain([0, 10]);
-    assert.isTrue(callbackWasCalled, "The registered callback was called");
+      protected _getDomain() {
+        return this._domain;
+      }
 
-    callbackWasCalled = false;
-    scale.offUpdate(testCallback);
-    scale.domain([11, 19]);
-    assert.isFalse(callbackWasCalled, "The registered callback was not called because the callback was removed");
-  });
+      protected _setBackingScaleDomain(values: D[]) {
+        this._domain = values;
+      }
 
-  describe("extent calculation", () => {
+      protected _getRange() {
+        return this._range;
+      }
 
-    it("quantitaveScale gives the minimum and maxiumum when the domain is stringy", () => {
-      let values = ["1", "3", "2", "1"];
-      let scale = new Plottable.QuantitativeScale();
-      let computedExtent = scale.extentOfValues(values);
+      protected _setRange(values: R[]) {
+        this._range = values;
+      }
 
-      assert.deepEqual(computedExtent, ["1", "3"], "the extent is the miminum and the maximum value in the domain");
+      public includedValues() {
+        return this._getAllIncludedValues();
+      }
+    }
+
+    describe("domain and range", () => {
+      it("can set and get the domain", () => {
+        const scale = new MockScale();
+        const expectedDomain = [0, 10];
+        assert.strictEqual(scale.domain(expectedDomain), scale, "setter mode returns the calling Scale");
+        assert.deepEqual(scale.domain(), expectedDomain, "returns the set domain");
+      });
+
+      it("can set and get the range", () => {
+        const scale = new MockScale();
+        const expectedRange = [0, 10];
+        assert.strictEqual(scale.range(expectedRange), scale, "setter mode returns the calling Scale");
+        assert.deepEqual(scale.range(), expectedRange, "returns the set range");
+      });
     });
 
-    it("quantitaveScale gives the minimum and maxiumum when the domain is numeric", () => {
-      let values = [1, 3, 2, 1];
-      let scale = new Plottable.QuantitativeScale();
-      let computedExtent = scale.extentOfValues(values);
+    describe("onUpdate", () => {
+      it("alerts listeners when its domain is updated", () => {
+        const scale = new MockScale();
 
-      assert.deepEqual(computedExtent, [1, 3], "the extent is the miminum and the maximum value in the domain");
+        const expectedDomain = [0, 10];
+
+        let callbackWasCalled = false;
+        const testCallback = (listenable: Plottable.Scale<any, any>) => {
+          assert.strictEqual(listenable, scale, "Callback received the calling scale as the first argument");
+          assert.deepEqual(listenable.domain(), expectedDomain, "domain was updated bofore the callback was called");
+          callbackWasCalled = true;
+        };
+        scale.onUpdate(testCallback);
+        scale.domain(expectedDomain);
+        assert.isTrue(callbackWasCalled, "The registered callback was called");
+      });
+
+      it("can disconnect listeners", () => {
+        const scale = new MockScale();
+
+        let callbackWasCalled = false;
+        const testCallback = (listenable: Plottable.Scale<any, any>) => {
+          assert.strictEqual(listenable, scale, "Callback received the calling scale as the first argument");
+          callbackWasCalled = true;
+        };
+        scale.onUpdate(testCallback);
+        scale.domain([0, 10]);
+        assert.isTrue(callbackWasCalled, "The registered callback was called");
+
+        callbackWasCalled = false;
+        scale.offUpdate(testCallback);
+        scale.domain([11, 19]);
+        assert.isFalse(callbackWasCalled, "The registered callback was not called because the callback was removed");
+      });
     });
 
+    describe("included values", () => {
+      it("adding or removing an IncludedValuesProvider returns the Scale", () => {
+        const scale = new MockScale<number, number>();
+        const valueProvider = (): any[] => [];
+        assert.strictEqual(scale.addIncludedValuesProvider(valueProvider), scale, "adding the provider returns the Scale");
+        assert.strictEqual(scale.removeIncludedValuesProvider(valueProvider), scale, "removing the provider returns the Scale");
+      });
+
+      it("combines all values from its IncludedValuesProviders", () => {
+        const scale = new MockScale();
+        const provider1Value = { value: 1 };
+        const provider1 = (passedScale: Plottable.Scale<any, any>) => {
+          assert.strictEqual(passedScale, scale, "was passed the scale it was attached to");
+          return [provider1Value];
+        };
+        const provider2Value = { value: 2 };
+        const provider2 = () => [provider2Value];
+        scale.addIncludedValuesProvider(provider1);
+        scale.addIncludedValuesProvider(provider2);
+
+        const expectedIncludedValues = [provider1Value, provider2Value];
+        assert.deepEqual(scale.includedValues(), expectedIncludedValues, "combines all included values into a single array");
+      });
+
+      it("does not include values from removed IncludedValuesProviders", () => {
+        const scale = new MockScale();
+        const provider1Value = { value: 1 };
+        const provider1 = () => [provider1Value];
+        const provider2Value = { value: 2 };
+        const provider2 = () => [provider2Value];
+
+        scale.addIncludedValuesProvider(provider1);
+        scale.addIncludedValuesProvider(provider2);
+        scale.removeIncludedValuesProvider(provider2);
+
+        const expectedIncludedValues = [provider1Value];
+        assert.deepEqual(scale.includedValues(), expectedIncludedValues, "includes only values from remaining providers");
+      });
+
+      it("won't add the same IncludedValuesProvider twice", () => {
+        const scale = new MockScale();
+        const providerValue = { value: 1 };
+        const provider = () => [providerValue];
+
+        scale.addIncludedValuesProvider(provider);
+        scale.addIncludedValuesProvider(provider);
+
+        const expectedIncludedValues = [providerValue];
+        assert.deepEqual(scale.includedValues(), expectedIncludedValues, "only includes the value once");
+      });
+    });
+
+    describe("autodomaining", () => {
+      it("overrides a set domain if explicitly autodomained", () => {
+        const expectedDomain = [0, 99];
+        const autodomainCallback = () => expectedDomain;
+        const scale = new MockScale(autodomainCallback);
+        const explicitlySetDomain = [0, 1];
+        scale.domain(explicitlySetDomain);
+        scale.autoDomain();
+        assert.deepEqual(scale.domain(), expectedDomain, "returns the autodomain value by default");
+      });
+
+      it("autodomains when adding or removing an IncludedValuesProvider if in auto mode", () => {
+        let autodomainCalls = 0;
+        const autodomainCallback = (): any[] => {
+          autodomainCalls++;
+          return [];
+        };
+        const scale = new MockScale(autodomainCallback);
+        const provider = (): any[] => [];
+        scale.addIncludedValuesProvider(provider);
+        assert.strictEqual(autodomainCalls, 1, "scale autodomained when a provider was added");
+        scale.removeIncludedValuesProvider(provider);
+        assert.strictEqual(autodomainCalls, 2, "scale autodomained when a provider was removed");
+      });
+
+      it("does not autodomain when adding or removing an IncludedValuesProvider if NOT in auto mode", () => {
+        let autodomainCalls = 0;
+        const autodomainCallback = (): any[] => {
+          autodomainCalls++;
+          return [];
+        };
+        const scale = new MockScale(autodomainCallback);
+        scale.domain([0, 1]);
+        const provider = (): any[] => [];
+        scale.addIncludedValuesProvider(provider);
+        assert.strictEqual(autodomainCalls, 0, "scale did not autodomain when a provider was added");
+        scale.removeIncludedValuesProvider(provider);
+        assert.strictEqual(autodomainCalls, 0, "scale dit not autodomain when a provider was removed");
+      });
+    });
   });
 });

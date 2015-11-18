@@ -54,6 +54,7 @@
 ///<reference path="core/symbolFactoriesTests.ts" />
 
 ///<reference path="scales/scaleTests.ts" />
+///<reference path="scales/quantitativeScaleTests.ts" />
 ///<reference path="scales/categoryScaleTests.ts" />
 ///<reference path="scales/linearScaleTests.ts" />
 ///<reference path="scales/colorScaleTests.ts" />
