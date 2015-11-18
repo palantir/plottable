@@ -133,6 +133,27 @@ describe("Drawers", () => {
       assert.deepEqual(selection[0], drawn[0], "retrieved all elements it drew");
       svg.remove();
     });
+
+    it("can retrieve the selection for a particular index", () => {
+      const svg = TestMethods.generateSVG();
+      const data = ["A", "B", "C"];
+      const attrToProjector: Plottable.AttributeToProjector = {};
+      const drawSteps = [
+        {
+          attrToProjector: attrToProjector,
+          animator: new Plottable.Animators.Null()
+        }
+      ];
+      drawer.renderArea(svg);
+      drawer.draw(data, drawSteps);
+
+      const selections = drawer.selection();
+      data.forEach((datum, index) => {
+        const selectionForIndex = drawer.selectionForIndex(index);
+        assert.strictEqual(selectionForIndex.node(), selections[0][index], `retrieves the correct selection for index ${index}`);
+      });
+      svg.remove();
+    });
   });
 
   describe("Abstract Drawer", () => {
@@ -196,19 +217,6 @@ describe("Drawers", () => {
       let steps = [ds1, ds2, ds3];
       drawer.draw([], steps);
       assert.deepEqual(timings, [0, 20, 30], "setTimeout called with appropriate times");
-    });
-
-    it("selectionForIndex()", () => {
-      let svg = TestMethods.generateSVG(300, 300);
-      let drawer = createMockDrawer(null);
-      drawer.renderArea(svg.append("g"));
-      drawer.selector = () => "circle";
-      let data = [{one: 2, two: 1}, {one: 33, two: 21}, {one: 11, two: 10}];
-      let circles = drawer.renderArea().selectAll("circle").data(data);
-      circles.enter().append("circle").attr("cx", (datum: any) => datum.one).attr("cy", (datum: any) => datum.two).attr("r", 10);
-      let selection = drawer.selectionForIndex(1);
-      assert.strictEqual(selection.node(), circles[0][1], "correct selection gotten");
-      svg.remove();
     });
   });
 });
