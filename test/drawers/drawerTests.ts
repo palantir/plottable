@@ -85,9 +85,17 @@ describe("Drawers", () => {
     it("draws elements accoding to a specified drawStep", () => {
       const svg = TestMethods.generateSVG();
       const data = ["A", "B", "C"];
-      const propertyName = "property";
+      let invocationCount = 0;
+      const validatingProjector = (datum: any, index: number, passedDataset: Plottable.Dataset) => {
+        assert.strictEqual(datum, data[invocationCount], "projector was passed the correct datum");
+        assert.strictEqual(index, invocationCount, "projector was passed the correct index");
+        assert.strictEqual(passedDataset, dataset, "projector was passed the Drawer's dataset");
+        invocationCount++;
+        return datum;
+      };
       const attrToProjector: Plottable.AttributeToProjector = {};
-      attrToProjector[propertyName] = (datum: any) => datum;
+      const propertyName = "property";
+      attrToProjector[propertyName] = validatingProjector;
       const drawSteps = [
         {
           attrToProjector: attrToProjector,
