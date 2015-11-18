@@ -56,77 +56,62 @@ describe("Drawers", () => {
       assert.strictEqual(totalTime, expectedTotalTime, "returned the total time taken by all Animators");
     });
 
-    it("draws elements accoding to a specified drawStep", () => {
-      const svg = TestMethods.generateSVG();
+    describe("drawing and retrieving elements", () => {
       const data = ["A", "B", "C"];
-      let invocationCount = 0;
-      const validatingProjector = (datum: any, index: number, passedDataset: Plottable.Dataset) => {
-        assert.strictEqual(datum, data[invocationCount], "projector was passed the correct datum");
-        assert.strictEqual(index, invocationCount, "projector was passed the correct index");
-        assert.strictEqual(passedDataset, dataset, "projector was passed the Drawer's dataset");
-        invocationCount++;
-        return datum;
-      };
-      const attrToProjector: Plottable.AttributeToProjector = {};
       const propertyName = "property";
-      attrToProjector[propertyName] = validatingProjector;
-      const drawSteps = [
-        {
-          attrToProjector: attrToProjector,
-          animator: new Plottable.Animators.Null()
-        }
-      ];
-      drawer.renderArea(svg);
-      drawer.draw(data, drawSteps);
+      let svg: d3.Selection<void>;
 
-      const drawn = svg.selectAll(MockDrawer.ELEMENT_NAME);
-      assert.strictEqual(drawn.size(), data.length, "created one element per datum");
-      drawn.each(function(datum, index) {
-        const element = d3.select(this);
-        assert.strictEqual(element.attr(propertyName), data[index], "property was set correctly");
+      beforeEach(() => {
+        svg = TestMethods.generateSVG();
+        let invocationCount = 0;
+        const validatingProjector = (datum: any, index: number, passedDataset: Plottable.Dataset) => {
+          assert.strictEqual(datum, data[invocationCount], "projector was passed the correct datum");
+          assert.strictEqual(index, invocationCount, "projector was passed the correct index");
+          assert.strictEqual(passedDataset, dataset, "projector was passed the Drawer's dataset");
+          invocationCount++;
+          return datum;
+        };
+        const attrToProjector: Plottable.AttributeToProjector = {};
+        attrToProjector[propertyName] = validatingProjector;
+        const drawSteps = [
+          {
+            attrToProjector: attrToProjector,
+            animator: new Plottable.Animators.Null()
+          }
+        ];
+        drawer.renderArea(svg);
+        drawer.draw(data, drawSteps);
       });
-      svg.remove();
-    });
 
-    it("can retrieve a selection containing elements it drew", () => {
-      const svg = TestMethods.generateSVG();
-      const data = ["A", "B", "C"];
-      const attrToProjector: Plottable.AttributeToProjector = {};
-      const drawSteps = [
-        {
-          attrToProjector: attrToProjector,
-          animator: new Plottable.Animators.Null()
+      afterEach(function() {
+        if (this.currentTest.state === "passed") {
+          svg.remove();
         }
-      ];
-      drawer.renderArea(svg);
-      drawer.draw(data, drawSteps);
-
-      const selection = drawer.selection();
-      assert.strictEqual(selection.size(), data.length, "retrieved one element per datum");
-      const drawn = svg.selectAll(MockDrawer.ELEMENT_NAME);
-      assert.deepEqual(selection[0], drawn[0], "retrieved all elements it drew");
-      svg.remove();
-    });
-
-    it("can retrieve the selection for a particular index", () => {
-      const svg = TestMethods.generateSVG();
-      const data = ["A", "B", "C"];
-      const attrToProjector: Plottable.AttributeToProjector = {};
-      const drawSteps = [
-        {
-          attrToProjector: attrToProjector,
-          animator: new Plottable.Animators.Null()
-        }
-      ];
-      drawer.renderArea(svg);
-      drawer.draw(data, drawSteps);
-
-      const selections = drawer.selection();
-      data.forEach((datum, index) => {
-        const selectionForIndex = drawer.selectionForIndex(index);
-        assert.strictEqual(selectionForIndex.node(), selections[0][index], `retrieves the correct selection for index ${index}`);
       });
-      svg.remove();
+
+      it("draws elements accoding to a specified DrawStep", () => {
+        const drawn = svg.selectAll(MockDrawer.ELEMENT_NAME);
+        assert.strictEqual(drawn.size(), data.length, "created one element per datum");
+        drawn.each(function(datum, index) {
+          const element = d3.select(this);
+          assert.strictEqual(element.attr(propertyName), data[index], "property was set correctly");
+        });
+      });
+
+      it("can retrieve a selection containing elements it drew", () => {
+        const selection = drawer.selection();
+        assert.strictEqual(selection.size(), data.length, "retrieved one element per datum");
+        const drawn = svg.selectAll(MockDrawer.ELEMENT_NAME);
+        assert.deepEqual(selection[0], drawn[0], "retrieved all elements it drew");
+      });
+
+      it("can retrieve the selection for a particular index", () => {
+        const selection = drawer.selection();
+        data.forEach((datum, index) => {
+          const selectionForIndex = drawer.selectionForIndex(index);
+          assert.strictEqual(selectionForIndex.node(), selection[0][index], `retrieves the correct selection for index ${index}`);
+        });
+      });
     });
 
     describe("animation timings", () => {
