@@ -1,25 +1,5 @@
 ///<reference path="../testReference.ts" />
 
-class MockAnimator implements Plottable.Animator {
-  private _time: number;
-  private _callback: Function;
-  constructor(time: number, callback?: Function) {
-    this._time = time;
-    this._callback = callback;
-  }
-
-  public totalTime(numberOfIterations: number) {
-    return this._time;
-  }
-
-  public animate(selection: any, attrToProjector: Plottable.AttributeToProjector): any {
-    if (this._callback) {
-      this._callback();
-    }
-    return selection;
-  }
-}
-
 function createMockDrawer(dataset: Plottable.Dataset) {
   let drawer = new Plottable.Drawer(dataset);
   (<any> drawer)._svgElementName = "circle";
@@ -154,69 +134,89 @@ describe("Drawers", () => {
       });
       svg.remove();
     });
-  });
 
-  describe("Abstract Drawer", () => {
-    let oldTimeout: any;
-    let timings: number[] = [];
-    let svg: d3.Selection<void>;
-    let drawer: Plottable.Drawer;
-    before(() => {
-      oldTimeout = Plottable.Utils.Window.setTimeout;
-      Plottable.Utils.Window.setTimeout = function(f: Function, time: number, ...args: any[]) {
-        timings.push(time);
-        return oldTimeout(f, time, args);
-      };
-    });
+    describe("animation timings", () => {
+      class MockAnimator implements Plottable.Animator {
+        private _time: number;
+        private _callback: Function;
 
-    after(() => {
-      Plottable.Utils.Window.setTimeout = oldTimeout;
-    });
+        constructor(time: number, callback?: Function) {
+          this._time = time;
+          this._callback = callback;
+        }
 
-    beforeEach(() => {
-      timings = [];
-      svg = TestMethods.generateSVG();
-      drawer = createMockDrawer(null);
-      drawer.renderArea(svg);
-    });
+        public totalTime(numberOfIterations: number) {
+          return this._time;
+        }
 
-    afterEach(() => {
-      svg.remove(); // no point keeping it around since we don't draw anything in it anyway
-    });
+        public animate(selection: any, attrToProjector: Plottable.AttributeToProjector): any {
+          if (this._callback) {
+            this._callback();
+          }
+          return selection;
+        }
+      }
 
-    it("drawer timing works as expected for null animators", () => {
-      let a1 = new Plottable.Animators.Null();
-      let a2 = new Plottable.Animators.Null();
-      let ds1: Plottable.Drawers.DrawStep = {attrToProjector: {}, animator: a1};
-      let ds2: Plottable.Drawers.DrawStep = {attrToProjector: {}, animator: a2};
-      let steps = [ds1, ds2];
-      drawer.draw([], steps);
-      assert.deepEqual(timings, [0, 0], "setTimeout called twice with 0 time both times");
-    });
+      let oldTimeout: any;
+      let timings: number[] = [];
+      let svg: d3.Selection<void>;
 
-    it("drawer timing works for non-null animators", (done) => {
-      let callback1Called = false;
-      let callback2Called = false;
-      let callback1 = () => {
-        callback1Called = true;
-      };
-      let callback2 = () => {
-        assert.isTrue(callback1Called, "callback2 called after callback 1");
-        callback2Called = true;
-      };
-      let callback3 = () => {
-        assert.isTrue(callback2Called, "callback3 called after callback 2");
-        done();
-      };
-      let a1 = new MockAnimator(20, callback1);
-      let a2 = new MockAnimator(10, callback2);
-      let a3 = new MockAnimator(0, callback3);
-      let ds1: Plottable.Drawers.DrawStep = {attrToProjector: {}, animator: a1};
-      let ds2: Plottable.Drawers.DrawStep = {attrToProjector: {}, animator: a2};
-      let ds3: Plottable.Drawers.DrawStep = {attrToProjector: {}, animator: a3};
-      let steps = [ds1, ds2, ds3];
-      drawer.draw([], steps);
-      assert.deepEqual(timings, [0, 20, 30], "setTimeout called with appropriate times");
+      before(() => {
+        oldTimeout = Plottable.Utils.Window.setTimeout;
+        Plottable.Utils.Window.setTimeout = function(f: Function, time: number, ...args: any[]) {
+          timings.push(time);
+          return oldTimeout(f, time, args);
+        };
+      });
+
+      after(() => {
+        Plottable.Utils.Window.setTimeout = oldTimeout;
+      });
+
+      beforeEach(() => {
+        timings = [];
+        svg = TestMethods.generateSVG();
+        drawer.renderArea(svg);
+      });
+
+      afterEach(() => {
+        svg.remove(); // no point keeping it around since we don't draw anything in it anyway
+      });
+
+      it("drawer timing works as expected for null animators", () => {
+        const a1 = new Plottable.Animators.Null();
+        const a2 = new Plottable.Animators.Null();
+        const ds1: Plottable.Drawers.DrawStep = {attrToProjector: {}, animator: a1};
+        const ds2: Plottable.Drawers.DrawStep = {attrToProjector: {}, animator: a2};
+        const steps = [ds1, ds2];
+        drawer.draw([], steps);
+        assert.deepEqual(timings, [0, 0], "setTimeout called twice with 0 time both times");
+      });
+
+      it("drawer timing works for non-null animators", (done) => {
+        let callback1Called = false;
+        let callback2Called = false;
+        const callback1 = () => {
+          callback1Called = true;
+        };
+        const callback2 = () => {
+          assert.isTrue(callback1Called, "callback2 called after callback 1");
+          callback2Called = true;
+        };
+        const callback3 = () => {
+          assert.isTrue(callback2Called, "callback3 called after callback 2");
+          done();
+        };
+        const a1 = new MockAnimator(20, callback1);
+        const a2 = new MockAnimator(10, callback2);
+        const a3 = new MockAnimator(0, callback3);
+        const ds1: Plottable.Drawers.DrawStep = {attrToProjector: {}, animator: a1};
+        const ds2: Plottable.Drawers.DrawStep = {attrToProjector: {}, animator: a2};
+        const ds3: Plottable.Drawers.DrawStep = {attrToProjector: {}, animator: a3};
+        const steps = [ds1, ds2, ds3];
+        drawer.draw([], steps);
+        assert.deepEqual(timings, [0, 20, 30], "setTimeout called with appropriate times");
+      });
     });
   });
 });
