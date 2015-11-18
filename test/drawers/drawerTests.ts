@@ -36,26 +36,6 @@ describe("Drawers", () => {
       assert.isFalse(document.body.contains(<any> svg.node()), "renderArea was removed from the DOM");
     });
 
-    it("correctly computes the total draw time", () => {
-      function makeFixedTimeAnimator(totalTime: number) {
-        return <Plottable.Animator> {
-          animate: () => null,
-          totalTime: () => totalTime
-        };
-      }
-
-      const animationTimes = [10, 20];
-      const drawSteps = animationTimes.map((time) => {
-        return {
-          attrToProjector: <Plottable.AttributeToProjector> {},
-          animator: makeFixedTimeAnimator(time)
-        };
-      });
-      const totalTime = drawer.totalDrawTime([], drawSteps);
-      const expectedTotalTime = d3.sum(animationTimes);
-      assert.strictEqual(totalTime, expectedTotalTime, "returned the total time taken by all Animators");
-    });
-
     describe("drawing and retrieving elements", () => {
       const data = ["A", "B", "C"];
       const propertyName = "property";
@@ -160,6 +140,26 @@ describe("Drawers", () => {
 
       afterEach(() => {
         svg.remove(); // no point keeping it around since we don't draw anything in it anyway
+      });
+
+      it("correctly computes the total draw time", () => {
+        function makeFixedTimeAnimator(totalTime: number) {
+          return <Plottable.Animator> {
+            animate: () => null,
+            totalTime: () => totalTime
+          };
+        }
+
+        const animationTimes = [10, 20];
+        const drawSteps = animationTimes.map((time) => {
+          return {
+            attrToProjector: <Plottable.AttributeToProjector> {},
+            animator: makeFixedTimeAnimator(time)
+          };
+        });
+        const totalTime = drawer.totalDrawTime([], drawSteps);
+        const expectedTotalTime = d3.sum(animationTimes);
+        assert.strictEqual(totalTime, expectedTotalTime, "returned the total time taken by all Animators");
       });
 
       it("drawer timing works as expected for null animators", () => {
