@@ -27,6 +27,86 @@ function createMockDrawer(dataset: Plottable.Dataset) {
 }
 
 describe("Drawers", () => {
+  describe("Drawer", () => {
+    class MockDrawer extends Plottable.Drawer {
+      public static ELEMENT_NAME = "mock";
+
+      constructor(dataset: Plottable.Dataset) {
+        super(dataset);
+        this._svgElementName = MockDrawer.ELEMENT_NAME;
+      }
+    }
+
+   let drawer: MockDrawer;
+   let dataset: Plottable.Dataset;
+   beforeEach(() => {
+     dataset = new Plottable.Dataset();
+     drawer = new MockDrawer(dataset);
+   });
+
+    it("returns its element name as a selector", () => {
+      assert.strictEqual(drawer.selector(), MockDrawer.ELEMENT_NAME);
+    });
+
+    it("can set and get its renderArea", () => {
+      const svg = TestMethods.generateSVG();
+      assert.strictEqual(drawer.renderArea(svg), drawer, "setter mode returns the calling Drawer");
+      assert.strictEqual(drawer.renderArea(), svg, "getter mode returns the selection");
+      svg.remove();
+    });
+
+    it("can remove its renderArea", () => {
+      const svg = TestMethods.generateSVG();
+      drawer.renderArea(svg);
+      drawer.remove();
+      assert.isFalse(document.body.contains(<any> svg.node()), "renderArea was removed from the DOM");
+    });
+
+    it("draws elements accoding to a specified drawStep", () => {
+      const svg = TestMethods.generateSVG();
+      const data = ["A", "B", "C"];
+      const propertyName = "property";
+      const attrToProjector: Plottable.AttributeToProjector = {};
+      attrToProjector[propertyName] = (datum: any) => datum;
+      const drawSteps = [
+        {
+          attrToProjector: attrToProjector,
+          animator: new Plottable.Animators.Null()
+        }
+      ];
+      drawer.renderArea(svg);
+      drawer.draw(data, drawSteps);
+
+      const drawn = svg.selectAll(MockDrawer.ELEMENT_NAME);
+      assert.strictEqual(drawn.size(), data.length, "created one element per datum");
+      drawn.each(function(datum, index) {
+        const element = d3.select(this);
+        assert.strictEqual(element.attr(propertyName), data[index], "property was set correctly");
+      });
+      svg.remove();
+    });
+
+    it("can retrieve a selection containing elements it drew", () => {
+      const svg = TestMethods.generateSVG();
+      const data = ["A", "B", "C"];
+      const attrToProjector: Plottable.AttributeToProjector = {};
+      const drawSteps = [
+        {
+          attrToProjector: attrToProjector,
+          animator: new Plottable.Animators.Null()
+        }
+      ];
+      drawer.renderArea(svg);
+      drawer.draw(data, drawSteps);
+
+      const selection = drawer.selection();
+      assert.strictEqual(selection.size(), data.length, "retrieved one element per datum");
+      const drawn = svg.selectAll(MockDrawer.ELEMENT_NAME);
+      assert.deepEqual(selection[0], drawn[0], "retrieved all elements it drew");
+      svg.remove();
+    });
+  });
+
   describe("Abstract Drawer", () => {
     let oldTimeout: any;
     let timings: number[] = [];
@@ -131,7 +211,6 @@ describe("Drawers", () => {
       assert.strictEqual(drawTime, expectedAnimationDuration, "Total Draw time");
 
       svg.remove();
-
     });
   });
 });
