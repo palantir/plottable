@@ -2,26 +2,25 @@
 
 describe("Drawers", () => {
   describe("Line Drawer", () => {
-    it("selectionForIndex()", () => {
-      let svg = TestMethods.generateSVG(300, 300);
-      let data = [{a: 12, b: 10}, {a: 13, b: 24}, {a: 14, b: 21}, {a: 15, b: 14}];
-      let dataset = new Plottable.Dataset(data);
-      let xScale = new Plottable.Scales.Linear();
-      let yScale = new Plottable.Scales.Linear();
-      let linePlot = new Plottable.Plots.Line();
+    it("retrieves the same line regardless of requested selection index", () => {
+      const svg = TestMethods.generateSVG();
+      const drawer = new Plottable.Drawers.Line(null);
+      drawer.renderArea(svg);
 
-      let drawer = new Plottable.Drawers.Line(dataset);
-      (<any> linePlot)._createDrawer = () => drawer;
+      const data = [["A", "B", "C"]]; // line normally takes single array of data
+      const drawSteps: Plottable.Drawers.DrawStep[] = [
+        {
+          attrToProjector: {},
+          animator: new Plottable.Animators.Null()
+        }
+      ];
+      drawer.draw(data, drawSteps);
 
-      linePlot.addDataset(dataset);
-      linePlot.x((d: any) => d.a, xScale);
-      linePlot.y((d: any) => d.b, yScale);
-      linePlot.renderTo(svg);
-
-      let lineSelection = linePlot.selections();
-      data.forEach((datum: any, index: number) => {
-        let selection = drawer.selectionForIndex(index);
-        assert.strictEqual(selection.node(), lineSelection.node(), "line selection retrieved");
+      const expectedSelection = svg.selectAll("path");
+      data[0].forEach((datum, index) => {
+        const selectionForIndex = drawer.selectionForIndex(index);
+        assert.strictEqual(selectionForIndex.size(), 1, `selection for index ${index} contains only one element`);
+        assert.strictEqual(selectionForIndex.node(), expectedSelection.node(), `selection for index ${index} contains the correct element`);
       });
 
       svg.remove();
