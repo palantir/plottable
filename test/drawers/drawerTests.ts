@@ -4,10 +4,12 @@ describe("Drawers", () => {
   describe("Drawer", () => {
     class MockDrawer extends Plottable.Drawer {
       public static ELEMENT_NAME = "mock";
+      public static CSS_CLASS_NAME = "mock-css";
 
       constructor(dataset: Plottable.Dataset) {
         super(dataset);
         this._svgElementName = MockDrawer.ELEMENT_NAME;
+        this._className = MockDrawer.CSS_CLASS_NAME;
       }
     }
 
@@ -75,6 +77,7 @@ describe("Drawers", () => {
         drawn.each(function(datum, index) {
           const element = d3.select(this);
           assert.strictEqual(element.attr(propertyName), data[index], "property was set correctly");
+          assert.isTrue(element.classed(MockDrawer.CSS_CLASS_NAME), "element carries the correct CSS class");
         });
       });
 
