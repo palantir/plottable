@@ -2,8 +2,17 @@
 
 describe("Labels", () => {
   const LABEL_CLASS = "label";
+  let CLOSETO_REQUIRMENT;
+  before(() => {
+    CLOSETO_REQUIRMENT = window.Pixel_CloseTo_Requirement;
+    window.Pixel_CloseTo_Requirement = 2;
+  });
+  after(() => {
+    window.Pixel_CloseTo_Requirement = CLOSETO_REQUIRMENT;
+  });
 
   describe("Label", () => {
+
     describe("Basic Usage", () => {
       const BBOX_SELECTOR = ".bounding-box";
       let svg: d3.Selection<void>;
@@ -144,7 +153,6 @@ describe("Labels", () => {
 
     describe("Padding", () => {
       const PADDING = 30;
-      const CLOSETO_REQUIRMENT = 1;
       let svg: d3.Selection<void>;
       let label: Plottable.Components.Label;
 
@@ -157,7 +165,8 @@ describe("Labels", () => {
         label.xAlignment("left").renderTo(svg);
         const testTextRect = (<Element> label.content().select("text").node()).getBoundingClientRect();
         const elementRect = (<any> label)._element.node().getBoundingClientRect();
-        assert.closeTo(testTextRect.left, elementRect.left + PADDING, CLOSETO_REQUIRMENT, "left difference by padding amount");
+        assert.closeTo(testTextRect.left, elementRect.left + PADDING, window.Pixel_CloseTo_Requirement,
+          "left difference by padding amount");
 
         svg.remove();
       });
@@ -166,7 +175,8 @@ describe("Labels", () => {
         label.xAlignment("right").renderTo(svg);
         const testTextRect = (<Element> label.content().select("text").node()).getBoundingClientRect();
         const elementRect = (<any> label)._element.node().getBoundingClientRect();
-        assert.closeTo(testTextRect.right, elementRect.right - PADDING, CLOSETO_REQUIRMENT, "right difference by padding amount");
+        assert.closeTo(testTextRect.right, elementRect.right - PADDING, window.Pixel_CloseTo_Requirement,
+          "right difference by padding amount");
 
         svg.remove();
       });
@@ -175,7 +185,8 @@ describe("Labels", () => {
         label.yAlignment("top").renderTo(svg);
         const testTextRect = (<Element> label.content().select("text").node()).getBoundingClientRect();
         const elementRect = (<any> label)._element.node().getBoundingClientRect();
-        assert.closeTo(testTextRect.top, elementRect.top + PADDING, CLOSETO_REQUIRMENT, "top difference by padding amount");
+        assert.closeTo(testTextRect.top, elementRect.top + PADDING, window.Pixel_CloseTo_Requirement,
+          "top difference by padding amount");
 
         svg.remove();
       });
@@ -184,7 +195,8 @@ describe("Labels", () => {
         label.yAlignment("bottom").renderTo(svg);
         const testTextRect = (<Element> label.content().select("text").node()).getBoundingClientRect();
         const elementRect = (<any> label)._element.node().getBoundingClientRect();
-        assert.closeTo(testTextRect.bottom, elementRect.bottom - PADDING, CLOSETO_REQUIRMENT, "bottom difference by padding amount");
+        assert.closeTo(testTextRect.bottom, elementRect.bottom - PADDING, window.Pixel_CloseTo_Requirement,
+          "bottom difference by padding amount");
 
         svg.remove();
       });
