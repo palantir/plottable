@@ -1,11 +1,5 @@
 ///<reference path="../testReference.ts" />
 
-function createMockDrawer(dataset: Plottable.Dataset) {
-  let drawer = new Plottable.Drawer(dataset);
-  (<any> drawer)._svgElementName = "circle";
-  return drawer;
-}
-
 describe("Drawers", () => {
   describe("Drawer", () => {
     class MockDrawer extends Plottable.Drawer {
