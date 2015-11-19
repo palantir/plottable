@@ -2,6 +2,44 @@
 
 describe("Animators", () => {
   describe("EasingAnimator", () => {
+    describe("getters and setters", () => {
+      let animator: Plottable.Animators.Easing;
+
+      beforeEach(() => {
+        animator = new Plottable.Animators.Easing();
+      });
+
+      it("can get and set the start delay", () => {
+        const adjustedStartDelay = animator.startDelay() + 10;
+        assert.strictEqual(animator.startDelay(adjustedStartDelay), animator, "setter mode returns the Animator");
+        assert.strictEqual(animator.startDelay(), adjustedStartDelay, "retrieved the set value");
+      });
+
+      it("can get and set the step duration", () => {
+        const adjustedStepDuration = animator.stepDuration() + 10;
+        assert.strictEqual(animator.stepDuration(adjustedStepDuration), animator, "setter mode returns the Animator");
+        assert.strictEqual(animator.stepDuration(), adjustedStepDuration, "retrieved the set value");
+      });
+
+      it("can get and set the step delay", () => {
+        const adjustedStepDelay = animator.stepDelay() + 10;
+        assert.strictEqual(animator.stepDelay(adjustedStepDelay), animator, "setter mode returns the Animator");
+        assert.strictEqual(animator.stepDelay(), adjustedStepDelay, "retrieved the set value");
+      });
+
+      it("can get and set the max total duration", () => {
+        const setMaxTotalDuration = 10;
+        assert.strictEqual(animator.maxTotalDuration(setMaxTotalDuration), animator, "setter mode returns the Animator");
+        assert.strictEqual(animator.maxTotalDuration(), setMaxTotalDuration, "retrieved the set value");
+      });
+
+      it("can get and set the easing mode", () => {
+        const setEasingMode = "test-easing";
+        assert.strictEqual(animator.easingMode(setEasingMode), animator, "setter mode returns the Animator");
+        assert.strictEqual(animator.easingMode(), setEasingMode, "retrieved the set value");
+      });
+    });
+
     describe("Time computations", () => {
 
       it("totalTime() defaults", () => {
