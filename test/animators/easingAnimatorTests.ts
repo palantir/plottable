@@ -2,12 +2,13 @@
 
 describe("Animators", () => {
   describe("EasingAnimator", () => {
-    describe("getters and setters", () => {
-      let animator: Plottable.Animators.Easing;
+    let animator: Plottable.Animators.Easing;
 
-      beforeEach(() => {
-        animator = new Plottable.Animators.Easing();
-      });
+    beforeEach(() => {
+      animator = new Plottable.Animators.Easing();
+    });
+
+    describe("getters and setters", () => {
 
       it("can get and set the start delay", () => {
         const adjustedStartDelay = animator.startDelay() + 10;
@@ -42,11 +43,6 @@ describe("Animators", () => {
 
     describe("total time", () => {
       const NUM_STEPS = 10;
-      let animator: Plottable.Animators.Easing;
-
-      beforeEach(() => {
-        animator = new Plottable.Animators.Easing();
-      });
 
       it("includes start delay in the total time", () => {
         const startDelay = 123;
@@ -87,7 +83,6 @@ describe("Animators", () => {
         const stepDelay = 1000;
         const expectedTotalTime = 2000;
 
-        const animator = new Plottable.Animators.Easing();
         animator.startDelay(startDelay);
         animator.stepDuration(stepDuration);
         animator.stepDelay(stepDelay);
@@ -105,7 +100,6 @@ describe("Animators", () => {
         const stepDelay = 100;
         const expectedTotalTime = 2000;
 
-        const animator = new Plottable.Animators.Easing();
         animator.startDelay(startDelay);
         animator.stepDuration(stepDuration);
         animator.stepDelay(stepDelay);
@@ -125,7 +119,6 @@ describe("Animators", () => {
 
         const expectedTotalTime = 200;
 
-        const animator = new Plottable.Animators.Easing();
         animator.startDelay(startDelay);
         animator.stepDuration(stepDuration);
         animator.stepDelay(stepDelay);
@@ -143,7 +136,6 @@ describe("Animators", () => {
         const stepDelay = 1000000;
         const maxTotalDuration = 1500;
 
-        const animator = new Plottable.Animators.Easing();
         animator.startDelay(startDelay);
         animator.stepDuration(stepDuration);
         animator.stepDelay(stepDelay);
