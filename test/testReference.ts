@@ -14,6 +14,7 @@
 ///<reference path="drawers/drawerTests.ts" />
 ///<reference path="drawers/lineDrawerTests.ts" />
 
+///<reference path="animators/nullAnimatorTests.ts" />
 ///<reference path="animators/easingAnimatorTests.ts" />
 
 ///<reference path="axes/axisTests.ts" />
