@@ -23,7 +23,7 @@ describe("Plots", () => {
         clusterBarPlot.renderTo(svg);
       });
 
-      it(`renders correctly with correcly width, height and position`, () => {
+      it(`renders with correct width, height and position`, () => {
         linearScale.domain([0, 2]);
 
         const dataset1 = new Plottable.Dataset([
@@ -71,7 +71,7 @@ describe("Plots", () => {
         svg.remove();
       });
 
-      it("renders correcly with missing values", () => {
+      it("renders correctly with missing values", () => {
         clusterBarPlot.addDataset(new Plottable.Dataset([
           {category: "A", num: 1},
           {category: "B", num: 2},
