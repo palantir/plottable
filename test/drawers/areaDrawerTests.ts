@@ -1,14 +1,14 @@
 ///<reference path="../testReference.ts" />
 
 describe("Drawers", () => {
-  describe("Line Drawer", () => {
-    const data = [["A", "B", "C"]]; // line normally takes single array of data
+  describe("Area Drawer", () => {
+    const data = [["A", "B", "C"]]; // area normally takes single array of data
     let svg: d3.Selection<void>;
-    let drawer: Plottable.Drawers.Line;
+    let drawer: Plottable.Drawers.Area;
 
     beforeEach(() => {
       svg = TestMethods.generateSVG();
-      drawer = new Plottable.Drawers.Line(null);
+      drawer = new Plottable.Drawers.Area(null);
       drawer.renderArea(svg);
 
       const drawSteps: Plottable.Drawers.DrawStep[] = [
@@ -26,8 +26,8 @@ describe("Drawers", () => {
       }
     });
 
-    it("has a fill of \"none\"", () => {
-      assert.strictEqual(drawer.selection().style("fill"), "none");
+    it("has a stroke of \"none\"", () => {
+      assert.strictEqual(drawer.selection().style("stroke"), "none");
     });
 
     it("retrieves the same path regardless of requested selection index", () => {
