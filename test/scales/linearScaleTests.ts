@@ -349,6 +349,12 @@ describe("Scales", () => {
     });
 
     describe("Plot interaction", () => {
+      function createMockDrawer(dataset: Plottable.Dataset) {
+        let drawer = new Plottable.Drawer(dataset);
+        (<any> drawer)._svgElementName = "mock";
+        return drawer;
+      }
+
       let data: any[];
       let dataset: Plottable.Dataset;
       let scale: Plottable.Scales.Linear;
