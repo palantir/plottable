@@ -136,40 +136,6 @@ describe("Animators", () => {
           "The total duration constraint is just an upper bound");
       });
 
-      it("maxTotalDuration() edge case for 1 step", () => {
-        const iterationSteps = 1;
-        const startDelay = 0;
-        const stepDuration = 333;
-        const stepDelay = 432;
-
-        const animator = new Plottable.Animators.Easing();
-        animator.startDelay(startDelay);
-        animator.stepDuration(stepDuration);
-        animator.stepDelay(stepDelay);
-
-        const actualTotalTime = animator.totalTime(iterationSteps);
-        assert.strictEqual(actualTotalTime, stepDuration,
-          "The total time is just the time for one step");
-      });
-
-      it("maxTotalDuration() edge case for 1 step and startDelay", () => {
-        const iterationSteps = 1;
-        const startDelay = 213;
-        const stepDuration = 333;
-        const stepDelay = 432;
-
-        const expectedTotalTime = startDelay + stepDuration;
-
-        const animator = new Plottable.Animators.Easing();
-        animator.startDelay(startDelay);
-        animator.stepDuration(stepDuration);
-        animator.stepDelay(stepDelay);
-
-        const actualTotalTime = animator.totalTime(iterationSteps);
-        assert.strictEqual(actualTotalTime, expectedTotalTime,
-          "Total time is the time for one step, plus waiting for the start delay");
-      });
-
       it("_getAdjustedIterativeDelay() works with maxTotalDuration constraint", () => {
         const iterationSteps = 2;
         const startDelay = 0;
