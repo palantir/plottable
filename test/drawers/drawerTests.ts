@@ -120,7 +120,7 @@ describe("Drawers", () => {
       }
 
       let oldTimeout: any;
-      let timings: number[] = [];
+      let timings: number[];
       let svg: d3.Selection<void>;
 
       before(() => {
@@ -167,7 +167,7 @@ describe("Drawers", () => {
         assert.strictEqual(totalTime, expectedTotalTime, "returned the total time taken by all Animators");
       });
 
-      it("drawer timing works as expected for null animators", () => {
+      it("computes the correct timings for Null Animators", () => {
         const a1 = new Plottable.Animators.Null();
         const a2 = new Plottable.Animators.Null();
         const ds1: Plottable.Drawers.DrawStep = {attrToProjector: {}, animator: a1};
@@ -177,29 +177,37 @@ describe("Drawers", () => {
         assert.deepEqual(timings, [0, 0], "setTimeout called twice with 0 time both times");
       });
 
-      it("drawer timing works for non-null animators", (done) => {
+      it("computes the correct timings for non-Null Animators", (done) => {
         let callback1Called = false;
-        let callback2Called = false;
         const callback1 = () => {
           callback1Called = true;
         };
+        const animator1Time = 20;
+        const a1 = new MockAnimator(animator1Time, callback1);
+        const ds1: Plottable.Drawers.DrawStep = {attrToProjector: {}, animator: a1};
+
+        let callback2Called = false;
         const callback2 = () => {
           assert.isTrue(callback1Called, "callback2 called after callback 1");
           callback2Called = true;
         };
+        const animator2Time = 10;
+        const a2 = new MockAnimator(animator2Time, callback2);
+        const ds2: Plottable.Drawers.DrawStep = {attrToProjector: {}, animator: a2};
+
         const callback3 = () => {
           assert.isTrue(callback2Called, "callback3 called after callback 2");
           done();
         };
-        const a1 = new MockAnimator(20, callback1);
-        const a2 = new MockAnimator(10, callback2);
-        const a3 = new MockAnimator(0, callback3);
-        const ds1: Plottable.Drawers.DrawStep = {attrToProjector: {}, animator: a1};
-        const ds2: Plottable.Drawers.DrawStep = {attrToProjector: {}, animator: a2};
+        const animator3Time = 0;
+        const a3 = new MockAnimator(animator3Time, callback3);
         const ds3: Plottable.Drawers.DrawStep = {attrToProjector: {}, animator: a3};
+
         const steps = [ds1, ds2, ds3];
         drawer.draw([], steps);
-        assert.deepEqual(timings, [0, 20, 30], "setTimeout called with appropriate times");
+
+        const expectedTimings = [0, animator1Time, animator1Time + animator2Time];
+        assert.deepEqual(timings, expectedTimings, "setTimeout called with appropriate times");
       });
     });
   });
