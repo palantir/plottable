@@ -248,11 +248,10 @@ describe("Interactions", () => {
         callbackCalled = false;
         TestMethods.triggerFakeMouseEvent("mousemove", eventTarget, SVG_WIDTH * 2, SVG_HEIGHT * 2);
         TestMethods.triggerFakeMouseEvent("mousemove", overlay, SVG_WIDTH / 4, SVG_HEIGHT / 4);
-        assert.isTrue(callbackCalled, "called when moving inside overlay (mouse)");
+        assert.isFalse(callbackCalled, "callback not called when moving inside overlay (mouse)");
 
-        callbackCalled = false;
         TestMethods.triggerFakeMouseEvent("mousemove", eventTarget, SVG_WIDTH / 4, SVG_HEIGHT / 4);
-        assert.isFalse(callbackCalled, "callback not called on entering Component from overlay (mouse)");
+        assert.isTrue(callbackCalled, "callback called on entering Component from overlay (mouse)");
 
         pointerInteraction.offPointerEnter(callback);
         svg.remove();
@@ -268,11 +267,10 @@ describe("Interactions", () => {
         callbackCalled = false;
         TestMethods.triggerFakeTouchEvent("touchstart", eventTarget, [{x: SVG_WIDTH * 2, y: SVG_HEIGHT * 2}]);
         TestMethods.triggerFakeTouchEvent("touchstart", overlay, [{x: SVG_WIDTH / 4, y: SVG_HEIGHT / 4}]);
-        assert.isTrue(callbackCalled, "called when moving to overlay (touch)");
+        assert.isFalse(callbackCalled, "callback not called when moving to overlay (touch)");
 
-        callbackCalled = false;
         TestMethods.triggerFakeTouchEvent("touchstart", eventTarget, [{x: SVG_WIDTH / 4, y: SVG_HEIGHT / 4}]);
-        assert.isFalse(callbackCalled, "callback not called on entering Component from overlay (touch)");
+        assert.isTrue(callbackCalled, "callback called on entering Component from overlay (touch)");
 
         pointerInteraction.offPointerEnter(callback);
         svg.remove();
@@ -287,7 +285,7 @@ describe("Interactions", () => {
 
         callbackCalled = false;
         TestMethods.triggerFakeMouseEvent("mousemove", overlay, SVG_WIDTH / 4, SVG_HEIGHT / 4);
-        assert.isTrue(callbackCalled, "called on moving inside overlay (mouse)");
+        assert.isFalse(callbackCalled, "callback not called on moving inside overlay (mouse)");
 
         pointerInteraction.offPointerMove(callback);
         svg.remove();
@@ -302,14 +300,14 @@ describe("Interactions", () => {
 
         callbackCalled = false;
         TestMethods.triggerFakeTouchEvent("touchstart", overlay, [{x: SVG_WIDTH / 4, y: SVG_HEIGHT / 4}]);
-        assert.isTrue(callbackCalled, "called on moving inside overlay (touch)");
+        assert.isFalse(callbackCalled, "callback not called on moving inside overlay (touch)");
 
         pointerInteraction.offPointerMove(callback);
         svg.remove();
         overlay.remove();
       });
 
-      it("does not the onPointerExit callback moving into overlay with mouse", () => {
+      it("calls the onPointerExit callback moving into overlay with mouse", () => {
         pointerInteraction.onPointerExit(callback);
 
         TestMethods.triggerFakeMouseEvent("mousemove", eventTarget, SVG_WIDTH / 4, SVG_HEIGHT / 4);
@@ -328,15 +326,19 @@ describe("Interactions", () => {
         overlay.remove();
       });
 
-      it("does not the onPointerExit callback moving into overlay with touch", () => {
+      it("calls the onPointerExit callback moving into overlay with touch", () => {
         pointerInteraction.onPointerExit(callback);
 
         TestMethods.triggerFakeTouchEvent("touchstart", eventTarget, [{x: SVG_WIDTH / 4, y: SVG_HEIGHT / 4}]);
         TestMethods.triggerFakeTouchEvent("touchstart", overlay, [{x: SVG_WIDTH / 4, y: SVG_HEIGHT / 4}]);
-        assert.isFalse(callbackCalled, "callback not called on moving inside overlay (touch)");
+        assert.isTrue(callbackCalled, "callback called on moving inside overlay (touch)");
 
+        callbackCalled = false;
         TestMethods.triggerFakeTouchEvent("touchstart", eventTarget, [{x: 2 * SVG_WIDTH, y: 2 * SVG_HEIGHT}]);
-        assert.isTrue(callbackCalled, "callback called moving from overlay to outside of Component (touch)");
+        assert.isFalse(callbackCalled, "callback not called moving from overlay to outside of Component (touch)");
+
+        TestMethods.triggerFakeTouchEvent("touchstart", overlay, [{x: SVG_WIDTH / 4, y: SVG_HEIGHT / 4}]);
+        assert.isFalse(callbackCalled, "callback not called moving from outside of Component into overlay (touch)");
 
         pointerInteraction.offPointerExit(callback);
         svg.remove();
