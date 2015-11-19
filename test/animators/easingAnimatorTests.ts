@@ -40,38 +40,46 @@ describe("Animators", () => {
       });
     });
 
-    describe("Time computations", () => {
-      it("totalTime() defaults", () => {
-        const iterationSteps = 10;
-        const startDelay = 0;
-        const stepDuration = 300;
-        const stepDelay = 15;
-        const expectedTotalTime = startDelay + (iterationSteps - 1) * stepDelay + stepDuration;
+    describe("total time", () => {
+      const NUM_STEPS = 10;
+      let animator: Plottable.Animators.Easing;
 
-        const animator = new Plottable.Animators.Easing();
-        const actualTotalTime = animator.totalTime(iterationSteps);
-
-        assert.strictEqual(actualTotalTime, expectedTotalTime,
-          "Formula for calculating total time should work");
+      beforeEach(() => {
+        animator = new Plottable.Animators.Easing();
       });
 
-      it("totalTime() takes setters into account", () => {
-        const iterationSteps = 17;
-        const startDelay = 135;
-        const stepDuration = 453;
-        const stepDelay = 265;
-        const expectedTotalTime = startDelay + (iterationSteps - 1) * stepDelay + stepDuration;
-
-        const animator = new Plottable.Animators.Easing();
+      it("includes start delay in the total time", () => {
+        const startDelay = 123;
         animator.startDelay(startDelay);
-        animator.stepDuration(stepDuration);
-        animator.stepDelay(stepDelay);
+        animator.stepDelay(0);
+        animator.stepDuration(0);
 
-        const actualTotalTime = animator.totalTime(iterationSteps);
-        assert.strictEqual(actualTotalTime, expectedTotalTime,
-          "Setters should work");
+        const expectedTotalTime = startDelay;
+        assert.strictEqual(animator.totalTime(NUM_STEPS), expectedTotalTime, "total time includes start delay (when other values are 0)");
       });
 
+      it("includes step delay in the total time", () => {
+        animator.startDelay(0);
+        const stepDelay = 123;
+        animator.stepDelay(stepDelay);
+        animator.stepDuration(0);
+
+        const expectedTotalTime = (NUM_STEPS - 1) * stepDelay;
+        assert.strictEqual(animator.totalTime(NUM_STEPS), expectedTotalTime, "total time increased by each delay between steps");
+      });
+
+      it("includes step duration in the total time", () => {
+        animator.startDelay(0);
+        animator.stepDelay(0);
+        const stepDuration = 123;
+        animator.stepDuration(stepDuration);
+
+        const expectedTotalTime = stepDuration;
+        assert.strictEqual(animator.totalTime(NUM_STEPS), expectedTotalTime, "total time increased by one step duration");
+      });
+    });
+
+    describe("max total duration", () => {
       it("maxTotalDuration() with many steps", () => {
         const iterationSteps = 10000;
         const startDelay = 0;
