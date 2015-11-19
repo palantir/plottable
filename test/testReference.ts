@@ -13,6 +13,7 @@
 
 ///<reference path="drawers/drawerTests.ts" />
 ///<reference path="drawers/arcDrawerTests.ts" />
+///<reference path="drawers/arcOutlineDrawerTests.ts" />
 ///<reference path="drawers/areaDrawerTests.ts" />
 ///<reference path="drawers/lineDrawerTests.ts" />
 

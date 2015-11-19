@@ -1,13 +1,13 @@
 ///<reference path="../testReference.ts" />
 
 describe("Drawers", () => {
-  describe("Arc Drawer", () => {
-    it("has a stroke of \"none\"", () => {
-      const drawer = new Plottable.Drawers.Arc(null);
+  describe("Arc Outline Drawer", () => {
+    it("has a fill of \"none\"", () => {
+      const drawer = new Plottable.Drawers.ArcOutline(null);
       const svg = TestMethods.generateSVG();
       drawer.renderArea(svg);
 
-      const data = [["A", "B", "C"]]; // arc normally takes single array of data
+      const data = [["A", "B", "C"]]; // arc outline normally takes single array of data
       const drawSteps: Plottable.Drawers.DrawStep[] = [
         {
           attrToProjector: {},
@@ -16,7 +16,7 @@ describe("Drawers", () => {
       ];
       drawer.draw(data, drawSteps);
 
-      assert.strictEqual(drawer.selection().style("stroke"), "none");
+      assert.strictEqual(drawer.selection().style("fill"), "none");
 
       svg.remove();
     });
