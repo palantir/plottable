@@ -34,33 +34,33 @@ describe("Interactions", () => {
       TestMethods.triggerFakeInteractionEvent(mode, type, target, p.x, p.y);
     }
 
-    describe("Basic usage", () => {
+    [TestMethods.InteractionMode.Mouse, TestMethods.InteractionMode.Touch].forEach((mode) => {
+      describe(`Listening to ${MODE_NAME[mode]} events`, () => {
 
-      let svg: d3.Selection<void>;
-      let pointerInteraction: Plottable.Interactions.Pointer;
-      let eventTarget: d3.Selection<void>;
-      let callback: PointerTestCallback;
+        let svg: d3.Selection<void>;
+        let pointerInteraction: Plottable.Interactions.Pointer;
+        let eventTarget: d3.Selection<void>;
+        let callback: PointerTestCallback;
 
-      beforeEach(() => {
-        svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+        beforeEach(() => {
+          svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
 
-        const component = new Plottable.Component();
-        component.renderTo(svg);
-        eventTarget = component.background();
+          const component = new Plottable.Component();
+          component.renderTo(svg);
+          eventTarget = component.background();
 
-        pointerInteraction = new Plottable.Interactions.Pointer();
-        pointerInteraction.attachTo(component);
-        callback = makePointerCallback();
-      });
+          pointerInteraction = new Plottable.Interactions.Pointer();
+          pointerInteraction.attachTo(component);
+          callback = makePointerCallback();
+        });
 
-      afterEach(function() {
-        if (this.currentTest.state === "passed") {
-          svg.remove();
-        }
-      });
+        afterEach(function() {
+          if (this.currentTest.state === "passed") {
+            svg.remove();
+          }
+        });
 
-      [TestMethods.InteractionMode.Mouse, TestMethods.InteractionMode.Touch].forEach((mode) => {
-        it(`calls the onPointerEnter callback with ${MODE_NAME[mode]}`, () => {
+        it("calls the onPointerEnter callback", () => {
           pointerInteraction.onPointerEnter(callback);
 
           triggerPointerEvent(HALF_POINT, mode, eventTarget);
@@ -79,7 +79,7 @@ describe("Interactions", () => {
           assert.isFalse(callback.called, `callback not called after disconnecting (${MODE_NAME[mode]})`);
         });
 
-        it(`calls the onPointerMove callback with ${MODE_NAME[mode]}`, () => {
+        it("calls the onPointerMove callback", () => {
           pointerInteraction.onPointerMove(callback);
 
           triggerPointerEvent(HALF_POINT, mode, eventTarget);
@@ -100,7 +100,7 @@ describe("Interactions", () => {
           assert.isFalse(callback.called, `callback not called after disconnecting (${MODE_NAME[mode]})`);
         });
 
-        it(`calls the onPointerExit callback with ${MODE_NAME[mode]}`, () => {
+        it("calls the onPointerExit callback", () => {
           pointerInteraction.onPointerExit(callback);
 
           triggerPointerEvent(OUTSIDE_POINT, mode, eventTarget);
@@ -121,7 +121,7 @@ describe("Interactions", () => {
           assert.isFalse(callback.called, `callback not called after disconnecting (${MODE_NAME[mode]})`);
         });
 
-        it(`can register two callbacks for the same pointer event with ${MODE_NAME[mode]}`, () => {
+        it("can register two callbacks for the same pointer event", () => {
           const callback2 = makePointerCallback();
 
           pointerInteraction.onPointerEnter(callback);
@@ -146,47 +146,45 @@ describe("Interactions", () => {
           svg.remove();
         });
       });
-    });
 
-    describe("Interactions under overlay", () => {
-      let svg: d3.Selection<void>;
-      let pointerInteraction: Plottable.Interactions.Pointer;
-      let eventTarget: d3.Selection<void>;
+      describe(`Interactions under overlay for ${MODE_NAME[mode]} events`, () => {
+        let svg: d3.Selection<void>;
+        let pointerInteraction: Plottable.Interactions.Pointer;
+        let eventTarget: d3.Selection<void>;
 
-      let callback: PointerTestCallback;
-      let overlay: d3.Selection<void>;
+        let callback: PointerTestCallback;
+        let overlay: d3.Selection<void>;
 
-      beforeEach(() => {
-        svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
-        overlay = TestMethods.getSVGParent().append("div").style({
-          height: `${SVG_HEIGHT}px`,
-          width: `${SVG_WIDTH}px`,
-          position: "relative",
-          top: `-${SVG_HEIGHT / 2}px`,
-          left: `${SVG_WIDTH / 2}px`,
-          background: "black"
+        beforeEach(() => {
+          svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+          overlay = TestMethods.getSVGParent().append("div").style({
+            height: `${SVG_HEIGHT}px`,
+            width: `${SVG_WIDTH}px`,
+            position: "relative",
+            top: `-${SVG_HEIGHT / 2}px`,
+            left: `${SVG_WIDTH / 2}px`,
+            background: "black"
+          });
+
+          const component = new Plottable.Component();
+          component.renderTo(svg);
+          eventTarget = component.background();
+
+          pointerInteraction = new Plottable.Interactions.Pointer();
+          pointerInteraction.attachTo(component);
+
+          eventTarget = component.background();
+
+          callback = makePointerCallback();
+        });
+        afterEach(function() {
+          if (this.currentTest.state === "passed") {
+            svg.remove();
+            overlay.remove();
+          }
         });
 
-        const component = new Plottable.Component();
-        component.renderTo(svg);
-        eventTarget = component.background();
-
-        pointerInteraction = new Plottable.Interactions.Pointer();
-        pointerInteraction.attachTo(component);
-
-        eventTarget = component.background();
-
-        callback = makePointerCallback();
-      });
-      afterEach(function() {
-        if (this.currentTest.state === "passed") {
-          svg.remove();
-          overlay.remove();
-        }
-      });
-
-      [TestMethods.InteractionMode.Mouse, TestMethods.InteractionMode.Touch].forEach((mode) => {
-        it(`does not call the onPointerEnter moving from within overlay with ${MODE_NAME[mode]}`, () => {
+        it("does not call the onPointerEnter moving from within overlay", () => {
           pointerInteraction.onPointerEnter(callback);
 
           triggerPointerEvent(QUARTER_POINT, mode, eventTarget);
@@ -202,7 +200,7 @@ describe("Interactions", () => {
           assert.isFalse(callback.called, `callback not called on entering Component from overlay (${MODE_NAME[mode]})`);
         });
 
-        it(`calls the onPointerMove callback under overlay with ${MODE_NAME[mode]}`, () => {
+        it("calls the onPointerMove callback under overlay", () => {
           pointerInteraction.onPointerMove(callback);
 
           triggerPointerEvent(QUARTER_POINT, mode, eventTarget);
@@ -213,7 +211,7 @@ describe("Interactions", () => {
           assert.isTrue(callback.called, `called on moving inside overlay (${MODE_NAME[mode]})`);
         });
 
-        it(`does not the onPointerExit callback moving into overlay with ${MODE_NAME[mode]}`, () => {
+        it("does not the onPointerExit callback moving into overlay", () => {
           pointerInteraction.onPointerExit(callback);
 
           triggerPointerEvent(QUARTER_POINT, mode, eventTarget);
