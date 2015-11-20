@@ -48,7 +48,6 @@
 ///<reference path="plots/clusteredBarPlotTests.ts" />
 ///<reference path="plots/segmentPlotTests.ts" />
 ///<reference path="plots/waterfallPlotTests.ts" />
-///<reference path="plots/wheelPlotTests.ts" />
 
 ///<reference path="core/metadataTests.ts" />
 ///<reference path="core/renderControllerTests.ts" />
