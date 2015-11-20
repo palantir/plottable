@@ -101,14 +101,14 @@ describe("Animators", () => {
         animator.stepDelay(2 * ORIGINAL_STEP_DELAY);
         const longerStepDelayTotalTime = animator.totalTime(NUM_STEPS);
         assert.closeTo(longerStepDelayTotalTime, totalTimeLimit, EPSILON,
-          "adding more steps does not increase the total time past the limit");
+          "increasing step delay does not increase the total time past the limit");
       });
 
       it("restricts the total time when the step duration increases", () => {
         animator.stepDuration(2 * ORIGINAL_STEP_DURATION);
         const longerStepDurationTotalTime = animator.totalTime(NUM_STEPS);
         assert.closeTo(longerStepDurationTotalTime, totalTimeLimit, EPSILON,
-          "adding more steps does not increase the total time past the limit");
+          "increasing step duration does not increase the total time past the limit");
       });
 
       it("allows the start delay to increase the total time", () => {
