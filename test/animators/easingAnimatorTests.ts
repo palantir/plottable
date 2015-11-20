@@ -76,82 +76,50 @@ describe("Animators", () => {
     });
 
     describe("max total duration", () => {
-      it("maxTotalDuration() with many steps", () => {
-        const iterationSteps = 10000;
-        const startDelay = 0;
-        const stepDuration = 100;
-        const stepDelay = 1000;
-        const expectedTotalTime = 2000;
+      const EPSILON = 0.0000001; // floating-point errors
 
-        animator.startDelay(startDelay);
-        animator.stepDuration(stepDuration);
-        animator.stepDelay(stepDelay);
-        animator.maxTotalDuration(expectedTotalTime);
+      const NUM_STEPS = 10;
+      const ORIGINAL_STEP_DELAY = 100;
+      const ORIGINAL_STEP_DURATION = 100;
+      let totalTimeLimit: number;
 
-        const actualTotalTime = animator.totalTime(iterationSteps);
-        assert.strictEqual(actualTotalTime, expectedTotalTime,
-          "Animation should not exceed the maxTotalDuration time constraint when presented with lots of iteration steps");
+      beforeEach(() => {
+        animator.stepDelay(ORIGINAL_STEP_DELAY);
+        animator.stepDuration(ORIGINAL_STEP_DURATION);
+        totalTimeLimit = animator.totalTime(NUM_STEPS);
+
+        animator.maxTotalDuration(totalTimeLimit);
       });
 
-      it("maxTotalDuration() long steps", () => {
-        const iterationSteps = 2;
-        const startDelay = 0;
-        const stepDuration = 10000;
-        const stepDelay = 100;
-        const expectedTotalTime = 2000;
-
-        animator.startDelay(startDelay);
-        animator.stepDuration(stepDuration);
-        animator.stepDelay(stepDelay);
-        animator.maxTotalDuration(expectedTotalTime);
-
-        const actualTotalTime = animator.totalTime(iterationSteps);
-        assert.strictEqual(actualTotalTime, expectedTotalTime,
-          "Animation should not exceed the maxTotalDuration time constraint when step duration set too high");
+      it("restricts the total time when the number of steps increases", () => {
+        const moreStepsTotalTime = animator.totalTime(2 * NUM_STEPS);
+        assert.closeTo(moreStepsTotalTime, totalTimeLimit, EPSILON,
+          "adding more steps does not increase the total time past the limit");
       });
 
-      it("maxTotalDuration() is just a constraint", () => {
-        const iterationSteps = 2;
-        const startDelay = 0;
-        const stepDuration = 100;
-        const stepDelay = 100;
-        const maxTotalDuration = 5000;
-
-        const expectedTotalTime = 200;
-
-        animator.startDelay(startDelay);
-        animator.stepDuration(stepDuration);
-        animator.stepDelay(stepDelay);
-        animator.maxTotalDuration(maxTotalDuration);
-
-        const actualTotalTime = animator.totalTime(iterationSteps);
-        assert.strictEqual(actualTotalTime, expectedTotalTime,
-          "The total duration constraint is just an upper bound");
+      it("restricts the total time when the step delay increases", () => {
+        animator.stepDelay(2 * ORIGINAL_STEP_DELAY);
+        const longerStepDelayTotalTime = animator.totalTime(NUM_STEPS);
+        assert.closeTo(longerStepDelayTotalTime, totalTimeLimit, EPSILON,
+          "adding more steps does not increase the total time past the limit");
       });
 
-      it("_getAdjustedIterativeDelay() works with maxTotalDuration constraint", () => {
-        const iterationSteps = 2;
-        const startDelay = 0;
-        const stepDuration = 1000;
-        const stepDelay = 1000000;
-        const maxTotalDuration = 1500;
-
-        animator.startDelay(startDelay);
-        animator.stepDuration(stepDuration);
-        animator.stepDelay(stepDelay);
-        animator.maxTotalDuration(maxTotalDuration);
-
-        const expectedIterativeDelay = 500;
-        // 1 |  ###########
-        // 2 |       ###########
-        //   +------------------------
-        //   |  |    |    |    |    |
-        //     0.0  0.5  1.0  1.5  2.0
-        const actualIterativeDelay = (<any>animator)._getAdjustedIterativeDelay(iterationSteps);
-        assert.strictEqual(actualIterativeDelay, expectedIterativeDelay,
-          "The total duration constraint is just an upper bound");
+      it("restricts the total time when the step duration increases", () => {
+        animator.stepDuration(2 * ORIGINAL_STEP_DURATION);
+        const longerStepDurationTotalTime = animator.totalTime(NUM_STEPS);
+        assert.closeTo(longerStepDurationTotalTime, totalTimeLimit, EPSILON,
+          "adding more steps does not increase the total time past the limit");
       });
 
+      it("allows the start delay to increase the total time", () => {
+        const originalTotalTime = animator.totalTime(NUM_STEPS);
+
+        animator.startDelay(100);
+        const totalTimeWithStartDelay = animator.totalTime(NUM_STEPS);
+        const expectedTotalTime = animator.startDelay() + originalTotalTime;
+        assert.closeTo(totalTimeWithStartDelay, expectedTotalTime, EPSILON,
+          "start delay is added on to the max total duration");
+      });
     });
   });
 });
