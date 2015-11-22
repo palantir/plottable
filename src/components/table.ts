@@ -337,6 +337,9 @@ module Plottable.Components {
       if (rowPadding == null) {
         return this._rowPadding;
       }
+      if (!Utils.Math.isValidNumber(rowPadding) || rowPadding < 0) {
+        throw Error("rowPadding must be a non-negative finite value");
+      }
       this._rowPadding = rowPadding;
       this.redraw();
       return this;
@@ -356,6 +359,9 @@ module Plottable.Components {
     public columnPadding(columnPadding?: number): any {
       if (columnPadding == null) {
         return this._columnPadding;
+      }
+      if (!Utils.Math.isValidNumber(columnPadding) || columnPadding < 0) {
+        throw Error("columnPadding must be a non-negative finite value");
       }
       this._columnPadding = columnPadding;
       this.redraw();
@@ -398,6 +404,9 @@ module Plottable.Components {
       if (weight == null) {
         return this._rowWeights[index];
       }
+      if (!Utils.Math.isValidNumber(weight) || weight < 0) {
+        throw Error("rowWeight must be a non-negative finite value");
+      }
       this._rowWeights[index] = weight;
       this.redraw();
       return this;
@@ -423,6 +432,9 @@ module Plottable.Components {
     public columnWeight(index: number, weight?: number): any {
       if (weight == null) {
         return this._columnWeights[index];
+      }
+      if (!Utils.Math.isValidNumber(weight) || weight < 0) {
+        throw Error("columnWeight must be a non-negative finite value");
       }
       this._columnWeights[index] = weight;
       this.redraw();

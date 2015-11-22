@@ -1,5 +1,5 @@
 /*!
-Plottable 1.16.1 (https://github.com/palantir/plottable)
+Plottable 1.16.2 (https://github.com/palantir/plottable)
 Copyright 2014-2015 Palantir Technologies
 Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
 */
@@ -885,7 +885,7 @@ var Plottable;
 })(Plottable || (Plottable = {}));
 var Plottable;
 (function (Plottable) {
-    Plottable.version = "1.16.1";
+    Plottable.version = "1.16.2";
 })(Plottable || (Plottable = {}));
 var Plottable;
 (function (Plottable) {
@@ -4947,7 +4947,7 @@ var Plottable;
             Category.prototype._setup = function () {
                 _super.prototype._setup.call(this);
                 this._measurer = new SVGTypewriter.Measurers.CacheCharacterMeasurer(this._tickLabelContainer);
-                this._wrapper = new SVGTypewriter.Wrappers.SingleLineWrapper();
+                this._wrapper = new SVGTypewriter.Wrappers.Wrapper();
                 this._writer = new SVGTypewriter.Writers.Writer(this._measurer, this._wrapper);
             };
             Category.prototype._rescale = function () {
@@ -6183,6 +6183,9 @@ var Plottable;
                 if (rowPadding == null) {
                     return this._rowPadding;
                 }
+                if (!Plottable.Utils.Math.isValidNumber(rowPadding) || rowPadding < 0) {
+                    throw Error("rowPadding must be a non-negative finite value");
+                }
                 this._rowPadding = rowPadding;
                 this.redraw();
                 return this;
@@ -6190,6 +6193,9 @@ var Plottable;
             Table.prototype.columnPadding = function (columnPadding) {
                 if (columnPadding == null) {
                     return this._columnPadding;
+                }
+                if (!Plottable.Utils.Math.isValidNumber(columnPadding) || columnPadding < 0) {
+                    throw Error("columnPadding must be a non-negative finite value");
                 }
                 this._columnPadding = columnPadding;
                 this.redraw();
@@ -6199,6 +6205,9 @@ var Plottable;
                 if (weight == null) {
                     return this._rowWeights[index];
                 }
+                if (!Plottable.Utils.Math.isValidNumber(weight) || weight < 0) {
+                    throw Error("rowWeight must be a non-negative finite value");
+                }
                 this._rowWeights[index] = weight;
                 this.redraw();
                 return this;
@@ -6206,6 +6215,9 @@ var Plottable;
             Table.prototype.columnWeight = function (index, weight) {
                 if (weight == null) {
                     return this._columnWeights[index];
+                }
+                if (!Plottable.Utils.Math.isValidNumber(weight) || weight < 0) {
+                    throw Error("columnWeight must be a non-negative finite value");
                 }
                 this._columnWeights[index] = weight;
                 this.redraw();
@@ -7045,6 +7057,9 @@ var Plottable;
                     closestPointEntity = entity;
                 }
             });
+            if (closestPointEntity === undefined) {
+                return undefined;
+            }
             return this._lightweightPlotEntityToPlotEntity(closestPointEntity);
         };
         /**

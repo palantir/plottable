@@ -1,142 +1,214 @@
 ///<reference path="../testReference.ts" />
 
-class MockAnimator implements Plottable.Animator {
-  private _time: number;
-  private _callback: Function;
-  constructor(time: number, callback?: Function) {
-    this._time = time;
-    this._callback = callback;
-  }
-
-  public totalTime(numberOfIterations: number) {
-    return this._time;
-  }
-  public animateJoin(joinResult: Plottable.Drawers.JoinResult
-    , attrToProjector: Plottable.AttributeToProjector, drawer: Plottable.Drawer): void {
-    if (this._callback) {
-      this._callback(joinResult, attrToProjector, drawer);
-    }
-  }
-  public animate(selection: any, attrToProjector: Plottable.AttributeToProjector): any {
-    if (this._callback) {
-      this._callback();
-    }
-    return selection;
-  }
-}
-
-function createMockDrawer(dataset: Plottable.Dataset) {
-  let drawer = new Plottable.Drawer(dataset);
-  (<any> drawer)._svgElementName = "circle";
-  return drawer;
-}
-
 describe("Drawers", () => {
-  describe("Abstract Drawer", () => {
-    let oldTimeout: any;
-    let timings: number[] = [];
-    let svg: d3.Selection<void>;
-    let drawer: Plottable.Drawer;
-    before(() => {
-      oldTimeout = Plottable.Utils.Window.setTimeout;
-      Plottable.Utils.Window.setTimeout = function(f: Function, time: number, ...args: any[]) {
-        timings.push(time);
-        return oldTimeout(f, time, args);
-      };
+  describe("Drawer", () => {
+    class MockDrawer extends Plottable.Drawer {
+      public static ELEMENT_NAME = "mock";
+      public static CSS_CLASS_NAME = "mock-css";
+
+      constructor(dataset: Plottable.Dataset) {
+        super(dataset);
+        this._svgElementName = MockDrawer.ELEMENT_NAME;
+        this._className = MockDrawer.CSS_CLASS_NAME;
+      }
+    }
+
+   let drawer: MockDrawer;
+   let dataset: Plottable.Dataset;
+   beforeEach(() => {
+     dataset = new Plottable.Dataset();
+     drawer = new MockDrawer(dataset);
+   });
+
+    it("returns its element name as a selector", () => {
+      assert.strictEqual(drawer.selector(), MockDrawer.ELEMENT_NAME);
     });
 
-    after(() => {
-      Plottable.Utils.Window.setTimeout = oldTimeout;
+    it("can set and get its renderArea", () => {
+      const svg = TestMethods.generateSVG();
+      assert.strictEqual(drawer.renderArea(svg), drawer, "setter mode returns the calling Drawer");
+      assert.strictEqual(drawer.renderArea(), svg, "getter mode returns the selection");
+      svg.remove();
     });
 
-    beforeEach(() => {
-      timings = [];
-      svg = TestMethods.generateSVG();
-      drawer = createMockDrawer(null);
+    it("can remove its renderArea", () => {
+      const svg = TestMethods.generateSVG();
       drawer.renderArea(svg);
+      drawer.remove();
+      assert.isFalse(document.body.contains(<any> svg.node()), "renderArea was removed from the DOM");
     });
 
-    afterEach(() => {
-      svg.remove(); // no point keeping it around since we don't draw anything in it anyway
+    describe("drawing and retrieving elements", () => {
+      const data = ["A", "B", "C"];
+      const propertyName = "property";
+      let svg: d3.Selection<void>;
+
+      beforeEach(() => {
+        svg = TestMethods.generateSVG();
+        let invocationCount = 0;
+        const validatingProjector = (datum: any, index: number, passedDataset: Plottable.Dataset) => {
+          assert.strictEqual(datum, data[invocationCount], "projector was passed the correct datum");
+          assert.strictEqual(index, invocationCount, "projector was passed the correct index");
+          assert.strictEqual(passedDataset, dataset, "projector was passed the Drawer's dataset");
+          invocationCount++;
+          return datum;
+        };
+        const attrToProjector: Plottable.AttributeToProjector = {};
+        attrToProjector[propertyName] = validatingProjector;
+        const drawSteps = [
+          {
+            attrToProjector: attrToProjector,
+            animator: new Plottable.Animators.Null()
+          }
+        ];
+        drawer.renderArea(svg);
+        drawer.draw(data, drawSteps);
+      });
+
+      afterEach(function() {
+        if (this.currentTest.state === "passed") {
+          svg.remove();
+        }
+      });
+
+      it("draws elements accoding to a specified DrawStep", () => {
+        const drawn = svg.selectAll(MockDrawer.ELEMENT_NAME);
+        assert.strictEqual(drawn.size(), data.length, "created one element per datum");
+        drawn.each(function(datum, index) {
+          const element = d3.select(this);
+          assert.strictEqual(element.attr(propertyName), data[index], "property was set correctly");
+          assert.isTrue(element.classed(MockDrawer.CSS_CLASS_NAME), "element carries the correct CSS class");
+        });
+      });
+
+      it("can retrieve a selection containing elements it drew", () => {
+        const selection = drawer.selection();
+        assert.strictEqual(selection.size(), data.length, "retrieved one element per datum");
+        const drawn = svg.selectAll(MockDrawer.ELEMENT_NAME);
+        assert.deepEqual(selection[0], drawn[0], "retrieved all elements it drew");
+      });
+
+      it("can retrieve the selection for a particular index", () => {
+        const selection = drawer.selection();
+        data.forEach((datum, index) => {
+          const selectionForIndex = drawer.selectionForIndex(index);
+          assert.strictEqual(selectionForIndex.node(), selection[0][index], `retrieves the correct selection for index ${index}`);
+        });
+      });
     });
 
-    it("drawer timing works as expected for null animators", () => {
-      let a1 = new Plottable.Animators.Null();
-      let a2 = new Plottable.Animators.Null();
-      let ds1: Plottable.Drawers.DrawStep = {attrToProjector: {}, animator: a1};
-      let ds2: Plottable.Drawers.DrawStep = {attrToProjector: {}, animator: a2};
-      let steps = [ds1, ds2];
-      drawer.draw([], steps);
-      assert.deepEqual(timings, [0, 0], "setTimeout called twice with 0 time both times");
-    });
+    describe("animation timings", () => {
+      class MockAnimator implements Plottable.Animator {
+        private _time: number;
+        private _callback: Function;
 
-    it("drawer timing works for non-null animators", (done) => {
-      let callback1Called = false;
-      let callback2Called = false;
-      let callback1 = () => {
-        callback1Called = true;
-      };
-      let callback2 = () => {
-        assert.isTrue(callback1Called, "callback2 called after callback 1");
-        callback2Called = true;
-      };
-      let callback3 = () => {
-        assert.isTrue(callback2Called, "callback3 called after callback 2");
-        done();
-      };
-      let a1 = new MockAnimator(20, callback1);
-      let a2 = new MockAnimator(10, callback2);
-      let a3 = new MockAnimator(0, callback3);
-      let ds1: Plottable.Drawers.DrawStep = {attrToProjector: {}, animator: a1};
-      let ds2: Plottable.Drawers.DrawStep = {attrToProjector: {}, animator: a2};
-      let ds3: Plottable.Drawers.DrawStep = {attrToProjector: {}, animator: a3};
-      let steps = [ds1, ds2, ds3];
-      drawer.draw([], steps);
-      assert.deepEqual(timings, [0, 20, 30], "setTimeout called with appropriate times");
-    });
+        constructor(time: number, callback?: Function) {
+          this._time = time;
+          this._callback = callback;
+        }
 
-    it("selectionForIndex()", () => {
-      let svg = TestMethods.generateSVG(300, 300);
-      let drawer = createMockDrawer(null);
-      drawer.renderArea(svg.append("g"));
-      drawer.selector = () => "circle";
-      let data = [{one: 2, two: 1}, {one: 33, two: 21}, {one: 11, two: 10}];
-      let circles = drawer.renderArea().selectAll("circle").data(data);
-      circles.enter().append("circle").attr("cx", (datum: any) => datum.one).attr("cy", (datum: any) => datum.two).attr("r", 10);
-      let selection = drawer.selectionForIndex(1);
-      assert.strictEqual(selection.node(), circles[0][1], "correct selection gotten");
-      svg.remove();
-    });
+        public totalTime(numberOfIterations: number) {
+          return this._time;
+        }
 
-    it("totalDrawTime()", () => {
-      let svg = TestMethods.generateSVG(300, 300);
-      let drawer = createMockDrawer(null);
+        public animate(selection: any, attrToProjector: Plottable.AttributeToProjector): any {
+          if (this._callback) {
+            this._callback();
+          }
+          return selection;
+        }
+      }
 
-      let dataObjects = 9;
-      let stepDuration = 987;
-      let stepDelay = 133;
-      let startDelay = 245;
+      let oldTimeout: any;
+      let timings: number[];
+      let svg: d3.Selection<void>;
 
-      let expectedAnimationDuration = startDelay + (dataObjects - 1) * stepDelay + stepDuration;
+      before(() => {
+        oldTimeout = Plottable.Utils.Window.setTimeout;
+        Plottable.Utils.Window.setTimeout = function(f: Function, time: number, ...args: any[]) {
+          timings.push(time);
+          return oldTimeout(f, time, args);
+        };
+      });
 
-      let data = Plottable.Utils.Array.createFilledArray({}, dataObjects);
+      after(() => {
+        Plottable.Utils.Window.setTimeout = oldTimeout;
+      });
 
-      let attrToProjector: Plottable.AttributeToProjector = null;
+      beforeEach(() => {
+        timings = [];
+        svg = TestMethods.generateSVG();
+        drawer = new Plottable.Drawer(null); // HACKHACK #2777: have to create a Plottable.Drawer to avoid "two Plottables" issue
+        (<any> drawer)._svgElementName = MockDrawer.ELEMENT_NAME;
+        drawer.renderArea(svg);
+      });
 
-      let animator = new Plottable.Animators.Easing();
-      animator.maxTotalDuration(Infinity);
-      animator.stepDuration(stepDuration);
-      animator.stepDelay(stepDelay);
-      animator.startDelay(startDelay);
+      afterEach(() => {
+        svg.remove(); // no point keeping it around since we don't draw anything in it anyway
+      });
 
-      let mockDrawStep = [{attrToProjector: attrToProjector, animator: animator}];
+      it("correctly computes the total draw time", () => {
+        function makeFixedTimeAnimator(totalTime: number) {
+          return <Plottable.Animator> {
+            animate: () => null,
+            totalTime: () => totalTime
+          };
+        }
 
-      let drawTime = drawer.totalDrawTime(data, mockDrawStep);
+        const animationTimes = [10, 20];
+        const drawSteps = animationTimes.map((time) => {
+          return {
+            attrToProjector: <Plottable.AttributeToProjector> {},
+            animator: makeFixedTimeAnimator(time)
+          };
+        });
+        const totalTime = drawer.totalDrawTime([], drawSteps);
+        const expectedTotalTime = d3.sum(animationTimes);
+        assert.strictEqual(totalTime, expectedTotalTime, "returned the total time taken by all Animators");
+      });
 
-      assert.strictEqual(drawTime, expectedAnimationDuration, "Total Draw time");
+      it("computes the correct timings for Null Animators", () => {
+        const a1 = new Plottable.Animators.Null();
+        const a2 = new Plottable.Animators.Null();
+        const ds1: Plottable.Drawers.DrawStep = {attrToProjector: {}, animator: a1};
+        const ds2: Plottable.Drawers.DrawStep = {attrToProjector: {}, animator: a2};
+        const steps = [ds1, ds2];
+        drawer.draw([], steps);
+        assert.deepEqual(timings, [0, 0], "setTimeout called twice with 0 time both times");
+      });
 
-      svg.remove();
+      it("computes the correct timings for non-Null Animators", (done) => {
+        let callback1Called = false;
+        const callback1 = () => {
+          callback1Called = true;
+        };
+        const animator1Time = 20;
+        const a1 = new MockAnimator(animator1Time, callback1);
+        const ds1: Plottable.Drawers.DrawStep = {attrToProjector: {}, animator: a1};
 
+        let callback2Called = false;
+        const callback2 = () => {
+          assert.isTrue(callback1Called, "callback2 called after callback 1");
+          callback2Called = true;
+        };
+        const animator2Time = 10;
+        const a2 = new MockAnimator(animator2Time, callback2);
+        const ds2: Plottable.Drawers.DrawStep = {attrToProjector: {}, animator: a2};
+
+        const callback3 = () => {
+          assert.isTrue(callback2Called, "callback3 called after callback 2");
+          done();
+        };
+        const animator3Time = 0;
+        const a3 = new MockAnimator(animator3Time, callback3);
+        const ds3: Plottable.Drawers.DrawStep = {attrToProjector: {}, animator: a3};
+
+        const steps = [ds1, ds2, ds3];
+        drawer.draw([], steps);
+
+        const expectedTimings = [0, animator1Time, animator1Time + animator2Time];
+        assert.deepEqual(timings, expectedTimings, "setTimeout called with appropriate times");
+      });
     });
   });
 });
