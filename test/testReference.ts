@@ -12,8 +12,12 @@
 ///<reference path="testMethods.ts" />
 
 ///<reference path="drawers/drawerTests.ts" />
+///<reference path="drawers/arcDrawerTests.ts" />
+///<reference path="drawers/arcOutlineDrawerTests.ts" />
+///<reference path="drawers/areaDrawerTests.ts" />
 ///<reference path="drawers/lineDrawerTests.ts" />
 
+///<reference path="animators/nullAnimatorTests.ts" />
 ///<reference path="animators/easingAnimatorTests.ts" />
 
 ///<reference path="axes/axisTests.ts" />
