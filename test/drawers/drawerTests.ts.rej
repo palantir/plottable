@@ -1,0 +1,27 @@
+diff a/test/drawers/drawerTests.ts b/test/drawers/drawerTests.ts	(rejected hunks)
+@@ -1,25 +1,5 @@
+ ///<reference path="../testReference.ts" />
+ 
+-class MockAnimator implements Plottable.Animator {
+-  private _time: number;
+-  private _callback: Function;
+-  constructor(time: number, callback?: Function) {
+-    this._time = time;
+-    this._callback = callback;
+-  }
+-
+-  public totalTime(numberOfIterations: number) {
+-    return this._time;
+-  }
+-  public animateJoin(joinResult: Plottable.Drawers.JoinResult
+-    , attrToProjector: Plottable.AttributeToProjector, drawer: Plottable.Drawer): void {
+-    if (this._callback) {
+-      this._callback(joinResult, attrToProjector, drawer);
+-    }
+-  }
+-  public animate(selection: any, attrToProjector: Plottable.AttributeToProjector): any {
+-    if (this._callback) {
+-      this._callback();
+ describe("Drawers", () => {
+   describe("Drawer", () => {
+     class MockDrawer extends Plottable.Drawer {
