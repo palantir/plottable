@@ -4,12 +4,12 @@ describe("Dispatchers", () => {
   describe("Touch Dispatcher", () => {
 
     describe("Basic usage", () => {
-      it("creates only one Dispatcher.Touch per <svg> using getDispatcher()", () => {
-        let svg = TestMethods.generateSVG();
+      it("creates only one Dispatcher.Touch per element", () => {
+        const svg = TestMethods.generateSVG();
 
-        let td1 = Plottable.Dispatchers.Touch.getDispatcher(<SVGElement> svg.node());
+        const td1 = Plottable.Dispatchers.Touch.getDispatcher(svg.node());
         assert.isNotNull(td1, "created a new Dispatcher on an SVG");
-        let td2 = Plottable.Dispatchers.Touch.getDispatcher(<SVGElement> svg.node());
+        const td2 = Plottable.Dispatchers.Touch.getDispatcher(svg.node());
         assert.strictEqual(td1, td2, "returned the existing Dispatcher if called again with same <svg>");
 
         svg.remove();
@@ -19,38 +19,36 @@ describe("Dispatchers", () => {
     describe("Callbacks", () => {
       let svg: d3.Selection<void>;
       let touchDispatcher: Plottable.Dispatchers.Touch;
+      let callbackWasCalled: boolean;
 
-      let SVG_WIDTH = 400;
-      let SVG_HEIGHT = 400;
+      const SVG_WIDTH = 400;
+      const SVG_HEIGHT = 400;
+      const targetXs = [17, 18, 12, 23, 44];
+      const targetYs = [77, 78, 52, 43, 14];
+      const ids = targetXs.map((targetX, i) => i);
+      const expectedPoints = targetXs.map((targetX, i) => {
+        return {
+          x: targetX,
+          y: targetYs[i]
+        };
+      });
+      const callback = (ids: number[], points: { [id: number]: Plottable.Point; }, event: TouchEvent) => {
+        callbackWasCalled = true;
+        ids.forEach((id) => {
+          TestMethods.assertPointsClose(points[id], expectedPoints[id], 0.5, "touch position is correct");
+        });
+        assert.isNotNull(event, "TouchEvent was passed to the Dispatcher");
+      };
 
       beforeEach(() => {
-
         svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
         // HACKHACK: PhantomJS can't measure SVGs unless they have something in them occupying space
         svg.append("rect").attr("width", SVG_WIDTH).attr("height", SVG_HEIGHT);
         touchDispatcher = Plottable.Dispatchers.Touch.getDispatcher(<SVGElement> svg.node());
+        callbackWasCalled = false;
       });
 
       it("calls the touchStart callback", () => {
-        let targetXs = [17, 18, 12, 23, 44];
-        let targetYs = [77, 78, 52, 43, 14];
-        let expectedPoints = targetXs.map((targetX, i) => {
-          return {
-            x: targetX,
-            y: targetYs[i]
-          };
-        });
-        let ids = targetXs.map((targetX, i) => i);
-
-        let callbackWasCalled = false;
-        let callback = (ids: number[], points: { [id: number]: Plottable.Point; }, event: TouchEvent) => {
-          callbackWasCalled = true;
-          ids.forEach((id) => {
-            TestMethods.assertPointsClose(points[id], expectedPoints[id], 0.5, "touch position is correct");
-          });
-          assert.isNotNull(event, "TouchEvent was passed to the Dispatcher");
-        };
-
         assert.strictEqual(touchDispatcher.onTouchStart(callback), touchDispatcher,
           "setting the touchStart callback returns the dispatcher");
 
@@ -68,25 +66,6 @@ describe("Dispatchers", () => {
       });
 
       it("calls the touchMove callback", () => {
-        let targetXs = [17, 18, 12, 23, 44];
-        let targetYs = [77, 78, 52, 43, 14];
-        let expectedPoints = targetXs.map((targetX, i) => {
-          return {
-            x: targetX,
-            y: targetYs[i]
-          };
-        });
-        let ids = targetXs.map((targetX, i) => i);
-
-        let callbackWasCalled = false;
-        let callback = (ids: number[], points: { [id: number]: Plottable.Point; }, event: TouchEvent) => {
-          callbackWasCalled = true;
-          ids.forEach((id) => {
-            TestMethods.assertPointsClose(points[id], expectedPoints[id], 0.5, "touch position is correct");
-          });
-          assert.isNotNull(event, "TouchEvent was passed to the Dispatcher");
-        };
-
         assert.strictEqual(touchDispatcher.onTouchMove(callback), touchDispatcher,
           "setting the touchMove callback returns the dispatcher");
 
@@ -104,25 +83,6 @@ describe("Dispatchers", () => {
       });
 
       it("calls the touchEnd callback", () => {
-        let targetXs = [17, 18, 12, 23, 44];
-        let targetYs = [77, 78, 52, 43, 14];
-        let expectedPoints = targetXs.map((targetX, i) => {
-          return {
-            x: targetX,
-            y: targetYs[i]
-          };
-        });
-        let ids = targetXs.map((targetX, i) => i);
-
-        let callbackWasCalled = false;
-        let callback = (ids: number[], points: { [id: number]: Plottable.Point; }, event: TouchEvent) => {
-          callbackWasCalled = true;
-          ids.forEach((id) => {
-            TestMethods.assertPointsClose(points[id], expectedPoints[id], 0.5, "touch position is correct");
-          });
-          assert.isNotNull(event, "TouchEvent was passed to the Dispatcher");
-        };
-
         assert.strictEqual(touchDispatcher.onTouchEnd(callback), touchDispatcher,
           "setting the touchEnd callback returns the dispatcher");
 
@@ -140,25 +100,6 @@ describe("Dispatchers", () => {
       });
 
       it("calls the touchCancel callback", () => {
-        let targetXs = [17, 18, 12, 23, 44];
-        let targetYs = [77, 78, 52, 43, 14];
-        let expectedPoints = targetXs.map((targetX, i) => {
-          return {
-            x: targetX,
-            y: targetYs[i]
-          };
-        });
-        let ids = targetXs.map((targetX, i) => i);
-
-        let callbackWasCalled = false;
-        let callback = (ids: number[], points: { [id: number]: Plottable.Point; }, event: TouchEvent) => {
-          callbackWasCalled = true;
-          ids.forEach((id) => {
-            TestMethods.assertPointsClose(points[id], expectedPoints[id], 0.5, "touch position is correct");
-          });
-          assert.isNotNull(event, "TouchEvent was passed to the Dispatcher");
-        };
-
         assert.strictEqual(touchDispatcher.onTouchCancel(callback), touchDispatcher,
           "setting the touchCancel callback returns the dispatcher");
 
@@ -176,20 +117,10 @@ describe("Dispatchers", () => {
       });
 
       it("can register two callbacks for the same touch dispatcher", () => {
-        let targetXs = [17, 18, 12, 23, 44];
-        let targetYs = [77, 78, 52, 43, 14];
-        let expectedPoints = targetXs.map((targetX, i) => {
-          return {
-            x: targetX,
-            y: targetYs[i]
-          };
-        });
-        let ids = targetXs.map((targetX, i) => i);
-
         let callback1WasCalled = false;
-        let callback1 = () => callback1WasCalled = true;
+        const callback1 = () => callback1WasCalled = true;
         let callback2WasCalled = false;
-        let callback2 = () => callback2WasCalled = true;
+        const callback2 = () => callback2WasCalled = true;
 
         touchDispatcher.onTouchStart(callback1);
         touchDispatcher.onTouchStart(callback2);
@@ -211,18 +142,8 @@ describe("Dispatchers", () => {
       });
 
       it("doesn't call callbacks if not in the DOM", () => {
-        let targetXs = [17, 18, 12, 23, 44];
-        let targetYs = [77, 78, 52, 43, 14];
-        let expectedPoints = targetXs.map((targetX, i) => {
-          return {
-            x: targetX,
-            y: targetYs[i]
-          };
-        });
-        let ids = targetXs.map((targetX, i) => i);
-
         let callbackWasCalled = false;
-        let callback = () => callbackWasCalled = true;
+        const callback = () => callbackWasCalled = true;
 
         touchDispatcher.onTouchMove(callback);
         TestMethods.triggerFakeTouchEvent("touchmove", svg, expectedPoints, ids);
@@ -234,53 +155,6 @@ describe("Dispatchers", () => {
         assert.isFalse(callbackWasCalled, "callback was not called after <svg> was removed from DOM");
 
         touchDispatcher.offTouchMove(callback);
-      });
-
-      // #2789
-      it.skip("doesn't call callbacks if obscured by overlay", () => {
-        let targetXs = [17, 18, 12, 23, 44];
-        let targetYs = [77, 78, 52, 43, 14];
-        let expectedPoints = targetXs.map((d, i) => {
-          return {
-            x: targetXs[i],
-            y: targetYs[i]
-          };
-        });
-
-        let callbackWasCalled = false;
-        let callback = () => callbackWasCalled = true;
-
-        touchDispatcher.onTouchStart(callback);
-        TestMethods.triggerFakeTouchEvent("touchstart", svg, expectedPoints);
-        assert.isTrue(callbackWasCalled, "callback was called on touchstart");
-
-        let element = <HTMLElement> svg[0][0];
-        let position = { x: 0, y: 0 };
-        while (element != null) {
-          position.x += (element.offsetLeft || element.clientLeft || 0);
-          position.y += (element.offsetTop || element.clientTop || 0);
-          element = <HTMLElement> (element.offsetParent || element.parentNode);
-        }
-
-        let overlay = TestMethods.getSVGParent().append("div").style({
-          height: SVG_HEIGHT + "px",
-          width: SVG_WIDTH + "px",
-          position: "absolute",
-          top: position.y + "px",
-          left: position.x + "px"
-        });
-
-        callbackWasCalled = false;
-        TestMethods.triggerFakeTouchEvent("touchstart", svg, expectedPoints);
-
-        try {
-          assert.isFalse(callbackWasCalled, "callback was not called on touchstart on overlay");
-        } finally {
-          overlay.remove();
-        }
-
-        touchDispatcher.offTouchStart(callback);
-        svg.remove();
       });
     });
   });
