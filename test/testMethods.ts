@@ -328,6 +328,7 @@ module TestMethods {
       Object.keys(options).forEach((key) => (<any> event)[key] = options[key] );
     }
     target.node().dispatchEvent(event);
+    return event;
   }
 
   export function assertAreaPathCloseTo(actualPath: string, expectedPath: string, precision: number, msg: string) {
