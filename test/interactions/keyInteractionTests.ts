@@ -2,12 +2,33 @@
 
 describe("Interactions", () => {
   describe("Key Interaction", () => {
+    const A_KEY_CODE = 65;
+    const B_KEY_CODE = 66;
+    const INSIDE_POINT = { x: 100, y: 100 };
+    const OUTSIDE_POINT = { x: -100, y: -100 };
+
+    type KeyTestCallback = {
+      called: boolean;
+      keycode: number;
+      reset: () => void;
+      (keycode: number): void;
+    }
+
+    function makeKeyCallback() {
+      const callback = <KeyTestCallback> function(keycode?: number) {
+        callback.called = true;
+        callback.keycode = keycode;
+      };
+      callback.called = false;
+      callback.reset = () => {
+        callback.called = false;
+        callback.keycode = null;
+      };
+      return callback;
+    }
+
     ["KeyPress", "KeyRelease"].forEach((event: string) => {
       describe(`on${event}`, () => {
-        const A_KEY_CODE = 65;
-        const B_KEY_CODE = 66;
-        const INSIDE_POINT = { x: 100, y: 100 };
-        const OUTSIDE_POINT = { x: -100, y: -100 };
         const ACTION = event === "KeyPress" ? "pressed" : "released";
 
         let svg: d3.Selection<void>;
@@ -29,26 +50,6 @@ describe("Interactions", () => {
             svg.remove();
           }
         });
-
-        type KeyTestCallback = {
-          called: boolean;
-          keycode: number;
-          reset: () => void;
-          (keycode: number): void;
-        }
-
-        function makeKeyCallback() {
-          const callback = <KeyTestCallback> function(keycode?: number) {
-            callback.called = true;
-            callback.keycode = keycode;
-          };
-          callback.called = false;
-          callback.reset = () => {
-            callback.called = false;
-            callback.keycode = null;
-          };
-          return callback;
-        }
 
         function triggerKeyEvent(mouseEvent: string, p: Plottable.Point, target: d3.Selection<void>, keycode: number, options = null) {
           TestMethods.triggerFakeMouseEvent(mouseEvent, target, p.x, p.y);
@@ -120,7 +121,7 @@ describe("Interactions", () => {
           assert.isTrue(callback.called, `callback for "a" was properly connected back to the interaction`);
         });
 
-        it("can attach multiple keyPress callbacks on the same key code", () => {
+        it(`can attach multiple ${event} callbacks on the same key code`, () => {
           const callback2 = makeKeyCallback();
 
           registerEvent(A_KEY_CODE, callback);
@@ -142,72 +143,117 @@ describe("Interactions", () => {
           assert.isFalse(callback.called, `callback 1 for "a" was disconnected from the interaction`);
           assert.isTrue(callback2.called, `callback 2 for "a" is still connected to the interaction`);
         });
+      });
+    });
 
-        if (event === "KeyPress") {
-          it("is only triggered once when the key is pressed", () => {
-            registerEvent(A_KEY_CODE, callback);
+    describe("onKeyPress respects mouse position", () => {
+      let svg: d3.Selection<void>;
+      let eventTarget: d3.Selection<void>;
+      let keyInteraction: Plottable.Interactions.Key;
+      let callback: KeyTestCallback;
 
-            triggerKeyEvent("mouseover", INSIDE_POINT, eventTarget, A_KEY_CODE);
-            assert.isTrue(callback.called, `callback for "a" was called when "a" key was pressed`);
+      beforeEach(() => {
+        svg = TestMethods.generateSVG();
+        let component = new Plottable.Component().renderTo(svg);
+        eventTarget = component.background();
+        keyInteraction = new Plottable.Interactions.Key();
+        keyInteraction.attachTo(component);
+        callback = makeKeyCallback();
+      });
 
-            callback.reset();
-            triggerKeyEvent("mouseover", INSIDE_POINT, eventTarget, A_KEY_CODE, { repeat : true });
-            assert.isFalse(callback.called, `callback for "a" was not called when keydown was fired the second time`);
-          });
-
-          it("does not fire the callback when component is initially out of focus", () => {
-            registerEvent(A_KEY_CODE, callback);
-
-            triggerKeyEvent("mouseout", OUTSIDE_POINT, eventTarget, A_KEY_CODE);
-            triggerKeyEvent("mouseover", INSIDE_POINT, eventTarget, A_KEY_CODE, { repeat : true });
-          });
+      afterEach(function() {
+        if (this.currentTest.state === "passed") {
+          svg.remove();
         }
+      });
 
-        if (event === "KeyRelease") {
-          it("does not fire callbak if press without release", () => {
-            registerEvent(A_KEY_CODE, callback);
+      it("is only triggered once when the key is pressed", () => {
+        keyInteraction.onKeyPress(A_KEY_CODE, callback);
 
-            TestMethods.triggerFakeMouseEvent("mouseover", eventTarget, INSIDE_POINT.x, INSIDE_POINT.y);
-            TestMethods.triggerFakeKeyboardEvent("keydown", eventTarget, A_KEY_CODE);
-            assert.isFalse(callback.called, `callback for "a" was not called wihtout releasing the key`);
-          });
+        TestMethods.triggerFakeMouseEvent("mouseover", eventTarget, INSIDE_POINT.x, INSIDE_POINT.y);
+        TestMethods.triggerFakeKeyboardEvent("keydown", eventTarget, A_KEY_CODE);
+        assert.isTrue(callback.called, `callback for "a" was called when "a" key was pressed`);
 
-          it("does not fire callbak if release without press", () => {
-            registerEvent(A_KEY_CODE, callback);
+        callback.reset();
+        TestMethods.triggerFakeMouseEvent("mouseover", eventTarget, INSIDE_POINT.x, INSIDE_POINT.y);
+        TestMethods.triggerFakeKeyboardEvent("keydown", eventTarget, A_KEY_CODE, { repeat : true });
+        assert.isFalse(callback.called, `callback for "a" was not called when keydown was fired the second time`);
+      });
 
-            TestMethods.triggerFakeKeyboardEvent("keyup", eventTarget, A_KEY_CODE);
-            assert.isFalse(callback.called, `callback for "a" was not called wihtout pressing the key`);
-          });
+      it("does not fire the callback when component is initially out of focus", () => {
+        keyInteraction.onKeyPress(A_KEY_CODE, callback);
 
-          it("fires callback if key was released outside of component after being pressed inside", () => {
-            registerEvent(A_KEY_CODE, callback);
+        TestMethods.triggerFakeMouseEvent("mouseout", eventTarget, OUTSIDE_POINT.x, OUTSIDE_POINT.y);
+        TestMethods.triggerFakeKeyboardEvent("keydown", eventTarget, A_KEY_CODE);
+        TestMethods.triggerFakeMouseEvent("mouseover", eventTarget, INSIDE_POINT.x, INSIDE_POINT.y);
+        TestMethods.triggerFakeKeyboardEvent("keydown", eventTarget, A_KEY_CODE, { repeat : true });
+        assert.isFalse(callback.called, `callback for "a" was not called when keydown was fired the second time`);
+      });
+    });
 
-            TestMethods.triggerFakeMouseEvent("mouseover", eventTarget, INSIDE_POINT.x, INSIDE_POINT.y);
-            TestMethods.triggerFakeKeyboardEvent("keydown", eventTarget, A_KEY_CODE);
-            TestMethods.triggerFakeMouseEvent("mouseout", eventTarget, OUTSIDE_POINT.x, OUTSIDE_POINT.y);
-            TestMethods.triggerFakeKeyboardEvent("keyup", eventTarget, A_KEY_CODE);
-            assert.isTrue(callback.called, `callback for "a" was called when "a" key was released`);
-          });
+    describe("onKeyRelease respects mouse position", () => {
+      let svg: d3.Selection<void>;
+      let eventTarget: d3.Selection<void>;
+      let keyInteraction: Plottable.Interactions.Key;
+      let callback: KeyTestCallback;
 
-          it("doesn't fire callback if key was released after being pressed outside", () => {
-            registerEvent(A_KEY_CODE, callback);
+      beforeEach(() => {
+        svg = TestMethods.generateSVG();
+        let component = new Plottable.Component().renderTo(svg);
+        eventTarget = component.background();
+        keyInteraction = new Plottable.Interactions.Key();
+        keyInteraction.attachTo(component);
+        callback = makeKeyCallback();
+      });
 
-            TestMethods.triggerFakeMouseEvent("mouseout", eventTarget, OUTSIDE_POINT.x, OUTSIDE_POINT.y);
-            TestMethods.triggerFakeKeyboardEvent("keydown", eventTarget, A_KEY_CODE);
-            TestMethods.triggerFakeKeyboardEvent("keyup", eventTarget, A_KEY_CODE);
-            assert.isFalse(callback.called, `callback for "a" was not called when "a" key was released`);
-          });
-
-          it("doesn't fire callback key was released inside after being pressed outside", () => {
-            registerEvent(A_KEY_CODE, callback);
-
-            TestMethods.triggerFakeMouseEvent("mouseout", eventTarget, OUTSIDE_POINT.x, OUTSIDE_POINT.y);
-            TestMethods.triggerFakeKeyboardEvent("keydown", eventTarget, A_KEY_CODE);
-            TestMethods.triggerFakeMouseEvent("mouseover", eventTarget, INSIDE_POINT.x, INSIDE_POINT.y);
-            TestMethods.triggerFakeKeyboardEvent("keyup", eventTarget, A_KEY_CODE);
-            assert.isFalse(callback.called, `callback for "a" was not called when "a" key was released`);
-          });
+      afterEach(function() {
+        if (this.currentTest.state === "passed") {
+          svg.remove();
         }
+      });
+
+      it("does not fire callback if press without release", () => {
+        keyInteraction.onKeyRelease(A_KEY_CODE, callback);
+
+        TestMethods.triggerFakeMouseEvent("mouseover", eventTarget, INSIDE_POINT.x, INSIDE_POINT.y);
+        TestMethods.triggerFakeKeyboardEvent("keydown", eventTarget, A_KEY_CODE);
+        assert.isFalse(callback.called, `callback for "a" was not called wihtout releasing the key`);
+      });
+
+      it("does not fire callback if release without press", () => {
+        keyInteraction.onKeyRelease(A_KEY_CODE, callback);
+
+        TestMethods.triggerFakeKeyboardEvent("keyup", eventTarget, A_KEY_CODE);
+        assert.isFalse(callback.called, `callback for "a" was not called wihtout pressing the key`);
+      });
+
+      it("fires callback if key was released outside of component after being pressed inside", () => {
+        keyInteraction.onKeyRelease(A_KEY_CODE, callback);
+
+        TestMethods.triggerFakeMouseEvent("mouseover", eventTarget, INSIDE_POINT.x, INSIDE_POINT.y);
+        TestMethods.triggerFakeKeyboardEvent("keydown", eventTarget, A_KEY_CODE);
+        TestMethods.triggerFakeMouseEvent("mouseout", eventTarget, OUTSIDE_POINT.x, OUTSIDE_POINT.y);
+        TestMethods.triggerFakeKeyboardEvent("keyup", eventTarget, A_KEY_CODE);
+        assert.isTrue(callback.called, `callback for "a" was called when "a" key was released`);
+      });
+
+      it("doesn't fire callback if key was released after being pressed outside", () => {
+        keyInteraction.onKeyRelease(A_KEY_CODE, callback);
+
+        TestMethods.triggerFakeMouseEvent("mouseout", eventTarget, OUTSIDE_POINT.x, OUTSIDE_POINT.y);
+        TestMethods.triggerFakeKeyboardEvent("keydown", eventTarget, A_KEY_CODE);
+        TestMethods.triggerFakeKeyboardEvent("keyup", eventTarget, A_KEY_CODE);
+        assert.isFalse(callback.called, `callback for "a" was not called when "a" key was released`);
+      });
+
+      it("doesn't fire callback key was released inside after being pressed outside", () => {
+        keyInteraction.onKeyRelease(A_KEY_CODE, callback);
+
+        TestMethods.triggerFakeMouseEvent("mouseout", eventTarget, OUTSIDE_POINT.x, OUTSIDE_POINT.y);
+        TestMethods.triggerFakeKeyboardEvent("keydown", eventTarget, A_KEY_CODE);
+        TestMethods.triggerFakeMouseEvent("mouseover", eventTarget, INSIDE_POINT.x, INSIDE_POINT.y);
+        TestMethods.triggerFakeKeyboardEvent("keyup", eventTarget, A_KEY_CODE);
+        assert.isFalse(callback.called, `callback for "a" was not called when "a" key was released`);
       });
     });
   });
