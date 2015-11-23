@@ -101,7 +101,7 @@ module Plottable.Scales {
       return Utils.Color.lightenColor(color, modifyFactor);
     }
 
-    protected _getDomain() {
+    protected _getDomain(): string[] {
       return this._d3Scale.domain();
     }
 
@@ -109,7 +109,7 @@ module Plottable.Scales {
       this._d3Scale.domain(values);
     }
 
-    protected _getRange() {
+    protected _getRange(): string[] {
       return this._d3Scale.range();
     }
 

@@ -78,7 +78,7 @@ module Plottable.Scales {
       return this._invertedAdjustedLog(this._d3Scale.invert(x));
     }
 
-    protected _getDomain() {
+    protected _getDomain(): number[] {
       return this._untransformedDomain;
     }
 
@@ -188,7 +188,7 @@ module Plottable.Scales {
       return singleValueDomain;
     }
 
-    protected _getRange() {
+    protected _getRange(): number[] {
       return this._d3Scale.range();
     }
 

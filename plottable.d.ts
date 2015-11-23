@@ -752,7 +752,7 @@ declare module Plottable {
          * @returns {Scale} The calling Scale.
          */
         domain(values: D[]): Scale<D, R>;
-        protected _getDomain(): void;
+        protected _getDomain(): D[];
         protected _setDomain(values: D[]): void;
         protected _setBackingScaleDomain(values: D[]): void;
         /**
@@ -768,7 +768,7 @@ declare module Plottable {
          * @returns {Scale} The calling Scale.
          */
         range(values: R[]): Scale<D, R>;
-        protected _getRange(): void;
+        protected _getRange(): R[];
         protected _setRange(values: R[]): void;
         /**
          * Adds an IncludedValuesProvider to the Scale.

@@ -12,11 +12,11 @@ describe("Scales", () => {
         this._autodomainCallback = autodomainCallback;
       }
 
-      protected _getExtent() {
+      protected _getExtent(): D[] {
         return this._autodomainCallback();
       }
 
-      protected _getDomain() {
+      protected _getDomain(): D[] {
         return this._domain;
       }
 
@@ -24,7 +24,7 @@ describe("Scales", () => {
         this._domain = values;
       }
 
-      protected _getRange() {
+      protected _getRange(): R[] {
         return this._range;
       }
 
