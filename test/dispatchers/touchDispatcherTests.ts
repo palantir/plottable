@@ -7,9 +7,9 @@ describe("Dispatchers", () => {
       it("creates only one Dispatcher.Touch per element", () => {
         const svg = TestMethods.generateSVG();
 
-        const td1 = Plottable.Dispatchers.Touch.getDispatcher(svg.node());
+        const td1 = Plottable.Dispatchers.Touch.getDispatcher(<SVGElement> svg.node());
         assert.isNotNull(td1, "created a new Dispatcher on an SVG");
-        const td2 = Plottable.Dispatchers.Touch.getDispatcher(svg.node());
+        const td2 = Plottable.Dispatchers.Touch.getDispatcher(<SVGElement> svg.node());
         assert.strictEqual(td1, td2, "returned the existing Dispatcher if called again with same <svg>");
 
         svg.remove();

@@ -29,8 +29,8 @@ module Plottable.Dispatchers {
     constructor() {
       super();
 
-      this._eventToCallback[Key._KEYDOWN_EVENT_NAME] = (e: KeyboardEvent) => this._processKeydown(e);
-      this._eventToCallback[Key._KEYUP_EVENT_NAME] = (e: KeyboardEvent) => this._processKeyup(e);
+      this._eventToProcessingFunction[Key._KEYDOWN_EVENT_NAME] = (e: KeyboardEvent) => this._processKeydown(e);
+      this._eventToProcessingFunction[Key._KEYUP_EVENT_NAME] = (e: KeyboardEvent) => this._processKeyup(e);
     }
 
     private _processKeydown(event: KeyboardEvent) {

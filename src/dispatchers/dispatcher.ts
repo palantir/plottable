@@ -1,6 +1,6 @@
 module Plottable {
 export class Dispatcher {
-  protected _eventToCallback: { [eventName: string]: (e: Event) => any; } = {};
+  protected _eventToProcessingFunction: { [eventName: string]: (e: Event) => any; } = {};
   private _eventNameToCallbackSet: { [eventName: string]: Utils.CallbackSet<Function>; } = {};
   private _connected = false;
 
@@ -18,8 +18,8 @@ export class Dispatcher {
     if (this._connected) {
       return;
     }
-    Object.keys(this._eventToCallback).forEach((event: string) => {
-      let callback = this._eventToCallback[event];
+    Object.keys(this._eventToProcessingFunction).forEach((event: string) => {
+      let callback = this._eventToProcessingFunction[event];
       document.addEventListener(event, callback);
     });
     this._connected = true;
@@ -27,8 +27,8 @@ export class Dispatcher {
 
   private _disconnect() {
     if (this._connected && this._hasNoCallbacks()) {
-      Object.keys(this._eventToCallback).forEach((event: string) => {
-        let callback = this._eventToCallback[event];
+      Object.keys(this._eventToProcessingFunction).forEach((event: string) => {
+        let callback = this._eventToProcessingFunction[event];
         document.removeEventListener(event, callback);
       });
       this._connected = false;

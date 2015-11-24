@@ -4084,7 +4084,7 @@ declare module Plottable.Animators {
 }
 declare module Plottable {
     class Dispatcher {
-        protected _eventToCallback: {
+        protected _eventToProcessingFunction: {
             [eventName: string]: (e: Event) => any;
         };
         private _eventNameToCallbackSet;

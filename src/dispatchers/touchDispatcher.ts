@@ -38,13 +38,13 @@ module Plottable.Dispatchers {
 
       this._translator = Utils.ClientToSVGTranslator.getTranslator(svg);
 
-      this._eventToCallback[Touch._TOUCHSTART_EVENT_NAME] =
+      this._eventToProcessingFunction[Touch._TOUCHSTART_EVENT_NAME] =
         (e: TouchEvent) => this._measureAndDispatch(e, Touch._TOUCHSTART_EVENT_NAME, "page");
-      this._eventToCallback[Touch._TOUCHMOVE_EVENT_NAME] =
+      this._eventToProcessingFunction[Touch._TOUCHMOVE_EVENT_NAME] =
         (e: TouchEvent) => this._measureAndDispatch(e, Touch._TOUCHMOVE_EVENT_NAME, "page");
-      this._eventToCallback[Touch._TOUCHEND_EVENT_NAME] =
+      this._eventToProcessingFunction[Touch._TOUCHEND_EVENT_NAME] =
         (e: TouchEvent) => this._measureAndDispatch(e, Touch._TOUCHEND_EVENT_NAME, "page");
-      this._eventToCallback[Touch._TOUCHCANCEL_EVENT_NAME] =
+      this._eventToProcessingFunction[Touch._TOUCHCANCEL_EVENT_NAME] =
         (e: TouchEvent) => this._measureAndDispatch(e, Touch._TOUCHCANCEL_EVENT_NAME, "page");
     }
 

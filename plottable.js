@@ -10158,7 +10158,7 @@ var Plottable;
 (function (Plottable) {
     var Dispatcher = (function () {
         function Dispatcher() {
-            this._eventToCallback = {};
+            this._eventToProcessingFunction = {};
             this._eventNameToCallbackSet = {};
             this._connected = false;
         }
@@ -10176,8 +10176,8 @@ var Plottable;
             if (this._connected) {
                 return;
             }
-            Object.keys(this._eventToCallback).forEach(function (event) {
-                var callback = _this._eventToCallback[event];
+            Object.keys(this._eventToProcessingFunction).forEach(function (event) {
+                var callback = _this._eventToProcessingFunction[event];
                 document.addEventListener(event, callback);
             });
             this._connected = true;
@@ -10185,8 +10185,8 @@ var Plottable;
         Dispatcher.prototype._disconnect = function () {
             var _this = this;
             if (this._connected && this._hasNoCallbacks()) {
-                Object.keys(this._eventToCallback).forEach(function (event) {
-                    var callback = _this._eventToCallback[event];
+                Object.keys(this._eventToProcessingFunction).forEach(function (event) {
+                    var callback = _this._eventToProcessingFunction[event];
                     document.removeEventListener(event, callback);
                 });
                 this._connected = false;
@@ -10237,13 +10237,13 @@ var Plottable;
                 this._translator = Plottable.Utils.ClientToSVGTranslator.getTranslator(svg);
                 this._lastMousePosition = { x: -1, y: -1 };
                 var processMoveCallback = function (e) { return _this._measureAndDispatch(e, Mouse._MOUSEMOVE_EVENT_NAME, "page"); };
-                this._eventToCallback[Mouse._MOUSEOVER_EVENT_NAME] = processMoveCallback;
-                this._eventToCallback[Mouse._MOUSEMOVE_EVENT_NAME] = processMoveCallback;
-                this._eventToCallback[Mouse._MOUSEOUT_EVENT_NAME] = processMoveCallback;
-                this._eventToCallback[Mouse._MOUSEDOWN_EVENT_NAME] = function (e) { return _this._measureAndDispatch(e, Mouse._MOUSEDOWN_EVENT_NAME); };
-                this._eventToCallback[Mouse._MOUSEUP_EVENT_NAME] = function (e) { return _this._measureAndDispatch(e, Mouse._MOUSEUP_EVENT_NAME, "page"); };
-                this._eventToCallback[Mouse._WHEEL_EVENT_NAME] = function (e) { return _this._measureAndDispatch(e, Mouse._WHEEL_EVENT_NAME); };
-                this._eventToCallback[Mouse._DBLCLICK_EVENT_NAME] = function (e) { return _this._measureAndDispatch(e, Mouse._DBLCLICK_EVENT_NAME); };
+                this._eventToProcessingFunction[Mouse._MOUSEOVER_EVENT_NAME] = processMoveCallback;
+                this._eventToProcessingFunction[Mouse._MOUSEMOVE_EVENT_NAME] = processMoveCallback;
+                this._eventToProcessingFunction[Mouse._MOUSEOUT_EVENT_NAME] = processMoveCallback;
+                this._eventToProcessingFunction[Mouse._MOUSEDOWN_EVENT_NAME] = function (e) { return _this._measureAndDispatch(e, Mouse._MOUSEDOWN_EVENT_NAME); };
+                this._eventToProcessingFunction[Mouse._MOUSEUP_EVENT_NAME] = function (e) { return _this._measureAndDispatch(e, Mouse._MOUSEUP_EVENT_NAME, "page"); };
+                this._eventToProcessingFunction[Mouse._WHEEL_EVENT_NAME] = function (e) { return _this._measureAndDispatch(e, Mouse._WHEEL_EVENT_NAME); };
+                this._eventToProcessingFunction[Mouse._DBLCLICK_EVENT_NAME] = function (e) { return _this._measureAndDispatch(e, Mouse._DBLCLICK_EVENT_NAME); };
             }
             /**
              * Get a Mouse Dispatcher for the <svg> containing elem.
@@ -10418,13 +10418,13 @@ var Plottable;
                 var _this = this;
                 _super.call(this);
                 this._translator = Plottable.Utils.ClientToSVGTranslator.getTranslator(svg);
-                this._eventToCallback[Touch._TOUCHSTART_EVENT_NAME] =
+                this._eventToProcessingFunction[Touch._TOUCHSTART_EVENT_NAME] =
                     function (e) { return _this._measureAndDispatch(e, Touch._TOUCHSTART_EVENT_NAME, "page"); };
-                this._eventToCallback[Touch._TOUCHMOVE_EVENT_NAME] =
+                this._eventToProcessingFunction[Touch._TOUCHMOVE_EVENT_NAME] =
                     function (e) { return _this._measureAndDispatch(e, Touch._TOUCHMOVE_EVENT_NAME, "page"); };
-                this._eventToCallback[Touch._TOUCHEND_EVENT_NAME] =
+                this._eventToProcessingFunction[Touch._TOUCHEND_EVENT_NAME] =
                     function (e) { return _this._measureAndDispatch(e, Touch._TOUCHEND_EVENT_NAME, "page"); };
-                this._eventToCallback[Touch._TOUCHCANCEL_EVENT_NAME] =
+                this._eventToProcessingFunction[Touch._TOUCHCANCEL_EVENT_NAME] =
                     function (e) { return _this._measureAndDispatch(e, Touch._TOUCHCANCEL_EVENT_NAME, "page"); };
             }
             /**
@@ -10579,8 +10579,8 @@ var Plottable;
             function Key() {
                 var _this = this;
                 _super.call(this);
-                this._eventToCallback[Key._KEYDOWN_EVENT_NAME] = function (e) { return _this._processKeydown(e); };
-                this._eventToCallback[Key._KEYUP_EVENT_NAME] = function (e) { return _this._processKeyup(e); };
+                this._eventToProcessingFunction[Key._KEYDOWN_EVENT_NAME] = function (e) { return _this._processKeydown(e); };
+                this._eventToProcessingFunction[Key._KEYUP_EVENT_NAME] = function (e) { return _this._processKeyup(e); };
             }
             /**
              * Gets a Key Dispatcher. If one already exists it will be returned;

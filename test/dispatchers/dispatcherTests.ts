@@ -7,7 +7,8 @@ describe("Dispatchers", () => {
 
       constructor() {
         super();
-        this._eventToCallback[InstrumentedDispatcher.EVENT_NAME] = () => this._callCallbacksForEvent(InstrumentedDispatcher.EVENT_NAME);
+        this._eventToProcessingFunction[InstrumentedDispatcher.EVENT_NAME] =
+          () => this._callCallbacksForEvent(InstrumentedDispatcher.EVENT_NAME);
       }
 
       public addCallback(callback: Function) {
@@ -25,7 +26,7 @@ describe("Dispatchers", () => {
       const dispatcher = new Plottable.Dispatcher();
 
       let callbackCalled = false;
-      (<any> dispatcher)._eventToCallback[TEST_EVENT_NAME] = () => callbackCalled = true;
+      (<any> dispatcher)._eventToProcessingFunction[TEST_EVENT_NAME] = () => callbackCalled = true;
 
       let d3document = d3.select(document);
       (<any> dispatcher)._connect();
@@ -47,7 +48,7 @@ describe("Dispatchers", () => {
       const dispatcher = new InstrumentedDispatcher();
 
       let processingFunctionWasCalled = false;
-      (<any> dispatcher)._eventToCallback[TEST_EVENT_NAME] = () => processingFunctionWasCalled = true;
+      (<any> dispatcher)._eventToProcessingFunction[TEST_EVENT_NAME] = () => processingFunctionWasCalled = true;
 
       const callback = () => { return; };
       dispatcher.addCallback(callback);

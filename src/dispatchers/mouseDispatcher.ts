@@ -45,13 +45,17 @@ module Plottable.Dispatchers {
       this._lastMousePosition = { x: -1, y: -1 };
 
       let processMoveCallback = (e: MouseEvent) => this._measureAndDispatch(e, Mouse._MOUSEMOVE_EVENT_NAME, "page");
-      this._eventToCallback[Mouse._MOUSEOVER_EVENT_NAME] = processMoveCallback;
-      this._eventToCallback[Mouse._MOUSEMOVE_EVENT_NAME] = processMoveCallback;
-      this._eventToCallback[Mouse._MOUSEOUT_EVENT_NAME] = processMoveCallback;
-      this._eventToCallback[Mouse._MOUSEDOWN_EVENT_NAME] = (e: MouseEvent) => this._measureAndDispatch(e, Mouse._MOUSEDOWN_EVENT_NAME);
-      this._eventToCallback[Mouse._MOUSEUP_EVENT_NAME] = (e: MouseEvent) => this._measureAndDispatch(e, Mouse._MOUSEUP_EVENT_NAME, "page");
-      this._eventToCallback[Mouse._WHEEL_EVENT_NAME] = (e: WheelEvent) => this._measureAndDispatch(e, Mouse._WHEEL_EVENT_NAME);
-      this._eventToCallback[Mouse._DBLCLICK_EVENT_NAME] = (e: MouseEvent) => this._measureAndDispatch(e, Mouse._DBLCLICK_EVENT_NAME);
+      this._eventToProcessingFunction[Mouse._MOUSEOVER_EVENT_NAME] = processMoveCallback;
+      this._eventToProcessingFunction[Mouse._MOUSEMOVE_EVENT_NAME] = processMoveCallback;
+      this._eventToProcessingFunction[Mouse._MOUSEOUT_EVENT_NAME] = processMoveCallback;
+      this._eventToProcessingFunction[Mouse._MOUSEDOWN_EVENT_NAME] =
+        (e: MouseEvent) => this._measureAndDispatch(e, Mouse._MOUSEDOWN_EVENT_NAME);
+      this._eventToProcessingFunction[Mouse._MOUSEUP_EVENT_NAME] =
+        (e: MouseEvent) => this._measureAndDispatch(e, Mouse._MOUSEUP_EVENT_NAME, "page");
+      this._eventToProcessingFunction[Mouse._WHEEL_EVENT_NAME] =
+        (e: WheelEvent) => this._measureAndDispatch(e, Mouse._WHEEL_EVENT_NAME);
+      this._eventToProcessingFunction[Mouse._DBLCLICK_EVENT_NAME] =
+        (e: MouseEvent) => this._measureAndDispatch(e, Mouse._DBLCLICK_EVENT_NAME);
     }
 
     /**
