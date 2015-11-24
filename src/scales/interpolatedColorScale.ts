@@ -134,7 +134,7 @@ module Plottable.Scales {
       return this._d3Scale(value);
     }
 
-    protected _getDomain(): number[] {
+    protected _getDomain() {
       return this._d3Scale.domain();
     }
 
@@ -142,7 +142,7 @@ module Plottable.Scales {
       this._d3Scale.domain(values);
     }
 
-    protected _getRange(): string[] {
+    protected _getRange() {
       return this._colorRange;
     }
 
