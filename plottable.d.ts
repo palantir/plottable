@@ -4486,10 +4486,19 @@ declare module Plottable {
             private _downedKeys;
             private _keyDownCallback;
             private _keyUpCallback;
+            private _preventDefault;
             protected _anchor(component: Component): void;
             protected _unanchor(): void;
             private _handleKeyDownEvent(keyCode, event);
-            private _handleKeyUpEvent(keyCode);
+            private _handleKeyUpEvent(keyCode, event);
+            /**
+             * Returns whether preventDefault is enabled for Key Interaction
+             */
+            preventDefault(): boolean;
+            /**
+             * Enables or disables preventDefault
+             */
+            preventDefault(preventDefault: boolean): Key;
             /**
              * Adds a callback to be called when the key with the given keyCode is
              * pressed and the user is moused over the Component.

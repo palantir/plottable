@@ -15,7 +15,8 @@ export module Interactions {
     private _mouseMoveCallback = (point: Point) => false; // HACKHACK: registering a listener
     private _downedKeys = new Plottable.Utils.Set();
     private _keyDownCallback = (keyCode: number, event: KeyboardEvent) => this._handleKeyDownEvent(keyCode, event);
-    private _keyUpCallback = (keyCode: number) => this._handleKeyUpEvent(keyCode);
+    private _keyUpCallback = (keyCode: number, event: KeyboardEvent) => this._handleKeyUpEvent(keyCode, event);
+    private _preventDefault= false;
 
     protected _anchor(component: Component) {
       super._anchor(component);
@@ -43,17 +44,39 @@ export module Interactions {
       let p = this._translateToComponentSpace(this._positionDispatcher.lastMousePosition());
       if (this._isInsideComponent(p) && !event.repeat) {
         if (this._keyPressCallbacks[keyCode]) {
+          if (this.preventDefault()) {
+            event.preventDefault();
+          }
           this._keyPressCallbacks[keyCode].callCallbacks(keyCode);
         }
         this._downedKeys.add(keyCode);
       }
     }
 
-    private _handleKeyUpEvent(keyCode: number) {
+    private _handleKeyUpEvent(keyCode: number, event: KeyboardEvent) {
       if (this._downedKeys.has(keyCode) && this._keyReleaseCallbacks[keyCode]) {
+        if (this.preventDefault()) {
+          event.preventDefault();
+        }
         this._keyReleaseCallbacks[keyCode].callCallbacks(keyCode);
       }
       this._downedKeys.delete(keyCode);
+    }
+
+    /**
+     * Returns whether preventDefault is enabled for Key Interaction
+     */
+    public preventDefault(): boolean;
+    /**
+     * Enables or disables preventDefault
+     */
+    public preventDefault(preventDefault: boolean): Key;
+    public preventDefault(preventDefault: boolean): any {
+      if (preventDefault == null) {
+        return this._preventDefault;
+      }
+      this._preventDefault = preventDefault;
+      return this;
     }
 
     /**

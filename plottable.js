@@ -10914,7 +10914,8 @@ var Plottable;
                 this._mouseMoveCallback = function (point) { return false; }; // HACKHACK: registering a listener
                 this._downedKeys = new Plottable.Utils.Set();
                 this._keyDownCallback = function (keyCode, event) { return _this._handleKeyDownEvent(keyCode, event); };
-                this._keyUpCallback = function (keyCode) { return _this._handleKeyUpEvent(keyCode); };
+                this._keyUpCallback = function (keyCode, event) { return _this._handleKeyUpEvent(keyCode, event); };
+                this._preventDefault = false;
             }
             Key.prototype._anchor = function (component) {
                 _super.prototype._anchor.call(this, component);
@@ -10936,16 +10937,29 @@ var Plottable;
                 var p = this._translateToComponentSpace(this._positionDispatcher.lastMousePosition());
                 if (this._isInsideComponent(p) && !event.repeat) {
                     if (this._keyPressCallbacks[keyCode]) {
+                        if (this.preventDefault()) {
+                            event.preventDefault();
+                        }
                         this._keyPressCallbacks[keyCode].callCallbacks(keyCode);
                     }
                     this._downedKeys.add(keyCode);
                 }
             };
-            Key.prototype._handleKeyUpEvent = function (keyCode) {
+            Key.prototype._handleKeyUpEvent = function (keyCode, event) {
                 if (this._downedKeys.has(keyCode) && this._keyReleaseCallbacks[keyCode]) {
+                    if (this.preventDefault()) {
+                        event.preventDefault();
+                    }
                     this._keyReleaseCallbacks[keyCode].callCallbacks(keyCode);
                 }
                 this._downedKeys.delete(keyCode);
+            };
+            Key.prototype.preventDefault = function (preventDefault) {
+                if (preventDefault == null) {
+                    return this._preventDefault;
+                }
+                this._preventDefault = preventDefault;
+                return this;
             };
             /**
              * Adds a callback to be called when the key with the given keyCode is

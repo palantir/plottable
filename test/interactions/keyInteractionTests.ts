@@ -53,10 +53,11 @@ describe("Interactions", () => {
 
         function triggerKeyEvent(mouseEvent: string, p: Plottable.Point, target: d3.Selection<void>, keycode: number, options = null) {
           TestMethods.triggerFakeMouseEvent(mouseEvent, target, p.x, p.y);
-          TestMethods.triggerFakeKeyboardEvent("keydown", target, keycode, options);
+          let lastEvent = TestMethods.triggerFakeKeyboardEvent("keydown", target, keycode, options);
           if (event === "KeyRelease") {
-            TestMethods.triggerFakeKeyboardEvent("keyup", target, keycode, options);
+            lastEvent = TestMethods.triggerFakeKeyboardEvent("keyup", target, keycode, options);
           }
+          return lastEvent;
         }
 
         function registerEvent(keycode: number, callback: KeyTestCallback) {
@@ -142,6 +143,34 @@ describe("Interactions", () => {
           triggerKeyEvent("mouseover", INSIDE_POINT, eventTarget, A_KEY_CODE);
           assert.isFalse(callback.called, `callback 1 for "a" was disconnected from the interaction`);
           assert.isTrue(callback2.called, `callback 2 for "a" is still connected to the interaction`);
+        });
+
+        it("can set and get preventDefault setting", () => {
+          assert.isFalse(keyInteraction.preventDefault(), "preventDefault is false by default");
+          assert.strictEqual(keyInteraction.preventDefault(true), keyInteraction, "setting preventDefault returns calling Interaction");
+          assert.isTrue(keyInteraction.preventDefault(), "preventDefault is set to true");
+          keyInteraction.preventDefault(false);
+          assert.isFalse(keyInteraction.preventDefault(), "preventDefault can be set back to false");
+        });
+
+        it("prevents default according to the setting", () => {
+          registerEvent(A_KEY_CODE, callback);
+          let event = triggerKeyEvent("mouseover", INSIDE_POINT, eventTarget, A_KEY_CODE);
+          assert.isFalse(event.defaultPrevented, "default was not prevented");
+
+          keyInteraction.preventDefault(true);
+          event = triggerKeyEvent("mouseover", INSIDE_POINT, eventTarget, A_KEY_CODE);
+          assert.isTrue(event.defaultPrevented, "default was prevented");
+        });
+
+        it("does not prevents default for unregistered key", () => {
+          registerEvent(A_KEY_CODE, callback);
+          keyInteraction.preventDefault(true);
+
+          let event = triggerKeyEvent("mouseover", INSIDE_POINT, eventTarget, A_KEY_CODE);
+          assert.isTrue(event.defaultPrevented, "default was prevented for key A");
+          event = triggerKeyEvent("mouseover", INSIDE_POINT, eventTarget, B_KEY_CODE);
+          assert.isFalse(event.defaultPrevented, "default was not prevented for key B");
         });
       });
     });
