@@ -13,6 +13,7 @@ module Plottable.Plots {
     private _croppedRenderingEnabled = true;
 
     private _downsamplingEnabled = false;
+    protected _datasetsIndexConsistent = false;
 
     /**
      * A Line Plot draws line segments starting from the first data point to the next.
@@ -389,26 +390,41 @@ module Plottable.Plots {
 
     protected _getDataToDraw() {
       let dataToDraw = new Utils.Map<Dataset, any[]> ();
-
-      this.datasets().forEach((dataset) => {
-        let data = dataset.data();
-
-        if (!this._croppedRenderingEnabled && !this._downsamplingEnabled) {
-          dataToDraw.set(dataset, [data]);
-          return;
-        }
-
-        let filteredDataIndices = data.map((d, i) => i);
-        if (this._croppedRenderingEnabled) {
-          filteredDataIndices = this._filterCroppedRendering(dataset, filteredDataIndices);
-        }
-        if (this._downsamplingEnabled) {
-          filteredDataIndices = this._filterDownsampling(dataset, filteredDataIndices);
-        }
-        dataToDraw.set(dataset, [filteredDataIndices.map((d, i) => data[d])]);
-      });
-
+      if (!this._datasetsIndexConsistent || (!this._croppedRenderingEnabled && !this._downsamplingEnabled)) {
+        this.datasets().forEach((dataset) => {
+          let data = dataset.data();
+          if (!this._croppedRenderingEnabled && !this._downsamplingEnabled) {
+            dataToDraw.set(dataset, [data]);
+          } else {
+            let filteredDataIndices = this._filterDataset(data, dataset);
+            dataToDraw.set(dataset, [filteredDataIndices.map((d, i) => data[d])]);
+          }
+        });
+      } else {
+        let overallFilteredDataIndices: number[] = [];
+        this.datasets().forEach((dataset) => {
+          let data = dataset.data();
+          let filteredDataIndices = this._filterDataset(data, dataset);
+          overallFilteredDataIndices = overallFilteredDataIndices.concat(
+            filteredDataIndices.filter((d) => overallFilteredDataIndices.indexOf(d) < 0 ));
+        });
+        this.datasets().forEach((dataset) => {
+          let data = dataset.data();
+          dataToDraw.set(dataset, [overallFilteredDataIndices.sort((a, b) => a - b).map((d) => data[d])]);
+        });
+      }
       return dataToDraw;
+    }
+
+    private _filterDataset(data: any[], dataset: Dataset) {
+      let filteredDataIndices = data.map((d, i) => i);
+      if (this._croppedRenderingEnabled) {
+        filteredDataIndices = this._filterCroppedRendering(dataset, filteredDataIndices);
+      }
+      if (this._downsamplingEnabled) {
+        filteredDataIndices = this._filterDownsampling(dataset, filteredDataIndices);
+      }
+      return filteredDataIndices;
     }
 
     private _filterCroppedRendering(dataset: Dataset, indices: number[]) {

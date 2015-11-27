@@ -3541,6 +3541,7 @@ declare module Plottable.Plots {
         private _autorangeSmooth;
         private _croppedRenderingEnabled;
         private _downsamplingEnabled;
+        protected _datasetsIndexConsistent: boolean;
         /**
          * A Line Plot draws line segments starting from the first data point to the next.
          *
@@ -3635,6 +3636,7 @@ declare module Plottable.Plots {
         protected _propertyProjectors(): AttributeToProjector;
         protected _constructLineProjector(xProjector: Projector, yProjector: Projector): (datum: any, index: number, dataset: Dataset) => string;
         protected _getDataToDraw(): Utils.Map<Dataset, any[]>;
+        private _filterDataset(data, dataset);
         private _filterCroppedRendering(dataset, indices);
         private _filterDownsampling(dataset, indices);
     }
@@ -3721,19 +3723,6 @@ declare module Plottable.Plots {
         y(): Plots.AccessorScaleBinding<number, number>;
         y(y: number | Accessor<number>): StackedArea<X>;
         y(y: number | Accessor<number>, yScale: QuantitativeScale<number>): StackedArea<X>;
-        /**
-         * Gets if downsampling is enabled
-         *
-         * When downsampling is enabled, two consecutive lines with the same slope will be merged to one line.
-         */
-        downsamplingEnabled(): boolean;
-        /**
-         * Sets if downsampling is enabled
-         *
-         * For now, downsampling is always disabled in stacked area plot
-         * @returns {Plots.StackedArea} The calling Plots.StackedArea
-         */
-        downsamplingEnabled(downsampling: boolean): Plots.Line<X>;
         protected _additionalPaint(): void;
         protected _updateYScale(): void;
         protected _onDatasetUpdate(): StackedArea<X>;

@@ -17,6 +17,7 @@ module Plottable.Plots {
       this._stackingResult = new Utils.Map<Dataset, Utils.Map<string, Utils.Stacking.StackedDatum>>();
       this._stackedExtent = [];
       this._baselineValueProvider = () => [this._baselineValue];
+      this._datasetsIndexConsistent = true;
     }
 
     protected _getAnimator(key: string): Animator {
@@ -61,27 +62,6 @@ module Plottable.Plots {
 
       this._updateStackExtentsAndOffsets();
 
-      return this;
-    }
-
-    /**
-     * Gets if downsampling is enabled
-     *
-     * When downsampling is enabled, two consecutive lines with the same slope will be merged to one line.
-     */
-    public downsamplingEnabled(): boolean;
-    /**
-     * Sets if downsampling is enabled
-     *
-     * For now, downsampling is always disabled in stacked area plot
-     * @returns {Plots.StackedArea} The calling Plots.StackedArea
-     */
-    public downsamplingEnabled(downsampling: boolean): Plots.Line<X>;
-    public downsamplingEnabled(downsampling?: boolean): any {
-       if (downsampling == null) {
-         return super.downsamplingEnabled();
-       }
-      Utils.Window.warn("Warning: Stacked Area Plot does not support downsampling");
       return this;
     }
 
@@ -198,6 +178,5 @@ module Plottable.Plots {
       let scaledYValue = this.y().scale.scale(+yValue + this._stackingResult.get(dataset).get(Utils.Stacking.normalizeKey(xValue)).offset);
       return { x: pixelPoint.x, y: scaledYValue };
     }
-
   }
 }
