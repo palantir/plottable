@@ -47,6 +47,7 @@ export class Component {
   private _clipPathID: string;
   private _onAnchorCallbacks = new Utils.CallbackSet<ComponentCallback>();
   private _onDetachCallbacks = new Utils.CallbackSet<ComponentCallback>();
+  private _onRenderCallbacks = new Utils.CallbackSet<ComponentCallback>();
 
   public constructor() {
     this._cssClasses.add("component");
@@ -233,10 +234,20 @@ export class Component {
    * Renders the Component without waiting for the next frame.
    */
   public renderImmediately() {
+    const deferredTotalDrawTime = this._deferredTotalDrawTime();
+    this._renderImmediately();
+    Utils.Window.setTimeout(() => this._onRenderCallbacks.callCallbacks(this), deferredTotalDrawTime);
+    return this;
+  }
+
+  protected _deferredTotalDrawTime() {
+    return 0;
+  }
+
+  protected _renderImmediately() {
     if (this._clipPathEnabled) {
       this._updateClipPath();
     }
-    return this;
   }
 
   /**
@@ -591,6 +602,29 @@ export class Component {
    */
   public background(): d3.Selection<void> {
     return this._backgroundContainer;
+  }
+
+  /**
+   * Adds a callback to be called on rendering the Component.
+   *
+   * @param {ComponentCallback} callback
+   * @return {Component}
+   */
+  public onRender(callback: ComponentCallback) {
+    this._onRenderCallbacks.add(callback);
+    return this;
+  }
+
+  /**
+   * Removes a callback that would be called on rendering the Component.
+   * The callback is identified by reference equality.
+   *
+   * @param {ComponentCallback} callback
+   * @return {Component}
+   */
+  public offRender(callback: ComponentCallback) {
+    this._onRenderCallbacks.delete(callback);
+    return this;
   }
 }
 }

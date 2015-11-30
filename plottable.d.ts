@@ -1368,6 +1368,7 @@ declare module Plottable {
         private _clipPathID;
         private _onAnchorCallbacks;
         private _onDetachCallbacks;
+        private _onRenderCallbacks;
         constructor();
         /**
          * Attaches the Component as a child of a given d3 Selection.
@@ -1432,6 +1433,8 @@ declare module Plottable {
          * Renders the Component without waiting for the next frame.
          */
         renderImmediately(): Component;
+        protected _deferredTotalDrawTime(): number;
+        protected _renderImmediately(): void;
         /**
          * Causes the Component to re-layout and render.
          *
@@ -1585,6 +1588,21 @@ declare module Plottable {
          * @return {d3.Selection} background selection for the Component
          */
         background(): d3.Selection<void>;
+        /**
+         * Adds a callback to be called on rendering the Component.
+         *
+         * @param {ComponentCallback} callback
+         * @return {Component}
+         */
+        onRender(callback: ComponentCallback): Component;
+        /**
+         * Removes a callback that would be called on rendering the Component.
+         * The callback is identified by reference equality.
+         *
+         * @param {ComponentCallback} callback
+         * @return {Component}
+         */
+        offRender(callback: ComponentCallback): Component;
     }
 }
 declare module Plottable {
@@ -1729,7 +1747,7 @@ declare module Plottable {
         computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number): Axis<D>;
         protected _setup(): void;
         protected _getTickValues(): D[];
-        renderImmediately(): Axis<D>;
+        protected _renderImmediately(): Axis<D>;
         /**
          * Gets the annotated ticks.
          */
@@ -1993,7 +2011,7 @@ declare module Plottable.Axes {
         private _renderTickMarks(tickValues, index);
         private _renderLabellessTickMarks(tickValues);
         private _generateLabellessTicks();
-        renderImmediately(): Time;
+        protected _renderImmediately(): Time;
         private _hideOverflowingTiers();
         private _hideOverlappingAndCutOffLabels(index);
     }
@@ -2021,7 +2039,7 @@ declare module Plottable.Axes {
         protected _computeHeight(): number;
         protected _getTickValues(): number[];
         protected _rescale(): void;
-        renderImmediately(): Numeric;
+        protected _renderImmediately(): Numeric;
         private _showAllTickMarks();
         /**
          * Hides the Tick Marks which have no corresponding Tick Labels
@@ -2118,7 +2136,7 @@ declare module Plottable.Axes {
          * @param {string[]} ticks The strings that will be printed on the ticks.
          */
         private _measureTicks(axisWidth, axisHeight, scale, ticks);
-        renderImmediately(): Category;
+        protected _renderImmediately(): Category;
         computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number): Category;
     }
 }
@@ -2176,7 +2194,7 @@ declare module Plottable.Components {
         padding(padAmount: number): Label;
         fixedWidth(): boolean;
         fixedHeight(): boolean;
-        renderImmediately(): Label;
+        protected _renderImmediately(): Label;
     }
     class TitleLabel extends Label {
         static TITLE_LABEL_CLASS: string;
@@ -2293,7 +2311,7 @@ declare module Plottable.Components {
          * @returns {Entity<Legend>[]}
          */
         entitiesAt(p: Point): Entity<Legend>[];
-        renderImmediately(): Legend;
+        protected _renderImmediately(): Legend;
         /**
          * Gets the function determining the symbols of the Legend.
          *
@@ -2396,7 +2414,7 @@ declare module Plottable.Components {
         protected _setup(): void;
         requestedSpace(offeredWidth: number, offeredHeight: number): SpaceRequest;
         private _isVertical();
-        renderImmediately(): InterpolatedColorLegend;
+        protected _renderImmediately(): InterpolatedColorLegend;
     }
 }
 declare module Plottable.Components {
@@ -2414,7 +2432,7 @@ declare module Plottable.Components {
         constructor(xScale: QuantitativeScale<any>, yScale: QuantitativeScale<any>);
         destroy(): Gridlines;
         protected _setup(): void;
-        renderImmediately(): Gridlines;
+        protected _renderImmediately(): Gridlines;
         computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number): Gridlines;
         private _redrawXLines();
         private _redrawYLines();
@@ -2592,7 +2610,7 @@ declare module Plottable.Components {
         bounds(newBounds: Bounds): SelectionBoxLayer;
         protected _setBounds(newBounds: Bounds): void;
         private _getBounds();
-        renderImmediately(): SelectionBoxLayer;
+        protected _renderImmediately(): SelectionBoxLayer;
         /**
          * Gets whether the box is being shown.
          */
@@ -2694,7 +2712,7 @@ declare module Plottable.Components {
         fixedWidth(): boolean;
         fixedHeight(): boolean;
         computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number): GuideLineLayer<D>;
-        renderImmediately(): GuideLineLayer<D>;
+        protected _renderImmediately(): GuideLineLayer<D>;
         private _syncPixelPositionAndValue();
         protected _setPixelPositionWithoutChangingMode(pixelPosition: number): void;
         /**
@@ -2813,7 +2831,7 @@ declare module Plottable {
         protected _bindProperty(property: string, value: any, scale: Scale<any, any>): void;
         private _bindAttr(attr, value, scale);
         protected _generateAttrToProjector(): AttributeToProjector;
-        renderImmediately(): Plot;
+        protected _renderImmediately(): Plot;
         /**
          * Returns whether the plot will be animated.
          */
@@ -2879,6 +2897,7 @@ declare module Plottable {
         protected _additionalPaint(time: number): void;
         protected _getDataToDraw(): Utils.Map<Dataset, any[]>;
         private _paint();
+        protected _deferredTotalDrawTime(): number;
         /**
          * Retrieves Selections of this Plot for the specified Datasets.
          *
@@ -4936,7 +4955,7 @@ declare module Plottable.Components {
         private _setUpCallbacks();
         protected _setup(): void;
         private _getResizingEdges(p);
-        renderImmediately(): DragBoxLayer;
+        protected _renderImmediately(): DragBoxLayer;
         /**
          * Gets the detection radius of the drag box in pixels.
          */
@@ -5101,7 +5120,7 @@ declare module Plottable.Components {
         private _disconnectInteraction;
         constructor(orientation: string);
         protected _setup(): void;
-        renderImmediately(): DragLineLayer<D>;
+        protected _renderImmediately(): DragLineLayer<D>;
         /**
          * Gets the detection radius of the drag line in pixels.
          */

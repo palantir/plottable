@@ -857,4 +857,42 @@ describe("Component", () => {
       svg.remove();
     });
   });
+
+  describe("rendering immediately", () => {
+    let component: Plottable.Component;
+    let svg: d3.Selection<void>;
+    beforeEach(() => {
+      component = new Plottable.Component();
+      svg = TestMethods.generateSVG();
+    });
+
+    it("can undergo behavior upon rendering", () => {
+      component.anchor(svg);
+      component.computeLayout();
+
+      let passedComponent: Plottable.Component;
+      let callback = (component: Plottable.Component) => passedComponent = component;
+      assert.strictEqual(component.onRender(callback), component, "setter calls calling object");
+
+      component.renderImmediately();
+      assert.strictEqual(passedComponent, component, "callback called with component upon rendering");
+      component.destroy();
+      svg.remove();
+    });
+
+    it("can remove behavior that would have been called upon rendering", () => {
+      component.anchor(svg);
+      component.computeLayout();
+
+      let passedComponent: Plottable.Component;
+      let callback = (component: Plottable.Component) => passedComponent = component;
+      component.onRender(callback);
+      assert.strictEqual(component.offRender(callback), component, "setter calls calling object");
+
+      component.renderImmediately();
+      assert.isUndefined(passedComponent, "callback not called");
+      component.destroy();
+      svg.remove();
+    });
+  });
 });

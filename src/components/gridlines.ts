@@ -49,8 +49,8 @@ module Plottable.Components {
       this._yLinesContainer = this.content().append("g").classed("y-gridlines", true);
     }
 
-    public renderImmediately() {
-      super.renderImmediately();
+    protected _renderImmediately() {
+      super._renderImmediately();
       this._redrawXLines();
       this._redrawYLines();
       return this;

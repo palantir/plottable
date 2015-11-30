@@ -67,8 +67,8 @@ module Plottable.Components {
       return this;
     }
 
-    public renderImmediately() {
-      super.renderImmediately();
+    protected _renderImmediately() {
+      super._renderImmediately();
       this._syncPixelPositionAndValue();
       this._guideLine.attr({
         x1: this._isVertical() ? this.pixelPosition() : 0,

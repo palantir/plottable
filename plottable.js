@@ -2838,6 +2838,7 @@ var Plottable;
             this._destroyed = false;
             this._onAnchorCallbacks = new Plottable.Utils.CallbackSet();
             this._onDetachCallbacks = new Plottable.Utils.CallbackSet();
+            this._onRenderCallbacks = new Plottable.Utils.CallbackSet();
             this._cssClasses.add("component");
         }
         /**
@@ -3010,10 +3011,19 @@ var Plottable;
          * Renders the Component without waiting for the next frame.
          */
         Component.prototype.renderImmediately = function () {
+            var _this = this;
+            var deferredTotalDrawTime = this._deferredTotalDrawTime();
+            this._renderImmediately();
+            Plottable.Utils.Window.setTimeout(function () { return _this._onRenderCallbacks.callCallbacks(_this); }, deferredTotalDrawTime);
+            return this;
+        };
+        Component.prototype._deferredTotalDrawTime = function () {
+            return 0;
+        };
+        Component.prototype._renderImmediately = function () {
             if (this._clipPathEnabled) {
                 this._updateClipPath();
             }
-            return this;
         };
         /**
          * Causes the Component to re-layout and render.
@@ -3309,6 +3319,27 @@ var Plottable;
          */
         Component.prototype.background = function () {
             return this._backgroundContainer;
+        };
+        /**
+         * Adds a callback to be called on rendering the Component.
+         *
+         * @param {ComponentCallback} callback
+         * @return {Component}
+         */
+        Component.prototype.onRender = function (callback) {
+            this._onRenderCallbacks.add(callback);
+            return this;
+        };
+        /**
+         * Removes a callback that would be called on rendering the Component.
+         * The callback is identified by reference equality.
+         *
+         * @param {ComponentCallback} callback
+         * @return {Component}
+         */
+        Component.prototype.offRender = function (callback) {
+            this._onRenderCallbacks.delete(callback);
+            return this;
         };
         Component._xAlignToProportion = {
             "left": 0,
@@ -3612,7 +3643,7 @@ var Plottable;
         Axis.prototype._getTickValues = function () {
             return [];
         };
-        Axis.prototype.renderImmediately = function () {
+        Axis.prototype._renderImmediately = function () {
             var tickMarkValues = this._getTickValues();
             var tickMarks = this._tickMarkContainer.selectAll("." + Axis.TICK_MARK_CLASS).data(tickMarkValues);
             tickMarks.enter().append("line").classed(Axis.TICK_MARK_CLASS, true);
@@ -4307,7 +4338,7 @@ var Plottable;
                 }
                 return this._getTickIntervalValues(this._possibleTimeAxisConfigurations[this._mostPreciseConfigIndex - 1][0]);
             };
-            Time.prototype.renderImmediately = function () {
+            Time.prototype._renderImmediately = function () {
                 var _this = this;
                 this._mostPreciseConfigIndex = this._getMostPreciseConfigurationIndex();
                 var tierConfigs = this._possibleTimeAxisConfigurations[this._mostPreciseConfigIndex];
@@ -4607,9 +4638,9 @@ var Plottable;
                 }
                 this.render();
             };
-            Numeric.prototype.renderImmediately = function () {
+            Numeric.prototype._renderImmediately = function () {
                 var _this = this;
-                _super.prototype.renderImmediately.call(this);
+                _super.prototype._renderImmediately.call(this);
                 var tickLabelAttrHash = {
                     x: 0,
                     y: 0,
@@ -5016,9 +5047,9 @@ var Plottable;
                     usedHeight: usedHeight
                 };
             };
-            Category.prototype.renderImmediately = function () {
+            Category.prototype._renderImmediately = function () {
                 var _this = this;
-                _super.prototype.renderImmediately.call(this);
+                _super.prototype._renderImmediately.call(this);
                 var catScale = this._scale;
                 var tickLabels = this._tickLabelContainer.selectAll("." + Plottable.Axis.TICK_LABEL_CLASS).data(this._scale.domain(), function (d) { return d; });
                 var getTickLabelTransform = function (d, i) {
@@ -5150,8 +5181,8 @@ var Plottable;
             Label.prototype.fixedHeight = function () {
                 return true;
             };
-            Label.prototype.renderImmediately = function () {
-                _super.prototype.renderImmediately.call(this);
+            Label.prototype._renderImmediately = function () {
+                _super.prototype._renderImmediately.call(this);
                 // HACKHACK SVGTypewriter should remove existing content - #21 on SVGTypewriter.
                 this._textContainer.selectAll("g").remove();
                 var textMeasurement = this._measurer.measure(this._text);
@@ -5387,9 +5418,9 @@ var Plottable;
                 });
                 return entities;
             };
-            Legend.prototype.renderImmediately = function () {
+            Legend.prototype._renderImmediately = function () {
                 var _this = this;
-                _super.prototype.renderImmediately.call(this);
+                _super.prototype._renderImmediately.call(this);
                 var layout = this._calculateLayoutInfo(this.width(), this.height());
                 var rowsToDraw = layout.rows.slice(0, layout.numRowsToDraw);
                 var rows = this.content().selectAll("g." + Legend.LEGEND_ROW_CLASS).data(rowsToDraw);
@@ -5607,9 +5638,9 @@ var Plottable;
             InterpolatedColorLegend.prototype._isVertical = function () {
                 return this._orientation !== "horizontal";
             };
-            InterpolatedColorLegend.prototype.renderImmediately = function () {
+            InterpolatedColorLegend.prototype._renderImmediately = function () {
                 var _this = this;
-                _super.prototype.renderImmediately.call(this);
+                _super.prototype._renderImmediately.call(this);
                 var domain = this._scale.domain();
                 var text0 = this._formatter(domain[0]);
                 var text0Width = this._measurer.measure(text0).width;
@@ -5769,8 +5800,8 @@ var Plottable;
                 this._xLinesContainer = this.content().append("g").classed("x-gridlines", true);
                 this._yLinesContainer = this.content().append("g").classed("y-gridlines", true);
             };
-            Gridlines.prototype.renderImmediately = function () {
-                _super.prototype.renderImmediately.call(this);
+            Gridlines.prototype._renderImmediately = function () {
+                _super.prototype._renderImmediately.call(this);
                 this._redrawXLines();
                 this._redrawYLines();
                 return this;
@@ -6296,8 +6327,8 @@ var Plottable;
                     }
                 };
             };
-            SelectionBoxLayer.prototype.renderImmediately = function () {
-                _super.prototype.renderImmediately.call(this);
+            SelectionBoxLayer.prototype._renderImmediately = function () {
+                _super.prototype._renderImmediately.call(this);
                 if (this._boxVisible) {
                     var bounds = this.bounds();
                     var t = bounds.topLeft.y;
@@ -6480,8 +6511,8 @@ var Plottable;
                 }
                 return this;
             };
-            GuideLineLayer.prototype.renderImmediately = function () {
-                _super.prototype.renderImmediately.call(this);
+            GuideLineLayer.prototype._renderImmediately = function () {
+                _super.prototype._renderImmediately.call(this);
                 this._syncPixelPositionAndValue();
                 this._guideLine.attr({
                     x1: this._isVertical() ? this.pixelPosition() : 0,
@@ -6687,8 +6718,8 @@ var Plottable;
             });
             return h;
         };
-        Plot.prototype.renderImmediately = function () {
-            _super.prototype.renderImmediately.call(this);
+        Plot.prototype._renderImmediately = function () {
+            _super.prototype._renderImmediately.call(this);
             if (this._isAnchored) {
                 this._paint();
                 this._dataChanged = false;
@@ -6887,6 +6918,12 @@ var Plottable;
             var times = this.datasets().map(function (ds, i) { return drawers[i].totalDrawTime(dataToDraw.get(ds), drawSteps); });
             var maxTime = Plottable.Utils.Math.max(times, 0);
             this._additionalPaint(maxTime);
+        };
+        Plot.prototype._deferredTotalDrawTime = function () {
+            var drawSteps = this._generateDrawSteps();
+            var dataToDraw = this._getDataToDraw();
+            var drawers = this._getDrawersInOrder();
+            return Plottable.Utils.Math.max(this.datasets().map(function (ds, i) { return drawers[i].totalDrawTime(dataToDraw.get(ds), drawSteps); }), 0);
         };
         /**
          * Retrieves Selections of this Plot for the specified Datasets.
@@ -11926,8 +11963,8 @@ var Plottable;
                 }
                 return edges;
             };
-            DragBoxLayer.prototype.renderImmediately = function () {
-                _super.prototype.renderImmediately.call(this);
+            DragBoxLayer.prototype._renderImmediately = function () {
+                _super.prototype._renderImmediately.call(this);
                 if (this.boxVisible()) {
                     var bounds = this.bounds();
                     var t = bounds.topLeft.y;
@@ -12283,8 +12320,8 @@ var Plottable;
                     "pointer-events": "visibleStroke"
                 }).classed("drag-edge", true);
             };
-            DragLineLayer.prototype.renderImmediately = function () {
-                _super.prototype.renderImmediately.call(this);
+            DragLineLayer.prototype._renderImmediately = function () {
+                _super.prototype._renderImmediately.call(this);
                 this._detectionEdge.attr({
                     x1: this._isVertical() ? this.pixelPosition() : 0,
                     y1: this._isVertical() ? 0 : this.pixelPosition(),

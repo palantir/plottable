@@ -198,8 +198,8 @@ export class Plot extends Component {
     return h;
   }
 
-  public renderImmediately() {
-    super.renderImmediately();
+  protected _renderImmediately() {
+    super._renderImmediately();
     if (this._isAnchored) {
       this._paint();
       this._dataChanged = false;
@@ -450,6 +450,13 @@ export class Plot extends Component {
     let times = this.datasets().map((ds, i) => drawers[i].totalDrawTime(dataToDraw.get(ds), drawSteps));
     let maxTime = Utils.Math.max(times, 0);
     this._additionalPaint(maxTime);
+  }
+
+  protected _deferredTotalDrawTime() {
+    let drawSteps = this._generateDrawSteps();
+    let dataToDraw = this._getDataToDraw();
+    let drawers = this._getDrawersInOrder();
+    return Utils.Math.max(this.datasets().map((ds, i) => drawers[i].totalDrawTime(dataToDraw.get(ds), drawSteps)), 0);
   }
 
   /**

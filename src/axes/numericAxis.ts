@@ -99,8 +99,8 @@ module Plottable.Axes {
       this.render();
     }
 
-    public renderImmediately() {
-      super.renderImmediately();
+    protected _renderImmediately() {
+      super._renderImmediately();
 
       let tickLabelAttrHash: { [key: string]: number | string | ((d: any) => number) } = {
         x: <any> 0,

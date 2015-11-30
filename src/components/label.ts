@@ -132,8 +132,8 @@ module Plottable.Components {
       return true;
     }
 
-    public renderImmediately() {
-      super.renderImmediately();
+    protected _renderImmediately() {
+      super._renderImmediately();
       // HACKHACK SVGTypewriter should remove existing content - #21 on SVGTypewriter.
       this._textContainer.selectAll("g").remove();
       let textMeasurement = this._measurer.measure(this._text);

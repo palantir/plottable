@@ -462,7 +462,7 @@ module Plottable.Axes {
       return this._getTickIntervalValues(this._possibleTimeAxisConfigurations[this._mostPreciseConfigIndex - 1][0]);
     }
 
-    public renderImmediately() {
+    protected _renderImmediately() {
       this._mostPreciseConfigIndex = this._getMostPreciseConfigurationIndex();
       let tierConfigs = this._possibleTimeAxisConfigurations[this._mostPreciseConfigIndex];
 
