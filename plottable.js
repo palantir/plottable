@@ -10240,10 +10240,14 @@ var Plottable;
                 this._eventToProcessingFunction[Mouse._MOUSEOVER_EVENT_NAME] = processMoveCallback;
                 this._eventToProcessingFunction[Mouse._MOUSEMOVE_EVENT_NAME] = processMoveCallback;
                 this._eventToProcessingFunction[Mouse._MOUSEOUT_EVENT_NAME] = processMoveCallback;
-                this._eventToProcessingFunction[Mouse._MOUSEDOWN_EVENT_NAME] = function (e) { return _this._measureAndDispatch(e, Mouse._MOUSEDOWN_EVENT_NAME); };
-                this._eventToProcessingFunction[Mouse._MOUSEUP_EVENT_NAME] = function (e) { return _this._measureAndDispatch(e, Mouse._MOUSEUP_EVENT_NAME, "page"); };
-                this._eventToProcessingFunction[Mouse._WHEEL_EVENT_NAME] = function (e) { return _this._measureAndDispatch(e, Mouse._WHEEL_EVENT_NAME); };
-                this._eventToProcessingFunction[Mouse._DBLCLICK_EVENT_NAME] = function (e) { return _this._measureAndDispatch(e, Mouse._DBLCLICK_EVENT_NAME); };
+                this._eventToProcessingFunction[Mouse._MOUSEDOWN_EVENT_NAME] =
+                    function (e) { return _this._measureAndDispatch(e, Mouse._MOUSEDOWN_EVENT_NAME); };
+                this._eventToProcessingFunction[Mouse._MOUSEUP_EVENT_NAME] =
+                    function (e) { return _this._measureAndDispatch(e, Mouse._MOUSEUP_EVENT_NAME, "page"); };
+                this._eventToProcessingFunction[Mouse._WHEEL_EVENT_NAME] =
+                    function (e) { return _this._measureAndDispatch(e, Mouse._WHEEL_EVENT_NAME); };
+                this._eventToProcessingFunction[Mouse._DBLCLICK_EVENT_NAME] =
+                    function (e) { return _this._measureAndDispatch(e, Mouse._DBLCLICK_EVENT_NAME); };
             }
             /**
              * Get a Mouse Dispatcher for the <svg> containing elem.
@@ -10374,7 +10378,7 @@ var Plottable;
                     var newMousePosition = this._translator.computePosition(event.clientX, event.clientY);
                     if (newMousePosition != null) {
                         this._lastMousePosition = newMousePosition;
-                        this._callCallbacksForEvent(eventName, this._lastMousePosition, event);
+                        this._callCallbacksForEvent(eventName, this.lastMousePosition(), event);
                     }
                 }
             };

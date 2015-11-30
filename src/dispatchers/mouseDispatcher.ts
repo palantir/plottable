@@ -180,7 +180,7 @@ module Plottable.Dispatchers {
         let newMousePosition = this._translator.computePosition(event.clientX, event.clientY);
         if (newMousePosition != null) {
           this._lastMousePosition = newMousePosition;
-          this._callCallbacksForEvent(eventName, this._lastMousePosition, event);
+          this._callCallbacksForEvent(eventName, this.lastMousePosition(), event);
         }
       }
     }
