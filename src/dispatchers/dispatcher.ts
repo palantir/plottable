@@ -19,8 +19,8 @@ export class Dispatcher {
       return;
     }
     Object.keys(this._eventToProcessingFunction).forEach((event: string) => {
-      let callback = this._eventToProcessingFunction[event];
-      document.addEventListener(event, callback);
+      const processingFunction = this._eventToProcessingFunction[event];
+      document.addEventListener(event, processingFunction);
     });
     this._connected = true;
   }
@@ -28,8 +28,8 @@ export class Dispatcher {
   private _disconnect() {
     if (this._connected && this._hasNoCallbacks()) {
       Object.keys(this._eventToProcessingFunction).forEach((event: string) => {
-        let callback = this._eventToProcessingFunction[event];
-        document.removeEventListener(event, callback);
+        const processingFunction = this._eventToProcessingFunction[event];
+        document.removeEventListener(event, processingFunction);
       });
       this._connected = false;
     }

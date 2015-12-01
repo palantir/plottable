@@ -10177,8 +10177,8 @@ var Plottable;
                 return;
             }
             Object.keys(this._eventToProcessingFunction).forEach(function (event) {
-                var callback = _this._eventToProcessingFunction[event];
-                document.addEventListener(event, callback);
+                var processingFunction = _this._eventToProcessingFunction[event];
+                document.addEventListener(event, processingFunction);
             });
             this._connected = true;
         };
@@ -10186,8 +10186,8 @@ var Plottable;
             var _this = this;
             if (this._connected && this._hasNoCallbacks()) {
                 Object.keys(this._eventToProcessingFunction).forEach(function (event) {
-                    var callback = _this._eventToProcessingFunction[event];
-                    document.removeEventListener(event, callback);
+                    var processingFunction = _this._eventToProcessingFunction[event];
+                    document.removeEventListener(event, processingFunction);
                 });
                 this._connected = false;
             }
