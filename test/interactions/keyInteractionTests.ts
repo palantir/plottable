@@ -51,11 +51,11 @@ describe("Interactions", () => {
           }
         });
 
-        function triggerKeyEvent(mouseEvent: string, p: Plottable.Point, target: d3.Selection<void>, keycode: number, options = null) {
+        function triggerKeyEvent(mouseEvent: string, p: Plottable.Point, target: d3.Selection<void>, keycode: number) {
           TestMethods.triggerFakeMouseEvent(mouseEvent, target, p.x, p.y);
-          TestMethods.triggerFakeKeyboardEvent("keydown", target, keycode, options);
+          TestMethods.triggerFakeKeyboardEvent("keydown", target, keycode);
           if (event === "KeyRelease") {
-            TestMethods.triggerFakeKeyboardEvent("keyup", target, keycode, options);
+            TestMethods.triggerFakeKeyboardEvent("keyup", target, keycode);
           }
         }
 
