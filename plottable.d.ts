@@ -4015,7 +4015,7 @@ declare module Plottable.Animators {
          * @param {number} startDelay The start delay in milliseconds.
          * @returns {Easing} The calling Easing Animator.
          */
-        startDelay(startDelay: number): Easing;
+        startDelay(startDelay: number): this;
         /**
          * Gets the duration of one animation step in milliseconds.
          *
@@ -4028,7 +4028,7 @@ declare module Plottable.Animators {
          * @param {number} stepDuration The duration in milliseconds.
          * @returns {Easing} The calling Easing Animator.
          */
-        stepDuration(stepDuration: number): Easing;
+        stepDuration(stepDuration: number): this;
         /**
          * Gets the maximum start delay between animation steps in milliseconds.
          *
@@ -4041,7 +4041,7 @@ declare module Plottable.Animators {
          * @param {number} stepDelay The maximum iterative delay in milliseconds.
          * @returns {Easing} The calling Easing Animator.
          */
-        stepDelay(stepDelay: number): Easing;
+        stepDelay(stepDelay: number): this;
         /**
          * Gets the maximum total animation duration constraint in milliseconds.
          *
@@ -4062,7 +4062,7 @@ declare module Plottable.Animators {
          * @param {number} maxTotalDuration The maximum total animation duration in milliseconds.
          * @returns {Easing} The calling Easing Animator.
          */
-        maxTotalDuration(maxTotalDuration: number): Easing;
+        maxTotalDuration(maxTotalDuration: number): this;
         /**
          * Gets the current easing mode of the animation.
          *
@@ -4075,7 +4075,7 @@ declare module Plottable.Animators {
          * @param {string} easingMode The desired easing mode.
          * @returns {Easing} The calling Easing Animator.
          */
-        easingMode(easingMode: string): Easing;
+        easingMode(easingMode: string): this;
         /**
          * Adjust the iterative delay, such that it takes into account the maxTotalDuration constraint
          */
