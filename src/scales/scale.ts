@@ -144,7 +144,7 @@ export class Scale<D, R> {
     }
   }
 
-  protected _getDomain() {
+  protected _getDomain(): D[] {
     throw new Error("Subclasses should override _getDomain");
   }
 
@@ -183,7 +183,7 @@ export class Scale<D, R> {
     }
   }
 
-  protected _getRange() {
+  protected _getRange(): R[] {
     throw new Error("Subclasses should override _getRange");
   }
 
