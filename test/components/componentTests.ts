@@ -182,7 +182,7 @@ describe("Component", () => {
       svg.remove();
     });
 
-    it("removes the parent when detaching", () => {
+    it("sets its parent to null when detaching", () => {
       let parent = new Plottable.Components.Group([c]);
       c.detach();
       assert.isNull(c.parent(), "parent removed upon detaching");
@@ -397,8 +397,19 @@ describe("Component", () => {
       svg.remove();
     });
 
-    it("throws an error when computing layout when attached to non-root node using default arguments", () => {
-      let g = svg.append("g");
+    it("requires arguments when not anchored directly under the svg", () => {
+      const g = svg.append("g");
+      c.anchor(g);
+      // HACKHACK: https://github.com/palantir/plottable/issues/2661 Cannot assert errors being thrown with description
+      (<any> assert).throws(() => c.computeLayout(), "null arguments",
+        "cannot compute layout with no arguments and not being the top svg element");
+      svg.remove();
+    });
+
+    it("requires arguments if not anchored directly under the svg, even if previously anchored directly under the svg", () => {
+      c.anchor(svg);
+      c.detach();
+      const g = svg.append("g");
       c.anchor(g);
       // HACKHACK: https://github.com/palantir/plottable/issues/2661 Cannot assert errors being thrown with description
       (<any> assert).throws(() => c.computeLayout(), "null arguments",

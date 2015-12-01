@@ -63,13 +63,14 @@ export class Component {
       throw new Error("Can't reuse destroy()-ed Components!");
     }
 
-    if ((<Node> selection.node()).nodeName.toLowerCase() === "svg") {
+    this._isTopLevelComponent = (<Node> selection.node()).nodeName.toLowerCase() === "svg";
+
+    if (this._isTopLevelComponent) {
       // svg node gets the "plottable" CSS class
       this._rootSVG = selection;
       this._rootSVG.classed("plottable", true);
       // visible overflow for firefox https://stackoverflow.com/questions/5926986/why-does-firefox-appear-to-truncate-embedded-svgs
       this._rootSVG.style("overflow", "visible");
-      this._isTopLevelComponent = true;
     }
 
     if (this._element != null) {
