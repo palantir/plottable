@@ -1739,7 +1739,7 @@ declare module Plottable {
          *
          * @returns {Axis} The calling Axis.
          */
-        annotatedTicks(annotatedTicks: D[]): Axis<D>;
+        annotatedTicks(annotatedTicks: D[]): this;
         /**
          * Gets the Formatter for the annotations.
          */
@@ -1749,7 +1749,7 @@ declare module Plottable {
          *
          * @returns {Axis} The calling Axis.
          */
-        annotationFormatter(annotationFormatter: Formatter): Axis<D>;
+        annotationFormatter(annotationFormatter: Formatter): this;
         /**
          * Gets if annotations are enabled.
          */
@@ -1759,7 +1759,7 @@ declare module Plottable {
          *
          * @returns {Axis} The calling Axis.
          */
-        annotationsEnabled(annotationsEnabled: boolean): Axis<D>;
+        annotationsEnabled(annotationsEnabled: boolean): this;
         /**
          * Gets the count of annotation tiers to render.
          */
@@ -1769,7 +1769,7 @@ declare module Plottable {
          *
          * @returns {Axis} The calling Axis.
          */
-        annotationTierCount(annotationTierCount: number): Axis<D>;
+        annotationTierCount(annotationTierCount: number): this;
         protected _drawAnnotations(): void;
         private _annotatedTicksToRender();
         /**
@@ -1800,7 +1800,7 @@ declare module Plottable {
          * @param {Formatter} formatter
          * @returns {Axis} The calling Axis.
          */
-        formatter(formatter: Formatter): Axis<D>;
+        formatter(formatter: Formatter): this;
         /**
          * @deprecated As of release v1.3.0, replaced by innerTickLength()
          *
@@ -1813,7 +1813,7 @@ declare module Plottable {
          * @param {number} length
          * @returns {Axis} The calling Axis.
          */
-        tickLength(length: number): Axis<D>;
+        tickLength(length: number): this;
         /**
          * Gets the tick mark length in pixels.
          */
@@ -1824,7 +1824,7 @@ declare module Plottable {
          * @param {number} length
          * @returns {Axis} The calling Axis.
          */
-        innerTickLength(length: number): Axis<D>;
+        innerTickLength(length: number): this;
         /**
          * Gets the end tick mark length in pixels.
          */
@@ -1835,7 +1835,7 @@ declare module Plottable {
          * @param {number} length
          * @returns {Axis} The calling Axis.
          */
-        endTickLength(length: number): Axis<D>;
+        endTickLength(length: number): this;
         protected _maxLabelTickLength(): number;
         /**
          * Gets the padding between each tick mark and its associated label in pixels.
@@ -1847,7 +1847,7 @@ declare module Plottable {
          * @param {number} padding
          * @returns {Axis} The calling Axis.
          */
-        tickLabelPadding(padding: number): Axis<D>;
+        tickLabelPadding(padding: number): this;
         /**
          * Gets the margin in pixels.
          * The margin is the amount of space between the tick labels and the outer edge of the Axis.
@@ -1862,7 +1862,7 @@ declare module Plottable {
          * @param {number} size
          * @returns {Axis} The calling Axis.
          */
-        margin(size: number): Axis<D>;
+        margin(size: number): this;
         /**
          * Gets the orientation of the Axis.
          */
@@ -1873,7 +1873,7 @@ declare module Plottable {
          * @param {number} orientation One of "top"/"bottom"/"left"/"right".
          * @returns {Axis} The calling Axis.
          */
-        orientation(orientation: string): Axis<D>;
+        orientation(orientation: string): this;
         /**
          * Gets whether the Axis shows the end tick labels.
          */
@@ -1884,7 +1884,7 @@ declare module Plottable {
          * @param {boolean} show
          * @returns {Axis} The calling Axis.
          */
-        showEndTickLabels(show: boolean): Axis<D>;
+        showEndTickLabels(show: boolean): this;
     }
 }
 declare module Plottable {
@@ -1953,7 +1953,7 @@ declare module Plottable.Axes {
          * @param {string[]} newPositions The positions for each tier. "bottom" and "center" are the only supported values.
          * @returns {Axes.Time} The calling Time Axis.
          */
-        tierLabelPositions(newPositions: string[]): Time;
+        tierLabelPositions(newPositions: string[]): this;
         /**
          * Gets the possible TimeAxisConfigurations.
          */
@@ -1965,13 +1965,13 @@ declare module Plottable.Axes {
          * @param {TimeAxisConfiguration[]} configurations
          * @returns {Axes.Time} The calling Time Axis.
          */
-        axisConfigurations(configurations: TimeAxisConfiguration[]): Time;
+        axisConfigurations(configurations: TimeAxisConfiguration[]): this;
         /**
          * Gets the index of the most precise TimeAxisConfiguration that will fit in the current width.
          */
         private _getMostPreciseConfigurationIndex();
         orientation(): string;
-        orientation(orientation: string): Time;
+        orientation(orientation: string): this;
         protected _computeHeight(): number;
         private _getIntervalLength(config);
         private _maxWidthForInterval(config);
@@ -2040,7 +2040,7 @@ declare module Plottable.Axes {
          *                          "left"/"center"/"right" for a horizontal Numeric Axis.
          * @returns {Numeric} The calling Numeric Axis.
          */
-        tickLabelPosition(position: string): Numeric;
+        tickLabelPosition(position: string): this;
         /**
          * Gets the approximate text width setting.
          *
@@ -2105,7 +2105,7 @@ declare module Plottable.Axes {
          * @param {number} angle
          * @returns {Category} The calling Category Axis.
          */
-        tickLabelAngle(angle: number): Category;
+        tickLabelAngle(angle: number): this;
         /**
          * Measures the size of the ticks while also writing them to the DOM.
          * @param {d3.Selection} ticks The tick elements to be written to.

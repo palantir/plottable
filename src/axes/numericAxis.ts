@@ -254,7 +254,7 @@ module Plottable.Axes {
      *                          "left"/"center"/"right" for a horizontal Numeric Axis.
      * @returns {Numeric} The calling Numeric Axis.
      */
-    public tickLabelPosition(position: string): Numeric;
+    public tickLabelPosition(position: string): this;
     public tickLabelPosition(position?: string): any {
       if (position == null) {
         return this._tickLabelPositioning;
