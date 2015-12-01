@@ -445,12 +445,14 @@ module Plottable.Components {
     public detach() {
       this._resetState();
       this._dragInteraction.detachFrom(this);
-      return super.detach();
+      super.detach();
+      return this;
     }
 
     public anchor(selection: d3.Selection<void>) {
       this._dragInteraction.attachTo(this);
-      return super.anchor(selection);
+      super.anchor(selection);
+      return this;
     }
 
     private _resetState() {
