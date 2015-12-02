@@ -265,7 +265,7 @@ export class Component {
    * @param {String|d3.Selection} element A selector-string for the <svg>, or a d3 selection containing an <svg>.
    * @returns {Component} The calling Component.
    */
-  public renderTo(element: String | Element | d3.Selection<void>): Component {
+  public renderTo(element: String | Element | d3.Selection<void>): this {
     this.detach();
     if (element != null) {
       let selection: d3.Selection<void>;
@@ -302,7 +302,7 @@ export class Component {
    * @param {string} xAlignment The x alignment of the Component ("left"/"center"/"right").
    * @returns {Component} The calling Component.
    */
-  public xAlignment(xAlignment: string): Component;
+  public xAlignment(xAlignment: string): this;
   public xAlignment(xAlignment?: string): any {
     if (xAlignment == null) {
       return this._xAlignment;
@@ -327,7 +327,7 @@ export class Component {
    * @param {string} yAlignment The y alignment of the Component ("top"/"center"/"bottom").
    * @returns {Component} The calling Component.
    */
-  public yAlignment(yAlignment: string): Component;
+  public yAlignment(yAlignment: string): this;
   public yAlignment(yAlignment?: string): any {
     if (yAlignment == null) {
       return this._yAlignment;
@@ -498,7 +498,7 @@ export class Component {
    * Adding a Component to a ComponentContainer should be done
    * using the appropriate method on the ComponentContainer.
    */
-  public parent(parent: ComponentContainer): Component;
+  public parent(parent: ComponentContainer): this;
   public parent(parent?: ComponentContainer): any {
     if (parent === undefined) {
      return this._parent;

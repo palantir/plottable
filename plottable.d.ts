@@ -1447,7 +1447,7 @@ declare module Plottable {
          * @param {String|d3.Selection} element A selector-string for the <svg>, or a d3 selection containing an <svg>.
          * @returns {Component} The calling Component.
          */
-        renderTo(element: String | Element | d3.Selection<void>): Component;
+        renderTo(element: String | Element | d3.Selection<void>): this;
         /**
          * Gets the x alignment of the Component.
          */
@@ -1458,7 +1458,7 @@ declare module Plottable {
          * @param {string} xAlignment The x alignment of the Component ("left"/"center"/"right").
          * @returns {Component} The calling Component.
          */
-        xAlignment(xAlignment: string): Component;
+        xAlignment(xAlignment: string): this;
         /**
          * Gets the y alignment of the Component.
          */
@@ -1469,7 +1469,7 @@ declare module Plottable {
          * @param {string} yAlignment The y alignment of the Component ("top"/"center"/"bottom").
          * @returns {Component} The calling Component.
          */
-        yAlignment(yAlignment: string): Component;
+        yAlignment(yAlignment: string): this;
         private _addBox(className?, parentElement?);
         private _generateClipPath();
         private _updateClipPath();
@@ -1536,7 +1536,7 @@ declare module Plottable {
          * Adding a Component to a ComponentContainer should be done
          * using the appropriate method on the ComponentContainer.
          */
-        parent(parent: ComponentContainer): Component;
+        parent(parent: ComponentContainer): this;
         /**
          * Removes a Component from the DOM and disconnects all listeners.
          */
@@ -2151,7 +2151,7 @@ declare module Plottable.Components {
          * @param {string} displayText
          * @returns {Label} The calling Label.
          */
-        text(displayText: string): Label;
+        text(displayText: string): this;
         /**
          * Gets the angle of the Label in degrees.
          */
@@ -2162,7 +2162,7 @@ declare module Plottable.Components {
          * @param {number} angle One of -90/0/90. 0 is horizontal.
          * @returns {Label} The calling Label.
          */
-        angle(angle: number): Label;
+        angle(angle: number): this;
         /**
          * Gets the amount of padding around the Label in pixels.
          */
@@ -2173,7 +2173,7 @@ declare module Plottable.Components {
          * @param {number} padAmount
          * @returns {Label} The calling Label.
          */
-        padding(padAmount: number): Label;
+        padding(padAmount: number): this;
         fixedWidth(): boolean;
         fixedHeight(): boolean;
         renderImmediately(): this;
@@ -2240,7 +2240,7 @@ declare module Plottable.Components {
          * @param {Formatter} formatter
          * @returns {Legend} The calling Legend.
          */
-        formatter(formatter: Formatter): Legend;
+        formatter(formatter: Formatter): this;
         /**
          * Gets the maximum number of entries per row.
          *
@@ -2253,7 +2253,7 @@ declare module Plottable.Components {
          * @param {number} maxEntriesPerRow
          * @returns {Legend} The calling Legend.
          */
-        maxEntriesPerRow(maxEntriesPerRow: number): Legend;
+        maxEntriesPerRow(maxEntriesPerRow: number): this;
         /**
          * Gets the current comparator for the Legend's entries.
          *
@@ -2267,7 +2267,7 @@ declare module Plottable.Components {
          * @param {(a: string, b: string) => number} comparator
          * @returns {Legend} The calling Legend.
          */
-        comparator(comparator: (a: string, b: string) => number): Legend;
+        comparator(comparator: (a: string, b: string) => number): this;
         /**
          * Gets the Color Scale.
          *
@@ -2280,7 +2280,7 @@ declare module Plottable.Components {
          * @param {Scales.Color} scale
          * @returns {Legend} The calling Legend.
          */
-        colorScale(colorScale: Scales.Color): Legend;
+        colorScale(colorScale: Scales.Color): this;
         destroy(): void;
         private _calculateLayoutInfo(availableWidth, availableHeight);
         requestedSpace(offeredWidth: number, offeredHeight: number): SpaceRequest;
@@ -2306,7 +2306,7 @@ declare module Plottable.Components {
          * @param {(datum: any, index: number) => SymbolFactory} symbol
          * @returns {Legend} The calling Legend
          */
-        symbol(symbol: (datum: any, index: number) => SymbolFactory): Legend;
+        symbol(symbol: (datum: any, index: number) => SymbolFactory): this;
         /**
          * Gets the opacity of the symbols of the Legend.
          *
@@ -2319,7 +2319,7 @@ declare module Plottable.Components {
          * @param {number | ((datum: any, index: number) => number)} symbolOpacity
          * @returns {Legend} The calling Legend
          */
-        symbolOpacity(symbolOpacity: number | ((datum: any, index: number) => number)): Legend;
+        symbolOpacity(symbolOpacity: number | ((datum: any, index: number) => number)): this;
         fixedWidth(): boolean;
         fixedHeight(): boolean;
     }
@@ -2366,7 +2366,7 @@ declare module Plottable.Components {
          * @param {Formatter} formatter
          * @returns {InterpolatedColorLegend} The calling InterpolatedColorLegend.
          */
-        formatter(formatter: Formatter): InterpolatedColorLegend;
+        formatter(formatter: Formatter): this;
         /**
          * Gets whether the InterpolatedColorLegend expands to occupy all offered space in the long direction
          */
@@ -2377,7 +2377,7 @@ declare module Plottable.Components {
          * @param {expands} boolean
          * @returns {InterpolatedColorLegend} The calling InterpolatedColorLegend.
          */
-        expands(expands: boolean): InterpolatedColorLegend;
+        expands(expands: boolean): this;
         private static _ensureOrientation(orientation);
         /**
          * Gets the orientation.
@@ -2389,7 +2389,7 @@ declare module Plottable.Components {
          * @param {string} orientation One of "horizontal"/"left"/"right".
          * @returns {InterpolatedColorLegend} The calling InterpolatedColorLegend.
          */
-        orientation(orientation: string): InterpolatedColorLegend;
+        orientation(orientation: string): this;
         fixedWidth(): boolean;
         fixedHeight(): boolean;
         private _generateTicks(numSwatches?);
@@ -2487,7 +2487,7 @@ declare module Plottable.Components {
          * @param {number} rowPadding
          * @returns {Table} The calling Table.
          */
-        rowPadding(rowPadding: number): Table;
+        rowPadding(rowPadding: number): this;
         /**
          * Gets the padding to the left and right of each column in pixels.
          */
@@ -2498,7 +2498,7 @@ declare module Plottable.Components {
          * @param {number} columnPadding
          * @returns {Table} The calling Table.
          */
-        columnPadding(columnPadding: number): Table;
+        columnPadding(columnPadding: number): this;
         /**
          * Gets the weight of the specified row.
          *
@@ -2530,7 +2530,7 @@ declare module Plottable.Components {
          * @param {number} weight
          * @returns {Table} The calling Table.
          */
-        rowWeight(index: number, weight: number): Table;
+        rowWeight(index: number, weight: number): this;
         /**
          * Gets the weight of the specified column.
          *
@@ -2547,7 +2547,7 @@ declare module Plottable.Components {
          * @param {number} weight
          * @returns {Table} The calling Table.
          */
-        columnWeight(index: number, weight: number): Table;
+        columnWeight(index: number, weight: number): this;
         fixedWidth(): boolean;
         fixedHeight(): boolean;
         private _padTableToSize(nRows, nCols);
@@ -2589,7 +2589,7 @@ declare module Plottable.Components {
          * @param {Bounds} newBounds
          * @return {SelectionBoxLayer} The calling SelectionBoxLayer.
          */
-        bounds(newBounds: Bounds): SelectionBoxLayer;
+        bounds(newBounds: Bounds): this;
         protected _setBounds(newBounds: Bounds): void;
         private _getBounds();
         renderImmediately(): this;
@@ -2603,7 +2603,7 @@ declare module Plottable.Components {
          * @param {boolean} show Whether or not to show the box.
          * @return {SelectionBoxLayer} The calling SelectionBoxLayer.
          */
-        boxVisible(show: boolean): SelectionBoxLayer;
+        boxVisible(show: boolean): this;
         fixedWidth(): boolean;
         fixedHeight(): boolean;
         /**
@@ -2619,7 +2619,7 @@ declare module Plottable.Components {
          */
         xScale(xScale: QuantitativeScale<number | {
             valueOf(): number;
-        }>): SelectionBoxLayer;
+        }>): this;
         /**
          * Gets the y scale for this SelectionBoxLayer.
          */
@@ -2633,7 +2633,7 @@ declare module Plottable.Components {
          */
         yScale(yScale: QuantitativeScale<number | {
             valueOf(): number;
-        }>): SelectionBoxLayer;
+        }>): this;
         /**
          * Gets the data values backing the left and right edges of the box.
          *
@@ -2647,7 +2647,7 @@ declare module Plottable.Components {
          */
         xExtent(xExtent: (number | {
             valueOf(): number;
-        })[]): SelectionBoxLayer;
+        })[]): this;
         private _getXExtent();
         protected _setXExtent(xExtent: (number | {
             valueOf(): number;
@@ -2665,7 +2665,7 @@ declare module Plottable.Components {
          */
         yExtent(yExtent: (number | {
             valueOf(): number;
-        })[]): SelectionBoxLayer;
+        })[]): this;
         private _getYExtent();
         protected _setYExtent(yExtent: (number | {
             valueOf(): number;
@@ -2711,7 +2711,7 @@ declare module Plottable.Components {
          * @param {QuantitativeScale<D>} scale
          * @return {GuideLineLayer<D>} The calling GuideLineLayer.
          */
-        scale(scale: QuantitativeScale<D>): GuideLineLayer<D>;
+        scale(scale: QuantitativeScale<D>): this;
         /**
          * Gets the value of the guide line in data-space.
          *
@@ -2725,7 +2725,7 @@ declare module Plottable.Components {
          * @param {D} value
          * @return {GuideLineLayer<D>} The calling GuideLineLayer.
          */
-        value(value: D): GuideLineLayer<D>;
+        value(value: D): this;
         /**
          * Gets the position of the guide line in pixel-space.
          *
@@ -2739,7 +2739,7 @@ declare module Plottable.Components {
          * @param {number} pixelPosition
          * @return {GuideLineLayer<D>} The calling GuideLineLayer.
          */
-        pixelPosition(pixelPosition: number): GuideLineLayer<D>;
+        pixelPosition(pixelPosition: number): this;
         destroy(): void;
     }
 }
@@ -4863,7 +4863,7 @@ declare module Plottable.Components {
          * @param {number} r
          * @return {DragBoxLayer} The calling DragBoxLayer.
          */
-        detectionRadius(r: number): DragBoxLayer;
+        detectionRadius(r: number): this;
         /**
          * Gets whether or not the drag box is resizable.
          */
@@ -4874,7 +4874,7 @@ declare module Plottable.Components {
          * @param {boolean} canResize
          * @return {DragBoxLayer} The calling DragBoxLayer.
          */
-        resizable(canResize: boolean): DragBoxLayer;
+        resizable(canResize: boolean): this;
         protected _setResizableClasses(canResize: boolean): void;
         /**
          * Gets whether or not the drag box is movable.
@@ -4886,7 +4886,7 @@ declare module Plottable.Components {
          * @param {boolean} movable
          * @return {DragBoxLayer} The calling DragBoxLayer.
          */
-        movable(movable: boolean): DragBoxLayer;
+        movable(movable: boolean): this;
         private _setMovableClass();
         /**
          * Sets the callback to be called when dragging starts.
@@ -4937,7 +4937,7 @@ declare module Plottable.Components {
         /**
          * Enables or disables the interaction and drag box.
          */
-        enabled(enabled: boolean): DragBoxLayer;
+        enabled(enabled: boolean): this;
         /**
          * Gets the enabled state.
          */
@@ -4965,13 +4965,13 @@ declare module Plottable.Components {
         }>(): QuantitativeScale<D>;
         yScale<D extends number | {
             valueOf(): number;
-        }>(yScale: QuantitativeScale<D>): SelectionBoxLayer;
+        }>(yScale: QuantitativeScale<D>): this;
         yExtent(): (number | {
             valueOf(): number;
         })[];
         yExtent(yExtent: (number | {
             valueOf(): number;
-        })[]): SelectionBoxLayer;
+        })[]): this;
     }
 }
 declare module Plottable.Components {
@@ -4991,13 +4991,13 @@ declare module Plottable.Components {
         }>(): QuantitativeScale<D>;
         xScale<D extends number | {
             valueOf(): number;
-        }>(xScale: QuantitativeScale<D>): SelectionBoxLayer;
+        }>(xScale: QuantitativeScale<D>): this;
         xExtent(): (number | {
             valueOf(): number;
         })[];
         xExtent(xExtent: (number | {
             valueOf(): number;
-        })[]): SelectionBoxLayer;
+        })[]): this;
     }
 }
 declare module Plottable {
@@ -5028,7 +5028,7 @@ declare module Plottable.Components {
          * @param {number} detectionRadius
          * @return {DragLineLayer<D>} The calling DragLineLayer.
          */
-        detectionRadius(detectionRadius: number): DragLineLayer<D>;
+        detectionRadius(detectionRadius: number): this;
         /**
          * Gets whether the DragLineLayer is enabled.
          */
@@ -5039,7 +5039,7 @@ declare module Plottable.Components {
          * @param {boolean} enabled
          * @return {DragLineLayer<D>} The calling DragLineLayer.
          */
-        enabled(enabled: boolean): DragLineLayer<D>;
+        enabled(enabled: boolean): this;
         /**
          * Sets the callback to be called when dragging starts.
          * The callback will be passed the calling DragLineLayer.
