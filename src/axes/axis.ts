@@ -35,10 +35,6 @@ export class Axis<D> extends Component {
   protected _scale: Scale<D, number>;
   private _formatter: Formatter;
   private _orientation: string;
-  // @deprecated As of release v1.15.0, removed as premature optimization, use _computeWidth() directly instead
-  protected _computedWidth: number;
-  // @deprecated As of release v1.15.0, removed as premature optimization, use _computeHeight() directly instead
-  protected _computedHeight: number;
   private _endTickLength = 5;
   private _innerTickLength = 5;
   private _tickLabelPadding = 10;
@@ -570,24 +566,6 @@ export class Axis<D> extends Component {
     this._formatter = formatter;
     this.redraw();
     return this;
-  }
-
-  /**
-   * @deprecated As of release v1.3.0, replaced by innerTickLength()
-   *
-   * Gets the tick mark length in pixels.
-   */
-  public tickLength(): number;
-  /**
-   * Sets the tick mark length in pixels.
-   *
-   * @param {number} length
-   * @returns {Axis} The calling Axis.
-   */
-  public tickLength(length: number): this;
-  public tickLength(length?: number): any {
-    Utils.Window.deprecated("tickLength()", "v1.3.0", "Replaced by innerTickLength()");
-    return this.innerTickLength(length);
   }
 
   /**
