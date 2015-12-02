@@ -310,18 +310,6 @@ module Plottable.Plots {
       return closest;
     }
 
-    /**
-     * @deprecated As of release v1.1.0, replaced by _entityVisibleOnPlot()
-     */
-    protected _visibleOnPlot(datum: any, pixelPoint: Point, selection: d3.Selection<void>): boolean {
-      Utils.Window.deprecated("Bar._visibleOnPlot()", "v1.1.0", "replaced by _entityVisibleOnPlot()");
-      let xRange = { min: 0, max: this.width() };
-      let yRange = { min: 0, max: this.height() };
-      let barBBox = Utils.DOM.elementBBox(selection);
-
-      return Plottable.Utils.DOM.intersectsBBox(xRange, yRange, barBBox);
-    }
-
     protected _entityVisibleOnPlot(pixelPoint: Point, datum: any, index: number, dataset: Dataset) {
       let xRange = { min: 0, max: this.width() };
       let yRange = { min: 0, max: this.height() };

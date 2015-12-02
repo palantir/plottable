@@ -541,16 +541,6 @@ declare module Plottable {
 }
 declare module Plottable {
     type Formatter = (d: any) => string;
-    /**
-     * This field is deprecated and will be removed in v2.0.0.
-     *
-     * The number of milliseconds between midnight one day and the next is
-     * not a fixed quantity.
-     *
-     * Use date.setDate(date.getDate() + number_of_days) instead.
-     *
-     */
-    var MILLISECONDS_IN_ONE_DAY: number;
 }
 declare module Plottable.Formatters {
     /**
@@ -636,18 +626,6 @@ declare module Plottable.Formatters {
      * @returns {Formatter} A formatter for time/date values.
      */
     function time(specifier: string): Formatter;
-    /**
-     * @deprecated As of release v1.3.0, not safe for use with time zones.
-     *
-     * Creates a formatter for relative dates.
-     *
-     * @param {number} baseValue The start date (as epoch time) used in computing relative dates (default 0)
-     * @param {number} increment The unit used in calculating relative date values (default MILLISECONDS_IN_ONE_DAY)
-     * @param {string} label The label to append to the formatted string (default "")
-     *
-     * @returns {Formatter} A formatter for time/date values.
-     */
-    function relativeDate(baseValue?: number, increment?: number, label?: string): (d: any) => string;
 }
 declare module Plottable {
     /**
@@ -1694,8 +1672,6 @@ declare module Plottable {
         protected _scale: Scale<D, number>;
         private _formatter;
         private _orientation;
-        protected _computedWidth: number;
-        protected _computedHeight: number;
         private _endTickLength;
         private _innerTickLength;
         private _tickLabelPadding;
@@ -1720,8 +1696,8 @@ declare module Plottable {
         constructor(scale: Scale<D, number>, orientation: string);
         destroy(): void;
         protected _isHorizontal(): boolean;
-        protected _computeWidth(): number;
-        protected _computeHeight(): number;
+        protected _computeWidth(): any;
+        protected _computeHeight(): any;
         requestedSpace(offeredWidth: number, offeredHeight: number): SpaceRequest;
         fixedHeight(): boolean;
         fixedWidth(): boolean;
@@ -1801,19 +1777,6 @@ declare module Plottable {
          * @returns {Axis} The calling Axis.
          */
         formatter(formatter: Formatter): this;
-        /**
-         * @deprecated As of release v1.3.0, replaced by innerTickLength()
-         *
-         * Gets the tick mark length in pixels.
-         */
-        tickLength(): number;
-        /**
-         * Sets the tick mark length in pixels.
-         *
-         * @param {number} length
-         * @returns {Axis} The calling Axis.
-         */
-        tickLength(length: number): this;
         /**
          * Gets the tick mark length in pixels.
          */
@@ -1972,7 +1935,7 @@ declare module Plottable.Axes {
         private _getMostPreciseConfigurationIndex();
         orientation(): string;
         orientation(orientation: string): this;
-        protected _computeHeight(): number;
+        protected _computeHeight(): any;
         private _getIntervalLength(config);
         private _maxWidthForInterval(config);
         /**
@@ -2015,10 +1978,10 @@ declare module Plottable.Axes {
          */
         constructor(scale: QuantitativeScale<number>, orientation: string);
         protected _setup(): void;
-        protected _computeWidth(): number;
+        protected _computeWidth(): any;
         private _computeExactTextWidth();
         private _computeApproximateTextWidth();
-        protected _computeHeight(): number;
+        protected _computeHeight(): any;
         protected _getTickValues(): number[];
         protected _rescale(): void;
         renderImmediately(): this;
@@ -2904,10 +2867,6 @@ declare module Plottable {
          * @returns {Plots.PlotEntity} The nearest PlotEntity, or undefined if no PlotEntity can be found.
          */
         entityNearest(queryPoint: Point): Plots.PlotEntity;
-        /**
-         * @deprecated As of release v1.1.0, replaced by _entityVisibleOnPlot()
-         */
-        protected _visibleOnPlot(datum: any, pixelPoint: Point, selection: d3.Selection<void>): boolean;
         protected _entityVisibleOnPlot(pixelPoint: Point, datum: any, index: number, dataset: Dataset): boolean;
         protected _uninstallScaleForKey(scale: Scale<any, any>, key: string): void;
         protected _installScaleForKey(scale: Scale<any, any>, key: string): void;
@@ -3350,10 +3309,6 @@ declare module Plottable.Plots {
          */
         symbol(symbol: Accessor<SymbolFactory>): this;
         protected _generateDrawSteps(): Drawers.DrawStep[];
-        /**
-         * @deprecated As of release v1.1.0, replaced by _entityVisibleOnPlot()
-         */
-        protected _visibleOnPlot(datum: any, pixelPoint: Point, selection: d3.Selection<void>): boolean;
         protected _entityVisibleOnPlot(pixelPoint: Point, datum: any, index: number, dataset: Dataset): boolean;
         protected _propertyProjectors(): AttributeToProjector;
         /**
@@ -3480,10 +3435,6 @@ declare module Plottable.Plots {
          * @returns {PlotEntity} The nearest PlotEntity, or undefined if no PlotEntity can be found.
          */
         entityNearest(queryPoint: Point): PlotEntity;
-        /**
-         * @deprecated As of release v1.1.0, replaced by _entityVisibleOnPlot()
-         */
-        protected _visibleOnPlot(datum: any, pixelPoint: Point, selection: d3.Selection<void>): boolean;
         protected _entityVisibleOnPlot(pixelPoint: Point, datum: any, index: number, dataset: Dataset): boolean;
         /**
          * Gets the Entities at a particular Point.

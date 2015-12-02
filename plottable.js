@@ -1112,19 +1112,6 @@ var Plottable;
 })(Plottable || (Plottable = {}));
 var Plottable;
 (function (Plottable) {
-    /**
-     * This field is deprecated and will be removed in v2.0.0.
-     *
-     * The number of milliseconds between midnight one day and the next is
-     * not a fixed quantity.
-     *
-     * Use date.setDate(date.getDate() + number_of_days) instead.
-     *
-     */
-    Plottable.MILLISECONDS_IN_ONE_DAY = 24 * 60 * 60 * 1000;
-})(Plottable || (Plottable = {}));
-var Plottable;
-(function (Plottable) {
     var Formatters;
     (function (Formatters) {
         /**
@@ -1354,28 +1341,6 @@ var Plottable;
             return d3.time.format(specifier);
         }
         Formatters.time = time;
-        /**
-         * @deprecated As of release v1.3.0, not safe for use with time zones.
-         *
-         * Creates a formatter for relative dates.
-         *
-         * @param {number} baseValue The start date (as epoch time) used in computing relative dates (default 0)
-         * @param {number} increment The unit used in calculating relative date values (default MILLISECONDS_IN_ONE_DAY)
-         * @param {string} label The label to append to the formatted string (default "")
-         *
-         * @returns {Formatter} A formatter for time/date values.
-         */
-        function relativeDate(baseValue, increment, label) {
-            if (baseValue === void 0) { baseValue = 0; }
-            if (increment === void 0) { increment = Plottable.MILLISECONDS_IN_ONE_DAY; }
-            if (label === void 0) { label = ""; }
-            Plottable.Utils.Window.deprecated("relativeDate()", "v1.3.0", "Not safe for use with time zones.");
-            return function (d) {
-                var relativeDate = Math.round((d.valueOf() - baseValue) / increment);
-                return relativeDate.toString() + label;
-            };
-        }
-        Formatters.relativeDate = relativeDate;
         function verifyPrecision(precision) {
             if (precision < 0 || precision > 20) {
                 throw new RangeError("Formatter precision must be between 0 and 20");
@@ -3918,10 +3883,6 @@ var Plottable;
             this._formatter = formatter;
             this.redraw();
             return this;
-        };
-        Axis.prototype.tickLength = function (length) {
-            Plottable.Utils.Window.deprecated("tickLength()", "v1.3.0", "Replaced by innerTickLength()");
-            return this.innerTickLength(length);
         };
         Axis.prototype.innerTickLength = function (length) {
             if (length == null) {
@@ -6985,14 +6946,6 @@ var Plottable;
             }
             return this._lightweightPlotEntityToPlotEntity(closestPointEntity);
         };
-        /**
-         * @deprecated As of release v1.1.0, replaced by _entityVisibleOnPlot()
-         */
-        Plot.prototype._visibleOnPlot = function (datum, pixelPoint, selection) {
-            Plottable.Utils.Window.deprecated("Plot._visibleOnPlot()", "v1.1.0", "replaced by _entityVisibleOnPlot()");
-            return !(pixelPoint.x < 0 || pixelPoint.y < 0 ||
-                pixelPoint.x > this.width() || pixelPoint.y > this.height());
-        };
         Plot.prototype._entityVisibleOnPlot = function (pixelPoint, datum, index, dataset) {
             return !(pixelPoint.x < 0 || pixelPoint.y < 0 ||
                 pixelPoint.x > this.width() || pixelPoint.y > this.height());
@@ -8044,23 +7997,6 @@ var Plottable;
                 drawSteps.push({ attrToProjector: this._generateAttrToProjector(), animator: this._getAnimator(Plots.Animator.MAIN) });
                 return drawSteps;
             };
-            /**
-             * @deprecated As of release v1.1.0, replaced by _entityVisibleOnPlot()
-             */
-            Scatter.prototype._visibleOnPlot = function (datum, pixelPoint, selection) {
-                Plottable.Utils.Window.deprecated("Scatter._visibleOnPlot()", "v1.1.0", "replaced by _entityVisibleOnPlot()");
-                var xRange = { min: 0, max: this.width() };
-                var yRange = { min: 0, max: this.height() };
-                var translation = d3.transform(selection.attr("transform")).translate;
-                var bbox = Plottable.Utils.DOM.elementBBox(selection);
-                var translatedBbox = {
-                    x: bbox.x + translation[0],
-                    y: bbox.y + translation[1],
-                    width: bbox.width,
-                    height: bbox.height
-                };
-                return Plottable.Utils.DOM.intersectsBBox(xRange, yRange, translatedBbox);
-            };
             Scatter.prototype._entityVisibleOnPlot = function (pixelPoint, datum, index, dataset) {
                 var xRange = { min: 0, max: this.width() };
                 var yRange = { min: 0, max: this.height() };
@@ -8360,16 +8296,6 @@ var Plottable;
                     }
                 });
                 return closest;
-            };
-            /**
-             * @deprecated As of release v1.1.0, replaced by _entityVisibleOnPlot()
-             */
-            Bar.prototype._visibleOnPlot = function (datum, pixelPoint, selection) {
-                Plottable.Utils.Window.deprecated("Bar._visibleOnPlot()", "v1.1.0", "replaced by _entityVisibleOnPlot()");
-                var xRange = { min: 0, max: this.width() };
-                var yRange = { min: 0, max: this.height() };
-                var barBBox = Plottable.Utils.DOM.elementBBox(selection);
-                return Plottable.Utils.DOM.intersectsBBox(xRange, yRange, barBBox);
             };
             Bar.prototype._entityVisibleOnPlot = function (pixelPoint, datum, index, dataset) {
                 var xRange = { min: 0, max: this.width() };
