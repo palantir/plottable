@@ -49,7 +49,7 @@ export class Drawer {
    * @param {d3.Selection} Selection containing the <g> to render to.
    * @returns {Drawer} The calling Drawer.
    */
-  public renderArea(area: d3.Selection<void>): Drawer;
+  public renderArea(area: d3.Selection<void>): this;
   public renderArea(area?: d3.Selection<void>): any {
     if (area == null) {
       return this._renderArea;

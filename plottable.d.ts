@@ -1245,7 +1245,7 @@ declare module Plottable {
          * @param {d3.Selection} Selection containing the <g> to render to.
          * @returns {Drawer} The calling Drawer.
          */
-        renderArea(area: d3.Selection<void>): Drawer;
+        renderArea(area: d3.Selection<void>): this;
         /**
          * Removes the Drawer and its renderArea
          */
