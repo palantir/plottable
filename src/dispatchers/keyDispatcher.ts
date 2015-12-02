@@ -47,7 +47,8 @@ module Plottable.Dispatchers {
      * @param {KeyCallback} callback
      * @return {Dispatchers.Key} The calling Key Dispatcher.
      */
-    public onKeyDown(callback: KeyCallback): Key {
+
+    public onKeyDown(callback: KeyCallback): this {
       this._addCallbackForEvent(Key._KEYDOWN_EVENT_NAME, callback);
       return this;
     }
@@ -58,7 +59,7 @@ module Plottable.Dispatchers {
      * @param {KeyCallback} callback
      * @return {Dispatchers.Key} The calling Key Dispatcher.
      */
-    public offKeyDown(callback: KeyCallback): Key {
+    public offKeyDown(callback: KeyCallback): this {
       this._removeCallbackForEvent(Key._KEYDOWN_EVENT_NAME, callback);
       return this;
     }
@@ -68,7 +69,7 @@ module Plottable.Dispatchers {
      * @param {KeyCallback} callback
      * @return {Dispatchers.Key} The calling Key Dispatcher.
      */
-    public onKeyUp(callback: KeyCallback): Key {
+    public onKeyUp(callback: KeyCallback): this {
       this._addCallbackForEvent(Key._KEYUP_EVENT_NAME, callback);
       return this;
     }
@@ -79,7 +80,7 @@ module Plottable.Dispatchers {
      * @param {KeyCallback} callback
      * @return {Dispatchers.Key} The calling Key Dispatcher.
      */
-    public offKeyUp(callback: KeyCallback): Key {
+    public offKeyUp(callback: KeyCallback): this {
       this._removeCallbackForEvent(Key._KEYUP_EVENT_NAME, callback);
       return this;
     }

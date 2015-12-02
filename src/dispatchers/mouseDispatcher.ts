@@ -23,7 +23,7 @@ module Plottable.Dispatchers {
     public static getDispatcher(elem: SVGElement): Dispatchers.Mouse {
       let svg = Utils.DOM.boundingSVG(elem);
 
-      let dispatcher: Mouse = (<any> svg)[Mouse._DISPATCHER_KEY];
+      let dispatcher: Dispatchers.Mouse = (<any> svg)[Mouse._DISPATCHER_KEY];
       if (dispatcher == null) {
         dispatcher = new Mouse(svg);
         (<any> svg)[Mouse._DISPATCHER_KEY] = dispatcher;
@@ -64,7 +64,7 @@ module Plottable.Dispatchers {
      * @param {MouseCallback} callback
      * @return {Dispatchers.Mouse} The calling Mouse Dispatcher.
      */
-    public onMouseMove(callback: MouseCallback): Dispatchers.Mouse {
+    public onMouseMove(callback: MouseCallback): this {
       this._addCallbackForEvent(Mouse._MOUSEMOVE_EVENT_NAME, callback);
       return this;
     }
@@ -75,7 +75,8 @@ module Plottable.Dispatchers {
      * @param {MouseCallback} callback
      * @return {Dispatchers.Mouse} The calling Mouse Dispatcher.
      */
-    public offMouseMove(callback: MouseCallback): Dispatchers.Mouse {
+
+    public offMouseMove(callback: MouseCallback): this {
       this._removeCallbackForEvent(Mouse._MOUSEMOVE_EVENT_NAME, callback);
       return this;
     }
@@ -86,7 +87,8 @@ module Plottable.Dispatchers {
      * @param {MouseCallback} callback
      * @return {Dispatchers.Mouse} The calling Mouse Dispatcher.
      */
-    public onMouseDown(callback: MouseCallback): Dispatchers.Mouse {
+
+    public onMouseDown(callback: MouseCallback): this {
       this._addCallbackForEvent(Mouse._MOUSEDOWN_EVENT_NAME, callback);
       return this;
     }
@@ -97,7 +99,7 @@ module Plottable.Dispatchers {
      * @param {MouseCallback} callback
      * @return {Dispatchers.Mouse} The calling Mouse Dispatcher.
      */
-    public offMouseDown(callback: MouseCallback): Dispatchers.Mouse {
+    public offMouseDown(callback: MouseCallback): this {
       this._removeCallbackForEvent(Mouse._MOUSEDOWN_EVENT_NAME, callback);
       return this;
     }
@@ -108,7 +110,7 @@ module Plottable.Dispatchers {
      * @param {MouseCallback} callback
      * @return {Dispatchers.Mouse} The calling Mouse Dispatcher.
      */
-    public onMouseUp(callback: MouseCallback): Dispatchers.Mouse {
+    public onMouseUp(callback: MouseCallback): this {
       this._addCallbackForEvent(Mouse._MOUSEUP_EVENT_NAME, callback);
       return this;
     }
@@ -119,7 +121,8 @@ module Plottable.Dispatchers {
      * @param {MouseCallback} callback
      * @return {Dispatchers.Mouse} The calling Mouse Dispatcher.
      */
-    public offMouseUp(callback: MouseCallback): Dispatchers.Mouse {
+
+    public offMouseUp(callback: MouseCallback): this {
       this._removeCallbackForEvent(Mouse._MOUSEUP_EVENT_NAME, callback);
       return this;
     }
@@ -130,7 +133,8 @@ module Plottable.Dispatchers {
      * @param {MouseCallback} callback
      * @return {Dispatchers.Mouse} The calling Mouse Dispatcher.
      */
-    public onWheel(callback: MouseCallback): Dispatchers.Mouse {
+
+    public onWheel(callback: MouseCallback): this {
       this._addCallbackForEvent(Mouse._WHEEL_EVENT_NAME, callback);
       return this;
     }
@@ -141,7 +145,7 @@ module Plottable.Dispatchers {
      * @param {MouseCallback} callback
      * @return {Dispatchers.Mouse} The calling Mouse Dispatcher.
      */
-    public offWheel(callback: MouseCallback): Dispatchers.Mouse {
+    public offWheel(callback: MouseCallback): this {
       this._removeCallbackForEvent(Mouse._WHEEL_EVENT_NAME, callback);
       return this;
     }
@@ -152,7 +156,7 @@ module Plottable.Dispatchers {
      * @param {MouseCallback} callback
      * @return {Dispatchers.Mouse} The calling Mouse Dispatcher.
      */
-    public onDblClick(callback: MouseCallback): Dispatchers.Mouse {
+    public onDblClick(callback: MouseCallback): this {
       this._addCallbackForEvent(Mouse._DBLCLICK_EVENT_NAME, callback);
       return this;
     }
@@ -163,7 +167,7 @@ module Plottable.Dispatchers {
      * @param {MouseCallback} callback
      * @return {Dispatchers.Mouse} The calling Mouse Dispatcher.
      */
-    public offDblClick(callback: MouseCallback): Dispatchers.Mouse {
+    public offDblClick(callback: MouseCallback): this {
       this._removeCallbackForEvent(Mouse._DBLCLICK_EVENT_NAME, callback);
       return this;
     }

@@ -4131,70 +4131,70 @@ declare module Plottable.Dispatchers {
          * @param {MouseCallback} callback
          * @return {Dispatchers.Mouse} The calling Mouse Dispatcher.
          */
-        onMouseMove(callback: MouseCallback): Dispatchers.Mouse;
+        onMouseMove(callback: MouseCallback): this;
         /**
          * Removes a callback that would be called when the mouse position changes.
          *
          * @param {MouseCallback} callback
          * @return {Dispatchers.Mouse} The calling Mouse Dispatcher.
          */
-        offMouseMove(callback: MouseCallback): Dispatchers.Mouse;
+        offMouseMove(callback: MouseCallback): this;
         /**
          * Registers a callback to be called when a mousedown occurs.
          *
          * @param {MouseCallback} callback
          * @return {Dispatchers.Mouse} The calling Mouse Dispatcher.
          */
-        onMouseDown(callback: MouseCallback): Dispatchers.Mouse;
+        onMouseDown(callback: MouseCallback): this;
         /**
          * Removes a callback that would be called when a mousedown occurs.
          *
          * @param {MouseCallback} callback
          * @return {Dispatchers.Mouse} The calling Mouse Dispatcher.
          */
-        offMouseDown(callback: MouseCallback): Dispatchers.Mouse;
+        offMouseDown(callback: MouseCallback): this;
         /**
          * Registers a callback to be called when a mouseup occurs.
          *
          * @param {MouseCallback} callback
          * @return {Dispatchers.Mouse} The calling Mouse Dispatcher.
          */
-        onMouseUp(callback: MouseCallback): Dispatchers.Mouse;
+        onMouseUp(callback: MouseCallback): this;
         /**
          * Removes a callback that would be called when a mouseup occurs.
          *
          * @param {MouseCallback} callback
          * @return {Dispatchers.Mouse} The calling Mouse Dispatcher.
          */
-        offMouseUp(callback: MouseCallback): Dispatchers.Mouse;
+        offMouseUp(callback: MouseCallback): this;
         /**
          * Registers a callback to be called when a wheel event occurs.
          *
          * @param {MouseCallback} callback
          * @return {Dispatchers.Mouse} The calling Mouse Dispatcher.
          */
-        onWheel(callback: MouseCallback): Dispatchers.Mouse;
+        onWheel(callback: MouseCallback): this;
         /**
          * Removes a callback that would be called when a wheel event occurs.
          *
          * @param {MouseCallback} callback
          * @return {Dispatchers.Mouse} The calling Mouse Dispatcher.
          */
-        offWheel(callback: MouseCallback): Dispatchers.Mouse;
+        offWheel(callback: MouseCallback): this;
         /**
          * Registers a callback to be called when a dblClick occurs.
          *
          * @param {MouseCallback} callback
          * @return {Dispatchers.Mouse} The calling Mouse Dispatcher.
          */
-        onDblClick(callback: MouseCallback): Dispatchers.Mouse;
+        onDblClick(callback: MouseCallback): this;
         /**
          * Removes a callback that would be called when a dblClick occurs.
          *
          * @param {MouseCallback} callback
          * @return {Dispatchers.Mouse} The calling Mouse Dispatcher.
          */
-        offDblClick(callback: MouseCallback): Dispatchers.Mouse;
+        offDblClick(callback: MouseCallback): this;
         /**
          * Computes the mouse position from the given event, and if successful
          * calls all the callbacks in the provided callbackSet.
@@ -4241,56 +4241,56 @@ declare module Plottable.Dispatchers {
          * @param {TouchCallback} callback
          * @return {Dispatchers.Touch} The calling Touch Dispatcher.
          */
-        onTouchStart(callback: TouchCallback): Dispatchers.Touch;
+        onTouchStart(callback: TouchCallback): this;
         /**
          * Removes a callback that would be called when a touch starts.
          *
          * @param {TouchCallback} callback
          * @return {Dispatchers.Touch} The calling Touch Dispatcher.
          */
-        offTouchStart(callback: TouchCallback): Dispatchers.Touch;
+        offTouchStart(callback: TouchCallback): this;
         /**
          * Registers a callback to be called when the touch position changes.
          *
          * @param {TouchCallback} callback
          * @return {Dispatchers.Touch} The calling Touch Dispatcher.
          */
-        onTouchMove(callback: TouchCallback): Dispatchers.Touch;
+        onTouchMove(callback: TouchCallback): this;
         /**
          * Removes a callback that would be called when the touch position changes.
          *
          * @param {TouchCallback} callback
          * @return {Dispatchers.Touch} The calling Touch Dispatcher.
          */
-        offTouchMove(callback: TouchCallback): Dispatchers.Touch;
+        offTouchMove(callback: TouchCallback): this;
         /**
          * Registers a callback to be called when a touch ends.
          *
          * @param {TouchCallback} callback
          * @return {Dispatchers.Touch} The calling Touch Dispatcher.
          */
-        onTouchEnd(callback: TouchCallback): Dispatchers.Touch;
+        onTouchEnd(callback: TouchCallback): this;
         /**
          * Removes a callback that would be called when a touch ends.
          *
          * @param {TouchCallback} callback
          * @return {Dispatchers.Touch} The calling Touch Dispatcher.
          */
-        offTouchEnd(callback: TouchCallback): Dispatchers.Touch;
+        offTouchEnd(callback: TouchCallback): this;
         /**
          * Registers a callback to be called when a touch is cancelled.
          *
          * @param {TouchCallback} callback
          * @return {Dispatchers.Touch} The calling Touch Dispatcher.
          */
-        onTouchCancel(callback: TouchCallback): Dispatchers.Touch;
+        onTouchCancel(callback: TouchCallback): this;
         /**
          * Removes a callback that would be called when a touch is cancelled.
          *
          * @param {TouchCallback} callback
          * @return {Dispatchers.Touch} The calling Touch Dispatcher.
          */
-        offTouchCancel(callback: TouchCallback): Dispatchers.Touch;
+        offTouchCancel(callback: TouchCallback): this;
         /**
          * Computes the Touch position from the given event, and if successful
          * calls all the callbacks in the provided callbackSet.
@@ -4326,27 +4326,27 @@ declare module Plottable.Dispatchers {
          * @param {KeyCallback} callback
          * @return {Dispatchers.Key} The calling Key Dispatcher.
          */
-        onKeyDown(callback: KeyCallback): Key;
+        onKeyDown(callback: KeyCallback): this;
         /**
          * Removes the callback to be called whenever a key is pressed.
          *
          * @param {KeyCallback} callback
          * @return {Dispatchers.Key} The calling Key Dispatcher.
          */
-        offKeyDown(callback: KeyCallback): Key;
+        offKeyDown(callback: KeyCallback): this;
         /** Registers a callback to be called whenever a key is released.
          *
          * @param {KeyCallback} callback
          * @return {Dispatchers.Key} The calling Key Dispatcher.
          */
-        onKeyUp(callback: KeyCallback): Key;
+        onKeyUp(callback: KeyCallback): this;
         /**
          * Removes the callback to be called whenever a key is released.
          *
          * @param {KeyCallback} callback
          * @return {Dispatchers.Key} The calling Key Dispatcher.
          */
-        offKeyUp(callback: KeyCallback): Key;
+        offKeyUp(callback: KeyCallback): this;
     }
 }
 declare module Plottable {
