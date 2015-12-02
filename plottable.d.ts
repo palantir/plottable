@@ -2854,7 +2854,7 @@ declare module Plottable {
          * @param {Animator} animator
          * @returns {Plot} The calling Plot.
          */
-        animator(animatorKey: string, animator: Animator): Plot;
+        animator(animatorKey: string, animator: Animator): this;
         /**
          * Adds a Dataset to the Plot.
          *
@@ -2869,11 +2869,11 @@ declare module Plottable {
          * @param {Dataset} dataset
          * @returns {Plot} The calling Plot.
          */
-        removeDataset(dataset: Dataset): Plot;
+        removeDataset(dataset: Dataset): this;
         protected _removeDataset(dataset: Dataset): this;
         protected _removeDatasetNodes(dataset: Dataset): void;
         datasets(): Dataset[];
-        datasets(datasets: Dataset[]): Plot;
+        datasets(datasets: Dataset[]): this;
         protected _getDrawersInOrder(): Drawer[];
         protected _generateDrawSteps(): Drawers.DrawStep[];
         protected _additionalPaint(time: number): void;
@@ -3014,7 +3014,7 @@ declare module Plottable.Plots {
          * @param {boolean} labelsEnabled
          * @returns {Pie} The calling Pie Plot.
          */
-        labelsEnabled(enabled: boolean): Pie;
+        labelsEnabled(enabled: boolean): this;
         /**
          * Gets the Formatter for the labels.
          */
@@ -3025,7 +3025,7 @@ declare module Plottable.Plots {
          * @param {Formatter} formatter
          * @returns {Pie} The calling Pie Plot.
          */
-        labelFormatter(formatter: Formatter): Pie;
+        labelFormatter(formatter: Formatter): this;
         entitiesAt(queryPoint: Point): PlotEntity[];
         protected _propertyProjectors(): AttributeToProjector;
         private _updatePieAngles();
@@ -3074,7 +3074,7 @@ declare module Plottable {
          *
          * This option is intended for cases where performance is an issue.
          */
-        deferredRendering(deferredRendering: boolean): XYPlot<X, Y>;
+        deferredRendering(deferredRendering: boolean): this;
         /**
          * Gets the AccessorScaleBinding for X.
          */
@@ -3085,7 +3085,7 @@ declare module Plottable {
          * @param {number|Accessor<number>} x
          * @returns {XYPlot} The calling XYPlot.
          */
-        x(x: number | Accessor<number>): XYPlot<X, Y>;
+        x(x: number | Accessor<number>): this;
         /**
          * Sets X to a scaled constant value or scaled result of an Accessor.
          * The provided Scale will account for the values when autoDomain()-ing.
@@ -3094,7 +3094,7 @@ declare module Plottable {
          * @param {Scale<X, number>} xScale
          * @returns {XYPlot} The calling XYPlot.
          */
-        x(x: X | Accessor<X>, xScale: Scale<X, number>): XYPlot<X, Y>;
+        x(x: X | Accessor<X>, xScale: Scale<X, number>): this;
         /**
          * Gets the AccessorScaleBinding for Y.
          */
@@ -3105,7 +3105,7 @@ declare module Plottable {
          * @param {number|Accessor<number>} y
          * @returns {XYPlot} The calling XYPlot.
          */
-        y(y: number | Accessor<number>): XYPlot<X, Y>;
+        y(y: number | Accessor<number>): this;
         /**
          * Sets Y to a scaled constant value or scaled result of an Accessor.
          * The provided Scale will account for the values when autoDomain()-ing.
@@ -3114,7 +3114,7 @@ declare module Plottable {
          * @param {Scale<Y, number>} yScale
          * @returns {XYPlot} The calling XYPlot.
          */
-        y(y: Y | Accessor<Y>, yScale: Scale<Y, number>): XYPlot<X, Y>;
+        y(y: Y | Accessor<Y>, yScale: Scale<Y, number>): this;
         protected _filterForProperty(property: string): (datum: any, index: number, dataset: Dataset) => boolean;
         private _makeFilterByProperty(property);
         protected _uninstallScaleForKey(scale: Scale<any, any>, key: string): void;
@@ -3134,7 +3134,7 @@ declare module Plottable {
          *   "none" means neither Scale will change automatically.
          * @returns {XYPlot} The calling XYPlot.
          */
-        autorangeMode(autorangeMode: string): XYPlot<X, Y>;
+        autorangeMode(autorangeMode: string): this;
         computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number): this;
         private _updateXExtentsAndAutodomain();
         private _updateYExtentsAndAutodomain();
@@ -3187,7 +3187,7 @@ declare module Plottable.Plots {
          * @param {number|Accessor<number>} x
          * @returns {Plots.Rectangle} The calling Rectangle Plot.
          */
-        x(x: number | Accessor<number>): Plots.Rectangle<X, Y>;
+        x(x: number | Accessor<number>): this;
         /**
          * Sets X to a scaled constant value or scaled result of an Accessor.
          * The provided Scale will account for the values when autoDomain()-ing.
@@ -3196,7 +3196,7 @@ declare module Plottable.Plots {
          * @param {Scale<X, number>} xScale
          * @returns {Plots.Rectangle} The calling Rectangle Plot.
          */
-        x(x: X | Accessor<X>, xScale: Scale<X, number>): Plots.Rectangle<X, Y>;
+        x(x: X | Accessor<X>, xScale: Scale<X, number>): this;
         /**
          * Gets the AccessorScaleBinding for X2.
          */
@@ -3208,7 +3208,7 @@ declare module Plottable.Plots {
          * @param {number|Accessor<number>|X|Accessor<X>} x2
          * @returns {Plots.Rectangle} The calling Rectangle Plot.
          */
-        x2(x2: number | Accessor<number> | X | Accessor<X>): Plots.Rectangle<X, Y>;
+        x2(x2: number | Accessor<number> | X | Accessor<X>): this;
         /**
          * Gets the AccessorScaleBinding for Y.
          */
@@ -3219,7 +3219,7 @@ declare module Plottable.Plots {
          * @param {number|Accessor<number>} y
          * @returns {Plots.Rectangle} The calling Rectangle Plot.
          */
-        y(y: number | Accessor<number>): Plots.Rectangle<X, Y>;
+        y(y: number | Accessor<number>): this;
         /**
          * Sets Y to a scaled constant value or scaled result of an Accessor.
          * The provided Scale will account for the values when autoDomain()-ing.
@@ -3228,7 +3228,7 @@ declare module Plottable.Plots {
          * @param {Scale<Y, number>} yScale
          * @returns {Plots.Rectangle} The calling Rectangle Plot.
          */
-        y(y: Y | Accessor<Y>, yScale: Scale<Y, number>): Plots.Rectangle<X, Y>;
+        y(y: Y | Accessor<Y>, yScale: Scale<Y, number>): this;
         /**
          * Gets the AccessorScaleBinding for Y2.
          */
@@ -3240,7 +3240,7 @@ declare module Plottable.Plots {
          * @param {number|Accessor<number>|Y|Accessor<Y>} y2
          * @returns {Plots.Rectangle} The calling Rectangle Plot.
          */
-        y2(y2: number | Accessor<number> | Y | Accessor<Y>): Plots.Rectangle<X, Y>;
+        y2(y2: number | Accessor<number> | Y | Accessor<Y>): this;
         /**
          * Gets the PlotEntities at a particular Point.
          *
@@ -3277,7 +3277,7 @@ declare module Plottable.Plots {
          * @param {Accessor<string>} label
          * @returns {Plots.Rectangle} The calling Rectangle Plot.
          */
-        label(label: Accessor<string>): Plots.Rectangle<X, Y>;
+        label(label: Accessor<string>): this;
         /**
          * Gets whether labels are enabled.
          *
@@ -3291,7 +3291,7 @@ declare module Plottable.Plots {
          * @param {boolean} labelsEnabled
          * @returns {Rectangle} The calling Rectangle Plot.
          */
-        labelsEnabled(enabled: boolean): Plots.Rectangle<X, Y>;
+        labelsEnabled(enabled: boolean): this;
         protected _propertyProjectors(): AttributeToProjector;
         protected _pixelPoint(datum: any, index: number, dataset: Dataset): {
             x: any;
@@ -3408,11 +3408,11 @@ declare module Plottable.Plots {
          */
         constructor(orientation?: string);
         x(): Plots.AccessorScaleBinding<X, number>;
-        x(x: number | Accessor<number>): Bar<X, Y>;
-        x(x: X | Accessor<X>, xScale: Scale<X, number>): Bar<X, Y>;
+        x(x: number | Accessor<number>): this;
+        x(x: X | Accessor<X>, xScale: Scale<X, number>): this;
         y(): Plots.AccessorScaleBinding<Y, number>;
-        y(y: number | Accessor<number>): Bar<X, Y>;
-        y(y: Y | Accessor<Y>, yScale: Scale<Y, number>): Bar<X, Y>;
+        y(y: number | Accessor<number>): this;
+        y(y: Y | Accessor<Y>, yScale: Scale<Y, number>): this;
         /**
          * Gets the orientation of the plot
          *
@@ -3436,13 +3436,13 @@ declare module Plottable.Plots {
          * @param {X|Y} value
          * @returns {Bar} The calling Bar Plot.
          */
-        baselineValue(value: X | Y): Bar<X, Y>;
+        baselineValue(value: X | Y): this;
         addDataset(dataset: Dataset): this;
         protected _addDataset(dataset: Dataset): this;
         removeDataset(dataset: Dataset): this;
         protected _removeDataset(dataset: Dataset): this;
         datasets(): Dataset[];
-        datasets(datasets: Dataset[]): Plot;
+        datasets(datasets: Dataset[]): this;
         /**
          * Get whether bar labels are enabled.
          *
@@ -3455,7 +3455,7 @@ declare module Plottable.Plots {
          * @param {boolean} labelsEnabled
          * @returns {Bar} The calling Bar Plot.
          */
-        labelsEnabled(enabled: boolean): Bar<X, Y>;
+        labelsEnabled(enabled: boolean): this;
         /**
          * Gets the Formatter for the labels.
          */
@@ -3466,7 +3466,7 @@ declare module Plottable.Plots {
          * @param {Formatter} formatter
          * @returns {Bar} The calling Bar Plot.
          */
-        labelFormatter(formatter: Formatter): Bar<X, Y>;
+        labelFormatter(formatter: Formatter): this;
         protected _createNodesForDataset(dataset: Dataset): Drawer;
         protected _removeDatasetNodes(dataset: Dataset): void;
         /**
@@ -3548,13 +3548,13 @@ declare module Plottable.Plots {
          */
         constructor();
         x(): Plots.AccessorScaleBinding<X, number>;
-        x(x: number | Accessor<number>): Line<X>;
-        x(x: X | Accessor<X>, xScale: Scale<X, number>): Line<X>;
+        x(x: number | Accessor<number>): this;
+        x(x: X | Accessor<X>, xScale: Scale<X, number>): this;
         y(): Plots.AccessorScaleBinding<number, number>;
-        y(y: number | Accessor<number>): Line<X>;
-        y(y: number | Accessor<number>, yScale: Scale<number, number>): Line<X>;
+        y(y: number | Accessor<number>): this;
+        y(y: number | Accessor<number>, yScale: Scale<number, number>): this;
         autorangeMode(): string;
-        autorangeMode(autorangeMode: string): Line<X>;
+        autorangeMode(autorangeMode: string): this;
         /**
          * Gets whether or not the autoranging is done smoothly.
          */
@@ -3580,19 +3580,19 @@ declare module Plottable.Plots {
          * @return Plots.Line
          */
         interpolator(interpolator: string | ((points: Array<[number, number]>) => string)): Plots.Line<X>;
-        interpolator(interpolator: "linear"): Line<X>;
-        interpolator(interpolator: "linear-closed"): Line<X>;
-        interpolator(interpolator: "step"): Line<X>;
-        interpolator(interpolator: "step-before"): Line<X>;
-        interpolator(interpolator: "step-after"): Line<X>;
-        interpolator(interpolator: "basis"): Line<X>;
-        interpolator(interpolator: "basis-open"): Line<X>;
-        interpolator(interpolator: "basis-closed"): Line<X>;
-        interpolator(interpolator: "bundle"): Line<X>;
-        interpolator(interpolator: "cardinal"): Line<X>;
-        interpolator(interpolator: "cardinal-open"): Line<X>;
-        interpolator(interpolator: "cardinal-closed"): Line<X>;
-        interpolator(interpolator: "monotone"): Line<X>;
+        interpolator(interpolator: "linear"): this;
+        interpolator(interpolator: "linear-closed"): this;
+        interpolator(interpolator: "step"): this;
+        interpolator(interpolator: "step-before"): this;
+        interpolator(interpolator: "step-after"): this;
+        interpolator(interpolator: "basis"): this;
+        interpolator(interpolator: "basis-open"): this;
+        interpolator(interpolator: "basis-closed"): this;
+        interpolator(interpolator: "bundle"): this;
+        interpolator(interpolator: "cardinal"): this;
+        interpolator(interpolator: "cardinal-open"): this;
+        interpolator(interpolator: "cardinal-closed"): this;
+        interpolator(interpolator: "monotone"): this;
         /**
          * Gets if downsampling is enabled
          *
@@ -3652,8 +3652,8 @@ declare module Plottable.Plots {
         constructor();
         protected _setup(): void;
         y(): Plots.AccessorScaleBinding<number, number>;
-        y(y: number | Accessor<number>): Area<X>;
-        y(y: number | Accessor<number>, yScale: QuantitativeScale<number>): Area<X>;
+        y(y: number | Accessor<number>): this;
+        y(y: number | Accessor<number>, yScale: QuantitativeScale<number>): this;
         /**
          * Gets the AccessorScaleBinding for Y0.
          */
@@ -3665,7 +3665,7 @@ declare module Plottable.Plots {
          * @param {number|Accessor<number>} y0
          * @returns {Area} The calling Area Plot.
          */
-        y0(y0: number | Accessor<number>): Area<X>;
+        y0(y0: number | Accessor<number>): this;
         protected _onDatasetUpdate(): void;
         addDataset(dataset: Dataset): this;
         protected _addDataset(dataset: Dataset): this;
@@ -3716,11 +3716,11 @@ declare module Plottable.Plots {
         protected _getAnimator(key: string): Animator;
         protected _setup(): void;
         x(): Plots.AccessorScaleBinding<X, number>;
-        x(x: number | Accessor<number>): StackedArea<X>;
-        x(x: X | Accessor<X>, xScale: Scale<X, number>): StackedArea<X>;
+        x(x: number | Accessor<number>): this;
+        x(x: X | Accessor<X>, xScale: Scale<X, number>): this;
         y(): Plots.AccessorScaleBinding<number, number>;
-        y(y: number | Accessor<number>): StackedArea<X>;
-        y(y: number | Accessor<number>, yScale: QuantitativeScale<number>): StackedArea<X>;
+        y(y: number | Accessor<number>): this;
+        y(y: number | Accessor<number>, yScale: QuantitativeScale<number>): this;
         /**
          * Gets if downsampling is enabled
          *
@@ -3771,11 +3771,11 @@ declare module Plottable.Plots {
          */
         constructor(orientation?: string);
         x(): Plots.AccessorScaleBinding<X, number>;
-        x(x: number | Accessor<number>): StackedBar<X, Y>;
-        x(x: X | Accessor<X>, xScale: Scale<X, number>): StackedBar<X, Y>;
+        x(x: number | Accessor<number>): this;
+        x(x: X | Accessor<X>, xScale: Scale<X, number>): this;
         y(): Plots.AccessorScaleBinding<Y, number>;
-        y(y: number | Accessor<number>): StackedBar<X, Y>;
-        y(y: Y | Accessor<Y>, yScale: Scale<Y, number>): StackedBar<X, Y>;
+        y(y: number | Accessor<number>): this;
+        y(y: Y | Accessor<Y>, yScale: Scale<Y, number>): this;
         protected _generateAttrToProjector(): {
             [attr: string]: (datum: any, index: number, dataset: Dataset) => any;
         };
@@ -3809,7 +3809,7 @@ declare module Plottable.Plots {
          * @param {X|Accessor<X>} x
          * @returns {Plots.Segment} The calling Segment Plot.
          */
-        x(x: number | Accessor<number>): Plots.Segment<X, Y>;
+        x(x: number | Accessor<number>): this;
         /**
          * Sets X to a scaled constant value or scaled result of an Accessor.
          * The provided Scale will account for the values when autoDomain()-ing.
@@ -3818,7 +3818,7 @@ declare module Plottable.Plots {
          * @param {Scale<X, number>} xScale
          * @returns {Plots.Segment} The calling Segment Plot.
          */
-        x(x: X | Accessor<X>, xScale: Scale<X, number>): Plots.Segment<X, Y>;
+        x(x: X | Accessor<X>, xScale: Scale<X, number>): this;
         /**
          * Gets the AccessorScaleBinding for X2
          */
@@ -3830,7 +3830,7 @@ declare module Plottable.Plots {
          * @param {number|Accessor<number>|Y|Accessor<Y>} y2
          * @returns {Plots.Segment} The calling Segment Plot
          */
-        x2(x2: number | Accessor<number> | X | Accessor<X>): Plots.Segment<X, Y>;
+        x2(x2: number | Accessor<number> | X | Accessor<X>): this;
         /**
          * Gets the AccessorScaleBinding for Y
          */
@@ -3841,7 +3841,7 @@ declare module Plottable.Plots {
          * @param {Y|Accessor<Y>} y
          * @returns {Plots.Segment} The calling Segment Plot.
          */
-        y(y: number | Accessor<number>): Plots.Segment<X, Y>;
+        y(y: number | Accessor<number>): this;
         /**
          * Sets Y to a scaled constant value or scaled result of an Accessor.
          * The provided Scale will account for the values when autoDomain()-ing.
@@ -3850,7 +3850,7 @@ declare module Plottable.Plots {
          * @param {Scale<Y, number>} yScale
          * @returns {Plots.Segment} The calling Segment Plot.
          */
-        y(y: Y | Accessor<Y>, yScale: Scale<Y, number>): Plots.Segment<X, Y>;
+        y(y: Y | Accessor<Y>, yScale: Scale<Y, number>): this;
         /**
          * Gets the AccessorScaleBinding for Y2.
          */
@@ -3862,7 +3862,7 @@ declare module Plottable.Plots {
          * @param {number|Accessor<number>|Y|Accessor<Y>} y2
          * @returns {Plots.Segment} The calling Segment Plot.
          */
-        y2(y2: number | Accessor<number> | Y | Accessor<Y>): Plots.Segment<X, Y>;
+        y2(y2: number | Accessor<number> | Y | Accessor<Y>): this;
         protected _propertyProjectors(): AttributeToProjector;
         /**
          * Gets the Entities that intersect the Bounds.
@@ -3909,7 +3909,7 @@ declare module Plottable.Plots {
          * @param {boolean} enabled
          * @returns {Plots.Waterfall} The calling Waterfall Plot.
          */
-        connectorsEnabled(enabled: boolean): Waterfall<X, Y>;
+        connectorsEnabled(enabled: boolean): this;
         /**
          * Gets the AccessorScaleBinding for whether a bar represents a total or a delta.
          */
@@ -3920,7 +3920,7 @@ declare module Plottable.Plots {
          * @param {Accessor<boolean>}
          * @returns {Plots.Waterfall} The calling Waterfall Plot.
          */
-        total(total: Accessor<boolean>): Waterfall<X, Y>;
+        total(total: Accessor<boolean>): this;
         protected _additionalPaint(time: number): void;
         protected _createNodesForDataset(dataset: Dataset): Drawer;
         protected _extentsForProperty(attr: string): any[];

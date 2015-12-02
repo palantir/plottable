@@ -29,8 +29,8 @@ module Plottable.Plots {
     }
 
     public x(): Plots.AccessorScaleBinding<X, number>;
-    public x(x: number | Accessor<number>): StackedArea<X>;
-    public x(x: X | Accessor<X>, xScale: Scale<X, number>): StackedArea<X>;
+    public x(x: number | Accessor<number>): this;
+    public x(x: X | Accessor<X>, xScale: Scale<X, number>): this;
     public x(x?: number | Accessor<number> | X | Accessor<X>, xScale?: Scale<X, number>): any {
       if (x == null) {
         return super.x();
@@ -47,8 +47,8 @@ module Plottable.Plots {
     }
 
     public y(): Plots.AccessorScaleBinding<number, number>;
-    public y(y: number | Accessor<number>): StackedArea<X>;
-    public y(y: number | Accessor<number>, yScale: QuantitativeScale<number>): StackedArea<X>;
+    public y(y: number | Accessor<number>): this;
+    public y(y: number | Accessor<number>, yScale: QuantitativeScale<number>): this;
     public y(y?: number | Accessor<number>, yScale?: QuantitativeScale<number>): any {
       if (y == null) {
         return super.y();

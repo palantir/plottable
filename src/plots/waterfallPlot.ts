@@ -28,7 +28,7 @@ module Plottable.Plots {
      * @param {boolean} enabled
      * @returns {Plots.Waterfall} The calling Waterfall Plot.
      */
-    public connectorsEnabled(enabled: boolean): Waterfall<X, Y>;
+    public connectorsEnabled(enabled: boolean): this;
     public connectorsEnabled(enabled?: boolean): any {
       if (enabled == null) {
         return this._connectorsEnabled;
@@ -47,7 +47,7 @@ module Plottable.Plots {
      * @param {Accessor<boolean>}
      * @returns {Plots.Waterfall} The calling Waterfall Plot.
      */
-    public total(total: Accessor<boolean>): Waterfall<X, Y>;
+    public total(total: Accessor<boolean>): this;
     public total(total?: Accessor<boolean>): any {
       if (total == null) {
         return this._propertyBindings.get(Waterfall._TOTAL_KEY);

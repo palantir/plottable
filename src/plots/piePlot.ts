@@ -210,7 +210,7 @@ module Plottable.Plots {
      * @param {boolean} labelsEnabled
      * @returns {Pie} The calling Pie Plot.
      */
-    public labelsEnabled(enabled: boolean): Pie;
+    public labelsEnabled(enabled: boolean): this;
     public labelsEnabled(enabled?: boolean): any {
       if (enabled == null) {
         return this._labelsEnabled;
@@ -231,7 +231,7 @@ module Plottable.Plots {
      * @param {Formatter} formatter
      * @returns {Pie} The calling Pie Plot.
      */
-    public labelFormatter(formatter: Formatter): Pie;
+    public labelFormatter(formatter: Formatter): this;
     public labelFormatter(formatter?: Formatter): any {
       if (formatter == null) {
         return this._labelFormatter;

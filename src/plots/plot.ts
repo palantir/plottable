@@ -344,7 +344,7 @@ export class Plot extends Component {
    * @param {Animator} animator
    * @returns {Plot} The calling Plot.
    */
-  public animator(animatorKey: string, animator: Animator): Plot;
+  public animator(animatorKey: string, animator: Animator): this;
   public animator(animatorKey: string, animator?: Animator): any {
     if (animator === undefined) {
       return this._animators[animatorKey];
@@ -385,7 +385,7 @@ export class Plot extends Component {
    * @param {Dataset} dataset
    * @returns {Plot} The calling Plot.
    */
-  public removeDataset(dataset: Dataset): Plot {
+  public removeDataset(dataset: Dataset): this {
     this._removeDataset(dataset);
     this._onDatasetUpdate();
     return this;
@@ -408,7 +408,7 @@ export class Plot extends Component {
   }
 
   public datasets(): Dataset[];
-  public datasets(datasets: Dataset[]): Plot;
+  public datasets(datasets: Dataset[]): this;
   public datasets(datasets?: Dataset[]): any {
     let currentDatasets: Dataset[] = [];
     this._datasetToDrawer.forEach((drawer, dataset) => currentDatasets.push(dataset));

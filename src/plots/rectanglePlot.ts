@@ -97,7 +97,7 @@ module Plottable.Plots {
      * @param {number|Accessor<number>} x
      * @returns {Plots.Rectangle} The calling Rectangle Plot.
      */
-    public x(x: number | Accessor<number>): Plots.Rectangle<X, Y>;
+    public x(x: number | Accessor<number>): this;
     /**
      * Sets X to a scaled constant value or scaled result of an Accessor.
      * The provided Scale will account for the values when autoDomain()-ing.
@@ -106,7 +106,7 @@ module Plottable.Plots {
      * @param {Scale<X, number>} xScale
      * @returns {Plots.Rectangle} The calling Rectangle Plot.
      */
-    public x(x: X | Accessor<X>, xScale: Scale<X, number>): Plots.Rectangle<X, Y>;
+    public x(x: X | Accessor<X>, xScale: Scale<X, number>): this;
     public x(x?: number | Accessor<number> | X | Accessor<X>, xScale?: Scale<X, number>): any {
       if (x == null) {
         return super.x();
@@ -145,7 +145,7 @@ module Plottable.Plots {
      * @param {number|Accessor<number>|X|Accessor<X>} x2
      * @returns {Plots.Rectangle} The calling Rectangle Plot.
      */
-    public x2(x2: number | Accessor<number> | X | Accessor<X>): Plots.Rectangle<X, Y>;
+    public x2(x2: number | Accessor<number> | X | Accessor<X>): this;
     public x2(x2?: number | Accessor<number> | X | Accessor<X>): any {
       if (x2 == null) {
         return this._propertyBindings.get(Rectangle._X2_KEY);
@@ -169,7 +169,7 @@ module Plottable.Plots {
      * @param {number|Accessor<number>} y
      * @returns {Plots.Rectangle} The calling Rectangle Plot.
      */
-    public y(y: number | Accessor<number>): Plots.Rectangle<X, Y>;
+    public y(y: number | Accessor<number>): this;
     /**
      * Sets Y to a scaled constant value or scaled result of an Accessor.
      * The provided Scale will account for the values when autoDomain()-ing.
@@ -178,7 +178,7 @@ module Plottable.Plots {
      * @param {Scale<Y, number>} yScale
      * @returns {Plots.Rectangle} The calling Rectangle Plot.
      */
-    public y(y: Y | Accessor<Y>, yScale: Scale<Y, number>): Plots.Rectangle<X, Y>;
+    public y(y: Y | Accessor<Y>, yScale: Scale<Y, number>): this;
     public y(y?: number | Accessor<number> | Y | Accessor<Y>, yScale?: Scale<Y, number>): any {
       if (y == null) {
         return super.y();
@@ -217,7 +217,7 @@ module Plottable.Plots {
      * @param {number|Accessor<number>|Y|Accessor<Y>} y2
      * @returns {Plots.Rectangle} The calling Rectangle Plot.
      */
-    public y2(y2: number | Accessor<number> | Y | Accessor<Y>): Plots.Rectangle<X, Y>;
+    public y2(y2: number | Accessor<number> | Y | Accessor<Y>): this;
     public y2(y2?: number | Accessor<number> | Y | Accessor<Y>): any {
       if (y2 == null) {
         return this._propertyBindings.get(Rectangle._Y2_KEY);
@@ -313,7 +313,7 @@ module Plottable.Plots {
      * @param {Accessor<string>} label
      * @returns {Plots.Rectangle} The calling Rectangle Plot.
      */
-    public label(label: Accessor<string>): Plots.Rectangle<X, Y>;
+    public label(label: Accessor<string>): this;
     public label(label?: Accessor<string>): any {
       if (label == null) {
         return this._label;
@@ -337,7 +337,7 @@ module Plottable.Plots {
      * @param {boolean} labelsEnabled
      * @returns {Rectangle} The calling Rectangle Plot.
      */
-    public labelsEnabled(enabled: boolean): Plots.Rectangle<X, Y>;
+    public labelsEnabled(enabled: boolean): this;
     public labelsEnabled(enabled?: boolean): any {
       if (enabled == null) {
         return this._labelsEnabled;
