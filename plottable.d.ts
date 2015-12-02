@@ -2056,7 +2056,7 @@ declare module Plottable.Axes {
          * @param {boolean} The new text width approximation setting.
          * @returns {Axes.Numeric} The calling Axes.Numeric.
          */
-        usesTextWidthApproximation(enable: boolean): Axes.Numeric;
+        usesTextWidthApproximation(enable: boolean): this;
         private _hideEndTickLabels();
         private _hideOverflowingTickLabels();
         private _hideOverlappingTickLabels();
@@ -2799,7 +2799,7 @@ declare module Plottable {
          * @param {number|string|Accessor<number>|Accessor<string>} attrValue
          * @returns {Plot} The calling Plot.
          */
-        attr(attr: string, attrValue: number | string | Accessor<number> | Accessor<string>): Plot;
+        attr(attr: string, attrValue: number | string | Accessor<number> | Accessor<string>): this;
         /**
          * Sets a particular attribute to a scaled constant value or scaled result of an Accessor.
          * The provided Scale will account for the attribute values when autoDomain()-ing.
@@ -2809,7 +2809,7 @@ declare module Plottable {
          * @param {Scale<A, number | string>} scale The Scale used to scale the attrValue.
          * @returns {Plot} The calling Plot.
          */
-        attr<A>(attr: string, attrValue: A | Accessor<A>, scale: Scale<A, number | string>): Plot;
+        attr<A>(attr: string, attrValue: A | Accessor<A>, scale: Scale<A, number | string>): this;
         protected _bindProperty(property: string, value: any, scale: Scale<any, any>): void;
         private _bindAttr(attr, value, scale);
         protected _generateAttrToProjector(): AttributeToProjector;
@@ -2821,7 +2821,7 @@ declare module Plottable {
         /**
          * Enables or disables animation.
          */
-        animated(willAnimate: boolean): Plot;
+        animated(willAnimate: boolean): this;
         detach(): this;
         /**
          * @returns {Scale[]} A unique array of all scales currently used by the Plot.
@@ -2952,7 +2952,7 @@ declare module Plottable.Plots {
          * @param {number|Accessor<number>} sectorValue
          * @returns {Pie} The calling Pie Plot.
          */
-        sectorValue(sectorValue: number | Accessor<number>): Plots.Pie;
+        sectorValue(sectorValue: number | Accessor<number>): this;
         /**
          * Sets the sector value to a scaled constant value or scaled result of an Accessor.
          * The provided Scale will account for the values when autoDomain()-ing.
@@ -2961,7 +2961,7 @@ declare module Plottable.Plots {
          * @param {Scale<S, number>} scale
          * @returns {Pie} The calling Pie Plot.
          */
-        sectorValue<S>(sectorValue: S | Accessor<S>, scale: Scale<S, number>): Plots.Pie;
+        sectorValue<S>(sectorValue: S | Accessor<S>, scale: Scale<S, number>): this;
         /**
          * Gets the AccessorScaleBinding for the inner radius.
          */
@@ -2972,7 +2972,7 @@ declare module Plottable.Plots {
          * @param {number|Accessor<number>} innerRadius
          * @returns {Pie} The calling Pie Plot.
          */
-        innerRadius(innerRadius: number | Accessor<number>): Plots.Pie;
+        innerRadius(innerRadius: number | Accessor<number>): any;
         /**
          * Sets the inner radius to a scaled constant value or scaled result of an Accessor.
          * The provided Scale will account for the values when autoDomain()-ing.
@@ -2981,7 +2981,7 @@ declare module Plottable.Plots {
          * @param {Scale<R, number>} scale
          * @returns {Pie} The calling Pie Plot.
          */
-        innerRadius<R>(innerRadius: R | Accessor<R>, scale: Scale<R, number>): Plots.Pie;
+        innerRadius<R>(innerRadius: R | Accessor<R>, scale: Scale<R, number>): any;
         /**
          * Gets the AccessorScaleBinding for the outer radius.
          */
@@ -2992,7 +2992,7 @@ declare module Plottable.Plots {
          * @param {number|Accessor<number>} outerRadius
          * @returns {Pie} The calling Pie Plot.
          */
-        outerRadius(outerRadius: number | Accessor<number>): Plots.Pie;
+        outerRadius(outerRadius: number | Accessor<number>): this;
         /**
          * Sets the outer radius to a scaled constant value or scaled result of an Accessor.
          * The provided Scale will account for the values when autoDomain()-ing.
@@ -3001,7 +3001,7 @@ declare module Plottable.Plots {
          * @param {Scale<R, number>} scale
          * @returns {Pie} The calling Pie Plot.
          */
-        outerRadius<R>(outerRadius: R | Accessor<R>, scale: Scale<R, number>): Plots.Pie;
+        outerRadius<R>(outerRadius: R | Accessor<R>, scale: Scale<R, number>): this;
         /**
          * Get whether slice labels are enabled.
          *
@@ -3327,7 +3327,7 @@ declare module Plottable.Plots {
          * @param {number|Accessor<number>} size
          * @returns {Plots.Scatter} The calling Scatter Plot.
          */
-        size(size: number | Accessor<number>): Plots.Scatter<X, Y>;
+        size(size: number | Accessor<number>): this;
         /**
          * Sets the size property to a scaled constant value or scaled result of an Accessor.
          * The provided Scale will account for the values when autoDomain()-ing.
@@ -3336,7 +3336,7 @@ declare module Plottable.Plots {
          * @param {Scale<S, number>} scale
          * @returns {Plots.Scatter} The calling Scatter Plot.
          */
-        size<S>(size: S | Accessor<S>, scale: Scale<S, number>): Plots.Scatter<X, Y>;
+        size<S>(size: S | Accessor<S>, scale: Scale<S, number>): this;
         /**
          * Gets the AccessorScaleBinding for the symbol property of the plot.
          * The symbol property corresponds to how the symbol will be drawn.
@@ -3348,7 +3348,7 @@ declare module Plottable.Plots {
          * @param {Accessor<SymbolFactory>} symbol
          * @returns {Plots.Scatter} The calling Scatter Plot.
          */
-        symbol(symbol: Accessor<SymbolFactory>): Plots.Scatter<X, Y>;
+        symbol(symbol: Accessor<SymbolFactory>): this;
         protected _generateDrawSteps(): Drawers.DrawStep[];
         /**
          * @deprecated As of release v1.1.0, replaced by _entityVisibleOnPlot()
@@ -3565,7 +3565,7 @@ declare module Plottable.Plots {
          * Smooth autoranging is done by making sure lines always exit on the left / right side of the plot
          * and deactivating the nice domain feature on the scales
          */
-        autorangeSmooth(autorangeSmooth: boolean): Plots.Line<X>;
+        autorangeSmooth(autorangeSmooth: boolean): this;
         private _setScaleSnapping();
         /**
          * Gets the interpolation function associated with the plot.
@@ -3579,7 +3579,7 @@ declare module Plottable.Plots {
          * @param {string | points: Array<[number, number]>) => string} interpolator Interpolation function
          * @return Plots.Line
          */
-        interpolator(interpolator: string | ((points: Array<[number, number]>) => string)): Plots.Line<X>;
+        interpolator(interpolator: string | ((points: Array<[number, number]>) => string)): this;
         interpolator(interpolator: "linear"): this;
         interpolator(interpolator: "linear-closed"): this;
         interpolator(interpolator: "step"): this;
@@ -3604,7 +3604,7 @@ declare module Plottable.Plots {
          *
          * @returns {Plots.Line} The calling Plots.Line
          */
-        downsamplingEnabled(downsampling: boolean): Plots.Line<X>;
+        downsamplingEnabled(downsampling: boolean): this;
         /**
          * Gets if croppedRendering is enabled
          *
@@ -3616,7 +3616,7 @@ declare module Plottable.Plots {
          *
          * @returns {Plots.Line} The calling Plots.Line
          */
-        croppedRenderingEnabled(croppedRendering: boolean): Plots.Line<X>;
+        croppedRenderingEnabled(croppedRendering: boolean): this;
         protected _createDrawer(dataset: Dataset): Drawer;
         protected _extentsForProperty(property: string): any[];
         private _getEdgeIntersectionPoints();
@@ -3733,7 +3733,7 @@ declare module Plottable.Plots {
          * For now, downsampling is always disabled in stacked area plot
          * @returns {Plots.StackedArea} The calling Plots.StackedArea
          */
-        downsamplingEnabled(downsampling: boolean): Plots.Line<X>;
+        downsamplingEnabled(downsampling: boolean): this;
         protected _additionalPaint(): void;
         protected _updateYScale(): void;
         protected _onDatasetUpdate(): this;
@@ -4642,7 +4642,7 @@ declare module Plottable.Interactions {
          *
          * @returns {Interactions.PanZoom} The calling PanZoom Interaction.
          */
-        xScales(xScales: QuantitativeScale<any>[]): Interactions.PanZoom;
+        xScales(xScales: QuantitativeScale<any>[]): this;
         /**
          * Gets the y scales for this PanZoom Interaction.
          */
@@ -4652,7 +4652,7 @@ declare module Plottable.Interactions {
          *
          * @returns {Interactions.PanZoom} The calling PanZoom Interaction.
          */
-        yScales(yScales: QuantitativeScale<any>[]): Interactions.PanZoom;
+        yScales(yScales: QuantitativeScale<any>[]): this;
         /**
          * Adds an x scale to this PanZoom Interaction
          *
@@ -4701,7 +4701,7 @@ declare module Plottable.Interactions {
          * @param {D} minDomainExtent The minimum domain extent for the scale.
          * @returns {Interactions.PanZoom} The calling PanZoom Interaction.
          */
-        minDomainExtent<D>(quantitativeScale: QuantitativeScale<D>, minDomainExtent: D): Interactions.PanZoom;
+        minDomainExtent<D>(quantitativeScale: QuantitativeScale<D>, minDomainExtent: D): this;
         /**
          * Gets the maximum domain extent for the scale, specifying the maximum allowable amount
          * between the ends of the domain.
@@ -4722,7 +4722,7 @@ declare module Plottable.Interactions {
          * @param {D} minDomainExtent The maximum domain extent for the scale.
          * @returns {Interactions.PanZoom} The calling PanZoom Interaction.
          */
-        maxDomainExtent<D>(quantitativeScale: QuantitativeScale<D>, maxDomainExtent: D): Interactions.PanZoom;
+        maxDomainExtent<D>(quantitativeScale: QuantitativeScale<D>, maxDomainExtent: D): this;
     }
 }
 declare module Plottable {

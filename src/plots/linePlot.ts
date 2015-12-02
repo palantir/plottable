@@ -83,7 +83,7 @@ module Plottable.Plots {
      * Smooth autoranging is done by making sure lines always exit on the left / right side of the plot
      * and deactivating the nice domain feature on the scales
      */
-    public autorangeSmooth(autorangeSmooth: boolean): Plots.Line<X>;
+    public autorangeSmooth(autorangeSmooth: boolean): this;
     public autorangeSmooth(autorangeSmooth?: boolean): any {
       if (autorangeSmooth == null) {
         return this._autorangeSmooth;
@@ -115,7 +115,7 @@ module Plottable.Plots {
      * @param {string | points: Array<[number, number]>) => string} interpolator Interpolation function
      * @return Plots.Line
      */
-    public interpolator(interpolator: string | ((points: Array<[number, number]>) => string)): Plots.Line<X>;
+    public interpolator(interpolator: string | ((points: Array<[number, number]>) => string)): this;
     public interpolator(interpolator: "linear"): this;
     public interpolator(interpolator: "linear-closed"): this;
     public interpolator(interpolator: "step"): this;
@@ -148,7 +148,7 @@ module Plottable.Plots {
      *
      * @returns {Plots.Line} The calling Plots.Line
      */
-    public downsamplingEnabled(downsampling: boolean): Plots.Line<X>;
+    public downsamplingEnabled(downsampling: boolean): this;
     public downsamplingEnabled(downsampling?: boolean): any {
       if (downsampling == null) {
         return this._downsamplingEnabled;
@@ -168,7 +168,7 @@ module Plottable.Plots {
      *
      * @returns {Plots.Line} The calling Plots.Line
      */
-    public croppedRenderingEnabled(croppedRendering: boolean): Plots.Line<X>;
+    public croppedRenderingEnabled(croppedRendering: boolean): this;
     public croppedRenderingEnabled(croppedRendering?: boolean): any {
       if (croppedRendering == null) {
         return this._croppedRenderingEnabled;

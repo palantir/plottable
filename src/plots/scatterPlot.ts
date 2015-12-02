@@ -38,7 +38,7 @@ module Plottable.Plots {
      * @param {number|Accessor<number>} size
      * @returns {Plots.Scatter} The calling Scatter Plot.
      */
-    public size(size: number | Accessor<number>): Plots.Scatter<X, Y>;
+    public size(size: number | Accessor<number>): this;
     /**
      * Sets the size property to a scaled constant value or scaled result of an Accessor.
      * The provided Scale will account for the values when autoDomain()-ing.
@@ -47,7 +47,7 @@ module Plottable.Plots {
      * @param {Scale<S, number>} scale
      * @returns {Plots.Scatter} The calling Scatter Plot.
      */
-    public size<S>(size: S | Accessor<S>, scale: Scale<S, number>): Plots.Scatter<X, Y>;
+    public size<S>(size: S | Accessor<S>, scale: Scale<S, number>): this;
     public size<S>(size?: number | Accessor<number> | S | Accessor<S>, scale?: Scale<S, number>): any {
       if (size == null) {
         return this._propertyBindings.get(Scatter._SIZE_KEY);
@@ -68,7 +68,7 @@ module Plottable.Plots {
      * @param {Accessor<SymbolFactory>} symbol
      * @returns {Plots.Scatter} The calling Scatter Plot.
      */
-    public symbol(symbol: Accessor<SymbolFactory>): Plots.Scatter<X, Y>;
+    public symbol(symbol: Accessor<SymbolFactory>): this;
     public symbol(symbol?: Accessor<SymbolFactory>): any {
       if (symbol == null) {
         return this._propertyBindings.get(Scatter._SYMBOL_KEY);

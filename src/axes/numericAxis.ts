@@ -290,7 +290,7 @@ module Plottable.Axes {
      * @param {boolean} The new text width approximation setting.
      * @returns {Axes.Numeric} The calling Axes.Numeric.
      */
-    public usesTextWidthApproximation(enable: boolean): Axes.Numeric;
+    public usesTextWidthApproximation(enable: boolean): this;
     public usesTextWidthApproximation(enable?: boolean): any {
       if (enable == null) {
         return this._usesTextWidthApproximation;

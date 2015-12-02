@@ -130,7 +130,7 @@ export class Plot extends Component {
    * @param {number|string|Accessor<number>|Accessor<string>} attrValue
    * @returns {Plot} The calling Plot.
    */
-  public attr(attr: string, attrValue: number | string | Accessor<number> | Accessor<string>): Plot;
+  public attr(attr: string, attrValue: number | string | Accessor<number> | Accessor<string>): this;
   /**
    * Sets a particular attribute to a scaled constant value or scaled result of an Accessor.
    * The provided Scale will account for the attribute values when autoDomain()-ing.
@@ -140,7 +140,7 @@ export class Plot extends Component {
    * @param {Scale<A, number | string>} scale The Scale used to scale the attrValue.
    * @returns {Plot} The calling Plot.
    */
-  public attr<A>(attr: string, attrValue: A | Accessor<A>, scale: Scale<A, number | string>): Plot;
+  public attr<A>(attr: string, attrValue: A | Accessor<A>, scale: Scale<A, number | string>): this;
   public attr<A>(attr: string, attrValue?: number | string | Accessor<number> | Accessor<string> | A | Accessor<A>,
                  scale?: Scale<A, number | string>): any {
     if (attrValue == null) {
@@ -214,7 +214,7 @@ export class Plot extends Component {
   /**
    * Enables or disables animation.
    */
-  public animated(willAnimate: boolean): Plot;
+  public animated(willAnimate: boolean): this;
   public animated(willAnimate?: boolean): any {
     if (willAnimate == null) {
       return this._animate;

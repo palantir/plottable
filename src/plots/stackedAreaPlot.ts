@@ -76,7 +76,7 @@ module Plottable.Plots {
      * For now, downsampling is always disabled in stacked area plot
      * @returns {Plots.StackedArea} The calling Plots.StackedArea
      */
-    public downsamplingEnabled(downsampling: boolean): Plots.Line<X>;
+    public downsamplingEnabled(downsampling: boolean): this;
     public downsamplingEnabled(downsampling?: boolean): any {
        if (downsampling == null) {
          return super.downsamplingEnabled();

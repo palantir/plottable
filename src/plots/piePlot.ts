@@ -120,7 +120,7 @@ module Plottable.Plots {
      * @param {number|Accessor<number>} sectorValue
      * @returns {Pie} The calling Pie Plot.
      */
-    public sectorValue(sectorValue: number | Accessor<number>): Plots.Pie;
+    public sectorValue(sectorValue: number | Accessor<number>): this;
     /**
      * Sets the sector value to a scaled constant value or scaled result of an Accessor.
      * The provided Scale will account for the values when autoDomain()-ing.
@@ -129,7 +129,7 @@ module Plottable.Plots {
      * @param {Scale<S, number>} scale
      * @returns {Pie} The calling Pie Plot.
      */
-    public sectorValue<S>(sectorValue: S | Accessor<S>, scale: Scale<S, number>): Plots.Pie;
+    public sectorValue<S>(sectorValue: S | Accessor<S>, scale: Scale<S, number>): this;
     public sectorValue<S>(sectorValue?: number | Accessor<number> | S | Accessor<S>, scale?: Scale<S, number>): any {
       if (sectorValue == null) {
         return this._propertyBindings.get(Pie._SECTOR_VALUE_KEY);
@@ -150,7 +150,7 @@ module Plottable.Plots {
      * @param {number|Accessor<number>} innerRadius
      * @returns {Pie} The calling Pie Plot.
      */
-    public innerRadius(innerRadius: number | Accessor<number>): Plots.Pie;
+    public innerRadius(innerRadius: number | Accessor<number>): any;
     /**
      * Sets the inner radius to a scaled constant value or scaled result of an Accessor.
      * The provided Scale will account for the values when autoDomain()-ing.
@@ -159,7 +159,7 @@ module Plottable.Plots {
      * @param {Scale<R, number>} scale
      * @returns {Pie} The calling Pie Plot.
      */
-    public innerRadius<R>(innerRadius: R | Accessor<R>, scale: Scale<R, number>): Plots.Pie;
+    public innerRadius<R>(innerRadius: R | Accessor<R>, scale: Scale<R, number>): any;
     public innerRadius<R>(innerRadius?: number | Accessor<number> | R | Accessor<R>, scale?: Scale<R, number>): any {
       if (innerRadius == null) {
         return this._propertyBindings.get(Pie._INNER_RADIUS_KEY);
@@ -179,7 +179,7 @@ module Plottable.Plots {
      * @param {number|Accessor<number>} outerRadius
      * @returns {Pie} The calling Pie Plot.
      */
-    public outerRadius(outerRadius: number | Accessor<number>): Plots.Pie;
+    public outerRadius(outerRadius: number | Accessor<number>): this;
     /**
      * Sets the outer radius to a scaled constant value or scaled result of an Accessor.
      * The provided Scale will account for the values when autoDomain()-ing.
@@ -188,7 +188,7 @@ module Plottable.Plots {
      * @param {Scale<R, number>} scale
      * @returns {Pie} The calling Pie Plot.
      */
-    public outerRadius<R>(outerRadius: R | Accessor<R>, scale: Scale<R, number>): Plots.Pie;
+    public outerRadius<R>(outerRadius: R | Accessor<R>, scale: Scale<R, number>): this;
     public outerRadius<R>(outerRadius?: number | Accessor<number> | R | Accessor<R>, scale?: Scale<R, number>): any {
       if (outerRadius == null) {
         return this._propertyBindings.get(Pie._OUTER_RADIUS_KEY);
