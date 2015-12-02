@@ -142,8 +142,6 @@ describe("Interactions", () => {
 
           assert.isFalse(callback.called, `callback 1 was disconnected from pointer enter interaction (${MODE_NAME[mode]})`);
           assert.isTrue(callback2.called, `callback 2 is still connected to the pointer enter interaction (${MODE_NAME[mode]})`);
-
-          svg.remove();
         });
       });
 
@@ -177,6 +175,7 @@ describe("Interactions", () => {
 
           callback = makePointerCallback();
         });
+
         afterEach(function() {
           if (this.currentTest.state === "passed") {
             svg.remove();
@@ -184,7 +183,7 @@ describe("Interactions", () => {
           }
         });
 
-        it("does not call the onPointerEnter moving from within overlay", () => {
+        it("calls the onPointerEnter moving from within overlay", () => {
           pointerInteraction.onPointerEnter(callback);
 
           triggerPointerEvent(QUARTER_POINT, mode, eventTarget);
@@ -193,14 +192,13 @@ describe("Interactions", () => {
           callback.reset();
           triggerPointerEvent(OUTSIDE_POINT, mode, eventTarget);
           triggerPointerEvent(QUARTER_POINT, mode, overlay);
-          assert.isTrue(callback.called, `called when moving inside overlay (${MODE_NAME[mode]})`);
+          assert.isFalse(callback.called, `callback not called when moving inside overlay (${MODE_NAME[mode]})`);
 
-          callback.reset();
           triggerPointerEvent(QUARTER_POINT, mode, eventTarget);
-          assert.isFalse(callback.called, `callback not called on entering Component from overlay (${MODE_NAME[mode]})`);
+          assert.isTrue(callback.called, `callback called on entering Component from overlay (${MODE_NAME[mode]})`);
         });
 
-        it("calls the onPointerMove callback under overlay", () => {
+        it("does not call the onPointerMove callback under overlay", () => {
           pointerInteraction.onPointerMove(callback);
 
           triggerPointerEvent(QUARTER_POINT, mode, eventTarget);
@@ -208,7 +206,7 @@ describe("Interactions", () => {
 
           callback.reset();
           triggerPointerEvent(QUARTER_POINT, mode, overlay);
-          assert.isTrue(callback.called, `called on moving inside overlay (${MODE_NAME[mode]})`);
+          assert.isFalse(callback.called, `callback not called on moving inside overlay (${MODE_NAME[mode]})`);
         });
 
         it("does not the onPointerExit callback moving into overlay", () => {
@@ -216,18 +214,15 @@ describe("Interactions", () => {
 
           triggerPointerEvent(QUARTER_POINT, mode, eventTarget);
           triggerPointerEvent(QUARTER_POINT, mode, overlay);
-          assert.isFalse(callback.called, `callback not called on moving inside overlay (${MODE_NAME[mode]})`);
+          assert.isTrue(callback.called, `callback called on moving to overlay (${MODE_NAME[mode]})`);
 
+          callback.reset();
           triggerPointerEvent(OUTSIDE_POINT, mode, eventTarget);
-          assert.isTrue(callback.called, `callback called moving from overlay to outside of Component (${MODE_NAME[mode]})`);
+          assert.isFalse(callback.called, `callback not called moving from overlay to outside of Component (${MODE_NAME[mode]})`);
 
           callback.reset();
           triggerPointerEvent(QUARTER_POINT, mode, overlay);
           assert.isFalse(callback.called, `callback not called moving from outside of Component into overlay (${MODE_NAME[mode]})`);
-
-          pointerInteraction.offPointerExit(callback);
-          svg.remove();
-          overlay.remove();
         });
       });
     });
