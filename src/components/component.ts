@@ -47,6 +47,7 @@ export class Component {
   private _clipPathID: string;
   private _onAnchorCallbacks = new Utils.CallbackSet<ComponentCallback>();
   private _onDetachCallbacks = new Utils.CallbackSet<ComponentCallback>();
+  private static _SAFARI_EVENT_BACKING_CLASS = "safari-event-backing";
 
   public constructor() {
     this._cssClasses.add("component");
@@ -71,6 +72,17 @@ export class Component {
       this._rootSVG.classed("plottable", true);
       // visible overflow for firefox https://stackoverflow.com/questions/5926986/why-does-firefox-appear-to-truncate-embedded-svgs
       this._rootSVG.style("overflow", "visible");
+
+      // HACKHACK: Safari fails to register events on the <svg> itself
+      const safariBacking = this._rootSVG.select(`.${Component._SAFARI_EVENT_BACKING_CLASS}`);
+      if (safariBacking.empty()) {
+        this._rootSVG.append("rect").classed(Component._SAFARI_EVENT_BACKING_CLASS, true).attr({
+          x: 0,
+          y: 0,
+          width: "100%",
+          height: "100%"
+        }).style("opacity", 0);
+      }
     }
 
     if (this._element != null) {
@@ -80,6 +92,7 @@ export class Component {
       this._element = selection.append("g");
       this._setup();
     }
+
     this._isAnchored = true;
     this._onAnchorCallbacks.callCallbacks(this);
     return this;
@@ -458,6 +471,9 @@ export class Component {
 
     if (this._isAnchored) {
       this._element.remove();
+      if (this._isTopLevelComponent) {
+        this._rootSVG.select(`.${Component._SAFARI_EVENT_BACKING_CLASS}`).remove();
+      }
     }
     this._isAnchored = false;
     this._onDetachCallbacks.callCallbacks(this);

@@ -868,4 +868,83 @@ describe("Component", () => {
       svg.remove();
     });
   });
+
+  describe("backing element for catching events in Safari", () => {
+    let backingClass: string;
+
+    before(() => {
+      backingClass = <string> (<any> Plottable.Component)._SAFARI_EVENT_BACKING_CLASS;
+      assert.strictEqual(typeof(backingClass), "string", "test battery was able to extract backing CSS class");
+    });
+
+    it("adds an transparent backing rectangle if it is the root Component", () => {
+      const component = new Plottable.Component();
+      const svg = TestMethods.generateSVG();
+      component.anchor(svg);
+
+      const backing = svg.select(`.${backingClass}`);
+      assert.isFalse(backing.empty(), "added a backing element");
+      assert.strictEqual(+backing.style("opacity"), 0, "backing element is transparent");
+
+      const backingElementBCR = (<Element> backing.node()).getBoundingClientRect();
+      assert.strictEqual(backingElementBCR.width, TestMethods.numAttr(svg, "width"), "backing's width is equal to the SVG's");
+      assert.strictEqual(backingElementBCR.height, TestMethods.numAttr(svg, "height"), "backing's height is equal to the SVG's");
+
+      svg.remove();
+    });
+
+    it("resizes the backing when the SVG size changes", () => {
+      const component = new Plottable.Component();
+      const svg = TestMethods.generateSVG();
+      component.anchor(svg);
+
+      const expectedWidth = TestMethods.numAttr(svg, "width") + 100;
+      const expectedHeight = TestMethods.numAttr(svg, "height") + 100;
+      svg.attr({
+        width: expectedWidth,
+        height: expectedHeight
+      });
+
+      const backing = svg.select(`.${backingClass}`);
+      const backingElementBCR = (<Element> backing.node()).getBoundingClientRect();
+      assert.strictEqual(backingElementBCR.width, expectedWidth, "backing's width is equal to the SVG's");
+      assert.strictEqual(backingElementBCR.height, expectedHeight, "backing's height is equal to the SVG's");
+
+      svg.remove();
+    });
+
+    it("only adds the backing once", () => {
+      const component = new Plottable.Component();
+      const svg = TestMethods.generateSVG();
+      component.anchor(svg);
+      component.anchor(svg);
+
+      const backings = svg.selectAll(`.${backingClass}`);
+      assert.strictEqual(backings.size(), 1, "only one backing was added");
+
+      svg.remove();
+    });
+
+    it("doesn't add a backing if it's not the root Component", () => {
+      const component = new Plottable.Component();
+      const svg = TestMethods.generateSVG();
+      const g = svg.append("g");
+      component.anchor(g);
+
+      const backing = svg.select(`.${backingClass}`);
+      assert.isTrue(backing.empty(), "did not add a backing element");
+      svg.remove();
+    });
+
+    it("removes the backing when detached", () => {
+      const component = new Plottable.Component();
+      const svg = TestMethods.generateSVG();
+      component.anchor(svg);
+      component.detach();
+
+      const backing = svg.select(`.${backingClass}`);
+      assert.isTrue(backing.empty(), "backing element was removed");
+      svg.remove();
+    });
+  });
 });
