@@ -377,7 +377,7 @@ declare module Plottable {
          * @param {any[]} data
          * @returns {Dataset} The calling Dataset.
          */
-        data(data: any[]): Dataset;
+        data(data: any[]): this;
         /**
          * Gets the metadata.
          *
@@ -390,7 +390,7 @@ declare module Plottable {
          * @param {any} metadata
          * @returns {Dataset} The calling Dataset.
          */
-        metadata(metadata: any): Dataset;
+        metadata(metadata: any): this;
     }
 }
 declare module Plottable.RenderPolicies {
