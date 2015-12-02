@@ -716,14 +716,14 @@ declare module Plottable {
          * @param {ScaleCallback} callback.
          * @returns {Scale} The calling Scale.
          */
-        onUpdate(callback: ScaleCallback<Scale<D, R>>): this;
+        onUpdate(callback: ScaleCallback<this>): this;
         /**
          * Removes a callback that would be called when the Scale updates.
          *
          * @param {ScaleCallback} callback.
          * @returns {Scale} The calling Scale.
          */
-        offUpdate(callback: ScaleCallback<Scale<D, R>>): this;
+        offUpdate(callback: ScaleCallback<this>): this;
         protected _dispatchUpdate(): void;
         /**
          * Sets the Scale's domain so that it spans the Extents of all its ExtentsProviders.
@@ -751,7 +751,7 @@ declare module Plottable {
          * @param {D[]} values
          * @returns {Scale} The calling Scale.
          */
-        domain(values: D[]): Scale<D, R>;
+        domain(values: D[]): this;
         protected _getDomain(): D[];
         protected _setDomain(values: D[]): void;
         protected _setBackingScaleDomain(values: D[]): void;
@@ -767,7 +767,7 @@ declare module Plottable {
          * @param {R[]} values
          * @returns {Scale} The calling Scale.
          */
-        range(values: R[]): Scale<D, R>;
+        range(values: R[]): this;
         protected _getRange(): R[];
         protected _setRange(values: R[]): void;
         /**
@@ -833,7 +833,7 @@ declare module Plottable {
          * @param {number} padProportion The padding proportion. Passing 0 disables padding.
          * @returns {QuantitativeScale} The calling QuantitativeScale.
          */
-        padProportion(padProportion: number): QuantitativeScale<D>;
+        padProportion(padProportion: number): this;
         private _padDomain(domain);
         /**
          * Gets whether or not the scale snaps its domain to nice values.
@@ -842,7 +842,7 @@ declare module Plottable {
         /**
          * Sets whether or not the scale snaps its domain to nice values.
          */
-        snappingDomainEnabled(snappingDomainEnabled: boolean): QuantitativeScale<D>;
+        snappingDomainEnabled(snappingDomainEnabled: boolean): this;
         protected _expandSingleValueDomain(singleValueDomain: D[]): D[];
         /**
          * Computes the domain value corresponding to a supplied range value.
@@ -852,7 +852,7 @@ declare module Plottable {
          */
         invert(value: number): D;
         domain(): D[];
-        domain(values: D[]): QuantitativeScale<D>;
+        domain(values: D[]): this;
         /**
          * Gets the lower end of the domain.
          *
@@ -864,7 +864,7 @@ declare module Plottable {
          *
          * @return {QuantitativeScale} The calling QuantitativeScale.
          */
-        domainMin(domainMin: D): QuantitativeScale<D>;
+        domainMin(domainMin: D): this;
         /**
          * Gets the upper end of the domain.
          *
@@ -876,7 +876,7 @@ declare module Plottable {
          *
          * @return {QuantitativeScale} The calling QuantitativeScale.
          */
-        domainMax(domainMax: D): QuantitativeScale<D>;
+        domainMax(domainMax: D): this;
         extentOfValues(values: D[]): D[];
         protected _setDomain(values: D[]): void;
         /**
@@ -905,7 +905,7 @@ declare module Plottable {
          * @param {TickGenerator} generator
          * @return {QuantitativeScale} The calling QuantitativeScale.
          */
-        tickGenerator(generator: Scales.TickGenerators.TickGenerator<D>): QuantitativeScale<D>;
+        tickGenerator(generator: Scales.TickGenerators.TickGenerator<D>): this;
     }
 }
 declare module Plottable.Scales {
@@ -1013,10 +1013,10 @@ declare module Plottable.Scales {
         extentOfValues(values: string[]): string[];
         protected _getExtent(): string[];
         domain(): string[];
-        domain(values: string[]): Category;
+        domain(values: string[]): this;
         protected _setDomain(values: string[]): void;
         range(): [number, number];
-        range(values: [number, number]): Category;
+        range(values: [number, number]): this;
         private static _convertToPlottableInnerPadding(d3InnerPadding);
         private static _convertToPlottableOuterPadding(d3OuterPadding, d3InnerPadding);
         /**
@@ -1050,7 +1050,7 @@ declare module Plottable.Scales {
          *
          * @returns {Category} The calling Category Scale.
          */
-        innerPadding(innerPadding: number): Category;
+        innerPadding(innerPadding: number): this;
         /**
          * Gets the outer padding.
          *
@@ -1068,7 +1068,7 @@ declare module Plottable.Scales {
          *
          * @returns {Category} The calling Category Scale.
          */
-        outerPadding(outerPadding: number): Category;
+        outerPadding(outerPadding: number): this;
         scale(value: string): number;
         protected _getDomain(): string[];
         protected _setBackingScaleDomain(values: string[]): void;
