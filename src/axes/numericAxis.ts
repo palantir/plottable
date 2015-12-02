@@ -254,7 +254,7 @@ module Plottable.Axes {
      *                          "left"/"center"/"right" for a horizontal Numeric Axis.
      * @returns {Numeric} The calling Numeric Axis.
      */
-    public tickLabelPosition(position: string): Numeric;
+    public tickLabelPosition(position: string): this;
     public tickLabelPosition(position?: string): any {
       if (position == null) {
         return this._tickLabelPositioning;
@@ -290,7 +290,7 @@ module Plottable.Axes {
      * @param {boolean} The new text width approximation setting.
      * @returns {Axes.Numeric} The calling Axes.Numeric.
      */
-    public usesTextWidthApproximation(enable: boolean): Axes.Numeric;
+    public usesTextWidthApproximation(enable: boolean): this;
     public usesTextWidthApproximation(enable?: boolean): any {
       if (enable == null) {
         return this._usesTextWidthApproximation;

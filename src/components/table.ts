@@ -332,7 +332,7 @@ module Plottable.Components {
      * @param {number} rowPadding
      * @returns {Table} The calling Table.
      */
-    public rowPadding(rowPadding: number): Table;
+    public rowPadding(rowPadding: number): this;
     public rowPadding(rowPadding?: number): any {
       if (rowPadding == null) {
         return this._rowPadding;
@@ -355,7 +355,7 @@ module Plottable.Components {
      * @param {number} columnPadding
      * @returns {Table} The calling Table.
      */
-    public columnPadding(columnPadding: number): Table;
+    public columnPadding(columnPadding: number): this;
     public columnPadding(columnPadding?: number): any {
       if (columnPadding == null) {
         return this._columnPadding;
@@ -399,7 +399,7 @@ module Plottable.Components {
      * @param {number} weight
      * @returns {Table} The calling Table.
      */
-    public rowWeight(index: number, weight: number): Table;
+    public rowWeight(index: number, weight: number): this;
     public rowWeight(index: number, weight?: number): any {
       if (weight == null) {
         return this._rowWeights[index];
@@ -428,7 +428,7 @@ module Plottable.Components {
      * @param {number} weight
      * @returns {Table} The calling Table.
      */
-    public columnWeight(index: number, weight: number): Table;
+    public columnWeight(index: number, weight: number): this;
     public columnWeight(index: number, weight?: number): any {
       if (weight == null) {
         return this._columnWeights[index];

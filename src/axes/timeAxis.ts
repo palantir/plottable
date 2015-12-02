@@ -190,7 +190,7 @@ module Plottable.Axes {
      * @param {string[]} newPositions The positions for each tier. "bottom" and "center" are the only supported values.
      * @returns {Axes.Time} The calling Time Axis.
      */
-    public tierLabelPositions(newPositions: string[]): Time;
+    public tierLabelPositions(newPositions: string[]): this;
     public tierLabelPositions(newPositions?: string[]): any {
       if (newPositions == null) {
         return this._tierLabelPositions;
@@ -215,7 +215,7 @@ module Plottable.Axes {
      * @param {TimeAxisConfiguration[]} configurations
      * @returns {Axes.Time} The calling Time Axis.
      */
-    public axisConfigurations(configurations: TimeAxisConfiguration[]): Time;
+    public axisConfigurations(configurations: TimeAxisConfiguration[]): this;
     public axisConfigurations(configurations?: any): any {
       if (configurations == null) {
         return this._possibleTimeAxisConfigurations;
@@ -259,7 +259,7 @@ module Plottable.Axes {
     }
 
     public orientation(): string;
-    public orientation(orientation: string): Time;
+    public orientation(orientation: string): this;
     public orientation(orientation?: string): any {
       if (orientation && (orientation.toLowerCase() === "right" || orientation.toLowerCase() === "left")) {
         throw new Error(orientation + " is not a supported orientation for TimeAxis - only horizontal orientations are supported");

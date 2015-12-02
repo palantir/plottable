@@ -19,7 +19,7 @@ module Plottable.Dispatchers {
     public static getDispatcher(elem: SVGElement): Dispatchers.Touch {
       let svg = Utils.DOM.boundingSVG(elem);
 
-      let dispatcher: Touch = (<any> svg)[Touch._DISPATCHER_KEY];
+      let dispatcher: Dispatchers.Touch = (<any> svg)[Touch._DISPATCHER_KEY];
       if (dispatcher == null) {
         dispatcher = new Touch(svg);
         (<any> svg)[Touch._DISPATCHER_KEY] = dispatcher;
@@ -54,7 +54,7 @@ module Plottable.Dispatchers {
      * @param {TouchCallback} callback
      * @return {Dispatchers.Touch} The calling Touch Dispatcher.
      */
-    public onTouchStart(callback: TouchCallback): Dispatchers.Touch {
+    public onTouchStart(callback: TouchCallback): this {
       this._addCallbackForEvent(Touch._TOUCHSTART_EVENT_NAME, callback);
       return this;
     }
@@ -65,7 +65,7 @@ module Plottable.Dispatchers {
      * @param {TouchCallback} callback
      * @return {Dispatchers.Touch} The calling Touch Dispatcher.
      */
-    public offTouchStart(callback: TouchCallback): Dispatchers.Touch {
+    public offTouchStart(callback: TouchCallback): this {
       this._removeCallbackForEvent(Touch._TOUCHSTART_EVENT_NAME, callback);
       return this;
     }
@@ -76,7 +76,7 @@ module Plottable.Dispatchers {
      * @param {TouchCallback} callback
      * @return {Dispatchers.Touch} The calling Touch Dispatcher.
      */
-    public onTouchMove(callback: TouchCallback): Dispatchers.Touch {
+    public onTouchMove(callback: TouchCallback): this {
       this._addCallbackForEvent(Touch._TOUCHMOVE_EVENT_NAME, callback);
       return this;
     }
@@ -87,7 +87,7 @@ module Plottable.Dispatchers {
      * @param {TouchCallback} callback
      * @return {Dispatchers.Touch} The calling Touch Dispatcher.
      */
-    public offTouchMove(callback: TouchCallback): Dispatchers.Touch {
+    public offTouchMove(callback: TouchCallback): this {
       this._removeCallbackForEvent(Touch._TOUCHMOVE_EVENT_NAME, callback);
       return this;
     }
@@ -98,7 +98,7 @@ module Plottable.Dispatchers {
      * @param {TouchCallback} callback
      * @return {Dispatchers.Touch} The calling Touch Dispatcher.
      */
-    public onTouchEnd(callback: TouchCallback): Dispatchers.Touch {
+    public onTouchEnd(callback: TouchCallback): this {
       this._addCallbackForEvent(Touch._TOUCHEND_EVENT_NAME, callback);
       return this;
     }
@@ -109,7 +109,7 @@ module Plottable.Dispatchers {
      * @param {TouchCallback} callback
      * @return {Dispatchers.Touch} The calling Touch Dispatcher.
      */
-    public offTouchEnd(callback: TouchCallback): Dispatchers.Touch {
+    public offTouchEnd(callback: TouchCallback): this {
       this._removeCallbackForEvent(Touch._TOUCHEND_EVENT_NAME, callback);
       return this;
     }
@@ -120,7 +120,7 @@ module Plottable.Dispatchers {
      * @param {TouchCallback} callback
      * @return {Dispatchers.Touch} The calling Touch Dispatcher.
      */
-    public onTouchCancel(callback: TouchCallback): Dispatchers.Touch {
+    public onTouchCancel(callback: TouchCallback): this {
       this._addCallbackForEvent(Touch._TOUCHCANCEL_EVENT_NAME, callback);
       return this;
     }
@@ -131,7 +131,7 @@ module Plottable.Dispatchers {
      * @param {TouchCallback} callback
      * @return {Dispatchers.Touch} The calling Touch Dispatcher.
      */
-    public offTouchCancel(callback: TouchCallback): Dispatchers.Touch {
+    public offTouchCancel(callback: TouchCallback): this {
       this._removeCallbackForEvent(Touch._TOUCHCANCEL_EVENT_NAME, callback);
       return this;
     }

@@ -113,7 +113,7 @@ export class QuantitativeScale<D> extends Scale<D, number> {
    * @param {number} padProportion The padding proportion. Passing 0 disables padding.
    * @returns {QuantitativeScale} The calling QuantitativeScale.
    */
-  public padProportion(padProportion: number): QuantitativeScale<D>;
+  public padProportion(padProportion: number): this;
   public padProportion(padProportion?: number): any {
     if (padProportion == null) {
       return this._padProportion;
@@ -165,7 +165,7 @@ export class QuantitativeScale<D> extends Scale<D, number> {
   /**
    * Sets whether or not the scale snaps its domain to nice values.
    */
-  public snappingDomainEnabled(snappingDomainEnabled: boolean): QuantitativeScale<D>;
+  public snappingDomainEnabled(snappingDomainEnabled: boolean): this;
   public snappingDomainEnabled(snappingDomainEnabled?: boolean): any {
     if (snappingDomainEnabled == null) {
       return this._snappingDomainEnabled;
@@ -191,7 +191,7 @@ export class QuantitativeScale<D> extends Scale<D, number> {
   }
 
   public domain(): D[];
-  public domain(values: D[]): QuantitativeScale<D>;
+  public domain(values: D[]): this;
   public domain(values?: D[]): any {
     if (values != null) {
       this._domainMin = values[0];
@@ -211,7 +211,7 @@ export class QuantitativeScale<D> extends Scale<D, number> {
    *
    * @return {QuantitativeScale} The calling QuantitativeScale.
    */
-  public domainMin(domainMin: D): QuantitativeScale<D>;
+  public domainMin(domainMin: D): this;
   public domainMin(domainMin?: D): any {
     if (domainMin == null) {
       return this.domain()[0];
@@ -232,7 +232,7 @@ export class QuantitativeScale<D> extends Scale<D, number> {
    *
    * @return {QuantitativeScale} The calling QuantitativeScale.
    */
-  public domainMax(domainMax: D): QuantitativeScale<D>;
+  public domainMax(domainMax: D): this;
   public domainMax(domainMax?: D): any {
     if (domainMax == null) {
       return this.domain()[1];
@@ -299,7 +299,7 @@ export class QuantitativeScale<D> extends Scale<D, number> {
    * @param {TickGenerator} generator
    * @return {QuantitativeScale} The calling QuantitativeScale.
    */
-  public tickGenerator(generator: Scales.TickGenerators.TickGenerator<D>): QuantitativeScale<D>;
+  public tickGenerator(generator: Scales.TickGenerators.TickGenerator<D>): this;
   public tickGenerator(generator?: Scales.TickGenerators.TickGenerator<D>): any {
     if (generator == null) {
       return this._tickGenerator;

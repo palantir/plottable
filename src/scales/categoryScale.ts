@@ -28,7 +28,7 @@ module Plottable.Scales {
     }
 
     public domain(): string[];
-    public domain(values: string[]): Category;
+    public domain(values: string[]): this;
     public domain(values?: string[]): any {
       return super.domain(values);
     }
@@ -39,7 +39,7 @@ module Plottable.Scales {
     }
 
     public range(): [number, number];
-    public range(values: [number, number]): Category;
+    public range(values: [number, number]): this;
     public range(values?: [number, number]): any {
       if (values == null) {
         return this._range;
@@ -97,7 +97,7 @@ module Plottable.Scales {
      *
      * @returns {Category} The calling Category Scale.
      */
-    public innerPadding(innerPadding: number): Category;
+    public innerPadding(innerPadding: number): this;
     public innerPadding(innerPadding?: number): any {
       if (innerPadding == null) {
         return this._innerPadding;
@@ -125,7 +125,7 @@ module Plottable.Scales {
      *
      * @returns {Category} The calling Category Scale.
      */
-    public outerPadding(outerPadding: number): Category;
+    public outerPadding(outerPadding: number): this;
     public outerPadding(outerPadding?: number): any {
       if (outerPadding == null) {
         return this._outerPadding;

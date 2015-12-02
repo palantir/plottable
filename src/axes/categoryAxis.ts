@@ -84,7 +84,7 @@ module Plottable.Axes {
      * @param {number} angle
      * @returns {Category} The calling Category Axis.
      */
-    public tickLabelAngle(angle: number): Category;
+    public tickLabelAngle(angle: number): this;
     public tickLabelAngle(angle?: number): any {
       if (angle == null) {
         return this._tickLabelAngle;
