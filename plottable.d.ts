@@ -4385,7 +4385,7 @@ declare module Plottable {
          * @param {boolean} enabled Whether the Interaction should be enabled.
          * @return {Interaction} The calling Interaction.
          */
-        enabled(enabled: boolean): Interaction;
+        enabled(enabled: boolean): this;
         /**
          * Translates an <svg>-coordinate-space point to Component-space coordinates.
          *
@@ -4772,7 +4772,7 @@ declare module Plottable.Interactions {
          * @param {boolean}
          * @return {Interactions.Drag} The calling Drag Interaction.
          */
-        constrainedToComponent(constrainedToComponent: boolean): Drag;
+        constrainedToComponent(constrainedToComponent: boolean): this;
         /**
          * Adds a callback to be called when dragging starts.
          *
