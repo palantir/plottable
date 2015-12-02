@@ -887,8 +887,8 @@ describe("Component", () => {
       assert.strictEqual(+backing.style("opacity"), 0, "backing element is transparent");
 
       const backingElementBCR = (<Element> backing.node()).getBoundingClientRect();
-      assert.strictEqual(backingElementBCR.width, TestMethods.numAttr(svg, "width"), "backing's width is equal to the SVG's");
-      assert.strictEqual(backingElementBCR.height, TestMethods.numAttr(svg, "height"), "backing's height is equal to the SVG's");
+      assert.operator(backingElementBCR.width, ">=", TestMethods.numAttr(svg, "width"), "backing is at least as wide as the SVG");
+      assert.operator(backingElementBCR.height, ">=", TestMethods.numAttr(svg, "height"), "backing is at least as tall as the SVG");
 
       svg.remove();
     });
@@ -907,8 +907,8 @@ describe("Component", () => {
 
       const backing = svg.select(`.${backingClass}`);
       const backingElementBCR = (<Element> backing.node()).getBoundingClientRect();
-      assert.strictEqual(backingElementBCR.width, expectedWidth, "backing's width is equal to the SVG's");
-      assert.strictEqual(backingElementBCR.height, expectedHeight, "backing's height is equal to the SVG's");
+      assert.operator(backingElementBCR.width, ">=", expectedWidth, "backing is at least as wide as the SVG");
+      assert.operator(backingElementBCR.height, ">=", expectedHeight, "backing is at least as tall as the SVG");
 
       svg.remove();
     });
