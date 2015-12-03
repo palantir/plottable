@@ -1697,8 +1697,8 @@ declare module Plottable {
         constructor(scale: Scale<D, number>, orientation: string);
         destroy(): void;
         protected _isHorizontal(): boolean;
-        protected _computeWidth(): any;
-        protected _computeHeight(): any;
+        protected _computeWidth(): number;
+        protected _computeHeight(): number;
         requestedSpace(offeredWidth: number, offeredHeight: number): SpaceRequest;
         fixedHeight(): boolean;
         fixedWidth(): boolean;
@@ -1936,7 +1936,7 @@ declare module Plottable.Axes {
         private _getMostPreciseConfigurationIndex();
         orientation(): string;
         orientation(orientation: string): this;
-        protected _computeHeight(): any;
+        protected _computeHeight(): number;
         private _getIntervalLength(config);
         private _maxWidthForInterval(config);
         /**
@@ -1979,10 +1979,10 @@ declare module Plottable.Axes {
          */
         constructor(scale: QuantitativeScale<number>, orientation: string);
         protected _setup(): void;
-        protected _computeWidth(): any;
+        protected _computeWidth(): number;
         private _computeExactTextWidth();
         private _computeApproximateTextWidth();
-        protected _computeHeight(): any;
+        protected _computeHeight(): number;
         protected _getTickValues(): number[];
         protected _rescale(): void;
         renderImmediately(): this;
