@@ -946,5 +946,38 @@ describe("Component", () => {
       assert.isTrue(backing.empty(), "backing element was removed");
       svg.remove();
     });
+
+    it("doesn't add the backing even if it was previously the root Component", () => {
+      const component = new Plottable.Component();
+      const svg = TestMethods.generateSVG();
+      component.anchor(svg);
+      const backingAsRoot = svg.select(`.${backingClass}`);
+      assert.isFalse(backingAsRoot.empty(), "backing was added when Component was root");
+
+      component.detach();
+      const g = svg.append("g");
+      component.anchor(g);
+      const backingNotAsRoot = svg.select(`.${backingClass}`);
+      assert.isTrue(backingNotAsRoot.empty(), "backing element was removed");
+
+      svg.remove();
+    });
+
+    it("will add a backing even if it's not the first root Component anchored to an svg", () => {
+      const component = new Plottable.Component();
+      const svg = TestMethods.generateSVG();
+      component.anchor(svg);
+      component.detach();
+
+      const backingWithoutComponents = svg.select(`.${backingClass}`);
+      assert.isTrue(backingWithoutComponents.empty(), "no backing with no Components");
+
+      const component2 = new Plottable.Component();
+      component2.anchor(svg);
+      const backingWithNewRoot = svg.select(`.${backingClass}`);
+      assert.isFalse(backingWithNewRoot.empty(), "new root Component recreated backing");
+
+      svg.remove();
+    });
   });
 });
