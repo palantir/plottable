@@ -35,6 +35,8 @@ export class Axis<D> extends Component {
   protected _scale: Scale<D, number>;
   private _formatter: Formatter;
   private _orientation: string;
+  protected _computedWidth: number;
+  protected _computedHeight: number;
   private _endTickLength = 5;
   private _innerTickLength = 5;
   private _tickLabelPadding = 10;
