@@ -1346,6 +1346,7 @@ declare module Plottable {
         private _clipPathID;
         private _onAnchorCallbacks;
         private _onDetachCallbacks;
+        private static _SAFARI_EVENT_BACKING_CLASS;
         constructor();
         /**
          * Attaches the Component as a child of a given d3 Selection.

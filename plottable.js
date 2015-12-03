@@ -2822,6 +2822,16 @@ var Plottable;
                 this._rootSVG.classed("plottable", true);
                 // visible overflow for firefox https://stackoverflow.com/questions/5926986/why-does-firefox-appear-to-truncate-embedded-svgs
                 this._rootSVG.style("overflow", "visible");
+                // HACKHACK: Safari fails to register events on the <svg> itself
+                var safariBacking = this._rootSVG.select("." + Component._SAFARI_EVENT_BACKING_CLASS);
+                if (safariBacking.empty()) {
+                    this._rootSVG.append("rect").classed(Component._SAFARI_EVENT_BACKING_CLASS, true).attr({
+                        x: 0,
+                        y: 0,
+                        width: "100%",
+                        height: "100%"
+                    }).style("opacity", 0);
+                }
             }
             if (this._element != null) {
                 // reattach existing element
@@ -3163,6 +3173,9 @@ var Plottable;
             this.parent(null);
             if (this._isAnchored) {
                 this._element.remove();
+                if (this._isTopLevelComponent) {
+                    this._rootSVG.select("." + Component._SAFARI_EVENT_BACKING_CLASS).remove();
+                }
             }
             this._isAnchored = false;
             this._onDetachCallbacks.callCallbacks(this);
@@ -3285,6 +3298,7 @@ var Plottable;
             "center": 0.5,
             "bottom": 1
         };
+        Component._SAFARI_EVENT_BACKING_CLASS = "safari-event-backing";
         return Component;
     })();
     Plottable.Component = Component;
