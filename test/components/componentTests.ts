@@ -954,7 +954,7 @@ describe("Component", () => {
       const backingAsRoot = svg.select(`.${backingClass}`);
       assert.isFalse(backingAsRoot.empty(), "backing was added when Component was root");
 
-      component.detach();
+      component.detach(); // HACKHACK #3013: need to detach before re-anchoring()
       const g = svg.append("g");
       component.anchor(g);
       const backingNotAsRoot = svg.select(`.${backingClass}`);
@@ -967,7 +967,7 @@ describe("Component", () => {
       const component = new Plottable.Component();
       const svg = TestMethods.generateSVG();
       component.anchor(svg);
-      component.detach();
+      component.detach(); // HACKHACK #3013: need to detach before re-anchoring()
 
       const backingWithoutComponents = svg.select(`.${backingClass}`);
       assert.isTrue(backingWithoutComponents.empty(), "no backing with no Components");
