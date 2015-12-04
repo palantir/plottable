@@ -35,10 +35,6 @@ export class Axis<D> extends Component {
   protected _scale: Scale<D, number>;
   private _formatter: Formatter;
   private _orientation: string;
-  // @deprecated As of release v1.15.0, removed as premature optimization, use _computeWidth() directly instead
-  protected _computedWidth: number;
-  // @deprecated As of release v1.15.0, removed as premature optimization, use _computeHeight() directly instead
-  protected _computedHeight: number;
   private _endTickLength = 5;
   private _innerTickLength = 5;
   private _tickLabelPadding = 10;
@@ -95,14 +91,12 @@ export class Axis<D> extends Component {
 
   protected _computeWidth() {
     // to be overridden by subclass logic
-    this._computedWidth = this._maxLabelTickLength();
-    return this._computedWidth;
+    return this._maxLabelTickLength();
   }
 
   protected _computeHeight() {
     // to be overridden by subclass logic
-    this._computedHeight = this._maxLabelTickLength();
-    return this._computedHeight;
+    return this._maxLabelTickLength();
   }
 
   public requestedSpace(offeredWidth: number, offeredHeight: number): SpaceRequest {
@@ -205,7 +199,7 @@ export class Axis<D> extends Component {
    *
    * @returns {Axis} The calling Axis.
    */
-  public annotatedTicks(annotatedTicks: D[]): Axis<D>;
+  public annotatedTicks(annotatedTicks: D[]): this;
   public annotatedTicks(annotatedTicks?: D[]): any {
     if (annotatedTicks == null) {
       return this._annotatedTicks;
@@ -224,7 +218,7 @@ export class Axis<D> extends Component {
    *
    * @returns {Axis} The calling Axis.
    */
-  public annotationFormatter(annotationFormatter: Formatter): Axis<D>;
+  public annotationFormatter(annotationFormatter: Formatter): this;
   public annotationFormatter(annotationFormatter?: Formatter): any {
     if (annotationFormatter == null) {
       return this._annotationFormatter;
@@ -243,7 +237,7 @@ export class Axis<D> extends Component {
    *
    * @returns {Axis} The calling Axis.
    */
-  public annotationsEnabled(annotationsEnabled: boolean): Axis<D>;
+  public annotationsEnabled(annotationsEnabled: boolean): this;
   public annotationsEnabled(annotationsEnabled?: boolean): any {
     if (annotationsEnabled == null) {
       return this._annotationsEnabled;
@@ -262,7 +256,7 @@ export class Axis<D> extends Component {
    *
    * @returns {Axis} The calling Axis.
    */
-  public annotationTierCount(annotationTierCount: number): Axis<D>;
+  public annotationTierCount(annotationTierCount: number): this;
   public annotationTierCount(annotationTierCount?: number): any {
     if (annotationTierCount == null) {
       return this._annotationTierCount;
@@ -562,7 +556,7 @@ export class Axis<D> extends Component {
    * @param {Formatter} formatter
    * @returns {Axis} The calling Axis.
    */
-  public formatter(formatter: Formatter): Axis<D>;
+  public formatter(formatter: Formatter): this;
   public formatter(formatter?: Formatter): any {
     if (formatter == null) {
       return this._formatter;
@@ -570,24 +564,6 @@ export class Axis<D> extends Component {
     this._formatter = formatter;
     this.redraw();
     return this;
-  }
-
-  /**
-   * @deprecated As of release v1.3.0, replaced by innerTickLength()
-   *
-   * Gets the tick mark length in pixels.
-   */
-  public tickLength(): number;
-  /**
-   * Sets the tick mark length in pixels.
-   *
-   * @param {number} length
-   * @returns {Axis} The calling Axis.
-   */
-  public tickLength(length: number): Axis<D>;
-  public tickLength(length?: number): any {
-    Utils.Window.deprecated("tickLength()", "v1.3.0", "Replaced by innerTickLength()");
-    return this.innerTickLength(length);
   }
 
   /**
@@ -600,7 +576,7 @@ export class Axis<D> extends Component {
    * @param {number} length
    * @returns {Axis} The calling Axis.
    */
-  public innerTickLength(length: number): Axis<D>;
+  public innerTickLength(length: number): this;
   public innerTickLength(length?: number): any {
     if (length == null) {
       return this._innerTickLength;
@@ -624,7 +600,7 @@ export class Axis<D> extends Component {
    * @param {number} length
    * @returns {Axis} The calling Axis.
    */
-  public endTickLength(length: number): Axis<D>;
+  public endTickLength(length: number): this;
   public endTickLength(length?: number): any {
     if (length == null) {
       return this._endTickLength;
@@ -656,7 +632,7 @@ export class Axis<D> extends Component {
    * @param {number} padding
    * @returns {Axis} The calling Axis.
    */
-  public tickLabelPadding(padding: number): Axis<D>;
+  public tickLabelPadding(padding: number): this;
   public tickLabelPadding(padding?: number): any {
     if (padding == null) {
       return this._tickLabelPadding;
@@ -684,7 +660,7 @@ export class Axis<D> extends Component {
    * @param {number} size
    * @returns {Axis} The calling Axis.
    */
-  public margin(size: number): Axis<D>;
+  public margin(size: number): this;
   public margin(size?: number): any {
     if (size == null) {
       return this._margin;
@@ -708,7 +684,7 @@ export class Axis<D> extends Component {
    * @param {number} orientation One of "top"/"bottom"/"left"/"right".
    * @returns {Axis} The calling Axis.
    */
-  public orientation(orientation: string): Axis<D>;
+  public orientation(orientation: string): this;
   public orientation(orientation?: string): any {
     if (orientation == null) {
       return this._orientation;
@@ -736,7 +712,7 @@ export class Axis<D> extends Component {
    * @param {boolean} show
    * @returns {Axis} The calling Axis.
    */
-  public showEndTickLabels(show: boolean): Axis<D>;
+  public showEndTickLabels(show: boolean): this;
   public showEndTickLabels(show?: boolean): any {
     if (show == null) {
       return this._showEndTickLabels;

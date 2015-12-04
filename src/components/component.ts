@@ -47,6 +47,7 @@ export class Component {
   private _clipPathID: string;
   private _onAnchorCallbacks = new Utils.CallbackSet<ComponentCallback>();
   private _onDetachCallbacks = new Utils.CallbackSet<ComponentCallback>();
+  private static _SAFARI_EVENT_BACKING_CLASS = "safari-event-backing";
 
   public constructor() {
     this._cssClasses.add("component");
@@ -63,13 +64,25 @@ export class Component {
       throw new Error("Can't reuse destroy()-ed Components!");
     }
 
-    if ((<Node> selection.node()).nodeName.toLowerCase() === "svg") {
+    this._isTopLevelComponent = (<Node> selection.node()).nodeName.toLowerCase() === "svg";
+
+    if (this._isTopLevelComponent) {
       // svg node gets the "plottable" CSS class
       this._rootSVG = selection;
       this._rootSVG.classed("plottable", true);
       // visible overflow for firefox https://stackoverflow.com/questions/5926986/why-does-firefox-appear-to-truncate-embedded-svgs
       this._rootSVG.style("overflow", "visible");
-      this._isTopLevelComponent = true;
+
+      // HACKHACK: Safari fails to register events on the <svg> itself
+      const safariBacking = this._rootSVG.select(`.${Component._SAFARI_EVENT_BACKING_CLASS}`);
+      if (safariBacking.empty()) {
+        this._rootSVG.append("rect").classed(Component._SAFARI_EVENT_BACKING_CLASS, true).attr({
+          x: 0,
+          y: 0,
+          width: "100%",
+          height: "100%"
+        }).style("opacity", 0);
+      }
     }
 
     if (this._element != null) {
@@ -79,6 +92,7 @@ export class Component {
       this._element = selection.append("g");
       this._setup();
     }
+
     this._isAnchored = true;
     this._onAnchorCallbacks.callCallbacks(this);
     return this;
@@ -264,7 +278,7 @@ export class Component {
    * @param {String|d3.Selection} element A selector-string for the <svg>, or a d3 selection containing an <svg>.
    * @returns {Component} The calling Component.
    */
-  public renderTo(element: String | Element | d3.Selection<void>): Component {
+  public renderTo(element: String | Element | d3.Selection<void>): this {
     this.detach();
     if (element != null) {
       let selection: d3.Selection<void>;
@@ -301,7 +315,7 @@ export class Component {
    * @param {string} xAlignment The x alignment of the Component ("left"/"center"/"right").
    * @returns {Component} The calling Component.
    */
-  public xAlignment(xAlignment: string): Component;
+  public xAlignment(xAlignment: string): this;
   public xAlignment(xAlignment?: string): any {
     if (xAlignment == null) {
       return this._xAlignment;
@@ -326,7 +340,7 @@ export class Component {
    * @param {string} yAlignment The y alignment of the Component ("top"/"center"/"bottom").
    * @returns {Component} The calling Component.
    */
-  public yAlignment(yAlignment: string): Component;
+  public yAlignment(yAlignment: string): this;
   public yAlignment(yAlignment?: string): any {
     if (yAlignment == null) {
       return this._yAlignment;
@@ -457,6 +471,9 @@ export class Component {
 
     if (this._isAnchored) {
       this._element.remove();
+      if (this._isTopLevelComponent) {
+        this._rootSVG.select(`.${Component._SAFARI_EVENT_BACKING_CLASS}`).remove();
+      }
     }
     this._isAnchored = false;
     this._onDetachCallbacks.callCallbacks(this);
@@ -497,7 +514,7 @@ export class Component {
    * Adding a Component to a ComponentContainer should be done
    * using the appropriate method on the ComponentContainer.
    */
-  public parent(parent: ComponentContainer): Component;
+  public parent(parent: ComponentContainer): this;
   public parent(parent?: ComponentContainer): any {
     if (parent === undefined) {
      return this._parent;

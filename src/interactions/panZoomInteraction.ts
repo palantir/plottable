@@ -258,7 +258,7 @@ module Plottable.Interactions {
      *
      * @returns {Interactions.PanZoom} The calling PanZoom Interaction.
      */
-    public xScales(xScales: QuantitativeScale<any>[]): Interactions.PanZoom;
+    public xScales(xScales: QuantitativeScale<any>[]): this;
     public xScales(xScales?: QuantitativeScale<any>[]): any {
       if (xScales == null) {
         let scales: QuantitativeScale<any>[] = [];
@@ -283,7 +283,7 @@ module Plottable.Interactions {
      *
      * @returns {Interactions.PanZoom} The calling PanZoom Interaction.
      */
-    public yScales(yScales: QuantitativeScale<any>[]): Interactions.PanZoom;
+    public yScales(yScales: QuantitativeScale<any>[]): this;
     public yScales(yScales?: QuantitativeScale<any>[]): any {
       if (yScales == null) {
         let scales: QuantitativeScale<any>[] = [];
@@ -367,7 +367,7 @@ module Plottable.Interactions {
      * @param {D} minDomainExtent The minimum domain extent for the scale.
      * @returns {Interactions.PanZoom} The calling PanZoom Interaction.
      */
-    public minDomainExtent<D>(quantitativeScale: QuantitativeScale<D>, minDomainExtent: D): Interactions.PanZoom;
+    public minDomainExtent<D>(quantitativeScale: QuantitativeScale<D>, minDomainExtent: D): this;
     public minDomainExtent<D>(quantitativeScale: QuantitativeScale<D>, minDomainExtent?: D): any {
       if (minDomainExtent == null) {
         return this._minDomainExtents.get(quantitativeScale);
@@ -406,7 +406,7 @@ module Plottable.Interactions {
      * @param {D} minDomainExtent The maximum domain extent for the scale.
      * @returns {Interactions.PanZoom} The calling PanZoom Interaction.
      */
-    public maxDomainExtent<D>(quantitativeScale: QuantitativeScale<D>, maxDomainExtent: D): Interactions.PanZoom;
+    public maxDomainExtent<D>(quantitativeScale: QuantitativeScale<D>, maxDomainExtent: D): this;
     public maxDomainExtent<D>(quantitativeScale: QuantitativeScale<D>, maxDomainExtent?: D): any {
       if (maxDomainExtent == null) {
         return this._maxDomainExtents.get(quantitativeScale);
