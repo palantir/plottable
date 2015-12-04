@@ -91,14 +91,12 @@ export class Axis<D> extends Component {
 
   protected _computeWidth() {
     // to be overridden by subclass logic
-    this._computedWidth = this._maxLabelTickLength();
-    return this._computedWidth;
+    return this._maxLabelTickLength();
   }
 
   protected _computeHeight() {
     // to be overridden by subclass logic
-    this._computedHeight = this._maxLabelTickLength();
-    return this._computedHeight;
+    return this._maxLabelTickLength();
   }
 
   public requestedSpace(offeredWidth: number, offeredHeight: number): SpaceRequest {
