@@ -2,7 +2,10 @@
   "name": "plottable",
   "description": "A modular charting library built on D3",
   "version": "2.0.0-rc1",
-  "main": ["plottable.js", "plottable.css"],
+  "main": [
+    "plottable.js",
+    "plottable.css"
+  ],
   "typescript": {
     "definition": "plottable.d.ts"
   },
@@ -34,7 +37,7 @@
     "d3": "3.5.5",
     "svg-typewriter": "0.3.0"
   },
-  "homepage": "plottablejs.org",
+  "homepage": "http://plottablejs.org",
   "repository": {
     "type": "git",
     "url": "git://github.com/palantir/plottable.git"
