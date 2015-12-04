@@ -12,8 +12,12 @@
 ///<reference path="testMethods.ts" />
 
 ///<reference path="drawers/drawerTests.ts" />
+///<reference path="drawers/arcDrawerTests.ts" />
+///<reference path="drawers/arcOutlineDrawerTests.ts" />
+///<reference path="drawers/areaDrawerTests.ts" />
 ///<reference path="drawers/lineDrawerTests.ts" />
 
+///<reference path="animators/nullAnimatorTests.ts" />
 ///<reference path="animators/easingAnimatorTests.ts" />
 
 ///<reference path="axes/axisTests.ts" />
@@ -45,7 +49,6 @@
 ///<reference path="plots/clusteredBarPlotTests.ts" />
 ///<reference path="plots/segmentPlotTests.ts" />
 ///<reference path="plots/waterfallPlotTests.ts" />
-///<reference path="plots/wheelPlotTests.ts" />
 
 ///<reference path="core/metadataTests.ts" />
 ///<reference path="core/renderControllerTests.ts" />
@@ -54,6 +57,7 @@
 ///<reference path="core/symbolFactoriesTests.ts" />
 
 ///<reference path="scales/scaleTests.ts" />
+///<reference path="scales/quantitativeScaleTests.ts" />
 ///<reference path="scales/categoryScaleTests.ts" />
 ///<reference path="scales/linearScaleTests.ts" />
 ///<reference path="scales/colorScaleTests.ts" />

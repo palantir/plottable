@@ -332,10 +332,13 @@ module Plottable.Components {
      * @param {number} rowPadding
      * @returns {Table} The calling Table.
      */
-    public rowPadding(rowPadding: number): Table;
+    public rowPadding(rowPadding: number): this;
     public rowPadding(rowPadding?: number): any {
       if (rowPadding == null) {
         return this._rowPadding;
+      }
+      if (!Utils.Math.isValidNumber(rowPadding) || rowPadding < 0) {
+        throw Error("rowPadding must be a non-negative finite value");
       }
       this._rowPadding = rowPadding;
       this.redraw();
@@ -352,10 +355,13 @@ module Plottable.Components {
      * @param {number} columnPadding
      * @returns {Table} The calling Table.
      */
-    public columnPadding(columnPadding: number): Table;
+    public columnPadding(columnPadding: number): this;
     public columnPadding(columnPadding?: number): any {
       if (columnPadding == null) {
         return this._columnPadding;
+      }
+      if (!Utils.Math.isValidNumber(columnPadding) || columnPadding < 0) {
+        throw Error("columnPadding must be a non-negative finite value");
       }
       this._columnPadding = columnPadding;
       this.redraw();
@@ -393,10 +399,13 @@ module Plottable.Components {
      * @param {number} weight
      * @returns {Table} The calling Table.
      */
-    public rowWeight(index: number, weight: number): Table;
+    public rowWeight(index: number, weight: number): this;
     public rowWeight(index: number, weight?: number): any {
       if (weight == null) {
         return this._rowWeights[index];
+      }
+      if (!Utils.Math.isValidNumber(weight) || weight < 0) {
+        throw Error("rowWeight must be a non-negative finite value");
       }
       this._rowWeights[index] = weight;
       this.redraw();
@@ -419,10 +428,13 @@ module Plottable.Components {
      * @param {number} weight
      * @returns {Table} The calling Table.
      */
-    public columnWeight(index: number, weight: number): Table;
+    public columnWeight(index: number, weight: number): this;
     public columnWeight(index: number, weight?: number): any {
       if (weight == null) {
         return this._columnWeights[index];
+      }
+      if (!Utils.Math.isValidNumber(weight) || weight < 0) {
+        throw Error("columnWeight must be a non-negative finite value");
       }
       this._columnWeights[index] = weight;
       this.redraw();

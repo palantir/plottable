@@ -1,7 +1,7 @@
 {
   "name": "plottable.js",
   "description": "A modular charting library built on D3",
-  "version": "1.16.2",
+  "version": "2.0.0-rc1",
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -17,13 +17,13 @@
     "grunt-contrib-watch": "~0.5.3",
     "load-grunt-tasks": "~0.2.0",
     "grunt-ts": "5.0.0",
-    "grunt-tslint": "2.4.0",
+    "grunt-tslint": "3.0.0",
     "grunt-contrib-concat": "~0.3.0",
     "grunt-mocha-phantomjs": "0.6.1",
     "grunt-contrib-connect": "~0.6.0",
     "grunt-blanket-mocha": "~0.4.0",
     "grunt-saucelabs": "8.6.0",
-    "typescript": "1.6.2",
+    "typescript": "1.7.3",
     "grunt-sed": "~0.1.1",
     "grunt-git": "~0.2.6",
     "grunt-contrib-clean": "~0.4.0",
@@ -34,6 +34,7 @@
     "grunt-parallelize": "1.0.0",
     "grunt-umd": "2.3.3",
     "grunt-jscs": "1.8.0",
-    "grunt-eslint": "15.0.0"
+    "grunt-eslint": "15.0.0",
+    "tslint": "3.1.1"
   }
 }

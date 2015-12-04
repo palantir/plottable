@@ -102,7 +102,7 @@ module Plottable.Components {
      * @param {number} detectionRadius
      * @return {DragLineLayer<D>} The calling DragLineLayer.
      */
-    public detectionRadius(detectionRadius: number): DragLineLayer<D>;
+    public detectionRadius(detectionRadius: number): this;
     public detectionRadius(detectionRadius?: number): any {
       if (detectionRadius == null) {
         return this._detectionRadius;
@@ -125,7 +125,7 @@ module Plottable.Components {
      * @param {boolean} enabled
      * @return {DragLineLayer<D>} The calling DragLineLayer.
      */
-    public enabled(enabled: boolean): DragLineLayer<D>;
+    public enabled(enabled: boolean): this;
     public enabled(enabled?: boolean): any {
       if (enabled == null) {
         return this._enabled;

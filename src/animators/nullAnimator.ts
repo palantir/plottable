@@ -5,10 +5,10 @@ module Plottable.Animators {
    * immediately set on the selection.
    */
   export class Null implements Animator {
-
     public totalTime(selection: any) {
       return 0;
     }
+
     public animate(selection: d3.Selection<any>, attrToAppliedProjector: AttributeToAppliedProjector) {
       return selection.attr(attrToAppliedProjector);
     }

@@ -260,6 +260,66 @@ module TestMethods {
     target.node().dispatchEvent(e);
   }
 
+  export enum InteractionMode {
+    Mouse,
+    Touch
+  };
+
+  export enum InteractionType {
+    Start,
+    Move,
+    End
+  }
+
+  export function triggerFakeInteractionEvent(mode: InteractionMode,
+                                              type: InteractionType,
+                                              target: d3.Selection<void>,
+                                              relativeX: number,
+                                              relativeY: number) {
+    const typeString = getInteractionTypeString(mode, type);
+    switch (mode) {
+      case InteractionMode.Mouse:
+        TestMethods.triggerFakeMouseEvent(typeString, target, relativeX, relativeY);
+        break;
+      case InteractionMode.Touch:
+        TestMethods.triggerFakeTouchEvent(typeString, target, [{x: relativeX, y: relativeY}]);
+        break;
+      default:
+        throw new Error("Unrecognized enum value: " + mode);
+    }
+  }
+
+  function getInteractionTypeString(mode: InteractionMode, type: InteractionType) {
+    switch (mode) {
+      case InteractionMode.Mouse:
+        switch (type) {
+          case InteractionType.Start:
+            return "mousedown";
+          case InteractionType.Move:
+            return "mousemove";
+          case InteractionType.End:
+            return "mouseup";
+          default:
+            throw new Error("Unrecognized enum value: " + type);
+        }
+        break;
+      case InteractionMode.Touch:
+        switch (type) {
+          case InteractionType.Start:
+            return "touchstart";
+          case InteractionType.Move:
+            return "touchmove";
+          case InteractionType.End:
+            return "touchend";
+          default:
+            throw new Error("Unrecognized enum value: " + type);
+        }
+        break;
+      default:
+        throw new Error("Unrecognized enum value: " + mode);
+    }
+  }
+
   export function triggerFakeKeyboardEvent(type: string, target: d3.Selection<void>, keyCode: number, options?: {[key: string]: any}) {
     let event = <KeyboardEvent> document.createEvent("Events");
     event.initEvent(type, true, true);

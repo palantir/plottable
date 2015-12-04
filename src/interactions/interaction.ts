@@ -67,7 +67,7 @@ export class Interaction {
    * @param {boolean} enabled Whether the Interaction should be enabled.
    * @return {Interaction} The calling Interaction.
    */
-  public enabled(enabled: boolean): Interaction;
+  public enabled(enabled: boolean): this;
   public enabled(enabled?: boolean): any {
     if (enabled == null) {
       return this._enabled;

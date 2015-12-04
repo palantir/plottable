@@ -2,6 +2,20 @@
 
 describe("Category Axes", () => {
   describe("rendering the tick labels", () => {
+    it("handles newlines", () => {
+      let svg = TestMethods.generateSVG();
+      let domain = ["Johannes\nGensfleisch\nGutenberg"];
+      let scale = new Plottable.Scales.Category().domain(domain);
+      let axis = new Plottable.Axes.Category(scale, "bottom");
+      axis.renderTo(svg);
+
+      let ticks = axis.content().selectAll("text");
+      let texts = ticks[0].map((tick: any) => d3.select(tick).text());
+      assert.deepEqual(texts, domain[0].split("\n"), "newlines are supported in domains");
+
+      svg.remove();
+    });
+
     it("renders short words fully", () => {
       let svg = TestMethods.generateSVG();
       let domain = ["2000", "2001", "2002", "2003"];

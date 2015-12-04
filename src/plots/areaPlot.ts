@@ -25,8 +25,8 @@ module Plottable.Plots {
     }
 
     public y(): Plots.AccessorScaleBinding<number, number>;
-    public y(y: number | Accessor<number>): Area<X>;
-    public y(y: number | Accessor<number>, yScale: QuantitativeScale<number>): Area<X>;
+    public y(y: number | Accessor<number>): this;
+    public y(y: number | Accessor<number>, yScale: QuantitativeScale<number>): this;
     public y(y?: number | Accessor<number>, yScale?: QuantitativeScale<number>): any {
       if (y == null) {
         return super.y();
@@ -59,7 +59,7 @@ module Plottable.Plots {
      * @param {number|Accessor<number>} y0
      * @returns {Area} The calling Area Plot.
      */
-    public y0(y0: number | Accessor<number>): Area<X>;
+    public y0(y0: number | Accessor<number>): this;
     public y0(y0?: number | Accessor<number>): any {
       if (y0 == null) {
         return this._propertyBindings.get(Area._Y0_KEY);

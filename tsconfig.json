@@ -80,7 +80,6 @@
       "src/plots/stackedBarPlot.ts",
       "src/plots/segmentPlot.ts",
       "src/plots/waterfallPlot.ts",
-      "src/plots/wheelPlot.ts",
 
       "src/animators/animator.ts",
       "src/animators/nullAnimator.ts",

@@ -72,7 +72,7 @@ module Plottable.Animators {
      * @param {number} startDelay The start delay in milliseconds.
      * @returns {Easing} The calling Easing Animator.
      */
-    public startDelay(startDelay: number): Easing;
+    public startDelay(startDelay: number): this;
     public startDelay(startDelay?: number): any {
       if (startDelay == null) {
         return this._startDelay;
@@ -94,7 +94,7 @@ module Plottable.Animators {
      * @param {number} stepDuration The duration in milliseconds.
      * @returns {Easing} The calling Easing Animator.
      */
-    public stepDuration(stepDuration: number): Easing;
+    public stepDuration(stepDuration: number): this;
     public stepDuration(stepDuration?: number): any {
       if (stepDuration == null) {
         return Math.min(this._stepDuration, this._maxTotalDuration);
@@ -116,7 +116,7 @@ module Plottable.Animators {
      * @param {number} stepDelay The maximum iterative delay in milliseconds.
      * @returns {Easing} The calling Easing Animator.
      */
-    public stepDelay(stepDelay: number): Easing;
+    public stepDelay(stepDelay: number): this;
     public stepDelay(stepDelay?: number): any {
       if (stepDelay == null) {
         return this._stepDelay;
@@ -146,7 +146,7 @@ module Plottable.Animators {
      * @param {number} maxTotalDuration The maximum total animation duration in milliseconds.
      * @returns {Easing} The calling Easing Animator.
      */
-    public maxTotalDuration(maxTotalDuration: number): Easing;
+    public maxTotalDuration(maxTotalDuration: number): this;
     public maxTotalDuration(maxTotalDuration?: number): any {
       if (maxTotalDuration == null) {
         return this._maxTotalDuration;
@@ -168,7 +168,7 @@ module Plottable.Animators {
      * @param {string} easingMode The desired easing mode.
      * @returns {Easing} The calling Easing Animator.
      */
-    public easingMode(easingMode: string): Easing;
+    public easingMode(easingMode: string): this;
     public easingMode(easingMode?: string): any {
       if (easingMode == null) {
         return this._easingMode;

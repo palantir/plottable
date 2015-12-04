@@ -30,7 +30,7 @@ export interface ScaleCallback<S extends Scale<any, any>> {
 }
 
 export class Scale<D, R> {
-  private _callbacks: Utils.CallbackSet<ScaleCallback<Scale<D, R>>>;
+  private _callbacks: Utils.CallbackSet<ScaleCallback<this>>;
   private _autoDomainAutomatically = true;
   private _domainModificationInProgress = false;
   private _includedValuesProviders: Utils.Set<Scales.IncludedValuesProvider<D>>;
@@ -41,7 +41,7 @@ export class Scale<D, R> {
    * @constructor
    */
   constructor() {
-    this._callbacks = new Utils.CallbackSet<ScaleCallback<Scale<D, R>>>();
+    this._callbacks = new Utils.CallbackSet<ScaleCallback<this>>();
     this._includedValuesProviders = new Utils.Set<Scales.IncludedValuesProvider<D>>();
   }
 
@@ -74,7 +74,7 @@ export class Scale<D, R> {
    * @param {ScaleCallback} callback.
    * @returns {Scale} The calling Scale.
    */
-  public onUpdate(callback: ScaleCallback<Scale<D, R>>) {
+  public onUpdate(callback: ScaleCallback<this>) {
     this._callbacks.add(callback);
     return this;
   }
@@ -85,7 +85,7 @@ export class Scale<D, R> {
    * @param {ScaleCallback} callback.
    * @returns {Scale} The calling Scale.
    */
-  public offUpdate(callback: ScaleCallback<Scale<D, R>>) {
+  public offUpdate(callback: ScaleCallback<this>) {
     this._callbacks.delete(callback);
     return this;
   }
@@ -133,7 +133,7 @@ export class Scale<D, R> {
    * @param {D[]} values
    * @returns {Scale} The calling Scale.
    */
-  public domain(values: D[]): Scale<D, R>;
+  public domain(values: D[]): this;
   public domain(values?: D[]): any {
     if (values == null) {
       return this._getDomain();
@@ -144,7 +144,7 @@ export class Scale<D, R> {
     }
   }
 
-  protected _getDomain() {
+  protected _getDomain(): D[] {
     throw new Error("Subclasses should override _getDomain");
   }
 
@@ -173,7 +173,7 @@ export class Scale<D, R> {
    * @param {R[]} values
    * @returns {Scale} The calling Scale.
    */
-  public range(values: R[]): Scale<D, R>;
+  public range(values: R[]): this;
   public range(values?: R[]): any {
     if (values == null) {
       return this._getRange();
@@ -183,7 +183,7 @@ export class Scale<D, R> {
     }
   }
 
-  protected _getRange() {
+  protected _getRange(): R[] {
     throw new Error("Subclasses should override _getRange");
   }
 

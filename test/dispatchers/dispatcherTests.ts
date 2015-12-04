@@ -2,72 +2,90 @@
 
 describe("Dispatchers", () => {
   describe("Dispatcher", () => {
-    it("_connect() and _disconnect()", () => {
-      let dispatcher = new Plottable.Dispatcher();
+    class InstrumentedDispatcher extends Plottable.Dispatcher {
+      public static EVENT_NAME = "instrumented";
 
-      let callbackCalls = 0;
-      (<any> dispatcher)._eventToCallback["click"] = () => callbackCalls++;
+      constructor() {
+        super();
+        this._eventToProcessingFunction[InstrumentedDispatcher.EVENT_NAME] =
+          () => this._callCallbacksForEvent(InstrumentedDispatcher.EVENT_NAME);
+      }
 
-      let d3document = d3.select(document);
-      (<any> dispatcher)._connect();
-      TestMethods.triggerFakeUIEvent("click", d3document);
-      assert.strictEqual(callbackCalls, 1, "connected correctly (callback was called)");
+      public addCallback(callback: Function) {
+        this._addCallbackForEvent(InstrumentedDispatcher.EVENT_NAME, callback);
+      }
 
-      (<any> dispatcher)._connect();
-      callbackCalls = 0;
-      TestMethods.triggerFakeUIEvent("click", d3document);
-      assert.strictEqual(callbackCalls, 1, "can't double-connect (callback only called once)");
+      public removeCallback(callback: Function) {
+        this._removeCallbackForEvent(InstrumentedDispatcher.EVENT_NAME, callback);
+      }
+    }
 
-      (<any> dispatcher)._disconnect();
-      callbackCalls = 0;
-      TestMethods.triggerFakeUIEvent("click", d3document);
-      assert.strictEqual(callbackCalls, 0, "disconnected correctly (callback not called)");
-    });
+    const TEST_EVENT_NAME = "test";
 
-    it("won't _disconnect() if dispatcher still have listeners", () => {
-      let dispatcher = new Plottable.Dispatcher();
+    it("connects and disconnects correctly", () => {
+      const dispatcher = new Plottable.Dispatcher();
 
-      let callbackWasCalled = false;
-      (<any> dispatcher)._eventToCallback["click"] = () => callbackWasCalled = true;
-
-      let callback = () => { return; };
-      let callbackSet = new Plottable.Utils.CallbackSet<Function>();
-      callbackSet.add(callback);
-      (<any> dispatcher)._callbacks = [callbackSet];
+      let callbackCalled = false;
+      (<any> dispatcher)._eventToProcessingFunction[TEST_EVENT_NAME] = () => callbackCalled = true;
 
       let d3document = d3.select(document);
       (<any> dispatcher)._connect();
+      TestMethods.triggerFakeUIEvent(TEST_EVENT_NAME, d3document);
+      assert.isTrue(callbackCalled, "connected correctly (callback was called)");
 
-      TestMethods.triggerFakeUIEvent("click", d3document);
-      assert.isTrue(callbackWasCalled, "connected correctly (callback was called)");
+      (<any> dispatcher)._connect();
+      callbackCalled = false;
+      TestMethods.triggerFakeUIEvent(TEST_EVENT_NAME, d3document);
+      assert.isTrue(callbackCalled, "can't double-connect (callback only called once)");
 
       (<any> dispatcher)._disconnect();
-      callbackWasCalled = false;
-      TestMethods.triggerFakeUIEvent("click", d3document);
-      assert.isTrue(callbackWasCalled, "didn't disconnect while dispatcher had listener");
-
-      callbackSet.delete(callback);
-      (<any> dispatcher)._disconnect();
-      callbackWasCalled = false;
-      TestMethods.triggerFakeUIEvent("click", d3document);
-      assert.isFalse(callbackWasCalled, "disconnected when dispatcher had no listeners");
+      callbackCalled = false;
+      TestMethods.triggerFakeUIEvent(TEST_EVENT_NAME, d3document);
+      assert.isFalse(callbackCalled, "disconnected correctly (callback not called)");
     });
 
-    it("_setCallback()", () => {
-      let dispatcher = new Plottable.Dispatcher();
-      let callbackSet = new Plottable.Utils.CallbackSet<Function>();
+    it("won't disconnect if it still has listeners", () => {
+      const dispatcher = new InstrumentedDispatcher();
+
+      let processingFunctionWasCalled = false;
+      (<any> dispatcher)._eventToProcessingFunction[TEST_EVENT_NAME] = () => processingFunctionWasCalled = true;
+
+      const callback = () => { return; };
+      dispatcher.addCallback(callback);
+
+      const d3document = d3.select(document);
+      (<any> dispatcher)._connect();
+
+      TestMethods.triggerFakeUIEvent(TEST_EVENT_NAME, d3document);
+      assert.isTrue(processingFunctionWasCalled, "connected correctly (processing function was called)");
+
+      (<any> dispatcher)._disconnect();
+      processingFunctionWasCalled = false;
+      TestMethods.triggerFakeUIEvent(TEST_EVENT_NAME, d3document);
+      assert.isTrue(processingFunctionWasCalled, "didn't disconnect while dispatcher had listener");
+
+      dispatcher.removeCallback(callback);
+      (<any> dispatcher)._disconnect();
+      processingFunctionWasCalled = false;
+      TestMethods.triggerFakeUIEvent(TEST_EVENT_NAME, d3document);
+      assert.isFalse(processingFunctionWasCalled, "disconnected when dispatcher had no listeners");
+    });
+
+    it("can set and unset callbacks", () => {
+      const dispatcher = new InstrumentedDispatcher();
 
       let callbackWasCalled = false;
-      let callback = () => callbackWasCalled = true;
+      const callback = () => callbackWasCalled = true;
+      dispatcher.addCallback(callback);
 
-      (<any> dispatcher)._setCallback(callbackSet, callback);
-      callbackSet.callCallbacks();
-      assert.isTrue(callbackWasCalled, "callback was called after setting with _setCallback()");
+      const d3document = d3.select(document);
+      TestMethods.triggerFakeUIEvent(InstrumentedDispatcher.EVENT_NAME, d3document);
+      assert.isTrue(callbackWasCalled, "callback was called after being added");
 
-      (<any> dispatcher)._unsetCallback(callbackSet, callback);
+      dispatcher.removeCallback(callback);
       callbackWasCalled = false;
-      callbackSet.callCallbacks();
-      assert.isFalse(callbackWasCalled, "callback was removed by calling _unsetCallback()");
+      TestMethods.triggerFakeUIEvent(InstrumentedDispatcher.EVENT_NAME, d3document);
+      assert.isFalse(callbackWasCalled, "callback was not called after removal");
     });
   });
 });

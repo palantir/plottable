@@ -2,119 +2,161 @@
 
 describe("Interactions", () => {
   describe("DoubleClick Interaction", () => {
+    let clickedPoint: Plottable.Point;
+    let svg: d3.Selection<void>;
+    let doubleClickInteraction: Plottable.Interactions.DoubleClick;
+    let component: Plottable.Component;
 
-    describe("Basic Usage", () => {
-      let clickedPoint: Plottable.Point;
-      let svg: d3.Selection<void>;
-      let dblClickInteraction: Plottable.Interactions.DoubleClick;
-      let component: Plottable.Component;
+    beforeEach(() => {
+      const svgWidth = 400;
+      const svgHeight = 400;
+      svg = TestMethods.generateSVG(svgWidth, svgHeight);
+      component = new Plottable.Component();
+      component.renderTo(svg);
 
-      beforeEach(() => {
-        let svgWidth = 400;
-        let svgHeight = 400;
-        svg = TestMethods.generateSVG(svgWidth, svgHeight);
-        clickedPoint = {x: svgWidth / 2, y: svgHeight / 2};
-        component = new Plottable.Component();
-        component.renderTo(svg);
-        dblClickInteraction = new Plottable.Interactions.DoubleClick();
-        dblClickInteraction.attachTo(component);
+      doubleClickInteraction = new Plottable.Interactions.DoubleClick();
+      doubleClickInteraction.attachTo(component);
+
+      clickedPoint = {x: svgWidth / 2, y: svgHeight / 2};
+    });
+
+    afterEach(function() {
+      if (this.currentTest.state === "passed") {
+        svg.remove();
+      }
+    });
+
+    type ClickTestCallback = {
+      lastPoint: Plottable.Point;
+      called: boolean;
+      reset: () => void;
+      (p: Plottable.Point): void;
+    }
+
+    function makeClickCallback() {
+      let callback = <ClickTestCallback> function(p: Plottable.Point) {
+        callback.lastPoint = p;
+        callback.called = true;
+      };
+      callback.called = false;
+      callback.reset = () => {
+        callback.lastPoint = undefined;
+        callback.called = false;
+      };
+      return callback;
+    }
+
+    function doubleClickPoint(mode: TestMethods.InteractionMode = TestMethods.InteractionMode.Mouse) {
+      doubleClickPointWithMove(clickedPoint, clickedPoint, mode);
+    }
+
+    function doubleClickPointWithMove(firstClickPoint: Plottable.Point,
+                                      secondClickPoint: Plottable.Point,
+                                      mode: TestMethods.InteractionMode) {
+      TestMethods.triggerFakeInteractionEvent(mode,
+                                              TestMethods.InteractionType.Start,
+                                              component.content(),
+                                              firstClickPoint.x,
+                                              firstClickPoint.y);
+      TestMethods.triggerFakeInteractionEvent(mode,
+                                              TestMethods.InteractionType.End,
+                                              component.content(),
+                                              firstClickPoint.x,
+                                              firstClickPoint.y);
+      TestMethods.triggerFakeInteractionEvent(mode,
+                                              TestMethods.InteractionType.Start,
+                                              component.content(),
+                                              secondClickPoint.x,
+                                              secondClickPoint.y);
+      TestMethods.triggerFakeInteractionEvent(mode,
+                                              TestMethods.InteractionType.End,
+                                              component.content(),
+                                              secondClickPoint.x,
+                                              secondClickPoint.y);
+      TestMethods.triggerFakeMouseEvent("dblclick", component.content(), secondClickPoint.x, secondClickPoint.y);
+    }
+
+    describe("registering callbacks", () => {
+      it("registers callback using onDoubleClick", () => {
+        const callback = makeClickCallback();
+
+        assert.strictEqual(doubleClickInteraction.onDoubleClick(callback), doubleClickInteraction,
+          "registration returns the calling Interaction");
+        doubleClickPoint();
+
+        assert.isTrue(callback.called, "Interaction should trigger the callback");
       });
 
-      it("calls callback and passes correct click position", () => {
-        let doubleClickedPoint: Plottable.Point = null;
-        let dblClickCallback = (point: Plottable.Point) => doubleClickedPoint = point;
-        dblClickInteraction.onDoubleClick(dblClickCallback);
+      it("deregisters callback using offDoubleClick", () => {
+        const callback = makeClickCallback();
 
-        TestMethods.triggerFakeMouseEvent("mousedown", component.content(), clickedPoint.x, clickedPoint.y);
-        TestMethods.triggerFakeMouseEvent("mouseup", component.content(), clickedPoint.x, clickedPoint.y);
-        TestMethods.triggerFakeMouseEvent("mousedown", component.content(), clickedPoint.x, clickedPoint.y);
-        TestMethods.triggerFakeMouseEvent("mouseup", component.content(), clickedPoint.x, clickedPoint.y);
-        TestMethods.triggerFakeMouseEvent("dblclick", component.content(), clickedPoint.x, clickedPoint.y);
-        assert.deepEqual(doubleClickedPoint, clickedPoint, "was passed correct point");
+        doubleClickInteraction.onDoubleClick(callback);
+        assert.strictEqual(doubleClickInteraction.offDoubleClick(callback), doubleClickInteraction,
+          "deregistration returns the calling Interaction");
+        doubleClickPoint();
 
-        svg.remove();
+        assert.isFalse(callback.called, "Callback should be disconnected from the interaction");
       });
 
-      it("does not call callback if clicked in different locations", () => {
-        let callbackWasCalled = false;
-        let dblClickCallback = () => callbackWasCalled = true;
-        dblClickInteraction.onDoubleClick(dblClickCallback);
+      it("can register multiple onDoubleClick callbacks", () => {
+        const callback1 = makeClickCallback();
+        const callback2 = makeClickCallback();
 
-        TestMethods.triggerFakeMouseEvent("mousedown", component.content(), clickedPoint.x, clickedPoint.y);
-        TestMethods.triggerFakeMouseEvent("mouseup", component.content(), clickedPoint.x, clickedPoint.y);
-        TestMethods.triggerFakeMouseEvent("mousedown", component.content(), clickedPoint.x + 10, clickedPoint.y + 10);
-        TestMethods.triggerFakeMouseEvent("mouseup", component.content(), clickedPoint.x + 10, clickedPoint.y + 10);
-        TestMethods.triggerFakeMouseEvent("dblclick", component.content(), clickedPoint.x + 10, clickedPoint.y + 10);
-        assert.isFalse(callbackWasCalled, "callback was not called");
+        doubleClickInteraction.onDoubleClick(callback1);
+        doubleClickInteraction.onDoubleClick(callback2);
+        doubleClickPoint();
 
-        svg.remove();
+        assert.isTrue(callback1.called, "Interaction should trigger the first callback");
+        assert.isTrue(callback2.called, "Interaction should trigger the second callback");
       });
 
-      it("can register multiple callback listeners for the same component", () => {
-        let newCallback1WasCalled = false;
-        let newCallback1 = () => newCallback1WasCalled = true;
+      it("can deregister a callback without affecting the other ones", () => {
+        const callback1 = makeClickCallback();
+        const callback2 = makeClickCallback();
 
-        let newCallback2WasCalled = false;
-        let newCallback2 = () => newCallback2WasCalled = true;
+        doubleClickInteraction.onDoubleClick(callback1);
+        doubleClickInteraction.onDoubleClick(callback2);
+        doubleClickInteraction.offDoubleClick(callback1);
+        doubleClickPoint();
 
-        dblClickInteraction.onDoubleClick(newCallback1);
-        dblClickInteraction.onDoubleClick(newCallback2);
-
-        TestMethods.triggerFakeMouseEvent("mousedown", component.content(), clickedPoint.x, clickedPoint.y);
-        TestMethods.triggerFakeMouseEvent("mouseup", component.content(), clickedPoint.x, clickedPoint.y);
-        TestMethods.triggerFakeMouseEvent("mousedown", component.content(), clickedPoint.x, clickedPoint.y);
-        TestMethods.triggerFakeMouseEvent("mouseup", component.content(), clickedPoint.x, clickedPoint.y);
-        TestMethods.triggerFakeMouseEvent("dblclick", component.content(), clickedPoint.x, clickedPoint.y);
-
-        assert.isTrue(newCallback1WasCalled, "Callback 1 should be called on double click");
-        assert.isTrue(newCallback2WasCalled, "Callback 2 should be called on double click");
-
-        newCallback1WasCalled = false;
-        newCallback2WasCalled = false;
-        dblClickInteraction.offDoubleClick(newCallback1);
-        TestMethods.triggerFakeMouseEvent("mousedown", component.content(), clickedPoint.x, clickedPoint.y);
-        TestMethods.triggerFakeMouseEvent("mouseup", component.content(), clickedPoint.x, clickedPoint.y);
-        TestMethods.triggerFakeMouseEvent("mousedown", component.content(), clickedPoint.x, clickedPoint.y);
-        TestMethods.triggerFakeMouseEvent("mouseup", component.content(), clickedPoint.x, clickedPoint.y);
-        TestMethods.triggerFakeMouseEvent("dblclick", component.content(), clickedPoint.x, clickedPoint.y);
-
-        assert.isFalse(newCallback1WasCalled, "Callback 1 should be disconnected from the interaction");
-        assert.isTrue(newCallback2WasCalled, "Callback 2 should still be connected to the interaction");
-
-        svg.remove();
-      });
-
-      it("works with touch events", () => {
-        let doubleClickedPoint: Plottable.Point = null;
-        let dblClickCallback = (point: Plottable.Point) => doubleClickedPoint = point;
-        dblClickInteraction.onDoubleClick(dblClickCallback);
-
-        TestMethods.triggerFakeTouchEvent("touchstart", component.content(), [{x: clickedPoint.x, y: clickedPoint.y}]);
-        TestMethods.triggerFakeTouchEvent("touchend", component.content(), [{x: clickedPoint.x, y: clickedPoint.y}]);
-        TestMethods.triggerFakeTouchEvent("touchstart", component.content(), [{x: clickedPoint.x, y: clickedPoint.y}]);
-        TestMethods.triggerFakeTouchEvent("touchend", component.content(), [{x: clickedPoint.x, y: clickedPoint.y}]);
-        TestMethods.triggerFakeMouseEvent("dblclick", component.content(), clickedPoint.x, clickedPoint.y);
-        assert.deepEqual(doubleClickedPoint, clickedPoint, "was passed the correct point");
-
-        svg.remove();
-      });
-
-      it("does not trigger callback when touch event is cancelled", () => {
-        let doubleClickedPoint: Plottable.Point = null;
-        let dblClickCallback = (point: Plottable.Point) => doubleClickedPoint = point;
-        dblClickInteraction.onDoubleClick(dblClickCallback);
-
-        TestMethods.triggerFakeTouchEvent("touchstart", component.content(), [{x: clickedPoint.x, y: clickedPoint.y}]);
-        TestMethods.triggerFakeTouchEvent("touchend", component.content(), [{x: clickedPoint.x, y: clickedPoint.y}]);
-        TestMethods.triggerFakeTouchEvent("touchstart", component.content(), [{x: clickedPoint.x, y: clickedPoint.y}]);
-        TestMethods.triggerFakeTouchEvent("touchend", component.content(), [{x: clickedPoint.x, y: clickedPoint.y}]);
-        TestMethods.triggerFakeTouchEvent("touchcancel", component.content(), [{x: clickedPoint.x, y: clickedPoint.y}]);
-        TestMethods.triggerFakeMouseEvent("dblclick", component.content(), clickedPoint.x, clickedPoint.y);
-        assert.deepEqual(doubleClickedPoint, null, "point never set");
-
-        svg.remove();
+        assert.isFalse(callback1.called, "Callback1 should be disconnected from the click interaction");
+        assert.isTrue(callback2.called, "Callback2 should still exist on the click interaction");
       });
     });
 
+    [TestMethods.InteractionMode.Mouse, TestMethods.InteractionMode.Touch].forEach((mode) => {
+      describe(`invoking callbacks with ${TestMethods.InteractionMode[mode]} events`, () => {
+        let callback: ClickTestCallback;
+
+        beforeEach(() => {
+          callback = makeClickCallback();
+          doubleClickInteraction.onDoubleClick(callback);
+        });
+
+        it("calls callback and passes correct click position", () => {
+          doubleClickPoint(mode);
+          assert.deepEqual(callback.lastPoint, clickedPoint, "was passed correct point");
+        });
+
+        it("does not call callback if clicked in different locations", () => {
+          doubleClickPointWithMove(clickedPoint, {x: clickedPoint.x + 10, y: clickedPoint.y + 10}, mode);
+          assert.isFalse(callback.called, "callback was not called");
+        });
+
+        if (mode === TestMethods.InteractionMode.Touch) {
+          it("does not trigger callback when touch event is cancelled", () => {
+            doubleClickInteraction.onDoubleClick(callback);
+
+            TestMethods.triggerFakeTouchEvent("touchstart", component.content(), [clickedPoint]);
+            TestMethods.triggerFakeTouchEvent("touchend", component.content(), [clickedPoint]);
+            TestMethods.triggerFakeTouchEvent("touchstart", component.content(), [clickedPoint]);
+            TestMethods.triggerFakeTouchEvent("touchend", component.content(), [clickedPoint]);
+            TestMethods.triggerFakeTouchEvent("touchcancel", component.content(), [clickedPoint]);
+            TestMethods.triggerFakeMouseEvent("dblclick", component.content(), clickedPoint.x, clickedPoint.y);
+            assert.isUndefined(callback.lastPoint, "point never set");
+          });
+        }
+      });
+    });
   });
 });

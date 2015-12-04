@@ -1,17 +1,7 @@
 module Plottable {
 
-export type Formatter = (d: any) => string;
+  export type Formatter = (d: any) => string;
 
-/**
- * This field is deprecated and will be removed in v2.0.0.
- *
- * The number of milliseconds between midnight one day and the next is
- * not a fixed quantity.
- *
- * Use date.setDate(date.getDate() + number_of_days) instead.
- *
- */
-export var MILLISECONDS_IN_ONE_DAY = 24 * 60 * 60 * 1000;
 }
 
 module Plottable.Formatters {
@@ -240,25 +230,6 @@ module Plottable.Formatters {
    */
   export function time(specifier: string): Formatter {
     return d3.time.format(specifier);
-  }
-
-  /**
-   * @deprecated As of release v1.3.0, not safe for use with time zones.
-   *
-   * Creates a formatter for relative dates.
-   *
-   * @param {number} baseValue The start date (as epoch time) used in computing relative dates (default 0)
-   * @param {number} increment The unit used in calculating relative date values (default MILLISECONDS_IN_ONE_DAY)
-   * @param {string} label The label to append to the formatted string (default "")
-   *
-   * @returns {Formatter} A formatter for time/date values.
-   */
-  export function relativeDate(baseValue: number = 0, increment: number = MILLISECONDS_IN_ONE_DAY, label: string = "") {
-    Plottable.Utils.Window.deprecated("relativeDate()", "v1.3.0", "Not safe for use with time zones.");
-    return (d: any) => {
-      let relativeDate = Math.round((d.valueOf() - baseValue) / increment);
-      return relativeDate.toString() + label;
-    };
   }
 
   function verifyPrecision(precision: number) {

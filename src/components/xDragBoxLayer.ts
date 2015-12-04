@@ -35,7 +35,7 @@ module Plottable.Components {
     }
 
     public yScale<D extends number | { valueOf(): number }>(): QuantitativeScale<D>;
-    public yScale<D extends number | { valueOf(): number }>(yScale: QuantitativeScale<D>): SelectionBoxLayer;
+    public yScale<D extends number | { valueOf(): number }>(yScale: QuantitativeScale<D>): this;
     public yScale<D extends number | { valueOf(): number }>(yScale?: QuantitativeScale<D>): any {
       if (yScale == null) {
         return super.yScale();
@@ -44,7 +44,7 @@ module Plottable.Components {
     }
 
     public yExtent(): (number | { valueOf(): number })[];
-    public yExtent(yExtent: (number | { valueOf(): number })[]): SelectionBoxLayer;
+    public yExtent(yExtent: (number | { valueOf(): number })[]): this;
     public yExtent(yExtent?: (number | { valueOf(): number })[]): any {
       if (yExtent == null) {
         return super.yExtent();
