@@ -91,8 +91,9 @@ module Plottable.Plots {
     }
 
     protected _onDatasetUpdate() {
-      this._updatePieAngles();
       super._onDatasetUpdate();
+      this._updatePieAngles();
+      this.render();
     }
 
     protected _createDrawer(dataset: Dataset) {

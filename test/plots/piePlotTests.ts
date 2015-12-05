@@ -143,6 +143,46 @@ describe("Plots", () => {
       });
     });
 
+    describe("Rendering with scale", () => {
+      let svg: d3.Selection<void>;
+      let dataset: Plottable.Dataset;
+      let data: any[];
+      let piePlot: Plottable.Plots.Pie;
+
+      beforeEach(() => {
+        svg = TestMethods.generateSVG();
+        const scale = new Plottable.Scales.Linear();
+        data = [{value: 500}, {value: 600}];
+        dataset = new Plottable.Dataset(data);
+        piePlot = new Plottable.Plots.Pie();
+        piePlot.addDataset(dataset);
+        piePlot.sectorValue((d) => d.value, scale);
+        piePlot.renderTo(svg);
+      });
+
+      it("updates slices when data changes and render correctly w.r.t. scale changes", () => {
+
+        let originalStringPaths: String[] = [];
+
+        piePlot.content().selectAll("path").each(function() {
+          const pathString = d3.select(this).attr("d");
+          assert.notInclude(pathString, "NaN", "original pathString should not contain NaN");
+          originalStringPaths.push(pathString);
+        });
+
+        const newData = [{value: 10}, {value: 20}];
+        dataset.data(newData);
+
+        piePlot.content().selectAll("path").each(function(path, index) {
+          const pathString = d3.select(this).attr("d");
+          assert.notInclude(pathString, "NaN", "new pathString should not contain NaN");
+          assert.notStrictEqual(pathString, originalStringPaths[index], "new pathString should not equal old one");
+        });
+        svg.remove();
+      });
+
+    });
+
     describe("Labels", () => {
       let svg: d3.Selection<void>;
       let piePlot: Plottable.Plots.Pie;

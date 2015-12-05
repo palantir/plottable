@@ -7071,8 +7071,9 @@ var Plottable;
                 return d3.selectAll(allSelections);
             };
             Pie.prototype._onDatasetUpdate = function () {
-                this._updatePieAngles();
                 _super.prototype._onDatasetUpdate.call(this);
+                this._updatePieAngles();
+                this.render();
             };
             Pie.prototype._createDrawer = function (dataset) {
                 return new Plottable.Drawers.Arc(dataset);
