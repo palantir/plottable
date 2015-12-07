@@ -5,7 +5,7 @@
         "sourceMap": false,
         "declaration": true,
         "removeComments": false,
-        "out": "plottable.js"
+        "outFile": "plottable.js"
     },
     "files": [
       "typings/d3/d3.d.ts",
