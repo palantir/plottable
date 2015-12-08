@@ -103,7 +103,7 @@ export class XYPlot<X, Y> extends Plot {
    *
    * This option is intended for cases where performance is an issue.
    */
-  public deferredRendering(deferredRendering: boolean): XYPlot<X, Y>;
+  public deferredRendering(deferredRendering: boolean): this;
   public deferredRendering(deferredRendering?: boolean): any {
     if (deferredRendering == null) {
       return this._deferredRendering;
@@ -132,7 +132,7 @@ export class XYPlot<X, Y> extends Plot {
    * @param {number|Accessor<number>} x
    * @returns {XYPlot} The calling XYPlot.
    */
-  public x(x: number | Accessor<number>): XYPlot<X, Y>;
+  public x(x: number | Accessor<number>): this;
   /**
    * Sets X to a scaled constant value or scaled result of an Accessor.
    * The provided Scale will account for the values when autoDomain()-ing.
@@ -141,7 +141,7 @@ export class XYPlot<X, Y> extends Plot {
    * @param {Scale<X, number>} xScale
    * @returns {XYPlot} The calling XYPlot.
    */
-  public x(x: X | Accessor<X>, xScale: Scale<X, number>): XYPlot<X, Y>;
+  public x(x: X | Accessor<X>, xScale: Scale<X, number>): this;
   public x(x?: number | Accessor<number> | X | Accessor<X>, xScale?: Scale<X, number>): any {
     if (x == null) {
       return this._propertyBindings.get(XYPlot._X_KEY);
@@ -171,7 +171,7 @@ export class XYPlot<X, Y> extends Plot {
    * @param {number|Accessor<number>} y
    * @returns {XYPlot} The calling XYPlot.
    */
-  public y(y: number | Accessor<number>): XYPlot<X, Y>;
+  public y(y: number | Accessor<number>): this;
   /**
    * Sets Y to a scaled constant value or scaled result of an Accessor.
    * The provided Scale will account for the values when autoDomain()-ing.
@@ -180,7 +180,7 @@ export class XYPlot<X, Y> extends Plot {
    * @param {Scale<Y, number>} yScale
    * @returns {XYPlot} The calling XYPlot.
    */
-  public y(y: Y | Accessor<Y>, yScale: Scale<Y, number>): XYPlot<X, Y>;
+  public y(y: Y | Accessor<Y>, yScale: Scale<Y, number>): this;
   public y(y?: number | Accessor<number> | Y | Accessor<Y>, yScale?: Scale<Y, number>): any {
     if (y == null) {
       return this._propertyBindings.get(XYPlot._Y_KEY);
@@ -267,7 +267,7 @@ export class XYPlot<X, Y> extends Plot {
    *   "none" means neither Scale will change automatically.
    * @returns {XYPlot} The calling XYPlot.
    */
-  public autorangeMode(autorangeMode: string): XYPlot<X, Y>;
+  public autorangeMode(autorangeMode: string): this;
   public autorangeMode(autorangeMode?: string): any {
     if (autorangeMode == null) {
       if (this._autoAdjustXScaleDomain) {

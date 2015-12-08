@@ -32,8 +32,8 @@ module Plottable.Plots {
     }
 
     public x(): Plots.AccessorScaleBinding<X, number>;
-    public x(x: number | Accessor<number>): Line<X>;
-    public x(x: X | Accessor<X>, xScale: Scale<X, number>): Line<X>;
+    public x(x: number | Accessor<number>): this;
+    public x(x: X | Accessor<X>, xScale: Scale<X, number>): this;
     public x(x?: number | Accessor<number> | X | Accessor<X>, xScale?: Scale<X, number>): any {
       if (x == null) {
         return super.x();
@@ -49,8 +49,8 @@ module Plottable.Plots {
     }
 
     public y(): Plots.AccessorScaleBinding<number, number>;
-    public y(y: number | Accessor<number>): Line<X>;
-    public y(y: number | Accessor<number>, yScale: Scale<number, number>): Line<X>;
+    public y(y: number | Accessor<number>): this;
+    public y(y: number | Accessor<number>, yScale: Scale<number, number>): this;
     public y(y?: number | Accessor<number>, yScale?: Scale<number, number>): any {
       if (y == null) {
         return super.y();
@@ -62,7 +62,7 @@ module Plottable.Plots {
     }
 
     public autorangeMode(): string;
-    public autorangeMode(autorangeMode: string): Line<X>;
+    public autorangeMode(autorangeMode: string): this;
     public autorangeMode(autorangeMode?: string): any {
       if (autorangeMode == null) {
         return super.autorangeMode();
@@ -83,7 +83,7 @@ module Plottable.Plots {
      * Smooth autoranging is done by making sure lines always exit on the left / right side of the plot
      * and deactivating the nice domain feature on the scales
      */
-    public autorangeSmooth(autorangeSmooth: boolean): Plots.Line<X>;
+    public autorangeSmooth(autorangeSmooth: boolean): this;
     public autorangeSmooth(autorangeSmooth?: boolean): any {
       if (autorangeSmooth == null) {
         return this._autorangeSmooth;
@@ -115,20 +115,20 @@ module Plottable.Plots {
      * @param {string | points: Array<[number, number]>) => string} interpolator Interpolation function
      * @return Plots.Line
      */
-    public interpolator(interpolator: string | ((points: Array<[number, number]>) => string)): Plots.Line<X>;
-    public interpolator(interpolator: "linear"): Line<X>;
-    public interpolator(interpolator: "linear-closed"): Line<X>;
-    public interpolator(interpolator: "step"): Line<X>;
-    public interpolator(interpolator: "step-before"): Line<X>;
-    public interpolator(interpolator: "step-after"): Line<X>;
-    public interpolator(interpolator: "basis"): Line<X>;
-    public interpolator(interpolator: "basis-open"): Line<X>;
-    public interpolator(interpolator: "basis-closed"): Line<X>;
-    public interpolator(interpolator: "bundle"): Line<X>;
-    public interpolator(interpolator: "cardinal"): Line<X>;
-    public interpolator(interpolator: "cardinal-open"): Line<X>;
-    public interpolator(interpolator: "cardinal-closed"): Line<X>;
-    public interpolator(interpolator: "monotone"): Line<X>;
+    public interpolator(interpolator: string | ((points: Array<[number, number]>) => string)): this;
+    public interpolator(interpolator: "linear"): this;
+    public interpolator(interpolator: "linear-closed"): this;
+    public interpolator(interpolator: "step"): this;
+    public interpolator(interpolator: "step-before"): this;
+    public interpolator(interpolator: "step-after"): this;
+    public interpolator(interpolator: "basis"): this;
+    public interpolator(interpolator: "basis-open"): this;
+    public interpolator(interpolator: "basis-closed"): this;
+    public interpolator(interpolator: "bundle"): this;
+    public interpolator(interpolator: "cardinal"): this;
+    public interpolator(interpolator: "cardinal-open"): this;
+    public interpolator(interpolator: "cardinal-closed"): this;
+    public interpolator(interpolator: "monotone"): this;
     public interpolator(interpolator?: string | ((points: Array<[number, number]>) => string)): any {
       if (interpolator == null) {
         return this._interpolator;
@@ -148,7 +148,7 @@ module Plottable.Plots {
      *
      * @returns {Plots.Line} The calling Plots.Line
      */
-    public downsamplingEnabled(downsampling: boolean): Plots.Line<X>;
+    public downsamplingEnabled(downsampling: boolean): this;
     public downsamplingEnabled(downsampling?: boolean): any {
       if (downsampling == null) {
         return this._downsamplingEnabled;
@@ -168,7 +168,7 @@ module Plottable.Plots {
      *
      * @returns {Plots.Line} The calling Plots.Line
      */
-    public croppedRenderingEnabled(croppedRendering: boolean): Plots.Line<X>;
+    public croppedRenderingEnabled(croppedRendering: boolean): this;
     public croppedRenderingEnabled(croppedRendering?: boolean): any {
       if (croppedRendering == null) {
         return this._croppedRenderingEnabled;

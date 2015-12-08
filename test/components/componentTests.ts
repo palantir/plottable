@@ -182,7 +182,7 @@ describe("Component", () => {
       svg.remove();
     });
 
-    it("removes the parent when detaching", () => {
+    it("sets its parent to null when detaching", () => {
       let parent = new Plottable.Components.Group([c]);
       c.detach();
       assert.isNull(c.parent(), "parent removed upon detaching");
@@ -397,8 +397,19 @@ describe("Component", () => {
       svg.remove();
     });
 
-    it("throws an error when computing layout when attached to non-root node using default arguments", () => {
-      let g = svg.append("g");
+    it("requires arguments when not anchored directly under the svg", () => {
+      const g = svg.append("g");
+      c.anchor(g);
+      // HACKHACK: https://github.com/palantir/plottable/issues/2661 Cannot assert errors being thrown with description
+      (<any> assert).throws(() => c.computeLayout(), "null arguments",
+        "cannot compute layout with no arguments and not being the top svg element");
+      svg.remove();
+    });
+
+    it("requires arguments if not anchored directly under the svg, even if previously anchored directly under the svg", () => {
+      c.anchor(svg);
+      c.detach();
+      const g = svg.append("g");
       c.anchor(g);
       // HACKHACK: https://github.com/palantir/plottable/issues/2661 Cannot assert errors being thrown with description
       (<any> assert).throws(() => c.computeLayout(), "null arguments",
@@ -854,6 +865,118 @@ describe("Component", () => {
       let normalizeClipPath = (s: string) => s.replace(/"/g, "");
       assert.strictEqual(normalizeClipPath((<any> clippedComponent)._element.attr("clip-path")), expectedClipPathURL,
         "the clipPath reference was updated");
+      svg.remove();
+    });
+  });
+
+  describe("backing element for catching events in Safari", () => {
+    let backingClass: string;
+
+    before(() => {
+      backingClass = <string> (<any> Plottable.Component)._SAFARI_EVENT_BACKING_CLASS;
+      assert.strictEqual(typeof(backingClass), "string", "test battery was able to extract backing CSS class");
+    });
+
+    it("adds an transparent backing rectangle if it is the root Component", () => {
+      const component = new Plottable.Component();
+      const svg = TestMethods.generateSVG();
+      component.anchor(svg);
+
+      const backing = svg.select(`.${backingClass}`);
+      assert.isFalse(backing.empty(), "added a backing element");
+      assert.strictEqual(+backing.style("opacity"), 0, "backing element is transparent");
+
+      const backingElementBCR = (<Element> backing.node()).getBoundingClientRect();
+      assert.operator(backingElementBCR.width, ">=", TestMethods.numAttr(svg, "width"), "backing is at least as wide as the SVG");
+      assert.operator(backingElementBCR.height, ">=", TestMethods.numAttr(svg, "height"), "backing is at least as tall as the SVG");
+
+      svg.remove();
+    });
+
+    it("resizes the backing when the SVG size changes", () => {
+      const component = new Plottable.Component();
+      const svg = TestMethods.generateSVG();
+      component.anchor(svg);
+
+      const expectedWidth = TestMethods.numAttr(svg, "width") + 100;
+      const expectedHeight = TestMethods.numAttr(svg, "height") + 100;
+      svg.attr({
+        width: expectedWidth,
+        height: expectedHeight
+      });
+
+      const backing = svg.select(`.${backingClass}`);
+      const backingElementBCR = (<Element> backing.node()).getBoundingClientRect();
+      assert.operator(backingElementBCR.width, ">=", expectedWidth, "backing is at least as wide as the SVG");
+      assert.operator(backingElementBCR.height, ">=", expectedHeight, "backing is at least as tall as the SVG");
+
+      svg.remove();
+    });
+
+    it("only adds the backing once", () => {
+      const component = new Plottable.Component();
+      const svg = TestMethods.generateSVG();
+      component.anchor(svg);
+      component.anchor(svg);
+
+      const backings = svg.selectAll(`.${backingClass}`);
+      assert.strictEqual(backings.size(), 1, "only one backing was added");
+
+      svg.remove();
+    });
+
+    it("doesn't add a backing if it's not the root Component", () => {
+      const component = new Plottable.Component();
+      const svg = TestMethods.generateSVG();
+      const g = svg.append("g");
+      component.anchor(g);
+
+      const backing = svg.select(`.${backingClass}`);
+      assert.isTrue(backing.empty(), "did not add a backing element");
+      svg.remove();
+    });
+
+    it("removes the backing when detached", () => {
+      const component = new Plottable.Component();
+      const svg = TestMethods.generateSVG();
+      component.anchor(svg);
+      component.detach();
+
+      const backing = svg.select(`.${backingClass}`);
+      assert.isTrue(backing.empty(), "backing element was removed");
+      svg.remove();
+    });
+
+    it("doesn't add the backing even if it was previously the root Component", () => {
+      const component = new Plottable.Component();
+      const svg = TestMethods.generateSVG();
+      component.anchor(svg);
+      const backingAsRoot = svg.select(`.${backingClass}`);
+      assert.isFalse(backingAsRoot.empty(), "backing was added when Component was root");
+
+      component.detach(); // HACKHACK #3013: need to detach before re-anchoring()
+      const g = svg.append("g");
+      component.anchor(g);
+      const backingNotAsRoot = svg.select(`.${backingClass}`);
+      assert.isTrue(backingNotAsRoot.empty(), "backing element was removed");
+
+      svg.remove();
+    });
+
+    it("will add a backing even if it's not the first root Component anchored to an svg", () => {
+      const component = new Plottable.Component();
+      const svg = TestMethods.generateSVG();
+      component.anchor(svg);
+      component.detach(); // HACKHACK #3013: need to detach before re-anchoring()
+
+      const backingWithoutComponents = svg.select(`.${backingClass}`);
+      assert.isTrue(backingWithoutComponents.empty(), "no backing with no Components");
+
+      const component2 = new Plottable.Component();
+      component2.anchor(svg);
+      const backingWithNewRoot = svg.select(`.${backingClass}`);
+      assert.isFalse(backingWithNewRoot.empty(), "new root Component recreated backing");
+
       svg.remove();
     });
   });

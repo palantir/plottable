@@ -51,7 +51,7 @@ module Plottable.Components {
      * @param {Bounds} newBounds
      * @return {SelectionBoxLayer} The calling SelectionBoxLayer.
      */
-    public bounds(newBounds: Bounds): SelectionBoxLayer;
+    public bounds(newBounds: Bounds): this;
     public bounds(newBounds?: Bounds): any {
       if (newBounds == null) {
         return this._getBounds();
@@ -144,7 +144,7 @@ module Plottable.Components {
      * @param {boolean} show Whether or not to show the box.
      * @return {SelectionBoxLayer} The calling SelectionBoxLayer.
      */
-    public boxVisible(show: boolean): SelectionBoxLayer;
+    public boxVisible(show: boolean): this;
     public boxVisible(show?: boolean): any {
       if (show == null) {
         return this._boxVisible;
@@ -172,7 +172,7 @@ module Plottable.Components {
      *
      * @returns {SelectionBoxLayer} The calling SelectionBoxLayer.
      */
-    public xScale(xScale: QuantitativeScale<number | { valueOf(): number }>): SelectionBoxLayer;
+    public xScale(xScale: QuantitativeScale<number | { valueOf(): number }>): this;
     public xScale(xScale?: QuantitativeScale<number | { valueOf(): number }>): any {
       if (xScale == null) {
         return this._xScale;
@@ -196,7 +196,7 @@ module Plottable.Components {
      *
      * @returns {SelectionBoxLayer} The calling SelectionBoxLayer.
      */
-    public yScale(yScale: QuantitativeScale<number | { valueOf(): number }>): SelectionBoxLayer;
+    public yScale(yScale: QuantitativeScale<number | { valueOf(): number }>): this;
     public yScale(yScale?: QuantitativeScale<number | { valueOf(): number }>): any {
       if (yScale == null) {
         return this._yScale;
@@ -220,7 +220,7 @@ module Plottable.Components {
     /**
      * Sets the data values backing the left and right edges of the box.
      */
-    public xExtent(xExtent: (number | { valueOf(): number })[]): SelectionBoxLayer;
+    public xExtent(xExtent: (number | { valueOf(): number })[]): this;
     public xExtent(xExtent?: (number | { valueOf(): number })[]): any {
       // Explicit typing for Typescript 1.4
       if (xExtent == null) {
@@ -254,7 +254,7 @@ module Plottable.Components {
     /**
      * Sets the data values backing the top and bottom edges of the box.
      */
-    public yExtent(yExtent: (number | { valueOf(): number })[]): SelectionBoxLayer;
+    public yExtent(yExtent: (number | { valueOf(): number })[]): this;
     public yExtent(yExtent?: (number | { valueOf(): number })[]): any {
       // Explicit typing for Typescript 1.4
       if (yExtent == null) {

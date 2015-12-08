@@ -271,7 +271,7 @@ module Plottable.Components {
      * @param {number} r
      * @return {DragBoxLayer} The calling DragBoxLayer.
      */
-    public detectionRadius(r: number): DragBoxLayer;
+    public detectionRadius(r: number): this;
     public detectionRadius(r?: number): any {
       if (r == null) {
         return this._detectionRadius;
@@ -294,7 +294,7 @@ module Plottable.Components {
      * @param {boolean} canResize
      * @return {DragBoxLayer} The calling DragBoxLayer.
      */
-    public resizable(canResize: boolean): DragBoxLayer;
+    public resizable(canResize: boolean): this;
     public resizable(canResize?: boolean): any {
       if (canResize == null) {
         return this._resizable;
@@ -325,7 +325,7 @@ module Plottable.Components {
      * @param {boolean} movable
      * @return {DragBoxLayer} The calling DragBoxLayer.
      */
-    public movable(movable: boolean): DragBoxLayer;
+    public movable(movable: boolean): this;
     public movable(movable?: boolean): any {
       if (movable == null) {
         return this._movable;
@@ -419,7 +419,7 @@ module Plottable.Components {
     /**
      * Enables or disables the interaction and drag box.
      */
-    public enabled(enabled: boolean): DragBoxLayer;
+    public enabled(enabled: boolean): this;
     /**
      * Gets the enabled state.
      */
@@ -445,12 +445,14 @@ module Plottable.Components {
     public detach() {
       this._resetState();
       this._dragInteraction.detachFrom(this);
-      return super.detach();
+      super.detach();
+      return this;
     }
 
     public anchor(selection: d3.Selection<void>) {
       this._dragInteraction.attachTo(this);
-      return super.anchor(selection);
+      super.anchor(selection);
+      return this;
     }
 
     private _resetState() {

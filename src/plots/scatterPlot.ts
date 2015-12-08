@@ -39,7 +39,7 @@ module Plottable.Plots {
      * @param {number|Accessor<number>} size
      * @returns {Plots.Scatter} The calling Scatter Plot.
      */
-    public size(size: number | Accessor<number>): Plots.Scatter<X, Y>;
+    public size(size: number | Accessor<number>): this;
     /**
      * Sets the size property to a scaled constant value or scaled result of an Accessor.
      * The provided Scale will account for the values when autoDomain()-ing.
@@ -48,7 +48,7 @@ module Plottable.Plots {
      * @param {Scale<S, number>} scale
      * @returns {Plots.Scatter} The calling Scatter Plot.
      */
-    public size<S>(size: S | Accessor<S>, scale: Scale<S, number>): Plots.Scatter<X, Y>;
+    public size<S>(size: S | Accessor<S>, scale: Scale<S, number>): this;
     public size<S>(size?: number | Accessor<number> | S | Accessor<S>, scale?: Scale<S, number>): any {
       if (size == null) {
         return this._propertyBindings.get(Scatter._SIZE_KEY);
@@ -69,7 +69,7 @@ module Plottable.Plots {
      * @param {Accessor<SymbolFactory>} symbol
      * @returns {Plots.Scatter} The calling Scatter Plot.
      */
-    public symbol(symbol: Accessor<SymbolFactory>): Plots.Scatter<X, Y>;
+    public symbol(symbol: Accessor<SymbolFactory>): this;
     public symbol(symbol?: Accessor<SymbolFactory>): any {
       if (symbol == null) {
         return this._propertyBindings.get(Scatter._SYMBOL_KEY);
@@ -88,26 +88,6 @@ module Plottable.Plots {
       let drawSteps: Drawers.DrawStep[] = [];
       drawSteps.push({attrToProjector: this._generateAttrToProjector(), animator: this._getAnimator(Plots.Animator.MAIN)});
       return drawSteps;
-    }
-
-    /**
-     * @deprecated As of release v1.1.0, replaced by _entityVisibleOnPlot()
-     */
-    protected _visibleOnPlot(datum: any, pixelPoint: Point, selection: d3.Selection<void>): boolean {
-      Utils.Window.deprecated("Scatter._visibleOnPlot()", "v1.1.0", "replaced by _entityVisibleOnPlot()");
-      let xRange = { min: 0, max: this.width() };
-      let yRange = { min: 0, max: this.height() };
-
-      let translation = d3.transform(selection.attr("transform")).translate;
-      let bbox = Utils.DOM.elementBBox(selection);
-      let translatedBbox: SVGRect = {
-        x: bbox.x + translation[0],
-        y: bbox.y + translation[1],
-        width: bbox.width,
-        height: bbox.height
-      };
-
-      return Utils.DOM.intersectsBBox(xRange, yRange, translatedBbox);
     }
 
     protected _entityVisibleOnPlot(pixelPoint: Point, datum: any, index: number, dataset: Dataset) {

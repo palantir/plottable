@@ -1,10 +1,10 @@
 {
   "rules": {
     "ban": [true,
-        ["d3", "max"],
-        ["d3", "min"],
-        ["d3", "keys"],
-        ["assert", "equal"]
+      ["d3", "max"],
+      ["d3", "min"],
+      ["d3", "keys"],
+      ["assert", "equal"]
     ],
     "class-name": true,
     "comment-format": [true, "check-space"],
@@ -19,13 +19,13 @@
     "no-bitwise": true,
     "no-consecutive-blank-lines": true,
     "no-console": [true,
-        "log",
-        "debug",
-        "info",
-        "time",
-        "timeEnd",
-        "trace",
-        "warn"
+      "log",
+      "debug",
+      "info",
+      "time",
+      "timeEnd",
+      "trace",
+      "warn"
     ],
     "no-construct": true,
     "no-constructor-vars": true,
@@ -43,33 +43,33 @@
     "no-use-before-declare": true,
     "no-var-keyword": true,
     "one-line": [true,
-        "check-catch",
-        "check-else",
-        "check-open-brace",
-        "check-whitespace"
+      "check-catch",
+      "check-else",
+      "check-open-brace",
+      "check-whitespace"
     ],
     "quotemark": [true,
-        "double"
+      "double"
     ],
     "radix": true,
     "semicolon": true,
     "triple-equals": [true,
-        "allow-null-check"
+      "allow-null-check"
     ],
     "typedef-whitespace": [true, {
-        "call-signature": "nospace",
-        "index-signature": "nospace",
-        "parameter": "nospace",
-        "property-declaration": "nospace",
-        "variable-declaration": "nospace"
+      "call-signature": "nospace",
+      "index-signature": "nospace",
+      "parameter": "nospace",
+      "property-declaration": "nospace",
+      "variable-declaration": "nospace"
     }],
     "variable-name": [true, "allow-leading-underscore"],
     "whitespace": [true,
-        "check-branch",
-        "check-decl",
-        "check-operator",
-        "check-separator",
-        "check-type"
+      "check-branch",
+      "check-decl",
+      "check-operator",
+      "check-separator",
+      "check-type"
     ]
   }
 }
