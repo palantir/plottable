@@ -113,7 +113,7 @@ module Plottable.Components {
      * @param {QuantitativeScale<D>} scale
      * @return {GuideLineLayer<D>} The calling GuideLineLayer.
      */
-    public scale(scale: QuantitativeScale<D>): GuideLineLayer<D>;
+    public scale(scale: QuantitativeScale<D>): this;
     public scale(scale?: QuantitativeScale<D>): any {
       if (scale == null) {
         return this._scale;
@@ -142,7 +142,7 @@ module Plottable.Components {
      * @param {D} value
      * @return {GuideLineLayer<D>} The calling GuideLineLayer.
      */
-    public value(value: D): GuideLineLayer<D>;
+    public value(value: D): this;
     public value(value?: D): any {
       if (value == null) {
         return this._value;
@@ -167,7 +167,7 @@ module Plottable.Components {
      * @param {number} pixelPosition
      * @return {GuideLineLayer<D>} The calling GuideLineLayer.
      */
-    public pixelPosition(pixelPosition: number): GuideLineLayer<D>;
+    public pixelPosition(pixelPosition: number): this;
     public pixelPosition(pixelPosition?: number): any {
       if (pixelPosition == null) {
         return this._pixelPosition;

@@ -5,10 +5,10 @@ module Plottable.Animators {
    * immediately set on the selection.
    */
   export class Null implements Animator {
-
     public totalTime(selection: any) {
       return 0;
     }
+
     public animateJoin(joinResult: Drawers.JoinResult, attrToAppliedProjector: AttributeToAppliedProjector, drawer: Drawer): void {
       joinResult.exit
         .remove();

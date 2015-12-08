@@ -69,7 +69,7 @@ export class Dataset {
    * @param {any[]} data
    * @returns {Dataset} The calling Dataset.
    */
-  public data(data: any[]): Dataset;
+  public data(data: any[]): this;
   public data(data?: any[]): any {
     if (data == null) {
       return this._data;
@@ -92,7 +92,7 @@ export class Dataset {
    * @param {any} metadata
    * @returns {Dataset} The calling Dataset.
    */
-  public metadata(metadata: any): Dataset;
+  public metadata(metadata: any): this;
   public metadata(metadata?: any): any {
     if (metadata == null) {
       return this._metadata;

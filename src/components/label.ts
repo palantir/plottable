@@ -54,7 +54,7 @@ module Plottable.Components {
      * @param {string} displayText
      * @returns {Label} The calling Label.
      */
-    public text(displayText: string): Label;
+    public text(displayText: string): this;
     public text(displayText?: string): any {
       if (displayText == null) {
         return this._text;
@@ -78,7 +78,7 @@ module Plottable.Components {
      * @param {number} angle One of -90/0/90. 0 is horizontal.
      * @returns {Label} The calling Label.
      */
-    public angle(angle: number): Label;
+    public angle(angle: number): this;
     public angle(angle?: number): any {
       if (angle == null) {
         return this._angle;
@@ -109,7 +109,7 @@ module Plottable.Components {
      * @param {number} padAmount
      * @returns {Label} The calling Label.
      */
-    public padding(padAmount: number): Label;
+    public padding(padAmount: number): this;
     public padding(padAmount?: number): any {
       if (padAmount == null) {
         return this._padding;

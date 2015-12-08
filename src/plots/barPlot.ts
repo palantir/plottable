@@ -48,8 +48,8 @@ module Plottable.Plots {
     }
 
     public x(): Plots.AccessorScaleBinding<X, number>;
-    public x(x: number | Accessor<number>): Bar<X, Y>;
-    public x(x: X | Accessor<X>, xScale: Scale<X, number>): Bar<X, Y>;
+    public x(x: number | Accessor<number>): this;
+    public x(x: X | Accessor<X>, xScale: Scale<X, number>): this;
     public x(x?: number | Accessor<number> | X | Accessor<X>, xScale?: Scale<X, number>): any {
       if (x == null) {
         return super.x();
@@ -67,8 +67,8 @@ module Plottable.Plots {
     }
 
     public y(): Plots.AccessorScaleBinding<Y, number>;
-    public y(y: number | Accessor<number>): Bar<X, Y>;
-    public y(y: Y | Accessor<Y>, yScale: Scale<Y, number>): Bar<X, Y>;
+    public y(y: number | Accessor<number>): this;
+    public y(y: Y | Accessor<Y>, yScale: Scale<Y, number>): this;
     public y(y?: number | Accessor<number> | Y | Accessor<Y>, yScale?: Scale<Y, number>): any {
       if (y == null) {
         return super.y();
@@ -124,7 +124,7 @@ module Plottable.Plots {
      * @param {X|Y} value
      * @returns {Bar} The calling Bar Plot.
      */
-    public baselineValue(value: X|Y): Bar<X, Y>;
+    public baselineValue(value: X|Y): this;
     public baselineValue(value?: X|Y): any {
       if (value == null) {
         if (this._baselineValue != null) {
@@ -176,7 +176,7 @@ module Plottable.Plots {
     }
 
     public datasets(): Dataset[];
-    public datasets(datasets: Dataset[]): Plot;
+    public datasets(datasets: Dataset[]): this;
     public datasets(datasets?: Dataset[]): any {
       if (datasets == null) {
         return super.datasets();
@@ -199,7 +199,7 @@ module Plottable.Plots {
      * @param {boolean} labelsEnabled
      * @returns {Bar} The calling Bar Plot.
      */
-    public labelsEnabled(enabled: boolean): Bar<X, Y>;
+    public labelsEnabled(enabled: boolean): this;
     public labelsEnabled(enabled?: boolean): any {
       if (enabled == null) {
         return this._labelsEnabled;
@@ -220,7 +220,7 @@ module Plottable.Plots {
      * @param {Formatter} formatter
      * @returns {Bar} The calling Bar Plot.
      */
-    public labelFormatter(formatter: Formatter): Bar<X, Y>;
+    public labelFormatter(formatter: Formatter): this;
     public labelFormatter(formatter?: Formatter): any {
       if (formatter == null) {
         return this._labelFormatter;
@@ -308,18 +308,6 @@ module Plottable.Plots {
       });
 
       return closest;
-    }
-
-    /**
-     * @deprecated As of release v1.1.0, replaced by _entityVisibleOnPlot()
-     */
-    protected _visibleOnPlot(datum: any, pixelPoint: Point, selection: d3.Selection<void>): boolean {
-      Utils.Window.deprecated("Bar._visibleOnPlot()", "v1.1.0", "replaced by _entityVisibleOnPlot()");
-      let xRange = { min: 0, max: this.width() };
-      let yRange = { min: 0, max: this.height() };
-      let barBBox = Utils.DOM.elementBBox(selection);
-
-      return Plottable.Utils.DOM.intersectsBBox(xRange, yRange, barBBox);
     }
 
     protected _entityVisibleOnPlot(pixelPoint: Point, datum: any, index: number, dataset: Dataset) {

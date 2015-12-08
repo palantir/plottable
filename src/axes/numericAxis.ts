@@ -30,12 +30,10 @@ module Plottable.Axes {
       let maxTextWidth = this._usesTextWidthApproximation ? this._computeApproximateTextWidth() : this._computeExactTextWidth();
 
       if (this._tickLabelPositioning === "center") {
-        this._computedWidth = this._maxLabelTickLength() + this.tickLabelPadding() + maxTextWidth;
+        return this._maxLabelTickLength() + this.tickLabelPadding() + maxTextWidth;
       } else {
-        this._computedWidth = Math.max(this._maxLabelTickLength(), this.tickLabelPadding() + maxTextWidth);
+        return Math.max(this._maxLabelTickLength(), this.tickLabelPadding() + maxTextWidth);
       }
-
-      return this._computedWidth;
     }
 
     private _computeExactTextWidth(): number {
@@ -63,12 +61,10 @@ module Plottable.Axes {
       let textHeight = this._measurer.measure().height;
 
       if (this._tickLabelPositioning === "center") {
-        this._computedHeight = this._maxLabelTickLength() + this.tickLabelPadding() + textHeight;
+        return this._maxLabelTickLength() + this.tickLabelPadding() + textHeight;
       } else {
-        this._computedHeight = Math.max(this._maxLabelTickLength(), this.tickLabelPadding() + textHeight);
+        return Math.max(this._maxLabelTickLength(), this.tickLabelPadding() + textHeight);
       }
-
-      return this._computedHeight;
     }
 
     protected _getTickValues() {
@@ -254,7 +250,7 @@ module Plottable.Axes {
      *                          "left"/"center"/"right" for a horizontal Numeric Axis.
      * @returns {Numeric} The calling Numeric Axis.
      */
-    public tickLabelPosition(position: string): Numeric;
+    public tickLabelPosition(position: string): this;
     public tickLabelPosition(position?: string): any {
       if (position == null) {
         return this._tickLabelPositioning;
@@ -290,7 +286,7 @@ module Plottable.Axes {
      * @param {boolean} The new text width approximation setting.
      * @returns {Axes.Numeric} The calling Axes.Numeric.
      */
-    public usesTextWidthApproximation(enable: boolean): Axes.Numeric;
+    public usesTextWidthApproximation(enable: boolean): this;
     public usesTextWidthApproximation(enable?: boolean): any {
       if (enable == null) {
         return this._usesTextWidthApproximation;

@@ -369,46 +369,4 @@ describe("Formatters", () => {
       );
     });
   });
-
-  describe("relativeDate()", () => {
-    let showWarning: boolean;
-    beforeEach(() => {
-      showWarning = Plottable.Configs.SHOW_WARNINGS;
-      Plottable.Configs.SHOW_WARNINGS = false;
-    });
-
-    afterEach(() => {
-      Plottable.Configs.SHOW_WARNINGS = showWarning;
-    });
-
-    it("uses reasonable defaults", () => {
-      let relativeDateFormatter = Plottable.Formatters.relativeDate();
-      let result = relativeDateFormatter(7 * Plottable.MILLISECONDS_IN_ONE_DAY);
-      assert.strictEqual(result, "7", "7 day difference from epoch, incremented by days, no suffix");
-    });
-
-    it("resulting value is difference from base value", () => {
-      let relativeDateFormatter = Plottable.Formatters.relativeDate(5 * Plottable.MILLISECONDS_IN_ONE_DAY);
-      let result = relativeDateFormatter(9 * Plottable.MILLISECONDS_IN_ONE_DAY);
-      assert.strictEqual(result, "4", "4 days greater from base value");
-      result = relativeDateFormatter(Plottable.MILLISECONDS_IN_ONE_DAY);
-      assert.strictEqual(result, "-4", "4 days less from base value");
-    });
-
-    it("can increment by different time types (hours, minutes)", () => {
-      let hoursRelativeDateFormatter = Plottable.Formatters.relativeDate(0, Plottable.MILLISECONDS_IN_ONE_DAY / 24);
-      let result = hoursRelativeDateFormatter(3 * Plottable.MILLISECONDS_IN_ONE_DAY);
-      assert.strictEqual(result, "72", "72 hour difference from epoch");
-
-      let minutesRelativeDateFormatter = Plottable.Formatters.relativeDate(0, Plottable.MILLISECONDS_IN_ONE_DAY / (24 * 60));
-      result = minutesRelativeDateFormatter(3 * Plottable.MILLISECONDS_IN_ONE_DAY);
-      assert.strictEqual(result, "4320", "4320 minute difference from epoch");
-    });
-
-    it("can append a suffix", () => {
-      let relativeDateFormatter = Plottable.Formatters.relativeDate(0, Plottable.MILLISECONDS_IN_ONE_DAY, "days");
-      let result = relativeDateFormatter(7 * Plottable.MILLISECONDS_IN_ONE_DAY);
-      assert.strictEqual(result, "7days", "days appended to the end");
-    });
-  });
 });

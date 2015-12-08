@@ -62,7 +62,7 @@ declare module Plottable.Utils {
         private _keyValuePairs;
         private _es6Map;
         constructor();
-        set(key: K, value: V): Map<K, V>;
+        set(key: K, value: V): this;
         get(key: K): V;
         has(key: K): boolean;
         forEach(callbackFn: (value: V, key: K, map: Map<K, V>) => void, thisArg?: any): void;
@@ -79,7 +79,7 @@ declare module Plottable.Utils {
         private _values;
         private _es6Set;
         constructor();
-        add(value: T): Set<T>;
+        add(value: T): this;
         delete(value: T): boolean;
         has(value: T): boolean;
         forEach(callback: (value: T, value2: T, set: Set<T>) => void, thisArg?: any): void;
@@ -239,7 +239,7 @@ declare module Plottable.Utils {
      * All callbacks should have the same signature.
      */
     class CallbackSet<CB extends Function> extends Set<CB> {
-        callCallbacks(...args: any[]): CallbackSet<CB>;
+        callCallbacks(...args: any[]): this;
     }
 }
 declare module Plottable.Utils.Stacking {
@@ -364,14 +364,14 @@ declare module Plottable {
          * @param {DatasetCallback} callback.
          * @returns {Dataset} The calling Dataset.
          */
-        onUpdate(callback: DatasetCallback): Dataset;
+        onUpdate(callback: DatasetCallback): this;
         /**
          * Removes a callback that would be called when the Dataset updates.
          *
          * @param {DatasetCallback} callback
          * @returns {Dataset} The calling Dataset.
          */
-        offUpdate(callback: DatasetCallback): Dataset;
+        offUpdate(callback: DatasetCallback): this;
         /**
          * Gets the data.
          *
@@ -384,7 +384,7 @@ declare module Plottable {
          * @param {any[]} data
          * @returns {Dataset} The calling Dataset.
          */
-        data(data: any[]): Dataset;
+        data(data: any[]): this;
         /**
          * Gets the metadata.
          *
@@ -397,7 +397,7 @@ declare module Plottable {
          * @param {any} metadata
          * @returns {Dataset} The calling Dataset.
          */
-        metadata(metadata: any): Dataset;
+        metadata(metadata: any): this;
         keyFunction(): (datum: any, index: number) => any;
         /**
          * Sets the keyFunction.
@@ -559,16 +559,6 @@ declare module Plottable {
 }
 declare module Plottable {
     type Formatter = (d: any) => string;
-    /**
-     * This field is deprecated and will be removed in v2.0.0.
-     *
-     * The number of milliseconds between midnight one day and the next is
-     * not a fixed quantity.
-     *
-     * Use date.setDate(date.getDate() + number_of_days) instead.
-     *
-     */
-    var MILLISECONDS_IN_ONE_DAY: number;
 }
 declare module Plottable.Formatters {
     /**
@@ -654,18 +644,6 @@ declare module Plottable.Formatters {
      * @returns {Formatter} A formatter for time/date values.
      */
     function time(specifier: string): Formatter;
-    /**
-     * @deprecated As of release v1.3.0, not safe for use with time zones.
-     *
-     * Creates a formatter for relative dates.
-     *
-     * @param {number} baseValue The start date (as epoch time) used in computing relative dates (default 0)
-     * @param {number} increment The unit used in calculating relative date values (default MILLISECONDS_IN_ONE_DAY)
-     * @param {string} label The label to append to the formatted string (default "")
-     *
-     * @returns {Formatter} A formatter for time/date values.
-     */
-    function relativeDate(baseValue?: number, increment?: number, label?: string): (d: any) => string;
 }
 declare module Plottable {
     /**
@@ -734,21 +712,21 @@ declare module Plottable {
          * @param {ScaleCallback} callback.
          * @returns {Scale} The calling Scale.
          */
-        onUpdate(callback: ScaleCallback<Scale<D, R>>): Scale<D, R>;
+        onUpdate(callback: ScaleCallback<this>): this;
         /**
          * Removes a callback that would be called when the Scale updates.
          *
          * @param {ScaleCallback} callback.
          * @returns {Scale} The calling Scale.
          */
-        offUpdate(callback: ScaleCallback<Scale<D, R>>): Scale<D, R>;
+        offUpdate(callback: ScaleCallback<this>): this;
         protected _dispatchUpdate(): void;
         /**
          * Sets the Scale's domain so that it spans the Extents of all its ExtentsProviders.
          *
          * @returns {Scale} The calling Scale.
          */
-        autoDomain(): Scale<D, R>;
+        autoDomain(): this;
         protected _autoDomainIfAutomaticMode(): void;
         /**
          * Computes the range value corresponding to a given domain value.
@@ -769,8 +747,8 @@ declare module Plottable {
          * @param {D[]} values
          * @returns {Scale} The calling Scale.
          */
-        domain(values: D[]): Scale<D, R>;
-        protected _getDomain(): void;
+        domain(values: D[]): this;
+        protected _getDomain(): D[];
         protected _setDomain(values: D[]): void;
         protected _setBackingScaleDomain(values: D[]): void;
         /**
@@ -785,8 +763,8 @@ declare module Plottable {
          * @param {R[]} values
          * @returns {Scale} The calling Scale.
          */
-        range(values: R[]): Scale<D, R>;
-        protected _getRange(): void;
+        range(values: R[]): this;
+        protected _getRange(): R[];
         protected _setRange(values: R[]): void;
         /**
          * Adds an IncludedValuesProvider to the Scale.
@@ -794,14 +772,14 @@ declare module Plottable {
          * @param {Scales.IncludedValuesProvider} provider
          * @returns {Scale} The calling Scale.
          */
-        addIncludedValuesProvider(provider: Scales.IncludedValuesProvider<D>): Scale<D, R>;
+        addIncludedValuesProvider(provider: Scales.IncludedValuesProvider<D>): this;
         /**
          * Removes the IncludedValuesProvider from the Scale.
          *
          * @param {Scales.IncludedValuesProvider} provider
          * @returns {Scale} The calling Scale.
          */
-        removeIncludedValuesProvider(provider: Scales.IncludedValuesProvider<D>): Scale<D, R>;
+        removeIncludedValuesProvider(provider: Scales.IncludedValuesProvider<D>): this;
     }
 }
 declare module Plottable {
@@ -820,7 +798,7 @@ declare module Plottable {
          * @constructor
          */
         constructor();
-        autoDomain(): QuantitativeScale<D>;
+        autoDomain(): this;
         protected _autoDomainIfAutomaticMode(): void;
         protected _getExtent(): D[];
         /**
@@ -831,14 +809,14 @@ declare module Plottable {
          * @param {Scales.PaddingExceptionProvider<D>} provider The provider function.
          * @returns {QuantitativeScale} The calling QuantitativeScale.
          */
-        addPaddingExceptionsProvider(provider: Scales.PaddingExceptionsProvider<D>): QuantitativeScale<D>;
+        addPaddingExceptionsProvider(provider: Scales.PaddingExceptionsProvider<D>): this;
         /**
          * Removes the padding exception provider.
          *
          * @param {Scales.PaddingExceptionProvider<D>} provider The provider function.
          * @returns {QuantitativeScale} The calling QuantitativeScale.
          */
-        removePaddingExceptionsProvider(provider: Scales.PaddingExceptionsProvider<D>): QuantitativeScale<D>;
+        removePaddingExceptionsProvider(provider: Scales.PaddingExceptionsProvider<D>): this;
         /**
          * Gets the padding proportion.
          */
@@ -851,7 +829,7 @@ declare module Plottable {
          * @param {number} padProportion The padding proportion. Passing 0 disables padding.
          * @returns {QuantitativeScale} The calling QuantitativeScale.
          */
-        padProportion(padProportion: number): QuantitativeScale<D>;
+        padProportion(padProportion: number): this;
         private _padDomain(domain);
         /**
          * Gets whether or not the scale snaps its domain to nice values.
@@ -860,7 +838,7 @@ declare module Plottable {
         /**
          * Sets whether or not the scale snaps its domain to nice values.
          */
-        snappingDomainEnabled(snappingDomainEnabled: boolean): QuantitativeScale<D>;
+        snappingDomainEnabled(snappingDomainEnabled: boolean): this;
         protected _expandSingleValueDomain(singleValueDomain: D[]): D[];
         /**
          * Computes the domain value corresponding to a supplied range value.
@@ -870,7 +848,7 @@ declare module Plottable {
          */
         invert(value: number): D;
         domain(): D[];
-        domain(values: D[]): QuantitativeScale<D>;
+        domain(values: D[]): this;
         /**
          * Gets the lower end of the domain.
          *
@@ -882,7 +860,7 @@ declare module Plottable {
          *
          * @return {QuantitativeScale} The calling QuantitativeScale.
          */
-        domainMin(domainMin: D): QuantitativeScale<D>;
+        domainMin(domainMin: D): this;
         /**
          * Gets the upper end of the domain.
          *
@@ -894,7 +872,7 @@ declare module Plottable {
          *
          * @return {QuantitativeScale} The calling QuantitativeScale.
          */
-        domainMax(domainMax: D): QuantitativeScale<D>;
+        domainMax(domainMax: D): this;
         extentOfValues(values: D[]): D[];
         protected _setDomain(values: D[]): void;
         /**
@@ -923,7 +901,7 @@ declare module Plottable {
          * @param {TickGenerator} generator
          * @return {QuantitativeScale} The calling QuantitativeScale.
          */
-        tickGenerator(generator: Scales.TickGenerators.TickGenerator<D>): QuantitativeScale<D>;
+        tickGenerator(generator: Scales.TickGenerators.TickGenerator<D>): this;
     }
 }
 declare module Plottable.Scales {
@@ -1031,10 +1009,10 @@ declare module Plottable.Scales {
         extentOfValues(values: string[]): string[];
         protected _getExtent(): string[];
         domain(): string[];
-        domain(values: string[]): Category;
+        domain(values: string[]): this;
         protected _setDomain(values: string[]): void;
         range(): [number, number];
-        range(values: [number, number]): Category;
+        range(values: [number, number]): this;
         private static _convertToPlottableInnerPadding(d3InnerPadding);
         private static _convertToPlottableOuterPadding(d3OuterPadding, d3InnerPadding);
         /**
@@ -1068,7 +1046,7 @@ declare module Plottable.Scales {
          *
          * @returns {Category} The calling Category Scale.
          */
-        innerPadding(innerPadding: number): Category;
+        innerPadding(innerPadding: number): this;
         /**
          * Gets the outer padding.
          *
@@ -1086,7 +1064,7 @@ declare module Plottable.Scales {
          *
          * @returns {Category} The calling Category Scale.
          */
-        outerPadding(outerPadding: number): Category;
+        outerPadding(outerPadding: number): this;
         scale(value: string): number;
         protected _getDomain(): string[];
         protected _setBackingScaleDomain(values: string[]): void;
@@ -1186,7 +1164,7 @@ declare module Plottable.Scales {
          */
         private _interpolateColors();
         private _resetScale();
-        autoDomain(): InterpolatedColor;
+        autoDomain(): this;
         scale(value: number): string;
         protected _getDomain(): number[];
         protected _setBackingScaleDomain(values: number[]): void;
@@ -1277,7 +1255,7 @@ declare module Plottable {
          * @param {d3.Selection} Selection containing the <g> to render to.
          * @returns {Drawer} The calling Drawer.
          */
-        renderArea(area: d3.Selection<void>): Drawer;
+        renderArea(area: d3.Selection<void>): this;
         /**
          * Retieves a function that can supply initial settings to entering elements.
          * this function is typically supplied by the plot using the Drawer
@@ -1328,7 +1306,7 @@ declare module Plottable {
          * @param{any[]} data The data to be drawn
          * @param{DrawStep[]} drawSteps The list of steps, which needs to be drawn
          */
-        draw(data: any[], drawSteps: Drawers.DrawStep[]): Drawer;
+        draw(data: any[], drawSteps: Drawers.DrawStep[]): this;
         selection(): d3.Selection<any>;
         /**
          * Returns the CSS selector for this Drawer's visual elements.
@@ -1418,6 +1396,7 @@ declare module Plottable {
         private _clipPathID;
         private _onAnchorCallbacks;
         private _onDetachCallbacks;
+        private static _SAFARI_EVENT_BACKING_CLASS;
         constructor();
         /**
          * Attaches the Component as a child of a given d3 Selection.
@@ -1425,7 +1404,7 @@ declare module Plottable {
          * @param {d3.Selection} selection.
          * @returns {Component} The calling Component.
          */
-        anchor(selection: d3.Selection<void>): Component;
+        anchor(selection: d3.Selection<void>): this;
         /**
          * Adds a callback to be called on anchoring the Component to the DOM.
          * If the Component is already anchored, the callback is called immediately.
@@ -1433,7 +1412,7 @@ declare module Plottable {
          * @param {ComponentCallback} callback
          * @return {Component}
          */
-        onAnchor(callback: ComponentCallback): Component;
+        onAnchor(callback: ComponentCallback): this;
         /**
          * Removes a callback that would be called on anchoring the Component to the DOM.
          * The callback is identified by reference equality.
@@ -1441,7 +1420,7 @@ declare module Plottable {
          * @param {ComponentCallback} callback
          * @return {Component}
          */
-        offAnchor(callback: ComponentCallback): Component;
+        offAnchor(callback: ComponentCallback): this;
         /**
          * Creates additional elements as necessary for the Component to function.
          * Called during anchor() if the Component's element has not been created yet.
@@ -1466,7 +1445,7 @@ declare module Plottable {
          * @param {number} [availableHeight] Available height in pixels.
          * @returns {Component} The calling Component.
          */
-        computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number): Component;
+        computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number): this;
         protected _sizeFromOffer(availableWidth: number, availableHeight: number): {
             width: number;
             height: number;
@@ -1476,12 +1455,12 @@ declare module Plottable {
          *
          * @returns {Component} The calling Component.
          */
-        render(): Component;
+        render(): this;
         private _scheduleComputeLayout();
         /**
          * Renders the Component without waiting for the next frame.
          */
-        renderImmediately(): Component;
+        renderImmediately(): this;
         /**
          * Causes the Component to re-layout and render.
          *
@@ -1490,14 +1469,14 @@ declare module Plottable {
          *
          * @returns {Component} The calling Component.
          */
-        redraw(): Component;
+        redraw(): this;
         /**
          * Renders the Component to a given <svg>.
          *
          * @param {String|d3.Selection} element A selector-string for the <svg>, or a d3 selection containing an <svg>.
          * @returns {Component} The calling Component.
          */
-        renderTo(element: String | Element | d3.Selection<void>): Component;
+        renderTo(element: String | Element | d3.Selection<void>): this;
         /**
          * Gets the x alignment of the Component.
          */
@@ -1508,7 +1487,7 @@ declare module Plottable {
          * @param {string} xAlignment The x alignment of the Component ("left"/"center"/"right").
          * @returns {Component} The calling Component.
          */
-        xAlignment(xAlignment: string): Component;
+        xAlignment(xAlignment: string): this;
         /**
          * Gets the y alignment of the Component.
          */
@@ -1519,7 +1498,7 @@ declare module Plottable {
          * @param {string} yAlignment The y alignment of the Component ("top"/"center"/"bottom").
          * @returns {Component} The calling Component.
          */
-        yAlignment(yAlignment: string): Component;
+        yAlignment(yAlignment: string): this;
         private _addBox(className?, parentElement?);
         private _generateClipPath();
         private _updateClipPath();
@@ -1535,14 +1514,14 @@ declare module Plottable {
          * @param {string} cssClass The CSS class to add.
          * @returns {Component} The calling Component.
          */
-        addClass(cssClass: string): Component;
+        addClass(cssClass: string): this;
         /**
          * Removes a given CSS class from the Component.
          *
          * @param {string} cssClass The CSS class to remove.
          * @returns {Component} The calling Component.
          */
-        removeClass(cssClass: string): Component;
+        removeClass(cssClass: string): this;
         /**
          * Checks if the Component has a fixed width or if it grows to fill available space.
          * Returns false by default on the base Component class.
@@ -1560,14 +1539,14 @@ declare module Plottable {
          *
          * @returns The calling Component.
          */
-        detach(): Component;
+        detach(): this;
         /**
          * Adds a callback to be called when the Component is detach()-ed.
          *
          * @param {ComponentCallback} callback
          * @return {Component} The calling Component.
          */
-        onDetach(callback: ComponentCallback): Component;
+        onDetach(callback: ComponentCallback): this;
         /**
          * Removes a callback to be called when the Component is detach()-ed.
          * The callback is identified by reference equality.
@@ -1575,7 +1554,7 @@ declare module Plottable {
          * @param {ComponentCallback} callback
          * @return {Component} The calling Component.
          */
-        offDetach(callback: ComponentCallback): Component;
+        offDetach(callback: ComponentCallback): this;
         /**
          * Gets the parent ComponentContainer for this Component.
          */
@@ -1586,7 +1565,7 @@ declare module Plottable {
          * Adding a Component to a ComponentContainer should be done
          * using the appropriate method on the ComponentContainer.
          */
-        parent(parent: ComponentContainer): Component;
+        parent(parent: ComponentContainer): this;
         /**
          * Removes a Component from the DOM and disconnects all listeners.
          */
@@ -1641,8 +1620,8 @@ declare module Plottable {
     class ComponentContainer extends Component {
         private _detachCallback;
         constructor();
-        anchor(selection: d3.Selection<void>): ComponentContainer;
-        render(): ComponentContainer;
+        anchor(selection: d3.Selection<void>): this;
+        render(): this;
         /**
          * Checks whether the specified Component is in the ComponentContainer.
          */
@@ -1651,7 +1630,7 @@ declare module Plottable {
         /**
          * Removes the specified Component from the ComponentContainer.
          */
-        remove(component: Component): ComponentContainer;
+        remove(component: Component): this;
         /**
          * Carry out the actual removal of a Component.
          * Implementation dependent on the type of container.
@@ -1688,7 +1667,7 @@ declare module Plottable.Components {
          */
         has(component: Component): boolean;
         requestedSpace(offeredWidth: number, offeredHeight: number): SpaceRequest;
-        computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number): Group;
+        computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number): this;
         protected _sizeFromOffer(availableWidth: number, availableHeight: number): {
             width: number;
             height: number;
@@ -1703,7 +1682,7 @@ declare module Plottable.Components {
          * Adds a Component to this Group.
          * The added Component will be rendered above Components already in the Group.
          */
-        append(component: Component): Group;
+        append(component: Component): this;
         protected _remove(component: Component): boolean;
     }
 }
@@ -1744,8 +1723,6 @@ declare module Plottable {
         protected _scale: Scale<D, number>;
         private _formatter;
         private _orientation;
-        protected _computedWidth: number;
-        protected _computedHeight: number;
         private _endTickLength;
         private _innerTickLength;
         private _tickLabelPadding;
@@ -1776,10 +1753,10 @@ declare module Plottable {
         fixedHeight(): boolean;
         fixedWidth(): boolean;
         protected _rescale(): void;
-        computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number): Axis<D>;
+        computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number): this;
         protected _setup(): void;
         protected _getTickValues(): D[];
-        renderImmediately(): Axis<D>;
+        renderImmediately(): this;
         /**
          * Gets the annotated ticks.
          */
@@ -1789,7 +1766,7 @@ declare module Plottable {
          *
          * @returns {Axis} The calling Axis.
          */
-        annotatedTicks(annotatedTicks: D[]): Axis<D>;
+        annotatedTicks(annotatedTicks: D[]): this;
         /**
          * Gets the Formatter for the annotations.
          */
@@ -1799,7 +1776,7 @@ declare module Plottable {
          *
          * @returns {Axis} The calling Axis.
          */
-        annotationFormatter(annotationFormatter: Formatter): Axis<D>;
+        annotationFormatter(annotationFormatter: Formatter): this;
         /**
          * Gets if annotations are enabled.
          */
@@ -1809,7 +1786,7 @@ declare module Plottable {
          *
          * @returns {Axis} The calling Axis.
          */
-        annotationsEnabled(annotationsEnabled: boolean): Axis<D>;
+        annotationsEnabled(annotationsEnabled: boolean): this;
         /**
          * Gets the count of annotation tiers to render.
          */
@@ -1819,7 +1796,7 @@ declare module Plottable {
          *
          * @returns {Axis} The calling Axis.
          */
-        annotationTierCount(annotationTierCount: number): Axis<D>;
+        annotationTierCount(annotationTierCount: number): this;
         protected _drawAnnotations(): void;
         private _annotatedTicksToRender();
         /**
@@ -1850,20 +1827,7 @@ declare module Plottable {
          * @param {Formatter} formatter
          * @returns {Axis} The calling Axis.
          */
-        formatter(formatter: Formatter): Axis<D>;
-        /**
-         * @deprecated As of release v1.3.0, replaced by innerTickLength()
-         *
-         * Gets the tick mark length in pixels.
-         */
-        tickLength(): number;
-        /**
-         * Sets the tick mark length in pixels.
-         *
-         * @param {number} length
-         * @returns {Axis} The calling Axis.
-         */
-        tickLength(length: number): Axis<D>;
+        formatter(formatter: Formatter): this;
         /**
          * Gets the tick mark length in pixels.
          */
@@ -1874,7 +1838,7 @@ declare module Plottable {
          * @param {number} length
          * @returns {Axis} The calling Axis.
          */
-        innerTickLength(length: number): Axis<D>;
+        innerTickLength(length: number): this;
         /**
          * Gets the end tick mark length in pixels.
          */
@@ -1885,7 +1849,7 @@ declare module Plottable {
          * @param {number} length
          * @returns {Axis} The calling Axis.
          */
-        endTickLength(length: number): Axis<D>;
+        endTickLength(length: number): this;
         protected _maxLabelTickLength(): number;
         /**
          * Gets the padding between each tick mark and its associated label in pixels.
@@ -1897,7 +1861,7 @@ declare module Plottable {
          * @param {number} padding
          * @returns {Axis} The calling Axis.
          */
-        tickLabelPadding(padding: number): Axis<D>;
+        tickLabelPadding(padding: number): this;
         /**
          * Gets the margin in pixels.
          * The margin is the amount of space between the tick labels and the outer edge of the Axis.
@@ -1912,7 +1876,7 @@ declare module Plottable {
          * @param {number} size
          * @returns {Axis} The calling Axis.
          */
-        margin(size: number): Axis<D>;
+        margin(size: number): this;
         /**
          * Gets the orientation of the Axis.
          */
@@ -1923,7 +1887,7 @@ declare module Plottable {
          * @param {number} orientation One of "top"/"bottom"/"left"/"right".
          * @returns {Axis} The calling Axis.
          */
-        orientation(orientation: string): Axis<D>;
+        orientation(orientation: string): this;
         /**
          * Gets whether the Axis shows the end tick labels.
          */
@@ -1934,7 +1898,7 @@ declare module Plottable {
          * @param {boolean} show
          * @returns {Axis} The calling Axis.
          */
-        showEndTickLabels(show: boolean): Axis<D>;
+        showEndTickLabels(show: boolean): this;
     }
 }
 declare module Plottable {
@@ -2003,7 +1967,7 @@ declare module Plottable.Axes {
          * @param {string[]} newPositions The positions for each tier. "bottom" and "center" are the only supported values.
          * @returns {Axes.Time} The calling Time Axis.
          */
-        tierLabelPositions(newPositions: string[]): Time;
+        tierLabelPositions(newPositions: string[]): this;
         /**
          * Gets the possible TimeAxisConfigurations.
          */
@@ -2015,13 +1979,13 @@ declare module Plottable.Axes {
          * @param {TimeAxisConfiguration[]} configurations
          * @returns {Axes.Time} The calling Time Axis.
          */
-        axisConfigurations(configurations: TimeAxisConfiguration[]): Time;
+        axisConfigurations(configurations: TimeAxisConfiguration[]): this;
         /**
          * Gets the index of the most precise TimeAxisConfiguration that will fit in the current width.
          */
         private _getMostPreciseConfigurationIndex();
         orientation(): string;
-        orientation(orientation: string): Time;
+        orientation(orientation: string): this;
         protected _computeHeight(): number;
         private _getIntervalLength(config);
         private _maxWidthForInterval(config);
@@ -2043,7 +2007,7 @@ declare module Plottable.Axes {
         private _renderTickMarks(tickValues, index);
         private _renderLabellessTickMarks(tickValues);
         private _generateLabellessTicks();
-        renderImmediately(): Time;
+        renderImmediately(): this;
         private _hideOverflowingTiers();
         private _hideOverlappingAndCutOffLabels(index);
     }
@@ -2071,7 +2035,7 @@ declare module Plottable.Axes {
         protected _computeHeight(): number;
         protected _getTickValues(): number[];
         protected _rescale(): void;
-        renderImmediately(): Numeric;
+        renderImmediately(): this;
         private _showAllTickMarks();
         /**
          * Hides the Tick Marks which have no corresponding Tick Labels
@@ -2090,7 +2054,7 @@ declare module Plottable.Axes {
          *                          "left"/"center"/"right" for a horizontal Numeric Axis.
          * @returns {Numeric} The calling Numeric Axis.
          */
-        tickLabelPosition(position: string): Numeric;
+        tickLabelPosition(position: string): this;
         /**
          * Gets the approximate text width setting.
          *
@@ -2106,7 +2070,7 @@ declare module Plottable.Axes {
          * @param {boolean} The new text width approximation setting.
          * @returns {Axes.Numeric} The calling Axes.Numeric.
          */
-        usesTextWidthApproximation(enable: boolean): Axes.Numeric;
+        usesTextWidthApproximation(enable: boolean): this;
         private _hideEndTickLabels();
         private _hideOverflowingTickLabels();
         private _hideOverlappingTickLabels();
@@ -2140,7 +2104,7 @@ declare module Plottable.Axes {
          */
         constructor(scale: Scales.Category, orientation: string);
         protected _setup(): void;
-        protected _rescale(): Component;
+        protected _rescale(): this;
         requestedSpace(offeredWidth: number, offeredHeight: number): SpaceRequest;
         protected _coreSize(): number;
         protected _getTickValues(): string[];
@@ -2155,7 +2119,7 @@ declare module Plottable.Axes {
          * @param {number} angle
          * @returns {Category} The calling Category Axis.
          */
-        tickLabelAngle(angle: number): Category;
+        tickLabelAngle(angle: number): this;
         /**
          * Measures the size of the ticks while also writing them to the DOM.
          * @param {d3.Selection} ticks The tick elements to be written to.
@@ -2168,8 +2132,8 @@ declare module Plottable.Axes {
          * @param {string[]} ticks The strings that will be printed on the ticks.
          */
         private _measureTicks(axisWidth, axisHeight, scale, ticks);
-        renderImmediately(): Category;
-        computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number): Category;
+        renderImmediately(): this;
+        computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number): this;
     }
 }
 declare module Plottable.Components {
@@ -2201,7 +2165,7 @@ declare module Plottable.Components {
          * @param {string} displayText
          * @returns {Label} The calling Label.
          */
-        text(displayText: string): Label;
+        text(displayText: string): this;
         /**
          * Gets the angle of the Label in degrees.
          */
@@ -2212,7 +2176,7 @@ declare module Plottable.Components {
          * @param {number} angle One of -90/0/90. 0 is horizontal.
          * @returns {Label} The calling Label.
          */
-        angle(angle: number): Label;
+        angle(angle: number): this;
         /**
          * Gets the amount of padding around the Label in pixels.
          */
@@ -2223,10 +2187,10 @@ declare module Plottable.Components {
          * @param {number} padAmount
          * @returns {Label} The calling Label.
          */
-        padding(padAmount: number): Label;
+        padding(padAmount: number): this;
         fixedWidth(): boolean;
         fixedHeight(): boolean;
-        renderImmediately(): Label;
+        renderImmediately(): this;
     }
     class TitleLabel extends Label {
         static TITLE_LABEL_CLASS: string;
@@ -2290,7 +2254,7 @@ declare module Plottable.Components {
          * @param {Formatter} formatter
          * @returns {Legend} The calling Legend.
          */
-        formatter(formatter: Formatter): Legend;
+        formatter(formatter: Formatter): this;
         /**
          * Gets the maximum number of entries per row.
          *
@@ -2303,7 +2267,7 @@ declare module Plottable.Components {
          * @param {number} maxEntriesPerRow
          * @returns {Legend} The calling Legend.
          */
-        maxEntriesPerRow(maxEntriesPerRow: number): Legend;
+        maxEntriesPerRow(maxEntriesPerRow: number): this;
         /**
          * Gets the current comparator for the Legend's entries.
          *
@@ -2317,7 +2281,7 @@ declare module Plottable.Components {
          * @param {(a: string, b: string) => number} comparator
          * @returns {Legend} The calling Legend.
          */
-        comparator(comparator: (a: string, b: string) => number): Legend;
+        comparator(comparator: (a: string, b: string) => number): this;
         /**
          * Gets the Color Scale.
          *
@@ -2330,7 +2294,7 @@ declare module Plottable.Components {
          * @param {Scales.Color} scale
          * @returns {Legend} The calling Legend.
          */
-        colorScale(colorScale: Scales.Color): Legend;
+        colorScale(colorScale: Scales.Color): this;
         destroy(): void;
         private _calculateLayoutInfo(availableWidth, availableHeight);
         requestedSpace(offeredWidth: number, offeredHeight: number): SpaceRequest;
@@ -2343,7 +2307,7 @@ declare module Plottable.Components {
          * @returns {Entity<Legend>[]}
          */
         entitiesAt(p: Point): Entity<Legend>[];
-        renderImmediately(): Legend;
+        renderImmediately(): this;
         /**
          * Gets the function determining the symbols of the Legend.
          *
@@ -2356,7 +2320,7 @@ declare module Plottable.Components {
          * @param {(datum: any, index: number) => SymbolFactory} symbol
          * @returns {Legend} The calling Legend
          */
-        symbol(symbol: (datum: any, index: number) => SymbolFactory): Legend;
+        symbol(symbol: (datum: any, index: number) => SymbolFactory): this;
         /**
          * Gets the opacity of the symbols of the Legend.
          *
@@ -2369,7 +2333,7 @@ declare module Plottable.Components {
          * @param {number | ((datum: any, index: number) => number)} symbolOpacity
          * @returns {Legend} The calling Legend
          */
-        symbolOpacity(symbolOpacity: number | ((datum: any, index: number) => number)): Legend;
+        symbolOpacity(symbolOpacity: number | ((datum: any, index: number) => number)): this;
         fixedWidth(): boolean;
         fixedHeight(): boolean;
     }
@@ -2416,7 +2380,7 @@ declare module Plottable.Components {
          * @param {Formatter} formatter
          * @returns {InterpolatedColorLegend} The calling InterpolatedColorLegend.
          */
-        formatter(formatter: Formatter): InterpolatedColorLegend;
+        formatter(formatter: Formatter): this;
         /**
          * Gets whether the InterpolatedColorLegend expands to occupy all offered space in the long direction
          */
@@ -2427,7 +2391,7 @@ declare module Plottable.Components {
          * @param {expands} boolean
          * @returns {InterpolatedColorLegend} The calling InterpolatedColorLegend.
          */
-        expands(expands: boolean): InterpolatedColorLegend;
+        expands(expands: boolean): this;
         private static _ensureOrientation(orientation);
         /**
          * Gets the orientation.
@@ -2439,14 +2403,14 @@ declare module Plottable.Components {
          * @param {string} orientation One of "horizontal"/"left"/"right".
          * @returns {InterpolatedColorLegend} The calling InterpolatedColorLegend.
          */
-        orientation(orientation: string): InterpolatedColorLegend;
+        orientation(orientation: string): this;
         fixedWidth(): boolean;
         fixedHeight(): boolean;
         private _generateTicks(numSwatches?);
         protected _setup(): void;
         requestedSpace(offeredWidth: number, offeredHeight: number): SpaceRequest;
         private _isVertical();
-        renderImmediately(): InterpolatedColorLegend;
+        renderImmediately(): this;
     }
 }
 declare module Plottable.Components {
@@ -2462,10 +2426,10 @@ declare module Plottable.Components {
          * @param {QuantitativeScale} yScale The scale to base the y gridlines on. Pass null if no gridlines are desired.
          */
         constructor(xScale: QuantitativeScale<any>, yScale: QuantitativeScale<any>);
-        destroy(): Gridlines;
+        destroy(): this;
         protected _setup(): void;
-        renderImmediately(): Gridlines;
-        computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number): Gridlines;
+        renderImmediately(): this;
+        computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number): this;
         private _redrawXLines();
         private _redrawYLines();
     }
@@ -2521,12 +2485,12 @@ declare module Plottable.Components {
          * @param {number} col
          * @returns {Table} The calling Table.
          */
-        add(component: Component, row: number, col: number): Table;
+        add(component: Component, row: number, col: number): this;
         protected _remove(component: Component): boolean;
         private _iterateLayout(availableWidth, availableHeight, isFinalOffer?);
         private _determineGuarantees(offeredWidths, offeredHeights, isFinalOffer?);
         requestedSpace(offeredWidth: number, offeredHeight: number): SpaceRequest;
-        computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number): Table;
+        computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number): this;
         /**
          * Gets the padding above and below each row in pixels.
          */
@@ -2537,7 +2501,7 @@ declare module Plottable.Components {
          * @param {number} rowPadding
          * @returns {Table} The calling Table.
          */
-        rowPadding(rowPadding: number): Table;
+        rowPadding(rowPadding: number): this;
         /**
          * Gets the padding to the left and right of each column in pixels.
          */
@@ -2548,7 +2512,7 @@ declare module Plottable.Components {
          * @param {number} columnPadding
          * @returns {Table} The calling Table.
          */
-        columnPadding(columnPadding: number): Table;
+        columnPadding(columnPadding: number): this;
         /**
          * Gets the weight of the specified row.
          *
@@ -2580,7 +2544,7 @@ declare module Plottable.Components {
          * @param {number} weight
          * @returns {Table} The calling Table.
          */
-        rowWeight(index: number, weight: number): Table;
+        rowWeight(index: number, weight: number): this;
         /**
          * Gets the weight of the specified column.
          *
@@ -2597,7 +2561,7 @@ declare module Plottable.Components {
          * @param {number} weight
          * @returns {Table} The calling Table.
          */
-        columnWeight(index: number, weight: number): Table;
+        columnWeight(index: number, weight: number): this;
         fixedWidth(): boolean;
         fixedHeight(): boolean;
         private _padTableToSize(nRows, nCols);
@@ -2639,10 +2603,10 @@ declare module Plottable.Components {
          * @param {Bounds} newBounds
          * @return {SelectionBoxLayer} The calling SelectionBoxLayer.
          */
-        bounds(newBounds: Bounds): SelectionBoxLayer;
+        bounds(newBounds: Bounds): this;
         protected _setBounds(newBounds: Bounds): void;
         private _getBounds();
-        renderImmediately(): SelectionBoxLayer;
+        renderImmediately(): this;
         /**
          * Gets whether the box is being shown.
          */
@@ -2653,7 +2617,7 @@ declare module Plottable.Components {
          * @param {boolean} show Whether or not to show the box.
          * @return {SelectionBoxLayer} The calling SelectionBoxLayer.
          */
-        boxVisible(show: boolean): SelectionBoxLayer;
+        boxVisible(show: boolean): this;
         fixedWidth(): boolean;
         fixedHeight(): boolean;
         /**
@@ -2669,7 +2633,7 @@ declare module Plottable.Components {
          */
         xScale(xScale: QuantitativeScale<number | {
             valueOf(): number;
-        }>): SelectionBoxLayer;
+        }>): this;
         /**
          * Gets the y scale for this SelectionBoxLayer.
          */
@@ -2683,7 +2647,7 @@ declare module Plottable.Components {
          */
         yScale(yScale: QuantitativeScale<number | {
             valueOf(): number;
-        }>): SelectionBoxLayer;
+        }>): this;
         /**
          * Gets the data values backing the left and right edges of the box.
          *
@@ -2697,7 +2661,7 @@ declare module Plottable.Components {
          */
         xExtent(xExtent: (number | {
             valueOf(): number;
-        })[]): SelectionBoxLayer;
+        })[]): this;
         private _getXExtent();
         protected _setXExtent(xExtent: (number | {
             valueOf(): number;
@@ -2715,7 +2679,7 @@ declare module Plottable.Components {
          */
         yExtent(yExtent: (number | {
             valueOf(): number;
-        })[]): SelectionBoxLayer;
+        })[]): this;
         private _getYExtent();
         protected _setYExtent(yExtent: (number | {
             valueOf(): number;
@@ -2743,8 +2707,8 @@ declare module Plottable.Components {
         protected _isVertical(): boolean;
         fixedWidth(): boolean;
         fixedHeight(): boolean;
-        computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number): GuideLineLayer<D>;
-        renderImmediately(): GuideLineLayer<D>;
+        computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number): this;
+        renderImmediately(): this;
         private _syncPixelPositionAndValue();
         protected _setPixelPositionWithoutChangingMode(pixelPosition: number): void;
         /**
@@ -2761,7 +2725,7 @@ declare module Plottable.Components {
          * @param {QuantitativeScale<D>} scale
          * @return {GuideLineLayer<D>} The calling GuideLineLayer.
          */
-        scale(scale: QuantitativeScale<D>): GuideLineLayer<D>;
+        scale(scale: QuantitativeScale<D>): this;
         /**
          * Gets the value of the guide line in data-space.
          *
@@ -2775,7 +2739,7 @@ declare module Plottable.Components {
          * @param {D} value
          * @return {GuideLineLayer<D>} The calling GuideLineLayer.
          */
-        value(value: D): GuideLineLayer<D>;
+        value(value: D): this;
         /**
          * Gets the position of the guide line in pixel-space.
          *
@@ -2789,7 +2753,7 @@ declare module Plottable.Components {
          * @param {number} pixelPosition
          * @return {GuideLineLayer<D>} The calling GuideLineLayer.
          */
-        pixelPosition(pixelPosition: number): GuideLineLayer<D>;
+        pixelPosition(pixelPosition: number): this;
         destroy(): void;
     }
 }
@@ -2829,7 +2793,7 @@ declare module Plottable {
          * @constructor
          */
         constructor();
-        anchor(selection: d3.Selection<void>): Plot;
+        anchor(selection: d3.Selection<void>): this;
         protected _setup(): void;
         destroy(): void;
         protected _createNodesForDataset(dataset: Dataset): Drawer;
@@ -2849,7 +2813,7 @@ declare module Plottable {
          * @param {number|string|Accessor<number>|Accessor<string>} attrValue
          * @returns {Plot} The calling Plot.
          */
-        attr(attr: string, attrValue: number | string | Accessor<number> | Accessor<string>): Plot;
+        attr(attr: string, attrValue: number | string | Accessor<number> | Accessor<string>): this;
         /**
          * Sets a particular attribute to a scaled constant value or scaled result of an Accessor.
          * The provided Scale will account for the attribute values when autoDomain()-ing.
@@ -2859,11 +2823,11 @@ declare module Plottable {
          * @param {Scale<A, number | string>} scale The Scale used to scale the attrValue.
          * @returns {Plot} The calling Plot.
          */
-        attr<A>(attr: string, attrValue: A | Accessor<A>, scale: Scale<A, number | string>): Plot;
+        attr<A>(attr: string, attrValue: A | Accessor<A>, scale: Scale<A, number | string>): this;
         protected _bindProperty(property: string, value: any, scale: Scale<any, any>): void;
         private _bindAttr(attr, value, scale);
         protected _generateAttrToProjector(): AttributeToProjector;
-        renderImmediately(): Plot;
+        renderImmediately(): this;
         /**
          * Returns whether the plot will be animated.
          */
@@ -2871,8 +2835,8 @@ declare module Plottable {
         /**
          * Enables or disables animation.
          */
-        animated(willAnimate: boolean): Plot;
-        detach(): Plot;
+        animated(willAnimate: boolean): this;
+        detach(): this;
         /**
          * @returns {Scale[]} A unique array of all scales currently used by the Plot.
          */
@@ -2904,26 +2868,26 @@ declare module Plottable {
          * @param {Animator} animator
          * @returns {Plot} The calling Plot.
          */
-        animator(animatorKey: string, animator: Animator): Plot;
+        animator(animatorKey: string, animator: Animator): this;
         /**
          * Adds a Dataset to the Plot.
          *
          * @param {Dataset} dataset
          * @returns {Plot} The calling Plot.
          */
-        addDataset(dataset: Dataset): Plot;
-        protected _addDataset(dataset: Dataset): Plot;
+        addDataset(dataset: Dataset): this;
+        protected _addDataset(dataset: Dataset): this;
         /**
          * Removes a Dataset from the Plot.
          *
          * @param {Dataset} dataset
          * @returns {Plot} The calling Plot.
          */
-        removeDataset(dataset: Dataset): Plot;
-        protected _removeDataset(dataset: Dataset): Plot;
+        removeDataset(dataset: Dataset): this;
+        protected _removeDataset(dataset: Dataset): this;
         protected _removeDatasetNodes(dataset: Dataset): void;
         datasets(): Dataset[];
-        datasets(datasets: Dataset[]): Plot;
+        datasets(datasets: Dataset[]): this;
         protected _getDrawersInOrder(): Drawer[];
         protected _generateDrawSteps(): Drawers.DrawStep[];
         protected _additionalPaint(time: number): void;
@@ -2954,10 +2918,6 @@ declare module Plottable {
          * @returns {Plots.PlotEntity} The nearest PlotEntity, or undefined if no PlotEntity can be found.
          */
         entityNearest(queryPoint: Point): Plots.PlotEntity;
-        /**
-         * @deprecated As of release v1.1.0, replaced by _entityVisibleOnPlot()
-         */
-        protected _visibleOnPlot(datum: any, pixelPoint: Point, selection: d3.Selection<void>): boolean;
         protected _entityVisibleOnPlot(pixelPoint: Point, datum: any, index: number, dataset: Dataset): boolean;
         protected _uninstallScaleForKey(scale: Scale<any, any>, key: string): void;
         protected _installScaleForKey(scale: Scale<any, any>, key: string): void;
@@ -2982,12 +2942,12 @@ declare module Plottable.Plots {
          */
         constructor();
         protected _setup(): void;
-        computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number): Pie;
-        addDataset(dataset: Dataset): Pie;
-        protected _addDataset(dataset: Dataset): Pie;
-        removeDataset(dataset: Dataset): Pie;
+        computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number): this;
+        addDataset(dataset: Dataset): this;
+        protected _addDataset(dataset: Dataset): this;
+        removeDataset(dataset: Dataset): this;
         protected _removeDatasetNodes(dataset: Dataset): void;
-        protected _removeDataset(dataset: Dataset): Pie;
+        protected _removeDataset(dataset: Dataset): this;
         selections(datasets?: Dataset[]): d3.Selection<any>;
         protected _onDatasetUpdate(): void;
         protected _createDrawer(dataset: Dataset): Drawers.Arc;
@@ -3002,7 +2962,7 @@ declare module Plottable.Plots {
          * @param {number|Accessor<number>} sectorValue
          * @returns {Pie} The calling Pie Plot.
          */
-        sectorValue(sectorValue: number | Accessor<number>): Plots.Pie;
+        sectorValue(sectorValue: number | Accessor<number>): this;
         /**
          * Sets the sector value to a scaled constant value or scaled result of an Accessor.
          * The provided Scale will account for the values when autoDomain()-ing.
@@ -3011,7 +2971,7 @@ declare module Plottable.Plots {
          * @param {Scale<S, number>} scale
          * @returns {Pie} The calling Pie Plot.
          */
-        sectorValue<S>(sectorValue: S | Accessor<S>, scale: Scale<S, number>): Plots.Pie;
+        sectorValue<S>(sectorValue: S | Accessor<S>, scale: Scale<S, number>): this;
         /**
          * Gets the AccessorScaleBinding for the inner radius.
          */
@@ -3022,7 +2982,7 @@ declare module Plottable.Plots {
          * @param {number|Accessor<number>} innerRadius
          * @returns {Pie} The calling Pie Plot.
          */
-        innerRadius(innerRadius: number | Accessor<number>): Plots.Pie;
+        innerRadius(innerRadius: number | Accessor<number>): any;
         /**
          * Sets the inner radius to a scaled constant value or scaled result of an Accessor.
          * The provided Scale will account for the values when autoDomain()-ing.
@@ -3031,7 +2991,7 @@ declare module Plottable.Plots {
          * @param {Scale<R, number>} scale
          * @returns {Pie} The calling Pie Plot.
          */
-        innerRadius<R>(innerRadius: R | Accessor<R>, scale: Scale<R, number>): Plots.Pie;
+        innerRadius<R>(innerRadius: R | Accessor<R>, scale: Scale<R, number>): any;
         /**
          * Gets the AccessorScaleBinding for the outer radius.
          */
@@ -3042,7 +3002,7 @@ declare module Plottable.Plots {
          * @param {number|Accessor<number>} outerRadius
          * @returns {Pie} The calling Pie Plot.
          */
-        outerRadius(outerRadius: number | Accessor<number>): Plots.Pie;
+        outerRadius(outerRadius: number | Accessor<number>): this;
         /**
          * Sets the outer radius to a scaled constant value or scaled result of an Accessor.
          * The provided Scale will account for the values when autoDomain()-ing.
@@ -3051,7 +3011,7 @@ declare module Plottable.Plots {
          * @param {Scale<R, number>} scale
          * @returns {Pie} The calling Pie Plot.
          */
-        outerRadius<R>(outerRadius: R | Accessor<R>, scale: Scale<R, number>): Plots.Pie;
+        outerRadius<R>(outerRadius: R | Accessor<R>, scale: Scale<R, number>): this;
         /**
          * Get whether slice labels are enabled.
          *
@@ -3064,7 +3024,7 @@ declare module Plottable.Plots {
          * @param {boolean} labelsEnabled
          * @returns {Pie} The calling Pie Plot.
          */
-        labelsEnabled(enabled: boolean): Pie;
+        labelsEnabled(enabled: boolean): this;
         /**
          * Gets the Formatter for the labels.
          */
@@ -3075,7 +3035,7 @@ declare module Plottable.Plots {
          * @param {Formatter} formatter
          * @returns {Pie} The calling Pie Plot.
          */
-        labelFormatter(formatter: Formatter): Pie;
+        labelFormatter(formatter: Formatter): this;
         entitiesAt(queryPoint: Point): PlotEntity[];
         protected _propertyProjectors(): AttributeToProjector;
         private _updatePieAngles();
@@ -3124,7 +3084,7 @@ declare module Plottable {
          *
          * This option is intended for cases where performance is an issue.
          */
-        deferredRendering(deferredRendering: boolean): XYPlot<X, Y>;
+        deferredRendering(deferredRendering: boolean): this;
         /**
          * Gets the AccessorScaleBinding for X.
          */
@@ -3135,7 +3095,7 @@ declare module Plottable {
          * @param {number|Accessor<number>} x
          * @returns {XYPlot} The calling XYPlot.
          */
-        x(x: number | Accessor<number>): XYPlot<X, Y>;
+        x(x: number | Accessor<number>): this;
         /**
          * Sets X to a scaled constant value or scaled result of an Accessor.
          * The provided Scale will account for the values when autoDomain()-ing.
@@ -3144,7 +3104,7 @@ declare module Plottable {
          * @param {Scale<X, number>} xScale
          * @returns {XYPlot} The calling XYPlot.
          */
-        x(x: X | Accessor<X>, xScale: Scale<X, number>): XYPlot<X, Y>;
+        x(x: X | Accessor<X>, xScale: Scale<X, number>): this;
         /**
          * Gets the AccessorScaleBinding for Y.
          */
@@ -3155,7 +3115,7 @@ declare module Plottable {
          * @param {number|Accessor<number>} y
          * @returns {XYPlot} The calling XYPlot.
          */
-        y(y: number | Accessor<number>): XYPlot<X, Y>;
+        y(y: number | Accessor<number>): this;
         /**
          * Sets Y to a scaled constant value or scaled result of an Accessor.
          * The provided Scale will account for the values when autoDomain()-ing.
@@ -3164,12 +3124,12 @@ declare module Plottable {
          * @param {Scale<Y, number>} yScale
          * @returns {XYPlot} The calling XYPlot.
          */
-        y(y: Y | Accessor<Y>, yScale: Scale<Y, number>): XYPlot<X, Y>;
+        y(y: Y | Accessor<Y>, yScale: Scale<Y, number>): this;
         protected _filterForProperty(property: string): (datum: any, index: number, dataset: Dataset) => boolean;
         private _makeFilterByProperty(property);
         protected _uninstallScaleForKey(scale: Scale<any, any>, key: string): void;
         protected _installScaleForKey(scale: Scale<any, any>, key: string): void;
-        destroy(): XYPlot<X, Y>;
+        destroy(): this;
         /**
          * Gets the automatic domain adjustment mode for visible points.
          */
@@ -3184,8 +3144,8 @@ declare module Plottable {
          *   "none" means neither Scale will change automatically.
          * @returns {XYPlot} The calling XYPlot.
          */
-        autorangeMode(autorangeMode: string): XYPlot<X, Y>;
-        computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number): XYPlot<X, Y>;
+        autorangeMode(autorangeMode: string): this;
+        computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number): this;
         private _updateXExtentsAndAutodomain();
         private _updateYExtentsAndAutodomain();
         /**
@@ -3194,7 +3154,7 @@ declare module Plottable {
          *
          * @returns {XYPlot} The calling XYPlot.
          */
-        showAllData(): XYPlot<X, Y>;
+        showAllData(): this;
         private _adjustYDomainOnChangeFromX();
         private _adjustXDomainOnChangeFromY();
         protected _projectorsReady(): boolean;
@@ -3237,7 +3197,7 @@ declare module Plottable.Plots {
          * @param {number|Accessor<number>} x
          * @returns {Plots.Rectangle} The calling Rectangle Plot.
          */
-        x(x: number | Accessor<number>): Plots.Rectangle<X, Y>;
+        x(x: number | Accessor<number>): this;
         /**
          * Sets X to a scaled constant value or scaled result of an Accessor.
          * The provided Scale will account for the values when autoDomain()-ing.
@@ -3246,7 +3206,7 @@ declare module Plottable.Plots {
          * @param {Scale<X, number>} xScale
          * @returns {Plots.Rectangle} The calling Rectangle Plot.
          */
-        x(x: X | Accessor<X>, xScale: Scale<X, number>): Plots.Rectangle<X, Y>;
+        x(x: X | Accessor<X>, xScale: Scale<X, number>): this;
         /**
          * Gets the AccessorScaleBinding for X2.
          */
@@ -3258,7 +3218,7 @@ declare module Plottable.Plots {
          * @param {number|Accessor<number>|X|Accessor<X>} x2
          * @returns {Plots.Rectangle} The calling Rectangle Plot.
          */
-        x2(x2: number | Accessor<number> | X | Accessor<X>): Plots.Rectangle<X, Y>;
+        x2(x2: number | Accessor<number> | X | Accessor<X>): this;
         /**
          * Gets the AccessorScaleBinding for Y.
          */
@@ -3269,7 +3229,7 @@ declare module Plottable.Plots {
          * @param {number|Accessor<number>} y
          * @returns {Plots.Rectangle} The calling Rectangle Plot.
          */
-        y(y: number | Accessor<number>): Plots.Rectangle<X, Y>;
+        y(y: number | Accessor<number>): this;
         /**
          * Sets Y to a scaled constant value or scaled result of an Accessor.
          * The provided Scale will account for the values when autoDomain()-ing.
@@ -3278,7 +3238,7 @@ declare module Plottable.Plots {
          * @param {Scale<Y, number>} yScale
          * @returns {Plots.Rectangle} The calling Rectangle Plot.
          */
-        y(y: Y | Accessor<Y>, yScale: Scale<Y, number>): Plots.Rectangle<X, Y>;
+        y(y: Y | Accessor<Y>, yScale: Scale<Y, number>): this;
         /**
          * Gets the AccessorScaleBinding for Y2.
          */
@@ -3290,7 +3250,7 @@ declare module Plottable.Plots {
          * @param {number|Accessor<number>|Y|Accessor<Y>} y2
          * @returns {Plots.Rectangle} The calling Rectangle Plot.
          */
-        y2(y2: number | Accessor<number> | Y | Accessor<Y>): Plots.Rectangle<X, Y>;
+        y2(y2: number | Accessor<number> | Y | Accessor<Y>): this;
         /**
          * Gets the PlotEntities at a particular Point.
          *
@@ -3327,7 +3287,7 @@ declare module Plottable.Plots {
          * @param {Accessor<string>} label
          * @returns {Plots.Rectangle} The calling Rectangle Plot.
          */
-        label(label: Accessor<string>): Plots.Rectangle<X, Y>;
+        label(label: Accessor<string>): this;
         /**
          * Gets whether labels are enabled.
          *
@@ -3341,7 +3301,7 @@ declare module Plottable.Plots {
          * @param {boolean} labelsEnabled
          * @returns {Rectangle} The calling Rectangle Plot.
          */
-        labelsEnabled(enabled: boolean): Plots.Rectangle<X, Y>;
+        labelsEnabled(enabled: boolean): this;
         protected _propertyProjectors(): AttributeToProjector;
         protected _pixelPoint(datum: any, index: number, dataset: Dataset): {
             x: any;
@@ -3377,7 +3337,7 @@ declare module Plottable.Plots {
          * @param {number|Accessor<number>} size
          * @returns {Plots.Scatter} The calling Scatter Plot.
          */
-        size(size: number | Accessor<number>): Plots.Scatter<X, Y>;
+        size(size: number | Accessor<number>): this;
         /**
          * Sets the size property to a scaled constant value or scaled result of an Accessor.
          * The provided Scale will account for the values when autoDomain()-ing.
@@ -3386,7 +3346,7 @@ declare module Plottable.Plots {
          * @param {Scale<S, number>} scale
          * @returns {Plots.Scatter} The calling Scatter Plot.
          */
-        size<S>(size: S | Accessor<S>, scale: Scale<S, number>): Plots.Scatter<X, Y>;
+        size<S>(size: S | Accessor<S>, scale: Scale<S, number>): this;
         /**
          * Gets the AccessorScaleBinding for the symbol property of the plot.
          * The symbol property corresponds to how the symbol will be drawn.
@@ -3398,12 +3358,8 @@ declare module Plottable.Plots {
          * @param {Accessor<SymbolFactory>} symbol
          * @returns {Plots.Scatter} The calling Scatter Plot.
          */
-        symbol(symbol: Accessor<SymbolFactory>): Plots.Scatter<X, Y>;
+        symbol(symbol: Accessor<SymbolFactory>): this;
         protected _generateDrawSteps(): Drawers.DrawStep[];
-        /**
-         * @deprecated As of release v1.1.0, replaced by _entityVisibleOnPlot()
-         */
-        protected _visibleOnPlot(datum: any, pixelPoint: Point, selection: d3.Selection<void>): boolean;
         protected _entityVisibleOnPlot(pixelPoint: Point, datum: any, index: number, dataset: Dataset): boolean;
         protected _propertyProjectors(): AttributeToProjector;
         /**
@@ -3458,18 +3414,18 @@ declare module Plottable.Plots {
          */
         constructor(orientation?: string);
         x(): Plots.AccessorScaleBinding<X, number>;
-        x(x: number | Accessor<number>): Bar<X, Y>;
-        x(x: X | Accessor<X>, xScale: Scale<X, number>): Bar<X, Y>;
+        x(x: number | Accessor<number>): this;
+        x(x: X | Accessor<X>, xScale: Scale<X, number>): this;
         y(): Plots.AccessorScaleBinding<Y, number>;
-        y(y: number | Accessor<number>): Bar<X, Y>;
-        y(y: Y | Accessor<Y>, yScale: Scale<Y, number>): Bar<X, Y>;
+        y(y: number | Accessor<number>): this;
+        y(y: Y | Accessor<Y>, yScale: Scale<Y, number>): this;
         /**
          * Gets the orientation of the plot
          *
          * @return "vertical" | "horizontal"
          */
         orientation(): string;
-        render(): Bar<X, Y>;
+        render(): this;
         protected _createDrawer(dataset: Dataset): Drawers.Rectangle;
         protected _setup(): void;
         /**
@@ -3486,13 +3442,13 @@ declare module Plottable.Plots {
          * @param {X|Y} value
          * @returns {Bar} The calling Bar Plot.
          */
-        baselineValue(value: X | Y): Bar<X, Y>;
-        addDataset(dataset: Dataset): Bar<X, Y>;
-        protected _addDataset(dataset: Dataset): Bar<X, Y>;
-        removeDataset(dataset: Dataset): Bar<X, Y>;
-        protected _removeDataset(dataset: Dataset): Bar<X, Y>;
+        baselineValue(value: X | Y): this;
+        addDataset(dataset: Dataset): this;
+        protected _addDataset(dataset: Dataset): this;
+        removeDataset(dataset: Dataset): this;
+        protected _removeDataset(dataset: Dataset): this;
         datasets(): Dataset[];
-        datasets(datasets: Dataset[]): Plot;
+        datasets(datasets: Dataset[]): this;
         /**
          * Get whether bar labels are enabled.
          *
@@ -3505,7 +3461,7 @@ declare module Plottable.Plots {
          * @param {boolean} labelsEnabled
          * @returns {Bar} The calling Bar Plot.
          */
-        labelsEnabled(enabled: boolean): Bar<X, Y>;
+        labelsEnabled(enabled: boolean): this;
         /**
          * Gets the Formatter for the labels.
          */
@@ -3516,7 +3472,7 @@ declare module Plottable.Plots {
          * @param {Formatter} formatter
          * @returns {Bar} The calling Bar Plot.
          */
-        labelFormatter(formatter: Formatter): Bar<X, Y>;
+        labelFormatter(formatter: Formatter): this;
         protected _createNodesForDataset(dataset: Dataset): Drawer;
         protected _removeDatasetNodes(dataset: Dataset): void;
         /**
@@ -3530,10 +3486,6 @@ declare module Plottable.Plots {
          * @returns {PlotEntity} The nearest PlotEntity, or undefined if no PlotEntity can be found.
          */
         entityNearest(queryPoint: Point): PlotEntity;
-        /**
-         * @deprecated As of release v1.1.0, replaced by _entityVisibleOnPlot()
-         */
-        protected _visibleOnPlot(datum: any, pixelPoint: Point, selection: d3.Selection<void>): boolean;
         protected _entityVisibleOnPlot(pixelPoint: Point, datum: any, index: number, dataset: Dataset): boolean;
         /**
          * Gets the Entities at a particular Point.
@@ -3598,13 +3550,13 @@ declare module Plottable.Plots {
          */
         constructor();
         x(): Plots.AccessorScaleBinding<X, number>;
-        x(x: number | Accessor<number>): Line<X>;
-        x(x: X | Accessor<X>, xScale: Scale<X, number>): Line<X>;
+        x(x: number | Accessor<number>): this;
+        x(x: X | Accessor<X>, xScale: Scale<X, number>): this;
         y(): Plots.AccessorScaleBinding<number, number>;
-        y(y: number | Accessor<number>): Line<X>;
-        y(y: number | Accessor<number>, yScale: Scale<number, number>): Line<X>;
+        y(y: number | Accessor<number>): this;
+        y(y: number | Accessor<number>, yScale: Scale<number, number>): this;
         autorangeMode(): string;
-        autorangeMode(autorangeMode: string): Line<X>;
+        autorangeMode(autorangeMode: string): this;
         /**
          * Gets whether or not the autoranging is done smoothly.
          */
@@ -3615,7 +3567,7 @@ declare module Plottable.Plots {
          * Smooth autoranging is done by making sure lines always exit on the left / right side of the plot
          * and deactivating the nice domain feature on the scales
          */
-        autorangeSmooth(autorangeSmooth: boolean): Plots.Line<X>;
+        autorangeSmooth(autorangeSmooth: boolean): this;
         private _setScaleSnapping();
         /**
          * Gets the interpolation function associated with the plot.
@@ -3629,20 +3581,20 @@ declare module Plottable.Plots {
          * @param {string | points: Array<[number, number]>) => string} interpolator Interpolation function
          * @return Plots.Line
          */
-        interpolator(interpolator: string | ((points: Array<[number, number]>) => string)): Plots.Line<X>;
-        interpolator(interpolator: "linear"): Line<X>;
-        interpolator(interpolator: "linear-closed"): Line<X>;
-        interpolator(interpolator: "step"): Line<X>;
-        interpolator(interpolator: "step-before"): Line<X>;
-        interpolator(interpolator: "step-after"): Line<X>;
-        interpolator(interpolator: "basis"): Line<X>;
-        interpolator(interpolator: "basis-open"): Line<X>;
-        interpolator(interpolator: "basis-closed"): Line<X>;
-        interpolator(interpolator: "bundle"): Line<X>;
-        interpolator(interpolator: "cardinal"): Line<X>;
-        interpolator(interpolator: "cardinal-open"): Line<X>;
-        interpolator(interpolator: "cardinal-closed"): Line<X>;
-        interpolator(interpolator: "monotone"): Line<X>;
+        interpolator(interpolator: string | ((points: Array<[number, number]>) => string)): this;
+        interpolator(interpolator: "linear"): this;
+        interpolator(interpolator: "linear-closed"): this;
+        interpolator(interpolator: "step"): this;
+        interpolator(interpolator: "step-before"): this;
+        interpolator(interpolator: "step-after"): this;
+        interpolator(interpolator: "basis"): this;
+        interpolator(interpolator: "basis-open"): this;
+        interpolator(interpolator: "basis-closed"): this;
+        interpolator(interpolator: "bundle"): this;
+        interpolator(interpolator: "cardinal"): this;
+        interpolator(interpolator: "cardinal-open"): this;
+        interpolator(interpolator: "cardinal-closed"): this;
+        interpolator(interpolator: "monotone"): this;
         /**
          * Gets if downsampling is enabled
          *
@@ -3654,7 +3606,7 @@ declare module Plottable.Plots {
          *
          * @returns {Plots.Line} The calling Plots.Line
          */
-        downsamplingEnabled(downsampling: boolean): Plots.Line<X>;
+        downsamplingEnabled(downsampling: boolean): this;
         /**
          * Gets if croppedRendering is enabled
          *
@@ -3666,7 +3618,7 @@ declare module Plottable.Plots {
          *
          * @returns {Plots.Line} The calling Plots.Line
          */
-        croppedRenderingEnabled(croppedRendering: boolean): Plots.Line<X>;
+        croppedRenderingEnabled(croppedRendering: boolean): this;
         protected _createDrawer(dataset: Dataset): Drawer;
         protected _extentsForProperty(property: string): any[];
         private _getEdgeIntersectionPoints();
@@ -3702,8 +3654,8 @@ declare module Plottable.Plots {
         constructor();
         protected _setup(): void;
         y(): Plots.AccessorScaleBinding<number, number>;
-        y(y: number | Accessor<number>): Area<X>;
-        y(y: number | Accessor<number>, yScale: QuantitativeScale<number>): Area<X>;
+        y(y: number | Accessor<number>): this;
+        y(y: number | Accessor<number>, yScale: QuantitativeScale<number>): this;
         /**
          * Gets the AccessorScaleBinding for Y0.
          */
@@ -3715,10 +3667,10 @@ declare module Plottable.Plots {
          * @param {number|Accessor<number>} y0
          * @returns {Area} The calling Area Plot.
          */
-        y0(y0: number | Accessor<number>): Area<X>;
+        y0(y0: number | Accessor<number>): this;
         protected _onDatasetUpdate(): void;
-        addDataset(dataset: Dataset): Area<X>;
-        protected _addDataset(dataset: Dataset): Area<X>;
+        addDataset(dataset: Dataset): this;
+        protected _addDataset(dataset: Dataset): this;
         protected _removeDatasetNodes(dataset: Dataset): void;
         protected _additionalPaint(): void;
         private _generateLineDrawSteps();
@@ -3766,11 +3718,11 @@ declare module Plottable.Plots {
         protected _getAnimator(key: string): Animator;
         protected _setup(): void;
         x(): Plots.AccessorScaleBinding<X, number>;
-        x(x: number | Accessor<number>): StackedArea<X>;
-        x(x: X | Accessor<X>, xScale: Scale<X, number>): StackedArea<X>;
+        x(x: number | Accessor<number>): this;
+        x(x: X | Accessor<X>, xScale: Scale<X, number>): this;
         y(): Plots.AccessorScaleBinding<number, number>;
-        y(y: number | Accessor<number>): StackedArea<X>;
-        y(y: number | Accessor<number>, yScale: QuantitativeScale<number>): StackedArea<X>;
+        y(y: number | Accessor<number>): this;
+        y(y: number | Accessor<number>, yScale: QuantitativeScale<number>): this;
         /**
          * Gets if downsampling is enabled
          *
@@ -3783,10 +3735,10 @@ declare module Plottable.Plots {
          * For now, downsampling is always disabled in stacked area plot
          * @returns {Plots.StackedArea} The calling Plots.StackedArea
          */
-        downsamplingEnabled(downsampling: boolean): Plots.Line<X>;
+        downsamplingEnabled(downsampling: boolean): this;
         protected _additionalPaint(): void;
         protected _updateYScale(): void;
-        protected _onDatasetUpdate(): StackedArea<X>;
+        protected _onDatasetUpdate(): this;
         protected _updateExtentsForProperty(property: string): void;
         protected _extentsForProperty(attr: string): any[];
         private _updateStackExtentsAndOffsets();
@@ -3821,15 +3773,15 @@ declare module Plottable.Plots {
          */
         constructor(orientation?: string);
         x(): Plots.AccessorScaleBinding<X, number>;
-        x(x: number | Accessor<number>): StackedBar<X, Y>;
-        x(x: X | Accessor<X>, xScale: Scale<X, number>): StackedBar<X, Y>;
+        x(x: number | Accessor<number>): this;
+        x(x: X | Accessor<X>, xScale: Scale<X, number>): this;
         y(): Plots.AccessorScaleBinding<Y, number>;
-        y(y: number | Accessor<number>): StackedBar<X, Y>;
-        y(y: Y | Accessor<Y>, yScale: Scale<Y, number>): StackedBar<X, Y>;
+        y(y: number | Accessor<number>): this;
+        y(y: Y | Accessor<Y>, yScale: Scale<Y, number>): this;
         protected _generateAttrToProjector(): {
             [attr: string]: (datum: any, index: number, dataset: Dataset) => any;
         };
-        protected _onDatasetUpdate(): StackedBar<X, Y>;
+        protected _onDatasetUpdate(): this;
         protected _updateExtentsForProperty(property: string): void;
         protected _extentsForProperty(attr: string): any[];
         private _updateStackExtentsAndOffsets();
@@ -3859,7 +3811,7 @@ declare module Plottable.Plots {
          * @param {X|Accessor<X>} x
          * @returns {Plots.Segment} The calling Segment Plot.
          */
-        x(x: number | Accessor<number>): Plots.Segment<X, Y>;
+        x(x: number | Accessor<number>): this;
         /**
          * Sets X to a scaled constant value or scaled result of an Accessor.
          * The provided Scale will account for the values when autoDomain()-ing.
@@ -3868,7 +3820,7 @@ declare module Plottable.Plots {
          * @param {Scale<X, number>} xScale
          * @returns {Plots.Segment} The calling Segment Plot.
          */
-        x(x: X | Accessor<X>, xScale: Scale<X, number>): Plots.Segment<X, Y>;
+        x(x: X | Accessor<X>, xScale: Scale<X, number>): this;
         /**
          * Gets the AccessorScaleBinding for X2
          */
@@ -3880,7 +3832,7 @@ declare module Plottable.Plots {
          * @param {number|Accessor<number>|Y|Accessor<Y>} y2
          * @returns {Plots.Segment} The calling Segment Plot
          */
-        x2(x2: number | Accessor<number> | X | Accessor<X>): Plots.Segment<X, Y>;
+        x2(x2: number | Accessor<number> | X | Accessor<X>): this;
         /**
          * Gets the AccessorScaleBinding for Y
          */
@@ -3891,7 +3843,7 @@ declare module Plottable.Plots {
          * @param {Y|Accessor<Y>} y
          * @returns {Plots.Segment} The calling Segment Plot.
          */
-        y(y: number | Accessor<number>): Plots.Segment<X, Y>;
+        y(y: number | Accessor<number>): this;
         /**
          * Sets Y to a scaled constant value or scaled result of an Accessor.
          * The provided Scale will account for the values when autoDomain()-ing.
@@ -3900,7 +3852,7 @@ declare module Plottable.Plots {
          * @param {Scale<Y, number>} yScale
          * @returns {Plots.Segment} The calling Segment Plot.
          */
-        y(y: Y | Accessor<Y>, yScale: Scale<Y, number>): Plots.Segment<X, Y>;
+        y(y: Y | Accessor<Y>, yScale: Scale<Y, number>): this;
         /**
          * Gets the AccessorScaleBinding for Y2.
          */
@@ -3912,7 +3864,7 @@ declare module Plottable.Plots {
          * @param {number|Accessor<number>|Y|Accessor<Y>} y2
          * @returns {Plots.Segment} The calling Segment Plot.
          */
-        y2(y2: number | Accessor<number> | Y | Accessor<Y>): Plots.Segment<X, Y>;
+        y2(y2: number | Accessor<number> | Y | Accessor<Y>): this;
         protected _propertyProjectors(): AttributeToProjector;
         /**
          * Gets the Entities that intersect the Bounds.
@@ -3959,7 +3911,7 @@ declare module Plottable.Plots {
          * @param {boolean} enabled
          * @returns {Plots.Waterfall} The calling Waterfall Plot.
          */
-        connectorsEnabled(enabled: boolean): Waterfall<X, Y>;
+        connectorsEnabled(enabled: boolean): this;
         /**
          * Gets the AccessorScaleBinding for whether a bar represents a total or a delta.
          */
@@ -3970,104 +3922,17 @@ declare module Plottable.Plots {
          * @param {Accessor<boolean>}
          * @returns {Plots.Waterfall} The calling Waterfall Plot.
          */
-        total(total: Accessor<boolean>): Waterfall<X, Y>;
+        total(total: Accessor<boolean>): this;
         protected _additionalPaint(time: number): void;
         protected _createNodesForDataset(dataset: Dataset): Drawer;
         protected _extentsForProperty(attr: string): any[];
         protected _generateAttrToProjector(): {
             [attr: string]: (datum: any, index: number, dataset: Dataset) => any;
         };
-        protected _onDatasetUpdate(): Waterfall<X, Y>;
+        protected _onDatasetUpdate(): this;
         private _calculateSubtotalsAndExtent(dataset);
         private _drawConnectors();
         private _updateSubtotals();
-    }
-}
-declare module Plottable.Plots {
-    class Wheel<R, T> extends Plot {
-        private static _R_KEY;
-        private static _R2_KEY;
-        private static _T_KEY;
-        private static _T2_KEY;
-        /**
-         * @constructor
-         */
-        constructor();
-        computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number): Wheel<R, T>;
-        protected _createDrawer(dataset: Dataset): Drawers.Arc;
-        entities(datasets?: Dataset[]): PlotEntity[];
-        protected _getDataToDraw(): Utils.Map<Dataset, any[]>;
-        protected _propertyProjectors(): AttributeToProjector;
-        /**
-         * Gets the AccessorScaleBinding for t in degrees.
-         */
-        t(): AccessorScaleBinding<T, number>;
-        /**
-         * Sets t to a constant number or the result of an Accessor<number> in degrees.
-         *
-         * @param {number|Accessor<number>} t
-         * @returns {Wheel} The calling Wheel Plot.
-         */
-        t(t: number | Accessor<number>): Plots.Wheel<R, T>;
-        /**
-         * Sets t to a scaled constant value or scaled result of an Accessor in degrees.
-         * The supplied Scale will also be used for t2().
-         * The provided Scale will account for the values when autoDomain()-ing.
-         *
-         * @param {T|Accessor<T>} t
-         * @param {QuantitativeScale<T>} scale
-         * @returns {Wheel} The calling Wheel Plot.
-         */
-        t(t: T | Accessor<T>, scale: QuantitativeScale<T>): Plots.Wheel<R, T>;
-        /**
-         * Gets the AccessorScaleBinding for t2 in degrees.
-         */
-        t2(): AccessorScaleBinding<T, number>;
-        /**
-         * Sets t2 to a constant number or the result of an Accessor<number> in degrees.
-         * If a Scale has been set for t, it will also be used to scale t2.
-         *
-         * @param {number|Accessor<number|T|Accessor<T>>} t2
-         * @returns {Wheel} The calling Wheel Plot.
-         */
-        t2(t2: number | Accessor<number> | T | Accessor<T>): Plots.Wheel<R, T>;
-        /**
-         * Gets the AccessorScaleBinding for r.
-         */
-        r(): AccessorScaleBinding<R, number>;
-        /**
-         * Sets r to a constant number or the result of an Accessor<number>.
-         *
-         * @param {number|Accessor<number>} r
-         * @returns {Wheel} The calling Wheel Plot.
-         */
-        r(r: number | Accessor<number>): Plots.Wheel<R, T>;
-        /**
-         * Sets r to a scaled constant value or scaled result of an Accessor.
-         * The supplied Scale will also be used for r2().
-         * The provided Scale will account for the values when autoDomain()-ing.
-         *
-         * @param {R|Accessor<R>} r
-         * @param {QuantitativeScale<R>} scale
-         * @returns {Wheel} The calling Wheel Plot.
-         */
-        r(r: R | Accessor<R>, scale: QuantitativeScale<R>): Plots.Wheel<R, T>;
-        /**
-         * Gets the AccessorScaleBinding for r2.
-         */
-        r2(): AccessorScaleBinding<R, number>;
-        /**
-         * Sets r2 to a constant number or the result of an Accessor<number>.
-         * If a Scale has been set for r, it will also be used to scale r2.
-         *
-         * @param {number|Accessor<number>|R|Accessor<R>} r2
-         * @returns {Wheel} The calling Wheel Plot.
-         */
-        r2(r2: number | Accessor<number> | R | Accessor<R>): Plots.Wheel<R, T>;
-        protected _pixelPoint(datum: any, index: number, dataset: Dataset): {
-            x: number;
-            y: number;
-        };
     }
 }
 declare module Plottable.Animators {
@@ -4212,7 +4077,7 @@ declare module Plottable.Animators {
          * @param {number} startDelay The start delay in milliseconds.
          * @returns {Easing} The calling Easing Animator.
          */
-        startDelay(startDelay: number): Easing;
+        startDelay(startDelay: number): this;
         /**
          * Gets the duration of one animation step in milliseconds.
          *
@@ -4225,7 +4090,7 @@ declare module Plottable.Animators {
          * @param {number} stepDuration The duration in milliseconds.
          * @returns {Easing} The calling Easing Animator.
          */
-        stepDuration(stepDuration: number): Easing;
+        stepDuration(stepDuration: number): this;
         /**
          * Gets the maximum start delay between animation steps in milliseconds.
          *
@@ -4238,7 +4103,7 @@ declare module Plottable.Animators {
          * @param {number} stepDelay The maximum iterative delay in milliseconds.
          * @returns {Easing} The calling Easing Animator.
          */
-        stepDelay(stepDelay: number): Easing;
+        stepDelay(stepDelay: number): this;
         /**
          * Gets the maximum total animation duration constraint in milliseconds.
          *
@@ -4259,7 +4124,7 @@ declare module Plottable.Animators {
          * @param {number} maxTotalDuration The maximum total animation duration in milliseconds.
          * @returns {Easing} The calling Easing Animator.
          */
-        maxTotalDuration(maxTotalDuration: number): Easing;
+        maxTotalDuration(maxTotalDuration: number): this;
         /**
          * Gets the current easing mode of the animation.
          *
@@ -4272,7 +4137,7 @@ declare module Plottable.Animators {
          * @param {string} easingMode The desired easing mode.
          * @returns {Easing} The calling Easing Animator.
          */
-        easingMode(easingMode: string): Easing;
+        easingMode(easingMode: string): this;
         /**
          * Adjust the iterative delay, such that it takes into account the maxTotalDuration constraint
          */
@@ -4281,16 +4146,17 @@ declare module Plottable.Animators {
 }
 declare module Plottable {
     class Dispatcher {
-        protected _eventToCallback: {
+        protected _eventToProcessingFunction: {
             [eventName: string]: (e: Event) => any;
         };
-        protected _callbacks: Utils.CallbackSet<Function>[];
+        private _eventNameToCallbackSet;
         private _connected;
-        private _hasNoListeners();
+        private _hasNoCallbacks();
         private _connect();
         private _disconnect();
-        protected _setCallback(callbackSet: Utils.CallbackSet<Function>, callback: Function): void;
-        protected _unsetCallback(callbackSet: Utils.CallbackSet<Function>, callback: Function): void;
+        protected _addCallbackForEvent(eventName: string, callback: Function): void;
+        protected _removeCallbackForEvent(eventName: string, callback: Function): void;
+        protected _callCallbacksForEvent(eventName: string, ...args: any[]): void;
     }
 }
 declare module Plottable.Dispatchers {
@@ -4299,11 +4165,13 @@ declare module Plottable.Dispatchers {
         private static _DISPATCHER_KEY;
         private _translator;
         private _lastMousePosition;
-        private _moveCallbacks;
-        private _downCallbacks;
-        private _upCallbacks;
-        private _wheelCallbacks;
-        private _dblClickCallbacks;
+        private static _MOUSEOVER_EVENT_NAME;
+        private static _MOUSEMOVE_EVENT_NAME;
+        private static _MOUSEOUT_EVENT_NAME;
+        private static _MOUSEDOWN_EVENT_NAME;
+        private static _MOUSEUP_EVENT_NAME;
+        private static _WHEEL_EVENT_NAME;
+        private static _DBLCLICK_EVENT_NAME;
         /**
          * Get a Mouse Dispatcher for the <svg> containing elem.
          * If one already exists on that <svg>, it will be returned; otherwise, a new one will be created.
@@ -4325,75 +4193,75 @@ declare module Plottable.Dispatchers {
          * @param {MouseCallback} callback
          * @return {Dispatchers.Mouse} The calling Mouse Dispatcher.
          */
-        onMouseMove(callback: MouseCallback): Dispatchers.Mouse;
+        onMouseMove(callback: MouseCallback): this;
         /**
          * Removes a callback that would be called when the mouse position changes.
          *
          * @param {MouseCallback} callback
          * @return {Dispatchers.Mouse} The calling Mouse Dispatcher.
          */
-        offMouseMove(callback: MouseCallback): Dispatchers.Mouse;
+        offMouseMove(callback: MouseCallback): this;
         /**
          * Registers a callback to be called when a mousedown occurs.
          *
          * @param {MouseCallback} callback
          * @return {Dispatchers.Mouse} The calling Mouse Dispatcher.
          */
-        onMouseDown(callback: MouseCallback): Dispatchers.Mouse;
+        onMouseDown(callback: MouseCallback): this;
         /**
          * Removes a callback that would be called when a mousedown occurs.
          *
          * @param {MouseCallback} callback
          * @return {Dispatchers.Mouse} The calling Mouse Dispatcher.
          */
-        offMouseDown(callback: MouseCallback): Dispatchers.Mouse;
+        offMouseDown(callback: MouseCallback): this;
         /**
          * Registers a callback to be called when a mouseup occurs.
          *
          * @param {MouseCallback} callback
          * @return {Dispatchers.Mouse} The calling Mouse Dispatcher.
          */
-        onMouseUp(callback: MouseCallback): Dispatchers.Mouse;
+        onMouseUp(callback: MouseCallback): this;
         /**
          * Removes a callback that would be called when a mouseup occurs.
          *
          * @param {MouseCallback} callback
          * @return {Dispatchers.Mouse} The calling Mouse Dispatcher.
          */
-        offMouseUp(callback: MouseCallback): Dispatchers.Mouse;
+        offMouseUp(callback: MouseCallback): this;
         /**
          * Registers a callback to be called when a wheel event occurs.
          *
          * @param {MouseCallback} callback
          * @return {Dispatchers.Mouse} The calling Mouse Dispatcher.
          */
-        onWheel(callback: MouseCallback): Dispatchers.Mouse;
+        onWheel(callback: MouseCallback): this;
         /**
          * Removes a callback that would be called when a wheel event occurs.
          *
          * @param {MouseCallback} callback
          * @return {Dispatchers.Mouse} The calling Mouse Dispatcher.
          */
-        offWheel(callback: MouseCallback): Dispatchers.Mouse;
+        offWheel(callback: MouseCallback): this;
         /**
          * Registers a callback to be called when a dblClick occurs.
          *
          * @param {MouseCallback} callback
          * @return {Dispatchers.Mouse} The calling Mouse Dispatcher.
          */
-        onDblClick(callback: MouseCallback): Dispatchers.Mouse;
+        onDblClick(callback: MouseCallback): this;
         /**
          * Removes a callback that would be called when a dblClick occurs.
          *
          * @param {MouseCallback} callback
          * @return {Dispatchers.Mouse} The calling Mouse Dispatcher.
          */
-        offDblClick(callback: MouseCallback): Dispatchers.Mouse;
+        offDblClick(callback: MouseCallback): this;
         /**
          * Computes the mouse position from the given event, and if successful
          * calls all the callbacks in the provided callbackSet.
          */
-        private _measureAndDispatch(event, callbackSet, scope?);
+        private _measureAndDispatch(event, eventName, scope?);
         eventInsideSVG(event: MouseEvent): boolean;
         /**
          * Returns the last computed mouse position in <svg> coordinate space.
@@ -4409,11 +4277,11 @@ declare module Plottable.Dispatchers {
     }, event: TouchEvent) => void;
     class Touch extends Dispatcher {
         private static _DISPATCHER_KEY;
+        private static _TOUCHSTART_EVENT_NAME;
+        private static _TOUCHMOVE_EVENT_NAME;
+        private static _TOUCHEND_EVENT_NAME;
+        private static _TOUCHCANCEL_EVENT_NAME;
         private _translator;
-        private _startCallbacks;
-        private _moveCallbacks;
-        private _endCallbacks;
-        private _cancelCallbacks;
         /**
          * Gets a Touch Dispatcher for the <svg> containing elem.
          * If one already exists on that <svg>, it will be returned; otherwise, a new one will be created.
@@ -4435,61 +4303,61 @@ declare module Plottable.Dispatchers {
          * @param {TouchCallback} callback
          * @return {Dispatchers.Touch} The calling Touch Dispatcher.
          */
-        onTouchStart(callback: TouchCallback): Dispatchers.Touch;
+        onTouchStart(callback: TouchCallback): this;
         /**
          * Removes a callback that would be called when a touch starts.
          *
          * @param {TouchCallback} callback
          * @return {Dispatchers.Touch} The calling Touch Dispatcher.
          */
-        offTouchStart(callback: TouchCallback): Dispatchers.Touch;
+        offTouchStart(callback: TouchCallback): this;
         /**
          * Registers a callback to be called when the touch position changes.
          *
          * @param {TouchCallback} callback
          * @return {Dispatchers.Touch} The calling Touch Dispatcher.
          */
-        onTouchMove(callback: TouchCallback): Dispatchers.Touch;
+        onTouchMove(callback: TouchCallback): this;
         /**
          * Removes a callback that would be called when the touch position changes.
          *
          * @param {TouchCallback} callback
          * @return {Dispatchers.Touch} The calling Touch Dispatcher.
          */
-        offTouchMove(callback: TouchCallback): Dispatchers.Touch;
+        offTouchMove(callback: TouchCallback): this;
         /**
          * Registers a callback to be called when a touch ends.
          *
          * @param {TouchCallback} callback
          * @return {Dispatchers.Touch} The calling Touch Dispatcher.
          */
-        onTouchEnd(callback: TouchCallback): Dispatchers.Touch;
+        onTouchEnd(callback: TouchCallback): this;
         /**
          * Removes a callback that would be called when a touch ends.
          *
          * @param {TouchCallback} callback
          * @return {Dispatchers.Touch} The calling Touch Dispatcher.
          */
-        offTouchEnd(callback: TouchCallback): Dispatchers.Touch;
+        offTouchEnd(callback: TouchCallback): this;
         /**
          * Registers a callback to be called when a touch is cancelled.
          *
          * @param {TouchCallback} callback
          * @return {Dispatchers.Touch} The calling Touch Dispatcher.
          */
-        onTouchCancel(callback: TouchCallback): Dispatchers.Touch;
+        onTouchCancel(callback: TouchCallback): this;
         /**
          * Removes a callback that would be called when a touch is cancelled.
          *
          * @param {TouchCallback} callback
          * @return {Dispatchers.Touch} The calling Touch Dispatcher.
          */
-        offTouchCancel(callback: TouchCallback): Dispatchers.Touch;
+        offTouchCancel(callback: TouchCallback): this;
         /**
          * Computes the Touch position from the given event, and if successful
          * calls all the callbacks in the provided callbackSet.
          */
-        private _measureAndDispatch(event, callbackSet, scope?);
+        private _measureAndDispatch(event, eventName, scope?);
         eventInsideSVG(event: TouchEvent): boolean;
     }
 }
@@ -4497,8 +4365,8 @@ declare module Plottable.Dispatchers {
     type KeyCallback = (keyCode: number, event: KeyboardEvent) => void;
     class Key extends Dispatcher {
         private static _DISPATCHER_KEY;
-        private _keydownCallbacks;
-        private _keyupCallbacks;
+        private static _KEYDOWN_EVENT_NAME;
+        private static _KEYUP_EVENT_NAME;
         /**
          * Gets a Key Dispatcher. If one already exists it will be returned;
          * otherwise, a new one will be created.
@@ -4512,35 +4380,35 @@ declare module Plottable.Dispatchers {
          * @constructor
          */
         constructor();
+        private _processKeydown(event);
+        private _processKeyup(event);
         /**
          * Registers a callback to be called whenever a key is pressed.
          *
          * @param {KeyCallback} callback
          * @return {Dispatchers.Key} The calling Key Dispatcher.
          */
-        onKeyDown(callback: KeyCallback): Key;
+        onKeyDown(callback: KeyCallback): this;
         /**
          * Removes the callback to be called whenever a key is pressed.
          *
          * @param {KeyCallback} callback
          * @return {Dispatchers.Key} The calling Key Dispatcher.
          */
-        offKeyDown(callback: KeyCallback): Key;
+        offKeyDown(callback: KeyCallback): this;
         /** Registers a callback to be called whenever a key is released.
          *
          * @param {KeyCallback} callback
          * @return {Dispatchers.Key} The calling Key Dispatcher.
          */
-        onKeyUp(callback: KeyCallback): Key;
+        onKeyUp(callback: KeyCallback): this;
         /**
          * Removes the callback to be called whenever a key is released.
          *
          * @param {KeyCallback} callback
          * @return {Dispatchers.Key} The calling Key Dispatcher.
          */
-        offKeyUp(callback: KeyCallback): Key;
-        private _processKeydown(event);
-        private _processKeyup(event);
+        offKeyUp(callback: KeyCallback): this;
     }
 }
 declare module Plottable {
@@ -4558,7 +4426,7 @@ declare module Plottable {
          * @param {Component} component
          * @returns {Interaction} The calling Interaction.
          */
-        attachTo(component: Component): Interaction;
+        attachTo(component: Component): this;
         private _connect();
         /**
          * Detaches this Interaction from the Component.
@@ -4567,7 +4435,7 @@ declare module Plottable {
          * @param {Component} component
          * @returns {Interaction} The calling Interaction.
          */
-        detachFrom(component: Component): Interaction;
+        detachFrom(component: Component): this;
         private _disconnect();
         /**
          * Gets whether this Interaction is enabled.
@@ -4579,7 +4447,7 @@ declare module Plottable {
          * @param {boolean} enabled Whether the Interaction should be enabled.
          * @return {Interaction} The calling Interaction.
          */
-        enabled(enabled: boolean): Interaction;
+        enabled(enabled: boolean): this;
         /**
          * Translates an <svg>-coordinate-space point to Component-space coordinates.
          *
@@ -4620,14 +4488,14 @@ declare module Plottable.Interactions {
          * @param {ClickCallback} callback
          * @return {Interactions.Click} The calling Click Interaction.
          */
-        onClick(callback: ClickCallback): Click;
+        onClick(callback: ClickCallback): this;
         /**
          * Removes a callback that would be called when the Component is clicked.
          *
          * @param {ClickCallback} callback
          * @return {Interactions.Click} The calling Click Interaction.
          */
-        offClick(callback: ClickCallback): Click;
+        offClick(callback: ClickCallback): this;
     }
 }
 declare module Plottable.Interactions {
@@ -4657,14 +4525,14 @@ declare module Plottable.Interactions {
          * @param {ClickCallback} callback
          * @return {Interactions.DoubleClick} The calling DoubleClick Interaction.
          */
-        onDoubleClick(callback: ClickCallback): DoubleClick;
+        onDoubleClick(callback: ClickCallback): this;
         /**
          * Removes a callback that would be called when the Component is double-clicked.
          *
          * @param {ClickCallback} callback
          * @return {Interactions.DoubleClick} The calling DoubleClick Interaction.
          */
-        offDoubleClick(callback: ClickCallback): DoubleClick;
+        offDoubleClick(callback: ClickCallback): this;
     }
 }
 declare module Plottable {
@@ -4695,7 +4563,7 @@ declare module Plottable {
              * @param {KeyCallback} callback
              * @returns {Interactions.Key} The calling Key Interaction.
              */
-            onKeyPress(keyCode: number, callback: KeyCallback): Key;
+            onKeyPress(keyCode: number, callback: KeyCallback): this;
             /**
              * Removes a callback that would be called when the key with the given keyCode is
              * pressed and the user is moused over the Component.
@@ -4704,7 +4572,7 @@ declare module Plottable {
              * @param {KeyCallback} callback
              * @returns {Interactions.Key} The calling Key Interaction.
              */
-            offKeyPress(keyCode: number, callback: KeyCallback): Key;
+            offKeyPress(keyCode: number, callback: KeyCallback): this;
             /**
              * Adds a callback to be called when the key with the given keyCode is
              * released if the key was pressed with the mouse inside of the Component.
@@ -4713,7 +4581,7 @@ declare module Plottable {
              * @param {KeyCallback} callback
              * @returns {Interactions.Key} The calling Key Interaction.
              */
-            onKeyRelease(keyCode: number, callback: KeyCallback): Key;
+            onKeyRelease(keyCode: number, callback: KeyCallback): this;
             /**
              * Removes a callback that would be called when the key with the given keyCode is
              * released if the key was pressed with the mouse inside of the Component.
@@ -4722,7 +4590,7 @@ declare module Plottable {
              * @param {KeyCallback} callback
              * @returns {Interactions.Key} The calling Key Interaction.
              */
-            offKeyRelease(keyCode: number, callback: KeyCallback): Key;
+            offKeyRelease(keyCode: number, callback: KeyCallback): this;
         }
     }
 }
@@ -4741,49 +4609,51 @@ declare module Plottable.Interactions {
         private _touchStartCallback;
         protected _anchor(component: Component): void;
         protected _unanchor(): void;
-        private _handlePointerEvent(p);
+        private _handleMouseEvent(p, e);
+        private _handleTouchEvent(p, e);
+        private _handlePointerEvent(p, insideSVG);
         /**
          * Adds a callback to be called when the pointer enters the Component.
          *
          * @param {PointerCallback} callback
          * @return {Interactions.Pointer} The calling Pointer Interaction.
          */
-        onPointerEnter(callback: PointerCallback): Pointer;
+        onPointerEnter(callback: PointerCallback): this;
         /**
          * Removes a callback that would be called when the pointer enters the Component.
          *
          * @param {PointerCallback} callback
          * @return {Interactions.Pointer} The calling Pointer Interaction.
          */
-        offPointerEnter(callback: PointerCallback): Pointer;
+        offPointerEnter(callback: PointerCallback): this;
         /**
          * Adds a callback to be called when the pointer moves within the Component.
          *
          * @param {PointerCallback} callback
          * @return {Interactions.Pointer} The calling Pointer Interaction.
          */
-        onPointerMove(callback: PointerCallback): Pointer;
+        onPointerMove(callback: PointerCallback): this;
         /**
          * Removes a callback that would be called when the pointer moves within the Component.
          *
          * @param {PointerCallback} callback
          * @return {Interactions.Pointer} The calling Pointer Interaction.
          */
-        offPointerMove(callback: PointerCallback): Pointer;
+        offPointerMove(callback: PointerCallback): this;
         /**
          * Adds a callback to be called when the pointer exits the Component.
          *
          * @param {PointerCallback} callback
          * @return {Interactions.Pointer} The calling Pointer Interaction.
          */
-        onPointerExit(callback: PointerCallback): Pointer;
+        onPointerExit(callback: PointerCallback): this;
         /**
          * Removes a callback that would be called when the pointer exits the Component.
          *
          * @param {PointerCallback} callback
          * @return {Interactions.Pointer} The calling Pointer Interaction.
          */
-        offPointerExit(callback: PointerCallback): Pointer;
+        offPointerExit(callback: PointerCallback): this;
     }
 }
 declare module Plottable.Interactions {
@@ -4836,7 +4706,7 @@ declare module Plottable.Interactions {
          *
          * @returns {Interactions.PanZoom} The calling PanZoom Interaction.
          */
-        xScales(xScales: QuantitativeScale<any>[]): Interactions.PanZoom;
+        xScales(xScales: QuantitativeScale<any>[]): this;
         /**
          * Gets the y scales for this PanZoom Interaction.
          */
@@ -4846,35 +4716,35 @@ declare module Plottable.Interactions {
          *
          * @returns {Interactions.PanZoom} The calling PanZoom Interaction.
          */
-        yScales(yScales: QuantitativeScale<any>[]): Interactions.PanZoom;
+        yScales(yScales: QuantitativeScale<any>[]): this;
         /**
          * Adds an x scale to this PanZoom Interaction
          *
          * @param {QuantitativeScale<any>} An x scale to add
          * @returns {Interactions.PanZoom} The calling PanZoom Interaction.
          */
-        addXScale(xScale: QuantitativeScale<any>): PanZoom;
+        addXScale(xScale: QuantitativeScale<any>): this;
         /**
          * Removes an x scale from this PanZoom Interaction
          *
          * @param {QuantitativeScale<any>} An x scale to remove
          * @returns {Interactions.PanZoom} The calling PanZoom Interaction.
          */
-        removeXScale(xScale: QuantitativeScale<any>): PanZoom;
+        removeXScale(xScale: QuantitativeScale<any>): this;
         /**
          * Adds a y scale to this PanZoom Interaction
          *
          * @param {QuantitativeScale<any>} A y scale to add
          * @returns {Interactions.PanZoom} The calling PanZoom Interaction.
          */
-        addYScale(yScale: QuantitativeScale<any>): PanZoom;
+        addYScale(yScale: QuantitativeScale<any>): this;
         /**
          * Removes a y scale from this PanZoom Interaction
          *
          * @param {QuantitativeScale<any>} A y scale to remove
          * @returns {Interactions.PanZoom} The calling PanZoom Interaction.
          */
-        removeYScale(yScale: QuantitativeScale<any>): PanZoom;
+        removeYScale(yScale: QuantitativeScale<any>): this;
         /**
          * Gets the minimum domain extent for the scale, specifying the minimum allowable amount
          * between the ends of the domain.
@@ -4895,7 +4765,7 @@ declare module Plottable.Interactions {
          * @param {D} minDomainExtent The minimum domain extent for the scale.
          * @returns {Interactions.PanZoom} The calling PanZoom Interaction.
          */
-        minDomainExtent<D>(quantitativeScale: QuantitativeScale<D>, minDomainExtent: D): Interactions.PanZoom;
+        minDomainExtent<D>(quantitativeScale: QuantitativeScale<D>, minDomainExtent: D): this;
         /**
          * Gets the maximum domain extent for the scale, specifying the maximum allowable amount
          * between the ends of the domain.
@@ -4916,7 +4786,7 @@ declare module Plottable.Interactions {
          * @param {D} minDomainExtent The maximum domain extent for the scale.
          * @returns {Interactions.PanZoom} The calling PanZoom Interaction.
          */
-        maxDomainExtent<D>(quantitativeScale: QuantitativeScale<D>, maxDomainExtent: D): Interactions.PanZoom;
+        maxDomainExtent<D>(quantitativeScale: QuantitativeScale<D>, maxDomainExtent: D): this;
     }
 }
 declare module Plottable {
@@ -4966,49 +4836,49 @@ declare module Plottable.Interactions {
          * @param {boolean}
          * @return {Interactions.Drag} The calling Drag Interaction.
          */
-        constrainedToComponent(constrainedToComponent: boolean): Drag;
+        constrainedToComponent(constrainedToComponent: boolean): this;
         /**
          * Adds a callback to be called when dragging starts.
          *
          * @param {DragCallback} callback
          * @returns {Drag} The calling Drag Interaction.
          */
-        onDragStart(callback: DragCallback): Drag;
+        onDragStart(callback: DragCallback): this;
         /**
          * Removes a callback that would be called when dragging starts.
          *
          * @param {DragCallback} callback
          * @returns {Drag} The calling Drag Interaction.
          */
-        offDragStart(callback: DragCallback): Drag;
+        offDragStart(callback: DragCallback): this;
         /**
          * Adds a callback to be called during dragging.
          *
          * @param {DragCallback} callback
          * @returns {Drag} The calling Drag Interaction.
          */
-        onDrag(callback: DragCallback): Drag;
+        onDrag(callback: DragCallback): this;
         /**
          * Removes a callback that would be called during dragging.
          *
          * @param {DragCallback} callback
          * @returns {Drag} The calling Drag Interaction.
          */
-        offDrag(callback: DragCallback): Drag;
+        offDrag(callback: DragCallback): this;
         /**
          * Adds a callback to be called when dragging ends.
          *
          * @param {DragCallback} callback
          * @returns {Drag} The calling Drag Interaction.
          */
-        onDragEnd(callback: DragCallback): Drag;
+        onDragEnd(callback: DragCallback): this;
         /**
          * Removes a callback that would be called when dragging ends.
          *
          * @param {DragCallback} callback
          * @returns {Drag} The calling Drag Interaction.
          */
-        offDragEnd(callback: DragCallback): Drag;
+        offDragEnd(callback: DragCallback): this;
     }
 }
 declare module Plottable {
@@ -5046,7 +4916,7 @@ declare module Plottable.Components {
         private _setUpCallbacks();
         protected _setup(): void;
         private _getResizingEdges(p);
-        renderImmediately(): DragBoxLayer;
+        renderImmediately(): this;
         /**
          * Gets the detection radius of the drag box in pixels.
          */
@@ -5057,7 +4927,7 @@ declare module Plottable.Components {
          * @param {number} r
          * @return {DragBoxLayer} The calling DragBoxLayer.
          */
-        detectionRadius(r: number): DragBoxLayer;
+        detectionRadius(r: number): this;
         /**
          * Gets whether or not the drag box is resizable.
          */
@@ -5068,7 +4938,7 @@ declare module Plottable.Components {
          * @param {boolean} canResize
          * @return {DragBoxLayer} The calling DragBoxLayer.
          */
-        resizable(canResize: boolean): DragBoxLayer;
+        resizable(canResize: boolean): this;
         protected _setResizableClasses(canResize: boolean): void;
         /**
          * Gets whether or not the drag box is movable.
@@ -5080,7 +4950,7 @@ declare module Plottable.Components {
          * @param {boolean} movable
          * @return {DragBoxLayer} The calling DragBoxLayer.
          */
-        movable(movable: boolean): DragBoxLayer;
+        movable(movable: boolean): this;
         private _setMovableClass();
         /**
          * Sets the callback to be called when dragging starts.
@@ -5088,42 +4958,42 @@ declare module Plottable.Components {
          * @param {DragBoxCallback} callback
          * @returns {DragBoxLayer} The calling DragBoxLayer.
          */
-        onDragStart(callback: DragBoxCallback): DragBoxLayer;
+        onDragStart(callback: DragBoxCallback): this;
         /**
          * Removes a callback to be called when dragging starts.
          *
          * @param {DragBoxCallback} callback
          * @returns {DragBoxLayer} The calling DragBoxLayer.
          */
-        offDragStart(callback: DragBoxCallback): DragBoxLayer;
+        offDragStart(callback: DragBoxCallback): this;
         /**
          * Sets a callback to be called during dragging.
          *
          * @param {DragBoxCallback} callback
          * @returns {DragBoxLayer} The calling DragBoxLayer.
          */
-        onDrag(callback: DragBoxCallback): DragBoxLayer;
+        onDrag(callback: DragBoxCallback): this;
         /**
          * Removes a callback to be called during dragging.
          *
          * @param {DragBoxCallback} callback
          * @returns {DragBoxLayer} The calling DragBoxLayer.
          */
-        offDrag(callback: DragBoxCallback): DragBoxLayer;
+        offDrag(callback: DragBoxCallback): this;
         /**
          * Sets a callback to be called when dragging ends.
          *
          * @param {DragBoxCallback} callback
          * @returns {DragBoxLayer} The calling DragBoxLayer.
          */
-        onDragEnd(callback: DragBoxCallback): DragBoxLayer;
+        onDragEnd(callback: DragBoxCallback): this;
         /**
          * Removes a callback to be called when dragging ends.
          *
          * @param {DragBoxCallback} callback
          * @returns {DragBoxLayer} The calling DragBoxLayer.
          */
-        offDragEnd(callback: DragBoxCallback): DragBoxLayer;
+        offDragEnd(callback: DragBoxCallback): this;
         /**
          * Gets the internal Interactions.Drag of the DragBoxLayer.
          */
@@ -5131,14 +5001,14 @@ declare module Plottable.Components {
         /**
          * Enables or disables the interaction and drag box.
          */
-        enabled(enabled: boolean): DragBoxLayer;
+        enabled(enabled: boolean): this;
         /**
          * Gets the enabled state.
          */
         enabled(): boolean;
         destroy(): void;
-        detach(): Component;
-        anchor(selection: d3.Selection<void>): Component;
+        detach(): this;
+        anchor(selection: d3.Selection<void>): this;
         private _resetState();
     }
 }
@@ -5151,7 +5021,7 @@ declare module Plottable.Components {
          * @constructor
          */
         constructor();
-        computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number): XDragBoxLayer;
+        computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number): this;
         protected _setBounds(newBounds: Bounds): void;
         protected _setResizableClasses(canResize: boolean): void;
         yScale<D extends number | {
@@ -5159,13 +5029,13 @@ declare module Plottable.Components {
         }>(): QuantitativeScale<D>;
         yScale<D extends number | {
             valueOf(): number;
-        }>(yScale: QuantitativeScale<D>): SelectionBoxLayer;
+        }>(yScale: QuantitativeScale<D>): this;
         yExtent(): (number | {
             valueOf(): number;
         })[];
         yExtent(yExtent: (number | {
             valueOf(): number;
-        })[]): SelectionBoxLayer;
+        })[]): this;
     }
 }
 declare module Plottable.Components {
@@ -5177,7 +5047,7 @@ declare module Plottable.Components {
          * @constructor
          */
         constructor();
-        computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number): YDragBoxLayer;
+        computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number): this;
         protected _setBounds(newBounds: Bounds): void;
         protected _setResizableClasses(canResize: boolean): void;
         xScale<D extends number | {
@@ -5185,13 +5055,13 @@ declare module Plottable.Components {
         }>(): QuantitativeScale<D>;
         xScale<D extends number | {
             valueOf(): number;
-        }>(xScale: QuantitativeScale<D>): SelectionBoxLayer;
+        }>(xScale: QuantitativeScale<D>): this;
         xExtent(): (number | {
             valueOf(): number;
         })[];
         xExtent(xExtent: (number | {
             valueOf(): number;
-        })[]): SelectionBoxLayer;
+        })[]): this;
     }
 }
 declare module Plottable {
@@ -5211,7 +5081,7 @@ declare module Plottable.Components {
         private _disconnectInteraction;
         constructor(orientation: string);
         protected _setup(): void;
-        renderImmediately(): DragLineLayer<D>;
+        renderImmediately(): this;
         /**
          * Gets the detection radius of the drag line in pixels.
          */
@@ -5222,7 +5092,7 @@ declare module Plottable.Components {
          * @param {number} detectionRadius
          * @return {DragLineLayer<D>} The calling DragLineLayer.
          */
-        detectionRadius(detectionRadius: number): DragLineLayer<D>;
+        detectionRadius(detectionRadius: number): this;
         /**
          * Gets whether the DragLineLayer is enabled.
          */
@@ -5233,7 +5103,7 @@ declare module Plottable.Components {
          * @param {boolean} enabled
          * @return {DragLineLayer<D>} The calling DragLineLayer.
          */
-        enabled(enabled: boolean): DragLineLayer<D>;
+        enabled(enabled: boolean): this;
         /**
          * Sets the callback to be called when dragging starts.
          * The callback will be passed the calling DragLineLayer.
@@ -5241,14 +5111,14 @@ declare module Plottable.Components {
          * @param {DragLineCallback<D>} callback
          * @returns {DragLineLayer<D>} The calling DragLineLayer.
          */
-        onDragStart(callback: DragLineCallback<D>): DragLineLayer<D>;
+        onDragStart(callback: DragLineCallback<D>): this;
         /**
          * Removes a callback that would be called when dragging starts.
          *
          * @param {DragLineCallback<D>} callback
          * @returns {DragLineLayer<D>} The calling DragLineLayer.
          */
-        offDragStart(callback: DragLineCallback<D>): DragLineLayer<D>;
+        offDragStart(callback: DragLineCallback<D>): this;
         /**
          * Sets a callback to be called during dragging.
          * The callback will be passed the calling DragLineLayer.
@@ -5256,14 +5126,14 @@ declare module Plottable.Components {
          * @param {DragLineCallback<D>} callback
          * @returns {DragLineLayer<D>} The calling DragLineLayer.
          */
-        onDrag(callback: DragLineCallback<D>): DragLineLayer<D>;
+        onDrag(callback: DragLineCallback<D>): this;
         /**
          * Removes a callback that would be called during dragging.
          *
          * @param {DragLineCallback<D>} callback
          * @returns {DragLineLayer<D>} The calling DragLineLayer.
          */
-        offDrag(callback: DragLineCallback<D>): DragLineLayer<D>;
+        offDrag(callback: DragLineCallback<D>): this;
         /**
          * Sets a callback to be called when dragging ends.
          * The callback will be passed the calling DragLineLayer.
@@ -5271,14 +5141,14 @@ declare module Plottable.Components {
          * @param {DragLineCallback<D>} callback
          * @returns {DragLineLayer<D>} The calling DragLineLayer.
          */
-        onDragEnd(callback: DragLineCallback<D>): DragLineLayer<D>;
+        onDragEnd(callback: DragLineCallback<D>): this;
         /**
          * Removes a callback that would be called when dragging ends.
          *
          * @param {DragLineCallback<D>} callback
          * @returns {DragLineLayer<D>} The calling DragLineLayer.
          */
-        offDragEnd(callback: DragLineCallback<D>): DragLineLayer<D>;
+        offDragEnd(callback: DragLineCallback<D>): this;
         destroy(): void;
     }
 }

@@ -63,7 +63,7 @@ module Plottable.Components {
      * @param {Formatter} formatter
      * @returns {InterpolatedColorLegend} The calling InterpolatedColorLegend.
      */
-    public formatter(formatter: Formatter): InterpolatedColorLegend;
+    public formatter(formatter: Formatter): this;
     public formatter(formatter?: Formatter): any {
       if (formatter === undefined) {
         return this._formatter;
@@ -83,7 +83,7 @@ module Plottable.Components {
      * @param {expands} boolean
      * @returns {InterpolatedColorLegend} The calling InterpolatedColorLegend.
      */
-    public expands(expands: boolean): InterpolatedColorLegend;
+    public expands(expands: boolean): this;
     public expands(expands?: boolean): any {
       if (expands == null) {
         return this._expands;
@@ -112,7 +112,7 @@ module Plottable.Components {
      * @param {string} orientation One of "horizontal"/"left"/"right".
      * @returns {InterpolatedColorLegend} The calling InterpolatedColorLegend.
      */
-    public orientation(orientation: string): InterpolatedColorLegend;
+    public orientation(orientation: string): this;
     public orientation(orientation?: string): any {
       if (orientation == null) {
         return this._orientation;

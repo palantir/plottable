@@ -73,7 +73,7 @@ module Plottable.Components {
      * @param {Formatter} formatter
      * @returns {Legend} The calling Legend.
      */
-    public formatter(formatter: Formatter): Legend;
+    public formatter(formatter: Formatter): this;
     public formatter(formatter?: Formatter): any {
       if (formatter == null) {
         return this._formatter;
@@ -94,7 +94,7 @@ module Plottable.Components {
      * @param {number} maxEntriesPerRow
      * @returns {Legend} The calling Legend.
      */
-    public maxEntriesPerRow(maxEntriesPerRow: number): Legend;
+    public maxEntriesPerRow(maxEntriesPerRow: number): this;
     public maxEntriesPerRow(maxEntriesPerRow?: number): any {
       if (maxEntriesPerRow == null) {
         return this._maxEntriesPerRow;
@@ -118,7 +118,7 @@ module Plottable.Components {
      * @param {(a: string, b: string) => number} comparator
      * @returns {Legend} The calling Legend.
      */
-    public comparator(comparator: (a: string, b: string) => number): Legend;
+    public comparator(comparator: (a: string, b: string) => number): this;
     public comparator(comparator?: (a: string, b: string) => number): any {
       if (comparator == null) {
         return this._comparator;
@@ -141,7 +141,7 @@ module Plottable.Components {
      * @param {Scales.Color} scale
      * @returns {Legend} The calling Legend.
      */
-    public colorScale(colorScale: Scales.Color): Legend;
+    public colorScale(colorScale: Scales.Color): this;
     public colorScale(colorScale?: Scales.Color): any {
       if (colorScale != null) {
         this._colorScale.offUpdate(this._redrawCallback);
@@ -334,7 +334,7 @@ module Plottable.Components {
      * @param {(datum: any, index: number) => SymbolFactory} symbol
      * @returns {Legend} The calling Legend
      */
-    public symbol(symbol: (datum: any, index: number) => SymbolFactory): Legend;
+    public symbol(symbol: (datum: any, index: number) => SymbolFactory): this;
     public symbol(symbol?: (datum: any, index: number) => SymbolFactory): any {
       if (symbol == null) {
         return this._symbolFactoryAccessor;
@@ -357,7 +357,7 @@ module Plottable.Components {
      * @param {number | ((datum: any, index: number) => number)} symbolOpacity
      * @returns {Legend} The calling Legend
      */
-    public symbolOpacity(symbolOpacity: number | ((datum: any, index: number) => number)): Legend;
+    public symbolOpacity(symbolOpacity: number | ((datum: any, index: number) => number)): this;
     public symbolOpacity(symbolOpacity?: number | ((datum: any, index: number) => number)): any {
       if (symbolOpacity == null) {
         return this._symbolOpacityAccessor;

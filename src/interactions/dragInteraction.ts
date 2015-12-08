@@ -111,7 +111,7 @@ module Plottable.Interactions {
      * @param {boolean}
      * @return {Interactions.Drag} The calling Drag Interaction.
      */
-    public constrainedToComponent(constrainedToComponent: boolean): Drag;
+    public constrainedToComponent(constrainedToComponent: boolean): this;
     public constrainedToComponent(constrainedToComponent?: boolean): any {
       if (constrainedToComponent == null) {
         return this._constrainedToComponent;
