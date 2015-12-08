@@ -1652,8 +1652,11 @@ var Plottable;
                     }
                 });
             });
+            var originalDomain = this._getDomain();
+            this._setBackingScaleDomain(domain);
             var newMin = minExistsInExceptions ? min : this.invert(this.scale(min) - (this.scale(max) - this.scale(min)) * p);
             var newMax = maxExistsInExceptions ? max : this.invert(this.scale(max) + (this.scale(max) - this.scale(min)) * p);
+            this._setBackingScaleDomain(originalDomain);
             if (this._snappingDomainEnabled) {
                 return this._niceDomain([newMin, newMax]);
             }
