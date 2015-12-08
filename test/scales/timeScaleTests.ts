@@ -128,7 +128,7 @@ describe("Scales", () => {
       });
 
       it("doesn't lock up if a zero-width domain is set while there are value providers", () => {
-        let scale = new Plottable.Scales.Time();
+        const scale = new Plottable.Scales.Time();
         scale.padProportion(0.1);
         const provider = () => [new Date(2000, 5, 5), new Date(2000, 5, 6)];
         scale.addIncludedValuesProvider(provider);
