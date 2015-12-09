@@ -175,6 +175,19 @@ describe("Scales", () => {
         assert.deepEqual(scale.domain(), [0, 1], "scale defaults back to the [0, 1] domain when all value providers are removed");
       });
 
+      it("doesn't lock up if a zero-width domain is set while there are value providers and padding", () => {
+        scale.padProportion(0.1);
+        const provider = () => [0, 1];
+        scale.addIncludedValuesProvider(provider);
+        scale.autoDomain();
+        const originalAutoDomain = scale.domain();
+
+        scale.domain([0, 0]);
+        scale.autoDomain();
+
+        assert.deepEqual(scale.domain(), originalAutoDomain, "autodomained as expected");
+      });
+
       it("expands single value domains to [value - 1, value + 1] when auto domaining", () => {
         let singleValue = 15;
         scale.addIncludedValuesProvider((scale: Plottable.Scales.Linear) => [singleValue]);
@@ -275,15 +288,19 @@ describe("Scales", () => {
       });
 
       it("stops snapping the domain when option is disabled", () => {
+        const includedValues = [0.5, 1.5];
         scale.addIncludedValuesProvider(function() {
-          return [1.123123123, 3.123123123];
+          return includedValues;
         });
+        const originalPaddedDomain = scale.domain();
 
-        assert.deepEqual(scale.domain(), [1, 3.2], "domain snapping works");
         scale.snappingDomainEnabled(false);
-        assert.deepEqual(scale.domain(), [1.073123123, 3.173123123], "domain snapping can be deactivated");
+        const padding = scale.padProportion() / 2 * (includedValues[1] - includedValues[0]);
+        const expectedDomain = [includedValues[0] - padding, includedValues[1] + padding];
+        assert.deepEqual(scale.domain(), expectedDomain, "domain snapping can be deactivated");
+
         scale.snappingDomainEnabled(true);
-        assert.deepEqual(scale.domain(), [1, 3.2], "domain snapping can be activated back");
+        assert.deepEqual(scale.domain(), originalPaddedDomain, "domain snapping can be activated back");
       });
     });
 

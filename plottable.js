@@ -1,5 +1,5 @@
 /*!
-Plottable 2.0.0-rc1 (https://github.com/palantir/plottable)
+Plottable 2.0.0-rc2 (https://github.com/palantir/plottable)
 Copyright 2014-2015 Palantir Technologies
 Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
 */
@@ -885,7 +885,7 @@ var Plottable;
 })(Plottable || (Plottable = {}));
 var Plottable;
 (function (Plottable) {
-    Plottable.version = "2.0.0-rc1";
+    Plottable.version = "2.0.0-rc2";
 })(Plottable || (Plottable = {}));
 var Plottable;
 (function (Plottable) {
@@ -1680,8 +1680,11 @@ var Plottable;
                     }
                 });
             });
+            var originalDomain = this._getDomain();
+            this._setBackingScaleDomain(domain);
             var newMin = minExistsInExceptions ? min : this.invert(this.scale(min) - (this.scale(max) - this.scale(min)) * p);
             var newMax = maxExistsInExceptions ? max : this.invert(this.scale(max) + (this.scale(max) - this.scale(min)) * p);
+            this._setBackingScaleDomain(originalDomain);
             if (this._snappingDomainEnabled) {
                 return this._niceDomain([newMin, newMax]);
             }

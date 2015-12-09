@@ -113,6 +113,19 @@ describe("Scales", () => {
           "zero single-value extent was expanded to [base, -base]");
       });
 
+      it("doesn't lock up if a zero-width domain is set while there are value providers", () => {
+        scale.padProportion(0.1);
+        const provider = () => [0, 1];
+        scale.addIncludedValuesProvider(provider);
+        scale.autoDomain();
+        const originalAutoDomain = scale.domain();
+
+        scale.domain([0, 0]);
+        scale.autoDomain();
+
+        assert.deepEqual(scale.domain(), originalAutoDomain, "autodomained as expected");
+      });
+
       it("can force the minimum of the domain with domainMin()", () => {
         let requestedDomain = [-5, 5];
         scale.addIncludedValuesProvider(() => requestedDomain);
