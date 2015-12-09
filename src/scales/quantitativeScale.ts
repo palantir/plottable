@@ -133,6 +133,7 @@ export class QuantitativeScale<D> extends Scale<D, number> {
     if (this._padProportion === 0) {
       return domain;
     }
+
     let p = this._padProportion / 2;
     let min = domain[0];
     let max = domain[1];
@@ -149,8 +150,11 @@ export class QuantitativeScale<D> extends Scale<D, number> {
         }
       });
     });
+    const originalDomain = this._getDomain();
+    this._setBackingScaleDomain(domain);
     let newMin = minExistsInExceptions ? min : this.invert(this.scale(min) - (this.scale(max) - this.scale(min)) * p);
     let newMax = maxExistsInExceptions ? max : this.invert(this.scale(max) + (this.scale(max) - this.scale(min)) * p);
+    this._setBackingScaleDomain(originalDomain);
 
     if (this._snappingDomainEnabled) {
       return this._niceDomain([newMin, newMax]);
