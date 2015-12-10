@@ -9330,6 +9330,17 @@ var Plottable;
                 this._baselineValueProvider = function () { return [_this._baselineValue]; };
                 this.croppedRenderingEnabled(false);
             }
+            StackedArea.prototype.croppedRenderingEnabled = function (croppedRendering) {
+                if (croppedRendering == null) {
+                    return _super.prototype.croppedRenderingEnabled.call(this);
+                }
+                if (croppedRendering === true) {
+                    // HACKHACK #3032: cropped rendering doesn't currently work correctly on StackedArea
+                    Plottable.Utils.Window.warn("Warning: Stacked Area Plot does not support downsampling.");
+                    return this;
+                }
+                return _super.prototype.croppedRenderingEnabled.call(this, croppedRendering);
+            };
             StackedArea.prototype._getAnimator = function (key) {
                 return new Plottable.Animators.Null();
             };
