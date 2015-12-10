@@ -17,6 +17,7 @@ module Plottable.Plots {
       this._stackingResult = new Utils.Map<Dataset, Utils.Map<string, Utils.Stacking.StackedDatum>>();
       this._stackedExtent = [];
       this._baselineValueProvider = () => [this._baselineValue];
+      this.croppedRenderingEnabled(false);
     }
 
     protected _getAnimator(key: string): Animator {

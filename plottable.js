@@ -9328,6 +9328,7 @@ var Plottable;
                 this._stackingResult = new Plottable.Utils.Map();
                 this._stackedExtent = [];
                 this._baselineValueProvider = function () { return [_this._baselineValue]; };
+                this.croppedRenderingEnabled(false);
             }
             StackedArea.prototype._getAnimator = function (key) {
                 return new Plottable.Animators.Null();
