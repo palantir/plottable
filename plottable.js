@@ -9336,7 +9336,7 @@ var Plottable;
                 }
                 if (croppedRendering === true) {
                     // HACKHACK #3032: cropped rendering doesn't currently work correctly on StackedArea
-                    Plottable.Utils.Window.warn("Warning: Stacked Area Plot does not support downsampling.");
+                    Plottable.Utils.Window.warn("Warning: Stacked Area Plot does not support cropped rendering.");
                     return this;
                 }
                 return _super.prototype.croppedRenderingEnabled.call(this, croppedRendering);

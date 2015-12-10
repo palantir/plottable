@@ -29,7 +29,7 @@ module Plottable.Plots {
 
       if (croppedRendering === true) {
         // HACKHACK #3032: cropped rendering doesn't currently work correctly on StackedArea
-        Utils.Window.warn("Warning: Stacked Area Plot does not support downsampling.");
+        Utils.Window.warn("Warning: Stacked Area Plot does not support cropped rendering.");
         return this;
       }
 
