@@ -17,6 +17,23 @@ module Plottable.Plots {
       this._stackingResult = new Utils.Map<Dataset, Utils.Map<string, Utils.Stacking.StackedDatum>>();
       this._stackedExtent = [];
       this._baselineValueProvider = () => [this._baselineValue];
+      this.croppedRenderingEnabled(false);
+    }
+
+    public croppedRenderingEnabled(): boolean;
+    public croppedRenderingEnabled(croppedRendering: boolean): this;
+    public croppedRenderingEnabled(croppedRendering?: boolean): any {
+      if (croppedRendering == null) {
+        return super.croppedRenderingEnabled();
+      }
+
+      if (croppedRendering === true) {
+        // HACKHACK #3032: cropped rendering doesn't currently work correctly on StackedArea
+        Utils.Window.warn("Warning: Stacked Area Plot does not support cropped rendering.");
+        return this;
+      }
+
+      return super.croppedRenderingEnabled(croppedRendering);
     }
 
     protected _getAnimator(key: string): Animator {
