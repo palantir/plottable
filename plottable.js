@@ -1,5 +1,5 @@
 /*!
-Plottable 2.0.0-rc2 (https://github.com/palantir/plottable)
+Plottable 2.0.0 (https://github.com/palantir/plottable)
 Copyright 2014-2015 Palantir Technologies
 Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
 */
@@ -885,7 +885,7 @@ var Plottable;
 })(Plottable || (Plottable = {}));
 var Plottable;
 (function (Plottable) {
-    Plottable.version = "2.0.0-rc2";
+    Plottable.version = "2.0.0";
 })(Plottable || (Plottable = {}));
 var Plottable;
 (function (Plottable) {
@@ -9328,7 +9328,19 @@ var Plottable;
                 this._stackingResult = new Plottable.Utils.Map();
                 this._stackedExtent = [];
                 this._baselineValueProvider = function () { return [_this._baselineValue]; };
+                this.croppedRenderingEnabled(false);
             }
+            StackedArea.prototype.croppedRenderingEnabled = function (croppedRendering) {
+                if (croppedRendering == null) {
+                    return _super.prototype.croppedRenderingEnabled.call(this);
+                }
+                if (croppedRendering === true) {
+                    // HACKHACK #3032: cropped rendering doesn't currently work correctly on StackedArea
+                    Plottable.Utils.Window.warn("Warning: Stacked Area Plot does not support cropped rendering.");
+                    return this;
+                }
+                return _super.prototype.croppedRenderingEnabled.call(this, croppedRendering);
+            };
             StackedArea.prototype._getAnimator = function (key) {
                 return new Plottable.Animators.Null();
             };
