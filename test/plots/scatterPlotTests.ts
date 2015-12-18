@@ -57,10 +57,11 @@ describe("Plots", () => {
 
         plot.renderTo(svg);
 
-        const expectedPathString = TestMethods.normalizePath(symbolFactory(0));
-        const path = plot.content().select("path");
-        const normalizedActualPath = TestMethods.normalizePath(path.attr("d"));
-        assert.strictEqual(normalizedActualPath, expectedPathString, "path string is initialized with the correct symbol and a size of 0");
+        const pathString = plot.content().select("path").attr("d");
+        const zeroSizePathString = symbolFactory(0);
+        const normalizingPath = svg.append("path"); // generated and normalized paths don't align on all browsers
+        const expectedPathString = normalizingPath.attr("d", zeroSizePathString).attr("d");
+        assert.strictEqual(pathString, expectedPathString, "path string is initialized with the correct symbol and a size of 0");
       });
 
       it.skip("correctly handles NaN, undefined, Infinity, and non-number x and y values", () => {
