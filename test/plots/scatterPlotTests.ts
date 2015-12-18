@@ -38,6 +38,30 @@ describe("Plots", () => {
         svg.remove();
       });
 
+      it("initially draws the points with a size of 0 when resetting", () => {
+        const data = [
+          { x: 0, y: 0 }
+        ];
+        const dataset = new Plottable.Dataset(data);
+        plot.addDataset(dataset);
+
+        const symbolFactory = Plottable.SymbolFactories.square();
+        plot.symbol(() => symbolFactory);
+
+        plot.animator(Plottable.Plots.Animator.MAIN, new Mocks.NoOpAnimator());
+        plot.animated(true);
+
+        plot.renderTo(svg);
+
+        const expectedPathString = TestMethods.normalizePath(symbolFactory(0));
+        const path = plot.content().select("path");
+        const normalizedActualPath = TestMethods.normalizePath(path.attr("d"));
+        assert.strictEqual(normalizedActualPath, expectedPathString, "path string is initialized with the correct symbol and a size of 0");
+
+        plot.destroy();
+        svg.remove();
+      });
+
       it.skip("correctly handles NaN, undefined, Infinity, and non-number x and y values", () => {
         let data = [
           { x: 0.0, y: 0.0 },
