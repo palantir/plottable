@@ -18,6 +18,7 @@ Plottable.js is being developed by [Palantir Technologies](http://palantir.com/)
 
 - Get Plottable:
   - Bower: `bower install --save plottable`
+  - NPM: `npm install --save palantir/plottable`
   - [cdnjs URL](https://cdnjs.com/libraries/plottable.js)
   - [Direct download: plottable.zip](plottable.zip)
 - [Check out examples](http://plottablejs.org/examples/)
