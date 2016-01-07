@@ -82,7 +82,9 @@ module Plottable.Plots {
       let drawSteps: Drawers.DrawStep[] = [];
       if (this._animateOnNextRender()) {
         let resetAttrToProjector = this._generateAttrToProjector();
-        resetAttrToProjector["d"] = () => "";
+
+        let symbolProjector = Plot._scaledAccessor(this.symbol());
+        resetAttrToProjector["d"] = (datum: any, index: number, dataset: Dataset) => symbolProjector(datum, index, dataset)(0);
         drawSteps.push({attrToProjector: resetAttrToProjector, animator: this._getAnimator(Plots.Animator.RESET)});
       }
 
