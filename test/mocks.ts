@@ -40,5 +40,10 @@ module Mocks {
     public animate(selection: d3.Selection<any>) {
       return selection;
     }
+    /* tslint:disable */
+    public animateJoin(joinResult: Plottable.Drawers.JoinResult,
+      attrToAppliedProjector: Plottable.AttributeToAppliedProjector, drawer: Plottable.Drawer) {
+    };
+    /* tslint:enable */
   }
 }
