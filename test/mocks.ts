@@ -26,4 +26,24 @@ module Mocks {
       return true;
     }
   }
+
+  export class NoOpAnimator implements Plottable.Animator {
+    /*
+     * A do-nothing Animator.
+     * Useful for testing the reset states of Plots by blanking the MAIN Animator.
+     */
+
+    public totalTime(selection: any) {
+      return 0;
+    }
+
+    public animate(selection: d3.Selection<any>) {
+      return selection;
+    }
+    /* tslint:disable */
+    public animateJoin(joinResult: Plottable.Drawers.JoinResult,
+      attrToAppliedProjector: Plottable.AttributeToAppliedProjector, drawer: Plottable.Drawer) {
+    };
+    /* tslint:enable */
+  }
 }

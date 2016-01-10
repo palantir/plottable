@@ -8080,7 +8080,8 @@ var Plottable;
             };
             Scatter.prototype._initializer = function () {
                 var resetAttrToProjector = this._generateAttrToProjector();
-                resetAttrToProjector["d"] = function () { return ""; };
+                var symbolProjector = Plottable.Plot._scaledAccessor(this.symbol());
+                resetAttrToProjector["d"] = function (datum, index, dataset) { return symbolProjector(datum, index, dataset)(0); };
                 return resetAttrToProjector;
             };
             Scatter.prototype._generateDrawSteps = function () {

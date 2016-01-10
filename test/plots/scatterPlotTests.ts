@@ -19,11 +19,17 @@ describe("Plots", () => {
             .y((d: any) => d.y, yScale);
       });
 
+      afterEach(function() {
+        if (this.currentTest.state === "passed") {
+          plot.destroy();
+          svg.remove();
+        }
+      });
+
       it("renders correctly with no data", () => {
         assert.doesNotThrow(() => plot.renderTo(svg), Error);
         assert.strictEqual(plot.width(), SVG_WIDTH, "was allocated width");
         assert.strictEqual(plot.height(), SVG_HEIGHT, "was allocated height");
-        svg.remove();
       });
 
       it("is initialized correctly", () => {
@@ -34,8 +40,28 @@ describe("Plots", () => {
         assert.isDefined(plot.animator(Plottable.Plots.Animator.MAIN), "main animator is defined");
         assert.isDefined(plot.size(), "size() is defined");
         assert.isDefined(plot.symbol(), "symbol() is defined");
+      });
 
-        svg.remove();
+      it("initially draws the points with a size of 0 when resetting", () => {
+        const data = [
+          { x: 0, y: 0 }
+        ];
+        const dataset = new Plottable.Dataset(data);
+        plot.addDataset(dataset);
+
+        const symbolFactory = Plottable.SymbolFactories.square();
+        plot.symbol(() => symbolFactory);
+
+        plot.animator(Plottable.Plots.Animator.MAIN, new Mocks.NoOpAnimator());
+        plot.animated(true);
+
+        plot.renderTo(svg);
+
+        const pathString = plot.content().select("path").attr("d");
+        const zeroSizePathString = symbolFactory(0);
+        const normalizingPath = svg.append("path"); // generated and normalized paths don't align on all browsers
+        const expectedPathString = normalizingPath.attr("d", zeroSizePathString).attr("d");
+        assert.strictEqual(pathString, expectedPathString, "path string is initialized with the correct symbol and a size of 0");
       });
 
       it.skip("correctly handles NaN, undefined, Infinity, and non-number x and y values", () => {
@@ -99,7 +125,6 @@ describe("Plots", () => {
         dataset.data(dataWithError);
         assert.strictEqual(plot.selections().size(), 4, "only 4 data points are drawn when one of the x values is \"abc\"");
         assert.lengthOf(plot.entities(), 4, "only 4 Entities returned when one of the x values is \"abc\"");
-        svg.remove();
       });
     });
 
