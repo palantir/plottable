@@ -8080,7 +8080,8 @@ var Plottable;
                 var drawSteps = [];
                 if (this._animateOnNextRender()) {
                     var resetAttrToProjector = this._generateAttrToProjector();
-                    resetAttrToProjector["d"] = function () { return ""; };
+                    var symbolProjector = Plottable.Plot._scaledAccessor(this.symbol());
+                    resetAttrToProjector["d"] = function (datum, index, dataset) { return symbolProjector(datum, index, dataset)(0); };
                     drawSteps.push({ attrToProjector: resetAttrToProjector, animator: this._getAnimator(Plots.Animator.RESET) });
                 }
                 drawSteps.push({ attrToProjector: this._generateAttrToProjector(), animator: this._getAnimator(Plots.Animator.MAIN) });
