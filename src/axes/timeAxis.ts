@@ -377,11 +377,11 @@ module Plottable.Axes {
       let tickPos = this._getTickValuesForConfiguration(config);
       let labelPos: Date[] = [];
       if (this._tierLabelPositions[index] === "between" && config.step === 1) {
-        tickPos.map((datum: any, index: any) => {
-          if (index + 1 >= tickPos.length) {
+        tickPos.map((datum: any, i: any) => {
+          if (i + 1 >= tickPos.length) {
             return;
           }
-          labelPos.push(new Date((tickPos[index + 1].valueOf() - tickPos[index].valueOf()) / 2 + tickPos[index].valueOf()));
+          labelPos.push(new Date((tickPos[i + 1].valueOf() - tickPos[i].valueOf()) / 2 + tickPos[i].valueOf()));
         });
       } else {
         labelPos = tickPos;

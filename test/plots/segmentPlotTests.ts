@@ -181,50 +181,50 @@ describe("Plots", () => {
 
       it("retrieves the entity if exactly one of its endpoints is in the ranges", () => {
         // vertial segment
-        checkEntitiesInRange(plot, 0, 0.5, 1.5, 1.5, 0.5);
-        checkEntitiesInRange(plot, 0, 0.5, 1.5, 4.5, 3.5);
+        checkEntitiesInRange(0, 0.5, 1.5, 1.5, 0.5);
+        checkEntitiesInRange(0, 0.5, 1.5, 4.5, 3.5);
 
         // diagonal segment with negative slope
-        checkEntitiesInRange(plot, 1, 1.5, 2.5, 4.5, 3.5);
-        checkEntitiesInRange(plot, 1, 2.5, 3.5, 3.5, 2.5);
+        checkEntitiesInRange(1, 1.5, 2.5, 4.5, 3.5);
+        checkEntitiesInRange(1, 2.5, 3.5, 3.5, 2.5);
 
        // diagonal segment with positive slope
-        checkEntitiesInRange(plot, 2, 4.5, 5.5, 4.5, 3.5);
-        checkEntitiesInRange(plot, 2, 3.5, 4.5, 2.5, 1.5);
+        checkEntitiesInRange(2, 4.5, 5.5, 4.5, 3.5);
+        checkEntitiesInRange(2, 3.5, 4.5, 2.5, 1.5);
 
         // horizontal segment
-        checkEntitiesInRange(plot, 3, 1.5, 2.5, 1.5, 0.5);
-        checkEntitiesInRange(plot, 3, 3.5, 4.5, 1.5, 0.5);
+        checkEntitiesInRange(3, 1.5, 2.5, 1.5, 0.5);
+        checkEntitiesInRange(3, 3.5, 4.5, 1.5, 0.5);
         svg.remove();
       });
 
       it("retrieves the entity if both of its endpoints are in the ranges", () => {
         // vertial segment
-        checkEntitiesInRange(plot, 0, 0.5, 1.5, 4.5, 0.5);
+        checkEntitiesInRange(0, 0.5, 1.5, 4.5, 0.5);
 
         // diagonal segment with negative slope
-        checkEntitiesInRange(plot, 1, 1.5, 3.5, 4.5, 2.5);
+        checkEntitiesInRange(1, 1.5, 3.5, 4.5, 2.5);
 
        // diagonal segment with positive slope
-        checkEntitiesInRange(plot, 2, 3.5, 5.5, 4.5, 1.5);
+        checkEntitiesInRange(2, 3.5, 5.5, 4.5, 1.5);
 
         // horizontal segment
-        checkEntitiesInRange(plot, 3, 1.5, 4.5, 1.5, 0.5);
+        checkEntitiesInRange(3, 1.5, 4.5, 1.5, 0.5);
         svg.remove();
       });
 
       it("retrieves the entity if it intersects with the ranges with no endpoints inside", () => {
         // vertial segment
-        checkEntitiesInRange(plot, 0, 0.5, 1.5, 3.5, 1.5);
+        checkEntitiesInRange(0, 0.5, 1.5, 3.5, 1.5);
 
         // diagonal segment with negative slope
-        checkEntitiesInRange(plot, 1, 2.4, 2.6, 3.6, 3.4);
+        checkEntitiesInRange(1, 2.4, 2.6, 3.6, 3.4);
 
        // diagonal segment with positive slope
-        checkEntitiesInRange(plot, 2, 4.4, 4.6, 3.5, 2.5);
+        checkEntitiesInRange(2, 4.4, 4.6, 3.5, 2.5);
 
         // horizontal segment
-        checkEntitiesInRange(plot, 3, 2.5, 3.5, 1.5, 0.5);
+        checkEntitiesInRange(3, 2.5, 3.5, 1.5, 0.5);
         svg.remove();
       });
 
@@ -248,8 +248,7 @@ describe("Plots", () => {
         svg.remove();
       });
 
-      function checkEntitiesInRange(plot: Plottable.Plots.Segment<any, any>, index: number,
-                                    x1: number, x2: number, y1: number, y2: number) {
+      function checkEntitiesInRange(index: number, x1: number, x2: number, y1: number, y2: number) {
         const entities = plot.entitiesIn(
           { min: xScale.scale(x1), max: xScale.scale(x2) },
           { min: yScale.scale(y1), max: yScale.scale(y2) }

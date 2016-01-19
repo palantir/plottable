@@ -73,7 +73,7 @@ export class Axis<D> extends Component {
 
     this.formatter(Formatters.identity());
 
-    this._rescaleCallback = (scale) => this._rescale();
+    this._rescaleCallback = (newScale) => this._rescale();
     this._scale.onUpdate(this._rescaleCallback);
 
     this._annotatedTicks = [];

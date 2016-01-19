@@ -230,23 +230,27 @@ describe("Plots", () => {
         assert.strictEqual(plot.attr("foo", numberAccessor), plot, "setting the attribute returns the calling plot");
 
         let attrAccessor = plot.attr("foo").accessor;
+        /* tslint:disable no-shadowed-variable */
         plot.datasets().forEach((dataset, datasetIndex) => {
           dataset.data().forEach((datum, index) => {
             assert.strictEqual(attrAccessor(datum, index, dataset), numberAccessor(datum, index),
               `can set attribute for number datum ${index} in dataset ${datasetIndex}`);
           });
         });
+        /* tslint:enable no-shadowed-variable */
 
         const stringAccessor = (d: any, i: number) => `${d + i * 10} foo`;
         assert.strictEqual(plot.attr("foo", stringAccessor), plot, "setting the attribute returns the calling plot");
 
         attrAccessor = plot.attr("foo").accessor;
+        /* tslint:disable no-shadowed-variable */
         plot.datasets().forEach((dataset, datasetIndex) => {
           dataset.data().forEach((datum, index) => {
             assert.strictEqual(attrAccessor(datum, index, dataset), stringAccessor(datum, index),
               `can set attribute for string datum ${index} in dataset ${datasetIndex}`);
           });
         });
+        /* tslint:enable no-shadowed-variable */
       });
 
       it("passes the correct index to the Accessor", () => {
@@ -276,12 +280,14 @@ describe("Plots", () => {
 
         let attrAccessor = plot.attr("foo").accessor;
         let attrScale = plot.attr("foo").scale;
+        /* tslint:disable no-shadowed-variable */
         plot.datasets().forEach((dataset, datasetIndex) => {
           dataset.data().forEach((datum, index) => {
             assert.strictEqual(attrScale.scale(attrAccessor(datum, index, dataset)), linearScale.scale(numberAccessor(datum, index)),
               `can set based on scaled version of number datum ${index} in dataset ${datasetIndex}`);
           });
         });
+        /* tslint:enable no-shadowed-variable */
 
         const stringAccessor = (d: any, i: number) => `${d} foo`;
         const categoryScale = new Plottable.Scales.Category();
@@ -290,12 +296,14 @@ describe("Plots", () => {
 
         attrAccessor = plot.attr("foo").accessor;
         attrScale = plot.attr("foo").scale;
+        /* tslint:disable no-shadowed-variable */
         plot.datasets().forEach((dataset, datasetIndex) => {
           dataset.data().forEach((datum, index) => {
             assert.strictEqual(attrScale.scale(attrAccessor(datum, index, dataset)), categoryScale.scale(stringAccessor(datum, index)),
               `can set based on scaled version of string datum ${index} in dataset ${datasetIndex}`);
           });
         });
+        /* tslint:enable no-shadowed-variable */
       });
 
       it("updates the scales extents associated with an attribute when that attribute is set", () => {
