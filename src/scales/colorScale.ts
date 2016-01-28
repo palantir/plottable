@@ -73,16 +73,17 @@ module Plottable.Scales {
 
       let defaultColorHex: string = Utils.Color.colorTest(colorTester, "");
       let i = 0;
-      let colorHex: string;
-      while ((colorHex = Utils.Color.colorTest(colorTester, "plottable-colors-" + i)) !== null &&
-              i < this._MAXIMUM_COLORS_FROM_CSS) {
+      let colorHex = Utils.Color.colorTest(colorTester, "plottable-colors-0");
+      while (colorHex != null && i < this._MAXIMUM_COLORS_FROM_CSS) {
         if (colorHex === defaultColorHex && colorHex === plottableDefaultColors[plottableDefaultColors.length - 1]) {
           break;
         }
         plottableDefaultColors.push(colorHex);
         i++;
+        colorHex = Utils.Color.colorTest(colorTester, `plottable-colors-${i}`);
       }
       colorTester.remove();
+
       return plottableDefaultColors;
     }
 

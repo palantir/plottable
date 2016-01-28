@@ -56,9 +56,9 @@ describe("TimeAxis", () => {
         .filter(function() {
           return d3.select(this).style("visibility") === "visible";
         });
-      visibleTickLabels.each(function(d, i) {
+      visibleTickLabels.each(function(d2, j) {
         let clientRect1 = this.getBoundingClientRect();
-        visibleTickLabels.filter((d2, j) => j > i).each(function(d2, j) {
+        visibleTickLabels.filter((d3, k) => k > j).each(function(d3, k) {
           let clientRect2 = this.getBoundingClientRect();
           assert.isFalse(Plottable.Utils.DOM.clientRectsOverlap(clientRect1, clientRect2), "tick labels don't overlap");
         });

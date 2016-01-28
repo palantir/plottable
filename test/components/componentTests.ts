@@ -650,7 +650,6 @@ describe("Component", () => {
 
     it("performs all of the same operations as renderImmediately()", () => {
       let renderFlag = false;
-      let c = new Plottable.Component();
       c.renderImmediately = () => {
         renderFlag = true;
         return c;
@@ -666,7 +665,6 @@ describe("Component", () => {
 
     it("does not render unless allocated space", () => {
       let renderFlag = false;
-      let c = new Plottable.Component();
       c.renderImmediately = () => {
         renderFlag = true;
         return c;

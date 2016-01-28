@@ -144,8 +144,8 @@ describe("Plots", () => {
         data = [{ x: 0, y: 0 }, { x: 1, y: 1 }];
         dataset = new Plottable.Dataset(data, metadata);
         plot = new Plottable.Plots.Scatter<number, number>();
-        plot.x((d, i, dataset) => d.x + i * dataset.metadata().foo, xScale);
-        plot.y((d, i, dataset) => dataset.metadata().bar, yScale);
+        plot.x((d, i, _dataset) => d.x + i * dataset.metadata().foo, xScale);
+        plot.y((d, i, _dataset) => dataset.metadata().bar, yScale);
         plot.addDataset(dataset);
       });
 

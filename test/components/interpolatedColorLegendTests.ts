@@ -21,7 +21,7 @@ describe("InterpolatedColorLegend", () => {
       legend = new Plottable.Components.InterpolatedColorLegend(colorScale);
     });
 
-    function assertBasicRendering(legend: Plottable.Components.InterpolatedColorLegend) {
+    function assertBasicRendering() {
       const scaleDomain = colorScale.domain();
       const legendContent = legend.content();
 
@@ -56,7 +56,7 @@ describe("InterpolatedColorLegend", () => {
     it("renders correctly when horizontal", () => {
       legend.renderTo(svg);
 
-      assertBasicRendering(legend);
+      assertBasicRendering();
 
       const legendContent = legend.content();
       const labels = legendContent.selectAll("text");
@@ -75,7 +75,7 @@ describe("InterpolatedColorLegend", () => {
       legend.orientation("right");
       legend.renderTo(svg);
 
-      assertBasicRendering(legend);
+      assertBasicRendering();
 
       const legendContent = legend.content();
       const labels = legendContent.selectAll("text");
@@ -95,7 +95,7 @@ describe("InterpolatedColorLegend", () => {
       legend.orientation("left");
       legend.renderTo(svg);
 
-      assertBasicRendering(legend);
+      assertBasicRendering();
 
       const legendContent = legend.content();
       const labels = legendContent.selectAll("text");
@@ -130,7 +130,7 @@ describe("InterpolatedColorLegend", () => {
       legend.renderTo(svg);
 
       colorScale.domain([0, 85]);
-      assertBasicRendering(legend);
+      assertBasicRendering();
 
       svg.remove();
     });
@@ -169,7 +169,7 @@ describe("InterpolatedColorLegend", () => {
           svg.attr(constrain, value);
           legend.orientation(orientation);
           legend.renderTo(svg);
-          assertBasicRendering(legend);
+          assertBasicRendering();
           svg.remove();
         });
       });
@@ -203,6 +203,7 @@ describe("InterpolatedColorLegend", () => {
       svg.remove();
     });
   });
+
   describe("Expanding", () => {
     const SVG_HEIGHT = 400;
     const SVG_WIDTH = 400;

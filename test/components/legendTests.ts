@@ -349,9 +349,9 @@ describe("Legend", () => {
       entries.each(function(d: any, i: number) {
         const entry = d3.select(this);
         const text = entry.select("text").text();
-        const titles = entry.selectAll("title");
-        assert.strictEqual(titles.size(), 1, "only one title node per legend entry should be present");
-        assert.strictEqual(text, titles.text(), "the text and title node have the same text");
+        const title = entry.selectAll("title");
+        assert.strictEqual(title.size(), 1, "only one title node per legend entry should be present");
+        assert.strictEqual(text, title.text(), "the text and title node have the same text");
       });
       svg.remove();
     });
@@ -457,7 +457,7 @@ describe("Legend", () => {
       legend = new Plottable.Components.Legend(color);
     });
 
-    function computeExpectedSymbolPosition(legend: Plottable.Components.Legend, rowIndex: number, entryIndexWithinRow: number) {
+    function computeExpectedSymbolPosition(rowIndex: number, entryIndexWithinRow: number) {
       const row = d3.select(legend.content().selectAll(ROW_SELECTOR)[0][rowIndex]);
       const entry = d3.select(row.selectAll(ENTRY_SELECTOR)[0][entryIndexWithinRow]);
       const symbol = entry.select(SYMBOL_SELECTOR);
@@ -479,7 +479,7 @@ describe("Legend", () => {
 
       let expectedEntity: Plottable.Entity<Plottable.Components.Legend> = {
         datum: "AA",
-        position: computeExpectedSymbolPosition(legend, 0, 0),
+        position: computeExpectedSymbolPosition(0, 0),
         selection: d3.select(entries[0][0]),
         component: legend
       };
@@ -488,7 +488,7 @@ describe("Legend", () => {
       entities = legend.entitiesAt({x: 10, y: 30});
       expectedEntity = {
         datum: "BB",
-        position: computeExpectedSymbolPosition(legend, 1, 0),
+        position: computeExpectedSymbolPosition(1, 0),
         selection: d3.select(entries[0][1]),
         component: legend
       };
@@ -509,7 +509,7 @@ describe("Legend", () => {
       const entries = legend.content().selectAll(ENTRY_SELECTOR);
       let expectedEntity: Plottable.Entity<Plottable.Components.Legend> = {
         datum: "AA",
-        position: computeExpectedSymbolPosition(legend, 0, 0),
+        position: computeExpectedSymbolPosition(0, 0),
         selection: d3.select(entries[0][0]),
         component: legend
       };
@@ -518,7 +518,7 @@ describe("Legend", () => {
       entities = legend.entitiesAt({x: 50, y: 10});
       expectedEntity = {
         datum: "BB",
-        position: computeExpectedSymbolPosition(legend, 0, 1),
+        position: computeExpectedSymbolPosition(0, 1),
         selection: d3.select(entries[0][1]),
         component: legend
       };
