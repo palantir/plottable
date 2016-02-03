@@ -397,26 +397,28 @@ describe("Plots", () => {
       });
 
       it("retrieves the entity under each given point with entitiesAt()", () => {
-        let OUTER_RADIUS = 200;
+        const OUTER_RADIUS = 200;
         piePlot.outerRadius(OUTER_RADIUS);
-        let data = [
+        /* tslint:disable no-shadowed-variable */
+        const data = [
           {value: 500},
           {value: 5},
           {value: 5},
           {value: 5},
           {value: 5}
         ];
+        /* tslint:enable no-shadowed-variable */
         dataset.data(data);
 
-        let totalValue = data.map((d) => d.value).reduce((previous, current) => previous + current);
+        const totalValue = data.map((d) => d.value).reduce((previous, current) => previous + current);
         let runningTotal = 0;
-        let clickAngles = data.map(function(d) {
-          let angle = (runningTotal + d.value / 2) / totalValue * 2 * Math.PI;
+        const clickAngles = data.map((d) => {
+          const angle = (runningTotal + d.value / 2) / totalValue * 2 * Math.PI;
           runningTotal += d.value;
           return angle;
         });
 
-        let clicks = clickAngles.map((angle) => {
+        const clicks = clickAngles.map((angle) => {
           return {
             x: OUTER_RADIUS + Math.sin(angle),
             y: OUTER_RADIUS - Math.cos(angle)
@@ -430,7 +432,7 @@ describe("Plots", () => {
             `the Entity with index ${i} is selected when clicking at [${point.x}, ${point.y}]`);
         });
 
-        let entities = piePlot.entitiesAt( { x: 0, y: 0 } );
+        const entities = piePlot.entitiesAt( { x: 0, y: 0 } );
         assert.lengthOf(entities, 0, "no entities returned");
 
         svg.remove();

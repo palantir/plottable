@@ -32,9 +32,9 @@ describe("Dispatchers", () => {
           y: targetYs[i]
         };
       });
-      const callback = (ids: number[], points: { [id: number]: Plottable.Point; }, event: TouchEvent) => {
+      const callbackWithPositionAssertion = (_ids: number[], points: { [id: number]: Plottable.Point; }, event: TouchEvent) => {
         callbackWasCalled = true;
-        ids.forEach((id) => {
+        _ids.forEach((id) => {
           TestMethods.assertPointsClose(points[id], expectedPoints[id], 0.5, "touch position is correct");
         });
         assert.isNotNull(event, "TouchEvent was passed to the Dispatcher");
@@ -49,13 +49,13 @@ describe("Dispatchers", () => {
       });
 
       it("calls the touchStart callback", () => {
-        assert.strictEqual(touchDispatcher.onTouchStart(callback), touchDispatcher,
+        assert.strictEqual(touchDispatcher.onTouchStart(callbackWithPositionAssertion), touchDispatcher,
           "setting the touchStart callback returns the dispatcher");
 
         TestMethods.triggerFakeTouchEvent("touchstart", svg, expectedPoints, ids);
         assert.isTrue(callbackWasCalled, "callback was called on touchstart");
 
-        assert.strictEqual(touchDispatcher.offTouchStart(callback), touchDispatcher,
+        assert.strictEqual(touchDispatcher.offTouchStart(callbackWithPositionAssertion), touchDispatcher,
           "unsetting the touchStart callback returns the dispatcher");
 
         callbackWasCalled = false;
@@ -66,13 +66,13 @@ describe("Dispatchers", () => {
       });
 
       it("calls the touchMove callback", () => {
-        assert.strictEqual(touchDispatcher.onTouchMove(callback), touchDispatcher,
+        assert.strictEqual(touchDispatcher.onTouchMove(callbackWithPositionAssertion), touchDispatcher,
           "setting the touchMove callback returns the dispatcher");
 
         TestMethods.triggerFakeTouchEvent("touchmove", svg, expectedPoints, ids);
         assert.isTrue(callbackWasCalled, "callback was called on touchmove");
 
-        assert.strictEqual(touchDispatcher.offTouchMove(callback), touchDispatcher,
+        assert.strictEqual(touchDispatcher.offTouchMove(callbackWithPositionAssertion), touchDispatcher,
           "unsetting the touchMove callback returns the dispatcher");
 
         callbackWasCalled = false;
@@ -83,13 +83,13 @@ describe("Dispatchers", () => {
       });
 
       it("calls the touchEnd callback", () => {
-        assert.strictEqual(touchDispatcher.onTouchEnd(callback), touchDispatcher,
+        assert.strictEqual(touchDispatcher.onTouchEnd(callbackWithPositionAssertion), touchDispatcher,
           "setting the touchEnd callback returns the dispatcher");
 
         TestMethods.triggerFakeTouchEvent("touchend", svg, expectedPoints, ids);
         assert.isTrue(callbackWasCalled, "callback was called on touchend");
 
-        assert.strictEqual(touchDispatcher.offTouchEnd(callback), touchDispatcher,
+        assert.strictEqual(touchDispatcher.offTouchEnd(callbackWithPositionAssertion), touchDispatcher,
           "unsetting the touchEnd callback returns the dispatcher");
 
         callbackWasCalled = false;
@@ -100,13 +100,13 @@ describe("Dispatchers", () => {
       });
 
       it("calls the touchCancel callback", () => {
-        assert.strictEqual(touchDispatcher.onTouchCancel(callback), touchDispatcher,
+        assert.strictEqual(touchDispatcher.onTouchCancel(callbackWithPositionAssertion), touchDispatcher,
           "setting the touchCancel callback returns the dispatcher");
 
         TestMethods.triggerFakeTouchEvent("touchcancel", svg, expectedPoints, ids);
         assert.isTrue(callbackWasCalled, "callback was called on touchend");
 
-        assert.strictEqual(touchDispatcher.offTouchCancel(callback), touchDispatcher,
+        assert.strictEqual(touchDispatcher.offTouchCancel(callbackWithPositionAssertion), touchDispatcher,
           "unsetting the touchCancel callback returns the dispatcher");
 
         callbackWasCalled = false;
@@ -142,17 +142,17 @@ describe("Dispatchers", () => {
       });
 
       it("doesn't call callbacks if not in the DOM", () => {
-        let callbackWasCalled = false;
-        const callback = () => callbackWasCalled = true;
+        let customCallbackWasCalled = false;
+        const callback = () => customCallbackWasCalled = true;
 
         touchDispatcher.onTouchMove(callback);
         TestMethods.triggerFakeTouchEvent("touchmove", svg, expectedPoints, ids);
-        assert.isTrue(callbackWasCalled, "callback was called on touchmove");
+        assert.isTrue(customCallbackWasCalled, "callback was called on touchmove");
 
         svg.remove();
-        callbackWasCalled = false;
+        customCallbackWasCalled = false;
         TestMethods.triggerFakeTouchEvent("touchmove", svg, expectedPoints, ids);
-        assert.isFalse(callbackWasCalled, "callback was not called after <svg> was removed from DOM");
+        assert.isFalse(customCallbackWasCalled, "callback was not called after <svg> was removed from DOM");
 
         touchDispatcher.offTouchMove(callback);
       });
