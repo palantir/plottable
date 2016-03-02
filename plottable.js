@@ -1823,18 +1823,28 @@ var Plottable;
              * As it approaches 0, it gradually becomes linear.
              * Consequently, a ModifiedLog Scale can process 0 and negative numbers.
              *
+             * For x >= base, scale(x) = log(x).
+             *
+             * For 0 < x < base, scale(x) will become more and more
+             * linear as it approaches 0.
+             *
+             * At x == 0, scale(x) == 0.
+             *
+             * For negative values, scale(-x) = -scale(x).
+             *
+             * The range and domain for the scale should also be set, using the
+             * range() and domain() accessors, respectively.
+             *
+             * For `range`, provide a two-element array giving the minimum and
+             * maximum of values produced when scaling.
+             *
+             * For `domain` provide a two-element array giving the minimum and
+             * maximum of the values that will be scaled.
+             *
              * @constructor
              * @param {number} [base=10]
              *        The base of the log. Must be > 1.
              *
-             *        For x <= base, scale(x) = log(x).
-             *
-             *        For 0 < x < base, scale(x) will become more and more
-             *        linear as it approaches 0.
-             *
-             *        At x == 0, scale(x) == 0.
-             *
-             *        For negative values, scale(-x) = -scale(x).
              */
             function ModifiedLog(base) {
                 if (base === void 0) { base = 10; }
@@ -2168,14 +2178,14 @@ var Plottable;
                 var colorTester = d3.select("body").append("plottable-color-tester");
                 var defaultColorHex = Plottable.Utils.Color.colorTest(colorTester, "");
                 var i = 0;
-                var colorHex;
-                while ((colorHex = Plottable.Utils.Color.colorTest(colorTester, "plottable-colors-" + i)) !== null &&
-                    i < this._MAXIMUM_COLORS_FROM_CSS) {
+                var colorHex = Plottable.Utils.Color.colorTest(colorTester, "plottable-colors-0");
+                while (colorHex != null && i < this._MAXIMUM_COLORS_FROM_CSS) {
                     if (colorHex === defaultColorHex && colorHex === plottableDefaultColors[plottableDefaultColors.length - 1]) {
                         break;
                     }
                     plottableDefaultColors.push(colorHex);
                     i++;
+                    colorHex = Plottable.Utils.Color.colorTest(colorTester, "plottable-colors-" + i);
                 }
                 colorTester.remove();
                 return plottableDefaultColors;
@@ -3507,7 +3517,7 @@ var Plottable;
                 this.addClass("y-axis");
             }
             this.formatter(Plottable.Formatters.identity());
-            this._rescaleCallback = function (scale) { return _this._rescale(); };
+            this._rescaleCallback = function (newScale) { return _this._rescale(); };
             this._scale.onUpdate(this._rescaleCallback);
             this._annotatedTicks = [];
             this._annotationFormatter = Plottable.Formatters.identity();
@@ -4202,11 +4212,11 @@ var Plottable;
                 var tickPos = this._getTickValuesForConfiguration(config);
                 var labelPos = [];
                 if (this._tierLabelPositions[index] === "between" && config.step === 1) {
-                    tickPos.map(function (datum, index) {
-                        if (index + 1 >= tickPos.length) {
+                    tickPos.map(function (datum, i) {
+                        if (i + 1 >= tickPos.length) {
                             return;
                         }
-                        labelPos.push(new Date((tickPos[index + 1].valueOf() - tickPos[index].valueOf()) / 2 + tickPos[index].valueOf()));
+                        labelPos.push(new Date((tickPos[i + 1].valueOf() - tickPos[i].valueOf()) / 2 + tickPos[i].valueOf()));
                     });
                 }
                 else {
@@ -9760,9 +9770,11 @@ var Plottable;
                 return intersections.length > 0;
             };
             Segment.prototype._lineIntersectsSegment = function (point1, point2, point3, point4) {
+                /* tslint:disable no-shadowed-variable */
                 var calcOrientation = function (point1, point2, point) {
                     return (point2.x - point1.x) * (point.y - point2.y) - (point2.y - point1.y) * (point.x - point2.x);
                 };
+                /* tslint:enable no-shadowed-variable */
                 // point3 and point4 are on different sides of line formed by point1 and point2
                 return calcOrientation(point1, point2, point3) * calcOrientation(point1, point2, point4) < 0;
             };
