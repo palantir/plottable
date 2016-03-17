@@ -1002,11 +1002,11 @@ declare module Plottable.Scales {
         protected _getExtent(): string[];
         domain(): string[];
         domain(values: string[]): this;
-        protected _setDomain(values: string[]): void;
         range(): [number, number];
         range(values: [number, number]): this;
         private static _convertToPlottableInnerPadding(d3InnerPadding);
         private static _convertToPlottableOuterPadding(d3OuterPadding, d3InnerPadding);
+        private _setBands();
         /**
          * Returns the width of the range band.
          *
