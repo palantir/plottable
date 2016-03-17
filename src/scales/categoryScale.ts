@@ -33,23 +33,10 @@ module Plottable.Scales {
       return super.domain(values);
     }
 
-    protected _setDomain(values: string[]) {
-      super._setDomain(values);
-      this.range(this.range()); // update range
-    }
-
     public range(): [number, number];
     public range(values: [number, number]): this;
     public range(values?: [number, number]): any {
-      if (values == null) {
-        return this._range;
-      } else {
-        this._range = values;
-        let d3InnerPadding = 1 - 1 / (1 + this.innerPadding());
-        let d3OuterPadding = this.outerPadding() / (1 + this.innerPadding());
-        this._d3Scale.rangeBands(values, d3InnerPadding, d3OuterPadding);
-        return this;
-      }
+      return super.range(values);
     }
 
     private static _convertToPlottableInnerPadding(d3InnerPadding: number): number {
@@ -58,6 +45,12 @@ module Plottable.Scales {
 
     private static _convertToPlottableOuterPadding(d3OuterPadding: number, d3InnerPadding: number): number {
       return d3OuterPadding / (1 - d3InnerPadding);
+    }
+
+    private _setBands() {
+      let d3InnerPadding = 1 - 1 / (1 + this.innerPadding());
+      let d3OuterPadding = this.outerPadding() / (1 + this.innerPadding());
+      this._d3Scale.rangeBands(<[number, number]>this._range, d3InnerPadding, d3OuterPadding);
     }
 
     /**
@@ -147,14 +140,16 @@ module Plottable.Scales {
 
     protected _setBackingScaleDomain(values: string[]) {
       this._d3Scale.domain(values);
+      this._setBands();
     }
 
     protected _getRange() {
-      return this._d3Scale.range();
+      return this._range;
     }
 
     protected _setRange(values: number[]) {
-      this._d3Scale.range(values);
+      this._range = values;
+      this._setBands();
     }
   }
 }

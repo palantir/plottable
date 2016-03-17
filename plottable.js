@@ -2034,27 +2034,19 @@ var Plottable;
             Category.prototype.domain = function (values) {
                 return _super.prototype.domain.call(this, values);
             };
-            Category.prototype._setDomain = function (values) {
-                _super.prototype._setDomain.call(this, values);
-                this.range(this.range()); // update range
-            };
             Category.prototype.range = function (values) {
-                if (values == null) {
-                    return this._range;
-                }
-                else {
-                    this._range = values;
-                    var d3InnerPadding = 1 - 1 / (1 + this.innerPadding());
-                    var d3OuterPadding = this.outerPadding() / (1 + this.innerPadding());
-                    this._d3Scale.rangeBands(values, d3InnerPadding, d3OuterPadding);
-                    return this;
-                }
+                return _super.prototype.range.call(this, values);
             };
             Category._convertToPlottableInnerPadding = function (d3InnerPadding) {
                 return 1 / (1 - d3InnerPadding) - 1;
             };
             Category._convertToPlottableOuterPadding = function (d3OuterPadding, d3InnerPadding) {
                 return d3OuterPadding / (1 - d3InnerPadding);
+            };
+            Category.prototype._setBands = function () {
+                var d3InnerPadding = 1 - 1 / (1 + this.innerPadding());
+                var d3OuterPadding = this.outerPadding() / (1 + this.innerPadding());
+                this._d3Scale.rangeBands(this._range, d3InnerPadding, d3OuterPadding);
             };
             /**
              * Returns the width of the range band.
@@ -2101,12 +2093,14 @@ var Plottable;
             };
             Category.prototype._setBackingScaleDomain = function (values) {
                 this._d3Scale.domain(values);
+                this._setBands();
             };
             Category.prototype._getRange = function () {
-                return this._d3Scale.range();
+                return this._range;
             };
             Category.prototype._setRange = function (values) {
-                this._d3Scale.range(values);
+                this._range = values;
+                this._setBands();
             };
             return Category;
         })(Plottable.Scale);
