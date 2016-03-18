@@ -103,11 +103,18 @@ module Plottable.Scales {
     }
 
     protected _getDomain() {
-      return this._d3Scale.domain();
+      return this._backingScaleDomain();
     }
 
-    protected _setBackingScaleDomain(values: string[]) {
-      this._d3Scale.domain(values);
+    protected _backingScaleDomain(): string[]
+    protected _backingScaleDomain(values: string[]): this
+    protected _backingScaleDomain(values?: string[]): any {
+      if (values == null) {
+        return this._d3Scale.domain();
+      } else {
+        this._d3Scale.domain(values);
+        return this;
+      }
     }
 
     protected _getRange() {
