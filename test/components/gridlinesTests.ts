@@ -63,14 +63,33 @@ describe("Gridlines", () => {
     svg.remove();
   });
 
-  it("throws error on non-Quantitative Scales", () => {
-    const categoryScale = new Plottable.Scales.Category();
-    // HACKHACK #2661: Cannot assert errors being thrown with description
-    (<any> assert).throw(() => new Plottable.Components.Gridlines(<any> categoryScale, null), Error,
-      "xScale needs to inherit from Scale.QuantitativeScale", "can't set xScale to category scale");
-    (<any> assert).throw(() => new Plottable.Components.Gridlines(null, <any> categoryScale), Error,
-      "yScale needs to inherit from Scale.QuantitativeScale", "can't set yScale to category scale");
+  it("draws gridlines on category ticks and updates when scale update", () => {
+    let categoryScale: Plottable.Scales.Category = new Plottable.Scales.Category().domain(["a", "b", "c"]);
+    let categoryGrid: Plottable.Components.Gridlines = new Plottable.Components.Gridlines(null, categoryScale);
 
+    categoryGrid.renderTo(svg);
+
+    let yGridlines = categoryGrid.content().select(".y-gridlines").selectAll("line");
+    let yTicks = categoryScale.domain();
+    assert.strictEqual(yGridlines.size(), yTicks.length, "There is a y gridline for each y tick");
+    yGridlines.each(function(gridline, i) {
+      const y = TestMethods.numAttr(d3.select(this), "y1");
+      assert.closeTo(y, categoryScale.scale(yTicks[i]), window.Pixel_CloseTo_Requirement, "y gridline drawn on ticks");
+    });
+
+    categoryScale.domain(["a", "b", "c", "d", "e"]);
+
+    yGridlines = categoryGrid.content().select(".y-gridlines").selectAll("line");
+    yTicks = categoryScale.domain();
+    yGridlines.each(function(gridline, i) {
+      const y = TestMethods.numAttr(d3.select(this), "y1");
+      assert.closeTo(y, categoryScale.scale(yTicks[i]), window.Pixel_CloseTo_Requirement, "y gridline is updated");
+    });
+    svg.remove();
+  });
+
+  it("throws error on not-allowed scales", () => {
+    // HACKHACK #2661: Cannot assert errors being thrown with description
     const colorScale = new Plottable.Scales.Color();
     (<any> assert).throw(() => new Plottable.Components.Gridlines(<any> colorScale, null), Error,
       "xScale needs to inherit from Scale.QuantitativeScale", "can't set xScale to color scale");

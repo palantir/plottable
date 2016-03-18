@@ -5795,26 +5795,37 @@ var Plottable;
             __extends(Gridlines, _super);
             /**
              * @constructor
-             * @param {QuantitativeScale} xScale The scale to base the x gridlines on. Pass null if no gridlines are desired.
-             * @param {QuantitativeScale} yScale The scale to base the y gridlines on. Pass null if no gridlines are desired.
+             *
+             * @param {Scale<any, number>} xScale The scale to base the x
+             * gridlines on. Can be a category or numeric scale. Pass null if
+             * no gridlines are desired.
+             *
+             * @param {Scale<any, number>} yScale The scale to base the y
+             * gridlines on. Can be a category or numeric scale. Pass null if
+             * no gridlines are desired.
              */
             function Gridlines(xScale, yScale) {
                 var _this = this;
-                if (xScale != null && !(Plottable.QuantitativeScale.prototype.isPrototypeOf(xScale))) {
-                    throw new Error("xScale needs to inherit from Scale.QuantitativeScale");
-                }
-                if (yScale != null && !(Plottable.QuantitativeScale.prototype.isPrototypeOf(yScale))) {
-                    throw new Error("yScale needs to inherit from Scale.QuantitativeScale");
-                }
+                var check = function (scale, which) {
+                    if (scale != null &&
+                        !Plottable.QuantitativeScale.prototype.isPrototypeOf(scale) &&
+                        !Plottable.Scales.Category.prototype.isPrototypeOf(scale)) {
+                        throw new Error(which + " needs to inherit from Scale.QuantitativeScale or Scales.Category.");
+                    }
+                };
+                check(xScale, "xScale");
+                check(yScale, "yScale");
                 _super.call(this);
                 this.addClass("gridlines");
                 this._xScale = xScale;
                 this._yScale = yScale;
                 this._renderCallback = function (scale) { return _this.render(); };
                 if (this._xScale) {
+                    this._xTicks = this._mkTicks(xScale);
                     this._xScale.onUpdate(this._renderCallback);
                 }
                 if (this._yScale) {
+                    this._yTicks = this._mkTicks(yScale);
                     this._yScale.onUpdate(this._renderCallback);
                 }
             }
@@ -5849,10 +5860,20 @@ var Plottable;
                 }
                 return this;
             };
+            Gridlines.prototype._mkTicks = function (scale) {
+                if (Plottable.QuantitativeScale.prototype.isPrototypeOf(scale)) {
+                    return function () { return scale.ticks(); };
+                }
+                else {
+                    if (Plottable.Scales.Category.prototype.isPrototypeOf(scale)) {
+                        return function () { return scale.domain(); };
+                    }
+                }
+            };
             Gridlines.prototype._redrawXLines = function () {
                 var _this = this;
                 if (this._xScale) {
-                    var xTicks = this._xScale.ticks();
+                    var xTicks = this._xTicks();
                     var getScaledXValue = function (tickVal) { return _this._xScale.scale(tickVal); };
                     var xLines = this._xLinesContainer.selectAll("line").data(xTicks);
                     xLines.enter().append("line");
@@ -5867,8 +5888,8 @@ var Plottable;
             Gridlines.prototype._redrawYLines = function () {
                 var _this = this;
                 if (this._yScale) {
-                    var yTicks = this._yScale.ticks();
                     var getScaledYValue = function (tickVal) { return _this._yScale.scale(tickVal); };
+                    var yTicks = this._yTicks();
                     var yLines = this._yLinesContainer.selectAll("line").data(yTicks);
                     yLines.enter().append("line");
                     yLines.attr("x1", 0)

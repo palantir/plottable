@@ -2429,17 +2429,26 @@ declare module Plottable.Components {
         private _yScale;
         private _xLinesContainer;
         private _yLinesContainer;
+        private _xTicks;
+        private _yTicks;
         private _renderCallback;
         /**
          * @constructor
-         * @param {QuantitativeScale} xScale The scale to base the x gridlines on. Pass null if no gridlines are desired.
-         * @param {QuantitativeScale} yScale The scale to base the y gridlines on. Pass null if no gridlines are desired.
+         *
+         * @param {Scale<any, number>} xScale The scale to base the x
+         * gridlines on. Can be a category or numeric scale. Pass null if
+         * no gridlines are desired.
+         *
+         * @param {Scale<any, number>} yScale The scale to base the y
+         * gridlines on. Can be a category or numeric scale. Pass null if
+         * no gridlines are desired.
          */
-        constructor(xScale: QuantitativeScale<any>, yScale: QuantitativeScale<any>);
+        constructor(xScale: QuantitativeScale<any> | Plottable.Scales.Category, yScale: QuantitativeScale<any> | Plottable.Scales.Category);
         destroy(): this;
         protected _setup(): void;
         renderImmediately(): this;
         computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number): this;
+        private _mkTicks(scale);
         private _redrawXLines();
         private _redrawYLines();
     }
