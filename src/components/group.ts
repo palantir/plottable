@@ -70,7 +70,7 @@ module Plottable.Components {
      * Adds a Component to this Group.
      * The added Component will be rendered above Components already in the Group.
      */
-    public append(component: Component) {
+    public append(component: Component): this {
       if (component != null && !this.has(component)) {
         component.detach();
         this._components.push(component);

@@ -3897,6 +3897,16 @@ declare module Plottable.Plots {
         private _updateSubtotals();
     }
 }
+declare module Plottable.Plots {
+    class PlotGroup extends Components.Group {
+        entityNearest(point: Point): PlotEntity;
+        /**
+         * Adds a Plot to this Plot Group.
+         * The added Plot will be rendered above Plots already in the Group.
+         */
+        append(component: Component): any;
+    }
+}
 declare module Plottable {
     interface Animator {
         /**
