@@ -1,7 +1,7 @@
 module Plottable.Plots {
   export class PlotGroup extends Components.Group {
     public entityNearest(point: Point): PlotEntity {
-      let closestPlotEntity: PlotEntity = null;
+      let closestPlotEntity: PlotEntity;
       let minDistSquared = Infinity;
       this.components().forEach((plot: Plot) => {
         let candidatePlotEntity = plot.entityNearest(point);

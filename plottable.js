@@ -9986,7 +9986,7 @@ var Plottable;
                 _super.apply(this, arguments);
             }
             PlotGroup.prototype.entityNearest = function (point) {
-                var closestPlotEntity = null;
+                var closestPlotEntity;
                 var minDistSquared = Infinity;
                 this.components().forEach(function (plot) {
                     var candidatePlotEntity = plot.entityNearest(point);
