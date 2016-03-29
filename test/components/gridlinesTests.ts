@@ -64,27 +64,29 @@ describe("Gridlines", () => {
   });
 
   it("draws gridlines on category ticks and updates when scale update", () => {
-    let categoryScale: Plottable.Scales.Category = new Plottable.Scales.Category().domain(["a", "b", "c"]);
-    let categoryGrid: Plottable.Components.Gridlines = new Plottable.Components.Gridlines(null, categoryScale);
+    let check = function(lines: d3.Selection<any>, scale: Plottable.Scales.Category, axis: string) {
+      let ticks = scale.domain();
+      assert.strictEqual(lines.size(), ticks.length, "There is a " + axis + " gridline for each " + axis + " tick");
+      lines.each(function(gridline: any, i: number) {
+        const v = TestMethods.numAttr(d3.select(this), axis + "1");
+        assert.closeTo(v, scale.scale(ticks[i]), window.Pixel_CloseTo_Requirement, axis + " gridline drawn on ticks");
+      });
+    };
+    let ys: Plottable.Scales.Category = new Plottable.Scales.Category().domain(["a", "b", "c"]);
+    let xs: Plottable.Scales.Category = new Plottable.Scales.Category().domain(["x", "y", "z"]);
+    let categoryGrid: Plottable.Components.Gridlines = new Plottable.Components.Gridlines(xs, ys);
 
     categoryGrid.renderTo(svg);
 
-    let yGridlines = categoryGrid.content().select(".y-gridlines").selectAll("line");
-    let yTicks = categoryScale.domain();
-    assert.strictEqual(yGridlines.size(), yTicks.length, "There is a y gridline for each y tick");
-    yGridlines.each(function(gridline, i) {
-      const y = TestMethods.numAttr(d3.select(this), "y1");
-      assert.closeTo(y, categoryScale.scale(yTicks[i]), window.Pixel_CloseTo_Requirement, "y gridline drawn on ticks");
-    });
+    check(categoryGrid.content().select(".y-gridlines").selectAll("line"), ys, "y");
+    check(categoryGrid.content().select(".x-gridlines").selectAll("line"), xs, "x");
 
-    categoryScale.domain(["a", "b", "c", "d", "e"]);
+    ys.domain(["a", "b", "c", "d", "e"]);
+    xs.domain(["v", "w", "x", "y", "z"]);
 
-    yGridlines = categoryGrid.content().select(".y-gridlines").selectAll("line");
-    yTicks = categoryScale.domain();
-    yGridlines.each(function(gridline, i) {
-      const y = TestMethods.numAttr(d3.select(this), "y1");
-      assert.closeTo(y, categoryScale.scale(yTicks[i]), window.Pixel_CloseTo_Requirement, "y gridline is updated");
-    });
+    check(categoryGrid.content().select(".y-gridlines").selectAll("line"), ys, "y");
+    check(categoryGrid.content().select(".x-gridlines").selectAll("line"), xs, "x");
+
     svg.remove();
   });
 
