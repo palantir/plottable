@@ -351,8 +351,8 @@ module Plottable.Plots {
         if (!this._entityVisibleOnPlot(entity.position, entity.datum, entity.index, entity.dataset)) {
           return;
         }
-        let xDelta = queryPoint.x - entity.position.x
-        let yDelta = queryPoint.y - entity.position.y
+        let xDelta = queryPoint.x - entity.position.x;
+        let yDelta = queryPoint.y - entity.position.y;
         let dist = Math.sqrt(Math.pow(xDelta, 2) + Math.pow(yDelta, 2));
         if (dist < minDist) {
           closest = entity;
