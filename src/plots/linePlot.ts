@@ -339,26 +339,24 @@ module Plottable.Plots {
     }
 
     /**
-     * Returns the PlotEntity nearest to the query point by X then by Y, or undefined if no PlotEntity can be found.
+     * Returns the PlotEntity nearest to the query point by Euclidean distance, or undefined if no PlotEntity can be found.
      *
      * @param {Point} queryPoint
      * @returns {PlotEntity} The nearest PlotEntity, or undefined if no PlotEntity can be found.
      */
     public entityNearest(queryPoint: Point): PlotEntity {
-      let minXDist = Infinity;
-      let minYDist = Infinity;
+      let minDist = Infinity;
       let closest: PlotEntity;
       this.entities().forEach((entity) => {
         if (!this._entityVisibleOnPlot(entity.position, entity.datum, entity.index, entity.dataset)) {
           return;
         }
-        let xDist = Math.abs(queryPoint.x - entity.position.x);
-        let yDist = Math.abs(queryPoint.y - entity.position.y);
-
-        if (xDist < minXDist || xDist === minXDist && yDist < minYDist) {
+        let xDelta = queryPoint.x - entity.position.x
+        let yDelta = queryPoint.y - entity.position.y
+        let dist = Math.sqrt(Math.pow(xDelta, 2) + Math.pow(yDelta, 2));
+        if (dist < minDist) {
           closest = entity;
-          minXDist = xDist;
-          minYDist = yDist;
+          minDist = dist;
         }
       });
 
