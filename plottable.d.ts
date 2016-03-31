@@ -3587,13 +3587,6 @@ declare module Plottable.Plots {
         protected _generateAttrToProjector(): {
             [attr: string]: (datum: any, index: number, dataset: Dataset) => any;
         };
-        /**
-         * Returns the PlotEntity nearest to the query point by Euclidean distance, or undefined if no PlotEntity can be found.
-         *
-         * @param {Point} queryPoint
-         * @returns {PlotEntity} The nearest PlotEntity, or undefined if no PlotEntity can be found.
-         */
-        entityNearest(queryPoint: Point): PlotEntity;
         protected _propertyProjectors(): AttributeToProjector;
         protected _constructLineProjector(xProjector: Projector, yProjector: Projector): (datum: any, index: number, dataset: Dataset) => string;
         protected _getDataToDraw(): Utils.Map<Dataset, any[]>;

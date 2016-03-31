@@ -8928,30 +8928,6 @@ var Plottable;
                 });
                 return attrToProjector;
             };
-            /**
-             * Returns the PlotEntity nearest to the query point by Euclidean distance, or undefined if no PlotEntity can be found.
-             *
-             * @param {Point} queryPoint
-             * @returns {PlotEntity} The nearest PlotEntity, or undefined if no PlotEntity can be found.
-             */
-            Line.prototype.entityNearest = function (queryPoint) {
-                var _this = this;
-                var minDist = Infinity;
-                var closest;
-                this.entities().forEach(function (entity) {
-                    if (!_this._entityVisibleOnPlot(entity.position, entity.datum, entity.index, entity.dataset)) {
-                        return;
-                    }
-                    var xDelta = queryPoint.x - entity.position.x;
-                    var yDelta = queryPoint.y - entity.position.y;
-                    var dist = Math.sqrt(Math.pow(xDelta, 2) + Math.pow(yDelta, 2));
-                    if (dist < minDist) {
-                        closest = entity;
-                        minDist = dist;
-                    }
-                });
-                return closest;
-            };
             Line.prototype._propertyProjectors = function () {
                 var propertyToProjectors = _super.prototype._propertyProjectors.call(this);
                 propertyToProjectors["d"] = this._constructLineProjector(Plottable.Plot._scaledAccessor(this.x()), Plottable.Plot._scaledAccessor(this.y()));
