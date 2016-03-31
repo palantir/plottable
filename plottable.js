@@ -3477,6 +3477,47 @@ var Plottable;
 })(Plottable || (Plottable = {}));
 var Plottable;
 (function (Plottable) {
+    var Components;
+    (function (Components) {
+        var PlotGroup = (function (_super) {
+            __extends(PlotGroup, _super);
+            function PlotGroup() {
+                _super.apply(this, arguments);
+            }
+            PlotGroup.prototype.entityNearest = function (point) {
+                var closestPlotEntity;
+                var minDistSquared = Infinity;
+                this.components().forEach(function (plot) {
+                    var candidatePlotEntity = plot.entityNearest(point);
+                    if (candidatePlotEntity == null) {
+                        return;
+                    }
+                    var distSquared = Plottable.Utils.Math.distanceSquared(candidatePlotEntity.position, point);
+                    if (distSquared <= minDistSquared) {
+                        minDistSquared = distSquared;
+                        closestPlotEntity = candidatePlotEntity;
+                    }
+                });
+                return closestPlotEntity;
+            };
+            /**
+             * Adds a Plot to this Plot Group.
+             * The added Plot will be rendered above Plots already in the Group.
+             */
+            PlotGroup.prototype.append = function (plot) {
+                if (plot != null && !(plot instanceof Plottable.Plot)) {
+                    throw new Error("Plot Group only accepts plots");
+                }
+                _super.prototype.append.call(this, plot);
+                return this;
+            };
+            return PlotGroup;
+        })(Components.Group);
+        Components.PlotGroup = PlotGroup;
+    })(Components = Plottable.Components || (Plottable.Components = {}));
+})(Plottable || (Plottable = {}));
+var Plottable;
+(function (Plottable) {
     var Axis = (function (_super) {
         __extends(Axis, _super);
         /**
@@ -9974,47 +10015,6 @@ var Plottable;
             return Waterfall;
         })(Plots.Bar);
         Plots.Waterfall = Waterfall;
-    })(Plots = Plottable.Plots || (Plottable.Plots = {}));
-})(Plottable || (Plottable = {}));
-var Plottable;
-(function (Plottable) {
-    var Plots;
-    (function (Plots) {
-        var PlotGroup = (function (_super) {
-            __extends(PlotGroup, _super);
-            function PlotGroup() {
-                _super.apply(this, arguments);
-            }
-            PlotGroup.prototype.entityNearest = function (point) {
-                var closestPlotEntity;
-                var minDistSquared = Infinity;
-                this.components().forEach(function (plot) {
-                    var candidatePlotEntity = plot.entityNearest(point);
-                    if (candidatePlotEntity == null) {
-                        return;
-                    }
-                    var position = candidatePlotEntity.position;
-                    var distSquared = Math.pow(position.x - point.x, 2) + Math.pow(position.y - point.y, 2);
-                    if (distSquared <= minDistSquared) {
-                        minDistSquared = distSquared;
-                        closestPlotEntity = candidatePlotEntity;
-                    }
-                });
-                return closestPlotEntity;
-            };
-            /**
-             * Adds a Plot to this Plot Group.
-             * The added Plot will be rendered above Plots already in the Group.
-             */
-            PlotGroup.prototype.append = function (component) {
-                if (component != null && !(component instanceof Plottable.Plot)) {
-                    throw new Error("Plot Group only accepts plots");
-                }
-                return _super.prototype.append.call(this, component);
-            };
-            return PlotGroup;
-        })(Plottable.Components.Group);
-        Plots.PlotGroup = PlotGroup;
     })(Plots = Plottable.Plots || (Plottable.Plots = {}));
 })(Plottable || (Plottable = {}));
 var Plottable;

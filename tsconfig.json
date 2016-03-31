@@ -53,6 +53,7 @@
       "src/components/component.ts",
       "src/components/componentContainer.ts",
       "src/components/group.ts",
+      "src/components/plotGroup.ts",
 
       "src/axes/axis.ts",
       "src/axes/timeAxis.ts",
@@ -80,7 +81,6 @@
       "src/plots/stackedBarPlot.ts",
       "src/plots/segmentPlot.ts",
       "src/plots/waterfallPlot.ts",
-      "src/plots/plotGroup.ts",
 
       "src/animators/animator.ts",
       "src/animators/nullAnimator.ts",

@@ -1646,6 +1646,16 @@ declare module Plottable.Components {
         protected _remove(component: Component): boolean;
     }
 }
+declare module Plottable.Components {
+    class PlotGroup extends Group {
+        entityNearest(point: Point): Plots.PlotEntity;
+        /**
+         * Adds a Plot to this Plot Group.
+         * The added Plot will be rendered above Plots already in the Group.
+         */
+        append(plot: Plot): this;
+    }
+}
 declare module Plottable {
     class Axis<D> extends Component {
         /**
@@ -3895,16 +3905,6 @@ declare module Plottable.Plots {
         private _calculateSubtotalsAndExtent(dataset);
         private _drawConnectors();
         private _updateSubtotals();
-    }
-}
-declare module Plottable.Plots {
-    class PlotGroup extends Components.Group {
-        entityNearest(point: Point): PlotEntity;
-        /**
-         * Adds a Plot to this Plot Group.
-         * The added Plot will be rendered above Plots already in the Group.
-         */
-        append(component: Component): any;
     }
 }
 declare module Plottable {

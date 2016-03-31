@@ -1,11 +1,11 @@
 ///<reference path="../testReference.ts" />
 
-describe("Plots", () => {
-  describe("GroupPlot", () => {
+describe("Components", () => {
+  describe("PlotGroup", () => {
     let svg: d3.Selection<void>;
     let xScale: Plottable.Scales.Linear;
     let yScale: Plottable.Scales.Linear;
-    let plotGroup: Plottable.Plots.PlotGroup;
+    let plotGroup: Plottable.Components.PlotGroup;
     let bottomPlot: Plottable.Plots.Line<number>;
     let topPlot: Plottable.Plots.Line<number>;
     let bottomData: any[];
@@ -15,7 +15,7 @@ describe("Plots", () => {
       svg = TestMethods.generateSVG();
       xScale = new Plottable.Scales.Linear();
       yScale = new Plottable.Scales.Linear();
-      plotGroup = new Plottable.Plots.PlotGroup();
+      plotGroup = new Plottable.Components.PlotGroup();
       bottomPlot = new Plottable.Plots.Line<number>();
       topPlot = new Plottable.Plots.Line<number>();
 
@@ -38,7 +38,7 @@ describe("Plots", () => {
 
     it("throws error when appending not plot", () => {
       let label = new Plottable.Components.Label();
-      assert.throw(() => plotGroup.append(label), Error, "Plot Group only accepts plots");
+      assert.throw(() => plotGroup.append((<any>label)), Error, "Plot Group only accepts plots");
       svg.remove();
     });
 
