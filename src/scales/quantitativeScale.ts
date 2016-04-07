@@ -150,11 +150,11 @@ export class QuantitativeScale<D> extends Scale<D, number> {
         }
       });
     });
-    const originalDomain = this._getDomain();
-    this._setBackingScaleDomain(domain);
+    const originalDomain = this._backingScaleDomain();
+    this._backingScaleDomain(domain);
     let newMin = minExistsInExceptions ? min : this.invert(this.scale(min) - (this.scale(max) - this.scale(min)) * p);
     let newMax = maxExistsInExceptions ? max : this.invert(this.scale(max) + (this.scale(max) - this.scale(min)) * p);
-    this._setBackingScaleDomain(originalDomain);
+    this._backingScaleDomain(originalDomain);
 
     if (this._snappingDomainEnabled) {
       return this._niceDomain([newMin, newMax]);

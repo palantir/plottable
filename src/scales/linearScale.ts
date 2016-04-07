@@ -26,11 +26,18 @@ module Plottable.Scales {
     }
 
     protected _getDomain() {
-      return this._d3Scale.domain();
+      return this._backingScaleDomain();
     }
 
-    protected _setBackingScaleDomain(values: number[]) {
-      this._d3Scale.domain(values);
+    protected _backingScaleDomain(): number[]
+    protected _backingScaleDomain(values: number[]): this
+    protected _backingScaleDomain(values?: number[]): any {
+      if (values == null) {
+        return this._d3Scale.domain();
+      } else {
+        this._d3Scale.domain(values);
+        return this;
+      }
     }
 
     protected _getRange() {

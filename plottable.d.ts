@@ -732,7 +732,8 @@ declare module Plottable {
         domain(values: D[]): this;
         protected _getDomain(): D[];
         protected _setDomain(values: D[]): void;
-        protected _setBackingScaleDomain(values: D[]): void;
+        protected _backingScaleDomain(): D[];
+        protected _backingScaleDomain(values: D[]): this;
         /**
          * Gets the range.
          *
@@ -897,7 +898,8 @@ declare module Plottable.Scales {
         protected _expandSingleValueDomain(singleValueDomain: number[]): number[];
         scale(value: number): number;
         protected _getDomain(): number[];
-        protected _setBackingScaleDomain(values: number[]): void;
+        protected _backingScaleDomain(): number[];
+        protected _backingScaleDomain(values: number[]): this;
         protected _getRange(): number[];
         protected _setRange(values: number[]): void;
         invert(value: number): number;
@@ -954,7 +956,8 @@ declare module Plottable.Scales {
         invert(x: number): number;
         protected _getDomain(): number[];
         protected _setDomain(values: number[]): void;
-        protected _setBackingScaleDomain(values: number[]): void;
+        protected _backingScaleDomain(): number[];
+        protected _backingScaleDomain(values: number[]): this;
         ticks(): number[];
         /**
          * Return an appropriate number of ticks from lower to upper.
@@ -1059,7 +1062,8 @@ declare module Plottable.Scales {
         outerPadding(outerPadding: number): this;
         scale(value: string): number;
         protected _getDomain(): string[];
-        protected _setBackingScaleDomain(values: string[]): void;
+        protected _backingScaleDomain(): string[];
+        protected _backingScaleDomain(values: string[]): this;
         protected _getRange(): number[];
         protected _setRange(values: number[]): void;
     }
@@ -1092,7 +1096,8 @@ declare module Plottable.Scales {
          */
         scale(value: string): string;
         protected _getDomain(): string[];
-        protected _setBackingScaleDomain(values: string[]): void;
+        protected _backingScaleDomain(): string[];
+        protected _backingScaleDomain(values: string[]): this;
         protected _getRange(): string[];
         protected _setRange(values: string[]): void;
     }
@@ -1119,7 +1124,8 @@ declare module Plottable.Scales {
         protected _expandSingleValueDomain(singleValueDomain: Date[]): Date[];
         scale(value: Date): number;
         protected _getDomain(): Date[];
-        protected _setBackingScaleDomain(values: Date[]): void;
+        protected _backingScaleDomain(): Date[];
+        protected _backingScaleDomain(values: Date[]): this;
         protected _getRange(): number[];
         protected _setRange(values: number[]): void;
         invert(value: number): Date;
@@ -1159,7 +1165,8 @@ declare module Plottable.Scales {
         autoDomain(): this;
         scale(value: number): string;
         protected _getDomain(): number[];
-        protected _setBackingScaleDomain(values: number[]): void;
+        protected _backingScaleDomain(): number[];
+        protected _backingScaleDomain(values: number[]): this;
         protected _getRange(): string[];
         protected _setRange(range: string[]): void;
     }

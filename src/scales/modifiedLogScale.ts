@@ -19,7 +19,7 @@ module Plottable.Scales {
      *
      * For negative values, scale(-x) = -scale(x).
      *
-     * The range and domain for the scale should also be set, using the 
+     * The range and domain for the scale should also be set, using the
      * range() and domain() accessors, respectively.
      *
      * For `range`, provide a two-element array giving the minimum and
@@ -98,8 +98,15 @@ module Plottable.Scales {
       super._setDomain(transformedDomain);
     }
 
-    protected _setBackingScaleDomain(values: number[]) {
-      this._d3Scale.domain(values);
+    protected _backingScaleDomain(): number[]
+    protected _backingScaleDomain(values: number[]): this
+    protected _backingScaleDomain(values?: number[]): any {
+      if (values == null) {
+        return this._d3Scale.domain();
+      } else {
+        this._d3Scale.domain(values);
+        return this;
+      }
     }
 
     public ticks(): number[] {

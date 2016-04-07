@@ -1479,13 +1479,13 @@ var Plottable;
         Scale.prototype._setDomain = function (values) {
             if (!this._domainModificationInProgress) {
                 this._domainModificationInProgress = true;
-                this._setBackingScaleDomain(values);
+                this._backingScaleDomain(values);
                 this._dispatchUpdate();
                 this._domainModificationInProgress = false;
             }
         };
-        Scale.prototype._setBackingScaleDomain = function (values) {
-            throw new Error("Subclasses should override _setBackingDomain");
+        Scale.prototype._backingScaleDomain = function (values) {
+            throw new Error("Subclasses should override _backingDomain");
         };
         Scale.prototype.range = function (values) {
             if (values == null) {
@@ -1652,11 +1652,11 @@ var Plottable;
                     }
                 });
             });
-            var originalDomain = this._getDomain();
-            this._setBackingScaleDomain(domain);
+            var originalDomain = this._backingScaleDomain();
+            this._backingScaleDomain(domain);
             var newMin = minExistsInExceptions ? min : this.invert(this.scale(min) - (this.scale(max) - this.scale(min)) * p);
             var newMax = maxExistsInExceptions ? max : this.invert(this.scale(max) + (this.scale(max) - this.scale(min)) * p);
-            this._setBackingScaleDomain(originalDomain);
+            this._backingScaleDomain(originalDomain);
             if (this._snappingDomainEnabled) {
                 return this._niceDomain([newMin, newMax]);
             }
@@ -1787,10 +1787,16 @@ var Plottable;
                 return this._d3Scale(value);
             };
             Linear.prototype._getDomain = function () {
-                return this._d3Scale.domain();
+                return this._backingScaleDomain();
             };
-            Linear.prototype._setBackingScaleDomain = function (values) {
-                this._d3Scale.domain(values);
+            Linear.prototype._backingScaleDomain = function (values) {
+                if (values == null) {
+                    return this._d3Scale.domain();
+                }
+                else {
+                    this._d3Scale.domain(values);
+                    return this;
+                }
             };
             Linear.prototype._getRange = function () {
                 return this._d3Scale.range();
@@ -1899,8 +1905,14 @@ var Plottable;
                 var transformedDomain = [this._adjustedLog(values[0]), this._adjustedLog(values[1])];
                 _super.prototype._setDomain.call(this, transformedDomain);
             };
-            ModifiedLog.prototype._setBackingScaleDomain = function (values) {
-                this._d3Scale.domain(values);
+            ModifiedLog.prototype._backingScaleDomain = function (values) {
+                if (values == null) {
+                    return this._d3Scale.domain();
+                }
+                else {
+                    this._d3Scale.domain(values);
+                    return this;
+                }
             };
             ModifiedLog.prototype.ticks = function () {
                 // Say your domain is [-100, 100] and your pivot is 10.
@@ -2089,11 +2101,17 @@ var Plottable;
                 return this._d3Scale(value) + this.rangeBand() / 2;
             };
             Category.prototype._getDomain = function () {
-                return this._d3Scale.domain();
+                return this._backingScaleDomain();
             };
-            Category.prototype._setBackingScaleDomain = function (values) {
-                this._d3Scale.domain(values);
-                this._setBands();
+            Category.prototype._backingScaleDomain = function (values) {
+                if (values == null) {
+                    return this._d3Scale.domain();
+                }
+                else {
+                    this._d3Scale.domain(values);
+                    this._setBands();
+                    return this;
+                }
             };
             Category.prototype._getRange = function () {
                 return this._range;
@@ -2199,10 +2217,16 @@ var Plottable;
                 return Plottable.Utils.Color.lightenColor(color, modifyFactor);
             };
             Color.prototype._getDomain = function () {
-                return this._d3Scale.domain();
+                return this._backingScaleDomain();
             };
-            Color.prototype._setBackingScaleDomain = function (values) {
-                this._d3Scale.domain(values);
+            Color.prototype._backingScaleDomain = function (values) {
+                if (values == null) {
+                    return this._d3Scale.domain();
+                }
+                else {
+                    this._d3Scale.domain(values);
+                    return this;
+                }
             };
             Color.prototype._getRange = function () {
                 return this._d3Scale.range();
@@ -2274,10 +2298,16 @@ var Plottable;
                 return this._d3Scale(value);
             };
             Time.prototype._getDomain = function () {
-                return this._d3Scale.domain();
+                return this._backingScaleDomain();
             };
-            Time.prototype._setBackingScaleDomain = function (values) {
-                this._d3Scale.domain(values);
+            Time.prototype._backingScaleDomain = function (values) {
+                if (values == null) {
+                    return this._d3Scale.domain();
+                }
+                else {
+                    this._d3Scale.domain(values);
+                    return this;
+                }
             };
             Time.prototype._getRange = function () {
                 return this._d3Scale.range();
@@ -2411,10 +2441,16 @@ var Plottable;
                 return this._d3Scale(value);
             };
             InterpolatedColor.prototype._getDomain = function () {
-                return this._d3Scale.domain();
+                return this._backingScaleDomain();
             };
-            InterpolatedColor.prototype._setBackingScaleDomain = function (values) {
-                this._d3Scale.domain(values);
+            InterpolatedColor.prototype._backingScaleDomain = function (values) {
+                if (values == null) {
+                    return this._d3Scale.domain();
+                }
+                else {
+                    this._d3Scale.domain(values);
+                    return this;
+                }
             };
             InterpolatedColor.prototype._getRange = function () {
                 return this._colorRange;
