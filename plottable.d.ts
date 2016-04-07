@@ -1653,6 +1653,16 @@ declare module Plottable.Components {
         protected _remove(component: Component): boolean;
     }
 }
+declare module Plottable.Components {
+    class PlotGroup extends Group {
+        entityNearest(point: Point): Plots.PlotEntity;
+        /**
+         * Adds a Plot to this Plot Group.
+         * The added Plot will be rendered above Plots already in the Group.
+         */
+        append(plot: Plot): this;
+    }
+}
 declare module Plottable {
     class Axis<D> extends Component {
         /**

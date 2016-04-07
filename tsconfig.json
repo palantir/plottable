@@ -53,6 +53,7 @@
       "src/components/component.ts",
       "src/components/componentContainer.ts",
       "src/components/group.ts",
+      "src/components/plotGroup.ts",
 
       "src/axes/axis.ts",
       "src/axes/timeAxis.ts",
