@@ -52,8 +52,10 @@ module.exports = function(grunt) {
   var umdConfig = {
     all: {
       src: "plottable.js",
-      template: "unit",
-      objectToExport: "Plottable"
+      objectToExport: "Plottable",
+      deps: {
+          "default": ["d3"],
+      }
     }
   };
 
@@ -63,8 +65,16 @@ module.exports = function(grunt) {
       dest: "plottable.js"
     },
     svgtypewriter: {
-      src: ["plottable.js", "bower_components/svg-typewriter/svgtypewriter.js"],
+      src: ["plottable.js", "./bower_components/svg-typewriter/svgtypewriter.js"],
       dest: "plottable.js"
+    },
+    typings: {
+      src: ["plottable.d.ts"],
+      dest: "plottable-npm.d.ts",
+      options: {
+        banner: 'import * as d3 from "d3";\n',
+        footer: "\nexport = Plottable;\n",
+      }
     }
   };
 
@@ -256,6 +266,7 @@ module.exports = function(grunt) {
     "concat:svgtypewriter",
     "umd:all",
     "concat:header",
+    "concat:typings",
     "sed:versionNumber"
   ]);
 
