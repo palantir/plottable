@@ -66,7 +66,7 @@ function run(svg, data, Plottable){
   table.renderTo(svg);
 
   var pointer = new Plottable.Interactions.Pointer();
-  var defaultTitleText = "n = new point, d = delete last point, c = log points";
+  var defaultTitleText = "n = new point, d = delete last point";
   pointer.onPointerMove(function(p) {
     var datum;
     var position;
