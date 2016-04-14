@@ -1,4 +1,4 @@
-module Plottable {
+namespace Plottable {
 /**
  * Accesses a specific datum property.
  */

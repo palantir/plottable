@@ -1,4 +1,4 @@
-module Plottable.Scales {
+namespace Plottable.Scales {
 
   /**
    * A function that supplies domain values to be included into a Scale.
@@ -23,7 +23,7 @@ module Plottable.Scales {
   }
 }
 
-module Plottable {
+namespace Plottable {
 
 export interface ScaleCallback<S extends Scale<any, any>> {
   (scale: S): any;

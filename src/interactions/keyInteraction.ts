@@ -1,7 +1,7 @@
-module Plottable {
+namespace Plottable {
 export type KeyCallback = (keyCode: number) => void;
 
-export module Interactions {
+export namespace Interactions {
   export class Key extends Interaction {
     /**
      * A Key Interaction listens to key events that occur while the Component is

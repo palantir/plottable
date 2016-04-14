@@ -1,4 +1,4 @@
-module Plottable {
+namespace Plottable {
 export class QuantitativeScale<D> extends Scale<D, number> {
   protected static _DEFAULT_NUM_TICKS = 10;
   private _tickGenerator: Scales.TickGenerators.TickGenerator<D> = (scale: Plottable.QuantitativeScale<D>) => scale.defaultTicks();
@@ -61,7 +61,7 @@ export class QuantitativeScale<D> extends Scale<D, number> {
     if (includedValues.length !== 0) {
       let combinedExtent = [
         Utils.Math.min<D>(includedValues, extent[0]),
-        Utils.Math.max<D>(includedValues, extent[1])
+        Utils.Math.max<D>(includedValues, extent[1]),
       ];
       extent = this._padDomain(combinedExtent);
     }

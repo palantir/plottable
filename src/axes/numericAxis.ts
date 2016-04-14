@@ -1,4 +1,4 @@
-module Plottable.Axes {
+namespace Plottable.Axes {
   export class Numeric extends Axis<number> {
 
     private _tickLabelPositioning = "center";
@@ -102,7 +102,7 @@ module Plottable.Axes {
         x: <any> 0,
         y: <any> 0,
         dx: "0em",
-        dy: "0.3em"
+        dy: "0.3em",
       };
 
       let tickMarkLength = this._maxLabelTickLength();

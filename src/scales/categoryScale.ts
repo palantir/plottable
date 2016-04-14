@@ -1,4 +1,4 @@
-module Plottable.Scales {
+namespace Plottable.Scales {
   export class Category extends Scale<string, number> {
     private _d3Scale: d3.scale.Ordinal<string, number>;
     private _range = [0, 1];

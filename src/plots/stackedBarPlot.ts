@@ -1,4 +1,4 @@
-module Plottable.Plots {
+namespace Plottable.Plots {
   export class StackedBar<X, Y> extends Bar<X, Y> {
     private _stackingResult: Utils.Stacking.StackingResult;
     private _stackedExtent: number[];

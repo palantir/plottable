@@ -36,10 +36,9 @@
     "no-empty": true,
     "no-eval": true,
     "no-inferrable-types": true,
-    "no-internal-module": false,
+    "no-internal-module": true,
     "no-shadowed-variable": true,
     "no-switch-case-fall-through": true,
-    "no-trailing-comma": true,
     "no-trailing-whitespace": true,
     "no-unreachable": true,
     "no-unused-expression": true,
@@ -57,6 +56,10 @@
     ],
     "radix": true,
     "semicolon": true,
+    "trailing-comma": [true, {
+        "singleline": "never",
+        "multiline": "always"
+    }],
     "triple-equals": [true,
       "allow-null-check"
     ],

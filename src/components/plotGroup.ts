@@ -1,4 +1,4 @@
-module Plottable.Components {
+namespace Plottable.Components {
   export class PlotGroup extends Group {
     public entityNearest(point: Point): Plots.PlotEntity {
       let closestPlotEntity: Plots.PlotEntity;

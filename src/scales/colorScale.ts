@@ -1,4 +1,4 @@
-module Plottable.Scales {
+namespace Plottable.Scales {
   export class Color extends Scale<string, string> {
 
     private static _LOOP_LIGHTEN_FACTOR = 1.6;

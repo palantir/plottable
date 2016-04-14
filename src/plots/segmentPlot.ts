@@ -1,4 +1,4 @@
-module Plottable.Plots {
+namespace Plottable.Plots {
   export class Segment<X, Y> extends XYPlot<X, Y> {
     private static _X2_KEY = "x2";
     private static _Y2_KEY = "y2";
@@ -228,7 +228,8 @@ module Plottable.Plots {
         { x: xRange.min, y: yRange.min },
         { x: xRange.min, y: yRange.max },
         { x: xRange.max, y: yRange.max },
-        { x: xRange.max, y: yRange.min }];
+        { x: xRange.max, y: yRange.min },
+      ];
       let intersections = corners.filter((point: Point, index: number) => {
           if (index !== 0) {
             // return true if border formed by conecting current corner and previous corner intersects with the segment

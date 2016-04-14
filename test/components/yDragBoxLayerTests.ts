@@ -8,15 +8,15 @@ describe("SelectionBoxLayer", () => {
 
       const quarterTopLeftPoint = {
         x: SVG_WIDTH / 4,
-        y: SVG_HEIGHT / 4
+        y: SVG_HEIGHT / 4,
       };
       const middlePoint = {
         x: SVG_WIDTH / 2,
-        y: SVG_HEIGHT / 2
+        y: SVG_HEIGHT / 2,
       };
       const quarterBottomRightPoint = {
         x: SVG_WIDTH * 3 / 4,
-        y: SVG_HEIGHT * 3 / 4
+        y: SVG_HEIGHT * 3 / 4,
       };
 
       let svg: d3.Selection<void>;
@@ -33,7 +33,7 @@ describe("SelectionBoxLayer", () => {
 
         dbl.bounds({
           topLeft: quarterTopLeftPoint,
-          bottomRight: middlePoint
+          bottomRight: middlePoint,
         });
 
         const actualBounds = dbl.bounds();
@@ -68,7 +68,7 @@ describe("SelectionBoxLayer", () => {
 
         dbl.bounds({
           topLeft: quarterTopLeftPoint,
-          bottomRight: middlePoint
+          bottomRight: middlePoint,
         });
 
         const boundsBefore = dbl.bounds();
@@ -113,7 +113,7 @@ describe("SelectionBoxLayer", () => {
 
         dbl.bounds({
           topLeft: quarterTopLeftPoint,
-          bottomRight: quarterBottomRightPoint
+          bottomRight: quarterBottomRightPoint,
         });
 
         const boundsBefore = dbl.bounds();

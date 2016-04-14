@@ -1,3 +1,3 @@
-module Plottable {
+namespace Plottable {
 export var version = "@VERSION";
 }

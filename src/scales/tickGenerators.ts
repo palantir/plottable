@@ -1,4 +1,4 @@
-module Plottable.Scales.TickGenerators {
+namespace Plottable.Scales.TickGenerators {
   // HACKHACK: Generic types in type definition fails compilation
   // https://github.com/Microsoft/TypeScript/issues/1616
   /**

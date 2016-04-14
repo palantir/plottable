@@ -21,7 +21,7 @@ describe("Components", () => {
 
       bottomData = [
         { x: 0.0, y: 0.0 },
-        { x: 0.2, y: 0.2 }
+        { x: 0.2, y: 0.2 },
       ];
       bottomPlot.x((d) => d.x, xScale);
       bottomPlot.y((d) => d.y, yScale);
@@ -29,7 +29,7 @@ describe("Components", () => {
 
       topData = [
         { x: 0.0, y: 0.0 },
-        { x: 0.2, y: 0.4 }
+        { x: 0.2, y: 0.4 },
       ];
       topPlot.x((d) => d.x, xScale);
       topPlot.y((d) => d.y, yScale);

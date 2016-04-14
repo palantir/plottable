@@ -1,4 +1,4 @@
-module Plottable.Scales {
+namespace Plottable.Scales {
   export class ModifiedLog extends QuantitativeScale<number> {
     private _base: number;
     private _d3Scale: d3.scale.Linear<number, number>;

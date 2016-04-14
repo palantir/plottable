@@ -16,23 +16,23 @@ describe("Plots", () => {
     it("uses positive offset on stacking the 0 value", () => {
       let data0 = [
         {x: 1, y: 1},
-        {x: 3, y: 1}
+        {x: 3, y: 1},
       ];
       let data1 = [
         {x: 1, y: 0},
-        {x: 3, y: 1}
+        {x: 3, y: 1},
       ];
       let data2 = [
         {x: 1, y: -1},
-        {x: 3, y: 1}
+        {x: 3, y: 1},
       ];
       let data3 = [
         {x: 1, y: 1},
-        {x: 3, y: 1}
+        {x: 3, y: 1},
       ];
       let data4 = [
         {x: 1, y: 0},
-        {x: 3, y: 1}
+        {x: 3, y: 1},
       ];
 
       let ds0 = new Plottable.Dataset(data0);
@@ -54,22 +54,22 @@ describe("Plots", () => {
 
     it("strings are coerced to numbers for stacking", () => {
       let data0 = [
-        { x: 1, y: "-2" }
+        { x: 1, y: "-2" },
       ];
       let data1 = [
-        { x: 1, y: "3" }
+        { x: 1, y: "3" },
       ];
       let data2 = [
-        { x: 1, y: "-1" }
+        { x: 1, y: "-1" },
       ];
       let data3 = [
-        { x: 1, y: "5" }
+        { x: 1, y: "5" },
       ];
       let data4 = [
-        { x: 1, y: "1" }
+        { x: 1, y: "1" },
       ];
       let data5 = [
-        { x: 1, y: "-1" }
+        { x: 1, y: "-1" },
       ];
 
       let ds0 = new Plottable.Dataset(data0);
@@ -108,7 +108,7 @@ describe("Plots", () => {
 
     it("does not crash on stacking no datasets", () => {
       let dataset1 = new Plottable.Dataset([
-        {x: 1, y: -2}
+        {x: 1, y: -2},
       ]);
 
       stackedPlot.addDataset(dataset1);
@@ -130,23 +130,23 @@ describe("Plots", () => {
     it("uses positive offset on stacking the 0 value", () => {
       let data0 = [
         { x: 1, y: 1 },
-        { x: 3, y: 1 }
+        { x: 3, y: 1 },
       ];
       let data1 = [
         { x: 1, y: 0 },
-        { x: 3, y: 1 }
+        { x: 3, y: 1 },
       ];
       let data2 = [
         { x: 1, y: -1 },
-        { x: 3, y: 1 }
+        { x: 3, y: 1 },
       ];
       let data3 = [
         { x: 1, y: 1 },
-        { x: 3, y: 1 }
+        { x: 3, y: 1 },
       ];
       let data4 = [
         { x: 1, y: 0 },
-        { x: 3, y: 1 }
+        { x: 3, y: 1 },
       ];
 
       let ds0 = new Plottable.Dataset(data0);
@@ -168,22 +168,22 @@ describe("Plots", () => {
 
     it("strings are coerced to numbers for stacking", () => {
       let data0 = [
-        { x: 1, y: "-2" }
+        { x: 1, y: "-2" },
       ];
       let data1 = [
-        { x: 1, y: "3" }
+        { x: 1, y: "3" },
       ];
       let data2 = [
-        { x: 1, y: "-1" }
+        { x: 1, y: "-1" },
       ];
       let data3 = [
-        { x: 1, y: "5" }
+        { x: 1, y: "5" },
       ];
       let data4 = [
-        { x: 1, y: "1" }
+        { x: 1, y: "1" },
       ];
       let data5 = [
-        { x: 1, y: "-1" }
+        { x: 1, y: "-1" },
       ];
 
       let ds0 = new Plottable.Dataset(data0);
@@ -222,7 +222,7 @@ describe("Plots", () => {
 
     it("does not crash on stacking no datasets", () => {
       let dataset1 = new Plottable.Dataset([
-        { x: 1, y: -2 }
+        { x: 1, y: -2 },
       ]);
 
       stackedPlot.addDataset(dataset1);
@@ -248,13 +248,13 @@ describe("Plots", () => {
       dataset1 = new Plottable.Dataset([
         {x: 1, y: 1},
         {x: 2, y: 2},
-        {x: 3, y: 8}
+        {x: 3, y: 8},
       ]);
 
       dataset2 = new Plottable.Dataset([
         {x: 1, y: 2},
         {x: 2, y: 2},
-        {x: 3, y: 3}
+        {x: 3, y: 3},
       ]);
     });
 
@@ -300,13 +300,13 @@ describe("Plots", () => {
       dataset1 = new Plottable.Dataset([
         {x: "a", y: 1},
         {x: "b", y: 2},
-        {x: "c", y: 8}
+        {x: "c", y: 8},
       ]);
 
       dataset2 = new Plottable.Dataset([
         {x: "a", y: 2},
         {x: "b", y: 2},
-        {x: "c", y: 3}
+        {x: "c", y: 3},
       ]);
     });
 
@@ -361,15 +361,15 @@ describe("Plots", () => {
     it("extents are updated as datasets are updated", () => {
       let data1 = [
         { key: "a", value: 1 },
-        { key: "b", value: -2 }
+        { key: "b", value: -2 },
       ];
       let data2 = [
         { key: "a", value: 3 },
-        { key: "b", value: -4 }
+        { key: "b", value: -4 },
       ];
       let data2B = [
         { key: "a", value: 1 },
-        { key: "b", value: -2 }
+        { key: "b", value: -2 },
       ];
 
       let dataset1 = new Plottable.Dataset(data1);

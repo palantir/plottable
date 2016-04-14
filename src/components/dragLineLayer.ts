@@ -1,8 +1,8 @@
-module Plottable {
+namespace Plottable {
   export interface DragLineCallback<D> { (dragLineLayer: Components.DragLineLayer<D>): void; };
 }
 
-module Plottable.Components {
+namespace Plottable.Components {
   export class DragLineLayer<D> extends GuideLineLayer<D> {
     private _dragInteraction: Interactions.Drag;
     private _detectionRadius = 3;
@@ -76,7 +76,7 @@ module Plottable.Components {
       this._detectionEdge = this.content().append("line").style({
                               "opacity": 0,
                               "stroke": "pink",
-                              "pointer-events": "visibleStroke"
+                              "pointer-events": "visibleStroke",
                             }).classed("drag-edge", true);
     }
 
@@ -87,7 +87,7 @@ module Plottable.Components {
         y1: this._isVertical() ? 0 : this.pixelPosition(),
         x2: this._isVertical() ? this.pixelPosition() : this.width(),
         y2: this._isVertical() ? this.height() : this.pixelPosition(),
-        "stroke-width": this._detectionRadius * 2
+        "stroke-width": this._detectionRadius * 2,
       });
 
       return this;

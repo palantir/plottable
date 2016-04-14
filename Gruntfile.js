@@ -70,7 +70,7 @@ module.exports = function(grunt) {
 
   var tslintConfig = {
     options: {
-      configuration: grunt.file.readJSON(".tslintrc")
+      configuration: grunt.file.readJSON("tslint.json")
     },
     all: {
       src: ["src/**/*.ts", "test/**/*.ts"]

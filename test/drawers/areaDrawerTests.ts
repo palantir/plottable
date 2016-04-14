@@ -14,8 +14,8 @@ describe("Drawers", () => {
       const drawSteps: Plottable.Drawers.DrawStep[] = [
         {
           attrToProjector: {},
-          animator: new Plottable.Animators.Null()
-        }
+          animator: new Plottable.Animators.Null(),
+        },
       ];
       drawer.draw(data, drawSteps);
     });

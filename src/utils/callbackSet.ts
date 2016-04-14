@@ -1,4 +1,4 @@
-module Plottable.Utils {
+namespace Plottable.Utils {
   /**
    * A set of callbacks which can be all invoked at once.
    * Each callback exists at most once in the set (based on reference equality).

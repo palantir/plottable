@@ -33,7 +33,7 @@ describe("Scales", () => {
           "a string",
           0,
           expectedExtent[0],
-          expectedExtent[1]
+          expectedExtent[1],
         ];
         let extent = scale.extentOfValues(arrayWithBadValues);
         assert.strictEqual(extent[0].getTime(), expectedExtent[0].getTime(), "returned correct min");

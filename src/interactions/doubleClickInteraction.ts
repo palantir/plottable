@@ -1,4 +1,4 @@
-module Plottable.Interactions {
+namespace Plottable.Interactions {
   enum ClickState {NotClicked, SingleClicked, DoubleClicked};
   export class DoubleClick extends Interaction {
 

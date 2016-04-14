@@ -1,6 +1,6 @@
 ///<reference path="testReference.ts" />
 
-module Mocks {
+namespace Mocks {
   export class FixedSizeComponent extends Plottable.Component {
     public fsWidth: number;
     public fsHeight: number;
@@ -14,7 +14,7 @@ module Mocks {
     public requestedSpace(availableWidth: number, availableHeight: number): Plottable.SpaceRequest {
       return {
         minWidth: this.fsWidth,
-        minHeight: this.fsHeight
+        minHeight: this.fsHeight,
       };
     }
 
