@@ -181,7 +181,7 @@ describe("GuideLineLayer", () => {
           x1: orientation === "vertical" ? value : 0,
           x2: orientation === "vertical" ? value : SVG_WIDTH,
           y1: orientation === "vertical" ? 0 : value,
-          y2: orientation === "vertical" ? SVG_HEIGHT : value
+          y2: orientation === "vertical" ? SVG_HEIGHT : value,
         };
       }
       it("requests no space, but will occupy all offered space", () => {

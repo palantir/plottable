@@ -1,3 +1,4 @@
+import * as d3 from "d3";
 declare namespace Plottable.Utils.Math {
     /**
      * Checks if x is between a and b.
@@ -5071,3 +5072,5 @@ declare namespace Plottable.Components {
         destroy(): void;
     }
 }
+
+export = Plottable;

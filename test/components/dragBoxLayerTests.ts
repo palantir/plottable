@@ -308,11 +308,11 @@ describe("SelectionBoxLayer", () => {
 
         const startPoint = {
           x: SVG_WIDTH / 4,
-          y: SVG_HEIGHT / 4
+          y: SVG_HEIGHT / 4,
         };
         const endPoint = {
           x: SVG_WIDTH / 2,
-          y: SVG_HEIGHT / 2
+          y: SVG_HEIGHT / 2,
         };
 
         const target = dbl.background();
@@ -338,7 +338,7 @@ describe("SelectionBoxLayer", () => {
       function resetBox() {
         dbl.bounds({
           topLeft: { x: 0, y: 0 },
-          bottomRight: { x: 0, y: 0 }
+          bottomRight: { x: 0, y: 0 },
         });
         TestMethods.triggerFakeDragSequence(target,
                                 { x: SVG_WIDTH / 4, y: SVG_HEIGHT / 4},
@@ -569,7 +569,7 @@ describe("SelectionBoxLayer", () => {
         target = dbl.background();
         dbl.bounds({
           topLeft: { x: SVG_WIDTH / 4, y: SVG_HEIGHT / 4},
-          bottomRight: { x: SVG_WIDTH * 3 / 4, y: SVG_HEIGHT * 3 / 4}
+          bottomRight: { x: SVG_WIDTH * 3 / 4, y: SVG_HEIGHT * 3 / 4},
         });
         dbl.boxVisible(true);
         initialBounds = dbl.bounds();

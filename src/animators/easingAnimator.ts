@@ -1,4 +1,4 @@
-module Plottable.Animators {
+namespace Plottable.Animators {
 
   /**
    * An Animator with easing and configurable durations and delays.

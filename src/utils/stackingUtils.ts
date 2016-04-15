@@ -1,4 +1,4 @@
-module Plottable.Utils.Stacking {
+namespace Plottable.Utils.Stacking {
 
   export type StackedDatum = {
     value: number;
@@ -38,7 +38,7 @@ module Plottable.Utils.Stacking {
         }
         keyToStackedDatum.set(key, {
           value: value,
-          offset: offset
+          offset: offset,
         });
       });
       datasetToKeyToStackedDatum.set(dataset, keyToStackedDatum);

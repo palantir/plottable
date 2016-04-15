@@ -1,4 +1,4 @@
-module Plottable {
+namespace Plottable {
 export class XYPlot<X, Y> extends Plot {
   protected static _X_KEY = "x";
   protected static _Y_KEY = "y";

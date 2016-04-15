@@ -18,12 +18,12 @@ describe("Utils.Methods", () => {
       let defaultValue = 3;
       let goodArray: number[][] = [
         [minValue],
-        [maxValue]
+        [maxValue],
       ];
       // bad array is technically of type number[][], but subarrays are empty!
       let badArray: number[][] = [
         [],
-        []
+        [],
       ];
       let accessor = (arr: number[]) => arr[0];
       assert.strictEqual(min<number[], number>(goodArray, accessor, defaultValue),

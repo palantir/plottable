@@ -1,4 +1,4 @@
-module Plottable.Configs {
+namespace Plottable.Configs {
   /**
    * Specifies if Plottable should show warnings.
    */

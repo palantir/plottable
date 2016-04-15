@@ -1,5 +1,5 @@
-module Plottable {
-export module Drawers {
+namespace Plottable {
+export namespace Drawers {
   /**
    * A step for the drawer to draw.
    *
@@ -142,7 +142,7 @@ export class Drawer {
       let attrToAppliedProjector = this._appliedProjectors(dr.attrToProjector);
       return {
         attrToAppliedProjector: attrToAppliedProjector,
-        animator: dr.animator
+        animator: dr.animator,
       };
     });
 

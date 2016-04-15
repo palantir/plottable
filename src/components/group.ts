@@ -1,4 +1,4 @@
-module Plottable.Components {
+namespace Plottable.Components {
   export class Group extends ComponentContainer {
     private _components: Component[] = [];
 
@@ -32,7 +32,7 @@ module Plottable.Components {
       let requests = this._components.map((c: Component) => c.requestedSpace(offeredWidth, offeredHeight));
       return {
         minWidth: Utils.Math.max<SpaceRequest, number>(requests, (request) => request.minWidth, 0),
-        minHeight: Utils.Math.max<SpaceRequest, number>(requests, (request) => request.minHeight, 0)
+        minHeight: Utils.Math.max<SpaceRequest, number>(requests, (request) => request.minHeight, 0),
       };
     }
 
@@ -47,7 +47,7 @@ module Plottable.Components {
     protected _sizeFromOffer(availableWidth: number, availableHeight: number) {
       return {
         width: availableWidth,
-        height: availableHeight
+        height: availableHeight,
       };
     }
 

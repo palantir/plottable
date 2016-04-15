@@ -1,6 +1,6 @@
 ///<reference path="testReference.ts" />
 
-module TestMethods {
+namespace TestMethods {
 
   export function generateSVG(width = 400, height = 400): d3.Selection<void> {
     let parent = TestMethods.getSVGParent();
@@ -32,7 +32,7 @@ module TestMethods {
     c.requestedSpace = function(w, h) {
       return {
         minWidth: fixedWidth == null ? 0 : fixedWidth,
-        minHeight: fixedHeight == null ? 0 : fixedHeight
+        minHeight: fixedHeight == null ? 0 : fixedHeight,
       };
     };
     (<any> c).fixedWidth = () => fixedWidth == null ? false : true;
@@ -76,7 +76,7 @@ module TestMethods {
       left: Math.max(firstBox.left, secondBox.left),
       right: Math.min(firstBox.right, secondBox.right),
       bottom: Math.min(firstBox.bottom, secondBox.bottom),
-      top: Math.max(firstBox.top, secondBox.top)
+      top: Math.max(firstBox.top, secondBox.top),
     };
 
     // +1 for inaccuracy in IE
@@ -162,7 +162,7 @@ module TestMethods {
     return commands.map((command, index) => {
       return {
         command: command,
-        arguments: argumentStrings[index].split(",").filter((s) => s !== "").map((s) => parseFloat(s))
+        arguments: argumentStrings[index].split(",").filter((s) => s !== "").map((s) => parseFloat(s)),
       };
     });
   }
@@ -245,7 +245,7 @@ module TestMethods {
         clientX: xPos,
         clientY: yPos,
         pageX: xPos,
-        pageY: yPos
+        pageY: yPos,
       });
     });
     fakeTouchList.item = ( index: number ) => fakeTouchList[index];
@@ -289,6 +289,7 @@ module TestMethods {
     }
   }
 
+  /* tslint:disable:no-switch-case-fall-through */
   function getInteractionTypeString(mode: InteractionMode, type: InteractionType) {
     switch (mode) {
       case InteractionMode.Mouse:
@@ -302,7 +303,6 @@ module TestMethods {
           default:
             throw new Error("Unrecognized enum value: " + type);
         }
-        break;
       case InteractionMode.Touch:
         switch (type) {
           case InteractionType.Start:
@@ -314,11 +314,11 @@ module TestMethods {
           default:
             throw new Error("Unrecognized enum value: " + type);
         }
-        break;
       default:
         throw new Error("Unrecognized enum value: " + mode);
     }
   }
+  /* tslint:enable:no-switch-case-fall-through */
 
   export function triggerFakeKeyboardEvent(type: string, target: d3.Selection<void>, keyCode: number, options?: {[key: string]: any}) {
     let event = <KeyboardEvent> document.createEvent("Events");
@@ -375,7 +375,7 @@ module TestMethods {
     return {
       red: parseInt(hex.substr(1, 2), 16),
       green: parseInt(hex.substr(3, 2), 16),
-      blue: parseInt(hex.substr(5, 2), 16)
+      blue: parseInt(hex.substr(5, 2), 16),
     };
   }
 
@@ -417,7 +417,7 @@ module TestMethods {
         let pointArray = d.trim().split(",");
         return {
           x: +pointArray[0],
-          y: +pointArray[1]
+          y: +pointArray[1],
         };
       });
   }

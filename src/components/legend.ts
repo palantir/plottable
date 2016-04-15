@@ -1,4 +1,4 @@
-module Plottable.Components {
+namespace Plottable.Components {
   export class Legend extends Component {
     /**
      * The css class applied to each legend row
@@ -186,7 +186,7 @@ module Plottable.Components {
         entryLengths: entryLengths,
         untruncatedEntryLengths: untruncatedEntryLengths,
         rows: rows,
-        numRowsToDraw: Math.max(Math.min(rowsAvailable, rows.length), 0)
+        numRowsToDraw: Math.max(Math.min(rowsAvailable, rows.length), 0),
       };
     }
 
@@ -200,7 +200,7 @@ module Plottable.Components {
 
       return {
         minWidth: this._padding + longestUntruncatedRowLength,
-        minHeight: estimatedLayout.rows.length * estimatedLayout.textHeight + 2 * this._padding
+        minHeight: estimatedLayout.rows.length * estimatedLayout.textHeight + 2 * this._padding,
       };
     }
 
@@ -258,7 +258,7 @@ module Plottable.Components {
               datum: datum,
               position: { x: symbolX, y: symbolY },
               selection: entrySelection,
-              component: legend
+              component: legend,
             });
           }
           lowX += layout.entryLengths.get(value);
@@ -315,7 +315,7 @@ module Plottable.Components {
                         selection: container,
                         xAlign: "left",
                         yAlign: "top",
-                        textRotation: 0
+                        textRotation: 0,
                       };
                       self._writer.write(self._formatter(value), maxTextLength, self.height(), writeOptions);
                     });

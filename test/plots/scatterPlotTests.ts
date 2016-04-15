@@ -44,7 +44,7 @@ describe("Plots", () => {
 
       it("initially draws the points with a size of 0 when resetting", () => {
         const data = [
-          { x: 0, y: 0 }
+          { x: 0, y: 0 },
         ];
         const dataset = new Plottable.Dataset(data);
         plot.addDataset(dataset);
@@ -70,7 +70,7 @@ describe("Plots", () => {
           { x: 0.2, y: 0.2 },
           { x: 0.4, y: 0.4 },
           { x: 0.6, y: 0.6 },
-          { x: 0.8, y: 0.8 }
+          { x: 0.8, y: 0.8 },
         ];
         let dataset = new Plottable.Dataset(data);
         plot.addDataset(dataset);
@@ -279,7 +279,7 @@ describe("Plots", () => {
         let diff = 10;
         let closest = plot.entityNearest({
           x: xScale.scale(0) + diff,
-          y: yScale.scale(0) + diff
+          y: yScale.scale(0) + diff,
         });
 
         assert.deepEqual(closest.datum, dataset.data()[0], "correct datum has been retrieved");
@@ -293,7 +293,7 @@ describe("Plots", () => {
 
         let closest = plot.entityNearest({
           x: xScale.scale(1),
-          y: xScale.scale(2)
+          y: xScale.scale(2),
         });
         assert.deepEqual(closest.datum, dataset.data()[1], "correct datum has been retrieved");
 
@@ -307,7 +307,7 @@ describe("Plots", () => {
 
         let closest = plot.entityNearest({
           x: plot.width() / 2,
-          y: plot.height() / 2
+          y: plot.height() / 2,
         });
         assert.strictEqual(closest, undefined, "no datum has been retrieved");
         svg.remove();
@@ -318,10 +318,10 @@ describe("Plots", () => {
 
         let entities = plot.entitiesIn({
           min: xScale.scale(1),
-          max: xScale.scale(1)
+          max: xScale.scale(1),
         }, {
           min: yScale.scale(1),
-          max: yScale.scale(1)
+          max: yScale.scale(1),
         });
 
         assert.lengthOf(entities, 1, "only one Entity has been retrieved");
@@ -335,10 +335,10 @@ describe("Plots", () => {
 
         let entities = plot.entitiesIn({
           min: xScale.scale(1.001),
-          max: xScale.scale(1.001)
+          max: xScale.scale(1.001),
         }, {
           min: yScale.scale(1.001),
-          max: yScale.scale(1.001)
+          max: yScale.scale(1.001),
         });
 
         assert.lengthOf(entities, 0, "no Entities retrieved");
@@ -351,12 +351,13 @@ describe("Plots", () => {
         let entities = plot.entitiesIn({
           topLeft: {
             x: xScale.scale(1),
-            y: yScale.scale(1)
+            y: yScale.scale(1),
           },
           bottomRight: {
             x: xScale.scale(1),
-            y: yScale.scale(1)
-          }});
+            y: yScale.scale(1),
+          },
+        });
 
         assert.lengthOf(entities, 1, "only one Entity has been retrieved");
         assert.deepEqual(entities[0].datum, { x: 1, y: 1 }, "correct datum has been retrieved");
@@ -369,7 +370,7 @@ describe("Plots", () => {
 
         let entities = plot.entitiesAt({
           x: xScale.scale(1),
-          y: yScale.scale(1)
+          y: yScale.scale(1),
         });
         assert.lengthOf(entities, 1, "only one Entity has been retrieved");
         assert.deepEqual(entities[0].datum, { x: 1, y: 1 }, "correct datum has been retrieved");
@@ -385,7 +386,7 @@ describe("Plots", () => {
 
         let entities = plot.entitiesAt({
           x: xScale.scale(1) + initialRadius,
-          y: yScale.scale(1) - initialRadius
+          y: yScale.scale(1) - initialRadius,
         });
         assert.lengthOf(entities, 1, "only one Entity has been retrieved");
         assert.deepEqual(entities[0].datum, { x: 1, y: 1 }, "correct datum has been retrieved");
@@ -393,7 +394,7 @@ describe("Plots", () => {
         plot.size(initialSize - 1);
         entities = plot.entitiesAt({
           x: xScale.scale(1) + initialRadius,
-          y: yScale.scale(1) - initialRadius
+          y: yScale.scale(1) - initialRadius,
         });
         assert.lengthOf(entities, 0, "none of the Entities is retrieved");
         svg.remove();
@@ -405,7 +406,7 @@ describe("Plots", () => {
 
         let entities = plot.entitiesAt({
           x: xScale.scale(0.5),
-          y: yScale.scale(0.5)
+          y: yScale.scale(0.5),
         });
         assert.lengthOf(entities, 3, "all 3 Entities containing the Point have been retrieved");
         assert.deepEqual(entities[0].datum, { x: 0, y: 0 }, "correct datum has been retrieved");

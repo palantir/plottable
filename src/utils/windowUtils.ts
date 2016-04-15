@@ -1,4 +1,4 @@
-module Plottable.Utils.Window {
+namespace Plottable.Utils.Window {
 
   /**
    * Print a warning message to the console, if it is available.

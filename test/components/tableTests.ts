@@ -21,7 +21,7 @@ describe("Tables", () => {
       const c11 = new Plottable.Component();
       const rows = [
         [c00, null],
-        [null, c11]
+        [null, c11],
       ];
       const table = new Plottable.Components.Table(rows);
 
@@ -47,7 +47,7 @@ describe("Tables", () => {
       const c11 = new Plottable.Component();
       const table = new Plottable.Components.Table([
         [c00, c01],
-        [c10, c11]
+        [c10, c11],
       ]);
 
       assert.strictEqual(table.componentAt(0, 0), c00, "retrieves the Component at [0, 0]");
@@ -123,13 +123,13 @@ describe("Tables", () => {
     it("removes the specified Component", () => {
       const tableRows = [
         [c00, c01],
-        [c10, c11]
+        [c10, c11],
       ];
       table = new Plottable.Components.Table(tableRows);
       table.remove(c11);
       const expectedRows = [
         [c00, c01],
-        [c10, null]
+        [c10, null],
       ];
       assertTableRows(table, expectedRows, "the requested element was removed");
       assert.isNull(c11.parent(), "Component disconnected from the Table");
@@ -138,7 +138,7 @@ describe("Tables", () => {
     it("does nothing when component is not found", () => {
       const tableRows = [
         [c00, c01],
-        [c10, c11]
+        [c10, c11],
       ];
       table = new Plottable.Components.Table(tableRows);
       const expectedRows = tableRows;
@@ -150,12 +150,12 @@ describe("Tables", () => {
     it("has no further effect when called a second time with the same Component", () => {
       const tableRows = [
         [c00, c01],
-        [c10, c11]
+        [c10, c11],
       ];
       table = new Plottable.Components.Table(tableRows);
       const expectedRows = [
         [null, c01],
-        [c10, c11]
+        [c10, c11],
       ];
       table.remove(c00);
       assertTableRows(table, expectedRows, "Component was removed");
@@ -175,13 +175,13 @@ describe("Tables", () => {
     it("is fixed-width if all columns contain only fixed-width Components, non-fixed otherwise", () => {
       const fixedNullsTable = new Plottable.Components.Table([
         [new Mocks.FixedSizeComponent(), null],
-        [null, new Mocks.FixedSizeComponent()]
+        [null, new Mocks.FixedSizeComponent()],
       ]);
       assert.isTrue(fixedNullsTable.fixedWidth(), "width is fixed if all columns contain fixed-width Components or null");
 
       const notAllFixedTable = new Plottable.Components.Table([
         [new Mocks.FixedSizeComponent(), new Mocks.FixedSizeComponent()],
-        [new Plottable.Component(), null]
+        [new Plottable.Component(), null],
       ]);
       assert.isFalse(notAllFixedTable.fixedWidth(), "width is not fixed if any column contains a non-fixed-width Component");
     });
@@ -189,13 +189,13 @@ describe("Tables", () => {
     it("is fixed-height if all rows contain only fixed-height Components, non-fixed otherwise", () => {
       const fixedNullsTable = new Plottable.Components.Table([
         [new Mocks.FixedSizeComponent(), null],
-        [null, new Mocks.FixedSizeComponent()]
+        [null, new Mocks.FixedSizeComponent()],
       ]);
       assert.isTrue(fixedNullsTable.fixedHeight(), "height is fixed if all columns contain fixed-height Components or null");
 
       const notAllFixedTable = new Plottable.Components.Table([
         [new Mocks.FixedSizeComponent(), new Plottable.Component()],
-        [new Mocks.FixedSizeComponent(), null]
+        [new Mocks.FixedSizeComponent(), null],
       ]);
       assert.isFalse(notAllFixedTable.fixedHeight(), "height is not fixed if any row contains a non-fixed-height Component");
     });
@@ -211,7 +211,7 @@ describe("Tables", () => {
 
       const table = new Plottable.Components.Table([
         [unfixedComponent, bigFixedComponent01],
-        [bigFixedComponent10, smallFixedComponent]
+        [bigFixedComponent10, smallFixedComponent],
       ]);
 
       const expectedMinWidth = 2 * BIG_COMPONENT_SIZE;
@@ -237,7 +237,7 @@ describe("Tables", () => {
     beforeEach(() => {
       table = new Plottable.Components.Table([
         [new Plottable.Component(), new Plottable.Component()],
-        [new Plottable.Component(), new Plottable.Component()]
+        [new Plottable.Component(), new Plottable.Component()],
       ]);
     });
 
@@ -300,7 +300,7 @@ describe("Tables", () => {
     function verifyOrigins(rows: Plottable.Component[][], rowPadding = 0, columnPadding = 0) {
       let expectedOrigin = {
         x: 0,
-        y: 0
+        y: 0,
       };
       rows.forEach((row, r) => {
         let maxHeight = 0;
@@ -364,7 +364,7 @@ describe("Tables", () => {
       const component2 = new Plottable.Component();
       let tableRows = [
         [component1],
-        [component2]
+        [component2],
       ];
       const table = new Plottable.Components.Table(tableRows);
       table.renderTo(svg);
@@ -394,7 +394,7 @@ describe("Tables", () => {
       const table = new Plottable.Components.Table([
         [fixedSizeComponent],
         [unfixedComponent1],
-        [unfixedComponent2]
+        [unfixedComponent2],
       ]);
       table.renderTo(svg);
       const expectedUnfixedHeight = (TestMethods.numAttr(svg, "height") - FIXED_COMPONENT_SIZE) / 2;
@@ -430,7 +430,7 @@ describe("Tables", () => {
       const fixedComponent2 = new Mocks.FixedSizeComponent(FIXED_COMPONENT_SIZE, FIXED_COMPONENT_SIZE);
       const tableRows = [
         [fixedComponent1],
-        [fixedComponent2]
+        [fixedComponent2],
       ];
       const table = new Plottable.Components.Table(tableRows);
       table.renderTo(svg);
@@ -452,7 +452,7 @@ describe("Tables", () => {
         const component2 = new Plottable.Component();
         const tableRows = [
           [component1],
-          [component2]
+          [component2],
         ];
         const table = new Plottable.Components.Table(tableRows);
         const rowPadding = 10;
@@ -495,7 +495,7 @@ describe("Tables", () => {
         const component1 = new Plottable.Component();
         const table = new Plottable.Components.Table([
           [component0],
-          [component1]
+          [component1],
         ]);
         const row0Weight = 1;
         table.rowWeight(0, row0Weight);

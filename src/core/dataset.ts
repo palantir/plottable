@@ -1,4 +1,4 @@
-module Plottable {
+namespace Plottable {
 
 export type DatasetCallback = (dataset: Dataset) => void;
 

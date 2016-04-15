@@ -30,7 +30,7 @@ describe("Plots", () => {
         return Plottable.Utils.Math.range(0, count).map((datumNumber: number) => {
           return {
             x: datumNumber,
-            y: yTransform(datumNumber)
+            y: yTransform(datumNumber),
           };
         });
       };

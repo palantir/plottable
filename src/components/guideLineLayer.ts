@@ -1,4 +1,4 @@
-module Plottable.Components {
+namespace Plottable.Components {
   enum PropertyMode { VALUE, PIXEL };
   export class GuideLineLayer<D> extends Component {
     public static ORIENTATION_VERTICAL = "vertical";
@@ -39,7 +39,7 @@ module Plottable.Components {
     protected _sizeFromOffer(availableWidth: number, availableHeight: number) {
       return {
         width: availableWidth,
-        height: availableHeight
+        height: availableHeight,
       };
     }
 
@@ -74,7 +74,7 @@ module Plottable.Components {
         x1: this._isVertical() ? this.pixelPosition() : 0,
         y1: this._isVertical() ? 0 : this.pixelPosition(),
         x2: this._isVertical() ? this.pixelPosition() : this.width(),
-        y2: this._isVertical() ? this.height() : this.pixelPosition()
+        y2: this._isVertical() ? this.height() : this.pixelPosition(),
       });
       return this;
     }

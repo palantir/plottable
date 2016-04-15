@@ -436,11 +436,11 @@ describe("Scales", () => {
         let svg = TestMethods.generateSVG();
         let dataset1 = new Plottable.Dataset([
           {x: 0, y: 0},
-          {x: 1, y: 1}
+          {x: 1, y: 1},
         ]);
         let dataset2 = new Plottable.Dataset([
           {x: 1, y: 1},
-          {x: 2, y: 2}
+          {x: 2, y: 2},
         ]);
 
         let xScale = new Plottable.Scales.Linear();

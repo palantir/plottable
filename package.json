@@ -1,13 +1,15 @@
 {
-  "name": "plottable.js",
+  "name": "plottable",
   "description": "A modular charting library built on D3",
-  "version": "2.0.0",
+  "version": "2.0.1-beta.0",
   "license": "MIT",
   "repository": {
     "type": "git",
     "url": "https://github.com/palantir/plottable.git"
   },
   "author": "Palantir Technologies",
+  "main": "plottable.js",
+  "typings": "plottable-npm.d.ts",
   "scripts": {
     "test": "grunt test-travis"
   },
@@ -31,10 +33,13 @@
     "grunt-sed": "0.1.1",
     "grunt-shell": "1.1.2",
     "grunt-ts": "5.3.2",
-    "grunt-tslint": "3.0.1",
+    "grunt-tslint": "3.0.3",
     "grunt-umd": "2.3.5",
     "load-grunt-tasks": "3.4.0",
-    "tslint": "3.3.0",
-    "typescript": "1.7.5"
+    "tslint": "3.7.4",
+    "typescript": "1.8.10"
+  },
+  "dependencies": {
+    "d3": "^3.5.16"
   }
 }

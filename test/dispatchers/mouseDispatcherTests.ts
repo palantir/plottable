@@ -37,7 +37,7 @@ describe("Dispatchers", () => {
       let targetY = 76;
       let expectedPoint = {
         x: targetX,
-        y: targetY
+        y: targetY,
       };
 
       let svg: d3.Selection<void>;
@@ -257,7 +257,7 @@ describe("Dispatchers", () => {
           width: "400px",
           topLeftCorner: "absolute",
           top: topLeftCorner.y + "px",
-          left: topLeftCorner.x + "px"
+          left: topLeftCorner.x + "px",
         });
 
         callbackWasCalled = false;

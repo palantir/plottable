@@ -58,8 +58,8 @@ describe("Drawers", () => {
         const drawSteps = [
           {
             attrToProjector: attrToProjector,
-            animator: new Plottable.Animators.Null()
-          }
+            animator: new Plottable.Animators.Null(),
+          },
         ];
         drawer.renderArea(svg);
         drawer.draw(data, drawSteps);
@@ -151,7 +151,7 @@ describe("Drawers", () => {
         function makeFixedTimeAnimator(totalTime: number) {
           return <Plottable.Animator> {
             animate: () => null,
-            totalTime: () => totalTime
+            totalTime: () => totalTime,
           };
         }
 
@@ -159,7 +159,7 @@ describe("Drawers", () => {
         const drawSteps = animationTimes.map((time) => {
           return {
             attrToProjector: <Plottable.AttributeToProjector> {},
-            animator: makeFixedTimeAnimator(time)
+            animator: makeFixedTimeAnimator(time),
           };
         });
         const totalTime = drawer.totalDrawTime([], drawSteps);

@@ -52,8 +52,10 @@ module.exports = function(grunt) {
   var umdConfig = {
     all: {
       src: "plottable.js",
-      template: "unit",
-      objectToExport: "Plottable"
+      objectToExport: "Plottable",
+      deps: {
+          "default": ["d3"],
+      }
     }
   };
 
@@ -63,14 +65,22 @@ module.exports = function(grunt) {
       dest: "plottable.js"
     },
     svgtypewriter: {
-      src: ["plottable.js", "bower_components/svg-typewriter/svgtypewriter.js"],
+      src: ["plottable.js", "./bower_components/svg-typewriter/svgtypewriter.js"],
       dest: "plottable.js"
+    },
+    typings: {
+      src: ["plottable.d.ts"],
+      dest: "plottable-npm.d.ts",
+      options: {
+        banner: 'import * as d3 from "d3";\n',
+        footer: "\nexport = Plottable;\n",
+      }
     }
   };
 
   var tslintConfig = {
     options: {
-      configuration: grunt.file.readJSON(".tslintrc")
+      configuration: grunt.file.readJSON("tslint.json")
     },
     all: {
       src: ["src/**/*.ts", "test/**/*.ts"]
@@ -142,6 +152,7 @@ module.exports = function(grunt) {
     "plottable.js",
     "plottable.min.js",
     "plottable.d.ts",
+    "plottable-npm.d.ts",
     "plottable.css",
     "plottable.zip",
     "bower.json",
@@ -256,11 +267,12 @@ module.exports = function(grunt) {
     "concat:svgtypewriter",
     "umd:all",
     "concat:header",
+    "concat:typings",
     "sed:versionNumber"
   ]);
 
   grunt.registerTask("release:patch", ["bump:patch", "dist-compile", "gitcommit:version"]);
-  grunt.registerTask("release:minor", ["bump:minor", "dist-compile", "gitcommit:version"]);
+  grunt.registerTask("release:minor", ["uump:minor", "dist-compile", "gitcommit:version"]);
   grunt.registerTask("release:major", ["bump:major", "dist-compile", "gitcommit:version"]);
 
   grunt.registerTask("dist-compile", ["test", "uglify", "compress"]);

@@ -1,4 +1,4 @@
-module Plottable.Plots {
+namespace Plottable.Plots {
   export class Pie extends Plot {
 
     private static _INNER_RADIUS_KEY = "inner-radius";
@@ -391,7 +391,7 @@ module Plottable.Plots {
           { x: x, y: y },
           { x: x, y: y + measurement.height},
           { x: x + measurement.width, y: y },
-          { x: x + measurement.width, y: y + measurement.height }
+          { x: x + measurement.width, y: y + measurement.height },
         ];
 
         let showLabel = corners.every((corner) => {
@@ -414,7 +414,7 @@ module Plottable.Plots {
           selection: g,
           xAlign: "center",
           yAlign: "center",
-          textRotation: 0
+          textRotation: 0,
         });
       });
     }

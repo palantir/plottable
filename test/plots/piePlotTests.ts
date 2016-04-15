@@ -182,7 +182,7 @@ describe("Plots", () => {
         let data = [
           { value: 1 },
           { value: 2 },
-          { value: 3 }
+          { value: 3 },
         ];
         let dataset = new Plottable.Dataset(data);
         piePlot.addDataset(dataset);
@@ -199,7 +199,7 @@ describe("Plots", () => {
         let data1 = [
           { value: 1 },
           { value: 1 },
-          { value: 1 }
+          { value: 1 },
         ];
         let dataset = new Plottable.Dataset(data1);
         piePlot.addDataset(dataset);
@@ -212,7 +212,7 @@ describe("Plots", () => {
         });
         let data2 = [
           { value: 2 },
-          { value: 2 }
+          { value: 2 },
         ];
         dataset.data(data2);
         labels = piePlot.content().selectAll("text");
@@ -228,7 +228,7 @@ describe("Plots", () => {
         let data = [
           { value: 1 },
           { value: 1 },
-          { value: 1 }
+          { value: 1 },
         ];
         let dataset = new Plottable.Dataset(data);
         piePlot.addDataset(dataset);
@@ -248,7 +248,7 @@ describe("Plots", () => {
           { key: "C", value: 1 },
           { key: "D", value: 50 },
           { key: "E", value: 1 },
-          { key: "F", value: 50 }
+          { key: "F", value: 50 },
         ];
         let dataset = new Plottable.Dataset(data);
         piePlot.addDataset(dataset);
@@ -268,7 +268,7 @@ describe("Plots", () => {
       it("uses its formatter to format labels", () => {
         let data = [
           { value: 5 },
-          { value: 15 }
+          { value: 15 },
         ];
         let dataset = new Plottable.Dataset(data);
         piePlot.addDataset(dataset);
@@ -288,7 +288,7 @@ describe("Plots", () => {
           { value: 1 },
           { value: 50 },
           { value: 1 },
-          { value: 50 }
+          { value: 50 },
         ];
         let dataset = new Plottable.Dataset(data);
         piePlot.addDataset(dataset);
@@ -313,7 +313,7 @@ describe("Plots", () => {
         let data = [
           { value: 5000 },
           { value: 5000 },
-          { value: 5000 }
+          { value: 5000 },
         ];
         let dataset = new Plottable.Dataset(data);
         piePlot.addDataset(dataset).outerRadius(500);
@@ -337,7 +337,7 @@ describe("Plots", () => {
         let data = [
           { value: 1 },
           { value: "value" },
-          { value: 2 }
+          { value: 2 },
         ];
         let dataset = new Plottable.Dataset(data);
         piePlot.addDataset(dataset);
@@ -445,7 +445,7 @@ describe("Plots", () => {
         const clicks = clickAngles.map((angle) => {
           return {
             x: OUTER_RADIUS + Math.sin(angle),
-            y: OUTER_RADIUS - Math.cos(angle)
+            y: OUTER_RADIUS - Math.cos(angle),
           };
         });
 
@@ -468,7 +468,7 @@ describe("Plots", () => {
 
         let clickInCenter = {
           x: 200,
-          y: 200
+          y: 200,
         };
         let entitiesInCenter = piePlot.entitiesAt(clickInCenter);
         assert.lengthOf(entitiesInCenter, 0, "no entities returned when clicking inside innerRadius()");
@@ -477,14 +477,14 @@ describe("Plots", () => {
         piePlot.outerRadius(OUTER_RADIUS);
         let clickBetweenRadii = {
           x: 200,
-          y: 200 + (INNER_RADIUS + OUTER_RADIUS) / 2
+          y: 200 + (INNER_RADIUS + OUTER_RADIUS) / 2,
         };
         let entitiesBetweenRadii = piePlot.entitiesAt(clickBetweenRadii);
         TestMethods.assertPlotEntitiesEqual(entitiesBetweenRadii[0], piePlot.entities()[1], "retrieved the correct entity");
 
         let clickOutsideOuterRadius = {
           x: 200,
-          y: 200 + OUTER_RADIUS + 1
+          y: 200 + OUTER_RADIUS + 1,
         };
         let entitiesOutsideOuterRadius = piePlot.entitiesAt(clickOutsideOuterRadius);
         assert.lengthOf(entitiesOutsideOuterRadius, 0, "no entities returned when clicking outside outerRadius()");
@@ -496,7 +496,7 @@ describe("Plots", () => {
         piePlot.renderTo(svg);
         let closest = piePlot.entityNearest({
           x: piePlot.width() / 2,
-          y: piePlot.height() / 2
+          y: piePlot.height() / 2,
         });
         assert.strictEqual(closest, undefined, "no datum has been retrieved");
         svg.remove();
@@ -527,7 +527,7 @@ describe("Plots", () => {
           { v: 1 },
           { v: "Bad String" },
           { v: 1 },
-          { v: -100 }
+          { v: -100 },
         ];
 
         let piePlot = new Plottable.Plots.Pie();

@@ -1,10 +1,10 @@
-module Plottable {
+namespace Plottable {
 
   export type Formatter = (d: any) => string;
 
 }
 
-module Plottable.Formatters {
+namespace Plottable.Formatters {
 
   interface TimeFilterFormat {
     format: string;
@@ -179,35 +179,35 @@ module Plottable.Formatters {
 
     timeFormat[0] = {
       format: ".%L",
-      filter: (d: any) => d.getMilliseconds() !== 0
+      filter: (d: any) => d.getMilliseconds() !== 0,
     };
     timeFormat[1] = {
       format: ":%S",
-      filter: (d: any) => d.getSeconds() !== 0
+      filter: (d: any) => d.getSeconds() !== 0,
     };
     timeFormat[2] = {
       format: "%I:%M",
-      filter: (d: any) => d.getMinutes() !== 0
+      filter: (d: any) => d.getMinutes() !== 0,
     };
     timeFormat[3] = {
       format: "%I %p",
-      filter: (d: any) => d.getHours() !== 0
+      filter: (d: any) => d.getHours() !== 0,
     };
     timeFormat[4] = {
       format: "%a %d",
-      filter: (d: any) => d.getDay() !== 0 && d.getDate() !== 1
+      filter: (d: any) => d.getDay() !== 0 && d.getDate() !== 1,
     };
     timeFormat[5] = {
       format: "%b %d",
-      filter: (d: any) => d.getDate() !== 1
+      filter: (d: any) => d.getDate() !== 1,
     };
     timeFormat[6] = {
       format: "%b",
-      filter: (d: any) => d.getMonth() !== 0
+      filter: (d: any) => d.getMonth() !== 0,
     };
     timeFormat[7] = {
       format: "%Y",
-      filter: () => true
+      filter: () => true,
     };
 
     return (d: any) => {

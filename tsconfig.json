@@ -5,7 +5,11 @@
         "sourceMap": false,
         "declaration": true,
         "removeComments": false,
-        "outFile": "plottable.js"
+        "outFile": "plottable.js",
+
+        "forceConsistentCasingInFileNames": true,
+        "noFallthroughCasesInSwitch": true,
+        "noImplicitReturns": true
     },
     "files": [
       "typings/d3/d3.d.ts",

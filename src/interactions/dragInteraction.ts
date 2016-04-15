@@ -1,10 +1,10 @@
-module Plottable {
+namespace Plottable {
 
 export type DragCallback = (start: Point, end: Point) => void;
 
 }
 
-module Plottable.Interactions {
+namespace Plottable.Interactions {
   export class Drag extends Interaction {
     private _dragging = false;
     private _constrainedToComponent = true;
@@ -56,7 +56,7 @@ module Plottable.Interactions {
 
       return {
         x: Utils.Math.clamp(translatedP.x, 0, this._componentAttachedTo.width()),
-        y: Utils.Math.clamp(translatedP.y, 0, this._componentAttachedTo.height())
+        y: Utils.Math.clamp(translatedP.y, 0, this._componentAttachedTo.height()),
       };
     }
 

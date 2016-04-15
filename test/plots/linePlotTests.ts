@@ -26,7 +26,7 @@ describe("Plots", () => {
           { x: 0.2, y: 0.2 },
           { x: 0.4, y: NaN },
           { x: 0.6, y: 0.6 },
-          { x: 0.8, y: 0.8 }
+          { x: 0.8, y: 0.8 },
         ];
 
         linePlot.addDataset(new Plottable.Dataset(dataWithNaN));
@@ -86,7 +86,7 @@ describe("Plots", () => {
           { x: 0.2, y: 0.2 },
           { x: 0.4, y: 0.4 },
           { x: 0.6, y: 0.6 },
-          { x: 0.8, y: 0.8 }
+          { x: 0.8, y: 0.8 },
         ];
         const mutableDataset = new Plottable.Dataset(lineData);
         linePlot.addDataset(mutableDataset);
@@ -273,7 +273,7 @@ describe("Plots", () => {
       let yScale: Plottable.Scales.Linear;
       let data = [
         {x: 0.0, y: -1},
-        {x: 1.8, y: -2}
+        {x: 1.8, y: -2},
       ];
       let dataset: Plottable.Dataset;
       let line: Plottable.Plots.Line<number>;
@@ -473,7 +473,7 @@ describe("Plots", () => {
         yScale.domain([0.1, 1.1]);
         let verticalLinesData = [
           {x: -2, y: 1.8},
-          {x: -1, y: 0.0}
+          {x: -1, y: 0.0},
         ];
         line.addDataset(new Plottable.Dataset(verticalLinesData));
         line.autorangeMode("x");
@@ -546,7 +546,7 @@ describe("Plots", () => {
           {x: 2, y: 2},
           {x: 3, y: 1},
           {x: 4, y: 2},
-          {x: 5, y: 1}
+          {x: 5, y: 1},
         ];
         plot.addDataset(new Plottable.Dataset(data));
 
@@ -569,7 +569,7 @@ describe("Plots", () => {
           {x: 2, y: 2},
           {x: 3, y: 1},
           {x: 4, y: 2},
-          {x: 5, y: 1}
+          {x: 5, y: 1},
         ];
         plot.addDataset(new Plottable.Dataset(data));
 
@@ -592,7 +592,7 @@ describe("Plots", () => {
           {x: 2, y: 2},
           {x: 1, y: 3},
           {x: 2, y: 4},
-          {x: 1, y: 5}
+          {x: 1, y: 5},
         ];
         plot.addDataset(new Plottable.Dataset(data));
         xScale.padProportion(0);
@@ -616,7 +616,7 @@ describe("Plots", () => {
           {x: 2, y: 2},
           {x: 3, y: 1},
           {x: 4, y: 2},
-          {x: 5, y: 1}
+          {x: 5, y: 1},
         ];
         plot.addDataset(new Plottable.Dataset(data));
 

@@ -28,11 +28,11 @@ describe("Plots", () => {
 
         const dataset1 = new Plottable.Dataset([
           {category: "A", num: 1},
-          {category: "B", num: 2}
+          {category: "B", num: 2},
         ]);
         const dataset2 = new Plottable.Dataset([
           {category: "A", num: 2},
-          {category: "B", num: 1}
+          {category: "B", num: 1},
         ]);
         const originalData1 = dataset1.data().slice();
         const originalData2 = dataset2.data().slice();
@@ -75,17 +75,17 @@ describe("Plots", () => {
         clusterBarPlot.addDataset(new Plottable.Dataset([
           {category: "A", num: 1},
           {category: "B", num: 2},
-          {category: "C", num: 1}
+          {category: "C", num: 1},
         ]));
 
         clusterBarPlot.addDataset(new Plottable.Dataset([
           {category: "A", num: 2},
-          {category: "B", num: 4}
+          {category: "B", num: 4},
         ]));
 
         clusterBarPlot.addDataset(new Plottable.Dataset([
           {category: "B", num: 15},
-          {category: "C", num: 15}
+          {category: "C", num: 15},
         ]));
 
         const bars =  clusterBarPlot.content().selectAll(".bar-area").selectAll("rect");
