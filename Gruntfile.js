@@ -272,7 +272,7 @@ module.exports = function(grunt) {
   ]);
 
   grunt.registerTask("release:patch", ["bump:patch", "dist-compile", "gitcommit:version"]);
-  grunt.registerTask("release:minor", ["uump:minor", "dist-compile", "gitcommit:version"]);
+  grunt.registerTask("release:minor", ["bump:minor", "dist-compile", "gitcommit:version"]);
   grunt.registerTask("release:major", ["bump:major", "dist-compile", "gitcommit:version"]);
 
   grunt.registerTask("dist-compile", ["test", "uglify", "compress"]);
