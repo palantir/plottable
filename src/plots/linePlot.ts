@@ -338,33 +338,6 @@ namespace Plottable.Plots {
       return attrToProjector;
     }
 
-    /**
-     * Returns the PlotEntity nearest to the query point by X then by Y, or undefined if no PlotEntity can be found.
-     *
-     * @param {Point} queryPoint
-     * @returns {PlotEntity} The nearest PlotEntity, or undefined if no PlotEntity can be found.
-     */
-    public entityNearest(queryPoint: Point): PlotEntity {
-      let minXDist = Infinity;
-      let minYDist = Infinity;
-      let closest: PlotEntity;
-      this.entities().forEach((entity) => {
-        if (!this._entityVisibleOnPlot(entity.position, entity.datum, entity.index, entity.dataset)) {
-          return;
-        }
-        let xDist = Math.abs(queryPoint.x - entity.position.x);
-        let yDist = Math.abs(queryPoint.y - entity.position.y);
-
-        if (xDist < minXDist || xDist === minXDist && yDist < minYDist) {
-          closest = entity;
-          minXDist = xDist;
-          minYDist = yDist;
-        }
-      });
-
-      return closest;
-    }
-
     protected _propertyProjectors(): AttributeToProjector {
       let propertyToProjectors = super._propertyProjectors();
       propertyToProjectors["d"] = this._constructLineProjector(Plot._scaledAccessor(this.x()), Plot._scaledAccessor(this.y()));
