@@ -344,7 +344,7 @@ namespace Plottable.Plots {
      * @param {Point} queryPoint
      * @returns {PlotEntity} The nearest PlotEntity, or undefined if no PlotEntity can be found.
      */
-    public entityNearest(queryPoint: Point): PlotEntity {
+    public entityNearestByXThenY(queryPoint: Point): PlotEntity {
       let minXDist = Infinity;
       let minYDist = Infinity;
       let closest: PlotEntity;
