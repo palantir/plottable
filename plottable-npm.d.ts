@@ -3611,7 +3611,7 @@ declare namespace Plottable.Plots {
          * @param {Point} queryPoint
          * @returns {PlotEntity} The nearest PlotEntity, or undefined if no PlotEntity can be found.
          */
-        entityNearest(queryPoint: Point): PlotEntity;
+        entityNearestByXThenY(queryPoint: Point): PlotEntity;
         protected _propertyProjectors(): AttributeToProjector;
         protected _constructLineProjector(xProjector: Projector, yProjector: Projector): (datum: any, index: number, dataset: Dataset) => string;
         protected _getDataToDraw(): Utils.Map<Dataset, any[]>;

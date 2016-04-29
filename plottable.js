@@ -9020,7 +9020,7 @@ var Plottable;
              * @param {Point} queryPoint
              * @returns {PlotEntity} The nearest PlotEntity, or undefined if no PlotEntity can be found.
              */
-            Line.prototype.entityNearest = function (queryPoint) {
+            Line.prototype.entityNearestByXThenY = function (queryPoint) {
                 var _this = this;
                 var minXDist = Infinity;
                 var minYDist = Infinity;
