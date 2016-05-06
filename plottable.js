@@ -4926,22 +4926,27 @@ var Plottable;
                 this.redraw();
                 return this;
             };
+            /**
+             * The pad value gives the amount of padding that must be
+             * subtracted from overall space when rendering text (important for
+             * proper line breaking).
+             *
+             * The translate value gives the amount the label should be moved
+             * to give the proper padding.
+             *
+             * Pad will always be a positive amount, but translate can be
+             * negative depending on rotation of labels and axis orientation.
+             */
             Category.prototype._calcTextPadding = function () {
-                // Padding always moves the label *away* from the outer edge of
-                // the axis (tickLabelPadding moves labels away from the inner
-                // edge of the axis already).
-                // The pad value gives the amount of padding that must be
-                // subtracted from overall space when renderign text (import for
-                // proper line breaking).
-                //
-                // The translate value gives the amount the label should be
-                // moved to give the proper padding.
-                //
-                // Pad will always be a positive amount, but translate can be
-                // negative depending on rotation of labels and axis
-                // orientation.
                 var pad = { x: 0, y: 0 };
                 var translate = { x: 0, y: 0 };
+                // In general, padding moves the label *away* from the outer
+                // edge of the axis (tickLabelPadding moves labels away from the
+                // inner edge of the axis already). 
+                //
+                // The doc comment for tickTextPadding details the particular
+                // combinations of orientation and label rotation implemented
+                // below.
                 if (this.tickLabelAngle() === 0 && !this._isHorizontal()) {
                     if (this.orientation() === "right" && this.tickTextAlignment() === "right") {
                         pad.x = this.tickTextPadding();
@@ -4982,9 +4987,7 @@ var Plottable;
                 var self = this;
                 var xAlign;
                 var yAlign;
-                var result = this._calcTextPadding();
-                var pad = result.pad;
-                var translate = result.translate;
+                var _a = this._calcTextPadding(), pad = _a.pad, translate = _a.translate;
                 switch (this.tickLabelAngle()) {
                     case 0:
                         xAlign = { left: "right", right: "left", top: "center", bottom: "center" };

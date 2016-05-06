@@ -103,7 +103,7 @@ module Plottable.Axes {
       } else {
         let v = tickTextAlignment.toLowerCase();
         if (v !== "left" && v !== "right" && v !== "center") {
-          throw new Error("tickTextAlignment '" + tickTextAlignment + "' not supported. Must be left, right, or center.");
+          throw new Error(`tickTextAlignment '${tickTextAlignment}' not supported. Must be left, right, or center.`);
         }
         this._tickTextAlignment = v;
       }
@@ -117,8 +117,9 @@ module Plottable.Axes {
      */
     public tickTextPadding(): number;
     /**
-     * Sets Padding between labels and outer edge of the axis (i.e.,
-     * the edge opposite the plot, as defined by the axis' {@link
+     * In general, padding moves the label *away* from the outer edge
+     * of the axis (tickLabelPadding moves labels away from the inner
+     * edge of the axis already), as defined by the axis' {@link
      * orientation}).
      *
      * Padding will only be applied when {@link tickTextAlignment} is
@@ -173,23 +174,28 @@ module Plottable.Axes {
       return this;
     }
 
+    /**
+     * The pad value gives the amount of padding that must be
+     * subtracted from overall space when rendering text (important for
+     * proper line breaking).
+     * 
+     * The translate value gives the amount the label should be moved
+     * to give the proper padding.
+     * 
+     * Pad will always be a positive amount, but translate can be
+     * negative depending on rotation of labels and axis orientation.
+     */
     private _calcTextPadding(): { translate: { x: number, y: number }, pad: { x: number, y: number }} {
-      // Padding always moves the label *away* from the outer edge of
-      // the axis (tickLabelPadding moves labels away from the inner
-      // edge of the axis already).
+      const pad = { x: 0, y: 0 };
+      const translate = { x: 0, y: 0 };
 
-      // The pad value gives the amount of padding that must be
-      // subtracted from overall space when renderign text (import for
-      // proper line breaking).
+      // In general, padding moves the label *away* from the outer
+      // edge of the axis (tickLabelPadding moves labels away from the
+      // inner edge of the axis already). 
       //
-      // The translate value gives the amount the label should be
-      // moved to give the proper padding.
-      //
-      // Pad will always be a positive amount, but translate can be
-      // negative depending on rotation of labels and axis
-      // orientation.
-      let pad = { x: 0, y: 0 };
-      let translate = { x: 0, y: 0 };
+      // The doc comment for tickTextPadding details the particular
+      // combinations of orientation and label rotation implemented
+      // below.
 
       if (this.tickLabelAngle() === 0 && ! this._isHorizontal()) {
         if (this.orientation() === "right" && this.tickTextAlignment() === "right") {
@@ -228,9 +234,7 @@ module Plottable.Axes {
       let self = this;
       let xAlign: {[s: string]: string};
       let yAlign: {[s: string]: string};
-      let result = this._calcTextPadding();
-      let pad = result.pad;
-      let translate = result.translate;
+      const { pad, translate } = this._calcTextPadding();
 
       switch (this.tickLabelAngle()) {
         case 0:
@@ -262,7 +266,7 @@ module Plottable.Axes {
 
         if (translate.x !== 0 || translate.y !== 0) {
           let text = writeOptions.selection;
-          text.attr("transform", "translate(" + translate.x + ", " + translate.y + ") " + text.attr("transform"));
+          text.attr("transform", `translate(${translate.x}, ${translate.y}) ${text.attr("transform")}`);
         }
       });
     }
@@ -279,7 +283,7 @@ module Plottable.Axes {
       let totalInnerPaddingRatio = (ticks.length - 1) * scale.innerPadding();
       let expectedRangeBand = axisSpace / (totalOuterPaddingRatio + totalInnerPaddingRatio + ticks.length);
       let stepWidth = expectedRangeBand * (1 + scale.innerPadding());
-      let tickTextPadding = this._calcTextPadding().pad;
+      const tickTextPadding = this._calcTextPadding().pad;
 
       let wrappingResults = ticks.map((s: string) => {
 

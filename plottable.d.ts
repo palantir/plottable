@@ -2094,8 +2094,9 @@ declare module Plottable.Axes {
          */
         tickTextPadding(): number;
         /**
-         * Sets Padding between labels and outer edge of the axis (i.e.,
-         * the edge opposite the plot, as defined by the axis' {@link
+         * In general, padding moves the label *away* from the outer edge
+         * of the axis (tickLabelPadding moves labels away from the inner
+         * edge of the axis already), as defined by the axis' {@link
          * orientation}).
          *
          * Padding will only be applied when {@link tickTextAlignment} is
@@ -2129,6 +2130,17 @@ declare module Plottable.Axes {
          * @returns {Category} The calling Category Axis.
          */
         tickLabelAngle(angle: number): this;
+        /**
+         * The pad value gives the amount of padding that must be
+         * subtracted from overall space when rendering text (important for
+         * proper line breaking).
+         *
+         * The translate value gives the amount the label should be moved
+         * to give the proper padding.
+         *
+         * Pad will always be a positive amount, but translate can be
+         * negative depending on rotation of labels and axis orientation.
+         */
         private _calcTextPadding();
         /**
          * Measures the size of the ticks while also writing them to the DOM.
