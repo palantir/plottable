@@ -1,4 +1,4 @@
-module Plottable.Interactions {
+namespace Plottable.Interactions {
   export class PanZoom extends Interaction {
     /**
      * The number of pixels occupied in a line.
@@ -130,7 +130,7 @@ module Plottable.Interactions {
       let constrainedPoints = oldPoints.map((oldPoint, i) => {
         return {
           x: normalizedPointDiffs[i].x * magnifyAmount + oldPoint.x,
-          y: normalizedPointDiffs[i].y * magnifyAmount + oldPoint.y
+          y: normalizedPointDiffs[i].y * magnifyAmount + oldPoint.y,
         };
       });
 

@@ -1,4 +1,4 @@
-module Plottable {
+namespace Plottable {
 export class QuantitativeScale<D> extends Scale<D, number> {
   protected static _DEFAULT_NUM_TICKS = 10;
   private _tickGenerator: Scales.TickGenerators.TickGenerator<D> = (scale: Plottable.QuantitativeScale<D>) => scale.defaultTicks();
@@ -61,7 +61,7 @@ export class QuantitativeScale<D> extends Scale<D, number> {
     if (includedValues.length !== 0) {
       let combinedExtent = [
         Utils.Math.min<D>(includedValues, extent[0]),
-        Utils.Math.max<D>(includedValues, extent[1])
+        Utils.Math.max<D>(includedValues, extent[1]),
       ];
       extent = this._padDomain(combinedExtent);
     }
@@ -150,11 +150,11 @@ export class QuantitativeScale<D> extends Scale<D, number> {
         }
       });
     });
-    const originalDomain = this._getDomain();
-    this._setBackingScaleDomain(domain);
+    const originalDomain = this._backingScaleDomain();
+    this._backingScaleDomain(domain);
     let newMin = minExistsInExceptions ? min : this.invert(this.scale(min) - (this.scale(max) - this.scale(min)) * p);
     let newMax = maxExistsInExceptions ? max : this.invert(this.scale(max) + (this.scale(max) - this.scale(min)) * p);
-    this._setBackingScaleDomain(originalDomain);
+    this._backingScaleDomain(originalDomain);
 
     if (this._snappingDomainEnabled) {
       return this._niceDomain([newMin, newMax]);

@@ -115,15 +115,15 @@ describe("Utils", () => {
     it("stackedExtent() works as expected with mixed values and multiple datapoints", () => {
       let data1 = [
         {key: "Fred", value: 100},
-        {key: "Barney", value: 15}
+        {key: "Barney", value: 15},
       ];
       let data2 = [
         {key: "Fred", value: -5},
-        {key: "Barney", value: -50}
+        {key: "Barney", value: -50},
       ];
       let data3 = [
         {key: "Fred", value: 0},
-        {key: "Barney", value: 0}
+        {key: "Barney", value: 0},
       ];
 
       let datasets = createDatasets([data1, data2, data3]);
@@ -141,15 +141,15 @@ describe("Utils", () => {
     it("stackedExtent() works with filter", () => {
       let data1 = [
         {key: "Fred", value: 100},
-        {key: "Barney", value: 15}
+        {key: "Barney", value: 15},
       ];
       let data2 = [
         {key: "Fred", value: -5},
-        {key: "Barney", value: -50}
+        {key: "Barney", value: -50},
       ];
       let data3 = [
         {key: "Fred", value: 0},
-        {key: "Barney", value: 0}
+        {key: "Barney", value: 0},
       ];
 
       let datasets = createDatasets([data1, data2, data3]);

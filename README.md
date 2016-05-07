@@ -35,9 +35,12 @@ If you run into any problems using Plottable, please let us know. We want Plotta
 ## Development
 
 - Clone the repo
-- Install global dependencies `sudo npm install grunt grunt-cli typescript -g`
+- Install global dependencies `npm install grunt grunt-cli -g`
 - Install local dependencies `npm install`
-- Run `grunt` and it will spin up a server (pointed at localhost:9999) and begin compiling the typescript code
+- Run `grunt` and it will spin up a server (pointed at http://localhost:9999) and begin compiling the typescript code
+- If you get an EACCESS error at any point, instead of running command with ``sudo`` try first changing permission to following folders:
+  - ``usr/local`` by running ``sudo chown -R "$(whoami)" /usr/local``
+  - ``~/.npm/`` by running ``sudo chown -R "$(whoami)" ~/.npm/``
 
 ## Contributing
 

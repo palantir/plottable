@@ -1,4 +1,4 @@
-module Plottable.Dispatchers {
+namespace Plottable.Dispatchers {
   export type MouseCallback = (p: Point, event: MouseEvent) => void;
 
   export class Mouse extends Dispatcher {

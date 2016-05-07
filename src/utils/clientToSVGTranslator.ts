@@ -1,4 +1,4 @@
-module Plottable.Utils {
+namespace Plottable.Utils {
   export class ClientToSVGTranslator {
     private static _TRANSLATOR_KEY = "__Plottable_ClientToSVGTranslator";
     private _svg: SVGElement;
@@ -62,7 +62,7 @@ module Plottable.Utils {
 
       let scaledPosition = {
         x: (trueCursorPosition.x - origin.x) / scaleX,
-        y: (trueCursorPosition.y - origin.y) / scaleY
+        y: (trueCursorPosition.y - origin.y) / scaleY,
       };
 
       return scaledPosition;

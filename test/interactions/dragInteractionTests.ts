@@ -7,19 +7,19 @@ describe("Interactions", () => {
 
     const startPoint = {
       x: SVG_WIDTH / 4,
-      y: SVG_HEIGHT / 4
+      y: SVG_HEIGHT / 4,
     };
     const endPoint = {
       x: SVG_WIDTH / 2,
-      y: SVG_HEIGHT / 2
+      y: SVG_HEIGHT / 2,
     };
     const positiveOutsidePoint = {
       x: SVG_WIDTH * 1.5,
-      y: SVG_HEIGHT * 1.5
+      y: SVG_HEIGHT * 1.5,
     };
     const negativeOutsidePoint = {
       x: -SVG_WIDTH / 2,
-      y: -SVG_HEIGHT / 2
+      y: -SVG_HEIGHT / 2,
     };
 
     let svg: d3.Selection<void>;
@@ -221,7 +221,7 @@ describe("Interactions", () => {
           let target = component.background();
           const tenFromEndPoint = {
             x: endPoint.x - 10,
-            y: endPoint.y - 10
+            y: endPoint.y - 10,
           };
           TestMethods.triggerFakeTouchEvent("touchstart", target, [startPoint]);
           TestMethods.triggerFakeTouchEvent("touchmove", target, [tenFromEndPoint]);

@@ -1,4 +1,4 @@
-module Plottable.Components {
+namespace Plottable.Components {
   export class YDragBoxLayer extends DragBoxLayer {
     /**
      * A YDragBoxLayer is a DragBoxLayer whose size can only be set in the Y-direction.
@@ -22,7 +22,7 @@ module Plottable.Components {
     protected _setBounds(newBounds: Bounds) {
       super._setBounds({
         topLeft: { x: 0, y: newBounds.topLeft.y },
-        bottomRight: { x: this.width(), y: newBounds.bottomRight.y }
+        bottomRight: { x: this.width(), y: newBounds.bottomRight.y },
       });
     }
 

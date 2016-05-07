@@ -1,4 +1,4 @@
-module Plottable.Scales {
+namespace Plottable.Scales {
   type supportedScale = d3.scale.Linear<number, string> | d3.scale.Log<number, string> | d3.scale.Pow<number, string>;
 
   export class InterpolatedColor extends Scale<number, string> {
@@ -11,7 +11,7 @@ module Plottable.Scales {
       "#FD8D3C",
       "#FC4E2A",
       "#E31A1C",
-      "#B10026" // red
+      "#B10026", // red
     ];
     public static BLUES = [
       "#FFFFFF", // white
@@ -22,7 +22,7 @@ module Plottable.Scales {
       "#55A7E0",
       "#417FD0",
       "#2545D3",
-      "#0B02E1" // blue
+      "#0B02E1", // blue
     ];
     public static POSNEG = [
       "#0B02E1", // blue
@@ -41,7 +41,7 @@ module Plottable.Scales {
       "#FD8D3C",
       "#FC4E2A",
       "#E31A1C",
-      "#B10026" // red
+      "#B10026", // red
     ];
     private _colorRange: string[];
     private _colorScale: supportedScale;
@@ -135,11 +135,18 @@ module Plottable.Scales {
     }
 
     protected _getDomain() {
-      return this._d3Scale.domain();
+      return this._backingScaleDomain();
     }
 
-    protected _setBackingScaleDomain(values: number[]) {
-      this._d3Scale.domain(values);
+    protected _backingScaleDomain(): number[]
+    protected _backingScaleDomain(values: number[]): this
+    protected _backingScaleDomain(values?: number[]): any {
+      if (values == null) {
+        return this._d3Scale.domain();
+      } else {
+        this._d3Scale.domain(values);
+        return this;
+      }
     }
 
     protected _getRange() {

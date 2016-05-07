@@ -1,4 +1,4 @@
-module Plottable.Scales {
+namespace Plottable.Scales {
 
   /**
    * A function that supplies domain values to be included into a Scale.
@@ -23,7 +23,7 @@ module Plottable.Scales {
   }
 }
 
-module Plottable {
+namespace Plottable {
 
 export interface ScaleCallback<S extends Scale<any, any>> {
   (scale: S): any;
@@ -151,14 +151,16 @@ export class Scale<D, R> {
   protected _setDomain(values: D[]) {
     if (!this._domainModificationInProgress) {
       this._domainModificationInProgress = true;
-      this._setBackingScaleDomain(values);
+      this._backingScaleDomain(values);
       this._dispatchUpdate();
       this._domainModificationInProgress = false;
     }
   }
 
-  protected _setBackingScaleDomain(values: D[]) {
-    throw new Error("Subclasses should override _setBackingDomain");
+  protected _backingScaleDomain(): D[]
+  protected _backingScaleDomain(values: D[]): this
+  protected _backingScaleDomain(values?: D[]): any {
+    throw new Error("Subclasses should override _backingDomain");
   }
 
   /**

@@ -1,6 +1,6 @@
-module Plottable {
+namespace Plottable {
 
-export module TimeInterval {
+export namespace TimeInterval {
   export var second = "second";
   export var minute = "minute";
   export var hour = "hour";
@@ -12,7 +12,7 @@ export module TimeInterval {
 
 }
 
-module Plottable.Axes {
+namespace Plottable.Axes {
   /**
    * Defines a configuration for a Time Axis tier.
    * For details on how ticks are generated see: https://github.com/mbostock/d3/wiki/Time-Scales#ticks
@@ -42,111 +42,111 @@ module Plottable.Axes {
     private static _DEFAULT_TIME_AXIS_CONFIGURATIONS: TimeAxisConfiguration[] = [
       [
         {interval: TimeInterval.second, step: 1, formatter: Formatters.time("%I:%M:%S %p")},
-        {interval: TimeInterval.day, step: 1, formatter: Formatters.time("%B %e, %Y")}
+        {interval: TimeInterval.day, step: 1, formatter: Formatters.time("%B %e, %Y")},
       ],
       [
         {interval: TimeInterval.second, step: 5, formatter: Formatters.time("%I:%M:%S %p")},
-        {interval: TimeInterval.day, step: 1, formatter: Formatters.time("%B %e, %Y")}
+        {interval: TimeInterval.day, step: 1, formatter: Formatters.time("%B %e, %Y")},
       ],
       [
         {interval: TimeInterval.second, step: 10, formatter: Formatters.time("%I:%M:%S %p")},
-        {interval: TimeInterval.day, step: 1, formatter: Formatters.time("%B %e, %Y")}
+        {interval: TimeInterval.day, step: 1, formatter: Formatters.time("%B %e, %Y")},
       ],
       [
         {interval: TimeInterval.second, step: 15, formatter: Formatters.time("%I:%M:%S %p")},
-        {interval: TimeInterval.day, step: 1, formatter: Formatters.time("%B %e, %Y")}
+        {interval: TimeInterval.day, step: 1, formatter: Formatters.time("%B %e, %Y")},
       ],
       [
         {interval: TimeInterval.second, step: 30, formatter: Formatters.time("%I:%M:%S %p")},
-        {interval: TimeInterval.day, step: 1, formatter: Formatters.time("%B %e, %Y")}
+        {interval: TimeInterval.day, step: 1, formatter: Formatters.time("%B %e, %Y")},
       ],
       [
         {interval: TimeInterval.minute, step: 1, formatter: Formatters.time("%I:%M %p")},
-        {interval: TimeInterval.day, step: 1, formatter: Formatters.time("%B %e, %Y")}
+        {interval: TimeInterval.day, step: 1, formatter: Formatters.time("%B %e, %Y")},
       ],
       [
         {interval: TimeInterval.minute, step: 5, formatter: Formatters.time("%I:%M %p")},
-        {interval: TimeInterval.day, step: 1, formatter: Formatters.time("%B %e, %Y")}
+        {interval: TimeInterval.day, step: 1, formatter: Formatters.time("%B %e, %Y")},
       ],
       [
         {interval: TimeInterval.minute, step: 10, formatter: Formatters.time("%I:%M %p")},
-        {interval: TimeInterval.day, step: 1, formatter: Formatters.time("%B %e, %Y")}
+        {interval: TimeInterval.day, step: 1, formatter: Formatters.time("%B %e, %Y")},
       ],
       [
         {interval: TimeInterval.minute, step: 15, formatter: Formatters.time("%I:%M %p")},
-        {interval: TimeInterval.day, step: 1, formatter: Formatters.time("%B %e, %Y")}
+        {interval: TimeInterval.day, step: 1, formatter: Formatters.time("%B %e, %Y")},
       ],
       [
         {interval: TimeInterval.minute, step: 30, formatter: Formatters.time("%I:%M %p")},
-        {interval: TimeInterval.day, step: 1, formatter: Formatters.time("%B %e, %Y")}
+        {interval: TimeInterval.day, step: 1, formatter: Formatters.time("%B %e, %Y")},
       ],
       [
         {interval: TimeInterval.hour, step: 1, formatter: Formatters.time("%I %p")},
-        {interval: TimeInterval.day, step: 1, formatter: Formatters.time("%B %e, %Y")}
+        {interval: TimeInterval.day, step: 1, formatter: Formatters.time("%B %e, %Y")},
       ],
       [
         {interval: TimeInterval.hour, step: 3, formatter: Formatters.time("%I %p")},
-        {interval: TimeInterval.day, step: 1, formatter: Formatters.time("%B %e, %Y")}
+        {interval: TimeInterval.day, step: 1, formatter: Formatters.time("%B %e, %Y")},
       ],
       [
         {interval: TimeInterval.hour, step: 6, formatter: Formatters.time("%I %p")},
-        {interval: TimeInterval.day, step: 1, formatter: Formatters.time("%B %e, %Y")}
+        {interval: TimeInterval.day, step: 1, formatter: Formatters.time("%B %e, %Y")},
       ],
       [
         {interval: TimeInterval.hour, step: 12, formatter: Formatters.time("%I %p")},
-        {interval: TimeInterval.day, step: 1, formatter: Formatters.time("%B %e, %Y")}
+        {interval: TimeInterval.day, step: 1, formatter: Formatters.time("%B %e, %Y")},
       ],
       [
         {interval: TimeInterval.day, step: 1, formatter: Formatters.time("%a %e")},
-        {interval: TimeInterval.month, step: 1, formatter: Formatters.time("%B %Y")}
+        {interval: TimeInterval.month, step: 1, formatter: Formatters.time("%B %Y")},
       ],
       [
         {interval: TimeInterval.day, step: 1, formatter: Formatters.time("%e")},
-        {interval: TimeInterval.month, step: 1, formatter: Formatters.time("%B %Y")}
+        {interval: TimeInterval.month, step: 1, formatter: Formatters.time("%B %Y")},
       ],
       [
         {interval: TimeInterval.month, step: 1, formatter: Formatters.time("%B")},
-        {interval: TimeInterval.year, step: 1, formatter: Formatters.time("%Y")}
+        {interval: TimeInterval.year, step: 1, formatter: Formatters.time("%Y")},
       ],
       [
         {interval: TimeInterval.month, step: 1, formatter: Formatters.time("%b")},
-        {interval: TimeInterval.year, step: 1, formatter: Formatters.time("%Y")}
+        {interval: TimeInterval.year, step: 1, formatter: Formatters.time("%Y")},
       ],
       [
         {interval: TimeInterval.month, step: 3, formatter: Formatters.time("%b")},
-        {interval: TimeInterval.year, step: 1, formatter: Formatters.time("%Y")}
+        {interval: TimeInterval.year, step: 1, formatter: Formatters.time("%Y")},
       ],
       [
         {interval: TimeInterval.month, step: 6, formatter: Formatters.time("%b")},
-        {interval: TimeInterval.year, step: 1, formatter: Formatters.time("%Y")}
+        {interval: TimeInterval.year, step: 1, formatter: Formatters.time("%Y")},
       ],
       [
-        {interval: TimeInterval.year, step: 1, formatter: Formatters.time("%Y")}
+        {interval: TimeInterval.year, step: 1, formatter: Formatters.time("%Y")},
       ],
       [
-        {interval: TimeInterval.year, step: 1, formatter: Formatters.time("%y")}
+        {interval: TimeInterval.year, step: 1, formatter: Formatters.time("%y")},
       ],
       [
-        {interval: TimeInterval.year, step: 5, formatter: Formatters.time("%Y")}
+        {interval: TimeInterval.year, step: 5, formatter: Formatters.time("%Y")},
       ],
       [
-        {interval: TimeInterval.year, step: 25, formatter: Formatters.time("%Y")}
+        {interval: TimeInterval.year, step: 25, formatter: Formatters.time("%Y")},
       ],
       [
-        {interval: TimeInterval.year, step: 50, formatter: Formatters.time("%Y")}
+        {interval: TimeInterval.year, step: 50, formatter: Formatters.time("%Y")},
       ],
       [
-        {interval: TimeInterval.year, step: 100, formatter: Formatters.time("%Y")}
+        {interval: TimeInterval.year, step: 100, formatter: Formatters.time("%Y")},
       ],
       [
-        {interval: TimeInterval.year, step: 200, formatter: Formatters.time("%Y")}
+        {interval: TimeInterval.year, step: 200, formatter: Formatters.time("%Y")},
       ],
       [
-        {interval: TimeInterval.year, step: 500, formatter: Formatters.time("%Y")}
+        {interval: TimeInterval.year, step: 500, formatter: Formatters.time("%Y")},
       ],
       [
-        {interval: TimeInterval.year, step: 1000, formatter: Formatters.time("%Y")}
-      ]
+        {interval: TimeInterval.year, step: 1000, formatter: Formatters.time("%Y")},
+      ],
     ];
 
     private _tierLabelContainers: d3.Selection<void>[];

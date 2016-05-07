@@ -9,7 +9,7 @@ describe("Plots", () => {
           { x: 1, y: 1, x2: 2, y2: 2 },
           { x: 2, y: 2, x2: 3, y2: 3 },
           { x: 3, y: 3, x2: 4, y2: 4 },
-          { x: 4, y: 4, x2: 5, y2: 5 }
+          { x: 4, y: 4, x2: 5, y2: 5 },
         ];
 
         const svg = TestMethods.generateSVG();
@@ -63,7 +63,7 @@ describe("Plots", () => {
             x: rectangleNumber,
             y: rectangleNumber,
             x2: rectangleNumber + 1,
-            y2: rectangleNumber + 1
+            y2: rectangleNumber + 1,
           };
         });
       }
@@ -74,7 +74,7 @@ describe("Plots", () => {
             x: rectangleNumber,
             y: rectangleNumber,
             x2: rectangleNumber + 1.5,
-            y2: rectangleNumber + 1.5
+            y2: rectangleNumber + 1.5,
           };
         });
       }
@@ -85,7 +85,7 @@ describe("Plots", () => {
         plot.renderTo(svg);
 
         const entities = plot.entitiesAt({ x: (xScale.scale(data[2].x) + xScale.scale(data[3].x)) / 2,
-          y: (yScale.scale(data[2].y) + yScale.scale(data[3].y)) / 2 });
+          y: (yScale.scale(data[2].y) + yScale.scale(data[3].y)) / 2, });
         assert.lengthOf(entities, 1, "found only one entity when querying a point inside a rectangle");
         assert.strictEqual(entities[0].index, 2, "entity retrieved is at index 2");
         svg.remove();
@@ -118,9 +118,9 @@ describe("Plots", () => {
 
         const entities = plot.entitiesIn({
           topLeft: { x: (xScale.scale(data[1].x) + xScale.scale(data[2].x)) / 2,
-            y: (yScale.scale(data[2].y) + yScale.scale(data[3].y)) / 2 },
+            y: (yScale.scale(data[2].y) + yScale.scale(data[3].y)) / 2, },
           bottomRight: { x: (xScale.scale(data[2].x) + xScale.scale(data[3].x)) / 2,
-            y: (yScale.scale(data[1].y) + yScale.scale(data[2].y)) / 2 } });
+            y: (yScale.scale(data[1].y) + yScale.scale(data[2].y)) / 2, }, });
         assert.lengthOf(entities, 2, "retrieved 2 entities intersect with the box");
         assert.strictEqual(entities[0].index, 1, "the entity of index 1 is retrieved");
         assert.strictEqual(entities[1].index, 2, "the entity of index 2 is retrieved");
@@ -133,10 +133,15 @@ describe("Plots", () => {
         plot.renderTo(svg);
 
         const entities = plot.entitiesIn(
-          {min: (xScale.scale(data[1].x) + xScale.scale(data[2].x)) / 2,
-            max: (xScale.scale(data[2].x) + xScale.scale(data[3].x)) / 2},
-          {min: (yScale.scale(data[2].y) + yScale.scale(data[3].y)) / 2,
-            max: (yScale.scale(data[1].y) + yScale.scale(data[2].y)) / 2});
+          {
+            min: (xScale.scale(data[1].x) + xScale.scale(data[2].x)) / 2,
+            max: (xScale.scale(data[2].x) + xScale.scale(data[3].x)) / 2,
+          },
+          {
+            min: (yScale.scale(data[2].y) + yScale.scale(data[3].y)) / 2,
+            max: (yScale.scale(data[1].y) + yScale.scale(data[2].y)) / 2,
+          }
+        );
         assert.lengthOf(entities, 2, "retrieved 2 entities intersect with the box");
         assert.strictEqual(entities[0].index, 1, "the entity of index 1 is retrieved");
         assert.strictEqual(entities[1].index, 2, "the entity of index 2 is retrieved");
@@ -148,7 +153,7 @@ describe("Plots", () => {
         plot.renderTo(svg);
         let closest = plot.entityNearest({
           x: plot.width() / 2,
-          y: plot.height() / 2
+          y: plot.height() / 2,
         });
         assert.strictEqual(closest, undefined, "no datum has been retrieved");
         svg.remove();
@@ -165,7 +170,7 @@ describe("Plots", () => {
       it("adjusts the xScale domain with respect to the yScale domain when autorangeMode is set to x", () => {
         const data = [
           { y: "A", x: 0, x2: 1 },
-          { y: "B", x: 1, x2: 2 }
+          { y: "B", x: 1, x2: 2 },
         ];
 
         const xScale = new Plottable.Scales.Linear();
@@ -193,7 +198,7 @@ describe("Plots", () => {
       it("adjusts the yScale domain with respect to the xScale domain when autorangeMode is set to y", () => {
         const data = [
           { x: "A", y: 0, y2: 1 },
-          { x: "B", y: 1, y2: 2 }
+          { x: "B", y: 1, y2: 2 },
         ];
 
         const xScale = new Plottable.Scales.Category();
@@ -226,7 +231,7 @@ describe("Plots", () => {
         const data = [
           { x: "A", y: 1, y2: 2 },
           { x: "B", y: 2, y2: 3 },
-          { x: "C", y: 3, y2: NaN }
+          { x: "C", y: 3, y2: NaN },
         ];
 
         const xScale = new Plottable.Scales.Category();
@@ -303,7 +308,7 @@ describe("Plots", () => {
         plot.renderTo(svg);
         const data = [
           {x: "X", y: "Z"},
-          {x: "Y", y: "T"}
+          {x: "Y", y: "T"},
         ];
         dataset.data(data);
 
@@ -327,7 +332,7 @@ describe("Plots", () => {
           {x: "A", y: "W"},
           {x: "B", y: "X"},
           {x: "C", y: "Y"},
-          {x: "D", y: "Z"}
+          {x: "D", y: "Z"},
         ];
         plot.addDataset(new Plottable.Dataset(data));
         plot.renderTo(svg);
@@ -442,7 +447,7 @@ describe("Plots", () => {
 
         const data = [
           { x: 0, y: 0, x2: 1, y2: 1, val: "1" },
-          { x: 0, y: 1, x2: 1, y2: 2, val: "2" }
+          { x: 0, y: 1, x2: 1, y2: 2, val: "2" },
         ];
 
         const dataset = new Plottable.Dataset(data);

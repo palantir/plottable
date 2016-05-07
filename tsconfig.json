@@ -5,7 +5,11 @@
         "sourceMap": false,
         "declaration": true,
         "removeComments": false,
-        "outFile": "plottable.js"
+        "outFile": "plottable.js",
+
+        "forceConsistentCasingInFileNames": true,
+        "noFallthroughCasesInSwitch": true,
+        "noImplicitReturns": true
     },
     "files": [
       "typings/d3/d3.d.ts",
@@ -53,6 +57,7 @@
       "src/components/component.ts",
       "src/components/componentContainer.ts",
       "src/components/group.ts",
+      "src/components/plotGroup.ts",
 
       "src/axes/axis.ts",
       "src/axes/timeAxis.ts",

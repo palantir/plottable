@@ -1,4 +1,4 @@
-module Plottable.Plots {
+namespace Plottable.Plots {
   export class Area<X> extends Line<X> {
     private static _Y0_KEY = "y0";
     private _lineDrawers: Utils.Map<Dataset, Drawers.Line>;

@@ -131,12 +131,8 @@ describe("Drawers", () => {
         .keyFunction(Plottable.KeyFunctions.noConstancy);
       drawer = createMockDrawer(dataset);
       let atp: Plottable.AttributeToProjector = {
-        height: () => {
-          return 20;
-        },
-        x: (d: any) => {
-          return d.v;
-        }
+        height: () => 20,
+        x: (d: any) => d.v,
       };
       // initializer is a function returning AttributeToProjector
       ini = () => {
@@ -184,9 +180,9 @@ describe("Drawers", () => {
       // animator will apply a tranistion to enter
       animatefcn = function (joinResult: Plottable.Drawers.JoinResult
         , attrToAppliedProjector: Plottable.AttributeToAppliedProjector
-        , drawer: Plottable.Drawer): void {
+        , dwr: Plottable.Drawer): void {
         jr = joinResult;
-        dr = drawer;
+        dr = dwr;
         joinResult.enter = this.getTransition(joinResult.enter)
           .attr(attrToAppliedProjector);
         joinResult.exit = this.getTransition(joinResult.exit);
@@ -206,7 +202,7 @@ describe("Drawers", () => {
         },
         x: (d: any) => {
           return d.v;
-        }
+        },
       };
       // initializer is a function returning AttributeToProjector
       ini = () => {

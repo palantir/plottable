@@ -13,7 +13,7 @@ describe("Plots", () => {
         { x: "A", y: 0 },
         { x: "B", y: 5 },
         { x: "C", y: 10 },
-        { x: "D", y: 100}
+        { x: "D", y: 100},
       ];
       let growthClass = "waterfall-growth";
 
@@ -76,7 +76,7 @@ describe("Plots", () => {
         { x: "B", y: -5 },
         { x: "C", y: -25 },
         { x: "D", y: -10 },
-        { x: "E", y: -15 }
+        { x: "E", y: -15 },
       ];
       let declineClass = "waterfall-decline";
 
@@ -138,7 +138,7 @@ describe("Plots", () => {
         { x: "B", y: 5, t: false },
         { x: "C", y: 25, t: true },
         { x: "D", y: -10, t: false },
-        { x: "E", y: 15, t: true }
+        { x: "E", y: 15, t: true },
       ];
       let totalClass = "waterfall-total";
 
@@ -188,7 +188,7 @@ describe("Plots", () => {
         { x: "B", y: 5, t: false },
         { x: "C", y: 25, t: true },
         { x: "D", y: -10, t: false },
-        { x: "E", y: 15, t: true }
+        { x: "E", y: 15, t: true },
       ];
 
       beforeEach(() => {

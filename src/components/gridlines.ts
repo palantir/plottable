@@ -1,4 +1,4 @@
-module Plottable.Components {
+namespace Plottable.Components {
   export class Gridlines extends Component {
     private _xScale: QuantitativeScale<any>;
     private _yScale: QuantitativeScale<any>;

@@ -1,4 +1,4 @@
-module Plottable.Utils.Array {
+namespace Plottable.Utils.Array {
   let nativeArray = (<any>window).Array;
 
   /**

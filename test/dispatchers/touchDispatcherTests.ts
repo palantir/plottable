@@ -29,7 +29,7 @@ describe("Dispatchers", () => {
       const expectedPoints = targetXs.map((targetX, i) => {
         return {
           x: targetX,
-          y: targetYs[i]
+          y: targetYs[i],
         };
       });
       const callbackWithPositionAssertion = (_ids: number[], points: { [id: number]: Plottable.Point; }, event: TouchEvent) => {

@@ -1,4 +1,4 @@
-module Plottable.Components {
+namespace Plottable.Components {
   export enum PropertyMode { VALUE, PIXEL };
   export class SelectionBoxLayer extends Component {
     protected _box: d3.Selection<void>;
@@ -6,7 +6,7 @@ module Plottable.Components {
     private _boxVisible = false;
     private _boxBounds: Bounds = {
       topLeft: { x: 0, y: 0 },
-      bottomRight: { x: 0, y: 0 }
+      bottomRight: { x: 0, y: 0 },
     };
     private _xExtent: (number | { valueOf(): number })[];
     private _yExtent: (number | { valueOf(): number })[];
@@ -37,7 +37,7 @@ module Plottable.Components {
     protected _sizeFromOffer(availableWidth: number, availableHeight: number) {
       return {
         width: availableWidth,
-        height: availableHeight
+        height: availableHeight,
       };
     }
 
@@ -67,15 +67,15 @@ module Plottable.Components {
     protected _setBounds(newBounds: Bounds) {
       let topLeft: Point = {
         x: Math.min(newBounds.topLeft.x, newBounds.bottomRight.x),
-        y: Math.min(newBounds.topLeft.y, newBounds.bottomRight.y)
+        y: Math.min(newBounds.topLeft.y, newBounds.bottomRight.y),
       };
       let bottomRight: Point = {
         x: Math.max(newBounds.topLeft.x, newBounds.bottomRight.x),
-        y: Math.max(newBounds.topLeft.y, newBounds.bottomRight.y)
+        y: Math.max(newBounds.topLeft.y, newBounds.bottomRight.y),
       };
       this._boxBounds = {
         topLeft: topLeft,
-        bottomRight: bottomRight
+        bottomRight: bottomRight,
       };
     }
 
@@ -91,7 +91,7 @@ module Plottable.Components {
             this._boxBounds.topLeft.y :
             (this._yScale == null ?
               0 :
-              Math.min(this.yScale().scale(this.yExtent()[0]), this.yScale().scale(this.yExtent()[1])))
+              Math.min(this.yScale().scale(this.yExtent()[0]), this.yScale().scale(this.yExtent()[1]))),
         },
         bottomRight: {
           x: this._xBoundsMode === PropertyMode.PIXEL ?
@@ -103,8 +103,8 @@ module Plottable.Components {
                this._boxBounds.bottomRight.y :
                (this._yScale == null ?
                  0 :
-                 Math.max(this.yScale().scale(this.yExtent()[0]), this.yScale().scale(this.yExtent()[1])))
-        }
+                 Math.max(this.yScale().scale(this.yExtent()[0]), this.yScale().scale(this.yExtent()[1]))),
+        },
       };
     }
 
@@ -125,7 +125,7 @@ module Plottable.Components {
         }
 
         this._boxArea.attr({
-          x: l, y: t, width: r - l, height: b - t
+          x: l, y: t, width: r - l, height: b - t,
         });
         (<Node> this.content().node()).appendChild(<Node> this._box.node());
       } else {
@@ -237,8 +237,11 @@ module Plottable.Components {
         this._xExtent :
         (this._xScale == null ?
           [undefined, undefined] :
-          [this._xScale.invert(this._boxBounds.topLeft.x),
-          this._xScale.invert(this._boxBounds.bottomRight.x)]);
+          [
+            this._xScale.invert(this._boxBounds.topLeft.x),
+            this._xScale.invert(this._boxBounds.bottomRight.x),
+          ]
+        );
     }
 
     protected _setXExtent(xExtent: (number | { valueOf(): number })[]) {
@@ -271,8 +274,11 @@ module Plottable.Components {
         this._yExtent :
         (this._yScale == null ?
           [undefined, undefined] :
-          [this._yScale.invert(this._boxBounds.topLeft.y),
-          this._yScale.invert(this._boxBounds.bottomRight.y)]);
+          [
+            this._yScale.invert(this._boxBounds.topLeft.y),
+            this._yScale.invert(this._boxBounds.bottomRight.y),
+          ]
+        );
     }
 
     protected _setYExtent(yExtent: (number | { valueOf(): number })[]) {

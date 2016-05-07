@@ -1,8 +1,8 @@
-module Plottable {
+namespace Plottable {
 export type DragBoxCallback = (bounds: Bounds) => void;
 }
 
-module Plottable.Components {
+namespace Plottable.Components {
   type _EdgeIndicator = {
     top: boolean;
     bottom: boolean;
@@ -62,7 +62,7 @@ module Plottable.Components {
       let DRAG_MODES = {
         newBox: 0,
         resize: 1,
-        move: 2
+        move: 2,
       };
       let mode = DRAG_MODES.newBox;
 
@@ -81,7 +81,7 @@ module Plottable.Components {
           mode = DRAG_MODES.newBox;
           this._setBounds({
             topLeft: startPoint,
-            bottomRight: startPoint
+            bottomRight: startPoint,
           });
           if (this._xBoundsMode === PropertyMode.VALUE && this.xScale() != null) {
             this._setXExtent([this.xScale().invert(startPoint.x), this.xScale().invert(startPoint.x)]);
@@ -133,7 +133,7 @@ module Plottable.Components {
 
         this._setBounds({
           topLeft: topLeft,
-          bottomRight: bottomRight
+          bottomRight: bottomRight,
         });
         if (this._xBoundsMode === PropertyMode.VALUE && this.xScale() != null) {
           this._setXExtent([this.xScale().invert(topLeft.x), this.xScale().invert(bottomRight.x)]);
@@ -172,7 +172,7 @@ module Plottable.Components {
       let createLine = () => this._box.append("line").style({
                                "opacity": 0,
                                "stroke": "pink",
-                               "pointer-events": "visibleStroke"
+                               "pointer-events": "visibleStroke",
                              });
       this._detectionEdgeT = createLine().classed("drag-edge-tb", true);
       this._detectionEdgeB = createLine().classed("drag-edge-tb", true);
@@ -184,7 +184,7 @@ module Plottable.Components {
                                      .style({
                                        "opacity": 0,
                                        "fill": "pink",
-                                       "pointer-events": "visibleFill"
+                                       "pointer-events": "visibleFill",
                                      });
         this._detectionCornerTL = createCorner().classed("drag-corner-tl", true);
         this._detectionCornerTR = createCorner().classed("drag-corner-tr", true);
@@ -198,7 +198,7 @@ module Plottable.Components {
         top: false,
         bottom: false,
         left: false,
-        right: false
+        right: false,
       };
 
       if (!this.resizable()) {
@@ -236,19 +236,19 @@ module Plottable.Components {
 
         this._detectionEdgeT.attr({
           x1: l, y1: t, x2: r, y2: t,
-          "stroke-width": this._detectionRadius * 2
+          "stroke-width": this._detectionRadius * 2,
         });
         this._detectionEdgeB.attr({
           x1: l, y1: b, x2: r, y2: b,
-          "stroke-width": this._detectionRadius * 2
+          "stroke-width": this._detectionRadius * 2,
         });
         this._detectionEdgeL.attr({
           x1: l, y1: t, x2: l, y2: b,
-          "stroke-width": this._detectionRadius * 2
+          "stroke-width": this._detectionRadius * 2,
         });
         this._detectionEdgeR.attr({
           x1: r, y1: t, x2: r, y2: b,
-          "stroke-width": this._detectionRadius * 2
+          "stroke-width": this._detectionRadius * 2,
         });
 
         if (this._hasCorners) {
@@ -458,7 +458,7 @@ module Plottable.Components {
     private _resetState() {
       this.bounds({
         topLeft: { x: 0, y: 0 },
-        bottomRight: { x: 0, y: 0 }
+        bottomRight: { x: 0, y: 0 },
       });
     }
   }

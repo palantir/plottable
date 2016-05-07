@@ -17,11 +17,18 @@ describe("Scales", () => {
       }
 
       protected _getDomain() {
-        return this._domain;
+        return this._backingScaleDomain();
       }
 
-      protected _setBackingScaleDomain(values: D[]) {
-        this._domain = values;
+      protected _backingScaleDomain(): D[]
+      protected _backingScaleDomain(values: D[]): this
+      protected _backingScaleDomain(values?: D[]): any {
+        if (values == null) {
+          return this._domain;
+        } else {
+          this._domain = values;
+          return this;
+        }
       }
 
       protected _getRange() {

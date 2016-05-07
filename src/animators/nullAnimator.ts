@@ -1,4 +1,4 @@
-module Plottable.Animators {
+namespace Plottable.Animators {
 
   /**
    * An animator implementation with no animation. The attributes are

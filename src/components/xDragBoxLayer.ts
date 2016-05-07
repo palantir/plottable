@@ -1,4 +1,4 @@
-module Plottable.Components {
+namespace Plottable.Components {
   export class XDragBoxLayer extends DragBoxLayer {
     /**
      * An XDragBoxLayer is a DragBoxLayer whose size can only be set in the X-direction.
@@ -22,7 +22,7 @@ module Plottable.Components {
     protected _setBounds(newBounds: Bounds) {
       super._setBounds({
         topLeft: { x: newBounds.topLeft.x, y: 0 },
-        bottomRight: { x: newBounds.bottomRight.x, y: this.height() }
+        bottomRight: { x: newBounds.bottomRight.x, y: this.height() },
       });
     }
 

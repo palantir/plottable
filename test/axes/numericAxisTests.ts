@@ -313,9 +313,11 @@ describe("Axes", () => {
       it("reasonably approximates tick label sizes with approximate measuring", () => {
         const svg = TestMethods.generateSVG();
 
-        const testDomains = [[-1, 1],
-                        [0, 10],
-                        [0, 999999999]];
+        const testDomains = [
+          [-1, 1],
+          [0, 10],
+          [0, 999999999],
+        ];
 
         const maxErrorFactor = 1.4;
 

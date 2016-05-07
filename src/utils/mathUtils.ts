@@ -1,4 +1,4 @@
-module Plottable.Utils.Math {
+namespace Plottable.Utils.Math {
 
   let nativeMath: Math = (<any>window).Math;
 

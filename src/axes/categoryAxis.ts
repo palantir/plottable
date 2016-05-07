@@ -1,4 +1,4 @@
-module Plottable.Axes {
+namespace Plottable.Axes {
   export class Category extends Axis<string> {
     private _tickLabelAngle = 0;
     private _measurer: SVGTypewriter.Measurers.CacheCharacterMeasurer;
@@ -37,7 +37,7 @@ module Plottable.Axes {
       if (this._scale.domain().length === 0) {
         return {
           minWidth: 0,
-          minHeight: 0
+          minHeight: 0,
         };
       }
 
@@ -55,7 +55,7 @@ module Plottable.Axes {
 
       return {
         minWidth: measureResult.usedWidth + widthRequiredByTicks,
-        minHeight: measureResult.usedHeight + heightRequiredByTicks
+        minHeight: measureResult.usedHeight + heightRequiredByTicks,
       };
     }
 
@@ -127,7 +127,7 @@ module Plottable.Axes {
           selection: d3.select(this),
           xAlign: xAlign[self.orientation()],
           yAlign: yAlign[self.orientation()],
-          textRotation: self.tickLabelAngle()
+          textRotation: self.tickLabelAngle(),
         };
         self._writer.write(self.formatter()(d), width, height, writeOptions);
       });
@@ -195,7 +195,7 @@ module Plottable.Axes {
       return {
         textFits: textFits,
         usedWidth: usedWidth,
-        usedHeight: usedHeight
+        usedHeight: usedHeight,
       };
     }
 

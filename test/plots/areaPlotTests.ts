@@ -112,7 +112,7 @@ describe("Plots", () => {
           { x: 0.2, y: 0.2 },
           { x: 0.4, y: 0.4 },
           { x: 0.6, y: 0.6 },
-          { x: 0.8, y: 0.8 }
+          { x: 0.8, y: 0.8 },
         ];
 
         let areaPath = areaPlot.content().select(".area");

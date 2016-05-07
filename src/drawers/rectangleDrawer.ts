@@ -1,4 +1,4 @@
-module Plottable.Drawers {
+namespace Plottable.Drawers {
   export class Rectangle extends Drawer {
 
     constructor(dataset: Dataset) {

@@ -81,7 +81,7 @@ describe("TimeAxis", () => {
       // 1 minute span
       [new Date(2000, 0, 1, 0, 0, 0, 0), new Date(2000, 0, 1, 0, 1, 0, 0)],
       // 1 second span
-      [new Date(2000, 0, 1, 0, 0, 0, 0), new Date(2000, 0, 1, 0, 0, 1, 0)]
+      [new Date(2000, 0, 1, 0, 0, 0, 0), new Date(2000, 0, 1, 0, 0, 1, 0)],
     ];
 
     it(`does not overlap visible tick labels with orientation ${orientation}`, () => {
@@ -223,8 +223,8 @@ describe("TimeAxis", () => {
     it("grows in height for each added tier", () => {
       axis.axisConfigurations([
         [
-          {interval: Plottable.TimeInterval.day, step: 2, formatter: Plottable.Formatters.time("%a %e")}
-        ]
+          {interval: Plottable.TimeInterval.day, step: 2, formatter: Plottable.Formatters.time("%a %e")},
+        ],
       ]);
       axis.renderTo(svg);
 
@@ -233,8 +233,8 @@ describe("TimeAxis", () => {
       axis.axisConfigurations([
         [
           {interval: Plottable.TimeInterval.day, step: 2, formatter: Plottable.Formatters.time("%a %e")},
-          {interval: Plottable.TimeInterval.day, step: 2, formatter: Plottable.Formatters.time("%a %e")}
-        ]
+          {interval: Plottable.TimeInterval.day, step: 2, formatter: Plottable.Formatters.time("%a %e")},
+        ],
       ]);
 
       let twoTierHeight = axis.height();
@@ -246,7 +246,7 @@ describe("TimeAxis", () => {
           {interval: Plottable.TimeInterval.day, step: 2, formatter: Plottable.Formatters.time("%a %e")},
           {interval: Plottable.TimeInterval.day, step: 2, formatter: Plottable.Formatters.time("%a %e")},
           {interval: Plottable.TimeInterval.day, step: 2, formatter: Plottable.Formatters.time("%a %e")},
-        ]
+        ],
       ]);
 
       let threeTierHeight = axis.height();
@@ -260,8 +260,8 @@ describe("TimeAxis", () => {
       axis.axisConfigurations([
         [
           {interval: Plottable.TimeInterval.day, step: 2, formatter: Plottable.Formatters.time("%a %e")},
-          {interval: Plottable.TimeInterval.day, step: 2, formatter: Plottable.Formatters.time("%a %e")}
-        ]
+          {interval: Plottable.TimeInterval.day, step: 2, formatter: Plottable.Formatters.time("%a %e")},
+        ],
       ]);
       axis.renderTo(svg);
 
@@ -269,8 +269,8 @@ describe("TimeAxis", () => {
 
       axis.axisConfigurations([
         [
-          {interval: Plottable.TimeInterval.day, step: 2, formatter: Plottable.Formatters.time("%a %e")}
-        ]
+          {interval: Plottable.TimeInterval.day, step: 2, formatter: Plottable.Formatters.time("%a %e")},
+        ],
       ]);
 
       let newHeight = axis.height();
@@ -370,8 +370,8 @@ describe("TimeAxis", () => {
       let formatter = Plottable.Formatters.time("%a %e");
       axis.axisConfigurations([
         [
-          {interval: Plottable.TimeInterval.day, step: 2, formatter: formatter}
-        ]
+          {interval: Plottable.TimeInterval.day, step: 2, formatter: formatter},
+        ],
       ]);
       axis.renderTo(svg);
       let tickLabels = axis.content().selectAll(".tick-label");

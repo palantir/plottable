@@ -466,7 +466,7 @@ describe("Legend", () => {
       const symbolTranslate = d3.transform(symbol.attr("transform")).translate;
       return {
         x: rowTranslate[0] + entryTranslate[0] + symbolTranslate[0],
-        y: rowTranslate[1] + entryTranslate[1] + symbolTranslate[1]
+        y: rowTranslate[1] + entryTranslate[1] + symbolTranslate[1],
       };
     }
 
@@ -481,7 +481,7 @@ describe("Legend", () => {
         datum: "AA",
         position: computeExpectedSymbolPosition(0, 0),
         selection: d3.select(entries[0][0]),
-        component: legend
+        component: legend,
       };
       TestMethods.assertEntitiesEqual(entities[0], expectedEntity, "returned Entity corresponding to first entry");
 
@@ -490,7 +490,7 @@ describe("Legend", () => {
         datum: "BB",
         position: computeExpectedSymbolPosition(1, 0),
         selection: d3.select(entries[0][1]),
-        component: legend
+        component: legend,
       };
       TestMethods.assertEntitiesEqual(entities[0], expectedEntity, "returned Entity corresponding to second entry");
 
@@ -511,7 +511,7 @@ describe("Legend", () => {
         datum: "AA",
         position: computeExpectedSymbolPosition(0, 0),
         selection: d3.select(entries[0][0]),
-        component: legend
+        component: legend,
       };
       TestMethods.assertEntitiesEqual(entities[0], expectedEntity, "returned Entity corresponding to first entry");
 
@@ -520,7 +520,7 @@ describe("Legend", () => {
         datum: "BB",
         position: computeExpectedSymbolPosition(0, 1),
         selection: d3.select(entries[0][1]),
-        component: legend
+        component: legend,
       };
       TestMethods.assertEntitiesEqual(entities[0], expectedEntity, "returned Entity corresponding to second entry");
 
