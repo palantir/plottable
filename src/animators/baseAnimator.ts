@@ -1,4 +1,4 @@
-module Plottable.Animators {
+namespace Plottable.Animators {
   /**
    * Base class for animators. Equivalent behaviour to Easing animator
    * Provides helper functions for subclassed animators

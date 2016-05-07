@@ -1,4 +1,4 @@
-﻿module Plottable.Animators {
+﻿namespace Plottable.Animators {
   export type AnimateJoinCallback = (joinResult: Drawers.JoinResult
     , attrToAppliedProjector: AttributeToAppliedProjector
     , drawer: Drawer) => void;
@@ -54,7 +54,7 @@
      * Gets an inner animator.
      * callback functions have access to this animator, so callbacks may be designed to
      * wrap another animator
-     * 
+     *
      * @returns {innerAnimator} The current innerAnimator.
      */
     public innerAnimator(): Animator;
@@ -77,10 +77,10 @@
      * Invoke animateJoin on the specified innerAnimator.
      * If no innerAnimator is specified, delegates to Callback's base class
      * (Plottable.Animators.Base)
-     * 
-     * @param {Drawers.JoinResult} joinResult 
-     * @param {AttributeToAppliedProjector} attrToAppliedProjector 
-     * @param {Drawer} drawer 
+     *
+     * @param {Drawers.JoinResult} joinResult
+     * @param {AttributeToAppliedProjector} attrToAppliedProjector
+     * @param {Drawer} drawer
      */
     public innerAnimate(joinResult: Drawers.JoinResult
       , attrToAppliedProjector: AttributeToAppliedProjector

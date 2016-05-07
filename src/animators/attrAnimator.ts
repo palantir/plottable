@@ -1,4 +1,4 @@
-﻿module Plottable.Animators {
+﻿namespace Plottable.Animators {
   /**
    * Base for animators that animate specific attributes, such as Opacity, height... .
    */

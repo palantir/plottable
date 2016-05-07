@@ -1,4 +1,4 @@
-module Plottable.Animators {
+namespace Plottable.Animators {
   /**
    * Fade in - fade out the entering - exiting elements by transitioning opacity
    */

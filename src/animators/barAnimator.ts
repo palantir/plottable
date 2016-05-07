@@ -1,4 +1,4 @@
-﻿module Plottable.Animators {
+﻿namespace Plottable.Animators {
   /**
    * A "staged" animation specific for bar charts
    * Animates exit, update and enter in sequence
@@ -62,7 +62,7 @@
       // a projector to set bar height and y-origin to 0
       let zeroProj: AttributeToAppliedProjector = {
         height: function () { return 0; },
-        y: function (d, i) { return yScale.scale(0); }
+        y: function (d, i) { return yScale.scale(0); },
       };
       // durations for the stages - by checking the size() of the relevant selection, a stage may be
       // suppressed if it is not needed. this means that the actual overall duration of the transition
