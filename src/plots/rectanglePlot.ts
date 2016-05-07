@@ -1,4 +1,4 @@
-module Plottable.Plots {
+namespace Plottable.Plots {
   export class Rectangle<X, Y> extends XYPlot<X, Y> {
     private static _X2_KEY = "x2";
     private static _Y2_KEY = "y2";
@@ -285,7 +285,7 @@ module Plottable.Plots {
         x: attrToProjector["x"](datum, index, dataset),
         y: attrToProjector["y"](datum, index, dataset),
         width: attrToProjector["width"](datum, index, dataset),
-        height: attrToProjector["height"](datum, index, dataset)
+        height: attrToProjector["height"](datum, index, dataset),
       };
     }
 
@@ -458,7 +458,7 @@ module Plottable.Plots {
             selection: g,
             xAlign: "center",
             yAlign: "center",
-            textRotation: 0
+            textRotation: 0,
           });
         }
       });

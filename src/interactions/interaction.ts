@@ -1,4 +1,4 @@
-module Plottable {
+namespace Plottable {
 export class Interaction {
   protected _componentAttachedTo: Component;
 
@@ -91,7 +91,7 @@ export class Interaction {
     let origin = this._componentAttachedTo.originToSVG();
     return {
       x: p.x - origin.x,
-      y: p.y - origin.y
+      y: p.y - origin.y,
     };
   }
 

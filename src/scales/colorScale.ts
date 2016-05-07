@@ -1,4 +1,4 @@
-module Plottable.Scales {
+namespace Plottable.Scales {
   export class Color extends Scale<string, string> {
 
     private static _LOOP_LIGHTEN_FACTOR = 1.6;
@@ -73,16 +73,17 @@ module Plottable.Scales {
 
       let defaultColorHex: string = Utils.Color.colorTest(colorTester, "");
       let i = 0;
-      let colorHex: string;
-      while ((colorHex = Utils.Color.colorTest(colorTester, "plottable-colors-" + i)) !== null &&
-              i < this._MAXIMUM_COLORS_FROM_CSS) {
+      let colorHex = Utils.Color.colorTest(colorTester, "plottable-colors-0");
+      while (colorHex != null && i < this._MAXIMUM_COLORS_FROM_CSS) {
         if (colorHex === defaultColorHex && colorHex === plottableDefaultColors[plottableDefaultColors.length - 1]) {
           break;
         }
         plottableDefaultColors.push(colorHex);
         i++;
+        colorHex = Utils.Color.colorTest(colorTester, `plottable-colors-${i}`);
       }
       colorTester.remove();
+
       return plottableDefaultColors;
     }
 
@@ -102,11 +103,18 @@ module Plottable.Scales {
     }
 
     protected _getDomain() {
-      return this._d3Scale.domain();
+      return this._backingScaleDomain();
     }
 
-    protected _setBackingScaleDomain(values: string[]) {
-      this._d3Scale.domain(values);
+    protected _backingScaleDomain(): string[]
+    protected _backingScaleDomain(values: string[]): this
+    protected _backingScaleDomain(values?: string[]): any {
+      if (values == null) {
+        return this._d3Scale.domain();
+      } else {
+        this._d3Scale.domain(values);
+        return this;
+      }
     }
 
     protected _getRange() {

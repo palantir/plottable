@@ -1,4 +1,4 @@
-module Plottable {
+namespace Plottable {
 export class Axis<D> extends Component {
   /**
    * The css class applied to each end tick mark (the line on the end tick).
@@ -73,7 +73,7 @@ export class Axis<D> extends Component {
 
     this.formatter(Formatters.identity());
 
-    this._rescaleCallback = (scale) => this._rescale();
+    this._rescaleCallback = (newScale) => this._rescale();
     this._scale.onUpdate(this._rescaleCallback);
 
     this._annotatedTicks = [];
@@ -119,7 +119,7 @@ export class Axis<D> extends Component {
 
     return {
       minWidth: requestedWidth,
-      minHeight: requestedHeight
+      minHeight: requestedHeight,
     };
   }
 
@@ -333,14 +333,14 @@ export class Axis<D> extends Component {
         x2: isHorizontal ? positionF : offsetF,
         y1: isHorizontal ? secondaryPosition : positionF,
         y2: isHorizontal ? offsetF : positionF,
-        visibility: visibilityF
+        visibility: visibilityF,
       });
 
     bindElements(this._annotationContainer.select(".annotation-circle-container"), "circle", Axis.ANNOTATION_CIRCLE_CLASS)
       .attr({
         cx: isHorizontal ? positionF : secondaryPosition,
         cy: isHorizontal ? secondaryPosition : positionF,
-        r: 3
+        r: 3,
       });
 
     let rectangleOffsetF = (d: D) => {
@@ -359,7 +359,7 @@ export class Axis<D> extends Component {
         y: isHorizontal ? rectangleOffsetF : positionF,
         width: isHorizontal ? (d) => measurements.get(d).width : (d) => measurements.get(d).height,
         height: isHorizontal ? (d) => measurements.get(d).height : (d) => measurements.get(d).width,
-        visibility: visibilityF
+        visibility: visibilityF,
       });
 
     let annotationWriter = this._annotationWriter;
@@ -372,14 +372,14 @@ export class Axis<D> extends Component {
           let yTranslate = isHorizontal ? rectangleOffsetF(d) : positionF(d);
           return `translate(${xTranslate},${yTranslate})`;
         },
-        visibility: visibilityF
+        visibility: visibilityF,
       })
       .each(function (annotationLabel) {
         let writeOptions = {
           selection: d3.select(this),
           xAlign: "center",
           yAlign: "center",
-          textRotation: isHorizontal ? 0 : 90
+          textRotation: isHorizontal ? 0 : 90,
         };
         annotationWriter.write(annotationFormatter(annotationLabel),
                                  isHorizontal ? measurements.get(annotationLabel).width : measurements.get(annotationLabel).height,
@@ -454,7 +454,7 @@ export class Axis<D> extends Component {
       x1: 0,
       y1: 0,
       x2: 0,
-      y2: 0
+      y2: 0,
     };
 
     switch (this._orientation) {
@@ -487,7 +487,7 @@ export class Axis<D> extends Component {
       x1: 0,
       y1: 0,
       x2: 0,
-      y2: 0
+      y2: 0,
     };
 
     let scalingFunction = (d: any) => this._scale.scale(d);

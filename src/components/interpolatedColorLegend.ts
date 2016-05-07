@@ -1,4 +1,4 @@
-module Plottable.Components {
+namespace Plottable.Components {
   export class InterpolatedColorLegend extends Component {
     private static _DEFAULT_NUM_SWATCHES = 11;
 
@@ -179,7 +179,7 @@ module Plottable.Components {
 
       return {
         minWidth: desiredWidth,
-        minHeight: desiredHeight
+        minHeight: desiredHeight,
       };
     }
 
@@ -206,13 +206,13 @@ module Plottable.Components {
                 selection: this._lowerLabel,
                 xAlign: "center",
                 yAlign: "center",
-                textRotation: 0
+                textRotation: 0,
             };
       let upperWriteOptions = {
                 selection: this._upperLabel,
                 xAlign: "center",
                 yAlign: "center",
-                textRotation: 0
+                textRotation: 0,
             };
 
       let swatchWidth: number;
@@ -224,7 +224,7 @@ module Plottable.Components {
         x: 0,
         y: 0,
         width: 0,
-        height: 0
+        height: 0,
       };
 
       let padding: number;
@@ -300,7 +300,7 @@ module Plottable.Components {
         "height": swatchHeight,
         "x": swatchX,
         "y": swatchY,
-        "shape-rendering": "crispEdges"
+        "shape-rendering": "crispEdges",
       });
       if (Configs.ADD_TITLE_ELEMENTS) {
         rects.append("title").text((d) => this._formatter(d));

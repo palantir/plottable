@@ -15,11 +15,11 @@ describe("Plots", () => {
 
         let data1 = [
           {x: "A", y: 1},
-          {x: "B", y: 2}
+          {x: "B", y: 2},
         ];
         let data2 = [
           {x: "A", y: 2},
-          {x: "B", y: 1}
+          {x: "B", y: 1},
         ];
         let dataset1 = new Plottable.Dataset(data1);
         let dataset2 = new Plottable.Dataset(data2);
@@ -108,11 +108,11 @@ describe("Plots", () => {
 
         let data1 = [
           {x: "A", y: -1},
-          {x: "B", y: -2}
+          {x: "B", y: -2},
         ];
         let data2 = [
           {x: "A", y: -2},
-          {x: "B", y: -1}
+          {x: "B", y: -1},
         ];
         let dataset1 = new Plottable.Dataset(data1);
         let dataset2 = new Plottable.Dataset(data2);
@@ -173,15 +173,15 @@ describe("Plots", () => {
         let data1 = [
           {x: "A", y: 1},
           {x: "B", y: 2},
-          {x: "C", y: 1}
+          {x: "C", y: 1},
         ];
         let data2 = [
           {x: "A", y: 2},
-          {x: "B", y: 3}
+          {x: "B", y: 3},
         ];
         let data3 = [
           {x: "B", y: 1},
-          {x: "C", y: 7}
+          {x: "C", y: 7},
         ];
 
         stackedBarPlot = new Plottable.Plots.StackedBar<string, number>();
@@ -274,11 +274,11 @@ describe("Plots", () => {
 
         let data1 = [
           {x: 1, y: "A"},
-          {x: 2, y: "B"}
+          {x: 2, y: "B"},
         ];
         let data2 = [
           {x: 2, y: "A"},
-          {x: 1, y: "B"}
+          {x: 1, y: "B"},
         ];
         let dataset1 = new Plottable.Dataset(data1);
         let dataset2 = new Plottable.Dataset(data2);
@@ -351,15 +351,15 @@ describe("Plots", () => {
         let data1 = [
           {y: "A", x: 1},
           {y: "B", x: 2},
-          {y: "C", x: 1}
+          {y: "C", x: 1},
         ];
         let data2 = [
           {y: "A", x: 2},
-          {y: "B", x: 3}
+          {y: "B", x: 3},
         ];
         let data3 = [
           {y: "B", x: 1},
-          {y: "C", x: 7}
+          {y: "C", x: 7},
         ];
 
         stackedBarPlot = new Plottable.Plots.StackedBar<number, string>(Plottable.Plots.Bar.ORIENTATION_HORIZONTAL);

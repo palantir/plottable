@@ -1,4 +1,4 @@
-module Plottable {
+namespace Plottable {
 /*
  * ComponentContainer class encapsulates Table and ComponentGroup's shared functionality.
  * It will not do anything if instantiated directly.

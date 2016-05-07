@@ -1,4 +1,4 @@
-module Plottable.RenderPolicies {
+namespace Plottable.RenderPolicies {
   /**
    * A policy for rendering Components.
    */

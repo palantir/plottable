@@ -14,12 +14,12 @@
  * );
  * ```
  */
-module Plottable.RenderController {
+namespace Plottable.RenderController {
   let _componentsNeedingRender = new Utils.Set<Component>();
   let _componentsNeedingComputeLayout = new Utils.Set<Component>();
   let _animationRequested = false;
   let _isCurrentlyFlushing = false;
-  export module Policy {
+  export namespace Policy {
     export var IMMEDIATE = "immediate";
     export var ANIMATION_FRAME = "animationframe";
     export var TIMEOUT = "timeout";

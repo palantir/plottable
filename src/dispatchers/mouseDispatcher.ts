@@ -1,4 +1,4 @@
-module Plottable.Dispatchers {
+namespace Plottable.Dispatchers {
   export type MouseCallback = (p: Point, event: MouseEvent) => void;
 
   export class Mouse extends Dispatcher {
@@ -176,7 +176,7 @@ module Plottable.Dispatchers {
      * Computes the mouse position from the given event, and if successful
      * calls all the callbacks in the provided callbackSet.
      */
-    private _measureAndDispatch(event: MouseEvent, eventName: string, scope: string = "element") {
+    private _measureAndDispatch(event: MouseEvent, eventName: string, scope = "element") {
       if (scope !== "page" && scope !== "element") {
         throw new Error("Invalid scope '" + scope + "', must be 'element' or 'page'");
       }

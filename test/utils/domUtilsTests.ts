@@ -8,7 +8,7 @@ describe("Utils.DOM", () => {
       x: 0,
       y: 0,
       width: 40,
-      height: 20
+      height: 20,
     };
     let rect = svg.append("rect").attr(expectedBox);
     let measuredBox = Plottable.Utils.DOM.elementBBox(rect);
@@ -21,7 +21,7 @@ describe("Utils.DOM", () => {
       x: 0,
       y: 0,
       width: 40,
-      height: 20
+      height: 20,
     };
 
     let removedSVG = TestMethods.generateSVG().remove();

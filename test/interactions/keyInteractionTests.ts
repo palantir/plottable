@@ -7,7 +7,7 @@ describe("Interactions", () => {
     const INSIDE_POINT = { x: 100, y: 100 };
     const OUTSIDE_POINT = { x: -100, y: -100 };
 
-    type KeyTestCallback = {
+    interface KeyTestCallback {
       called: boolean;
       keycode: number;
       reset: () => void;
@@ -59,19 +59,19 @@ describe("Interactions", () => {
           }
         }
 
-        function registerEvent(keycode: number, callback: KeyTestCallback) {
+        function registerEvent(keycode: number, handler: KeyTestCallback) {
           if (event === "KeyPress") {
-            return keyInteraction.onKeyPress(keycode, callback);
+            return keyInteraction.onKeyPress(keycode, handler);
           } else {
-            return keyInteraction.onKeyRelease(keycode, callback);
+            return keyInteraction.onKeyRelease(keycode, handler);
           }
         }
 
-        function unregisterEvent(keycode: number, callback: KeyTestCallback) {
+        function unregisterEvent(keycode: number, handler: KeyTestCallback) {
           if (event === "KeyPress") {
-            return keyInteraction.offKeyPress(keycode, callback);
+            return keyInteraction.offKeyPress(keycode, handler);
           } else {
-            return keyInteraction.offKeyRelease(keycode, callback);
+            return keyInteraction.offKeyRelease(keycode, handler);
           }
         }
 

@@ -1,4 +1,4 @@
-module Plottable.Plots {
+namespace Plottable.Plots {
   export class StackedArea<X> extends Area<X> {
     private _stackingResult: Utils.Stacking.StackingResult;
     private _stackedExtent: number[];
@@ -108,7 +108,7 @@ module Plottable.Plots {
         "x1": 0,
         "y1": scaledBaseline,
         "x2": this.width(),
-        "y2": scaledBaseline
+        "y2": scaledBaseline,
       };
 
       this._getAnimator("baseline").animate(this._baseline, baselineAttr);

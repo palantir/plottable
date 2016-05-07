@@ -1,4 +1,4 @@
-module Plottable.Components {
+namespace Plottable.Components {
   type _LayoutAllocation = {
     guaranteedWidths: number[];
     guaranteedHeights: number[];
@@ -240,12 +240,14 @@ module Plottable.Components {
       colProportionalSpace = Table._calcProportionalSpace(colWeights, freeWidth );
       rowProportionalSpace = Table._calcProportionalSpace(rowWeights, freeHeight);
 
-      return {colProportionalSpace: colProportionalSpace,
-              rowProportionalSpace: rowProportionalSpace,
-              guaranteedWidths: guarantees.guaranteedWidths,
-              guaranteedHeights: guarantees.guaranteedHeights,
-              wantsWidth: wantsWidth,
-              wantsHeight: wantsHeight};
+      return {
+        colProportionalSpace: colProportionalSpace,
+        rowProportionalSpace: rowProportionalSpace,
+        guaranteedWidths: guarantees.guaranteedWidths,
+        guaranteedHeights: guarantees.guaranteedHeights,
+        wantsWidth: wantsWidth,
+        wantsHeight: wantsHeight,
+      };
     }
 
     private _determineGuarantees(offeredWidths: number[], offeredHeights: number[], isFinalOffer = false): _LayoutAllocation {
@@ -262,7 +264,7 @@ module Plottable.Components {
           } else {
             spaceRequest = {
               minWidth: 0,
-              minHeight: 0
+              minHeight: 0,
             };
           }
 
@@ -284,7 +286,7 @@ module Plottable.Components {
         guaranteedWidths: requestedWidths,
         guaranteedHeights: requestedHeights,
         wantsWidthArr: columnNeedsWidth,
-        wantsHeightArr: rowNeedsHeight
+        wantsHeightArr: rowNeedsHeight,
       };
     }
 
@@ -292,7 +294,7 @@ module Plottable.Components {
       this._calculatedLayout = this._iterateLayout(offeredWidth, offeredHeight);
       return {
         minWidth: d3.sum(this._calculatedLayout.guaranteedWidths),
-        minHeight: d3.sum(this._calculatedLayout.guaranteedHeights)
+        minHeight: d3.sum(this._calculatedLayout.guaranteedHeights),
       };
     }
 

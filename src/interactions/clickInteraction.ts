@@ -1,10 +1,10 @@
-module Plottable {
+namespace Plottable {
 
 export type ClickCallback = (point: Point) => void;
 
 }
 
-module Plottable.Interactions {
+namespace Plottable.Interactions {
   export class Click extends Interaction {
 
     private _mouseDispatcher: Plottable.Dispatchers.Mouse;

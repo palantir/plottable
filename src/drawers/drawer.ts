@@ -1,5 +1,5 @@
-module Plottable {
-export module Drawers {
+namespace Plottable {
+export namespace Drawers {
   /**
    * A step for the drawer to draw.
    *
@@ -138,7 +138,7 @@ export class Drawer {
       }),
       enter: null,
       exit: null,
-      merge: null
+      merge: null,
     };
     this._joinResult.enter = dataElements.enter()
       .append(this._svgElementName)
@@ -222,7 +222,7 @@ export class Drawer {
       let attrToAppliedProjector = this._appliedProjectors(dr.attrToProjector);
       return {
         attrToAppliedProjector: attrToAppliedProjector,
-        animator: dr.animator
+        animator: dr.animator,
       };
     });
 

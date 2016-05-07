@@ -251,7 +251,7 @@ describe("Component", () => {
 
     it("can set its parent to a container that contains this component", () => {
       let acceptingContainer: any = {
-        has: () => true
+        has: () => true,
       };
       assert.strictEqual(c.parent(acceptingContainer), c, "setter returns calling object");
       assert.strictEqual(c.parent(), acceptingContainer, "parent set if parent contains component");
@@ -261,7 +261,7 @@ describe("Component", () => {
 
     it("throws an error when the input parent does not contain this component", () => {
       let rejectingContainer: any = {
-        has: (component: Plottable.Component) => false
+        has: (component: Plottable.Component) => false,
       };
       // HACKHACK: https://github.com/palantir/plottable/issues/2661 Cannot assert errors being thrown with description
       (<any> assert).throws(() => c.parent(rejectingContainer), Error,
@@ -427,7 +427,7 @@ describe("Component", () => {
     it("computes the layout of the component based on input", () => {
       let origin = {
         x: 10,
-        y: 20
+        y: 20,
       };
       let width = 100;
       let height = 200;
@@ -650,7 +650,6 @@ describe("Component", () => {
 
     it("performs all of the same operations as renderImmediately()", () => {
       let renderFlag = false;
-      let c = new Plottable.Component();
       c.renderImmediately = () => {
         renderFlag = true;
         return c;
@@ -666,7 +665,6 @@ describe("Component", () => {
 
     it("does not render unless allocated space", () => {
       let renderFlag = false;
-      let c = new Plottable.Component();
       c.renderImmediately = () => {
         renderFlag = true;
         return c;
@@ -805,7 +803,7 @@ describe("Component", () => {
       c.computeLayout({x: SVG_WIDTH / 4, y: SVG_HEIGHT / 4}, SVG_WIDTH / 4, SVG_HEIGHT / 4);
       let originToSvg = {
         x: parent.origin().x + c.origin().x,
-        y: parent.origin().y + c.origin().y
+        y: parent.origin().y + c.origin().y,
       };
       assert.deepEqual(c.originToSVG(), originToSvg, "origin offsetted by parents");
       parent.destroy();
@@ -902,7 +900,7 @@ describe("Component", () => {
       const expectedHeight = TestMethods.numAttr(svg, "height") + 100;
       svg.attr({
         width: expectedWidth,
-        height: expectedHeight
+        height: expectedHeight,
       });
 
       const backing = svg.select(`.${backingClass}`);

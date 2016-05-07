@@ -78,11 +78,11 @@ describe("GuideLineLayer", () => {
 
         const quarterPoint = {
           x: SVG_WIDTH / 4,
-          y: SVG_HEIGHT / 4
+          y: SVG_HEIGHT / 4,
         };
         const halfPoint = {
           x: SVG_WIDTH / 2,
-          y: SVG_HEIGHT / 2
+          y: SVG_HEIGHT / 2,
         };
 
         let dll: Plottable.Components.DragLineLayer<number>;
@@ -98,14 +98,14 @@ describe("GuideLineLayer", () => {
             x1: orientation === "vertical" ? value : 0,
             x2: orientation === "vertical" ? value : SVG_WIDTH,
             y1: orientation === "vertical" ? 0 : value,
-            y2: orientation === "vertical" ? SVG_HEIGHT : value
+            y2: orientation === "vertical" ? SVG_HEIGHT : value,
           };
         };
 
         function getDragPoint(value: number) {
           return {
             x: orientation === "vertical" ? value : halfPoint.x,
-            y: orientation === "vertical" ? halfPoint.y : value
+            y: orientation === "vertical" ? halfPoint.y : value,
           };
         };
 

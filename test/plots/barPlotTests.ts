@@ -33,7 +33,7 @@ describe("Plots", () => {
         const data = [
           { base: "A", value: 1 },
           { base: "B", value: 0 },
-          { base: "C", value: -1 }
+          { base: "C", value: -1 },
         ];
 
         let svg: d3.Selection<void>;
@@ -177,7 +177,7 @@ describe("Plots", () => {
 
         it("computes the base scale domain correctly when there is only one data point", () => {
           const singlePointData = [
-            { base: baseScale.domain()[1] + 10, value: 5 }
+            { base: baseScale.domain()[1] + 10, value: 5 },
           ];
           barPlot.addDataset(new Plottable.Dataset(singlePointData));
           barPlot.renderTo(svg);
@@ -189,7 +189,7 @@ describe("Plots", () => {
         it("base scale domain does not change when autoDomain is called more than once", () => {
           const data = [
             { base: 0, value: 1 },
-            { base: 1, value: 2 }
+            { base: 1, value: 2 },
           ];
           barPlot.addDataset(new Plottable.Dataset(data));
           barPlot.renderTo(svg);
@@ -255,7 +255,7 @@ describe("Plots", () => {
               const data = [
                 { base: 1, value: 5 },
                 { base: 10, value: 2 },
-                { base: 100, value: 4 }
+                { base: 100, value: 4 },
               ];
               dataset.data(data);
 
@@ -275,7 +275,7 @@ describe("Plots", () => {
               const data = [
                 { base: 1, value: 5 },
                 { base: 10, value: 2 },
-                { base: 100, value: 4 }
+                { base: 100, value: 4 },
               ];
               dataset.data(data);
 
@@ -296,14 +296,14 @@ describe("Plots", () => {
             it("does not crash when given bad data", () => {
               const badData: any = [
                 {},
-                { base: null, value: null }
+                { base: null, value: null },
               ];
               assert.doesNotThrow(() => dataset.data(badData), Error);
             });
 
             it("computes a sensible width when given only one datum", () => {
               const singleDatumData = [
-                { base: 1, value: 5 }
+                { base: 1, value: 5 },
               ];
               dataset.data(singleDatumData);
 
@@ -317,7 +317,7 @@ describe("Plots", () => {
             it("computes a sensible width when given repeated base value", () => {
               const repeatedBaseData = [
                 { base: 1, value: 5 },
-                { base: 1, value: -5 }
+                { base: 1, value: -5 },
               ];
               dataset.data(repeatedBaseData);
 
@@ -336,7 +336,7 @@ describe("Plots", () => {
               const unsortedData = [
                 { base: 10, value: 2 },
                 { base: 1, value: 5 },
-                { base: 100, value: 4 }
+                { base: 100, value: 4 },
               ];
               dataset.data(unsortedData);
 
@@ -361,7 +361,7 @@ describe("Plots", () => {
           { base: -2, value: -0.1},
           { base: 0, value: 0 },
           { base: 2, value: 0.1 },
-          { base: 4, value: 4 }
+          { base: 4, value: 4 },
         ];
         const DEFAULT_DOMAIN = [-5, 5];
 
@@ -403,7 +403,7 @@ describe("Plots", () => {
 
           return {
             x: (labelBoundingClientRect.left + labelBoundingClientRect.right) / 2 - plotBoundingClientRect.left,
-            y: (labelBoundingClientRect.top + labelBoundingClientRect.bottom) / 2 - plotBoundingClientRect.top
+            y: (labelBoundingClientRect.top + labelBoundingClientRect.bottom) / 2 - plotBoundingClientRect.top,
           };
         };
 
@@ -585,7 +585,7 @@ describe("Plots", () => {
         const data = [
           { base: -1, value: -1 },
           { base: 0, value: 0 },
-          { base: 1, value: 1 }
+          { base: 1, value: 1 },
         ];
         const DEFAULT_DOMAIN = [-2, 2];
 
@@ -636,7 +636,7 @@ describe("Plots", () => {
         function getPointFromBaseAndValuePositions(basePosition: number, valuePosition: number) {
           return {
             x: isVertical ? basePosition : valuePosition,
-            y: isVertical ? valuePosition : basePosition
+            y: isVertical ? valuePosition : basePosition,
           };
         }
 
@@ -650,7 +650,7 @@ describe("Plots", () => {
             dataset: dataset,
             position: getPointFromBaseAndValuePositions(basePosition, valuePosition),
             selection: d3.select(barPlot.content().selectAll("rect")[0][index]),
-            component: barPlot
+            component: barPlot,
           };
         }
 
@@ -709,7 +709,7 @@ describe("Plots", () => {
             baseScale.domain([100, 200]);
             const centerOfPlot = {
               x: barPlot.width() / 2,
-              y: barPlot.height() / 2
+              y: barPlot.height() / 2,
             };
             const nearestEntity = barPlot.entityNearest(centerOfPlot);
             assert.isUndefined(nearestEntity, "returns undefined when no bars are in view");
@@ -747,11 +747,11 @@ describe("Plots", () => {
             const bar0FarEdge = TestMethods.numAttr(bar0, basePositionAttr) + TestMethods.numAttr(bar0, baseSizeAttr);
             const baseRange = {
               min: bar0Edge,
-              max: bar0FarEdge
+              max: bar0FarEdge,
             };
             const fullSizeValueRange = {
               min: -Infinity,
-              max: Infinity
+              max: Infinity,
             };
 
             const entitiesInRange = isVertical ? barPlot.entitiesIn(baseRange, fullSizeValueRange)
@@ -765,11 +765,11 @@ describe("Plots", () => {
             const halfUpBar0 = valueScale.scale(data[0].value / 2);
             const valueRange = {
               min: Math.min(quarterUpBar0, halfUpBar0),
-              max: Math.max(quarterUpBar0, halfUpBar0)
+              max: Math.max(quarterUpBar0, halfUpBar0),
             };
             const fullSizeBaseRange = {
               min: -Infinity,
-              max: Infinity
+              max: Infinity,
             };
             const entitiesInRange = isVertical ? barPlot.entitiesIn(fullSizeBaseRange, valueRange)
                                                : barPlot.entitiesIn(valueRange, fullSizeBaseRange);

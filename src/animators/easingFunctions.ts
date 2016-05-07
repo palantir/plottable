@@ -1,4 +1,4 @@
-module Plottable.Animators {
+namespace Plottable.Animators {
   export type d3SelectionOrTransition = d3.Selection<any> | d3.Transition<any>;
 
   export type EasingFunction = (t: number) => number;

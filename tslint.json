@@ -17,6 +17,7 @@
     "max-line-length": [true, 140],
     "no-arg": true,
     "no-bitwise": true,
+    "no-conditional-assignment": true,
     "no-consecutive-blank-lines": true,
     "no-console": [true,
       "log",
@@ -34,8 +35,10 @@
     "no-duplicate-variable": true,
     "no-empty": true,
     "no-eval": true,
+    "no-inferrable-types": true,
+    "no-internal-module": true,
+    "no-shadowed-variable": true,
     "no-switch-case-fall-through": true,
-    "no-trailing-comma": true,
     "no-trailing-whitespace": true,
     "no-unreachable": true,
     "no-unused-expression": true,
@@ -53,6 +56,10 @@
     ],
     "radix": true,
     "semicolon": true,
+    "trailing-comma": [true, {
+        "singleline": "never",
+        "multiline": "always"
+    }],
     "triple-equals": [true,
       "allow-null-check"
     ],

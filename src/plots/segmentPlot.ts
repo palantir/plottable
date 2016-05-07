@@ -1,4 +1,4 @@
-module Plottable.Plots {
+namespace Plottable.Plots {
   export class Segment<X, Y> extends XYPlot<X, Y> {
     private static _X2_KEY = "x2";
     private static _Y2_KEY = "y2";
@@ -228,7 +228,8 @@ module Plottable.Plots {
         { x: xRange.min, y: yRange.min },
         { x: xRange.min, y: yRange.max },
         { x: xRange.max, y: yRange.max },
-        { x: xRange.max, y: yRange.min }];
+        { x: xRange.max, y: yRange.min },
+      ];
       let intersections = corners.filter((point: Point, index: number) => {
           if (index !== 0) {
             // return true if border formed by conecting current corner and previous corner intersects with the segment
@@ -240,9 +241,12 @@ module Plottable.Plots {
     }
 
     private _lineIntersectsSegment(point1: Point, point2: Point, point3: Point, point4: Point) {
+      /* tslint:disable no-shadowed-variable */
       let calcOrientation = (point1: Point, point2: Point, point: Point) => {
         return (point2.x - point1.x) * (point.y - point2.y) - (point2.y - point1.y) * (point.x - point2.x);
       };
+      /* tslint:enable no-shadowed-variable */
+
       // point3 and point4 are on different sides of line formed by point1 and point2
       return calcOrientation(point1, point2, point3) * calcOrientation(point1, point2, point4) < 0;
     }

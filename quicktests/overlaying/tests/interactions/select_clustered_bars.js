@@ -33,7 +33,7 @@ function run(svg, data, Plottable) {
   clickInteraction.onClick(function (p) {
     var bars = barPlot.entitiesAt(p);
     if (bars.length === 0) {
-      barPlot.getAllSelections().style("fill", null);
+      barPlot.selections().style("fill", null);
     } else {
       bars.forEach(function(bar) { bar.selection.style("fill", "red"); });
     }

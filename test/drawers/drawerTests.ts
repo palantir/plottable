@@ -96,8 +96,6 @@ describe("Drawers", () => {
     });
 
     it("selectionForIndex()", () => {
-      let svg = TestMethods.generateSVG(300, 300);
-      let drawer = createMockDrawer(null);
       drawer.renderArea(svg.append("g"));
       drawer.selector = () => "circle";
       let data = [{one: 2, two: 1}, {one: 33, two: 21}, {one: 11, two: 10}];
@@ -105,12 +103,10 @@ describe("Drawers", () => {
       circles.enter().append("circle").attr("cx", (datum: any) => datum.one).attr("cy", (datum: any) => datum.two).attr("r", 10);
       let selection = drawer.selectionForIndex(1);
       assert.strictEqual(selection.node(), circles[0][1], "correct selection gotten");
-      svg.remove();
     });
 
     it("totalDrawTime()", () => {
-      let svg = TestMethods.generateSVG(300, 300);
-      let drawer = createMockDrawer(null);
+      let mockDrawer = createMockDrawer(null);
 
       let dataObjects = 9;
       let stepDuration = 987;
@@ -131,12 +127,9 @@ describe("Drawers", () => {
 
       let mockDrawStep = [{attrToProjector: attrToProjector, animator: animator}];
 
-      let drawTime = drawer.totalDrawTime(data, mockDrawStep);
+      let drawTime = mockDrawer.totalDrawTime(data, mockDrawStep);
 
       assert.strictEqual(drawTime, expectedAnimationDuration, "Total Draw time");
-
-      svg.remove();
-
     });
   });
 });

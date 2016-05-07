@@ -33,7 +33,7 @@ describe("Scales", () => {
           "a string",
           0,
           expectedExtent[0],
-          expectedExtent[1]
+          expectedExtent[1],
         ];
         let extent = scale.extentOfValues(arrayWithBadValues);
         assert.strictEqual(extent[0].getTime(), expectedExtent[0].getTime(), "returned correct min");
@@ -238,7 +238,7 @@ describe("Scales", () => {
         assert.strictEqual(scale.domain()[1].getTime(), maxInMiddle.getTime(), "can set domain maximum with domainMax()");
 
         let requestedDomain2 = [new Date("2014-05-01"), new Date("2016-07-01")];
-        scale.addIncludedValuesProvider((scale: Plottable.Scales.Time) => requestedDomain2);
+        scale.addIncludedValuesProvider((_scale) => requestedDomain2);
         assert.strictEqual(scale.domain()[1].getTime(), maxInMiddle.getTime(),
           "adding another ExtentsProvider doesn't change domainMax()");
       });

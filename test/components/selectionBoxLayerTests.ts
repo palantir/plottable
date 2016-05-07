@@ -92,15 +92,15 @@ describe("SelectionBoxLayer", () => {
 
       const topLeft = {
         x: 100,
-        y: 100
+        y: 100,
       };
       const bottomRight = {
         x: 300,
-        y: 300
+        y: 300,
       };
       assert.doesNotThrow(() => sbl.bounds({
         topLeft: topLeft,
-        bottomRight: bottomRight
+        bottomRight: bottomRight,
       }), Error, "can set bounds before anchoring");
 
       sbl.boxVisible(true);
@@ -113,7 +113,7 @@ describe("SelectionBoxLayer", () => {
 
       assert.strictEqual(sbl.bounds({
         topLeft: bottomRight,
-        bottomRight: topLeft
+        bottomRight: topLeft,
       }), sbl, "Setting the bounds property returns the selection box layer");
       assertCorrectRendering(topLeft, bottomRight, "rendered correctly with reversed bounds");
       queriedBounds = sbl.bounds();
@@ -136,15 +136,15 @@ describe("SelectionBoxLayer", () => {
     it("throws an error if the bounds have not been set properly before rendering", () => {
       const topLeft = {
         x: <any> "a",
-        y: <any> "b"
+        y: <any> "b",
       };
       const bottomRight = {
         x: 300,
-        y: 300
+        y: 300,
       };
       sbl.bounds({
         topLeft: topLeft,
-        bottomRight: bottomRight
+        bottomRight: bottomRight,
       });
 
       sbl.boxVisible(true);
@@ -166,15 +166,15 @@ describe("SelectionBoxLayer", () => {
 
       const topLeft = {
         x: 100,
-        y: 100
+        y: 100,
       };
       const bottomRight = {
         x: 300,
-        y: 300
+        y: 300,
       };
       assert.doesNotThrow(() => sbl.bounds({
         topLeft: topLeft,
-        bottomRight: bottomRight
+        bottomRight: bottomRight,
       }), Error, "can set bounds before anchoring");
 
       const queriedBounds = sbl.bounds();
@@ -263,12 +263,12 @@ describe("SelectionBoxLayer", () => {
       const bounds = {
         topLeft: {
           x: 100,
-          y: 100
+          y: 100,
         },
         bottomRight: {
           x: 200,
-          y: 200
-        }
+          y: 200,
+        },
       };
       sbl.bounds(bounds);
       assert.deepEqual(sbl.bounds(), bounds, "bounds set");
@@ -397,12 +397,12 @@ describe("SelectionBoxLayer", () => {
       const bounds = {
         topLeft: {
           x: 100,
-          y: 100
+          y: 100,
         },
         bottomRight: {
           x: 200,
-          y: 200
-        }
+          y: 200,
+        },
       };
       sbl.bounds(bounds);
       assert.deepEqual(sbl.bounds(), bounds, "bounds set");

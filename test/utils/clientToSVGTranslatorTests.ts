@@ -17,13 +17,13 @@ describe("ClientToSVGTranslator", () => {
 
     let rectOrigin: Plottable.Point = {
       x: 19,
-      y: 85
+      y: 85,
     };
     let rect = svg.append("rect").attr({
       x: rectOrigin.x,
       y: rectOrigin.y,
       width: 30,
-      height: 30
+      height: 30,
     });
 
     let translator = Plottable.Utils.ClientToSVGTranslator.getTranslator(<SVGElement> svg.node());

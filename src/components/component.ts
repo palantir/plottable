@@ -1,8 +1,8 @@
-module Plottable {
+namespace Plottable {
 
 export type ComponentCallback = (component: Component) => void;
 
-export module Components {
+export namespace Components {
   export class Alignment {
     static TOP = "top";
     static BOTTOM = "bottom";
@@ -25,13 +25,13 @@ export class Component {
   private static _xAlignToProportion: { [alignment: string]: number } = {
     "left": 0,
     "center": 0.5,
-    "right": 1
+    "right": 1,
   };
   private _yAlignment: string = "top";
   private static _yAlignToProportion: { [alignment: string]: number } = {
     "top": 0,
     "center": 0.5,
-    "bottom": 1
+    "bottom": 1,
   };
   protected _isSetup = false;
   protected _isAnchored = false;
@@ -80,7 +80,7 @@ export class Component {
           x: 0,
           y: 0,
           width: "100%",
-          height: "100%"
+          height: "100%",
         }).style("opacity", 0);
       }
     }
@@ -164,7 +164,7 @@ export class Component {
   public requestedSpace(availableWidth: number, availableHeight: number): SpaceRequest {
     return {
       minWidth: 0,
-      minHeight: 0
+      minHeight: 0,
     };
   }
 
@@ -210,7 +210,7 @@ export class Component {
     let yAlignProportion = Component._yAlignToProportion[this._yAlignment];
     this._origin = {
       x: origin.x + (availableWidth - this.width()) * xAlignProportion,
-      y: origin.y + (availableHeight - this.height()) * yAlignProportion
+      y: origin.y + (availableHeight - this.height()) * yAlignProportion,
     };
     this._element.attr("transform", "translate(" + this._origin.x + "," + this._origin.y + ")");
     this._boxes.forEach((b: d3.Selection<void>) => b.attr("width", this.width()).attr("height", this.height()));
@@ -221,7 +221,7 @@ export class Component {
     let requestedSpace = this.requestedSpace(availableWidth, availableHeight);
     return {
       width: this.fixedWidth() ? Math.min(availableWidth , requestedSpace.minWidth) : availableWidth,
-      height: this.fixedHeight() ? Math.min(availableHeight, requestedSpace.minHeight) : availableHeight
+      height: this.fixedHeight() ? Math.min(availableHeight, requestedSpace.minHeight) : availableHeight,
     };
   }
 
@@ -556,7 +556,7 @@ export class Component {
   public origin(): Point {
     return {
       x: this._origin.x,
-      y: this._origin.y
+      y: this._origin.y,
     };
   }
 

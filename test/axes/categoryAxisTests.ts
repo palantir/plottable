@@ -156,7 +156,6 @@ describe("Category Axes", () => {
   });
 
   describe("requesting space when bottom oriented", () => {
-
     let svg: d3.Selection<void>;
     let axis: Plottable.Axes.Category;
     let scale: Plottable.Scales.Category;
@@ -207,8 +206,7 @@ describe("Category Axes", () => {
     });
 
     it("accounts for margin, innerTickLength, and padding when calculating for height", () => {
-      let scale = new Plottable.Scales.Category().domain(["foo", "bar", "baz"]);
-      let axis = new Plottable.Axes.Category(scale, "bottom");
+      scale.domain(["foo", "bar", "baz"]);
       axis.anchor(svg);
 
       let svgWidth = TestMethods.numAttr(svg, "width");

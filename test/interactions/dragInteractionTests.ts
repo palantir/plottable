@@ -7,26 +7,26 @@ describe("Interactions", () => {
 
     const startPoint = {
       x: SVG_WIDTH / 4,
-      y: SVG_HEIGHT / 4
+      y: SVG_HEIGHT / 4,
     };
     const endPoint = {
       x: SVG_WIDTH / 2,
-      y: SVG_HEIGHT / 2
+      y: SVG_HEIGHT / 2,
     };
     const positiveOutsidePoint = {
       x: SVG_WIDTH * 1.5,
-      y: SVG_HEIGHT * 1.5
+      y: SVG_HEIGHT * 1.5,
     };
     const negativeOutsidePoint = {
       x: -SVG_WIDTH / 2,
-      y: -SVG_HEIGHT / 2
+      y: -SVG_HEIGHT / 2,
     };
 
     let svg: d3.Selection<void>;
     let component: Plottable.Component;
     let dragInteraction: Plottable.Interactions.Drag;
 
-    type DragTestCallback = {
+    interface DragTestCallback {
       lastStartPoint: Plottable.Point;
       lastEndPoint: Plottable.Point;
       called: boolean;
@@ -35,9 +35,9 @@ describe("Interactions", () => {
     }
 
     function makeDragCallback() {
-      let callback = <DragTestCallback> function(startPoint: Plottable.Point, endPoint: Plottable.Point) {
-        callback.lastStartPoint = startPoint;
-        callback.lastEndPoint = endPoint;
+      let callback = <DragTestCallback> function(start: Plottable.Point, end: Plottable.Point) {
+        callback.lastStartPoint = start;
+        callback.lastEndPoint = end;
         callback.called = true;
       };
       callback.called = false;
@@ -49,23 +49,18 @@ describe("Interactions", () => {
       return callback;
     }
 
-    function triggerFakeDragStart(point: Plottable.Point,
-                                  mode: TestMethods.InteractionMode = TestMethods.InteractionMode.Mouse) {
+    function triggerFakeDragStart(point: Plottable.Point, mode = TestMethods.InteractionMode.Mouse) {
       TestMethods.triggerFakeInteractionEvent(mode, TestMethods.InteractionType.Start, component.background(), point.x, point.y);
     }
 
-    function triggerFakeDragMove(startPoint: Plottable.Point,
-                                 endPoint: Plottable.Point,
-                                 mode: TestMethods.InteractionMode = TestMethods.InteractionMode.Mouse) {
-      TestMethods.triggerFakeInteractionEvent(mode, TestMethods.InteractionType.Start, component.background(), startPoint.x, startPoint.y);
-      TestMethods.triggerFakeInteractionEvent(mode, TestMethods.InteractionType.Move, component.background(), endPoint.x, endPoint.y);
+    function triggerFakeDragMove(start: Plottable.Point, end: Plottable.Point, mode = TestMethods.InteractionMode.Mouse) {
+      TestMethods.triggerFakeInteractionEvent(mode, TestMethods.InteractionType.Start, component.background(), start.x, start.y);
+      TestMethods.triggerFakeInteractionEvent(mode, TestMethods.InteractionType.Move, component.background(), end.x, end.y);
     }
 
-    function triggerFakeDragEnd(startPoint: Plottable.Point,
-                                endPoint: Plottable.Point,
-                                mode: TestMethods.InteractionMode = TestMethods.InteractionMode.Mouse) {
-      TestMethods.triggerFakeInteractionEvent(mode, TestMethods.InteractionType.Start, component.background(), startPoint.x, startPoint.y);
-      TestMethods.triggerFakeInteractionEvent(mode, TestMethods.InteractionType.End, component.background(), endPoint.x, endPoint.y);
+    function triggerFakeDragEnd(start: Plottable.Point, end: Plottable.Point, mode = TestMethods.InteractionMode.Mouse) {
+      TestMethods.triggerFakeInteractionEvent(mode, TestMethods.InteractionType.Start, component.background(), start.x, start.y);
+      TestMethods.triggerFakeInteractionEvent(mode, TestMethods.InteractionType.End, component.background(), end.x, end.y);
     }
 
     beforeEach(() => {
@@ -110,16 +105,17 @@ describe("Interactions", () => {
               throw new Error(`unrecognized event type "${eventName}"`);
           }
         }
-        function triggerAppropriateFakeEvent(startPoint: Plottable.Point, endPoint: Plottable.Point) {
+
+        function triggerAppropriateFakeEvent(start: Plottable.Point, end: Plottable.Point) {
           switch (eventName) {
             case "DragStart":
-              triggerFakeDragStart(startPoint);
+              triggerFakeDragStart(start);
               break;
             case "Drag":
-              triggerFakeDragMove(startPoint, endPoint);
+              triggerFakeDragMove(start, end);
               break;
             case "DragEnd":
-              triggerFakeDragEnd(startPoint, endPoint);
+              triggerFakeDragEnd(start, end);
               break;
             default:
               throw new Error(`unrecognized event type "${eventName}"`);
@@ -222,13 +218,10 @@ describe("Interactions", () => {
         });
 
         it("does not continue dragging once the touch is cancelled", () => {
-          const callback = makeDragCallback();
-          dragInteraction.onDrag(callback);
-
           let target = component.background();
           const tenFromEndPoint = {
             x: endPoint.x - 10,
-            y: endPoint.y - 10
+            y: endPoint.y - 10,
           };
           TestMethods.triggerFakeTouchEvent("touchstart", target, [startPoint]);
           TestMethods.triggerFakeTouchEvent("touchmove", target, [tenFromEndPoint]);

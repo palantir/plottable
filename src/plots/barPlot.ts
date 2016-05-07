@@ -1,4 +1,4 @@
-module Plottable.Plots {
+namespace Plottable.Plots {
   type LabelConfig = {
     labelArea: d3.Selection<void>;
     measurer: SVGTypewriter.Measurers.Measurer;
@@ -325,7 +325,7 @@ module Plottable.Plots {
         x: attrToProjector["x"](datum, index, dataset),
         y: attrToProjector["y"](datum, index, dataset),
         width: attrToProjector["width"](datum, index, dataset),
-        height: attrToProjector["height"](datum, index, dataset)
+        height: attrToProjector["height"](datum, index, dataset),
       };
 
       return Plottable.Utils.DOM.intersectsBBox(xRange, yRange, barBBox);
@@ -400,7 +400,7 @@ module Plottable.Plots {
         "x1": this._isVertical ? 0 : scaledBaseline,
         "y1": this._isVertical ? scaledBaseline : 0,
         "x2": this._isVertical ? this.width() : scaledBaseline,
-        "y2": this._isVertical ? scaledBaseline : this.height()
+        "y2": this._isVertical ? scaledBaseline : this.height(),
       };
       this._getAnimator("baseline").animate(this._baseline, baselineAttr);
 
@@ -436,7 +436,7 @@ module Plottable.Plots {
         scale.invert(scale.scale(extent[0]) - this._barPixelWidth / 2),
         scale.invert(scale.scale(extent[0]) + this._barPixelWidth / 2),
         scale.invert(scale.scale(extent[1]) - this._barPixelWidth / 2),
-        scale.invert(scale.scale(extent[1]) + this._barPixelWidth / 2)
+        scale.invert(scale.scale(extent[1]) + this._barPixelWidth / 2),
       ]));
 
       return extents;
@@ -474,14 +474,14 @@ module Plottable.Plots {
         let yAlignment = "center";
         let labelContainerOrigin = {
           x: attrToProjector["x"](d, i, dataset),
-          y: attrToProjector["y"](d, i, dataset)
+          y: attrToProjector["y"](d, i, dataset),
         };
         let containerWidth = barWidth;
         let containerHeight = barHeight;
 
         let labelOrigin = {
           x: labelContainerOrigin.x,
-          y: labelContainerOrigin.y
+          y: labelContainerOrigin.y,
         };
 
         let showLabelOnBar: boolean;
@@ -577,7 +577,7 @@ module Plottable.Plots {
           selection: labelContainer,
           xAlign: xAlignment,
           yAlign: yAlignment,
-          textRotation: 0
+          textRotation: 0,
         };
         writer.write(text, containerWidth, containerHeight, writeOptions);
 

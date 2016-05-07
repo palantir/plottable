@@ -1,4 +1,4 @@
-module Plottable.Scales {
+namespace Plottable.Scales {
   export class Time extends QuantitativeScale<Date> {
     private _d3Scale: d3.time.Scale<number, number>;
     /**
@@ -57,11 +57,18 @@ module Plottable.Scales {
     }
 
     protected _getDomain() {
-      return this._d3Scale.domain();
+      return this._backingScaleDomain();
     }
 
-    protected _setBackingScaleDomain(values: Date[]) {
-      this._d3Scale.domain(values);
+    protected _backingScaleDomain(): Date[]
+    protected _backingScaleDomain(values: Date[]): this
+    protected _backingScaleDomain(values?: Date[]): any {
+      if (values == null) {
+        return this._d3Scale.domain();
+      } else {
+        this._d3Scale.domain(values);
+        return this;
+      }
     }
 
     protected _getRange() {

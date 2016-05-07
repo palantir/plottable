@@ -1,4 +1,4 @@
-module Plottable.Scales {
+namespace Plottable.Scales {
   export class ModifiedLog extends QuantitativeScale<number> {
     private _base: number;
     private _d3Scale: d3.scale.Linear<number, number>;
@@ -10,18 +10,28 @@ module Plottable.Scales {
      * As it approaches 0, it gradually becomes linear.
      * Consequently, a ModifiedLog Scale can process 0 and negative numbers.
      *
+     * For x >= base, scale(x) = log(x).
+     *
+     * For 0 < x < base, scale(x) will become more and more
+     * linear as it approaches 0.
+     *
+     * At x == 0, scale(x) == 0.
+     *
+     * For negative values, scale(-x) = -scale(x).
+     *
+     * The range and domain for the scale should also be set, using the
+     * range() and domain() accessors, respectively.
+     *
+     * For `range`, provide a two-element array giving the minimum and
+     * maximum of values produced when scaling.
+     *
+     * For `domain` provide a two-element array giving the minimum and
+     * maximum of the values that will be scaled.
+     *
      * @constructor
      * @param {number} [base=10]
      *        The base of the log. Must be > 1.
      *
-     *        For x <= base, scale(x) = log(x).
-     *
-     *        For 0 < x < base, scale(x) will become more and more
-     *        linear as it approaches 0.
-     *
-     *        At x == 0, scale(x) == 0.
-     *
-     *        For negative values, scale(-x) = -scale(x).
      */
     constructor(base = 10) {
       super();
@@ -88,8 +98,15 @@ module Plottable.Scales {
       super._setDomain(transformedDomain);
     }
 
-    protected _setBackingScaleDomain(values: number[]) {
-      this._d3Scale.domain(values);
+    protected _backingScaleDomain(): number[]
+    protected _backingScaleDomain(values: number[]): this
+    protected _backingScaleDomain(values?: number[]): any {
+      if (values == null) {
+        return this._d3Scale.domain();
+      } else {
+        this._d3Scale.domain(values);
+        return this;
+      }
     }
 
     public ticks(): number[] {

@@ -1,4 +1,4 @@
-module Plottable.Components {
+namespace Plottable.Components {
   export class Label extends Component {
     private _textContainer: d3.Selection<void>;
     private _text: string; // text assigned to the Label; may not be the actual text displayed due to truncation
@@ -31,7 +31,7 @@ module Plottable.Components {
 
       return {
         minWidth: desiredWidth,
-        minHeight: desiredHeight
+        minHeight: desiredHeight,
       };
     }
 
@@ -146,7 +146,7 @@ module Plottable.Components {
                         selection: this._textContainer,
                         xAlign: this.xAlignment(),
                         yAlign: this.yAlignment(),
-                        textRotation: this.angle()
+                        textRotation: this.angle(),
                     };
       this._writer.write(this._text, writeWidth, writeHeight, writeOptions);
       return this;

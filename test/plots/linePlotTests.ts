@@ -26,7 +26,7 @@ describe("Plots", () => {
           { x: 0.2, y: 0.2 },
           { x: 0.4, y: NaN },
           { x: 0.6, y: 0.6 },
-          { x: 0.8, y: 0.8 }
+          { x: 0.8, y: 0.8 },
         ];
 
         linePlot.addDataset(new Plottable.Dataset(dataWithNaN));
@@ -81,37 +81,37 @@ describe("Plots", () => {
       });
 
       it("skips NaN and undefined x and y values", () => {
-        let lineData = [
+        const lineData = [
           { x: 0.0, y: 0.0 },
           { x: 0.2, y: 0.2 },
           { x: 0.4, y: 0.4 },
           { x: 0.6, y: 0.6 },
-          { x: 0.8, y: 0.8 }
+          { x: 0.8, y: 0.8 },
         ];
-        let dataset = new Plottable.Dataset(lineData);
-        linePlot.addDataset(dataset);
+        const mutableDataset = new Plottable.Dataset(lineData);
+        linePlot.addDataset(mutableDataset);
         linePlot.renderTo(svg);
 
-        let linePath = linePlot.content().select(".line");
-        let validPoints = lineData.slice(0, 2).concat(lineData.slice(3, 5));
-        let dataWithNaN = lineData.slice();
+        const linePath = linePlot.content().select(".line");
+        const validPoints = lineData.slice(0, 2).concat(lineData.slice(3, 5));
+        const dataWithNaN = lineData.slice();
 
         dataWithNaN[2] = { x: 0.4, y: NaN };
-        dataset.data(dataWithNaN);
+        mutableDataset.data(dataWithNaN);
         linePlot.render();
         TestMethods.assertPathEqualToDataPoints(linePath.attr("d"), validPoints, xScale, yScale);
 
         dataWithNaN[2] = { x: NaN, y: 0.4 };
-        dataset.data(dataWithNaN);
+        mutableDataset.data(dataWithNaN);
         TestMethods.assertPathEqualToDataPoints(linePath.attr("d"), validPoints, xScale, yScale);
 
         let dataWithUndefined = lineData.slice();
         dataWithUndefined[2] = { x: 0.4, y: undefined };
-        dataset.data(dataWithUndefined);
+        mutableDataset.data(dataWithUndefined);
         TestMethods.assertPathEqualToDataPoints(linePath.attr("d"), validPoints, xScale, yScale);
 
         dataWithUndefined[2] = { x: undefined, y: 0.4 };
-        dataset.data(dataWithUndefined);
+        mutableDataset.data(dataWithUndefined);
         TestMethods.assertPathEqualToDataPoints(linePath.attr("d"), validPoints, xScale, yScale);
 
         svg.remove();
@@ -273,7 +273,7 @@ describe("Plots", () => {
       let yScale: Plottable.Scales.Linear;
       let data = [
         {x: 0.0, y: -1},
-        {x: 1.8, y: -2}
+        {x: 1.8, y: -2},
       ];
       let dataset: Plottable.Dataset;
       let line: Plottable.Plots.Line<number>;
@@ -471,11 +471,11 @@ describe("Plots", () => {
 
       it("handles autorange smoothly for vertical lines", () => {
         yScale.domain([0.1, 1.1]);
-        let data = [
+        let verticalLinesData = [
           {x: -2, y: 1.8},
-          {x: -1, y: 0.0}
+          {x: -1, y: 0.0},
         ];
-        line.addDataset(new Plottable.Dataset(data));
+        line.addDataset(new Plottable.Dataset(verticalLinesData));
         line.autorangeMode("x");
 
         xScale.padProportion(0);
@@ -486,13 +486,13 @@ describe("Plots", () => {
 
         line.autorangeSmooth(true);
 
-        let base = data[0].x;
-        let x1 = (yScale.domain()[1] - data[0].y);
-        let x2 = data[1].y - data[0].y;
-        let y2 = data[1].x - data[0].x;
+        let base = verticalLinesData[0].x;
+        let x1 = (yScale.domain()[1] - verticalLinesData[0].y);
+        let x2 = verticalLinesData[1].y - verticalLinesData[0].y;
+        let y2 = verticalLinesData[1].x - verticalLinesData[0].x;
         let expectedTop = base + y2 * x1 / x2;
 
-        x1 = (yScale.domain()[0] - data[0].y);
+        x1 = (yScale.domain()[0] - verticalLinesData[0].y);
         let expectedBottom = base + y2 * x1 / x2;
 
         assert.closeTo(xScale.domain()[0], expectedTop, 0.001, "smooth autoranging forces the domain to include the line (left)");
@@ -501,7 +501,7 @@ describe("Plots", () => {
         line.autorangeSmooth(false);
         assert.deepEqual(xScale.domain(), [0, 1], "resetting the smooth autorange works");
 
-        yScale.domain([data[0].y, data[1].y]);
+        yScale.domain([verticalLinesData[0].y, verticalLinesData[1].y]);
         assert.deepEqual(xScale.domain(), [-2, -1], "no changes for autoranging smooth with same edge poitns (no smooth)");
 
         line.autorangeSmooth(true);
@@ -546,7 +546,7 @@ describe("Plots", () => {
           {x: 2, y: 2},
           {x: 3, y: 1},
           {x: 4, y: 2},
-          {x: 5, y: 1}
+          {x: 5, y: 1},
         ];
         plot.addDataset(new Plottable.Dataset(data));
 
@@ -569,7 +569,7 @@ describe("Plots", () => {
           {x: 2, y: 2},
           {x: 3, y: 1},
           {x: 4, y: 2},
-          {x: 5, y: 1}
+          {x: 5, y: 1},
         ];
         plot.addDataset(new Plottable.Dataset(data));
 
@@ -592,7 +592,7 @@ describe("Plots", () => {
           {x: 2, y: 2},
           {x: 1, y: 3},
           {x: 2, y: 4},
-          {x: 1, y: 5}
+          {x: 1, y: 5},
         ];
         plot.addDataset(new Plottable.Dataset(data));
         xScale.padProportion(0);
@@ -616,7 +616,7 @@ describe("Plots", () => {
           {x: 2, y: 2},
           {x: 3, y: 1},
           {x: 4, y: 2},
-          {x: 5, y: 1}
+          {x: 5, y: 1},
         ];
         plot.addDataset(new Plottable.Dataset(data));
 

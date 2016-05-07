@@ -1,4 +1,4 @@
-module Plottable.Plots {
+namespace Plottable.Plots {
   export interface PlotEntity extends Entity<Plot> {
     dataset: Dataset;
     index: number;
@@ -10,13 +10,13 @@ module Plottable.Plots {
     scale?: Scale<D, R>;
   }
 
-  export module Animator {
+  export namespace Animator {
     export var MAIN = "main";
     export var RESET = "reset";
   }
 }
 
-module Plottable {
+namespace Plottable {
 /**
  * Computing the selection of an entity is an expensive operation. This object aims to
  * reproduce the behavior of the Plots.PlotEntity, excluding the selection, but including
@@ -502,7 +502,7 @@ export class Plot extends Component {
           position: position,
           component: this,
           drawer: drawer,
-          validDatumIndex: validDatumIndex
+          validDatumIndex: validDatumIndex,
         });
         validDatumIndex++;
       });
@@ -517,7 +517,7 @@ export class Plot extends Component {
       dataset: entity.dataset,
       index: entity.index,
       component: entity.component,
-      selection: entity.drawer.selectionForIndex(entity.validDatumIndex)
+      selection: entity.drawer.selectionForIndex(entity.validDatumIndex),
     };
     return plotEntity;
   }

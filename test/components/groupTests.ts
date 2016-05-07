@@ -245,7 +245,7 @@ describe("Group", () => {
       assert.strictEqual(fixedComponent.height(), FIXED_COMPONENT_SIZE, "fixed-size Component has correct height");
       let expectedFixedOrigin = {
         x: SVG_WIDTH - FIXED_COMPONENT_SIZE,
-        y: SVG_HEIGHT - FIXED_COMPONENT_SIZE
+        y: SVG_HEIGHT - FIXED_COMPONENT_SIZE,
       };
       TestMethods.assertPointsClose(expectedFixedOrigin, fixedComponent.origin(), 1, "fixed-size Component has correct origin");
 
@@ -253,7 +253,7 @@ describe("Group", () => {
       assert.strictEqual(unfixedComponent.height(), SVG_HEIGHT, "non-fixed-size Component has correct height");
       let expectedUnfixedOrigin = {
         x: 0,
-        y: 0
+        y: 0,
       };
       TestMethods.assertPointsClose(expectedUnfixedOrigin, unfixedComponent.origin(), 1, "non-fixed-size Component has correct origin");
 

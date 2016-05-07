@@ -1,4 +1,4 @@
-module Plottable.Plots {
+namespace Plottable.Plots {
   type EdgeIntersections = {
     left: Point[],
     right: Point[],
@@ -218,7 +218,7 @@ module Plottable.Plots {
           left: [],
           right: [],
           top: [],
-          bottom: []
+          bottom: [],
         };
       }
 
@@ -229,7 +229,7 @@ module Plottable.Plots {
         left: [],
         right: [],
         top: [],
-        bottom: []
+        bottom: [],
       };
       let leftX = xScale.scale(xScale.domain()[0]);
       let rightX = xScale.scale(xScale.domain()[1]);
@@ -257,7 +257,7 @@ module Plottable.Plots {
 
             intersectionPoints.left.push({
               x: leftX,
-              y: yScale.invert(prevY + y1)
+              y: yScale.invert(prevY + y1),
             });
           }
 
@@ -270,7 +270,7 @@ module Plottable.Plots {
 
             intersectionPoints.right.push({
               x: rightX,
-              y: yScale.invert(prevY + y1)
+              y: yScale.invert(prevY + y1),
             });
           }
 
@@ -283,7 +283,7 @@ module Plottable.Plots {
 
             intersectionPoints.top.push({
               x: xScale.invert(prevX + x1),
-              y: topY
+              y: topY,
             });
           }
 
@@ -296,7 +296,7 @@ module Plottable.Plots {
 
             intersectionPoints.bottom.push({
               x: xScale.invert(prevX + x1),
-              y: bottomY
+              y: bottomY,
             });
           }
         };
@@ -350,7 +350,7 @@ module Plottable.Plots {
      * @param {Point} queryPoint
      * @returns {PlotEntity} The nearest PlotEntity, or undefined if no PlotEntity can be found.
      */
-    public entityNearest(queryPoint: Point): PlotEntity {
+    public entityNearestByXThenY(queryPoint: Point): PlotEntity {
       let minXDist = Infinity;
       let minYDist = Infinity;
       let closest: PlotEntity;

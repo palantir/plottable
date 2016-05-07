@@ -1,4 +1,4 @@
-module Plottable {
+namespace Plottable {
   export interface Animator {
     /**
      * Applies attributes to the 'enter update exit' selections created when binding new data into

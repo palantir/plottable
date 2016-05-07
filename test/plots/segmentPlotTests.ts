@@ -16,7 +16,7 @@ describe("Plots", () => {
         const data = [
           { x: 1, y: 1, x2: 4, y2: 4 },
           { x: 2, y: 2, x2: 3, y2: 5 },
-          { x: 3, y: 3, x2: 5, y2: 2 }
+          { x: 3, y: 3, x2: 5, y2: 2 },
         ];
         plot.addDataset(new Plottable.Dataset(data));
         plot.x((d) => d.x, xScale);
@@ -89,7 +89,7 @@ describe("Plots", () => {
       it("adjusts the xScale domain with respect to the yScale domain when autorangeMode is set to x", () => {
         const staggeredData = [
           { y: 0, x: 0, x2: 1 },
-          { y: 1, x: 1, x2: 2 }
+          { y: 1, x: 1, x2: 2 },
         ];
 
         plot.x((d) => d.x, xScale);
@@ -113,7 +113,7 @@ describe("Plots", () => {
       it("adjusts the yScale domain with respect to the xScale domain when autorangeMode is set to y", () => {
         const staggeredData = [
           { x: 0, y: 0, y2: 1 },
-          { x: 1, y: 1, y2: 2 }
+          { x: 1, y: 1, y2: 2 },
         ];
 
         plot.x((d) => d.x, xScale);
@@ -152,7 +152,7 @@ describe("Plots", () => {
           { x: 1, x2: 1, y: 1, y2: 4 },
           { x: 2, x2: 3, y: 4, y2: 3 },
           { x: 4, x2: 5, y: 2, y2: 4 },
-          { x: 2, x2: 4, y: 1, y2: 1 }
+          { x: 2, x2: 4, y: 1, y2: 1 },
         ];
         plot.addDataset(new Plottable.Dataset(data)).renderTo(svg);
       });
@@ -160,7 +160,7 @@ describe("Plots", () => {
       it("retrieves the entities that intersect with the bounding box", () => {
         const entities = plot.entitiesIn({
           topLeft: { x: xScale.scale(0), y: yScale.scale(4.5) },
-          bottomRight: { x: xScale.scale(2.5), y: yScale.scale(3) }
+          bottomRight: { x: xScale.scale(2.5), y: yScale.scale(3) },
         });
         assert.lengthOf(entities, 2, "retrieved 2 entities intersect with the box");
         assert.strictEqual(entities[0].index, 0, "the entity of index 0 is retrieved");
@@ -181,50 +181,50 @@ describe("Plots", () => {
 
       it("retrieves the entity if exactly one of its endpoints is in the ranges", () => {
         // vertial segment
-        checkEntitiesInRange(plot, 0, 0.5, 1.5, 1.5, 0.5);
-        checkEntitiesInRange(plot, 0, 0.5, 1.5, 4.5, 3.5);
+        checkEntitiesInRange(0, 0.5, 1.5, 1.5, 0.5);
+        checkEntitiesInRange(0, 0.5, 1.5, 4.5, 3.5);
 
         // diagonal segment with negative slope
-        checkEntitiesInRange(plot, 1, 1.5, 2.5, 4.5, 3.5);
-        checkEntitiesInRange(plot, 1, 2.5, 3.5, 3.5, 2.5);
+        checkEntitiesInRange(1, 1.5, 2.5, 4.5, 3.5);
+        checkEntitiesInRange(1, 2.5, 3.5, 3.5, 2.5);
 
        // diagonal segment with positive slope
-        checkEntitiesInRange(plot, 2, 4.5, 5.5, 4.5, 3.5);
-        checkEntitiesInRange(plot, 2, 3.5, 4.5, 2.5, 1.5);
+        checkEntitiesInRange(2, 4.5, 5.5, 4.5, 3.5);
+        checkEntitiesInRange(2, 3.5, 4.5, 2.5, 1.5);
 
         // horizontal segment
-        checkEntitiesInRange(plot, 3, 1.5, 2.5, 1.5, 0.5);
-        checkEntitiesInRange(plot, 3, 3.5, 4.5, 1.5, 0.5);
+        checkEntitiesInRange(3, 1.5, 2.5, 1.5, 0.5);
+        checkEntitiesInRange(3, 3.5, 4.5, 1.5, 0.5);
         svg.remove();
       });
 
       it("retrieves the entity if both of its endpoints are in the ranges", () => {
         // vertial segment
-        checkEntitiesInRange(plot, 0, 0.5, 1.5, 4.5, 0.5);
+        checkEntitiesInRange(0, 0.5, 1.5, 4.5, 0.5);
 
         // diagonal segment with negative slope
-        checkEntitiesInRange(plot, 1, 1.5, 3.5, 4.5, 2.5);
+        checkEntitiesInRange(1, 1.5, 3.5, 4.5, 2.5);
 
        // diagonal segment with positive slope
-        checkEntitiesInRange(plot, 2, 3.5, 5.5, 4.5, 1.5);
+        checkEntitiesInRange(2, 3.5, 5.5, 4.5, 1.5);
 
         // horizontal segment
-        checkEntitiesInRange(plot, 3, 1.5, 4.5, 1.5, 0.5);
+        checkEntitiesInRange(3, 1.5, 4.5, 1.5, 0.5);
         svg.remove();
       });
 
       it("retrieves the entity if it intersects with the ranges with no endpoints inside", () => {
         // vertial segment
-        checkEntitiesInRange(plot, 0, 0.5, 1.5, 3.5, 1.5);
+        checkEntitiesInRange(0, 0.5, 1.5, 3.5, 1.5);
 
         // diagonal segment with negative slope
-        checkEntitiesInRange(plot, 1, 2.4, 2.6, 3.6, 3.4);
+        checkEntitiesInRange(1, 2.4, 2.6, 3.6, 3.4);
 
        // diagonal segment with positive slope
-        checkEntitiesInRange(plot, 2, 4.4, 4.6, 3.5, 2.5);
+        checkEntitiesInRange(2, 4.4, 4.6, 3.5, 2.5);
 
         // horizontal segment
-        checkEntitiesInRange(plot, 3, 2.5, 3.5, 1.5, 0.5);
+        checkEntitiesInRange(3, 2.5, 3.5, 1.5, 0.5);
         svg.remove();
       });
 
@@ -242,14 +242,13 @@ describe("Plots", () => {
         plot.renderTo(svg);
         let closest = plot.entityNearest({
           x: plot.width() / 2,
-          y: plot.height() / 2
+          y: plot.height() / 2,
         });
         assert.strictEqual(closest, undefined, "no datum has been retrieved");
         svg.remove();
       });
 
-      function checkEntitiesInRange(plot: Plottable.Plots.Segment<any, any>, index: number,
-                                    x1: number, x2: number, y1: number, y2: number) {
+      function checkEntitiesInRange(index: number, x1: number, x2: number, y1: number, y2: number) {
         const entities = plot.entitiesIn(
           { min: xScale.scale(x1), max: xScale.scale(x2) },
           { min: yScale.scale(y1), max: yScale.scale(y2) }

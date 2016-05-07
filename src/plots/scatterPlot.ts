@@ -1,4 +1,4 @@
-module Plottable.Plots {
+namespace Plottable.Plots {
   export class Scatter<X, Y> extends XYPlot<X, Y> {
     private static _SIZE_KEY = "size";
     private static _SYMBOL_KEY = "symbol";
@@ -100,7 +100,7 @@ module Plottable.Plots {
         x: pixelPoint.x - diameter,
         y: pixelPoint.y - diameter,
         width: diameter,
-        height: diameter
+        height: diameter,
       };
 
       return Utils.DOM.intersectsBBox(xRange, yRange, translatedBbox);

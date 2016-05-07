@@ -10,13 +10,13 @@ describe("Plots", () => {
         svg = TestMethods.generateSVG();
         let data1 = [
           {x: 1},
-          {x: 3}
+          {x: 3},
         ];
         let dataset1 = new Plottable.Dataset(data1);
         dataset1.metadata({ bar: 7 });
         let data2 = [
           {x: 1},
-          {x: 3}
+          {x: 3},
         ];
         let dataset2 = new Plottable.Dataset(data2);
         dataset2.metadata({ bar: 10 });
@@ -116,13 +116,13 @@ describe("Plots", () => {
         svg = TestMethods.generateSVG();
         let data1 = [
           {y: 1},
-          {y: 3}
+          {y: 3},
         ];
         let dataset1 = new Plottable.Dataset(data1);
         dataset1.metadata({ bar: 7 });
         let data2 = [
           {y: 5},
-          {y: 3}
+          {y: 3},
         ];
         let dataset2 = new Plottable.Dataset(data2);
         dataset2.metadata({ bar: 10 });
@@ -207,13 +207,13 @@ describe("Plots", () => {
       beforeEach(() => {
         let data1 = [
           {foo: 1},
-          {foo: 3}
+          {foo: 3},
         ];
         let dataset1 = new Plottable.Dataset(data1);
         dataset1.metadata({ bar: 7 });
         let data2 = [
           {foo: 1},
-          {foo: 3}
+          {foo: 3},
         ];
         let dataset2 = new Plottable.Dataset(data2);
         dataset2.metadata({ bar: 10 });
@@ -261,15 +261,15 @@ describe("Plots", () => {
         let svg = TestMethods.generateSVG();
         let data0 = [
           { x: 2, y: "2" },
-          { x: 3, y: 2 }
+          { x: 3, y: 2 },
         ];
         let data1 = [
           { x: 2, y: "0" },
-          { x: 3, y: "2" }
+          { x: 3, y: "2" },
         ];
         let data2 = [
           { x: 2, y: 2 },
-          { x: 3, y: 2 }
+          { x: 3, y: 2 },
         ];
         let xScale = new Plottable.Scales.Linear();
         let yScale = new Plottable.Scales.Linear();
@@ -310,15 +310,15 @@ describe("Plots", () => {
         let svg = TestMethods.generateSVG();
         let data0 = [
           { x: 2, y: 2 },
-          { x: 3, y: 2 }
+          { x: 3, y: 2 },
         ];
         let data1 = [
           { x: 2, y: null },
-          { x: 3, y: 2 }
+          { x: 3, y: 2 },
         ];
         let data2 = [
           { x: 2, y: 2 },
-          { x: 3, y: 2 }
+          { x: 3, y: 2 },
         ];
         let xScale = new Plottable.Scales.Linear();
         let yScale = new Plottable.Scales.Linear();

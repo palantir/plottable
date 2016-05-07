@@ -161,7 +161,7 @@ describe("Interactions", () => {
             position: "relative",
             top: `-${SVG_HEIGHT / 2}px`,
             left: `${SVG_WIDTH / 2}px`,
-            background: "black"
+            background: "black",
           });
 
           const component = new Plottable.Component();
