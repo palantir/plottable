@@ -38,9 +38,9 @@ function expandSidebar(){
 (function iife(){
 
 "use strict";
-var P = Plottable.Plot;
-var singlePlots = [P.VerticalBar];
-var singleHorizontalPlots = [P.HorizontalBar];
+var P = Plottable.Plots;
+var singlePlots = [P.Bar];
+var singleHorizontalPlots = [function() { return new P.Bar("horizontal"); }];
 var multipleDatasetPlots = [P.Line, P.Area, P.Scatter];
 var stackedPlots = [P.StackedBar, P.StackedArea, P.ClusteredBar];
 var stackedHorizontalPlots = [P.StackedBar, P.ClusteredBar];
@@ -101,81 +101,85 @@ function renderPlots(plottablePlots){
     var plotDivName = "." + plot.constructor.name;
     var plotDiv = d3.select(plotDivName);
     var box = plotDiv.append("svg").attr("height", plotheight).attr("width", plotwidth);
-    var chart = new Plottable.Component.Table([[plot]]);
+    var chart = new Plottable.Components.Table([[plot]]);
     chart.renderTo(box);
   });
 }
 
 function addAllDatasets(plot, arr, numOfDatasets){
   if (numOfDatasets === "single") {
-    plot.addDataset("d1", arr[0]);
+    plot.addDataset(new Plottable.Dataset(arr[0]));
   }
   if (numOfDatasets === "multiple") {
     arr.forEach(function(dataset){
-      plot.addDataset(dataset);
+      plot.addDataset(new Plottable.Dataset(dataset));
     });
   }
-  return plot;
 }
 
 function generatePlots(dataType){
   var plottablePlots = [];
   plots.forEach(function(PlotType){
-    var xScale = new Plottable.Scale.Category();
-    var yScale = new Plottable.Scale.Linear();
-    var colorScale = new Plottable.Scale.Color();
-    var plot = new PlotType(xScale, yScale);
-      plot.attr("fill", "type", colorScale)
-      .project("x", "x", xScale)
-      .project("y", "y", yScale)
-      .animate(true);
+    var xScale = new Plottable.Scales.Category();
+    var yScale = new Plottable.Scales.Linear();
+    var colorScale = new Plottable.Scales.Color();
+    var xFunc = function(d) { return d.x; };
+    var yFunc = function(d) { return d.y; };
+    var typeFunc = function(d) { return d.type; };
+    var plot = new PlotType();
+      plot.attr("fill", typeFunc, colorScale)
+      .animated(true);
+
+    if(piePlots.indexOf(PlotType) === -1) {
+        plot.x(xFunc, xScale).y(yFunc, yScale);
+    }
 
     if (singlePlots.indexOf(PlotType) > -1) { //if single dataset plot
-      plot = addAllDatasets(plot, dataType[0], "single");
+      addAllDatasets(plot, dataType[0], "single");
       plottablePlots.push(plot);
     }
 
     if (singleHorizontalPlots.indexOf(PlotType) > -1) { //if single horizontal plot
-      xScale = new Plottable.Scale.Linear();
-      yScale = new Plottable.Scale.Category();
-      colorScale = new Plottable.Scale.Color();
-      plot = new PlotType(xScale, yScale);
-      plot.project("x", "y", xScale)
-          .project("y", "x", yScale)
-          .attr("fill", "type", colorScale)
-          .animate(true);
-      plot = addAllDatasets(plot, dataType[0], "single");
+      xScale = new Plottable.Scales.Linear();
+      yScale = new Plottable.Scales.Category();
+      colorScale = new Plottable.Scales.Color();
+      plot = new PlotType();
+      plot.x(yFunc, xScale)
+          .y(xFunc, yScale)
+          .attr("fill", typeFunc, colorScale)
+          .animated(true);
+      addAllDatasets(plot, dataType[0], "single");
       plottablePlots.push(plot);
     }
 
     if (multipleDatasetPlots.indexOf(PlotType) > -1) { //if multiple dataset plot
-      plot = addAllDatasets(plot, dataType[1], "multiple");
+      addAllDatasets(plot, dataType[1], "multiple");
       plottablePlots.push(plot);
     }
 
     if (stackedPlots.indexOf(PlotType) > -1) { //if stacked dataset plot
-      plot = addAllDatasets(plot, dataType[2], "multiple");
+      addAllDatasets(plot, dataType[2], "multiple");
       plottablePlots.push(plot);
     }
 
     if (stackedHorizontalPlots.indexOf(PlotType) > -1) { //if stacked horizontal dataset plot
-      xScale = new Plottable.Scale.Linear();
-      yScale = new Plottable.Scale.Category();
-      colorScale = new Plottable.Scale.Color();
-      plot = new PlotType(xScale, yScale, false);
+      xScale = new Plottable.Scales.Linear();
+      yScale = new Plottable.Scales.Category();
+      colorScale = new Plottable.Scales.Color();
+      plot = new PlotType();
 
-      plot.project("x", "y", xScale)
-          .project("y", "x", yScale)
-          .attr("fill", "type", colorScale)
-          .animate(true);
+      plot.x(yFunc, xScale)
+          .y(xFunc, yScale)
+          .attr("fill", typeFunc, colorScale)
+          .animated(true);
 
-      plot = addAllDatasets(plot, dataType[2], "multiple");
+      addAllDatasets(plot, dataType[2], "multiple");
       plottablePlots.push(plot);
     }
 
     if (piePlots.indexOf(PlotType) > -1) { //if pie dataset plot
-      plot.project("value", "x");
-      plot = addAllDatasets(plot, dataType[0], "single");
+      plot.sectorValue(xFunc);
+      addAllDatasets(plot, dataType[0], "single");
       plottablePlots.push(plot);
     }
 
