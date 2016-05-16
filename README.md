@@ -41,6 +41,7 @@ If you run into any problems using Plottable, please let us know. We want Plotta
 - If you get an EACCESS error at any point, instead of running command with ``sudo`` try first changing permission to following folders:
   - ``usr/local`` by running ``sudo chown -R "$(whoami)" /usr/local``
   - ``~/.npm/`` by running ``sudo chown -R "$(whoami)" ~/.npm/``
+- Navigate to `http://localhost:9999/quicktests/` and choose a directory to view visual tests
 
 ## Contributing
 
