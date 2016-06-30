@@ -8,6 +8,7 @@ test/tests.js
 
 # Project specific
 node_modules/
+bower_components/
 local/
 quicktests/github_token.txt
 quicktests/overlaying/list_of_quicktests.json
