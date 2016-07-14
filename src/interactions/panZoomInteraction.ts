@@ -1,4 +1,8 @@
 namespace Plottable.Interactions {
+
+  export type PanCallback = (e: Event) => void;
+  export type ZoomCallback = (e: Event) => void;
+
   export class PanZoom extends Interaction {
     /**
      * The number of pixels occupied in a line.
@@ -21,6 +25,9 @@ namespace Plottable.Interactions {
 
     private _minDomainExtents: Utils.Map<QuantitativeScale<any>, any>;
     private _maxDomainExtents: Utils.Map<QuantitativeScale<any>, any>;
+
+    private _panCallbacks = new Utils.CallbackSet<PanCallback>();
+    private _zoomCallbacks = new Utils.CallbackSet<ZoomCallback>();
 
     /**
      * A PanZoom Interaction updates the domains of an x-scale and/or a y-scale
@@ -171,6 +178,10 @@ namespace Plottable.Interactions {
       ids.forEach((id) => {
         this._touchIds.remove(id.toString());
       });
+
+      if (this._touchIds.size() > 0) {
+        this._zoomCallbacks.callCallbacks(e);
+      }
     }
 
     private _magnifyScale<D>(scale: QuantitativeScale<D>, magnifyAmount: number, centerValue: number) {
@@ -205,6 +216,7 @@ namespace Plottable.Interactions {
         this.yScales().forEach((yScale) => {
           this._magnifyScale(yScale, zoomAmount, translatedP.y);
         });
+        this._zoomCallbacks.callCallbacks(e);
       }
     }
 
@@ -242,6 +254,7 @@ namespace Plottable.Interactions {
         });
         lastDragPoint = endPoint;
       });
+      this._dragInteraction.onDragEnd((e) => this._panCallbacks.callCallbacks(e));
     }
 
     private _nonLinearScaleWithExtents(scale: QuantitativeScale<any>) {
@@ -422,6 +435,50 @@ namespace Plottable.Interactions {
         Utils.Window.warn("Panning and zooming with extents on a nonlinear scale may have unintended behavior.");
       }
       this._maxDomainExtents.set(quantitativeScale, maxDomainExtent);
+      return this;
+    }
+
+    /**
+     * Adds a callback to be called when panning ends.
+     *
+     * @param {PanCallback} callback
+     * @returns {Event} The calling PanZoom Interaction.
+     */
+    public onPan(callback: PanCallback) {
+      this._panCallbacks.add(callback);
+      return this;
+    }
+
+    /**
+     * Removes a callback that would be called when panning ends.
+     *
+     * @param {PanCallback} callback
+     * @returns {Event} The calling PanZoom Interaction.
+     */
+    public offPan(callback: PanCallback) {
+      this._panCallbacks.delete(callback);
+      return this;
+    }
+
+    /**
+     * Adds a callback to be called when zooming ends.
+     *
+     * @param {ZoomCallback} callback
+     * @returns {Event} The calling PanZoom Interaction.
+     */
+    public onZoom(callback: ZoomCallback) {
+      this._zoomCallbacks.add(callback);
+      return this;
+    }
+
+    /**
+     * Removes a callback that would be called when zooming ends.
+     *
+     * @param {ZoomCallback} callback
+     * @returns {Event} The calling PanZoom Interaction.
+     */
+    public offZoom(callback: ZoomCallback) {
+      this._zoomCallbacks.delete(callback);
       return this;
     }
   }

@@ -4576,6 +4576,8 @@ declare namespace Plottable.Interactions {
     }
 }
 declare namespace Plottable.Interactions {
+    type PanCallback = (e: Event) => void;
+    type ZoomCallback = (e: Event) => void;
     class PanZoom extends Interaction {
         /**
          * The number of pixels occupied in a line.
@@ -4594,6 +4596,8 @@ declare namespace Plottable.Interactions {
         private _touchCancelCallback;
         private _minDomainExtents;
         private _maxDomainExtents;
+        private _panCallbacks;
+        private _zoomCallbacks;
         /**
          * A PanZoom Interaction updates the domains of an x-scale and/or a y-scale
          * in response to the user panning or zooming.
@@ -4706,6 +4710,34 @@ declare namespace Plottable.Interactions {
          * @returns {Interactions.PanZoom} The calling PanZoom Interaction.
          */
         maxDomainExtent<D>(quantitativeScale: QuantitativeScale<D>, maxDomainExtent: D): this;
+        /**
+         * Adds a callback to be called when panning ends.
+         *
+         * @param {PanCallback} callback
+         * @returns {Event} The calling PanZoom Interaction.
+         */
+        onPan(callback: PanCallback): this;
+        /**
+         * Removes a callback that would be called when panning ends.
+         *
+         * @param {PanCallback} callback
+         * @returns {Event} The calling PanZoom Interaction.
+         */
+        offPan(callback: PanCallback): this;
+        /**
+         * Adds a callback to be called when zooming ends.
+         *
+         * @param {ZoomCallback} callback
+         * @returns {Event} The calling PanZoom Interaction.
+         */
+        onZoom(callback: ZoomCallback): this;
+        /**
+         * Removes a callback that would be called when zooming ends.
+         *
+         * @param {ZoomCallback} callback
+         * @returns {Event} The calling PanZoom Interaction.
+         */
+        offZoom(callback: ZoomCallback): this;
     }
 }
 declare namespace Plottable {
