@@ -26,8 +26,8 @@ namespace Plottable.Interactions {
     private _minDomainExtents: Utils.Map<QuantitativeScale<any>, any>;
     private _maxDomainExtents: Utils.Map<QuantitativeScale<any>, any>;
 
-    private _panCallbacks = new Utils.CallbackSet<PanCallback>();
-    private _zoomCallbacks = new Utils.CallbackSet<ZoomCallback>();
+    private _panEndCallbacks = new Utils.CallbackSet<PanCallback>();
+    private _zoomEndCallbacks = new Utils.CallbackSet<ZoomCallback>();
 
     /**
      * A PanZoom Interaction updates the domains of an x-scale and/or a y-scale
@@ -180,7 +180,7 @@ namespace Plottable.Interactions {
       });
 
       if (this._touchIds.size() > 0) {
-        this._zoomCallbacks.callCallbacks(e);
+        this._zoomEndCallbacks.callCallbacks(e);
       }
     }
 
@@ -216,7 +216,7 @@ namespace Plottable.Interactions {
         this.yScales().forEach((yScale) => {
           this._magnifyScale(yScale, zoomAmount, translatedP.y);
         });
-        this._zoomCallbacks.callCallbacks(e);
+        this._zoomEndCallbacks.callCallbacks(e);
       }
     }
 
@@ -254,7 +254,7 @@ namespace Plottable.Interactions {
         });
         lastDragPoint = endPoint;
       });
-      this._dragInteraction.onDragEnd((e) => this._panCallbacks.callCallbacks(e));
+      this._dragInteraction.onDragEnd((e) => this._panEndCallbacks.callCallbacks(e));
     }
 
     private _nonLinearScaleWithExtents(scale: QuantitativeScale<any>) {
@@ -444,8 +444,8 @@ namespace Plottable.Interactions {
      * @param {PanCallback} callback
      * @returns {Event} The calling PanZoom Interaction.
      */
-    public onPan(callback: PanCallback) {
-      this._panCallbacks.add(callback);
+    public onPanEnd(callback: PanCallback) {
+      this._panEndCallbacks.add(callback);
       return this;
     }
 
@@ -455,8 +455,8 @@ namespace Plottable.Interactions {
      * @param {PanCallback} callback
      * @returns {Event} The calling PanZoom Interaction.
      */
-    public offPan(callback: PanCallback) {
-      this._panCallbacks.delete(callback);
+    public offPanEnd(callback: PanCallback) {
+      this._panEndCallbacks.delete(callback);
       return this;
     }
 
@@ -466,8 +466,8 @@ namespace Plottable.Interactions {
      * @param {ZoomCallback} callback
      * @returns {Event} The calling PanZoom Interaction.
      */
-    public onZoom(callback: ZoomCallback) {
-      this._zoomCallbacks.add(callback);
+    public onZoomEnd(callback: ZoomCallback) {
+      this._zoomEndCallbacks.add(callback);
       return this;
     }
 
@@ -477,8 +477,8 @@ namespace Plottable.Interactions {
      * @param {ZoomCallback} callback
      * @returns {Event} The calling PanZoom Interaction.
      */
-    public offZoom(callback: ZoomCallback) {
-      this._zoomCallbacks.delete(callback);
+    public offZoomEnd(callback: ZoomCallback) {
+      this._zoomEndCallbacks.delete(callback);
       return this;
     }
   }

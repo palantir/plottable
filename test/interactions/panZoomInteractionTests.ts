@@ -624,12 +624,12 @@ describe("Interactions", () => {
         eventTarget = component.background();
       });
 
-      it("registers callback using onPan", () => {
+      it("registers callback using onPanEnd", () => {
         let callback = makeCallback();
         let startPoint = { x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2 };
         let endPoint = { x: -SVG_WIDTH / 2, y: -SVG_HEIGHT / 2 };
 
-        assert.strictEqual(panZoomInteraction.onPan(callback), panZoomInteraction, "registration returns the calling Interaction");
+        assert.strictEqual(panZoomInteraction.onPanEnd(callback), panZoomInteraction, "registration returns the calling Interaction");
 
         TestMethods.triggerFakeTouchEvent("touchstart", eventTarget, [startPoint]);
         TestMethods.triggerFakeTouchEvent("touchmove", eventTarget, [endPoint]);
@@ -647,14 +647,14 @@ describe("Interactions", () => {
         svg.remove();
       });
 
-      it("registers callback using onZoom", () => {
+      it("registers callback using onZoomEnd", () => {
         let callback = makeCallback();
         let startPoint = { x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2 };
         let endPoint = { x: -SVG_WIDTH / 2, y: -SVG_HEIGHT / 2 };
         let scrollPoint = { x: SVG_WIDTH / 4, y: SVG_HEIGHT / 4 };
         let deltaY = 3000;
 
-        assert.strictEqual(panZoomInteraction.onZoom(callback), panZoomInteraction, "registration returns the calling Interaction");
+        assert.strictEqual(panZoomInteraction.onZoomEnd(callback), panZoomInteraction, "registration returns the calling Interaction");
 
         TestMethods.triggerFakeTouchEvent("touchstart", eventTarget, [startPoint, scrollPoint], [0, 1]);
         TestMethods.triggerFakeTouchEvent("touchmove", eventTarget, [endPoint], [1]);
@@ -682,14 +682,14 @@ describe("Interactions", () => {
         svg.remove();
       });
 
-      it("deregisters callback using offPan", () => {
+      it("deregisters callback using offPanEnd", () => {
         let callback = makeCallback();
         let startPoint = { x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2 };
         let endPoint = { x: -SVG_WIDTH / 2, y: -SVG_HEIGHT / 2 };
 
-        panZoomInteraction.onPan(callback);
+        panZoomInteraction.onPanEnd(callback);
 
-        assert.strictEqual(panZoomInteraction.offPan(callback), panZoomInteraction, "deregistration returns the calling Interaction");
+        assert.strictEqual(panZoomInteraction.offPanEnd(callback), panZoomInteraction, "deregistration returns the calling Interaction");
 
         TestMethods.triggerFakeTouchEvent("touchstart", eventTarget, [startPoint]);
         TestMethods.triggerFakeTouchEvent("touchmove", eventTarget, [endPoint]);
@@ -699,14 +699,14 @@ describe("Interactions", () => {
         svg.remove();
       });
 
-      it("deregisters callback using offZoom", () => {
+      it("deregisters callback using offZoomEnd", () => {
         let callback = makeCallback();
         let startPoint = { x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2 };
         let endPoint = { x: -SVG_WIDTH / 2, y: -SVG_HEIGHT / 2 };
         let scrollPoint = { x: SVG_WIDTH / 4, y: SVG_HEIGHT / 4 };
-        panZoomInteraction.onZoom(callback);
+        panZoomInteraction.onZoomEnd(callback);
 
-        assert.strictEqual(panZoomInteraction.offZoom(callback), panZoomInteraction, "deregistration returns the calling Interaction");
+        assert.strictEqual(panZoomInteraction.offZoomEnd(callback), panZoomInteraction, "deregistration returns the calling Interaction");
 
         TestMethods.triggerFakeTouchEvent("touchstart", eventTarget, [startPoint, scrollPoint], [0, 1]);
         TestMethods.triggerFakeTouchEvent("touchmove", eventTarget, [endPoint], [1]);
@@ -717,14 +717,14 @@ describe("Interactions", () => {
         svg.remove();
       });
 
-      it("can register multiple onPan callbacks", () => {
+      it("can register multiple onPanEnd callbacks", () => {
         let callback1 = makeCallback();
         let callback2 = makeCallback();
         let startPoint = { x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2 };
         let endPoint = { x: -SVG_WIDTH / 2, y: -SVG_HEIGHT / 2 };
 
-        panZoomInteraction.onPan(callback1);
-        panZoomInteraction.onPan(callback2);
+        panZoomInteraction.onPanEnd(callback1);
+        panZoomInteraction.onPanEnd(callback2);
 
         TestMethods.triggerFakeTouchEvent("touchstart", eventTarget, [startPoint]);
         TestMethods.triggerFakeTouchEvent("touchmove", eventTarget, [endPoint]);
@@ -734,15 +734,15 @@ describe("Interactions", () => {
         svg.remove();
       });
 
-      it("can register multiple onZoom callbacks", () => {
+      it("can register multiple onZoomEnd callbacks", () => {
         let callback1 = makeCallback();
         let callback2 = makeCallback();
         let startPoint = { x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2 };
         let endPoint = { x: -SVG_WIDTH / 2, y: -SVG_HEIGHT / 2 };
         let scrollPoint = { x: SVG_WIDTH / 4, y: SVG_HEIGHT / 4 };
 
-        panZoomInteraction.onZoom(callback1);
-        panZoomInteraction.onZoom(callback2);
+        panZoomInteraction.onZoomEnd(callback1);
+        panZoomInteraction.onZoomEnd(callback2);
 
         TestMethods.triggerFakeTouchEvent("touchstart", eventTarget, [startPoint, scrollPoint], [0, 1]);
         TestMethods.triggerFakeTouchEvent("touchmove", eventTarget, [endPoint], [1]);
@@ -753,15 +753,15 @@ describe("Interactions", () => {
         svg.remove();
       });
 
-      it("can deregister a onPan callback without affecting the other ones", () => {
+      it("can deregister a onPanEnd callback without affecting the other ones", () => {
         let callback1 = makeCallback();
         let callback2 = makeCallback();
         let startPoint = { x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2 };
         let endPoint = { x: -SVG_WIDTH / 2, y: -SVG_HEIGHT / 2 };
 
-        panZoomInteraction.onPan(callback1);
-        panZoomInteraction.onPan(callback2);
-        panZoomInteraction.offPan(callback1);
+        panZoomInteraction.onPanEnd(callback1);
+        panZoomInteraction.onPanEnd(callback2);
+        panZoomInteraction.offPanEnd(callback1);
 
         TestMethods.triggerFakeTouchEvent("touchstart", eventTarget, [startPoint]);
         TestMethods.triggerFakeTouchEvent("touchmove", eventTarget, [endPoint]);
@@ -771,16 +771,16 @@ describe("Interactions", () => {
         svg.remove();
       });
 
-      it("can deregister a onZoom callback without affecting the other ones", () => {
+      it("can deregister a onZoomEnd callback without affecting the other ones", () => {
         let callback1 = makeCallback();
         let callback2 = makeCallback();
         let startPoint = { x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2 };
         let endPoint = { x: -SVG_WIDTH / 2, y: -SVG_HEIGHT / 2 };
         let scrollPoint = { x: SVG_WIDTH / 4, y: SVG_HEIGHT / 4 };
 
-        panZoomInteraction.onZoom(callback1);
-        panZoomInteraction.onZoom(callback2);
-        panZoomInteraction.offZoom(callback1);
+        panZoomInteraction.onZoomEnd(callback1);
+        panZoomInteraction.onZoomEnd(callback2);
+        panZoomInteraction.offZoomEnd(callback1);
 
         TestMethods.triggerFakeTouchEvent("touchstart", eventTarget, [startPoint, scrollPoint], [0, 1]);
         TestMethods.triggerFakeTouchEvent("touchmove", eventTarget, [endPoint], [1]);

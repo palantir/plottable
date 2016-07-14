@@ -11222,8 +11222,8 @@ var Plottable;
                 this._touchMoveCallback = function (ids, idToPoint, e) { return _this._handlePinch(ids, idToPoint, e); };
                 this._touchEndCallback = function (ids, idToPoint, e) { return _this._handleTouchEnd(ids, idToPoint, e); };
                 this._touchCancelCallback = function (ids, idToPoint, e) { return _this._handleTouchEnd(ids, idToPoint, e); };
-                this._panCallbacks = new Plottable.Utils.CallbackSet();
-                this._zoomCallbacks = new Plottable.Utils.CallbackSet();
+                this._panEndCallbacks = new Plottable.Utils.CallbackSet();
+                this._zoomEndCallbacks = new Plottable.Utils.CallbackSet();
                 this._xScales = new Plottable.Utils.Set();
                 this._yScales = new Plottable.Utils.Set();
                 this._dragInteraction = new Interactions.Drag();
@@ -11338,7 +11338,7 @@ var Plottable;
                     _this._touchIds.remove(id.toString());
                 });
                 if (this._touchIds.size() > 0) {
-                    this._zoomCallbacks.callCallbacks(e);
+                    this._zoomEndCallbacks.callCallbacks(e);
                 }
             };
             PanZoom.prototype._magnifyScale = function (scale, magnifyAmount, centerValue) {
@@ -11368,7 +11368,7 @@ var Plottable;
                     this.yScales().forEach(function (yScale) {
                         _this._magnifyScale(yScale, zoomAmount_1, translatedP.y);
                     });
-                    this._zoomCallbacks.callCallbacks(e);
+                    this._zoomEndCallbacks.callCallbacks(e);
                 }
             };
             PanZoom.prototype._constrainedZoomAmount = function (scale, zoomAmount) {
@@ -11401,7 +11401,7 @@ var Plottable;
                     });
                     lastDragPoint = endPoint;
                 });
-                this._dragInteraction.onDragEnd(function (e) { return _this._panCallbacks.callCallbacks(e); });
+                this._dragInteraction.onDragEnd(function (e) { return _this._panEndCallbacks.callCallbacks(e); });
             };
             PanZoom.prototype._nonLinearScaleWithExtents = function (scale) {
                 return this.minDomainExtent(scale) != null && this.maxDomainExtent(scale) != null &&
@@ -11521,8 +11521,8 @@ var Plottable;
              * @param {PanCallback} callback
              * @returns {Event} The calling PanZoom Interaction.
              */
-            PanZoom.prototype.onPan = function (callback) {
-                this._panCallbacks.add(callback);
+            PanZoom.prototype.onPanEnd = function (callback) {
+                this._panEndCallbacks.add(callback);
                 return this;
             };
             /**
@@ -11531,8 +11531,8 @@ var Plottable;
              * @param {PanCallback} callback
              * @returns {Event} The calling PanZoom Interaction.
              */
-            PanZoom.prototype.offPan = function (callback) {
-                this._panCallbacks.delete(callback);
+            PanZoom.prototype.offPanEnd = function (callback) {
+                this._panEndCallbacks.delete(callback);
                 return this;
             };
             /**
@@ -11541,8 +11541,8 @@ var Plottable;
              * @param {ZoomCallback} callback
              * @returns {Event} The calling PanZoom Interaction.
              */
-            PanZoom.prototype.onZoom = function (callback) {
-                this._zoomCallbacks.add(callback);
+            PanZoom.prototype.onZoomEnd = function (callback) {
+                this._zoomEndCallbacks.add(callback);
                 return this;
             };
             /**
@@ -11551,8 +11551,8 @@ var Plottable;
              * @param {ZoomCallback} callback
              * @returns {Event} The calling PanZoom Interaction.
              */
-            PanZoom.prototype.offZoom = function (callback) {
-                this._zoomCallbacks.delete(callback);
+            PanZoom.prototype.offZoomEnd = function (callback) {
+                this._zoomEndCallbacks.delete(callback);
                 return this;
             };
             /**
