@@ -11338,7 +11338,7 @@ var Plottable;
                     _this._touchIds.remove(id.toString());
                 });
                 if (this._touchIds.size() > 0) {
-                    this._zoomEndCallbacks.callCallbacks(e);
+                    this._zoomEndCallbacks.callCallbacks();
                 }
             };
             PanZoom.prototype._magnifyScale = function (scale, magnifyAmount, centerValue) {
@@ -11368,7 +11368,7 @@ var Plottable;
                     this.yScales().forEach(function (yScale) {
                         _this._magnifyScale(yScale, zoomAmount_1, translatedP.y);
                     });
-                    this._zoomEndCallbacks.callCallbacks(e);
+                    this._zoomEndCallbacks.callCallbacks();
                 }
             };
             PanZoom.prototype._constrainedZoomAmount = function (scale, zoomAmount) {
@@ -11401,7 +11401,7 @@ var Plottable;
                     });
                     lastDragPoint = endPoint;
                 });
-                this._dragInteraction.onDragEnd(function (e) { return _this._panEndCallbacks.callCallbacks(e); });
+                this._dragInteraction.onDragEnd(function () { return _this._panEndCallbacks.callCallbacks(); });
             };
             PanZoom.prototype._nonLinearScaleWithExtents = function (scale) {
                 return this.minDomainExtent(scale) != null && this.maxDomainExtent(scale) != null &&
@@ -11519,7 +11519,7 @@ var Plottable;
              * Adds a callback to be called when panning ends.
              *
              * @param {PanCallback} callback
-             * @returns {Event} The calling PanZoom Interaction.
+             * @returns {this} The calling PanZoom Interaction.
              */
             PanZoom.prototype.onPanEnd = function (callback) {
                 this._panEndCallbacks.add(callback);
@@ -11529,7 +11529,7 @@ var Plottable;
              * Removes a callback that would be called when panning ends.
              *
              * @param {PanCallback} callback
-             * @returns {Event} The calling PanZoom Interaction.
+             * @returns {this} The calling PanZoom Interaction.
              */
             PanZoom.prototype.offPanEnd = function (callback) {
                 this._panEndCallbacks.delete(callback);
@@ -11539,7 +11539,7 @@ var Plottable;
              * Adds a callback to be called when zooming ends.
              *
              * @param {ZoomCallback} callback
-             * @returns {Event} The calling PanZoom Interaction.
+             * @returns {this} The calling PanZoom Interaction.
              */
             PanZoom.prototype.onZoomEnd = function (callback) {
                 this._zoomEndCallbacks.add(callback);
@@ -11549,7 +11549,7 @@ var Plottable;
              * Removes a callback that would be called when zooming ends.
              *
              * @param {ZoomCallback} callback
-             * @returns {Event} The calling PanZoom Interaction.
+             * @returns {this} The calling PanZoom Interaction.
              */
             PanZoom.prototype.offZoomEnd = function (callback) {
                 this._zoomEndCallbacks.delete(callback);

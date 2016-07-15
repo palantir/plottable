@@ -1,7 +1,7 @@
 namespace Plottable.Interactions {
 
-  export type PanCallback = (e: Event) => void;
-  export type ZoomCallback = (e: Event) => void;
+  export type PanCallback = () => void;
+  export type ZoomCallback = () => void;
 
   export class PanZoom extends Interaction {
     /**
@@ -180,7 +180,7 @@ namespace Plottable.Interactions {
       });
 
       if (this._touchIds.size() > 0) {
-        this._zoomEndCallbacks.callCallbacks(e);
+        this._zoomEndCallbacks.callCallbacks();
       }
     }
 
@@ -216,7 +216,7 @@ namespace Plottable.Interactions {
         this.yScales().forEach((yScale) => {
           this._magnifyScale(yScale, zoomAmount, translatedP.y);
         });
-        this._zoomEndCallbacks.callCallbacks(e);
+        this._zoomEndCallbacks.callCallbacks();
       }
     }
 
@@ -254,7 +254,7 @@ namespace Plottable.Interactions {
         });
         lastDragPoint = endPoint;
       });
-      this._dragInteraction.onDragEnd((e) => this._panEndCallbacks.callCallbacks(e));
+      this._dragInteraction.onDragEnd(() => this._panEndCallbacks.callCallbacks());
     }
 
     private _nonLinearScaleWithExtents(scale: QuantitativeScale<any>) {
@@ -442,7 +442,7 @@ namespace Plottable.Interactions {
      * Adds a callback to be called when panning ends.
      *
      * @param {PanCallback} callback
-     * @returns {Event} The calling PanZoom Interaction.
+     * @returns {this} The calling PanZoom Interaction.
      */
     public onPanEnd(callback: PanCallback) {
       this._panEndCallbacks.add(callback);
@@ -453,7 +453,7 @@ namespace Plottable.Interactions {
      * Removes a callback that would be called when panning ends.
      *
      * @param {PanCallback} callback
-     * @returns {Event} The calling PanZoom Interaction.
+     * @returns {this} The calling PanZoom Interaction.
      */
     public offPanEnd(callback: PanCallback) {
       this._panEndCallbacks.delete(callback);
@@ -464,7 +464,7 @@ namespace Plottable.Interactions {
      * Adds a callback to be called when zooming ends.
      *
      * @param {ZoomCallback} callback
-     * @returns {Event} The calling PanZoom Interaction.
+     * @returns {this} The calling PanZoom Interaction.
      */
     public onZoomEnd(callback: ZoomCallback) {
       this._zoomEndCallbacks.add(callback);
@@ -475,7 +475,7 @@ namespace Plottable.Interactions {
      * Removes a callback that would be called when zooming ends.
      *
      * @param {ZoomCallback} callback
-     * @returns {Event} The calling PanZoom Interaction.
+     * @returns {this} The calling PanZoom Interaction.
      */
     public offZoomEnd(callback: ZoomCallback) {
       this._zoomEndCallbacks.delete(callback);

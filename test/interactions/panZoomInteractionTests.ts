@@ -594,7 +594,7 @@ describe("Interactions", () => {
       interface PanZoomTestCallback {
         called: boolean;
         reset: () => void;
-        (e: Event): void;
+        (): void;
       }
 
       function makeCallback () {
