@@ -47,6 +47,6 @@
     "jQuery": "2.1.0",
     "jquery.simulate": "1.2.0",
     "requirejs": "2.1.18",
-    "sinon": "1.16.1"
+    "sinon": "http://sinonjs.org/releases/sinon-1.16.1.js"
   }
 }

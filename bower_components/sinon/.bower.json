@@ -1,14 +1,14 @@
 {
   "name": "sinon",
-  "homepage": "https://github.com/cjohansen/Sinon.JS",
-  "version": "1.16.1",
-  "_release": "1.16.1",
-  "_resolution": {
-    "type": "version",
-    "tag": "v1.16.1",
-    "commit": "38799cceb076a8190f60a41da234dcef0292ef64"
+  "_cacheHeaders": {
+    "ETag": "\"2081e3-30978-520e8094b8900\"",
+    "Last-Modified": "Tue, 29 Sep 2015 19:44:04 GMT",
+    "Content-Length": "199032",
+    "Content-Type": "application/javascript"
   },
-  "_source": "git://github.com/cjohansen/Sinon.JS.git",
-  "_target": "1.16.1",
-  "_originalSource": "sinon"
+  "_release": "e-tag:2081e3-30",
+  "main": "index.js",
+  "_source": "http://sinonjs.org/releases/sinon-1.16.1.js",
+  "_target": "*",
+  "_originalSource": "http://sinonjs.org/releases/sinon-1.16.1.js"
 }
