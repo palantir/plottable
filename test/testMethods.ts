@@ -249,14 +249,14 @@ namespace TestMethods {
       });
     });
     fakeTouchList.item = ( index: number ) => fakeTouchList[index];
-    e.touches = <TouchList> fakeTouchList;
-    e.targetTouches = <TouchList> fakeTouchList;
-    e.changedTouches = <TouchList> fakeTouchList;
+    (e as any).touches = <TouchList> fakeTouchList;
+    (e as any).targetTouches = <TouchList> fakeTouchList;
+    (e as any).changedTouches = <TouchList> fakeTouchList;
 
-    e.altKey = false;
-    e.metaKey = false;
-    e.ctrlKey = false;
-    e.shiftKey = false;
+    (e as any).altKey = false;
+    (e as any).metaKey = false;
+    (e as any).ctrlKey = false;
+    (e as any).shiftKey = false;
     target.node().dispatchEvent(e);
   }
 
@@ -323,7 +323,7 @@ namespace TestMethods {
   export function triggerFakeKeyboardEvent(type: string, target: d3.Selection<void>, keyCode: number, options?: {[key: string]: any}) {
     let event = <KeyboardEvent> document.createEvent("Events");
     event.initEvent(type, true, true);
-    event.keyCode = keyCode;
+    (event as any).keyCode = keyCode;
     if (options != null ) {
       Object.keys(options).forEach((key) => (<any> event)[key] = options[key] );
     }

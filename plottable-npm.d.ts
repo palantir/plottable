@@ -3160,7 +3160,7 @@ declare namespace Plottable.Plots {
         constructor();
         protected _createDrawer(dataset: Dataset): Drawers.Rectangle;
         protected _generateAttrToProjector(): {
-            [attr: string]: (datum: any, index: number, dataset: Dataset) => any;
+            [attr: string]: Projector;
         };
         protected _generateDrawSteps(): Drawers.DrawStep[];
         protected _updateExtentsForProperty(property: string): void;
@@ -3498,7 +3498,7 @@ declare namespace Plottable.Plots {
         private _drawLabel(data, dataset);
         protected _generateDrawSteps(): Drawers.DrawStep[];
         protected _generateAttrToProjector(): {
-            [attr: string]: (datum: any, index: number, dataset: Dataset) => any;
+            [attr: string]: Projector;
         };
         /**
          * Computes the barPixelWidth of all the bars in the plot.
@@ -3603,7 +3603,7 @@ declare namespace Plottable.Plots {
         protected _getResetYFunction(): (d: any, i: number, dataset: Dataset) => number;
         protected _generateDrawSteps(): Drawers.DrawStep[];
         protected _generateAttrToProjector(): {
-            [attr: string]: (datum: any, index: number, dataset: Dataset) => any;
+            [attr: string]: Projector;
         };
         /**
          * Returns the PlotEntity nearest to the query point by X then by Y, or undefined if no PlotEntity can be found.
@@ -3675,7 +3675,7 @@ declare namespace Plottable.Plots {
          */
         constructor(orientation?: string);
         protected _generateAttrToProjector(): {
-            [attr: string]: (datum: any, index: number, dataset: Dataset) => any;
+            [attr: string]: Projector;
         };
         private _updateClusterPosition();
         private _makeInnerScale();
@@ -3759,7 +3759,7 @@ declare namespace Plottable.Plots {
         y(y: number | Accessor<number>): this;
         y(y: Y | Accessor<Y>, yScale: Scale<Y, number>): this;
         protected _generateAttrToProjector(): {
-            [attr: string]: (datum: any, index: number, dataset: Dataset) => any;
+            [attr: string]: Projector;
         };
         protected _onDatasetUpdate(): this;
         protected _updateExtentsForProperty(property: string): void;
@@ -3907,7 +3907,7 @@ declare namespace Plottable.Plots {
         protected _createNodesForDataset(dataset: Dataset): Drawer;
         protected _extentsForProperty(attr: string): any[];
         protected _generateAttrToProjector(): {
-            [attr: string]: (datum: any, index: number, dataset: Dataset) => any;
+            [attr: string]: Projector;
         };
         protected _onDatasetUpdate(): this;
         private _calculateSubtotalsAndExtent(dataset);
