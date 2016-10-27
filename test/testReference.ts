@@ -1,9 +1,9 @@
-///<reference path="../typings/chai/chai.d.ts" />
-///<reference path="../typings/mocha/mocha.d.ts" />
-///<reference path="../typings/sinon/sinon.d.ts" />
+///<reference path="../node_modules/@types/chai/index.d.ts" />
+///<reference path="../node_modules/@types/mocha/index.d.ts" />
+///<reference path="../node_modules/@types/sinon/index.d.ts" />
 ///<reference path="../typings/d3/d3.d.ts" />
-///<reference path="../typings/jquery/jquery.d.ts" />
-///<reference path="../typings/jquery.simulate/jquery.simulate.d.ts" />
+///<reference path="../node_modules/@types/jquery/index.d.ts" />
+///<reference path="../node_modules/@types/jquery.simulate/index.d.ts" />
 ///<reference path="../plottable.d.ts" />
 ///<reference path="../node_modules/svg-typewriter/svgtypewriter.d.ts" />
 ///<reference path="mocks.ts" />
