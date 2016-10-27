@@ -14,6 +14,11 @@
     "test": "grunt test-travis"
   },
   "devDependencies": {
+    "@types/chai": "^3.4.34",
+    "@types/jquery": "^2.0.33",
+    "@types/jquery.simulate": "0.0.28",
+    "@types/mocha": "^2.2.27",
+    "@types/sinon": "^1.16.26",
     "chai": "2.0.0",
     "grunt": "~0.4.5",
     "grunt-blanket-mocha": "0.5.0",

@@ -4,23 +4,8 @@
   "ref": "master",
   "path": "typings",
   "installed": {
-    "chai/chai.d.ts": {
-      "commit": "8f081073e6cb416f901b272810d8b04d6e01c9e0"
-    },
     "d3/d3.d.ts": {
       "commit": "7c27233ae47768442b9b0a40d7f03fadf593fad2"
-    },
-    "mocha/mocha.d.ts": {
-      "commit": "8f081073e6cb416f901b272810d8b04d6e01c9e0"
-    },
-    "jquery/jquery.d.ts": {
-      "commit": "484544d14d400190b20f270341c97b16adc0f1ef"
-    },
-    "jquery.simulate/jquery.simulate.d.ts": {
-      "commit": "70737c2a2496f7a13c4da63eb00081cad94d19f1"
-    },
-    "sinon/sinon.d.ts": {
-      "commit": "381479952e9725f6e14e7974f082b5e11585bf0b"
     }
   }
 }
