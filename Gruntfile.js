@@ -219,11 +219,9 @@ module.exports = function(grunt) {
           version: "9",
           platform: "WIN7"
         }, {
-          browserName: "iphone",
+          browserName: "safari",
           platform: "OS X 10.10",
           version: "8.0",
-          deviceName: "iPad Simulator",
-          deviceOrientation: "portrait"
         }]
       }
     }
