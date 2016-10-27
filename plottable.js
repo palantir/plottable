@@ -16,7 +16,7 @@ Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
     // like Node.
     module.exports = factory(require("d3"));
   } else {
-    root['Plottable'] = factory(d3);
+    root['Plottable'] = factory(root["d3"]);
   }
 }(this, function (d3) {
 
