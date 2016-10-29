@@ -13,7 +13,7 @@
     },
     "files": [
       "typings/d3/d3.d.ts",
-      "bower_components/svg-typewriter/svgtypewriter.d.ts",
+      "node_modules/svg-typewriter/svgtypewriter.d.ts",
 
       "src/utils/mathUtils.ts",
       "src/utils/map.ts",

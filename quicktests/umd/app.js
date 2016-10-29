@@ -2,7 +2,7 @@
 
 require.config({
   paths: {
-    d3: "../../bower_components/d3/d3",
+    d3: "../../node_modules/d3/d3",
     plottable: "../../plottable"
   }
 });

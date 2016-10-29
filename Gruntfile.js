@@ -22,7 +22,7 @@ module.exports = function(grunt) {
       src: [
         "typings/d3/d3.d.ts",
         "plottable.d.ts",
-        "bower_components/svg-typewriter/svgtypewriter.d.ts"
+        "node_modules/svg-typewriter/svgtypewriter.d.ts"
       ],
       options: {
         compiler: "./node_modules/typescript/bin/tsc"
@@ -65,7 +65,7 @@ module.exports = function(grunt) {
       dest: "plottable.js"
     },
     svgtypewriter: {
-      src: ["plottable.js", "./bower_components/svg-typewriter/svgtypewriter.js"],
+      src: ["plottable.js", "./node_modules/svg-typewriter/svgtypewriter.js"],
       dest: "plottable.js"
     },
     typings: {
