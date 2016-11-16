@@ -1,6 +1,7 @@
 namespace Plottable.Plots {
   export interface PlotEntity extends Entity<Plot> {
     dataset: Dataset;
+    datasetIndex: number;
     index: number;
     component: Plot;
   }
@@ -26,6 +27,7 @@ interface LightweightPlotEntity {
   datum: any;
   position: Point;
   dataset: Dataset;
+  datasetIndex: number;
   index: number;
   component: Plot;
   drawer: Plottable.Drawer;
@@ -486,19 +488,20 @@ export class Plot extends Component {
 
   private _lightweightEntities(datasets = this.datasets()) {
     let lightweightEntities: LightweightPlotEntity[] = [];
-    datasets.forEach((dataset) => {
+    datasets.forEach((dataset: Dataset, datasetIndex: number) => {
       let drawer = this._datasetToDrawer.get(dataset);
       let validDatumIndex = 0;
 
-      dataset.data().forEach((datum: any, datasetIndex: number) => {
-        let position = this._pixelPoint(datum, datasetIndex, dataset);
+      dataset.data().forEach((datum: any, datumIndex: number) => {
+        let position = this._pixelPoint(datum, datumIndex, dataset);
         if (Utils.Math.isNaN(position.x) || Utils.Math.isNaN(position.y)) {
           return;
         }
         lightweightEntities.push({
           datum: datum,
-          index: datasetIndex,
+          index: datumIndex,
           dataset: dataset,
+          datasetIndex: datasetIndex,
           position: position,
           component: this,
           drawer: drawer,
@@ -515,11 +518,27 @@ export class Plot extends Component {
       datum: entity.datum,
       position: entity.position,
       dataset: entity.dataset,
+      datasetIndex: entity.datasetIndex,
       index: entity.index,
       component: entity.component,
       selection: entity.drawer.selectionForIndex(entity.validDatumIndex),
     };
     return plotEntity;
+  }
+
+  /**
+   * Gets the PlotEntities at a particular Point.
+   *
+   * Each plot type determines how to locate entities at or near the query
+   * point. For example, line and area charts will return the nearest entity,
+   * but bar charts will only return the entities that fully contain the query
+   * point.
+   *
+   * @param {Point} point The point to query.
+   * @returns {PlotEntity[]} The PlotEntities at the particular point
+   */
+  public entitiesAt(point: Point): Plots.PlotEntity[] {
+    throw new Error("plots must implement entitiesAt");
   }
 
   /**

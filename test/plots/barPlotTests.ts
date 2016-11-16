@@ -648,6 +648,7 @@ describe("Plots", () => {
             datum: datum,
             index: index,
             dataset: dataset,
+            datasetIndex: 0,
             position: getPointFromBaseAndValuePositions(basePosition, valuePosition),
             selection: d3.select(barPlot.content().selectAll("rect")[0][index]),
             component: barPlot,

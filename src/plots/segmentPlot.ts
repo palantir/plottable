@@ -170,6 +170,15 @@ namespace Plottable.Plots {
       return attrToProjector;
     }
 
+    public entitiesAt(point: Point): PlotEntity[] {
+      const entity = this.entityNearest(point);
+      if (entity != null) {
+        return [entity];
+      } else {
+        return [];
+      }
+    }
+
     /**
      * Gets the Entities that intersect the Bounds.
      *

@@ -338,6 +338,15 @@ namespace Plottable.Plots {
       return attrToProjector;
     }
 
+    public entitiesAt(point: Point): PlotEntity[] {
+      const entity = this.entityNearestByXThenY(point);
+      if (entity != null) {
+        return [entity];
+      } else {
+        return [];
+      }
+    }
+
     /**
      * Returns the PlotEntity nearest to the query point by X then by Y, or undefined if no PlotEntity can be found.
      *
