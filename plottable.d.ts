@@ -1664,6 +1664,7 @@ declare namespace Plottable.Components {
     }
 }
 declare namespace Plottable {
+    type AxisOrientation = "left" | "top" | "right" | "bottom";
     class Axis<D> extends Component {
         /**
          * The css class applied to each end tick mark (the line on the end tick).
@@ -1719,9 +1720,9 @@ declare namespace Plottable {
          *
          * @constructor
          * @param {Scale} scale
-         * @param {string} orientation One of "top"/"bottom"/"left"/"right".
+         * @param {AxisOrientation} orientation Orientation of this Axis.
          */
-        constructor(scale: Scale<D, number>, orientation: string);
+        constructor(scale: Scale<D, number>, orientation: AxisOrientation);
         destroy(): void;
         protected _isHorizontal(): boolean;
         protected _computeWidth(): number;
@@ -1857,14 +1858,14 @@ declare namespace Plottable {
         /**
          * Gets the orientation of the Axis.
          */
-        orientation(): string;
+        orientation(): AxisOrientation;
         /**
          * Sets the orientation of the Axis.
          *
-         * @param {number} orientation One of "top"/"bottom"/"left"/"right".
+         * @param {AxisOrientation} orientation The orientation to apply to this axis.
          * @returns {Axis} The calling Axis.
          */
-        orientation(orientation: string): this;
+        orientation(orientation: AxisOrientation): this;
         /**
          * Gets whether the Axis shows the end tick labels.
          */
@@ -1908,6 +1909,10 @@ declare namespace Plottable.Axes {
      * Currently, up to two tiers are supported.
      */
     type TimeAxisConfiguration = TimeAxisTierConfiguration[];
+    /**
+     * Possible orientations for a Time Axis.
+     */
+    type TimeAxisOrientation = "top" | "bottom";
     class Time extends Axis<Date> {
         /**
          * The CSS class applied to each Time Axis tier
@@ -1931,9 +1936,10 @@ declare namespace Plottable.Axes {
          *
          * @constructor
          * @param {Scales.Time} scale
-         * @param {string} orientation One of "top"/"bottom".
+         * @param {AxisOrientation} orientation Orientation of this Time Axis. Time Axes can only have "top" or "bottom"
+         * orientations.
          */
-        constructor(scale: Scales.Time, orientation: string);
+        constructor(scale: Scales.Time, orientation: TimeAxisOrientation);
         /**
          * Gets the label positions for each tier.
          */
@@ -1961,8 +1967,8 @@ declare namespace Plottable.Axes {
          * Gets the index of the most precise TimeAxisConfiguration that will fit in the current width.
          */
         private _getMostPreciseConfigurationIndex();
-        orientation(): string;
-        orientation(orientation: string): this;
+        orientation(): TimeAxisOrientation;
+        orientation(orientation: TimeAxisOrientation): this;
         protected _computeHeight(): number;
         private _getIntervalLength(config);
         private _maxWidthForInterval(config);
@@ -2002,9 +2008,9 @@ declare namespace Plottable.Axes {
          *
          * @constructor
          * @param {QuantitativeScale} scale
-         * @param {string} orientation One of "top"/"bottom"/"left"/"right".
+         * @param {AxisOrientaiton} orientation Orientation of this Numeric Axis.
          */
-        constructor(scale: QuantitativeScale<number>, orientation: string);
+        constructor(scale: QuantitativeScale<number>, orientation: AxisOrientation);
         protected _setup(): void;
         protected _computeWidth(): number;
         private _computeExactTextWidth();
@@ -2077,9 +2083,9 @@ declare namespace Plottable.Axes {
          *
          * @constructor
          * @param {Scales.Category} scale
-         * @param {string} [orientation="bottom"] One of "top"/"bottom"/"left"/"right".
+         * @param {AxisOrientation} [orientation="bottom"] Orientation of this Category Axis.
          */
-        constructor(scale: Scales.Category, orientation: string);
+        constructor(scale: Scales.Category, orientation?: AxisOrientation);
         protected _setup(): void;
         protected _rescale(): this;
         requestedSpace(offeredWidth: number, offeredHeight: number): SpaceRequest;
