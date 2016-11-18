@@ -2,11 +2,11 @@
 
 describe("Axis", () => {
 
-  const horizontalOrientations = ["top", "bottom"];
-  const verticalOrientations = ["left", "right"];
+  const horizontalOrientations: Plottable.AxisOrientation[] = ["top", "bottom"];
+  const verticalOrientations: Plottable.AxisOrientation[] = ["left", "right"];
   const orientations = horizontalOrientations.concat(verticalOrientations);
 
-  const isHorizOrient = (orientation: string) => horizontalOrientations.indexOf(orientation) > -1;
+  const isHorizOrient = (orientation: Plottable.AxisOrientation) => horizontalOrientations.indexOf(orientation) > -1;
   const numAttr = TestMethods.numAttr;
 
   horizontalOrientations.forEach((horizontalOrientation) => {
@@ -33,7 +33,7 @@ describe("Axis", () => {
 
   it("throws an error when setting an invalid orientation", () => {
     let scale = new Plottable.Scales.Linear();
-    assert.throws(() => new Plottable.Axis(scale, "blargh"), "unsupported");
+    assert.throws(() => new Plottable.Axis(scale, "blargh" as any), "unsupported");
   });
 
   it("throws an error when setting a negative tickLabelPadding", () => {

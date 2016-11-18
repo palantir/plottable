@@ -2,21 +2,21 @@
 
 describe("TimeAxis", () => {
 
-  let orientations = ["top", "bottom"];
+  let orientations: ["top", "bottom"] = ["top", "bottom"];
 
   describe("setting the orientation", () => {
     it("throws an error when setting a vertical orientation", () => {
       let scale = new Plottable.Scales.Time();
-      assert.throws(() => new Plottable.Axes.Time(scale, "left"), "horizontal");
-      assert.throws(() => new Plottable.Axes.Time(scale, "right"), "horizontal");
+      assert.throws(() => new Plottable.Axes.Time(scale, "left" as any), "horizontal");
+      assert.throws(() => new Plottable.Axes.Time(scale, "right" as any), "horizontal");
     });
 
     it("cannot change to a vertical orientation", () => {
       let scale = new Plottable.Scales.Time();
-      let originalOrientation = "bottom";
+      let originalOrientation: "bottom" = "bottom";
       let axis = new Plottable.Axes.Time(scale, originalOrientation);
-      assert.throws(() => axis.orientation("left"), "horizontal");
-      assert.throws(() => axis.orientation("right"), "horizontal");
+      assert.throws(() => axis.orientation("left" as any), "horizontal");
+      assert.throws(() => axis.orientation("right" as any), "horizontal");
       assert.strictEqual(axis.orientation(), originalOrientation, "orientation unchanged");
       axis.destroy();
     });

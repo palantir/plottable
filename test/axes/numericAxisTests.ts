@@ -16,11 +16,11 @@ describe("Axes", () => {
       });
     }
 
-    const horizontalOrientations = ["bottom", "top"];
-    const verticalOrientations = ["left", "right"];
+    const horizontalOrientations: Plottable.AxisOrientation[] = ["top", "bottom"];
+    const verticalOrientations: Plottable.AxisOrientation[] = ["left", "right"];
     const orientations = horizontalOrientations.concat(verticalOrientations);
 
-    const isHorizontalOrientation = (orientation: string) => horizontalOrientations.indexOf(orientation) >= 0;
+    const isHorizontalOrientation = (orientation: Plottable.AxisOrientation) => horizontalOrientations.indexOf(orientation) >= 0;
 
     describe("managing tick labels", () => {
       const verticalTickLabelPositions = ["top", "bottom"];
