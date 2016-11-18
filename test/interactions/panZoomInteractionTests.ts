@@ -581,6 +581,289 @@ describe("Interactions", () => {
       });
     });
 
+    describe("Setting minDomainValue", () => {
+      let svg: d3.Selection<void>;
+      let SVG_WIDTH = 400;
+      let SVG_HEIGHT = 500;
+      let eventTarget: d3.Selection<void>;
+      let xScale: Plottable.QuantitativeScale<number>;
+      let panZoomInteraction: Plottable.Interactions.PanZoom;
+
+      beforeEach(() => {
+        xScale = new Plottable.Scales.Linear();
+        xScale.domain([0, SVG_WIDTH / 2]).range([0, SVG_WIDTH]);
+
+        svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+
+        let component = new Plottable.Component();
+        component.renderTo(svg);
+
+        panZoomInteraction = new Plottable.Interactions.PanZoom();
+        panZoomInteraction.addXScale(xScale);
+        panZoomInteraction.attachTo(component);
+
+        eventTarget = component.background();
+      });
+
+      afterEach(() => {
+        svg.remove();
+      });
+
+      it("can set minDomainValue", () => {
+        let domainValue = SVG_WIDTH / 4;
+        panZoomInteraction.minDomainValue(xScale, domainValue);
+        assert.strictEqual(panZoomInteraction.minDomainValue(xScale), domainValue,
+          "returns the correct minDomainValue");
+      });
+
+      it("can't set minDomainValue() be larger than maxDomainValue() for the same Scale", () => {
+        let domainValue = SVG_WIDTH / 2;
+        panZoomInteraction.maxDomainValue(xScale, domainValue);
+
+        let tooBigValue = domainValue * 2;
+        // HACKHACK #2661: Cannot assert errors being thrown with description
+        (<any> assert).throws(() => panZoomInteraction.minDomainValue(xScale, tooBigValue), Error,
+          "minDomainValue must be smaller than maxDomainValue for the same Scale",
+          "cannot have minDomainValue larger than maxDomainValue");
+      });
+
+      it("cannot go beyond the specified minDomainValue (mousewheel)", () => {
+        // HACKHACK PhantomJS doesn't implement fake creation of WheelEvents
+        // https://github.com/ariya/phantomjs/issues/11289
+        if (window.PHANTOMJS) {
+          return;
+        }
+
+        let domainValue = SVG_WIDTH / 4;
+
+        // simulate massive scroll zoom out
+        let scrollPoint = { x: SVG_WIDTH / 4, y: SVG_HEIGHT / 4 };
+        let deltaY = 3000;
+        TestMethods.triggerFakeWheelEvent("wheel", svg, scrollPoint.x, scrollPoint.y, deltaY);
+        assert.operator(xScale.domain()[0], "<", domainValue, "no initial limit");
+
+        // add limit
+        panZoomInteraction.minDomainValue(xScale, domainValue);
+
+        TestMethods.triggerFakeWheelEvent("wheel", svg, scrollPoint.x, scrollPoint.y, deltaY);
+        assert.strictEqual(xScale.domain()[0], domainValue, "limit works");
+      });
+
+      it("cannot go beyond the specified minDomainValue (pinching)", () => {
+        let domainValue = SVG_WIDTH / 4;
+
+        let startPoint = { x: SVG_WIDTH / 4, y: SVG_HEIGHT / 4 };
+        let startPoint2 = { x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2 };
+        let zoomAmount = 1 / 6;
+        let endX = (startPoint2.x - startPoint.x) * zoomAmount + startPoint.x;
+        let endY = (startPoint2.y - startPoint.y) * zoomAmount + startPoint.y;
+        let endPoint = { x: endX, y: endY };
+
+        TestMethods.triggerFakeTouchEvent("touchstart", eventTarget, [startPoint, startPoint2], [0, 1]);
+        TestMethods.triggerFakeTouchEvent("touchmove", eventTarget, [endPoint], [1]);
+        TestMethods.triggerFakeTouchEvent("touchend", eventTarget, [endPoint], [1]);
+
+        assert.operator(xScale.domain()[0], "<", domainValue, "no initial limit");
+
+        // add limit
+        panZoomInteraction.minDomainValue(xScale, domainValue);
+
+        TestMethods.triggerFakeTouchEvent("touchstart", eventTarget, [startPoint, startPoint2], [0, 1]);
+        TestMethods.triggerFakeTouchEvent("touchmove", eventTarget, [endPoint], [1]);
+        TestMethods.triggerFakeTouchEvent("touchend", eventTarget, [endPoint], [1]);
+
+        assert.strictEqual(xScale.domain()[0], domainValue, "limit works");
+      });
+    });
+
+    describe("Setting maxDomainValue", () => {
+      let svg: d3.Selection<void>;
+      let SVG_WIDTH = 400;
+      let SVG_HEIGHT = 500;
+      let eventTarget: d3.Selection<void>;
+      let xScale: Plottable.QuantitativeScale<number>;
+      let panZoomInteraction: Plottable.Interactions.PanZoom;
+
+      beforeEach(() => {
+        xScale = new Plottable.Scales.Linear();
+        xScale.domain([0, SVG_WIDTH / 2]).range([0, SVG_WIDTH]);
+
+        svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+
+        let component = new Plottable.Component();
+        component.renderTo(svg);
+
+        panZoomInteraction = new Plottable.Interactions.PanZoom();
+        panZoomInteraction.addXScale(xScale);
+        panZoomInteraction.attachTo(component);
+
+        eventTarget = component.background();
+      });
+
+      afterEach(() => {
+        svg.remove();
+      });
+
+      it("can set maxDomainValue", () => {
+        let domainValue = SVG_WIDTH / 4;
+        panZoomInteraction.maxDomainValue(xScale, domainValue);
+        assert.strictEqual(panZoomInteraction.maxDomainValue(xScale), domainValue,
+          "returns the correct minDomainValue");
+      });
+
+      it("can't set maxDomainValue() be smaller than maxDomainValue() for the same Scale", () => {
+        let domainValue = SVG_WIDTH / 2;
+        panZoomInteraction.minDomainValue(xScale, domainValue);
+
+        let tooSmallValue = domainValue / 2;
+        // HACKHACK #2661: Cannot assert errors being thrown with description
+        (<any> assert).throws(() => panZoomInteraction.maxDomainValue(xScale, tooSmallValue), Error,
+          "maxDomainValue must be larger than minDomainValue for the same Scale",
+          "cannot have minDomainValue larger than maxDomainValue");
+      });
+
+      it("cannot go beyond the specified maxDomainValue (mousewheel)", () => {
+        // HACKHACK PhantomJS doesn't implement fake creation of WheelEvents
+        // https://github.com/ariya/phantomjs/issues/11289
+        if (window.PHANTOMJS) {
+          return;
+        }
+
+        let domainValue = SVG_WIDTH / 2;
+
+        // simulate massive scroll zoom out
+        let scrollPoint = { x: SVG_WIDTH / 4, y: SVG_HEIGHT / 4 };
+        let deltaY = 3000;
+        TestMethods.triggerFakeWheelEvent("wheel", svg, scrollPoint.x, scrollPoint.y, deltaY);
+        assert.operator(xScale.domain()[1], ">", domainValue, "no initial limit");
+
+        // add limit
+        panZoomInteraction.maxDomainValue(xScale, domainValue);
+
+        TestMethods.triggerFakeWheelEvent("wheel", svg, scrollPoint.x, scrollPoint.y, deltaY);
+        assert.strictEqual(xScale.domain()[1], domainValue, "limit works");
+      });
+
+      it("cannot go beyond the specified maxDomainValue (pinching)", () => {
+        let domainValue = SVG_WIDTH / 2;
+
+        let fromCenter = (dx: number, dy: number) => {
+          return { x: SVG_WIDTH / 4 + dx, y: SVG_HEIGHT / 4 + dy };
+        };
+
+        let startPoint1 = fromCenter(-60, 0);
+        let startPoint2 = fromCenter(60, 0);
+        let endPoint1 = fromCenter(-10, 0);
+        let endPoint2 = fromCenter(10, 0);
+
+        // zoom out pinch
+        TestMethods.triggerFakeTouchEvent("touchstart", eventTarget, [startPoint1, startPoint2], [0, 1]);
+        TestMethods.triggerFakeTouchEvent("touchmove", eventTarget, [endPoint1, endPoint2], [0, 1]);
+        TestMethods.triggerFakeTouchEvent("touchend", eventTarget, [endPoint1, endPoint2], [0, 1]);
+
+        assert.operator(xScale.domain()[1], ">", domainValue, "no initial limit " + xScale.domain());
+
+        // add limit
+        panZoomInteraction.maxDomainValue(xScale, domainValue);
+
+        // zoom out pinch
+        TestMethods.triggerFakeTouchEvent("touchstart", eventTarget, [startPoint1, startPoint2], [0, 1]);
+        TestMethods.triggerFakeTouchEvent("touchmove", eventTarget, [endPoint1, endPoint2], [0, 1]);
+        TestMethods.triggerFakeTouchEvent("touchend", eventTarget, [endPoint1, endPoint2], [0, 1]);
+
+        assert.strictEqual(xScale.domain()[1], domainValue, "limit works");
+      });
+    });
+
+    describe("Setting both minDomainValue and maxDomainValue", () => {
+      let svg: d3.Selection<void>;
+      let SVG_WIDTH = 400;
+      let SVG_HEIGHT = 500;
+      let eventTarget: d3.Selection<void>;
+      let xScale: Plottable.QuantitativeScale<number>;
+      let panZoomInteraction: Plottable.Interactions.PanZoom;
+
+      beforeEach(() => {
+        xScale = new Plottable.Scales.Linear();
+        xScale.domain([0, SVG_WIDTH / 2]).range([0, SVG_WIDTH]);
+
+        svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+
+        let component = new Plottable.Component();
+        component.renderTo(svg);
+
+        panZoomInteraction = new Plottable.Interactions.PanZoom();
+        panZoomInteraction.addXScale(xScale);
+        panZoomInteraction.attachTo(component);
+
+        eventTarget = component.background();
+      });
+
+      afterEach(() => {
+        svg.remove();
+      });
+
+      it("cannot go beyond the specified maxDomainValue (mousewheel)", () => {
+        // HACKHACK PhantomJS doesn't implement fake creation of WheelEvents
+        // https://github.com/ariya/phantomjs/issues/11289
+        if (window.PHANTOMJS) {
+          return;
+        }
+
+        let domainMinValue = SVG_WIDTH / 4;
+        let domainMaxValue = domainMinValue + SVG_WIDTH / 2;
+
+        // simulate massive scroll zoom out
+        let scrollPoint = { x: SVG_WIDTH / 2, y: SVG_HEIGHT / 4 };
+        let deltaY = 3000;
+        TestMethods.triggerFakeWheelEvent("wheel", svg, scrollPoint.x, scrollPoint.y, deltaY);
+        assert.operator(xScale.domain()[0], "<", domainMinValue, "no initial min limit");
+        assert.operator(xScale.domain()[1], ">", domainMaxValue, "no initial max limit");
+
+        // add limit
+        xScale.domain([domainMinValue, domainMaxValue]);
+        panZoomInteraction.setMinMaxDomainValuesTo(xScale);
+
+        TestMethods.triggerFakeWheelEvent("wheel", svg, scrollPoint.x, scrollPoint.y, deltaY);
+        assert.strictEqual(xScale.domain()[0], domainMinValue, "min limit works");
+        assert.strictEqual(xScale.domain()[1], domainMaxValue, "max limit works");
+      });
+
+      it("cannot go beyond the specified minDomainValue (pinching)", () => {
+        let fromCenter = (dx: number, dy: number) => {
+          return { x: SVG_WIDTH / 4 + dx, y: SVG_HEIGHT / 4 + dy };
+        };
+
+        let domainMinValue = SVG_WIDTH / 4;
+        let domainMaxValue = domainMinValue + SVG_WIDTH / 2;
+
+        let startPoint1 = fromCenter(-60, 0);
+        let startPoint2 = fromCenter(60, 0);
+        let endPoint1 = fromCenter(-10, 0);
+        let endPoint2 = fromCenter(10, 0);
+
+        // zoom out pinch
+        TestMethods.triggerFakeTouchEvent("touchstart", eventTarget, [startPoint1, startPoint2], [0, 1]);
+        TestMethods.triggerFakeTouchEvent("touchmove", eventTarget, [endPoint1, endPoint2], [0, 1]);
+        TestMethods.triggerFakeTouchEvent("touchend", eventTarget, [endPoint1, endPoint2], [0, 1]);
+
+        assert.operator(xScale.domain()[0], "<", domainMinValue, "no initial min limit");
+        assert.operator(xScale.domain()[1], ">", domainMaxValue, "no initial max limit");
+
+        // add limit
+        xScale.domain([domainMinValue, domainMaxValue]);
+        panZoomInteraction.setMinMaxDomainValuesTo(xScale);
+
+        // zoom out pinch
+        TestMethods.triggerFakeTouchEvent("touchstart", eventTarget, [startPoint1, startPoint2], [0, 1]);
+        TestMethods.triggerFakeTouchEvent("touchmove", eventTarget, [endPoint1, endPoint2], [0, 1]);
+        TestMethods.triggerFakeTouchEvent("touchend", eventTarget, [endPoint1, endPoint2], [0, 1]);
+
+        assert.strictEqual(xScale.domain()[0], domainMinValue, "min limit works");
+        assert.strictEqual(xScale.domain()[1], domainMaxValue, "max limit works");
+      });
+    });
+
     describe("Registering and deregistering Pan and Zoom event callbacks", () => {
       let svg: d3.Selection<void>;
       let SVG_WIDTH = 400;
