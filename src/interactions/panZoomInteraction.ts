@@ -519,7 +519,7 @@ namespace Plottable.Interactions {
      * @returns {Interactions.PanZoom} The calling PanZoom Interaction.
      */
     public minDomainExtent<D>(quantitativeScale: QuantitativeScale<D>, minDomainExtent: D): this;
-    public minDomainExtent<D>(quantitativeScale: QuantitativeScale<D>, minDomainExtent?: D): any {
+    public minDomainExtent<D>(quantitativeScale: QuantitativeScale<D>, minDomainExtent?: D): D | this {
       if (minDomainExtent == null) {
         return this._minDomainExtents.get(quantitativeScale);
       }
@@ -558,7 +558,7 @@ namespace Plottable.Interactions {
      * @returns {Interactions.PanZoom} The calling PanZoom Interaction.
      */
     public maxDomainExtent<D>(quantitativeScale: QuantitativeScale<D>, maxDomainExtent: D): this;
-    public maxDomainExtent<D>(quantitativeScale: QuantitativeScale<D>, maxDomainExtent?: D): any {
+    public maxDomainExtent<D>(quantitativeScale: QuantitativeScale<D>, maxDomainExtent?: D): D | this {
       if (maxDomainExtent == null) {
         return this._maxDomainExtents.get(quantitativeScale);
       }
@@ -607,7 +607,7 @@ namespace Plottable.Interactions {
      * @returns {Interactions.PanZoom} The calling PanZoom Interaction.
      */
     public minDomainValue<D>(quantitativeScale: QuantitativeScale<D>, minDomainValue: D): this;
-    public minDomainValue<D>(quantitativeScale: QuantitativeScale<D>, minDomainValue?: D): any {
+    public minDomainValue<D>(quantitativeScale: QuantitativeScale<D>, minDomainValue?: D): D | this {
       if (minDomainValue == null) {
         return this._minDomainValues.get(quantitativeScale);
       }
@@ -650,7 +650,7 @@ namespace Plottable.Interactions {
      * @returns {Interactions.PanZoom} The calling PanZoom Interaction.
      */
     public maxDomainValue<D>(quantitativeScale: QuantitativeScale<D>, maxDomainValue: D): this;
-    public maxDomainValue<D>(quantitativeScale: QuantitativeScale<D>, maxDomainValue?: D): any {
+    public maxDomainValue<D>(quantitativeScale: QuantitativeScale<D>, maxDomainValue?: D): D | this {
       if (maxDomainValue == null) {
         return this._maxDomainValues.get(quantitativeScale);
       }
