@@ -822,7 +822,7 @@ describe("Interactions", () => {
 
         // add limit
         xScale.domain([domainMinValue, domainMaxValue]);
-        panZoomInteraction.constrainToScaleDomainValues();
+        panZoomInteraction.setMinMaxDomainValuesTo(xScale);
 
         TestMethods.triggerFakeWheelEvent("wheel", svg, scrollPoint.x, scrollPoint.y, deltaY);
         assert.strictEqual(xScale.domain()[0], domainMinValue, "min limit works");
@@ -852,7 +852,7 @@ describe("Interactions", () => {
 
         // add limit
         xScale.domain([domainMinValue, domainMaxValue]);
-        panZoomInteraction.constrainToScaleDomainValues();
+        panZoomInteraction.setMinMaxDomainValuesTo(xScale);
 
         // zoom out pinch
         TestMethods.triggerFakeTouchEvent("touchstart", eventTarget, [startPoint1, startPoint2], [0, 1]);

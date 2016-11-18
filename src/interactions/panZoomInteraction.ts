@@ -663,18 +663,13 @@ namespace Plottable.Interactions {
     }
 
     /**
-     * Uses the current domain of each scale to apply a minimum and maximum
+     * Uses the current domain of the scale to apply a minimum and maximum
      * domain value for that scale.
      *
      * This constrains the pan/zoom interaction to show no more than the domain
      * of the scale.
      */
-    public constrainToScaleDomainValues() {
-      this.xScales().forEach((scale) => this._constrainToScaleDomainValues(scale));
-      this.yScales().forEach((scale) => this._constrainToScaleDomainValues(scale));
-    }
-
-    private _constrainToScaleDomainValues<D>(scale: QuantitativeScale<D>) {
+    public setMinMaxDomainValuesTo<D>(scale: QuantitativeScale<D>) {
       this._minDomainValues.delete(scale);
       this._maxDomainValues.delete(scale);
       const [ domainMin, domainMax ] = scale.domain();
