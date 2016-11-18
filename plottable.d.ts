@@ -2737,6 +2737,7 @@ declare namespace Plottable.Components {
 declare namespace Plottable.Plots {
     interface PlotEntity extends Entity<Plot> {
         dataset: Dataset;
+        datasetIndex: number;
         index: number;
         component: Plot;
     }
@@ -2888,6 +2889,18 @@ declare namespace Plottable {
         entities(datasets?: Dataset[]): Plots.PlotEntity[];
         private _lightweightEntities(datasets?);
         private _lightweightPlotEntityToPlotEntity(entity);
+        /**
+         * Gets the PlotEntities at a particular Point.
+         *
+         * Each plot type determines how to locate entities at or near the query
+         * point. For example, line and area charts will return the nearest entity,
+         * but bar charts will only return the entities that fully contain the query
+         * point.
+         *
+         * @param {Point} point The point to query.
+         * @returns {PlotEntity[]} The PlotEntities at the particular point
+         */
+        entitiesAt(point: Point): Plots.PlotEntity[];
         /**
          * Returns the PlotEntity nearest to the query point by the Euclidian norm, or undefined if no PlotEntity can be found.
          *
@@ -3604,6 +3617,7 @@ declare namespace Plottable.Plots {
         protected _generateAttrToProjector(): {
             [attr: string]: Projector;
         };
+        entitiesAt(point: Point): PlotEntity[];
         /**
          * Returns the PlotEntity nearest to the query point by X then by Y, or undefined if no PlotEntity can be found.
          *
@@ -3845,6 +3859,7 @@ declare namespace Plottable.Plots {
          */
         y2(y2: number | Accessor<number> | Y | Accessor<Y>): this;
         protected _propertyProjectors(): AttributeToProjector;
+        entitiesAt(point: Point): PlotEntity[];
         /**
          * Gets the Entities that intersect the Bounds.
          *
@@ -4596,6 +4611,8 @@ declare namespace Plottable.Interactions {
         private _touchCancelCallback;
         private _minDomainExtents;
         private _maxDomainExtents;
+        private _minDomainValues;
+        private _maxDomainValues;
         private _panEndCallbacks;
         private _zoomEndCallbacks;
         /**
@@ -4617,8 +4634,26 @@ declare namespace Plottable.Interactions {
         private _magnifyScale<D>(scale, magnifyAmount, centerValue);
         private _translateScale<D>(scale, translateAmount);
         private _handleWheelEvent(p, e);
-        private _constrainedZoomAmount(scale, zoomAmount);
+        private _constrainedZoom(scale, zoomAmount, centerPoint);
+        private _constrainZoomExtents(scale, zoomAmount);
+        private _constrainZoomValues(scale, zoomAmount, centerPoint);
+        /**
+         * Performs a zoom transformation of the `value` argument scaled by the
+         * `zoom` argument about the point defined by the `center` argument.
+         */
+        private _zoomAt(value, zoom, center);
+        /**
+         * Returns the `center` value to be used with `_zoomAt` that will produce
+         * the `target` value given the same `value` and `zoom` arguments. Algebra
+         * brought to you by Wolfram Alpha.
+         */
+        private _getZoomCenterForTarget(value, zoom, target);
         private _setupDragInteraction();
+        /**
+         * Returns a new translation value that respects domain min/max value
+         * constraints.
+         */
+        private _constrainedTranslation(scale, translation);
         private _nonLinearScaleWithExtents(scale);
         /**
          * Gets the x scales for this PanZoom Interaction.
@@ -4710,6 +4745,76 @@ declare namespace Plottable.Interactions {
          * @returns {Interactions.PanZoom} The calling PanZoom Interaction.
          */
         maxDomainExtent<D>(quantitativeScale: QuantitativeScale<D>, maxDomainExtent: D): this;
+        /**
+         * Gets the minimum domain value for the scale, constraining the pan/zoom
+         * interaction to a minimum value in the domain.
+         *
+         * Note that this differs from minDomainExtent/maxDomainExtent, in that
+         * those methods provide constraints such as showing at least 2 but no more
+         * than 5 values at a time.
+         *
+         * By contrast, minDomainValue/maxDomainValue set a boundary beyond which
+         * the user cannot pan/zoom.
+         *
+         * @param {QuantitativeScale<any>} quantitativeScale The scale to query
+         * @returns {D} The minimum domain value for the scale.
+         */
+        minDomainValue<D>(quantitativeScale: QuantitativeScale<D>): D;
+        /**
+         * Sets the minimum domain value for the scale, constraining the pan/zoom
+         * interaction to a minimum value in the domain.
+         *
+         * Note that this differs from minDomainExtent/maxDomainExtent, in that
+         * those methods provide constraints such as showing at least 2 but no more
+         * than 5 values at a time.
+         *
+         * By contrast, minDomainValue/maxDomainValue set a boundary beyond which
+         * the user cannot pan/zoom.
+         *
+         * @param {QuantitativeScale<any>} quantitativeScale The scale to query
+         * @param {D} minDomainExtent The minimum domain value for the scale.
+         * @returns {Interactions.PanZoom} The calling PanZoom Interaction.
+         */
+        minDomainValue<D>(quantitativeScale: QuantitativeScale<D>, minDomainValue: D): this;
+        /**
+         * Gets the maximum domain value for the scale, constraining the pan/zoom
+         * interaction to a maximum value in the domain.
+         *
+         * Note that this differs from minDomainExtent/maxDomainExtent, in that
+         * those methods provide constraints such as showing at least 2 but no more
+         * than 5 values at a time.
+         *
+         * By contrast, minDomainValue/maxDomainValue set a boundary beyond which
+         * the user cannot pan/zoom.
+         *
+         * @param {QuantitativeScale<any>} quantitativeScale The scale to query
+         * @returns {D} The maximum domain value for the scale.
+         */
+        maxDomainValue<D>(quantitativeScale: QuantitativeScale<D>): D;
+        /**
+         * Sets the maximum domain value for the scale, constraining the pan/zoom
+         * interaction to a maximum value in the domain.
+         *
+         * Note that this differs from minDomainExtent/maxDomainExtent, in that
+         * those methods provide constraints such as showing at least 2 but no more
+         * than 5 values at a time.
+         *
+         * By contrast, minDomainValue/maxDomainValue set a boundary beyond which
+         * the user cannot pan/zoom.
+         *
+         * @param {QuantitativeScale<any>} quantitativeScale The scale to query
+         * @param {D} maxDomainExtent The maximum domain value for the scale.
+         * @returns {Interactions.PanZoom} The calling PanZoom Interaction.
+         */
+        maxDomainValue<D>(quantitativeScale: QuantitativeScale<D>, maxDomainValue: D): this;
+        /**
+         * Uses the current domain of the scale to apply a minimum and maximum
+         * domain value for that scale.
+         *
+         * This constrains the pan/zoom interaction to show no more than the domain
+         * of the scale.
+         */
+        setMinMaxDomainValuesTo<D>(scale: QuantitativeScale<D>): void;
         /**
          * Adds a callback to be called when panning ends.
          *

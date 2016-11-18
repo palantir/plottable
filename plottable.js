@@ -6988,18 +6988,19 @@ var Plottable;
             var _this = this;
             if (datasets === void 0) { datasets = this.datasets(); }
             var lightweightEntities = [];
-            datasets.forEach(function (dataset) {
+            datasets.forEach(function (dataset, datasetIndex) {
                 var drawer = _this._datasetToDrawer.get(dataset);
                 var validDatumIndex = 0;
-                dataset.data().forEach(function (datum, datasetIndex) {
-                    var position = _this._pixelPoint(datum, datasetIndex, dataset);
+                dataset.data().forEach(function (datum, datumIndex) {
+                    var position = _this._pixelPoint(datum, datumIndex, dataset);
                     if (Plottable.Utils.Math.isNaN(position.x) || Plottable.Utils.Math.isNaN(position.y)) {
                         return;
                     }
                     lightweightEntities.push({
                         datum: datum,
-                        index: datasetIndex,
+                        index: datumIndex,
                         dataset: dataset,
+                        datasetIndex: datasetIndex,
                         position: position,
                         component: _this,
                         drawer: drawer,
@@ -7015,11 +7016,26 @@ var Plottable;
                 datum: entity.datum,
                 position: entity.position,
                 dataset: entity.dataset,
+                datasetIndex: entity.datasetIndex,
                 index: entity.index,
                 component: entity.component,
                 selection: entity.drawer.selectionForIndex(entity.validDatumIndex),
             };
             return plotEntity;
+        };
+        /**
+         * Gets the PlotEntities at a particular Point.
+         *
+         * Each plot type determines how to locate entities at or near the query
+         * point. For example, line and area charts will return the nearest entity,
+         * but bar charts will only return the entities that fully contain the query
+         * point.
+         *
+         * @param {Point} point The point to query.
+         * @returns {PlotEntity[]} The PlotEntities at the particular point
+         */
+        Plot.prototype.entitiesAt = function (point) {
+            throw new Error("plots must implement entitiesAt");
         };
         /**
          * Returns the PlotEntity nearest to the query point by the Euclidian norm, or undefined if no PlotEntity can be found.
@@ -9014,6 +9030,15 @@ var Plottable;
                 });
                 return attrToProjector;
             };
+            Line.prototype.entitiesAt = function (point) {
+                var entity = this.entityNearestByXThenY(point);
+                if (entity != null) {
+                    return [entity];
+                }
+                else {
+                    return [];
+                }
+            };
             /**
              * Returns the PlotEntity nearest to the query point by X then by Y, or undefined if no PlotEntity can be found.
              *
@@ -9796,6 +9821,15 @@ var Plottable;
                 attrToProjector["y1"] = Plottable.Plot._scaledAccessor(this.y());
                 attrToProjector["y2"] = this.y2() == null ? Plottable.Plot._scaledAccessor(this.y()) : Plottable.Plot._scaledAccessor(this.y2());
                 return attrToProjector;
+            };
+            Segment.prototype.entitiesAt = function (point) {
+                var entity = this.entityNearest(point);
+                if (entity != null) {
+                    return [entity];
+                }
+                else {
+                    return [];
+                }
             };
             Segment.prototype.entitiesIn = function (xRangeOrBounds, yRange) {
                 var dataXRange;
@@ -11231,6 +11265,8 @@ var Plottable;
                 this._touchIds = d3.map();
                 this._minDomainExtents = new Plottable.Utils.Map();
                 this._maxDomainExtents = new Plottable.Utils.Map();
+                this._minDomainValues = new Plottable.Utils.Map();
+                this._maxDomainValues = new Plottable.Utils.Map();
                 if (xScale != null) {
                     this.addXScale(xScale);
                 }
@@ -11294,11 +11330,18 @@ var Plottable;
                 var normalizedPointDiffs = points.map(function (point, i) {
                     return { x: (point.x - oldPoints[i].x) / magnifyAmount, y: (point.y - oldPoints[i].y) / magnifyAmount };
                 });
+                var oldCenterPoint = PanZoom._centerPoint(oldPoints[0], oldPoints[1]);
+                var centerX = oldCenterPoint.x;
+                var centerY = oldCenterPoint.y;
                 this.xScales().forEach(function (xScale) {
-                    magnifyAmount = _this._constrainedZoomAmount(xScale, magnifyAmount);
+                    var constrained = _this._constrainedZoom(xScale, magnifyAmount, centerX);
+                    centerX = constrained.centerPoint;
+                    magnifyAmount = constrained.zoomAmount;
                 });
                 this.yScales().forEach(function (yScale) {
-                    magnifyAmount = _this._constrainedZoomAmount(yScale, magnifyAmount);
+                    var constrained = _this._constrainedZoom(yScale, magnifyAmount, centerY);
+                    centerY = constrained.centerPoint;
+                    magnifyAmount = constrained.zoomAmount;
                 });
                 var constrainedPoints = oldPoints.map(function (oldPoint, i) {
                     return {
@@ -11306,16 +11349,15 @@ var Plottable;
                         y: normalizedPointDiffs[i].y * magnifyAmount + oldPoint.y,
                     };
                 });
-                var oldCenterPoint = PanZoom._centerPoint(oldPoints[0], oldPoints[1]);
-                var translateAmountX = oldCenterPoint.x - ((constrainedPoints[0].x + constrainedPoints[1].x) / 2);
+                var translateAmountX = centerX - ((constrainedPoints[0].x + constrainedPoints[1].x) / 2);
                 this.xScales().forEach(function (xScale) {
-                    _this._magnifyScale(xScale, magnifyAmount, oldCenterPoint.x);
-                    _this._translateScale(xScale, translateAmountX);
+                    _this._magnifyScale(xScale, magnifyAmount, centerX);
+                    _this._translateScale(xScale, _this._constrainedTranslation(xScale, translateAmountX));
                 });
-                var translateAmountY = oldCenterPoint.y - ((constrainedPoints[0].y + constrainedPoints[1].y) / 2);
+                var translateAmountY = centerY - ((constrainedPoints[0].y + constrainedPoints[1].y) / 2);
                 this.yScales().forEach(function (yScale) {
-                    _this._magnifyScale(yScale, magnifyAmount, oldCenterPoint.y);
-                    _this._translateScale(yScale, translateAmountY);
+                    _this._magnifyScale(yScale, magnifyAmount, centerY);
+                    _this._translateScale(yScale, _this._constrainedTranslation(yScale, translateAmountY));
                 });
             };
             PanZoom._centerPoint = function (point1, point2) {
@@ -11342,7 +11384,8 @@ var Plottable;
                 }
             };
             PanZoom.prototype._magnifyScale = function (scale, magnifyAmount, centerValue) {
-                var magnifyTransform = function (rangeValue) { return scale.invert(centerValue - (centerValue - rangeValue) * magnifyAmount); };
+                var _this = this;
+                var magnifyTransform = function (rangeValue) { return scale.invert(_this._zoomAt(rangeValue, magnifyAmount, centerValue)); };
                 scale.domain(scale.range().map(magnifyTransform));
             };
             PanZoom.prototype._translateScale = function (scale, translateAmount) {
@@ -11356,22 +11399,32 @@ var Plottable;
                     e.preventDefault();
                     var deltaPixelAmount = e.deltaY * (e.deltaMode ? PanZoom._PIXELS_PER_LINE : 1);
                     var zoomAmount_1 = Math.pow(2, deltaPixelAmount * .002);
+                    var centerX_1 = translatedP.x;
+                    var centerY_1 = translatedP.y;
                     this.xScales().forEach(function (xScale) {
-                        zoomAmount_1 = _this._constrainedZoomAmount(xScale, zoomAmount_1);
+                        var constrained = _this._constrainedZoom(xScale, zoomAmount_1, centerX_1);
+                        centerX_1 = constrained.centerPoint;
+                        zoomAmount_1 = constrained.zoomAmount;
                     });
                     this.yScales().forEach(function (yScale) {
-                        zoomAmount_1 = _this._constrainedZoomAmount(yScale, zoomAmount_1);
+                        var constrained = _this._constrainedZoom(yScale, zoomAmount_1, centerY_1);
+                        centerY_1 = constrained.centerPoint;
+                        zoomAmount_1 = constrained.zoomAmount;
                     });
                     this.xScales().forEach(function (xScale) {
-                        _this._magnifyScale(xScale, zoomAmount_1, translatedP.x);
+                        _this._magnifyScale(xScale, zoomAmount_1, centerX_1);
                     });
                     this.yScales().forEach(function (yScale) {
-                        _this._magnifyScale(yScale, zoomAmount_1, translatedP.y);
+                        _this._magnifyScale(yScale, zoomAmount_1, centerY_1);
                     });
                     this._zoomEndCallbacks.callCallbacks();
                 }
             };
-            PanZoom.prototype._constrainedZoomAmount = function (scale, zoomAmount) {
+            PanZoom.prototype._constrainedZoom = function (scale, zoomAmount, centerPoint) {
+                zoomAmount = this._constrainZoomExtents(scale, zoomAmount);
+                return this._constrainZoomValues(scale, zoomAmount, centerPoint);
+            };
+            PanZoom.prototype._constrainZoomExtents = function (scale, zoomAmount) {
                 var extentIncreasing = zoomAmount > 1;
                 var boundingDomainExtent = extentIncreasing ? this.maxDomainExtent(scale) : this.minDomainExtent(scale);
                 if (boundingDomainExtent == null) {
@@ -11381,6 +11434,79 @@ var Plottable;
                 var domainExtent = Math.abs(scaleDomain[1] - scaleDomain[0]);
                 var compareF = extentIncreasing ? Math.min : Math.max;
                 return compareF(zoomAmount, boundingDomainExtent / domainExtent);
+            };
+            PanZoom.prototype._constrainZoomValues = function (scale, zoomAmount, centerPoint) {
+                // when zooming in, we don't have to worry about overflowing domain
+                if (zoomAmount <= 1) {
+                    return { centerPoint: centerPoint, zoomAmount: zoomAmount };
+                }
+                var minDomain = this.minDomainValue(scale);
+                var maxDomain = this.maxDomainValue(scale);
+                // if no constraints set, we're done
+                if (minDomain == null && maxDomain == null) {
+                    return { centerPoint: centerPoint, zoomAmount: zoomAmount };
+                }
+                var _a = scale.domain(), scaleDomainMin = _a[0], scaleDomainMax = _a[1];
+                if (maxDomain != null) {
+                    // compute max range point if zoom applied
+                    var maxRange = scale.scale(maxDomain);
+                    var currentMaxRange = scale.scale(scaleDomainMax);
+                    var testMaxRange = this._zoomAt(currentMaxRange, zoomAmount, centerPoint);
+                    // move the center point to prevent max overflow, if necessary
+                    if (testMaxRange > maxRange) {
+                        centerPoint = this._getZoomCenterForTarget(currentMaxRange, zoomAmount, maxRange);
+                    }
+                }
+                if (minDomain != null) {
+                    // compute min range point if zoom applied
+                    var minRange = scale.scale(minDomain);
+                    var currentMinRange = scale.scale(scaleDomainMin);
+                    var testMinRange = this._zoomAt(currentMinRange, zoomAmount, centerPoint);
+                    // move the center point to prevent min overflow, if necessary
+                    if (testMinRange < minRange) {
+                        centerPoint = this._getZoomCenterForTarget(currentMinRange, zoomAmount, minRange);
+                    }
+                }
+                // add fallback to prevent overflowing both min and max
+                if (maxDomain != null && maxDomain != null) {
+                    var maxRange = scale.scale(maxDomain);
+                    var currentMaxRange = scale.scale(scaleDomainMax);
+                    var testMaxRange = this._zoomAt(currentMaxRange, zoomAmount, centerPoint);
+                    var minRange = scale.scale(minDomain);
+                    var currentMinRange = scale.scale(scaleDomainMin);
+                    var testMinRange = this._zoomAt(currentMinRange, zoomAmount, centerPoint);
+                    // If we overflow both, use some algebra to solve for centerPoint and
+                    // zoomAmount that will make the domain match the min/max exactly.
+                    // Algebra brought to you by Wolfram Alpha.
+                    if (testMaxRange > maxRange || testMinRange < minRange) {
+                        var denominator = (currentMaxRange - currentMinRange + minRange - maxRange);
+                        if (denominator === 0) {
+                            // In this case the domains already match, so just return no-op values.
+                            centerPoint = (currentMaxRange + currentMinRange) / 2;
+                            zoomAmount = 1;
+                        }
+                        else {
+                            centerPoint = (currentMaxRange * minRange - currentMinRange * maxRange) / denominator;
+                            zoomAmount = (maxRange - minRange) / (currentMaxRange - currentMinRange);
+                        }
+                    }
+                }
+                return { centerPoint: centerPoint, zoomAmount: zoomAmount };
+            };
+            /**
+             * Performs a zoom transformation of the `value` argument scaled by the
+             * `zoom` argument about the point defined by the `center` argument.
+             */
+            PanZoom.prototype._zoomAt = function (value, zoom, center) {
+                return center - (center - value) * zoom;
+            };
+            /**
+             * Returns the `center` value to be used with `_zoomAt` that will produce
+             * the `target` value given the same `value` and `zoom` arguments. Algebra
+             * brought to you by Wolfram Alpha.
+             */
+            PanZoom.prototype._getZoomCenterForTarget = function (value, zoom, target) {
+                return (value * zoom - target) / (zoom - 1);
             };
             PanZoom.prototype._setupDragInteraction = function () {
                 var _this = this;
@@ -11393,15 +11519,39 @@ var Plottable;
                     }
                     var translateAmountX = (lastDragPoint == null ? startPoint.x : lastDragPoint.x) - endPoint.x;
                     _this.xScales().forEach(function (xScale) {
-                        _this._translateScale(xScale, translateAmountX);
+                        _this._translateScale(xScale, _this._constrainedTranslation(xScale, translateAmountX));
                     });
                     var translateAmountY = (lastDragPoint == null ? startPoint.y : lastDragPoint.y) - endPoint.y;
                     _this.yScales().forEach(function (yScale) {
-                        _this._translateScale(yScale, translateAmountY);
+                        _this._translateScale(yScale, _this._constrainedTranslation(yScale, translateAmountY));
                     });
                     lastDragPoint = endPoint;
                 });
                 this._dragInteraction.onDragEnd(function () { return _this._panEndCallbacks.callCallbacks(); });
+            };
+            /**
+             * Returns a new translation value that respects domain min/max value
+             * constraints.
+             */
+            PanZoom.prototype._constrainedTranslation = function (scale, translation) {
+                var _a = scale.domain(), scaleDomainMin = _a[0], scaleDomainMax = _a[1];
+                if (translation > 0) {
+                    var bound = this.maxDomainValue(scale);
+                    if (bound != null) {
+                        var currentMaxRange = scale.scale(scaleDomainMax);
+                        var maxRange = scale.scale(bound);
+                        translation = Math.min(currentMaxRange + translation, maxRange) - currentMaxRange;
+                    }
+                }
+                else {
+                    var bound = this.minDomainValue(scale);
+                    if (bound != null) {
+                        var currentMinRange = scale.scale(scaleDomainMin);
+                        var minRange = scale.scale(bound);
+                        translation = Math.max(currentMinRange + translation, minRange) - currentMinRange;
+                    }
+                }
+                return translation;
             };
             PanZoom.prototype._nonLinearScaleWithExtents = function (scale) {
                 return this.minDomainExtent(scale) != null && this.maxDomainExtent(scale) != null &&
@@ -11457,6 +11607,8 @@ var Plottable;
                 this._xScales.delete(xScale);
                 this._minDomainExtents.delete(xScale);
                 this._maxDomainExtents.delete(xScale);
+                this._minDomainValues.delete(xScale);
+                this._maxDomainValues.delete(xScale);
                 return this;
             };
             /**
@@ -11479,6 +11631,8 @@ var Plottable;
                 this._yScales.delete(yScale);
                 this._minDomainExtents.delete(yScale);
                 this._maxDomainExtents.delete(yScale);
+                this._minDomainValues.delete(yScale);
+                this._maxDomainValues.delete(yScale);
                 return this;
             };
             PanZoom.prototype.minDomainExtent = function (quantitativeScale, minDomainExtent) {
@@ -11514,6 +11668,42 @@ var Plottable;
                 }
                 this._maxDomainExtents.set(quantitativeScale, maxDomainExtent);
                 return this;
+            };
+            PanZoom.prototype.minDomainValue = function (quantitativeScale, minDomainValue) {
+                if (minDomainValue == null) {
+                    return this._minDomainValues.get(quantitativeScale);
+                }
+                var maxValueForScale = this.maxDomainValue(quantitativeScale);
+                if (maxValueForScale != null && maxValueForScale.valueOf() <= minDomainValue.valueOf()) {
+                    throw new Error("minDomainValue must be smaller than maxDomainValue for the same Scale");
+                }
+                this._minDomainValues.set(quantitativeScale, minDomainValue);
+                return this;
+            };
+            PanZoom.prototype.maxDomainValue = function (quantitativeScale, maxDomainValue) {
+                if (maxDomainValue == null) {
+                    return this._maxDomainValues.get(quantitativeScale);
+                }
+                var minValueForScale = this.minDomainValue(quantitativeScale);
+                if (minValueForScale != null && maxDomainValue.valueOf() <= minValueForScale.valueOf()) {
+                    throw new Error("maxDomainValue must be larger than minDomainValue for the same Scale");
+                }
+                this._maxDomainValues.set(quantitativeScale, maxDomainValue);
+                return this;
+            };
+            /**
+             * Uses the current domain of the scale to apply a minimum and maximum
+             * domain value for that scale.
+             *
+             * This constrains the pan/zoom interaction to show no more than the domain
+             * of the scale.
+             */
+            PanZoom.prototype.setMinMaxDomainValuesTo = function (scale) {
+                this._minDomainValues.delete(scale);
+                this._maxDomainValues.delete(scale);
+                var _a = scale.domain(), domainMin = _a[0], domainMax = _a[1];
+                this.minDomainValue(scale, domainMin);
+                this.maxDomainValue(scale, domainMax);
             };
             /**
              * Adds a callback to be called when panning ends.
