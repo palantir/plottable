@@ -257,8 +257,8 @@ namespace Plottable.Components {
           this._detectionCornerBL.attr({ cx: l, cy: b, r: this._detectionRadius });
           this._detectionCornerBR.attr({ cx: r, cy: b, r: this._detectionRadius });
         }
-        return this;
       }
+      return this;
     }
 
     /**

@@ -216,6 +216,7 @@ namespace Plottable.Formatters {
           return d3.time.format(timeFormat[i].format)(d);
         }
       }
+      return undefined;
     };
   }
 

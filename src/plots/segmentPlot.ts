@@ -245,6 +245,7 @@ namespace Plottable.Plots {
             return this._lineIntersectsSegment(startPoint, endPoint, point, corners[index - 1]) &&
                    this._lineIntersectsSegment(point, corners[index - 1], startPoint, endPoint) ;
           }
+          return undefined;
       });
       return intersections.length > 0;
     }
