@@ -157,13 +157,13 @@ namespace Plottable.Interactions {
       let translateAmountX = centerX - ((constrainedPoints[0].x + constrainedPoints[1].x) / 2);
       this.xScales().forEach((xScale) => {
         this._magnifyScale(xScale, magnifyAmount, centerX);
-        this._translateScale(xScale, translateAmountX);
+        this._translateScale(xScale, this._constrainedTranslation(xScale, translateAmountX));
       });
 
       let translateAmountY = centerY - ((constrainedPoints[0].y + constrainedPoints[1].y) / 2);
       this.yScales().forEach((yScale) => {
         this._magnifyScale(yScale, magnifyAmount, centerY);
-        this._translateScale(yScale, translateAmountY);
+        this._translateScale(yScale, this._constrainedTranslation(yScale, translateAmountY));
       });
     }
 
