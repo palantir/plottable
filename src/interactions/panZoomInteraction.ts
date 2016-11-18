@@ -269,12 +269,12 @@ namespace Plottable.Interactions {
         return { centerPoint, zoomAmount };
       }
 
-      const scaleDomain = scale.domain();
+      const [ scaleDomainMin, scaleDomainMax ] = scale.domain();
 
       if (maxDomain != null) {
         // compute max range point if zoom applied
         const maxRange = scale.scale(maxDomain);
-        const currentMaxRange = scale.scale(scaleDomain[1]);
+        const currentMaxRange = scale.scale(scaleDomainMax);
         const testMaxRange = this._zoomAt(currentMaxRange, zoomAmount, centerPoint);
 
         // move the center point to prevent max overflow, if necessary
@@ -286,7 +286,7 @@ namespace Plottable.Interactions {
       if (minDomain != null) {
         // compute min range point if zoom applied
         const minRange = scale.scale(minDomain);
-        const currentMinRange = scale.scale(scaleDomain[0]);
+        const currentMinRange = scale.scale(scaleDomainMin);
         const testMinRange = this._zoomAt(currentMinRange, zoomAmount, centerPoint);
 
         // move the center point to prevent min overflow, if necessary
@@ -298,11 +298,11 @@ namespace Plottable.Interactions {
       // add fallback to prevent overflowing both min and max
       if (maxDomain != null && maxDomain != null) {
         const maxRange = scale.scale(maxDomain);
-        const currentMaxRange = scale.scale(scaleDomain[1]);
+        const currentMaxRange = scale.scale(scaleDomainMax);
         const testMaxRange = this._zoomAt(currentMaxRange, zoomAmount, centerPoint);
 
         const minRange = scale.scale(minDomain);
-        const currentMinRange = scale.scale(scaleDomain[0]);
+        const currentMinRange = scale.scale(scaleDomainMin);
         const testMinRange = this._zoomAt(currentMinRange, zoomAmount, centerPoint);
 
         // If we overflow both, use some algebra to solve for centerPoint and
@@ -372,20 +372,20 @@ namespace Plottable.Interactions {
      * constraints.
      */
     private _constrainedTranslation(scale: QuantitativeScale<number>, translation: number) {
-      const scaleDomain = scale.domain();
+      const [ scaleDomainMin, scaleDomainMax ] = scale.domain();
       if (translation > 0) {
         const bound = this.maxDomainValue(scale);
         if (bound != null) {
-          const currentRange = scale.scale(scaleDomain[1]);
+          const currentMaxRange = scale.scale(scaleDomainMax);
           const maxRange = scale.scale(bound);
-          translation = Math.min(currentRange + translation, maxRange) - currentRange;
+          translation = Math.min(currentMaxRange + translation, maxRange) - currentMaxRange;
         }
       } else {
         const bound = this.minDomainValue(scale);
         if (bound != null) {
-          const currentRange = scale.scale(scaleDomain[0]);
+          const currentMinRange = scale.scale(scaleDomainMin);
           const minRange = scale.scale(bound);
-          translation = Math.max(currentRange + translation, minRange) - currentRange;
+          translation = Math.max(currentMinRange + translation, minRange) - currentMinRange;
         }
       }
       return translation;
@@ -588,7 +588,7 @@ namespace Plottable.Interactions {
      * the user cannot pan/zoom.
      *
      * @param {QuantitativeScale<any>} quantitativeScale The scale to query
-     * @returns {D} The minimum domain extent for the scale.
+     * @returns {D} The minimum domain value for the scale.
      */
     public minDomainValue<D>(quantitativeScale: QuantitativeScale<D>): D;
     /**
@@ -603,7 +603,7 @@ namespace Plottable.Interactions {
      * the user cannot pan/zoom.
      *
      * @param {QuantitativeScale<any>} quantitativeScale The scale to query
-     * @param {D} minDomainExtent The minimum domain extent for the scale.
+     * @param {D} minDomainExtent The minimum domain value for the scale.
      * @returns {Interactions.PanZoom} The calling PanZoom Interaction.
      */
     public minDomainValue<D>(quantitativeScale: QuantitativeScale<D>, minDomainValue: D): this;
@@ -612,7 +612,7 @@ namespace Plottable.Interactions {
         return this._minDomainValues.get(quantitativeScale);
       }
       let maxValueForScale = this.maxDomainValue(quantitativeScale);
-      if (maxValueForScale != null && maxValueForScale.valueOf() < minDomainValue.valueOf()) {
+      if (maxValueForScale != null && maxValueForScale.valueOf() <= minDomainValue.valueOf()) {
         throw new Error("minDomainValue must be smaller than maxDomainValue for the same Scale");
       }
       this._minDomainValues.set(quantitativeScale, minDomainValue);
@@ -631,7 +631,7 @@ namespace Plottable.Interactions {
      * the user cannot pan/zoom.
      *
      * @param {QuantitativeScale<any>} quantitativeScale The scale to query
-     * @returns {D} The maximum domain extent for the scale.
+     * @returns {D} The maximum domain value for the scale.
      */
     public maxDomainValue<D>(quantitativeScale: QuantitativeScale<D>): D;
     /**
@@ -646,7 +646,7 @@ namespace Plottable.Interactions {
      * the user cannot pan/zoom.
      *
      * @param {QuantitativeScale<any>} quantitativeScale The scale to query
-     * @param {D} maxDomainExtent The maximum domain extent for the scale.
+     * @param {D} maxDomainExtent The maximum domain value for the scale.
      * @returns {Interactions.PanZoom} The calling PanZoom Interaction.
      */
     public maxDomainValue<D>(quantitativeScale: QuantitativeScale<D>, maxDomainValue: D): this;
@@ -655,7 +655,7 @@ namespace Plottable.Interactions {
         return this._maxDomainValues.get(quantitativeScale);
       }
       let minValueForScale = this.minDomainValue(quantitativeScale);
-      if (minValueForScale != null && maxDomainValue.valueOf() < minValueForScale.valueOf()) {
+      if (minValueForScale != null && maxDomainValue.valueOf() <= minValueForScale.valueOf()) {
         throw new Error("maxDomainValue must be larger than minDomainValue for the same Scale");
       }
       this._maxDomainValues.set(quantitativeScale, maxDomainValue);
@@ -670,21 +670,16 @@ namespace Plottable.Interactions {
      * of the scale.
      */
     public constrainToScaleDomainValues() {
-      this.xScales().forEach((scale) => {
-        this._minDomainValues.delete(scale);
-        this._maxDomainValues.delete(scale);
-        const domain = scale.domain();
-        this.minDomainValue(scale, domain[0]);
-        this.maxDomainValue(scale, domain[1]);
-      });
+      this.xScales().forEach((scale) => this._constrainToScaleDomainValues(scale));
+      this.yScales().forEach((scale) => this._constrainToScaleDomainValues(scale));
+    }
 
-      this.yScales().forEach((scale) => {
-        this._minDomainValues.delete(scale);
-        this._maxDomainValues.delete(scale);
-        const domain = scale.domain();
-        this.minDomainValue(scale, domain[0]);
-        this.maxDomainValue(scale, domain[1]);
-      });
+    private _constrainToScaleDomainValues<D>(scale: QuantitativeScale<D>) {
+      this._minDomainValues.delete(scale);
+      this._maxDomainValues.delete(scale);
+      const [ domainMin, domainMax ] = scale.domain();
+      this.minDomainValue(scale, domainMin);
+      this.maxDomainValue(scale, domainMax);
     }
 
     /**
