@@ -12,9 +12,9 @@ namespace Plottable.Axes {
      *
      * @constructor
      * @param {Scales.Category} scale
-     * @param {string} [orientation="bottom"] One of "top"/"bottom"/"left"/"right".
+     * @param {AxisOrientation} [orientation="bottom"] Orientation of this Category Axis.
      */
-    constructor(scale: Scales.Category, orientation: string) {
+    constructor(scale: Scales.Category, orientation: AxisOrientation = "bottom") {
       super(scale, orientation);
       this.addClass("category-axis");
     }

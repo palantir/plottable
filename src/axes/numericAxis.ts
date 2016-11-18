@@ -13,9 +13,9 @@ namespace Plottable.Axes {
      *
      * @constructor
      * @param {QuantitativeScale} scale
-     * @param {string} orientation One of "top"/"bottom"/"left"/"right".
+     * @param {AxisOrientaiton} orientation Orientation of this Numeric Axis.
      */
-    constructor(scale: QuantitativeScale<number>, orientation: string) {
+    constructor(scale: QuantitativeScale<number>, orientation: AxisOrientation) {
       super(scale, orientation);
       this.formatter(Formatters.general());
     }

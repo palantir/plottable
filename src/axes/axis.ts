@@ -1,4 +1,6 @@
 namespace Plottable {
+export type AxisOrientation = "left" | "top" | "right" | "bottom";
+
 export class Axis<D> extends Component {
   /**
    * The css class applied to each end tick mark (the line on the end tick).
@@ -34,7 +36,7 @@ export class Axis<D> extends Component {
   protected _baseline: d3.Selection<void>;
   protected _scale: Scale<D, number>;
   private _formatter: Formatter;
-  private _orientation: string;
+  private _orientation: AxisOrientation;
   private _endTickLength = 5;
   private _innerTickLength = 5;
   private _tickLabelPadding = 10;
@@ -56,9 +58,9 @@ export class Axis<D> extends Component {
    *
    * @constructor
    * @param {Scale} scale
-   * @param {string} orientation One of "top"/"bottom"/"left"/"right".
+   * @param {AxisOrientation} orientation Orientation of this Axis.
    */
-  constructor(scale: Scale<D, number>, orientation: string) {
+  constructor(scale: Scale<D, number>, orientation: AxisOrientation) {
     super();
     if (scale == null || orientation == null) { throw new Error("Axis requires a scale and orientation"); }
     this._scale = scale;
@@ -677,19 +679,20 @@ export class Axis<D> extends Component {
   /**
    * Gets the orientation of the Axis.
    */
-  public orientation(): string;
+  public orientation(): AxisOrientation;
   /**
    * Sets the orientation of the Axis.
    *
-   * @param {number} orientation One of "top"/"bottom"/"left"/"right".
+   * @param {AxisOrientation} orientation The orientation to apply to this axis.
    * @returns {Axis} The calling Axis.
    */
-  public orientation(orientation: string): this;
-  public orientation(orientation?: string): any {
+  public orientation(orientation: AxisOrientation): this;
+  public orientation(orientation?: AxisOrientation): AxisOrientation | this {
     if (orientation == null) {
       return this._orientation;
     } else {
-      let newOrientationLC = orientation.toLowerCase();
+      // ensure backwards compatibility for older versions that supply orientation in different cases
+      let newOrientationLC = orientation.toLowerCase() as AxisOrientation;
       if (newOrientationLC !== "top" &&
           newOrientationLC !== "bottom" &&
           newOrientationLC !== "left" &&
