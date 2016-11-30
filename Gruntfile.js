@@ -22,7 +22,7 @@ module.exports = function(grunt) {
       src: [
         "typings/d3/d3.d.ts",
         "plottable.d.ts",
-        "node_modules/svg-typewriter/svgtypewriter.d.ts"
+        "bower_components/svg-typewriter/svgtypewriter.d.ts"
       ],
       options: {
         compiler: "./node_modules/typescript/bin/tsc"
@@ -54,9 +54,7 @@ module.exports = function(grunt) {
       src: "plottable.js",
       objectToExport: "Plottable",
       deps: {
-        "default": ["d3", "SVGTypewriter"],
-        "amd": ["d3", "svg-typewriter"],
-        "cjs": ["d3", "svg-typewriter"]
+        "default": ["d3"]
       }
     }
   };
@@ -64,6 +62,10 @@ module.exports = function(grunt) {
   var concatConfig = {
     header: {
       src: ["license_header.txt", "plottable.js"],
+      dest: "plottable.js"
+    },
+    svgtypewriter: {
+      src: ["plottable.js", "./bower_components/svg-typewriter/svgtypewriter.js"],
       dest: "plottable.js"
     },
     typings: {
@@ -260,6 +262,7 @@ module.exports = function(grunt) {
   ]);
 
   grunt.registerTask("generateJS", [
+    "concat:svgtypewriter",
     "umd:all",
     "concat:header",
     "concat:typings",
