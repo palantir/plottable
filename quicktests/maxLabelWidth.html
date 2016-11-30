@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script src="/node_modules/jquery/dist/jquery.js" charset="utf-8"></script>
+    <script src="/node_modules/d3/d3.js" charset="utf-8"></script>
+    <script src="/quicktests/exampleUtil.js"></script>
+    <script src="/node_modules/svg-typewriter/svgtypewriter.js" charset="utf-8"></script>
+    <link rel="stylesheet" type="text/css" href="/plottable.css">
+    <script src="/plottable.js"></script>
+
+    <title>Max Label Width</title>
+</head>
+
+<body>
+    <script>
+        function first() {
+            var xScale = new Plottable.Scales.Linear();
+            var yScale = new Plottable.Scales.Category();
+
+            var xAxis = new Plottable.Axes.Numeric(xScale, "bottom");
+            var yAxis = new Plottable.Axes.Category(yScale, "left");
+            yAxis.tickLabelMaxWidth(100);
+
+            var plot = new Plottable.Plots.ClusteredBar();
+            plot.x(function (d) {
+                return d.x;
+            }, xScale);
+            plot.y(function (d) {
+                return d.y;
+            }, yScale);
+
+            var data = [
+                {"y": "albatross long long long long long long long long long long long long title", "x": 1},
+                {"y": "turkey", "x": 2},
+                {"y": "denizens", "x": 4},
+                {"y": "123959DF 3", "x": 8}
+            ];
+
+            var dataset = new Plottable.Dataset(data);
+            plot.addDataset(dataset);
+
+            var chart = new Plottable.Components.Table([
+                [yAxis, plot],
+                [null, xAxis]
+            ]);
+
+            const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+            svg.style.width = "500px";
+            svg.style.height = "500px";
+            document.body.appendChild(svg);
+            chart.renderTo(svg);
+        }
+        first();
+
+        function second() {
+            var xScale = new Plottable.Scales.Category();
+            var yScale = new Plottable.Scales.Linear();
+
+            var xAxis = new Plottable.Axes.Category(xScale, "bottom");
+            var yAxis = new Plottable.Axes.Numeric(yScale, "left");
+
+            var plot = new Plottable.Plots.ClusteredBar();
+            plot.x(function (d) {
+                return d.x;
+            }, xScale);
+            plot.y(function (d) {
+                return d.y;
+            }, yScale);
+
+            var data = [
+                {"x": "albatross long long long long long long long long long long long long title", "y": 1},
+                {"x": "turkey", "y": 2},
+                {"x": "denizens", "y": 4},
+                {"x": "123959DF 3", "y": 8}
+            ];
+
+            var dataset = new Plottable.Dataset(data);
+            plot.addDataset(dataset);
+
+            var chart = new Plottable.Components.Table([
+                [yAxis, plot],
+                [null, xAxis]
+            ]);
+
+            const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+            svg.style.width = "500px";
+            svg.style.height = "500px";
+            document.body.appendChild(svg);
+            chart.renderTo(svg);
+        }
+//        second();
+    </script>
+</body>
+</html>
