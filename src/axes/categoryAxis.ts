@@ -46,8 +46,8 @@ namespace Plottable.Axes {
      * @returns {any}
      */
     public requestedSpace(offeredWidth: number, offeredHeight: number): SpaceRequest {
-      let widthRequiredByTicks = this._isHorizontal() ? 0 : this._maxLabelTickLength() + this.tickLabelPadding() + this.margin();
-      let heightRequiredByTicks = this._isHorizontal() ? this._maxLabelTickLength() + this.tickLabelPadding() + this.margin() : 0;
+      let widthRequiredByTicks = this._isHorizontal() ? 0 : this._tickSpaceRequired() + this.margin();
+      let heightRequiredByTicks = this._isHorizontal() ? this._tickSpaceRequired() + this.margin() : 0;
 
       if (this._scale.domain().length === 0) {
         return {
@@ -124,6 +124,14 @@ namespace Plottable.Axes {
     }
 
     /**
+     * Return the space required by the ticks, padding included.
+     * @returns {number}
+     */
+    private _tickSpaceRequired() {
+      return this._maxLabelTickLength() + this.tickLabelPadding();
+    }
+
+    /**
      * Write ticks to the DOM.
      * @param {Plottable.Scales.Category} scale The scale this axis is representing.
      * @param {d3.Selection} ticks The tick elements to write.
@@ -148,8 +156,8 @@ namespace Plottable.Axes {
       }
       ticks.each(function (d: string) {
         let bandWidth = scale.stepWidth();
-        let width = self._isHorizontal() ? bandWidth : self.width() - self._maxLabelTickLength() - self.tickLabelPadding();
-        let height = self._isHorizontal() ? self.height() - self._maxLabelTickLength() - self.tickLabelPadding() : bandWidth;
+        let width = self._isHorizontal() ? bandWidth : self.width() - self._tickSpaceRequired();
+        let height = self._isHorizontal() ? self.height() - self._tickSpaceRequired() : bandWidth;
         let writeOptions = {
           selection: d3.select(this),
           xAlign: xAlign[self.orientation()],
@@ -178,11 +186,11 @@ namespace Plottable.Axes {
       let wrappingResults = ticks.map((s: string) => {
 
         // HACKHACK: https://github.com/palantir/svg-typewriter/issues/25
-        let width = axisWidth - this._maxLabelTickLength() - this.tickLabelPadding(); // default for left/right
+        let width = axisWidth - this._tickSpaceRequired(); // default for left/right
         if (this._isHorizontal()) { // case for top/bottom
           width = stepWidth; // defaults to the band width
           if (this._tickLabelAngle !== 0) { // rotated label
-            width = axisHeight - this._maxLabelTickLength() - this.tickLabelPadding(); // use the axis height
+            width = axisHeight - this._tickSpaceRequired(); // use the axis height
           }
           // HACKHACK: Wrapper fails under negative circumstances
           width = Math.max(width, 0);
@@ -191,9 +199,9 @@ namespace Plottable.Axes {
         // HACKHACK: https://github.com/palantir/svg-typewriter/issues/25
         let height = stepWidth; // default for left/right
         if (this._isHorizontal()) { // case for top/bottom
-          height = axisHeight - this._maxLabelTickLength() - this.tickLabelPadding();
+          height = axisHeight - this._tickSpaceRequired();
           if (this._tickLabelAngle !== 0) { // rotated label
-            height = axisWidth - this._maxLabelTickLength() - this.tickLabelPadding();
+            height = axisWidth - this._tickSpaceRequired();
           }
           // HACKHACK: Wrapper fails under negative circumstances
           height = Math.max(height, 0);
@@ -242,8 +250,8 @@ namespace Plottable.Axes {
       tickLabels.text("");
       this._drawTicks(catScale, tickLabels);
 
-      let xTranslate = this.orientation() === "right" ? this._maxLabelTickLength() + this.tickLabelPadding() : 0;
-      let yTranslate = this.orientation() === "bottom" ? this._maxLabelTickLength() + this.tickLabelPadding() : 0;
+      let xTranslate = this.orientation() === "right" ? this._tickSpaceRequired() : 0;
+      let yTranslate = this.orientation() === "bottom" ? this._tickSpaceRequired() : 0;
       Utils.DOM.translate(this._tickLabelContainer, xTranslate, yTranslate);
       return this;
     }
