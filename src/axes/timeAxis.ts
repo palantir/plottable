@@ -266,7 +266,7 @@ namespace Plottable.Axes {
 
     public orientation(): TimeAxisOrientation;
     public orientation(orientation: TimeAxisOrientation): this;
-    public orientation(orientation?: TimeAxisOrientation): any {
+    public orientation(orientation?: TimeAxisOrientation): TimeAxisOrientation | this {
       if (orientation && (orientation.toLowerCase() === "right" || orientation.toLowerCase() === "left")) {
         throw new Error(orientation + " is not a supported orientation for TimeAxis - only horizontal orientations are supported");
       }

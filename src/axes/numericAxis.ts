@@ -13,7 +13,7 @@ namespace Plottable.Axes {
      *
      * @constructor
      * @param {QuantitativeScale} scale
-     * @param {AxisOrientaiton} orientation Orientation of this Numeric Axis.
+     * @param {AxisOrientation} orientation Orientation of this Numeric Axis.
      */
     constructor(scale: QuantitativeScale<number>, orientation: AxisOrientation) {
       super(scale, orientation);

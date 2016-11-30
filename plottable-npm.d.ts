@@ -1665,7 +1665,7 @@ declare namespace Plottable.Components {
     }
 }
 declare namespace Plottable {
-    type AxisOrientation = "left" | "top" | "right" | "bottom";
+    type AxisOrientation = "bottom" | "left" | "right" | "top";
     class Axis<D> extends Component {
         /**
          * The css class applied to each end tick mark (the line on the end tick).
@@ -2009,7 +2009,7 @@ declare namespace Plottable.Axes {
          *
          * @constructor
          * @param {QuantitativeScale} scale
-         * @param {AxisOrientaiton} orientation Orientation of this Numeric Axis.
+         * @param {AxisOrientation} orientation Orientation of this Numeric Axis.
          */
         constructor(scale: QuantitativeScale<number>, orientation: AxisOrientation);
         protected _setup(): void;
