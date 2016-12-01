@@ -51,6 +51,31 @@ describe("Category Axes", () => {
       svg.remove();
     });
 
+    it("truncates longer labels when tickLabelMaxWidth is set", () => {
+      let svg = TestMethods.generateSVG();
+      let domain = ["albatross long long long long long long long long long long long long title", "short"];
+      let scale = new Plottable.Scales.Category().domain(domain);
+      let axis = new Plottable.Axes.Category(scale, "left");
+      const TICK_LABEL_MAX_WIDTH = 60;
+      axis.tickLabelMaxWidth(TICK_LABEL_MAX_WIDTH);
+      axis.renderTo("svg");
+
+      let ticks = axis.content().selectAll("text");
+      ticks.each(function (this: SVGTextElement) {
+        // add 5px padding to account for https://github.com/palantir/svg-typewriter/issues/40
+        assert.isBelow(this.getBBox().width, TICK_LABEL_MAX_WIDTH + 5, "tick width was capped");
+      });
+
+      // test unsetting property
+      axis.tickLabelMaxWidth(undefined);
+      ticks = axis.content().selectAll("text");
+      ticks.each(function (this: SVGTextElement, text: string, index: number) {
+        // add 5px padding to account for https://github.com/palantir/svg-typewriter/issues/40
+        assert.equal(text, domain[index], "tick width successfully unset");
+      });
+      svg.remove();
+    });
+
     it("re-renders with the new domain when the category scale's domain changes", () => {
       let svg = TestMethods.generateSVG();
       let domain = ["foo", "bar", "baz"];

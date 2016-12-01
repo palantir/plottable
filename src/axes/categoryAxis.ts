@@ -131,9 +131,9 @@ namespace Plottable.Axes {
     public tickLabelMaxWidth(): number;
     public tickLabelMaxWidth(maxWidth: number): this;
     /**
-     * Set or get the tick label's max width on this axis. When set, tick labels will be constrained to be at most
-     * `tickLabelMaxWidth()` pixels wide, and will also never span more than one line. This ensures the axis doesn't grow
-     * to an undesirable width (or, through wrapping, grow to an undesirable height).
+     * Set or get the tick label's max width on this axis. When set, tick labels will be truncated with ellipsis to be
+     * at most `tickLabelMaxWidth()` pixels wide, and will also never span more than one line. This ensures the axis
+     * doesn't grow to an undesirable width (or, through wrapping, grow to an undesirable height).
      *
      * Passing no arguments retrieves the value, while passing a number sets the value. Pass undefined to un-set the max
      * width.
@@ -181,7 +181,7 @@ namespace Plottable.Axes {
           yAlign = {left: "bottom", right: "top", top: "center", bottom: "center"};
           break;
       }
-      ticks.each(function (d: string) {
+      ticks.each(function (this: SVGElement, d: string) {
         let bandWidth = scale.stepWidth();
         let width = self._isHorizontal() ? bandWidth : self.width() - self._tickSpaceRequired();
         let height = self._isHorizontal() ? self.height() - self._tickSpaceRequired() : bandWidth;
@@ -191,6 +191,9 @@ namespace Plottable.Axes {
           yAlign: yAlign[self.orientation()],
           textRotation: self.tickLabelAngle(),
         };
+        if (self._tickLabelMaxWidth != null) {
+          width = Math.min(width, self._tickLabelMaxWidth);
+        }
         self._writer.write(self.formatter()(d), width, height, writeOptions);
       });
     }
