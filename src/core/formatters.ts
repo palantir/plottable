@@ -6,9 +6,9 @@ namespace Plottable {
 
 namespace Plottable.Formatters {
 
-  interface TimeFilterFormat {
-    format: string;
-    filter: (d: any) => any;
+  interface PredicatedFormat {
+    specifier: string;
+    predicate: (d: Date) => boolean;
   }
 
   /**
@@ -170,52 +170,52 @@ namespace Plottable.Formatters {
    * @returns {Formatter} A formatter for time/date values.
    */
   export function multiTime() {
-
-    let numFormats = 8;
-
-    // these defaults were taken from d3
+    // Formatter tiers going from shortest time scale to largest - these were taken from d3
     // https://github.com/mbostock/d3/wiki/Time-Formatting#format_multi
-    let timeFormat: { [index: number]: TimeFilterFormat } = {};
+    const candidateFormats: PredicatedFormat[] = [
+      {
+        specifier: ".%L",
+        predicate: (d) => d.getMilliseconds() !== 0,
+      },
 
-    timeFormat[0] = {
-      format: ".%L",
-      filter: (d: any) => d.getMilliseconds() !== 0,
-    };
-    timeFormat[1] = {
-      format: ":%S",
-      filter: (d: any) => d.getSeconds() !== 0,
-    };
-    timeFormat[2] = {
-      format: "%I:%M",
-      filter: (d: any) => d.getMinutes() !== 0,
-    };
-    timeFormat[3] = {
-      format: "%I %p",
-      filter: (d: any) => d.getHours() !== 0,
-    };
-    timeFormat[4] = {
-      format: "%a %d",
-      filter: (d: any) => d.getDay() !== 0 && d.getDate() !== 1,
-    };
-    timeFormat[5] = {
-      format: "%b %d",
-      filter: (d: any) => d.getDate() !== 1,
-    };
-    timeFormat[6] = {
-      format: "%b",
-      filter: (d: any) => d.getMonth() !== 0,
-    };
-    timeFormat[7] = {
-      format: "%Y",
-      filter: () => true,
-    };
+      {
+        specifier: ":%S",
+        predicate: (d) => d.getSeconds() !== 0,
+      },
+
+      {
+        specifier: "%I:%M",
+        predicate: (d) => d.getMinutes() !== 0,
+      },
+
+      {
+        specifier: "%I %p",
+        predicate: (d) => d.getHours() !== 0,
+      },
+
+      {
+        specifier: "%a %d",
+        predicate: (d) => d.getDay() !== 0 && d.getDate() !== 1,
+      },
+
+      {
+        specifier: "%b %d",
+        predicate: (d) => d.getDate() !== 1,
+      },
+
+      {
+        specifier: "%b",
+        predicate: (d) => d.getMonth() !== 0,
+      },
+    ];
 
     return (d: any) => {
-      for (let i = 0; i < numFormats; i++) {
-        if (timeFormat[i].filter(d)) {
-          return d3.time.format(timeFormat[i].format)(d);
-        }
-      }
+      const acceptableFormats = candidateFormats.filter((candidate) => candidate.predicate(d));
+      let specifier = acceptableFormats.length > 0
+        ? acceptableFormats[0].specifier
+        : "%Y";
+
+      return d3.time.format(specifier)(d);
     };
   }
 

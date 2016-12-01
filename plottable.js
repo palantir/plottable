@@ -1285,48 +1285,44 @@ var Plottable;
          * @returns {Formatter} A formatter for time/date values.
          */
         function multiTime() {
-            var numFormats = 8;
-            // these defaults were taken from d3
+            // Formatter tiers going from shortest time scale to largest - these were taken from d3
             // https://github.com/mbostock/d3/wiki/Time-Formatting#format_multi
-            var timeFormat = {};
-            timeFormat[0] = {
-                format: ".%L",
-                filter: function (d) { return d.getMilliseconds() !== 0; },
-            };
-            timeFormat[1] = {
-                format: ":%S",
-                filter: function (d) { return d.getSeconds() !== 0; },
-            };
-            timeFormat[2] = {
-                format: "%I:%M",
-                filter: function (d) { return d.getMinutes() !== 0; },
-            };
-            timeFormat[3] = {
-                format: "%I %p",
-                filter: function (d) { return d.getHours() !== 0; },
-            };
-            timeFormat[4] = {
-                format: "%a %d",
-                filter: function (d) { return d.getDay() !== 0 && d.getDate() !== 1; },
-            };
-            timeFormat[5] = {
-                format: "%b %d",
-                filter: function (d) { return d.getDate() !== 1; },
-            };
-            timeFormat[6] = {
-                format: "%b",
-                filter: function (d) { return d.getMonth() !== 0; },
-            };
-            timeFormat[7] = {
-                format: "%Y",
-                filter: function () { return true; },
-            };
+            var candidateFormats = [
+                {
+                    specifier: ".%L",
+                    predicate: function (d) { return d.getMilliseconds() !== 0; },
+                },
+                {
+                    specifier: ":%S",
+                    predicate: function (d) { return d.getSeconds() !== 0; },
+                },
+                {
+                    specifier: "%I:%M",
+                    predicate: function (d) { return d.getMinutes() !== 0; },
+                },
+                {
+                    specifier: "%I %p",
+                    predicate: function (d) { return d.getHours() !== 0; },
+                },
+                {
+                    specifier: "%a %d",
+                    predicate: function (d) { return d.getDay() !== 0 && d.getDate() !== 1; },
+                },
+                {
+                    specifier: "%b %d",
+                    predicate: function (d) { return d.getDate() !== 1; },
+                },
+                {
+                    specifier: "%b",
+                    predicate: function (d) { return d.getMonth() !== 0; },
+                },
+            ];
             return function (d) {
-                for (var i = 0; i < numFormats; i++) {
-                    if (timeFormat[i].filter(d)) {
-                        return d3.time.format(timeFormat[i].format)(d);
-                    }
-                }
+                var acceptableFormats = candidateFormats.filter(function (candidate) { return candidate.predicate(d); });
+                var specifier = acceptableFormats.length > 0
+                    ? acceptableFormats[0].specifier
+                    : "%Y";
+                return d3.time.format(specifier)(d);
             };
         }
         Formatters.multiTime = multiTime;
@@ -3564,7 +3560,7 @@ var Plottable;
          *
          * @constructor
          * @param {Scale} scale
-         * @param {string} orientation One of "top"/"bottom"/"left"/"right".
+         * @param {AxisOrientation} orientation Orientation of this Axis.
          */
         function Axis(scale, orientation) {
             var _this = this;
@@ -4047,6 +4043,7 @@ var Plottable;
                 return this._orientation;
             }
             else {
+                // ensure backwards compatibility for older versions that supply orientation in different cases
                 var newOrientationLC = orientation.toLowerCase();
                 if (newOrientationLC !== "top" &&
                     newOrientationLC !== "bottom" &&
@@ -4127,7 +4124,8 @@ var Plottable;
              *
              * @constructor
              * @param {Scales.Time} scale
-             * @param {string} orientation One of "top"/"bottom".
+             * @param {AxisOrientation} orientation Orientation of this Time Axis. Time Axes can only have "top" or "bottom"
+             * orientations.
              */
             function Time(scale, orientation) {
                 _super.call(this, scale, orientation);
@@ -4588,7 +4586,7 @@ var Plottable;
              *
              * @constructor
              * @param {QuantitativeScale} scale
-             * @param {string} orientation One of "top"/"bottom"/"left"/"right".
+             * @param {AxisOrientation} orientation Orientation of this Numeric Axis.
              */
             function Numeric(scale, orientation) {
                 _super.call(this, scale, orientation);
@@ -4916,9 +4914,10 @@ var Plottable;
              *
              * @constructor
              * @param {Scales.Category} scale
-             * @param {string} [orientation="bottom"] One of "top"/"bottom"/"left"/"right".
+             * @param {AxisOrientation} [orientation="bottom"] Orientation of this Category Axis.
              */
             function Category(scale, orientation) {
+                if (orientation === void 0) { orientation = "bottom"; }
                 _super.call(this, scale, orientation);
                 this._tickLabelAngle = 0;
                 this.addClass("category-axis");
@@ -9881,6 +9880,7 @@ var Plottable;
                         return _this._lineIntersectsSegment(startPoint, endPoint, point, corners[index - 1]) &&
                             _this._lineIntersectsSegment(point, corners[index - 1], startPoint, endPoint);
                     }
+                    return false;
                 });
                 return intersections.length > 0;
             };
@@ -12119,8 +12119,8 @@ var Plottable;
                         this._detectionCornerBL.attr({ cx: l, cy: b, r: this._detectionRadius });
                         this._detectionCornerBR.attr({ cx: r, cy: b, r: this._detectionRadius });
                     }
-                    return this;
                 }
+                return this;
             };
             DragBoxLayer.prototype.detectionRadius = function (r) {
                 if (r == null) {

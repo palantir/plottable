@@ -243,8 +243,9 @@ namespace Plottable.Plots {
           if (index !== 0) {
             // return true if border formed by conecting current corner and previous corner intersects with the segment
             return this._lineIntersectsSegment(startPoint, endPoint, point, corners[index - 1]) &&
-                   this._lineIntersectsSegment(point, corners[index - 1], startPoint, endPoint) ;
+                   this._lineIntersectsSegment(point, corners[index - 1], startPoint, endPoint);
           }
+          return false;
       });
       return intersections.length > 0;
     }

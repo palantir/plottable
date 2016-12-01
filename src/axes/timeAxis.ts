@@ -33,6 +33,11 @@ namespace Plottable.Axes {
    */
   export type TimeAxisConfiguration = TimeAxisTierConfiguration[];
 
+  /**
+   * Possible orientations for a Time Axis.
+   */
+  export type TimeAxisOrientation = "top" | "bottom";
+
   export class Time extends Axis<Date> {
     /**
      * The CSS class applied to each Time Axis tier
@@ -170,9 +175,10 @@ namespace Plottable.Axes {
      *
      * @constructor
      * @param {Scales.Time} scale
-     * @param {string} orientation One of "top"/"bottom".
+     * @param {AxisOrientation} orientation Orientation of this Time Axis. Time Axes can only have "top" or "bottom"
+     * orientations.
      */
-    constructor(scale: Scales.Time, orientation: string) {
+    constructor(scale: Scales.Time, orientation: TimeAxisOrientation) {
       super(scale, orientation);
       this.addClass("time-axis");
       this.tickLabelPadding(5);
@@ -258,9 +264,9 @@ namespace Plottable.Axes {
       return mostPreciseIndex;
     }
 
-    public orientation(): string;
-    public orientation(orientation: string): this;
-    public orientation(orientation?: string): any {
+    public orientation(): TimeAxisOrientation;
+    public orientation(orientation: TimeAxisOrientation): this;
+    public orientation(orientation?: TimeAxisOrientation): TimeAxisOrientation | this {
       if (orientation && (orientation.toLowerCase() === "right" || orientation.toLowerCase() === "left")) {
         throw new Error(orientation + " is not a supported orientation for TimeAxis - only horizontal orientations are supported");
       }
