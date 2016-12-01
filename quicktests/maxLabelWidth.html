@@ -7,88 +7,116 @@
     <script src="/node_modules/svg-typewriter/svgtypewriter.js" charset="utf-8"></script>
     <link rel="stylesheet" type="text/css" href="/plottable.css">
     <script src="/plottable.js"></script>
+    <style>
+        svg.plottable {
+            display: inline-block;
+            margin: 50px;
+            background: white;
+        }
+
+        body {
+            background: #F3F3F3;
+        }
+    </style>
 
     <title>Max Label Width</title>
 </head>
 
 <body>
     <script>
-        function first() {
-            var xScale = new Plottable.Scales.Linear();
-            var yScale = new Plottable.Scales.Category();
-
-            var xAxis = new Plottable.Axes.Numeric(xScale, "bottom");
-            var yAxis = new Plottable.Axes.Category(yScale, "left");
-            yAxis.tickLabelMaxWidth(100);
-
-            var plot = new Plottable.Plots.ClusteredBar();
-            plot.x(function (d) {
-                return d.x;
-            }, xScale);
-            plot.y(function (d) {
-                return d.y;
-            }, yScale);
-
-            var data = [
-                {"y": "albatross long long long long long long long long long long long long title", "x": 1},
-                {"y": "turkey", "x": 2},
-                {"y": "denizens", "x": 4},
-                {"y": "123959DF 3", "x": 8}
-            ];
-
-            var dataset = new Plottable.Dataset(data);
-            plot.addDataset(dataset);
-
-            var chart = new Plottable.Components.Table([
-                [yAxis, plot],
-                [null, xAxis]
+        function getLongCategoricalScale() {
+            return new Plottable.Scales.Category().domain([
+                "albatross long long long long long long long long long long long long title",
+                "short",
+                "a b c d e f g h i j k l m n",
+                "TheresNoStoppingMeNowNoStoppingNoStoppingMeNOW"
             ]);
+        }
+
+        function createSVG(width, height) {
+            if (width == null) {
+                width = "500px";
+            }
+            if (height == null) {
+                height = "500px";
+            }
 
             const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-            svg.style.width = "500px";
-            svg.style.height = "500px";
-            document.body.appendChild(svg);
-            chart.renderTo(svg);
+            svg.style.width = width;
+            svg.style.height = height;
+            return svg;
         }
-        first();
 
-        function second() {
-            var xScale = new Plottable.Scales.Category();
-            var yScale = new Plottable.Scales.Linear();
+        function renderAxisComparison(orientation, constrainedWidth) {
+            var scale = getLongCategoricalScale();
 
-            var xAxis = new Plottable.Axes.Category(xScale, "bottom");
-            var yAxis = new Plottable.Axes.Numeric(yScale, "left");
+            var unconstrained = new Plottable.Axes.Category(scale, orientation);
+            var constrained = new Plottable.Axes.Category(scale, orientation).tickLabelMaxWidth(constrainedWidth);
 
-            var plot = new Plottable.Plots.ClusteredBar();
-            plot.x(function (d) {
-                return d.x;
-            }, xScale);
-            plot.y(function (d) {
-                return d.y;
-            }, yScale);
+            const svgUnconstrained = createSVG("300px", "300px");
+            const svgConstrained = createSVG("300px", "300px");
 
-            var data = [
-                {"x": "albatross long long long long long long long long long long long long title", "y": 1},
-                {"x": "turkey", "y": 2},
-                {"x": "denizens", "y": 4},
-                {"x": "123959DF 3", "y": 8}
-            ];
+            const div = document.createElement("div");
+            $(div).append("<h3>Comparison of " + orientation + " axes</h3>");
+            div.appendChild(svgUnconstrained);
+            div.appendChild(svgConstrained);
+            document.body.appendChild(div);
 
-            var dataset = new Plottable.Dataset(data);
-            plot.addDataset(dataset);
-
-            var chart = new Plottable.Components.Table([
-                [yAxis, plot],
-                [null, xAxis]
-            ]);
-
-            const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-            svg.style.width = "500px";
-            svg.style.height = "500px";
-            document.body.appendChild(svg);
-            chart.renderTo(svg);
+            unconstrained.renderTo(svgUnconstrained);
+            constrained.renderTo(svgConstrained);
         }
-//        second();
+        renderAxisComparison("left", 60);
+        renderAxisComparison("bottom", 100);
+
+        function renderGridComparison() {
+            var xScale = getLongCategoricalScale();
+            var yScale = getLongCategoricalScale();
+
+            var data = [];
+            xScale.domain().forEach(function (x) {
+                yScale.domain().forEach(function (y) {
+                    data.push({x: x, y: y, z: Math.random()});
+                });
+            });
+
+            function makeGridChart(constrained) {
+                var gridPlot = new Plottable.Plots.Rectangle();
+                gridPlot.x(function (d) { return d.x; }, xScale);
+                gridPlot.y(function (d) { return d.y; }, xScale);
+                const gridColorScale = new Plottable.Scales.InterpolatedColor();
+                gridPlot.attr("fill", function (d) { return d.z; }, gridColorScale);
+                gridPlot.addDataset(new Plottable.Dataset(data))
+
+                var xAxis = new Plottable.Axes.Category(xScale, "bottom");
+                var yAxis = new Plottable.Axes.Category(yScale, "left");
+                if (constrained) {
+                    xAxis.tickLabelMaxWidth(100);
+                    yAxis.tickLabelMaxWidth(60);
+                }
+                var chart = new Plottable.Components.Table([
+                    [yAxis, gridPlot],
+                    [null, xAxis]
+                ]);
+
+                return chart;
+            }
+
+            const unconstrained = makeGridChart(false);
+            const constrained = makeGridChart(true);
+
+            const svgUnconstrained = createSVG();
+            const svgConstrained = createSVG();
+
+            const div = document.createElement("div");
+            $(div).append("<h3>Comparison in grid chart</h3>");
+            div.appendChild(svgUnconstrained);
+            div.appendChild(svgConstrained);
+            document.body.appendChild(div);
+
+            unconstrained.renderTo(svgUnconstrained);
+            constrained.renderTo(svgConstrained);
+        }
+        renderGridComparison();
     </script>
 </body>
 </html>

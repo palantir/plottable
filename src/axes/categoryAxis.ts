@@ -6,8 +6,26 @@ namespace Plottable.Axes {
      */
     private _tickLabelMaxWidth: number;
     private _measurer: SVGTypewriter.Measurers.CacheCharacterMeasurer;
-    private _wrapper: SVGTypewriter.Wrappers.Wrapper;
-    private _writer: SVGTypewriter.Writers.Writer;
+
+    /**
+     * A Wrapper configured according to the other properties on this axis.
+     * @returns {SVGTypewriter.Wrappers.Wrapper}
+     */
+    private get _wrapper() {
+      const wrapper = new SVGTypewriter.Wrappers.Wrapper();
+      if (this._tickLabelMaxWidth != null) {
+        wrapper.maxLines(1);
+      }
+      return wrapper;
+    }
+
+    /**
+     * A Writer attached to this measurer and wrapper.
+     * @returns {SVGTypewriter.Writers.Writer}
+     */
+    private get _writer() {
+      return new SVGTypewriter.Writers.Writer(this._measurer, this._wrapper);
+    }
 
     /**
      * Constructs a Category Axis.
@@ -26,8 +44,6 @@ namespace Plottable.Axes {
     protected _setup() {
       super._setup();
       this._measurer = new SVGTypewriter.Measurers.CacheCharacterMeasurer(this._tickLabelContainer);
-      this._wrapper = new SVGTypewriter.Wrappers.Wrapper().maxLines(1).textTrimming("ellipsis");
-      this._writer = new SVGTypewriter.Writers.Writer(this._measurer, this._wrapper);
     }
 
     protected _rescale() {
@@ -207,6 +223,9 @@ namespace Plottable.Axes {
           height = Math.max(height, 0);
         }
 
+        if (this._tickLabelMaxWidth != null) {
+          width = Math.min(width, this._tickLabelMaxWidth);
+        }
         return this._wrapper.wrap(this.formatter()(s), this._measurer, width, height);
       });
 
