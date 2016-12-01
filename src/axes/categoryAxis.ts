@@ -130,8 +130,19 @@ namespace Plottable.Axes {
 
     public tickLabelMaxWidth(): number;
     public tickLabelMaxWidth(maxWidth: number): this;
+    /**
+     * Set or get the tick label's max width on this axis. When set, tick labels will be constrained to be at most
+     * `tickLabelMaxWidth()` pixels wide, and will also never span more than one line. This ensures the axis doesn't grow
+     * to an undesirable width (or, through wrapping, grow to an undesirable height).
+     *
+     * Passing no arguments retrieves the value, while passing a number sets the value. Pass undefined to un-set the max
+     * width.
+     * @param maxWidth
+     * @returns {any}
+     */
     public tickLabelMaxWidth(maxWidth?: number): number | this {
-      if (maxWidth == null) {
+      // allow user to un-set tickLabelMaxWidth by passing in null or undefined explicitly
+      if (arguments.length === 0) {
         return this._tickLabelMaxWidth;
       }
       this._tickLabelMaxWidth = maxWidth;
