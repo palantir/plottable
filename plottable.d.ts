@@ -1827,6 +1827,10 @@ declare namespace Plottable {
          * @returns {Axis} The calling Axis.
          */
         endTickLength(length: number): this;
+        /**
+         * Gets the maximum pixel length over all ticks on this axis.
+         * @returns {number}
+         */
         protected _maxLabelTickLength(): number;
         /**
          * Gets the padding between each tick mark and its associated label in pixels.
@@ -2067,9 +2071,21 @@ declare namespace Plottable.Axes {
 declare namespace Plottable.Axes {
     class Category extends Axis<string> {
         private _tickLabelAngle;
+        /**
+         * Maximum allowable px width of tick labels.
+         */
+        private _tickLabelMaxWidth;
         private _measurer;
-        private _wrapper;
-        private _writer;
+        /**
+         * A Wrapper configured according to the other properties on this axis.
+         * @returns {SVGTypewriter.Wrappers.Wrapper}
+         */
+        private readonly _wrapper;
+        /**
+         * A Writer attached to this measurer and wrapper.
+         * @returns {SVGTypewriter.Writers.Writer}
+         */
+        private readonly _writer;
         /**
          * Constructs a Category Axis.
          *
@@ -2082,6 +2098,17 @@ declare namespace Plottable.Axes {
         constructor(scale: Scales.Category, orientation: string);
         protected _setup(): void;
         protected _rescale(): this;
+        /**
+         * Compute space requirements for this Category Axis. Category Axes have two primary space requirements:
+         *
+         * 1) width/height needed by the tick lines (including annotations, padding, and margins).
+         * 2) width/height needed by the tick text.
+         *
+         * We requested space is the sum of the lines and text.
+         * @param offeredWidth
+         * @param offeredHeight
+         * @returns {any}
+         */
         requestedSpace(offeredWidth: number, offeredHeight: number): SpaceRequest;
         protected _coreSize(): number;
         protected _getTickValues(): string[];
@@ -2097,18 +2124,28 @@ declare namespace Plottable.Axes {
          * @returns {Category} The calling Category Axis.
          */
         tickLabelAngle(angle: number): this;
+        tickLabelMaxWidth(): number;
+        tickLabelMaxWidth(maxWidth: number): this;
         /**
-         * Measures the size of the ticks while also writing them to the DOM.
-         * @param {d3.Selection} ticks The tick elements to be written to.
+         * Return the space required by the ticks, padding included.
+         * @returns {number}
          */
-        private _drawTicks(axisWidth, axisHeight, scale, ticks);
+        private _tickSpaceRequired();
         /**
-         * Measures the size of the ticks without making any (permanent) DOM
-         * changes.
+         * Write ticks to the DOM.
+         * @param {Plottable.Scales.Category} scale The scale this axis is representing.
+         * @param {d3.Selection} ticks The tick elements to write.
+         */
+        private _drawTicks(scale, ticks);
+        /**
+         * Measures the size of the tick labels without making any (permanent) DOM changes.
          *
+         * @param {number} axisWidth Width available for this axis.
+         * @param {number} axisHeight Height available for this axis.
+         * @param {Plottable.Scales.Category} scale The scale this axis is representing.
          * @param {string[]} ticks The strings that will be printed on the ticks.
          */
-        private _measureTicks(axisWidth, axisHeight, scale, ticks);
+        private _measureTickLabels(axisWidth, axisHeight, scale, ticks);
         renderImmediately(): this;
         computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number): this;
     }
