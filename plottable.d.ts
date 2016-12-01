@@ -2076,6 +2076,8 @@ declare namespace Plottable.Axes {
         private _measurer;
         private _wrapper;
         private _writer;
+        private _tickTextAlignment;
+        private _tickTextPadding;
         /**
          * Constructs a Category Axis.
          *
@@ -2092,6 +2094,54 @@ declare namespace Plottable.Axes {
         protected _coreSize(): number;
         protected _getTickValues(): string[];
         /**
+         * Gets the current alignment. If not set, null will be returned.
+         */
+        tickTextAlignment(): string;
+        /**
+         * Set alignment of tick labels. Must be one of "left", "right",
+         * or "center", or a falsy value. Setting to a falsy value will
+         * reset tick label alignment to the default alignment.
+         *
+         * Note that alignment is applied before rotation (see "{@link
+         * tickLabelAngle}").
+         *
+         * @param {String} tickTextAlignment One of "left", "right", "center",
+         * or a falsy value.
+         *
+         * @returns {Category} The calling Category.
+         */
+        tickTextAlignment(tickTextAlignment: string): this;
+        /**
+         * Returns the current padding between tick labels and the
+         * opposite edge of the axis.
+         */
+        tickTextPadding(): number;
+        /**
+         * In general, padding moves the label *away* from the outer edge
+         * of the axis (tickLabelPadding moves labels away from the inner
+         * edge of the axis already), as defined by the axis' {@link
+         * orientation}).
+         *
+         * Padding will only be applied when {@link tickTextAlignment} is
+         * set and either of the following conditions hold:
+         *
+         *   * Orientation is "left" or "right"; labels are not rotated;
+         *     for "left" orientation, {@link tickTextAlignment} must be
+         *     "left". For "right" orientation, {@link tickTextAlignment}
+         *     must be "right".
+         *
+         *   * Orientation is "top" or "bottom"; labels are rotated. For
+         *     "top" orientation and 90 rotation, alignment must "left";
+         *     for -90 rotation, alignment must be "right". For "bottom"
+         *     orientation and 90 rotation, alignment must "right"; For
+         *     -90 rotation, alignment must be "left".
+         *
+         * @param {Number} tickTextPadding Padding in pixels.
+         *
+         * @returns {Category} The calling Category.
+         */
+        tickTextPadding(tickTextPadding: number): this;
+        /**
          * Gets the tick label angle in degrees.
          */
         tickLabelAngle(): number;
@@ -2103,6 +2153,18 @@ declare namespace Plottable.Axes {
          * @returns {Category} The calling Category Axis.
          */
         tickLabelAngle(angle: number): this;
+        /**
+         * The pad value gives the amount of padding that must be
+         * subtracted from overall space when rendering text (important for
+         * proper line breaking).
+         *
+         * The translate value gives the amount the label should be moved
+         * to give the proper padding.
+         *
+         * Pad will always be a positive amount, but translate can be
+         * negative depending on rotation of labels and axis orientation.
+         */
+        private _calcTextPadding();
         /**
          * Measures the size of the ticks while also writing them to the DOM.
          * @param {d3.Selection} ticks The tick elements to be written to.
