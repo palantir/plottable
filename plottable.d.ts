@@ -2076,6 +2076,8 @@ declare namespace Plottable.Axes {
         private _measurer;
         private _wrapper;
         private _writer;
+        private _tickTextAlignment;
+        private _tickTextPadding;
         /**
          * Constructs a Category Axis.
          *
@@ -2092,6 +2094,53 @@ declare namespace Plottable.Axes {
         protected _coreSize(): number;
         protected _getTickValues(): string[];
         /**
+         * Gets the current alignment. If not set, null will be returned.
+         */
+        tickTextAlignment(): string;
+        /**
+         * Set alignment of tick labels. Must be one of "left", "right",
+         * or "center", or a falsy value. Setting to a falsy value will
+         * reset tick label alignment to the default alignment.
+         *
+         * Note that alignment is applied before rotation (see "{@link
+         * tickLabelAngle}").
+         *
+         * @param {String} tickTextAlignment One of "left", "right", "center",
+         * or a falsy value.
+         *
+         * @returns {Category} The calling Category.
+         */
+        tickTextAlignment(tickTextAlignment: string): this;
+        /**
+         * Returns the current padding between tick labels and the
+         * opposite edge of the axis.
+         */
+        tickTextPadding(): number;
+        /**
+         * Sets Padding between labels and outer edge of the axis (i.e.,
+         * the edge opposite the plot, as defined by the axis' {@link
+         * orientation}).
+         *
+         * Padding will only be applied when {@link tickTextAlignment} is
+         * set and either of the following conditions hold:
+         *
+         *   * Orientation is "left" or "right"; labels are not rotated;
+         *     for "left" orientation, {@link tickTextAlignment} must be
+         *     "left". For "right" orientation, {@link tickTextAlignment}
+         *     must be "right".
+         *
+         *   * Orientation is "top" or "bottom"; labels are rotated. For
+         *     "top" orientation and 90 rotation, alignment must "left";
+         *     for -90 rotation, alignment must be "right". For "bottom"
+         *     orientation and 90 rotation, alignment must "right"; For
+         *     -90 rotation, alignment must be "left".
+         *
+         * @param {Number} tickTextPadding Padding in pixels.
+         *
+         * @returns {Category} The calling Category.
+         */
+        tickTextPadding(tickTextPadding: number): this;
+        /**
          * Gets the tick label angle in degrees.
          */
         tickLabelAngle(): number;
@@ -2103,6 +2152,7 @@ declare namespace Plottable.Axes {
          * @returns {Category} The calling Category Axis.
          */
         tickLabelAngle(angle: number): this;
+        private _calcTextPadding();
         /**
          * Measures the size of the ticks while also writing them to the DOM.
          * @param {d3.Selection} ticks The tick elements to be written to.
@@ -2402,17 +2452,26 @@ declare namespace Plottable.Components {
         private _yScale;
         private _xLinesContainer;
         private _yLinesContainer;
+        private _xTicks;
+        private _yTicks;
         private _renderCallback;
         /**
          * @constructor
-         * @param {QuantitativeScale} xScale The scale to base the x gridlines on. Pass null if no gridlines are desired.
-         * @param {QuantitativeScale} yScale The scale to base the y gridlines on. Pass null if no gridlines are desired.
+         *
+         * @param {Scale<any, number>} xScale The scale to base the x
+         * gridlines on. Can be a category or numeric scale. Pass null if
+         * no gridlines are desired.
+         *
+         * @param {Scale<any, number>} yScale The scale to base the y
+         * gridlines on. Can be a category or numeric scale. Pass null if
+         * no gridlines are desired.
          */
-        constructor(xScale: QuantitativeScale<any>, yScale: QuantitativeScale<any>);
+        constructor(xScale: QuantitativeScale<any> | Plottable.Scales.Category, yScale: QuantitativeScale<any> | Plottable.Scales.Category);
         destroy(): this;
         protected _setup(): void;
         renderImmediately(): this;
         computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number): this;
+        private _mkTicks(scale);
         private _redrawXLines();
         private _redrawYLines();
     }

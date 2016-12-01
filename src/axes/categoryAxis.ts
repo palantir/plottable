@@ -4,6 +4,8 @@ namespace Plottable.Axes {
     private _measurer: SVGTypewriter.Measurers.CacheCharacterMeasurer;
     private _wrapper: SVGTypewriter.Wrappers.Wrapper;
     private _writer: SVGTypewriter.Writers.Writer;
+    private _tickTextAlignment: string = null;
+    private _tickTextPadding: number = 0;
 
     /**
      * Constructs a Category Axis.
@@ -74,6 +76,80 @@ namespace Plottable.Axes {
     }
 
     /**
+     * Gets the current alignment. If not set, null will be returned.
+     */
+    public tickTextAlignment(): string;
+    /**
+     * Set alignment of tick labels. Must be one of "left", "right",
+     * or "center", or a falsy value. Setting to a falsy value will
+     * reset tick label alignment to the default alignment.
+     *
+     * Note that alignment is applied before rotation (see "{@link
+     * tickLabelAngle}").
+     * 
+     * @param {String} tickTextAlignment One of "left", "right", "center",
+     * or a falsy value.
+     *
+     * @returns {Category} The calling Category.
+     */
+    public tickTextAlignment(tickTextAlignment: string): this;
+    public tickTextAlignment(tickTextAlignment?: string): any {
+      if (arguments.length === 0) {
+        return this._tickTextAlignment;
+      }
+
+      if (! tickTextAlignment) {
+        this._tickTextAlignment = null;
+      } else {
+        let v = tickTextAlignment.toLowerCase();
+        if (v !== "left" && v !== "right" && v !== "center") {
+          throw new Error("tickTextAlignment '" + tickTextAlignment + "' not supported. Must be left, right, or center.");
+        }
+        this._tickTextAlignment = v;
+      }
+
+      return this;
+    }
+
+    /**
+     * Returns the current padding between tick labels and the
+     * opposite edge of the axis.
+     */
+    public tickTextPadding(): number;
+    /**
+     * Sets Padding between labels and outer edge of the axis (i.e.,
+     * the edge opposite the plot, as defined by the axis' {@link
+     * orientation}).
+     *
+     * Padding will only be applied when {@link tickTextAlignment} is
+     * set and either of the following conditions hold:
+     *
+     *   * Orientation is "left" or "right"; labels are not rotated;
+     *     for "left" orientation, {@link tickTextAlignment} must be
+     *     "left". For "right" orientation, {@link tickTextAlignment}
+     *     must be "right".
+     *
+     *   * Orientation is "top" or "bottom"; labels are rotated. For
+     *     "top" orientation and 90 rotation, alignment must "left";
+     *     for -90 rotation, alignment must be "right". For "bottom"
+     *     orientation and 90 rotation, alignment must "right"; For
+     *     -90 rotation, alignment must be "left".
+     *
+     * @param {Number} tickTextPadding Padding in pixels.
+     *
+     * @returns {Category} The calling Category.
+     */
+    public tickTextPadding(tickTextPadding: number): this;
+    public tickTextPadding(tickTextPadding?: number): any {
+      if (arguments.length === 0) {
+        return this._tickTextPadding;
+      }
+
+      this._tickTextPadding = tickTextPadding ? tickTextPadding : 0;
+      return this;
+    }
+
+    /**
      * Gets the tick label angle in degrees.
      */
     public tickLabelAngle(): number;
@@ -97,6 +173,53 @@ namespace Plottable.Axes {
       return this;
     }
 
+    private _calcTextPadding(): { translate: { x: number, y: number }, pad: { x: number, y: number }} {
+      // Padding always moves the label *away* from the outer edge of
+      // the axis (tickLabelPadding moves labels away from the inner
+      // edge of the axis already).
+
+      // The pad value gives the amount of padding that must be
+      // subtracted from overall space when renderign text (import for
+      // proper line breaking).
+      //
+      // The translate value gives the amount the label should be
+      // moved to give the proper padding.
+      //
+      // Pad will always be a positive amount, but translate can be
+      // negative depending on rotation of labels and axis
+      // orientation.
+      let pad = { x: 0, y: 0 };
+      let translate = { x: 0, y: 0 };
+
+      if (this.tickLabelAngle() === 0 && ! this._isHorizontal()) {
+        if (this.orientation() === "right" && this.tickTextAlignment() === "right") {
+          pad.x = this.tickTextPadding();
+          translate.x = this.tickTextPadding() * -1;
+        } else if (this.orientation() === "left" && this.tickTextAlignment() === "left") {
+          pad.x = this.tickTextPadding();
+          translate.x = this.tickTextPadding();
+        }
+      } else if (this.tickLabelAngle() === -90) {
+        if (this.orientation() === "top" && this.tickTextAlignment() === "right") {
+          pad.y = this.tickTextPadding();
+          translate.y = this.tickTextPadding();
+        } else if (this.orientation() === "bottom" && this.tickTextAlignment() === "left") {
+          pad.y = this.tickTextPadding();
+          translate.y = this.tickTextPadding() * -1;
+        }
+      } else if (this.tickLabelAngle() === 90) {
+        if (this.orientation() === "top" && this.tickTextAlignment() === "left") {
+          pad.y = this.tickTextPadding();
+          translate.y = this.tickTextPadding();
+        } else if (this.orientation() === "bottom" && this.tickTextAlignment() === "right") {
+          pad.y = this.tickTextPadding();
+          translate.y = this.tickTextPadding() * -1;
+        }
+      }
+
+      return { pad: pad, translate: translate };
+    }
+
     /**
      * Measures the size of the ticks while also writing them to the DOM.
      * @param {d3.Selection} ticks The tick elements to be written to.
@@ -105,6 +228,10 @@ namespace Plottable.Axes {
       let self = this;
       let xAlign: {[s: string]: string};
       let yAlign: {[s: string]: string};
+      let result = this._calcTextPadding();
+      let pad = result.pad;
+      let translate = result.translate;
+
       switch (this.tickLabelAngle()) {
         case 0:
           xAlign = {left: "right", right: "left", top: "center", bottom: "center"};
@@ -119,17 +246,24 @@ namespace Plottable.Axes {
           yAlign = {left: "bottom", right: "top", top: "center", bottom: "center"};
           break;
       }
+
       ticks.each(function (d: string) {
         let bandWidth = scale.stepWidth();
-        let width = self._isHorizontal() ? bandWidth : axisWidth - self._maxLabelTickLength() - self.tickLabelPadding();
-        let height = self._isHorizontal() ? axisHeight - self._maxLabelTickLength() - self.tickLabelPadding() : bandWidth;
+        let width = self._isHorizontal() ? bandWidth : axisWidth - self._maxLabelTickLength() - self.tickLabelPadding() - pad.x;
+        let height = self._isHorizontal() ? axisHeight - self._maxLabelTickLength() - self.tickLabelPadding() - pad.y : bandWidth;
         let writeOptions = {
           selection: d3.select(this),
-          xAlign: xAlign[self.orientation()],
+          xAlign: self.tickTextAlignment() || xAlign[self.orientation()],
           yAlign: yAlign[self.orientation()],
           textRotation: self.tickLabelAngle(),
         };
+
         self._writer.write(self.formatter()(d), width, height, writeOptions);
+
+        if (translate.x !== 0 || translate.y !== 0) {
+          let text = writeOptions.selection;
+          text.attr("transform", "translate(" + translate.x + ", " + translate.y + ") " + text.attr("transform"));
+        }
       });
     }
 
@@ -145,15 +279,16 @@ namespace Plottable.Axes {
       let totalInnerPaddingRatio = (ticks.length - 1) * scale.innerPadding();
       let expectedRangeBand = axisSpace / (totalOuterPaddingRatio + totalInnerPaddingRatio + ticks.length);
       let stepWidth = expectedRangeBand * (1 + scale.innerPadding());
+      let tickTextPadding = this._calcTextPadding().pad;
 
       let wrappingResults = ticks.map((s: string) => {
 
         // HACKHACK: https://github.com/palantir/svg-typewriter/issues/25
-        let width = axisWidth - this._maxLabelTickLength() - this.tickLabelPadding(); // default for left/right
+        let width = axisWidth - this._maxLabelTickLength() - this.tickLabelPadding() - tickTextPadding.x; // default for left/right
         if (this._isHorizontal()) { // case for top/bottom
           width = stepWidth; // defaults to the band width
           if (this._tickLabelAngle !== 0) { // rotated label
-            width = axisHeight - this._maxLabelTickLength() - this.tickLabelPadding(); // use the axis height
+            width = axisHeight - this._maxLabelTickLength() - this.tickLabelPadding() - tickTextPadding.y; // use the axis height
           }
           // HACKHACK: Wrapper fails under negative circumstances
           width = Math.max(width, 0);
@@ -161,10 +296,10 @@ namespace Plottable.Axes {
 
         // HACKHACK: https://github.com/palantir/svg-typewriter/issues/25
         let height = stepWidth; // default for left/right
-        if (this._isHorizontal()) { // case for top/bottom
+        if (! this._isHorizontal()) { // case for top/bottom
           height = axisHeight - this._maxLabelTickLength() - this.tickLabelPadding();
           if (this._tickLabelAngle !== 0) { // rotated label
-            height = axisWidth - this._maxLabelTickLength() - this.tickLabelPadding();
+            height = axisWidth - this._maxLabelTickLength() - this.tickLabelPadding() ;
           }
           // HACKHACK: Wrapper fails under negative circumstances
           height = Math.max(height, 0);
@@ -190,6 +325,12 @@ namespace Plottable.Axes {
         let tempHeight = usedHeight;
         usedHeight = usedWidth;
         usedWidth = tempHeight;
+      }
+
+      if (this._isHorizontal()) {
+        usedHeight += tickTextPadding.y;
+      } else {
+        usedWidth += tickTextPadding.x;
       }
 
       return {
