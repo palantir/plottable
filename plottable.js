@@ -5041,8 +5041,19 @@ var Plottable;
                 this.redraw();
                 return this;
             };
+            /**
+             * Set or get the tick label's max width on this axis. When set, tick labels will be truncated with ellipsis to be
+             * at most `tickLabelMaxWidth()` pixels wide, and will also never span more than one line. This ensures the axis
+             * doesn't grow to an undesirable width (or, through wrapping, grow to an undesirable height).
+             *
+             * Passing no arguments retrieves the value, while passing a number sets the value. Pass undefined to un-set the max
+             * width.
+             * @param maxWidth
+             * @returns {any}
+             */
             Category.prototype.tickLabelMaxWidth = function (maxWidth) {
-                if (maxWidth == null) {
+                // allow user to un-set tickLabelMaxWidth by passing in null or undefined explicitly
+                if (arguments.length === 0) {
                     return this._tickLabelMaxWidth;
                 }
                 this._tickLabelMaxWidth = maxWidth;
@@ -5089,6 +5100,9 @@ var Plottable;
                         yAlign: yAlign[self.orientation()],
                         textRotation: self.tickLabelAngle(),
                     };
+                    if (self._tickLabelMaxWidth != null) {
+                        width = Math.min(width, self._tickLabelMaxWidth);
+                    }
                     self._writer.write(self.formatter()(d), width, height, writeOptions);
                 });
             };
