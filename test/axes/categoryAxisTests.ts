@@ -66,12 +66,6 @@ describe("Category Axes", () => {
         assert.isBelow(this.getBBox().width, TICK_LABEL_MAX_WIDTH + 5, "tick width was capped");
       });
 
-      // unset
-      axis.tickLabelMaxWidth(undefined);
-      ticks = axis.content().selectAll("text");
-      let texts = ticks[0].map((tick: any) => d3.select(tick).text());
-      assert.deepEqual(texts, domain, "tick width successfully unset");
-
       svg.remove();
     });
 
