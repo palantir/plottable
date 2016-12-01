@@ -616,6 +616,10 @@ export class Axis<D> extends Component {
     }
   }
 
+  /**
+   * Gets the maximum pixel length over all ticks on this axis.
+   * @returns {number}
+   */
   protected _maxLabelTickLength() {
     if (this.showEndTickLabels()) {
       return Math.max(this.innerTickLength(), this.endTickLength());
