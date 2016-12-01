@@ -5027,7 +5027,7 @@ var Plottable;
              * Passing no arguments retrieves the value, while passing a number sets the value. Pass undefined to un-set the max
              * width.
              * @param maxWidth
-             * @returns {any}
+             * @returns {number | this}
              */
             Category.prototype.tickLabelMaxWidth = function (maxWidth) {
                 // allow user to un-set tickLabelMaxWidth by passing in null or undefined explicitly

@@ -138,7 +138,7 @@ namespace Plottable.Axes {
      * Passing no arguments retrieves the value, while passing a number sets the value. Pass undefined to un-set the max
      * width.
      * @param maxWidth
-     * @returns {any}
+     * @returns {number | this}
      */
     public tickLabelMaxWidth(maxWidth?: number): number | this {
       // allow user to un-set tickLabelMaxWidth by passing in null or undefined explicitly
