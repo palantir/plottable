@@ -5078,6 +5078,13 @@ var Plottable;
                         textRotation: self.tickLabelAngle(),
                     };
                     if (self._tickLabelMaxWidth != null) {
+                        // for left-oriented axes, we must move the ticks by the amount we've cut off in order to keep the text
+                        // aligned with the side of the ticks
+                        if (self.orientation() === "left" && width > self._tickLabelMaxWidth) {
+                            var cutOffWidth = width - self._tickLabelMaxWidth;
+                            var newTransform = writeOptions.selection.attr("transform") + " translate(" + cutOffWidth + ", 0)";
+                            writeOptions.selection.attr("transform", newTransform);
+                        }
                         width = Math.min(width, self._tickLabelMaxWidth);
                     }
                     self._writer.write(self.formatter()(d), width, height, writeOptions);
@@ -5146,8 +5153,14 @@ var Plottable;
                 var catScale = this._scale;
                 var tickLabels = this._tickLabelContainer.selectAll("." + Plottable.Axis.TICK_LABEL_CLASS).data(this._scale.domain(), function (d) { return d; });
                 var getTickLabelTransform = function (d, i) {
-                    var innerPaddingWidth = catScale.stepWidth() - catScale.rangeBand();
-                    var scaledValue = catScale.scale(d) - catScale.rangeBand() / 2 - innerPaddingWidth / 2;
+                    // Give each tick a stepWidth of space which will partition the entire axis evenly
+                    var availableTextWidth = catScale.stepWidth();
+                    if (_this._isHorizontal() && _this._tickLabelMaxWidth != null) {
+                        availableTextWidth = Math.min(availableTextWidth, _this._tickLabelMaxWidth);
+                    }
+                    // scale(d) will give the center of the band, so subtract half of the text width so that the tick label will be
+                    // centered with the band
+                    var scaledValue = catScale.scale(d) - availableTextWidth / 2;
                     var x = _this._isHorizontal() ? scaledValue : 0;
                     var y = _this._isHorizontal() ? 0 : scaledValue;
                     return "translate(" + x + "," + y + ")";
