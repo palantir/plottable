@@ -192,6 +192,13 @@ namespace Plottable.Axes {
           textRotation: self.tickLabelAngle(),
         };
         if (self._tickLabelMaxWidth != null) {
+          // for left-oriented axes, we must move the ticks by the amount we've cut off in order to keep the text
+          // aligned with the side of the ticks
+          if (self.orientation() === "left" && width > self._tickLabelMaxWidth) {
+            const cutOffWidth = width - self._tickLabelMaxWidth;
+            const newTransform = `${writeOptions.selection.attr("transform")} translate(${cutOffWidth}, 0)`;
+            writeOptions.selection.attr("transform", newTransform);
+          }
           width = Math.min(width, self._tickLabelMaxWidth);
         }
         self._writer.write(self.formatter()(d), width, height, writeOptions);
@@ -270,8 +277,15 @@ namespace Plottable.Axes {
       let tickLabels = this._tickLabelContainer.selectAll("." + Axis.TICK_LABEL_CLASS).data(this._scale.domain(), (d) => d);
 
       let getTickLabelTransform = (d: string, i: number) => {
-        let innerPaddingWidth = catScale.stepWidth() - catScale.rangeBand();
-        let scaledValue = catScale.scale(d) - catScale.rangeBand() / 2 - innerPaddingWidth / 2;
+        // Give each tick a stepWidth of space which will partition the entire axis evenly
+        let availableTextWidth = catScale.stepWidth();
+        if (this._isHorizontal() && this._tickLabelMaxWidth != null) {
+          availableTextWidth = Math.min(availableTextWidth, this._tickLabelMaxWidth);
+        }
+
+        // scale(d) will give the center of the band, so subtract half of the text width so that the tick label will be
+        // centered with the band
+        let scaledValue = catScale.scale(d) - availableTextWidth / 2;
         let x = this._isHorizontal() ? scaledValue : 0;
         let y = this._isHorizontal() ? 0 : scaledValue;
         return "translate(" + x + "," + y + ")";

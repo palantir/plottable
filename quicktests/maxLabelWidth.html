@@ -4,18 +4,26 @@
     <script src="/node_modules/jquery/dist/jquery.js" charset="utf-8"></script>
     <script src="/node_modules/d3/d3.js" charset="utf-8"></script>
     <script src="/quicktests/exampleUtil.js"></script>
-    <script src="/node_modules/svg-typewriter/svgtypewriter.js" charset="utf-8"></script>
+    <script src="/bower_components/svg-typewriter/svgtypewriter.js" charset="utf-8"></script>
     <link rel="stylesheet" type="text/css" href="/plottable.css">
     <script src="/plottable.js"></script>
     <style>
         svg.plottable {
             display: inline-block;
-            margin: 50px;
+            margin: 20px;
             background: white;
+        }
+        .plottable .axis line.tick-mark,
+        .plottable .axis line.baseline {
+            stroke: #f00;
         }
 
         body {
             background: #F3F3F3;
+        }
+
+        .bigdiv {
+            padding: 20px;
         }
     </style>
 
@@ -47,26 +55,36 @@
             return svg;
         }
 
-        function renderAxisComparison(orientation, constrainedWidth) {
-            var scale = getLongCategoricalScale();
+        function renderAllAxisOrientationComparisons(tickLabelAngle) {
+            const bigDiv = document.createElement("div");
+            $(bigDiv).addClass("bigdiv").append("<h1>" + tickLabelAngle + " degrees</h1>");
+            document.body.appendChild(bigDiv);
+            function renderAxisComparison(orientation, constrainedWidth, svgWidth, svgHeight) {
+                var scale = getLongCategoricalScale();
 
-            var unconstrained = new Plottable.Axes.Category(scale, orientation);
-            var constrained = new Plottable.Axes.Category(scale, orientation).tickLabelMaxWidth(constrainedWidth);
+                var unconstrained = new Plottable.Axes.Category(scale, orientation).tickLabelAngle(tickLabelAngle).innerTickLength(15).endTickLength(15);
+                var constrained = new Plottable.Axes.Category(scale, orientation).tickLabelAngle(tickLabelAngle).innerTickLength(15).endTickLength(15).tickLabelMaxWidth(constrainedWidth);
 
-            const svgUnconstrained = createSVG("300px", "300px");
-            const svgConstrained = createSVG("300px", "300px");
+                const svgUnconstrained = createSVG(svgWidth, svgHeight);
+                const svgConstrained = createSVG(svgWidth, svgHeight);
 
-            const div = document.createElement("div");
-            $(div).append("<h3>Comparison of " + orientation + " axes</h3>");
-            div.appendChild(svgUnconstrained);
-            div.appendChild(svgConstrained);
-            document.body.appendChild(div);
+                const div = document.createElement("div");
+                $(div).append("<h3>Comparison of " + orientation + " axes (" + constrainedWidth + "px constrained)</h3>");
+                div.appendChild(svgUnconstrained);
+                div.appendChild(svgConstrained);
+                bigDiv.appendChild(div);
 
-            unconstrained.renderTo(svgUnconstrained);
-            constrained.renderTo(svgConstrained);
+                unconstrained.renderTo(svgUnconstrained);
+                constrained.renderTo(svgConstrained);
+            }
+            renderAxisComparison("left", 60, "150px", "600px");
+            renderAxisComparison("right", 60, "150px", "600px");
+            renderAxisComparison("top", 100, "600px", "150px");
+            renderAxisComparison("bottom", 100, "600px", "150px");
         }
-        renderAxisComparison("left", 60);
-        renderAxisComparison("bottom", 100);
+        renderAllAxisOrientationComparisons(0);
+        renderAllAxisOrientationComparisons(90);
+        renderAllAxisOrientationComparisons(-90);
 
         function renderGridComparison() {
             var xScale = getLongCategoricalScale();
