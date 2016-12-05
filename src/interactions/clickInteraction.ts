@@ -1,6 +1,6 @@
 namespace Plottable {
 
-export type ClickCallback = (point: Point) => void;
+export type ClickCallback = (point: Point, event: MouseEvent | TouchEvent) => void;
 
 }
 
@@ -12,11 +12,11 @@ namespace Plottable.Interactions {
     private _clickedDown = false;
     private _onClickCallbacks = new Utils.CallbackSet<ClickCallback>();
 
-    private _mouseDownCallback = (p: Point) => this._handleClickDown(p);
-    private _mouseUpCallback = (p: Point) => this._handleClickUp(p);
+    private _mouseDownCallback = (p: Point, event: MouseEvent) => this._handleClickDown(p, event);
+    private _mouseUpCallback = (p: Point, event: MouseEvent) => this._handleClickUp(p, event);
 
-    private _touchStartCallback = (ids: number[], idToPoint: Point[]) => this._handleClickDown(idToPoint[ids[0]]);
-    private _touchEndCallback = (ids: number[], idToPoint: Point[]) => this._handleClickUp(idToPoint[ids[0]]);
+    private _touchStartCallback = (ids: number[], idToPoint: Point[], event: TouchEvent) => this._handleClickDown(idToPoint[ids[0]], event);
+    private _touchEndCallback = (ids: number[], idToPoint: Point[], event: TouchEvent) => this._handleClickUp(idToPoint[ids[0]], event);
     private _touchCancelCallback = (ids: number[], idToPoint: Point[]) => this._clickedDown = false;
 
     protected _anchor(component: Component) {
@@ -44,17 +44,17 @@ namespace Plottable.Interactions {
       this._touchDispatcher = null;
     }
 
-    private _handleClickDown(p: Point) {
+    private _handleClickDown(p: Point, e: MouseEvent | TouchEvent) {
       let translatedPoint = this._translateToComponentSpace(p);
       if (this._isInsideComponent(translatedPoint)) {
         this._clickedDown = true;
       }
     }
 
-    private _handleClickUp(p: Point) {
+    private _handleClickUp(p: Point, e: MouseEvent | TouchEvent) {
       let translatedPoint = this._translateToComponentSpace(p);
       if (this._clickedDown && this._isInsideComponent(translatedPoint)) {
-        this._onClickCallbacks.callCallbacks(translatedPoint);
+        this._onClickCallbacks.callCallbacks(translatedPoint, e);
       }
       this._clickedDown = false;
     }

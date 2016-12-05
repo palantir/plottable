@@ -10917,10 +10917,10 @@ var Plottable;
                 _super.apply(this, arguments);
                 this._clickedDown = false;
                 this._onClickCallbacks = new Plottable.Utils.CallbackSet();
-                this._mouseDownCallback = function (p) { return _this._handleClickDown(p); };
-                this._mouseUpCallback = function (p) { return _this._handleClickUp(p); };
-                this._touchStartCallback = function (ids, idToPoint) { return _this._handleClickDown(idToPoint[ids[0]]); };
-                this._touchEndCallback = function (ids, idToPoint) { return _this._handleClickUp(idToPoint[ids[0]]); };
+                this._mouseDownCallback = function (p, event) { return _this._handleClickDown(p, event); };
+                this._mouseUpCallback = function (p, event) { return _this._handleClickUp(p, event); };
+                this._touchStartCallback = function (ids, idToPoint, event) { return _this._handleClickDown(idToPoint[ids[0]], event); };
+                this._touchEndCallback = function (ids, idToPoint, event) { return _this._handleClickUp(idToPoint[ids[0]], event); };
                 this._touchCancelCallback = function (ids, idToPoint) { return _this._clickedDown = false; };
             }
             Click.prototype._anchor = function (component) {
@@ -10943,16 +10943,16 @@ var Plottable;
                 this._touchDispatcher.offTouchCancel(this._touchCancelCallback);
                 this._touchDispatcher = null;
             };
-            Click.prototype._handleClickDown = function (p) {
+            Click.prototype._handleClickDown = function (p, e) {
                 var translatedPoint = this._translateToComponentSpace(p);
                 if (this._isInsideComponent(translatedPoint)) {
                     this._clickedDown = true;
                 }
             };
-            Click.prototype._handleClickUp = function (p) {
+            Click.prototype._handleClickUp = function (p, e) {
                 var translatedPoint = this._translateToComponentSpace(p);
                 if (this._clickedDown && this._isInsideComponent(translatedPoint)) {
-                    this._onClickCallbacks.callCallbacks(translatedPoint);
+                    this._onClickCallbacks.callCallbacks(translatedPoint, e);
                 }
                 this._clickedDown = false;
             };
