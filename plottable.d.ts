@@ -4442,7 +4442,7 @@ declare namespace Plottable {
     }
 }
 declare namespace Plottable {
-    type ClickCallback = (point: Point) => void;
+    type ClickCallback = (point: Point, event: MouseEvent | TouchEvent) => void;
 }
 declare namespace Plottable.Interactions {
     class Click extends Interaction {
@@ -4457,8 +4457,8 @@ declare namespace Plottable.Interactions {
         private _touchCancelCallback;
         protected _anchor(component: Component): void;
         protected _unanchor(): void;
-        private _handleClickDown(p);
-        private _handleClickUp(p);
+        private _handleClickDown(p, e);
+        private _handleClickUp(p, e);
         /**
          * Adds a callback to be called when the Component is clicked.
          *
