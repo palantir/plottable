@@ -3571,7 +3571,7 @@ declare namespace Plottable.Plots {
     }
 }
 declare namespace Plottable.Plots {
-    class Line<X> extends XYPlot<X, number> {
+    class Line<X, Y> extends XYPlot<X, Y> {
         private _interpolator;
         private _autorangeSmooth;
         private _croppedRenderingEnabled;
@@ -3585,9 +3585,9 @@ declare namespace Plottable.Plots {
         x(): Plots.AccessorScaleBinding<X, number>;
         x(x: number | Accessor<number>): this;
         x(x: X | Accessor<X>, xScale: Scale<X, number>): this;
-        y(): Plots.AccessorScaleBinding<number, number>;
+        y(): Plots.AccessorScaleBinding<Y, number>;
         y(y: number | Accessor<number>): this;
-        y(y: number | Accessor<number>, yScale: Scale<number, number>): this;
+        y(y: Y | Accessor<Y>, yScale: Scale<Y, number>): this;
         autorangeMode(): string;
         autorangeMode(autorangeMode: string): this;
         /**
@@ -3676,7 +3676,7 @@ declare namespace Plottable.Plots {
     }
 }
 declare namespace Plottable.Plots {
-    class Area<X> extends Line<X> {
+    class Area<X> extends Line<X, number> {
         private static _Y0_KEY;
         private _lineDrawers;
         private _constantBaselineValueProvider;
