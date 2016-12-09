@@ -1,5 +1,3 @@
-///<reference path="../reference.ts" />
-
 module Plottable {
 export module Components {
   export class DragZoomLayer extends Components.SelectionBoxLayer {
@@ -96,8 +94,8 @@ export module Components {
 
       if (!this.isZoomed) {
         this.isZoomed = true;
-        this.xDomainToRestore = this._xScale.domain();
-        this.yDomainToRestore = this._yScale.domain();
+        this.xDomainToRestore = this.xScale().domain();
+        this.yDomainToRestore = this.yScale().domain();
       }
       this.interpolateZoom(x0, x1, y0, y1);
     }
@@ -119,10 +117,10 @@ export module Components {
     }
 
     private interpolateZoom(x0f: Numeric, x1f: Numeric, y0f: Numeric, y1f: Numeric) {
-      let x0s: number = this._xScale.domain()[0].valueOf();
-      let x1s: number = this._xScale.domain()[1].valueOf();
-      let y0s: number = this._yScale.domain()[0].valueOf();
-      let y1s: number = this._yScale.domain()[1].valueOf();
+      let x0s: number = this.xScale().domain()[0].valueOf();
+      let x1s: number = this.xScale().domain()[1].valueOf();
+      let y0s: number = this.yScale().domain()[0].valueOf();
+      let y1s: number = this.yScale().domain()[1].valueOf();
 
       // Copy a ref to the ease fn, so that changing ease wont affect zooms in progress
       let ease = this.easeFn;
@@ -139,8 +137,8 @@ export module Components {
         let x1 = interpolator(x1s, x1f, p);
         let y0 = interpolator(y0s, y0f, p);
         let y1 = interpolator(y1s, y1f, p);
-        this._xScale.domain([x0, x1]);
-        this._yScale.domain([y0, y1]);
+        this.xScale().domain([x0, x1]);
+        this.yScale().domain([y0, y1]);
         if (p < 1) {
           Utils.DOM.requestAnimationFramePolyfill(draw);
         } else {

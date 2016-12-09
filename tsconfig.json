@@ -106,6 +106,7 @@
       "src/components/dragBoxLayer.ts",
       "src/components/xDragBoxLayer.ts",
       "src/components/yDragBoxLayer.ts",
-      "src/components/dragLineLayer.ts"
+      "src/components/dragLineLayer.ts",
+      "src/components/dragZoomLayer.ts"
     ]
 }
