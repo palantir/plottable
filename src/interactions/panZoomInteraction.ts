@@ -3,14 +3,74 @@ namespace Plottable.Interactions {
   export type PanCallback = () => void;
   export type ZoomCallback = () => void;
 
+  /**
+   * Performs a zoom transformation of the `value` argument scaled by the
+   * `zoom` argument about the point defined by the `center` argument.
+   */
+  export function zoomAt(value: number, zoom: number, center: number) {
+    return center - (center - value) * zoom;
+  }
+
+  /**
+   * Type guarded function to check if the scale implements the
+   * `TransformableScale` interface. Unfortunately, there is no way to do
+   * runtime interface typechecking, so we have to explicitly list all classes
+   * that implement the interface.
+   */
+  export function isTransformable(scale: any): scale is TransformableScale {
+    return (scale instanceof Plottable.QuantitativeScale ||
+      scale instanceof Plottable.Scales.Category);
+  }
+
+  /**
+   * This interface abstracts the necessary API for implementing pan/zoom on
+   * various types of scales.
+   *
+   * Due to some limitations of d3, for example category scales can't invert
+   * screen space coordinates, we nevertheless allow the scale types to support
+   * pan/zoom if they implement this interface. See `Category`'s
+   * `_d3TransformationScale` for more info.
+   */
+  export interface TransformableScale {
+    /**
+     * Apply the magnification with the floating point `magnifyAmount` centered
+     * at the `centerValue` coordinate.
+     *
+     * @param {number} [magnifyAmount] The floating point zoom amount. `1.0` is
+     * no zoom change.
+     * @param {number} [centerValue] The coordinate of the mouse in screen
+     * space.
+     */
+    magnify(magnifyAmount: number, centerValue: number): void;
+
+    /**
+     * Translates the scale by a number of pixels.
+     *
+     * @param {number} [translateAmount] The translation amount in screen space
+     */
+    translate(translateAmount: number): void;
+
+    /**
+     * Returns value in *screen space* for the given domain value.
+     */
+    scaleTransformation(value: number): number;
+
+    /**
+     * Returns the current transformed domain of the scale. This must be a
+     * numerical range in the same coordinate space used for
+     * `scaleTransformation`.
+     */
+    getTransformationDomain(): [number, number];
+  }
+
   export class PanZoom extends Interaction {
     /**
      * The number of pixels occupied in a line.
      */
     private static _PIXELS_PER_LINE = 120;
 
-    private _xScales: Utils.Set<QuantitativeScale<any>>;
-    private _yScales: Utils.Set<QuantitativeScale<any>>;
+    private _xScales: Utils.Set<TransformableScale>;
+    private _yScales: Utils.Set<TransformableScale>;
     private _dragInteraction: Interactions.Drag;
     private _mouseDispatcher: Dispatchers.Mouse;
     private _touchDispatcher: Dispatchers.Touch;
@@ -23,11 +83,11 @@ namespace Plottable.Interactions {
     private _touchEndCallback = (ids: number[], idToPoint: Point[], e: TouchEvent) => this._handleTouchEnd(ids, idToPoint, e);
     private _touchCancelCallback = (ids: number[], idToPoint: Point[], e: TouchEvent) => this._handleTouchEnd(ids, idToPoint, e);
 
-    private _minDomainExtents: Utils.Map<QuantitativeScale<any>, any>;
-    private _maxDomainExtents: Utils.Map<QuantitativeScale<any>, any>;
+    private _minDomainExtents: Utils.Map<TransformableScale, any>;
+    private _maxDomainExtents: Utils.Map<TransformableScale, any>;
 
-    private _minDomainValues: Utils.Map<QuantitativeScale<any>, any>;
-    private _maxDomainValues: Utils.Map<QuantitativeScale<any>, any>;
+    private _minDomainValues: Utils.Map<TransformableScale, any>;
+    private _maxDomainValues: Utils.Map<TransformableScale, any>;
 
     private _panEndCallbacks = new Utils.CallbackSet<PanCallback>();
     private _zoomEndCallbacks = new Utils.CallbackSet<ZoomCallback>();
@@ -37,20 +97,20 @@ namespace Plottable.Interactions {
      * in response to the user panning or zooming.
      *
      * @constructor
-     * @param {QuantitativeScale} [xScale] The x-scale to update on panning/zooming.
-     * @param {QuantitativeScale} [yScale] The y-scale to update on panning/zooming.
+     * @param {TransformableScale} [xScale] The x-scale to update on panning/zooming.
+     * @param {TransformableScale} [yScale] The y-scale to update on panning/zooming.
      */
-    constructor(xScale?: QuantitativeScale<any>, yScale?: QuantitativeScale<any>) {
+    constructor(xScale?: TransformableScale, yScale?: TransformableScale) {
       super();
-      this._xScales = new Utils.Set<QuantitativeScale<any>>();
-      this._yScales = new Utils.Set<QuantitativeScale<any>>();
+      this._xScales = new Utils.Set<TransformableScale>();
+      this._yScales = new Utils.Set<TransformableScale>();
       this._dragInteraction = new Interactions.Drag();
       this._setupDragInteraction();
       this._touchIds = d3.map<Point>();
-      this._minDomainExtents = new Utils.Map<QuantitativeScale<any>, number>();
-      this._maxDomainExtents = new Utils.Map<QuantitativeScale<any>, number>();
-      this._minDomainValues = new Utils.Map<QuantitativeScale<any>, number>();
-      this._maxDomainValues = new Utils.Map<QuantitativeScale<any>, number>();
+      this._minDomainExtents = new Utils.Map<TransformableScale, number>();
+      this._maxDomainExtents = new Utils.Map<TransformableScale, number>();
+      this._minDomainValues = new Utils.Map<TransformableScale, any>();
+      this._maxDomainValues = new Utils.Map<TransformableScale, any>();
       if (xScale != null) {
         this.addXScale(xScale);
       }
@@ -156,14 +216,14 @@ namespace Plottable.Interactions {
 
       let translateAmountX = centerX - ((constrainedPoints[0].x + constrainedPoints[1].x) / 2);
       this.xScales().forEach((xScale) => {
-        this._magnifyScale(xScale, magnifyAmount, centerX);
-        this._translateScale(xScale, this._constrainedTranslation(xScale, translateAmountX));
+        xScale.magnify(magnifyAmount, centerX);
+        xScale.translate(this._constrainedTranslation(xScale, translateAmountX));
       });
 
       let translateAmountY = centerY - ((constrainedPoints[0].y + constrainedPoints[1].y) / 2);
       this.yScales().forEach((yScale) => {
-        this._magnifyScale(yScale, magnifyAmount, centerY);
-        this._translateScale(yScale, this._constrainedTranslation(yScale, translateAmountY));
+        yScale.magnify(magnifyAmount, centerY);
+        yScale.translate(this._constrainedTranslation(yScale, translateAmountY));
       });
     }
 
@@ -195,16 +255,6 @@ namespace Plottable.Interactions {
       }
     }
 
-    private _magnifyScale<D>(scale: QuantitativeScale<D>, magnifyAmount: number, centerValue: number) {
-      let magnifyTransform = (rangeValue: number) => scale.invert(this._zoomAt(rangeValue, magnifyAmount, centerValue));
-      scale.domain(scale.range().map(magnifyTransform));
-    }
-
-    private _translateScale<D>(scale: QuantitativeScale<D>, translateAmount: number) {
-      let translateTransform = (rangeValue: number) => scale.invert(rangeValue + translateAmount);
-      scale.domain(scale.range().map(translateTransform));
-    }
-
     private _handleWheelEvent(p: Point, e: WheelEvent) {
       let translatedP = this._translateToComponentSpace(p);
       if (this._isInsideComponent(translatedP)) {
@@ -227,35 +277,31 @@ namespace Plottable.Interactions {
           zoomAmount = constrained.zoomAmount;
         });
 
-        this.xScales().forEach((xScale) => {
-          this._magnifyScale(xScale, zoomAmount, centerX);
-        });
-        this.yScales().forEach((yScale) => {
-          this._magnifyScale(yScale, zoomAmount, centerY);
-        });
+        this.xScales().forEach((xScale) => xScale.magnify(zoomAmount, centerX));
+        this.yScales().forEach((yScale) => yScale.magnify(zoomAmount, centerY));
 
         this._zoomEndCallbacks.callCallbacks();
       }
     }
 
-    private _constrainedZoom(scale: QuantitativeScale<number>, zoomAmount: number, centerPoint: number) {
+    private _constrainedZoom(scale: TransformableScale, zoomAmount: number, centerPoint: number) {
       zoomAmount = this._constrainZoomExtents(scale, zoomAmount);
       return this._constrainZoomValues(scale, zoomAmount, centerPoint);
     }
 
-    private _constrainZoomExtents(scale: QuantitativeScale<any>, zoomAmount: number) {
+    private _constrainZoomExtents(scale: TransformableScale, zoomAmount: number) {
       let extentIncreasing = zoomAmount > 1;
 
       let boundingDomainExtent = extentIncreasing ? this.maxDomainExtent(scale) : this.minDomainExtent(scale);
       if (boundingDomainExtent == null) { return zoomAmount; }
 
-      let scaleDomain = scale.domain();
-      let domainExtent = Math.abs(scaleDomain[1] - scaleDomain[0]);
+      const [ scaleDomainMin, scaleDomainMax ] = scale.getTransformationDomain();
+      let domainExtent = Math.abs(scaleDomainMax - scaleDomainMin);
       let compareF = extentIncreasing ? Math.min : Math.max;
       return compareF(zoomAmount, boundingDomainExtent / domainExtent);
     }
 
-    private _constrainZoomValues(scale: QuantitativeScale<number>, zoomAmount: number, centerPoint: number) {
+    private _constrainZoomValues(scale: TransformableScale, zoomAmount: number, centerPoint: number) {
       // when zooming in, we don't have to worry about overflowing domain
       if (zoomAmount <= 1) {
         return { centerPoint, zoomAmount };
@@ -269,13 +315,13 @@ namespace Plottable.Interactions {
         return { centerPoint, zoomAmount };
       }
 
-      const [ scaleDomainMin, scaleDomainMax ] = scale.domain();
+      const [ scaleDomainMin, scaleDomainMax ] = scale.getTransformationDomain();
 
       if (maxDomain != null) {
         // compute max range point if zoom applied
-        const maxRange = scale.scale(maxDomain);
-        const currentMaxRange = scale.scale(scaleDomainMax);
-        const testMaxRange = this._zoomAt(currentMaxRange, zoomAmount, centerPoint);
+        const maxRange = scale.scaleTransformation(maxDomain);
+        const currentMaxRange = scale.scaleTransformation(scaleDomainMax);
+        const testMaxRange = zoomAt(currentMaxRange, zoomAmount, centerPoint);
 
         // move the center point to prevent max overflow, if necessary
         if (testMaxRange > maxRange) {
@@ -285,9 +331,9 @@ namespace Plottable.Interactions {
 
       if (minDomain != null) {
         // compute min range point if zoom applied
-        const minRange = scale.scale(minDomain);
-        const currentMinRange = scale.scale(scaleDomainMin);
-        const testMinRange = this._zoomAt(currentMinRange, zoomAmount, centerPoint);
+        const minRange = scale.scaleTransformation(minDomain);
+        const currentMinRange = scale.scaleTransformation(scaleDomainMin);
+        const testMinRange = zoomAt(currentMinRange, zoomAmount, centerPoint);
 
         // move the center point to prevent min overflow, if necessary
         if (testMinRange < minRange) {
@@ -297,13 +343,13 @@ namespace Plottable.Interactions {
 
       // add fallback to prevent overflowing both min and max
       if (maxDomain != null && maxDomain != null) {
-        const maxRange = scale.scale(maxDomain);
-        const currentMaxRange = scale.scale(scaleDomainMax);
-        const testMaxRange = this._zoomAt(currentMaxRange, zoomAmount, centerPoint);
+        const maxRange = scale.scaleTransformation(maxDomain);
+        const currentMaxRange = scale.scaleTransformation(scaleDomainMax);
+        const testMaxRange = zoomAt(currentMaxRange, zoomAmount, centerPoint);
 
-        const minRange = scale.scale(minDomain);
-        const currentMinRange = scale.scale(scaleDomainMin);
-        const testMinRange = this._zoomAt(currentMinRange, zoomAmount, centerPoint);
+        const minRange = scale.scaleTransformation(minDomain);
+        const currentMinRange = scale.scaleTransformation(scaleDomainMin);
+        const testMinRange = zoomAt(currentMinRange, zoomAmount, centerPoint);
 
         // If we overflow both, use some algebra to solve for centerPoint and
         // zoomAmount that will make the domain match the min/max exactly.
@@ -325,16 +371,8 @@ namespace Plottable.Interactions {
     }
 
     /**
-     * Performs a zoom transformation of the `value` argument scaled by the
-     * `zoom` argument about the point defined by the `center` argument.
-     */
-    private _zoomAt(value: number, zoom: number, center: number) {
-      return center - (center - value) * zoom;
-    }
-
-    /**
-     * Returns the `center` value to be used with `_zoomAt` that will produce
-     * the `target` value given the same `value` and `zoom` arguments. Algebra
+     * Returns the `center` value to be used with `zoomAt` that will produce the
+     * `target` value given the same `value` and `zoom` arguments. Algebra
      * brought to you by Wolfram Alpha.
      */
     private _getZoomCenterForTarget(value: number, zoom: number, target: number) {
@@ -350,17 +388,13 @@ namespace Plottable.Interactions {
         if (this._touchIds.size() >= 2) {
           return;
         }
-        let translateAmountX = (lastDragPoint == null ? startPoint.x : lastDragPoint.x) - endPoint.x;
 
-        this.xScales().forEach((xScale) => {
-          this._translateScale(xScale, this._constrainedTranslation(xScale, translateAmountX));
-        });
+        let translateAmountX = (lastDragPoint == null ? startPoint.x : lastDragPoint.x) - endPoint.x;
+        this.xScales().forEach((xScale) => xScale.translate(this._constrainedTranslation(xScale, translateAmountX)));
 
         let translateAmountY = (lastDragPoint == null ? startPoint.y : lastDragPoint.y) - endPoint.y;
+        this.yScales().forEach((yScale) => yScale.translate(this._constrainedTranslation(yScale, translateAmountY)));
 
-        this.yScales().forEach((yScale) => {
-          this._translateScale(yScale, this._constrainedTranslation(yScale, translateAmountY));
-        });
         lastDragPoint = endPoint;
       });
 
@@ -371,27 +405,27 @@ namespace Plottable.Interactions {
      * Returns a new translation value that respects domain min/max value
      * constraints.
      */
-    private _constrainedTranslation(scale: QuantitativeScale<number>, translation: number) {
-      const [ scaleDomainMin, scaleDomainMax ] = scale.domain();
+    private _constrainedTranslation(scale: TransformableScale, translation: number) {
+      const [ scaleDomainMin, scaleDomainMax ] = scale.getTransformationDomain();
       if (translation > 0) {
         const bound = this.maxDomainValue(scale);
         if (bound != null) {
-          const currentMaxRange = scale.scale(scaleDomainMax);
-          const maxRange = scale.scale(bound);
+          const currentMaxRange = scale.scaleTransformation(scaleDomainMax);
+          const maxRange = scale.scaleTransformation(bound);
           translation = Math.min(currentMaxRange + translation, maxRange) - currentMaxRange;
         }
       } else {
         const bound = this.minDomainValue(scale);
         if (bound != null) {
-          const currentMinRange = scale.scale(scaleDomainMin);
-          const minRange = scale.scale(bound);
+          const currentMinRange = scale.scaleTransformation(scaleDomainMin);
+          const minRange = scale.scaleTransformation(bound);
           translation = Math.max(currentMinRange + translation, minRange) - currentMinRange;
         }
       }
       return translation;
     }
 
-    private _nonLinearScaleWithExtents(scale: QuantitativeScale<any>) {
+    private _nonLinearScaleWithExtents(scale: TransformableScale) {
       return this.minDomainExtent(scale) != null && this.maxDomainExtent(scale) != null &&
              !(scale instanceof Scales.Linear) && !(scale instanceof Scales.Time);
     }
@@ -399,22 +433,22 @@ namespace Plottable.Interactions {
     /**
      * Gets the x scales for this PanZoom Interaction.
      */
-    public xScales(): QuantitativeScale<any>[];
+    public xScales(): TransformableScale[];
     /**
      * Sets the x scales for this PanZoom Interaction.
      *
      * @returns {Interactions.PanZoom} The calling PanZoom Interaction.
      */
-    public xScales(xScales: QuantitativeScale<any>[]): this;
-    public xScales(xScales?: QuantitativeScale<any>[]): any {
+    public xScales(xScales: TransformableScale[]): this;
+    public xScales(xScales?: TransformableScale[]): any {
       if (xScales == null) {
-        let scales: QuantitativeScale<any>[] = [];
+        let scales: TransformableScale[] = [];
         this._xScales.forEach((xScale) => {
           scales.push(xScale);
         });
         return scales;
       }
-      this._xScales = new Utils.Set<QuantitativeScale<any>>();
+      this._xScales = new Utils.Set<TransformableScale>();
       xScales.forEach((xScale) => {
         this.addXScale(xScale);
       });
@@ -424,22 +458,22 @@ namespace Plottable.Interactions {
     /**
      * Gets the y scales for this PanZoom Interaction.
      */
-    public yScales(): QuantitativeScale<any>[];
+    public yScales(): TransformableScale[];
     /**
      * Sets the y scales for this PanZoom Interaction.
      *
      * @returns {Interactions.PanZoom} The calling PanZoom Interaction.
      */
-    public yScales(yScales: QuantitativeScale<any>[]): this;
-    public yScales(yScales?: QuantitativeScale<any>[]): any {
+    public yScales(yScales: TransformableScale[]): this;
+    public yScales(yScales?: TransformableScale[]): any {
       if (yScales == null) {
-        let scales: QuantitativeScale<any>[] = [];
+        let scales: TransformableScale[] = [];
         this._yScales.forEach((yScale) => {
           scales.push(yScale);
         });
         return scales;
       }
-      this._yScales = new Utils.Set<QuantitativeScale<any>>();
+      this._yScales = new Utils.Set<TransformableScale>();
       yScales.forEach((yScale) => {
         this.addYScale(yScale);
       });
@@ -449,10 +483,10 @@ namespace Plottable.Interactions {
     /**
      * Adds an x scale to this PanZoom Interaction
      *
-     * @param {QuantitativeScale<any>} An x scale to add
+     * @param {TransformableScale} An x scale to add
      * @returns {Interactions.PanZoom} The calling PanZoom Interaction.
      */
-    public addXScale(xScale: QuantitativeScale<any>) {
+    public addXScale(xScale: TransformableScale) {
       this._xScales.add(xScale);
       return this;
     }
@@ -460,10 +494,10 @@ namespace Plottable.Interactions {
     /**
      * Removes an x scale from this PanZoom Interaction
      *
-     * @param {QuantitativeScale<any>} An x scale to remove
+     * @param {TransformableScale} An x scale to remove
      * @returns {Interactions.PanZoom} The calling PanZoom Interaction.
      */
-    public removeXScale(xScale: QuantitativeScale<any>) {
+    public removeXScale(xScale: TransformableScale) {
       this._xScales.delete(xScale);
       this._minDomainExtents.delete(xScale);
       this._maxDomainExtents.delete(xScale);
@@ -475,10 +509,10 @@ namespace Plottable.Interactions {
     /**
      * Adds a y scale to this PanZoom Interaction
      *
-     * @param {QuantitativeScale<any>} A y scale to add
+     * @param {TransformableScale} A y scale to add
      * @returns {Interactions.PanZoom} The calling PanZoom Interaction.
      */
-    public addYScale(yScale: QuantitativeScale<any>) {
+    public addYScale(yScale: TransformableScale) {
       this._yScales.add(yScale);
       return this;
     }
@@ -486,10 +520,10 @@ namespace Plottable.Interactions {
     /**
      * Removes a y scale from this PanZoom Interaction
      *
-     * @param {QuantitativeScale<any>} A y scale to remove
+     * @param {TransformableScale} A y scale to remove
      * @returns {Interactions.PanZoom} The calling PanZoom Interaction.
      */
-    public removeYScale(yScale: QuantitativeScale<any>) {
+    public removeYScale(yScale: TransformableScale) {
       this._yScales.delete(yScale);
       this._minDomainExtents.delete(yScale);
       this._maxDomainExtents.delete(yScale);
@@ -499,80 +533,90 @@ namespace Plottable.Interactions {
     }
 
     /**
-     * Gets the minimum domain extent for the scale, specifying the minimum allowable amount
-     * between the ends of the domain.
+     * Gets the minimum domain extent for the scale, specifying the minimum
+     * allowable amount between the ends of the domain.
      *
-     * Note that extents will mainly work on scales that work linearly like Linear Scale and Time Scale
+     * Note that extents will mainly work on scales that work linearly like
+     * Linear Scale and Time Scale
      *
-     * @param {QuantitativeScale<any>} quantitativeScale The scale to query
-     * @returns {D} The minimum domain extent for the scale.
+     * @param {TransformableScale} scale The scale to query
+     * @returns {number} The minimum numerical domain extent for the scale.
      */
-    public minDomainExtent<D>(quantitativeScale: QuantitativeScale<D>): D;
+    public minDomainExtent(scale: TransformableScale): number;
     /**
-     * Sets the minimum domain extent for the scale, specifying the minimum allowable amount
-     * between the ends of the domain.
+     * Sets the minimum domain extent for the scale, specifying the minimum
+     * allowable amount between the ends of the domain.
      *
-     * Note that extents will mainly work on scales that work linearly like Linear Scale and Time Scale
+     * Note that extents will mainly work on scales that work linearly like
+     * Linear Scale and Time Scale
      *
-     * @param {QuantitativeScale<any>} quantitativeScale The scale to query
-     * @param {D} minDomainExtent The minimum domain extent for the scale.
+     * @param {TransformableScale} scale The scale to query
+     * @param {number} minDomainExtent The minimum numerical domain extent for
+     * the scale.
      * @returns {Interactions.PanZoom} The calling PanZoom Interaction.
      */
-    public minDomainExtent<D>(quantitativeScale: QuantitativeScale<D>, minDomainExtent: D): this;
-    public minDomainExtent<D>(quantitativeScale: QuantitativeScale<D>, minDomainExtent?: D): D | this {
+    public minDomainExtent(scale: TransformableScale, minDomainExtent: number): this;
+    public minDomainExtent(scale: TransformableScale, minDomainExtent?: number): number | this {
       if (minDomainExtent == null) {
-        return this._minDomainExtents.get(quantitativeScale);
+        return this._minDomainExtents.get(scale);
       }
       if (minDomainExtent.valueOf() < 0) {
         throw new Error("extent must be non-negative");
       }
-      let maxExtentForScale = this.maxDomainExtent(quantitativeScale);
+      let maxExtentForScale = this.maxDomainExtent(scale);
       if (maxExtentForScale != null && maxExtentForScale.valueOf() < minDomainExtent.valueOf()) {
         throw new Error("minDomainExtent must be smaller than maxDomainExtent for the same Scale");
       }
-      if (this._nonLinearScaleWithExtents(quantitativeScale)) {
+      if (this._nonLinearScaleWithExtents(scale)) {
         Utils.Window.warn("Panning and zooming with extents on a nonlinear scale may have unintended behavior.");
       }
-      this._minDomainExtents.set(quantitativeScale, minDomainExtent);
+      this._minDomainExtents.set(scale, minDomainExtent);
       return this;
     }
 
     /**
-     * Gets the maximum domain extent for the scale, specifying the maximum allowable amount
-     * between the ends of the domain.
+     * Gets the maximum domain extent for the scale, specifying the maximum
+     * allowable amount between the ends of the domain.
      *
-     * Note that extents will mainly work on scales that work linearly like Linear Scale and Time Scale
+     * Note that extents will mainly work on scales that work linearly like
+     * Linear Scale and Time Scale
      *
-     * @param {QuantitativeScale<any>} quantitativeScale The scale to query
-     * @returns {D} The maximum domain extent for the scale.
+     * @param {TransformableScale} scale The scale to query
+     * @returns {number} The maximum numerical domain extent for the scale.
      */
-    public maxDomainExtent<D>(quantitativeScale: QuantitativeScale<D>): D;
+    public maxDomainExtent(scale: TransformableScale): number;
     /**
-     * Sets the maximum domain extent for the scale, specifying the maximum allowable amount
-     * between the ends of the domain.
+     * Sets the maximum domain extent for the scale, specifying the maximum
+     * allowable amount between the ends of the domain.
      *
-     * Note that extents will mainly work on scales that work linearly like Linear Scale and Time Scale
+     * For example, if the scale's transformation domain is `[500, 600]` and the
+     * `maxDomainExtent` is set to `50`, then the user will only be able to zoom
+     * out to see an interval like `[500, 550]` or `[520, 570]`.
      *
-     * @param {QuantitativeScale<any>} quantitativeScale The scale to query
-     * @param {D} minDomainExtent The maximum domain extent for the scale.
+     * Note that extents will mainly work on scales that work linearly like
+     * Linear Scale and Time Scale
+     *
+     * @param {TransformableScale} scale The scale to query
+     * @param {number} minDomainExtent The maximum numerical domain extent for
+     * the scale.
      * @returns {Interactions.PanZoom} The calling PanZoom Interaction.
      */
-    public maxDomainExtent<D>(quantitativeScale: QuantitativeScale<D>, maxDomainExtent: D): this;
-    public maxDomainExtent<D>(quantitativeScale: QuantitativeScale<D>, maxDomainExtent?: D): D | this {
+    public maxDomainExtent(scale: TransformableScale, maxDomainExtent: number): this;
+    public maxDomainExtent(scale: TransformableScale, maxDomainExtent?: number): number | this {
       if (maxDomainExtent == null) {
-        return this._maxDomainExtents.get(quantitativeScale);
+        return this._maxDomainExtents.get(scale);
       }
       if (maxDomainExtent.valueOf() <= 0) {
         throw new Error("extent must be positive");
       }
-      let minExtentForScale = this.minDomainExtent(quantitativeScale);
+      let minExtentForScale = this.minDomainExtent(scale);
       if (minExtentForScale != null && maxDomainExtent.valueOf() < minExtentForScale.valueOf()) {
         throw new Error("maxDomainExtent must be larger than minDomainExtent for the same Scale");
       }
-      if (this._nonLinearScaleWithExtents(quantitativeScale)) {
+      if (this._nonLinearScaleWithExtents(scale)) {
         Utils.Window.warn("Panning and zooming with extents on a nonlinear scale may have unintended behavior.");
       }
-      this._maxDomainExtents.set(quantitativeScale, maxDomainExtent);
+      this._maxDomainExtents.set(scale, maxDomainExtent);
       return this;
     }
 
@@ -587,10 +631,10 @@ namespace Plottable.Interactions {
      * By contrast, minDomainValue/maxDomainValue set a boundary beyond which
      * the user cannot pan/zoom.
      *
-     * @param {QuantitativeScale<any>} quantitativeScale The scale to query
-     * @returns {D} The minimum domain value for the scale.
+     * @param {TransformableScale} scale The scale to query
+     * @returns {number} The minimum domain value for the scale.
      */
-    public minDomainValue<D>(quantitativeScale: QuantitativeScale<D>): D;
+    public minDomainValue(scale: TransformableScale): number;
     /**
      * Sets the minimum domain value for the scale, constraining the pan/zoom
      * interaction to a minimum value in the domain.
@@ -602,20 +646,20 @@ namespace Plottable.Interactions {
      * By contrast, minDomainValue/maxDomainValue set a boundary beyond which
      * the user cannot pan/zoom.
      *
-     * @param {QuantitativeScale<any>} quantitativeScale The scale to query
-     * @param {D} minDomainExtent The minimum domain value for the scale.
+     * @param {TransformableScale} scale The scale to query
+     * @param {number} minDomainExtent The minimum domain value for the scale.
      * @returns {Interactions.PanZoom} The calling PanZoom Interaction.
      */
-    public minDomainValue<D>(quantitativeScale: QuantitativeScale<D>, minDomainValue: D): this;
-    public minDomainValue<D>(quantitativeScale: QuantitativeScale<D>, minDomainValue?: D): D | this {
+    public minDomainValue(scale: TransformableScale, minDomainValue: number): this;
+    public minDomainValue(scale: TransformableScale, minDomainValue?: number): number | this {
       if (minDomainValue == null) {
-        return this._minDomainValues.get(quantitativeScale);
+        return this._minDomainValues.get(scale);
       }
-      let maxValueForScale = this.maxDomainValue(quantitativeScale);
+      let maxValueForScale = this.maxDomainValue(scale);
       if (maxValueForScale != null && maxValueForScale.valueOf() <= minDomainValue.valueOf()) {
         throw new Error("minDomainValue must be smaller than maxDomainValue for the same Scale");
       }
-      this._minDomainValues.set(quantitativeScale, minDomainValue);
+      this._minDomainValues.set(scale, minDomainValue);
       return this;
     }
 
@@ -630,10 +674,10 @@ namespace Plottable.Interactions {
      * By contrast, minDomainValue/maxDomainValue set a boundary beyond which
      * the user cannot pan/zoom.
      *
-     * @param {QuantitativeScale<any>} quantitativeScale The scale to query
-     * @returns {D} The maximum domain value for the scale.
+     * @param {TransformableScale} scale The scale to query
+     * @returns {number} The maximum domain value for the scale.
      */
-    public maxDomainValue<D>(quantitativeScale: QuantitativeScale<D>): D;
+    public maxDomainValue(scale: TransformableScale): number;
     /**
      * Sets the maximum domain value for the scale, constraining the pan/zoom
      * interaction to a maximum value in the domain.
@@ -645,20 +689,20 @@ namespace Plottable.Interactions {
      * By contrast, minDomainValue/maxDomainValue set a boundary beyond which
      * the user cannot pan/zoom.
      *
-     * @param {QuantitativeScale<any>} quantitativeScale The scale to query
-     * @param {D} maxDomainExtent The maximum domain value for the scale.
+     * @param {TransformableScale} scale The scale to query
+     * @param {number} maxDomainExtent The maximum domain value for the scale.
      * @returns {Interactions.PanZoom} The calling PanZoom Interaction.
      */
-    public maxDomainValue<D>(quantitativeScale: QuantitativeScale<D>, maxDomainValue: D): this;
-    public maxDomainValue<D>(quantitativeScale: QuantitativeScale<D>, maxDomainValue?: D): D | this {
+    public maxDomainValue(scale: TransformableScale, maxDomainValue: number): this;
+    public maxDomainValue(scale: TransformableScale, maxDomainValue?: number): number | this {
       if (maxDomainValue == null) {
-        return this._maxDomainValues.get(quantitativeScale);
+        return this._maxDomainValues.get(scale);
       }
-      let minValueForScale = this.minDomainValue(quantitativeScale);
-      if (minValueForScale != null && maxDomainValue.valueOf() <= minValueForScale.valueOf()) {
+      let minValueForScale = this.minDomainValue(scale);
+      if (minValueForScale != null && maxDomainValue <= minValueForScale) {
         throw new Error("maxDomainValue must be larger than minDomainValue for the same Scale");
       }
-      this._maxDomainValues.set(quantitativeScale, maxDomainValue);
+      this._maxDomainValues.set(scale, maxDomainValue);
       return this;
     }
 
@@ -669,10 +713,10 @@ namespace Plottable.Interactions {
      * This constrains the pan/zoom interaction to show no more than the domain
      * of the scale.
      */
-    public setMinMaxDomainValuesTo<D>(scale: QuantitativeScale<D>) {
+    public setMinMaxDomainValuesTo(scale: TransformableScale) {
       this._minDomainValues.delete(scale);
       this._maxDomainValues.delete(scale);
-      const [ domainMin, domainMax ] = scale.domain();
+      const [ domainMin, domainMax ] = scale.getTransformationDomain();
       this.minDomainValue(scale, domainMin);
       this.maxDomainValue(scale, domainMax);
     }

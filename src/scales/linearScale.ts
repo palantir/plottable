@@ -25,6 +25,14 @@ namespace Plottable.Scales {
       return this._d3Scale(value);
     }
 
+    public scaleTransformation(value: number) {
+      return this.scale(value);
+    }
+
+    public getTransformationDomain() {
+      return this.domain() as [number, number];
+    }
+
     protected _getDomain() {
       return this._backingScaleDomain();
     }

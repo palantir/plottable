@@ -1713,6 +1713,22 @@ var Plottable;
                 return extent;
             }
         };
+        QuantitativeScale.prototype.magnify = function (magnifyAmount, centerValue) {
+            var _this = this;
+            var magnifyTransform = function (rangeValue) { return _this.invert(Plottable.Interactions.zoomAt(rangeValue, magnifyAmount, centerValue)); };
+            this.domain(this.range().map(magnifyTransform));
+        };
+        QuantitativeScale.prototype.translate = function (translateAmount) {
+            var _this = this;
+            var translateTransform = function (rangeValue) { return _this.invert(rangeValue + translateAmount); };
+            this.domain(this.range().map(translateTransform));
+        };
+        QuantitativeScale.prototype.scaleTransformation = function (value) {
+            throw new Error("Subclasses should override scaleTransformation");
+        };
+        QuantitativeScale.prototype.getTransformationDomain = function () {
+            throw new Error("Subclasses should override getTransformationDomain");
+        };
         QuantitativeScale.prototype._setDomain = function (values) {
             var isNaNOrInfinity = function (x) { return Plottable.Utils.Math.isNaN(x) || x === Infinity || x === -Infinity; };
             if (isNaNOrInfinity(values[0]) || isNaNOrInfinity(values[1])) {
@@ -1783,6 +1799,12 @@ var Plottable;
             };
             Linear.prototype.scale = function (value) {
                 return this._d3Scale(value);
+            };
+            Linear.prototype.scaleTransformation = function (value) {
+                return this.scale(value);
+            };
+            Linear.prototype.getTransformationDomain = function () {
+                return this.domain();
             };
             Linear.prototype._getDomain = function () {
                 return this._backingScaleDomain();
@@ -1894,6 +1916,12 @@ var Plottable;
             };
             ModifiedLog.prototype.invert = function (x) {
                 return this._invertedAdjustedLog(this._d3Scale.invert(x));
+            };
+            ModifiedLog.prototype.scaleTransformation = function (value) {
+                return this.scale(value);
+            };
+            ModifiedLog.prototype.getTransformationDomain = function () {
+                return this.domain();
             };
             ModifiedLog.prototype._getDomain = function () {
                 return this._untransformedDomain;
@@ -2020,6 +2048,7 @@ var Plottable;
 (function (Plottable) {
     var Scales;
     (function (Scales) {
+        var TRANSFORMATION_SPACE = [0, 1];
         var Category = (function (_super) {
             __extends(Category, _super);
             /**
@@ -2031,6 +2060,9 @@ var Plottable;
                 _super.call(this);
                 this._range = [0, 1];
                 this._d3Scale = d3.scale.ordinal();
+                this._d3Scale.range(TRANSFORMATION_SPACE);
+                this._d3TransformationScale = d3.scale.linear();
+                this._d3TransformationScale.domain(TRANSFORMATION_SPACE);
                 var d3InnerPadding = 0.3;
                 this._innerPadding = Category._convertToPlottableInnerPadding(d3InnerPadding);
                 this._outerPadding = Category._convertToPlottableOuterPadding(0.5, d3InnerPadding);
@@ -2056,7 +2088,7 @@ var Plottable;
             Category.prototype._setBands = function () {
                 var d3InnerPadding = 1 - 1 / (1 + this.innerPadding());
                 var d3OuterPadding = this.outerPadding() / (1 + this.innerPadding());
-                this._d3Scale.rangeBands(this._range, d3InnerPadding, d3OuterPadding);
+                this._d3Scale.rangeBands(TRANSFORMATION_SPACE, d3InnerPadding, d3OuterPadding);
             };
             /**
              * Returns the width of the range band.
@@ -2064,7 +2096,7 @@ var Plottable;
              * @returns {number} The range band width
              */
             Category.prototype.rangeBand = function () {
-                return this._d3Scale.rangeBand();
+                return this._rescaleBand(this._d3Scale.rangeBand());
             };
             /**
              * Returns the step width of the scale.
@@ -2074,7 +2106,7 @@ var Plottable;
              * @returns {number}
              */
             Category.prototype.stepWidth = function () {
-                return this.rangeBand() * (1 + this.innerPadding());
+                return this._rescaleBand(this._d3Scale.rangeBand() * (1 + this.innerPadding()));
             };
             Category.prototype.innerPadding = function (innerPadding) {
                 if (innerPadding == null) {
@@ -2095,8 +2127,32 @@ var Plottable;
                 return this;
             };
             Category.prototype.scale = function (value) {
-                // scale it to the middle
-                return this._d3Scale(value) + this.rangeBand() / 2;
+                // Determine the middle of the range band for the value
+                var untransformed = this._d3Scale(value) + this._d3Scale.rangeBand() / 2;
+                // Convert to screen space
+                return this._d3TransformationScale(untransformed);
+            };
+            Category.prototype.magnify = function (magnifyAmount, centerValue) {
+                var _this = this;
+                var magnifyTransform = function (rangeValue) {
+                    return _this._d3TransformationScale.invert(Plottable.Interactions.zoomAt(rangeValue, magnifyAmount, centerValue));
+                };
+                this._d3TransformationScale.domain(this._d3TransformationScale.range().map(magnifyTransform));
+                this._dispatchUpdate();
+            };
+            Category.prototype.translate = function (translateAmount) {
+                var _this = this;
+                var translateTransform = function (rangeValue) {
+                    return _this._d3TransformationScale.invert(rangeValue + translateAmount);
+                };
+                this._d3TransformationScale.domain(this._d3TransformationScale.range().map(translateTransform));
+                this._dispatchUpdate();
+            };
+            Category.prototype.scaleTransformation = function (value) {
+                return this._d3TransformationScale(value);
+            };
+            Category.prototype.getTransformationDomain = function () {
+                return this._d3TransformationScale.domain();
             };
             Category.prototype._getDomain = function () {
                 return this._backingScaleDomain();
@@ -2116,7 +2172,14 @@ var Plottable;
             };
             Category.prototype._setRange = function (values) {
                 this._range = values;
+                this._d3TransformationScale.range(values);
                 this._setBands();
+            };
+            /**
+             * Converts a width or height in *Transformation Space* into *Screen Space*.
+             */
+            Category.prototype._rescaleBand = function (band) {
+                return Math.abs(this._d3TransformationScale(band) - this._d3TransformationScale(0));
             };
             return Category;
         }(Plottable.Scale));
@@ -2294,6 +2357,13 @@ var Plottable;
             };
             Time.prototype.scale = function (value) {
                 return this._d3Scale(value);
+            };
+            Time.prototype.scaleTransformation = function (value) {
+                return this.scale(new Date(value));
+            };
+            Time.prototype.getTransformationDomain = function () {
+                var dates = this.domain();
+                return [dates[0].valueOf(), dates[1].valueOf()];
             };
             Time.prototype._getDomain = function () {
                 return this._backingScaleDomain();
@@ -11320,6 +11390,25 @@ var Plottable;
 (function (Plottable) {
     var Interactions;
     (function (Interactions) {
+        /**
+         * Performs a zoom transformation of the `value` argument scaled by the
+         * `zoom` argument about the point defined by the `center` argument.
+         */
+        function zoomAt(value, zoom, center) {
+            return center - (center - value) * zoom;
+        }
+        Interactions.zoomAt = zoomAt;
+        /**
+         * Type guarded function to check if the scale implements the
+         * `TransformableScale` interface. Unfortunately, there is no way to do
+         * runtime interface typechecking, so we have to explicitly list all classes
+         * that implement the interface.
+         */
+        function isTransformable(scale) {
+            return (scale instanceof Plottable.QuantitativeScale ||
+                scale instanceof Plottable.Scales.Category);
+        }
+        Interactions.isTransformable = isTransformable;
         var PanZoom = (function (_super) {
             __extends(PanZoom, _super);
             /**
@@ -11327,8 +11416,8 @@ var Plottable;
              * in response to the user panning or zooming.
              *
              * @constructor
-             * @param {QuantitativeScale} [xScale] The x-scale to update on panning/zooming.
-             * @param {QuantitativeScale} [yScale] The y-scale to update on panning/zooming.
+             * @param {TransformableScale} [xScale] The x-scale to update on panning/zooming.
+             * @param {TransformableScale} [yScale] The y-scale to update on panning/zooming.
              */
             function PanZoom(xScale, yScale) {
                 var _this = this;
@@ -11433,13 +11522,13 @@ var Plottable;
                 });
                 var translateAmountX = centerX - ((constrainedPoints[0].x + constrainedPoints[1].x) / 2);
                 this.xScales().forEach(function (xScale) {
-                    _this._magnifyScale(xScale, magnifyAmount, centerX);
-                    _this._translateScale(xScale, _this._constrainedTranslation(xScale, translateAmountX));
+                    xScale.magnify(magnifyAmount, centerX);
+                    xScale.translate(_this._constrainedTranslation(xScale, translateAmountX));
                 });
                 var translateAmountY = centerY - ((constrainedPoints[0].y + constrainedPoints[1].y) / 2);
                 this.yScales().forEach(function (yScale) {
-                    _this._magnifyScale(yScale, magnifyAmount, centerY);
-                    _this._translateScale(yScale, _this._constrainedTranslation(yScale, translateAmountY));
+                    yScale.magnify(magnifyAmount, centerY);
+                    yScale.translate(_this._constrainedTranslation(yScale, translateAmountY));
                 });
             };
             PanZoom._centerPoint = function (point1, point2) {
@@ -11465,15 +11554,6 @@ var Plottable;
                     this._zoomEndCallbacks.callCallbacks();
                 }
             };
-            PanZoom.prototype._magnifyScale = function (scale, magnifyAmount, centerValue) {
-                var _this = this;
-                var magnifyTransform = function (rangeValue) { return scale.invert(_this._zoomAt(rangeValue, magnifyAmount, centerValue)); };
-                scale.domain(scale.range().map(magnifyTransform));
-            };
-            PanZoom.prototype._translateScale = function (scale, translateAmount) {
-                var translateTransform = function (rangeValue) { return scale.invert(rangeValue + translateAmount); };
-                scale.domain(scale.range().map(translateTransform));
-            };
             PanZoom.prototype._handleWheelEvent = function (p, e) {
                 var _this = this;
                 var translatedP = this._translateToComponentSpace(p);
@@ -11493,12 +11573,8 @@ var Plottable;
                         centerY_1 = constrained.centerPoint;
                         zoomAmount_1 = constrained.zoomAmount;
                     });
-                    this.xScales().forEach(function (xScale) {
-                        _this._magnifyScale(xScale, zoomAmount_1, centerX_1);
-                    });
-                    this.yScales().forEach(function (yScale) {
-                        _this._magnifyScale(yScale, zoomAmount_1, centerY_1);
-                    });
+                    this.xScales().forEach(function (xScale) { return xScale.magnify(zoomAmount_1, centerX_1); });
+                    this.yScales().forEach(function (yScale) { return yScale.magnify(zoomAmount_1, centerY_1); });
                     this._zoomEndCallbacks.callCallbacks();
                 }
             };
@@ -11512,8 +11588,8 @@ var Plottable;
                 if (boundingDomainExtent == null) {
                     return zoomAmount;
                 }
-                var scaleDomain = scale.domain();
-                var domainExtent = Math.abs(scaleDomain[1] - scaleDomain[0]);
+                var _a = scale.getTransformationDomain(), scaleDomainMin = _a[0], scaleDomainMax = _a[1];
+                var domainExtent = Math.abs(scaleDomainMax - scaleDomainMin);
                 var compareF = extentIncreasing ? Math.min : Math.max;
                 return compareF(zoomAmount, boundingDomainExtent / domainExtent);
             };
@@ -11528,12 +11604,12 @@ var Plottable;
                 if (minDomain == null && maxDomain == null) {
                     return { centerPoint: centerPoint, zoomAmount: zoomAmount };
                 }
-                var _a = scale.domain(), scaleDomainMin = _a[0], scaleDomainMax = _a[1];
+                var _a = scale.getTransformationDomain(), scaleDomainMin = _a[0], scaleDomainMax = _a[1];
                 if (maxDomain != null) {
                     // compute max range point if zoom applied
-                    var maxRange = scale.scale(maxDomain);
-                    var currentMaxRange = scale.scale(scaleDomainMax);
-                    var testMaxRange = this._zoomAt(currentMaxRange, zoomAmount, centerPoint);
+                    var maxRange = scale.scaleTransformation(maxDomain);
+                    var currentMaxRange = scale.scaleTransformation(scaleDomainMax);
+                    var testMaxRange = zoomAt(currentMaxRange, zoomAmount, centerPoint);
                     // move the center point to prevent max overflow, if necessary
                     if (testMaxRange > maxRange) {
                         centerPoint = this._getZoomCenterForTarget(currentMaxRange, zoomAmount, maxRange);
@@ -11541,9 +11617,9 @@ var Plottable;
                 }
                 if (minDomain != null) {
                     // compute min range point if zoom applied
-                    var minRange = scale.scale(minDomain);
-                    var currentMinRange = scale.scale(scaleDomainMin);
-                    var testMinRange = this._zoomAt(currentMinRange, zoomAmount, centerPoint);
+                    var minRange = scale.scaleTransformation(minDomain);
+                    var currentMinRange = scale.scaleTransformation(scaleDomainMin);
+                    var testMinRange = zoomAt(currentMinRange, zoomAmount, centerPoint);
                     // move the center point to prevent min overflow, if necessary
                     if (testMinRange < minRange) {
                         centerPoint = this._getZoomCenterForTarget(currentMinRange, zoomAmount, minRange);
@@ -11551,12 +11627,12 @@ var Plottable;
                 }
                 // add fallback to prevent overflowing both min and max
                 if (maxDomain != null && maxDomain != null) {
-                    var maxRange = scale.scale(maxDomain);
-                    var currentMaxRange = scale.scale(scaleDomainMax);
-                    var testMaxRange = this._zoomAt(currentMaxRange, zoomAmount, centerPoint);
-                    var minRange = scale.scale(minDomain);
-                    var currentMinRange = scale.scale(scaleDomainMin);
-                    var testMinRange = this._zoomAt(currentMinRange, zoomAmount, centerPoint);
+                    var maxRange = scale.scaleTransformation(maxDomain);
+                    var currentMaxRange = scale.scaleTransformation(scaleDomainMax);
+                    var testMaxRange = zoomAt(currentMaxRange, zoomAmount, centerPoint);
+                    var minRange = scale.scaleTransformation(minDomain);
+                    var currentMinRange = scale.scaleTransformation(scaleDomainMin);
+                    var testMinRange = zoomAt(currentMinRange, zoomAmount, centerPoint);
                     // If we overflow both, use some algebra to solve for centerPoint and
                     // zoomAmount that will make the domain match the min/max exactly.
                     // Algebra brought to you by Wolfram Alpha.
@@ -11576,15 +11652,8 @@ var Plottable;
                 return { centerPoint: centerPoint, zoomAmount: zoomAmount };
             };
             /**
-             * Performs a zoom transformation of the `value` argument scaled by the
-             * `zoom` argument about the point defined by the `center` argument.
-             */
-            PanZoom.prototype._zoomAt = function (value, zoom, center) {
-                return center - (center - value) * zoom;
-            };
-            /**
-             * Returns the `center` value to be used with `_zoomAt` that will produce
-             * the `target` value given the same `value` and `zoom` arguments. Algebra
+             * Returns the `center` value to be used with `zoomAt` that will produce the
+             * `target` value given the same `value` and `zoom` arguments. Algebra
              * brought to you by Wolfram Alpha.
              */
             PanZoom.prototype._getZoomCenterForTarget = function (value, zoom, target) {
@@ -11600,13 +11669,9 @@ var Plottable;
                         return;
                     }
                     var translateAmountX = (lastDragPoint == null ? startPoint.x : lastDragPoint.x) - endPoint.x;
-                    _this.xScales().forEach(function (xScale) {
-                        _this._translateScale(xScale, _this._constrainedTranslation(xScale, translateAmountX));
-                    });
+                    _this.xScales().forEach(function (xScale) { return xScale.translate(_this._constrainedTranslation(xScale, translateAmountX)); });
                     var translateAmountY = (lastDragPoint == null ? startPoint.y : lastDragPoint.y) - endPoint.y;
-                    _this.yScales().forEach(function (yScale) {
-                        _this._translateScale(yScale, _this._constrainedTranslation(yScale, translateAmountY));
-                    });
+                    _this.yScales().forEach(function (yScale) { return yScale.translate(_this._constrainedTranslation(yScale, translateAmountY)); });
                     lastDragPoint = endPoint;
                 });
                 this._dragInteraction.onDragEnd(function () { return _this._panEndCallbacks.callCallbacks(); });
@@ -11616,20 +11681,20 @@ var Plottable;
              * constraints.
              */
             PanZoom.prototype._constrainedTranslation = function (scale, translation) {
-                var _a = scale.domain(), scaleDomainMin = _a[0], scaleDomainMax = _a[1];
+                var _a = scale.getTransformationDomain(), scaleDomainMin = _a[0], scaleDomainMax = _a[1];
                 if (translation > 0) {
                     var bound = this.maxDomainValue(scale);
                     if (bound != null) {
-                        var currentMaxRange = scale.scale(scaleDomainMax);
-                        var maxRange = scale.scale(bound);
+                        var currentMaxRange = scale.scaleTransformation(scaleDomainMax);
+                        var maxRange = scale.scaleTransformation(bound);
                         translation = Math.min(currentMaxRange + translation, maxRange) - currentMaxRange;
                     }
                 }
                 else {
                     var bound = this.minDomainValue(scale);
                     if (bound != null) {
-                        var currentMinRange = scale.scale(scaleDomainMin);
-                        var minRange = scale.scale(bound);
+                        var currentMinRange = scale.scaleTransformation(scaleDomainMin);
+                        var minRange = scale.scaleTransformation(bound);
                         translation = Math.max(currentMinRange + translation, minRange) - currentMinRange;
                     }
                 }
@@ -11672,7 +11737,7 @@ var Plottable;
             /**
              * Adds an x scale to this PanZoom Interaction
              *
-             * @param {QuantitativeScale<any>} An x scale to add
+             * @param {TransformableScale} An x scale to add
              * @returns {Interactions.PanZoom} The calling PanZoom Interaction.
              */
             PanZoom.prototype.addXScale = function (xScale) {
@@ -11682,7 +11747,7 @@ var Plottable;
             /**
              * Removes an x scale from this PanZoom Interaction
              *
-             * @param {QuantitativeScale<any>} An x scale to remove
+             * @param {TransformableScale} An x scale to remove
              * @returns {Interactions.PanZoom} The calling PanZoom Interaction.
              */
             PanZoom.prototype.removeXScale = function (xScale) {
@@ -11696,7 +11761,7 @@ var Plottable;
             /**
              * Adds a y scale to this PanZoom Interaction
              *
-             * @param {QuantitativeScale<any>} A y scale to add
+             * @param {TransformableScale} A y scale to add
              * @returns {Interactions.PanZoom} The calling PanZoom Interaction.
              */
             PanZoom.prototype.addYScale = function (yScale) {
@@ -11706,7 +11771,7 @@ var Plottable;
             /**
              * Removes a y scale from this PanZoom Interaction
              *
-             * @param {QuantitativeScale<any>} A y scale to remove
+             * @param {TransformableScale} A y scale to remove
              * @returns {Interactions.PanZoom} The calling PanZoom Interaction.
              */
             PanZoom.prototype.removeYScale = function (yScale) {
@@ -11717,60 +11782,60 @@ var Plottable;
                 this._maxDomainValues.delete(yScale);
                 return this;
             };
-            PanZoom.prototype.minDomainExtent = function (quantitativeScale, minDomainExtent) {
+            PanZoom.prototype.minDomainExtent = function (scale, minDomainExtent) {
                 if (minDomainExtent == null) {
-                    return this._minDomainExtents.get(quantitativeScale);
+                    return this._minDomainExtents.get(scale);
                 }
                 if (minDomainExtent.valueOf() < 0) {
                     throw new Error("extent must be non-negative");
                 }
-                var maxExtentForScale = this.maxDomainExtent(quantitativeScale);
+                var maxExtentForScale = this.maxDomainExtent(scale);
                 if (maxExtentForScale != null && maxExtentForScale.valueOf() < minDomainExtent.valueOf()) {
                     throw new Error("minDomainExtent must be smaller than maxDomainExtent for the same Scale");
                 }
-                if (this._nonLinearScaleWithExtents(quantitativeScale)) {
+                if (this._nonLinearScaleWithExtents(scale)) {
                     Plottable.Utils.Window.warn("Panning and zooming with extents on a nonlinear scale may have unintended behavior.");
                 }
-                this._minDomainExtents.set(quantitativeScale, minDomainExtent);
+                this._minDomainExtents.set(scale, minDomainExtent);
                 return this;
             };
-            PanZoom.prototype.maxDomainExtent = function (quantitativeScale, maxDomainExtent) {
+            PanZoom.prototype.maxDomainExtent = function (scale, maxDomainExtent) {
                 if (maxDomainExtent == null) {
-                    return this._maxDomainExtents.get(quantitativeScale);
+                    return this._maxDomainExtents.get(scale);
                 }
                 if (maxDomainExtent.valueOf() <= 0) {
                     throw new Error("extent must be positive");
                 }
-                var minExtentForScale = this.minDomainExtent(quantitativeScale);
+                var minExtentForScale = this.minDomainExtent(scale);
                 if (minExtentForScale != null && maxDomainExtent.valueOf() < minExtentForScale.valueOf()) {
                     throw new Error("maxDomainExtent must be larger than minDomainExtent for the same Scale");
                 }
-                if (this._nonLinearScaleWithExtents(quantitativeScale)) {
+                if (this._nonLinearScaleWithExtents(scale)) {
                     Plottable.Utils.Window.warn("Panning and zooming with extents on a nonlinear scale may have unintended behavior.");
                 }
-                this._maxDomainExtents.set(quantitativeScale, maxDomainExtent);
+                this._maxDomainExtents.set(scale, maxDomainExtent);
                 return this;
             };
-            PanZoom.prototype.minDomainValue = function (quantitativeScale, minDomainValue) {
+            PanZoom.prototype.minDomainValue = function (scale, minDomainValue) {
                 if (minDomainValue == null) {
-                    return this._minDomainValues.get(quantitativeScale);
+                    return this._minDomainValues.get(scale);
                 }
-                var maxValueForScale = this.maxDomainValue(quantitativeScale);
+                var maxValueForScale = this.maxDomainValue(scale);
                 if (maxValueForScale != null && maxValueForScale.valueOf() <= minDomainValue.valueOf()) {
                     throw new Error("minDomainValue must be smaller than maxDomainValue for the same Scale");
                 }
-                this._minDomainValues.set(quantitativeScale, minDomainValue);
+                this._minDomainValues.set(scale, minDomainValue);
                 return this;
             };
-            PanZoom.prototype.maxDomainValue = function (quantitativeScale, maxDomainValue) {
+            PanZoom.prototype.maxDomainValue = function (scale, maxDomainValue) {
                 if (maxDomainValue == null) {
-                    return this._maxDomainValues.get(quantitativeScale);
+                    return this._maxDomainValues.get(scale);
                 }
-                var minValueForScale = this.minDomainValue(quantitativeScale);
-                if (minValueForScale != null && maxDomainValue.valueOf() <= minValueForScale.valueOf()) {
+                var minValueForScale = this.minDomainValue(scale);
+                if (minValueForScale != null && maxDomainValue <= minValueForScale) {
                     throw new Error("maxDomainValue must be larger than minDomainValue for the same Scale");
                 }
-                this._maxDomainValues.set(quantitativeScale, maxDomainValue);
+                this._maxDomainValues.set(scale, maxDomainValue);
                 return this;
             };
             /**
@@ -11783,7 +11848,7 @@ var Plottable;
             PanZoom.prototype.setMinMaxDomainValuesTo = function (scale) {
                 this._minDomainValues.delete(scale);
                 this._maxDomainValues.delete(scale);
-                var _a = scale.domain(), domainMin = _a[0], domainMax = _a[1];
+                var _a = scale.getTransformationDomain(), domainMin = _a[0], domainMax = _a[1];
                 this.minDomainValue(scale, domainMin);
                 this.maxDomainValue(scale, domainMax);
             };

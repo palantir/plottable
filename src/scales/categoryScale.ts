@@ -1,5 +1,24 @@
 namespace Plottable.Scales {
-  export class Category extends Scale<string, number> {
+  const TRANSFORMATION_SPACE = [0, 1] as [number, number];
+
+  export class Category extends Scale<string, number> implements Plottable.Interactions.TransformableScale {
+    /**
+     * An additional linear scale to apply pan/zoom interactions to the category
+     * scale. Pan/zoom requires a numerically invertable scale.
+     *
+     * This adds an intermediate coordinate space called the *Transformation
+     * Space*. The conversion from data to screen coordinates is as follows:
+     *
+     * Data Space -> _d3Scale -> Transformation Space -> _d3TransformationScale -> Screen Space.
+     *
+     * The *Transformation Space* coordinates are initialized to [0, 1].
+     *
+     * Notably, range band calculations are internally computed in
+     * *Transformation Space* and transformed to screen space in methods like
+     * `rangeBand()` and `stepWidth()`.
+     */
+    private _d3TransformationScale: d3.scale.Linear<number, number>;
+
     private _d3Scale: d3.scale.Ordinal<string, number>;
     private _range = [0, 1];
 
@@ -14,6 +33,11 @@ namespace Plottable.Scales {
     constructor() {
       super();
       this._d3Scale = d3.scale.ordinal<string, number>();
+      this._d3Scale.range(TRANSFORMATION_SPACE);
+
+      this._d3TransformationScale = d3.scale.linear<number, number>();
+      this._d3TransformationScale.domain(TRANSFORMATION_SPACE);
+
       let d3InnerPadding = 0.3;
       this._innerPadding = Category._convertToPlottableInnerPadding(d3InnerPadding);
       this._outerPadding = Category._convertToPlottableOuterPadding(0.5, d3InnerPadding);
@@ -50,7 +74,7 @@ namespace Plottable.Scales {
     private _setBands() {
       let d3InnerPadding = 1 - 1 / (1 + this.innerPadding());
       let d3OuterPadding = this.outerPadding() / (1 + this.innerPadding());
-      this._d3Scale.rangeBands(<[number, number]>this._range, d3InnerPadding, d3OuterPadding);
+      this._d3Scale.rangeBands(TRANSFORMATION_SPACE, d3InnerPadding, d3OuterPadding);
     }
 
     /**
@@ -59,7 +83,7 @@ namespace Plottable.Scales {
      * @returns {number} The range band width
      */
     public rangeBand(): number {
-      return this._d3Scale.rangeBand();
+      return this._rescaleBand(this._d3Scale.rangeBand());
     }
 
     /**
@@ -70,7 +94,7 @@ namespace Plottable.Scales {
      * @returns {number}
      */
     public stepWidth(): number {
-      return this.rangeBand() * (1 + this.innerPadding());
+      return this._rescaleBand(this._d3Scale.rangeBand() * (1 + this.innerPadding()));
     }
 
     /**
@@ -130,8 +154,34 @@ namespace Plottable.Scales {
     }
 
     public scale(value: string): number {
-      // scale it to the middle
-      return this._d3Scale(value) + this.rangeBand() / 2;
+      // Determine the middle of the range band for the value
+      let untransformed = this._d3Scale(value) + this._d3Scale.rangeBand() / 2;
+      // Convert to screen space
+      return this._d3TransformationScale(untransformed);
+    }
+
+    public magnify(magnifyAmount: number, centerValue: number) {
+      let magnifyTransform = (rangeValue: number) => {
+        return this._d3TransformationScale.invert(Interactions.zoomAt(rangeValue, magnifyAmount, centerValue));
+      };
+      this._d3TransformationScale.domain(this._d3TransformationScale.range().map(magnifyTransform));
+      this._dispatchUpdate();
+    }
+
+    public translate(translateAmount: number){
+      let translateTransform = (rangeValue: number) => {
+        return this._d3TransformationScale.invert(rangeValue + translateAmount);
+      }
+      this._d3TransformationScale.domain(this._d3TransformationScale.range().map(translateTransform));
+      this._dispatchUpdate();
+    }
+
+    public scaleTransformation(value: number) {
+      return this._d3TransformationScale(value);
+    }
+
+    public getTransformationDomain() {
+      return this._d3TransformationScale.domain() as [number, number];
     }
 
     protected _getDomain() {
@@ -156,7 +206,15 @@ namespace Plottable.Scales {
 
     protected _setRange(values: number[]) {
       this._range = values;
+      this._d3TransformationScale.range(values);
       this._setBands();
+    }
+
+    /**
+     * Converts a width or height in *Transformation Space* into *Screen Space*.
+     */
+    protected _rescaleBand(band: number) {
+      return Math.abs(this._d3TransformationScale(band) - this._d3TransformationScale(0));
     }
   }
 }

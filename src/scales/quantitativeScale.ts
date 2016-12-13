@@ -1,5 +1,6 @@
 namespace Plottable {
-export class QuantitativeScale<D> extends Scale<D, number> {
+
+export class QuantitativeScale<D> extends Scale<D, number> implements Interactions.TransformableScale {
   protected static _DEFAULT_NUM_TICKS = 10;
   private _tickGenerator: Scales.TickGenerators.TickGenerator<D> = (scale: Plottable.QuantitativeScale<D>) => scale.defaultTicks();
   private _padProportion = 0.05;
@@ -254,6 +255,24 @@ export class QuantitativeScale<D> extends Scale<D, number> {
     } else {
       return extent;
     }
+  }
+
+  public magnify(magnifyAmount: number, centerValue: number) {
+    let magnifyTransform = (rangeValue: number) => this.invert(Interactions.zoomAt(rangeValue, magnifyAmount, centerValue));
+    this.domain(this.range().map(magnifyTransform));
+  }
+
+  public translate(translateAmount: number){
+    let translateTransform = (rangeValue: number) => this.invert(rangeValue + translateAmount);
+    this.domain(this.range().map(translateTransform));
+  }
+
+  public scaleTransformation(value: number): number {
+    throw new Error("Subclasses should override scaleTransformation");
+  }
+
+  public getTransformationDomain(): [number, number] {
+    throw new Error("Subclasses should override getTransformationDomain");
   }
 
   protected _setDomain(values: D[]) {
