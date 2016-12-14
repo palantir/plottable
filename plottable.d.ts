@@ -1915,6 +1915,17 @@ declare namespace Plottable {
          * @returns {Axis} The calling Axis.
          */
         showEndTickLabels(show: boolean): this;
+        protected _showAllTickMarks(): void;
+        protected _showAllTickLabels(): void;
+        /**
+         * Responsible for hiding any tick labels that break out of the bounding
+         * container.
+         */
+        protected _hideOverflowingTickLabels(): void;
+        /**
+         * Hides the Tick Marks which have no corresponding Tick Labels
+         */
+        protected _hideTickMarksWithoutLabel(): void;
     }
 }
 declare namespace Plottable {
@@ -2057,11 +2068,6 @@ declare namespace Plottable.Axes {
         protected _getTickValues(): number[];
         protected _rescale(): void;
         renderImmediately(): this;
-        private _showAllTickMarks();
-        /**
-         * Hides the Tick Marks which have no corresponding Tick Labels
-         */
-        private _hideTickMarksWithoutLabel();
         /**
          * Gets the tick label position relative to the tick marks.
          *
@@ -2093,7 +2099,6 @@ declare namespace Plottable.Axes {
          */
         usesTextWidthApproximation(enable: boolean): this;
         private _hideEndTickLabels();
-        private _hideOverflowingTickLabels();
         private _hideOverlappingTickLabels();
         /**
          * The method is responsible for evenly spacing the labels on the axis.

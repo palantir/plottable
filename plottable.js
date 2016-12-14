@@ -4138,6 +4138,53 @@ var Plottable;
             this.render();
             return this;
         };
+        Axis.prototype._showAllTickMarks = function () {
+            this._tickMarkContainer.selectAll("." + Axis.TICK_MARK_CLASS)
+                .each(function () {
+                d3.select(this).style("visibility", "inherit");
+            });
+        };
+        Axis.prototype._showAllTickLabels = function () {
+            this._tickLabelContainer.selectAll("." + Axis.TICK_LABEL_CLASS)
+                .each(function () {
+                d3.select(this).style("visibility", "inherit");
+            });
+        };
+        /**
+         * Responsible for hiding any tick labels that break out of the bounding
+         * container.
+         */
+        Axis.prototype._hideOverflowingTickLabels = function () {
+            var boundingBox = this._boundingBox.node().getBoundingClientRect();
+            var tickLabels = this._tickLabelContainer.selectAll("." + Axis.TICK_LABEL_CLASS);
+            if (tickLabels.empty()) {
+                return;
+            }
+            tickLabels.each(function (d, i) {
+                if (!Plottable.Utils.DOM.clientRectInside(this.getBoundingClientRect(), boundingBox)) {
+                    d3.select(this).style("visibility", "hidden");
+                }
+            });
+        };
+        /**
+         * Hides the Tick Marks which have no corresponding Tick Labels
+         */
+        Axis.prototype._hideTickMarksWithoutLabel = function () {
+            var visibleTickMarks = this._tickMarkContainer.selectAll("." + Axis.TICK_MARK_CLASS);
+            var visibleTickLabels = this._tickLabelContainer
+                .selectAll("." + Axis.TICK_LABEL_CLASS)
+                .filter(function (d, i) {
+                var visibility = d3.select(this).style("visibility");
+                return (visibility === "inherit") || (visibility === "visible");
+            });
+            var labelNumbersShown = [];
+            visibleTickLabels.each(function (labelNumber) { return labelNumbersShown.push(labelNumber); });
+            visibleTickMarks.each(function (e, i) {
+                if (labelNumbersShown.indexOf(e) === -1) {
+                    d3.select(this).style("visibility", "hidden");
+                }
+            });
+        };
         /**
          * The css class applied to each end tick mark (the line on the end tick).
          */
@@ -4834,31 +4881,6 @@ var Plottable;
                 }
                 return this;
             };
-            Numeric.prototype._showAllTickMarks = function () {
-                this._tickMarkContainer.selectAll("." + Plottable.Axis.TICK_MARK_CLASS)
-                    .each(function () {
-                    d3.select(this).style("visibility", "inherit");
-                });
-            };
-            /**
-             * Hides the Tick Marks which have no corresponding Tick Labels
-             */
-            Numeric.prototype._hideTickMarksWithoutLabel = function () {
-                var visibleTickMarks = this._tickMarkContainer.selectAll("." + Plottable.Axis.TICK_MARK_CLASS);
-                var visibleTickLabels = this._tickLabelContainer
-                    .selectAll("." + Plottable.Axis.TICK_LABEL_CLASS)
-                    .filter(function (d, i) {
-                    var visibility = d3.select(this).style("visibility");
-                    return (visibility === "inherit") || (visibility === "visible");
-                });
-                var labelNumbersShown = [];
-                visibleTickLabels.each(function (labelNumber) { return labelNumbersShown.push(labelNumber); });
-                visibleTickMarks.each(function (e, i) {
-                    if (labelNumbersShown.indexOf(e) === -1) {
-                        d3.select(this).style("visibility", "hidden");
-                    }
-                });
-            };
             Numeric.prototype.tickLabelPosition = function (position) {
                 if (position == null) {
                     return this._tickLabelPositioning;
@@ -4903,19 +4925,6 @@ var Plottable;
                 if (!Plottable.Utils.DOM.clientRectInside(lastTickLabel.getBoundingClientRect(), boundingBox)) {
                     d3.select(lastTickLabel).style("visibility", "hidden");
                 }
-            };
-            // Responsible for hiding any tick labels that break out of the bounding container
-            Numeric.prototype._hideOverflowingTickLabels = function () {
-                var boundingBox = this._boundingBox.node().getBoundingClientRect();
-                var tickLabels = this._tickLabelContainer.selectAll("." + Plottable.Axis.TICK_LABEL_CLASS);
-                if (tickLabels.empty()) {
-                    return;
-                }
-                tickLabels.each(function (d, i) {
-                    if (!Plottable.Utils.DOM.clientRectInside(this.getBoundingClientRect(), boundingBox)) {
-                        d3.select(this).style("visibility", "hidden");
-                    }
-                });
             };
             Numeric.prototype._hideOverlappingTickLabels = function () {
                 var visibleTickLabels = this._tickLabelContainer
@@ -5244,6 +5253,11 @@ var Plottable;
                 var xTranslate = this.orientation() === "right" ? this._tickSpaceRequired() : 0;
                 var yTranslate = this.orientation() === "bottom" ? this._tickSpaceRequired() : 0;
                 Plottable.Utils.DOM.translate(this._tickLabelContainer, xTranslate, yTranslate);
+                // hide ticks and labels that overflow the axis
+                this._showAllTickMarks();
+                this._showAllTickLabels();
+                this._hideOverflowingTickLabels();
+                this._hideTickMarksWithoutLabel();
                 return this;
             };
             Category.prototype.computeLayout = function (origin, availableWidth, availableHeight) {
