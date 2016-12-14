@@ -199,6 +199,60 @@ describe("Plots", () => {
         linePlot.renderTo(svg);
       });
 
+      afterEach(() => {
+        svg.remove();
+      });
+
+      it("can retrieve entities in a certain range", () => {
+        linePlot.addDataset(dataset2);
+
+        const entities = linePlot.entitiesIn({
+            min: xScale.scale(0),
+            max: xScale.scale(0),
+          }, {
+            min: yScale.scale(1),
+            max: yScale.scale(0),
+          });
+
+        assert.lengthOf(entities, 2, "only two Entities have been retrieved");
+        assert.deepEqual(entities[0].datum, { x: 0, y: 0.75 }, "correct datum has been retrieved");
+        assert.deepEqual(entities[1].datum, { x: 0, y: 1 }, "correct datum has been retrieved");
+      });
+
+      it("can retrieve Entities in a certain bounds", () => {
+        linePlot.addDataset(dataset2);
+
+        const entities = linePlot.entitiesIn({
+          topLeft: {
+            x: xScale.scale(0),
+            y: yScale.scale(1),
+          },
+          bottomRight: {
+            x: xScale.scale(0),
+            y: yScale.scale(0),
+          },
+        });
+
+        assert.lengthOf(entities, 2, "only two Entities have been retrieved");
+        assert.deepEqual(entities[0].datum, { x: 0, y: 0.75 }, "correct datum has been retrieved");
+        assert.deepEqual(entities[1].datum, { x: 0, y: 1 }, "correct datum has been retrieved");
+      });
+
+      it("doesn't return entities outside of the bounds", () => {
+        const entities = linePlot.entitiesIn({
+          topLeft: {
+            x: xScale.scale(0.01),
+            y: yScale.scale(1),
+          },
+          bottomRight: {
+            x: xScale.scale(0.01),
+            y: yScale.scale(0),
+          },
+        });
+
+        assert.lengthOf(entities, 0, "no entities have been retrieved");
+      });
+
       it("retrieves all dataset selections with no args", () => {
         linePlot.addDataset(dataset2);
         let allLines = linePlot.selections();
@@ -213,8 +267,6 @@ describe("Plots", () => {
         assert.strictEqual(allLines.size(), 1, "all lines retrieved");
         let selectionData = allLines.data()[0];
         assert.deepEqual(selectionData, dataset.data(), "third dataset data in selection data");
-
-        svg.remove();
       });
 
       it("skips invalid Dataset", () => {
@@ -224,8 +276,6 @@ describe("Plots", () => {
         assert.strictEqual(allLines.size(), 1, "all lines retrieved");
         let selectionData = allLines.data()[0];
         assert.deepEqual(selectionData, dataset.data(), "third dataset data in selection data");
-
-        svg.remove();
       });
 
       it("can retrieve the nearest Entity", () => {
@@ -245,8 +295,6 @@ describe("Plots", () => {
 
         closest = linePlot.entityNearest({x: px - 1, y: py});
         assert.strictEqual(closest.datum, data[1], "it retrieves the closest point from the left");
-
-        svg.remove();
       });
 
       it("considers only in-view points for the nearest Entity", () => {
@@ -254,15 +302,12 @@ describe("Plots", () => {
 
         let closest = linePlot.entityNearest({ x: xScale.scale(data[0].x), y: yScale.scale(data[0].y) });
         assert.strictEqual(closest.datum, data[1], "it retrieves the closest point in-view");
-
-        svg.remove();
       });
 
       it("returns undefined if no Entities are visible", () => {
         dataset.data([]);
         let closest = linePlot.entityNearest({ x: 0, y: 0 });
         assert.isUndefined(closest, "returns undefined if no Entity can be found");
-        svg.remove();
       });
     });
 
