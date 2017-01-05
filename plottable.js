@@ -1381,6 +1381,23 @@ var Plottable;
 })(Plottable || (Plottable = {}));
 var Plottable;
 (function (Plottable) {
+    var Scales;
+    (function (Scales) {
+        /**
+         * Type guarded function to check if the scale implements the
+         * `TransformableScale` interface. Unfortunately, there is no way to do
+         * runtime interface typechecking, so we have to explicitly list all classes
+         * that implement the interface.
+         */
+        function isTransformable(scale) {
+            return (scale instanceof Plottable.QuantitativeScale ||
+                scale instanceof Plottable.Scales.Category);
+        }
+        Scales.isTransformable = isTransformable;
+    })(Scales = Plottable.Scales || (Plottable.Scales = {}));
+})(Plottable || (Plottable = {}));
+var Plottable;
+(function (Plottable) {
     var Scale = (function () {
         /**
          * A Scale is a function (in the mathematical sense) that maps values from a domain to a range.
@@ -11412,17 +11429,6 @@ var Plottable;
             return center - (center - value) * zoom;
         }
         Interactions.zoomAt = zoomAt;
-        /**
-         * Type guarded function to check if the scale implements the
-         * `TransformableScale` interface. Unfortunately, there is no way to do
-         * runtime interface typechecking, so we have to explicitly list all classes
-         * that implement the interface.
-         */
-        function isTransformable(scale) {
-            return (scale instanceof Plottable.QuantitativeScale ||
-                scale instanceof Plottable.Scales.Category);
-        }
-        Interactions.isTransformable = isTransformable;
         var PanZoom = (function (_super) {
             __extends(PanZoom, _super);
             /**

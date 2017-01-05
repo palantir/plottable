@@ -664,6 +664,50 @@ declare namespace Plottable.Scales {
     interface PaddingExceptionsProvider<D> {
         (scale: QuantitativeScale<D>): D[];
     }
+    /**
+     * This interface abstracts the necessary API for implementing pan/zoom on
+     * various types of scales.
+     *
+     * Due to some limitations of d3, for example category scales can't invert
+     * screen space coordinates, we nevertheless allow the scale types to support
+     * pan/zoom if they implement this interface. See `Category`'s
+     * `_d3TransformationScale` for more info.
+     */
+    interface TransformableScale {
+        /**
+         * Apply the magnification with the floating point `magnifyAmount` centered
+         * at the `centerValue` coordinate.
+         *
+         * @param {number} [magnifyAmount] The floating point zoom amount. `1.0` is
+         * no zoom change.
+         * @param {number} [centerValue] The coordinate of the mouse in screen
+         * space.
+         */
+        magnify(magnifyAmount: number, centerValue: number): void;
+        /**
+         * Translates the scale by a number of pixels.
+         *
+         * @param {number} [translateAmount] The translation amount in screen space
+         */
+        translate(translateAmount: number): void;
+        /**
+         * Returns value in *screen space* for the given domain value.
+         */
+        scaleTransformation(value: number): number;
+        /**
+         * Returns the current transformed domain of the scale. This must be a
+         * numerical range in the same coordinate space used for
+         * `scaleTransformation`.
+         */
+        getTransformationDomain(): [number, number];
+    }
+    /**
+     * Type guarded function to check if the scale implements the
+     * `TransformableScale` interface. Unfortunately, there is no way to do
+     * runtime interface typechecking, so we have to explicitly list all classes
+     * that implement the interface.
+     */
+    function isTransformable(scale: any): scale is TransformableScale;
 }
 declare namespace Plottable {
     interface ScaleCallback<S extends Scale<any, any>> {
@@ -767,7 +811,7 @@ declare namespace Plottable {
     }
 }
 declare namespace Plottable {
-    class QuantitativeScale<D> extends Scale<D, number> implements Interactions.TransformableScale {
+    class QuantitativeScale<D> extends Scale<D, number> implements Plottable.Scales.TransformableScale {
         protected static _DEFAULT_NUM_TICKS: number;
         private _tickGenerator;
         private _padProportion;
@@ -999,7 +1043,7 @@ declare namespace Plottable.Scales {
     }
 }
 declare namespace Plottable.Scales {
-    class Category extends Scale<string, number> implements Plottable.Interactions.TransformableScale {
+    class Category extends Scale<string, number> implements Plottable.Scales.TransformableScale {
         /**
          * An additional linear scale to apply pan/zoom interactions to the category
          * scale. Pan/zoom requires a numerically invertable scale.
@@ -4681,50 +4725,7 @@ declare namespace Plottable.Interactions {
      * `zoom` argument about the point defined by the `center` argument.
      */
     function zoomAt(value: number, zoom: number, center: number): number;
-    /**
-     * Type guarded function to check if the scale implements the
-     * `TransformableScale` interface. Unfortunately, there is no way to do
-     * runtime interface typechecking, so we have to explicitly list all classes
-     * that implement the interface.
-     */
-    function isTransformable(scale: any): scale is TransformableScale;
-    /**
-     * This interface abstracts the necessary API for implementing pan/zoom on
-     * various types of scales.
-     *
-     * Due to some limitations of d3, for example category scales can't invert
-     * screen space coordinates, we nevertheless allow the scale types to support
-     * pan/zoom if they implement this interface. See `Category`'s
-     * `_d3TransformationScale` for more info.
-     */
-    interface TransformableScale {
-        /**
-         * Apply the magnification with the floating point `magnifyAmount` centered
-         * at the `centerValue` coordinate.
-         *
-         * @param {number} [magnifyAmount] The floating point zoom amount. `1.0` is
-         * no zoom change.
-         * @param {number} [centerValue] The coordinate of the mouse in screen
-         * space.
-         */
-        magnify(magnifyAmount: number, centerValue: number): void;
-        /**
-         * Translates the scale by a number of pixels.
-         *
-         * @param {number} [translateAmount] The translation amount in screen space
-         */
-        translate(translateAmount: number): void;
-        /**
-         * Returns value in *screen space* for the given domain value.
-         */
-        scaleTransformation(value: number): number;
-        /**
-         * Returns the current transformed domain of the scale. This must be a
-         * numerical range in the same coordinate space used for
-         * `scaleTransformation`.
-         */
-        getTransformationDomain(): [number, number];
-    }
+    type TransformableScale = Plottable.Scales.TransformableScale;
     class PanZoom extends Interaction {
         /**
          * The number of pixels occupied in a line.

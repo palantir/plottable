@@ -1,6 +1,6 @@
 namespace Plottable {
 
-export class QuantitativeScale<D> extends Scale<D, number> implements Interactions.TransformableScale {
+export class QuantitativeScale<D> extends Scale<D, number> implements Plottable.Scales.TransformableScale {
   protected static _DEFAULT_NUM_TICKS = 10;
   private _tickGenerator: Scales.TickGenerators.TickGenerator<D> = (scale: Plottable.QuantitativeScale<D>) => scale.defaultTicks();
   private _padProportion = 0.05;

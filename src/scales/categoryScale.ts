@@ -1,7 +1,7 @@
 namespace Plottable.Scales {
   const TRANSFORMATION_SPACE = [0, 1] as [number, number];
 
-  export class Category extends Scale<string, number> implements Plottable.Interactions.TransformableScale {
+  export class Category extends Scale<string, number> implements Plottable.Scales.TransformableScale {
     /**
      * An additional linear scale to apply pan/zoom interactions to the category
      * scale. Pan/zoom requires a numerically invertable scale.
