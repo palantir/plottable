@@ -3662,6 +3662,21 @@ declare namespace Plottable.Plots {
         };
         entitiesAt(point: Point): PlotEntity[];
         /**
+         * Gets the Entities that intersect the Bounds.
+         *
+         * @param {Bounds} bounds
+         * @returns {PlotEntity[]}
+         */
+        entitiesIn(bounds: Bounds): PlotEntity[];
+        /**
+         * Gets the Entities that intersect the area defined by the ranges.
+         *
+         * @param {Range} xRange
+         * @param {Range} yRange
+         * @returns {PlotEntity[]}
+         */
+        entitiesIn(xRange: Range, yRange: Range): PlotEntity[];
+        /**
          * Returns the PlotEntity nearest to the query point by X then by Y, or undefined if no PlotEntity can be found.
          *
          * @param {Point} queryPoint
