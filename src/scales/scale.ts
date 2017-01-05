@@ -21,6 +21,58 @@ namespace Plottable.Scales {
   export interface PaddingExceptionsProvider<D> {
     (scale: QuantitativeScale<D>): D[];
   }
+
+  /**
+   * This interface abstracts the necessary API for implementing pan/zoom on
+   * various types of scales.
+   *
+   * Due to some limitations of d3, for example category scales can't invert
+   * screen space coordinates, we nevertheless allow the scale types to support
+   * pan/zoom if they implement this interface. See `Category`'s
+   * `_d3TransformationScale` for more info.
+   */
+  export interface TransformableScale {
+    /**
+     * Apply the magnification with the floating point `magnifyAmount` centered
+     * at the `centerValue` coordinate.
+     *
+     * @param {number} [magnifyAmount] The floating point zoom amount. `1.0` is
+     * no zoom change.
+     * @param {number} [centerValue] The coordinate of the mouse in screen
+     * space.
+     */
+    magnify(magnifyAmount: number, centerValue: number): void;
+
+    /**
+     * Translates the scale by a number of pixels.
+     *
+     * @param {number} [translateAmount] The translation amount in screen space
+     */
+    translate(translateAmount: number): void;
+
+    /**
+     * Returns value in *screen space* for the given domain value.
+     */
+    scaleTransformation(value: number): number;
+
+    /**
+     * Returns the current transformed domain of the scale. This must be a
+     * numerical range in the same coordinate space used for
+     * `scaleTransformation`.
+     */
+    getTransformationDomain(): [number, number];
+  }
+
+  /**
+   * Type guarded function to check if the scale implements the
+   * `TransformableScale` interface. Unfortunately, there is no way to do
+   * runtime interface typechecking, so we have to explicitly list all classes
+   * that implement the interface.
+   */
+  export function isTransformable(scale: any): scale is TransformableScale {
+    return (scale instanceof Plottable.QuantitativeScale ||
+      scale instanceof Plottable.Scales.Category);
+  }
 }
 
 namespace Plottable {
