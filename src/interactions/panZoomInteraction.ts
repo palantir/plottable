@@ -11,7 +11,7 @@ namespace Plottable.Interactions {
     return center - (center - value) * zoom;
   }
 
-  export type TransformableScale = Plottable.Scales.TransformableScale;
+  export type TransformableScale = Plottable.Scale<any, number> & Plottable.Scales.TransformableScale;
 
   export class PanZoom extends Interaction {
     /**
@@ -67,6 +67,49 @@ namespace Plottable.Interactions {
       if (yScale != null) {
         this.addYScale(yScale);
       }
+    }
+
+    /**
+     * Pans the chart by a specified amount
+     *
+     * @param {Plottable.Point} [translateAmount] The amount by which to translate the x and y scales.
+     */
+    public pan(translateAmount: Plottable.Point) {
+      this.xScales().forEach((xScale) => {
+        xScale.pan(this._constrainedTranslation(xScale, translateAmount.x));
+      });
+
+      this.yScales().forEach((yScale) => {
+        yScale.pan(this._constrainedTranslation(yScale, translateAmount.y));
+      });
+    }
+    /**
+     * Zooms the chart by a specified amount around a specific point
+     *
+     * @param {number} [maginfyAmount] The percentage by which to zoom the x and y scale.
+     * A value of 0.9 zooms in by 10%. A value of 1.1 zooms out by 10%. A value of 1 has
+     * no effect.
+     * @param {Plottable.Point} [centerValue] The center in pixels around which to zoom.
+     * By default, `centerValue` is the center of the x and y range of each scale.
+     */
+    public zoom(zoomAmount: number, centerValue?: Plottable.Point) {
+      this.xScales().forEach((xScale) => {
+        const range = xScale.range();
+        const xCenter = centerValue === undefined
+          ? (range[1] - range[0]) / 2
+          : centerValue.x;
+
+        xScale.zoom(zoomAmount, xCenter);
+      });
+
+      this.yScales().forEach((yScale) => {
+        const range = yScale.range();
+        const yCenter = centerValue === undefined
+          ? (range[1] - range[0]) / 2
+          : centerValue.y;
+
+        yScale.zoom(zoomAmount, yCenter);
+      });
     }
 
     protected _anchor(component: Component) {
@@ -141,7 +184,7 @@ namespace Plottable.Interactions {
         return { x: (point.x - oldPoints[i].x) / magnifyAmount, y: (point.y - oldPoints[i].y) / magnifyAmount };
       });
 
-      let oldCenterPoint = PanZoom._centerPoint(oldPoints[0], oldPoints[1]);
+      let oldCenterPoint = PanZoom.centerPoint(oldPoints[0], oldPoints[1]);
       let centerX = oldCenterPoint.x;
       let centerY = oldCenterPoint.y;
 
@@ -164,20 +207,16 @@ namespace Plottable.Interactions {
         };
       });
 
-      let translateAmountX = centerX - ((constrainedPoints[0].x + constrainedPoints[1].x) / 2);
-      this.xScales().forEach((xScale) => {
-        xScale.magnify(magnifyAmount, centerX);
-        xScale.translate(this._constrainedTranslation(xScale, translateAmountX));
-      });
+      const translateAmount = {
+        x: centerX - ((constrainedPoints[0].x + constrainedPoints[1].x) / 2),
+        y: centerY - ((constrainedPoints[0].y + constrainedPoints[1].y) / 2)
+      };
 
-      let translateAmountY = centerY - ((constrainedPoints[0].y + constrainedPoints[1].y) / 2);
-      this.yScales().forEach((yScale) => {
-        yScale.magnify(magnifyAmount, centerY);
-        yScale.translate(this._constrainedTranslation(yScale, translateAmountY));
-      });
+      this.zoom(magnifyAmount, { x: centerX, y: centerY });
+      this.pan(translateAmount);
     }
 
-    private static _centerPoint(point1: Point, point2: Point) {
+    public static centerPoint(point1: Point, point2: Point) {
       let leftX = Math.min(point1.x, point2.x);
       let rightX = Math.max(point1.x, point2.x);
       let topY = Math.min(point1.y, point2.y);
@@ -227,9 +266,7 @@ namespace Plottable.Interactions {
           zoomAmount = constrained.zoomAmount;
         });
 
-        this.xScales().forEach((xScale) => xScale.magnify(zoomAmount, centerX));
-        this.yScales().forEach((yScale) => yScale.magnify(zoomAmount, centerY));
-
+        this.zoom(zoomAmount, { x: centerX, y: centerY });
         this._zoomEndCallbacks.callCallbacks();
       }
     }
@@ -339,11 +376,11 @@ namespace Plottable.Interactions {
           return;
         }
 
-        let translateAmountX = (lastDragPoint == null ? startPoint.x : lastDragPoint.x) - endPoint.x;
-        this.xScales().forEach((xScale) => xScale.translate(this._constrainedTranslation(xScale, translateAmountX)));
-
-        let translateAmountY = (lastDragPoint == null ? startPoint.y : lastDragPoint.y) - endPoint.y;
-        this.yScales().forEach((yScale) => yScale.translate(this._constrainedTranslation(yScale, translateAmountY)));
+        const translateAmount = {
+          x: (lastDragPoint == null ? startPoint.x : lastDragPoint.x) - endPoint.x,
+          y: (lastDragPoint == null ? startPoint.y : lastDragPoint.y) - endPoint.y
+        };
+        this.pan(translateAmount);
 
         lastDragPoint = endPoint;
       });

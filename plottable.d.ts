@@ -682,13 +682,13 @@ declare namespace Plottable.Scales {
          * @param {number} [centerValue] The coordinate of the mouse in screen
          * space.
          */
-        magnify(magnifyAmount: number, centerValue: number): void;
+        zoom(magnifyAmount: number, centerValue: number): void;
         /**
          * Translates the scale by a number of pixels.
          *
          * @param {number} [translateAmount] The translation amount in screen space
          */
-        translate(translateAmount: number): void;
+        pan(translateAmount: number): void;
         /**
          * Returns value in *screen space* for the given domain value.
          */
@@ -901,8 +901,8 @@ declare namespace Plottable {
          */
         domainMax(domainMax: D): this;
         extentOfValues(values: D[]): D[];
-        magnify(magnifyAmount: number, centerValue: number): void;
-        translate(translateAmount: number): void;
+        zoom(magnifyAmount: number, centerValue: number): void;
+        pan(translateAmount: number): void;
         scaleTransformation(value: number): number;
         getTransformationDomain(): [number, number];
         protected _setDomain(values: D[]): void;
@@ -1129,8 +1129,8 @@ declare namespace Plottable.Scales {
          */
         outerPadding(outerPadding: number): this;
         scale(value: string): number;
-        magnify(magnifyAmount: number, centerValue: number): void;
-        translate(translateAmount: number): void;
+        zoom(magnifyAmount: number, centerValue: number): void;
+        pan(translateAmount: number): void;
         scaleTransformation(value: number): number;
         getTransformationDomain(): [number, number];
         protected _getDomain(): string[];
@@ -4739,7 +4739,7 @@ declare namespace Plottable.Interactions {
      * `zoom` argument about the point defined by the `center` argument.
      */
     function zoomAt(value: number, zoom: number, center: number): number;
-    type TransformableScale = Plottable.Scales.TransformableScale;
+    type TransformableScale = Plottable.Scale<any, number> & Plottable.Scales.TransformableScale;
     class PanZoom extends Interaction {
         /**
          * The number of pixels occupied in a line.
@@ -4771,11 +4771,30 @@ declare namespace Plottable.Interactions {
          * @param {TransformableScale} [yScale] The y-scale to update on panning/zooming.
          */
         constructor(xScale?: TransformableScale, yScale?: TransformableScale);
+        /**
+         * Pans the chart by a specified amount
+         *
+         * @param {Plottable.Point} [translateAmount] The amount by which to translate the x and y scales.
+         */
+        pan(translateAmount: Plottable.Point): void;
+        /**
+         * Zooms the chart by a specified amount around a specific point
+         *
+         * @param {number} [maginfyAmount] The percentage by which to zoom the x and y scale.
+         * A value of 0.9 zooms in by 10%. A value of 1.1 zooms out by 10%. A value of 1 has
+         * no effect.
+         * @param {Plottable.Point} [centerValue] The center in pixels around which to zoom.
+         * By default, `centerValue` is the center of the x and y range of each scale.
+         */
+        zoom(zoomAmount: number, centerValue?: Plottable.Point): void;
         protected _anchor(component: Component): void;
         protected _unanchor(): void;
         private _handleTouchStart(ids, idToPoint, e);
         private _handlePinch(ids, idToPoint, e);
-        private static _centerPoint(point1, point2);
+        static centerPoint(point1: Point, point2: Point): {
+            x: number;
+            y: number;
+        };
         private static _pointDistance(point1, point2);
         private _handleTouchEnd(ids, idToPoint, e);
         private _handleWheelEvent(p, e);

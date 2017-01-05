@@ -1730,12 +1730,12 @@ var Plottable;
                 return extent;
             }
         };
-        QuantitativeScale.prototype.magnify = function (magnifyAmount, centerValue) {
+        QuantitativeScale.prototype.zoom = function (magnifyAmount, centerValue) {
             var _this = this;
             var magnifyTransform = function (rangeValue) { return _this.invert(Plottable.Interactions.zoomAt(rangeValue, magnifyAmount, centerValue)); };
             this.domain(this.range().map(magnifyTransform));
         };
-        QuantitativeScale.prototype.translate = function (translateAmount) {
+        QuantitativeScale.prototype.pan = function (translateAmount) {
             var _this = this;
             var translateTransform = function (rangeValue) { return _this.invert(rangeValue + translateAmount); };
             this.domain(this.range().map(translateTransform));
@@ -2149,7 +2149,7 @@ var Plottable;
                 // Convert to screen space
                 return this._d3TransformationScale(untransformed);
             };
-            Category.prototype.magnify = function (magnifyAmount, centerValue) {
+            Category.prototype.zoom = function (magnifyAmount, centerValue) {
                 var _this = this;
                 var magnifyTransform = function (rangeValue) {
                     return _this._d3TransformationScale.invert(Plottable.Interactions.zoomAt(rangeValue, magnifyAmount, centerValue));
@@ -2157,7 +2157,7 @@ var Plottable;
                 this._d3TransformationScale.domain(this._d3TransformationScale.range().map(magnifyTransform));
                 this._dispatchUpdate();
             };
-            Category.prototype.translate = function (translateAmount) {
+            Category.prototype.pan = function (translateAmount) {
                 var _this = this;
                 var translateTransform = function (rangeValue) {
                     return _this._d3TransformationScale.invert(rangeValue + translateAmount);
@@ -11486,6 +11486,45 @@ var Plottable;
                     this.addYScale(yScale);
                 }
             }
+            /**
+             * Pans the chart by a specified amount
+             *
+             * @param {Plottable.Point} [translateAmount] The amount by which to translate the x and y scales.
+             */
+            PanZoom.prototype.pan = function (translateAmount) {
+                var _this = this;
+                this.xScales().forEach(function (xScale) {
+                    xScale.pan(_this._constrainedTranslation(xScale, translateAmount.x));
+                });
+                this.yScales().forEach(function (yScale) {
+                    yScale.pan(_this._constrainedTranslation(yScale, translateAmount.y));
+                });
+            };
+            /**
+             * Zooms the chart by a specified amount around a specific point
+             *
+             * @param {number} [maginfyAmount] The percentage by which to zoom the x and y scale.
+             * A value of 0.9 zooms in by 10%. A value of 1.1 zooms out by 10%. A value of 1 has
+             * no effect.
+             * @param {Plottable.Point} [centerValue] The center in pixels around which to zoom.
+             * By default, `centerValue` is the center of the x and y range of each scale.
+             */
+            PanZoom.prototype.zoom = function (zoomAmount, centerValue) {
+                this.xScales().forEach(function (xScale) {
+                    var range = xScale.range();
+                    var xCenter = centerValue === undefined
+                        ? (range[1] - range[0]) / 2
+                        : centerValue.x;
+                    xScale.zoom(zoomAmount, xCenter);
+                });
+                this.yScales().forEach(function (yScale) {
+                    var range = yScale.range();
+                    var yCenter = centerValue === undefined
+                        ? (range[1] - range[0]) / 2
+                        : centerValue.y;
+                    yScale.zoom(zoomAmount, yCenter);
+                });
+            };
             PanZoom.prototype._anchor = function (component) {
                 _super.prototype._anchor.call(this, component);
                 this._dragInteraction.attachTo(component);
@@ -11542,7 +11581,7 @@ var Plottable;
                 var normalizedPointDiffs = points.map(function (point, i) {
                     return { x: (point.x - oldPoints[i].x) / magnifyAmount, y: (point.y - oldPoints[i].y) / magnifyAmount };
                 });
-                var oldCenterPoint = PanZoom._centerPoint(oldPoints[0], oldPoints[1]);
+                var oldCenterPoint = PanZoom.centerPoint(oldPoints[0], oldPoints[1]);
                 var centerX = oldCenterPoint.x;
                 var centerY = oldCenterPoint.y;
                 this.xScales().forEach(function (xScale) {
@@ -11561,18 +11600,14 @@ var Plottable;
                         y: normalizedPointDiffs[i].y * magnifyAmount + oldPoint.y,
                     };
                 });
-                var translateAmountX = centerX - ((constrainedPoints[0].x + constrainedPoints[1].x) / 2);
-                this.xScales().forEach(function (xScale) {
-                    xScale.magnify(magnifyAmount, centerX);
-                    xScale.translate(_this._constrainedTranslation(xScale, translateAmountX));
-                });
-                var translateAmountY = centerY - ((constrainedPoints[0].y + constrainedPoints[1].y) / 2);
-                this.yScales().forEach(function (yScale) {
-                    yScale.magnify(magnifyAmount, centerY);
-                    yScale.translate(_this._constrainedTranslation(yScale, translateAmountY));
-                });
+                var translateAmount = {
+                    x: centerX - ((constrainedPoints[0].x + constrainedPoints[1].x) / 2),
+                    y: centerY - ((constrainedPoints[0].y + constrainedPoints[1].y) / 2)
+                };
+                this.zoom(magnifyAmount, { x: centerX, y: centerY });
+                this.pan(translateAmount);
             };
-            PanZoom._centerPoint = function (point1, point2) {
+            PanZoom.centerPoint = function (point1, point2) {
                 var leftX = Math.min(point1.x, point2.x);
                 var rightX = Math.max(point1.x, point2.x);
                 var topY = Math.min(point1.y, point2.y);
@@ -11614,8 +11649,7 @@ var Plottable;
                         centerY_1 = constrained.centerPoint;
                         zoomAmount_1 = constrained.zoomAmount;
                     });
-                    this.xScales().forEach(function (xScale) { return xScale.magnify(zoomAmount_1, centerX_1); });
-                    this.yScales().forEach(function (yScale) { return yScale.magnify(zoomAmount_1, centerY_1); });
+                    this.zoom(zoomAmount_1, { x: centerX_1, y: centerY_1 });
                     this._zoomEndCallbacks.callCallbacks();
                 }
             };
@@ -11709,10 +11743,11 @@ var Plottable;
                     if (_this._touchIds.size() >= 2) {
                         return;
                     }
-                    var translateAmountX = (lastDragPoint == null ? startPoint.x : lastDragPoint.x) - endPoint.x;
-                    _this.xScales().forEach(function (xScale) { return xScale.translate(_this._constrainedTranslation(xScale, translateAmountX)); });
-                    var translateAmountY = (lastDragPoint == null ? startPoint.y : lastDragPoint.y) - endPoint.y;
-                    _this.yScales().forEach(function (yScale) { return yScale.translate(_this._constrainedTranslation(yScale, translateAmountY)); });
+                    var translateAmount = {
+                        x: (lastDragPoint == null ? startPoint.x : lastDragPoint.x) - endPoint.x,
+                        y: (lastDragPoint == null ? startPoint.y : lastDragPoint.y) - endPoint.y
+                    };
+                    _this.pan(translateAmount);
                     lastDragPoint = endPoint;
                 });
                 this._dragInteraction.onDragEnd(function () { return _this._panEndCallbacks.callCallbacks(); });

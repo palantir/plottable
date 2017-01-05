@@ -41,14 +41,14 @@ namespace Plottable.Scales {
      * @param {number} [centerValue] The coordinate of the mouse in screen
      * space.
      */
-    magnify(magnifyAmount: number, centerValue: number): void;
+    zoom(magnifyAmount: number, centerValue: number): void;
 
     /**
      * Translates the scale by a number of pixels.
      *
      * @param {number} [translateAmount] The translation amount in screen space
      */
-    translate(translateAmount: number): void;
+    pan(translateAmount: number): void;
 
     /**
      * Returns value in *screen space* for the given domain value.

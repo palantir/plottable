@@ -160,7 +160,7 @@ namespace Plottable.Scales {
       return this._d3TransformationScale(untransformed);
     }
 
-    public magnify(magnifyAmount: number, centerValue: number) {
+    public zoom(magnifyAmount: number, centerValue: number) {
       let magnifyTransform = (rangeValue: number) => {
         return this._d3TransformationScale.invert(Interactions.zoomAt(rangeValue, magnifyAmount, centerValue));
       };
@@ -168,7 +168,7 @@ namespace Plottable.Scales {
       this._dispatchUpdate();
     }
 
-    public translate(translateAmount: number){
+    public pan(translateAmount: number){
       let translateTransform = (rangeValue: number) => {
         return this._d3TransformationScale.invert(rangeValue + translateAmount);
       }
