@@ -257,12 +257,12 @@ export class QuantitativeScale<D> extends Scale<D, number> implements Plottable.
     }
   }
 
-  public magnify(magnifyAmount: number, centerValue: number) {
+  public zoom(magnifyAmount: number, centerValue: number) {
     let magnifyTransform = (rangeValue: number) => this.invert(Interactions.zoomAt(rangeValue, magnifyAmount, centerValue));
     this.domain(this.range().map(magnifyTransform));
   }
 
-  public translate(translateAmount: number){
+  public pan(translateAmount: number){
     let translateTransform = (rangeValue: number) => this.invert(rangeValue + translateAmount);
     this.domain(this.range().map(translateTransform));
   }

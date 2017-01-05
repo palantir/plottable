@@ -1730,12 +1730,12 @@ var Plottable;
                 return extent;
             }
         };
-        QuantitativeScale.prototype.magnify = function (magnifyAmount, centerValue) {
+        QuantitativeScale.prototype.zoom = function (magnifyAmount, centerValue) {
             var _this = this;
             var magnifyTransform = function (rangeValue) { return _this.invert(Plottable.Interactions.zoomAt(rangeValue, magnifyAmount, centerValue)); };
             this.domain(this.range().map(magnifyTransform));
         };
-        QuantitativeScale.prototype.translate = function (translateAmount) {
+        QuantitativeScale.prototype.pan = function (translateAmount) {
             var _this = this;
             var translateTransform = function (rangeValue) { return _this.invert(rangeValue + translateAmount); };
             this.domain(this.range().map(translateTransform));
@@ -2149,7 +2149,7 @@ var Plottable;
                 // Convert to screen space
                 return this._d3TransformationScale(untransformed);
             };
-            Category.prototype.magnify = function (magnifyAmount, centerValue) {
+            Category.prototype.zoom = function (magnifyAmount, centerValue) {
                 var _this = this;
                 var magnifyTransform = function (rangeValue) {
                     return _this._d3TransformationScale.invert(Plottable.Interactions.zoomAt(rangeValue, magnifyAmount, centerValue));
@@ -2157,7 +2157,7 @@ var Plottable;
                 this._d3TransformationScale.domain(this._d3TransformationScale.range().map(magnifyTransform));
                 this._dispatchUpdate();
             };
-            Category.prototype.translate = function (translateAmount) {
+            Category.prototype.pan = function (translateAmount) {
                 var _this = this;
                 var translateTransform = function (rangeValue) {
                     return _this._d3TransformationScale.invert(rangeValue + translateAmount);
@@ -11494,10 +11494,10 @@ var Plottable;
             PanZoom.prototype.pan = function (translateAmount) {
                 var _this = this;
                 this.xScales().forEach(function (xScale) {
-                    xScale.translate(_this._constrainedTranslation(xScale, translateAmount.x));
+                    xScale.pan(_this._constrainedTranslation(xScale, translateAmount.x));
                 });
                 this.yScales().forEach(function (yScale) {
-                    yScale.translate(_this._constrainedTranslation(yScale, translateAmount.y));
+                    yScale.pan(_this._constrainedTranslation(yScale, translateAmount.y));
                 });
             };
             /**
@@ -11515,14 +11515,14 @@ var Plottable;
                     var xCenter = centerValue === undefined
                         ? (range[1] - range[0]) / 2
                         : centerValue.x;
-                    xScale.magnify(zoomAmount, xCenter);
+                    xScale.zoom(zoomAmount, xCenter);
                 });
                 this.yScales().forEach(function (yScale) {
                     var range = yScale.range();
                     var yCenter = centerValue === undefined
                         ? (range[1] - range[0]) / 2
                         : centerValue.y;
-                    yScale.magnify(zoomAmount, yCenter);
+                    yScale.zoom(zoomAmount, yCenter);
                 });
             };
             PanZoom.prototype._anchor = function (component) {

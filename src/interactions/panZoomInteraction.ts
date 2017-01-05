@@ -76,11 +76,11 @@ namespace Plottable.Interactions {
      */
     public pan(translateAmount: Plottable.Point) {
       this.xScales().forEach((xScale) => {
-        xScale.translate(this._constrainedTranslation(xScale, translateAmount.x));
+        xScale.pan(this._constrainedTranslation(xScale, translateAmount.x));
       });
 
       this.yScales().forEach((yScale) => {
-        yScale.translate(this._constrainedTranslation(yScale, translateAmount.y));
+        yScale.pan(this._constrainedTranslation(yScale, translateAmount.y));
       });
     }
     /**
@@ -99,7 +99,7 @@ namespace Plottable.Interactions {
           ? (range[1] - range[0]) / 2
           : centerValue.x;
 
-        xScale.magnify(zoomAmount, xCenter);
+        xScale.zoom(zoomAmount, xCenter);
       });
 
       this.yScales().forEach((yScale) => {
@@ -108,7 +108,7 @@ namespace Plottable.Interactions {
           ? (range[1] - range[0]) / 2
           : centerValue.y;
 
-        yScale.magnify(zoomAmount, yCenter);
+        yScale.zoom(zoomAmount, yCenter);
       });
     }
 
