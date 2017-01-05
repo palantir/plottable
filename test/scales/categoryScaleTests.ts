@@ -25,7 +25,7 @@ describe("Scales", () => {
 
         scale.domain(["1", "2", "3", "4"]);
         let widthSum = scale.rangeBand() * (1 + scale.innerPadding());
-        assert.strictEqual(scale.stepWidth(), widthSum, "step width is the sum of innerPadding width and band width");
+        assert.closeTo(scale.stepWidth(), widthSum, 1e-5, "step width is the sum of innerPadding width and band width");
       });
 
       it("interacts well with BarPlot and data swapping", () => {

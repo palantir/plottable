@@ -88,6 +88,14 @@ namespace Plottable.Scales {
       return this._invertedAdjustedLog(this._d3Scale.invert(x));
     }
 
+    public scaleTransformation(value: number) {
+      return this.scale(value);
+    }
+
+    public getTransformationDomain() {
+      return this.domain() as [number, number];
+    }
+
     protected _getDomain() {
       return this._untransformedDomain;
     }

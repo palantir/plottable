@@ -56,6 +56,15 @@ namespace Plottable.Scales {
       return this._d3Scale(value);
     }
 
+    public scaleTransformation(value: number) {
+      return this.scale(new Date(value));
+    }
+
+    public getTransformationDomain() {
+      let dates = this.domain();
+      return [dates[0].valueOf(), dates[1].valueOf()] as [number, number];
+    }
+
     protected _getDomain() {
       return this._backingScaleDomain();
     }

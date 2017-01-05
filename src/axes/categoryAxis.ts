@@ -300,6 +300,12 @@ namespace Plottable.Axes {
       let xTranslate = this.orientation() === "right" ? this._tickSpaceRequired() : 0;
       let yTranslate = this.orientation() === "bottom" ? this._tickSpaceRequired() : 0;
       Utils.DOM.translate(this._tickLabelContainer, xTranslate, yTranslate);
+
+      // hide ticks and labels that overflow the axis
+      this._showAllTickMarks();
+      this._showAllTickLabels();
+      this._hideOverflowingTickLabels();
+      this._hideTickMarksWithoutLabel();
       return this;
     }
 
