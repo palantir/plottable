@@ -11356,6 +11356,46 @@ var Plottable;
                     this.addYScale(yScale);
                 }
             }
+            /**
+             * Pans the chart by a specified amount
+             *
+             * @param {Plottable.Point} [translateAmount] The amount by which to translate the x and y scales.
+             */
+            PanZoom.prototype.pan = function (translateAmount) {
+                var _this = this;
+                this.xScales().forEach(function (xScale) {
+                    _this._translateScale(xScale, _this._constrainedTranslation(xScale, translateAmount.x));
+                });
+                this.yScales().forEach(function (yScale) {
+                    _this._translateScale(yScale, _this._constrainedTranslation(yScale, translateAmount.y));
+                });
+            };
+            /**
+             * Zooms the chart by a specified amount around a specific point
+             *
+             * @param {number} [maginfyAmount] The percentage by which to zoom the x and y scale.
+             * A value of 0.9 zooms in by 10%. A value of 1.1 zooms out by 10%. A value of 1 has
+             * no effect.
+             * @param {Plottable.Point} [centerValue] The center in pixels around which to zoom.
+             * By default, `centerValue` is the center of the x and y range of each scale.
+             */
+            PanZoom.prototype.zoom = function (magnifyAmount, centerValue) {
+                var _this = this;
+                this.xScales().forEach(function (xScale) {
+                    var range = xScale.range();
+                    var xCenter = centerValue === undefined
+                        ? (range[1] - range[0]) / 2
+                        : centerValue.x;
+                    _this._magnifyScale(xScale, magnifyAmount, xCenter);
+                });
+                this.yScales().forEach(function (yScale) {
+                    var range = yScale.range();
+                    var yCenter = centerValue === undefined
+                        ? (range[1] - range[0]) / 2
+                        : centerValue.y;
+                    _this._magnifyScale(yScale, magnifyAmount, yCenter);
+                });
+            };
             PanZoom.prototype._anchor = function (component) {
                 _super.prototype._anchor.call(this, component);
                 this._dragInteraction.attachTo(component);
@@ -11412,7 +11452,7 @@ var Plottable;
                 var normalizedPointDiffs = points.map(function (point, i) {
                     return { x: (point.x - oldPoints[i].x) / magnifyAmount, y: (point.y - oldPoints[i].y) / magnifyAmount };
                 });
-                var oldCenterPoint = PanZoom._centerPoint(oldPoints[0], oldPoints[1]);
+                var oldCenterPoint = PanZoom.centerPoint(oldPoints[0], oldPoints[1]);
                 var centerX = oldCenterPoint.x;
                 var centerY = oldCenterPoint.y;
                 this.xScales().forEach(function (xScale) {
@@ -11431,18 +11471,14 @@ var Plottable;
                         y: normalizedPointDiffs[i].y * magnifyAmount + oldPoint.y,
                     };
                 });
-                var translateAmountX = centerX - ((constrainedPoints[0].x + constrainedPoints[1].x) / 2);
-                this.xScales().forEach(function (xScale) {
-                    _this._magnifyScale(xScale, magnifyAmount, centerX);
-                    _this._translateScale(xScale, _this._constrainedTranslation(xScale, translateAmountX));
-                });
-                var translateAmountY = centerY - ((constrainedPoints[0].y + constrainedPoints[1].y) / 2);
-                this.yScales().forEach(function (yScale) {
-                    _this._magnifyScale(yScale, magnifyAmount, centerY);
-                    _this._translateScale(yScale, _this._constrainedTranslation(yScale, translateAmountY));
-                });
+                var translateAmount = {
+                    x: centerX - ((constrainedPoints[0].x + constrainedPoints[1].x) / 2),
+                    y: centerY - ((constrainedPoints[0].y + constrainedPoints[1].y) / 2)
+                };
+                this.zoom(magnifyAmount, { x: centerX, y: centerY });
+                this.pan(translateAmount);
             };
-            PanZoom._centerPoint = function (point1, point2) {
+            PanZoom.centerPoint = function (point1, point2) {
                 var leftX = Math.min(point1.x, point2.x);
                 var rightX = Math.max(point1.x, point2.x);
                 var topY = Math.min(point1.y, point2.y);
@@ -11493,12 +11529,7 @@ var Plottable;
                         centerY_1 = constrained.centerPoint;
                         zoomAmount_1 = constrained.zoomAmount;
                     });
-                    this.xScales().forEach(function (xScale) {
-                        _this._magnifyScale(xScale, zoomAmount_1, centerX_1);
-                    });
-                    this.yScales().forEach(function (yScale) {
-                        _this._magnifyScale(yScale, zoomAmount_1, centerY_1);
-                    });
+                    this.zoom(zoomAmount_1, { x: centerX_1, y: centerY_1 });
                     this._zoomEndCallbacks.callCallbacks();
                 }
             };
@@ -11599,14 +11630,11 @@ var Plottable;
                     if (_this._touchIds.size() >= 2) {
                         return;
                     }
-                    var translateAmountX = (lastDragPoint == null ? startPoint.x : lastDragPoint.x) - endPoint.x;
-                    _this.xScales().forEach(function (xScale) {
-                        _this._translateScale(xScale, _this._constrainedTranslation(xScale, translateAmountX));
-                    });
-                    var translateAmountY = (lastDragPoint == null ? startPoint.y : lastDragPoint.y) - endPoint.y;
-                    _this.yScales().forEach(function (yScale) {
-                        _this._translateScale(yScale, _this._constrainedTranslation(yScale, translateAmountY));
-                    });
+                    var translateAmount = {
+                        x: (lastDragPoint == null ? startPoint.x : lastDragPoint.x) - endPoint.x,
+                        y: (lastDragPoint == null ? startPoint.y : lastDragPoint.y) - endPoint.y
+                    };
+                    _this.pan(translateAmount);
                     lastDragPoint = endPoint;
                 });
                 this._dragInteraction.onDragEnd(function () { return _this._panEndCallbacks.callCallbacks(); });

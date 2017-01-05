@@ -4667,11 +4667,30 @@ declare namespace Plottable.Interactions {
          * @param {QuantitativeScale} [yScale] The y-scale to update on panning/zooming.
          */
         constructor(xScale?: QuantitativeScale<any>, yScale?: QuantitativeScale<any>);
+        /**
+         * Pans the chart by a specified amount
+         *
+         * @param {Plottable.Point} [translateAmount] The amount by which to translate the x and y scales.
+         */
+        pan(translateAmount: Plottable.Point): void;
+        /**
+         * Zooms the chart by a specified amount around a specific point
+         *
+         * @param {number} [maginfyAmount] The percentage by which to zoom the x and y scale.
+         * A value of 0.9 zooms in by 10%. A value of 1.1 zooms out by 10%. A value of 1 has
+         * no effect.
+         * @param {Plottable.Point} [centerValue] The center in pixels around which to zoom.
+         * By default, `centerValue` is the center of the x and y range of each scale.
+         */
+        zoom(magnifyAmount: number, centerValue?: Plottable.Point): void;
         protected _anchor(component: Component): void;
         protected _unanchor(): void;
         private _handleTouchStart(ids, idToPoint, e);
         private _handlePinch(ids, idToPoint, e);
-        private static _centerPoint(point1, point2);
+        static centerPoint(point1: Point, point2: Point): {
+            x: number;
+            y: number;
+        };
         private static _pointDistance(point1, point2);
         private _handleTouchEnd(ids, idToPoint, e);
         private _magnifyScale<D>(scale, magnifyAmount, centerValue);
