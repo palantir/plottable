@@ -1,18 +1,18 @@
-# Plottable.js [![Builds](https://api.travis-ci.org/repositories/palantir/plottable.svg?branch=master)](https://travis-ci.org/palantir/plottable)
+# Plottable [![Builds](https://api.travis-ci.org/repositories/palantir/plottable.svg?branch=master)](https://travis-ci.org/palantir/plottable)
 ============
 
 [![Join the chat at https://gitter.im/palantir/plottable](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/palantir/plottable?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 ## Overview
 
-Plottable.js is a library of chart components for creating flexible, custom charts for websites. It is built on top of [D3.js](http://d3js.org/) and provides higher-level pieces, like plots, gridlines, and axes. As such, it's easier to quickly build charts than with D3, and the charts are much
+Plottable is a library of chart components for creating flexible, custom charts for websites. It is built on top of [D3.js](http://d3js.org/) and provides higher-level pieces, like plots, gridlines, and axes. As such, it's easier to quickly build charts than with D3, and the charts are much
 more flexible than standard-template charts provided by charting libraries. You can think of Plottable as a "D3 for Charts" &mdash; it is not a charting library but rather a library of chart components. Check out examples of Plottable on our website's [examples page](http://plottablejs.org/examples/).
 
 ## Philosophy
 
 Plottable's core philosophy is "Composition over Configuration", so a lot of the API flexibility is in choosing which `Components` to use, and how to arrange them in `Tables`, rather than setting high-level properties on the charts. If you find you need a feature that doesn't exist, consider writing a new `Component` that implements the functionality. This way, you can get your custom functionality and still benefit from the rest of the library.
 
-Plottable.js is being developed by [Palantir Technologies](http://palantir.com/). It's developed in [TypeScript](http://typescriptlang.org/) and distributed in ES5 JavaScript.
+Plottable is used and developed at [Palantir Technologies](http://palantir.com/). It's developed in [TypeScript](http://typescriptlang.org/) and distributed in ES5 JavaScript.
 
 ## Quick Start
 
