@@ -11,6 +11,9 @@ export namespace Components {
     static CENTER = "center";
   }
 }
+
+export type IResizeHandler = (size: Plottable.Size) => void;
+
 export class Component {
   private _element: d3.Selection<void>;
   private _content: d3.Selection<void>;
@@ -18,6 +21,7 @@ export class Component {
   private _backgroundContainer: d3.Selection<void>;
   private _foregroundContainer: d3.Selection<void>;
   protected _clipPathEnabled = false;
+  private _resizeHandler: IResizeHandler;
   private _origin: Point = { x: 0, y: 0 }; // Origin of the coordinate space for the Component.
 
   private _parent: ComponentContainer;
@@ -203,9 +207,11 @@ export class Component {
         throw new Error("null arguments cannot be passed to computeLayout() on a non-root node");
       }
     }
+
     let size = this._sizeFromOffer(availableWidth, availableHeight);
     this._width = size.width;
     this._height = size.height;
+
     let xAlignProportion = Component._xAlignToProportion[this._xAlignment];
     let yAlignProportion = Component._yAlignToProportion[this._yAlignment];
     this._origin = {
@@ -214,10 +220,15 @@ export class Component {
     };
     this._element.attr("transform", "translate(" + this._origin.x + "," + this._origin.y + ")");
     this._boxes.forEach((b: d3.Selection<void>) => b.attr("width", this.width()).attr("height", this.height()));
+
+    if (this._resizeHandler !== undefined) {
+        this._resizeHandler(size);
+    }
+
     return this;
   }
 
-  protected _sizeFromOffer(availableWidth: number, availableHeight: number) {
+  protected _sizeFromOffer(availableWidth: number, availableHeight: number): Plottable.Size {
     let requestedSpace = this.requestedSpace(availableWidth, availableHeight);
     return {
       width: this.fixedWidth() ? Math.min(availableWidth , requestedSpace.minWidth) : availableWidth,
@@ -241,6 +252,17 @@ export class Component {
     if (this._isAnchored && this._isSetup) {
       RenderController.registerToComputeLayout(this);
     }
+  }
+
+  /**
+   * Sets a callback that gets called when the component resizes. The size change
+   * is not guaranteed to be reflected by the DOM at the time the callback is fired.
+   *
+   * @param {IResizeHandler} [resizeHandler] Callback to be called when component resizes
+   */
+  public onResize(resizeHandler: IResizeHandler) {
+    this._resizeHandler = resizeHandler;
+    return this;
   }
 
   /**

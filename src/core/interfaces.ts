@@ -64,6 +64,14 @@ export type Bounds = {
 };
 
 /**
+ * The size in pixels
+ */
+export type Size = {
+  height: number;
+  width: number;
+}
+
+/**
  * An object representing a data-backed visual entity inside a Component.
  */
 export interface Entity<C extends Component> {

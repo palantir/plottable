@@ -530,6 +530,13 @@ declare namespace Plottable {
         bottomRight: Point;
     };
     /**
+     * The size in pixels
+     */
+    type Size = {
+        height: number;
+        width: number;
+    };
+    /**
      * An object representing a data-backed visual entity inside a Component.
      */
     interface Entity<C extends Component> {
@@ -1415,6 +1422,7 @@ declare namespace Plottable {
             static CENTER: string;
         }
     }
+    type IResizeHandler = (size: Plottable.Size) => void;
     class Component {
         private _element;
         private _content;
@@ -1422,6 +1430,7 @@ declare namespace Plottable {
         private _backgroundContainer;
         private _foregroundContainer;
         protected _clipPathEnabled: boolean;
+        private _resizeHandler;
         private _origin;
         private _parent;
         private _xAlignment;
@@ -1491,10 +1500,7 @@ declare namespace Plottable {
          * @returns {Component} The calling Component.
          */
         computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number): this;
-        protected _sizeFromOffer(availableWidth: number, availableHeight: number): {
-            width: number;
-            height: number;
-        };
+        protected _sizeFromOffer(availableWidth: number, availableHeight: number): Plottable.Size;
         /**
          * Queues the Component for rendering.
          *
@@ -1502,6 +1508,13 @@ declare namespace Plottable {
          */
         render(): this;
         private _scheduleComputeLayout();
+        /**
+         * Sets a callback that gets called when the component resizes. The size change
+         * is not guaranteed to be reflected by the DOM at the time the callback is fired.
+         *
+         * @param {IResizeHandler} [resizeHandler] Callback to be called when component resizes
+         */
+        onResize(resizeHandler: IResizeHandler): this;
         /**
          * Renders the Component without waiting for the next frame.
          */
@@ -2070,8 +2083,8 @@ declare namespace Plottable.Axes {
          */
         private _checkTimeAxisTierConfigurationWidth(config);
         protected _sizeFromOffer(availableWidth: number, availableHeight: number): {
-            width: number;
             height: number;
+            width: number;
         };
         protected _setup(): void;
         private _setupDomElements();
