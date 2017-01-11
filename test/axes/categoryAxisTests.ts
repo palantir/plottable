@@ -76,7 +76,7 @@ describe("Category Axes", () => {
       axis.tickLabelMaxLines(2);
       axis.renderTo("svg");
 
-      const tickLabels = axis.content().select(".tick-label");
+      const tickLabels = axis.content().selectAll(".tick-label");
       assert.strictEqual(tickLabels.size(), 2, "only renders two labels");
       const [longLabel, shortLabel] = tickLabels[0];
       assert.strictEqual(d3.select(longLabel).selectAll("text").size(), 2, "first label is only two lines long");
