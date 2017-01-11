@@ -1,10 +1,17 @@
 namespace Plottable.Axes {
   export class Category extends Axis<string> {
     private _tickLabelAngle = 0;
+
     /**
      * Maximum allowable px width of tick labels.
      */
     private _tickLabelMaxWidth: number;
+
+    /**
+     * Maximum allowable number of wrapped lines for tick labels.
+     */
+    private _tickLabelMaxLines: number;
+
     private _measurer: SVGTypewriter.Measurers.CacheCharacterMeasurer;
 
     /**
@@ -13,8 +20,8 @@ namespace Plottable.Axes {
      */
     private get _wrapper() {
       const wrapper = new SVGTypewriter.Wrappers.Wrapper();
-      if (this._tickLabelMaxWidth != null) {
-        wrapper.maxLines(1);
+      if (this._tickLabelMaxLines != null) {
+        wrapper.maxLines(this._tickLabelMaxLines)
       }
       return wrapper;
     }
@@ -132,8 +139,7 @@ namespace Plottable.Axes {
     public tickLabelMaxWidth(maxWidth: number): this;
     /**
      * Set or get the tick label's max width on this axis. When set, tick labels will be truncated with ellipsis to be
-     * at most `tickLabelMaxWidth()` pixels wide, and will also never span more than one line. This ensures the axis
-     * doesn't grow to an undesirable width (or, through wrapping, grow to an undesirable height).
+     * at most `tickLabelMaxWidth()` pixels wide. This ensures the axis doesn't grow to an undesirable width.
      *
      * Passing no arguments retrieves the value, while passing a number sets the value. Pass undefined to un-set the max
      * width.
@@ -146,6 +152,29 @@ namespace Plottable.Axes {
         return this._tickLabelMaxWidth;
       }
       this._tickLabelMaxWidth = maxWidth;
+      this.redraw();
+      return this;
+    }
+
+    public tickLabelMaxLines(): number;
+    public tickLabelMaxLines(maxLines: number): this;
+
+    /**
+     * Set or get the tick label's max number of wrapped lines on this axis. By default, a Category Axis will line-wrap
+     * long tick labels onto multiple lines in order to fit the width of the axis. When set, long tick labels will be
+     * rendered on at most `tickLabelMaxLines()` lines. This ensures the axis doesn't grow to an undesirable height.
+     *
+     * Passing no arguments retrieves the value, while passing a number sets the value. Pass undefined to un-set the
+     * max lines.
+     * @param maxLines
+     * @returns {number | this}
+     */
+    public tickLabelMaxLines(maxLines?: number): number | this {
+      // allow user to un-set tickLabelMaxLines by passing in null or undefined explicitly
+      if (arguments.length === 0) {
+        return this._tickLabelMaxLines;
+      }
+      this._tickLabelMaxLines = maxLines;
       this.redraw();
       return this;
     }
