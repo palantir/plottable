@@ -2965,8 +2965,12 @@ declare namespace Plottable.Plots {
         private static _INNER_RADIUS_KEY;
         private static _OUTER_RADIUS_KEY;
         private static _SECTOR_VALUE_KEY;
+        private _startAngle;
+        private _endAngle;
         private _startAngles;
         private _endAngles;
+        private _hAlign;
+        private _vAlign;
         private _labelFormatter;
         private _labelsEnabled;
         private _strokeDrawers;
@@ -3046,6 +3050,32 @@ declare namespace Plottable.Plots {
          */
         outerRadius<R>(outerRadius: R | Accessor<R>, scale: Scale<R, number>): this;
         /**
+         * Gets the start angle of the Pie Plot
+         *
+         * @returns {number} Returns the start angle
+         */
+        startAngle(): number;
+        /**
+         * Sets the end angle of the Pie Plot.
+         *
+         * @param {number} endAngle
+         * @returns {Pie} The calling Pie Plot.
+         */
+        startAngle(angle: number): this;
+        /**
+         * Gets whether slice labels are enabled.
+         *
+         * @returns {number} Returns the end angle
+         */
+        endAngle(): number;
+        /**
+         * Sets the end angle of the Pie Plot.
+         *
+         * @param {number} endAngle
+         * @returns {Pie} The calling Pie Plot.
+         */
+        endAngle(angle: number): this;
+        /**
          * Get whether slice labels are enabled.
          *
          * @returns {boolean} Whether slices should display labels or not.
@@ -3058,6 +3088,32 @@ declare namespace Plottable.Plots {
          * @returns {Pie} The calling Pie Plot.
          */
         labelsEnabled(enabled: boolean): this;
+        /**
+          * Get whether slice labels are enabled.
+          *
+          * @returns {boolean} Whether slices should display labels or not.
+          */
+        hAlign(): string;
+        /**
+         * Sets whether labels are enabled.
+         *
+         * @param {string} hAlign
+         * @returns {Pie} The calling Pie Plot.
+         */
+        hAlign(alignment: string): this;
+        /**
+         * Get whether slice labels are enabled.
+         *
+         * @returns {boolean} Whether slices should display labels or not.
+         */
+        vAlign(): string;
+        /**
+         * Sets whether labels are enabled.
+         *
+         * @param {string} vAlign
+         * @returns {Pie} The calling Pie Plot.
+         */
+        vAlign(alignment: string): this;
         /**
          * Gets the Formatter for the labels.
          */

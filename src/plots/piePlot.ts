@@ -4,8 +4,12 @@ namespace Plottable.Plots {
     private static _INNER_RADIUS_KEY = "inner-radius";
     private static _OUTER_RADIUS_KEY = "outer-radius";
     private static _SECTOR_VALUE_KEY = "sector-value";
+    private _startAngle: number = 0;
+    private _endAngle: number = 2*Math.PI;
     private _startAngles: number[];
     private _endAngles: number[];
+    private _hAlign: string;
+    private _vAlign: string;
     private _labelFormatter: Formatter = Formatters.identity();
     private _labelsEnabled = false;
     private _strokeDrawers: Utils.Map<Dataset, Drawers.ArcOutline>;
@@ -29,8 +33,10 @@ namespace Plottable.Plots {
     }
 
     public computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number) {
-      super.computeLayout(origin, availableWidth, availableHeight);
-      this._renderArea.attr("transform", "translate(" + this.width() / 2 + "," + this.height() / 2 + ")");
+      super.computeLayout(origin, availableWidth, availableHeight);  
+      let hAlign = this.hAlign() === "left" ? 0 : (this.hAlign() === "right" ?  1 : 0.5)
+      let vAlign = this.vAlign() === "top" ? 0 : (this.vAlign() === "bottom" ?  1 : 0.5)
+      this._renderArea.attr("transform", "translate(" + this.width() * hAlign + "," + this.height() * vAlign + ")");
       let radiusLimit = Math.min(this.width(), this.height()) / 2;
       if (this.innerRadius().scale != null) {
         this.innerRadius().scale.range([0, radiusLimit]);
@@ -198,6 +204,53 @@ namespace Plottable.Plots {
       this.render();
       return this;
     }
+    /**
+     * Gets the start angle of the Pie Plot
+     *
+     * @returns {number} Returns the start angle
+     */
+    public startAngle(): number;
+    /**
+     * Sets the end angle of the Pie Plot.
+     *
+     * @param {number} endAngle
+     * @returns {Pie} The calling Pie Plot.
+     */
+    public startAngle(angle: number): this;
+    public startAngle(angle?: number): any {
+      if (angle == null) {
+        return this._startAngle;
+      } else {
+        this._startAngle = angle;
+        this._updatePieAngles();
+        this.render();
+        return this;
+      }
+    }
+
+    /**
+     * Gets whether slice labels are enabled.
+     *
+     * @returns {number} Returns the end angle
+     */
+    public endAngle(): number;
+    /**
+     * Sets the end angle of the Pie Plot.
+     *
+     * @param {number} endAngle
+     * @returns {Pie} The calling Pie Plot.
+     */
+    public endAngle(angle: number): this;
+    public endAngle(angle?: number): any {
+      if (angle == null) {
+        return this._endAngle;
+      } else {
+        this._endAngle = angle;
+        this._updatePieAngles();
+        this.render();
+        return this;
+      }
+    }
 
     /**
      * Get whether slice labels are enabled.
@@ -217,6 +270,52 @@ namespace Plottable.Plots {
         return this._labelsEnabled;
       } else {
         this._labelsEnabled = enabled;
+        this.render();
+        return this;
+      }
+    }
+
+   /**
+     * Get whether slice labels are enabled.
+     *
+     * @returns {boolean} Whether slices should display labels or not.
+     */
+    public hAlign(): string;
+    /**
+     * Sets whether labels are enabled.
+     *
+     * @param {string} hAlign
+     * @returns {Pie} The calling Pie Plot.
+     */
+    public hAlign(alignment: string): this;
+    public hAlign(alignment?: string): any {
+      if (alignment == null) {
+        return this._hAlign;
+      } else {
+        this._hAlign = alignment;
+        this.render();
+        return this;
+      }
+    }
+
+    /**
+     * Get whether slice labels are enabled.
+     *
+     * @returns {boolean} Whether slices should display labels or not.
+     */
+    public vAlign(): string;
+    /**
+     * Sets whether labels are enabled.
+     *
+     * @param {string} vAlign
+     * @returns {Pie} The calling Pie Plot.
+     */
+    public vAlign(alignment: string): this;
+    public vAlign(alignment?: string): any {
+      if (alignment == null) {
+        return this._vAlign;
+      } else {
+        this._vAlign = alignment;
         this.render();
         return this;
       }
@@ -276,8 +375,9 @@ namespace Plottable.Plots {
       let dataset = this.datasets()[0];
       let data = this._getDataToDraw().get(dataset);
       let pie = d3.layout.pie().sort(null).value((d, i) => sectorValueAccessor(d, i, dataset))(data);
-      this._startAngles = pie.map((slice) => slice.startAngle);
-      this._endAngles = pie.map((slice) => slice.endAngle);
+      let factor = (this.endAngle() - this.startAngle()) / (2 * Math.PI);
+      this._startAngles = pie.map((slice) => slice.startAngle * factor + this.startAngle());
+      this._endAngles = pie.map((slice) => slice.endAngle * factor + this.startAngle());
     }
 
     protected _getDataToDraw() {

@@ -7187,6 +7187,8 @@ var Plottable;
             function Pie() {
                 var _this = this;
                 _super.call(this);
+                this._startAngle = 0;
+                this._endAngle = 2 * Math.PI;
                 this._labelFormatter = Plottable.Formatters.identity();
                 this._labelsEnabled = false;
                 this.innerRadius(0);
@@ -7202,7 +7204,9 @@ var Plottable;
             };
             Pie.prototype.computeLayout = function (origin, availableWidth, availableHeight) {
                 _super.prototype.computeLayout.call(this, origin, availableWidth, availableHeight);
-                this._renderArea.attr("transform", "translate(" + this.width() / 2 + "," + this.height() / 2 + ")");
+                var hAlign = this.hAlign() === "left" ? 0 : (this.hAlign() === "right" ? 1 : 0.5);
+                var vAlign = this.vAlign() === "top" ? 0 : (this.vAlign() === "bottom" ? 1 : 0.5);
+                this._renderArea.attr("transform", "translate(" + this.width() * hAlign + "," + this.height() * vAlign + ")");
                 var radiusLimit = Math.min(this.width(), this.height()) / 2;
                 if (this.innerRadius().scale != null) {
                     this.innerRadius().scale.range([0, radiusLimit]);
@@ -7304,12 +7308,54 @@ var Plottable;
                 this.render();
                 return this;
             };
+            Pie.prototype.startAngle = function (angle) {
+                if (angle == null) {
+                    return this._startAngle;
+                }
+                else {
+                    this._startAngle = angle;
+                    this._updatePieAngles();
+                    this.render();
+                    return this;
+                }
+            };
+            Pie.prototype.endAngle = function (angle) {
+                if (angle == null) {
+                    return this._endAngle;
+                }
+                else {
+                    this._endAngle = angle;
+                    this._updatePieAngles();
+                    this.render();
+                    return this;
+                }
+            };
             Pie.prototype.labelsEnabled = function (enabled) {
                 if (enabled == null) {
                     return this._labelsEnabled;
                 }
                 else {
                     this._labelsEnabled = enabled;
+                    this.render();
+                    return this;
+                }
+            };
+            Pie.prototype.hAlign = function (alignment) {
+                if (alignment == null) {
+                    return this._hAlign;
+                }
+                else {
+                    this._hAlign = alignment;
+                    this.render();
+                    return this;
+                }
+            };
+            Pie.prototype.vAlign = function (alignment) {
+                if (alignment == null) {
+                    return this._vAlign;
+                }
+                else {
+                    this._vAlign = alignment;
                     this.render();
                     return this;
                 }
@@ -7350,6 +7396,7 @@ var Plottable;
                 return attrToProjector;
             };
             Pie.prototype._updatePieAngles = function () {
+                var _this = this;
                 if (this.sectorValue() == null) {
                     return;
                 }
@@ -7360,8 +7407,9 @@ var Plottable;
                 var dataset = this.datasets()[0];
                 var data = this._getDataToDraw().get(dataset);
                 var pie = d3.layout.pie().sort(null).value(function (d, i) { return sectorValueAccessor(d, i, dataset); })(data);
-                this._startAngles = pie.map(function (slice) { return slice.startAngle; });
-                this._endAngles = pie.map(function (slice) { return slice.endAngle; });
+                var factor = (this.endAngle() - this.startAngle()) / (2 * Math.PI);
+                this._startAngles = pie.map(function (slice) { return slice.startAngle * factor + _this.startAngle(); });
+                this._endAngles = pie.map(function (slice) { return slice.endAngle * factor + _this.startAngle(); });
             };
             Pie.prototype._getDataToDraw = function () {
                 var dataToDraw = _super.prototype._getDataToDraw.call(this);
