@@ -2165,6 +2165,10 @@ declare namespace Plottable.Axes {
          * Maximum allowable px width of tick labels.
          */
         private _tickLabelMaxWidth;
+        /**
+         * Maximum allowable number of wrapped lines for tick labels.
+         */
+        private _tickLabelMaxLines;
         private _measurer;
         /**
          * A Wrapper configured according to the other properties on this axis.
@@ -2216,6 +2220,8 @@ declare namespace Plottable.Axes {
         tickLabelAngle(angle: number): this;
         tickLabelMaxWidth(): number;
         tickLabelMaxWidth(maxWidth: number): this;
+        tickLabelMaxLines(): number;
+        tickLabelMaxLines(maxLines: number): this;
         /**
          * Return the space required by the ticks, padding included.
          * @returns {number}

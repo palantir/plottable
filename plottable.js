@@ -5029,8 +5029,8 @@ var Plottable;
                  */
                 get: function () {
                     var wrapper = new SVGTypewriter.Wrappers.Wrapper();
-                    if (this._tickLabelMaxWidth != null) {
-                        wrapper.maxLines(1);
+                    if (this._tickLabelMaxLines != null) {
+                        wrapper.maxLines(this._tickLabelMaxLines);
                     }
                     return wrapper;
                 },
@@ -5116,8 +5116,7 @@ var Plottable;
             };
             /**
              * Set or get the tick label's max width on this axis. When set, tick labels will be truncated with ellipsis to be
-             * at most `tickLabelMaxWidth()` pixels wide, and will also never span more than one line. This ensures the axis
-             * doesn't grow to an undesirable width (or, through wrapping, grow to an undesirable height).
+             * at most `tickLabelMaxWidth()` pixels wide. This ensures the axis doesn't grow to an undesirable width.
              *
              * Passing no arguments retrieves the value, while passing a number sets the value. Pass undefined to un-set the max
              * width.
@@ -5130,6 +5129,25 @@ var Plottable;
                     return this._tickLabelMaxWidth;
                 }
                 this._tickLabelMaxWidth = maxWidth;
+                this.redraw();
+                return this;
+            };
+            /**
+             * Set or get the tick label's max number of wrapped lines on this axis. By default, a Category Axis will line-wrap
+             * long tick labels onto multiple lines in order to fit the width of the axis. When set, long tick labels will be
+             * rendered on at most `tickLabelMaxLines()` lines. This ensures the axis doesn't grow to an undesirable height.
+             *
+             * Passing no arguments retrieves the value, while passing a number sets the value. Pass undefined to un-set the
+             * max lines.
+             * @param maxLines
+             * @returns {number | this}
+             */
+            Category.prototype.tickLabelMaxLines = function (maxLines) {
+                // allow user to un-set tickLabelMaxLines by passing in null or undefined explicitly
+                if (arguments.length === 0) {
+                    return this._tickLabelMaxLines;
+                }
+                this._tickLabelMaxLines = maxLines;
                 this.redraw();
                 return this;
             };
