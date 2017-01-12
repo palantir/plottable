@@ -60,7 +60,7 @@ describe("Category Axes", () => {
       axis.tickLabelMaxWidth(TICK_LABEL_MAX_WIDTH);
       axis.renderTo("svg");
 
-      let tickLabelContainer = axis.content().node() as SVGGElement;
+      let tickLabelContainer = axis.content().select(".tick-label-container").node() as SVGGElement;
       // add 8px padding to account for https://github.com/palantir/svg-typewriter/issues/40
       assert.isBelow(tickLabelContainer.getBBox().width, TICK_LABEL_MAX_WIDTH + 8, "tick width was capped");
 
