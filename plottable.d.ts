@@ -1,3 +1,50 @@
+declare namespace Plottable.Utils {
+    /**
+     * EntityIndex stores entities and makes them searchable.
+     * Valid entities must be positioned in Cartesian space.
+     */
+    interface EntityIndex<T extends PositionedEntity> {
+        /**
+         * Adds an entity to the store
+         * @param {T} [entity] Entity to add to the store. Entity must be positionable
+         */
+        add(entity: T): void;
+        /**
+         * Returns closest entity to a given {Point}
+         * @param {Point} [point] Point around which to search for a closest entity
+         * @param {(entity: T) => boolean} [filter] optional method that is called while
+         * searching for the entity nearest a point. If the filter returns false, the point
+         * is considered invalid and is not considered. If the filter returns true, the point
+         * is considered valid and will be considered.
+         * @returns {T} Will return the nearest entity or undefined if none are found
+         */
+        entityNearest(point: Point, filter?: (entity: T) => boolean): T;
+        /**
+         * Iterator that loops through entities and returns a transformed array
+         * @param {(value: T) => S} [callback] transformation function that is passed
+         * passed an entity {T} and returns an object {S}.
+         * @returns {S[]} The aggregate result of each call to the transformation function
+         */
+        map<S>(callback: (value: T) => S): S[];
+    }
+    interface PositionedEntity {
+        position: Point;
+    }
+    /**
+     * Array-backed implementation of {EntityIndex}
+     */
+    class EntityArray<T extends PositionedEntity> implements EntityIndex<T> {
+        private _entities;
+        constructor();
+        add(entity: T): void;
+        /**
+         * Iterates through array of of entities and computes the closest point using
+         * the standard Euclidean distance formula.
+         */
+        entityNearest(queryPoint: Point, filter?: (entity: T) => boolean): T;
+        map<S>(callback: (value: T) => S): S[];
+    }
+}
 declare namespace Plottable.Utils.Math {
     /**
      * Checks if x is between a and b.
@@ -699,6 +746,10 @@ declare namespace Plottable.Scales {
          * `scaleTransformation`.
          */
         getTransformationDomain(): [number, number];
+        /**
+         * Returns value in *Transformation Space* for the provided *screen space*.
+         */
+        invertTransformation(value: number): number;
     }
     /**
      * Type guarded function to check if the scale implements the
@@ -709,6 +760,7 @@ declare namespace Plottable.Scales {
     function isTransformable(scale: any): scale is TransformableScale;
 }
 declare namespace Plottable {
+    type TransformableScale<D, R> = Scale<D, R> & Plottable.Scales.TransformableScale;
     interface ScaleCallback<S extends Scale<any, any>> {
         (scale: S): any;
     }
@@ -904,6 +956,7 @@ declare namespace Plottable {
         zoom(magnifyAmount: number, centerValue: number): void;
         pan(translateAmount: number): void;
         scaleTransformation(value: number): number;
+        invertTransformation(value: number): number;
         getTransformationDomain(): [number, number];
         protected _setDomain(values: D[]): void;
         /**
@@ -946,6 +999,7 @@ declare namespace Plottable.Scales {
         protected _expandSingleValueDomain(singleValueDomain: number[]): number[];
         scale(value: number): number;
         scaleTransformation(value: number): number;
+        invertTransformation(value: number): number;
         getTransformationDomain(): [number, number];
         protected _getDomain(): number[];
         protected _backingScaleDomain(): number[];
@@ -1005,6 +1059,7 @@ declare namespace Plottable.Scales {
         scale(x: number): number;
         invert(x: number): number;
         scaleTransformation(value: number): number;
+        invertTransformation(value: number): number;
         getTransformationDomain(): [number, number];
         protected _getDomain(): number[];
         protected _setDomain(values: number[]): void;
@@ -1132,6 +1187,7 @@ declare namespace Plottable.Scales {
         zoom(magnifyAmount: number, centerValue: number): void;
         pan(translateAmount: number): void;
         scaleTransformation(value: number): number;
+        invertTransformation(value: number): number;
         getTransformationDomain(): [number, number];
         protected _getDomain(): string[];
         protected _backingScaleDomain(): string[];
@@ -1200,6 +1256,7 @@ declare namespace Plottable.Scales {
         protected _expandSingleValueDomain(singleValueDomain: Date[]): Date[];
         scale(value: Date): number;
         scaleTransformation(value: number): number;
+        invertTransformation(value: number): number;
         getTransformationDomain(): [number, number];
         protected _getDomain(): Date[];
         protected _backingScaleDomain(): Date[];
@@ -1611,6 +1668,12 @@ declare namespace Plottable {
          * using the appropriate method on the ComponentContainer.
          */
         parent(parent: ComponentContainer): this;
+        /**
+         * @returns {Bounds} for the component in pixel space, where the topLeft
+         * represents the component's minimum x and y values and the bottomRight represents
+         * the component's maximum x and y values.
+         */
+        bounds(): Bounds;
         /**
          * Removes a Component from the DOM and disconnects all listeners.
          */
@@ -2861,6 +2924,21 @@ declare namespace Plottable.Components {
     }
 }
 declare namespace Plottable.Plots {
+    /**
+     * Computing the selection of an entity is an expensive operation. This object aims to
+     * reproduce the behavior of the Plots.PlotEntity, excluding the selection, but including
+     * drawer and validDatumIndex, which can be used to compute the selection.
+     */
+    interface LightweightPlotEntity {
+        datum: any;
+        dataset: Dataset;
+        datasetIndex: number;
+        position: Point;
+        index: number;
+        component: Plot;
+        drawer: Plottable.Drawer;
+        validDatumIndex: number;
+    }
     interface PlotEntity extends Entity<Plot> {
         dataset: Dataset;
         datasetIndex: number;
@@ -2871,6 +2949,10 @@ declare namespace Plottable.Plots {
         accessor: Accessor<any>;
         scale?: Scale<D, R>;
     }
+    interface TransformableAccessorScaleBinding<D, R> {
+        accessor: Accessor<any>;
+        scale?: TransformableScale<D, R>;
+    }
     namespace Animator {
         var MAIN: string;
         var RESET: string;
@@ -2879,6 +2961,12 @@ declare namespace Plottable.Plots {
 declare namespace Plottable {
     class Plot extends Component {
         protected static _ANIMATION_MAX_DURATION: number;
+        /**
+         * _cachedEntityIndex is a cache of all the entities in the plot. It, at times
+         * may be undefined and shouldn't be accessed directly. Instead, use _getEntityIndex
+         * to access the entity index.
+         */
+        private _cachedEntityIndex;
         private _dataChanged;
         private _datasetToDrawer;
         protected _renderArea: d3.Selection<void>;
@@ -2995,6 +3083,12 @@ declare namespace Plottable {
         protected _getDrawersInOrder(): Drawer[];
         protected _generateDrawSteps(): Drawers.DrawStep[];
         protected _additionalPaint(time: number): void;
+        /**
+         * _buildLightweightPlotEntities constucts {LightweightPlotEntity[]} from
+         * all the entities in the plot
+         * @param {Dataset[]} [datasets] - datasets comprising this plot
+         */
+        protected _buildLightweightPlotEntities(datasets: Dataset[]): Plots.LightweightPlotEntity[];
         protected _getDataToDraw(): Utils.Map<Dataset, any[]>;
         private _paint();
         /**
@@ -3008,12 +3102,18 @@ declare namespace Plottable {
         /**
          * Gets the Entities associated with the specified Datasets.
          *
-         * @param {dataset[]} datasets The Datasets to retrieve the Entities for.
+         * @param {Dataset[]} datasets The Datasets to retrieve the Entities for.
          *   If not provided, returns defaults to all Datasets on the Plot.
          * @return {Plots.PlotEntity[]}
          */
         entities(datasets?: Dataset[]): Plots.PlotEntity[];
-        private _lightweightEntities(datasets?);
+        /**
+         * _getEntityIndex returns the index of all Entities associated with the specified dataset
+         *
+         * @param {Dataset[]} [datasets] - The datasets with which to construct the index. If no datasets
+         * are specified all datasets will be used.
+         */
+        private _getEntityIndex(datasets?);
         private _lightweightPlotEntityToPlotEntity(entity);
         /**
          * Gets the PlotEntities at a particular Point.
@@ -3028,17 +3128,39 @@ declare namespace Plottable {
          */
         entitiesAt(point: Point): Plots.PlotEntity[];
         /**
-         * Returns the PlotEntity nearest to the query point by the Euclidian norm, or undefined if no PlotEntity can be found.
+         * Returns the {Plots.PlotEntity} nearest to the query point,
+         * or undefined if no {Plots.PlotEntity} can be found.
          *
          * @param {Point} queryPoint
-         * @returns {Plots.PlotEntity} The nearest PlotEntity, or undefined if no PlotEntity can be found.
+         * @returns {Plots.PlotEntity} The nearest PlotEntity, or undefined if no {Plots.PlotEntity} can be found.
          */
         entityNearest(queryPoint: Point): Plots.PlotEntity;
-        protected _entityVisibleOnPlot(pixelPoint: Point, datum: any, index: number, dataset: Dataset): boolean;
+        protected _entityVisibleOnPlot(entity: Plots.PlotEntity | Plots.LightweightPlotEntity, chartBounds: Bounds): boolean;
         protected _uninstallScaleForKey(scale: Scale<any, any>, key: string): void;
         protected _installScaleForKey(scale: Scale<any, any>, key: string): void;
         protected _propertyProjectors(): AttributeToProjector;
         protected static _scaledAccessor<D, R>(binding: Plots.AccessorScaleBinding<D, R>): Accessor<any>;
+        /**
+         * _invertPixelPoint converts a point in pixel coordinates to a point in data coordinates
+         * @param {Point} point Representation of the point in pixel coordinates
+         * @return {Point} Returns the point represented in data coordinates
+         */
+        protected _invertPixelPoint(point: Point): Point;
+        /**
+         * Returns the bounds of the plot in the Data space ensures that the topLeft
+         * and bottomRight points represent the minima and maxima of the Data space, respectively
+         @returns {Bounds}
+         */
+        protected _invertedBounds(): {
+            topLeft: {
+                x: number;
+                y: number;
+            };
+            bottomRight: {
+                x: number;
+                y: number;
+            };
+        };
         protected _pixelPoint(datum: any, index: number, dataset: Dataset): Point;
         protected _animateOnNextRender(): boolean;
     }
@@ -3202,9 +3324,9 @@ declare namespace Plottable {
          */
         deferredRendering(deferredRendering: boolean): this;
         /**
-         * Gets the AccessorScaleBinding for X.
+         * Gets the TransformableAccessorScaleBinding for X.
          */
-        x(): Plots.AccessorScaleBinding<X, number>;
+        x(): Plots.TransformableAccessorScaleBinding<X, number>;
         /**
          * Sets X to a constant number or the result of an Accessor<number>.
          *
@@ -3224,7 +3346,7 @@ declare namespace Plottable {
         /**
          * Gets the AccessorScaleBinding for Y.
          */
-        y(): Plots.AccessorScaleBinding<Y, number>;
+        y(): Plots.TransformableAccessorScaleBinding<Y, number>;
         /**
          * Sets Y to a constant number or the result of an Accessor<number>.
          *
@@ -3274,6 +3396,7 @@ declare namespace Plottable {
         private _adjustYDomainOnChangeFromX();
         private _adjustXDomainOnChangeFromY();
         protected _projectorsReady(): boolean;
+        protected _invertPixelPoint(point: Point): Point;
         protected _pixelPoint(datum: any, index: number, dataset: Dataset): Point;
         protected _getDataToDraw(): Utils.Map<Dataset, any[]>;
     }
@@ -3306,7 +3429,7 @@ declare namespace Plottable.Plots {
         /**
          * Gets the AccessorScaleBinding for X.
          */
-        x(): AccessorScaleBinding<X, number>;
+        x(): Plots.TransformableAccessorScaleBinding<X, number>;
         /**
          * Sets X to a constant number or the result of an Accessor<number>.
          *
@@ -3326,7 +3449,7 @@ declare namespace Plottable.Plots {
         /**
          * Gets the AccessorScaleBinding for X2.
          */
-        x2(): AccessorScaleBinding<X, number>;
+        x2(): Plots.TransformableAccessorScaleBinding<X, number>;
         /**
          * Sets X2 to a constant number or the result of an Accessor.
          * If a Scale has been set for X, it will also be used to scale X2.
@@ -3338,7 +3461,7 @@ declare namespace Plottable.Plots {
         /**
          * Gets the AccessorScaleBinding for Y.
          */
-        y(): AccessorScaleBinding<Y, number>;
+        y(): Plots.TransformableAccessorScaleBinding<Y, number>;
         /**
          * Sets Y to a constant number or the result of an Accessor<number>.
          *
@@ -3358,7 +3481,7 @@ declare namespace Plottable.Plots {
         /**
          * Gets the AccessorScaleBinding for Y2.
          */
-        y2(): AccessorScaleBinding<Y, number>;
+        y2(): Plots.TransformableAccessorScaleBinding<Y, number>;
         /**
          * Sets Y2 to a constant number or the result of an Accessor.
          * If a Scale has been set for Y, it will also be used to scale Y2.
@@ -3432,6 +3555,9 @@ declare namespace Plottable.Plots {
     }
 }
 declare namespace Plottable.Plots {
+    interface LightweightScatterPlotEntity extends LightweightPlotEntity {
+        diameter: Point;
+    }
     class Scatter<X, Y> extends XYPlot<X, Y> {
         private static _SIZE_KEY;
         private static _SYMBOL_KEY;
@@ -3441,12 +3567,13 @@ declare namespace Plottable.Plots {
          * @constructor
          */
         constructor();
+        protected _buildLightweightPlotEntities(datasets: Dataset[]): LightweightScatterPlotEntity[];
         protected _createDrawer(dataset: Dataset): Drawers.Symbol;
         /**
          * Gets the AccessorScaleBinding for the size property of the plot.
          * The size property corresponds to the area of the symbol.
          */
-        size<S>(): AccessorScaleBinding<S, number>;
+        size<S>(): TransformableAccessorScaleBinding<S, number>;
         /**
          * Sets the size property to a constant number or the result of an Accessor<number>.
          *
@@ -3476,7 +3603,7 @@ declare namespace Plottable.Plots {
          */
         symbol(symbol: Accessor<SymbolFactory>): this;
         protected _generateDrawSteps(): Drawers.DrawStep[];
-        protected _entityVisibleOnPlot(pixelPoint: Point, datum: any, index: number, dataset: Dataset): boolean;
+        protected _entityVisibleOnPlot(entity: LightweightScatterPlotEntity, bounds: Bounds): boolean;
         protected _propertyProjectors(): AttributeToProjector;
         /**
          * Gets the Entities that intersect the Bounds.
@@ -3500,6 +3627,15 @@ declare namespace Plottable.Plots {
          * @returns {PlotEntity[]}
          */
         entitiesAt(p: Point): PlotEntity[];
+        /**
+         * _invertedPixelSize returns the size of the object in data space
+         * @param {Point} [point] The size of the object in pixel space. X corresponds to
+         * the width of the object, and Y corresponds to the height of the object
+         * @return {Point} Returns the size of the object in data space. X corresponds to
+         * the width of the object in data space, and Y corresponds to the height of the
+         * object in data space.
+         */
+        private _invertedPixelSize(point);
     }
 }
 declare namespace Plottable.Plots {
@@ -3529,10 +3665,10 @@ declare namespace Plottable.Plots {
          * @param {string} [orientation="vertical"] One of "vertical"/"horizontal".
          */
         constructor(orientation?: string);
-        x(): Plots.AccessorScaleBinding<X, number>;
+        x(): Plots.TransformableAccessorScaleBinding<X, number>;
         x(x: number | Accessor<number>): this;
         x(x: X | Accessor<X>, xScale: Scale<X, number>): this;
-        y(): Plots.AccessorScaleBinding<Y, number>;
+        y(): Plots.TransformableAccessorScaleBinding<Y, number>;
         y(y: number | Accessor<number>): this;
         y(y: Y | Accessor<Y>, yScale: Scale<Y, number>): this;
         /**
@@ -3602,7 +3738,7 @@ declare namespace Plottable.Plots {
          * @returns {PlotEntity} The nearest PlotEntity, or undefined if no PlotEntity can be found.
          */
         entityNearest(queryPoint: Point): PlotEntity;
-        protected _entityVisibleOnPlot(pixelPoint: Point, datum: any, index: number, dataset: Dataset): boolean;
+        protected _entityVisibleOnPlot(entity: Plots.PlotEntity, bounds: Bounds): boolean;
         /**
          * Gets the Entities at a particular Point.
          *
@@ -3665,10 +3801,10 @@ declare namespace Plottable.Plots {
          * @constructor
          */
         constructor();
-        x(): Plots.AccessorScaleBinding<X, number>;
+        x(): Plots.TransformableAccessorScaleBinding<X, number>;
         x(x: number | Accessor<number>): this;
         x(x: X | Accessor<X>, xScale: Scale<X, number>): this;
-        y(): Plots.AccessorScaleBinding<number, number>;
+        y(): Plots.TransformableAccessorScaleBinding<number, number>;
         y(y: number | Accessor<number>): this;
         y(y: number | Accessor<number>, yScale: Scale<number, number>): this;
         autorangeMode(): string;
@@ -3785,7 +3921,7 @@ declare namespace Plottable.Plots {
          */
         constructor();
         protected _setup(): void;
-        y(): Plots.AccessorScaleBinding<number, number>;
+        y(): Plots.TransformableAccessorScaleBinding<number, number>;
         y(y: number | Accessor<number>): this;
         y(y: number | Accessor<number>, yScale: QuantitativeScale<number>): this;
         /**
@@ -3851,10 +3987,10 @@ declare namespace Plottable.Plots {
         croppedRenderingEnabled(croppedRendering: boolean): this;
         protected _getAnimator(key: string): Animator;
         protected _setup(): void;
-        x(): Plots.AccessorScaleBinding<X, number>;
+        x(): Plots.TransformableAccessorScaleBinding<X, number>;
         x(x: number | Accessor<number>): this;
         x(x: X | Accessor<X>, xScale: Scale<X, number>): this;
-        y(): Plots.AccessorScaleBinding<number, number>;
+        y(): Plots.TransformableAccessorScaleBinding<number, number>;
         y(y: number | Accessor<number>): this;
         y(y: number | Accessor<number>, yScale: QuantitativeScale<number>): this;
         /**
@@ -3906,10 +4042,10 @@ declare namespace Plottable.Plots {
          * @param {string} [orientation="vertical"] One of "vertical"/"horizontal".
          */
         constructor(orientation?: string);
-        x(): Plots.AccessorScaleBinding<X, number>;
+        x(): Plots.TransformableAccessorScaleBinding<X, number>;
         x(x: number | Accessor<number>): this;
         x(x: X | Accessor<X>, xScale: Scale<X, number>): this;
-        y(): Plots.AccessorScaleBinding<Y, number>;
+        y(): Plots.TransformableAccessorScaleBinding<Y, number>;
         y(y: number | Accessor<number>): this;
         y(y: Y | Accessor<Y>, yScale: Scale<Y, number>): this;
         protected _generateAttrToProjector(): {
@@ -3938,7 +4074,7 @@ declare namespace Plottable.Plots {
         /**
          * Gets the AccessorScaleBinding for X
          */
-        x(): AccessorScaleBinding<X, number>;
+        x(): TransformableAccessorScaleBinding<X, number>;
         /**
          * Sets X to a constant value or the result of an Accessor.
          *
@@ -3970,7 +4106,7 @@ declare namespace Plottable.Plots {
         /**
          * Gets the AccessorScaleBinding for Y
          */
-        y(): AccessorScaleBinding<Y, number>;
+        y(): TransformableAccessorScaleBinding<Y, number>;
         /**
          * Sets Y to a constant value or the result of an Accessor.
          *
@@ -4739,7 +4875,6 @@ declare namespace Plottable.Interactions {
      * `zoom` argument about the point defined by the `center` argument.
      */
     function zoomAt(value: number, zoom: number, center: number): number;
-    type TransformableScale = Plottable.Scale<any, number> & Plottable.Scales.TransformableScale;
     class PanZoom extends Interaction {
         /**
          * The number of pixels occupied in a line.
@@ -4770,7 +4905,7 @@ declare namespace Plottable.Interactions {
          * @param {TransformableScale} [xScale] The x-scale to update on panning/zooming.
          * @param {TransformableScale} [yScale] The y-scale to update on panning/zooming.
          */
-        constructor(xScale?: TransformableScale, yScale?: TransformableScale);
+        constructor(xScale?: TransformableScale<any, number>, yScale?: TransformableScale<any, number>);
         /**
          * Pans the chart by a specified amount
          *
@@ -4817,51 +4952,51 @@ declare namespace Plottable.Interactions {
         /**
          * Gets the x scales for this PanZoom Interaction.
          */
-        xScales(): TransformableScale[];
+        xScales(): TransformableScale<any, number>[];
         /**
          * Sets the x scales for this PanZoom Interaction.
          *
          * @returns {Interactions.PanZoom} The calling PanZoom Interaction.
          */
-        xScales(xScales: TransformableScale[]): this;
+        xScales(xScales: TransformableScale<any, number>[]): this;
         /**
          * Gets the y scales for this PanZoom Interaction.
          */
-        yScales(): TransformableScale[];
+        yScales(): TransformableScale<any, number>[];
         /**
          * Sets the y scales for this PanZoom Interaction.
          *
          * @returns {Interactions.PanZoom} The calling PanZoom Interaction.
          */
-        yScales(yScales: TransformableScale[]): this;
+        yScales(yScales: TransformableScale<any, number>[]): this;
         /**
          * Adds an x scale to this PanZoom Interaction
          *
          * @param {TransformableScale} An x scale to add
          * @returns {Interactions.PanZoom} The calling PanZoom Interaction.
          */
-        addXScale(xScale: TransformableScale): this;
+        addXScale(xScale: TransformableScale<any, number>): this;
         /**
          * Removes an x scale from this PanZoom Interaction
          *
          * @param {TransformableScale} An x scale to remove
          * @returns {Interactions.PanZoom} The calling PanZoom Interaction.
          */
-        removeXScale(xScale: TransformableScale): this;
+        removeXScale(xScale: TransformableScale<any, number>): this;
         /**
          * Adds a y scale to this PanZoom Interaction
          *
          * @param {TransformableScale} A y scale to add
          * @returns {Interactions.PanZoom} The calling PanZoom Interaction.
          */
-        addYScale(yScale: TransformableScale): this;
+        addYScale(yScale: TransformableScale<any, number>): this;
         /**
          * Removes a y scale from this PanZoom Interaction
          *
          * @param {TransformableScale} A y scale to remove
          * @returns {Interactions.PanZoom} The calling PanZoom Interaction.
          */
-        removeYScale(yScale: TransformableScale): this;
+        removeYScale(yScale: TransformableScale<any, number>): this;
         /**
          * Gets the minimum domain extent for the scale, specifying the minimum
          * allowable amount between the ends of the domain.
@@ -4872,7 +5007,7 @@ declare namespace Plottable.Interactions {
          * @param {TransformableScale} scale The scale to query
          * @returns {number} The minimum numerical domain extent for the scale.
          */
-        minDomainExtent(scale: TransformableScale): number;
+        minDomainExtent(scale: TransformableScale<any, number>): number;
         /**
          * Sets the minimum domain extent for the scale, specifying the minimum
          * allowable amount between the ends of the domain.
@@ -4885,7 +5020,7 @@ declare namespace Plottable.Interactions {
          * the scale.
          * @returns {Interactions.PanZoom} The calling PanZoom Interaction.
          */
-        minDomainExtent(scale: TransformableScale, minDomainExtent: number): this;
+        minDomainExtent(scale: TransformableScale<any, number>, minDomainExtent: number): this;
         /**
          * Gets the maximum domain extent for the scale, specifying the maximum
          * allowable amount between the ends of the domain.
@@ -4896,7 +5031,7 @@ declare namespace Plottable.Interactions {
          * @param {TransformableScale} scale The scale to query
          * @returns {number} The maximum numerical domain extent for the scale.
          */
-        maxDomainExtent(scale: TransformableScale): number;
+        maxDomainExtent(scale: TransformableScale<any, number>): number;
         /**
          * Sets the maximum domain extent for the scale, specifying the maximum
          * allowable amount between the ends of the domain.
@@ -4913,7 +5048,7 @@ declare namespace Plottable.Interactions {
          * the scale.
          * @returns {Interactions.PanZoom} The calling PanZoom Interaction.
          */
-        maxDomainExtent(scale: TransformableScale, maxDomainExtent: number): this;
+        maxDomainExtent(scale: TransformableScale<any, number>, maxDomainExtent: number): this;
         /**
          * Gets the minimum domain value for the scale, constraining the pan/zoom
          * interaction to a minimum value in the domain.
@@ -4928,7 +5063,7 @@ declare namespace Plottable.Interactions {
          * @param {TransformableScale} scale The scale to query
          * @returns {number} The minimum domain value for the scale.
          */
-        minDomainValue(scale: TransformableScale): number;
+        minDomainValue(scale: TransformableScale<any, number>): number;
         /**
          * Sets the minimum domain value for the scale, constraining the pan/zoom
          * interaction to a minimum value in the domain.
@@ -4944,7 +5079,7 @@ declare namespace Plottable.Interactions {
          * @param {number} minDomainExtent The minimum domain value for the scale.
          * @returns {Interactions.PanZoom} The calling PanZoom Interaction.
          */
-        minDomainValue(scale: TransformableScale, minDomainValue: number): this;
+        minDomainValue(scale: TransformableScale<any, number>, minDomainValue: number): this;
         /**
          * Gets the maximum domain value for the scale, constraining the pan/zoom
          * interaction to a maximum value in the domain.
@@ -4959,7 +5094,7 @@ declare namespace Plottable.Interactions {
          * @param {TransformableScale} scale The scale to query
          * @returns {number} The maximum domain value for the scale.
          */
-        maxDomainValue(scale: TransformableScale): number;
+        maxDomainValue(scale: TransformableScale<any, number>): number;
         /**
          * Sets the maximum domain value for the scale, constraining the pan/zoom
          * interaction to a maximum value in the domain.
@@ -4975,7 +5110,7 @@ declare namespace Plottable.Interactions {
          * @param {number} maxDomainExtent The maximum domain value for the scale.
          * @returns {Interactions.PanZoom} The calling PanZoom Interaction.
          */
-        maxDomainValue(scale: TransformableScale, maxDomainValue: number): this;
+        maxDomainValue(scale: TransformableScale<any, number>, maxDomainValue: number): this;
         /**
          * Uses the current domain of the scale to apply a minimum and maximum
          * domain value for that scale.
@@ -4983,7 +5118,7 @@ declare namespace Plottable.Interactions {
          * This constrains the pan/zoom interaction to show no more than the domain
          * of the scale.
          */
-        setMinMaxDomainValuesTo(scale: TransformableScale): void;
+        setMinMaxDomainValuesTo(scale: TransformableScale<any, number>): void;
         /**
          * Adds a callback to be called when panning ends.
          *

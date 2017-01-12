@@ -29,6 +29,50 @@ var Plottable;
 (function (Plottable) {
     var Utils;
     (function (Utils) {
+        /**
+         * Array-backed implementation of {EntityIndex}
+         */
+        var EntityArray = (function () {
+            function EntityArray() {
+                this._entities = [];
+            }
+            EntityArray.prototype.add = function (entity) {
+                this._entities.push(entity);
+            };
+            /**
+             * Iterates through array of of entities and computes the closest point using
+             * the standard Euclidean distance formula.
+             */
+            EntityArray.prototype.entityNearest = function (queryPoint, filter) {
+                var closestDistanceSquared = Infinity;
+                var closestPointEntity;
+                this._entities.forEach(function (entity) {
+                    if (filter !== undefined && filter(entity) === false) {
+                        return;
+                    }
+                    var distanceSquared = Utils.Math.distanceSquared(entity.position, queryPoint);
+                    if (distanceSquared < closestDistanceSquared) {
+                        closestDistanceSquared = distanceSquared;
+                        closestPointEntity = entity;
+                    }
+                });
+                if (closestPointEntity === undefined) {
+                    return undefined;
+                }
+                return closestPointEntity;
+            };
+            EntityArray.prototype.map = function (callback) {
+                return this._entities.map(function (entity) { return callback(entity); });
+            };
+            return EntityArray;
+        }());
+        Utils.EntityArray = EntityArray;
+    })(Utils = Plottable.Utils || (Plottable.Utils = {}));
+})(Plottable || (Plottable = {}));
+var Plottable;
+(function (Plottable) {
+    var Utils;
+    (function (Utils) {
         var Math;
         (function (Math) {
             var nativeMath = window.Math;
@@ -1743,6 +1787,9 @@ var Plottable;
         QuantitativeScale.prototype.scaleTransformation = function (value) {
             throw new Error("Subclasses should override scaleTransformation");
         };
+        QuantitativeScale.prototype.invertTransformation = function (value) {
+            throw new Error("Subclasses should override invertTransformation");
+        };
         QuantitativeScale.prototype.getTransformationDomain = function () {
             throw new Error("Subclasses should override getTransformationDomain");
         };
@@ -1819,6 +1866,9 @@ var Plottable;
             };
             Linear.prototype.scaleTransformation = function (value) {
                 return this.scale(value);
+            };
+            Linear.prototype.invertTransformation = function (value) {
+                return this.invert(value);
             };
             Linear.prototype.getTransformationDomain = function () {
                 return this.domain();
@@ -1936,6 +1986,9 @@ var Plottable;
             };
             ModifiedLog.prototype.scaleTransformation = function (value) {
                 return this.scale(value);
+            };
+            ModifiedLog.prototype.invertTransformation = function (value) {
+                return this.invert(value);
             };
             ModifiedLog.prototype.getTransformationDomain = function () {
                 return this.domain();
@@ -2168,6 +2221,9 @@ var Plottable;
             Category.prototype.scaleTransformation = function (value) {
                 return this._d3TransformationScale(value);
             };
+            Category.prototype.invertTransformation = function (value) {
+                return this._d3TransformationScale.invert(value);
+            };
             Category.prototype.getTransformationDomain = function () {
                 return this._d3TransformationScale.domain();
             };
@@ -2377,6 +2433,9 @@ var Plottable;
             };
             Time.prototype.scaleTransformation = function (value) {
                 return this.scale(new Date(value));
+            };
+            Time.prototype.invertTransformation = function (value) {
+                return this.invert(value).getTime();
             };
             Time.prototype.getTransformationDomain = function () {
                 var dates = this.domain();
@@ -3339,6 +3398,21 @@ var Plottable;
             }
             this._parent = parent;
             return this;
+        };
+        /**
+         * @returns {Bounds} for the component in pixel space, where the topLeft
+         * represents the component's minimum x and y values and the bottomRight represents
+         * the component's maximum x and y values.
+         */
+        Component.prototype.bounds = function () {
+            var topLeft = this.origin();
+            return {
+                topLeft: topLeft,
+                bottomRight: {
+                    x: topLeft.x + this.width(),
+                    y: topLeft.y + this.height()
+                },
+            };
         };
         /**
          * Removes a Component from the DOM and disconnects all listeners.
@@ -6847,6 +6921,7 @@ var Plottable;
         Plot.prototype.anchor = function (selection) {
             _super.prototype.anchor.call(this, selection);
             this._dataChanged = true;
+            this._cachedEntityIndex = undefined;
             this._updateExtents();
             return this;
         };
@@ -6881,6 +6956,7 @@ var Plottable;
         Plot.prototype._onDatasetUpdate = function () {
             this._updateExtents();
             this._dataChanged = true;
+            this._cachedEntityIndex = undefined;
             this.render();
         };
         Plot.prototype.attr = function (attr, attrValue, scale) {
@@ -7118,6 +7194,37 @@ var Plottable;
         Plot.prototype._additionalPaint = function (time) {
             // no-op
         };
+        /**
+         * _buildLightweightPlotEntities constucts {LightweightPlotEntity[]} from
+         * all the entities in the plot
+         * @param {Dataset[]} [datasets] - datasets comprising this plot
+         */
+        Plot.prototype._buildLightweightPlotEntities = function (datasets) {
+            var _this = this;
+            var lightweightPlotEntities = [];
+            datasets.forEach(function (dataset, datasetIndex) {
+                var drawer = _this._datasetToDrawer.get(dataset);
+                var validDatumIndex = 0;
+                dataset.data().forEach(function (datum, datumIndex) {
+                    var position = _this._pixelPoint(datum, datumIndex, dataset);
+                    if (Plottable.Utils.Math.isNaN(position.x) || Plottable.Utils.Math.isNaN(position.y)) {
+                        return;
+                    }
+                    lightweightPlotEntities.push({
+                        datum: datum,
+                        position: _this._invertPixelPoint(position),
+                        index: datumIndex,
+                        dataset: dataset,
+                        datasetIndex: datasetIndex,
+                        component: _this,
+                        drawer: drawer,
+                        validDatumIndex: validDatumIndex,
+                    });
+                    validDatumIndex++;
+                });
+            });
+            return lightweightPlotEntities;
+        };
         Plot.prototype._getDataToDraw = function () {
             var dataToDraw = new Plottable.Utils.Map();
             this.datasets().forEach(function (dataset) { return dataToDraw.set(dataset, dataset.data()); });
@@ -7157,46 +7264,42 @@ var Plottable;
         /**
          * Gets the Entities associated with the specified Datasets.
          *
-         * @param {dataset[]} datasets The Datasets to retrieve the Entities for.
+         * @param {Dataset[]} datasets The Datasets to retrieve the Entities for.
          *   If not provided, returns defaults to all Datasets on the Plot.
          * @return {Plots.PlotEntity[]}
          */
         Plot.prototype.entities = function (datasets) {
             var _this = this;
             if (datasets === void 0) { datasets = this.datasets(); }
-            return this._lightweightEntities(datasets).map(function (entity) { return _this._lightweightPlotEntityToPlotEntity(entity); });
+            return this._getEntityIndex(datasets).map(function (entity) { return _this._lightweightPlotEntityToPlotEntity(entity); });
         };
-        Plot.prototype._lightweightEntities = function (datasets) {
+        /**
+         * _getEntityIndex returns the index of all Entities associated with the specified dataset
+         *
+         * @param {Dataset[]} [datasets] - The datasets with which to construct the index. If no datasets
+         * are specified all datasets will be used.
+         */
+        Plot.prototype._getEntityIndex = function (datasets) {
             var _this = this;
-            if (datasets === void 0) { datasets = this.datasets(); }
-            var lightweightEntities = [];
-            datasets.forEach(function (dataset, datasetIndex) {
-                var drawer = _this._datasetToDrawer.get(dataset);
-                var validDatumIndex = 0;
-                dataset.data().forEach(function (datum, datumIndex) {
-                    var position = _this._pixelPoint(datum, datumIndex, dataset);
-                    if (Plottable.Utils.Math.isNaN(position.x) || Plottable.Utils.Math.isNaN(position.y)) {
-                        return;
-                    }
-                    lightweightEntities.push({
-                        datum: datum,
-                        index: datumIndex,
-                        dataset: dataset,
-                        datasetIndex: datasetIndex,
-                        position: position,
-                        component: _this,
-                        drawer: drawer,
-                        validDatumIndex: validDatumIndex,
-                    });
-                    validDatumIndex++;
+            if (datasets !== undefined) {
+                var entityIndex_1 = new Plottable.Utils.EntityArray();
+                this._buildLightweightPlotEntities(datasets).forEach(function (entity) {
+                    entityIndex_1.add(entity);
                 });
-            });
-            return lightweightEntities;
+                return entityIndex_1;
+            }
+            else if (this._cachedEntityIndex === undefined) {
+                this._cachedEntityIndex = new Plottable.Utils.EntityArray();
+                this._buildLightweightPlotEntities(this.datasets()).forEach(function (entity) {
+                    _this._cachedEntityIndex.add(entity);
+                });
+            }
+            return this._cachedEntityIndex;
         };
         Plot.prototype._lightweightPlotEntityToPlotEntity = function (entity) {
             var plotEntity = {
                 datum: entity.datum,
-                position: entity.position,
+                position: this._pixelPoint(entity.datum, entity.index, entity.dataset),
                 dataset: entity.dataset,
                 datasetIndex: entity.datasetIndex,
                 index: entity.index,
@@ -7220,34 +7323,27 @@ var Plottable;
             throw new Error("plots must implement entitiesAt");
         };
         /**
-         * Returns the PlotEntity nearest to the query point by the Euclidian norm, or undefined if no PlotEntity can be found.
+         * Returns the {Plots.PlotEntity} nearest to the query point,
+         * or undefined if no {Plots.PlotEntity} can be found.
          *
          * @param {Point} queryPoint
-         * @returns {Plots.PlotEntity} The nearest PlotEntity, or undefined if no PlotEntity can be found.
+         * @returns {Plots.PlotEntity} The nearest PlotEntity, or undefined if no {Plots.PlotEntity} can be found.
          */
         Plot.prototype.entityNearest = function (queryPoint) {
             var _this = this;
-            var closestDistanceSquared = Infinity;
-            var closestPointEntity;
-            var entities = this._lightweightEntities();
-            entities.forEach(function (entity) {
-                if (!_this._entityVisibleOnPlot(entity.position, entity.datum, entity.index, entity.dataset)) {
-                    return;
-                }
-                var distanceSquared = Plottable.Utils.Math.distanceSquared(entity.position, queryPoint);
-                if (distanceSquared < closestDistanceSquared) {
-                    closestDistanceSquared = distanceSquared;
-                    closestPointEntity = entity;
-                }
+            // by default, the entity index stores position information in the data space
+            // the default impelentation of the entityNearest must convert the chart bounding
+            // box as well as the query point to the data space before it can make a comparison
+            var invertedChartBounds = this._invertedBounds();
+            var invertedQueryPoint = this._invertPixelPoint(queryPoint);
+            var nearest = this._getEntityIndex().entityNearest(invertedQueryPoint, function (entity) {
+                return _this._entityVisibleOnPlot(entity, invertedChartBounds);
             });
-            if (closestPointEntity === undefined) {
-                return undefined;
-            }
-            return this._lightweightPlotEntityToPlotEntity(closestPointEntity);
+            return nearest === undefined ? undefined : this._lightweightPlotEntityToPlotEntity(nearest);
         };
-        Plot.prototype._entityVisibleOnPlot = function (pixelPoint, datum, index, dataset) {
-            return !(pixelPoint.x < 0 || pixelPoint.y < 0 ||
-                pixelPoint.x > this.width() || pixelPoint.y > this.height());
+        Plot.prototype._entityVisibleOnPlot = function (entity, chartBounds) {
+            return !(entity.position.x < chartBounds.topLeft.x || entity.position.y < chartBounds.topLeft.y ||
+                entity.position.x > chartBounds.bottomRight.x || entity.position.y > chartBounds.bottomRight.y);
         };
         Plot.prototype._uninstallScaleForKey = function (scale, key) {
             scale.offUpdate(this._renderCallback);
@@ -7264,6 +7360,39 @@ var Plottable;
             return binding.scale == null ?
                 binding.accessor :
                 function (d, i, ds) { return binding.scale.scale(binding.accessor(d, i, ds)); };
+        };
+        /**
+         * _invertPixelPoint converts a point in pixel coordinates to a point in data coordinates
+         * @param {Point} point Representation of the point in pixel coordinates
+         * @return {Point} Returns the point represented in data coordinates
+         */
+        Plot.prototype._invertPixelPoint = function (point) {
+            throw new Error("Subclasses should implement this method");
+        };
+        /**
+         * Returns the bounds of the plot in the Data space ensures that the topLeft
+         * and bottomRight points represent the minima and maxima of the Data space, respectively
+         @returns {Bounds}
+         */
+        Plot.prototype._invertedBounds = function () {
+            var bounds = this.bounds();
+            var maybeTopLeft = this._invertPixelPoint(bounds.topLeft);
+            var maybeBottomRight = this._invertPixelPoint(bounds.bottomRight);
+            // Scale domains can map from lowest to highest or highest to lowest (eg [0, 1] or [1, 0]).
+            // What we're interested in is a domain space equivalent to the concept of topLeft
+            // and bottomRight, not a true mapping from point to domain. This is in keeping
+            // with our definition of {Bounds}, where the topLeft coordinate is minimal
+            // and the bottomRight is maximal.
+            return {
+                topLeft: {
+                    x: Math.min(maybeTopLeft.x, maybeBottomRight.x),
+                    y: Math.min(maybeTopLeft.y, maybeBottomRight.y)
+                },
+                bottomRight: {
+                    x: Math.max(maybeBottomRight.x, maybeTopLeft.x),
+                    y: Math.max(maybeBottomRight.y, maybeTopLeft.y)
+                }
+            };
         };
         Plot.prototype._pixelPoint = function (datum, index, dataset) {
             return { x: 0, y: 0 };
@@ -7871,6 +8000,11 @@ var Plottable;
                 yBinding != null &&
                 yBinding.accessor != null;
         };
+        XYPlot.prototype._invertPixelPoint = function (point) {
+            var xScale = this.x();
+            var yScale = this.y();
+            return { x: xScale.scale.invertTransformation(point.x), y: yScale.scale.invertTransformation(point.y) };
+        };
         XYPlot.prototype._pixelPoint = function (datum, index, dataset) {
             var xProjector = Plottable.Plot._scaledAccessor(this.x());
             var yProjector = Plottable.Plot._scaledAccessor(this.y());
@@ -8268,6 +8402,16 @@ var Plottable;
                 var circleSymbolFactory = Plottable.SymbolFactories.circle();
                 this.symbol(function () { return circleSymbolFactory; });
             }
+            Scatter.prototype._buildLightweightPlotEntities = function (datasets) {
+                var _this = this;
+                var lightweightPlotEntities = _super.prototype._buildLightweightPlotEntities.call(this, datasets);
+                return lightweightPlotEntities.map(function (lightweightPlotEntity) {
+                    var diameter = Plottable.Plot._scaledAccessor(_this.size())(lightweightPlotEntity.datum, lightweightPlotEntity.index, lightweightPlotEntity.dataset);
+                    // convert diameter into data space to be on the same scale as the scatter point position
+                    lightweightPlotEntity.diameter = _this._invertedPixelSize({ x: diameter, y: diameter });
+                    return lightweightPlotEntity;
+                });
+            };
             Scatter.prototype._createDrawer = function (dataset) {
                 return new Plottable.Drawers.Symbol(dataset);
             };
@@ -8298,15 +8442,16 @@ var Plottable;
                 drawSteps.push({ attrToProjector: this._generateAttrToProjector(), animator: this._getAnimator(Plots.Animator.MAIN) });
                 return drawSteps;
             };
-            Scatter.prototype._entityVisibleOnPlot = function (pixelPoint, datum, index, dataset) {
-                var xRange = { min: 0, max: this.width() };
-                var yRange = { min: 0, max: this.height() };
-                var diameter = Plottable.Plot._scaledAccessor(this.size())(datum, index, dataset);
+            Scatter.prototype._entityVisibleOnPlot = function (entity, bounds) {
+                var chartWidth = bounds.bottomRight.x - bounds.topLeft.x;
+                var chartHeight = bounds.bottomRight.y - bounds.topLeft.y;
+                var xRange = { min: 0, max: chartWidth };
+                var yRange = { min: 0, max: chartHeight };
                 var translatedBbox = {
-                    x: pixelPoint.x - diameter,
-                    y: pixelPoint.y - diameter,
-                    width: diameter,
-                    height: diameter,
+                    x: entity.position.x - entity.diameter.x,
+                    y: entity.position.y - entity.diameter.y,
+                    width: entity.diameter.x,
+                    height: entity.diameter.y,
                 };
                 return Plottable.Utils.DOM.intersectsBBox(xRange, yRange, translatedBbox);
             };
@@ -8366,6 +8511,22 @@ var Plottable;
                     var size = sizeProjector(datum, index, dataset);
                     return x - size / 2 <= p.x && p.x <= x + size / 2 && y - size / 2 <= p.y && p.y <= y + size / 2;
                 });
+            };
+            /**
+             * _invertedPixelSize returns the size of the object in data space
+             * @param {Point} [point] The size of the object in pixel space. X corresponds to
+             * the width of the object, and Y corresponds to the height of the object
+             * @return {Point} Returns the size of the object in data space. X corresponds to
+             * the width of the object in data space, and Y corresponds to the height of the
+             * object in data space.
+             */
+            Scatter.prototype._invertedPixelSize = function (point) {
+                var invertedOrigin = this._invertPixelPoint(this.origin());
+                var invertedSize = this._invertPixelPoint({ x: point.x, y: point.y });
+                return {
+                    x: Math.abs(invertedSize.x - invertedOrigin.x),
+                    y: Math.abs(invertedSize.y - invertedOrigin.y)
+                };
             };
             Scatter._SIZE_KEY = "size";
             Scatter._SYMBOL_KEY = "symbol";
@@ -8563,9 +8724,10 @@ var Plottable;
                 // for the x, y, height & width attributes), but user selections (e.g. via
                 // mouse events) usually have pixel accuracy. We add a tolerance of 0.5 pixels.
                 var tolerance = 0.5;
+                var chartBounds = this.bounds();
                 var closest;
                 this.entities().forEach(function (entity) {
-                    if (!_this._entityVisibleOnPlot(entity.position, entity.datum, entity.index, entity.dataset)) {
+                    if (!_this._entityVisibleOnPlot(entity, chartBounds)) {
                         return;
                     }
                     var primaryDist = 0;
@@ -8598,10 +8760,13 @@ var Plottable;
                 });
                 return closest;
             };
-            Bar.prototype._entityVisibleOnPlot = function (pixelPoint, datum, index, dataset) {
-                var xRange = { min: 0, max: this.width() };
-                var yRange = { min: 0, max: this.height() };
+            Bar.prototype._entityVisibleOnPlot = function (entity, bounds) {
+                var chartWidth = bounds.bottomRight.x - bounds.topLeft.x;
+                var chartHeight = bounds.bottomRight.y - bounds.topLeft.y;
+                var xRange = { min: 0, max: chartWidth };
+                var yRange = { min: 0, max: chartHeight };
                 var attrToProjector = this._generateAttrToProjector();
+                var datum = entity.datum, index = entity.index, dataset = entity.dataset;
                 var barBBox = {
                     x: attrToProjector["x"](datum, index, dataset),
                     y: attrToProjector["y"](datum, index, dataset),
@@ -9253,8 +9418,9 @@ var Plottable;
                 var minXDist = Infinity;
                 var minYDist = Infinity;
                 var closest;
+                var chartBounds = this.bounds();
                 this.entities().forEach(function (entity) {
-                    if (!_this._entityVisibleOnPlot(entity.position, entity.datum, entity.index, entity.dataset)) {
+                    if (!_this._entityVisibleOnPlot(entity, chartBounds)) {
                         return;
                     }
                     var xDist = Math.abs(queryPoint.x - entity.position.x);
