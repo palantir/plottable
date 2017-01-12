@@ -153,11 +153,11 @@ describe("Plots", () => {
 
         let moveCommand0 = decomposedPath0[0];
         assert.closeTo(moveCommand0.arguments[0], 0, 1, "starts first arc at the bottom of the circle (x)");
-        assert.operator(moveCommand0.arguments[1], ">", 0, "starts first arc at the bottom of circle (y)");
+        assert.isAbove(moveCommand0.arguments[1], 0, "starts first arc at the bottom of circle (y)");
 
         let arcCommand0 = decomposedPath0[1];
-        assert.operator(arcCommand0.arguments[5], "<", 0, "arc ends on the left side of the circle (x)");
-        assert.operator(arcCommand0.arguments[6], ">", 0, "arc ends on the bottom side of the circle (y)");
+        assert.isBelow(arcCommand0.arguments[5], 0, "arc ends on the left side of the circle (x)");
+        assert.isAbove(arcCommand0.arguments[6], 0, "arc ends on the bottom side of the circle (y)");
 
         let lineCommand0 = decomposedPath0[2];
         assert.closeTo(lineCommand0.arguments[0], 0, 1, "draws line to origin (x)");
@@ -167,12 +167,12 @@ describe("Plots", () => {
         let decomposedPath1 = TestMethods.decomposePath(TestMethods.normalizePath(pathString1));
 
         let moveCommand1 = decomposedPath1[0];
-        assert.operator(moveCommand1.arguments[0], "<", 0, "starts second arc at the end of the first arc");
-        assert.operator(moveCommand1.arguments[1], ">", 0, "starts secnond arc at the end of the first arc");
+        assert.isBelow(moveCommand1.arguments[0], 0, "starts second arc at the end of the first arc");
+        assert.isAbove(moveCommand1.arguments[1], 0, "starts secnond arc at the end of the first arc");
 
         let arcCommand1 = decomposedPath1[1];
         assert.closeTo(arcCommand1.arguments[5], 0, 1, "ends second arc at x origin");
-        assert.operator(arcCommand1.arguments[6], "<", 0, "ends second arc below 0");
+        assert.isBelow(arcCommand1.arguments[6], 0, "ends second arc below 0");
 
         let lineCommand1 = decomposedPath1[2];
         assert.closeTo(lineCommand1.arguments[0], 0, 1, "draws line to origin (x)");
@@ -192,11 +192,11 @@ describe("Plots", () => {
 
         let moveCommand0 = decomposedPath0[0];
         assert.closeTo(moveCommand0.arguments[0], 0, 1, "starts first arc at the top of the circle (x)");
-        assert.operator(moveCommand0.arguments[1], "<", 0, "starts first arc at the top of circle (y)");
+        assert.isBelow(moveCommand0.arguments[1], 0, "starts first arc at the top of circle (y)");
 
         let arcCommand0 = decomposedPath0[1];
-        assert.operator(arcCommand0.arguments[5], ">", 0, "arc ends on the right side of the circle (x)");
-        assert.operator(arcCommand0.arguments[6], "<", 0, "arc ends on the right side of the circle (y)");
+        assert.isAbove(arcCommand0.arguments[5], 0, "arc ends on the right side of the circle (x)");
+        assert.isBelow(arcCommand0.arguments[6], 0, "arc ends on the right side of the circle (y)");
 
         let lineCommand0 = decomposedPath0[2];
         assert.closeTo(lineCommand0.arguments[0], 0, 1, "draws line to origin (x)");
@@ -206,12 +206,12 @@ describe("Plots", () => {
         let decomposedPath1 = TestMethods.decomposePath(TestMethods.normalizePath(pathString1));
 
         let moveCommand1 = decomposedPath1[0];
-        assert.operator(moveCommand1.arguments[0], ">", 0, "starts second arc at the top right of the circle");
-        assert.operator(moveCommand1.arguments[1], "<", 0, "starts second arc at the top right of the circle");
+        assert.isAbove(moveCommand1.arguments[0], 0, "starts second arc at the top right of the circle");
+        assert.isBelow(moveCommand1.arguments[1], 0, "starts second arc at the top right of the circle");
 
         let arcCommand1 = decomposedPath1[1];
         assert.closeTo(arcCommand1.arguments[5], 0, 1, "ends second arc at the bottom of the circle (x origin)");
-        assert.operator(arcCommand1.arguments[6], ">", 0, "ends second arc at the bottom of the circle");
+        assert.isAbove(arcCommand1.arguments[6], 0, "ends second arc at the bottom of the circle");
 
         let lineCommand1 = decomposedPath1[2];
         assert.closeTo(lineCommand1.arguments[0], 0, 1, "draws line to origin (x)");

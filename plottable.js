@@ -7396,7 +7396,6 @@ var Plottable;
                 return attrToProjector;
             };
             Pie.prototype._updatePieAngles = function () {
-                var _this = this;
                 if (this.sectorValue() == null) {
                     return;
                 }
@@ -7406,10 +7405,10 @@ var Plottable;
                 var sectorValueAccessor = Plottable.Plot._scaledAccessor(this.sectorValue());
                 var dataset = this.datasets()[0];
                 var data = this._getDataToDraw().get(dataset);
-                var pie = d3.layout.pie().sort(null).value(function (d, i) { return sectorValueAccessor(d, i, dataset); })(data);
-                var factor = (this.endAngle() - this.startAngle()) / (2 * Math.PI);
-                this._startAngles = pie.map(function (slice) { return slice.startAngle * factor + _this.startAngle(); });
-                this._endAngles = pie.map(function (slice) { return slice.endAngle * factor + _this.startAngle(); });
+                var pie = d3.layout.pie().sort(null).startAngle(this._startAngle).endAngle(this._endAngle)
+                    .value(function (d, i) { return sectorValueAccessor(d, i, dataset); })(data);
+                this._startAngles = pie.map(function (slice) { return slice.startAngle; });
+                this._endAngles = pie.map(function (slice) { return slice.endAngle; });
             };
             Pie.prototype._getDataToDraw = function () {
                 var dataToDraw = _super.prototype._getDataToDraw.call(this);
@@ -7439,7 +7438,7 @@ var Plottable;
                     .value(function (d, i) {
                     var value = scaledValueAccessor(d, i, dataset);
                     return Pie._isValidData(value) ? value : 0;
-                })(dataset.data());
+                }).startAngle(this._startAngle).endAngle(this._endAngle)(dataset.data());
                 var startAngle = pie[index].startAngle;
                 var endAngle = pie[index].endAngle;
                 var avgAngle = (startAngle + endAngle) / 2;

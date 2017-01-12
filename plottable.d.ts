@@ -3063,7 +3063,7 @@ declare namespace Plottable.Plots {
          */
         startAngle(angle: number): this;
         /**
-         * Gets whether slice labels are enabled.
+         * Gets the end angle of the Pie Plot.
          *
          * @returns {number} Returns the end angle
          */

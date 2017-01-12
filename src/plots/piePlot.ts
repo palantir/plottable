@@ -229,7 +229,7 @@ namespace Plottable.Plots {
     }
 
     /**
-     * Gets whether slice labels are enabled.
+     * Gets the end angle of the Pie Plot.
      *
      * @returns {number} Returns the end angle
      */
@@ -374,10 +374,10 @@ namespace Plottable.Plots {
       let sectorValueAccessor = Plot._scaledAccessor(this.sectorValue());
       let dataset = this.datasets()[0];
       let data = this._getDataToDraw().get(dataset);
-      let pie = d3.layout.pie().sort(null).value((d, i) => sectorValueAccessor(d, i, dataset))(data);
-      let factor = (this.endAngle() - this.startAngle()) / (2 * Math.PI);
-      this._startAngles = pie.map((slice) => slice.startAngle * factor + this.startAngle());
-      this._endAngles = pie.map((slice) => slice.endAngle * factor + this.startAngle());
+      let pie = d3.layout.pie().sort(null).startAngle(this._startAngle).endAngle(this._endAngle)
+        .value((d, i) => sectorValueAccessor(d, i, dataset))(data);
+      this._startAngles = pie.map((slice) => slice.startAngle);
+      this._endAngles = pie.map((slice) => slice.endAngle);
     }
 
     protected _getDataToDraw() {
@@ -410,7 +410,7 @@ namespace Plottable.Plots {
                          .value((d: any, i: number) => {
                            let value = scaledValueAccessor(d, i, dataset);
                            return Pie._isValidData(value) ? value : 0;
-                         })(dataset.data());
+                         }).startAngle(this._startAngle).endAngle(this._endAngle)(dataset.data());
       let startAngle = pie[index].startAngle;
       let endAngle = pie[index].endAngle;
       let avgAngle = (startAngle + endAngle) / 2;
