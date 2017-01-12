@@ -90,7 +90,7 @@ namespace Plottable.Plots {
     /**
      * Gets the AccessorScaleBinding for X.
      */
-    public x(): AccessorScaleBinding<X, number>;
+    public x(): Plots.TransformableAccessorScaleBinding<X, number>;
     /**
      * Sets X to a constant number or the result of an Accessor<number>.
      *
@@ -137,7 +137,7 @@ namespace Plottable.Plots {
     /**
      * Gets the AccessorScaleBinding for X2.
      */
-    public x2(): AccessorScaleBinding<X, number>;
+    public x2(): Plots.TransformableAccessorScaleBinding<X, number>;
     /**
      * Sets X2 to a constant number or the result of an Accessor.
      * If a Scale has been set for X, it will also be used to scale X2.
@@ -162,7 +162,7 @@ namespace Plottable.Plots {
     /**
      * Gets the AccessorScaleBinding for Y.
      */
-    public y(): AccessorScaleBinding<Y, number>;
+    public y(): Plots.TransformableAccessorScaleBinding<Y, number>;
     /**
      * Sets Y to a constant number or the result of an Accessor<number>.
      *
@@ -209,7 +209,7 @@ namespace Plottable.Plots {
     /**
      * Gets the AccessorScaleBinding for Y2.
      */
-    public y2(): AccessorScaleBinding<Y, number>;
+    public y2(): Plots.TransformableAccessorScaleBinding<Y, number>;
     /**
      * Sets Y2 to a constant number or the result of an Accessor.
      * If a Scale has been set for Y, it will also be used to scale Y2.

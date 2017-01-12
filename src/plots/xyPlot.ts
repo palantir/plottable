@@ -2,6 +2,7 @@ namespace Plottable {
 export class XYPlot<X, Y> extends Plot {
   protected static _X_KEY = "x";
   protected static _Y_KEY = "y";
+
   private _autoAdjustXScaleDomain = false;
   private _autoAdjustYScaleDomain = false;
   private _adjustYDomainOnChangeFromXCallback: ScaleCallback<Scale<any, any>>;
@@ -123,9 +124,9 @@ export class XYPlot<X, Y> extends Plot {
   }
 
   /**
-   * Gets the AccessorScaleBinding for X.
+   * Gets the TransformableAccessorScaleBinding for X.
    */
-  public x(): Plots.AccessorScaleBinding<X, number>;
+  public x(): Plots.TransformableAccessorScaleBinding<X, number>;
   /**
    * Sets X to a constant number or the result of an Accessor<number>.
    *
@@ -164,7 +165,7 @@ export class XYPlot<X, Y> extends Plot {
   /**
    * Gets the AccessorScaleBinding for Y.
    */
-  public y(): Plots.AccessorScaleBinding<Y, number>;
+  public y(): Plots.TransformableAccessorScaleBinding<Y, number>;
   /**
    * Sets Y to a constant number or the result of an Accessor<number>.
    *
@@ -352,6 +353,7 @@ export class XYPlot<X, Y> extends Plot {
       this._updateYExtentsAndAutodomain();
     }
   }
+
   private _adjustXDomainOnChangeFromY() {
     if (!this._projectorsReady()) { return; }
     if (this._autoAdjustXScaleDomain) {
@@ -366,6 +368,13 @@ export class XYPlot<X, Y> extends Plot {
         xBinding.accessor != null &&
         yBinding != null &&
         yBinding.accessor != null;
+  }
+
+  protected _invertPixelPoint(point: Point): Point {
+    const xScale = this.x();
+    const yScale = this.y();
+
+    return { x: xScale.scale.invertTransformation(point.x), y: yScale.scale.invertTransformation(point.y) };
   }
 
   protected _pixelPoint(datum: any, index: number, dataset: Dataset): Point {

@@ -29,6 +29,10 @@ namespace Plottable.Scales {
       return this.scale(value);
     }
 
+    public invertTransformation(value: number) {
+      return this.invert(value);
+    }
+
     public getTransformationDomain() {
       return this.domain() as [number, number];
     }

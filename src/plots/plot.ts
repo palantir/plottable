@@ -1,4 +1,21 @@
 namespace Plottable.Plots {
+
+  /**
+   * Computing the selection of an entity is an expensive operation. This object aims to
+   * reproduce the behavior of the Plots.PlotEntity, excluding the selection, but including
+   * drawer and validDatumIndex, which can be used to compute the selection.
+   */
+  export interface LightweightPlotEntity {
+    datum: any;
+    dataset: Dataset;
+    datasetIndex: number;
+    position: Point;
+    index: number;
+    component: Plot;
+    drawer: Plottable.Drawer;
+    validDatumIndex: number;
+  }
+
   export interface PlotEntity extends Entity<Plot> {
     dataset: Dataset;
     datasetIndex: number;
@@ -11,6 +28,11 @@ namespace Plottable.Plots {
     scale?: Scale<D, R>;
   }
 
+  export interface TransformableAccessorScaleBinding<D, R> {
+    accessor: Accessor<any>;
+    scale?: TransformableScale<D, R>;
+  }
+
   export namespace Animator {
     export var MAIN = "main";
     export var RESET = "reset";
@@ -18,25 +40,17 @@ namespace Plottable.Plots {
 }
 
 namespace Plottable {
-/**
- * Computing the selection of an entity is an expensive operation. This object aims to
- * reproduce the behavior of the Plots.PlotEntity, excluding the selection, but including
- * drawer and validDatumIndex, which can be used to compute the selection.
- */
-interface LightweightPlotEntity {
-  datum: any;
-  position: Point;
-  dataset: Dataset;
-  datasetIndex: number;
-  index: number;
-  component: Plot;
-  drawer: Plottable.Drawer;
-  validDatumIndex: number;
-}
+
 
 export class Plot extends Component {
   protected static _ANIMATION_MAX_DURATION = 600;
 
+  /**
+   * _cachedEntityIndex is a cache of all the entities in the plot. It, at times
+   * may be undefined and shouldn't be accessed directly. Instead, use _getEntityIndex
+   * to access the entity index.
+   */
+  private _cachedEntityIndex: Plottable.Utils.EntityIndex<Plots.LightweightPlotEntity>;
   private _dataChanged = false;
   private _datasetToDrawer: Utils.Map<Dataset, Drawer>;
 
@@ -79,6 +93,7 @@ export class Plot extends Component {
   public anchor(selection: d3.Selection<void>) {
     super.anchor(selection);
     this._dataChanged = true;
+    this._cachedEntityIndex = undefined;
     this._updateExtents();
     return this;
   }
@@ -116,6 +131,7 @@ export class Plot extends Component {
   protected _onDatasetUpdate() {
     this._updateExtents();
     this._dataChanged = true;
+    this._cachedEntityIndex = undefined;
     this.render();
   }
 
@@ -436,6 +452,40 @@ export class Plot extends Component {
     // no-op
   }
 
+  /**
+   * _buildLightweightPlotEntities constucts {LightweightPlotEntity[]} from
+   * all the entities in the plot
+   * @param {Dataset[]} [datasets] - datasets comprising this plot
+   */
+  protected _buildLightweightPlotEntities(datasets: Dataset[]) {
+    const lightweightPlotEntities: Plots.LightweightPlotEntity[] = [];
+      datasets.forEach((dataset: Dataset, datasetIndex: number) => {
+        let drawer = this._datasetToDrawer.get(dataset);
+        let validDatumIndex = 0;
+
+        dataset.data().forEach((datum: any, datumIndex: number) => {
+          let position = this._pixelPoint(datum, datumIndex, dataset);
+          if (Utils.Math.isNaN(position.x) || Utils.Math.isNaN(position.y)) {
+            return;
+          }
+
+          lightweightPlotEntities.push({
+            datum,
+            position: this._invertPixelPoint(position),
+            index: datumIndex,
+            dataset,
+            datasetIndex,
+            component: this,
+            drawer,
+            validDatumIndex,
+          });
+          validDatumIndex++;
+        });
+      });
+
+    return lightweightPlotEntities;
+  }
+
   protected _getDataToDraw() {
     let dataToDraw: Utils.Map<Dataset, any[]> = new Utils.Map<Dataset, any[]>();
     this.datasets().forEach((dataset) => dataToDraw.set(dataset, dataset.data()));
@@ -478,45 +528,42 @@ export class Plot extends Component {
   /**
    * Gets the Entities associated with the specified Datasets.
    *
-   * @param {dataset[]} datasets The Datasets to retrieve the Entities for.
+   * @param {Dataset[]} datasets The Datasets to retrieve the Entities for.
    *   If not provided, returns defaults to all Datasets on the Plot.
    * @return {Plots.PlotEntity[]}
    */
   public entities(datasets = this.datasets()): Plots.PlotEntity[] {
-    return this._lightweightEntities(datasets).map((entity) => this._lightweightPlotEntityToPlotEntity(entity));
+    return this._getEntityIndex(datasets).map((entity) => this._lightweightPlotEntityToPlotEntity(entity));
   }
 
-  private _lightweightEntities(datasets = this.datasets()) {
-    let lightweightEntities: LightweightPlotEntity[] = [];
-    datasets.forEach((dataset: Dataset, datasetIndex: number) => {
-      let drawer = this._datasetToDrawer.get(dataset);
-      let validDatumIndex = 0;
-
-      dataset.data().forEach((datum: any, datumIndex: number) => {
-        let position = this._pixelPoint(datum, datumIndex, dataset);
-        if (Utils.Math.isNaN(position.x) || Utils.Math.isNaN(position.y)) {
-          return;
-        }
-        lightweightEntities.push({
-          datum: datum,
-          index: datumIndex,
-          dataset: dataset,
-          datasetIndex: datasetIndex,
-          position: position,
-          component: this,
-          drawer: drawer,
-          validDatumIndex: validDatumIndex,
-        });
-        validDatumIndex++;
+  /**
+   * _getEntityIndex returns the index of all Entities associated with the specified dataset
+   *
+   * @param {Dataset[]} [datasets] - The datasets with which to construct the index. If no datasets
+   * are specified all datasets will be used.
+   */
+  private _getEntityIndex(datasets?: Dataset[]): Plottable.Utils.EntityIndex<Plots.LightweightPlotEntity> {
+    if (datasets !== undefined) {
+      const entityIndex = new Plottable.Utils.EntityArray<Plots.LightweightPlotEntity>();
+      this._buildLightweightPlotEntities(datasets).forEach((entity: Plots.LightweightPlotEntity) => {
+        entityIndex.add(entity);
       });
-    });
-    return lightweightEntities;
+
+      return entityIndex;
+    } else if (this._cachedEntityIndex === undefined) {
+      this._cachedEntityIndex = new Plottable.Utils.EntityArray<Plots.LightweightPlotEntity>();
+      this._buildLightweightPlotEntities(this.datasets()).forEach((entity: Plots.LightweightPlotEntity) => {
+        this._cachedEntityIndex.add(entity);
+      });
+    }
+
+    return this._cachedEntityIndex;
   }
 
-  private _lightweightPlotEntityToPlotEntity(entity: LightweightPlotEntity) {
+  private _lightweightPlotEntityToPlotEntity(entity: Plots.LightweightPlotEntity) {
     let plotEntity: Plots.PlotEntity = {
       datum: entity.datum,
-      position: entity.position,
+      position: this._pixelPoint(entity.datum, entity.index, entity.dataset),
       dataset: entity.dataset,
       datasetIndex: entity.datasetIndex,
       index: entity.index,
@@ -542,36 +589,29 @@ export class Plot extends Component {
   }
 
   /**
-   * Returns the PlotEntity nearest to the query point by the Euclidian norm, or undefined if no PlotEntity can be found.
+   * Returns the {Plots.PlotEntity} nearest to the query point,
+   * or undefined if no {Plots.PlotEntity} can be found.
    *
    * @param {Point} queryPoint
-   * @returns {Plots.PlotEntity} The nearest PlotEntity, or undefined if no PlotEntity can be found.
+   * @returns {Plots.PlotEntity} The nearest PlotEntity, or undefined if no {Plots.PlotEntity} can be found.
    */
   public entityNearest(queryPoint: Point): Plots.PlotEntity {
-    let closestDistanceSquared = Infinity;
-    let closestPointEntity: LightweightPlotEntity;
-    let entities = this._lightweightEntities();
-    entities.forEach((entity) => {
-      if (!this._entityVisibleOnPlot(entity.position, entity.datum, entity.index, entity.dataset)) {
-        return;
-      }
+    // by default, the entity index stores position information in the data space
+    // the default impelentation of the entityNearest must convert the chart bounding
+    // box as well as the query point to the data space before it can make a comparison
+    const invertedChartBounds = this._invertedBounds();
+    const invertedQueryPoint = this._invertPixelPoint(queryPoint);
 
-      let distanceSquared = Utils.Math.distanceSquared(entity.position, queryPoint);
-      if (distanceSquared < closestDistanceSquared) {
-        closestDistanceSquared = distanceSquared;
-        closestPointEntity = entity;
-      }
+    const nearest = this._getEntityIndex().entityNearest(invertedQueryPoint, (entity: Plots.LightweightPlotEntity) => {
+      return this._entityVisibleOnPlot(entity, invertedChartBounds);
     });
-    if (closestPointEntity === undefined) {
-      return undefined;
-    }
 
-    return this._lightweightPlotEntityToPlotEntity(closestPointEntity);
+    return nearest === undefined ? undefined : this._lightweightPlotEntityToPlotEntity(nearest);
   }
 
-  protected _entityVisibleOnPlot(pixelPoint: Point, datum: any, index: number, dataset: Dataset) {
-    return !(pixelPoint.x < 0 || pixelPoint.y < 0 ||
-      pixelPoint.x > this.width() || pixelPoint.y > this.height());
+  protected _entityVisibleOnPlot(entity: Plots.PlotEntity | Plots.LightweightPlotEntity, chartBounds: Bounds) {
+    return !(entity.position.x < chartBounds.topLeft.x || entity.position.y < chartBounds.topLeft.y ||
+      entity.position.x > chartBounds.bottomRight.x || entity.position.y > chartBounds.bottomRight.y);
   }
 
   protected _uninstallScaleForKey(scale: Scale<any, any>, key: string) {
@@ -592,6 +632,42 @@ export class Plot extends Component {
     return binding.scale == null ?
              binding.accessor :
              (d: any, i: number, ds: Dataset) => binding.scale.scale(binding.accessor(d, i, ds));
+  }
+
+  /**
+   * _invertPixelPoint converts a point in pixel coordinates to a point in data coordinates
+   * @param {Point} point Representation of the point in pixel coordinates
+   * @return {Point} Returns the point represented in data coordinates
+   */
+  protected _invertPixelPoint(point: Point): Point {
+    throw new Error("Subclasses should implement this method");
+  }
+
+  /**
+   * Returns the bounds of the plot in the Data space ensures that the topLeft
+   * and bottomRight points represent the minima and maxima of the Data space, respectively
+   @returns {Bounds}
+   */
+  protected _invertedBounds() {
+    const bounds = this.bounds();
+    const maybeTopLeft = this._invertPixelPoint(bounds.topLeft);
+    const maybeBottomRight = this._invertPixelPoint(bounds.bottomRight);
+
+    // Scale domains can map from lowest to highest or highest to lowest (eg [0, 1] or [1, 0]).
+    // What we're interested in is a domain space equivalent to the concept of topLeft
+    // and bottomRight, not a true mapping from point to domain. This is in keeping
+    // with our definition of {Bounds}, where the topLeft coordinate is minimal
+    // and the bottomRight is maximal.
+    return {
+      topLeft: {
+        x: Math.min(maybeTopLeft.x, maybeBottomRight.x),
+        y: Math.min(maybeTopLeft.y, maybeBottomRight.y)
+      },
+      bottomRight: {
+        x: Math.max(maybeBottomRight.x, maybeTopLeft.x),
+        y: Math.max(maybeBottomRight.y, maybeTopLeft.y)
+      }
+    };
   }
 
   protected _pixelPoint(datum: any, index: number, dataset: Dataset): Point {

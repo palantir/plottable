@@ -11,16 +11,14 @@ namespace Plottable.Interactions {
     return center - (center - value) * zoom;
   }
 
-  export type TransformableScale = Plottable.Scale<any, number> & Plottable.Scales.TransformableScale;
-
   export class PanZoom extends Interaction {
     /**
      * The number of pixels occupied in a line.
      */
     private static _PIXELS_PER_LINE = 120;
 
-    private _xScales: Utils.Set<TransformableScale>;
-    private _yScales: Utils.Set<TransformableScale>;
+    private _xScales: Utils.Set<TransformableScale<any, number>>;
+    private _yScales: Utils.Set<TransformableScale<any, number>>;
     private _dragInteraction: Interactions.Drag;
     private _mouseDispatcher: Dispatchers.Mouse;
     private _touchDispatcher: Dispatchers.Touch;
@@ -33,11 +31,11 @@ namespace Plottable.Interactions {
     private _touchEndCallback = (ids: number[], idToPoint: Point[], e: TouchEvent) => this._handleTouchEnd(ids, idToPoint, e);
     private _touchCancelCallback = (ids: number[], idToPoint: Point[], e: TouchEvent) => this._handleTouchEnd(ids, idToPoint, e);
 
-    private _minDomainExtents: Utils.Map<TransformableScale, any>;
-    private _maxDomainExtents: Utils.Map<TransformableScale, any>;
+    private _minDomainExtents: Utils.Map<TransformableScale<any, number>, any>;
+    private _maxDomainExtents: Utils.Map<TransformableScale<any, number>, any>;
 
-    private _minDomainValues: Utils.Map<TransformableScale, any>;
-    private _maxDomainValues: Utils.Map<TransformableScale, any>;
+    private _minDomainValues: Utils.Map<TransformableScale<any, number>, any>;
+    private _maxDomainValues: Utils.Map<TransformableScale<any, number>, any>;
 
     private _panEndCallbacks = new Utils.CallbackSet<PanCallback>();
     private _zoomEndCallbacks = new Utils.CallbackSet<ZoomCallback>();
@@ -50,17 +48,17 @@ namespace Plottable.Interactions {
      * @param {TransformableScale} [xScale] The x-scale to update on panning/zooming.
      * @param {TransformableScale} [yScale] The y-scale to update on panning/zooming.
      */
-    constructor(xScale?: TransformableScale, yScale?: TransformableScale) {
+    constructor(xScale?: TransformableScale<any, number>, yScale?: TransformableScale<any, number>) {
       super();
-      this._xScales = new Utils.Set<TransformableScale>();
-      this._yScales = new Utils.Set<TransformableScale>();
+      this._xScales = new Utils.Set<TransformableScale<any, number>>();
+      this._yScales = new Utils.Set<TransformableScale<any, number>>();
       this._dragInteraction = new Interactions.Drag();
       this._setupDragInteraction();
       this._touchIds = d3.map<Point>();
-      this._minDomainExtents = new Utils.Map<TransformableScale, number>();
-      this._maxDomainExtents = new Utils.Map<TransformableScale, number>();
-      this._minDomainValues = new Utils.Map<TransformableScale, any>();
-      this._maxDomainValues = new Utils.Map<TransformableScale, any>();
+      this._minDomainExtents = new Utils.Map<TransformableScale<any, number>, number>();
+      this._maxDomainExtents = new Utils.Map<TransformableScale<any, number>, number>();
+      this._minDomainValues = new Utils.Map<TransformableScale<any, number>, any>();
+      this._maxDomainValues = new Utils.Map<TransformableScale<any, number>, any>();
       if (xScale != null) {
         this.addXScale(xScale);
       }
@@ -271,12 +269,12 @@ namespace Plottable.Interactions {
       }
     }
 
-    private _constrainedZoom(scale: TransformableScale, zoomAmount: number, centerPoint: number) {
+    private _constrainedZoom(scale: TransformableScale<any, number>, zoomAmount: number, centerPoint: number) {
       zoomAmount = this._constrainZoomExtents(scale, zoomAmount);
       return this._constrainZoomValues(scale, zoomAmount, centerPoint);
     }
 
-    private _constrainZoomExtents(scale: TransformableScale, zoomAmount: number) {
+    private _constrainZoomExtents(scale: TransformableScale<any, number>, zoomAmount: number) {
       let extentIncreasing = zoomAmount > 1;
 
       let boundingDomainExtent = extentIncreasing ? this.maxDomainExtent(scale) : this.minDomainExtent(scale);
@@ -288,7 +286,7 @@ namespace Plottable.Interactions {
       return compareF(zoomAmount, boundingDomainExtent / domainExtent);
     }
 
-    private _constrainZoomValues(scale: TransformableScale, zoomAmount: number, centerPoint: number) {
+    private _constrainZoomValues(scale: TransformableScale<any, number>, zoomAmount: number, centerPoint: number) {
       // when zooming in, we don't have to worry about overflowing domain
       if (zoomAmount <= 1) {
         return { centerPoint, zoomAmount };
@@ -392,7 +390,7 @@ namespace Plottable.Interactions {
      * Returns a new translation value that respects domain min/max value
      * constraints.
      */
-    private _constrainedTranslation(scale: TransformableScale, translation: number) {
+    private _constrainedTranslation(scale: TransformableScale<any, number>, translation: number) {
       const [ scaleDomainMin, scaleDomainMax ] = scale.getTransformationDomain();
       if (translation > 0) {
         const bound = this.maxDomainValue(scale);
@@ -412,7 +410,7 @@ namespace Plottable.Interactions {
       return translation;
     }
 
-    private _nonLinearScaleWithExtents(scale: TransformableScale) {
+    private _nonLinearScaleWithExtents(scale: TransformableScale<any, number>) {
       return this.minDomainExtent(scale) != null && this.maxDomainExtent(scale) != null &&
              !(scale instanceof Scales.Linear) && !(scale instanceof Scales.Time);
     }
@@ -420,22 +418,22 @@ namespace Plottable.Interactions {
     /**
      * Gets the x scales for this PanZoom Interaction.
      */
-    public xScales(): TransformableScale[];
+    public xScales(): TransformableScale<any, number>[];
     /**
      * Sets the x scales for this PanZoom Interaction.
      *
      * @returns {Interactions.PanZoom} The calling PanZoom Interaction.
      */
-    public xScales(xScales: TransformableScale[]): this;
-    public xScales(xScales?: TransformableScale[]): any {
+    public xScales(xScales: TransformableScale<any, number>[]): this;
+    public xScales(xScales?: TransformableScale<any, number>[]): any {
       if (xScales == null) {
-        let scales: TransformableScale[] = [];
+        let scales: TransformableScale<any, number>[] = [];
         this._xScales.forEach((xScale) => {
           scales.push(xScale);
         });
         return scales;
       }
-      this._xScales = new Utils.Set<TransformableScale>();
+      this._xScales = new Utils.Set<TransformableScale<any, number>>();
       xScales.forEach((xScale) => {
         this.addXScale(xScale);
       });
@@ -445,22 +443,22 @@ namespace Plottable.Interactions {
     /**
      * Gets the y scales for this PanZoom Interaction.
      */
-    public yScales(): TransformableScale[];
+    public yScales(): TransformableScale<any, number>[];
     /**
      * Sets the y scales for this PanZoom Interaction.
      *
      * @returns {Interactions.PanZoom} The calling PanZoom Interaction.
      */
-    public yScales(yScales: TransformableScale[]): this;
-    public yScales(yScales?: TransformableScale[]): any {
+    public yScales(yScales: TransformableScale<any, number>[]): this;
+    public yScales(yScales?: TransformableScale<any, number>[]): any {
       if (yScales == null) {
-        let scales: TransformableScale[] = [];
+        let scales: TransformableScale<any, number>[] = [];
         this._yScales.forEach((yScale) => {
           scales.push(yScale);
         });
         return scales;
       }
-      this._yScales = new Utils.Set<TransformableScale>();
+      this._yScales = new Utils.Set<TransformableScale<any, number>>();
       yScales.forEach((yScale) => {
         this.addYScale(yScale);
       });
@@ -473,7 +471,7 @@ namespace Plottable.Interactions {
      * @param {TransformableScale} An x scale to add
      * @returns {Interactions.PanZoom} The calling PanZoom Interaction.
      */
-    public addXScale(xScale: TransformableScale) {
+    public addXScale(xScale: TransformableScale<any, number>) {
       this._xScales.add(xScale);
       return this;
     }
@@ -484,7 +482,7 @@ namespace Plottable.Interactions {
      * @param {TransformableScale} An x scale to remove
      * @returns {Interactions.PanZoom} The calling PanZoom Interaction.
      */
-    public removeXScale(xScale: TransformableScale) {
+    public removeXScale(xScale: TransformableScale<any, number>) {
       this._xScales.delete(xScale);
       this._minDomainExtents.delete(xScale);
       this._maxDomainExtents.delete(xScale);
@@ -499,7 +497,7 @@ namespace Plottable.Interactions {
      * @param {TransformableScale} A y scale to add
      * @returns {Interactions.PanZoom} The calling PanZoom Interaction.
      */
-    public addYScale(yScale: TransformableScale) {
+    public addYScale(yScale: TransformableScale<any, number>) {
       this._yScales.add(yScale);
       return this;
     }
@@ -510,7 +508,7 @@ namespace Plottable.Interactions {
      * @param {TransformableScale} A y scale to remove
      * @returns {Interactions.PanZoom} The calling PanZoom Interaction.
      */
-    public removeYScale(yScale: TransformableScale) {
+    public removeYScale(yScale: TransformableScale<any, number>) {
       this._yScales.delete(yScale);
       this._minDomainExtents.delete(yScale);
       this._maxDomainExtents.delete(yScale);
@@ -529,7 +527,7 @@ namespace Plottable.Interactions {
      * @param {TransformableScale} scale The scale to query
      * @returns {number} The minimum numerical domain extent for the scale.
      */
-    public minDomainExtent(scale: TransformableScale): number;
+    public minDomainExtent(scale: TransformableScale<any, number>): number;
     /**
      * Sets the minimum domain extent for the scale, specifying the minimum
      * allowable amount between the ends of the domain.
@@ -542,8 +540,8 @@ namespace Plottable.Interactions {
      * the scale.
      * @returns {Interactions.PanZoom} The calling PanZoom Interaction.
      */
-    public minDomainExtent(scale: TransformableScale, minDomainExtent: number): this;
-    public minDomainExtent(scale: TransformableScale, minDomainExtent?: number): number | this {
+    public minDomainExtent(scale: TransformableScale<any, number>, minDomainExtent: number): this;
+    public minDomainExtent(scale: TransformableScale<any, number>, minDomainExtent?: number): number | this {
       if (minDomainExtent == null) {
         return this._minDomainExtents.get(scale);
       }
@@ -571,7 +569,7 @@ namespace Plottable.Interactions {
      * @param {TransformableScale} scale The scale to query
      * @returns {number} The maximum numerical domain extent for the scale.
      */
-    public maxDomainExtent(scale: TransformableScale): number;
+    public maxDomainExtent(scale: TransformableScale<any, number>): number;
     /**
      * Sets the maximum domain extent for the scale, specifying the maximum
      * allowable amount between the ends of the domain.
@@ -588,8 +586,8 @@ namespace Plottable.Interactions {
      * the scale.
      * @returns {Interactions.PanZoom} The calling PanZoom Interaction.
      */
-    public maxDomainExtent(scale: TransformableScale, maxDomainExtent: number): this;
-    public maxDomainExtent(scale: TransformableScale, maxDomainExtent?: number): number | this {
+    public maxDomainExtent(scale: TransformableScale<any, number>, maxDomainExtent: number): this;
+    public maxDomainExtent(scale: TransformableScale<any, number>, maxDomainExtent?: number): number | this {
       if (maxDomainExtent == null) {
         return this._maxDomainExtents.get(scale);
       }
@@ -621,7 +619,7 @@ namespace Plottable.Interactions {
      * @param {TransformableScale} scale The scale to query
      * @returns {number} The minimum domain value for the scale.
      */
-    public minDomainValue(scale: TransformableScale): number;
+    public minDomainValue(scale: TransformableScale<any, number>): number;
     /**
      * Sets the minimum domain value for the scale, constraining the pan/zoom
      * interaction to a minimum value in the domain.
@@ -637,8 +635,8 @@ namespace Plottable.Interactions {
      * @param {number} minDomainExtent The minimum domain value for the scale.
      * @returns {Interactions.PanZoom} The calling PanZoom Interaction.
      */
-    public minDomainValue(scale: TransformableScale, minDomainValue: number): this;
-    public minDomainValue(scale: TransformableScale, minDomainValue?: number): number | this {
+    public minDomainValue(scale: TransformableScale<any, number>, minDomainValue: number): this;
+    public minDomainValue(scale: TransformableScale<any, number>, minDomainValue?: number): number | this {
       if (minDomainValue == null) {
         return this._minDomainValues.get(scale);
       }
@@ -664,7 +662,7 @@ namespace Plottable.Interactions {
      * @param {TransformableScale} scale The scale to query
      * @returns {number} The maximum domain value for the scale.
      */
-    public maxDomainValue(scale: TransformableScale): number;
+    public maxDomainValue(scale: TransformableScale<any, number>): number;
     /**
      * Sets the maximum domain value for the scale, constraining the pan/zoom
      * interaction to a maximum value in the domain.
@@ -680,8 +678,8 @@ namespace Plottable.Interactions {
      * @param {number} maxDomainExtent The maximum domain value for the scale.
      * @returns {Interactions.PanZoom} The calling PanZoom Interaction.
      */
-    public maxDomainValue(scale: TransformableScale, maxDomainValue: number): this;
-    public maxDomainValue(scale: TransformableScale, maxDomainValue?: number): number | this {
+    public maxDomainValue(scale: TransformableScale<any, number>, maxDomainValue: number): this;
+    public maxDomainValue(scale: TransformableScale<any, number>, maxDomainValue?: number): number | this {
       if (maxDomainValue == null) {
         return this._maxDomainValues.get(scale);
       }
@@ -700,7 +698,7 @@ namespace Plottable.Interactions {
      * This constrains the pan/zoom interaction to show no more than the domain
      * of the scale.
      */
-    public setMinMaxDomainValuesTo(scale: TransformableScale) {
+    public setMinMaxDomainValuesTo(scale: TransformableScale<any, number>) {
       this._minDomainValues.delete(scale);
       this._maxDomainValues.delete(scale);
       const [ domainMin, domainMax ] = scale.getTransformationDomain();

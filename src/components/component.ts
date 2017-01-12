@@ -527,6 +527,23 @@ export class Component {
   }
 
   /**
+   * @returns {Bounds} for the component in pixel space, where the topLeft
+   * represents the component's minimum x and y values and the bottomRight represents
+   * the component's maximum x and y values.
+   */
+  public bounds(): Bounds {
+    const topLeft = this.origin();
+
+    return {
+      topLeft,
+      bottomRight: {
+        x: topLeft.x + this.width(),
+        y: topLeft.y + this.height()
+      },
+    }
+  }
+
+  /**
    * Removes a Component from the DOM and disconnects all listeners.
    */
   public destroy() {

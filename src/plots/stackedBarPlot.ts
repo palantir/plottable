@@ -20,7 +20,7 @@ namespace Plottable.Plots {
       this._stackedExtent = [];
     }
 
-    public x(): Plots.AccessorScaleBinding<X, number>;
+    public x(): Plots.TransformableAccessorScaleBinding<X, number>;
     public x(x: number | Accessor<number>): this;
     public x(x: X | Accessor<X>, xScale: Scale<X, number>): this;
     public x(x?: number | Accessor<number> | X | Accessor<X>, xScale?: Scale<X, number>): any {
@@ -37,7 +37,7 @@ namespace Plottable.Plots {
       return this;
     }
 
-    public y(): Plots.AccessorScaleBinding<Y, number>;
+    public y(): Plots.TransformableAccessorScaleBinding<Y, number>;
     public y(y: number | Accessor<number>): this;
     public y(y: Y | Accessor<Y>, yScale: Scale<Y, number>): this;
     public y(y?: number | Accessor<number> | Y | Accessor<Y>, yScale?: Scale<Y, number>): any {
