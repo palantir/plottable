@@ -471,7 +471,7 @@ export class Plot extends Component {
 
           lightweightPlotEntities.push({
             datum,
-            position: this._invertPixelPoint(position),
+            position,
             index: datumIndex,
             dataset,
             datasetIndex,
@@ -593,17 +593,13 @@ export class Plot extends Component {
    * or undefined if no {Plots.PlotEntity} can be found.
    *
    * @param {Point} queryPoint
+   * @param {bounds} Bounds The bounding box within which to search. By default, bounds is the bounds of
+   * the chart, relative to the parent.
    * @returns {Plots.PlotEntity} The nearest PlotEntity, or undefined if no {Plots.PlotEntity} can be found.
    */
-  public entityNearest(queryPoint: Point): Plots.PlotEntity {
-    // by default, the entity index stores position information in the data space
-    // the default impelentation of the entityNearest must convert the chart bounding
-    // box as well as the query point to the data space before it can make a comparison
-    const invertedChartBounds = this._invertedBounds();
-    const invertedQueryPoint = this._invertPixelPoint(queryPoint);
-
-    const nearest = this._getEntityIndex().entityNearest(invertedQueryPoint, (entity: Plots.LightweightPlotEntity) => {
-      return this._entityVisibleOnPlot(entity, invertedChartBounds);
+  public entityNearest(queryPoint: Point, bounds = this.bounds()): Plots.PlotEntity {
+    const nearest = this._getEntityIndex().entityNearest(queryPoint, (entity: Plots.LightweightPlotEntity) => {
+      return this._entityVisibleOnPlot(entity, bounds);
     });
 
     return nearest === undefined ? undefined : this._lightweightPlotEntityToPlotEntity(nearest);
@@ -632,42 +628,6 @@ export class Plot extends Component {
     return binding.scale == null ?
              binding.accessor :
              (d: any, i: number, ds: Dataset) => binding.scale.scale(binding.accessor(d, i, ds));
-  }
-
-  /**
-   * _invertPixelPoint converts a point in pixel coordinates to a point in data coordinates
-   * @param {Point} point Representation of the point in pixel coordinates
-   * @return {Point} Returns the point represented in data coordinates
-   */
-  protected _invertPixelPoint(point: Point): Point {
-    throw new Error("Subclasses should implement this method");
-  }
-
-  /**
-   * Returns the bounds of the plot in the Data space ensures that the topLeft
-   * and bottomRight points represent the minima and maxima of the Data space, respectively
-   @returns {Bounds}
-   */
-  protected _invertedBounds() {
-    const bounds = this.bounds();
-    const maybeTopLeft = this._invertPixelPoint(bounds.topLeft);
-    const maybeBottomRight = this._invertPixelPoint(bounds.bottomRight);
-
-    // Scale domains can map from lowest to highest or highest to lowest (eg [0, 1] or [1, 0]).
-    // What we're interested in is a domain space equivalent to the concept of topLeft
-    // and bottomRight, not a true mapping from point to domain. This is in keeping
-    // with our definition of {Bounds}, where the topLeft coordinate is minimal
-    // and the bottomRight is maximal.
-    return {
-      topLeft: {
-        x: Math.min(maybeTopLeft.x, maybeBottomRight.x),
-        y: Math.min(maybeTopLeft.y, maybeBottomRight.y)
-      },
-      bottomRight: {
-        x: Math.max(maybeBottomRight.x, maybeTopLeft.x),
-        y: Math.max(maybeBottomRight.y, maybeTopLeft.y)
-      }
-    };
   }
 
   protected _pixelPoint(datum: any, index: number, dataset: Dataset): Point {

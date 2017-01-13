@@ -90,6 +90,15 @@ export class XYPlot<X, Y> extends Plot {
     };
   }
 
+  public entityNearest(queryPoint: Point): Plots.PlotEntity {
+    // by default, the entity index stores position information in the data space
+    // the default impelentation of the entityNearest must convert the chart bounding
+    // box as well as the query point to the data space before it can make a comparison
+    const invertedChartBounds = this._invertedBounds();
+    const invertedQueryPoint = this._invertPixelPoint(queryPoint);
+    return super.entityNearest(invertedQueryPoint, invertedChartBounds);
+  }
+
   /**
    * Returns the whether or not the rendering is deferred for performance boost.
    * @return {boolean} The deferred rendering option
@@ -361,6 +370,13 @@ export class XYPlot<X, Y> extends Plot {
     }
   }
 
+  protected _buildLightweightPlotEntities(datasets?: Dataset[]) {
+    return super._buildLightweightPlotEntities(datasets).map((lightweightPlotEntity) => {
+      lightweightPlotEntity.position = this._invertPixelPoint(lightweightPlotEntity.position);
+      return lightweightPlotEntity;
+    });
+  }
+
   protected _projectorsReady() {
     let xBinding = this.x();
     let yBinding = this.y();
@@ -370,6 +386,38 @@ export class XYPlot<X, Y> extends Plot {
         yBinding.accessor != null;
   }
 
+  /**
+   * Returns the bounds of the plot in the Data space ensures that the topLeft
+   * and bottomRight points represent the minima and maxima of the Data space, respectively
+   @returns {Bounds}
+   */
+  private _invertedBounds() {
+    const bounds = this.bounds();
+    const maybeTopLeft = this._invertPixelPoint(bounds.topLeft);
+    const maybeBottomRight = this._invertPixelPoint(bounds.bottomRight);
+
+    // Scale domains can map from lowest to highest or highest to lowest (eg [0, 1] or [1, 0]).
+    // What we're interested in is a domain space equivalent to the concept of topLeft
+    // and bottomRight, not a true mapping from point to domain. This is in keeping
+    // with our definition of {Bounds}, where the topLeft coordinate is minimal
+    // and the bottomRight is maximal.
+    return {
+      topLeft: {
+        x: Math.min(maybeTopLeft.x, maybeBottomRight.x),
+        y: Math.min(maybeTopLeft.y, maybeBottomRight.y)
+      },
+      bottomRight: {
+        x: Math.max(maybeBottomRight.x, maybeTopLeft.x),
+        y: Math.max(maybeBottomRight.y, maybeTopLeft.y)
+      }
+    };
+  }
+
+  /**
+   * _invertPixelPoint converts a point in pixel coordinates to a point in data coordinates
+   * @param {Point} point Representation of the point in pixel coordinates
+   * @return {Point} Returns the point represented in data coordinates
+   */
   protected _invertPixelPoint(point: Point): Point {
     const xScale = this.x();
     const yScale = this.y();
