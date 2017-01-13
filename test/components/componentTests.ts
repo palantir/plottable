@@ -473,7 +473,7 @@ describe("Component", () => {
       let height = 200;
       c.anchor(svg);
 
-      c.onResize((size: Plottable.Size) => {
+      c.onResize((size: { height: number, width: number }) => {
         assert.deepEqual(size, { width, height });
         c.destroy();
         svg.remove();

@@ -3084,7 +3084,7 @@ var Plottable;
             };
             this._element.attr("transform", "translate(" + this._origin.x + "," + this._origin.y + ")");
             this._boxes.forEach(function (b) { return b.attr("width", _this.width()).attr("height", _this.height()); });
-            if (this._resizeHandler !== undefined) {
+            if (this._resizeHandler != null) {
                 this._resizeHandler(size);
             }
             return this;

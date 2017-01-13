@@ -12,7 +12,7 @@ export namespace Components {
   }
 }
 
-export type IResizeHandler = (size: Plottable.Size) => void;
+export type IResizeHandler = (size: { height: number, width: number }) => void;
 
 export class Component {
   private _element: d3.Selection<void>;
@@ -221,14 +221,14 @@ export class Component {
     this._element.attr("transform", "translate(" + this._origin.x + "," + this._origin.y + ")");
     this._boxes.forEach((b: d3.Selection<void>) => b.attr("width", this.width()).attr("height", this.height()));
 
-    if (this._resizeHandler !== undefined) {
+    if (this._resizeHandler != null) {
         this._resizeHandler(size);
     }
 
     return this;
   }
 
-  protected _sizeFromOffer(availableWidth: number, availableHeight: number): Plottable.Size {
+  protected _sizeFromOffer(availableWidth: number, availableHeight: number) {
     let requestedSpace = this.requestedSpace(availableWidth, availableHeight);
     return {
       width: this.fixedWidth() ? Math.min(availableWidth , requestedSpace.minWidth) : availableWidth,

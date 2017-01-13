@@ -531,13 +531,6 @@ declare namespace Plottable {
         bottomRight: Point;
     };
     /**
-     * The size in pixels
-     */
-    type Size = {
-        height: number;
-        width: number;
-    };
-    /**
      * An object representing a data-backed visual entity inside a Component.
      */
     interface Entity<C extends Component> {
@@ -1423,7 +1416,10 @@ declare namespace Plottable {
             static CENTER: string;
         }
     }
-    type IResizeHandler = (size: Plottable.Size) => void;
+    type IResizeHandler = (size: {
+        height: number;
+        width: number;
+    }) => void;
     class Component {
         private _element;
         private _content;
@@ -1501,7 +1497,10 @@ declare namespace Plottable {
          * @returns {Component} The calling Component.
          */
         computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number): this;
-        protected _sizeFromOffer(availableWidth: number, availableHeight: number): Plottable.Size;
+        protected _sizeFromOffer(availableWidth: number, availableHeight: number): {
+            width: number;
+            height: number;
+        };
         /**
          * Queues the Component for rendering.
          *
@@ -2084,8 +2083,8 @@ declare namespace Plottable.Axes {
          */
         private _checkTimeAxisTierConfigurationWidth(config);
         protected _sizeFromOffer(availableWidth: number, availableHeight: number): {
-            height: number;
             width: number;
+            height: number;
         };
         protected _setup(): void;
         private _setupDomElements();
