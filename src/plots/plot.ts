@@ -28,6 +28,11 @@ namespace Plottable.Plots {
     scale?: Scale<D, R>;
   }
 
+  /**
+   * TransformableAccessorScaleBinding mapping from property accessor to
+   * TransformableScale. It is distinct from a plain AccessorScaleBinding
+   * in that the scale is guaranteed to be invertable.
+   */
   export interface TransformableAccessorScaleBinding<D, R> {
     accessor: Accessor<any>;
     scale?: TransformableScale<D, R>;
@@ -46,11 +51,11 @@ export class Plot extends Component {
   protected static _ANIMATION_MAX_DURATION = 600;
 
   /**
-   * _cachedEntityIndex is a cache of all the entities in the plot. It, at times
-   * may be undefined and shouldn't be accessed directly. Instead, use _getEntityIndex
+   * _cachedEntityStore is a cache of all the entities in the plot. It, at times
+   * may be undefined and shouldn't be accessed directly. Instead, use _getEntityStore
    * to access the entity index.
    */
-  private _cachedEntityIndex: Plottable.Utils.EntityIndex<Plots.LightweightPlotEntity>;
+  private _cachedEntityStore: Plottable.Utils.EntityStore<Plots.LightweightPlotEntity>;
   private _dataChanged = false;
   private _datasetToDrawer: Utils.Map<Dataset, Drawer>;
 
@@ -93,7 +98,7 @@ export class Plot extends Component {
   public anchor(selection: d3.Selection<void>) {
     super.anchor(selection);
     this._dataChanged = true;
-    this._cachedEntityIndex = undefined;
+    this._cachedEntityStore = undefined;
     this._updateExtents();
     return this;
   }
@@ -131,7 +136,7 @@ export class Plot extends Component {
   protected _onDatasetUpdate() {
     this._updateExtents();
     this._dataChanged = true;
-    this._cachedEntityIndex = undefined;
+    this._cachedEntityStore = undefined;
     this.render();
   }
 
@@ -533,31 +538,31 @@ export class Plot extends Component {
    * @return {Plots.PlotEntity[]}
    */
   public entities(datasets = this.datasets()): Plots.PlotEntity[] {
-    return this._getEntityIndex(datasets).map((entity) => this._lightweightPlotEntityToPlotEntity(entity));
+    return this._getEntityStore(datasets).map((entity) => this._lightweightPlotEntityToPlotEntity(entity));
   }
 
   /**
-   * _getEntityIndex returns the index of all Entities associated with the specified dataset
+   * _getEntityStore returns the index of all Entities associated with the specified dataset
    *
    * @param {Dataset[]} [datasets] - The datasets with which to construct the index. If no datasets
    * are specified all datasets will be used.
    */
-  private _getEntityIndex(datasets?: Dataset[]): Plottable.Utils.EntityIndex<Plots.LightweightPlotEntity> {
+  private _getEntityStore(datasets?: Dataset[]): Plottable.Utils.EntityStore<Plots.LightweightPlotEntity> {
     if (datasets !== undefined) {
-      const entityIndex = new Plottable.Utils.EntityArray<Plots.LightweightPlotEntity>();
+      const EntityStore = new Plottable.Utils.EntityArray<Plots.LightweightPlotEntity>();
       this._buildLightweightPlotEntities(datasets).forEach((entity: Plots.LightweightPlotEntity) => {
-        entityIndex.add(entity);
+        EntityStore.add(entity);
       });
 
-      return entityIndex;
-    } else if (this._cachedEntityIndex === undefined) {
-      this._cachedEntityIndex = new Plottable.Utils.EntityArray<Plots.LightweightPlotEntity>();
+      return EntityStore;
+    } else if (this._cachedEntityStore === undefined) {
+      this._cachedEntityStore = new Plottable.Utils.EntityArray<Plots.LightweightPlotEntity>();
       this._buildLightweightPlotEntities(this.datasets()).forEach((entity: Plots.LightweightPlotEntity) => {
-        this._cachedEntityIndex.add(entity);
+        this._cachedEntityStore.add(entity);
       });
     }
 
-    return this._cachedEntityIndex;
+    return this._cachedEntityStore;
   }
 
   private _lightweightPlotEntityToPlotEntity(entity: Plots.LightweightPlotEntity) {
@@ -598,7 +603,7 @@ export class Plot extends Component {
    * @returns {Plots.PlotEntity} The nearest PlotEntity, or undefined if no {Plots.PlotEntity} can be found.
    */
   public entityNearest(queryPoint: Point, bounds = this.bounds()): Plots.PlotEntity {
-    const nearest = this._getEntityIndex().entityNearest(queryPoint, (entity: Plots.LightweightPlotEntity) => {
+    const nearest = this._getEntityStore().entityNearest(queryPoint, (entity: Plots.LightweightPlotEntity) => {
       return this._entityVisibleOnPlot(entity, bounds);
     });
 

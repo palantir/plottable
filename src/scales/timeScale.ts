@@ -60,7 +60,7 @@ namespace Plottable.Scales {
       return this.scale(new Date(value));
     }
 
-    public invertTransformation(value: number) {
+    public invertedTransformation(value: number) {
       return this.invert(value).getTime();
     }
 

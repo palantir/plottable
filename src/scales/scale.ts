@@ -65,7 +65,7 @@ namespace Plottable.Scales {
     /**
      * Returns value in *Transformation Space* for the provided *screen space*.
      */
-    invertTransformation(value: number): number;
+    invertedTransformation(value: number): number;
   }
 
   /**

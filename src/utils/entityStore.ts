@@ -1,10 +1,10 @@
 namespace Plottable.Utils {
 
   /**
-   * EntityIndex stores entities and makes them searchable.
+   * EntityStore stores entities and makes them searchable.
    * Valid entities must be positioned in Cartesian space.
    */
-  export interface EntityIndex<T extends PositionedEntity> {
+  export interface EntityStore<T extends PositionedEntity> {
     /**
      * Adds an entity to the store
      * @param {T} [entity] Entity to add to the store. Entity must be positionable
@@ -34,9 +34,9 @@ namespace Plottable.Utils {
   }
 
   /**
-   * Array-backed implementation of {EntityIndex}
+   * Array-backed implementation of {EntityStore}
    */
-  export class EntityArray<T extends PositionedEntity> implements EntityIndex<T> {
+  export class EntityArray<T extends PositionedEntity> implements EntityStore<T> {
     private _entities: T[];
 
     constructor() {

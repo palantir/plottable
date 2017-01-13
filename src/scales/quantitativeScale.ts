@@ -271,8 +271,8 @@ export class QuantitativeScale<D> extends Scale<D, number> implements Plottable.
     throw new Error("Subclasses should override scaleTransformation");
   }
 
-  public invertTransformation(value: number): number {
-    throw new Error("Subclasses should override invertTransformation");
+  public invertedTransformation(value: number): number {
+    throw new Error("Subclasses should override invertedTransformation");
   }
 
   public getTransformationDomain(): [number, number] {

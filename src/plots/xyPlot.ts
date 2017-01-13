@@ -422,7 +422,7 @@ export class XYPlot<X, Y> extends Plot {
     const xScale = this.x();
     const yScale = this.y();
 
-    return { x: xScale.scale.invertTransformation(point.x), y: yScale.scale.invertTransformation(point.y) };
+    return { x: xScale.scale.invertedTransformation(point.x), y: yScale.scale.invertedTransformation(point.y) };
   }
 
   protected _pixelPoint(datum: any, index: number, dataset: Dataset): Point {
