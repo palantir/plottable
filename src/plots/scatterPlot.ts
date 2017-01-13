@@ -113,13 +113,10 @@ namespace Plottable.Plots {
     }
 
     protected _entityVisibleOnPlot(entity: LightweightScatterPlotEntity, bounds: Bounds) {
-      const chartWidth = bounds.bottomRight.x - bounds.topLeft.x;
-      const chartHeight = bounds.bottomRight.y - bounds.topLeft.y;
+      const xRange = { min: bounds.topLeft.x, max: bounds.bottomRight.x };
+      const yRange = { min: bounds.topLeft.y, max: bounds.bottomRight.y };
 
-      let xRange = { min: 0, max: chartWidth };
-      let yRange = { min: 0, max: chartHeight };
-
-      let translatedBbox = {
+      const translatedBbox = {
         x: entity.position.x - entity.diameter.x,
         y: entity.position.y - entity.diameter.y,
         width: entity.diameter.x,
