@@ -8454,10 +8454,8 @@ var Plottable;
                 return drawSteps;
             };
             Scatter.prototype._entityVisibleOnPlot = function (entity, bounds) {
-                var chartWidth = bounds.bottomRight.x - bounds.topLeft.x;
-                var chartHeight = bounds.bottomRight.y - bounds.topLeft.y;
-                var xRange = { min: 0, max: chartWidth };
-                var yRange = { min: 0, max: chartHeight };
+                var xRange = { min: bounds.topLeft.x, max: bounds.bottomRight.x };
+                var yRange = { min: bounds.topLeft.y, max: bounds.bottomRight.y };
                 var translatedBbox = {
                     x: entity.position.x - entity.diameter.x,
                     y: entity.position.y - entity.diameter.y,
