@@ -1,9 +1,9 @@
 declare namespace Plottable.Utils {
     /**
-     * EntityIndex stores entities and makes them searchable.
+     * EntityStore stores entities and makes them searchable.
      * Valid entities must be positioned in Cartesian space.
      */
-    interface EntityIndex<T extends PositionedEntity> {
+    interface EntityStore<T extends PositionedEntity> {
         /**
          * Adds an entity to the store
          * @param {T} [entity] Entity to add to the store. Entity must be positionable
@@ -31,9 +31,9 @@ declare namespace Plottable.Utils {
         position: Point;
     }
     /**
-     * Array-backed implementation of {EntityIndex}
+     * Array-backed implementation of {EntityStore}
      */
-    class EntityArray<T extends PositionedEntity> implements EntityIndex<T> {
+    class EntityArray<T extends PositionedEntity> implements EntityStore<T> {
         private _entities;
         constructor();
         add(entity: T): void;
@@ -749,7 +749,7 @@ declare namespace Plottable.Scales {
         /**
          * Returns value in *Transformation Space* for the provided *screen space*.
          */
-        invertTransformation(value: number): number;
+        invertedTransformation(value: number): number;
     }
     /**
      * Type guarded function to check if the scale implements the
@@ -956,7 +956,7 @@ declare namespace Plottable {
         zoom(magnifyAmount: number, centerValue: number): void;
         pan(translateAmount: number): void;
         scaleTransformation(value: number): number;
-        invertTransformation(value: number): number;
+        invertedTransformation(value: number): number;
         getTransformationDomain(): [number, number];
         protected _setDomain(values: D[]): void;
         /**
@@ -999,7 +999,7 @@ declare namespace Plottable.Scales {
         protected _expandSingleValueDomain(singleValueDomain: number[]): number[];
         scale(value: number): number;
         scaleTransformation(value: number): number;
-        invertTransformation(value: number): number;
+        invertedTransformation(value: number): number;
         getTransformationDomain(): [number, number];
         protected _getDomain(): number[];
         protected _backingScaleDomain(): number[];
@@ -1059,7 +1059,7 @@ declare namespace Plottable.Scales {
         scale(x: number): number;
         invert(x: number): number;
         scaleTransformation(value: number): number;
-        invertTransformation(value: number): number;
+        invertedTransformation(value: number): number;
         getTransformationDomain(): [number, number];
         protected _getDomain(): number[];
         protected _setDomain(values: number[]): void;
@@ -1187,7 +1187,7 @@ declare namespace Plottable.Scales {
         zoom(magnifyAmount: number, centerValue: number): void;
         pan(translateAmount: number): void;
         scaleTransformation(value: number): number;
-        invertTransformation(value: number): number;
+        invertedTransformation(value: number): number;
         getTransformationDomain(): [number, number];
         protected _getDomain(): string[];
         protected _backingScaleDomain(): string[];
@@ -1256,7 +1256,7 @@ declare namespace Plottable.Scales {
         protected _expandSingleValueDomain(singleValueDomain: Date[]): Date[];
         scale(value: Date): number;
         scaleTransformation(value: number): number;
-        invertTransformation(value: number): number;
+        invertedTransformation(value: number): number;
         getTransformationDomain(): [number, number];
         protected _getDomain(): Date[];
         protected _backingScaleDomain(): Date[];
@@ -2949,6 +2949,11 @@ declare namespace Plottable.Plots {
         accessor: Accessor<any>;
         scale?: Scale<D, R>;
     }
+    /**
+     * TransformableAccessorScaleBinding mapping from property accessor to
+     * TransformableScale. It is distinct from a plain AccessorScaleBinding
+     * in that the scale is guaranteed to be invertable.
+     */
     interface TransformableAccessorScaleBinding<D, R> {
         accessor: Accessor<any>;
         scale?: TransformableScale<D, R>;
@@ -2962,11 +2967,11 @@ declare namespace Plottable {
     class Plot extends Component {
         protected static _ANIMATION_MAX_DURATION: number;
         /**
-         * _cachedEntityIndex is a cache of all the entities in the plot. It, at times
-         * may be undefined and shouldn't be accessed directly. Instead, use _getEntityIndex
+         * _cachedEntityStore is a cache of all the entities in the plot. It, at times
+         * may be undefined and shouldn't be accessed directly. Instead, use _getEntityStore
          * to access the entity index.
          */
-        private _cachedEntityIndex;
+        private _cachedEntityStore;
         private _dataChanged;
         private _datasetToDrawer;
         protected _renderArea: d3.Selection<void>;
@@ -3108,12 +3113,12 @@ declare namespace Plottable {
          */
         entities(datasets?: Dataset[]): Plots.PlotEntity[];
         /**
-         * _getEntityIndex returns the index of all Entities associated with the specified dataset
+         * _getEntityStore returns the index of all Entities associated with the specified dataset
          *
          * @param {Dataset[]} [datasets] - The datasets with which to construct the index. If no datasets
          * are specified all datasets will be used.
          */
-        private _getEntityIndex(datasets?);
+        private _getEntityStore(datasets?);
         private _lightweightPlotEntityToPlotEntity(entity);
         /**
          * Gets the PlotEntities at a particular Point.
@@ -3132,10 +3137,14 @@ declare namespace Plottable {
          * or undefined if no {Plots.PlotEntity} can be found.
          *
          * @param {Point} queryPoint
-         * @param {bounds} Bounds The bounding box within which to search
+         * @param {bounds} Bounds The bounding box within which to search. By default, bounds is the bounds of
+         * the chart, relative to the parent.
          * @returns {Plots.PlotEntity} The nearest PlotEntity, or undefined if no {Plots.PlotEntity} can be found.
          */
-        entityNearest(queryPoint: Point, bounds?: Bounds): Plots.PlotEntity;
+        entityNearest(queryPoint: Point, bounds?: {
+            topLeft: Point;
+            bottomRight: Point;
+        }): Plots.PlotEntity;
         protected _entityVisibleOnPlot(entity: Plots.PlotEntity | Plots.LightweightPlotEntity, chartBounds: Bounds): boolean;
         protected _uninstallScaleForKey(scale: Scale<any, any>, key: string): void;
         protected _installScaleForKey(scale: Scale<any, any>, key: string): void;

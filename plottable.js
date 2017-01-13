@@ -30,7 +30,7 @@ var Plottable;
     var Utils;
     (function (Utils) {
         /**
-         * Array-backed implementation of {EntityIndex}
+         * Array-backed implementation of {EntityStore}
          */
         var EntityArray = (function () {
             function EntityArray() {
@@ -1787,8 +1787,8 @@ var Plottable;
         QuantitativeScale.prototype.scaleTransformation = function (value) {
             throw new Error("Subclasses should override scaleTransformation");
         };
-        QuantitativeScale.prototype.invertTransformation = function (value) {
-            throw new Error("Subclasses should override invertTransformation");
+        QuantitativeScale.prototype.invertedTransformation = function (value) {
+            throw new Error("Subclasses should override invertedTransformation");
         };
         QuantitativeScale.prototype.getTransformationDomain = function () {
             throw new Error("Subclasses should override getTransformationDomain");
@@ -1867,7 +1867,7 @@ var Plottable;
             Linear.prototype.scaleTransformation = function (value) {
                 return this.scale(value);
             };
-            Linear.prototype.invertTransformation = function (value) {
+            Linear.prototype.invertedTransformation = function (value) {
                 return this.invert(value);
             };
             Linear.prototype.getTransformationDomain = function () {
@@ -1987,7 +1987,7 @@ var Plottable;
             ModifiedLog.prototype.scaleTransformation = function (value) {
                 return this.scale(value);
             };
-            ModifiedLog.prototype.invertTransformation = function (value) {
+            ModifiedLog.prototype.invertedTransformation = function (value) {
                 return this.invert(value);
             };
             ModifiedLog.prototype.getTransformationDomain = function () {
@@ -2221,7 +2221,7 @@ var Plottable;
             Category.prototype.scaleTransformation = function (value) {
                 return this._d3TransformationScale(value);
             };
-            Category.prototype.invertTransformation = function (value) {
+            Category.prototype.invertedTransformation = function (value) {
                 return this._d3TransformationScale.invert(value);
             };
             Category.prototype.getTransformationDomain = function () {
@@ -2434,7 +2434,7 @@ var Plottable;
             Time.prototype.scaleTransformation = function (value) {
                 return this.scale(new Date(value));
             };
-            Time.prototype.invertTransformation = function (value) {
+            Time.prototype.invertedTransformation = function (value) {
                 return this.invert(value).getTime();
             };
             Time.prototype.getTransformationDomain = function () {
@@ -6921,7 +6921,7 @@ var Plottable;
         Plot.prototype.anchor = function (selection) {
             _super.prototype.anchor.call(this, selection);
             this._dataChanged = true;
-            this._cachedEntityIndex = undefined;
+            this._cachedEntityStore = undefined;
             this._updateExtents();
             return this;
         };
@@ -6956,7 +6956,7 @@ var Plottable;
         Plot.prototype._onDatasetUpdate = function () {
             this._updateExtents();
             this._dataChanged = true;
-            this._cachedEntityIndex = undefined;
+            this._cachedEntityStore = undefined;
             this.render();
         };
         Plot.prototype.attr = function (attr, attrValue, scale) {
@@ -7271,30 +7271,30 @@ var Plottable;
         Plot.prototype.entities = function (datasets) {
             var _this = this;
             if (datasets === void 0) { datasets = this.datasets(); }
-            return this._getEntityIndex(datasets).map(function (entity) { return _this._lightweightPlotEntityToPlotEntity(entity); });
+            return this._getEntityStore(datasets).map(function (entity) { return _this._lightweightPlotEntityToPlotEntity(entity); });
         };
         /**
-         * _getEntityIndex returns the index of all Entities associated with the specified dataset
+         * _getEntityStore returns the index of all Entities associated with the specified dataset
          *
          * @param {Dataset[]} [datasets] - The datasets with which to construct the index. If no datasets
          * are specified all datasets will be used.
          */
-        Plot.prototype._getEntityIndex = function (datasets) {
+        Plot.prototype._getEntityStore = function (datasets) {
             var _this = this;
             if (datasets !== undefined) {
-                var entityIndex_1 = new Plottable.Utils.EntityArray();
+                var EntityStore_1 = new Plottable.Utils.EntityArray();
                 this._buildLightweightPlotEntities(datasets).forEach(function (entity) {
-                    entityIndex_1.add(entity);
+                    EntityStore_1.add(entity);
                 });
-                return entityIndex_1;
+                return EntityStore_1;
             }
-            else if (this._cachedEntityIndex === undefined) {
-                this._cachedEntityIndex = new Plottable.Utils.EntityArray();
+            else if (this._cachedEntityStore === undefined) {
+                this._cachedEntityStore = new Plottable.Utils.EntityArray();
                 this._buildLightweightPlotEntities(this.datasets()).forEach(function (entity) {
-                    _this._cachedEntityIndex.add(entity);
+                    _this._cachedEntityStore.add(entity);
                 });
             }
-            return this._cachedEntityIndex;
+            return this._cachedEntityStore;
         };
         Plot.prototype._lightweightPlotEntityToPlotEntity = function (entity) {
             var plotEntity = {
@@ -7327,15 +7327,14 @@ var Plottable;
          * or undefined if no {Plots.PlotEntity} can be found.
          *
          * @param {Point} queryPoint
-         * @param {bounds} Bounds The bounding box within which to search
+         * @param {bounds} Bounds The bounding box within which to search. By default, bounds is the bounds of
+         * the chart, relative to the parent.
          * @returns {Plots.PlotEntity} The nearest PlotEntity, or undefined if no {Plots.PlotEntity} can be found.
          */
         Plot.prototype.entityNearest = function (queryPoint, bounds) {
             var _this = this;
-            if (bounds == null) {
-                bounds = this.bounds();
-            }
-            var nearest = this._getEntityIndex().entityNearest(queryPoint, function (entity) {
+            if (bounds === void 0) { bounds = this.bounds(); }
+            var nearest = this._getEntityStore().entityNearest(queryPoint, function (entity) {
                 return _this._entityVisibleOnPlot(entity, bounds);
             });
             return nearest === undefined ? undefined : this._lightweightPlotEntityToPlotEntity(nearest);
@@ -8014,7 +8013,7 @@ var Plottable;
         XYPlot.prototype._invertPixelPoint = function (point) {
             var xScale = this.x();
             var yScale = this.y();
-            return { x: xScale.scale.invertTransformation(point.x), y: yScale.scale.invertTransformation(point.y) };
+            return { x: xScale.scale.invertedTransformation(point.x), y: yScale.scale.invertedTransformation(point.y) };
         };
         XYPlot.prototype._pixelPoint = function (datum, index, dataset) {
             var xProjector = Plottable.Plot._scaledAccessor(this.x());
