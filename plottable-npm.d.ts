@@ -3133,35 +3133,15 @@ declare namespace Plottable {
          * or undefined if no {Plots.PlotEntity} can be found.
          *
          * @param {Point} queryPoint
+         * @param {bounds} Bounds The bounding box within which to search
          * @returns {Plots.PlotEntity} The nearest PlotEntity, or undefined if no {Plots.PlotEntity} can be found.
          */
-        entityNearest(queryPoint: Point): Plots.PlotEntity;
+        entityNearest(queryPoint: Point, bounds?: Bounds): Plots.PlotEntity;
         protected _entityVisibleOnPlot(entity: Plots.PlotEntity | Plots.LightweightPlotEntity, chartBounds: Bounds): boolean;
         protected _uninstallScaleForKey(scale: Scale<any, any>, key: string): void;
         protected _installScaleForKey(scale: Scale<any, any>, key: string): void;
         protected _propertyProjectors(): AttributeToProjector;
         protected static _scaledAccessor<D, R>(binding: Plots.AccessorScaleBinding<D, R>): Accessor<any>;
-        /**
-         * _invertPixelPoint converts a point in pixel coordinates to a point in data coordinates
-         * @param {Point} point Representation of the point in pixel coordinates
-         * @return {Point} Returns the point represented in data coordinates
-         */
-        protected _invertPixelPoint(point: Point): Point;
-        /**
-         * Returns the bounds of the plot in the Data space ensures that the topLeft
-         * and bottomRight points represent the minima and maxima of the Data space, respectively
-         @returns {Bounds}
-         */
-        protected _invertedBounds(): {
-            topLeft: {
-                x: number;
-                y: number;
-            };
-            bottomRight: {
-                x: number;
-                y: number;
-            };
-        };
         protected _pixelPoint(datum: any, index: number, dataset: Dataset): Point;
         protected _animateOnNextRender(): boolean;
     }
@@ -3309,6 +3289,7 @@ declare namespace Plottable {
          * @param {Scale} yScale The y scale to use.
          */
         constructor();
+        entityNearest(queryPoint: Point): Plots.PlotEntity;
         /**
          * Returns the whether or not the rendering is deferred for performance boost.
          * @return {boolean} The deferred rendering option
@@ -3396,7 +3377,19 @@ declare namespace Plottable {
         showAllData(): this;
         private _adjustYDomainOnChangeFromX();
         private _adjustXDomainOnChangeFromY();
+        protected _buildLightweightPlotEntities(datasets?: Dataset[]): Plots.LightweightPlotEntity[];
         protected _projectorsReady(): boolean;
+        /**
+         * Returns the bounds of the plot in the Data space ensures that the topLeft
+         * and bottomRight points represent the minima and maxima of the Data space, respectively
+         @returns {Bounds}
+         */
+        private _invertedBounds();
+        /**
+         * _invertPixelPoint converts a point in pixel coordinates to a point in data coordinates
+         * @param {Point} point Representation of the point in pixel coordinates
+         * @return {Point} Returns the point represented in data coordinates
+         */
         protected _invertPixelPoint(point: Point): Point;
         protected _pixelPoint(datum: any, index: number, dataset: Dataset): Point;
         protected _getDataToDraw(): Utils.Map<Dataset, any[]>;
