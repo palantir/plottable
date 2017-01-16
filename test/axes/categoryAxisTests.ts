@@ -60,11 +60,27 @@ describe("Category Axes", () => {
       axis.tickLabelMaxWidth(TICK_LABEL_MAX_WIDTH);
       axis.renderTo("svg");
 
-      let ticks = axis.content().selectAll("text");
-      ticks.each(function (this: SVGTextElement) {
-        // add 5px padding to account for https://github.com/palantir/svg-typewriter/issues/40
-        assert.isBelow(this.getBBox().width, TICK_LABEL_MAX_WIDTH + 5, "tick width was capped");
-      });
+      let tickLabelContainer = axis.content().select(".tick-label-container").node() as SVGGElement;
+      // add 8px padding to account for https://github.com/palantir/svg-typewriter/issues/40
+      assert.isBelow(tickLabelContainer.getBBox().width, TICK_LABEL_MAX_WIDTH + 8, "tick width was capped");
+
+      svg.remove();
+    });
+
+    it("has a maximum number of lines when ticklabelMaxLines is set", () => {
+      const svg = TestMethods.generateSVG();
+      const domain = ["albatross long long long long long long long long long long long long title", "short"];
+      const scale = new Plottable.Scales.Category().domain(domain);
+      const axis = new Plottable.Axes.Category(scale, "left");
+      axis.tickLabelMaxWidth(60);
+      axis.tickLabelMaxLines(2);
+      axis.renderTo("svg");
+
+      const tickLabels = axis.content().selectAll(".tick-label");
+      assert.strictEqual(tickLabels.size(), 2, "only renders two labels");
+      const [longLabel, shortLabel] = tickLabels[0];
+      assert.strictEqual(d3.select(longLabel).selectAll("text").size(), 2, "first label is only two lines long");
+      assert.strictEqual(d3.select(shortLabel).selectAll("text").size(), 1, "second label is only one line long");
 
       svg.remove();
     });
