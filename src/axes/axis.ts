@@ -173,6 +173,10 @@ export class Axis<D> extends Component {
     return [];
   }
 
+  /**
+   * Render tick marks, baseline, and annotations. Should be super called by subclasses and then overridden to draw
+   * other relevant aspects of this Axis.
+   */
   public renderImmediately() {
     let tickMarkValues = this._getTickValues();
     let tickMarks = this._tickMarkContainer.selectAll("." + Axis.TICK_MARK_CLASS).data(tickMarkValues);

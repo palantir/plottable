@@ -85,6 +85,27 @@ describe("Category Axes", () => {
       svg.remove();
     });
 
+    it("downsamples the domain if there are too many ticks to fit", () => {
+      const height = 30;
+      const svg = TestMethods.generateSVG(400, height);
+      const domain = ["one", "two", "three", "four", "five", "six", "seven"];
+      const scale = new Plottable.Scales.Category().domain(domain);
+      const axis = new Plottable.Axes.Category(scale, "left");
+      axis.renderTo("svg");
+
+      const [downsampledDomain, stepWidth] = axis.getDownsampleInfo();
+      assert.strictEqual(stepWidth, 4 * scale.stepWidth(), "computes new stepWidth correctly");
+      assert.deepEqual(downsampledDomain, ["one", "five"], "downsamples domain correctly");
+
+      const tickLabels = axis.content().selectAll(".tick-label");
+      assert.strictEqual(tickLabels.size(), 2, "renders downsampled labels");
+      const [oneLabel, fiveLabel] = tickLabels[0];
+      assert.strictEqual(d3.select(oneLabel).text(), "one", "first label is correct");
+      assert.strictEqual(d3.select(fiveLabel).text(), "five", "second label is correct");
+
+      svg.remove();
+    });
+
     it("re-renders with the new domain when the category scale's domain changes", () => {
       let svg = TestMethods.generateSVG();
       let domain = ["foo", "bar", "baz"];
