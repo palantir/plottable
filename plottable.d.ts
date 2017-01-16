@@ -2969,8 +2969,6 @@ declare namespace Plottable.Plots {
         private _endAngle;
         private _startAngles;
         private _endAngles;
-        private _hAlign;
-        private _vAlign;
         private _labelFormatter;
         private _labelsEnabled;
         private _strokeDrawers;
@@ -3056,9 +3054,9 @@ declare namespace Plottable.Plots {
          */
         startAngle(): number;
         /**
-         * Sets the end angle of the Pie Plot.
+         * Sets the start angle of the Pie Plot.
          *
-         * @param {number} endAngle
+         * @param {number} startAngle
          * @returns {Pie} The calling Pie Plot.
          */
         startAngle(angle: number): this;
@@ -3089,32 +3087,6 @@ declare namespace Plottable.Plots {
          */
         labelsEnabled(enabled: boolean): this;
         /**
-          * Get whether slice labels are enabled.
-          *
-          * @returns {boolean} Whether slices should display labels or not.
-          */
-        hAlign(): string;
-        /**
-         * Sets whether labels are enabled.
-         *
-         * @param {string} hAlign
-         * @returns {Pie} The calling Pie Plot.
-         */
-        hAlign(alignment: string): this;
-        /**
-         * Get whether slice labels are enabled.
-         *
-         * @returns {boolean} Whether slices should display labels or not.
-         */
-        vAlign(): string;
-        /**
-         * Sets whether labels are enabled.
-         *
-         * @param {string} vAlign
-         * @returns {Pie} The calling Pie Plot.
-         */
-        vAlign(alignment: string): this;
-        /**
          * Gets the Formatter for the labels.
          */
         labelFormatter(): Formatter;
@@ -3128,6 +3100,7 @@ declare namespace Plottable.Plots {
         entitiesAt(queryPoint: Point): PlotEntity[];
         protected _propertyProjectors(): AttributeToProjector;
         private _updatePieAngles();
+        private _pieCenter();
         protected _getDataToDraw(): Utils.Map<Dataset, any[]>;
         protected static _isValidData(value: any): boolean;
         protected _pixelPoint(datum: any, index: number, dataset: Dataset): {

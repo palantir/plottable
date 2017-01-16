@@ -20,9 +20,8 @@ function run(svg, data, Plottable){
   topPie.sectorValue(function(d){ return d.value; })
         .innerRadius(0)
         .outerRadius(100)
-        .vAlign("top")
-        .startAngle(Math.PI/2)
-        .endAngle(3 * Math.PI/2)
+        .startAngle(0)
+        .endAngle(3 * Math.PI / 2)
         .attr("opacity", .5)
         .attr("fill", function(d){ return d.key; }, cs);
 
@@ -31,8 +30,8 @@ function run(svg, data, Plottable){
   bottomPie.sectorValue(function(d){ return d.value; })
           .innerRadius(0)
           .outerRadius(100)
-          .startAngle(3 *  Math.PI / 2)
-          .endAngle(5 * Math.PI / 2)
+          .startAngle(Math.PI / 4)
+          .endAngle(11 * Math.PI / 6)
           .attr("fill", function(d){ return d.key; }, cs);
 
   var leftPie = new Plottable.Plots.Pie();
@@ -40,7 +39,6 @@ function run(svg, data, Plottable){
   leftPie.sectorValue(function(d){ return d.value; })
         .innerRadius(0)
         .outerRadius(100)
-        .hAlign("left")
         .endAngle(Math.PI)
         .attr("opacity", .5)
         .attr("fill", function(d){ return d.key; }, cs);
@@ -50,22 +48,9 @@ function run(svg, data, Plottable){
   rightPie.sectorValue(function(d){ return d.value; })
           .innerRadius(0)
           .outerRadius(100)
-          .hAlign("right")
           .startAngle(Math.PI)
           .attr("fill", function(d){ return d.key; }, cs);
 
   var pies = new Plottable.Components.Table([[topPie, rightPie], [leftPie, bottomPie]]);
   pies.renderTo(svg);
-
-  new Plottable.Interactions.Pointer()
-  .onPointerMove(function(p){
-    topPie.entities().forEach(function(e){
-      e.selection.attr("opacity", .5);
-    });
-    var entity = topPie.entitiesAt(p)[0];
-    if(entity){
-      entity.selection.attr("opacity", 1);
-    }
-  })
-  .attachTo(topPie);
 }

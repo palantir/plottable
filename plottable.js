@@ -7204,10 +7204,9 @@ var Plottable;
             };
             Pie.prototype.computeLayout = function (origin, availableWidth, availableHeight) {
                 _super.prototype.computeLayout.call(this, origin, availableWidth, availableHeight);
-                var hAlign = this.hAlign() === "left" ? 0 : (this.hAlign() === "right" ? 1 : 0.5);
-                var vAlign = this.vAlign() === "top" ? 0 : (this.vAlign() === "bottom" ? 1 : 0.5);
-                this._renderArea.attr("transform", "translate(" + this.width() * hAlign + "," + this.height() * vAlign + ")");
-                var radiusLimit = Math.min(this.width(), this.height()) / 2;
+                var pieCenter = this._pieCenter();
+                this._renderArea.attr("transform", "translate(" + pieCenter.x + "," + pieCenter.y + ")");
+                var radiusLimit = Math.max(Math.sqrt(Math.pow(pieCenter.x, 2) + Math.pow(pieCenter.y, 2)), Math.sqrt(Math.pow(this.height() - pieCenter.y, 2) + Math.pow(this.width() - pieCenter.y, 2)));
                 if (this.innerRadius().scale != null) {
                     this.innerRadius().scale.range([0, radiusLimit]);
                 }
@@ -7340,26 +7339,6 @@ var Plottable;
                     return this;
                 }
             };
-            Pie.prototype.hAlign = function (alignment) {
-                if (alignment == null) {
-                    return this._hAlign;
-                }
-                else {
-                    this._hAlign = alignment;
-                    this.render();
-                    return this;
-                }
-            };
-            Pie.prototype.vAlign = function (alignment) {
-                if (alignment == null) {
-                    return this._vAlign;
-                }
-                else {
-                    this._vAlign = alignment;
-                    this.render();
-                    return this;
-                }
-            };
             Pie.prototype.labelFormatter = function (formatter) {
                 if (formatter == null) {
                     return this._labelFormatter;
@@ -7409,6 +7388,126 @@ var Plottable;
                     .value(function (d, i) { return sectorValueAccessor(d, i, dataset); })(data);
                 this._startAngles = pie.map(function (slice) { return slice.startAngle; });
                 this._endAngles = pie.map(function (slice) { return slice.endAngle; });
+            };
+            Pie.prototype._pieCenter = function () {
+                var a = this._startAngle < this._endAngle ? this._startAngle : this._endAngle;
+                var b = this._startAngle < this._endAngle ? this._endAngle : this._startAngle;
+                var sinA = Math.sin(a);
+                var cosA = Math.cos(a);
+                var sinB = Math.sin(b);
+                var cosB = Math.cos(b);
+                var hTop;
+                var hBottom;
+                var wRight;
+                var wLeft;
+                if (sinA >= 0 && sinB >= 0) {
+                    if (cosA >= 0 && cosB >= 0) {
+                        hTop = cosA;
+                        hBottom = 0;
+                        wLeft = 0;
+                        wRight = Math.max(sinA, sinB);
+                    }
+                    else if (cosA < 0 && cosB < 0) {
+                        hTop = 0;
+                        hBottom = Math.abs(Math.min(cosA, cosB));
+                        wLeft = 0;
+                        wRight = Math.max(sinA, sinB);
+                    }
+                    else if (cosA >= 0 && cosB < 0) {
+                        hTop = cosA;
+                        hBottom = -cosB;
+                        wLeft = 0;
+                        wRight = Math.max(sinA, sinB);
+                    }
+                    else if (cosA < 0 && cosB >= 0) {
+                        hTop = 1;
+                        hBottom = 1;
+                        wLeft = 1;
+                        wRight = Math.max(sinA, sinB);
+                    }
+                }
+                else if (sinA >= 0 && sinB < 0) {
+                    if (cosA >= 0 && cosB >= 0) {
+                        hTop = Math.max(cosA, cosB);
+                        hBottom = 1;
+                        wLeft = 1;
+                        wRight = 1;
+                    }
+                    else if (cosA < 0 && cosB < 0) {
+                        hTop = 0;
+                        hBottom = 1;
+                        wLeft = -sinB;
+                        wRight = sinA;
+                    }
+                    else if (cosA >= 0 && cosB < 0) {
+                        hTop = cosA;
+                        hBottom = 1;
+                        wLeft = -sinB;
+                        wRight = 1;
+                    }
+                    else if (cosA < 0 && cosB >= 0) {
+                        hTop = cosB;
+                        hBottom = 1;
+                        wLeft = 1;
+                        wRight = sinA;
+                    }
+                }
+                else if (sinA < 0 && sinB >= 0) {
+                    if (cosA >= 0 && cosB >= 0) {
+                        hTop = 1;
+                        hBottom = 0;
+                        wLeft = -sinA;
+                        wRight = sinB;
+                    }
+                    else if (cosA < 0 && cosB < 0) {
+                        hTop = 1;
+                        hBottom = Math.max(-cosA, -cosB);
+                        wLeft = 1;
+                        wRight = 1;
+                    }
+                    else if (cosA >= 0 && cosB < 0) {
+                        hTop = 1;
+                        hBottom = -cosB;
+                        wLeft = -sinA;
+                        wRight = 1;
+                    }
+                    else if (cosA < 0 && cosB >= 0) {
+                        hTop = 1;
+                        hBottom = -cosA;
+                        wLeft = 1;
+                        wRight = sinB;
+                    }
+                }
+                else if (sinA < 0 && sinB < 0) {
+                    if (cosA >= 0 && cosB >= 0) {
+                        hTop = cosB;
+                        hBottom = 0;
+                        wLeft = -sinA;
+                        wRight = 0;
+                    }
+                    else if (cosA < 0 && cosB < 0) {
+                        hTop = 0;
+                        hBottom = -cosA;
+                        wLeft = -sinB;
+                        wRight = 0;
+                    }
+                    else if (cosA >= 0 && cosB < 0) {
+                        hTop = 1;
+                        hBottom = 1;
+                        wLeft = Math.max(cosA, -cosB);
+                        wRight = 1;
+                    }
+                    else if (cosA < 0 && cosB >= 0) {
+                        hTop = cosB;
+                        hBottom = -cosA;
+                        wLeft = 1;
+                        wRight = 0;
+                    }
+                }
+                return {
+                    x: wLeft + wRight == 0 ? 0 : (wLeft / (wLeft + wRight)) * this.width(),
+                    y: hTop + hBottom == 0 ? 0 : (hTop / (hTop + hBottom)) * this.height()
+                };
             };
             Pie.prototype._getDataToDraw = function () {
                 var dataToDraw = _super.prototype._getDataToDraw.call(this);

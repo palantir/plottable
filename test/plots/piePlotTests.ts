@@ -220,62 +220,6 @@ describe("Plots", () => {
         svg.remove();
       });
 
-      it("can set hAlign() to left", () => {
-        let expectedHAlign = "left";
-        assert.strictEqual(piePlot.hAlign(expectedHAlign), piePlot, "setter returns the calling pie plot");
-        let arcPaths = piePlot.content().selectAll(".arc.fill");
-        assert.strictEqual(arcPaths.size(), 2, "has two sectors");
-
-        let renderArea = piePlot.computeLayout().content().selectAll(".render-area");
-        let vallll = d3.select(renderArea[0][0]).attr("transform");
-
-        assert.strictEqual(vallll, "translate(0,200)", "the center of the pie is at the center left");
-
-        svg.remove();
-      });
-
-      it("can set hAlign() to right", () => {
-        let expectedHAlign = "right";
-        assert.strictEqual(piePlot.hAlign(expectedHAlign), piePlot, "setter returns the calling pie plot");
-        let arcPaths = piePlot.content().selectAll(".arc.fill");
-        assert.strictEqual(arcPaths.size(), 2, "has two sectors");
-
-        let renderArea = piePlot.computeLayout().content().selectAll(".render-area");
-        let vallll = d3.select(renderArea[0][0]).attr("transform");
-
-        assert.strictEqual(vallll, "translate(400,200)", "the center of the pie is at the center right");
-
-        svg.remove();
-      });
-
-      it("can set vAlign() to top", () => {
-        let expectedVAlign = "top";
-        assert.strictEqual(piePlot.vAlign(expectedVAlign), piePlot, "setter returns the calling pie plot");
-        let arcPaths = piePlot.content().selectAll(".arc.fill");
-        assert.strictEqual(arcPaths.size(), 2, "has two sectors");
-
-        let renderArea = piePlot.computeLayout().content().selectAll(".render-area");
-        let vallll = d3.select(renderArea[0][0]).attr("transform");
-
-        assert.strictEqual(vallll, "translate(200,0)", "the center of the pie is at the top center");
-
-        svg.remove();
-      });
-
-      it("can set vAlign() to bottom", () => {
-        let expectedVAlign = "bottom";
-        assert.strictEqual(piePlot.vAlign(expectedVAlign), piePlot, "setter returns the calling pie plot");
-        let arcPaths = piePlot.content().selectAll(".arc.fill");
-        assert.strictEqual(arcPaths.size(), 2, "has two sectors");
-
-        let renderArea = piePlot.computeLayout().content().selectAll(".render-area");
-        let vallll = d3.select(renderArea[0][0]).attr("transform");
-
-        assert.strictEqual(vallll, "translate(200,400)", "the center of the pie is at the bottom center");
-
-        svg.remove();
-      });
-
       it("updates slices when data changes and render correctly w.r.t. scale changes", () => {
         const newDataset = new Plottable.Dataset([{ value: 500 }, { value: 600 }]);
         // reset database for this test's sake

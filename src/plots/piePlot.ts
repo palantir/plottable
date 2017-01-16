@@ -8,8 +8,6 @@ namespace Plottable.Plots {
     private _endAngle: number = 2*Math.PI;
     private _startAngles: number[];
     private _endAngles: number[];
-    private _hAlign: string;
-    private _vAlign: string;
     private _labelFormatter: Formatter = Formatters.identity();
     private _labelsEnabled = false;
     private _strokeDrawers: Utils.Map<Dataset, Drawers.ArcOutline>;
@@ -33,11 +31,16 @@ namespace Plottable.Plots {
     }
 
     public computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number) {
-      super.computeLayout(origin, availableWidth, availableHeight);  
-      let hAlign = this.hAlign() === "left" ? 0 : (this.hAlign() === "right" ?  1 : 0.5)
-      let vAlign = this.vAlign() === "top" ? 0 : (this.vAlign() === "bottom" ?  1 : 0.5)
-      this._renderArea.attr("transform", "translate(" + this.width() * hAlign + "," + this.height() * vAlign + ")");
-      let radiusLimit = Math.min(this.width(), this.height()) / 2;
+      super.computeLayout(origin, availableWidth, availableHeight);
+      
+      let pieCenter = this._pieCenter()
+      this._renderArea.attr("transform", "translate(" + pieCenter.x + "," + pieCenter.y + ")");
+      
+      let radiusLimit = Math.max(
+        Math.sqrt(Math.pow(pieCenter.x, 2) + Math.pow(pieCenter.y, 2)),
+        Math.sqrt(Math.pow(this.height() - pieCenter.y, 2) + Math.pow(this.width() - pieCenter.y, 2))
+      );
+
       if (this.innerRadius().scale != null) {
         this.innerRadius().scale.range([0, radiusLimit]);
       }
@@ -211,9 +214,9 @@ namespace Plottable.Plots {
      */
     public startAngle(): number;
     /**
-     * Sets the end angle of the Pie Plot.
+     * Sets the start angle of the Pie Plot.
      *
-     * @param {number} endAngle
+     * @param {number} startAngle
      * @returns {Pie} The calling Pie Plot.
      */
     public startAngle(angle: number): this;
@@ -270,52 +273,6 @@ namespace Plottable.Plots {
         return this._labelsEnabled;
       } else {
         this._labelsEnabled = enabled;
-        this.render();
-        return this;
-      }
-    }
-
-   /**
-     * Get whether slice labels are enabled.
-     *
-     * @returns {boolean} Whether slices should display labels or not.
-     */
-    public hAlign(): string;
-    /**
-     * Sets whether labels are enabled.
-     *
-     * @param {string} hAlign
-     * @returns {Pie} The calling Pie Plot.
-     */
-    public hAlign(alignment: string): this;
-    public hAlign(alignment?: string): any {
-      if (alignment == null) {
-        return this._hAlign;
-      } else {
-        this._hAlign = alignment;
-        this.render();
-        return this;
-      }
-    }
-
-    /**
-     * Get whether slice labels are enabled.
-     *
-     * @returns {boolean} Whether slices should display labels or not.
-     */
-    public vAlign(): string;
-    /**
-     * Sets whether labels are enabled.
-     *
-     * @param {string} vAlign
-     * @returns {Pie} The calling Pie Plot.
-     */
-    public vAlign(alignment: string): this;
-    public vAlign(alignment?: string): any {
-      if (alignment == null) {
-        return this._vAlign;
-      } else {
-        this._vAlign = alignment;
         this.render();
         return this;
       }
@@ -378,6 +335,48 @@ namespace Plottable.Plots {
         .value((d, i) => sectorValueAccessor(d, i, dataset))(data);
       this._startAngles = pie.map((slice) => slice.startAngle);
       this._endAngles = pie.map((slice) => slice.endAngle);
+    }
+
+    private _pieCenter(): Point {
+      let a = this._startAngle < this._endAngle ? this._startAngle: this._endAngle;
+      let b = this._startAngle < this._endAngle ? this._endAngle: this._startAngle;
+      let sinA = Math.sin(a);
+      let cosA = Math.cos(a);
+      let sinB = Math.sin(b);
+      let cosB = Math.cos(b);
+      let hTop: number;
+      let hBottom: number;
+      let wRight: number;
+      let wLeft: number;
+      if (sinA >= 0 && sinB >= 0) {
+        if (cosA >= 0 && cosB >= 0) { hTop = cosA; hBottom = 0; wLeft = 0; wRight = Math.max(sinA, sinB); }
+        else if (cosA < 0 && cosB < 0) { hTop = 0; hBottom = Math.abs(Math.min(cosA, cosB)); wLeft = 0; wRight = Math.max(sinA, sinB); }
+        else if (cosA >= 0 && cosB < 0) { hTop = cosA; hBottom = -cosB; wLeft = 0; wRight = Math.max(sinA, sinB) }
+        else if (cosA < 0 && cosB >= 0) { hTop = 1; hBottom = 1; wLeft = 1; wRight = Math.max(sinA, sinB); }
+      }
+      else if (sinA >= 0 && sinB < 0) {
+        if (cosA >= 0 && cosB >= 0) { hTop = Math.max(cosA, cosB); hBottom = 1; wLeft = 1; wRight = 1; }
+        else if (cosA < 0 && cosB < 0) { hTop = 0; hBottom = 1; wLeft = -sinB; wRight = sinA; }
+        else if (cosA >= 0 && cosB < 0) { hTop = cosA; hBottom = 1; wLeft = -sinB; wRight = 1; }
+        else if (cosA < 0 && cosB >= 0) { hTop = cosB; hBottom = 1; wLeft = 1; wRight = sinA; }
+      }
+      else if (sinA < 0 && sinB >= 0) {
+        if (cosA >= 0 && cosB >= 0) { hTop = 1; hBottom = 0; wLeft = -sinA; wRight = sinB; }
+        else if (cosA < 0 && cosB < 0) { hTop = 1; hBottom = Math.max(-cosA, -cosB); wLeft = 1; wRight = 1; }
+        else if (cosA >= 0 && cosB < 0) { hTop = 1; hBottom = -cosB; wLeft = -sinA; wRight = 1; }
+        else if (cosA < 0 && cosB >= 0) { hTop = 1; hBottom = -cosA; wLeft = 1 ; wRight = sinB; }
+      }
+      else if (sinA < 0 && sinB < 0) {
+        if (cosA >= 0 && cosB >= 0) { hTop = cosB; hBottom = 0; wLeft = -sinA ; wRight = 0; }
+        else if (cosA < 0 && cosB < 0) { hTop = 0; hBottom = -cosA; wLeft = -sinB ; wRight = 0; }
+        else if (cosA >= 0 && cosB < 0) { hTop = 1; hBottom = 1; wLeft = Math.max(cosA, -cosB); wRight = 1; }
+        else if (cosA < 0 && cosB >= 0) { hTop = cosB; hBottom = -cosA; wLeft = 1; wRight = 0; }
+      }
+
+      return {
+        x: wLeft + wRight == 0 ? 0 : (wLeft / (wLeft + wRight)) * this.width(),
+        y: hTop + hBottom == 0 ? 0 : (hTop / (hTop + hBottom)) * this.height()
+      }
     }
 
     protected _getDataToDraw() {
