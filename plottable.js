@@ -3084,6 +3084,9 @@ var Plottable;
             };
             this._element.attr("transform", "translate(" + this._origin.x + "," + this._origin.y + ")");
             this._boxes.forEach(function (b) { return b.attr("width", _this.width()).attr("height", _this.height()); });
+            if (this._resizeHandler != null) {
+                this._resizeHandler(size);
+            }
             return this;
         };
         Component.prototype._sizeFromOffer = function (availableWidth, availableHeight) {
@@ -3108,6 +3111,16 @@ var Plottable;
             if (this._isAnchored && this._isSetup) {
                 Plottable.RenderController.registerToComputeLayout(this);
             }
+        };
+        /**
+         * Sets a callback that gets called when the component resizes. The size change
+         * is not guaranteed to be reflected by the DOM at the time the callback is fired.
+         *
+         * @param {IResizeHandler} [resizeHandler] Callback to be called when component resizes
+         */
+        Component.prototype.onResize = function (resizeHandler) {
+            this._resizeHandler = resizeHandler;
+            return this;
         };
         /**
          * Renders the Component without waiting for the next frame.

@@ -1416,6 +1416,10 @@ declare namespace Plottable {
             static CENTER: string;
         }
     }
+    type IResizeHandler = (size: {
+        height: number;
+        width: number;
+    }) => void;
     class Component {
         private _element;
         private _content;
@@ -1423,6 +1427,7 @@ declare namespace Plottable {
         private _backgroundContainer;
         private _foregroundContainer;
         protected _clipPathEnabled: boolean;
+        private _resizeHandler;
         private _origin;
         private _parent;
         private _xAlignment;
@@ -1503,6 +1508,13 @@ declare namespace Plottable {
          */
         render(): this;
         private _scheduleComputeLayout();
+        /**
+         * Sets a callback that gets called when the component resizes. The size change
+         * is not guaranteed to be reflected by the DOM at the time the callback is fired.
+         *
+         * @param {IResizeHandler} [resizeHandler] Callback to be called when component resizes
+         */
+        onResize(resizeHandler: IResizeHandler): this;
         /**
          * Renders the Component without waiting for the next frame.
          */

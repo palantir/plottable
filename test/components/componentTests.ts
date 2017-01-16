@@ -463,6 +463,25 @@ describe("Component", () => {
       c.destroy();
       svg.remove();
     });
+
+    it("calls onResize callback if callback is registered", (done) => {
+      let origin = {
+        x: 10,
+        y: 20,
+      };
+      let width = 100;
+      let height = 200;
+      c.anchor(svg);
+
+      c.onResize((size: { height: number, width: number }) => {
+        assert.deepEqual(size, { width, height });
+        c.destroy();
+        svg.remove();
+        done();
+      });
+
+      c.computeLayout(origin, width, height);
+    });
   });
 
   describe("computing the layout when of fixed size", () => {
