@@ -1,8 +1,8 @@
 namespace Plottable.Plots {
   type LabelConfig = {
     labelArea: d3.Selection<void>;
-    measurer: SVGTypewriter.Measurers.Measurer;
-    writer: SVGTypewriter.Writers.Writer;
+    measurer: SVGTypewriter.Measurer;
+    writer: SVGTypewriter.Writer;
   };
 
   export class Bar<X, Y> extends XYPlot<X, Y> {
@@ -235,8 +235,8 @@ namespace Plottable.Plots {
       let drawer = super._createNodesForDataset(dataset);
       drawer.renderArea().classed(Bar._BAR_AREA_CLASS, true);
       let labelArea = this._renderArea.append("g").classed(Bar._LABEL_AREA_CLASS, true);
-      let measurer = new SVGTypewriter.Measurers.CacheCharacterMeasurer(labelArea);
-      let writer = new SVGTypewriter.Writers.Writer(measurer);
+      let measurer = new SVGTypewriter.CacheMeasurer(labelArea);
+      let writer = new SVGTypewriter.Writer(measurer);
       this._labelConfig.set(dataset, { labelArea: labelArea, measurer: measurer, writer: writer });
       return drawer;
     }

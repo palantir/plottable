@@ -204,7 +204,7 @@ describe("Labels", () => {
       it("puts space around the label", () => {
         label.renderTo(svg);
 
-        const measurer = new SVGTypewriter.Measurers.Measurer(svg);
+        const measurer = new SVGTypewriter.CacheMeasurer(svg);
         const measure = measurer.measure("testing label");
         assert.operator(label.width(), ">", measure.width, "padding increases size of the component");
         assert.operator(label.width(), "<=", measure.width + 2 * PADDING, "width at most incorporates full padding amount");

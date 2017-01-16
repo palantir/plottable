@@ -51,6 +51,7 @@
     "typescript": "2.0.6"
   },
   "dependencies": {
-    "d3": "^3.5.16"
+    "d3": "^3.5.16",
+    "svg-typewriter": "1.0.0"
   }
 }

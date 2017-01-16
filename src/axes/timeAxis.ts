@@ -160,7 +160,7 @@ namespace Plottable.Axes {
     private _tierHeights: number[];
     private _possibleTimeAxisConfigurations: TimeAxisConfiguration[];
     private _numTiers: number;
-    private _measurer: SVGTypewriter.Measurers.Measurer;
+    private _measurer: SVGTypewriter.Measurer;
 
     private _mostPreciseConfigIndex: number;
 
@@ -344,7 +344,7 @@ namespace Plottable.Axes {
         this._tierBaselines.push(tierContainer.append("line").classed("baseline", true));
       }
 
-      this._measurer = new SVGTypewriter.Measurers.Measurer(this._tierLabelContainers[0]);
+      this._measurer = new SVGTypewriter.CacheMeasurer(this._tierLabelContainers[0]);
     }
 
     private _getTickIntervalValues(config: TimeAxisTierConfiguration): any[] {

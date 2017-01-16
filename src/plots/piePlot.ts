@@ -361,8 +361,8 @@ namespace Plottable.Plots {
     private _drawLabels() {
       let attrToProjector = this._generateAttrToProjector();
       let labelArea = this._renderArea.append("g").classed("label-area", true);
-      let measurer = new SVGTypewriter.Measurers.Measurer(labelArea);
-      let writer = new SVGTypewriter.Writers.Writer(measurer);
+      let measurer = new SVGTypewriter.CacheMeasurer(labelArea);
+      let writer = new SVGTypewriter.Writer(measurer);
       let dataset = this.datasets()[0];
       let data = this._getDataToDraw().get(dataset);
       data.forEach((datum, datumIndex) => {

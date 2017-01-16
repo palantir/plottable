@@ -2,9 +2,9 @@ namespace Plottable.Components {
   export class InterpolatedColorLegend extends Component {
     private static _DEFAULT_NUM_SWATCHES = 11;
 
-    private _measurer: SVGTypewriter.Measurers.Measurer;
-    private _wrapper: SVGTypewriter.Wrappers.Wrapper;
-    private _writer: SVGTypewriter.Writers.Writer;
+    private _measurer: SVGTypewriter.Measurer;
+    private _wrapper: SVGTypewriter.Wrapper;
+    private _writer: SVGTypewriter.Writer;
     private _scale: Scales.InterpolatedColor;
     private _orientation: String ;
     private _textPadding = 5;
@@ -152,9 +152,9 @@ namespace Plottable.Components {
       this._lowerLabel = this.content().append("g").classed(InterpolatedColorLegend.LEGEND_LABEL_CLASS, true);
       this._upperLabel = this.content().append("g").classed(InterpolatedColorLegend.LEGEND_LABEL_CLASS, true);
 
-      this._measurer = new SVGTypewriter.Measurers.Measurer(this.content());
-      this._wrapper = new SVGTypewriter.Wrappers.Wrapper();
-      this._writer = new SVGTypewriter.Writers.Writer(this._measurer, this._wrapper);
+      this._measurer = new SVGTypewriter.CacheMeasurer(this.content());
+      this._wrapper = new SVGTypewriter.Wrapper();
+      this._writer = new SVGTypewriter.Writer(this._measurer, this._wrapper);
     }
 
     public requestedSpace(offeredWidth: number, offeredHeight: number): SpaceRequest {
