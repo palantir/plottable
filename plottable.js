@@ -2707,6 +2707,7 @@ var Plottable;
         function Drawer(dataset) {
             this._cachedSelectionValid = false;
             this._dataset = dataset;
+            this._svgElementName = "path";
         }
         Drawer.prototype.renderArea = function (area) {
             if (area == null) {
@@ -7270,13 +7271,12 @@ var Plottable;
          */
         Plot.prototype.entities = function (datasets) {
             var _this = this;
-            if (datasets === void 0) { datasets = this.datasets(); }
             return this._getEntityStore(datasets).map(function (entity) { return _this._lightweightPlotEntityToPlotEntity(entity); });
         };
         /**
-         * _getEntityStore returns the index of all Entities associated with the specified dataset
+         * _getEntityStore returns the store of all Entities associated with the specified dataset
          *
-         * @param {Dataset[]} [datasets] - The datasets with which to construct the index. If no datasets
+         * @param {Dataset[]} [datasets] - The datasets with which to construct the store. If no datasets
          * are specified all datasets will be used.
          */
         Plot.prototype._getEntityStore = function (datasets) {
