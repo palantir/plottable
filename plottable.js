@@ -7192,7 +7192,10 @@ var Plottable;
                 this._labelFormatter = Plottable.Formatters.identity();
                 this._labelsEnabled = false;
                 this.innerRadius(0);
-                this.outerRadius(function () { return Math.min(_this.width(), _this.height()) / 2; });
+                this.outerRadius(function () {
+                    var pieCenter = _this._pieCenter();
+                    return Math.min(Math.max(_this.width() - pieCenter.x, pieCenter.x), Math.max(_this.height() - pieCenter.y, pieCenter.y));
+                });
                 this.addClass("pie-plot");
                 this.attr("fill", function (d, i) { return String(i); }, new Plottable.Scales.Color());
                 this._strokeDrawers = new Plottable.Utils.Map();
@@ -7206,7 +7209,7 @@ var Plottable;
                 _super.prototype.computeLayout.call(this, origin, availableWidth, availableHeight);
                 var pieCenter = this._pieCenter();
                 this._renderArea.attr("transform", "translate(" + pieCenter.x + "," + pieCenter.y + ")");
-                var radiusLimit = Math.max(Math.sqrt(Math.pow(pieCenter.x, 2) + Math.pow(pieCenter.y, 2)), Math.sqrt(Math.pow(this.height() - pieCenter.y, 2) + Math.pow(this.width() - pieCenter.y, 2)));
+                var radiusLimit = Math.min(Math.max(this.width() - pieCenter.x, pieCenter.x), Math.max(this.height() - pieCenter.y, pieCenter.y));
                 if (this.innerRadius().scale != null) {
                     this.innerRadius().scale.range([0, radiusLimit]);
                 }
@@ -7400,24 +7403,30 @@ var Plottable;
                 var hBottom;
                 var wRight;
                 var wLeft;
+                /**
+                 *  The center of the pie is computed using the sine and cosine of the start angle and the end angle
+                 *  The sine indicates whether the start and end fall on the right half or the left half of the pie
+                 *  The cosine indicates whether the start and end fall on the top or the bottom half of the pie
+                 *  Different combinations provide the different heights and widths the pie needs from the center to the sides
+                 */
                 if (sinA >= 0 && sinB >= 0) {
                     if (cosA >= 0 && cosB >= 0) {
                         hTop = cosA;
                         hBottom = 0;
                         wLeft = 0;
-                        wRight = Math.max(sinA, sinB);
+                        wRight = sinB;
                     }
                     else if (cosA < 0 && cosB < 0) {
                         hTop = 0;
-                        hBottom = Math.abs(Math.min(cosA, cosB));
+                        hBottom = -cosB;
                         wLeft = 0;
-                        wRight = Math.max(sinA, sinB);
+                        wRight = sinA;
                     }
                     else if (cosA >= 0 && cosB < 0) {
                         hTop = cosA;
                         hBottom = -cosB;
                         wLeft = 0;
-                        wRight = Math.max(sinA, sinB);
+                        wRight = sinA;
                     }
                     else if (cosA < 0 && cosB >= 0) {
                         hTop = 1;

@@ -17,8 +17,11 @@ namespace Plottable.Plots {
      */
     constructor() {
       super();
-      this.innerRadius(0);
-      this.outerRadius(() => Math.min(this.width(), this.height()) / 2);
+      this.innerRadius(0)
+      this.outerRadius(() => {
+        let pieCenter = this._pieCenter();
+        return Math.min(Math.max(this.width() - pieCenter.x, pieCenter.x), Math.max(this.height() - pieCenter.y, pieCenter.y));
+      });
       this.addClass("pie-plot");
       this.attr("fill", (d, i) => String(i), new Scales.Color());
 
@@ -36,10 +39,7 @@ namespace Plottable.Plots {
       let pieCenter = this._pieCenter()
       this._renderArea.attr("transform", "translate(" + pieCenter.x + "," + pieCenter.y + ")");
       
-      let radiusLimit = Math.max(
-        Math.sqrt(Math.pow(pieCenter.x, 2) + Math.pow(pieCenter.y, 2)),
-        Math.sqrt(Math.pow(this.height() - pieCenter.y, 2) + Math.pow(this.width() - pieCenter.y, 2))
-      );
+      let radiusLimit = Math.min(Math.max(this.width() - pieCenter.x, pieCenter.x), Math.max(this.height() - pieCenter.y, pieCenter.y));
 
       if (this.innerRadius().scale != null) {
         this.innerRadius().scale.range([0, radiusLimit]);
@@ -348,10 +348,17 @@ namespace Plottable.Plots {
       let hBottom: number;
       let wRight: number;
       let wLeft: number;
+
+      /**
+       *  The center of the pie is computed using the sine and cosine of the start angle and the end angle
+       *  The sine indicates whether the start and end fall on the right half or the left half of the pie
+       *  The cosine indicates whether the start and end fall on the top or the bottom half of the pie
+       *  Different combinations provide the different heights and widths the pie needs from the center to the sides
+       */
       if (sinA >= 0 && sinB >= 0) {
-        if (cosA >= 0 && cosB >= 0) { hTop = cosA; hBottom = 0; wLeft = 0; wRight = Math.max(sinA, sinB); }
-        else if (cosA < 0 && cosB < 0) { hTop = 0; hBottom = Math.abs(Math.min(cosA, cosB)); wLeft = 0; wRight = Math.max(sinA, sinB); }
-        else if (cosA >= 0 && cosB < 0) { hTop = cosA; hBottom = -cosB; wLeft = 0; wRight = Math.max(sinA, sinB) }
+        if (cosA >= 0 && cosB >= 0) { hTop = cosA; hBottom = 0; wLeft = 0; wRight = sinB; }
+        else if (cosA < 0 && cosB < 0) { hTop = 0; hBottom = -cosB; wLeft = 0; wRight = sinA; }
+        else if (cosA >= 0 && cosB < 0) { hTop = cosA; hBottom = -cosB; wLeft = 0; wRight = sinA }
         else if (cosA < 0 && cosB >= 0) { hTop = 1; hBottom = 1; wLeft = 1; wRight = Math.max(sinA, sinB); }
       }
       else if (sinA >= 0 && sinB < 0) {

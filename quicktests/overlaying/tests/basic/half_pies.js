@@ -19,9 +19,8 @@ function run(svg, data, Plottable){
   topPie.addDataset(new Plottable.Dataset(data));
   topPie.sectorValue(function(d){ return d.value; })
         .innerRadius(0)
-        .outerRadius(100)
         .startAngle(0)
-        .endAngle(3 * Math.PI / 2)
+        .endAngle(Math.PI / 2)
         .attr("opacity", .5)
         .attr("fill", function(d){ return d.key; }, cs);
 
@@ -29,16 +28,13 @@ function run(svg, data, Plottable){
   bottomPie.addDataset(new Plottable.Dataset(data));
   bottomPie.sectorValue(function(d){ return d.value; })
           .innerRadius(0)
-          .outerRadius(100)
-          .startAngle(Math.PI / 4)
-          .endAngle(11 * Math.PI / 6)
+          .startAngle(3 * Math.PI / 4)
           .attr("fill", function(d){ return d.key; }, cs);
 
   var leftPie = new Plottable.Plots.Pie();
   leftPie.addDataset(new Plottable.Dataset(data));
   leftPie.sectorValue(function(d){ return d.value; })
         .innerRadius(0)
-        .outerRadius(100)
         .endAngle(Math.PI)
         .attr("opacity", .5)
         .attr("fill", function(d){ return d.key; }, cs);
@@ -47,7 +43,6 @@ function run(svg, data, Plottable){
   rightPie.addDataset(new Plottable.Dataset(data));
   rightPie.sectorValue(function(d){ return d.value; })
           .innerRadius(0)
-          .outerRadius(100)
           .startAngle(Math.PI)
           .attr("fill", function(d){ return d.key; }, cs);
 
