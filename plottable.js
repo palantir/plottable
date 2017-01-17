@@ -5123,7 +5123,7 @@ var Plottable;
              * Take the scale and drop ticks at regular intervals such that the resultant ticks are all a reasonable minimum
              * distance apart. Return the resultant ticks to render, as well as the new stepWidth between them.
              *
-             * @param scale the scale being downsampled. Defaults to this Axis' scale.
+             * @param {Scales.Category} scale - The scale being downsampled. Defaults to this Axis' scale.
              * @return {DownsampleInfo} an object holding the resultant domain and new stepWidth.
              */
             Category.prototype.getDownsampleInfo = function (scale) {
