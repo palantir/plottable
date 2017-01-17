@@ -258,6 +258,10 @@ declare namespace Plottable.Utils.Stacking {
      * @return {StackingResult} value and offset for each datapoint in each Dataset
      */
     function stack(datasets: Dataset[], keyAccessor: Accessor<any>, valueAccessor: Accessor<number>): StackingResult;
+    function stackedExtents(stackingResult: StackingResult): {
+        maximumExtents: Map<string, number>;
+        minimumExtents: Map<string, number>;
+    };
     /**
      * Computes the total extent over all data points in all Datasets, taking stacking into consideration.
      *
@@ -3633,7 +3637,7 @@ declare namespace Plottable.Plots {
          * Makes sure the extent takes into account the widths of the bars
          */
         protected _extentsForProperty(property: string): any[];
-        private _drawLabels();
+        protected _drawLabels(): void;
         private _drawLabel(data, dataset);
         protected _generateDrawSteps(): Drawers.DrawStep[];
         protected _generateAttrToProjector(): {
@@ -3894,6 +3898,11 @@ declare namespace Plottable.Plots {
 }
 declare namespace Plottable.Plots {
     class StackedBar<X, Y> extends Bar<X, Y> {
+        private static _STACKED_BAR_LABEL_AREA_CLASS;
+        protected static _STACKED_BAR_LABEL_PADDING: number;
+        private _labelArea;
+        private _measurer;
+        private _writer;
         private _stackingResult;
         private _stackedExtent;
         /**
@@ -3913,6 +3922,8 @@ declare namespace Plottable.Plots {
         y(): Plots.AccessorScaleBinding<Y, number>;
         y(y: number | Accessor<number>): this;
         y(y: Y | Accessor<Y>, yScale: Scale<Y, number>): this;
+        protected _setup(): void;
+        protected _drawLabels(): void;
         protected _generateAttrToProjector(): {
             [attr: string]: Projector;
         };
