@@ -4,6 +4,8 @@ namespace Plottable.Plots {
     private static _INNER_RADIUS_KEY = "inner-radius";
     private static _OUTER_RADIUS_KEY = "outer-radius";
     private static _SECTOR_VALUE_KEY = "sector-value";
+    private _startAngle: number = 0;
+    private _endAngle: number = 2*Math.PI;
     private _startAngles: number[];
     private _endAngles: number[];
     private _labelFormatter: Formatter = Formatters.identity();
@@ -15,8 +17,11 @@ namespace Plottable.Plots {
      */
     constructor() {
       super();
-      this.innerRadius(0);
-      this.outerRadius(() => Math.min(this.width(), this.height()) / 2);
+      this.innerRadius(0)
+      this.outerRadius(() => {
+        let pieCenter = this._pieCenter();
+        return Math.min(Math.max(this.width() - pieCenter.x, pieCenter.x), Math.max(this.height() - pieCenter.y, pieCenter.y));
+      });
       this.addClass("pie-plot");
       this.attr("fill", (d, i) => String(i), new Scales.Color());
 
@@ -30,8 +35,12 @@ namespace Plottable.Plots {
 
     public computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number) {
       super.computeLayout(origin, availableWidth, availableHeight);
-      this._renderArea.attr("transform", "translate(" + this.width() / 2 + "," + this.height() / 2 + ")");
-      let radiusLimit = Math.min(this.width(), this.height()) / 2;
+      
+      let pieCenter = this._pieCenter()
+      this._renderArea.attr("transform", "translate(" + pieCenter.x + "," + pieCenter.y + ")");
+      
+      let radiusLimit = Math.min(Math.max(this.width() - pieCenter.x, pieCenter.x), Math.max(this.height() - pieCenter.y, pieCenter.y));
+
       if (this.innerRadius().scale != null) {
         this.innerRadius().scale.range([0, radiusLimit]);
       }
@@ -198,6 +207,53 @@ namespace Plottable.Plots {
       this.render();
       return this;
     }
+    /**
+     * Gets the start angle of the Pie Plot
+     *
+     * @returns {number} Returns the start angle
+     */
+    public startAngle(): number;
+    /**
+     * Sets the start angle of the Pie Plot.
+     *
+     * @param {number} startAngle
+     * @returns {Pie} The calling Pie Plot.
+     */
+    public startAngle(angle: number): this;
+    public startAngle(angle?: number): any {
+      if (angle == null) {
+        return this._startAngle;
+      } else {
+        this._startAngle = angle;
+        this._updatePieAngles();
+        this.render();
+        return this;
+      }
+    }
+
+    /**
+     * Gets the end angle of the Pie Plot.
+     *
+     * @returns {number} Returns the end angle
+     */
+    public endAngle(): number;
+    /**
+     * Sets the end angle of the Pie Plot.
+     *
+     * @param {number} endAngle
+     * @returns {Pie} The calling Pie Plot.
+     */
+    public endAngle(angle: number): this;
+    public endAngle(angle?: number): any {
+      if (angle == null) {
+        return this._endAngle;
+      } else {
+        this._endAngle = angle;
+        this._updatePieAngles();
+        this.render();
+        return this;
+      }
+    }
 
     /**
      * Get whether slice labels are enabled.
@@ -275,9 +331,59 @@ namespace Plottable.Plots {
       let sectorValueAccessor = Plot._scaledAccessor(this.sectorValue());
       let dataset = this.datasets()[0];
       let data = this._getDataToDraw().get(dataset);
-      let pie = d3.layout.pie().sort(null).value((d, i) => sectorValueAccessor(d, i, dataset))(data);
+      let pie = d3.layout.pie().sort(null).startAngle(this._startAngle).endAngle(this._endAngle)
+        .value((d, i) => sectorValueAccessor(d, i, dataset))(data);
       this._startAngles = pie.map((slice) => slice.startAngle);
       this._endAngles = pie.map((slice) => slice.endAngle);
+    }
+
+    private _pieCenter(): Point {
+      let a = this._startAngle < this._endAngle ? this._startAngle: this._endAngle;
+      let b = this._startAngle < this._endAngle ? this._endAngle: this._startAngle;
+      let sinA = Math.sin(a);
+      let cosA = Math.cos(a);
+      let sinB = Math.sin(b);
+      let cosB = Math.cos(b);
+      let hTop: number;
+      let hBottom: number;
+      let wRight: number;
+      let wLeft: number;
+
+      /**
+       *  The center of the pie is computed using the sine and cosine of the start angle and the end angle
+       *  The sine indicates whether the start and end fall on the right half or the left half of the pie
+       *  The cosine indicates whether the start and end fall on the top or the bottom half of the pie
+       *  Different combinations provide the different heights and widths the pie needs from the center to the sides
+       */
+      if (sinA >= 0 && sinB >= 0) {
+        if (cosA >= 0 && cosB >= 0) { hTop = cosA; hBottom = 0; wLeft = 0; wRight = sinB; }
+        else if (cosA < 0 && cosB < 0) { hTop = 0; hBottom = -cosB; wLeft = 0; wRight = sinA; }
+        else if (cosA >= 0 && cosB < 0) { hTop = cosA; hBottom = -cosB; wLeft = 0; wRight = sinA }
+        else if (cosA < 0 && cosB >= 0) { hTop = 1; hBottom = 1; wLeft = 1; wRight = Math.max(sinA, sinB); }
+      }
+      else if (sinA >= 0 && sinB < 0) {
+        if (cosA >= 0 && cosB >= 0) { hTop = Math.max(cosA, cosB); hBottom = 1; wLeft = 1; wRight = 1; }
+        else if (cosA < 0 && cosB < 0) { hTop = 0; hBottom = 1; wLeft = -sinB; wRight = sinA; }
+        else if (cosA >= 0 && cosB < 0) { hTop = cosA; hBottom = 1; wLeft = -sinB; wRight = 1; }
+        else if (cosA < 0 && cosB >= 0) { hTop = cosB; hBottom = 1; wLeft = 1; wRight = sinA; }
+      }
+      else if (sinA < 0 && sinB >= 0) {
+        if (cosA >= 0 && cosB >= 0) { hTop = 1; hBottom = 0; wLeft = -sinA; wRight = sinB; }
+        else if (cosA < 0 && cosB < 0) { hTop = 1; hBottom = Math.max(-cosA, -cosB); wLeft = 1; wRight = 1; }
+        else if (cosA >= 0 && cosB < 0) { hTop = 1; hBottom = -cosB; wLeft = -sinA; wRight = 1; }
+        else if (cosA < 0 && cosB >= 0) { hTop = 1; hBottom = -cosA; wLeft = 1 ; wRight = sinB; }
+      }
+      else if (sinA < 0 && sinB < 0) {
+        if (cosA >= 0 && cosB >= 0) { hTop = cosB; hBottom = 0; wLeft = -sinA ; wRight = 0; }
+        else if (cosA < 0 && cosB < 0) { hTop = 0; hBottom = -cosA; wLeft = -sinB ; wRight = 0; }
+        else if (cosA >= 0 && cosB < 0) { hTop = 1; hBottom = 1; wLeft = Math.max(cosA, -cosB); wRight = 1; }
+        else if (cosA < 0 && cosB >= 0) { hTop = cosB; hBottom = -cosA; wLeft = 1; wRight = 0; }
+      }
+
+      return {
+        x: wLeft + wRight == 0 ? 0 : (wLeft / (wLeft + wRight)) * this.width(),
+        y: hTop + hBottom == 0 ? 0 : (hTop / (hTop + hBottom)) * this.height()
+      }
     }
 
     protected _getDataToDraw() {
@@ -310,7 +416,7 @@ namespace Plottable.Plots {
                          .value((d: any, i: number) => {
                            let value = scaledValueAccessor(d, i, dataset);
                            return Pie._isValidData(value) ? value : 0;
-                         })(dataset.data());
+                         }).startAngle(this._startAngle).endAngle(this._endAngle)(dataset.data());
       let startAngle = pie[index].startAngle;
       let endAngle = pie[index].endAngle;
       let avgAngle = (startAngle + endAngle) / 2;

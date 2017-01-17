@@ -3067,6 +3067,8 @@ declare namespace Plottable.Plots {
         private static _INNER_RADIUS_KEY;
         private static _OUTER_RADIUS_KEY;
         private static _SECTOR_VALUE_KEY;
+        private _startAngle;
+        private _endAngle;
         private _startAngles;
         private _endAngles;
         private _labelFormatter;
@@ -3148,6 +3150,32 @@ declare namespace Plottable.Plots {
          */
         outerRadius<R>(outerRadius: R | Accessor<R>, scale: Scale<R, number>): this;
         /**
+         * Gets the start angle of the Pie Plot
+         *
+         * @returns {number} Returns the start angle
+         */
+        startAngle(): number;
+        /**
+         * Sets the start angle of the Pie Plot.
+         *
+         * @param {number} startAngle
+         * @returns {Pie} The calling Pie Plot.
+         */
+        startAngle(angle: number): this;
+        /**
+         * Gets the end angle of the Pie Plot.
+         *
+         * @returns {number} Returns the end angle
+         */
+        endAngle(): number;
+        /**
+         * Sets the end angle of the Pie Plot.
+         *
+         * @param {number} endAngle
+         * @returns {Pie} The calling Pie Plot.
+         */
+        endAngle(angle: number): this;
+        /**
          * Get whether slice labels are enabled.
          *
          * @returns {boolean} Whether slices should display labels or not.
@@ -3174,6 +3202,7 @@ declare namespace Plottable.Plots {
         entitiesAt(queryPoint: Point): PlotEntity[];
         protected _propertyProjectors(): AttributeToProjector;
         private _updatePieAngles();
+        private _pieCenter();
         protected _getDataToDraw(): Utils.Map<Dataset, any[]>;
         protected static _isValidData(value: any): boolean;
         protected _pixelPoint(datum: any, index: number, dataset: Dataset): {

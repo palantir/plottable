@@ -7319,10 +7319,15 @@ var Plottable;
             function Pie() {
                 var _this = this;
                 _super.call(this);
+                this._startAngle = 0;
+                this._endAngle = 2 * Math.PI;
                 this._labelFormatter = Plottable.Formatters.identity();
                 this._labelsEnabled = false;
                 this.innerRadius(0);
-                this.outerRadius(function () { return Math.min(_this.width(), _this.height()) / 2; });
+                this.outerRadius(function () {
+                    var pieCenter = _this._pieCenter();
+                    return Math.min(Math.max(_this.width() - pieCenter.x, pieCenter.x), Math.max(_this.height() - pieCenter.y, pieCenter.y));
+                });
                 this.addClass("pie-plot");
                 this.attr("fill", function (d, i) { return String(i); }, new Plottable.Scales.Color());
                 this._strokeDrawers = new Plottable.Utils.Map();
@@ -7334,8 +7339,9 @@ var Plottable;
             };
             Pie.prototype.computeLayout = function (origin, availableWidth, availableHeight) {
                 _super.prototype.computeLayout.call(this, origin, availableWidth, availableHeight);
-                this._renderArea.attr("transform", "translate(" + this.width() / 2 + "," + this.height() / 2 + ")");
-                var radiusLimit = Math.min(this.width(), this.height()) / 2;
+                var pieCenter = this._pieCenter();
+                this._renderArea.attr("transform", "translate(" + pieCenter.x + "," + pieCenter.y + ")");
+                var radiusLimit = Math.min(Math.max(this.width() - pieCenter.x, pieCenter.x), Math.max(this.height() - pieCenter.y, pieCenter.y));
                 if (this.innerRadius().scale != null) {
                     this.innerRadius().scale.range([0, radiusLimit]);
                 }
@@ -7436,6 +7442,28 @@ var Plottable;
                 this.render();
                 return this;
             };
+            Pie.prototype.startAngle = function (angle) {
+                if (angle == null) {
+                    return this._startAngle;
+                }
+                else {
+                    this._startAngle = angle;
+                    this._updatePieAngles();
+                    this.render();
+                    return this;
+                }
+            };
+            Pie.prototype.endAngle = function (angle) {
+                if (angle == null) {
+                    return this._endAngle;
+                }
+                else {
+                    this._endAngle = angle;
+                    this._updatePieAngles();
+                    this.render();
+                    return this;
+                }
+            };
             Pie.prototype.labelsEnabled = function (enabled) {
                 if (enabled == null) {
                     return this._labelsEnabled;
@@ -7491,9 +7519,136 @@ var Plottable;
                 var sectorValueAccessor = Plottable.Plot._scaledAccessor(this.sectorValue());
                 var dataset = this.datasets()[0];
                 var data = this._getDataToDraw().get(dataset);
-                var pie = d3.layout.pie().sort(null).value(function (d, i) { return sectorValueAccessor(d, i, dataset); })(data);
+                var pie = d3.layout.pie().sort(null).startAngle(this._startAngle).endAngle(this._endAngle)
+                    .value(function (d, i) { return sectorValueAccessor(d, i, dataset); })(data);
                 this._startAngles = pie.map(function (slice) { return slice.startAngle; });
                 this._endAngles = pie.map(function (slice) { return slice.endAngle; });
+            };
+            Pie.prototype._pieCenter = function () {
+                var a = this._startAngle < this._endAngle ? this._startAngle : this._endAngle;
+                var b = this._startAngle < this._endAngle ? this._endAngle : this._startAngle;
+                var sinA = Math.sin(a);
+                var cosA = Math.cos(a);
+                var sinB = Math.sin(b);
+                var cosB = Math.cos(b);
+                var hTop;
+                var hBottom;
+                var wRight;
+                var wLeft;
+                /**
+                 *  The center of the pie is computed using the sine and cosine of the start angle and the end angle
+                 *  The sine indicates whether the start and end fall on the right half or the left half of the pie
+                 *  The cosine indicates whether the start and end fall on the top or the bottom half of the pie
+                 *  Different combinations provide the different heights and widths the pie needs from the center to the sides
+                 */
+                if (sinA >= 0 && sinB >= 0) {
+                    if (cosA >= 0 && cosB >= 0) {
+                        hTop = cosA;
+                        hBottom = 0;
+                        wLeft = 0;
+                        wRight = sinB;
+                    }
+                    else if (cosA < 0 && cosB < 0) {
+                        hTop = 0;
+                        hBottom = -cosB;
+                        wLeft = 0;
+                        wRight = sinA;
+                    }
+                    else if (cosA >= 0 && cosB < 0) {
+                        hTop = cosA;
+                        hBottom = -cosB;
+                        wLeft = 0;
+                        wRight = sinA;
+                    }
+                    else if (cosA < 0 && cosB >= 0) {
+                        hTop = 1;
+                        hBottom = 1;
+                        wLeft = 1;
+                        wRight = Math.max(sinA, sinB);
+                    }
+                }
+                else if (sinA >= 0 && sinB < 0) {
+                    if (cosA >= 0 && cosB >= 0) {
+                        hTop = Math.max(cosA, cosB);
+                        hBottom = 1;
+                        wLeft = 1;
+                        wRight = 1;
+                    }
+                    else if (cosA < 0 && cosB < 0) {
+                        hTop = 0;
+                        hBottom = 1;
+                        wLeft = -sinB;
+                        wRight = sinA;
+                    }
+                    else if (cosA >= 0 && cosB < 0) {
+                        hTop = cosA;
+                        hBottom = 1;
+                        wLeft = -sinB;
+                        wRight = 1;
+                    }
+                    else if (cosA < 0 && cosB >= 0) {
+                        hTop = cosB;
+                        hBottom = 1;
+                        wLeft = 1;
+                        wRight = sinA;
+                    }
+                }
+                else if (sinA < 0 && sinB >= 0) {
+                    if (cosA >= 0 && cosB >= 0) {
+                        hTop = 1;
+                        hBottom = 0;
+                        wLeft = -sinA;
+                        wRight = sinB;
+                    }
+                    else if (cosA < 0 && cosB < 0) {
+                        hTop = 1;
+                        hBottom = Math.max(-cosA, -cosB);
+                        wLeft = 1;
+                        wRight = 1;
+                    }
+                    else if (cosA >= 0 && cosB < 0) {
+                        hTop = 1;
+                        hBottom = -cosB;
+                        wLeft = -sinA;
+                        wRight = 1;
+                    }
+                    else if (cosA < 0 && cosB >= 0) {
+                        hTop = 1;
+                        hBottom = -cosA;
+                        wLeft = 1;
+                        wRight = sinB;
+                    }
+                }
+                else if (sinA < 0 && sinB < 0) {
+                    if (cosA >= 0 && cosB >= 0) {
+                        hTop = cosB;
+                        hBottom = 0;
+                        wLeft = -sinA;
+                        wRight = 0;
+                    }
+                    else if (cosA < 0 && cosB < 0) {
+                        hTop = 0;
+                        hBottom = -cosA;
+                        wLeft = -sinB;
+                        wRight = 0;
+                    }
+                    else if (cosA >= 0 && cosB < 0) {
+                        hTop = 1;
+                        hBottom = 1;
+                        wLeft = Math.max(cosA, -cosB);
+                        wRight = 1;
+                    }
+                    else if (cosA < 0 && cosB >= 0) {
+                        hTop = cosB;
+                        hBottom = -cosA;
+                        wLeft = 1;
+                        wRight = 0;
+                    }
+                }
+                return {
+                    x: wLeft + wRight == 0 ? 0 : (wLeft / (wLeft + wRight)) * this.width(),
+                    y: hTop + hBottom == 0 ? 0 : (hTop / (hTop + hBottom)) * this.height()
+                };
             };
             Pie.prototype._getDataToDraw = function () {
                 var dataToDraw = _super.prototype._getDataToDraw.call(this);
@@ -7523,7 +7678,7 @@ var Plottable;
                     .value(function (d, i) {
                     var value = scaledValueAccessor(d, i, dataset);
                     return Pie._isValidData(value) ? value : 0;
-                })(dataset.data());
+                }).startAngle(this._startAngle).endAngle(this._endAngle)(dataset.data());
                 var startAngle = pie[index].startAngle;
                 var endAngle = pie[index].endAngle;
                 var avgAngle = (startAngle + endAngle) / 2;
