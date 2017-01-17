@@ -99,9 +99,6 @@ describe("Category Axes", () => {
 
       const tickLabels = axis.content().selectAll(".tick-label");
       assert.strictEqual(tickLabels.size(), 2, "renders downsampled labels");
-      const [oneLabel, fiveLabel] = tickLabels[0];
-      assert.strictEqual(d3.select(oneLabel).text(), "one", "first label is correct");
-      assert.strictEqual(d3.select(fiveLabel).text(), "five", "second label is correct");
 
       svg.remove();
     });
