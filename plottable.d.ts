@@ -2174,11 +2174,15 @@ declare namespace Plottable.Axes {
     }
 }
 declare namespace Plottable.Axes {
+    interface DownsampleInfo {
+        domain: string[];
+        stepWidth: number;
+    }
     class Category extends Axis<string> {
         /**
          * How many pixels to give labels at minimum before downsampling takes effect.
          */
-        static MINIMUM_WIDTH_PER_LABEL: number;
+        private static _MINIMUM_WIDTH_PER_LABEL_PX;
         private _tickLabelAngle;
         /**
          * Maximum allowable px width of tick labels.
@@ -2229,9 +2233,10 @@ declare namespace Plottable.Axes {
          * Take the scale and drop ticks at regular intervals such that the resultant ticks are all a reasonable minimum
          * distance apart. Return the resultant ticks to render, as well as the new stepWidth between them.
          *
-         * @return [downsampled domain, new stepWidth]
+         * @param scale the scale being downsampled. Defaults to this Axis' scale.
+         * @return {DownsampleInfo} an object holding the resultant domain and new stepWidth.
          */
-        getDownsampleInfo(scale?: Scales.Category): [string[], number];
+        getDownsampleInfo(scale?: Scales.Category): DownsampleInfo;
         /**
          * Gets the tick label angle in degrees.
          */

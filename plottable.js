@@ -5117,18 +5117,22 @@ var Plottable;
                 return Math.min(axisHeightWithoutMargin, relevantDimension);
             };
             Category.prototype._getTickValues = function () {
-                return this.getDownsampleInfo()[0];
+                return this.getDownsampleInfo().domain;
             };
             /**
              * Take the scale and drop ticks at regular intervals such that the resultant ticks are all a reasonable minimum
              * distance apart. Return the resultant ticks to render, as well as the new stepWidth between them.
              *
-             * @return [downsampled domain, new stepWidth]
+             * @param scale the scale being downsampled. Defaults to this Axis' scale.
+             * @return {DownsampleInfo} an object holding the resultant domain and new stepWidth.
              */
             Category.prototype.getDownsampleInfo = function (scale) {
                 if (scale === void 0) { scale = this._scale; }
-                var downsampleRatio = Math.ceil(Category.MINIMUM_WIDTH_PER_LABEL / scale.stepWidth());
-                return [scale.domain().filter(function (d, i) { return i % downsampleRatio === 0; }), downsampleRatio * scale.stepWidth()];
+                var downsampleRatio = Math.ceil(Category._MINIMUM_WIDTH_PER_LABEL_PX / scale.stepWidth());
+                return {
+                    domain: scale.domain().filter(function (d, i) { return i % downsampleRatio === 0; }),
+                    stepWidth: downsampleRatio * scale.stepWidth(),
+                };
             };
             Category.prototype.tickLabelAngle = function (angle) {
                 if (angle == null) {
@@ -5247,7 +5251,7 @@ var Plottable;
                     .innerPadding(thisScale.innerPadding())
                     .outerPadding(thisScale.outerPadding())
                     .range([0, this._isHorizontal() ? axisWidth : axisHeight]);
-                var _a = this.getDownsampleInfo(scale), ticks = _a[0], stepWidth = _a[1];
+                var _a = this.getDownsampleInfo(scale), domain = _a.domain, stepWidth = _a.stepWidth;
                 // HACKHACK: https://github.com/palantir/svg-typewriter/issues/25
                 // the width (x-axis specific) available to a single tick label.
                 var width = axisWidth - this._tickSpaceRequired(); // default for left/right
@@ -5273,7 +5277,7 @@ var Plottable;
                 if (this._tickLabelMaxWidth != null) {
                     width = Math.min(width, this._tickLabelMaxWidth);
                 }
-                var wrappingResults = ticks.map(function (s) {
+                var wrappingResults = domain.map(function (s) {
                     return _this._wrapper.wrap(_this.formatter()(s), _this._measurer, width, height);
                 });
                 // HACKHACK: https://github.com/palantir/svg-typewriter/issues/25
@@ -5296,17 +5300,17 @@ var Plottable;
                 var _this = this;
                 _super.prototype.renderImmediately.call(this);
                 var catScale = this._scale;
-                var _a = this.getDownsampleInfo(), downsampledDomain = _a[0], stepWidth = _a[1];
-                var tickLabels = this._tickLabelContainer.selectAll("." + Plottable.Axis.TICK_LABEL_CLASS).data(downsampledDomain, function (d) { return d; });
+                var _a = this.getDownsampleInfo(), domain = _a.domain, stepWidth = _a.stepWidth;
+                var tickLabels = this._tickLabelContainer.selectAll("." + Plottable.Axis.TICK_LABEL_CLASS).data(domain, function (d) { return d; });
                 // Give each tick a stepWidth of space which will partition the entire axis evenly
-                var availableTextWidth = stepWidth;
+                var availableTextSpace = stepWidth;
                 if (this._isHorizontal() && this._tickLabelMaxWidth != null) {
-                    availableTextWidth = Math.min(availableTextWidth, this._tickLabelMaxWidth);
+                    availableTextSpace = Math.min(availableTextSpace, this._tickLabelMaxWidth);
                 }
                 var getTickLabelTransform = function (d, i) {
                     // scale(d) will give the center of the band, so subtract half of the text width to get the left (top-most)
                     // coordinate that the tick label should be transformed to.
-                    var tickLabelEdge = catScale.scale(d) - availableTextWidth / 2;
+                    var tickLabelEdge = catScale.scale(d) - availableTextSpace / 2;
                     var x = _this._isHorizontal() ? tickLabelEdge : 0;
                     var y = _this._isHorizontal() ? 0 : tickLabelEdge;
                     return "translate(" + x + "," + y + ")";
@@ -5316,7 +5320,7 @@ var Plottable;
                 tickLabels.attr("transform", getTickLabelTransform);
                 // erase all text first, then rewrite
                 tickLabels.text("");
-                this._drawTicks(availableTextWidth, tickLabels);
+                this._drawTicks(stepWidth, tickLabels);
                 var xTranslate = this.orientation() === "right" ? this._tickSpaceRequired() : 0;
                 var yTranslate = this.orientation() === "bottom" ? this._tickSpaceRequired() : 0;
                 Plottable.Utils.DOM.translate(this._tickLabelContainer, xTranslate, yTranslate);
@@ -5341,7 +5345,7 @@ var Plottable;
             /**
              * How many pixels to give labels at minimum before downsampling takes effect.
              */
-            Category.MINIMUM_WIDTH_PER_LABEL = 15;
+            Category._MINIMUM_WIDTH_PER_LABEL_PX = 15;
             return Category;
         }(Plottable.Axis));
         Axes.Category = Category;

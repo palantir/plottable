@@ -1,9 +1,14 @@
 namespace Plottable.Axes {
+  export interface DownsampleInfo {
+    domain: string[];
+    stepWidth: number;
+  }
+
   export class Category extends Axis<string> {
     /**
      * How many pixels to give labels at minimum before downsampling takes effect.
      */
-    public static MINIMUM_WIDTH_PER_LABEL = 15;
+    private static _MINIMUM_WIDTH_PER_LABEL_PX = 15;
 
     private _tickLabelAngle = 0;
 
@@ -112,18 +117,22 @@ namespace Plottable.Axes {
     }
 
     protected _getTickValues() {
-      return this.getDownsampleInfo()[0];
+      return this.getDownsampleInfo().domain;
     }
 
     /**
      * Take the scale and drop ticks at regular intervals such that the resultant ticks are all a reasonable minimum
      * distance apart. Return the resultant ticks to render, as well as the new stepWidth between them.
      *
-     * @return [downsampled domain, new stepWidth]
+     * @param scale the scale being downsampled. Defaults to this Axis' scale.
+     * @return {DownsampleInfo} an object holding the resultant domain and new stepWidth.
      */
-    public getDownsampleInfo(scale = <Scales.Category> this._scale): [string[], number] {
-      const downsampleRatio = Math.ceil(Category.MINIMUM_WIDTH_PER_LABEL / scale.stepWidth());
-      return [scale.domain().filter((d, i) => i % downsampleRatio === 0), downsampleRatio * scale.stepWidth()];
+    public getDownsampleInfo(scale = <Scales.Category> this._scale): DownsampleInfo {
+      const downsampleRatio = Math.ceil(Category._MINIMUM_WIDTH_PER_LABEL_PX / scale.stepWidth());
+      return {
+        domain: scale.domain().filter((d, i) => i % downsampleRatio === 0),
+        stepWidth: downsampleRatio * scale.stepWidth(),
+      };
     }
 
     /**
@@ -266,7 +275,7 @@ namespace Plottable.Axes {
         .outerPadding(thisScale.outerPadding())
         .range([0, this._isHorizontal() ? axisWidth : axisHeight]);
 
-      const [ticks, stepWidth] = this.getDownsampleInfo(scale);
+      const { domain, stepWidth } = this.getDownsampleInfo(scale);
 
       // HACKHACK: https://github.com/palantir/svg-typewriter/issues/25
       // the width (x-axis specific) available to a single tick label.
@@ -296,7 +305,7 @@ namespace Plottable.Axes {
         width = Math.min(width, this._tickLabelMaxWidth);
       }
 
-      let wrappingResults = ticks.map((s: string) => {
+      let wrappingResults = domain.map((s: string) => {
         return this._wrapper.wrap(this.formatter()(s), this._measurer, width, height);
       });
 
@@ -324,18 +333,18 @@ namespace Plottable.Axes {
     public renderImmediately() {
       super.renderImmediately();
       let catScale = <Scales.Category> this._scale;
-      const [downsampledDomain, stepWidth] = this.getDownsampleInfo();
-      let tickLabels = this._tickLabelContainer.selectAll("." + Axis.TICK_LABEL_CLASS).data(downsampledDomain, (d) => d);
+      const { domain, stepWidth } = this.getDownsampleInfo();
+      let tickLabels = this._tickLabelContainer.selectAll("." + Axis.TICK_LABEL_CLASS).data(domain, (d) => d);
       // Give each tick a stepWidth of space which will partition the entire axis evenly
-      let availableTextWidth = stepWidth;
+      let availableTextSpace = stepWidth;
       if (this._isHorizontal() && this._tickLabelMaxWidth != null) {
-        availableTextWidth = Math.min(availableTextWidth, this._tickLabelMaxWidth);
+        availableTextSpace = Math.min(availableTextSpace, this._tickLabelMaxWidth);
       }
 
       let getTickLabelTransform = (d: string, i: number) => {
         // scale(d) will give the center of the band, so subtract half of the text width to get the left (top-most)
         // coordinate that the tick label should be transformed to.
-        let tickLabelEdge = catScale.scale(d) - availableTextWidth / 2;
+        let tickLabelEdge = catScale.scale(d) - availableTextSpace / 2;
         let x = this._isHorizontal() ? tickLabelEdge : 0;
         let y = this._isHorizontal() ? 0 : tickLabelEdge;
         return "translate(" + x + "," + y + ")";
@@ -345,7 +354,7 @@ namespace Plottable.Axes {
       tickLabels.attr("transform", getTickLabelTransform);
       // erase all text first, then rewrite
       tickLabels.text("");
-      this._drawTicks(availableTextWidth, tickLabels);
+      this._drawTicks(stepWidth, tickLabels);
 
       let xTranslate = this.orientation() === "right" ? this._tickSpaceRequired() : 0;
       let yTranslate = this.orientation() === "bottom" ? this._tickSpaceRequired() : 0;
