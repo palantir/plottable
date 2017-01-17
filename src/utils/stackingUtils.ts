@@ -46,6 +46,33 @@ namespace Plottable.Utils.Stacking {
     return datasetToKeyToStackedDatum;
   }
 
+  export function stackedExtents(stackingResult: StackingResult) {
+    const maximumExtents: Utils.Map<string, number> = new Utils.Map<string, number>();
+    const minimumExtents: Utils.Map<string, number> = new Utils.Map<string, number>();
+
+    stackingResult.forEach((stack) => {
+      stack.forEach((datum: StackedDatum, key: string) => {
+        // correctly handle negative bar stacks
+        const maximalValue = Math.max([datum.offset + datum.value, datum.offset], datum.offset);
+        const minimalValue = Math.min([datum.offset + datum.value, datum.offset], datum.offset);
+
+        if (!maximumExtents.has(key)) {
+          maximumExtents.set(key, maximalValue);
+        } else if (maximumExtents.get(key) < maximalValue) {
+          maximumExtents.set(key, maximalValue);
+        }
+
+        if (!minimumExtents.has(key)) {
+          minimumExtents.set(key, minimalValue);
+        } else if (minimumExtents.get(key) > (minimalValue)) {
+          minimumExtents.set(key, minimalValue);
+        }
+      });
+    });
+
+    return { maximumExtents, minimumExtents };
+  }
+
   /**
    * Computes the total extent over all data points in all Datasets, taking stacking into consideration.
    *

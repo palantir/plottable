@@ -1,5 +1,11 @@
 namespace Plottable.Plots {
   export class StackedBar<X, Y> extends Bar<X, Y> {
+    private static _STACKED_BAR_LABEL_AREA_CLASS = "stacked-bar-label-text-area"
+    protected static _STACKED_BAR_LABEL_PADDING = 5;
+
+    private _labelArea: d3.Selection<void>;
+    private _measurer: SVGTypewriter.Measurers.CacheCharacterMeasurer;
+    private _writer: SVGTypewriter.Writers.Writer;
     private _stackingResult: Utils.Stacking.StackingResult;
     private _stackedExtent: number[];
 
@@ -52,6 +58,92 @@ namespace Plottable.Plots {
 
       this._updateStackExtentsAndOffsets();
       return this;
+    }
+
+    protected _setup() {
+      super._setup();
+      this._labelArea = this._renderArea.append("g").classed(StackedBar._STACKED_BAR_LABEL_AREA_CLASS, true);
+      this._measurer = new SVGTypewriter.Measurers.CacheCharacterMeasurer(this._labelArea);
+      this._writer = new SVGTypewriter.Writers.Writer(this._measurer);
+    }
+
+    protected _drawLabels() {
+      super._drawLabels();
+
+      // remove all current labels before redrawing
+      this._labelArea.selectAll("g").remove();
+
+      const baselineValue = +this.baselineValue();
+      const primaryScale: Scale<any, number> = this._isVertical ? this.x().scale : this.y().scale;
+      const secondaryScale: Scale<any, number> = this._isVertical ? this.y().scale : this.x().scale;
+      const { maximumExtents, minimumExtents } = Utils.Stacking.stackedExtents(this._stackingResult);
+      const barWidth = this._getBarPixelWidth();
+
+      const drawLabel = (text: string, measurement: { height: number, width: number }, labelPosition: Point) => {
+        const { x, y } = labelPosition;
+        const { height, width } = measurement;
+        const tooWide = this._isVertical ? ( width > barWidth ) : ( height > barWidth );
+
+        const hideLabel = x < 0
+          || y < 0
+          || x + width > this.width()
+          || y + height > this.height()
+          || tooWide;
+
+        if (!hideLabel) {
+          const labelContainer = this._labelArea.append("g").attr("transform", `translate(${x}, ${y})`);
+          labelContainer.classed("stacked-bar-label", true);
+
+          const writeOptions = {
+            selection: labelContainer,
+            xAlign: "center",
+            yAlign: "center",
+            textRotation: 0,
+          };
+
+          this._writer.write(text, measurement.width, measurement.height, writeOptions);
+        }
+      };
+
+      maximumExtents.forEach((maximum, axisValue) => {
+        if (maximum !== baselineValue) {
+          // only draw sums for values not at the baseline
+
+          const text = this.labelFormatter()(maximum);
+          const measurement = this._measurer.measure(text);
+
+          const primaryTextMeasurement = this._isVertical ? measurement.width : measurement.height;
+          const secondaryTextMeasurement = this._isVertical ? measurement.height : measurement.width;
+
+          const x = this._isVertical
+            ? primaryScale.scale(axisValue) - primaryTextMeasurement / 2
+            : secondaryScale.scale(maximum) + StackedBar._STACKED_BAR_LABEL_PADDING;
+          const y = this._isVertical
+            ? secondaryScale.scale(maximum) - secondaryTextMeasurement - StackedBar._STACKED_BAR_LABEL_PADDING
+            : primaryScale.scale(axisValue) - primaryTextMeasurement / 2;
+
+          drawLabel(text, measurement, { x, y });
+        }
+      });
+
+      minimumExtents.forEach((minimum, axisValue) => {
+        if (minimum !== baselineValue) {
+          const text = this.labelFormatter()(minimum);
+          const measurement = this._measurer.measure(text);
+
+          const primaryTextMeasurement = this._isVertical ? measurement.width : measurement.height;
+          const secondaryTextMeasurement = this._isVertical ? measurement.height : measurement.width;
+
+          const x = this._isVertical
+            ? primaryScale.scale(axisValue) - primaryTextMeasurement / 2
+            : secondaryScale.scale(minimum) - secondaryTextMeasurement - StackedBar._STACKED_BAR_LABEL_PADDING;
+          const y = this._isVertical
+            ? secondaryScale.scale(minimum) + StackedBar._STACKED_BAR_LABEL_PADDING
+            : primaryScale.scale(axisValue) - primaryTextMeasurement / 2;
+
+          drawLabel(text, measurement, { x, y });
+        }
+      });
     }
 
     protected _generateAttrToProjector() {

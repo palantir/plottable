@@ -438,7 +438,7 @@ namespace Plottable.Plots {
       return extents;
     }
 
-    private _drawLabels() {
+    protected _drawLabels() {
       let dataToDraw = this._getDataToDraw();
       let labelsTooWide = false;
       this.datasets().forEach((dataset) => labelsTooWide = labelsTooWide || this._drawLabel(dataToDraw.get(dataset), dataset));
