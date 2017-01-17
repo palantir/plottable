@@ -37,6 +37,7 @@ export class Drawer {
    */
   constructor(dataset: Dataset) {
     this._dataset = dataset;
+    this._svgElementName = "path";
   }
 
   /**

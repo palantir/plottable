@@ -53,7 +53,7 @@ export class Plot extends Component {
   /**
    * _cachedEntityStore is a cache of all the entities in the plot. It, at times
    * may be undefined and shouldn't be accessed directly. Instead, use _getEntityStore
-   * to access the entity index.
+   * to access the entity store.
    */
   private _cachedEntityStore: Plottable.Utils.EntityStore<Plots.LightweightPlotEntity>;
   private _dataChanged = false;
@@ -537,14 +537,14 @@ export class Plot extends Component {
    *   If not provided, returns defaults to all Datasets on the Plot.
    * @return {Plots.PlotEntity[]}
    */
-  public entities(datasets = this.datasets()): Plots.PlotEntity[] {
+  public entities(datasets?: Dataset[]): Plots.PlotEntity[] {
     return this._getEntityStore(datasets).map((entity) => this._lightweightPlotEntityToPlotEntity(entity));
   }
 
   /**
-   * _getEntityStore returns the index of all Entities associated with the specified dataset
+   * _getEntityStore returns the store of all Entities associated with the specified dataset
    *
-   * @param {Dataset[]} [datasets] - The datasets with which to construct the index. If no datasets
+   * @param {Dataset[]} [datasets] - The datasets with which to construct the store. If no datasets
    * are specified all datasets will be used.
    */
   private _getEntityStore(datasets?: Dataset[]): Plottable.Utils.EntityStore<Plots.LightweightPlotEntity> {

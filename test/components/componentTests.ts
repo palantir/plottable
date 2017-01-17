@@ -812,6 +812,27 @@ describe("Component", () => {
     });
   });
 
+  describe("calculating the bounds", () => {
+    let c: Plottable.Component;
+    let svg: d3.Selection<void>;
+
+    beforeEach(() => {
+      c = new Plottable.Component();
+      svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+      c.anchor(svg);
+      c.computeLayout();
+    });
+
+    it("calculates the bounds relative to the origin", () => {
+      assert.deepEqual(c.bounds(), {
+        topLeft: c.origin(),
+        bottomRight: { x: SVG_WIDTH, y: SVG_HEIGHT }
+      });
+      c.destroy();
+      svg.remove();
+    });
+  });
+
   describe("restricting rendering through clipPath", () => {
 
     let clippedComponent: Plottable.Component;
