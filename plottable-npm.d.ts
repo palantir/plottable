@@ -1825,6 +1825,10 @@ declare namespace Plottable {
         computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number): this;
         protected _setup(): void;
         protected _getTickValues(): D[];
+        /**
+         * Render tick marks, baseline, and annotations. Should be super called by subclasses and then overridden to draw
+         * other relevant aspects of this Axis.
+         */
         renderImmediately(): this;
         /**
          * Gets the annotated ticks.
@@ -2171,7 +2175,15 @@ declare namespace Plottable.Axes {
     }
 }
 declare namespace Plottable.Axes {
+    interface DownsampleInfo {
+        domain: string[];
+        stepWidth: number;
+    }
     class Category extends Axis<string> {
+        /**
+         * How many pixels to give labels at minimum before downsampling takes effect.
+         */
+        private static _MINIMUM_WIDTH_PER_LABEL_PX;
         private _tickLabelAngle;
         /**
          * Maximum allowable px width of tick labels.
@@ -2219,6 +2231,14 @@ declare namespace Plottable.Axes {
         protected _coreSize(): number;
         protected _getTickValues(): string[];
         /**
+         * Take the scale and drop ticks at regular intervals such that the resultant ticks are all a reasonable minimum
+         * distance apart. Return the resultant ticks to render, as well as the new stepWidth between them.
+         *
+         * @param {Scales.Category} scale - The scale being downsampled. Defaults to this Axis' scale.
+         * @return {DownsampleInfo} an object holding the resultant domain and new stepWidth.
+         */
+        getDownsampleInfo(scale?: Scales.Category): DownsampleInfo;
+        /**
          * Gets the tick label angle in degrees.
          */
         tickLabelAngle(): number;
@@ -2244,7 +2264,7 @@ declare namespace Plottable.Axes {
          * @param {Plottable.Scales.Category} scale The scale this axis is representing.
          * @param {d3.Selection} ticks The tick elements to write.
          */
-        private _drawTicks(scale, ticks);
+        private _drawTicks(stepWidth, ticks);
         /**
          * Measures the size of the tick labels without making any (permanent) DOM changes.
          *
@@ -2253,7 +2273,7 @@ declare namespace Plottable.Axes {
          * @param {Plottable.Scales.Category} scale The scale this axis is representing.
          * @param {string[]} ticks The strings that will be printed on the ticks.
          */
-        private _measureTickLabels(axisWidth, axisHeight, scale, ticks);
+        private _measureTickLabels(axisWidth, axisHeight);
         renderImmediately(): this;
         computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number): this;
     }
