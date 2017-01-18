@@ -58,7 +58,7 @@ namespace Plottable.Components {
       let fakeLegendRow = this.content().append("g").classed(Legend.LEGEND_ROW_CLASS, true);
       let fakeLegendEntry = fakeLegendRow.append("g").classed(Legend.LEGEND_ENTRY_CLASS, true);
       fakeLegendEntry.append("text");
-      this._measurer = new SVGTypewriter.CacheMeasurer(fakeLegendRow);
+      this._measurer = new SVGTypewriter.Measurer(fakeLegendRow);
       this._wrapper = new SVGTypewriter.Wrapper().maxLines(1);
       this._writer = new SVGTypewriter.Writer(this._measurer, this._wrapper).addTitleElement(Configs.ADD_TITLE_ELEMENTS);
     }

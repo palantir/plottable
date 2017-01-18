@@ -54,21 +54,35 @@ module.exports = function(grunt) {
       src: "plottable.js",
       objectToExport: "Plottable",
       deps: {
-        "default": ["d3", {"svg-typewriter": "SVGTypewriter"}]
+        "default": ["d3"],
+      }
+    },
+    npm: {
+      src: "plottable.js",
+      dest: "plottable-npm.js",
+      objectToExport: "Plottable",
+      deps: {
+        "default": ["d3", "SVGTypewriter"],
+        "amd": ["d3", "svg-typewriter"],
+        "cjs": ["d3", "svg-typewriter"]
       }
     }
   };
 
   var concatConfig = {
     header: {
-      src: ["license_header.txt", "plottable.js"],
+      src: ["license_header.txt", "plottable.js", "node_modules/svg-typewriter/svg-typewriter.js"],
       dest: "plottable.js"
+    },
+    headerNpm: {
+      src: ["license_header.txt", "plottable-npm.js"],
+      dest: "plottable-npm.js"
     },
     typings: {
       src: ["plottable.d.ts"],
       dest: "plottable-npm.d.ts",
       options: {
-        banner: 'import * as d3 from "d3";\nimport * as SVGTypewriter from "svg-typewriter";\n',
+        banner: 'import * as d3 from "d3";\n',
         footer: "\nexport = Plottable;\n",
       }
     }
@@ -258,6 +272,8 @@ module.exports = function(grunt) {
   ]);
 
   grunt.registerTask("generateJS", [
+    "umd:npm",
+    "concat:headerNpm",
     "umd:all",
     "concat:header",
     "concat:typings",

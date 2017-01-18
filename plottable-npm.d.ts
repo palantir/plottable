@@ -1,5 +1,4 @@
 import * as d3 from "d3";
-import * as SVGTypewriter from "svg-typewriter";
 declare namespace Plottable.Utils.Math {
     /**
      * Checks if x is between a and b.

@@ -152,7 +152,7 @@ namespace Plottable.Components {
       this._lowerLabel = this.content().append("g").classed(InterpolatedColorLegend.LEGEND_LABEL_CLASS, true);
       this._upperLabel = this.content().append("g").classed(InterpolatedColorLegend.LEGEND_LABEL_CLASS, true);
 
-      this._measurer = new SVGTypewriter.CacheMeasurer(this.content());
+      this._measurer = new SVGTypewriter.Measurer(this.content());
       this._wrapper = new SVGTypewriter.Wrapper();
       this._writer = new SVGTypewriter.Writer(this._measurer, this._wrapper);
     }
