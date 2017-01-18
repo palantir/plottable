@@ -65,7 +65,7 @@ namespace Plottable.RenderController {
    *
    * @param {Component} component
    */
-  export function registerToComputeLayout(component: Component) {
+  export function registerToComputeLayoutAndRender(component: Component) {
     _componentsNeedingComputeLayout.add(component);
     _componentsNeedingRender.add(component);
     requestRender();
@@ -81,7 +81,7 @@ namespace Plottable.RenderController {
 
   /**
    * Renders all Components waiting to be rendered immediately
-   * instead of waiting until the next frame.
+   * instead of waiting until the next frame. Flush is idempotent (given there are no intermediate registrations).
    *
    * Useful to call when debugging.
    */

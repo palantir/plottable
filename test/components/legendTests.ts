@@ -294,7 +294,7 @@ describe("Legend", () => {
       svg.remove();
     });
 
-    it("passes correct index in symobl", () => {
+    it("passes correct index in symbol", () => {
       const domain = ["AA", "BB", "CC"];
       color.domain(domain);
 
