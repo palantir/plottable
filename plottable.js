@@ -695,6 +695,13 @@ var Plottable;
                 return datasetToKeyToStackedDatum;
             }
             Stacking.stack = stack;
+            /**
+             * Computes the maximum and minimum extents of each stack individually.
+             *
+             * @param {GenericStackingResult} stackingResult The value and offset information for each datapoint in each dataset
+             * @return { { maximumExtents: Utils.Map<D, number>, minimumExtents: Utils.Map<D, number> } } The maximum and minimum extents
+             * of each individual stack.
+             */
             function stackedExtents(stackingResult) {
                 var maximumExtents = new Utils.Map();
                 var minimumExtents = new Utils.Map();
@@ -724,7 +731,7 @@ var Plottable;
              * Computes the total extent over all data points in all Datasets, taking stacking into consideration.
              *
              * @param {StackingResult} stackingResult The value and offset information for each datapoint in each dataset
-             * @oaram {Accessor<any>} keyAccessor Accessor for the key of the data existent in the stackingResult
+             * @param {Accessor<any>} keyAccessor Accessor for the key of the data existent in the stackingResult
              * @param {Accessor<boolean>} filter A filter for data to be considered when computing the total extent
              * @return {[number, number]} The total extent
              */
@@ -8993,9 +9000,9 @@ var Plottable;
             Bar._BAR_WIDTH_RATIO = 0.95;
             Bar._SINGLE_BAR_DIMENSION_RATIO = 0.4;
             Bar._BAR_AREA_CLASS = "bar-area";
-            Bar._LABEL_AREA_CLASS = "bar-label-text-area";
             Bar._LABEL_VERTICAL_PADDING = 5;
             Bar._LABEL_HORIZONTAL_PADDING = 5;
+            Bar._LABEL_AREA_CLASS = "bar-label-text-area";
             return Bar;
         }(Plottable.XYPlot));
         Plots.Bar = Bar;
@@ -9883,7 +9890,7 @@ var Plottable;
             };
             StackedBar.prototype._setup = function () {
                 _super.prototype._setup.call(this);
-                this._labelArea = this._renderArea.append("g").classed(StackedBar._STACKED_BAR_LABEL_AREA_CLASS, true);
+                this._labelArea = this._renderArea.append("g").classed(Plots.Bar._LABEL_AREA_CLASS, true);
                 this._measurer = new SVGTypewriter.Measurers.CacheCharacterMeasurer(this._labelArea);
                 this._writer = new SVGTypewriter.Writers.Writer(this._measurer);
             };
@@ -10011,7 +10018,6 @@ var Plottable;
                 this._stackingResult = Plottable.Utils.Stacking.stack(datasets, keyAccessor, valueAccessor);
                 this._stackedExtent = Plottable.Utils.Stacking.stackedExtent(this._stackingResult, keyAccessor, filter);
             };
-            StackedBar._STACKED_BAR_LABEL_AREA_CLASS = "stacked-bar-label-text-area";
             StackedBar._STACKED_BAR_LABEL_PADDING = 5;
             return StackedBar;
         }(Plots.Bar));
