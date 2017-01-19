@@ -3,6 +3,7 @@
 describe("Legend", () => {
   const ENTRY_SELECTOR = "." + Plottable.Components.Legend.LEGEND_ENTRY_CLASS;
   const SYMBOL_SELECTOR = "." + Plottable.Components.Legend.LEGEND_SYMBOL_CLASS;
+  const TEXT_LINE_SELECTOR = ".text-line";
   const ROW_SELECTOR = "." + Plottable.Components.Legend.LEGEND_ROW_CLASS;
 
   describe("Basic Usage", () => {
@@ -147,7 +148,28 @@ describe("Legend", () => {
       svg.remove();
     });
 
-    it("can set maximun number of entries per row", () => {
+    it("can set maximum number of lines per entry", () => {
+      color.domain(["this is a very very very very very very very long"]);
+      legend.renderTo(svg);
+      legend.maxWidth(100);
+      legend.maxLinesPerEntry(2);
+      assert.strictEqual(2, legend.content().selectAll(`${ROW_SELECTOR} ${TEXT_LINE_SELECTOR}`).size());
+      legend.maxLinesPerEntry(10);
+      assert.strictEqual(4, legend.content().selectAll(`${ROW_SELECTOR} ${TEXT_LINE_SELECTOR}`).size());
+      svg.remove();
+    });
+
+   it("can set maximum width of legend", () => {
+      color.domain(["this is a very very very very very very very long"]);
+      legend.renderTo(svg);
+      legend.maxWidth(100);
+      assert.strictEqual(100, (legend.background()[0][0] as SVGElement).getBoundingClientRect().width);
+      legend.maxWidth(0);
+      assert.strictEqual(0, (legend.background()[0][0] as SVGElement).getBoundingClientRect().width);
+      svg.remove();
+    });
+
+    it("can set maximum number of entries per row", () => {
       color.domain(["AA", "BB", "CC", "DD", "EE", "FF"]);
       legend.renderTo(svg);
 
@@ -425,7 +447,7 @@ describe("Legend", () => {
       const entryTexts = legend.content().selectAll(ENTRY_SELECTOR).data();
       assert.deepEqual(colorDomain, entryTexts, "displayed texts should have the same order as the legend domain");
       svg.remove();
-      });
+    });
 
     it("sorts entries by comparator", () => {
       const newDomain = ["F", "E", "D", "C", "B", "A"];
