@@ -154,7 +154,7 @@ describe("Legend", () => {
       legend.maxWidth(100);
       legend.maxLinesPerEntry(2);
       assert.strictEqual(2, legend.content().selectAll(`${ROW_SELECTOR} ${TEXT_LINE_SELECTOR}`).size());
-      legend.maxLinesPerEntry(10);
+      legend.maxLinesPerEntry(4);
       assert.strictEqual(4, legend.content().selectAll(`${ROW_SELECTOR} ${TEXT_LINE_SELECTOR}`).size());
       svg.remove();
     });
