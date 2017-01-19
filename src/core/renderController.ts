@@ -71,6 +71,16 @@ namespace Plottable.RenderController {
     requestRender();
   }
 
+  /**
+   * Enqueues the Component for layout and rendering.
+   *
+   * @param {Component} component
+   * @deprecated This method has been renamed to `RenderController.registerToComputeLayoutAndRender()`.
+   */
+  export function registerToComputeLayout(component: Component) {
+    registerToComputeLayoutAndRender(component);
+  }
+
   function requestRender() {
     // Only run or enqueue flush on first request.
     if (!_animationRequested) {

@@ -1148,6 +1148,16 @@ var Plottable;
             requestRender();
         }
         RenderController.registerToComputeLayoutAndRender = registerToComputeLayoutAndRender;
+        /**
+         * Enqueues the Component for layout and rendering.
+         *
+         * @param {Component} component
+         * @deprecated This method has been renamed to `RenderController.registerToComputeLayoutAndRender()`.
+         */
+        function registerToComputeLayout(component) {
+            registerToComputeLayoutAndRender(component);
+        }
+        RenderController.registerToComputeLayout = registerToComputeLayout;
         function requestRender() {
             // Only run or enqueue flush on first request.
             if (!_animationRequested) {

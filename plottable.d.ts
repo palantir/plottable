@@ -524,6 +524,13 @@ declare namespace Plottable.RenderController {
      */
     function registerToComputeLayoutAndRender(component: Component): void;
     /**
+     * Enqueues the Component for layout and rendering.
+     *
+     * @param {Component} component
+     * @deprecated This method has been renamed to `RenderController.registerToComputeLayoutAndRender()`.
+     */
+    function registerToComputeLayout(component: Component): void;
+    /**
      * Renders all Components waiting to be rendered immediately
      * instead of waiting until the next frame. Flush is idempotent (given there are no intermediate registrations).
      *
