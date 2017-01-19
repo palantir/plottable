@@ -81,6 +81,40 @@ describe("Plots", () => {
         svg.remove();
       });
 
+      it("shows stacked bar labels", () => {
+        stackedBarPlot.labelsEnabled(true);
+        yScale.domain([0, 30]);
+        const stackedBarLabels = stackedBarPlot.content().selectAll(".stacked-bar-label");
+        assert.strictEqual(stackedBarLabels.size(), 2);
+        const text: string[] = [];
+        stackedBarLabels.each(function (d) {
+          text.push(d3.select(this).text());
+        });
+        assert.deepEqual(["3", "3"], text);
+
+        stackedBarPlot.destroy();
+        svg.remove();
+      });
+
+      it("doesn't show stacked bar labels when columns are too tall", () => {
+        stackedBarPlot.labelsEnabled(true);
+        yScale.domain([0, 3]);
+        const stackedBarLabels = stackedBarPlot.content().selectAll(".stacked-bar-label");
+        assert.strictEqual(stackedBarLabels.size(), 0);
+        stackedBarPlot.destroy();
+        svg.remove();
+      });
+
+      it("doesn't show stacked bar labels when columns are too narrow", () => {
+        stackedBarPlot.labelsEnabled(true);
+        xScale.range([0, 20]);
+        xScale.domain(xScale.domain());
+        const stackedBarLabels = stackedBarPlot.content().selectAll(".stacked-bar-label");
+        assert.strictEqual(stackedBarLabels.size(), 0);
+        stackedBarPlot.destroy();
+        svg.remove();
+      });
+
       it("considers lying within a bar's y-range to mean it is closest", () => {
         let d0 = stackedBarPlot.datasets()[0].data()[0];
         let d1 = stackedBarPlot.datasets()[1].data()[0];
@@ -123,6 +157,40 @@ describe("Plots", () => {
         stackedBarPlot.x((d) => d.x, xScale);
         stackedBarPlot.y((d) => d.y, yScale);
         stackedBarPlot.renderTo(svg);
+      });
+
+      it("shows stacked bar labels", () => {
+        yScale.domain([3, -3]);
+        stackedBarPlot.labelsEnabled(true);
+        const stackedBarLabels = stackedBarPlot.content().selectAll(".stacked-bar-label");
+        assert.strictEqual(stackedBarLabels.size(), 2);
+        const text: string[] = [];
+        stackedBarLabels.each(function (d) {
+          text.push(d3.select(this).text());
+        });
+        assert.deepEqual(["-3", "-3"], text);
+
+        stackedBarPlot.destroy();
+        svg.remove();
+      });
+
+      it("doesn't show stacked bar labels when columns are too tall", () => {
+        stackedBarPlot.labelsEnabled(true);
+        yScale.domain([-3, 0]);
+        const stackedBarLabels = stackedBarPlot.content().selectAll(".stacked-bar-label");
+        assert.strictEqual(stackedBarLabels.size(), 0);
+        stackedBarPlot.destroy();
+        svg.remove();
+      });
+
+      it("doesn't show stacked bar labels when columns are too narrow", () => {
+        stackedBarPlot.labelsEnabled(true);
+        xScale.range([0, 40]);
+        xScale.domain(xScale.domain());
+        const stackedBarLabels = stackedBarPlot.content().selectAll(".stacked-bar-label");
+        assert.strictEqual(stackedBarLabels.size(), 0);
+        stackedBarPlot.destroy();
+        svg.remove();
       });
 
       it("renders rects offset by previous values", () => {
@@ -289,6 +357,40 @@ describe("Plots", () => {
         stackedBarPlot.x((d) => d.x, xScale);
         stackedBarPlot.y((d) => d.y, yScale);
         stackedBarPlot.renderTo(svg);
+      });
+
+      it("shows stacked bar labels", () => {
+        xScale.domain([0, 30]);
+        stackedBarPlot.labelsEnabled(true);
+        const stackedBarLabels = stackedBarPlot.content().selectAll(".stacked-bar-label");
+        assert.strictEqual(stackedBarLabels.size(), 2);
+        const text: string[] = [];
+        stackedBarLabels.each(function (d) {
+          text.push(d3.select(this).text());
+        });
+        assert.deepEqual(["3", "3"], text);
+
+        stackedBarPlot.destroy();
+        svg.remove();
+      });
+
+      it("doesn't show stacked bar labels when columns are too tall", () => {
+        xScale.domain([0, 3]);
+        stackedBarPlot.labelsEnabled(true);
+        const stackedBarLabels = stackedBarPlot.content().selectAll(".stacked-bar-label");
+        assert.strictEqual(stackedBarLabels.size(), 0);
+        stackedBarPlot.destroy();
+        svg.remove();
+      });
+
+      it("doesn't show stacked bar labels when columns are too narrow", () => {
+        stackedBarPlot.labelsEnabled(true);
+        yScale.range([0, 40]);
+        yScale.domain(yScale.domain());
+        const stackedBarLabels = stackedBarPlot.content().selectAll(".stacked-bar-label");
+        assert.strictEqual(stackedBarLabels.size(), 0);
+        stackedBarPlot.destroy();
+        svg.remove();
       });
 
       it("renders rects offset by previous values", () => {

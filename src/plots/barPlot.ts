@@ -11,9 +11,10 @@ namespace Plottable.Plots {
     private static _BAR_WIDTH_RATIO = 0.95;
     private static _SINGLE_BAR_DIMENSION_RATIO = 0.4;
     private static _BAR_AREA_CLASS = "bar-area";
-    private static _LABEL_AREA_CLASS = "bar-label-text-area";
     private static _LABEL_VERTICAL_PADDING = 5;
     private static _LABEL_HORIZONTAL_PADDING = 5;
+    protected static _LABEL_AREA_CLASS = "bar-label-text-area";
+
     private _baseline: d3.Selection<void>;
     private _baselineValue: X|Y;
     protected _isVertical: boolean;
@@ -444,7 +445,7 @@ namespace Plottable.Plots {
       return extents;
     }
 
-    private _drawLabels() {
+    protected _drawLabels() {
       let dataToDraw = this._getDataToDraw();
       let labelsTooWide = false;
       this.datasets().forEach((dataset) => labelsTooWide = labelsTooWide || this._drawLabel(dataToDraw.get(dataset), dataset));

@@ -740,10 +740,42 @@ var Plottable;
             }
             Stacking.stack = stack;
             /**
+             * Computes the maximum and minimum extents of each stack individually.
+             *
+             * @param {GenericStackingResult} stackingResult The value and offset information for each datapoint in each dataset
+             * @return { { maximumExtents: Utils.Map<D, number>, minimumExtents: Utils.Map<D, number> } } The maximum and minimum extents
+             * of each individual stack.
+             */
+            function stackedExtents(stackingResult) {
+                var maximumExtents = new Utils.Map();
+                var minimumExtents = new Utils.Map();
+                stackingResult.forEach(function (stack) {
+                    stack.forEach(function (datum, key) {
+                        // correctly handle negative bar stacks
+                        var maximalValue = Utils.Math.max([datum.offset + datum.value, datum.offset], datum.offset);
+                        var minimalValue = Utils.Math.min([datum.offset + datum.value, datum.offset], datum.offset);
+                        if (!maximumExtents.has(key)) {
+                            maximumExtents.set(key, maximalValue);
+                        }
+                        else if (maximumExtents.get(key) < maximalValue) {
+                            maximumExtents.set(key, maximalValue);
+                        }
+                        if (!minimumExtents.has(key)) {
+                            minimumExtents.set(key, minimalValue);
+                        }
+                        else if (minimumExtents.get(key) > (minimalValue)) {
+                            minimumExtents.set(key, minimalValue);
+                        }
+                    });
+                });
+                return { maximumExtents: maximumExtents, minimumExtents: minimumExtents };
+            }
+            Stacking.stackedExtents = stackedExtents;
+            /**
              * Computes the total extent over all data points in all Datasets, taking stacking into consideration.
              *
              * @param {StackingResult} stackingResult The value and offset information for each datapoint in each dataset
-             * @oaram {Accessor<any>} keyAccessor Accessor for the key of the data existent in the stackingResult
+             * @param {Accessor<any>} keyAccessor Accessor for the key of the data existent in the stackingResult
              * @param {Accessor<boolean>} filter A filter for data to be considered when computing the total extent
              * @return {[number, number]} The total extent
              */
@@ -9354,9 +9386,9 @@ var Plottable;
             Bar._BAR_WIDTH_RATIO = 0.95;
             Bar._SINGLE_BAR_DIMENSION_RATIO = 0.4;
             Bar._BAR_AREA_CLASS = "bar-area";
-            Bar._LABEL_AREA_CLASS = "bar-label-text-area";
             Bar._LABEL_VERTICAL_PADDING = 5;
             Bar._LABEL_HORIZONTAL_PADDING = 5;
+            Bar._LABEL_AREA_CLASS = "bar-label-text-area";
             return Bar;
         }(Plottable.XYPlot));
         Plots.Bar = Bar;
@@ -10243,6 +10275,75 @@ var Plottable;
                 this._updateStackExtentsAndOffsets();
                 return this;
             };
+            StackedBar.prototype._setup = function () {
+                _super.prototype._setup.call(this);
+                this._labelArea = this._renderArea.append("g").classed(Plots.Bar._LABEL_AREA_CLASS, true);
+                this._measurer = new SVGTypewriter.Measurers.CacheCharacterMeasurer(this._labelArea);
+                this._writer = new SVGTypewriter.Writers.Writer(this._measurer);
+            };
+            StackedBar.prototype._drawLabels = function () {
+                var _this = this;
+                _super.prototype._drawLabels.call(this);
+                // remove all current labels before redrawing
+                this._labelArea.selectAll("g").remove();
+                var baselineValue = +this.baselineValue();
+                var primaryScale = this._isVertical ? this.x().scale : this.y().scale;
+                var secondaryScale = this._isVertical ? this.y().scale : this.x().scale;
+                var _a = Plottable.Utils.Stacking.stackedExtents(this._stackingResult), maximumExtents = _a.maximumExtents, minimumExtents = _a.minimumExtents;
+                var barWidth = this._getBarPixelWidth();
+                var drawLabel = function (text, measurement, labelPosition) {
+                    var x = labelPosition.x, y = labelPosition.y;
+                    var height = measurement.height, width = measurement.width;
+                    var tooWide = _this._isVertical ? (width > barWidth) : (height > barWidth);
+                    var hideLabel = x < 0
+                        || y < 0
+                        || x + width > _this.width()
+                        || y + height > _this.height()
+                        || tooWide;
+                    if (!hideLabel) {
+                        var labelContainer = _this._labelArea.append("g").attr("transform", "translate(" + x + ", " + y + ")");
+                        labelContainer.classed("stacked-bar-label", true);
+                        var writeOptions = {
+                            selection: labelContainer,
+                            xAlign: "center",
+                            yAlign: "center",
+                            textRotation: 0,
+                        };
+                        _this._writer.write(text, measurement.width, measurement.height, writeOptions);
+                    }
+                };
+                maximumExtents.forEach(function (maximum, axisValue) {
+                    if (maximum !== baselineValue) {
+                        // only draw sums for values not at the baseline
+                        var text = _this.labelFormatter()(maximum);
+                        var measurement = _this._measurer.measure(text);
+                        var primaryTextMeasurement = _this._isVertical ? measurement.width : measurement.height;
+                        var secondaryTextMeasurement = _this._isVertical ? measurement.height : measurement.width;
+                        var x = _this._isVertical
+                            ? primaryScale.scale(axisValue) - primaryTextMeasurement / 2
+                            : secondaryScale.scale(maximum) + StackedBar._STACKED_BAR_LABEL_PADDING;
+                        var y = _this._isVertical
+                            ? secondaryScale.scale(maximum) - secondaryTextMeasurement - StackedBar._STACKED_BAR_LABEL_PADDING
+                            : primaryScale.scale(axisValue) - primaryTextMeasurement / 2;
+                        drawLabel(text, measurement, { x: x, y: y });
+                    }
+                });
+                minimumExtents.forEach(function (minimum, axisValue) {
+                    if (minimum !== baselineValue) {
+                        var text = _this.labelFormatter()(minimum);
+                        var measurement = _this._measurer.measure(text);
+                        var primaryTextMeasurement = _this._isVertical ? measurement.width : measurement.height;
+                        var secondaryTextMeasurement = _this._isVertical ? measurement.height : measurement.width;
+                        var x = _this._isVertical
+                            ? primaryScale.scale(axisValue) - primaryTextMeasurement / 2
+                            : secondaryScale.scale(minimum) - secondaryTextMeasurement - StackedBar._STACKED_BAR_LABEL_PADDING;
+                        var y = _this._isVertical
+                            ? secondaryScale.scale(minimum) + StackedBar._STACKED_BAR_LABEL_PADDING
+                            : primaryScale.scale(axisValue) - primaryTextMeasurement / 2;
+                        drawLabel(text, measurement, { x: x, y: y });
+                    }
+                });
+            };
             StackedBar.prototype._generateAttrToProjector = function () {
                 var _this = this;
                 var attrToProjector = _super.prototype._generateAttrToProjector.call(this);
@@ -10304,6 +10405,7 @@ var Plottable;
                 this._stackingResult = Plottable.Utils.Stacking.stack(datasets, keyAccessor, valueAccessor);
                 this._stackedExtent = Plottable.Utils.Stacking.stackedExtent(this._stackingResult, keyAccessor, filter);
             };
+            StackedBar._STACKED_BAR_LABEL_PADDING = 5;
             return StackedBar;
         }(Plots.Bar));
         Plots.StackedBar = StackedBar;

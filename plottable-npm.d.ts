@@ -295,7 +295,12 @@ declare namespace Plottable.Utils.Stacking {
         value: number;
         offset: number;
     };
-    type StackingResult = Utils.Map<Dataset, Utils.Map<string, StackedDatum>>;
+    type GenericStackingResult<D> = Utils.Map<Dataset, Utils.Map<D, StackedDatum>>;
+    /**
+     * Map of Dataset to stacks.
+     * @deprecated
+     */
+    type StackingResult = GenericStackingResult<string>;
     /**
      * Computes the StackingResult (value and offset) for each data point in each Dataset.
      *
@@ -306,10 +311,21 @@ declare namespace Plottable.Utils.Stacking {
      */
     function stack(datasets: Dataset[], keyAccessor: Accessor<any>, valueAccessor: Accessor<number>): StackingResult;
     /**
+     * Computes the maximum and minimum extents of each stack individually.
+     *
+     * @param {GenericStackingResult} stackingResult The value and offset information for each datapoint in each dataset
+     * @return { { maximumExtents: Utils.Map<D, number>, minimumExtents: Utils.Map<D, number> } } The maximum and minimum extents
+     * of each individual stack.
+     */
+    function stackedExtents<D>(stackingResult: GenericStackingResult<D>): {
+        maximumExtents: Map<D, number>;
+        minimumExtents: Map<D, number>;
+    };
+    /**
      * Computes the total extent over all data points in all Datasets, taking stacking into consideration.
      *
      * @param {StackingResult} stackingResult The value and offset information for each datapoint in each dataset
-     * @oaram {Accessor<any>} keyAccessor Accessor for the key of the data existent in the stackingResult
+     * @param {Accessor<any>} keyAccessor Accessor for the key of the data existent in the stackingResult
      * @param {Accessor<boolean>} filter A filter for data to be considered when computing the total extent
      * @return {[number, number]} The total extent
      */
@@ -3715,9 +3731,9 @@ declare namespace Plottable.Plots {
         private static _BAR_WIDTH_RATIO;
         private static _SINGLE_BAR_DIMENSION_RATIO;
         private static _BAR_AREA_CLASS;
-        private static _LABEL_AREA_CLASS;
         private static _LABEL_VERTICAL_PADDING;
         private static _LABEL_HORIZONTAL_PADDING;
+        protected static _LABEL_AREA_CLASS: string;
         private _baseline;
         private _baselineValue;
         protected _isVertical: boolean;
@@ -3838,7 +3854,7 @@ declare namespace Plottable.Plots {
          * Makes sure the extent takes into account the widths of the bars
          */
         protected _extentsForProperty(property: string): any[];
-        private _drawLabels();
+        protected _drawLabels(): void;
         private _drawLabel(data, dataset);
         protected _generateDrawSteps(): Drawers.DrawStep[];
         protected _generateAttrToProjector(): {
@@ -4099,6 +4115,10 @@ declare namespace Plottable.Plots {
 }
 declare namespace Plottable.Plots {
     class StackedBar<X, Y> extends Bar<X, Y> {
+        protected static _STACKED_BAR_LABEL_PADDING: number;
+        private _labelArea;
+        private _measurer;
+        private _writer;
         private _stackingResult;
         private _stackedExtent;
         /**
@@ -4118,6 +4138,8 @@ declare namespace Plottable.Plots {
         y(): Plots.TransformableAccessorScaleBinding<Y, number>;
         y(y: number | Accessor<number>): this;
         y(y: Y | Accessor<Y>, yScale: Scale<Y, number>): this;
+        protected _setup(): void;
+        protected _drawLabels(): void;
         protected _generateAttrToProjector(): {
             [attr: string]: Projector;
         };
