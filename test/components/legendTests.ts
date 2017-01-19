@@ -163,9 +163,7 @@ describe("Legend", () => {
       color.domain(["this is a very very very very very very very long"]);
       legend.renderTo(svg);
       legend.maxWidth(100);
-      assert.strictEqual(100, (legend.background()[0][0] as SVGElement).getBoundingClientRect().width);
-      legend.maxWidth(0);
-      assert.strictEqual(0, (legend.background()[0][0] as SVGElement).getBoundingClientRect().width);
+      assert.isTrue((legend.content()[0][0] as SVGElement).getBoundingClientRect().width <= 100);
       svg.remove();
     });
 
