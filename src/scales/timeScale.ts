@@ -60,6 +60,10 @@ namespace Plottable.Scales {
       return this.scale(new Date(value));
     }
 
+    public invertedTransformation(value: number) {
+      return this.invert(value).getTime();
+    }
+
     public getTransformationDomain() {
       let dates = this.domain();
       return [dates[0].valueOf(), dates[1].valueOf()] as [number, number];

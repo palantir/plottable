@@ -7,6 +7,95 @@ describe("Plots", () => {
       assert.isTrue(plot.hasClass("plot"), "plot class added by default");
     });
 
+    describe("managing entities", () => {
+      let plot: Plottable.Plot;
+      let svg: any;
+
+      beforeEach(() => {
+        plot = new Plottable.Plot();
+        svg = TestMethods.generateSVG();
+        plot.renderTo(svg);
+      });
+
+      afterEach(() => {
+        svg.remove();
+      });
+
+      it("first call to entities builds a new store", () => {
+        const data = [5, -5, 10];
+        const dataset = new Plottable.Dataset(data);
+        plot.addDataset(dataset);
+
+        const lightweightPlotEntitySpy = sinon.spy(plot, "_buildLightweightPlotEntities");
+        const entities = plot.entities();
+        const entities1 = plot.entities();
+        assert.deepEqual(entities, entities1);
+        assert.isTrue(lightweightPlotEntitySpy.calledOnce);
+      });
+
+      it("new store is built each time entities is called with data", () => {
+        const data = [5, -5, 10];
+        const dataset = new Plottable.Dataset(data);
+        plot.addDataset(dataset);
+
+        const lightweightPlotEntitySpy = sinon.spy(plot, "_buildLightweightPlotEntities");
+        const entities = plot.entities([dataset]);
+        const entities1 = plot.entities([dataset]);
+        assert.deepEqual(entities, entities1);
+        assert.isTrue(lightweightPlotEntitySpy.calledTwice);
+      });
+
+      it("rebuilds the store when the datasets change", () => {
+        const dataset = new Plottable.Dataset([5, -5, 10]);
+        const dataset1 = new Plottable.Dataset([1, -2, 3]);
+
+        plot.addDataset(dataset);
+
+        const lightweightPlotEntitySpy = sinon.spy(plot, "_buildLightweightPlotEntities");
+        const entities = plot.entities();
+        assert.strictEqual(entities.length, 3);
+
+        plot.datasets([dataset1]);
+
+        const entities1 = plot.entities();
+        assert.isTrue(lightweightPlotEntitySpy.calledTwice);
+        assert.strictEqual(entities1.length, 3);
+
+        plot.addDataset(dataset);
+        const entities2 = plot.entities();
+        assert.isTrue(lightweightPlotEntitySpy.calledThrice);
+        assert.strictEqual(entities2.length, 6);
+
+        plot.removeDataset(dataset);
+        const entities3 = plot.entities();
+        assert.deepEqual(entities3, entities1);
+        assert.strictEqual(lightweightPlotEntitySpy.callCount, 4);
+      });
+    });
+
+    describe("entityNearest", () => {
+      let plot: Plottable.Plot;
+      let svg: any;
+
+      beforeEach(() => {
+        plot = new Plottable.Plot();
+        svg = TestMethods.generateSVG();
+        plot.renderTo(svg);
+      });
+
+      afterEach(() => {
+        svg.remove();
+      });
+
+      it("builds entityStore if entity store is undefined", () => {
+        const dataset = new Plottable.Dataset([5, -5, 10]);
+        plot.addDataset(dataset);
+        const lightweightPlotEntitySpy = sinon.spy(plot, "_buildLightweightPlotEntities");
+        plot.entityNearest({ x: 5, y: 0 });
+        assert.isTrue(lightweightPlotEntitySpy.calledOnce);
+      });
+    });
+
     describe("managing datasets", () => {
       let plot: Plottable.Plot;
 

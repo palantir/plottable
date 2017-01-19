@@ -180,6 +180,10 @@ namespace Plottable.Scales {
       return this._d3TransformationScale(value);
     }
 
+    public invertedTransformation(value: number) {
+      return this._d3TransformationScale.invert(value);
+    }
+
     public getTransformationDomain() {
       return this._d3TransformationScale.domain() as [number, number];
     }

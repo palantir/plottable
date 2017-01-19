@@ -49,8 +49,8 @@ export class Axis<D> extends Component {
   private _annotationsEnabled = false;
   private _annotationTierCount = 1;
   private _annotationContainer: d3.Selection<void>;
-  private _annotationMeasurer: SVGTypewriter.Measurers.Measurer;
-  private _annotationWriter: SVGTypewriter.Writers.Writer;
+  private _annotationMeasurer: SVGTypewriter.Measurer;
+  private _annotationWriter: SVGTypewriter.Writer;
 
   /**
    * Constructs an Axis.
@@ -161,8 +161,8 @@ export class Axis<D> extends Component {
     this._annotationContainer.append("g").classed("annotation-circle-container", true);
     this._annotationContainer.append("g").classed("annotation-rect-container", true);
     let annotationLabelContainer = this._annotationContainer.append("g").classed("annotation-label-container", true);
-    this._annotationMeasurer = new SVGTypewriter.Measurers.Measurer(annotationLabelContainer);
-    this._annotationWriter = new SVGTypewriter.Writers.Writer(this._annotationMeasurer);
+    this._annotationMeasurer = new SVGTypewriter.CacheMeasurer(annotationLabelContainer);
+    this._annotationWriter = new SVGTypewriter.Writer(this._annotationMeasurer);
   }
 
   /*
@@ -173,6 +173,10 @@ export class Axis<D> extends Component {
     return [];
   }
 
+  /**
+   * Render tick marks, baseline, and annotations. Should be super called by subclasses and then overridden to draw
+   * other relevant aspects of this Axis.
+   */
   public renderImmediately() {
     let tickMarkValues = this._getTickValues();
     let tickMarks = this._tickMarkContainer.selectAll("." + Axis.TICK_MARK_CLASS).data(tickMarkValues);
@@ -273,7 +277,7 @@ export class Axis<D> extends Component {
 
   protected _drawAnnotations() {
     let labelPadding = Axis._ANNOTATION_LABEL_PADDING;
-    let measurements = new Utils.Map<D, SVGTypewriter.Measurers.Dimensions>();
+    let measurements = new Utils.Map<D, SVGTypewriter.IDimensions>();
     let annotatedTicks = this._annotatedTicksToRender();
     annotatedTicks.forEach((annotatedTick) => {
       let measurement = this._annotationMeasurer.measure(this.annotationFormatter()(annotatedTick));
@@ -415,7 +419,7 @@ export class Axis<D> extends Component {
     return this._annotationMeasurer.measure().height + 2 * Axis._ANNOTATION_LABEL_PADDING;
   }
 
-  private _annotationToTier(measurements: Utils.Map<D, SVGTypewriter.Measurers.Dimensions>) {
+  private _annotationToTier(measurements: Utils.Map<D, SVGTypewriter.IDimensions>) {
     let annotationTiers: D[][] = [[]];
     let annotationToTier = new Utils.Map<D, number>();
     let dimension = this._isHorizontal() ? this.width() : this.height();

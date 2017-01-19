@@ -1,5 +1,15 @@
 namespace Plottable.Axes {
+  export interface DownsampleInfo {
+    domain: string[];
+    stepWidth: number;
+  }
+
   export class Category extends Axis<string> {
+    /**
+     * How many pixels to give labels at minimum before downsampling takes effect.
+     */
+    private static _MINIMUM_WIDTH_PER_LABEL_PX = 15;
+
     private _tickLabelAngle = 0;
 
     /**
@@ -12,14 +22,14 @@ namespace Plottable.Axes {
      */
     private _tickLabelMaxLines: number;
 
-    private _measurer: SVGTypewriter.Measurers.CacheCharacterMeasurer;
+    private _measurer: SVGTypewriter.CacheMeasurer;
 
     /**
      * A Wrapper configured according to the other properties on this axis.
-     * @returns {SVGTypewriter.Wrappers.Wrapper}
+     * @returns {SVGTypewriter.Wrapper}
      */
     private get _wrapper() {
-      const wrapper = new SVGTypewriter.Wrappers.Wrapper();
+      const wrapper = new SVGTypewriter.Wrapper();
       if (this._tickLabelMaxLines != null) {
         wrapper.maxLines(this._tickLabelMaxLines)
       }
@@ -28,10 +38,10 @@ namespace Plottable.Axes {
 
     /**
      * A Writer attached to this measurer and wrapper.
-     * @returns {SVGTypewriter.Writers.Writer}
+     * @returns {SVGTypewriter.Writer}
      */
     private get _writer() {
-      return new SVGTypewriter.Writers.Writer(this._measurer, this._wrapper);
+      return new SVGTypewriter.Writer(this._measurer, this._wrapper);
     }
 
     /**
@@ -50,7 +60,7 @@ namespace Plottable.Axes {
 
     protected _setup() {
       super._setup();
-      this._measurer = new SVGTypewriter.Measurers.CacheCharacterMeasurer(this._tickLabelContainer);
+      this._measurer = new SVGTypewriter.CacheMeasurer(this._tickLabelContainer);
     }
 
     protected _rescale() {
@@ -88,8 +98,7 @@ namespace Plottable.Axes {
         }
       }
 
-      let categoryScale = <Scales.Category> this._scale;
-      let measureResult = this._measureTickLabels(offeredWidth, offeredHeight, categoryScale, categoryScale.domain());
+      let measureResult = this._measureTickLabels(offeredWidth, offeredHeight);
 
       return {
         minWidth: measureResult.usedWidth + widthRequiredByTicks,
@@ -108,7 +117,22 @@ namespace Plottable.Axes {
     }
 
     protected _getTickValues() {
-      return this._scale.domain();
+      return this.getDownsampleInfo().domain;
+    }
+
+    /**
+     * Take the scale and drop ticks at regular intervals such that the resultant ticks are all a reasonable minimum
+     * distance apart. Return the resultant ticks to render, as well as the new stepWidth between them.
+     *
+     * @param {Scales.Category} scale - The scale being downsampled. Defaults to this Axis' scale.
+     * @return {DownsampleInfo} an object holding the resultant domain and new stepWidth.
+     */
+    public getDownsampleInfo(scale = <Scales.Category> this._scale): DownsampleInfo {
+      const downsampleRatio = Math.ceil(Category._MINIMUM_WIDTH_PER_LABEL_PX / scale.stepWidth());
+      return {
+        domain: scale.domain().filter((d, i) => i % downsampleRatio === 0),
+        stepWidth: downsampleRatio * scale.stepWidth(),
+      };
     }
 
     /**
@@ -192,7 +216,7 @@ namespace Plottable.Axes {
      * @param {Plottable.Scales.Category} scale The scale this axis is representing.
      * @param {d3.Selection} ticks The tick elements to write.
      */
-    private _drawTicks(scale: Scales.Category, ticks: d3.Selection<string>) {
+    private _drawTicks(stepWidth: number, ticks: d3.Selection<string>) {
       let self = this;
       let xAlign: {[s: string]: string};
       let yAlign: {[s: string]: string};
@@ -211,9 +235,8 @@ namespace Plottable.Axes {
           break;
       }
       ticks.each(function (this: SVGElement, d: string) {
-        let bandWidth = scale.stepWidth();
-        let width = self._isHorizontal() ? bandWidth : self.width() - self._tickSpaceRequired();
-        let height = self._isHorizontal() ? self.height() - self._tickSpaceRequired() : bandWidth;
+        let width = self._isHorizontal() ? stepWidth : self.width() - self._tickSpaceRequired();
+        let height = self._isHorizontal() ? self.height() - self._tickSpaceRequired() : stepWidth;
         let writeOptions = {
           selection: d3.select(this),
           xAlign: xAlign[self.orientation()],
@@ -242,40 +265,47 @@ namespace Plottable.Axes {
      * @param {Plottable.Scales.Category} scale The scale this axis is representing.
      * @param {string[]} ticks The strings that will be printed on the ticks.
      */
-    private _measureTickLabels(axisWidth: number, axisHeight: number, scale: Scales.Category, ticks: string[]) {
-      let axisSpace = this._isHorizontal() ? axisWidth : axisHeight;
-      let totalOuterPaddingRatio = 2 * scale.outerPadding();
-      let totalInnerPaddingRatio = (ticks.length - 1) * scale.innerPadding();
-      let expectedRangeBand = axisSpace / (totalOuterPaddingRatio + totalInnerPaddingRatio + ticks.length);
-      let stepWidth = expectedRangeBand * (1 + scale.innerPadding());
+    private _measureTickLabels(axisWidth: number, axisHeight: number) {
+      const thisScale = <Scales.Category> this._scale;
 
-      let wrappingResults = ticks.map((s: string) => {
+      // set up a test scale to simulate rendering ticks with the given width and height.
+      const scale = new Scales.Category()
+        .domain(thisScale.domain())
+        .innerPadding(thisScale.innerPadding())
+        .outerPadding(thisScale.outerPadding())
+        .range([0, this._isHorizontal() ? axisWidth : axisHeight]);
 
-        // HACKHACK: https://github.com/palantir/svg-typewriter/issues/25
-        let width = axisWidth - this._tickSpaceRequired(); // default for left/right
-        if (this._isHorizontal()) { // case for top/bottom
-          width = stepWidth; // defaults to the band width
-          if (this._tickLabelAngle !== 0) { // rotated label
-            width = axisHeight - this._tickSpaceRequired(); // use the axis height
-          }
-          // HACKHACK: Wrapper fails under negative circumstances
-          width = Math.max(width, 0);
+      const { domain, stepWidth } = this.getDownsampleInfo(scale);
+
+      // HACKHACK: https://github.com/palantir/svg-typewriter/issues/25
+      // the width (x-axis specific) available to a single tick label.
+      let width = axisWidth - this._tickSpaceRequired(); // default for left/right
+      if (this._isHorizontal()) { // case for top/bottom
+        width = stepWidth; // defaults to the band width
+        if (this._tickLabelAngle !== 0) { // rotated label
+          width = axisHeight - this._tickSpaceRequired(); // use the axis height
         }
+        // HACKHACK: Wrapper fails under negative circumstances
+        width = Math.max(width, 0);
+      }
 
-        // HACKHACK: https://github.com/palantir/svg-typewriter/issues/25
-        let height = stepWidth; // default for left/right
-        if (this._isHorizontal()) { // case for top/bottom
-          height = axisHeight - this._tickSpaceRequired();
-          if (this._tickLabelAngle !== 0) { // rotated label
-            height = axisWidth - this._tickSpaceRequired();
-          }
-          // HACKHACK: Wrapper fails under negative circumstances
-          height = Math.max(height, 0);
+      // HACKHACK: https://github.com/palantir/svg-typewriter/issues/25
+      // the height (y-axis specific) available to a single tick label.
+      let height = stepWidth; // default for left/right
+      if (this._isHorizontal()) { // case for top/bottom
+        height = axisHeight - this._tickSpaceRequired();
+        if (this._tickLabelAngle !== 0) { // rotated label
+          height = axisWidth - this._tickSpaceRequired();
         }
+        // HACKHACK: Wrapper fails under negative circumstances
+        height = Math.max(height, 0);
+      }
 
-        if (this._tickLabelMaxWidth != null) {
-          width = Math.min(width, this._tickLabelMaxWidth);
-        }
+      if (this._tickLabelMaxWidth != null) {
+        width = Math.min(width, this._tickLabelMaxWidth);
+      }
+
+      let wrappingResults = domain.map((s: string) => {
         return this._wrapper.wrap(this.formatter()(s), this._measurer, width, height);
       });
 
@@ -283,10 +313,10 @@ namespace Plottable.Axes {
       let widthFn = (this._isHorizontal() && this._tickLabelAngle === 0) ? d3.sum : Utils.Math.max;
       let heightFn = (this._isHorizontal() && this._tickLabelAngle === 0) ? Utils.Math.max : d3.sum;
 
-      let usedWidth = widthFn<SVGTypewriter.Wrappers.WrappingResult, number>(wrappingResults,
-                      (t: SVGTypewriter.Wrappers.WrappingResult) => this._measurer.measure(t.wrappedText).width, 0);
-      let usedHeight = heightFn<SVGTypewriter.Wrappers.WrappingResult, number>(wrappingResults,
-                      (t: SVGTypewriter.Wrappers.WrappingResult) => this._measurer.measure(t.wrappedText).height, 0);
+      let usedWidth = widthFn<SVGTypewriter.IWrappingResult, number>(wrappingResults,
+                      (t: SVGTypewriter.IWrappingResult) => this._measurer.measure(t.wrappedText).width, 0);
+      let usedHeight = heightFn<SVGTypewriter.IWrappingResult, number>(wrappingResults,
+                      (t: SVGTypewriter.IWrappingResult) => this._measurer.measure(t.wrappedText).height, 0);
 
       // If the tick labels are rotated, reverse usedWidth and usedHeight
       // HACKHACK: https://github.com/palantir/svg-typewriter/issues/25
@@ -303,20 +333,20 @@ namespace Plottable.Axes {
     public renderImmediately() {
       super.renderImmediately();
       let catScale = <Scales.Category> this._scale;
-      let tickLabels = this._tickLabelContainer.selectAll("." + Axis.TICK_LABEL_CLASS).data(this._scale.domain(), (d) => d);
+      const { domain, stepWidth } = this.getDownsampleInfo();
+      let tickLabels = this._tickLabelContainer.selectAll("." + Axis.TICK_LABEL_CLASS).data(domain, (d) => d);
+      // Give each tick a stepWidth of space which will partition the entire axis evenly
+      let availableTextSpace = stepWidth;
+      if (this._isHorizontal() && this._tickLabelMaxWidth != null) {
+        availableTextSpace = Math.min(availableTextSpace, this._tickLabelMaxWidth);
+      }
 
       let getTickLabelTransform = (d: string, i: number) => {
-        // Give each tick a stepWidth of space which will partition the entire axis evenly
-        let availableTextWidth = catScale.stepWidth();
-        if (this._isHorizontal() && this._tickLabelMaxWidth != null) {
-          availableTextWidth = Math.min(availableTextWidth, this._tickLabelMaxWidth);
-        }
-
-        // scale(d) will give the center of the band, so subtract half of the text width so that the tick label will be
-        // centered with the band
-        let scaledValue = catScale.scale(d) - availableTextWidth / 2;
-        let x = this._isHorizontal() ? scaledValue : 0;
-        let y = this._isHorizontal() ? 0 : scaledValue;
+        // scale(d) will give the center of the band, so subtract half of the text width to get the left (top-most)
+        // coordinate that the tick label should be transformed to.
+        let tickLabelEdge = catScale.scale(d) - availableTextSpace / 2;
+        let x = this._isHorizontal() ? tickLabelEdge : 0;
+        let y = this._isHorizontal() ? 0 : tickLabelEdge;
         return "translate(" + x + "," + y + ")";
       };
       tickLabels.enter().append("g").classed(Axis.TICK_LABEL_CLASS, true);
@@ -324,7 +354,7 @@ namespace Plottable.Axes {
       tickLabels.attr("transform", getTickLabelTransform);
       // erase all text first, then rewrite
       tickLabels.text("");
-      this._drawTicks(catScale, tickLabels);
+      this._drawTicks(stepWidth, tickLabels);
 
       let xTranslate = this.orientation() === "right" ? this._tickSpaceRequired() : 0;
       let yTranslate = this.orientation() === "bottom" ? this._tickSpaceRequired() : 0;

@@ -3,9 +3,9 @@ namespace Plottable.Components {
     private _textContainer: d3.Selection<void>;
     private _text: string; // text assigned to the Label; may not be the actual text displayed due to truncation
     private _angle: number;
-    private _measurer: SVGTypewriter.Measurers.Measurer;
-    private _wrapper: SVGTypewriter.Wrappers.Wrapper;
-    private _writer: SVGTypewriter.Writers.Writer;
+    private _measurer: SVGTypewriter.Measurer;
+    private _wrapper: SVGTypewriter.Wrapper;
+    private _writer: SVGTypewriter.Writer;
     private _padding: number;
 
     /**
@@ -38,9 +38,9 @@ namespace Plottable.Components {
     protected _setup() {
       super._setup();
       this._textContainer = this.content().append("g");
-      this._measurer = new SVGTypewriter.Measurers.Measurer(this._textContainer);
-      this._wrapper = new SVGTypewriter.Wrappers.Wrapper();
-      this._writer = new SVGTypewriter.Writers.Writer(this._measurer, this._wrapper);
+      this._measurer = new SVGTypewriter.CacheMeasurer(this._textContainer);
+      this._wrapper = new SVGTypewriter.Wrapper();
+      this._writer = new SVGTypewriter.Writer(this._measurer, this._wrapper);
       this.text(this._text);
     }
 
@@ -134,7 +134,7 @@ namespace Plottable.Components {
 
     public renderImmediately() {
       super.renderImmediately();
-      // HACKHACK SVGTypewriter should remove existing content - #21 on SVGTypewriter.
+      // HACKHACK SVGTypewriter.remove existing content - #21 on SVGTypewriter.
       this._textContainer.selectAll("g").remove();
       let textMeasurement = this._measurer.measure(this._text);
       let heightPadding = Math.max(Math.min((this.height() - textMeasurement.height) / 2, this.padding()), 0);

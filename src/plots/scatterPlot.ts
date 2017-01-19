@@ -1,4 +1,9 @@
 namespace Plottable.Plots {
+
+  export interface LightweightScatterPlotEntity extends LightweightPlotEntity {
+    diameter: Point;
+  }
+
   export class Scatter<X, Y> extends XYPlot<X, Y> {
     private static _SIZE_KEY = "size";
     private static _SYMBOL_KEY = "symbol";
@@ -23,6 +28,21 @@ namespace Plottable.Plots {
       this.symbol(() => circleSymbolFactory);
     }
 
+    protected _buildLightweightPlotEntities(datasets: Dataset[]) {
+        const lightweightPlotEntities = super._buildLightweightPlotEntities(datasets);
+
+        return lightweightPlotEntities.map((lightweightPlotEntity: LightweightScatterPlotEntity) => {
+          const diameter = Plot._scaledAccessor(this.size())(
+            lightweightPlotEntity.datum,
+            lightweightPlotEntity.index,
+            lightweightPlotEntity.dataset);
+
+          // convert diameter into data space to be on the same scale as the scatter point position
+          lightweightPlotEntity.diameter = this._invertedPixelSize({ x: diameter, y: diameter });
+          return lightweightPlotEntity;
+        });
+    }
+
     protected _createDrawer(dataset: Dataset) {
       return new Plottable.Drawers.Symbol(dataset);
     }
@@ -31,7 +51,7 @@ namespace Plottable.Plots {
      * Gets the AccessorScaleBinding for the size property of the plot.
      * The size property corresponds to the area of the symbol.
      */
-    public size<S>(): AccessorScaleBinding<S, number>;
+    public size<S>(): TransformableAccessorScaleBinding<S, number>;
     /**
      * Sets the size property to a constant number or the result of an Accessor<number>.
      *
@@ -92,16 +112,15 @@ namespace Plottable.Plots {
       return drawSteps;
     }
 
-    protected _entityVisibleOnPlot(pixelPoint: Point, datum: any, index: number, dataset: Dataset) {
-      let xRange = { min: 0, max: this.width() };
-      let yRange = { min: 0, max: this.height() };
+    protected _entityVisibleOnPlot(entity: LightweightScatterPlotEntity, bounds: Bounds) {
+      const xRange = { min: bounds.topLeft.x, max: bounds.bottomRight.x };
+      const yRange = { min: bounds.topLeft.y, max: bounds.bottomRight.y };
 
-      let diameter = Plot._scaledAccessor(this.size())(datum, index, dataset);
-      let translatedBbox = {
-        x: pixelPoint.x - diameter,
-        y: pixelPoint.y - diameter,
-        width: diameter,
-        height: diameter,
+      const translatedBbox = {
+        x: entity.position.x - entity.diameter.x,
+        y: entity.position.y - entity.diameter.y,
+        width: entity.diameter.x,
+        height: entity.diameter.y,
       };
 
       return Utils.DOM.intersectsBBox(xRange, yRange, translatedBbox);
@@ -182,6 +201,24 @@ namespace Plottable.Plots {
         let size = sizeProjector(datum, index, dataset);
         return x - size / 2  <= p.x && p.x <= x + size / 2 && y - size / 2 <= p.y && p.y <= y + size / 2;
       });
+    }
+
+    /**
+     * _invertedPixelSize returns the size of the object in data space
+     * @param {Point} [point] The size of the object in pixel space. X corresponds to
+     * the width of the object, and Y corresponds to the height of the object
+     * @return {Point} Returns the size of the object in data space. X corresponds to
+     * the width of the object in data space, and Y corresponds to the height of the
+     * object in data space.
+     */
+    private _invertedPixelSize(point: Point) {
+      const invertedOrigin = this._invertPixelPoint(this.origin());
+      const invertedSize = this._invertPixelPoint({ x: point.x, y: point.y });
+
+      return {
+        x: Math.abs(invertedSize.x - invertedOrigin.x),
+        y: Math.abs(invertedSize.y - invertedOrigin.y)
+      };
     }
   }
 }

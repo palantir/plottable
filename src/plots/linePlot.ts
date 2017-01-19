@@ -31,7 +31,7 @@ namespace Plottable.Plots {
       this.attr("stroke-width", "2px");
     }
 
-    public x(): Plots.AccessorScaleBinding<X, number>;
+    public x(): Plots.TransformableAccessorScaleBinding<X, number>;
     public x(x: number | Accessor<number>): this;
     public x(x: X | Accessor<X>, xScale: Scale<X, number>): this;
     public x(x?: number | Accessor<number> | X | Accessor<X>, xScale?: Scale<X, number>): any {
@@ -48,7 +48,7 @@ namespace Plottable.Plots {
       }
     }
 
-    public y(): Plots.AccessorScaleBinding<number, number>;
+    public y(): Plots.TransformableAccessorScaleBinding<number, number>;
     public y(y: number | Accessor<number>): this;
     public y(y: number | Accessor<number>, yScale: Scale<number, number>): this;
     public y(y?: number | Accessor<number>, yScale?: Scale<number, number>): any {
@@ -395,8 +395,10 @@ namespace Plottable.Plots {
       let minXDist = Infinity;
       let minYDist = Infinity;
       let closest: PlotEntity;
+
+      const chartBounds = this.bounds();
       this.entities().forEach((entity) => {
-        if (!this._entityVisibleOnPlot(entity.position, entity.datum, entity.index, entity.dataset)) {
+        if (!this._entityVisibleOnPlot(entity, chartBounds)) {
           return;
         }
         let xDist = Math.abs(queryPoint.x - entity.position.x);

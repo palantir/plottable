@@ -61,6 +61,11 @@ namespace Plottable.Scales {
      * `scaleTransformation`.
      */
     getTransformationDomain(): [number, number];
+
+    /**
+     * Returns value in *Transformation Space* for the provided *screen space*.
+     */
+    invertedTransformation(value: number): number;
   }
 
   /**
@@ -76,6 +81,8 @@ namespace Plottable.Scales {
 }
 
 namespace Plottable {
+
+export type TransformableScale<D, R> = Scale<D, R> & Plottable.Scales.TransformableScale;
 
 export interface ScaleCallback<S extends Scale<any, any>> {
   (scale: S): any;

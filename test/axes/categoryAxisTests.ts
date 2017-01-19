@@ -58,7 +58,7 @@ describe("Category Axes", () => {
       let axis = new Plottable.Axes.Category(scale, "left");
       const TICK_LABEL_MAX_WIDTH = 60;
       axis.tickLabelMaxWidth(TICK_LABEL_MAX_WIDTH);
-      axis.renderTo("svg");
+      axis.renderTo(svg);
 
       let tickLabelContainer = axis.content().select(".tick-label-container").node() as SVGGElement;
       // add 8px padding to account for https://github.com/palantir/svg-typewriter/issues/40
@@ -74,13 +74,31 @@ describe("Category Axes", () => {
       const axis = new Plottable.Axes.Category(scale, "left");
       axis.tickLabelMaxWidth(60);
       axis.tickLabelMaxLines(2);
-      axis.renderTo("svg");
+      axis.renderTo(svg);
 
       const tickLabels = axis.content().selectAll(".tick-label");
       assert.strictEqual(tickLabels.size(), 2, "only renders two labels");
       const [longLabel, shortLabel] = tickLabels[0];
       assert.strictEqual(d3.select(longLabel).selectAll("text").size(), 2, "first label is only two lines long");
       assert.strictEqual(d3.select(shortLabel).selectAll("text").size(), 1, "second label is only one line long");
+
+      svg.remove();
+    });
+
+    it("downsamples the domain if there are too many ticks to fit", () => {
+      const height = 30;
+      const svg = TestMethods.generateSVG(400, height);
+      const domain = ["one", "two", "three", "four", "five", "six", "seven"];
+      const scale = new Plottable.Scales.Category().domain(domain);
+      const axis = new Plottable.Axes.Category(scale, "left");
+      axis.renderTo(svg);
+
+      const { domain: downsampledDomain, stepWidth } = axis.getDownsampleInfo();
+      assert.strictEqual(stepWidth, 4 * scale.stepWidth(), "computes new stepWidth correctly");
+      assert.deepEqual(downsampledDomain, ["one", "five"], "downsamples domain correctly");
+
+      const tickLabels = axis.content().selectAll(".tick-label");
+      assert.strictEqual(tickLabels.size(), 2, "renders downsampled labels");
 
       svg.remove();
     });

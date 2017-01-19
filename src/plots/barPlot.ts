@@ -1,8 +1,8 @@
 namespace Plottable.Plots {
   type LabelConfig = {
     labelArea: d3.Selection<void>;
-    measurer: SVGTypewriter.Measurers.Measurer;
-    writer: SVGTypewriter.Writers.Writer;
+    measurer: SVGTypewriter.Measurer;
+    writer: SVGTypewriter.Writer;
   };
 
   export class Bar<X, Y> extends XYPlot<X, Y> {
@@ -11,9 +11,10 @@ namespace Plottable.Plots {
     private static _BAR_WIDTH_RATIO = 0.95;
     private static _SINGLE_BAR_DIMENSION_RATIO = 0.4;
     private static _BAR_AREA_CLASS = "bar-area";
-    private static _LABEL_AREA_CLASS = "bar-label-text-area";
     private static _LABEL_VERTICAL_PADDING = 5;
     private static _LABEL_HORIZONTAL_PADDING = 5;
+    protected static _LABEL_AREA_CLASS = "bar-label-text-area";
+
     private _baseline: d3.Selection<void>;
     private _baselineValue: X|Y;
     protected _isVertical: boolean;
@@ -47,7 +48,7 @@ namespace Plottable.Plots {
       this._updateBarPixelWidthCallback = () => this._updateBarPixelWidth();
     }
 
-    public x(): Plots.AccessorScaleBinding<X, number>;
+    public x(): Plots.TransformableAccessorScaleBinding<X, number>;
     public x(x: number | Accessor<number>): this;
     public x(x: X | Accessor<X>, xScale: Scale<X, number>): this;
     public x(x?: number | Accessor<number> | X | Accessor<X>, xScale?: Scale<X, number>): any {
@@ -66,7 +67,7 @@ namespace Plottable.Plots {
       return this;
     }
 
-    public y(): Plots.AccessorScaleBinding<Y, number>;
+    public y(): Plots.TransformableAccessorScaleBinding<Y, number>;
     public y(y: number | Accessor<number>): this;
     public y(y: Y | Accessor<Y>, yScale: Scale<Y, number>): this;
     public y(y?: number | Accessor<number> | Y | Accessor<Y>, yScale?: Scale<Y, number>): any {
@@ -235,8 +236,8 @@ namespace Plottable.Plots {
       let drawer = super._createNodesForDataset(dataset);
       drawer.renderArea().classed(Bar._BAR_AREA_CLASS, true);
       let labelArea = this._renderArea.append("g").classed(Bar._LABEL_AREA_CLASS, true);
-      let measurer = new SVGTypewriter.Measurers.CacheCharacterMeasurer(labelArea);
-      let writer = new SVGTypewriter.Writers.Writer(measurer);
+      let measurer = new SVGTypewriter.CacheMeasurer(labelArea);
+      let writer = new SVGTypewriter.Writer(measurer);
       this._labelConfig.set(dataset, { labelArea: labelArea, measurer: measurer, writer: writer });
       return drawer;
     }
@@ -272,9 +273,10 @@ namespace Plottable.Plots {
       // mouse events) usually have pixel accuracy. We add a tolerance of 0.5 pixels.
       let tolerance = 0.5;
 
+      const chartBounds = this.bounds();
       let closest: PlotEntity;
       this.entities().forEach((entity) => {
-        if (!this._entityVisibleOnPlot(entity.position, entity.datum, entity.index, entity.dataset)) {
+        if (!this._entityVisibleOnPlot(entity, chartBounds)) {
           return;
         }
         let primaryDist = 0;
@@ -310,11 +312,16 @@ namespace Plottable.Plots {
       return closest;
     }
 
-    protected _entityVisibleOnPlot(pixelPoint: Point, datum: any, index: number, dataset: Dataset) {
-      let xRange = { min: 0, max: this.width() };
-      let yRange = { min: 0, max: this.height() };
+    protected _entityVisibleOnPlot(entity: Plots.PlotEntity, bounds: Bounds) {
+      const chartWidth = bounds.bottomRight.x - bounds.topLeft.x;
+      const chartHeight = bounds.bottomRight.y - bounds.topLeft.y;
+
+      let xRange = { min: 0, max: chartWidth };
+      let yRange = { min: 0, max: chartHeight };
 
       let attrToProjector = this._generateAttrToProjector();
+
+      const { datum, index, dataset } = entity;
 
       let barBBox = {
         x: attrToProjector["x"](datum, index, dataset),
@@ -438,7 +445,7 @@ namespace Plottable.Plots {
       return extents;
     }
 
-    private _drawLabels() {
+    protected _drawLabels() {
       let dataToDraw = this._getDataToDraw();
       let labelsTooWide = false;
       this.datasets().forEach((dataset) => labelsTooWide = labelsTooWide || this._drawLabel(dataToDraw.get(dataset), dataset));
