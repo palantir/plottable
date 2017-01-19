@@ -5,7 +5,14 @@ namespace Plottable.Utils.Stacking {
     offset: number;
   };
 
-  export type StackingResult = Utils.Map<Dataset, Utils.Map<string, StackedDatum>>;
+  // HACKHACK More accurate stacking result definition. Remove typeless stacking result
+  // and replace with typed stacking result in 3.0.
+  export type GenericStackingResult<D> = Utils.Map<Dataset, Utils.Map<D, StackedDatum>>;
+  /**
+   * Map of Dataset to stacks.
+   * @deprecated
+   */
+  export type StackingResult = GenericStackingResult<string>;
 
   let nativeMath: Math = (<any>window).Math;
 
@@ -46,12 +53,20 @@ namespace Plottable.Utils.Stacking {
     return datasetToKeyToStackedDatum;
   }
 
-  export function stackedExtents(stackingResult: StackingResult) {
-    const maximumExtents: Utils.Map<string, number> = new Utils.Map<string, number>();
-    const minimumExtents: Utils.Map<string, number> = new Utils.Map<string, number>();
+
+ /**
+  * Computes the maximum and minimum extents of each stack individually.
+  *
+  * @param {GenericStackingResult} stackingResult The value and offset information for each datapoint in each dataset
+  * @return { { maximumExtents: Utils.Map<D, number>, minimumExtents: Utils.Map<D, number> } } The maximum and minimum extents
+  * of each individual stack.
+  */
+  export function stackedExtents<D>(stackingResult: GenericStackingResult<D>) {
+    const maximumExtents: Utils.Map<D, number> = new Utils.Map<D, number>();
+    const minimumExtents: Utils.Map<D, number> = new Utils.Map<D, number>();
 
     stackingResult.forEach((stack) => {
-      stack.forEach((datum: StackedDatum, key: string) => {
+      stack.forEach((datum: StackedDatum, key: D) => {
         // correctly handle negative bar stacks
         const maximalValue = Math.max([datum.offset + datum.value, datum.offset], datum.offset);
         const minimalValue = Math.min([datum.offset + datum.value, datum.offset], datum.offset);
@@ -77,7 +92,7 @@ namespace Plottable.Utils.Stacking {
    * Computes the total extent over all data points in all Datasets, taking stacking into consideration.
    *
    * @param {StackingResult} stackingResult The value and offset information for each datapoint in each dataset
-   * @oaram {Accessor<any>} keyAccessor Accessor for the key of the data existent in the stackingResult
+   * @param {Accessor<any>} keyAccessor Accessor for the key of the data existent in the stackingResult
    * @param {Accessor<boolean>} filter A filter for data to be considered when computing the total extent
    * @return {[number, number]} The total extent
    */

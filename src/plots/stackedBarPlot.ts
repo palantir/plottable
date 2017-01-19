@@ -1,6 +1,5 @@
 namespace Plottable.Plots {
   export class StackedBar<X, Y> extends Bar<X, Y> {
-    private static _STACKED_BAR_LABEL_AREA_CLASS = "stacked-bar-label-text-area"
     protected static _STACKED_BAR_LABEL_PADDING = 5;
 
     private _labelArea: d3.Selection<void>;
@@ -62,7 +61,7 @@ namespace Plottable.Plots {
 
     protected _setup() {
       super._setup();
-      this._labelArea = this._renderArea.append("g").classed(StackedBar._STACKED_BAR_LABEL_AREA_CLASS, true);
+      this._labelArea = this._renderArea.append("g").classed(Bar._LABEL_AREA_CLASS, true);
       this._measurer = new SVGTypewriter.Measurers.CacheCharacterMeasurer(this._labelArea);
       this._writer = new SVGTypewriter.Writers.Writer(this._measurer);
     }

@@ -62,7 +62,8 @@ svg.plottable {
 
 .plottable .bar-label-text-area text {
   font-family: "Helvetica Neue", sans-serif;
-  font-size: 14px;
+  font-size: 12px;
+  font-style: italic;
 }
 
 .plottable .label-area text {
@@ -85,6 +86,7 @@ svg.plottable {
 
 .plottable .stacked-bar-label text {
   fill: #32313F;
+  font-style: normal;
 }
 
 .plottable .stacked-bar-plot .off-bar-label {
