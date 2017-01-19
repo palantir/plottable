@@ -6,7 +6,7 @@ describe("Labels", () => {
   before(() => {
     CLOSETO_REQUIRMENT = window.Pixel_CloseTo_Requirement;
     // HACKHACK #2422: use an open source web font by default for Plottable
-    window.Pixel_CloseTo_Requirement = 2;
+    window.Pixel_CloseTo_Requirement = 3;
   });
   after(() => {
     window.Pixel_CloseTo_Requirement = CLOSETO_REQUIRMENT;
