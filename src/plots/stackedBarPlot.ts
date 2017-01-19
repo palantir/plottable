@@ -3,8 +3,8 @@ namespace Plottable.Plots {
     protected static _STACKED_BAR_LABEL_PADDING = 5;
 
     private _labelArea: d3.Selection<void>;
-    private _measurer: SVGTypewriter.Measurers.CacheCharacterMeasurer;
-    private _writer: SVGTypewriter.Writers.Writer;
+    private _measurer: SVGTypewriter.Measurer;
+    private _writer: SVGTypewriter.Writer;
     private _stackingResult: Utils.Stacking.StackingResult;
     private _stackedExtent: number[];
 
@@ -62,8 +62,8 @@ namespace Plottable.Plots {
     protected _setup() {
       super._setup();
       this._labelArea = this._renderArea.append("g").classed(Bar._LABEL_AREA_CLASS, true);
-      this._measurer = new SVGTypewriter.Measurers.CacheCharacterMeasurer(this._labelArea);
-      this._writer = new SVGTypewriter.Writers.Writer(this._measurer);
+      this._measurer = new SVGTypewriter.CacheMeasurer(this._labelArea);
+      this._writer = new SVGTypewriter.Writer(this._measurer);
     }
 
     protected _drawLabels() {

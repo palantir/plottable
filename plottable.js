@@ -10278,8 +10278,8 @@ var Plottable;
             StackedBar.prototype._setup = function () {
                 _super.prototype._setup.call(this);
                 this._labelArea = this._renderArea.append("g").classed(Plots.Bar._LABEL_AREA_CLASS, true);
-                this._measurer = new SVGTypewriter.Measurers.CacheCharacterMeasurer(this._labelArea);
-                this._writer = new SVGTypewriter.Writers.Writer(this._measurer);
+                this._measurer = new SVGTypewriter.CacheMeasurer(this._labelArea);
+                this._writer = new SVGTypewriter.Writer(this._measurer);
             };
             StackedBar.prototype._drawLabels = function () {
                 var _this = this;
