@@ -107,7 +107,7 @@ describe("Plots", () => {
 
       it("doesn't show stacked bar labels when columns are too narrow", () => {
         stackedBarPlot.labelsEnabled(true);
-        xScale.range([0, 40]);
+        xScale.range([0, 20]);
         xScale.domain(xScale.domain());
         const stackedBarLabels = stackedBarPlot.content().selectAll(".stacked-bar-label");
         assert.strictEqual(stackedBarLabels.size(), 0);
