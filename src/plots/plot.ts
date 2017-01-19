@@ -1,4 +1,21 @@
 namespace Plottable.Plots {
+
+  /**
+   * Computing the selection of an entity is an expensive operation. This object aims to
+   * reproduce the behavior of the Plots.PlotEntity, excluding the selection, but including
+   * drawer and validDatumIndex, which can be used to compute the selection.
+   */
+  export interface LightweightPlotEntity {
+    datum: any;
+    dataset: Dataset;
+    datasetIndex: number;
+    position: Point;
+    index: number;
+    component: Plot;
+    drawer: Plottable.Drawer;
+    validDatumIndex: number;
+  }
+
   export interface PlotEntity extends Entity<Plot> {
     dataset: Dataset;
     datasetIndex: number;
@@ -11,6 +28,16 @@ namespace Plottable.Plots {
     scale?: Scale<D, R>;
   }
 
+  /**
+   * TransformableAccessorScaleBinding mapping from property accessor to
+   * TransformableScale. It is distinct from a plain AccessorScaleBinding
+   * in that the scale is guaranteed to be invertable.
+   */
+  export interface TransformableAccessorScaleBinding<D, R> {
+    accessor: Accessor<any>;
+    scale?: TransformableScale<D, R>;
+  }
+
   export namespace Animator {
     export var MAIN = "main";
     export var RESET = "reset";
@@ -18,25 +45,17 @@ namespace Plottable.Plots {
 }
 
 namespace Plottable {
-/**
- * Computing the selection of an entity is an expensive operation. This object aims to
- * reproduce the behavior of the Plots.PlotEntity, excluding the selection, but including
- * drawer and validDatumIndex, which can be used to compute the selection.
- */
-interface LightweightPlotEntity {
-  datum: any;
-  position: Point;
-  dataset: Dataset;
-  datasetIndex: number;
-  index: number;
-  component: Plot;
-  drawer: Plottable.Drawer;
-  validDatumIndex: number;
-}
+
 
 export class Plot extends Component {
   protected static _ANIMATION_MAX_DURATION = 600;
 
+  /**
+   * _cachedEntityStore is a cache of all the entities in the plot. It, at times
+   * may be undefined and shouldn't be accessed directly. Instead, use _getEntityStore
+   * to access the entity store.
+   */
+  private _cachedEntityStore: Plottable.Utils.EntityStore<Plots.LightweightPlotEntity>;
   private _dataChanged = false;
   private _datasetToDrawer: Utils.Map<Dataset, Drawer>;
 
@@ -79,6 +98,7 @@ export class Plot extends Component {
   public anchor(selection: d3.Selection<void>) {
     super.anchor(selection);
     this._dataChanged = true;
+    this._cachedEntityStore = undefined;
     this._updateExtents();
     return this;
   }
@@ -116,6 +136,7 @@ export class Plot extends Component {
   protected _onDatasetUpdate() {
     this._updateExtents();
     this._dataChanged = true;
+    this._cachedEntityStore = undefined;
     this.render();
   }
 
@@ -436,6 +457,40 @@ export class Plot extends Component {
     // no-op
   }
 
+  /**
+   * _buildLightweightPlotEntities constucts {LightweightPlotEntity[]} from
+   * all the entities in the plot
+   * @param {Dataset[]} [datasets] - datasets comprising this plot
+   */
+  protected _buildLightweightPlotEntities(datasets: Dataset[]) {
+    const lightweightPlotEntities: Plots.LightweightPlotEntity[] = [];
+      datasets.forEach((dataset: Dataset, datasetIndex: number) => {
+        let drawer = this._datasetToDrawer.get(dataset);
+        let validDatumIndex = 0;
+
+        dataset.data().forEach((datum: any, datumIndex: number) => {
+          let position = this._pixelPoint(datum, datumIndex, dataset);
+          if (Utils.Math.isNaN(position.x) || Utils.Math.isNaN(position.y)) {
+            return;
+          }
+
+          lightweightPlotEntities.push({
+            datum,
+            position,
+            index: datumIndex,
+            dataset,
+            datasetIndex,
+            component: this,
+            drawer,
+            validDatumIndex,
+          });
+          validDatumIndex++;
+        });
+      });
+
+    return lightweightPlotEntities;
+  }
+
   protected _getDataToDraw() {
     let dataToDraw: Utils.Map<Dataset, any[]> = new Utils.Map<Dataset, any[]>();
     this.datasets().forEach((dataset) => dataToDraw.set(dataset, dataset.data()));
@@ -478,45 +533,42 @@ export class Plot extends Component {
   /**
    * Gets the Entities associated with the specified Datasets.
    *
-   * @param {dataset[]} datasets The Datasets to retrieve the Entities for.
+   * @param {Dataset[]} datasets The Datasets to retrieve the Entities for.
    *   If not provided, returns defaults to all Datasets on the Plot.
    * @return {Plots.PlotEntity[]}
    */
-  public entities(datasets = this.datasets()): Plots.PlotEntity[] {
-    return this._lightweightEntities(datasets).map((entity) => this._lightweightPlotEntityToPlotEntity(entity));
+  public entities(datasets?: Dataset[]): Plots.PlotEntity[] {
+    return this._getEntityStore(datasets).map((entity) => this._lightweightPlotEntityToPlotEntity(entity));
   }
 
-  private _lightweightEntities(datasets = this.datasets()) {
-    let lightweightEntities: LightweightPlotEntity[] = [];
-    datasets.forEach((dataset: Dataset, datasetIndex: number) => {
-      let drawer = this._datasetToDrawer.get(dataset);
-      let validDatumIndex = 0;
-
-      dataset.data().forEach((datum: any, datumIndex: number) => {
-        let position = this._pixelPoint(datum, datumIndex, dataset);
-        if (Utils.Math.isNaN(position.x) || Utils.Math.isNaN(position.y)) {
-          return;
-        }
-        lightweightEntities.push({
-          datum: datum,
-          index: datumIndex,
-          dataset: dataset,
-          datasetIndex: datasetIndex,
-          position: position,
-          component: this,
-          drawer: drawer,
-          validDatumIndex: validDatumIndex,
-        });
-        validDatumIndex++;
+  /**
+   * _getEntityStore returns the store of all Entities associated with the specified dataset
+   *
+   * @param {Dataset[]} [datasets] - The datasets with which to construct the store. If no datasets
+   * are specified all datasets will be used.
+   */
+  private _getEntityStore(datasets?: Dataset[]): Plottable.Utils.EntityStore<Plots.LightweightPlotEntity> {
+    if (datasets !== undefined) {
+      const EntityStore = new Plottable.Utils.EntityArray<Plots.LightweightPlotEntity>();
+      this._buildLightweightPlotEntities(datasets).forEach((entity: Plots.LightweightPlotEntity) => {
+        EntityStore.add(entity);
       });
-    });
-    return lightweightEntities;
+
+      return EntityStore;
+    } else if (this._cachedEntityStore === undefined) {
+      this._cachedEntityStore = new Plottable.Utils.EntityArray<Plots.LightweightPlotEntity>();
+      this._buildLightweightPlotEntities(this.datasets()).forEach((entity: Plots.LightweightPlotEntity) => {
+        this._cachedEntityStore.add(entity);
+      });
+    }
+
+    return this._cachedEntityStore;
   }
 
-  private _lightweightPlotEntityToPlotEntity(entity: LightweightPlotEntity) {
+  private _lightweightPlotEntityToPlotEntity(entity: Plots.LightweightPlotEntity) {
     let plotEntity: Plots.PlotEntity = {
       datum: entity.datum,
-      position: entity.position,
+      position: this._pixelPoint(entity.datum, entity.index, entity.dataset),
       dataset: entity.dataset,
       datasetIndex: entity.datasetIndex,
       index: entity.index,
@@ -542,36 +594,25 @@ export class Plot extends Component {
   }
 
   /**
-   * Returns the PlotEntity nearest to the query point by the Euclidian norm, or undefined if no PlotEntity can be found.
+   * Returns the {Plots.PlotEntity} nearest to the query point,
+   * or undefined if no {Plots.PlotEntity} can be found.
    *
    * @param {Point} queryPoint
-   * @returns {Plots.PlotEntity} The nearest PlotEntity, or undefined if no PlotEntity can be found.
+   * @param {bounds} Bounds The bounding box within which to search. By default, bounds is the bounds of
+   * the chart, relative to the parent.
+   * @returns {Plots.PlotEntity} The nearest PlotEntity, or undefined if no {Plots.PlotEntity} can be found.
    */
-  public entityNearest(queryPoint: Point): Plots.PlotEntity {
-    let closestDistanceSquared = Infinity;
-    let closestPointEntity: LightweightPlotEntity;
-    let entities = this._lightweightEntities();
-    entities.forEach((entity) => {
-      if (!this._entityVisibleOnPlot(entity.position, entity.datum, entity.index, entity.dataset)) {
-        return;
-      }
-
-      let distanceSquared = Utils.Math.distanceSquared(entity.position, queryPoint);
-      if (distanceSquared < closestDistanceSquared) {
-        closestDistanceSquared = distanceSquared;
-        closestPointEntity = entity;
-      }
+  public entityNearest(queryPoint: Point, bounds = this.bounds()): Plots.PlotEntity {
+    const nearest = this._getEntityStore().entityNearest(queryPoint, (entity: Plots.LightweightPlotEntity) => {
+      return this._entityVisibleOnPlot(entity, bounds);
     });
-    if (closestPointEntity === undefined) {
-      return undefined;
-    }
 
-    return this._lightweightPlotEntityToPlotEntity(closestPointEntity);
+    return nearest === undefined ? undefined : this._lightweightPlotEntityToPlotEntity(nearest);
   }
 
-  protected _entityVisibleOnPlot(pixelPoint: Point, datum: any, index: number, dataset: Dataset) {
-    return !(pixelPoint.x < 0 || pixelPoint.y < 0 ||
-      pixelPoint.x > this.width() || pixelPoint.y > this.height());
+  protected _entityVisibleOnPlot(entity: Plots.PlotEntity | Plots.LightweightPlotEntity, chartBounds: Bounds) {
+    return !(entity.position.x < chartBounds.topLeft.x || entity.position.y < chartBounds.topLeft.y ||
+      entity.position.x > chartBounds.bottomRight.x || entity.position.y > chartBounds.bottomRight.y);
   }
 
   protected _uninstallScaleForKey(scale: Scale<any, any>, key: string) {

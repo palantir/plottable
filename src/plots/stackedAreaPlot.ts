@@ -45,7 +45,7 @@ namespace Plottable.Plots {
       this._baseline = this._renderArea.append("line").classed("baseline", true);
     }
 
-    public x(): Plots.AccessorScaleBinding<X, number>;
+    public x(): Plots.TransformableAccessorScaleBinding<X, number>;
     public x(x: number | Accessor<number>): this;
     public x(x: X | Accessor<X>, xScale: Scale<X, number>): this;
     public x(x?: number | Accessor<number> | X | Accessor<X>, xScale?: Scale<X, number>): any {
@@ -63,7 +63,7 @@ namespace Plottable.Plots {
       return this;
     }
 
-    public y(): Plots.AccessorScaleBinding<number, number>;
+    public y(): Plots.TransformableAccessorScaleBinding<number, number>;
     public y(y: number | Accessor<number>): this;
     public y(y: number | Accessor<number>, yScale: QuantitativeScale<number>): this;
     public y(y?: number | Accessor<number>, yScale?: QuantitativeScale<number>): any {

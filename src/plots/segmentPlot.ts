@@ -44,7 +44,7 @@ namespace Plottable.Plots {
     /**
      * Gets the AccessorScaleBinding for X
      */
-    public x(): AccessorScaleBinding<X, number>;
+    public x(): TransformableAccessorScaleBinding<X, number>;
     /**
      * Sets X to a constant value or the result of an Accessor.
      *
@@ -104,7 +104,7 @@ namespace Plottable.Plots {
     /**
      * Gets the AccessorScaleBinding for Y
      */
-    public y(): AccessorScaleBinding<Y, number>;
+    public y(): TransformableAccessorScaleBinding<Y, number>;
     /**
      * Sets Y to a constant value or the result of an Accessor.
      *
