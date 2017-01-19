@@ -1,5 +1,5 @@
 /*!
-Plottable 2.6.0 (https://github.com/palantir/plottable)
+Plottable @VERSION (https://github.com/palantir/plottable)
 Copyright 2014-2017 Palantir Technologies
 Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
 */
@@ -7,68 +7,24 @@ Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
 (function (root, factory) {
   if (typeof define === 'function' && define.amd) {
     // AMD. Register as an anonymous module unless amdModuleId is set
-    define(["d3"], function (a0) {
-      return (root['Plottable'] = factory(a0));
+    define(["d3","svg-typewriter"], function (a0,b1) {
+      return (root['Plottable'] = factory(a0,b1));
     });
   } else if (typeof exports === 'object') {
     // Node. Does not work with strict CommonJS, but
     // only CommonJS-like environments that support module.exports,
     // like Node.
-    module.exports = factory(require("d3"));
+    module.exports = factory(require("d3"),require("svg-typewriter"));
   } else {
-    root['Plottable'] = factory(root["d3"]);
+    root['Plottable'] = factory(root["d3"],root["SVGTypewriter"]);
   }
-}(this, function (d3) {
+}(this, function (d3, SVGTypewriter) {
 
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var Plottable;
-(function (Plottable) {
-    var Utils;
-    (function (Utils) {
-        /**
-         * Array-backed implementation of {EntityStore}
-         */
-        var EntityArray = (function () {
-            function EntityArray() {
-                this._entities = [];
-            }
-            EntityArray.prototype.add = function (entity) {
-                this._entities.push(entity);
-            };
-            /**
-             * Iterates through array of of entities and computes the closest point using
-             * the standard Euclidean distance formula.
-             */
-            EntityArray.prototype.entityNearest = function (queryPoint, filter) {
-                var closestDistanceSquared = Infinity;
-                var closestPointEntity;
-                this._entities.forEach(function (entity) {
-                    if (filter !== undefined && filter(entity) === false) {
-                        return;
-                    }
-                    var distanceSquared = Utils.Math.distanceSquared(entity.position, queryPoint);
-                    if (distanceSquared < closestDistanceSquared) {
-                        closestDistanceSquared = distanceSquared;
-                        closestPointEntity = entity;
-                    }
-                });
-                if (closestPointEntity === undefined) {
-                    return undefined;
-                }
-                return closestPointEntity;
-            };
-            EntityArray.prototype.map = function (callback) {
-                return this._entities.map(function (entity) { return callback(entity); });
-            };
-            return EntityArray;
-        }());
-        Utils.EntityArray = EntityArray;
-    })(Utils = Plottable.Utils || (Plottable.Utils = {}));
-})(Plottable || (Plottable = {}));
 var Plottable;
 (function (Plottable) {
     var Utils;
@@ -740,42 +696,10 @@ var Plottable;
             }
             Stacking.stack = stack;
             /**
-             * Computes the maximum and minimum extents of each stack individually.
-             *
-             * @param {GenericStackingResult} stackingResult The value and offset information for each datapoint in each dataset
-             * @return { { maximumExtents: Utils.Map<D, number>, minimumExtents: Utils.Map<D, number> } } The maximum and minimum extents
-             * of each individual stack.
-             */
-            function stackedExtents(stackingResult) {
-                var maximumExtents = new Utils.Map();
-                var minimumExtents = new Utils.Map();
-                stackingResult.forEach(function (stack) {
-                    stack.forEach(function (datum, key) {
-                        // correctly handle negative bar stacks
-                        var maximalValue = Utils.Math.max([datum.offset + datum.value, datum.offset], datum.offset);
-                        var minimalValue = Utils.Math.min([datum.offset + datum.value, datum.offset], datum.offset);
-                        if (!maximumExtents.has(key)) {
-                            maximumExtents.set(key, maximalValue);
-                        }
-                        else if (maximumExtents.get(key) < maximalValue) {
-                            maximumExtents.set(key, maximalValue);
-                        }
-                        if (!minimumExtents.has(key)) {
-                            minimumExtents.set(key, minimalValue);
-                        }
-                        else if (minimumExtents.get(key) > (minimalValue)) {
-                            minimumExtents.set(key, minimalValue);
-                        }
-                    });
-                });
-                return { maximumExtents: maximumExtents, minimumExtents: minimumExtents };
-            }
-            Stacking.stackedExtents = stackedExtents;
-            /**
              * Computes the total extent over all data points in all Datasets, taking stacking into consideration.
              *
              * @param {StackingResult} stackingResult The value and offset information for each datapoint in each dataset
-             * @param {Accessor<any>} keyAccessor Accessor for the key of the data existent in the stackingResult
+             * @oaram {Accessor<any>} keyAccessor Accessor for the key of the data existent in the stackingResult
              * @param {Accessor<boolean>} filter A filter for data to be considered when computing the total extent
              * @return {[number, number]} The total extent
              */
@@ -963,7 +887,7 @@ var Plottable;
 })(Plottable || (Plottable = {}));
 var Plottable;
 (function (Plottable) {
-    Plottable.version = "2.6.0";
+    Plottable.version = "@VERSION";
 })(Plottable || (Plottable = {}));
 var Plottable;
 (function (Plottable) {
@@ -1819,9 +1743,6 @@ var Plottable;
         QuantitativeScale.prototype.scaleTransformation = function (value) {
             throw new Error("Subclasses should override scaleTransformation");
         };
-        QuantitativeScale.prototype.invertedTransformation = function (value) {
-            throw new Error("Subclasses should override invertedTransformation");
-        };
         QuantitativeScale.prototype.getTransformationDomain = function () {
             throw new Error("Subclasses should override getTransformationDomain");
         };
@@ -1898,9 +1819,6 @@ var Plottable;
             };
             Linear.prototype.scaleTransformation = function (value) {
                 return this.scale(value);
-            };
-            Linear.prototype.invertedTransformation = function (value) {
-                return this.invert(value);
             };
             Linear.prototype.getTransformationDomain = function () {
                 return this.domain();
@@ -2018,9 +1936,6 @@ var Plottable;
             };
             ModifiedLog.prototype.scaleTransformation = function (value) {
                 return this.scale(value);
-            };
-            ModifiedLog.prototype.invertedTransformation = function (value) {
-                return this.invert(value);
             };
             ModifiedLog.prototype.getTransformationDomain = function () {
                 return this.domain();
@@ -2253,9 +2168,6 @@ var Plottable;
             Category.prototype.scaleTransformation = function (value) {
                 return this._d3TransformationScale(value);
             };
-            Category.prototype.invertedTransformation = function (value) {
-                return this._d3TransformationScale.invert(value);
-            };
             Category.prototype.getTransformationDomain = function () {
                 return this._d3TransformationScale.domain();
             };
@@ -2465,9 +2377,6 @@ var Plottable;
             };
             Time.prototype.scaleTransformation = function (value) {
                 return this.scale(new Date(value));
-            };
-            Time.prototype.invertedTransformation = function (value) {
-                return this.invert(value).getTime();
             };
             Time.prototype.getTransformationDomain = function () {
                 var dates = this.domain();
@@ -2739,7 +2648,6 @@ var Plottable;
         function Drawer(dataset) {
             this._cachedSelectionValid = false;
             this._dataset = dataset;
-            this._svgElementName = "path";
         }
         Drawer.prototype.renderArea = function (area) {
             if (area == null) {
@@ -3446,21 +3354,6 @@ var Plottable;
             return this;
         };
         /**
-         * @returns {Bounds} for the component in pixel space, where the topLeft
-         * represents the component's minimum x and y values and the bottomRight represents
-         * the component's maximum x and y values.
-         */
-        Component.prototype.bounds = function () {
-            var topLeft = this.origin();
-            return {
-                topLeft: topLeft,
-                bottomRight: {
-                    x: topLeft.x + this.width(),
-                    y: topLeft.y + this.height()
-                },
-            };
-        };
-        /**
          * Removes a Component from the DOM and disconnects all listeners.
          */
         Component.prototype.destroy = function () {
@@ -3878,10 +3771,6 @@ var Plottable;
         Axis.prototype._getTickValues = function () {
             return [];
         };
-        /**
-         * Render tick marks, baseline, and annotations. Should be super called by subclasses and then overridden to draw
-         * other relevant aspects of this Axis.
-         */
         Axis.prototype.renderImmediately = function () {
             var tickMarkValues = this._getTickValues();
             var tickMarks = this._tickMarkContainer.selectAll("." + Axis.TICK_MARK_CLASS).data(tickMarkValues);
@@ -5208,7 +5097,8 @@ var Plottable;
                         widthRequiredByTicks += tierTotalHeight;
                     }
                 }
-                var measureResult = this._measureTickLabels(offeredWidth, offeredHeight);
+                var categoryScale = this._scale;
+                var measureResult = this._measureTickLabels(offeredWidth, offeredHeight, categoryScale, categoryScale.domain());
                 return {
                     minWidth: measureResult.usedWidth + widthRequiredByTicks,
                     minHeight: measureResult.usedHeight + heightRequiredByTicks,
@@ -5224,22 +5114,7 @@ var Plottable;
                 return Math.min(axisHeightWithoutMargin, relevantDimension);
             };
             Category.prototype._getTickValues = function () {
-                return this.getDownsampleInfo().domain;
-            };
-            /**
-             * Take the scale and drop ticks at regular intervals such that the resultant ticks are all a reasonable minimum
-             * distance apart. Return the resultant ticks to render, as well as the new stepWidth between them.
-             *
-             * @param {Scales.Category} scale - The scale being downsampled. Defaults to this Axis' scale.
-             * @return {DownsampleInfo} an object holding the resultant domain and new stepWidth.
-             */
-            Category.prototype.getDownsampleInfo = function (scale) {
-                if (scale === void 0) { scale = this._scale; }
-                var downsampleRatio = Math.ceil(Category._MINIMUM_WIDTH_PER_LABEL_PX / scale.stepWidth());
-                return {
-                    domain: scale.domain().filter(function (d, i) { return i % downsampleRatio === 0; }),
-                    stepWidth: downsampleRatio * scale.stepWidth(),
-                };
+                return this._scale.domain();
             };
             Category.prototype.tickLabelAngle = function (angle) {
                 if (angle == null) {
@@ -5301,7 +5176,7 @@ var Plottable;
              * @param {Plottable.Scales.Category} scale The scale this axis is representing.
              * @param {d3.Selection} ticks The tick elements to write.
              */
-            Category.prototype._drawTicks = function (stepWidth, ticks) {
+            Category.prototype._drawTicks = function (scale, ticks) {
                 var self = this;
                 var xAlign;
                 var yAlign;
@@ -5320,8 +5195,9 @@ var Plottable;
                         break;
                 }
                 ticks.each(function (d) {
-                    var width = self._isHorizontal() ? stepWidth : self.width() - self._tickSpaceRequired();
-                    var height = self._isHorizontal() ? self.height() - self._tickSpaceRequired() : stepWidth;
+                    var bandWidth = scale.stepWidth();
+                    var width = self._isHorizontal() ? bandWidth : self.width() - self._tickSpaceRequired();
+                    var height = self._isHorizontal() ? self.height() - self._tickSpaceRequired() : bandWidth;
                     var writeOptions = {
                         selection: d3.select(this),
                         xAlign: xAlign[self.orientation()],
@@ -5349,42 +5225,37 @@ var Plottable;
              * @param {Plottable.Scales.Category} scale The scale this axis is representing.
              * @param {string[]} ticks The strings that will be printed on the ticks.
              */
-            Category.prototype._measureTickLabels = function (axisWidth, axisHeight) {
+            Category.prototype._measureTickLabels = function (axisWidth, axisHeight, scale, ticks) {
                 var _this = this;
-                var thisScale = this._scale;
-                // set up a test scale to simulate rendering ticks with the given width and height.
-                var scale = new Plottable.Scales.Category()
-                    .domain(thisScale.domain())
-                    .innerPadding(thisScale.innerPadding())
-                    .outerPadding(thisScale.outerPadding())
-                    .range([0, this._isHorizontal() ? axisWidth : axisHeight]);
-                var _a = this.getDownsampleInfo(scale), domain = _a.domain, stepWidth = _a.stepWidth;
-                // HACKHACK: https://github.com/palantir/svg-typewriter/issues/25
-                // the width (x-axis specific) available to a single tick label.
-                var width = axisWidth - this._tickSpaceRequired(); // default for left/right
-                if (this._isHorizontal()) {
-                    width = stepWidth; // defaults to the band width
-                    if (this._tickLabelAngle !== 0) {
-                        width = axisHeight - this._tickSpaceRequired(); // use the axis height
+                var axisSpace = this._isHorizontal() ? axisWidth : axisHeight;
+                var totalOuterPaddingRatio = 2 * scale.outerPadding();
+                var totalInnerPaddingRatio = (ticks.length - 1) * scale.innerPadding();
+                var expectedRangeBand = axisSpace / (totalOuterPaddingRatio + totalInnerPaddingRatio + ticks.length);
+                var stepWidth = expectedRangeBand * (1 + scale.innerPadding());
+                var wrappingResults = ticks.map(function (s) {
+                    // HACKHACK: https://github.com/palantir/svg-typewriter/issues/25
+                    var width = axisWidth - _this._tickSpaceRequired(); // default for left/right
+                    if (_this._isHorizontal()) {
+                        width = stepWidth; // defaults to the band width
+                        if (_this._tickLabelAngle !== 0) {
+                            width = axisHeight - _this._tickSpaceRequired(); // use the axis height
+                        }
+                        // HACKHACK: Wrapper fails under negative circumstances
+                        width = Math.max(width, 0);
                     }
-                    // HACKHACK: Wrapper fails under negative circumstances
-                    width = Math.max(width, 0);
-                }
-                // HACKHACK: https://github.com/palantir/svg-typewriter/issues/25
-                // the height (y-axis specific) available to a single tick label.
-                var height = stepWidth; // default for left/right
-                if (this._isHorizontal()) {
-                    height = axisHeight - this._tickSpaceRequired();
-                    if (this._tickLabelAngle !== 0) {
-                        height = axisWidth - this._tickSpaceRequired();
+                    // HACKHACK: https://github.com/palantir/svg-typewriter/issues/25
+                    var height = stepWidth; // default for left/right
+                    if (_this._isHorizontal()) {
+                        height = axisHeight - _this._tickSpaceRequired();
+                        if (_this._tickLabelAngle !== 0) {
+                            height = axisWidth - _this._tickSpaceRequired();
+                        }
+                        // HACKHACK: Wrapper fails under negative circumstances
+                        height = Math.max(height, 0);
                     }
-                    // HACKHACK: Wrapper fails under negative circumstances
-                    height = Math.max(height, 0);
-                }
-                if (this._tickLabelMaxWidth != null) {
-                    width = Math.min(width, this._tickLabelMaxWidth);
-                }
-                var wrappingResults = domain.map(function (s) {
+                    if (_this._tickLabelMaxWidth != null) {
+                        width = Math.min(width, _this._tickLabelMaxWidth);
+                    }
                     return _this._wrapper.wrap(_this.formatter()(s), _this._measurer, width, height);
                 });
                 // HACKHACK: https://github.com/palantir/svg-typewriter/issues/25
@@ -5395,31 +5266,30 @@ var Plottable;
                 // If the tick labels are rotated, reverse usedWidth and usedHeight
                 // HACKHACK: https://github.com/palantir/svg-typewriter/issues/25
                 if (this._tickLabelAngle !== 0) {
-                    _b = [usedHeight, usedWidth], usedWidth = _b[0], usedHeight = _b[1];
+                    _a = [usedHeight, usedWidth], usedWidth = _a[0], usedHeight = _a[1];
                 }
                 return {
                     usedWidth: usedWidth,
                     usedHeight: usedHeight,
                 };
-                var _b;
+                var _a;
             };
             Category.prototype.renderImmediately = function () {
                 var _this = this;
                 _super.prototype.renderImmediately.call(this);
                 var catScale = this._scale;
-                var _a = this.getDownsampleInfo(), domain = _a.domain, stepWidth = _a.stepWidth;
-                var tickLabels = this._tickLabelContainer.selectAll("." + Plottable.Axis.TICK_LABEL_CLASS).data(domain, function (d) { return d; });
-                // Give each tick a stepWidth of space which will partition the entire axis evenly
-                var availableTextSpace = stepWidth;
-                if (this._isHorizontal() && this._tickLabelMaxWidth != null) {
-                    availableTextSpace = Math.min(availableTextSpace, this._tickLabelMaxWidth);
-                }
+                var tickLabels = this._tickLabelContainer.selectAll("." + Plottable.Axis.TICK_LABEL_CLASS).data(this._scale.domain(), function (d) { return d; });
                 var getTickLabelTransform = function (d, i) {
-                    // scale(d) will give the center of the band, so subtract half of the text width to get the left (top-most)
-                    // coordinate that the tick label should be transformed to.
-                    var tickLabelEdge = catScale.scale(d) - availableTextSpace / 2;
-                    var x = _this._isHorizontal() ? tickLabelEdge : 0;
-                    var y = _this._isHorizontal() ? 0 : tickLabelEdge;
+                    // Give each tick a stepWidth of space which will partition the entire axis evenly
+                    var availableTextWidth = catScale.stepWidth();
+                    if (_this._isHorizontal() && _this._tickLabelMaxWidth != null) {
+                        availableTextWidth = Math.min(availableTextWidth, _this._tickLabelMaxWidth);
+                    }
+                    // scale(d) will give the center of the band, so subtract half of the text width so that the tick label will be
+                    // centered with the band
+                    var scaledValue = catScale.scale(d) - availableTextWidth / 2;
+                    var x = _this._isHorizontal() ? scaledValue : 0;
+                    var y = _this._isHorizontal() ? 0 : scaledValue;
                     return "translate(" + x + "," + y + ")";
                 };
                 tickLabels.enter().append("g").classed(Plottable.Axis.TICK_LABEL_CLASS, true);
@@ -5427,7 +5297,7 @@ var Plottable;
                 tickLabels.attr("transform", getTickLabelTransform);
                 // erase all text first, then rewrite
                 tickLabels.text("");
-                this._drawTicks(stepWidth, tickLabels);
+                this._drawTicks(catScale, tickLabels);
                 var xTranslate = this.orientation() === "right" ? this._tickSpaceRequired() : 0;
                 var yTranslate = this.orientation() === "bottom" ? this._tickSpaceRequired() : 0;
                 Plottable.Utils.DOM.translate(this._tickLabelContainer, xTranslate, yTranslate);
@@ -5449,10 +5319,6 @@ var Plottable;
                 }
                 return this;
             };
-            /**
-             * How many pixels to give labels at minimum before downsampling takes effect.
-             */
-            Category._MINIMUM_WIDTH_PER_LABEL_PX = 15;
             return Category;
         }(Plottable.Axis));
         Axes.Category = Category;
@@ -7012,7 +6878,6 @@ var Plottable;
         Plot.prototype.anchor = function (selection) {
             _super.prototype.anchor.call(this, selection);
             this._dataChanged = true;
-            this._cachedEntityStore = undefined;
             this._updateExtents();
             return this;
         };
@@ -7047,7 +6912,6 @@ var Plottable;
         Plot.prototype._onDatasetUpdate = function () {
             this._updateExtents();
             this._dataChanged = true;
-            this._cachedEntityStore = undefined;
             this.render();
         };
         Plot.prototype.attr = function (attr, attrValue, scale) {
@@ -7285,37 +7149,6 @@ var Plottable;
         Plot.prototype._additionalPaint = function (time) {
             // no-op
         };
-        /**
-         * _buildLightweightPlotEntities constucts {LightweightPlotEntity[]} from
-         * all the entities in the plot
-         * @param {Dataset[]} [datasets] - datasets comprising this plot
-         */
-        Plot.prototype._buildLightweightPlotEntities = function (datasets) {
-            var _this = this;
-            var lightweightPlotEntities = [];
-            datasets.forEach(function (dataset, datasetIndex) {
-                var drawer = _this._datasetToDrawer.get(dataset);
-                var validDatumIndex = 0;
-                dataset.data().forEach(function (datum, datumIndex) {
-                    var position = _this._pixelPoint(datum, datumIndex, dataset);
-                    if (Plottable.Utils.Math.isNaN(position.x) || Plottable.Utils.Math.isNaN(position.y)) {
-                        return;
-                    }
-                    lightweightPlotEntities.push({
-                        datum: datum,
-                        position: position,
-                        index: datumIndex,
-                        dataset: dataset,
-                        datasetIndex: datasetIndex,
-                        component: _this,
-                        drawer: drawer,
-                        validDatumIndex: validDatumIndex,
-                    });
-                    validDatumIndex++;
-                });
-            });
-            return lightweightPlotEntities;
-        };
         Plot.prototype._getDataToDraw = function () {
             var dataToDraw = new Plottable.Utils.Map();
             this.datasets().forEach(function (dataset) { return dataToDraw.set(dataset, dataset.data()); });
@@ -7355,41 +7188,46 @@ var Plottable;
         /**
          * Gets the Entities associated with the specified Datasets.
          *
-         * @param {Dataset[]} datasets The Datasets to retrieve the Entities for.
+         * @param {dataset[]} datasets The Datasets to retrieve the Entities for.
          *   If not provided, returns defaults to all Datasets on the Plot.
          * @return {Plots.PlotEntity[]}
          */
         Plot.prototype.entities = function (datasets) {
             var _this = this;
-            return this._getEntityStore(datasets).map(function (entity) { return _this._lightweightPlotEntityToPlotEntity(entity); });
+            if (datasets === void 0) { datasets = this.datasets(); }
+            return this._lightweightEntities(datasets).map(function (entity) { return _this._lightweightPlotEntityToPlotEntity(entity); });
         };
-        /**
-         * _getEntityStore returns the store of all Entities associated with the specified dataset
-         *
-         * @param {Dataset[]} [datasets] - The datasets with which to construct the store. If no datasets
-         * are specified all datasets will be used.
-         */
-        Plot.prototype._getEntityStore = function (datasets) {
+        Plot.prototype._lightweightEntities = function (datasets) {
             var _this = this;
-            if (datasets !== undefined) {
-                var EntityStore_1 = new Plottable.Utils.EntityArray();
-                this._buildLightweightPlotEntities(datasets).forEach(function (entity) {
-                    EntityStore_1.add(entity);
+            if (datasets === void 0) { datasets = this.datasets(); }
+            var lightweightEntities = [];
+            datasets.forEach(function (dataset, datasetIndex) {
+                var drawer = _this._datasetToDrawer.get(dataset);
+                var validDatumIndex = 0;
+                dataset.data().forEach(function (datum, datumIndex) {
+                    var position = _this._pixelPoint(datum, datumIndex, dataset);
+                    if (Plottable.Utils.Math.isNaN(position.x) || Plottable.Utils.Math.isNaN(position.y)) {
+                        return;
+                    }
+                    lightweightEntities.push({
+                        datum: datum,
+                        index: datumIndex,
+                        dataset: dataset,
+                        datasetIndex: datasetIndex,
+                        position: position,
+                        component: _this,
+                        drawer: drawer,
+                        validDatumIndex: validDatumIndex,
+                    });
+                    validDatumIndex++;
                 });
-                return EntityStore_1;
-            }
-            else if (this._cachedEntityStore === undefined) {
-                this._cachedEntityStore = new Plottable.Utils.EntityArray();
-                this._buildLightweightPlotEntities(this.datasets()).forEach(function (entity) {
-                    _this._cachedEntityStore.add(entity);
-                });
-            }
-            return this._cachedEntityStore;
+            });
+            return lightweightEntities;
         };
         Plot.prototype._lightweightPlotEntityToPlotEntity = function (entity) {
             var plotEntity = {
                 datum: entity.datum,
-                position: this._pixelPoint(entity.datum, entity.index, entity.dataset),
+                position: entity.position,
                 dataset: entity.dataset,
                 datasetIndex: entity.datasetIndex,
                 index: entity.index,
@@ -7413,25 +7251,34 @@ var Plottable;
             throw new Error("plots must implement entitiesAt");
         };
         /**
-         * Returns the {Plots.PlotEntity} nearest to the query point,
-         * or undefined if no {Plots.PlotEntity} can be found.
+         * Returns the PlotEntity nearest to the query point by the Euclidian norm, or undefined if no PlotEntity can be found.
          *
          * @param {Point} queryPoint
-         * @param {bounds} Bounds The bounding box within which to search. By default, bounds is the bounds of
-         * the chart, relative to the parent.
-         * @returns {Plots.PlotEntity} The nearest PlotEntity, or undefined if no {Plots.PlotEntity} can be found.
+         * @returns {Plots.PlotEntity} The nearest PlotEntity, or undefined if no PlotEntity can be found.
          */
-        Plot.prototype.entityNearest = function (queryPoint, bounds) {
+        Plot.prototype.entityNearest = function (queryPoint) {
             var _this = this;
-            if (bounds === void 0) { bounds = this.bounds(); }
-            var nearest = this._getEntityStore().entityNearest(queryPoint, function (entity) {
-                return _this._entityVisibleOnPlot(entity, bounds);
+            var closestDistanceSquared = Infinity;
+            var closestPointEntity;
+            var entities = this._lightweightEntities();
+            entities.forEach(function (entity) {
+                if (!_this._entityVisibleOnPlot(entity.position, entity.datum, entity.index, entity.dataset)) {
+                    return;
+                }
+                var distanceSquared = Plottable.Utils.Math.distanceSquared(entity.position, queryPoint);
+                if (distanceSquared < closestDistanceSquared) {
+                    closestDistanceSquared = distanceSquared;
+                    closestPointEntity = entity;
+                }
             });
-            return nearest === undefined ? undefined : this._lightweightPlotEntityToPlotEntity(nearest);
+            if (closestPointEntity === undefined) {
+                return undefined;
+            }
+            return this._lightweightPlotEntityToPlotEntity(closestPointEntity);
         };
-        Plot.prototype._entityVisibleOnPlot = function (entity, chartBounds) {
-            return !(entity.position.x < chartBounds.topLeft.x || entity.position.y < chartBounds.topLeft.y ||
-                entity.position.x > chartBounds.bottomRight.x || entity.position.y > chartBounds.bottomRight.y);
+        Plot.prototype._entityVisibleOnPlot = function (pixelPoint, datum, index, dataset) {
+            return !(pixelPoint.x < 0 || pixelPoint.y < 0 ||
+                pixelPoint.x > this.width() || pixelPoint.y > this.height());
         };
         Plot.prototype._uninstallScaleForKey = function (scale, key) {
             scale.offUpdate(this._renderCallback);
@@ -7472,15 +7319,10 @@ var Plottable;
             function Pie() {
                 var _this = this;
                 _super.call(this);
-                this._startAngle = 0;
-                this._endAngle = 2 * Math.PI;
                 this._labelFormatter = Plottable.Formatters.identity();
                 this._labelsEnabled = false;
                 this.innerRadius(0);
-                this.outerRadius(function () {
-                    var pieCenter = _this._pieCenter();
-                    return Math.min(Math.max(_this.width() - pieCenter.x, pieCenter.x), Math.max(_this.height() - pieCenter.y, pieCenter.y));
-                });
+                this.outerRadius(function () { return Math.min(_this.width(), _this.height()) / 2; });
                 this.addClass("pie-plot");
                 this.attr("fill", function (d, i) { return String(i); }, new Plottable.Scales.Color());
                 this._strokeDrawers = new Plottable.Utils.Map();
@@ -7492,9 +7334,8 @@ var Plottable;
             };
             Pie.prototype.computeLayout = function (origin, availableWidth, availableHeight) {
                 _super.prototype.computeLayout.call(this, origin, availableWidth, availableHeight);
-                var pieCenter = this._pieCenter();
-                this._renderArea.attr("transform", "translate(" + pieCenter.x + "," + pieCenter.y + ")");
-                var radiusLimit = Math.min(Math.max(this.width() - pieCenter.x, pieCenter.x), Math.max(this.height() - pieCenter.y, pieCenter.y));
+                this._renderArea.attr("transform", "translate(" + this.width() / 2 + "," + this.height() / 2 + ")");
+                var radiusLimit = Math.min(this.width(), this.height()) / 2;
                 if (this.innerRadius().scale != null) {
                     this.innerRadius().scale.range([0, radiusLimit]);
                 }
@@ -7595,28 +7436,6 @@ var Plottable;
                 this.render();
                 return this;
             };
-            Pie.prototype.startAngle = function (angle) {
-                if (angle == null) {
-                    return this._startAngle;
-                }
-                else {
-                    this._startAngle = angle;
-                    this._updatePieAngles();
-                    this.render();
-                    return this;
-                }
-            };
-            Pie.prototype.endAngle = function (angle) {
-                if (angle == null) {
-                    return this._endAngle;
-                }
-                else {
-                    this._endAngle = angle;
-                    this._updatePieAngles();
-                    this.render();
-                    return this;
-                }
-            };
             Pie.prototype.labelsEnabled = function (enabled) {
                 if (enabled == null) {
                     return this._labelsEnabled;
@@ -7672,136 +7491,9 @@ var Plottable;
                 var sectorValueAccessor = Plottable.Plot._scaledAccessor(this.sectorValue());
                 var dataset = this.datasets()[0];
                 var data = this._getDataToDraw().get(dataset);
-                var pie = d3.layout.pie().sort(null).startAngle(this._startAngle).endAngle(this._endAngle)
-                    .value(function (d, i) { return sectorValueAccessor(d, i, dataset); })(data);
+                var pie = d3.layout.pie().sort(null).value(function (d, i) { return sectorValueAccessor(d, i, dataset); })(data);
                 this._startAngles = pie.map(function (slice) { return slice.startAngle; });
                 this._endAngles = pie.map(function (slice) { return slice.endAngle; });
-            };
-            Pie.prototype._pieCenter = function () {
-                var a = this._startAngle < this._endAngle ? this._startAngle : this._endAngle;
-                var b = this._startAngle < this._endAngle ? this._endAngle : this._startAngle;
-                var sinA = Math.sin(a);
-                var cosA = Math.cos(a);
-                var sinB = Math.sin(b);
-                var cosB = Math.cos(b);
-                var hTop;
-                var hBottom;
-                var wRight;
-                var wLeft;
-                /**
-                 *  The center of the pie is computed using the sine and cosine of the start angle and the end angle
-                 *  The sine indicates whether the start and end fall on the right half or the left half of the pie
-                 *  The cosine indicates whether the start and end fall on the top or the bottom half of the pie
-                 *  Different combinations provide the different heights and widths the pie needs from the center to the sides
-                 */
-                if (sinA >= 0 && sinB >= 0) {
-                    if (cosA >= 0 && cosB >= 0) {
-                        hTop = cosA;
-                        hBottom = 0;
-                        wLeft = 0;
-                        wRight = sinB;
-                    }
-                    else if (cosA < 0 && cosB < 0) {
-                        hTop = 0;
-                        hBottom = -cosB;
-                        wLeft = 0;
-                        wRight = sinA;
-                    }
-                    else if (cosA >= 0 && cosB < 0) {
-                        hTop = cosA;
-                        hBottom = -cosB;
-                        wLeft = 0;
-                        wRight = sinA;
-                    }
-                    else if (cosA < 0 && cosB >= 0) {
-                        hTop = 1;
-                        hBottom = 1;
-                        wLeft = 1;
-                        wRight = Math.max(sinA, sinB);
-                    }
-                }
-                else if (sinA >= 0 && sinB < 0) {
-                    if (cosA >= 0 && cosB >= 0) {
-                        hTop = Math.max(cosA, cosB);
-                        hBottom = 1;
-                        wLeft = 1;
-                        wRight = 1;
-                    }
-                    else if (cosA < 0 && cosB < 0) {
-                        hTop = 0;
-                        hBottom = 1;
-                        wLeft = -sinB;
-                        wRight = sinA;
-                    }
-                    else if (cosA >= 0 && cosB < 0) {
-                        hTop = cosA;
-                        hBottom = 1;
-                        wLeft = -sinB;
-                        wRight = 1;
-                    }
-                    else if (cosA < 0 && cosB >= 0) {
-                        hTop = cosB;
-                        hBottom = 1;
-                        wLeft = 1;
-                        wRight = sinA;
-                    }
-                }
-                else if (sinA < 0 && sinB >= 0) {
-                    if (cosA >= 0 && cosB >= 0) {
-                        hTop = 1;
-                        hBottom = 0;
-                        wLeft = -sinA;
-                        wRight = sinB;
-                    }
-                    else if (cosA < 0 && cosB < 0) {
-                        hTop = 1;
-                        hBottom = Math.max(-cosA, -cosB);
-                        wLeft = 1;
-                        wRight = 1;
-                    }
-                    else if (cosA >= 0 && cosB < 0) {
-                        hTop = 1;
-                        hBottom = -cosB;
-                        wLeft = -sinA;
-                        wRight = 1;
-                    }
-                    else if (cosA < 0 && cosB >= 0) {
-                        hTop = 1;
-                        hBottom = -cosA;
-                        wLeft = 1;
-                        wRight = sinB;
-                    }
-                }
-                else if (sinA < 0 && sinB < 0) {
-                    if (cosA >= 0 && cosB >= 0) {
-                        hTop = cosB;
-                        hBottom = 0;
-                        wLeft = -sinA;
-                        wRight = 0;
-                    }
-                    else if (cosA < 0 && cosB < 0) {
-                        hTop = 0;
-                        hBottom = -cosA;
-                        wLeft = -sinB;
-                        wRight = 0;
-                    }
-                    else if (cosA >= 0 && cosB < 0) {
-                        hTop = 1;
-                        hBottom = 1;
-                        wLeft = Math.max(cosA, -cosB);
-                        wRight = 1;
-                    }
-                    else if (cosA < 0 && cosB >= 0) {
-                        hTop = cosB;
-                        hBottom = -cosA;
-                        wLeft = 1;
-                        wRight = 0;
-                    }
-                }
-                return {
-                    x: wLeft + wRight == 0 ? 0 : (wLeft / (wLeft + wRight)) * this.width(),
-                    y: hTop + hBottom == 0 ? 0 : (hTop / (hTop + hBottom)) * this.height()
-                };
             };
             Pie.prototype._getDataToDraw = function () {
                 var dataToDraw = _super.prototype._getDataToDraw.call(this);
@@ -7831,7 +7523,7 @@ var Plottable;
                     .value(function (d, i) {
                     var value = scaledValueAccessor(d, i, dataset);
                     return Pie._isValidData(value) ? value : 0;
-                }).startAngle(this._startAngle).endAngle(this._endAngle)(dataset.data());
+                })(dataset.data());
                 var startAngle = pie[index].startAngle;
                 var endAngle = pie[index].endAngle;
                 var avgAngle = (startAngle + endAngle) / 2;
@@ -8017,14 +7709,6 @@ var Plottable;
                 }
             };
         }
-        XYPlot.prototype.entityNearest = function (queryPoint) {
-            // by default, the entity index stores position information in the data space
-            // the default impelentation of the entityNearest must convert the chart bounding
-            // box as well as the query point to the data space before it can make a comparison
-            var invertedChartBounds = this._invertedBounds();
-            var invertedQueryPoint = this._invertPixelPoint(queryPoint);
-            return _super.prototype.entityNearest.call(this, invertedQueryPoint, invertedChartBounds);
-        };
         XYPlot.prototype.deferredRendering = function (deferredRendering) {
             if (deferredRendering == null) {
                 return this._deferredRendering;
@@ -8210,13 +7894,6 @@ var Plottable;
                 this._updateXExtentsAndAutodomain();
             }
         };
-        XYPlot.prototype._buildLightweightPlotEntities = function (datasets) {
-            var _this = this;
-            return _super.prototype._buildLightweightPlotEntities.call(this, datasets).map(function (lightweightPlotEntity) {
-                lightweightPlotEntity.position = _this._invertPixelPoint(lightweightPlotEntity.position);
-                return lightweightPlotEntity;
-            });
-        };
         XYPlot.prototype._projectorsReady = function () {
             var xBinding = this.x();
             var yBinding = this.y();
@@ -8224,41 +7901,6 @@ var Plottable;
                 xBinding.accessor != null &&
                 yBinding != null &&
                 yBinding.accessor != null;
-        };
-        /**
-         * Returns the bounds of the plot in the Data space ensures that the topLeft
-         * and bottomRight points represent the minima and maxima of the Data space, respectively
-         @returns {Bounds}
-         */
-        XYPlot.prototype._invertedBounds = function () {
-            var bounds = this.bounds();
-            var maybeTopLeft = this._invertPixelPoint(bounds.topLeft);
-            var maybeBottomRight = this._invertPixelPoint(bounds.bottomRight);
-            // Scale domains can map from lowest to highest or highest to lowest (eg [0, 1] or [1, 0]).
-            // What we're interested in is a domain space equivalent to the concept of topLeft
-            // and bottomRight, not a true mapping from point to domain. This is in keeping
-            // with our definition of {Bounds}, where the topLeft coordinate is minimal
-            // and the bottomRight is maximal.
-            return {
-                topLeft: {
-                    x: Math.min(maybeTopLeft.x, maybeBottomRight.x),
-                    y: Math.min(maybeTopLeft.y, maybeBottomRight.y)
-                },
-                bottomRight: {
-                    x: Math.max(maybeBottomRight.x, maybeTopLeft.x),
-                    y: Math.max(maybeBottomRight.y, maybeTopLeft.y)
-                }
-            };
-        };
-        /**
-         * _invertPixelPoint converts a point in pixel coordinates to a point in data coordinates
-         * @param {Point} point Representation of the point in pixel coordinates
-         * @return {Point} Returns the point represented in data coordinates
-         */
-        XYPlot.prototype._invertPixelPoint = function (point) {
-            var xScale = this.x();
-            var yScale = this.y();
-            return { x: xScale.scale.invertedTransformation(point.x), y: yScale.scale.invertedTransformation(point.y) };
         };
         XYPlot.prototype._pixelPoint = function (datum, index, dataset) {
             var xProjector = Plottable.Plot._scaledAccessor(this.x());
@@ -8657,16 +8299,6 @@ var Plottable;
                 var circleSymbolFactory = Plottable.SymbolFactories.circle();
                 this.symbol(function () { return circleSymbolFactory; });
             }
-            Scatter.prototype._buildLightweightPlotEntities = function (datasets) {
-                var _this = this;
-                var lightweightPlotEntities = _super.prototype._buildLightweightPlotEntities.call(this, datasets);
-                return lightweightPlotEntities.map(function (lightweightPlotEntity) {
-                    var diameter = Plottable.Plot._scaledAccessor(_this.size())(lightweightPlotEntity.datum, lightweightPlotEntity.index, lightweightPlotEntity.dataset);
-                    // convert diameter into data space to be on the same scale as the scatter point position
-                    lightweightPlotEntity.diameter = _this._invertedPixelSize({ x: diameter, y: diameter });
-                    return lightweightPlotEntity;
-                });
-            };
             Scatter.prototype._createDrawer = function (dataset) {
                 return new Plottable.Drawers.Symbol(dataset);
             };
@@ -8697,14 +8329,15 @@ var Plottable;
                 drawSteps.push({ attrToProjector: this._generateAttrToProjector(), animator: this._getAnimator(Plots.Animator.MAIN) });
                 return drawSteps;
             };
-            Scatter.prototype._entityVisibleOnPlot = function (entity, bounds) {
-                var xRange = { min: bounds.topLeft.x, max: bounds.bottomRight.x };
-                var yRange = { min: bounds.topLeft.y, max: bounds.bottomRight.y };
+            Scatter.prototype._entityVisibleOnPlot = function (pixelPoint, datum, index, dataset) {
+                var xRange = { min: 0, max: this.width() };
+                var yRange = { min: 0, max: this.height() };
+                var diameter = Plottable.Plot._scaledAccessor(this.size())(datum, index, dataset);
                 var translatedBbox = {
-                    x: entity.position.x - entity.diameter.x,
-                    y: entity.position.y - entity.diameter.y,
-                    width: entity.diameter.x,
-                    height: entity.diameter.y,
+                    x: pixelPoint.x - diameter,
+                    y: pixelPoint.y - diameter,
+                    width: diameter,
+                    height: diameter,
                 };
                 return Plottable.Utils.DOM.intersectsBBox(xRange, yRange, translatedBbox);
             };
@@ -8764,22 +8397,6 @@ var Plottable;
                     var size = sizeProjector(datum, index, dataset);
                     return x - size / 2 <= p.x && p.x <= x + size / 2 && y - size / 2 <= p.y && p.y <= y + size / 2;
                 });
-            };
-            /**
-             * _invertedPixelSize returns the size of the object in data space
-             * @param {Point} [point] The size of the object in pixel space. X corresponds to
-             * the width of the object, and Y corresponds to the height of the object
-             * @return {Point} Returns the size of the object in data space. X corresponds to
-             * the width of the object in data space, and Y corresponds to the height of the
-             * object in data space.
-             */
-            Scatter.prototype._invertedPixelSize = function (point) {
-                var invertedOrigin = this._invertPixelPoint(this.origin());
-                var invertedSize = this._invertPixelPoint({ x: point.x, y: point.y });
-                return {
-                    x: Math.abs(invertedSize.x - invertedOrigin.x),
-                    y: Math.abs(invertedSize.y - invertedOrigin.y)
-                };
             };
             Scatter._SIZE_KEY = "size";
             Scatter._SYMBOL_KEY = "symbol";
@@ -8977,10 +8594,9 @@ var Plottable;
                 // for the x, y, height & width attributes), but user selections (e.g. via
                 // mouse events) usually have pixel accuracy. We add a tolerance of 0.5 pixels.
                 var tolerance = 0.5;
-                var chartBounds = this.bounds();
                 var closest;
                 this.entities().forEach(function (entity) {
-                    if (!_this._entityVisibleOnPlot(entity, chartBounds)) {
+                    if (!_this._entityVisibleOnPlot(entity.position, entity.datum, entity.index, entity.dataset)) {
                         return;
                     }
                     var primaryDist = 0;
@@ -9013,13 +8629,10 @@ var Plottable;
                 });
                 return closest;
             };
-            Bar.prototype._entityVisibleOnPlot = function (entity, bounds) {
-                var chartWidth = bounds.bottomRight.x - bounds.topLeft.x;
-                var chartHeight = bounds.bottomRight.y - bounds.topLeft.y;
-                var xRange = { min: 0, max: chartWidth };
-                var yRange = { min: 0, max: chartHeight };
+            Bar.prototype._entityVisibleOnPlot = function (pixelPoint, datum, index, dataset) {
+                var xRange = { min: 0, max: this.width() };
+                var yRange = { min: 0, max: this.height() };
                 var attrToProjector = this._generateAttrToProjector();
-                var datum = entity.datum, index = entity.index, dataset = entity.dataset;
                 var barBBox = {
                     x: attrToProjector["x"](datum, index, dataset),
                     y: attrToProjector["y"](datum, index, dataset),
@@ -9386,9 +8999,9 @@ var Plottable;
             Bar._BAR_WIDTH_RATIO = 0.95;
             Bar._SINGLE_BAR_DIMENSION_RATIO = 0.4;
             Bar._BAR_AREA_CLASS = "bar-area";
+            Bar._LABEL_AREA_CLASS = "bar-label-text-area";
             Bar._LABEL_VERTICAL_PADDING = 5;
             Bar._LABEL_HORIZONTAL_PADDING = 5;
-            Bar._LABEL_AREA_CLASS = "bar-label-text-area";
             return Bar;
         }(Plottable.XYPlot));
         Plots.Bar = Bar;
@@ -9671,9 +9284,8 @@ var Plottable;
                 var minXDist = Infinity;
                 var minYDist = Infinity;
                 var closest;
-                var chartBounds = this.bounds();
                 this.entities().forEach(function (entity) {
-                    if (!_this._entityVisibleOnPlot(entity, chartBounds)) {
+                    if (!_this._entityVisibleOnPlot(entity.position, entity.datum, entity.index, entity.dataset)) {
                         return;
                     }
                     var xDist = Math.abs(queryPoint.x - entity.position.x);
@@ -10275,75 +9887,6 @@ var Plottable;
                 this._updateStackExtentsAndOffsets();
                 return this;
             };
-            StackedBar.prototype._setup = function () {
-                _super.prototype._setup.call(this);
-                this._labelArea = this._renderArea.append("g").classed(Plots.Bar._LABEL_AREA_CLASS, true);
-                this._measurer = new SVGTypewriter.Measurers.CacheCharacterMeasurer(this._labelArea);
-                this._writer = new SVGTypewriter.Writers.Writer(this._measurer);
-            };
-            StackedBar.prototype._drawLabels = function () {
-                var _this = this;
-                _super.prototype._drawLabels.call(this);
-                // remove all current labels before redrawing
-                this._labelArea.selectAll("g").remove();
-                var baselineValue = +this.baselineValue();
-                var primaryScale = this._isVertical ? this.x().scale : this.y().scale;
-                var secondaryScale = this._isVertical ? this.y().scale : this.x().scale;
-                var _a = Plottable.Utils.Stacking.stackedExtents(this._stackingResult), maximumExtents = _a.maximumExtents, minimumExtents = _a.minimumExtents;
-                var barWidth = this._getBarPixelWidth();
-                var drawLabel = function (text, measurement, labelPosition) {
-                    var x = labelPosition.x, y = labelPosition.y;
-                    var height = measurement.height, width = measurement.width;
-                    var tooWide = _this._isVertical ? (width > barWidth) : (height > barWidth);
-                    var hideLabel = x < 0
-                        || y < 0
-                        || x + width > _this.width()
-                        || y + height > _this.height()
-                        || tooWide;
-                    if (!hideLabel) {
-                        var labelContainer = _this._labelArea.append("g").attr("transform", "translate(" + x + ", " + y + ")");
-                        labelContainer.classed("stacked-bar-label", true);
-                        var writeOptions = {
-                            selection: labelContainer,
-                            xAlign: "center",
-                            yAlign: "center",
-                            textRotation: 0,
-                        };
-                        _this._writer.write(text, measurement.width, measurement.height, writeOptions);
-                    }
-                };
-                maximumExtents.forEach(function (maximum, axisValue) {
-                    if (maximum !== baselineValue) {
-                        // only draw sums for values not at the baseline
-                        var text = _this.labelFormatter()(maximum);
-                        var measurement = _this._measurer.measure(text);
-                        var primaryTextMeasurement = _this._isVertical ? measurement.width : measurement.height;
-                        var secondaryTextMeasurement = _this._isVertical ? measurement.height : measurement.width;
-                        var x = _this._isVertical
-                            ? primaryScale.scale(axisValue) - primaryTextMeasurement / 2
-                            : secondaryScale.scale(maximum) + StackedBar._STACKED_BAR_LABEL_PADDING;
-                        var y = _this._isVertical
-                            ? secondaryScale.scale(maximum) - secondaryTextMeasurement - StackedBar._STACKED_BAR_LABEL_PADDING
-                            : primaryScale.scale(axisValue) - primaryTextMeasurement / 2;
-                        drawLabel(text, measurement, { x: x, y: y });
-                    }
-                });
-                minimumExtents.forEach(function (minimum, axisValue) {
-                    if (minimum !== baselineValue) {
-                        var text = _this.labelFormatter()(minimum);
-                        var measurement = _this._measurer.measure(text);
-                        var primaryTextMeasurement = _this._isVertical ? measurement.width : measurement.height;
-                        var secondaryTextMeasurement = _this._isVertical ? measurement.height : measurement.width;
-                        var x = _this._isVertical
-                            ? primaryScale.scale(axisValue) - primaryTextMeasurement / 2
-                            : secondaryScale.scale(minimum) - secondaryTextMeasurement - StackedBar._STACKED_BAR_LABEL_PADDING;
-                        var y = _this._isVertical
-                            ? secondaryScale.scale(minimum) + StackedBar._STACKED_BAR_LABEL_PADDING
-                            : primaryScale.scale(axisValue) - primaryTextMeasurement / 2;
-                        drawLabel(text, measurement, { x: x, y: y });
-                    }
-                });
-            };
             StackedBar.prototype._generateAttrToProjector = function () {
                 var _this = this;
                 var attrToProjector = _super.prototype._generateAttrToProjector.call(this);
@@ -10405,7 +9948,6 @@ var Plottable;
                 this._stackingResult = Plottable.Utils.Stacking.stack(datasets, keyAccessor, valueAccessor);
                 this._stackedExtent = Plottable.Utils.Stacking.stackedExtent(this._stackingResult, keyAccessor, filter);
             };
-            StackedBar._STACKED_BAR_LABEL_PADDING = 5;
             return StackedBar;
         }(Plots.Bar));
         Plots.StackedBar = StackedBar;
@@ -13276,1151 +12818,3 @@ var Plottable;
 return Plottable;
 
 }));
-
-(function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.SVGTypewriter = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
-(function (global){
-/**
- * Copyright 2017-present Palantir Technologies, Inc. All rights reserved.
- * Licensed under the MIT License (the "License"); you may obtain a copy of the
- * license at https://github.com/palantir/svg-typewriter/blob/develop/LICENSE
- */
-"use strict";
-var d3 = (typeof window !== "undefined" ? window['d3'] : typeof global !== "undefined" ? global['d3'] : null);
-var BaseAnimator = (function () {
-    function BaseAnimator() {
-        this.duration(BaseAnimator.DEFAULT_DURATION_MILLISECONDS);
-        this.delay(0);
-        this.easing(BaseAnimator.DEFAULT_EASING);
-        this.moveX(0);
-        this.moveY(0);
-    }
-    BaseAnimator.prototype.animate = function (selection) {
-        var xForm = d3.transform("");
-        xForm.translate = [this.moveX(), this.moveY()];
-        selection.attr("transform", xForm.toString());
-        xForm.translate = [0, 0];
-        return this._animate(selection, { transform: xForm.toString() });
-    };
-    BaseAnimator.prototype._animate = function (selection, attr) {
-        return selection.transition()
-            .ease(this.easing())
-            .duration(this.duration())
-            .delay(this.delay())
-            .attr(attr);
-    };
-    BaseAnimator.prototype.duration = function (duration) {
-        if (duration == null) {
-            return this._duration;
-        }
-        else {
-            this._duration = duration;
-            return this;
-        }
-    };
-    BaseAnimator.prototype.moveX = function (shift) {
-        if (shift == null) {
-            return this._moveX;
-        }
-        else {
-            this._moveX = shift;
-            return this;
-        }
-    };
-    BaseAnimator.prototype.moveY = function (shift) {
-        if (shift == null) {
-            return this._moveY;
-        }
-        else {
-            this._moveY = shift;
-            return this;
-        }
-    };
-    BaseAnimator.prototype.delay = function (delay) {
-        if (delay == null) {
-            return this._delay;
-        }
-        else {
-            this._delay = delay;
-            return this;
-        }
-    };
-    BaseAnimator.prototype.easing = function (easing) {
-        if (easing == null) {
-            return this._easing;
-        }
-        else {
-            this._easing = easing;
-            return this;
-        }
-    };
-    return BaseAnimator;
-}());
-/**
- * The default duration of the animation in milliseconds
- */
-BaseAnimator.DEFAULT_DURATION_MILLISECONDS = 300;
-/**
- * The default easing of the animation
- */
-BaseAnimator.DEFAULT_EASING = "exp-out";
-exports.BaseAnimator = BaseAnimator;
-
-}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],2:[function(require,module,exports){
-/**
- * Copyright 2017-present Palantir Technologies, Inc. All rights reserved.
- * Licensed under the MIT License (the "License"); you may obtain a copy of the
- * license at https://github.com/palantir/svg-typewriter/blob/develop/LICENSE
- */
-"use strict";
-function __export(m) {
-    for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
-}
-__export(require("./baseAnimator"));
-__export(require("./opacityAnimator"));
-__export(require("./unveilAnimator"));
-
-},{"./baseAnimator":1,"./opacityAnimator":3,"./unveilAnimator":4}],3:[function(require,module,exports){
-/**
- * Copyright 2017-present Palantir Technologies, Inc. All rights reserved.
- * Licensed under the MIT License (the "License"); you may obtain a copy of the
- * license at https://github.com/palantir/svg-typewriter/blob/develop/LICENSE
- */
-"use strict";
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
-var baseAnimator_1 = require("./baseAnimator");
-var OpacityAnimator = (function (_super) {
-    __extends(OpacityAnimator, _super);
-    function OpacityAnimator() {
-        return _super.apply(this, arguments) || this;
-    }
-    OpacityAnimator.prototype.animate = function (selection) {
-        var area = selection.select(".text-area");
-        area.attr("opacity", 0);
-        var attr = {
-            opacity: 1,
-        };
-        this._animate(area, attr);
-        return _super.prototype.animate.call(this, selection);
-    };
-    return OpacityAnimator;
-}(baseAnimator_1.BaseAnimator));
-exports.OpacityAnimator = OpacityAnimator;
-
-},{"./baseAnimator":1}],4:[function(require,module,exports){
-/**
- * Copyright 2017-present Palantir Technologies, Inc. All rights reserved.
- * Licensed under the MIT License (the "License"); you may obtain a copy of the
- * license at https://github.com/palantir/svg-typewriter/blob/develop/LICENSE
- */
-"use strict";
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
-var Utils = require("../utils");
-var baseAnimator_1 = require("./baseAnimator");
-var UnveilAnimator = (function (_super) {
-    __extends(UnveilAnimator, _super);
-    function UnveilAnimator() {
-        var _this = _super.call(this) || this;
-        _this.direction("bottom");
-        return _this;
-    }
-    UnveilAnimator.prototype.direction = function (direction) {
-        if (direction == null) {
-            return this._direction;
-        }
-        else {
-            if (UnveilAnimator.SupportedDirections.indexOf(direction) === -1) {
-                throw new Error("unsupported direction - " + direction);
-            }
-            this._direction = direction;
-            return this;
-        }
-    };
-    UnveilAnimator.prototype.animate = function (selection) {
-        var attr = Utils.DOM.getBBox(selection);
-        var mask = selection.select(".clip-rect");
-        mask.attr("width", 0);
-        mask.attr("height", 0);
-        switch (this._direction) {
-            case "top":
-                mask.attr("y", attr.y + attr.height);
-                mask.attr("x", attr.x);
-                mask.attr("width", attr.width);
-                break;
-            case "bottom":
-                mask.attr("y", attr.y);
-                mask.attr("x", attr.x);
-                mask.attr("width", attr.width);
-                break;
-            case "left":
-                mask.attr("y", attr.y);
-                mask.attr("x", attr.x);
-                mask.attr("height", attr.height);
-                break;
-            case "right":
-                mask.attr("y", attr.y);
-                mask.attr("x", attr.x + attr.width);
-                mask.attr("height", attr.height);
-                break;
-            default:
-                break;
-        }
-        this._animate(mask, attr);
-        return _super.prototype.animate.call(this, selection);
-    };
-    return UnveilAnimator;
-}(baseAnimator_1.BaseAnimator));
-UnveilAnimator.SupportedDirections = ["top", "bottom", "left", "right"];
-exports.UnveilAnimator = UnveilAnimator;
-
-},{"../utils":14,"./baseAnimator":1}],5:[function(require,module,exports){
-/**
- * Copyright 2017-present Palantir Technologies, Inc. All rights reserved.
- * Licensed under the MIT License (the "License"); you may obtain a copy of the
- * license at https://github.com/palantir/svg-typewriter/blob/develop/LICENSE
- */
-"use strict";
-function __export(m) {
-    for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
-}
-__export(require("./animators"));
-__export(require("./measurers"));
-__export(require("./utils"));
-__export(require("./wrappers"));
-__export(require("./writers"));
-
-},{"./animators":2,"./measurers":10,"./utils":14,"./wrappers":18,"./writers":21}],6:[function(require,module,exports){
-/**
- * Copyright 2017-present Palantir Technologies, Inc. All rights reserved.
- * Licensed under the MIT License (the "License"); you may obtain a copy of the
- * license at https://github.com/palantir/svg-typewriter/blob/develop/LICENSE
- */
-"use strict";
-var Utils = require("../utils");
-;
-var AbstractMeasurer = (function () {
-    function AbstractMeasurer(area, className) {
-        this.textMeasurer = this.getTextMeasurer(area, className);
-    }
-    AbstractMeasurer.prototype.measure = function (text) {
-        if (text === void 0) { text = AbstractMeasurer.HEIGHT_TEXT; }
-        return this.textMeasurer(text);
-    };
-    AbstractMeasurer.prototype.checkSelectionIsText = function (d) {
-        return d[0][0].tagName === "text" || !d.select("text").empty();
-    };
-    AbstractMeasurer.prototype.getTextMeasurer = function (area, className) {
-        var _this = this;
-        if (!this.checkSelectionIsText(area)) {
-            var textElement_1 = area.append("text");
-            if (className) {
-                textElement_1.classed(className, true);
-            }
-            textElement_1.remove();
-            return function (text) {
-                area.node().appendChild(textElement_1.node());
-                var areaDimension = _this.measureBBox(textElement_1, text);
-                textElement_1.remove();
-                return areaDimension;
-            };
-        }
-        else {
-            var parentNode_1 = area.node().parentNode;
-            var textSelection_1;
-            if (area[0][0].tagName === "text") {
-                textSelection_1 = area;
-            }
-            else {
-                textSelection_1 = area.select("text");
-            }
-            area.remove();
-            return function (text) {
-                parentNode_1.appendChild(area.node());
-                var areaDimension = _this.measureBBox(textSelection_1, text);
-                area.remove();
-                return areaDimension;
-            };
-        }
-    };
-    AbstractMeasurer.prototype.measureBBox = function (d, text) {
-        d.text(text);
-        var bb = Utils.DOM.getBBox(d);
-        return { width: bb.width, height: bb.height };
-    };
-    return AbstractMeasurer;
-}());
-AbstractMeasurer.HEIGHT_TEXT = "bqpdl";
-exports.AbstractMeasurer = AbstractMeasurer;
-
-},{"../utils":14}],7:[function(require,module,exports){
-/**
- * Copyright 2017-present Palantir Technologies, Inc. All rights reserved.
- * Licensed under the MIT License (the "License"); you may obtain a copy of the
- * license at https://github.com/palantir/svg-typewriter/blob/develop/LICENSE
- */
-"use strict";
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
-var Utils = require("../utils");
-var characterMeasurer_1 = require("./characterMeasurer");
-var CacheCharacterMeasurer = (function (_super) {
-    __extends(CacheCharacterMeasurer, _super);
-    function CacheCharacterMeasurer(area, className, useGuards) {
-        var _this = _super.call(this, area, className, useGuards) || this;
-        _this.cache = new Utils.Cache(function (c) {
-            return _this._measureCharacterNotFromCache(c);
-        });
-        return _this;
-    }
-    CacheCharacterMeasurer.prototype._measureCharacterNotFromCache = function (c) {
-        return _super.prototype._measureCharacter.call(this, c);
-    };
-    CacheCharacterMeasurer.prototype._measureCharacter = function (c) {
-        return this.cache.get(c);
-    };
-    CacheCharacterMeasurer.prototype.reset = function () {
-        this.cache.clear();
-    };
-    return CacheCharacterMeasurer;
-}(characterMeasurer_1.CharacterMeasurer));
-exports.CacheCharacterMeasurer = CacheCharacterMeasurer;
-
-},{"../utils":14,"./characterMeasurer":9}],8:[function(require,module,exports){
-/**
- * Copyright 2017-present Palantir Technologies, Inc. All rights reserved.
- * Licensed under the MIT License (the "License"); you may obtain a copy of the
- * license at https://github.com/palantir/svg-typewriter/blob/develop/LICENSE
- */
-"use strict";
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
-var Utils = require("../utils");
-var cacheCharacterMeasurer_1 = require("./cacheCharacterMeasurer");
-var CacheMeasurer = (function (_super) {
-    __extends(CacheMeasurer, _super);
-    function CacheMeasurer(area, className) {
-        var _this = _super.call(this, area, className) || this;
-        _this.dimCache = new Utils.Cache(function (s) {
-            return _this._measureNotFromCache(s);
-        });
-        return _this;
-    }
-    CacheMeasurer.prototype._measureNotFromCache = function (s) {
-        return _super.prototype.measure.call(this, s);
-    };
-    CacheMeasurer.prototype.measure = function (s) {
-        return this.dimCache.get(s);
-    };
-    CacheMeasurer.prototype.reset = function () {
-        this.dimCache.clear();
-        _super.prototype.reset.call(this);
-    };
-    return CacheMeasurer;
-}(cacheCharacterMeasurer_1.CacheCharacterMeasurer));
-exports.CacheMeasurer = CacheMeasurer;
-
-},{"../utils":14,"./cacheCharacterMeasurer":7}],9:[function(require,module,exports){
-(function (global){
-/**
- * Copyright 2017-present Palantir Technologies, Inc. All rights reserved.
- * Licensed under the MIT License (the "License"); you may obtain a copy of the
- * license at https://github.com/palantir/svg-typewriter/blob/develop/LICENSE
- */
-"use strict";
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
-var d3 = (typeof window !== "undefined" ? window['d3'] : typeof global !== "undefined" ? global['d3'] : null);
-var measurer_1 = require("./measurer");
-var CharacterMeasurer = (function (_super) {
-    __extends(CharacterMeasurer, _super);
-    function CharacterMeasurer() {
-        return _super.apply(this, arguments) || this;
-    }
-    CharacterMeasurer.prototype._measureCharacter = function (c) {
-        return _super.prototype._measureLine.call(this, c);
-    };
-    CharacterMeasurer.prototype._measureLine = function (line) {
-        var _this = this;
-        var charactersDimensions = line.split("").map(function (c) { return _this._measureCharacter(c); });
-        return {
-            height: d3.max(charactersDimensions, function (dim) { return dim.height; }),
-            width: d3.sum(charactersDimensions, function (dim) { return dim.width; }),
-        };
-    };
-    return CharacterMeasurer;
-}(measurer_1.Measurer));
-exports.CharacterMeasurer = CharacterMeasurer;
-
-}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./measurer":11}],10:[function(require,module,exports){
-/**
- * Copyright 2017-present Palantir Technologies, Inc. All rights reserved.
- * Licensed under the MIT License (the "License"); you may obtain a copy of the
- * license at https://github.com/palantir/svg-typewriter/blob/develop/LICENSE
- */
-"use strict";
-function __export(m) {
-    for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
-}
-__export(require("./abstractMeasurer"));
-__export(require("./cacheCharacterMeasurer"));
-__export(require("./cacheMeasurer"));
-__export(require("./characterMeasurer"));
-__export(require("./measurer"));
-
-},{"./abstractMeasurer":6,"./cacheCharacterMeasurer":7,"./cacheMeasurer":8,"./characterMeasurer":9,"./measurer":11}],11:[function(require,module,exports){
-(function (global){
-/**
- * Copyright 2017-present Palantir Technologies, Inc. All rights reserved.
- * Licensed under the MIT License (the "License"); you may obtain a copy of the
- * license at https://github.com/palantir/svg-typewriter/blob/develop/LICENSE
- */
-"use strict";
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
-var d3 = (typeof window !== "undefined" ? window['d3'] : typeof global !== "undefined" ? global['d3'] : null);
-var abstractMeasurer_1 = require("./abstractMeasurer");
-var Measurer = (function (_super) {
-    __extends(Measurer, _super);
-    function Measurer(area, className, useGuards) {
-        if (className === void 0) { className = null; }
-        if (useGuards === void 0) { useGuards = false; }
-        var _this = _super.call(this, area, className) || this;
-        _this.useGuards = useGuards;
-        return _this;
-    }
-    // Guards assures same line height and width of whitespaces on both ends.
-    Measurer.prototype._addGuards = function (text) {
-        return abstractMeasurer_1.AbstractMeasurer.HEIGHT_TEXT + text + abstractMeasurer_1.AbstractMeasurer.HEIGHT_TEXT;
-    };
-    Measurer.prototype._measureLine = function (line, forceGuards) {
-        if (forceGuards === void 0) { forceGuards = false; }
-        var useGuards = this.useGuards || forceGuards || /^[\t ]$/.test(line);
-        var measuredLine = useGuards ? this._addGuards(line) : line;
-        var measuredLineDimensions = _super.prototype.measure.call(this, measuredLine);
-        measuredLineDimensions.width -= useGuards ? (2 * this.getGuardWidth()) : 0;
-        return measuredLineDimensions;
-    };
-    Measurer.prototype.measure = function (text) {
-        var _this = this;
-        if (text === void 0) { text = abstractMeasurer_1.AbstractMeasurer.HEIGHT_TEXT; }
-        if (text.trim() === "") {
-            return { width: 0, height: 0 };
-        }
-        var linesDimensions = text.trim().split("\n").map(function (line) { return _this._measureLine(line); });
-        return {
-            height: d3.sum(linesDimensions, function (dim) { return dim.height; }),
-            width: d3.max(linesDimensions, function (dim) { return dim.width; }),
-        };
-    };
-    Measurer.prototype.getGuardWidth = function () {
-        if (this.guardWidth == null) {
-            this.guardWidth = _super.prototype.measure.call(this).width;
-        }
-        return this.guardWidth;
-    };
-    return Measurer;
-}(abstractMeasurer_1.AbstractMeasurer));
-exports.Measurer = Measurer;
-
-}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./abstractMeasurer":6}],12:[function(require,module,exports){
-(function (global){
-/**
- * Copyright 2017-present Palantir Technologies, Inc. All rights reserved.
- * Licensed under the MIT License (the "License"); you may obtain a copy of the
- * license at https://github.com/palantir/svg-typewriter/blob/develop/LICENSE
- */
-"use strict";
-var d3 = (typeof window !== "undefined" ? window['d3'] : typeof global !== "undefined" ? global['d3'] : null);
-var Cache = (function () {
-    /**
-     * @constructor
-     *
-     * @param {string} compute The function whose results will be cached.
-     */
-    function Cache(compute) {
-        this.cache = d3.map();
-        this.compute = compute;
-    }
-    /**
-     * Attempt to look up k in the cache, computing the result if it isn't
-     * found.
-     *
-     * @param {string} k The key to look up in the cache.
-     * @return {T} The value associated with k; the result of compute(k).
-     */
-    Cache.prototype.get = function (k) {
-        if (!this.cache.has(k)) {
-            this.cache.set(k, this.compute(k));
-        }
-        return this.cache.get(k);
-    };
-    /**
-     * Reset the cache empty.
-     *
-     * @return {Cache<T>} The calling Cache.
-     */
-    Cache.prototype.clear = function () {
-        this.cache = d3.map();
-        return this;
-    };
-    return Cache;
-}());
-exports.Cache = Cache;
-
-}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],13:[function(require,module,exports){
-(function (global){
-/**
- * Copyright 2017-present Palantir Technologies, Inc. All rights reserved.
- * Licensed under the MIT License (the "License"); you may obtain a copy of the
- * license at https://github.com/palantir/svg-typewriter/blob/develop/LICENSE
- */
-"use strict";
-var d3 = (typeof window !== "undefined" ? window['d3'] : typeof global !== "undefined" ? global['d3'] : null);
-var DOM = (function () {
-    function DOM() {
-    }
-    DOM.transform = function (s, x, y) {
-        var xform = d3.transform(s.attr("transform"));
-        if (x == null) {
-            return xform.translate;
-        }
-        else {
-            y = (y == null) ? 0 : y;
-            xform.translate[0] = x;
-            xform.translate[1] = y;
-            s.attr("transform", xform.toString());
-            return s;
-        }
-    };
-    DOM.getBBox = function (element) {
-        var bbox;
-        try {
-            bbox = element.node().getBBox();
-        }
-        catch (err) {
-            bbox = {
-                height: 0,
-                width: 0,
-                x: 0,
-                y: 0,
-            };
-        }
-        return bbox;
-    };
-    return DOM;
-}());
-exports.DOM = DOM;
-
-}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],14:[function(require,module,exports){
-/**
- * Copyright 2017-present Palantir Technologies, Inc. All rights reserved.
- * Licensed under the MIT License (the "License"); you may obtain a copy of the
- * license at https://github.com/palantir/svg-typewriter/blob/develop/LICENSE
- */
-"use strict";
-function __export(m) {
-    for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
-}
-__export(require("./cache"));
-__export(require("./dom"));
-__export(require("./methods"));
-__export(require("./stringMethods"));
-__export(require("./tokenizer"));
-
-},{"./cache":12,"./dom":13,"./methods":15,"./stringMethods":16,"./tokenizer":17}],15:[function(require,module,exports){
-/**
- * Copyright 2017-present Palantir Technologies, Inc. All rights reserved.
- * Licensed under the MIT License (the "License"); you may obtain a copy of the
- * license at https://github.com/palantir/svg-typewriter/blob/develop/LICENSE
- */
-"use strict";
-var Methods = (function () {
-    function Methods() {
-    }
-    /**
-     * Check if two arrays are equal by strict equality.
-     */
-    Methods.arrayEq = function (a, b) {
-        // Technically, null and undefined are arrays too
-        if (a == null || b == null) {
-            return a === b;
-        }
-        if (a.length !== b.length) {
-            return false;
-        }
-        for (var i = 0; i < a.length; i++) {
-            if (a[i] !== b[i]) {
-                return false;
-            }
-        }
-        return true;
-    };
-    /**
-     * @param {any} a Object to check against b for equality.
-     * @param {any} b Object to check against a for equality.
-     *
-     * @returns {boolean} whether or not two objects share the same keys, and
-     *          values associated with those keys. Values will be compared
-     *          with ===.
-     */
-    Methods.objEq = function (a, b) {
-        if (a == null || b == null) {
-            return a === b;
-        }
-        var keysA = Object.keys(a).sort();
-        var keysB = Object.keys(b).sort();
-        var valuesA = keysA.map(function (k) { return a[k]; });
-        var valuesB = keysB.map(function (k) { return b[k]; });
-        return Methods.arrayEq(keysA, keysB) && Methods.arrayEq(valuesA, valuesB);
-    };
-    Methods.strictEq = function (a, b) {
-        return a === b;
-    };
-    return Methods;
-}());
-exports.Methods = Methods;
-
-},{}],16:[function(require,module,exports){
-/**
- * Copyright 2017-present Palantir Technologies, Inc. All rights reserved.
- * Licensed under the MIT License (the "License"); you may obtain a copy of the
- * license at https://github.com/palantir/svg-typewriter/blob/develop/LICENSE
- */
-"use strict";
-var StringMethods = (function () {
-    function StringMethods() {
-    }
-    /**
-     * Treat all sequences of consecutive spaces as a single " ".
-     */
-    StringMethods.combineWhitespace = function (str) {
-        return str.replace(/[ \t]+/g, " ");
-    };
-    StringMethods.isNotEmptyString = function (str) {
-        return str && str.trim() !== "";
-    };
-    StringMethods.trimStart = function (str, splitter) {
-        if (!str) {
-            return str;
-        }
-        var chars = str.split("");
-        var reduceFunction = splitter ? function (s) { return s.split(splitter).some(StringMethods.isNotEmptyString); }
-            : StringMethods.isNotEmptyString;
-        return chars.reduce(function (s, c) { return reduceFunction(s + c) ? s + c : s; }, "");
-    };
-    StringMethods.trimEnd = function (str, c) {
-        if (!str) {
-            return str;
-        }
-        var reversedChars = str.split("");
-        reversedChars.reverse();
-        reversedChars = StringMethods.trimStart(reversedChars.join(""), c).split("");
-        reversedChars.reverse();
-        return reversedChars.join("");
-    };
-    return StringMethods;
-}());
-exports.StringMethods = StringMethods;
-
-},{}],17:[function(require,module,exports){
-/**
- * Copyright 2017-present Palantir Technologies, Inc. All rights reserved.
- * Licensed under the MIT License (the "License"); you may obtain a copy of the
- * license at https://github.com/palantir/svg-typewriter/blob/develop/LICENSE
- */
-"use strict";
-var Tokenizer = (function () {
-    function Tokenizer() {
-        this.WordDividerRegExp = new RegExp("\\W");
-        this.WhitespaceRegExp = new RegExp("\\s");
-    }
-    Tokenizer.prototype.tokenize = function (line) {
-        var _this = this;
-        return line.split("").reduce(function (tokens, c) {
-            return tokens.slice(0, -1).concat(_this.shouldCreateNewToken(tokens[tokens.length - 1], c));
-        }, [""]);
-    };
-    Tokenizer.prototype.shouldCreateNewToken = function (token, newCharacter) {
-        if (!token) {
-            return [newCharacter];
-        }
-        var lastCharacter = token[token.length - 1];
-        if (this.WhitespaceRegExp.test(lastCharacter) && this.WhitespaceRegExp.test(newCharacter)) {
-            return [token + newCharacter];
-        }
-        else if (this.WhitespaceRegExp.test(lastCharacter) || this.WhitespaceRegExp.test(newCharacter)) {
-            return [token, newCharacter];
-        }
-        else if (!(this.WordDividerRegExp.test(lastCharacter) || this.WordDividerRegExp.test(newCharacter))) {
-            return [token + newCharacter];
-        }
-        else if (lastCharacter === newCharacter) {
-            return [token + newCharacter];
-        }
-        else {
-            return [token, newCharacter];
-        }
-    };
-    return Tokenizer;
-}());
-exports.Tokenizer = Tokenizer;
-
-},{}],18:[function(require,module,exports){
-/**
- * Copyright 2017-present Palantir Technologies, Inc. All rights reserved.
- * Licensed under the MIT License (the "License"); you may obtain a copy of the
- * license at https://github.com/palantir/svg-typewriter/blob/develop/LICENSE
- */
-"use strict";
-function __export(m) {
-    for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
-}
-__export(require("./singleLineWrapper"));
-__export(require("./wrapper"));
-
-},{"./singleLineWrapper":19,"./wrapper":20}],19:[function(require,module,exports){
-/**
- * Copyright 2017-present Palantir Technologies, Inc. All rights reserved.
- * Licensed under the MIT License (the "License"); you may obtain a copy of the
- * license at https://github.com/palantir/svg-typewriter/blob/develop/LICENSE
- */
-"use strict";
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
-var wrapper_1 = require("./wrapper");
-var SingleLineWrapper = (function (_super) {
-    __extends(SingleLineWrapper, _super);
-    function SingleLineWrapper() {
-        return _super.apply(this, arguments) || this;
-    }
-    SingleLineWrapper.prototype.wrap = function (text, measurer, width, height) {
-        var _this = this;
-        if (height === void 0) { height = Infinity; }
-        var lines = text.split("\n");
-        if (lines.length > 1) {
-            throw new Error("SingleLineWrapper is designed to work only on single line");
-        }
-        var wrapFN = function (w) { return _super.prototype.wrap.call(_this, text, measurer, w, height); };
-        var result = wrapFN(width);
-        if (result.noLines < 2) {
-            return result;
-        }
-        var left = 0;
-        var right = width;
-        for (var i = 0; i < SingleLineWrapper.NO_WRAP_ITERATIONS && right > left; ++i) {
-            var currentWidth = (right + left) / 2;
-            var currentResult = wrapFN(currentWidth);
-            if (this.areSameResults(result, currentResult)) {
-                right = currentWidth;
-                result = currentResult;
-            }
-            else {
-                left = currentWidth;
-            }
-        }
-        return result;
-    };
-    SingleLineWrapper.prototype.areSameResults = function (one, two) {
-        return one.noLines === two.noLines && one.truncatedText === two.truncatedText;
-    };
-    return SingleLineWrapper;
-}(wrapper_1.Wrapper));
-SingleLineWrapper.NO_WRAP_ITERATIONS = 5;
-exports.SingleLineWrapper = SingleLineWrapper;
-
-},{"./wrapper":20}],20:[function(require,module,exports){
-/**
- * Copyright 2017-present Palantir Technologies, Inc. All rights reserved.
- * Licensed under the MIT License (the "License"); you may obtain a copy of the
- * license at https://github.com/palantir/svg-typewriter/blob/develop/LICENSE
- */
-"use strict";
-var Utils = require("../utils");
-var Wrapper = (function () {
-    function Wrapper() {
-        this.maxLines(Infinity);
-        this.textTrimming("ellipsis");
-        this.allowBreakingWords(true);
-        this._tokenizer = new Utils.Tokenizer();
-        this._breakingCharacter = "-";
-    }
-    Wrapper.prototype.maxLines = function (noLines) {
-        if (noLines == null) {
-            return this._maxLines;
-        }
-        else {
-            this._maxLines = noLines;
-            return this;
-        }
-    };
-    Wrapper.prototype.textTrimming = function (option) {
-        if (option == null) {
-            return this._textTrimming;
-        }
-        else {
-            if (option !== "ellipsis" && option !== "none") {
-                throw new Error(option + " - unsupported text trimming option.");
-            }
-            this._textTrimming = option;
-            return this;
-        }
-    };
-    Wrapper.prototype.allowBreakingWords = function (allow) {
-        if (allow == null) {
-            return this._allowBreakingWords;
-        }
-        else {
-            this._allowBreakingWords = allow;
-            return this;
-        }
-    };
-    Wrapper.prototype.wrap = function (text, measurer, width, height) {
-        var _this = this;
-        if (height === void 0) { height = Infinity; }
-        var initialWrappingResult = {
-            noBrokeWords: 0,
-            noLines: 0,
-            originalText: text,
-            truncatedText: "",
-            wrappedText: "",
-        };
-        var state = {
-            availableLines: Math.min(Math.floor(height / measurer.measure().height), this._maxLines),
-            availableWidth: width,
-            canFitText: true,
-            currentLine: "",
-            wrapping: initialWrappingResult,
-        };
-        var lines = text.split("\n");
-        return lines.reduce(function (s, line, i) {
-            return _this.breakLineToFitWidth(s, line, i !== lines.length - 1, measurer);
-        }, state).wrapping;
-    };
-    Wrapper.prototype.breakLineToFitWidth = function (state, line, hasNextLine, measurer) {
-        var _this = this;
-        if (!state.canFitText && state.wrapping.truncatedText !== "") {
-            state.wrapping.truncatedText += "\n";
-        }
-        var tokens = this._tokenizer.tokenize(line);
-        state = tokens.reduce(function (s, token) {
-            return _this.wrapNextToken(token, s, measurer);
-        }, state);
-        var wrappedText = Utils.StringMethods.trimEnd(state.currentLine);
-        state.wrapping.noLines += +(wrappedText !== "");
-        if (state.wrapping.noLines === state.availableLines && this._textTrimming !== "none" && hasNextLine) {
-            var ellipsisResult = this.addEllipsis(wrappedText, state.availableWidth, measurer);
-            state.wrapping.wrappedText += ellipsisResult.wrappedToken;
-            state.wrapping.truncatedText += ellipsisResult.remainingToken;
-            state.canFitText = false;
-        }
-        else {
-            state.wrapping.wrappedText += wrappedText;
-        }
-        state.currentLine = "\n";
-        return state;
-    };
-    Wrapper.prototype.canFitToken = function (token, width, measurer) {
-        var _this = this;
-        var possibleBreaks = this._allowBreakingWords ?
-            token.split("").map(function (c, i) { return (i !== token.length - 1) ? c + _this._breakingCharacter : c; })
-            : [token];
-        return (measurer.measure(token).width <= width) || possibleBreaks.every(function (c) { return measurer.measure(c).width <= width; });
-    };
-    Wrapper.prototype.addEllipsis = function (line, width, measurer) {
-        if (this._textTrimming === "none") {
-            return {
-                remainingToken: "",
-                wrappedToken: line,
-            };
-        }
-        var truncatedLine = line.substring(0).trim();
-        var lineWidth = measurer.measure(truncatedLine).width;
-        var ellipsesWidth = measurer.measure("...").width;
-        var prefix = (line.length > 0 && line[0] === "\n") ? "\n" : "";
-        if (width <= ellipsesWidth) {
-            var periodWidth = ellipsesWidth / 3;
-            var numPeriodsThatFit = Math.floor(width / periodWidth);
-            return {
-                remainingToken: line,
-                wrappedToken: prefix + "...".substr(0, numPeriodsThatFit),
-            };
-        }
-        while (lineWidth + ellipsesWidth > width) {
-            truncatedLine = Utils.StringMethods.trimEnd(truncatedLine.substr(0, truncatedLine.length - 1));
-            lineWidth = measurer.measure(truncatedLine).width;
-        }
-        return {
-            remainingToken: Utils.StringMethods.trimEnd(line.substring(truncatedLine.length), "-").trim(),
-            wrappedToken: prefix + truncatedLine + "...",
-        };
-    };
-    Wrapper.prototype.wrapNextToken = function (token, state, measurer) {
-        if (!state.canFitText ||
-            state.availableLines === state.wrapping.noLines ||
-            !this.canFitToken(token, state.availableWidth, measurer)) {
-            return this.finishWrapping(token, state, measurer);
-        }
-        var remainingToken = token;
-        while (remainingToken) {
-            var result = this.breakTokenToFitInWidth(remainingToken, state.currentLine, state.availableWidth, measurer);
-            state.currentLine = result.line;
-            remainingToken = result.remainingToken;
-            if (remainingToken != null) {
-                state.wrapping.noBrokeWords += +result.breakWord;
-                ++state.wrapping.noLines;
-                if (state.availableLines === state.wrapping.noLines) {
-                    var ellipsisResult = this.addEllipsis(state.currentLine, state.availableWidth, measurer);
-                    state.wrapping.wrappedText += ellipsisResult.wrappedToken;
-                    state.wrapping.truncatedText += ellipsisResult.remainingToken + remainingToken;
-                    state.currentLine = "\n";
-                    return state;
-                }
-                else {
-                    state.wrapping.wrappedText += Utils.StringMethods.trimEnd(state.currentLine);
-                    state.currentLine = "\n";
-                }
-            }
-        }
-        return state;
-    };
-    Wrapper.prototype.finishWrapping = function (token, state, measurer) {
-        // Token is really long, but we have a space to put part of the word.
-        if (state.canFitText &&
-            state.availableLines !== state.wrapping.noLines &&
-            this._allowBreakingWords &&
-            this._textTrimming !== "none") {
-            var res = this.addEllipsis(state.currentLine + token, state.availableWidth, measurer);
-            state.wrapping.wrappedText += res.wrappedToken;
-            state.wrapping.truncatedText += res.remainingToken;
-            state.wrapping.noBrokeWords += +(res.remainingToken.length < token.length);
-            state.wrapping.noLines += +(res.wrappedToken.length > 0);
-            state.currentLine = "";
-        }
-        else {
-            state.wrapping.truncatedText += token;
-        }
-        state.canFitText = false;
-        return state;
-    };
-    /**
-     * Breaks single token to fit current line.
-     * If token contains only whitespaces then they will not be populated to next line.
-     */
-    Wrapper.prototype.breakTokenToFitInWidth = function (token, line, availableWidth, measurer, breakingCharacter) {
-        if (breakingCharacter === void 0) { breakingCharacter = this._breakingCharacter; }
-        if (measurer.measure(line + token).width <= availableWidth) {
-            return {
-                breakWord: false,
-                line: line + token,
-                remainingToken: null,
-            };
-        }
-        if (token.trim() === "") {
-            return {
-                breakWord: false,
-                line: line,
-                remainingToken: "",
-            };
-        }
-        if (!this._allowBreakingWords) {
-            return {
-                breakWord: false,
-                line: line,
-                remainingToken: token,
-            };
-        }
-        var fitTokenLength = 0;
-        while (fitTokenLength < token.length) {
-            if (measurer.measure(line + token.substring(0, fitTokenLength + 1) + breakingCharacter).width <= availableWidth) {
-                ++fitTokenLength;
-            }
-            else {
-                break;
-            }
-        }
-        var suffix = "";
-        if (fitTokenLength > 0) {
-            suffix = breakingCharacter;
-        }
-        return {
-            breakWord: fitTokenLength > 0,
-            line: line + token.substring(0, fitTokenLength) + suffix,
-            remainingToken: token.substring(fitTokenLength),
-        };
-    };
-    return Wrapper;
-}());
-exports.Wrapper = Wrapper;
-
-},{"../utils":14}],21:[function(require,module,exports){
-/**
- * Copyright 2017-present Palantir Technologies, Inc. All rights reserved.
- * Licensed under the MIT License (the "License"); you may obtain a copy of the
- * license at https://github.com/palantir/svg-typewriter/blob/develop/LICENSE
- */
-"use strict";
-function __export(m) {
-    for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
-}
-__export(require("./writer"));
-
-},{"./writer":22}],22:[function(require,module,exports){
-(function (global){
-/**
- * Copyright 2017-present Palantir Technologies, Inc. All rights reserved.
- * Licensed under the MIT License (the "License"); you may obtain a copy of the
- * license at https://github.com/palantir/svg-typewriter/blob/develop/LICENSE
- */
-"use strict";
-var d3 = (typeof window !== "undefined" ? window['d3'] : typeof global !== "undefined" ? global['d3'] : null);
-var Utils = require("../utils");
-var Writer = (function () {
-    function Writer(measurer, wrapper) {
-        this._writerID = Writer.nextID++;
-        this._elementID = 0;
-        this.measurer(measurer);
-        if (wrapper) {
-            this.wrapper(wrapper);
-        }
-        this.addTitleElement(false);
-    }
-    Writer.prototype.measurer = function (newMeasurer) {
-        this._measurer = newMeasurer;
-        return this;
-    };
-    Writer.prototype.wrapper = function (newWrapper) {
-        this._wrapper = newWrapper;
-        return this;
-    };
-    Writer.prototype.addTitleElement = function (add) {
-        this._addTitleElement = add;
-        return this;
-    };
-    Writer.prototype.write = function (text, width, height, options) {
-        if (Writer.SupportedRotation.indexOf(options.textRotation) === -1) {
-            throw new Error("unsupported rotation - " + options.textRotation);
-        }
-        var orientHorizontally = Math.abs(Math.abs(options.textRotation) - 90) > 45;
-        var primaryDimension = orientHorizontally ? width : height;
-        var secondaryDimension = orientHorizontally ? height : width;
-        var textContainer = options.selection.append("g").classed("text-container", true);
-        if (this._addTitleElement) {
-            textContainer.append("title").text(text);
-        }
-        var normalizedText = Utils.StringMethods.combineWhitespace(text);
-        var textArea = textContainer.append("g").classed("text-area", true);
-        var wrappedText = this._wrapper ?
-            this._wrapper.wrap(normalizedText, this._measurer, primaryDimension, secondaryDimension).wrappedText : normalizedText;
-        this.writeText(wrappedText, textArea, primaryDimension, secondaryDimension, options.xAlign, options.yAlign);
-        var xForm = d3.transform("");
-        var xForm2 = d3.transform("");
-        xForm.rotate = options.textRotation;
-        switch (options.textRotation) {
-            case 90:
-                xForm.translate = [width, 0];
-                xForm2.rotate = -90;
-                xForm2.translate = [0, 200];
-                break;
-            case -90:
-                xForm.translate = [0, height];
-                xForm2.rotate = 90;
-                xForm2.translate = [width, 0];
-                break;
-            case 180:
-                xForm.translate = [width, height];
-                xForm2.translate = [width, height];
-                xForm2.rotate = 180;
-                break;
-            default:
-                break;
-        }
-        textArea.attr("transform", xForm.toString());
-        this.addClipPath(textContainer, xForm2);
-        if (options.animator) {
-            options.animator.animate(textContainer);
-        }
-    };
-    Writer.prototype.writeLine = function (line, g, width, xAlign, yOffset) {
-        var textEl = g.append("text");
-        textEl.text(line);
-        var xOffset = width * Writer.XOffsetFactor[xAlign];
-        var anchor = Writer.AnchorConverter[xAlign];
-        textEl.attr("text-anchor", anchor).classed("text-line", true);
-        Utils.DOM.transform(textEl, xOffset, yOffset).attr("y", "-0.25em");
-    };
-    Writer.prototype.writeText = function (text, writingArea, width, height, xAlign, yAlign) {
-        var _this = this;
-        var lines = text.split("\n");
-        var lineHeight = this._measurer.measure().height;
-        var yOffset = Writer.YOffsetFactor[yAlign] * (height - lines.length * lineHeight);
-        lines.forEach(function (line, i) {
-            _this.writeLine(line, writingArea, width, xAlign, (i + 1) * lineHeight + yOffset);
-        });
-    };
-    Writer.prototype.addClipPath = function (selection, _transform) {
-        var elementID = this._elementID++;
-        var prefix = /MSIE [5-9]/.test(navigator.userAgent) ? "" : document.location.href;
-        prefix = prefix.split("#")[0]; // To fix cases where an anchor tag was used
-        var clipPathID = "clipPath" + this._writerID + "_" + elementID;
-        selection.select(".text-area").attr("clip-path", "url(\"" + prefix + "#" + clipPathID + "\")");
-        var clipPathParent = selection.append("clipPath").attr("id", clipPathID);
-        var bboxAttrs = Utils.DOM.getBBox(selection.select(".text-area"));
-        var box = clipPathParent.append("rect");
-        box.classed("clip-rect", true).attr({
-            height: bboxAttrs.height,
-            width: bboxAttrs.width,
-            x: bboxAttrs.x,
-            y: bboxAttrs.y,
-        });
-    };
-    return Writer;
-}());
-Writer.nextID = 0;
-Writer.SupportedRotation = [-90, 0, 180, 90];
-Writer.AnchorConverter = {
-    center: "middle",
-    left: "start",
-    right: "end",
-};
-Writer.XOffsetFactor = {
-    center: 0.5,
-    left: 0,
-    right: 1,
-};
-Writer.YOffsetFactor = {
-    bottom: 1,
-    center: 0.5,
-    top: 0,
-};
-exports.Writer = Writer;
-
-}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"../utils":14}]},{},[5])(5)
-});

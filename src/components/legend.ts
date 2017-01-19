@@ -18,9 +18,9 @@ namespace Plottable.Components {
     private _formatter: Formatter;
     private _maxEntriesPerRow: number;
     private _comparator: (a: string, b: string) => number;
-    private _measurer: SVGTypewriter.Measurers.Measurer;
-    private _wrapper: SVGTypewriter.Wrappers.Wrapper;
-    private _writer: SVGTypewriter.Writers.Writer;
+    private _measurer: SVGTypewriter.Measurer;
+    private _wrapper: SVGTypewriter.Wrapper;
+    private _writer: SVGTypewriter.Writer;
     private _symbolFactoryAccessor: (datum: any, index: number) => SymbolFactory;
     private _symbolOpacityAccessor: (datum: any, index: number) => number;
     private _redrawCallback: ScaleCallback<Scales.Color>;
@@ -58,9 +58,9 @@ namespace Plottable.Components {
       let fakeLegendRow = this.content().append("g").classed(Legend.LEGEND_ROW_CLASS, true);
       let fakeLegendEntry = fakeLegendRow.append("g").classed(Legend.LEGEND_ENTRY_CLASS, true);
       fakeLegendEntry.append("text");
-      this._measurer = new SVGTypewriter.Measurers.Measurer(fakeLegendRow);
-      this._wrapper = new SVGTypewriter.Wrappers.Wrapper().maxLines(1);
-      this._writer = new SVGTypewriter.Writers.Writer(this._measurer, this._wrapper).addTitleElement(Configs.ADD_TITLE_ELEMENTS);
+      this._measurer = new SVGTypewriter.Measurer(fakeLegendRow);
+      this._wrapper = new SVGTypewriter.Wrapper().maxLines(1);
+      this._writer = new SVGTypewriter.Writer(this._measurer, this._wrapper).addTitleElement(Configs.ADD_TITLE_ELEMENTS);
     }
 
     /**

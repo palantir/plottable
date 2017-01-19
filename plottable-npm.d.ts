@@ -2275,12 +2275,12 @@ declare namespace Plottable.Axes {
         private _measurer;
         /**
          * A Wrapper configured according to the other properties on this axis.
-         * @returns {SVGTypewriter.Wrappers.Wrapper}
+         * @returns {SVGTypewriter.Wrapper}
          */
         private readonly _wrapper;
         /**
          * A Writer attached to this measurer and wrapper.
-         * @returns {SVGTypewriter.Writers.Writer}
+         * @returns {SVGTypewriter.Writer}
          */
         private readonly _writer;
         /**

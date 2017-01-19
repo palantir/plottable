@@ -415,8 +415,8 @@ namespace Plottable.Plots {
     private _drawLabel(dataToDraw: Utils.Map<Dataset, any[]>, dataset: Dataset, datasetIndex: number) {
       let attrToProjector = this._generateAttrToProjector();
       let labelArea = this._renderArea.append("g").classed("label-area", true);
-      let measurer = new SVGTypewriter.Measurers.Measurer(labelArea);
-      let writer = new SVGTypewriter.Writers.Writer(measurer);
+      let measurer = new SVGTypewriter.CacheMeasurer(labelArea);
+      let writer = new SVGTypewriter.Writer(measurer);
       let xRange = this.x().scale.range();
       let yRange = this.y().scale.range();
       let xMin = Math.min.apply(null, xRange);

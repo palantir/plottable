@@ -22,14 +22,14 @@ namespace Plottable.Axes {
      */
     private _tickLabelMaxLines: number;
 
-    private _measurer: SVGTypewriter.Measurers.CacheCharacterMeasurer;
+    private _measurer: SVGTypewriter.CacheMeasurer;
 
     /**
      * A Wrapper configured according to the other properties on this axis.
-     * @returns {SVGTypewriter.Wrappers.Wrapper}
+     * @returns {SVGTypewriter.Wrapper}
      */
     private get _wrapper() {
-      const wrapper = new SVGTypewriter.Wrappers.Wrapper();
+      const wrapper = new SVGTypewriter.Wrapper();
       if (this._tickLabelMaxLines != null) {
         wrapper.maxLines(this._tickLabelMaxLines)
       }
@@ -38,10 +38,10 @@ namespace Plottable.Axes {
 
     /**
      * A Writer attached to this measurer and wrapper.
-     * @returns {SVGTypewriter.Writers.Writer}
+     * @returns {SVGTypewriter.Writer}
      */
     private get _writer() {
-      return new SVGTypewriter.Writers.Writer(this._measurer, this._wrapper);
+      return new SVGTypewriter.Writer(this._measurer, this._wrapper);
     }
 
     /**
@@ -60,7 +60,7 @@ namespace Plottable.Axes {
 
     protected _setup() {
       super._setup();
-      this._measurer = new SVGTypewriter.Measurers.CacheCharacterMeasurer(this._tickLabelContainer);
+      this._measurer = new SVGTypewriter.CacheMeasurer(this._tickLabelContainer);
     }
 
     protected _rescale() {
@@ -313,10 +313,10 @@ namespace Plottable.Axes {
       let widthFn = (this._isHorizontal() && this._tickLabelAngle === 0) ? d3.sum : Utils.Math.max;
       let heightFn = (this._isHorizontal() && this._tickLabelAngle === 0) ? Utils.Math.max : d3.sum;
 
-      let usedWidth = widthFn<SVGTypewriter.Wrappers.WrappingResult, number>(wrappingResults,
-                      (t: SVGTypewriter.Wrappers.WrappingResult) => this._measurer.measure(t.wrappedText).width, 0);
-      let usedHeight = heightFn<SVGTypewriter.Wrappers.WrappingResult, number>(wrappingResults,
-                      (t: SVGTypewriter.Wrappers.WrappingResult) => this._measurer.measure(t.wrappedText).height, 0);
+      let usedWidth = widthFn<SVGTypewriter.IWrappingResult, number>(wrappingResults,
+                      (t: SVGTypewriter.IWrappingResult) => this._measurer.measure(t.wrappedText).width, 0);
+      let usedHeight = heightFn<SVGTypewriter.IWrappingResult, number>(wrappingResults,
+                      (t: SVGTypewriter.IWrappingResult) => this._measurer.measure(t.wrappedText).height, 0);
 
       // If the tick labels are rotated, reverse usedWidth and usedHeight
       // HACKHACK: https://github.com/palantir/svg-typewriter/issues/25

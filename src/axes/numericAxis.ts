@@ -3,8 +3,8 @@ namespace Plottable.Axes {
 
     private _tickLabelPositioning = "center";
     private _usesTextWidthApproximation = false;
-    private _measurer: SVGTypewriter.Measurers.Measurer;
-    private _wrapper: SVGTypewriter.Wrappers.Wrapper;
+    private _measurer: SVGTypewriter.Measurer;
+    private _wrapper: SVGTypewriter.Wrapper;
 
     /**
      * Constructs a Numeric Axis.
@@ -22,8 +22,8 @@ namespace Plottable.Axes {
 
     protected _setup() {
       super._setup();
-      this._measurer = new SVGTypewriter.Measurers.Measurer(this._tickLabelContainer, Axis.TICK_LABEL_CLASS);
-      this._wrapper = new SVGTypewriter.Wrappers.Wrapper().maxLines(1);
+      this._measurer = new SVGTypewriter.CacheMeasurer(this._tickLabelContainer, Axis.TICK_LABEL_CLASS);
+      this._wrapper = new SVGTypewriter.Wrapper().maxLines(1);
     }
 
     protected _computeWidth() {
