@@ -84,7 +84,7 @@ namespace Plottable.Axes {
         return;
       }
 
-      if (!this._isHorizontal()) {
+      if (!this.isHorizontal()) {
         let reComputedWidth = this._computeWidth();
         if (reComputedWidth > this.width() || reComputedWidth < (this.width() - this.margin())) {
           this.redraw();
@@ -114,7 +114,7 @@ namespace Plottable.Axes {
       let labelGroupTransformY = 0;
       let labelGroupShiftX = 0;
       let labelGroupShiftY = 0;
-      if (this._isHorizontal()) {
+      if (this.isHorizontal()) {
         switch (this._tickLabelPositioning) {
           case "left":
             tickLabelTextAnchor = "end";
@@ -227,7 +227,7 @@ namespace Plottable.Axes {
         return this._tickLabelPositioning;
       } else {
         let positionLC = position.toLowerCase();
-        if (this._isHorizontal()) {
+        if (this.isHorizontal()) {
           if (!(positionLC === "left" || positionLC === "center" || positionLC === "right")) {
             throw new Error(positionLC + " is not a valid tick label position for a horizontal NumericAxis");
           }
@@ -330,7 +330,7 @@ namespace Plottable.Axes {
       for (let i = 0; i < rects.length - (interval); i += interval) {
         let currRect = rects[i];
         let nextRect = rects[i + interval];
-        if (this._isHorizontal()) {
+        if (this.isHorizontal()) {
           if (currRect.right + padding >= nextRect.left) {
             return false;
           }

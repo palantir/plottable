@@ -79,8 +79,8 @@ namespace Plottable.Axes {
      * @returns {any}
      */
     public requestedSpace(offeredWidth: number, offeredHeight: number): SpaceRequest {
-      let widthRequiredByTicks = this._isHorizontal() ? 0 : this._tickSpaceRequired() + this.margin();
-      let heightRequiredByTicks = this._isHorizontal() ? this._tickSpaceRequired() + this.margin() : 0;
+      let widthRequiredByTicks = this.isHorizontal() ? 0 : this._tickSpaceRequired() + this.margin();
+      let heightRequiredByTicks = this.isHorizontal() ? this._tickSpaceRequired() + this.margin() : 0;
 
       if (this._scale.domain().length === 0) {
         return {
@@ -91,7 +91,7 @@ namespace Plottable.Axes {
 
       if (this.annotationsEnabled()) {
         let tierTotalHeight = this._annotationTierHeight() * this.annotationTierCount();
-        if (this._isHorizontal()) {
+        if (this.isHorizontal()) {
           heightRequiredByTicks += tierTotalHeight;
         } else {
           widthRequiredByTicks += tierTotalHeight;
@@ -107,8 +107,8 @@ namespace Plottable.Axes {
     }
 
     protected _coreSize() {
-      let relevantDimension = this._isHorizontal() ? this.height() : this.width();
-      let relevantRequestedSpaceDimension = this._isHorizontal() ?
+      let relevantDimension = this.isHorizontal() ? this.height() : this.width();
+      let relevantRequestedSpaceDimension = this.isHorizontal() ?
                                               this.requestedSpace(this.width(), this.height()).minHeight :
                                               this.requestedSpace(this.width(), this.height()).minWidth;
       let marginAndAnnotationSize = this.margin() + this._annotationTierHeight();
@@ -235,8 +235,8 @@ namespace Plottable.Axes {
           break;
       }
       ticks.each(function (this: SVGElement, d: string) {
-        let width = self._isHorizontal() ? stepWidth : self.width() - self._tickSpaceRequired();
-        let height = self._isHorizontal() ? self.height() - self._tickSpaceRequired() : stepWidth;
+        let width = self.isHorizontal() ? stepWidth : self.width() - self._tickSpaceRequired();
+        let height = self.isHorizontal() ? self.height() - self._tickSpaceRequired() : stepWidth;
         let writeOptions = {
           selection: d3.select(this),
           xAlign: xAlign[self.orientation()],
@@ -273,14 +273,14 @@ namespace Plottable.Axes {
         .domain(thisScale.domain())
         .innerPadding(thisScale.innerPadding())
         .outerPadding(thisScale.outerPadding())
-        .range([0, this._isHorizontal() ? axisWidth : axisHeight]);
+        .range([0, this.isHorizontal() ? axisWidth : axisHeight]);
 
       const { domain, stepWidth } = this.getDownsampleInfo(scale);
 
       // HACKHACK: https://github.com/palantir/svg-typewriter/issues/25
       // the width (x-axis specific) available to a single tick label.
       let width = axisWidth - this._tickSpaceRequired(); // default for left/right
-      if (this._isHorizontal()) { // case for top/bottom
+      if (this.isHorizontal()) { // case for top/bottom
         width = stepWidth; // defaults to the band width
         if (this._tickLabelAngle !== 0) { // rotated label
           width = axisHeight - this._tickSpaceRequired(); // use the axis height
@@ -292,7 +292,7 @@ namespace Plottable.Axes {
       // HACKHACK: https://github.com/palantir/svg-typewriter/issues/25
       // the height (y-axis specific) available to a single tick label.
       let height = stepWidth; // default for left/right
-      if (this._isHorizontal()) { // case for top/bottom
+      if (this.isHorizontal()) { // case for top/bottom
         height = axisHeight - this._tickSpaceRequired();
         if (this._tickLabelAngle !== 0) { // rotated label
           height = axisWidth - this._tickSpaceRequired();
@@ -310,8 +310,8 @@ namespace Plottable.Axes {
       });
 
       // HACKHACK: https://github.com/palantir/svg-typewriter/issues/25
-      let widthFn = (this._isHorizontal() && this._tickLabelAngle === 0) ? d3.sum : Utils.Math.max;
-      let heightFn = (this._isHorizontal() && this._tickLabelAngle === 0) ? Utils.Math.max : d3.sum;
+      let widthFn = (this.isHorizontal() && this._tickLabelAngle === 0) ? d3.sum : Utils.Math.max;
+      let heightFn = (this.isHorizontal() && this._tickLabelAngle === 0) ? Utils.Math.max : d3.sum;
 
       let usedWidth = widthFn<SVGTypewriter.IWrappingResult, number>(wrappingResults,
                       (t: SVGTypewriter.IWrappingResult) => this._measurer.measure(t.wrappedText).width, 0);
@@ -337,7 +337,7 @@ namespace Plottable.Axes {
       let tickLabels = this._tickLabelContainer.selectAll("." + Axis.TICK_LABEL_CLASS).data(domain, (d) => d);
       // Give each tick a stepWidth of space which will partition the entire axis evenly
       let availableTextSpace = stepWidth;
-      if (this._isHorizontal() && this._tickLabelMaxWidth != null) {
+      if (this.isHorizontal() && this._tickLabelMaxWidth != null) {
         availableTextSpace = Math.min(availableTextSpace, this._tickLabelMaxWidth);
       }
 
@@ -345,8 +345,8 @@ namespace Plottable.Axes {
         // scale(d) will give the center of the band, so subtract half of the text width to get the left (top-most)
         // coordinate that the tick label should be transformed to.
         let tickLabelEdge = catScale.scale(d) - availableTextSpace / 2;
-        let x = this._isHorizontal() ? tickLabelEdge : 0;
-        let y = this._isHorizontal() ? 0 : tickLabelEdge;
+        let x = this.isHorizontal() ? tickLabelEdge : 0;
+        let y = this.isHorizontal() ? 0 : tickLabelEdge;
         return "translate(" + x + "," + y + ")";
       };
       tickLabels.enter().append("g").classed(Axis.TICK_LABEL_CLASS, true);
@@ -374,7 +374,7 @@ namespace Plottable.Axes {
       // affected the size of the characters, clear the cache.
       this._measurer.reset();
       super.computeLayout(origin, availableWidth, availableHeight);
-      if (!this._isHorizontal()) {
+      if (!this.isHorizontal()) {
         this._scale.range([0, this.height()]);
       }
       return this;

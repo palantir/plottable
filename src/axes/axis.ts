@@ -67,7 +67,7 @@ export class Axis<D> extends Component {
     this.orientation(orientation);
     this._setDefaultAlignment();
     this.addClass("axis");
-    if (this._isHorizontal()) {
+    if (this.isHorizontal()) {
       this.addClass("x-axis");
     } else {
       this.addClass("y-axis");
@@ -87,10 +87,6 @@ export class Axis<D> extends Component {
     this._scale.offUpdate(this._rescaleCallback);
   }
 
-  protected _isHorizontal() {
-    return this._orientation === "top" || this._orientation === "bottom";
-  }
-
   protected _computeWidth() {
     // to be overridden by subclass logic
     return this._maxLabelTickLength();
@@ -105,7 +101,7 @@ export class Axis<D> extends Component {
     let requestedWidth = 0;
     let requestedHeight = 0;
 
-    if (this._isHorizontal()) {
+    if (this.isHorizontal()) {
       requestedHeight = this._computeHeight() + this._margin;
       if (this.annotationsEnabled()) {
         let tierHeight = this._annotationMeasurer.measure().height + 2 * Axis._ANNOTATION_LABEL_PADDING;
@@ -126,11 +122,11 @@ export class Axis<D> extends Component {
   }
 
   public fixedHeight() {
-    return this._isHorizontal();
+    return this.isHorizontal();
   }
 
   public fixedWidth() {
-    return !this._isHorizontal();
+    return !this.isHorizontal();
   }
 
   protected _rescale() {
@@ -140,7 +136,7 @@ export class Axis<D> extends Component {
 
   public computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number) {
     super.computeLayout(origin, availableWidth, availableHeight);
-    if (this._isHorizontal()) {
+    if (this.isHorizontal()) {
       this._scale.range([0, this.width()]);
     } else {
       this._scale.range([this.height(), 0]);
@@ -290,7 +286,7 @@ export class Axis<D> extends Component {
     let annotationToTier = this._annotationToTier(measurements);
 
     let hiddenAnnotations = new Utils.Set<any>();
-    let axisHeight = this._isHorizontal() ? this.height() : this.width();
+    let axisHeight = this.isHorizontal() ? this.height() : this.width();
     let axisHeightWithoutMarginAndAnnotations = this._coreSize();
     let numTiers = Math.min(this.annotationTierCount(), Math.floor((axisHeight - axisHeightWithoutMarginAndAnnotations) / tierHeight));
     annotationToTier.forEach((tier, annotation) => {
@@ -332,7 +328,7 @@ export class Axis<D> extends Component {
         break;
     }
 
-    let isHorizontal = this._isHorizontal();
+    let isHorizontal = this.isHorizontal();
     bindElements(this._annotationContainer.select(".annotation-line-container"), "line", Axis.ANNOTATION_LINE_CLASS)
       .attr({
         x1: isHorizontal ? positionF : secondaryPosition,
@@ -410,8 +406,8 @@ export class Axis<D> extends Component {
    * The core pieces include the labels, the end tick marks, the inner tick marks, and the tick label padding.
    */
   protected _coreSize() {
-    let relevantDimension = this._isHorizontal() ? this.height() : this.width();
-    let axisHeightWithoutMargin = this._isHorizontal() ? this._computeHeight() : this._computeWidth();
+    let relevantDimension = this.isHorizontal() ? this.height() : this.width();
+    let axisHeightWithoutMargin = this.isHorizontal() ? this._computeHeight() : this._computeWidth();
     return Math.min(axisHeightWithoutMargin, relevantDimension);
   }
 
@@ -422,7 +418,7 @@ export class Axis<D> extends Component {
   private _annotationToTier(measurements: Utils.Map<D, SVGTypewriter.IDimensions>) {
     let annotationTiers: D[][] = [[]];
     let annotationToTier = new Utils.Map<D, number>();
-    let dimension = this._isHorizontal() ? this.width() : this.height();
+    let dimension = this.isHorizontal() ? this.width() : this.height();
     this._annotatedTicksToRender().forEach((annotatedTick) => {
       let position = this._scale.scale(annotatedTick);
       let length = measurements.get(annotatedTick).width;
@@ -497,7 +493,7 @@ export class Axis<D> extends Component {
     };
 
     let scalingFunction = (d: any) => this._scale.scale(d);
-    if (this._isHorizontal()) {
+    if (this.isHorizontal()) {
       tickMarkAttrHash["x1"] = scalingFunction;
       tickMarkAttrHash["x2"] = scalingFunction;
     } else {
@@ -549,6 +545,23 @@ export class Axis<D> extends Component {
         break;
     }
   }
+
+  /**
+   * Get whether this axis is horizontal (orientation is "top" or "bottom") or vertical.
+   * @returns {boolean} - true for horizontal, false for vertical.
+   */
+  public isHorizontal() {
+    return this._orientation === "top" || this._orientation === "bottom";
+  }
+
+  /**
+   * Get the scale that this axis is associated with.
+   * @returns {Scale<D, number>}
+   */
+  public getScale() {
+    return this._scale;
+  }
+
 
   /**
    * Gets the Formatter on the Axis. Tick values are passed through the

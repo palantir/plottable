@@ -1893,7 +1893,6 @@ declare namespace Plottable {
          */
         constructor(scale: Scale<D, number>, orientation: AxisOrientation);
         destroy(): void;
-        protected _isHorizontal(): boolean;
         protected _computeWidth(): number;
         protected _computeHeight(): number;
         requestedSpace(offeredWidth: number, offeredHeight: number): SpaceRequest;
@@ -1966,6 +1965,16 @@ declare namespace Plottable {
             [key: string]: number | ((d: any) => number);
         };
         protected _setDefaultAlignment(): void;
+        /**
+         * Get whether this axis is horizontal (orientation is "top" or "bottom") or vertical.
+         * @returns {boolean} - true for horizontal, false for vertical.
+         */
+        isHorizontal(): boolean;
+        /**
+         * Get the scale that this axis is associated with.
+         * @returns {Scale<D, number>}
+         */
+        getScale(): Scale<D, number>;
         /**
          * Gets the Formatter on the Axis. Tick values are passed through the
          * Formatter before being displayed.

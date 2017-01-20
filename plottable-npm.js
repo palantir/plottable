@@ -3786,7 +3786,7 @@ var Plottable;
             this.orientation(orientation);
             this._setDefaultAlignment();
             this.addClass("axis");
-            if (this._isHorizontal()) {
+            if (this.isHorizontal()) {
                 this.addClass("x-axis");
             }
             else {
@@ -3802,9 +3802,6 @@ var Plottable;
             _super.prototype.destroy.call(this);
             this._scale.offUpdate(this._rescaleCallback);
         };
-        Axis.prototype._isHorizontal = function () {
-            return this._orientation === "top" || this._orientation === "bottom";
-        };
         Axis.prototype._computeWidth = function () {
             // to be overridden by subclass logic
             return this._maxLabelTickLength();
@@ -3816,7 +3813,7 @@ var Plottable;
         Axis.prototype.requestedSpace = function (offeredWidth, offeredHeight) {
             var requestedWidth = 0;
             var requestedHeight = 0;
-            if (this._isHorizontal()) {
+            if (this.isHorizontal()) {
                 requestedHeight = this._computeHeight() + this._margin;
                 if (this.annotationsEnabled()) {
                     var tierHeight = this._annotationMeasurer.measure().height + 2 * Axis._ANNOTATION_LABEL_PADDING;
@@ -3836,10 +3833,10 @@ var Plottable;
             };
         };
         Axis.prototype.fixedHeight = function () {
-            return this._isHorizontal();
+            return this.isHorizontal();
         };
         Axis.prototype.fixedWidth = function () {
-            return !this._isHorizontal();
+            return !this.isHorizontal();
         };
         Axis.prototype._rescale = function () {
             // default implementation; subclasses may call redraw() here
@@ -3847,7 +3844,7 @@ var Plottable;
         };
         Axis.prototype.computeLayout = function (origin, availableWidth, availableHeight) {
             _super.prototype.computeLayout.call(this, origin, availableWidth, availableHeight);
-            if (this._isHorizontal()) {
+            if (this.isHorizontal()) {
                 this._scale.range([0, this.width()]);
             }
             else {
@@ -3949,7 +3946,7 @@ var Plottable;
             var tierHeight = this._annotationMeasurer.measure().height + 2 * labelPadding;
             var annotationToTier = this._annotationToTier(measurements);
             var hiddenAnnotations = new Plottable.Utils.Set();
-            var axisHeight = this._isHorizontal() ? this.height() : this.width();
+            var axisHeight = this.isHorizontal() ? this.height() : this.width();
             var axisHeightWithoutMarginAndAnnotations = this._coreSize();
             var numTiers = Math.min(this.annotationTierCount(), Math.floor((axisHeight - axisHeightWithoutMarginAndAnnotations) / tierHeight));
             annotationToTier.forEach(function (tier, annotation) {
@@ -3988,7 +3985,7 @@ var Plottable;
                     secondaryPosition = this.width();
                     break;
             }
-            var isHorizontal = this._isHorizontal();
+            var isHorizontal = this.isHorizontal();
             bindElements(this._annotationContainer.select(".annotation-line-container"), "line", Axis.ANNOTATION_LINE_CLASS)
                 .attr({
                 x1: isHorizontal ? positionF : secondaryPosition,
@@ -4059,8 +4056,8 @@ var Plottable;
          * The core pieces include the labels, the end tick marks, the inner tick marks, and the tick label padding.
          */
         Axis.prototype._coreSize = function () {
-            var relevantDimension = this._isHorizontal() ? this.height() : this.width();
-            var axisHeightWithoutMargin = this._isHorizontal() ? this._computeHeight() : this._computeWidth();
+            var relevantDimension = this.isHorizontal() ? this.height() : this.width();
+            var axisHeightWithoutMargin = this.isHorizontal() ? this._computeHeight() : this._computeWidth();
             return Math.min(axisHeightWithoutMargin, relevantDimension);
         };
         Axis.prototype._annotationTierHeight = function () {
@@ -4070,7 +4067,7 @@ var Plottable;
             var _this = this;
             var annotationTiers = [[]];
             var annotationToTier = new Plottable.Utils.Map();
-            var dimension = this._isHorizontal() ? this.width() : this.height();
+            var dimension = this.isHorizontal() ? this.width() : this.height();
             this._annotatedTicksToRender().forEach(function (annotatedTick) {
                 var position = _this._scale.scale(annotatedTick);
                 var length = measurements.get(annotatedTick).width;
@@ -4138,7 +4135,7 @@ var Plottable;
                 y2: 0,
             };
             var scalingFunction = function (d) { return _this._scale.scale(d); };
-            if (this._isHorizontal()) {
+            if (this.isHorizontal()) {
                 tickMarkAttrHash["x1"] = scalingFunction;
                 tickMarkAttrHash["x2"] = scalingFunction;
             }
@@ -4180,6 +4177,20 @@ var Plottable;
                     this.xAlignment("left");
                     break;
             }
+        };
+        /**
+         * Get whether this axis is horizontal (orientation is "top" or "bottom") or vertical.
+         * @returns {boolean} - true for horizontal, false for vertical.
+         */
+        Axis.prototype.isHorizontal = function () {
+            return this._orientation === "top" || this._orientation === "bottom";
+        };
+        /**
+         * Get the scale that this axis is associated with.
+         * @returns {Scale<D, number>}
+         */
+        Axis.prototype.getScale = function () {
+            return this._scale;
         };
         Axis.prototype.formatter = function (formatter) {
             if (formatter == null) {
@@ -4914,7 +4925,7 @@ var Plottable;
                 if (!this._isSetup) {
                     return;
                 }
-                if (!this._isHorizontal()) {
+                if (!this.isHorizontal()) {
                     var reComputedWidth = this._computeWidth();
                     if (reComputedWidth > this.width() || reComputedWidth < (this.width() - this.margin())) {
                         this.redraw();
@@ -4939,7 +4950,7 @@ var Plottable;
                 var labelGroupTransformY = 0;
                 var labelGroupShiftX = 0;
                 var labelGroupShiftY = 0;
-                if (this._isHorizontal()) {
+                if (this.isHorizontal()) {
                     switch (this._tickLabelPositioning) {
                         case "left":
                             tickLabelTextAnchor = "end";
@@ -5028,7 +5039,7 @@ var Plottable;
                 }
                 else {
                     var positionLC = position.toLowerCase();
-                    if (this._isHorizontal()) {
+                    if (this.isHorizontal()) {
                         if (!(positionLC === "left" || positionLC === "center" || positionLC === "right")) {
                             throw new Error(positionLC + " is not a valid tick label position for a horizontal NumericAxis");
                         }
@@ -5107,7 +5118,7 @@ var Plottable;
                 for (var i = 0; i < rects.length - (interval); i += interval) {
                     var currRect = rects[i];
                     var nextRect = rects[i + interval];
-                    if (this._isHorizontal()) {
+                    if (this.isHorizontal()) {
                         if (currRect.right + padding >= nextRect.left) {
                             return false;
                         }
@@ -5191,8 +5202,8 @@ var Plottable;
              * @returns {any}
              */
             Category.prototype.requestedSpace = function (offeredWidth, offeredHeight) {
-                var widthRequiredByTicks = this._isHorizontal() ? 0 : this._tickSpaceRequired() + this.margin();
-                var heightRequiredByTicks = this._isHorizontal() ? this._tickSpaceRequired() + this.margin() : 0;
+                var widthRequiredByTicks = this.isHorizontal() ? 0 : this._tickSpaceRequired() + this.margin();
+                var heightRequiredByTicks = this.isHorizontal() ? this._tickSpaceRequired() + this.margin() : 0;
                 if (this._scale.domain().length === 0) {
                     return {
                         minWidth: 0,
@@ -5201,7 +5212,7 @@ var Plottable;
                 }
                 if (this.annotationsEnabled()) {
                     var tierTotalHeight = this._annotationTierHeight() * this.annotationTierCount();
-                    if (this._isHorizontal()) {
+                    if (this.isHorizontal()) {
                         heightRequiredByTicks += tierTotalHeight;
                     }
                     else {
@@ -5215,8 +5226,8 @@ var Plottable;
                 };
             };
             Category.prototype._coreSize = function () {
-                var relevantDimension = this._isHorizontal() ? this.height() : this.width();
-                var relevantRequestedSpaceDimension = this._isHorizontal() ?
+                var relevantDimension = this.isHorizontal() ? this.height() : this.width();
+                var relevantRequestedSpaceDimension = this.isHorizontal() ?
                     this.requestedSpace(this.width(), this.height()).minHeight :
                     this.requestedSpace(this.width(), this.height()).minWidth;
                 var marginAndAnnotationSize = this.margin() + this._annotationTierHeight();
@@ -5320,8 +5331,8 @@ var Plottable;
                         break;
                 }
                 ticks.each(function (d) {
-                    var width = self._isHorizontal() ? stepWidth : self.width() - self._tickSpaceRequired();
-                    var height = self._isHorizontal() ? self.height() - self._tickSpaceRequired() : stepWidth;
+                    var width = self.isHorizontal() ? stepWidth : self.width() - self._tickSpaceRequired();
+                    var height = self.isHorizontal() ? self.height() - self._tickSpaceRequired() : stepWidth;
                     var writeOptions = {
                         selection: d3.select(this),
                         xAlign: xAlign[self.orientation()],
@@ -5357,12 +5368,12 @@ var Plottable;
                     .domain(thisScale.domain())
                     .innerPadding(thisScale.innerPadding())
                     .outerPadding(thisScale.outerPadding())
-                    .range([0, this._isHorizontal() ? axisWidth : axisHeight]);
+                    .range([0, this.isHorizontal() ? axisWidth : axisHeight]);
                 var _a = this.getDownsampleInfo(scale), domain = _a.domain, stepWidth = _a.stepWidth;
                 // HACKHACK: https://github.com/palantir/svg-typewriter/issues/25
                 // the width (x-axis specific) available to a single tick label.
                 var width = axisWidth - this._tickSpaceRequired(); // default for left/right
-                if (this._isHorizontal()) {
+                if (this.isHorizontal()) {
                     width = stepWidth; // defaults to the band width
                     if (this._tickLabelAngle !== 0) {
                         width = axisHeight - this._tickSpaceRequired(); // use the axis height
@@ -5373,7 +5384,7 @@ var Plottable;
                 // HACKHACK: https://github.com/palantir/svg-typewriter/issues/25
                 // the height (y-axis specific) available to a single tick label.
                 var height = stepWidth; // default for left/right
-                if (this._isHorizontal()) {
+                if (this.isHorizontal()) {
                     height = axisHeight - this._tickSpaceRequired();
                     if (this._tickLabelAngle !== 0) {
                         height = axisWidth - this._tickSpaceRequired();
@@ -5388,8 +5399,8 @@ var Plottable;
                     return _this._wrapper.wrap(_this.formatter()(s), _this._measurer, width, height);
                 });
                 // HACKHACK: https://github.com/palantir/svg-typewriter/issues/25
-                var widthFn = (this._isHorizontal() && this._tickLabelAngle === 0) ? d3.sum : Plottable.Utils.Math.max;
-                var heightFn = (this._isHorizontal() && this._tickLabelAngle === 0) ? Plottable.Utils.Math.max : d3.sum;
+                var widthFn = (this.isHorizontal() && this._tickLabelAngle === 0) ? d3.sum : Plottable.Utils.Math.max;
+                var heightFn = (this.isHorizontal() && this._tickLabelAngle === 0) ? Plottable.Utils.Math.max : d3.sum;
                 var usedWidth = widthFn(wrappingResults, function (t) { return _this._measurer.measure(t.wrappedText).width; }, 0);
                 var usedHeight = heightFn(wrappingResults, function (t) { return _this._measurer.measure(t.wrappedText).height; }, 0);
                 // If the tick labels are rotated, reverse usedWidth and usedHeight
@@ -5411,15 +5422,15 @@ var Plottable;
                 var tickLabels = this._tickLabelContainer.selectAll("." + Plottable.Axis.TICK_LABEL_CLASS).data(domain, function (d) { return d; });
                 // Give each tick a stepWidth of space which will partition the entire axis evenly
                 var availableTextSpace = stepWidth;
-                if (this._isHorizontal() && this._tickLabelMaxWidth != null) {
+                if (this.isHorizontal() && this._tickLabelMaxWidth != null) {
                     availableTextSpace = Math.min(availableTextSpace, this._tickLabelMaxWidth);
                 }
                 var getTickLabelTransform = function (d, i) {
                     // scale(d) will give the center of the band, so subtract half of the text width to get the left (top-most)
                     // coordinate that the tick label should be transformed to.
                     var tickLabelEdge = catScale.scale(d) - availableTextSpace / 2;
-                    var x = _this._isHorizontal() ? tickLabelEdge : 0;
-                    var y = _this._isHorizontal() ? 0 : tickLabelEdge;
+                    var x = _this.isHorizontal() ? tickLabelEdge : 0;
+                    var y = _this.isHorizontal() ? 0 : tickLabelEdge;
                     return "translate(" + x + "," + y + ")";
                 };
                 tickLabels.enter().append("g").classed(Plottable.Axis.TICK_LABEL_CLASS, true);
@@ -5444,7 +5455,7 @@ var Plottable;
                 // affected the size of the characters, clear the cache.
                 this._measurer.reset();
                 _super.prototype.computeLayout.call(this, origin, availableWidth, availableHeight);
-                if (!this._isHorizontal()) {
+                if (!this.isHorizontal()) {
                     this._scale.range([0, this.height()]);
                 }
                 return this;
