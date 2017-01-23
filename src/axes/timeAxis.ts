@@ -1,14 +1,14 @@
 namespace Plottable {
 
-export namespace TimeInterval {
-  export var second = "second";
-  export var minute = "minute";
-  export var hour = "hour";
-  export var day = "day";
-  export var week = "week";
-  export var month = "month";
-  export var year = "year";
-};
+  export namespace TimeInterval {
+    export var second = "second";
+    export var minute = "minute";
+    export var hour = "hour";
+    export var day = "day";
+    export var week = "week";
+    export var month = "month";
+    export var year = "year";
+  };
 
 }
 
@@ -43,6 +43,16 @@ namespace Plottable.Axes {
      * The CSS class applied to each Time Axis tier
      */
     public static TIME_AXIS_TIER_CLASS = "time-axis-tier";
+
+    private static _SORTED_TIME_INTERVAL_INDEX = {
+      [TimeInterval.second]: 0,
+      [TimeInterval.minute]: 1,
+      [TimeInterval.hour]: 2,
+      [TimeInterval.day]: 3,
+      [TimeInterval.week]: 4,
+      [TimeInterval.month]: 5,
+      [TimeInterval.year]: 6
+    };
 
     private static _DEFAULT_TIME_AXIS_CONFIGURATIONS: TimeAxisConfiguration[] = [
       [
@@ -161,6 +171,7 @@ namespace Plottable.Axes {
     private _possibleTimeAxisConfigurations: TimeAxisConfiguration[];
     private _numTiers: number;
     private _measurer: SVGTypewriter.Measurer;
+    private _maxTimeIntervalPrecision: string = null;
 
     private _mostPreciseConfigIndex: number;
 
@@ -211,6 +222,43 @@ namespace Plottable.Axes {
     }
 
     /**
+     * Gets the maximum TimeInterval precision
+     */
+    public maxTimeIntervalPrecision(): string;
+    /**
+     * Sets the maximum TimeInterval precision. This limits the display to not
+     * show time intervals above this precision. For example, if this is set to
+     * `TimeInterval.day` then no hours or minute ticks will be displayed in the
+     * axis.
+     *
+     * @param {TimeInterval} newPositions The positions for each tier. "bottom" and "center" are the only supported values.
+     * @returns {Axes.Time} The calling Time Axis.
+     */
+    public maxTimeIntervalPrecision(newPrecision: string): this;
+    public maxTimeIntervalPrecision(newPrecision?: string): any {
+      if (newPrecision == null) {
+        return this._maxTimeIntervalPrecision;
+      } else {
+        this._maxTimeIntervalPrecision = newPrecision;
+        this.redraw();
+        return this;
+      }
+    }
+
+    /**
+     * Returns the current `TimeAxisConfiguration` used to render the axes.
+     *
+     * Note that this is only valid after the axis had been rendered and the
+     * most precise valid configuration is determined from the available space
+     * and maximum precision constraints.
+     *
+     * @returns {TimeAxisConfiguration} The currently used `TimeAxisConfiguration` or `undefined`.
+     */
+    public currentAxisConfiguration(): TimeAxisConfiguration {
+      return this._possibleTimeAxisConfigurations[this._mostPreciseConfigIndex];
+    }
+
+    /**
      * Gets the possible TimeAxisConfigurations.
      */
     public axisConfigurations(): TimeAxisConfiguration[];
@@ -251,7 +299,7 @@ namespace Plottable.Axes {
       let mostPreciseIndex = this._possibleTimeAxisConfigurations.length;
       this._possibleTimeAxisConfigurations.forEach((interval: TimeAxisConfiguration, index: number) => {
         if (index < mostPreciseIndex && interval.every((tier: TimeAxisTierConfiguration) =>
-          this._checkTimeAxisTierConfigurationWidth(tier))) {
+          this._checkTimeAxisTierConfiguration(tier))) {
           mostPreciseIndex = index;
         }
       });
@@ -303,9 +351,21 @@ namespace Plottable.Axes {
     }
 
     /**
-     * Check if tier configuration fits in the current width.
+     * Check if tier configuration fits in the current width and satisfied the
+     * max TimeInterval precision limit.
      */
-    private _checkTimeAxisTierConfigurationWidth(config: TimeAxisTierConfiguration): boolean {
+    private _checkTimeAxisTierConfiguration(config: TimeAxisTierConfiguration): boolean {
+      // Use the sorted index to determine if the teir configuration contains a
+      // time interval that is too precise for the maxTimeIntervalPrecision
+      // setting (if set).
+      if (this._maxTimeIntervalPrecision != null) {
+        const precisionLimit = Time._SORTED_TIME_INTERVAL_INDEX[this._maxTimeIntervalPrecision];
+        const configPrecision = Time._SORTED_TIME_INTERVAL_INDEX[config.interval];
+        if (precisionLimit != null && configPrecision  != null && configPrecision < precisionLimit) {
+          return false;
+        }
+      }
+
       let worstWidth = this._maxWidthForInterval(config) + 2 * this.tickLabelPadding();
       return Math.min(this._getIntervalLength(config), this.width()) >= worstWidth;
     }
