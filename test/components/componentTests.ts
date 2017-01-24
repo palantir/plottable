@@ -725,6 +725,10 @@ describe("Component", () => {
       };
     });
 
+    afterEach(() => {
+      Plottable.RenderController.renderPolicy(Plottable.RenderController.Policy.IMMEDIATE);
+    });
+
     it("renders to a DOM node involves anchoring, layout computing, and actual rendering", () => {
       assert.strictEqual(c.renderTo(svg), c, "returns calling object");
       assert.isTrue(svg.classed("plottable"), "anchored to svg");
@@ -733,6 +737,34 @@ describe("Component", () => {
       assert.isTrue(renderFlag, "component has rendered");
       c.destroy();
       svg.remove();
+    });
+
+    it("only computes layout once", (done) => {
+      // use async rendering so flushing doesn't happen immediately
+      Plottable.RenderController.renderPolicy(Plottable.RenderController.Policy.ANIMATION_FRAME);
+      // set up a bar plot with a color scale
+      const colorScale = new Plottable.Scales.Color();
+      const xScale = new Plottable.Scales.Linear();
+      const yScale = new Plottable.Scales.Linear();
+      colorScale.autoDomain();
+      const barPlot = new Plottable.Plots.Bar();
+      barPlot.addDataset(new Plottable.Dataset([{x: 1, y: 1}]));
+      barPlot.x((d) => d.x, xScale);
+      barPlot.y((d) => d.y, yScale);
+      // hook up the colorScale to look at data from the bar plot
+      barPlot.attr("fill", (d) => d.x, colorScale);
+      // set up a legend to based on the colorScale. Legend will trigger an internal redraw() no the Table
+      // a second time; this test ensures that second redraw doesn't compute layout twice
+      const legend = new Plottable.Components.Legend(colorScale);
+      const table = new Plottable.Components.Table([[barPlot, legend]]);
+      const computeLayoutSpy = sinon.spy(table, "computeLayout");
+
+      table.renderTo(svg);
+
+      assert.strictEqual(computeLayoutSpy.callCount, 1, "component only computes layout once");
+      table.destroy();
+      svg.remove();
+      done();
     });
 
     it("renders to a node chosen through D3 selection", () => {

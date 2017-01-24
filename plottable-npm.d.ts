@@ -523,10 +523,17 @@ declare namespace Plottable.RenderController {
      *
      * @param {Component} component
      */
+    function registerToComputeLayoutAndRender(component: Component): void;
+    /**
+     * Enqueues the Component for layout and rendering.
+     *
+     * @param {Component} component
+     * @deprecated This method has been renamed to `RenderController.registerToComputeLayoutAndRender()`.
+     */
     function registerToComputeLayout(component: Component): void;
     /**
      * Renders all Components waiting to be rendered immediately
-     * instead of waiting until the next frame.
+     * instead of waiting until the next frame. Flush is idempotent (given there are no intermediate registrations).
      *
      * Useful to call when debugging.
      */
@@ -1589,7 +1596,8 @@ declare namespace Plottable {
          */
         onResize(resizeHandler: IResizeHandler): this;
         /**
-         * Renders the Component without waiting for the next frame.
+         * Renders the Component without waiting for the next frame. This method is a no-op on
+         * Component, Table, and Group; render them immediately with .renderTo() instead.
          */
         renderImmediately(): this;
         /**

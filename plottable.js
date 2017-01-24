@@ -1142,10 +1142,20 @@ var Plottable;
          *
          * @param {Component} component
          */
-        function registerToComputeLayout(component) {
+        function registerToComputeLayoutAndRender(component) {
             _componentsNeedingComputeLayout.add(component);
             _componentsNeedingRender.add(component);
             requestRender();
+        }
+        RenderController.registerToComputeLayoutAndRender = registerToComputeLayoutAndRender;
+        /**
+         * Enqueues the Component for layout and rendering.
+         *
+         * @param {Component} component
+         * @deprecated This method has been renamed to `RenderController.registerToComputeLayoutAndRender()`.
+         */
+        function registerToComputeLayout(component) {
+            registerToComputeLayoutAndRender(component);
         }
         RenderController.registerToComputeLayout = registerToComputeLayout;
         function requestRender() {
@@ -1157,7 +1167,7 @@ var Plottable;
         }
         /**
          * Renders all Components waiting to be rendered immediately
-         * instead of waiting until the next frame.
+         * instead of waiting until the next frame. Flush is idempotent (given there are no intermediate registrations).
          *
          * Useful to call when debugging.
          */
@@ -3201,7 +3211,7 @@ var Plottable;
         };
         Component.prototype._scheduleComputeLayout = function () {
             if (this._isAnchored && this._isSetup) {
-                Plottable.RenderController.registerToComputeLayout(this);
+                Plottable.RenderController.registerToComputeLayoutAndRender(this);
             }
         };
         /**
@@ -3215,7 +3225,8 @@ var Plottable;
             return this;
         };
         /**
-         * Renders the Component without waiting for the next frame.
+         * Renders the Component without waiting for the next frame. This method is a no-op on
+         * Component, Table, and Group; render them immediately with .renderTo() instead.
          */
         Component.prototype.renderImmediately = function () {
             if (this._clipPathEnabled) {
@@ -3270,8 +3281,7 @@ var Plottable;
                 throw new Error("If a Component has never been rendered before, then renderTo must be given a node to render to, " +
                     "or a d3.Selection, or a selector string");
             }
-            this.computeLayout();
-            this.render();
+            Plottable.RenderController.registerToComputeLayoutAndRender(this);
             // flush so that consumers can immediately attach to stuff we create in the DOM
             Plottable.RenderController.flush();
             return this;

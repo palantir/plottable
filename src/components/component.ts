@@ -250,7 +250,7 @@ export class Component {
 
   private _scheduleComputeLayout() {
     if (this._isAnchored && this._isSetup) {
-      RenderController.registerToComputeLayout(this);
+      RenderController.registerToComputeLayoutAndRender(this);
     }
   }
 
@@ -266,7 +266,8 @@ export class Component {
   }
 
   /**
-   * Renders the Component without waiting for the next frame.
+   * Renders the Component without waiting for the next frame. This method is a no-op on
+   * Component, Table, and Group; render them immediately with .renderTo() instead.
    */
   public renderImmediately() {
     if (this._clipPathEnabled) {
@@ -320,8 +321,7 @@ export class Component {
       throw new Error("If a Component has never been rendered before, then renderTo must be given a node to render to, " +
         "or a d3.Selection, or a selector string");
     }
-    this.computeLayout();
-    this.render();
+    RenderController.registerToComputeLayoutAndRender(this);
     // flush so that consumers can immediately attach to stuff we create in the DOM
     RenderController.flush();
     return this;

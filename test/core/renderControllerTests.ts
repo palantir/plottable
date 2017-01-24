@@ -48,7 +48,7 @@ describe("RenderController", () => {
       return component;
     };
     component.anchor(svg);
-    Plottable.RenderController.registerToComputeLayout(component);
+    Plottable.RenderController.registerToComputeLayoutAndRender(component);
     assert.isFalse(component.content().select(`.${renderedClass}`).empty(), "component has rendered");
     assert.deepEqual(component.origin(), {x: 0, y: 0}, "origin set");
     assert.strictEqual(component.width(), SVG_WIDTH, "width set");
