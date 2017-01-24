@@ -2123,6 +2123,7 @@ declare namespace Plottable.Axes {
          * The CSS class applied to each Time Axis tier
          */
         static TIME_AXIS_TIER_CLASS: string;
+        private static _SORTED_TIME_INTERVAL_INDEX;
         private static _DEFAULT_TIME_AXIS_CONFIGURATIONS;
         private _tierLabelContainers;
         private _tierMarkContainers;
@@ -2131,6 +2132,7 @@ declare namespace Plottable.Axes {
         private _possibleTimeAxisConfigurations;
         private _numTiers;
         private _measurer;
+        private _maxTimeIntervalPrecision;
         private _mostPreciseConfigIndex;
         private _tierLabelPositions;
         private static _LONG_DATE;
@@ -2157,6 +2159,30 @@ declare namespace Plottable.Axes {
          */
         tierLabelPositions(newPositions: string[]): this;
         /**
+         * Gets the maximum TimeInterval precision
+         */
+        maxTimeIntervalPrecision(): string;
+        /**
+         * Sets the maximum TimeInterval precision. This limits the display to not
+         * show time intervals above this precision. For example, if this is set to
+         * `TimeInterval.day` then no hours or minute ticks will be displayed in the
+         * axis.
+         *
+         * @param {TimeInterval} newPositions The positions for each tier. "bottom" and "center" are the only supported values.
+         * @returns {Axes.Time} The calling Time Axis.
+         */
+        maxTimeIntervalPrecision(newPrecision: string): this;
+        /**
+         * Returns the current `TimeAxisConfiguration` used to render the axes.
+         *
+         * Note that this is only valid after the axis had been rendered and the
+         * most precise valid configuration is determined from the available space
+         * and maximum precision constraints.
+         *
+         * @returns {TimeAxisConfiguration} The currently used `TimeAxisConfiguration` or `undefined`.
+         */
+        currentAxisConfiguration(): TimeAxisConfiguration;
+        /**
          * Gets the possible TimeAxisConfigurations.
          */
         axisConfigurations(): TimeAxisConfiguration[];
@@ -2178,9 +2204,10 @@ declare namespace Plottable.Axes {
         private _getIntervalLength(config);
         private _maxWidthForInterval(config);
         /**
-         * Check if tier configuration fits in the current width.
+         * Check if tier configuration fits in the current width and satisfied the
+         * max TimeInterval precision limit.
          */
-        private _checkTimeAxisTierConfigurationWidth(config);
+        private _checkTimeAxisTierConfiguration(config);
         protected _sizeFromOffer(availableWidth: number, availableHeight: number): {
             width: number;
             height: number;

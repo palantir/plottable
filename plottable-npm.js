@@ -4412,6 +4412,7 @@ var Plottable;
              */
             function Time(scale, orientation) {
                 _super.call(this, scale, orientation);
+                this._maxTimeIntervalPrecision = null;
                 this._tierLabelPositions = [];
                 this.addClass("time-axis");
                 this.tickLabelPadding(5);
@@ -4430,6 +4431,28 @@ var Plottable;
                     this.redraw();
                     return this;
                 }
+            };
+            Time.prototype.maxTimeIntervalPrecision = function (newPrecision) {
+                if (newPrecision == null) {
+                    return this._maxTimeIntervalPrecision;
+                }
+                else {
+                    this._maxTimeIntervalPrecision = newPrecision;
+                    this.redraw();
+                    return this;
+                }
+            };
+            /**
+             * Returns the current `TimeAxisConfiguration` used to render the axes.
+             *
+             * Note that this is only valid after the axis had been rendered and the
+             * most precise valid configuration is determined from the available space
+             * and maximum precision constraints.
+             *
+             * @returns {TimeAxisConfiguration} The currently used `TimeAxisConfiguration` or `undefined`.
+             */
+            Time.prototype.currentAxisConfiguration = function () {
+                return this._possibleTimeAxisConfigurations[this._mostPreciseConfigIndex];
             };
             Time.prototype.axisConfigurations = function (configurations) {
                 if (configurations == null) {
@@ -4457,7 +4480,7 @@ var Plottable;
                 var mostPreciseIndex = this._possibleTimeAxisConfigurations.length;
                 this._possibleTimeAxisConfigurations.forEach(function (interval, index) {
                     if (index < mostPreciseIndex && interval.every(function (tier) {
-                        return _this._checkTimeAxisTierConfigurationWidth(tier);
+                        return _this._checkTimeAxisTierConfiguration(tier);
                     })) {
                         mostPreciseIndex = index;
                     }
@@ -4499,9 +4522,20 @@ var Plottable;
                 return this._measurer.measure(config.formatter(Time._LONG_DATE)).width;
             };
             /**
-             * Check if tier configuration fits in the current width.
+             * Check if tier configuration fits in the current width and satisfied the
+             * max TimeInterval precision limit.
              */
-            Time.prototype._checkTimeAxisTierConfigurationWidth = function (config) {
+            Time.prototype._checkTimeAxisTierConfiguration = function (config) {
+                // Use the sorted index to determine if the teir configuration contains a
+                // time interval that is too precise for the maxTimeIntervalPrecision
+                // setting (if set).
+                if (this._maxTimeIntervalPrecision != null) {
+                    var precisionLimit = Time._SORTED_TIME_INTERVAL_INDEX[this._maxTimeIntervalPrecision];
+                    var configPrecision = Time._SORTED_TIME_INTERVAL_INDEX[config.interval];
+                    if (precisionLimit != null && configPrecision != null && configPrecision < precisionLimit) {
+                        return false;
+                    }
+                }
                 var worstWidth = this._maxWidthForInterval(config) + 2 * this.tickLabelPadding();
                 return Math.min(this._getIntervalLength(config), this.width()) >= worstWidth;
             };
@@ -4741,6 +4775,16 @@ var Plottable;
              * The CSS class applied to each Time Axis tier
              */
             Time.TIME_AXIS_TIER_CLASS = "time-axis-tier";
+            Time._SORTED_TIME_INTERVAL_INDEX = (_a = {},
+                _a[Plottable.TimeInterval.second] = 0,
+                _a[Plottable.TimeInterval.minute] = 1,
+                _a[Plottable.TimeInterval.hour] = 2,
+                _a[Plottable.TimeInterval.day] = 3,
+                _a[Plottable.TimeInterval.week] = 4,
+                _a[Plottable.TimeInterval.month] = 5,
+                _a[Plottable.TimeInterval.year] = 6,
+                _a
+            );
             Time._DEFAULT_TIME_AXIS_CONFIGURATIONS = [
                 [
                     { interval: Plottable.TimeInterval.second, step: 1, formatter: Plottable.Formatters.time("%I:%M:%S %p") },
@@ -4852,6 +4896,7 @@ var Plottable;
             ];
             Time._LONG_DATE = new Date(9999, 8, 29, 12, 59, 9999);
             return Time;
+            var _a;
         }(Plottable.Axis));
         Axes.Time = Time;
     })(Axes = Plottable.Axes || (Plottable.Axes = {}));

@@ -383,4 +383,51 @@ describe("TimeAxis", () => {
       svg.remove();
     });
   });
+
+  describe("limiting timeinterval precision", () => {
+    it("uses default axis config when maxTimeIntervalPrecision not set", () => {
+      let svg = TestMethods.generateSVG();
+      let axis = new Plottable.Axes.Time(new Plottable.Scales.Time(), "bottom");
+
+      axis.renderTo(svg);
+      let config = axis.currentAxisConfiguration();
+      assert.strictEqual(config.length, 2, "2 tiers");
+      assert.strictEqual(config[0].interval, "hour");
+      assert.strictEqual(config[1].interval, "day");
+
+      axis.destroy();
+      svg.remove();
+    });
+
+    it("still works when maxTimeIntervalPrecision is set high", () => {
+      let svg = TestMethods.generateSVG();
+      let axis = new Plottable.Axes.Time(new Plottable.Scales.Time(), "bottom");
+
+      axis.maxTimeIntervalPrecision("minute")
+      axis.renderTo(svg);
+      let config = axis.currentAxisConfiguration();
+      assert.strictEqual(config.length, 2, "2 tiers");
+      assert.strictEqual(config[0].interval, "hour");
+      assert.strictEqual(config[1].interval, "day");
+
+      axis.destroy();
+      svg.remove();
+    });
+
+    it("limits axis config when maxTimeIntervalPrecision is set", () => {
+      let svg = TestMethods.generateSVG();
+      let axis = new Plottable.Axes.Time(new Plottable.Scales.Time(), "bottom");
+
+      axis.maxTimeIntervalPrecision("day")
+      axis.renderTo(svg);
+      let config = axis.currentAxisConfiguration();
+      // day/month is most precise valid config after hour/day
+      assert.strictEqual(config.length, 2, "2 tiers");
+      assert.strictEqual(config[0].interval, "day");
+      assert.strictEqual(config[1].interval, "month");
+
+      axis.destroy();
+      svg.remove();
+    });
+  });
 });
