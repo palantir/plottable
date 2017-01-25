@@ -1,9 +1,9 @@
 general:
   artifacts:
     - demo/**/*.{css,html,js}
-dependencies:
-  pre:
-    - case $CIRCLE_NODE_INDEX in 0) nvm use 4.2 ;; 1) nvm use 5.7 ;; 2) nvm use 6.1 ;; esac
+machine:
+  node:
+    version: 6.1
 test:
   override:
     - npm test
