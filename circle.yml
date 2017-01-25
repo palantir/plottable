@@ -1,6 +1,7 @@
 general:
   artifacts:
     - demo
+    - plottable.css
 machine:
   node:
     version: 6.1
