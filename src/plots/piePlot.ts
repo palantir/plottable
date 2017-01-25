@@ -35,10 +35,10 @@ namespace Plottable.Plots {
 
     public computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number) {
       super.computeLayout(origin, availableWidth, availableHeight);
-      
+
       let pieCenter = this._pieCenter()
       this._renderArea.attr("transform", "translate(" + pieCenter.x + "," + pieCenter.y + ")");
-      
+
       let radiusLimit = Math.min(Math.max(this.width() - pieCenter.x, pieCenter.x), Math.max(this.height() - pieCenter.y, pieCenter.y));
 
       if (this.innerRadius().scale != null) {
@@ -476,7 +476,7 @@ namespace Plottable.Plots {
         if (!Plottable.Utils.Math.isValidNumber(value)) {
           return;
         }
-        value = this._labelFormatter(value);
+        value = this._labelFormatter(value, datum, datumIndex, dataset);
         let measurement = measurer.measure(value);
 
         let theta = (this._endAngles[datumIndex] + this._startAngles[datumIndex]) / 2;

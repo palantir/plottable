@@ -7954,7 +7954,7 @@ var Plottable;
                     if (!Plottable.Utils.Math.isValidNumber(value)) {
                         return;
                     }
-                    value = _this._labelFormatter(value);
+                    value = _this._labelFormatter(value, datum, datumIndex, dataset);
                     var measurement = measurer.measure(value);
                     var theta = (_this._endAngles[datumIndex] + _this._startAngles[datumIndex]) / 2;
                     var outerRadius = _this.outerRadius().accessor(datum, datumIndex, dataset);
@@ -9206,7 +9206,7 @@ var Plottable;
                     var scaledBaseline = valueScale != null ? valueScale.scale(_this.baselineValue()) : _this.baselineValue();
                     var barWidth = attrToProjector["width"](d, i, dataset);
                     var barHeight = attrToProjector["height"](d, i, dataset);
-                    var text = _this._labelFormatter(valueAccessor(d, i, dataset));
+                    var text = _this._labelFormatter(valueAccessor(d, i, dataset), d, i, dataset);
                     var measurement = measurer.measure(text);
                     var xAlignment = "center";
                     var yAlignment = "center";

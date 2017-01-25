@@ -470,7 +470,7 @@ namespace Plottable.Plots {
 
         let barWidth = attrToProjector["width"](d, i, dataset);
         let barHeight = attrToProjector["height"](d, i, dataset);
-        let text = this._labelFormatter(valueAccessor(d, i, dataset));
+        let text = this._labelFormatter(valueAccessor(d, i, dataset), d, i, dataset);
         let measurement = measurer.measure(text);
 
         let xAlignment = "center";
