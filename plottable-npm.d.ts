@@ -2166,10 +2166,10 @@ declare namespace Plottable.Axes {
         /**
          * Sets the maximum TimeInterval precision. This limits the display to not
          * show time intervals above this precision. For example, if this is set to
-         * `TimeInterval.day` then no hours or minute ticks will be displayed in the
-         * axis.
+         * `TimeInterval.day` or `"day"` then no hours or minute ticks will be
+         * displayed in the axis.
          *
-         * @param {TimeInterval} newPositions The positions for each tier. "bottom" and "center" are the only supported values.
+         * @param {TimeInterval} newPrecision The new maximum precision.
          * @returns {Axes.Time} The calling Time Axis.
          */
         maxTimeIntervalPrecision(newPrecision: string): this;
@@ -2327,6 +2327,8 @@ declare namespace Plottable.Axes {
          * @returns {SVGTypewriter.Writer}
          */
         private readonly _writer;
+        private _tickTextAlignment;
+        private _tickTextPadding;
         /**
          * Constructs a Category Axis.
          *
@@ -2362,6 +2364,53 @@ declare namespace Plottable.Axes {
          */
         getDownsampleInfo(scale?: Scales.Category): DownsampleInfo;
         /**
+         * Gets the current alignment. If not set, null will be returned.
+         */
+        tickTextAlignment(): string;
+        /**
+         * Set alignment of tick labels. Must be one of "left", "right",
+         * or "center", or a falsy value. Setting to a falsy value will
+         * reset tick label alignment to the default alignment.
+         *
+         * Note that alignment is applied before rotation (see "{@link
+         * tickLabelAngle}").
+         *
+         * @param {String} tickTextAlignment One of "left", "right", "center",
+         * or a falsy value.
+         *
+         * @returns {Category} The calling Category.
+         */
+        tickTextAlignment(tickTextAlignment: string): this;
+        /**
+         * Returns the current padding between tick labels and the
+         * opposite edge of the axis.
+         */
+        tickTextPadding(): number;
+        /**
+         * Sets Padding between labels and outer edge of the axis (i.e.,
+         * the edge opposite the plot, as defined by the axis' {@link
+         * orientation}).
+         *
+         * Padding will only be applied when {@link tickTextAlignment} is
+         * set and either of the following conditions hold:
+         *
+         *   * Orientation is "left" or "right"; labels are not rotated;
+         *     for "left" orientation, {@link tickTextAlignment} must be
+         *     "left". For "right" orientation, {@link tickTextAlignment}
+         *     must be "right".
+         *
+         *   * Orientation is "top" or "bottom"; labels are rotated. For
+         *     "top" orientation and 90 rotation, alignment must "left";
+         *     for -90 rotation, alignment must be "right". For "bottom"
+         *     orientation and 90 rotation, alignment must "right"; For
+         *     -90 rotation, alignment must be "left".
+         *
+         * @param {Number} tickTextPadding Padding in pixels.
+         *
+         * @returns {Category} The calling Category.
+         */
+        tickTextPadding(tickTextPadding: number): this;
+        /**
          * Gets the tick label angle in degrees.
          */
         tickLabelAngle(): number;
@@ -2382,6 +2431,7 @@ declare namespace Plottable.Axes {
          * @returns {number}
          */
         private _tickSpaceRequired();
+        private _calcTextPadding();
         /**
          * Write ticks to the DOM.
          * @param {Plottable.Scales.Category} scale The scale this axis is representing.
@@ -2684,17 +2734,26 @@ declare namespace Plottable.Components {
         private _yScale;
         private _xLinesContainer;
         private _yLinesContainer;
+        private _xTicks;
+        private _yTicks;
         private _renderCallback;
         /**
          * @constructor
-         * @param {QuantitativeScale} xScale The scale to base the x gridlines on. Pass null if no gridlines are desired.
-         * @param {QuantitativeScale} yScale The scale to base the y gridlines on. Pass null if no gridlines are desired.
+         *
+         * @param {Scale<any, number>} xScale The scale to base the x
+         * gridlines on. Can be a category or numeric scale. Pass null if
+         * no gridlines are desired.
+         *
+         * @param {Scale<any, number>} yScale The scale to base the y
+         * gridlines on. Can be a category or numeric scale. Pass null if
+         * no gridlines are desired.
          */
-        constructor(xScale: QuantitativeScale<any>, yScale: QuantitativeScale<any>);
+        constructor(xScale: QuantitativeScale<any> | Plottable.Scales.Category, yScale: QuantitativeScale<any> | Plottable.Scales.Category);
         destroy(): this;
         protected _setup(): void;
         renderImmediately(): this;
         computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number): this;
+        private _mkTicks(scale);
         private _redrawXLines();
         private _redrawYLines();
     }

@@ -5210,6 +5210,8 @@ var Plottable;
                 if (orientation === void 0) { orientation = "bottom"; }
                 _super.call(this, scale, orientation);
                 this._tickLabelAngle = 0;
+                this._tickTextAlignment = null;
+                this._tickTextPadding = 0;
                 this.addClass("category-axis");
             }
             Object.defineProperty(Category.prototype, "_wrapper", {
@@ -5307,6 +5309,29 @@ var Plottable;
                     stepWidth: downsampleRatio * scale.stepWidth(),
                 };
             };
+            Category.prototype.tickTextAlignment = function (tickTextAlignment) {
+                if (arguments.length === 0) {
+                    return this._tickTextAlignment;
+                }
+                if (!tickTextAlignment) {
+                    this._tickTextAlignment = null;
+                }
+                else {
+                    var v = tickTextAlignment.toLowerCase();
+                    if (v !== "left" && v !== "right" && v !== "center") {
+                        throw new Error("tickTextAlignment '" + tickTextAlignment + "' not supported. Must be left, right, or center.");
+                    }
+                    this._tickTextAlignment = v;
+                }
+                return this;
+            };
+            Category.prototype.tickTextPadding = function (tickTextPadding) {
+                if (arguments.length === 0) {
+                    return this._tickTextPadding;
+                }
+                this._tickTextPadding = tickTextPadding ? tickTextPadding : 0;
+                return this;
+            };
             Category.prototype.tickLabelAngle = function (angle) {
                 if (angle == null) {
                     return this._tickLabelAngle;
@@ -5362,6 +5387,54 @@ var Plottable;
             Category.prototype._tickSpaceRequired = function () {
                 return this._maxLabelTickLength() + this.tickLabelPadding();
             };
+            Category.prototype._calcTextPadding = function () {
+                // Padding always moves the label *away* from the outer edge of
+                // the axis (tickLabelPadding moves labels away from the inner
+                // edge of the axis already).
+                // The pad value gives the amount of padding that must be
+                // subtracted from overall space when renderign text (import for
+                // proper line breaking).
+                //
+                // The translate value gives the amount the label should be
+                // moved to give the proper padding.
+                //
+                // Pad will always be a positive amount, but translate can be
+                // negative depending on rotation of labels and axis
+                // orientation.
+                var pad = { x: 0, y: 0 };
+                var translate = { x: 0, y: 0 };
+                if (this.tickLabelAngle() === 0 && !this.isHorizontal()) {
+                    if (this.orientation() === "right" && this.tickTextAlignment() === "right") {
+                        pad.x = this.tickTextPadding();
+                        translate.x = this.tickTextPadding() * -1;
+                    }
+                    else if (this.orientation() === "left" && this.tickTextAlignment() === "left") {
+                        pad.x = this.tickTextPadding();
+                        translate.x = this.tickTextPadding();
+                    }
+                }
+                else if (this.tickLabelAngle() === -90) {
+                    if (this.orientation() === "top" && this.tickTextAlignment() === "right") {
+                        pad.y = this.tickTextPadding();
+                        translate.y = this.tickTextPadding();
+                    }
+                    else if (this.orientation() === "bottom" && this.tickTextAlignment() === "left") {
+                        pad.y = this.tickTextPadding();
+                        translate.y = this.tickTextPadding() * -1;
+                    }
+                }
+                else if (this.tickLabelAngle() === 90) {
+                    if (this.orientation() === "top" && this.tickTextAlignment() === "left") {
+                        pad.y = this.tickTextPadding();
+                        translate.y = this.tickTextPadding();
+                    }
+                    else if (this.orientation() === "bottom" && this.tickTextAlignment() === "right") {
+                        pad.y = this.tickTextPadding();
+                        translate.y = this.tickTextPadding() * -1;
+                    }
+                }
+                return { pad: pad, translate: translate };
+            };
             /**
              * Write ticks to the DOM.
              * @param {Plottable.Scales.Category} scale The scale this axis is representing.
@@ -5371,6 +5444,9 @@ var Plottable;
                 var self = this;
                 var xAlign;
                 var yAlign;
+                var result = this._calcTextPadding();
+                var pad = result.pad;
+                var translate = result.translate;
                 switch (this.tickLabelAngle()) {
                     case 0:
                         xAlign = { left: "right", right: "left", top: "center", bottom: "center" };
@@ -5386,11 +5462,11 @@ var Plottable;
                         break;
                 }
                 ticks.each(function (d) {
-                    var width = self.isHorizontal() ? stepWidth : self.width() - self._tickSpaceRequired();
-                    var height = self.isHorizontal() ? self.height() - self._tickSpaceRequired() : stepWidth;
+                    var width = self.isHorizontal() ? stepWidth : self.width() - self._tickSpaceRequired() - pad.x;
+                    var height = self.isHorizontal() ? self.height() - self._tickSpaceRequired() - pad.y : stepWidth;
                     var writeOptions = {
                         selection: d3.select(this),
-                        xAlign: xAlign[self.orientation()],
+                        xAlign: self.tickTextAlignment() || xAlign[self.orientation()],
                         yAlign: yAlign[self.orientation()],
                         textRotation: self.tickLabelAngle(),
                     };
@@ -5405,6 +5481,10 @@ var Plottable;
                         width = Math.min(width, self._tickLabelMaxWidth);
                     }
                     self._writer.write(self.formatter()(d), width, height, writeOptions);
+                    if (translate.x !== 0 || translate.y !== 0) {
+                        var text = writeOptions.selection;
+                        text.attr("transform", "translate(" + translate.x + ", " + translate.y + ") " + text.attr("transform"));
+                    }
                 });
             };
             /**
@@ -5425,13 +5505,14 @@ var Plottable;
                     .outerPadding(thisScale.outerPadding())
                     .range([0, this.isHorizontal() ? axisWidth : axisHeight]);
                 var _a = this.getDownsampleInfo(scale), domain = _a.domain, stepWidth = _a.stepWidth;
+                var tickTextPadding = this._calcTextPadding().pad;
                 // HACKHACK: https://github.com/palantir/svg-typewriter/issues/25
                 // the width (x-axis specific) available to a single tick label.
-                var width = axisWidth - this._tickSpaceRequired(); // default for left/right
+                var width = axisWidth - this._tickSpaceRequired() - tickTextPadding.x; // default for left/right
                 if (this.isHorizontal()) {
                     width = stepWidth; // defaults to the band width
                     if (this._tickLabelAngle !== 0) {
-                        width = axisHeight - this._tickSpaceRequired(); // use the axis height
+                        width = axisHeight - this._tickSpaceRequired() - tickTextPadding.y; // use the axis height
                     }
                     // HACKHACK: Wrapper fails under negative circumstances
                     width = Math.max(width, 0);
@@ -5439,7 +5520,7 @@ var Plottable;
                 // HACKHACK: https://github.com/palantir/svg-typewriter/issues/25
                 // the height (y-axis specific) available to a single tick label.
                 var height = stepWidth; // default for left/right
-                if (this.isHorizontal()) {
+                if (!this.isHorizontal()) {
                     height = axisHeight - this._tickSpaceRequired();
                     if (this._tickLabelAngle !== 0) {
                         height = axisWidth - this._tickSpaceRequired();
@@ -5462,6 +5543,12 @@ var Plottable;
                 // HACKHACK: https://github.com/palantir/svg-typewriter/issues/25
                 if (this._tickLabelAngle !== 0) {
                     _b = [usedHeight, usedWidth], usedWidth = _b[0], usedHeight = _b[1];
+                }
+                if (this.isHorizontal()) {
+                    usedHeight += tickTextPadding.y;
+                }
+                else {
+                    usedWidth += tickTextPadding.x;
                 }
                 return {
                     usedWidth: usedWidth,
@@ -6200,26 +6287,37 @@ var Plottable;
             __extends(Gridlines, _super);
             /**
              * @constructor
-             * @param {QuantitativeScale} xScale The scale to base the x gridlines on. Pass null if no gridlines are desired.
-             * @param {QuantitativeScale} yScale The scale to base the y gridlines on. Pass null if no gridlines are desired.
+             *
+             * @param {Scale<any, number>} xScale The scale to base the x
+             * gridlines on. Can be a category or numeric scale. Pass null if
+             * no gridlines are desired.
+             *
+             * @param {Scale<any, number>} yScale The scale to base the y
+             * gridlines on. Can be a category or numeric scale. Pass null if
+             * no gridlines are desired.
              */
             function Gridlines(xScale, yScale) {
                 var _this = this;
-                if (xScale != null && !(Plottable.QuantitativeScale.prototype.isPrototypeOf(xScale))) {
-                    throw new Error("xScale needs to inherit from Scale.QuantitativeScale");
-                }
-                if (yScale != null && !(Plottable.QuantitativeScale.prototype.isPrototypeOf(yScale))) {
-                    throw new Error("yScale needs to inherit from Scale.QuantitativeScale");
-                }
+                var check = function (scale, which) {
+                    if (scale != null &&
+                        !Plottable.QuantitativeScale.prototype.isPrototypeOf(scale) &&
+                        !Plottable.Scales.Category.prototype.isPrototypeOf(scale)) {
+                        throw new Error(which + " needs to inherit from Scale.QuantitativeScale or Scales.Category.");
+                    }
+                };
+                check(xScale, "xScale");
+                check(yScale, "yScale");
                 _super.call(this);
                 this.addClass("gridlines");
                 this._xScale = xScale;
                 this._yScale = yScale;
                 this._renderCallback = function (scale) { return _this.render(); };
                 if (this._xScale) {
+                    this._xTicks = this._mkTicks(xScale);
                     this._xScale.onUpdate(this._renderCallback);
                 }
                 if (this._yScale) {
+                    this._yTicks = this._mkTicks(yScale);
                     this._yScale.onUpdate(this._renderCallback);
                 }
             }
@@ -6254,10 +6352,19 @@ var Plottable;
                 }
                 return this;
             };
+            Gridlines.prototype._mkTicks = function (scale) {
+                if (Plottable.QuantitativeScale.prototype.isPrototypeOf(scale)) {
+                    return function () { return scale.ticks(); };
+                }
+                else {
+                    // if (Plottable.Scales.Category.prototype.isPrototypeOf(scale)) {
+                    return function () { return scale.domain(); };
+                }
+            };
             Gridlines.prototype._redrawXLines = function () {
                 var _this = this;
                 if (this._xScale) {
-                    var xTicks = this._xScale.ticks();
+                    var xTicks = this._xTicks();
                     var getScaledXValue = function (tickVal) { return _this._xScale.scale(tickVal); };
                     var xLines = this._xLinesContainer.selectAll("line").data(xTicks);
                     xLines.enter().append("line");
@@ -6272,8 +6379,8 @@ var Plottable;
             Gridlines.prototype._redrawYLines = function () {
                 var _this = this;
                 if (this._yScale) {
-                    var yTicks = this._yScale.ticks();
                     var getScaledYValue = function (tickVal) { return _this._yScale.scale(tickVal); };
+                    var yTicks = this._yTicks();
                     var yLines = this._yLinesContainer.selectAll("line").data(yTicks);
                     yLines.enter().append("line");
                     yLines.attr("x1", 0)
