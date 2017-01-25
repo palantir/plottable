@@ -1,6 +1,6 @@
 general:
   artifacts:
-    - demo/**/*.{css,html,js}
+    - demo
 machine:
   node:
     version: 6.1
