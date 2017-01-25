@@ -2165,10 +2165,10 @@ declare namespace Plottable.Axes {
         /**
          * Sets the maximum TimeInterval precision. This limits the display to not
          * show time intervals above this precision. For example, if this is set to
-         * `TimeInterval.day` then no hours or minute ticks will be displayed in the
-         * axis.
+         * `TimeInterval.day` or `"day"` then no hours or minute ticks will be
+         * displayed in the axis.
          *
-         * @param {TimeInterval} newPositions The positions for each tier. "bottom" and "center" are the only supported values.
+         * @param {TimeInterval} newPrecision The new maximum precision.
          * @returns {Axes.Time} The calling Time Axis.
          */
         maxTimeIntervalPrecision(newPrecision: string): this;
