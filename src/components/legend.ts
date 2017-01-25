@@ -290,9 +290,9 @@ namespace Plottable.Components {
       super._setup();
       let fakeLegendRow = this.content().append("g").classed(Legend.LEGEND_ROW_CLASS, true);
       let fakeLegendEntry = fakeLegendRow.append("g").classed(Legend.LEGEND_ENTRY_CLASS, true);
-      fakeLegendEntry.append("text");
+      fakeLegendEntry.append("text"); 
       this._measurer = new SVGTypewriter.Measurer(fakeLegendRow);
-      this._wrapper = new SVGTypewriter.Wrappers.Wrapper().maxLines(this.maxLinesPerEntry());
+      this._wrapper = new SVGTypewriter.Wrapper().maxLines(this.maxLinesPerEntry());
       this._writer = new SVGTypewriter.Writer(this._measurer, this._wrapper).addTitleElement(Configs.ADD_TITLE_ELEMENTS);
     }
 
@@ -494,7 +494,10 @@ namespace Plottable.Components {
     public requestedSpace(offeredWidth: number, offeredHeight: number): SpaceRequest {
       // if max width is set, the table is guaranteed to be at most maxWidth wide.
       // if max width is not set, the table will be as wide as the longest untruncated row
-      const table = this._buildLegendTable(Utils.Math.min([this.maxWidth(), Infinity], Infinity), offeredHeight);
+      const table = this._buildLegendTable(
+        Utils.Math.min([this.maxWidth(), offeredWidth], offeredWidth),
+        offeredHeight
+      );
 
       return {
         minHeight: table.getHeight(),

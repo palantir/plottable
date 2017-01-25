@@ -5677,6 +5677,207 @@ var Plottable;
 (function (Plottable) {
     var Components;
     (function (Components) {
+        /**
+         * The Legend's column representation. Stores position information
+         * as well as data
+         */
+        var LegendColumn = (function () {
+            function LegendColumn(_width, _height, _data) {
+                if (_width === void 0) { _width = 0; }
+                if (_height === void 0) { _height = 0; }
+                this._width = _width;
+                this._height = _height;
+                this._data = _data;
+            }
+            /**
+             * @return {T} data Returns any data stored in the column
+             */
+            LegendColumn.prototype.getData = function () {
+                return this._data;
+            };
+            /**
+             * @return {number} height The height of the column.
+             */
+            LegendColumn.prototype.getHeight = function () {
+                return this._height;
+            };
+            /**
+             * @return {number} width The width of the column.
+             */
+            LegendColumn.prototype.getWidth = function () {
+                return this._width;
+            };
+            /**
+             * @param {number} width Sets the width of the column
+             */
+            LegendColumn.prototype.setWidth = function (width) {
+                return this._width = width;
+            };
+            return LegendColumn;
+        }());
+        /**
+         * The Legend's row representations. Stores positioning information
+         * and column data.
+         */
+        var LegendRow = (function () {
+            function LegendRow(_columns, _bottomPadding, _maxWidth) {
+                if (_columns === void 0) { _columns = []; }
+                if (_bottomPadding === void 0) { _bottomPadding = 0; }
+                if (_maxWidth === void 0) { _maxWidth = Infinity; }
+                this._columns = _columns;
+                this._bottomPadding = _bottomPadding;
+                this._maxWidth = _maxWidth;
+            }
+            LegendRow.prototype.addColumn = function (column) {
+                var desiredColumnWidth = column.getWidth();
+                // choose the smaller of 1) remaining space, 2) desired width
+                var widthRemaining = this.getWidthAvailable();
+                column.setWidth(Math.min(widthRemaining, desiredColumnWidth));
+                this._columns.push(column);
+            };
+            LegendRow.prototype.forEach = function (callback) {
+                this._columns.forEach(callback);
+            };
+            LegendRow.prototype.reduce = function (callbackfn, initialValue) {
+                return this._columns.reduce(callbackfn, initialValue);
+            };
+            /**
+             * Returns the bounds the column, relative to the row.
+             * @param {LegendColumn<any>} column The column in question
+             * @returns {Bounds} bounds
+             */
+            LegendRow.prototype.getBounds = function (column) {
+                var indexOfColumn = this._columns.indexOf(column);
+                var columnXOffset = this._columns.slice(0, indexOfColumn)
+                    .reduce(function (sum, column) { return sum + column.getWidth(); }, 0);
+                return {
+                    topLeft: { x: columnXOffset, y: 0 },
+                    bottomRight: {
+                        x: columnXOffset + column.getWidth(),
+                        y: column.getHeight(),
+                    }
+                };
+            };
+            LegendRow.prototype.getColumns = function () {
+                return this._columns;
+            };
+            /**
+             * Returns the height of the row, including the bottomPadding.
+             * @return {number} height
+             */
+            LegendRow.prototype.getHeight = function () {
+                return Plottable.Utils.Math.max(this._columns.map(function (column) { return column.getHeight(); }), 0)
+                    + this._bottomPadding;
+            };
+            /**
+             * Padding applied below the row. Affects the spacing between rows. Defaults to 0.
+             * @param {bottomPadding} number
+             */
+            LegendRow.prototype.setBottomPadding = function (bottomPadding) {
+                this._bottomPadding = bottomPadding;
+            };
+            /**
+             * Sets the maximum allowable width of this column.
+             * @param {number} maxWidth
+             */
+            LegendRow.prototype.setMaxWidth = function (maxWidth) {
+                this._maxWidth = maxWidth;
+            };
+            /**
+             * Returns the current width of the row constrained by maxWidth, if set.
+             * @returns {number} width
+             */
+            LegendRow.prototype.getWidth = function () {
+                return Math.min(this._columns.reduce(function (sum, column) { return sum + column.getWidth(); }, 0), this._maxWidth);
+            };
+            /**
+             * Returns the remaining width available in the row based on the maximum
+             * width of this row.
+             * @returns {number} widthRemaining
+             */
+            LegendRow.prototype.getWidthAvailable = function () {
+                var widthConsumed = this.getWidth();
+                return Math.max(this._maxWidth - widthConsumed, 0);
+            };
+            return LegendRow;
+        }());
+        /**
+         * Stores LegendRows. Useful for calculating and maintaining
+         * positioning information about the Legend.
+         */
+        var LegendTable = (function () {
+            function LegendTable(_maxWidth, _maxHeight, _padding, _rows) {
+                if (_maxWidth === void 0) { _maxWidth = Infinity; }
+                if (_maxHeight === void 0) { _maxHeight = Infinity; }
+                if (_padding === void 0) { _padding = 0; }
+                if (_rows === void 0) { _rows = []; }
+                this._maxWidth = _maxWidth;
+                this._maxHeight = _maxHeight;
+                this._padding = _padding;
+                this._rows = _rows;
+            }
+            LegendTable.prototype.addRow = function (row) {
+                row.setMaxWidth(this._maxWidth - this._padding * 2);
+                this._rows.push(row);
+            };
+            LegendTable.prototype.forEach = function (callback) {
+                this._rows.forEach(callback);
+            };
+            /**
+             * Returns the bounds relative to the parent and siblings of the row or
+             * column. If column is not specified, bounds will be calculate for the row only.
+             * If the column is specified, the bounds will be calculate for the column only.
+             *
+             * @param {LegendRow} row The row to calculate bounds
+             * @param {LegendColumn} column The column to calculate bounds.
+             * @returns {Bounds}
+             */
+            LegendTable.prototype.getBounds = function (row, column) {
+                var indexOfRow = this._rows.indexOf(row);
+                var rowYOffset = this._rows.slice(0, indexOfRow)
+                    .reduce(function (sum, row) { return sum + row.getHeight(); }, this._padding);
+                var rowXOffset = this._padding;
+                var rowBounds = {
+                    topLeft: { x: rowXOffset, y: rowYOffset },
+                    bottomRight: {
+                        x: rowXOffset + row.getWidth(),
+                        y: rowYOffset + row.getHeight(),
+                    }
+                };
+                if (column !== undefined) {
+                    var columnBounds = row.getBounds(column);
+                    columnBounds.topLeft.x += rowBounds.topLeft.x;
+                    columnBounds.bottomRight.x += rowBounds.topLeft.x;
+                    columnBounds.topLeft.y += rowBounds.topLeft.y;
+                    columnBounds.bottomRight.y += rowBounds.topLeft.y;
+                    return columnBounds;
+                }
+                return rowBounds;
+            };
+            LegendTable.prototype.getRows = function () {
+                return this._rows;
+            };
+            /**
+             * Returns the height of the Table, constrained by a maximum height, if set.
+             * The height includes the padding, if set.
+             * @returns {number} height
+             */
+            LegendTable.prototype.getHeight = function () {
+                return Math.min(this._rows.reduce(function (sum, row) { return sum + row.getHeight(); }, 0) + this._padding * 2, this._maxHeight);
+            };
+            /**
+             * Returns the width of the table, constrained by the maximum width, if set.
+             * The width includes the padding, if set.
+             * @returns {number} width
+             */
+            LegendTable.prototype.getWidth = function () {
+                return Math.min(Plottable.Utils.Math.max(this._rows.map(function (row) { return row.getWidth(); }), 0) + this._padding * 2, this._maxWidth);
+            };
+            LegendTable.prototype.reduce = function (callbackfn, initialValue) {
+                return this._rows.reduce(callbackfn, initialValue);
+            };
+            return LegendTable;
+        }());
         var Legend = (function (_super) {
             __extends(Legend, _super);
             /**
@@ -5689,6 +5890,7 @@ var Plottable;
                 var _this = this;
                 _super.call(this);
                 this._padding = 5;
+                this._rowBottomPadding = 3;
                 this.addClass("legend");
                 this.maxEntriesPerRow(1);
                 if (colorScale == null) {
@@ -5698,6 +5900,7 @@ var Plottable;
                 this._redrawCallback = function (scale) { return _this.redraw(); };
                 this._colorScale.onUpdate(this._redrawCallback);
                 this._formatter = Plottable.Formatters.identity();
+                this.maxLinesPerEntry(1);
                 this.xAlignment("right").yAlignment("top");
                 this.comparator(function (a, b) {
                     var formattedText = _this._colorScale.domain().slice().map(function (d) { return _this._formatter(d); });
@@ -5712,7 +5915,7 @@ var Plottable;
                 var fakeLegendEntry = fakeLegendRow.append("g").classed(Legend.LEGEND_ENTRY_CLASS, true);
                 fakeLegendEntry.append("text");
                 this._measurer = new SVGTypewriter.Measurer(fakeLegendRow);
-                this._wrapper = new SVGTypewriter.Wrapper().maxLines(1);
+                this._wrapper = new SVGTypewriter.Wrapper().maxLines(this.maxLinesPerEntry());
                 this._writer = new SVGTypewriter.Writer(this._measurer, this._wrapper).addTitleElement(Plottable.Configs.ADD_TITLE_ELEMENTS);
             };
             Legend.prototype.formatter = function (formatter) {
@@ -5729,6 +5932,26 @@ var Plottable;
                 }
                 else {
                     this._maxEntriesPerRow = maxEntriesPerRow;
+                    this.redraw();
+                    return this;
+                }
+            };
+            Legend.prototype.maxLinesPerEntry = function (maxLinesPerEntry) {
+                if (maxLinesPerEntry == null) {
+                    return this._maxLinesPerEntry;
+                }
+                else {
+                    this._maxLinesPerEntry = maxLinesPerEntry;
+                    this.redraw();
+                    return this;
+                }
+            };
+            Legend.prototype.maxWidth = function (maxWidth) {
+                if (maxWidth == null) {
+                    return this._maxWidth;
+                }
+                else {
+                    this._maxWidth = maxWidth;
                     this.redraw();
                     return this;
                 }
@@ -5759,62 +5982,58 @@ var Plottable;
                 _super.prototype.destroy.call(this);
                 this._colorScale.offUpdate(this._redrawCallback);
             };
-            Legend.prototype._calculateLayoutInfo = function (availableWidth, availableHeight) {
+            Legend.prototype._buildLegendTable = function (width, height) {
                 var _this = this;
                 var textHeight = this._measurer.measure().height;
-                var availableWidthForEntries = Math.max(0, (availableWidth - this._padding));
+                var table = new LegendTable(width, height, this._padding);
                 var entryNames = this._colorScale.domain().slice().sort(function (a, b) { return _this._comparator(_this._formatter(a), _this._formatter(b)); });
-                var entryLengths = d3.map();
-                var untruncatedEntryLengths = d3.map();
-                entryNames.forEach(function (entryName) {
-                    var untruncatedEntryLength = textHeight + _this._measurer.measure(_this._formatter(entryName)).width + _this._padding;
-                    var entryLength = Math.min(untruncatedEntryLength, availableWidthForEntries);
-                    entryLengths.set(entryName, entryLength);
-                    untruncatedEntryLengths.set(entryName, untruncatedEntryLength);
+                var row = new LegendRow();
+                table.addRow(row);
+                entryNames.forEach(function (entryName, index) {
+                    if (row.getColumns().length / 2 === _this.maxEntriesPerRow()) {
+                        // we add two columns per entry, a symbol column and a name column
+                        // if the current row is full, according to the number of entries
+                        // we're allowed to have per row, we need to allocate new space
+                        row = new LegendRow();
+                        row.setBottomPadding(_this._rowBottomPadding);
+                        table.addRow(row);
+                    }
+                    var availableWidth = row.getWidthAvailable();
+                    var formattedName = _this._formatter(entryName);
+                    // this is the width of the series name without any line wrapping
+                    // it is the most optimal presentation of the name
+                    var unwrappedNameWidth = _this._measurer.measure(formattedName).width;
+                    var willBeSquished = (availableWidth - textHeight - unwrappedNameWidth) < 0;
+                    if (willBeSquished && row.getColumns().length > 1) {
+                        // adding the entry to this row will squish this
+                        // entry. The row already contains entries so create
+                        // a new row to add this entry to for optimal display
+                        row = new LegendRow();
+                        row.setBottomPadding(_this._rowBottomPadding);
+                        table.addRow(row);
+                    }
+                    var symbolColumn = new LegendColumn(textHeight, textHeight, entryName);
+                    row.addColumn(symbolColumn);
+                    // the space consumed by the name field is the minimum of the space available in the table
+                    // and the actual width consumed by the name
+                    availableWidth = row.getWidthAvailable();
+                    var usedNameWidth = Math.min(availableWidth, unwrappedNameWidth);
+                    _this._wrapper.maxLines(_this.maxLinesPerEntry());
+                    var numberOfRows = _this._wrapper.wrap(formattedName, _this._measurer, usedNameWidth).noLines;
+                    var nameColumnHeight = numberOfRows * textHeight;
+                    var nameColumn = new LegendColumn(usedNameWidth, nameColumnHeight, entryName);
+                    row.addColumn(nameColumn);
                 });
-                var rows = this._packRows(availableWidthForEntries, entryNames, entryLengths);
-                var rowsAvailable = Math.floor((availableHeight - 2 * this._padding) / textHeight);
-                if (rowsAvailable !== rowsAvailable) {
-                    rowsAvailable = 0;
-                }
-                return {
-                    textHeight: textHeight,
-                    entryLengths: entryLengths,
-                    untruncatedEntryLengths: untruncatedEntryLengths,
-                    rows: rows,
-                    numRowsToDraw: Math.max(Math.min(rowsAvailable, rows.length), 0),
-                };
+                return table;
             };
             Legend.prototype.requestedSpace = function (offeredWidth, offeredHeight) {
-                var estimatedLayout = this._calculateLayoutInfo(offeredWidth, offeredHeight);
-                var untruncatedRowLengths = estimatedLayout.rows.map(function (row) {
-                    return d3.sum(row, function (entry) { return estimatedLayout.untruncatedEntryLengths.get(entry); });
-                });
-                var longestUntruncatedRowLength = Plottable.Utils.Math.max(untruncatedRowLengths, 0);
+                // if max width is set, the table is guaranteed to be at most maxWidth wide.
+                // if max width is not set, the table will be as wide as the longest untruncated row
+                var table = this._buildLegendTable(Plottable.Utils.Math.min([this.maxWidth(), offeredWidth], offeredWidth), offeredHeight);
                 return {
-                    minWidth: this._padding + longestUntruncatedRowLength,
-                    minHeight: estimatedLayout.rows.length * estimatedLayout.textHeight + 2 * this._padding,
+                    minHeight: table.getHeight(),
+                    minWidth: table.getWidth()
                 };
-            };
-            Legend.prototype._packRows = function (availableWidth, entries, entryLengths) {
-                var _this = this;
-                var rows = [];
-                var currentRow = [];
-                var spaceLeft = availableWidth;
-                entries.forEach(function (e) {
-                    var entryLength = entryLengths.get(e);
-                    if (entryLength > spaceLeft || currentRow.length === _this._maxEntriesPerRow) {
-                        rows.push(currentRow);
-                        currentRow = [];
-                        spaceLeft = availableWidth;
-                    }
-                    currentRow.push(e);
-                    spaceLeft -= entryLength;
-                });
-                if (currentRow.length !== 0) {
-                    rows.push(currentRow);
-                }
-                return rows;
             };
             /**
              * Gets the Entities (representing Legend entries) at a particular point.
@@ -5824,82 +6043,94 @@ var Plottable;
              * @returns {Entity<Legend>[]}
              */
             Legend.prototype.entitiesAt = function (p) {
+                var _this = this;
                 if (!this._isSetup) {
                     return [];
                 }
-                var entities = [];
-                var layout = this._calculateLayoutInfo(this.width(), this.height());
-                var legendPadding = this._padding;
-                var legend = this;
-                this.content().selectAll("g." + Legend.LEGEND_ROW_CLASS).each(function (d, i) {
-                    var lowY = i * layout.textHeight + legendPadding;
-                    var highY = (i + 1) * layout.textHeight + legendPadding;
-                    var symbolY = (lowY + highY) / 2;
-                    var lowX = legendPadding;
-                    var highX = legendPadding;
-                    d3.select(this).selectAll("g." + Legend.LEGEND_ENTRY_CLASS).each(function (value) {
-                        highX += layout.entryLengths.get(value);
-                        var symbolX = lowX + layout.textHeight / 2;
-                        if (highX >= p.x && lowX <= p.x &&
-                            highY >= p.y && lowY <= p.y) {
-                            var entrySelection = d3.select(this);
-                            var datum = entrySelection.datum();
-                            entities.push({
-                                datum: datum,
-                                position: { x: symbolX, y: symbolY },
-                                selection: entrySelection,
-                                component: legend,
-                            });
+                function within(p, bounds) {
+                    return bounds.topLeft.x <= p.x
+                        && bounds.bottomRight.x >= p.x
+                        && bounds.topLeft.y <= p.y
+                        && bounds.bottomRight.y >= p.y;
+                }
+                ;
+                var table = this._buildLegendTable(this.width(), this.height());
+                return table.reduce(function (entity, row, rowIndex) {
+                    if (entity.length !== 0) {
+                        // we've already found the nearest entity; just return it.
+                        return entity;
+                    }
+                    var rowBounds = table.getBounds(row);
+                    var withinRow = within(p, rowBounds);
+                    if (!withinRow) {
+                        // the nearest entity isn't within this row, continue;
+                        return entity;
+                    }
+                    return row.reduce(function (entity, column, columnIndex) {
+                        var columnBounds = table.getBounds(row, column);
+                        var withinColumn = within(p, columnBounds);
+                        if (withinColumn) {
+                            var rowElement = _this.content().selectAll("." + Legend.LEGEND_ROW_CLASS)[0][rowIndex];
+                            // HACKHACK The 2.x API chooses the symbol element as the "selection" to return, regardless of what
+                            // was actually selected
+                            var entryElement = d3.select(rowElement)
+                                .selectAll("." + Legend.LEGEND_ENTRY_CLASS)[0][Math.floor(columnIndex / 2)];
+                            var symbolElement = d3.select(entryElement).select("." + Legend.LEGEND_SYMBOL_CLASS);
+                            // HACKHACK The 2.x API returns the center {x, y} of the symbol as the position.
+                            var rowTranslate = d3.transform(d3.select(rowElement).attr("transform")).translate;
+                            var symbolTranslate = d3.transform(symbolElement.attr("transform")).translate;
+                            return [{
+                                    datum: column.getData(),
+                                    position: { x: rowTranslate[0] + symbolTranslate[0], y: rowTranslate[1] + symbolTranslate[1] },
+                                    selection: d3.select(entryElement),
+                                    component: _this,
+                                }];
                         }
-                        lowX += layout.entryLengths.get(value);
-                    });
-                });
-                return entities;
+                        return entity;
+                    }, entity);
+                }, []);
             };
             Legend.prototype.renderImmediately = function () {
                 var _this = this;
                 _super.prototype.renderImmediately.call(this);
-                var layout = this._calculateLayoutInfo(this.width(), this.height());
-                var rowsToDraw = layout.rows.slice(0, layout.numRowsToDraw);
-                var rows = this.content().selectAll("g." + Legend.LEGEND_ROW_CLASS).data(rowsToDraw);
-                rows.enter().append("g").classed(Legend.LEGEND_ROW_CLASS, true);
-                rows.exit().remove();
-                rows.attr("transform", function (d, i) { return "translate(0, " + (i * layout.textHeight + _this._padding) + ")"; });
-                var entries = rows.selectAll("g." + Legend.LEGEND_ENTRY_CLASS).data(function (d) { return d; });
-                var entriesEnter = entries.enter().append("g").classed(Legend.LEGEND_ENTRY_CLASS, true);
-                entriesEnter.append("path");
-                entriesEnter.append("g").classed("text-container", true);
-                entries.exit().remove();
-                var legendPadding = this._padding;
-                rows.each(function (values) {
-                    var xShift = legendPadding;
-                    var entriesInRow = d3.select(this).selectAll("g." + Legend.LEGEND_ENTRY_CLASS);
-                    entriesInRow.attr("transform", function (value, i) {
-                        var translateString = "translate(" + xShift + ", 0)";
-                        xShift += layout.entryLengths.get(value);
-                        return translateString;
+                var table = this._buildLegendTable(this.width(), this.height());
+                var entryNames = this._colorScale.domain().slice().sort(function (a, b) { return _this._comparator(_this._formatter(a), _this._formatter(b)); });
+                // clear content from previous renders
+                this.content().selectAll("*").remove();
+                var tableRoot = this.content();
+                table.forEach(function (row, rowIndex) {
+                    var rowBounds = table.getBounds(row);
+                    var rowRoot = tableRoot.append("g").classed(Legend.LEGEND_ROW_CLASS, true)
+                        .attr("transform", "translate(" + rowBounds.topLeft.x + ", " + rowBounds.topLeft.y + ")");
+                    var rowEntry;
+                    var rowElement = row.forEach(function (column, index) {
+                        var columnBounds = table.getBounds(row, column);
+                        if (index % 2 === 0) {
+                            // symbols are at even indices in the rows of our table
+                            // HACKHACK need a legend entry element to maintain back compat with 2.x
+                            rowEntry = rowRoot.append("g").classed(Legend.LEGEND_ENTRY_CLASS, true);
+                            rowEntry.append("path")
+                                .attr("d", _this.symbol()(column.getData(), rowIndex)(column.getHeight() * 0.6))
+                                .attr("transform", "translate(" + (columnBounds.topLeft.x + column.getWidth() / 2) + ", " + column.getHeight() / 2 + ")")
+                                .attr("fill", _this._colorScale.scale(column.getData()))
+                                .attr("opacity", _this.symbolOpacity()(column.getData(), rowIndex))
+                                .classed(Legend.LEGEND_SYMBOL_CLASS, true);
+                        }
+                        else {
+                            // series names are at odd indicies in the rows of our table
+                            // HACKHACK add data to element to maintain backcompat with 2.x
+                            rowEntry.data(function () { return [column.getData()]; });
+                            var textContainer = rowEntry.append("g").classed("text-container", true)
+                                .attr("transform", "translate(" + columnBounds.topLeft.x + ", 0)");
+                            var writeOptions = {
+                                selection: textContainer,
+                                xAlign: "left",
+                                yAlign: "top",
+                                textRotation: 0,
+                            };
+                            _this._writer.write(_this._formatter(column.getData()), column.getWidth(), _this.height(), writeOptions);
+                        }
                     });
-                });
-                entries.select("path").attr("d", function (d, i, j) { return _this.symbol()(d, j)(layout.textHeight * 0.6); })
-                    .attr("transform", "translate(" + (layout.textHeight / 2) + "," + layout.textHeight / 2 + ")")
-                    .attr("fill", function (value) { return _this._colorScale.scale(value); })
-                    .attr("opacity", function (d, i, j) { return _this.symbolOpacity()(d, j); })
-                    .classed(Legend.LEGEND_SYMBOL_CLASS, true);
-                var padding = this._padding;
-                var textContainers = entries.select("g.text-container");
-                textContainers.text(""); // clear out previous results
-                var self = this;
-                textContainers.attr("transform", "translate(" + layout.textHeight + ", 0)")
-                    .each(function (value) {
-                    var container = d3.select(this);
-                    var maxTextLength = layout.entryLengths.get(value) - layout.textHeight - padding;
-                    var writeOptions = {
-                        selection: container,
-                        xAlign: "left",
-                        yAlign: "top",
-                        textRotation: 0,
-                    };
-                    self._writer.write(self._formatter(value), maxTextLength, self.height(), writeOptions);
                 });
                 return this;
             };
