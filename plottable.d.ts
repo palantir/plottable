@@ -99,6 +99,13 @@ declare namespace Plottable.Utils.Math {
      */
     function distanceSquared(p1: Point, p2: Point): number;
     function degreesToRadians(degree: number): number;
+    /**
+     * Returns if the point is within the bounds. Points along
+     * the bounds are considered "within" as well.
+     * @param {Point} p Point in considerations.
+     * @param {Bounds} bounds Bounds within which to check for inclusion.
+     */
+    function within(p: Point, bounds: Bounds): boolean;
 }
 declare namespace Plottable.Utils {
     /**
@@ -2490,9 +2497,12 @@ declare namespace Plottable.Components {
          */
         static LEGEND_SYMBOL_CLASS: string;
         private _padding;
+        private _rowBottomPadding;
         private _colorScale;
         private _formatter;
         private _maxEntriesPerRow;
+        private _maxLinesPerEntry;
+        private _maxWidth;
         private _comparator;
         private _measurer;
         private _wrapper;
@@ -2526,12 +2536,40 @@ declare namespace Plottable.Components {
          */
         maxEntriesPerRow(): number;
         /**
-         * Sets the maximum number of entries perrow.
+         * Sets the maximum number of entries per row.
          *
          * @param {number} maxEntriesPerRow
          * @returns {Legend} The calling Legend.
          */
         maxEntriesPerRow(maxEntriesPerRow: number): this;
+        /**
+         * Gets the maximum lines per row.
+         *
+         * @returns {number}
+         */
+        maxLinesPerEntry(): number;
+        /**
+         * Sets the maximum number of lines per entry. This is distinct from
+         * maxEntriesPerRow in that, maxEntriesPerRow determines the maximum allowable
+         * number of series labels that may be displayed per row whereas maxLinesPerEntry
+         * specifies the maximum number of times a single entry may be broken into new
+         * lines before being truncated.
+         *
+         * @param {number} maxLinesPerEntry
+         * @returns {Legend} The calling Legend.
+         */
+        maxLinesPerEntry(maxLinesPerEntry: number): this;
+        /**
+         * Gets the maximum width of the legend in pixels.
+         * @returns {number}
+         */
+        maxWidth(): number;
+        /**
+         * Sets the maximum width of the legend in pixels.
+         * @param {number} maxWidth The maximum width in pixels.
+         * @returns {Legend}
+         */
+        maxWidth(maxWidth: number): this;
         /**
          * Gets the current comparator for the Legend's entries.
          *
@@ -2560,9 +2598,8 @@ declare namespace Plottable.Components {
          */
         colorScale(colorScale: Scales.Color): this;
         destroy(): void;
-        private _calculateLayoutInfo(availableWidth, availableHeight);
+        private _buildLegendTable(width, height);
         requestedSpace(offeredWidth: number, offeredHeight: number): SpaceRequest;
-        private _packRows(availableWidth, entries, entryLengths);
         /**
          * Gets the Entities (representing Legend entries) at a particular point.
          * Returns an empty array if no Entities are present at that location.
@@ -3239,10 +3276,7 @@ declare namespace Plottable {
          * the chart, relative to the parent.
          * @returns {Plots.PlotEntity} The nearest PlotEntity, or undefined if no {Plots.PlotEntity} can be found.
          */
-        entityNearest(queryPoint: Point, bounds?: {
-            topLeft: Point;
-            bottomRight: Point;
-        }): Plots.PlotEntity;
+        entityNearest(queryPoint: Point, bounds?: Bounds): Plots.PlotEntity;
         protected _entityVisibleOnPlot(entity: Plots.PlotEntity | Plots.LightweightPlotEntity, chartBounds: Bounds): boolean;
         protected _uninstallScaleForKey(scale: Scale<any, any>, key: string): void;
         protected _installScaleForKey(scale: Scale<any, any>, key: string): void;
