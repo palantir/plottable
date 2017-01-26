@@ -47,7 +47,7 @@ describe("InterpolatedColorLegend", () => {
       assert.isTrue(Plottable.Utils.DOM.clientRectInside(swatchContainerBCR, elementBCR),
                     "swatches are drawn within the legend's element");
 
-      const formattedDomainValues = scaleDomain.map(legend.formatter();
+      const formattedDomainValues = scaleDomain.map(legend.formatter());
       const labels = legendContent.selectAll("text");
       const labelTexts = labels[0].map((textNode: HTMLScriptElement) => textNode.textContent);
       assert.deepEqual(labelTexts, formattedDomainValues, "formatter is used to format label text");
