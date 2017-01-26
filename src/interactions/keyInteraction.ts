@@ -19,8 +19,8 @@ export namespace Interactions {
     protected _anchor(component: Component) {
       super._anchor(component);
       this._positionDispatcher = Dispatchers.Mouse.getDispatcher(
-                                   <SVGElement> (<any> this._componentAttachedTo)._element.node()
-                                 );
+        <SVGElement> (<any> this._componentAttachedTo)._element.node()
+      );
       this._positionDispatcher.onMouseMove(this._mouseMoveCallback);
 
       this._keyDispatcher = Dispatchers.Key.getDispatcher();

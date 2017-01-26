@@ -1,4 +1,3 @@
-
 export class QuantitativeScale<D> extends Scale<D, number> implements Plottable.Scales.TransformableScale {
   protected static _DEFAULT_NUM_TICKS = 10;
   private _tickGenerator: Scales.TickGenerators.TickGenerator<D> = (scale: Plottable.QuantitativeScale<D>) => scale.defaultTicks();
@@ -261,7 +260,7 @@ export class QuantitativeScale<D> extends Scale<D, number> implements Plottable.
     this.domain(this.range().map(magnifyTransform));
   }
 
-  public pan(translateAmount: number){
+  public pan(translateAmount: number) {
     let translateTransform = (rangeValue: number) => this.invert(rangeValue + translateAmount);
     this.domain(this.range().map(translateTransform));
   }

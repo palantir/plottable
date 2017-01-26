@@ -1,6 +1,6 @@
-  export class Segment extends Drawer {
-    constructor(dataset: Dataset) {
-      super(dataset);
-      this._svgElementName = "line";
-    }
+export class Segment extends Drawer {
+  constructor(dataset: Dataset) {
+    super(dataset);
+    this._svgElementName = "line";
   }
+}

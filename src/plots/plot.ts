@@ -1,47 +1,45 @@
+/**
+ * Computing the selection of an entity is an expensive operation. This object aims to
+ * reproduce the behavior of the Plots.PlotEntity, excluding the selection, but including
+ * drawer and validDatumIndex, which can be used to compute the selection.
+ */
+export interface LightweightPlotEntity {
+  datum: any;
+  dataset: Dataset;
+  datasetIndex: number;
+  position: Point;
+  index: number;
+  component: Plot;
+  drawer: Plottable.Drawer;
+  validDatumIndex: number;
+}
 
-  /**
-   * Computing the selection of an entity is an expensive operation. This object aims to
-   * reproduce the behavior of the Plots.PlotEntity, excluding the selection, but including
-   * drawer and validDatumIndex, which can be used to compute the selection.
-   */
-  export interface LightweightPlotEntity {
-    datum: any;
-    dataset: Dataset;
-    datasetIndex: number;
-    position: Point;
-    index: number;
-    component: Plot;
-    drawer: Plottable.Drawer;
-    validDatumIndex: number;
-  }
+export interface PlotEntity extends Entity<Plot> {
+  dataset: Dataset;
+  datasetIndex: number;
+  index: number;
+  component: Plot;
+}
 
-  export interface PlotEntity extends Entity<Plot> {
-    dataset: Dataset;
-    datasetIndex: number;
-    index: number;
-    component: Plot;
-  }
+export interface AccessorScaleBinding<D, R> {
+  accessor: Accessor<any>;
+  scale?: Scale<D, R>;
+}
 
-  export interface AccessorScaleBinding<D, R> {
-    accessor: Accessor<any>;
-    scale?: Scale<D, R>;
-  }
+/**
+ * TransformableAccessorScaleBinding mapping from property accessor to
+ * TransformableScale. It is distinct from a plain AccessorScaleBinding
+ * in that the scale is guaranteed to be invertable.
+ */
+export interface TransformableAccessorScaleBinding<D, R> {
+  accessor: Accessor<any>;
+  scale?: TransformableScale<D, R>;
+}
 
-  /**
-   * TransformableAccessorScaleBinding mapping from property accessor to
-   * TransformableScale. It is distinct from a plain AccessorScaleBinding
-   * in that the scale is guaranteed to be invertable.
-   */
-  export interface TransformableAccessorScaleBinding<D, R> {
-    accessor: Accessor<any>;
-    scale?: TransformableScale<D, R>;
-  }
-
-  export namespace Animator {
-    export var MAIN = "main";
-    export var RESET = "reset";
-  }
-
+export namespace Animator {
+  export var MAIN = "main";
+  export var RESET = "reset";
+}
 
 
 export class Plot extends Component {
@@ -294,9 +292,11 @@ export class Plot extends Component {
   }
 
   private _updateExtentsForKey(key: string, bindings: d3.Map<Plots.AccessorScaleBinding<any, any>>,
-      extents: d3.Map<any[]>, filter: Accessor<boolean>) {
+                               extents: d3.Map<any[]>, filter: Accessor<boolean>) {
     let accScaleBinding = bindings.get(key);
-    if (accScaleBinding == null || accScaleBinding.accessor == null) { return; }
+    if (accScaleBinding == null || accScaleBinding.accessor == null) {
+      return;
+    }
     extents.set(key, this.datasets().map((dataset) => this._computeExtent(dataset, accScaleBinding, filter)));
   }
 
@@ -447,7 +447,7 @@ export class Plot extends Component {
   }
 
   protected _generateDrawSteps(): Drawers.DrawStep[] {
-    return [{attrToProjector: this._generateAttrToProjector(), animator: new Animators.Null()}];
+    return [{ attrToProjector: this._generateAttrToProjector(), animator: new Animators.Null() }];
   }
 
   protected _additionalPaint(time: number) {
@@ -461,29 +461,29 @@ export class Plot extends Component {
    */
   protected _buildLightweightPlotEntities(datasets: Dataset[]) {
     const lightweightPlotEntities: Plots.LightweightPlotEntity[] = [];
-      datasets.forEach((dataset: Dataset, datasetIndex: number) => {
-        let drawer = this._datasetToDrawer.get(dataset);
-        let validDatumIndex = 0;
+    datasets.forEach((dataset: Dataset, datasetIndex: number) => {
+      let drawer = this._datasetToDrawer.get(dataset);
+      let validDatumIndex = 0;
 
-        dataset.data().forEach((datum: any, datumIndex: number) => {
-          let position = this._pixelPoint(datum, datumIndex, dataset);
-          if (Utils.Math.isNaN(position.x) || Utils.Math.isNaN(position.y)) {
-            return;
-          }
+      dataset.data().forEach((datum: any, datumIndex: number) => {
+        let position = this._pixelPoint(datum, datumIndex, dataset);
+        if (Utils.Math.isNaN(position.x) || Utils.Math.isNaN(position.y)) {
+          return;
+        }
 
-          lightweightPlotEntities.push({
-            datum,
-            position,
-            index: datumIndex,
-            dataset,
-            datasetIndex,
-            component: this,
-            drawer,
-            validDatumIndex,
-          });
-          validDatumIndex++;
+        lightweightPlotEntities.push({
+          datum,
+          position,
+          index: datumIndex,
+          dataset,
+          datasetIndex,
+          component: this,
+          drawer,
+          validDatumIndex,
         });
+        validDatumIndex++;
       });
+    });
 
     return lightweightPlotEntities;
   }
@@ -518,8 +518,10 @@ export class Plot extends Component {
 
     datasets.forEach((dataset) => {
       let drawer = this._datasetToDrawer.get(dataset);
-      if (drawer == null) { return; }
-      drawer.renderArea().selectAll(drawer.selector()).each(function() {
+      if (drawer == null) {
+        return;
+      }
+      drawer.renderArea().selectAll(drawer.selector()).each(function () {
         selections.push(this);
       });
     });
@@ -609,7 +611,7 @@ export class Plot extends Component {
 
   protected _entityVisibleOnPlot(entity: Plots.PlotEntity | Plots.LightweightPlotEntity, chartBounds: Bounds) {
     return !(entity.position.x < chartBounds.topLeft.x || entity.position.y < chartBounds.topLeft.y ||
-      entity.position.x > chartBounds.bottomRight.x || entity.position.y > chartBounds.bottomRight.y);
+    entity.position.x > chartBounds.bottomRight.x || entity.position.y > chartBounds.bottomRight.y);
   }
 
   protected _uninstallScaleForKey(scale: Scale<any, any>, key: string) {
@@ -628,8 +630,8 @@ export class Plot extends Component {
 
   protected static _scaledAccessor<D, R>(binding: Plots.AccessorScaleBinding<D, R>) {
     return binding.scale == null ?
-             binding.accessor :
-             (d: any, i: number, ds: Dataset) => binding.scale.scale(binding.accessor(d, i, ds));
+      binding.accessor :
+      (d: any, i: number, ds: Dataset) => binding.scale.scale(binding.accessor(d, i, ds));
   }
 
   protected _pixelPoint(datum: any, index: number, dataset: Dataset): Point {

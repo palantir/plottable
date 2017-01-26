@@ -240,14 +240,14 @@ export class XYPlot<X, Y> extends Plot {
   protected _uninstallScaleForKey(scale: Scale<any, any>, key: string) {
     super._uninstallScaleForKey(scale, key);
     let adjustCallback = key === XYPlot._X_KEY ? this._adjustYDomainOnChangeFromXCallback
-                                               : this._adjustXDomainOnChangeFromYCallback;
+      : this._adjustXDomainOnChangeFromYCallback;
     scale.offUpdate(adjustCallback);
   }
 
   protected _installScaleForKey(scale: Scale<any, any>, key: string) {
     super._installScaleForKey(scale, key);
     let adjustCallback = key === XYPlot._X_KEY ? this._adjustYDomainOnChangeFromXCallback
-                                               : this._adjustXDomainOnChangeFromYCallback;
+      : this._adjustXDomainOnChangeFromYCallback;
     scale.onUpdate(adjustCallback);
   }
 
@@ -356,14 +356,18 @@ export class XYPlot<X, Y> extends Plot {
   }
 
   private _adjustYDomainOnChangeFromX() {
-    if (!this._projectorsReady()) { return; }
+    if (!this._projectorsReady()) {
+      return;
+    }
     if (this._autoAdjustYScaleDomain) {
       this._updateYExtentsAndAutodomain();
     }
   }
 
   private _adjustXDomainOnChangeFromY() {
-    if (!this._projectorsReady()) { return; }
+    if (!this._projectorsReady()) {
+      return;
+    }
     if (this._autoAdjustXScaleDomain) {
       this._updateXExtentsAndAutodomain();
     }
@@ -380,9 +384,9 @@ export class XYPlot<X, Y> extends Plot {
     let xBinding = this.x();
     let yBinding = this.y();
     return xBinding != null &&
-        xBinding.accessor != null &&
-        yBinding != null &&
-        yBinding.accessor != null;
+      xBinding.accessor != null &&
+      yBinding != null &&
+      yBinding.accessor != null;
   }
 
   /**
@@ -437,7 +441,7 @@ export class XYPlot<X, Y> extends Plot {
       let positionX = Plot._scaledAccessor(this.x())(d, i, dataset);
       let positionY = Plot._scaledAccessor(this.y())(d, i, dataset);
       return Utils.Math.isValidNumber(positionX) &&
-             Utils.Math.isValidNumber(positionY);
+        Utils.Math.isValidNumber(positionY);
     };
 
     this.datasets().forEach((dataset) => {

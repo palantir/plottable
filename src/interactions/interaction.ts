@@ -102,7 +102,7 @@ export class Interaction {
    */
   protected _isInsideComponent(p: Point) {
     return 0 <= p.x && 0 <= p.y
-           && p.x <= this._componentAttachedTo.width()
-           && p.y <= this._componentAttachedTo.height();
+      && p.x <= this._componentAttachedTo.width()
+      && p.y <= this._componentAttachedTo.height();
   }
 }

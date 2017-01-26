@@ -149,7 +149,8 @@ export class Component {
 
     if (this._clipPathEnabled) {
       this._generateClipPath();
-    };
+    }
+    ;
 
     this._boundingBox = this._addBox("bounding-box");
 
@@ -220,7 +221,7 @@ export class Component {
     this._boxes.forEach((b: d3.Selection<void>) => b.attr("width", this.width()).attr("height", this.height()));
 
     if (this._resizeHandler != null) {
-        this._resizeHandler(size);
+      this._resizeHandler(size);
     }
 
     return this;
@@ -229,7 +230,7 @@ export class Component {
   protected _sizeFromOffer(availableWidth: number, availableHeight: number) {
     let requestedSpace = this.requestedSpace(availableWidth, availableHeight);
     return {
-      width: this.fixedWidth() ? Math.min(availableWidth , requestedSpace.minWidth) : availableWidth,
+      width: this.fixedWidth() ? Math.min(availableWidth, requestedSpace.minWidth) : availableWidth,
       height: this.fixedHeight() ? Math.min(availableHeight, requestedSpace.minHeight) : availableHeight,
     };
   }
@@ -381,7 +382,9 @@ export class Component {
     }
     parentElement = parentElement == null ? this._boxContainer : parentElement;
     let box = parentElement.append("rect");
-    if (className != null) { box.classed(className, true); }
+    if (className != null) {
+      box.classed(className, true);
+    }
 
     this._boxes.push(box);
     if (this.width() != null && this.height() != null) {
@@ -537,7 +540,7 @@ export class Component {
   public parent(parent: ComponentContainer): this;
   public parent(parent?: ComponentContainer): any {
     if (parent === undefined) {
-     return this._parent;
+      return this._parent;
     }
     if (parent !== null && !parent.has(this)) {
       throw new Error("Passed invalid parent");
