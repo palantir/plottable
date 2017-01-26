@@ -1,6 +1,7 @@
 general:
   artifacts:
     - demo
+    - quicktests
     - plottable.*
     # Modules used by quicktests
     - node_modules/d3
