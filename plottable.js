@@ -8880,6 +8880,7 @@ var Plottable;
                 if (orientation === void 0) { orientation = Bar.ORIENTATION_VERTICAL; }
                 _super.call(this);
                 this._labelFormatter = Plottable.Formatters.labelFormatter();
+                this._axisLabelFormatter = Plottable.Formatters.identity();
                 this._labelsEnabled = false;
                 this._hideBarsIfAnyAreTooWide = true;
                 this._barPixelWidth = 0;
@@ -9017,10 +9018,10 @@ var Plottable;
             };
             Bar.prototype.axisLabelFormatter = function (formatter) {
                 if (formatter == null) {
-                    return this._labelFormatter;
+                    return this._axisLabelFormatter;
                 }
                 else {
-                    this._labelFormatter = formatter;
+                    this._axisLabelFormatter = formatter;
                     this.render();
                     return this;
                 }

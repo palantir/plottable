@@ -19,6 +19,7 @@ namespace Plottable.Plots {
     private _baselineValue: X|Y;
     protected _isVertical: boolean;
     private _labelFormatter: LabelFormatter = Formatters.labelFormatter();
+    private _axisLabelFormatter: Formatter = Formatters.identity();
     private _labelsEnabled = false;
     private _hideBarsIfAnyAreTooWide = true;
     private _labelConfig: Utils.Map<Dataset, LabelConfig>;
@@ -245,9 +246,9 @@ namespace Plottable.Plots {
     public axisLabelFormatter(formatter: Formatter): this;
     public axisLabelFormatter(formatter?: Formatter): any {
       if (formatter == null) {
-        return this._labelFormatter;
+        return this._axisLabelFormatter;
       } else {
-        this._labelFormatter = formatter;
+        this._axisLabelFormatter = formatter;
         this.render();
         return this;
       }

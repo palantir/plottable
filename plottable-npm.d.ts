@@ -3789,6 +3789,7 @@ declare namespace Plottable.Plots {
         private _baselineValue;
         protected _isVertical: boolean;
         private _labelFormatter;
+        private _axisLabelFormatter;
         private _labelsEnabled;
         private _hideBarsIfAnyAreTooWide;
         private _labelConfig;
