@@ -1,10 +1,7 @@
-namespace Plottable {
 
 export type PointerCallback = (point: Point) => void;
 
-}
 
-namespace Plottable.Interactions {
   export class Pointer extends Interaction {
     private _mouseDispatcher: Dispatchers.Mouse;
     private _touchDispatcher: Dispatchers.Touch;
@@ -126,4 +123,3 @@ namespace Plottable.Interactions {
       return this;
     }
   }
-}

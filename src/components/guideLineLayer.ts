@@ -1,4 +1,3 @@
-namespace Plottable.Components {
   enum PropertyMode { VALUE, PIXEL };
   export class GuideLineLayer<D> extends Component {
     public static ORIENTATION_VERTICAL = "vertical";
@@ -189,4 +188,3 @@ namespace Plottable.Components {
       }
     }
   }
-}

@@ -1,4 +1,3 @@
-namespace Plottable.Utils.Window {
 
   /**
    * Print a warning message to the console, if it is available.
@@ -52,4 +51,3 @@ namespace Plottable.Utils.Window {
       ". Please refer to the release notes. " + message);
   }
 
-}

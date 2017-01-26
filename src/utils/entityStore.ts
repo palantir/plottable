@@ -1,4 +1,3 @@
-namespace Plottable.Utils {
 
   /**
    * EntityStore stores entities and makes them searchable.
@@ -77,4 +76,3 @@ namespace Plottable.Utils {
       return this._entities.map<S>((entity: T) => callback(entity));
     }
   }
-}

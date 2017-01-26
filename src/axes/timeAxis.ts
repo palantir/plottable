@@ -1,5 +1,3 @@
-namespace Plottable {
-
   export namespace TimeInterval {
     export var second = "second";
     export var minute = "minute";
@@ -10,9 +8,6 @@ namespace Plottable {
     export var year = "year";
   };
 
-}
-
-namespace Plottable.Axes {
   /**
    * Defines a configuration for a Time Axis tier.
    * For details on how ticks are generated see: https://github.com/mbostock/d3/wiki/Time-Scales#ticks
@@ -635,4 +630,3 @@ namespace Plottable.Axes {
     }
 
   }
-}

@@ -14,7 +14,6 @@
  * );
  * ```
  */
-namespace Plottable.RenderController {
   let _componentsNeedingRender = new Utils.Set<Component>();
   let _componentsNeedingComputeLayout = new Utils.Set<Component>();
   let _animationRequested = false;
@@ -120,4 +119,3 @@ namespace Plottable.RenderController {
       _isCurrentlyFlushing = false;
     }
   }
-}

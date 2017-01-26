@@ -1,4 +1,3 @@
-namespace Plottable {
 export namespace Drawers {
   /**
    * A step for the drawer to draw.
@@ -181,5 +180,4 @@ export class Drawer {
     return d3.select(this.selection()[0][index]);
   }
 
-}
 }

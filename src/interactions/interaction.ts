@@ -1,4 +1,3 @@
-namespace Plottable {
 export class Interaction {
   protected _componentAttachedTo: Component;
 
@@ -106,5 +105,4 @@ export class Interaction {
            && p.x <= this._componentAttachedTo.width()
            && p.y <= this._componentAttachedTo.height();
   }
-}
 }

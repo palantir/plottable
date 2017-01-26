@@ -1,4 +1,3 @@
-namespace Plottable.Components {
   type _LayoutAllocation = {
     guaranteedWidths: number[];
     guaranteedHeights: number[];
@@ -502,4 +501,3 @@ namespace Plottable.Components {
       return all(componentGroup.map(groupIsFixed));
     }
   }
-}

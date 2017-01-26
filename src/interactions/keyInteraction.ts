@@ -1,4 +1,3 @@
-namespace Plottable {
 export type KeyCallback = (keyCode: number) => void;
 
 export namespace Interactions {
@@ -120,5 +119,4 @@ export namespace Interactions {
       return this;
     }
   }
-}
 }

@@ -1,4 +1,3 @@
-namespace Plottable {
 
 export class QuantitativeScale<D> extends Scale<D, number> implements Plottable.Scales.TransformableScale {
   protected static _DEFAULT_NUM_TICKS = 10;
@@ -335,5 +334,4 @@ export class QuantitativeScale<D> extends Scale<D, number> implements Plottable.
       return this;
     }
   }
-}
 }

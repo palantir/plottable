@@ -1,4 +1,3 @@
-namespace Plottable.Scales {
   const TRANSFORMATION_SPACE = [0, 1] as [number, number];
 
   export class Category extends Scale<string, number> implements Plottable.Scales.TransformableScale {
@@ -221,4 +220,3 @@ namespace Plottable.Scales {
       return Math.abs(this._d3TransformationScale(band) - this._d3TransformationScale(0));
     }
   }
-}

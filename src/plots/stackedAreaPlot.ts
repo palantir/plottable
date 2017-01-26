@@ -1,4 +1,3 @@
-namespace Plottable.Plots {
   export class StackedArea<X> extends Area<X> {
     private _stackingResult: Utils.Stacking.StackingResult;
     private _stackedExtent: number[];
@@ -217,4 +216,3 @@ namespace Plottable.Plots {
     }
 
   }
-}

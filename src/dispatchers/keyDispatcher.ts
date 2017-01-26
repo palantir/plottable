@@ -1,4 +1,3 @@
-namespace Plottable.Dispatchers {
   export type KeyCallback = (keyCode: number, event: KeyboardEvent) => void;
 
   export class Key extends Dispatcher {
@@ -85,4 +84,3 @@ namespace Plottable.Dispatchers {
       return this;
     }
   }
-}

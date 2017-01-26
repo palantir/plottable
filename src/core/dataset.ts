@@ -1,4 +1,3 @@
-namespace Plottable {
 
 export type DatasetCallback = (dataset: Dataset) => void;
 
@@ -88,5 +87,4 @@ export class Dataset {
       return this;
     }
   }
-}
 }

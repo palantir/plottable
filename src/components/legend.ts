@@ -1,4 +1,3 @@
-namespace Plottable.Components {
   export class Legend extends Component {
     /**
      * The css class applied to each legend row
@@ -378,4 +377,3 @@ namespace Plottable.Components {
       return true;
     }
   }
-}

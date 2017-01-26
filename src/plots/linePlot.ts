@@ -1,4 +1,3 @@
-namespace Plottable.Plots {
   type EdgeIntersections = {
     left: Point[],
     right: Point[],
@@ -560,4 +559,3 @@ namespace Plottable.Plots {
       return filteredIndices;
     }
   }
-}

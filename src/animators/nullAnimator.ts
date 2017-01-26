@@ -1,5 +1,3 @@
-namespace Plottable.Animators {
-
   /**
    * An animator implementation with no animation. The attributes are
    * immediately set on the selection.
@@ -14,4 +12,3 @@ namespace Plottable.Animators {
     }
   }
 
-}

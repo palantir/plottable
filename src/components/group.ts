@@ -1,4 +1,3 @@
-namespace Plottable.Components {
   export class Group extends ComponentContainer {
     private _components: Component[] = [];
 
@@ -90,4 +89,3 @@ namespace Plottable.Components {
     }
 
   }
-}

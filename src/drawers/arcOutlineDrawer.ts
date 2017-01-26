@@ -1,5 +1,3 @@
-namespace Plottable.Drawers {
-
   export class ArcOutline extends Drawer {
 
     constructor(dataset: Dataset) {
@@ -13,4 +11,3 @@ namespace Plottable.Drawers {
       selection.style("fill", "none");
     }
   }
-}

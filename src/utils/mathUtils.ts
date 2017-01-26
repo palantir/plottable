@@ -1,4 +1,3 @@
-namespace Plottable.Utils.Math {
 
   let nativeMath: Math = (<any>window).Math;
 
@@ -103,4 +102,3 @@ namespace Plottable.Utils.Math {
   export function degreesToRadians(degree: number) {
     return degree / 360 * nativeMath.PI * 2;
   }
-}

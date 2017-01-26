@@ -1,4 +1,3 @@
-namespace Plottable {
 export class Dispatcher {
   protected _eventToProcessingFunction: { [eventName: string]: (e: Event) => any; } = {};
   private _eventNameToCallbackSet: { [eventName: string]: Utils.CallbackSet<Function>; } = {};
@@ -56,5 +55,4 @@ export class Dispatcher {
       callbackSet.callCallbacks.apply(callbackSet, args);
     }
   }
-}
 }

@@ -1,4 +1,3 @@
-namespace Plottable {
 export type AxisOrientation =  "bottom" | "left" | "right" | "top";
 
 export class Axis<D> extends Component {
@@ -800,5 +799,4 @@ export class Axis<D> extends Component {
   }
 
 
-}
 }

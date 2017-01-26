@@ -1,4 +1,3 @@
-namespace Plottable.Plots {
   export class Segment<X, Y> extends XYPlot<X, Y> {
     private static _X2_KEY = "x2";
     private static _Y2_KEY = "y2";
@@ -261,4 +260,3 @@ namespace Plottable.Plots {
       return calcOrientation(point1, point2, point3) * calcOrientation(point1, point2, point4) < 0;
     }
   }
-}

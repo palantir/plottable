@@ -1,4 +1,3 @@
-namespace Plottable.Components {
   export class InterpolatedColorLegend extends Component {
     private static _DEFAULT_NUM_SWATCHES = 11;
 
@@ -309,4 +308,3 @@ namespace Plottable.Components {
     }
 
   }
-}

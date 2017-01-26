@@ -1,5 +1,3 @@
-namespace Plottable.Animators {
-
   /**
    * An Animator with easing and configurable durations and delays.
    */
@@ -188,4 +186,3 @@ namespace Plottable.Animators {
       return Math.min(this.stepDelay(), maxPossibleIterativeDelay);
     }
   }
-}

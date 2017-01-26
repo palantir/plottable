@@ -1,4 +1,3 @@
-namespace Plottable.Scales {
   type supportedScale = d3.scale.Linear<number, string> | d3.scale.Log<number, string> | d3.scale.Pow<number, string>;
 
   export class InterpolatedColor extends Scale<number, string> {
@@ -158,4 +157,3 @@ namespace Plottable.Scales {
       this._resetScale();
     }
   }
-}

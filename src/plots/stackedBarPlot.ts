@@ -1,4 +1,3 @@
-namespace Plottable.Plots {
   export class StackedBar<X, Y> extends Bar<X, Y> {
     protected static _STACKED_BAR_LABEL_PADDING = 5;
 
@@ -210,4 +209,3 @@ namespace Plottable.Plots {
       this._stackedExtent = Utils.Stacking.stackedExtent(this._stackingResult, keyAccessor, filter);
     }
   }
-}

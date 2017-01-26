@@ -1,4 +1,3 @@
-namespace Plottable.Dispatchers {
   export type MouseCallback = (p: Point, event: MouseEvent) => void;
 
   export class Mouse extends Dispatcher {
@@ -202,4 +201,3 @@ namespace Plottable.Dispatchers {
       return this._lastMousePosition;
     }
   }
-}

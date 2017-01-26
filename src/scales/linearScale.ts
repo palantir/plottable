@@ -1,4 +1,3 @@
-namespace Plottable.Scales {
   export class Linear extends QuantitativeScale<number> {
     private _d3Scale: d3.scale.Linear<number, number>;
 
@@ -72,4 +71,3 @@ namespace Plottable.Scales {
       return this._d3Scale.copy().domain(domain).nice(count).domain();
     }
   }
-}

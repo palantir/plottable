@@ -1,13 +1,8 @@
-namespace Plottable {
-
 /**
  * A SymbolFactory is a function that takes in a symbolSize which is the edge length of the render area
  * and returns a string representing the 'd' attribute of the resultant 'path' element
  */
 export type SymbolFactory = (symbolSize: number) => string;
-}
-
-namespace Plottable.SymbolFactories {
 
   export function circle(): SymbolFactory {
     return (symbolSize: number) => d3.svg.symbol().type("circle").size(Math.PI * Math.pow(symbolSize / 2, 2))(null);
@@ -32,5 +27,3 @@ namespace Plottable.SymbolFactories {
   export function triangleDown(): SymbolFactory {
     return (symbolSize: number) => d3.svg.symbol().type("triangle-down").size(Math.sqrt(3) * Math.pow(symbolSize / 2, 2))(null);
   }
-
-}

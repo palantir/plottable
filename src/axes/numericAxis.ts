@@ -1,4 +1,3 @@
-namespace Plottable.Axes {
   export class Numeric extends Axis<number> {
 
     private _tickLabelPositioning = "center";
@@ -344,4 +343,3 @@ namespace Plottable.Axes {
     }
 
   }
-}

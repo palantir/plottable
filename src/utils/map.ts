@@ -1,4 +1,3 @@
-namespace Plottable.Utils {
   /**
    * Shim for ES6 map.
    * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map
@@ -87,4 +86,3 @@ namespace Plottable.Utils {
       return false;
     }
   }
-}

@@ -1,4 +1,3 @@
-namespace Plottable.Utils.Color {
   let nativeMath: Math = (<any>window).Math;
 
   /**
@@ -71,4 +70,3 @@ namespace Plottable.Utils.Color {
     let b = lum(rgb.b);
     return 0.2126 * r + 0.7152 * g + 0.0722 * b;
   }
-}

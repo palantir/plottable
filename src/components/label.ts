@@ -1,4 +1,3 @@
-namespace Plottable.Components {
   export class Label extends Component {
     private _textContainer: d3.Selection<void>;
     private _text: string; // text assigned to the Label; may not be the actual text displayed due to truncation
@@ -178,4 +177,3 @@ namespace Plottable.Components {
       this.addClass(AxisLabel.AXIS_LABEL_CLASS);
     }
   }
-}

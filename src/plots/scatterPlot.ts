@@ -1,4 +1,3 @@
-namespace Plottable.Plots {
 
   export interface LightweightScatterPlotEntity extends LightweightPlotEntity {
     diameter: Point;
@@ -221,4 +220,3 @@ namespace Plottable.Plots {
       };
     }
   }
-}

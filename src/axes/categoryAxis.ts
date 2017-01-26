@@ -1,4 +1,3 @@
-namespace Plottable.Axes {
   export interface DownsampleInfo {
     domain: string[];
     stepWidth: number;
@@ -380,4 +379,3 @@ namespace Plottable.Axes {
       return this;
     }
   }
-}

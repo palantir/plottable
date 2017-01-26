@@ -1,4 +1,3 @@
-namespace Plottable.Plots {
   type LabelConfig = {
     labelArea: d3.Selection<void>;
     measurer: SVGTypewriter.Measurer;
@@ -728,4 +727,3 @@ namespace Plottable.Plots {
       return dataToDraw;
     }
   }
-}

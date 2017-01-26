@@ -1,8 +1,5 @@
-namespace Plottable {
   export interface DragLineCallback<D> { (dragLineLayer: Components.DragLineLayer<D>): void; };
-}
 
-namespace Plottable.Components {
   export class DragLineLayer<D> extends GuideLineLayer<D> {
     private _dragInteraction: Interactions.Drag;
     private _detectionRadius = 3;
@@ -217,4 +214,3 @@ namespace Plottable.Components {
       this._disconnectInteraction();
     }
   }
-}

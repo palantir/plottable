@@ -1,10 +1,7 @@
-namespace Plottable {
 
 export type DragCallback = (start: Point, end: Point) => void;
 
-}
 
-namespace Plottable.Interactions {
   export class Drag extends Interaction {
     private _dragging = false;
     private _constrainedToComponent = true;
@@ -186,4 +183,3 @@ namespace Plottable.Interactions {
       return this;
     }
   }
-}

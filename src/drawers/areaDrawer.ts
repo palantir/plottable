@@ -1,4 +1,3 @@
-namespace Plottable.Drawers {
   export class Area extends Drawer {
 
     constructor(dataset: Dataset) {
@@ -16,4 +15,3 @@ namespace Plottable.Drawers {
       return d3.select(this.selection()[0][0]);
     }
   }
-}

@@ -1,5 +1,3 @@
-namespace Plottable {
-
 export interface Animator {
   /**
    * Applies the supplied attributes to a d3.Selection with some animation.
@@ -22,4 +20,3 @@ export interface Animator {
   totalTime(numberOfIterations: number): number;
 }
 
-}

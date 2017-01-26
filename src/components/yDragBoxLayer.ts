@@ -1,4 +1,3 @@
-namespace Plottable.Components {
   export class YDragBoxLayer extends DragBoxLayer {
     /**
      * A YDragBoxLayer is a DragBoxLayer whose size can only be set in the Y-direction.
@@ -52,4 +51,3 @@ namespace Plottable.Components {
       throw new Error("YDragBoxLayer has no xExtent");
     }
   }
-}

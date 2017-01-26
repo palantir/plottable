@@ -1,4 +1,3 @@
-namespace Plottable.Configs {
   /**
    * Specifies if Plottable should show warnings.
    */
@@ -8,4 +7,3 @@ namespace Plottable.Configs {
    * Specifies if Plottable should add <title> elements to text.
    */
   export var ADD_TITLE_ELEMENTS = true;
-}

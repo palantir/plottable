@@ -1,4 +1,3 @@
-namespace Plottable.Scales {
 
   /**
    * A function that supplies domain values to be included into a Scale.
@@ -78,9 +77,7 @@ namespace Plottable.Scales {
     return (scale instanceof Plottable.QuantitativeScale ||
       scale instanceof Plottable.Scales.Category);
   }
-}
 
-namespace Plottable {
 
 export type TransformableScale<D, R> = Scale<D, R> & Plottable.Scales.TransformableScale;
 
@@ -275,5 +272,4 @@ export class Scale<D, R> {
     this._autoDomainIfAutomaticMode();
     return this;
   }
-}
 }

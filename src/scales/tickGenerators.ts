@@ -1,4 +1,3 @@
-namespace Plottable.Scales.TickGenerators {
   // HACKHACK: Generic types in type definition fails compilation
   // https://github.com/Microsoft/TypeScript/issues/1616
   /**
@@ -49,4 +48,3 @@ namespace Plottable.Scales.TickGenerators {
       return defaultTicks.filter((tick, i) => (tick % 1 === 0) || (i === 0) || (i === defaultTicks.length - 1));
     };
   }
-}

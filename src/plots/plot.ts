@@ -1,4 +1,3 @@
-namespace Plottable.Plots {
 
   /**
    * Computing the selection of an entity is an expensive operation. This object aims to
@@ -42,9 +41,7 @@ namespace Plottable.Plots {
     export var MAIN = "main";
     export var RESET = "reset";
   }
-}
 
-namespace Plottable {
 
 
 export class Plot extends Component {
@@ -642,5 +639,4 @@ export class Plot extends Component {
   protected _animateOnNextRender() {
     return this._animate && this._dataChanged;
   }
-}
 }

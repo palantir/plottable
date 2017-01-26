@@ -1,4 +1,3 @@
-namespace Plottable {
 /*
  * ComponentContainer class encapsulates Table and ComponentGroup's shared functionality.
  * It will not do anything if instantiated directly.
@@ -74,5 +73,4 @@ export class ComponentContainer extends Component {
     super.destroy();
     this._forEach((c: Component) => c.destroy());
   }
-}
 }

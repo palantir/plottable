@@ -1,4 +1,3 @@
-namespace Plottable.Interactions {
 
   export type PanCallback = () => void;
   export type ZoomCallback = () => void;
@@ -750,4 +749,3 @@ namespace Plottable.Interactions {
       return this;
     }
   }
-}

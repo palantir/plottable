@@ -1,4 +1,3 @@
-namespace Plottable.RenderPolicies {
   /**
    * A policy for rendering Components.
    */
@@ -38,4 +37,3 @@ namespace Plottable.RenderPolicies {
       setTimeout(RenderController.flush, this._timeoutMsec);
     }
   }
-}

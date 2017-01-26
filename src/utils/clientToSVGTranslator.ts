@@ -1,4 +1,3 @@
-namespace Plottable.Utils {
   export class ClientToSVGTranslator {
     private static _TRANSLATOR_KEY = "__Plottable_ClientToSVGTranslator";
     private _svg: SVGElement;
@@ -75,4 +74,3 @@ namespace Plottable.Utils {
       return Utils.DOM.boundingSVG(<SVGElement>e.target) === this._svg;
     }
   }
-}

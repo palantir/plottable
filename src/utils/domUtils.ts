@@ -1,4 +1,3 @@
-namespace Plottable.Utils.DOM {
   let nativeMath: Math = (<any>window).Math;
 
   /**
@@ -211,4 +210,3 @@ namespace Plottable.Utils.DOM {
     let parsedValue = parseFloat(value);
     return parsedValue || 0;
   }
-}

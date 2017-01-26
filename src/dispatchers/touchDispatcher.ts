@@ -1,4 +1,3 @@
-namespace Plottable.Dispatchers {
   export type TouchCallback = (ids: number[], idToPoint: { [id: number]: Point; }, event: TouchEvent) => void;
 
   export class Touch extends Dispatcher {
@@ -168,4 +167,3 @@ namespace Plottable.Dispatchers {
       return this._translator.insideSVG(event);
     }
   }
-}

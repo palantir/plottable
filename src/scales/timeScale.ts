@@ -1,4 +1,3 @@
-namespace Plottable.Scales {
   export class Time extends QuantitativeScale<Date> {
     private _d3Scale: d3.time.Scale<number, number>;
     /**
@@ -129,4 +128,3 @@ namespace Plottable.Scales {
       }
     }
   }
-}

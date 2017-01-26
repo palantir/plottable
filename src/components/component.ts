@@ -1,5 +1,3 @@
-namespace Plottable {
-
 export type ComponentCallback = (component: Component) => void;
 
 export namespace Components {
@@ -648,5 +646,4 @@ export class Component {
   public background(): d3.Selection<void> {
     return this._backgroundContainer;
   }
-}
 }

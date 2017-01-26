@@ -1,10 +1,4 @@
-namespace Plottable {
-
   export type Formatter = (d: any) => string;
-
-}
-
-namespace Plottable.Formatters {
 
   interface PredicatedFormat {
     specifier: string;
@@ -242,4 +236,3 @@ namespace Plottable.Formatters {
     }
   }
 
-}

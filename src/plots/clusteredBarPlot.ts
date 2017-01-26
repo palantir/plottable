@@ -1,4 +1,3 @@
-namespace Plottable.Plots {
   export class ClusteredBar<X, Y> extends Bar<X, Y> {
 
     private _clusterOffsets: Utils.Map<Dataset, number>;
@@ -54,4 +53,3 @@ namespace Plottable.Plots {
       return super._getDataToDraw();
     }
   }
-}

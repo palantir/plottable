@@ -1,4 +1,3 @@
-namespace Plottable.Utils.Stacking {
 
   export type StackedDatum = {
     value: number;
@@ -123,4 +122,3 @@ namespace Plottable.Utils.Stacking {
     return String(key);
   }
 
-}
