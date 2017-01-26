@@ -610,7 +610,8 @@ declare namespace Plottable {
     }
 }
 declare namespace Plottable {
-    type Formatter = (d: any, datum?: any, index?: number, dataset?: Dataset) => string;
+    type Formatter = (d: any) => string;
+    type LabelFormatter = (d: any, datum: any, index: number, dataset: Dataset) => string;
 }
 declare namespace Plottable.Formatters {
     /**

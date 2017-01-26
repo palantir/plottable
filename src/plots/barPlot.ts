@@ -18,7 +18,7 @@ namespace Plottable.Plots {
     private _baseline: d3.Selection<void>;
     private _baselineValue: X|Y;
     protected _isVertical: boolean;
-    private _labelFormatter: Formatter = Formatters.identity();
+    private _labelFormatter: LabelFormatter = Formatters.identity();
     private _labelsEnabled = false;
     private _hideBarsIfAnyAreTooWide = true;
     private _labelConfig: Utils.Map<Dataset, LabelConfig>;

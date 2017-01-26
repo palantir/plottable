@@ -1,6 +1,7 @@
 namespace Plottable {
 
-  export type Formatter = (d: any, datum?: any, index?: number, dataset?: Dataset) => string;
+  export type Formatter = (d: any) => string;
+  export type LabelFormatter = (d: any, datum: any, index: number, dataset: Dataset) => string;
 }
 
 namespace Plottable.Formatters {
