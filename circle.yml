@@ -1,8 +1,11 @@
 general:
   artifacts:
+    # Compiled assets
+    - plottable.js
+    - plottable.css
+    # Demo paths
     - demo
     - quicktests
-    - plottable.*
     # Modules used by quicktests
     - node_modules/d3
     - node_modules/jquery
