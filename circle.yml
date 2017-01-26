@@ -1,7 +1,11 @@
 general:
   artifacts:
     - demo
-    - plottable.css
+    - plottable.*
+    # Modules used by quicktests
+    - node_modules/d3
+    - node_modules/jquery
+    - node_modules/requirejs
 machine:
   node:
     version: 6.1
