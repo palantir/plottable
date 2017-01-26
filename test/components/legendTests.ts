@@ -24,12 +24,13 @@ describe("Legend", () => {
       assert.strictEqual(rows.size(), color.domain().length, "one entry is created for each item in the domain");
 
       rows.each(function(d: any, i: number) {
-        assert.strictEqual(d, color.domain()[i], "the data is set properly");
+        const name = d[0].data.name;
+        assert.strictEqual(name, color.domain()[i], "the data is set properly");
         let row = d3.select(this);
         let text = row.select("text").text();
-        assert.strictEqual(text, d, "the text node has correct text");
+        assert.strictEqual(text, name, "the text node has correct text");
         let symbol = row.select(SYMBOL_SELECTOR);
-        assert.strictEqual(symbol.attr("fill"), color.scale(d), "the symbol's fill is set properly");
+        assert.strictEqual(symbol.attr("fill"), color.scale(name), "the symbol's fill is set properly");
         assert.strictEqual(symbol.attr("opacity"), "1", "the symbol's opacity is set by default to 1");
       });
       svg.remove();
@@ -97,11 +98,12 @@ describe("Legend", () => {
       color.domain(newDomain);
 
       legend.content().selectAll(ENTRY_SELECTOR).each(function(d: any, i: number) {
-        assert.strictEqual(d, newDomain[i], "the data is set correctly");
+        const name = d[0].data.name;
+        assert.strictEqual(name, newDomain[i], "the data is set correctly");
         const text = d3.select(this).select("text").text();
-        assert.strictEqual(text, d, "the text was set properly");
+        assert.strictEqual(text, name, "the text was set properly");
         const fill = d3.select(this).select(SYMBOL_SELECTOR).attr("fill");
-        assert.strictEqual(fill, color.scale(d), "the fill was set properly");
+        assert.strictEqual(fill, color.scale(name), "the fill was set properly");
       });
       assert.strictEqual(legend.content().selectAll(ENTRY_SELECTOR).size(), 5, "there are the right number of legend elements");
       svg.remove();
@@ -117,11 +119,12 @@ describe("Legend", () => {
       legend.colorScale(newColorScale);
 
       legend.content().selectAll(ENTRY_SELECTOR).each(function(d: any, i: number) {
-        assert.strictEqual(d, newDomain[i], "the data is set correctly");
+        const name = d[0].data.name;
+        assert.strictEqual(name, newDomain[i], "the data is set correctly");
         let text = d3.select(this).select("text").text();
-        assert.strictEqual(text, d, "the text was set properly");
+        assert.strictEqual(text, name, "the text was set properly");
         let fill = d3.select(this).select(SYMBOL_SELECTOR).attr("fill");
-        assert.strictEqual(fill, newColorScale.scale(d), "the fill was set properly");
+        assert.strictEqual(fill, newColorScale.scale(name), "the fill was set properly");
       });
 
       svg.remove();
@@ -139,11 +142,12 @@ describe("Legend", () => {
       const newDomain = ["a", "foo", "d"];
       newColorScale.domain(newDomain);
       legend.content().selectAll(ENTRY_SELECTOR).each(function(d: any, i: number) {
-        assert.strictEqual(d, newDomain[i], "the data is set correctly");
+        const name = d[0].data.name;
+        assert.strictEqual(name, newDomain[i], "the data is set correctly");
         const text = d3.select(this).select("text").text();
-        assert.strictEqual(text, d, "the text was set properly");
+        assert.strictEqual(text, name, "the text was set properly");
         const fill = d3.select(this).select(SYMBOL_SELECTOR).attr("fill");
-        assert.strictEqual(fill, newColorScale.scale(d), "the fill was set properly");
+        assert.strictEqual(fill, newColorScale.scale(name), "the fill was set properly");
       });
       svg.remove();
     });
@@ -206,19 +210,6 @@ describe("Legend", () => {
       svg.remove();
     });
 
-    it("requests more width if entries would be truncated", () => {
-      color.domain(["George Waaaaaashington", "John Adaaaams", "Thomaaaaas Jefferson"]);
-
-      legend.renderTo(svg); // have to be in DOM to measure
-
-      const idealSpaceRequest = legend.requestedSpace(Infinity, Infinity);
-      const constrainedRequest = legend.requestedSpace(idealSpaceRequest.minWidth * 0.9, Infinity);
-
-      assert.strictEqual(idealSpaceRequest.minWidth, constrainedRequest.minWidth,
-        "won't settle for less width if entries would be truncated");
-      svg.remove();
-    });
-
     it("truncates and hides entries if space is constrained for a horizontal legend", () => {
       svg.remove();
       svg = TestMethods.generateSVG(70, 400);
@@ -277,9 +268,10 @@ describe("Legend", () => {
       rows = legend.content().selectAll(ENTRY_SELECTOR);
 
       rows.each(function(d: any, i: number) {
+        const name = d[0].data.name;
         const row = d3.select(this);
         const symbol = row.select(SYMBOL_SELECTOR);
-        assert.strictEqual(symbol.attr("opacity"), String(opacityFunction(d, i)), "the symbol's opacity follows the provided function.");
+        assert.strictEqual(symbol.attr("opacity"), String(opacityFunction(name, i)), "the symbol's opacity follows the provided function.");
       });
       svg.remove();
     });
@@ -442,7 +434,7 @@ describe("Legend", () => {
       const colorDomain = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k"];
       color.domain(colorDomain);
       legend.renderTo(svg);
-      const entryTexts = legend.content().selectAll(ENTRY_SELECTOR).data();
+      const entryTexts = legend.content().selectAll(ENTRY_SELECTOR).data().map((datum) => datum[0].data.name);
       assert.deepEqual(colorDomain, entryTexts, "displayed texts should have the same order as the legend domain");
       svg.remove();
     });

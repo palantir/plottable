@@ -100,6 +100,13 @@ declare namespace Plottable.Utils.Math {
      */
     function distanceSquared(p1: Point, p2: Point): number;
     function degreesToRadians(degree: number): number;
+    /**
+     * Returns if the point is within the bounds. Points along
+     * the bounds are considered "within" as well.
+     * @param {Point} p Point in considerations.
+     * @param {Bounds} bounds Bounds within which to check for inclusion.
+     */
+    function within(p: Point, bounds: Bounds): boolean;
 }
 declare namespace Plottable.Utils {
     /**
@@ -2554,7 +2561,7 @@ declare namespace Plottable.Components {
          */
         maxLinesPerEntry(maxLinesPerEntry: number): this;
         /**
-         * Gets teh maximum width of the legend in pixels.
+         * Gets the maximum width of the legend in pixels.
          * @returns {number}
          */
         maxWidth(): number;
@@ -3270,10 +3277,7 @@ declare namespace Plottable {
          * the chart, relative to the parent.
          * @returns {Plots.PlotEntity} The nearest PlotEntity, or undefined if no {Plots.PlotEntity} can be found.
          */
-        entityNearest(queryPoint: Point, bounds?: {
-            topLeft: Point;
-            bottomRight: Point;
-        }): Plots.PlotEntity;
+        entityNearest(queryPoint: Point, bounds?: Bounds): Plots.PlotEntity;
         protected _entityVisibleOnPlot(entity: Plots.PlotEntity | Plots.LightweightPlotEntity, chartBounds: Bounds): boolean;
         protected _uninstallScaleForKey(scale: Scale<any, any>, key: string): void;
         protected _installScaleForKey(scale: Scale<any, any>, key: string): void;

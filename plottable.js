@@ -165,6 +165,19 @@ var Plottable;
                 return degree / 360 * nativeMath.PI * 2;
             }
             Math.degreesToRadians = degreesToRadians;
+            /**
+             * Returns if the point is within the bounds. Points along
+             * the bounds are considered "within" as well.
+             * @param {Point} p Point in considerations.
+             * @param {Bounds} bounds Bounds within which to check for inclusion.
+             */
+            function within(p, bounds) {
+                return bounds.topLeft.x <= p.x
+                    && bounds.bottomRight.x >= p.x
+                    && bounds.topLeft.y <= p.y
+                    && bounds.bottomRight.y >= p.y;
+            }
+            Math.within = within;
         })(Math = Utils.Math || (Utils.Math = {}));
     })(Utils = Plottable.Utils || (Plottable.Utils = {}));
 })(Plottable || (Plottable = {}));
@@ -5678,117 +5691,84 @@ var Plottable;
     var Components;
     (function (Components) {
         /**
-         * The Legend's column representation. Stores position information
-         * as well as data
-         */
-        var LegendColumn = (function () {
-            function LegendColumn(_width, _height, _data) {
-                if (_width === void 0) { _width = 0; }
-                if (_height === void 0) { _height = 0; }
-                this._width = _width;
-                this._height = _height;
-                this._data = _data;
-            }
-            /**
-             * @return {T} data Returns any data stored in the column
-             */
-            LegendColumn.prototype.getData = function () {
-                return this._data;
-            };
-            /**
-             * @return {number} height The height of the column.
-             */
-            LegendColumn.prototype.getHeight = function () {
-                return this._height;
-            };
-            /**
-             * @return {number} width The width of the column.
-             */
-            LegendColumn.prototype.getWidth = function () {
-                return this._width;
-            };
-            /**
-             * @param {number} width Sets the width of the column
-             */
-            LegendColumn.prototype.setWidth = function (width) {
-                return this._width = width;
-            };
-            return LegendColumn;
-        }());
-        /**
          * The Legend's row representations. Stores positioning information
          * and column data.
          */
         var LegendRow = (function () {
-            function LegendRow(_columns, _bottomPadding, _maxWidth) {
-                if (_columns === void 0) { _columns = []; }
-                if (_bottomPadding === void 0) { _bottomPadding = 0; }
-                if (_maxWidth === void 0) { _maxWidth = Infinity; }
-                this._columns = _columns;
-                this._bottomPadding = _bottomPadding;
-                this._maxWidth = _maxWidth;
+            function LegendRow(
+                /**
+                 * Columns within the row
+                 * @param {LegendColumn<any>[]} columns
+                 */
+                columns, 
+                /**
+                 * Padding applied below the row. Affects the spacing between rows. Defaults to 0.
+                 * @param {bottomPadding} number
+                 */
+                bottomPadding, 
+                /**
+                 * Sets the maximum allowable width of this column.
+                 * @param {number} maxWidth
+                 */
+                maxWidth) {
+                if (columns === void 0) { columns = []; }
+                if (bottomPadding === void 0) { bottomPadding = 0; }
+                if (maxWidth === void 0) { maxWidth = Infinity; }
+                this.columns = columns;
+                this.bottomPadding = bottomPadding;
+                this.maxWidth = maxWidth;
             }
+            /**
+             * Adds a column to the list of columns within the row. May readjust the size of the
+             * column to fit within the row
+             *
+             * @param {LegendColumn<any>} column
+             */
             LegendRow.prototype.addColumn = function (column) {
-                var desiredColumnWidth = column.getWidth();
+                var desiredColumnWidth = column.width;
                 // choose the smaller of 1) remaining space, 2) desired width
                 var widthRemaining = this.getWidthAvailable();
-                column.setWidth(Math.min(widthRemaining, desiredColumnWidth));
-                this._columns.push(column);
-            };
-            LegendRow.prototype.forEach = function (callback) {
-                this._columns.forEach(callback);
-            };
-            LegendRow.prototype.reduce = function (callbackfn, initialValue) {
-                return this._columns.reduce(callbackfn, initialValue);
+                column.width = Math.min(widthRemaining, desiredColumnWidth);
+                this.columns.push(column);
             };
             /**
              * Returns the bounds the column, relative to the row.
-             * @param {LegendColumn<any>} column The column in question
+             * @param {number} columnIndex The index of the column in question
              * @returns {Bounds} bounds
              */
-            LegendRow.prototype.getBounds = function (column) {
-                var indexOfColumn = this._columns.indexOf(column);
-                var columnXOffset = this._columns.slice(0, indexOfColumn)
-                    .reduce(function (sum, column) { return sum + column.getWidth(); }, 0);
+            LegendRow.prototype.getBounds = function (columnIndex) {
+                var column = this.columns[columnIndex];
+                var columnXOffset = 0;
+                for (var i = 0; i < columnIndex; i++) {
+                    columnXOffset += this.columns[i].width;
+                }
                 return {
                     topLeft: { x: columnXOffset, y: 0 },
                     bottomRight: {
-                        x: columnXOffset + column.getWidth(),
-                        y: column.getHeight(),
+                        x: columnXOffset + column.width,
+                        y: column.height,
                     }
                 };
-            };
-            LegendRow.prototype.getColumns = function () {
-                return this._columns;
             };
             /**
              * Returns the height of the row, including the bottomPadding.
              * @return {number} height
              */
             LegendRow.prototype.getHeight = function () {
-                return Plottable.Utils.Math.max(this._columns.map(function (column) { return column.getHeight(); }), 0)
-                    + this._bottomPadding;
-            };
-            /**
-             * Padding applied below the row. Affects the spacing between rows. Defaults to 0.
-             * @param {bottomPadding} number
-             */
-            LegendRow.prototype.setBottomPadding = function (bottomPadding) {
-                this._bottomPadding = bottomPadding;
-            };
-            /**
-             * Sets the maximum allowable width of this column.
-             * @param {number} maxWidth
-             */
-            LegendRow.prototype.setMaxWidth = function (maxWidth) {
-                this._maxWidth = maxWidth;
+                return Plottable.Utils.Math.max(this.columns.map(function (_a) {
+                    var height = _a.height;
+                    return height;
+                }), 0) + this.bottomPadding;
             };
             /**
              * Returns the current width of the row constrained by maxWidth, if set.
              * @returns {number} width
              */
             LegendRow.prototype.getWidth = function () {
-                return Math.min(this._columns.reduce(function (sum, column) { return sum + column.getWidth(); }, 0), this._maxWidth);
+                return Math.min(this.columns.reduce(function (sum, _a) {
+                    var width = _a.width;
+                    return sum + width;
+                }, 0), this.maxWidth);
             };
             /**
              * Returns the remaining width available in the row based on the maximum
@@ -5797,7 +5777,7 @@ var Plottable;
              */
             LegendRow.prototype.getWidthAvailable = function () {
                 var widthConsumed = this.getWidth();
-                return Math.max(this._maxWidth - widthConsumed, 0);
+                return Math.max(this.maxWidth - widthConsumed, 0);
             };
             return LegendRow;
         }());
@@ -5806,56 +5786,57 @@ var Plottable;
          * positioning information about the Legend.
          */
         var LegendTable = (function () {
-            function LegendTable(_maxWidth, _maxHeight, _padding, _rows) {
-                if (_maxWidth === void 0) { _maxWidth = Infinity; }
-                if (_maxHeight === void 0) { _maxHeight = Infinity; }
-                if (_padding === void 0) { _padding = 0; }
-                if (_rows === void 0) { _rows = []; }
-                this._maxWidth = _maxWidth;
-                this._maxHeight = _maxHeight;
-                this._padding = _padding;
-                this._rows = _rows;
+            function LegendTable(maxWidth, maxHeight, padding, rows) {
+                if (maxWidth === void 0) { maxWidth = Infinity; }
+                if (maxHeight === void 0) { maxHeight = Infinity; }
+                if (padding === void 0) { padding = 0; }
+                if (rows === void 0) { rows = []; }
+                this.maxWidth = maxWidth;
+                this.maxHeight = maxHeight;
+                this.padding = padding;
+                this.rows = rows;
             }
             LegendTable.prototype.addRow = function (row) {
-                row.setMaxWidth(this._maxWidth - this._padding * 2);
-                this._rows.push(row);
-            };
-            LegendTable.prototype.forEach = function (callback) {
-                this._rows.forEach(callback);
+                row.maxWidth = this.maxWidth - this.padding * 2;
+                this.rows.push(row);
             };
             /**
-             * Returns the bounds relative to the parent and siblings of the row or
-             * column. If column is not specified, bounds will be calculate for the row only.
-             * If the column is specified, the bounds will be calculate for the column only.
+              * Returns the bounds of the column relative to the parent and siblings of the
+              * column.
+              *
+              * @param {number} rowIndex The parent row containing the desired column.
+              * @param {number} columnIndex The column to calculate bounds.
+              * @returns {Bounds}
+              */
+            LegendTable.prototype.getColumnBounds = function (rowIndex, columnIndex) {
+                var rowBounds = this.getRowBounds(rowIndex);
+                var columnBounds = this.rows[rowIndex].getBounds(columnIndex);
+                columnBounds.topLeft.x += rowBounds.topLeft.x;
+                columnBounds.bottomRight.x += rowBounds.topLeft.x;
+                columnBounds.topLeft.y += rowBounds.topLeft.y;
+                columnBounds.bottomRight.y += rowBounds.topLeft.y;
+                return columnBounds;
+            };
+            /**
+             * Returns the bounds relative to the parent and siblings of the row.
              *
-             * @param {LegendRow} row The row to calculate bounds
-             * @param {LegendColumn} column The column to calculate bounds.
+             * @param {number} rowIndex The row to calculate bounds
              * @returns {Bounds}
              */
-            LegendTable.prototype.getBounds = function (row, column) {
-                var indexOfRow = this._rows.indexOf(row);
-                var rowYOffset = this._rows.slice(0, indexOfRow)
-                    .reduce(function (sum, row) { return sum + row.getHeight(); }, this._padding);
-                var rowXOffset = this._padding;
+            LegendTable.prototype.getRowBounds = function (rowIndex) {
+                var rowXOffset = this.padding;
+                var rowYOffset = this.padding;
+                for (var i = 0; i < rowIndex; i++) {
+                    rowYOffset += this.rows[i].getHeight();
+                }
                 var rowBounds = {
                     topLeft: { x: rowXOffset, y: rowYOffset },
                     bottomRight: {
-                        x: rowXOffset + row.getWidth(),
-                        y: rowYOffset + row.getHeight(),
+                        x: rowXOffset + this.rows[rowIndex].getWidth(),
+                        y: rowYOffset + this.rows[rowIndex].getHeight(),
                     }
                 };
-                if (column !== undefined) {
-                    var columnBounds = row.getBounds(column);
-                    columnBounds.topLeft.x += rowBounds.topLeft.x;
-                    columnBounds.bottomRight.x += rowBounds.topLeft.x;
-                    columnBounds.topLeft.y += rowBounds.topLeft.y;
-                    columnBounds.bottomRight.y += rowBounds.topLeft.y;
-                    return columnBounds;
-                }
                 return rowBounds;
-            };
-            LegendTable.prototype.getRows = function () {
-                return this._rows;
             };
             /**
              * Returns the height of the Table, constrained by a maximum height, if set.
@@ -5863,7 +5844,7 @@ var Plottable;
              * @returns {number} height
              */
             LegendTable.prototype.getHeight = function () {
-                return Math.min(this._rows.reduce(function (sum, row) { return sum + row.getHeight(); }, 0) + this._padding * 2, this._maxHeight);
+                return Math.min(this.rows.reduce(function (sum, row) { return sum + row.getHeight(); }, 0) + this.padding * 2, this.maxHeight);
             };
             /**
              * Returns the width of the table, constrained by the maximum width, if set.
@@ -5871,10 +5852,7 @@ var Plottable;
              * @returns {number} width
              */
             LegendTable.prototype.getWidth = function () {
-                return Math.min(Plottable.Utils.Math.max(this._rows.map(function (row) { return row.getWidth(); }), 0) + this._padding * 2, this._maxWidth);
-            };
-            LegendTable.prototype.reduce = function (callbackfn, initialValue) {
-                return this._rows.reduce(callbackfn, initialValue);
+                return Math.min(Plottable.Utils.Math.max(this.rows.map(function (row) { return row.getWidth(); }), 0) + this.padding * 2, this.maxWidth);
             };
             return LegendTable;
         }());
@@ -5989,30 +5967,31 @@ var Plottable;
                 var entryNames = this._colorScale.domain().slice().sort(function (a, b) { return _this._comparator(_this._formatter(a), _this._formatter(b)); });
                 var row = new LegendRow();
                 table.addRow(row);
-                entryNames.forEach(function (entryName, index) {
-                    if (row.getColumns().length / 2 === _this.maxEntriesPerRow()) {
+                row.bottomPadding = this._rowBottomPadding;
+                entryNames.forEach(function (name, index) {
+                    if (row.columns.length / 2 === _this.maxEntriesPerRow()) {
                         // we add two columns per entry, a symbol column and a name column
                         // if the current row is full, according to the number of entries
                         // we're allowed to have per row, we need to allocate new space
                         row = new LegendRow();
-                        row.setBottomPadding(_this._rowBottomPadding);
+                        row.bottomPadding = _this._rowBottomPadding;
                         table.addRow(row);
                     }
                     var availableWidth = row.getWidthAvailable();
-                    var formattedName = _this._formatter(entryName);
+                    var formattedName = _this._formatter(name);
                     // this is the width of the series name without any line wrapping
                     // it is the most optimal presentation of the name
                     var unwrappedNameWidth = _this._measurer.measure(formattedName).width;
                     var willBeSquished = (availableWidth - textHeight - unwrappedNameWidth) < 0;
-                    if (willBeSquished && row.getColumns().length > 1) {
+                    if (willBeSquished && row.columns.length > 1) {
                         // adding the entry to this row will squish this
                         // entry. The row already contains entries so create
                         // a new row to add this entry to for optimal display
                         row = new LegendRow();
-                        row.setBottomPadding(_this._rowBottomPadding);
+                        row.bottomPadding = _this._rowBottomPadding;
                         table.addRow(row);
                     }
-                    var symbolColumn = new LegendColumn(textHeight, textHeight, entryName);
+                    var symbolColumn = { width: textHeight, height: textHeight, data: { name: name, type: "symbol" } };
                     row.addColumn(symbolColumn);
                     // the space consumed by the name field is the minimum of the space available in the table
                     // and the actual width consumed by the name
@@ -6021,7 +6000,7 @@ var Plottable;
                     _this._wrapper.maxLines(_this.maxLinesPerEntry());
                     var numberOfRows = _this._wrapper.wrap(formattedName, _this._measurer, usedNameWidth).noLines;
                     var nameColumnHeight = numberOfRows * textHeight;
-                    var nameColumn = new LegendColumn(usedNameWidth, nameColumnHeight, entryName);
+                    var nameColumn = { width: usedNameWidth, height: nameColumnHeight, data: { name: name, type: "text" } };
                     row.addColumn(nameColumn);
                 });
                 return table;
@@ -6047,28 +6026,21 @@ var Plottable;
                 if (!this._isSetup) {
                     return [];
                 }
-                function within(p, bounds) {
-                    return bounds.topLeft.x <= p.x
-                        && bounds.bottomRight.x >= p.x
-                        && bounds.topLeft.y <= p.y
-                        && bounds.bottomRight.y >= p.y;
-                }
-                ;
                 var table = this._buildLegendTable(this.width(), this.height());
-                return table.reduce(function (entity, row, rowIndex) {
+                return table.rows.reduce(function (entity, row, rowIndex) {
                     if (entity.length !== 0) {
                         // we've already found the nearest entity; just return it.
                         return entity;
                     }
-                    var rowBounds = table.getBounds(row);
-                    var withinRow = within(p, rowBounds);
+                    var rowBounds = table.getRowBounds(rowIndex);
+                    var withinRow = Plottable.Utils.Math.within(p, rowBounds);
                     if (!withinRow) {
                         // the nearest entity isn't within this row, continue;
                         return entity;
                     }
-                    return row.reduce(function (entity, column, columnIndex) {
-                        var columnBounds = table.getBounds(row, column);
-                        var withinColumn = within(p, columnBounds);
+                    return row.columns.reduce(function (entity, column, columnIndex) {
+                        var columnBounds = table.getColumnBounds(rowIndex, columnIndex);
+                        var withinColumn = Plottable.Utils.Math.within(p, columnBounds);
                         if (withinColumn) {
                             var rowElement = _this.content().selectAll("." + Legend.LEGEND_ROW_CLASS)[0][rowIndex];
                             // HACKHACK The 2.x API chooses the symbol element as the "selection" to return, regardless of what
@@ -6080,7 +6052,7 @@ var Plottable;
                             var rowTranslate = d3.transform(d3.select(rowElement).attr("transform")).translate;
                             var symbolTranslate = d3.transform(symbolElement.attr("transform")).translate;
                             return [{
-                                    datum: column.getData(),
+                                    datum: column.data.name,
                                     position: { x: rowTranslate[0] + symbolTranslate[0], y: rowTranslate[1] + symbolTranslate[1] },
                                     selection: d3.select(entryElement),
                                     component: _this,
@@ -6097,40 +6069,55 @@ var Plottable;
                 var entryNames = this._colorScale.domain().slice().sort(function (a, b) { return _this._comparator(_this._formatter(a), _this._formatter(b)); });
                 // clear content from previous renders
                 this.content().selectAll("*").remove();
-                var tableRoot = this.content();
-                table.forEach(function (row, rowIndex) {
-                    var rowBounds = table.getBounds(row);
-                    var rowRoot = tableRoot.append("g").classed(Legend.LEGEND_ROW_CLASS, true)
-                        .attr("transform", "translate(" + rowBounds.topLeft.x + ", " + rowBounds.topLeft.y + ")");
-                    var rowEntry;
-                    var rowElement = row.forEach(function (column, index) {
-                        var columnBounds = table.getBounds(row, column);
-                        if (index % 2 === 0) {
-                            // symbols are at even indices in the rows of our table
-                            // HACKHACK need a legend entry element to maintain back compat with 2.x
-                            rowEntry = rowRoot.append("g").classed(Legend.LEGEND_ENTRY_CLASS, true);
-                            rowEntry.append("path")
-                                .attr("d", _this.symbol()(column.getData(), rowIndex)(column.getHeight() * 0.6))
-                                .attr("transform", "translate(" + (columnBounds.topLeft.x + column.getWidth() / 2) + ", " + column.getHeight() / 2 + ")")
-                                .attr("fill", _this._colorScale.scale(column.getData()))
-                                .attr("opacity", _this.symbolOpacity()(column.getData(), rowIndex))
-                                .classed(Legend.LEGEND_SYMBOL_CLASS, true);
-                        }
-                        else {
-                            // series names are at odd indicies in the rows of our table
-                            // HACKHACK add data to element to maintain backcompat with 2.x
-                            rowEntry.data(function () { return [column.getData()]; });
-                            var textContainer = rowEntry.append("g").classed("text-container", true)
-                                .attr("transform", "translate(" + columnBounds.topLeft.x + ", 0)");
-                            var writeOptions = {
-                                selection: textContainer,
-                                xAlign: "left",
-                                yAlign: "top",
-                                textRotation: 0,
-                            };
-                            _this._writer.write(_this._formatter(column.getData()), column.getWidth(), _this.height(), writeOptions);
-                        }
-                    });
+                var rows = this.content().selectAll("g." + Legend.LEGEND_ROW_CLASS).data(table.rows);
+                rows.enter().append("g").classed(Legend.LEGEND_ROW_CLASS, true);
+                rows.exit().remove();
+                rows.attr("transform", function (row, rowIndex) {
+                    var rowBounds = table.getRowBounds(rowIndex);
+                    return "translate(" + rowBounds.topLeft.x + ", " + rowBounds.topLeft.y + ")";
+                });
+                var entries = rows.selectAll("g." + Legend.LEGEND_ENTRY_CLASS).data(function (row) {
+                    var symbolEntryPairs = [];
+                    for (var i = 0; i < row.columns.length; i += 2) {
+                        symbolEntryPairs.push([row.columns[i], row.columns[i + 1]]);
+                    }
+                    return symbolEntryPairs;
+                });
+                var entriesEnter = entries.enter().append("g").classed(Legend.LEGEND_ENTRY_CLASS, true);
+                entriesEnter.append("path")
+                    .attr("d", function (symbolEntryPair, columnIndex, rowIndex) {
+                    var symbol = symbolEntryPair[0];
+                    return _this.symbol()(symbol.data.name, rowIndex)(symbol.height * 0.6);
+                })
+                    .attr("transform", function (symbolEntryPair, i, rowIndex) {
+                    var symbol = symbolEntryPair[0];
+                    var columnIndex = table.rows[rowIndex].columns.indexOf(symbol);
+                    var columnBounds = table.getColumnBounds(rowIndex, columnIndex);
+                    return "translate(" + (columnBounds.topLeft.x + symbol.width / 2) + ", " + symbol.height / 2 + ")";
+                })
+                    .attr("fill", function (symbolEntryPair) { return _this._colorScale.scale(symbolEntryPair[0].data.name); })
+                    .attr("opacity", function (symbolEntryPair, _columnIndex, rowIndex) {
+                    return _this.symbolOpacity()(symbolEntryPair[0].data.name, rowIndex);
+                })
+                    .classed(Legend.LEGEND_SYMBOL_CLASS, true);
+                var self = this;
+                entriesEnter.append("g").classed("text-container", true)
+                    .attr("transform", function (symbolEntryPair, i, rowIndex) {
+                    var entry = symbolEntryPair[1];
+                    var columnIndex = table.rows[rowIndex].columns.indexOf(entry);
+                    var columnBounds = table.getColumnBounds(rowIndex, columnIndex);
+                    return "translate(" + columnBounds.topLeft.x + ", 0)";
+                })
+                    .each(function (symbolEntryPair, i, rowIndex) {
+                    var textContainer = d3.select(this);
+                    var column = symbolEntryPair[1];
+                    var writeOptions = {
+                        selection: textContainer,
+                        xAlign: "left",
+                        yAlign: "top",
+                        textRotation: 0,
+                    };
+                    self._writer.write(self._formatter(column.data.name), column.width, self.height(), writeOptions);
                 });
                 return this;
             };

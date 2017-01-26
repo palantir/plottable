@@ -3,36 +3,19 @@ namespace Plottable.Components {
    * The Legend's column representation. Stores position information
    * as well as data
    */
-  class LegendColumn<T> {
-    constructor(private _width = 0, private _height = 0, private _data: T) {}
-
+  interface LegendColumn<T> {
     /**
-     * @return {T} data Returns any data stored in the column
+     * Data stored in the column
      */
-    public getData() {
-      return this._data;
-    }
-
+    data: T;
     /**
-     * @return {number} height The height of the column.
+     * Width of the column in pixels
      */
-    public getHeight() {
-      return this._height;
-    }
-
+    width: number;
     /**
-     * @return {number} width The width of the column.
+     * Height of the column in pixels
      */
-    public getWidth() {
-      return this._width;
-    }
-
-    /**
-     * @param {number} width Sets the width of the column
-     */
-    public setWidth(width: number) {
-      return this._width = width;
-    }
+    height: number;
   }
 
   /**
@@ -41,89 +24,74 @@ namespace Plottable.Components {
    */
   class LegendRow {
     constructor(
-        private _columns: LegendColumn<any>[] = [],
-        private _bottomPadding = 0,
-        private _maxWidth = Infinity) {}
-
-    public addColumn(column: LegendColumn<any>) {
-      const desiredColumnWidth = column.getWidth();
-      // choose the smaller of 1) remaining space, 2) desired width
-      const widthRemaining = this.getWidthAvailable();
-      column.setWidth(Math.min(widthRemaining, desiredColumnWidth));
-      this._columns.push(column);
-    }
-
-    public forEach(callback: (column: LegendColumn<any>, index?: number) => void) {
-      this._columns.forEach(callback);
-    }
-
-    public reduce<U>(callbackfn: (
-      previousValue: U,
-      currentValue: LegendColumn<any>,
-      currentIndex: number,
-      array: LegendColumn<any>[]) => U, initialValue: U): U {
-      return this._columns.reduce(callbackfn, initialValue);
-    }
+        /**
+         * Columns within the row
+         * @param {LegendColumn<any>[]} columns
+         */
+        public columns: LegendColumn<any>[] = [],
+        /**
+         * Padding applied below the row. Affects the spacing between rows. Defaults to 0.
+         * @param {bottomPadding} number
+         */
+        public bottomPadding = 0,
+        /**
+         * Sets the maximum allowable width of this column.
+         * @param {number} maxWidth
+         */
+        public maxWidth = Infinity) {}
 
     /**
+     * Adds a column to the list of columns within the row. May readjust the size of the
+     * column to fit within the row
+     *
+     * @param {LegendColumn<any>} column
+     */
+    public addColumn(column: LegendColumn<any>) {
+      const desiredColumnWidth = column.width;
+
+      // choose the smaller of 1) remaining space, 2) desired width
+      const widthRemaining = this.getWidthAvailable();
+      column.width = Math.min(widthRemaining, desiredColumnWidth);
+      this.columns.push(column);
+    }
+    /**
      * Returns the bounds the column, relative to the row.
-     * @param {LegendColumn<any>} column The column in question
+     * @param {number} columnIndex The index of the column in question
      * @returns {Bounds} bounds
      */
-    public getBounds(column: LegendColumn<any>) {
-      const indexOfColumn = this._columns.indexOf(column);
-      const columnXOffset = this._columns.slice(0, indexOfColumn)
-        .reduce((sum, column) => sum + column.getWidth(), 0);
+    public getBounds(columnIndex: number) {
+      const column = this.columns[columnIndex];
+
+      let columnXOffset = 0;
+      for (let i = 0; i < columnIndex; i ++) {
+        columnXOffset += this.columns[i].width;
+      }
 
       return {
         topLeft: { x: columnXOffset, y: 0 },
         bottomRight: {
-          x: columnXOffset + column.getWidth(),
-          y: column.getHeight(),
+          x: columnXOffset + column.width,
+          y: column.height,
         }
       };
     }
-
-    public getColumns() {
-      return this._columns;
-    }
-
     /**
      * Returns the height of the row, including the bottomPadding.
      * @return {number} height
      */
     public getHeight() {
-      return Utils.Math.max(this._columns.map((column) => column.getHeight()), 0)
-        + this._bottomPadding;
+      return Utils.Math.max(this.columns.map(({ height }) => height), 0) + this.bottomPadding;
     }
-
-    /**
-     * Padding applied below the row. Affects the spacing between rows. Defaults to 0.
-     * @param {bottomPadding} number
-     */
-    public setBottomPadding(bottomPadding: number) {
-      this._bottomPadding = bottomPadding;
-    }
-
-    /**
-     * Sets the maximum allowable width of this column.
-     * @param {number} maxWidth
-     */
-    public setMaxWidth(maxWidth: number) {
-      this._maxWidth = maxWidth;
-    }
-
     /**
      * Returns the current width of the row constrained by maxWidth, if set.
      * @returns {number} width
      */
     public getWidth() {
       return Math.min(
-        this._columns.reduce((sum, column) => sum + column.getWidth(), 0),
-        this._maxWidth
+        this.columns.reduce((sum, { width }) => sum + width, 0),
+        this.maxWidth
       );
     }
-
     /**
      * Returns the remaining width available in the row based on the maximum
      * width of this row.
@@ -131,7 +99,7 @@ namespace Plottable.Components {
      */
     public getWidthAvailable() {
       const widthConsumed = this.getWidth();
-      return Math.max(this._maxWidth - widthConsumed, 0);
+      return Math.max(this.maxWidth - widthConsumed, 0);
     }
   }
 
@@ -141,60 +109,58 @@ namespace Plottable.Components {
    */
   class LegendTable {
     constructor(
-        private _maxWidth = Infinity,
-        private _maxHeight = Infinity,
-        private _padding = 0,
-        private _rows: LegendRow[] = []) {}
+        public maxWidth = Infinity,
+        public maxHeight = Infinity,
+        public padding = 0,
+        public rows: LegendRow[] = []) {}
 
     public addRow(row: LegendRow) {
-      row.setMaxWidth(this._maxWidth - this._padding * 2);
-      this._rows.push(row);
+      row.maxWidth = this.maxWidth - this.padding * 2;
+      this.rows.push(row);
     }
-
-    public forEach(callback: (row: LegendRow, index?: number) => void) {
-      this._rows.forEach(callback);
-    }
-
-    /**
-     * Returns the bounds relative to the parent and siblings of the row or
-     * column. If column is not specified, bounds will be calculate for the row only.
-     * If the column is specified, the bounds will be calculate for the column only.
+   /**
+     * Returns the bounds of the column relative to the parent and siblings of the
+     * column.
      *
-     * @param {LegendRow} row The row to calculate bounds
-     * @param {LegendColumn} column The column to calculate bounds.
+     * @param {number} rowIndex The parent row containing the desired column.
+     * @param {number} columnIndex The column to calculate bounds.
      * @returns {Bounds}
      */
-    public getBounds(row: LegendRow, column?: LegendColumn<any>) {
-      const indexOfRow = this._rows.indexOf(row);
-      const rowYOffset = this._rows.slice(0, indexOfRow)
-        .reduce((sum, row) => sum + row.getHeight(), this._padding);
-      const rowXOffset = this._padding;
+    public getColumnBounds(rowIndex: number, columnIndex: number) {
+      const rowBounds = this.getRowBounds(rowIndex);
+
+      const columnBounds = this.rows[rowIndex].getBounds(columnIndex);
+      columnBounds.topLeft.x += rowBounds.topLeft.x;
+      columnBounds.bottomRight.x += rowBounds.topLeft.x;
+
+      columnBounds.topLeft.y += rowBounds.topLeft.y;
+      columnBounds.bottomRight.y += rowBounds.topLeft.y;
+      return columnBounds;
+    }
+    /**
+     * Returns the bounds relative to the parent and siblings of the row.
+     *
+     * @param {number} rowIndex The row to calculate bounds
+     * @returns {Bounds}
+     */
+    public getRowBounds(rowIndex: number) {
+      const rowXOffset = this.padding;
+
+      let rowYOffset = this.padding;
+      for (let i = 0; i < rowIndex; i ++) {
+        rowYOffset += this.rows[i].getHeight();
+      }
 
       const rowBounds = {
         topLeft: { x: rowXOffset, y: rowYOffset },
         bottomRight: {
-          x: rowXOffset + row.getWidth(),
-          y: rowYOffset + row.getHeight(),
+          x: rowXOffset + this.rows[rowIndex].getWidth(),
+          y: rowYOffset + this.rows[rowIndex].getHeight(),
         }
       };
 
-      if (column !== undefined) {
-        const columnBounds = row.getBounds(column);
-        columnBounds.topLeft.x += rowBounds.topLeft.x;
-        columnBounds.bottomRight.x += rowBounds.topLeft.x;
-
-        columnBounds.topLeft.y += rowBounds.topLeft.y;
-        columnBounds.bottomRight.y += rowBounds.topLeft.y;
-        return columnBounds;
-      }
-
       return rowBounds;
     }
-
-    public getRows() {
-      return this._rows;
-    }
-
     /**
      * Returns the height of the Table, constrained by a maximum height, if set.
      * The height includes the padding, if set.
@@ -202,11 +168,10 @@ namespace Plottable.Components {
      */
     public getHeight() {
       return Math.min(
-        this._rows.reduce((sum, row) => sum + row.getHeight(), 0) + this._padding * 2,
-        this._maxHeight
+        this.rows.reduce((sum, row) => sum + row.getHeight(), 0) + this.padding * 2,
+        this.maxHeight
       );
     }
-
     /**
      * Returns the width of the table, constrained by the maximum width, if set.
      * The width includes the padding, if set.
@@ -214,17 +179,9 @@ namespace Plottable.Components {
      */
     public getWidth() {
       return Math.min(
-        Utils.Math.max(this._rows.map((row) => row.getWidth()), 0) + this._padding * 2,
-        this._maxWidth
+        Utils.Math.max(this.rows.map((row) => row.getWidth()), 0) + this.padding * 2,
+        this.maxWidth
       );
-    }
-
-    public reduce<U>(callbackfn: (
-      previousValue: U,
-      currentValue: LegendRow,
-      currentIndex: number,
-      array: LegendRow[]) => U, initialValue: U): U {
-      return this._rows.reduce(callbackfn, initialValue);
     }
   }
 
@@ -290,7 +247,7 @@ namespace Plottable.Components {
       super._setup();
       let fakeLegendRow = this.content().append("g").classed(Legend.LEGEND_ROW_CLASS, true);
       let fakeLegendEntry = fakeLegendRow.append("g").classed(Legend.LEGEND_ENTRY_CLASS, true);
-      fakeLegendEntry.append("text"); 
+      fakeLegendEntry.append("text");
       this._measurer = new SVGTypewriter.Measurer(fakeLegendRow);
       this._wrapper = new SVGTypewriter.Wrapper().maxLines(this.maxLinesPerEntry());
       this._writer = new SVGTypewriter.Writer(this._measurer, this._wrapper).addTitleElement(Configs.ADD_TITLE_ELEMENTS);
@@ -365,7 +322,7 @@ namespace Plottable.Components {
     }
 
     /**
-     * Gets teh maximum width of the legend in pixels.
+     * Gets the maximum width of the legend in pixels.
      * @returns {number}
      */
     public maxWidth(): number;
@@ -446,33 +403,34 @@ namespace Plottable.Components {
 
       let row: LegendRow = new LegendRow();
       table.addRow(row);
-      entryNames.forEach((entryName, index) => {
-        if (row.getColumns().length / 2 === this.maxEntriesPerRow()) {
+      row.bottomPadding = this._rowBottomPadding;
+      entryNames.forEach((name, index) => {
+        if (row.columns.length / 2 === this.maxEntriesPerRow()) {
           // we add two columns per entry, a symbol column and a name column
           // if the current row is full, according to the number of entries
           // we're allowed to have per row, we need to allocate new space
           row = new LegendRow();
-          row.setBottomPadding(this._rowBottomPadding);
+          row.bottomPadding = this._rowBottomPadding;
           table.addRow(row);
         }
 
         let availableWidth = row.getWidthAvailable();
-        const formattedName = this._formatter(entryName);
+        const formattedName = this._formatter(name);
         // this is the width of the series name without any line wrapping
         // it is the most optimal presentation of the name
         const unwrappedNameWidth = this._measurer.measure(formattedName).width;
         const willBeSquished = (availableWidth - textHeight - unwrappedNameWidth) < 0;
 
-        if (willBeSquished && row.getColumns().length > 1) {
+        if (willBeSquished && row.columns.length > 1) {
           // adding the entry to this row will squish this
           // entry. The row already contains entries so create
           // a new row to add this entry to for optimal display
           row = new LegendRow();
-          row.setBottomPadding(this._rowBottomPadding);
+          row.bottomPadding = this._rowBottomPadding;
           table.addRow(row);
         }
 
-        const symbolColumn = new LegendColumn(textHeight, textHeight, entryName);
+        const symbolColumn = { width: textHeight, height: textHeight, data: { name, type: "symbol"} };
         row.addColumn(symbolColumn);
 
         // the space consumed by the name field is the minimum of the space available in the table
@@ -484,7 +442,7 @@ namespace Plottable.Components {
         let numberOfRows = this._wrapper.wrap(formattedName, this._measurer, usedNameWidth).noLines;
 
         let nameColumnHeight = numberOfRows * textHeight;
-        const nameColumn = new LegendColumn(usedNameWidth, nameColumnHeight, entryName);
+        const nameColumn = { width: usedNameWidth, height: nameColumnHeight, data: { name, type: "text" } };
         row.addColumn(nameColumn);
       });
 
@@ -517,31 +475,24 @@ namespace Plottable.Components {
         return [];
       }
 
-      function within(p: Point, bounds: Bounds) {
-        return bounds.topLeft.x <= p.x
-          && bounds.bottomRight.x >= p.x
-          && bounds.topLeft.y <= p.y
-          && bounds.bottomRight.y >= p.y;
-      };
-
       const table = this._buildLegendTable(this.width(), this.height());
-      return table.reduce((entity: Entity<Legend>[], row: LegendRow, rowIndex: number) => {
+      return table.rows.reduce((entity: Entity<Legend>[], row: LegendRow, rowIndex: number) => {
         if (entity.length !== 0) {
           // we've already found the nearest entity; just return it.
           return entity;
         }
 
-        const rowBounds = table.getBounds(row);
-        const withinRow = within(p, rowBounds);
+        const rowBounds = table.getRowBounds(rowIndex);
+        const withinRow = Utils.Math.within(p, rowBounds);
 
         if (!withinRow) {
           // the nearest entity isn't within this row, continue;
           return entity;
         }
 
-        return row.reduce((entity: Entity<Legend>[], column: LegendColumn<string>, columnIndex: number) => {
-          const columnBounds = table.getBounds(row, column);
-          const withinColumn = within(p, columnBounds);
+        return row.columns.reduce((entity: Entity<Legend>[], column: LegendColumn<{ name: string, type: string }>, columnIndex: number) => {
+          const columnBounds = table.getColumnBounds(rowIndex, columnIndex);
+          const withinColumn = Utils.Math.within(p, columnBounds);
 
           if (withinColumn) {
             const rowElement = this.content().selectAll(`.${Legend.LEGEND_ROW_CLASS}`)[0][rowIndex];
@@ -556,7 +507,7 @@ namespace Plottable.Components {
             const symbolTranslate = d3.transform(symbolElement.attr("transform")).translate;
 
             return [{
-              datum: column.getData(),
+              datum: column.data.name,
               position: { x: rowTranslate[0] + symbolTranslate[0], y: rowTranslate[1] + symbolTranslate[1] },
               selection: d3.select(entryElement),
               component: this,
@@ -571,52 +522,69 @@ namespace Plottable.Components {
 
     public renderImmediately() {
       super.renderImmediately();
+
       const table = this._buildLegendTable(this.width(), this.height());
       const entryNames = this._colorScale.domain().slice().sort((a, b) => this._comparator(this._formatter(a), this._formatter(b)));
 
       // clear content from previous renders
       this.content().selectAll("*").remove();
-      const tableRoot = this.content();
-
-      table.forEach((row: LegendRow, rowIndex: number) => {
-        const rowBounds = table.getBounds(row);
-        const rowRoot = tableRoot.append("g").classed(Legend.LEGEND_ROW_CLASS, true)
-          .attr("transform", `translate(${rowBounds.topLeft.x}, ${rowBounds.topLeft.y})`);
-
-        let rowEntry: d3.Selection<any>;
-        const rowElement = row.forEach((column: LegendColumn<string>, index: number) => {
-          const columnBounds = table.getBounds(row, column);
-
-          if (index % 2  === 0) {
-            // symbols are at even indices in the rows of our table
-
-            // HACKHACK need a legend entry element to maintain back compat with 2.x
-            rowEntry = rowRoot.append("g").classed(Legend.LEGEND_ENTRY_CLASS, true);
-            rowEntry.append("path")
-              .attr("d", this.symbol()(column.getData(), rowIndex)(column.getHeight() * 0.6))
-              .attr("transform", `translate(${columnBounds.topLeft.x + column.getWidth() / 2}, ${column.getHeight() / 2})`)
-              .attr("fill", this._colorScale.scale(column.getData()))
-              .attr("opacity", this.symbolOpacity()(column.getData(), rowIndex))
-              .classed(Legend.LEGEND_SYMBOL_CLASS, true);
-          } else {
-            // series names are at odd indicies in the rows of our table
-
-            // HACKHACK add data to element to maintain backcompat with 2.x
-            rowEntry.data(() => [column.getData()]);
-
-            const textContainer = rowEntry.append("g").classed("text-container", true)
-              .attr("transform", "translate(" + columnBounds.topLeft.x + ", 0)");
-
-            const writeOptions = {
-              selection: textContainer,
-              xAlign: "left",
-              yAlign: "top",
-              textRotation: 0,
-            };
-            this._writer.write(this._formatter(column.getData()), column.getWidth(), this.height(), writeOptions);
-          }
-        });
+      const rows = this.content().selectAll("g." + Legend.LEGEND_ROW_CLASS).data(table.rows);
+      rows.enter().append("g").classed(Legend.LEGEND_ROW_CLASS, true);
+      rows.exit().remove();
+      rows.attr("transform", (row, rowIndex) => {
+        const rowBounds = table.getRowBounds(rowIndex);
+        return `translate(${rowBounds.topLeft.x}, ${rowBounds.topLeft.y})`;
       });
+
+      const entries = rows.selectAll(`g.${Legend.LEGEND_ENTRY_CLASS}`).data((row) => {
+        const symbolEntryPairs: [
+            LegendColumn<{name: string, type: string }>,
+            LegendColumn<{ name: string, type: string}>][] = [];
+        for (let i = 0; i < row.columns.length; i += 2) {
+          symbolEntryPairs.push([row.columns[i], row.columns[i + 1]]);
+        }
+        return symbolEntryPairs;
+      });
+
+      const entriesEnter = entries.enter().append("g").classed(Legend.LEGEND_ENTRY_CLASS, true);
+      entriesEnter.append("path")
+        .attr("d", (symbolEntryPair, columnIndex, rowIndex) => {
+          const symbol = symbolEntryPair[0];
+          return this.symbol()(symbol.data.name, rowIndex)(symbol.height * 0.6);
+        })
+        .attr("transform", (symbolEntryPair, i, rowIndex) => {
+          const symbol = symbolEntryPair[0];
+          const columnIndex = table.rows[rowIndex].columns.indexOf(symbol);
+          const columnBounds = table.getColumnBounds(rowIndex, columnIndex);
+          return `translate(${columnBounds.topLeft.x + symbol.width / 2}, ${symbol.height / 2})`;
+        })
+        .attr("fill", (symbolEntryPair) => this._colorScale.scale(symbolEntryPair[0].data.name))
+        .attr("opacity", (symbolEntryPair, _columnIndex, rowIndex ) => {
+          return this.symbolOpacity()(symbolEntryPair[0].data.name, rowIndex);
+        })
+        .classed(Legend.LEGEND_SYMBOL_CLASS, true);
+
+      const self = this;
+      entriesEnter.append("g").classed("text-container", true)
+        .attr("transform", (symbolEntryPair, i, rowIndex) => {
+          const entry = symbolEntryPair[1];
+          const columnIndex = table.rows[rowIndex].columns.indexOf(entry);
+          const columnBounds = table.getColumnBounds(rowIndex, columnIndex);
+          return  "translate(" + columnBounds.topLeft.x + ", 0)"
+        })
+        .each(function(symbolEntryPair, i, rowIndex) {
+          const textContainer = d3.select(this);
+          const column = symbolEntryPair[1];
+
+          const writeOptions = {
+            selection: textContainer,
+            xAlign: "left",
+            yAlign: "top",
+            textRotation: 0,
+          };
+
+          self._writer.write(self._formatter(column.data.name), column.width, self.height(), writeOptions)
+        });
 
       return this;
     }
