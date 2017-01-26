@@ -212,17 +212,38 @@ namespace Plottable.Plots {
     }
 
     /**
-     * Gets the Formatter for the labels.
+     * Gets the Formatter for the chart labels.
      */
-    public labelFormatter(): Formatter;
+    public labelFormatter(): LabelFormatter;
     /**
-     * Sets the Formatter for the labels.
+     * Sets the Formatter for the chart labels.
+     *
+     * @param {LabelFormatter} formatter
+     * @returns {Bar} The calling Bar Plot.
+     */
+    public labelFormatter(formatter: LabelFormatter): this;
+    public labelFormatter(formatter?: LabelFormatter): any {
+      if (formatter == null) {
+        return this._labelFormatter;
+      } else {
+        this._labelFormatter = formatter;
+        this.render();
+        return this;
+      }
+    }
+
+    /**
+     * Gets the Formatter for the chart axis.
+     */
+    public axisLabelFormatter(): Formatter;
+    /**
+     * Sets the Formatter for the chart axis.
      *
      * @param {Formatter} formatter
      * @returns {Bar} The calling Bar Plot.
      */
-    public labelFormatter(formatter: Formatter): this;
-    public labelFormatter(formatter?: Formatter): any {
+    public axisLabelFormatter(formatter: Formatter): this;
+    public axisLabelFormatter(formatter?: Formatter): any {
       if (formatter == null) {
         return this._labelFormatter;
       } else {

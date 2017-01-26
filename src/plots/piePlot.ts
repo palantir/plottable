@@ -281,15 +281,15 @@ namespace Plottable.Plots {
     /**
      * Gets the Formatter for the labels.
      */
-    public labelFormatter(): Formatter;
+    public labelFormatter(): LabelFormatter;
     /**
      * Sets the Formatter for the labels.
      *
-     * @param {Formatter} formatter
+     * @param {LabelFormatter} formatter
      * @returns {Pie} The calling Pie Plot.
      */
-    public labelFormatter(formatter: Formatter): this;
-    public labelFormatter(formatter?: Formatter): any {
+    public labelFormatter(formatter: LabelFormatter): this;
+    public labelFormatter(formatter?: LabelFormatter): any {
       if (formatter == null) {
         return this._labelFormatter;
       } else {

@@ -3388,14 +3388,14 @@ declare namespace Plottable.Plots {
         /**
          * Gets the Formatter for the labels.
          */
-        labelFormatter(): Formatter;
+        labelFormatter(): LabelFormatter;
         /**
          * Sets the Formatter for the labels.
          *
-         * @param {Formatter} formatter
+         * @param {LabelFormatter} formatter
          * @returns {Pie} The calling Pie Plot.
          */
-        labelFormatter(formatter: Formatter): this;
+        labelFormatter(formatter: LabelFormatter): this;
         entitiesAt(queryPoint: Point): PlotEntity[];
         protected _propertyProjectors(): AttributeToProjector;
         private _updatePieAngles();
@@ -3851,16 +3851,27 @@ declare namespace Plottable.Plots {
          */
         labelsEnabled(enabled: boolean): this;
         /**
-         * Gets the Formatter for the labels.
+         * Gets the Formatter for the chart labels.
          */
-        labelFormatter(): Formatter;
+        labelFormatter(): LabelFormatter;
         /**
-         * Sets the Formatter for the labels.
+         * Sets the Formatter for the chart labels.
+         *
+         * @param {LabelFormatter} formatter
+         * @returns {Bar} The calling Bar Plot.
+         */
+        labelFormatter(formatter: LabelFormatter): this;
+        /**
+         * Gets the Formatter for the chart axis.
+         */
+        axisLabelFormatter(): Formatter;
+        /**
+         * Sets the Formatter for the chart axis.
          *
          * @param {Formatter} formatter
          * @returns {Bar} The calling Bar Plot.
          */
-        labelFormatter(formatter: Formatter): this;
+        axisLabelFormatter(formatter: Formatter): this;
         protected _createNodesForDataset(dataset: Dataset): Drawer;
         protected _removeDatasetNodes(dataset: Dataset): void;
         /**

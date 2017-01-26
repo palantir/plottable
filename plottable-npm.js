@@ -9015,6 +9015,16 @@ var Plottable;
                     return this;
                 }
             };
+            Bar.prototype.axisLabelFormatter = function (formatter) {
+                if (formatter == null) {
+                    return this._labelFormatter;
+                }
+                else {
+                    this._labelFormatter = formatter;
+                    this.render();
+                    return this;
+                }
+            };
             Bar.prototype._createNodesForDataset = function (dataset) {
                 var drawer = _super.prototype._createNodesForDataset.call(this, dataset);
                 drawer.renderArea().classed(Bar._BAR_AREA_CLASS, true);
@@ -10390,7 +10400,7 @@ var Plottable;
                 maximumExtents.forEach(function (maximum, axisValue) {
                     if (maximum !== baselineValue) {
                         // only draw sums for values not at the baseline
-                        var text = _this.labelFormatter()(maximum);
+                        var text = _this.axisLabelFormatter()(maximum);
                         var measurement = _this._measurer.measure(text);
                         var primaryTextMeasurement = _this._isVertical ? measurement.width : measurement.height;
                         var secondaryTextMeasurement = _this._isVertical ? measurement.height : measurement.width;
@@ -10405,7 +10415,7 @@ var Plottable;
                 });
                 minimumExtents.forEach(function (minimum, axisValue) {
                     if (minimum !== baselineValue) {
-                        var text = _this.labelFormatter()(minimum);
+                        var text = _this.axisLabelFormatter()(minimum);
                         var measurement = _this._measurer.measure(text);
                         var primaryTextMeasurement = _this._isVertical ? measurement.width : measurement.height;
                         var secondaryTextMeasurement = _this._isVertical ? measurement.height : measurement.width;
