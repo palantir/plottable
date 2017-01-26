@@ -18,6 +18,16 @@ module.exports = function(grunt) {
         removeComments: false
       }
     },
+    demo: {
+      src: ["demo/**/*.ts"],
+      options: {
+        target: "es5",
+        sourceMap: false,
+        noImplicitAny: true,
+        declaration: false,
+        removeComments: false
+      }
+    },
     verifyDefinitionFiles: {
       src: [
         "typings/d3/d3.d.ts",
@@ -88,6 +98,14 @@ module.exports = function(grunt) {
     }
   };
 
+  var browserifyConfig = {
+    demo: {
+      files: {
+        "demo/bundle.js": ["demo/app.js"]
+      }
+    }
+  };
+
   var tslintConfig = {
     options: {
       configuration: grunt.file.readJSON("tslint.json")
@@ -130,6 +148,10 @@ module.exports = function(grunt) {
       tasks: ["test-compile"],
       files: ["test/**/*.ts"]
     },
+    demo: {
+      tasks: ["demo-compile"],
+      files: ["demo/**/*.ts"]
+    },
     quicktests: {
       tasks: ["update-quicktests"],
       files: ["quicktests/overlaying/tests/**/*.js"]
@@ -155,7 +177,8 @@ module.exports = function(grunt) {
   };
 
   var cleanConfig = {
-    tscommand: ["tscommand*.tmp.txt"]
+    tscommand: ["tscommand*.tmp.txt"],
+    demo: ["demo/**/*.js"]
   };
 
   var FILES_TO_COMMIT = [
@@ -242,6 +265,7 @@ module.exports = function(grunt) {
     bump: bumpConfig,
     umd: umdConfig,
     concat: concatConfig,
+    browserify: browserifyConfig,
     ts: tsConfig,
     tslint: tslintConfig,
     jscs: jscsConfig,
@@ -271,6 +295,11 @@ module.exports = function(grunt) {
     "update-quicktests"
   ]);
 
+  grunt.registerTask("demo-compile", [
+    "ts:demo",
+    "browserify:demo"
+  ]);
+
   grunt.registerTask("generateJS", [
     "umd:npm",
     "concat:headerNpm",
@@ -287,7 +316,7 @@ module.exports = function(grunt) {
   grunt.registerTask("dist-compile", ["test", "uglify", "compress"]);
 
   grunt.registerTask("commitjs", ["dist-compile", "gitcommit:built"]);
-  grunt.registerTask("default", ["connect", "dev-compile", "watch-silent"]);
+  grunt.registerTask("default", ["connect", "dev-compile", "demo-compile", "watch-silent"]);
 
   grunt.registerTask("test", ["dev-compile", "test-local"]);
   grunt.registerTask("test-local", ["blanket_mocha", "ts:verifyDefinitionFiles", "lint"]);
