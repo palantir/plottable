@@ -8,7 +8,7 @@ namespace Plottable.Plots {
     private _endAngle: number = 2*Math.PI;
     private _startAngles: number[];
     private _endAngles: number[];
-    private _labelFormatter: LabelFormatter = Formatters.identity();
+    private _labelFormatter: LabelFormatter = Formatters.labelFormatter();
     private _labelsEnabled = false;
     private _strokeDrawers: Utils.Map<Dataset, Drawers.ArcOutline>;
 

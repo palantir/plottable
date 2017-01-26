@@ -1278,6 +1278,15 @@ var Plottable;
         }
         Formatters.identity = identity;
         /**
+         * Creates a formatter for generating chart labels.
+         *
+         * @returns {LabelFormatter} A formatter for generating chart labels.
+         */
+        function labelFormatter() {
+            return function (d, datum, index, dataset) { return String(d); };
+        }
+        Formatters.labelFormatter = labelFormatter;
+        /**
          * Creates a formatter for percentage values.
          * Multiplies the input by 100 and appends "%".
          *
@@ -7540,7 +7549,7 @@ var Plottable;
                 _super.call(this);
                 this._startAngle = 0;
                 this._endAngle = 2 * Math.PI;
-                this._labelFormatter = Plottable.Formatters.identity();
+                this._labelFormatter = Plottable.Formatters.labelFormatter();
                 this._labelsEnabled = false;
                 this.innerRadius(0);
                 this.outerRadius(function () {
@@ -8870,7 +8879,7 @@ var Plottable;
                 var _this = this;
                 if (orientation === void 0) { orientation = Bar.ORIENTATION_VERTICAL; }
                 _super.call(this);
-                this._labelFormatter = Plottable.Formatters.identity();
+                this._labelFormatter = Plottable.Formatters.labelFormatter();
                 this._labelsEnabled = false;
                 this._hideBarsIfAnyAreTooWide = true;
                 this._barPixelWidth = 0;

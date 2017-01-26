@@ -649,6 +649,12 @@ declare namespace Plottable.Formatters {
      */
     function identity(): (d: any) => string;
     /**
+     * Creates a formatter for generating chart labels.
+     *
+     * @returns {LabelFormatter} A formatter for generating chart labels.
+     */
+    function labelFormatter(): (d: any, datum: any, index: number, dataset: Dataset) => string;
+    /**
      * Creates a formatter for percentage values.
      * Multiplies the input by 100 and appends "%".
      *

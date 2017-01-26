@@ -81,6 +81,15 @@ namespace Plottable.Formatters {
   }
 
   /**
+   * Creates a formatter for generating chart labels.
+   *
+   * @returns {LabelFormatter} A formatter for generating chart labels.
+   */
+  export function labelFormatter() {
+    return (d: any, datum: any, index: number, dataset: Dataset) => String(d);
+  }
+
+  /**
    * Creates a formatter for percentage values.
    * Multiplies the input by 100 and appends "%".
    *
