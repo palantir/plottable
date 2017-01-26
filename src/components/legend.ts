@@ -586,6 +586,8 @@ namespace Plottable.Components {
           self._writer.write(self._formatter(column.data.name), column.width, self.height(), writeOptions)
         });
 
+      entries.exit().remove();
+
       return this;
     }
 
