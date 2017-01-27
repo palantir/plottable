@@ -1,0 +1,65 @@
+<!DOCTYPE html> <meta charset="utf-8">
+<html>
+<head>
+    <title>JSFiddle Redirect</title>
+</head>
+<body>
+    <form method="post" action="http://jsfiddle.net/api/post/library/pure/">
+        <input type="hidden" name="title" value="Plottable Fiddle">
+        <input type="hidden" name="html">
+        <input type="hidden" name="css">
+        <input type="hidden" name="js">
+        <input type="submit">
+    </form>
+
+    <script>
+        // Get Circle artifact URL from self
+        let baseHref = window.location.href;
+        baseHref = baseHref.replace(/\/demo\/fiddle.html$/, '');
+        baseHref = baseHref.replace(/^http(s?):/, '');
+        console.log(baseHref);
+
+        document.querySelector("input[name=css]").value = `
+body {
+    font-family: sans-serif;
+}
+
+div.panel {
+    background: white;
+    display: inline-block;
+    padding: 20px 20px;
+    border-radius: 5px;
+}
+        `;
+
+        document.querySelector("input[name=html]").value = `
+<head>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/d3/3.5.17/d3.js" charset="utf-8">${'</' + 'script>'}
+    <script src="${baseHref}/plottable.js" charset="utf-8">${'</' + 'script>'}
+    <link rel="stylesheet" type="text/css" href="${baseHref}/plottable.css">
+</head>
+<body>
+    <h2>Fiddle</h2>
+    <div class="panel">
+        <svg width="600" height="400"></svg>
+    </div>
+</body>
+        `;
+
+        document.querySelector("input[name=js]").value = `
+const data = Array.apply(null, Array(20)).map((d, i) => i * i);
+
+const xScale = new Plottable.Scales.Category();
+const yScale = new Plottable.Scales.Linear();
+new Plottable.Plots.Bar()
+    .addDataset(new Plottable.Dataset(data))
+    .x(((d, i) => i), xScale)
+    .y(((d, i) => d), yScale)
+    .renderTo("svg");
+        `;
+    timerToken = set
+
+        //document.querySelector("form").submit();
+    </script>
+</body>
+</html>
