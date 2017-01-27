@@ -103,4 +103,17 @@ namespace Plottable.Utils.Math {
   export function degreesToRadians(degree: number) {
     return degree / 360 * nativeMath.PI * 2;
   }
+
+  /**
+   * Returns if the point is within the bounds. Points along
+   * the bounds are considered "within" as well.
+   * @param {Point} p Point in considerations.
+   * @param {Bounds} bounds Bounds within which to check for inclusion.
+   */
+  export function within(p: Point, bounds: Bounds) {
+    return bounds.topLeft.x <= p.x
+      && bounds.bottomRight.x >= p.x
+      && bounds.topLeft.y <= p.y
+      && bounds.bottomRight.y >= p.y;
+  }
 }

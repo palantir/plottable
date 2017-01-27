@@ -216,14 +216,15 @@ function runQuickTest(result, svg, data, branch){
 function loadAllQuickTests(quicktestsPaths, firstQTBranch, secondQTBranch){
   quicktestsPaths.forEach(function(path) { //for each quicktest
     var name = path.replace(/\w*\/|\.js/g, "");
-    d3.text("http://localhost:9999/" + path, function(error, text) {
+    var relativePath = path.replace(/^quicktests\/overlaying\//, "");
+    d3.text(relativePath, function(error, text) {
       if (error !== null) {
         throw new Error("Tried to load nonexistant quicktest.");
       }
       text = "(function(){" + text +
           "\nreturn {makeData: makeData, run: run};" +
                "})();" +
-          "\n////# sourceURL=" + path;
+          "\n////# sourceURL=" + relativePath;
       var result = eval(text);
       var className = "quicktest " + name;
       var div = d3.select("#results").append("div").attr("class", className);
@@ -294,9 +295,9 @@ function loadPlottableBranches(category, branchList){
 
   branchList.forEach(function(branch){
     if (branch !== "#local") {
-      listOfUrl.push("https://rawgit.com/palantir/plottable/" + branch + "/plottable.js");
+      listOfUrl.push("//rawgit.com/palantir/plottable/" + branch + "/plottable.js");
     } else {
-      listOfUrl.push("/plottable.js"); //load local version
+      listOfUrl.push("../../plottable.js"); //load local version
     }
   });
 

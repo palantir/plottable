@@ -11,6 +11,7 @@
   "main": "plottable-npm.js",
   "typings": "plottable-npm.d.ts",
   "scripts": {
+    "start": "grunt",
     "test": "grunt test-travis"
   },
   "devDependencies": {
@@ -20,8 +21,10 @@
     "@types/mocha": "^2.2.27",
     "@types/sinon": "^1.16.26",
     "chai": "2.0.0",
+    "circle-github-bot": "0.3.0",
     "grunt": "~0.4.5",
     "grunt-blanket-mocha": "0.5.0",
+    "grunt-browserify": "^5.0.0",
     "grunt-bump": "0.7.0",
     "grunt-cli": "0.1.13",
     "grunt-contrib-clean": "0.7.0",

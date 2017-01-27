@@ -126,9 +126,10 @@ function generatePlots(dataType){
     var xFunc = function(d) { return d.x; };
     var yFunc = function(d) { return d.y; };
     var typeFunc = function(d) { return d.type; };
-    var plot = new PlotType();
-      plot.attr("fill", typeFunc, colorScale)
-      .animated(true);
+
+    var plot = new PlotType()
+        .attr("fill", typeFunc, colorScale)
+        .animated(true);
 
     if(piePlots.indexOf(PlotType) === -1) {
         plot.x(xFunc, xScale).y(yFunc, yScale);
