@@ -7,7 +7,6 @@ export namespace TimeInterval {
   export var month = "month";
   export var year = "year";
 }
-;
 
 /**
  * Defines a configuration for a Time Axis tier.

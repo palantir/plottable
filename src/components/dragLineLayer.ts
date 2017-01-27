@@ -1,6 +1,5 @@
 export interface DragLineCallback<D> { (dragLineLayer: Components.DragLineLayer<D>): void;
 }
-;
 
 export class DragLineLayer<D> extends GuideLineLayer<D> {
   private _dragInteraction: Interactions.Drag;
