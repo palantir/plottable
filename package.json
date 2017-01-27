@@ -11,6 +11,7 @@
   "main": "plottable-npm.js",
   "typings": "plottable-npm.d.ts",
   "scripts": {
+    "build:typescript": "tsc -p .",
     "test": "grunt test-travis"
   },
   "devDependencies": {
