@@ -1,10 +1,17 @@
+import { Component } from "#/components/component";
+import { Point } from "#/core/interfaces";
+import * as Dispatchers from "#/dispatchers";
+import * as Utils from "#/utils";
+
+import { Interaction } from "./interaction";
+
 export type ClickCallback = (point: Point, event: MouseEvent | TouchEvent) => void;
 
 
 export class Click extends Interaction {
 
-  private _mouseDispatcher: Plottable.Dispatchers.Mouse;
-  private _touchDispatcher: Plottable.Dispatchers.Touch;
+  private _mouseDispatcher: Dispatchers.Mouse;
+  private _touchDispatcher: Dispatchers.Touch;
   private _clickedDown = false;
   private _onClickCallbacks = new Utils.CallbackSet<ClickCallback>();
 

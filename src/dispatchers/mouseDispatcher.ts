@@ -1,3 +1,9 @@
+import { Point } from "#/core/interfaces";
+import * as Utils from "#/utils";
+
+import { Dispatcher } from "./dispatcher";
+import * as Dispatchers from "./";
+
 export type MouseCallback = (p: Point, event: MouseEvent) => void;
 
 export class Mouse extends Dispatcher {

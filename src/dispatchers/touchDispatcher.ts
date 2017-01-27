@@ -1,3 +1,9 @@
+import { Point } from "#/core/interfaces";
+import * as Utils from "#/utils";
+
+import { Dispatcher } from "./dispatcher";
+import * as Dispatchers from "./";
+
 export type TouchCallback = (ids: number[], idToPoint: { [id: number]: Point; }, event: TouchEvent) => void;
 
 export class Touch extends Dispatcher {

@@ -1,3 +1,7 @@
+import { Point } from "#/core/interfaces";
+
+import * as DOM from "./domUtils";
+
 export class ClientToSVGTranslator {
   private static _TRANSLATOR_KEY = "__Plottable_ClientToSVGTranslator";
   private _svg: SVGElement;
@@ -8,7 +12,7 @@ export class ClientToSVGTranslator {
    * If one already exists on that <svg>, it will be returned; otherwise, a new one will be created.
    */
   public static getTranslator(elem: SVGElement): ClientToSVGTranslator {
-    let svg = Utils.DOM.boundingSVG(elem);
+    let svg = DOM.boundingSVG(elem);
 
     let translator: ClientToSVGTranslator = (<any> svg)[ClientToSVGTranslator._TRANSLATOR_KEY];
     if (translator == null) {
@@ -71,6 +75,6 @@ export class ClientToSVGTranslator {
    * Checks whether event happened inside <svg> element.
    */
   public insideSVG(e: Event): boolean {
-    return Utils.DOM.boundingSVG(<SVGElement>e.target) === this._svg;
+    return DOM.boundingSVG(<SVGElement>e.target) === this._svg;
   }
 }

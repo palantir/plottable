@@ -1,3 +1,18 @@
+import * as Animators from "#/animators";
+import { Accessor, Point, Bounds, Range, AttributeToProjector } from "#/core/interfaces";
+import { Dataset } from "#/core/dataset";
+import * as SymbolFactories from "#/core/symbolFactories";
+import { SymbolFactory } from "#/core/symbolFactories";
+import * as Drawers from "#/drawers";
+import * as Scales from "#/scales";
+import { Scale } from "#/scales/scale";
+import * as Utils from "#/utils";
+
+import * as Plots from "./";
+import { PlotEntity, LightweightPlotEntity, TransformableAccessorScaleBinding, AccessorScaleBinding } from "./";
+import { Plot } from "./plot";
+import { XYPlot } from "./xyPlot";
+
 export interface LightweightScatterPlotEntity extends LightweightPlotEntity {
   diameter: Point;
 }
@@ -41,8 +56,8 @@ export class Scatter<X, Y> extends XYPlot<X, Y> {
     });
   }
 
-  protected _createDrawer(dataset: Dataset) {
-    return new Plottable.Drawers.Symbol(dataset);
+  protected _createDrawer(dataset: Dataset): Drawers.Symbol {
+    return new Drawers.Symbol(dataset);
   }
 
   /**

@@ -1,3 +1,12 @@
+import { Accessor, Point } from "#/core/interfaces";
+import { Dataset } from "#/core/dataset";
+import * as Scales from "#/scales";
+import { Scale, ScaleCallback } from "#/scales/scale";
+import * as Utils from "#/utils";
+
+import * as Plots from "./";
+import { Plot } from "./plot";
+
 export class XYPlot<X, Y> extends Plot {
   protected static _X_KEY = "x";
   protected static _Y_KEY = "y";
@@ -434,7 +443,7 @@ export class XYPlot<X, Y> extends Plot {
     return { x: xProjector(datum, index, dataset), y: yProjector(datum, index, dataset) };
   }
 
-  protected _getDataToDraw() {
+  protected _getDataToDraw(): Utils.Map<Dataset, any[]> {
     let dataToDraw: Utils.Map<Dataset, any[]> = super._getDataToDraw();
 
     let definedFunction = (d: any, i: number, dataset: Dataset) => {

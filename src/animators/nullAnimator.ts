@@ -1,3 +1,7 @@
+import * as d3 from "d3";
+
+import { Animator } from "./animator";
+import { AttributeToAppliedProjector } from "../core/interfaces";
 /**
  * An animator implementation with no animation. The attributes are
  * immediately set on the selection.

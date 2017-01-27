@@ -1,3 +1,13 @@
+import { Component } from "#/components/component";
+import { Point } from "#/core/interfaces";
+import * as Dispatchers from "#/dispatchers";
+import * as Scales from "#/scales";
+import { TransformableScale } from "#/scales/scale";
+import * as Utils from "#/utils";
+
+import { Interaction } from "./interaction";
+import * as Interactions from "./";
+
 export type PanCallback = () => void;
 export type ZoomCallback = () => void;
 
@@ -70,7 +80,7 @@ export class PanZoom extends Interaction {
    *
    * @param {Plottable.Point} [translateAmount] The amount by which to translate the x and y scales.
    */
-  public pan(translateAmount: Plottable.Point) {
+  public pan(translateAmount: Point) {
     this.xScales().forEach((xScale) => {
       xScale.pan(this._constrainedTranslation(xScale, translateAmount.x));
     });
@@ -89,7 +99,7 @@ export class PanZoom extends Interaction {
    * @param {Plottable.Point} [centerValue] The center in pixels around which to zoom.
    * By default, `centerValue` is the center of the x and y range of each scale.
    */
-  public zoom(zoomAmount: number, centerValue?: Plottable.Point) {
+  public zoom(zoomAmount: number, centerValue?: Point) {
     this.xScales().forEach((xScale) => {
       const range = xScale.range();
       const xCenter = centerValue === undefined

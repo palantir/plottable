@@ -1,3 +1,7 @@
+import * as d3 from "d3";
+
+import { Component, ComponentCallback } from "./component";
+
 /*
  * ComponentContainer class encapsulates Table and ComponentGroup's shared functionality.
  * It will not do anything if instantiated directly.

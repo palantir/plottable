@@ -42,7 +42,7 @@ type TestInterfaces = Plottable.Axes.DownsampleInfo
   | Plottable.Axes.TimeAxisConfiguration
   | Plottable.Plots.AccessorScaleBinding<any, any>
   | Plottable.Scales.TickGenerators.TickGenerator<any>
-  | Plottable.Scales.PaddingExceptionsProvider
+  | Plottable.Scales.PaddingExceptionsProvider<any>
   | Plottable.Accessor<any>
   | Plottable.Animator
   | Plottable.DragLineCallback<any>

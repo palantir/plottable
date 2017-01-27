@@ -1,3 +1,12 @@
+import { Accessor, Point, Bounds, Range, AttributeToProjector } from "#/core/interfaces";
+import { Dataset } from "#/core/dataset";
+import { Drawer } from "#/drawers/drawer";
+import * as Utils from "#/utils";
+
+import * as Plots from "./";
+import { Bar } from "./barPlot";
+import { Plot } from "./plot";
+
 export class Waterfall<X, Y> extends Bar<X, number> {
   private static _BAR_DECLINE_CLASS = "waterfall-decline";
   private static _BAR_GROWTH_CLASS = "waterfall-growth";
@@ -62,7 +71,7 @@ export class Waterfall<X, Y> extends Bar<X, number> {
     }
   }
 
-  protected _createNodesForDataset(dataset: Dataset) {
+  protected _createNodesForDataset(dataset: Dataset): Drawer {
     let drawer = super._createNodesForDataset(dataset);
     this._connectorArea = this._renderArea.append("g").classed(Waterfall._CONNECTOR_AREA_CLASS, true);
     return drawer;

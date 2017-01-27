@@ -1,3 +1,7 @@
+import * as Utils from "#/utils";
+
+import { Scale } from "./scale";
+
 export class Color extends Scale<string, string> {
 
   private static _LOOP_LIGHTEN_FACTOR = 1.6;

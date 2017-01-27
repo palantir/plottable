@@ -1,3 +1,9 @@
+import { Dataset } from "#/core/dataset";
+import { Point, Entity, Accessor } from "#/core/interfaces";
+import { Drawer } from "#/drawers/drawer";
+import { Plot } from "#/plots/plot";
+import { Scale, TransformableScale } from "#/scales/scale";
+
 export * from "./areaPlot";
 export * from "./barPlot";
 export * from "./clusteredBarPlot";
@@ -22,7 +28,7 @@ export interface LightweightPlotEntity {
   position: Point;
   index: number;
   component: Plot;
-  drawer: Plottable.Drawer;
+  drawer: Drawer;
   validDatumIndex: number;
 }
 

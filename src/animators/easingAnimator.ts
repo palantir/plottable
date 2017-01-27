@@ -1,3 +1,8 @@
+import * as d3 from "d3";
+
+import { Animator } from "./animator";
+import { AttributeToAppliedProjector } from "../core/interfaces";
+
 /**
  * An Animator with easing and configurable durations and delays.
  */

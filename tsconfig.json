@@ -1,5 +1,6 @@
 {
     "compilerOptions": {
+      "baseUrl": ".",
       "declaration": true,
       "forceConsistentCasingInFileNames": true,
       "module": "commonjs",
@@ -7,6 +8,9 @@
       "noImplicitReturns": true,
       "outDir": "build",
       "noImplicitAny": true,
+      "paths": {
+        "#/*": ["src/*"]
+      },
       "removeComments": false,
       "sourceMap": false,
       "target": "es5"

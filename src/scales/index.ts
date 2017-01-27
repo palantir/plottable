@@ -11,6 +11,12 @@ export * from "./linearScale";
 export * from "./modifiedLogScale";
 export * from "./timeScale";
 
+// ---------------------------------------------------------
+
+import { Category } from "./categoryScale";
+import { QuantitativeScale } from "./quantitativeScale";
+import { Scale } from "./scale";
+
 /**
  * A function that supplies domain values to be included into a Scale.
  *
@@ -86,6 +92,6 @@ export interface TransformableScale {
  * that implement the interface.
  */
 export function isTransformable(scale: any): scale is TransformableScale {
-  return (scale instanceof Plottable.QuantitativeScale ||
-  scale instanceof Plottable.Scales.Category);
+  return (scale instanceof QuantitativeScale ||
+  scale instanceof Category);
 }

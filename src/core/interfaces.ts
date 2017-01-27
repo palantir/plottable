@@ -1,3 +1,8 @@
+import * as d3 from "d3";
+
+import { Dataset } from "./dataset";
+import { Component } from "#/components/component";
+
 /**
  * Accesses a specific datum property.
  */

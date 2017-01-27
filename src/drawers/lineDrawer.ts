@@ -1,3 +1,9 @@
+import * as d3 from "d3";
+
+import { Dataset } from "#/core/dataset";
+
+import { Drawer } from "./drawer";
+
 export class Line extends Drawer {
 
   constructor(dataset: Dataset) {

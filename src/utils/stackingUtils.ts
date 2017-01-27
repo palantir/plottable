@@ -1,3 +1,8 @@
+import { Dataset } from "#/core/dataset";
+import { Accessor } from "#/core/interfaces";
+
+import * as Utils from "./";
+
 export type StackedDatum = {
   value: number;
   offset: number;
@@ -59,15 +64,18 @@ export function stack(datasets: Dataset[], keyAccessor: Accessor<any>, valueAcce
  * @return { { maximumExtents: Utils.Map<D, number>, minimumExtents: Utils.Map<D, number> } } The maximum and minimum extents
  * of each individual stack.
  */
-export function stackedExtents<D>(stackingResult: GenericStackingResult<D>) {
+export function stackedExtents<D>(stackingResult: GenericStackingResult<D>): {
+  maximumExtents: Utils.Map<D, number>,
+  minimumExtents: Utils.Map<D, number>,
+} {
   const maximumExtents: Utils.Map<D, number> = new Utils.Map<D, number>();
   const minimumExtents: Utils.Map<D, number> = new Utils.Map<D, number>();
 
   stackingResult.forEach((stack) => {
     stack.forEach((datum: StackedDatum, key: D) => {
       // correctly handle negative bar stacks
-      const maximalValue = Math.max([datum.offset + datum.value, datum.offset], datum.offset);
-      const minimalValue = Math.min([datum.offset + datum.value, datum.offset], datum.offset);
+      const maximalValue = Utils.Math.max([datum.offset + datum.value, datum.offset], datum.offset);
+      const minimalValue = Utils.Math.min([datum.offset + datum.value, datum.offset], datum.offset);
 
       if (!maximumExtents.has(key)) {
         maximumExtents.set(key, maximalValue);

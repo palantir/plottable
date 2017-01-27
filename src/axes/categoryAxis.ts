@@ -1,3 +1,11 @@
+import * as d3 from "d3";
+import * as SVGTypewriter from "svg-typewriter";
+
+import { Axis, AxisOrientation } from "./axis";
+import { SpaceRequest, Point } from "#/core/interfaces";
+import * as Scales from "#/scales";
+import * as Utils from "#/utils";
+
 export interface DownsampleInfo {
   domain: string[];
   stepWidth: number;
@@ -126,7 +134,7 @@ export class Category extends Axis<string> {
    * @param {Scales.Category} scale - The scale being downsampled. Defaults to this Axis' scale.
    * @return {DownsampleInfo} an object holding the resultant domain and new stepWidth.
    */
-  public getDownsampleInfo(scale = <Scales.Category> this._scale): DownsampleInfo {
+  public getDownsampleInfo(scale: Scales.Category = <Scales.Category> this._scale): DownsampleInfo {
     const downsampleRatio = Math.ceil(Category._MINIMUM_WIDTH_PER_LABEL_PX / scale.stepWidth());
     return {
       domain: scale.domain().filter((d, i) => i % downsampleRatio === 0),

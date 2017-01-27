@@ -1,5 +1,14 @@
+import * as d3 from "d3";
+
+import { Bounds, Point } from "#/core/interfaces";
+import { QuantitativeScale } from "#/scales/quantitativeScale";
+import { ScaleCallback } from "#/scales/scale";
+import * as Utils from "#/utils";
+
+import { Component } from "./component";
+
 export enum PropertyMode { VALUE, PIXEL }
-;
+
 export class SelectionBoxLayer extends Component {
   protected _box: d3.Selection<void>;
   private _boxArea: d3.Selection<void>;

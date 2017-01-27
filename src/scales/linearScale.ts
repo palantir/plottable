@@ -1,3 +1,5 @@
+import { QuantitativeScale } from "./quantitativeScale";
+
 export class Linear extends QuantitativeScale<number> {
   private _d3Scale: d3.scale.Linear<number, number>;
 
@@ -64,7 +66,7 @@ export class Linear extends QuantitativeScale<number> {
   }
 
   public defaultTicks(): number[] {
-    return this._d3Scale.ticks(Scales.Linear._DEFAULT_NUM_TICKS);
+    return this._d3Scale.ticks(Linear._DEFAULT_NUM_TICKS);
   }
 
   protected _niceDomain(domain: number[], count?: number): number[] {

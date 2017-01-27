@@ -1,3 +1,13 @@
+import * as SVGTypewriter from "svg-typewriter";
+
+import { Accessor, Point } from "#/core/interfaces";
+import { Dataset } from "#/core/dataset";
+import { Scale } from "#/scales/scale";
+import * as Utils from "#/utils";
+
+import * as Plots from "./";
+import { Bar } from "./barPlot";
+
 export class StackedBar<X, Y> extends Bar<X, Y> {
   protected static _STACKED_BAR_LABEL_PADDING = 5;
 

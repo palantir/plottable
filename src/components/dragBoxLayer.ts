@@ -1,3 +1,12 @@
+import * as d3 from "d3";
+
+import { Bounds, Point } from "#/core/interfaces";
+import * as Interactions from "#/interactions";
+import * as Utils from "#/utils";
+
+import * as Components from "./";
+import { PropertyMode } from "./";
+
 export type DragBoxCallback = (bounds: Bounds) => void;
 
 type _EdgeIndicator = {
@@ -409,7 +418,7 @@ export class DragBoxLayer extends Components.SelectionBoxLayer {
   /**
    * Gets the internal Interactions.Drag of the DragBoxLayer.
    */
-  public dragInteraction() {
+  public dragInteraction(): Interactions.Drag {
     return this._dragInteraction;
   }
 

@@ -1,3 +1,8 @@
+import { Component } from "#/components/component";
+import * as Utils from "#/utils";
+
+import * as RenderPolicies from "./renderPolicy";
+
 /**
  * The RenderController is responsible for enqueueing and synchronizing
  * layout and render calls for Components.

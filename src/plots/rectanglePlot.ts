@@ -1,3 +1,19 @@
+import * as d3 from "d3";
+import * as SVGTypewriter from "svg-typewriter";
+
+import * as Animators from "#/animators";
+import { Accessor, Point, Bounds, Range, AttributeToProjector } from "#/core/interfaces";
+import { Dataset } from "#/core/dataset";
+import * as Drawers from "#/drawers";
+import * as Scales from "#/scales";
+import { Scale } from "#/scales/scale";
+import * as Utils from "#/utils";
+
+import * as Plots from "./";
+import { PlotEntity } from "./";
+import { Plot } from "./plot";
+import { XYPlot } from "./xyPlot";
+
 export class Rectangle<X, Y> extends XYPlot<X, Y> {
   private static _X2_KEY = "x2";
   private static _Y2_KEY = "y2";
@@ -23,7 +39,7 @@ export class Rectangle<X, Y> extends XYPlot<X, Y> {
     this.attr("fill", new Scales.Color().range()[0]);
   }
 
-  protected _createDrawer(dataset: Dataset) {
+  protected _createDrawer(dataset: Dataset): Drawers.Rectangle {
     return new Drawers.Rectangle(dataset);
   }
 
@@ -279,7 +295,7 @@ export class Rectangle<X, Y> extends XYPlot<X, Y> {
     return this._entitiesIntersecting(dataXRange, dataYRange);
   }
 
-  private _entityBBox(datum: any, index: number, dataset: Plottable.Dataset, attrToProjector: AttributeToProjector): SVGRect {
+  private _entityBBox(datum: any, index: number, dataset: Dataset, attrToProjector: AttributeToProjector): SVGRect {
     return {
       x: attrToProjector["x"](datum, index, dataset),
       y: attrToProjector["y"](datum, index, dataset),
@@ -370,23 +386,23 @@ export class Rectangle<X, Y> extends XYPlot<X, Y> {
   }
 
   private _rectangleWidth(scale: Scale<any, number>) {
-    if (scale instanceof Plottable.Scales.Category) {
-      return (<Plottable.Scales.Category> scale).rangeBand();
+    if (scale instanceof Scales.Category) {
+      return (<Scales.Category> scale).rangeBand();
     } else {
       let accessor = scale === this.x().scale ? this.x().accessor : this.y().accessor;
       let accessorData = d3.set(Utils.Array.flatten(this.datasets().map((dataset) => {
         return dataset.data().map((d, i) => accessor(d, i, dataset).valueOf());
       }))).values().map((value) => +value);
       // Get the absolute difference between min and max
-      let min = Plottable.Utils.Math.min(accessorData, 0);
-      let max = Plottable.Utils.Math.max(accessorData, 0);
+      let min = Utils.Math.min(accessorData, 0);
+      let max = Utils.Math.max(accessorData, 0);
       let scaledMin = scale.scale(min);
       let scaledMax = scale.scale(max);
       return (scaledMax - scaledMin) / Math.abs(max - min);
     }
   }
 
-  protected _getDataToDraw() {
+  protected _getDataToDraw(): Utils.Map<Dataset, any[]> {
     let dataToDraw = new Utils.Map<Dataset, any[]>();
     let attrToProjector = this._generateAttrToProjector();
     this.datasets().forEach((dataset) => {

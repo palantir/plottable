@@ -1,3 +1,19 @@
+import * as d3 from "d3";
+import * as SVGTypewriter from "svg-typewriter";
+
+import * as Animators from "#/animators";
+import { Accessor, Point, AttributeToProjector } from "#/core/interfaces";
+import { Dataset } from "#/core/dataset";
+import * as Drawers from "#/drawers";
+import { Formatter } from "#/core/formatters";
+import * as Formatters from "#/core/formatters";
+import * as Scales from "#/scales";
+import { Scale } from "#/scales/scale";
+import * as Utils from "#/utils";
+
+import { PlotEntity, AccessorScaleBinding } from "./";
+import { Plot } from "./plot";
+
 export class Pie extends Plot {
 
   private static _INNER_RADIUS_KEY = "inner-radius";
@@ -106,8 +122,8 @@ export class Pie extends Plot {
     this.render();
   }
 
-  protected _createDrawer(dataset: Dataset) {
-    return new Plottable.Drawers.Arc(dataset);
+  protected _createDrawer(dataset: Dataset): Drawers.Arc {
+    return new Drawers.Arc(dataset);
   }
 
   public entities(datasets = this.datasets()): PlotEntity[] {
@@ -472,7 +488,7 @@ export class Pie extends Plot {
     }
   }
 
-  protected _getDataToDraw() {
+  protected _getDataToDraw(): Utils.Map<Dataset, any[]> {
     let dataToDraw = super._getDataToDraw();
     if (this.datasets().length === 0) {
       return dataToDraw;
@@ -486,7 +502,7 @@ export class Pie extends Plot {
   }
 
   protected static _isValidData(value: any) {
-    return Plottable.Utils.Math.isValidNumber(value) && value >= 0;
+    return Utils.Math.isValidNumber(value) && value >= 0;
   }
 
   protected _pixelPoint(datum: any, index: number, dataset: Dataset) {
@@ -561,7 +577,7 @@ export class Pie extends Plot {
     let data = this._getDataToDraw().get(dataset);
     data.forEach((datum, datumIndex) => {
       let value = this.sectorValue().accessor(datum, datumIndex, dataset);
-      if (!Plottable.Utils.Math.isValidNumber(value)) {
+      if (!Utils.Math.isValidNumber(value)) {
         return;
       }
       value = this._labelFormatter(value);

@@ -1,3 +1,7 @@
+import * as d3 from "d3";
+
+import { AttributeToAppliedProjector } from "../core/interfaces";
+
 export interface Animator {
   /**
    * Applies the supplied attributes to a d3.Selection with some animation.

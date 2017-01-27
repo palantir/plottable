@@ -1,9 +1,17 @@
+import { Component } from "#/components/component";
+import { Point } from "#/core/interfaces";
+import * as Dispatchers from "#/dispatchers";
+import * as Utils from "#/utils";
+
+import { Interaction } from "./interaction";
+import { ClickCallback } from "./";
+
 enum ClickState {NotClicked, SingleClicked, DoubleClicked}
-;
+
 export class DoubleClick extends Interaction {
 
-  private _mouseDispatcher: Plottable.Dispatchers.Mouse;
-  private _touchDispatcher: Plottable.Dispatchers.Touch;
+  private _mouseDispatcher: Dispatchers.Mouse;
+  private _touchDispatcher: Dispatchers.Touch;
   private _clickState = ClickState.NotClicked;
   private _clickedDown = false;
   private _clickedPoint: Point;

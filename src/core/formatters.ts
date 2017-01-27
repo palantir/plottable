@@ -15,7 +15,7 @@ interface PredicatedFormat {
  * @returns {Formatter} A formatter for currency values.
  */
 export function currency(precision = 2, symbol = "$", prefix = true) {
-  let fixedFormatter = Formatters.fixed(precision);
+  let fixedFormatter = fixed(precision);
   return (d: any) => {
     let formattedValue = fixedFormatter(Math.abs(d));
     if (formattedValue !== "") {
@@ -83,7 +83,7 @@ export function identity() {
  * @returns {Formatter} A formatter for percentage values.
  */
 export function percentage(precision = 0) {
-  let fixedFormatter = Formatters.fixed(precision);
+  let fixedFormatter = fixed(precision);
   return (d: any) => {
     let valToFormat = d * 100;
 

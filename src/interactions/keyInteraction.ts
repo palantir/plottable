@@ -1,3 +1,10 @@
+import { Component } from "#/components/component";
+import { Point } from "#/core/interfaces";
+import * as Dispatchers from "#/dispatchers";
+import * as Utils from "#/utils";
+
+import { Interaction } from "./interaction";
+
 export type KeyCallback = (keyCode: number) => void;
 
 export namespace Interactions {
@@ -6,13 +13,13 @@ export namespace Interactions {
      * A Key Interaction listens to key events that occur while the Component is
      * moused over.
      */
-    private _positionDispatcher: Plottable.Dispatchers.Mouse;
-    private _keyDispatcher: Plottable.Dispatchers.Key;
+    private _positionDispatcher: Dispatchers.Mouse;
+    private _keyDispatcher: Dispatchers.Key;
     private _keyPressCallbacks: { [keyCode: string]: Utils.CallbackSet<KeyCallback> } = {};
     private _keyReleaseCallbacks: { [keyCode: string]: Utils.CallbackSet<KeyCallback> } = {};
 
     private _mouseMoveCallback = (point: Point) => false; // HACKHACK: registering a listener
-    private _downedKeys = new Plottable.Utils.Set();
+    private _downedKeys = new Utils.Set();
     private _keyDownCallback = (keyCode: number, event: KeyboardEvent) => this._handleKeyDownEvent(keyCode, event);
     private _keyUpCallback = (keyCode: number) => this._handleKeyUpEvent(keyCode);
 

@@ -1,3 +1,12 @@
+import * as SVGTypewriter from "svg-typewriter";
+
+import { Formatter } from "#/core/formatters";
+import * as Formatters from "#/core/formatters";
+import * as Scales from "#/scales";
+import * as Utils from "#/utils";
+
+import { Axis } from "./axis";
+
 export namespace TimeInterval {
   export var second = "second";
   export var minute = "minute";
@@ -189,7 +198,7 @@ export class Time extends Axis<Date> {
     this.addClass("time-axis");
     this.tickLabelPadding(5);
     this.axisConfigurations(Time._DEFAULT_TIME_AXIS_CONFIGURATIONS);
-    this.annotationFormatter(Plottable.Formatters.time("%a %b %d, %Y"));
+    this.annotationFormatter(Formatters.time("%a %b %d, %Y"));
   }
 
   /**

@@ -1,3 +1,4 @@
+import * as Math from "./mathUtils";
 /**
  * Shim for ES6 map.
  * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map
@@ -15,7 +16,7 @@ export class Map<K, V> {
   }
 
   public set(key: K, value: V) {
-    if (Utils.Math.isNaN(key)) {
+    if (Math.isNaN(key)) {
       throw new Error("NaN may not be used as a key to the Map");
     }
 

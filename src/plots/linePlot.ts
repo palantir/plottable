@@ -1,3 +1,18 @@
+import * as Animators from "#/animators";
+import { Accessor, AttributeToProjector, Projector, Point, Bounds, Range } from "#/core/interfaces";
+import { Dataset } from "#/core/dataset";
+import * as Drawers from "#/drawers";
+import { Drawer } from "#/drawers/drawer";
+import * as Scales from "#/scales";
+import { QuantitativeScale } from "#/scales/quantitativeScale";
+import { Scale } from "#/scales/scale";
+import * as Utils from "#/utils";
+
+import * as Plots from "./";
+import { PlotEntity } from "./";
+import { Plot } from "./plot";
+import { XYPlot } from "./xyPlot";
+
 type EdgeIntersections = {
   left: Point[],
   right: Point[],
@@ -179,7 +194,7 @@ export class Line<X> extends XYPlot<X, number> {
   }
 
   protected _createDrawer(dataset: Dataset): Drawer {
-    return new Plottable.Drawers.Line(dataset);
+    return new Drawers.Line(dataset);
   }
 
   protected _extentsForProperty(property: string) {
@@ -442,7 +457,7 @@ export class Line<X> extends XYPlot<X, number> {
     };
   }
 
-  protected _getDataToDraw() {
+  protected _getDataToDraw(): Utils.Map<Dataset, any[]> {
     let dataToDraw = new Utils.Map<Dataset, any[]>();
 
     this.datasets().forEach((dataset) => {

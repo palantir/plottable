@@ -1,5 +1,8 @@
 
-export type TransformableScale<D, R> = Scale<D, R> & Plottable.Scales.TransformableScale;
+import * as Utils from "../utils";
+import * as Scales from "./";
+
+export type TransformableScale<D, R> = Scale<D, R> & Scales.TransformableScale;
 
 export interface ScaleCallback<S extends Scale<any, any>> {
   (scale: S): any;

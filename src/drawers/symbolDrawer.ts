@@ -1,3 +1,7 @@
+import { Dataset } from "#/core/dataset";
+
+import { Drawer } from "./drawer";
+
 export class Symbol extends Drawer {
 
   constructor(dataset: Dataset) {

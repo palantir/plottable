@@ -1,3 +1,9 @@
+import * as Components from "#/components";
+import { GuideLineLayer } from "#/components";
+import { Point } from "#/core/interfaces";
+import * as Interactions from "#/interactions";
+import * as Utils from "#/utils";
+
 export interface DragLineCallback<D> { (dragLineLayer: Components.DragLineLayer<D>): void;
 }
 
@@ -17,7 +23,7 @@ export class DragLineLayer<D> extends GuideLineLayer<D> {
     this.addClass("drag-line-layer");
     this.addClass("enabled");
 
-    this._dragInteraction = new Plottable.Interactions.Drag();
+    this._dragInteraction = new Interactions.Drag();
     this._dragInteraction.attachTo(this);
 
     let onLine = (p: Point) => {

@@ -1,3 +1,16 @@
+import * as d3 from "d3";
+
+import { Accessor, AttributeToProjector, Projector } from "#/core/interfaces";
+import { Dataset } from "#/core/dataset";
+import * as Drawers from "#/drawers";
+import * as Scales from "#/scales";
+import { QuantitativeScale } from "#/scales/quantitativeScale";
+import * as Utils from "#/utils";
+
+import * as Plots from "./";
+import { Line } from "./linePlot";
+import { Plot } from "./plot";
+
 export class Area<X> extends Line<X> {
   private static _Y0_KEY = "y0";
   private _lineDrawers: Utils.Map<Dataset, Drawers.Line>;
@@ -122,8 +135,8 @@ export class Area<X> extends Line<X> {
     return lineAttrToProjector;
   }
 
-  protected _createDrawer(dataset: Dataset) {
-    return new Plottable.Drawers.Area(dataset);
+  protected _createDrawer(dataset: Dataset): Drawers.Area {
+    return new Drawers.Area(dataset);
   }
 
   protected _generateDrawSteps(): Drawers.DrawStep[] {

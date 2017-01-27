@@ -1,3 +1,18 @@
+import * as d3 from "d3";
+import * as SVGTypewriter from "svg-typewriter";
+
+import * as Configs from "#/core/config";
+import { Formatter } from "#/core/formatters";
+import * as Formatters from "#/core/formatters";
+import { SpaceRequest, Point, Entity } from "#/core/interfaces";
+import { SymbolFactory } from "#/core/symbolFactories";
+import * as SymbolFactories from "#/core/symbolFactories";
+import { ScaleCallback } from "#/scales/scale";
+import * as Scales from "#/scales";
+import * as Utils from "#/utils";
+
+import { Component } from "./component";
+
 export class Legend extends Component {
   /**
    * The css class applied to each legend row

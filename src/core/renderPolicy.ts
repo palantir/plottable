@@ -1,3 +1,7 @@
+import * as Utils from "#/utils";
+
+import * as RenderController from "./renderController";
+
 /**
  * A policy for rendering Components.
  */

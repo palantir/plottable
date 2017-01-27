@@ -1,3 +1,9 @@
+import * as d3 from "d3";
+
+import { TimeInterval } from "#/axes/timeAxis";
+
+import { QuantitativeScale } from "./quantitativeScale";
+
 export class Time extends QuantitativeScale<Date> {
   private _d3Scale: d3.time.Scale<number, number>;
 
@@ -97,7 +103,7 @@ export class Time extends QuantitativeScale<Date> {
   }
 
   public defaultTicks(): Date[] {
-    return this._d3Scale.ticks(Scales.Time._DEFAULT_NUM_TICKS);
+    return this._d3Scale.ticks(Time._DEFAULT_NUM_TICKS);
   }
 
   protected _niceDomain(domain: Date[]) {

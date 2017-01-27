@@ -1,6 +1,16 @@
-export class QuantitativeScale<D> extends Scale<D, number> implements Plottable.Scales.TransformableScale {
+import * as d3 from "d3";
+
+import * as Interactions from "#/interactions";
+import * as Utils from "#/utils";
+
+import { TransformableScale } from "./";
+import * as Scales from "./";
+import { Scale } from "./scale";
+import * as TickGenerators from "./tickGenerators";
+
+export class QuantitativeScale<D> extends Scale<D, number> implements TransformableScale {
   protected static _DEFAULT_NUM_TICKS = 10;
-  private _tickGenerator: Scales.TickGenerators.TickGenerator<D> = (scale: Plottable.QuantitativeScale<D>) => scale.defaultTicks();
+  private _tickGenerator: TickGenerators.TickGenerator<D> = (scale: QuantitativeScale<D>) => scale.defaultTicks();
   private _padProportion = 0.05;
   private _paddingExceptionsProviders: Utils.Set<Scales.PaddingExceptionsProvider<D>>;
   private _domainMin: D;

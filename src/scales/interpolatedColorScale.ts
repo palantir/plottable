@@ -1,3 +1,7 @@
+import * as Utils from "#/utils";
+
+import { Scale } from "./scale";
+
 type supportedScale = d3.scale.Linear<number, string> | d3.scale.Log<number, string> | d3.scale.Pow<number, string>;
 
 export class InterpolatedColor extends Scale<number, string> {

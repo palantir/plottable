@@ -1,3 +1,6 @@
+import { QuantitativeScale } from "#/scales/quantitativeScale";
+import * as Utils from "#/utils";
+
 // HACKHACK: Generic types in type definition fails compilation
 // https://github.com/Microsoft/TypeScript/issues/1616
 /**
@@ -7,7 +10,7 @@
  * @returns {D[]}
  */
 export interface TickGenerator<D> {
-  (scale: Plottable.QuantitativeScale<D>): D[];
+  (scale: QuantitativeScale<D>): D[];
 }
 /**
  * Creates a TickGenerator using the specified interval.

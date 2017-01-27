@@ -1,3 +1,15 @@
+import * as Animators from "#/animators";
+import { Accessor, Point, Bounds, Range, AttributeToProjector } from "#/core/interfaces";
+import { Dataset } from "#/core/dataset";
+import * as Drawers from "#/drawers";
+import * as Scales from "#/scales";
+import { Scale } from "#/scales/scale";
+
+import * as Plots from "./";
+import { PlotEntity, TransformableAccessorScaleBinding, AccessorScaleBinding } from "./";
+import { Plot } from "./plot";
+import { XYPlot } from "./xyPlot";
+
 export class Segment<X, Y> extends XYPlot<X, Y> {
   private static _X2_KEY = "x2";
   private static _Y2_KEY = "y2";
@@ -14,7 +26,7 @@ export class Segment<X, Y> extends XYPlot<X, Y> {
     this.attr("stroke-width", "2px");
   }
 
-  protected _createDrawer(dataset: Dataset) {
+  protected _createDrawer(dataset: Dataset): Drawers.Segment {
     return new Drawers.Segment(dataset);
   }
 

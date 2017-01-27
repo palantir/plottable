@@ -1,3 +1,4 @@
+import { Point } from "#/core/interfaces";
 let nativeMath: Math = (<any>window).Math;
 
 /**
@@ -66,7 +67,7 @@ export function isNaN(n: any) {
  * Numbers represented as strings do not pass this function
  */
 export function isValidNumber(n: any) {
-  return typeof n === "number" && !Plottable.Utils.Math.isNaN(n) && isFinite(n);
+  return typeof n === "number" && !isNaN(n) && isFinite(n);
 }
 
 /**

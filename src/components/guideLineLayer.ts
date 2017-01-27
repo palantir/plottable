@@ -1,5 +1,12 @@
+import { Point } from "#/core/interfaces";
+import { QuantitativeScale } from "#/scales/quantitativeScale";
+import { ScaleCallback } from "#/scales/scale";
+import * as Utils from "#/utils";
+
+import { Component } from "./component";
+
 enum PropertyMode { VALUE, PIXEL }
-;
+
 export class GuideLineLayer<D> extends Component {
   public static ORIENTATION_VERTICAL = "vertical";
   public static ORIENTATION_HORIZONTAL = "horizontal";

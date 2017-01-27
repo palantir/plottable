@@ -1,3 +1,23 @@
+import * as d3 from "d3";
+import * as SVGTypewriter from "svg-typewriter";
+
+import * as Animators from "#/animators";
+import { Accessor, Point, Bounds, Range } from "#/core/interfaces";
+import { Dataset } from "#/core/dataset";
+import { Drawer } from "#/drawers/drawer";
+import * as Drawers from "#/drawers";
+import { Formatter } from "#/core/formatters";
+import * as Formatters from "#/core/formatters";
+import * as Scales from "#/scales";
+import { QuantitativeScale } from "#/scales/quantitativeScale";
+import { Scale } from "#/scales/scale";
+import * as Utils from "#/utils";
+
+import * as Plots from "./";
+import { PlotEntity } from "./";
+import { Plot } from "./plot";
+import { XYPlot } from "./xyPlot";
+
 type LabelConfig = {
   labelArea: d3.Selection<void>;
   measurer: SVGTypewriter.Measurer;
@@ -101,8 +121,8 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
     return this;
   }
 
-  protected _createDrawer(dataset: Dataset) {
-    return new Plottable.Drawers.Rectangle(dataset);
+  protected _createDrawer(dataset: Dataset): Drawers.Rectangle {
+    return new Drawers.Rectangle(dataset);
   }
 
   protected _setup() {
@@ -231,7 +251,7 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
     }
   }
 
-  protected _createNodesForDataset(dataset: Dataset) {
+  protected _createNodesForDataset(dataset: Dataset): Drawer {
     let drawer = super._createNodesForDataset(dataset);
     drawer.renderArea().classed(Bar._BAR_AREA_CLASS, true);
     let labelArea = this._renderArea.append("g").classed(Bar._LABEL_AREA_CLASS, true);
@@ -329,7 +349,7 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
       height: attrToProjector["height"](datum, index, dataset),
     };
 
-    return Plottable.Utils.DOM.intersectsBBox(xRange, yRange, barBBox);
+    return Utils.DOM.intersectsBBox(xRange, yRange, barBBox);
   }
 
   /**
@@ -656,8 +676,8 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
     }
     let barPixelWidth: number;
     let barScale: Scale<any, number> = this._isVertical ? this.x().scale : this.y().scale;
-    if (barScale instanceof Plottable.Scales.Category) {
-      barPixelWidth = (<Plottable.Scales.Category> barScale).rangeBand();
+    if (barScale instanceof Scales.Category) {
+      barPixelWidth = (<Scales.Category> barScale).rangeBand();
     } else {
       let barAccessor = this._isVertical ? this.x().accessor : this.y().accessor;
 
@@ -719,7 +739,7 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
     super._uninstallScaleForKey(scale, key);
   }
 
-  protected _getDataToDraw() {
+  protected _getDataToDraw(): Utils.Map<Dataset, any[]> {
     let dataToDraw = new Utils.Map<Dataset, any[]>();
     let attrToProjector = this._generateAttrToProjector();
     this.datasets().forEach((dataset: Dataset) => {

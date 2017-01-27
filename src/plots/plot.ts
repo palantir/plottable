@@ -1,3 +1,17 @@
+import * as d3 from "d3";
+
+import * as Animators from "#/animators";
+import { Animator } from "#/animators/animator";
+import { Component } from "#/components/component";
+import { Accessor, Point, AttributeToProjector, Bounds } from "#/core/interfaces";
+import { Dataset, DatasetCallback } from "#/core/dataset";
+import * as Drawers from "#/drawers";
+import { Drawer } from "#/drawers/drawer";
+import * as Scales from "#/scales";
+import { Scale, ScaleCallback } from "#/scales/scale";
+import * as Utils from "#/utils";
+
+import * as Plots from "./";
 
 export class Plot extends Component {
   protected static _ANIMATION_MAX_DURATION = 600;
@@ -7,7 +21,7 @@ export class Plot extends Component {
    * may be undefined and shouldn't be accessed directly. Instead, use _getEntityStore
    * to access the entity store.
    */
-  private _cachedEntityStore: Plottable.Utils.EntityStore<Plots.LightweightPlotEntity>;
+  private _cachedEntityStore: Utils.EntityStore<Plots.LightweightPlotEntity>;
   private _dataChanged = false;
   private _datasetToDrawer: Utils.Map<Dataset, Drawer>;
 
@@ -445,7 +459,7 @@ export class Plot extends Component {
     return lightweightPlotEntities;
   }
 
-  protected _getDataToDraw() {
+  protected _getDataToDraw(): Utils.Map<Dataset, any[]> {
     let dataToDraw: Utils.Map<Dataset, any[]> = new Utils.Map<Dataset, any[]>();
     this.datasets().forEach((dataset) => dataToDraw.set(dataset, dataset.data()));
     return dataToDraw;
@@ -503,16 +517,16 @@ export class Plot extends Component {
    * @param {Dataset[]} [datasets] - The datasets with which to construct the store. If no datasets
    * are specified all datasets will be used.
    */
-  private _getEntityStore(datasets?: Dataset[]): Plottable.Utils.EntityStore<Plots.LightweightPlotEntity> {
+  private _getEntityStore(datasets?: Dataset[]): Utils.EntityStore<Plots.LightweightPlotEntity> {
     if (datasets !== undefined) {
-      const EntityStore = new Plottable.Utils.EntityArray<Plots.LightweightPlotEntity>();
+      const EntityStore = new Utils.EntityArray<Plots.LightweightPlotEntity>();
       this._buildLightweightPlotEntities(datasets).forEach((entity: Plots.LightweightPlotEntity) => {
         EntityStore.add(entity);
       });
 
       return EntityStore;
     } else if (this._cachedEntityStore === undefined) {
-      this._cachedEntityStore = new Plottable.Utils.EntityArray<Plots.LightweightPlotEntity>();
+      this._cachedEntityStore = new Utils.EntityArray<Plots.LightweightPlotEntity>();
       this._buildLightweightPlotEntities(this.datasets()).forEach((entity: Plots.LightweightPlotEntity) => {
         this._cachedEntityStore.add(entity);
       });

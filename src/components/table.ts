@@ -1,3 +1,9 @@
+import { Point, SpaceRequest } from "#/core/interfaces";
+import * as Utils from "#/utils";
+
+import { Component } from "./component";
+import { ComponentContainer } from "./componentContainer";
+
 type _LayoutAllocation = {
   guaranteedWidths: number[];
   guaranteedHeights: number[];

@@ -1,3 +1,12 @@
+
+import * as d3 from "d3";
+
+import { QuantitativeScale } from "#/scales/quantitativeScale";
+import { ScaleCallback } from "#/scales/scale";
+import { Point } from "#/core/interfaces";
+
+import { Component } from "./component";
+
 export class Gridlines extends Component {
   private _xScale: QuantitativeScale<any>;
   private _yScale: QuantitativeScale<any>;

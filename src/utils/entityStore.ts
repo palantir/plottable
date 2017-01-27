@@ -1,3 +1,7 @@
+import { Point } from "#/core/interfaces";
+
+import * as Math from "./mathUtils";
+
 /**
  * EntityStore stores entities and makes them searchable.
  * Valid entities must be positioned in Cartesian space.
@@ -57,7 +61,7 @@ export class EntityArray<T extends PositionedEntity> implements EntityStore<T> {
         return;
       }
 
-      let distanceSquared = Utils.Math.distanceSquared(entity.position, queryPoint);
+      let distanceSquared = Math.distanceSquared(entity.position, queryPoint);
       if (distanceSquared < closestDistanceSquared) {
         closestDistanceSquared = distanceSquared;
         closestPointEntity = entity;

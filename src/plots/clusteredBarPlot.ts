@@ -1,3 +1,10 @@
+import { Dataset } from "#/core/dataset";
+import * as Scales from "#/scales";
+import * as Utils from "#/utils";
+
+import { Bar } from "./barPlot";
+import { Plot } from "./plot";
+
 export class ClusteredBar<X, Y> extends Bar<X, Y> {
 
   private _clusterOffsets: Utils.Map<Dataset, number>;
@@ -48,7 +55,7 @@ export class ClusteredBar<X, Y> extends Bar<X, Y> {
     return innerScale;
   }
 
-  protected _getDataToDraw() {
+  protected _getDataToDraw(): Utils.Map<Dataset, any[]> {
     this._updateClusterPosition();
     return super._getDataToDraw();
   }

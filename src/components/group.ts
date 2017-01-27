@@ -1,3 +1,9 @@
+import { SpaceRequest, Point } from "#/core/interfaces";
+import * as Utils from "#/utils";
+
+import { Component } from "./component";
+import { ComponentContainer } from "./componentContainer";
+
 export class Group extends ComponentContainer {
   private _components: Component[] = [];
 
