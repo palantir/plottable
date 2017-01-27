@@ -27,7 +27,7 @@ deployment:
     commands:
       # Confirm we are ready to publish
       - npm start -- dist-compile
-      - git diff HEAD..origin/master --quiet || (echo "dist not built"; exit 1)
+      - git diff HEAD..origin/develop --quiet || (echo "dist not built"; exit 1)
       - npm run -s check_version || (echo "package.json version not updated"; exit 1)
       # Publish
       - echo -e "$NPM_USER\n$NPM_PASS\n$NPM_EMAIL" | npm login
