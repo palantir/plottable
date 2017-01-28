@@ -1,6 +1,6 @@
 import * as d3 from "d3";
 
-import { TimeInterval } from "#/axes/timeAxis";
+import { TimeInterval } from "../axes/timeAxis";
 
 import { QuantitativeScale } from "./quantitativeScale";
 

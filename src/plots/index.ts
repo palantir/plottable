@@ -1,8 +1,8 @@
-import { Dataset } from "#/core/dataset";
-import { Point, Entity, Accessor } from "#/core/interfaces";
-import { Drawer } from "#/drawers/drawer";
-import { Plot } from "#/plots/plot";
-import { Scale, TransformableScale } from "#/scales/scale";
+import { Dataset } from "../core/dataset";
+import { Point, Entity, Accessor } from "../core/interfaces";
+import { Drawer } from "../drawers/drawer";
+import { Plot } from "../plots/plot";
+import { Scale, TransformableScale } from "../scales/scale";
 
 export * from "./areaPlot";
 export * from "./barPlot";

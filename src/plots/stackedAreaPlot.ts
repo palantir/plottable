@@ -1,10 +1,10 @@
-import * as Animators from "#/animators";
-import { Animator } from "#/animators/animator";
-import { Accessor, Point, AttributeToProjector } from "#/core/interfaces";
-import { Dataset } from "#/core/dataset";
-import { Scale } from "#/scales/scale";
-import { QuantitativeScale } from "#/scales/quantitativeScale";
-import * as Utils from "#/utils";
+import * as Animators from "../animators";
+import { Animator } from "../animators/animator";
+import { Accessor, Point, AttributeToProjector } from "../core/interfaces";
+import { Dataset } from "../core/dataset";
+import { Scale } from "../scales/scale";
+import { QuantitativeScale } from "../scales/quantitativeScale";
+import * as Utils from "../utils";
 
 import * as Plots from "./";
 import { Area } from "./areaPlot";

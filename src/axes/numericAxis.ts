@@ -2,9 +2,9 @@ import * as d3 from "d3";
 import * as SVGTypewriter from "svg-typewriter";
 
 import { Axis, AxisOrientation } from "./axis";
-import * as Formatters from "#/core/formatters";
-import { QuantitativeScale } from "#/scales/quantitativeScale";
-import * as Utils from "#/utils";
+import * as Formatters from "../core/formatters";
+import { QuantitativeScale } from "../scales/quantitativeScale";
+import * as Utils from "../utils";
 
 export class Numeric extends Axis<number> {
 

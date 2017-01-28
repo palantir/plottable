@@ -1,7 +1,7 @@
-import { Accessor, Point, Bounds, Range, AttributeToProjector } from "#/core/interfaces";
-import { Dataset } from "#/core/dataset";
-import { Drawer } from "#/drawers/drawer";
-import * as Utils from "#/utils";
+import { Accessor, Point, Bounds, Range, AttributeToProjector } from "../core/interfaces";
+import { Dataset } from "../core/dataset";
+import { Drawer } from "../drawers/drawer";
+import * as Utils from "../utils";
 
 import * as Plots from "./";
 import { Bar } from "./barPlot";

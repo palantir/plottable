@@ -1,15 +1,15 @@
 import * as d3 from "d3";
 
-import * as Animators from "#/animators";
-import { Animator } from "#/animators/animator";
-import { Component } from "#/components/component";
-import { Accessor, Point, AttributeToProjector, Bounds } from "#/core/interfaces";
-import { Dataset, DatasetCallback } from "#/core/dataset";
-import * as Drawers from "#/drawers";
-import { Drawer } from "#/drawers/drawer";
-import * as Scales from "#/scales";
-import { Scale, ScaleCallback } from "#/scales/scale";
-import * as Utils from "#/utils";
+import * as Animators from "../animators";
+import { Animator } from "../animators/animator";
+import { Component } from "../components/component";
+import { Accessor, Point, AttributeToProjector, Bounds } from "../core/interfaces";
+import { Dataset, DatasetCallback } from "../core/dataset";
+import * as Drawers from "../drawers";
+import { Drawer } from "../drawers/drawer";
+import * as Scales from "../scales";
+import { Scale, ScaleCallback } from "../scales/scale";
+import * as Utils from "../utils";
 
 import * as Plots from "./";
 

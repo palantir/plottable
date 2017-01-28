@@ -1,5 +1,5 @@
-import { SpaceRequest, Point } from "#/core/interfaces";
-import * as Utils from "#/utils";
+import { SpaceRequest, Point } from "../core/interfaces";
+import * as Utils from "../utils";
 
 import { Component } from "./component";
 import { ComponentContainer } from "./componentContainer";

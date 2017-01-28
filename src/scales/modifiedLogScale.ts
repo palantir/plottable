@@ -1,4 +1,4 @@
-import * as Utils from "#/utils";
+import * as Utils from "../utils";
 
 import * as Scales from "./";
 import { QuantitativeScale } from "./quantitativeScale";

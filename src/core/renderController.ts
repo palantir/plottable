@@ -1,5 +1,5 @@
-import { Component } from "#/components/component";
-import * as Utils from "#/utils";
+import { Component } from "../components/component";
+import * as Utils from "../utils";
 
 import * as RenderPolicies from "./renderPolicy";
 

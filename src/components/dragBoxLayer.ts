@@ -1,8 +1,8 @@
 import * as d3 from "d3";
 
-import { Bounds, Point } from "#/core/interfaces";
-import * as Interactions from "#/interactions";
-import * as Utils from "#/utils";
+import { Bounds, Point } from "../core/interfaces";
+import * as Interactions from "../interactions";
+import * as Utils from "../utils";
 
 import * as Components from "./";
 import { PropertyMode } from "./";

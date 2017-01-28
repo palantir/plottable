@@ -1,12 +1,12 @@
-import * as Animators from "#/animators";
-import { Accessor, AttributeToProjector, Projector, Point, Bounds, Range } from "#/core/interfaces";
-import { Dataset } from "#/core/dataset";
-import * as Drawers from "#/drawers";
-import { Drawer } from "#/drawers/drawer";
-import * as Scales from "#/scales";
-import { QuantitativeScale } from "#/scales/quantitativeScale";
-import { Scale } from "#/scales/scale";
-import * as Utils from "#/utils";
+import * as Animators from "../animators";
+import { Accessor, AttributeToProjector, Projector, Point, Bounds, Range } from "../core/interfaces";
+import { Dataset } from "../core/dataset";
+import * as Drawers from "../drawers";
+import { Drawer } from "../drawers/drawer";
+import * as Scales from "../scales";
+import { QuantitativeScale } from "../scales/quantitativeScale";
+import { Scale } from "../scales/scale";
+import * as Utils from "../utils";
 
 import * as Plots from "./";
 import { PlotEntity } from "./";

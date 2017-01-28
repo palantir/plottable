@@ -1,7 +1,7 @@
 import * as d3 from "d3";
 
-import * as Interactions from "#/interactions";
-import * as Utils from "#/utils";
+import * as Interactions from "../interactions";
+import * as Utils from "../utils";
 
 import { TransformableScale } from "./";
 import { Scale } from "./scale";

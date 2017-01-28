@@ -1,6 +1,6 @@
-import { Dataset } from "#/core/dataset";
-import * as Scales from "#/scales";
-import * as Utils from "#/utils";
+import { Dataset } from "../core/dataset";
+import * as Scales from "../scales";
+import * as Utils from "../utils";
 
 import { Bar } from "./barPlot";
 import { Plot } from "./plot";

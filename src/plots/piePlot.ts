@@ -1,15 +1,15 @@
 import * as d3 from "d3";
 import * as SVGTypewriter from "svg-typewriter";
 
-import * as Animators from "#/animators";
-import { Accessor, Point, AttributeToProjector } from "#/core/interfaces";
-import { Dataset } from "#/core/dataset";
-import * as Drawers from "#/drawers";
-import { Formatter } from "#/core/formatters";
-import * as Formatters from "#/core/formatters";
-import * as Scales from "#/scales";
-import { Scale } from "#/scales/scale";
-import * as Utils from "#/utils";
+import * as Animators from "../animators";
+import { Accessor, Point, AttributeToProjector } from "../core/interfaces";
+import { Dataset } from "../core/dataset";
+import * as Drawers from "../drawers";
+import { Formatter } from "../core/formatters";
+import * as Formatters from "../core/formatters";
+import * as Scales from "../scales";
+import { Scale } from "../scales/scale";
+import * as Utils from "../utils";
 
 import { PlotEntity, AccessorScaleBinding } from "./";
 import { Plot } from "./plot";

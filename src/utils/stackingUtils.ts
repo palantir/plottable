@@ -1,5 +1,5 @@
-import { Dataset } from "#/core/dataset";
-import { Accessor } from "#/core/interfaces";
+import { Dataset } from "../core/dataset";
+import { Accessor } from "../core/interfaces";
 
 import * as Utils from "./";
 

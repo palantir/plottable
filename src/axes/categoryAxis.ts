@@ -2,9 +2,9 @@ import * as d3 from "d3";
 import * as SVGTypewriter from "svg-typewriter";
 
 import { Axis, AxisOrientation } from "./axis";
-import { SpaceRequest, Point } from "#/core/interfaces";
-import * as Scales from "#/scales";
-import * as Utils from "#/utils";
+import { SpaceRequest, Point } from "../core/interfaces";
+import * as Scales from "../scales";
+import * as Utils from "../utils";
 
 export interface DownsampleInfo {
   domain: string[];

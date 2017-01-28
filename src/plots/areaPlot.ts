@@ -1,11 +1,11 @@
 import * as d3 from "d3";
 
-import { Accessor, AttributeToProjector, Projector } from "#/core/interfaces";
-import { Dataset } from "#/core/dataset";
-import * as Drawers from "#/drawers";
-import * as Scales from "#/scales";
-import { QuantitativeScale } from "#/scales/quantitativeScale";
-import * as Utils from "#/utils";
+import { Accessor, AttributeToProjector, Projector } from "../core/interfaces";
+import { Dataset } from "../core/dataset";
+import * as Drawers from "../drawers";
+import * as Scales from "../scales";
+import { QuantitativeScale } from "../scales/quantitativeScale";
+import * as Utils from "../utils";
 
 import * as Plots from "./";
 import { Line } from "./linePlot";

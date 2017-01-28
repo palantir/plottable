@@ -1,8 +1,8 @@
 import * as d3 from "d3";
 
-import { Point, SpaceRequest, Bounds } from "#/core/interfaces";
-import * as RenderController from "#/core/renderController";
-import * as Utils from "#/utils";
+import { Point, SpaceRequest, Bounds } from "../core/interfaces";
+import * as RenderController from "../core/renderController";
+import * as Utils from "../utils";
 
 import { ComponentContainer } from "./componentContainer";
 

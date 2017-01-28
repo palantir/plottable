@@ -1,5 +1,5 @@
-import { Component } from "#/components/component";
-import { Point } from "#/core/interfaces";
+import { Component } from "../components/component";
+import { Point } from "../core/interfaces";
 
 export class Interaction {
   protected _componentAttachedTo: Component;

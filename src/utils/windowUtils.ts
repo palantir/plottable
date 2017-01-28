@@ -1,4 +1,4 @@
-import * as Configs from "#/core/config";
+import * as Configs from "../core/config";
 import * as Utils from "./";
 
 /**

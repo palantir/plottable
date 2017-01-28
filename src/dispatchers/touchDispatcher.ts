@@ -1,5 +1,5 @@
-import { Point } from "#/core/interfaces";
-import * as Utils from "#/utils";
+import { Point } from "../core/interfaces";
+import * as Utils from "../utils";
 
 import { Dispatcher } from "./dispatcher";
 import * as Dispatchers from "./";

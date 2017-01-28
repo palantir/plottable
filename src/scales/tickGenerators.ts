@@ -1,5 +1,5 @@
-import { QuantitativeScale } from "#/scales/quantitativeScale";
-import * as Utils from "#/utils";
+import { QuantitativeScale } from "../scales/quantitativeScale";
+import * as Utils from "../utils";
 
 // HACKHACK: Generic types in type definition fails compilation
 // https://github.com/Microsoft/TypeScript/issues/1616

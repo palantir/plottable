@@ -1,6 +1,6 @@
 import * as SVGTypewriter from "svg-typewriter";
 
-import { SpaceRequest } from "#/core/interfaces";
+import { SpaceRequest } from "../core/interfaces";
 
 import { Component } from "./component";
 

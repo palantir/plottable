@@ -1,6 +1,6 @@
 import * as d3 from "d3";
 
-import { Dataset } from "#/core/dataset";
+import { Dataset } from "../core/dataset";
 
 import { Drawer } from "./drawer";
 

@@ -1,8 +1,8 @@
-import * as Components from "#/components";
-import { GuideLineLayer } from "#/components";
-import { Point } from "#/core/interfaces";
-import * as Interactions from "#/interactions";
-import * as Utils from "#/utils";
+import * as Components from "../components";
+import { GuideLineLayer } from "../components";
+import { Point } from "../core/interfaces";
+import * as Interactions from "../interactions";
+import * as Utils from "../utils";
 
 export interface DragLineCallback<D> { (dragLineLayer: Components.DragLineLayer<D>): void;
 }

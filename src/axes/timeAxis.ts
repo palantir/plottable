@@ -1,9 +1,9 @@
 import * as SVGTypewriter from "svg-typewriter";
 
-import { Formatter } from "#/core/formatters";
-import * as Formatters from "#/core/formatters";
-import * as Scales from "#/scales";
-import * as Utils from "#/utils";
+import { Formatter } from "../core/formatters";
+import * as Formatters from "../core/formatters";
+import * as Scales from "../scales";
+import * as Utils from "../utils";
 
 import { Axis } from "./axis";
 

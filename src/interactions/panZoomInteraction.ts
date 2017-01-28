@@ -1,9 +1,9 @@
-import { Component } from "#/components/component";
-import { Point } from "#/core/interfaces";
-import * as Dispatchers from "#/dispatchers";
-import * as Scales from "#/scales";
-import { TransformableScale } from "#/scales/scale";
-import * as Utils from "#/utils";
+import { Component } from "../components/component";
+import { Point } from "../core/interfaces";
+import * as Dispatchers from "../dispatchers";
+import * as Scales from "../scales";
+import { TransformableScale } from "../scales/scale";
+import * as Utils from "../utils";
 
 import { Interaction } from "./interaction";
 import * as Interactions from "./";

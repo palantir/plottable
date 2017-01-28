@@ -1,7 +1,7 @@
-import { Point } from "#/core/interfaces";
-import { QuantitativeScale } from "#/scales/quantitativeScale";
-import { ScaleCallback } from "#/scales/scale";
-import * as Utils from "#/utils";
+import { Point } from "../core/interfaces";
+import { QuantitativeScale } from "../scales/quantitativeScale";
+import { ScaleCallback } from "../scales/scale";
+import * as Utils from "../utils";
 
 import { Component } from "./component";
 

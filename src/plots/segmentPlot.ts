@@ -1,9 +1,9 @@
-import * as Animators from "#/animators";
-import { Accessor, Point, Bounds, Range, AttributeToProjector } from "#/core/interfaces";
-import { Dataset } from "#/core/dataset";
-import * as Drawers from "#/drawers";
-import * as Scales from "#/scales";
-import { Scale } from "#/scales/scale";
+import * as Animators from "../animators";
+import { Accessor, Point, Bounds, Range, AttributeToProjector } from "../core/interfaces";
+import { Dataset } from "../core/dataset";
+import * as Drawers from "../drawers";
+import * as Scales from "../scales";
+import { Scale } from "../scales/scale";
 
 import * as Plots from "./";
 import { PlotEntity, TransformableAccessorScaleBinding, AccessorScaleBinding } from "./";

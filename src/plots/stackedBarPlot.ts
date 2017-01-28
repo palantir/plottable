@@ -1,9 +1,9 @@
 import * as SVGTypewriter from "svg-typewriter";
 
-import { Accessor, Point } from "#/core/interfaces";
-import { Dataset } from "#/core/dataset";
-import { Scale } from "#/scales/scale";
-import * as Utils from "#/utils";
+import { Accessor, Point } from "../core/interfaces";
+import { Dataset } from "../core/dataset";
+import { Scale } from "../scales/scale";
+import * as Utils from "../utils";
 
 import * as Plots from "./";
 import { Bar } from "./barPlot";

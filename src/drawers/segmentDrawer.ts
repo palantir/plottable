@@ -1,4 +1,4 @@
-import { Dataset } from "#/core/dataset";
+import { Dataset } from "../core/dataset";
 
 import { Drawer } from "./drawer";
 

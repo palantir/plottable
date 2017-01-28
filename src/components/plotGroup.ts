@@ -1,7 +1,7 @@
-import { Point } from "#/core/interfaces";
-import * as Plots from "#/plots";
-import { Plot } from "#/plots/plot";
-import * as Utils from "#/utils";
+import { Point } from "../core/interfaces";
+import * as Plots from "../plots";
+import { Plot } from "../plots/plot";
+import * as Utils from "../utils";
 
 import { Component } from "./component";
 import { Group } from "./group";

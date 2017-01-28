@@ -1,5 +1,5 @@
-import { Point, Bounds } from "#/core/interfaces";
-import { QuantitativeScale } from "#/scales/quantitativeScale";
+import { Point, Bounds } from "../core/interfaces";
+import { QuantitativeScale } from "../scales/quantitativeScale";
 
 import { DragBoxLayer } from "./dragBoxLayer";
 
