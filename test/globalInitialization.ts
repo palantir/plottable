@@ -1,17 +1,9 @@
-///<reference path="testReference.ts" />
+import { assert } from "chai";
+import * as d3 from "d3";
 
 import * as Plottable from "../src";
 
 import * as TestMethods from "./testMethods";
-
-interface Window {
-  PHANTOMJS: boolean;
-  Pixel_CloseTo_Requirement: number;
-}
-
-/* tslint:disable:no-unused-variable */
-const assert = chai.assert;
-/* tslint:enable:no-unused-variable */
 
 before(() => {
   // Set the render policy to immediate to make sure ETE tests can check DOM change immediately

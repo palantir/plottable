@@ -1,4 +1,4 @@
-///<reference path="testReference.ts" />
+import * as d3 from "d3";
 
 import * as Plottable from "../src";
 
