@@ -1,5 +1,11 @@
 ///<reference path="../testReference.ts" />
 
+import { assert } from "chai";
+
+import * as Plottable from "../../src";
+
+import * as TestMethods from "../testMethods";
+
 describe("InterpolatedColorLegend", () => {
   const SWATCH_SELECTOR = ".swatch";
   const SWATCH_CONTAINER_SELECTOR = ".swatch-container";

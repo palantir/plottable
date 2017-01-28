@@ -1,5 +1,11 @@
 ///<reference path="../testReference.ts" />
 
+import { assert } from "chai";
+
+import * as Plottable from "../../src";
+
+import * as TestMethods from "../testMethods";
+
 describe("Drawers", () => {
   describe("Line Drawer", () => {
     const data = [["A", "B", "C"]]; // line normally takes single array of data

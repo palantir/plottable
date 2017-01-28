@@ -1,3 +1,5 @@
+import * as d3 from "d3";
+
 import { Dataset } from "../core/dataset";
 import { Accessor } from "../core/interfaces";
 

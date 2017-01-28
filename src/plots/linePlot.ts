@@ -1,3 +1,5 @@
+import * as d3 from "d3";
+
 import * as Animators from "../animators";
 import { Accessor, AttributeToProjector, Projector, Point, Bounds, Range } from "../core/interfaces";
 import { Dataset } from "../core/dataset";

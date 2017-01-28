@@ -1,5 +1,11 @@
 ///<reference path="../testReference.ts" />
 
+import { assert } from "chai";
+
+import * as Plottable from "../../src";
+
+import * as TestMethods from "../testMethods";
+
 describe("Scales", () => {
   describe("Category Scale", () => {
     describe("Basic usage", () => {

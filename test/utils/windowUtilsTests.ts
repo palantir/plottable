@@ -1,5 +1,11 @@
 ///<reference path="../testReference.ts" />
 
+import { assert } from "chai";
+
+import * as Plottable from "../../src";
+
+import * as TestMethods from "../testMethods";
+
 describe("Utils.Window", () => {
   describe("warn()", () => {
     if (console != null) { // console not defined in IE unless it's opened

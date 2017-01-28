@@ -1,5 +1,11 @@
 ///<reference path="../testReference.ts" />
 
+import { assert } from "chai";
+
+import * as Plottable from "../../src";
+
+import * as TestMethods from "../testMethods";
+
 describe("Plots", () => {
   describe("XY Plot", () => {
     describe("autoranging on the x and y scales", () => {

@@ -1,3 +1,5 @@
+import * as d3 from "d3";
+
 import * as Utils from "../utils";
 
 import { Scale } from "./scale";

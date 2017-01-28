@@ -5,7 +5,7 @@
       "module": "commonjs",
       "noFallthroughCasesInSwitch": true,
       "noImplicitReturns": true,
-      "outDir": "build",
+      "outDir": "build/src",
       "noImplicitAny": true,
       "removeComments": false,
       "sourceMap": false,

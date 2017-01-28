@@ -1,5 +1,9 @@
 ///<reference path="../testReference.ts" />
 
+import { assert } from "chai";
+
+import * as Plottable from "../../src";
+
 describe("Animators", () => {
   describe("EasingAnimator", () => {
     let animator: Plottable.Animators.Easing;

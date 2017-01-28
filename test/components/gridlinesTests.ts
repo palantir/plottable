@@ -1,5 +1,11 @@
 ///<reference path="../testReference.ts" />
 
+import { assert } from "chai";
+
+import * as Plottable from "../../src";
+
+import * as TestMethods from "../testMethods";
+
 describe("Gridlines", () => {
   let svg: d3.Selection<void>;
   let xScale: Plottable.Scales.Linear;

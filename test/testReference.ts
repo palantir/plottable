@@ -5,7 +5,6 @@
 ///<reference path="../node_modules/@types/jquery/index.d.ts" />
 ///<reference path="../node_modules/@types/jquery.simulate/index.d.ts" />
 ///<reference path="../node_modules/svg-typewriter/build/src/index.d.ts" />
-///<reference path="../plottable.d.ts" />
 ///<reference path="mocks.ts" />
 
 ///<reference path="globalInitialization.ts" />
@@ -95,3 +94,4 @@
 ///<reference path="components/xDragBoxLayerTests.ts" />
 ///<reference path="components/yDragBoxLayerTests.ts" />
 ///<reference path="components/dragLineLayerTests.ts" />
+

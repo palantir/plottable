@@ -1,3 +1,5 @@
+import * as d3 from "d3";
+
 export type Formatter = (d: any) => string;
 
 interface PredicatedFormat {

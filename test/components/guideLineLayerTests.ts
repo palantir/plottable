@@ -1,5 +1,11 @@
 ///<reference path="../testReference.ts" />
 
+import { assert } from "chai";
+
+import * as Plottable from "../../src";
+
+import * as TestMethods from "../testMethods";
+
 describe("GuideLineLayer", () => {
   describe("Basic Usage", () => {
     it("has the \"vertical\" class if vertical, and the \"horizontal\" class if horizontal", () => {

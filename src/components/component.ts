@@ -8,16 +8,6 @@ import { ComponentContainer } from "./componentContainer";
 
 export type ComponentCallback = (component: Component) => void;
 
-export namespace Components {
-  export class Alignment {
-    static TOP = "top";
-    static BOTTOM = "bottom";
-    static LEFT = "left";
-    static RIGHT = "right";
-    static CENTER = "center";
-  }
-}
-
 export type IResizeHandler = (size: { height: number, width: number }) => void;
 
 export class Component {

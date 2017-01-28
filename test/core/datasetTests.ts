@@ -1,5 +1,11 @@
 ///<reference path="../testReference.ts" />
 
+import { assert } from "chai";
+
+import * as Plottable from "../../src";
+
+import * as TestMethods from "../testMethods";
+
 describe("Dataset", () => {
   it("Updates listeners when the data is changed", () => {
     let ds = new Plottable.Dataset();

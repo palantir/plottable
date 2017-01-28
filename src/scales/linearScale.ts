@@ -1,3 +1,5 @@
+import * as d3 from "d3";
+
 import { QuantitativeScale } from "./quantitativeScale";
 
 export class Linear extends QuantitativeScale<number> {

@@ -1,5 +1,12 @@
 ///<reference path="../testReference.ts" />
 
+import { assert } from "chai";
+import * as SVGTypewriter from "svg-typewriter";
+
+import * as Plottable from "../../src";
+
+import * as TestMethods from "../testMethods";
+
 describe("Labels", () => {
   const LABEL_CLASS = "label";
   let CLOSETO_REQUIRMENT: number;

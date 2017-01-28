@@ -1,3 +1,4 @@
+import * as d3 from "d3";
 import * as SVGTypewriter from "svg-typewriter";
 
 import { Formatter } from "../core/formatters";

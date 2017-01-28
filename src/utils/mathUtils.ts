@@ -1,4 +1,7 @@
+import * as d3 from "d3";
+
 import { Point } from "../core/interfaces";
+
 let nativeMath: Math = (<any>window).Math;
 
 /**

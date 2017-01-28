@@ -1,5 +1,9 @@
 ///<reference path="testReference.ts" />
 
+import * as Plottable from "../src";
+
+import * as TestMethods from "./testMethods";
+
 interface Window {
   PHANTOMJS: boolean;
   Pixel_CloseTo_Requirement: number;

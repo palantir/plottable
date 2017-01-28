@@ -1,5 +1,13 @@
 ///<reference path="../testReference.ts" />
 
+import { assert } from "chai";
+import * as sinon from "sinon";
+
+import * as Plottable from "../../src";
+
+import * as Mocks from "../mocks";
+import * as TestMethods from "../testMethods";
+
 describe("Component", () => {
   let SVG_WIDTH = 400;
   let SVG_HEIGHT = 300;

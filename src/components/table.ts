@@ -1,3 +1,5 @@
+import * as d3 from "d3";
+
 import { Point, SpaceRequest } from "../core/interfaces";
 import * as Utils from "../utils";
 

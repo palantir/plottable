@@ -1,3 +1,5 @@
+import * as d3 from "d3";
+
 /**
  * A SymbolFactory is a function that takes in a symbolSize which is the edge length of the render area
  * and returns a string representing the 'd' attribute of the resultant 'path' element

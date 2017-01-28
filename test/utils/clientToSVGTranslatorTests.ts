@@ -1,5 +1,11 @@
 ///<reference path="../testReference.ts" />
 
+import { assert } from "chai";
+
+import * as Plottable from "../../src";
+
+import * as TestMethods from "../testMethods";
+
 describe("ClientToSVGTranslator", () => {
   it("getTranslator() creates only one ClientToSVGTranslator per <svg>", () => {
     let svg = TestMethods.generateSVG();

@@ -1,5 +1,12 @@
 ///<reference path="../testReference.ts" />
 
+import { assert } from "chai";
+
+import * as Plottable from "../../src";
+
+import * as Mocks from "../mocks";
+import * as TestMethods from "../testMethods";
+
 describe("Group", () => {
   describe("Basic add/remove/has functionality", () => {
     it("appends Components with append()", () => {

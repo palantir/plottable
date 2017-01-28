@@ -1,5 +1,11 @@
 ///<reference path="../testReference.ts" />
 
+import { assert } from "chai";
+
+import * as Plottable from "../../src";
+
+import * as TestMethods from "../testMethods";
+
 describe("Map", () => {
   it("set() and get()", () => {
     let map = new Plottable.Utils.Map<string, string>();

@@ -1,3 +1,5 @@
+import * as d3 from "d3";
+
 import { Component } from "../components/component";
 import { Point } from "../core/interfaces";
 import * as Dispatchers from "../dispatchers";

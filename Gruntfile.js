@@ -9,13 +9,14 @@ module.exports = function(grunt) {
     },
     test: {
       src: ["test/**/*.ts"],
-      out: "test/tests.js",
       options: {
-        target: "es5",
-        sourceMap: false,
-        noImplicitAny: true,
         declaration: false,
-        removeComments: false
+        module: "commonjs",
+        outDir: "build/test",
+        noImplicitAny: true,
+        removeComments: false,
+        sourceMap: false,
+        target: "es5"
       }
     },
     verifyDefinitionFiles: {

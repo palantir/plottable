@@ -1,5 +1,12 @@
 ///<reference path="../testReference.ts" />
 
+import { assert } from "chai";
+import * as sinon from "sinon";
+
+import * as Plottable from "../../src";
+
+import * as TestMethods from "../testMethods";
+
 describe("Plots", () => {
   describe("Plot", () => {
     it("adds a \"plot\" css class by default", () => {
