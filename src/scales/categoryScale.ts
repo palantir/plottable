@@ -1,7 +1,21 @@
 namespace Plottable.Scales {
+  export interface DownsampleInfo {
+    domain: string[];
+    stepWidth: number;
+  }
+
   const TRANSFORMATION_SPACE = [0, 1] as [number, number];
 
   export class Category extends Scale<string, number> implements Plottable.Scales.TransformableScale {
+    public static isInstance(scale: Scale<any, any>): scale is Category {
+      return Category.prototype.isPrototypeOf(scale);
+    };
+
+    /**
+     * How many pixels to give labels at minimum before downsampling takes effect.
+     */
+    private static _MINIMUM_WIDTH_PER_LABEL_PX = 15;
+
     /**
      * An additional linear scale to apply pan/zoom interactions to the category
      * scale. Pan/zoom requires a numerically invertable scale.
@@ -95,6 +109,22 @@ namespace Plottable.Scales {
      */
     public stepWidth(): number {
       return this._rescaleBand(this._d3Scale.rangeBand() * (1 + this.innerPadding()));
+    }
+
+    /**
+     * Take the scale and drop ticks at regular intervals such that the
+     * resultant ticks are all a reasonable minimum distance apart. Return the
+     * resultant ticks to render, as well as the new stepWidth between them.
+     *
+     * @return {DownsampleInfo} an object holding the resultant domain and new
+     * stepWidth.
+     */
+    public getDownsampleInfo(): DownsampleInfo {
+      const downsampleRatio = Math.ceil(Category._MINIMUM_WIDTH_PER_LABEL_PX / this.stepWidth());
+      return {
+        domain: this.domain().filter((d, i) => i % downsampleRatio === 0),
+        stepWidth: downsampleRatio * this.stepWidth(),
+      };
     }
 
     /**

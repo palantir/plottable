@@ -93,7 +93,7 @@ describe("Category Axes", () => {
       const axis = new Plottable.Axes.Category(scale, "left");
       axis.renderTo(svg);
 
-      const { domain: downsampledDomain, stepWidth } = axis.getDownsampleInfo();
+      const { domain: downsampledDomain, stepWidth } = scale.getDownsampleInfo();
       assert.strictEqual(stepWidth, 4 * scale.stepWidth(), "computes new stepWidth correctly");
       assert.deepEqual(downsampledDomain, ["one", "five"], "downsamples domain correctly");
 

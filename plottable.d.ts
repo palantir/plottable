@@ -1127,7 +1127,16 @@ declare namespace Plottable.Scales {
     }
 }
 declare namespace Plottable.Scales {
+    interface DownsampleInfo {
+        domain: string[];
+        stepWidth: number;
+    }
     class Category extends Scale<string, number> implements Plottable.Scales.TransformableScale {
+        static isInstance(scale: Scale<any, any>): scale is Category;
+        /**
+         * How many pixels to give labels at minimum before downsampling takes effect.
+         */
+        private static _MINIMUM_WIDTH_PER_LABEL_PX;
         /**
          * An additional linear scale to apply pan/zoom interactions to the category
          * scale. Pan/zoom requires a numerically invertable scale.
@@ -1177,6 +1186,15 @@ declare namespace Plottable.Scales {
          * @returns {number}
          */
         stepWidth(): number;
+        /**
+         * Take the scale and drop ticks at regular intervals such that the
+         * resultant ticks are all a reasonable minimum distance apart. Return the
+         * resultant ticks to render, as well as the new stepWidth between them.
+         *
+         * @return {DownsampleInfo} an object holding the resultant domain and new
+         * stepWidth.
+         */
+        getDownsampleInfo(): DownsampleInfo;
         /**
          * Gets the inner padding.
          *
@@ -2304,15 +2322,8 @@ declare namespace Plottable.Axes {
     }
 }
 declare namespace Plottable.Axes {
-    interface DownsampleInfo {
-        domain: string[];
-        stepWidth: number;
-    }
+    type ITickMarkPosition = "center" | "after";
     class Category extends Axis<string> {
-        /**
-         * How many pixels to give labels at minimum before downsampling takes effect.
-         */
-        private static _MINIMUM_WIDTH_PER_LABEL_PX;
         private _tickLabelAngle;
         /**
          * Maximum allowable px width of tick labels.
@@ -2322,6 +2333,13 @@ declare namespace Plottable.Axes {
          * Maximum allowable number of wrapped lines for tick labels.
          */
         private _tickLabelMaxLines;
+        /**
+         * Specifies whether tick marks are drawn in the center of category or after
+         * it. Valid options are "center" and "after".
+         *
+         * @default "center"
+         */
+        private _tickMarkPosition;
         private _measurer;
         /**
          * A Wrapper configured according to the other properties on this axis.
@@ -2362,13 +2380,16 @@ declare namespace Plottable.Axes {
         protected _coreSize(): number;
         protected _getTickValues(): string[];
         /**
-         * Take the scale and drop ticks at regular intervals such that the resultant ticks are all a reasonable minimum
-         * distance apart. Return the resultant ticks to render, as well as the new stepWidth between them.
-         *
-         * @param {Scales.Category} scale - The scale being downsampled. Defaults to this Axis' scale.
-         * @return {DownsampleInfo} an object holding the resultant domain and new stepWidth.
+         * Gets the current tick mark position value.
          */
-        getDownsampleInfo(scale?: Scales.Category): DownsampleInfo;
+        tickMarkPosition(): ITickMarkPosition;
+        /**
+         * Sets  whether tick marks are drawn in the center of category or after it.
+         *
+         * @param {ITickMarkPosition} tickMarkPosition - "center" or "after"
+         * @returns {Category} The calling Category.
+         */
+        tickMarkPosition(tickMarkPosition: ITickMarkPosition): this;
         /**
          * Gets the current alignment. If not set, null will be returned.
          */
@@ -2765,13 +2786,19 @@ declare namespace Plottable.Components {
     }
 }
 declare namespace Plottable.Components {
+    type ILinePosition = "center" | "after";
     class Gridlines extends Component {
+        private static validateScale;
         private _xScale;
         private _yScale;
         private _xLinesContainer;
         private _yLinesContainer;
         private _xTicks;
         private _yTicks;
+        /**
+         */
+        private _xLinePosition;
+        private _yLinePosition;
         private _renderCallback;
         /**
          * @constructor
@@ -2785,6 +2812,40 @@ declare namespace Plottable.Components {
          * no gridlines are desired.
          */
         constructor(xScale: QuantitativeScale<any> | Plottable.Scales.Category, yScale: QuantitativeScale<any> | Plottable.Scales.Category);
+        /**
+         * Gets the xLinePosition value.
+         */
+        xLinePosition(): ILinePosition;
+        /**
+         * Sets the xLinePosition value, which specifies whether lines are drawn in
+         * the center of category or after it.
+         *
+         * Valid options are "center" and "after". Note that this only makes sense
+         * for category axes.
+         *
+         * @default "center"
+         *
+         * @param {ILinePosition} linePosition - "center" or "after"
+         * @returns {GridLines} this object.
+         */
+        xLinePosition(linePosition: ILinePosition): this;
+        /**
+         * Gets the yLinePosition value.
+         */
+        yLinePosition(): ILinePosition;
+        /**
+         * Sets the yLinePosition value, which specifies whether lines are drawn in
+         * the center of category or after it.
+         *
+         * Valid options are "center" and "after". Note that this only makes sense
+         * for category axes.
+         *
+         * @default "center"
+         *
+         * @param {ILinePosition} linePosition - "center" or "after"
+         * @returns {GridLines} this object.
+         */
+        yLinePosition(linePosition: ILinePosition): this;
         destroy(): this;
         protected _setup(): void;
         renderImmediately(): this;

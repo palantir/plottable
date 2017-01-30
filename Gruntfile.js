@@ -150,7 +150,7 @@ module.exports = function(grunt) {
     },
     demo: {
       tasks: ["demo-compile"],
-      files: ["demo/**/*.ts"]
+      files: ["plottable-npm.js", "demo/**/*.ts"]
     },
     quicktests: {
       tasks: ["update-quicktests"],

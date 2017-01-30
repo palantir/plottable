@@ -1,15 +1,7 @@
 namespace Plottable.Axes {
-  export interface DownsampleInfo {
-    domain: string[];
-    stepWidth: number;
-  }
+  export type ITickMarkPosition = "center" | "after";
 
   export class Category extends Axis<string> {
-    /**
-     * How many pixels to give labels at minimum before downsampling takes effect.
-     */
-    private static _MINIMUM_WIDTH_PER_LABEL_PX = 15;
-
     private _tickLabelAngle = 0;
 
     /**
@@ -21,6 +13,14 @@ namespace Plottable.Axes {
      * Maximum allowable number of wrapped lines for tick labels.
      */
     private _tickLabelMaxLines: number;
+
+    /**
+     * Specifies whether tick marks are drawn in the center of category or after
+     * it. Valid options are "center" and "after".
+     *
+     * @default "center"
+     */
+    private _tickMarkPosition: ITickMarkPosition = "center";
 
     private _measurer: SVGTypewriter.CacheMeasurer;
 
@@ -120,22 +120,27 @@ namespace Plottable.Axes {
     }
 
     protected _getTickValues() {
-      return this.getDownsampleInfo().domain;
+      return (this._scale as Scales.Category).getDownsampleInfo().domain;
     }
 
     /**
-     * Take the scale and drop ticks at regular intervals such that the resultant ticks are all a reasonable minimum
-     * distance apart. Return the resultant ticks to render, as well as the new stepWidth between them.
-     *
-     * @param {Scales.Category} scale - The scale being downsampled. Defaults to this Axis' scale.
-     * @return {DownsampleInfo} an object holding the resultant domain and new stepWidth.
+     * Gets the current tick mark position value.
      */
-    public getDownsampleInfo(scale = <Scales.Category> this._scale): DownsampleInfo {
-      const downsampleRatio = Math.ceil(Category._MINIMUM_WIDTH_PER_LABEL_PX / scale.stepWidth());
-      return {
-        domain: scale.domain().filter((d, i) => i % downsampleRatio === 0),
-        stepWidth: downsampleRatio * scale.stepWidth(),
-      };
+    public tickMarkPosition(): ITickMarkPosition;
+    /**
+     * Sets  whether tick marks are drawn in the center of category or after it.
+     *
+     * @param {ITickMarkPosition} tickMarkPosition - "center" or "after"
+     * @returns {Category} The calling Category.
+     */
+    public tickMarkPosition(tickMarkPosition: ITickMarkPosition): this;
+    public tickMarkPosition(tickMarkPosition?: ITickMarkPosition): any {
+      if (arguments.length === 0) {
+        return this._tickMarkPosition;
+      } else {
+        this._tickMarkPosition = tickMarkPosition;
+      }
+      return this;
     }
 
     /**
@@ -411,7 +416,7 @@ namespace Plottable.Axes {
         .outerPadding(thisScale.outerPadding())
         .range([0, this.isHorizontal() ? axisWidth : axisHeight]);
 
-      const { domain, stepWidth } = this.getDownsampleInfo(scale);
+      const { domain, stepWidth } = scale.getDownsampleInfo();
       let tickTextPadding = this._calcTextPadding().pad;
 
       // HACKHACK: https://github.com/palantir/svg-typewriter/issues/25
@@ -475,8 +480,8 @@ namespace Plottable.Axes {
 
     public renderImmediately() {
       super.renderImmediately();
-      let catScale = <Scales.Category> this._scale;
-      const { domain, stepWidth } = this.getDownsampleInfo();
+      let catScale = this._scale as Scales.Category;
+      const { domain, stepWidth } = catScale.getDownsampleInfo();
       let tickLabels = this._tickLabelContainer.selectAll("." + Axis.TICK_LABEL_CLASS).data(domain, (d) => d);
       // Give each tick a stepWidth of space which will partition the entire axis evenly
       let availableTextSpace = stepWidth;
@@ -498,6 +503,12 @@ namespace Plottable.Axes {
       // erase all text first, then rewrite
       tickLabels.text("");
       this._drawTicks(stepWidth, tickLabels);
+
+      if (this.tickMarkPosition() === "after") {
+        const tickMarks = this._tickMarkContainer.selectAll("." + Axis.TICK_MARK_CLASS);
+        const transform = this.isHorizontal() ? `translate(${stepWidth/2.0}, 0)` : `translate(0, ${stepWidth/2.0})`
+        tickMarks.attr("transform", transform);
+      }
 
       let xTranslate = this.orientation() === "right" ? this._tickSpaceRequired() : 0;
       let yTranslate = this.orientation() === "bottom" ? this._tickSpaceRequired() : 0;
