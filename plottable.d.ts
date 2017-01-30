@@ -5681,3 +5681,7 @@ declare namespace Plottable.Components {
         destroy(): void;
     }
 }
+
+declare module "plottable" {
+  export = Plottable
+}
