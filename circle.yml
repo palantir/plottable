@@ -22,3 +22,13 @@ deployment:
     commands:
       - npm start -- demo-compile
       - ./demo.js
+  npm:
+    tag: /v[0-9.]+/
+    commands:
+      # Confirm we are ready to publish
+      - npm start -- dist-compile
+      - git diff HEAD..origin/develop --quiet || (echo "dist not built"; exit 1)
+      - npm run -s check_version || (echo "package.json version not updated"; exit 1)
+      # Publish
+      - echo -e "$NPM_USER\n$NPM_PASS\n$NPM_EMAIL" | npm login
+      - npm publish
