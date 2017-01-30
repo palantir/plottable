@@ -16,13 +16,15 @@ describe("Gridlines", () => {
     gridlines = new Plottable.Components.Gridlines(xScale, yScale);
   });
 
+  afterEach(() => {
+    svg.remove();
+  });
+
   it("sets ranges of scales to the Gridlines dimensions when layout is computed", () => {
     gridlines.renderTo(svg);
 
     assert.deepEqual(xScale.range(), [0, TestMethods.numAttr(svg, "width")], "x scale range extends to the width of the svg");
     assert.deepEqual(yScale.range(), [TestMethods.numAttr(svg, "height"), 0], "y scale range extends to the height of the svg");
-
-    svg.remove();
   });
 
   it("draws gridlines on ticks of its scales and updates when scale update", () => {
@@ -60,7 +62,6 @@ describe("Gridlines", () => {
       const y = TestMethods.numAttr(d3.select(this), "y1");
       assert.closeTo(y, yScale.scale(yTicks[i]), window.Pixel_CloseTo_Requirement, "y gridline is updated");
     });
-    svg.remove();
   });
 
   it("draws gridlines on category ticks and updates when scale update", () => {
@@ -86,8 +87,27 @@ describe("Gridlines", () => {
 
     check(categoryGrid.content().select(".y-gridlines").selectAll("line"), ys, "y");
     check(categoryGrid.content().select(".x-gridlines").selectAll("line"), xs, "x");
+  });
 
-    svg.remove();
+  it("downsamples the domain if there are too many lines to fit", () => {
+    const shortDomain = ["one", "two", "three"];
+    let longDomain = ["one", "two", "seven", "twelve", "thirteenteen",
+      "twenty-seven-half", "shiggity", "shwah", "shfifty", "shfifty-shfive",
+      "girlfriends-age", "shifty-shfive", "my-iq", "shfifty-shfive"];
+    longDomain = longDomain.concat(longDomain, longDomain);
+
+    const ys = new Plottable.Scales.Category().domain(shortDomain);
+    const xs = new Plottable.Scales.Category().domain(shortDomain);
+    const grid = new Plottable.Components.Gridlines(xs, ys).renderTo(svg);
+
+    assert.equal(grid.content().select(".y-gridlines").selectAll("line").size(), shortDomain.length);
+    assert.equal(grid.content().select(".x-gridlines").selectAll("line").size(), shortDomain.length);
+
+    xs.domain(longDomain);
+    ys.domain(longDomain);
+
+    assert.equal(grid.content().select(".y-gridlines").selectAll("line").size(), 13);
+    assert.equal(grid.content().select(".x-gridlines").selectAll("line").size(), 13);
   });
 
   it("throws error on not-allowed scales", () => {
@@ -97,7 +117,5 @@ describe("Gridlines", () => {
       "xScale needs to inherit from Scale.QuantitativeScale", "can't set xScale to color scale");
     (<any> assert).throw(() => new Plottable.Components.Gridlines(null, <any> colorScale), Error,
       "yScale needs to inherit from Scale.QuantitativeScale", "can't set yScale to color scale");
-
-     svg.remove();
   });
 });
