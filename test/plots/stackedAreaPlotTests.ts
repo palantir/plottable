@@ -369,5 +369,55 @@ describe("Plots", () => {
         assert.strictEqual(stackedAreaPlot.downsamplingEnabled(), false, "downsampling will not be enabled by user");
       });
     });
+
+    describe("stacking order", () => {
+      let svg: d3.Selection<void>;
+      let xScale: Plottable.Scales.Category;
+      let stackedAreaPlot: Plottable.Plots.StackedArea<string>;
+      const datas = [
+        [1, 2, 3],
+        [17, 13, 11],
+      ];
+
+      beforeEach(() => {
+        svg = TestMethods.generateSVG();
+        xScale = new Plottable.Scales.Category();
+        stackedAreaPlot = new Plottable.Plots.StackedArea<string>()
+          .addDataset(new Plottable.Dataset(datas[0]))
+          .addDataset(new Plottable.Dataset(datas[1]))
+          .x((d, i) => `${i}`, xScale)
+          .y((d) => d, new Plottable.Scales.Linear())
+          .renderTo(svg);
+      });
+
+      it("stacks bottomup by default", () => {
+        let areas = stackedAreaPlot.content().selectAll("path");
+        let area0 = areas.filter((d) => d === datas[0]);
+        let area1 = areas.filter((d) => d === datas[1]);
+        let areaYs0 = TestMethods.areaVertices(area0).map((areaVertex) => areaVertex.y);
+        let areaYs1 = TestMethods.areaVertices(area1).map((areaVertex) => areaVertex.y);
+
+        // note that higher y value means toward bottom of screen
+        assert.operator(areaYs0[0], ">", areaYs1[0], "first series below second");
+      });
+
+      it("stacks topdown", () => {
+        stackedAreaPlot.stackingOrder("topdown");
+
+        let areas = stackedAreaPlot.content().selectAll("path");
+        let area0 = areas.filter((d) => d === datas[0]);
+        let area1 = areas.filter((d) => d === datas[1]);
+        let areaYs0 = TestMethods.areaVertices(area0).map((areaVertex) => areaVertex.y);
+        let areaYs1 = TestMethods.areaVertices(area1).map((areaVertex) => areaVertex.y);;
+
+        // note that higher y value means toward bottom of screen
+        assert.operator(areaYs0[0], "<", areaYs1[0], "first series atop second");
+      });
+
+      afterEach(() => {
+        stackedAreaPlot.destroy();
+        svg.remove();
+      });
+    });
   });
 });
