@@ -18,9 +18,6 @@ namespace Plottable.Components {
     private _yLinesContainer: d3.Selection<void>;
     private _xTicks: () => ScaleDomainValues;
     private _yTicks: () => ScaleDomainValues;
-
-    /**
-     */
     private _xLinePosition: ILinePosition;
     private _yLinePosition: ILinePosition;
 

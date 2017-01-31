@@ -2353,6 +2353,7 @@ declare namespace Plottable.Axes {
         private readonly _writer;
         private _tickTextAlignment;
         private _tickTextPadding;
+        protected _scale: Scales.Category;
         /**
          * Constructs a Category Axis.
          *
@@ -2363,6 +2364,11 @@ declare namespace Plottable.Axes {
          * @param {AxisOrientation} [orientation="bottom"] Orientation of this Category Axis.
          */
         constructor(scale: Scales.Category, orientation?: AxisOrientation);
+        /**
+         * @deprecated in favor of method on scale.
+         * see {@link Plottable.Scales.Category.getDownsampleInfo}
+         */
+        getDownsampleInfo(scale?: Scales.Category): Scales.DownsampleInfo;
         protected _setup(): void;
         protected _rescale(): this;
         /**
@@ -2795,8 +2801,6 @@ declare namespace Plottable.Components {
         private _yLinesContainer;
         private _xTicks;
         private _yTicks;
-        /**
-         */
         private _xLinePosition;
         private _yLinePosition;
         private _renderCallback;

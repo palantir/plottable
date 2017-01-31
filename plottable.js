@@ -5283,6 +5283,14 @@ var Plottable;
                 enumerable: true,
                 configurable: true
             });
+            /**
+             * @deprecated in favor of method on scale.
+             * see {@link Plottable.Scales.Category.getDownsampleInfo}
+             */
+            Category.prototype.getDownsampleInfo = function (scale) {
+                if (scale === void 0) { scale = this._scale; }
+                return scale.getDownsampleInfo();
+            };
             Category.prototype._setup = function () {
                 _super.prototype._setup.call(this);
                 this._measurer = new SVGTypewriter.CacheMeasurer(this._tickLabelContainer);
@@ -5354,11 +5362,10 @@ var Plottable;
                     this._tickTextAlignment = null;
                 }
                 else {
-                    var v = tickTextAlignment.toLowerCase();
-                    if (v !== "left" && v !== "right" && v !== "center") {
-                        throw new Error("tickTextAlignment '" + tickTextAlignment + "' not supported. Must be left, right, or center.");
+                    if (tickTextAlignment !== "left" && tickTextAlignment !== "right" && tickTextAlignment !== "center") {
+                        throw new Error("tickTextAlignment '" + tickTextAlignment + "' not supported. Must be 'left', 'right', or 'center'.");
                     }
-                    this._tickTextAlignment = v;
+                    this._tickTextAlignment = tickTextAlignment;
                 }
                 return this;
             };

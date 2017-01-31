@@ -47,6 +47,8 @@ namespace Plottable.Axes {
     private _tickTextAlignment: string = null;
     private _tickTextPadding: number = 0;
 
+    protected _scale: Scales.Category;
+
     /**
      * Constructs a Category Axis.
      *
@@ -59,6 +61,14 @@ namespace Plottable.Axes {
     constructor(scale: Scales.Category, orientation: AxisOrientation = "bottom") {
       super(scale, orientation);
       this.addClass("category-axis");
+    }
+
+    /**
+     * @deprecated in favor of method on scale.
+     * see {@link Plottable.Scales.Category.getDownsampleInfo}
+     */
+    public getDownsampleInfo(scale = this._scale): Scales.DownsampleInfo {
+      return scale.getDownsampleInfo();
     }
 
     protected _setup() {
@@ -120,7 +130,7 @@ namespace Plottable.Axes {
     }
 
     protected _getTickValues() {
-      return (this._scale as Scales.Category).getDownsampleInfo().domain;
+      return this._scale.getDownsampleInfo().domain;
     }
 
     /**
@@ -166,14 +176,13 @@ namespace Plottable.Axes {
         return this._tickTextAlignment;
       }
 
-      if (! tickTextAlignment) {
+      if (!tickTextAlignment) {
         this._tickTextAlignment = null;
       } else {
-        let v = tickTextAlignment.toLowerCase();
-        if (v !== "left" && v !== "right" && v !== "center") {
-          throw new Error("tickTextAlignment '" + tickTextAlignment + "' not supported. Must be left, right, or center.");
+        if (tickTextAlignment !== "left" && tickTextAlignment !== "right" && tickTextAlignment !== "center") {
+          throw new Error("tickTextAlignment '" + tickTextAlignment + "' not supported. Must be 'left', 'right', or 'center'.");
         }
-        this._tickTextAlignment = v;
+        this._tickTextAlignment = tickTextAlignment;
       }
 
       return this;
