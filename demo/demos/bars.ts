@@ -41,6 +41,41 @@ function buildClusteredBar() {
         .attr("fill", ((d, i, dataset) => dataset.metadata()), colorScale);
 }
 
+function buildStackedBar() {
+    const xScale = new Plottable.Scales.Category();
+    const yScale = new Plottable.Scales.Linear();
+    const colorScale = new Plottable.Scales.Color()
+        .autoDomain()
+        .range(["#5279C7", "#BDCEF0"]);
+
+    const datasets = [
+        new Plottable.Dataset(primaryData).metadata({scale: 1, label: "SERIES A"}),
+        new Plottable.Dataset(secondaryData).metadata({scale: 10, label: "SERIES B"}),
+    ]
+
+    const legend = new Plottable.Components.Legend(colorScale);
+
+    const barSort1 = new Plottable.Plots.StackedBar()
+        .addDataset(datasets[0])
+        .addDataset(datasets[1])
+        .stackingOrder("bottomup")
+        .x(((d) => d.x), xScale)
+        .y(((d, i, dataset) => d.y * dataset.metadata().scale), yScale)
+        .attr("fill", ((d, i, dataset) => dataset.metadata().label), colorScale);
+
+    const barSort2 = new Plottable.Plots.StackedBar()
+        .addDataset(datasets[0])
+        .addDataset(datasets[1])
+        .stackingOrder("topdown")
+        .x(((d) => d.x), xScale)
+        .y(((d, i, dataset) => d.y * dataset.metadata().scale), yScale)
+        .attr("fill", ((d, i, dataset) => dataset.metadata().label), colorScale);
+
+    return new Plottable.Components.Table([
+        [barSort1, barSort2, legend]
+    ]);
+}
+
 export const route = "bars";
 export const title = "Bars";
 export function render(el: HTMLElement) {
@@ -56,10 +91,16 @@ export function render(el: HTMLElement) {
         <div  class="chart-block">
             <svg width="600" height="200" class="clustered-bar"></svg>
         </div>
+
+        <h3>Stacked Bar Chart</h3>
+        <div class="chart-block">
+            <svg width="600" height="200" class="stacked-bar"></svg>
+        </div>
     `;
     el.appendChild(root);
 
     // Build charts
     buildBasicBar().renderTo(root.querySelector("svg.basic-bar"));
     buildClusteredBar().renderTo(root.querySelector("svg.clustered-bar"));
+    buildStackedBar().renderTo(root.querySelector("svg.stacked-bar"));
 };
