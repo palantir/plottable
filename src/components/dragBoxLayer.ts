@@ -4,8 +4,8 @@ import { Bounds, Point } from "../core/interfaces";
 import * as Interactions from "../interactions";
 import * as Utils from "../utils";
 
-import * as Components from "./";
 import { PropertyMode } from "./";
+import { SelectionBoxLayer } from "./selectionBoxLayer";
 
 export type DragBoxCallback = (bounds: Bounds) => void;
 
@@ -16,7 +16,7 @@ type _EdgeIndicator = {
   right: boolean;
 };
 
-export class DragBoxLayer extends Components.SelectionBoxLayer {
+export class DragBoxLayer extends SelectionBoxLayer {
   private _dragInteraction: Interactions.Drag;
   private _detectionEdgeT: d3.Selection<void>;
   private _detectionEdgeB: d3.Selection<void>;

@@ -4,7 +4,7 @@ import * as Scales from "../scales";
 import { Scale, ScaleCallback } from "../scales/scale";
 import * as Utils from "../utils";
 
-import * as Plots from "./";
+import { TransformableAccessorScaleBinding, LightweightPlotEntity, PlotEntity } from "./commons";
 import { Plot } from "./plot";
 
 export class XYPlot<X, Y> extends Plot {
@@ -98,7 +98,7 @@ export class XYPlot<X, Y> extends Plot {
     };
   }
 
-  public entityNearest(queryPoint: Point): Plots.PlotEntity {
+  public entityNearest(queryPoint: Point): PlotEntity {
     // by default, the entity index stores position information in the data space
     // the default impelentation of the entityNearest must convert the chart bounding
     // box as well as the query point to the data space before it can make a comparison
@@ -143,7 +143,7 @@ export class XYPlot<X, Y> extends Plot {
   /**
    * Gets the TransformableAccessorScaleBinding for X.
    */
-  public x(): Plots.TransformableAccessorScaleBinding<X, number>;
+  public x(): TransformableAccessorScaleBinding<X, number>;
   /**
    * Sets X to a constant number or the result of an Accessor<number>.
    *
@@ -182,7 +182,7 @@ export class XYPlot<X, Y> extends Plot {
   /**
    * Gets the AccessorScaleBinding for Y.
    */
-  public y(): Plots.TransformableAccessorScaleBinding<Y, number>;
+  public y(): TransformableAccessorScaleBinding<Y, number>;
   /**
    * Sets Y to a constant number or the result of an Accessor<number>.
    *
@@ -382,7 +382,7 @@ export class XYPlot<X, Y> extends Plot {
     }
   }
 
-  protected _buildLightweightPlotEntities(datasets?: Dataset[]) {
+  protected _buildLightweightPlotEntities(datasets?: Dataset[]): LightweightPlotEntity[] {
     return super._buildLightweightPlotEntities(datasets).map((lightweightPlotEntity) => {
       lightweightPlotEntity.position = this._invertPixelPoint(lightweightPlotEntity.position);
       return lightweightPlotEntity;

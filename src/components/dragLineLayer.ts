@@ -1,10 +1,10 @@
-import * as Components from "../components";
-import { GuideLineLayer } from "../components";
+import { GuideLineLayer } from "../components/guideLineLayer";
 import { Point } from "../core/interfaces";
 import * as Interactions from "../interactions";
 import * as Utils from "../utils";
 
-export interface DragLineCallback<D> { (dragLineLayer: Components.DragLineLayer<D>): void;
+export interface DragLineCallback<D> {
+  (dragLineLayer: DragLineLayer<D>): void;
 }
 
 export class DragLineLayer<D> extends GuideLineLayer<D> {

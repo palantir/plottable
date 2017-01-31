@@ -1,5 +1,4 @@
 import * as Configs from "../core/config";
-import * as Utils from "./";
 
 /**
  * Print a warning message to the console, if it is available.
@@ -49,7 +48,7 @@ export function setTimeout(f: Function, time: number, ...args: any[]) {
  * @param {string?} message Optional message to be shown with the warning
  */
 export function deprecated(callingMethod: string, version: string, message = "") {
-  Utils.Window.warn("Method " + callingMethod + " has been deprecated in version " + version +
+  warn("Method " + callingMethod + " has been deprecated in version " + version +
     ". Please refer to the release notes. " + message);
 }
 

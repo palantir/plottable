@@ -11,7 +11,7 @@ import * as Scales from "../scales";
 import { Scale, ScaleCallback } from "../scales/scale";
 import * as Utils from "../utils";
 
-import * as Plots from "./";
+import * as Plots from "./commons";
 
 export class Plot extends Component {
   protected static _ANIMATION_MAX_DURATION = 600;
