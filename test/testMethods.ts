@@ -29,7 +29,7 @@ export function verifySpaceRequest(sr: Plottable.SpaceRequest, expectedMinWidth:
   assert.strictEqual(sr.minHeight, expectedMinHeight, message + " (space request: minHeight)");
 }
 
-export function fixComponentSize(c: Plottable.Component, fixedWidth?: number, fixedHeight?: number) {
+export function fixComponentSize(c: Plottable.Component, fixedWidth?: number, fixedHeight?: number): Plottable.Component {
   c.requestedSpace = function (w, h) {
     return {
       minWidth: fixedWidth == null ? 0 : fixedWidth,
@@ -41,7 +41,7 @@ export function fixComponentSize(c: Plottable.Component, fixedWidth?: number, fi
   return c;
 }
 
-export function makeFixedSizeComponent(fixedWidth?: number, fixedHeight?: number) {
+export function makeFixedSizeComponent(fixedWidth?: number, fixedHeight?: number): Plottable.Component {
   return fixComponentSize(new Plottable.Component(), fixedWidth, fixedHeight);
 }
 
