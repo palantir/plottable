@@ -11,12 +11,14 @@
   "main": "plottable-npm.js",
   "typings": "plottable-npm.d.ts",
   "scripts": {
-    "build-js": "npm-run-all compile-typescript webpack-plottable.js webpack-plottable-npm.js",
+    "build-src": "npm-run-all compile-typescript webpack-plottable webpack-plottable-npm",
+    "build-test": "npm-run-all compile-typescript-test webpack-test",
     "compile-typescript": "tsc -p .",
     "compile-typescript-test": "tsc -p test/",
     "test": "grunt test-travis",
-    "webpack-plottable.js": "webpack --config webpack.config.plottable-js.js",
-    "webpack-plottable-npm.js": "webpack --config webpack.config.plottable-npm-js.js"
+    "webpack-plottable": "webpack --config webpack.config.plottable.js",
+    "webpack-plottable-npm": "webpack --config webpack.config.plottable-npm.js",
+    "webpack-test": "webpack --config webpack.config.test.js"
   },
   "devDependencies": {
     "@types/chai": "^3.4.34",
