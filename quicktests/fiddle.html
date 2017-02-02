@@ -9,13 +9,12 @@
         <input type="hidden" name="html">
         <input type="hidden" name="css">
         <input type="hidden" name="js">
-        <input type="submit">
     </form>
 
     <script>
         // Get Circle artifact URL from self
         let baseHref = window.location.href;
-        baseHref = baseHref.replace(/\/demo\/fiddle.html$/, '');
+        baseHref = baseHref.replace(/\/quicktests\/fiddle.html$/, '');
         baseHref = baseHref.replace(/^http(s?):/, '');
 
         document.querySelector("input[name=css]").value = `
@@ -44,6 +43,7 @@ div.panel {
 
         document.querySelector("input[name=js]").value = `
 document.addEventListener("DOMContentLoaded", () => {
+
     const data = Array.apply(null, Array(10)).map((d, i) => 1 / (1 + Math.exp(4 - i)));
 
     const xScale = new Plottable.Scales.Category();
