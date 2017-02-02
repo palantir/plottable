@@ -1,5 +1,4 @@
 
-
 class Router {
     constructor() {
         this.routes = {};
@@ -72,7 +71,7 @@ function renderRouteList(routes) {
         `);
     });
 
-    d3.select("#app").html(links.join('\n'));
+    d3.select("#app").html(links.join("\n"));
 }
 
 function loadQuickTest(path){
