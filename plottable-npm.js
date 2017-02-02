@@ -12428,6 +12428,15 @@ var Plottable;
                     this._zoomEndCallbacks.callCallbacks();
                 }
             };
+            /**
+             * When scale ranges are reversed (i.e. range[1] < range[0]), we must alter the
+             * the calculations we do in screen space to constrain pan and zoom. This method
+             * returns `true` if the scale is reversed.
+             */
+            PanZoom.prototype._isRangeReversed = function (scale) {
+                var range = scale.range();
+                return range[1] < range[0];
+            };
             PanZoom.prototype._constrainedZoom = function (scale, zoomAmount, centerPoint) {
                 zoomAmount = this._constrainZoomExtents(scale, zoomAmount);
                 return this._constrainZoomValues(scale, zoomAmount, centerPoint);
@@ -12448,6 +12457,7 @@ var Plottable;
                 if (zoomAmount <= 1) {
                     return { centerPoint: centerPoint, zoomAmount: zoomAmount };
                 }
+                var reversed = this._isRangeReversed(scale);
                 var minDomain = this.minDomainValue(scale);
                 var maxDomain = this.maxDomainValue(scale);
                 // if no constraints set, we're done
@@ -12461,7 +12471,7 @@ var Plottable;
                     var currentMaxRange = scale.scaleTransformation(scaleDomainMax);
                     var testMaxRange = zoomAt(currentMaxRange, zoomAmount, centerPoint);
                     // move the center point to prevent max overflow, if necessary
-                    if (testMaxRange > maxRange) {
+                    if (testMaxRange > maxRange != reversed) {
                         centerPoint = this._getZoomCenterForTarget(currentMaxRange, zoomAmount, maxRange);
                     }
                 }
@@ -12471,7 +12481,7 @@ var Plottable;
                     var currentMinRange = scale.scaleTransformation(scaleDomainMin);
                     var testMinRange = zoomAt(currentMinRange, zoomAmount, centerPoint);
                     // move the center point to prevent min overflow, if necessary
-                    if (testMinRange < minRange) {
+                    if (testMinRange < minRange != reversed) {
                         centerPoint = this._getZoomCenterForTarget(currentMinRange, zoomAmount, minRange);
                     }
                 }
@@ -12486,7 +12496,7 @@ var Plottable;
                     // If we overflow both, use some algebra to solve for centerPoint and
                     // zoomAmount that will make the domain match the min/max exactly.
                     // Algebra brought to you by Wolfram Alpha.
-                    if (testMaxRange > maxRange || testMinRange < minRange) {
+                    if (testMaxRange > maxRange != reversed || testMinRange < minRange != reversed) {
                         var denominator = (currentMaxRange - currentMinRange + minRange - maxRange);
                         if (denominator === 0) {
                             // In this case the domains already match, so just return no-op values.
@@ -12533,12 +12543,13 @@ var Plottable;
              */
             PanZoom.prototype._constrainedTranslation = function (scale, translation) {
                 var _a = scale.getTransformationDomain(), scaleDomainMin = _a[0], scaleDomainMax = _a[1];
-                if (translation > 0) {
+                var reversed = this._isRangeReversed(scale);
+                if (translation > 0 !== reversed) {
                     var bound = this.maxDomainValue(scale);
                     if (bound != null) {
                         var currentMaxRange = scale.scaleTransformation(scaleDomainMax);
                         var maxRange = scale.scaleTransformation(bound);
-                        translation = Math.min(currentMaxRange + translation, maxRange) - currentMaxRange;
+                        translation = (reversed ? Math.max : Math.min)(currentMaxRange + translation, maxRange) - currentMaxRange;
                     }
                 }
                 else {
@@ -12546,7 +12557,7 @@ var Plottable;
                     if (bound != null) {
                         var currentMinRange = scale.scaleTransformation(scaleDomainMin);
                         var minRange = scale.scaleTransformation(bound);
-                        translation = Math.max(currentMinRange + translation, minRange) - currentMinRange;
+                        translation = (reversed ? Math.min : Math.max)(currentMinRange + translation, minRange) - currentMinRange;
                     }
                 }
                 return translation;
@@ -12671,20 +12682,12 @@ var Plottable;
                 if (minDomainValue == null) {
                     return this._minDomainValues.get(scale);
                 }
-                var maxValueForScale = this.maxDomainValue(scale);
-                if (maxValueForScale != null && maxValueForScale.valueOf() <= minDomainValue.valueOf()) {
-                    throw new Error("minDomainValue must be smaller than maxDomainValue for the same Scale");
-                }
                 this._minDomainValues.set(scale, minDomainValue);
                 return this;
             };
             PanZoom.prototype.maxDomainValue = function (scale, maxDomainValue) {
                 if (maxDomainValue == null) {
                     return this._maxDomainValues.get(scale);
-                }
-                var minValueForScale = this.minDomainValue(scale);
-                if (minValueForScale != null && maxDomainValue <= minValueForScale) {
-                    throw new Error("maxDomainValue must be larger than minDomainValue for the same Scale");
                 }
                 this._maxDomainValues.set(scale, maxDomainValue);
                 return this;
@@ -12702,6 +12705,7 @@ var Plottable;
                 var _a = scale.getTransformationDomain(), domainMin = _a[0], domainMax = _a[1];
                 this.minDomainValue(scale, domainMin);
                 this.maxDomainValue(scale, domainMax);
+                return this;
             };
             /**
              * Adds a callback to be called when panning ends.

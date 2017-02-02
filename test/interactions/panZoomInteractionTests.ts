@@ -616,17 +616,6 @@ describe("Interactions", () => {
           "returns the correct minDomainValue");
       });
 
-      it("can't set minDomainValue() be larger than maxDomainValue() for the same Scale", () => {
-        let domainValue = SVG_WIDTH / 2;
-        panZoomInteraction.maxDomainValue(xScale, domainValue);
-
-        let tooBigValue = domainValue * 2;
-        // HACKHACK #2661: Cannot assert errors being thrown with description
-        (<any> assert).throws(() => panZoomInteraction.minDomainValue(xScale, tooBigValue), Error,
-          "minDomainValue must be smaller than maxDomainValue for the same Scale",
-          "cannot have minDomainValue larger than maxDomainValue");
-      });
-
       it("cannot go beyond the specified minDomainValue (mousewheel)", () => {
         // HACKHACK PhantomJS doesn't implement fake creation of WheelEvents
         // https://github.com/ariya/phantomjs/issues/11289
@@ -709,17 +698,6 @@ describe("Interactions", () => {
         panZoomInteraction.maxDomainValue(xScale, domainValue);
         assert.strictEqual(panZoomInteraction.maxDomainValue(xScale), domainValue,
           "returns the correct minDomainValue");
-      });
-
-      it("can't set maxDomainValue() be smaller than maxDomainValue() for the same Scale", () => {
-        let domainValue = SVG_WIDTH / 2;
-        panZoomInteraction.minDomainValue(xScale, domainValue);
-
-        let tooSmallValue = domainValue / 2;
-        // HACKHACK #2661: Cannot assert errors being thrown with description
-        (<any> assert).throws(() => panZoomInteraction.maxDomainValue(xScale, tooSmallValue), Error,
-          "maxDomainValue must be larger than minDomainValue for the same Scale",
-          "cannot have minDomainValue larger than maxDomainValue");
       });
 
       it("cannot go beyond the specified maxDomainValue (mousewheel)", () => {
