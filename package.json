@@ -20,7 +20,7 @@
     "compile-typescript-test": "tsc -p test/",
     "start": "grunt",
     "test": "grunt test-travis",
-    "webpack-demo": "webpack --config demo/webpack.config.js",
+    "webpack-demo": "webpack --config webpack.config.demo.js",
     "webpack-plottable": "webpack --config webpack.config.plottable.js",
     "webpack-plottable-npm": "webpack --config webpack.config.plottable-npm.js",
     "webpack-test": "webpack --config webpack.config.test.js"
