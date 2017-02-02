@@ -20,7 +20,6 @@ deployment:
   demo:
     branch: /.*/
     commands:
-      - npm start -- demo-compile
       - ./demo.js
   npm:
     tag: /v[0-9.]+/

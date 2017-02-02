@@ -242,7 +242,6 @@ module.exports = function(grunt) {
     bump: bumpConfig,
     umd: umdConfig,
     concat: concatConfig,
-    browserify: browserifyConfig,
     ts: tsConfig,
     tslint: tslintConfig,
     jscs: jscsConfig,
