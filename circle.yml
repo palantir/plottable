@@ -1,11 +1,34 @@
+general:
+  artifacts:
+    # Compiled assets
+    - plottable.js
+    - plottable.css
+    # Demo paths
+    - demo
+    - quicktests
+    # Modules used by quicktests
+    - node_modules/d3
+    - node_modules/jquery
+    - node_modules/requirejs
 machine:
   node:
-    version: 5.6.0
-
-dependencies:
-  pre:
-    - case $CIRCLE_NODE_INDEX in 0) nvm use 4.2 ;; 1) nvm use 5.7 ;; 2) nvm use 6.1 ;; esac
-
+    version: 6.1
 test:
   override:
     - npm test
+deployment:
+  demo:
+    branch: /.*/
+    commands:
+      - npm start -- demo-compile
+      - ./demo.js
+  npm:
+    tag: /v[0-9.]+/
+    commands:
+      # Confirm we are ready to publish
+      - npm start -- dist-compile
+      - git diff HEAD..origin/develop --quiet || (echo "dist not built"; exit 1)
+      - npm run -s check_version || (echo "package.json version not updated"; exit 1)
+      # Publish
+      - echo -e "$NPM_USER\n$NPM_PASS\n$NPM_EMAIL" | npm login
+      - npm publish

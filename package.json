@@ -1,7 +1,7 @@
 {
   "name": "plottable",
   "description": "A modular charting library built on D3",
-  "version": "2.7.0",
+  "version": "2.8.0",
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -11,11 +11,16 @@
   "main": "plottable-npm.js",
   "typings": "plottable-npm.d.ts",
   "scripts": {
+    "build-demo": "npm-run-all compile-typescript-demo webpack-demo",
     "build-src": "npm-run-all compile-typescript webpack-plottable webpack-plottable-npm",
     "build-test": "npm-run-all compile-typescript-test webpack-test",
+    "check_version": "echo ${npm_package_version} $(npm view ${npm_package_name} version) | awk '{ if ($1 == $2) { exit 1 }}'",
     "compile-typescript": "tsc -p .",
+    "compile-typescript-demo": "tsc -p demo/",
     "compile-typescript-test": "tsc -p test/",
+    "start": "grunt",
     "test": "grunt test-travis",
+    "webpack-demo": "webpack --config demo/webpack.config.js",
     "webpack-plottable": "webpack --config webpack.config.plottable.js",
     "webpack-plottable-npm": "webpack --config webpack.config.plottable-npm.js",
     "webpack-test": "webpack --config webpack.config.test.js"
@@ -25,6 +30,7 @@
     "@types/mocha": "^2.2.27",
     "@types/sinon": "^1.16.26",
     "chai": "2.0.0",
+    "circle-github-bot": "0.3.0",
     "grunt": "~0.4.5",
     "grunt-blanket-mocha": "0.5.0",
     "grunt-bump": "0.7.0",

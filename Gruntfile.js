@@ -122,6 +122,10 @@ module.exports = function(grunt) {
       tasks: ["test-compile"],
       files: ["test/**/*.ts", "webpack.config.test.js"]
     },
+    demo: {
+      tasks: ["demo-compile"],
+      files: ["demo/**/*.ts"]
+    },
     quicktests: {
       tasks: ["update-quicktests"],
       files: ["quicktests/overlaying/tests/**/*.js"]
@@ -255,6 +259,7 @@ module.exports = function(grunt) {
 
   grunt.registerTask("test-compile", ["exec:npm:build-test"]);
   grunt.registerTask("src-compile", ["exec:npm:build-src", "generateJS"]);
+  grunt.registerTask("demo-compile", ["exec:npm:build-demo"]);
 
   grunt.registerTask("dev-compile", [
     "src-compile",
@@ -278,7 +283,7 @@ module.exports = function(grunt) {
   grunt.registerTask("dist-compile", ["test", "uglify", "compress"]);
 
   grunt.registerTask("commitjs", ["dist-compile", "gitcommit:built"]);
-  grunt.registerTask("default", ["connect", "dev-compile", "watch-silent"]);
+  grunt.registerTask("default", ["connect", "dev-compile", "demo-compile", "watch-silent"]);
 
   grunt.registerTask("test", ["dev-compile", "test-local"]);
   grunt.registerTask("test-local", ["blanket_mocha", "ts:verifyDefinitionFile", "ts:verifyNpmDefinitionFile", "lint"]);

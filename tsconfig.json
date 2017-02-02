@@ -5,17 +5,13 @@
       "module": "commonjs",
       "noFallthroughCasesInSwitch": true,
       "noImplicitReturns": true,
-      "outDir": "build",
+      "outDir": "build/src",
       "noImplicitAny": true,
       "removeComments": false,
       "sourceMap": false,
       "target": "es5"
     },
-    "exclude": [
-      "build",
-      "test",
-      "node_modules",
-      "plottable-npm.d.ts",
-      "plottable.d.ts"
+    "include": [
+      "src"
     ]
 }
