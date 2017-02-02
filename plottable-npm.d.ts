@@ -5103,6 +5103,12 @@ declare namespace Plottable.Interactions {
         private static _pointDistance(point1, point2);
         private _handleTouchEnd(ids, idToPoint, e);
         private _handleWheelEvent(p, e);
+        /**
+         * When scale ranges are reversed (i.e. range[1] < range[0]), we must alter the
+         * the calculations we do in screen space to constrain pan and zoom. This method
+         * returns `true` if the scale is reversed.
+         */
+        private _isRangeReversed(scale);
         private _constrainedZoom(scale, zoomAmount, centerPoint);
         private _constrainZoomExtents(scale, zoomAmount);
         private _constrainZoomValues(scale, zoomAmount, centerPoint);
@@ -5288,7 +5294,7 @@ declare namespace Plottable.Interactions {
          * This constrains the pan/zoom interaction to show no more than the domain
          * of the scale.
          */
-        setMinMaxDomainValuesTo(scale: TransformableScale<any, number>): void;
+        setMinMaxDomainValuesTo(scale: TransformableScale<any, number>): this;
         /**
          * Adds a callback to be called when panning ends.
          *

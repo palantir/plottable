@@ -81,6 +81,7 @@ namespace Plottable.Interactions {
         yScale.pan(this._constrainedTranslation(yScale, translateAmount.y));
       });
     }
+
     /**
      * Zooms the chart by a specified amount around a specific point
      *
@@ -269,6 +270,16 @@ namespace Plottable.Interactions {
       }
     }
 
+    /**
+     * When scale ranges are reversed (i.e. range[1] < range[0]), we must alter the
+     * the calculations we do in screen space to constrain pan and zoom. This method
+     * returns `true` if the scale is reversed.
+     */
+    private _isRangeReversed(scale: TransformableScale<any, number>): boolean {
+      const range = scale.range();
+      return range[1] < range[0];
+    }
+
     private _constrainedZoom(scale: TransformableScale<any, number>, zoomAmount: number, centerPoint: number) {
       zoomAmount = this._constrainZoomExtents(scale, zoomAmount);
       return this._constrainZoomValues(scale, zoomAmount, centerPoint);
@@ -292,6 +303,7 @@ namespace Plottable.Interactions {
         return { centerPoint, zoomAmount };
       }
 
+      const reversed = this._isRangeReversed(scale);
       const minDomain = this.minDomainValue(scale);
       const maxDomain = this.maxDomainValue(scale);
 
@@ -309,7 +321,7 @@ namespace Plottable.Interactions {
         const testMaxRange = zoomAt(currentMaxRange, zoomAmount, centerPoint);
 
         // move the center point to prevent max overflow, if necessary
-        if (testMaxRange > maxRange) {
+        if (testMaxRange > maxRange != reversed) {
           centerPoint = this._getZoomCenterForTarget(currentMaxRange, zoomAmount, maxRange);
         }
       }
@@ -321,7 +333,7 @@ namespace Plottable.Interactions {
         const testMinRange = zoomAt(currentMinRange, zoomAmount, centerPoint);
 
         // move the center point to prevent min overflow, if necessary
-        if (testMinRange < minRange) {
+        if (testMinRange < minRange != reversed) {
           centerPoint = this._getZoomCenterForTarget(currentMinRange, zoomAmount, minRange);
         }
       }
@@ -339,7 +351,7 @@ namespace Plottable.Interactions {
         // If we overflow both, use some algebra to solve for centerPoint and
         // zoomAmount that will make the domain match the min/max exactly.
         // Algebra brought to you by Wolfram Alpha.
-        if (testMaxRange > maxRange || testMinRange < minRange) {
+        if (testMaxRange > maxRange != reversed || testMinRange < minRange != reversed) {
           const denominator = (currentMaxRange - currentMinRange + minRange - maxRange);
           if (denominator === 0) {
             // In this case the domains already match, so just return no-op values.
@@ -392,21 +404,24 @@ namespace Plottable.Interactions {
      */
     private _constrainedTranslation(scale: TransformableScale<any, number>, translation: number) {
       const [ scaleDomainMin, scaleDomainMax ] = scale.getTransformationDomain();
-      if (translation > 0) {
+      const reversed = this._isRangeReversed(scale);
+
+      if (translation > 0 !== reversed) {
         const bound = this.maxDomainValue(scale);
         if (bound != null) {
           const currentMaxRange = scale.scaleTransformation(scaleDomainMax);
           const maxRange = scale.scaleTransformation(bound);
-          translation = Math.min(currentMaxRange + translation, maxRange) - currentMaxRange;
+          translation = (reversed ? Math.max : Math.min)(currentMaxRange + translation, maxRange) - currentMaxRange;
         }
       } else {
         const bound = this.minDomainValue(scale);
         if (bound != null) {
           const currentMinRange = scale.scaleTransformation(scaleDomainMin);
           const minRange = scale.scaleTransformation(bound);
-          translation = Math.max(currentMinRange + translation, minRange) - currentMinRange;
+          translation = (reversed ? Math.min : Math.max)(currentMinRange + translation, minRange) - currentMinRange;
         }
       }
+
       return translation;
     }
 
@@ -640,10 +655,6 @@ namespace Plottable.Interactions {
       if (minDomainValue == null) {
         return this._minDomainValues.get(scale);
       }
-      let maxValueForScale = this.maxDomainValue(scale);
-      if (maxValueForScale != null && maxValueForScale.valueOf() <= minDomainValue.valueOf()) {
-        throw new Error("minDomainValue must be smaller than maxDomainValue for the same Scale");
-      }
       this._minDomainValues.set(scale, minDomainValue);
       return this;
     }
@@ -683,10 +694,6 @@ namespace Plottable.Interactions {
       if (maxDomainValue == null) {
         return this._maxDomainValues.get(scale);
       }
-      let minValueForScale = this.minDomainValue(scale);
-      if (minValueForScale != null && maxDomainValue <= minValueForScale) {
-        throw new Error("maxDomainValue must be larger than minDomainValue for the same Scale");
-      }
       this._maxDomainValues.set(scale, maxDomainValue);
       return this;
     }
@@ -704,6 +711,7 @@ namespace Plottable.Interactions {
       const [ domainMin, domainMax ] = scale.getTransformationDomain();
       this.minDomainValue(scale, domainMin);
       this.maxDomainValue(scale, domainMax);
+      return this;
     }
 
     /**
