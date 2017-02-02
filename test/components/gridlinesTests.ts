@@ -16,13 +16,15 @@ describe("Gridlines", () => {
     gridlines = new Plottable.Components.Gridlines(xScale, yScale);
   });
 
+  afterEach(() => {
+    svg.remove();
+  });
+
   it("sets ranges of scales to the Gridlines dimensions when layout is computed", () => {
     gridlines.renderTo(svg);
 
     assert.deepEqual(xScale.range(), [0, TestMethods.numAttr(svg, "width")], "x scale range extends to the width of the svg");
     assert.deepEqual(yScale.range(), [TestMethods.numAttr(svg, "height"), 0], "y scale range extends to the height of the svg");
-
-    svg.remove();
   });
 
   it("draws gridlines on ticks of its scales and updates when scale update", () => {
@@ -60,23 +62,60 @@ describe("Gridlines", () => {
       const y = TestMethods.numAttr(d3.select(this), "y1");
       assert.closeTo(y, yScale.scale(yTicks[i]), window.Pixel_CloseTo_Requirement, "y gridline is updated");
     });
-    svg.remove();
   });
 
-  it("throws error on non-Quantitative Scales", () => {
-    const categoryScale = new Plottable.Scales.Category();
-    // HACKHACK #2661: Cannot assert errors being thrown with description
-    (<any> assert).throw(() => new Plottable.Components.Gridlines(<any> categoryScale, null), Error,
-      "xScale needs to inherit from Scale.QuantitativeScale", "can't set xScale to category scale");
-    (<any> assert).throw(() => new Plottable.Components.Gridlines(null, <any> categoryScale), Error,
-      "yScale needs to inherit from Scale.QuantitativeScale", "can't set yScale to category scale");
+  it("draws gridlines on category ticks and updates when scale update", () => {
+    let check = function(lines: d3.Selection<any>, scale: Plottable.Scales.Category, axis: string) {
+      let ticks = scale.domain();
+      assert.strictEqual(lines.size(), ticks.length, "There is a " + axis + " gridline for each " + axis + " tick");
+      lines.each(function(gridline: any, i: number) {
+        const v = TestMethods.numAttr(d3.select(this), axis + "1");
+        assert.closeTo(v, scale.scale(ticks[i]), window.Pixel_CloseTo_Requirement, axis + " gridline drawn on ticks");
+      });
+    };
+    let ys: Plottable.Scales.Category = new Plottable.Scales.Category().domain(["a", "b", "c"]);
+    let xs: Plottable.Scales.Category = new Plottable.Scales.Category().domain(["x", "y", "z"]);
+    let categoryGrid: Plottable.Components.Gridlines = new Plottable.Components.Gridlines(xs, ys);
 
+    categoryGrid.renderTo(svg);
+
+    check(categoryGrid.content().select(".y-gridlines").selectAll("line"), ys, "y");
+    check(categoryGrid.content().select(".x-gridlines").selectAll("line"), xs, "x");
+
+    ys.domain(["a", "b", "c", "d", "e"]);
+    xs.domain(["v", "w", "x", "y", "z"]);
+
+    check(categoryGrid.content().select(".y-gridlines").selectAll("line"), ys, "y");
+    check(categoryGrid.content().select(".x-gridlines").selectAll("line"), xs, "x");
+  });
+
+  it("downsamples the domain if there are too many lines to fit", () => {
+    const shortDomain = ["one", "two", "three"];
+    let longDomain = ["one", "two", "seven", "twelve", "thirteenteen",
+      "twenty-seven-half", "shiggity", "shwah", "shfifty", "shfifty-shfive",
+      "girlfriends-age", "shifty-shfive", "my-iq", "shfifty-shfive"];
+    longDomain = longDomain.concat(longDomain, longDomain);
+
+    const ys = new Plottable.Scales.Category().domain(shortDomain);
+    const xs = new Plottable.Scales.Category().domain(shortDomain);
+    const grid = new Plottable.Components.Gridlines(xs, ys).renderTo(svg);
+
+    assert.equal(grid.content().select(".y-gridlines").selectAll("line").size(), shortDomain.length);
+    assert.equal(grid.content().select(".x-gridlines").selectAll("line").size(), shortDomain.length);
+
+    xs.domain(longDomain);
+    ys.domain(longDomain);
+
+    assert.equal(grid.content().select(".y-gridlines").selectAll("line").size(), 13);
+    assert.equal(grid.content().select(".x-gridlines").selectAll("line").size(), 13);
+  });
+
+  it("throws error on not-allowed scales", () => {
+    // HACKHACK #2661: Cannot assert errors being thrown with description
     const colorScale = new Plottable.Scales.Color();
     (<any> assert).throw(() => new Plottable.Components.Gridlines(<any> colorScale, null), Error,
       "xScale needs to inherit from Scale.QuantitativeScale", "can't set xScale to color scale");
     (<any> assert).throw(() => new Plottable.Components.Gridlines(null, <any> colorScale), Error,
       "yScale needs to inherit from Scale.QuantitativeScale", "can't set yScale to color scale");
-
-     svg.remove();
   });
 });

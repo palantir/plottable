@@ -11,6 +11,7 @@ node_modules/
 local/
 quicktests/github_token.txt
 quicktests/overlaying/list_of_quicktests.json
+*.log
 
 # Mac
 .DS_Store

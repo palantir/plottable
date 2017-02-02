@@ -4,12 +4,14 @@ import { Router, IDemoRoute } from "./router";
 import * as DefaultDemo from "./demos/default";
 import * as BarsDemo from "./demos/bars";
 import * as LinesDemo from "./demos/lines";
+import * as GridLinesDemo from "./demos/gridlines";
 
 const router = new Router();
 router.register([
     DefaultDemo,
     BarsDemo,
     LinesDemo,
+    GridLinesDemo,
 ]);
 router.start();
 

@@ -39,7 +39,7 @@ export function render(el: HTMLElement) {
     // Render template
     const root = document.createElement("div");
     root.innerHTML = `
-        <h3>Running Line Data</h3>
+        <h3>Streaming Data</h3>
         <div class="chart-block">
             <svg width="600" height="200" class="running-line"></svg>
         </div>

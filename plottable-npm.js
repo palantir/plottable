@@ -2192,6 +2192,10 @@ var Plottable;
                 this._innerPadding = Category._convertToPlottableInnerPadding(d3InnerPadding);
                 this._outerPadding = Category._convertToPlottableOuterPadding(0.5, d3InnerPadding);
             }
+            Category.isInstance = function (scale) {
+                return Category.prototype.isPrototypeOf(scale);
+            };
+            ;
             Category.prototype.extentOfValues = function (values) {
                 return Plottable.Utils.Array.uniq(values);
             };
@@ -2232,6 +2236,21 @@ var Plottable;
              */
             Category.prototype.stepWidth = function () {
                 return this._rescaleBand(this._d3Scale.rangeBand() * (1 + this.innerPadding()));
+            };
+            /**
+             * Take the scale and drop ticks at regular intervals such that the
+             * resultant ticks are all a reasonable minimum distance apart. Return the
+             * resultant ticks to render, as well as the new stepWidth between them.
+             *
+             * @return {DownsampleInfo} an object holding the resultant domain and new
+             * stepWidth.
+             */
+            Category.prototype.getDownsampleInfo = function () {
+                var downsampleRatio = Math.ceil(Category._MINIMUM_WIDTH_PER_LABEL_PX / this.stepWidth());
+                return {
+                    domain: this.domain().filter(function (d, i) { return i % downsampleRatio === 0; }),
+                    stepWidth: downsampleRatio * this.stepWidth(),
+                };
             };
             Category.prototype.innerPadding = function (innerPadding) {
                 if (innerPadding == null) {
@@ -2309,6 +2328,10 @@ var Plottable;
             Category.prototype._rescaleBand = function (band) {
                 return Math.abs(this._d3TransformationScale(band) - this._d3TransformationScale(0));
             };
+            /**
+             * How many pixels to give labels at minimum before downsampling takes effect.
+             */
+            Category._MINIMUM_WIDTH_PER_LABEL_PX = 15;
             return Category;
         }(Plottable.Scale));
         Scales.Category = Category;
@@ -5223,6 +5246,15 @@ var Plottable;
                 if (orientation === void 0) { orientation = "bottom"; }
                 _super.call(this, scale, orientation);
                 this._tickLabelAngle = 0;
+                /**
+                 * Specifies whether tick marks are drawn in the center of category or after
+                 * it. Valid options are "center" and "after".
+                 *
+                 * @default "center"
+                 */
+                this._tickMarkPosition = "center";
+                this._tickTextAlignment = null;
+                this._tickTextPadding = 0;
                 this.addClass("category-axis");
             }
             Object.defineProperty(Category.prototype, "_wrapper", {
@@ -5251,6 +5283,14 @@ var Plottable;
                 enumerable: true,
                 configurable: true
             });
+            /**
+             * @deprecated in favor of method on scale.
+             * see {@link Plottable.Scales.Category.getDownsampleInfo}
+             */
+            Category.prototype.getDownsampleInfo = function (scale) {
+                if (scale === void 0) { scale = this._scale; }
+                return scale.getDownsampleInfo();
+            };
             Category.prototype._setup = function () {
                 _super.prototype._setup.call(this);
                 this._measurer = new SVGTypewriter.CacheMeasurer(this._tickLabelContainer);
@@ -5303,22 +5343,38 @@ var Plottable;
                 return Math.min(axisHeightWithoutMargin, relevantDimension);
             };
             Category.prototype._getTickValues = function () {
-                return this.getDownsampleInfo().domain;
+                return this._scale.getDownsampleInfo().domain;
             };
-            /**
-             * Take the scale and drop ticks at regular intervals such that the resultant ticks are all a reasonable minimum
-             * distance apart. Return the resultant ticks to render, as well as the new stepWidth between them.
-             *
-             * @param {Scales.Category} scale - The scale being downsampled. Defaults to this Axis' scale.
-             * @return {DownsampleInfo} an object holding the resultant domain and new stepWidth.
-             */
-            Category.prototype.getDownsampleInfo = function (scale) {
-                if (scale === void 0) { scale = this._scale; }
-                var downsampleRatio = Math.ceil(Category._MINIMUM_WIDTH_PER_LABEL_PX / scale.stepWidth());
-                return {
-                    domain: scale.domain().filter(function (d, i) { return i % downsampleRatio === 0; }),
-                    stepWidth: downsampleRatio * scale.stepWidth(),
-                };
+            Category.prototype.tickMarkPosition = function (tickMarkPosition) {
+                if (arguments.length === 0) {
+                    return this._tickMarkPosition;
+                }
+                else {
+                    this._tickMarkPosition = tickMarkPosition;
+                }
+                return this;
+            };
+            Category.prototype.tickTextAlignment = function (tickTextAlignment) {
+                if (arguments.length === 0) {
+                    return this._tickTextAlignment;
+                }
+                if (!tickTextAlignment) {
+                    this._tickTextAlignment = null;
+                }
+                else {
+                    if (tickTextAlignment !== "left" && tickTextAlignment !== "right" && tickTextAlignment !== "center") {
+                        throw new Error("tickTextAlignment '" + tickTextAlignment + "' not supported. Must be 'left', 'right', or 'center'.");
+                    }
+                    this._tickTextAlignment = tickTextAlignment;
+                }
+                return this;
+            };
+            Category.prototype.tickTextPadding = function (tickTextPadding) {
+                if (arguments.length === 0) {
+                    return this._tickTextPadding;
+                }
+                this._tickTextPadding = tickTextPadding ? tickTextPadding : 0;
+                return this;
             };
             Category.prototype.tickLabelAngle = function (angle) {
                 if (angle == null) {
@@ -5375,6 +5431,54 @@ var Plottable;
             Category.prototype._tickSpaceRequired = function () {
                 return this._maxLabelTickLength() + this.tickLabelPadding();
             };
+            Category.prototype._calcTextPadding = function () {
+                // Padding always moves the label *away* from the outer edge of
+                // the axis (tickLabelPadding moves labels away from the inner
+                // edge of the axis already).
+                // The pad value gives the amount of padding that must be
+                // subtracted from overall space when renderign text (import for
+                // proper line breaking).
+                //
+                // The translate value gives the amount the label should be
+                // moved to give the proper padding.
+                //
+                // Pad will always be a positive amount, but translate can be
+                // negative depending on rotation of labels and axis
+                // orientation.
+                var pad = { x: 0, y: 0 };
+                var translate = { x: 0, y: 0 };
+                if (this.tickLabelAngle() === 0 && !this.isHorizontal()) {
+                    if (this.orientation() === "right" && this.tickTextAlignment() === "right") {
+                        pad.x = this.tickTextPadding();
+                        translate.x = this.tickTextPadding() * -1;
+                    }
+                    else if (this.orientation() === "left" && this.tickTextAlignment() === "left") {
+                        pad.x = this.tickTextPadding();
+                        translate.x = this.tickTextPadding();
+                    }
+                }
+                else if (this.tickLabelAngle() === -90) {
+                    if (this.orientation() === "top" && this.tickTextAlignment() === "right") {
+                        pad.y = this.tickTextPadding();
+                        translate.y = this.tickTextPadding();
+                    }
+                    else if (this.orientation() === "bottom" && this.tickTextAlignment() === "left") {
+                        pad.y = this.tickTextPadding();
+                        translate.y = this.tickTextPadding() * -1;
+                    }
+                }
+                else if (this.tickLabelAngle() === 90) {
+                    if (this.orientation() === "top" && this.tickTextAlignment() === "left") {
+                        pad.y = this.tickTextPadding();
+                        translate.y = this.tickTextPadding();
+                    }
+                    else if (this.orientation() === "bottom" && this.tickTextAlignment() === "right") {
+                        pad.y = this.tickTextPadding();
+                        translate.y = this.tickTextPadding() * -1;
+                    }
+                }
+                return { pad: pad, translate: translate };
+            };
             /**
              * Write ticks to the DOM.
              * @param {Plottable.Scales.Category} scale The scale this axis is representing.
@@ -5384,6 +5488,9 @@ var Plottable;
                 var self = this;
                 var xAlign;
                 var yAlign;
+                var result = this._calcTextPadding();
+                var pad = result.pad;
+                var translate = result.translate;
                 switch (this.tickLabelAngle()) {
                     case 0:
                         xAlign = { left: "right", right: "left", top: "center", bottom: "center" };
@@ -5399,11 +5506,11 @@ var Plottable;
                         break;
                 }
                 ticks.each(function (d) {
-                    var width = self.isHorizontal() ? stepWidth : self.width() - self._tickSpaceRequired();
-                    var height = self.isHorizontal() ? self.height() - self._tickSpaceRequired() : stepWidth;
+                    var width = self.isHorizontal() ? stepWidth : self.width() - self._tickSpaceRequired() - pad.x;
+                    var height = self.isHorizontal() ? self.height() - self._tickSpaceRequired() - pad.y : stepWidth;
                     var writeOptions = {
                         selection: d3.select(this),
-                        xAlign: xAlign[self.orientation()],
+                        xAlign: self.tickTextAlignment() || xAlign[self.orientation()],
                         yAlign: yAlign[self.orientation()],
                         textRotation: self.tickLabelAngle(),
                     };
@@ -5418,6 +5525,10 @@ var Plottable;
                         width = Math.min(width, self._tickLabelMaxWidth);
                     }
                     self._writer.write(self.formatter()(d), width, height, writeOptions);
+                    if (translate.x !== 0 || translate.y !== 0) {
+                        var text = writeOptions.selection;
+                        text.attr("transform", "translate(" + translate.x + ", " + translate.y + ") " + text.attr("transform"));
+                    }
                 });
             };
             /**
@@ -5437,14 +5548,15 @@ var Plottable;
                     .innerPadding(thisScale.innerPadding())
                     .outerPadding(thisScale.outerPadding())
                     .range([0, this.isHorizontal() ? axisWidth : axisHeight]);
-                var _a = this.getDownsampleInfo(scale), domain = _a.domain, stepWidth = _a.stepWidth;
+                var _a = scale.getDownsampleInfo(), domain = _a.domain, stepWidth = _a.stepWidth;
+                var tickTextPadding = this._calcTextPadding().pad;
                 // HACKHACK: https://github.com/palantir/svg-typewriter/issues/25
                 // the width (x-axis specific) available to a single tick label.
-                var width = axisWidth - this._tickSpaceRequired(); // default for left/right
+                var width = axisWidth - this._tickSpaceRequired() - tickTextPadding.x; // default for left/right
                 if (this.isHorizontal()) {
                     width = stepWidth; // defaults to the band width
                     if (this._tickLabelAngle !== 0) {
-                        width = axisHeight - this._tickSpaceRequired(); // use the axis height
+                        width = axisHeight - this._tickSpaceRequired() - tickTextPadding.y; // use the axis height
                     }
                     // HACKHACK: Wrapper fails under negative circumstances
                     width = Math.max(width, 0);
@@ -5452,7 +5564,7 @@ var Plottable;
                 // HACKHACK: https://github.com/palantir/svg-typewriter/issues/25
                 // the height (y-axis specific) available to a single tick label.
                 var height = stepWidth; // default for left/right
-                if (this.isHorizontal()) {
+                if (!this.isHorizontal()) {
                     height = axisHeight - this._tickSpaceRequired();
                     if (this._tickLabelAngle !== 0) {
                         height = axisWidth - this._tickSpaceRequired();
@@ -5476,6 +5588,12 @@ var Plottable;
                 if (this._tickLabelAngle !== 0) {
                     _b = [usedHeight, usedWidth], usedWidth = _b[0], usedHeight = _b[1];
                 }
+                if (this.isHorizontal()) {
+                    usedHeight += tickTextPadding.y;
+                }
+                else {
+                    usedWidth += tickTextPadding.x;
+                }
                 return {
                     usedWidth: usedWidth,
                     usedHeight: usedHeight,
@@ -5486,7 +5604,7 @@ var Plottable;
                 var _this = this;
                 _super.prototype.renderImmediately.call(this);
                 var catScale = this._scale;
-                var _a = this.getDownsampleInfo(), domain = _a.domain, stepWidth = _a.stepWidth;
+                var _a = catScale.getDownsampleInfo(), domain = _a.domain, stepWidth = _a.stepWidth;
                 var tickLabels = this._tickLabelContainer.selectAll("." + Plottable.Axis.TICK_LABEL_CLASS).data(domain, function (d) { return d; });
                 // Give each tick a stepWidth of space which will partition the entire axis evenly
                 var availableTextSpace = stepWidth;
@@ -5507,6 +5625,11 @@ var Plottable;
                 // erase all text first, then rewrite
                 tickLabels.text("");
                 this._drawTicks(stepWidth, tickLabels);
+                if (this.tickMarkPosition() === "after") {
+                    var tickMarks = this._tickMarkContainer.selectAll("." + Plottable.Axis.TICK_MARK_CLASS);
+                    var transform = this.isHorizontal() ? "translate(" + stepWidth / 2.0 + ", 0)" : "translate(0, " + stepWidth / 2.0 + ")";
+                    tickMarks.attr("transform", transform);
+                }
                 var xTranslate = this.orientation() === "right" ? this._tickSpaceRequired() : 0;
                 var yTranslate = this.orientation() === "bottom" ? this._tickSpaceRequired() : 0;
                 Plottable.Utils.DOM.translate(this._tickLabelContainer, xTranslate, yTranslate);
@@ -5528,10 +5651,6 @@ var Plottable;
                 }
                 return this;
             };
-            /**
-             * How many pixels to give labels at minimum before downsampling takes effect.
-             */
-            Category._MINIMUM_WIDTH_PER_LABEL_PX = 15;
             return Category;
         }(Plottable.Axis));
         Axes.Category = Category;
@@ -6419,29 +6538,53 @@ var Plottable;
             __extends(Gridlines, _super);
             /**
              * @constructor
-             * @param {QuantitativeScale} xScale The scale to base the x gridlines on. Pass null if no gridlines are desired.
-             * @param {QuantitativeScale} yScale The scale to base the y gridlines on. Pass null if no gridlines are desired.
+             *
+             * @param {Scale<any, number>} xScale The scale to base the x
+             * gridlines on. Can be a category or numeric scale. Pass null if
+             * no gridlines are desired.
+             *
+             * @param {Scale<any, number>} yScale The scale to base the y
+             * gridlines on. Can be a category or numeric scale. Pass null if
+             * no gridlines are desired.
              */
             function Gridlines(xScale, yScale) {
                 var _this = this;
-                if (xScale != null && !(Plottable.QuantitativeScale.prototype.isPrototypeOf(xScale))) {
-                    throw new Error("xScale needs to inherit from Scale.QuantitativeScale");
-                }
-                if (yScale != null && !(Plottable.QuantitativeScale.prototype.isPrototypeOf(yScale))) {
-                    throw new Error("yScale needs to inherit from Scale.QuantitativeScale");
-                }
+                Gridlines.validateScale(xScale, "xScale");
+                Gridlines.validateScale(yScale, "yScale");
                 _super.call(this);
                 this.addClass("gridlines");
                 this._xScale = xScale;
                 this._yScale = yScale;
                 this._renderCallback = function (scale) { return _this.render(); };
+                this._xLinePosition = "center";
+                this._yLinePosition = "center";
                 if (this._xScale) {
+                    this._xTicks = this._mkTicks(xScale);
                     this._xScale.onUpdate(this._renderCallback);
                 }
                 if (this._yScale) {
+                    this._yTicks = this._mkTicks(yScale);
                     this._yScale.onUpdate(this._renderCallback);
                 }
             }
+            Gridlines.prototype.xLinePosition = function (linePosition) {
+                if (arguments.length === 0) {
+                    return this._xLinePosition;
+                }
+                else {
+                    this._xLinePosition = linePosition;
+                }
+                return this;
+            };
+            Gridlines.prototype.yLinePosition = function (linePosition) {
+                if (arguments.length === 0) {
+                    return this._yLinePosition;
+                }
+                else {
+                    this._yLinePosition = linePosition;
+                }
+                return this;
+            };
             Gridlines.prototype.destroy = function () {
                 _super.prototype.destroy.call(this);
                 if (this._xScale) {
@@ -6473,11 +6616,26 @@ var Plottable;
                 }
                 return this;
             };
+            Gridlines.prototype._mkTicks = function (scale) {
+                if (Plottable.QuantitativeScale.prototype.isPrototypeOf(scale)) {
+                    return function () { return scale.ticks(); };
+                }
+                else if (Plottable.Scales.Category.isInstance(scale)) {
+                    return function () { return scale.getDownsampleInfo().domain; };
+                }
+                else {
+                    return function () { return scale.domain(); };
+                }
+            };
             Gridlines.prototype._redrawXLines = function () {
                 var _this = this;
                 if (this._xScale) {
-                    var xTicks = this._xScale.ticks();
-                    var getScaledXValue = function (tickVal) { return _this._xScale.scale(tickVal); };
+                    var positionOffet_1 = 0;
+                    if (Plottable.Scales.Category.isInstance(this._xScale) && this.xLinePosition() === "after") {
+                        positionOffet_1 = this._xScale.getDownsampleInfo().stepWidth / 2.0;
+                    }
+                    var getScaledXValue = function (tickVal) { return _this._xScale.scale(tickVal) + positionOffet_1; };
+                    var xTicks = this._xTicks();
                     var xLines = this._xLinesContainer.selectAll("line").data(xTicks);
                     xLines.enter().append("line");
                     xLines.attr("x1", getScaledXValue)
@@ -6491,8 +6649,12 @@ var Plottable;
             Gridlines.prototype._redrawYLines = function () {
                 var _this = this;
                 if (this._yScale) {
-                    var yTicks = this._yScale.ticks();
-                    var getScaledYValue = function (tickVal) { return _this._yScale.scale(tickVal); };
+                    var positionOffet_2 = 0;
+                    if (Plottable.Scales.Category.isInstance(this._yScale) && this.yLinePosition() === "after") {
+                        positionOffet_2 = this._yScale.getDownsampleInfo().stepWidth / 2.0;
+                    }
+                    var getScaledYValue = function (tickVal) { return _this._yScale.scale(tickVal) + positionOffet_2; };
+                    var yTicks = this._yTicks();
                     var yLines = this._yLinesContainer.selectAll("line").data(yTicks);
                     yLines.enter().append("line");
                     yLines.attr("x1", 0)
@@ -6501,6 +6663,13 @@ var Plottable;
                         .attr("y2", getScaledYValue)
                         .classed("zeroline", function (t) { return t === 0; });
                     yLines.exit().remove();
+                }
+            };
+            Gridlines.validateScale = function (scale, which) {
+                if (scale != null &&
+                    !Plottable.QuantitativeScale.prototype.isPrototypeOf(scale) &&
+                    !Plottable.Scales.Category.prototype.isPrototypeOf(scale)) {
+                    throw new Error(which + " needs to inherit from Scale.QuantitativeScale or Scales.Category.");
                 }
             };
             return Gridlines;

@@ -93,7 +93,7 @@ describe("Category Axes", () => {
       const axis = new Plottable.Axes.Category(scale, "left");
       axis.renderTo(svg);
 
-      const { domain: downsampledDomain, stepWidth } = axis.getDownsampleInfo();
+      const { domain: downsampledDomain, stepWidth } = scale.getDownsampleInfo();
       assert.strictEqual(stepWidth, 4 * scale.stepWidth(), "computes new stepWidth correctly");
       assert.deepEqual(downsampledDomain, ["one", "five"], "downsamples domain correctly");
 
@@ -282,14 +282,100 @@ describe("Category Axes", () => {
       axis.destroy();
       svg.remove();
     });
+
+    it("accounts for textPadding & textAlignment", () => {
+      scale.domain(["foo", "bar", "baz"]);
+      axis.anchor(svg);
+
+      axis.tickLabelAngle(90);
+      axis.tickTextAlignment("right");
+
+      let svgWidth = TestMethods.numAttr(svg, "width");
+      let svgHeight = TestMethods.numAttr(svg, "height");
+
+      let axisRequestedHeight = () => axis.requestedSpace(svgWidth, svgHeight).minHeight;
+
+      let oldHeight = axisRequestedHeight();
+      let increaseAmount = 10;
+
+      axis.tickTextPadding(increaseAmount);
+      assert.strictEqual(axisRequestedHeight(), oldHeight + increaseAmount, "increasing tickTextPadding should increase height.");
+
+      axis.tickTextAlignment("left");
+      assert.strictEqual(axisRequestedHeight(), oldHeight, "Left-aligned labels should not increase height.");
+
+      axis.tickTextAlignment("center");
+      assert.strictEqual(axisRequestedHeight(), oldHeight, "Center-aligned labels should not increase height.");
+
+      axis.tickTextAlignment(null);
+      assert.strictEqual(axisRequestedHeight(), oldHeight, "Default-aligned labels should not increase height.");
+
+      axis.destroy();
+      svg.remove();
+    });
+  });
+
+  describe("requesting space when top oriented", () => {
+    let svg: d3.Selection<void>;
+    let axis: Plottable.Axes.Category;
+    let scale: Plottable.Scales.Category;
+
+    beforeEach(() => {
+      svg = TestMethods.generateSVG();
+      scale = new Plottable.Scales.Category();
+      axis = new Plottable.Axes.Category(scale, "top");
+    });
+
+    it("accounts for textPadding & textAlignment", () => {
+      scale.domain(["foo", "bar", "baz"]);
+      axis.anchor(svg);
+
+      axis.tickLabelAngle(90);
+      axis.tickTextAlignment("left");
+
+      let svgWidth = TestMethods.numAttr(svg, "width");
+      let svgHeight = TestMethods.numAttr(svg, "height");
+
+      let axisRequestedHeight = () => axis.requestedSpace(svgWidth, svgHeight).minHeight;
+
+      let oldHeight = axisRequestedHeight();
+      let increaseAmount = 10;
+
+      axis.tickTextPadding(increaseAmount);
+      assert.strictEqual(axisRequestedHeight(), oldHeight + increaseAmount, "increasing tickTextPadding should increase height.");
+
+      axis.tickTextAlignment("right");
+      assert.strictEqual(axisRequestedHeight(), oldHeight, "Right-aligned labels should not increase height.");
+
+      axis.tickTextAlignment("center");
+      assert.strictEqual(axisRequestedHeight(), oldHeight, "Center-aligned labels should not increase height.");
+
+      axis.tickTextAlignment(null);
+      assert.strictEqual(axisRequestedHeight(), oldHeight, "Default-aligned labels should not increase height.");
+
+      axis.destroy();
+      svg.remove();
+    });
   });
 
   describe("requesting space on left oriented axes", () => {
+    let svg: d3.Selection<void>;
+    let axis: Plottable.Axes.Category;
+    let scale: Plottable.Scales.Category;
+
+    beforeEach(() => {
+      svg = TestMethods.generateSVG();
+      scale = new Plottable.Scales.Category();
+      axis = new Plottable.Axes.Category(scale, "left");
+    });
+
+    afterEach(() => {
+      axis.destroy();
+      svg.remove();
+    });
 
     it("accounts for margin, innerTickLength, and padding when calculating for width", () => {
-      let svg = TestMethods.generateSVG();
-      let scale = new Plottable.Scales.Category().domain(["foo", "bar", "baz"]);
-      let axis = new Plottable.Axes.Category(scale, "left");
+      scale.domain(["foo", "bar", "baz"]);
       axis.anchor(svg);
 
       let svgWidth = TestMethods.numAttr(svg, "width");
@@ -309,6 +395,64 @@ describe("Category Axes", () => {
       oldWidth = axisRequestedWidth();
       axis.innerTickLength(axis.innerTickLength() + increaseAmount);
       assert.strictEqual(axisRequestedWidth(), oldWidth + increaseAmount, "increasing innerTickLength increases width");
+    });
+
+    it("accounts for textPadding & textAlignment", () => {
+      scale.domain(["foo", "bar", "baz"]);
+      axis.anchor(svg);
+
+      axis.tickTextAlignment("left");
+
+      let svgWidth = TestMethods.numAttr(svg, "width");
+      let svgHeight = TestMethods.numAttr(svg, "height");
+
+      let axisRequestedWidth = () => axis.requestedSpace(svgWidth, svgHeight).minWidth;
+
+      let oldWidth = axisRequestedWidth();
+      let increaseAmount = 10;
+
+      axis.tickTextPadding(increaseAmount);
+      assert.strictEqual(axisRequestedWidth(), oldWidth + increaseAmount, "increasing tickTextPadding should increase width.");
+
+      axis.tickTextAlignment("right");
+      assert.strictEqual(axisRequestedWidth(), oldWidth, "Right-aligned labels should not increase width.");
+
+      axis.tickTextAlignment("center");
+      assert.strictEqual(axisRequestedWidth(), oldWidth, "Center-aligned labels should not increase width.");
+
+      axis.tickTextAlignment(null);
+      assert.strictEqual(axisRequestedWidth(), oldWidth, "Default-aligned labels should not increase width.");
+    });
+  });
+
+  describe("requesting space on right oriented axes", () => {
+    it("accounts for textPadding & textAlignment", () => {
+      let svg: d3.Selection<void> = TestMethods.generateSVG();
+      let scale: Plottable.Scales.Category = new Plottable.Scales.Category().domain(["foo", "bar", "baz"]);
+      let axis: Plottable.Axes.Category = new Plottable.Axes.Category(scale, "right");
+
+      axis.anchor(svg);
+      axis.tickTextAlignment("right");
+
+      let svgWidth = TestMethods.numAttr(svg, "width");
+      let svgHeight = TestMethods.numAttr(svg, "height");
+
+      let axisRequestedWidth = () => axis.requestedSpace(svgWidth, svgHeight).minWidth;
+
+      let oldWidth = axisRequestedWidth();
+      let increaseAmount = 10;
+
+      axis.tickTextPadding(increaseAmount);
+      assert.strictEqual(axisRequestedWidth(), oldWidth + increaseAmount, "increasing tickTextPadding should increase width.");
+
+      axis.tickTextAlignment("left");
+      assert.strictEqual(axisRequestedWidth(), oldWidth, "Left-aligned labels should not increase height.");
+
+      axis.tickTextAlignment("center");
+      assert.strictEqual(axisRequestedWidth(), oldWidth, "Center-aligned labels should not increase height.");
+
+      axis.tickTextAlignment(null);
+      assert.strictEqual(axisRequestedWidth(), oldWidth, "Default-aligned labels should not increase height.");
 
       axis.destroy();
       svg.remove();
