@@ -9450,7 +9450,7 @@ var Plottable;
                         else if (barY < 0) {
                             effectiveBarHeight = barY + barHeight;
                         }
-                        var offset = Bar._LABEL_VERTICAL_PADDING;
+                        var offset = Bar._LABEL_PADDING;
                         showLabelOnBar = measurement.height + 2 * offset <= effectiveBarHeight;
                         if (showLabelOnBar) {
                             if (scaledValue < scaledBaseline) {
@@ -9487,7 +9487,7 @@ var Plottable;
                         else if (barX < 0) {
                             effectiveBarWidth = barX + barWidth;
                         }
-                        var offset = Bar._LABEL_HORIZONTAL_PADDING;
+                        var offset = Bar._LABEL_PADDING;
                         showLabelOnBar = measurement.width + 2 * offset <= effectiveBarWidth;
                         if (showLabelOnBar) {
                             if (scaledValue < scaledBaseline) {
@@ -9536,7 +9536,9 @@ var Plottable;
                         textRotation: 0,
                     };
                     writer.write(text, containerWidth, containerHeight, writeOptions);
-                    var tooWide = _this._isVertical ? barWidth < measurement.width : barHeight < measurement.height;
+                    var tooWide = _this._isVertical
+                        ? barWidth < (measurement.width + Bar._LABEL_PADDING * 2)
+                        : barHeight < (measurement.height + Bar._LABEL_PADDING * 2);
                     return tooWide;
                 };
                 var labelTooWide = data.map(drawLabel);
@@ -9671,8 +9673,7 @@ var Plottable;
             Bar._BAR_WIDTH_RATIO = 0.95;
             Bar._SINGLE_BAR_DIMENSION_RATIO = 0.4;
             Bar._BAR_AREA_CLASS = "bar-area";
-            Bar._LABEL_VERTICAL_PADDING = 5;
-            Bar._LABEL_HORIZONTAL_PADDING = 5;
+            Bar._LABEL_PADDING = 10;
             Bar._LABEL_AREA_CLASS = "bar-label-text-area";
             return Bar;
         }(Plottable.XYPlot));
