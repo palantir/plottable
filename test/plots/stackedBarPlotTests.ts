@@ -32,6 +32,11 @@ describe("Plots", () => {
         stackedBarPlot.renderTo(svg);
       });
 
+      afterEach(() => {
+        stackedBarPlot.destroy();
+        svg.remove();
+      });
+
       it("renders rects offset by previous values", () => {
         let bars = stackedBarPlot.content().selectAll("rect");
 
@@ -62,9 +67,6 @@ describe("Plots", () => {
           assert.closeTo(TestMethods.numAttr(bar, "y"), yScale.scale(stackedYs[datasetIndex][datumIndex]),
             window.Pixel_CloseTo_Requirement, "y attribute offset set correctly");
         });
-
-        stackedBarPlot.destroy();
-        svg.remove();
       });
 
       // HACKHACK #2795: correct off-bar label logic to be implemented
@@ -76,9 +78,6 @@ describe("Plots", () => {
         offBarLabels.each(function(d, i) {
           assert.isTrue(d3.select(this).style("visibility") === "hidden", `off-bar label ${i} is hidden`);
         });
-
-        stackedBarPlot.destroy();
-        svg.remove();
       });
 
       it("shows stacked bar labels", () => {
@@ -91,9 +90,6 @@ describe("Plots", () => {
           text.push(d3.select(this).text());
         });
         assert.deepEqual(["3", "3"], text);
-
-        stackedBarPlot.destroy();
-        svg.remove();
       });
 
       it("doesn't show stacked bar labels when columns are too tall", () => {
@@ -101,8 +97,6 @@ describe("Plots", () => {
         yScale.domain([0, 3]);
         const stackedBarLabels = stackedBarPlot.content().selectAll(".stacked-bar-label");
         assert.strictEqual(stackedBarLabels.size(), 0);
-        stackedBarPlot.destroy();
-        svg.remove();
       });
 
       it("doesn't show stacked bar labels when columns are too narrow", () => {
@@ -111,8 +105,6 @@ describe("Plots", () => {
         xScale.domain(xScale.domain());
         const stackedBarLabels = stackedBarPlot.content().selectAll(".stacked-bar-label");
         assert.strictEqual(stackedBarLabels.size(), 0);
-        stackedBarPlot.destroy();
-        svg.remove();
       });
 
       it("considers lying within a bar's y-range to mean it is closest", () => {
@@ -124,8 +116,6 @@ describe("Plots", () => {
 
         closestEntity = stackedBarPlot.entityNearest({ x: 0, y: yScale.scale(d0.y) - 1 });
         assert.strictEqual(closestEntity.datum, d1, "top bar is closest when within its range");
-
-        svg.remove();
       });
     });
 
@@ -159,6 +149,11 @@ describe("Plots", () => {
         stackedBarPlot.renderTo(svg);
       });
 
+      afterEach(() => {
+        stackedBarPlot.destroy();
+        svg.remove();
+      });
+
       it("shows stacked bar labels", () => {
         yScale.domain([3, -3]);
         stackedBarPlot.labelsEnabled(true);
@@ -169,18 +164,13 @@ describe("Plots", () => {
           text.push(d3.select(this).text());
         });
         assert.deepEqual(["-3", "-3"], text);
-
-        stackedBarPlot.destroy();
-        svg.remove();
       });
 
       it("doesn't show stacked bar labels when columns are too tall", () => {
         stackedBarPlot.labelsEnabled(true);
         yScale.domain([-3, 0]);
         const stackedBarLabels = stackedBarPlot.content().selectAll(".stacked-bar-label");
-        assert.strictEqual(stackedBarLabels.size(), 0);
-        stackedBarPlot.destroy();
-        svg.remove();
+        assert.strictEqual(stackedBarLabels.size(), 0)
       });
 
       it("doesn't show stacked bar labels when columns are too narrow", () => {
@@ -188,9 +178,7 @@ describe("Plots", () => {
         xScale.range([0, 40]);
         xScale.domain(xScale.domain());
         const stackedBarLabels = stackedBarPlot.content().selectAll(".stacked-bar-label");
-        assert.strictEqual(stackedBarLabels.size(), 0);
-        stackedBarPlot.destroy();
-        svg.remove();
+        assert.strictEqual(stackedBarLabels.size(), 0)
       });
 
       it("renders rects offset by previous values", () => {
@@ -222,9 +210,6 @@ describe("Plots", () => {
           assert.closeTo(TestMethods.numAttr(bar, "y"), yScale.scale(stackedYs[datasetIndex][datumIndex]),
             window.Pixel_CloseTo_Requirement, "y attribute offset set correctly");
         });
-
-        stackedBarPlot.destroy();
-        svg.remove();
       });
     });
 
@@ -261,6 +246,11 @@ describe("Plots", () => {
         stackedBarPlot.renderTo(svg);
       });
 
+      afterEach(() => {
+        stackedBarPlot.destroy();
+        svg.remove();
+      });
+
       it("draws bars at specified x location and stacks in order of datasets", () => {
         let bars = stackedBarPlot.content().selectAll("rect");
 
@@ -277,8 +267,27 @@ describe("Plots", () => {
               TestMethods.numAttr(d3.select(aBarPair[1]), "y"), "previous dataset bar under second");
           });
         });
-        stackedBarPlot.destroy();
-        svg.remove();
+      });
+
+      it("can be use reverse stacking order", () => {
+        // change stacking order
+        stackedBarPlot.stackingOrder("topdown");
+
+        let bars = stackedBarPlot.content().selectAll("rect");
+
+        let datumCount = stackedBarPlot.datasets().reduce((prev, curr) => prev + curr.data().length, 0);
+        assert.strictEqual(bars.size(), datumCount, "draws a bar for each datum");
+
+        let domain = xScale.domain();
+        domain.forEach((value) => {
+          let domainBarPairs = d3.pairs(bars.filter((d) => d.x === value)[0]);
+          domainBarPairs.forEach((aBarPair) => {
+            assert.closeTo(TestMethods.numAttr(d3.select(aBarPair[0]), "x"), TestMethods.numAttr(d3.select(aBarPair[1]), "x"),
+              window.Pixel_CloseTo_Requirement, "bars at same x position");
+            assert.operator(TestMethods.numAttr(d3.select(aBarPair[0]), "y"), "<",
+              TestMethods.numAttr(d3.select(aBarPair[1]), "y"), "previous dataset bar above second");
+          });
+        });
       });
     });
 
@@ -359,6 +368,11 @@ describe("Plots", () => {
         stackedBarPlot.renderTo(svg);
       });
 
+      afterEach(() => {
+        stackedBarPlot.destroy();
+        svg.remove();
+      });
+
       it("shows stacked bar labels", () => {
         xScale.domain([0, 30]);
         stackedBarPlot.labelsEnabled(true);
@@ -369,18 +383,13 @@ describe("Plots", () => {
           text.push(d3.select(this).text());
         });
         assert.deepEqual(["3", "3"], text);
-
-        stackedBarPlot.destroy();
-        svg.remove();
       });
 
       it("doesn't show stacked bar labels when columns are too tall", () => {
         xScale.domain([0, 3]);
         stackedBarPlot.labelsEnabled(true);
         const stackedBarLabels = stackedBarPlot.content().selectAll(".stacked-bar-label");
-        assert.strictEqual(stackedBarLabels.size(), 0);
-        stackedBarPlot.destroy();
-        svg.remove();
+        assert.strictEqual(stackedBarLabels.size(), 0)
       });
 
       it("doesn't show stacked bar labels when columns are too narrow", () => {
@@ -388,9 +397,7 @@ describe("Plots", () => {
         yScale.range([0, 40]);
         yScale.domain(yScale.domain());
         const stackedBarLabels = stackedBarPlot.content().selectAll(".stacked-bar-label");
-        assert.strictEqual(stackedBarLabels.size(), 0);
-        stackedBarPlot.destroy();
-        svg.remove();
+        assert.strictEqual(stackedBarLabels.size(), 0)
       });
 
       it("renders rects offset by previous values", () => {
@@ -422,9 +429,6 @@ describe("Plots", () => {
           assert.closeTo(TestMethods.numAttr(bar, "x"), xScale.scale(stackedXs[datasetIndex][datumIndex]),
             window.Pixel_CloseTo_Requirement, "x attribute offset correctly");
         });
-
-        stackedBarPlot.destroy();
-        svg.remove();
       });
 
       // HACKHACK #2795: correct off-bar label logic to be implemented
@@ -436,7 +440,6 @@ describe("Plots", () => {
         offBarLabels.each(function(d, i) {
           assert.strictEqual(d3.select(this).style("visibility"), "hidden", `off-bar label ${i} is hidden`);
         });
-        svg.remove();
       });
     });
 
@@ -473,6 +476,11 @@ describe("Plots", () => {
         stackedBarPlot.renderTo(svg);
       });
 
+      afterEach(() => {
+        stackedBarPlot.destroy();
+        svg.remove();
+      });
+
       it("draws bars at specified y location and stacks in order of datasets", () => {
         let bars = stackedBarPlot.content().selectAll("rect");
 
@@ -489,13 +497,10 @@ describe("Plots", () => {
               TestMethods.numAttr(d3.select(aBarPair[1]), "x"), "previous dataset bar under second");
           });
         });
-        stackedBarPlot.destroy();
-        svg.remove();
       });
     });
 
     describe("fail safe tests", () => {
-
       it("should default to 0 when calculating stack offsets with non-numbers", () => {
         let svg = TestMethods.generateSVG();
         let stringData = [

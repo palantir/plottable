@@ -302,6 +302,13 @@ declare namespace Plottable.Utils.Stacking {
         value: number;
         offset: number;
     };
+    /**
+     * Option type for stacking direction. By default, stacked bar and area charts
+     * put the first data series at the bottom of the axis ("bottomup"), but this
+     * can be reversed with the "topdown" option, which produces a stacking order
+     * that matches the order of series in the legend.
+     */
+    type IStackingOrder = "topdown" | "bottomup";
     type GenericStackingResult<D> = Utils.Map<Dataset, Utils.Map<D, StackedDatum>>;
     /**
      * Map of Dataset to stacks.
@@ -314,9 +321,10 @@ declare namespace Plottable.Utils.Stacking {
      * @param {Dataset[]} datasets The Datasets to be stacked on top of each other in the order of stacking
      * @param {Accessor<any>} keyAccessor Accessor for the key of the data
      * @param {Accessor<number>} valueAccessor Accessor for the value of the data
+     * @param {IStackingOrder} stackingOrder The order of stacking (default "bottomup")
      * @return {StackingResult} value and offset for each datapoint in each Dataset
      */
-    function stack(datasets: Dataset[], keyAccessor: Accessor<any>, valueAccessor: Accessor<number>): StackingResult;
+    function stack(datasets: Dataset[], keyAccessor: Accessor<any>, valueAccessor: Accessor<number>, stackingOrder?: IStackingOrder): StackingResult;
     /**
      * Computes the maximum and minimum extents of each stack individually.
      *
@@ -4137,6 +4145,7 @@ declare namespace Plottable.Plots {
 }
 declare namespace Plottable.Plots {
     class StackedArea<X> extends Area<X> {
+        private _stackingOrder;
         private _stackingResult;
         private _stackedExtent;
         private _baseline;
@@ -4156,6 +4165,21 @@ declare namespace Plottable.Plots {
         y(): Plots.TransformableAccessorScaleBinding<number, number>;
         y(y: number | Accessor<number>): this;
         y(y: number | Accessor<number>, yScale: QuantitativeScale<number>): this;
+        /**
+         * Gets the stacking order of the plot.
+         */
+        stackingOrder(): Utils.Stacking.IStackingOrder;
+        /**
+         * Sets the stacking order of the plot.
+         *
+         * By default, stacked plots are "bottomup", meaning for positive data, the
+         * first series will be placed at the bottom of the scale and subsequent
+         * data series will by stacked on top. This can be reveresed by setting
+         * stacking order to "topdown".
+         *
+         * @returns {Plots.StackedArea} This plot
+         */
+        stackingOrder(stackingOrder: Utils.Stacking.IStackingOrder): this;
         /**
          * Gets if downsampling is enabled
          *
@@ -4196,6 +4220,7 @@ declare namespace Plottable.Plots {
         private _labelArea;
         private _measurer;
         private _writer;
+        private _stackingOrder;
         private _stackingResult;
         private _stackedExtent;
         /**
@@ -4215,6 +4240,21 @@ declare namespace Plottable.Plots {
         y(): Plots.TransformableAccessorScaleBinding<Y, number>;
         y(y: number | Accessor<number>): this;
         y(y: Y | Accessor<Y>, yScale: Scale<Y, number>): this;
+        /**
+         * Gets the stacking order of the plot.
+         */
+        stackingOrder(): Utils.Stacking.IStackingOrder;
+        /**
+         * Sets the stacking order of the plot.
+         *
+         * By default, stacked plots are "bottomup", meaning for positive data, the
+         * first series will be placed at the bottom of the scale and subsequent
+         * data series will by stacked on top. This can be reveresed by setting
+         * stacking order to "topdown".
+         *
+         * @returns {Plots.StackedArea} This plot
+         */
+        stackingOrder(stackingOrder: Utils.Stacking.IStackingOrder): this;
         protected _setup(): void;
         protected _drawLabels(): void;
         protected _generateAttrToProjector(): {

@@ -721,12 +721,18 @@ var Plottable;
              * @param {Dataset[]} datasets The Datasets to be stacked on top of each other in the order of stacking
              * @param {Accessor<any>} keyAccessor Accessor for the key of the data
              * @param {Accessor<number>} valueAccessor Accessor for the value of the data
+             * @param {IStackingOrder} stackingOrder The order of stacking (default "bottomup")
              * @return {StackingResult} value and offset for each datapoint in each Dataset
              */
-            function stack(datasets, keyAccessor, valueAccessor) {
+            function stack(datasets, keyAccessor, valueAccessor, stackingOrder) {
+                if (stackingOrder === void 0) { stackingOrder = "bottomup"; }
                 var positiveOffsets = d3.map();
                 var negativeOffsets = d3.map();
                 var datasetToKeyToStackedDatum = new Utils.Map();
+                if (stackingOrder === "topdown") {
+                    datasets = datasets.slice();
+                    datasets.reverse();
+                }
                 datasets.forEach(function (dataset) {
                     var keyToStackedDatum = new Utils.Map();
                     dataset.data().forEach(function (datum, index) {
@@ -10347,6 +10353,7 @@ var Plottable;
                 var _this = this;
                 _super.call(this);
                 this._baselineValue = 0;
+                this._stackingOrder = "bottomup";
                 this.addClass("stacked-area-plot");
                 this.attr("fill-opacity", 1);
                 this._stackingResult = new Plottable.Utils.Map();
@@ -10396,6 +10403,14 @@ var Plottable;
                     _super.prototype.y.call(this, y, yScale);
                 }
                 this._updateStackExtentsAndOffsets();
+                return this;
+            };
+            StackedArea.prototype.stackingOrder = function (stackingOrder) {
+                if (stackingOrder == null) {
+                    return this._stackingOrder;
+                }
+                this._stackingOrder = stackingOrder;
+                this._onDatasetUpdate();
                 return this;
             };
             StackedArea.prototype.downsamplingEnabled = function (downsampling) {
@@ -10453,7 +10468,7 @@ var Plottable;
                 var valueAccessor = this.y().accessor;
                 var filter = this._filterForProperty("y");
                 this._checkSameDomain(datasets, keyAccessor);
-                this._stackingResult = Plottable.Utils.Stacking.stack(datasets, keyAccessor, valueAccessor);
+                this._stackingResult = Plottable.Utils.Stacking.stack(datasets, keyAccessor, valueAccessor, this._stackingOrder);
                 this._stackedExtent = Plottable.Utils.Stacking.stackedExtent(this._stackingResult, keyAccessor, filter);
             };
             StackedArea.prototype._checkSameDomain = function (datasets, keyAccessor) {
@@ -10532,6 +10547,7 @@ var Plottable;
                 if (orientation === void 0) { orientation = Plots.Bar.ORIENTATION_VERTICAL; }
                 _super.call(this, orientation);
                 this.addClass("stacked-bar-plot");
+                this._stackingOrder = "bottomup";
                 this._stackingResult = new Plottable.Utils.Map();
                 this._stackedExtent = [];
             }
@@ -10559,6 +10575,14 @@ var Plottable;
                     _super.prototype.y.call(this, y, yScale);
                 }
                 this._updateStackExtentsAndOffsets();
+                return this;
+            };
+            StackedBar.prototype.stackingOrder = function (stackingOrder) {
+                if (stackingOrder == null) {
+                    return this._stackingOrder;
+                }
+                this._stackingOrder = stackingOrder;
+                this._onDatasetUpdate();
                 return this;
             };
             StackedBar.prototype._setup = function () {
@@ -10688,7 +10712,7 @@ var Plottable;
                 var keyAccessor = this._isVertical ? this.x().accessor : this.y().accessor;
                 var valueAccessor = this._isVertical ? this.y().accessor : this.x().accessor;
                 var filter = this._filterForProperty(this._isVertical ? "y" : "x");
-                this._stackingResult = Plottable.Utils.Stacking.stack(datasets, keyAccessor, valueAccessor);
+                this._stackingResult = Plottable.Utils.Stacking.stack(datasets, keyAccessor, valueAccessor, this._stackingOrder);
                 this._stackedExtent = Plottable.Utils.Stacking.stackedExtent(this._stackingResult, keyAccessor, filter);
             };
             StackedBar._STACKED_BAR_LABEL_PADDING = 5;
