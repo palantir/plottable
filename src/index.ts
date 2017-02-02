@@ -1,48 +1,32 @@
 import * as Animators from "./animators";
 import * as Axes from "./axes";
 import * as Components from "./components";
-
 import * as Configs from "./core/config";
 import * as Formatters from "./core/formatters";
 import * as RenderController from "./core/renderController";
 import * as RenderPolicies from "./core/renderPolicy";
 import * as SymbolFactories from "./core/symbolFactories";
-
 import * as Dispatchers from "./dispatchers";
-
 import * as Drawers from "./drawers";
-
 import * as Interactions from "./interactions";
-
 import * as Plots from "./plots";
-
 import * as Scales from "./scales";
-
 import * as Utils from "./utils";
 
 export {
   Animators,
-
   Axes,
-
   Components,
-
   Configs,
   Formatters,
   RenderController,
   RenderPolicies,
   SymbolFactories,
-
   Dispatchers,
-
   Drawers,
-
   Interactions,
-
   Plots,
-
   Scales,
-
   Utils
 };
 
