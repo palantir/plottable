@@ -226,8 +226,8 @@ module.exports = function(grunt) {
           platform: "WIN7"
         }, {
           browserName: "safari",
-          platform: "OS X 10.10",
-          version: "8.0",
+          platform: "OS X 10.11",
+          version: "10.0",
         }]
       }
     }
