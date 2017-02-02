@@ -1,9 +1,0 @@
-{
-  "compilerOptions": {
-    "target": "es5",
-    "sourceMap": false,
-    "noImplicitAny": true,
-    "declaration": false,
-    "removeComments": false
-  }
-}

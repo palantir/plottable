@@ -11,16 +11,13 @@
   "main": "plottable-npm.js",
   "typings": "plottable-npm.d.ts",
   "scripts": {
-    "build-demo": "npm-run-all compile-typescript-demo webpack-demo",
     "build-src": "npm-run-all compile-typescript webpack-plottable webpack-plottable-npm",
     "build-test": "npm-run-all compile-typescript-test webpack-test",
     "check_version": "echo ${npm_package_version} $(npm view ${npm_package_name} version) | awk '{ if ($1 == $2) { exit 1 }}'",
     "compile-typescript": "tsc -p .",
-    "compile-typescript-demo": "tsc -p demo/",
     "compile-typescript-test": "tsc -p test/",
     "start": "grunt",
     "test": "grunt test-travis",
-    "webpack-demo": "webpack --config webpack.config.demo.js",
     "webpack-plottable": "webpack --config webpack.config.plottable.js",
     "webpack-plottable-npm": "webpack --config webpack.config.plottable-npm.js",
     "webpack-test": "webpack --config webpack.config.test.js"

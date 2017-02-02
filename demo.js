@@ -3,9 +3,8 @@
 const bot = require("circle-github-bot").create();
 
 demos = [
-    bot.artifactLink('demo/index.html', 'demo'),
     bot.artifactLink('quicktests/index.html', 'quicktests'),
-    bot.artifactLink('demo/fiddle.html', 'fiddle'),
+    bot.artifactLink('quicktests/fiddle.html', 'fiddle'),
 ];
 
 bot.comment(`

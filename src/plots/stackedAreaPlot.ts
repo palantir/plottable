@@ -13,6 +13,7 @@ import { Area } from "./areaPlot";
 import { Plot } from "./plot";
 
 export class StackedArea<X> extends Area<X> {
+  private _stackingOrder: Utils.Stacking.IStackingOrder;
   private _stackingResult: Utils.Stacking.StackingResult;
   private _stackedExtent: number[];
 
@@ -25,6 +26,7 @@ export class StackedArea<X> extends Area<X> {
    */
   constructor() {
     super();
+    this._stackingOrder = "bottomup";
     this.addClass("stacked-area-plot");
     this.attr("fill-opacity", 1);
     this._stackingResult = new Utils.Map<Dataset, Utils.Map<string, Utils.Stacking.StackedDatum>>();
@@ -91,6 +93,30 @@ export class StackedArea<X> extends Area<X> {
 
     this._updateStackExtentsAndOffsets();
 
+    return this;
+  }
+
+  /**
+   * Gets the stacking order of the plot.
+   */
+  public stackingOrder(): Utils.Stacking.IStackingOrder;
+  /**
+   * Sets the stacking order of the plot.
+   *
+   * By default, stacked plots are "bottomup", meaning for positive data, the
+   * first series will be placed at the bottom of the scale and subsequent
+   * data series will by stacked on top. This can be reveresed by setting
+   * stacking order to "topdown".
+   *
+   * @returns {Plots.StackedArea} This plot
+   */
+  public stackingOrder(stackingOrder: Utils.Stacking.IStackingOrder): this;
+  public stackingOrder(stackingOrder?: Utils.Stacking.IStackingOrder): any {
+    if (stackingOrder == null) {
+      return this._stackingOrder;
+    }
+    this._stackingOrder = stackingOrder;
+    this._onDatasetUpdate();
     return this;
   }
 
@@ -170,7 +196,7 @@ export class StackedArea<X> extends Area<X> {
     let filter = this._filterForProperty("y");
 
     this._checkSameDomain(datasets, keyAccessor);
-    this._stackingResult = Utils.Stacking.stack(datasets, keyAccessor, valueAccessor);
+    this._stackingResult = Utils.Stacking.stack(datasets, keyAccessor, valueAccessor, this._stackingOrder);
     this._stackedExtent = Utils.Stacking.stackedExtent(this._stackingResult, keyAccessor, filter);
   }
 

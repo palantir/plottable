@@ -30,8 +30,8 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
   private static _BAR_WIDTH_RATIO = 0.95;
   private static _SINGLE_BAR_DIMENSION_RATIO = 0.4;
   private static _BAR_AREA_CLASS = "bar-area";
-  private static _LABEL_VERTICAL_PADDING = 5;
-  private static _LABEL_HORIZONTAL_PADDING = 5;
+  private static _LABEL_PADDING = 10;
+
   protected static _LABEL_AREA_CLASS = "bar-label-text-area";
 
   private _baseline: d3.Selection<void>;
@@ -518,7 +518,7 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
         } else if (barY < 0) {
           effectiveBarHeight = barY + barHeight;
         }
-        let offset = Bar._LABEL_VERTICAL_PADDING;
+        let offset = Bar._LABEL_PADDING;
         showLabelOnBar = measurement.height + 2 * offset <= effectiveBarHeight;
 
         if (showLabelOnBar) {
@@ -552,7 +552,7 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
         } else if (barX < 0) {
           effectiveBarWidth = barX + barWidth;
         }
-        let offset = Bar._LABEL_HORIZONTAL_PADDING;
+        let offset = Bar._LABEL_PADDING;
         showLabelOnBar = measurement.width + 2 * offset <= effectiveBarWidth;
 
         if (showLabelOnBar) {
@@ -603,7 +603,9 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
       };
       writer.write(text, containerWidth, containerHeight, writeOptions);
 
-      let tooWide = this._isVertical ? barWidth < measurement.width : barHeight < measurement.height;
+      let tooWide = this._isVertical
+        ? barWidth < (measurement.width + Bar._LABEL_PADDING * 2)
+        : barHeight < (measurement.height + Bar._LABEL_PADDING * 2);
       return tooWide;
     };
 

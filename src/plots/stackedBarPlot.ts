@@ -14,6 +14,7 @@ export class StackedBar<X, Y> extends Bar<X, Y> {
   private _labelArea: d3.Selection<void>;
   private _measurer: SVGTypewriter.Measurer;
   private _writer: SVGTypewriter.Writer;
+  private _stackingOrder: Utils.Stacking.IStackingOrder;
   private _stackingResult: Utils.Stacking.StackingResult;
   private _stackedExtent: number[];
 
@@ -30,6 +31,7 @@ export class StackedBar<X, Y> extends Bar<X, Y> {
   constructor(orientation = Bar.ORIENTATION_VERTICAL) {
     super(orientation);
     this.addClass("stacked-bar-plot");
+    this._stackingOrder = "bottomup";
     this._stackingResult = new Utils.Map<Dataset, Utils.Map<string, Utils.Stacking.StackedDatum>>();
     this._stackedExtent = [];
   }
@@ -65,6 +67,30 @@ export class StackedBar<X, Y> extends Bar<X, Y> {
     }
 
     this._updateStackExtentsAndOffsets();
+    return this;
+  }
+
+  /**
+   * Gets the stacking order of the plot.
+   */
+  public stackingOrder(): Utils.Stacking.IStackingOrder;
+  /**
+   * Sets the stacking order of the plot.
+   *
+   * By default, stacked plots are "bottomup", meaning for positive data, the
+   * first series will be placed at the bottom of the scale and subsequent
+   * data series will by stacked on top. This can be reveresed by setting
+   * stacking order to "topdown".
+   *
+   * @returns {Plots.StackedArea} This plot
+   */
+  public stackingOrder(stackingOrder: Utils.Stacking.IStackingOrder): this;
+  public stackingOrder(stackingOrder?: Utils.Stacking.IStackingOrder): any {
+    if (stackingOrder == null) {
+      return this._stackingOrder;
+    }
+    this._stackingOrder = stackingOrder;
+    this._onDatasetUpdate();
     return this;
   }
 
@@ -216,7 +242,7 @@ export class StackedBar<X, Y> extends Bar<X, Y> {
     let valueAccessor = this._isVertical ? this.y().accessor : this.x().accessor;
     let filter = this._filterForProperty(this._isVertical ? "y" : "x");
 
-    this._stackingResult = Utils.Stacking.stack(datasets, keyAccessor, valueAccessor);
+    this._stackingResult = Utils.Stacking.stack(datasets, keyAccessor, valueAccessor, this._stackingOrder);
     this._stackedExtent = Utils.Stacking.stackedExtent(this._stackingResult, keyAccessor, filter);
   }
 }

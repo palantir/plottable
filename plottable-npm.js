@@ -3660,7 +3660,7 @@ var Bar = (function (_super) {
                 else if (barY < 0) {
                     effectiveBarHeight = barY + barHeight;
                 }
-                var offset = Bar._LABEL_VERTICAL_PADDING;
+                var offset = Bar._LABEL_PADDING;
                 showLabelOnBar = measurement.height + 2 * offset <= effectiveBarHeight;
                 if (showLabelOnBar) {
                     if (scaledValue < scaledBaseline) {
@@ -3697,7 +3697,7 @@ var Bar = (function (_super) {
                 else if (barX < 0) {
                     effectiveBarWidth = barX + barWidth;
                 }
-                var offset = Bar._LABEL_HORIZONTAL_PADDING;
+                var offset = Bar._LABEL_PADDING;
                 showLabelOnBar = measurement.width + 2 * offset <= effectiveBarWidth;
                 if (showLabelOnBar) {
                     if (scaledValue < scaledBaseline) {
@@ -3746,7 +3746,9 @@ var Bar = (function (_super) {
                 textRotation: 0,
             };
             writer.write(text, containerWidth, containerHeight, writeOptions);
-            var tooWide = _this._isVertical ? barWidth < measurement.width : barHeight < measurement.height;
+            var tooWide = _this._isVertical
+                ? barWidth < (measurement.width + Bar._LABEL_PADDING * 2)
+                : barHeight < (measurement.height + Bar._LABEL_PADDING * 2);
             return tooWide;
         };
         var labelTooWide = data.map(drawLabel);
@@ -3884,8 +3886,7 @@ var Bar = (function (_super) {
     Bar._BAR_WIDTH_RATIO = 0.95;
     Bar._SINGLE_BAR_DIMENSION_RATIO = 0.4;
     Bar._BAR_AREA_CLASS = "bar-area";
-    Bar._LABEL_VERTICAL_PADDING = 5;
-    Bar._LABEL_HORIZONTAL_PADDING = 5;
+    Bar._LABEL_PADDING = 10;
     Bar._LABEL_AREA_CLASS = "bar-label-text-area";
     return Bar;
 }(xyPlot_1.XYPlot));
@@ -10807,6 +10808,15 @@ var PanZoom = (function (_super) {
             this._zoomEndCallbacks.callCallbacks();
         }
     };
+    /**
+     * When scale ranges are reversed (i.e. range[1] < range[0]), we must alter the
+     * the calculations we do in screen space to constrain pan and zoom. This method
+     * returns `true` if the scale is reversed.
+     */
+    PanZoom.prototype._isRangeReversed = function (scale) {
+        var range = scale.range();
+        return range[1] < range[0];
+    };
     PanZoom.prototype._constrainedZoom = function (scale, zoomAmount, centerPoint) {
         zoomAmount = this._constrainZoomExtents(scale, zoomAmount);
         return this._constrainZoomValues(scale, zoomAmount, centerPoint);
@@ -10827,6 +10837,7 @@ var PanZoom = (function (_super) {
         if (zoomAmount <= 1) {
             return { centerPoint: centerPoint, zoomAmount: zoomAmount };
         }
+        var reversed = this._isRangeReversed(scale);
         var minDomain = this.minDomainValue(scale);
         var maxDomain = this.maxDomainValue(scale);
         // if no constraints set, we're done
@@ -10840,7 +10851,7 @@ var PanZoom = (function (_super) {
             var currentMaxRange = scale.scaleTransformation(scaleDomainMax);
             var testMaxRange = zoomAt(currentMaxRange, zoomAmount, centerPoint);
             // move the center point to prevent max overflow, if necessary
-            if (testMaxRange > maxRange) {
+            if (testMaxRange > maxRange != reversed) {
                 centerPoint = this._getZoomCenterForTarget(currentMaxRange, zoomAmount, maxRange);
             }
         }
@@ -10850,7 +10861,7 @@ var PanZoom = (function (_super) {
             var currentMinRange = scale.scaleTransformation(scaleDomainMin);
             var testMinRange = zoomAt(currentMinRange, zoomAmount, centerPoint);
             // move the center point to prevent min overflow, if necessary
-            if (testMinRange < minRange) {
+            if (testMinRange < minRange != reversed) {
                 centerPoint = this._getZoomCenterForTarget(currentMinRange, zoomAmount, minRange);
             }
         }
@@ -10865,7 +10876,7 @@ var PanZoom = (function (_super) {
             // If we overflow both, use some algebra to solve for centerPoint and
             // zoomAmount that will make the domain match the min/max exactly.
             // Algebra brought to you by Wolfram Alpha.
-            if (testMaxRange > maxRange || testMinRange < minRange) {
+            if (testMaxRange > maxRange != reversed || testMinRange < minRange != reversed) {
                 var denominator = (currentMaxRange - currentMinRange + minRange - maxRange);
                 if (denominator === 0) {
                     // In this case the domains already match, so just return no-op values.
@@ -10912,12 +10923,13 @@ var PanZoom = (function (_super) {
      */
     PanZoom.prototype._constrainedTranslation = function (scale, translation) {
         var _a = scale.getTransformationDomain(), scaleDomainMin = _a[0], scaleDomainMax = _a[1];
-        if (translation > 0) {
+        var reversed = this._isRangeReversed(scale);
+        if (translation > 0 !== reversed) {
             var bound = this.maxDomainValue(scale);
             if (bound != null) {
                 var currentMaxRange = scale.scaleTransformation(scaleDomainMax);
                 var maxRange = scale.scaleTransformation(bound);
-                translation = Math.min(currentMaxRange + translation, maxRange) - currentMaxRange;
+                translation = (reversed ? Math.max : Math.min)(currentMaxRange + translation, maxRange) - currentMaxRange;
             }
         }
         else {
@@ -10925,7 +10937,7 @@ var PanZoom = (function (_super) {
             if (bound != null) {
                 var currentMinRange = scale.scaleTransformation(scaleDomainMin);
                 var minRange = scale.scaleTransformation(bound);
-                translation = Math.max(currentMinRange + translation, minRange) - currentMinRange;
+                translation = (reversed ? Math.min : Math.max)(currentMinRange + translation, minRange) - currentMinRange;
             }
         }
         return translation;
@@ -11049,20 +11061,12 @@ var PanZoom = (function (_super) {
         if (minDomainValue == null) {
             return this._minDomainValues.get(scale);
         }
-        var maxValueForScale = this.maxDomainValue(scale);
-        if (maxValueForScale != null && maxValueForScale.valueOf() <= minDomainValue.valueOf()) {
-            throw new Error("minDomainValue must be smaller than maxDomainValue for the same Scale");
-        }
         this._minDomainValues.set(scale, minDomainValue);
         return this;
     };
     PanZoom.prototype.maxDomainValue = function (scale, maxDomainValue) {
         if (maxDomainValue == null) {
             return this._maxDomainValues.get(scale);
-        }
-        var minValueForScale = this.minDomainValue(scale);
-        if (minValueForScale != null && maxDomainValue <= minValueForScale) {
-            throw new Error("maxDomainValue must be larger than minDomainValue for the same Scale");
         }
         this._maxDomainValues.set(scale, maxDomainValue);
         return this;
@@ -11080,6 +11084,7 @@ var PanZoom = (function (_super) {
         var _a = scale.getTransformationDomain(), domainMin = _a[0], domainMax = _a[1];
         this.minDomainValue(scale, domainMin);
         this.maxDomainValue(scale, domainMax);
+        return this;
     };
     /**
      * Adds a callback to be called when panning ends.
@@ -12573,6 +12578,7 @@ var StackedArea = (function (_super) {
         var _this = this;
         _super.call(this);
         this._baselineValue = 0;
+        this._stackingOrder = "bottomup";
         this.addClass("stacked-area-plot");
         this.attr("fill-opacity", 1);
         this._stackingResult = new Utils.Map();
@@ -12622,6 +12628,14 @@ var StackedArea = (function (_super) {
             _super.prototype.y.call(this, y, yScale);
         }
         this._updateStackExtentsAndOffsets();
+        return this;
+    };
+    StackedArea.prototype.stackingOrder = function (stackingOrder) {
+        if (stackingOrder == null) {
+            return this._stackingOrder;
+        }
+        this._stackingOrder = stackingOrder;
+        this._onDatasetUpdate();
         return this;
     };
     StackedArea.prototype.downsamplingEnabled = function (downsampling) {
@@ -12679,7 +12693,7 @@ var StackedArea = (function (_super) {
         var valueAccessor = this.y().accessor;
         var filter = this._filterForProperty("y");
         this._checkSameDomain(datasets, keyAccessor);
-        this._stackingResult = Utils.Stacking.stack(datasets, keyAccessor, valueAccessor);
+        this._stackingResult = Utils.Stacking.stack(datasets, keyAccessor, valueAccessor, this._stackingOrder);
         this._stackedExtent = Utils.Stacking.stackedExtent(this._stackingResult, keyAccessor, filter);
     };
     StackedArea.prototype._checkSameDomain = function (datasets, keyAccessor) {
@@ -12768,6 +12782,7 @@ var StackedBar = (function (_super) {
         if (orientation === void 0) { orientation = barPlot_1.Bar.ORIENTATION_VERTICAL; }
         _super.call(this, orientation);
         this.addClass("stacked-bar-plot");
+        this._stackingOrder = "bottomup";
         this._stackingResult = new Utils.Map();
         this._stackedExtent = [];
     }
@@ -12795,6 +12810,14 @@ var StackedBar = (function (_super) {
             _super.prototype.y.call(this, y, yScale);
         }
         this._updateStackExtentsAndOffsets();
+        return this;
+    };
+    StackedBar.prototype.stackingOrder = function (stackingOrder) {
+        if (stackingOrder == null) {
+            return this._stackingOrder;
+        }
+        this._stackingOrder = stackingOrder;
+        this._onDatasetUpdate();
         return this;
     };
     StackedBar.prototype._setup = function () {
@@ -12924,7 +12947,7 @@ var StackedBar = (function (_super) {
         var keyAccessor = this._isVertical ? this.x().accessor : this.y().accessor;
         var valueAccessor = this._isVertical ? this.y().accessor : this.x().accessor;
         var filter = this._filterForProperty(this._isVertical ? "y" : "x");
-        this._stackingResult = Utils.Stacking.stack(datasets, keyAccessor, valueAccessor);
+        this._stackingResult = Utils.Stacking.stack(datasets, keyAccessor, valueAccessor, this._stackingOrder);
         this._stackedExtent = Utils.Stacking.stackedExtent(this._stackingResult, keyAccessor, filter);
     };
     StackedBar._STACKED_BAR_LABEL_PADDING = 5;
@@ -14307,12 +14330,18 @@ var nativeMath = window.Math;
  * @param {Dataset[]} datasets The Datasets to be stacked on top of each other in the order of stacking
  * @param {Accessor<any>} keyAccessor Accessor for the key of the data
  * @param {Accessor<number>} valueAccessor Accessor for the value of the data
+ * @param {IStackingOrder} stackingOrder The order of stacking (default "bottomup")
  * @return {StackingResult} value and offset for each datapoint in each Dataset
  */
-function stack(datasets, keyAccessor, valueAccessor) {
+function stack(datasets, keyAccessor, valueAccessor, stackingOrder) {
+    if (stackingOrder === void 0) { stackingOrder = "bottomup"; }
     var positiveOffsets = d3.map();
     var negativeOffsets = d3.map();
     var datasetToKeyToStackedDatum = new Utils.Map();
+    if (stackingOrder === "topdown") {
+        datasets = datasets.slice();
+        datasets.reverse();
+    }
     datasets.forEach(function (dataset) {
         var keyToStackedDatum = new Utils.Map();
         dataset.data().forEach(function (datum, index) {

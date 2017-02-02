@@ -4,7 +4,6 @@ general:
     - plottable.js
     - plottable.css
     # Demo paths
-    - demo
     - quicktests
     # Modules used by quicktests
     - node_modules/d3
@@ -20,7 +19,6 @@ deployment:
   demo:
     branch: /.*/
     commands:
-      - npm start -- demo-compile
       - ./demo.js
   npm:
     tag: /v[0-9.]+/

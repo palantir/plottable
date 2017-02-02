@@ -10,6 +10,14 @@ export type StackedDatum = {
   offset: number;
 };
 
+/**
+ * Option type for stacking direction. By default, stacked bar and area charts
+ * put the first data series at the bottom of the axis ("bottomup"), but this
+ * can be reversed with the "topdown" option, which produces a stacking order
+ * that matches the order of series in the legend.
+ */
+export type IStackingOrder = "topdown" | "bottomup";
+
 // HACKHACK More accurate stacking result definition. Remove typeless stacking result
 // and replace with typed stacking result in 3.0.
 export type GenericStackingResult<D> = Utils.Map<Dataset, Utils.Map<D, StackedDatum>>;
@@ -27,12 +35,23 @@ let nativeMath: Math = (<any>window).Math;
  * @param {Dataset[]} datasets The Datasets to be stacked on top of each other in the order of stacking
  * @param {Accessor<any>} keyAccessor Accessor for the key of the data
  * @param {Accessor<number>} valueAccessor Accessor for the value of the data
+ * @param {IStackingOrder} stackingOrder The order of stacking (default "bottomup")
  * @return {StackingResult} value and offset for each datapoint in each Dataset
  */
-export function stack(datasets: Dataset[], keyAccessor: Accessor<any>, valueAccessor: Accessor<number>): StackingResult {
+export function stack(
+  datasets: Dataset[],
+  keyAccessor: Accessor<any>,
+  valueAccessor: Accessor<number>,
+  stackingOrder: IStackingOrder = "bottomup",
+): StackingResult {
   let positiveOffsets = d3.map<number>();
   let negativeOffsets = d3.map<number>();
   let datasetToKeyToStackedDatum = new Utils.Map<Dataset, Utils.Map<string, StackedDatum>>();
+
+  if (stackingOrder === "topdown") {
+    datasets = datasets.slice();
+    datasets.reverse();
+  }
 
   datasets.forEach((dataset) => {
     let keyToStackedDatum = new Utils.Map<string, StackedDatum>();
