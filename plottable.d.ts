@@ -3808,8 +3808,7 @@ declare namespace Plottable.Plots {
         private static _BAR_WIDTH_RATIO;
         private static _SINGLE_BAR_DIMENSION_RATIO;
         private static _BAR_AREA_CLASS;
-        private static _LABEL_VERTICAL_PADDING;
-        private static _LABEL_HORIZONTAL_PADDING;
+        private static _LABEL_PADDING;
         protected static _LABEL_AREA_CLASS: string;
         private _baseline;
         private _baselineValue;
