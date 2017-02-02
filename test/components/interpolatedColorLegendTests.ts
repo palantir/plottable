@@ -492,8 +492,10 @@ describe("InterpolatedColorLegend", () => {
     });
 
     it("does not create title elements if configuration is set to false", () => {
+      var originalSetting = Plottable.Configs.ADD_TITLE_ELEMENTS;
       Plottable.Configs.ADD_TITLE_ELEMENTS = false;
       legend.renderTo(svg);
+      Plottable.Configs.ADD_TITLE_ELEMENTS = originalSetting;
 
       const entries = legend.content().selectAll("rect.swatch");
       assert.operator(entries.size(), ">=", 11, "there is at least 11 swatches");

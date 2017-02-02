@@ -1,6 +1,7 @@
 # Build files
 build/
 test/tests.js
+test/tests.js.map
 
 # Typescript
 .baseDir.ts
