@@ -1141,12 +1141,7 @@ var Component = (function () {
             y: this._origin.y,
         };
     };
-    /**
-     * Gets the origin of the Component relative to the root <svg>.
-     *
-     * @return {Point}
-     */
-    Component.prototype.originToSVG = function () {
+    Component.prototype.originToRoot = function () {
         var origin = this.origin();
         var ancestor = this.parent();
         while (ancestor != null) {
@@ -1156,6 +1151,15 @@ var Component = (function () {
             ancestor = ancestor.parent();
         }
         return origin;
+    };
+    /**
+     * Gets the origin of the Component relative to the root <svg>.
+     *
+     * @deprecated Use originToRoot instead
+     * @return {Point}
+     */
+    Component.prototype.originToSVG = function () {
+        return this.originToRoot();
     };
     /**
      * Gets the Selection containing the <g> in front of the visual elements of the Component.

@@ -88,10 +88,10 @@ export interface IComponent<D> {
   /**
    * Renders the Component to a given D
    *
-   * @param {D} element The object to render to
+   * @param {D} container The object to render to
    * @returns {IComponent} The calling Component.
    */
-  renderTo(element: D): this;
+  renderTo(container: D): this;
   /**
    * Gets the x alignment of the Component.
    */
@@ -206,11 +206,11 @@ export interface IComponent<D> {
    */
   origin(): Point;
   /**
-   * Gets the origin of the Component relative to the root <svg>.
+   * Gets the origin of the Component relative to the root
    *
    * @return {Point}
    */
-  originToSVG(): Point;
+  originToRoot(): Point;
   /**
    * Gets the container holding the visual elements of the Component.
    *
@@ -809,12 +809,7 @@ export class Component implements IComponent<d3.Selection<void>> {
     };
   }
 
-  /**
-   * Gets the origin of the Component relative to the root <svg>.
-   *
-   * @return {Point}
-   */
-  public originToSVG(): Point {
+  public originToRoot() {
     let origin = this.origin();
     let ancestor = this.parent();
     while (ancestor != null) {
@@ -824,6 +819,16 @@ export class Component implements IComponent<d3.Selection<void>> {
       ancestor = ancestor.parent();
     }
     return origin;
+  }
+
+  /**
+   * Gets the origin of the Component relative to the root <svg>.
+   *
+   * @deprecated Use originToRoot instead
+   * @return {Point}
+   */
+  public originToSVG() {
+    return this.originToRoot();
   }
 
   /**
