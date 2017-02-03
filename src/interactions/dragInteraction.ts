@@ -1,3 +1,8 @@
+/*
+Copyright 2014-present Palantir Technologies
+Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
+*/
+
 import { Component } from "../components/component";
 import { Point } from "../core/interfaces";
 import * as Dispatchers from "../dispatchers";

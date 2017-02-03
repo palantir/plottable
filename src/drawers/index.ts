@@ -1,3 +1,8 @@
+/*
+Copyright 2014-present Palantir Technologies
+Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
+*/
+
 import { Animator } from "../animators/animator";
 import { AttributeToProjector, AttributeToAppliedProjector } from "../core/interfaces";
 

@@ -1,3 +1,8 @@
+/*
+Copyright 2014-present Palantir Technologies
+Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
+*/
+
 import { GuideLineLayer } from "../components/guideLineLayer";
 import { Point } from "../core/interfaces";
 import * as Interactions from "../interactions";

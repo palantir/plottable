@@ -1,3 +1,8 @@
+/*
+Copyright 2014-present Palantir Technologies
+Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
+*/
+
 /**
  * Shim for ES6 set.
  * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Set

@@ -1,3 +1,8 @@
+/*
+Copyright 2014-present Palantir Technologies
+Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
+*/
+
 import { Dataset } from "../core/dataset";
 import { Point, Entity, Accessor } from "../core/interfaces";
 import { Drawer } from "../drawers/drawer";
