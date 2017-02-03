@@ -4,7 +4,7 @@ import { Point, SpaceRequest, Bounds } from "../core/interfaces";
 import * as RenderController from "../core/renderController";
 import * as Utils from "../utils";
 
-import { ComponentContainer } from "./componentContainer";
+import { ComponentContainer, IComponentContainer } from "./componentContainer";
 
 export type GenericComponentCallback<D> = (component: IComponent<D>) => void;
 
@@ -172,15 +172,15 @@ export interface IComponent<D> {
   /**
    * Gets the parent ComponentContainer for this Component.
    */
-  parent(): ComponentContainer;
+  parent(): IComponentContainer<any>;
   /**
    * Sets the parent ComponentContainer for this Component.
    * An error will be thrown if the parent does not contain this Component.
    * Adding a Component to a ComponentContainer should be done
    * using the appropriate method on the ComponentContainer.
    */
-  parent(parent: ComponentContainer): this;
-  parent(parent?: ComponentContainer): any;
+  parent(parent: IComponentContainer<any>): this;
+  parent(parent?: IComponentContainer<any>): any;
   /**
    * @returns {Bounds} for the component in pixel space, where the topLeft
    * represents the component's minimum x and y values and the bottomRight represents
