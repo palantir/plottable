@@ -5,4 +5,4 @@
 !plottable.js
 !plottable.css
 !plottable.min.js
-!build/**/*
+!build/src/**/*
