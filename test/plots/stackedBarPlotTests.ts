@@ -98,6 +98,50 @@ describe("Plots", () => {
         assert.deepEqual(["3", "3"], text);
       });
 
+      it("shows stacked bar labels for date axes", () => {
+        // remove existing stacked bar plot
+        stackedBarPlot.destroy();
+
+        const dateString1 = "2013-09-02T00:00:00.000Z";
+        const dateString2 = "2013-09-03T00:00:00.000Z";
+
+        let data1 = [
+          { x: new Date(dateString1) , y: 1 },
+          { x: new Date(dateString2), y: 2 },
+        ];
+
+        let data2 = [
+          { x: new Date(dateString1) , y: 2 },
+          { x: new Date(dateString2), y: 1 },
+        ];
+
+        let dataset1 = new Plottable.Dataset(data1);
+        let dataset2 = new Plottable.Dataset(data2);
+
+        let stackedBar = new Plottable.Plots.StackedBar<Date, number>();
+
+        stackedBar.addDataset(dataset1);
+        stackedBar.addDataset(dataset2);
+
+        const xScale = new Plottable.Scales.Time();
+
+        stackedBar.x((d) => d.x, xScale);
+        stackedBar.y((d) => d.y, yScale);
+        stackedBar.renderTo(svg);
+
+        stackedBar.labelsEnabled(true);
+        yScale.domain([0, 30]);
+        const stackedBarLabels = stackedBar.content().selectAll(".stacked-bar-label");
+        assert.strictEqual(stackedBarLabels.size(), 2);
+        const text: string[] = [];
+        stackedBarLabels.each(function (d) {
+          text.push(d3.select(this).text());
+        });
+        assert.deepEqual(["3", "3"], text);
+
+        stackedBar.destroy();
+      });
+
       it("doesn't show stacked bar labels when columns are too tall", () => {
         stackedBarPlot.labelsEnabled(true);
         yScale.domain([0, 3]);
