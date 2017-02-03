@@ -1,4 +1,6 @@
-namespace Plottable {
+import * as d3 from "d3";
+
+import { AttributeToAppliedProjector } from "../core/interfaces";
 
 export interface Animator {
   /**
@@ -22,4 +24,3 @@ export interface Animator {
   totalTime(numberOfIterations: number): number;
 }
 
-}

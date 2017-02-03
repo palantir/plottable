@@ -1,4 +1,12 @@
-///<reference path="../testReference.ts" />
+import * as d3 from "d3";
+
+import { assert } from "chai";
+
+import * as Plottable from "../../src";
+
+import * as Mocks from "../mocks";
+import * as TestMethods from "../testMethods";
+
 
 describe("Tables", () => {
   function assertTableRows(table: Plottable.Components.Table, expectedRows: Plottable.Component[][], message: string) {

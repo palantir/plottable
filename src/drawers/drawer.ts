@@ -1,24 +1,10 @@
-namespace Plottable {
-export namespace Drawers {
-  /**
-   * A step for the drawer to draw.
-   *
-   * Specifies how AttributeToProjector needs to be animated.
-   */
-  export type DrawStep = {
-    attrToProjector: AttributeToProjector;
-    animator: Animator;
-  };
+import * as d3 from "d3";
+import * as Utils from "../utils";
 
-  /**
-   * A DrawStep that carries an AttributeToAppliedProjector map.
-   */
-  export type AppliedDrawStep = {
-    attrToAppliedProjector: AttributeToAppliedProjector;
-    animator: Animator;
-  };
+import { Dataset } from "../core/dataset";
+import { AttributeToProjector, AttributeToAppliedProjector } from "../core/interfaces";
 
-}
+import * as Drawers from "./";
 
 export class Drawer {
   private _renderArea: d3.Selection<void>;
@@ -181,5 +167,4 @@ export class Drawer {
     return d3.select(this.selection()[0][index]);
   }
 
-}
 }

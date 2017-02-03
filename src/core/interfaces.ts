@@ -1,4 +1,8 @@
-namespace Plottable {
+import * as d3 from "d3";
+
+import { Dataset } from "./dataset";
+import { Component } from "../components/component";
+
 /**
  * Accesses a specific datum property.
  */
@@ -71,5 +75,4 @@ export interface Entity<C extends Component> {
   position: Point;
   selection: d3.Selection<any>;
   component: C;
-}
 }

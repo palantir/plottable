@@ -1,4 +1,12 @@
-namespace Plottable {
+import { Accessor, Point } from "../core/interfaces";
+import { Dataset } from "../core/dataset";
+import * as Scales from "../scales";
+import { Scale, ScaleCallback } from "../scales/scale";
+import * as Utils from "../utils";
+
+import { TransformableAccessorScaleBinding, LightweightPlotEntity, PlotEntity } from "./commons";
+import { Plot } from "./plot";
+
 export class XYPlot<X, Y> extends Plot {
   protected static _X_KEY = "x";
   protected static _Y_KEY = "y";
@@ -90,7 +98,7 @@ export class XYPlot<X, Y> extends Plot {
     };
   }
 
-  public entityNearest(queryPoint: Point): Plots.PlotEntity {
+  public entityNearest(queryPoint: Point): PlotEntity {
     // by default, the entity index stores position information in the data space
     // the default impelentation of the entityNearest must convert the chart bounding
     // box as well as the query point to the data space before it can make a comparison
@@ -135,7 +143,7 @@ export class XYPlot<X, Y> extends Plot {
   /**
    * Gets the TransformableAccessorScaleBinding for X.
    */
-  public x(): Plots.TransformableAccessorScaleBinding<X, number>;
+  public x(): TransformableAccessorScaleBinding<X, number>;
   /**
    * Sets X to a constant number or the result of an Accessor<number>.
    *
@@ -174,7 +182,7 @@ export class XYPlot<X, Y> extends Plot {
   /**
    * Gets the AccessorScaleBinding for Y.
    */
-  public y(): Plots.TransformableAccessorScaleBinding<Y, number>;
+  public y(): TransformableAccessorScaleBinding<Y, number>;
   /**
    * Sets Y to a constant number or the result of an Accessor<number>.
    *
@@ -241,14 +249,14 @@ export class XYPlot<X, Y> extends Plot {
   protected _uninstallScaleForKey(scale: Scale<any, any>, key: string) {
     super._uninstallScaleForKey(scale, key);
     let adjustCallback = key === XYPlot._X_KEY ? this._adjustYDomainOnChangeFromXCallback
-                                               : this._adjustXDomainOnChangeFromYCallback;
+      : this._adjustXDomainOnChangeFromYCallback;
     scale.offUpdate(adjustCallback);
   }
 
   protected _installScaleForKey(scale: Scale<any, any>, key: string) {
     super._installScaleForKey(scale, key);
     let adjustCallback = key === XYPlot._X_KEY ? this._adjustYDomainOnChangeFromXCallback
-                                               : this._adjustXDomainOnChangeFromYCallback;
+      : this._adjustXDomainOnChangeFromYCallback;
     scale.onUpdate(adjustCallback);
   }
 
@@ -357,20 +365,24 @@ export class XYPlot<X, Y> extends Plot {
   }
 
   private _adjustYDomainOnChangeFromX() {
-    if (!this._projectorsReady()) { return; }
+    if (!this._projectorsReady()) {
+      return;
+    }
     if (this._autoAdjustYScaleDomain) {
       this._updateYExtentsAndAutodomain();
     }
   }
 
   private _adjustXDomainOnChangeFromY() {
-    if (!this._projectorsReady()) { return; }
+    if (!this._projectorsReady()) {
+      return;
+    }
     if (this._autoAdjustXScaleDomain) {
       this._updateXExtentsAndAutodomain();
     }
   }
 
-  protected _buildLightweightPlotEntities(datasets?: Dataset[]) {
+  protected _buildLightweightPlotEntities(datasets?: Dataset[]): LightweightPlotEntity[] {
     return super._buildLightweightPlotEntities(datasets).map((lightweightPlotEntity) => {
       lightweightPlotEntity.position = this._invertPixelPoint(lightweightPlotEntity.position);
       return lightweightPlotEntity;
@@ -381,9 +393,9 @@ export class XYPlot<X, Y> extends Plot {
     let xBinding = this.x();
     let yBinding = this.y();
     return xBinding != null &&
-        xBinding.accessor != null &&
-        yBinding != null &&
-        yBinding.accessor != null;
+      xBinding.accessor != null &&
+      yBinding != null &&
+      yBinding.accessor != null;
   }
 
   /**
@@ -431,14 +443,14 @@ export class XYPlot<X, Y> extends Plot {
     return { x: xProjector(datum, index, dataset), y: yProjector(datum, index, dataset) };
   }
 
-  protected _getDataToDraw() {
+  protected _getDataToDraw(): Utils.Map<Dataset, any[]> {
     let dataToDraw: Utils.Map<Dataset, any[]> = super._getDataToDraw();
 
     let definedFunction = (d: any, i: number, dataset: Dataset) => {
       let positionX = Plot._scaledAccessor(this.x())(d, i, dataset);
       let positionY = Plot._scaledAccessor(this.y())(d, i, dataset);
       return Utils.Math.isValidNumber(positionX) &&
-             Utils.Math.isValidNumber(positionY);
+        Utils.Math.isValidNumber(positionY);
     };
 
     this.datasets().forEach((dataset) => {
@@ -446,5 +458,4 @@ export class XYPlot<X, Y> extends Plot {
     });
     return dataToDraw;
   }
-}
 }

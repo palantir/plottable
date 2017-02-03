@@ -1,34 +1,42 @@
-namespace Plottable.Components {
-  export class PlotGroup extends Group {
-    public entityNearest(point: Point): Plots.PlotEntity {
-      let closestPlotEntity: Plots.PlotEntity;
-      let minDistSquared = Infinity;
-      this.components().forEach((plot: Plot) => {
-        let candidatePlotEntity = plot.entityNearest(point);
-        if (candidatePlotEntity == null) {
-          return;
-        }
+import { Point } from "../core/interfaces";
+import * as Plots from "../plots";
+import { Plot } from "../plots/plot";
+import * as Utils from "../utils";
 
-        const distSquared = Utils.Math.distanceSquared(candidatePlotEntity.position, point);
-        if (distSquared <= minDistSquared) {
-          minDistSquared = distSquared;
-          closestPlotEntity = candidatePlotEntity;
-        }
-      });
+import { Component } from "./component";
+import { Group } from "./group";
 
-      return closestPlotEntity;
-    }
-
-    /**
-     * Adds a Plot to this Plot Group.
-     * The added Plot will be rendered above Plots already in the Group.
-     */
-    public append(plot: Plot): this {
-      if (plot != null && !(plot instanceof Plot)) {
-        throw new Error("Plot Group only accepts plots");
+export class PlotGroup extends Group {
+  public entityNearest(point: Point): Plots.PlotEntity {
+    let closestPlotEntity: Plots.PlotEntity;
+    let minDistSquared = Infinity;
+    this.components().forEach((plotComponent: Component) => {
+      // we know it's a Plot since .append() throws a runtime error otherwise
+      const plot: Plot = <Plot> <any> plotComponent;
+      let candidatePlotEntity = plot.entityNearest(point);
+      if (candidatePlotEntity == null) {
+        return;
       }
-      super.append(plot);
-      return this;
+
+      const distSquared = Utils.Math.distanceSquared(candidatePlotEntity.position, point);
+      if (distSquared <= minDistSquared) {
+        minDistSquared = distSquared;
+        closestPlotEntity = candidatePlotEntity;
+      }
+    });
+
+    return closestPlotEntity;
+  }
+
+  /**
+   * Adds a Plot to this Plot Group.
+   * The added Plot will be rendered above Plots already in the Group.
+   */
+  public append(plot: Component): this {
+    if (plot != null && !(plot instanceof Plot)) {
+      throw new Error("Plot Group only accepts plots");
     }
+    super.append(plot);
+    return this;
   }
 }

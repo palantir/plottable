@@ -1,4 +1,6 @@
-namespace Plottable {
+import { Component } from "../components/component";
+import { Point } from "../core/interfaces";
+
 export class Interaction {
   protected _componentAttachedTo: Component;
 
@@ -103,8 +105,7 @@ export class Interaction {
    */
   protected _isInsideComponent(p: Point) {
     return 0 <= p.x && 0 <= p.y
-           && p.x <= this._componentAttachedTo.width()
-           && p.y <= this._componentAttachedTo.height();
+      && p.x <= this._componentAttachedTo.width()
+      && p.y <= this._componentAttachedTo.height();
   }
-}
 }

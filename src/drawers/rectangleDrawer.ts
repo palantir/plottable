@@ -1,10 +1,12 @@
-namespace Plottable.Drawers {
-  export class Rectangle extends Drawer {
+import { Dataset } from "../core/dataset";
 
-    constructor(dataset: Dataset) {
-      super(dataset);
-      this._svgElementName = "rect";
-    }
+import { Drawer } from "./drawer";
 
+export class Rectangle extends Drawer {
+
+  constructor(dataset: Dataset) {
+    super(dataset);
+    this._svgElementName = "rect";
   }
+
 }

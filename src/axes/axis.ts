@@ -1,4 +1,14 @@
-namespace Plottable {
+
+import * as d3 from "d3";
+import * as SVGTypewriter from "svg-typewriter";
+
+import { Component } from "../components/component";
+import { Scale, ScaleCallback } from "../scales/scale";
+import { Formatter } from "../core/formatters";
+import * as Formatters from "../core/formatters";
+import { SpaceRequest, Point } from "../core/interfaces";
+import * as Utils from "../utils";
+
 export type AxisOrientation =  "bottom" | "left" | "right" | "top";
 
 export class Axis<D> extends Component {
@@ -62,7 +72,9 @@ export class Axis<D> extends Component {
    */
   constructor(scale: Scale<D, number>, orientation: AxisOrientation) {
     super();
-    if (scale == null || orientation == null) { throw new Error("Axis requires a scale and orientation"); }
+    if (scale == null || orientation == null) {
+      throw new Error("Axis requires a scale and orientation");
+    }
     this._scale = scale;
     this.orientation(orientation);
     this._setDefaultAlignment();
@@ -147,12 +159,12 @@ export class Axis<D> extends Component {
   protected _setup() {
     super._setup();
     this._tickMarkContainer = this.content().append("g")
-                                          .classed(Axis.TICK_MARK_CLASS + "-container", true);
+      .classed(Axis.TICK_MARK_CLASS + "-container", true);
     this._tickLabelContainer = this.content().append("g")
-                                           .classed(Axis.TICK_LABEL_CLASS + "-container", true);
+      .classed(Axis.TICK_LABEL_CLASS + "-container", true);
     this._baseline = this.content().append("line").classed("baseline", true);
     this._annotationContainer = this.content().append("g")
-                                              .classed("annotation-container", true);
+      .classed("annotation-container", true);
     this._annotationContainer.append("g").classed("annotation-line-container", true);
     this._annotationContainer.append("g").classed("annotation-circle-container", true);
     this._annotationContainer.append("g").classed("annotation-rect-container", true);
@@ -179,9 +191,9 @@ export class Axis<D> extends Component {
     tickMarks.enter().append("line").classed(Axis.TICK_MARK_CLASS, true);
     tickMarks.attr(this._generateTickMarkAttrHash());
     d3.select(tickMarks[0][0]).classed(Axis.END_TICK_MARK_CLASS, true)
-                              .attr(this._generateTickMarkAttrHash(true));
+      .attr(this._generateTickMarkAttrHash(true));
     d3.select(tickMarks[0][tickMarkValues.length - 1]).classed(Axis.END_TICK_MARK_CLASS, true)
-                                                    .attr(this._generateTickMarkAttrHash(true));
+      .attr(this._generateTickMarkAttrHash(true));
     tickMarks.exit().remove();
     this._baseline.attr(this._generateBaselineAttrHash());
     if (this.annotationsEnabled()) {
@@ -277,7 +289,10 @@ export class Axis<D> extends Component {
     let annotatedTicks = this._annotatedTicksToRender();
     annotatedTicks.forEach((annotatedTick) => {
       let measurement = this._annotationMeasurer.measure(this.annotationFormatter()(annotatedTick));
-      let paddedMeasurement = { width: measurement.width + 2 * labelPadding, height: measurement.height + 2 * labelPadding };
+      let paddedMeasurement = {
+        width: measurement.width + 2 * labelPadding,
+        height: measurement.height + 2 * labelPadding
+      };
       measurements.set(annotatedTick, paddedMeasurement);
     });
 
@@ -369,13 +384,13 @@ export class Axis<D> extends Component {
     let annotationLabels = bindElements(this._annotationContainer.select(".annotation-label-container"), "g", Axis.ANNOTATION_LABEL_CLASS);
     annotationLabels.selectAll(".text-container").remove();
     annotationLabels.attr({
-        transform: (d) => {
-          let xTranslate = isHorizontal ? positionF(d) : rectangleOffsetF(d);
-          let yTranslate = isHorizontal ? rectangleOffsetF(d) : positionF(d);
-          return `translate(${xTranslate},${yTranslate})`;
-        },
-        visibility: visibilityF,
-      })
+      transform: (d) => {
+        let xTranslate = isHorizontal ? positionF(d) : rectangleOffsetF(d);
+        let yTranslate = isHorizontal ? rectangleOffsetF(d) : positionF(d);
+        return `translate(${xTranslate},${yTranslate})`;
+      },
+      visibility: visibilityF,
+    })
       .each(function (annotationLabel) {
         let writeOptions = {
           selection: d3.select(this),
@@ -384,9 +399,9 @@ export class Axis<D> extends Component {
           textRotation: isHorizontal ? 0 : 90,
         };
         annotationWriter.write(annotationFormatter(annotationLabel),
-                                 isHorizontal ? measurements.get(annotationLabel).width : measurements.get(annotationLabel).height,
-                                 isHorizontal ? measurements.get(annotationLabel).height : measurements.get(annotationLabel).width,
-                                 writeOptions);
+          isHorizontal ? measurements.get(annotationLabel).width : measurements.get(annotationLabel).height,
+          isHorizontal ? measurements.get(annotationLabel).height : measurements.get(annotationLabel).width,
+          writeOptions);
       });
   }
 
@@ -715,9 +730,9 @@ export class Axis<D> extends Component {
       // ensure backwards compatibility for older versions that supply orientation in different cases
       let newOrientationLC = orientation.toLowerCase() as AxisOrientation;
       if (newOrientationLC !== "top" &&
-          newOrientationLC !== "bottom" &&
-          newOrientationLC !== "left" &&
-          newOrientationLC !== "right") {
+        newOrientationLC !== "bottom" &&
+        newOrientationLC !== "left" &&
+        newOrientationLC !== "right") {
         throw new Error("unsupported orientation");
       }
       this._orientation = newOrientationLC;
@@ -748,14 +763,14 @@ export class Axis<D> extends Component {
 
   protected _showAllTickMarks() {
     this._tickMarkContainer.selectAll("." + Axis.TICK_MARK_CLASS)
-      .each(function() {
+      .each(function () {
         d3.select(this).style("visibility", "inherit");
       });
   }
 
   protected _showAllTickLabels() {
     this._tickLabelContainer.selectAll("." + Axis.TICK_LABEL_CLASS)
-      .each(function() {
+      .each(function () {
         d3.select(this).style("visibility", "inherit");
       });
   }
@@ -770,7 +785,7 @@ export class Axis<D> extends Component {
     if (tickLabels.empty()) {
       return;
     }
-    tickLabels.each(function(d: any, i: number) {
+    tickLabels.each(function (d: any, i: number) {
       if (!Utils.DOM.clientRectInside(this.getBoundingClientRect(), boundingBox)) {
         d3.select(this).style("visibility", "hidden");
       }
@@ -784,7 +799,7 @@ export class Axis<D> extends Component {
     let visibleTickMarks = this._tickMarkContainer.selectAll("." + Axis.TICK_MARK_CLASS);
     let visibleTickLabels = this._tickLabelContainer
       .selectAll("." + Axis.TICK_LABEL_CLASS)
-      .filter(function(d: any, i: number) {
+      .filter(function (d: any, i: number) {
         let visibility = d3.select(this).style("visibility");
         return (visibility === "inherit") || (visibility === "visible");
       });
@@ -792,13 +807,12 @@ export class Axis<D> extends Component {
     let labelNumbersShown: number[] = [];
     visibleTickLabels.each((labelNumber: number) => labelNumbersShown.push(labelNumber));
 
-    visibleTickMarks.each(function(e, i) {
+    visibleTickMarks.each(function (e, i) {
       if (labelNumbersShown.indexOf(e) === -1) {
-          d3.select(this).style("visibility", "hidden");
+        d3.select(this).style("visibility", "hidden");
       }
     });
   }
 
 
-}
 }

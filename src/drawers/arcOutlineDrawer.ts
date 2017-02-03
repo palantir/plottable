@@ -1,16 +1,19 @@
-namespace Plottable.Drawers {
+import * as d3 from "d3";
 
-  export class ArcOutline extends Drawer {
+import { Dataset } from "../core/dataset";
 
-    constructor(dataset: Dataset) {
-      super(dataset);
-      this._className = "arc outline";
-      this._svgElementName = "path";
-    }
+import { Drawer } from "./drawer";
 
-    protected _applyDefaultAttributes(selection: d3.Selection<any>) {
-      super._applyDefaultAttributes(selection);
-      selection.style("fill", "none");
-    }
+export class ArcOutline extends Drawer {
+
+  constructor(dataset: Dataset) {
+    super(dataset);
+    this._className = "arc outline";
+    this._svgElementName = "path";
+  }
+
+  protected _applyDefaultAttributes(selection: d3.Selection<any>) {
+    super._applyDefaultAttributes(selection);
+    selection.style("fill", "none");
   }
 }

@@ -1,16 +1,12 @@
-namespace Plottable {
+import * as d3 from "d3";
+
+import { Point, SpaceRequest, Bounds } from "../core/interfaces";
+import * as RenderController from "../core/renderController";
+import * as Utils from "../utils";
+
+import { ComponentContainer } from "./componentContainer";
 
 export type ComponentCallback = (component: Component) => void;
-
-export namespace Components {
-  export class Alignment {
-    static TOP = "top";
-    static BOTTOM = "bottom";
-    static LEFT = "left";
-    static RIGHT = "right";
-    static CENTER = "center";
-  }
-}
 
 export type IResizeHandler = (size: { height: number, width: number }) => void;
 
@@ -151,7 +147,8 @@ export class Component {
 
     if (this._clipPathEnabled) {
       this._generateClipPath();
-    };
+    }
+    ;
 
     this._boundingBox = this._addBox("bounding-box");
 
@@ -222,7 +219,7 @@ export class Component {
     this._boxes.forEach((b: d3.Selection<void>) => b.attr("width", this.width()).attr("height", this.height()));
 
     if (this._resizeHandler != null) {
-        this._resizeHandler(size);
+      this._resizeHandler(size);
     }
 
     return this;
@@ -231,7 +228,7 @@ export class Component {
   protected _sizeFromOffer(availableWidth: number, availableHeight: number) {
     let requestedSpace = this.requestedSpace(availableWidth, availableHeight);
     return {
-      width: this.fixedWidth() ? Math.min(availableWidth , requestedSpace.minWidth) : availableWidth,
+      width: this.fixedWidth() ? Math.min(availableWidth, requestedSpace.minWidth) : availableWidth,
       height: this.fixedHeight() ? Math.min(availableHeight, requestedSpace.minHeight) : availableHeight,
     };
   }
@@ -383,7 +380,9 @@ export class Component {
     }
     parentElement = parentElement == null ? this._boxContainer : parentElement;
     let box = parentElement.append("rect");
-    if (className != null) { box.classed(className, true); }
+    if (className != null) {
+      box.classed(className, true);
+    }
 
     this._boxes.push(box);
     if (this.width() != null && this.height() != null) {
@@ -539,7 +538,7 @@ export class Component {
   public parent(parent: ComponentContainer): this;
   public parent(parent?: ComponentContainer): any {
     if (parent === undefined) {
-     return this._parent;
+      return this._parent;
     }
     if (parent !== null && !parent.has(this)) {
       throw new Error("Passed invalid parent");
@@ -648,5 +647,4 @@ export class Component {
   public background(): d3.Selection<void> {
     return this._backgroundContainer;
   }
-}
 }

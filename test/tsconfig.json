@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "declaration": true,
+    "forceConsistentCasingInFileNames": true,
+    "module": "commonjs",
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitReturns": true,
+    "outDir": "../build",
+    "noImplicitAny": true,
+    "removeComments": false,
+    "sourceMap": false,
+    "target": "es5"
+  }
+}

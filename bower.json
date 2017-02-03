@@ -16,7 +16,8 @@
     "!plottable.js",
     "!plottable.css",
     "!plottable.min.js",
-    "!plottable.d.ts"
+    "!plottable.d.ts",
+    "!build"
   ],
   "keywords": [
     "plottable",

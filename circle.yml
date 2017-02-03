@@ -4,7 +4,6 @@ general:
     - plottable.js
     - plottable.css
     # Demo paths
-    - demo
     - quicktests
     # Modules used by quicktests
     - node_modules/d3

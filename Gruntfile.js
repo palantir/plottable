@@ -3,26 +3,26 @@
 module.exports = function(grunt) {
   "use strict";
 
+  var execConfig = {
+    npm: {
+      cmd: function (npmCommandName) {
+        return "npm run " + npmCommandName;
+      }
+    }
+  };
+
   var tsConfig = {
-    dev: {
-      tsconfig: true
-    },
-    test: {
-      src: ["test/**/*.ts"],
-      out: "test/tests.js",
+    verifyDefinitionFile: {
+      src: [
+        "plottable.d.ts",
+      ],
       options: {
-        target: "es5",
-        sourceMap: false,
-        noImplicitAny: true,
-        declaration: false,
-        removeComments: false
+        compiler: "./node_modules/typescript/bin/tsc"
       }
     },
-    verifyDefinitionFiles: {
+    verifyNpmDefinitionFile: {
       src: [
-        "typings/d3/d3.d.ts",
-        "plottable.d.ts",
-        "node_modules/svg-typewriter/build/src/index.d.ts"
+        "plottable-npm.d.ts",
       ],
       options: {
         compiler: "./node_modules/typescript/bin/tsc"
@@ -71,20 +71,12 @@ module.exports = function(grunt) {
 
   var concatConfig = {
     header: {
-      src: ["license_header.txt", "plottable.js", "node_modules/svg-typewriter/svg-typewriter.js"],
+      src: ["license_header.txt", "plottable.js"],
       dest: "plottable.js"
     },
     headerNpm: {
       src: ["license_header.txt", "plottable-npm.js"],
       dest: "plottable-npm.js"
-    },
-    typings: {
-      src: ["plottable.d.ts"],
-      dest: "plottable-npm.d.ts",
-      options: {
-        banner: 'import * as d3 from "d3";\n',
-        footer: "\nexport = Plottable;\n",
-      }
     }
   };
 
@@ -124,11 +116,11 @@ module.exports = function(grunt) {
     },
     rebuild: {
       tasks: ["src-compile"],
-      files: ["src/**/*.ts"]
+      files: ["src/**/*.ts", "webpack.config.plottable.js"]
     },
     tests: {
       tasks: ["test-compile"],
-      files: ["test/**/*.ts"]
+      files: ["test/**/*.ts", "webpack.config.test.js"]
     },
     quicktests: {
       tasks: ["update-quicktests"],
@@ -139,7 +131,8 @@ module.exports = function(grunt) {
   var blanketMochaConfig = {
     all: ["test/coverage.html"],
     options: {
-      threshold: 70
+      // disable coverage for the time being since we intend to replace grunt-blanket-mocha
+      threshold: 0
     }
   };
 
@@ -152,10 +145,6 @@ module.exports = function(grunt) {
         livereload: true
       }
     }
-  };
-
-  var cleanConfig = {
-    tscommand: ["tscommand*.tmp.txt"]
   };
 
   var FILES_TO_COMMIT = [
@@ -194,12 +183,15 @@ module.exports = function(grunt) {
         archive: "plottable.zip"
       },
       files: [
-        {src: "plottable.js",     dest: "."},
-        {src: "plottable.min.js", dest: "."},
-        {src: "plottable.d.ts",   dest: "."},
-        {src: "plottable.css",    dest: "."},
-        {src: "README.md",        dest: "."},
-        {src: "LICENSE",          dest: "."}
+        {src: "plottable.js",       dest: "."},
+        {src: "plottable.min.js",   dest: "."},
+        {src: "plottable.d.ts",     dest: "."},
+        {src: "plottable-npm.js",   dest: "."},
+        {src: "plottable-npm.d.ts", dest: "."},
+        {src: "plottable.css",      dest: "."},
+        {src: "README.md",          dest: "."},
+        {src: "LICENSE",            dest: "."},
+        {src: ["build/**"],         dest: "."}
       ]
     }
   };
@@ -230,8 +222,8 @@ module.exports = function(grunt) {
           platform: "WIN7"
         }, {
           browserName: "safari",
-          platform: "OS X 10.10",
-          version: "8.0",
+          platform: "OS X 10.11",
+          version: "10.0",
         }]
       }
     }
@@ -246,11 +238,11 @@ module.exports = function(grunt) {
     tslint: tslintConfig,
     jscs: jscsConfig,
     eslint: eslintConfig,
+    exec: execConfig,
     parallelize: parallelizeConfig,
     watch: watchConfig,
     "blanket_mocha": blanketMochaConfig,
     connect: connectConfig,
-    clean: cleanConfig,
     sed: sedConfig,
     gitcommit: gitcommitConfig,
     compress: compressConfig,
@@ -261,22 +253,21 @@ module.exports = function(grunt) {
   // Loads the tasks specified in package.json
   require("load-grunt-tasks")(grunt);
 
-  grunt.registerTask("test-compile", ["ts:test"]);
-  grunt.registerTask("src-compile", ["ts:dev", "generateJS"]);
+  grunt.registerTask("test-compile", ["exec:npm:build-test"]);
+  grunt.registerTask("src-compile", ["exec:npm:build-src", "generateJS"]);
 
   grunt.registerTask("dev-compile", [
     "src-compile",
     "test-compile",
-    "clean:tscommand",
     "update-quicktests"
   ]);
 
   grunt.registerTask("generateJS", [
-    "umd:npm",
-    "concat:headerNpm",
-    "umd:all",
+    // adds license_header.txt to plottable.js
     "concat:header",
-    "concat:typings",
+    // adds license_header.txt to plottable-npm.js
+    "concat:headerNpm",
+    // replaces plottable.js' @VERSION with package.json's version
     "sed:versionNumber"
   ]);
 
@@ -290,7 +281,7 @@ module.exports = function(grunt) {
   grunt.registerTask("default", ["connect", "dev-compile", "watch-silent"]);
 
   grunt.registerTask("test", ["dev-compile", "test-local"]);
-  grunt.registerTask("test-local", ["blanket_mocha", "ts:verifyDefinitionFiles", "lint"]);
+  grunt.registerTask("test-local", ["blanket_mocha", "ts:verifyDefinitionFile", "ts:verifyNpmDefinitionFile", "lint"]);
   grunt.registerTask("test-sauce", ["connect", "saucelabs-mocha"]);
 
   grunt.registerTask("watch-silent", function() {

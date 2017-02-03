@@ -1,19 +1,23 @@
-namespace Plottable.Drawers {
-  export class Area extends Drawer {
+import * as d3 from "d3";
 
-    constructor(dataset: Dataset) {
-      super(dataset);
-      this._className = "area";
-      this._svgElementName = "path";
-    }
+import { Dataset } from "../core/dataset";
 
-    protected _applyDefaultAttributes(selection: d3.Selection<any>) {
-      super._applyDefaultAttributes(selection);
-      selection.style("stroke", "none");
-    }
+import { Drawer } from "./drawer";
 
-    public selectionForIndex(index: number): d3.Selection<any> {
-      return d3.select(this.selection()[0][0]);
-    }
+export class Area extends Drawer {
+
+  constructor(dataset: Dataset) {
+    super(dataset);
+    this._className = "area";
+    this._svgElementName = "path";
+  }
+
+  protected _applyDefaultAttributes(selection: d3.Selection<any>) {
+    super._applyDefaultAttributes(selection);
+    selection.style("stroke", "none");
+  }
+
+  public selectionForIndex(index: number): d3.Selection<any> {
+    return d3.select(this.selection()[0][0]);
   }
 }
