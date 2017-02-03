@@ -623,6 +623,9 @@ declare namespace Plottable {
         selection: d3.Selection<any>;
         component: C;
     }
+    type Numeric = number | {
+        valueOf(): number;
+    };
 }
 declare namespace Plottable {
     type Formatter = (d: any) => string;
@@ -5724,5 +5727,27 @@ declare namespace Plottable.Components {
          */
         offDragEnd(callback: DragLineCallback<D>): this;
         destroy(): void;
+    }
+}
+declare module Plottable {
+    module Components {
+        class DragZoomLayer extends Components.SelectionBoxLayer {
+            private _dragInteraction;
+            private _doubleClickInteraction;
+            private xDomainToRestore;
+            private yDomainToRestore;
+            private isZoomed;
+            private easeFn;
+            private _animationTime;
+            constructor(xScale: QuantitativeScale<Numeric>, yScale: QuantitativeScale<Numeric>);
+            private setupCallbacks();
+            animationTime(): number;
+            animationTime(animationTime: number): DragZoomLayer;
+            ease(fn: (t: number) => number): DragZoomLayer;
+            private zoom();
+            private unzoom();
+            private isZooming(isZooming);
+            private interpolateZoom(x0f, x1f, y0f, y1f);
+        }
     }
 }
