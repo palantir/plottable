@@ -1,5 +1,5 @@
 /*!
-Plottable 2.8.0 (https://github.com/palantir/plottable)
+Plottable 2.9.0 (https://github.com/palantir/plottable)
 Copyright 2014-2017 Palantir Technologies
 Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
 */
@@ -982,7 +982,7 @@ var Plottable;
 })(Plottable || (Plottable = {}));
 var Plottable;
 (function (Plottable) {
-    Plottable.version = "2.8.0";
+    Plottable.version = "2.9.0";
 })(Plottable || (Plottable = {}));
 var Plottable;
 (function (Plottable) {
