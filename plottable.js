@@ -1297,6 +1297,15 @@ var Plottable;
         }
         Formatters.identity = identity;
         /**
+         * Creates a formatter for generating chart labels.
+         *
+         * @returns {LabelFormatter} A formatter for generating chart labels.
+         */
+        function labelFormatter() {
+            return function (d, datum, index, dataset) { return String(d); };
+        }
+        Formatters.labelFormatter = labelFormatter;
+        /**
          * Creates a formatter for percentage values.
          * Multiplies the input by 100 and appends "%".
          *
@@ -7765,7 +7774,7 @@ var Plottable;
                 _super.call(this);
                 this._startAngle = 0;
                 this._endAngle = 2 * Math.PI;
-                this._labelFormatter = Plottable.Formatters.identity();
+                this._labelFormatter = Plottable.Formatters.labelFormatter();
                 this._labelsEnabled = false;
                 this.innerRadius(0);
                 this.outerRadius(function () {
@@ -8179,7 +8188,7 @@ var Plottable;
                     if (!Plottable.Utils.Math.isValidNumber(value)) {
                         return;
                     }
-                    value = _this._labelFormatter(value);
+                    value = _this._labelFormatter(value, datum, datumIndex, dataset);
                     var measurement = measurer.measure(value);
                     var theta = (_this._endAngles[datumIndex] + _this._startAngles[datumIndex]) / 2;
                     var outerRadius = _this.outerRadius().accessor(datum, datumIndex, dataset);
@@ -9095,7 +9104,8 @@ var Plottable;
                 var _this = this;
                 if (orientation === void 0) { orientation = Bar.ORIENTATION_VERTICAL; }
                 _super.call(this);
-                this._labelFormatter = Plottable.Formatters.identity();
+                this._labelFormatter = Plottable.Formatters.labelFormatter();
+                this._axisLabelFormatter = Plottable.Formatters.identity();
                 this._labelsEnabled = false;
                 this._hideBarsIfAnyAreTooWide = true;
                 this._barPixelWidth = 0;
@@ -9227,6 +9237,16 @@ var Plottable;
                 }
                 else {
                     this._labelFormatter = formatter;
+                    this.render();
+                    return this;
+                }
+            };
+            Bar.prototype.axisLabelFormatter = function (formatter) {
+                if (formatter == null) {
+                    return this._axisLabelFormatter;
+                }
+                else {
+                    this._axisLabelFormatter = formatter;
                     this.render();
                     return this;
                 }
@@ -9431,7 +9451,7 @@ var Plottable;
                     var scaledBaseline = valueScale != null ? valueScale.scale(_this.baselineValue()) : _this.baselineValue();
                     var barWidth = attrToProjector["width"](d, i, dataset);
                     var barHeight = attrToProjector["height"](d, i, dataset);
-                    var text = _this._labelFormatter(valueAccessor(d, i, dataset));
+                    var text = _this._labelFormatter(valueAccessor(d, i, dataset), d, i, dataset);
                     var measurement = measurer.measure(text);
                     var xAlignment = "center";
                     var yAlignment = "center";
@@ -10625,7 +10645,7 @@ var Plottable;
                 maximumExtents.forEach(function (maximum, axisValue) {
                     if (maximum !== baselineValue) {
                         // only draw sums for values not at the baseline
-                        var text = _this.labelFormatter()(maximum);
+                        var text = _this.axisLabelFormatter()(maximum);
                         var measurement = _this._measurer.measure(text);
                         var primaryTextMeasurement = _this._isVertical ? measurement.width : measurement.height;
                         var secondaryTextMeasurement = _this._isVertical ? measurement.height : measurement.width;
@@ -10640,7 +10660,7 @@ var Plottable;
                 });
                 minimumExtents.forEach(function (minimum, axisValue) {
                     if (minimum !== baselineValue) {
-                        var text = _this.labelFormatter()(minimum);
+                        var text = _this.axisLabelFormatter()(minimum);
                         var measurement = _this._measurer.measure(text);
                         var primaryTextMeasurement = _this._isVertical ? measurement.width : measurement.height;
                         var secondaryTextMeasurement = _this._isVertical ? measurement.height : measurement.width;

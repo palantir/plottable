@@ -626,6 +626,7 @@ declare namespace Plottable {
 }
 declare namespace Plottable {
     type Formatter = (d: any) => string;
+    type LabelFormatter = (d: any, datum: any, index: number, dataset: Dataset) => string;
 }
 declare namespace Plottable.Formatters {
     /**
@@ -661,6 +662,12 @@ declare namespace Plottable.Formatters {
      * @returns {Formatter} A formatter that stringifies its input.
      */
     function identity(): (d: any) => string;
+    /**
+     * Creates a formatter for generating chart labels.
+     *
+     * @returns {LabelFormatter} A formatter for generating chart labels.
+     */
+    function labelFormatter(): (d: any, datum: any, index: number, dataset: Dataset) => string;
     /**
      * Creates a formatter for percentage values.
      * Multiplies the input by 100 and appends "%".
@@ -3423,14 +3430,14 @@ declare namespace Plottable.Plots {
         /**
          * Gets the Formatter for the labels.
          */
-        labelFormatter(): Formatter;
+        labelFormatter(): LabelFormatter;
         /**
          * Sets the Formatter for the labels.
          *
-         * @param {Formatter} formatter
+         * @param {LabelFormatter} formatter
          * @returns {Pie} The calling Pie Plot.
          */
-        labelFormatter(formatter: Formatter): this;
+        labelFormatter(formatter: LabelFormatter): this;
         entitiesAt(queryPoint: Point): PlotEntity[];
         protected _propertyProjectors(): AttributeToProjector;
         private _updatePieAngles();
@@ -3822,6 +3829,7 @@ declare namespace Plottable.Plots {
         private _baselineValue;
         protected _isVertical: boolean;
         private _labelFormatter;
+        private _axisLabelFormatter;
         private _labelsEnabled;
         private _hideBarsIfAnyAreTooWide;
         private _labelConfig;
@@ -3885,16 +3893,27 @@ declare namespace Plottable.Plots {
          */
         labelsEnabled(enabled: boolean): this;
         /**
-         * Gets the Formatter for the labels.
+         * Gets the Formatter for the chart labels.
          */
-        labelFormatter(): Formatter;
+        labelFormatter(): LabelFormatter;
         /**
-         * Sets the Formatter for the labels.
+         * Sets the Formatter for the chart labels.
+         *
+         * @param {LabelFormatter} formatter
+         * @returns {Bar} The calling Bar Plot.
+         */
+        labelFormatter(formatter: LabelFormatter): this;
+        /**
+         * Gets the Formatter for the chart axis.
+         */
+        axisLabelFormatter(): Formatter;
+        /**
+         * Sets the Formatter for the chart axis.
          *
          * @param {Formatter} formatter
          * @returns {Bar} The calling Bar Plot.
          */
-        labelFormatter(formatter: Formatter): this;
+        axisLabelFormatter(formatter: Formatter): this;
         protected _createNodesForDataset(dataset: Dataset): Drawer;
         protected _removeDatasetNodes(dataset: Dataset): void;
         /**

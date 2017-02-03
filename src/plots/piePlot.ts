@@ -8,7 +8,7 @@ namespace Plottable.Plots {
     private _endAngle: number = 2*Math.PI;
     private _startAngles: number[];
     private _endAngles: number[];
-    private _labelFormatter: Formatter = Formatters.identity();
+    private _labelFormatter: LabelFormatter = Formatters.labelFormatter();
     private _labelsEnabled = false;
     private _strokeDrawers: Utils.Map<Dataset, Drawers.ArcOutline>;
 
@@ -35,10 +35,10 @@ namespace Plottable.Plots {
 
     public computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number) {
       super.computeLayout(origin, availableWidth, availableHeight);
-      
+
       let pieCenter = this._pieCenter()
       this._renderArea.attr("transform", "translate(" + pieCenter.x + "," + pieCenter.y + ")");
-      
+
       let radiusLimit = Math.min(Math.max(this.width() - pieCenter.x, pieCenter.x), Math.max(this.height() - pieCenter.y, pieCenter.y));
 
       if (this.innerRadius().scale != null) {
@@ -281,15 +281,15 @@ namespace Plottable.Plots {
     /**
      * Gets the Formatter for the labels.
      */
-    public labelFormatter(): Formatter;
+    public labelFormatter(): LabelFormatter;
     /**
      * Sets the Formatter for the labels.
      *
-     * @param {Formatter} formatter
+     * @param {LabelFormatter} formatter
      * @returns {Pie} The calling Pie Plot.
      */
-    public labelFormatter(formatter: Formatter): this;
-    public labelFormatter(formatter?: Formatter): any {
+    public labelFormatter(formatter: LabelFormatter): this;
+    public labelFormatter(formatter?: LabelFormatter): any {
       if (formatter == null) {
         return this._labelFormatter;
       } else {
@@ -476,7 +476,7 @@ namespace Plottable.Plots {
         if (!Plottable.Utils.Math.isValidNumber(value)) {
           return;
         }
-        value = this._labelFormatter(value);
+        value = this._labelFormatter(value, datum, datumIndex, dataset);
         let measurement = measurer.measure(value);
 
         let theta = (this._endAngles[datumIndex] + this._startAngles[datumIndex]) / 2;

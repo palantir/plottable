@@ -1,7 +1,7 @@
 namespace Plottable {
 
   export type Formatter = (d: any) => string;
-
+  export type LabelFormatter = (d: any, datum: any, index: number, dataset: Dataset) => string;
 }
 
 namespace Plottable.Formatters {
@@ -78,6 +78,15 @@ namespace Plottable.Formatters {
    */
   export function identity() {
     return (d: any) => String(d);
+  }
+
+  /**
+   * Creates a formatter for generating chart labels.
+   *
+   * @returns {LabelFormatter} A formatter for generating chart labels.
+   */
+  export function labelFormatter() {
+    return (d: any, datum: any, index: number, dataset: Dataset) => String(d);
   }
 
   /**

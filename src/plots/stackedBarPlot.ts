@@ -134,7 +134,7 @@ namespace Plottable.Plots {
         if (maximum !== baselineValue) {
           // only draw sums for values not at the baseline
 
-          const text = this.labelFormatter()(maximum);
+          const text = this.axisLabelFormatter()(maximum);
           const measurement = this._measurer.measure(text);
 
           const primaryTextMeasurement = this._isVertical ? measurement.width : measurement.height;
@@ -153,7 +153,7 @@ namespace Plottable.Plots {
 
       minimumExtents.forEach((minimum, axisValue) => {
         if (minimum !== baselineValue) {
-          const text = this.labelFormatter()(minimum);
+          const text = this.axisLabelFormatter()(minimum);
           const measurement = this._measurer.measure(text);
 
           const primaryTextMeasurement = this._isVertical ? measurement.width : measurement.height;
