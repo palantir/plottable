@@ -8,13 +8,11 @@
  */
 var path = require("path");
 var webpack = require("webpack");
+var packageJson = require("./package.json");
 
 module.exports = {
   devtool: "source-map",
   entry: "./build/test/index.js",
-  module: {
-    exprContextRegExp: /^\.\//,
-  },
   output: {
     filename: "test/tests.js"
   },
@@ -29,6 +27,9 @@ module.exports = {
     // for files matching the /Tests.js$/ regex. we use .js files because webpack runs on compiled
     // .js files.
     // see https://github.com/webpack/webpack/issues/2783 for info on how this works
-    new webpack.ContextReplacementPlugin(/TestSelector/, ".", true, /Tests.js$/)
+    new webpack.ContextReplacementPlugin(/TestSelector/, ".", true, /Tests.js$/),
+    new webpack.DefinePlugin({
+      "__VERSION__": JSON.stringify(packageJson.version)
+    })
   ]
 };

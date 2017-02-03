@@ -56,14 +56,6 @@ module.exports = function(grunt) {
       livereload: true,
       spawn: false
     },
-    rebuild: {
-      tasks: ["src-compile"],
-      files: ["src/**/*.ts", "webpack.config.plottable.js"]
-    },
-    tests: {
-      tasks: ["test-compile"],
-      files: ["test/**/*.ts", "webpack.config.test.js"]
-    },
     quicktests: {
       tasks: ["update-quicktests"],
       files: ["quicktests/overlaying/tests/**/*.js"]
@@ -204,13 +196,13 @@ module.exports = function(grunt) {
   grunt.registerTask("dist-compile", ["test", "uglify", "compress"]);
 
   grunt.registerTask("commitjs", ["dist-compile", "gitcommit:built"]);
-  grunt.registerTask("default", ["connect", "dev-compile", "watch-silent"]);
+  grunt.registerTask("default", ["connect", "dev-compile", "exec:npm:watch"]);
 
   grunt.registerTask("test", ["dev-compile", "test-local"]);
   grunt.registerTask("test-local", ["blanket_mocha", "lint"]);
   grunt.registerTask("test-sauce", ["connect", "saucelabs-mocha"]);
 
-  grunt.registerTask("watch-silent", function() {
+  grunt.registerTask("watch-quicktests-silent", function() {
     // Surpresses the "Running 'foo' task" messages
     grunt.log.header = function() {};
     grunt.task.run(["watch"]);
