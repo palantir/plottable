@@ -6,6 +6,9 @@ import * as Utils from "../utils";
 
 import { ComponentContainer } from "./componentContainer";
 
+export type GenericComponentCallback<D> = (component: IComponent<D>) => void;
+
+// HACKHACK replace with GenericComponentCallback in 3.0
 export type ComponentCallback = (component: Component) => void;
 
 export type IResizeHandler = (size: { height: number, width: number }) => void;
@@ -22,18 +25,18 @@ export interface IComponent<D> {
    * Adds a callback to be called on anchoring the Component to the DOM.
    * If the Component is already anchored, the callback is called immediately.
    *
-   * @param {ComponentCallback} callback
+   * @param {GenericComponentCallback} callback
    * @return {Component}
    */
-  onAnchor(callback: ComponentCallback): this;
+  onAnchor(callback: GenericComponentCallback<D>): this;
   /**
    * Removes a callback that would be called on anchoring the Component to the DOM.
    * The callback is identified by reference equality.
    *
-   * @param {ComponentCallback} callback
+   * @param {GenericComponentCallback} callback
    * @return {Component}
    */
-  offAnchor(callback: ComponentCallback): this;
+  offAnchor(callback: GenericComponentCallback<D>): this;
   /**
    * Given available space in pixels, returns the minimum width and height this Component will need.
    *
@@ -50,13 +53,13 @@ export interface IComponent<D> {
    * @param {Point} [origin] Origin of the space offered to the Component.
    * @param {number} [availableWidth] Available width in pixels.
    * @param {number} [availableHeight] Available height in pixels.
-   * @returns {Component} The calling Component.
+   * @returns {IComponent} The calling Component.
    */
   computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number): this;
   /**
    * Queues the Component for rendering.
    *
-   * @returns {Component} The calling Component.
+   * @returns {IComponent} The calling Component.
    */
   render(): this;
   /**
@@ -69,6 +72,8 @@ export interface IComponent<D> {
   /**
    * Renders the Component without waiting for the next frame. This method is a no-op on
    * Component, Table, and Group; render them immediately with .renderTo() instead.
+   *
+   * @returns {IComponent} The calling Component.
    */
   renderImmediately(): this;
   /**
@@ -77,14 +82,14 @@ export interface IComponent<D> {
    * This function should be called when a CSS change has occured that could
    * influence the layout of the Component, such as changing the font size.
    *
-   * @returns {Component} The calling Component.
+   * @returns {IComponent} The calling Component.
    */
   redraw(): this;
   /**
-   * Renders the Component to a given <svg>.
+   * Renders the Component to a given D
    *
-   * @param {D} element A selector-string for the <svg>, or a d3 selection containing an <svg>.
-   * @returns {Component} The calling Component.
+   * @param {D} element The object to render to
+   * @returns {IComponent} The calling Component.
    */
   renderTo(element: D): this;
   /**
@@ -95,7 +100,7 @@ export interface IComponent<D> {
    * Sets the x alignment of the Component.
    *
    * @param {string} xAlignment The x alignment of the Component ("left"/"center"/"right").
-   * @returns {Component} The calling Component.
+   * @returns {IComponent} The calling Component.
    */
   xAlignment(xAlignment: string): this;
   xAlignment(xAlignment?: string): any;
@@ -107,7 +112,7 @@ export interface IComponent<D> {
    * Sets the y alignment of the Component.
    *
    * @param {string} yAlignment The y alignment of the Component ("top"/"center"/"bottom").
-   * @returns {Component} The calling Component.
+   * @returns {IComponent} The calling Component.
    */
   yAlignment(yAlignment: string): this;
   yAlignment(yAlignment?: string): any;
@@ -121,14 +126,14 @@ export interface IComponent<D> {
    * Adds a given CSS class to the Component.
    *
    * @param {string} cssClass The CSS class to add.
-   * @returns {Component} The calling Component.
+   * @returns {IComponent} The calling Component.
    */
   addClass(cssClass: string): this;
   /**
    * Removes a given CSS class from the Component.
    *
    * @param {string} cssClass The CSS class to remove.
-   * @returns {Component} The calling Component.
+   * @returns {IComponent} The calling Component.
    */
   removeClass(cssClass: string): this;
   /**
@@ -152,18 +157,18 @@ export interface IComponent<D> {
   /**
    * Adds a callback to be called when the Component is detach()-ed.
    *
-   * @param {ComponentCallback} callback
-   * @return {Component} The calling Component.
+   * @param {GenericComponentCallback} callback
+   * @return {IComponent} The calling Component.
    */
-  onDetach(callback: ComponentCallback): this;
+  onDetach(callback: GenericComponentCallback<D>): this;
   /**
    * Removes a callback to be called when the Component is detach()-ed.
    * The callback is identified by reference equality.
    *
-   * @param {ComponentCallback} callback
-   * @return {Component} The calling Component.
+   * @param {GenericComponentCallback} callback
+   * @return {IComponent} The calling Component.
    */
-  offDetach(callback: ComponentCallback): this;
+  offDetach(callback: GenericComponentCallback<D>): this;
   /**
    * Gets the parent ComponentContainer for this Component.
    */
@@ -207,29 +212,13 @@ export interface IComponent<D> {
    */
   originToSVG(): Point;
   /**
-   * Gets the Selection containing the <g> in front of the visual elements of the Component.
+   * Gets the container holding the visual elements of the Component.
    *
    * Will return undefined if the Component has not been anchored.
    *
-   * @return {D}
-   */
-  foreground(): D;
-  /**
-   * Gets a Selection containing a <g> that holds the visual elements of the Component.
-   *
-   * Will return undefined if the Component has not been anchored.
-   *
-   * @return {d3.Selection} content selection for the Component
+   * @return {D} content selection for the Component
    */
   content(): D;
-  /**
-   * Gets the Selection containing the <g> behind the visual elements of the Component.
-   *
-   * Will return undefined if the Component has not been anchored.
-   *
-   * @return {d3.Selection} background selection for the Component
-   */
-  background(): D;
 }
 
 export class Component implements IComponent<d3.Selection<void>> {
