@@ -44,6 +44,13 @@
  *     a dependency on a module named "plottable" (both in AMD and CommonJS).
  */
 var path = require("path");
+var webpack = require("webpack");
+var packageJson = require("./package.json");
+
+var LICENSE_HEADER =
+`Plottable ${packageJson.version} (https://github.com/palantir/plottable)
+Copyright 2014-2017 Palantir Technologies
+Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)`;
 
 module.exports = {
   entry: "./build/src/index.js",
@@ -57,5 +64,14 @@ module.exports = {
   externals: {
     // don't bundle d3 but instead it request it externally
     "d3": "d3"
-  }
+  },
+  plugins: [
+    new webpack.BannerPlugin({
+      banner: LICENSE_HEADER,
+      entryOnly: true
+    }),
+    new webpack.DefinePlugin({
+      "__VERSION__": JSON.stringify(packageJson.version)
+    })
+  ]
 };

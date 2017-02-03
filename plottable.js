@@ -1,9 +1,8 @@
 /*!
-Plottable 2.9.1 (https://github.com/palantir/plottable)
-Copyright 2014-2017 Palantir Technologies
-Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
-*/
-
+ * Plottable 2.9.1 (https://github.com/palantir/plottable)
+ * Copyright 2014-2017 Palantir Technologies
+ * Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
+ */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
 		module.exports = factory(require("d3"));
