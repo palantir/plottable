@@ -10,7 +10,7 @@ export interface IComponentContainer<D> extends IComponent<D> {
   /**
    * Removes the specified Component from the ComponentContainer.
    */
-  remove(component: Component): this;
+  remove(component: IComponent<any>): this;
 }
 
 /*
