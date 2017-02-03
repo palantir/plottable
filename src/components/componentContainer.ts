@@ -1,12 +1,23 @@
 import * as d3 from "d3";
 
-import { Component, ComponentCallback } from "./component";
+import { IComponent, Component, ComponentCallback } from "./component";
+
+export interface IComponentContainer<D> extends IComponent<D> {
+  /**
+   * Checks whether the specified Component is in the ComponentContainer.
+   */
+  has(component: IComponent<any>): boolean;
+  /**
+   * Removes the specified Component from the ComponentContainer.
+   */
+  remove(component: Component): this;
+}
 
 /*
  * ComponentContainer class encapsulates Table and ComponentGroup's shared functionality.
  * It will not do anything if instantiated directly.
  */
-export class ComponentContainer extends Component {
+export class ComponentContainer extends Component implements IComponentContainer<d3.Selection<void>> {
   private _detachCallback: ComponentCallback;
 
   constructor() {
