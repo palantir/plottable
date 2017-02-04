@@ -3,9 +3,11 @@
 module.exports = function(grunt) {
   "use strict";
 
+  // run an arbitrary npm command through grunt, e.g. grunt exec:npm:build:test -> npm run build:test
   var execConfig = {
     npm: {
-      cmd: function (npmCommandName) {
+      cmd: function () {
+        var npmCommandName = Array.prototype.slice.call(arguments).join(":");
         return "npm run " + npmCommandName;
       }
     }
@@ -180,12 +182,8 @@ module.exports = function(grunt) {
   // Loads the tasks specified in package.json
   require("load-grunt-tasks")(grunt);
 
-  grunt.registerTask("test-compile", ["exec:npm:build-test"]);
-  grunt.registerTask("src-compile", ["exec:npm:build-src"]);
-
   grunt.registerTask("dev-compile", [
-    "src-compile",
-    "test-compile",
+    "exec:npm:build",
     "update-quicktests"
   ]);
 
