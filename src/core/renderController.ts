@@ -1,4 +1,4 @@
-import { IComponent } from "../components/component";
+import { IComponent } from "../components/abstractComponent";
 import * as Utils from "../utils";
 
 import * as RenderPolicies from "./renderPolicy";

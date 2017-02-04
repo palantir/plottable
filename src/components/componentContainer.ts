@@ -1,6 +1,7 @@
 import * as d3 from "d3";
 
-import { IComponent, Component, ComponentCallback } from "./component";
+import {  Component, ComponentCallback } from "./component";
+import { IComponent } from "./abstractComponent";
 
 export interface IComponentContainer<D> extends IComponent<D> {
   /**

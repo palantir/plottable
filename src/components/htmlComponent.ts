@@ -1,40 +1,14 @@
-import { GenericComponentCallback, IComponent, IResizeHandler } from "./component";
+import { AbstractComponent } from "./abstractComponent";
+import { GenericComponentCallback, IResizeHandler } from "./component";
 import { IComponentContainer } from "./componentContainer";
 
 import { Point, SpaceRequest, Bounds } from "../core/interfaces";
 import * as RenderController from "../core/renderController";
 import * as Utils from "../utils";
 
-
-
-export class HTMLComponent implements IComponent<HTMLElement> {
+export class HTMLComponent extends AbstractComponent<HTMLElement> {
   private _cssClasses = new Utils.Set<string>();
-  private _destroyed = false;
   private _element: HTMLDivElement;
-  private _content: HTMLDivElement;
-  private _height: number;
-  private _onAnchorCallbacks = new Utils.CallbackSet<GenericComponentCallback<HTMLElement>>();
-  private _onDetachCallbacks = new Utils.CallbackSet<GenericComponentCallback<HTMLElement>>();
-  private _origin: Point = { x: 0, y: 0 };
-  private _parent: IComponentContainer<HTMLElement>;
-  private _resizeHandler: IResizeHandler;
-  private _width: number;
-  private _xAlignment: string = "left";
-  private _yAlignment: string = "top";
-
-  protected _isAnchored = false;
-  protected _isSetup = false;
-
-  private static _xAlignToProportion: { [alignment: string]: number } = {
-    "left": 0,
-    "center": 0.5,
-    "right": 1,
-  };
-  private static _yAlignToProportion: { [alignment: string]: number } = {
-    "top": 0,
-    "center": 0.5,
-    "bottom": 1,
-  };
 
   public anchor(selection: HTMLElement) {
     if (this._destroyed) {
@@ -55,41 +29,8 @@ export class HTMLComponent implements IComponent<HTMLElement> {
     return this;
   }
 
-  public onAnchor(callback: GenericComponentCallback<HTMLElement>) {
-    if (this._isAnchored) {
-      callback(this);
-    }
-    this._onAnchorCallbacks.add(callback);
-    return this;
-  }
-
-  public offAnchor(callback: GenericComponentCallback<HTMLElement>) {
-    this._onAnchorCallbacks.delete(callback);
-    return this;
-  }
-
-  public requestedSpace(availableWidth: number, availableHeight: number) {
-    return {
-      minWidth: 0,
-      minHeight: 0,
-    };
-  }
-
   public computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number) {
     // TODO: Write this method
-    return this;
-  }
-
-  public render() {
-    if (this._isAnchored && this._isSetup && this.width() >= 0 && this.height() >= 0) {
-      RenderController.registerToRender(this);
-    }
-
-    return this;
-  }
-
-  public onResize(resizeHandler: IResizeHandler) {
-    this._resizeHandler = resizeHandler;
     return this;
   }
 
@@ -124,47 +65,6 @@ export class HTMLComponent implements IComponent<HTMLElement> {
     RenderController.registerToComputeLayoutAndRender(this);
     // flush so that consumers can immediately attach to stuff we create in the DOM
     RenderController.flush();
-    return this;
-  }
-
-  public xAlignment(): string;
-  public xAlignment(xAlignment: string): this;
-  public xAlignment(xAlignment?: string) {
-    if (xAlignment == null) {
-      return this._xAlignment;
-    }
-
-    xAlignment = xAlignment.toLowerCase();
-    if (HTMLComponent._xAlignToProportion[xAlignment] == null) {
-      throw new Error("Unsupported alignment: " + xAlignment);
-    }
-    this._xAlignment = xAlignment;
-    this.redraw();
-    return this;
-  }
-
-  /**
-   * Gets the y alignment of the Component.
-   */
-  public yAlignment(): string;
-  /**
-   * Sets the y alignment of the Component.
-   *
-   * @param {string} yAlignment The y alignment of the Component ("top"/"center"/"bottom").
-   * @returns {IComponent} The calling Component.
-   */
-  public yAlignment(yAlignment: string): this;
-  public yAlignment(yAlignment?: string) {
-    if (yAlignment == null) {
-      return this._yAlignment;
-    }
-
-    yAlignment = yAlignment.toLowerCase();
-    if (HTMLComponent._yAlignToProportion[yAlignment] == null) {
-      throw new Error("Unsupported alignment: " + yAlignment);
-    }
-    this._yAlignment = yAlignment;
-    this.redraw();
     return this;
   }
 
@@ -217,14 +117,6 @@ export class HTMLComponent implements IComponent<HTMLElement> {
     return this;
   }
 
-  public fixedWidth() {
-    return false;
-  }
-
-  public fixedHeight() {
-    return false;
-  }
-
   public detach() {
     this.parent(null);
 
@@ -236,77 +128,6 @@ export class HTMLComponent implements IComponent<HTMLElement> {
     this._onDetachCallbacks.callCallbacks(this);
 
     return this;
-  }
-
-  public onDetach(callback: GenericComponentCallback<HTMLElement>) {
-    this._onDetachCallbacks.add(callback);
-    return this;
-  }
-
-  public offDetach(callback: GenericComponentCallback<HTMLElement>) {
-    this._onDetachCallbacks.delete(callback);
-    return this;
-  }
-
-  public parent(): IComponentContainer<any>;
-  public parent(parent: IComponentContainer<any>): this;
-  public parent(parent?: IComponentContainer<any>) {
-    if (parent === undefined) {
-      return this._parent;
-    }
-
-    if (parent !== null && !parent.has(this)) {
-      throw new Error("Passed invalid parent");
-    }
-
-    this._parent = parent;
-    return this;
-  }
-
-  public bounds() {
-    const topLeft = this.origin();
-
-    return {
-      topLeft,
-      bottomRight: {
-        x: topLeft.x + this.width(),
-        y: topLeft.y + this.height()
-      },
-    }
-  }
-
-  public destroy() {
-    this._destroyed = true;
-    this.detach();
-  }
-
-  public width() {
-    return this._width;
-  }
-
-  public height() {
-    return this._height;
-  }
-
-  public origin() {
-    const { x, y } = this._origin;
-    return { x, y };
-  }
-
-  public originToRoot() {
-    let origin = this.origin();
-    let ancestor = this.parent();
-    while (ancestor != null) {
-      let ancestorOrigin = ancestor.origin();
-      origin.x += ancestorOrigin.x;
-      origin.y += ancestorOrigin.y;
-      ancestor = ancestor.parent();
-    }
-    return origin;
-  }
-
-  public content() {
-    return this._content;
   }
 
   /**
