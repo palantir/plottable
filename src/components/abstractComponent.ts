@@ -13,6 +13,7 @@ export interface IComponent<D> {
    * @returns {Component} The calling Component.
    */
   anchor(selection: D): this;
+  anchorHTML(selection: HTMLElement): this;
   /**
    * Adds a callback to be called on anchoring the Component to the DOM.
    * If the Component is already anchored, the callback is called immediately.
@@ -249,6 +250,7 @@ export abstract class AbstractComponent<D> implements IComponent<D> {
    * @returns {Component} The calling Component.
    */
   abstract anchor(selection: D): this;
+  abstract anchorHTML(selection: HTMLElement): this;
   /**
    * Adds a callback to be called on anchoring the Component to the DOM.
    * If the Component is already anchored, the callback is called immediately.

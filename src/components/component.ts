@@ -79,6 +79,11 @@ export class Component extends AbstractComponent<d3.Selection<void>> {
     return this;
   }
 
+  public anchorHTML(selection: HTMLElement) {
+    const root = d3.select(selection).append("svg");
+    return this.anchor(root);
+  }
+
   /**
    * Creates additional elements as necessary for the Component to function.
    * Called during anchor() if the Component's element has not been created yet.

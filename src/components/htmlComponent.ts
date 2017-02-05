@@ -29,6 +29,10 @@ export class HTMLComponent extends AbstractComponent<HTMLElement> {
     return this;
   }
 
+  public anchorHTML(selection: HTMLElement) {
+    return this.anchor(selection);
+  }
+
   public computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number) {
     // TODO: Write this method
     return this;
@@ -151,6 +155,9 @@ export class HTMLComponent extends AbstractComponent<HTMLElement> {
     this._element.className = classList.join(" ");
 
     this._cssClasses = new Utils.Set<string>();
+    this._content = document.createElement("div");
+    this._content.className = "content";
+    this._element.appendChild(this._content);
 
     this._isSetup = true;
   }
