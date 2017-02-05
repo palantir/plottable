@@ -22,7 +22,7 @@ export class HTMLComponent extends AbstractComponent<HTMLElement> {
       selection.appendChild(this._element);
     } else {
       this._element = document.createElement("div");
-      selection.appendChild(document.createElement("div"));
+      selection.appendChild(this._element);
       this._setup();
     }
 
@@ -36,7 +36,47 @@ export class HTMLComponent extends AbstractComponent<HTMLElement> {
   }
 
   public computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number) {
-    // TODO: Write this method
+    if (origin == null || availableWidth == null || availableHeight == null) {
+      if (this._element == null) {
+        throw new Error("anchor() must be called before computeLayout()");
+      } else if (this.parent() == null) {
+        // we are the root node, retrieve height/width from root SVG
+        origin = { x: 0, y: 0 };
+
+        // Set width/height to 100% if not specified, to allow accurate size calculation
+        // see http://www.w3.org/TR/CSS21/visudet.html#block-replaced-width
+        // and http://www.w3.org/TR/CSS21/visudet.html#inline-replaced-height
+        if (this.content().attr("width") == null) {
+          this.content().attr("width", "100%");
+        }
+        if (this.content().attr("height") == null) {
+          this.content().attr("height", "100%");
+        }
+
+        let elem: HTMLScriptElement = (<HTMLScriptElement> this.content().node());
+        availableWidth = Utils.DOM.elementWidth(elem);
+        availableHeight = Utils.DOM.elementHeight(elem);
+      } else {
+        throw new Error("null arguments cannot be passed to computeLayout() on a non-root node");
+      }
+    }
+
+    let size = this._sizeFromOffer(availableWidth, availableHeight);
+    this._width = size.width;
+    this._height = size.height;
+
+    let xAlignProportion = HTMLComponent._xAlignToProportion[this._xAlignment];
+    let yAlignProportion = HTMLComponent._yAlignToProportion[this._yAlignment];
+    this._origin = {
+      x: origin.x + (availableWidth - this.width()) * xAlignProportion,
+      y: origin.y + (availableHeight - this.height()) * yAlignProportion,
+    };
+    d3.select(this._element).attr("transform", "translate(" + this._origin.x + "," + this._origin.y + ")");
+
+    if (this._resizeHandler != null) {
+      this._resizeHandler(size);
+    }
+
     return this;
   }
 
@@ -153,6 +193,7 @@ export class HTMLComponent extends AbstractComponent<HTMLElement> {
       return;
     }
 
+
     const classListSet = new Utils.Set<string>();
     this._element.className.split(" ").forEach((className) => classListSet.add(className));
     this._cssClasses.forEach((className) => classListSet.add(className));
@@ -166,6 +207,14 @@ export class HTMLComponent extends AbstractComponent<HTMLElement> {
     this._element.appendChild(this._content);
 
     this._isSetup = true;
+  }
+
+  protected _sizeFromOffer(availableWidth: number, availableHeight: number) {
+    let requestedSpace = this.requestedSpace(availableWidth, availableHeight);
+    return {
+      width: this.fixedWidth() ? Math.min(availableWidth, requestedSpace.minWidth) : availableWidth,
+      height: this.fixedHeight() ? Math.min(availableHeight, requestedSpace.minHeight) : availableHeight,
+    };
   }
 
   private _scheduleComputeLayout() {
