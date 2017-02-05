@@ -17,7 +17,7 @@ export class HTMLComponentContainer extends HTMLComponent implements IComponentC
   public anchor(selection: HTMLElement) {
     super.anchor(selection);
 
-    this._forEach((c) => c.anchorHTML(this.content()));
+    this._forEach((c) => c.anchorHTML(this.content().node() as HTMLElement));
 
     return this;
   }
@@ -38,7 +38,7 @@ export class HTMLComponentContainer extends HTMLComponent implements IComponentC
     component.parent(this);
     component.onDetach(this._detachCallback);
     if (this._isAnchored) {
-      component.anchorHTML(this.content());
+      component.anchorHTML(this.content().node() as HTMLElement);
     }
   }
 

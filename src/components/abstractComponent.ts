@@ -5,6 +5,10 @@ import { Point, SpaceRequest, Bounds } from "../core/interfaces";
 import * as RenderController from "../core/renderController";
 import * as Utils from "../utils";
 
+export interface IContent {
+  node(): Node;
+}
+
 export interface IComponent<D> {
   /**
    * Attaches the Component as a child of a given html element.
@@ -211,7 +215,7 @@ export interface IComponent<D> {
    *
    * @return {D} content selection for the Component
    */
-  content(): D;
+  content(): IContent;
 }
 
 export abstract class AbstractComponent<D> implements IComponent<D> {
@@ -536,14 +540,6 @@ export abstract class AbstractComponent<D> implements IComponent<D> {
     }
     return origin;
   }
-  /**
-   * Gets the container holding the visual elements of the Component.
-   *
-   * Will return undefined if the Component has not been anchored.
-   *
-   * @return {D} content selection for the Component
-   */
-  public content() {
-    return this._content;
-  }
+
+  abstract content(): IContent;
 }

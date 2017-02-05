@@ -387,4 +387,8 @@ export class Component extends AbstractComponent<d3.Selection<void>> {
   public background(): d3.Selection<void> {
     return this._backgroundContainer;
   }
+
+  public content() {
+    return this._content;
+  }
 }

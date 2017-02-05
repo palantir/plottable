@@ -1,3 +1,5 @@
+import * as d3 from "d3";
+
 import { AbstractComponent } from "./abstractComponent";
 import { GenericComponentCallback, IResizeHandler } from "./component";
 import { IComponentContainer } from "./componentContainer";
@@ -132,6 +134,10 @@ export class HTMLComponent extends AbstractComponent<HTMLElement> {
     this._onDetachCallbacks.callCallbacks(this);
 
     return this;
+  }
+
+  public content() {
+    return d3.select(this._content);
   }
 
   /**
