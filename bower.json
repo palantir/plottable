@@ -17,7 +17,7 @@
     "!plottable.css",
     "!plottable.min.js",
     "!plottable.d.ts",
-    "!build"
+    "!build/src/**/*"
   ],
   "keywords": [
     "plottable",
