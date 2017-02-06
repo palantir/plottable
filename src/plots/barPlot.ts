@@ -301,7 +301,7 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
       }
       let primaryDist = 0;
       let secondaryDist = 0;
-      let plotPt = entity.position;
+      let plotPt = this._pixelPoint(entity.datum, entity.index, entity.dataset);
       // if we're inside a bar, distance in both directions should stay 0
       let barBBox = Utils.DOM.elementBBox(entity.drawer.selectionForIndex(entity.validDatumIndex));
       if (!Utils.DOM.intersectsBBox(queryPoint.x, queryPoint.y, barBBox, tolerance)) {
@@ -329,7 +329,11 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
       }
     });
 
-    return this._lightweightPlotEntityToPlotEntity(closest);
+    if (closest !== undefined) {
+      return this._lightweightPlotEntityToPlotEntity(closest);
+    } else {
+      return undefined;
+    }
   }
 
   protected _entityVisibleOnPlot(entity: Plots.PlotEntity | Plots.LightweightPlotEntity, bounds: Bounds) {
