@@ -11,25 +11,6 @@ module.exports = function(grunt) {
     }
   };
 
-  var tsConfig = {
-    verifyDefinitionFile: {
-      src: [
-        "plottable.d.ts",
-      ],
-      options: {
-        compiler: "./node_modules/typescript/bin/tsc"
-      }
-    },
-    verifyNpmDefinitionFile: {
-      src: [
-        "plottable-npm.d.ts",
-      ],
-      options: {
-        compiler: "./node_modules/typescript/bin/tsc"
-      }
-    }
-  };
-
   var bumpConfig = {
     options: {
       files: ["package.json", "bower.json"],
@@ -56,16 +37,6 @@ module.exports = function(grunt) {
       deps: {
         "default": ["d3"],
       }
-    },
-    npm: {
-      src: "plottable.js",
-      dest: "plottable-npm.js",
-      objectToExport: "Plottable",
-      deps: {
-        "default": ["d3", "SVGTypewriter"],
-        "amd": ["d3", "svg-typewriter"],
-        "cjs": ["d3", "svg-typewriter"]
-      }
     }
   };
 
@@ -73,10 +44,6 @@ module.exports = function(grunt) {
     header: {
       src: ["license_header.txt", "plottable.js"],
       dest: "plottable.js"
-    },
-    headerNpm: {
-      src: ["license_header.txt", "plottable-npm.js"],
-      dest: "plottable-npm.js"
     }
   };
 
@@ -151,7 +118,6 @@ module.exports = function(grunt) {
     "plottable.js",
     "plottable.min.js",
     "plottable.d.ts",
-    "plottable-npm.d.ts",
     "plottable.css",
     "plottable.zip",
     "bower.json",
@@ -186,8 +152,6 @@ module.exports = function(grunt) {
         {src: "plottable.js",       dest: "."},
         {src: "plottable.min.js",   dest: "."},
         {src: "plottable.d.ts",     dest: "."},
-        {src: "plottable-npm.js",   dest: "."},
-        {src: "plottable-npm.d.ts", dest: "."},
         {src: "plottable.css",      dest: "."},
         {src: "README.md",          dest: "."},
         {src: "LICENSE",            dest: "."},
@@ -234,7 +198,6 @@ module.exports = function(grunt) {
     bump: bumpConfig,
     umd: umdConfig,
     concat: concatConfig,
-    ts: tsConfig,
     tslint: tslintConfig,
     jscs: jscsConfig,
     eslint: eslintConfig,
@@ -265,8 +228,6 @@ module.exports = function(grunt) {
   grunt.registerTask("generateJS", [
     // adds license_header.txt to plottable.js
     "concat:header",
-    // adds license_header.txt to plottable-npm.js
-    "concat:headerNpm",
     // replaces plottable.js' @VERSION with package.json's version
     "sed:versionNumber"
   ]);
@@ -281,7 +242,7 @@ module.exports = function(grunt) {
   grunt.registerTask("default", ["connect", "dev-compile", "watch-silent"]);
 
   grunt.registerTask("test", ["dev-compile", "test-local"]);
-  grunt.registerTask("test-local", ["blanket_mocha", "ts:verifyDefinitionFile", "ts:verifyNpmDefinitionFile", "lint"]);
+  grunt.registerTask("test-local", ["blanket_mocha", "lint"]);
   grunt.registerTask("test-sauce", ["connect", "saucelabs-mocha"]);
 
   grunt.registerTask("watch-silent", function() {
