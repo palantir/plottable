@@ -13424,34 +13424,34 @@ var StackedBar = (function (_super) {
                 _this._writer.write(text, measurement.width, measurement.height, writeOptions);
             }
         };
-        maximumExtents.forEach(function (maximum, axisValue) {
-            if (maximum !== baselineValue) {
+        maximumExtents.forEach(function (maximum) {
+            if (maximum.extent !== baselineValue) {
                 // only draw sums for values not at the baseline
-                var text = _this.labelFormatter()(maximum);
+                var text = _this.labelFormatter()(maximum.extent);
                 var measurement = _this._measurer.measure(text);
                 var primaryTextMeasurement = _this._isVertical ? measurement.width : measurement.height;
                 var secondaryTextMeasurement = _this._isVertical ? measurement.height : measurement.width;
                 var x = _this._isVertical
-                    ? primaryScale.scale(axisValue) - primaryTextMeasurement / 2
-                    : secondaryScale.scale(maximum) + StackedBar._STACKED_BAR_LABEL_PADDING;
+                    ? primaryScale.scale(maximum.axisValue) - primaryTextMeasurement / 2
+                    : secondaryScale.scale(maximum.extent) + StackedBar._STACKED_BAR_LABEL_PADDING;
                 var y = _this._isVertical
-                    ? secondaryScale.scale(maximum) - secondaryTextMeasurement - StackedBar._STACKED_BAR_LABEL_PADDING
-                    : primaryScale.scale(axisValue) - primaryTextMeasurement / 2;
+                    ? secondaryScale.scale(maximum.extent) - secondaryTextMeasurement - StackedBar._STACKED_BAR_LABEL_PADDING
+                    : primaryScale.scale(maximum.axisValue) - primaryTextMeasurement / 2;
                 drawLabel(text, measurement, { x: x, y: y });
             }
         });
-        minimumExtents.forEach(function (minimum, axisValue) {
-            if (minimum !== baselineValue) {
-                var text = _this.labelFormatter()(minimum);
+        minimumExtents.forEach(function (minimum) {
+            if (minimum.extent !== baselineValue) {
+                var text = _this.labelFormatter()(minimum.extent);
                 var measurement = _this._measurer.measure(text);
                 var primaryTextMeasurement = _this._isVertical ? measurement.width : measurement.height;
                 var secondaryTextMeasurement = _this._isVertical ? measurement.height : measurement.width;
                 var x = _this._isVertical
-                    ? primaryScale.scale(axisValue) - primaryTextMeasurement / 2
-                    : secondaryScale.scale(minimum) - secondaryTextMeasurement - StackedBar._STACKED_BAR_LABEL_PADDING;
+                    ? primaryScale.scale(minimum.axisValue) - primaryTextMeasurement / 2
+                    : secondaryScale.scale(minimum.extent) - secondaryTextMeasurement - StackedBar._STACKED_BAR_LABEL_PADDING;
                 var y = _this._isVertical
-                    ? secondaryScale.scale(minimum) + StackedBar._STACKED_BAR_LABEL_PADDING
-                    : primaryScale.scale(axisValue) - primaryTextMeasurement / 2;
+                    ? secondaryScale.scale(minimum.extent) + StackedBar._STACKED_BAR_LABEL_PADDING
+                    : primaryScale.scale(minimum.axisValue) - primaryTextMeasurement / 2;
                 drawLabel(text, measurement, { x: x, y: y });
             }
         });
@@ -14925,8 +14925,9 @@ function stack(datasets, keyAccessor, valueAccessor, stackingOrder) {
                 offsetMap.set(key, value);
             }
             keyToStackedDatum.set(key, {
-                value: value,
                 offset: offset,
+                value: value,
+                axisValue: keyAccessor(datum, index, dataset),
             });
         });
         datasetToKeyToStackedDatum.set(dataset, keyToStackedDatum);
@@ -14950,16 +14951,16 @@ function stackedExtents(stackingResult) {
             var maximalValue = Utils.Math.max([datum.offset + datum.value, datum.offset], datum.offset);
             var minimalValue = Utils.Math.min([datum.offset + datum.value, datum.offset], datum.offset);
             if (!maximumExtents.has(key)) {
-                maximumExtents.set(key, maximalValue);
+                maximumExtents.set(key, { extent: maximalValue, axisValue: datum.axisValue });
             }
-            else if (maximumExtents.get(key) < maximalValue) {
-                maximumExtents.set(key, maximalValue);
+            else if (maximumExtents.get(key).extent < maximalValue) {
+                maximumExtents.set(key, { extent: maximalValue, axisValue: datum.axisValue });
             }
             if (!minimumExtents.has(key)) {
-                minimumExtents.set(key, minimalValue);
+                minimumExtents.set(key, { extent: minimalValue, axisValue: datum.axisValue });
             }
-            else if (minimumExtents.get(key) > (minimalValue)) {
-                minimumExtents.set(key, minimalValue);
+            else if (minimumExtents.get(key).extent > (minimalValue)) {
+                minimumExtents.set(key, { extent: minimalValue, axisValue: datum.axisValue });
             }
         });
     });
