@@ -29,6 +29,13 @@ export interface EntityStore<T extends PositionedEntity> {
    * @returns {S[]} The aggregate result of each call to the transformation function
    */
   map<S>(callback: (value: T) => S): S[];
+
+  /**
+   * Iterator that loops through entities calls the callback on each iteration.
+   * @param {(value: T) => void} [callback] transformation function that is passed
+   * passed an entity {T}.
+   */
+  forEach(callback: (value: T) => void): void;
 }
 
 export interface PositionedEntity {
@@ -77,5 +84,9 @@ export class EntityArray<T extends PositionedEntity> implements EntityStore<T> {
 
   public map<S>(callback: (value: T) => S) {
     return this._entities.map<S>((entity: T) => callback(entity));
+  }
+
+  public forEach(callback: (value: T) => void) {
+    return this._entities.forEach(callback);
   }
 }

@@ -3510,7 +3510,7 @@ var Bar = (function (_super) {
         var tolerance = 0.5;
         var chartBounds = this.bounds();
         var closest;
-        this.entities().forEach(function (entity) {
+        this._getEntityStore().map(function (entity) {
             if (!_this._entityVisibleOnPlot(entity, chartBounds)) {
                 return;
             }
@@ -3518,7 +3518,7 @@ var Bar = (function (_super) {
             var secondaryDist = 0;
             var plotPt = entity.position;
             // if we're inside a bar, distance in both directions should stay 0
-            var barBBox = Utils.DOM.elementBBox(entity.selection);
+            var barBBox = Utils.DOM.elementBBox(entity.drawer.selectionForIndex(entity.validDatumIndex));
             if (!Utils.DOM.intersectsBBox(queryPoint.x, queryPoint.y, barBBox, tolerance)) {
                 var plotPtPrimary = _this._isVertical ? plotPt.x : plotPt.y;
                 primaryDist = Math.abs(queryPtPrimary - plotPtPrimary);
@@ -3542,7 +3542,7 @@ var Bar = (function (_super) {
                 minSecondaryDist = secondaryDist;
             }
         });
-        return closest;
+        return this._lightweightPlotEntityToPlotEntity(closest);
     };
     Bar.prototype._entityVisibleOnPlot = function (entity, bounds) {
         var chartWidth = bounds.bottomRight.x - bounds.topLeft.x;

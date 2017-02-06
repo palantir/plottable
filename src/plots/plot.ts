@@ -517,7 +517,7 @@ export class Plot extends Component {
    * @param {Dataset[]} [datasets] - The datasets with which to construct the store. If no datasets
    * are specified all datasets will be used.
    */
-  private _getEntityStore(datasets?: Dataset[]): Utils.EntityStore<Plots.LightweightPlotEntity> {
+  protected _getEntityStore(datasets?: Dataset[]): Utils.EntityStore<Plots.LightweightPlotEntity> {
     if (datasets !== undefined) {
       const EntityStore = new Utils.EntityArray<Plots.LightweightPlotEntity>();
       this._buildLightweightPlotEntities(datasets).forEach((entity: Plots.LightweightPlotEntity) => {
@@ -535,7 +535,7 @@ export class Plot extends Component {
     return this._cachedEntityStore;
   }
 
-  private _lightweightPlotEntityToPlotEntity(entity: Plots.LightweightPlotEntity) {
+  protected _lightweightPlotEntityToPlotEntity(entity: Plots.LightweightPlotEntity) {
     let plotEntity: Plots.PlotEntity = {
       datum: entity.datum,
       position: this._pixelPoint(entity.datum, entity.index, entity.dataset),
