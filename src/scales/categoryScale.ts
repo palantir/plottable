@@ -78,14 +78,16 @@ export class Category extends Scale<string, number> implements TransformableScal
   }
 
   /**
-   * Returns all domain values that map to range values inside
-   * the given range in order.
+   * Returns domain values that lie inside the given range.
    * @param range
    * @returns {string[]}
    */
   public invertRange(range: [number, number] = this.range()): string[] {
-    const domainStartNormalized = this.invertedTransformation(range[0]);
-    const domainEndNormalized = this.invertedTransformation(range[1]);
+    const rangeBand = this._d3Scale.rangeBand();
+    // offset the domain by half the rangeBand such that we consider the
+    // center of the bars
+    const domainStartNormalized = this.invertedTransformation(range[0]) - rangeBand / 2;
+    const domainEndNormalized = this.invertedTransformation(range[1]) - rangeBand / 2;
     const domainStart = d3.bisect(this._d3Scale.range(), domainStartNormalized);
     const domainEnd = d3.bisect(this._d3Scale.range(), domainEndNormalized);
     return this._d3Scale.domain().slice(domainStart, domainEnd);
