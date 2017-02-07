@@ -15,12 +15,10 @@
       "build:tsc": "tsc -p test/",
       "build:webpack": "webpack --config webpack.config.js",
     "check_version": "echo ${npm_package_version} $(npm view ${npm_package_name} version) | awk '{ if ($1 == $2) { exit 1 }}'",
-    "start": "grunt",
-    "test": "grunt test-travis",
-    "watch": "npm-run-all -p watch:tsc watch:webpack watch:quicktests-silent",
-      "watch:quicktests-silent": "grunt watch-quicktests-silent",
-      "watch:tsc": "tsc -w -p test/",
-      "watch:webpack": "webpack --watch --config webpack.config.js"
+    "start": "npm-run-all -p watch:watch-tsc watch:watch-quicktests webpack-dev-server",
+    "start:watch-quicktests": "grunt watch-quicktests",
+    "start:watch-tsc": "tsc -w -p test/",
+    "test": "grunt test-travis"
   },
   "devDependencies": {
     "@types/chai": "^3.4.34",
@@ -57,7 +55,8 @@
     "sinon": "1.16.1",
     "tslint": "3.15.1",
     "typescript": "2.0.6",
-    "webpack": "2.2.1"
+    "webpack": "2.2.1",
+    "webpack-dev-server": "2.3.0"
   },
   "dependencies": {
     "d3": "^3.5.16",

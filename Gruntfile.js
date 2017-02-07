@@ -194,13 +194,13 @@ module.exports = function(grunt) {
   grunt.registerTask("dist-compile", ["test", "uglify", "compress"]);
 
   grunt.registerTask("commitjs", ["dist-compile", "gitcommit:built"]);
-  grunt.registerTask("default", ["connect", "dev-compile", "exec:npm:watch"]);
+  grunt.registerTask("default", ["npm run start"]);
 
   grunt.registerTask("test", ["dev-compile", "test-local"]);
   grunt.registerTask("test-local", ["blanket_mocha", "lint"]);
   grunt.registerTask("test-sauce", ["connect", "saucelabs-mocha"]);
 
-  grunt.registerTask("watch-quicktests-silent", function() {
+  grunt.registerTask("watch-quicktests", function() {
     // Surpresses the "Running 'foo' task" messages
     grunt.log.header = function() {};
     grunt.task.run(["watch"]);

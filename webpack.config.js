@@ -18,6 +18,10 @@ module.exports = [
    */
   {
     devtool: "source-map",
+    devServer: {
+      compress: true,
+      port: 9999
+    },
     entry: "./build/test/index.js",
     output: {
       filename: "test/tests.js"
