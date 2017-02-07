@@ -1,7 +1,7 @@
-/*
-Copyright 2014-present Palantir Technologies
-Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
-*/
+/**
+ * Copyright 2014-present Palantir Technologies
+ * @license MIT
+ */
 
 import { Accessor, Point, Bounds, Range, AttributeToProjector } from "../core/interfaces";
 import { Dataset } from "../core/dataset";

@@ -1,7 +1,7 @@
-/*
-Copyright 2014-present Palantir Technologies
-Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
-*/
+/**
+ * Copyright 2014-present Palantir Technologies
+ * @license MIT
+ */
 
 import * as Array from "./arrayUtils";
 import * as Color from "./colorUtils";
