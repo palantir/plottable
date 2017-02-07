@@ -3510,15 +3510,15 @@ var Bar = (function (_super) {
         var tolerance = 0.5;
         var chartBounds = this.bounds();
         var closest;
-        this.entities().forEach(function (entity) {
+        this._getEntityStore().forEach(function (entity) {
             if (!_this._entityVisibleOnPlot(entity, chartBounds)) {
                 return;
             }
             var primaryDist = 0;
             var secondaryDist = 0;
-            var plotPt = entity.position;
+            var plotPt = _this._pixelPoint(entity.datum, entity.index, entity.dataset);
             // if we're inside a bar, distance in both directions should stay 0
-            var barBBox = Utils.DOM.elementBBox(entity.selection);
+            var barBBox = Utils.DOM.elementBBox(entity.drawer.selectionForIndex(entity.validDatumIndex));
             if (!Utils.DOM.intersectsBBox(queryPoint.x, queryPoint.y, barBBox, tolerance)) {
                 var plotPtPrimary = _this._isVertical ? plotPt.x : plotPt.y;
                 primaryDist = Math.abs(queryPtPrimary - plotPtPrimary);
@@ -3542,7 +3542,12 @@ var Bar = (function (_super) {
                 minSecondaryDist = secondaryDist;
             }
         });
-        return closest;
+        if (closest !== undefined) {
+            return this._lightweightPlotEntityToPlotEntity(closest);
+        }
+        else {
+            return undefined;
+        }
     };
     Bar.prototype._entityVisibleOnPlot = function (entity, bounds) {
         var chartWidth = bounds.bottomRight.x - bounds.topLeft.x;
@@ -3583,10 +3588,12 @@ var Bar = (function (_super) {
         return this._entitiesIntersecting(dataXRange, dataYRange);
     };
     Bar.prototype._entitiesIntersecting = function (xValOrRange, yValOrRange) {
+        var _this = this;
         var intersected = [];
-        this.entities().forEach(function (entity) {
-            if (Utils.DOM.intersectsBBox(xValOrRange, yValOrRange, Utils.DOM.elementBBox(entity.selection))) {
-                intersected.push(entity);
+        this._getEntityStore().forEach(function (entity) {
+            var selection = entity.drawer.selectionForIndex(entity.validDatumIndex);
+            if (Utils.DOM.intersectsBBox(xValOrRange, yValOrRange, Utils.DOM.elementBBox(selection))) {
+                intersected.push(_this._lightweightPlotEntityToPlotEntity(entity));
             }
         });
         return intersected;
@@ -14789,6 +14796,9 @@ var EntityArray = (function () {
     };
     EntityArray.prototype.map = function (callback) {
         return this._entities.map(function (entity) { return callback(entity); });
+    };
+    EntityArray.prototype.forEach = function (callback) {
+        return this._entities.forEach(callback);
     };
     return EntityArray;
 }());

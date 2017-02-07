@@ -17,6 +17,7 @@ import * as Plots from "./";
 import { PlotEntity } from "./";
 import { Plot } from "./plot";
 import { XYPlot } from "./xyPlot";
+import { LightweightPlotEntity } from "./commons";
 
 type LabelConfig = {
   labelArea: d3.Selection<void>;
@@ -293,16 +294,16 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
     let tolerance = 0.5;
 
     const chartBounds = this.bounds();
-    let closest: PlotEntity;
-    this.entities().forEach((entity) => {
+    let closest: LightweightPlotEntity;
+    this._getEntityStore().forEach((entity: LightweightPlotEntity) => {
       if (!this._entityVisibleOnPlot(entity, chartBounds)) {
         return;
       }
       let primaryDist = 0;
       let secondaryDist = 0;
-      let plotPt = entity.position;
+      let plotPt = this._pixelPoint(entity.datum, entity.index, entity.dataset);
       // if we're inside a bar, distance in both directions should stay 0
-      let barBBox = Utils.DOM.elementBBox(entity.selection);
+      let barBBox = Utils.DOM.elementBBox(entity.drawer.selectionForIndex(entity.validDatumIndex));
       if (!Utils.DOM.intersectsBBox(queryPoint.x, queryPoint.y, barBBox, tolerance)) {
         let plotPtPrimary = this._isVertical ? plotPt.x : plotPt.y;
         primaryDist = Math.abs(queryPtPrimary - plotPtPrimary);
@@ -328,10 +329,14 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
       }
     });
 
-    return closest;
+    if (closest !== undefined) {
+      return this._lightweightPlotEntityToPlotEntity(closest);
+    } else {
+      return undefined;
+    }
   }
 
-  protected _entityVisibleOnPlot(entity: Plots.PlotEntity, bounds: Bounds) {
+  protected _entityVisibleOnPlot(entity: Plots.PlotEntity | Plots.LightweightPlotEntity, bounds: Bounds) {
     const chartWidth = bounds.bottomRight.x - bounds.topLeft.x;
     const chartHeight = bounds.bottomRight.y - bounds.topLeft.y;
 
@@ -393,9 +398,10 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
 
   private _entitiesIntersecting(xValOrRange: number | Range, yValOrRange: number | Range): PlotEntity[] {
     let intersected: PlotEntity[] = [];
-    this.entities().forEach((entity) => {
-      if (Utils.DOM.intersectsBBox(xValOrRange, yValOrRange, Utils.DOM.elementBBox(entity.selection))) {
-        intersected.push(entity);
+    this._getEntityStore().forEach((entity) => {
+      const selection = entity.drawer.selectionForIndex(entity.validDatumIndex);
+      if (Utils.DOM.intersectsBBox(xValOrRange, yValOrRange, Utils.DOM.elementBBox(selection))) {
+        intersected.push(this._lightweightPlotEntityToPlotEntity(entity));
       }
     });
     return intersected;
