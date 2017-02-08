@@ -79,7 +79,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/ 	__webpack_require__.p = "";
 
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 92);
+/******/ 	return __webpack_require__(__webpack_require__.s = 97);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -91,23 +91,23 @@ return /******/ (function(modules) { // webpackBootstrap
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-var Array = __webpack_require__(84);
+var Array = __webpack_require__(89);
 exports.Array = Array;
-var Color = __webpack_require__(87);
+var Color = __webpack_require__(92);
 exports.Color = Color;
-var DOM = __webpack_require__(37);
+var DOM = __webpack_require__(40);
 exports.DOM = DOM;
-var Math = __webpack_require__(26);
+var Math = __webpack_require__(28);
 exports.Math = Math;
-var Stacking = __webpack_require__(90);
+var Stacking = __webpack_require__(95);
 exports.Stacking = Stacking;
-var Window = __webpack_require__(91);
+var Window = __webpack_require__(96);
 exports.Window = Window;
-__export(__webpack_require__(85));
-__export(__webpack_require__(86));
-__export(__webpack_require__(88));
-__export(__webpack_require__(89));
-__export(__webpack_require__(38));
+__export(__webpack_require__(90));
+__export(__webpack_require__(91));
+__export(__webpack_require__(93));
+__export(__webpack_require__(94));
+__export(__webpack_require__(41));
 
 
 /***/ }),
@@ -125,16 +125,16 @@ module.exports = __WEBPACK_EXTERNAL_MODULE_1__;
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-var TickGenerators = __webpack_require__(82);
+var TickGenerators = __webpack_require__(87);
 exports.TickGenerators = TickGenerators;
-__export(__webpack_require__(36));
-__export(__webpack_require__(78));
-__export(__webpack_require__(79));
-__export(__webpack_require__(80));
-__export(__webpack_require__(81));
+__export(__webpack_require__(39));
 __export(__webpack_require__(83));
+__export(__webpack_require__(84));
+__export(__webpack_require__(85));
+__export(__webpack_require__(86));
+__export(__webpack_require__(88));
 // ---------------------------------------------------------
-var categoryScale_2 = __webpack_require__(36);
+var categoryScale_2 = __webpack_require__(39);
 var quantitativeScale_1 = __webpack_require__(10);
 /**
  * Type guarded function to check if the scale implements the
@@ -165,7 +165,7 @@ var Animators = __webpack_require__(6);
 var component_1 = __webpack_require__(5);
 var drawer_1 = __webpack_require__(7);
 var Utils = __webpack_require__(0);
-var Plots = __webpack_require__(34);
+var Plots = __webpack_require__(37);
 var Plot = (function (_super) {
     __extends(Plot, _super);
     /**
@@ -657,23 +657,23 @@ module.exports = __WEBPACK_EXTERNAL_MODULE_4__;
 
 "use strict";
 
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
 var d3 = __webpack_require__(1);
-var RenderController = __webpack_require__(23);
+var abstractComponent_1 = __webpack_require__(25);
+var RenderController = __webpack_require__(15);
 var Utils = __webpack_require__(0);
-var Component = (function () {
+var Component = (function (_super) {
+    __extends(Component, _super);
     function Component() {
+        _super.call(this);
         this._clipPathEnabled = false;
-        this._origin = { x: 0, y: 0 }; // Origin of the coordinate space for the Component.
-        this._xAlignment = "left";
-        this._yAlignment = "top";
-        this._isSetup = false;
-        this._isAnchored = false;
         this._boxes = [];
-        this._isTopLevelComponent = false;
+        this._isTopLevelSVG = false;
         this._cssClasses = new Utils.Set();
-        this._destroyed = false;
-        this._onAnchorCallbacks = new Utils.CallbackSet();
-        this._onDetachCallbacks = new Utils.CallbackSet();
         this._cssClasses.add("component");
     }
     /**
@@ -686,11 +686,13 @@ var Component = (function () {
         if (this._destroyed) {
             throw new Error("Can't reuse destroy()-ed Components!");
         }
-        this._isTopLevelComponent = selection.node().nodeName.toLowerCase() === "svg";
-        if (this._isTopLevelComponent) {
-            // svg node gets the "plottable" CSS class
-            this._rootSVG = selection;
+        this._isTopLevelSVG = selection.node().nodeName.toLowerCase() === "svg";
+        if (!this.isNestedTopLevelSVG()) {
+            // non-nested top-level svg node gets the "plottable" CSS class
             this._rootSVG.classed("plottable", true);
+        }
+        if (this._isTopLevelSVG) {
+            this._rootSVG = selection;
             // visible overflow for firefox https://stackoverflow.com/questions/5926986/why-does-firefox-appear-to-truncate-embedded-svgs
             this._rootSVG.style("overflow", "visible");
             // HACKHACK: Safari fails to register events on the <svg> itself
@@ -716,30 +718,9 @@ var Component = (function () {
         this._onAnchorCallbacks.callCallbacks(this);
         return this;
     };
-    /**
-     * Adds a callback to be called on anchoring the Component to the DOM.
-     * If the Component is already anchored, the callback is called immediately.
-     *
-     * @param {ComponentCallback} callback
-     * @return {Component}
-     */
-    Component.prototype.onAnchor = function (callback) {
-        if (this._isAnchored) {
-            callback(this);
-        }
-        this._onAnchorCallbacks.add(callback);
-        return this;
-    };
-    /**
-     * Removes a callback that would be called on anchoring the Component to the DOM.
-     * The callback is identified by reference equality.
-     *
-     * @param {ComponentCallback} callback
-     * @return {Component}
-     */
-    Component.prototype.offAnchor = function (callback) {
-        this._onAnchorCallbacks.delete(callback);
-        return this;
+    Component.prototype.anchorHTML = function (selection) {
+        var root = d3.select(selection).append("svg");
+        return this.anchor(root);
     };
     /**
      * Creates additional elements as necessary for the Component to function.
@@ -750,6 +731,11 @@ var Component = (function () {
         var _this = this;
         if (this._isSetup) {
             return;
+        }
+        if (this._isTopLevelSVG && this.parent() != null) {
+            // this component is a top level SVG; however, it has parents
+            // which means that it is nested within a div container
+            this._rootSVG.classed("svg-component", true);
         }
         this._cssClasses.forEach(function (cssClass) {
             _this._element.classed(cssClass, true);
@@ -763,22 +749,8 @@ var Component = (function () {
         if (this._clipPathEnabled) {
             this._generateClipPath();
         }
-        ;
         this._boundingBox = this._addBox("bounding-box");
         this._isSetup = true;
-    };
-    /**
-     * Given available space in pixels, returns the minimum width and height this Component will need.
-     *
-     * @param {number} availableWidth
-     * @param {number} availableHeight
-     * @returns {SpaceRequest}
-     */
-    Component.prototype.requestedSpace = function (availableWidth, availableHeight) {
-        return {
-            minWidth: 0,
-            minHeight: 0,
-        };
     };
     /**
      * Computes and sets the size, position, and alignment of the Component from the specified values.
@@ -796,7 +768,7 @@ var Component = (function () {
             if (this._element == null) {
                 throw new Error("anchor() must be called before computeLayout()");
             }
-            else if (this._isTopLevelComponent) {
+            else if (this._isTopLevelSVG) {
                 // we are the root node, retrieve height/width from root SVG
                 origin = { x: 0, y: 0 };
                 // Set width/height to 100% if not specified, to allow accurate size calculation
@@ -825,7 +797,20 @@ var Component = (function () {
             x: origin.x + (availableWidth - this.width()) * xAlignProportion,
             y: origin.y + (availableHeight - this.height()) * yAlignProportion,
         };
-        this._element.attr("transform", "translate(" + this._origin.x + "," + this._origin.y + ")");
+        if (this.isNestedTopLevelSVG()) {
+            // this is a top-level SVG nested within an HTML layout. Apply the styles
+            // directly to the root SVG rather than to the g element
+            this._rootSVG.style({
+                height: this.height(),
+                left: this._origin.x + "px",
+                top: this._origin.y + "px",
+                width: this.width(),
+            });
+            this._element.attr("transform", "translate(0, 0)");
+        }
+        else {
+            this._element.attr("transform", "translate(" + this._origin.x + "," + this._origin.y + ")");
+        }
         this._boxes.forEach(function (b) { return b.attr("width", _this.width()).attr("height", _this.height()); });
         if (this._resizeHandler != null) {
             this._resizeHandler(size);
@@ -839,31 +824,10 @@ var Component = (function () {
             height: this.fixedHeight() ? Math.min(availableHeight, requestedSpace.minHeight) : availableHeight,
         };
     };
-    /**
-     * Queues the Component for rendering.
-     *
-     * @returns {Component} The calling Component.
-     */
-    Component.prototype.render = function () {
-        if (this._isAnchored && this._isSetup && this.width() >= 0 && this.height() >= 0) {
-            RenderController.registerToRender(this);
-        }
-        return this;
-    };
     Component.prototype._scheduleComputeLayout = function () {
         if (this._isAnchored && this._isSetup) {
             RenderController.registerToComputeLayoutAndRender(this);
         }
-    };
-    /**
-     * Sets a callback that gets called when the component resizes. The size change
-     * is not guaranteed to be reflected by the DOM at the time the callback is fired.
-     *
-     * @param {IResizeHandler} [resizeHandler] Callback to be called when component resizes
-     */
-    Component.prototype.onResize = function (resizeHandler) {
-        this._resizeHandler = resizeHandler;
-        return this;
     };
     /**
      * Renders the Component without waiting for the next frame. This method is a no-op on
@@ -885,7 +849,7 @@ var Component = (function () {
      */
     Component.prototype.redraw = function () {
         if (this._isAnchored && this._isSetup) {
-            if (this._isTopLevelComponent) {
+            if (this._isTopLevelSVG) {
                 this._scheduleComputeLayout();
             }
             else {
@@ -925,30 +889,6 @@ var Component = (function () {
         RenderController.registerToComputeLayoutAndRender(this);
         // flush so that consumers can immediately attach to stuff we create in the DOM
         RenderController.flush();
-        return this;
-    };
-    Component.prototype.xAlignment = function (xAlignment) {
-        if (xAlignment == null) {
-            return this._xAlignment;
-        }
-        xAlignment = xAlignment.toLowerCase();
-        if (Component._xAlignToProportion[xAlignment] == null) {
-            throw new Error("Unsupported alignment: " + xAlignment);
-        }
-        this._xAlignment = xAlignment;
-        this.redraw();
-        return this;
-    };
-    Component.prototype.yAlignment = function (yAlignment) {
-        if (yAlignment == null) {
-            return this._yAlignment;
-        }
-        yAlignment = yAlignment.toLowerCase();
-        if (Component._yAlignToProportion[yAlignment] == null) {
-            throw new Error("Unsupported alignment: " + yAlignment);
-        }
-        this._yAlignment = yAlignment;
-        this.redraw();
         return this;
     };
     Component.prototype._addBox = function (className, parentElement) {
@@ -1033,20 +973,6 @@ var Component = (function () {
         return this;
     };
     /**
-     * Checks if the Component has a fixed width or if it grows to fill available space.
-     * Returns false by default on the base Component class.
-     */
-    Component.prototype.fixedWidth = function () {
-        return false;
-    };
-    /**
-     * Checks if the Component has a fixed height or if it grows to fill available space.
-     * Returns false by default on the base Component class.
-     */
-    Component.prototype.fixedHeight = function () {
-        return false;
-    };
-    /**
      * Detaches a Component from the DOM. The Component can be reused.
      *
      * This should only be used if you plan on reusing the calling Component. Otherwise, use destroy().
@@ -1057,100 +983,13 @@ var Component = (function () {
         this.parent(null);
         if (this._isAnchored) {
             this._element.remove();
-            if (this._isTopLevelComponent) {
+            if (this._isTopLevelSVG) {
                 this._rootSVG.select("." + Component._SAFARI_EVENT_BACKING_CLASS).remove();
             }
         }
         this._isAnchored = false;
         this._onDetachCallbacks.callCallbacks(this);
         return this;
-    };
-    /**
-     * Adds a callback to be called when the Component is detach()-ed.
-     *
-     * @param {ComponentCallback} callback
-     * @return {Component} The calling Component.
-     */
-    Component.prototype.onDetach = function (callback) {
-        this._onDetachCallbacks.add(callback);
-        return this;
-    };
-    /**
-     * Removes a callback to be called when the Component is detach()-ed.
-     * The callback is identified by reference equality.
-     *
-     * @param {ComponentCallback} callback
-     * @return {Component} The calling Component.
-     */
-    Component.prototype.offDetach = function (callback) {
-        this._onDetachCallbacks.delete(callback);
-        return this;
-    };
-    Component.prototype.parent = function (parent) {
-        if (parent === undefined) {
-            return this._parent;
-        }
-        if (parent !== null && !parent.has(this)) {
-            throw new Error("Passed invalid parent");
-        }
-        this._parent = parent;
-        return this;
-    };
-    /**
-     * @returns {Bounds} for the component in pixel space, where the topLeft
-     * represents the component's minimum x and y values and the bottomRight represents
-     * the component's maximum x and y values.
-     */
-    Component.prototype.bounds = function () {
-        var topLeft = this.origin();
-        return {
-            topLeft: topLeft,
-            bottomRight: {
-                x: topLeft.x + this.width(),
-                y: topLeft.y + this.height()
-            },
-        };
-    };
-    /**
-     * Removes a Component from the DOM and disconnects all listeners.
-     */
-    Component.prototype.destroy = function () {
-        this._destroyed = true;
-        this.detach();
-    };
-    /**
-     * Gets the width of the Component in pixels.
-     */
-    Component.prototype.width = function () {
-        return this._width;
-    };
-    /**
-     * Gets the height of the Component in pixels.
-     */
-    Component.prototype.height = function () {
-        return this._height;
-    };
-    /**
-     * Gets the origin of the Component relative to its parent.
-     *
-     * @return {Point}
-     */
-    Component.prototype.origin = function () {
-        return {
-            x: this._origin.x,
-            y: this._origin.y,
-        };
-    };
-    Component.prototype.originToRoot = function () {
-        var origin = this.origin();
-        var ancestor = this.parent();
-        while (ancestor != null) {
-            var ancestorOrigin = ancestor.origin();
-            origin.x += ancestorOrigin.x;
-            origin.y += ancestorOrigin.y;
-            ancestor = ancestor.parent();
-        }
-        return origin;
     };
     /**
      * Gets the origin of the Component relative to the root <svg>.
@@ -1172,16 +1011,6 @@ var Component = (function () {
         return this._foregroundContainer;
     };
     /**
-     * Gets a Selection containing a <g> that holds the visual elements of the Component.
-     *
-     * Will return undefined if the Component has not been anchored.
-     *
-     * @return {d3.Selection} content selection for the Component
-     */
-    Component.prototype.content = function () {
-        return this._content;
-    };
-    /**
      * Gets the Selection containing the <g> behind the visual elements of the Component.
      *
      * Will return undefined if the Component has not been anchored.
@@ -1191,19 +1020,22 @@ var Component = (function () {
     Component.prototype.background = function () {
         return this._backgroundContainer;
     };
-    Component._xAlignToProportion = {
-        "left": 0,
-        "center": 0.5,
-        "right": 1,
+    Component.prototype.content = function () {
+        return this._content;
     };
-    Component._yAlignToProportion = {
-        "top": 0,
-        "center": 0.5,
-        "bottom": 1,
+    /**
+     * Top-level SVGs <svg ...>  can exist as non *root* components. For example,
+     * you can place an <svg ..> within an HTMLTable or HTMLGroup, which themselves
+     * are not SVGs. This method determines whether the SVG element is 1) a top-level
+     * svg (<svg>) and 2) the root of the rendering tree. If both are true, then this
+     * is method will return false.
+     */
+    Component.prototype.isNestedTopLevelSVG = function () {
+        return this._isTopLevelSVG && this.parent() != null;
     };
     Component._SAFARI_EVENT_BACKING_CLASS = "safari-event-backing";
     return Component;
-}());
+}(abstractComponent_1.AbstractComponent));
 exports.Component = Component;
 
 
@@ -1216,8 +1048,8 @@ exports.Component = Component;
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-__export(__webpack_require__(42));
-__export(__webpack_require__(43));
+__export(__webpack_require__(45));
+__export(__webpack_require__(46));
 
 
 /***/ }),
@@ -1610,13 +1442,13 @@ function verifyPrecision(precision) {
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-__export(__webpack_require__(58));
-__export(__webpack_require__(59));
-__export(__webpack_require__(60));
-__export(__webpack_require__(61));
-__export(__webpack_require__(62));
 __export(__webpack_require__(63));
 __export(__webpack_require__(64));
+__export(__webpack_require__(65));
+__export(__webpack_require__(66));
+__export(__webpack_require__(67));
+__export(__webpack_require__(68));
+__export(__webpack_require__(69));
 
 
 /***/ }),
@@ -1633,7 +1465,7 @@ var __extends = (this && this.__extends) || function (d, b) {
 var d3 = __webpack_require__(1);
 var Interactions = __webpack_require__(13);
 var Utils = __webpack_require__(0);
-var scale_1 = __webpack_require__(16);
+var scale_1 = __webpack_require__(17);
 var QuantitativeScale = (function (_super) {
     __extends(QuantitativeScale, _super);
     /**
@@ -1894,9 +1726,9 @@ exports.QuantitativeScale = QuantitativeScale;
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-__export(__webpack_require__(55));
-__export(__webpack_require__(56));
-__export(__webpack_require__(57));
+__export(__webpack_require__(60));
+__export(__webpack_require__(61));
+__export(__webpack_require__(62));
 
 
 /***/ }),
@@ -2006,12 +1838,12 @@ exports.Interaction = Interaction;
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-__export(__webpack_require__(65));
-__export(__webpack_require__(66));
-__export(__webpack_require__(67));
-__export(__webpack_require__(29));
-__export(__webpack_require__(68));
-__export(__webpack_require__(69));
+__export(__webpack_require__(70));
+__export(__webpack_require__(71));
+__export(__webpack_require__(72));
+__export(__webpack_require__(31));
+__export(__webpack_require__(73));
+__export(__webpack_require__(74));
 
 
 /***/ }),
@@ -2381,25 +2213,155 @@ exports.XYPlot = XYPlot;
 
 "use strict";
 
-function __export(m) {
-    for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
+var Utils = __webpack_require__(0);
+var RenderPolicies = __webpack_require__(30);
+/**
+ * The RenderController is responsible for enqueueing and synchronizing
+ * layout and render calls for Components.
+ *
+ * Layout and render calls occur inside an animation callback
+ * (window.requestAnimationFrame if available).
+ *
+ * RenderController.flush() immediately lays out and renders all Components currently enqueued.
+ *
+ * To always have immediate rendering (useful for debugging), call
+ * ```typescript
+ * Plottable.RenderController.setRenderPolicy(
+ *   new Plottable.RenderPolicies.Immediate()
+ * );
+ * ```
+ */
+var _componentsNeedingRender = new Utils.Set();
+var _componentsNeedingComputeLayout = new Utils.Set();
+var _animationRequested = false;
+var _isCurrentlyFlushing = false;
+var Policy;
+(function (Policy) {
+    Policy.IMMEDIATE = "immediate";
+    Policy.ANIMATION_FRAME = "animationframe";
+    Policy.TIMEOUT = "timeout";
+})(Policy = exports.Policy || (exports.Policy = {}));
+var _renderPolicy = new RenderPolicies.AnimationFrame();
+function renderPolicy(renderPolicy) {
+    if (renderPolicy == null) {
+        return _renderPolicy;
+    }
+    switch (renderPolicy.toLowerCase()) {
+        case Policy.IMMEDIATE:
+            _renderPolicy = new RenderPolicies.Immediate();
+            break;
+        case Policy.ANIMATION_FRAME:
+            _renderPolicy = new RenderPolicies.AnimationFrame();
+            break;
+        case Policy.TIMEOUT:
+            _renderPolicy = new RenderPolicies.Timeout();
+            break;
+        default:
+            Utils.Window.warn("Unrecognized renderPolicy: " + renderPolicy);
+    }
 }
-__export(__webpack_require__(33));
-__export(__webpack_require__(20));
-__export(__webpack_require__(34));
-__export(__webpack_require__(70));
-__export(__webpack_require__(35));
-__export(__webpack_require__(71));
-__export(__webpack_require__(72));
-__export(__webpack_require__(73));
-__export(__webpack_require__(74));
-__export(__webpack_require__(75));
-__export(__webpack_require__(76));
-__export(__webpack_require__(77));
+exports.renderPolicy = renderPolicy;
+/**
+ * Enqueues the Component for rendering.
+ *
+ * @param {Component} component
+ */
+function registerToRender(component) {
+    if (_isCurrentlyFlushing) {
+        Utils.Window.warn("Registered to render while other components are flushing: request may be ignored");
+    }
+    _componentsNeedingRender.add(component);
+    requestRender();
+}
+exports.registerToRender = registerToRender;
+/**
+ * Enqueues the Component for layout and rendering.
+ *
+ * @param {Component} component
+ */
+function registerToComputeLayoutAndRender(component) {
+    _componentsNeedingComputeLayout.add(component);
+    _componentsNeedingRender.add(component);
+    requestRender();
+}
+exports.registerToComputeLayoutAndRender = registerToComputeLayoutAndRender;
+/**
+ * Enqueues the Component for layout and rendering.
+ *
+ * @param {Component} component
+ * @deprecated This method has been renamed to `RenderController.registerToComputeLayoutAndRender()`.
+ */
+function registerToComputeLayout(component) {
+    registerToComputeLayoutAndRender(component);
+}
+exports.registerToComputeLayout = registerToComputeLayout;
+function requestRender() {
+    // Only run or enqueue flush on first request.
+    if (!_animationRequested) {
+        _animationRequested = true;
+        _renderPolicy.render();
+    }
+}
+/**
+ * Renders all Components waiting to be rendered immediately
+ * instead of waiting until the next frame. Flush is idempotent (given there are no intermediate registrations).
+ *
+ * Useful to call when debugging.
+ */
+function flush() {
+    if (_animationRequested) {
+        // Layout
+        _componentsNeedingComputeLayout.forEach(function (component) { return component.computeLayout(); });
+        // Top level render; Containers will put their children in the toRender queue
+        _componentsNeedingRender.forEach(function (component) { return component.render(); });
+        _isCurrentlyFlushing = true;
+        var failed_1 = new Utils.Set();
+        _componentsNeedingRender.forEach(function (component) {
+            try {
+                component.renderImmediately();
+            }
+            catch (err) {
+                // throw error with timeout to avoid interrupting further renders
+                window.setTimeout(function () {
+                    throw err;
+                }, 0);
+                failed_1.add(component);
+            }
+        });
+        _componentsNeedingComputeLayout = new Utils.Set();
+        _componentsNeedingRender = failed_1;
+        _animationRequested = false;
+        _isCurrentlyFlushing = false;
+    }
+}
+exports.flush = flush;
 
 
 /***/ }),
 /* 16 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+function __export(m) {
+    for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
+}
+__export(__webpack_require__(36));
+__export(__webpack_require__(21));
+__export(__webpack_require__(37));
+__export(__webpack_require__(75));
+__export(__webpack_require__(38));
+__export(__webpack_require__(76));
+__export(__webpack_require__(77));
+__export(__webpack_require__(78));
+__export(__webpack_require__(79));
+__export(__webpack_require__(80));
+__export(__webpack_require__(81));
+__export(__webpack_require__(82));
+
+
+/***/ }),
+/* 17 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2552,7 +2514,7 @@ exports.Scale = Scale;
 
 
 /***/ }),
-/* 17 */
+/* 18 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3183,7 +3145,7 @@ exports.Axis = Axis;
 
 
 /***/ }),
-/* 18 */
+/* 19 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3199,7 +3161,7 @@ exports.ADD_TITLE_ELEMENTS = true;
 
 
 /***/ }),
-/* 19 */
+/* 20 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3270,7 +3232,7 @@ exports.Dispatcher = Dispatcher;
 
 
 /***/ }),
-/* 20 */
+/* 21 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3288,7 +3250,7 @@ var Formatters = __webpack_require__(8);
 var Scales = __webpack_require__(2);
 var quantitativeScale_1 = __webpack_require__(10);
 var Utils = __webpack_require__(0);
-var Plots = __webpack_require__(15);
+var Plots = __webpack_require__(16);
 var plot_1 = __webpack_require__(3);
 var xyPlot_1 = __webpack_require__(14);
 var Bar = (function (_super) {
@@ -3898,7 +3860,7 @@ exports.Bar = Bar;
 
 
 /***/ }),
-/* 21 */
+/* 22 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3913,7 +3875,7 @@ var SVGTypewriter = __webpack_require__(4);
 var Formatters = __webpack_require__(8);
 var Scales = __webpack_require__(2);
 var Utils = __webpack_require__(0);
-var axis_1 = __webpack_require__(17);
+var axis_1 = __webpack_require__(18);
 var TimeInterval;
 (function (TimeInterval) {
     TimeInterval.second = "second";
@@ -4428,7 +4390,7 @@ exports.Time = Time;
 
 
 /***/ }),
-/* 22 */
+/* 23 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -4513,136 +4475,6 @@ exports.ComponentContainer = ComponentContainer;
 
 
 /***/ }),
-/* 23 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-var Utils = __webpack_require__(0);
-var RenderPolicies = __webpack_require__(28);
-/**
- * The RenderController is responsible for enqueueing and synchronizing
- * layout and render calls for Components.
- *
- * Layout and render calls occur inside an animation callback
- * (window.requestAnimationFrame if available).
- *
- * RenderController.flush() immediately lays out and renders all Components currently enqueued.
- *
- * To always have immediate rendering (useful for debugging), call
- * ```typescript
- * Plottable.RenderController.setRenderPolicy(
- *   new Plottable.RenderPolicies.Immediate()
- * );
- * ```
- */
-var _componentsNeedingRender = new Utils.Set();
-var _componentsNeedingComputeLayout = new Utils.Set();
-var _animationRequested = false;
-var _isCurrentlyFlushing = false;
-var Policy;
-(function (Policy) {
-    Policy.IMMEDIATE = "immediate";
-    Policy.ANIMATION_FRAME = "animationframe";
-    Policy.TIMEOUT = "timeout";
-})(Policy = exports.Policy || (exports.Policy = {}));
-var _renderPolicy = new RenderPolicies.AnimationFrame();
-function renderPolicy(renderPolicy) {
-    if (renderPolicy == null) {
-        return _renderPolicy;
-    }
-    switch (renderPolicy.toLowerCase()) {
-        case Policy.IMMEDIATE:
-            _renderPolicy = new RenderPolicies.Immediate();
-            break;
-        case Policy.ANIMATION_FRAME:
-            _renderPolicy = new RenderPolicies.AnimationFrame();
-            break;
-        case Policy.TIMEOUT:
-            _renderPolicy = new RenderPolicies.Timeout();
-            break;
-        default:
-            Utils.Window.warn("Unrecognized renderPolicy: " + renderPolicy);
-    }
-}
-exports.renderPolicy = renderPolicy;
-/**
- * Enqueues the Component for rendering.
- *
- * @param {Component} component
- */
-function registerToRender(component) {
-    if (_isCurrentlyFlushing) {
-        Utils.Window.warn("Registered to render while other components are flushing: request may be ignored");
-    }
-    _componentsNeedingRender.add(component);
-    requestRender();
-}
-exports.registerToRender = registerToRender;
-/**
- * Enqueues the Component for layout and rendering.
- *
- * @param {Component} component
- */
-function registerToComputeLayoutAndRender(component) {
-    _componentsNeedingComputeLayout.add(component);
-    _componentsNeedingRender.add(component);
-    requestRender();
-}
-exports.registerToComputeLayoutAndRender = registerToComputeLayoutAndRender;
-/**
- * Enqueues the Component for layout and rendering.
- *
- * @param {Component} component
- * @deprecated This method has been renamed to `RenderController.registerToComputeLayoutAndRender()`.
- */
-function registerToComputeLayout(component) {
-    registerToComputeLayoutAndRender(component);
-}
-exports.registerToComputeLayout = registerToComputeLayout;
-function requestRender() {
-    // Only run or enqueue flush on first request.
-    if (!_animationRequested) {
-        _animationRequested = true;
-        _renderPolicy.render();
-    }
-}
-/**
- * Renders all Components waiting to be rendered immediately
- * instead of waiting until the next frame. Flush is idempotent (given there are no intermediate registrations).
- *
- * Useful to call when debugging.
- */
-function flush() {
-    if (_animationRequested) {
-        // Layout
-        _componentsNeedingComputeLayout.forEach(function (component) { return component.computeLayout(); });
-        // Top level render; Containers will put their children in the toRender queue
-        _componentsNeedingRender.forEach(function (component) { return component.render(); });
-        _isCurrentlyFlushing = true;
-        var failed_1 = new Utils.Set();
-        _componentsNeedingRender.forEach(function (component) {
-            try {
-                component.renderImmediately();
-            }
-            catch (err) {
-                // throw error with timeout to avoid interrupting further renders
-                window.setTimeout(function () {
-                    throw err;
-                }, 0);
-                failed_1.add(component);
-            }
-        });
-        _componentsNeedingComputeLayout = new Utils.Set();
-        _componentsNeedingRender = failed_1;
-        _animationRequested = false;
-        _isCurrentlyFlushing = false;
-    }
-}
-exports.flush = flush;
-
-
-/***/ }),
 /* 24 */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -4681,6 +4513,227 @@ exports.triangleDown = triangleDown;
 
 "use strict";
 
+var RenderController = __webpack_require__(15);
+var Utils = __webpack_require__(0);
+var AbstractComponent = (function () {
+    function AbstractComponent() {
+        this._destroyed = false;
+        this._isAnchored = false;
+        this._isSetup = false;
+        this._onAnchorCallbacks = new Utils.CallbackSet();
+        this._onDetachCallbacks = new Utils.CallbackSet();
+        this._origin = { x: 0, y: 0 };
+        this._xAlignment = "left";
+        this._yAlignment = "top";
+    }
+    /**
+     * Adds a callback to be called on anchoring the Component to the DOM.
+     * If the Component is already anchored, the callback is called immediately.
+     *
+     * @param {GenericComponentCallback} callback
+     * @return {Component}
+     */
+    AbstractComponent.prototype.onAnchor = function (callback) {
+        if (this._isAnchored) {
+            callback(this);
+        }
+        this._onAnchorCallbacks.add(callback);
+        return this;
+    };
+    /**
+     * Removes a callback that would be called on anchoring the Component to the DOM.
+     * The callback is identified by reference equality.
+     *
+     * @param {GenericComponentCallback} callback
+     * @return {Component}
+     */
+    AbstractComponent.prototype.offAnchor = function (callback) {
+        this._onAnchorCallbacks.delete(callback);
+        return this;
+    };
+    /**
+     * Given available space in pixels, returns the minimum width and height this Component will need.
+     *
+     * @param {number} availableWidth
+     * @param {number} availableHeight
+     * @returns {SpaceRequest}
+     */
+    AbstractComponent.prototype.requestedSpace = function (availableWidth, availableHeight) {
+        return {
+            minWidth: 0,
+            minHeight: 0,
+        };
+    };
+    /**
+     * Queues the Component for rendering.
+     *
+     * @returns {IComponent} The calling Component.
+     */
+    AbstractComponent.prototype.render = function () {
+        if (this._isAnchored && this._isSetup && this.width() >= 0 && this.height() >= 0) {
+            RenderController.registerToRender(this);
+        }
+        return this;
+    };
+    /**
+     * Sets a callback that gets called when the component resizes. The size change
+     * is not guaranteed to be reflected by the DOM at the time the callback is fired.
+     *
+     * @param {IResizeHandler} [resizeHandler] Callback to be called when component resizes
+     */
+    AbstractComponent.prototype.onResize = function (resizeHandler) {
+        this._resizeHandler = resizeHandler;
+        return this;
+    };
+    AbstractComponent.prototype.xAlignment = function (xAlignment) {
+        if (xAlignment == null) {
+            return this._xAlignment;
+        }
+        xAlignment = xAlignment.toLowerCase();
+        if (AbstractComponent._xAlignToProportion[xAlignment] == null) {
+            throw new Error("Unsupported alignment: " + xAlignment);
+        }
+        this._xAlignment = xAlignment;
+        this.redraw();
+        return this;
+    };
+    AbstractComponent.prototype.yAlignment = function (yAlignment) {
+        if (yAlignment == null) {
+            return this._yAlignment;
+        }
+        yAlignment = yAlignment.toLowerCase();
+        if (AbstractComponent._yAlignToProportion[yAlignment] == null) {
+            throw new Error("Unsupported alignment: " + yAlignment);
+        }
+        this._yAlignment = yAlignment;
+        this.redraw();
+        return this;
+    };
+    /**
+     * Checks if the Component has a fixed width or if it grows to fill available space.
+     * Returns false by default on the base Component class.
+     */
+    AbstractComponent.prototype.fixedWidth = function () {
+        return false;
+    };
+    /**
+     * Checks if the Component has a fixed height or if it grows to fill available space.
+     * Returns false by default on the base Component class.
+     */
+    AbstractComponent.prototype.fixedHeight = function () {
+        return false;
+    };
+    /**
+     * Adds a callback to be called when the Component is detach()-ed.
+     *
+     * @param {GenericComponentCallback} callback
+     * @return {IComponent} The calling Component.
+     */
+    AbstractComponent.prototype.onDetach = function (callback) {
+        this._onDetachCallbacks.add(callback);
+        return this;
+    };
+    /**
+     * Removes a callback to be called when the Component is detach()-ed.
+     * The callback is identified by reference equality.
+     *
+     * @param {GenericComponentCallback} callback
+     * @return {IComponent} The calling Component.
+     */
+    AbstractComponent.prototype.offDetach = function (callback) {
+        this._onDetachCallbacks.delete(callback);
+        return this;
+    };
+    AbstractComponent.prototype.parent = function (parent) {
+        if (parent === undefined) {
+            return this._parent;
+        }
+        if (parent !== null && !parent.has(this)) {
+            throw new Error("Passed invalid parent");
+        }
+        this._parent = parent;
+        return this;
+    };
+    /**
+     * @returns {Bounds} for the component in pixel space, where the topLeft
+     * represents the component's minimum x and y values and the bottomRight represents
+     * the component's maximum x and y values.
+     */
+    AbstractComponent.prototype.bounds = function () {
+        var topLeft = this.origin();
+        return {
+            topLeft: topLeft,
+            bottomRight: {
+                x: topLeft.x + this.width(),
+                y: topLeft.y + this.height()
+            },
+        };
+    };
+    /**
+     * Removes a Component from the DOM and disconnects all listeners.
+     */
+    AbstractComponent.prototype.destroy = function () {
+        this._destroyed = true;
+        this.detach();
+    };
+    /**
+     * Gets the width of the Component in pixels.
+     */
+    AbstractComponent.prototype.width = function () {
+        return this._width;
+    };
+    /**
+     * Gets the height of the Component in pixels.
+     */
+    AbstractComponent.prototype.height = function () {
+        return this._height;
+    };
+    /**
+     * Gets the origin of the Component relative to its parent.
+     *
+     * @return {Point}
+     */
+    AbstractComponent.prototype.origin = function () {
+        var _a = this._origin, x = _a.x, y = _a.y;
+        return { x: x, y: y };
+    };
+    /**
+     * Gets the origin of the Component relative to the root
+     *
+     * @return {Point}
+     */
+    AbstractComponent.prototype.originToRoot = function () {
+        var origin = this.origin();
+        var ancestor = this.parent();
+        while (ancestor != null) {
+            var ancestorOrigin = ancestor.origin();
+            origin.x += ancestorOrigin.x;
+            origin.y += ancestorOrigin.y;
+            ancestor = ancestor.parent();
+        }
+        return origin;
+    };
+    AbstractComponent._xAlignToProportion = {
+        "left": 0,
+        "center": 0.5,
+        "right": 1,
+    };
+    AbstractComponent._yAlignToProportion = {
+        "top": 0,
+        "center": 0.5,
+        "bottom": 1,
+    };
+    return AbstractComponent;
+}());
+exports.AbstractComponent = AbstractComponent;
+
+
+/***/ }),
+/* 26 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
@@ -4688,8 +4741,8 @@ var __extends = (this && this.__extends) || function (d, b) {
 };
 var Interactions = __webpack_require__(13);
 var Utils = __webpack_require__(0);
-var _1 = __webpack_require__(27);
-var selectionBoxLayer_1 = __webpack_require__(32);
+var _1 = __webpack_require__(29);
+var selectionBoxLayer_1 = __webpack_require__(35);
 var DragBoxLayer = (function (_super) {
     __extends(DragBoxLayer, _super);
     /**
@@ -5055,7 +5108,92 @@ exports.DragBoxLayer = DragBoxLayer;
 
 
 /***/ }),
-/* 26 */
+/* 27 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
+var htmlComponent_1 = __webpack_require__(34);
+/*
+ * ComponentContainer class encapsulates Table and ComponentGroup's shared functionality.
+ * It will not do anything if instantiated directly.
+ */
+var HTMLComponentContainer = (function (_super) {
+    __extends(HTMLComponentContainer, _super);
+    function HTMLComponentContainer() {
+        var _this = this;
+        _super.call(this);
+        this._detachCallback = function (component) { return _this.remove(component); };
+    }
+    HTMLComponentContainer.prototype.anchor = function (selection) {
+        var _this = this;
+        _super.prototype.anchor.call(this, selection);
+        this._forEach(function (c) { return c.anchorHTML(_this.content().node()); });
+        return this;
+    };
+    HTMLComponentContainer.prototype.render = function () {
+        this._forEach(function (c) { return c.render(); });
+        return this;
+    };
+    /**
+     * Checks whether the specified Component is in the ComponentContainer.
+     */
+    HTMLComponentContainer.prototype.has = function (component) {
+        throw new Error("has() is not implemented on ComponentContainer");
+    };
+    HTMLComponentContainer.prototype._adoptAndAnchor = function (component) {
+        component.parent(this);
+        component.onDetach(this._detachCallback);
+        if (this._isAnchored) {
+            component.anchorHTML(this.content().node());
+        }
+    };
+    /**
+     * Removes the specified Component from the ComponentContainer.
+     */
+    HTMLComponentContainer.prototype.remove = function (component) {
+        if (this.has(component)) {
+            component.offDetach(this._detachCallback);
+            this._remove(component);
+            component.detach();
+            this.redraw();
+        }
+        return this;
+    };
+    /**
+     * Carry out the actual removal of a Component.
+     * Implementation dependent on the type of container.
+     *
+     * @return {boolean} true if the Component was successfully removed, false otherwise.
+     */
+    HTMLComponentContainer.prototype._remove = function (component) {
+        return false;
+    };
+    /**
+     * Invokes a callback on each Component in the ComponentContainer.
+     */
+    HTMLComponentContainer.prototype._forEach = function (callback) {
+        throw new Error("_forEach() is not implemented on ComponentContainer");
+    };
+    /**
+     * Destroys the ComponentContainer and all Components within it.
+     */
+    HTMLComponentContainer.prototype.destroy = function () {
+        _super.prototype.destroy.call(this);
+        this._forEach(function (c) { return c.destroy(); });
+    };
+    return HTMLComponentContainer;
+}(htmlComponent_1.HTMLComponent));
+exports.HTMLComponentContainer = HTMLComponentContainer;
+
+
+/***/ }),
+/* 28 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -5167,7 +5305,7 @@ exports.within = within;
 
 
 /***/ }),
-/* 27 */
+/* 29 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -5176,18 +5314,23 @@ function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
 __export(__webpack_require__(25));
-__export(__webpack_require__(46));
-__export(__webpack_require__(47));
-__export(__webpack_require__(30));
-__export(__webpack_require__(31));
-__export(__webpack_require__(48));
+__export(__webpack_require__(26));
 __export(__webpack_require__(49));
 __export(__webpack_require__(50));
-__export(__webpack_require__(51));
 __export(__webpack_require__(32));
+__export(__webpack_require__(33));
+__export(__webpack_require__(34));
+__export(__webpack_require__(27));
+__export(__webpack_require__(51));
 __export(__webpack_require__(52));
 __export(__webpack_require__(53));
 __export(__webpack_require__(54));
+__export(__webpack_require__(55));
+__export(__webpack_require__(56));
+__export(__webpack_require__(35));
+__export(__webpack_require__(57));
+__export(__webpack_require__(58));
+__export(__webpack_require__(59));
 var Alignment = (function () {
     function Alignment() {
     }
@@ -5202,13 +5345,13 @@ exports.Alignment = Alignment;
 
 
 /***/ }),
-/* 28 */
+/* 30 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 var Utils = __webpack_require__(0);
-var RenderController = __webpack_require__(23);
+var RenderController = __webpack_require__(15);
 /**
  * Renders Components immediately after they are enqueued.
  * Useful for debugging, horrible for performance.
@@ -5253,7 +5396,7 @@ exports.Timeout = Timeout;
 
 
 /***/ }),
-/* 29 */
+/* 31 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -5375,7 +5518,7 @@ exports.Key = Key;
 
 
 /***/ }),
-/* 30 */
+/* 32 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -5386,7 +5529,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
 var Utils = __webpack_require__(0);
-var componentContainer_1 = __webpack_require__(22);
+var componentContainer_1 = __webpack_require__(23);
 var Group = (function (_super) {
     __extends(Group, _super);
     /**
@@ -5475,7 +5618,7 @@ exports.Group = Group;
 
 
 /***/ }),
-/* 31 */
+/* 33 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -5627,7 +5770,218 @@ exports.GuideLineLayer = GuideLineLayer;
 
 
 /***/ }),
-/* 32 */
+/* 34 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
+var d3 = __webpack_require__(1);
+var abstractComponent_1 = __webpack_require__(25);
+var RenderController = __webpack_require__(15);
+var Utils = __webpack_require__(0);
+var HTMLComponent = (function (_super) {
+    __extends(HTMLComponent, _super);
+    function HTMLComponent() {
+        _super.apply(this, arguments);
+        this._cssClasses = new Utils.Set();
+    }
+    HTMLComponent.prototype.anchor = function (selection) {
+        if (this._destroyed) {
+            throw new Error("Can't reuse destroy()-ed Components!");
+        }
+        if (this._element != null) {
+            // reattach existing element
+            selection.appendChild(this._element);
+        }
+        else {
+            this._element = document.createElement("div");
+            selection.appendChild(this._element);
+            this._setup();
+        }
+        this._isAnchored = true;
+        this._onAnchorCallbacks.callCallbacks(this);
+        return this;
+    };
+    HTMLComponent.prototype.anchorHTML = function (selection) {
+        return this.anchor(selection);
+    };
+    HTMLComponent.prototype.computeLayout = function (origin, availableWidth, availableHeight) {
+        if (origin == null || availableWidth == null || availableHeight == null) {
+            if (this._element == null) {
+                throw new Error("anchor() must be called before computeLayout()");
+            }
+            else if (this.parent() == null) {
+                // if the parent is null we are the root node. In this case, we determine
+                // then sizing constraints for the remainder of the chart.
+                origin = { x: 0, y: 0 };
+                // this is the top-level element. make it 100% height and width
+                // so we can measure the amount of space available for the chart
+                // with respect to the total space allocated for charting as specified
+                // by the user.
+                this._element.style.width = "100%";
+                this._element.style.height = "100%";
+                this.content().style("height", "100%");
+                this.content().style("width", "100%");
+                availableWidth = Utils.DOM.elementWidth(this._element);
+                availableHeight = Utils.DOM.elementHeight(this._element);
+            }
+            else {
+                throw new Error("null arguments cannot be passed to computeLayout() on a non-root node");
+            }
+        }
+        var size = this._sizeFromOffer(availableWidth, availableHeight);
+        this._width = size.width;
+        this._height = size.height;
+        var xAlignProportion = HTMLComponent._xAlignToProportion[this._xAlignment];
+        var yAlignProportion = HTMLComponent._yAlignToProportion[this._yAlignment];
+        this._origin = {
+            x: origin.x + (availableWidth - this.width()) * xAlignProportion,
+            y: origin.y + (availableHeight - this.height()) * yAlignProportion,
+        };
+        // set the size and position of the root element given the
+        // calculated space constraints
+        d3.select(this._element).style({
+            height: this._height + "px",
+            left: this._origin.x + "px",
+            top: this._origin.y + "px",
+            width: this._width + "px",
+        });
+        if (this._resizeHandler != null) {
+            this._resizeHandler(size);
+        }
+        return this;
+    };
+    HTMLComponent.prototype.renderImmediately = function () {
+        return this;
+    };
+    HTMLComponent.prototype.redraw = function () {
+        if (this._isAnchored && this._isSetup) {
+            this._scheduleComputeLayout();
+        }
+        return this;
+    };
+    HTMLComponent.prototype.renderTo = function (element) {
+        this.detach();
+        if (element == null || !element.nodeName) {
+            throw new Error("Plottable requires a valid SVG to renderTo");
+        }
+        this.anchor(element);
+        if (this._element == null) {
+            throw new Error("If a Component has never been rendered before, then renderTo must be given a node to render to, " +
+                "or a d3.Selection, or a selector string");
+        }
+        RenderController.registerToComputeLayoutAndRender(this);
+        // flush so that consumers can immediately attach to stuff we create in the DOM
+        RenderController.flush();
+        return this;
+    };
+    HTMLComponent.prototype.hasClass = function (cssClass) {
+        if (cssClass == null) {
+            return false;
+        }
+        if (this._element == null) {
+            return this._cssClasses.has(cssClass);
+        }
+        else {
+            return this._element.className.split(" ").indexOf(cssClass) !== -1;
+        }
+    };
+    HTMLComponent.prototype.addClass = function (cssClass) {
+        if (cssClass == null) {
+            return this;
+        }
+        if (this._element == null) {
+            this._cssClasses.add(cssClass);
+        }
+        else {
+            var classNames = this._element.className.split(" ");
+            if (classNames.indexOf(cssClass) !== -1) {
+                classNames.push(cssClass);
+                this._element.className = classNames.join(" ");
+            }
+        }
+        return this;
+    };
+    HTMLComponent.prototype.removeClass = function (cssClass) {
+        if (cssClass == null) {
+            return this;
+        }
+        if (this._element == null) {
+            this._cssClasses.delete(cssClass);
+        }
+        else {
+            var classNames = this._element.className.split(" ");
+            var indexOfClass = classNames.indexOf(cssClass);
+            if (indexOfClass > -1) {
+                classNames.splice(indexOfClass, 1);
+                this._element.className = classNames.join(" ");
+            }
+        }
+        return this;
+    };
+    HTMLComponent.prototype.detach = function () {
+        this.parent(null);
+        if (this._isAnchored) {
+            this._element.remove();
+        }
+        this._isAnchored = false;
+        this._onDetachCallbacks.callCallbacks(this);
+        return this;
+    };
+    HTMLComponent.prototype.content = function () {
+        return d3.select(this._content);
+    };
+    /**
+     * Gets the container holding the visual elements of the Component.
+     *
+     * Will return undefined if the Component has not been anchored.
+     *
+     * @return {D} content selection for the Component
+     */
+    HTMLComponent.prototype._setup = function () {
+        if (this._isSetup) {
+            return;
+        }
+        var classListSet = new Utils.Set();
+        this._element.className.split(" ").forEach(function (className) { return classListSet.add(className); });
+        this._cssClasses.forEach(function (className) { return classListSet.add(className); });
+        var classList = [];
+        classListSet.forEach(function (className) { return classList.push(className); });
+        this._element.className = classList.join(" ");
+        if (this.parent() == null) {
+            // the root element gets the plottable class name
+            d3.select(this._element).classed("plottable", true);
+        }
+        this._cssClasses = new Utils.Set();
+        this._content = document.createElement("div");
+        this._content.className = "content html-content";
+        this._element.appendChild(this._content);
+        this._isSetup = true;
+    };
+    HTMLComponent.prototype._sizeFromOffer = function (availableWidth, availableHeight) {
+        var requestedSpace = this.requestedSpace(availableWidth, availableHeight);
+        return {
+            width: this.fixedWidth() ? Math.min(availableWidth, requestedSpace.minWidth) : availableWidth,
+            height: this.fixedHeight() ? Math.min(availableHeight, requestedSpace.minHeight) : availableHeight,
+        };
+    };
+    HTMLComponent.prototype._scheduleComputeLayout = function () {
+        if (this._isAnchored && this._isSetup) {
+            RenderController.registerToComputeLayoutAndRender(this);
+        }
+    };
+    return HTMLComponent;
+}(abstractComponent_1.AbstractComponent));
+exports.HTMLComponent = HTMLComponent;
+
+
+/***/ }),
+/* 35 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -5852,7 +6206,7 @@ exports.SelectionBoxLayer = SelectionBoxLayer;
 
 
 /***/ }),
-/* 33 */
+/* 36 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -5866,8 +6220,8 @@ var d3 = __webpack_require__(1);
 var Drawers = __webpack_require__(9);
 var Scales = __webpack_require__(2);
 var Utils = __webpack_require__(0);
-var Plots = __webpack_require__(15);
-var linePlot_1 = __webpack_require__(35);
+var Plots = __webpack_require__(16);
+var linePlot_1 = __webpack_require__(38);
 var plot_1 = __webpack_require__(3);
 var Area = (function (_super) {
     __extends(Area, _super);
@@ -6040,7 +6394,7 @@ exports.Area = Area;
 
 
 /***/ }),
-/* 34 */
+/* 37 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -6053,7 +6407,7 @@ var Animator;
 
 
 /***/ }),
-/* 35 */
+/* 38 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -6069,7 +6423,7 @@ var Drawers = __webpack_require__(9);
 var Scales = __webpack_require__(2);
 var quantitativeScale_1 = __webpack_require__(10);
 var Utils = __webpack_require__(0);
-var Plots = __webpack_require__(15);
+var Plots = __webpack_require__(16);
 var plot_1 = __webpack_require__(3);
 var xyPlot_1 = __webpack_require__(14);
 var Line = (function (_super) {
@@ -6500,7 +6854,7 @@ exports.Line = Line;
 
 
 /***/ }),
-/* 36 */
+/* 39 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -6513,7 +6867,7 @@ var __extends = (this && this.__extends) || function (d, b) {
 var d3 = __webpack_require__(1);
 var Interactions = __webpack_require__(13);
 var Utils = __webpack_require__(0);
-var scale_1 = __webpack_require__(16);
+var scale_1 = __webpack_require__(17);
 var TRANSFORMATION_SPACE = [0, 1];
 var Category = (function (_super) {
     __extends(Category, _super);
@@ -6656,7 +7010,7 @@ exports.Category = Category;
 
 
 /***/ }),
-/* 37 */
+/* 40 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -6795,7 +7149,7 @@ function boundingSVG(element) {
     if (element.nodeName.toLowerCase() === "svg") {
         return element;
     }
-    return null; // not in the DOM
+    return document.body;
 }
 exports.boundingSVG = boundingSVG;
 var _latestClipPathId = 0;
@@ -6858,7 +7212,7 @@ function _parseStyleValue(style, property) {
 
 
 /***/ }),
-/* 38 */
+/* 41 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -6926,7 +7280,7 @@ exports.Set = Set;
 
 
 /***/ }),
-/* 39 */
+/* 42 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -6934,13 +7288,13 @@ exports.Set = Set;
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-__export(__webpack_require__(44));
-__export(__webpack_require__(45));
-__export(__webpack_require__(21));
+__export(__webpack_require__(47));
+__export(__webpack_require__(48));
+__export(__webpack_require__(22));
 
 
 /***/ }),
-/* 40 */
+/* 43 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7008,7 +7362,7 @@ exports.Dataset = Dataset;
 
 
 /***/ }),
-/* 41 */
+/* 44 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7017,7 +7371,7 @@ exports.version = "@VERSION";
 
 
 /***/ }),
-/* 42 */
+/* 45 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7132,7 +7486,7 @@ exports.Easing = Easing;
 
 
 /***/ }),
-/* 43 */
+/* 46 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7156,7 +7510,7 @@ exports.Null = Null;
 
 
 /***/ }),
-/* 44 */
+/* 47 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7168,7 +7522,7 @@ var __extends = (this && this.__extends) || function (d, b) {
 };
 var d3 = __webpack_require__(1);
 var SVGTypewriter = __webpack_require__(4);
-var axis_1 = __webpack_require__(17);
+var axis_1 = __webpack_require__(18);
 var Scales = __webpack_require__(2);
 var Utils = __webpack_require__(0);
 var Category = (function (_super) {
@@ -7501,7 +7855,7 @@ exports.Category = Category;
 
 
 /***/ }),
-/* 45 */
+/* 48 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7513,7 +7867,7 @@ var __extends = (this && this.__extends) || function (d, b) {
 };
 var d3 = __webpack_require__(1);
 var SVGTypewriter = __webpack_require__(4);
-var axis_1 = __webpack_require__(17);
+var axis_1 = __webpack_require__(18);
 var Formatters = __webpack_require__(8);
 var Utils = __webpack_require__(0);
 var Numeric = (function (_super) {
@@ -7803,7 +8157,7 @@ exports.Numeric = Numeric;
 
 
 /***/ }),
-/* 46 */
+/* 49 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7813,7 +8167,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var guideLineLayer_1 = __webpack_require__(31);
+var guideLineLayer_1 = __webpack_require__(33);
 var Interactions = __webpack_require__(13);
 var Utils = __webpack_require__(0);
 var DragLineLayer = (function (_super) {
@@ -7988,7 +8342,7 @@ exports.DragLineLayer = DragLineLayer;
 
 
 /***/ }),
-/* 47 */
+/* 50 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8094,7 +8448,502 @@ exports.Gridlines = Gridlines;
 
 
 /***/ }),
-/* 48 */
+/* 51 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
+var Utils = __webpack_require__(0);
+var htmlComponentContainer_1 = __webpack_require__(27);
+var HTMLGroup = (function (_super) {
+    __extends(HTMLGroup, _super);
+    /**
+     * Constructs a Group.
+     *
+     * A Group contains Components that will be rendered on top of each other.
+     * Components added later will be rendered above Components already in the Group.
+     *
+     * @constructor
+     * @param {Component[]} [components=[]] Components to be added to the Group.
+     */
+    function HTMLGroup(components) {
+        var _this = this;
+        if (components === void 0) { components = []; }
+        _super.call(this);
+        this._components = [];
+        this.addClass("component-group");
+        components.forEach(function (c) { return _this.append(c); });
+    }
+    HTMLGroup.prototype._forEach = function (callback) {
+        this.components().forEach(callback);
+    };
+    /**
+     * Checks whether the specified Component is in the Group.
+     */
+    HTMLGroup.prototype.has = function (component) {
+        return this._components.indexOf(component) >= 0;
+    };
+    HTMLGroup.prototype.requestedSpace = function (offeredWidth, offeredHeight) {
+        var requests = this._components.map(function (c) { return c.requestedSpace(offeredWidth, offeredHeight); });
+        return {
+            minWidth: Utils.Math.max(requests, function (request) { return request.minWidth; }, 0),
+            minHeight: Utils.Math.max(requests, function (request) { return request.minHeight; }, 0),
+        };
+    };
+    HTMLGroup.prototype.computeLayout = function (origin, availableWidth, availableHeight) {
+        var _this = this;
+        _super.prototype.computeLayout.call(this, origin, availableWidth, availableHeight);
+        this._forEach(function (component) {
+            component.computeLayout({ x: 0, y: 0 }, _this.width(), _this.height());
+        });
+        return this;
+    };
+    HTMLGroup.prototype._sizeFromOffer = function (availableWidth, availableHeight) {
+        return {
+            width: availableWidth,
+            height: availableHeight,
+        };
+    };
+    HTMLGroup.prototype.fixedWidth = function () {
+        return this._components.every(function (c) { return c.fixedWidth(); });
+    };
+    HTMLGroup.prototype.fixedHeight = function () {
+        return this._components.every(function (c) { return c.fixedHeight(); });
+    };
+    /**
+     * @return {Component[]} The Components in this Group.
+     */
+    HTMLGroup.prototype.components = function () {
+        return this._components.slice();
+    };
+    /**
+     * Adds a Component to this Group.
+     * The added Component will be rendered above Components already in the Group.
+     */
+    HTMLGroup.prototype.append = function (component) {
+        if (component != null && !this.has(component)) {
+            component.detach();
+            this._components.push(component);
+            this._adoptAndAnchor(component);
+            this.redraw();
+        }
+        return this;
+    };
+    HTMLGroup.prototype._remove = function (component) {
+        var removeIndex = this._components.indexOf(component);
+        if (removeIndex >= 0) {
+            this._components.splice(removeIndex, 1);
+            return true;
+        }
+        return false;
+    };
+    return HTMLGroup;
+}(htmlComponentContainer_1.HTMLComponentContainer));
+exports.HTMLGroup = HTMLGroup;
+
+
+/***/ }),
+/* 52 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
+var d3 = __webpack_require__(1);
+var Utils = __webpack_require__(0);
+var htmlComponentContainer_1 = __webpack_require__(27);
+var HTMLTable = (function (_super) {
+    __extends(HTMLTable, _super);
+    /**
+     * A Table combines Components in the form of a grid. A
+     * common case is combining a y-axis, x-axis, and the plotted data via
+     * ```typescript
+     * new Table([[yAxis, plot],
+     *            [null,  xAxis]]);
+     * ```
+     *
+     * @constructor
+     * @param {Component[][]} [rows=[]] A 2-D array of Components to be added to the Table.
+     *   null can be used if a cell is empty.
+     */
+    function HTMLTable(rows) {
+        var _this = this;
+        if (rows === void 0) { rows = []; }
+        _super.call(this);
+        this._rowPadding = 0;
+        this._columnPadding = 0;
+        this._rows = [];
+        this._rowWeights = [];
+        this._columnWeights = [];
+        this._nRows = 0;
+        this._nCols = 0;
+        this._calculatedLayout = null;
+        this.addClass("table");
+        rows.forEach(function (row, rowIndex) {
+            row.forEach(function (component, colIndex) {
+                if (component != null) {
+                    _this.add(component, rowIndex, colIndex);
+                }
+            });
+        });
+    }
+    HTMLTable.prototype._forEach = function (callback) {
+        for (var r = 0; r < this._nRows; r++) {
+            for (var c = 0; c < this._nCols; c++) {
+                if (this._rows[r][c] != null) {
+                    callback(this._rows[r][c]);
+                }
+            }
+        }
+    };
+    /**
+     * Checks whether the specified Component is in the Table.
+     */
+    HTMLTable.prototype.has = function (component) {
+        for (var r = 0; r < this._nRows; r++) {
+            for (var c = 0; c < this._nCols; c++) {
+                if (this._rows[r][c] === component) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    };
+    /**
+     * Returns the Component at the specified row and column index.
+     *
+     * @param {number} rowIndex
+     * @param {number} columnIndex
+     * @returns {Component} The Component at the specified position, or null if no Component is there.
+     */
+    HTMLTable.prototype.componentAt = function (rowIndex, columnIndex) {
+        if (rowIndex < 0 || rowIndex >= this._nRows || columnIndex < 0 || columnIndex >= this._nCols) {
+            return null;
+        }
+        return this._rows[rowIndex][columnIndex];
+    };
+    ;
+    /**
+     * Adds a Component in the specified row and column position.
+     *
+     * For example, instead of calling `new Table([[a, b], [null, c]])`, you
+     * could call
+     * var table = new Plottable.Components.Table();
+     * table.add(a, 0, 0);
+     * table.add(b, 0, 1);
+     * table.add(c, 1, 1);
+     *
+     * @param {Component} component The Component to be added.
+     * @param {number} row
+     * @param {number} col
+     * @returns {Table} The calling Table.
+     */
+    HTMLTable.prototype.add = function (component, row, col) {
+        if (component == null) {
+            throw Error("Cannot add null to a table cell");
+        }
+        if (!this.has(component)) {
+            var currentComponent = this._rows[row] && this._rows[row][col];
+            if (currentComponent != null) {
+                throw new Error("cell is occupied");
+            }
+            component.detach();
+            this._nRows = Math.max(row + 1, this._nRows);
+            this._nCols = Math.max(col + 1, this._nCols);
+            this._padTableToSize(this._nRows, this._nCols);
+            this._rows[row][col] = component;
+            this._adoptAndAnchor(component);
+            this.redraw();
+        }
+        return this;
+    };
+    HTMLTable.prototype._remove = function (component) {
+        for (var r = 0; r < this._nRows; r++) {
+            for (var c = 0; c < this._nCols; c++) {
+                if (this._rows[r][c] === component) {
+                    this._rows[r][c] = null;
+                    return true;
+                }
+            }
+        }
+        return false;
+    };
+    HTMLTable.prototype._iterateLayout = function (availableWidth, availableHeight, isFinalOffer) {
+        if (isFinalOffer === void 0) { isFinalOffer = false; }
+        /*
+         * Given availableWidth and availableHeight, figure out how to allocate it between rows and columns using an iterative algorithm.
+         *
+         * For both dimensions, keeps track of "guaranteedSpace", which the fixed-size components have requested, and
+         * "proportionalSpace", which is being given to proportionally-growing components according to the weights on the table.
+         * Here is how it works (example uses width but it is the same for height). First, columns are guaranteed no width, and
+         * the free width is allocated to columns based on their colWeights. Then, in determineGuarantees, every component is
+         * offered its column's width and may request some amount of it, which increases that column's guaranteed
+         * width. If there are some components that were not satisfied with the width they were offered, and there is free
+         * width that has not already been guaranteed, then the remaining width is allocated to the unsatisfied columns and the
+         * algorithm runs again. If all components are satisfied, then the remaining width is allocated as proportional space
+         * according to the colWeights.
+         *
+         * The guaranteed width for each column is monotonically increasing as the algorithm iterates. Since it is deterministic
+         * and monotonically increasing, if the freeWidth does not change during an iteration it implies that no further progress
+         * is possible, so the algorithm will not continue iterating on that dimension's account.
+         *
+         * If the algorithm runs more than 5 times, we stop and just use whatever we arrived at. It's not clear under what
+         * circumstances this will happen or if it will happen at all. A message will be printed to the console if this occurs.
+         *
+         */
+        var rows = this._rows;
+        var cols = d3.transpose(this._rows);
+        var availableWidthAfterPadding = availableWidth - this._columnPadding * (this._nCols - 1);
+        var availableHeightAfterPadding = availableHeight - this._rowPadding * (this._nRows - 1);
+        var rowWeights = HTMLTable._calcComponentWeights(this._rowWeights, rows, function (c) { return (c == null) || c.fixedHeight(); });
+        var colWeights = HTMLTable._calcComponentWeights(this._columnWeights, cols, function (c) { return (c == null) || c.fixedWidth(); });
+        // To give the table a good starting position to iterate from, we give the fixed-width components half-weight
+        // so that they will get some initial space allocated to work with
+        var heuristicColWeights = colWeights.map(function (c) { return c === 0 ? 0.5 : c; });
+        var heuristicRowWeights = rowWeights.map(function (c) { return c === 0 ? 0.5 : c; });
+        var colProportionalSpace = HTMLTable._calcProportionalSpace(heuristicColWeights, availableWidthAfterPadding);
+        var rowProportionalSpace = HTMLTable._calcProportionalSpace(heuristicRowWeights, availableHeightAfterPadding);
+        var guaranteedWidths = Utils.Array.createFilledArray(0, this._nCols);
+        var guaranteedHeights = Utils.Array.createFilledArray(0, this._nRows);
+        var freeWidth;
+        var freeHeight;
+        var nIterations = 0;
+        var guarantees;
+        var wantsWidth;
+        var wantsHeight;
+        while (true) {
+            var offeredHeights = Utils.Array.add(guaranteedHeights, rowProportionalSpace);
+            var offeredWidths = Utils.Array.add(guaranteedWidths, colProportionalSpace);
+            guarantees = this._determineGuarantees(offeredWidths, offeredHeights, isFinalOffer);
+            guaranteedWidths = guarantees.guaranteedWidths;
+            guaranteedHeights = guarantees.guaranteedHeights;
+            wantsWidth = guarantees.wantsWidthArr.some(function (x) { return x; });
+            wantsHeight = guarantees.wantsHeightArr.some(function (x) { return x; });
+            var lastFreeWidth = freeWidth;
+            var lastFreeHeight = freeHeight;
+            freeWidth = availableWidthAfterPadding - d3.sum(guarantees.guaranteedWidths);
+            freeHeight = availableHeightAfterPadding - d3.sum(guarantees.guaranteedHeights);
+            var xWeights = void 0;
+            if (wantsWidth) {
+                xWeights = guarantees.wantsWidthArr.map(function (x) { return x ? 0.1 : 0; });
+                xWeights = Utils.Array.add(xWeights, colWeights);
+            }
+            else {
+                xWeights = colWeights;
+            }
+            var yWeights = void 0;
+            if (wantsHeight) {
+                yWeights = guarantees.wantsHeightArr.map(function (x) { return x ? 0.1 : 0; });
+                yWeights = Utils.Array.add(yWeights, rowWeights);
+            }
+            else {
+                yWeights = rowWeights;
+            }
+            colProportionalSpace = HTMLTable._calcProportionalSpace(xWeights, freeWidth);
+            rowProportionalSpace = HTMLTable._calcProportionalSpace(yWeights, freeHeight);
+            nIterations++;
+            var canImproveWidthAllocation = freeWidth > 0 && freeWidth !== lastFreeWidth;
+            var canImproveHeightAllocation = freeHeight > 0 && freeHeight !== lastFreeHeight;
+            if (!(canImproveWidthAllocation || canImproveHeightAllocation)) {
+                break;
+            }
+            if (nIterations > 5) {
+                break;
+            }
+        }
+        // Redo the proportional space one last time, to ensure we use the real weights not the wantsWidth/Height weights
+        freeWidth = availableWidthAfterPadding - d3.sum(guarantees.guaranteedWidths);
+        freeHeight = availableHeightAfterPadding - d3.sum(guarantees.guaranteedHeights);
+        colProportionalSpace = HTMLTable._calcProportionalSpace(colWeights, freeWidth);
+        rowProportionalSpace = HTMLTable._calcProportionalSpace(rowWeights, freeHeight);
+        return {
+            colProportionalSpace: colProportionalSpace,
+            rowProportionalSpace: rowProportionalSpace,
+            guaranteedWidths: guarantees.guaranteedWidths,
+            guaranteedHeights: guarantees.guaranteedHeights,
+            wantsWidth: wantsWidth,
+            wantsHeight: wantsHeight,
+        };
+    };
+    HTMLTable.prototype._determineGuarantees = function (offeredWidths, offeredHeights, isFinalOffer) {
+        if (isFinalOffer === void 0) { isFinalOffer = false; }
+        var requestedWidths = Utils.Array.createFilledArray(0, this._nCols);
+        var requestedHeights = Utils.Array.createFilledArray(0, this._nRows);
+        var columnNeedsWidth = Utils.Array.createFilledArray(false, this._nCols);
+        var rowNeedsHeight = Utils.Array.createFilledArray(false, this._nRows);
+        this._rows.forEach(function (row, rowIndex) {
+            row.forEach(function (component, colIndex) {
+                var spaceRequest;
+                if (component != null) {
+                    spaceRequest = component.requestedSpace(offeredWidths[colIndex], offeredHeights[rowIndex]);
+                }
+                else {
+                    spaceRequest = {
+                        minWidth: 0,
+                        minHeight: 0,
+                    };
+                }
+                var columnWidth = isFinalOffer ? Math.min(spaceRequest.minWidth, offeredWidths[colIndex]) : spaceRequest.minWidth;
+                requestedWidths[colIndex] = Math.max(requestedWidths[colIndex], columnWidth);
+                var rowHeight = isFinalOffer ? Math.min(spaceRequest.minHeight, offeredHeights[rowIndex]) : spaceRequest.minHeight;
+                requestedHeights[rowIndex] = Math.max(requestedHeights[rowIndex], rowHeight);
+                var componentNeedsWidth = spaceRequest.minWidth > offeredWidths[colIndex];
+                columnNeedsWidth[colIndex] = columnNeedsWidth[colIndex] || componentNeedsWidth;
+                var componentNeedsHeight = spaceRequest.minHeight > offeredHeights[rowIndex];
+                rowNeedsHeight[rowIndex] = rowNeedsHeight[rowIndex] || componentNeedsHeight;
+            });
+        });
+        return {
+            guaranteedWidths: requestedWidths,
+            guaranteedHeights: requestedHeights,
+            wantsWidthArr: columnNeedsWidth,
+            wantsHeightArr: rowNeedsHeight,
+        };
+    };
+    HTMLTable.prototype.requestedSpace = function (offeredWidth, offeredHeight) {
+        this._calculatedLayout = this._iterateLayout(offeredWidth, offeredHeight);
+        return {
+            minWidth: d3.sum(this._calculatedLayout.guaranteedWidths),
+            minHeight: d3.sum(this._calculatedLayout.guaranteedHeights),
+        };
+    };
+    HTMLTable.prototype.computeLayout = function (origin, availableWidth, availableHeight) {
+        var _this = this;
+        _super.prototype.computeLayout.call(this, origin, availableWidth, availableHeight);
+        var lastLayoutWidth = d3.sum(this._calculatedLayout.guaranteedWidths);
+        var lastLayoutHeight = d3.sum(this._calculatedLayout.guaranteedHeights);
+        var layout = this._calculatedLayout;
+        if (lastLayoutWidth > this.width() || lastLayoutHeight > this.height()) {
+            layout = this._iterateLayout(this.width(), this.height(), true);
+        }
+        var childYOrigin = 0;
+        var rowHeights = Utils.Array.add(layout.rowProportionalSpace, layout.guaranteedHeights);
+        var colWidths = Utils.Array.add(layout.colProportionalSpace, layout.guaranteedWidths);
+        this._rows.forEach(function (row, rowIndex) {
+            var childXOrigin = 0;
+            row.forEach(function (component, colIndex) {
+                // recursively compute layout
+                if (component != null) {
+                    component.computeLayout({ x: childXOrigin, y: childYOrigin }, colWidths[colIndex], rowHeights[rowIndex]);
+                }
+                childXOrigin += colWidths[colIndex] + _this._columnPadding;
+            });
+            childYOrigin += rowHeights[rowIndex] + _this._rowPadding;
+        });
+        return this;
+    };
+    HTMLTable.prototype.rowPadding = function (rowPadding) {
+        if (rowPadding == null) {
+            return this._rowPadding;
+        }
+        if (!Utils.Math.isValidNumber(rowPadding) || rowPadding < 0) {
+            throw Error("rowPadding must be a non-negative finite value");
+        }
+        this._rowPadding = rowPadding;
+        this.redraw();
+        return this;
+    };
+    HTMLTable.prototype.columnPadding = function (columnPadding) {
+        if (columnPadding == null) {
+            return this._columnPadding;
+        }
+        if (!Utils.Math.isValidNumber(columnPadding) || columnPadding < 0) {
+            throw Error("columnPadding must be a non-negative finite value");
+        }
+        this._columnPadding = columnPadding;
+        this.redraw();
+        return this;
+    };
+    HTMLTable.prototype.rowWeight = function (index, weight) {
+        if (weight == null) {
+            return this._rowWeights[index];
+        }
+        if (!Utils.Math.isValidNumber(weight) || weight < 0) {
+            throw Error("rowWeight must be a non-negative finite value");
+        }
+        this._rowWeights[index] = weight;
+        this.redraw();
+        return this;
+    };
+    HTMLTable.prototype.columnWeight = function (index, weight) {
+        if (weight == null) {
+            return this._columnWeights[index];
+        }
+        if (!Utils.Math.isValidNumber(weight) || weight < 0) {
+            throw Error("columnWeight must be a non-negative finite value");
+        }
+        this._columnWeights[index] = weight;
+        this.redraw();
+        return this;
+    };
+    HTMLTable.prototype.fixedWidth = function () {
+        var cols = d3.transpose(this._rows);
+        return HTMLTable._fixedSpace(cols, function (c) { return (c == null) || c.fixedWidth(); });
+    };
+    HTMLTable.prototype.fixedHeight = function () {
+        return HTMLTable._fixedSpace(this._rows, function (c) { return (c == null) || c.fixedHeight(); });
+    };
+    HTMLTable.prototype._padTableToSize = function (nRows, nCols) {
+        for (var i = 0; i < nRows; i++) {
+            if (this._rows[i] === undefined) {
+                this._rows[i] = [];
+                this._rowWeights[i] = null;
+            }
+            for (var j = 0; j < nCols; j++) {
+                if (this._rows[i][j] === undefined) {
+                    this._rows[i][j] = null;
+                }
+            }
+        }
+        for (var j = 0; j < nCols; j++) {
+            if (this._columnWeights[j] === undefined) {
+                this._columnWeights[j] = null;
+            }
+        }
+    };
+    HTMLTable._calcComponentWeights = function (setWeights, componentGroups, fixityAccessor) {
+        // If the row/col weight was explicitly set, then return it outright
+        // If the weight was not explicitly set, then guess it using the heuristic that if all components are fixed-space
+        // then weight is 0, otherwise weight is 1
+        return setWeights.map(function (w, i) {
+            if (w != null) {
+                return w;
+            }
+            var fixities = componentGroups[i].map(fixityAccessor);
+            var allFixed = fixities.reduce(function (a, b) { return a && b; }, true);
+            return allFixed ? 0 : 1;
+        });
+    };
+    HTMLTable._calcProportionalSpace = function (weights, freeSpace) {
+        var weightSum = d3.sum(weights);
+        if (weightSum === 0) {
+            return Utils.Array.createFilledArray(0, weights.length);
+        }
+        else {
+            return weights.map(function (w) { return freeSpace * w / weightSum; });
+        }
+    };
+    HTMLTable._fixedSpace = function (componentGroup, fixityAccessor) {
+        var all = function (bools) { return bools.reduce(function (a, b) { return a && b; }, true); };
+        var groupIsFixed = function (components) { return all(components.map(fixityAccessor)); };
+        return all(componentGroup.map(groupIsFixed));
+    };
+    return HTMLTable;
+}(htmlComponentContainer_1.HTMLComponentContainer));
+exports.HTMLTable = HTMLTable;
+
+
+/***/ }),
+/* 53 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8105,7 +8954,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
 var SVGTypewriter = __webpack_require__(4);
-var Configs = __webpack_require__(18);
+var Configs = __webpack_require__(19);
 var Formatters = __webpack_require__(8);
 var Utils = __webpack_require__(0);
 var component_1 = __webpack_require__(5);
@@ -8349,7 +9198,7 @@ exports.InterpolatedColorLegend = InterpolatedColorLegend;
 
 
 /***/ }),
-/* 49 */
+/* 54 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8507,7 +9356,7 @@ exports.AxisLabel = AxisLabel;
 
 
 /***/ }),
-/* 50 */
+/* 55 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8519,7 +9368,7 @@ var __extends = (this && this.__extends) || function (d, b) {
 };
 var d3 = __webpack_require__(1);
 var SVGTypewriter = __webpack_require__(4);
-var Configs = __webpack_require__(18);
+var Configs = __webpack_require__(19);
 var Formatters = __webpack_require__(8);
 var SymbolFactories = __webpack_require__(24);
 var Utils = __webpack_require__(0);
@@ -9003,7 +9852,7 @@ exports.Legend = Legend;
 
 
 /***/ }),
-/* 51 */
+/* 56 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -9015,7 +9864,7 @@ var __extends = (this && this.__extends) || function (d, b) {
 };
 var plot_1 = __webpack_require__(3);
 var Utils = __webpack_require__(0);
-var group_1 = __webpack_require__(30);
+var group_1 = __webpack_require__(32);
 var PlotGroup = (function (_super) {
     __extends(PlotGroup, _super);
     function PlotGroup() {
@@ -9056,7 +9905,7 @@ exports.PlotGroup = PlotGroup;
 
 
 /***/ }),
-/* 52 */
+/* 57 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -9068,7 +9917,7 @@ var __extends = (this && this.__extends) || function (d, b) {
 };
 var d3 = __webpack_require__(1);
 var Utils = __webpack_require__(0);
-var componentContainer_1 = __webpack_require__(22);
+var componentContainer_1 = __webpack_require__(23);
 var Table = (function (_super) {
     __extends(Table, _super);
     /**
@@ -9451,7 +10300,7 @@ exports.Table = Table;
 
 
 /***/ }),
-/* 53 */
+/* 58 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -9461,7 +10310,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var dragBoxLayer_1 = __webpack_require__(25);
+var dragBoxLayer_1 = __webpack_require__(26);
 var XDragBoxLayer = (function (_super) {
     __extends(XDragBoxLayer, _super);
     /**
@@ -9513,7 +10362,7 @@ exports.XDragBoxLayer = XDragBoxLayer;
 
 
 /***/ }),
-/* 54 */
+/* 59 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -9523,7 +10372,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var dragBoxLayer_1 = __webpack_require__(25);
+var dragBoxLayer_1 = __webpack_require__(26);
 var YDragBoxLayer = (function (_super) {
     __extends(YDragBoxLayer, _super);
     /**
@@ -9575,7 +10424,7 @@ exports.YDragBoxLayer = YDragBoxLayer;
 
 
 /***/ }),
-/* 55 */
+/* 60 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -9585,7 +10434,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var dispatcher_1 = __webpack_require__(19);
+var dispatcher_1 = __webpack_require__(20);
 var Key = (function (_super) {
     __extends(Key, _super);
     /**
@@ -9667,7 +10516,7 @@ exports.Key = Key;
 
 
 /***/ }),
-/* 56 */
+/* 61 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -9678,7 +10527,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
 var Utils = __webpack_require__(0);
-var dispatcher_1 = __webpack_require__(19);
+var dispatcher_1 = __webpack_require__(20);
 var Mouse = (function (_super) {
     __extends(Mouse, _super);
     /**
@@ -9863,7 +10712,7 @@ exports.Mouse = Mouse;
 
 
 /***/ }),
-/* 57 */
+/* 62 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -9874,7 +10723,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
 var Utils = __webpack_require__(0);
-var dispatcher_1 = __webpack_require__(19);
+var dispatcher_1 = __webpack_require__(20);
 var Touch = (function (_super) {
     __extends(Touch, _super);
     /**
@@ -10035,7 +10884,7 @@ exports.Touch = Touch;
 
 
 /***/ }),
-/* 58 */
+/* 63 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -10063,7 +10912,7 @@ exports.Arc = Arc;
 
 
 /***/ }),
-/* 59 */
+/* 64 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -10091,7 +10940,7 @@ exports.ArcOutline = ArcOutline;
 
 
 /***/ }),
-/* 60 */
+/* 65 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -10123,7 +10972,7 @@ exports.Area = Area;
 
 
 /***/ }),
-/* 61 */
+/* 66 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -10155,7 +11004,7 @@ exports.Line = Line;
 
 
 /***/ }),
-/* 62 */
+/* 67 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -10178,7 +11027,7 @@ exports.Rectangle = Rectangle;
 
 
 /***/ }),
-/* 63 */
+/* 68 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -10201,7 +11050,7 @@ exports.Segment = Segment;
 
 
 /***/ }),
-/* 64 */
+/* 69 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -10225,7 +11074,7 @@ exports.Symbol = Symbol;
 
 
 /***/ }),
-/* 65 */
+/* 70 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -10310,7 +11159,7 @@ exports.Click = Click;
 
 
 /***/ }),
-/* 66 */
+/* 71 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -10425,7 +11274,7 @@ exports.DoubleClick = DoubleClick;
 
 
 /***/ }),
-/* 67 */
+/* 72 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -10586,7 +11435,7 @@ exports.Drag = Drag;
 
 
 /***/ }),
-/* 68 */
+/* 73 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -11140,7 +11989,7 @@ exports.PanZoom = PanZoom;
 
 
 /***/ }),
-/* 69 */
+/* 74 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -11267,7 +12116,7 @@ exports.Pointer = Pointer;
 
 
 /***/ }),
-/* 70 */
+/* 75 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -11279,7 +12128,7 @@ var __extends = (this && this.__extends) || function (d, b) {
 };
 var Scales = __webpack_require__(2);
 var Utils = __webpack_require__(0);
-var barPlot_1 = __webpack_require__(20);
+var barPlot_1 = __webpack_require__(21);
 var plot_1 = __webpack_require__(3);
 var ClusteredBar = (function (_super) {
     __extends(ClusteredBar, _super);
@@ -11336,7 +12185,7 @@ exports.ClusteredBar = ClusteredBar;
 
 
 /***/ }),
-/* 71 */
+/* 76 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -11828,7 +12677,7 @@ exports.Pie = Pie;
 
 
 /***/ }),
-/* 72 */
+/* 77 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -12190,7 +13039,7 @@ exports.Rectangle = Rectangle;
 
 
 /***/ }),
-/* 73 */
+/* 78 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -12205,7 +13054,7 @@ var SymbolFactories = __webpack_require__(24);
 var Drawers = __webpack_require__(9);
 var Scales = __webpack_require__(2);
 var Utils = __webpack_require__(0);
-var Plots = __webpack_require__(15);
+var Plots = __webpack_require__(16);
 var plot_1 = __webpack_require__(3);
 var xyPlot_1 = __webpack_require__(14);
 var Scatter = (function (_super) {
@@ -12364,7 +13213,7 @@ exports.Scatter = Scatter;
 
 
 /***/ }),
-/* 74 */
+/* 79 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -12558,7 +13407,7 @@ exports.Segment = Segment;
 
 
 /***/ }),
-/* 75 */
+/* 80 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -12571,7 +13420,7 @@ var __extends = (this && this.__extends) || function (d, b) {
 var d3 = __webpack_require__(1);
 var Animators = __webpack_require__(6);
 var Utils = __webpack_require__(0);
-var areaPlot_1 = __webpack_require__(33);
+var areaPlot_1 = __webpack_require__(36);
 var plot_1 = __webpack_require__(3);
 var StackedArea = (function (_super) {
     __extends(StackedArea, _super);
@@ -12757,7 +13606,7 @@ exports.StackedArea = StackedArea;
 
 
 /***/ }),
-/* 76 */
+/* 81 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -12769,7 +13618,7 @@ var __extends = (this && this.__extends) || function (d, b) {
 };
 var SVGTypewriter = __webpack_require__(4);
 var Utils = __webpack_require__(0);
-var barPlot_1 = __webpack_require__(20);
+var barPlot_1 = __webpack_require__(21);
 var StackedBar = (function (_super) {
     __extends(StackedBar, _super);
     /**
@@ -12961,7 +13810,7 @@ exports.StackedBar = StackedBar;
 
 
 /***/ }),
-/* 77 */
+/* 82 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -12972,7 +13821,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
 var Utils = __webpack_require__(0);
-var barPlot_1 = __webpack_require__(20);
+var barPlot_1 = __webpack_require__(21);
 var plot_1 = __webpack_require__(3);
 var Waterfall = (function (_super) {
     __extends(Waterfall, _super);
@@ -13168,7 +14017,7 @@ exports.Waterfall = Waterfall;
 
 
 /***/ }),
-/* 78 */
+/* 83 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -13180,7 +14029,7 @@ var __extends = (this && this.__extends) || function (d, b) {
 };
 var d3 = __webpack_require__(1);
 var Utils = __webpack_require__(0);
-var scale_1 = __webpack_require__(16);
+var scale_1 = __webpack_require__(17);
 var Color = (function (_super) {
     __extends(Color, _super);
     /**
@@ -13295,7 +14144,7 @@ exports.Color = Color;
 
 
 /***/ }),
-/* 79 */
+/* 84 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -13307,7 +14156,7 @@ var __extends = (this && this.__extends) || function (d, b) {
 };
 var d3 = __webpack_require__(1);
 var Utils = __webpack_require__(0);
-var scale_1 = __webpack_require__(16);
+var scale_1 = __webpack_require__(17);
 var InterpolatedColor = (function (_super) {
     __extends(InterpolatedColor, _super);
     /**
@@ -13457,7 +14306,7 @@ exports.InterpolatedColor = InterpolatedColor;
 
 
 /***/ }),
-/* 80 */
+/* 85 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -13532,7 +14381,7 @@ exports.Linear = Linear;
 
 
 /***/ }),
-/* 81 */
+/* 86 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -13752,7 +14601,7 @@ exports.ModifiedLog = ModifiedLog;
 
 
 /***/ }),
-/* 82 */
+/* 87 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -13798,7 +14647,7 @@ exports.integerTickGenerator = integerTickGenerator;
 
 
 /***/ }),
-/* 83 */
+/* 88 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -13809,7 +14658,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
 var d3 = __webpack_require__(1);
-var timeAxis_1 = __webpack_require__(21);
+var timeAxis_1 = __webpack_require__(22);
 var quantitativeScale_1 = __webpack_require__(10);
 var Time = (function (_super) {
     __extends(Time, _super);
@@ -13929,7 +14778,7 @@ exports.Time = Time;
 
 
 /***/ }),
-/* 84 */
+/* 89 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -13995,7 +14844,7 @@ exports.createFilledArray = createFilledArray;
 
 
 /***/ }),
-/* 85 */
+/* 90 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -14005,7 +14854,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var set_1 = __webpack_require__(38);
+var set_1 = __webpack_require__(41);
 /**
  * A set of callbacks which can be all invoked at once.
  * Each callback exists at most once in the set (based on reference equality).
@@ -14033,12 +14882,12 @@ exports.CallbackSet = CallbackSet;
 
 
 /***/ }),
-/* 86 */
+/* 91 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
-var DOM = __webpack_require__(37);
+var DOM = __webpack_require__(40);
 var ClientToSVGTranslator = (function () {
     function ClientToSVGTranslator(svg) {
         this._svg = svg;
@@ -14107,7 +14956,7 @@ exports.ClientToSVGTranslator = ClientToSVGTranslator;
 
 
 /***/ }),
-/* 87 */
+/* 92 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -14186,12 +15035,12 @@ function luminance(color) {
 
 
 /***/ }),
-/* 88 */
+/* 93 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
-var Math = __webpack_require__(26);
+var Math = __webpack_require__(28);
 /**
  * Array-backed implementation of {EntityStore}
  */
@@ -14233,12 +15082,12 @@ exports.EntityArray = EntityArray;
 
 
 /***/ }),
-/* 89 */
+/* 94 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
-var Math = __webpack_require__(26);
+var Math = __webpack_require__(28);
 /**
  * Shim for ES6 map.
  * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map
@@ -14320,7 +15169,7 @@ exports.Map = Map;
 
 
 /***/ }),
-/* 90 */
+/* 95 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -14440,12 +15289,12 @@ exports.normalizeKey = normalizeKey;
 
 
 /***/ }),
-/* 91 */
+/* 96 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
-var Configs = __webpack_require__(18);
+var Configs = __webpack_require__(19);
 /**
  * Print a warning message to the console, if it is available.
  *
@@ -14508,7 +15357,7 @@ exports.deprecated = deprecated;
 
 
 /***/ }),
-/* 92 */
+/* 97 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -14518,17 +15367,17 @@ function __export(m) {
 }
 var Animators = __webpack_require__(6);
 exports.Animators = Animators;
-var Axes = __webpack_require__(39);
+var Axes = __webpack_require__(42);
 exports.Axes = Axes;
-var Components = __webpack_require__(27);
+var Components = __webpack_require__(29);
 exports.Components = Components;
-var Configs = __webpack_require__(18);
+var Configs = __webpack_require__(19);
 exports.Configs = Configs;
 var Formatters = __webpack_require__(8);
 exports.Formatters = Formatters;
-var RenderController = __webpack_require__(23);
+var RenderController = __webpack_require__(15);
 exports.RenderController = RenderController;
-var RenderPolicies = __webpack_require__(28);
+var RenderPolicies = __webpack_require__(30);
 exports.RenderPolicies = RenderPolicies;
 var SymbolFactories = __webpack_require__(24);
 exports.SymbolFactories = SymbolFactories;
@@ -14538,28 +15387,28 @@ var Drawers = __webpack_require__(9);
 exports.Drawers = Drawers;
 var Interactions = __webpack_require__(13);
 exports.Interactions = Interactions;
-var Plots = __webpack_require__(15);
+var Plots = __webpack_require__(16);
 exports.Plots = Plots;
 var Scales = __webpack_require__(2);
 exports.Scales = Scales;
 var Utils = __webpack_require__(0);
 exports.Utils = Utils;
-__export(__webpack_require__(17));
-var timeAxis_1 = __webpack_require__(21);
+__export(__webpack_require__(18));
+var timeAxis_1 = __webpack_require__(22);
 exports.TimeInterval = timeAxis_1.TimeInterval;
 __export(__webpack_require__(5));
-__export(__webpack_require__(22));
-__export(__webpack_require__(40));
-var version_1 = __webpack_require__(41);
+__export(__webpack_require__(23));
+__export(__webpack_require__(43));
+var version_1 = __webpack_require__(44);
 exports.version = version_1.version;
-__export(__webpack_require__(19));
+__export(__webpack_require__(20));
 __export(__webpack_require__(7));
 __export(__webpack_require__(12));
-__export(__webpack_require__(29));
+__export(__webpack_require__(31));
 __export(__webpack_require__(14));
 __export(__webpack_require__(3));
 __export(__webpack_require__(10));
-__export(__webpack_require__(16));
+__export(__webpack_require__(17));
 
 
 /***/ })
