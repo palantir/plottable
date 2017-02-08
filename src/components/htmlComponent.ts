@@ -26,6 +26,7 @@ export class HTMLComponent extends AbstractComponent<HTMLElement> {
       this._setup();
     }
 
+
     this._isAnchored = true;
     this._onAnchorCallbacks.callCallbacks(this);
     return this;
@@ -40,22 +41,21 @@ export class HTMLComponent extends AbstractComponent<HTMLElement> {
       if (this._element == null) {
         throw new Error("anchor() must be called before computeLayout()");
       } else if (this.parent() == null) {
-        // we are the root node, retrieve height/width from root SVG
+        // if the parent is null we are the root node. In this case, we determine
+        // then sizing constraints for the remainder of the chart.
+
         origin = { x: 0, y: 0 };
+        // this is the top-level element. make it 100% height and width
+        // so we can measure the amount of space available for the chart
+        // with respect to the total space allocated for charting as specified
+        // by the user.
+        this._element.style.width = "100%";
+        this._element.style.height = "100%";
+        this.content().style("height", "100%");
+        this.content().style("width", "100%");
 
-        // Set width/height to 100% if not specified, to allow accurate size calculation
-        // see http://www.w3.org/TR/CSS21/visudet.html#block-replaced-width
-        // and http://www.w3.org/TR/CSS21/visudet.html#inline-replaced-height
-        if (this.content().attr("width") == null) {
-          this.content().attr("width", "100%");
-        }
-        if (this.content().attr("height") == null) {
-          this.content().attr("height", "100%");
-        }
-
-        let elem: HTMLScriptElement = (<HTMLScriptElement> this.content().node());
-        availableWidth = Utils.DOM.elementWidth(elem);
-        availableHeight = Utils.DOM.elementHeight(elem);
+        availableWidth = Utils.DOM.elementWidth(this._element);
+        availableHeight = Utils.DOM.elementHeight(this._element);
       } else {
         throw new Error("null arguments cannot be passed to computeLayout() on a non-root node");
       }
@@ -71,7 +71,15 @@ export class HTMLComponent extends AbstractComponent<HTMLElement> {
       x: origin.x + (availableWidth - this.width()) * xAlignProportion,
       y: origin.y + (availableHeight - this.height()) * yAlignProportion,
     };
-    d3.select(this._element).attr("transform", "translate(" + this._origin.x + "," + this._origin.y + ")");
+
+    // set the size and position of the root element given the
+    // calculated space constraints
+    d3.select(this._element).style({
+      height: `${this._height}px`,
+      left: `${this._origin.x}px`,
+      top: `${this._origin.y}px`,
+      width: `${this._width}px`,
+    });
 
     if (this._resizeHandler != null) {
       this._resizeHandler(size);
@@ -81,12 +89,10 @@ export class HTMLComponent extends AbstractComponent<HTMLElement> {
   }
 
   public renderImmediately() {
-    // TODO render immediately
     return this;
   }
 
   public redraw() {
-    // TODO make redraw actually work
     if (this._isAnchored && this._isSetup) {
         this._scheduleComputeLayout();
     }
@@ -193,7 +199,6 @@ export class HTMLComponent extends AbstractComponent<HTMLElement> {
       return;
     }
 
-
     const classListSet = new Utils.Set<string>();
     this._element.className.split(" ").forEach((className) => classListSet.add(className));
     this._cssClasses.forEach((className) => classListSet.add(className));
@@ -201,9 +206,14 @@ export class HTMLComponent extends AbstractComponent<HTMLElement> {
     classListSet.forEach((className) => classList.push(className));
     this._element.className = classList.join(" ");
 
+    if (this.parent() == null) {
+      // the root element gets the plottable class name
+      d3.select(this._element).classed("plottable", true);
+    }
+
     this._cssClasses = new Utils.Set<string>();
     this._content = document.createElement("div");
-    this._content.className = "content";
+    this._content.className = "content html-content";
     this._element.appendChild(this._content);
 
     this._isSetup = true;

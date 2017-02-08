@@ -44,6 +44,22 @@ svg.plottable {
   pointer-events: visibleFill;
 }
 
+.plottable .html-content {
+  position: relative;
+}
+
+.plottable .html-content > .table {
+  position: absolute;
+}
+
+.plottable .html-content > .component-group {
+  position: absolute;
+}
+
+.plottable .svg-component {
+  position: absolute;
+}
+
 .plottable .background-fill {
   fill: none;
   pointer-events: none;

@@ -47,10 +47,13 @@ export class Component extends AbstractComponent<d3.Selection<void>> {
 
     this._isTopLevelSVG = (<Node> selection.node()).nodeName.toLowerCase() === "svg";
 
-    if (this._isTopLevelSVG) {
-      // svg node gets the "plottable" CSS class
-      this._rootSVG = selection;
+    if (!this.isNestedTopLevelSVG()) {
+      // non-nested top-level svg node gets the "plottable" CSS class
       this._rootSVG.classed("plottable", true);
+    }
+
+    if (this._isTopLevelSVG) {
+      this._rootSVG = selection;
       // visible overflow for firefox https://stackoverflow.com/questions/5926986/why-does-firefox-appear-to-truncate-embedded-svgs
       this._rootSVG.style("overflow", "visible");
 
