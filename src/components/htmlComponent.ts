@@ -51,8 +51,6 @@ export class HTMLComponent extends AbstractComponent<HTMLElement> {
         // by the user.
         this._element.style.width = "100%";
         this._element.style.height = "100%";
-        this.content().style("height", "100%");
-        this.content().style("width", "100%");
 
         availableWidth = Utils.DOM.elementWidth(this._element);
         availableHeight = Utils.DOM.elementHeight(this._element);
@@ -183,7 +181,7 @@ export class HTMLComponent extends AbstractComponent<HTMLElement> {
   }
 
   public content() {
-    return d3.select(this._content);
+    return d3.select(this._element);
   }
 
   /**
@@ -212,10 +210,6 @@ export class HTMLComponent extends AbstractComponent<HTMLElement> {
     }
 
     this._cssClasses = new Utils.Set<string>();
-    this._content = document.createElement("div");
-    this._content.className = "content html-content";
-    this._element.appendChild(this._content);
-
     this._isSetup = true;
   }
 
