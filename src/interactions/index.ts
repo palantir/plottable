@@ -1,3 +1,8 @@
+/**
+ * Copyright 2014-present Palantir Technologies
+ * @license MIT
+ */
+
 export * from "./clickInteraction";
 export * from "./doubleClickInteraction";
 export * from "./dragInteraction";

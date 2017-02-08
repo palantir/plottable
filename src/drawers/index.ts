@@ -1,3 +1,8 @@
+/**
+ * Copyright 2014-present Palantir Technologies
+ * @license MIT
+ */
+
 import { Animator } from "../animators/animator";
 import { AttributeToProjector, AttributeToAppliedProjector } from "../core/interfaces";
 

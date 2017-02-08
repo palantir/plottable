@@ -96,7 +96,7 @@ function loadQuickTest(path){
             <a href="#"><div>&#x3008; quicktests</div></a><br/>
             <div class="quicktest">
                 <h2>${name}</h2>
-                <svg width=600 height=400>
+                <svg width="100%" height="100%">
             </div>
         `)
 

@@ -1,3 +1,8 @@
+/**
+ * Copyright 2014-present Palantir Technologies
+ * @license MIT
+ */
+
 import { Point, Bounds } from "../core/interfaces";
 import { QuantitativeScale } from "../scales/quantitativeScale";
 
