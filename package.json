@@ -15,9 +15,10 @@
     "build:tsc": "tsc -p test/",
     "build:webpack": "webpack --config webpack.config.js",
     "check_version": "echo ${npm_package_version} $(npm view ${npm_package_name} version) | awk '{ if ($1 == $2) { exit 1 }}'",
-    "start": "npm-run-all -p watch:watch-tsc watch:watch-quicktests webpack-dev-server",
+    "start": "npm-run-all -p start:watch-tsc start:watch-quicktests start:webpack-dev-server",
     "start:watch-quicktests": "grunt watch-quicktests",
     "start:watch-tsc": "tsc -w -p test/",
+    "start:webpack-dev-server": "webpack-dev-server",
     "test": "grunt test-travis"
   },
   "devDependencies": {

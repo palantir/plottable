@@ -194,7 +194,7 @@ module.exports = function(grunt) {
   grunt.registerTask("dist-compile", ["test", "uglify", "compress"]);
 
   grunt.registerTask("commitjs", ["dist-compile", "gitcommit:built"]);
-  grunt.registerTask("default", ["npm run start"]);
+  grunt.registerTask("default", ["exec:npm:start"]);
 
   grunt.registerTask("test", ["dev-compile", "test-local"]);
   grunt.registerTask("test-local", ["blanket_mocha", "lint"]);
