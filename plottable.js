@@ -87,6 +87,10 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
+/*
+Copyright 2014-present Palantir Technologies
+Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
+*/
 
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
@@ -121,6 +125,10 @@ module.exports = __WEBPACK_EXTERNAL_MODULE_1__;
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
+/*
+Copyright 2014-present Palantir Technologies
+Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
+*/
 
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
@@ -154,6 +162,10 @@ exports.isTransformable = isTransformable;
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
+/*
+Copyright 2014-present Palantir Technologies
+Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
+*/
 
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
@@ -671,6 +683,10 @@ __export(__webpack_require__(111));
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
+/*
+Copyright 2014-present Palantir Technologies
+Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
+*/
 
 var d3 = __webpack_require__(1);
 var RenderController = __webpack_require__(24);
@@ -1223,6 +1239,10 @@ exports.Component = Component;
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
+/*
+Copyright 2014-present Palantir Technologies
+Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
+*/
 
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
@@ -1236,6 +1256,10 @@ __export(__webpack_require__(50));
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
+/*
+Copyright 2014-present Palantir Technologies
+Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
+*/
 
 var d3 = __webpack_require__(1);
 var Utils = __webpack_require__(0);
@@ -1377,6 +1401,10 @@ exports.Drawer = Drawer;
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
+/*
+Copyright 2014-present Palantir Technologies
+Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
+*/
 
 var d3 = __webpack_require__(1);
 /**
@@ -1617,6 +1645,10 @@ function verifyPrecision(precision) {
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
+/*
+Copyright 2014-present Palantir Technologies
+Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
+*/
 
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
@@ -1635,6 +1667,10 @@ __export(__webpack_require__(71));
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
+/*
+Copyright 2014-present Palantir Technologies
+Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
+*/
 
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
@@ -1901,6 +1937,10 @@ exports.QuantitativeScale = QuantitativeScale;
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
+/*
+Copyright 2014-present Palantir Technologies
+Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
+*/
 
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
@@ -1915,6 +1955,10 @@ __export(__webpack_require__(64));
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
+/*
+Copyright 2014-present Palantir Technologies
+Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
+*/
 
 var Interaction = (function () {
     function Interaction() {
@@ -2034,6 +2078,10 @@ __export(__webpack_require__(108));
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
+/*
+Copyright 2014-present Palantir Technologies
+Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
+*/
 
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
@@ -2051,6 +2099,10 @@ __export(__webpack_require__(76));
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
+/*
+Copyright 2014-present Palantir Technologies
+Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
+*/
 
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
@@ -2412,6 +2464,10 @@ exports.XYPlot = XYPlot;
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
+/*
+Copyright 2014-present Palantir Technologies
+Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
+*/
 
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
@@ -2435,6 +2491,10 @@ __export(__webpack_require__(84));
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
+/*
+Copyright 2014-present Palantir Technologies
+Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
+*/
 
 var Utils = __webpack_require__(0);
 var Scale = (function () {
@@ -2588,6 +2648,10 @@ exports.Scale = Scale;
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
+/*
+Copyright 2014-present Palantir Technologies
+Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
+*/
 
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
@@ -3219,6 +3283,10 @@ exports.Axis = Axis;
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
+/*
+Copyright 2014-present Palantir Technologies
+Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
+*/
 
 /**
  * Specifies if Plottable should show warnings.
@@ -3235,6 +3303,10 @@ exports.ADD_TITLE_ELEMENTS = true;
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
+/*
+Copyright 2014-present Palantir Technologies
+Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
+*/
 
 var Utils = __webpack_require__(0);
 var Dispatcher = (function () {
@@ -3306,6 +3378,10 @@ exports.Dispatcher = Dispatcher;
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
+/*
+Copyright 2014-present Palantir Technologies
+Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
+*/
 
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
@@ -3941,6 +4017,10 @@ exports.Bar = Bar;
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
+/*
+Copyright 2014-present Palantir Technologies
+Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
+*/
 
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
@@ -4471,6 +4551,10 @@ exports.Time = Time;
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
+/*
+Copyright 2014-present Palantir Technologies
+Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
+*/
 
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
@@ -4556,6 +4640,10 @@ exports.ComponentContainer = ComponentContainer;
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
+/*
+Copyright 2014-present Palantir Technologies
+Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
+*/
 
 var Utils = __webpack_require__(0);
 var RenderPolicies = __webpack_require__(30);
@@ -4686,6 +4774,10 @@ exports.flush = flush;
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
+/*
+Copyright 2014-present Palantir Technologies
+Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
+*/
 
 var d3 = __webpack_require__(1);
 function circle() {
@@ -4719,6 +4811,10 @@ exports.triangleDown = triangleDown;
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
+/*
+Copyright 2014-present Palantir Technologies
+Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
+*/
 
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
@@ -5098,6 +5194,10 @@ exports.DragBoxLayer = DragBoxLayer;
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
+/*
+Copyright 2014-present Palantir Technologies
+Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
+*/
 
 var d3 = __webpack_require__(1);
 var nativeMath = window.Math;
@@ -5302,6 +5402,10 @@ exports.BaseAnimator = BaseAnimator;
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
+/*
+Copyright 2014-present Palantir Technologies
+Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
+*/
 
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
@@ -5337,6 +5441,10 @@ exports.Alignment = Alignment;
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
+/*
+Copyright 2014-present Palantir Technologies
+Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
+*/
 
 var Utils = __webpack_require__(0);
 var RenderController = __webpack_require__(24);
@@ -5388,6 +5496,10 @@ exports.Timeout = Timeout;
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
+/*
+Copyright 2014-present Palantir Technologies
+Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
+*/
 
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
@@ -5510,6 +5622,10 @@ exports.Key = Key;
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
+/*
+Copyright 2014-present Palantir Technologies
+Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
+*/
 
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
@@ -5610,6 +5726,10 @@ exports.Group = Group;
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
+/*
+Copyright 2014-present Palantir Technologies
+Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
+*/
 
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
@@ -5762,6 +5882,10 @@ exports.GuideLineLayer = GuideLineLayer;
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
+/*
+Copyright 2014-present Palantir Technologies
+Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
+*/
 
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
@@ -5987,6 +6111,10 @@ exports.SelectionBoxLayer = SelectionBoxLayer;
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
+/*
+Copyright 2014-present Palantir Technologies
+Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
+*/
 
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
@@ -6175,6 +6303,10 @@ exports.Area = Area;
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
+/*
+Copyright 2014-present Palantir Technologies
+Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
+*/
 
 var Animator;
 (function (Animator) {
@@ -6188,6 +6320,10 @@ var Animator;
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
+/*
+Copyright 2014-present Palantir Technologies
+Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
+*/
 
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
@@ -6635,6 +6771,10 @@ exports.Line = Line;
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
+/*
+Copyright 2014-present Palantir Technologies
+Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
+*/
 
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
@@ -6791,6 +6931,10 @@ exports.Category = Category;
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
+/*
+Copyright 2014-present Palantir Technologies
+Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
+*/
 
 var d3 = __webpack_require__(1);
 var nativeMath = window.Math;
@@ -6993,6 +7137,10 @@ function _parseStyleValue(style, property) {
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
+/*
+Copyright 2014-present Palantir Technologies
+Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
+*/
 
 /**
  * Shim for ES6 set.
@@ -7500,6 +7648,10 @@ exports.Wrapper = Wrapper;
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
+/*
+Copyright 2014-present Palantir Technologies
+Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
+*/
 
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
@@ -7514,6 +7666,10 @@ __export(__webpack_require__(22));
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
+/*
+Copyright 2014-present Palantir Technologies
+Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
+*/
 
 var Utils = __webpack_require__(0);
 var Dataset = (function () {
@@ -7582,6 +7738,10 @@ exports.Dataset = Dataset;
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
+/*
+Copyright 2014-present Palantir Technologies
+Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
+*/
 
 exports.version = "2.9.1";
 
@@ -7591,6 +7751,10 @@ exports.version = "2.9.1";
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
+/*
+Copyright 2014-present Palantir Technologies
+Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
+*/
 
 /**
  * An Animator with easing and configurable durations and delays.
@@ -7706,6 +7870,10 @@ exports.Easing = Easing;
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
+/*
+Copyright 2014-present Palantir Technologies
+Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
+*/
 
 /**
  * An animator implementation with no animation. The attributes are
@@ -7730,6 +7898,10 @@ exports.Null = Null;
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
+/*
+Copyright 2014-present Palantir Technologies
+Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
+*/
 
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
@@ -8075,6 +8247,10 @@ exports.Category = Category;
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
+/*
+Copyright 2014-present Palantir Technologies
+Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
+*/
 
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
@@ -8377,6 +8553,10 @@ exports.Numeric = Numeric;
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
+/*
+Copyright 2014-present Palantir Technologies
+Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
+*/
 
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
@@ -8562,6 +8742,10 @@ exports.DragLineLayer = DragLineLayer;
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
+/*
+Copyright 2014-present Palantir Technologies
+Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
+*/
 
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
@@ -8668,6 +8852,10 @@ exports.Gridlines = Gridlines;
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
+/*
+Copyright 2014-present Palantir Technologies
+Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
+*/
 
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
@@ -8923,6 +9111,10 @@ exports.InterpolatedColorLegend = InterpolatedColorLegend;
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
+/*
+Copyright 2014-present Palantir Technologies
+Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
+*/
 
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
@@ -9081,6 +9273,10 @@ exports.AxisLabel = AxisLabel;
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
+/*
+Copyright 2014-present Palantir Technologies
+Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
+*/
 
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
@@ -9577,6 +9773,10 @@ exports.Legend = Legend;
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
+/*
+Copyright 2014-present Palantir Technologies
+Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
+*/
 
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
@@ -9630,6 +9830,10 @@ exports.PlotGroup = PlotGroup;
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
+/*
+Copyright 2014-present Palantir Technologies
+Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
+*/
 
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
@@ -10025,6 +10229,10 @@ exports.Table = Table;
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
+/*
+Copyright 2014-present Palantir Technologies
+Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
+*/
 
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
@@ -10087,6 +10295,10 @@ exports.XDragBoxLayer = XDragBoxLayer;
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
+/*
+Copyright 2014-present Palantir Technologies
+Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
+*/
 
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
@@ -10149,6 +10361,10 @@ exports.YDragBoxLayer = YDragBoxLayer;
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
+/*
+Copyright 2014-present Palantir Technologies
+Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
+*/
 
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
@@ -10241,6 +10457,10 @@ exports.Key = Key;
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
+/*
+Copyright 2014-present Palantir Technologies
+Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
+*/
 
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
@@ -10437,6 +10657,10 @@ exports.Mouse = Mouse;
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
+/*
+Copyright 2014-present Palantir Technologies
+Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
+*/
 
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
@@ -10609,6 +10833,10 @@ exports.Touch = Touch;
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
+/*
+Copyright 2014-present Palantir Technologies
+Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
+*/
 
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
@@ -10637,6 +10865,10 @@ exports.Arc = Arc;
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
+/*
+Copyright 2014-present Palantir Technologies
+Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
+*/
 
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
@@ -10665,6 +10897,10 @@ exports.ArcOutline = ArcOutline;
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
+/*
+Copyright 2014-present Palantir Technologies
+Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
+*/
 
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
@@ -10697,6 +10933,10 @@ exports.Area = Area;
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
+/*
+Copyright 2014-present Palantir Technologies
+Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
+*/
 
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
@@ -10729,6 +10969,10 @@ exports.Line = Line;
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
+/*
+Copyright 2014-present Palantir Technologies
+Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
+*/
 
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
@@ -10752,6 +10996,10 @@ exports.Rectangle = Rectangle;
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
+/*
+Copyright 2014-present Palantir Technologies
+Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
+*/
 
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
@@ -10775,6 +11023,10 @@ exports.Segment = Segment;
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
+/*
+Copyright 2014-present Palantir Technologies
+Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
+*/
 
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
@@ -10799,6 +11051,10 @@ exports.Symbol = Symbol;
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
+/*
+Copyright 2014-present Palantir Technologies
+Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
+*/
 
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
@@ -10884,6 +11140,10 @@ exports.Click = Click;
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
+/*
+Copyright 2014-present Palantir Technologies
+Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
+*/
 
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
@@ -10999,6 +11259,10 @@ exports.DoubleClick = DoubleClick;
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
+/*
+Copyright 2014-present Palantir Technologies
+Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
+*/
 
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
@@ -11160,6 +11424,10 @@ exports.Drag = Drag;
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
+/*
+Copyright 2014-present Palantir Technologies
+Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
+*/
 
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
@@ -11714,6 +11982,10 @@ exports.PanZoom = PanZoom;
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
+/*
+Copyright 2014-present Palantir Technologies
+Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
+*/
 
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
@@ -11841,6 +12113,10 @@ exports.Pointer = Pointer;
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
+/*
+Copyright 2014-present Palantir Technologies
+Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
+*/
 
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
@@ -11910,6 +12186,10 @@ exports.ClusteredBar = ClusteredBar;
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
+/*
+Copyright 2014-present Palantir Technologies
+Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
+*/
 
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
@@ -12402,6 +12682,10 @@ exports.Pie = Pie;
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
+/*
+Copyright 2014-present Palantir Technologies
+Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
+*/
 
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
@@ -12764,6 +13048,10 @@ exports.Rectangle = Rectangle;
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
+/*
+Copyright 2014-present Palantir Technologies
+Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
+*/
 
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
@@ -12938,6 +13226,10 @@ exports.Scatter = Scatter;
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
+/*
+Copyright 2014-present Palantir Technologies
+Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
+*/
 
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
@@ -13132,6 +13424,10 @@ exports.Segment = Segment;
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
+/*
+Copyright 2014-present Palantir Technologies
+Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
+*/
 
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
@@ -13331,6 +13627,10 @@ exports.StackedArea = StackedArea;
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
+/*
+Copyright 2014-present Palantir Technologies
+Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
+*/
 
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
@@ -13535,6 +13835,10 @@ exports.StackedBar = StackedBar;
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
+/*
+Copyright 2014-present Palantir Technologies
+Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
+*/
 
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
@@ -13742,6 +14046,10 @@ exports.Waterfall = Waterfall;
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
+/*
+Copyright 2014-present Palantir Technologies
+Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
+*/
 
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
@@ -13869,6 +14177,10 @@ exports.Color = Color;
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
+/*
+Copyright 2014-present Palantir Technologies
+Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
+*/
 
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
@@ -14031,6 +14343,10 @@ exports.InterpolatedColor = InterpolatedColor;
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
+/*
+Copyright 2014-present Palantir Technologies
+Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
+*/
 
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
@@ -14106,6 +14422,10 @@ exports.Linear = Linear;
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
+/*
+Copyright 2014-present Palantir Technologies
+Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
+*/
 
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
@@ -14326,6 +14646,10 @@ exports.ModifiedLog = ModifiedLog;
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
+/*
+Copyright 2014-present Palantir Technologies
+Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
+*/
 
 var Utils = __webpack_require__(0);
 /**
@@ -14372,6 +14696,10 @@ exports.integerTickGenerator = integerTickGenerator;
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
+/*
+Copyright 2014-present Palantir Technologies
+Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
+*/
 
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
@@ -14503,6 +14831,10 @@ exports.Time = Time;
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
+/*
+Copyright 2014-present Palantir Technologies
+Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
+*/
 
 var d3 = __webpack_require__(1);
 var nativeArray = window.Array;
@@ -14569,6 +14901,10 @@ exports.createFilledArray = createFilledArray;
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
+/*
+Copyright 2014-present Palantir Technologies
+Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
+*/
 
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
@@ -14607,6 +14943,10 @@ exports.CallbackSet = CallbackSet;
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
+/*
+Copyright 2014-present Palantir Technologies
+Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
+*/
 
 var DOM = __webpack_require__(39);
 var ClientToSVGTranslator = (function () {
@@ -14681,6 +15021,10 @@ exports.ClientToSVGTranslator = ClientToSVGTranslator;
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
+/*
+Copyright 2014-present Palantir Technologies
+Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
+*/
 
 var d3 = __webpack_require__(1);
 var nativeMath = window.Math;
@@ -14760,6 +15104,10 @@ function luminance(color) {
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
+/*
+Copyright 2014-present Palantir Technologies
+Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
+*/
 
 var Math = __webpack_require__(27);
 /**
@@ -14810,6 +15158,10 @@ exports.EntityArray = EntityArray;
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
+/*
+Copyright 2014-present Palantir Technologies
+Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
+*/
 
 var Math = __webpack_require__(27);
 /**
@@ -14897,6 +15249,10 @@ exports.Map = Map;
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
+/*
+Copyright 2014-present Palantir Technologies
+Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
+*/
 
 var d3 = __webpack_require__(1);
 var Utils = __webpack_require__(0);
@@ -15018,6 +15374,10 @@ exports.normalizeKey = normalizeKey;
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
+/*
+Copyright 2014-present Palantir Technologies
+Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
+*/
 
 var Configs = __webpack_require__(19);
 /**

@@ -1,3 +1,8 @@
+/**
+ * Copyright 2014-present Palantir Technologies
+ * @license MIT
+ */
+
 import { QuantitativeScale } from "../scales/quantitativeScale";
 import * as Utils from "../utils";
 

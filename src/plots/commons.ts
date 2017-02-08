@@ -1,3 +1,8 @@
+/**
+ * Copyright 2014-present Palantir Technologies
+ * @license MIT
+ */
+
 import { Dataset } from "../core/dataset";
 import { Point, Entity, Accessor } from "../core/interfaces";
 import { Drawer } from "../drawers/drawer";

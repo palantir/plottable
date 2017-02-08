@@ -1,3 +1,8 @@
+/**
+ * Copyright 2014-present Palantir Technologies
+ * @license MIT
+ */
+
 import * as SVGTypewriter from "svg-typewriter";
 
 import { SpaceRequest } from "../core/interfaces";

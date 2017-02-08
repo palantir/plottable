@@ -1,4 +1,9 @@
 /**
+ * Copyright 2014-present Palantir Technologies
+ * @license MIT
+ */
+
+/**
  * Shim for ES6 set.
  * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Set
  */
