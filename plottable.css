@@ -44,20 +44,12 @@ svg.plottable {
   pointer-events: visibleFill;
 }
 
-/* Root-level html components are relative all others are absolute */
+/* Root-level html components are relative, all others are absolute */
 div.plottable {
   position: relative;
 }
 
-.plottable div.table {
-  position: absolute;
-}
-
-.plottable div.component-group {
-  position: absolute;
-}
-
-.plottable .svg-component {
+.plottable .component {
   position: absolute;
 }
 

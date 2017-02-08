@@ -207,6 +207,9 @@ export class HTMLComponent extends AbstractComponent<HTMLElement> {
     if (this.parent() == null) {
       // the root element gets the plottable class name
       d3.select(this._element).classed("plottable", true);
+    } else {
+      // non-root components are simple components
+      d3.select(this._element).classed("component", true);
     }
 
     this._cssClasses = new Utils.Set<string>();

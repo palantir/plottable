@@ -99,7 +99,7 @@ export class Component extends AbstractComponent<d3.Selection<void>> {
     if (this._isTopLevelSVG && this.parent() != null) {
       // this component is a top level SVG; however, it has parents
       // which means that it is nested within a div container
-      this._rootSVG.classed("svg-component", true);
+      this._rootSVG.classed("component", true);
     }
 
     this._cssClasses.forEach((cssClass: string) => {
