@@ -24,7 +24,7 @@ export class Component extends AbstractComponent<d3.Selection<void>> {
   private _boxes: d3.Selection<void>[] = [];
   private _boxContainer: d3.Selection<void>;
   private _rootSVG: d3.Selection<void>;
-  private _isTopLevelComponent = false;
+  private _isTopLevelSVG = false;
   private _cssClasses = new Utils.Set<string>();
   private _clipPathID: string;
   private static _SAFARI_EVENT_BACKING_CLASS = "safari-event-backing";
@@ -45,9 +45,9 @@ export class Component extends AbstractComponent<d3.Selection<void>> {
       throw new Error("Can't reuse destroy()-ed Components!");
     }
 
-    this._isTopLevelComponent = (<Node> selection.node()).nodeName.toLowerCase() === "svg";
+    this._isTopLevelSVG = (<Node> selection.node()).nodeName.toLowerCase() === "svg";
 
-    if (this._isTopLevelComponent) {
+    if (this._isTopLevelSVG) {
       // svg node gets the "plottable" CSS class
       this._rootSVG = selection;
       this._rootSVG.classed("plottable", true);
@@ -93,9 +93,16 @@ export class Component extends AbstractComponent<d3.Selection<void>> {
     if (this._isSetup) {
       return;
     }
+    if (this._isTopLevelSVG && this.parent() != null) {
+      // this component is a top level SVG; however, it has parents
+      // which means that it is nested within a div container
+      this._rootSVG.classed("svg-component", true);
+    }
+
     this._cssClasses.forEach((cssClass: string) => {
       this._element.classed(cssClass, true);
     });
+
     this._cssClasses = new Utils.Set<string>();
 
     this._backgroundContainer = this._element.append("g").classed("background-container", true);
@@ -126,7 +133,7 @@ export class Component extends AbstractComponent<d3.Selection<void>> {
     if (origin == null || availableWidth == null || availableHeight == null) {
       if (this._element == null) {
         throw new Error("anchor() must be called before computeLayout()");
-      } else if (this._isTopLevelComponent) {
+      } else if (this._isTopLevelSVG) {
         // we are the root node, retrieve height/width from root SVG
         origin = { x: 0, y: 0 };
 
@@ -158,7 +165,21 @@ export class Component extends AbstractComponent<d3.Selection<void>> {
       x: origin.x + (availableWidth - this.width()) * xAlignProportion,
       y: origin.y + (availableHeight - this.height()) * yAlignProportion,
     };
-    this._element.attr("transform", "translate(" + this._origin.x + "," + this._origin.y + ")");
+
+    if (this.isNestedTopLevelSVG()) {
+      // this is a top-level SVG nested within an HTML layout. Apply the styles
+      // directly to the root SVG rather than to the g element
+      this._rootSVG.style({
+        height: this.height(),
+        left: `${this._origin.x}px`,
+        top: `${this._origin.y}px`,
+        width: this.width(),
+      });
+      this._element.attr("transform", "translate(0, 0)");
+    } else {
+      this._element.attr("transform", "translate(" + this._origin.x + "," + this._origin.y + ")");
+    }
+
     this._boxes.forEach((b: d3.Selection<void>) => b.attr("width", this.width()).attr("height", this.height()));
 
     if (this._resizeHandler != null) {
@@ -203,7 +224,7 @@ export class Component extends AbstractComponent<d3.Selection<void>> {
    */
   public redraw() {
     if (this._isAnchored && this._isSetup) {
-      if (this._isTopLevelComponent) {
+      if (this._isTopLevelSVG) {
         this._scheduleComputeLayout();
       } else {
         this.parent().redraw();
@@ -346,7 +367,7 @@ export class Component extends AbstractComponent<d3.Selection<void>> {
 
     if (this._isAnchored) {
       this._element.remove();
-      if (this._isTopLevelComponent) {
+      if (this._isTopLevelSVG) {
         this._rootSVG.select(`.${Component._SAFARI_EVENT_BACKING_CLASS}`).remove();
       }
     }
@@ -390,5 +411,16 @@ export class Component extends AbstractComponent<d3.Selection<void>> {
 
   public content() {
     return this._content;
+  }
+
+  /**
+   * Top-level SVGs <svg ...>  can exist as non *root* components. For example,
+   * you can place an <svg ..> within an HTMLTable or HTMLGroup, which themselves
+   * are not SVGs. This method determines whether the SVG element is 1) a top-level
+   * svg (<svg>) and 2) the root of the rendering tree. If both are true, then this
+   * is method will return false.
+   */
+  private isNestedTopLevelSVG() {
+    return this._isTopLevelSVG && this.parent() != null;
   }
 }
