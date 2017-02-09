@@ -78,7 +78,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/ 	__webpack_require__.p = "";
 
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 121);
+/******/ 	return __webpack_require__(__webpack_require__.s = 118);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -94,25 +94,25 @@ return /******/ (function(modules) { // webpackBootstrap
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-var Array = __webpack_require__(98);
+var Array = __webpack_require__(95);
 exports.Array = Array;
-var Color = __webpack_require__(102);
+var Color = __webpack_require__(99);
 exports.Color = Color;
-var DOM = __webpack_require__(43);
+var DOM = __webpack_require__(42);
 exports.DOM = DOM;
-var Math = __webpack_require__(29);
+var Math = __webpack_require__(28);
 exports.Math = Math;
-var Stacking = __webpack_require__(105);
+var Stacking = __webpack_require__(102);
 exports.Stacking = Stacking;
-var Window = __webpack_require__(106);
+var Window = __webpack_require__(103);
 exports.Window = Window;
-__export(__webpack_require__(99));
+__export(__webpack_require__(96));
+__export(__webpack_require__(97));
+__export(__webpack_require__(98));
 __export(__webpack_require__(100));
+__export(__webpack_require__(29));
 __export(__webpack_require__(101));
-__export(__webpack_require__(103));
-__export(__webpack_require__(30));
-__export(__webpack_require__(104));
-__export(__webpack_require__(45));
+__export(__webpack_require__(44));
 
 
 /***/ }),
@@ -134,16 +134,16 @@ module.exports = __WEBPACK_EXTERNAL_MODULE_1__;
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-var TickGenerators = __webpack_require__(96);
+var TickGenerators = __webpack_require__(93);
 exports.TickGenerators = TickGenerators;
-__export(__webpack_require__(42));
+__export(__webpack_require__(41));
+__export(__webpack_require__(89));
+__export(__webpack_require__(90));
+__export(__webpack_require__(91));
 __export(__webpack_require__(92));
-__export(__webpack_require__(93));
 __export(__webpack_require__(94));
-__export(__webpack_require__(95));
-__export(__webpack_require__(97));
 // ---------------------------------------------------------
-var categoryScale_2 = __webpack_require__(42);
+var categoryScale_2 = __webpack_require__(41);
 var quantitativeScale_1 = __webpack_require__(10);
 /**
  * Type guarded function to check if the scale implements the
@@ -174,11 +174,11 @@ var __extends = (this && this.__extends) || function (d, b) {
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
 var d3 = __webpack_require__(1);
-var Animators = __webpack_require__(6);
-var component_1 = __webpack_require__(5);
+var Animators = __webpack_require__(5);
+var component_1 = __webpack_require__(6);
 var drawer_1 = __webpack_require__(7);
 var Utils = __webpack_require__(0);
-var Plots = __webpack_require__(40);
+var Plots = __webpack_require__(39);
 var Plot = (function (_super) {
     __extends(Plot, _super);
     /**
@@ -672,15 +672,32 @@ exports.Plot = Plot;
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-__export(__webpack_require__(107));
-__export(__webpack_require__(111));
+__export(__webpack_require__(104));
+__export(__webpack_require__(108));
 __export(__webpack_require__(13));
-__export(__webpack_require__(117));
-__export(__webpack_require__(119));
+__export(__webpack_require__(114));
+__export(__webpack_require__(116));
 //# sourceMappingURL=index.js.map
 
 /***/ }),
 /* 5 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/**
+ * Copyright 2014-present Palantir Technologies
+ * @license MIT
+ */
+
+function __export(m) {
+    for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
+}
+__export(__webpack_require__(53));
+__export(__webpack_require__(54));
+
+
+/***/ }),
+/* 6 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1079,23 +1096,6 @@ var Component = (function (_super) {
     return Component;
 }(abstractComponent_1.AbstractComponent));
 exports.Component = Component;
-
-
-/***/ }),
-/* 6 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-/**
- * Copyright 2014-present Palantir Technologies
- * @license MIT
- */
-
-function __export(m) {
-    for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
-}
-__export(__webpack_require__(54));
-__export(__webpack_require__(55));
 
 
 /***/ }),
@@ -1500,13 +1500,13 @@ function verifyPrecision(precision) {
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
+__export(__webpack_require__(69));
+__export(__webpack_require__(70));
+__export(__webpack_require__(71));
 __export(__webpack_require__(72));
 __export(__webpack_require__(73));
 __export(__webpack_require__(74));
 __export(__webpack_require__(75));
-__export(__webpack_require__(76));
-__export(__webpack_require__(77));
-__export(__webpack_require__(78));
 
 
 /***/ }),
@@ -1792,9 +1792,9 @@ exports.QuantitativeScale = QuantitativeScale;
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-__export(__webpack_require__(69));
-__export(__webpack_require__(70));
-__export(__webpack_require__(71));
+__export(__webpack_require__(66));
+__export(__webpack_require__(67));
+__export(__webpack_require__(68));
 
 
 /***/ }),
@@ -1913,11 +1913,11 @@ exports.Interaction = Interaction;
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
+__export(__webpack_require__(109));
+__export(__webpack_require__(110));
+__export(__webpack_require__(111));
 __export(__webpack_require__(112));
 __export(__webpack_require__(113));
-__export(__webpack_require__(114));
-__export(__webpack_require__(115));
-__export(__webpack_require__(116));
 //# sourceMappingURL=index.js.map
 
 /***/ }),
@@ -1933,12 +1933,12 @@ __export(__webpack_require__(116));
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
+__export(__webpack_require__(76));
+__export(__webpack_require__(77));
+__export(__webpack_require__(78));
+__export(__webpack_require__(33));
 __export(__webpack_require__(79));
 __export(__webpack_require__(80));
-__export(__webpack_require__(81));
-__export(__webpack_require__(34));
-__export(__webpack_require__(82));
-__export(__webpack_require__(83));
 
 
 /***/ }),
@@ -2317,7 +2317,7 @@ exports.XYPlot = XYPlot;
  */
 
 var Utils = __webpack_require__(0);
-var RenderPolicies = __webpack_require__(33);
+var RenderPolicies = __webpack_require__(32);
 /**
  * The RenderController is responsible for enqueueing and synchronizing
  * layout and render calls for Components.
@@ -2453,18 +2453,18 @@ exports.flush = flush;
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-__export(__webpack_require__(39));
+__export(__webpack_require__(38));
 __export(__webpack_require__(22));
+__export(__webpack_require__(39));
+__export(__webpack_require__(81));
 __export(__webpack_require__(40));
+__export(__webpack_require__(82));
+__export(__webpack_require__(83));
 __export(__webpack_require__(84));
-__export(__webpack_require__(41));
 __export(__webpack_require__(85));
 __export(__webpack_require__(86));
 __export(__webpack_require__(87));
 __export(__webpack_require__(88));
-__export(__webpack_require__(89));
-__export(__webpack_require__(90));
-__export(__webpack_require__(91));
 
 
 /***/ }),
@@ -2641,7 +2641,7 @@ var __extends = (this && this.__extends) || function (d, b) {
 };
 var d3 = __webpack_require__(1);
 var SVGTypewriter = __webpack_require__(4);
-var component_1 = __webpack_require__(5);
+var component_1 = __webpack_require__(6);
 var Formatters = __webpack_require__(8);
 var Utils = __webpack_require__(0);
 var Axis = (function (_super) {
@@ -3371,7 +3371,7 @@ var __extends = (this && this.__extends) || function (d, b) {
 };
 var d3 = __webpack_require__(1);
 var SVGTypewriter = __webpack_require__(4);
-var Animators = __webpack_require__(6);
+var Animators = __webpack_require__(5);
 var Drawers = __webpack_require__(9);
 var Formatters = __webpack_require__(8);
 var Scales = __webpack_require__(2);
@@ -4532,17 +4532,13 @@ exports.Time = Time;
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-/**
- * Copyright 2014-present Palantir Technologies
- * @license MIT
- */
 
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var component_1 = __webpack_require__(5);
+var htmlComponent_1 = __webpack_require__(36);
 /*
  * ComponentContainer class encapsulates Table and ComponentGroup's shared functionality.
  * It will not do anything if instantiated directly.
@@ -4557,7 +4553,7 @@ var ComponentContainer = (function (_super) {
     ComponentContainer.prototype.anchor = function (selection) {
         var _this = this;
         _super.prototype.anchor.call(this, selection);
-        this._forEach(function (c) { return c.anchor(_this.content()); });
+        this._forEach(function (c) { return c.anchorHTML(_this.content().node()); });
         return this;
     };
     ComponentContainer.prototype.render = function () {
@@ -4574,7 +4570,7 @@ var ComponentContainer = (function (_super) {
         component.parent(this);
         component.onDetach(this._detachCallback);
         if (this._isAnchored) {
-            component.anchor(this.content());
+            component.anchorHTML(this.content().node());
         }
     };
     /**
@@ -4612,7 +4608,7 @@ var ComponentContainer = (function (_super) {
         this._forEach(function (c) { return c.destroy(); });
     };
     return ComponentContainer;
-}(component_1.Component));
+}(htmlComponent_1.HTMLComponent));
 exports.ComponentContainer = ComponentContainer;
 
 
@@ -4898,8 +4894,8 @@ var __extends = (this && this.__extends) || function (d, b) {
 };
 var Interactions = __webpack_require__(14);
 var Utils = __webpack_require__(0);
-var _1 = __webpack_require__(32);
-var selectionBoxLayer_1 = __webpack_require__(38);
+var _1 = __webpack_require__(31);
+var selectionBoxLayer_1 = __webpack_require__(37);
 var DragBoxLayer = (function (_super) {
     __extends(DragBoxLayer, _super);
     /**
@@ -5269,91 +5265,6 @@ exports.DragBoxLayer = DragBoxLayer;
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
-var htmlComponent_1 = __webpack_require__(37);
-/*
- * ComponentContainer class encapsulates Table and ComponentGroup's shared functionality.
- * It will not do anything if instantiated directly.
- */
-var HTMLComponentContainer = (function (_super) {
-    __extends(HTMLComponentContainer, _super);
-    function HTMLComponentContainer() {
-        var _this = this;
-        _super.call(this);
-        this._detachCallback = function (component) { return _this.remove(component); };
-    }
-    HTMLComponentContainer.prototype.anchor = function (selection) {
-        var _this = this;
-        _super.prototype.anchor.call(this, selection);
-        this._forEach(function (c) { return c.anchorHTML(_this.content().node()); });
-        return this;
-    };
-    HTMLComponentContainer.prototype.render = function () {
-        this._forEach(function (c) { return c.render(); });
-        return this;
-    };
-    /**
-     * Checks whether the specified Component is in the ComponentContainer.
-     */
-    HTMLComponentContainer.prototype.has = function (component) {
-        throw new Error("has() is not implemented on ComponentContainer");
-    };
-    HTMLComponentContainer.prototype._adoptAndAnchor = function (component) {
-        component.parent(this);
-        component.onDetach(this._detachCallback);
-        if (this._isAnchored) {
-            component.anchorHTML(this.content().node());
-        }
-    };
-    /**
-     * Removes the specified Component from the ComponentContainer.
-     */
-    HTMLComponentContainer.prototype.remove = function (component) {
-        if (this.has(component)) {
-            component.offDetach(this._detachCallback);
-            this._remove(component);
-            component.detach();
-            this.redraw();
-        }
-        return this;
-    };
-    /**
-     * Carry out the actual removal of a Component.
-     * Implementation dependent on the type of container.
-     *
-     * @return {boolean} true if the Component was successfully removed, false otherwise.
-     */
-    HTMLComponentContainer.prototype._remove = function (component) {
-        return false;
-    };
-    /**
-     * Invokes a callback on each Component in the ComponentContainer.
-     */
-    HTMLComponentContainer.prototype._forEach = function (callback) {
-        throw new Error("_forEach() is not implemented on ComponentContainer");
-    };
-    /**
-     * Destroys the ComponentContainer and all Components within it.
-     */
-    HTMLComponentContainer.prototype.destroy = function () {
-        _super.prototype.destroy.call(this);
-        this._forEach(function (c) { return c.destroy(); });
-    };
-    return HTMLComponentContainer;
-}(htmlComponent_1.HTMLComponent));
-exports.HTMLComponentContainer = HTMLComponentContainer;
-
-
-/***/ }),
-/* 29 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
 /**
  * Copyright 2014-present Palantir Technologies
  * @license MIT
@@ -5466,7 +5377,7 @@ exports.within = within;
 
 
 /***/ }),
-/* 30 */
+/* 29 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -5517,7 +5428,7 @@ exports.Translator = Translator;
 
 
 /***/ }),
-/* 31 */
+/* 30 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -5609,7 +5520,7 @@ exports.BaseAnimator = BaseAnimator;
 //# sourceMappingURL=baseAnimator.js.map
 
 /***/ }),
-/* 32 */
+/* 31 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -5623,22 +5534,19 @@ function __export(m) {
 }
 __export(__webpack_require__(26));
 __export(__webpack_require__(27));
+__export(__webpack_require__(57));
 __export(__webpack_require__(58));
-__export(__webpack_require__(59));
+__export(__webpack_require__(34));
 __export(__webpack_require__(35));
 __export(__webpack_require__(36));
-__export(__webpack_require__(37));
-__export(__webpack_require__(28));
+__export(__webpack_require__(59));
 __export(__webpack_require__(60));
 __export(__webpack_require__(61));
 __export(__webpack_require__(62));
+__export(__webpack_require__(37));
 __export(__webpack_require__(63));
 __export(__webpack_require__(64));
 __export(__webpack_require__(65));
-__export(__webpack_require__(38));
-__export(__webpack_require__(66));
-__export(__webpack_require__(67));
-__export(__webpack_require__(68));
 var Alignment = (function () {
     function Alignment() {
     }
@@ -5653,7 +5561,7 @@ exports.Alignment = Alignment;
 
 
 /***/ }),
-/* 33 */
+/* 32 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -5708,7 +5616,7 @@ exports.Timeout = Timeout;
 
 
 /***/ }),
-/* 34 */
+/* 33 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -5834,14 +5742,10 @@ exports.Key = Key;
 
 
 /***/ }),
-/* 35 */
+/* 34 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-/**
- * Copyright 2014-present Palantir Technologies
- * @license MIT
- */
 
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
@@ -5938,7 +5842,7 @@ exports.Group = Group;
 
 
 /***/ }),
-/* 36 */
+/* 35 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -5953,7 +5857,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
 var Utils = __webpack_require__(0);
-var component_1 = __webpack_require__(5);
+var component_1 = __webpack_require__(6);
 var PropertyMode;
 (function (PropertyMode) {
     PropertyMode[PropertyMode["VALUE"] = 0] = "VALUE";
@@ -6094,7 +5998,7 @@ exports.GuideLineLayer = GuideLineLayer;
 
 
 /***/ }),
-/* 37 */
+/* 36 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -6195,12 +6099,11 @@ var HTMLComponent = (function (_super) {
     HTMLComponent.prototype.renderTo = function (element) {
         this.detach();
         if (element == null || !element.nodeName) {
-            throw new Error("Plottable requires a valid SVG to renderTo");
+            throw new Error("Plottable requires a valid HTMLElement to renderTo");
         }
         this.anchor(element);
         if (this._element == null) {
-            throw new Error("If a Component has never been rendered before, then renderTo must be given a node to render to, " +
-                "or a d3.Selection, or a selector string");
+            throw new Error("If a Component has never been rendered before, then renderTo must be given an HTMLElement to render to");
         }
         RenderController.registerToComputeLayoutAndRender(this);
         // flush so that consumers can immediately attach to stuff we create in the DOM
@@ -6315,7 +6218,7 @@ exports.HTMLComponent = HTMLComponent;
 
 
 /***/ }),
-/* 38 */
+/* 37 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -6330,7 +6233,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
 var Utils = __webpack_require__(0);
-var component_1 = __webpack_require__(5);
+var component_1 = __webpack_require__(6);
 (function (PropertyMode) {
     PropertyMode[PropertyMode["VALUE"] = 0] = "VALUE";
     PropertyMode[PropertyMode["PIXEL"] = 1] = "PIXEL";
@@ -6544,7 +6447,7 @@ exports.SelectionBoxLayer = SelectionBoxLayer;
 
 
 /***/ }),
-/* 39 */
+/* 38 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -6563,7 +6466,7 @@ var Drawers = __webpack_require__(9);
 var Scales = __webpack_require__(2);
 var Utils = __webpack_require__(0);
 var Plots = __webpack_require__(17);
-var linePlot_1 = __webpack_require__(41);
+var linePlot_1 = __webpack_require__(40);
 var plot_1 = __webpack_require__(3);
 var Area = (function (_super) {
     __extends(Area, _super);
@@ -6736,7 +6639,7 @@ exports.Area = Area;
 
 
 /***/ }),
-/* 40 */
+/* 39 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -6753,7 +6656,7 @@ var Animator;
 
 
 /***/ }),
-/* 41 */
+/* 40 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -6768,7 +6671,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
 var d3 = __webpack_require__(1);
-var Animators = __webpack_require__(6);
+var Animators = __webpack_require__(5);
 var Drawers = __webpack_require__(9);
 var Scales = __webpack_require__(2);
 var quantitativeScale_1 = __webpack_require__(10);
@@ -7204,7 +7107,7 @@ exports.Line = Line;
 
 
 /***/ }),
-/* 42 */
+/* 41 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7364,7 +7267,7 @@ exports.Category = Category;
 
 
 /***/ }),
-/* 43 */
+/* 42 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7581,7 +7484,7 @@ function _parseStyleValue(style, property) {
 
 
 /***/ }),
-/* 44 */
+/* 43 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7643,7 +7546,7 @@ exports.PlottableSVGElement = PlottableSVGElement;
 
 
 /***/ }),
-/* 45 */
+/* 44 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7715,7 +7618,7 @@ exports.Set = Set;
 
 
 /***/ }),
-/* 46 */
+/* 45 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7783,7 +7686,7 @@ exports.AbstractMeasurer = AbstractMeasurer;
 //# sourceMappingURL=abstractMeasurer.js.map
 
 /***/ }),
-/* 47 */
+/* 46 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7799,7 +7702,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
 var Utils = __webpack_require__(13);
-var characterMeasurer_1 = __webpack_require__(48);
+var characterMeasurer_1 = __webpack_require__(47);
 var CacheCharacterMeasurer = (function (_super) {
     __extends(CacheCharacterMeasurer, _super);
     function CacheCharacterMeasurer(area, className, useGuards) {
@@ -7824,7 +7727,7 @@ exports.CacheCharacterMeasurer = CacheCharacterMeasurer;
 //# sourceMappingURL=cacheCharacterMeasurer.js.map
 
 /***/ }),
-/* 48 */
+/* 47 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7840,7 +7743,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
 var d3 = __webpack_require__(1);
-var measurer_1 = __webpack_require__(49);
+var measurer_1 = __webpack_require__(48);
 var CharacterMeasurer = (function (_super) {
     __extends(CharacterMeasurer, _super);
     function CharacterMeasurer() {
@@ -7863,7 +7766,7 @@ exports.CharacterMeasurer = CharacterMeasurer;
 //# sourceMappingURL=characterMeasurer.js.map
 
 /***/ }),
-/* 49 */
+/* 48 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7879,7 +7782,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
 var d3 = __webpack_require__(1);
-var abstractMeasurer_1 = __webpack_require__(46);
+var abstractMeasurer_1 = __webpack_require__(45);
 var Measurer = (function (_super) {
     __extends(Measurer, _super);
     function Measurer(area, className, useGuards) {
@@ -7925,7 +7828,7 @@ exports.Measurer = Measurer;
 //# sourceMappingURL=measurer.js.map
 
 /***/ }),
-/* 50 */
+/* 49 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8154,7 +8057,7 @@ exports.Wrapper = Wrapper;
 //# sourceMappingURL=wrapper.js.map
 
 /***/ }),
-/* 51 */
+/* 50 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8166,13 +8069,13 @@ exports.Wrapper = Wrapper;
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
+__export(__webpack_require__(55));
 __export(__webpack_require__(56));
-__export(__webpack_require__(57));
 __export(__webpack_require__(23));
 
 
 /***/ }),
-/* 52 */
+/* 51 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8244,7 +8147,7 @@ exports.Dataset = Dataset;
 
 
 /***/ }),
-/* 53 */
+/* 52 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8257,7 +8160,7 @@ exports.version = "2.9.1";
 
 
 /***/ }),
-/* 54 */
+/* 53 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8376,7 +8279,7 @@ exports.Easing = Easing;
 
 
 /***/ }),
-/* 55 */
+/* 54 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8404,7 +8307,7 @@ exports.Null = Null;
 
 
 /***/ }),
-/* 56 */
+/* 55 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8753,7 +8656,7 @@ exports.Category = Category;
 
 
 /***/ }),
-/* 57 */
+/* 56 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -9059,7 +8962,7 @@ exports.Numeric = Numeric;
 
 
 /***/ }),
-/* 58 */
+/* 57 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -9073,7 +8976,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var guideLineLayer_1 = __webpack_require__(36);
+var guideLineLayer_1 = __webpack_require__(35);
 var Interactions = __webpack_require__(14);
 var Utils = __webpack_require__(0);
 var DragLineLayer = (function (_super) {
@@ -9248,7 +9151,7 @@ exports.DragLineLayer = DragLineLayer;
 
 
 /***/ }),
-/* 59 */
+/* 58 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -9263,7 +9166,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
 var quantitativeScale_1 = __webpack_require__(10);
-var component_1 = __webpack_require__(5);
+var component_1 = __webpack_require__(6);
 var Gridlines = (function (_super) {
     __extends(Gridlines, _super);
     /**
@@ -9358,502 +9261,7 @@ exports.Gridlines = Gridlines;
 
 
 /***/ }),
-/* 60 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
-var Utils = __webpack_require__(0);
-var htmlComponentContainer_1 = __webpack_require__(28);
-var HTMLGroup = (function (_super) {
-    __extends(HTMLGroup, _super);
-    /**
-     * Constructs a Group.
-     *
-     * A Group contains Components that will be rendered on top of each other.
-     * Components added later will be rendered above Components already in the Group.
-     *
-     * @constructor
-     * @param {Component[]} [components=[]] Components to be added to the Group.
-     */
-    function HTMLGroup(components) {
-        var _this = this;
-        if (components === void 0) { components = []; }
-        _super.call(this);
-        this._components = [];
-        this.addClass("component-group");
-        components.forEach(function (c) { return _this.append(c); });
-    }
-    HTMLGroup.prototype._forEach = function (callback) {
-        this.components().forEach(callback);
-    };
-    /**
-     * Checks whether the specified Component is in the Group.
-     */
-    HTMLGroup.prototype.has = function (component) {
-        return this._components.indexOf(component) >= 0;
-    };
-    HTMLGroup.prototype.requestedSpace = function (offeredWidth, offeredHeight) {
-        var requests = this._components.map(function (c) { return c.requestedSpace(offeredWidth, offeredHeight); });
-        return {
-            minWidth: Utils.Math.max(requests, function (request) { return request.minWidth; }, 0),
-            minHeight: Utils.Math.max(requests, function (request) { return request.minHeight; }, 0),
-        };
-    };
-    HTMLGroup.prototype.computeLayout = function (origin, availableWidth, availableHeight) {
-        var _this = this;
-        _super.prototype.computeLayout.call(this, origin, availableWidth, availableHeight);
-        this._forEach(function (component) {
-            component.computeLayout({ x: 0, y: 0 }, _this.width(), _this.height());
-        });
-        return this;
-    };
-    HTMLGroup.prototype._sizeFromOffer = function (availableWidth, availableHeight) {
-        return {
-            width: availableWidth,
-            height: availableHeight,
-        };
-    };
-    HTMLGroup.prototype.fixedWidth = function () {
-        return this._components.every(function (c) { return c.fixedWidth(); });
-    };
-    HTMLGroup.prototype.fixedHeight = function () {
-        return this._components.every(function (c) { return c.fixedHeight(); });
-    };
-    /**
-     * @return {Component[]} The Components in this Group.
-     */
-    HTMLGroup.prototype.components = function () {
-        return this._components.slice();
-    };
-    /**
-     * Adds a Component to this Group.
-     * The added Component will be rendered above Components already in the Group.
-     */
-    HTMLGroup.prototype.append = function (component) {
-        if (component != null && !this.has(component)) {
-            component.detach();
-            this._components.push(component);
-            this._adoptAndAnchor(component);
-            this.redraw();
-        }
-        return this;
-    };
-    HTMLGroup.prototype._remove = function (component) {
-        var removeIndex = this._components.indexOf(component);
-        if (removeIndex >= 0) {
-            this._components.splice(removeIndex, 1);
-            return true;
-        }
-        return false;
-    };
-    return HTMLGroup;
-}(htmlComponentContainer_1.HTMLComponentContainer));
-exports.HTMLGroup = HTMLGroup;
-
-
-/***/ }),
-/* 61 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
-var d3 = __webpack_require__(1);
-var Utils = __webpack_require__(0);
-var htmlComponentContainer_1 = __webpack_require__(28);
-var HTMLTable = (function (_super) {
-    __extends(HTMLTable, _super);
-    /**
-     * A Table combines Components in the form of a grid. A
-     * common case is combining a y-axis, x-axis, and the plotted data via
-     * ```typescript
-     * new Table([[yAxis, plot],
-     *            [null,  xAxis]]);
-     * ```
-     *
-     * @constructor
-     * @param {Component[][]} [rows=[]] A 2-D array of Components to be added to the Table.
-     *   null can be used if a cell is empty.
-     */
-    function HTMLTable(rows) {
-        var _this = this;
-        if (rows === void 0) { rows = []; }
-        _super.call(this);
-        this._rowPadding = 0;
-        this._columnPadding = 0;
-        this._rows = [];
-        this._rowWeights = [];
-        this._columnWeights = [];
-        this._nRows = 0;
-        this._nCols = 0;
-        this._calculatedLayout = null;
-        this.addClass("table");
-        rows.forEach(function (row, rowIndex) {
-            row.forEach(function (component, colIndex) {
-                if (component != null) {
-                    _this.add(component, rowIndex, colIndex);
-                }
-            });
-        });
-    }
-    HTMLTable.prototype._forEach = function (callback) {
-        for (var r = 0; r < this._nRows; r++) {
-            for (var c = 0; c < this._nCols; c++) {
-                if (this._rows[r][c] != null) {
-                    callback(this._rows[r][c]);
-                }
-            }
-        }
-    };
-    /**
-     * Checks whether the specified Component is in the Table.
-     */
-    HTMLTable.prototype.has = function (component) {
-        for (var r = 0; r < this._nRows; r++) {
-            for (var c = 0; c < this._nCols; c++) {
-                if (this._rows[r][c] === component) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    };
-    /**
-     * Returns the Component at the specified row and column index.
-     *
-     * @param {number} rowIndex
-     * @param {number} columnIndex
-     * @returns {Component} The Component at the specified position, or null if no Component is there.
-     */
-    HTMLTable.prototype.componentAt = function (rowIndex, columnIndex) {
-        if (rowIndex < 0 || rowIndex >= this._nRows || columnIndex < 0 || columnIndex >= this._nCols) {
-            return null;
-        }
-        return this._rows[rowIndex][columnIndex];
-    };
-    ;
-    /**
-     * Adds a Component in the specified row and column position.
-     *
-     * For example, instead of calling `new Table([[a, b], [null, c]])`, you
-     * could call
-     * var table = new Plottable.Components.Table();
-     * table.add(a, 0, 0);
-     * table.add(b, 0, 1);
-     * table.add(c, 1, 1);
-     *
-     * @param {Component} component The Component to be added.
-     * @param {number} row
-     * @param {number} col
-     * @returns {Table} The calling Table.
-     */
-    HTMLTable.prototype.add = function (component, row, col) {
-        if (component == null) {
-            throw Error("Cannot add null to a table cell");
-        }
-        if (!this.has(component)) {
-            var currentComponent = this._rows[row] && this._rows[row][col];
-            if (currentComponent != null) {
-                throw new Error("cell is occupied");
-            }
-            component.detach();
-            this._nRows = Math.max(row + 1, this._nRows);
-            this._nCols = Math.max(col + 1, this._nCols);
-            this._padTableToSize(this._nRows, this._nCols);
-            this._rows[row][col] = component;
-            this._adoptAndAnchor(component);
-            this.redraw();
-        }
-        return this;
-    };
-    HTMLTable.prototype._remove = function (component) {
-        for (var r = 0; r < this._nRows; r++) {
-            for (var c = 0; c < this._nCols; c++) {
-                if (this._rows[r][c] === component) {
-                    this._rows[r][c] = null;
-                    return true;
-                }
-            }
-        }
-        return false;
-    };
-    HTMLTable.prototype._iterateLayout = function (availableWidth, availableHeight, isFinalOffer) {
-        if (isFinalOffer === void 0) { isFinalOffer = false; }
-        /*
-         * Given availableWidth and availableHeight, figure out how to allocate it between rows and columns using an iterative algorithm.
-         *
-         * For both dimensions, keeps track of "guaranteedSpace", which the fixed-size components have requested, and
-         * "proportionalSpace", which is being given to proportionally-growing components according to the weights on the table.
-         * Here is how it works (example uses width but it is the same for height). First, columns are guaranteed no width, and
-         * the free width is allocated to columns based on their colWeights. Then, in determineGuarantees, every component is
-         * offered its column's width and may request some amount of it, which increases that column's guaranteed
-         * width. If there are some components that were not satisfied with the width they were offered, and there is free
-         * width that has not already been guaranteed, then the remaining width is allocated to the unsatisfied columns and the
-         * algorithm runs again. If all components are satisfied, then the remaining width is allocated as proportional space
-         * according to the colWeights.
-         *
-         * The guaranteed width for each column is monotonically increasing as the algorithm iterates. Since it is deterministic
-         * and monotonically increasing, if the freeWidth does not change during an iteration it implies that no further progress
-         * is possible, so the algorithm will not continue iterating on that dimension's account.
-         *
-         * If the algorithm runs more than 5 times, we stop and just use whatever we arrived at. It's not clear under what
-         * circumstances this will happen or if it will happen at all. A message will be printed to the console if this occurs.
-         *
-         */
-        var rows = this._rows;
-        var cols = d3.transpose(this._rows);
-        var availableWidthAfterPadding = availableWidth - this._columnPadding * (this._nCols - 1);
-        var availableHeightAfterPadding = availableHeight - this._rowPadding * (this._nRows - 1);
-        var rowWeights = HTMLTable._calcComponentWeights(this._rowWeights, rows, function (c) { return (c == null) || c.fixedHeight(); });
-        var colWeights = HTMLTable._calcComponentWeights(this._columnWeights, cols, function (c) { return (c == null) || c.fixedWidth(); });
-        // To give the table a good starting position to iterate from, we give the fixed-width components half-weight
-        // so that they will get some initial space allocated to work with
-        var heuristicColWeights = colWeights.map(function (c) { return c === 0 ? 0.5 : c; });
-        var heuristicRowWeights = rowWeights.map(function (c) { return c === 0 ? 0.5 : c; });
-        var colProportionalSpace = HTMLTable._calcProportionalSpace(heuristicColWeights, availableWidthAfterPadding);
-        var rowProportionalSpace = HTMLTable._calcProportionalSpace(heuristicRowWeights, availableHeightAfterPadding);
-        var guaranteedWidths = Utils.Array.createFilledArray(0, this._nCols);
-        var guaranteedHeights = Utils.Array.createFilledArray(0, this._nRows);
-        var freeWidth;
-        var freeHeight;
-        var nIterations = 0;
-        var guarantees;
-        var wantsWidth;
-        var wantsHeight;
-        while (true) {
-            var offeredHeights = Utils.Array.add(guaranteedHeights, rowProportionalSpace);
-            var offeredWidths = Utils.Array.add(guaranteedWidths, colProportionalSpace);
-            guarantees = this._determineGuarantees(offeredWidths, offeredHeights, isFinalOffer);
-            guaranteedWidths = guarantees.guaranteedWidths;
-            guaranteedHeights = guarantees.guaranteedHeights;
-            wantsWidth = guarantees.wantsWidthArr.some(function (x) { return x; });
-            wantsHeight = guarantees.wantsHeightArr.some(function (x) { return x; });
-            var lastFreeWidth = freeWidth;
-            var lastFreeHeight = freeHeight;
-            freeWidth = availableWidthAfterPadding - d3.sum(guarantees.guaranteedWidths);
-            freeHeight = availableHeightAfterPadding - d3.sum(guarantees.guaranteedHeights);
-            var xWeights = void 0;
-            if (wantsWidth) {
-                xWeights = guarantees.wantsWidthArr.map(function (x) { return x ? 0.1 : 0; });
-                xWeights = Utils.Array.add(xWeights, colWeights);
-            }
-            else {
-                xWeights = colWeights;
-            }
-            var yWeights = void 0;
-            if (wantsHeight) {
-                yWeights = guarantees.wantsHeightArr.map(function (x) { return x ? 0.1 : 0; });
-                yWeights = Utils.Array.add(yWeights, rowWeights);
-            }
-            else {
-                yWeights = rowWeights;
-            }
-            colProportionalSpace = HTMLTable._calcProportionalSpace(xWeights, freeWidth);
-            rowProportionalSpace = HTMLTable._calcProportionalSpace(yWeights, freeHeight);
-            nIterations++;
-            var canImproveWidthAllocation = freeWidth > 0 && freeWidth !== lastFreeWidth;
-            var canImproveHeightAllocation = freeHeight > 0 && freeHeight !== lastFreeHeight;
-            if (!(canImproveWidthAllocation || canImproveHeightAllocation)) {
-                break;
-            }
-            if (nIterations > 5) {
-                break;
-            }
-        }
-        // Redo the proportional space one last time, to ensure we use the real weights not the wantsWidth/Height weights
-        freeWidth = availableWidthAfterPadding - d3.sum(guarantees.guaranteedWidths);
-        freeHeight = availableHeightAfterPadding - d3.sum(guarantees.guaranteedHeights);
-        colProportionalSpace = HTMLTable._calcProportionalSpace(colWeights, freeWidth);
-        rowProportionalSpace = HTMLTable._calcProportionalSpace(rowWeights, freeHeight);
-        return {
-            colProportionalSpace: colProportionalSpace,
-            rowProportionalSpace: rowProportionalSpace,
-            guaranteedWidths: guarantees.guaranteedWidths,
-            guaranteedHeights: guarantees.guaranteedHeights,
-            wantsWidth: wantsWidth,
-            wantsHeight: wantsHeight,
-        };
-    };
-    HTMLTable.prototype._determineGuarantees = function (offeredWidths, offeredHeights, isFinalOffer) {
-        if (isFinalOffer === void 0) { isFinalOffer = false; }
-        var requestedWidths = Utils.Array.createFilledArray(0, this._nCols);
-        var requestedHeights = Utils.Array.createFilledArray(0, this._nRows);
-        var columnNeedsWidth = Utils.Array.createFilledArray(false, this._nCols);
-        var rowNeedsHeight = Utils.Array.createFilledArray(false, this._nRows);
-        this._rows.forEach(function (row, rowIndex) {
-            row.forEach(function (component, colIndex) {
-                var spaceRequest;
-                if (component != null) {
-                    spaceRequest = component.requestedSpace(offeredWidths[colIndex], offeredHeights[rowIndex]);
-                }
-                else {
-                    spaceRequest = {
-                        minWidth: 0,
-                        minHeight: 0,
-                    };
-                }
-                var columnWidth = isFinalOffer ? Math.min(spaceRequest.minWidth, offeredWidths[colIndex]) : spaceRequest.minWidth;
-                requestedWidths[colIndex] = Math.max(requestedWidths[colIndex], columnWidth);
-                var rowHeight = isFinalOffer ? Math.min(spaceRequest.minHeight, offeredHeights[rowIndex]) : spaceRequest.minHeight;
-                requestedHeights[rowIndex] = Math.max(requestedHeights[rowIndex], rowHeight);
-                var componentNeedsWidth = spaceRequest.minWidth > offeredWidths[colIndex];
-                columnNeedsWidth[colIndex] = columnNeedsWidth[colIndex] || componentNeedsWidth;
-                var componentNeedsHeight = spaceRequest.minHeight > offeredHeights[rowIndex];
-                rowNeedsHeight[rowIndex] = rowNeedsHeight[rowIndex] || componentNeedsHeight;
-            });
-        });
-        return {
-            guaranteedWidths: requestedWidths,
-            guaranteedHeights: requestedHeights,
-            wantsWidthArr: columnNeedsWidth,
-            wantsHeightArr: rowNeedsHeight,
-        };
-    };
-    HTMLTable.prototype.requestedSpace = function (offeredWidth, offeredHeight) {
-        this._calculatedLayout = this._iterateLayout(offeredWidth, offeredHeight);
-        return {
-            minWidth: d3.sum(this._calculatedLayout.guaranteedWidths),
-            minHeight: d3.sum(this._calculatedLayout.guaranteedHeights),
-        };
-    };
-    HTMLTable.prototype.computeLayout = function (origin, availableWidth, availableHeight) {
-        var _this = this;
-        _super.prototype.computeLayout.call(this, origin, availableWidth, availableHeight);
-        var lastLayoutWidth = d3.sum(this._calculatedLayout.guaranteedWidths);
-        var lastLayoutHeight = d3.sum(this._calculatedLayout.guaranteedHeights);
-        var layout = this._calculatedLayout;
-        if (lastLayoutWidth > this.width() || lastLayoutHeight > this.height()) {
-            layout = this._iterateLayout(this.width(), this.height(), true);
-        }
-        var childYOrigin = 0;
-        var rowHeights = Utils.Array.add(layout.rowProportionalSpace, layout.guaranteedHeights);
-        var colWidths = Utils.Array.add(layout.colProportionalSpace, layout.guaranteedWidths);
-        this._rows.forEach(function (row, rowIndex) {
-            var childXOrigin = 0;
-            row.forEach(function (component, colIndex) {
-                // recursively compute layout
-                if (component != null) {
-                    component.computeLayout({ x: childXOrigin, y: childYOrigin }, colWidths[colIndex], rowHeights[rowIndex]);
-                }
-                childXOrigin += colWidths[colIndex] + _this._columnPadding;
-            });
-            childYOrigin += rowHeights[rowIndex] + _this._rowPadding;
-        });
-        return this;
-    };
-    HTMLTable.prototype.rowPadding = function (rowPadding) {
-        if (rowPadding == null) {
-            return this._rowPadding;
-        }
-        if (!Utils.Math.isValidNumber(rowPadding) || rowPadding < 0) {
-            throw Error("rowPadding must be a non-negative finite value");
-        }
-        this._rowPadding = rowPadding;
-        this.redraw();
-        return this;
-    };
-    HTMLTable.prototype.columnPadding = function (columnPadding) {
-        if (columnPadding == null) {
-            return this._columnPadding;
-        }
-        if (!Utils.Math.isValidNumber(columnPadding) || columnPadding < 0) {
-            throw Error("columnPadding must be a non-negative finite value");
-        }
-        this._columnPadding = columnPadding;
-        this.redraw();
-        return this;
-    };
-    HTMLTable.prototype.rowWeight = function (index, weight) {
-        if (weight == null) {
-            return this._rowWeights[index];
-        }
-        if (!Utils.Math.isValidNumber(weight) || weight < 0) {
-            throw Error("rowWeight must be a non-negative finite value");
-        }
-        this._rowWeights[index] = weight;
-        this.redraw();
-        return this;
-    };
-    HTMLTable.prototype.columnWeight = function (index, weight) {
-        if (weight == null) {
-            return this._columnWeights[index];
-        }
-        if (!Utils.Math.isValidNumber(weight) || weight < 0) {
-            throw Error("columnWeight must be a non-negative finite value");
-        }
-        this._columnWeights[index] = weight;
-        this.redraw();
-        return this;
-    };
-    HTMLTable.prototype.fixedWidth = function () {
-        var cols = d3.transpose(this._rows);
-        return HTMLTable._fixedSpace(cols, function (c) { return (c == null) || c.fixedWidth(); });
-    };
-    HTMLTable.prototype.fixedHeight = function () {
-        return HTMLTable._fixedSpace(this._rows, function (c) { return (c == null) || c.fixedHeight(); });
-    };
-    HTMLTable.prototype._padTableToSize = function (nRows, nCols) {
-        for (var i = 0; i < nRows; i++) {
-            if (this._rows[i] === undefined) {
-                this._rows[i] = [];
-                this._rowWeights[i] = null;
-            }
-            for (var j = 0; j < nCols; j++) {
-                if (this._rows[i][j] === undefined) {
-                    this._rows[i][j] = null;
-                }
-            }
-        }
-        for (var j = 0; j < nCols; j++) {
-            if (this._columnWeights[j] === undefined) {
-                this._columnWeights[j] = null;
-            }
-        }
-    };
-    HTMLTable._calcComponentWeights = function (setWeights, componentGroups, fixityAccessor) {
-        // If the row/col weight was explicitly set, then return it outright
-        // If the weight was not explicitly set, then guess it using the heuristic that if all components are fixed-space
-        // then weight is 0, otherwise weight is 1
-        return setWeights.map(function (w, i) {
-            if (w != null) {
-                return w;
-            }
-            var fixities = componentGroups[i].map(fixityAccessor);
-            var allFixed = fixities.reduce(function (a, b) { return a && b; }, true);
-            return allFixed ? 0 : 1;
-        });
-    };
-    HTMLTable._calcProportionalSpace = function (weights, freeSpace) {
-        var weightSum = d3.sum(weights);
-        if (weightSum === 0) {
-            return Utils.Array.createFilledArray(0, weights.length);
-        }
-        else {
-            return weights.map(function (w) { return freeSpace * w / weightSum; });
-        }
-    };
-    HTMLTable._fixedSpace = function (componentGroup, fixityAccessor) {
-        var all = function (bools) { return bools.reduce(function (a, b) { return a && b; }, true); };
-        var groupIsFixed = function (components) { return all(components.map(fixityAccessor)); };
-        return all(componentGroup.map(groupIsFixed));
-    };
-    return HTMLTable;
-}(htmlComponentContainer_1.HTMLComponentContainer));
-exports.HTMLTable = HTMLTable;
-
-
-/***/ }),
-/* 62 */
+/* 59 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -9871,7 +9279,7 @@ var SVGTypewriter = __webpack_require__(4);
 var Configs = __webpack_require__(20);
 var Formatters = __webpack_require__(8);
 var Utils = __webpack_require__(0);
-var component_1 = __webpack_require__(5);
+var component_1 = __webpack_require__(6);
 var InterpolatedColorLegend = (function (_super) {
     __extends(InterpolatedColorLegend, _super);
     /**
@@ -10112,7 +9520,7 @@ exports.InterpolatedColorLegend = InterpolatedColorLegend;
 
 
 /***/ }),
-/* 63 */
+/* 60 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -10127,7 +9535,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
 var SVGTypewriter = __webpack_require__(4);
-var component_1 = __webpack_require__(5);
+var component_1 = __webpack_require__(6);
 var Label = (function (_super) {
     __extends(Label, _super);
     /**
@@ -10274,7 +9682,7 @@ exports.AxisLabel = AxisLabel;
 
 
 /***/ }),
-/* 64 */
+/* 61 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -10294,7 +9702,7 @@ var Configs = __webpack_require__(20);
 var Formatters = __webpack_require__(8);
 var SymbolFactories = __webpack_require__(25);
 var Utils = __webpack_require__(0);
-var component_1 = __webpack_require__(5);
+var component_1 = __webpack_require__(6);
 /**
  * The Legend's row representations. Stores positioning information
  * and column data.
@@ -10774,7 +10182,7 @@ exports.Legend = Legend;
 
 
 /***/ }),
-/* 65 */
+/* 62 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -10790,7 +10198,7 @@ var __extends = (this && this.__extends) || function (d, b) {
 };
 var plot_1 = __webpack_require__(3);
 var Utils = __webpack_require__(0);
-var group_1 = __webpack_require__(35);
+var group_1 = __webpack_require__(34);
 var PlotGroup = (function (_super) {
     __extends(PlotGroup, _super);
     function PlotGroup() {
@@ -10831,14 +10239,10 @@ exports.PlotGroup = PlotGroup;
 
 
 /***/ }),
-/* 66 */
+/* 63 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-/**
- * Copyright 2014-present Palantir Technologies
- * @license MIT
- */
 
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
@@ -11230,7 +10634,7 @@ exports.Table = Table;
 
 
 /***/ }),
-/* 67 */
+/* 64 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -11296,7 +10700,7 @@ exports.XDragBoxLayer = XDragBoxLayer;
 
 
 /***/ }),
-/* 68 */
+/* 65 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -11362,7 +10766,7 @@ exports.YDragBoxLayer = YDragBoxLayer;
 
 
 /***/ }),
-/* 69 */
+/* 66 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -11458,7 +10862,7 @@ exports.Key = Key;
 
 
 /***/ }),
-/* 70 */
+/* 67 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -11657,7 +11061,7 @@ exports.Mouse = Mouse;
 
 
 /***/ }),
-/* 71 */
+/* 68 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -11832,7 +11236,7 @@ exports.Touch = Touch;
 
 
 /***/ }),
-/* 72 */
+/* 69 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -11864,7 +11268,7 @@ exports.Arc = Arc;
 
 
 /***/ }),
-/* 73 */
+/* 70 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -11896,7 +11300,7 @@ exports.ArcOutline = ArcOutline;
 
 
 /***/ }),
-/* 74 */
+/* 71 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -11932,7 +11336,7 @@ exports.Area = Area;
 
 
 /***/ }),
-/* 75 */
+/* 72 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -11968,7 +11372,7 @@ exports.Line = Line;
 
 
 /***/ }),
-/* 76 */
+/* 73 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -11995,7 +11399,7 @@ exports.Rectangle = Rectangle;
 
 
 /***/ }),
-/* 77 */
+/* 74 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -12022,7 +11426,7 @@ exports.Segment = Segment;
 
 
 /***/ }),
-/* 78 */
+/* 75 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -12050,7 +11454,7 @@ exports.Symbol = Symbol;
 
 
 /***/ }),
-/* 79 */
+/* 76 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -12139,7 +11543,7 @@ exports.Click = Click;
 
 
 /***/ }),
-/* 80 */
+/* 77 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -12258,7 +11662,7 @@ exports.DoubleClick = DoubleClick;
 
 
 /***/ }),
-/* 81 */
+/* 78 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -12423,7 +11827,7 @@ exports.Drag = Drag;
 
 
 /***/ }),
-/* 82 */
+/* 79 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -12981,7 +12385,7 @@ exports.PanZoom = PanZoom;
 
 
 /***/ }),
-/* 83 */
+/* 80 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -13112,7 +12516,7 @@ exports.Pointer = Pointer;
 
 
 /***/ }),
-/* 84 */
+/* 81 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -13185,7 +12589,7 @@ exports.ClusteredBar = ClusteredBar;
 
 
 /***/ }),
-/* 85 */
+/* 82 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -13201,7 +12605,7 @@ var __extends = (this && this.__extends) || function (d, b) {
 };
 var d3 = __webpack_require__(1);
 var SVGTypewriter = __webpack_require__(4);
-var Animators = __webpack_require__(6);
+var Animators = __webpack_require__(5);
 var Drawers = __webpack_require__(9);
 var Formatters = __webpack_require__(8);
 var Scales = __webpack_require__(2);
@@ -13681,7 +13085,7 @@ exports.Pie = Pie;
 
 
 /***/ }),
-/* 86 */
+/* 83 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -13697,7 +13101,7 @@ var __extends = (this && this.__extends) || function (d, b) {
 };
 var d3 = __webpack_require__(1);
 var SVGTypewriter = __webpack_require__(4);
-var Animators = __webpack_require__(6);
+var Animators = __webpack_require__(5);
 var Drawers = __webpack_require__(9);
 var Scales = __webpack_require__(2);
 var Utils = __webpack_require__(0);
@@ -14047,7 +13451,7 @@ exports.Rectangle = Rectangle;
 
 
 /***/ }),
-/* 87 */
+/* 84 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -14061,7 +13465,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var Animators = __webpack_require__(6);
+var Animators = __webpack_require__(5);
 var SymbolFactories = __webpack_require__(25);
 var Drawers = __webpack_require__(9);
 var Scales = __webpack_require__(2);
@@ -14225,7 +13629,7 @@ exports.Scatter = Scatter;
 
 
 /***/ }),
-/* 88 */
+/* 85 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -14239,7 +13643,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var Animators = __webpack_require__(6);
+var Animators = __webpack_require__(5);
 var Drawers = __webpack_require__(9);
 var Scales = __webpack_require__(2);
 var plot_1 = __webpack_require__(3);
@@ -14423,7 +13827,7 @@ exports.Segment = Segment;
 
 
 /***/ }),
-/* 89 */
+/* 86 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -14438,9 +13842,9 @@ var __extends = (this && this.__extends) || function (d, b) {
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
 var d3 = __webpack_require__(1);
-var Animators = __webpack_require__(6);
+var Animators = __webpack_require__(5);
 var Utils = __webpack_require__(0);
-var areaPlot_1 = __webpack_require__(39);
+var areaPlot_1 = __webpack_require__(38);
 var plot_1 = __webpack_require__(3);
 var StackedArea = (function (_super) {
     __extends(StackedArea, _super);
@@ -14626,7 +14030,7 @@ exports.StackedArea = StackedArea;
 
 
 /***/ }),
-/* 90 */
+/* 87 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -14834,7 +14238,7 @@ exports.StackedBar = StackedBar;
 
 
 /***/ }),
-/* 91 */
+/* 88 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -15045,7 +14449,7 @@ exports.Waterfall = Waterfall;
 
 
 /***/ }),
-/* 92 */
+/* 89 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -15176,7 +14580,7 @@ exports.Color = Color;
 
 
 /***/ }),
-/* 93 */
+/* 90 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -15342,7 +14746,7 @@ exports.InterpolatedColor = InterpolatedColor;
 
 
 /***/ }),
-/* 94 */
+/* 91 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -15421,7 +14825,7 @@ exports.Linear = Linear;
 
 
 /***/ }),
-/* 95 */
+/* 92 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -15645,7 +15049,7 @@ exports.ModifiedLog = ModifiedLog;
 
 
 /***/ }),
-/* 96 */
+/* 93 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -15695,7 +15099,7 @@ exports.integerTickGenerator = integerTickGenerator;
 
 
 /***/ }),
-/* 97 */
+/* 94 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -15830,7 +15234,7 @@ exports.Time = Time;
 
 
 /***/ }),
-/* 98 */
+/* 95 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -15900,7 +15304,7 @@ exports.createFilledArray = createFilledArray;
 
 
 /***/ }),
-/* 99 */
+/* 96 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -15914,7 +15318,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var set_1 = __webpack_require__(45);
+var set_1 = __webpack_require__(44);
 /**
  * A set of callbacks which can be all invoked at once.
  * Each callback exists at most once in the set (based on reference equality).
@@ -15942,13 +15346,13 @@ exports.CallbackSet = CallbackSet;
 
 
 /***/ }),
-/* 100 */
+/* 97 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
-var plottableElement_1 = __webpack_require__(44);
-var translator_1 = __webpack_require__(30);
+var plottableElement_1 = __webpack_require__(43);
+var translator_1 = __webpack_require__(29);
 var ClientToHTMLTranslator = (function () {
     function ClientToHTMLTranslator() {
     }
@@ -15965,9 +15369,7 @@ var ClientToHTMLTranslator = (function () {
         if (translator == null) {
             var measureElement = document.createElementNS(root.namespaceURI, "div");
             measureElement.setAttribute("class", "measure-rect");
-            measureElement.setAttribute("style", "opacity: 0; visibility: hidden; position: relative;");
-            measureElement.setAttribute("width", "1");
-            measureElement.setAttribute("height", "1");
+            measureElement.setAttribute("style", "opacity: 0; visibility: hidden; position: absolute; width: 1px; height: 1px;");
             root.appendChild(measureElement);
             translator = new translator_1.Translator(new plottableElement_1.PlottableHTMLElement(measureElement));
             root[ClientToHTMLTranslator._TRANSLATOR_KEY] = translator;
@@ -15981,7 +15383,7 @@ exports.ClientToHTMLTranslator = ClientToHTMLTranslator;
 
 
 /***/ }),
-/* 101 */
+/* 98 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -15990,9 +15392,9 @@ exports.ClientToHTMLTranslator = ClientToHTMLTranslator;
  * @license MIT
  */
 
-var DOM = __webpack_require__(43);
-var plottableElement_1 = __webpack_require__(44);
-var translator_1 = __webpack_require__(30);
+var DOM = __webpack_require__(42);
+var plottableElement_1 = __webpack_require__(43);
+var translator_1 = __webpack_require__(29);
 var ClientToSVGTranslator = (function () {
     function ClientToSVGTranslator() {
     }
@@ -16022,7 +15424,7 @@ exports.ClientToSVGTranslator = ClientToSVGTranslator;
 
 
 /***/ }),
-/* 102 */
+/* 99 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -16105,7 +15507,7 @@ function luminance(color) {
 
 
 /***/ }),
-/* 103 */
+/* 100 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -16114,7 +15516,7 @@ function luminance(color) {
  * @license MIT
  */
 
-var Math = __webpack_require__(29);
+var Math = __webpack_require__(28);
 /**
  * Array-backed implementation of {EntityStore}
  */
@@ -16159,7 +15561,7 @@ exports.EntityArray = EntityArray;
 
 
 /***/ }),
-/* 104 */
+/* 101 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -16168,7 +15570,7 @@ exports.EntityArray = EntityArray;
  * @license MIT
  */
 
-var Math = __webpack_require__(29);
+var Math = __webpack_require__(28);
 /**
  * Shim for ES6 map.
  * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map
@@ -16250,7 +15652,7 @@ exports.Map = Map;
 
 
 /***/ }),
-/* 105 */
+/* 102 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -16375,7 +15777,7 @@ exports.normalizeKey = normalizeKey;
 
 
 /***/ }),
-/* 106 */
+/* 103 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -16447,7 +15849,7 @@ exports.deprecated = deprecated;
 
 
 /***/ }),
-/* 107 */
+/* 104 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -16460,13 +15862,13 @@ exports.deprecated = deprecated;
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-__export(__webpack_require__(31));
-__export(__webpack_require__(108));
-__export(__webpack_require__(109));
+__export(__webpack_require__(30));
+__export(__webpack_require__(105));
+__export(__webpack_require__(106));
 //# sourceMappingURL=index.js.map
 
 /***/ }),
-/* 108 */
+/* 105 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -16481,7 +15883,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var baseAnimator_1 = __webpack_require__(31);
+var baseAnimator_1 = __webpack_require__(30);
 var OpacityAnimator = (function (_super) {
     __extends(OpacityAnimator, _super);
     function OpacityAnimator() {
@@ -16502,7 +15904,7 @@ exports.OpacityAnimator = OpacityAnimator;
 //# sourceMappingURL=opacityAnimator.js.map
 
 /***/ }),
-/* 109 */
+/* 106 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -16518,7 +15920,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
 var Utils = __webpack_require__(13);
-var baseAnimator_1 = __webpack_require__(31);
+var baseAnimator_1 = __webpack_require__(30);
 var UnveilAnimator = (function (_super) {
     __extends(UnveilAnimator, _super);
     function UnveilAnimator() {
@@ -16577,7 +15979,7 @@ exports.UnveilAnimator = UnveilAnimator;
 //# sourceMappingURL=unveilAnimator.js.map
 
 /***/ }),
-/* 110 */
+/* 107 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -16593,7 +15995,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
 var Utils = __webpack_require__(13);
-var cacheCharacterMeasurer_1 = __webpack_require__(47);
+var cacheCharacterMeasurer_1 = __webpack_require__(46);
 var CacheMeasurer = (function (_super) {
     __extends(CacheMeasurer, _super);
     function CacheMeasurer(area, className) {
@@ -16619,7 +16021,7 @@ exports.CacheMeasurer = CacheMeasurer;
 //# sourceMappingURL=cacheMeasurer.js.map
 
 /***/ }),
-/* 111 */
+/* 108 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -16632,15 +16034,15 @@ exports.CacheMeasurer = CacheMeasurer;
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
+__export(__webpack_require__(45));
 __export(__webpack_require__(46));
+__export(__webpack_require__(107));
 __export(__webpack_require__(47));
-__export(__webpack_require__(110));
 __export(__webpack_require__(48));
-__export(__webpack_require__(49));
 //# sourceMappingURL=index.js.map
 
 /***/ }),
-/* 112 */
+/* 109 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -16689,7 +16091,7 @@ exports.Cache = Cache;
 //# sourceMappingURL=cache.js.map
 
 /***/ }),
-/* 113 */
+/* 110 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -16737,7 +16139,7 @@ exports.DOM = DOM;
 //# sourceMappingURL=dom.js.map
 
 /***/ }),
-/* 114 */
+/* 111 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -16795,7 +16197,7 @@ exports.Methods = Methods;
 //# sourceMappingURL=methods.js.map
 
 /***/ }),
-/* 115 */
+/* 112 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -16842,7 +16244,7 @@ exports.StringMethods = StringMethods;
 //# sourceMappingURL=stringMethods.js.map
 
 /***/ }),
-/* 116 */
+/* 113 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -16890,7 +16292,7 @@ exports.Tokenizer = Tokenizer;
 //# sourceMappingURL=tokenizer.js.map
 
 /***/ }),
-/* 117 */
+/* 114 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -16903,12 +16305,12 @@ exports.Tokenizer = Tokenizer;
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-__export(__webpack_require__(118));
-__export(__webpack_require__(50));
+__export(__webpack_require__(115));
+__export(__webpack_require__(49));
 //# sourceMappingURL=index.js.map
 
 /***/ }),
-/* 118 */
+/* 115 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -16923,7 +16325,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var wrapper_1 = __webpack_require__(50);
+var wrapper_1 = __webpack_require__(49);
 var SingleLineWrapper = (function (_super) {
     __extends(SingleLineWrapper, _super);
     function SingleLineWrapper() {
@@ -16966,7 +16368,7 @@ exports.SingleLineWrapper = SingleLineWrapper;
 //# sourceMappingURL=singleLineWrapper.js.map
 
 /***/ }),
-/* 119 */
+/* 116 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -16979,11 +16381,11 @@ exports.SingleLineWrapper = SingleLineWrapper;
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-__export(__webpack_require__(120));
+__export(__webpack_require__(117));
 //# sourceMappingURL=index.js.map
 
 /***/ }),
-/* 120 */
+/* 117 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -17117,7 +16519,7 @@ exports.Writer = Writer;
 //# sourceMappingURL=writer.js.map
 
 /***/ }),
-/* 121 */
+/* 118 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -17125,11 +16527,11 @@ exports.Writer = Writer;
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-var Animators = __webpack_require__(6);
+var Animators = __webpack_require__(5);
 exports.Animators = Animators;
-var Axes = __webpack_require__(51);
+var Axes = __webpack_require__(50);
 exports.Axes = Axes;
-var Components = __webpack_require__(32);
+var Components = __webpack_require__(31);
 exports.Components = Components;
 var Configs = __webpack_require__(20);
 exports.Configs = Configs;
@@ -17137,7 +16539,7 @@ var Formatters = __webpack_require__(8);
 exports.Formatters = Formatters;
 var RenderController = __webpack_require__(16);
 exports.RenderController = RenderController;
-var RenderPolicies = __webpack_require__(33);
+var RenderPolicies = __webpack_require__(32);
 exports.RenderPolicies = RenderPolicies;
 var SymbolFactories = __webpack_require__(25);
 exports.SymbolFactories = SymbolFactories;
@@ -17156,15 +16558,15 @@ exports.Utils = Utils;
 __export(__webpack_require__(19));
 var timeAxis_1 = __webpack_require__(23);
 exports.TimeInterval = timeAxis_1.TimeInterval;
-__export(__webpack_require__(5));
+__export(__webpack_require__(6));
 __export(__webpack_require__(24));
-__export(__webpack_require__(52));
-var version_1 = __webpack_require__(53);
+__export(__webpack_require__(51));
+var version_1 = __webpack_require__(52);
 exports.version = version_1.version;
 __export(__webpack_require__(21));
 __export(__webpack_require__(7));
 __export(__webpack_require__(12));
-__export(__webpack_require__(34));
+__export(__webpack_require__(33));
 __export(__webpack_require__(15));
 __export(__webpack_require__(3));
 __export(__webpack_require__(10));

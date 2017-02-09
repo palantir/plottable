@@ -174,7 +174,7 @@ export function decomposePath(normalizedPathString: string) {
 }
 
 export function numStyle(s: HTMLElement, a: string) {
-  return parseFloat(s.style[a]);
+  return parseFloat((s.style as any)[a]);
 }
 
 export function numAttr(s: d3.Selection<void>, a: string) {
