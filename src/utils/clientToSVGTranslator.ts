@@ -1,9 +1,13 @@
+/**
+ * Copyright 2014-present Palantir Technologies
+ * @license MIT
+ */
+
 import * as DOM from "./domUtils";
 import { PlottableSVGElement } from "./plottableElement";
 import { Translator } from "./translator";
 
 import { IComponent } from "../components";
-import { Point } from "../core/interfaces";
 
 export class ClientToSVGTranslator {
   private static _TRANSLATOR_KEY = "__Plottable_ClientToSVGTranslator";

@@ -1,3 +1,8 @@
+/**
+ * Copyright 2014-present Palantir Technologies
+ * @license MIT
+ */
+
 import { GuideLineLayer } from "../components/guideLineLayer";
 import { Point } from "../core/interfaces";
 import * as Interactions from "../interactions";

@@ -1,3 +1,8 @@
+/**
+ * Copyright 2014-present Palantir Technologies
+ * @license MIT
+ */
+
 export * from "./abstractComponent";
 export * from "./dragBoxLayer";
 export * from "./dragLineLayer";

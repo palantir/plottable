@@ -1,3 +1,8 @@
+/**
+ * Copyright 2014-present Palantir Technologies
+ * @license MIT
+ */
+
 import { Dispatcher } from "./dispatcher";
 import * as Dispatchers from "./";
 

@@ -3,29 +3,12 @@
 module.exports = function(grunt) {
   "use strict";
 
+  // run an arbitrary npm command through grunt, e.g. grunt exec:npm:build:test -> npm run build:test
   var execConfig = {
     npm: {
-      cmd: function (npmCommandName) {
+      cmd: function () {
+        var npmCommandName = Array.prototype.slice.call(arguments).join(":");
         return "npm run " + npmCommandName;
-      }
-    }
-  };
-
-  var tsConfig = {
-    verifyDefinitionFile: {
-      src: [
-        "plottable.d.ts",
-      ],
-      options: {
-        compiler: "./node_modules/typescript/bin/tsc"
-      }
-    },
-    verifyNpmDefinitionFile: {
-      src: [
-        "plottable-npm.d.ts",
-      ],
-      options: {
-        compiler: "./node_modules/typescript/bin/tsc"
       }
     }
   };
@@ -38,45 +21,6 @@ module.exports = function(grunt) {
       createTag: false,
       push: false,
       prereleaseName: "rc"
-    }
-  };
-
-  var sedConfig = {
-    versionNumber: {
-      pattern: "@VERSION",
-      replacement: "<%= pkg.version %>",
-      path: "plottable.js"
-    }
-  };
-
-  var umdConfig = {
-    all: {
-      src: "plottable.js",
-      objectToExport: "Plottable",
-      deps: {
-        "default": ["d3"],
-      }
-    },
-    npm: {
-      src: "plottable.js",
-      dest: "plottable-npm.js",
-      objectToExport: "Plottable",
-      deps: {
-        "default": ["d3", "SVGTypewriter"],
-        "amd": ["d3", "svg-typewriter"],
-        "cjs": ["d3", "svg-typewriter"]
-      }
-    }
-  };
-
-  var concatConfig = {
-    header: {
-      src: ["license_header.txt", "plottable.js"],
-      dest: "plottable.js"
-    },
-    headerNpm: {
-      src: ["license_header.txt", "plottable-npm.js"],
-      dest: "plottable-npm.js"
     }
   };
 
@@ -114,14 +58,6 @@ module.exports = function(grunt) {
       livereload: true,
       spawn: false
     },
-    rebuild: {
-      tasks: ["src-compile"],
-      files: ["src/**/*.ts", "webpack.config.plottable.js"]
-    },
-    tests: {
-      tasks: ["test-compile"],
-      files: ["test/**/*.ts", "webpack.config.test.js"]
-    },
     quicktests: {
       tasks: ["update-quicktests"],
       files: ["quicktests/overlaying/tests/**/*.js"]
@@ -151,7 +87,6 @@ module.exports = function(grunt) {
     "plottable.js",
     "plottable.min.js",
     "plottable.d.ts",
-    "plottable-npm.d.ts",
     "plottable.css",
     "plottable.zip",
     "bower.json",
@@ -186,8 +121,6 @@ module.exports = function(grunt) {
         {src: "plottable.js",       dest: "."},
         {src: "plottable.min.js",   dest: "."},
         {src: "plottable.d.ts",     dest: "."},
-        {src: "plottable-npm.js",   dest: "."},
-        {src: "plottable-npm.d.ts", dest: "."},
         {src: "plottable.css",      dest: "."},
         {src: "README.md",          dest: "."},
         {src: "LICENSE",            dest: "."},
@@ -232,9 +165,6 @@ module.exports = function(grunt) {
   grunt.initConfig({
     pkg: grunt.file.readJSON("package.json"),
     bump: bumpConfig,
-    umd: umdConfig,
-    concat: concatConfig,
-    ts: tsConfig,
     tslint: tslintConfig,
     jscs: jscsConfig,
     eslint: eslintConfig,
@@ -243,7 +173,6 @@ module.exports = function(grunt) {
     watch: watchConfig,
     "blanket_mocha": blanketMochaConfig,
     connect: connectConfig,
-    sed: sedConfig,
     gitcommit: gitcommitConfig,
     compress: compressConfig,
     uglify: uglifyConfig,
@@ -253,22 +182,9 @@ module.exports = function(grunt) {
   // Loads the tasks specified in package.json
   require("load-grunt-tasks")(grunt);
 
-  grunt.registerTask("test-compile", ["exec:npm:build-test"]);
-  grunt.registerTask("src-compile", ["exec:npm:build-src", "generateJS"]);
-
   grunt.registerTask("dev-compile", [
-    "src-compile",
-    "test-compile",
+    "exec:npm:build",
     "update-quicktests"
-  ]);
-
-  grunt.registerTask("generateJS", [
-    // adds license_header.txt to plottable.js
-    "concat:header",
-    // adds license_header.txt to plottable-npm.js
-    "concat:headerNpm",
-    // replaces plottable.js' @VERSION with package.json's version
-    "sed:versionNumber"
   ]);
 
   grunt.registerTask("release:patch", ["bump:patch", "dist-compile", "gitcommit:version"]);
@@ -278,13 +194,13 @@ module.exports = function(grunt) {
   grunt.registerTask("dist-compile", ["test", "uglify", "compress"]);
 
   grunt.registerTask("commitjs", ["dist-compile", "gitcommit:built"]);
-  grunt.registerTask("default", ["connect", "dev-compile", "watch-silent"]);
+  grunt.registerTask("default", ["exec:npm:start"]);
 
   grunt.registerTask("test", ["dev-compile", "test-local"]);
-  grunt.registerTask("test-local", ["blanket_mocha", "ts:verifyDefinitionFile", "ts:verifyNpmDefinitionFile", "lint"]);
+  grunt.registerTask("test-local", ["blanket_mocha", "lint"]);
   grunt.registerTask("test-sauce", ["connect", "saucelabs-mocha"]);
 
-  grunt.registerTask("watch-silent", function() {
+  grunt.registerTask("watch-quicktests", function() {
     // Surpresses the "Running 'foo' task" messages
     grunt.log.header = function() {};
     grunt.task.run(["watch"]);

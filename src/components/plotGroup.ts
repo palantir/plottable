@@ -1,3 +1,8 @@
+/**
+ * Copyright 2014-present Palantir Technologies
+ * @license MIT
+ */
+
 import { Point } from "../core/interfaces";
 import * as Plots from "../plots";
 import { Plot } from "../plots/plot";

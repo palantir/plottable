@@ -1,3 +1,8 @@
+/**
+ * Copyright 2014-present Palantir Technologies
+ * @license MIT
+ */
+
 export * from "./areaPlot";
 export * from "./barPlot";
 export * from "./commons";

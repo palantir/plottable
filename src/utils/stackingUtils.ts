@@ -1,3 +1,8 @@
+/**
+ * Copyright 2014-present Palantir Technologies
+ * @license MIT
+ */
+
 import * as d3 from "d3";
 
 import { Dataset } from "../core/dataset";
@@ -5,11 +10,15 @@ import { Accessor } from "../core/interfaces";
 
 import * as Utils from "./";
 
-export type StackedDatum = {
+export type GenericStackedDatum<D> = {
   value: number;
   offset: number;
-};
+  axisValue: D;
+}
 
+export type StackExtent<D> = { extent: number, axisValue: D }
+
+export type StackedDatum = GenericStackedDatum<string>;
 /**
  * Option type for stacking direction. By default, stacked bar and area charts
  * put the first data series at the bottom of the axis ("bottomup"), but this
@@ -20,7 +29,10 @@ export type IStackingOrder = "topdown" | "bottomup";
 
 // HACKHACK More accurate stacking result definition. Remove typeless stacking result
 // and replace with typed stacking result in 3.0.
-export type GenericStackingResult<D> = Utils.Map<Dataset, Utils.Map<D, StackedDatum>>;
+//
+// Maps compare Date keys using referential equality. So, for safety, we only want primitives
+// as keys
+export type GenericStackingResult<D> = Utils.Map<Dataset, Utils.Map<string | number, GenericStackedDatum<D>>>;
 /**
  * Map of Dataset to stacks.
  * @deprecated
@@ -68,8 +80,9 @@ export function stack(
         offsetMap.set(key, value);
       }
       keyToStackedDatum.set(key, {
-        value: value,
         offset: offset,
+        value: value,
+        axisValue: keyAccessor(datum, index, dataset),
       });
     });
     datasetToKeyToStackedDatum.set(dataset, keyToStackedDatum);
@@ -86,28 +99,28 @@ export function stack(
  * of each individual stack.
  */
 export function stackedExtents<D>(stackingResult: GenericStackingResult<D>): {
-  maximumExtents: Utils.Map<D, number>,
-  minimumExtents: Utils.Map<D, number>,
+  maximumExtents: Utils.Map<string | number, StackExtent<D>>,
+  minimumExtents: Utils.Map<string | number, StackExtent<D>>,
 } {
-  const maximumExtents: Utils.Map<D, number> = new Utils.Map<D, number>();
-  const minimumExtents: Utils.Map<D, number> = new Utils.Map<D, number>();
+  const maximumExtents = new Utils.Map<string | number, StackExtent<D>>();
+  const minimumExtents = new Utils.Map<string | number, StackExtent<D>>();
 
   stackingResult.forEach((stack) => {
-    stack.forEach((datum: StackedDatum, key: D) => {
+    stack.forEach((datum, key) => {
       // correctly handle negative bar stacks
       const maximalValue = Utils.Math.max([datum.offset + datum.value, datum.offset], datum.offset);
       const minimalValue = Utils.Math.min([datum.offset + datum.value, datum.offset], datum.offset);
 
       if (!maximumExtents.has(key)) {
-        maximumExtents.set(key, maximalValue);
-      } else if (maximumExtents.get(key) < maximalValue) {
-        maximumExtents.set(key, maximalValue);
+        maximumExtents.set(key, { extent: maximalValue, axisValue: datum.axisValue });
+      } else if (maximumExtents.get(key).extent < maximalValue) {
+        maximumExtents.set(key, { extent: maximalValue, axisValue: datum.axisValue });
       }
 
       if (!minimumExtents.has(key)) {
-        minimumExtents.set(key, minimalValue);
-      } else if (minimumExtents.get(key) > (minimalValue)) {
-        minimumExtents.set(key, minimalValue);
+        minimumExtents.set(key, { extent: minimalValue, axisValue: datum.axisValue });
+      } else if (minimumExtents.get(key).extent > (minimalValue)) {
+        minimumExtents.set(key, { extent: minimalValue, axisValue: datum.axisValue });
       }
     });
   });

@@ -1,7 +1,7 @@
 {
   "name": "plottable",
   "description": "A modular charting library built on D3",
-  "version": "2.9.0",
+  "version": "2.9.1",
   "main": [
     "plottable.js",
     "plottable.css"
@@ -17,7 +17,7 @@
     "!plottable.css",
     "!plottable.min.js",
     "!plottable.d.ts",
-    "!build"
+    "!build/src/**/*"
   ],
   "keywords": [
     "plottable",

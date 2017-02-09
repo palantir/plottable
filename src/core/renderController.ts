@@ -1,3 +1,8 @@
+/**
+ * Copyright 2014-present Palantir Technologies
+ * @license MIT
+ */
+
 import { IComponent } from "../components/abstractComponent";
 import * as Utils from "../utils";
 

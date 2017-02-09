@@ -1,4 +1,9 @@
 /**
+ * Copyright 2014-present Palantir Technologies
+ * @license MIT
+ */
+
+/**
  * Specifies if Plottable should show warnings.
  */
 export var SHOW_WARNINGS = true;
