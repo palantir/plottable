@@ -84,6 +84,20 @@ export class Interaction {
   }
 
   /**
+   * Translates an element-coordinate-space point to Component-space coordinates.
+   *
+   * @param {Point} p A Point in element space coordinates.
+   * @return {Point} The same location in Component-space coordinates.
+   */
+  protected _translateToComponentSpace(p: Point): Point {
+    let origin = this._componentAttachedTo.originToRoot();
+    return {
+      x: p.x - origin.x,
+      y: p.y - origin.y,
+    };
+  }
+
+  /**
    * Checks whether a Component-coordinate-space Point is inside the Component.
    *
    * @param {Point} p A Point in Compoennt-space coordinates.

@@ -52,13 +52,14 @@ export class Drag extends Interaction {
   }
 
   private _translateAndConstrain(p: Point) {
+    let translatedP = this._translateToComponentSpace(p);
     if (!this._constrainedToComponent) {
-      return p;
+      return translatedP;
     }
 
     return {
-      x: Utils.Math.clamp(p.x, 0, this._componentAttachedTo.width()),
-      y: Utils.Math.clamp(p.y, 0, this._componentAttachedTo.height()),
+      x: Utils.Math.clamp(translatedP.x, 0, this._componentAttachedTo.width()),
+      y: Utils.Math.clamp(translatedP.y, 0, this._componentAttachedTo.height()),
     };
   }
 
@@ -66,10 +67,11 @@ export class Drag extends Interaction {
     if (event instanceof MouseEvent && (<MouseEvent> event).button !== 0) {
       return;
     }
-    if (this._isInsideComponent(point)) {
+    let translatedP = this._translateToComponentSpace(point);
+    if (this._isInsideComponent(translatedP)) {
       event.preventDefault();
       this._dragging = true;
-      this._dragOrigin = point;
+      this._dragOrigin = translatedP;
       this._dragStartCallbacks.callCallbacks(this._dragOrigin);
     }
   }

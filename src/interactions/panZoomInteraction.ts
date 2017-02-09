@@ -152,7 +152,7 @@ export class PanZoom extends Interaction {
   private _handleTouchStart(ids: number[], idToPoint: { [id: number]: Point; }, e: TouchEvent) {
     for (let i = 0; i < ids.length && this._touchIds.size() < 2; i++) {
       let id = ids[i];
-      this._touchIds.set(id.toString(), idToPoint[id]);
+      this._touchIds.set(id.toString(), this._translateToComponentSpace(idToPoint[id]));
     }
   }
 
@@ -163,7 +163,7 @@ export class PanZoom extends Interaction {
 
     let oldPoints = this._touchIds.values();
 
-    if (!this._isInsideComponent(oldPoints[0]) || !this._isInsideComponent(oldPoints[1])) {
+    if (!this._isInsideComponent(this._translateToComponentSpace(oldPoints[0])) || !this._isInsideComponent(this._translateToComponentSpace(oldPoints[1]))) {
       return;
     }
 
@@ -175,7 +175,7 @@ export class PanZoom extends Interaction {
 
     ids.forEach((id) => {
       if (this._touchIds.has(id.toString())) {
-        this._touchIds.set(id.toString(), idToPoint[id]);
+        this._touchIds.set(id.toString(), this._translateToComponentSpace(idToPoint[id]));
       }
     });
 
@@ -253,13 +253,14 @@ export class PanZoom extends Interaction {
   }
 
   private _handleWheelEvent(p: Point, e: WheelEvent) {
-    if (this._isInsideComponent(p)) {
+    let translatedP = this._translateToComponentSpace(p);
+    if (this._isInsideComponent(translatedP)) {
       e.preventDefault();
 
       let deltaPixelAmount = e.deltaY * (e.deltaMode ? PanZoom._PIXELS_PER_LINE : 1);
       let zoomAmount = Math.pow(2, deltaPixelAmount * .002);
-      let centerX = p.x;
-      let centerY = p.y;
+      let centerX = translatedP.x;
+      let centerY = translatedP.y;
 
       this.xScales().forEach((xScale) => {
         const constrained = this._constrainedZoom(xScale, zoomAmount, centerX);

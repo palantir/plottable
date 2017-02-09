@@ -53,17 +53,19 @@ export class DoubleClick extends Interaction {
   }
 
   private _handleClickDown(p: Point) {
-    if (this._isInsideComponent(p)) {
-      if (!(this._clickState === ClickState.SingleClicked) || !DoubleClick._pointsEqual(p, this._clickedPoint)) {
+    let translatedPoint = this._translateToComponentSpace(p);
+    if (this._isInsideComponent(translatedPoint)) {
+      if (!(this._clickState === ClickState.SingleClicked) || !DoubleClick._pointsEqual(translatedPoint, this._clickedPoint)) {
         this._clickState = ClickState.NotClicked;
       }
-      this._clickedPoint = p;
+      this._clickedPoint = translatedPoint;
       this._clickedDown = true;
     }
   }
 
   private _handleClickUp(p: Point) {
-    if (this._clickedDown && DoubleClick._pointsEqual(p, this._clickedPoint)) {
+    let translatedPoint = this._translateToComponentSpace(p);
+    if (this._clickedDown && DoubleClick._pointsEqual(translatedPoint, this._clickedPoint)) {
       this._clickState = this._clickState === ClickState.NotClicked ? ClickState.SingleClicked : ClickState.DoubleClicked;
     } else {
       this._clickState = ClickState.NotClicked;

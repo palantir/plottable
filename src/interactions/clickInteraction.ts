@@ -48,14 +48,16 @@ export class Click extends Interaction {
   }
 
   private _handleClickDown(p: Point, e: MouseEvent | TouchEvent) {
-    if (this._isInsideComponent(p)) {
+    let translatedPoint = this._translateToComponentSpace(p);
+    if (this._isInsideComponent(translatedPoint)) {
       this._clickedDown = true;
     }
   }
 
   private _handleClickUp(p: Point, e: MouseEvent | TouchEvent) {
-    if (this._clickedDown && this._isInsideComponent(p)) {
-      this._onClickCallbacks.callCallbacks(p, e);
+    let translatedPoint = this._translateToComponentSpace(p);
+    if (this._clickedDown && this._isInsideComponent(translatedPoint)) {
+      this._onClickCallbacks.callCallbacks(translatedPoint, e);
     }
     this._clickedDown = false;
   }

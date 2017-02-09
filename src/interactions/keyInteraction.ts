@@ -42,7 +42,7 @@ export class Key extends Interaction {
   }
 
   private _handleKeyDownEvent(keyCode: number, event: KeyboardEvent) {
-    let p = this._positionDispatcher.lastMousePosition();
+    let p = this._translateToComponentSpace(this._positionDispatcher.lastMousePosition());
     if (this._isInsideComponent(p) && !event.repeat) {
       if (this._keyPressCallbacks[keyCode]) {
         this._keyPressCallbacks[keyCode].callCallbacks(keyCode);
