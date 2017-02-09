@@ -1,3 +1,4 @@
+import { IComponent } from "../components/abstractComponent";
 import { Point } from "../core/interfaces";
 import * as Utils from "../utils";
 
@@ -8,7 +9,7 @@ export type MouseCallback = (p: Point, event: MouseEvent) => void;
 
 export class Mouse extends Dispatcher {
   private static _DISPATCHER_KEY = "__Plottable_Dispatcher_Mouse";
-  private _translator: Utils.ClientToSVGTranslator;
+  private _translator: Utils.Translator;
   private _lastMousePosition: Point;
   private static _MOUSEOVER_EVENT_NAME = "mouseover";
   private static _MOUSEMOVE_EVENT_NAME = "mousemove";
@@ -25,13 +26,12 @@ export class Mouse extends Dispatcher {
    * @param {SVGElement} elem
    * @return {Dispatchers.Mouse}
    */
-  public static getDispatcher(elem: SVGElement): Dispatchers.Mouse {
-    let svg = Utils.DOM.boundingSVG(elem);
-
-    let dispatcher: Dispatchers.Mouse = (<any> svg)[Mouse._DISPATCHER_KEY];
+  public static getDispatcher(component: IComponent<any>): Dispatchers.Mouse {
+    let element = component.root().content();
+    let dispatcher: Dispatchers.Mouse = (<any> element)[Mouse._DISPATCHER_KEY];
     if (dispatcher == null) {
-      dispatcher = new Mouse(svg);
-      (<any> svg)[Mouse._DISPATCHER_KEY] = dispatcher;
+      dispatcher = new Mouse(component);
+      (<any> element)[Mouse._DISPATCHER_KEY] = dispatcher;
     }
     return dispatcher;
   }
@@ -42,10 +42,10 @@ export class Mouse extends Dispatcher {
    * @constructor
    * @param {SVGElement} svg The root <svg> to attach to.
    */
-  constructor(svg: SVGElement) {
+  private constructor(component: IComponent<any>) {
     super();
 
-    this._translator = Utils.ClientToSVGTranslator.getTranslator(svg);
+    this._translator = component.root().translator();
 
     this._lastMousePosition = { x: -1, y: -1 };
 
@@ -185,7 +185,7 @@ export class Mouse extends Dispatcher {
     if (scope !== "page" && scope !== "element") {
       throw new Error("Invalid scope '" + scope + "', must be 'element' or 'page'");
     }
-    if (scope === "page" || this.eventInsideSVG(event)) {
+    if (scope === "page" || this.eventInside(event)) {
       let newMousePosition = this._translator.computePosition(event.clientX, event.clientY);
       if (newMousePosition != null) {
         this._lastMousePosition = newMousePosition;
@@ -195,7 +195,11 @@ export class Mouse extends Dispatcher {
   }
 
   public eventInsideSVG(event: MouseEvent) {
-    return this._translator.insideSVG(event);
+    return this.eventInside(event);
+  }
+
+  public eventInside(event: MouseEvent) {
+    return this._translator.isInside(event);
   }
 
   /**
