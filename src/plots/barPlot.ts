@@ -11,7 +11,7 @@ import { Accessor, Point, Bounds, Range } from "../core/interfaces";
 import { Dataset } from "../core/dataset";
 import { Drawer } from "../drawers/drawer";
 import * as Drawers from "../drawers";
-import { Formatter } from "../core/formatters";
+import { Formatter, LabelFormatter } from "../core/formatters";
 import * as Formatters from "../core/formatters";
 import * as Scales from "../scales";
 import { QuantitativeScale } from "../scales/quantitativeScale";
@@ -43,7 +43,7 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
   private _baseline: d3.Selection<void>;
   private _baselineValue: X|Y;
   protected _isVertical: boolean;
-  private _labelFormatter: Formatter = Formatters.identity();
+  private _labelFormatter: LabelFormatter = Formatters.labelFormatter();
   private _labelsEnabled = false;
   private _hideBarsIfAnyAreTooWide = true;
   private _labelConfig: Utils.Map<Dataset, LabelConfig>;
@@ -239,15 +239,15 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
   /**
    * Gets the Formatter for the labels.
    */
-  public labelFormatter(): Formatter;
+  public labelFormatter(): LabelFormatter;
   /**
    * Sets the Formatter for the labels.
    *
-   * @param {Formatter} formatter
+   * @param {LabelFormatter} formatter
    * @returns {Bar} The calling Bar Plot.
    */
-  public labelFormatter(formatter: Formatter): this;
-  public labelFormatter(formatter?: Formatter): any {
+  public labelFormatter(formatter: LabelFormatter): this;
+  public labelFormatter(formatter?: LabelFormatter): any {
     if (formatter == null) {
       return this._labelFormatter;
     } else {
@@ -500,7 +500,7 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
 
       let barWidth = attrToProjector["width"](d, i, dataset);
       let barHeight = attrToProjector["height"](d, i, dataset);
-      let text = this._labelFormatter(valueAccessor(d, i, dataset));
+      let text = this._labelFormatter(valueAccessor(d, i, dataset), d, dataset);
       let measurement = measurer.measure(text);
 
       let xAlignment = "center";

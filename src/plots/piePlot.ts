@@ -10,7 +10,7 @@ import * as Animators from "../animators";
 import { Accessor, Point, AttributeToProjector } from "../core/interfaces";
 import { Dataset } from "../core/dataset";
 import * as Drawers from "../drawers";
-import { Formatter } from "../core/formatters";
+import { Formatter, LabelFormatter } from "../core/formatters";
 import * as Formatters from "../core/formatters";
 import * as Scales from "../scales";
 import { Scale } from "../scales/scale";
@@ -28,7 +28,7 @@ export class Pie extends Plot {
   private _endAngle: number = 2 * Math.PI;
   private _startAngles: number[];
   private _endAngles: number[];
-  private _labelFormatter: Formatter = Formatters.identity();
+  private _labelFormatter: LabelFormatter = Formatters.labelFormatter();
   private _labelsEnabled = false;
   private _strokeDrawers: Utils.Map<Dataset, Drawers.ArcOutline>;
 
@@ -304,15 +304,15 @@ export class Pie extends Plot {
   /**
    * Gets the Formatter for the labels.
    */
-  public labelFormatter(): Formatter;
+  public labelFormatter(): LabelFormatter;
   /**
    * Sets the Formatter for the labels.
    *
-   * @param {Formatter} formatter
+   * @param {LabelFormatter} formatter
    * @returns {Pie} The calling Pie Plot.
    */
-  public labelFormatter(formatter: Formatter): this;
-  public labelFormatter(formatter?: Formatter): any {
+  public labelFormatter(formatter: LabelFormatter): this;
+  public labelFormatter(formatter?: LabelFormatter): any {
     if (formatter == null) {
       return this._labelFormatter;
     } else {
@@ -585,7 +585,7 @@ export class Pie extends Plot {
       if (!Utils.Math.isValidNumber(value)) {
         return;
       }
-      value = this._labelFormatter(value);
+      value = this._labelFormatter(value, datum, dataset);
       let measurement = measurer.measure(value);
 
       let theta = (this._endAngles[datumIndex] + this._startAngles[datumIndex]) / 2;
