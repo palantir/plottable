@@ -6157,7 +6157,7 @@ var HTMLComponent = (function (_super) {
     HTMLComponent.prototype.detach = function () {
         this.parent(null);
         if (this._isAnchored) {
-            this._element.remove();
+            d3.select(this._element).remove();
         }
         this._isAnchored = false;
         this._onDetachCallbacks.callCallbacks(this);
