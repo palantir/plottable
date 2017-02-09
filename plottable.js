@@ -818,10 +818,10 @@ var Component = (function (_super) {
             // this is a top-level SVG nested within an HTML layout. Apply the styles
             // directly to the root SVG rather than to the g element
             this._rootSVG.style({
-                height: this.height(),
+                height: this.height() + "px",
                 left: this._origin.x + "px",
                 top: this._origin.y + "px",
-                width: this.width(),
+                width: this.width() + "px",
             });
             this._element.attr("transform", "translate(0, 0)");
         }
@@ -5365,6 +5365,7 @@ exports.within = within;
 
 "use strict";
 
+var Utils = __webpack_require__(0);
 var Translator = (function () {
     function Translator(measurementElement) {
         this._measurementElement = measurementElement;
@@ -5402,7 +5403,7 @@ var Translator = (function () {
         return scaledPosition;
     };
     Translator.prototype.isInside = function (component, e) {
-        return component.element().node().contains(e.target);
+        return Utils.DOM.contains(component.element().node(), e.target);
     };
     return Translator;
 }());
@@ -7224,6 +7225,17 @@ exports.Category = Category;
 
 var d3 = __webpack_require__(1);
 var nativeMath = window.Math;
+/**
+ * Returns whether the child is in fact a child of the parent
+ */
+function contains(parent, child) {
+    var maybeParent = child;
+    while (maybeParent != null && maybeParent !== parent) {
+        maybeParent = maybeParent.parentNode;
+    }
+    return maybeParent === parent;
+}
+exports.contains = contains;
 /**
  * Gets the bounding box of an element.
  * @param {d3.Selection} element

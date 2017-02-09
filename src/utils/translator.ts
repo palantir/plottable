@@ -1,3 +1,5 @@
+import * as Utils from "../utils";
+
 import { Point } from "../";
 import { IComponent } from "../components";
 
@@ -50,6 +52,6 @@ export class Translator {
   }
 
   public isInside(component: IComponent<any>, e: Event) {
-    return component.element().node().contains(e.target as Element);
+    return Utils.DOM.contains(component.element().node() as Element, e.target as Element);
   }
 }

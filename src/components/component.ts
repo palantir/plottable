@@ -173,10 +173,10 @@ export class Component extends AbstractComponent<d3.Selection<void>> {
       // this is a top-level SVG nested within an HTML layout. Apply the styles
       // directly to the root SVG rather than to the g element
       this._rootSVG.style({
-        height: this.height(),
+        height: `${this.height()}px`,
         left: `${this._origin.x}px`,
         top: `${this._origin.y}px`,
-        width: this.width(),
+        width: `${this.width()}px`,
       });
       this._element.attr("transform", "translate(0, 0)");
     } else {
