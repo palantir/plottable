@@ -170,14 +170,17 @@ describe("Group", () => {
       let group = new Plottable.Components.Group([c1, c2]);
 
       let div = TestMethods.generateDIV();
+      let svg = TestMethods.generateSVG();
+
       group.renderTo(div);
 
       group.destroy();
       // HACKHACK #2614: chai-assert.d.ts has the wrong signature
-      (<any> assert).throws(() => c1.renderTo(div), Error, "Can't reuse destroy()-ed Components!", "Component 1 was destroyed");
-      (<any> assert).throws(() => c2.renderTo(div), Error, "Can't reuse destroy()-ed Components!", "Component 2 was destroyed");
+      (<any> assert).throws(() => c1.renderTo(svg), Error, "Can't reuse destroy()-ed Components!", "Component 1 was destroyed");
+      (<any> assert).throws(() => c2.renderTo(svg), Error, "Can't reuse destroy()-ed Components!", "Component 2 was destroyed");
 
       div.remove();
+      svg.remove();
     });
   });
 

@@ -6,7 +6,7 @@ import { IComponent } from "../src/components";
 
 export function generateDIV(width = 400, height = 400): HTMLElement {
   let parent = getSVGParent();
-  return parent.append("div").attr("width", width).attr("height", height).attr("class", "div").node() as HTMLElement;
+  return parent.append("div").style("width", `${width}px`).style("height", `${height}px`).attr("class", "div").node() as HTMLElement;
 }
 
 export function generateSVG(width = 400, height = 400): d3.Selection<void> {
@@ -171,6 +171,10 @@ export function decomposePath(normalizedPathString: string) {
       arguments: argumentStrings[index].split(",").filter((s) => s !== "").map((s) => parseFloat(s)),
     };
   });
+}
+
+export function numStyle(s: HTMLElement, a: string) {
+  return parseFloat(s.style[a]);
 }
 
 export function numAttr(s: d3.Selection<void>, a: string) {

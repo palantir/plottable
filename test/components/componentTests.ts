@@ -533,7 +533,7 @@ describe("Component", () => {
       let t = new Plottable.Components.Table([[c]]);
       t.renderTo(div);
 
-      let componentElement = svg.select(".component");
+      let componentElement = d3.select(div).select(".component");
       assert.deepEqual(TestMethods.getTranslate(componentElement), [0, 0], "the element was not translated");
 
       div.remove();

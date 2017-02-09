@@ -330,7 +330,7 @@ describe("Tables", () => {
       let tableRows = [[component1, component2]];
       const table = new Plottable.Components.Table(tableRows);
       table.renderTo(div);
-      const twoColumnExpectedWidth = TestMethods.numAttr(d3.select(div), "width") / 2;
+      const twoColumnExpectedWidth = TestMethods.numStyle(div, "width") / 2;
       assert.strictEqual(component1.width(), twoColumnExpectedWidth, "first Component received half the available width");
       assert.strictEqual(component2.width(), twoColumnExpectedWidth, "second Component received half the available width");
       verifyOrigins(tableRows);
@@ -338,7 +338,7 @@ describe("Tables", () => {
       const component3 = new Plottable.Component();
       table.add(component3, 0, 2);
       tableRows[0].push(component3);
-      const threeColumnExpectedWidth = TestMethods.numAttr(d3.select(div), "width") / 3;
+      const threeColumnExpectedWidth = TestMethods.numStyle(div, "width") / 3;
       assert.strictEqual(component1.width(), threeColumnExpectedWidth, "first Component received one-third of the available width");
       assert.strictEqual(component2.width(), threeColumnExpectedWidth, "second Component received one-third of the available width");
       assert.strictEqual(component3.width(), threeColumnExpectedWidth, "third Component received one-third of the available width");
@@ -355,7 +355,7 @@ describe("Tables", () => {
       const unfixedComponent2 = new Plottable.Component();
       const table = new Plottable.Components.Table([[fixedSizeComponent, unfixedComponent1, unfixedComponent2]]);
       table.renderTo(div);
-      const expectedUnfixedWidth = (TestMethods.numAttr(d3.select(div), "width") - FIXED_COMPONENT_SIZE) / 2;
+      const expectedUnfixedWidth = (TestMethods.numStyle(div, "width") - FIXED_COMPONENT_SIZE) / 2;
       assert.strictEqual(unfixedComponent1.width(), expectedUnfixedWidth,
         "first non-fixed-width Component received half the remaining width");
       assert.strictEqual(unfixedComponent2.width(), expectedUnfixedWidth,
@@ -376,7 +376,7 @@ describe("Tables", () => {
       ];
       const table = new Plottable.Components.Table(tableRows);
       table.renderTo(div);
-      const twoRowExpectedHeight = TestMethods.numAttr(d3.select(div), "height") / 2;
+      const twoRowExpectedHeight = TestMethods.numStyle(div, "height") / 2;
       assert.strictEqual(component1.height(), twoRowExpectedHeight, "first Component received half the available height");
       assert.strictEqual(component2.height(), twoRowExpectedHeight, "second Component received half the available height");
       verifyOrigins(tableRows);
@@ -384,7 +384,7 @@ describe("Tables", () => {
       const component3 = new Plottable.Component();
       table.add(component3, 2, 0);
       tableRows.push([component3]);
-      const threeRowExpectedHeight = TestMethods.numAttr(d3.select(div), "height") / 3;
+      const threeRowExpectedHeight = TestMethods.numStyle(div, "height") / 3;
       assert.strictEqual(component1.height(), threeRowExpectedHeight, "first Component received one-third of the available height");
       assert.strictEqual(component2.height(), threeRowExpectedHeight, "second Component received one-third of the available height");
       assert.strictEqual(component3.height(), threeRowExpectedHeight, "third Component received one-third of the available height");
@@ -405,7 +405,7 @@ describe("Tables", () => {
         [unfixedComponent2],
       ]);
       table.renderTo(div);
-      const expectedUnfixedHeight = (TestMethods.numAttr(d3.select(div), "height") - FIXED_COMPONENT_SIZE) / 2;
+      const expectedUnfixedHeight = (TestMethods.numStyle(div, "height") - FIXED_COMPONENT_SIZE) / 2;
       assert.strictEqual(unfixedComponent1.height(), expectedUnfixedHeight,
         "first non-fixed-height Component received half the remaining height");
       assert.strictEqual(unfixedComponent2.height(), expectedUnfixedHeight,
@@ -467,7 +467,7 @@ describe("Tables", () => {
         table.rowPadding(rowPadding);
         table.renderTo(div);
 
-        const expectedHeight = (TestMethods.numAttr(d3.select(div), "height") - rowPadding) / 2;
+        const expectedHeight = (TestMethods.numStyle(div, "height") - rowPadding) / 2;
         assert.strictEqual(component1.height(), expectedHeight, "first non-fixed-height Component received half the remaining height");
         assert.strictEqual(component2.height(), expectedHeight, "second non-fixed-height Component received half the remaining height");
         verifyOrigins(tableRows, rowPadding, 0);
@@ -487,7 +487,7 @@ describe("Tables", () => {
         table.columnPadding(columnPadding);
         table.renderTo(div);
 
-        const expectedWidth = (TestMethods.numAttr(d3.select(div), "height") - columnPadding) / 2;
+        const expectedWidth = (TestMethods.numStyle(div, "height") - columnPadding) / 2;
         assert.strictEqual(component1.width(), expectedWidth, "first non-fixed-width Component received half the remaining width");
         assert.strictEqual(component2.width(), expectedWidth, "second non-fixed-width Component received half the remaining width");
         verifyOrigins(tableRows, 0, columnPadding);
@@ -512,9 +512,9 @@ describe("Tables", () => {
         const totalRowWeight = row0Weight + row1Weight;
         table.renderTo(div);
 
-        assert.strictEqual(component0.height(), TestMethods.numAttr(d3.select(div), "width") * row0Weight / totalRowWeight,
+        assert.strictEqual(component0.height(), TestMethods.numStyle(div, "width") * row0Weight / totalRowWeight,
           "row 0 received height according to its weight");
-        assert.strictEqual(component1.height(), TestMethods.numAttr(d3.select(div), "width") * row1Weight / totalRowWeight,
+        assert.strictEqual(component1.height(), TestMethods.numStyle(div, "width") * row1Weight / totalRowWeight,
           "row 1 received height according to its weight");
 
         table.destroy();
@@ -534,9 +534,9 @@ describe("Tables", () => {
         const totalColumnWeight = column0Weight + column1Weight;
         table.renderTo(div);
 
-        assert.strictEqual(component0.width(), TestMethods.numAttr(d3.select(div), "width") * column0Weight / totalColumnWeight,
+        assert.strictEqual(component0.width(), TestMethods.numStyle(div, "width") * column0Weight / totalColumnWeight,
           "column 0 received width according to its weight");
-        assert.strictEqual(component1.width(), TestMethods.numAttr(d3.select(div), "width") * column1Weight / totalColumnWeight,
+        assert.strictEqual(component1.width(), TestMethods.numStyle(div, "width") * column1Weight / totalColumnWeight,
           "column 1 received width according to its weight");
 
         table.destroy();

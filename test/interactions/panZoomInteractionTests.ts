@@ -320,6 +320,12 @@ describe("Interactions", () => {
       });
 
       it("can pinch inside one component and not affect another component", () => {
+
+        // its initially attached to the component rooted in an SVG
+        // which throws off measuring. It needs to be attached to the
+        // component once it's been attached to the group element
+        panZoomInteraction.detachFrom(component);
+
         const div = TestMethods.generateDIV(SVG_WIDTH, SVG_HEIGHT);
 
         let xScale2 = new Plottable.Scales.Linear();
@@ -333,6 +339,7 @@ describe("Interactions", () => {
         panZoomInteraction2.attachTo(component2);
 
         let table = new Plottable.Components.Table([[component, component2]]);
+        panZoomInteraction.attachTo(component);
         table.renderTo(div);
 
         let startPoint = { x: SVG_WIDTH / 4, y: SVG_HEIGHT / 2 };
