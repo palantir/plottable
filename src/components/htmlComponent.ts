@@ -2,7 +2,6 @@ import * as d3 from "d3";
 
 import { AbstractComponent, IComponent, IContent } from "./abstractComponent";
 import { GenericComponentCallback, IResizeHandler } from "./component";
-import { IComponentContainer } from "./componentContainer";
 
 import { Point, SpaceRequest, Bounds } from "../core/interfaces";
 import * as RenderController from "../core/renderController";

@@ -1,14 +1,9 @@
-/**
- * Copyright 2014-present Palantir Technologies
- * @license MIT
- */
-
 import * as d3 from "d3";
 
 import { Point, SpaceRequest } from "../core/interfaces";
 import * as Utils from "../utils";
 
-import { Component } from "./component";
+import { IComponent } from "./abstractComponent";
 import { ComponentContainer } from "./componentContainer";
 
 type _LayoutAllocation = {
@@ -31,7 +26,7 @@ export class Table extends ComponentContainer {
   private _rowPadding = 0;
   private _columnPadding = 0;
 
-  private _rows: Component[][] = [];
+  private _rows: IComponent<any>[][] = [];
 
   private _rowWeights: number[] = [];
   private _columnWeights: number[] = [];
@@ -53,7 +48,7 @@ export class Table extends ComponentContainer {
    * @param {Component[][]} [rows=[]] A 2-D array of Components to be added to the Table.
    *   null can be used if a cell is empty.
    */
-  constructor(rows: Component[][] = []) {
+  constructor(rows: IComponent<any>[][] = []) {
     super();
     this.addClass("table");
     rows.forEach((row, rowIndex) => {
@@ -65,7 +60,7 @@ export class Table extends ComponentContainer {
     });
   }
 
-  protected _forEach(callback: (component: Component) => any) {
+  protected _forEach(callback: (component: IComponent<any>) => any) {
     for (let r = 0; r < this._nRows; r++) {
       for (let c = 0; c < this._nCols; c++) {
         if (this._rows[r][c] != null) {
@@ -78,7 +73,7 @@ export class Table extends ComponentContainer {
   /**
    * Checks whether the specified Component is in the Table.
    */
-  public has(component: Component) {
+  public has(component: IComponent<any>) {
     for (let r = 0; r < this._nRows; r++) {
       for (let c = 0; c < this._nCols; c++) {
         if (this._rows[r][c] === component) {
@@ -118,7 +113,7 @@ export class Table extends ComponentContainer {
    * @param {number} col
    * @returns {Table} The calling Table.
    */
-  public add(component: Component, row: number, col: number) {
+  public add(component: IComponent<any>, row: number, col: number) {
     if (component == null) {
       throw Error("Cannot add null to a table cell");
     }
@@ -140,7 +135,7 @@ export class Table extends ComponentContainer {
     return this;
   }
 
-  protected _remove(component: Component) {
+  protected _remove(component: IComponent<any>) {
     for (let r = 0; r < this._nRows; r++) {
       for (let c = 0; c < this._nCols; c++) {
         if (this._rows[r][c] === component) {
@@ -179,8 +174,8 @@ export class Table extends ComponentContainer {
     let availableWidthAfterPadding = availableWidth - this._columnPadding * (this._nCols - 1);
     let availableHeightAfterPadding = availableHeight - this._rowPadding * (this._nRows - 1);
 
-    let rowWeights = Table._calcComponentWeights(this._rowWeights, rows, (c: Component) => (c == null) || c.fixedHeight());
-    let colWeights = Table._calcComponentWeights(this._columnWeights, cols, (c: Component) => (c == null) || c.fixedWidth());
+    let rowWeights = Table._calcComponentWeights(this._rowWeights, rows, (c: IComponent<any>) => (c == null) || c.fixedHeight());
+    let colWeights = Table._calcComponentWeights(this._columnWeights, cols, (c: IComponent<any>) => (c == null) || c.fixedWidth());
 
     // To give the table a good starting position to iterate from, we give the fixed-width components half-weight
     // so that they will get some initial space allocated to work with
@@ -268,8 +263,8 @@ export class Table extends ComponentContainer {
     let columnNeedsWidth = Utils.Array.createFilledArray(false, this._nCols);
     let rowNeedsHeight = Utils.Array.createFilledArray(false, this._nRows);
 
-    this._rows.forEach((row: Component[], rowIndex: number) => {
-      row.forEach((component: Component, colIndex: number) => {
+    this._rows.forEach((row: IComponent<any>[], rowIndex: number) => {
+      row.forEach((component: IComponent<any>, colIndex: number) => {
         let spaceRequest: SpaceRequest;
         if (component != null) {
           spaceRequest = component.requestedSpace(offeredWidths[colIndex], offeredHeights[rowIndex]);
@@ -322,9 +317,9 @@ export class Table extends ComponentContainer {
     let childYOrigin = 0;
     let rowHeights = Utils.Array.add(layout.rowProportionalSpace, layout.guaranteedHeights);
     let colWidths = Utils.Array.add(layout.colProportionalSpace, layout.guaranteedWidths);
-    this._rows.forEach((row: Component[], rowIndex: number) => {
+    this._rows.forEach((row: IComponent<any>[], rowIndex: number) => {
       let childXOrigin = 0;
-      row.forEach((component: Component, colIndex: number) => {
+      row.forEach((component: IComponent<any>, colIndex: number) => {
         // recursively compute layout
         if (component != null) {
           component.computeLayout({ x: childXOrigin, y: childYOrigin }, colWidths[colIndex], rowHeights[rowIndex]);
@@ -457,11 +452,11 @@ export class Table extends ComponentContainer {
 
   public fixedWidth(): boolean {
     let cols = d3.transpose(this._rows);
-    return Table._fixedSpace(cols, (c: Component) => (c == null) || c.fixedWidth());
+    return Table._fixedSpace(cols, (c: IComponent<any>) => (c == null) || c.fixedWidth());
   }
 
   public fixedHeight(): boolean {
-    return Table._fixedSpace(this._rows, (c: Component) => (c == null) || c.fixedHeight());
+    return Table._fixedSpace(this._rows, (c: IComponent<any>) => (c == null) || c.fixedHeight());
   }
 
   private _padTableToSize(nRows: number, nCols: number) {
@@ -484,8 +479,8 @@ export class Table extends ComponentContainer {
   }
 
   private static _calcComponentWeights(setWeights: number[],
-                                       componentGroups: Component[][],
-                                       fixityAccessor: (c: Component) => boolean) {
+                                       componentGroups: IComponent<any>[][],
+                                       fixityAccessor: (c: IComponent<any>) => boolean) {
     // If the row/col weight was explicitly set, then return it outright
     // If the weight was not explicitly set, then guess it using the heuristic that if all components are fixed-space
     // then weight is 0, otherwise weight is 1
@@ -508,9 +503,9 @@ export class Table extends ComponentContainer {
     }
   }
 
-  private static _fixedSpace(componentGroup: Component[][], fixityAccessor: (c: Component) => boolean) {
+  private static _fixedSpace(componentGroup: IComponent<any>[][], fixityAccessor: (c: IComponent<any>) => boolean) {
     let all = (bools: boolean[]) => bools.reduce((a, b) => a && b, true);
-    let groupIsFixed = (components: Component[]) => all(components.map(fixityAccessor));
+    let groupIsFixed = (components: IComponent<any>[]) => all(components.map(fixityAccessor));
     return all(componentGroup.map(groupIsFixed));
   }
 }

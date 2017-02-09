@@ -1,5 +1,5 @@
 import { GenericComponentCallback, IResizeHandler } from "./component";
-import { IComponentContainer } from "./componentContainer";
+import { ComponentContainer } from "./componentContainer";
 
 import { Point, SpaceRequest, Bounds } from "../core/interfaces";
 import * as RenderController from "../core/renderController";
@@ -169,15 +169,15 @@ export interface IComponent<D> {
   /**
    * Gets the parent ComponentContainer for this Component.
    */
-  parent(): IComponentContainer<any>;
+  parent(): ComponentContainer;
   /**
    * Sets the parent ComponentContainer for this Component.
    * An error will be thrown if the parent does not contain this Component.
    * Adding a Component to a ComponentContainer should be done
    * using the appropriate method on the ComponentContainer.
    */
-  parent(parent: IComponentContainer<any>): this;
-  parent(parent?: IComponentContainer<any>): any;
+  parent(parent: ComponentContainer): this;
+  parent(parent?: ComponentContainer): any;
   /**
    * @returns {Bounds} for the component in pixel space, where the topLeft
    * represents the component's minimum x and y values and the bottomRight represents
@@ -238,7 +238,7 @@ export interface IComponent<D> {
 }
 
 export abstract class AbstractComponent<D> implements IComponent<D> {
-  private _parent: IComponentContainer<any>;
+  private _parent: ComponentContainer;
 
   protected _content: D;
   protected _destroyed = false;
@@ -481,15 +481,15 @@ export abstract class AbstractComponent<D> implements IComponent<D> {
   /**
    * Gets the parent ComponentContainer for this Component.
    */
-  public parent(): IComponentContainer<any>;
+  public parent(): ComponentContainer;
   /**
    * Sets the parent ComponentContainer for this Component.
    * An error will be thrown if the parent does not contain this Component.
    * Adding a Component to a ComponentContainer should be done
    * using the appropriate method on the ComponentContainer.
    */
-  public parent(parent: IComponentContainer<any>): this;
-  public parent(parent?: IComponentContainer<any>): this | IComponentContainer<any> {
+  public parent(parent: ComponentContainer): this;
+  public parent(parent?: ComponentContainer): this | ComponentContainer {
     if (parent === undefined) {
       return this._parent;
     }

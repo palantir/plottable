@@ -10,8 +10,6 @@ import { Point, SpaceRequest, Bounds } from "../core/interfaces";
 import * as RenderController from "../core/renderController";
 import * as Utils from "../utils";
 
-import { ComponentContainer, IComponentContainer } from "./componentContainer";
-
 export type GenericComponentCallback<D> = (component: IComponent<D>) => void;
 
 // HACKHACK replace with GenericComponentCallback in 3.0

@@ -1,39 +1,24 @@
-/**
- * Copyright 2014-present Palantir Technologies
- * @license MIT
- */
-
-import * as d3 from "d3";
-
-import {  Component, ComponentCallback } from "./component";
 import { IComponent } from "./abstractComponent";
-
-export interface IComponentContainer<D> extends IComponent<D> {
-  /**
-   * Checks whether the specified Component is in the ComponentContainer.
-   */
-  has(component: IComponent<any>): boolean;
-  /**
-   * Removes the specified Component from the ComponentContainer.
-   */
-  remove(component: IComponent<any>): this;
-}
+import { GenericComponentCallback } from "./component";
+import { HTMLComponent } from "./htmlComponent";
 
 /*
  * ComponentContainer class encapsulates Table and ComponentGroup's shared functionality.
  * It will not do anything if instantiated directly.
  */
-export class ComponentContainer extends Component implements IComponentContainer<d3.Selection<void>> {
-  private _detachCallback: ComponentCallback;
+export class ComponentContainer extends HTMLComponent {
+  private _detachCallback: GenericComponentCallback<any>;
 
   constructor() {
     super();
-    this._detachCallback = (component: Component) => this.remove(component);
+    this._detachCallback = (component: IComponent<any>) => this.remove(component);
   }
 
-  public anchor(selection: d3.Selection<void>) {
+  public anchor(selection: HTMLElement) {
     super.anchor(selection);
-    this._forEach((c) => c.anchor(this.content()));
+
+    this._forEach((c) => c.anchorHTML(this.content().node() as HTMLElement));
+
     return this;
   }
 
@@ -45,22 +30,22 @@ export class ComponentContainer extends Component implements IComponentContainer
   /**
    * Checks whether the specified Component is in the ComponentContainer.
    */
-  public has(component: Component): boolean {
+  public has(component: IComponent<any>): boolean {
     throw new Error("has() is not implemented on ComponentContainer");
   }
 
-  protected _adoptAndAnchor(component: Component) {
+  protected _adoptAndAnchor(component: IComponent<any>) {
     component.parent(this);
     component.onDetach(this._detachCallback);
     if (this._isAnchored) {
-      component.anchor(this.content());
+      component.anchorHTML(this.content().node() as HTMLElement);
     }
   }
 
   /**
    * Removes the specified Component from the ComponentContainer.
    */
-  public remove(component: Component) {
+  public remove(component: IComponent<any>) {
     if (this.has(component)) {
       component.offDetach(this._detachCallback);
       this._remove(component);
@@ -76,14 +61,14 @@ export class ComponentContainer extends Component implements IComponentContainer
    *
    * @return {boolean} true if the Component was successfully removed, false otherwise.
    */
-  protected _remove(component: Component) {
+  protected _remove(component: IComponent<any>) {
     return false;
   }
 
   /**
    * Invokes a callback on each Component in the ComponentContainer.
    */
-  protected _forEach(callback: (component: Component) => void) {
+  protected _forEach(callback: (component: IComponent<any>) => void) {
     throw new Error("_forEach() is not implemented on ComponentContainer");
   }
 
@@ -92,6 +77,6 @@ export class ComponentContainer extends Component implements IComponentContainer
    */
   public destroy() {
     super.destroy();
-    this._forEach((c: Component) => c.destroy());
+    this._forEach((c: IComponent<any>) => c.destroy());
   }
 }
