@@ -531,9 +531,9 @@ describe("Component", () => {
       c.destroy();
       c = new Mocks.FixedSizeComponent(requestedWidth, requestedHeight);
       let t = new Plottable.Components.Table([[c]]);
-      t.renderTo(div);
+      t.renderTo(div.node() as HTMLElement);
 
-      let componentElement = d3.select(div).select(".component");
+      let componentElement = div.select(".component");
       assert.deepEqual(TestMethods.getTranslate(componentElement), [0, 0], "the element was not translated");
 
       div.remove();
@@ -773,7 +773,7 @@ describe("Component", () => {
       const table = new Plottable.Components.Table([[barPlot, legend]]);
       const computeLayoutSpy = sinon.spy(table, "computeLayout");
 
-      table.renderTo(div);
+      table.renderTo(div.node() as HTMLElement);
 
       assert.strictEqual(computeLayoutSpy.callCount, 1, "component only computes layout once");
       table.destroy();
@@ -811,8 +811,9 @@ describe("Component", () => {
     it("errors on inputs that do not evaluate to an SVG element", () => {
       let parent = TestMethods.getSVGParent();
       let div = parent.append("div");
+
       // HACKHACK #2614: chai-assert.d.ts has the wrong signature
-      (<any> assert).throws(() => c.renderTo(div), Error,
+      (<any> assert).throws(() => c.renderTo(div.node() as HTMLElement), Error,
         "Plottable requires a valid SVG to renderTo", "rejects selections that don't contain svgs");
       (<any> assert).throws(() => c.renderTo(<Element> div.node()), Error,
         "Plottable requires a valid SVG to renderTo", "rejects DOM nodes that are not svgs");
@@ -820,8 +821,9 @@ describe("Component", () => {
         "Plottable requires a valid SVG to renderTo", "rejects strings that don't correspond to DOM elements");
       (<any> assert).throws(() => c.renderTo(d3.select(null)), Error,
         "Plottable requires a valid SVG to renderTo", "rejects empty d3 selections");
-      div.remove();
+
       c.destroy();
+      div.remove();
       svg.remove();
     });
 
@@ -864,7 +866,7 @@ describe("Component", () => {
     it("is offset by the parent's origin", () => {
       const div = TestMethods.generateDIV(SVG_WIDTH, SVG_HEIGHT);
       let parent = new Plottable.Components.Group([c]);
-      parent.anchor(div);
+      parent.anchor(div.node() as HTMLElement);
       c.anchor(svg);
       parent.computeLayout({x: SVG_WIDTH / 4, y: SVG_HEIGHT / 4}, SVG_WIDTH / 2, SVG_HEIGHT / 2);
       c.computeLayout({x: SVG_WIDTH / 4, y: SVG_HEIGHT / 4}, SVG_WIDTH / 4, SVG_HEIGHT / 4);

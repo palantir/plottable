@@ -465,7 +465,7 @@ describe("Scales", () => {
         plot2.y((d) => d.y, yScale);
 
         let group = new Plottable.Components.Group([plot1, plot2]);
-        group.renderTo(div);
+        group.renderTo(div.node() as HTMLElement);
 
         assert.deepEqual(xScale.domain(), [0, 2]);
         plot1.detach();

@@ -4,9 +4,9 @@ import * as d3 from "d3";
 import * as Plottable from "../src";
 import { IComponent } from "../src/components";
 
-export function generateDIV(width = 400, height = 400): HTMLElement {
+export function generateDIV(width = 400, height = 400) {
   let parent = getSVGParent();
-  return parent.append("div").style("width", `${width}px`).style("height", `${height}px`).attr("class", "div").node() as HTMLElement;
+  return parent.append("div").style("width", `${width}px`).style("height", `${height}px`).attr("class", "div");
 }
 
 export function generateSVG(width = 400, height = 400): d3.Selection<void> {

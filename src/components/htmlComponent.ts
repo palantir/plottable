@@ -173,7 +173,7 @@ export class HTMLComponent extends AbstractComponent<HTMLElement> {
     this.parent(null);
 
     if (this._isAnchored) {
-      this._element.remove();
+      d3.select(this._element).remove();
     }
 
     this._isAnchored = false;

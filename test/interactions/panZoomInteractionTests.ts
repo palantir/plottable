@@ -340,7 +340,7 @@ describe("Interactions", () => {
 
         let table = new Plottable.Components.Table([[component, component2]]);
         panZoomInteraction.attachTo(component);
-        table.renderTo(div);
+        table.renderTo(div.node() as HTMLElement);
 
         let startPoint = { x: SVG_WIDTH / 4, y: SVG_HEIGHT / 2 };
         let startPoint2 = { x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2 };

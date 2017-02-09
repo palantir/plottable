@@ -8,7 +8,7 @@ import * as TestMethods from "../testMethods";
 
 describe("Components", () => {
   describe("PlotGroup", () => {
-    let div: HTMLElement;
+    let div: d3.Selection<void>;
     let xScale: Plottable.Scales.Linear;
     let yScale: Plottable.Scales.Linear;
     let plotGroup: Plottable.Components.PlotGroup;
@@ -49,7 +49,7 @@ describe("Components", () => {
     });
 
     it("can retrieve the nearest Entity in case of empty group", () => {
-      plotGroup.renderTo(div);
+      plotGroup.renderTo(div.node() as HTMLElement);
       assert.isUndefined(plotGroup.entityNearest({x: 0, y: 0}));
       div.remove();
     });
@@ -57,7 +57,7 @@ describe("Components", () => {
     it("can retrieve the nearest Entity", () => {
       plotGroup.append(bottomPlot);
       plotGroup.append(topPlot);
-      plotGroup.renderTo(div);
+      plotGroup.renderTo(div.node() as HTMLElement);
       let px = xScale.scale(topData[1].x);
       let py = yScale.scale(topData[1].y);
       let closest = plotGroup.entityNearest({x: px, y: py});
