@@ -1,6 +1,6 @@
 import * as d3 from "d3";
 
-import { AbstractComponent } from "./abstractComponent";
+import { AbstractComponent, IComponent, IContent } from "./abstractComponent";
 import { GenericComponentCallback, IResizeHandler } from "./component";
 import { IComponentContainer } from "./componentContainer";
 
@@ -182,6 +182,10 @@ export class HTMLComponent extends AbstractComponent<HTMLElement> {
 
   public content() {
     return d3.select(this._element);
+  }
+
+  public translator(): Utils.Translator {
+    return Utils.ClientToHTMLTranslator.getTranslator(this);
   }
 
   /**

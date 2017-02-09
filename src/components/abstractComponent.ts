@@ -213,9 +213,24 @@ export interface IComponent<D> {
    *
    * Will return undefined if the Component has not been anchored.
    *
-   * @return {D} content selection for the Component
+   * @return {IContent} content selection for the Component
    */
   content(): IContent;
+  /**
+   * Gets the root component of the hierarchy
+   *
+   * @return {IComponent}
+   */
+  root(): IComponent<any>;
+  /**
+   * Gets the translator for the component. A translator
+   * converts client coordinates to component coordinates and
+   * takes into account any transformations that have been applied
+   * to the element.
+   *
+   * @return {Utils.ITranslator}
+   */
+   translator(): Utils.Translator;
 }
 
 export abstract class AbstractComponent<D> implements IComponent<D> {
@@ -541,5 +556,16 @@ export abstract class AbstractComponent<D> implements IComponent<D> {
     return origin;
   }
 
+  public root() {
+    let parent: IComponent<any> = this;
+
+    while (parent.parent() != null) {
+      parent = parent.parent();
+    }
+
+    return parent;
+  }
+
   abstract content(): IContent;
+  abstract translator(): Utils.Translator;
 }
