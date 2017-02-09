@@ -24,7 +24,7 @@ export class ClientToSVGTranslator {
       measureRect.setAttribute("height", "1");
       svg.appendChild(measureRect);
 
-      translator = new Translator(component, new PlottableSVGElement(measureRect));
+      translator = new Translator(new PlottableSVGElement(measureRect));
       (<any> svg)[ClientToSVGTranslator._TRANSLATOR_KEY] = translator;
     }
 

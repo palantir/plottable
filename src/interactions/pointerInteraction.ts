@@ -39,12 +39,12 @@ export class Pointer extends Interaction {
   }
 
   private _handleMouseEvent(p: Point, e: MouseEvent) {
-    let insideSVG = this._mouseDispatcher.eventInsideSVG(e);
+    let insideSVG = this._mouseDispatcher.eventInside(this._componentAttachedTo, e);
     this._handlePointerEvent(p, insideSVG);
   }
 
   private _handleTouchEvent(p: Point, e: TouchEvent) {
-    let insideSVG = this._touchDispatcher.eventInsideSVG(e);
+    let insideSVG = this._touchDispatcher.eventInside(this._componentAttachedTo, e);
     this._handlePointerEvent(p, insideSVG);
   }
 

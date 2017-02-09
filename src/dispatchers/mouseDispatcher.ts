@@ -49,18 +49,18 @@ export class Mouse extends Dispatcher {
 
     this._lastMousePosition = { x: -1, y: -1 };
 
-    let processMoveCallback = (e: MouseEvent) => this._measureAndDispatch(e, Mouse._MOUSEMOVE_EVENT_NAME, "page");
+    let processMoveCallback = (e: MouseEvent) => this._measureAndDispatch(component, e, Mouse._MOUSEMOVE_EVENT_NAME, "page");
     this._eventToProcessingFunction[Mouse._MOUSEOVER_EVENT_NAME] = processMoveCallback;
     this._eventToProcessingFunction[Mouse._MOUSEMOVE_EVENT_NAME] = processMoveCallback;
     this._eventToProcessingFunction[Mouse._MOUSEOUT_EVENT_NAME] = processMoveCallback;
     this._eventToProcessingFunction[Mouse._MOUSEDOWN_EVENT_NAME] =
-      (e: MouseEvent) => this._measureAndDispatch(e, Mouse._MOUSEDOWN_EVENT_NAME);
+      (e: MouseEvent) => this._measureAndDispatch(component, e, Mouse._MOUSEDOWN_EVENT_NAME);
     this._eventToProcessingFunction[Mouse._MOUSEUP_EVENT_NAME] =
-      (e: MouseEvent) => this._measureAndDispatch(e, Mouse._MOUSEUP_EVENT_NAME, "page");
+      (e: MouseEvent) => this._measureAndDispatch(component, e, Mouse._MOUSEUP_EVENT_NAME, "page");
     this._eventToProcessingFunction[Mouse._WHEEL_EVENT_NAME] =
-      (e: WheelEvent) => this._measureAndDispatch(e, Mouse._WHEEL_EVENT_NAME);
+      (e: WheelEvent) => this._measureAndDispatch(component, e, Mouse._WHEEL_EVENT_NAME);
     this._eventToProcessingFunction[Mouse._DBLCLICK_EVENT_NAME] =
-      (e: MouseEvent) => this._measureAndDispatch(e, Mouse._DBLCLICK_EVENT_NAME);
+      (e: MouseEvent) => this._measureAndDispatch(component, e, Mouse._DBLCLICK_EVENT_NAME);
   }
 
   /**
@@ -181,12 +181,12 @@ export class Mouse extends Dispatcher {
    * Computes the mouse position from the given event, and if successful
    * calls all the callbacks in the provided callbackSet.
    */
-  private _measureAndDispatch(event: MouseEvent, eventName: string, scope = "element") {
+  private _measureAndDispatch(component: IComponent<any>, event: MouseEvent, eventName: string, scope = "element") {
     if (scope !== "page" && scope !== "element") {
       throw new Error("Invalid scope '" + scope + "', must be 'element' or 'page'");
     }
-    if (scope === "page" || this.eventInside(event)) {
-      let newMousePosition = this._translator.computePosition(event.clientX, event.clientY);
+    if (scope === "page" || this.eventInside(component, event)) {
+      let newMousePosition = this._translator.computePosition(component, event.clientX, event.clientY);
       if (newMousePosition != null) {
         this._lastMousePosition = newMousePosition;
         this._callCallbacksForEvent(eventName, this.lastMousePosition(), event);
@@ -194,12 +194,8 @@ export class Mouse extends Dispatcher {
     }
   }
 
-  public eventInsideSVG(event: MouseEvent) {
-    return this.eventInside(event);
-  }
-
-  public eventInside(event: MouseEvent) {
-    return this._translator.isInside(event);
+  public eventInside(component: IComponent<any>, event: MouseEvent) {
+    return this._translator.isInside(component, event);
   }
 
   /**

@@ -13,20 +13,22 @@ export class ClientToHTMLTranslator {
    * If one already exists for the root, it will be returned; otherwise, a new one will be created.
    */
   public static getTranslator(component: HTMLComponent) {
-    const root = component.root().content();
+    // The Translator works by first calculating the offset to root of the chart and then calculating
+    // the offset from the component to the root. It is imperative that the measureElement
+    // be added to the root of the hierarchy and nowhere else.
+    const root = component.root().content().node();
 
     let translator: Translator = (<any> root)[ClientToHTMLTranslator._TRANSLATOR_KEY];
     if (translator == null) {
-      const rootElement = root.node() as HTMLElement;
-      const measureElement = document.createElementNS(rootElement.namespaceURI, "div") as HTMLElement;
+      const measureElement = document.createElementNS(root.namespaceURI, "div") as HTMLElement;
 
       measureElement.setAttribute("class", "measure-rect");
       measureElement.setAttribute("style", "opacity: 0; visibility: hidden; position: relative;");
       measureElement.setAttribute("width", "1");
       measureElement.setAttribute("height", "1");
-      rootElement.appendChild(measureElement);
+      root.appendChild(measureElement);
 
-      translator = new Translator(component, new PlottableHTMLElement(measureElement));
+      translator = new Translator(new PlottableHTMLElement(measureElement));
       (<any> root)[ClientToHTMLTranslator._TRANSLATOR_KEY] = translator;
     }
 

@@ -4,18 +4,16 @@ import { IComponent } from "../components";
 import { IPlottableElement } from "./plottableElement";
 
 export class Translator {
-  private _component: IComponent<any>;
   private _measurementElement: IPlottableElement<any>;
 
-  constructor(component: IComponent<any>, measurementElement: IPlottableElement<any>) {
-    this._component = component;
+  constructor(measurementElement: IPlottableElement<any>) {
     this._measurementElement = measurementElement;
   }
 
   /**
    * Computes the position relative to the component
    */
-  public computePosition(clientX: number, clientY: number): Point {
+  public computePosition(component: IComponent<any>, clientX: number, clientY: number): Point {
     // get the origin
     this._measurementElement.left(0);
     this._measurementElement.top(0);
@@ -48,7 +46,7 @@ export class Translator {
       y: (trueCursorPosition.y - origin.y) / scaleY,
     };
 
-    const componentOrigin = this._component.originToRoot();
+    const componentOrigin = component.originToRoot();
 
     return {
       x: scaledPosition.x - componentOrigin.x,
@@ -56,14 +54,7 @@ export class Translator {
     };
   }
 
-  /**
-   * Checks whether event happened inside <svg> element.
-   */
-  public insideSVG(e: Event): boolean {
-    return this.isInside(e);
-  }
-
-  public isInside(e: Event) {
-    return this._component.content().node().contains(e.target as Element);
+  public isInside(component: IComponent<any>, e: Event) {
+    return component.content().node().contains(e.target as Element);
   }
 }

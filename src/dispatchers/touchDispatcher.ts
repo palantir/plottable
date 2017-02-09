@@ -41,16 +41,16 @@ export class Touch extends Dispatcher {
   constructor(component: IComponent<any>) {
     super();
 
-    this._translator = component.translator();
+    this._translator = component.root().translator();
 
     this._eventToProcessingFunction[Touch._TOUCHSTART_EVENT_NAME] =
-      (e: TouchEvent) => this._measureAndDispatch(e, Touch._TOUCHSTART_EVENT_NAME, "page");
+      (e: TouchEvent) => this._measureAndDispatch(component, e, Touch._TOUCHSTART_EVENT_NAME, "page");
     this._eventToProcessingFunction[Touch._TOUCHMOVE_EVENT_NAME] =
-      (e: TouchEvent) => this._measureAndDispatch(e, Touch._TOUCHMOVE_EVENT_NAME, "page");
+      (e: TouchEvent) => this._measureAndDispatch(component, e, Touch._TOUCHMOVE_EVENT_NAME, "page");
     this._eventToProcessingFunction[Touch._TOUCHEND_EVENT_NAME] =
-      (e: TouchEvent) => this._measureAndDispatch(e, Touch._TOUCHEND_EVENT_NAME, "page");
+      (e: TouchEvent) => this._measureAndDispatch(component, e, Touch._TOUCHEND_EVENT_NAME, "page");
     this._eventToProcessingFunction[Touch._TOUCHCANCEL_EVENT_NAME] =
-      (e: TouchEvent) => this._measureAndDispatch(e, Touch._TOUCHCANCEL_EVENT_NAME, "page");
+      (e: TouchEvent) => this._measureAndDispatch(component, e, Touch._TOUCHCANCEL_EVENT_NAME, "page");
   }
 
   /**
@@ -145,20 +145,21 @@ export class Touch extends Dispatcher {
    * Computes the Touch position from the given event, and if successful
    * calls all the callbacks in the provided callbackSet.
    */
-  private _measureAndDispatch(event: TouchEvent, eventName: string, scope = "element") {
+  private _measureAndDispatch(component: IComponent<any>, event: TouchEvent, eventName: string, scope = "element") {
     if (scope !== "page" && scope !== "element") {
       throw new Error("Invalid scope '" + scope + "', must be 'element' or 'page'");
     }
-    if (scope === "element" && !this.eventInsideSVG(event)) {
+    if (scope === "element" && !this.eventInside(component, event)) {
       return;
     }
+
     let touches = event.changedTouches;
     let touchPositions: { [id: number]: Point; } = {};
     let touchIdentifiers: number[] = [];
     for (let i = 0; i < touches.length; i++) {
       let touch = touches[i];
       let touchID = touch.identifier;
-      let newTouchPosition = this._translator.computePosition(touch.clientX, touch.clientY);
+      let newTouchPosition = this._translator.computePosition(component, touch.clientX, touch.clientY);
       if (newTouchPosition != null) {
         touchPositions[touchID] = newTouchPosition;
         touchIdentifiers.push(touchID);
@@ -170,7 +171,7 @@ export class Touch extends Dispatcher {
     }
   }
 
-  public eventInsideSVG(event: TouchEvent) {
-    return this._translator.insideSVG(event);
+  public eventInside(component: IComponent<any>, event: TouchEvent) {
+    return this._translator.isInside(component, event);
   }
 }
