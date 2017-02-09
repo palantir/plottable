@@ -92,7 +92,11 @@ export class HTMLComponent extends AbstractComponent<HTMLElement> {
 
   public redraw() {
     if (this._isAnchored && this._isSetup) {
+      if (this.parent() == null) {
         this._scheduleComputeLayout();
+      } else {
+        this.parent().redraw();
+      }
     }
 
     return this;

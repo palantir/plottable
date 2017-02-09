@@ -136,7 +136,7 @@ export class Component extends AbstractComponent<d3.Selection<void>> {
     if (origin == null || availableWidth == null || availableHeight == null) {
       if (this._element == null) {
         throw new Error("anchor() must be called before computeLayout()");
-      } else if (this._isTopLevelSVG) {
+      } else if (this._isTopLevelSVG && this.parent() == null) {
         // we are the root node, retrieve height/width from root SVG
         origin = { x: 0, y: 0 };
 
@@ -227,7 +227,8 @@ export class Component extends AbstractComponent<d3.Selection<void>> {
    */
   public redraw() {
     if (this._isAnchored && this._isSetup) {
-      if (this._isTopLevelSVG) {
+      if (this._isTopLevelSVG && this.parent() == null) {
+        // only redraw myself if I'm the root
         this._scheduleComputeLayout();
       } else {
         this.parent().redraw();
