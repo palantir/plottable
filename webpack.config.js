@@ -1,5 +1,6 @@
 var path = require("path");
 var webpack = require("webpack");
+var WriteFilePlugin = require("write-file-webpack-plugin");
 var packageJson = require("./package.json");
 
 var LICENSE_HEADER =
@@ -20,7 +21,8 @@ module.exports = [
     devtool: "source-map",
     devServer: {
       compress: true,
-      port: 9999
+      port: 9999,
+      inline: false
     },
     entry: "./build/test/index.js",
     output: {
@@ -109,7 +111,8 @@ module.exports = [
       }),
       new webpack.DefinePlugin({
         "__VERSION__": JSON.stringify(packageJson.version)
-      })
+      }),
+      new WriteFilePlugin()
     ]
   }
-]
+];
