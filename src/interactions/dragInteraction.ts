@@ -1,4 +1,4 @@
-import { Component } from "../components/component";
+import { IComponent } from "../components/abstractComponent";
 import { Point } from "../core/interfaces";
 import * as Dispatchers from "../dispatchers";
 import * as Utils from "../utils";
@@ -25,14 +25,14 @@ export class Drag extends Interaction {
   private _touchMoveCallback = (ids: number[], idToPoint: Point[], e: UIEvent) => this._doDrag(idToPoint[ids[0]], e);
   private _touchEndCallback = (ids: number[], idToPoint: Point[], e: UIEvent) => this._endDrag(idToPoint[ids[0]], e);
 
-  protected _anchor(component: Component) {
+  protected _anchor(component: IComponent<any>) {
     super._anchor(component);
-    this._mouseDispatcher = Dispatchers.Mouse.getDispatcher(<SVGElement> this._componentAttachedTo.content().node());
+    this._mouseDispatcher = Dispatchers.Mouse.getDispatcher(component);
     this._mouseDispatcher.onMouseDown(this._mouseDownCallback);
     this._mouseDispatcher.onMouseMove(this._mouseMoveCallback);
     this._mouseDispatcher.onMouseUp(this._mouseUpCallback);
 
-    this._touchDispatcher = Dispatchers.Touch.getDispatcher(<SVGElement> this._componentAttachedTo.content().node());
+    this._touchDispatcher = Dispatchers.Touch.getDispatcher(component);
     this._touchDispatcher.onTouchStart(this._touchStartCallback);
     this._touchDispatcher.onTouchMove(this._touchMoveCallback);
     this._touchDispatcher.onTouchEnd(this._touchEndCallback);
@@ -52,14 +52,13 @@ export class Drag extends Interaction {
   }
 
   private _translateAndConstrain(p: Point) {
-    let translatedP = this._translateToComponentSpace(p);
     if (!this._constrainedToComponent) {
-      return translatedP;
+      return p;
     }
 
     return {
-      x: Utils.Math.clamp(translatedP.x, 0, this._componentAttachedTo.width()),
-      y: Utils.Math.clamp(translatedP.y, 0, this._componentAttachedTo.height()),
+      x: Utils.Math.clamp(p.x, 0, this._componentAttachedTo.width()),
+      y: Utils.Math.clamp(p.y, 0, this._componentAttachedTo.height()),
     };
   }
 
@@ -67,11 +66,10 @@ export class Drag extends Interaction {
     if (event instanceof MouseEvent && (<MouseEvent> event).button !== 0) {
       return;
     }
-    let translatedP = this._translateToComponentSpace(point);
-    if (this._isInsideComponent(translatedP)) {
+    if (this._isInsideComponent(point)) {
       event.preventDefault();
       this._dragging = true;
-      this._dragOrigin = translatedP;
+      this._dragOrigin = point;
       this._dragStartCallbacks.callCallbacks(this._dragOrigin);
     }
   }

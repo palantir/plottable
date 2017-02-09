@@ -1,6 +1,6 @@
 import * as d3 from "d3";
 
-import { Component } from "../components/component";
+import { IComponent } from "../components/abstractComponent";
 import { Point } from "../core/interfaces";
 import * as Dispatchers from "../dispatchers";
 import * as Scales from "../scales";
@@ -121,14 +121,14 @@ export class PanZoom extends Interaction {
     });
   }
 
-  protected _anchor(component: Component) {
+  protected _anchor(component: IComponent<any>) {
     super._anchor(component);
     this._dragInteraction.attachTo(component);
 
-    this._mouseDispatcher = Dispatchers.Mouse.getDispatcher(<SVGElement> this._componentAttachedTo.content().node());
+    this._mouseDispatcher = Dispatchers.Mouse.getDispatcher(component);
     this._mouseDispatcher.onWheel(this._wheelCallback);
 
-    this._touchDispatcher = Dispatchers.Touch.getDispatcher(<SVGElement> this._componentAttachedTo.content().node());
+    this._touchDispatcher = Dispatchers.Touch.getDispatcher(component);
     this._touchDispatcher.onTouchStart(this._touchStartCallback);
     this._touchDispatcher.onTouchMove(this._touchMoveCallback);
     this._touchDispatcher.onTouchEnd(this._touchEndCallback);
@@ -152,7 +152,7 @@ export class PanZoom extends Interaction {
   private _handleTouchStart(ids: number[], idToPoint: { [id: number]: Point; }, e: TouchEvent) {
     for (let i = 0; i < ids.length && this._touchIds.size() < 2; i++) {
       let id = ids[i];
-      this._touchIds.set(id.toString(), this._translateToComponentSpace(idToPoint[id]));
+      this._touchIds.set(id.toString(), idToPoint[id]);
     }
   }
 
@@ -163,7 +163,7 @@ export class PanZoom extends Interaction {
 
     let oldPoints = this._touchIds.values();
 
-    if (!this._isInsideComponent(this._translateToComponentSpace(oldPoints[0])) || !this._isInsideComponent(this._translateToComponentSpace(oldPoints[1]))) {
+    if (!this._isInsideComponent(oldPoints[0]) || !this._isInsideComponent(oldPoints[1])) {
       return;
     }
 
@@ -175,7 +175,7 @@ export class PanZoom extends Interaction {
 
     ids.forEach((id) => {
       if (this._touchIds.has(id.toString())) {
-        this._touchIds.set(id.toString(), this._translateToComponentSpace(idToPoint[id]));
+        this._touchIds.set(id.toString(), idToPoint[id]);
       }
     });
 
@@ -253,14 +253,13 @@ export class PanZoom extends Interaction {
   }
 
   private _handleWheelEvent(p: Point, e: WheelEvent) {
-    let translatedP = this._translateToComponentSpace(p);
-    if (this._isInsideComponent(translatedP)) {
+    if (this._isInsideComponent(p)) {
       e.preventDefault();
 
       let deltaPixelAmount = e.deltaY * (e.deltaMode ? PanZoom._PIXELS_PER_LINE : 1);
       let zoomAmount = Math.pow(2, deltaPixelAmount * .002);
-      let centerX = translatedP.x;
-      let centerY = translatedP.y;
+      let centerX = p.x;
+      let centerY = p.y;
 
       this.xScales().forEach((xScale) => {
         const constrained = this._constrainedZoom(xScale, zoomAmount, centerX);

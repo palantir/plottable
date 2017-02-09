@@ -1,4 +1,4 @@
-import { Component } from "../components/component";
+import { IComponent } from "../components/abstractComponent";
 import { Point } from "../core/interfaces";
 import * as Dispatchers from "../dispatchers";
 import * as Utils from "../utils";
@@ -20,12 +20,12 @@ export class Pointer extends Interaction {
   private _mouseMoveCallback = (p: Point, e: MouseEvent) => this._handleMouseEvent(p, e);
   private _touchStartCallback = (ids: number[], idToPoint: Point[], e: TouchEvent) => this._handleTouchEvent(idToPoint[ids[0]], e);
 
-  protected _anchor(component: Component) {
+  protected _anchor(component: IComponent<any>) {
     super._anchor(component);
-    this._mouseDispatcher = Dispatchers.Mouse.getDispatcher(<SVGElement> this._componentAttachedTo.content().node());
+    this._mouseDispatcher = Dispatchers.Mouse.getDispatcher(component);
     this._mouseDispatcher.onMouseMove(this._mouseMoveCallback);
 
-    this._touchDispatcher = Dispatchers.Touch.getDispatcher(<SVGElement> this._componentAttachedTo.content().node());
+    this._touchDispatcher = Dispatchers.Touch.getDispatcher(component);
     this._touchDispatcher.onTouchStart(this._touchStartCallback);
   }
 
@@ -49,16 +49,15 @@ export class Pointer extends Interaction {
   }
 
   private _handlePointerEvent(p: Point, insideSVG: boolean) {
-    let translatedP = this._translateToComponentSpace(p);
-    let overComponent = this._isInsideComponent(translatedP);
+    let overComponent = this._isInsideComponent(p);
 
     if (overComponent && insideSVG) {
       if (!this._overComponent) {
-        this._pointerEnterCallbacks.callCallbacks(translatedP);
+        this._pointerEnterCallbacks.callCallbacks(p);
       }
-      this._pointerMoveCallbacks.callCallbacks(translatedP);
+      this._pointerMoveCallbacks.callCallbacks(p);
     } else if (this._overComponent) {
-      this._pointerExitCallbacks.callCallbacks(translatedP);
+      this._pointerExitCallbacks.callCallbacks(p);
     }
 
     this._overComponent = overComponent && insideSVG;

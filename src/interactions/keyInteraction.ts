@@ -1,4 +1,4 @@
-import { Component } from "../components/component";
+import { IComponent } from "../components/abstractComponent";
 import { Point } from "../core/interfaces";
 import * as Dispatchers from "../dispatchers";
 import * as Utils from "../utils";
@@ -21,11 +21,9 @@ export class Key extends Interaction {
   private _keyDownCallback = (keyCode: number, event: KeyboardEvent) => this._handleKeyDownEvent(keyCode, event);
   private _keyUpCallback = (keyCode: number) => this._handleKeyUpEvent(keyCode);
 
-  protected _anchor(component: Component) {
+  protected _anchor(component: IComponent<any>) {
     super._anchor(component);
-    this._positionDispatcher = Dispatchers.Mouse.getDispatcher(
-      <SVGElement> (<any> this._componentAttachedTo)._element.node()
-    );
+    this._positionDispatcher = Dispatchers.Mouse.getDispatcher(component);
     this._positionDispatcher.onMouseMove(this._mouseMoveCallback);
 
     this._keyDispatcher = Dispatchers.Key.getDispatcher();
@@ -44,7 +42,7 @@ export class Key extends Interaction {
   }
 
   private _handleKeyDownEvent(keyCode: number, event: KeyboardEvent) {
-    let p = this._translateToComponentSpace(this._positionDispatcher.lastMousePosition());
+    let p = this._positionDispatcher.lastMousePosition();
     if (this._isInsideComponent(p) && !event.repeat) {
       if (this._keyPressCallbacks[keyCode]) {
         this._keyPressCallbacks[keyCode].callCallbacks(keyCode);

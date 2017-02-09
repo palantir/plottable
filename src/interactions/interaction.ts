@@ -1,15 +1,15 @@
-import { Component } from "../components/component";
+import { IComponent } from "../components/abstractComponent";
 import { Point } from "../core/interfaces";
 
 export class Interaction {
-  protected _componentAttachedTo: Component;
+  protected _componentAttachedTo: IComponent<any>;
 
-  private _anchorCallback = (component: Component) => this._anchor(component);
+  private _anchorCallback = (component: IComponent<any>) => this._anchor(component);
 
   private _isAnchored: boolean;
   private _enabled = true;
 
-  protected _anchor(component: Component) {
+  protected _anchor(component: IComponent<any>) {
     this._isAnchored = true;
   }
 
@@ -24,7 +24,7 @@ export class Interaction {
    * @param {Component} component
    * @returns {Interaction} The calling Interaction.
    */
-  public attachTo(component: Component) {
+  public attachTo(component: IComponent<any>) {
     this._disconnect();
     this._componentAttachedTo = component;
     this._connect();
@@ -44,7 +44,7 @@ export class Interaction {
    * @param {Component} component
    * @returns {Interaction} The calling Interaction.
    */
-  public detachFrom(component: Component) {
+  public detachFrom(component: IComponent<any>) {
     this._disconnect();
     this._componentAttachedTo = null;
     return this;
@@ -81,20 +81,6 @@ export class Interaction {
       this._disconnect();
     }
     return this;
-  }
-
-  /**
-   * Translates an <svg>-coordinate-space point to Component-space coordinates.
-   *
-   * @param {Point} p A Point in <svg>-space coordinates.
-   * @return {Point} The same location in Component-space coordinates.
-   */
-  protected _translateToComponentSpace(p: Point): Point {
-    let origin = this._componentAttachedTo.originToSVG();
-    return {
-      x: p.x - origin.x,
-      y: p.y - origin.y,
-    };
   }
 
   /**
