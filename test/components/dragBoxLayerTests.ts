@@ -128,7 +128,7 @@ describe("SelectionBoxLayer", () => {
       it("does not call callbacks when dragBoxLayer is destroyed", () => {
         // rendered in a Group so that drag sequence can be simulated on Group background after DragBoxLayer is destroyed
         const group = new Plottable.Components.Group([dbl]).renderTo(svg);
-        const target = dbl.background();
+        const target = group.background();
         let onDragStartCallbackCalled = false;
         let onDragCallbackCalled = false;
         let onDragEndcallbackCalled = false;
@@ -158,7 +158,7 @@ describe("SelectionBoxLayer", () => {
         // rendered in a Group so that drag sequence can be simulated on Group background after DragBoxLayer is detached
         const group = new Plottable.Components.Group([dbl]);
         group.renderTo(svg);
-        const target = dbl.background();
+        const target = group.background();
         let onDragStartCallbackCalled = false;
         let onDragCallbackCalled = false;
         let onDragEndcallbackCalled = false;

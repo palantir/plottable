@@ -52,6 +52,6 @@ export class Translator {
   }
 
   public isInside(component: IComponent<any>, e: Event) {
-    return Utils.DOM.contains(component.element().node() as Element, e.target as Element);
+    return Utils.DOM.contains(component.root().element().node() as Element, e.target as Element);
   }
 }

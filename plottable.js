@@ -5403,7 +5403,7 @@ var Translator = (function () {
         return scaledPosition;
     };
     Translator.prototype.isInside = function (component, e) {
-        return Utils.DOM.contains(component.element().node(), e.target);
+        return Utils.DOM.contains(component.root().element().node(), e.target);
     };
     return Translator;
 }());
