@@ -23,7 +23,7 @@ export class Touch extends Dispatcher {
    * @return {Dispatchers.Touch}
    */
   public static getDispatcher(component: IComponent<any>): Dispatchers.Touch {
-    let element  = component.root().content().node();
+    let element  = component.root().element().node();
     let dispatcher: Dispatchers.Touch = (<any> element)[Touch._DISPATCHER_KEY];
     if (dispatcher == null) {
       dispatcher = new Touch(component);
@@ -159,7 +159,7 @@ export class Touch extends Dispatcher {
     for (let i = 0; i < touches.length; i++) {
       let touch = touches[i];
       let touchID = touch.identifier;
-      let newTouchPosition = this._translator.computePosition(component, touch.clientX, touch.clientY);
+      let newTouchPosition = this._translator.computePosition(touch.clientX, touch.clientY);
       if (newTouchPosition != null) {
         touchPositions[touchID] = newTouchPosition;
         touchIdentifiers.push(touchID);

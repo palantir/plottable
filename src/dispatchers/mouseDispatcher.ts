@@ -27,7 +27,7 @@ export class Mouse extends Dispatcher {
    * @return {Dispatchers.Mouse}
    */
   public static getDispatcher(component: IComponent<any>): Dispatchers.Mouse {
-    let element = component.root().content();
+    let element = component.root().element();
     let dispatcher: Dispatchers.Mouse = (<any> element)[Mouse._DISPATCHER_KEY];
     if (dispatcher == null) {
       dispatcher = new Mouse(component);
@@ -186,7 +186,7 @@ export class Mouse extends Dispatcher {
       throw new Error("Invalid scope '" + scope + "', must be 'element' or 'page'");
     }
     if (scope === "page" || this.eventInside(component, event)) {
-      let newMousePosition = this._translator.computePosition(component, event.clientX, event.clientY);
+      let newMousePosition = this._translator.computePosition(event.clientX, event.clientY);
       if (newMousePosition != null) {
         this._lastMousePosition = newMousePosition;
         this._callCallbacksForEvent(eventName, this.lastMousePosition(), event);

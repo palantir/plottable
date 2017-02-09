@@ -192,6 +192,10 @@ export class HTMLComponent extends AbstractComponent<HTMLElement> {
     return Utils.ClientToHTMLTranslator.getTranslator(this);
   }
 
+  public element() {
+    return d3.select(this._element);
+  }
+
   /**
    * Gets the container holding the visual elements of the Component.
    *

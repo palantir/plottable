@@ -16,7 +16,7 @@ export class ClientToHTMLTranslator {
     // The Translator works by first calculating the offset to root of the chart and then calculating
     // the offset from the component to the root. It is imperative that the measureElement
     // be added to the root of the hierarchy and nowhere else.
-    const root = component.root().content().node();
+    const root = component.root().element().node();
 
     let translator: Translator = (<any> root)[ClientToHTMLTranslator._TRANSLATOR_KEY];
     if (translator == null) {

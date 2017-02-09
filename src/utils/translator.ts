@@ -13,7 +13,7 @@ export class Translator {
   /**
    * Computes the position relative to the component
    */
-  public computePosition(component: IComponent<any>, clientX: number, clientY: number): Point {
+  public computePosition(clientX: number, clientY: number): Point {
     // get the origin
     this._measurementElement.left(0);
     this._measurementElement.top(0);
@@ -46,15 +46,10 @@ export class Translator {
       y: (trueCursorPosition.y - origin.y) / scaleY,
     };
 
-    const componentOrigin = component.originToRoot();
-
-    return {
-      x: scaledPosition.x - componentOrigin.x,
-      y: scaledPosition.y - componentOrigin.y,
-    };
+    return scaledPosition;
   }
 
   public isInside(component: IComponent<any>, e: Event) {
-    return component.content().node().contains(e.target as Element);
+    return component.element().node().contains(e.target as Element);
   }
 }

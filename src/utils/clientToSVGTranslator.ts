@@ -13,7 +13,7 @@ export class ClientToSVGTranslator {
    * If one already exists on that <svg>, it will be returned; otherwise, a new one will be created.
    */
   public static getTranslator(component: IComponent<any>): Translator {
-    let svg = DOM.boundingSVG(component.content().node() as SVGElement);
+    let svg = DOM.boundingSVG(component.element().node() as SVGElement);
 
     let translator: Translator = (<any> svg)[ClientToSVGTranslator._TRANSLATOR_KEY];
     if (translator == null) {

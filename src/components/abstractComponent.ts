@@ -217,6 +217,10 @@ export interface IComponent<D> {
    */
   content(): IContent;
   /**
+   * Gets the top-level element of the component
+   */
+  element(): IContent;
+  /**
    * Gets the root component of the hierarchy
    *
    * @return {IComponent}
@@ -567,5 +571,6 @@ export abstract class AbstractComponent<D> implements IComponent<D> {
   }
 
   abstract content(): IContent;
+  abstract element():  IContent;
   abstract translator(): Utils.Translator;
 }

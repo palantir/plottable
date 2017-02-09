@@ -417,6 +417,13 @@ export class Component extends AbstractComponent<d3.Selection<void>> {
     return this._content;
   }
 
+  public element() {
+    if (this._isTopLevelSVG) {
+      return this._rootSVG;
+    }
+    return this._element;
+  }
+
   public translator(): Utils.Translator {
     return Utils.ClientToSVGTranslator.getTranslator(this);
   }
