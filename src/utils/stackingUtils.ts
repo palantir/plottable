@@ -113,9 +113,11 @@ export function stackedExtents<D>(stackingResult: GenericStackingResult<D>): {
 
       if (!maximumExtents.has(key)) {
         maximumExtents.set(key, { extent: maximalValue, axisValue: datum.axisValue, datasets: [dataset] });
-      } else if (maximumExtents.get(key).extent < maximalValue) {
+      } else {
+        // always update with new dataset, update max if necessary
+        let max = maximumExtents.get(key).extent < maximalValue ? maximalValue : maximumExtents.get(key).extent;
         maximumExtents.set(key, {
-          extent: maximalValue,
+          extent: max,
           axisValue: datum.axisValue,
           datasets: maximumExtents.get(key).datasets.concat(dataset),
         });
@@ -123,9 +125,11 @@ export function stackedExtents<D>(stackingResult: GenericStackingResult<D>): {
 
       if (!minimumExtents.has(key)) {
         minimumExtents.set(key, { extent: minimalValue, axisValue: datum.axisValue, datasets: [dataset] });
-      } else if (minimumExtents.get(key).extent > (minimalValue)) {
+      } else {
+        // always update with new dataset, update min if necessary
+        let min = minimumExtents.get(key).extent > minimalValue ? minimalValue : minimumExtents.get(key).extent;
         minimumExtents.set(key, {
-          extent: minimalValue,
+          extent: min,
           axisValue: datum.axisValue,
           datasets: minimumExtents.get(key).datasets.concat(dataset),
         });
