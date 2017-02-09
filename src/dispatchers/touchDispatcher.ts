@@ -1,3 +1,4 @@
+import { IComponent } from "../components";
 import { Point } from "../core/interfaces";
 import * as Utils from "../utils";
 
@@ -12,7 +13,7 @@ export class Touch extends Dispatcher {
   private static _TOUCHMOVE_EVENT_NAME = "touchmove";
   private static _TOUCHEND_EVENT_NAME = "touchend";
   private static _TOUCHCANCEL_EVENT_NAME = "touchcancel";
-  private _translator: Utils.ClientToSVGTranslator;
+  private _translator: Utils.Translator;
 
   /**
    * Gets a Touch Dispatcher for the <svg> containing elem.
@@ -21,13 +22,12 @@ export class Touch extends Dispatcher {
    * @param {SVGElement} elem
    * @return {Dispatchers.Touch}
    */
-  public static getDispatcher(elem: SVGElement): Dispatchers.Touch {
-    let svg = Utils.DOM.boundingSVG(elem);
-
-    let dispatcher: Dispatchers.Touch = (<any> svg)[Touch._DISPATCHER_KEY];
+  public static getDispatcher(component: IComponent<any>): Dispatchers.Touch {
+    let element  = component.root().content().node();
+    let dispatcher: Dispatchers.Touch = (<any> element)[Touch._DISPATCHER_KEY];
     if (dispatcher == null) {
-      dispatcher = new Touch(svg);
-      (<any> svg)[Touch._DISPATCHER_KEY] = dispatcher;
+      dispatcher = new Touch(component);
+      (<any> element)[Touch._DISPATCHER_KEY] = dispatcher;
     }
     return dispatcher;
   }
@@ -38,10 +38,10 @@ export class Touch extends Dispatcher {
    * @constructor
    * @param {SVGElement} svg The root <svg> to attach to.
    */
-  constructor(svg: SVGElement) {
+  constructor(component: IComponent<any>) {
     super();
 
-    this._translator = Utils.ClientToSVGTranslator.getTranslator(svg);
+    this._translator = component.translator();
 
     this._eventToProcessingFunction[Touch._TOUCHSTART_EVENT_NAME] =
       (e: TouchEvent) => this._measureAndDispatch(e, Touch._TOUCHSTART_EVENT_NAME, "page");
