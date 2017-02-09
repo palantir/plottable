@@ -79,7 +79,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/ 	__webpack_require__.p = "";
 
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 118);
+/******/ 	return __webpack_require__(__webpack_require__.s = 121);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -91,23 +91,25 @@ return /******/ (function(modules) { // webpackBootstrap
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-var Array = __webpack_require__(96);
+var Array = __webpack_require__(98);
 exports.Array = Array;
-var Color = __webpack_require__(99);
+var Color = __webpack_require__(102);
 exports.Color = Color;
-var DOM = __webpack_require__(42);
+var DOM = __webpack_require__(43);
 exports.DOM = DOM;
 var Math = __webpack_require__(29);
 exports.Math = Math;
-var Stacking = __webpack_require__(102);
+var Stacking = __webpack_require__(105);
 exports.Stacking = Stacking;
-var Window = __webpack_require__(103);
+var Window = __webpack_require__(106);
 exports.Window = Window;
-__export(__webpack_require__(97));
-__export(__webpack_require__(98));
+__export(__webpack_require__(99));
 __export(__webpack_require__(100));
 __export(__webpack_require__(101));
-__export(__webpack_require__(43));
+__export(__webpack_require__(103));
+__export(__webpack_require__(30));
+__export(__webpack_require__(104));
+__export(__webpack_require__(45));
 
 
 /***/ }),
@@ -125,16 +127,16 @@ module.exports = __WEBPACK_EXTERNAL_MODULE_1__;
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-var TickGenerators = __webpack_require__(94);
+var TickGenerators = __webpack_require__(96);
 exports.TickGenerators = TickGenerators;
-__export(__webpack_require__(41));
-__export(__webpack_require__(90));
-__export(__webpack_require__(91));
+__export(__webpack_require__(42));
 __export(__webpack_require__(92));
 __export(__webpack_require__(93));
+__export(__webpack_require__(94));
 __export(__webpack_require__(95));
+__export(__webpack_require__(97));
 // ---------------------------------------------------------
-var categoryScale_2 = __webpack_require__(41);
+var categoryScale_2 = __webpack_require__(42);
 var quantitativeScale_1 = __webpack_require__(10);
 /**
  * Type guarded function to check if the scale implements the
@@ -165,7 +167,7 @@ var Animators = __webpack_require__(6);
 var component_1 = __webpack_require__(5);
 var drawer_1 = __webpack_require__(7);
 var Utils = __webpack_require__(0);
-var Plots = __webpack_require__(39);
+var Plots = __webpack_require__(40);
 var Plot = (function (_super) {
     __extends(Plot, _super);
     /**
@@ -659,11 +661,11 @@ exports.Plot = Plot;
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-__export(__webpack_require__(104));
-__export(__webpack_require__(108));
+__export(__webpack_require__(107));
+__export(__webpack_require__(111));
 __export(__webpack_require__(13));
-__export(__webpack_require__(114));
-__export(__webpack_require__(116));
+__export(__webpack_require__(117));
+__export(__webpack_require__(119));
 //# sourceMappingURL=index.js.map
 
 /***/ }),
@@ -702,10 +704,6 @@ var Component = (function (_super) {
             throw new Error("Can't reuse destroy()-ed Components!");
         }
         this._isTopLevelSVG = selection.node().nodeName.toLowerCase() === "svg";
-        if (!this.isNestedTopLevelSVG()) {
-            // non-nested top-level svg node gets the "plottable" CSS class
-            this._rootSVG.classed("plottable", true);
-        }
         if (this._isTopLevelSVG) {
             this._rootSVG = selection;
             // visible overflow for firefox https://stackoverflow.com/questions/5926986/why-does-firefox-appear-to-truncate-embedded-svgs
@@ -720,6 +718,10 @@ var Component = (function (_super) {
                     height: "100%",
                 }).style("opacity", 0);
             }
+        }
+        if (this._isTopLevelSVG && !this.isNestedTopLevelSVG()) {
+            // non-nested top-level svg node gets the "plottable" CSS class
+            this._rootSVG.classed("plottable", true);
         }
         if (this._element != null) {
             // reattach existing element
@@ -750,7 +752,7 @@ var Component = (function (_super) {
         if (this._isTopLevelSVG && this.parent() != null) {
             // this component is a top level SVG; however, it has parents
             // which means that it is nested within a div container
-            this._rootSVG.classed("svg-component", true);
+            this._rootSVG.classed("component", true);
         }
         this._cssClasses.forEach(function (cssClass) {
             _this._element.classed(cssClass, true);
@@ -783,7 +785,7 @@ var Component = (function (_super) {
             if (this._element == null) {
                 throw new Error("anchor() must be called before computeLayout()");
             }
-            else if (this._isTopLevelSVG) {
+            else if (this._isTopLevelSVG && this.parent() == null) {
                 // we are the root node, retrieve height/width from root SVG
                 origin = { x: 0, y: 0 };
                 // Set width/height to 100% if not specified, to allow accurate size calculation
@@ -864,7 +866,8 @@ var Component = (function (_super) {
      */
     Component.prototype.redraw = function () {
         if (this._isAnchored && this._isSetup) {
-            if (this._isTopLevelSVG) {
+            if (this._isTopLevelSVG && this.parent() == null) {
+                // only redraw myself if I'm the root
                 this._scheduleComputeLayout();
             }
             else {
@@ -1038,6 +1041,15 @@ var Component = (function (_super) {
     Component.prototype.content = function () {
         return this._content;
     };
+    Component.prototype.element = function () {
+        if (this._isTopLevelSVG) {
+            return this._rootSVG;
+        }
+        return this._element;
+    };
+    Component.prototype.translator = function () {
+        return Utils.ClientToSVGTranslator.getTranslator(this);
+    };
     /**
      * Top-level SVGs <svg ...>  can exist as non *root* components. For example,
      * you can place an <svg ..> within an HTMLTable or HTMLGroup, which themselves
@@ -1063,8 +1075,8 @@ exports.Component = Component;
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-__export(__webpack_require__(52));
-__export(__webpack_require__(53));
+__export(__webpack_require__(54));
+__export(__webpack_require__(55));
 
 
 /***/ }),
@@ -1457,13 +1469,13 @@ function verifyPrecision(precision) {
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-__export(__webpack_require__(70));
-__export(__webpack_require__(71));
 __export(__webpack_require__(72));
 __export(__webpack_require__(73));
 __export(__webpack_require__(74));
 __export(__webpack_require__(75));
 __export(__webpack_require__(76));
+__export(__webpack_require__(77));
+__export(__webpack_require__(78));
 
 
 /***/ }),
@@ -1741,9 +1753,9 @@ exports.QuantitativeScale = QuantitativeScale;
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-__export(__webpack_require__(67));
-__export(__webpack_require__(68));
 __export(__webpack_require__(69));
+__export(__webpack_require__(70));
+__export(__webpack_require__(71));
 
 
 /***/ }),
@@ -1816,13 +1828,13 @@ var Interaction = (function () {
         return this;
     };
     /**
-     * Translates an <svg>-coordinate-space point to Component-space coordinates.
+     * Translates an element-coordinate-space point to Component-space coordinates.
      *
-     * @param {Point} p A Point in <svg>-space coordinates.
+     * @param {Point} p A Point in element space coordinates.
      * @return {Point} The same location in Component-space coordinates.
      */
     Interaction.prototype._translateToComponentSpace = function (p) {
-        var origin = this._componentAttachedTo.originToSVG();
+        var origin = this._componentAttachedTo.originToRoot();
         return {
             x: p.x - origin.x,
             y: p.y - origin.y,
@@ -1858,11 +1870,11 @@ exports.Interaction = Interaction;
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-__export(__webpack_require__(109));
-__export(__webpack_require__(110));
-__export(__webpack_require__(111));
 __export(__webpack_require__(112));
 __export(__webpack_require__(113));
+__export(__webpack_require__(114));
+__export(__webpack_require__(115));
+__export(__webpack_require__(116));
 //# sourceMappingURL=index.js.map
 
 /***/ }),
@@ -1874,12 +1886,12 @@ __export(__webpack_require__(113));
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-__export(__webpack_require__(77));
-__export(__webpack_require__(78));
 __export(__webpack_require__(79));
-__export(__webpack_require__(33));
 __export(__webpack_require__(80));
 __export(__webpack_require__(81));
+__export(__webpack_require__(34));
+__export(__webpack_require__(82));
+__export(__webpack_require__(83));
 
 
 /***/ }),
@@ -2250,7 +2262,7 @@ exports.XYPlot = XYPlot;
 "use strict";
 
 var Utils = __webpack_require__(0);
-var RenderPolicies = __webpack_require__(32);
+var RenderPolicies = __webpack_require__(33);
 /**
  * The RenderController is responsible for enqueueing and synchronizing
  * layout and render calls for Components.
@@ -2382,18 +2394,18 @@ exports.flush = flush;
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-__export(__webpack_require__(38));
-__export(__webpack_require__(22));
 __export(__webpack_require__(39));
-__export(__webpack_require__(82));
+__export(__webpack_require__(22));
 __export(__webpack_require__(40));
-__export(__webpack_require__(83));
 __export(__webpack_require__(84));
+__export(__webpack_require__(41));
 __export(__webpack_require__(85));
 __export(__webpack_require__(86));
 __export(__webpack_require__(87));
 __export(__webpack_require__(88));
 __export(__webpack_require__(89));
+__export(__webpack_require__(90));
+__export(__webpack_require__(91));
 
 
 /***/ }),
@@ -4749,6 +4761,13 @@ var AbstractComponent = (function () {
         }
         return origin;
     };
+    AbstractComponent.prototype.root = function () {
+        var parent = this;
+        while (parent.parent() != null) {
+            parent = parent.parent();
+        }
+        return parent;
+    };
     AbstractComponent._xAlignToProportion = {
         "left": 0,
         "center": 0.5,
@@ -4777,8 +4796,8 @@ var __extends = (this && this.__extends) || function (d, b) {
 };
 var Interactions = __webpack_require__(14);
 var Utils = __webpack_require__(0);
-var _1 = __webpack_require__(31);
-var selectionBoxLayer_1 = __webpack_require__(37);
+var _1 = __webpack_require__(32);
+var selectionBoxLayer_1 = __webpack_require__(38);
 var DragBoxLayer = (function (_super) {
     __extends(DragBoxLayer, _super);
     /**
@@ -5154,7 +5173,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var htmlComponent_1 = __webpack_require__(36);
+var htmlComponent_1 = __webpack_require__(37);
 /*
  * ComponentContainer class encapsulates Table and ComponentGroup's shared functionality.
  * It will not do anything if instantiated directly.
@@ -5345,6 +5364,56 @@ exports.within = within;
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
+
+var Translator = (function () {
+    function Translator(measurementElement) {
+        this._measurementElement = measurementElement;
+    }
+    /**
+     * Computes the position relative to the component
+     */
+    Translator.prototype.computePosition = function (clientX, clientY) {
+        // get the origin
+        this._measurementElement.left(0);
+        this._measurementElement.top(0);
+        var mrBCR = this._measurementElement.getBoundingClientRect();
+        var origin = { x: mrBCR.left, y: mrBCR.top };
+        // calculate the scale
+        var sampleDistance = 100;
+        this._measurementElement.left(sampleDistance);
+        this._measurementElement.top(sampleDistance);
+        mrBCR = this._measurementElement.getBoundingClientRect();
+        var testPoint = { x: mrBCR.left, y: mrBCR.top };
+        // invalid measurements -- SVG might not be in the DOM
+        if (origin.x === testPoint.x || origin.y === testPoint.y) {
+            return null;
+        }
+        var scaleX = (testPoint.x - origin.x) / sampleDistance;
+        var scaleY = (testPoint.y - origin.y) / sampleDistance;
+        // get the true cursor position
+        this._measurementElement.left((clientX - origin.x) / scaleX);
+        this._measurementElement.top((clientY - origin.y) / scaleY);
+        mrBCR = this._measurementElement.getBoundingClientRect();
+        var trueCursorPosition = { x: mrBCR.left, y: mrBCR.top };
+        var scaledPosition = {
+            x: (trueCursorPosition.x - origin.x) / scaleX,
+            y: (trueCursorPosition.y - origin.y) / scaleY,
+        };
+        return scaledPosition;
+    };
+    Translator.prototype.isInside = function (component, e) {
+        return component.element().node().contains(e.target);
+    };
+    return Translator;
+}());
+exports.Translator = Translator;
+
+
+/***/ }),
+/* 31 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
 /**
  * Copyright 2017-present Palantir Technologies, Inc. All rights reserved.
  * Licensed under the MIT License (the "License"); you may obtain a copy of the
@@ -5433,7 +5502,7 @@ exports.BaseAnimator = BaseAnimator;
 //# sourceMappingURL=baseAnimator.js.map
 
 /***/ }),
-/* 31 */
+/* 32 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -5443,22 +5512,22 @@ function __export(m) {
 }
 __export(__webpack_require__(26));
 __export(__webpack_require__(27));
-__export(__webpack_require__(56));
-__export(__webpack_require__(57));
-__export(__webpack_require__(34));
-__export(__webpack_require__(35));
-__export(__webpack_require__(36));
-__export(__webpack_require__(28));
 __export(__webpack_require__(58));
 __export(__webpack_require__(59));
+__export(__webpack_require__(35));
+__export(__webpack_require__(36));
+__export(__webpack_require__(37));
+__export(__webpack_require__(28));
 __export(__webpack_require__(60));
 __export(__webpack_require__(61));
 __export(__webpack_require__(62));
 __export(__webpack_require__(63));
-__export(__webpack_require__(37));
 __export(__webpack_require__(64));
 __export(__webpack_require__(65));
+__export(__webpack_require__(38));
 __export(__webpack_require__(66));
+__export(__webpack_require__(67));
+__export(__webpack_require__(68));
 var Alignment = (function () {
     function Alignment() {
     }
@@ -5473,7 +5542,7 @@ exports.Alignment = Alignment;
 
 
 /***/ }),
-/* 32 */
+/* 33 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -5524,7 +5593,7 @@ exports.Timeout = Timeout;
 
 
 /***/ }),
-/* 33 */
+/* 34 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -5551,7 +5620,7 @@ var Key = (function (_super) {
     }
     Key.prototype._anchor = function (component) {
         _super.prototype._anchor.call(this, component);
-        this._positionDispatcher = Dispatchers.Mouse.getDispatcher(this._componentAttachedTo._element.node());
+        this._positionDispatcher = Dispatchers.Mouse.getDispatcher(component);
         this._positionDispatcher.onMouseMove(this._mouseMoveCallback);
         this._keyDispatcher = Dispatchers.Key.getDispatcher();
         this._keyDispatcher.onKeyDown(this._keyDownCallback);
@@ -5646,7 +5715,7 @@ exports.Key = Key;
 
 
 /***/ }),
-/* 34 */
+/* 35 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -5746,7 +5815,7 @@ exports.Group = Group;
 
 
 /***/ }),
-/* 35 */
+/* 36 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -5898,7 +5967,7 @@ exports.GuideLineLayer = GuideLineLayer;
 
 
 /***/ }),
-/* 36 */
+/* 37 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -5953,8 +6022,6 @@ var HTMLComponent = (function (_super) {
                 // by the user.
                 this._element.style.width = "100%";
                 this._element.style.height = "100%";
-                this.content().style("height", "100%");
-                this.content().style("width", "100%");
                 availableWidth = Utils.DOM.elementWidth(this._element);
                 availableHeight = Utils.DOM.elementHeight(this._element);
             }
@@ -5989,7 +6056,12 @@ var HTMLComponent = (function (_super) {
     };
     HTMLComponent.prototype.redraw = function () {
         if (this._isAnchored && this._isSetup) {
-            this._scheduleComputeLayout();
+            if (this.parent() == null) {
+                this._scheduleComputeLayout();
+            }
+            else {
+                this.parent().redraw();
+            }
         }
         return this;
     };
@@ -6062,7 +6134,13 @@ var HTMLComponent = (function (_super) {
         return this;
     };
     HTMLComponent.prototype.content = function () {
-        return d3.select(this._content);
+        return d3.select(this._element);
+    };
+    HTMLComponent.prototype.translator = function () {
+        return Utils.ClientToHTMLTranslator.getTranslator(this);
+    };
+    HTMLComponent.prototype.element = function () {
+        return d3.select(this._element);
     };
     /**
      * Gets the container holding the visual elements of the Component.
@@ -6085,10 +6163,11 @@ var HTMLComponent = (function (_super) {
             // the root element gets the plottable class name
             d3.select(this._element).classed("plottable", true);
         }
+        else {
+            // non-root components are simple components
+            d3.select(this._element).classed("component", true);
+        }
         this._cssClasses = new Utils.Set();
-        this._content = document.createElement("div");
-        this._content.className = "content html-content";
-        this._element.appendChild(this._content);
         this._isSetup = true;
     };
     HTMLComponent.prototype._sizeFromOffer = function (availableWidth, availableHeight) {
@@ -6109,7 +6188,7 @@ exports.HTMLComponent = HTMLComponent;
 
 
 /***/ }),
-/* 37 */
+/* 38 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -6334,7 +6413,7 @@ exports.SelectionBoxLayer = SelectionBoxLayer;
 
 
 /***/ }),
-/* 38 */
+/* 39 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -6349,7 +6428,7 @@ var Drawers = __webpack_require__(9);
 var Scales = __webpack_require__(2);
 var Utils = __webpack_require__(0);
 var Plots = __webpack_require__(17);
-var linePlot_1 = __webpack_require__(40);
+var linePlot_1 = __webpack_require__(41);
 var plot_1 = __webpack_require__(3);
 var Area = (function (_super) {
     __extends(Area, _super);
@@ -6522,7 +6601,7 @@ exports.Area = Area;
 
 
 /***/ }),
-/* 39 */
+/* 40 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -6535,7 +6614,7 @@ var Animator;
 
 
 /***/ }),
-/* 40 */
+/* 41 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -6982,7 +7061,7 @@ exports.Line = Line;
 
 
 /***/ }),
-/* 41 */
+/* 42 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7138,7 +7217,7 @@ exports.Category = Category;
 
 
 /***/ }),
-/* 42 */
+/* 43 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7277,7 +7356,7 @@ function boundingSVG(element) {
     if (element.nodeName.toLowerCase() === "svg") {
         return element;
     }
-    return document.body;
+    return null; // not in the DOM
 }
 exports.boundingSVG = boundingSVG;
 var _latestClipPathId = 0;
@@ -7340,7 +7419,69 @@ function _parseStyleValue(style, property) {
 
 
 /***/ }),
-/* 43 */
+/* 44 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
+var PlottableElement = (function () {
+    function PlottableElement(element) {
+        this._element = element;
+    }
+    PlottableElement.prototype.appendChild = function (newChild) {
+        return this._element.appendChild(newChild);
+    };
+    PlottableElement.prototype.getBoundingClientRect = function () {
+        return this._element.getBoundingClientRect();
+    };
+    PlottableElement.prototype.setAttribute = function (name, value) {
+        this._element.setAttribute(name, value);
+        return this;
+    };
+    return PlottableElement;
+}());
+exports.PlottableElement = PlottableElement;
+var PlottableHTMLElement = (function (_super) {
+    __extends(PlottableHTMLElement, _super);
+    function PlottableHTMLElement() {
+        _super.apply(this, arguments);
+    }
+    PlottableHTMLElement.prototype.left = function (position) {
+        this._element.style.left = position + "px";
+        return this;
+    };
+    PlottableHTMLElement.prototype.top = function (position) {
+        this._element.style.top = position + "px";
+        return this;
+    };
+    return PlottableHTMLElement;
+}(PlottableElement));
+exports.PlottableHTMLElement = PlottableHTMLElement;
+var PlottableSVGElement = (function (_super) {
+    __extends(PlottableSVGElement, _super);
+    function PlottableSVGElement() {
+        _super.apply(this, arguments);
+    }
+    PlottableSVGElement.prototype.left = function (position) {
+        this.setAttribute("x", String(position));
+        return this;
+    };
+    PlottableSVGElement.prototype.top = function (position) {
+        this.setAttribute("y", String(position));
+        return this;
+    };
+    return PlottableSVGElement;
+}(PlottableElement));
+exports.PlottableSVGElement = PlottableSVGElement;
+
+
+/***/ }),
+/* 45 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7408,7 +7549,7 @@ exports.Set = Set;
 
 
 /***/ }),
-/* 44 */
+/* 46 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7476,7 +7617,7 @@ exports.AbstractMeasurer = AbstractMeasurer;
 //# sourceMappingURL=abstractMeasurer.js.map
 
 /***/ }),
-/* 45 */
+/* 47 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7492,7 +7633,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
 var Utils = __webpack_require__(13);
-var characterMeasurer_1 = __webpack_require__(46);
+var characterMeasurer_1 = __webpack_require__(48);
 var CacheCharacterMeasurer = (function (_super) {
     __extends(CacheCharacterMeasurer, _super);
     function CacheCharacterMeasurer(area, className, useGuards) {
@@ -7517,7 +7658,7 @@ exports.CacheCharacterMeasurer = CacheCharacterMeasurer;
 //# sourceMappingURL=cacheCharacterMeasurer.js.map
 
 /***/ }),
-/* 46 */
+/* 48 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7533,7 +7674,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
 var d3 = __webpack_require__(1);
-var measurer_1 = __webpack_require__(47);
+var measurer_1 = __webpack_require__(49);
 var CharacterMeasurer = (function (_super) {
     __extends(CharacterMeasurer, _super);
     function CharacterMeasurer() {
@@ -7556,7 +7697,7 @@ exports.CharacterMeasurer = CharacterMeasurer;
 //# sourceMappingURL=characterMeasurer.js.map
 
 /***/ }),
-/* 47 */
+/* 49 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7572,7 +7713,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
 var d3 = __webpack_require__(1);
-var abstractMeasurer_1 = __webpack_require__(44);
+var abstractMeasurer_1 = __webpack_require__(46);
 var Measurer = (function (_super) {
     __extends(Measurer, _super);
     function Measurer(area, className, useGuards) {
@@ -7618,7 +7759,7 @@ exports.Measurer = Measurer;
 //# sourceMappingURL=measurer.js.map
 
 /***/ }),
-/* 48 */
+/* 50 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7847,7 +7988,7 @@ exports.Wrapper = Wrapper;
 //# sourceMappingURL=wrapper.js.map
 
 /***/ }),
-/* 49 */
+/* 51 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7855,13 +7996,13 @@ exports.Wrapper = Wrapper;
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-__export(__webpack_require__(54));
-__export(__webpack_require__(55));
+__export(__webpack_require__(56));
+__export(__webpack_require__(57));
 __export(__webpack_require__(23));
 
 
 /***/ }),
-/* 50 */
+/* 52 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7929,7 +8070,7 @@ exports.Dataset = Dataset;
 
 
 /***/ }),
-/* 51 */
+/* 53 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7938,7 +8079,7 @@ exports.version = "2.9.0";
 
 
 /***/ }),
-/* 52 */
+/* 54 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8053,7 +8194,7 @@ exports.Easing = Easing;
 
 
 /***/ }),
-/* 53 */
+/* 55 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8077,7 +8218,7 @@ exports.Null = Null;
 
 
 /***/ }),
-/* 54 */
+/* 56 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8422,7 +8563,7 @@ exports.Category = Category;
 
 
 /***/ }),
-/* 55 */
+/* 57 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8724,7 +8865,7 @@ exports.Numeric = Numeric;
 
 
 /***/ }),
-/* 56 */
+/* 58 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8734,7 +8875,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var guideLineLayer_1 = __webpack_require__(35);
+var guideLineLayer_1 = __webpack_require__(36);
 var Interactions = __webpack_require__(14);
 var Utils = __webpack_require__(0);
 var DragLineLayer = (function (_super) {
@@ -8909,7 +9050,7 @@ exports.DragLineLayer = DragLineLayer;
 
 
 /***/ }),
-/* 57 */
+/* 59 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -9015,7 +9156,7 @@ exports.Gridlines = Gridlines;
 
 
 /***/ }),
-/* 58 */
+/* 60 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -9115,7 +9256,7 @@ exports.HTMLGroup = HTMLGroup;
 
 
 /***/ }),
-/* 59 */
+/* 61 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -9510,7 +9651,7 @@ exports.HTMLTable = HTMLTable;
 
 
 /***/ }),
-/* 60 */
+/* 62 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -9765,7 +9906,7 @@ exports.InterpolatedColorLegend = InterpolatedColorLegend;
 
 
 /***/ }),
-/* 61 */
+/* 63 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -9923,7 +10064,7 @@ exports.AxisLabel = AxisLabel;
 
 
 /***/ }),
-/* 62 */
+/* 64 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -10419,7 +10560,7 @@ exports.Legend = Legend;
 
 
 /***/ }),
-/* 63 */
+/* 65 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -10431,7 +10572,7 @@ var __extends = (this && this.__extends) || function (d, b) {
 };
 var plot_1 = __webpack_require__(3);
 var Utils = __webpack_require__(0);
-var group_1 = __webpack_require__(34);
+var group_1 = __webpack_require__(35);
 var PlotGroup = (function (_super) {
     __extends(PlotGroup, _super);
     function PlotGroup() {
@@ -10472,7 +10613,7 @@ exports.PlotGroup = PlotGroup;
 
 
 /***/ }),
-/* 64 */
+/* 66 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -10867,7 +11008,7 @@ exports.Table = Table;
 
 
 /***/ }),
-/* 65 */
+/* 67 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -10929,7 +11070,7 @@ exports.XDragBoxLayer = XDragBoxLayer;
 
 
 /***/ }),
-/* 66 */
+/* 68 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -10991,7 +11132,7 @@ exports.YDragBoxLayer = YDragBoxLayer;
 
 
 /***/ }),
-/* 67 */
+/* 69 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -11083,7 +11224,7 @@ exports.Key = Key;
 
 
 /***/ }),
-/* 68 */
+/* 70 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -11093,7 +11234,6 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var Utils = __webpack_require__(0);
 var dispatcher_1 = __webpack_require__(21);
 var Mouse = (function (_super) {
     __extends(Mouse, _super);
@@ -11103,23 +11243,23 @@ var Mouse = (function (_super) {
      * @constructor
      * @param {SVGElement} svg The root <svg> to attach to.
      */
-    function Mouse(svg) {
+    function Mouse(component) {
         var _this = this;
         _super.call(this);
-        this._translator = Utils.ClientToSVGTranslator.getTranslator(svg);
+        this._translator = component.root().translator();
         this._lastMousePosition = { x: -1, y: -1 };
-        var processMoveCallback = function (e) { return _this._measureAndDispatch(e, Mouse._MOUSEMOVE_EVENT_NAME, "page"); };
+        var processMoveCallback = function (e) { return _this._measureAndDispatch(component, e, Mouse._MOUSEMOVE_EVENT_NAME, "page"); };
         this._eventToProcessingFunction[Mouse._MOUSEOVER_EVENT_NAME] = processMoveCallback;
         this._eventToProcessingFunction[Mouse._MOUSEMOVE_EVENT_NAME] = processMoveCallback;
         this._eventToProcessingFunction[Mouse._MOUSEOUT_EVENT_NAME] = processMoveCallback;
         this._eventToProcessingFunction[Mouse._MOUSEDOWN_EVENT_NAME] =
-            function (e) { return _this._measureAndDispatch(e, Mouse._MOUSEDOWN_EVENT_NAME); };
+            function (e) { return _this._measureAndDispatch(component, e, Mouse._MOUSEDOWN_EVENT_NAME); };
         this._eventToProcessingFunction[Mouse._MOUSEUP_EVENT_NAME] =
-            function (e) { return _this._measureAndDispatch(e, Mouse._MOUSEUP_EVENT_NAME, "page"); };
+            function (e) { return _this._measureAndDispatch(component, e, Mouse._MOUSEUP_EVENT_NAME, "page"); };
         this._eventToProcessingFunction[Mouse._WHEEL_EVENT_NAME] =
-            function (e) { return _this._measureAndDispatch(e, Mouse._WHEEL_EVENT_NAME); };
+            function (e) { return _this._measureAndDispatch(component, e, Mouse._WHEEL_EVENT_NAME); };
         this._eventToProcessingFunction[Mouse._DBLCLICK_EVENT_NAME] =
-            function (e) { return _this._measureAndDispatch(e, Mouse._DBLCLICK_EVENT_NAME); };
+            function (e) { return _this._measureAndDispatch(component, e, Mouse._DBLCLICK_EVENT_NAME); };
     }
     /**
      * Get a Mouse Dispatcher for the <svg> containing elem.
@@ -11128,12 +11268,12 @@ var Mouse = (function (_super) {
      * @param {SVGElement} elem
      * @return {Dispatchers.Mouse}
      */
-    Mouse.getDispatcher = function (elem) {
-        var svg = Utils.DOM.boundingSVG(elem);
-        var dispatcher = svg[Mouse._DISPATCHER_KEY];
+    Mouse.getDispatcher = function (component) {
+        var element = component.root().element();
+        var dispatcher = element[Mouse._DISPATCHER_KEY];
         if (dispatcher == null) {
-            dispatcher = new Mouse(svg);
-            svg[Mouse._DISPATCHER_KEY] = dispatcher;
+            dispatcher = new Mouse(component);
+            element[Mouse._DISPATCHER_KEY] = dispatcher;
         }
         return dispatcher;
     };
@@ -11241,12 +11381,12 @@ var Mouse = (function (_super) {
      * Computes the mouse position from the given event, and if successful
      * calls all the callbacks in the provided callbackSet.
      */
-    Mouse.prototype._measureAndDispatch = function (event, eventName, scope) {
+    Mouse.prototype._measureAndDispatch = function (component, event, eventName, scope) {
         if (scope === void 0) { scope = "element"; }
         if (scope !== "page" && scope !== "element") {
             throw new Error("Invalid scope '" + scope + "', must be 'element' or 'page'");
         }
-        if (scope === "page" || this.eventInsideSVG(event)) {
+        if (scope === "page" || this.eventInside(component, event)) {
             var newMousePosition = this._translator.computePosition(event.clientX, event.clientY);
             if (newMousePosition != null) {
                 this._lastMousePosition = newMousePosition;
@@ -11254,8 +11394,8 @@ var Mouse = (function (_super) {
             }
         }
     };
-    Mouse.prototype.eventInsideSVG = function (event) {
-        return this._translator.insideSVG(event);
+    Mouse.prototype.eventInside = function (component, event) {
+        return this._translator.isInside(component, event);
     };
     /**
      * Returns the last computed mouse position in <svg> coordinate space.
@@ -11279,7 +11419,7 @@ exports.Mouse = Mouse;
 
 
 /***/ }),
-/* 69 */
+/* 71 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -11289,7 +11429,6 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var Utils = __webpack_require__(0);
 var dispatcher_1 = __webpack_require__(21);
 var Touch = (function (_super) {
     __extends(Touch, _super);
@@ -11299,18 +11438,18 @@ var Touch = (function (_super) {
      * @constructor
      * @param {SVGElement} svg The root <svg> to attach to.
      */
-    function Touch(svg) {
+    function Touch(component) {
         var _this = this;
         _super.call(this);
-        this._translator = Utils.ClientToSVGTranslator.getTranslator(svg);
+        this._translator = component.root().translator();
         this._eventToProcessingFunction[Touch._TOUCHSTART_EVENT_NAME] =
-            function (e) { return _this._measureAndDispatch(e, Touch._TOUCHSTART_EVENT_NAME, "page"); };
+            function (e) { return _this._measureAndDispatch(component, e, Touch._TOUCHSTART_EVENT_NAME, "page"); };
         this._eventToProcessingFunction[Touch._TOUCHMOVE_EVENT_NAME] =
-            function (e) { return _this._measureAndDispatch(e, Touch._TOUCHMOVE_EVENT_NAME, "page"); };
+            function (e) { return _this._measureAndDispatch(component, e, Touch._TOUCHMOVE_EVENT_NAME, "page"); };
         this._eventToProcessingFunction[Touch._TOUCHEND_EVENT_NAME] =
-            function (e) { return _this._measureAndDispatch(e, Touch._TOUCHEND_EVENT_NAME, "page"); };
+            function (e) { return _this._measureAndDispatch(component, e, Touch._TOUCHEND_EVENT_NAME, "page"); };
         this._eventToProcessingFunction[Touch._TOUCHCANCEL_EVENT_NAME] =
-            function (e) { return _this._measureAndDispatch(e, Touch._TOUCHCANCEL_EVENT_NAME, "page"); };
+            function (e) { return _this._measureAndDispatch(component, e, Touch._TOUCHCANCEL_EVENT_NAME, "page"); };
     }
     /**
      * Gets a Touch Dispatcher for the <svg> containing elem.
@@ -11319,12 +11458,12 @@ var Touch = (function (_super) {
      * @param {SVGElement} elem
      * @return {Dispatchers.Touch}
      */
-    Touch.getDispatcher = function (elem) {
-        var svg = Utils.DOM.boundingSVG(elem);
-        var dispatcher = svg[Touch._DISPATCHER_KEY];
+    Touch.getDispatcher = function (component) {
+        var element = component.root().element().node();
+        var dispatcher = element[Touch._DISPATCHER_KEY];
         if (dispatcher == null) {
-            dispatcher = new Touch(svg);
-            svg[Touch._DISPATCHER_KEY] = dispatcher;
+            dispatcher = new Touch(component);
+            element[Touch._DISPATCHER_KEY] = dispatcher;
         }
         return dispatcher;
     };
@@ -11412,12 +11551,12 @@ var Touch = (function (_super) {
      * Computes the Touch position from the given event, and if successful
      * calls all the callbacks in the provided callbackSet.
      */
-    Touch.prototype._measureAndDispatch = function (event, eventName, scope) {
+    Touch.prototype._measureAndDispatch = function (component, event, eventName, scope) {
         if (scope === void 0) { scope = "element"; }
         if (scope !== "page" && scope !== "element") {
             throw new Error("Invalid scope '" + scope + "', must be 'element' or 'page'");
         }
-        if (scope === "element" && !this.eventInsideSVG(event)) {
+        if (scope === "element" && !this.eventInside(component, event)) {
             return;
         }
         var touches = event.changedTouches;
@@ -11437,8 +11576,8 @@ var Touch = (function (_super) {
             this._callCallbacksForEvent(eventName, touchIdentifiers, touchPositions, event);
         }
     };
-    Touch.prototype.eventInsideSVG = function (event) {
-        return this._translator.insideSVG(event);
+    Touch.prototype.eventInside = function (component, event) {
+        return this._translator.isInside(component, event);
     };
     Touch._DISPATCHER_KEY = "__Plottable_Dispatcher_Touch";
     Touch._TOUCHSTART_EVENT_NAME = "touchstart";
@@ -11451,7 +11590,7 @@ exports.Touch = Touch;
 
 
 /***/ }),
-/* 70 */
+/* 72 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -11479,7 +11618,7 @@ exports.Arc = Arc;
 
 
 /***/ }),
-/* 71 */
+/* 73 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -11507,7 +11646,7 @@ exports.ArcOutline = ArcOutline;
 
 
 /***/ }),
-/* 72 */
+/* 74 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -11539,7 +11678,7 @@ exports.Area = Area;
 
 
 /***/ }),
-/* 73 */
+/* 75 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -11571,7 +11710,7 @@ exports.Line = Line;
 
 
 /***/ }),
-/* 74 */
+/* 76 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -11594,7 +11733,7 @@ exports.Rectangle = Rectangle;
 
 
 /***/ }),
-/* 75 */
+/* 77 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -11617,7 +11756,7 @@ exports.Segment = Segment;
 
 
 /***/ }),
-/* 76 */
+/* 78 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -11641,7 +11780,7 @@ exports.Symbol = Symbol;
 
 
 /***/ }),
-/* 77 */
+/* 79 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -11669,10 +11808,10 @@ var Click = (function (_super) {
     }
     Click.prototype._anchor = function (component) {
         _super.prototype._anchor.call(this, component);
-        this._mouseDispatcher = Dispatchers.Mouse.getDispatcher(component.content().node());
+        this._mouseDispatcher = Dispatchers.Mouse.getDispatcher(component);
         this._mouseDispatcher.onMouseDown(this._mouseDownCallback);
         this._mouseDispatcher.onMouseUp(this._mouseUpCallback);
-        this._touchDispatcher = Dispatchers.Touch.getDispatcher(component.content().node());
+        this._touchDispatcher = Dispatchers.Touch.getDispatcher(component);
         this._touchDispatcher.onTouchStart(this._touchStartCallback);
         this._touchDispatcher.onTouchEnd(this._touchEndCallback);
         this._touchDispatcher.onTouchCancel(this._touchCancelCallback);
@@ -11726,7 +11865,7 @@ exports.Click = Click;
 
 
 /***/ }),
-/* 78 */
+/* 80 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -11762,11 +11901,11 @@ var DoubleClick = (function (_super) {
     }
     DoubleClick.prototype._anchor = function (component) {
         _super.prototype._anchor.call(this, component);
-        this._mouseDispatcher = Dispatchers.Mouse.getDispatcher(component.content().node());
+        this._mouseDispatcher = Dispatchers.Mouse.getDispatcher(component);
         this._mouseDispatcher.onMouseDown(this._mouseDownCallback);
         this._mouseDispatcher.onMouseUp(this._mouseUpCallback);
         this._mouseDispatcher.onDblClick(this._dblClickCallback);
-        this._touchDispatcher = Dispatchers.Touch.getDispatcher(component.content().node());
+        this._touchDispatcher = Dispatchers.Touch.getDispatcher(component);
         this._touchDispatcher.onTouchStart(this._touchStartCallback);
         this._touchDispatcher.onTouchEnd(this._touchEndCallback);
         this._touchDispatcher.onTouchCancel(this._touchCancelCallback);
@@ -11783,18 +11922,18 @@ var DoubleClick = (function (_super) {
         this._touchDispatcher = null;
     };
     DoubleClick.prototype._handleClickDown = function (p) {
-        var translatedP = this._translateToComponentSpace(p);
-        if (this._isInsideComponent(translatedP)) {
-            if (!(this._clickState === ClickState.SingleClicked) || !DoubleClick._pointsEqual(translatedP, this._clickedPoint)) {
+        var translatedPoint = this._translateToComponentSpace(p);
+        if (this._isInsideComponent(translatedPoint)) {
+            if (!(this._clickState === ClickState.SingleClicked) || !DoubleClick._pointsEqual(translatedPoint, this._clickedPoint)) {
                 this._clickState = ClickState.NotClicked;
             }
-            this._clickedPoint = translatedP;
+            this._clickedPoint = translatedPoint;
             this._clickedDown = true;
         }
     };
     DoubleClick.prototype._handleClickUp = function (p) {
-        var translatedP = this._translateToComponentSpace(p);
-        if (this._clickedDown && DoubleClick._pointsEqual(translatedP, this._clickedPoint)) {
+        var translatedPoint = this._translateToComponentSpace(p);
+        if (this._clickedDown && DoubleClick._pointsEqual(translatedPoint, this._clickedPoint)) {
             this._clickState = this._clickState === ClickState.NotClicked ? ClickState.SingleClicked : ClickState.DoubleClicked;
         }
         else {
@@ -11841,7 +11980,7 @@ exports.DoubleClick = DoubleClick;
 
 
 /***/ }),
-/* 79 */
+/* 81 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -11873,11 +12012,11 @@ var Drag = (function (_super) {
     }
     Drag.prototype._anchor = function (component) {
         _super.prototype._anchor.call(this, component);
-        this._mouseDispatcher = Dispatchers.Mouse.getDispatcher(this._componentAttachedTo.content().node());
+        this._mouseDispatcher = Dispatchers.Mouse.getDispatcher(component);
         this._mouseDispatcher.onMouseDown(this._mouseDownCallback);
         this._mouseDispatcher.onMouseMove(this._mouseMoveCallback);
         this._mouseDispatcher.onMouseUp(this._mouseUpCallback);
-        this._touchDispatcher = Dispatchers.Touch.getDispatcher(this._componentAttachedTo.content().node());
+        this._touchDispatcher = Dispatchers.Touch.getDispatcher(component);
         this._touchDispatcher.onTouchStart(this._touchStartCallback);
         this._touchDispatcher.onTouchMove(this._touchMoveCallback);
         this._touchDispatcher.onTouchEnd(this._touchEndCallback);
@@ -12002,7 +12141,7 @@ exports.Drag = Drag;
 
 
 /***/ }),
-/* 80 */
+/* 82 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -12104,9 +12243,9 @@ var PanZoom = (function (_super) {
     PanZoom.prototype._anchor = function (component) {
         _super.prototype._anchor.call(this, component);
         this._dragInteraction.attachTo(component);
-        this._mouseDispatcher = Dispatchers.Mouse.getDispatcher(this._componentAttachedTo.content().node());
+        this._mouseDispatcher = Dispatchers.Mouse.getDispatcher(component);
         this._mouseDispatcher.onWheel(this._wheelCallback);
-        this._touchDispatcher = Dispatchers.Touch.getDispatcher(this._componentAttachedTo.content().node());
+        this._touchDispatcher = Dispatchers.Touch.getDispatcher(component);
         this._touchDispatcher.onTouchStart(this._touchStartCallback);
         this._touchDispatcher.onTouchMove(this._touchMoveCallback);
         this._touchDispatcher.onTouchEnd(this._touchEndCallback);
@@ -12556,7 +12695,7 @@ exports.PanZoom = PanZoom;
 
 
 /***/ }),
-/* 81 */
+/* 83 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -12583,9 +12722,9 @@ var Pointer = (function (_super) {
     }
     Pointer.prototype._anchor = function (component) {
         _super.prototype._anchor.call(this, component);
-        this._mouseDispatcher = Dispatchers.Mouse.getDispatcher(this._componentAttachedTo.content().node());
+        this._mouseDispatcher = Dispatchers.Mouse.getDispatcher(component);
         this._mouseDispatcher.onMouseMove(this._mouseMoveCallback);
-        this._touchDispatcher = Dispatchers.Touch.getDispatcher(this._componentAttachedTo.content().node());
+        this._touchDispatcher = Dispatchers.Touch.getDispatcher(component);
         this._touchDispatcher.onTouchStart(this._touchStartCallback);
     };
     Pointer.prototype._unanchor = function () {
@@ -12596,11 +12735,11 @@ var Pointer = (function (_super) {
         this._touchDispatcher = null;
     };
     Pointer.prototype._handleMouseEvent = function (p, e) {
-        var insideSVG = this._mouseDispatcher.eventInsideSVG(e);
+        var insideSVG = this._mouseDispatcher.eventInside(this._componentAttachedTo, e);
         this._handlePointerEvent(p, insideSVG);
     };
     Pointer.prototype._handleTouchEvent = function (p, e) {
-        var insideSVG = this._touchDispatcher.eventInsideSVG(e);
+        var insideSVG = this._touchDispatcher.eventInside(this._componentAttachedTo, e);
         this._handlePointerEvent(p, insideSVG);
     };
     Pointer.prototype._handlePointerEvent = function (p, insideSVG) {
@@ -12683,7 +12822,7 @@ exports.Pointer = Pointer;
 
 
 /***/ }),
-/* 82 */
+/* 84 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -12752,7 +12891,7 @@ exports.ClusteredBar = ClusteredBar;
 
 
 /***/ }),
-/* 83 */
+/* 85 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -13244,7 +13383,7 @@ exports.Pie = Pie;
 
 
 /***/ }),
-/* 84 */
+/* 86 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -13606,7 +13745,7 @@ exports.Rectangle = Rectangle;
 
 
 /***/ }),
-/* 85 */
+/* 87 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -13780,7 +13919,7 @@ exports.Scatter = Scatter;
 
 
 /***/ }),
-/* 86 */
+/* 88 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -13974,7 +14113,7 @@ exports.Segment = Segment;
 
 
 /***/ }),
-/* 87 */
+/* 89 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -13987,7 +14126,7 @@ var __extends = (this && this.__extends) || function (d, b) {
 var d3 = __webpack_require__(1);
 var Animators = __webpack_require__(6);
 var Utils = __webpack_require__(0);
-var areaPlot_1 = __webpack_require__(38);
+var areaPlot_1 = __webpack_require__(39);
 var plot_1 = __webpack_require__(3);
 var StackedArea = (function (_super) {
     __extends(StackedArea, _super);
@@ -14173,7 +14312,7 @@ exports.StackedArea = StackedArea;
 
 
 /***/ }),
-/* 88 */
+/* 90 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -14377,7 +14516,7 @@ exports.StackedBar = StackedBar;
 
 
 /***/ }),
-/* 89 */
+/* 91 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -14584,7 +14723,7 @@ exports.Waterfall = Waterfall;
 
 
 /***/ }),
-/* 90 */
+/* 92 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -14711,7 +14850,7 @@ exports.Color = Color;
 
 
 /***/ }),
-/* 91 */
+/* 93 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -14873,7 +15012,7 @@ exports.InterpolatedColor = InterpolatedColor;
 
 
 /***/ }),
-/* 92 */
+/* 94 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -14948,7 +15087,7 @@ exports.Linear = Linear;
 
 
 /***/ }),
-/* 93 */
+/* 95 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -15168,7 +15307,7 @@ exports.ModifiedLog = ModifiedLog;
 
 
 /***/ }),
-/* 94 */
+/* 96 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -15214,7 +15353,7 @@ exports.integerTickGenerator = integerTickGenerator;
 
 
 /***/ }),
-/* 95 */
+/* 97 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -15345,7 +15484,7 @@ exports.Time = Time;
 
 
 /***/ }),
-/* 96 */
+/* 98 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -15411,7 +15550,7 @@ exports.createFilledArray = createFilledArray;
 
 
 /***/ }),
-/* 97 */
+/* 99 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -15421,7 +15560,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var set_1 = __webpack_require__(43);
+var set_1 = __webpack_require__(45);
 /**
  * A set of callbacks which can be all invoked at once.
  * Each callback exists at most once in the set (based on reference equality).
@@ -15449,72 +15588,74 @@ exports.CallbackSet = CallbackSet;
 
 
 /***/ }),
-/* 98 */
+/* 100 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
-var DOM = __webpack_require__(42);
+var plottableElement_1 = __webpack_require__(44);
+var translator_1 = __webpack_require__(30);
+var ClientToHTMLTranslator = (function () {
+    function ClientToHTMLTranslator() {
+    }
+    /**
+     * Returns a Translator for the root of the component.
+     * If one already exists for the root, it will be returned; otherwise, a new one will be created.
+     */
+    ClientToHTMLTranslator.getTranslator = function (component) {
+        // The Translator works by first calculating the offset to root of the chart and then calculating
+        // the offset from the component to the root. It is imperative that the measureElement
+        // be added to the root of the hierarchy and nowhere else.
+        var root = component.root().element().node();
+        var translator = root[ClientToHTMLTranslator._TRANSLATOR_KEY];
+        if (translator == null) {
+            var measureElement = document.createElementNS(root.namespaceURI, "div");
+            measureElement.setAttribute("class", "measure-rect");
+            measureElement.setAttribute("style", "opacity: 0; visibility: hidden; position: relative;");
+            measureElement.setAttribute("width", "1");
+            measureElement.setAttribute("height", "1");
+            root.appendChild(measureElement);
+            translator = new translator_1.Translator(new plottableElement_1.PlottableHTMLElement(measureElement));
+            root[ClientToHTMLTranslator._TRANSLATOR_KEY] = translator;
+        }
+        return translator;
+    };
+    ClientToHTMLTranslator._TRANSLATOR_KEY = "__Plottable_ClientToHTMLTranslator";
+    return ClientToHTMLTranslator;
+}());
+exports.ClientToHTMLTranslator = ClientToHTMLTranslator;
+
+
+/***/ }),
+/* 101 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var DOM = __webpack_require__(43);
+var plottableElement_1 = __webpack_require__(44);
+var translator_1 = __webpack_require__(30);
 var ClientToSVGTranslator = (function () {
-    function ClientToSVGTranslator(svg) {
-        this._svg = svg;
-        this._measureRect = document.createElementNS(svg.namespaceURI, "rect");
-        this._measureRect.setAttribute("class", "measure-rect");
-        this._measureRect.setAttribute("style", "opacity: 0; visibility: hidden;");
-        this._measureRect.setAttribute("width", "1");
-        this._measureRect.setAttribute("height", "1");
-        this._svg.appendChild(this._measureRect);
+    function ClientToSVGTranslator() {
     }
     /**
      * Returns the ClientToSVGTranslator for the <svg> containing elem.
      * If one already exists on that <svg>, it will be returned; otherwise, a new one will be created.
      */
-    ClientToSVGTranslator.getTranslator = function (elem) {
-        var svg = DOM.boundingSVG(elem);
+    ClientToSVGTranslator.getTranslator = function (component) {
+        var svg = DOM.boundingSVG(component.element().node());
         var translator = svg[ClientToSVGTranslator._TRANSLATOR_KEY];
         if (translator == null) {
-            translator = new ClientToSVGTranslator(svg);
+            var measureRect = document.createElementNS(svg.namespaceURI, "rect");
+            measureRect.setAttribute("class", "measure-rect");
+            measureRect.setAttribute("style", "opacity: 0; visibility: hidden;");
+            measureRect.setAttribute("width", "1");
+            measureRect.setAttribute("height", "1");
+            svg.appendChild(measureRect);
+            translator = new translator_1.Translator(new plottableElement_1.PlottableSVGElement(measureRect));
             svg[ClientToSVGTranslator._TRANSLATOR_KEY] = translator;
         }
         return translator;
-    };
-    /**
-     * Computes the position relative to the <svg> in svg-coordinate-space.
-     */
-    ClientToSVGTranslator.prototype.computePosition = function (clientX, clientY) {
-        // get the origin
-        this._measureRect.setAttribute("x", "0");
-        this._measureRect.setAttribute("y", "0");
-        var mrBCR = this._measureRect.getBoundingClientRect();
-        var origin = { x: mrBCR.left, y: mrBCR.top };
-        // calculate the scale
-        var sampleDistance = 100;
-        this._measureRect.setAttribute("x", String(sampleDistance));
-        this._measureRect.setAttribute("y", String(sampleDistance));
-        mrBCR = this._measureRect.getBoundingClientRect();
-        var testPoint = { x: mrBCR.left, y: mrBCR.top };
-        // invalid measurements -- SVG might not be in the DOM
-        if (origin.x === testPoint.x || origin.y === testPoint.y) {
-            return null;
-        }
-        var scaleX = (testPoint.x - origin.x) / sampleDistance;
-        var scaleY = (testPoint.y - origin.y) / sampleDistance;
-        // get the true cursor position
-        this._measureRect.setAttribute("x", String((clientX - origin.x) / scaleX));
-        this._measureRect.setAttribute("y", String((clientY - origin.y) / scaleY));
-        mrBCR = this._measureRect.getBoundingClientRect();
-        var trueCursorPosition = { x: mrBCR.left, y: mrBCR.top };
-        var scaledPosition = {
-            x: (trueCursorPosition.x - origin.x) / scaleX,
-            y: (trueCursorPosition.y - origin.y) / scaleY,
-        };
-        return scaledPosition;
-    };
-    /**
-     * Checks whether event happened inside <svg> element.
-     */
-    ClientToSVGTranslator.prototype.insideSVG = function (e) {
-        return DOM.boundingSVG(e.target) === this._svg;
     };
     ClientToSVGTranslator._TRANSLATOR_KEY = "__Plottable_ClientToSVGTranslator";
     return ClientToSVGTranslator;
@@ -15523,7 +15664,7 @@ exports.ClientToSVGTranslator = ClientToSVGTranslator;
 
 
 /***/ }),
-/* 99 */
+/* 102 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -15602,7 +15743,7 @@ function luminance(color) {
 
 
 /***/ }),
-/* 100 */
+/* 103 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -15649,7 +15790,7 @@ exports.EntityArray = EntityArray;
 
 
 /***/ }),
-/* 101 */
+/* 104 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -15736,7 +15877,7 @@ exports.Map = Map;
 
 
 /***/ }),
-/* 102 */
+/* 105 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -15856,7 +15997,7 @@ exports.normalizeKey = normalizeKey;
 
 
 /***/ }),
-/* 103 */
+/* 106 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -15924,7 +16065,7 @@ exports.deprecated = deprecated;
 
 
 /***/ }),
-/* 104 */
+/* 107 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -15937,13 +16078,13 @@ exports.deprecated = deprecated;
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-__export(__webpack_require__(30));
-__export(__webpack_require__(105));
-__export(__webpack_require__(106));
+__export(__webpack_require__(31));
+__export(__webpack_require__(108));
+__export(__webpack_require__(109));
 //# sourceMappingURL=index.js.map
 
 /***/ }),
-/* 105 */
+/* 108 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -15958,7 +16099,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var baseAnimator_1 = __webpack_require__(30);
+var baseAnimator_1 = __webpack_require__(31);
 var OpacityAnimator = (function (_super) {
     __extends(OpacityAnimator, _super);
     function OpacityAnimator() {
@@ -15979,7 +16120,7 @@ exports.OpacityAnimator = OpacityAnimator;
 //# sourceMappingURL=opacityAnimator.js.map
 
 /***/ }),
-/* 106 */
+/* 109 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -15995,7 +16136,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
 var Utils = __webpack_require__(13);
-var baseAnimator_1 = __webpack_require__(30);
+var baseAnimator_1 = __webpack_require__(31);
 var UnveilAnimator = (function (_super) {
     __extends(UnveilAnimator, _super);
     function UnveilAnimator() {
@@ -16054,7 +16195,7 @@ exports.UnveilAnimator = UnveilAnimator;
 //# sourceMappingURL=unveilAnimator.js.map
 
 /***/ }),
-/* 107 */
+/* 110 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -16070,7 +16211,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
 var Utils = __webpack_require__(13);
-var cacheCharacterMeasurer_1 = __webpack_require__(45);
+var cacheCharacterMeasurer_1 = __webpack_require__(47);
 var CacheMeasurer = (function (_super) {
     __extends(CacheMeasurer, _super);
     function CacheMeasurer(area, className) {
@@ -16096,7 +16237,7 @@ exports.CacheMeasurer = CacheMeasurer;
 //# sourceMappingURL=cacheMeasurer.js.map
 
 /***/ }),
-/* 108 */
+/* 111 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -16109,15 +16250,15 @@ exports.CacheMeasurer = CacheMeasurer;
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-__export(__webpack_require__(44));
-__export(__webpack_require__(45));
-__export(__webpack_require__(107));
 __export(__webpack_require__(46));
 __export(__webpack_require__(47));
+__export(__webpack_require__(110));
+__export(__webpack_require__(48));
+__export(__webpack_require__(49));
 //# sourceMappingURL=index.js.map
 
 /***/ }),
-/* 109 */
+/* 112 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -16166,7 +16307,7 @@ exports.Cache = Cache;
 //# sourceMappingURL=cache.js.map
 
 /***/ }),
-/* 110 */
+/* 113 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -16214,7 +16355,7 @@ exports.DOM = DOM;
 //# sourceMappingURL=dom.js.map
 
 /***/ }),
-/* 111 */
+/* 114 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -16272,7 +16413,7 @@ exports.Methods = Methods;
 //# sourceMappingURL=methods.js.map
 
 /***/ }),
-/* 112 */
+/* 115 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -16319,7 +16460,7 @@ exports.StringMethods = StringMethods;
 //# sourceMappingURL=stringMethods.js.map
 
 /***/ }),
-/* 113 */
+/* 116 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -16367,7 +16508,7 @@ exports.Tokenizer = Tokenizer;
 //# sourceMappingURL=tokenizer.js.map
 
 /***/ }),
-/* 114 */
+/* 117 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -16380,12 +16521,12 @@ exports.Tokenizer = Tokenizer;
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-__export(__webpack_require__(115));
-__export(__webpack_require__(48));
+__export(__webpack_require__(118));
+__export(__webpack_require__(50));
 //# sourceMappingURL=index.js.map
 
 /***/ }),
-/* 115 */
+/* 118 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -16400,7 +16541,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var wrapper_1 = __webpack_require__(48);
+var wrapper_1 = __webpack_require__(50);
 var SingleLineWrapper = (function (_super) {
     __extends(SingleLineWrapper, _super);
     function SingleLineWrapper() {
@@ -16443,7 +16584,7 @@ exports.SingleLineWrapper = SingleLineWrapper;
 //# sourceMappingURL=singleLineWrapper.js.map
 
 /***/ }),
-/* 116 */
+/* 119 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -16456,11 +16597,11 @@ exports.SingleLineWrapper = SingleLineWrapper;
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-__export(__webpack_require__(117));
+__export(__webpack_require__(120));
 //# sourceMappingURL=index.js.map
 
 /***/ }),
-/* 117 */
+/* 120 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -16594,7 +16735,7 @@ exports.Writer = Writer;
 //# sourceMappingURL=writer.js.map
 
 /***/ }),
-/* 118 */
+/* 121 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -16604,9 +16745,9 @@ function __export(m) {
 }
 var Animators = __webpack_require__(6);
 exports.Animators = Animators;
-var Axes = __webpack_require__(49);
+var Axes = __webpack_require__(51);
 exports.Axes = Axes;
-var Components = __webpack_require__(31);
+var Components = __webpack_require__(32);
 exports.Components = Components;
 var Configs = __webpack_require__(20);
 exports.Configs = Configs;
@@ -16614,7 +16755,7 @@ var Formatters = __webpack_require__(8);
 exports.Formatters = Formatters;
 var RenderController = __webpack_require__(16);
 exports.RenderController = RenderController;
-var RenderPolicies = __webpack_require__(32);
+var RenderPolicies = __webpack_require__(33);
 exports.RenderPolicies = RenderPolicies;
 var SymbolFactories = __webpack_require__(25);
 exports.SymbolFactories = SymbolFactories;
@@ -16635,13 +16776,13 @@ var timeAxis_1 = __webpack_require__(23);
 exports.TimeInterval = timeAxis_1.TimeInterval;
 __export(__webpack_require__(5));
 __export(__webpack_require__(24));
-__export(__webpack_require__(50));
-var version_1 = __webpack_require__(51);
+__export(__webpack_require__(52));
+var version_1 = __webpack_require__(53);
 exports.version = version_1.version;
 __export(__webpack_require__(21));
 __export(__webpack_require__(7));
 __export(__webpack_require__(12));
-__export(__webpack_require__(33));
+__export(__webpack_require__(34));
 __export(__webpack_require__(15));
 __export(__webpack_require__(3));
 __export(__webpack_require__(10));
