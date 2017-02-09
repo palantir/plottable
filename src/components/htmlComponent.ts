@@ -105,14 +105,13 @@ export class HTMLComponent extends AbstractComponent<HTMLElement> {
     this.detach();
 
     if (element == null || !element.nodeName) {
-      throw new Error("Plottable requires a valid SVG to renderTo");
+      throw new Error("Plottable requires a valid HTMLElement to renderTo");
     }
 
     this.anchor(element);
 
     if (this._element == null) {
-      throw new Error("If a Component has never been rendered before, then renderTo must be given a node to render to, " +
-        "or a d3.Selection, or a selector string");
+      throw new Error("If a Component has never been rendered before, then renderTo must be given an HTMLElement to render to");
     }
 
     RenderController.registerToComputeLayoutAndRender(this);
