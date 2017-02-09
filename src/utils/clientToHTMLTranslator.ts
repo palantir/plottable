@@ -23,9 +23,7 @@ export class ClientToHTMLTranslator {
       const measureElement = document.createElementNS(root.namespaceURI, "div") as HTMLElement;
 
       measureElement.setAttribute("class", "measure-rect");
-      measureElement.setAttribute("style", "opacity: 0; visibility: hidden; position: relative;");
-      measureElement.setAttribute("width", "1");
-      measureElement.setAttribute("height", "1");
+      measureElement.setAttribute("style", "opacity: 0; visibility: hidden; position: absolute; width: 1px; height: 1px;");
       root.appendChild(measureElement);
 
       translator = new Translator(new PlottableHTMLElement(measureElement));
