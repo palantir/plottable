@@ -3,7 +3,7 @@ function makeData() {
   return [makeRandomData(50), makeRandomData(50)];
 }
 
-function run(svg, data, Plottable) {
+function run(div, data, Plottable) {
   "use strict";
 
   //data
@@ -130,7 +130,7 @@ function run(svg, data, Plottable) {
     [null, labelTable]
   ]);
 
-  basicTable.renderTo(svg);
+  basicTable.renderTo(div);
 
   new Plottable.Interactions.Click().onClick(emptyTitle).attachTo(noTitleLabel);
   new Plottable.Interactions.Click().onClick(smallTitle).attachTo(shortTitleLabel);

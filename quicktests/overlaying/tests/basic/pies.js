@@ -19,7 +19,7 @@ function makeData() {
   return [inner, outer];
 }
 
-function run(svg, data, Plottable){
+function run(div, data, Plottable){
   "use strict";
 
   var cs = new Plottable.Scales.Color();
@@ -43,7 +43,7 @@ function run(svg, data, Plottable){
           .attr("fill", function(d){ return d.key; }, cs);
 
   var pies = new Plottable.Components.Group([innerPie, outerPie]);
-  pies.renderTo(svg);
+  pies.renderTo(div);
 
   new Plottable.Interactions.Pointer()
   .onPointerMove(function(p){

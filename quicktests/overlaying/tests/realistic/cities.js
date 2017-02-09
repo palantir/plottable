@@ -3,7 +3,7 @@ function makeData() {
 
 }
 
-function run(svg, data, Plottable) {
+function run(div, data, Plottable) {
   "use strict";
 
   d3.csv("data/cities.csv").get(function(error, rows) {
@@ -32,6 +32,6 @@ function run(svg, data, Plottable) {
 
   var table = new Plottable.Components.Table([[yAxis, plot],
                                              [null, xAxis]]);
-  table.renderTo(svg);
+  table.renderTo(div);
   });
 }

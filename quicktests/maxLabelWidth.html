@@ -40,6 +40,20 @@
             ]);
         }
 
+        function createDIV(width, height) {
+            if (width == null) {
+                width = "500px";
+            }
+            if (height == null) {
+                height = "500px";
+            }
+
+            const div = document.createElement("div");
+            div.style.width = width;
+            div.style.height = height;
+            return div;
+        }
+
         function createSVG(width, height) {
             if (width == null) {
                 width = "500px";
@@ -121,17 +135,17 @@
             const unconstrained = makeGridChart(false);
             const constrained = makeGridChart(true);
 
-            const svgUnconstrained = createSVG();
-            const svgConstrained = createSVG();
+            const divUnconstrained = createDIV();
+            const divConstrained = createDIV();
 
             const div = document.createElement("div");
             $(div).append("<h3>Comparison in grid chart</h3>");
-            div.appendChild(svgUnconstrained);
-            div.appendChild(svgConstrained);
+            div.appendChild(divUnconstrained);
+            div.appendChild(divConstrained);
             document.body.appendChild(div);
 
-            unconstrained.renderTo(svgUnconstrained);
-            constrained.renderTo(svgConstrained);
+            unconstrained.renderTo(divUnconstrained);
+            constrained.renderTo(divConstrained);
         }
         renderGridComparison();
     </script>

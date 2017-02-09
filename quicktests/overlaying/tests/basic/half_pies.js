@@ -10,7 +10,7 @@ function makeData() {
   ];
 }
 
-function run(svg, data, Plottable){
+function run(div, data, Plottable){
   "use strict";
 
   var cs = new Plottable.Scales.Color();
@@ -47,5 +47,5 @@ function run(svg, data, Plottable){
           .attr("fill", function(d){ return d.key; }, cs);
 
   var pies = new Plottable.Components.Table([[topPie, rightPie], [leftPie, bottomPie]]);
-  pies.renderTo(svg);
+  pies.renderTo(div);
 }

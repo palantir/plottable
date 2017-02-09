@@ -12,7 +12,7 @@ function makeData() {
   return makeGridData(10, 10);
 }
 
-function run(svg, data, Plottable) {
+function run(div, data, Plottable) {
   "use strict";
   var ds = new Plottable.Dataset(data);
 
@@ -67,7 +67,7 @@ function run(svg, data, Plottable) {
  };
 
    new Plottable.Components.Group([plot, gllh, gllv])
-  .renderTo(svg);
+  .renderTo(div);
   updateColors({x: gllv.pixelPosition(), y: gllh.pixelPosition()});
 
   new Plottable.Interactions.Pointer()

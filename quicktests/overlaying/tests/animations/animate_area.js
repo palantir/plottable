@@ -7,7 +7,7 @@ function makeData() {
   return data;
 }
 
-function run(svg, data, Plottable) {
+function run(div, data, Plottable) {
   "use strict";
 
   var doAnimate = true;
@@ -29,7 +29,7 @@ function run(svg, data, Plottable) {
   var areaChart = new Plottable.Components.Table([[yAxis, areaRenderer],
    [null,  xAxis]]);
 
-  areaChart.renderTo(svg);
+  areaChart.renderTo(div);
 
   var cb = function(){
     var d = dataset.data();

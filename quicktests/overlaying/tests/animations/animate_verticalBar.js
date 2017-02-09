@@ -4,7 +4,7 @@ function makeData() {
   return makeRandomData(6);
 }
 
-function run(svg, data, Plottable) {
+function run(div, data, Plottable) {
   "use strict";
 
   var doAnimate = true;
@@ -26,7 +26,7 @@ function run(svg, data, Plottable) {
   var chart = new Plottable.Components.Table([[yAxis, verticalBarPlot],
    [null,  xAxis]]);
 
-  chart.renderTo(svg);
+  chart.renderTo(div);
 
   var cb = function(){
     var d = dataset.data();

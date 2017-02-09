@@ -9,7 +9,7 @@ function makeData() {
           {company: "Twitter", overall: 0.30, leadership: 0.21}];
 }
 
-function run(svg, data, Plottable) {
+function run(div, data, Plottable) {
   "use strict";
 
   var xScale = new Plottable.Scales.Linear().domain([0, 0.50]);
@@ -61,5 +61,5 @@ function run(svg, data, Plottable) {
   var chart = new Plottable.Components.Table([[yAxis, plots],
                                               [null, xAxis]]);
 
-  chart.renderTo(svg);
+  chart.renderTo(div);
 }

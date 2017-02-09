@@ -24,7 +24,7 @@ function makeData() {
   return inflationData(5, 2, 0.4);
 }
 
-function run(svg, data, Plottable) {
+function run(div, data, Plottable) {
   "use strict";
   var d = data[0];
   var maxX = d[0].x;
@@ -128,5 +128,5 @@ function run(svg, data, Plottable) {
 
   var lineChart = new Plottable.Components.Table([[yAxis, group],
                                                  [null,  xAxis]]);
-  lineChart.renderTo(svg);
+  lineChart.renderTo(div);
 }

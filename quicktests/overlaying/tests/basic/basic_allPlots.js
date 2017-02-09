@@ -4,7 +4,7 @@ function makeData() {
   return makeRandomData(8);
 }
 
-function run(svg, data, Plottable) {
+function run(div, data, Plottable) {
   "use strict";
     //Axis
     var xScale = new Plottable.Scales.Linear();
@@ -40,6 +40,6 @@ function run(svg, data, Plottable) {
                                                   [areaTable, vbarTable],
                                                   [hbarTable, null]]);
 
-    bigTable.renderTo(svg);
+    bigTable.renderTo(div);
 
 }

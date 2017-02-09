@@ -13,7 +13,7 @@ function makeData() {
          ];
 }
 
-function run(svg, data, Plottable) {
+function run(div, data, Plottable) {
   "use strict";
 
   var xScale = new Plottable.Scales.Linear();
@@ -30,7 +30,7 @@ function run(svg, data, Plottable) {
       .attr("stroke", function(){ return "#000000"; })
       .attr("stroke-width", function(){ return 4; });
 
-  plot.renderTo(svg);
+  plot.renderTo(div);
 
   var hover = new Plottable.Interactions.Pointer().attachTo(plot);
   hover.onPointerEnter(function() {

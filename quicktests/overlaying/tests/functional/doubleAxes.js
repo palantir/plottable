@@ -4,7 +4,7 @@ function makeData() {
   return makeRandomData(6);
 }
 
-function run(svg, data, Plottable) {
+function run(div, data, Plottable) {
   "use strict";
 
   var ds1 = new Plottable.Dataset([{x: "200", y: 1}, {x: "250", y: 2}, {x: "400", y: 3}]);
@@ -38,6 +38,6 @@ function run(svg, data, Plottable) {
     [null,  xAxes]
   ]);
 
-  chart.renderTo(svg);
+  chart.renderTo(div);
 
 }

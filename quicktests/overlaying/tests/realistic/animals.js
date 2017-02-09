@@ -65,7 +65,7 @@ function makeData() {
   return [d];
 }
 
-function run(svg, data, Plottable){
+function run(div, data, Plottable){
   "use strict";
 
   var dataset = new Plottable.Dataset(data[0]);
@@ -114,5 +114,5 @@ function run(svg, data, Plottable){
                                                     [legend2],
                                                     [legend3]]);
   var table = new Plottable.Components.Table([[pies, legendTable]]);
-  table.renderTo(svg);
+  table.renderTo(div);
 }

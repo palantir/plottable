@@ -34,6 +34,6 @@ require(["d3"], function(d3) {
       [yAxis, plot],
       [null, xAxis]
     ]);
-    chart.renderTo(d3.select("#chart"));
+    chart.renderTo(d3.select("#chart").node());
   });
 });

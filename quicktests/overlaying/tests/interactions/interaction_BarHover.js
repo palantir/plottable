@@ -3,7 +3,7 @@ function makeData() {
   return [{name: "Frodo", y: 3}, {name: "Sam", y: 2}, {name: "Gollum", y: 4}];
 }
 
-function run(svg, data, Plottable) {
+function run(div, data, Plottable) {
   "use strict";
 
   var xScale = new Plottable.Scales.Category();
@@ -26,7 +26,7 @@ function run(svg, data, Plottable) {
       [yAxis, plot],
       [null, xAxis]]);
 
-  chart.renderTo(svg);
+  chart.renderTo(div);
 
   var pointer = new Plottable.Interactions.Pointer();
   pointer.onPointerMove(function(p) {

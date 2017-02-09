@@ -3,7 +3,7 @@ function makeData() {
 
 }
 
-function run(svg, data, Plottable) {
+function run(div, data, Plottable) {
   "use strict";
 
   function processDatum(d) {
@@ -107,7 +107,7 @@ function run(svg, data, Plottable) {
 
           table.rowWeight(2, 0.3);
 
-          table.renderTo(svg);
+          table.renderTo(div);
 
           var pzi = new Plottable.Interactions.PanZoom(xScale, null);
           pzi.attachTo(plotArea);

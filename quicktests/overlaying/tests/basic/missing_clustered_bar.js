@@ -7,7 +7,7 @@ function makeData() {
   return [data1, data2, data3];
 }
 
-function run(svg, data, Plottable) {
+function run(div, data, Plottable) {
   "use strict";
 
   var xScale = new Plottable.Scales.Category();
@@ -31,5 +31,5 @@ function run(svg, data, Plottable) {
 
   new Plottable.Components.Table([
     [yAxis, center], [null, xAxis]
-    ]).renderTo(svg);
+    ]).renderTo(div);
 }

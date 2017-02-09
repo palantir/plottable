@@ -21,7 +21,7 @@ function makeData() {
         ];
 }
 
-function run(svg, data, Plottable) {
+function run(div, data, Plottable) {
   "use strict";
 
   var colorScale = new Plottable.Scales.Color();
@@ -84,5 +84,5 @@ function run(svg, data, Plottable) {
       [allPlots]
   ]);
 
-  chart.renderTo(svg);
+  chart.renderTo(div);
 }
