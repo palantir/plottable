@@ -16,7 +16,7 @@ export type GenericStackedDatum<D> = {
   axisValue: D;
 }
 
-export type StackExtent<D> = { extent: number, axisValue: D, dataset: Dataset }
+export type StackExtent<D> = { extent: number, axisValue: D, datasets: Dataset[] }
 
 export type StackedDatum = GenericStackedDatum<string>;
 /**
@@ -112,15 +112,23 @@ export function stackedExtents<D>(stackingResult: GenericStackingResult<D>): {
       const minimalValue = Utils.Math.min([datum.offset + datum.value, datum.offset], datum.offset);
 
       if (!maximumExtents.has(key)) {
-        maximumExtents.set(key, { extent: maximalValue, axisValue: datum.axisValue, dataset: dataset });
+        maximumExtents.set(key, { extent: maximalValue, axisValue: datum.axisValue, datasets: [dataset] });
       } else if (maximumExtents.get(key).extent < maximalValue) {
-        maximumExtents.set(key, { extent: maximalValue, axisValue: datum.axisValue, dataset: dataset });
+        maximumExtents.set(key, {
+          extent: maximalValue,
+          axisValue: datum.axisValue,
+          datasets: maximumExtents.get(key).datasets.concat(dataset),
+        });
       }
 
       if (!minimumExtents.has(key)) {
-        minimumExtents.set(key, { extent: minimalValue, axisValue: datum.axisValue, dataset: dataset });
+        minimumExtents.set(key, { extent: minimalValue, axisValue: datum.axisValue, datasets: [dataset] });
       } else if (minimumExtents.get(key).extent > (minimalValue)) {
-        minimumExtents.set(key, { extent: minimalValue, axisValue: datum.axisValue, dataset: dataset });
+        minimumExtents.set(key, {
+          extent: minimalValue,
+          axisValue: datum.axisValue,
+          datasets: minimumExtents.get(key).datasets.concat(dataset),
+        });
       }
     });
   });

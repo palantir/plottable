@@ -585,7 +585,7 @@ export class Pie extends Plot {
       if (!Utils.Math.isValidNumber(value)) {
         return;
       }
-      value = this._labelFormatter(value, datum, dataset);
+      value = this._labelFormatter(value, datum, [dataset]);
       let measurement = measurer.measure(value);
 
       let theta = (this._endAngles[datumIndex] + this._startAngles[datumIndex]) / 2;
