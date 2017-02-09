@@ -127,8 +127,9 @@ describe("SelectionBoxLayer", () => {
 
       it("does not call callbacks when dragBoxLayer is destroyed", () => {
         // rendered in a Group so that drag sequence can be simulated on Group background after DragBoxLayer is destroyed
-        const group = new Plottable.Components.Group([dbl]).renderTo(svg);
-        const target = group.background();
+        const div = TestMethods.generateDIV(SVG_WIDTH, SVG_HEIGHT)
+        const group = new Plottable.Components.Group([dbl]).renderTo(div);
+        const target = group.content();
         let onDragStartCallbackCalled = false;
         let onDragCallbackCalled = false;
         let onDragEndcallbackCalled = false;
@@ -151,14 +152,16 @@ describe("SelectionBoxLayer", () => {
         assert.isFalse(onDragCallbackCalled, "onDrag callback is not called after destroyed");
         assert.isFalse(onDragEndcallbackCalled, "onDragEnd callback is not called after destroyed");
 
+        div.remove();
         svg.remove();
       });
 
       it("does not call callbacks when dragBoxLayer is detached", () => {
         // rendered in a Group so that drag sequence can be simulated on Group background after DragBoxLayer is detached
+        const div = TestMethods.generateDIV(SVG_WIDTH, SVG_HEIGHT);
         const group = new Plottable.Components.Group([dbl]);
-        group.renderTo(svg);
-        const target = group.background();
+        group.renderTo(div);
+        const target = group.content();
         let onDragStartCallbackCalled = false;
         let onDragCallbackCalled = false;
         let onDragEndcallbackCalled = false;
@@ -188,6 +191,7 @@ describe("SelectionBoxLayer", () => {
         assert.isTrue(onDragEndcallbackCalled, "onDragEnd callback is called when re-anchor()");
 
         dbl.destroy();
+        div.remove();
         svg.remove();
       });
 

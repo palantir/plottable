@@ -320,6 +320,8 @@ describe("Interactions", () => {
       });
 
       it("can pinch inside one component and not affect another component", () => {
+        const div = TestMethods.generateDIV(SVG_WIDTH, SVG_HEIGHT);
+
         let xScale2 = new Plottable.Scales.Linear();
         let initialDomain = [0, SVG_WIDTH / 2];
         xScale2.domain(initialDomain).range([0, SVG_WIDTH]);
@@ -331,7 +333,7 @@ describe("Interactions", () => {
         panZoomInteraction2.attachTo(component2);
 
         let table = new Plottable.Components.Table([[component, component2]]);
-        table.renderTo(svg);
+        table.renderTo(div);
 
         let startPoint = { x: SVG_WIDTH / 4, y: SVG_HEIGHT / 2 };
         let startPoint2 = { x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2 };
@@ -343,6 +345,8 @@ describe("Interactions", () => {
         TestMethods.triggerFakeTouchEvent("touchend", eventTarget, [endPoint], [1] );
         assert.deepEqual(xScale.domain(), expectedXDomain, "xScale inside target component transforms via pinch");
         assert.deepEqual(xScale2.domain(), initialDomain, "xScale outside of target component does not transform via pinch");
+
+        div.remove();
         svg.remove();
       });
 

@@ -439,7 +439,7 @@ describe("Scales", () => {
       });
 
       it("adjusts to plot detaching, reattaching or destruction", () => {
-        let svg = TestMethods.generateSVG();
+        let div = TestMethods.generateDIV();
         let dataset1 = new Plottable.Dataset([
           {x: 0, y: 0},
           {x: 1, y: 1},
@@ -465,7 +465,7 @@ describe("Scales", () => {
         plot2.y((d) => d.y, yScale);
 
         let group = new Plottable.Components.Group([plot1, plot2]);
-        group.renderTo(svg);
+        group.renderTo(div);
 
         assert.deepEqual(xScale.domain(), [0, 2]);
         plot1.detach();
@@ -475,7 +475,7 @@ describe("Scales", () => {
         plot1.destroy();
         assert.deepEqual(xScale.domain(), [1, 2], "domain update on destroying plot 1");
 
-        svg.remove();
+        div.remove();
       });
     });
   });

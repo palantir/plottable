@@ -2,6 +2,12 @@ import { assert } from "chai";
 import * as d3 from "d3";
 
 import * as Plottable from "../src";
+import { IComponent } from "../src/components";
+
+export function generateDIV(width = 400, height = 400): HTMLElement {
+  let parent = getSVGParent();
+  return parent.append("div").attr("width", width).attr("height", height).attr("class", "div").node() as HTMLElement;
+}
 
 export function generateSVG(width = 400, height = 400): d3.Selection<void> {
   let parent = getSVGParent();
@@ -19,9 +25,9 @@ export function getSVGParent(): d3.Selection<void> {
   }
 }
 
-export function isInDOM(component: Plottable.Component) {
+export function isInDOM(component: IComponent<any>) {
   let contentNode = component.content().node();
-  return contentNode != null && Plottable.Utils.DOM.boundingSVG(<SVGElement> contentNode) != null;
+  return contentNode != null && Plottable.Utils.DOM.contains(document.body, contentNode as Element);
 };
 
 export function verifySpaceRequest(sr: Plottable.SpaceRequest, expectedMinWidth: number, expectedMinHeight: number, message: string) {

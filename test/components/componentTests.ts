@@ -524,15 +524,19 @@ describe("Component", () => {
     });
 
     it("does not translate if more space was requested than offered", () => {
+      const div = TestMethods.generateDIV(SVG_WIDTH, SVG_HEIGHT);
+
       let requestedWidth = SVG_WIDTH * 2;
       let requestedHeight = SVG_HEIGHT * 2;
       c.destroy();
       c = new Mocks.FixedSizeComponent(requestedWidth, requestedHeight);
       let t = new Plottable.Components.Table([[c]]);
-      t.renderTo(svg);
+      t.renderTo(div);
 
       let componentElement = svg.select(".component");
       assert.deepEqual(TestMethods.getTranslate(componentElement), [0, 0], "the element was not translated");
+
+      div.remove();
       svg.remove();
     });
   });
@@ -748,6 +752,8 @@ describe("Component", () => {
     });
 
     it("only computes layout once", (done) => {
+      const div = TestMethods.generateDIV(SVG_WIDTH, SVG_HEIGHT);
+
       // use async rendering so flushing doesn't happen immediately
       Plottable.RenderController.renderPolicy(Plottable.RenderController.Policy.ANIMATION_FRAME);
       // set up a bar plot with a color scale
@@ -767,11 +773,12 @@ describe("Component", () => {
       const table = new Plottable.Components.Table([[barPlot, legend]]);
       const computeLayoutSpy = sinon.spy(table, "computeLayout");
 
-      table.renderTo(svg);
+      table.renderTo(div);
 
       assert.strictEqual(computeLayoutSpy.callCount, 1, "component only computes layout once");
       table.destroy();
       svg.remove();
+      div.remove();
       done();
     });
 
@@ -855,8 +862,9 @@ describe("Component", () => {
     });
 
     it("is offset by the parent's origin", () => {
+      const div = TestMethods.generateDIV(SVG_WIDTH, SVG_HEIGHT);
       let parent = new Plottable.Components.Group([c]);
-      parent.anchor(svg);
+      parent.anchor(div);
       c.anchor(svg);
       parent.computeLayout({x: SVG_WIDTH / 4, y: SVG_HEIGHT / 4}, SVG_WIDTH / 2, SVG_HEIGHT / 2);
       c.computeLayout({x: SVG_WIDTH / 4, y: SVG_HEIGHT / 4}, SVG_WIDTH / 4, SVG_HEIGHT / 4);
@@ -868,6 +876,7 @@ describe("Component", () => {
       parent.destroy();
       c.destroy();
       svg.remove();
+      div.remove();
     });
   });
 
