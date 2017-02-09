@@ -1,80 +1,33 @@
-import { Point } from "../core/interfaces";
-
 import * as DOM from "./domUtils";
+import { PlottableSVGElement } from "./plottableElement";
+import { Translator } from "./translator";
+
+import { IComponent } from "../components";
+import { Point } from "../core/interfaces";
 
 export class ClientToSVGTranslator {
   private static _TRANSLATOR_KEY = "__Plottable_ClientToSVGTranslator";
-  private _svg: SVGElement;
-  private _measureRect: SVGElement;
 
   /**
    * Returns the ClientToSVGTranslator for the <svg> containing elem.
    * If one already exists on that <svg>, it will be returned; otherwise, a new one will be created.
    */
-  public static getTranslator(elem: SVGElement): ClientToSVGTranslator {
-    let svg = DOM.boundingSVG(elem);
+  public static getTranslator(component: IComponent<any>): Translator {
+    let svg = DOM.boundingSVG(component.content().node() as SVGElement);
 
-    let translator: ClientToSVGTranslator = (<any> svg)[ClientToSVGTranslator._TRANSLATOR_KEY];
+    let translator: Translator = (<any> svg)[ClientToSVGTranslator._TRANSLATOR_KEY];
     if (translator == null) {
-      translator = new ClientToSVGTranslator(svg);
+      const measureRect = <SVGElement> <any>document.createElementNS(svg.namespaceURI, "rect");
+      measureRect.setAttribute("class", "measure-rect");
+      measureRect.setAttribute("style", "opacity: 0; visibility: hidden;");
+      measureRect.setAttribute("width", "1");
+      measureRect.setAttribute("height", "1");
+      svg.appendChild(measureRect);
+
+      translator = new Translator(component, new PlottableSVGElement(measureRect));
       (<any> svg)[ClientToSVGTranslator._TRANSLATOR_KEY] = translator;
     }
+
     return translator;
-  }
-
-  constructor(svg: SVGElement) {
-    this._svg = svg;
-    this._measureRect = <SVGElement> <any>document.createElementNS(svg.namespaceURI, "rect");
-    this._measureRect.setAttribute("class", "measure-rect");
-    this._measureRect.setAttribute("style", "opacity: 0; visibility: hidden;");
-    this._measureRect.setAttribute("width", "1");
-    this._measureRect.setAttribute("height", "1");
-    this._svg.appendChild(this._measureRect);
-  }
-
-  /**
-   * Computes the position relative to the <svg> in svg-coordinate-space.
-   */
-  public computePosition(clientX: number, clientY: number): Point {
-    // get the origin
-    this._measureRect.setAttribute("x", "0");
-    this._measureRect.setAttribute("y", "0");
-    let mrBCR = this._measureRect.getBoundingClientRect();
-    let origin = { x: mrBCR.left, y: mrBCR.top };
-
-    // calculate the scale
-    let sampleDistance = 100;
-    this._measureRect.setAttribute("x", String(sampleDistance));
-    this._measureRect.setAttribute("y", String(sampleDistance));
-    mrBCR = this._measureRect.getBoundingClientRect();
-    let testPoint = { x: mrBCR.left, y: mrBCR.top };
-
-    // invalid measurements -- SVG might not be in the DOM
-    if (origin.x === testPoint.x || origin.y === testPoint.y) {
-      return null;
-    }
-
-    let scaleX = (testPoint.x - origin.x) / sampleDistance;
-    let scaleY = (testPoint.y - origin.y) / sampleDistance;
-
-    // get the true cursor position
-    this._measureRect.setAttribute("x", String((clientX - origin.x) / scaleX));
-    this._measureRect.setAttribute("y", String((clientY - origin.y) / scaleY));
-    mrBCR = this._measureRect.getBoundingClientRect();
-    let trueCursorPosition = { x: mrBCR.left, y: mrBCR.top };
-
-    let scaledPosition = {
-      x: (trueCursorPosition.x - origin.x) / scaleX,
-      y: (trueCursorPosition.y - origin.y) / scaleY,
-    };
-
-    return scaledPosition;
-  }
-
-  /**
-   * Checks whether event happened inside <svg> element.
-   */
-  public insideSVG(e: Event): boolean {
-    return DOM.boundingSVG(<SVGElement>e.target) === this._svg;
   }
 }
