@@ -4004,8 +4004,8 @@ var Bar = (function (_super) {
     Bar._BAR_WIDTH_RATIO = 0.95;
     Bar._SINGLE_BAR_DIMENSION_RATIO = 0.4;
     Bar._BAR_AREA_CLASS = "bar-area";
-    Bar._LABEL_PADDING = 10;
     Bar._LABEL_AREA_CLASS = "bar-label-text-area";
+    Bar._LABEL_PADDING = 10;
     return Bar;
 }(xyPlot_1.XYPlot));
 exports.Bar = Bar;
@@ -13709,10 +13709,13 @@ var StackedBar = (function (_super) {
         var secondaryScale = this._isVertical ? this.y().scale : this.x().scale;
         var _a = Utils.Stacking.stackedExtents(this._stackingResult), maximumExtents = _a.maximumExtents, minimumExtents = _a.minimumExtents;
         var barWidth = this._getBarPixelWidth();
+        var anyTooWide = [];
         var drawLabel = function (text, measurement, labelPosition) {
             var x = labelPosition.x, y = labelPosition.y;
             var height = measurement.height, width = measurement.width;
-            var tooWide = _this._isVertical ? (width > barWidth) : (height > barWidth);
+            var tooWide = _this._isVertical
+                ? (width > barWidth - (2 * StackedBar._LABEL_PADDING))
+                : (height > barWidth - (2 * StackedBar._LABEL_PADDING));
             var hideLabel = x < 0
                 || y < 0
                 || x + width > _this.width()
@@ -13729,6 +13732,7 @@ var StackedBar = (function (_super) {
                 };
                 _this._writer.write(text, measurement.width, measurement.height, writeOptions);
             }
+            return tooWide;
         };
         maximumExtents.forEach(function (maximum) {
             if (maximum.extent !== baselineValue) {
@@ -13743,7 +13747,7 @@ var StackedBar = (function (_super) {
                 var y = _this._isVertical
                     ? secondaryScale.scale(maximum.extent) - secondaryTextMeasurement - StackedBar._STACKED_BAR_LABEL_PADDING
                     : primaryScale.scale(maximum.axisValue) - primaryTextMeasurement / 2;
-                drawLabel(text, measurement, { x: x, y: y });
+                anyTooWide.push(drawLabel(text, measurement, { x: x, y: y }));
             }
         });
         minimumExtents.forEach(function (minimum) {
@@ -13758,9 +13762,12 @@ var StackedBar = (function (_super) {
                 var y = _this._isVertical
                     ? secondaryScale.scale(minimum.extent) + StackedBar._STACKED_BAR_LABEL_PADDING
                     : primaryScale.scale(minimum.axisValue) - primaryTextMeasurement / 2;
-                drawLabel(text, measurement, { x: x, y: y });
+                anyTooWide.push(drawLabel(text, measurement, { x: x, y: y }));
             }
         });
+        if (anyTooWide.some(function (d) { return d; })) {
+            this._labelArea.selectAll("g").remove();
+        }
     };
     StackedBar.prototype._generateAttrToProjector = function () {
         var _this = this;
