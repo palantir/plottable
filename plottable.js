@@ -3256,10 +3256,6 @@ var Axis = (function (_super) {
      */
     Axis.TICK_LABEL_CLASS = "tick-label";
     /**
-     * The css class applied to each line of text in a tick label.
-     */
-    Axis.TEXT_LINE_CLASS = "text-line";
-    /**
      * The css class applied to each annotation line, which extends from the axis to the rect.
      */
     Axis.ANNOTATION_LINE_CLASS = "annotation-line";

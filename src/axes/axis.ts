@@ -30,10 +30,6 @@ export class Axis<D> extends Component {
    */
   public static TICK_LABEL_CLASS = "tick-label";
   /**
-   * The css class applied to each line of text in a tick label.
-   */
-  public static TEXT_LINE_CLASS = "text-line";
-  /**
    * The css class applied to each annotation line, which extends from the axis to the rect.
    */
   public static ANNOTATION_LINE_CLASS = "annotation-line";
