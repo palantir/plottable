@@ -49,7 +49,7 @@ function run(svg, data, Plottable) {
                 .tickLabelMaxLines(2)
                 .tickLabelAngle(-90)
                 .tickLabelShearAngle(shear);
-            const interaction = new Plottable.Interactions.PanZoom(scale).attachTo(axis);
+            new Plottable.Interactions.PanZoom(scale).attachTo(axis);
             table.add(axis, y++, 0);
         });
     });
