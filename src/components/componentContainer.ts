@@ -1,5 +1,4 @@
-import { IComponent } from "./abstractComponent";
-import { GenericComponentCallback } from "./component";
+import { GenericComponentCallback, IComponent } from "./abstractComponent";
 import { HTMLComponent } from "./htmlComponent";
 
 /*

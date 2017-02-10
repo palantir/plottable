@@ -51,7 +51,7 @@ describe("Interactions", () => {
         beforeEach(() => {
           svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
 
-          const component = new Plottable.Component();
+          const component = new Plottable.SVGComponent();
           component.renderTo(svg);
           eventTarget = component.background();
 
@@ -170,7 +170,7 @@ describe("Interactions", () => {
             background: "black",
           });
 
-          const component = new Plottable.Component();
+          const component = new Plottable.SVGComponent();
           component.renderTo(svg);
           eventTarget = component.background();
 

@@ -100,7 +100,7 @@ var Color = __webpack_require__(99);
 exports.Color = Color;
 var DOM = __webpack_require__(42);
 exports.DOM = DOM;
-var Math = __webpack_require__(28);
+var Math = __webpack_require__(29);
 exports.Math = Math;
 var Stacking = __webpack_require__(102);
 exports.Stacking = Stacking;
@@ -110,7 +110,7 @@ __export(__webpack_require__(96));
 __export(__webpack_require__(97));
 __export(__webpack_require__(98));
 __export(__webpack_require__(100));
-__export(__webpack_require__(29));
+__export(__webpack_require__(30));
 __export(__webpack_require__(101));
 __export(__webpack_require__(44));
 
@@ -175,7 +175,7 @@ var __extends = (this && this.__extends) || function (d, b) {
 };
 var d3 = __webpack_require__(1);
 var Animators = __webpack_require__(5);
-var component_1 = __webpack_require__(6);
+var svgComponent_1 = __webpack_require__(6);
 var drawer_1 = __webpack_require__(7);
 var Utils = __webpack_require__(0);
 var Plots = __webpack_require__(39);
@@ -654,7 +654,7 @@ var Plot = (function (_super) {
     };
     Plot._ANIMATION_MAX_DURATION = 600;
     return Plot;
-}(component_1.Component));
+}(svgComponent_1.SVGComponent));
 exports.Plot = Plot;
 
 
@@ -712,12 +712,12 @@ var __extends = (this && this.__extends) || function (d, b) {
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
 var d3 = __webpack_require__(1);
-var abstractComponent_1 = __webpack_require__(26);
+var abstractComponent_1 = __webpack_require__(20);
 var RenderController = __webpack_require__(16);
 var Utils = __webpack_require__(0);
-var Component = (function (_super) {
-    __extends(Component, _super);
-    function Component() {
+var SVGComponent = (function (_super) {
+    __extends(SVGComponent, _super);
+    function SVGComponent() {
         _super.call(this);
         this._clipPathEnabled = false;
         this._boxes = [];
@@ -731,7 +731,7 @@ var Component = (function (_super) {
      * @param {d3.Selection} selection.
      * @returns {Component} The calling Component.
      */
-    Component.prototype.anchor = function (selection) {
+    SVGComponent.prototype.anchor = function (selection) {
         if (this._destroyed) {
             throw new Error("Can't reuse destroy()-ed Components!");
         }
@@ -741,9 +741,9 @@ var Component = (function (_super) {
             // visible overflow for firefox https://stackoverflow.com/questions/5926986/why-does-firefox-appear-to-truncate-embedded-svgs
             this._rootSVG.style("overflow", "visible");
             // HACKHACK: Safari fails to register events on the <svg> itself
-            var safariBacking = this._rootSVG.select("." + Component._SAFARI_EVENT_BACKING_CLASS);
+            var safariBacking = this._rootSVG.select("." + SVGComponent._SAFARI_EVENT_BACKING_CLASS);
             if (safariBacking.empty()) {
-                this._rootSVG.append("rect").classed(Component._SAFARI_EVENT_BACKING_CLASS, true).attr({
+                this._rootSVG.append("rect").classed(SVGComponent._SAFARI_EVENT_BACKING_CLASS, true).attr({
                     x: 0,
                     y: 0,
                     width: "100%",
@@ -767,7 +767,7 @@ var Component = (function (_super) {
         this._onAnchorCallbacks.callCallbacks(this);
         return this;
     };
-    Component.prototype.anchorHTML = function (selection) {
+    SVGComponent.prototype.anchorHTML = function (selection) {
         var root = d3.select(selection).append("svg");
         return this.anchor(root);
     };
@@ -776,7 +776,7 @@ var Component = (function (_super) {
      * Called during anchor() if the Component's element has not been created yet.
      * Override in subclasses to provide additional functionality.
      */
-    Component.prototype._setup = function () {
+    SVGComponent.prototype._setup = function () {
         var _this = this;
         if (this._isSetup) {
             return;
@@ -811,7 +811,7 @@ var Component = (function (_super) {
      * @param {number} [availableHeight] Available height in pixels.
      * @returns {Component} The calling Component.
      */
-    Component.prototype.computeLayout = function (origin, availableWidth, availableHeight) {
+    SVGComponent.prototype.computeLayout = function (origin, availableWidth, availableHeight) {
         var _this = this;
         if (origin == null || availableWidth == null || availableHeight == null) {
             if (this._element == null) {
@@ -840,8 +840,8 @@ var Component = (function (_super) {
         var size = this._sizeFromOffer(availableWidth, availableHeight);
         this._width = size.width;
         this._height = size.height;
-        var xAlignProportion = Component._xAlignToProportion[this._xAlignment];
-        var yAlignProportion = Component._yAlignToProportion[this._yAlignment];
+        var xAlignProportion = SVGComponent._xAlignToProportion[this._xAlignment];
+        var yAlignProportion = SVGComponent._yAlignToProportion[this._yAlignment];
         this._origin = {
             x: origin.x + (availableWidth - this.width()) * xAlignProportion,
             y: origin.y + (availableHeight - this.height()) * yAlignProportion,
@@ -866,14 +866,14 @@ var Component = (function (_super) {
         }
         return this;
     };
-    Component.prototype._sizeFromOffer = function (availableWidth, availableHeight) {
+    SVGComponent.prototype._sizeFromOffer = function (availableWidth, availableHeight) {
         var requestedSpace = this.requestedSpace(availableWidth, availableHeight);
         return {
             width: this.fixedWidth() ? Math.min(availableWidth, requestedSpace.minWidth) : availableWidth,
             height: this.fixedHeight() ? Math.min(availableHeight, requestedSpace.minHeight) : availableHeight,
         };
     };
-    Component.prototype._scheduleComputeLayout = function () {
+    SVGComponent.prototype._scheduleComputeLayout = function () {
         if (this._isAnchored && this._isSetup) {
             RenderController.registerToComputeLayoutAndRender(this);
         }
@@ -882,7 +882,7 @@ var Component = (function (_super) {
      * Renders the Component without waiting for the next frame. This method is a no-op on
      * Component, Table, and Group; render them immediately with .renderTo() instead.
      */
-    Component.prototype.renderImmediately = function () {
+    SVGComponent.prototype.renderImmediately = function () {
         if (this._clipPathEnabled) {
             this._updateClipPath();
         }
@@ -896,7 +896,7 @@ var Component = (function (_super) {
      *
      * @returns {Component} The calling Component.
      */
-    Component.prototype.redraw = function () {
+    SVGComponent.prototype.redraw = function () {
         if (this._isAnchored && this._isSetup) {
             if (this._isTopLevelSVG && this.parent() == null) {
                 // only redraw myself if I'm the root
@@ -914,7 +914,7 @@ var Component = (function (_super) {
      * @param {String|d3.Selection} element A selector-string for the <svg>, or a d3 selection containing an <svg>.
      * @returns {Component} The calling Component.
      */
-    Component.prototype.renderTo = function (element) {
+    SVGComponent.prototype.renderTo = function (element) {
         this.detach();
         if (element != null) {
             var selection = void 0;
@@ -941,7 +941,7 @@ var Component = (function (_super) {
         RenderController.flush();
         return this;
     };
-    Component.prototype._addBox = function (className, parentElement) {
+    SVGComponent.prototype._addBox = function (className, parentElement) {
         if (this._element == null) {
             throw new Error("Adding boxes before anchoring is currently disallowed");
         }
@@ -956,14 +956,14 @@ var Component = (function (_super) {
         }
         return box;
     };
-    Component.prototype._generateClipPath = function () {
+    SVGComponent.prototype._generateClipPath = function () {
         // The clip path will prevent content from overflowing its Component space.
         this._clipPathID = Utils.DOM.generateUniqueClipPathId();
         var clipPathParent = this._boxContainer.append("clipPath").attr("id", this._clipPathID);
         this._addBox("clip-rect", clipPathParent);
         this._updateClipPath();
     };
-    Component.prototype._updateClipPath = function () {
+    SVGComponent.prototype._updateClipPath = function () {
         // HACKHACK: IE <= 9 does not respect the HTML base element in SVG.
         // They don't need the current URL in the clip path reference.
         var prefix = /MSIE [5-9]/.test(navigator.userAgent) ? "" : document.location.href;
@@ -975,7 +975,7 @@ var Component = (function (_super) {
      *
      * @param {string} cssClass The CSS class to check for.
      */
-    Component.prototype.hasClass = function (cssClass) {
+    SVGComponent.prototype.hasClass = function (cssClass) {
         if (cssClass == null) {
             return false;
         }
@@ -992,7 +992,7 @@ var Component = (function (_super) {
      * @param {string} cssClass The CSS class to add.
      * @returns {Component} The calling Component.
      */
-    Component.prototype.addClass = function (cssClass) {
+    SVGComponent.prototype.addClass = function (cssClass) {
         if (cssClass == null) {
             return this;
         }
@@ -1010,7 +1010,7 @@ var Component = (function (_super) {
      * @param {string} cssClass The CSS class to remove.
      * @returns {Component} The calling Component.
      */
-    Component.prototype.removeClass = function (cssClass) {
+    SVGComponent.prototype.removeClass = function (cssClass) {
         if (cssClass == null) {
             return this;
         }
@@ -1029,12 +1029,12 @@ var Component = (function (_super) {
      *
      * @returns The calling Component.
      */
-    Component.prototype.detach = function () {
+    SVGComponent.prototype.detach = function () {
         this.parent(null);
         if (this._isAnchored) {
             this._element.remove();
             if (this._isTopLevelSVG) {
-                this._rootSVG.select("." + Component._SAFARI_EVENT_BACKING_CLASS).remove();
+                this._rootSVG.select("." + SVGComponent._SAFARI_EVENT_BACKING_CLASS).remove();
             }
         }
         this._isAnchored = false;
@@ -1047,7 +1047,7 @@ var Component = (function (_super) {
      * @deprecated Use originToRoot instead
      * @return {Point}
      */
-    Component.prototype.originToSVG = function () {
+    SVGComponent.prototype.originToSVG = function () {
         return this.originToRoot();
     };
     /**
@@ -1057,7 +1057,7 @@ var Component = (function (_super) {
      *
      * @return {d3.Selection}
      */
-    Component.prototype.foreground = function () {
+    SVGComponent.prototype.foreground = function () {
         return this._foregroundContainer;
     };
     /**
@@ -1067,19 +1067,19 @@ var Component = (function (_super) {
      *
      * @return {d3.Selection} background selection for the Component
      */
-    Component.prototype.background = function () {
+    SVGComponent.prototype.background = function () {
         return this._backgroundContainer;
     };
-    Component.prototype.content = function () {
+    SVGComponent.prototype.content = function () {
         return this._content;
     };
-    Component.prototype.element = function () {
+    SVGComponent.prototype.element = function () {
         if (this._isTopLevelSVG) {
             return this._rootSVG;
         }
         return this._element;
     };
-    Component.prototype.translator = function () {
+    SVGComponent.prototype.translator = function () {
         return Utils.ClientToSVGTranslator.getTranslator(this);
     };
     /**
@@ -1089,13 +1089,13 @@ var Component = (function (_super) {
      * svg (<svg>) and 2) the root of the rendering tree. If both are true, then this
      * is method will return false.
      */
-    Component.prototype.isNestedTopLevelSVG = function () {
+    SVGComponent.prototype.isNestedTopLevelSVG = function () {
         return this._isTopLevelSVG && this.parent() != null;
     };
-    Component._SAFARI_EVENT_BACKING_CLASS = "safari-event-backing";
-    return Component;
+    SVGComponent._SAFARI_EVENT_BACKING_CLASS = "safari-event-backing";
+    return SVGComponent;
 }(abstractComponent_1.AbstractComponent));
-exports.Component = Component;
+exports.SVGComponent = SVGComponent;
 
 
 /***/ }),
@@ -1936,7 +1936,7 @@ function __export(m) {
 __export(__webpack_require__(76));
 __export(__webpack_require__(77));
 __export(__webpack_require__(78));
-__export(__webpack_require__(33));
+__export(__webpack_require__(34));
 __export(__webpack_require__(79));
 __export(__webpack_require__(80));
 
@@ -2317,7 +2317,7 @@ exports.XYPlot = XYPlot;
  */
 
 var Utils = __webpack_require__(0);
-var RenderPolicies = __webpack_require__(32);
+var RenderPolicies = __webpack_require__(33);
 /**
  * The RenderController is responsible for enqueueing and synchronizing
  * layout and render calls for Components.
@@ -2454,7 +2454,7 @@ function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
 __export(__webpack_require__(38));
-__export(__webpack_require__(22));
+__export(__webpack_require__(23));
 __export(__webpack_require__(39));
 __export(__webpack_require__(81));
 __export(__webpack_require__(40));
@@ -2641,7 +2641,7 @@ var __extends = (this && this.__extends) || function (d, b) {
 };
 var d3 = __webpack_require__(1);
 var SVGTypewriter = __webpack_require__(4);
-var component_1 = __webpack_require__(6);
+var svgComponent_1 = __webpack_require__(6);
 var Formatters = __webpack_require__(8);
 var Utils = __webpack_require__(0);
 var Axis = (function (_super) {
@@ -3255,12 +3255,240 @@ var Axis = (function (_super) {
     Axis.ANNOTATION_LABEL_CLASS = "annotation-label";
     Axis._ANNOTATION_LABEL_PADDING = 4;
     return Axis;
-}(component_1.Component));
+}(svgComponent_1.SVGComponent));
 exports.Axis = Axis;
 
 
 /***/ }),
 /* 20 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var RenderController = __webpack_require__(16);
+var Utils = __webpack_require__(0);
+var AbstractComponent = (function () {
+    function AbstractComponent() {
+        this._destroyed = false;
+        this._isAnchored = false;
+        this._isSetup = false;
+        this._onAnchorCallbacks = new Utils.CallbackSet();
+        this._onDetachCallbacks = new Utils.CallbackSet();
+        this._origin = { x: 0, y: 0 };
+        this._xAlignment = "left";
+        this._yAlignment = "top";
+    }
+    /**
+     * Adds a callback to be called on anchoring the Component to the DOM.
+     * If the Component is already anchored, the callback is called immediately.
+     *
+     * @param {GenericComponentCallback} callback
+     * @return {Component}
+     */
+    AbstractComponent.prototype.onAnchor = function (callback) {
+        if (this._isAnchored) {
+            callback(this);
+        }
+        this._onAnchorCallbacks.add(callback);
+        return this;
+    };
+    /**
+     * Removes a callback that would be called on anchoring the Component to the DOM.
+     * The callback is identified by reference equality.
+     *
+     * @param {GenericComponentCallback} callback
+     * @return {Component}
+     */
+    AbstractComponent.prototype.offAnchor = function (callback) {
+        this._onAnchorCallbacks.delete(callback);
+        return this;
+    };
+    /**
+     * Given available space in pixels, returns the minimum width and height this Component will need.
+     *
+     * @param {number} availableWidth
+     * @param {number} availableHeight
+     * @returns {SpaceRequest}
+     */
+    AbstractComponent.prototype.requestedSpace = function (availableWidth, availableHeight) {
+        return {
+            minWidth: 0,
+            minHeight: 0,
+        };
+    };
+    /**
+     * Queues the Component for rendering.
+     *
+     * @returns {IComponent} The calling Component.
+     */
+    AbstractComponent.prototype.render = function () {
+        if (this._isAnchored && this._isSetup && this.width() >= 0 && this.height() >= 0) {
+            RenderController.registerToRender(this);
+        }
+        return this;
+    };
+    /**
+     * Sets a callback that gets called when the component resizes. The size change
+     * is not guaranteed to be reflected by the DOM at the time the callback is fired.
+     *
+     * @param {IResizeHandler} [resizeHandler] Callback to be called when component resizes
+     */
+    AbstractComponent.prototype.onResize = function (resizeHandler) {
+        this._resizeHandler = resizeHandler;
+        return this;
+    };
+    AbstractComponent.prototype.xAlignment = function (xAlignment) {
+        if (xAlignment == null) {
+            return this._xAlignment;
+        }
+        xAlignment = xAlignment.toLowerCase();
+        if (AbstractComponent._xAlignToProportion[xAlignment] == null) {
+            throw new Error("Unsupported alignment: " + xAlignment);
+        }
+        this._xAlignment = xAlignment;
+        this.redraw();
+        return this;
+    };
+    AbstractComponent.prototype.yAlignment = function (yAlignment) {
+        if (yAlignment == null) {
+            return this._yAlignment;
+        }
+        yAlignment = yAlignment.toLowerCase();
+        if (AbstractComponent._yAlignToProportion[yAlignment] == null) {
+            throw new Error("Unsupported alignment: " + yAlignment);
+        }
+        this._yAlignment = yAlignment;
+        this.redraw();
+        return this;
+    };
+    /**
+     * Checks if the Component has a fixed width or if it grows to fill available space.
+     * Returns false by default on the base Component class.
+     */
+    AbstractComponent.prototype.fixedWidth = function () {
+        return false;
+    };
+    /**
+     * Checks if the Component has a fixed height or if it grows to fill available space.
+     * Returns false by default on the base Component class.
+     */
+    AbstractComponent.prototype.fixedHeight = function () {
+        return false;
+    };
+    /**
+     * Adds a callback to be called when the Component is detach()-ed.
+     *
+     * @param {GenericComponentCallback} callback
+     * @return {IComponent} The calling Component.
+     */
+    AbstractComponent.prototype.onDetach = function (callback) {
+        this._onDetachCallbacks.add(callback);
+        return this;
+    };
+    /**
+     * Removes a callback to be called when the Component is detach()-ed.
+     * The callback is identified by reference equality.
+     *
+     * @param {GenericComponentCallback} callback
+     * @return {IComponent} The calling Component.
+     */
+    AbstractComponent.prototype.offDetach = function (callback) {
+        this._onDetachCallbacks.delete(callback);
+        return this;
+    };
+    AbstractComponent.prototype.parent = function (parent) {
+        if (parent === undefined) {
+            return this._parent;
+        }
+        if (parent !== null && !parent.has(this)) {
+            throw new Error("Passed invalid parent");
+        }
+        this._parent = parent;
+        return this;
+    };
+    /**
+     * @returns {Bounds} for the component in pixel space, where the topLeft
+     * represents the component's minimum x and y values and the bottomRight represents
+     * the component's maximum x and y values.
+     */
+    AbstractComponent.prototype.bounds = function () {
+        var topLeft = this.origin();
+        return {
+            topLeft: topLeft,
+            bottomRight: {
+                x: topLeft.x + this.width(),
+                y: topLeft.y + this.height()
+            },
+        };
+    };
+    /**
+     * Removes a Component from the DOM and disconnects all listeners.
+     */
+    AbstractComponent.prototype.destroy = function () {
+        this._destroyed = true;
+        this.detach();
+    };
+    /**
+     * Gets the width of the Component in pixels.
+     */
+    AbstractComponent.prototype.width = function () {
+        return this._width;
+    };
+    /**
+     * Gets the height of the Component in pixels.
+     */
+    AbstractComponent.prototype.height = function () {
+        return this._height;
+    };
+    /**
+     * Gets the origin of the Component relative to its parent.
+     *
+     * @return {Point}
+     */
+    AbstractComponent.prototype.origin = function () {
+        var _a = this._origin, x = _a.x, y = _a.y;
+        return { x: x, y: y };
+    };
+    /**
+     * Gets the origin of the Component relative to the root
+     *
+     * @return {Point}
+     */
+    AbstractComponent.prototype.originToRoot = function () {
+        var origin = this.origin();
+        var ancestor = this.parent();
+        while (ancestor != null) {
+            var ancestorOrigin = ancestor.origin();
+            origin.x += ancestorOrigin.x;
+            origin.y += ancestorOrigin.y;
+            ancestor = ancestor.parent();
+        }
+        return origin;
+    };
+    AbstractComponent.prototype.root = function () {
+        var parent = this;
+        while (parent.parent() != null) {
+            parent = parent.parent();
+        }
+        return parent;
+    };
+    AbstractComponent._xAlignToProportion = {
+        "left": 0,
+        "center": 0.5,
+        "right": 1,
+    };
+    AbstractComponent._yAlignToProportion = {
+        "top": 0,
+        "center": 0.5,
+        "bottom": 1,
+    };
+    return AbstractComponent;
+}());
+exports.AbstractComponent = AbstractComponent;
+
+
+/***/ }),
+/* 21 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3280,7 +3508,7 @@ exports.ADD_TITLE_ELEMENTS = true;
 
 
 /***/ }),
-/* 21 */
+/* 22 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3355,7 +3583,7 @@ exports.Dispatcher = Dispatcher;
 
 
 /***/ }),
-/* 22 */
+/* 23 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3994,7 +4222,7 @@ exports.Bar = Bar;
 
 
 /***/ }),
-/* 23 */
+/* 24 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -4528,7 +4756,7 @@ exports.Time = Time;
 
 
 /***/ }),
-/* 24 */
+/* 25 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -4538,7 +4766,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var htmlComponent_1 = __webpack_require__(36);
+var htmlComponent_1 = __webpack_require__(26);
 /*
  * ComponentContainer class encapsulates Table and ComponentGroup's shared functionality.
  * It will not do anything if instantiated directly.
@@ -4613,7 +4841,227 @@ exports.ComponentContainer = ComponentContainer;
 
 
 /***/ }),
-/* 25 */
+/* 26 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
+var d3 = __webpack_require__(1);
+var abstractComponent_1 = __webpack_require__(20);
+var RenderController = __webpack_require__(16);
+var Utils = __webpack_require__(0);
+var HTMLComponent = (function (_super) {
+    __extends(HTMLComponent, _super);
+    function HTMLComponent() {
+        _super.apply(this, arguments);
+        this._cssClasses = new Utils.Set();
+    }
+    HTMLComponent.prototype.anchor = function (selection) {
+        if (this._destroyed) {
+            throw new Error("Can't reuse destroy()-ed Components!");
+        }
+        if (this._element != null) {
+            // reattach existing element
+            selection.appendChild(this._element);
+        }
+        else {
+            this._element = document.createElement("div");
+            selection.appendChild(this._element);
+            this._setup();
+        }
+        this._isAnchored = true;
+        this._onAnchorCallbacks.callCallbacks(this);
+        return this;
+    };
+    HTMLComponent.prototype.anchorHTML = function (selection) {
+        return this.anchor(selection);
+    };
+    HTMLComponent.prototype.computeLayout = function (origin, availableWidth, availableHeight) {
+        if (origin == null || availableWidth == null || availableHeight == null) {
+            if (this._element == null) {
+                throw new Error("anchor() must be called before computeLayout()");
+            }
+            else if (this.parent() == null) {
+                // if the parent is null we are the root node. In this case, we determine
+                // then sizing constraints for the remainder of the chart.
+                origin = { x: 0, y: 0 };
+                // this is the top-level element. make it 100% height and width
+                // so we can measure the amount of space available for the chart
+                // with respect to the total space allocated for charting as specified
+                // by the user.
+                this._element.style.width = "100%";
+                this._element.style.height = "100%";
+                availableWidth = Utils.DOM.elementWidth(this._element);
+                availableHeight = Utils.DOM.elementHeight(this._element);
+            }
+            else {
+                throw new Error("null arguments cannot be passed to computeLayout() on a non-root node");
+            }
+        }
+        var size = this._sizeFromOffer(availableWidth, availableHeight);
+        this._width = size.width;
+        this._height = size.height;
+        var xAlignProportion = HTMLComponent._xAlignToProportion[this._xAlignment];
+        var yAlignProportion = HTMLComponent._yAlignToProportion[this._yAlignment];
+        this._origin = {
+            x: origin.x + (availableWidth - this.width()) * xAlignProportion,
+            y: origin.y + (availableHeight - this.height()) * yAlignProportion,
+        };
+        // set the size and position of the root element given the
+        // calculated space constraints
+        d3.select(this._element).style({
+            height: this._height + "px",
+            left: this._origin.x + "px",
+            top: this._origin.y + "px",
+            width: this._width + "px",
+        });
+        if (this._resizeHandler != null) {
+            this._resizeHandler(size);
+        }
+        return this;
+    };
+    HTMLComponent.prototype.renderImmediately = function () {
+        return this;
+    };
+    HTMLComponent.prototype.redraw = function () {
+        if (this._isAnchored && this._isSetup) {
+            if (this.parent() == null) {
+                this._scheduleComputeLayout();
+            }
+            else {
+                this.parent().redraw();
+            }
+        }
+        return this;
+    };
+    HTMLComponent.prototype.renderTo = function (element) {
+        this.detach();
+        if (element == null || !element.nodeName) {
+            throw new Error("Plottable requires a valid HTMLElement to renderTo");
+        }
+        this.anchor(element);
+        if (this._element == null) {
+            throw new Error("If a Component has never been rendered before, then renderTo must be given an HTMLElement to render to");
+        }
+        RenderController.registerToComputeLayoutAndRender(this);
+        // flush so that consumers can immediately attach to stuff we create in the DOM
+        RenderController.flush();
+        return this;
+    };
+    HTMLComponent.prototype.hasClass = function (cssClass) {
+        if (cssClass == null) {
+            return false;
+        }
+        if (this._element == null) {
+            return this._cssClasses.has(cssClass);
+        }
+        else {
+            return this._element.className.split(" ").indexOf(cssClass) !== -1;
+        }
+    };
+    HTMLComponent.prototype.addClass = function (cssClass) {
+        if (cssClass == null) {
+            return this;
+        }
+        if (this._element == null) {
+            this._cssClasses.add(cssClass);
+        }
+        else {
+            var classNames = this._element.className.split(" ");
+            if (classNames.indexOf(cssClass) !== -1) {
+                classNames.push(cssClass);
+                this._element.className = classNames.join(" ");
+            }
+        }
+        return this;
+    };
+    HTMLComponent.prototype.removeClass = function (cssClass) {
+        if (cssClass == null) {
+            return this;
+        }
+        if (this._element == null) {
+            this._cssClasses.delete(cssClass);
+        }
+        else {
+            var classNames = this._element.className.split(" ");
+            var indexOfClass = classNames.indexOf(cssClass);
+            if (indexOfClass > -1) {
+                classNames.splice(indexOfClass, 1);
+                this._element.className = classNames.join(" ");
+            }
+        }
+        return this;
+    };
+    HTMLComponent.prototype.detach = function () {
+        this.parent(null);
+        if (this._isAnchored) {
+            d3.select(this._element).remove();
+        }
+        this._isAnchored = false;
+        this._onDetachCallbacks.callCallbacks(this);
+        return this;
+    };
+    HTMLComponent.prototype.content = function () {
+        return d3.select(this._element);
+    };
+    HTMLComponent.prototype.translator = function () {
+        return Utils.ClientToHTMLTranslator.getTranslator(this);
+    };
+    HTMLComponent.prototype.element = function () {
+        return d3.select(this._element);
+    };
+    /**
+     * Gets the container holding the visual elements of the Component.
+     *
+     * Will return undefined if the Component has not been anchored.
+     *
+     * @return {D} content selection for the Component
+     */
+    HTMLComponent.prototype._setup = function () {
+        if (this._isSetup) {
+            return;
+        }
+        var classListSet = new Utils.Set();
+        this._element.className.split(" ").forEach(function (className) { return classListSet.add(className); });
+        this._cssClasses.forEach(function (className) { return classListSet.add(className); });
+        var classList = [];
+        classListSet.forEach(function (className) { return classList.push(className); });
+        this._element.className = classList.join(" ");
+        if (this.parent() == null) {
+            // the root element gets the plottable class name
+            d3.select(this._element).classed("plottable", true);
+        }
+        else {
+            // non-root components are simple components
+            d3.select(this._element).classed("component", true);
+        }
+        this._cssClasses = new Utils.Set();
+        this._isSetup = true;
+    };
+    HTMLComponent.prototype._sizeFromOffer = function (availableWidth, availableHeight) {
+        var requestedSpace = this.requestedSpace(availableWidth, availableHeight);
+        return {
+            width: this.fixedWidth() ? Math.min(availableWidth, requestedSpace.minWidth) : availableWidth,
+            height: this.fixedHeight() ? Math.min(availableHeight, requestedSpace.minHeight) : availableHeight,
+        };
+    };
+    HTMLComponent.prototype._scheduleComputeLayout = function () {
+        if (this._isAnchored && this._isSetup) {
+            RenderController.registerToComputeLayoutAndRender(this);
+        }
+    };
+    return HTMLComponent;
+}(abstractComponent_1.AbstractComponent));
+exports.HTMLComponent = HTMLComponent;
+
+
+/***/ }),
+/* 27 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -4650,235 +5098,7 @@ exports.triangleDown = triangleDown;
 
 
 /***/ }),
-/* 26 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-var RenderController = __webpack_require__(16);
-var Utils = __webpack_require__(0);
-var AbstractComponent = (function () {
-    function AbstractComponent() {
-        this._destroyed = false;
-        this._isAnchored = false;
-        this._isSetup = false;
-        this._onAnchorCallbacks = new Utils.CallbackSet();
-        this._onDetachCallbacks = new Utils.CallbackSet();
-        this._origin = { x: 0, y: 0 };
-        this._xAlignment = "left";
-        this._yAlignment = "top";
-    }
-    /**
-     * Adds a callback to be called on anchoring the Component to the DOM.
-     * If the Component is already anchored, the callback is called immediately.
-     *
-     * @param {GenericComponentCallback} callback
-     * @return {Component}
-     */
-    AbstractComponent.prototype.onAnchor = function (callback) {
-        if (this._isAnchored) {
-            callback(this);
-        }
-        this._onAnchorCallbacks.add(callback);
-        return this;
-    };
-    /**
-     * Removes a callback that would be called on anchoring the Component to the DOM.
-     * The callback is identified by reference equality.
-     *
-     * @param {GenericComponentCallback} callback
-     * @return {Component}
-     */
-    AbstractComponent.prototype.offAnchor = function (callback) {
-        this._onAnchorCallbacks.delete(callback);
-        return this;
-    };
-    /**
-     * Given available space in pixels, returns the minimum width and height this Component will need.
-     *
-     * @param {number} availableWidth
-     * @param {number} availableHeight
-     * @returns {SpaceRequest}
-     */
-    AbstractComponent.prototype.requestedSpace = function (availableWidth, availableHeight) {
-        return {
-            minWidth: 0,
-            minHeight: 0,
-        };
-    };
-    /**
-     * Queues the Component for rendering.
-     *
-     * @returns {IComponent} The calling Component.
-     */
-    AbstractComponent.prototype.render = function () {
-        if (this._isAnchored && this._isSetup && this.width() >= 0 && this.height() >= 0) {
-            RenderController.registerToRender(this);
-        }
-        return this;
-    };
-    /**
-     * Sets a callback that gets called when the component resizes. The size change
-     * is not guaranteed to be reflected by the DOM at the time the callback is fired.
-     *
-     * @param {IResizeHandler} [resizeHandler] Callback to be called when component resizes
-     */
-    AbstractComponent.prototype.onResize = function (resizeHandler) {
-        this._resizeHandler = resizeHandler;
-        return this;
-    };
-    AbstractComponent.prototype.xAlignment = function (xAlignment) {
-        if (xAlignment == null) {
-            return this._xAlignment;
-        }
-        xAlignment = xAlignment.toLowerCase();
-        if (AbstractComponent._xAlignToProportion[xAlignment] == null) {
-            throw new Error("Unsupported alignment: " + xAlignment);
-        }
-        this._xAlignment = xAlignment;
-        this.redraw();
-        return this;
-    };
-    AbstractComponent.prototype.yAlignment = function (yAlignment) {
-        if (yAlignment == null) {
-            return this._yAlignment;
-        }
-        yAlignment = yAlignment.toLowerCase();
-        if (AbstractComponent._yAlignToProportion[yAlignment] == null) {
-            throw new Error("Unsupported alignment: " + yAlignment);
-        }
-        this._yAlignment = yAlignment;
-        this.redraw();
-        return this;
-    };
-    /**
-     * Checks if the Component has a fixed width or if it grows to fill available space.
-     * Returns false by default on the base Component class.
-     */
-    AbstractComponent.prototype.fixedWidth = function () {
-        return false;
-    };
-    /**
-     * Checks if the Component has a fixed height or if it grows to fill available space.
-     * Returns false by default on the base Component class.
-     */
-    AbstractComponent.prototype.fixedHeight = function () {
-        return false;
-    };
-    /**
-     * Adds a callback to be called when the Component is detach()-ed.
-     *
-     * @param {GenericComponentCallback} callback
-     * @return {IComponent} The calling Component.
-     */
-    AbstractComponent.prototype.onDetach = function (callback) {
-        this._onDetachCallbacks.add(callback);
-        return this;
-    };
-    /**
-     * Removes a callback to be called when the Component is detach()-ed.
-     * The callback is identified by reference equality.
-     *
-     * @param {GenericComponentCallback} callback
-     * @return {IComponent} The calling Component.
-     */
-    AbstractComponent.prototype.offDetach = function (callback) {
-        this._onDetachCallbacks.delete(callback);
-        return this;
-    };
-    AbstractComponent.prototype.parent = function (parent) {
-        if (parent === undefined) {
-            return this._parent;
-        }
-        if (parent !== null && !parent.has(this)) {
-            throw new Error("Passed invalid parent");
-        }
-        this._parent = parent;
-        return this;
-    };
-    /**
-     * @returns {Bounds} for the component in pixel space, where the topLeft
-     * represents the component's minimum x and y values and the bottomRight represents
-     * the component's maximum x and y values.
-     */
-    AbstractComponent.prototype.bounds = function () {
-        var topLeft = this.origin();
-        return {
-            topLeft: topLeft,
-            bottomRight: {
-                x: topLeft.x + this.width(),
-                y: topLeft.y + this.height()
-            },
-        };
-    };
-    /**
-     * Removes a Component from the DOM and disconnects all listeners.
-     */
-    AbstractComponent.prototype.destroy = function () {
-        this._destroyed = true;
-        this.detach();
-    };
-    /**
-     * Gets the width of the Component in pixels.
-     */
-    AbstractComponent.prototype.width = function () {
-        return this._width;
-    };
-    /**
-     * Gets the height of the Component in pixels.
-     */
-    AbstractComponent.prototype.height = function () {
-        return this._height;
-    };
-    /**
-     * Gets the origin of the Component relative to its parent.
-     *
-     * @return {Point}
-     */
-    AbstractComponent.prototype.origin = function () {
-        var _a = this._origin, x = _a.x, y = _a.y;
-        return { x: x, y: y };
-    };
-    /**
-     * Gets the origin of the Component relative to the root
-     *
-     * @return {Point}
-     */
-    AbstractComponent.prototype.originToRoot = function () {
-        var origin = this.origin();
-        var ancestor = this.parent();
-        while (ancestor != null) {
-            var ancestorOrigin = ancestor.origin();
-            origin.x += ancestorOrigin.x;
-            origin.y += ancestorOrigin.y;
-            ancestor = ancestor.parent();
-        }
-        return origin;
-    };
-    AbstractComponent.prototype.root = function () {
-        var parent = this;
-        while (parent.parent() != null) {
-            parent = parent.parent();
-        }
-        return parent;
-    };
-    AbstractComponent._xAlignToProportion = {
-        "left": 0,
-        "center": 0.5,
-        "right": 1,
-    };
-    AbstractComponent._yAlignToProportion = {
-        "top": 0,
-        "center": 0.5,
-        "bottom": 1,
-    };
-    return AbstractComponent;
-}());
-exports.AbstractComponent = AbstractComponent;
-
-
-/***/ }),
-/* 27 */
+/* 28 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -4894,7 +5114,7 @@ var __extends = (this && this.__extends) || function (d, b) {
 };
 var Interactions = __webpack_require__(14);
 var Utils = __webpack_require__(0);
-var _1 = __webpack_require__(31);
+var _1 = __webpack_require__(32);
 var selectionBoxLayer_1 = __webpack_require__(37);
 var DragBoxLayer = (function (_super) {
     __extends(DragBoxLayer, _super);
@@ -5261,7 +5481,7 @@ exports.DragBoxLayer = DragBoxLayer;
 
 
 /***/ }),
-/* 28 */
+/* 29 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -5377,7 +5597,7 @@ exports.within = within;
 
 
 /***/ }),
-/* 29 */
+/* 30 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -5428,7 +5648,7 @@ exports.Translator = Translator;
 
 
 /***/ }),
-/* 30 */
+/* 31 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -5520,7 +5740,7 @@ exports.BaseAnimator = BaseAnimator;
 //# sourceMappingURL=baseAnimator.js.map
 
 /***/ }),
-/* 31 */
+/* 32 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -5532,13 +5752,13 @@ exports.BaseAnimator = BaseAnimator;
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-__export(__webpack_require__(26));
-__export(__webpack_require__(27));
+__export(__webpack_require__(20));
+__export(__webpack_require__(28));
 __export(__webpack_require__(57));
 __export(__webpack_require__(58));
-__export(__webpack_require__(34));
 __export(__webpack_require__(35));
 __export(__webpack_require__(36));
+__export(__webpack_require__(26));
 __export(__webpack_require__(59));
 __export(__webpack_require__(60));
 __export(__webpack_require__(61));
@@ -5561,7 +5781,7 @@ exports.Alignment = Alignment;
 
 
 /***/ }),
-/* 32 */
+/* 33 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -5616,7 +5836,7 @@ exports.Timeout = Timeout;
 
 
 /***/ }),
-/* 33 */
+/* 34 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -5742,7 +5962,7 @@ exports.Key = Key;
 
 
 /***/ }),
-/* 34 */
+/* 35 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -5753,7 +5973,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
 var Utils = __webpack_require__(0);
-var componentContainer_1 = __webpack_require__(24);
+var componentContainer_1 = __webpack_require__(25);
 var Group = (function (_super) {
     __extends(Group, _super);
     /**
@@ -5842,7 +6062,7 @@ exports.Group = Group;
 
 
 /***/ }),
-/* 35 */
+/* 36 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -5857,7 +6077,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
 var Utils = __webpack_require__(0);
-var component_1 = __webpack_require__(6);
+var svgComponent_1 = __webpack_require__(6);
 var PropertyMode;
 (function (PropertyMode) {
     PropertyMode[PropertyMode["VALUE"] = 0] = "VALUE";
@@ -5993,228 +6213,8 @@ var GuideLineLayer = (function (_super) {
     GuideLineLayer.ORIENTATION_VERTICAL = "vertical";
     GuideLineLayer.ORIENTATION_HORIZONTAL = "horizontal";
     return GuideLineLayer;
-}(component_1.Component));
+}(svgComponent_1.SVGComponent));
 exports.GuideLineLayer = GuideLineLayer;
-
-
-/***/ }),
-/* 36 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
-var d3 = __webpack_require__(1);
-var abstractComponent_1 = __webpack_require__(26);
-var RenderController = __webpack_require__(16);
-var Utils = __webpack_require__(0);
-var HTMLComponent = (function (_super) {
-    __extends(HTMLComponent, _super);
-    function HTMLComponent() {
-        _super.apply(this, arguments);
-        this._cssClasses = new Utils.Set();
-    }
-    HTMLComponent.prototype.anchor = function (selection) {
-        if (this._destroyed) {
-            throw new Error("Can't reuse destroy()-ed Components!");
-        }
-        if (this._element != null) {
-            // reattach existing element
-            selection.appendChild(this._element);
-        }
-        else {
-            this._element = document.createElement("div");
-            selection.appendChild(this._element);
-            this._setup();
-        }
-        this._isAnchored = true;
-        this._onAnchorCallbacks.callCallbacks(this);
-        return this;
-    };
-    HTMLComponent.prototype.anchorHTML = function (selection) {
-        return this.anchor(selection);
-    };
-    HTMLComponent.prototype.computeLayout = function (origin, availableWidth, availableHeight) {
-        if (origin == null || availableWidth == null || availableHeight == null) {
-            if (this._element == null) {
-                throw new Error("anchor() must be called before computeLayout()");
-            }
-            else if (this.parent() == null) {
-                // if the parent is null we are the root node. In this case, we determine
-                // then sizing constraints for the remainder of the chart.
-                origin = { x: 0, y: 0 };
-                // this is the top-level element. make it 100% height and width
-                // so we can measure the amount of space available for the chart
-                // with respect to the total space allocated for charting as specified
-                // by the user.
-                this._element.style.width = "100%";
-                this._element.style.height = "100%";
-                availableWidth = Utils.DOM.elementWidth(this._element);
-                availableHeight = Utils.DOM.elementHeight(this._element);
-            }
-            else {
-                throw new Error("null arguments cannot be passed to computeLayout() on a non-root node");
-            }
-        }
-        var size = this._sizeFromOffer(availableWidth, availableHeight);
-        this._width = size.width;
-        this._height = size.height;
-        var xAlignProportion = HTMLComponent._xAlignToProportion[this._xAlignment];
-        var yAlignProportion = HTMLComponent._yAlignToProportion[this._yAlignment];
-        this._origin = {
-            x: origin.x + (availableWidth - this.width()) * xAlignProportion,
-            y: origin.y + (availableHeight - this.height()) * yAlignProportion,
-        };
-        // set the size and position of the root element given the
-        // calculated space constraints
-        d3.select(this._element).style({
-            height: this._height + "px",
-            left: this._origin.x + "px",
-            top: this._origin.y + "px",
-            width: this._width + "px",
-        });
-        if (this._resizeHandler != null) {
-            this._resizeHandler(size);
-        }
-        return this;
-    };
-    HTMLComponent.prototype.renderImmediately = function () {
-        return this;
-    };
-    HTMLComponent.prototype.redraw = function () {
-        if (this._isAnchored && this._isSetup) {
-            if (this.parent() == null) {
-                this._scheduleComputeLayout();
-            }
-            else {
-                this.parent().redraw();
-            }
-        }
-        return this;
-    };
-    HTMLComponent.prototype.renderTo = function (element) {
-        this.detach();
-        if (element == null || !element.nodeName) {
-            throw new Error("Plottable requires a valid HTMLElement to renderTo");
-        }
-        this.anchor(element);
-        if (this._element == null) {
-            throw new Error("If a Component has never been rendered before, then renderTo must be given an HTMLElement to render to");
-        }
-        RenderController.registerToComputeLayoutAndRender(this);
-        // flush so that consumers can immediately attach to stuff we create in the DOM
-        RenderController.flush();
-        return this;
-    };
-    HTMLComponent.prototype.hasClass = function (cssClass) {
-        if (cssClass == null) {
-            return false;
-        }
-        if (this._element == null) {
-            return this._cssClasses.has(cssClass);
-        }
-        else {
-            return this._element.className.split(" ").indexOf(cssClass) !== -1;
-        }
-    };
-    HTMLComponent.prototype.addClass = function (cssClass) {
-        if (cssClass == null) {
-            return this;
-        }
-        if (this._element == null) {
-            this._cssClasses.add(cssClass);
-        }
-        else {
-            var classNames = this._element.className.split(" ");
-            if (classNames.indexOf(cssClass) !== -1) {
-                classNames.push(cssClass);
-                this._element.className = classNames.join(" ");
-            }
-        }
-        return this;
-    };
-    HTMLComponent.prototype.removeClass = function (cssClass) {
-        if (cssClass == null) {
-            return this;
-        }
-        if (this._element == null) {
-            this._cssClasses.delete(cssClass);
-        }
-        else {
-            var classNames = this._element.className.split(" ");
-            var indexOfClass = classNames.indexOf(cssClass);
-            if (indexOfClass > -1) {
-                classNames.splice(indexOfClass, 1);
-                this._element.className = classNames.join(" ");
-            }
-        }
-        return this;
-    };
-    HTMLComponent.prototype.detach = function () {
-        this.parent(null);
-        if (this._isAnchored) {
-            d3.select(this._element).remove();
-        }
-        this._isAnchored = false;
-        this._onDetachCallbacks.callCallbacks(this);
-        return this;
-    };
-    HTMLComponent.prototype.content = function () {
-        return d3.select(this._element);
-    };
-    HTMLComponent.prototype.translator = function () {
-        return Utils.ClientToHTMLTranslator.getTranslator(this);
-    };
-    HTMLComponent.prototype.element = function () {
-        return d3.select(this._element);
-    };
-    /**
-     * Gets the container holding the visual elements of the Component.
-     *
-     * Will return undefined if the Component has not been anchored.
-     *
-     * @return {D} content selection for the Component
-     */
-    HTMLComponent.prototype._setup = function () {
-        if (this._isSetup) {
-            return;
-        }
-        var classListSet = new Utils.Set();
-        this._element.className.split(" ").forEach(function (className) { return classListSet.add(className); });
-        this._cssClasses.forEach(function (className) { return classListSet.add(className); });
-        var classList = [];
-        classListSet.forEach(function (className) { return classList.push(className); });
-        this._element.className = classList.join(" ");
-        if (this.parent() == null) {
-            // the root element gets the plottable class name
-            d3.select(this._element).classed("plottable", true);
-        }
-        else {
-            // non-root components are simple components
-            d3.select(this._element).classed("component", true);
-        }
-        this._cssClasses = new Utils.Set();
-        this._isSetup = true;
-    };
-    HTMLComponent.prototype._sizeFromOffer = function (availableWidth, availableHeight) {
-        var requestedSpace = this.requestedSpace(availableWidth, availableHeight);
-        return {
-            width: this.fixedWidth() ? Math.min(availableWidth, requestedSpace.minWidth) : availableWidth,
-            height: this.fixedHeight() ? Math.min(availableHeight, requestedSpace.minHeight) : availableHeight,
-        };
-    };
-    HTMLComponent.prototype._scheduleComputeLayout = function () {
-        if (this._isAnchored && this._isSetup) {
-            RenderController.registerToComputeLayoutAndRender(this);
-        }
-    };
-    return HTMLComponent;
-}(abstractComponent_1.AbstractComponent));
-exports.HTMLComponent = HTMLComponent;
 
 
 /***/ }),
@@ -6233,7 +6233,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
 var Utils = __webpack_require__(0);
-var component_1 = __webpack_require__(6);
+var svgComponent_1 = __webpack_require__(6);
 (function (PropertyMode) {
     PropertyMode[PropertyMode["VALUE"] = 0] = "VALUE";
     PropertyMode[PropertyMode["PIXEL"] = 1] = "PIXEL";
@@ -6442,7 +6442,7 @@ var SelectionBoxLayer = (function (_super) {
         }
     };
     return SelectionBoxLayer;
-}(component_1.Component));
+}(svgComponent_1.SVGComponent));
 exports.SelectionBoxLayer = SelectionBoxLayer;
 
 
@@ -8071,7 +8071,7 @@ function __export(m) {
 }
 __export(__webpack_require__(55));
 __export(__webpack_require__(56));
-__export(__webpack_require__(23));
+__export(__webpack_require__(24));
 
 
 /***/ }),
@@ -8976,7 +8976,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var guideLineLayer_1 = __webpack_require__(35);
+var guideLineLayer_1 = __webpack_require__(36);
 var Interactions = __webpack_require__(14);
 var Utils = __webpack_require__(0);
 var DragLineLayer = (function (_super) {
@@ -9166,7 +9166,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
 var quantitativeScale_1 = __webpack_require__(10);
-var component_1 = __webpack_require__(6);
+var svgComponent_1 = __webpack_require__(6);
 var Gridlines = (function (_super) {
     __extends(Gridlines, _super);
     /**
@@ -9256,7 +9256,7 @@ var Gridlines = (function (_super) {
         }
     };
     return Gridlines;
-}(component_1.Component));
+}(svgComponent_1.SVGComponent));
 exports.Gridlines = Gridlines;
 
 
@@ -9276,10 +9276,10 @@ var __extends = (this && this.__extends) || function (d, b) {
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
 var SVGTypewriter = __webpack_require__(4);
-var Configs = __webpack_require__(20);
+var Configs = __webpack_require__(21);
 var Formatters = __webpack_require__(8);
 var Utils = __webpack_require__(0);
-var component_1 = __webpack_require__(6);
+var svgComponent_1 = __webpack_require__(6);
 var InterpolatedColorLegend = (function (_super) {
     __extends(InterpolatedColorLegend, _super);
     /**
@@ -9515,7 +9515,7 @@ var InterpolatedColorLegend = (function (_super) {
      */
     InterpolatedColorLegend.LEGEND_LABEL_CLASS = "legend-label";
     return InterpolatedColorLegend;
-}(component_1.Component));
+}(svgComponent_1.SVGComponent));
 exports.InterpolatedColorLegend = InterpolatedColorLegend;
 
 
@@ -9535,7 +9535,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
 var SVGTypewriter = __webpack_require__(4);
-var component_1 = __webpack_require__(6);
+var svgComponent_1 = __webpack_require__(6);
 var Label = (function (_super) {
     __extends(Label, _super);
     /**
@@ -9647,7 +9647,7 @@ var Label = (function (_super) {
         return this;
     };
     return Label;
-}(component_1.Component));
+}(svgComponent_1.SVGComponent));
 exports.Label = Label;
 var TitleLabel = (function (_super) {
     __extends(TitleLabel, _super);
@@ -9698,11 +9698,11 @@ var __extends = (this && this.__extends) || function (d, b) {
 };
 var d3 = __webpack_require__(1);
 var SVGTypewriter = __webpack_require__(4);
-var Configs = __webpack_require__(20);
+var Configs = __webpack_require__(21);
 var Formatters = __webpack_require__(8);
-var SymbolFactories = __webpack_require__(25);
+var SymbolFactories = __webpack_require__(27);
 var Utils = __webpack_require__(0);
-var component_1 = __webpack_require__(6);
+var svgComponent_1 = __webpack_require__(6);
 /**
  * The Legend's row representations. Stores positioning information
  * and column data.
@@ -10177,7 +10177,7 @@ var Legend = (function (_super) {
      */
     Legend.LEGEND_SYMBOL_CLASS = "legend-symbol";
     return Legend;
-}(component_1.Component));
+}(svgComponent_1.SVGComponent));
 exports.Legend = Legend;
 
 
@@ -10198,7 +10198,7 @@ var __extends = (this && this.__extends) || function (d, b) {
 };
 var plot_1 = __webpack_require__(3);
 var Utils = __webpack_require__(0);
-var group_1 = __webpack_require__(34);
+var group_1 = __webpack_require__(35);
 var PlotGroup = (function (_super) {
     __extends(PlotGroup, _super);
     function PlotGroup() {
@@ -10251,7 +10251,7 @@ var __extends = (this && this.__extends) || function (d, b) {
 };
 var d3 = __webpack_require__(1);
 var Utils = __webpack_require__(0);
-var componentContainer_1 = __webpack_require__(24);
+var componentContainer_1 = __webpack_require__(25);
 var Table = (function (_super) {
     __extends(Table, _super);
     /**
@@ -10648,7 +10648,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var dragBoxLayer_1 = __webpack_require__(27);
+var dragBoxLayer_1 = __webpack_require__(28);
 var XDragBoxLayer = (function (_super) {
     __extends(XDragBoxLayer, _super);
     /**
@@ -10714,7 +10714,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var dragBoxLayer_1 = __webpack_require__(27);
+var dragBoxLayer_1 = __webpack_require__(28);
 var YDragBoxLayer = (function (_super) {
     __extends(YDragBoxLayer, _super);
     /**
@@ -10780,7 +10780,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var dispatcher_1 = __webpack_require__(21);
+var dispatcher_1 = __webpack_require__(22);
 var Key = (function (_super) {
     __extends(Key, _super);
     /**
@@ -10876,7 +10876,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var dispatcher_1 = __webpack_require__(21);
+var dispatcher_1 = __webpack_require__(22);
 var Mouse = (function (_super) {
     __extends(Mouse, _super);
     /**
@@ -11075,7 +11075,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var dispatcher_1 = __webpack_require__(21);
+var dispatcher_1 = __webpack_require__(22);
 var Touch = (function (_super) {
     __extends(Touch, _super);
     /**
@@ -12532,7 +12532,7 @@ var __extends = (this && this.__extends) || function (d, b) {
 };
 var Scales = __webpack_require__(2);
 var Utils = __webpack_require__(0);
-var barPlot_1 = __webpack_require__(22);
+var barPlot_1 = __webpack_require__(23);
 var plot_1 = __webpack_require__(3);
 var ClusteredBar = (function (_super) {
     __extends(ClusteredBar, _super);
@@ -13466,7 +13466,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
 var Animators = __webpack_require__(5);
-var SymbolFactories = __webpack_require__(25);
+var SymbolFactories = __webpack_require__(27);
 var Drawers = __webpack_require__(9);
 var Scales = __webpack_require__(2);
 var Utils = __webpack_require__(0);
@@ -14046,7 +14046,7 @@ var __extends = (this && this.__extends) || function (d, b) {
 };
 var SVGTypewriter = __webpack_require__(4);
 var Utils = __webpack_require__(0);
-var barPlot_1 = __webpack_require__(22);
+var barPlot_1 = __webpack_require__(23);
 var StackedBar = (function (_super) {
     __extends(StackedBar, _super);
     /**
@@ -14253,7 +14253,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
 var Utils = __webpack_require__(0);
-var barPlot_1 = __webpack_require__(22);
+var barPlot_1 = __webpack_require__(23);
 var plot_1 = __webpack_require__(3);
 var Waterfall = (function (_super) {
     __extends(Waterfall, _super);
@@ -15114,7 +15114,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
 var d3 = __webpack_require__(1);
-var timeAxis_1 = __webpack_require__(23);
+var timeAxis_1 = __webpack_require__(24);
 var quantitativeScale_1 = __webpack_require__(10);
 var Time = (function (_super) {
     __extends(Time, _super);
@@ -15352,7 +15352,7 @@ exports.CallbackSet = CallbackSet;
 "use strict";
 
 var plottableElement_1 = __webpack_require__(43);
-var translator_1 = __webpack_require__(29);
+var translator_1 = __webpack_require__(30);
 var ClientToHTMLTranslator = (function () {
     function ClientToHTMLTranslator() {
     }
@@ -15394,7 +15394,7 @@ exports.ClientToHTMLTranslator = ClientToHTMLTranslator;
 
 var DOM = __webpack_require__(42);
 var plottableElement_1 = __webpack_require__(43);
-var translator_1 = __webpack_require__(29);
+var translator_1 = __webpack_require__(30);
 var ClientToSVGTranslator = (function () {
     function ClientToSVGTranslator() {
     }
@@ -15516,7 +15516,7 @@ function luminance(color) {
  * @license MIT
  */
 
-var Math = __webpack_require__(28);
+var Math = __webpack_require__(29);
 /**
  * Array-backed implementation of {EntityStore}
  */
@@ -15570,7 +15570,7 @@ exports.EntityArray = EntityArray;
  * @license MIT
  */
 
-var Math = __webpack_require__(28);
+var Math = __webpack_require__(29);
 /**
  * Shim for ES6 map.
  * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map
@@ -15786,7 +15786,7 @@ exports.normalizeKey = normalizeKey;
  * @license MIT
  */
 
-var Configs = __webpack_require__(20);
+var Configs = __webpack_require__(21);
 /**
  * Print a warning message to the console, if it is available.
  *
@@ -15862,7 +15862,7 @@ exports.deprecated = deprecated;
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-__export(__webpack_require__(30));
+__export(__webpack_require__(31));
 __export(__webpack_require__(105));
 __export(__webpack_require__(106));
 //# sourceMappingURL=index.js.map
@@ -15883,7 +15883,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var baseAnimator_1 = __webpack_require__(30);
+var baseAnimator_1 = __webpack_require__(31);
 var OpacityAnimator = (function (_super) {
     __extends(OpacityAnimator, _super);
     function OpacityAnimator() {
@@ -15920,7 +15920,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
 var Utils = __webpack_require__(13);
-var baseAnimator_1 = __webpack_require__(30);
+var baseAnimator_1 = __webpack_require__(31);
 var UnveilAnimator = (function (_super) {
     __extends(UnveilAnimator, _super);
     function UnveilAnimator() {
@@ -16531,17 +16531,17 @@ var Animators = __webpack_require__(5);
 exports.Animators = Animators;
 var Axes = __webpack_require__(50);
 exports.Axes = Axes;
-var Components = __webpack_require__(31);
+var Components = __webpack_require__(32);
 exports.Components = Components;
-var Configs = __webpack_require__(20);
+var Configs = __webpack_require__(21);
 exports.Configs = Configs;
 var Formatters = __webpack_require__(8);
 exports.Formatters = Formatters;
 var RenderController = __webpack_require__(16);
 exports.RenderController = RenderController;
-var RenderPolicies = __webpack_require__(32);
+var RenderPolicies = __webpack_require__(33);
 exports.RenderPolicies = RenderPolicies;
-var SymbolFactories = __webpack_require__(25);
+var SymbolFactories = __webpack_require__(27);
 exports.SymbolFactories = SymbolFactories;
 var Dispatchers = __webpack_require__(11);
 exports.Dispatchers = Dispatchers;
@@ -16556,17 +16556,19 @@ exports.Scales = Scales;
 var Utils = __webpack_require__(0);
 exports.Utils = Utils;
 __export(__webpack_require__(19));
-var timeAxis_1 = __webpack_require__(23);
+var timeAxis_1 = __webpack_require__(24);
 exports.TimeInterval = timeAxis_1.TimeInterval;
+__export(__webpack_require__(20));
 __export(__webpack_require__(6));
-__export(__webpack_require__(24));
+__export(__webpack_require__(26));
+__export(__webpack_require__(25));
 __export(__webpack_require__(51));
 var version_1 = __webpack_require__(52);
 exports.version = version_1.version;
-__export(__webpack_require__(21));
+__export(__webpack_require__(22));
 __export(__webpack_require__(7));
 __export(__webpack_require__(12));
-__export(__webpack_require__(33));
+__export(__webpack_require__(34));
 __export(__webpack_require__(15));
 __export(__webpack_require__(3));
 __export(__webpack_require__(10));

@@ -12,12 +12,12 @@ describe("Interactions", () => {
     const SVG_HEIGHT = 400;
 
     let svg: d3.Selection<void>;
-    let component: Plottable.Component;
+    let component: Plottable.SVGComponent;
     let clickInteraction: Plottable.Interactions.Click;
 
     beforeEach(() => {
       svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
-      component = new Plottable.Component();
+      component = new Plottable.SVGComponent();
       component.renderTo(svg);
 
       clickInteraction = new Plottable.Interactions.Click();

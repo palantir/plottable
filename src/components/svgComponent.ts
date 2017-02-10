@@ -10,14 +10,10 @@ import { Point, SpaceRequest, Bounds } from "../core/interfaces";
 import * as RenderController from "../core/renderController";
 import * as Utils from "../utils";
 
-export type GenericComponentCallback<D> = (component: IComponent<D>) => void;
-
 // HACKHACK replace with GenericComponentCallback in 3.0
-export type ComponentCallback = (component: Component) => void;
+export type ComponentCallback = (component: SVGComponent) => void;
 
-export type IResizeHandler = (size: { height: number, width: number }) => void;
-
-export class Component extends AbstractComponent<d3.Selection<void>> {
+export class SVGComponent extends AbstractComponent<d3.Selection<void>> {
   private _element: d3.Selection<void>;
   protected _boundingBox: d3.Selection<void>;
   private _backgroundContainer: d3.Selection<void>;
@@ -56,9 +52,9 @@ export class Component extends AbstractComponent<d3.Selection<void>> {
       this._rootSVG.style("overflow", "visible");
 
       // HACKHACK: Safari fails to register events on the <svg> itself
-      const safariBacking = this._rootSVG.select(`.${Component._SAFARI_EVENT_BACKING_CLASS}`);
+      const safariBacking = this._rootSVG.select(`.${SVGComponent._SAFARI_EVENT_BACKING_CLASS}`);
       if (safariBacking.empty()) {
-        this._rootSVG.append("rect").classed(Component._SAFARI_EVENT_BACKING_CLASS, true).attr({
+        this._rootSVG.append("rect").classed(SVGComponent._SAFARI_EVENT_BACKING_CLASS, true).attr({
           x: 0,
           y: 0,
           width: "100%",
@@ -165,8 +161,8 @@ export class Component extends AbstractComponent<d3.Selection<void>> {
     this._width = size.width;
     this._height = size.height;
 
-    let xAlignProportion = Component._xAlignToProportion[this._xAlignment];
-    let yAlignProportion = Component._yAlignToProportion[this._yAlignment];
+    let xAlignProportion = SVGComponent._xAlignToProportion[this._xAlignment];
+    let yAlignProportion = SVGComponent._yAlignToProportion[this._yAlignment];
     this._origin = {
       x: origin.x + (availableWidth - this.width()) * xAlignProportion,
       y: origin.y + (availableHeight - this.height()) * yAlignProportion,
@@ -375,7 +371,7 @@ export class Component extends AbstractComponent<d3.Selection<void>> {
     if (this._isAnchored) {
       this._element.remove();
       if (this._isTopLevelSVG) {
-        this._rootSVG.select(`.${Component._SAFARI_EVENT_BACKING_CLASS}`).remove();
+        this._rootSVG.select(`.${SVGComponent._SAFARI_EVENT_BACKING_CLASS}`).remove();
       }
     }
     this._isAnchored = false;
@@ -416,7 +412,7 @@ export class Component extends AbstractComponent<d3.Selection<void>> {
     return this._backgroundContainer;
   }
 
-  public content() {
+  public content(): d3.Selection<void> {
     return this._content;
   }
 

@@ -13,10 +13,10 @@ describe("Dispatchers", () => {
     describe("Basic usage", () => {
       let svg: d3.Selection<void>;
       let svgNode: SVGElement;
-      let component: Plottable.Component;
+      let component: Plottable.IComponent<any>;
 
       beforeEach(() => {
-        component = new Plottable.Component();
+        component = new Plottable.SVGComponent();
         svg = TestMethods.generateSVG();
         sinon.stub(component, "root", () => component);
         sinon.stub(component, "element", () => svg);
@@ -51,7 +51,7 @@ describe("Dispatchers", () => {
         y: targetY,
       };
 
-      let component: Plottable.Component;
+      let component: Plottable.IComponent<any>;
       let svg: d3.Selection<void>;
       let mouseDispatcher: Plottable.Dispatchers.Mouse;
 
@@ -59,7 +59,7 @@ describe("Dispatchers", () => {
         let SVG_WIDTH = 400;
         let SVG_HEIGHT = 400;
 
-        component = new Plottable.Component();
+        component = new Plottable.SVGComponent();
         svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
         // HACKHACK: PhantomJS can't measure SVGs unless they have something in them occupying space
         svg.append("rect").attr("width", SVG_WIDTH).attr("height", SVG_HEIGHT);

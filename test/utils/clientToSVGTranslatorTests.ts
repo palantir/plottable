@@ -10,7 +10,7 @@ import * as TestMethods from "../testMethods";
 describe("ClientToSVGTranslator", () => {
   it("getTranslator() creates only one ClientToSVGTranslator per <svg>", () => {
     let svg = TestMethods.generateSVG();
-    const component = new Plottable.Component();
+    const component = new Plottable.SVGComponent();
     sinon.stub(component, "element", () => svg);
 
     let t1 = Plottable.Utils.ClientToSVGTranslator.getTranslator(component);
@@ -23,7 +23,7 @@ describe("ClientToSVGTranslator", () => {
 
   it("converts points to <svg>-space correctly", () => {
     let svg = TestMethods.generateSVG();
-    const component = new Plottable.Component();
+    const component = new Plottable.SVGComponent();
     sinon.stub(component, "element", () => svg);
 
     let rectOrigin: Plottable.Point = {

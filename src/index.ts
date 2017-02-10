@@ -35,7 +35,9 @@ export * from "./animators/animator";
 export * from "./axes/axis";
 export { TimeInterval } from "./axes/timeAxis";
 
-export * from "./components/component";
+export * from "./components/abstractComponent";
+export * from "./components/svgComponent";
+export * from "./components/htmlComponent";
 export * from "./components/componentContainer";
 export { DragBoxCallback } from "./components/dragBoxLayer";
 export { DragLineCallback } from "./components/dragLineLayer";

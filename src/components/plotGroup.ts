@@ -8,14 +8,14 @@ import * as Plots from "../plots";
 import { Plot } from "../plots/plot";
 import * as Utils from "../utils";
 
-import { Component } from "./component";
+import { IComponent } from "./abstractComponent";
 import { Group } from "./group";
 
 export class PlotGroup extends Group {
   public entityNearest(point: Point): Plots.PlotEntity {
     let closestPlotEntity: Plots.PlotEntity;
     let minDistSquared = Infinity;
-    this.components().forEach((plotComponent: Component) => {
+    this.components().forEach((plotComponent: IComponent<any>) => {
       // we know it's a Plot since .append() throws a runtime error otherwise
       const plot: Plot = <Plot> <any> plotComponent;
       let candidatePlotEntity = plot.entityNearest(point);
@@ -37,7 +37,7 @@ export class PlotGroup extends Group {
    * Adds a Plot to this Plot Group.
    * The added Plot will be rendered above Plots already in the Group.
    */
-  public append(plot: Component): this {
+  public append(plot: IComponent<any>): this {
     if (plot != null && !(plot instanceof Plot)) {
       throw new Error("Plot Group only accepts plots");
     }

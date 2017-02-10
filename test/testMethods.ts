@@ -35,7 +35,7 @@ export function verifySpaceRequest(sr: Plottable.SpaceRequest, expectedMinWidth:
   assert.strictEqual(sr.minHeight, expectedMinHeight, message + " (space request: minHeight)");
 }
 
-export function fixComponentSize(c: Plottable.Component, fixedWidth?: number, fixedHeight?: number): Plottable.Component {
+export function fixComponentSize(c: Plottable.SVGComponent, fixedWidth?: number, fixedHeight?: number): Plottable.SVGComponent {
   c.requestedSpace = function (w, h) {
     return {
       minWidth: fixedWidth == null ? 0 : fixedWidth,
@@ -47,8 +47,8 @@ export function fixComponentSize(c: Plottable.Component, fixedWidth?: number, fi
   return c;
 }
 
-export function makeFixedSizeComponent(fixedWidth?: number, fixedHeight?: number): Plottable.Component {
-  return fixComponentSize(new Plottable.Component(), fixedWidth, fixedHeight);
+export function makeFixedSizeComponent(fixedWidth?: number, fixedHeight?: number): Plottable.SVGComponent {
+  return fixComponentSize(new Plottable.SVGComponent(), fixedWidth, fixedHeight);
 }
 
 export function getTranslate(element: d3.Selection<void>) {
@@ -113,8 +113,8 @@ export function assertLineAttrs(line: d3.Selection<void>,
   assert.closeTo(numAttr(line, "y2"), expectedAttrs.y2, floatingPointError, message + " (y2)");
 }
 
-export function assertEntitiesEqual(actual: Plottable.Entity<Plottable.Component>,
-                                    expected: Plottable.Entity<Plottable.Component>,
+export function assertEntitiesEqual(actual: Plottable.Entity<Plottable.SVGComponent>,
+                                    expected: Plottable.Entity<Plottable.SVGComponent>,
                                     msg: string) {
   assert.deepEqual(actual.datum, expected.datum, msg + " (datum)");
   assertPointsClose(actual.position, expected.position, 0.01, msg);
@@ -365,7 +365,7 @@ function tokenizePathString(pathString: string) {
   return numbers;
 }
 
-export function verifyClipPath(c: Plottable.Component) {
+export function verifyClipPath(c: Plottable.SVGComponent) {
   let clipPathId = (<any>c)._boxContainer[0][0].firstChild.id;
   let expectedPrefix = /MSIE [5-9]/.test(navigator.userAgent) ? "" : document.location.href;
   expectedPrefix = expectedPrefix.replace(/#.*/g, "");

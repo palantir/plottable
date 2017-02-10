@@ -107,7 +107,7 @@ describe("Interactions", () => {
 
         svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
 
-        let component = new Plottable.Component();
+        let component = new Plottable.SVGComponent();
         component.renderTo(svg);
 
         panZoomInteraction = new Plottable.Interactions.PanZoom();
@@ -217,7 +217,7 @@ describe("Interactions", () => {
       let SVG_WIDTH = 400;
       let SVG_HEIGHT = 500;
 
-      let component: Plottable.Component;
+      let component: Plottable.SVGComponent;
       let eventTarget: d3.Selection<void>;
 
       let xScale: Plottable.QuantitativeScale<number>;
@@ -232,7 +232,7 @@ describe("Interactions", () => {
 
         svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
 
-        component = new Plottable.Component();
+        component = new Plottable.SVGComponent();
         component.renderTo(svg);
 
         panZoomInteraction = new Plottable.Interactions.PanZoom();
@@ -332,7 +332,7 @@ describe("Interactions", () => {
         let initialDomain = [0, SVG_WIDTH / 2];
         xScale2.domain(initialDomain).range([0, SVG_WIDTH]);
 
-        let component2 = new Plottable.Component();
+        let component2 = new Plottable.SVGComponent();
 
         let panZoomInteraction2 = new Plottable.Interactions.PanZoom();
         panZoomInteraction2.addXScale(xScale2);
@@ -396,7 +396,7 @@ describe("Interactions", () => {
 
         svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
 
-        let component = new Plottable.Component();
+        let component = new Plottable.SVGComponent();
         component.renderTo(svg);
 
         panZoomInteraction = new Plottable.Interactions.PanZoom();
@@ -503,7 +503,7 @@ describe("Interactions", () => {
 
         svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
 
-        let component = new Plottable.Component();
+        let component = new Plottable.SVGComponent();
         component.renderTo(svg);
 
         panZoomInteraction = new Plottable.Interactions.PanZoom();
@@ -612,7 +612,7 @@ describe("Interactions", () => {
 
         svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
 
-        let component = new Plottable.Component();
+        let component = new Plottable.SVGComponent();
         component.renderTo(svg);
 
         panZoomInteraction = new Plottable.Interactions.PanZoom();
@@ -696,7 +696,7 @@ describe("Interactions", () => {
 
         svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
 
-        let component = new Plottable.Component();
+        let component = new Plottable.SVGComponent();
         component.renderTo(svg);
 
         panZoomInteraction = new Plottable.Interactions.PanZoom();
@@ -784,7 +784,7 @@ describe("Interactions", () => {
 
         svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
 
-        let component = new Plottable.Component();
+        let component = new Plottable.SVGComponent();
         component.renderTo(svg);
 
         panZoomInteraction = new Plottable.Interactions.PanZoom();
@@ -892,7 +892,7 @@ describe("Interactions", () => {
 
         svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
 
-        let component = new Plottable.Component();
+        let component = new Plottable.SVGComponent();
         component.renderTo(svg);
 
         panZoomInteraction = new Plottable.Interactions.PanZoom();

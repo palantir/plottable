@@ -12,11 +12,11 @@ describe("Group", () => {
     it("appends Components with append()", () => {
       let componentGroup = new Plottable.Components.Group();
 
-      let c1 = new Plottable.Component();
+      let c1 = new Plottable.SVGComponent();
       componentGroup.append(c1);
       assert.deepEqual(componentGroup.components(), [c1], "Component 1 was added to the Group");
 
-      let c2 = new Plottable.Component();
+      let c2 = new Plottable.SVGComponent();
       componentGroup.append(c2);
       assert.deepEqual(componentGroup.components(), [c1, c2], "appended Component 2 to the Group");
 
@@ -25,7 +25,7 @@ describe("Group", () => {
 
       let div = TestMethods.generateDIV();
       componentGroup.renderTo(div.node() as HTMLElement);
-      let c3 = new Plottable.Component();
+      let c3 = new Plottable.SVGComponent();
       componentGroup.append(c3);
       assert.deepEqual(componentGroup.components(), [c1, c2, c3], "Components can be append()ed after rendering");
 
@@ -34,7 +34,7 @@ describe("Group", () => {
 
     it("can append() null to a Group without failing", () => {
       let group = new Plottable.Components.Group();
-      let component = new Plottable.Component;
+      let component = new Plottable.SVGComponent;
 
       group.append(component);
 
@@ -46,9 +46,9 @@ describe("Group", () => {
     });
 
     it("removes Components using remove()", () => {
-      let c1 = new Plottable.Component();
-      let c2 = new Plottable.Component();
-      let c3 = new Plottable.Component();
+      let c1 = new Plottable.SVGComponent();
+      let c2 = new Plottable.SVGComponent();
+      let c3 = new Plottable.SVGComponent();
 
       let componentGroup = new Plottable.Components.Group([c1, c2, c3]);
       assert.deepEqual(componentGroup.components(), [c1, c2, c3], "Group initialized correctly");
@@ -67,7 +67,7 @@ describe("Group", () => {
     });
 
     it("checks for Components using has()", () => {
-      let component = new Plottable.Component();
+      let component = new Plottable.SVGComponent();
       let group = new Plottable.Components.Group([component]);
       assert.isTrue(group.has(component), "correctly checks that Component is in the Group");
       group.remove(component);
@@ -79,8 +79,8 @@ describe("Group", () => {
 
   describe("Detaching constituent Components", () => {
     it("takes its constutuent Components with it when detach()ed or anchor()ed", () => {
-      let c1 = new Plottable.Component();
-      let c2 = new Plottable.Component();
+      let c1 = new Plottable.SVGComponent();
+      let c2 = new Plottable.SVGComponent();
       let group = new Plottable.Components.Group([c1, c2]);
 
       let div = TestMethods.generateDIV();
@@ -104,7 +104,7 @@ describe("Group", () => {
     });
 
     it("detach()es Components from their previous location when they are append()ed", () => {
-      let component = new Plottable.Component;
+      let component = new Plottable.SVGComponent;
       let svg = TestMethods.generateSVG();
       component.renderTo(svg);
       let group = new Plottable.Components.Group();
@@ -114,7 +114,7 @@ describe("Group", () => {
     });
 
     it("removes Components if detach() is called on them (before rendering)", () => {
-      let component = new Plottable.Component();
+      let component = new Plottable.SVGComponent();
       let group = new Plottable.Components.Group([component]);
       component.detach();
       assert.lengthOf(group.components(), 0, "Component is no longer in the Group");
@@ -122,8 +122,8 @@ describe("Group", () => {
     });
 
     it("removes Components if detach() is called on them (after rendering)", () => {
-      let c1 = new Plottable.Component();
-      let c2 = new Plottable.Component();
+      let c1 = new Plottable.SVGComponent();
+      let c2 = new Plottable.SVGComponent();
       let group = new Plottable.Components.Group([c1, c2]);
 
       let div = TestMethods.generateDIV();
@@ -146,7 +146,7 @@ describe("Group", () => {
 
       let group1 = new Plottable.Components.Group();
       let group2 = new Plottable.Components.Group();
-      let component = new Plottable.Component();
+      let component = new Plottable.SVGComponent();
 
       group1.append(component);
       group1.renderTo(div.node() as HTMLElement);
@@ -165,8 +165,8 @@ describe("Group", () => {
     });
 
     it("destroy()s its Components when destroy()ed", () => {
-      let c1 = new Plottable.Component();
-      let c2 = new Plottable.Component();
+      let c1 = new Plottable.SVGComponent();
+      let c2 = new Plottable.SVGComponent();
       let group = new Plottable.Components.Group([c1, c2]);
 
       let div = TestMethods.generateDIV();
@@ -206,8 +206,8 @@ describe("Group", () => {
     });
 
     it("requests space correctly when it contains a non-fixed-size Component", () => {
-      let c1 = new Plottable.Component();
-      let c2 = new Plottable.Component();
+      let c1 = new Plottable.SVGComponent();
+      let c2 = new Plottable.SVGComponent();
       let group = new Plottable.Components.Group([c1, c2]);
 
       let groupRequest = group.requestedSpace(SVG_WIDTH, SVG_HEIGHT);
@@ -246,7 +246,7 @@ describe("Group", () => {
       let FIXED_COMPONENT_SIZE = SVG_WIDTH / 4;
       let fixedComponent = new Mocks.FixedSizeComponent(FIXED_COMPONENT_SIZE, FIXED_COMPONENT_SIZE);
       fixedComponent.xAlignment("right").yAlignment("bottom");
-      let unfixedComponent = new Plottable.Component();
+      let unfixedComponent = new Plottable.SVGComponent();
 
       let group = new Plottable.Components.Group([fixedComponent, unfixedComponent]);
       group.renderTo(div.node() as HTMLElement);

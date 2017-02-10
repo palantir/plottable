@@ -1,9 +1,12 @@
-import { GenericComponentCallback, IResizeHandler } from "./component";
 import { ComponentContainer } from "./componentContainer";
 
 import { Point, SpaceRequest, Bounds } from "../core/interfaces";
 import * as RenderController from "../core/renderController";
 import * as Utils from "../utils";
+
+export type GenericComponentCallback<D> = (component: IComponent<D>) => void;
+
+export type IResizeHandler = (size: { height: number, width: number }) => void;
 
 export interface IContent {
   node(): Node;

@@ -8,11 +8,11 @@ import { QuantitativeScale } from "../scales/quantitativeScale";
 import { ScaleCallback } from "../scales/scale";
 import * as Utils from "../utils";
 
-import { Component } from "./component";
+import { SVGComponent } from "./svgComponent";
 
 enum PropertyMode { VALUE, PIXEL }
 
-export class GuideLineLayer<D> extends Component {
+export class GuideLineLayer<D> extends SVGComponent {
   public static ORIENTATION_VERTICAL = "vertical";
   public static ORIENTATION_HORIZONTAL = "horizontal";
 

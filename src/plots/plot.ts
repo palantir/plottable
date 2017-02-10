@@ -7,7 +7,7 @@ import * as d3 from "d3";
 
 import * as Animators from "../animators";
 import { Animator } from "../animators/animator";
-import { Component } from "../components/component";
+import { SVGComponent } from "../components/svgComponent";
 import { Accessor, Point, AttributeToProjector, Bounds } from "../core/interfaces";
 import { Dataset, DatasetCallback } from "../core/dataset";
 import * as Drawers from "../drawers";
@@ -18,7 +18,7 @@ import * as Utils from "../utils";
 
 import * as Plots from "./commons";
 
-export class Plot extends Component {
+export class Plot extends SVGComponent {
   protected static _ANIMATION_MAX_DURATION = 600;
 
   /**
