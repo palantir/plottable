@@ -5,7 +5,10 @@
 
 import * as d3 from "d3";
 
+import { Dataset } from "../core/dataset";
+
 export type Formatter = (d: any) => string;
+export type LabelFormatter = (d: any, datum: any, datasets: Dataset[]) => string;
 
 interface PredicatedFormat {
   specifier: string;
@@ -79,6 +82,14 @@ export function general(maxNumberOfDecimalPlaces = 3) {
  */
 export function identity() {
   return (d: any) => String(d);
+}
+/**
+ * Creates a formatter for generating chart labels.
+ *
+ * @returns { LabelFormatter } A formatter for generating chart labels.
+ */
+export function labelFormatter() {
+     return (d: any, datum: any, datasets: Dataset[]) => String(d);
 }
 
 /**

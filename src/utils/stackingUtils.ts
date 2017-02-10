@@ -16,7 +16,7 @@ export type GenericStackedDatum<D> = {
   axisValue: D;
 }
 
-export type StackExtent<D> = { extent: number, axisValue: D }
+export type StackExtent<D> = { extent: number, axisValue: D, datasets: Dataset[] }
 
 export type StackedDatum = GenericStackedDatum<string>;
 /**
@@ -105,22 +105,34 @@ export function stackedExtents<D>(stackingResult: GenericStackingResult<D>): {
   const maximumExtents = new Utils.Map<string | number, StackExtent<D>>();
   const minimumExtents = new Utils.Map<string | number, StackExtent<D>>();
 
-  stackingResult.forEach((stack) => {
+  stackingResult.forEach((stack, dataset) => {
     stack.forEach((datum, key) => {
       // correctly handle negative bar stacks
       const maximalValue = Utils.Math.max([datum.offset + datum.value, datum.offset], datum.offset);
       const minimalValue = Utils.Math.min([datum.offset + datum.value, datum.offset], datum.offset);
 
       if (!maximumExtents.has(key)) {
-        maximumExtents.set(key, { extent: maximalValue, axisValue: datum.axisValue });
-      } else if (maximumExtents.get(key).extent < maximalValue) {
-        maximumExtents.set(key, { extent: maximalValue, axisValue: datum.axisValue });
+        maximumExtents.set(key, { extent: maximalValue, axisValue: datum.axisValue, datasets: [dataset] });
+      } else {
+        // always update with new dataset, update max if necessary
+        let max = maximumExtents.get(key).extent < maximalValue ? maximalValue : maximumExtents.get(key).extent;
+        maximumExtents.set(key, {
+          extent: max,
+          axisValue: datum.axisValue,
+          datasets: maximumExtents.get(key).datasets.concat(dataset),
+        });
       }
 
       if (!minimumExtents.has(key)) {
-        minimumExtents.set(key, { extent: minimalValue, axisValue: datum.axisValue });
-      } else if (minimumExtents.get(key).extent > (minimalValue)) {
-        minimumExtents.set(key, { extent: minimalValue, axisValue: datum.axisValue });
+        minimumExtents.set(key, { extent: minimalValue, axisValue: datum.axisValue, datasets: [dataset] });
+      } else {
+        // always update with new dataset, update min if necessary
+        let min = minimumExtents.get(key).extent > minimalValue ? minimalValue : minimumExtents.get(key).extent;
+        minimumExtents.set(key, {
+          extent: min,
+          axisValue: datum.axisValue,
+          datasets: minimumExtents.get(key).datasets.concat(dataset),
+        });
       }
     });
   });
