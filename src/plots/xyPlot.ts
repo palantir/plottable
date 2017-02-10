@@ -1,3 +1,8 @@
+/**
+ * Copyright 2014-present Palantir Technologies
+ * @license MIT
+ */
+
 import { Accessor, Point } from "../core/interfaces";
 import { Dataset } from "../core/dataset";
 import * as Scales from "../scales";

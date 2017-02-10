@@ -1,3 +1,8 @@
+/**
+ * Copyright 2014-present Palantir Technologies
+ * @license MIT
+ */
+
 import * as Math from "./mathUtils";
 /**
  * Shim for ES6 map.

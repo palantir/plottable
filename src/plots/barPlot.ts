@@ -1,3 +1,8 @@
+/**
+ * Copyright 2014-present Palantir Technologies
+ * @license MIT
+ */
+
 import * as d3 from "d3";
 import * as SVGTypewriter from "svg-typewriter";
 
@@ -17,6 +22,7 @@ import * as Plots from "./";
 import { PlotEntity } from "./";
 import { Plot } from "./plot";
 import { XYPlot } from "./xyPlot";
+import { LightweightPlotEntity } from "./commons";
 
 type LabelConfig = {
   labelArea: d3.Selection<void>;
@@ -30,9 +36,9 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
   private static _BAR_WIDTH_RATIO = 0.95;
   private static _SINGLE_BAR_DIMENSION_RATIO = 0.4;
   private static _BAR_AREA_CLASS = "bar-area";
-  private static _LABEL_PADDING = 10;
 
   protected static _LABEL_AREA_CLASS = "bar-label-text-area";
+  protected static _LABEL_PADDING = 10;
 
   private _baseline: d3.Selection<void>;
   private _baselineValue: X|Y;
@@ -293,16 +299,16 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
     let tolerance = 0.5;
 
     const chartBounds = this.bounds();
-    let closest: PlotEntity;
-    this.entities().forEach((entity) => {
+    let closest: LightweightPlotEntity;
+    this._getEntityStore().forEach((entity: LightweightPlotEntity) => {
       if (!this._entityVisibleOnPlot(entity, chartBounds)) {
         return;
       }
       let primaryDist = 0;
       let secondaryDist = 0;
-      let plotPt = entity.position;
+      let plotPt = this._pixelPoint(entity.datum, entity.index, entity.dataset);
       // if we're inside a bar, distance in both directions should stay 0
-      let barBBox = Utils.DOM.elementBBox(entity.selection);
+      let barBBox = Utils.DOM.elementBBox(entity.drawer.selectionForIndex(entity.validDatumIndex));
       if (!Utils.DOM.intersectsBBox(queryPoint.x, queryPoint.y, barBBox, tolerance)) {
         let plotPtPrimary = this._isVertical ? plotPt.x : plotPt.y;
         primaryDist = Math.abs(queryPtPrimary - plotPtPrimary);
@@ -328,10 +334,14 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
       }
     });
 
-    return closest;
+    if (closest !== undefined) {
+      return this._lightweightPlotEntityToPlotEntity(closest);
+    } else {
+      return undefined;
+    }
   }
 
-  protected _entityVisibleOnPlot(entity: Plots.PlotEntity, bounds: Bounds) {
+  protected _entityVisibleOnPlot(entity: Plots.PlotEntity | Plots.LightweightPlotEntity, bounds: Bounds) {
     const chartWidth = bounds.bottomRight.x - bounds.topLeft.x;
     const chartHeight = bounds.bottomRight.y - bounds.topLeft.y;
 
@@ -393,9 +403,10 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
 
   private _entitiesIntersecting(xValOrRange: number | Range, yValOrRange: number | Range): PlotEntity[] {
     let intersected: PlotEntity[] = [];
-    this.entities().forEach((entity) => {
-      if (Utils.DOM.intersectsBBox(xValOrRange, yValOrRange, Utils.DOM.elementBBox(entity.selection))) {
-        intersected.push(entity);
+    this._getEntityStore().forEach((entity) => {
+      const selection = entity.drawer.selectionForIndex(entity.validDatumIndex);
+      if (Utils.DOM.intersectsBBox(xValOrRange, yValOrRange, Utils.DOM.elementBBox(selection))) {
+        intersected.push(this._lightweightPlotEntityToPlotEntity(entity));
       }
     });
     return intersected;

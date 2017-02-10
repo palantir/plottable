@@ -1,3 +1,8 @@
+/**
+ * Copyright 2014-present Palantir Technologies
+ * @license MIT
+ */
+
 import * as Array from "./arrayUtils";
 import * as Color from "./colorUtils";
 import * as DOM from "./domUtils";

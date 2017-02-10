@@ -3,12 +3,26 @@
 <head>
     <title>Plottable Quicktests</title>
     <style>
+        html {
+            height: 100%;
+        }
+
         body {
             background-color: #EEEEF0;
             color: #433;
             font-family: sans-serif;
-            padding: 40px 40px;
             margin: 0 0 0 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        #app {
+            box-sizing: border-box;
+            padding: 40px 40px;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
         }
 
         a .test-link {
@@ -33,7 +47,12 @@
             display: inline-block;
             background-color: white;
             border-radius: 5px;
+            flex-grow: 1;
+            height: 100%;
             padding: 20px 20px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
         }
     </style>
     <script src="../../node_modules/jquery/dist/jquery.js" charset="utf-8"></script>

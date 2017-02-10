@@ -1,3 +1,8 @@
+/**
+ * Copyright 2014-present Palantir Technologies
+ * @license MIT
+ */
+
 import { SpaceRequest, Point } from "../core/interfaces";
 import * as Utils from "../utils";
 

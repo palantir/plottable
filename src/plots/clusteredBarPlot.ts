@@ -1,3 +1,8 @@
+/**
+ * Copyright 2014-present Palantir Technologies
+ * @license MIT
+ */
+
 import { Dataset } from "../core/dataset";
 import * as Scales from "../scales";
 import * as Utils from "../utils";

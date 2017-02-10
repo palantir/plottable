@@ -1,3 +1,8 @@
+/**
+ * Copyright 2014-present Palantir Technologies
+ * @license MIT
+ */
+
 import * as Animators from "../animators";
 import { Accessor, Point, Bounds, Range, AttributeToProjector } from "../core/interfaces";
 import { Dataset } from "../core/dataset";
