@@ -55,6 +55,20 @@ export class Category extends Scale<string, number> implements TransformableScal
     this._outerPadding = Category._convertToPlottableOuterPadding(0.5, d3InnerPadding);
   }
 
+  /**
+   * Return a clone of this category scale that holds the same pan/zoom, padding, domain and range, but
+   * without any included values providers.
+   */
+  public cloneWithoutProviders(): Category {
+    const scale = new Category()
+      .domain(this.domain())
+      .range(this.range())
+      .innerPadding(this.innerPadding())
+      .outerPadding(this.outerPadding());
+    scale._d3TransformationScale.domain(this._d3TransformationScale.domain());
+    return scale;
+  }
+
   public extentOfValues(values: string[]) {
     return Utils.Array.uniq(values);
   }
@@ -67,6 +81,22 @@ export class Category extends Scale<string, number> implements TransformableScal
   public domain(values: string[]): this;
   public domain(values?: string[]): any {
     return super.domain(values);
+  }
+
+  /**
+   * Returns domain values that lie inside the given range.
+   * @param range
+   * @returns {string[]}
+   */
+  public invertRange(range: [number, number] = this.range()): string[] {
+    const rangeBand = this._d3Scale.rangeBand();
+    // offset the domain by half the rangeBand such that we consider the
+    // center of the bars
+    const domainStartNormalized = this.invertedTransformation(range[0]) - rangeBand / 2;
+    const domainEndNormalized = this.invertedTransformation(range[1]) - rangeBand / 2;
+    const domainStart = d3.bisect(this._d3Scale.range(), domainStartNormalized);
+    const domainEnd = d3.bisect(this._d3Scale.range(), domainEndNormalized);
+    return this._d3Scale.domain().slice(domainStart, domainEnd);
   }
 
   public range(): [number, number];

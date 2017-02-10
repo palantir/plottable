@@ -291,6 +291,22 @@ describe("Category Axes", () => {
   });
 
   describe("requesting space on left oriented axes", () => {
+    it("requests space only for the ticks it'll actually show", () => {
+      const svg = TestMethods.generateSVG(400, 400);
+      const scale = new Plottable.Scales.Category().domain(["a", "b", "c", "long long long long long long long long long long"]);
+      const axis = new Plottable.Axes.Category(scale, "left");
+      axis.anchor(svg);
+
+      let originalRequestedWidth = axis.requestedSpace(400, 400).minWidth;
+
+      // zoom towards the start of the domain such that the long entry shouldn't be shown
+      scale.zoom(0.5, 0);
+      let newRequestedWidth = axis.requestedSpace(400, 400).minWidth;
+
+      assert.isBelow(newRequestedWidth, originalRequestedWidth, "new wanted width is less than old");
+      axis.destroy();
+      svg.remove();
+    });
 
     it("accounts for margin, innerTickLength, and padding when calculating for width", () => {
       let svg = TestMethods.generateSVG();
