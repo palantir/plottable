@@ -22,7 +22,15 @@ export class Category extends Axis<string> {
    */
   private static _MINIMUM_WIDTH_PER_LABEL_PX = 15;
 
+  /**
+   * The rotation angle of tick label text. Only 0, 90, -90 are supported
+   */
   private _tickLabelAngle = 0;
+
+  /**
+   * The shear angle of the tick label text. Only values -80 <= x <= 80 are supported
+   */
+  private _tickLabelShearAngle = 0;
 
   /**
    * Maximum allowable px width of tick labels.
@@ -171,6 +179,30 @@ export class Category extends Axis<string> {
     return this;
   }
 
+  /**
+   * Gets the tick label shear angle in degrees.
+   */
+  public tickLabelShearAngle(): number;
+  /**
+   * Sets the tick label shear angle in degrees.
+   * Only angles between -80 and 80 are supported.
+   *
+   * @param {number} angle
+   * @returns {Category} The calling Category Axis.
+   */
+  public tickLabelShearAngle(angle: number): this;
+  public tickLabelShearAngle(angle?: number): any {
+    if (angle == null) {
+      return this._tickLabelShearAngle;
+    }
+    if (angle < -80 || angle > 80) {
+      throw new Error("Angle " + angle + " not supported; Must be between [-80, 80]");
+    }
+    this._tickLabelShearAngle = angle;
+    this.redraw();
+    return this;
+  }
+
   public tickLabelMaxWidth(): number;
   public tickLabelMaxWidth(maxWidth: number): this;
   /**
@@ -254,6 +286,7 @@ export class Category extends Axis<string> {
         xAlign: xAlign[self.orientation()],
         yAlign: yAlign[self.orientation()],
         textRotation: self.tickLabelAngle(),
+        textShear: self.tickLabelShearAngle(),
       };
       if (self._tickLabelMaxWidth != null) {
         // for left-oriented axes, we must move the ticks by the amount we've cut off in order to keep the text
@@ -265,6 +298,7 @@ export class Category extends Axis<string> {
         }
         width = Math.min(width, self._tickLabelMaxWidth);
       }
+
       self._writer.write(self.formatter()(d), width, height, writeOptions);
     });
   }
