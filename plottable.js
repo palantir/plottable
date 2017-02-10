@@ -6658,7 +6658,8 @@ var Category = (function (_super) {
         this._outerPadding = Category._convertToPlottableOuterPadding(0.5, d3InnerPadding);
     }
     /**
-     * Return a clone of this category scale without any included values providers.
+     * Return a clone of this category scale that holds the same pan/zoom, padding, domain and range, but
+     * without any included values providers.
      */
     Category.prototype.cloneWithoutProviders = function () {
         var scale = new Category()
@@ -6679,16 +6680,17 @@ var Category = (function (_super) {
         return _super.prototype.domain.call(this, values);
     };
     /**
-     * Returns all domain values that map to range values inside
-     * the given range in order.
+     * Returns domain values that lie inside the given range.
      * @param range
      * @returns {string[]}
      */
     Category.prototype.invertRange = function (range) {
         if (range === void 0) { range = this.range(); }
         var rangeBand = this._d3Scale.rangeBand();
-        var domainStartNormalized = this.invertedTransformation(range[0]) + rangeBand / 2;
-        var domainEndNormalized = this.invertedTransformation(range[1]) + rangeBand / 2;
+        // offset the domain by half the rangeBand such that we consider the
+        // center of the bars
+        var domainStartNormalized = this.invertedTransformation(range[0]) - rangeBand / 2;
+        var domainEndNormalized = this.invertedTransformation(range[1]) - rangeBand / 2;
         var domainStart = d3.bisect(this._d3Scale.range(), domainStartNormalized);
         var domainEnd = d3.bisect(this._d3Scale.range(), domainEndNormalized);
         return this._d3Scale.domain().slice(domainStart, domainEnd);

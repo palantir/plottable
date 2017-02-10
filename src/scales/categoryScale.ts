@@ -51,7 +51,8 @@ export class Category extends Scale<string, number> implements TransformableScal
   }
 
   /**
-   * Return a clone of this category scale without any included values providers.
+   * Return a clone of this category scale that holds the same pan/zoom, padding, domain and range, but
+   * without any included values providers.
    */
   public cloneWithoutProviders(): Category {
     const scale = new Category()
