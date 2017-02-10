@@ -129,43 +129,6 @@ module.exports = __WEBPACK_EXTERNAL_MODULE_1__;
  * @license MIT
  */
 
-function __export(m) {
-    for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
-}
-var TickGenerators = __webpack_require__(89);
-exports.TickGenerators = TickGenerators;
-__export(__webpack_require__(38));
-__export(__webpack_require__(85));
-__export(__webpack_require__(86));
-__export(__webpack_require__(87));
-__export(__webpack_require__(88));
-__export(__webpack_require__(90));
-// ---------------------------------------------------------
-var categoryScale_2 = __webpack_require__(38);
-var quantitativeScale_1 = __webpack_require__(10);
-/**
- * Type guarded function to check if the scale implements the
- * `TransformableScale` interface. Unfortunately, there is no way to do
- * runtime interface typechecking, so we have to explicitly list all classes
- * that implement the interface.
- */
-function isTransformable(scale) {
-    return (scale instanceof quantitativeScale_1.QuantitativeScale ||
-        scale instanceof categoryScale_2.Category);
-}
-exports.isTransformable = isTransformable;
-
-
-/***/ }),
-/* 3 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-/**
- * Copyright 2014-present Palantir Technologies
- * @license MIT
- */
-
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
@@ -654,6 +617,43 @@ var Plot = (function (_super) {
     return Plot;
 }(component_1.Component));
 exports.Plot = Plot;
+
+
+/***/ }),
+/* 3 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/**
+ * Copyright 2014-present Palantir Technologies
+ * @license MIT
+ */
+
+function __export(m) {
+    for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
+}
+var TickGenerators = __webpack_require__(89);
+exports.TickGenerators = TickGenerators;
+__export(__webpack_require__(38));
+__export(__webpack_require__(85));
+__export(__webpack_require__(86));
+__export(__webpack_require__(87));
+__export(__webpack_require__(88));
+__export(__webpack_require__(90));
+// ---------------------------------------------------------
+var categoryScale_2 = __webpack_require__(38);
+var quantitativeScale_1 = __webpack_require__(10);
+/**
+ * Type guarded function to check if the scale implements the
+ * `TransformableScale` interface. Unfortunately, there is no way to do
+ * runtime interface typechecking, so we have to explicitly list all classes
+ * that implement the interface.
+ */
+function isTransformable(scale) {
+    return (scale instanceof quantitativeScale_1.QuantitativeScale ||
+        scale instanceof categoryScale_2.Category);
+}
+exports.isTransformable = isTransformable;
 
 
 /***/ }),
@@ -2108,9 +2108,9 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var Scales = __webpack_require__(2);
+var Scales = __webpack_require__(3);
 var Utils = __webpack_require__(0);
-var plot_1 = __webpack_require__(3);
+var plot_1 = __webpack_require__(2);
 var XYPlot = (function (_super) {
     __extends(XYPlot, _super);
     /**
@@ -3392,11 +3392,11 @@ var SVGTypewriter = __webpack_require__(4);
 var Animators = __webpack_require__(6);
 var Drawers = __webpack_require__(9);
 var Formatters = __webpack_require__(8);
-var Scales = __webpack_require__(2);
+var Scales = __webpack_require__(3);
 var quantitativeScale_1 = __webpack_require__(10);
 var Utils = __webpack_require__(0);
 var Plots = __webpack_require__(16);
-var plot_1 = __webpack_require__(3);
+var plot_1 = __webpack_require__(2);
 var xyPlot_1 = __webpack_require__(15);
 var Bar = (function (_super) {
     __extends(Bar, _super);
@@ -4029,7 +4029,7 @@ var __extends = (this && this.__extends) || function (d, b) {
 var d3 = __webpack_require__(1);
 var SVGTypewriter = __webpack_require__(4);
 var Formatters = __webpack_require__(8);
-var Scales = __webpack_require__(2);
+var Scales = __webpack_require__(3);
 var Utils = __webpack_require__(0);
 var axis_1 = __webpack_require__(18);
 var TimeInterval;
@@ -6122,11 +6122,11 @@ var __extends = (this && this.__extends) || function (d, b) {
 };
 var d3 = __webpack_require__(1);
 var Drawers = __webpack_require__(9);
-var Scales = __webpack_require__(2);
+var Scales = __webpack_require__(3);
 var Utils = __webpack_require__(0);
 var Plots = __webpack_require__(16);
 var linePlot_1 = __webpack_require__(37);
-var plot_1 = __webpack_require__(3);
+var plot_1 = __webpack_require__(2);
 var Area = (function (_super) {
     __extends(Area, _super);
     /**
@@ -6332,11 +6332,11 @@ var __extends = (this && this.__extends) || function (d, b) {
 var d3 = __webpack_require__(1);
 var Animators = __webpack_require__(6);
 var Drawers = __webpack_require__(9);
-var Scales = __webpack_require__(2);
+var Scales = __webpack_require__(3);
 var quantitativeScale_1 = __webpack_require__(10);
 var Utils = __webpack_require__(0);
 var Plots = __webpack_require__(16);
-var plot_1 = __webpack_require__(3);
+var plot_1 = __webpack_require__(2);
 var xyPlot_1 = __webpack_require__(15);
 var Line = (function (_super) {
     __extends(Line, _super);
@@ -6803,6 +6803,19 @@ var Category = (function (_super) {
         this._innerPadding = Category._convertToPlottableInnerPadding(d3InnerPadding);
         this._outerPadding = Category._convertToPlottableOuterPadding(0.5, d3InnerPadding);
     }
+    /**
+     * Return a clone of this category scale that holds the same pan/zoom, padding, domain and range, but
+     * without any included values providers.
+     */
+    Category.prototype.cloneWithoutProviders = function () {
+        var scale = new Category()
+            .domain(this.domain())
+            .range(this.range())
+            .innerPadding(this.innerPadding())
+            .outerPadding(this.outerPadding());
+        scale._d3TransformationScale.domain(this._d3TransformationScale.domain());
+        return scale;
+    };
     Category.prototype.extentOfValues = function (values) {
         return Utils.Array.uniq(values);
     };
@@ -6811,6 +6824,22 @@ var Category = (function (_super) {
     };
     Category.prototype.domain = function (values) {
         return _super.prototype.domain.call(this, values);
+    };
+    /**
+     * Returns domain values that lie inside the given range.
+     * @param range
+     * @returns {string[]}
+     */
+    Category.prototype.invertRange = function (range) {
+        if (range === void 0) { range = this.range(); }
+        var rangeBand = this._d3Scale.rangeBand();
+        // offset the domain by half the rangeBand such that we consider the
+        // center of the bars
+        var domainStartNormalized = this.invertedTransformation(range[0]) - rangeBand / 2;
+        var domainEndNormalized = this.invertedTransformation(range[1]) - rangeBand / 2;
+        var domainStart = d3.bisect(this._d3Scale.range(), domainStartNormalized);
+        var domainEnd = d3.bisect(this._d3Scale.range(), domainEndNormalized);
+        return this._d3Scale.domain().slice(domainStart, domainEnd);
     };
     Category.prototype.range = function (values) {
         return _super.prototype.range.call(this, values);
@@ -7910,7 +7939,6 @@ var __extends = (this && this.__extends) || function (d, b) {
 var d3 = __webpack_require__(1);
 var SVGTypewriter = __webpack_require__(4);
 var axis_1 = __webpack_require__(18);
-var Scales = __webpack_require__(2);
 var Utils = __webpack_require__(0);
 var Category = (function (_super) {
     __extends(Category, _super);
@@ -8016,11 +8044,12 @@ var Category = (function (_super) {
      * @param {Scales.Category} scale - The scale being downsampled. Defaults to this Axis' scale.
      * @return {DownsampleInfo} an object holding the resultant domain and new stepWidth.
      */
-    Category.prototype.getDownsampleInfo = function (scale) {
+    Category.prototype.getDownsampleInfo = function (scale, domain) {
         if (scale === void 0) { scale = this._scale; }
+        if (domain === void 0) { domain = scale.invertRange(); }
         var downsampleRatio = Math.ceil(Category._MINIMUM_WIDTH_PER_LABEL_PX / scale.stepWidth());
         return {
-            domain: scale.domain().filter(function (d, i) { return i % downsampleRatio === 0; }),
+            domain: domain.filter(function (d, i) { return i % downsampleRatio === 0; }),
             stepWidth: downsampleRatio * scale.stepWidth(),
         };
     };
@@ -8136,10 +8165,7 @@ var Category = (function (_super) {
         var _this = this;
         var thisScale = this._scale;
         // set up a test scale to simulate rendering ticks with the given width and height.
-        var scale = new Scales.Category()
-            .domain(thisScale.domain())
-            .innerPadding(thisScale.innerPadding())
-            .outerPadding(thisScale.outerPadding())
+        var scale = thisScale.cloneWithoutProviders()
             .range([0, this.isHorizontal() ? axisWidth : axisHeight]);
         var _a = this.getDownsampleInfo(scale), domain = _a.domain, stepWidth = _a.stepWidth;
         // HACKHACK: https://github.com/palantir/svg-typewriter/issues/25
@@ -8190,7 +8216,7 @@ var Category = (function (_super) {
         var _this = this;
         _super.prototype.renderImmediately.call(this);
         var catScale = this._scale;
-        var _a = this.getDownsampleInfo(), domain = _a.domain, stepWidth = _a.stepWidth;
+        var _a = this.getDownsampleInfo(catScale), domain = _a.domain, stepWidth = _a.stepWidth;
         var tickLabels = this._tickLabelContainer.selectAll("." + axis_1.Axis.TICK_LABEL_CLASS).data(domain, function (d) { return d; });
         // Give each tick a stepWidth of space which will partition the entire axis evenly
         var availableTextSpace = stepWidth;
@@ -8217,7 +8243,6 @@ var Category = (function (_super) {
         // hide ticks and labels that overflow the axis
         this._showAllTickMarks();
         this._showAllTickLabels();
-        this._hideOverflowingTickLabels();
         this._hideTickMarksWithoutLabel();
         return this;
     };
@@ -9782,7 +9807,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var plot_1 = __webpack_require__(3);
+var plot_1 = __webpack_require__(2);
 var Utils = __webpack_require__(0);
 var group_1 = __webpack_require__(32);
 var PlotGroup = (function (_super) {
@@ -11435,7 +11460,7 @@ var __extends = (this && this.__extends) || function (d, b) {
 };
 var d3 = __webpack_require__(1);
 var Dispatchers = __webpack_require__(11);
-var Scales = __webpack_require__(2);
+var Scales = __webpack_require__(3);
 var Utils = __webpack_require__(0);
 var interaction_1 = __webpack_require__(12);
 var Interactions = __webpack_require__(14);
@@ -12122,10 +12147,10 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var Scales = __webpack_require__(2);
+var Scales = __webpack_require__(3);
 var Utils = __webpack_require__(0);
 var barPlot_1 = __webpack_require__(21);
-var plot_1 = __webpack_require__(3);
+var plot_1 = __webpack_require__(2);
 var ClusteredBar = (function (_super) {
     __extends(ClusteredBar, _super);
     /**
@@ -12200,9 +12225,9 @@ var SVGTypewriter = __webpack_require__(4);
 var Animators = __webpack_require__(6);
 var Drawers = __webpack_require__(9);
 var Formatters = __webpack_require__(8);
-var Scales = __webpack_require__(2);
+var Scales = __webpack_require__(3);
 var Utils = __webpack_require__(0);
-var plot_1 = __webpack_require__(3);
+var plot_1 = __webpack_require__(2);
 var Pie = (function (_super) {
     __extends(Pie, _super);
     /**
@@ -12695,9 +12720,9 @@ var d3 = __webpack_require__(1);
 var SVGTypewriter = __webpack_require__(4);
 var Animators = __webpack_require__(6);
 var Drawers = __webpack_require__(9);
-var Scales = __webpack_require__(2);
+var Scales = __webpack_require__(3);
 var Utils = __webpack_require__(0);
-var plot_1 = __webpack_require__(3);
+var plot_1 = __webpack_require__(2);
 var xyPlot_1 = __webpack_require__(15);
 var Rectangle = (function (_super) {
     __extends(Rectangle, _super);
@@ -13060,10 +13085,10 @@ var __extends = (this && this.__extends) || function (d, b) {
 var Animators = __webpack_require__(6);
 var SymbolFactories = __webpack_require__(25);
 var Drawers = __webpack_require__(9);
-var Scales = __webpack_require__(2);
+var Scales = __webpack_require__(3);
 var Utils = __webpack_require__(0);
 var Plots = __webpack_require__(16);
-var plot_1 = __webpack_require__(3);
+var plot_1 = __webpack_require__(2);
 var xyPlot_1 = __webpack_require__(15);
 var Scatter = (function (_super) {
     __extends(Scatter, _super);
@@ -13237,8 +13262,8 @@ var __extends = (this && this.__extends) || function (d, b) {
 };
 var Animators = __webpack_require__(6);
 var Drawers = __webpack_require__(9);
-var Scales = __webpack_require__(2);
-var plot_1 = __webpack_require__(3);
+var Scales = __webpack_require__(3);
+var plot_1 = __webpack_require__(2);
 var xyPlot_1 = __webpack_require__(15);
 var Segment = (function (_super) {
     __extends(Segment, _super);
@@ -13437,7 +13462,7 @@ var d3 = __webpack_require__(1);
 var Animators = __webpack_require__(6);
 var Utils = __webpack_require__(0);
 var areaPlot_1 = __webpack_require__(35);
-var plot_1 = __webpack_require__(3);
+var plot_1 = __webpack_require__(2);
 var StackedArea = (function (_super) {
     __extends(StackedArea, _super);
     /**
@@ -13853,7 +13878,7 @@ var __extends = (this && this.__extends) || function (d, b) {
 };
 var Utils = __webpack_require__(0);
 var barPlot_1 = __webpack_require__(21);
-var plot_1 = __webpack_require__(3);
+var plot_1 = __webpack_require__(2);
 var Waterfall = (function (_super) {
     __extends(Waterfall, _super);
     function Waterfall() {
@@ -14440,7 +14465,7 @@ var __extends = (this && this.__extends) || function (d, b) {
 };
 var d3 = __webpack_require__(1);
 var Utils = __webpack_require__(0);
-var Scales = __webpack_require__(2);
+var Scales = __webpack_require__(3);
 var quantitativeScale_1 = __webpack_require__(10);
 var ModifiedLog = (function (_super) {
     __extends(ModifiedLog, _super);
@@ -16150,7 +16175,7 @@ var Interactions = __webpack_require__(14);
 exports.Interactions = Interactions;
 var Plots = __webpack_require__(16);
 exports.Plots = Plots;
-var Scales = __webpack_require__(2);
+var Scales = __webpack_require__(3);
 exports.Scales = Scales;
 var Utils = __webpack_require__(0);
 exports.Utils = Utils;
@@ -16167,7 +16192,7 @@ __export(__webpack_require__(7));
 __export(__webpack_require__(12));
 __export(__webpack_require__(31));
 __export(__webpack_require__(15));
-__export(__webpack_require__(3));
+__export(__webpack_require__(2));
 __export(__webpack_require__(10));
 __export(__webpack_require__(17));
 

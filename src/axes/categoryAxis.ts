@@ -139,10 +139,10 @@ export class Category extends Axis<string> {
    * @param {Scales.Category} scale - The scale being downsampled. Defaults to this Axis' scale.
    * @return {DownsampleInfo} an object holding the resultant domain and new stepWidth.
    */
-  public getDownsampleInfo(scale: Scales.Category = <Scales.Category> this._scale): DownsampleInfo {
+  public getDownsampleInfo(scale: Scales.Category = <Scales.Category> this._scale, domain = scale.invertRange()): DownsampleInfo {
     const downsampleRatio = Math.ceil(Category._MINIMUM_WIDTH_PER_LABEL_PX / scale.stepWidth());
     return {
-      domain: scale.domain().filter((d, i) => i % downsampleRatio === 0),
+      domain: domain.filter((d, i) => i % downsampleRatio === 0),
       stepWidth: downsampleRatio * scale.stepWidth(),
     };
   }
@@ -281,10 +281,7 @@ export class Category extends Axis<string> {
     const thisScale = <Scales.Category> this._scale;
 
     // set up a test scale to simulate rendering ticks with the given width and height.
-    const scale = new Scales.Category()
-      .domain(thisScale.domain())
-      .innerPadding(thisScale.innerPadding())
-      .outerPadding(thisScale.outerPadding())
+    const scale = thisScale.cloneWithoutProviders()
       .range([0, this.isHorizontal() ? axisWidth : axisHeight]);
 
     const { domain, stepWidth } = this.getDownsampleInfo(scale);
@@ -345,7 +342,7 @@ export class Category extends Axis<string> {
   public renderImmediately() {
     super.renderImmediately();
     let catScale = <Scales.Category> this._scale;
-    const { domain, stepWidth } = this.getDownsampleInfo();
+    const { domain, stepWidth } = this.getDownsampleInfo(catScale);
     let tickLabels = this._tickLabelContainer.selectAll("." + Axis.TICK_LABEL_CLASS).data(domain, (d) => d);
     // Give each tick a stepWidth of space which will partition the entire axis evenly
     let availableTextSpace = stepWidth;
@@ -375,7 +372,6 @@ export class Category extends Axis<string> {
     // hide ticks and labels that overflow the axis
     this._showAllTickMarks();
     this._showAllTickLabels();
-    this._hideOverflowingTickLabels();
     this._hideTickMarksWithoutLabel();
     return this;
   }
