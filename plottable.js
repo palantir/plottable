@@ -7526,9 +7526,7 @@ var Wrapper = (function () {
         var wrappedText = Utils.StringMethods.trimEnd(state.currentLine);
         state.wrapping.noLines += +(wrappedText !== "");
         if (state.wrapping.noLines === state.availableLines && this._textTrimming !== "none" && hasNextLine) {
-            var ellipsisResult = this.addEllipsis(wrappedText, state.availableWidth, measurer);
-            state.wrapping.wrappedText += ellipsisResult.wrappedToken;
-            state.wrapping.truncatedText += ellipsisResult.remainingToken;
+            // Note: no need to add more ellipses, they were added in `wrapNextToken`
             state.canFitText = false;
         }
         else {
@@ -7954,7 +7952,14 @@ var Category = (function (_super) {
     function Category(scale, orientation) {
         if (orientation === void 0) { orientation = "bottom"; }
         _super.call(this, scale, orientation);
+        /**
+         * The rotation angle of tick label text. Only 0, 90, -90 are supported
+         */
         this._tickLabelAngle = 0;
+        /**
+         * The shear angle of the tick label text. Only values -80 <= x <= 80 are supported
+         */
+        this._tickLabelShearAngle = 0;
         this.addClass("category-axis");
     }
     Object.defineProperty(Category.prototype, "_wrapper", {
@@ -8064,6 +8069,17 @@ var Category = (function (_super) {
         this.redraw();
         return this;
     };
+    Category.prototype.tickLabelShearAngle = function (angle) {
+        if (angle == null) {
+            return this._tickLabelShearAngle;
+        }
+        if (angle < -80 || angle > 80) {
+            throw new Error("Angle " + angle + " not supported; Must be between [-80, 80]");
+        }
+        this._tickLabelShearAngle = angle;
+        this.redraw();
+        return this;
+    };
     /**
      * Set or get the tick label's max width on this axis. When set, tick labels will be truncated with ellipsis to be
      * at most `tickLabelMaxWidth()` pixels wide. This ensures the axis doesn't grow to an undesirable width.
@@ -8139,6 +8155,7 @@ var Category = (function (_super) {
                 xAlign: xAlign[self.orientation()],
                 yAlign: yAlign[self.orientation()],
                 textRotation: self.tickLabelAngle(),
+                textShear: self.tickLabelShearAngle(),
             };
             if (self._tickLabelMaxWidth != null) {
                 // for left-oriented axes, we must move the ticks by the amount we've cut off in order to keep the text
@@ -16045,66 +16062,98 @@ var Writer = (function () {
     };
     Writer.prototype.write = function (text, width, height, options) {
         if (Writer.SupportedRotation.indexOf(options.textRotation) === -1) {
-            throw new Error("unsupported rotation - " + options.textRotation);
+            throw new Error("unsupported rotation - " + options.textRotation +
+                ". Supported rotations are " + Writer.SupportedRotation.join(", "));
+        }
+        if (options.textShear != null && options.textShear < -80 || options.textShear > 80) {
+            throw new Error("unsupported shear angle - " + options.textShear + ". Must be between -80 and 80");
         }
         var orientHorizontally = Math.abs(Math.abs(options.textRotation) - 90) > 45;
         var primaryDimension = orientHorizontally ? width : height;
         var secondaryDimension = orientHorizontally ? height : width;
+        // compute shear parameters
+        var shearDegrees = (options.textShear || 0);
+        var shearRadians = shearDegrees * Math.PI / 180;
+        var lineHeight = this._measurer.measure().height;
+        var shearShift = lineHeight * Math.tan(shearRadians);
+        // When we apply text shear, the primary axis grows and the secondary axis
+        // shrinks, due to trigonometry. The text shear feature uses the normal
+        // wrapping logic with a subsituted bounding box of the corrected size
+        // (computed below). When rendering the wrapped lines, we rotate the text
+        // container by the text rotation angle AND the shear angle then carefully
+        // offset each one so that they are still aligned to the primary alignment
+        // option.
+        var shearCorrectedPrimaryDimension = primaryDimension / Math.cos(shearRadians) - Math.abs(shearShift);
+        var shearCorrectedSecondaryDimension = secondaryDimension * Math.cos(shearRadians);
+        // normalize and wrap text
+        var normalizedText = Utils.StringMethods.combineWhitespace(text);
+        var wrappedText = this._wrapper ?
+            this._wrapper.wrap(normalizedText, this._measurer, shearCorrectedPrimaryDimension, shearCorrectedSecondaryDimension).wrappedText : normalizedText;
+        var lines = wrappedText.split("\n");
+        // prepare svg components
         var textContainer = options.selection.append("g").classed("text-container", true);
         if (this._addTitleElement) {
             textContainer.append("title").text(text);
         }
-        var normalizedText = Utils.StringMethods.combineWhitespace(text);
         var textArea = textContainer.append("g").classed("text-area", true);
-        var wrappedText = this._wrapper ?
-            this._wrapper.wrap(normalizedText, this._measurer, primaryDimension, secondaryDimension).wrappedText : normalizedText;
-        this.writeText(wrappedText, textArea, primaryDimension, secondaryDimension, options.xAlign, options.yAlign);
+        this.writeLines(lines, textArea, shearCorrectedPrimaryDimension, shearShift, options.xAlign);
+        // correct the intial x/y offset of the text container accounting shear and alignment
+        var shearCorrectedXOffset = Writer.XOffsetFactor[options.xAlign] *
+            shearCorrectedPrimaryDimension * Math.sin(shearRadians);
+        var shearCorrectedYOffset = Writer.YOffsetFactor[options.yAlign] *
+            (shearCorrectedSecondaryDimension - (lines.length) * lineHeight);
+        var shearCorrection = shearCorrectedXOffset - shearCorrectedYOffset;
+        // build and apply transform
         var xForm = d3.transform("");
-        var xForm2 = d3.transform("");
-        xForm.rotate = options.textRotation;
+        xForm.rotate = options.textRotation + shearDegrees;
         switch (options.textRotation) {
             case 90:
-                xForm.translate = [width, 0];
-                xForm2.rotate = -90;
-                xForm2.translate = [0, 200];
+                xForm.translate = [width + shearCorrection, 0];
                 break;
             case -90:
-                xForm.translate = [0, height];
-                xForm2.rotate = 90;
-                xForm2.translate = [width, 0];
+                xForm.translate = [-shearCorrection, height];
                 break;
             case 180:
-                xForm.translate = [width, height];
-                xForm2.translate = [width, height];
-                xForm2.rotate = 180;
+                xForm.translate = [width, height + shearCorrection];
                 break;
             default:
+                xForm.translate = [0, -shearCorrection];
                 break;
         }
         textArea.attr("transform", xForm.toString());
-        this.addClipPath(textContainer, xForm2);
+        // // DEBUG
+        // textArea.append("rect").attr({
+        //   x: Math.max(0, shearShift),
+        //   y: 0,
+        //   width: shearCorrectedPrimaryDimension,
+        //   height: shearCorrectedSecondaryDimension,
+        //   fill: "none",
+        //   stroke: "blue"
+        // });
+        // TODO This has never taken into account the transform at all, so it's
+        // certainly in the wrong place. Why do we need it?
+        this.addClipPath(textContainer);
         if (options.animator) {
             options.animator.animate(textContainer);
         }
     };
-    Writer.prototype.writeLine = function (line, g, width, xAlign, yOffset) {
+    Writer.prototype.writeLine = function (line, g, width, xAlign, xOffset, yOffset) {
         var textEl = g.append("text");
         textEl.text(line);
-        var xOffset = width * Writer.XOffsetFactor[xAlign];
+        xOffset += width * Writer.XOffsetFactor[xAlign];
         var anchor = Writer.AnchorConverter[xAlign];
         textEl.attr("text-anchor", anchor).classed("text-line", true);
         Utils.DOM.transform(textEl, xOffset, yOffset).attr("y", "-0.25em");
     };
-    Writer.prototype.writeText = function (text, writingArea, width, height, xAlign, yAlign) {
+    Writer.prototype.writeLines = function (lines, writingArea, width, shearShift, xAlign) {
         var _this = this;
-        var lines = text.split("\n");
         var lineHeight = this._measurer.measure().height;
-        var yOffset = Writer.YOffsetFactor[yAlign] * (height - lines.length * lineHeight);
         lines.forEach(function (line, i) {
-            _this.writeLine(line, writingArea, width, xAlign, (i + 1) * lineHeight + yOffset);
+            var xOffset = (shearShift > 0) ? (i + 1) * shearShift : (i) * shearShift;
+            _this.writeLine(line, writingArea, width, xAlign, xOffset, (i + 1) * lineHeight);
         });
     };
-    Writer.prototype.addClipPath = function (selection, _transform) {
+    Writer.prototype.addClipPath = function (selection) {
         var elementID = this._elementID++;
         var prefix = /MSIE [5-9]/.test(navigator.userAgent) ? "" : document.location.href;
         prefix = prefix.split("#")[0]; // To fix cases where an anchor tag was used
