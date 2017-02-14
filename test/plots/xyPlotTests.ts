@@ -9,7 +9,7 @@ import * as TestMethods from "../testMethods";
 describe("Plots", () => {
   describe("XY Plot", () => {
     describe("autoranging on the x and y scales", () => {
-      let svg: d3.Selection<void>;
+      let svg: SimpleSelection<void>;
       let xScale: Plottable.Scales.Linear;
       let yScale: Plottable.Scales.Linear;
       let plot: Plottable.XYPlot<number, number>;
@@ -184,7 +184,7 @@ describe("Plots", () => {
     });
 
     describe("computing the layout", () => {
-      let svg: d3.Selection<void>;
+      let svg: SimpleSelection<void>;
 
       beforeEach(() => {
         svg = TestMethods.generateSVG();

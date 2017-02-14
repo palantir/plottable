@@ -89,11 +89,11 @@ describe("Interactions", () => {
     });
 
     describe("Panning", () => {
-      let svg: d3.Selection<void>;
+      let svg: SimpleSelection<void>;
       let SVG_WIDTH = 400;
       let SVG_HEIGHT = 500;
 
-      let eventTarget: d3.Selection<void>;
+      let eventTarget: SimpleSelection<void>;
 
       let xScale: Plottable.QuantitativeScale<number>;
       let yScale: Plottable.QuantitativeScale<number>;
@@ -213,12 +213,12 @@ describe("Interactions", () => {
     });
 
     describe("Zooming", () => {
-      let svg: d3.Selection<void>;
+      let svg: SimpleSelection<void>;
       let SVG_WIDTH = 400;
       let SVG_HEIGHT = 500;
 
       let component: Plottable.Component;
-      let eventTarget: d3.Selection<void>;
+      let eventTarget: SimpleSelection<void>;
 
       let xScale: Plottable.QuantitativeScale<number>;
       let yScale: Plottable.QuantitativeScale<number>;
@@ -370,11 +370,11 @@ describe("Interactions", () => {
     });
 
     describe("Setting minDomainExtent", () => {
-      let svg: d3.Selection<void>;
+      let svg: SimpleSelection<void>;
       let SVG_WIDTH = 400;
       let SVG_HEIGHT = 500;
 
-      let eventTarget: d3.Selection<void>;
+      let eventTarget: SimpleSelection<void>;
 
       let xScale: Plottable.QuantitativeScale<number>;
       let panZoomInteraction: Plottable.Interactions.PanZoom;
@@ -477,11 +477,11 @@ describe("Interactions", () => {
     });
 
     describe("Setting maxDomainExtent", () => {
-      let svg: d3.Selection<void>;
+      let svg: SimpleSelection<void>;
       let SVG_WIDTH = 400;
       let SVG_HEIGHT = 500;
 
-      let eventTarget: d3.Selection<void>;
+      let eventTarget: SimpleSelection<void>;
 
       let xScale: Plottable.QuantitativeScale<number>;
       let panZoomInteraction: Plottable.Interactions.PanZoom;
@@ -588,10 +588,10 @@ describe("Interactions", () => {
     });
 
     describe("Setting minDomainValue", () => {
-      let svg: d3.Selection<void>;
+      let svg: SimpleSelection<void>;
       let SVG_WIDTH = 400;
       let SVG_HEIGHT = 500;
-      let eventTarget: d3.Selection<void>;
+      let eventTarget: SimpleSelection<void>;
       let xScale: Plottable.QuantitativeScale<number>;
       let panZoomInteraction: Plottable.Interactions.PanZoom;
 
@@ -672,10 +672,10 @@ describe("Interactions", () => {
     });
 
     describe("Setting maxDomainValue", () => {
-      let svg: d3.Selection<void>;
+      let svg: SimpleSelection<void>;
       let SVG_WIDTH = 400;
       let SVG_HEIGHT = 500;
-      let eventTarget: d3.Selection<void>;
+      let eventTarget: SimpleSelection<void>;
       let xScale: Plottable.QuantitativeScale<number>;
       let panZoomInteraction: Plottable.Interactions.PanZoom;
 
@@ -760,10 +760,10 @@ describe("Interactions", () => {
     });
 
     describe("Setting both minDomainValue and maxDomainValue", () => {
-      let svg: d3.Selection<void>;
+      let svg: SimpleSelection<void>;
       let SVG_WIDTH = 400;
       let SVG_HEIGHT = 500;
-      let eventTarget: d3.Selection<void>;
+      let eventTarget: SimpleSelection<void>;
       let xScale: Plottable.QuantitativeScale<number>;
       let panZoomInteraction: Plottable.Interactions.PanZoom;
 
@@ -849,11 +849,11 @@ describe("Interactions", () => {
     });
 
     describe("Registering and deregistering Pan and Zoom event callbacks", () => {
-      let svg: d3.Selection<void>;
+      let svg: SimpleSelection<void>;
       let SVG_WIDTH = 400;
       let SVG_HEIGHT = 500;
 
-      let eventTarget: d3.Selection<void>;
+      let eventTarget: SimpleSelection<void>;
 
       let xScale: Plottable.QuantitativeScale<number>;
       let panZoomInteraction: Plottable.Interactions.PanZoom;

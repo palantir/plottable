@@ -37,8 +37,8 @@ describe("Interactions", () => {
       describe(`on${event}`, () => {
         const ACTION = event === "KeyPress" ? "pressed" : "released";
 
-        let svg: d3.Selection<void>;
-        let eventTarget: d3.Selection<void>;
+        let svg: SimpleSelection<void>;
+        let eventTarget: SimpleSelection<void>;
         let keyInteraction: Plottable.Interactions.Key;
         let callback: KeyTestCallback;
 
@@ -57,7 +57,7 @@ describe("Interactions", () => {
           }
         });
 
-        function triggerKeyEvent(mouseEvent: string, p: Plottable.Point, target: d3.Selection<void>, keycode: number) {
+        function triggerKeyEvent(mouseEvent: string, p: Plottable.Point, target: SimpleSelection<void>, keycode: number) {
           TestMethods.triggerFakeMouseEvent(mouseEvent, target, p.x, p.y);
           TestMethods.triggerFakeKeyboardEvent("keydown", target, keycode);
           if (event === "KeyRelease") {
@@ -153,8 +153,8 @@ describe("Interactions", () => {
     });
 
     describe("onKeyPress respects mouse position", () => {
-      let svg: d3.Selection<void>;
-      let eventTarget: d3.Selection<void>;
+      let svg: SimpleSelection<void>;
+      let eventTarget: SimpleSelection<void>;
       let keyInteraction: Plottable.Interactions.Key;
       let callback: KeyTestCallback;
 
@@ -198,8 +198,8 @@ describe("Interactions", () => {
     });
 
     describe("onKeyRelease respects mouse position", () => {
-      let svg: d3.Selection<void>;
-      let eventTarget: d3.Selection<void>;
+      let svg: SimpleSelection<void>;
+      let eventTarget: SimpleSelection<void>;
       let keyInteraction: Plottable.Interactions.Key;
       let callback: KeyTestCallback;
 

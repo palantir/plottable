@@ -9,7 +9,7 @@ import * as TestMethods from "../testMethods";
 describe("Plots", () => {
   describe("StackedAreaPlot", () => {
     describe("setting the x property", () => {
-      let svg: d3.Selection<void>;
+      let svg: SimpleSelection<void>;
       let stackedAreaPlot: Plottable.Plots.StackedArea<number>;
 
       beforeEach(() => {
@@ -115,7 +115,7 @@ describe("Plots", () => {
     });
 
     describe("setting the y property", () => {
-      let svg: d3.Selection<void>;
+      let svg: SimpleSelection<void>;
       let stackedAreaPlot: Plottable.Plots.StackedArea<number>;
 
       beforeEach(() => {
@@ -377,7 +377,7 @@ describe("Plots", () => {
     });
 
     describe("stacking order", () => {
-      let svg: d3.Selection<void>;
+      let svg: SimpleSelection<void>;
       let xScale: Plottable.Scales.Category;
       let stackedAreaPlot: Plottable.Plots.StackedArea<string>;
       const datas = [

@@ -19,7 +19,7 @@ export class ComponentContainer extends Component {
     this._detachCallback = (component: Component) => this.remove(component);
   }
 
-  public anchor(selection: d3.Selection<void>) {
+  public anchor(selection: SimpleSelection<void>) {
     super.anchor(selection);
     this._forEach((c) => c.anchor(this.content()));
     return this;

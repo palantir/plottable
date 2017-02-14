@@ -25,7 +25,7 @@ describe("SelectionBoxLayer", () => {
         y: SVG_HEIGHT * 3 / 4,
       };
 
-      let svg: d3.Selection<void>;
+      let svg: SimpleSelection<void>;
       let dbl: Plottable.Components.YDragBoxLayer;
 
       beforeEach(() => {

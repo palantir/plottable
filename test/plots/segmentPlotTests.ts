@@ -9,7 +9,7 @@ import * as TestMethods from "../testMethods";
 describe("Plots", () => {
   describe("SegmentPlot", () => {
     describe("rendering", () => {
-      let svg: d3.Selection<void>;
+      let svg: SimpleSelection<void>;
       let xScale: Plottable.Scales.Linear;
       let yScale: Plottable.Scales.Linear;
       let plot: Plottable.Plots.Segment<number, number>;
@@ -78,7 +78,7 @@ describe("Plots", () => {
     });
 
     describe("autoranging", () => {
-      let svg: d3.Selection<void>;
+      let svg: SimpleSelection<void>;
       let xScale: Plottable.Scales.Linear;
       let yScale: Plottable.Scales.Linear;
       let plot: Plottable.Plots.Segment<number, number>;
@@ -142,7 +142,7 @@ describe("Plots", () => {
     });
 
     describe("retrieving the entities in a specified area", () => {
-      let svg: d3.Selection<void>;
+      let svg: SimpleSelection<void>;
       let xScale: Plottable.Scales.Linear;
       let yScale: Plottable.Scales.Linear;
       let plot: Plottable.Plots.Segment<number, number>;

@@ -10,7 +10,7 @@ describe("Plots", () => {
   describe("Waterfall", () => {
     describe("rendering growth bars", () => {
       let numAttr = TestMethods.numAttr;
-      let svg: d3.Selection<void>;
+      let svg: SimpleSelection<void>;
       let dataset: Plottable.Dataset;
       let xScale: Plottable.Scales.Category;
       let yScale: Plottable.Scales.Linear;
@@ -72,7 +72,7 @@ describe("Plots", () => {
 
     describe("rendering decline bars", () => {
       let numAttr = TestMethods.numAttr;
-      let svg: d3.Selection<void>;
+      let svg: SimpleSelection<void>;
       let dataset: Plottable.Dataset;
       let xScale: Plottable.Scales.Category;
       let yScale: Plottable.Scales.Linear;
@@ -134,7 +134,7 @@ describe("Plots", () => {
     });
 
     describe("denoting total bars", () => {
-      let svg: d3.Selection<void>;
+      let svg: SimpleSelection<void>;
       let dataset: Plottable.Dataset;
       let xScale: Plottable.Scales.Category;
       let yScale: Plottable.Scales.Linear;
@@ -184,7 +184,7 @@ describe("Plots", () => {
 
     describe("enabling connectors", () => {
       let numAttr = TestMethods.numAttr;
-      let svg: d3.Selection<void>;
+      let svg: SimpleSelection<void>;
       let dataset: Plottable.Dataset;
       let xScale: Plottable.Scales.Category;
       let yScale: Plottable.Scales.Linear;

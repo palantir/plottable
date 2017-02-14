@@ -30,7 +30,7 @@ export class Plot extends Component {
   private _dataChanged = false;
   private _datasetToDrawer: Utils.Map<Dataset, Drawer>;
 
-  protected _renderArea: d3.Selection<void>;
+  protected _renderArea: SimpleSelection<void>;
   private _attrBindings: d3.Map<Plots.AccessorScaleBinding<any, any>>;
   private _attrExtents: d3.Map<any[]>;
   private _includedValuesProvider: Scales.IncludedValuesProvider<any>;
@@ -66,7 +66,7 @@ export class Plot extends Component {
     this.animator(Plots.Animator.RESET, new Animators.Null());
   }
 
-  public anchor(selection: d3.Selection<void>) {
+  public anchor(selection: SimpleSelection<void>) {
     super.anchor(selection);
     this._dataChanged = true;
     this._cachedEntityStore = undefined;
@@ -76,7 +76,8 @@ export class Plot extends Component {
 
   protected _setup() {
     super._setup();
-    this._renderArea = this.content().append("g").classed("render-area", true);
+    const renderArea = this.content().append("g").classed("render-area", true);
+    this._renderArea =
     this.datasets().forEach((dataset) => this._createNodesForDataset(dataset));
   }
 
@@ -489,7 +490,7 @@ export class Plot extends Component {
    *   If not provided, Selections will be retrieved for all Datasets on the Plot.
    * @returns {d3.Selection}
    */
-  public selections(datasets = this.datasets()): d3.Selection<any> {
+  public selections(datasets = this.datasets()): SimpleSelection<any> {
     let selections: Element[] = [];
 
     datasets.forEach((dataset) => {

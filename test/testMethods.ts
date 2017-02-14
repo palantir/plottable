@@ -3,12 +3,12 @@ import * as d3 from "d3";
 
 import * as Plottable from "../src";
 
-export function generateSVG(width = 400, height = 400): d3.Selection<void> {
+export function generateSVG(width = 400, height = 400): SimpleSelection<void> {
   let parent = getSVGParent();
   return parent.append("svg").attr("width", width).attr("height", height).attr("class", "svg");
 }
 
-export function getSVGParent(): d3.Selection<void> {
+export function getSVGParent(): SimpleSelection<void> {
   let mocha = d3.select("#mocha-report");
   if (mocha.node() != null) {
     let suites = mocha.selectAll(".suite");
@@ -45,7 +45,7 @@ export function makeFixedSizeComponent(fixedWidth?: number, fixedHeight?: number
   return fixComponentSize(new Plottable.Component(), fixedWidth, fixedHeight);
 }
 
-export function getTranslate(element: d3.Selection<void>) {
+export function getTranslate(element: SimpleSelection<void>) {
   return d3.transform(element.attr("transform")).translate;
 }
 
@@ -56,7 +56,7 @@ export function assertBBoxEquivalence(bbox: SVGRect, widthAndHeightPair: number[
   assert.strictEqual(bbox.height, height, "height: " + message);
 }
 
-export function assertBBoxInclusion(outerEl: d3.Selection<void>, innerEl: d3.Selection<void>) {
+export function assertBBoxInclusion(outerEl: SimpleSelection<void>, innerEl: SimpleSelection<void>) {
   let outerBox = (<Element> outerEl.node()).getBoundingClientRect();
   let innerBox = (<Element> innerEl.node()).getBoundingClientRect();
   assert.operator(Math.floor(outerBox.left), "<=", Math.ceil(innerBox.left) + window.Pixel_CloseTo_Requirement,
@@ -69,7 +69,7 @@ export function assertBBoxInclusion(outerEl: d3.Selection<void>, innerEl: d3.Sel
     "bounding rect bottom included");
 }
 
-export function assertBBoxNonIntersection(firstEl: d3.Selection<void>, secondEl: d3.Selection<void>) {
+export function assertBBoxNonIntersection(firstEl: SimpleSelection<void>, secondEl: SimpleSelection<void>) {
   let firstBox = (<Element> firstEl.node()).getBoundingClientRect();
   let secondBox = (<Element> secondEl.node()).getBoundingClientRect();
 
@@ -90,14 +90,14 @@ export function assertPointsClose(actual: Plottable.Point, expected: Plottable.P
   assert.closeTo(actual.y, expected.y, epsilon, message + " (y)");
 };
 
-export function assertWidthHeight(el: d3.Selection<void>, widthExpected: number, heightExpected: number, message: string) {
+export function assertWidthHeight(el: SimpleSelection<void>, widthExpected: number, heightExpected: number, message: string) {
   let width = el.attr("width");
   let height = el.attr("height");
   assert.strictEqual(width, String(widthExpected), "width: " + message);
   assert.strictEqual(height, String(heightExpected), "height: " + message);
 }
 
-export function assertLineAttrs(line: d3.Selection<void>,
+export function assertLineAttrs(line: SimpleSelection<void>,
                                 expectedAttrs: { x1: number, y1: number, x2: number, y2: number },
                                 message: string) {
   let floatingPointError = 0.000000001;
@@ -167,17 +167,17 @@ export function decomposePath(normalizedPathString: string) {
   });
 }
 
-export function numAttr(s: d3.Selection<void>, a: string) {
+export function numAttr(s: SimpleSelection<void>, a: string) {
   return parseFloat(s.attr(a));
 }
 
-export function triggerFakeUIEvent(type: string, target: d3.Selection<void>) {
+export function triggerFakeUIEvent(type: string, target: SimpleSelection<void>) {
   let e = <UIEvent> document.createEvent("UIEvents");
   e.initUIEvent(type, true, true, window, 1);
   target.node().dispatchEvent(e);
 }
 
-export function triggerFakeMouseEvent(type: string, target: d3.Selection<void>, relativeX: number, relativeY: number, button = 0) {
+export function triggerFakeMouseEvent(type: string, target: SimpleSelection<void>, relativeX: number, relativeY: number, button = 0) {
   let clientRect = (<Element> target.node()).getBoundingClientRect();
   let xPos = clientRect.left + relativeX;
   let yPos = clientRect.top + relativeY;
@@ -190,7 +190,7 @@ export function triggerFakeMouseEvent(type: string, target: d3.Selection<void>, 
   target.node().dispatchEvent(e);
 }
 
-export function triggerFakeDragSequence(target: d3.Selection<void>, start: Plottable.Point, end: Plottable.Point, numSteps = 2) {
+export function triggerFakeDragSequence(target: SimpleSelection<void>, start: Plottable.Point, end: Plottable.Point, numSteps = 2) {
   triggerFakeMouseEvent("mousedown", target, start.x, start.y);
   for (let i = 1; i < numSteps; i++) {
     triggerFakeMouseEvent(
@@ -209,7 +209,7 @@ export function isIE() {
   return userAgent.indexOf("MSIE ") > -1 || userAgent.indexOf("Trident/") > -1;
 }
 
-export function triggerFakeWheelEvent(type: string, target: d3.Selection<void>, relativeX: number, relativeY: number, deltaY: number) {
+export function triggerFakeWheelEvent(type: string, target: SimpleSelection<void>, relativeX: number, relativeY: number, deltaY: number) {
   let clientRect = (<Element> target.node()).getBoundingClientRect();
   let xPos = clientRect.left + relativeX;
   let yPos = clientRect.top + relativeY;
@@ -226,7 +226,7 @@ export function triggerFakeWheelEvent(type: string, target: d3.Selection<void>, 
   target.node().dispatchEvent(event);
 }
 
-export function triggerFakeTouchEvent(type: string, target: d3.Selection<void>, touchPoints: Plottable.Point[], ids: number[] = []) {
+export function triggerFakeTouchEvent(type: string, target: SimpleSelection<void>, touchPoints: Plottable.Point[], ids: number[] = []) {
   let targetNode = <Element> target.node();
   let clientRect = targetNode.getBoundingClientRect();
   let e = <TouchEvent> document.createEvent("UIEvent");
@@ -274,7 +274,7 @@ export enum InteractionType {
 
 export function triggerFakeInteractionEvent(mode: InteractionMode,
                                             type: InteractionType,
-                                            target: d3.Selection<void>,
+                                            target: SimpleSelection<void>,
                                             relativeX: number,
                                             relativeY: number) {
   const typeString = getInteractionTypeString(mode, type);
@@ -321,7 +321,7 @@ function getInteractionTypeString(mode: InteractionMode, type: InteractionType) 
 }
 /* tslint:enable:no-switch-case-fall-through */
 
-export function triggerFakeKeyboardEvent(type: string, target: d3.Selection<void>, keyCode: number, options?: {[key: string]: any}) {
+export function triggerFakeKeyboardEvent(type: string, target: SimpleSelection<void>, keyCode: number, options?: {[key: string]: any}) {
   let event = <KeyboardEvent> document.createEvent("Events");
   event.initEvent(type, true, true);
   (event as any).keyCode = keyCode;
@@ -411,7 +411,7 @@ export function assertWarns(fn: Function, warningMessage: string, assertMessage:
   assert.include(receivedWarning, warningMessage, assertMessage);
 }
 
-export function areaVertices(areaSelection: d3.Selection<any>): Plottable.Point[] {
+export function areaVertices(areaSelection: SimpleSelection<any>): Plottable.Point[] {
   let areaPathString = normalizePath(areaSelection.attr("d")).slice(1, -1);
   return areaPathString.split("L")
     .map((d) => {

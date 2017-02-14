@@ -11,7 +11,7 @@ describe("Interactions", () => {
     const SVG_WIDTH = 400;
     const SVG_HEIGHT = 400;
 
-    let svg: d3.Selection<void>;
+    let svg: SimpleSelection<void>;
     let component: Plottable.Component;
     let clickInteraction: Plottable.Interactions.Click;
 

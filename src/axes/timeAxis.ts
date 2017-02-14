@@ -174,9 +174,9 @@ export class Time extends Axis<Date> {
     ],
   ];
 
-  private _tierLabelContainers: d3.Selection<void>[];
-  private _tierMarkContainers: d3.Selection<void>[];
-  private _tierBaselines: d3.Selection<void>[];
+  private _tierLabelContainers: SimpleSelection<void>[];
+  private _tierMarkContainers: SimpleSelection<void>[];
+  private _tierBaselines: SimpleSelection<void>[];
   private _tierHeights: number[];
   private _possibleTimeAxisConfigurations: TimeAxisConfiguration[];
   private _numTiers: number;
@@ -449,7 +449,7 @@ export class Time extends Axis<Date> {
     return tickPos;
   }
 
-  private _renderTierLabels(container: d3.Selection<void>, config: TimeAxisTierConfiguration, index: number) {
+  private _renderTierLabels(container: SimpleSelection<void>, config: TimeAxisTierConfiguration, index: number) {
     let tickPos = this._getTickValuesForConfiguration(config);
     let labelPos: Date[] = [];
     if (this._tierLabelPositions[index] === "between" && config.step === 1) {

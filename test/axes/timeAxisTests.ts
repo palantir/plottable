@@ -140,7 +140,7 @@ describe("TimeAxis", () => {
 
   describe("drawing tick marks", () => {
     let axis: Plottable.Axes.Time;
-    let svg: d3.Selection<void>;
+    let svg: SimpleSelection<void>;
 
     beforeEach(() => {
       let scale = new Plottable.Scales.Time();
@@ -214,7 +214,7 @@ describe("TimeAxis", () => {
 
   describe("calculating space", () => {
     let axis: Plottable.Axes.Time;
-    let svg: d3.Selection<void>;
+    let svg: SimpleSelection<void>;
 
     beforeEach(() => {
       let scale = new Plottable.Scales.Time();

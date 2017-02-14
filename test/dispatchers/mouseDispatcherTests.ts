@@ -10,7 +10,7 @@ describe("Dispatchers", () => {
   describe("Mouse Dispatcher", () => {
 
     describe("Basic usage", () => {
-      let svg: d3.Selection<void>;
+      let svg: SimpleSelection<void>;
       let svgNode: SVGElement;
 
       beforeEach(() => {
@@ -46,7 +46,7 @@ describe("Dispatchers", () => {
         y: targetY,
       };
 
-      let svg: d3.Selection<void>;
+      let svg: SimpleSelection<void>;
       let mouseDispatcher: Plottable.Dispatchers.Mouse;
 
       beforeEach(() => {

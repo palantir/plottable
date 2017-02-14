@@ -6,7 +6,7 @@
 import * as d3 from "d3";
 
 import { Animator } from "./animator";
-import { AttributeToAppliedProjector } from "../core/interfaces";
+import { AttributeToAppliedProjector, SimpleSelection } from "../core/interfaces";
 
 /**
  * An Animator with easing and configurable durations and delays.
@@ -57,8 +57,8 @@ export class Easing implements Animator {
     return this.startDelay() + adjustedIterativeDelay * (Math.max(numberOfSteps - 1, 0)) + this.stepDuration();
   }
 
-  public animate(selection: d3.Selection<any>, attrToAppliedProjector: AttributeToAppliedProjector) {
-    let numberOfSteps = selection[0].length;
+  public animate(selection: SimpleSelection<any>, attrToAppliedProjector: AttributeToAppliedProjector) {
+    let numberOfSteps = selection.size();
     let adjustedIterativeDelay = this._getAdjustedIterativeDelay(numberOfSteps);
 
     return selection.transition()

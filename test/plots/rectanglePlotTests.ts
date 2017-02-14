@@ -49,7 +49,7 @@ describe("Plots", () => {
     });
 
     describe("retreiving entities", () => {
-      let svg: d3.Selection<void>;
+      let svg: SimpleSelection<void>;
       let xScale: Plottable.Scales.Linear;
       let yScale: Plottable.Scales.Linear;
       let plot: Plottable.Plots.Rectangle<number, number>;
@@ -167,7 +167,7 @@ describe("Plots", () => {
     });
 
     describe("autoranging the x and y scales", () => {
-      let svg: d3.Selection<void>;
+      let svg: SimpleSelection<void>;
 
       beforeEach(() => {
         svg = TestMethods.generateSVG();
@@ -268,7 +268,7 @@ describe("Plots", () => {
     });
 
     describe("using category scales", () => {
-      let svg: d3.Selection<void>;
+      let svg: SimpleSelection<void>;
       let xScale: Plottable.Scales.Category;
       let yScale: Plottable.Scales.Category;
       let plot: Plottable.Plots.Rectangle<string, string>;
@@ -387,7 +387,7 @@ describe("Plots", () => {
     });
 
     describe("retrieving D3 Selections from the plot", () => {
-      let svg: d3.Selection<void>;
+      let svg: SimpleSelection<void>;
       let xScale: Plottable.Scales.Category;
       let yScale: Plottable.Scales.Category;
       let plot: Plottable.Plots.Rectangle<string, string>;
@@ -443,7 +443,7 @@ describe("Plots", () => {
       let plot: Plottable.Plots.Rectangle<number, number>;
       let xScale: Plottable.Scales.Linear;
       let yScale: Plottable.Scales.Linear;
-      let svg: d3.Selection<void>;
+      let svg: SimpleSelection<void>;
 
       beforeEach(() => {
         svg = TestMethods.generateSVG();

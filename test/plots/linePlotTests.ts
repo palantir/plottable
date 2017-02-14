@@ -9,7 +9,7 @@ import * as TestMethods from "../testMethods";
 describe("Plots", () => {
   describe("LinePlot", () => {
     describe("Basic Usage", () => {
-      let svg: d3.Selection<void>;
+      let svg: SimpleSelection<void>;
       let xScale: Plottable.Scales.Linear;
       let yScale: Plottable.Scales.Linear;
       let linePlot: Plottable.Plots.Line<number>;
@@ -125,7 +125,7 @@ describe("Plots", () => {
     });
 
     describe("interpolation", () => {
-      let svg: d3.Selection<void>;
+      let svg: SimpleSelection<void>;
       let xScale: Plottable.Scales.Linear;
       let yScale: Plottable.Scales.Linear;
       let linePlot: Plottable.Plots.Line<number>;
@@ -183,7 +183,7 @@ describe("Plots", () => {
     });
 
     describe("selections", () => {
-      let svg: d3.Selection<void>;
+      let svg: SimpleSelection<void>;
       let xScale: Plottable.Scales.Linear;
       let yScale: Plottable.Scales.Linear;
       let data = [{ x: 0, y: 0.75 }, { x: 1, y: 0.25 }];
@@ -319,7 +319,7 @@ describe("Plots", () => {
 
     describe("smooth autoranging", () => {
 
-      let svg: d3.Selection<void>;
+      let svg: SimpleSelection<void>;
       let xScale: Plottable.Scales.Linear;
       let yScale: Plottable.Scales.Linear;
       let data = [
@@ -563,7 +563,7 @@ describe("Plots", () => {
     });
 
     describe("Cropped Rendering Performance", () => {
-      let svg: d3.Selection<void>;
+      let svg: SimpleSelection<void>;
       let plot: Plottable.Plots.Line<number>;
 
       let xScale: Plottable.Scales.Linear;
@@ -692,7 +692,7 @@ describe("Plots", () => {
     });
 
     describe("Downsampling Performance", () => {
-      let svg: d3.Selection<void>;
+      let svg: SimpleSelection<void>;
       let plot: Plottable.Plots.Line<number>;
 
       let xScale: Plottable.Scales.Linear;

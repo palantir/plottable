@@ -17,7 +17,7 @@ describe("InterpolatedColorLegend", () => {
     const SVG_HEIGHT = 400;
     const SVG_WIDTH = 400;
 
-    let svg: d3.Selection<void>;
+    let svg: SimpleSelection<void>;
     let colorScale: Plottable.Scales.InterpolatedColor;
     let legend: Plottable.Components.InterpolatedColorLegend;
 
@@ -214,7 +214,7 @@ describe("InterpolatedColorLegend", () => {
     const SVG_HEIGHT = 400;
     const SVG_WIDTH = 400;
 
-    let svg: d3.Selection<void>;
+    let svg: SimpleSelection<void>;
     let colorScale: Plottable.Scales.InterpolatedColor;
     let legend: Plottable.Components.InterpolatedColorLegend;
 
@@ -298,7 +298,7 @@ describe("InterpolatedColorLegend", () => {
     const SVG_HEIGHT = 400;
     const SVG_WIDTH = 400;
 
-    let svg: d3.Selection<void>;
+    let svg: SimpleSelection<void>;
     let colorScale: Plottable.Scales.InterpolatedColor;
     let legend: Plottable.Components.InterpolatedColorLegend;
 
@@ -393,7 +393,7 @@ describe("InterpolatedColorLegend", () => {
   });
 
   describe("Constrained situations", () => {
-    let svg: d3.Selection<void>;
+    let svg: SimpleSelection<void>;
     let colorScale: Plottable.Scales.InterpolatedColor;
     let legend: Plottable.Components.InterpolatedColorLegend;
 
@@ -467,7 +467,7 @@ describe("InterpolatedColorLegend", () => {
   });
 
   describe("Title Element", () => {
-    let svg: d3.Selection<void>;
+    let svg: SimpleSelection<void>;
     let colorScale: Plottable.Scales.InterpolatedColor;
     let legend: Plottable.Components.InterpolatedColorLegend;
 

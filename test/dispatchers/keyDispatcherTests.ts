@@ -13,7 +13,7 @@ describe("Dispatchers", () => {
       let keyCodeToSend: number;
       let keyDispatcher: Plottable.Dispatchers.Key;
 
-      let body: d3.Selection<void>;
+      let body: SimpleSelection<void>;
 
       beforeEach(() => {
         keyCodeToSend = 65;

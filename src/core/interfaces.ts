@@ -8,6 +8,8 @@ import * as d3 from "d3";
 import { Dataset } from "./dataset";
 import { Component } from "../components/component";
 
+export type SimpleSelection<Datum> = d3.Selection<d3.BaseType, Datum, any, any>;
+
 /**
  * Accesses a specific datum property.
  */
@@ -78,6 +80,6 @@ export type Bounds = {
 export interface Entity<C extends Component> {
   datum: any;
   position: Point;
-  selection: d3.Selection<any>;
+  selection: SimpleSelection<any>;
   component: C;
 }

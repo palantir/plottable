@@ -22,7 +22,7 @@ export class StackedArea<X> extends Area<X> {
   private _stackingResult: Utils.Stacking.StackingResult;
   private _stackedExtent: number[];
 
-  private _baseline: d3.Selection<void>;
+  private _baseline: SimpleSelection<void>;
   private _baselineValue = 0;
   private _baselineValueProvider: () => number[];
 

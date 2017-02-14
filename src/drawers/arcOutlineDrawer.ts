@@ -17,7 +17,7 @@ export class ArcOutline extends Drawer {
     this._svgElementName = "path";
   }
 
-  protected _applyDefaultAttributes(selection: d3.Selection<any>) {
+  protected _applyDefaultAttributes(selection: SimpleSelection<any>) {
     super._applyDefaultAttributes(selection);
     selection.style("fill", "none");
   }

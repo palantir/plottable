@@ -9,7 +9,7 @@ import * as TestMethods from "../testMethods";
 describe("Plots", () => {
   describe("Vertical Stacked Bar Plot", () => {
     describe("rendering using positive data", () => {
-      let svg: d3.Selection<void>;
+      let svg: SimpleSelection<void>;
       let xScale: Plottable.Scales.Category;
       let yScale: Plottable.Scales.Linear;
       let stackedBarPlot: Plottable.Plots.StackedBar<string, number>;
@@ -170,7 +170,7 @@ describe("Plots", () => {
     });
 
     describe("rendering using negative data", () => {
-      let svg: d3.Selection<void>;
+      let svg: SimpleSelection<void>;
       let xScale: Plottable.Scales.Category;
       let yScale: Plottable.Scales.Linear;
       let stackedBarPlot: Plottable.Plots.StackedBar<string, number>;
@@ -264,7 +264,7 @@ describe("Plots", () => {
     });
 
     describe("non-overlapping datasets", () => {
-      let svg: d3.Selection<void>;
+      let svg: SimpleSelection<void>;
       let xScale: Plottable.Scales.Category;
       let stackedBarPlot: Plottable.Plots.StackedBar<string, number>;
 
@@ -389,7 +389,7 @@ describe("Plots", () => {
 
   describe("Horizontal Stacked Bar Plot", () => {
     describe("rendering using positive data", () => {
-      let svg: d3.Selection<void>;
+      let svg: SimpleSelection<void>;
       let xScale: Plottable.Scales.Linear;
       let yScale: Plottable.Scales.Category;
       let stackedBarPlot: Plottable.Plots.StackedBar<number, string>;
@@ -494,7 +494,7 @@ describe("Plots", () => {
     });
 
     describe("non-overlapping datasets", () => {
-      let svg: d3.Selection<void>;
+      let svg: SimpleSelection<void>;
       let yScale: Plottable.Scales.Category;
       let stackedBarPlot: Plottable.Plots.StackedBar<number, string>;
 

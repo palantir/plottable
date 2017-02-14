@@ -15,7 +15,7 @@ export interface DragLineCallback<D> {
 export class DragLineLayer<D> extends GuideLineLayer<D> {
   private _dragInteraction: Interactions.Drag;
   private _detectionRadius = 3;
-  private _detectionEdge: d3.Selection<void>;
+  private _detectionEdge: SimpleSelection<void>;
   private _enabled = true;
 
   private _dragStartCallbacks: Utils.CallbackSet<DragLineCallback<D>>;

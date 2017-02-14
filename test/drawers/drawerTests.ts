@@ -47,7 +47,7 @@ describe("Drawers", () => {
     describe("drawing and retrieving elements", () => {
       const data = ["A", "B", "C"];
       const propertyName = "property";
-      let svg: d3.Selection<void>;
+      let svg: SimpleSelection<void>;
 
       beforeEach(() => {
         svg = TestMethods.generateSVG();
@@ -127,7 +127,7 @@ describe("Drawers", () => {
 
       let oldTimeout: any;
       let timings: number[];
-      let svg: d3.Selection<void>;
+      let svg: SimpleSelection<void>;
 
       before(() => {
         oldTimeout = Plottable.Utils.Window.setTimeout;

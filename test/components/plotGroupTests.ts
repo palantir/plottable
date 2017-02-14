@@ -8,7 +8,7 @@ import * as TestMethods from "../testMethods";
 
 describe("Components", () => {
   describe("PlotGroup", () => {
-    let svg: d3.Selection<void>;
+    let svg: SimpleSelection<void>;
     let xScale: Plottable.Scales.Linear;
     let yScale: Plottable.Scales.Linear;
     let plotGroup: Plottable.Components.PlotGroup;

@@ -22,7 +22,7 @@ describe("Labels", () => {
   describe("Label", () => {
     describe("Basic Usage", () => {
       const BBOX_SELECTOR = ".bounding-box";
-      let svg: d3.Selection<void>;
+      let svg: SimpleSelection<void>;
 
       beforeEach(() => {
         svg = TestMethods.generateSVG();
@@ -160,7 +160,7 @@ describe("Labels", () => {
 
     describe("Padding", () => {
       const PADDING = 30;
-      let svg: d3.Selection<void>;
+      let svg: SimpleSelection<void>;
       let label: Plottable.Components.Label;
 
       beforeEach(() => {

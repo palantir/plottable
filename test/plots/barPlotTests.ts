@@ -42,7 +42,7 @@ describe("Plots", () => {
           { base: "C", value: -1 },
         ];
 
-        let svg: d3.Selection<void>;
+        let svg: SimpleSelection<void>;
         let barPlot: Plottable.Plots.Bar<string | number, number | string>;
         let baseScale: Plottable.Scales.Category;
         let valueScale: Plottable.Scales.Linear;
@@ -152,7 +152,7 @@ describe("Plots", () => {
       });
 
       describe(`autodomaining when ${orientation}`, () => {
-        let svg: d3.Selection<void>;
+        let svg: SimpleSelection<void>;
         let baseScale: Plottable.Scales.Linear;
         let valueScale: Plottable.Scales.Linear;
         let barPlot: Plottable.Plots.Bar<number, number>;
@@ -211,7 +211,7 @@ describe("Plots", () => {
         const scaleTypes = ["Linear", "ModifiedLog", "Time"];
         scaleTypes.forEach((scaleType) => {
           describe(`using a ${scaleType} base Scale`, () => {
-            let svg: d3.Selection<void>;
+            let svg: SimpleSelection<void>;
             let barPlot: Plottable.Plots.Bar<number | Date, number | Date>;
             let baseScale: Plottable.QuantitativeScale<number | Date>;
             let valueScale: Plottable.Scales.Linear;
@@ -371,7 +371,7 @@ describe("Plots", () => {
         ];
         const DEFAULT_DOMAIN = [-5, 5];
 
-        let svg: d3.Selection<void>;
+        let svg: SimpleSelection<void>;
         let baseScale: Plottable.Scales.Linear;
         let valueScale: Plottable.Scales.Linear;
         let barPlot: Plottable.Plots.Bar<number, number>;
@@ -595,7 +595,7 @@ describe("Plots", () => {
         ];
         const DEFAULT_DOMAIN = [-2, 2];
 
-        let svg: d3.Selection<void>;
+        let svg: SimpleSelection<void>;
         let barPlot: Plottable.Plots.Bar<number, number>;
         let baseScale: Plottable.Scales.Linear;
         let valueScale: Plottable.Scales.Linear;

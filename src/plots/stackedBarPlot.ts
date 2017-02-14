@@ -16,7 +16,7 @@ import { Bar } from "./barPlot";
 export class StackedBar<X, Y> extends Bar<X, Y> {
   protected static _STACKED_BAR_LABEL_PADDING = 5;
 
-  private _labelArea: d3.Selection<void>;
+  private _labelArea: SimpleSelection<void>;
   private _measurer: SVGTypewriter.Measurer;
   private _writer: SVGTypewriter.Writer;
   private _stackingOrder: Utils.Stacking.IStackingOrder;

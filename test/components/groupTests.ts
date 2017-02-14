@@ -184,7 +184,7 @@ describe("Group", () => {
   describe("Layout", () => {
     let SVG_WIDTH = 400;
     let SVG_HEIGHT = 400;
-    let svg: d3.Selection<void>;
+    let svg: SimpleSelection<void>;
 
     beforeEach(() => {
       svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);

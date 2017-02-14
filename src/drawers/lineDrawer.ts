@@ -17,12 +17,12 @@ export class Line extends Drawer {
     this._svgElementName = "path";
   }
 
-  protected _applyDefaultAttributes(selection: d3.Selection<any>) {
+  protected _applyDefaultAttributes(selection: SimpleSelection<any>) {
     super._applyDefaultAttributes(selection);
     selection.style("fill", "none");
   }
 
-  public selectionForIndex(index: number): d3.Selection<any> {
+  public selectionForIndex(index: number): SimpleSelection<any> {
     return d3.select(this.selection()[0][0]);
   }
 }

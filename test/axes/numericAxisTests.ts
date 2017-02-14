@@ -15,7 +15,7 @@ describe("Axes", () => {
       assert.operator(inner.bottom, "<", outer.bottom + epsilon, message + " (box inside (bottom))");
     }
 
-    function applyVisibleFilter(selection: d3.Selection<any>) {
+    function applyVisibleFilter(selection: SimpleSelection<any>) {
       return selection.filter(function() {
         const visibilityAttr =  d3.select(this).style("visibility");
         return visibilityAttr === "visible" || visibilityAttr === "inherit";
@@ -245,7 +245,7 @@ describe("Axes", () => {
     });
 
     describe("allocating space", () => {
-      let svg: d3.Selection<void>;
+      let svg: SimpleSelection<void>;
 
       beforeEach(() => {
         svg = TestMethods.generateSVG();

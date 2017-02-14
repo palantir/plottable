@@ -12,7 +12,7 @@ describe("Plots", () => {
     describe("Basic Rendering", () => {
       const SVG_WIDTH = 400;
       const SVG_HEIGHT = 400;
-      let svg: d3.Selection<void>;
+      let svg: SimpleSelection<void>;
       let plot: Plottable.Plots.Scatter<number, number>;
       let xScale: Plottable.Scales.Linear;
       let yScale: Plottable.Scales.Linear;
@@ -136,7 +136,7 @@ describe("Plots", () => {
     });
 
     describe("The Accessors properly access data, index and Dataset", () => {
-      let svg: d3.Selection<void>;
+      let svg: SimpleSelection<void>;
       let plot: Plottable.Plots.Scatter<number, number>;
       let dataset: Plottable.Dataset;
       let data: any[];
@@ -247,7 +247,7 @@ describe("Plots", () => {
     });
 
     describe("Selections", () => {
-      let svg: d3.Selection<void>;
+      let svg: SimpleSelection<void>;
       let plot: Plottable.Plots.Scatter<number, number>;
       let dataset: Plottable.Dataset;
       let dataset2: Plottable.Dataset;

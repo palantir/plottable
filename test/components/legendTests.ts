@@ -13,7 +13,7 @@ describe("Legend", () => {
   const ROW_SELECTOR = "." + Plottable.Components.Legend.LEGEND_ROW_CLASS;
 
   describe("Basic Usage", () => {
-    let svg: d3.Selection<void>;
+    let svg: SimpleSelection<void>;
     let color: Plottable.Scales.Color;
     let legend: Plottable.Components.Legend;
 
@@ -243,7 +243,7 @@ describe("Legend", () => {
   });
 
   describe("Symbols", () => {
-    let svg: d3.Selection<void>;
+    let svg: SimpleSelection<void>;
     let color: Plottable.Scales.Color;
     let legend: Plottable.Components.Legend;
 
@@ -346,7 +346,7 @@ describe("Legend", () => {
   });
 
   describe("Title Elements", () => {
-    let svg: d3.Selection<void>;
+    let svg: SimpleSelection<void>;
     let color: Plottable.Scales.Color;
     let legend: Plottable.Components.Legend;
 
@@ -389,7 +389,7 @@ describe("Legend", () => {
   });
 
   describe("Formatting and Sorting", () => {
-    let svg: d3.Selection<void>;
+    let svg: SimpleSelection<void>;
     let color: Plottable.Scales.Color;
     let legend: Plottable.Components.Legend;
 
@@ -465,7 +465,7 @@ describe("Legend", () => {
   });
 
   describe("Selection", () => {
-    let svg: d3.Selection<void>;
+    let svg: SimpleSelection<void>;
     let color: Plottable.Scales.Color;
     let legend: Plottable.Components.Legend;
 

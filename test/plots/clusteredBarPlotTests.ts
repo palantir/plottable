@@ -13,7 +13,7 @@ describe("Plots", () => {
       const SVG_HEIGHT = 400;
       const isVertical = orientation === Plottable.Plots.Bar.ORIENTATION_VERTICAL;
 
-      let svg: d3.Selection<void>;
+      let svg: SimpleSelection<void>;
       let categoryScale: Plottable.Scales.Category;
       let linearScale: Plottable.Scales.Linear;
       let clusterBarPlot: Plottable.Plots.ClusteredBar<number | string, number | string>;

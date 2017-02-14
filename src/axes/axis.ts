@@ -11,7 +11,7 @@ import { Component } from "../components/component";
 import { Scale, ScaleCallback } from "../scales/scale";
 import { Formatter } from "../core/formatters";
 import * as Formatters from "../core/formatters";
-import { SpaceRequest, Point } from "../core/interfaces";
+import { SpaceRequest, Point, SimpleSelection } from "../core/interfaces";
 import * as Utils from "../utils";
 
 export type AxisOrientation =  "bottom" | "left" | "right" | "top";
@@ -46,9 +46,9 @@ export class Axis<D> extends Component {
    */
   public static ANNOTATION_LABEL_CLASS = "annotation-label";
   private static _ANNOTATION_LABEL_PADDING = 4;
-  protected _tickMarkContainer: d3.Selection<void>;
-  protected _tickLabelContainer: d3.Selection<void>;
-  protected _baseline: d3.Selection<void>;
+  protected _tickMarkContainer: SimpleSelection<void>;
+  protected _tickLabelContainer: SimpleSelection<void>;
+  protected _baseline: SimpleSelection<void>;
   protected _scale: Scale<D, number>;
   private _formatter: Formatter;
   private _orientation: AxisOrientation;
@@ -63,7 +63,7 @@ export class Axis<D> extends Component {
   private _annotationFormatter: Formatter;
   private _annotationsEnabled = false;
   private _annotationTierCount = 1;
-  private _annotationContainer: d3.Selection<void>;
+  private _annotationContainer: SimpleSelection<void>;
   private _annotationMeasurer: SVGTypewriter.Measurer;
   private _annotationWriter: SVGTypewriter.Writer;
 
@@ -315,7 +315,7 @@ export class Axis<D> extends Component {
       }
     });
 
-    let bindElements = (selection: d3.Selection<any>, elementName: string, className: string) => {
+    let bindElements = (selection: SimpleSelection<any>, elementName: string, className: string) => {
       let elements = selection.selectAll(`.${className}`).data(annotatedTicks);
       elements.enter().append(elementName).classed(className, true);
       elements.exit().remove();

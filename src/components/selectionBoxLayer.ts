@@ -15,8 +15,8 @@ import { Component } from "./component";
 export enum PropertyMode { VALUE, PIXEL }
 
 export class SelectionBoxLayer extends Component {
-  protected _box: d3.Selection<void>;
-  private _boxArea: d3.Selection<void>;
+  protected _box: SimpleSelection<void>;
+  private _boxArea: SimpleSelection<void>;
   private _boxVisible = false;
   private _boxBounds: Bounds = {
     topLeft: { x: 0, y: 0 },

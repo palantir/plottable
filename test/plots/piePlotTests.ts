@@ -9,7 +9,7 @@ import * as TestMethods from "../testMethods";
 describe("Plots", () => {
   describe("PiePlot", () => {
     describe("Rendering", () => {
-      let svg: d3.Selection<void>;
+      let svg: SimpleSelection<void>;
       let dataset: Plottable.Dataset;
       let data: any[];
       let piePlot: Plottable.Plots.Pie;
@@ -252,7 +252,7 @@ describe("Plots", () => {
     });
 
     describe("Labels", () => {
-      let svg: d3.Selection<void>;
+      let svg: SimpleSelection<void>;
       let piePlot: Plottable.Plots.Pie;
 
       beforeEach(() => {
@@ -436,7 +436,7 @@ describe("Plots", () => {
     });
 
     describe("Selections", () => {
-      let svg: d3.Selection<void>;
+      let svg: SimpleSelection<void>;
       let dataset: Plottable.Dataset;
       let data: any[];
       let piePlot: Plottable.Plots.Pie;
@@ -478,7 +478,7 @@ describe("Plots", () => {
     });
 
     describe("Entities", () => {
-      let svg: d3.Selection<void>;
+      let svg: SimpleSelection<void>;
       let dataset: Plottable.Dataset;
       let data = [{value: 5}, {value: 15}];
       let piePlot: Plottable.Plots.Pie;

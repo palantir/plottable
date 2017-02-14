@@ -14,7 +14,7 @@ let nativeMath: Math = (<any>window).Math;
  * @param {d3.Selection} element
  * @returns {SVGRed} The bounding box.
  */
-export function elementBBox(element: d3.Selection<any>) {
+export function elementBBox(element: SimpleSelection<any>) {
   let bbox: SVGRect;
   // HACKHACK: Firefox won't correctly measure nodes with style "display: none" or their descendents (FF Bug 612118).
   try {
@@ -83,7 +83,7 @@ export function elementHeight(element: Element) {
  * @param {d3.Selection<any>} selection The selection to query
  * @returns {[number, number]} The number array representing the translation
  */
-export function translate(selection: d3.Selection<any>): [number, number];
+export function translate(selection: SimpleSelection<any>): [number, number];
 /**
  * Translates the given selection by the input x / y pixel amounts.
  *
@@ -92,8 +92,8 @@ export function translate(selection: d3.Selection<any>): [number, number];
  * @param {number} y The amount to translate in the y direction
  * @returns {d3.Selection<any>} The input selection
  */
-export function translate(selection: d3.Selection<any>, x: number, y: number): d3.Selection<any>;
-export function translate(selection: d3.Selection<any>, x?: number, y?: number): any {
+export function translate(selection: SimpleSelection<any>, x: number, y: number): SimpleSelection<any>;
+export function translate(selection: SimpleSelection<any>, x?: number, y?: number): any {
   let transformMatrix = d3.transform(selection.attr("transform"));
 
   if (x == null) {

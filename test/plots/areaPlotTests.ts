@@ -9,7 +9,7 @@ import * as TestMethods from "../testMethods";
 describe("Plots", () => {
   describe("AreaPlot", () => {
     describe("Basic Usage", () => {
-      let svg: d3.Selection<void>;
+      let svg: SimpleSelection<void>;
       let xScale: Plottable.Scales.Linear;
       let yScale: Plottable.Scales.Linear;
       let plot: Plottable.Plots.Area<{}>;
@@ -41,7 +41,7 @@ describe("Plots", () => {
     });
 
     describe("Rendering", () => {
-      let svg: d3.Selection<void>;
+      let svg: SimpleSelection<void>;
       let xScale: Plottable.Scales.Linear;
       let yScale: Plottable.Scales.Linear;
       let areaPlot: Plottable.Plots.Area<number>;
@@ -161,7 +161,7 @@ describe("Plots", () => {
     });
 
     describe("Selections", () => {
-      let svg: d3.Selection<void>;
+      let svg: SimpleSelection<void>;
       let xScale: Plottable.Scales.Linear;
       let yScale: Plottable.Scales.Linear;
       let areaPlot: Plottable.Plots.Area<number>;

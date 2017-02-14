@@ -23,14 +23,14 @@ type _EdgeIndicator = {
 
 export class DragBoxLayer extends SelectionBoxLayer {
   private _dragInteraction: Interactions.Drag;
-  private _detectionEdgeT: d3.Selection<void>;
-  private _detectionEdgeB: d3.Selection<void>;
-  private _detectionEdgeL: d3.Selection<void>;
-  private _detectionEdgeR: d3.Selection<void>;
-  private _detectionCornerTL: d3.Selection<void>;
-  private _detectionCornerTR: d3.Selection<void>;
-  private _detectionCornerBL: d3.Selection<void>;
-  private _detectionCornerBR: d3.Selection<void>;
+  private _detectionEdgeT: SimpleSelection<void>;
+  private _detectionEdgeB: SimpleSelection<void>;
+  private _detectionEdgeL: SimpleSelection<void>;
+  private _detectionEdgeR: SimpleSelection<void>;
+  private _detectionCornerTL: SimpleSelection<void>;
+  private _detectionCornerTR: SimpleSelection<void>;
+  private _detectionCornerBL: SimpleSelection<void>;
+  private _detectionCornerBR: SimpleSelection<void>;
 
   private _detectionRadius = 3;
   private _resizable = false;
@@ -460,7 +460,7 @@ export class DragBoxLayer extends SelectionBoxLayer {
     return this;
   }
 
-  public anchor(selection: d3.Selection<void>) {
+  public anchor(selection: SimpleSelection<void>) {
     this._dragInteraction.attachTo(this);
     super.anchor(selection);
     return this;

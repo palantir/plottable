@@ -27,10 +27,10 @@ export class InterpolatedColorLegend extends Component {
   private _formatter: Formatter;
   private _expands: boolean;
 
-  private _swatchContainer: d3.Selection<void>;
-  private _swatchBoundingBox: d3.Selection<void>;
-  private _lowerLabel: d3.Selection<void>;
-  private _upperLabel: d3.Selection<void>;
+  private _swatchContainer: SimpleSelection<void>;
+  private _swatchBoundingBox: SimpleSelection<void>;
+  private _lowerLabel: SimpleSelection<void>;
+  private _upperLabel: SimpleSelection<void>;
   private _redrawCallback: ScaleCallback<Scales.InterpolatedColor>;
 
   /**

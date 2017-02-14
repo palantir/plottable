@@ -7,7 +7,7 @@ import * as Plottable from "../../src";
 import * as TestMethods from "../testMethods";
 
 describe("Gridlines", () => {
-  let svg: d3.Selection<void>;
+  let svg: SimpleSelection<void>;
   let xScale: Plottable.Scales.Linear;
   let yScale: Plottable.Scales.Linear;
   let gridlines: Plottable.Components.Gridlines;

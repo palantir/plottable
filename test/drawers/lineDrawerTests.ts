@@ -9,7 +9,7 @@ import * as TestMethods from "../testMethods";
 describe("Drawers", () => {
   describe("Line Drawer", () => {
     const data = [["A", "B", "C"]]; // line normally takes single array of data
-    let svg: d3.Selection<void>;
+    let svg: SimpleSelection<void>;
     let drawer: Plottable.Drawers.Line;
 
     beforeEach(() => {

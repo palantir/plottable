@@ -21,7 +21,7 @@ export class GuideLineLayer<D> extends Component {
   private _scale: QuantitativeScale<D>;
   private _pixelPosition: number;
   private _scaleUpdateCallback: ScaleCallback<QuantitativeScale<D>>;
-  private _guideLine: d3.Selection<void>;
+  private _guideLine: SimpleSelection<void>;
   private _mode = PropertyMode.VALUE;
 
   constructor(orientation: string) {

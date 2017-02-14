@@ -15,7 +15,7 @@ describe("Component", () => {
   describe("anchoring", () => {
 
     let c: Plottable.Component;
-    let svg: d3.Selection<void>;
+    let svg: SimpleSelection<void>;
 
     beforeEach(() => {
       c = new Plottable.Component();
@@ -167,7 +167,7 @@ describe("Component", () => {
   describe("detaching", () => {
 
     let c: Plottable.Component;
-    let svg: d3.Selection<void>;
+    let svg: SimpleSelection<void>;
 
     beforeEach(() => {
       c = new Plottable.Component();
@@ -250,7 +250,7 @@ describe("Component", () => {
   describe("parent container", () => {
 
     let c: Plottable.Component;
-    let svg: d3.Selection<void>;
+    let svg: SimpleSelection<void>;
 
     beforeEach(() => {
       c = new Plottable.Component();
@@ -282,7 +282,7 @@ describe("Component", () => {
   describe("css classes", () => {
 
     let c: Plottable.Component;
-    let svg: d3.Selection<void>;
+    let svg: SimpleSelection<void>;
 
     beforeEach(() => {
       c = new Plottable.Component();
@@ -321,7 +321,7 @@ describe("Component", () => {
   describe("computing the layout", () => {
 
     let c: Plottable.Component;
-    let svg: d3.Selection<void>;
+    let svg: SimpleSelection<void>;
 
     beforeEach(() => {
       c = new Plottable.Component();
@@ -495,7 +495,7 @@ describe("Component", () => {
   describe("computing the layout when of fixed size", () => {
 
     let c: Plottable.Component;
-    let svg: d3.Selection<void>;
+    let svg: SimpleSelection<void>;
     let fixedWidth = 100;
     let fixedHeight = 100;
 
@@ -540,7 +540,7 @@ describe("Component", () => {
   describe("aligning", () => {
 
     let c: Plottable.Component;
-    let svg: d3.Selection<void>;
+    let svg: SimpleSelection<void>;
 
     beforeEach(() => {
       c = new Plottable.Component();
@@ -581,7 +581,7 @@ describe("Component", () => {
   describe("aligning when of fixed size", () => {
 
     let c: Plottable.Component;
-    let svg: d3.Selection<void>;
+    let svg: SimpleSelection<void>;
     let fixedWidth = 100;
     let fixedHeight = 100;
 
@@ -617,7 +617,7 @@ describe("Component", () => {
   describe("calculating the minimum requested space", () => {
 
     let c: Plottable.Component;
-    let svg: d3.Selection<void>;
+    let svg: SimpleSelection<void>;
 
     beforeEach(() => {
       c = new Plottable.Component();
@@ -637,7 +637,7 @@ describe("Component", () => {
   describe("destroying", () => {
 
     let c: Plottable.Component;
-    let svg: d3.Selection<void>;
+    let svg: SimpleSelection<void>;
 
     beforeEach(() => {
       c = new Plottable.Component();
@@ -668,7 +668,7 @@ describe("Component", () => {
   describe("rendering on the anchored svg", () => {
 
     let c: Plottable.Component;
-    let svg: d3.Selection<void>;
+    let svg: SimpleSelection<void>;
 
     beforeEach(() => {
       c = new Plottable.Component();
@@ -720,7 +720,7 @@ describe("Component", () => {
   describe("rendering to a DOM node", () => {
 
     let c: Plottable.Component;
-    let svg: d3.Selection<void>;
+    let svg: SimpleSelection<void>;
     let renderFlag: boolean;
 
     beforeEach(() => {
@@ -841,7 +841,7 @@ describe("Component", () => {
   describe("calculating the origin in relation to the svg", () => {
 
     let c: Plottable.Component;
-    let svg: d3.Selection<void>;
+    let svg: SimpleSelection<void>;
 
     beforeEach(() => {
       c = new Plottable.Component();
@@ -873,7 +873,7 @@ describe("Component", () => {
 
   describe("calculating the bounds", () => {
     let c: Plottable.Component;
-    let svg: d3.Selection<void>;
+    let svg: SimpleSelection<void>;
 
     beforeEach(() => {
       c = new Plottable.Component();
@@ -895,7 +895,7 @@ describe("Component", () => {
   describe("restricting rendering through clipPath", () => {
 
     let clippedComponent: Plottable.Component;
-    let svg: d3.Selection<void>;
+    let svg: SimpleSelection<void>;
 
     beforeEach(() => {
       clippedComponent = new Plottable.Component();

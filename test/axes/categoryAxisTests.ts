@@ -136,7 +136,7 @@ describe("Category Axes", () => {
 
     it("does not overlap labels with tick marks", () => {
 
-      function verifyTickLabelOverlaps(tickLabels: d3.Selection<void>, tickMarks: d3.Selection<void>) {
+      function verifyTickLabelOverlaps(tickLabels: SimpleSelection<void>, tickMarks: SimpleSelection<void>) {
           for (let i = 0; i < tickLabels[0].length; i++) {
             let tickLabelRect = (<Element> tickLabels[0][i]).getBoundingClientRect();
             let tickMarkRect = (<Element> tickMarks[0][i]).getBoundingClientRect();
@@ -168,7 +168,7 @@ describe("Category Axes", () => {
       let tickLabels = axis.content().selectAll(".tick-label");
       assert.deepEqual(tickLabels.data(), domain, "tick label per datum in given order");
 
-      let getYTransform = (selection: d3.Selection<any>) => {
+      let getYTransform = (selection: SimpleSelection<any>) => {
         return d3.transform(selection.attr("transform")).translate[1];
       };
 
@@ -195,7 +195,7 @@ describe("Category Axes", () => {
       let tickLabels = axis.content().selectAll(".tick-label");
       assert.deepEqual(tickLabels.data(), domain, "tick label per datum in given order");
 
-      let getXTransform = (selection: d3.Selection<any>) => {
+      let getXTransform = (selection: SimpleSelection<any>) => {
         return d3.transform(selection.attr("transform")).translate[0];
       };
 
@@ -214,7 +214,7 @@ describe("Category Axes", () => {
   });
 
   describe("requesting space when bottom oriented", () => {
-    let svg: d3.Selection<void>;
+    let svg: SimpleSelection<void>;
     let axis: Plottable.Axes.Category;
     let scale: Plottable.Scales.Category;
 

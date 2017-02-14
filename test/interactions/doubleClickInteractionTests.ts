@@ -9,7 +9,7 @@ import * as TestMethods from "../testMethods";
 describe("Interactions", () => {
   describe("DoubleClick Interaction", () => {
     let clickedPoint: Plottable.Point;
-    let svg: d3.Selection<void>;
+    let svg: SimpleSelection<void>;
     let doubleClickInteraction: Plottable.Interactions.DoubleClick;
     let component: Plottable.Component;
 

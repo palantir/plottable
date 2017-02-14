@@ -6,7 +6,7 @@
 import * as d3 from "d3";
 
 import { Animator } from "./animator";
-import { AttributeToAppliedProjector } from "../core/interfaces";
+import { AttributeToAppliedProjector, SimpleSelection } from "../core/interfaces";
 /**
  * An animator implementation with no animation. The attributes are
  * immediately set on the selection.
@@ -16,7 +16,7 @@ export class Null implements Animator {
     return 0;
   }
 
-  public animate(selection: d3.Selection<any>, attrToAppliedProjector: AttributeToAppliedProjector) {
+  public animate(selection: SimpleSelection<any>, attrToAppliedProjector: AttributeToAppliedProjector) {
     return selection.attr(attrToAppliedProjector);
   }
 }

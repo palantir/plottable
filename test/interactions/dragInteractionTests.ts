@@ -28,7 +28,7 @@ describe("Interactions", () => {
       y: -SVG_HEIGHT / 2,
     };
 
-    let svg: d3.Selection<void>;
+    let svg: SimpleSelection<void>;
     let component: Plottable.Component;
     let dragInteraction: Plottable.Interactions.Drag;
 

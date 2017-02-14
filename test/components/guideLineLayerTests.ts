@@ -176,7 +176,7 @@ describe("GuideLineLayer", () => {
       const SVG_HEIGHT = orientation === "vertical" ? 300 : 400;
       const GUIDE_LINE_CLASS = ".guide-line";
 
-      let svg: d3.Selection<void>;
+      let svg: SimpleSelection<void>;
 
       beforeEach(() => {
         svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);

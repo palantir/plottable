@@ -260,7 +260,7 @@ export class Category extends Axis<string> {
    * @param {Plottable.Scales.Category} scale The scale this axis is representing.
    * @param {d3.Selection} ticks The tick elements to write.
    */
-  private _drawTicks(stepWidth: number, ticks: d3.Selection<string>) {
+  private _drawTicks(stepWidth: number, ticks: SimpleSelection<string>) {
     let self = this;
     let xAlign: {[s: string]: string};
     let yAlign: {[s: string]: string};

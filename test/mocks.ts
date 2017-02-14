@@ -38,7 +38,7 @@ export class NoOpAnimator implements Plottable.Animator {
     return 0;
   }
 
-  public animate(selection: d3.Selection<any>) {
+  public animate(selection: SimpleSelection<any>) {
     return selection;
   }
 }

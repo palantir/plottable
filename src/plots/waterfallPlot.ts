@@ -19,7 +19,7 @@ export class Waterfall<X, Y> extends Bar<X, number> {
   private static _CONNECTOR_CLASS = "connector";
   private static _CONNECTOR_AREA_CLASS = "connector-area";
   private static _TOTAL_KEY = "total";
-  private _connectorArea: d3.Selection<void>;
+  private _connectorArea: SimpleSelection<void>;
   private _connectorsEnabled = false;
   private _extent: number[];
   private _subtotals: number[];
