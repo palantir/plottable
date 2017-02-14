@@ -12,25 +12,25 @@ import * as d3 from "d3";
 export type SymbolFactory = (symbolSize: number) => string;
 
 export function circle(): SymbolFactory {
-  return (symbolSize: number) => d3.svg.symbol().type("circle").size(Math.PI * Math.pow(symbolSize / 2, 2))(null);
+  return (symbolSize: number) => d3.symbol().type("circle").size(Math.PI * Math.pow(symbolSize / 2, 2))(null);
 }
 
 export function square(): SymbolFactory {
-  return (symbolSize: number) => d3.svg.symbol().type("square").size(Math.pow(symbolSize, 2))(null);
+  return (symbolSize: number) => d3.symbol().type("square").size(Math.pow(symbolSize, 2))(null);
 }
 
 export function cross(): SymbolFactory {
-  return (symbolSize: number) => d3.svg.symbol().type("cross").size((5 / 9) * Math.pow(symbolSize, 2))(null);
+  return (symbolSize: number) => d3.symbol().type("cross").size((5 / 9) * Math.pow(symbolSize, 2))(null);
 }
 
 export function diamond(): SymbolFactory {
-  return (symbolSize: number) => d3.svg.symbol().type("diamond").size(Math.tan(Math.PI / 6) * Math.pow(symbolSize, 2) / 2)(null);
+  return (symbolSize: number) => d3.symbol().type("diamond").size(Math.tan(Math.PI / 6) * Math.pow(symbolSize, 2) / 2)(null);
 }
 
 export function triangleUp(): SymbolFactory {
-  return (symbolSize: number) => d3.svg.symbol().type("triangle-up").size(Math.sqrt(3) * Math.pow(symbolSize / 2, 2))(null);
+  return (symbolSize: number) => d3.symbol().type("triangle-up").size(Math.sqrt(3) * Math.pow(symbolSize / 2, 2))(null);
 }
 
 export function triangleDown(): SymbolFactory {
-  return (symbolSize: number) => d3.svg.symbol().type("triangle-down").size(Math.sqrt(3) * Math.pow(symbolSize / 2, 2))(null);
+  return (symbolSize: number) => d3.symbol().type("triangle-down").size(Math.sqrt(3) * Math.pow(symbolSize / 2, 2))(null);
 }

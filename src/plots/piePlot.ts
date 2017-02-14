@@ -340,7 +340,7 @@ export class Pie extends Plot {
     let innerRadiusAccessor = Plot._scaledAccessor(this.innerRadius());
     let outerRadiusAccessor = Plot._scaledAccessor(this.outerRadius());
     attrToProjector["d"] = (datum: any, index: number, ds: Dataset) => {
-      return d3.svg.arc().innerRadius(innerRadiusAccessor(datum, index, ds))
+      return d3.arc().innerRadius(innerRadiusAccessor(datum, index, ds))
         .outerRadius(outerRadiusAccessor(datum, index, ds))
         .startAngle(this._startAngles[index])
         .endAngle(this._endAngles[index])(datum, index);
@@ -358,7 +358,7 @@ export class Pie extends Plot {
     let sectorValueAccessor = Plot._scaledAccessor(this.sectorValue());
     let dataset = this.datasets()[0];
     let data = this._getDataToDraw().get(dataset);
-    let pie = d3.layout.pie().sort(null).startAngle(this._startAngle).endAngle(this._endAngle)
+    let pie = d3.pie().sort(null).startAngle(this._startAngle).endAngle(this._endAngle)
       .value((d, i) => sectorValueAccessor(d, i, dataset))(data);
     this._startAngles = pie.map((slice) => slice.startAngle);
     this._endAngles = pie.map((slice) => slice.endAngle);
@@ -520,7 +520,7 @@ export class Pie extends Plot {
     let outerRadius = Plot._scaledAccessor(this.outerRadius())(datum, index, dataset);
     let avgRadius = (innerRadius + outerRadius) / 2;
 
-    let pie = d3.layout.pie()
+    let pie = d3.pie()
       .sort(null)
       .value((d: any, i: number) => {
         let value = scaledValueAccessor(d, i, dataset);

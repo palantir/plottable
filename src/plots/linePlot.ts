@@ -456,7 +456,7 @@ export class Line<X> extends XYPlot<X, number> {
         positionY != null && !Utils.Math.isNaN(positionY);
     };
     return (datum: any, index: number, dataset: Dataset) => {
-      return d3.svg.line()
+      return d3.line()
         .x((innerDatum, innerIndex) => xProjector(innerDatum, innerIndex, dataset))
         .y((innerDatum, innerIndex) => yProjector(innerDatum, innerIndex, dataset))
         .interpolate(this.interpolator())

@@ -212,7 +212,7 @@ export class Area<X> extends Line<X> {
       return Utils.Math.isValidNumber(positionX) && Utils.Math.isValidNumber(positionY);
     };
     return (datum: any[], index: number, dataset: Dataset) => {
-      let areaGenerator = d3.svg.area()
+      let areaGenerator = d3.area()
         .x((innerDatum, innerIndex) => xProjector(innerDatum, innerIndex, dataset))
         .y1((innerDatum, innerIndex) => yProjector(innerDatum, innerIndex, dataset))
         .y0((innerDatum, innerIndex) => y0Projector(innerDatum, innerIndex, dataset))
