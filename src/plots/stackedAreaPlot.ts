@@ -7,7 +7,7 @@ import * as d3 from "d3";
 
 import * as Animators from "../animators";
 import { Animator } from "../animators/animator";
-import { Accessor, Point, AttributeToProjector } from "../core/interfaces";
+import { Accessor, Point, AttributeToProjector, SimpleSelection } from "../core/interfaces";
 import { Dataset } from "../core/dataset";
 import { Scale } from "../scales/scale";
 import { QuantitativeScale } from "../scales/quantitativeScale";

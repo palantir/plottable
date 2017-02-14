@@ -3,7 +3,7 @@
  * @license MIT
  */
 
-import { Accessor, Point, Bounds, Range, AttributeToProjector } from "../core/interfaces";
+import { Accessor, Point, Bounds, Range, AttributeToProjector, SimpleSelection } from "../core/interfaces";
 import { Dataset } from "../core/dataset";
 import { Drawer } from "../drawers/drawer";
 import * as Utils from "../utils";

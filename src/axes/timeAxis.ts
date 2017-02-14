@@ -12,6 +12,7 @@ import * as Scales from "../scales";
 import * as Utils from "../utils";
 
 import { Axis } from "./axis";
+import { SimpleSelection } from "../core/interfaces";
 
 export namespace TimeInterval {
   export var second = "second";

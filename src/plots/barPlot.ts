@@ -7,7 +7,7 @@ import * as d3 from "d3";
 import * as SVGTypewriter from "svg-typewriter";
 
 import * as Animators from "../animators";
-import { Accessor, Point, Bounds, Range } from "../core/interfaces";
+import { Accessor, Point, Bounds, Range, SimpleSelection } from "../core/interfaces";
 import { Dataset } from "../core/dataset";
 import { Drawer } from "../drawers/drawer";
 import * as Drawers from "../drawers";

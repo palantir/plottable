@@ -5,7 +5,7 @@
 
 import * as d3 from "d3";
 
-import { Range } from "../core/interfaces";
+import { Range, SimpleSelection } from "../core/interfaces";
 
 let nativeMath: Math = (<any>window).Math;
 

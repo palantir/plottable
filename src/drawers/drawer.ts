@@ -7,7 +7,7 @@ import * as d3 from "d3";
 import * as Utils from "../utils";
 
 import { Dataset } from "../core/dataset";
-import { AttributeToProjector, AttributeToAppliedProjector } from "../core/interfaces";
+import { AttributeToProjector, AttributeToAppliedProjector, SimpleSelection } from "../core/interfaces";
 
 import * as Drawers from "./";
 

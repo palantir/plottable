@@ -5,7 +5,7 @@
 
 import * as SVGTypewriter from "svg-typewriter";
 
-import { Accessor, Point } from "../core/interfaces";
+import { Accessor, Point, SimpleSelection } from "../core/interfaces";
 import { Dataset } from "../core/dataset";
 import { Scale } from "../scales/scale";
 import * as Utils from "../utils";

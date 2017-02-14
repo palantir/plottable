@@ -6,6 +6,7 @@
 import * as d3 from "d3";
 
 import { Component, ComponentCallback } from "./component";
+import { SimpleSelection } from "../core/interfaces";
 
 /*
  * ComponentContainer class encapsulates Table and ComponentGroup's shared functionality.

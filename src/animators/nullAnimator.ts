@@ -16,8 +16,8 @@ export class Null implements Animator {
     return 0;
   }
 
-  public animate(selection: SimpleSelection<any>, attrToAppliedProjector: AttributeToAppliedProjector) {
-    return selection.attr(attrToAppliedProjector);
+  public animate(selection: SimpleSelection<any>, attrToAppliedProjector: AttributeToAppliedProjector): SimpleSelection<any> {
+    return selection.attrs(attrToAppliedProjector);
   }
 }
 

@@ -194,11 +194,11 @@ export class Axis<D> extends Component {
     let tickMarkValues = this._getTickValues();
     let tickMarks = this._tickMarkContainer.selectAll("." + Axis.TICK_MARK_CLASS).data(tickMarkValues);
     tickMarks.enter().append("line").classed(Axis.TICK_MARK_CLASS, true);
-    tickMarks.attr(this._generateTickMarkAttrHash());
+    tickMarks.attrs(this._generateTickMarkAttrHash());
     d3.select(tickMarks[0][0]).classed(Axis.END_TICK_MARK_CLASS, true)
-      .attr(this._generateTickMarkAttrHash(true));
+      .attrs(this._generateTickMarkAttrHash(true));
     d3.select(tickMarks[0][tickMarkValues.length - 1]).classed(Axis.END_TICK_MARK_CLASS, true)
-      .attr(this._generateTickMarkAttrHash(true));
+      .attrs(this._generateTickMarkAttrHash(true));
     tickMarks.exit().remove();
     this._baseline.attr(this._generateBaselineAttrHash());
     if (this.annotationsEnabled()) {

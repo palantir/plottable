@@ -3,7 +3,7 @@
  * @license MIT
  */
 
-import { Point } from "../core/interfaces";
+import { Point, SimpleSelection } from "../core/interfaces";
 import { QuantitativeScale } from "../scales/quantitativeScale";
 import { ScaleCallback } from "../scales/scale";
 import * as Utils from "../utils";

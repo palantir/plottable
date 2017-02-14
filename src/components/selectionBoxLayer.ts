@@ -5,7 +5,7 @@
 
 import * as d3 from "d3";
 
-import { Bounds, Point } from "../core/interfaces";
+import { Bounds, Point, SimpleSelection } from "../core/interfaces";
 import { QuantitativeScale } from "../scales/quantitativeScale";
 import { ScaleCallback } from "../scales/scale";
 import * as Utils from "../utils";

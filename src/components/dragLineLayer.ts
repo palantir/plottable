@@ -4,7 +4,7 @@
  */
 
 import { GuideLineLayer } from "../components/guideLineLayer";
-import { Point } from "../core/interfaces";
+import { Point, SimpleSelection } from "../core/interfaces";
 import * as Interactions from "../interactions";
 import * as Utils from "../utils";
 

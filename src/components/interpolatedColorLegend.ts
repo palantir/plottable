@@ -10,7 +10,7 @@ import { Formatter } from "../core/formatters";
 import * as Formatters from "../core/formatters";
 import * as Scales from "../scales";
 import { ScaleCallback } from "../scales/scale";
-import { SpaceRequest, Point } from "../core/interfaces";
+import { SpaceRequest, Point, SimpleSelection } from "../core/interfaces";
 import * as Utils from "../utils";
 
 import { Component } from "./component";
