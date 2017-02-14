@@ -411,10 +411,6 @@ export class Category extends Axis<string> {
   }
 
   public computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number) {
-    // When anyone calls redraw(), computeLayout() will be called
-    // on everyone, including this. Since CSS or something might have
-    // affected the size of the characters, clear the cache.
-    this._measurer.reset();
     super.computeLayout(origin, availableWidth, availableHeight);
     if (!this.isHorizontal()) {
       this._scale.range([0, this.height()]);
