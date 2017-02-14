@@ -10,6 +10,7 @@ export * from "./clusteredBarPlot";
 export * from "./linePlot";
 export * from "./piePlot";
 export * from "./rectanglePlot";
+export * from "./canvasRectanglePlot";
 export * from "./scatterPlot";
 export * from "./segmentPlot";
 export * from "./stackedAreaPlot";

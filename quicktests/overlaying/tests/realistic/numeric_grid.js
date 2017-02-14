@@ -19,7 +19,7 @@ function run(div, data, Plottable) {
   var xScale = new Plottable.Scales.Linear();
   var yScale = new Plottable.Scales.Linear();
 
-  var plot = new Plottable.Plots.Rectangle();
+  var plot = new Plottable.Plots.CanvasRectangle();
   plot.addDataset(new Plottable.Dataset(data));
   plot.x(function(d){ return d.x; }, xScale)
       .y(function(d) { return d.y; }, yScale)

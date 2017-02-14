@@ -1,0 +1,357 @@
+/**
+ * Copyright 2014-present Palantir Technologies
+ * @license MIT
+ */
+
+import * as d3 from "d3";
+
+import * as Animators from "../animators";
+import * as Utils from "../utils";
+import * as Plots from "../plots";
+import * as Scales from "../scales";
+import { Scale, ScaleCallback } from "../scales/scale";
+
+import { HTMLComponent } from "../components/htmlComponent";
+import { Accessor, AttributeToProjector, Point } from "../core/interfaces";
+import { Dataset, DatasetCallback } from "../core/dataset";
+import * as Drawers from "../drawers";
+import { CanvasDrawer } from "../drawers/canvasDrawer";
+import { Drawer } from "../drawers/drawer";
+
+export class CanvasPlot extends HTMLComponent {
+    private _attrBindings: d3.Map<Plots.AccessorScaleBinding<any, any>>;
+    private _attrExtents: d3.Map<any[]>;
+    private _includedValuesProvider: Scales.IncludedValuesProvider<any>;
+
+    private _cachedEntityStore: Utils.EntityStore<Plots.LightweightPlotEntity>;
+    private _datasetToDrawer: Utils.Map<Dataset, CanvasDrawer>;
+    private _dataChanged = false;
+    private _onDatasetUpdateCallback: DatasetCallback;
+    protected _propertyExtents: d3.Map<any[]>;
+    protected _propertyBindings: d3.Map<Plots.AccessorScaleBinding<any, any>>;
+    protected _renderCallback: ScaleCallback<Scale<any, any>>;
+
+    protected _renderArea: d3.Selection<void>;
+
+    constructor() {
+        super();
+        this._attrExtents = d3.map<any[]>();
+        this._attrBindings = d3.map<Plots.AccessorScaleBinding<any, any>>();
+        this._datasetToDrawer = new Utils.Map<Dataset, CanvasDrawer>();
+        this._propertyBindings = d3.map<Plots.AccessorScaleBinding<any, any>>();
+        this._propertyExtents = d3.map<any[]>();
+
+        this._onDatasetUpdateCallback = () => this._onDatasetUpdate();
+        this._renderCallback = (scale) => this.render();
+        this._includedValuesProvider = (scale: Scale<any, any>) => this._includedValuesForScale(scale);
+    }
+
+    public addDataset(dataset: Dataset) {
+        this._addDataset(dataset);
+        this._onDatasetUpdate();
+        return this;
+    }
+
+    public anchor(selection: HTMLElement) {
+        super.anchor(selection);
+        this._dataChanged = true;
+        this._cachedEntityStore = undefined;
+        this._updateExtents();
+        return this;
+    }
+
+    public computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number) {
+        super.computeLayout(origin, availableWidth, availableHeight);
+        const canvas = this._renderArea.node() as HTMLCanvasElement;
+        canvas.width = this.width();
+        canvas.height = this.height();
+
+        return this;
+    }
+
+  /**
+   * Gets the AccessorScaleBinding for a particular attribute.
+   *
+   * @param {string} attr
+   */
+  public attr<A>(attr: string): Plots.AccessorScaleBinding<A, number | string>;
+  /**
+   * Sets a particular attribute to a constant value or the result of an Accessor.
+   *
+   * @param {string} attr
+   * @param {number|string|Accessor<number>|Accessor<string>} attrValue
+   * @returns {Plot} The calling Plot.
+   */
+  public attr(attr: string, attrValue: number | string | Accessor<number> | Accessor<string>): this;
+  /**
+   * Sets a particular attribute to a scaled constant value or scaled result of an Accessor.
+   * The provided Scale will account for the attribute values when autoDomain()-ing.
+   *
+   * @param {string} attr
+   * @param {A|Accessor<A>} attrValue
+   * @param {Scale<A, number | string>} scale The Scale used to scale the attrValue.
+   * @returns {Plot} The calling Plot.
+   */
+  public attr<A>(attr: string, attrValue: A | Accessor<A>, scale: Scale<A, number | string>): this;
+  public attr<A>(attr: string, attrValue?: number | string | Accessor<number> | Accessor<string> | A | Accessor<A>,
+                 scale?: Scale<A, number | string>): any {
+    if (attrValue == null) {
+      return this._attrBindings.get(attr);
+    }
+    this._bindAttr(attr, attrValue, scale);
+    this.render(); // queue a re-render upon changing projector
+    return this;
+  }
+
+    public datasets(): Dataset[];
+    public datasets(datasets: Dataset[]): this;
+    public datasets(datasets?: Dataset[]): any {
+        let currentDatasets: Dataset[] = [];
+        this._datasetToDrawer.forEach((drawer, dataset) => currentDatasets.push(dataset));
+        if (datasets == null) {
+            return currentDatasets;
+        }
+
+        currentDatasets.forEach((dataset) => this._removeDataset(dataset));
+        datasets.forEach((dataset) => this._addDataset(dataset));
+        this._onDatasetUpdate();
+        return this;
+    }
+
+   /**
+    * Removes a Dataset from the Plot.
+    *
+    * @param {Dataset} dataset
+    * @returns {Plot} The calling Plot.
+    */
+    public removeDataset(dataset: Dataset): this {
+        this._removeDataset(dataset);
+        this._onDatasetUpdate();
+        return this;
+    }
+
+
+    public renderImmediately() {
+        super.renderImmediately();
+        if (this._isAnchored) {
+            let drawSteps = this._generateDrawSteps();
+            let dataToDraw = this._getDataToDraw();
+            let drawers = this._getDrawersInOrder();
+            this.datasets().forEach((ds, i) => drawers[i].draw(dataToDraw.get(ds), drawSteps));
+
+            let times = this.datasets().map((ds, i) => drawers[i].totalDrawTime(dataToDraw.get(ds), drawSteps));
+            let maxTime = Utils.Math.max(times, 0);
+        }
+
+        return this;
+    }
+
+    protected _addDataset(dataset: Dataset) {
+        this._removeDataset(dataset);
+        let drawer = this._createDrawer(dataset);
+        if (this._renderArea != null) {
+            // may not be initiated yet, we'll initiate everything later
+            drawer.renderArea(this._renderArea.node() as HTMLCanvasElement);
+        }
+
+        this._datasetToDrawer.set(dataset, drawer);
+        dataset.onUpdate(this._onDatasetUpdateCallback);
+        return this;
+    }
+
+    protected _createDrawer(dataset: Dataset): CanvasDrawer {
+        return new CanvasDrawer(dataset);
+    }
+    /**
+     * Override in subclass to add special extents, such as included values
+     */
+    protected _extentsForProperty(property: string) {
+        return this._propertyExtents.get(property);
+    }
+
+    protected _filterForProperty(property: string): Accessor<boolean> {
+        return null;
+    }
+
+    protected _generateAttrToProjector(): AttributeToProjector {
+        let h: AttributeToProjector = {};
+        this._attrBindings.forEach((attr, binding) => {
+            let accessor = binding.accessor;
+            let scale = binding.scale;
+            let fn = scale ? (d: any, i: number, dataset: Dataset) => scale.scale(accessor(d, i, dataset)) : accessor;
+            h[attr] = fn;
+        });
+        let propertyProjectors = this._propertyProjectors();
+        Object.keys(propertyProjectors).forEach((key) => {
+            if (h[key] == null) {
+                h[key] = propertyProjectors[key];
+            }
+        });
+        return h;
+    }
+
+    protected _generateDrawSteps(): Drawers.DrawStep[] {
+        return [{ attrToProjector: this._generateAttrToProjector(), animator: new Animators.Null() }];
+    }
+
+    protected _getDataToDraw(): Utils.Map<Dataset, any[]> {
+        let dataToDraw: Utils.Map<Dataset, any[]> = new Utils.Map<Dataset, any[]>();
+        this.datasets().forEach((dataset) => dataToDraw.set(dataset, dataset.data()));
+        return dataToDraw;
+    }
+
+    protected _getDrawersInOrder(): CanvasDrawer[] {
+        return this.datasets().map((dataset) => this._datasetToDrawer.get(dataset));
+    }
+
+    protected _onDatasetUpdate() {
+        this._updateExtents();
+        this._dataChanged = true;
+        this._cachedEntityStore = undefined;
+        this.render();
+    }
+
+    protected _propertyProjectors(): AttributeToProjector {
+        return {};
+    }
+
+    protected static _scaledAccessor<D, R>(binding: Plots.AccessorScaleBinding<D, R>) {
+        return binding.scale == null ?
+            binding.accessor :
+            (d: any, i: number, ds: Dataset) => binding.scale.scale(binding.accessor(d, i, ds));
+    }
+
+    protected _removeDataset(dataset: Dataset) {
+        if (this.datasets().indexOf(dataset) === -1) {
+            return this;
+        }
+
+        // this._removeDatasetNodes(dataset);
+        dataset.offUpdate(this._onDatasetUpdateCallback);
+        this._datasetToDrawer.delete(dataset);
+        return this;
+    }
+
+    protected _setup() {
+        super._setup();
+        this._renderArea = this.element().append("canvas");
+        this.datasets().forEach((dataset) => {
+            this._datasetToDrawer.get(dataset).renderArea(this._renderArea.node() as HTMLCanvasElement);
+        });
+    }
+
+    protected _installScaleForKey(scale: Scale<any, any>, key: string) {
+        scale.onUpdate(this._renderCallback);
+        scale.addIncludedValuesProvider(this._includedValuesProvider);
+    }
+
+    protected _uninstallScaleForKey(scale: Scale<any, any>, key: string) {
+        scale.offUpdate(this._renderCallback);
+        scale.removeIncludedValuesProvider(this._includedValuesProvider);
+    }
+
+    /**
+     * Updates the extents associated with each attribute, then autodomains all scales the Plot uses.
+     */
+    protected _updateExtents() {
+        this._attrBindings.forEach((attr) => this._updateExtentsForAttr(attr));
+        this._propertyExtents.forEach((property) => this._updateExtentsForProperty(property));
+        this._scales().forEach((scale) => scale.addIncludedValuesProvider(this._includedValuesProvider));
+    }
+
+    private _updateExtentsForAttr(attr: string) {
+        // Filters should never be applied to attributes
+        this._updateExtentsForKey(attr, this._attrBindings, this._attrExtents, null);
+    }
+
+    protected _updateExtentsForProperty(property: string) {
+        this._updateExtentsForKey(property, this._propertyBindings, this._propertyExtents, this._filterForProperty(property));
+    }
+
+    private _computeExtent(dataset: Dataset, accScaleBinding: Plots.AccessorScaleBinding<any, any>, filter: Accessor<boolean>): any[] {
+        let accessor = accScaleBinding.accessor;
+        let scale = accScaleBinding.scale;
+
+        if (scale == null) {
+            return [];
+        }
+
+        let data = dataset.data();
+        if (filter != null) {
+            data = data.filter((d, i) => filter(d, i, dataset));
+        }
+        let appliedAccessor = (d: any, i: number) => accessor(d, i, dataset);
+        let mappedData = data.map(appliedAccessor);
+
+        return scale.extentOfValues(mappedData);
+    }
+    /**
+     * @returns {Scale[]} A unique array of all scales currently used by the Plot.
+     */
+    private _scales() {
+        let scales: Scale<any, any>[] = [];
+        this._attrBindings.forEach((attr, binding) => {
+            let scale = binding.scale;
+            if (scale != null && scales.indexOf(scale) === -1) {
+                scales.push(scale);
+            }
+        });
+        this._propertyBindings.forEach((property, binding) => {
+            let scale = binding.scale;
+            if (scale != null && scales.indexOf(scale) === -1) {
+                scales.push(scale);
+            }
+        });
+        return scales;
+    }
+
+    private _updateExtentsForKey(key: string, bindings: d3.Map<Plots.AccessorScaleBinding<any, any>>,
+                               extents: d3.Map<any[]>, filter: Accessor<boolean>) {
+        let accScaleBinding = bindings.get(key);
+        if (accScaleBinding == null || accScaleBinding.accessor == null) {
+            return;
+        }
+        extents.set(key, this.datasets().map((dataset) => this._computeExtent(dataset, accScaleBinding, filter)));
+    }
+
+    private _includedValuesForScale<D>(scale: Scale<D, any>): D[] {
+        if (!this._isAnchored) {
+            return [];
+        }
+        let includedValues: D[] = [];
+        this._attrBindings.forEach((attr, binding) => {
+            if (binding.scale === scale) {
+                let extents = this._attrExtents.get(attr);
+                if (extents != null) {
+                    includedValues = includedValues.concat(<D[]> d3.merge(extents));
+                }
+            }
+        });
+
+        this._propertyBindings.forEach((property, binding) => {
+            if (binding.scale === scale) {
+                let extents = this._extentsForProperty(property);
+                if (extents != null) {
+                    includedValues = includedValues.concat(<D[]> d3.merge(extents));
+                }
+            }
+        });
+
+        return includedValues;
+    }
+
+    private _bindAttr(attr: string, value: any, scale: Scale<any, any>) {
+        let binding = this._attrBindings.get(attr);
+        let oldScale = binding != null ? binding.scale : null;
+
+        this._attrBindings.set(attr, { accessor: d3.functor(value), scale: scale });
+        this._updateExtentsForAttr(attr);
+
+        if (oldScale != null) {
+            this._uninstallScaleForKey(oldScale, attr);
+        }
+        if (scale != null) {
+            this._installScaleForKey(scale, attr);
+        }
+    }
+}

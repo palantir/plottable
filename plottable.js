@@ -78,7 +78,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/ 	__webpack_require__.p = "";
 
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 118);
+/******/ 	return __webpack_require__(__webpack_require__.s = 121);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -94,25 +94,25 @@ return /******/ (function(modules) { // webpackBootstrap
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-var Array = __webpack_require__(95);
+var Array = __webpack_require__(98);
 exports.Array = Array;
-var Color = __webpack_require__(99);
+var Color = __webpack_require__(102);
 exports.Color = Color;
-var DOM = __webpack_require__(42);
+var DOM = __webpack_require__(43);
 exports.DOM = DOM;
 var Math = __webpack_require__(29);
 exports.Math = Math;
-var Stacking = __webpack_require__(102);
+var Stacking = __webpack_require__(105);
 exports.Stacking = Stacking;
-var Window = __webpack_require__(103);
+var Window = __webpack_require__(106);
 exports.Window = Window;
-__export(__webpack_require__(96));
-__export(__webpack_require__(97));
-__export(__webpack_require__(98));
+__export(__webpack_require__(99));
 __export(__webpack_require__(100));
-__export(__webpack_require__(30));
 __export(__webpack_require__(101));
-__export(__webpack_require__(44));
+__export(__webpack_require__(103));
+__export(__webpack_require__(30));
+__export(__webpack_require__(104));
+__export(__webpack_require__(45));
 
 
 /***/ }),
@@ -134,16 +134,16 @@ module.exports = __WEBPACK_EXTERNAL_MODULE_1__;
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-var TickGenerators = __webpack_require__(93);
+var TickGenerators = __webpack_require__(96);
 exports.TickGenerators = TickGenerators;
-__export(__webpack_require__(41));
-__export(__webpack_require__(89));
-__export(__webpack_require__(90));
-__export(__webpack_require__(91));
+__export(__webpack_require__(42));
 __export(__webpack_require__(92));
+__export(__webpack_require__(93));
 __export(__webpack_require__(94));
+__export(__webpack_require__(95));
+__export(__webpack_require__(97));
 // ---------------------------------------------------------
-var categoryScale_2 = __webpack_require__(41);
+var categoryScale_2 = __webpack_require__(42);
 var quantitativeScale_1 = __webpack_require__(10);
 /**
  * Type guarded function to check if the scale implements the
@@ -175,10 +175,10 @@ var __extends = (this && this.__extends) || function (d, b) {
 };
 var d3 = __webpack_require__(1);
 var Animators = __webpack_require__(5);
-var svgComponent_1 = __webpack_require__(6);
-var drawer_1 = __webpack_require__(7);
+var svgComponent_1 = __webpack_require__(7);
+var drawer_1 = __webpack_require__(6);
 var Utils = __webpack_require__(0);
-var Plots = __webpack_require__(39);
+var Plots = __webpack_require__(40);
 var Plot = (function (_super) {
     __extends(Plot, _super);
     /**
@@ -672,11 +672,11 @@ exports.Plot = Plot;
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-__export(__webpack_require__(104));
-__export(__webpack_require__(108));
+__export(__webpack_require__(107));
+__export(__webpack_require__(111));
 __export(__webpack_require__(13));
-__export(__webpack_require__(114));
-__export(__webpack_require__(116));
+__export(__webpack_require__(117));
+__export(__webpack_require__(119));
 //# sourceMappingURL=index.js.map
 
 /***/ }),
@@ -692,12 +692,157 @@ __export(__webpack_require__(116));
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-__export(__webpack_require__(53));
 __export(__webpack_require__(54));
+__export(__webpack_require__(55));
 
 
 /***/ }),
 /* 6 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/**
+ * Copyright 2014-present Palantir Technologies
+ * @license MIT
+ */
+
+var d3 = __webpack_require__(1);
+var Utils = __webpack_require__(0);
+var Drawer = (function () {
+    /**
+     * A Drawer draws svg elements based on the input Dataset.
+     *
+     * @constructor
+     * @param {Dataset} dataset The dataset associated with this Drawer
+     */
+    function Drawer(dataset) {
+        this._cachedSelectionValid = false;
+        this._dataset = dataset;
+        this._svgElementName = "path";
+    }
+    Drawer.prototype.renderArea = function (area) {
+        if (area == null) {
+            return this._renderArea;
+        }
+        this._renderArea = area;
+        this._cachedSelectionValid = false;
+        return this;
+    };
+    /**
+     * Removes the Drawer and its renderArea
+     */
+    Drawer.prototype.remove = function () {
+        if (this.renderArea() != null) {
+            this.renderArea().remove();
+        }
+    };
+    /**
+     * Binds data to selection
+     *
+     * @param{any[]} data The data to be drawn
+     */
+    Drawer.prototype._bindSelectionData = function (data) {
+        var dataElements = this.selection().data(data);
+        dataElements.enter().append(this._svgElementName);
+        dataElements.exit().remove();
+        this._applyDefaultAttributes(dataElements);
+    };
+    Drawer.prototype._applyDefaultAttributes = function (selection) {
+        if (this._className != null) {
+            selection.classed(this._className, true);
+        }
+    };
+    /**
+     * Draws data using one step
+     *
+     * @param{AppliedDrawStep} step The step, how data should be drawn.
+     */
+    Drawer.prototype._drawStep = function (step) {
+        var selection = this.selection();
+        var colorAttributes = ["fill", "stroke"];
+        colorAttributes.forEach(function (colorAttribute) {
+            if (step.attrToAppliedProjector[colorAttribute] != null) {
+                selection.attr(colorAttribute, step.attrToAppliedProjector[colorAttribute]);
+            }
+        });
+        step.animator.animate(selection, step.attrToAppliedProjector);
+        if (this._className != null) {
+            this.selection().classed(this._className, true);
+        }
+    };
+    Drawer.prototype._appliedProjectors = function (attrToProjector) {
+        var _this = this;
+        var modifiedAttrToProjector = {};
+        Object.keys(attrToProjector).forEach(function (attr) {
+            modifiedAttrToProjector[attr] =
+                function (datum, index) { return attrToProjector[attr](datum, index, _this._dataset); };
+        });
+        return modifiedAttrToProjector;
+    };
+    /**
+     * Calculates the total time it takes to use the input drawSteps to draw the input data
+     *
+     * @param {any[]} data The data that would have been drawn
+     * @param {Drawers.DrawStep[]} drawSteps The DrawSteps to use
+     * @returns {number} The total time it takes to draw
+     */
+    Drawer.prototype.totalDrawTime = function (data, drawSteps) {
+        var delay = 0;
+        drawSteps.forEach(function (drawStep, i) {
+            delay += drawStep.animator.totalTime(data.length);
+        });
+        return delay;
+    };
+    /**
+     * Draws the data into the renderArea using the spefic steps and metadata
+     *
+     * @param{any[]} data The data to be drawn
+     * @param{DrawStep[]} drawSteps The list of steps, which needs to be drawn
+     */
+    Drawer.prototype.draw = function (data, drawSteps) {
+        var _this = this;
+        var appliedDrawSteps = drawSteps.map(function (dr) {
+            var attrToAppliedProjector = _this._appliedProjectors(dr.attrToProjector);
+            return {
+                attrToAppliedProjector: attrToAppliedProjector,
+                animator: dr.animator,
+            };
+        });
+        this._bindSelectionData(data);
+        this._cachedSelectionValid = false;
+        var delay = 0;
+        appliedDrawSteps.forEach(function (drawStep, i) {
+            Utils.Window.setTimeout(function () { return _this._drawStep(drawStep); }, delay);
+            delay += drawStep.animator.totalTime(data.length);
+        });
+        return this;
+    };
+    Drawer.prototype.selection = function () {
+        if (!this._cachedSelectionValid) {
+            this._cachedSelection = this.renderArea().selectAll(this.selector());
+            this._cachedSelectionValid = true;
+        }
+        return this._cachedSelection;
+    };
+    /**
+     * Returns the CSS selector for this Drawer's visual elements.
+     */
+    Drawer.prototype.selector = function () {
+        return this._svgElementName;
+    };
+    /**
+     * Returns the D3 selection corresponding to the datum with the specified index.
+     */
+    Drawer.prototype.selectionForIndex = function (index) {
+        return d3.select(this.selection()[0][index]);
+    };
+    return Drawer;
+}());
+exports.Drawer = Drawer;
+
+
+/***/ }),
+/* 7 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1099,7 +1244,7 @@ exports.SVGComponent = SVGComponent;
 
 
 /***/ }),
-/* 7 */
+/* 8 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1108,143 +1253,20 @@ exports.SVGComponent = SVGComponent;
  * @license MIT
  */
 
-var d3 = __webpack_require__(1);
-var Utils = __webpack_require__(0);
-var Drawer = (function () {
-    /**
-     * A Drawer draws svg elements based on the input Dataset.
-     *
-     * @constructor
-     * @param {Dataset} dataset The dataset associated with this Drawer
-     */
-    function Drawer(dataset) {
-        this._cachedSelectionValid = false;
-        this._dataset = dataset;
-        this._svgElementName = "path";
-    }
-    Drawer.prototype.renderArea = function (area) {
-        if (area == null) {
-            return this._renderArea;
-        }
-        this._renderArea = area;
-        this._cachedSelectionValid = false;
-        return this;
-    };
-    /**
-     * Removes the Drawer and its renderArea
-     */
-    Drawer.prototype.remove = function () {
-        if (this.renderArea() != null) {
-            this.renderArea().remove();
-        }
-    };
-    /**
-     * Binds data to selection
-     *
-     * @param{any[]} data The data to be drawn
-     */
-    Drawer.prototype._bindSelectionData = function (data) {
-        var dataElements = this.selection().data(data);
-        dataElements.enter().append(this._svgElementName);
-        dataElements.exit().remove();
-        this._applyDefaultAttributes(dataElements);
-    };
-    Drawer.prototype._applyDefaultAttributes = function (selection) {
-        if (this._className != null) {
-            selection.classed(this._className, true);
-        }
-    };
-    /**
-     * Draws data using one step
-     *
-     * @param{AppliedDrawStep} step The step, how data should be drawn.
-     */
-    Drawer.prototype._drawStep = function (step) {
-        var selection = this.selection();
-        var colorAttributes = ["fill", "stroke"];
-        colorAttributes.forEach(function (colorAttribute) {
-            if (step.attrToAppliedProjector[colorAttribute] != null) {
-                selection.attr(colorAttribute, step.attrToAppliedProjector[colorAttribute]);
-            }
-        });
-        step.animator.animate(selection, step.attrToAppliedProjector);
-        if (this._className != null) {
-            this.selection().classed(this._className, true);
-        }
-    };
-    Drawer.prototype._appliedProjectors = function (attrToProjector) {
-        var _this = this;
-        var modifiedAttrToProjector = {};
-        Object.keys(attrToProjector).forEach(function (attr) {
-            modifiedAttrToProjector[attr] =
-                function (datum, index) { return attrToProjector[attr](datum, index, _this._dataset); };
-        });
-        return modifiedAttrToProjector;
-    };
-    /**
-     * Calculates the total time it takes to use the input drawSteps to draw the input data
-     *
-     * @param {any[]} data The data that would have been drawn
-     * @param {Drawers.DrawStep[]} drawSteps The DrawSteps to use
-     * @returns {number} The total time it takes to draw
-     */
-    Drawer.prototype.totalDrawTime = function (data, drawSteps) {
-        var delay = 0;
-        drawSteps.forEach(function (drawStep, i) {
-            delay += drawStep.animator.totalTime(data.length);
-        });
-        return delay;
-    };
-    /**
-     * Draws the data into the renderArea using the spefic steps and metadata
-     *
-     * @param{any[]} data The data to be drawn
-     * @param{DrawStep[]} drawSteps The list of steps, which needs to be drawn
-     */
-    Drawer.prototype.draw = function (data, drawSteps) {
-        var _this = this;
-        var appliedDrawSteps = drawSteps.map(function (dr) {
-            var attrToAppliedProjector = _this._appliedProjectors(dr.attrToProjector);
-            return {
-                attrToAppliedProjector: attrToAppliedProjector,
-                animator: dr.animator,
-            };
-        });
-        this._bindSelectionData(data);
-        this._cachedSelectionValid = false;
-        var delay = 0;
-        appliedDrawSteps.forEach(function (drawStep, i) {
-            Utils.Window.setTimeout(function () { return _this._drawStep(drawStep); }, delay);
-            delay += drawStep.animator.totalTime(data.length);
-        });
-        return this;
-    };
-    Drawer.prototype.selection = function () {
-        if (!this._cachedSelectionValid) {
-            this._cachedSelection = this.renderArea().selectAll(this.selector());
-            this._cachedSelectionValid = true;
-        }
-        return this._cachedSelection;
-    };
-    /**
-     * Returns the CSS selector for this Drawer's visual elements.
-     */
-    Drawer.prototype.selector = function () {
-        return this._svgElementName;
-    };
-    /**
-     * Returns the D3 selection corresponding to the datum with the specified index.
-     */
-    Drawer.prototype.selectionForIndex = function (index) {
-        return d3.select(this.selection()[0][index]);
-    };
-    return Drawer;
-}());
-exports.Drawer = Drawer;
+function __export(m) {
+    for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
+}
+__export(__webpack_require__(70));
+__export(__webpack_require__(71));
+__export(__webpack_require__(72));
+__export(__webpack_require__(73));
+__export(__webpack_require__(74));
+__export(__webpack_require__(75));
+__export(__webpack_require__(76));
 
 
 /***/ }),
-/* 8 */
+/* 9 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1485,28 +1507,6 @@ function verifyPrecision(precision) {
         throw new RangeError("Formatter precision must be an integer");
     }
 }
-
-
-/***/ }),
-/* 9 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-/**
- * Copyright 2014-present Palantir Technologies
- * @license MIT
- */
-
-function __export(m) {
-    for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
-}
-__export(__webpack_require__(69));
-__export(__webpack_require__(70));
-__export(__webpack_require__(71));
-__export(__webpack_require__(72));
-__export(__webpack_require__(73));
-__export(__webpack_require__(74));
-__export(__webpack_require__(75));
 
 
 /***/ }),
@@ -1792,9 +1792,9 @@ exports.QuantitativeScale = QuantitativeScale;
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-__export(__webpack_require__(66));
 __export(__webpack_require__(67));
 __export(__webpack_require__(68));
+__export(__webpack_require__(69));
 
 
 /***/ }),
@@ -1913,11 +1913,11 @@ exports.Interaction = Interaction;
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-__export(__webpack_require__(109));
-__export(__webpack_require__(110));
-__export(__webpack_require__(111));
 __export(__webpack_require__(112));
 __export(__webpack_require__(113));
+__export(__webpack_require__(114));
+__export(__webpack_require__(115));
+__export(__webpack_require__(116));
 //# sourceMappingURL=index.js.map
 
 /***/ }),
@@ -1933,12 +1933,12 @@ __export(__webpack_require__(113));
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-__export(__webpack_require__(76));
 __export(__webpack_require__(77));
 __export(__webpack_require__(78));
-__export(__webpack_require__(34));
 __export(__webpack_require__(79));
+__export(__webpack_require__(34));
 __export(__webpack_require__(80));
+__export(__webpack_require__(81));
 
 
 /***/ }),
@@ -2454,17 +2454,18 @@ function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
 __export(__webpack_require__(38));
-__export(__webpack_require__(23));
-__export(__webpack_require__(39));
-__export(__webpack_require__(81));
+__export(__webpack_require__(24));
 __export(__webpack_require__(40));
-__export(__webpack_require__(82));
 __export(__webpack_require__(83));
+__export(__webpack_require__(41));
 __export(__webpack_require__(84));
 __export(__webpack_require__(85));
+__export(__webpack_require__(82));
 __export(__webpack_require__(86));
 __export(__webpack_require__(87));
 __export(__webpack_require__(88));
+__export(__webpack_require__(89));
+__export(__webpack_require__(90));
 
 
 /***/ }),
@@ -2641,8 +2642,8 @@ var __extends = (this && this.__extends) || function (d, b) {
 };
 var d3 = __webpack_require__(1);
 var SVGTypewriter = __webpack_require__(4);
-var svgComponent_1 = __webpack_require__(6);
-var Formatters = __webpack_require__(8);
+var svgComponent_1 = __webpack_require__(7);
+var Formatters = __webpack_require__(9);
 var Utils = __webpack_require__(0);
 var Axis = (function (_super) {
     __extends(Axis, _super);
@@ -3492,6 +3493,226 @@ exports.AbstractComponent = AbstractComponent;
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
+
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
+var d3 = __webpack_require__(1);
+var abstractComponent_1 = __webpack_require__(20);
+var RenderController = __webpack_require__(16);
+var Utils = __webpack_require__(0);
+var HTMLComponent = (function (_super) {
+    __extends(HTMLComponent, _super);
+    function HTMLComponent() {
+        _super.apply(this, arguments);
+        this._cssClasses = new Utils.Set();
+    }
+    HTMLComponent.prototype.anchor = function (selection) {
+        if (this._destroyed) {
+            throw new Error("Can't reuse destroy()-ed Components!");
+        }
+        if (this._element != null) {
+            // reattach existing element
+            selection.appendChild(this._element);
+        }
+        else {
+            this._element = document.createElement("div");
+            selection.appendChild(this._element);
+            this._setup();
+        }
+        this._isAnchored = true;
+        this._onAnchorCallbacks.callCallbacks(this);
+        return this;
+    };
+    HTMLComponent.prototype.anchorHTML = function (selection) {
+        return this.anchor(selection);
+    };
+    HTMLComponent.prototype.computeLayout = function (origin, availableWidth, availableHeight) {
+        if (origin == null || availableWidth == null || availableHeight == null) {
+            if (this._element == null) {
+                throw new Error("anchor() must be called before computeLayout()");
+            }
+            else if (this.parent() == null) {
+                // if the parent is null we are the root node. In this case, we determine
+                // then sizing constraints for the remainder of the chart.
+                origin = { x: 0, y: 0 };
+                // this is the top-level element. make it 100% height and width
+                // so we can measure the amount of space available for the chart
+                // with respect to the total space allocated for charting as specified
+                // by the user.
+                this._element.style.width = "100%";
+                this._element.style.height = "100%";
+                availableWidth = Utils.DOM.elementWidth(this._element);
+                availableHeight = Utils.DOM.elementHeight(this._element);
+            }
+            else {
+                throw new Error("null arguments cannot be passed to computeLayout() on a non-root node");
+            }
+        }
+        var size = this._sizeFromOffer(availableWidth, availableHeight);
+        this._width = size.width;
+        this._height = size.height;
+        var xAlignProportion = HTMLComponent._xAlignToProportion[this._xAlignment];
+        var yAlignProportion = HTMLComponent._yAlignToProportion[this._yAlignment];
+        this._origin = {
+            x: origin.x + (availableWidth - this.width()) * xAlignProportion,
+            y: origin.y + (availableHeight - this.height()) * yAlignProportion,
+        };
+        // set the size and position of the root element given the
+        // calculated space constraints
+        d3.select(this._element).style({
+            height: this._height + "px",
+            left: this._origin.x + "px",
+            top: this._origin.y + "px",
+            width: this._width + "px",
+        });
+        if (this._resizeHandler != null) {
+            this._resizeHandler(size);
+        }
+        return this;
+    };
+    HTMLComponent.prototype.renderImmediately = function () {
+        return this;
+    };
+    HTMLComponent.prototype.redraw = function () {
+        if (this._isAnchored && this._isSetup) {
+            if (this.parent() == null) {
+                this._scheduleComputeLayout();
+            }
+            else {
+                this.parent().redraw();
+            }
+        }
+        return this;
+    };
+    HTMLComponent.prototype.renderTo = function (element) {
+        this.detach();
+        if (element == null || !element.nodeName) {
+            throw new Error("Plottable requires a valid HTMLElement to renderTo");
+        }
+        this.anchor(element);
+        if (this._element == null) {
+            throw new Error("If a Component has never been rendered before, then renderTo must be given an HTMLElement to render to");
+        }
+        RenderController.registerToComputeLayoutAndRender(this);
+        // flush so that consumers can immediately attach to stuff we create in the DOM
+        RenderController.flush();
+        return this;
+    };
+    HTMLComponent.prototype.hasClass = function (cssClass) {
+        if (cssClass == null) {
+            return false;
+        }
+        if (this._element == null) {
+            return this._cssClasses.has(cssClass);
+        }
+        else {
+            return this._element.className.split(" ").indexOf(cssClass) !== -1;
+        }
+    };
+    HTMLComponent.prototype.addClass = function (cssClass) {
+        if (cssClass == null) {
+            return this;
+        }
+        if (this._element == null) {
+            this._cssClasses.add(cssClass);
+        }
+        else {
+            var classNames = this._element.className.split(" ");
+            if (classNames.indexOf(cssClass) !== -1) {
+                classNames.push(cssClass);
+                this._element.className = classNames.join(" ");
+            }
+        }
+        return this;
+    };
+    HTMLComponent.prototype.removeClass = function (cssClass) {
+        if (cssClass == null) {
+            return this;
+        }
+        if (this._element == null) {
+            this._cssClasses.delete(cssClass);
+        }
+        else {
+            var classNames = this._element.className.split(" ");
+            var indexOfClass = classNames.indexOf(cssClass);
+            if (indexOfClass > -1) {
+                classNames.splice(indexOfClass, 1);
+                this._element.className = classNames.join(" ");
+            }
+        }
+        return this;
+    };
+    HTMLComponent.prototype.detach = function () {
+        this.parent(null);
+        if (this._isAnchored) {
+            d3.select(this._element).remove();
+        }
+        this._isAnchored = false;
+        this._onDetachCallbacks.callCallbacks(this);
+        return this;
+    };
+    HTMLComponent.prototype.content = function () {
+        return d3.select(this._element);
+    };
+    HTMLComponent.prototype.translator = function () {
+        return Utils.ClientToHTMLTranslator.getTranslator(this);
+    };
+    HTMLComponent.prototype.element = function () {
+        return d3.select(this._element);
+    };
+    /**
+     * Gets the container holding the visual elements of the Component.
+     *
+     * Will return undefined if the Component has not been anchored.
+     *
+     * @return {D} content selection for the Component
+     */
+    HTMLComponent.prototype._setup = function () {
+        if (this._isSetup) {
+            return;
+        }
+        var classListSet = new Utils.Set();
+        this._element.className.split(" ").forEach(function (className) { return classListSet.add(className); });
+        this._cssClasses.forEach(function (className) { return classListSet.add(className); });
+        var classList = [];
+        classListSet.forEach(function (className) { return classList.push(className); });
+        this._element.className = classList.join(" ");
+        if (this.parent() == null) {
+            // the root element gets the plottable class name
+            d3.select(this._element).classed("plottable", true);
+        }
+        else {
+            // non-root components are simple components
+            d3.select(this._element).classed("component", true);
+        }
+        this._cssClasses = new Utils.Set();
+        this._isSetup = true;
+    };
+    HTMLComponent.prototype._sizeFromOffer = function (availableWidth, availableHeight) {
+        var requestedSpace = this.requestedSpace(availableWidth, availableHeight);
+        return {
+            width: this.fixedWidth() ? Math.min(availableWidth, requestedSpace.minWidth) : availableWidth,
+            height: this.fixedHeight() ? Math.min(availableHeight, requestedSpace.minHeight) : availableHeight,
+        };
+    };
+    HTMLComponent.prototype._scheduleComputeLayout = function () {
+        if (this._isAnchored && this._isSetup) {
+            RenderController.registerToComputeLayoutAndRender(this);
+        }
+    };
+    return HTMLComponent;
+}(abstractComponent_1.AbstractComponent));
+exports.HTMLComponent = HTMLComponent;
+
+
+/***/ }),
+/* 22 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
 /**
  * Copyright 2014-present Palantir Technologies
  * @license MIT
@@ -3508,7 +3729,7 @@ exports.ADD_TITLE_ELEMENTS = true;
 
 
 /***/ }),
-/* 22 */
+/* 23 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3583,7 +3804,7 @@ exports.Dispatcher = Dispatcher;
 
 
 /***/ }),
-/* 23 */
+/* 24 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3600,8 +3821,8 @@ var __extends = (this && this.__extends) || function (d, b) {
 var d3 = __webpack_require__(1);
 var SVGTypewriter = __webpack_require__(4);
 var Animators = __webpack_require__(5);
-var Drawers = __webpack_require__(9);
-var Formatters = __webpack_require__(8);
+var Drawers = __webpack_require__(8);
+var Formatters = __webpack_require__(9);
 var Scales = __webpack_require__(2);
 var quantitativeScale_1 = __webpack_require__(10);
 var Utils = __webpack_require__(0);
@@ -4222,7 +4443,7 @@ exports.Bar = Bar;
 
 
 /***/ }),
-/* 24 */
+/* 25 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -4238,7 +4459,7 @@ var __extends = (this && this.__extends) || function (d, b) {
 };
 var d3 = __webpack_require__(1);
 var SVGTypewriter = __webpack_require__(4);
-var Formatters = __webpack_require__(8);
+var Formatters = __webpack_require__(9);
 var Scales = __webpack_require__(2);
 var Utils = __webpack_require__(0);
 var axis_1 = __webpack_require__(19);
@@ -4756,7 +4977,7 @@ exports.Time = Time;
 
 
 /***/ }),
-/* 25 */
+/* 26 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -4766,7 +4987,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var htmlComponent_1 = __webpack_require__(26);
+var htmlComponent_1 = __webpack_require__(21);
 /*
  * ComponentContainer class encapsulates Table and ComponentGroup's shared functionality.
  * It will not do anything if instantiated directly.
@@ -4838,226 +5059,6 @@ var ComponentContainer = (function (_super) {
     return ComponentContainer;
 }(htmlComponent_1.HTMLComponent));
 exports.ComponentContainer = ComponentContainer;
-
-
-/***/ }),
-/* 26 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
-var d3 = __webpack_require__(1);
-var abstractComponent_1 = __webpack_require__(20);
-var RenderController = __webpack_require__(16);
-var Utils = __webpack_require__(0);
-var HTMLComponent = (function (_super) {
-    __extends(HTMLComponent, _super);
-    function HTMLComponent() {
-        _super.apply(this, arguments);
-        this._cssClasses = new Utils.Set();
-    }
-    HTMLComponent.prototype.anchor = function (selection) {
-        if (this._destroyed) {
-            throw new Error("Can't reuse destroy()-ed Components!");
-        }
-        if (this._element != null) {
-            // reattach existing element
-            selection.appendChild(this._element);
-        }
-        else {
-            this._element = document.createElement("div");
-            selection.appendChild(this._element);
-            this._setup();
-        }
-        this._isAnchored = true;
-        this._onAnchorCallbacks.callCallbacks(this);
-        return this;
-    };
-    HTMLComponent.prototype.anchorHTML = function (selection) {
-        return this.anchor(selection);
-    };
-    HTMLComponent.prototype.computeLayout = function (origin, availableWidth, availableHeight) {
-        if (origin == null || availableWidth == null || availableHeight == null) {
-            if (this._element == null) {
-                throw new Error("anchor() must be called before computeLayout()");
-            }
-            else if (this.parent() == null) {
-                // if the parent is null we are the root node. In this case, we determine
-                // then sizing constraints for the remainder of the chart.
-                origin = { x: 0, y: 0 };
-                // this is the top-level element. make it 100% height and width
-                // so we can measure the amount of space available for the chart
-                // with respect to the total space allocated for charting as specified
-                // by the user.
-                this._element.style.width = "100%";
-                this._element.style.height = "100%";
-                availableWidth = Utils.DOM.elementWidth(this._element);
-                availableHeight = Utils.DOM.elementHeight(this._element);
-            }
-            else {
-                throw new Error("null arguments cannot be passed to computeLayout() on a non-root node");
-            }
-        }
-        var size = this._sizeFromOffer(availableWidth, availableHeight);
-        this._width = size.width;
-        this._height = size.height;
-        var xAlignProportion = HTMLComponent._xAlignToProportion[this._xAlignment];
-        var yAlignProportion = HTMLComponent._yAlignToProportion[this._yAlignment];
-        this._origin = {
-            x: origin.x + (availableWidth - this.width()) * xAlignProportion,
-            y: origin.y + (availableHeight - this.height()) * yAlignProportion,
-        };
-        // set the size and position of the root element given the
-        // calculated space constraints
-        d3.select(this._element).style({
-            height: this._height + "px",
-            left: this._origin.x + "px",
-            top: this._origin.y + "px",
-            width: this._width + "px",
-        });
-        if (this._resizeHandler != null) {
-            this._resizeHandler(size);
-        }
-        return this;
-    };
-    HTMLComponent.prototype.renderImmediately = function () {
-        return this;
-    };
-    HTMLComponent.prototype.redraw = function () {
-        if (this._isAnchored && this._isSetup) {
-            if (this.parent() == null) {
-                this._scheduleComputeLayout();
-            }
-            else {
-                this.parent().redraw();
-            }
-        }
-        return this;
-    };
-    HTMLComponent.prototype.renderTo = function (element) {
-        this.detach();
-        if (element == null || !element.nodeName) {
-            throw new Error("Plottable requires a valid HTMLElement to renderTo");
-        }
-        this.anchor(element);
-        if (this._element == null) {
-            throw new Error("If a Component has never been rendered before, then renderTo must be given an HTMLElement to render to");
-        }
-        RenderController.registerToComputeLayoutAndRender(this);
-        // flush so that consumers can immediately attach to stuff we create in the DOM
-        RenderController.flush();
-        return this;
-    };
-    HTMLComponent.prototype.hasClass = function (cssClass) {
-        if (cssClass == null) {
-            return false;
-        }
-        if (this._element == null) {
-            return this._cssClasses.has(cssClass);
-        }
-        else {
-            return this._element.className.split(" ").indexOf(cssClass) !== -1;
-        }
-    };
-    HTMLComponent.prototype.addClass = function (cssClass) {
-        if (cssClass == null) {
-            return this;
-        }
-        if (this._element == null) {
-            this._cssClasses.add(cssClass);
-        }
-        else {
-            var classNames = this._element.className.split(" ");
-            if (classNames.indexOf(cssClass) !== -1) {
-                classNames.push(cssClass);
-                this._element.className = classNames.join(" ");
-            }
-        }
-        return this;
-    };
-    HTMLComponent.prototype.removeClass = function (cssClass) {
-        if (cssClass == null) {
-            return this;
-        }
-        if (this._element == null) {
-            this._cssClasses.delete(cssClass);
-        }
-        else {
-            var classNames = this._element.className.split(" ");
-            var indexOfClass = classNames.indexOf(cssClass);
-            if (indexOfClass > -1) {
-                classNames.splice(indexOfClass, 1);
-                this._element.className = classNames.join(" ");
-            }
-        }
-        return this;
-    };
-    HTMLComponent.prototype.detach = function () {
-        this.parent(null);
-        if (this._isAnchored) {
-            d3.select(this._element).remove();
-        }
-        this._isAnchored = false;
-        this._onDetachCallbacks.callCallbacks(this);
-        return this;
-    };
-    HTMLComponent.prototype.content = function () {
-        return d3.select(this._element);
-    };
-    HTMLComponent.prototype.translator = function () {
-        return Utils.ClientToHTMLTranslator.getTranslator(this);
-    };
-    HTMLComponent.prototype.element = function () {
-        return d3.select(this._element);
-    };
-    /**
-     * Gets the container holding the visual elements of the Component.
-     *
-     * Will return undefined if the Component has not been anchored.
-     *
-     * @return {D} content selection for the Component
-     */
-    HTMLComponent.prototype._setup = function () {
-        if (this._isSetup) {
-            return;
-        }
-        var classListSet = new Utils.Set();
-        this._element.className.split(" ").forEach(function (className) { return classListSet.add(className); });
-        this._cssClasses.forEach(function (className) { return classListSet.add(className); });
-        var classList = [];
-        classListSet.forEach(function (className) { return classList.push(className); });
-        this._element.className = classList.join(" ");
-        if (this.parent() == null) {
-            // the root element gets the plottable class name
-            d3.select(this._element).classed("plottable", true);
-        }
-        else {
-            // non-root components are simple components
-            d3.select(this._element).classed("component", true);
-        }
-        this._cssClasses = new Utils.Set();
-        this._isSetup = true;
-    };
-    HTMLComponent.prototype._sizeFromOffer = function (availableWidth, availableHeight) {
-        var requestedSpace = this.requestedSpace(availableWidth, availableHeight);
-        return {
-            width: this.fixedWidth() ? Math.min(availableWidth, requestedSpace.minWidth) : availableWidth,
-            height: this.fixedHeight() ? Math.min(availableHeight, requestedSpace.minHeight) : availableHeight,
-        };
-    };
-    HTMLComponent.prototype._scheduleComputeLayout = function () {
-        if (this._isAnchored && this._isSetup) {
-            RenderController.registerToComputeLayoutAndRender(this);
-        }
-    };
-    return HTMLComponent;
-}(abstractComponent_1.AbstractComponent));
-exports.HTMLComponent = HTMLComponent;
 
 
 /***/ }),
@@ -5754,19 +5755,19 @@ function __export(m) {
 }
 __export(__webpack_require__(20));
 __export(__webpack_require__(28));
-__export(__webpack_require__(57));
 __export(__webpack_require__(58));
+__export(__webpack_require__(59));
 __export(__webpack_require__(35));
 __export(__webpack_require__(36));
-__export(__webpack_require__(26));
-__export(__webpack_require__(59));
+__export(__webpack_require__(21));
 __export(__webpack_require__(60));
 __export(__webpack_require__(61));
 __export(__webpack_require__(62));
-__export(__webpack_require__(37));
 __export(__webpack_require__(63));
+__export(__webpack_require__(37));
 __export(__webpack_require__(64));
 __export(__webpack_require__(65));
+__export(__webpack_require__(66));
 var Alignment = (function () {
     function Alignment() {
     }
@@ -5973,7 +5974,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
 var Utils = __webpack_require__(0);
-var componentContainer_1 = __webpack_require__(25);
+var componentContainer_1 = __webpack_require__(26);
 var Group = (function (_super) {
     __extends(Group, _super);
     /**
@@ -6077,7 +6078,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
 var Utils = __webpack_require__(0);
-var svgComponent_1 = __webpack_require__(6);
+var svgComponent_1 = __webpack_require__(7);
 var PropertyMode;
 (function (PropertyMode) {
     PropertyMode[PropertyMode["VALUE"] = 0] = "VALUE";
@@ -6233,7 +6234,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
 var Utils = __webpack_require__(0);
-var svgComponent_1 = __webpack_require__(6);
+var svgComponent_1 = __webpack_require__(7);
 (function (PropertyMode) {
     PropertyMode[PropertyMode["VALUE"] = 0] = "VALUE";
     PropertyMode[PropertyMode["PIXEL"] = 1] = "PIXEL";
@@ -6462,11 +6463,11 @@ var __extends = (this && this.__extends) || function (d, b) {
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
 var d3 = __webpack_require__(1);
-var Drawers = __webpack_require__(9);
+var Drawers = __webpack_require__(8);
 var Scales = __webpack_require__(2);
 var Utils = __webpack_require__(0);
 var Plots = __webpack_require__(17);
-var linePlot_1 = __webpack_require__(40);
+var linePlot_1 = __webpack_require__(41);
 var plot_1 = __webpack_require__(3);
 var Area = (function (_super) {
     __extends(Area, _super);
@@ -6648,6 +6649,291 @@ exports.Area = Area;
  * @license MIT
  */
 
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
+var d3 = __webpack_require__(1);
+var Animators = __webpack_require__(5);
+var Utils = __webpack_require__(0);
+var htmlComponent_1 = __webpack_require__(21);
+var canvasDrawer_1 = __webpack_require__(122);
+var CanvasPlot = (function (_super) {
+    __extends(CanvasPlot, _super);
+    function CanvasPlot() {
+        var _this = this;
+        _super.call(this);
+        this._dataChanged = false;
+        this._attrExtents = d3.map();
+        this._attrBindings = d3.map();
+        this._datasetToDrawer = new Utils.Map();
+        this._propertyBindings = d3.map();
+        this._propertyExtents = d3.map();
+        this._onDatasetUpdateCallback = function () { return _this._onDatasetUpdate(); };
+        this._renderCallback = function (scale) { return _this.render(); };
+        this._includedValuesProvider = function (scale) { return _this._includedValuesForScale(scale); };
+    }
+    CanvasPlot.prototype.addDataset = function (dataset) {
+        this._addDataset(dataset);
+        this._onDatasetUpdate();
+        return this;
+    };
+    CanvasPlot.prototype.anchor = function (selection) {
+        _super.prototype.anchor.call(this, selection);
+        this._dataChanged = true;
+        this._cachedEntityStore = undefined;
+        this._updateExtents();
+        return this;
+    };
+    CanvasPlot.prototype.computeLayout = function (origin, availableWidth, availableHeight) {
+        _super.prototype.computeLayout.call(this, origin, availableWidth, availableHeight);
+        var canvas = this._renderArea.node();
+        canvas.width = this.width();
+        canvas.height = this.height();
+        return this;
+    };
+    CanvasPlot.prototype.attr = function (attr, attrValue, scale) {
+        if (attrValue == null) {
+            return this._attrBindings.get(attr);
+        }
+        this._bindAttr(attr, attrValue, scale);
+        this.render(); // queue a re-render upon changing projector
+        return this;
+    };
+    CanvasPlot.prototype.datasets = function (datasets) {
+        var _this = this;
+        var currentDatasets = [];
+        this._datasetToDrawer.forEach(function (drawer, dataset) { return currentDatasets.push(dataset); });
+        if (datasets == null) {
+            return currentDatasets;
+        }
+        currentDatasets.forEach(function (dataset) { return _this._removeDataset(dataset); });
+        datasets.forEach(function (dataset) { return _this._addDataset(dataset); });
+        this._onDatasetUpdate();
+        return this;
+    };
+    /**
+     * Removes a Dataset from the Plot.
+     *
+     * @param {Dataset} dataset
+     * @returns {Plot} The calling Plot.
+     */
+    CanvasPlot.prototype.removeDataset = function (dataset) {
+        this._removeDataset(dataset);
+        this._onDatasetUpdate();
+        return this;
+    };
+    CanvasPlot.prototype.renderImmediately = function () {
+        _super.prototype.renderImmediately.call(this);
+        if (this._isAnchored) {
+            var drawSteps_1 = this._generateDrawSteps();
+            var dataToDraw_1 = this._getDataToDraw();
+            var drawers_1 = this._getDrawersInOrder();
+            this.datasets().forEach(function (ds, i) { return drawers_1[i].draw(dataToDraw_1.get(ds), drawSteps_1); });
+            var times = this.datasets().map(function (ds, i) { return drawers_1[i].totalDrawTime(dataToDraw_1.get(ds), drawSteps_1); });
+            var maxTime = Utils.Math.max(times, 0);
+        }
+        return this;
+    };
+    CanvasPlot.prototype._addDataset = function (dataset) {
+        this._removeDataset(dataset);
+        var drawer = this._createDrawer(dataset);
+        if (this._renderArea != null) {
+            // may not be initiated yet, we'll initiate everything later
+            drawer.renderArea(this._renderArea.node());
+        }
+        this._datasetToDrawer.set(dataset, drawer);
+        dataset.onUpdate(this._onDatasetUpdateCallback);
+        return this;
+    };
+    CanvasPlot.prototype._createDrawer = function (dataset) {
+        return new canvasDrawer_1.CanvasDrawer(dataset);
+    };
+    /**
+     * Override in subclass to add special extents, such as included values
+     */
+    CanvasPlot.prototype._extentsForProperty = function (property) {
+        return this._propertyExtents.get(property);
+    };
+    CanvasPlot.prototype._filterForProperty = function (property) {
+        return null;
+    };
+    CanvasPlot.prototype._generateAttrToProjector = function () {
+        var h = {};
+        this._attrBindings.forEach(function (attr, binding) {
+            var accessor = binding.accessor;
+            var scale = binding.scale;
+            var fn = scale ? function (d, i, dataset) { return scale.scale(accessor(d, i, dataset)); } : accessor;
+            h[attr] = fn;
+        });
+        var propertyProjectors = this._propertyProjectors();
+        Object.keys(propertyProjectors).forEach(function (key) {
+            if (h[key] == null) {
+                h[key] = propertyProjectors[key];
+            }
+        });
+        return h;
+    };
+    CanvasPlot.prototype._generateDrawSteps = function () {
+        return [{ attrToProjector: this._generateAttrToProjector(), animator: new Animators.Null() }];
+    };
+    CanvasPlot.prototype._getDataToDraw = function () {
+        var dataToDraw = new Utils.Map();
+        this.datasets().forEach(function (dataset) { return dataToDraw.set(dataset, dataset.data()); });
+        return dataToDraw;
+    };
+    CanvasPlot.prototype._getDrawersInOrder = function () {
+        var _this = this;
+        return this.datasets().map(function (dataset) { return _this._datasetToDrawer.get(dataset); });
+    };
+    CanvasPlot.prototype._onDatasetUpdate = function () {
+        this._updateExtents();
+        this._dataChanged = true;
+        this._cachedEntityStore = undefined;
+        this.render();
+    };
+    CanvasPlot.prototype._propertyProjectors = function () {
+        return {};
+    };
+    CanvasPlot._scaledAccessor = function (binding) {
+        return binding.scale == null ?
+            binding.accessor :
+            function (d, i, ds) { return binding.scale.scale(binding.accessor(d, i, ds)); };
+    };
+    CanvasPlot.prototype._removeDataset = function (dataset) {
+        if (this.datasets().indexOf(dataset) === -1) {
+            return this;
+        }
+        // this._removeDatasetNodes(dataset);
+        dataset.offUpdate(this._onDatasetUpdateCallback);
+        this._datasetToDrawer.delete(dataset);
+        return this;
+    };
+    CanvasPlot.prototype._setup = function () {
+        var _this = this;
+        _super.prototype._setup.call(this);
+        this._renderArea = this.element().append("canvas");
+        this.datasets().forEach(function (dataset) {
+            _this._datasetToDrawer.get(dataset).renderArea(_this._renderArea.node());
+        });
+    };
+    CanvasPlot.prototype._installScaleForKey = function (scale, key) {
+        scale.onUpdate(this._renderCallback);
+        scale.addIncludedValuesProvider(this._includedValuesProvider);
+    };
+    CanvasPlot.prototype._uninstallScaleForKey = function (scale, key) {
+        scale.offUpdate(this._renderCallback);
+        scale.removeIncludedValuesProvider(this._includedValuesProvider);
+    };
+    /**
+     * Updates the extents associated with each attribute, then autodomains all scales the Plot uses.
+     */
+    CanvasPlot.prototype._updateExtents = function () {
+        var _this = this;
+        this._attrBindings.forEach(function (attr) { return _this._updateExtentsForAttr(attr); });
+        this._propertyExtents.forEach(function (property) { return _this._updateExtentsForProperty(property); });
+        this._scales().forEach(function (scale) { return scale.addIncludedValuesProvider(_this._includedValuesProvider); });
+    };
+    CanvasPlot.prototype._updateExtentsForAttr = function (attr) {
+        // Filters should never be applied to attributes
+        this._updateExtentsForKey(attr, this._attrBindings, this._attrExtents, null);
+    };
+    CanvasPlot.prototype._updateExtentsForProperty = function (property) {
+        this._updateExtentsForKey(property, this._propertyBindings, this._propertyExtents, this._filterForProperty(property));
+    };
+    CanvasPlot.prototype._computeExtent = function (dataset, accScaleBinding, filter) {
+        var accessor = accScaleBinding.accessor;
+        var scale = accScaleBinding.scale;
+        if (scale == null) {
+            return [];
+        }
+        var data = dataset.data();
+        if (filter != null) {
+            data = data.filter(function (d, i) { return filter(d, i, dataset); });
+        }
+        var appliedAccessor = function (d, i) { return accessor(d, i, dataset); };
+        var mappedData = data.map(appliedAccessor);
+        return scale.extentOfValues(mappedData);
+    };
+    /**
+     * @returns {Scale[]} A unique array of all scales currently used by the Plot.
+     */
+    CanvasPlot.prototype._scales = function () {
+        var scales = [];
+        this._attrBindings.forEach(function (attr, binding) {
+            var scale = binding.scale;
+            if (scale != null && scales.indexOf(scale) === -1) {
+                scales.push(scale);
+            }
+        });
+        this._propertyBindings.forEach(function (property, binding) {
+            var scale = binding.scale;
+            if (scale != null && scales.indexOf(scale) === -1) {
+                scales.push(scale);
+            }
+        });
+        return scales;
+    };
+    CanvasPlot.prototype._updateExtentsForKey = function (key, bindings, extents, filter) {
+        var _this = this;
+        var accScaleBinding = bindings.get(key);
+        if (accScaleBinding == null || accScaleBinding.accessor == null) {
+            return;
+        }
+        extents.set(key, this.datasets().map(function (dataset) { return _this._computeExtent(dataset, accScaleBinding, filter); }));
+    };
+    CanvasPlot.prototype._includedValuesForScale = function (scale) {
+        var _this = this;
+        if (!this._isAnchored) {
+            return [];
+        }
+        var includedValues = [];
+        this._attrBindings.forEach(function (attr, binding) {
+            if (binding.scale === scale) {
+                var extents = _this._attrExtents.get(attr);
+                if (extents != null) {
+                    includedValues = includedValues.concat(d3.merge(extents));
+                }
+            }
+        });
+        this._propertyBindings.forEach(function (property, binding) {
+            if (binding.scale === scale) {
+                var extents = _this._extentsForProperty(property);
+                if (extents != null) {
+                    includedValues = includedValues.concat(d3.merge(extents));
+                }
+            }
+        });
+        return includedValues;
+    };
+    CanvasPlot.prototype._bindAttr = function (attr, value, scale) {
+        var binding = this._attrBindings.get(attr);
+        var oldScale = binding != null ? binding.scale : null;
+        this._attrBindings.set(attr, { accessor: d3.functor(value), scale: scale });
+        this._updateExtentsForAttr(attr);
+        if (oldScale != null) {
+            this._uninstallScaleForKey(oldScale, attr);
+        }
+        if (scale != null) {
+            this._installScaleForKey(scale, attr);
+        }
+    };
+    return CanvasPlot;
+}(htmlComponent_1.HTMLComponent));
+exports.CanvasPlot = CanvasPlot;
+
+
+/***/ }),
+/* 40 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/**
+ * Copyright 2014-present Palantir Technologies
+ * @license MIT
+ */
+
 var Animator;
 (function (Animator) {
     Animator.MAIN = "main";
@@ -6656,7 +6942,7 @@ var Animator;
 
 
 /***/ }),
-/* 40 */
+/* 41 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -6672,7 +6958,7 @@ var __extends = (this && this.__extends) || function (d, b) {
 };
 var d3 = __webpack_require__(1);
 var Animators = __webpack_require__(5);
-var Drawers = __webpack_require__(9);
+var Drawers = __webpack_require__(8);
 var Scales = __webpack_require__(2);
 var quantitativeScale_1 = __webpack_require__(10);
 var Utils = __webpack_require__(0);
@@ -7107,7 +7393,7 @@ exports.Line = Line;
 
 
 /***/ }),
-/* 41 */
+/* 42 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7267,7 +7553,7 @@ exports.Category = Category;
 
 
 /***/ }),
-/* 42 */
+/* 43 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7484,7 +7770,7 @@ function _parseStyleValue(style, property) {
 
 
 /***/ }),
-/* 43 */
+/* 44 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7546,7 +7832,7 @@ exports.PlottableSVGElement = PlottableSVGElement;
 
 
 /***/ }),
-/* 44 */
+/* 45 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7618,7 +7904,7 @@ exports.Set = Set;
 
 
 /***/ }),
-/* 45 */
+/* 46 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7686,7 +7972,7 @@ exports.AbstractMeasurer = AbstractMeasurer;
 //# sourceMappingURL=abstractMeasurer.js.map
 
 /***/ }),
-/* 46 */
+/* 47 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7702,7 +7988,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
 var Utils = __webpack_require__(13);
-var characterMeasurer_1 = __webpack_require__(47);
+var characterMeasurer_1 = __webpack_require__(48);
 var CacheCharacterMeasurer = (function (_super) {
     __extends(CacheCharacterMeasurer, _super);
     function CacheCharacterMeasurer(area, className, useGuards) {
@@ -7727,7 +8013,7 @@ exports.CacheCharacterMeasurer = CacheCharacterMeasurer;
 //# sourceMappingURL=cacheCharacterMeasurer.js.map
 
 /***/ }),
-/* 47 */
+/* 48 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7743,7 +8029,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
 var d3 = __webpack_require__(1);
-var measurer_1 = __webpack_require__(48);
+var measurer_1 = __webpack_require__(49);
 var CharacterMeasurer = (function (_super) {
     __extends(CharacterMeasurer, _super);
     function CharacterMeasurer() {
@@ -7766,7 +8052,7 @@ exports.CharacterMeasurer = CharacterMeasurer;
 //# sourceMappingURL=characterMeasurer.js.map
 
 /***/ }),
-/* 48 */
+/* 49 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7782,7 +8068,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
 var d3 = __webpack_require__(1);
-var abstractMeasurer_1 = __webpack_require__(45);
+var abstractMeasurer_1 = __webpack_require__(46);
 var Measurer = (function (_super) {
     __extends(Measurer, _super);
     function Measurer(area, className, useGuards) {
@@ -7828,7 +8114,7 @@ exports.Measurer = Measurer;
 //# sourceMappingURL=measurer.js.map
 
 /***/ }),
-/* 49 */
+/* 50 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8057,7 +8343,7 @@ exports.Wrapper = Wrapper;
 //# sourceMappingURL=wrapper.js.map
 
 /***/ }),
-/* 50 */
+/* 51 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8069,13 +8355,13 @@ exports.Wrapper = Wrapper;
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-__export(__webpack_require__(55));
 __export(__webpack_require__(56));
-__export(__webpack_require__(24));
+__export(__webpack_require__(57));
+__export(__webpack_require__(25));
 
 
 /***/ }),
-/* 51 */
+/* 52 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8147,7 +8433,7 @@ exports.Dataset = Dataset;
 
 
 /***/ }),
-/* 52 */
+/* 53 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8160,7 +8446,7 @@ exports.version = "2.9.1";
 
 
 /***/ }),
-/* 53 */
+/* 54 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8279,7 +8565,7 @@ exports.Easing = Easing;
 
 
 /***/ }),
-/* 54 */
+/* 55 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8307,7 +8593,7 @@ exports.Null = Null;
 
 
 /***/ }),
-/* 55 */
+/* 56 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8656,7 +8942,7 @@ exports.Category = Category;
 
 
 /***/ }),
-/* 56 */
+/* 57 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8673,7 +8959,7 @@ var __extends = (this && this.__extends) || function (d, b) {
 var d3 = __webpack_require__(1);
 var SVGTypewriter = __webpack_require__(4);
 var axis_1 = __webpack_require__(19);
-var Formatters = __webpack_require__(8);
+var Formatters = __webpack_require__(9);
 var Utils = __webpack_require__(0);
 var Numeric = (function (_super) {
     __extends(Numeric, _super);
@@ -8962,7 +9248,7 @@ exports.Numeric = Numeric;
 
 
 /***/ }),
-/* 57 */
+/* 58 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -9151,7 +9437,7 @@ exports.DragLineLayer = DragLineLayer;
 
 
 /***/ }),
-/* 58 */
+/* 59 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -9166,7 +9452,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
 var quantitativeScale_1 = __webpack_require__(10);
-var svgComponent_1 = __webpack_require__(6);
+var svgComponent_1 = __webpack_require__(7);
 var Gridlines = (function (_super) {
     __extends(Gridlines, _super);
     /**
@@ -9261,7 +9547,7 @@ exports.Gridlines = Gridlines;
 
 
 /***/ }),
-/* 59 */
+/* 60 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -9276,10 +9562,10 @@ var __extends = (this && this.__extends) || function (d, b) {
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
 var SVGTypewriter = __webpack_require__(4);
-var Configs = __webpack_require__(21);
-var Formatters = __webpack_require__(8);
+var Configs = __webpack_require__(22);
+var Formatters = __webpack_require__(9);
 var Utils = __webpack_require__(0);
-var svgComponent_1 = __webpack_require__(6);
+var svgComponent_1 = __webpack_require__(7);
 var InterpolatedColorLegend = (function (_super) {
     __extends(InterpolatedColorLegend, _super);
     /**
@@ -9520,7 +9806,7 @@ exports.InterpolatedColorLegend = InterpolatedColorLegend;
 
 
 /***/ }),
-/* 60 */
+/* 61 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -9535,7 +9821,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
 var SVGTypewriter = __webpack_require__(4);
-var svgComponent_1 = __webpack_require__(6);
+var svgComponent_1 = __webpack_require__(7);
 var Label = (function (_super) {
     __extends(Label, _super);
     /**
@@ -9682,7 +9968,7 @@ exports.AxisLabel = AxisLabel;
 
 
 /***/ }),
-/* 61 */
+/* 62 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -9698,11 +9984,11 @@ var __extends = (this && this.__extends) || function (d, b) {
 };
 var d3 = __webpack_require__(1);
 var SVGTypewriter = __webpack_require__(4);
-var Configs = __webpack_require__(21);
-var Formatters = __webpack_require__(8);
+var Configs = __webpack_require__(22);
+var Formatters = __webpack_require__(9);
 var SymbolFactories = __webpack_require__(27);
 var Utils = __webpack_require__(0);
-var svgComponent_1 = __webpack_require__(6);
+var svgComponent_1 = __webpack_require__(7);
 /**
  * The Legend's row representations. Stores positioning information
  * and column data.
@@ -10182,7 +10468,7 @@ exports.Legend = Legend;
 
 
 /***/ }),
-/* 62 */
+/* 63 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -10239,7 +10525,7 @@ exports.PlotGroup = PlotGroup;
 
 
 /***/ }),
-/* 63 */
+/* 64 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -10251,7 +10537,7 @@ var __extends = (this && this.__extends) || function (d, b) {
 };
 var d3 = __webpack_require__(1);
 var Utils = __webpack_require__(0);
-var componentContainer_1 = __webpack_require__(25);
+var componentContainer_1 = __webpack_require__(26);
 var Table = (function (_super) {
     __extends(Table, _super);
     /**
@@ -10634,7 +10920,7 @@ exports.Table = Table;
 
 
 /***/ }),
-/* 64 */
+/* 65 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -10700,7 +10986,7 @@ exports.XDragBoxLayer = XDragBoxLayer;
 
 
 /***/ }),
-/* 65 */
+/* 66 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -10766,7 +11052,7 @@ exports.YDragBoxLayer = YDragBoxLayer;
 
 
 /***/ }),
-/* 66 */
+/* 67 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -10780,7 +11066,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var dispatcher_1 = __webpack_require__(22);
+var dispatcher_1 = __webpack_require__(23);
 var Key = (function (_super) {
     __extends(Key, _super);
     /**
@@ -10862,7 +11148,7 @@ exports.Key = Key;
 
 
 /***/ }),
-/* 67 */
+/* 68 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -10876,7 +11162,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var dispatcher_1 = __webpack_require__(22);
+var dispatcher_1 = __webpack_require__(23);
 var Mouse = (function (_super) {
     __extends(Mouse, _super);
     /**
@@ -11061,7 +11347,7 @@ exports.Mouse = Mouse;
 
 
 /***/ }),
-/* 68 */
+/* 69 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -11075,7 +11361,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var dispatcher_1 = __webpack_require__(22);
+var dispatcher_1 = __webpack_require__(23);
 var Touch = (function (_super) {
     __extends(Touch, _super);
     /**
@@ -11236,7 +11522,7 @@ exports.Touch = Touch;
 
 
 /***/ }),
-/* 69 */
+/* 70 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -11250,7 +11536,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var drawer_1 = __webpack_require__(7);
+var drawer_1 = __webpack_require__(6);
 var Arc = (function (_super) {
     __extends(Arc, _super);
     function Arc(dataset) {
@@ -11268,7 +11554,7 @@ exports.Arc = Arc;
 
 
 /***/ }),
-/* 70 */
+/* 71 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -11282,7 +11568,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var drawer_1 = __webpack_require__(7);
+var drawer_1 = __webpack_require__(6);
 var ArcOutline = (function (_super) {
     __extends(ArcOutline, _super);
     function ArcOutline(dataset) {
@@ -11300,7 +11586,7 @@ exports.ArcOutline = ArcOutline;
 
 
 /***/ }),
-/* 71 */
+/* 72 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -11315,7 +11601,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
 var d3 = __webpack_require__(1);
-var drawer_1 = __webpack_require__(7);
+var drawer_1 = __webpack_require__(6);
 var Area = (function (_super) {
     __extends(Area, _super);
     function Area(dataset) {
@@ -11336,7 +11622,7 @@ exports.Area = Area;
 
 
 /***/ }),
-/* 72 */
+/* 73 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -11351,7 +11637,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
 var d3 = __webpack_require__(1);
-var drawer_1 = __webpack_require__(7);
+var drawer_1 = __webpack_require__(6);
 var Line = (function (_super) {
     __extends(Line, _super);
     function Line(dataset) {
@@ -11372,33 +11658,6 @@ exports.Line = Line;
 
 
 /***/ }),
-/* 73 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-/**
- * Copyright 2014-present Palantir Technologies
- * @license MIT
- */
-
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
-var drawer_1 = __webpack_require__(7);
-var Rectangle = (function (_super) {
-    __extends(Rectangle, _super);
-    function Rectangle(dataset) {
-        _super.call(this, dataset);
-        this._svgElementName = "rect";
-    }
-    return Rectangle;
-}(drawer_1.Drawer));
-exports.Rectangle = Rectangle;
-
-
-/***/ }),
 /* 74 */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -11413,16 +11672,16 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var drawer_1 = __webpack_require__(7);
-var Segment = (function (_super) {
-    __extends(Segment, _super);
-    function Segment(dataset) {
+var drawer_1 = __webpack_require__(6);
+var Rectangle = (function (_super) {
+    __extends(Rectangle, _super);
+    function Rectangle(dataset) {
         _super.call(this, dataset);
-        this._svgElementName = "line";
+        this._svgElementName = "rect";
     }
-    return Segment;
+    return Rectangle;
 }(drawer_1.Drawer));
-exports.Segment = Segment;
+exports.Rectangle = Rectangle;
 
 
 /***/ }),
@@ -11440,7 +11699,34 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var drawer_1 = __webpack_require__(7);
+var drawer_1 = __webpack_require__(6);
+var Segment = (function (_super) {
+    __extends(Segment, _super);
+    function Segment(dataset) {
+        _super.call(this, dataset);
+        this._svgElementName = "line";
+    }
+    return Segment;
+}(drawer_1.Drawer));
+exports.Segment = Segment;
+
+
+/***/ }),
+/* 76 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/**
+ * Copyright 2014-present Palantir Technologies
+ * @license MIT
+ */
+
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
+var drawer_1 = __webpack_require__(6);
 var Symbol = (function (_super) {
     __extends(Symbol, _super);
     function Symbol(dataset) {
@@ -11454,7 +11740,7 @@ exports.Symbol = Symbol;
 
 
 /***/ }),
-/* 76 */
+/* 77 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -11543,7 +11829,7 @@ exports.Click = Click;
 
 
 /***/ }),
-/* 77 */
+/* 78 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -11662,7 +11948,7 @@ exports.DoubleClick = DoubleClick;
 
 
 /***/ }),
-/* 78 */
+/* 79 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -11827,7 +12113,7 @@ exports.Drag = Drag;
 
 
 /***/ }),
-/* 79 */
+/* 80 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -12385,7 +12671,7 @@ exports.PanZoom = PanZoom;
 
 
 /***/ }),
-/* 80 */
+/* 81 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -12516,7 +12802,242 @@ exports.Pointer = Pointer;
 
 
 /***/ }),
-/* 81 */
+/* 82 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/**
+ * Copyright 2014-present Palantir Technologies
+ * @license MIT
+ */
+
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
+var d3 = __webpack_require__(1);
+var xyCanvasPlot_1 = __webpack_require__(91);
+var Animators = __webpack_require__(5);
+var canvasRectangleDrawer_1 = __webpack_require__(123);
+var Scales = __webpack_require__(2);
+var Utils = __webpack_require__(0);
+var canvasPlot_1 = __webpack_require__(39);
+var CanvasRectangle = (function (_super) {
+    __extends(CanvasRectangle, _super);
+    /**
+     * A Rectangle Plot displays rectangles based on the data.
+     * The left and right edges of each rectangle can be set with x() and x2().
+     *   If only x() is set the Rectangle Plot will attempt to compute the correct left and right edge positions.
+     * The top and bottom edges of each rectangle can be set with y() and y2().
+     *   If only y() is set the Rectangle Plot will attempt to compute the correct top and bottom edge positions.
+     *
+     * @constructor
+     * @param {Scale.Scale} xScale
+     * @param {Scale.Scale} yScale
+     */
+    function CanvasRectangle() {
+        _super.call(this);
+        this._labelsEnabled = false;
+        this._label = null;
+        this.addClass("rectangle-plot");
+    }
+    CanvasRectangle.prototype._createDrawer = function (dataset) {
+        return new canvasRectangleDrawer_1.RectangleDrawer(dataset);
+    };
+    CanvasRectangle.prototype._generateAttrToProjector = function () {
+        var _this = this;
+        var attrToProjector = _super.prototype._generateAttrToProjector.call(this);
+        // Copy each of the different projectors.
+        var xAttr = canvasPlot_1.CanvasPlot._scaledAccessor(this.x());
+        var x2Attr = attrToProjector[CanvasRectangle._X2_KEY];
+        var yAttr = canvasPlot_1.CanvasPlot._scaledAccessor(this.y());
+        var y2Attr = attrToProjector[CanvasRectangle._Y2_KEY];
+        var xScale = this.x().scale;
+        var yScale = this.y().scale;
+        var widthProjection = null;
+        var heightProjection = null;
+        var xProjection = null;
+        var yProjection = null;
+        if (x2Attr != null) {
+            widthProjection = function (d, i, dataset) { return Math.abs(x2Attr(d, i, dataset) - xAttr(d, i, dataset)); };
+            xProjection = function (d, i, dataset) { return Math.min(x2Attr(d, i, dataset), xAttr(d, i, dataset)); };
+        }
+        else {
+            widthProjection = function (d, i, dataset) { return _this._rectangleWidth(xScale); };
+            xProjection = function (d, i, dataset) { return xAttr(d, i, dataset) - 0.5 * widthProjection(d, i, dataset); };
+        }
+        if (y2Attr != null) {
+            heightProjection = function (d, i, dataset) { return Math.abs(y2Attr(d, i, dataset) - yAttr(d, i, dataset)); };
+            yProjection = function (d, i, dataset) {
+                return Math.max(y2Attr(d, i, dataset), yAttr(d, i, dataset)) - heightProjection(d, i, dataset);
+            };
+        }
+        else {
+            heightProjection = function (d, i, dataset) { return _this._rectangleWidth(yScale); };
+            yProjection = function (d, i, dataset) { return yAttr(d, i, dataset) - 0.5 * heightProjection(d, i, dataset); };
+        }
+        attrToProjector["fillRect"] = function (d, i, dataset) {
+            return {
+                height: heightProjection(d, i, dataset),
+                width: widthProjection(d, i, dataset),
+                x: xProjection(d, i, dataset),
+                y: yProjection(d, i, dataset),
+            };
+        };
+        // Clean up the attributes projected onto the SVG elements
+        delete attrToProjector[CanvasRectangle._X2_KEY];
+        delete attrToProjector[CanvasRectangle._Y2_KEY];
+        return attrToProjector;
+    };
+    CanvasRectangle.prototype._generateDrawSteps = function () {
+        return [{ attrToProjector: this._generateAttrToProjector(), animator: new Animators.Null() }];
+    };
+    CanvasRectangle.prototype._updateExtentsForProperty = function (property) {
+        _super.prototype._updateExtentsForProperty.call(this, property);
+        if (property === "x") {
+            _super.prototype._updateExtentsForProperty.call(this, "x2");
+        }
+        else if (property === "y") {
+            _super.prototype._updateExtentsForProperty.call(this, "y2");
+        }
+    };
+    CanvasRectangle.prototype._filterForProperty = function (property) {
+        if (property === "x2") {
+            return _super.prototype._filterForProperty.call(this, "x");
+        }
+        else if (property === "y2") {
+            return _super.prototype._filterForProperty.call(this, "y");
+        }
+        return _super.prototype._filterForProperty.call(this, property);
+    };
+    CanvasRectangle.prototype.x = function (x, xScale) {
+        if (x == null) {
+            return _super.prototype.x.call(this);
+        }
+        if (xScale == null) {
+            _super.prototype.x.call(this, x);
+        }
+        else {
+            _super.prototype.x.call(this, x, xScale);
+        }
+        if (xScale != null) {
+            var x2Binding = this.x2();
+            var x2 = x2Binding && x2Binding.accessor;
+            if (x2 != null) {
+                this._bindProperty(CanvasRectangle._X2_KEY, x2, xScale);
+            }
+        }
+        // The x and y scales should render in bands with no padding for category scales
+        if (xScale instanceof Scales.Category) {
+            xScale.innerPadding(0).outerPadding(0);
+        }
+        return this;
+    };
+    CanvasRectangle.prototype.x2 = function (x2) {
+        if (x2 == null) {
+            return this._propertyBindings.get(CanvasRectangle._X2_KEY);
+        }
+        var xBinding = this.x();
+        var xScale = xBinding && xBinding.scale;
+        this._bindProperty(CanvasRectangle._X2_KEY, x2, xScale);
+        this.render();
+        return this;
+    };
+    CanvasRectangle.prototype.y = function (y, yScale) {
+        if (y == null) {
+            return _super.prototype.y.call(this);
+        }
+        if (yScale == null) {
+            _super.prototype.y.call(this, y);
+        }
+        else {
+            _super.prototype.y.call(this, y, yScale);
+        }
+        if (yScale != null) {
+            var y2Binding = this.y2();
+            var y2 = y2Binding && y2Binding.accessor;
+            if (y2 != null) {
+                this._bindProperty(CanvasRectangle._Y2_KEY, y2, yScale);
+            }
+        }
+        // The x and y scales should render in bands with no padding for category scales
+        if (yScale instanceof Scales.Category) {
+            yScale.innerPadding(0).outerPadding(0);
+        }
+        return this;
+    };
+    CanvasRectangle.prototype.y2 = function (y2) {
+        if (y2 == null) {
+            return this._propertyBindings.get(CanvasRectangle._Y2_KEY);
+        }
+        var yBinding = this.y();
+        var yScale = yBinding && yBinding.scale;
+        this._bindProperty(CanvasRectangle._Y2_KEY, y2, yScale);
+        this.render();
+        return this;
+    };
+    CanvasRectangle.prototype._propertyProjectors = function () {
+        var attrToProjector = _super.prototype._propertyProjectors.call(this);
+        if (this.x2() != null) {
+            attrToProjector["x2"] = canvasPlot_1.CanvasPlot._scaledAccessor(this.x2());
+        }
+        if (this.y2() != null) {
+            attrToProjector["y2"] = canvasPlot_1.CanvasPlot._scaledAccessor(this.y2());
+        }
+        return attrToProjector;
+    };
+    CanvasRectangle.prototype._pixelPoint = function (datum, index, dataset) {
+        var attrToProjector = this._generateAttrToProjector();
+        var rectX = attrToProjector["x"](datum, index, dataset);
+        var rectY = attrToProjector["y"](datum, index, dataset);
+        var rectWidth = attrToProjector["width"](datum, index, dataset);
+        var rectHeight = attrToProjector["height"](datum, index, dataset);
+        var x = rectX + rectWidth / 2;
+        var y = rectY + rectHeight / 2;
+        return { x: x, y: y };
+    };
+    CanvasRectangle.prototype._rectangleWidth = function (scale) {
+        if (scale instanceof Scales.Category) {
+            return scale.rangeBand();
+        }
+        else {
+            var accessor_1 = scale === this.x().scale ? this.x().accessor : this.y().accessor;
+            var accessorData = d3.set(Utils.Array.flatten(this.datasets().map(function (dataset) {
+                return dataset.data().map(function (d, i) { return accessor_1(d, i, dataset).valueOf(); });
+            }))).values().map(function (value) { return +value; });
+            // Get the absolute difference between min and max
+            var min = Utils.Math.min(accessorData, 0);
+            var max = Utils.Math.max(accessorData, 0);
+            var scaledMin = scale.scale(min);
+            var scaledMax = scale.scale(max);
+            return (scaledMax - scaledMin) / Math.abs(max - min);
+        }
+    };
+    CanvasRectangle.prototype._getDataToDraw = function () {
+        var dataToDraw = new Utils.Map();
+        var fillProjector = this._generateAttrToProjector()["fillRect"];
+        this.datasets().forEach(function (dataset) {
+            var data = dataset.data().filter(function (d, i) {
+                var fillProjection = fillProjector(d, i, dataset);
+                return Utils.Math.isValidNumber(fillProjection.x) &&
+                    Utils.Math.isValidNumber(fillProjection.y) &&
+                    Utils.Math.isValidNumber(fillProjection.width) &&
+                    Utils.Math.isValidNumber(fillProjection.height);
+            });
+            dataToDraw.set(dataset, data);
+        });
+        return dataToDraw;
+    };
+    CanvasRectangle._X2_KEY = "x2";
+    CanvasRectangle._Y2_KEY = "y2";
+    return CanvasRectangle;
+}(xyCanvasPlot_1.XYCanvasPlot));
+exports.CanvasRectangle = CanvasRectangle;
+
+
+/***/ }),
+/* 83 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -12532,7 +13053,7 @@ var __extends = (this && this.__extends) || function (d, b) {
 };
 var Scales = __webpack_require__(2);
 var Utils = __webpack_require__(0);
-var barPlot_1 = __webpack_require__(23);
+var barPlot_1 = __webpack_require__(24);
 var plot_1 = __webpack_require__(3);
 var ClusteredBar = (function (_super) {
     __extends(ClusteredBar, _super);
@@ -12589,7 +13110,7 @@ exports.ClusteredBar = ClusteredBar;
 
 
 /***/ }),
-/* 82 */
+/* 84 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -12606,8 +13127,8 @@ var __extends = (this && this.__extends) || function (d, b) {
 var d3 = __webpack_require__(1);
 var SVGTypewriter = __webpack_require__(4);
 var Animators = __webpack_require__(5);
-var Drawers = __webpack_require__(9);
-var Formatters = __webpack_require__(8);
+var Drawers = __webpack_require__(8);
+var Formatters = __webpack_require__(9);
 var Scales = __webpack_require__(2);
 var Utils = __webpack_require__(0);
 var plot_1 = __webpack_require__(3);
@@ -13085,7 +13606,7 @@ exports.Pie = Pie;
 
 
 /***/ }),
-/* 83 */
+/* 85 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -13102,7 +13623,7 @@ var __extends = (this && this.__extends) || function (d, b) {
 var d3 = __webpack_require__(1);
 var SVGTypewriter = __webpack_require__(4);
 var Animators = __webpack_require__(5);
-var Drawers = __webpack_require__(9);
+var Drawers = __webpack_require__(8);
 var Scales = __webpack_require__(2);
 var Utils = __webpack_require__(0);
 var plot_1 = __webpack_require__(3);
@@ -13451,7 +13972,7 @@ exports.Rectangle = Rectangle;
 
 
 /***/ }),
-/* 84 */
+/* 86 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -13467,7 +13988,7 @@ var __extends = (this && this.__extends) || function (d, b) {
 };
 var Animators = __webpack_require__(5);
 var SymbolFactories = __webpack_require__(27);
-var Drawers = __webpack_require__(9);
+var Drawers = __webpack_require__(8);
 var Scales = __webpack_require__(2);
 var Utils = __webpack_require__(0);
 var Plots = __webpack_require__(17);
@@ -13629,7 +14150,7 @@ exports.Scatter = Scatter;
 
 
 /***/ }),
-/* 85 */
+/* 87 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -13644,7 +14165,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
 var Animators = __webpack_require__(5);
-var Drawers = __webpack_require__(9);
+var Drawers = __webpack_require__(8);
 var Scales = __webpack_require__(2);
 var plot_1 = __webpack_require__(3);
 var xyPlot_1 = __webpack_require__(15);
@@ -13827,7 +14348,7 @@ exports.Segment = Segment;
 
 
 /***/ }),
-/* 86 */
+/* 88 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -14030,7 +14551,7 @@ exports.StackedArea = StackedArea;
 
 
 /***/ }),
-/* 87 */
+/* 89 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -14046,7 +14567,7 @@ var __extends = (this && this.__extends) || function (d, b) {
 };
 var SVGTypewriter = __webpack_require__(4);
 var Utils = __webpack_require__(0);
-var barPlot_1 = __webpack_require__(23);
+var barPlot_1 = __webpack_require__(24);
 var StackedBar = (function (_super) {
     __extends(StackedBar, _super);
     /**
@@ -14238,7 +14759,7 @@ exports.StackedBar = StackedBar;
 
 
 /***/ }),
-/* 88 */
+/* 90 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -14253,7 +14774,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
 var Utils = __webpack_require__(0);
-var barPlot_1 = __webpack_require__(23);
+var barPlot_1 = __webpack_require__(24);
 var plot_1 = __webpack_require__(3);
 var Waterfall = (function (_super) {
     __extends(Waterfall, _super);
@@ -14449,7 +14970,206 @@ exports.Waterfall = Waterfall;
 
 
 /***/ }),
-/* 89 */
+/* 91 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/**
+ * Copyright 2014-present Palantir Technologies
+ * @license MIT
+ */
+
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
+var d3 = __webpack_require__(1);
+var Scales = __webpack_require__(2);
+var Utils = __webpack_require__(0);
+var canvasPlot_1 = __webpack_require__(39);
+var XYCanvasPlot = (function (_super) {
+    __extends(XYCanvasPlot, _super);
+    function XYCanvasPlot() {
+        var _this = this;
+        _super.call(this);
+        this._autoAdjustYScaleDomain = false;
+        this._autoAdjustXScaleDomain = false;
+        this._adjustYDomainOnChangeFromXCallback = function (scale) { return _this._adjustYDomainOnChangeFromX(); };
+        this._adjustXDomainOnChangeFromYCallback = function (scale) { return _this._adjustXDomainOnChangeFromY(); };
+    }
+    XYCanvasPlot.prototype.x = function (x, xScale) {
+        if (x == null) {
+            return this._propertyBindings.get(XYCanvasPlot._X_KEY);
+        }
+        this._bindProperty(XYCanvasPlot._X_KEY, x, xScale);
+        var width = this.width();
+        if (xScale != null && width != null) {
+            xScale.range([0, width]);
+        }
+        if (this._autoAdjustYScaleDomain) {
+            this._updateYExtentsAndAutodomain();
+        }
+        this.render();
+        return this;
+    };
+    XYCanvasPlot.prototype.y = function (y, yScale) {
+        if (y == null) {
+            return this._propertyBindings.get(XYCanvasPlot._Y_KEY);
+        }
+        this._bindProperty(XYCanvasPlot._Y_KEY, y, yScale);
+        var height = this.height();
+        if (yScale != null && height != null) {
+            if (yScale instanceof Scales.Category) {
+                yScale.range([0, height]);
+            }
+            else {
+                yScale.range([height, 0]);
+            }
+        }
+        if (this._autoAdjustXScaleDomain) {
+            this._updateXExtentsAndAutodomain();
+        }
+        this.render();
+        return this;
+    };
+    XYCanvasPlot.prototype.destroy = function () {
+        _super.prototype.destroy.call(this);
+        if (this.x().scale) {
+            this.x().scale.offUpdate(this._adjustYDomainOnChangeFromXCallback);
+        }
+        if (this.y().scale) {
+            this.y().scale.offUpdate(this._adjustXDomainOnChangeFromYCallback);
+        }
+        return this;
+    };
+    XYCanvasPlot.prototype.computeLayout = function (origin, availableWidth, availableHeight) {
+        _super.prototype.computeLayout.call(this, origin, availableWidth, availableHeight);
+        var xBinding = this.x();
+        var xScale = xBinding && xBinding.scale;
+        if (xScale != null) {
+            xScale.range([0, this.width()]);
+        }
+        var yBinding = this.y();
+        var yScale = yBinding && yBinding.scale;
+        if (yScale != null) {
+            if (yScale instanceof Scales.Category) {
+                yScale.range([0, this.height()]);
+            }
+            else {
+                yScale.range([this.height(), 0]);
+            }
+        }
+        return this;
+    };
+    XYCanvasPlot.prototype._bindProperty = function (property, value, scale) {
+        var binding = this._propertyBindings.get(property);
+        var oldScale = binding != null ? binding.scale : null;
+        this._propertyBindings.set(property, { accessor: d3.functor(value), scale: scale });
+        this._updateExtentsForProperty(property);
+        if (oldScale != null) {
+            this._uninstallScaleForKey(oldScale, property);
+        }
+        if (scale != null) {
+            this._installScaleForKey(scale, property);
+        }
+    };
+    XYCanvasPlot.prototype._filterForProperty = function (property) {
+        if (property === "x" && this._autoAdjustXScaleDomain) {
+            return this._makeFilterByProperty("y");
+        }
+        else if (property === "y" && this._autoAdjustYScaleDomain) {
+            return this._makeFilterByProperty("x");
+        }
+        return null;
+    };
+    XYCanvasPlot.prototype._makeFilterByProperty = function (property) {
+        var binding = this._propertyBindings.get(property);
+        if (binding != null) {
+            var accessor_1 = binding.accessor;
+            var scale_1 = binding.scale;
+            if (scale_1 != null) {
+                return function (datum, index, dataset) {
+                    var range = scale_1.range();
+                    return Utils.Math.inRange(scale_1.scale(accessor_1(datum, index, dataset)), range[0], range[1]);
+                };
+            }
+        }
+        return null;
+    };
+    XYCanvasPlot.prototype._getDataToDraw = function () {
+        var _this = this;
+        var dataToDraw = _super.prototype._getDataToDraw.call(this);
+        var definedFunction = function (d, i, dataset) {
+            var positionX = canvasPlot_1.CanvasPlot._scaledAccessor(_this.x())(d, i, dataset);
+            var positionY = canvasPlot_1.CanvasPlot._scaledAccessor(_this.y())(d, i, dataset);
+            return Utils.Math.isValidNumber(positionX) &&
+                Utils.Math.isValidNumber(positionY);
+        };
+        this.datasets().forEach(function (dataset) {
+            dataToDraw.set(dataset, dataToDraw.get(dataset).filter(function (d, i) { return definedFunction(d, i, dataset); }));
+        });
+        return dataToDraw;
+    };
+    XYCanvasPlot.prototype._installScaleForKey = function (scale, key) {
+        _super.prototype._installScaleForKey.call(this, scale, key);
+        var adjustCallback = key === XYCanvasPlot._X_KEY ? this._adjustYDomainOnChangeFromXCallback
+            : this._adjustXDomainOnChangeFromYCallback;
+        scale.onUpdate(adjustCallback);
+    };
+    XYCanvasPlot.prototype._uninstallScaleForKey = function (scale, key) {
+        _super.prototype._uninstallScaleForKey.call(this, scale, key);
+        var adjustCallback = key === XYCanvasPlot._X_KEY ? this._adjustYDomainOnChangeFromXCallback
+            : this._adjustXDomainOnChangeFromYCallback;
+        scale.offUpdate(adjustCallback);
+    };
+    XYCanvasPlot.prototype._adjustYDomainOnChangeFromX = function () {
+        if (!this._projectorsReady()) {
+            return;
+        }
+        if (this._autoAdjustYScaleDomain) {
+            this._updateYExtentsAndAutodomain();
+        }
+    };
+    XYCanvasPlot.prototype._adjustXDomainOnChangeFromY = function () {
+        if (!this._projectorsReady()) {
+            return;
+        }
+        if (this._autoAdjustXScaleDomain) {
+            this._updateXExtentsAndAutodomain();
+        }
+    };
+    XYCanvasPlot.prototype._projectorsReady = function () {
+        var xBinding = this.x();
+        var yBinding = this.y();
+        return xBinding != null &&
+            xBinding.accessor != null &&
+            yBinding != null &&
+            yBinding.accessor != null;
+    };
+    XYCanvasPlot.prototype._updateXExtentsAndAutodomain = function () {
+        this._updateExtentsForProperty("x");
+        var xScale = this.x().scale;
+        if (xScale != null) {
+            xScale.autoDomain();
+        }
+    };
+    XYCanvasPlot.prototype._updateYExtentsAndAutodomain = function () {
+        this._updateExtentsForProperty("y");
+        var yScale = this.y().scale;
+        if (yScale != null) {
+            yScale.autoDomain();
+        }
+    };
+    XYCanvasPlot._X_KEY = "x";
+    XYCanvasPlot._Y_KEY = "y";
+    return XYCanvasPlot;
+}(canvasPlot_1.CanvasPlot));
+exports.XYCanvasPlot = XYCanvasPlot;
+
+
+/***/ }),
+/* 92 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -14580,7 +15300,7 @@ exports.Color = Color;
 
 
 /***/ }),
-/* 90 */
+/* 93 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -14746,7 +15466,7 @@ exports.InterpolatedColor = InterpolatedColor;
 
 
 /***/ }),
-/* 91 */
+/* 94 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -14825,7 +15545,7 @@ exports.Linear = Linear;
 
 
 /***/ }),
-/* 92 */
+/* 95 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -15049,7 +15769,7 @@ exports.ModifiedLog = ModifiedLog;
 
 
 /***/ }),
-/* 93 */
+/* 96 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -15099,7 +15819,7 @@ exports.integerTickGenerator = integerTickGenerator;
 
 
 /***/ }),
-/* 94 */
+/* 97 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -15114,7 +15834,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
 var d3 = __webpack_require__(1);
-var timeAxis_1 = __webpack_require__(24);
+var timeAxis_1 = __webpack_require__(25);
 var quantitativeScale_1 = __webpack_require__(10);
 var Time = (function (_super) {
     __extends(Time, _super);
@@ -15234,7 +15954,7 @@ exports.Time = Time;
 
 
 /***/ }),
-/* 95 */
+/* 98 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -15304,7 +16024,7 @@ exports.createFilledArray = createFilledArray;
 
 
 /***/ }),
-/* 96 */
+/* 99 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -15318,7 +16038,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var set_1 = __webpack_require__(44);
+var set_1 = __webpack_require__(45);
 /**
  * A set of callbacks which can be all invoked at once.
  * Each callback exists at most once in the set (based on reference equality).
@@ -15346,12 +16066,12 @@ exports.CallbackSet = CallbackSet;
 
 
 /***/ }),
-/* 97 */
+/* 100 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
-var plottableElement_1 = __webpack_require__(43);
+var plottableElement_1 = __webpack_require__(44);
 var translator_1 = __webpack_require__(30);
 var ClientToHTMLTranslator = (function () {
     function ClientToHTMLTranslator() {
@@ -15383,7 +16103,7 @@ exports.ClientToHTMLTranslator = ClientToHTMLTranslator;
 
 
 /***/ }),
-/* 98 */
+/* 101 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -15392,8 +16112,8 @@ exports.ClientToHTMLTranslator = ClientToHTMLTranslator;
  * @license MIT
  */
 
-var DOM = __webpack_require__(42);
-var plottableElement_1 = __webpack_require__(43);
+var DOM = __webpack_require__(43);
+var plottableElement_1 = __webpack_require__(44);
 var translator_1 = __webpack_require__(30);
 var ClientToSVGTranslator = (function () {
     function ClientToSVGTranslator() {
@@ -15424,7 +16144,7 @@ exports.ClientToSVGTranslator = ClientToSVGTranslator;
 
 
 /***/ }),
-/* 99 */
+/* 102 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -15507,7 +16227,7 @@ function luminance(color) {
 
 
 /***/ }),
-/* 100 */
+/* 103 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -15561,7 +16281,7 @@ exports.EntityArray = EntityArray;
 
 
 /***/ }),
-/* 101 */
+/* 104 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -15652,7 +16372,7 @@ exports.Map = Map;
 
 
 /***/ }),
-/* 102 */
+/* 105 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -15777,7 +16497,7 @@ exports.normalizeKey = normalizeKey;
 
 
 /***/ }),
-/* 103 */
+/* 106 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -15786,7 +16506,7 @@ exports.normalizeKey = normalizeKey;
  * @license MIT
  */
 
-var Configs = __webpack_require__(21);
+var Configs = __webpack_require__(22);
 /**
  * Print a warning message to the console, if it is available.
  *
@@ -15849,7 +16569,7 @@ exports.deprecated = deprecated;
 
 
 /***/ }),
-/* 104 */
+/* 107 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -15863,12 +16583,12 @@ function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
 __export(__webpack_require__(31));
-__export(__webpack_require__(105));
-__export(__webpack_require__(106));
+__export(__webpack_require__(108));
+__export(__webpack_require__(109));
 //# sourceMappingURL=index.js.map
 
 /***/ }),
-/* 105 */
+/* 108 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -15904,7 +16624,7 @@ exports.OpacityAnimator = OpacityAnimator;
 //# sourceMappingURL=opacityAnimator.js.map
 
 /***/ }),
-/* 106 */
+/* 109 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -15979,7 +16699,7 @@ exports.UnveilAnimator = UnveilAnimator;
 //# sourceMappingURL=unveilAnimator.js.map
 
 /***/ }),
-/* 107 */
+/* 110 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -15995,7 +16715,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
 var Utils = __webpack_require__(13);
-var cacheCharacterMeasurer_1 = __webpack_require__(46);
+var cacheCharacterMeasurer_1 = __webpack_require__(47);
 var CacheMeasurer = (function (_super) {
     __extends(CacheMeasurer, _super);
     function CacheMeasurer(area, className) {
@@ -16021,7 +16741,7 @@ exports.CacheMeasurer = CacheMeasurer;
 //# sourceMappingURL=cacheMeasurer.js.map
 
 /***/ }),
-/* 108 */
+/* 111 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -16034,15 +16754,15 @@ exports.CacheMeasurer = CacheMeasurer;
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-__export(__webpack_require__(45));
 __export(__webpack_require__(46));
-__export(__webpack_require__(107));
 __export(__webpack_require__(47));
+__export(__webpack_require__(110));
 __export(__webpack_require__(48));
+__export(__webpack_require__(49));
 //# sourceMappingURL=index.js.map
 
 /***/ }),
-/* 109 */
+/* 112 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -16091,7 +16811,7 @@ exports.Cache = Cache;
 //# sourceMappingURL=cache.js.map
 
 /***/ }),
-/* 110 */
+/* 113 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -16139,7 +16859,7 @@ exports.DOM = DOM;
 //# sourceMappingURL=dom.js.map
 
 /***/ }),
-/* 111 */
+/* 114 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -16197,7 +16917,7 @@ exports.Methods = Methods;
 //# sourceMappingURL=methods.js.map
 
 /***/ }),
-/* 112 */
+/* 115 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -16244,7 +16964,7 @@ exports.StringMethods = StringMethods;
 //# sourceMappingURL=stringMethods.js.map
 
 /***/ }),
-/* 113 */
+/* 116 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -16292,7 +17012,7 @@ exports.Tokenizer = Tokenizer;
 //# sourceMappingURL=tokenizer.js.map
 
 /***/ }),
-/* 114 */
+/* 117 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -16305,12 +17025,12 @@ exports.Tokenizer = Tokenizer;
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-__export(__webpack_require__(115));
-__export(__webpack_require__(49));
+__export(__webpack_require__(118));
+__export(__webpack_require__(50));
 //# sourceMappingURL=index.js.map
 
 /***/ }),
-/* 115 */
+/* 118 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -16325,7 +17045,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var wrapper_1 = __webpack_require__(49);
+var wrapper_1 = __webpack_require__(50);
 var SingleLineWrapper = (function (_super) {
     __extends(SingleLineWrapper, _super);
     function SingleLineWrapper() {
@@ -16368,7 +17088,7 @@ exports.SingleLineWrapper = SingleLineWrapper;
 //# sourceMappingURL=singleLineWrapper.js.map
 
 /***/ }),
-/* 116 */
+/* 119 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -16381,11 +17101,11 @@ exports.SingleLineWrapper = SingleLineWrapper;
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-__export(__webpack_require__(117));
+__export(__webpack_require__(120));
 //# sourceMappingURL=index.js.map
 
 /***/ }),
-/* 117 */
+/* 120 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -16519,7 +17239,7 @@ exports.Writer = Writer;
 //# sourceMappingURL=writer.js.map
 
 /***/ }),
-/* 118 */
+/* 121 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -16529,13 +17249,13 @@ function __export(m) {
 }
 var Animators = __webpack_require__(5);
 exports.Animators = Animators;
-var Axes = __webpack_require__(50);
+var Axes = __webpack_require__(51);
 exports.Axes = Axes;
 var Components = __webpack_require__(32);
 exports.Components = Components;
-var Configs = __webpack_require__(21);
+var Configs = __webpack_require__(22);
 exports.Configs = Configs;
-var Formatters = __webpack_require__(8);
+var Formatters = __webpack_require__(9);
 exports.Formatters = Formatters;
 var RenderController = __webpack_require__(16);
 exports.RenderController = RenderController;
@@ -16545,7 +17265,7 @@ var SymbolFactories = __webpack_require__(27);
 exports.SymbolFactories = SymbolFactories;
 var Dispatchers = __webpack_require__(11);
 exports.Dispatchers = Dispatchers;
-var Drawers = __webpack_require__(9);
+var Drawers = __webpack_require__(8);
 exports.Drawers = Drawers;
 var Interactions = __webpack_require__(14);
 exports.Interactions = Interactions;
@@ -16556,23 +17276,167 @@ exports.Scales = Scales;
 var Utils = __webpack_require__(0);
 exports.Utils = Utils;
 __export(__webpack_require__(19));
-var timeAxis_1 = __webpack_require__(24);
+var timeAxis_1 = __webpack_require__(25);
 exports.TimeInterval = timeAxis_1.TimeInterval;
 __export(__webpack_require__(20));
-__export(__webpack_require__(6));
-__export(__webpack_require__(26));
-__export(__webpack_require__(25));
-__export(__webpack_require__(51));
-var version_1 = __webpack_require__(52);
-exports.version = version_1.version;
-__export(__webpack_require__(22));
 __export(__webpack_require__(7));
+__export(__webpack_require__(21));
+__export(__webpack_require__(26));
+__export(__webpack_require__(52));
+var version_1 = __webpack_require__(53);
+exports.version = version_1.version;
+__export(__webpack_require__(23));
+__export(__webpack_require__(6));
 __export(__webpack_require__(12));
 __export(__webpack_require__(34));
 __export(__webpack_require__(15));
 __export(__webpack_require__(3));
 __export(__webpack_require__(10));
 __export(__webpack_require__(18));
+
+
+/***/ }),
+/* 122 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/**
+ * Copyright 2014-present Palantir Technologies
+ * @license MIT
+ */
+
+var Utils = __webpack_require__(0);
+var CanvasDrawer = (function () {
+    /**
+     * A Drawer draws svg elements based on the input Dataset.
+     *
+     * @constructor
+     * @param {Dataset} dataset The dataset associated with this Drawer
+     */
+    function CanvasDrawer(dataset) {
+        this._dataset = dataset;
+    }
+    CanvasDrawer.prototype.renderArea = function (area) {
+        if (area == null) {
+            return this._renderArea;
+        }
+        this._renderArea = area;
+        return this;
+    };
+    /**
+     * Removes the Drawer and its renderArea
+     */
+    CanvasDrawer.prototype.remove = function () {
+        if (this.renderArea() != null) {
+        }
+    };
+    /**
+     * Draws data using one step
+     *
+     * @param{AppliedDrawStep} step The step, how data should be drawn.
+     */
+    CanvasDrawer.prototype._drawStep = function (step) {
+        /*
+      let selection = this.selection();
+      let colorAttributes = ["fill", "stroke"];
+      colorAttributes.forEach((colorAttribute) => {
+        if (step.attrToAppliedProjector[colorAttribute] != null) {
+          selection.attr(colorAttribute, step.attrToAppliedProjector[colorAttribute]);
+        }
+      });
+      step.animator.animate(selection, step.attrToAppliedProjector);
+      if (this._className != null) {
+        this.selection().classed(this._className, true);
+      }
+      */
+    };
+    CanvasDrawer.prototype._appliedProjectors = function (attrToProjector) {
+        var _this = this;
+        var modifiedAttrToProjector = {};
+        Object.keys(attrToProjector).forEach(function (attr) {
+            modifiedAttrToProjector[attr] =
+                function (datum, index) { return attrToProjector[attr](datum, index, _this._dataset); };
+        });
+        return modifiedAttrToProjector;
+    };
+    /**
+     * Calculates the total time it takes to use the input drawSteps to draw the input data
+     *
+     * @param {any[]} data The data that would have been drawn
+     * @param {Drawers.DrawStep[]} drawSteps The DrawSteps to use
+     * @returns {number} The total time it takes to draw
+     */
+    CanvasDrawer.prototype.totalDrawTime = function (data, drawSteps) {
+        var delay = 0;
+        drawSteps.forEach(function (drawStep, i) {
+            delay += drawStep.animator.totalTime(data.length);
+        });
+        return delay;
+    };
+    /**
+     * Draws the data into the renderArea using the spefic steps and metadata
+     *
+     * @param{any[]} data The data to be drawn
+     * @param{DrawStep[]} drawSteps The list of steps, which needs to be drawn
+     */
+    CanvasDrawer.prototype.draw = function (data, drawSteps) {
+        var _this = this;
+        var appliedDrawSteps = drawSteps.map(function (dr) {
+            var attrToAppliedProjector = _this._appliedProjectors(dr.attrToProjector);
+            return {
+                attrToAppliedProjector: attrToAppliedProjector,
+                animator: dr.animator,
+            };
+        });
+        var delay = 0;
+        appliedDrawSteps.forEach(function (drawStep, i) {
+            Utils.Window.setTimeout(function () { return _this._drawStep(drawStep); }, delay);
+            delay += drawStep.animator.totalTime(data.length);
+        });
+        return this;
+    };
+    return CanvasDrawer;
+}());
+exports.CanvasDrawer = CanvasDrawer;
+
+
+/***/ }),
+/* 123 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/**
+ * Copyright 2014-present Palantir Technologies
+ * @license MIT
+ */
+
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
+var canvasDrawer_1 = __webpack_require__(122);
+var RectangleDrawer = (function (_super) {
+    __extends(RectangleDrawer, _super);
+    function RectangleDrawer(dataset) {
+        _super.call(this, dataset);
+    }
+    RectangleDrawer.prototype._drawStep = function (step) {
+        _super.prototype._drawStep.call(this, step);
+        var context = this._renderArea.getContext("2d");
+        if (step.attrToAppliedProjector["fillRect"] == null) {
+            throw new Error("fillRect needs to be supplied in order for drawing to occur");
+        }
+        this._dataset.data().forEach(function (datum, index) {
+            var fill = step.attrToAppliedProjector["fill"](datum, index);
+            context.fillStyle = fill;
+            var _a = step.attrToAppliedProjector["fillRect"](datum, index), x = _a.x, y = _a.y, width = _a.width, height = _a.height;
+            context.fillRect(x, y, width, height);
+        });
+    };
+    return RectangleDrawer;
+}(canvasDrawer_1.CanvasDrawer));
+exports.RectangleDrawer = RectangleDrawer;
 
 
 /***/ })
