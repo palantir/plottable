@@ -4,9 +4,29 @@
  */
 
 import * as d3 from "d3";
+import * as d3Ease from "d3-ease";
 
 import { Animator } from "./animator";
 import { AttributeToAppliedProjector, SimpleSelection } from "../core/interfaces";
+
+/**
+ * Converts an easing mode string like "sin-in-out" to the corresponding function
+ * in the d3-ease module.
+ *
+ * @param easingMode
+ */
+function easingFnMapping(easingMode: string) {
+  // sin, [in, out]
+  const words = easingMode.split("-");
+  const capitalCaseWords = words.map((w) => w[0].toUpperCase() + w.slice(1));
+  const methodName = `ease${capitalCaseWords.join("")}`;
+  let easingFn: (t: number) => number = (d3Ease as any)[methodName];
+  if (easingFn == null) {
+    // default to easeLinear if we can't find the function
+    easingFn = d3Ease.easeLinear;
+  }
+  return easingFn;
+}
 
 /**
  * An Animator with easing and configurable durations and delays.
@@ -57,15 +77,15 @@ export class Easing implements Animator {
     return this.startDelay() + adjustedIterativeDelay * (Math.max(numberOfSteps - 1, 0)) + this.stepDuration();
   }
 
-  public animate(selection: SimpleSelection<any>, attrToAppliedProjector: AttributeToAppliedProjector) {
+  public animate(selection: SimpleSelection<any>, attrToAppliedProjector: AttributeToAppliedProjector): d3.Transition<any, any, any, any> {
     let numberOfSteps = selection.size();
     let adjustedIterativeDelay = this._getAdjustedIterativeDelay(numberOfSteps);
 
     return selection.transition()
-      .ease(this.easingMode())
+      .ease(easingFnMapping(this.easingMode()))
       .duration(this.stepDuration())
       .delay((d: any, i: number) => this.startDelay() + adjustedIterativeDelay * i)
-      .attr(attrToAppliedProjector);
+      .attrs(attrToAppliedProjector);
   }
 
   /**
