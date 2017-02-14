@@ -77,7 +77,6 @@ export class Plot extends Component {
   protected _setup() {
     super._setup();
     const renderArea = this.content().append("g").classed("render-area", true);
-    this._renderArea =
     this.datasets().forEach((dataset) => this._createNodesForDataset(dataset));
   }
 
@@ -150,7 +149,7 @@ export class Plot extends Component {
     let binding = this._propertyBindings.get(property);
     let oldScale = binding != null ? binding.scale : null;
 
-    this._propertyBindings.set(property, { accessor: d3.functor(value), scale: scale });
+    this._propertyBindings.set(property, { accessor: () => value, scale: scale });
     this._updateExtentsForProperty(property);
 
     if (oldScale != null) {
@@ -165,7 +164,7 @@ export class Plot extends Component {
     let binding = this._attrBindings.get(attr);
     let oldScale = binding != null ? binding.scale : null;
 
-    this._attrBindings.set(attr, { accessor: d3.functor(value), scale: scale });
+    this._attrBindings.set(attr, { accessor: () => value, scale: scale });
     this._updateExtentsForAttr(attr);
 
     if (oldScale != null) {
@@ -178,7 +177,7 @@ export class Plot extends Component {
 
   protected _generateAttrToProjector(): AttributeToProjector {
     let h: AttributeToProjector = {};
-    this._attrBindings.forEach((attr, binding) => {
+    this._attrBindings.each((binding, attr) => {
       let accessor = binding.accessor;
       let scale = binding.scale;
       let fn = scale ? (d: any, i: number, dataset: Dataset) => scale.scale(accessor(d, i, dataset)) : accessor;
@@ -231,13 +230,13 @@ export class Plot extends Component {
    */
   private _scales() {
     let scales: Scale<any, any>[] = [];
-    this._attrBindings.forEach((attr, binding) => {
+    this._attrBindings.each((binding, attr) => {
       let scale = binding.scale;
       if (scale != null && scales.indexOf(scale) === -1) {
         scales.push(scale);
       }
     });
-    this._propertyBindings.forEach((property, binding) => {
+    this._propertyBindings.each((binding, property) => {
       let scale = binding.scale;
       if (scale != null && scales.indexOf(scale) === -1) {
         scales.push(scale);
@@ -250,8 +249,8 @@ export class Plot extends Component {
    * Updates the extents associated with each attribute, then autodomains all scales the Plot uses.
    */
   protected _updateExtents() {
-    this._attrBindings.forEach((attr) => this._updateExtentsForAttr(attr));
-    this._propertyExtents.forEach((property) => this._updateExtentsForProperty(property));
+    this._attrBindings.each((_, attr) => this._updateExtentsForAttr(attr));
+    this._propertyExtents.each((_, property) => this._updateExtentsForProperty(property));
     this._scales().forEach((scale) => scale.addIncludedValuesProvider(this._includedValuesProvider));
   }
 
@@ -307,7 +306,7 @@ export class Plot extends Component {
       return [];
     }
     let includedValues: D[] = [];
-    this._attrBindings.forEach((attr, binding) => {
+    this._attrBindings.each((binding, attr) => {
       if (binding.scale === scale) {
         let extents = this._attrExtents.get(attr);
         if (extents != null) {
@@ -316,7 +315,7 @@ export class Plot extends Component {
       }
     });
 
-    this._propertyBindings.forEach((property, binding) => {
+    this._propertyBindings.each((binding, property) => {
       if (binding.scale === scale) {
         let extents = this._extentsForProperty(property);
         if (extents != null) {
