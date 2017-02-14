@@ -8264,10 +8264,6 @@ var Category = (function (_super) {
         return this;
     };
     Category.prototype.computeLayout = function (origin, availableWidth, availableHeight) {
-        // When anyone calls redraw(), computeLayout() will be called
-        // on everyone, including this. Since CSS or something might have
-        // affected the size of the characters, clear the cache.
-        this._measurer.reset();
         _super.prototype.computeLayout.call(this, origin, availableWidth, availableHeight);
         if (!this.isHorizontal()) {
             this._scale.range([0, this.height()]);
