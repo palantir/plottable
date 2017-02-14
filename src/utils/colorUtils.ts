@@ -26,8 +26,8 @@ export function contrast(a: string, b: string) {
  * Channel values are capped at the maximum value of 255, and the minimum value of 30.
  */
 export function lightenColor(color: string, factor: number) {
-  let hsl = <d3.Hsl> d3.hsl(color).brighter(factor);
-  return hsl.rgb().toString();
+  let brightened = d3.color(color).brighter(factor);
+  return brightened.rgb().toString();
 }
 
 /**
