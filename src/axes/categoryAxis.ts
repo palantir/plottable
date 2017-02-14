@@ -417,4 +417,9 @@ export class Category extends Axis<string> {
     }
     return this;
   }
+
+  public invalidateCache() {
+    super.invalidateCache();
+    this._measurer.reset();
+  }
 }

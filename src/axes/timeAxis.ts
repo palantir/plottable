@@ -644,4 +644,8 @@ export class Time extends Axis<Date> {
     });
   }
 
+  public invalidateCache() {
+    super.invalidateCache();
+    (this._measurer as SVGTypewriter.CacheMeasurer).reset();
+  }
 }

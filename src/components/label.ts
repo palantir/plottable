@@ -13,7 +13,7 @@ export class Label extends Component {
   private _textContainer: d3.Selection<void>;
   private _text: string; // text assigned to the Label; may not be the actual text displayed due to truncation
   private _angle: number;
-  private _measurer: SVGTypewriter.Measurer;
+  private _measurer: SVGTypewriter.CacheMeasurer;
   private _wrapper: SVGTypewriter.Wrapper;
   private _writer: SVGTypewriter.Writer;
   private _padding: number;
@@ -160,6 +160,11 @@ export class Label extends Component {
     };
     this._writer.write(this._text, writeWidth, writeHeight, writeOptions);
     return this;
+  }
+
+  public invalidateCache() {
+    super.invalidateCache();
+    this._measurer.reset();
   }
 }
 
