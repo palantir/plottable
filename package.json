@@ -24,6 +24,7 @@
   "devDependencies": {
     "@types/chai": "^3.4.34",
     "@types/d3": "4.5.0",
+    "@types/d3-selection-multi": "1.0.4",
     "@types/mocha": "^2.2.27",
     "@types/sinon": "^1.16.26",
     "chai": "2.0.0",
@@ -63,6 +64,7 @@
   },
   "dependencies": {
     "d3": "^4.5.0",
+    "d3-selection-multi": "1.0.0",
     "svg-typewriter": "^2.0.0"
   }
 }
