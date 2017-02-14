@@ -29,9 +29,9 @@ export class Category extends Scale<string, number> implements TransformableScal
    * *Transformation Space* and transformed to screen space in methods like
    * `rangeBand()` and `stepWidth()`.
    */
-  private _d3TransformationScale: d3.scale.Linear<number, number>;
+  private _d3TransformationScale: d3.ScaleLinear<number, number>;
 
-  private _d3Scale: d3.scale.Ordinal<string, number>;
+  private _d3Scale: d3.ScaleOrdinal<string, number>;
   private _range = [0, 1];
 
   private _innerPadding: number;
@@ -44,10 +44,10 @@ export class Category extends Scale<string, number> implements TransformableScal
    */
   constructor() {
     super();
-    this._d3Scale = d3.scale.ordinal<string, number>();
+    this._d3Scale = d3.scaleOrdinal<string, number>();
     this._d3Scale.range(TRANSFORMATION_SPACE);
 
-    this._d3TransformationScale = d3.scale.linear<number, number>();
+    this._d3TransformationScale = d3.scaleLinear<number, number>();
     this._d3TransformationScale.domain(TRANSFORMATION_SPACE);
 
     let d3InnerPadding = 0.3;
