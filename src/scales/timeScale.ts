@@ -117,7 +117,7 @@ export class Time extends QuantitativeScale<Date> {
 
   /**
    * Transforms the Plottable TimeInterval string into a d3 time interval equivalent.
-   * If the provided TimeInterval is incorrect, the default is d3.time.year
+   * If the provided TimeInterval is incorrect, the default is d3.timeYear
    */
   public static timeIntervalToD3Time(timeInterval: string): d3.CountableTimeInterval {
     switch (timeInterval) {
