@@ -191,7 +191,7 @@ module.exports = function(grunt) {
   grunt.registerTask("release:minor", ["bump:minor", "dist-compile", "gitcommit:version"]);
   grunt.registerTask("release:major", ["bump:major", "dist-compile", "gitcommit:version"]);
 
-  grunt.registerTask("dist-compile", ["test", "uglify", "compress"]);
+  grunt.registerTask("dist-compile", ["test", "exec:npm:sed-version", "uglify", "compress"]);
 
   grunt.registerTask("commitjs", ["dist-compile", "gitcommit:built"]);
   grunt.registerTask("default", ["exec:npm:start"]);

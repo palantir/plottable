@@ -7769,6 +7769,11 @@ exports.Dataset = Dataset;
  * @license MIT
  */
 
+/*
+ * WARNING: The js output of this expression is searched by string (yes, I know) and replaced with a
+ * real version number during the dist phase for for npm module publishing. Modifying this line should
+ * be accompanied by modifying the "sed-version" task in package.json accordingly.
+ */
 exports.version = "2.9.1";
 
 
