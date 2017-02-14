@@ -81,7 +81,7 @@ export class Component {
       // HACKHACK: Safari fails to register events on the <svg> itself
       const safariBacking = this._rootSVG.select(`.${Component._SAFARI_EVENT_BACKING_CLASS}`);
       if (safariBacking.empty()) {
-        this._rootSVG.append("rect").classed(Component._SAFARI_EVENT_BACKING_CLASS, true).attr({
+        this._rootSVG.append("rect").classed(Component._SAFARI_EVENT_BACKING_CLASS, true).attrs({
           x: 0,
           y: 0,
           width: "100%",

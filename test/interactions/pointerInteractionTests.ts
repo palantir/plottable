@@ -161,7 +161,7 @@ describe("Interactions", () => {
 
         beforeEach(() => {
           svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
-          overlay = TestMethods.getSVGParent().append("div").style({
+          overlay = TestMethods.getSVGParent().append("div").styles({
             height: `${SVG_HEIGHT}px`,
             width: `${SVG_WIDTH}px`,
             position: "relative",

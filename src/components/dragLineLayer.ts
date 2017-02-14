@@ -82,7 +82,7 @@ export class DragLineLayer<D> extends GuideLineLayer<D> {
 
   protected _setup() {
     super._setup();
-    this._detectionEdge = this.content().append("line").style({
+    this._detectionEdge = this.content().append("line").styles({
       "opacity": 0,
       "stroke": "pink",
       "pointer-events": "visibleStroke",
@@ -91,7 +91,7 @@ export class DragLineLayer<D> extends GuideLineLayer<D> {
 
   public renderImmediately() {
     super.renderImmediately();
-    this._detectionEdge.attr({
+    this._detectionEdge.attrs({
       x1: this._isVertical() ? this.pixelPosition() : 0,
       y1: this._isVertical() ? 0 : this.pixelPosition(),
       x2: this._isVertical() ? this.pixelPosition() : this.width(),

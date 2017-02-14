@@ -82,7 +82,7 @@ export class GuideLineLayer<D> extends Component {
   public renderImmediately() {
     super.renderImmediately();
     this._syncPixelPositionAndValue();
-    this._guideLine.attr({
+    this._guideLine.attrs({
       x1: this._isVertical() ? this.pixelPosition() : 0,
       y1: this._isVertical() ? 0 : this.pixelPosition(),
       x2: this._isVertical() ? this.pixelPosition() : this.width(),

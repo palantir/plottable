@@ -304,13 +304,13 @@ export class InterpolatedColorLegend extends Component {
     let lowerTranslateString = "translate(" + lowerLabelShift.x + ", " + lowerLabelShift.y + ")";
     this._lowerLabel.attr("transform", lowerTranslateString);
 
-    this._swatchBoundingBox.attr(boundingBoxAttr);
+    this._swatchBoundingBox.attrs(boundingBoxAttr);
 
     let ticks = this._generateTicks(numSwatches);
     let swatches = this._swatchContainer.selectAll("rect.swatch").data(ticks);
     let rects = swatches.enter().append("rect").classed("swatch", true);
     swatches.exit().remove();
-    swatches.attr({
+    swatches.attrs({
       "fill": (d: any, i: number) => this._scale.scale(d),
       "width": swatchWidth,
       "height": swatchHeight,

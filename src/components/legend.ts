@@ -525,7 +525,7 @@ export class Legend extends Component {
         const withinColumn = Utils.Math.within(p, columnBounds);
 
         if (withinColumn) {
-          const rowElement = this.content().selectAll(`.${Legend.LEGEND_ROW_CLASS}`)[0][rowIndex];
+          const rowElement = this.content().selectAll(`.${Legend.LEGEND_ROW_CLASS}`).nodes()[rowIndex];
           // HACKHACK The 2.x API chooses the symbol element as the "selection" to return, regardless of what
           // was actually selected
           const entryElement = d3.select(rowElement)

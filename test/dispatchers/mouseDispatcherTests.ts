@@ -258,7 +258,7 @@ describe("Dispatchers", () => {
           element = <HTMLElement> (element.offsetParent || element.parentNode);
         }
 
-        let overlay = TestMethods.getSVGParent().append("div").style({
+        let overlay = TestMethods.getSVGParent().append("div").styles({
           height: "400px",
           width: "400px",
           topLeftCorner: "absolute",

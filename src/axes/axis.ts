@@ -195,12 +195,12 @@ export class Axis<D> extends Component {
     let tickMarks = this._tickMarkContainer.selectAll("." + Axis.TICK_MARK_CLASS).data(tickMarkValues);
     tickMarks.enter().append("line").classed(Axis.TICK_MARK_CLASS, true);
     tickMarks.attrs(this._generateTickMarkAttrHash());
-    d3.select(tickMarks[0][0]).classed(Axis.END_TICK_MARK_CLASS, true)
+    d3.select(tickMarks.node()).classed(Axis.END_TICK_MARK_CLASS, true)
       .attrs(this._generateTickMarkAttrHash(true));
-    d3.select(tickMarks[0][tickMarkValues.length - 1]).classed(Axis.END_TICK_MARK_CLASS, true)
+    d3.select(tickMarks.nodes()[tickMarkValues.length - 1]).classed(Axis.END_TICK_MARK_CLASS, true)
       .attrs(this._generateTickMarkAttrHash(true));
     tickMarks.exit().remove();
-    this._baseline.attr(this._generateBaselineAttrHash());
+    this._baseline.attrs(this._generateBaselineAttrHash());
     if (this.annotationsEnabled()) {
       this._drawAnnotations();
     } else {
@@ -350,7 +350,7 @@ export class Axis<D> extends Component {
 
     let isHorizontal = this.isHorizontal();
     bindElements(this._annotationContainer.select(".annotation-line-container"), "line", Axis.ANNOTATION_LINE_CLASS)
-      .attr({
+      .attrs({
         x1: isHorizontal ? positionF : secondaryPosition,
         x2: isHorizontal ? positionF : offsetF,
         y1: isHorizontal ? secondaryPosition : positionF,
@@ -359,7 +359,7 @@ export class Axis<D> extends Component {
       });
 
     bindElements(this._annotationContainer.select(".annotation-circle-container"), "circle", Axis.ANNOTATION_CIRCLE_CLASS)
-      .attr({
+      .attrs({
         cx: isHorizontal ? positionF : secondaryPosition,
         cy: isHorizontal ? secondaryPosition : positionF,
         r: 3,
@@ -376,7 +376,7 @@ export class Axis<D> extends Component {
       }
     };
     bindElements(this._annotationContainer.select(".annotation-rect-container"), "rect", Axis.ANNOTATION_RECT_CLASS)
-      .attr({
+      .attrs({
         x: isHorizontal ? positionF : rectangleOffsetF,
         y: isHorizontal ? rectangleOffsetF : positionF,
         width: isHorizontal ? (d) => measurements.get(d).width : (d) => measurements.get(d).height,
@@ -388,7 +388,7 @@ export class Axis<D> extends Component {
     let annotationFormatter = this.annotationFormatter();
     let annotationLabels = bindElements(this._annotationContainer.select(".annotation-label-container"), "g", Axis.ANNOTATION_LABEL_CLASS);
     annotationLabels.selectAll(".text-container").remove();
-    annotationLabels.attr({
+    annotationLabels.attrs({
       transform: (d) => {
         let xTranslate = isHorizontal ? positionF(d) : rectangleOffsetF(d);
         let yTranslate = isHorizontal ? rectangleOffsetF(d) : positionF(d);

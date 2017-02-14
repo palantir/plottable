@@ -502,7 +502,7 @@ export class Time extends Axis<Date> {
       attr["y2"] = this.height() - (offset + (this._tierLabelPositions[index] === "center" ?
           this.innerTickLength() : this._tierHeights[index]));
     }
-    tickMarks.attr(attr);
+    tickMarks.attrs(attr);
     if (this.orientation() === "bottom") {
       attr["y1"] = offset;
       attr["y2"] = offset + (this._tierLabelPositions[index] === "center" ? this.endTickLength() : this._tierHeights[index]);
@@ -511,12 +511,12 @@ export class Time extends Axis<Date> {
       attr["y2"] = this.height() - (offset + (this._tierLabelPositions[index] === "center" ?
           this.endTickLength() : this._tierHeights[index]));
     }
-    d3.select(tickMarks[0][0]).attr(attr);
-    d3.select(tickMarks[0][tickMarks.size() - 1]).attr(attr);
+    d3.select(tickMarks.nodes()[0]).attrs(attr);
+    d3.select(tickMarks.nodes()[tickMarks.size() - 1]).attrs(attr);
 
     // Add end-tick classes to first and last tick for CSS customization purposes
-    d3.select(tickMarks[0][0]).classed(Axis.END_TICK_MARK_CLASS, true);
-    d3.select(tickMarks[0][tickMarks.size() - 1]).classed(Axis.END_TICK_MARK_CLASS, true);
+    d3.select(tickMarks.nodes()[0]).classed(Axis.END_TICK_MARK_CLASS, true);
+    d3.select(tickMarks.nodes()[tickMarks.size() - 1]).classed(Axis.END_TICK_MARK_CLASS, true);
 
     tickMarks.exit().remove();
   }
@@ -526,7 +526,7 @@ export class Time extends Axis<Date> {
     tickMarks.enter().append("line").classed(Axis.TICK_MARK_CLASS, true);
     let attr = this._generateTickMarkAttrHash();
     attr["y2"] = (this.orientation() === "bottom") ? this.tickLabelPadding() : this.height() - this.tickLabelPadding();
-    tickMarks.attr(attr);
+    tickMarks.attrs(attr);
     tickMarks.exit().remove();
   }
 
@@ -556,7 +556,7 @@ export class Time extends Axis<Date> {
       let attr = this._generateBaselineAttrHash();
       attr["y1"] += (this.orientation() === "bottom") ? baselineOffset : -baselineOffset;
       attr["y2"] = attr["y1"];
-      this._tierBaselines[i].attr(attr).style("visibility", "inherit");
+      this._tierBaselines[i].attrs(attr).style("visibility", "inherit");
       baselineOffset += this._tierHeights[i];
     }
 
@@ -616,7 +616,7 @@ export class Time extends Axis<Date> {
       });
 
     // We use the ClientRects because x1/x2 attributes are not comparable to ClientRects of labels
-    let visibleTickMarkRects = visibleTickMarks[0].map((mark: Element) => mark.getBoundingClientRect());
+    let visibleTickMarkRects = visibleTickMarks.nodes().map((mark: Element) => mark.getBoundingClientRect());
 
     let visibleTickLabels = this._tierLabelContainers[index]
       .selectAll("." + Axis.TICK_LABEL_CLASS)

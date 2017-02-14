@@ -196,7 +196,7 @@ export class Numeric extends Axis<number> {
 
     tickLabels.style("text-anchor", tickLabelTextAnchor)
       .style("visibility", "inherit")
-      .attr(tickLabelAttrHash)
+      .attrs(tickLabelAttrHash)
       .text((s: any) => this.formatter()(s));
 
     let labelGroupTransform = "translate(" + labelGroupTransformX + ", " + labelGroupTransformY + ")";
@@ -282,14 +282,14 @@ export class Numeric extends Axis<number> {
   private _hideEndTickLabels() {
     let boundingBox = (<Element> this._boundingBox.node()).getBoundingClientRect();
     let tickLabels = this._tickLabelContainer.selectAll("." + Axis.TICK_LABEL_CLASS);
-    if (tickLabels[0].length === 0) {
+    if (tickLabels.size() === 0) {
       return;
     }
-    let firstTickLabel = <Element> tickLabels[0][0];
+    let firstTickLabel = <Element> tickLabels.nodes()[0];
     if (!Utils.DOM.clientRectInside(firstTickLabel.getBoundingClientRect(), boundingBox)) {
       d3.select(firstTickLabel).style("visibility", "hidden");
     }
-    let lastTickLabel = <Element> tickLabels[0][tickLabels[0].length - 1];
+    let lastTickLabel = <Element> tickLabels.nodes()[tickLabels.size() - 1];
     if (!Utils.DOM.clientRectInside(lastTickLabel.getBoundingClientRect(), boundingBox)) {
       d3.select(lastTickLabel).style("visibility", "hidden");
     }
@@ -303,7 +303,7 @@ export class Numeric extends Axis<number> {
         return (visibility === "inherit") || (visibility === "visible");
       });
 
-    let visibleTickLabelRects = visibleTickLabels[0].map((label: HTMLScriptElement) => label.getBoundingClientRect());
+    let visibleTickLabelRects = visibleTickLabels.nodes().map((label: HTMLScriptElement) => label.getBoundingClientRect());
     let interval = 1;
 
     while (!this._hasOverlapWithInterval(interval, visibleTickLabelRects) && interval < visibleTickLabelRects.length) {
