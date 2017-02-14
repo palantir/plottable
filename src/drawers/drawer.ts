@@ -11,7 +11,15 @@ import { AttributeToProjector, AttributeToAppliedProjector } from "../core/inter
 
 import * as Drawers from "./";
 
-export class Drawer {
+export interface IDrawer {
+  renderArea(): d3.Selection<void>;
+  renderArea(area: d3.Selection<void>): this;
+  renderArea(area?: d3.Selection<void>): any;
+  remove(): void;
+  draw(data: any[], drawSteps: Drawers.DrawStep[]): this;
+}
+
+export class Drawer implements IDrawer {
   private _renderArea: d3.Selection<void>;
   protected _svgElementName: string;
   protected _className: string;

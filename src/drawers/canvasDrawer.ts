@@ -10,9 +10,10 @@ import { Dataset } from "../core/dataset";
 import { AttributeToProjector, AttributeToAppliedProjector } from "../core/interfaces";
 
 import * as Drawers from "./";
+import { IDrawer } from "./drawer";
 
-export class CanvasDrawer {
-  protected _renderArea: HTMLCanvasElement;
+export class CanvasDrawer implements IDrawer {
+  protected _renderArea: d3.Selection<void>;
   protected _className: string;
   protected _dataset: Dataset;
 
@@ -29,15 +30,15 @@ export class CanvasDrawer {
   /**
    * Retrieves the renderArea selection for the Drawer.
    */
-  public renderArea(): HTMLCanvasElement;
+  public renderArea(): d3.Selection<void>;
   /**
    * Sets the renderArea selection for the Drawer.
    *
    * @param {d3.Selection} Selection containing the <g> to render to.
    * @returns {Drawer} The calling Drawer.
    */
-  public renderArea(area: HTMLCanvasElement): this;
-  public renderArea(area?: HTMLCanvasElement): any {
+  public renderArea(area: d3.Selection<void>): this;
+  public renderArea(area?: d3.Selection<void>): any {
     if (area == null) {
       return this._renderArea;
     }

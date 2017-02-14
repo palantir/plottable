@@ -19,12 +19,15 @@ import * as Plots from "./";
 import { PlotEntity } from "./";
 import { CanvasPlot } from "./canvasPlot";
 import { XYPlot } from "./xyPlot";
+import { BaseRectanglePlot, IRectanglePlot } from "./baseRectanglePlot";
 
-export class CanvasRectangle<X, Y> extends XYCanvasPlot<X, Y> {
+export class CanvasRectangle<X, Y> extends XYCanvasPlot<X, Y> implements IRectanglePlot<X, Y> {
   private static _X2_KEY = "x2";
   private static _Y2_KEY = "y2";
   private _labelsEnabled = false;
   private _label: Accessor<string> = null;
+
+  protected _plot: BaseRectanglePlot<X, Y>;
 
   /**
    * A Rectangle Plot displays rectangles based on the data.
@@ -39,85 +42,7 @@ export class CanvasRectangle<X, Y> extends XYCanvasPlot<X, Y> {
    */
   constructor() {
     super();
-
     this.addClass("rectangle-plot");
-  }
-
-  protected _createDrawer(dataset: Dataset): RectangleDrawer {
-    return new RectangleDrawer(dataset);
-  }
-
-  protected _generateAttrToProjector() {
-    let attrToProjector = super._generateAttrToProjector();
-
-    // Copy each of the different projectors.
-    let xAttr = CanvasPlot._scaledAccessor(this.x());
-    let x2Attr = attrToProjector[CanvasRectangle._X2_KEY];
-    let yAttr = CanvasPlot._scaledAccessor(this.y());
-    let y2Attr = attrToProjector[CanvasRectangle._Y2_KEY];
-
-    let xScale = this.x().scale;
-    let yScale = this.y().scale;
-
-    let widthProjection: Projector = null;
-    let heightProjection: Projector = null;
-    let xProjection: Projector = null;
-    let yProjection: Projector = null;
-
-    if (x2Attr != null) {
-      widthProjection = (d, i, dataset) => Math.abs(x2Attr(d, i, dataset) - xAttr(d, i, dataset));
-      xProjection = (d, i, dataset) => Math.min(x2Attr(d, i, dataset), xAttr(d, i, dataset));
-    } else {
-      widthProjection = (d, i, dataset) => this._rectangleWidth(xScale);
-      xProjection = (d, i, dataset) => xAttr(d, i, dataset) - 0.5 * widthProjection(d, i, dataset);
-    }
-
-    if (y2Attr != null) {
-      heightProjection = (d, i, dataset) => Math.abs(y2Attr(d, i, dataset) - yAttr(d, i, dataset));
-      yProjection = (d, i, dataset) => {
-        return Math.max(y2Attr(d, i, dataset), yAttr(d, i, dataset)) - heightProjection(d, i, dataset);
-      };
-    } else {
-      heightProjection = (d, i, dataset) => this._rectangleWidth(yScale);
-      yProjection = (d, i, dataset) => yAttr(d, i, dataset) - 0.5 * heightProjection(d, i, dataset);
-    }
-
-    attrToProjector["fillRect"] = (d, i, dataset) => {
-      return {
-        height: heightProjection(d, i, dataset),
-        width: widthProjection(d, i, dataset),
-        x: xProjection(d, i, dataset),
-        y: yProjection(d, i, dataset),
-      };
-    };
-
-    // Clean up the attributes projected onto the SVG elements
-    delete attrToProjector[CanvasRectangle._X2_KEY];
-    delete attrToProjector[CanvasRectangle._Y2_KEY];
-
-    return attrToProjector;
-  }
-
-  protected _generateDrawSteps(): Drawers.DrawStep[] {
-    return [{ attrToProjector: this._generateAttrToProjector(), animator: new Animators.Null() }];
-  }
-
-  protected _updateExtentsForProperty(property: string) {
-    super._updateExtentsForProperty(property);
-    if (property === "x") {
-      super._updateExtentsForProperty("x2");
-    } else if (property === "y") {
-      super._updateExtentsForProperty("y2");
-    }
-  }
-
-  protected _filterForProperty(property: string) {
-    if (property === "x2") {
-      return super._filterForProperty("x");
-    } else if (property === "y2") {
-      return super._filterForProperty("y");
-    }
-    return super._filterForProperty(property);
   }
 
   /**
@@ -141,29 +66,10 @@ export class CanvasRectangle<X, Y> extends XYCanvasPlot<X, Y> {
    */
   public x(x: X | Accessor<X>, xScale: Scale<X, number>): this;
   public x(x?: number | Accessor<number> | X | Accessor<X>, xScale?: Scale<X, number>): any {
+    const xReturn = this._plot.x(x as X, xScale);
     if (x == null) {
-      return super.x();
+      return xReturn
     }
-
-    if (xScale == null) {
-      super.x(<number | Accessor<number>>x);
-    } else {
-      super.x(<X | Accessor<X>>x, xScale);
-    }
-
-    if (xScale != null) {
-      let x2Binding = this.x2();
-      let x2 = x2Binding && x2Binding.accessor;
-      if (x2 != null) {
-        this._bindProperty(CanvasRectangle._X2_KEY, x2, xScale);
-      }
-    }
-
-    // The x and y scales should render in bands with no padding for category scales
-    if (xScale instanceof Scales.Category) {
-      (<Scales.Category> <any> xScale).innerPadding(0).outerPadding(0);
-    }
-
     return this;
   }
 
@@ -180,13 +86,10 @@ export class CanvasRectangle<X, Y> extends XYCanvasPlot<X, Y> {
    */
   public x2(x2: number | Accessor<number> | X | Accessor<X>): this;
   public x2(x2?: number | Accessor<number> | X | Accessor<X>): any {
+    const x2Return = this._plot.x2(x2);
     if (x2 == null) {
-      return this._propertyBindings.get(CanvasRectangle._X2_KEY);
+      return x2Return;
     }
-
-    let xBinding = this.x();
-    let xScale = xBinding && xBinding.scale;
-    this._bindProperty(CanvasRectangle._X2_KEY, x2, xScale);
 
     this.render();
     return this;
@@ -213,29 +116,10 @@ export class CanvasRectangle<X, Y> extends XYCanvasPlot<X, Y> {
    */
   public y(y: Y | Accessor<Y>, yScale: Scale<Y, number>): this;
   public y(y?: number | Accessor<number> | Y | Accessor<Y>, yScale?: Scale<Y, number>): any {
+    const yReturn = this._plot.y(y as Y, yScale);
     if (y == null) {
-      return super.y();
+      return yReturn;
     }
-
-    if (yScale == null) {
-      super.y(<number | Accessor<number>>y);
-    } else {
-      super.y(<Y | Accessor<Y>>y, yScale);
-    }
-
-    if (yScale != null) {
-      let y2Binding = this.y2();
-      let y2 = y2Binding && y2Binding.accessor;
-      if (y2 != null) {
-        this._bindProperty(CanvasRectangle._Y2_KEY, y2, yScale);
-      }
-    }
-
-    // The x and y scales should render in bands with no padding for category scales
-    if (yScale instanceof Scales.Category) {
-      (<Scales.Category> <any> yScale).innerPadding(0).outerPadding(0);
-    }
-
     return this;
   }
 
@@ -252,72 +136,17 @@ export class CanvasRectangle<X, Y> extends XYCanvasPlot<X, Y> {
    */
   public y2(y2: number | Accessor<number> | Y | Accessor<Y>): this;
   public y2(y2?: number | Accessor<number> | Y | Accessor<Y>): any {
+    const y2Return = this._plot.y2(y2);
     if (y2 == null) {
-      return this._propertyBindings.get(CanvasRectangle._Y2_KEY);
+      return y2Return;
     }
-
-    let yBinding = this.y();
-    let yScale = yBinding && yBinding.scale;
-    this._bindProperty(CanvasRectangle._Y2_KEY, y2, yScale);
-
     this.render();
     return this;
   }
 
-  protected _propertyProjectors(): AttributeToProjector {
-    let attrToProjector = super._propertyProjectors();
-    if (this.x2() != null) {
-      attrToProjector["x2"] = CanvasPlot._scaledAccessor(this.x2());
-    }
-    if (this.y2() != null) {
-      attrToProjector["y2"] = CanvasPlot._scaledAccessor(this.y2());
-    }
-    return attrToProjector;
-  }
-
-  protected _pixelPoint(datum: any, index: number, dataset: Dataset) {
-    let attrToProjector = this._generateAttrToProjector();
-    let rectX = attrToProjector["x"](datum, index, dataset);
-    let rectY = attrToProjector["y"](datum, index, dataset);
-    let rectWidth = attrToProjector["width"](datum, index, dataset);
-    let rectHeight = attrToProjector["height"](datum, index, dataset);
-    let x = rectX + rectWidth / 2;
-    let y = rectY + rectHeight / 2;
-    return { x: x, y: y };
-  }
-
-  private _rectangleWidth(scale: Scale<any, number>) {
-    if (scale instanceof Scales.Category) {
-      return (<Scales.Category> scale).rangeBand();
-    } else {
-      let accessor = scale === this.x().scale ? this.x().accessor : this.y().accessor;
-      let accessorData = d3.set(Utils.Array.flatten(this.datasets().map((dataset) => {
-        return dataset.data().map((d, i) => accessor(d, i, dataset).valueOf());
-      }))).values().map((value) => +value);
-      // Get the absolute difference between min and max
-      let min = Utils.Math.min(accessorData, 0);
-      let max = Utils.Math.max(accessorData, 0);
-      let scaledMin = scale.scale(min);
-      let scaledMax = scale.scale(max);
-      return (scaledMax - scaledMin) / Math.abs(max - min);
-    }
-  }
-
-  protected _getDataToDraw(): Utils.Map<Dataset, any[]> {
-    let dataToDraw = new Utils.Map<Dataset, any[]>();
-    const fillProjector = this._generateAttrToProjector()["fillRect"]
-    this.datasets().forEach((dataset) => {
-      let data = dataset.data().filter((d, i) => {
-          const fillProjection = fillProjector(d, i, dataset);
-
-          return Utils.Math.isValidNumber(fillProjection.x) &&
-            Utils.Math.isValidNumber(fillProjection.y) &&
-            Utils.Math.isValidNumber(fillProjection.width) &&
-            Utils.Math.isValidNumber(fillProjection.height);
-      });
-
-      dataToDraw.set(dataset, data);
-    });
-    return dataToDraw;
+  protected _createPlot() {
+    return new BaseRectanglePlot((dataset) => new RectangleDrawer(dataset),
+      () => this.width(),
+      () => this.height());
   }
 }

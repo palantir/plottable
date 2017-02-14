@@ -16,7 +16,7 @@ export class RectangleDrawer extends CanvasDrawer {
 
   protected _drawStep(step: Drawers.AppliedDrawStep) {
     super._drawStep(step);
-    const context = this._renderArea.getContext("2d");
+    const context = (this._renderArea.node() as HTMLCanvasElement).getContext("2d");
     if (step.attrToAppliedProjector["fillRect"] == null) {
       throw new Error("fillRect needs to be supplied in order for drawing to occur");
     }

@@ -6654,9 +6654,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var d3 = __webpack_require__(1);
-var Animators = __webpack_require__(5);
-var Utils = __webpack_require__(0);
+var basePlot_1 = __webpack_require__(124);
 var htmlComponent_1 = __webpack_require__(21);
 var canvasDrawer_1 = __webpack_require__(122);
 var CanvasPlot = (function (_super) {
@@ -6665,53 +6663,37 @@ var CanvasPlot = (function (_super) {
         var _this = this;
         _super.call(this);
         this._dataChanged = false;
-        this._attrExtents = d3.map();
-        this._attrBindings = d3.map();
-        this._datasetToDrawer = new Utils.Map();
-        this._propertyBindings = d3.map();
-        this._propertyExtents = d3.map();
-        this._onDatasetUpdateCallback = function () { return _this._onDatasetUpdate(); };
-        this._renderCallback = function (scale) { return _this.render(); };
-        this._includedValuesProvider = function (scale) { return _this._includedValuesForScale(scale); };
+        this._plot = this._createPlot();
+        this._plot.onDatasetUpdate(function () { return _this._onDatasetUpdate(); });
+        this._plot.onDatasetsUpdate(function () { return _this._onDatasetUpdate(); });
+        this._plot.renderCallback(function (scale) { return _this.render(); });
     }
     CanvasPlot.prototype.addDataset = function (dataset) {
-        this._addDataset(dataset);
-        this._onDatasetUpdate();
+        this._plot.addDataset(dataset);
         return this;
     };
     CanvasPlot.prototype.anchor = function (selection) {
         _super.prototype.anchor.call(this, selection);
         this._dataChanged = true;
         this._cachedEntityStore = undefined;
-        this._updateExtents();
+        this._plot.updateExtents();
         return this;
     };
     CanvasPlot.prototype.computeLayout = function (origin, availableWidth, availableHeight) {
         _super.prototype.computeLayout.call(this, origin, availableWidth, availableHeight);
-        var canvas = this._renderArea.node();
+        var canvas = this._plot.renderArea().node();
         canvas.width = this.width();
         canvas.height = this.height();
         return this;
     };
     CanvasPlot.prototype.attr = function (attr, attrValue, scale) {
-        if (attrValue == null) {
-            return this._attrBindings.get(attr);
-        }
-        this._bindAttr(attr, attrValue, scale);
+        this._plot.attr(attr, attrValue, scale);
         this.render(); // queue a re-render upon changing projector
         return this;
     };
     CanvasPlot.prototype.datasets = function (datasets) {
-        var _this = this;
-        var currentDatasets = [];
-        this._datasetToDrawer.forEach(function (drawer, dataset) { return currentDatasets.push(dataset); });
-        if (datasets == null) {
-            return currentDatasets;
-        }
-        currentDatasets.forEach(function (dataset) { return _this._removeDataset(dataset); });
-        datasets.forEach(function (dataset) { return _this._addDataset(dataset); });
-        this._onDatasetUpdate();
-        return this;
+        var returnedDatasets = this._plot.datasets(datasets);
+        return datasets === undefined ? returnedDatasets : this;
     };
     /**
      * Removes a Dataset from the Plot.
@@ -6720,204 +6702,28 @@ var CanvasPlot = (function (_super) {
      * @returns {Plot} The calling Plot.
      */
     CanvasPlot.prototype.removeDataset = function (dataset) {
-        this._removeDataset(dataset);
-        this._onDatasetUpdate();
+        this._plot.removeDataset(dataset);
         return this;
     };
     CanvasPlot.prototype.renderImmediately = function () {
         _super.prototype.renderImmediately.call(this);
         if (this._isAnchored) {
-            var drawSteps_1 = this._generateDrawSteps();
-            var dataToDraw_1 = this._getDataToDraw();
-            var drawers_1 = this._getDrawersInOrder();
-            this.datasets().forEach(function (ds, i) { return drawers_1[i].draw(dataToDraw_1.get(ds), drawSteps_1); });
-            var times = this.datasets().map(function (ds, i) { return drawers_1[i].totalDrawTime(dataToDraw_1.get(ds), drawSteps_1); });
-            var maxTime = Utils.Math.max(times, 0);
+            this._plot.renderImmediately();
         }
         return this;
     };
-    CanvasPlot.prototype._addDataset = function (dataset) {
-        this._removeDataset(dataset);
-        var drawer = this._createDrawer(dataset);
-        if (this._renderArea != null) {
-            // may not be initiated yet, we'll initiate everything later
-            drawer.renderArea(this._renderArea.node());
-        }
-        this._datasetToDrawer.set(dataset, drawer);
-        dataset.onUpdate(this._onDatasetUpdateCallback);
-        return this;
-    };
-    CanvasPlot.prototype._createDrawer = function (dataset) {
-        return new canvasDrawer_1.CanvasDrawer(dataset);
-    };
-    /**
-     * Override in subclass to add special extents, such as included values
-     */
-    CanvasPlot.prototype._extentsForProperty = function (property) {
-        return this._propertyExtents.get(property);
-    };
-    CanvasPlot.prototype._filterForProperty = function (property) {
-        return null;
-    };
-    CanvasPlot.prototype._generateAttrToProjector = function () {
-        var h = {};
-        this._attrBindings.forEach(function (attr, binding) {
-            var accessor = binding.accessor;
-            var scale = binding.scale;
-            var fn = scale ? function (d, i, dataset) { return scale.scale(accessor(d, i, dataset)); } : accessor;
-            h[attr] = fn;
-        });
-        var propertyProjectors = this._propertyProjectors();
-        Object.keys(propertyProjectors).forEach(function (key) {
-            if (h[key] == null) {
-                h[key] = propertyProjectors[key];
-            }
-        });
-        return h;
-    };
-    CanvasPlot.prototype._generateDrawSteps = function () {
-        return [{ attrToProjector: this._generateAttrToProjector(), animator: new Animators.Null() }];
-    };
-    CanvasPlot.prototype._getDataToDraw = function () {
-        var dataToDraw = new Utils.Map();
-        this.datasets().forEach(function (dataset) { return dataToDraw.set(dataset, dataset.data()); });
-        return dataToDraw;
-    };
-    CanvasPlot.prototype._getDrawersInOrder = function () {
-        var _this = this;
-        return this.datasets().map(function (dataset) { return _this._datasetToDrawer.get(dataset); });
+    CanvasPlot.prototype._createPlot = function () {
+        return new basePlot_1.BasePlot(function (dataset) { return new canvasDrawer_1.CanvasDrawer(dataset); });
     };
     CanvasPlot.prototype._onDatasetUpdate = function () {
-        this._updateExtents();
+        this._plot.updateExtents();
         this._dataChanged = true;
         this._cachedEntityStore = undefined;
         this.render();
     };
-    CanvasPlot.prototype._propertyProjectors = function () {
-        return {};
-    };
-    CanvasPlot._scaledAccessor = function (binding) {
-        return binding.scale == null ?
-            binding.accessor :
-            function (d, i, ds) { return binding.scale.scale(binding.accessor(d, i, ds)); };
-    };
-    CanvasPlot.prototype._removeDataset = function (dataset) {
-        if (this.datasets().indexOf(dataset) === -1) {
-            return this;
-        }
-        // this._removeDatasetNodes(dataset);
-        dataset.offUpdate(this._onDatasetUpdateCallback);
-        this._datasetToDrawer.delete(dataset);
-        return this;
-    };
     CanvasPlot.prototype._setup = function () {
-        var _this = this;
         _super.prototype._setup.call(this);
-        this._renderArea = this.element().append("canvas");
-        this.datasets().forEach(function (dataset) {
-            _this._datasetToDrawer.get(dataset).renderArea(_this._renderArea.node());
-        });
-    };
-    CanvasPlot.prototype._installScaleForKey = function (scale, key) {
-        scale.onUpdate(this._renderCallback);
-        scale.addIncludedValuesProvider(this._includedValuesProvider);
-    };
-    CanvasPlot.prototype._uninstallScaleForKey = function (scale, key) {
-        scale.offUpdate(this._renderCallback);
-        scale.removeIncludedValuesProvider(this._includedValuesProvider);
-    };
-    /**
-     * Updates the extents associated with each attribute, then autodomains all scales the Plot uses.
-     */
-    CanvasPlot.prototype._updateExtents = function () {
-        var _this = this;
-        this._attrBindings.forEach(function (attr) { return _this._updateExtentsForAttr(attr); });
-        this._propertyExtents.forEach(function (property) { return _this._updateExtentsForProperty(property); });
-        this._scales().forEach(function (scale) { return scale.addIncludedValuesProvider(_this._includedValuesProvider); });
-    };
-    CanvasPlot.prototype._updateExtentsForAttr = function (attr) {
-        // Filters should never be applied to attributes
-        this._updateExtentsForKey(attr, this._attrBindings, this._attrExtents, null);
-    };
-    CanvasPlot.prototype._updateExtentsForProperty = function (property) {
-        this._updateExtentsForKey(property, this._propertyBindings, this._propertyExtents, this._filterForProperty(property));
-    };
-    CanvasPlot.prototype._computeExtent = function (dataset, accScaleBinding, filter) {
-        var accessor = accScaleBinding.accessor;
-        var scale = accScaleBinding.scale;
-        if (scale == null) {
-            return [];
-        }
-        var data = dataset.data();
-        if (filter != null) {
-            data = data.filter(function (d, i) { return filter(d, i, dataset); });
-        }
-        var appliedAccessor = function (d, i) { return accessor(d, i, dataset); };
-        var mappedData = data.map(appliedAccessor);
-        return scale.extentOfValues(mappedData);
-    };
-    /**
-     * @returns {Scale[]} A unique array of all scales currently used by the Plot.
-     */
-    CanvasPlot.prototype._scales = function () {
-        var scales = [];
-        this._attrBindings.forEach(function (attr, binding) {
-            var scale = binding.scale;
-            if (scale != null && scales.indexOf(scale) === -1) {
-                scales.push(scale);
-            }
-        });
-        this._propertyBindings.forEach(function (property, binding) {
-            var scale = binding.scale;
-            if (scale != null && scales.indexOf(scale) === -1) {
-                scales.push(scale);
-            }
-        });
-        return scales;
-    };
-    CanvasPlot.prototype._updateExtentsForKey = function (key, bindings, extents, filter) {
-        var _this = this;
-        var accScaleBinding = bindings.get(key);
-        if (accScaleBinding == null || accScaleBinding.accessor == null) {
-            return;
-        }
-        extents.set(key, this.datasets().map(function (dataset) { return _this._computeExtent(dataset, accScaleBinding, filter); }));
-    };
-    CanvasPlot.prototype._includedValuesForScale = function (scale) {
-        var _this = this;
-        if (!this._isAnchored) {
-            return [];
-        }
-        var includedValues = [];
-        this._attrBindings.forEach(function (attr, binding) {
-            if (binding.scale === scale) {
-                var extents = _this._attrExtents.get(attr);
-                if (extents != null) {
-                    includedValues = includedValues.concat(d3.merge(extents));
-                }
-            }
-        });
-        this._propertyBindings.forEach(function (property, binding) {
-            if (binding.scale === scale) {
-                var extents = _this._extentsForProperty(property);
-                if (extents != null) {
-                    includedValues = includedValues.concat(d3.merge(extents));
-                }
-            }
-        });
-        return includedValues;
-    };
-    CanvasPlot.prototype._bindAttr = function (attr, value, scale) {
-        var binding = this._attrBindings.get(attr);
-        var oldScale = binding != null ? binding.scale : null;
-        this._attrBindings.set(attr, { accessor: d3.functor(value), scale: scale });
-        this._updateExtentsForAttr(attr);
-        if (oldScale != null) {
-            this._uninstallScaleForKey(oldScale, attr);
-        }
-        if (scale != null) {
-            this._installScaleForKey(scale, attr);
-        }
+        this._plot.renderArea(this.element().append("canvas"));
     };
     return CanvasPlot;
 }(htmlComponent_1.HTMLComponent));
@@ -12816,13 +12622,9 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var d3 = __webpack_require__(1);
 var xyCanvasPlot_1 = __webpack_require__(91);
-var Animators = __webpack_require__(5);
 var canvasRectangleDrawer_1 = __webpack_require__(123);
-var Scales = __webpack_require__(2);
-var Utils = __webpack_require__(0);
-var canvasPlot_1 = __webpack_require__(39);
+var baseRectanglePlot_1 = __webpack_require__(126);
 var CanvasRectangle = (function (_super) {
     __extends(CanvasRectangle, _super);
     /**
@@ -12842,192 +12644,39 @@ var CanvasRectangle = (function (_super) {
         this._label = null;
         this.addClass("rectangle-plot");
     }
-    CanvasRectangle.prototype._createDrawer = function (dataset) {
-        return new canvasRectangleDrawer_1.RectangleDrawer(dataset);
-    };
-    CanvasRectangle.prototype._generateAttrToProjector = function () {
-        var _this = this;
-        var attrToProjector = _super.prototype._generateAttrToProjector.call(this);
-        // Copy each of the different projectors.
-        var xAttr = canvasPlot_1.CanvasPlot._scaledAccessor(this.x());
-        var x2Attr = attrToProjector[CanvasRectangle._X2_KEY];
-        var yAttr = canvasPlot_1.CanvasPlot._scaledAccessor(this.y());
-        var y2Attr = attrToProjector[CanvasRectangle._Y2_KEY];
-        var xScale = this.x().scale;
-        var yScale = this.y().scale;
-        var widthProjection = null;
-        var heightProjection = null;
-        var xProjection = null;
-        var yProjection = null;
-        if (x2Attr != null) {
-            widthProjection = function (d, i, dataset) { return Math.abs(x2Attr(d, i, dataset) - xAttr(d, i, dataset)); };
-            xProjection = function (d, i, dataset) { return Math.min(x2Attr(d, i, dataset), xAttr(d, i, dataset)); };
-        }
-        else {
-            widthProjection = function (d, i, dataset) { return _this._rectangleWidth(xScale); };
-            xProjection = function (d, i, dataset) { return xAttr(d, i, dataset) - 0.5 * widthProjection(d, i, dataset); };
-        }
-        if (y2Attr != null) {
-            heightProjection = function (d, i, dataset) { return Math.abs(y2Attr(d, i, dataset) - yAttr(d, i, dataset)); };
-            yProjection = function (d, i, dataset) {
-                return Math.max(y2Attr(d, i, dataset), yAttr(d, i, dataset)) - heightProjection(d, i, dataset);
-            };
-        }
-        else {
-            heightProjection = function (d, i, dataset) { return _this._rectangleWidth(yScale); };
-            yProjection = function (d, i, dataset) { return yAttr(d, i, dataset) - 0.5 * heightProjection(d, i, dataset); };
-        }
-        attrToProjector["fillRect"] = function (d, i, dataset) {
-            return {
-                height: heightProjection(d, i, dataset),
-                width: widthProjection(d, i, dataset),
-                x: xProjection(d, i, dataset),
-                y: yProjection(d, i, dataset),
-            };
-        };
-        // Clean up the attributes projected onto the SVG elements
-        delete attrToProjector[CanvasRectangle._X2_KEY];
-        delete attrToProjector[CanvasRectangle._Y2_KEY];
-        return attrToProjector;
-    };
-    CanvasRectangle.prototype._generateDrawSteps = function () {
-        return [{ attrToProjector: this._generateAttrToProjector(), animator: new Animators.Null() }];
-    };
-    CanvasRectangle.prototype._updateExtentsForProperty = function (property) {
-        _super.prototype._updateExtentsForProperty.call(this, property);
-        if (property === "x") {
-            _super.prototype._updateExtentsForProperty.call(this, "x2");
-        }
-        else if (property === "y") {
-            _super.prototype._updateExtentsForProperty.call(this, "y2");
-        }
-    };
-    CanvasRectangle.prototype._filterForProperty = function (property) {
-        if (property === "x2") {
-            return _super.prototype._filterForProperty.call(this, "x");
-        }
-        else if (property === "y2") {
-            return _super.prototype._filterForProperty.call(this, "y");
-        }
-        return _super.prototype._filterForProperty.call(this, property);
-    };
     CanvasRectangle.prototype.x = function (x, xScale) {
+        var xReturn = this._plot.x(x, xScale);
         if (x == null) {
-            return _super.prototype.x.call(this);
-        }
-        if (xScale == null) {
-            _super.prototype.x.call(this, x);
-        }
-        else {
-            _super.prototype.x.call(this, x, xScale);
-        }
-        if (xScale != null) {
-            var x2Binding = this.x2();
-            var x2 = x2Binding && x2Binding.accessor;
-            if (x2 != null) {
-                this._bindProperty(CanvasRectangle._X2_KEY, x2, xScale);
-            }
-        }
-        // The x and y scales should render in bands with no padding for category scales
-        if (xScale instanceof Scales.Category) {
-            xScale.innerPadding(0).outerPadding(0);
+            return xReturn;
         }
         return this;
     };
     CanvasRectangle.prototype.x2 = function (x2) {
+        var x2Return = this._plot.x2(x2);
         if (x2 == null) {
-            return this._propertyBindings.get(CanvasRectangle._X2_KEY);
+            return x2Return;
         }
-        var xBinding = this.x();
-        var xScale = xBinding && xBinding.scale;
-        this._bindProperty(CanvasRectangle._X2_KEY, x2, xScale);
         this.render();
         return this;
     };
     CanvasRectangle.prototype.y = function (y, yScale) {
+        var yReturn = this._plot.y(y, yScale);
         if (y == null) {
-            return _super.prototype.y.call(this);
-        }
-        if (yScale == null) {
-            _super.prototype.y.call(this, y);
-        }
-        else {
-            _super.prototype.y.call(this, y, yScale);
-        }
-        if (yScale != null) {
-            var y2Binding = this.y2();
-            var y2 = y2Binding && y2Binding.accessor;
-            if (y2 != null) {
-                this._bindProperty(CanvasRectangle._Y2_KEY, y2, yScale);
-            }
-        }
-        // The x and y scales should render in bands with no padding for category scales
-        if (yScale instanceof Scales.Category) {
-            yScale.innerPadding(0).outerPadding(0);
+            return yReturn;
         }
         return this;
     };
     CanvasRectangle.prototype.y2 = function (y2) {
+        var y2Return = this._plot.y2(y2);
         if (y2 == null) {
-            return this._propertyBindings.get(CanvasRectangle._Y2_KEY);
+            return y2Return;
         }
-        var yBinding = this.y();
-        var yScale = yBinding && yBinding.scale;
-        this._bindProperty(CanvasRectangle._Y2_KEY, y2, yScale);
         this.render();
         return this;
     };
-    CanvasRectangle.prototype._propertyProjectors = function () {
-        var attrToProjector = _super.prototype._propertyProjectors.call(this);
-        if (this.x2() != null) {
-            attrToProjector["x2"] = canvasPlot_1.CanvasPlot._scaledAccessor(this.x2());
-        }
-        if (this.y2() != null) {
-            attrToProjector["y2"] = canvasPlot_1.CanvasPlot._scaledAccessor(this.y2());
-        }
-        return attrToProjector;
-    };
-    CanvasRectangle.prototype._pixelPoint = function (datum, index, dataset) {
-        var attrToProjector = this._generateAttrToProjector();
-        var rectX = attrToProjector["x"](datum, index, dataset);
-        var rectY = attrToProjector["y"](datum, index, dataset);
-        var rectWidth = attrToProjector["width"](datum, index, dataset);
-        var rectHeight = attrToProjector["height"](datum, index, dataset);
-        var x = rectX + rectWidth / 2;
-        var y = rectY + rectHeight / 2;
-        return { x: x, y: y };
-    };
-    CanvasRectangle.prototype._rectangleWidth = function (scale) {
-        if (scale instanceof Scales.Category) {
-            return scale.rangeBand();
-        }
-        else {
-            var accessor_1 = scale === this.x().scale ? this.x().accessor : this.y().accessor;
-            var accessorData = d3.set(Utils.Array.flatten(this.datasets().map(function (dataset) {
-                return dataset.data().map(function (d, i) { return accessor_1(d, i, dataset).valueOf(); });
-            }))).values().map(function (value) { return +value; });
-            // Get the absolute difference between min and max
-            var min = Utils.Math.min(accessorData, 0);
-            var max = Utils.Math.max(accessorData, 0);
-            var scaledMin = scale.scale(min);
-            var scaledMax = scale.scale(max);
-            return (scaledMax - scaledMin) / Math.abs(max - min);
-        }
-    };
-    CanvasRectangle.prototype._getDataToDraw = function () {
-        var dataToDraw = new Utils.Map();
-        var fillProjector = this._generateAttrToProjector()["fillRect"];
-        this.datasets().forEach(function (dataset) {
-            var data = dataset.data().filter(function (d, i) {
-                var fillProjection = fillProjector(d, i, dataset);
-                return Utils.Math.isValidNumber(fillProjection.x) &&
-                    Utils.Math.isValidNumber(fillProjection.y) &&
-                    Utils.Math.isValidNumber(fillProjection.width) &&
-                    Utils.Math.isValidNumber(fillProjection.height);
-            });
-            dataToDraw.set(dataset, data);
-        });
-        return dataToDraw;
+    CanvasRectangle.prototype._createPlot = function () {
+        var _this = this;
+        return new baseRectanglePlot_1.BaseRectanglePlot(function (dataset) { return new canvasRectangleDrawer_1.RectangleDrawer(dataset); }, function () { return _this.width(); }, function () { return _this.height(); });
     };
     CanvasRectangle._X2_KEY = "x2";
     CanvasRectangle._Y2_KEY = "y2";
@@ -14984,185 +14633,44 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var d3 = __webpack_require__(1);
-var Scales = __webpack_require__(2);
-var Utils = __webpack_require__(0);
+var baseXYPlot_1 = __webpack_require__(125);
+var canvasDrawer_1 = __webpack_require__(122);
 var canvasPlot_1 = __webpack_require__(39);
 var XYCanvasPlot = (function (_super) {
     __extends(XYCanvasPlot, _super);
     function XYCanvasPlot() {
-        var _this = this;
-        _super.call(this);
-        this._autoAdjustYScaleDomain = false;
-        this._autoAdjustXScaleDomain = false;
-        this._adjustYDomainOnChangeFromXCallback = function (scale) { return _this._adjustYDomainOnChangeFromX(); };
-        this._adjustXDomainOnChangeFromYCallback = function (scale) { return _this._adjustXDomainOnChangeFromY(); };
+        _super.apply(this, arguments);
     }
     XYCanvasPlot.prototype.x = function (x, xScale) {
+        var xReturn = this._plot.x(x, xScale);
         if (x == null) {
-            return this._propertyBindings.get(XYCanvasPlot._X_KEY);
-        }
-        this._bindProperty(XYCanvasPlot._X_KEY, x, xScale);
-        var width = this.width();
-        if (xScale != null && width != null) {
-            xScale.range([0, width]);
-        }
-        if (this._autoAdjustYScaleDomain) {
-            this._updateYExtentsAndAutodomain();
+            return xReturn;
         }
         this.render();
         return this;
     };
     XYCanvasPlot.prototype.y = function (y, yScale) {
-        if (y == null) {
-            return this._propertyBindings.get(XYCanvasPlot._Y_KEY);
-        }
-        this._bindProperty(XYCanvasPlot._Y_KEY, y, yScale);
-        var height = this.height();
-        if (yScale != null && height != null) {
-            if (yScale instanceof Scales.Category) {
-                yScale.range([0, height]);
-            }
-            else {
-                yScale.range([height, 0]);
-            }
-        }
-        if (this._autoAdjustXScaleDomain) {
-            this._updateXExtentsAndAutodomain();
+        var yReturn = this._plot.y(y, yScale);
+        if (yReturn == null) {
+            return yReturn;
         }
         this.render();
         return this;
     };
     XYCanvasPlot.prototype.destroy = function () {
         _super.prototype.destroy.call(this);
-        if (this.x().scale) {
-            this.x().scale.offUpdate(this._adjustYDomainOnChangeFromXCallback);
-        }
-        if (this.y().scale) {
-            this.y().scale.offUpdate(this._adjustXDomainOnChangeFromYCallback);
-        }
+        this._plot.destroy();
         return this;
     };
     XYCanvasPlot.prototype.computeLayout = function (origin, availableWidth, availableHeight) {
         _super.prototype.computeLayout.call(this, origin, availableWidth, availableHeight);
-        var xBinding = this.x();
-        var xScale = xBinding && xBinding.scale;
-        if (xScale != null) {
-            xScale.range([0, this.width()]);
-        }
-        var yBinding = this.y();
-        var yScale = yBinding && yBinding.scale;
-        if (yScale != null) {
-            if (yScale instanceof Scales.Category) {
-                yScale.range([0, this.height()]);
-            }
-            else {
-                yScale.range([this.height(), 0]);
-            }
-        }
+        this._plot.computeLayout(origin, availableWidth, availableHeight);
         return this;
     };
-    XYCanvasPlot.prototype._bindProperty = function (property, value, scale) {
-        var binding = this._propertyBindings.get(property);
-        var oldScale = binding != null ? binding.scale : null;
-        this._propertyBindings.set(property, { accessor: d3.functor(value), scale: scale });
-        this._updateExtentsForProperty(property);
-        if (oldScale != null) {
-            this._uninstallScaleForKey(oldScale, property);
-        }
-        if (scale != null) {
-            this._installScaleForKey(scale, property);
-        }
-    };
-    XYCanvasPlot.prototype._filterForProperty = function (property) {
-        if (property === "x" && this._autoAdjustXScaleDomain) {
-            return this._makeFilterByProperty("y");
-        }
-        else if (property === "y" && this._autoAdjustYScaleDomain) {
-            return this._makeFilterByProperty("x");
-        }
-        return null;
-    };
-    XYCanvasPlot.prototype._makeFilterByProperty = function (property) {
-        var binding = this._propertyBindings.get(property);
-        if (binding != null) {
-            var accessor_1 = binding.accessor;
-            var scale_1 = binding.scale;
-            if (scale_1 != null) {
-                return function (datum, index, dataset) {
-                    var range = scale_1.range();
-                    return Utils.Math.inRange(scale_1.scale(accessor_1(datum, index, dataset)), range[0], range[1]);
-                };
-            }
-        }
-        return null;
-    };
-    XYCanvasPlot.prototype._getDataToDraw = function () {
+    XYCanvasPlot.prototype._createPlot = function () {
         var _this = this;
-        var dataToDraw = _super.prototype._getDataToDraw.call(this);
-        var definedFunction = function (d, i, dataset) {
-            var positionX = canvasPlot_1.CanvasPlot._scaledAccessor(_this.x())(d, i, dataset);
-            var positionY = canvasPlot_1.CanvasPlot._scaledAccessor(_this.y())(d, i, dataset);
-            return Utils.Math.isValidNumber(positionX) &&
-                Utils.Math.isValidNumber(positionY);
-        };
-        this.datasets().forEach(function (dataset) {
-            dataToDraw.set(dataset, dataToDraw.get(dataset).filter(function (d, i) { return definedFunction(d, i, dataset); }));
-        });
-        return dataToDraw;
+        return new baseXYPlot_1.BaseXYPlot(function (dataset) { return new canvasDrawer_1.CanvasDrawer(dataset); }, function () { return _this.width(); }, function () { return _this.height(); });
     };
-    XYCanvasPlot.prototype._installScaleForKey = function (scale, key) {
-        _super.prototype._installScaleForKey.call(this, scale, key);
-        var adjustCallback = key === XYCanvasPlot._X_KEY ? this._adjustYDomainOnChangeFromXCallback
-            : this._adjustXDomainOnChangeFromYCallback;
-        scale.onUpdate(adjustCallback);
-    };
-    XYCanvasPlot.prototype._uninstallScaleForKey = function (scale, key) {
-        _super.prototype._uninstallScaleForKey.call(this, scale, key);
-        var adjustCallback = key === XYCanvasPlot._X_KEY ? this._adjustYDomainOnChangeFromXCallback
-            : this._adjustXDomainOnChangeFromYCallback;
-        scale.offUpdate(adjustCallback);
-    };
-    XYCanvasPlot.prototype._adjustYDomainOnChangeFromX = function () {
-        if (!this._projectorsReady()) {
-            return;
-        }
-        if (this._autoAdjustYScaleDomain) {
-            this._updateYExtentsAndAutodomain();
-        }
-    };
-    XYCanvasPlot.prototype._adjustXDomainOnChangeFromY = function () {
-        if (!this._projectorsReady()) {
-            return;
-        }
-        if (this._autoAdjustXScaleDomain) {
-            this._updateXExtentsAndAutodomain();
-        }
-    };
-    XYCanvasPlot.prototype._projectorsReady = function () {
-        var xBinding = this.x();
-        var yBinding = this.y();
-        return xBinding != null &&
-            xBinding.accessor != null &&
-            yBinding != null &&
-            yBinding.accessor != null;
-    };
-    XYCanvasPlot.prototype._updateXExtentsAndAutodomain = function () {
-        this._updateExtentsForProperty("x");
-        var xScale = this.x().scale;
-        if (xScale != null) {
-            xScale.autoDomain();
-        }
-    };
-    XYCanvasPlot.prototype._updateYExtentsAndAutodomain = function () {
-        this._updateExtentsForProperty("y");
-        var yScale = this.y().scale;
-        if (yScale != null) {
-            yScale.autoDomain();
-        }
-    };
-    XYCanvasPlot._X_KEY = "x";
-    XYCanvasPlot._Y_KEY = "y";
     return XYCanvasPlot;
 }(canvasPlot_1.CanvasPlot));
 exports.XYCanvasPlot = XYCanvasPlot;
@@ -17423,7 +16931,7 @@ var RectangleDrawer = (function (_super) {
     }
     RectangleDrawer.prototype._drawStep = function (step) {
         _super.prototype._drawStep.call(this, step);
-        var context = this._renderArea.getContext("2d");
+        var context = this._renderArea.node().getContext("2d");
         if (step.attrToAppliedProjector["fillRect"] == null) {
             throw new Error("fillRect needs to be supplied in order for drawing to occur");
         }
@@ -17437,6 +16945,647 @@ var RectangleDrawer = (function (_super) {
     return RectangleDrawer;
 }(canvasDrawer_1.CanvasDrawer));
 exports.RectangleDrawer = RectangleDrawer;
+
+
+/***/ }),
+/* 124 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var d3 = __webpack_require__(1);
+var animators_1 = __webpack_require__(5);
+var Utils = __webpack_require__(0);
+var BasePlot = (function () {
+    function BasePlot(drawerFactory) {
+        var _this = this;
+        this._attrBindings = d3.map();
+        this._attrExtents = d3.map();
+        this._drawerFactory = drawerFactory;
+        this._datasetToDrawer = new Utils.Map();
+        this._propertyBindings = d3.map();
+        this._propertyExtents = d3.map();
+        this._includedValuesProvider = function (scale) { return _this._includedValuesForScale(scale); };
+    }
+    BasePlot.prototype.addDataset = function (dataset) {
+        this._addDataset(dataset);
+        this._onDatasetsUpdate();
+        return this;
+    };
+    BasePlot.prototype.attr = function (attr, attrValue, scale) {
+        if (attrValue == null) {
+            return this._attrBindings.get(attr);
+        }
+        this._bindAttr(attr, attrValue, scale);
+        return this;
+    };
+    BasePlot.prototype.renderArea = function (renderArea) {
+        var _this = this;
+        if (renderArea === undefined) {
+            return this._renderArea;
+        }
+        this._renderArea = renderArea;
+        this.datasets().forEach(function (dataset) {
+            _this._datasetToDrawer.get(dataset).renderArea(renderArea);
+        });
+        return this;
+    };
+    BasePlot.prototype.datasets = function (datasets) {
+        var _this = this;
+        var currentDatasets = [];
+        this._datasetToDrawer.forEach(function (drawer, dataset) { return currentDatasets.push(dataset); });
+        if (datasets == null) {
+            return currentDatasets;
+        }
+        currentDatasets.forEach(function (dataset) { return _this._removeDataset(dataset); });
+        datasets.forEach(function (dataset) { return _this._addDataset(dataset); });
+        this._onDatasetsUpdate();
+        return this;
+    };
+    BasePlot.prototype.onDatasetsUpdate = function (_onDatasetsUpdate) {
+        this._onDatasetsUpdate = _onDatasetsUpdate;
+    };
+    BasePlot.prototype.onDatasetUpdate = function (_onDatasetUpdate) {
+        this._onDatasetUpdate = _onDatasetUpdate;
+    };
+    /**
+     * Removes a Dataset from the Plot.
+     *
+     * @param {Dataset} dataset
+     * @returns {Plot} The calling Plot.
+     */
+    BasePlot.prototype.removeDataset = function (dataset) {
+        this._removeDataset(dataset);
+        this._onDatasetsUpdate();
+        return this;
+    };
+    BasePlot.prototype.renderImmediately = function () {
+        var drawSteps = this._generateDrawSteps();
+        var dataToDraw = this._getDataToDraw();
+        var drawers = this._getDrawersInOrder();
+        this.datasets().forEach(function (ds, i) { return drawers[i].draw(dataToDraw.get(ds), drawSteps); });
+        return this;
+    };
+    BasePlot.prototype.renderCallback = function (_renderCallback) {
+        this._renderCallback = _renderCallback;
+    };
+    /**
+     * Updates the extents associated with each attribute, then autodomains all scales the Plot uses.
+     */
+    BasePlot.prototype.updateExtents = function () {
+        var _this = this;
+        this._attrBindings.forEach(function (attr) { return _this._updateExtentsForAttr(attr); });
+        this._propertyExtents.forEach(function (property) { return _this._updateExtentsForProperty(property); });
+        this._scales().forEach(function (scale) { return scale.addIncludedValuesProvider(_this._includedValuesProvider); });
+    };
+    BasePlot.prototype._addDataset = function (dataset) {
+        this._removeDataset(dataset);
+        var drawer = this._drawerFactory(dataset);
+        if (this._renderArea != null) {
+            // may not be initiated yet, we'll initiate everything later
+            drawer.renderArea(this._renderArea);
+        }
+        this._datasetToDrawer.set(dataset, drawer);
+        dataset.onUpdate(this._onDatasetUpdate);
+    };
+    /**
+     * Override in subclass to add special extents, such as included values
+     */
+    BasePlot.prototype._extentsForProperty = function (property) {
+        return this._propertyExtents.get(property);
+    };
+    BasePlot.prototype._generateAttrToProjector = function () {
+        var h = {};
+        this._attrBindings.forEach(function (attr, binding) {
+            var accessor = binding.accessor;
+            var scale = binding.scale;
+            var fn = scale ? function (d, i, dataset) { return scale.scale(accessor(d, i, dataset)); } : accessor;
+            h[attr] = fn;
+        });
+        var propertyProjectors = this._propertyProjectors();
+        Object.keys(propertyProjectors).forEach(function (key) {
+            if (h[key] == null) {
+                h[key] = propertyProjectors[key];
+            }
+        });
+        return h;
+    };
+    BasePlot.prototype._getDrawersInOrder = function () {
+        var _this = this;
+        return this.datasets().map(function (dataset) { return _this._datasetToDrawer.get(dataset); });
+    };
+    BasePlot.prototype._getDataToDraw = function () {
+        var dataToDraw = new Utils.Map();
+        this.datasets().forEach(function (dataset) { return dataToDraw.set(dataset, dataset.data()); });
+        return dataToDraw;
+    };
+    BasePlot.prototype._filterForProperty = function (property) {
+        return null;
+    };
+    BasePlot.prototype._generateDrawSteps = function () {
+        return [{ attrToProjector: this._generateAttrToProjector(), animator: new animators_1.Null() }];
+    };
+    BasePlot.prototype._installScaleForKey = function (scale, key) {
+        scale.onUpdate(this._renderCallback);
+        scale.addIncludedValuesProvider(this._includedValuesProvider);
+    };
+    BasePlot.prototype._propertyProjectors = function () {
+        return {};
+    };
+    BasePlot.prototype._removeDataset = function (dataset) {
+        if (this.datasets().indexOf(dataset) === -1) {
+            return this;
+        }
+        // this._removeDatasetNodes(dataset);
+        dataset.offUpdate(this._onDatasetUpdate);
+        this._datasetToDrawer.delete(dataset);
+        return this;
+    };
+    BasePlot.prototype._uninstallScaleForKey = function (scale, key) {
+        scale.offUpdate(this._renderCallback);
+        scale.removeIncludedValuesProvider(this._includedValuesProvider);
+    };
+    BasePlot.prototype._updateExtentsForProperty = function (property) {
+        this._updateExtentsForKey(property, this._propertyBindings, this._propertyExtents, this._filterForProperty(property));
+    };
+    BasePlot.prototype._bindAttr = function (attr, value, scale) {
+        var binding = this._attrBindings.get(attr);
+        var oldScale = binding != null ? binding.scale : null;
+        this._attrBindings.set(attr, { accessor: d3.functor(value), scale: scale });
+        this._updateExtentsForAttr(attr);
+        if (oldScale != null) {
+            this._uninstallScaleForKey(oldScale, attr);
+        }
+        if (scale != null) {
+            this._installScaleForKey(scale, attr);
+        }
+    };
+    BasePlot.prototype._computeExtent = function (dataset, accScaleBinding, filter) {
+        var accessor = accScaleBinding.accessor;
+        var scale = accScaleBinding.scale;
+        if (scale == null) {
+            return [];
+        }
+        var data = dataset.data();
+        if (filter != null) {
+            data = data.filter(function (d, i) { return filter(d, i, dataset); });
+        }
+        var appliedAccessor = function (d, i) { return accessor(d, i, dataset); };
+        var mappedData = data.map(appliedAccessor);
+        return scale.extentOfValues(mappedData);
+    };
+    BasePlot.prototype._includedValuesForScale = function (scale) {
+        var _this = this;
+        var includedValues = [];
+        this._attrBindings.forEach(function (attr, binding) {
+            if (binding.scale === scale) {
+                var extents = _this._attrExtents.get(attr);
+                if (extents != null) {
+                    includedValues = includedValues.concat(d3.merge(extents));
+                }
+            }
+        });
+        this._propertyBindings.forEach(function (property, binding) {
+            if (binding.scale === scale) {
+                var extents = _this._extentsForProperty(property);
+                if (extents != null) {
+                    includedValues = includedValues.concat(d3.merge(extents));
+                }
+            }
+        });
+        return includedValues;
+    };
+    /**
+     * @returns {Scale[]} A unique array of all scales currently used by the Plot.
+     */
+    BasePlot.prototype._scales = function () {
+        var scales = [];
+        this._attrBindings.forEach(function (attr, binding) {
+            var scale = binding.scale;
+            if (scale != null && scales.indexOf(scale) === -1) {
+                scales.push(scale);
+            }
+        });
+        this._propertyBindings.forEach(function (property, binding) {
+            var scale = binding.scale;
+            if (scale != null && scales.indexOf(scale) === -1) {
+                scales.push(scale);
+            }
+        });
+        return scales;
+    };
+    BasePlot.prototype._updateExtentsForAttr = function (attr) {
+        // Filters should never be applied to attributes
+        this._updateExtentsForKey(attr, this._attrBindings, this._attrExtents, null);
+    };
+    BasePlot.prototype._updateExtentsForKey = function (key, bindings, extents, filter) {
+        var _this = this;
+        var accScaleBinding = bindings.get(key);
+        if (accScaleBinding == null || accScaleBinding.accessor == null) {
+            return;
+        }
+        extents.set(key, this.datasets().map(function (dataset) { return _this._computeExtent(dataset, accScaleBinding, filter); }));
+    };
+    BasePlot._scaledAccessor = function (binding) {
+        return binding.scale == null ?
+            binding.accessor :
+            function (d, i, ds) { return binding.scale.scale(binding.accessor(d, i, ds)); };
+    };
+    return BasePlot;
+}());
+exports.BasePlot = BasePlot;
+
+
+/***/ }),
+/* 125 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
+var d3 = __webpack_require__(1);
+var Utils = __webpack_require__(0);
+var Scales = __webpack_require__(2);
+var basePlot_1 = __webpack_require__(124);
+var BaseXYPlot = (function (_super) {
+    __extends(BaseXYPlot, _super);
+    function BaseXYPlot(drawerFactory, width, height) {
+        var _this = this;
+        _super.call(this, drawerFactory);
+        this._autoAdjustYScaleDomain = false;
+        this._autoAdjustXScaleDomain = false;
+        this._width = width;
+        this._height = height;
+        this._adjustXDomainOnChangeFromYCallback = function (scale) { return _this._adjustXDomainOnChangeFromY(); };
+        this._adjustYDomainOnChangeFromXCallback = function (scale) { return _this._adjustYDomainOnChangeFromX(); };
+    }
+    BaseXYPlot.prototype.computeLayout = function (origin, availableWidth, availableHeight) {
+        var xBinding = this.x();
+        var xScale = xBinding && xBinding.scale;
+        if (xScale != null) {
+            xScale.range([0, this._width()]);
+        }
+        var yBinding = this.y();
+        var yScale = yBinding && yBinding.scale;
+        if (yScale != null) {
+            if (yScale instanceof Scales.Category) {
+                yScale.range([0, this._height()]);
+            }
+            else {
+                yScale.range([this._height(), 0]);
+            }
+        }
+        return this;
+    };
+    BaseXYPlot.prototype.destroy = function () {
+        if (this.x().scale) {
+            this.x().scale.offUpdate(this._adjustYDomainOnChangeFromXCallback);
+        }
+        if (this.y().scale) {
+            this.y().scale.offUpdate(this._adjustXDomainOnChangeFromYCallback);
+        }
+        return this;
+    };
+    BaseXYPlot.prototype.x = function (x, xScale) {
+        if (x == null) {
+            return this._propertyBindings.get(BaseXYPlot._X_KEY);
+        }
+        this._bindProperty(BaseXYPlot._X_KEY, x, xScale);
+        var width = this._width();
+        if (xScale != null && width != null) {
+            xScale.range([0, width]);
+        }
+        if (this._autoAdjustYScaleDomain) {
+            this._updateYExtentsAndAutodomain();
+        }
+    };
+    BaseXYPlot.prototype.y = function (y, yScale) {
+        if (y == null) {
+            return this._propertyBindings.get(BaseXYPlot._Y_KEY);
+        }
+        this._bindProperty(BaseXYPlot._Y_KEY, y, yScale);
+        var height = this._height();
+        if (yScale != null && height != null) {
+            if (yScale instanceof Scales.Category) {
+                yScale.range([0, height]);
+            }
+            else {
+                yScale.range([height, 0]);
+            }
+        }
+        if (this._autoAdjustXScaleDomain) {
+            this._updateXExtentsAndAutodomain();
+        }
+        return this;
+    };
+    BaseXYPlot.prototype._bindProperty = function (property, value, scale) {
+        var binding = this._propertyBindings.get(property);
+        var oldScale = binding != null ? binding.scale : null;
+        this._propertyBindings.set(property, { accessor: d3.functor(value), scale: scale });
+        this._updateExtentsForProperty(property);
+        if (oldScale != null) {
+            this._uninstallScaleForKey(oldScale, property);
+        }
+        if (scale != null) {
+            this._installScaleForKey(scale, property);
+        }
+    };
+    BaseXYPlot.prototype._filterForProperty = function (property) {
+        if (property === "x" && this._autoAdjustXScaleDomain) {
+            return this._makeFilterByProperty("y");
+        }
+        else if (property === "y" && this._autoAdjustYScaleDomain) {
+            return this._makeFilterByProperty("x");
+        }
+        return null;
+    };
+    BaseXYPlot.prototype._getDataToDraw = function () {
+        var _this = this;
+        var dataToDraw = _super.prototype._getDataToDraw.call(this);
+        var definedFunction = function (d, i, dataset) {
+            var positionX = BaseXYPlot._scaledAccessor(_this.x())(d, i, dataset);
+            var positionY = BaseXYPlot._scaledAccessor(_this.y())(d, i, dataset);
+            return Utils.Math.isValidNumber(positionX) &&
+                Utils.Math.isValidNumber(positionY);
+        };
+        this.datasets().forEach(function (dataset) {
+            dataToDraw.set(dataset, dataToDraw.get(dataset).filter(function (d, i) { return definedFunction(d, i, dataset); }));
+        });
+        return dataToDraw;
+    };
+    BaseXYPlot.prototype._projectorsReady = function () {
+        var xBinding = this.x();
+        var yBinding = this.y();
+        return xBinding != null &&
+            xBinding.accessor != null &&
+            yBinding != null &&
+            yBinding.accessor != null;
+    };
+    BaseXYPlot.prototype._installScaleForKey = function (scale, key) {
+        _super.prototype._installScaleForKey.call(this, scale, key);
+        var adjustCallback = key === BaseXYPlot._X_KEY ? this._adjustYDomainOnChangeFromXCallback
+            : this._adjustXDomainOnChangeFromYCallback;
+        scale.onUpdate(adjustCallback);
+    };
+    BaseXYPlot.prototype._uninstallScaleForKey = function (scale, key) {
+        _super.prototype._uninstallScaleForKey.call(this, scale, key);
+        var adjustCallback = key === BaseXYPlot._X_KEY ? this._adjustYDomainOnChangeFromXCallback
+            : this._adjustXDomainOnChangeFromYCallback;
+        scale.offUpdate(adjustCallback);
+    };
+    BaseXYPlot.prototype._adjustYDomainOnChangeFromX = function () {
+        if (!this._projectorsReady()) {
+            return;
+        }
+        if (this._autoAdjustYScaleDomain) {
+            this._updateYExtentsAndAutodomain();
+        }
+    };
+    BaseXYPlot.prototype._adjustXDomainOnChangeFromY = function () {
+        if (!this._projectorsReady()) {
+            return;
+        }
+        if (this._autoAdjustXScaleDomain) {
+            this._updateXExtentsAndAutodomain();
+        }
+    };
+    BaseXYPlot.prototype._makeFilterByProperty = function (property) {
+        var binding = this._propertyBindings.get(property);
+        if (binding != null) {
+            var accessor_1 = binding.accessor;
+            var scale_1 = binding.scale;
+            if (scale_1 != null) {
+                return function (datum, index, dataset) {
+                    var range = scale_1.range();
+                    return Utils.Math.inRange(scale_1.scale(accessor_1(datum, index, dataset)), range[0], range[1]);
+                };
+            }
+        }
+        return null;
+    };
+    BaseXYPlot.prototype._updateXExtentsAndAutodomain = function () {
+        this._updateExtentsForProperty("x");
+        var xScale = this.x().scale;
+        if (xScale != null) {
+            xScale.autoDomain();
+        }
+    };
+    BaseXYPlot.prototype._updateYExtentsAndAutodomain = function () {
+        this._updateExtentsForProperty("y");
+        var yScale = this.y().scale;
+        if (yScale != null) {
+            yScale.autoDomain();
+        }
+    };
+    BaseXYPlot._X_KEY = "x";
+    BaseXYPlot._Y_KEY = "y";
+    return BaseXYPlot;
+}(basePlot_1.BasePlot));
+exports.BaseXYPlot = BaseXYPlot;
+
+
+/***/ }),
+/* 126 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
+var d3 = __webpack_require__(1);
+var baseXYPlot_1 = __webpack_require__(125);
+var Scales = __webpack_require__(2);
+var Utils = __webpack_require__(0);
+var animators_1 = __webpack_require__(5);
+var BaseRectanglePlot = (function (_super) {
+    __extends(BaseRectanglePlot, _super);
+    function BaseRectanglePlot() {
+        _super.apply(this, arguments);
+    }
+    BaseRectanglePlot.prototype.x = function (x, xScale) {
+        if (x == null) {
+            return _super.prototype.x.call(this);
+        }
+        if (xScale == null) {
+            _super.prototype.x.call(this, x);
+        }
+        else {
+            _super.prototype.x.call(this, x, xScale);
+        }
+        if (xScale != null) {
+            var x2Binding = this.x2();
+            var x2 = x2Binding && x2Binding.accessor;
+            if (x2 != null) {
+                this._bindProperty(BaseRectanglePlot._X2_KEY, x2, xScale);
+            }
+        }
+        // The x and y scales should render in bands with no padding for category scales
+        if (xScale instanceof Scales.Category) {
+            xScale.innerPadding(0).outerPadding(0);
+        }
+        return this;
+    };
+    BaseRectanglePlot.prototype.x2 = function (x2) {
+        if (x2 == null) {
+            return this._propertyBindings.get(BaseRectanglePlot._X2_KEY);
+        }
+        var xBinding = this.x();
+        var xScale = xBinding && xBinding.scale;
+        this._bindProperty(BaseRectanglePlot._X2_KEY, x2, xScale);
+        return this;
+    };
+    BaseRectanglePlot.prototype.y = function (y, yScale) {
+        if (y == null) {
+            return _super.prototype.y.call(this);
+        }
+        if (yScale == null) {
+            _super.prototype.y.call(this, y);
+        }
+        else {
+            _super.prototype.y.call(this, y, yScale);
+        }
+        if (yScale != null) {
+            var y2Binding = this.y2();
+            var y2 = y2Binding && y2Binding.accessor;
+            if (y2 != null) {
+                this._bindProperty(BaseRectanglePlot._Y2_KEY, y2, yScale);
+            }
+        }
+        // The x and y scales should render in bands with no padding for category scales
+        if (yScale instanceof Scales.Category) {
+            yScale.innerPadding(0).outerPadding(0);
+        }
+        return this;
+    };
+    BaseRectanglePlot.prototype.y2 = function (y2) {
+        if (y2 == null) {
+            return this._propertyBindings.get(BaseRectanglePlot._Y2_KEY);
+        }
+        var yBinding = this.y();
+        var yScale = yBinding && yBinding.scale;
+        this._bindProperty(BaseRectanglePlot._Y2_KEY, y2, yScale);
+        return this;
+    };
+    BaseRectanglePlot.prototype._filterForProperty = function (property) {
+        if (property === "x2") {
+            return _super.prototype._filterForProperty.call(this, "x");
+        }
+        else if (property === "y2") {
+            return _super.prototype._filterForProperty.call(this, "y");
+        }
+        return _super.prototype._filterForProperty.call(this, property);
+    };
+    BaseRectanglePlot.prototype._generateAttrToProjector = function () {
+        var _this = this;
+        var attrToProjector = _super.prototype._generateAttrToProjector.call(this);
+        // Copy each of the different projectors.
+        var xAttr = BaseRectanglePlot._scaledAccessor(this.x());
+        var x2Attr = attrToProjector[BaseRectanglePlot._X2_KEY];
+        var yAttr = BaseRectanglePlot._scaledAccessor(this.y());
+        var y2Attr = attrToProjector[BaseRectanglePlot._Y2_KEY];
+        var xScale = this.x().scale;
+        var yScale = this.y().scale;
+        var widthProjection = null;
+        var heightProjection = null;
+        var xProjection = null;
+        var yProjection = null;
+        if (x2Attr != null) {
+            widthProjection = function (d, i, dataset) { return Math.abs(x2Attr(d, i, dataset) - xAttr(d, i, dataset)); };
+            xProjection = function (d, i, dataset) { return Math.min(x2Attr(d, i, dataset), xAttr(d, i, dataset)); };
+        }
+        else {
+            widthProjection = function (d, i, dataset) { return _this._rectangleWidth(xScale); };
+            xProjection = function (d, i, dataset) { return xAttr(d, i, dataset) - 0.5 * widthProjection(d, i, dataset); };
+        }
+        if (y2Attr != null) {
+            heightProjection = function (d, i, dataset) { return Math.abs(y2Attr(d, i, dataset) - yAttr(d, i, dataset)); };
+            yProjection = function (d, i, dataset) {
+                return Math.max(y2Attr(d, i, dataset), yAttr(d, i, dataset)) - heightProjection(d, i, dataset);
+            };
+        }
+        else {
+            heightProjection = function (d, i, dataset) { return _this._rectangleWidth(yScale); };
+            yProjection = function (d, i, dataset) { return yAttr(d, i, dataset) - 0.5 * heightProjection(d, i, dataset); };
+        }
+        attrToProjector["fillRect"] = function (d, i, dataset) {
+            return {
+                height: heightProjection(d, i, dataset),
+                width: widthProjection(d, i, dataset),
+                x: xProjection(d, i, dataset),
+                y: yProjection(d, i, dataset),
+            };
+        };
+        // Clean up the attributes projected onto the SVG elements
+        delete attrToProjector[BaseRectanglePlot._X2_KEY];
+        delete attrToProjector[BaseRectanglePlot._Y2_KEY];
+        return attrToProjector;
+    };
+    BaseRectanglePlot.prototype._generateDrawSteps = function () {
+        return [{ attrToProjector: this._generateAttrToProjector(), animator: new animators_1.Null() }];
+    };
+    BaseRectanglePlot.prototype._getDataToDraw = function () {
+        var dataToDraw = new Utils.Map();
+        var fillProjector = this._generateAttrToProjector()["fillRect"];
+        this.datasets().forEach(function (dataset) {
+            var data = dataset.data().filter(function (d, i) {
+                var fillProjection = fillProjector(d, i, dataset);
+                return Utils.Math.isValidNumber(fillProjection.x) &&
+                    Utils.Math.isValidNumber(fillProjection.y) &&
+                    Utils.Math.isValidNumber(fillProjection.width) &&
+                    Utils.Math.isValidNumber(fillProjection.height);
+            });
+            dataToDraw.set(dataset, data);
+        });
+        return dataToDraw;
+    };
+    BaseRectanglePlot.prototype._propertyProjectors = function () {
+        var attrToProjector = _super.prototype._propertyProjectors.call(this);
+        if (this.x2() != null) {
+            attrToProjector["x2"] = BaseRectanglePlot._scaledAccessor(this.x2());
+        }
+        if (this.y2() != null) {
+            attrToProjector["y2"] = BaseRectanglePlot._scaledAccessor(this.y2());
+        }
+        return attrToProjector;
+    };
+    BaseRectanglePlot.prototype._updateExtentsForProperty = function (property) {
+        _super.prototype._updateExtentsForProperty.call(this, property);
+        if (property === "x") {
+            _super.prototype._updateExtentsForProperty.call(this, "x2");
+        }
+        else if (property === "y") {
+            _super.prototype._updateExtentsForProperty.call(this, "y2");
+        }
+    };
+    BaseRectanglePlot.prototype._rectangleWidth = function (scale) {
+        if (scale instanceof Scales.Category) {
+            return scale.rangeBand();
+        }
+        else {
+            var accessor_1 = scale === this.x().scale ? this.x().accessor : this.y().accessor;
+            var accessorData = d3.set(Utils.Array.flatten(this.datasets().map(function (dataset) {
+                return dataset.data().map(function (d, i) { return accessor_1(d, i, dataset).valueOf(); });
+            }))).values().map(function (value) { return +value; });
+            // Get the absolute difference between min and max
+            var min = Utils.Math.min(accessorData, 0);
+            var max = Utils.Math.max(accessorData, 0);
+            var scaledMin = scale.scale(min);
+            var scaledMax = scale.scale(max);
+            return (scaledMax - scaledMin) / Math.abs(max - min);
+        }
+    };
+    BaseRectanglePlot._X2_KEY = "x2";
+    BaseRectanglePlot._Y2_KEY = "y2";
+    return BaseRectanglePlot;
+}(baseXYPlot_1.BaseXYPlot));
+exports.BaseRectanglePlot = BaseRectanglePlot;
 
 
 /***/ })
