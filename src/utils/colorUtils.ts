@@ -38,7 +38,7 @@ export function lightenColor(color: string, factor: number) {
  * @param {string} className The name of the class to be applied
  * @return {string} The hex code of the computed color
  */
-export function colorTest(colorTester: SimpleSelection<void>, className: string) {
+export function colorTest(colorTester: SimpleSelection<any>, className: string) {
   colorTester.classed(className, true);
   // Use regex to get the text inside the rgb parentheses
   let colorStyle = colorTester.style("background-color");

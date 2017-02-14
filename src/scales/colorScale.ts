@@ -17,7 +17,7 @@ export class Color extends Scale<string, string> {
 
   private static _plottableColorCache: string[];
 
-  private _d3Scale: d3.scale.Ordinal<string, string>;
+  private _d3Scale: d3.ScaleOrdinal<string, string>;
 
   /**
    * A Color Scale maps string values to color hex values expressed as a string.
@@ -29,34 +29,34 @@ export class Color extends Scale<string, string> {
    */
   constructor(scaleType?: string) {
     super();
-    let scale: d3.scale.Ordinal<string, string>;
+    let scale: d3.ScaleOrdinal<string, string>;
     switch (scaleType) {
       case null:
       case undefined:
         if (Color._plottableColorCache == null) {
           Color._plottableColorCache = Color._getPlottableColors();
         }
-        scale = d3.scale.ordinal<string, string>().range(Color._plottableColorCache);
+        scale = d3.scaleOrdinal<string, string>().range(Color._plottableColorCache);
         break;
       case "Category10":
       case "category10":
       case "10":
-        scale = d3.scale.category10();
+        scale = d3.scaleOrdinal(d3.schemeCategory10);
         break;
       case "Category20":
       case "category20":
       case "20":
-        scale = d3.scale.category20();
+        scale = d3.scaleOrdinal(d3.schemeCategory20);
         break;
       case "Category20b":
       case "category20b":
       case "20b":
-        scale = d3.scale.category20b();
+        scale = d3.scaleOrdinal(d3.schemeCategory20b);
         break;
       case "Category20c":
       case "category20c":
       case "20c":
-        scale = d3.scale.category20c();
+        scale = d3.scaleOrdinal(d3.schemeCategory20c);
         break;
       default:
         throw new Error("Unsupported ColorScale type");
