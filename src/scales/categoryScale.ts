@@ -31,7 +31,7 @@ export class Category extends Scale<string, number> implements TransformableScal
    */
   private _d3TransformationScale: d3.ScaleLinear<number, number>;
 
-  private _d3Scale: d3.ScaleOrdinal<string, number>;
+  private _d3Scale: d3.ScaleBand<string>;
   private _range = [0, 1];
 
   private _innerPadding: number;
@@ -44,7 +44,7 @@ export class Category extends Scale<string, number> implements TransformableScal
    */
   constructor() {
     super();
-    this._d3Scale = d3.scaleOrdinal<string, number>();
+    this._d3Scale = d3.scaleBand<string>();
     this._d3Scale.range(TRANSFORMATION_SPACE);
 
     this._d3TransformationScale = d3.scaleLinear<number, number>();
@@ -89,7 +89,7 @@ export class Category extends Scale<string, number> implements TransformableScal
    * @returns {string[]}
    */
   public invertRange(range: [number, number] = this.range()): string[] {
-    const rangeBand = this._d3Scale.rangeBand();
+    const rangeBand = this._d3Scale.bandwidth();
     // offset the domain by half the rangeBand such that we consider the
     // center of the bars
     const domainStartNormalized = this.invertedTransformation(range[0]) - rangeBand / 2;
@@ -116,7 +116,9 @@ export class Category extends Scale<string, number> implements TransformableScal
   private _setBands() {
     let d3InnerPadding = 1 - 1 / (1 + this.innerPadding());
     let d3OuterPadding = this.outerPadding() / (1 + this.innerPadding());
-    this._d3Scale.rangeBands(TRANSFORMATION_SPACE, d3InnerPadding, d3OuterPadding);
+    this._d3Scale.range(TRANSFORMATION_SPACE);
+    this._d3Scale.paddingInner(d3InnerPadding);
+    this._d3Scale.paddingOuter(d3OuterPadding);
   }
 
   /**
@@ -125,7 +127,7 @@ export class Category extends Scale<string, number> implements TransformableScal
    * @returns {number} The range band width
    */
   public rangeBand(): number {
-    return this._rescaleBand(this._d3Scale.rangeBand());
+    return this._rescaleBand(this._d3Scale.bandwidth());
   }
 
   /**
@@ -136,7 +138,7 @@ export class Category extends Scale<string, number> implements TransformableScal
    * @returns {number}
    */
   public stepWidth(): number {
-    return this._rescaleBand(this._d3Scale.rangeBand() * (1 + this.innerPadding()));
+    return this._rescaleBand(this._d3Scale.bandwidth() * (1 + this.innerPadding()));
   }
 
   /**
@@ -197,7 +199,7 @@ export class Category extends Scale<string, number> implements TransformableScal
 
   public scale(value: string): number {
     // Determine the middle of the range band for the value
-    let untransformed = this._d3Scale(value) + this._d3Scale.rangeBand() / 2;
+    let untransformed = this._d3Scale(value) + this._d3Scale.bandwidth() / 2;
     // Convert to screen space
     return this._d3TransformationScale(untransformed);
   }
