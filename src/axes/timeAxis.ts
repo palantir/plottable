@@ -619,7 +619,7 @@ export class Time extends Axis<Date> {
     let visibleTickMarkRects = visibleTickMarks.nodes().map((mark: Element) => mark.getBoundingClientRect());
 
     let visibleTickLabels = this._tierLabelContainers[index]
-      .selectAll("." + Axis.TICK_LABEL_CLASS)
+      .selectAll<SVGGElement, any>("." + Axis.TICK_LABEL_CLASS)
       .filter(function (d: Element, i: number) {
         let visibility = d3.select(this).style("visibility");
         return visibility === "visible" || visibility === "inherit";
