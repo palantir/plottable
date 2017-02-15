@@ -192,14 +192,20 @@ export class Axis<D> extends Component {
    */
   public renderImmediately() {
     let tickMarkValues = this._getTickValues();
-    let tickMarks = this._tickMarkContainer.selectAll("." + Axis.TICK_MARK_CLASS).data(tickMarkValues);
-    tickMarks.enter().append("line").classed(Axis.TICK_MARK_CLASS, true);
+    let tickMarksUpdate = this._tickMarkContainer.selectAll("." + Axis.TICK_MARK_CLASS).data(tickMarkValues);
+    const tickMarks =
+      tickMarksUpdate
+        .enter()
+        .append("line")
+          .classed(Axis.TICK_MARK_CLASS, true)
+        .merge(tickMarksUpdate);
+
     tickMarks.attrs(this._generateTickMarkAttrHash());
-    d3.select(tickMarks.node()).classed(Axis.END_TICK_MARK_CLASS, true)
+    d3.select(tickMarks.nodes()[0]).classed(Axis.END_TICK_MARK_CLASS, true)
       .attrs(this._generateTickMarkAttrHash(true));
     d3.select(tickMarks.nodes()[tickMarkValues.length - 1]).classed(Axis.END_TICK_MARK_CLASS, true)
       .attrs(this._generateTickMarkAttrHash(true));
-    tickMarks.exit().remove();
+    tickMarksUpdate.exit().remove();
     this._baseline.attrs(this._generateBaselineAttrHash());
     if (this.annotationsEnabled()) {
       this._drawAnnotations();

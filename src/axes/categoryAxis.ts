@@ -377,7 +377,6 @@ export class Category extends Axis<string> {
     super.renderImmediately();
     let catScale = <Scales.Category> this._scale;
     const { domain, stepWidth } = this.getDownsampleInfo(catScale);
-    let tickLabels = this._tickLabelContainer.selectAll<SVGGElement, string>("." + Axis.TICK_LABEL_CLASS).data(domain, (d) => d);
     // Give each tick a stepWidth of space which will partition the entire axis evenly
     let availableTextSpace = stepWidth;
     if (this.isHorizontal() && this._tickLabelMaxWidth != null) {
@@ -392,8 +391,14 @@ export class Category extends Axis<string> {
       let y = this.isHorizontal() ? 0 : tickLabelEdge;
       return "translate(" + x + "," + y + ")";
     };
-    tickLabels.enter().append("g").classed(Axis.TICK_LABEL_CLASS, true);
-    tickLabels.exit().remove();
+    let tickLabelsUpdate = this._tickLabelContainer.selectAll<SVGGElement, string>("." + Axis.TICK_LABEL_CLASS).data(domain);
+    const tickLabels =
+      tickLabelsUpdate
+        .enter()
+        .append("g")
+          .classed(Axis.TICK_LABEL_CLASS, true)
+        .merge(tickLabelsUpdate);
+    tickLabelsUpdate.exit().remove();
     tickLabels.attr("transform", getTickLabelTransform);
     // erase all text first, then rewrite
     tickLabels.text("");

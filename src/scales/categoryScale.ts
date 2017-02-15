@@ -92,11 +92,14 @@ export class Category extends Scale<string, number> implements TransformableScal
     const rangeBand = this._d3Scale.bandwidth();
     // offset the domain by half the rangeBand such that we consider the
     // center of the bars
-    const domainStartNormalized = this.invertedTransformation(range[0]) - rangeBand / 2;
-    const domainEndNormalized = this.invertedTransformation(range[1]) - rangeBand / 2;
-    const domainStart = d3.bisect(this._d3Scale.range(), domainStartNormalized);
-    const domainEnd = d3.bisect(this._d3Scale.range(), domainEndNormalized);
-    return this._d3Scale.domain().slice(domainStart, domainEnd);
+    const domainStartNormalized = this.invertedTransformation(range[0]);
+    const domainEndNormalized = this.invertedTransformation(range[1]);
+    const domain = this._d3Scale.domain();
+    // map ["a", "b", "c"] to the normalized center position (e.g. [0.25, .5, 0.75])
+    const normalizedDomain = domain.map((d) => this._d3Scale(d) + rangeBand / 2);
+    const domainStart = d3.bisect(normalizedDomain, domainStartNormalized);
+    const domainEnd = d3.bisect(normalizedDomain, domainEndNormalized);
+    return domain.slice(domainStart, domainEnd);
   }
 
   public range(): [number, number];
@@ -116,7 +119,6 @@ export class Category extends Scale<string, number> implements TransformableScal
   private _setBands() {
     let d3InnerPadding = 1 - 1 / (1 + this.innerPadding());
     let d3OuterPadding = this.outerPadding() / (1 + this.innerPadding());
-    this._d3Scale.range(TRANSFORMATION_SPACE);
     this._d3Scale.paddingInner(d3InnerPadding);
     this._d3Scale.paddingOuter(d3OuterPadding);
   }
@@ -138,6 +140,7 @@ export class Category extends Scale<string, number> implements TransformableScal
    * @returns {number}
    */
   public stepWidth(): number {
+    // todo consider replacing this with _d3Scale.step()
     return this._rescaleBand(this._d3Scale.bandwidth() * (1 + this.innerPadding()));
   }
 
