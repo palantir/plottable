@@ -908,9 +908,6 @@ var Component = (function () {
     /**
      * Causes the Component to re-layout and render.
      *
-     * This function should be called when a CSS change has occured that could
-     * influence the layout of the Component, such as changing the font size.
-     *
      * @returns {Component} The calling Component.
      */
     Component.prototype.redraw = function () {
@@ -923,6 +920,16 @@ var Component = (function () {
             }
         }
         return this;
+    };
+    /**
+     * Tell this component to invalidate any caching. This function should be
+     * called when a CSS change has occurred that could influence the layout
+     * of the Component, such as changing the font size.
+     *
+     * Subclasses should override.
+     */
+    Component.prototype.invalidateCache = function () {
+        // Core component has no caching.
     };
     /**
      * Renders the Component to a given <svg>.
@@ -3243,6 +3250,10 @@ var Axis = (function (_super) {
             }
         });
     };
+    Axis.prototype.invalidateCache = function () {
+        _super.prototype.invalidateCache.call(this);
+        this._annotationMeasurer.reset();
+    };
     /**
      * The css class applied to each end tick mark (the line on the end tick).
      */
@@ -4415,6 +4426,10 @@ var Time = (function (_super) {
             }
         });
     };
+    Time.prototype.invalidateCache = function () {
+        _super.prototype.invalidateCache.call(this);
+        this._measurer.reset();
+    };
     /**
      * The CSS class applied to each Time Axis tier
      */
@@ -4628,6 +4643,9 @@ var ComponentContainer = (function (_super) {
     ComponentContainer.prototype.destroy = function () {
         _super.prototype.destroy.call(this);
         this._forEach(function (c) { return c.destroy(); });
+    };
+    ComponentContainer.prototype.invalidateCache = function () {
+        this._forEach(function (c) { return c.invalidateCache(); });
     };
     return ComponentContainer;
 }(component_1.Component));
@@ -8272,15 +8290,15 @@ var Category = (function (_super) {
         return this;
     };
     Category.prototype.computeLayout = function (origin, availableWidth, availableHeight) {
-        // When anyone calls redraw(), computeLayout() will be called
-        // on everyone, including this. Since CSS or something might have
-        // affected the size of the characters, clear the cache.
-        this._measurer.reset();
         _super.prototype.computeLayout.call(this, origin, availableWidth, availableHeight);
         if (!this.isHorizontal()) {
             this._scale.range([0, this.height()]);
         }
         return this;
+    };
+    Category.prototype.invalidateCache = function () {
+        _super.prototype.invalidateCache.call(this);
+        this._measurer.reset();
     };
     /**
      * How many pixels to give labels at minimum before downsampling takes effect.
@@ -8591,6 +8609,10 @@ var Numeric = (function (_super) {
             }
         }
         return true;
+    };
+    Numeric.prototype.invalidateCache = function () {
+        _super.prototype.invalidateCache.call(this);
+        this._measurer.reset();
     };
     return Numeric;
 }(axis_1.Axis));
@@ -9281,6 +9303,10 @@ var Label = (function (_super) {
         };
         this._writer.write(this._text, writeWidth, writeHeight, writeOptions);
         return this;
+    };
+    Label.prototype.invalidateCache = function () {
+        _super.prototype.invalidateCache.call(this);
+        this._measurer.reset();
     };
     return Label;
 }(component_1.Component));
@@ -13879,6 +13905,10 @@ var StackedBar = (function (_super) {
         var filter = this._filterForProperty(this._isVertical ? "y" : "x");
         this._stackingResult = Utils.Stacking.stack(datasets, keyAccessor, valueAccessor, this._stackingOrder);
         this._stackedExtent = Utils.Stacking.stackedExtent(this._stackingResult, keyAccessor, filter);
+    };
+    StackedBar.prototype.invalidateCache = function () {
+        _super.prototype.invalidateCache.call(this);
+        this._measurer.reset();
     };
     StackedBar._STACKED_BAR_LABEL_PADDING = 5;
     return StackedBar;

@@ -17,7 +17,7 @@ export class StackedBar<X, Y> extends Bar<X, Y> {
   protected static _STACKED_BAR_LABEL_PADDING = 5;
 
   private _labelArea: d3.Selection<void>;
-  private _measurer: SVGTypewriter.Measurer;
+  private _measurer: SVGTypewriter.CacheMeasurer;
   private _writer: SVGTypewriter.Writer;
   private _stackingOrder: Utils.Stacking.IStackingOrder;
   private _stackingResult: Utils.Stacking.StackingResult;
@@ -258,5 +258,10 @@ export class StackedBar<X, Y> extends Bar<X, Y> {
 
     this._stackingResult = Utils.Stacking.stack(datasets, keyAccessor, valueAccessor, this._stackingOrder);
     this._stackedExtent = Utils.Stacking.stackedExtent(this._stackingResult, keyAccessor, filter);
+  }
+
+  public invalidateCache() {
+    super.invalidateCache();
+    this._measurer.reset();
   }
 }
