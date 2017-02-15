@@ -7,7 +7,7 @@ import * as d3 from "d3";
 import * as SVGTypewriter from "svg-typewriter";
 
 import * as Animators from "../animators";
-import { Accessor, Point, AttributeToProjector } from "../core/interfaces";
+import { Accessor, Point, AttributeToProjector, SimpleSelection } from "../core/interfaces";
 import { Dataset } from "../core/dataset";
 import * as Drawers from "../drawers";
 import { Formatter } from "../core/formatters";
@@ -107,8 +107,8 @@ export class Pie extends Plot {
     return this;
   }
 
-  public selections(datasets = this.datasets()) {
-    let allSelections = super.selections(datasets)[0];
+  public selections(datasets = this.datasets()): SimpleSelection<any> {
+    let allSelections = super.selections(datasets).nodes();
     datasets.forEach((dataset) => {
       let drawer = this._strokeDrawers.get(dataset);
       if (drawer == null) {
@@ -137,7 +137,7 @@ export class Pie extends Plot {
       entity.position.x += this.width() / 2;
       entity.position.y += this.height() / 2;
       let stroke = this._strokeDrawers.get(entity.dataset).selectionForIndex(entity.index);
-      entity.selection[0].push(stroke[0][0]);
+      entity.selection[0].push(stroke.node());
     });
     return entities;
   }

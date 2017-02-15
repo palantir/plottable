@@ -501,7 +501,7 @@ export class Legend extends Component {
    * @param {Point} p
    * @returns {Entity<Legend>[]}
    */
-  public entitiesAt(p: Point) {
+  public entitiesAt(p: Point): Entity<Legend>[] {
     if (!this._isSetup) {
       return [];
     }
@@ -530,7 +530,7 @@ export class Legend extends Component {
           // HACKHACK The 2.x API chooses the symbol element as the "selection" to return, regardless of what
           // was actually selected
           const entryElement = d3.select(rowElement)
-            .selectAll(`.${Legend.LEGEND_ENTRY_CLASS}`)[0][Math.floor(columnIndex / 2)];
+            .selectAll(`.${Legend.LEGEND_ENTRY_CLASS}`).nodes()[Math.floor(columnIndex / 2)];
           const symbolElement = d3.select(entryElement).select(`.${Legend.LEGEND_SYMBOL_CLASS}`);
 
           // HACKHACK The 2.x API returns the center {x, y} of the symbol as the position.
