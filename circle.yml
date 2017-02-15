@@ -21,7 +21,7 @@ deployment:
     commands:
       - ./demo.js
   npm:
-    tag: /v[0-9.]+/
+    tag: /v[0-9.]+(-beta[0-9.]*)?/
     commands:
       # Confirm we are ready to publish
       - npm run dist-compile
