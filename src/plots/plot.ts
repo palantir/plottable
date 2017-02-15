@@ -76,7 +76,7 @@ export class Plot extends Component {
 
   protected _setup() {
     super._setup();
-    const renderArea = this.content().append("g").classed("render-area", true);
+    this._renderArea = this.content().append("g").classed("render-area", true);
     this.datasets().forEach((dataset) => this._createNodesForDataset(dataset));
   }
 
