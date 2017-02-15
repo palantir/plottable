@@ -801,16 +801,15 @@ export class Axis<D> extends Component {
    * Hides the Tick Marks which have no corresponding Tick Labels
    */
   protected _hideTickMarksWithoutLabel() {
-    let visibleTickMarks = this._tickMarkContainer.selectAll("." + Axis.TICK_MARK_CLASS);
+    let visibleTickMarks = this._tickMarkContainer.selectAll<SVGLineElement, D>("." + Axis.TICK_MARK_CLASS);
     let visibleTickLabels = this._tickLabelContainer
-      .selectAll("." + Axis.TICK_LABEL_CLASS)
+      .selectAll<SVGGElement, D>("." + Axis.TICK_LABEL_CLASS)
       .filter(function (d: any, i: number) {
         let visibility = d3.select(this).style("visibility");
         return (visibility === "inherit") || (visibility === "visible");
       });
 
-    let labelNumbersShown: number[] = [];
-    visibleTickLabels.each((labelNumber: number) => labelNumbersShown.push(labelNumber));
+    let labelNumbersShown = visibleTickLabels.data();
 
     visibleTickMarks.each(function (e, i) {
       if (labelNumbersShown.indexOf(e) === -1) {
