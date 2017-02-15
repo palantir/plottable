@@ -8057,7 +8057,10 @@ var Category = (function (_super) {
     Category.prototype.getDownsampleInfo = function (scale, domain) {
         if (scale === void 0) { scale = this._scale; }
         if (domain === void 0) { domain = scale.invertRange(); }
-        var downsampleRatio = Math.ceil(Category._MINIMUM_WIDTH_PER_LABEL_PX / scale.stepWidth());
+        // account for how shearing tightens the space between vertically oriented ticks
+        var shearFactor = this._tickLabelAngle === 0 ? 1 : 1 / Math.cos(this._tickLabelShearAngle / 180 * Math.PI);
+        var shearedMinimumWidth = Category._MINIMUM_WIDTH_PER_LABEL_PX * shearFactor;
+        var downsampleRatio = Math.ceil(shearedMinimumWidth / scale.stepWidth());
         return {
             domain: domain.filter(function (d, i) { return i % downsampleRatio === 0; }),
             stepWidth: downsampleRatio * scale.stepWidth(),

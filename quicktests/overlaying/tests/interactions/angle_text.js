@@ -41,14 +41,27 @@ function run(svg, data, Plottable) {
     let y = 0;
     const table = new Plottable.Components.Table();
 
-    const shears = [0, 30, 60];
-    shears.forEach((shear) => {
+    const slider = $('<input type="range" min=-80 max=80 value="45" />');
+    const indicator = $("<pre>axis.tickLabelShearAngle(45)</pre>")
+    slider.on("input", function() { indicator.text("axis.tickLabelShearAngle(" + this.value + ")") });
+    $(svg.node()).parent().prepend(slider);
+    $(svg.node()).parent().prepend(indicator);
+
+    const angles = [-90, 90, 0];
+
+    angles.forEach((angle) => {
         data.forEach((labels) => {
             const scale = new Plottable.Scales.Category().domain(labels);
             const axis = new Plottable.Axes.Category(scale, "bottom")
                 .tickLabelMaxLines(2)
-                .tickLabelAngle(-90)
-                .tickLabelShearAngle(shear);
+                .tickLabelAngle(angle)
+                .tickLabelShearAngle(45)
+                .margin(50);
+
+            slider.on("input", function() {
+                axis.tickLabelShearAngle(this.valueAsNumber);
+            });
+
             new Plottable.Interactions.PanZoom(scale).attachTo(axis);
             table.add(axis, y++, 0);
         });
