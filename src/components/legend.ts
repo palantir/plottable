@@ -570,57 +570,58 @@ export class Legend extends Component {
       return `translate(${rowBounds.topLeft.x}, ${rowBounds.topLeft.y})`;
     });
 
-    const entries = rows.selectAll(`g.${Legend.LEGEND_ENTRY_CLASS}`).data((row) => {
-      const symbolEntryPairs: [
-        LegendColumn<{name: string, type: string }>,
-        LegendColumn<{ name: string, type: string}>][] = [];
+    type SymbolEntryPair = [ LegendColumn<{name: string, type: string }>, LegendColumn<{ name: string, type: string}> ];
+
+    const self = this;
+    rows.each(function (row, rowIndex) {
+      const symbolEntryPairs: SymbolEntryPair[] = [];
       for (let i = 0; i < row.columns.length; i += 2) {
         symbolEntryPairs.push([row.columns[i], row.columns[i + 1]]);
       }
-      return symbolEntryPairs;
+
+      const entries = d3.select(this).selectAll(`g.${Legend.LEGEND_ENTRY_CLASS}`).data(symbolEntryPairs);
+      const entriesEnter = entries.enter().append("g").classed(Legend.LEGEND_ENTRY_CLASS, true);
+
+      entriesEnter.append("path")
+        .attr("d", (symbolEntryPair, columnIndex) => {
+          const symbol = symbolEntryPair[0];
+          return self.symbol()(symbol.data.name, rowIndex)(symbol.height * 0.6);
+        })
+        .attr("transform", (symbolEntryPair, i) => {
+          const symbol = symbolEntryPair[0];
+          const columnIndex = table.rows[rowIndex].columns.indexOf(symbol);
+          const columnBounds = table.getColumnBounds(rowIndex, columnIndex);
+          return `translate(${columnBounds.topLeft.x + symbol.width / 2}, ${symbol.height / 2})`;
+        })
+        .attr("fill", (symbolEntryPair) => self._colorScale.scale(symbolEntryPair[0].data.name))
+        .attr("opacity", (symbolEntryPair, _columnIndex) => {
+          return self.symbolOpacity()(symbolEntryPair[0].data.name, rowIndex);
+        })
+        .classed(Legend.LEGEND_SYMBOL_CLASS, true);
+
+      entriesEnter.append("g").classed("text-container", true)
+        .attr("transform", (symbolEntryPair, i) => {
+          const entry = symbolEntryPair[1];
+          const columnIndex = table.rows[rowIndex].columns.indexOf(entry);
+          const columnBounds = table.getColumnBounds(rowIndex, columnIndex);
+          return "translate(" + columnBounds.topLeft.x + ", 0)"
+        })
+        .each(function (symbolEntryPair, i, rowIndex) {
+          const textContainer = d3.select(this);
+          const column = symbolEntryPair[1];
+
+          const writeOptions = {
+            selection: textContainer,
+            xAlign: "left",
+            yAlign: "top",
+            textRotation: 0,
+          };
+
+          self._writer.write(self._formatter(column.data.name), column.width, self.height(), writeOptions)
+        });
+
+        entries.exit().remove();
     });
-
-    const entriesEnter = entries.enter().append("g").classed(Legend.LEGEND_ENTRY_CLASS, true);
-    entriesEnter.append("path")
-      .attr("d", (symbolEntryPair, columnIndex, rowIndex) => {
-        const symbol = symbolEntryPair[0];
-        return this.symbol()(symbol.data.name, rowIndex)(symbol.height * 0.6);
-      })
-      .attr("transform", (symbolEntryPair, i, rowIndex) => {
-        const symbol = symbolEntryPair[0];
-        const columnIndex = table.rows[rowIndex].columns.indexOf(symbol);
-        const columnBounds = table.getColumnBounds(rowIndex, columnIndex);
-        return `translate(${columnBounds.topLeft.x + symbol.width / 2}, ${symbol.height / 2})`;
-      })
-      .attr("fill", (symbolEntryPair) => this._colorScale.scale(symbolEntryPair[0].data.name))
-      .attr("opacity", (symbolEntryPair, _columnIndex, rowIndex) => {
-        return this.symbolOpacity()(symbolEntryPair[0].data.name, rowIndex);
-      })
-      .classed(Legend.LEGEND_SYMBOL_CLASS, true);
-
-    const self = this;
-    entriesEnter.append("g").classed("text-container", true)
-      .attr("transform", (symbolEntryPair, i, rowIndex) => {
-        const entry = symbolEntryPair[1];
-        const columnIndex = table.rows[rowIndex].columns.indexOf(entry);
-        const columnBounds = table.getColumnBounds(rowIndex, columnIndex);
-        return "translate(" + columnBounds.topLeft.x + ", 0)"
-      })
-      .each(function (symbolEntryPair, i, rowIndex) {
-        const textContainer = d3.select(this);
-        const column = symbolEntryPair[1];
-
-        const writeOptions = {
-          selection: textContainer,
-          xAlign: "left",
-          yAlign: "top",
-          textRotation: 0,
-        };
-
-        self._writer.write(self._formatter(column.data.name), column.width, self.height(), writeOptions)
-      });
-
-    entries.exit().remove();
 
     return this;
   }
