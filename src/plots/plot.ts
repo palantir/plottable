@@ -483,14 +483,14 @@ export class Plot extends Component {
   }
 
   /**
-   * Retrieves Selections of this Plot for the specified Datasets.
+   * Retrieves the drawn visual elements for the specified Datasets as a d3 Selection.
    *
    * @param {Dataset[]} [datasets] The Datasets to retrieve the Selections for.
    *   If not provided, Selections will be retrieved for all Datasets on the Plot.
    * @returns {d3.Selection}
    */
   public selections(datasets = this.datasets()): SimpleSelection<any> {
-    let selections: Element[] = [];
+    let selections: d3.BaseType[] = [];
 
     datasets.forEach((dataset) => {
       let drawer = this._datasetToDrawer.get(dataset);

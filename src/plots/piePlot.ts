@@ -19,6 +19,10 @@ import * as Utils from "../utils";
 import { PlotEntity, AccessorScaleBinding } from "./";
 import { Plot } from "./plot";
 
+export interface PiePlotEntity extends PlotEntity {
+  strokeSelection: SimpleSelection<any>;
+}
+
 export class Pie extends Plot {
 
   private static _INNER_RADIUS_KEY = "inner-radius";
@@ -131,15 +135,16 @@ export class Pie extends Plot {
     return new Drawers.Arc(dataset);
   }
 
-  public entities(datasets = this.datasets()): PlotEntity[] {
+  public entities(datasets = this.datasets()): PiePlotEntity[] {
     let entities = super.entities(datasets);
-    entities.forEach((entity) => {
+    return entities.map((entity) => {
       entity.position.x += this.width() / 2;
       entity.position.y += this.height() / 2;
       let stroke = this._strokeDrawers.get(entity.dataset).selectionForIndex(entity.index);
-      entity.selection[0].push(stroke.node());
+      const piePlotEntity = entity as PiePlotEntity;
+      piePlotEntity.strokeSelection = stroke;
+      return piePlotEntity;
     });
-    return entities;
   }
 
   /**
