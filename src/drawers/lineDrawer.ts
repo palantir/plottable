@@ -24,6 +24,6 @@ export class Line extends Drawer {
   }
 
   public selectionForIndex(index: number): SimpleSelection<any> {
-    return d3.select(this.selection()[0][0]);
+    return d3.select(this.selection().node());
   }
 }

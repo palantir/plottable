@@ -198,7 +198,7 @@ export class Area<X> extends Line<X> {
   }
 
   public selections(datasets = this.datasets()) {
-    let allSelections = super.selections(datasets)[0];
+    let allSelections = super.selections(datasets).nodes();
     let lineDrawers = datasets.map((dataset) => this._lineDrawers.get(dataset))
       .filter((drawer) => drawer != null);
     lineDrawers.forEach((ld, i) => allSelections.push(ld.selectionForIndex(i).node()));
