@@ -4,7 +4,6 @@
  */
 
 import * as d3 from "d3";
-import { parseSvg } from "d3-interpolate/src/transform/parse";
 
 import { Range, SimpleSelection } from "../core/interfaces";
 
@@ -76,10 +75,6 @@ export function elementHeight(element: Element) {
     + _parseStyleValue(style, "padding-bottom")
     + _parseStyleValue(style, "border-top-width")
     + _parseStyleValue(style, "border-bottom-width");
-}
-
-export function parseSvgTransform(transformString: string) {
-  return parseSvg(transformString);
 }
 
 /**
