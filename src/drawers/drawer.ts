@@ -46,6 +46,8 @@ export class Drawer {
     if (area == null) {
       return this._renderArea;
     }
+    // coerce possibly external d3 instance into our own instance of d3 so we can use d3-selection-multi
+    area = d3.selectAll<d3.BaseType, void>(area.nodes());
     this._renderArea = area;
     this._cachedSelectionValid = false;
     return this;

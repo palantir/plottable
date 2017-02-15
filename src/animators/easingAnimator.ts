@@ -78,6 +78,8 @@ export class Easing implements Animator {
   }
 
   public animate(selection: SimpleSelection<any>, attrToAppliedProjector: AttributeToAppliedProjector): d3.Transition<any, any, any, any> {
+    // coerce possibly external d3 instance into our own instance of d3 so we can use d3-selection-multi
+    selection = d3.selectAll<d3.BaseType, void>(selection.nodes());
     let numberOfSteps = selection.size();
     let adjustedIterativeDelay = this._getAdjustedIterativeDelay(numberOfSteps);
 

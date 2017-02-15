@@ -65,6 +65,8 @@ export class Component {
    * @returns {Component} The calling Component.
    */
   public anchor(selection: SimpleSelection<void>) {
+    // coerce possibly external d3 instance into our own instance of d3 so we can use d3-selection-multi
+    selection = d3.selectAll<d3.BaseType, void>(selection.nodes());
     if (this._destroyed) {
       throw new Error("Can't reuse destroy()-ed Components!");
     }
@@ -303,16 +305,17 @@ export class Component {
    * @param {String|d3.Selection} element A selector-string for the <svg>, or a d3 selection containing an <svg>.
    * @returns {Component} The calling Component.
    */
-  public renderTo(element: String | Element | SimpleSelection<void>): this {
+  public renderTo(element: string | Element | SimpleSelection<void>): this {
     this.detach();
     if (element != null) {
       let selection: SimpleSelection<void>;
       if (typeof(element) === "string") {
-        selection = d3.select<d3.BaseType, void>(<string> element);
+        selection = d3.select<d3.BaseType, void>(element);
       } else if (element instanceof Element) {
-        selection = d3.select<d3.BaseType, void>(<Element> element);
+        selection = d3.select<d3.BaseType, void>(element);
       } else {
-        selection = <SimpleSelection<void>> element;
+        // coerce possibly external d3 instance into our own instance of d3 so we can use d3-selection-multi
+        selection = d3.selectAll<d3.BaseType, void>(element.nodes());
       }
       if (!selection.node() || (<Node> selection.node()).nodeName.toLowerCase() !== "svg") {
         throw new Error("Plottable requires a valid SVG to renderTo");

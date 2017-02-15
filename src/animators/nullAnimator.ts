@@ -17,6 +17,8 @@ export class Null implements Animator {
   }
 
   public animate(selection: SimpleSelection<any>, attrToAppliedProjector: AttributeToAppliedProjector): SimpleSelection<any> {
+    // coerce possibly external d3 instance into our own instance of d3 so we can use d3-selection-multi
+    selection = d3.selectAll<d3.BaseType, void>(selection.nodes());
     return selection.attrs(attrToAppliedProjector);
   }
 }

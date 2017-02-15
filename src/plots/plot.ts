@@ -67,6 +67,8 @@ export class Plot extends Component {
   }
 
   public anchor(selection: SimpleSelection<void>) {
+    // coerce possibly external d3 instance into our own instance of d3 so we can use d3-selection-multi
+    selection = d3.selectAll<d3.BaseType, void>(selection.nodes());
     super.anchor(selection);
     this._dataChanged = true;
     this._cachedEntityStore = undefined;
