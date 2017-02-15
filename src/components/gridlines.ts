@@ -4,7 +4,7 @@
  */
 
 
-import * as d3 from "d3";
+import * as d3 from "d3/build/d3.node";
 
 import { QuantitativeScale } from "../scales/quantitativeScale";
 import { ScaleCallback } from "../scales/scale";

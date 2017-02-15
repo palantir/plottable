@@ -102,7 +102,7 @@ module.exports = [
     },
     externals: {
       // don't bundle d3 but instead it request it externally
-      "d3": "d3"
+      "d3/build/d3.node": "d3"
     },
     plugins: [
       new webpack.BannerPlugin({

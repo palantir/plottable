@@ -3,7 +3,7 @@
  * @license MIT
  */
 
-import * as d3 from "d3";
+import * as d3 from "d3/build/d3.node";
 import * as Utils from "../utils";
 
 import { Dataset } from "../core/dataset";

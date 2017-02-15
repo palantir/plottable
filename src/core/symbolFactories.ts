@@ -3,7 +3,7 @@
  * @license MIT
  */
 
-import * as d3 from "d3";
+import * as d3 from "d3/build/d3.node";
 
 /**
  * A SymbolFactory is a function that takes in a symbolSize which is the edge length of the render area

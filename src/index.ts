@@ -1,3 +1,6 @@
+// import d3-selection-multi for side effects - it will modify d3's selection prototype
+import "d3-selection-multi/index";
+
 import * as Animators from "./animators";
 import * as Axes from "./axes";
 import * as Components from "./components";

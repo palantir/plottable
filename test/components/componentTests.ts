@@ -1,4 +1,4 @@
-import * as d3 from "d3";
+import * as d3 from "d3/build/d3.node";
 
 import { assert } from "chai";
 import * as sinon from "sinon";

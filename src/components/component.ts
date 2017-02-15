@@ -3,7 +3,7 @@
  * @license MIT
  */
 
-import * as d3 from "d3";
+import * as d3 from "d3/build/d3.node";
 
 import { Point, SpaceRequest, Bounds, SimpleSelection } from "../core/interfaces";
 import * as RenderController from "../core/renderController";
