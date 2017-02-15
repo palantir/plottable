@@ -478,14 +478,17 @@ export class Line<X> extends XYPlot<X, number> {
         positionY != null && !Utils.Math.isNaN(positionY);
     };
     return (datum: any, index: number, dataset: Dataset) => {
-      const curve = this.curve();
-      const CurveFactory = (typeof curve === "string") ? CURVE_NAME_MAPPING[curve] : curve;
       return d3.line()
         .x((innerDatum, innerIndex) => xProjector(innerDatum, innerIndex, dataset))
         .y((innerDatum, innerIndex) => yProjector(innerDatum, innerIndex, dataset))
-        .curve(CurveFactory)
+        .curve(this._getCurveFactory())
         .defined((innerDatum, innerIndex) => definedProjector(innerDatum, innerIndex, dataset))(datum);
     };
+  }
+
+  protected _getCurveFactory(): d3.CurveFactory | d3.CurveFactoryLineOnly {
+    const curve = this.curve();
+    return (typeof curve === "string") ? CURVE_NAME_MAPPING[curve] : curve;
   }
 
   protected _getDataToDraw(): Utils.Map<Dataset, any[]> {

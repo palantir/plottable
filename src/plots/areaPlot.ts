@@ -212,11 +212,13 @@ export class Area<X> extends Line<X> {
       return Utils.Math.isValidNumber(positionX) && Utils.Math.isValidNumber(positionY);
     };
     return (datum: any[], index: number, dataset: Dataset) => {
+      // just runtime error if user passes curveBundle to area plot
+      const curveFactory = this._getCurveFactory() as d3.CurveFactory;
       let areaGenerator = d3.area()
         .x((innerDatum, innerIndex) => xProjector(innerDatum, innerIndex, dataset))
         .y1((innerDatum, innerIndex) => yProjector(innerDatum, innerIndex, dataset))
         .y0((innerDatum, innerIndex) => y0Projector(innerDatum, innerIndex, dataset))
-        .curve(this.curve())
+        .curve(curveFactory)
         .defined((innerDatum, innerIndex) => definedProjector(innerDatum, innerIndex, dataset));
       return areaGenerator(datum);
     };
