@@ -150,7 +150,7 @@ export class Drawer {
     return this;
   }
 
-  public selection() {
+  public selection(): SimpleSelection<any> {
     if (!this._cachedSelectionValid) {
       this._cachedSelection = this.renderArea().selectAll(this.selector());
       this._cachedSelectionValid = true;
@@ -169,7 +169,7 @@ export class Drawer {
    * Returns the D3 selection corresponding to the datum with the specified index.
    */
   public selectionForIndex(index: number): SimpleSelection<any> {
-    return d3.select(this.selection()[0][index]);
+    return d3.select(this.selection().nodes()[index]);
   }
 
 }

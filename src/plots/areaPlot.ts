@@ -5,7 +5,7 @@
 
 import * as d3 from "d3";
 
-import { Accessor, AttributeToProjector, Projector } from "../core/interfaces";
+import { Accessor, AttributeToProjector, Projector, SimpleSelection } from "../core/interfaces";
 import { Dataset } from "../core/dataset";
 import * as Drawers from "../drawers";
 import * as Scales from "../scales";
@@ -197,7 +197,7 @@ export class Area<X> extends Line<X> {
     return propertyToProjectors;
   }
 
-  public selections(datasets = this.datasets()) {
+  public selections(datasets = this.datasets()): SimpleSelection<any> {
     let allSelections = super.selections(datasets).nodes();
     let lineDrawers = datasets.map((dataset) => this._lineDrawers.get(dataset))
       .filter((drawer) => drawer != null);
