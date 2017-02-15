@@ -6,6 +6,7 @@
 import * as d3 from "d3";
 
 import * as Animators from "../animators";
+import { Animator } from "../animators/animator";
 import * as Utils from "../utils";
 import * as Plots from "../plots";
 import * as Scales from "../scales";
@@ -45,12 +46,41 @@ export class CanvasPlot extends HTMLComponent implements IPlot {
     this._plot.updateExtents();
     return this;
   }
+  /**
+   * Returns whether the plot will be animated.
+   */
+  public animated(): boolean;
+  /**
+   * Enables or disables animation.
+   */
+  public animated(willAnimate: boolean): this;
+  public animated(willAnimate?: boolean): any {
+    const plotAnimate = this._plot.animated(willAnimate);
+    if (willAnimate == null) {
+      return plotAnimate;
+    }
 
-  public computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number) {
-    super.computeLayout(origin, availableWidth, availableHeight);
-    const canvas = this._plot.renderArea().node() as HTMLCanvasElement;
-    canvas.width = this.width();
-    canvas.height = this.height();
+    return this;
+  }
+  /**
+   * Get the Animator associated with the specified Animator key.
+   *
+   * @return {Animator}
+   */
+  public animator(animatorKey: string): Animator;
+  /**
+   * Set the Animator associated with the specified Animator key.
+   *
+   * @param {string} animatorKey
+   * @param {Animator} animator
+   * @returns {Plot} The calling Plot.
+   */
+  public animator(animatorKey: string, animator: Animator): this;
+  public animator(animatorKey: string, animator?: Animator): any {
+    const plotAnimator = this._plot.animator(animatorKey, animator);
+    if (animator === undefined) {
+      return plotAnimator;
+    }
 
     return this;
   }
@@ -81,9 +111,20 @@ export class CanvasPlot extends HTMLComponent implements IPlot {
   public attr<A>(attr: string, attrValue: A | Accessor<A>, scale: Scale<A, number | string>): this;
   public attr<A>(attr: string, attrValue?: number | string | Accessor<number> | Accessor<string> | A | Accessor<A>,
                  scale?: Scale<A, number | string>): any {
-
-    this._plot.attr<A>(attr, attrValue as A, scale);
+    const plotAttr = this._plot.attr<A>(attr, attrValue as A, scale);
+    if (attrValue == null) {
+      return plotAttr;
+    }
     this.render(); // queue a re-render upon changing projector
+    return this;
+  }
+
+  public computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number) {
+    super.computeLayout(origin, availableWidth, availableHeight);
+    const canvas = this._plot.renderArea().node() as HTMLCanvasElement;
+    canvas.width = this.width();
+    canvas.height = this.height();
+
     return this;
   }
 
@@ -94,12 +135,62 @@ export class CanvasPlot extends HTMLComponent implements IPlot {
     return datasets === undefined ? returnedDatasets : this;
   }
 
- /**
-  * Removes a Dataset from the Plot.
-  *
-  * @param {Dataset} dataset
-  * @returns {Plot} The calling Plot.
-  */
+  public destroy() {
+    super.destroy();
+    this._plot.destroy();
+  }
+
+  public detach() {
+    super.detach();
+    this._plot.updateExtents();
+    return this;
+  }
+
+  /**
+   * Gets the Entities associated with the specified Datasets.
+   *
+   * @param {Dataset[]} datasets The Datasets to retrieve the Entities for.
+   *   If not provided, returns defaults to all Datasets on the Plot.
+   * @return {Plots.PlotEntity[]}
+   */
+  public entities(datasets?: Dataset[]): Plots.PlotEntity[] {
+    return this._plot.entities(datasets);
+  }
+
+  /**
+   * Gets the PlotEntities at a particular Point.
+   *
+   * Each plot type determines how to locate entities at or near the query
+   * point. For example, line and area charts will return the nearest entity,
+   * but bar charts will only return the entities that fully contain the query
+   * point.
+   *
+   * @param {Point} point The point to query.
+   * @returns {PlotEntity[]} The PlotEntities at the particular point
+   */
+  public entitiesAt(point: Point): Plots.PlotEntity[] {
+    return this._plot.entitiesAt(point);
+  }
+
+  /**
+   * Returns the {Plots.PlotEntity} nearest to the query point,
+   * or undefined if no {Plots.PlotEntity} can be found.
+   *
+   * @param {Point} queryPoint
+   * @param {bounds} Bounds The bounding box within which to search. By default, bounds is the bounds of
+   * the chart, relative to the parent.
+   * @returns {Plots.PlotEntity} The nearest PlotEntity, or undefined if no {Plots.PlotEntity} can be found.
+   */
+  public entityNearest(queryPoint: Point, bounds = this.bounds()): Plots.PlotEntity {
+    return this._plot.entityNearest(queryPoint, bounds);
+  }
+
+  /**
+   * Removes a Dataset from the Plot.
+   *
+   * @param {Dataset} dataset
+   * @returns {Plot} The calling Plot.
+   */
   public removeDataset(dataset: Dataset): this {
     this._plot.removeDataset(dataset);
     return this;
@@ -115,7 +206,7 @@ export class CanvasPlot extends HTMLComponent implements IPlot {
   }
 
   protected _createPlot() {
-    return new BasePlot((dataset) => new CanvasDrawer(dataset));
+    return new BasePlot((dataset) => new CanvasDrawer(dataset), this);
   }
 
   protected _onDatasetUpdate() {
@@ -124,7 +215,6 @@ export class CanvasPlot extends HTMLComponent implements IPlot {
     this._cachedEntityStore = undefined;
     this.render();
   }
-
 
   protected _setup() {
     super._setup();

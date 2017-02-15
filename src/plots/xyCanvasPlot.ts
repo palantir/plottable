@@ -21,6 +21,35 @@ import { TransformableAccessorScaleBinding, LightweightPlotEntity, PlotEntity } 
 export class XYCanvasPlot<X, Y> extends CanvasPlot implements IXYPlot<X, Y> {
   protected _plot: BaseXYPlot<X, Y>;
 
+  public autorangeMode(): string;
+  public autorangeMode(autorangeMode: string): this;
+  public autorangeMode(autorangeMode?: string): any {
+    const plotAutoRangeMode = this._plot.autorangeMode(autorangeMode);
+    if (autorangeMode == null) {
+      return plotAutoRangeMode;
+    }
+
+    return this;
+  }
+
+  public computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number) {
+    super.computeLayout(origin, availableWidth, availableHeight);
+    this._plot.computeLayout(origin, availableWidth, availableHeight);
+    return this;
+  }
+
+  public destroy() {
+    super.destroy();
+    this._plot.destroy();
+
+    return this;
+  }
+
+  public showAllData() {
+    this._plot.showAllData();
+    return this;
+  }
+
   /**
    * Gets the TransformableAccessorScaleBinding for X.
    */
@@ -81,21 +110,9 @@ export class XYCanvasPlot<X, Y> extends CanvasPlot implements IXYPlot<X, Y> {
     return this;
   }
 
-  public destroy() {
-    super.destroy();
-    this._plot.destroy();
-
-    return this;
-  }
-
-  public computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number) {
-    super.computeLayout(origin, availableWidth, availableHeight);
-    this._plot.computeLayout(origin, availableWidth, availableHeight);
-    return this;
-  }
-
   protected _createPlot() {
     return new BaseXYPlot((dataset) => new CanvasDrawer(dataset),
+      this,
       () => this.width(),
       () => this.height());
   }

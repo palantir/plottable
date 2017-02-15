@@ -12,11 +12,12 @@ import { AttributeToProjector, AttributeToAppliedProjector } from "../core/inter
 import * as Drawers from "./";
 
 export interface IDrawer {
+  draw(data: any[], drawSteps: Drawers.DrawStep[]): this;
   renderArea(): d3.Selection<void>;
   renderArea(area: d3.Selection<void>): this;
   renderArea(area?: d3.Selection<void>): any;
   remove(): void;
-  draw(data: any[], drawSteps: Drawers.DrawStep[]): this;
+  totalDrawTime(data: any[], drawSteps: Drawers.DrawStep[]): number;
 }
 
 export class Drawer implements IDrawer {

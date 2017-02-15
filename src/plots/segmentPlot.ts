@@ -15,9 +15,10 @@ import { PlotEntity, TransformableAccessorScaleBinding, AccessorScaleBinding } f
 import { Plot } from "./plot";
 import { XYPlot } from "./xyPlot";
 
-export class Segment<X, Y> extends XYPlot<X, Y> {
-  private static _X2_KEY = "x2";
-  private static _Y2_KEY = "y2";
+import { BaseSegmentPlot, ISegmentPlot } from "./baseSegmentPlot";
+
+export class Segment<X, Y> extends XYPlot<X, Y> implements ISegmentPlot<X, Y> {
+  protected _plot: BaseSegmentPlot<X, Y>;
 
   /**
    * A Segment Plot displays line segments based on the data.
@@ -31,30 +32,12 @@ export class Segment<X, Y> extends XYPlot<X, Y> {
     this.attr("stroke-width", "2px");
   }
 
-  protected _createDrawer(dataset: Dataset): Drawers.Segment {
-    return new Drawers.Segment(dataset);
-  }
-
-  protected _generateDrawSteps(): Drawers.DrawStep[] {
-    return [{ attrToProjector: this._generateAttrToProjector(), animator: new Animators.Null() }];
-  }
-
-  protected _updateExtentsForProperty(property: string) {
-    super._updateExtentsForProperty(property);
-    if (property === "x") {
-      super._updateExtentsForProperty("x2");
-    } else if (property === "y") {
-      super._updateExtentsForProperty("y2");
-    }
-  }
-
-  protected _filterForProperty(property: string) {
-    if (property === "x2") {
-      return super._filterForProperty("x");
-    } else if (property === "y2") {
-      return super._filterForProperty("y");
-    }
-    return super._filterForProperty(property);
+  protected _createPlot() {
+    return new BaseSegmentPlot((dataset) => new Drawers.Segment(dataset),
+      this,
+      () => this.width(),
+      () => this.height()
+    );
   }
 
   /**
@@ -78,19 +61,11 @@ export class Segment<X, Y> extends XYPlot<X, Y> {
    */
   public x(x: X | Accessor<X>, xScale: Scale<X, number>): this;
   public x(x?: number | Accessor<number> | X | Accessor<X>, xScale?: Scale<X, number>): any {
+    const plotX = this._plot.x(x as X, xScale);
     if (x == null) {
-      return super.x();
+      return plotX;
     }
-    if (xScale == null) {
-      super.x(<number | Accessor<number>>x);
-    } else {
-      super.x(<X | Accessor<X>>x, xScale);
-      let x2Binding = this.x2();
-      let x2 = x2Binding && x2Binding.accessor;
-      if (x2 != null) {
-        this._bindProperty(Segment._X2_KEY, x2, xScale);
-      }
-    }
+
     return this;
   }
 
@@ -107,12 +82,11 @@ export class Segment<X, Y> extends XYPlot<X, Y> {
    */
   public x2(x2: number | Accessor<number> | X | Accessor<X>): this;
   public x2(x2?: number | Accessor<number> | X | Accessor<X>): any {
+    const plotX2 = this._plot.x2();
     if (x2 == null) {
-      return this._propertyBindings.get(Segment._X2_KEY);
+      return plotX2;
     }
-    let xBinding = this.x();
-    let xScale = xBinding && xBinding.scale;
-    this._bindProperty(Segment._X2_KEY, x2, xScale);
+
     this.render();
     return this;
   }
@@ -138,19 +112,11 @@ export class Segment<X, Y> extends XYPlot<X, Y> {
    */
   public y(y: Y | Accessor<Y>, yScale: Scale<Y, number>): this;
   public y(y?: number | Accessor<number> | Y | Accessor<Y>, yScale?: Scale<Y, number>): any {
+    const plotY = this._plot.y(y as Y, yScale);
     if (y == null) {
-      return super.y();
+      return plotY;
     }
-    if (yScale == null) {
-      super.y(<number | Accessor<number>>y);
-    } else {
-      super.y(<Y | Accessor<Y>>y, yScale);
-      let y2Binding = this.y2();
-      let y2 = y2Binding && y2Binding.accessor;
-      if (y2 != null) {
-        this._bindProperty(Segment._Y2_KEY, y2, yScale);
-      }
-    }
+
     return this;
   }
 
@@ -167,32 +133,17 @@ export class Segment<X, Y> extends XYPlot<X, Y> {
    */
   public y2(y2: number | Accessor<number> | Y | Accessor<Y>): this;
   public y2(y2?: number | Accessor<number> | Y | Accessor<Y>): any {
+    const plotY2 = this._plot.y2(y2);
     if (y2 == null) {
-      return this._propertyBindings.get(Segment._Y2_KEY);
+      return plotY2;
     }
-    let yBinding = this.y();
-    let yScale = yBinding && yBinding.scale;
-    this._bindProperty(Segment._Y2_KEY, y2, yScale);
+
     this.render();
     return this;
   }
 
-  protected _propertyProjectors(): AttributeToProjector {
-    let attrToProjector = super._propertyProjectors();
-    attrToProjector["x1"] = Plot._scaledAccessor(this.x());
-    attrToProjector["x2"] = this.x2() == null ? Plot._scaledAccessor(this.x()) : Plot._scaledAccessor(this.x2());
-    attrToProjector["y1"] = Plot._scaledAccessor(this.y());
-    attrToProjector["y2"] = this.y2() == null ? Plot._scaledAccessor(this.y()) : Plot._scaledAccessor(this.y2());
-    return attrToProjector;
-  }
-
-  public entitiesAt(point: Point): PlotEntity[] {
-    const entity = this.entityNearest(point);
-    if (entity != null) {
-      return [entity];
-    } else {
-      return [];
-    }
+  public entitiesAt(point: Point) {
+    return this._plot.entitiesAt(point);
   }
 
   /**
@@ -211,69 +162,6 @@ export class Segment<X, Y> extends XYPlot<X, Y> {
    */
   public entitiesIn(xRange: Range, yRange: Range): PlotEntity[];
   public entitiesIn(xRangeOrBounds: Range | Bounds, yRange?: Range): PlotEntity[] {
-    let dataXRange: Range;
-    let dataYRange: Range;
-    if (yRange == null) {
-      let bounds = (<Bounds> xRangeOrBounds);
-      dataXRange = { min: bounds.topLeft.x, max: bounds.bottomRight.x };
-      dataYRange = { min: bounds.topLeft.y, max: bounds.bottomRight.y };
-    } else {
-      dataXRange = (<Range> xRangeOrBounds);
-      dataYRange = yRange;
-    }
-    return this._entitiesIntersecting(dataXRange, dataYRange);
-  }
-
-  private _entitiesIntersecting(xRange: Range, yRange: Range): PlotEntity[] {
-    let intersected: PlotEntity[] = [];
-    let attrToProjector = this._generateAttrToProjector();
-    this.entities().forEach((entity) => {
-      if (this._lineIntersectsBox(entity, xRange, yRange, attrToProjector)) {
-        intersected.push(entity);
-      }
-    });
-    return intersected;
-  }
-
-  private _lineIntersectsBox(entity: PlotEntity, xRange: Range, yRange: Range, attrToProjector: AttributeToProjector) {
-    let x1 = attrToProjector["x1"](entity.datum, entity.index, entity.dataset);
-    let x2 = attrToProjector["x2"](entity.datum, entity.index, entity.dataset);
-    let y1 = attrToProjector["y1"](entity.datum, entity.index, entity.dataset);
-    let y2 = attrToProjector["y2"](entity.datum, entity.index, entity.dataset);
-
-    // check if any of end points of the segment is inside the box
-    if (( xRange.min <= x1 && x1 <= xRange.max && yRange.min <= y1 && y1 <= yRange.max ) ||
-      ( xRange.min <= x2 && x2 <= xRange.max && yRange.min <= y2 && y2 <= yRange.max )) {
-      return true;
-    }
-
-    let startPoint = { x: x1, y: y1 };
-    let endPoint = { x: x2, y: y2 };
-    let corners = [
-      { x: xRange.min, y: yRange.min },
-      { x: xRange.min, y: yRange.max },
-      { x: xRange.max, y: yRange.max },
-      { x: xRange.max, y: yRange.min },
-    ];
-    let intersections = corners.filter((point: Point, index: number) => {
-      if (index !== 0) {
-        // return true if border formed by conecting current corner and previous corner intersects with the segment
-        return this._lineIntersectsSegment(startPoint, endPoint, point, corners[index - 1]) &&
-          this._lineIntersectsSegment(point, corners[index - 1], startPoint, endPoint);
-      }
-      return false;
-    });
-    return intersections.length > 0;
-  }
-
-  private _lineIntersectsSegment(point1: Point, point2: Point, point3: Point, point4: Point) {
-    /* tslint:disable no-shadowed-variable */
-    let calcOrientation = (point1: Point, point2: Point, point: Point) => {
-      return (point2.x - point1.x) * (point.y - point2.y) - (point2.y - point1.y) * (point.x - point2.x);
-    };
-    /* tslint:enable no-shadowed-variable */
-
-    // point3 and point4 are on different sides of line formed by point1 and point2
-    return calcOrientation(point1, point2, point3) * calcOrientation(point1, point2, point4) < 0;
+    return this._plot.entitiesIn(xRangeOrBounds as Range, yRange)
   }
 }

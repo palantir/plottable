@@ -3,7 +3,6 @@
  * @license MIT
  */
 
-
 import * as d3 from "d3";
 import { XYCanvasPlot } from "./xyCanvasPlot";
 import * as Animators from "../animators";
@@ -22,8 +21,6 @@ import { XYPlot } from "./xyPlot";
 import { BaseRectanglePlot, IRectanglePlot } from "./baseRectanglePlot";
 
 export class CanvasRectangle<X, Y> extends XYCanvasPlot<X, Y> implements IRectanglePlot<X, Y> {
-  private static _X2_KEY = "x2";
-  private static _Y2_KEY = "y2";
   private _labelsEnabled = false;
   private _label: Accessor<string> = null;
 
@@ -42,7 +39,31 @@ export class CanvasRectangle<X, Y> extends XYCanvasPlot<X, Y> implements IRectan
    */
   constructor() {
     super();
+    this.animator("rectangles", new Animators.Null());
     this.addClass("rectangle-plot");
+  }
+
+  public drawLabels() {
+    // no labels yet
+  }
+
+  /**
+   * Gets the Entities that intersect the Bounds.
+   *
+   * @param {Bounds} bounds
+   * @returns {PlotEntity[]}
+   */
+  public entitiesIn(bounds: Bounds): PlotEntity[];
+  /**
+   * Gets the Entities that intersect the area defined by the ranges.
+   *
+   * @param {Range} xRange
+   * @param {Range} yRange
+   * @returns {PlotEntity[]}
+   */
+  public entitiesIn(xRange: Range, yRange: Range): PlotEntity[];
+  public entitiesIn(xRangeOrBounds: Range | Bounds, yRange?: Range): PlotEntity[] {
+    return this._plot.entitiesIn(xRangeOrBounds as Range, yRange);
   }
 
   /**
@@ -146,6 +167,7 @@ export class CanvasRectangle<X, Y> extends XYCanvasPlot<X, Y> implements IRectan
 
   protected _createPlot() {
     return new BaseRectanglePlot((dataset) => new RectangleDrawer(dataset),
+      this,
       () => this.width(),
       () => this.height());
   }

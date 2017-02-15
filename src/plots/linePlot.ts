@@ -20,20 +20,12 @@ import { PlotEntity } from "./";
 import { Plot } from "./plot";
 import { XYPlot } from "./xyPlot";
 
-type EdgeIntersections = {
-  left: Point[],
-  right: Point[],
-  top: Point[],
-  bottom: Point[]
-};
+import { BaseLinePlot, ILinePlot, InterpolatorValue } from "./baseLinePlot";
 
-export class Line<X> extends XYPlot<X, number> {
-  private _interpolator: string | ((points: Array<[number, number]>) => string) = "linear";
 
-  private _autorangeSmooth = false;
-  private _croppedRenderingEnabled = true;
+export class Line<X> extends XYPlot<X, number> implements ILinePlot<X> {
 
-  private _downsamplingEnabled = false;
+  protected _plot: BaseLinePlot<X>;
 
   /**
    * A Line Plot draws line segments starting from the first data point to the next.
@@ -106,10 +98,11 @@ export class Line<X> extends XYPlot<X, number> {
    */
   public autorangeSmooth(autorangeSmooth: boolean): this;
   public autorangeSmooth(autorangeSmooth?: boolean): any {
+    const plotAutoRangeSmooth = this._plot.autorangeSmooth(autorangeSmooth);
     if (autorangeSmooth == null) {
-      return this._autorangeSmooth;
+      return plotAutoRangeSmooth;
     }
-    this._autorangeSmooth = autorangeSmooth;
+
     this._setScaleSnapping();
     return this;
   }
@@ -129,32 +122,20 @@ export class Line<X> extends XYPlot<X, number> {
    *
    * @return {string | (points: Array<[number, number]>) => string)}
    */
-  public interpolator(): string | ((points: Array<[number, number]>) => string);
+  public interpolator(): InterpolatorValue | ((points: Array<[number, number]>) => string);
   /**
    * Sets the interpolation function associated with the plot.
    *
    * @param {string | points: Array<[number, number]>) => string} interpolator Interpolation function
    * @return Plots.Line
    */
-  public interpolator(interpolator: string | ((points: Array<[number, number]>) => string)): this;
-  public interpolator(interpolator: "linear"): this;
-  public interpolator(interpolator: "linear-closed"): this;
-  public interpolator(interpolator: "step"): this;
-  public interpolator(interpolator: "step-before"): this;
-  public interpolator(interpolator: "step-after"): this;
-  public interpolator(interpolator: "basis"): this;
-  public interpolator(interpolator: "basis-open"): this;
-  public interpolator(interpolator: "basis-closed"): this;
-  public interpolator(interpolator: "bundle"): this;
-  public interpolator(interpolator: "cardinal"): this;
-  public interpolator(interpolator: "cardinal-open"): this;
-  public interpolator(interpolator: "cardinal-closed"): this;
-  public interpolator(interpolator: "monotone"): this;
-  public interpolator(interpolator?: string | ((points: Array<[number, number]>) => string)): any {
+  public interpolator(interpolator: InterpolatorValue | ((points: Array<[number, number]>) => string)): this;
+  public interpolator(interpolator?: InterpolatorValue | ((points: Array<[number, number]>) => string)): any {
+    const plotInterpolator = this._plot.interpolator(interpolator);
     if (interpolator == null) {
-      return this._interpolator;
+      return plotInterpolator;
     }
-    this._interpolator = interpolator;
+
     this.render();
     return this;
   }
@@ -172,10 +153,12 @@ export class Line<X> extends XYPlot<X, number> {
    */
   public downsamplingEnabled(downsampling: boolean): this;
   public downsamplingEnabled(downsampling?: boolean): any {
+    const plotDownsamplingEnabled = this._plot.downsamplingEnabled(downsampling);
+
     if (downsampling == null) {
-      return this._downsamplingEnabled;
+      return plotDownsamplingEnabled;
     }
-    this._downsamplingEnabled = downsampling;
+
     return this;
   }
 
@@ -192,187 +175,12 @@ export class Line<X> extends XYPlot<X, number> {
    */
   public croppedRenderingEnabled(croppedRendering: boolean): this;
   public croppedRenderingEnabled(croppedRendering?: boolean): any {
+    const plotCroppedRendering = this._plot.croppedRenderingEnabled(croppedRendering);
     if (croppedRendering == null) {
-      return this._croppedRenderingEnabled;
+      return plotCroppedRendering;
     }
-    this._croppedRenderingEnabled = croppedRendering;
     this.render();
     return this;
-  }
-
-  protected _createDrawer(dataset: Dataset): Drawer {
-    return new Drawers.Line(dataset);
-  }
-
-  protected _extentsForProperty(property: string) {
-    let extents = super._extentsForProperty(property);
-
-    if (!this._autorangeSmooth) {
-      return extents;
-    }
-
-    if (this.autorangeMode() !== property) {
-      return extents;
-    }
-
-    if (this.autorangeMode() !== "x" && this.autorangeMode() !== "y") {
-      return extents;
-    }
-
-    let edgeIntersectionPoints = this._getEdgeIntersectionPoints();
-    let includedValues: number[];
-    if (this.autorangeMode() === "y") {
-      includedValues = edgeIntersectionPoints.left.concat(edgeIntersectionPoints.right).map((point) => point.y);
-    } else { // === "x"
-      includedValues = edgeIntersectionPoints.top.concat(edgeIntersectionPoints.bottom).map((point) => point.x);
-    }
-
-    return extents.map((extent: [number, number]) => d3.extent(d3.merge([extent, includedValues])));
-  }
-
-  private _getEdgeIntersectionPoints(): EdgeIntersections {
-    if (!(this.y().scale instanceof QuantitativeScale && this.x().scale instanceof QuantitativeScale)) {
-      return {
-        left: [],
-        right: [],
-        top: [],
-        bottom: [],
-      };
-    }
-
-    let yScale = <QuantitativeScale<number>>this.y().scale;
-    let xScale = <QuantitativeScale<any>>this.x().scale;
-
-    let intersectionPoints: EdgeIntersections = {
-      left: [],
-      right: [],
-      top: [],
-      bottom: [],
-    };
-    let leftX = xScale.scale(xScale.domain()[0]);
-    let rightX = xScale.scale(xScale.domain()[1]);
-    let bottomY = yScale.scale(yScale.domain()[0]);
-    let topY = yScale.scale(yScale.domain()[1]);
-
-    this.datasets().forEach((dataset) => {
-      let data = dataset.data();
-
-      let x1: number, x2: number, y1: number, y2: number;
-      let prevX: number, prevY: number, currX: number, currY: number;
-      for (let i = 1; i < data.length; i++) {
-        prevX = currX || xScale.scale(this.x().accessor(data[i - 1], i - 1, dataset));
-        prevY = currY || yScale.scale(this.y().accessor(data[i - 1], i - 1, dataset));
-
-        currX = xScale.scale(this.x().accessor(data[i], i, dataset));
-        currY = yScale.scale(this.y().accessor(data[i], i, dataset));
-
-        // If values crossed left edge
-        if ((prevX < leftX) === (leftX <= currX)) {
-          x1 = leftX - prevX;
-          x2 = currX - prevX;
-          y2 = currY - prevY;
-          y1 = x1 * y2 / x2;
-
-          intersectionPoints.left.push({
-            x: leftX,
-            y: yScale.invert(prevY + y1),
-          });
-        }
-
-        // If values crossed right edge
-        if ((prevX < rightX) === (rightX <= currX)) {
-          x1 = rightX - prevX;
-          x2 = currX - prevX;
-          y2 = currY - prevY;
-          y1 = x1 * y2 / x2;
-
-          intersectionPoints.right.push({
-            x: rightX,
-            y: yScale.invert(prevY + y1),
-          });
-        }
-
-        // If values crossed upper edge
-        if ((prevY < topY) === (topY <= currY)) {
-          x2 = currX - prevX;
-          y1 = topY - prevY;
-          y2 = currY - prevY;
-          x1 = y1 * x2 / y2;
-
-          intersectionPoints.top.push({
-            x: xScale.invert(prevX + x1),
-            y: topY,
-          });
-        }
-
-        // If values crossed lower edge
-        if ((prevY < bottomY) === (bottomY <= currY)) {
-          x2 = currX - prevX;
-          y1 = bottomY - prevY;
-          y2 = currY - prevY;
-          x1 = y1 * x2 / y2;
-
-          intersectionPoints.bottom.push({
-            x: xScale.invert(prevX + x1),
-            y: bottomY,
-          });
-        }
-      }
-      ;
-    });
-
-    return intersectionPoints;
-  }
-
-  protected _getResetYFunction() {
-    // gets the y-value generator for the animation start point
-    let yDomain = this.y().scale.domain();
-    let domainMax = Math.max(yDomain[0], yDomain[1]);
-    let domainMin = Math.min(yDomain[0], yDomain[1]);
-    // start from zero, or the closest domain value to zero
-    // avoids lines zooming on from offscreen.
-    let startValue = (domainMax < 0 && domainMax) || (domainMin > 0 && domainMin) || 0;
-    let scaledStartValue = this.y().scale.scale(startValue);
-    return (d: any, i: number, dataset: Dataset) => scaledStartValue;
-  }
-
-  protected _generateDrawSteps(): Drawers.DrawStep[] {
-    let drawSteps: Drawers.DrawStep[] = [];
-    if (this._animateOnNextRender()) {
-      let attrToProjector = this._generateAttrToProjector();
-      attrToProjector["d"] = this._constructLineProjector(Plot._scaledAccessor(this.x()), this._getResetYFunction());
-      drawSteps.push({ attrToProjector: attrToProjector, animator: this._getAnimator(Plots.Animator.RESET) });
-    }
-
-    drawSteps.push({
-      attrToProjector: this._generateAttrToProjector(),
-      animator: this._getAnimator(Plots.Animator.MAIN)
-    });
-
-    return drawSteps;
-  }
-
-  protected _generateAttrToProjector() {
-    let attrToProjector = super._generateAttrToProjector();
-    Object.keys(attrToProjector).forEach((attribute: string) => {
-      if (attribute === "d") {
-        return;
-      }
-      let projector = attrToProjector[attribute];
-      attrToProjector[attribute] = (data: any[], i: number, dataset: Dataset) =>
-        data.length > 0 ? projector(data[0], i, dataset) : null;
-    });
-
-    return attrToProjector;
-  }
-
-  public entitiesAt(point: Point): PlotEntity[] {
-    const entity = this.entityNearestByXThenY(point);
-    if (entity != null) {
-      return [entity];
-    } else {
-      return [];
-    }
   }
 
   /**
@@ -391,26 +199,7 @@ export class Line<X> extends XYPlot<X, number> {
    */
   public entitiesIn(xRange: Range, yRange: Range): PlotEntity[];
   public entitiesIn(xRangeOrBounds: Range | Bounds, yRange?: Range): PlotEntity[] {
-    let dataXRange: Range;
-    let dataYRange: Range;
-    if (yRange == null) {
-      let bounds = (<Bounds> xRangeOrBounds);
-      dataXRange = { min: bounds.topLeft.x, max: bounds.bottomRight.x };
-      dataYRange = { min: bounds.topLeft.y, max: bounds.bottomRight.y };
-    } else {
-      dataXRange = (<Range> xRangeOrBounds);
-      dataYRange = yRange;
-    }
-
-    const xProjector = Plot._scaledAccessor(this.x());
-    const yProjector = Plot._scaledAccessor(this.y());
-    return this.entities().filter((entity) => {
-      const { datum, index, dataset } = entity;
-
-      const x = xProjector(datum, index, dataset);
-      const y = yProjector(datum, index, dataset);
-      return dataXRange.min <= x && x <= dataXRange.max && dataYRange.min <= y && y <= dataYRange.max;
-    });
+    return this._plot.entitiesIn(xRangeOrBounds as Range, yRange);
   }
 
   /**
@@ -420,171 +209,14 @@ export class Line<X> extends XYPlot<X, number> {
    * @returns {PlotEntity} The nearest PlotEntity, or undefined if no PlotEntity can be found.
    */
   public entityNearestByXThenY(queryPoint: Point): PlotEntity {
-    let minXDist = Infinity;
-    let minYDist = Infinity;
-    let closest: PlotEntity;
-
-    const chartBounds = this.bounds();
-    this.entities().forEach((entity) => {
-      if (!this._entityVisibleOnPlot(entity, chartBounds)) {
-        return;
-      }
-      let xDist = Math.abs(queryPoint.x - entity.position.x);
-      let yDist = Math.abs(queryPoint.y - entity.position.y);
-
-      if (xDist < minXDist || xDist === minXDist && yDist < minYDist) {
-        closest = entity;
-        minXDist = xDist;
-        minYDist = yDist;
-      }
-    });
-
-    return closest;
+    return this._plot.entityNearestByXThenY(queryPoint);
   }
 
-  protected _propertyProjectors(): AttributeToProjector {
-    let propertyToProjectors = super._propertyProjectors();
-    propertyToProjectors["d"] = this._constructLineProjector(Plot._scaledAccessor(this.x()), Plot._scaledAccessor(this.y()));
-    return propertyToProjectors;
-  }
-
-  protected _constructLineProjector(xProjector: Projector, yProjector: Projector) {
-    let definedProjector = (d: any, i: number, dataset: Dataset) => {
-      let positionX = Plot._scaledAccessor(this.x())(d, i, dataset);
-      let positionY = Plot._scaledAccessor(this.y())(d, i, dataset);
-      return positionX != null && !Utils.Math.isNaN(positionX) &&
-        positionY != null && !Utils.Math.isNaN(positionY);
-    };
-    return (datum: any, index: number, dataset: Dataset) => {
-      return d3.svg.line()
-        .x((innerDatum, innerIndex) => xProjector(innerDatum, innerIndex, dataset))
-        .y((innerDatum, innerIndex) => yProjector(innerDatum, innerIndex, dataset))
-        .interpolate(this.interpolator())
-        .defined((innerDatum, innerIndex) => definedProjector(innerDatum, innerIndex, dataset))(datum);
-    };
-  }
-
-  protected _getDataToDraw(): Utils.Map<Dataset, any[]> {
-    let dataToDraw = new Utils.Map<Dataset, any[]>();
-
-    this.datasets().forEach((dataset) => {
-      let data = dataset.data();
-
-      if (!this._croppedRenderingEnabled && !this._downsamplingEnabled) {
-        dataToDraw.set(dataset, [data]);
-        return;
-      }
-
-      let filteredDataIndices = data.map((d, i) => i);
-      if (this._croppedRenderingEnabled) {
-        filteredDataIndices = this._filterCroppedRendering(dataset, filteredDataIndices);
-      }
-      if (this._downsamplingEnabled) {
-        filteredDataIndices = this._filterDownsampling(dataset, filteredDataIndices);
-      }
-      dataToDraw.set(dataset, [filteredDataIndices.map((d, i) => data[d])]);
-    });
-
-    return dataToDraw;
-  }
-
-  private _filterCroppedRendering(dataset: Dataset, indices: number[]) {
-    let xProjector = Plot._scaledAccessor(this.x());
-    let yProjector = Plot._scaledAccessor(this.y());
-
-    let data = dataset.data();
-    let filteredDataIndices: number[] = [];
-    let pointInViewport = (x: number, y: number) => {
-      return Utils.Math.inRange(x, 0, this.width()) &&
-        Utils.Math.inRange(y, 0, this.height());
-    };
-
-    for (let i = 0; i < indices.length; i++) {
-      let currXPoint = xProjector(data[indices[i]], indices[i], dataset);
-      let currYPoint = yProjector(data[indices[i]], indices[i], dataset);
-      let shouldShow = pointInViewport(currXPoint, currYPoint);
-
-      if (!shouldShow && indices[i - 1] != null && data[indices[i - 1]] != null) {
-        let prevXPoint = xProjector(data[indices[i - 1]], indices[i - 1], dataset);
-        let prevYPoint = yProjector(data[indices[i - 1]], indices[i - 1], dataset);
-        shouldShow = shouldShow || pointInViewport(prevXPoint, prevYPoint);
-      }
-
-      if (!shouldShow && indices[i + 1] != null && data[indices[i + 1]] != null) {
-        let nextXPoint = xProjector(data[indices[i + 1]], indices[i + 1], dataset);
-        let nextYPoint = yProjector(data[indices[i + 1]], indices[i + 1], dataset);
-        shouldShow = shouldShow || pointInViewport(nextXPoint, nextYPoint);
-      }
-
-      if (shouldShow) {
-        filteredDataIndices.push(indices[i]);
-      }
-    }
-    return filteredDataIndices;
-  }
-
-  private _filterDownsampling(dataset: Dataset, indices: number[]) {
-    if (indices.length === 0) {
-      return [];
-    }
-    let data = dataset.data();
-    let scaledXAccessor = Plot._scaledAccessor(this.x());
-    let scaledYAccessor = Plot._scaledAccessor(this.y());
-    let filteredIndices = [indices[0]];
-
-    let indexOnCurrentSlope = (i: number, currentSlope: number) => {
-      let p1x = scaledXAccessor(data[indices[i]], indices[i], dataset);
-      let p1y = scaledYAccessor(data[indices[i]], indices[i], dataset);
-      let p2x = scaledXAccessor(data[indices[i + 1]], indices[i + 1], dataset);
-      let p2y = scaledYAccessor(data[indices[i + 1]], indices[i + 1], dataset);
-      if (currentSlope === Infinity) {
-        return Math.floor(p1x) === Math.floor(p2x);
-      } else {
-        let expectedP2y = p1y + (p2x - p1x) * currentSlope;
-        return Math.floor(p2y) === Math.floor(expectedP2y);
-      }
-    };
-
-    for (let i = 0; i < indices.length - 1;) {
-      let indexFirst = indices[i];
-      let p1x = scaledXAccessor(data[indices[i]], indices[i], dataset);
-      let p1y = scaledYAccessor(data[indices[i]], indices[i], dataset);
-      let p2x = scaledXAccessor(data[indices[i + 1]], indices[i + 1], dataset);
-      let p2y = scaledYAccessor(data[indices[i + 1]], indices[i + 1], dataset);
-      let currentSlope = (Math.floor(p1x) === Math.floor(p2x)) ? Infinity : (p2y - p1y) / (p2x - p1x);
-      let indexMin = indices[i];
-      let minScaledValue = (currentSlope === Infinity) ? p1y : p1x;
-      let indexMax = indexMin;
-      let maxScaledValue = minScaledValue;
-      let firstIndexOnCurrentSlope = true;
-
-      while (i < indices.length - 1 && (firstIndexOnCurrentSlope || indexOnCurrentSlope(i, currentSlope))) {
-        i++;
-        firstIndexOnCurrentSlope = false;
-        let currScaledValue = currentSlope === Infinity ? scaledYAccessor(data[indices[i]], indices[i], dataset) :
-          scaledXAccessor(data[indices[i]], indices[i], dataset);
-        if (currScaledValue > maxScaledValue) {
-          maxScaledValue = currScaledValue;
-          indexMax = indices[i];
-        }
-        if (currScaledValue < minScaledValue) {
-          minScaledValue = currScaledValue;
-          indexMin = indices[i];
-        }
-      }
-
-      let indexLast = indices[i];
-
-      if (indexMin !== indexFirst) {
-        filteredIndices.push(indexMin);
-      }
-      if (indexMax !== indexMin && indexMax !== indexFirst) {
-        filteredIndices.push(indexMax);
-      }
-      if (indexLast !== indexFirst && indexLast !== indexMin && indexLast !== indexMax) {
-        filteredIndices.push(indexLast);
-      }
-    }
-    return filteredIndices;
+  protected _createPlot() {
+    return new BaseLinePlot((dataset) => new Drawers.Line(dataset),
+      this,
+      () => this.width(),
+      () => this.height()
+    );
   }
 }

@@ -3,9 +3,10 @@
  * @license MIT
  */
 
+import { IComponent } from "../components";
 import { Dataset } from "../core/dataset";
 import { Point, Entity, Accessor } from "../core/interfaces";
-import { Drawer } from "../drawers/drawer";
+import { Drawer, IDrawer } from "../drawers/drawer";
 import { Plot } from "../plots/plot";
 import { Scale, TransformableScale } from "../scales/scale";
 
@@ -20,16 +21,16 @@ export interface LightweightPlotEntity {
   datasetIndex: number;
   position: Point;
   index: number;
-  component: Plot;
-  drawer: Drawer;
+  component: IComponent<any>;
+  drawer: IDrawer;
   validDatumIndex: number;
 }
 
-export interface PlotEntity extends Entity<Plot> {
+export interface PlotEntity extends Entity<IComponent<any>> {
   dataset: Dataset;
   datasetIndex: number;
   index: number;
-  component: Plot;
+  component: IComponent<any>;
 }
 
 export interface AccessorScaleBinding<D, R> {

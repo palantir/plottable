@@ -4,15 +4,33 @@ import * as Utils from "../utils";
 import * as Scales from "../scales";
 
 import { BasePlot, IPlot, DrawerFactory } from "./basePlot";
-import { TransformableAccessorScaleBinding } from "./commons";
+import { LightweightPlotEntity, PlotEntity, TransformableAccessorScaleBinding } from "./commons";
 
+import { IComponent } from "../components";
 import { Dataset } from "../core/dataset";
 import { Accessor, Point } from "../core/interfaces";
 import { Scale, ScaleCallback } from "../scales/scale";
 
 export interface IXYPlot<X, Y> extends IPlot {
+  /**
+   * Gets the automatic domain adjustment mode for visible points.
+   */
+  autorangeMode(): string;
+  /**
+   * Sets the automatic domain adjustment mode for visible points to operate against the X Scale, Y Scale, or neither.
+   * If "x" or "y" is specified the adjustment is immediately performed.
+   *
+   * @param {string} autorangeMode One of "x"/"y"/"none".
+   *   "x" will adjust the x Scale in relation to changes in the y domain.
+   *   "y" will adjust the y Scale in relation to changes in the x domain.
+   *   "none" means neither Scale will change automatically.
+   * @returns {XYPlot} The calling XYPlot.
+   */
+  autorangeMode(autorangeMode: string): this;
+  autorangeMode(autorangeMode?: string): any
   computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number): this;
   destroy(): this;
+  showAllData(): this;
   /**
    * Gets the TransformableAccessorScaleBinding for X.
    */
@@ -68,14 +86,47 @@ export class BaseXYPlot<X, Y> extends BasePlot implements IXYPlot<X, Y> {
   private _adjustYDomainOnChangeFromXCallback: ScaleCallback<Scale<any, any>>;
   private _adjustXDomainOnChangeFromYCallback: ScaleCallback<Scale<any, any>>;
 
-  constructor(drawerFactory: DrawerFactory, width: () => number, height: () => number) {
-    super(drawerFactory);
+  constructor(drawerFactory: DrawerFactory, component: IComponent<any>, width: () => number, height: () => number) {
+    super(drawerFactory, component);
 
     this._width = width;
     this._height = height;
 
     this._adjustXDomainOnChangeFromYCallback = (scale) => this._adjustXDomainOnChangeFromY();
     this._adjustYDomainOnChangeFromXCallback = (scale) => this._adjustYDomainOnChangeFromX();
+  }
+
+  public autorangeMode(): string;
+  public autorangeMode(autorangeMode: string): this;
+  public autorangeMode(autorangeMode?: string): any {
+    if (autorangeMode == null) {
+      if (this._autoAdjustXScaleDomain) {
+        return "x";
+      }
+      if (this._autoAdjustYScaleDomain) {
+        return "y";
+      }
+      return "none";
+    }
+    switch (autorangeMode) {
+      case "x":
+        this._autoAdjustXScaleDomain = true;
+        this._autoAdjustYScaleDomain = false;
+        this._adjustXDomainOnChangeFromY();
+        break;
+      case "y":
+        this._autoAdjustXScaleDomain = false;
+        this._autoAdjustYScaleDomain = true;
+        this._adjustYDomainOnChangeFromX();
+        break;
+      case "none":
+        this._autoAdjustXScaleDomain = false;
+        this._autoAdjustYScaleDomain = false;
+        break;
+      default:
+        throw new Error("Invalid scale name '" + autorangeMode + "', must be 'x', 'y' or 'none'");
+    }
+    return this;
   }
 
   public computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number) {
@@ -106,7 +157,22 @@ export class BaseXYPlot<X, Y> extends BasePlot implements IXYPlot<X, Y> {
     }
 
     return this;
- }
+  }
+
+  public entityNearest(queryPoint: Point): PlotEntity {
+    // by default, the entity index stores position information in the data space
+    // the default impelentation of the entityNearest must convert the chart bounding
+    // box as well as the query point to the data space before it can make a comparison
+    const invertedChartBounds = this._invertedBounds();
+    const invertedQueryPoint = this._invertPixelPoint(queryPoint);
+    return super.entityNearest(invertedQueryPoint, invertedChartBounds);
+  }
+
+  public showAllData() {
+    this._updateXExtentsAndAutodomain();
+    this._updateYExtentsAndAutodomain();
+    return this;
+  }
 
   public x(): TransformableAccessorScaleBinding<X, number>;
   public x(x: number | Accessor<number>): this;
@@ -166,6 +232,13 @@ export class BaseXYPlot<X, Y> extends BasePlot implements IXYPlot<X, Y> {
     }
   }
 
+  protected _buildLightweightPlotEntities(datasets?: Dataset[]): LightweightPlotEntity[] {
+    return super._buildLightweightPlotEntities(datasets).map((lightweightPlotEntity) => {
+      lightweightPlotEntity.position = this._invertPixelPoint(lightweightPlotEntity.position);
+      return lightweightPlotEntity;
+    });
+  }
+
   protected _filterForProperty(property: string) {
     if (property === "x" && this._autoAdjustXScaleDomain) {
       return this._makeFilterByProperty("y");
@@ -189,6 +262,24 @@ export class BaseXYPlot<X, Y> extends BasePlot implements IXYPlot<X, Y> {
       dataToDraw.set(dataset, dataToDraw.get(dataset).filter((d, i) => definedFunction(d, i, dataset)));
     });
     return dataToDraw;
+  }
+
+  /**
+   * _invertPixelPoint converts a point in pixel coordinates to a point in data coordinates
+   * @param {Point} point Representation of the point in pixel coordinates
+   * @return {Point} Returns the point represented in data coordinates
+   */
+  protected _invertPixelPoint(point: Point): Point {
+    const xScale = this.x();
+    const yScale = this.y();
+
+    return { x: xScale.scale.invertedTransformation(point.x), y: yScale.scale.invertedTransformation(point.y) };
+  }
+
+  protected _pixelPoint(datum: any, index: number, dataset: Dataset): Point {
+    let xProjector = BasePlot._scaledAccessor(this.x());
+    let yProjector = BasePlot._scaledAccessor(this.y());
+    return { x: xProjector(datum, index, dataset), y: yProjector(datum, index, dataset) };
   }
 
   protected _projectorsReady() {
@@ -230,6 +321,33 @@ export class BaseXYPlot<X, Y> extends BasePlot implements IXYPlot<X, Y> {
     if (this._autoAdjustXScaleDomain) {
       this._updateXExtentsAndAutodomain();
     }
+  }
+
+  /**
+   * Returns the bounds of the plot in the Data space ensures that the topLeft
+   * and bottomRight points represent the minima and maxima of the Data space, respectively
+   @returns {Bounds}
+   */
+  private _invertedBounds() {
+    const bounds = this._component.bounds();
+    const maybeTopLeft = this._invertPixelPoint(bounds.topLeft);
+    const maybeBottomRight = this._invertPixelPoint(bounds.bottomRight);
+
+    // Scale domains can map from lowest to highest or highest to lowest (eg [0, 1] or [1, 0]).
+    // What we're interested in is a domain space equivalent to the concept of topLeft
+    // and bottomRight, not a true mapping from point to domain. This is in keeping
+    // with our definition of {Bounds}, where the topLeft coordinate is minimal
+    // and the bottomRight is maximal.
+    return {
+      topLeft: {
+        x: Math.min(maybeTopLeft.x, maybeBottomRight.x),
+        y: Math.min(maybeTopLeft.y, maybeBottomRight.y)
+      },
+      bottomRight: {
+        x: Math.max(maybeBottomRight.x, maybeTopLeft.x),
+        y: Math.max(maybeBottomRight.y, maybeTopLeft.y)
+      }
+    };
   }
 
   private _makeFilterByProperty(property: string) {

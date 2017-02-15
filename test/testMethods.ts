@@ -128,7 +128,7 @@ export function assertEntitiesEqual(actual: Plottable.Entity<Plottable.SVGCompon
 export function assertPlotEntitiesEqual(actual: Plottable.Plots.PlotEntity,
                                         expected: Plottable.Plots.PlotEntity,
                                         msg: string) {
-  assertEntitiesEqual(actual, expected, msg);
+  assertEntitiesEqual(actual as any, expected as any, msg);
   assert.strictEqual(actual.dataset, expected.dataset, msg + " (dataset)");
   assert.strictEqual(actual.index, expected.index, msg + " (index)");
 }

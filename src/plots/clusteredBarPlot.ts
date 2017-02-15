@@ -6,13 +6,16 @@
 import { Dataset } from "../core/dataset";
 import * as Scales from "../scales";
 import * as Utils from "../utils";
+import * as Drawers from "../drawers";
+
 
 import { Bar } from "./barPlot";
 import { Plot } from "./plot";
 
-export class ClusteredBar<X, Y> extends Bar<X, Y> {
+import { BaseClusteredBarPlot, IClusteredBarPlot } from "./baseClusteredBarPlot";
 
-  private _clusterOffsets: Utils.Map<Dataset, number>;
+export class ClusteredBar<X, Y> extends Bar<X, Y> implements IClusteredBarPlot<X, Y> {
+  protected _plot: BaseClusteredBarPlot<X, Y>;
 
   /**
    * A ClusteredBar Plot groups bars across Datasets based on the primary value of the bars.
@@ -24,44 +27,13 @@ export class ClusteredBar<X, Y> extends Bar<X, Y> {
    */
   constructor(orientation = Bar.ORIENTATION_VERTICAL) {
     super(orientation);
-    this._clusterOffsets = new Utils.Map<Dataset, number>();
   }
 
-  protected _generateAttrToProjector() {
-    let attrToProjector = super._generateAttrToProjector();
-    // the width is constant, so set the inner scale range to that
-    let innerScale = this._makeInnerScale();
-    let innerWidthF = (d: any, i: number) => innerScale.rangeBand();
-    attrToProjector["width"] = this._isVertical ? innerWidthF : attrToProjector["width"];
-    attrToProjector["height"] = !this._isVertical ? innerWidthF : attrToProjector["height"];
-
-    let xAttr = attrToProjector["x"];
-    let yAttr = attrToProjector["y"];
-    attrToProjector["x"] = this._isVertical ?
-      (d: any, i: number, ds: Dataset) => xAttr(d, i, ds) + this._clusterOffsets.get(ds) :
-      (d: any, i: number, ds: Dataset) => xAttr(d, i, ds);
-    attrToProjector["y"] = this._isVertical ?
-      (d: any, i: number, ds: Dataset) => yAttr(d, i, ds) :
-      (d: any, i: number, ds: Dataset) => yAttr(d, i, ds) + this._clusterOffsets.get(ds);
-
-    return attrToProjector;
-  }
-
-  private _updateClusterPosition() {
-    let innerScale = this._makeInnerScale();
-    this.datasets().forEach((d, i) => this._clusterOffsets.set(d, innerScale.scale(String(i)) - innerScale.rangeBand() / 2));
-  }
-
-  private _makeInnerScale() {
-    let innerScale = new Scales.Category();
-    innerScale.domain(this.datasets().map((d, i) => String(i)));
-    let widthProjector = Plot._scaledAccessor(this.attr("width"));
-    innerScale.range([0, widthProjector(null, 0, null)]);
-    return innerScale;
-  }
-
-  protected _getDataToDraw(): Utils.Map<Dataset, any[]> {
-    this._updateClusterPosition();
-    return super._getDataToDraw();
+  protected _createPlot() {
+    return new BaseClusteredBarPlot((dataset) => new Drawers.Rectangle(dataset),
+      this,
+      () => this.width(),
+      () => this.height()
+    );
   }
 }

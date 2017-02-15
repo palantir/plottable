@@ -4,15 +4,35 @@ import { BaseXYPlot, IXYPlot } from "./baseXYPlot";
 
 import * as Plots from "./";
 import * as Drawers from "../drawers";
+import { DrawerFactory }  from "./basePlot";
 import * as Scales from "../scales";
 import * as Utils from "../utils";
 import { Null } from "../animators";
 
+import { PlotEntity } from "./commons";
+import { LabeledComponent } from "../components/labeled";
+
 import { Dataset } from "../core/dataset";
-import { Accessor, AttributeToProjector, Projector } from "../core/interfaces";
+import { Accessor, AttributeToProjector, Bounds, Point, Projector, Range } from "../core/interfaces";
 import { Scale } from "../scales/scale";
 
 export interface IRectanglePlot<X, Y> extends IXYPlot<X, Y> {
+  /**
+   * Gets the Entities that intersect the Bounds.
+   *
+   * @param {Bounds} bounds
+   * @returns {PlotEntity[]}
+   */
+  entitiesIn(bounds: Bounds): PlotEntity[];
+  /**
+   * Gets the Entities that intersect the area defined by the ranges.
+   *
+   * @param {Range} xRange
+   * @param {Range} yRange
+   * @returns {PlotEntity[]}
+   */
+  entitiesIn(xRange: Range, yRange: Range): PlotEntity[];
+  entitiesIn(xRangeOrBounds: Range | Bounds, yRange?: Range): PlotEntity[];
   /**
    * Gets the AccessorScaleBinding for X2.
    */
@@ -44,6 +64,46 @@ export interface IRectanglePlot<X, Y> extends IXYPlot<X, Y> {
 export class BaseRectanglePlot<X, Y> extends BaseXYPlot<X, Y> implements IRectanglePlot<X, Y> {
   private static _X2_KEY = "x2";
   private static _Y2_KEY = "y2";
+
+  protected _component: LabeledComponent;
+
+  constructor(drawerFactory: DrawerFactory,
+    component: LabeledComponent,
+    width: () => number,
+    height: () =>  number) {
+    super(drawerFactory, component, width, height);
+  }
+
+  public entitiesAt(point: Point) {
+    let attrToProjector = this._generateAttrToProjector();
+    return this.entities().filter((entity) => {
+      let datum = entity.datum;
+      let index = entity.index;
+      let dataset = entity.dataset;
+      let x = attrToProjector["x"](datum, index, dataset);
+      let y = attrToProjector["y"](datum, index, dataset);
+      let width = attrToProjector["width"](datum, index, dataset);
+      let height = attrToProjector["height"](datum, index, dataset);
+      return x <= point.x && point.x <= x + width && y <= point.y && point.y <= y + height;
+    });
+  }
+
+  public entitiesIn(bounds: Bounds): PlotEntity[];
+
+  public entitiesIn(xRange: Range, yRange: Range): PlotEntity[];
+  public entitiesIn(xRangeOrBounds: Range | Bounds, yRange?: Range): PlotEntity[] {
+    let dataXRange: Range;
+    let dataYRange: Range;
+    if (yRange == null) {
+      let bounds = (<Bounds> xRangeOrBounds);
+      dataXRange = { min: bounds.topLeft.x, max: bounds.bottomRight.x };
+      dataYRange = { min: bounds.topLeft.y, max: bounds.bottomRight.y };
+    } else {
+      dataXRange = (<Range> xRangeOrBounds);
+      dataYRange = yRange;
+    }
+    return this._entitiesIntersecting(dataXRange, dataYRange);
+  }
 
   public x(): Plots.TransformableAccessorScaleBinding<X, number>;
   public x(x: number | Accessor<number>): this;
@@ -129,6 +189,10 @@ export class BaseRectanglePlot<X, Y> extends BaseXYPlot<X, Y> implements IRectan
     return this;
   }
 
+  protected _additionalPaint(time: number) {
+    Utils.Window.setTimeout(() => this._component.drawLabels(this._getDataToDraw(), this._generateAttrToProjector()), time);
+  }
+
   protected _filterForProperty(property: string) {
     if (property === "x2") {
       return super._filterForProperty("x");
@@ -150,37 +214,23 @@ export class BaseRectanglePlot<X, Y> extends BaseXYPlot<X, Y> implements IRectan
     let xScale = this.x().scale;
     let yScale = this.y().scale;
 
-    let widthProjection: Projector = null;
-    let heightProjection: Projector = null;
-    let xProjection: Projector = null;
-    let yProjection: Projector = null;
-
     if (x2Attr != null) {
-      widthProjection = (d, i, dataset) => Math.abs(x2Attr(d, i, dataset) - xAttr(d, i, dataset));
-      xProjection = (d, i, dataset) => Math.min(x2Attr(d, i, dataset), xAttr(d, i, dataset));
+      attrToProjector["width"] = (d, i, dataset) => Math.abs(x2Attr(d, i, dataset) - xAttr(d, i, dataset));
+      attrToProjector["x"] = (d, i, dataset) => Math.min(x2Attr(d, i, dataset), xAttr(d, i, dataset));
     } else {
-      widthProjection = (d, i, dataset) => this._rectangleWidth(xScale);
-      xProjection = (d, i, dataset) => xAttr(d, i, dataset) - 0.5 * widthProjection(d, i, dataset);
+      attrToProjector["width"] = (d, i, dataset) => this._rectangleWidth(xScale);
+      attrToProjector["x"] = (d, i, dataset) => xAttr(d, i, dataset) - 0.5 * attrToProjector["width"](d, i, dataset);
     }
 
     if (y2Attr != null) {
-      heightProjection = (d, i, dataset) => Math.abs(y2Attr(d, i, dataset) - yAttr(d, i, dataset));
-      yProjection = (d, i, dataset) => {
-        return Math.max(y2Attr(d, i, dataset), yAttr(d, i, dataset)) - heightProjection(d, i, dataset);
+      attrToProjector["height"] = (d, i, dataset) => Math.abs(y2Attr(d, i, dataset) - yAttr(d, i, dataset));
+      attrToProjector["y"] = (d, i, dataset) => {
+        return Math.max(y2Attr(d, i, dataset), yAttr(d, i, dataset)) - attrToProjector["height"](d, i, dataset);
       };
     } else {
-      heightProjection = (d, i, dataset) => this._rectangleWidth(yScale);
-      yProjection = (d, i, dataset) => yAttr(d, i, dataset) - 0.5 * heightProjection(d, i, dataset);
+      attrToProjector["height"] = (d, i, dataset) => this._rectangleWidth(yScale);
+      attrToProjector["y"] = (d, i, dataset) => yAttr(d, i, dataset) - 0.5 * attrToProjector["height"](d, i, dataset);
     }
-
-    attrToProjector["fillRect"] = (d, i, dataset) => {
-      return {
-        height: heightProjection(d, i, dataset),
-        width: widthProjection(d, i, dataset),
-        x: xProjection(d, i, dataset),
-        y: yProjection(d, i, dataset),
-      };
-    };
 
     // Clean up the attributes projected onto the SVG elements
     delete attrToProjector[BaseRectanglePlot._X2_KEY];
@@ -190,25 +240,32 @@ export class BaseRectanglePlot<X, Y> extends BaseXYPlot<X, Y> implements IRectan
   }
 
   protected _generateDrawSteps(): Drawers.DrawStep[] {
-    return [{ attrToProjector: this._generateAttrToProjector(), animator: new Null() }];
+    return [{ attrToProjector: this._generateAttrToProjector(), animator: this._getAnimator("rectangles") }];
   }
 
   protected _getDataToDraw(): Utils.Map<Dataset, any[]> {
     let dataToDraw = new Utils.Map<Dataset, any[]>();
-    const fillProjector = this._generateAttrToProjector()["fillRect"]
+    let attrToProjector = this._generateAttrToProjector();
     this.datasets().forEach((dataset) => {
-      let data = dataset.data().filter((d, i) => {
-          const fillProjection = fillProjector(d, i, dataset);
-
-          return Utils.Math.isValidNumber(fillProjection.x) &&
-            Utils.Math.isValidNumber(fillProjection.y) &&
-            Utils.Math.isValidNumber(fillProjection.width) &&
-            Utils.Math.isValidNumber(fillProjection.height);
-      });
-
+      let data = dataset.data().filter((d, i) => Utils.Math.isValidNumber(attrToProjector["x"](d, i, dataset)) &&
+      Utils.Math.isValidNumber(attrToProjector["y"](d, i, dataset)) &&
+      Utils.Math.isValidNumber(attrToProjector["width"](d, i, dataset)) &&
+      Utils.Math.isValidNumber(attrToProjector["height"](d, i, dataset)));
       dataToDraw.set(dataset, data);
     });
     return dataToDraw;
+  }
+
+
+  protected _pixelPoint(datum: any, index: number, dataset: Dataset) {
+    let attrToProjector = this._generateAttrToProjector();
+    let rectX = attrToProjector["x"](datum, index, dataset);
+    let rectY = attrToProjector["y"](datum, index, dataset);
+    let rectWidth = attrToProjector["width"](datum, index, dataset);
+    let rectHeight = attrToProjector["height"](datum, index, dataset);
+    let x = rectX + rectWidth / 2;
+    let y = rectY + rectHeight / 2;
+    return { x: x, y: y };
   }
 
   protected _propertyProjectors(): AttributeToProjector {
@@ -229,6 +286,27 @@ export class BaseRectanglePlot<X, Y> extends BaseXYPlot<X, Y> implements IRectan
     } else if (property === "y") {
       super._updateExtentsForProperty("y2");
     }
+  }
+
+  private _entityBBox(datum: any, index: number, dataset: Dataset, attrToProjector: AttributeToProjector): SVGRect {
+    return {
+      x: attrToProjector["x"](datum, index, dataset),
+      y: attrToProjector["y"](datum, index, dataset),
+      width: attrToProjector["width"](datum, index, dataset),
+      height: attrToProjector["height"](datum, index, dataset),
+    };
+  }
+
+  private _entitiesIntersecting(xValOrRange: number | Range, yValOrRange: number | Range): PlotEntity[] {
+    let intersected: PlotEntity[] = [];
+    let attrToProjector = this._generateAttrToProjector();
+    this.entities().forEach((entity) => {
+      if (Utils.DOM.intersectsBBox(xValOrRange, yValOrRange,
+        this._entityBBox(entity.datum, entity.index, entity.dataset, attrToProjector))) {
+        intersected.push(entity);
+      }
+    });
+    return intersected;
   }
 
   private _rectangleWidth(scale: Scale<any, number>) {

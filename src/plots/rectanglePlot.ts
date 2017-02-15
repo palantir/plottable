@@ -10,6 +10,7 @@ import * as Animators from "../animators";
 import { Accessor, Point, Bounds, Range, AttributeToProjector } from "../core/interfaces";
 import { Dataset } from "../core/dataset";
 import * as Drawers from "../drawers";
+import { Rectangle as RectangleDrawer } from "../drawers";
 import * as Scales from "../scales";
 import { Scale } from "../scales/scale";
 import * as Utils from "../utils";
@@ -18,12 +19,12 @@ import * as Plots from "./";
 import { PlotEntity } from "./";
 import { Plot } from "./plot";
 import { XYPlot } from "./xyPlot";
+import { BaseRectanglePlot, IRectanglePlot } from "./baseRectanglePlot";
 
-export class Rectangle<X, Y> extends XYPlot<X, Y> {
-  private static _X2_KEY = "x2";
-  private static _Y2_KEY = "y2";
+export class Rectangle<X, Y> extends XYPlot<X, Y> implements IRectanglePlot<X, Y> {
   private _labelsEnabled = false;
   private _label: Accessor<string> = null;
+  protected _plot: BaseRectanglePlot<X, Y>;
 
   /**
    * A Rectangle Plot displays rectangles based on the data.
@@ -42,69 +43,6 @@ export class Rectangle<X, Y> extends XYPlot<X, Y> {
     this.animator("rectangles", new Animators.Null());
     this.addClass("rectangle-plot");
     this.attr("fill", new Scales.Color().range()[0]);
-  }
-
-  protected _createDrawer(dataset: Dataset): Drawers.Rectangle {
-    return new Drawers.Rectangle(dataset);
-  }
-
-  protected _generateAttrToProjector() {
-    let attrToProjector = super._generateAttrToProjector();
-
-    // Copy each of the different projectors.
-    let xAttr = Plot._scaledAccessor(this.x());
-    let x2Attr = attrToProjector[Rectangle._X2_KEY];
-    let yAttr = Plot._scaledAccessor(this.y());
-    let y2Attr = attrToProjector[Rectangle._Y2_KEY];
-
-    let xScale = this.x().scale;
-    let yScale = this.y().scale;
-
-    if (x2Attr != null) {
-      attrToProjector["width"] = (d, i, dataset) => Math.abs(x2Attr(d, i, dataset) - xAttr(d, i, dataset));
-      attrToProjector["x"] = (d, i, dataset) => Math.min(x2Attr(d, i, dataset), xAttr(d, i, dataset));
-    } else {
-      attrToProjector["width"] = (d, i, dataset) => this._rectangleWidth(xScale);
-      attrToProjector["x"] = (d, i, dataset) => xAttr(d, i, dataset) - 0.5 * attrToProjector["width"](d, i, dataset);
-    }
-
-    if (y2Attr != null) {
-      attrToProjector["height"] = (d, i, dataset) => Math.abs(y2Attr(d, i, dataset) - yAttr(d, i, dataset));
-      attrToProjector["y"] = (d, i, dataset) => {
-        return Math.max(y2Attr(d, i, dataset), yAttr(d, i, dataset)) - attrToProjector["height"](d, i, dataset);
-      };
-    } else {
-      attrToProjector["height"] = (d, i, dataset) => this._rectangleWidth(yScale);
-      attrToProjector["y"] = (d, i, dataset) => yAttr(d, i, dataset) - 0.5 * attrToProjector["height"](d, i, dataset);
-    }
-
-    // Clean up the attributes projected onto the SVG elements
-    delete attrToProjector[Rectangle._X2_KEY];
-    delete attrToProjector[Rectangle._Y2_KEY];
-
-    return attrToProjector;
-  }
-
-  protected _generateDrawSteps(): Drawers.DrawStep[] {
-    return [{ attrToProjector: this._generateAttrToProjector(), animator: this._getAnimator("rectangles") }];
-  }
-
-  protected _updateExtentsForProperty(property: string) {
-    super._updateExtentsForProperty(property);
-    if (property === "x") {
-      super._updateExtentsForProperty("x2");
-    } else if (property === "y") {
-      super._updateExtentsForProperty("y2");
-    }
-  }
-
-  protected _filterForProperty(property: string) {
-    if (property === "x2") {
-      return super._filterForProperty("x");
-    } else if (property === "y2") {
-      return super._filterForProperty("y");
-    }
-    return super._filterForProperty(property);
   }
 
   /**
@@ -128,29 +66,10 @@ export class Rectangle<X, Y> extends XYPlot<X, Y> {
    */
   public x(x: X | Accessor<X>, xScale: Scale<X, number>): this;
   public x(x?: number | Accessor<number> | X | Accessor<X>, xScale?: Scale<X, number>): any {
+        const xReturn = this._plot.x(x as X, xScale);
     if (x == null) {
-      return super.x();
+      return xReturn
     }
-
-    if (xScale == null) {
-      super.x(<number | Accessor<number>>x);
-    } else {
-      super.x(<X | Accessor<X>>x, xScale);
-    }
-
-    if (xScale != null) {
-      let x2Binding = this.x2();
-      let x2 = x2Binding && x2Binding.accessor;
-      if (x2 != null) {
-        this._bindProperty(Rectangle._X2_KEY, x2, xScale);
-      }
-    }
-
-    // The x and y scales should render in bands with no padding for category scales
-    if (xScale instanceof Scales.Category) {
-      (<Scales.Category> <any> xScale).innerPadding(0).outerPadding(0);
-    }
-
     return this;
   }
 
@@ -167,13 +86,10 @@ export class Rectangle<X, Y> extends XYPlot<X, Y> {
    */
   public x2(x2: number | Accessor<number> | X | Accessor<X>): this;
   public x2(x2?: number | Accessor<number> | X | Accessor<X>): any {
+    const x2Return = this._plot.x2(x2);
     if (x2 == null) {
-      return this._propertyBindings.get(Rectangle._X2_KEY);
+      return x2Return;
     }
-
-    let xBinding = this.x();
-    let xScale = xBinding && xBinding.scale;
-    this._bindProperty(Rectangle._X2_KEY, x2, xScale);
 
     this.render();
     return this;
@@ -200,29 +116,10 @@ export class Rectangle<X, Y> extends XYPlot<X, Y> {
    */
   public y(y: Y | Accessor<Y>, yScale: Scale<Y, number>): this;
   public y(y?: number | Accessor<number> | Y | Accessor<Y>, yScale?: Scale<Y, number>): any {
+    const yReturn = this._plot.y(y as Y, yScale);
     if (y == null) {
-      return super.y();
+      return yReturn;
     }
-
-    if (yScale == null) {
-      super.y(<number | Accessor<number>>y);
-    } else {
-      super.y(<Y | Accessor<Y>>y, yScale);
-    }
-
-    if (yScale != null) {
-      let y2Binding = this.y2();
-      let y2 = y2Binding && y2Binding.accessor;
-      if (y2 != null) {
-        this._bindProperty(Rectangle._Y2_KEY, y2, yScale);
-      }
-    }
-
-    // The x and y scales should render in bands with no padding for category scales
-    if (yScale instanceof Scales.Category) {
-      (<Scales.Category> <any> yScale).innerPadding(0).outerPadding(0);
-    }
-
     return this;
   }
 
@@ -239,36 +136,12 @@ export class Rectangle<X, Y> extends XYPlot<X, Y> {
    */
   public y2(y2: number | Accessor<number> | Y | Accessor<Y>): this;
   public y2(y2?: number | Accessor<number> | Y | Accessor<Y>): any {
+    const y2Return = this._plot.y2(y2);
     if (y2 == null) {
-      return this._propertyBindings.get(Rectangle._Y2_KEY);
+      return y2Return;
     }
-
-    let yBinding = this.y();
-    let yScale = yBinding && yBinding.scale;
-    this._bindProperty(Rectangle._Y2_KEY, y2, yScale);
-
     this.render();
     return this;
-  }
-
-  /**
-   * Gets the PlotEntities at a particular Point.
-   *
-   * @param {Point} point The point to query.
-   * @returns {PlotEntity[]} The PlotEntities at the particular point
-   */
-  public entitiesAt(point: Point) {
-    let attrToProjector = this._generateAttrToProjector();
-    return this.entities().filter((entity) => {
-      let datum = entity.datum;
-      let index = entity.index;
-      let dataset = entity.dataset;
-      let x = attrToProjector["x"](datum, index, dataset);
-      let y = attrToProjector["y"](datum, index, dataset);
-      let width = attrToProjector["width"](datum, index, dataset);
-      let height = attrToProjector["height"](datum, index, dataset);
-      return x <= point.x && point.x <= x + width && y <= point.y && point.y <= y + height;
-    });
   }
 
   /**
@@ -287,38 +160,14 @@ export class Rectangle<X, Y> extends XYPlot<X, Y> {
    */
   public entitiesIn(xRange: Range, yRange: Range): PlotEntity[];
   public entitiesIn(xRangeOrBounds: Range | Bounds, yRange?: Range): PlotEntity[] {
-    let dataXRange: Range;
-    let dataYRange: Range;
-    if (yRange == null) {
-      let bounds = (<Bounds> xRangeOrBounds);
-      dataXRange = { min: bounds.topLeft.x, max: bounds.bottomRight.x };
-      dataYRange = { min: bounds.topLeft.y, max: bounds.bottomRight.y };
-    } else {
-      dataXRange = (<Range> xRangeOrBounds);
-      dataYRange = yRange;
+    return this._plot.entitiesIn(xRangeOrBounds as Range, yRange);
+  }
+
+  public drawLabels(dataToDraw: Utils.Map<Dataset, any[]>, attrToProjector: AttributeToProjector) {
+    this._renderArea.selectAll(".label-area").remove();
+    if (this._labelsEnabled && this.label() != null) {
+      this.datasets().forEach((dataset, i) => this._drawLabel(dataToDraw, dataset, i, attrToProjector));
     }
-    return this._entitiesIntersecting(dataXRange, dataYRange);
-  }
-
-  private _entityBBox(datum: any, index: number, dataset: Dataset, attrToProjector: AttributeToProjector): SVGRect {
-    return {
-      x: attrToProjector["x"](datum, index, dataset),
-      y: attrToProjector["y"](datum, index, dataset),
-      width: attrToProjector["width"](datum, index, dataset),
-      height: attrToProjector["height"](datum, index, dataset),
-    };
-  }
-
-  private _entitiesIntersecting(xValOrRange: number | Range, yValOrRange: number | Range): PlotEntity[] {
-    let intersected: PlotEntity[] = [];
-    let attrToProjector = this._generateAttrToProjector();
-    this.entities().forEach((entity) => {
-      if (Utils.DOM.intersectsBBox(xValOrRange, yValOrRange,
-          this._entityBBox(entity.datum, entity.index, entity.dataset, attrToProjector))) {
-        intersected.push(entity);
-      }
-    });
-    return intersected;
   }
 
   /**
@@ -368,28 +217,6 @@ export class Rectangle<X, Y> extends XYPlot<X, Y> {
     }
   }
 
-  protected _propertyProjectors(): AttributeToProjector {
-    let attrToProjector = super._propertyProjectors();
-    if (this.x2() != null) {
-      attrToProjector["x2"] = Plot._scaledAccessor(this.x2());
-    }
-    if (this.y2() != null) {
-      attrToProjector["y2"] = Plot._scaledAccessor(this.y2());
-    }
-    return attrToProjector;
-  }
-
-  protected _pixelPoint(datum: any, index: number, dataset: Dataset) {
-    let attrToProjector = this._generateAttrToProjector();
-    let rectX = attrToProjector["x"](datum, index, dataset);
-    let rectY = attrToProjector["y"](datum, index, dataset);
-    let rectWidth = attrToProjector["width"](datum, index, dataset);
-    let rectHeight = attrToProjector["height"](datum, index, dataset);
-    let x = rectX + rectWidth / 2;
-    let y = rectY + rectHeight / 2;
-    return { x: x, y: y };
-  }
-
   private _rectangleWidth(scale: Scale<any, number>) {
     if (scale instanceof Scales.Category) {
       return (<Scales.Category> scale).rangeBand();
@@ -407,33 +234,7 @@ export class Rectangle<X, Y> extends XYPlot<X, Y> {
     }
   }
 
-  protected _getDataToDraw(): Utils.Map<Dataset, any[]> {
-    let dataToDraw = new Utils.Map<Dataset, any[]>();
-    let attrToProjector = this._generateAttrToProjector();
-    this.datasets().forEach((dataset) => {
-      let data = dataset.data().filter((d, i) => Utils.Math.isValidNumber(attrToProjector["x"](d, i, dataset)) &&
-      Utils.Math.isValidNumber(attrToProjector["y"](d, i, dataset)) &&
-      Utils.Math.isValidNumber(attrToProjector["width"](d, i, dataset)) &&
-      Utils.Math.isValidNumber(attrToProjector["height"](d, i, dataset)));
-      dataToDraw.set(dataset, data);
-    });
-    return dataToDraw;
-  }
-
-  protected _additionalPaint(time: number) {
-    this._renderArea.selectAll(".label-area").remove();
-    if (this._labelsEnabled && this.label() != null) {
-      Utils.Window.setTimeout(() => this._drawLabels(), time);
-    }
-  }
-
-  private _drawLabels() {
-    let dataToDraw = this._getDataToDraw();
-    this.datasets().forEach((dataset, i) => this._drawLabel(dataToDraw, dataset, i));
-  }
-
-  private _drawLabel(dataToDraw: Utils.Map<Dataset, any[]>, dataset: Dataset, datasetIndex: number) {
-    let attrToProjector = this._generateAttrToProjector();
+  private _drawLabel(dataToDraw: Utils.Map<Dataset, any[]>, dataset: Dataset, datasetIndex: number, attrToProjector: AttributeToProjector) {
     let labelArea = this._renderArea.append("g").classed("label-area", true);
     let measurer = new SVGTypewriter.CacheMeasurer(labelArea);
     let writer = new SVGTypewriter.Writer(measurer);
@@ -464,7 +265,7 @@ export class Rectangle<X, Y> extends XYPlot<X, Y> {
         if (xLabelRange.min < xMin || xLabelRange.max > xMax || yLabelRange.min < yMin || yLabelRange.max > yMax) {
           return;
         }
-        if (this._overlayLabel(xLabelRange, yLabelRange, datumIndex, datasetIndex, dataToDraw)) {
+        if (this._overlayLabel(xLabelRange, yLabelRange, datumIndex, datasetIndex, dataToDraw, attrToProjector)) {
           return;
         }
 
@@ -485,8 +286,7 @@ export class Rectangle<X, Y> extends XYPlot<X, Y> {
   }
 
   private _overlayLabel(labelXRange: Range, labelYRange: Range, datumIndex: number, datasetIndex: number,
-                        dataToDraw: Utils.Map<Dataset, any[]>) {
-    let attrToProjector = this._generateAttrToProjector();
+                        dataToDraw: Utils.Map<Dataset, any[]>, attrToProjector: AttributeToProjector) {
     let datasets = this.datasets();
     for (let i = datasetIndex; i < datasets.length; i++) {
       let dataset = datasets[i];
@@ -498,5 +298,21 @@ export class Rectangle<X, Y> extends XYPlot<X, Y> {
       }
     }
     return false;
+  }
+
+  private _entityBBox(datum: any, index: number, dataset: Dataset, attrToProjector: AttributeToProjector): SVGRect {
+    return {
+      x: attrToProjector["x"](datum, index, dataset),
+      y: attrToProjector["y"](datum, index, dataset),
+      width: attrToProjector["width"](datum, index, dataset),
+      height: attrToProjector["height"](datum, index, dataset),
+    };
+  }
+
+  protected _createPlot() {
+    return new BaseRectanglePlot((dataset) => new RectangleDrawer(dataset),
+      this,
+      () => this.width(),
+      () => this.height());
   }
 }

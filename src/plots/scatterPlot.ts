@@ -18,13 +18,10 @@ import { PlotEntity, LightweightPlotEntity, TransformableAccessorScaleBinding, A
 import { Plot } from "./plot";
 import { XYPlot } from "./xyPlot";
 
-export interface LightweightScatterPlotEntity extends LightweightPlotEntity {
-  diameter: Point;
-}
+import { BaseScatterPlot, IScatterPlot } from "./baseScatterPlot";
 
-export class Scatter<X, Y> extends XYPlot<X, Y> {
-  private static _SIZE_KEY = "size";
-  private static _SYMBOL_KEY = "symbol";
+export class Scatter<X, Y> extends XYPlot<X, Y> implements IScatterPlot<X, Y> {
+  protected _plot: BaseScatterPlot<X, Y>;
 
   /**
    * A Scatter Plot draws a symbol at each data point.
@@ -44,25 +41,6 @@ export class Scatter<X, Y> extends XYPlot<X, Y> {
     this.size(6);
     let circleSymbolFactory = SymbolFactories.circle();
     this.symbol(() => circleSymbolFactory);
-  }
-
-  protected _buildLightweightPlotEntities(datasets: Dataset[]) {
-    const lightweightPlotEntities = super._buildLightweightPlotEntities(datasets);
-
-    return lightweightPlotEntities.map((lightweightPlotEntity: LightweightScatterPlotEntity) => {
-      const diameter = Plot._scaledAccessor(this.size())(
-        lightweightPlotEntity.datum,
-        lightweightPlotEntity.index,
-        lightweightPlotEntity.dataset);
-
-      // convert diameter into data space to be on the same scale as the scatter point position
-      lightweightPlotEntity.diameter = this._invertedPixelSize({ x: diameter, y: diameter });
-      return lightweightPlotEntity;
-    });
-  }
-
-  protected _createDrawer(dataset: Dataset): Drawers.Symbol {
-    return new Drawers.Symbol(dataset);
   }
 
   /**
@@ -87,10 +65,10 @@ export class Scatter<X, Y> extends XYPlot<X, Y> {
    */
   public size<S>(size: S | Accessor<S>, scale: Scale<S, number>): this;
   public size<S>(size?: number | Accessor<number> | S | Accessor<S>, scale?: Scale<S, number>): any {
+    const plotSize = this._plot.size(size as S, scale);
     if (size == null) {
-      return this._propertyBindings.get(Scatter._SIZE_KEY);
+      return plotSize;
     }
-    this._bindProperty(Scatter._SIZE_KEY, size, scale);
     this.render();
     return this;
   }
@@ -108,61 +86,13 @@ export class Scatter<X, Y> extends XYPlot<X, Y> {
    */
   public symbol(symbol: Accessor<SymbolFactory>): this;
   public symbol(symbol?: Accessor<SymbolFactory>): any {
+    const plotSymbol = this._plot.symbol(symbol);
+
     if (symbol == null) {
-      return this._propertyBindings.get(Scatter._SYMBOL_KEY);
+      return plotSymbol;
     }
-    this._propertyBindings.set(Scatter._SYMBOL_KEY, { accessor: symbol });
     this.render();
     return this;
-  }
-
-  protected _generateDrawSteps(): Drawers.DrawStep[] {
-    let drawSteps: Drawers.DrawStep[] = [];
-    if (this._animateOnNextRender()) {
-      let resetAttrToProjector = this._generateAttrToProjector();
-
-      let symbolProjector = Plot._scaledAccessor(this.symbol());
-      resetAttrToProjector["d"] = (datum: any, index: number, dataset: Dataset) => symbolProjector(datum, index, dataset)(0);
-      drawSteps.push({ attrToProjector: resetAttrToProjector, animator: this._getAnimator(Plots.Animator.RESET) });
-    }
-
-    drawSteps.push({
-      attrToProjector: this._generateAttrToProjector(),
-      animator: this._getAnimator(Plots.Animator.MAIN)
-    });
-    return drawSteps;
-  }
-
-  protected _entityVisibleOnPlot(entity: LightweightScatterPlotEntity, bounds: Bounds) {
-    const xRange = { min: bounds.topLeft.x, max: bounds.bottomRight.x };
-    const yRange = { min: bounds.topLeft.y, max: bounds.bottomRight.y };
-
-    const translatedBbox = {
-      x: entity.position.x - entity.diameter.x,
-      y: entity.position.y - entity.diameter.y,
-      width: entity.diameter.x,
-      height: entity.diameter.y,
-    };
-
-    return Utils.DOM.intersectsBBox(xRange, yRange, translatedBbox);
-  }
-
-  protected _propertyProjectors(): AttributeToProjector {
-    let propertyToProjectors = super._propertyProjectors();
-
-    let xProjector = Plot._scaledAccessor(this.x());
-    let yProjector = Plot._scaledAccessor(this.y());
-
-    let sizeProjector = Plot._scaledAccessor(this.size());
-
-    propertyToProjectors["transform"] = (datum: any, index: number, dataset: Dataset) =>
-    "translate(" + xProjector(datum, index, dataset) + "," + yProjector(datum, index, dataset) + ")";
-
-    let symbolProjector = Plot._scaledAccessor(this.symbol());
-
-    propertyToProjectors["d"] = (datum: any, index: number, dataset: Dataset) =>
-      symbolProjector(datum, index, dataset)(sizeProjector(datum, index, dataset));
-    return propertyToProjectors;
   }
 
   /**
@@ -181,64 +111,14 @@ export class Scatter<X, Y> extends XYPlot<X, Y> {
    */
   public entitiesIn(xRange: Range, yRange: Range): PlotEntity[];
   public entitiesIn(xRangeOrBounds: Range | Bounds, yRange?: Range): PlotEntity[] {
-    let dataXRange: Range;
-    let dataYRange: Range;
-    if (yRange == null) {
-      let bounds = (<Bounds> xRangeOrBounds);
-      dataXRange = { min: bounds.topLeft.x, max: bounds.bottomRight.x };
-      dataYRange = { min: bounds.topLeft.y, max: bounds.bottomRight.y };
-    } else {
-      dataXRange = (<Range> xRangeOrBounds);
-      dataYRange = yRange;
-    }
-    let xProjector = Plot._scaledAccessor(this.x());
-    let yProjector = Plot._scaledAccessor(this.y());
-    return this.entities().filter((entity) => {
-      let datum = entity.datum;
-      let index = entity.index;
-      let dataset = entity.dataset;
-      let x = xProjector(datum, index, dataset);
-      let y = yProjector(datum, index, dataset);
-      return dataXRange.min <= x && x <= dataXRange.max && dataYRange.min <= y && y <= dataYRange.max;
-    });
+    return this._plot.entitiesIn(xRangeOrBounds as Range, yRange);
   }
 
-  /**
-   * Gets the Entities at a particular Point.
-   *
-   * @param {Point} p
-   * @returns {PlotEntity[]}
-   */
-  public entitiesAt(p: Point) {
-    let xProjector = Plot._scaledAccessor(this.x());
-    let yProjector = Plot._scaledAccessor(this.y());
-    let sizeProjector = Plot._scaledAccessor(this.size());
-    return this.entities().filter((entity) => {
-      let datum = entity.datum;
-      let index = entity.index;
-      let dataset = entity.dataset;
-      let x = xProjector(datum, index, dataset);
-      let y = yProjector(datum, index, dataset);
-      let size = sizeProjector(datum, index, dataset);
-      return x - size / 2 <= p.x && p.x <= x + size / 2 && y - size / 2 <= p.y && p.y <= y + size / 2;
-    });
-  }
-
-  /**
-   * _invertedPixelSize returns the size of the object in data space
-   * @param {Point} [point] The size of the object in pixel space. X corresponds to
-   * the width of the object, and Y corresponds to the height of the object
-   * @return {Point} Returns the size of the object in data space. X corresponds to
-   * the width of the object in data space, and Y corresponds to the height of the
-   * object in data space.
-   */
-  private _invertedPixelSize(point: Point) {
-    const invertedOrigin = this._invertPixelPoint(this.origin());
-    const invertedSize = this._invertPixelPoint({ x: point.x, y: point.y });
-
-    return {
-      x: Math.abs(invertedSize.x - invertedOrigin.x),
-      y: Math.abs(invertedSize.y - invertedOrigin.y)
-    };
+  protected _createPlot() {
+    return new BaseScatterPlot((dataset) => new Drawers.Symbol(dataset),
+      this,
+      () => this.width(),
+      () => this.height()
+    );
   }
 }

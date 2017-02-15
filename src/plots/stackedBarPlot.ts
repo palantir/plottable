@@ -4,8 +4,9 @@
  */
 
 import * as SVGTypewriter from "svg-typewriter";
+import * as Drawers from "../drawers";
 
-import { Accessor, Point } from "../core/interfaces";
+import { Accessor, AttributeToProjector, Point } from "../core/interfaces";
 import { Dataset } from "../core/dataset";
 import { Scale } from "../scales/scale";
 import * as Utils from "../utils";
@@ -13,15 +14,16 @@ import * as Utils from "../utils";
 import * as Plots from "./";
 import { Bar } from "./barPlot";
 
+import { BaseStackedBarPlot, IStackedBarPlot } from "./baseStackedBarPlot";
+
 export class StackedBar<X, Y> extends Bar<X, Y> {
   protected static _STACKED_BAR_LABEL_PADDING = 5;
+
+  protected _plot: BaseStackedBarPlot<X, Y>;
 
   private _labelArea: d3.Selection<void>;
   private _measurer: SVGTypewriter.Measurer;
   private _writer: SVGTypewriter.Writer;
-  private _stackingOrder: Utils.Stacking.IStackingOrder;
-  private _stackingResult: Utils.Stacking.StackingResult;
-  private _stackedExtent: number[];
 
   /**
    * A StackedBar Plot stacks bars across Datasets based on the primary value of the bars.
@@ -36,25 +38,18 @@ export class StackedBar<X, Y> extends Bar<X, Y> {
   constructor(orientation = Bar.ORIENTATION_VERTICAL) {
     super(orientation);
     this.addClass("stacked-bar-plot");
-    this._stackingOrder = "bottomup";
-    this._stackingResult = new Utils.Map<Dataset, Utils.Map<string, Utils.Stacking.StackedDatum>>();
-    this._stackedExtent = [];
   }
 
   public x(): Plots.TransformableAccessorScaleBinding<X, number>;
   public x(x: number | Accessor<number>): this;
   public x(x: X | Accessor<X>, xScale: Scale<X, number>): this;
   public x(x?: number | Accessor<number> | X | Accessor<X>, xScale?: Scale<X, number>): any {
+    const plotX = this._plot.x(x as X, xScale);
+
     if (x == null) {
-      return super.x();
-    }
-    if (xScale == null) {
-      super.x(<number | Accessor<number>> x);
-    } else {
-      super.x(<X | Accessor<X>> x, xScale);
+      return plotX;
     }
 
-    this._updateStackExtentsAndOffsets();
     return this;
   }
 
@@ -62,16 +57,12 @@ export class StackedBar<X, Y> extends Bar<X, Y> {
   public y(y: number | Accessor<number>): this;
   public y(y: Y | Accessor<Y>, yScale: Scale<Y, number>): this;
   public y(y?: number | Accessor<number> | Y | Accessor<Y>, yScale?: Scale<Y, number>): any {
+    const plotY = this._plot.y(y as Y, yScale);
+
     if (y == null) {
-      return super.y();
-    }
-    if (yScale == null) {
-      super.y(<number | Accessor<number>> y);
-    } else {
-      super.y(<Y | Accessor<Y>> y, yScale);
+      return plotY;
     }
 
-    this._updateStackExtentsAndOffsets();
     return this;
   }
 
@@ -91,10 +82,12 @@ export class StackedBar<X, Y> extends Bar<X, Y> {
    */
   public stackingOrder(stackingOrder: Utils.Stacking.IStackingOrder): this;
   public stackingOrder(stackingOrder?: Utils.Stacking.IStackingOrder): any {
+    const plotStackingOrder = this._plot.stackingOrder(stackingOrder);
+
     if (stackingOrder == null) {
-      return this._stackingOrder;
+      return plotStackingOrder;
     }
-    this._stackingOrder = stackingOrder;
+
     this._onDatasetUpdate();
     return this;
   }
@@ -106,22 +99,30 @@ export class StackedBar<X, Y> extends Bar<X, Y> {
     this._writer = new SVGTypewriter.Writer(this._measurer);
   }
 
-  protected _drawLabels() {
-    super._drawLabels();
+  protected _createPlot() {
+    return new BaseStackedBarPlot((dataset) => new Drawers.Rectangle(dataset),
+      this,
+      () => this.width(),
+      () => this.height()
+    );
+  }
+
+  public drawLabels(dataToDraw: Utils.Map<Dataset, any[]>, attrToProjector: AttributeToProjector) {
+    super.drawLabels(dataToDraw, attrToProjector);
 
     // remove all current labels before redrawing
     this._labelArea.selectAll("g").remove();
 
     const baselineValue = +this.baselineValue();
-    const primaryScale: Scale<any, number> = this._isVertical ? this.x().scale : this.y().scale;
-    const secondaryScale: Scale<any, number> = this._isVertical ? this.y().scale : this.x().scale;
-    const { maximumExtents, minimumExtents } = Utils.Stacking.stackedExtents<Date | string | number>(this._stackingResult);
-    const barWidth = this._getBarPixelWidth();
+    const primaryScale: Scale<any, number> = this._plot.isVertical() ? this.x().scale : this.y().scale;
+    const secondaryScale: Scale<any, number> = this._plot.isVertical() ? this.y().scale : this.x().scale;
+    const { maximumExtents, minimumExtents } = Utils.Stacking.stackedExtents<Date | string | number>(this._plot.stackingResult());
+    const barWidth = this._plot.getBarPixelWidth();
 
     const drawLabel = (text: string, measurement: { height: number, width: number }, labelPosition: Point) => {
       const { x, y } = labelPosition;
       const { height, width } = measurement;
-      const tooWide = this._isVertical ? ( width > barWidth ) : ( height > barWidth );
+      const tooWide = this._plot.getBarPixelWidth() ? ( width > barWidth ) : ( height > barWidth );
 
       const hideLabel = x < 0
         || y < 0
@@ -151,13 +152,13 @@ export class StackedBar<X, Y> extends Bar<X, Y> {
         const text = this.labelFormatter()(maximum.extent);
         const measurement = this._measurer.measure(text);
 
-        const primaryTextMeasurement = this._isVertical ? measurement.width : measurement.height;
-        const secondaryTextMeasurement = this._isVertical ? measurement.height : measurement.width;
+        const primaryTextMeasurement = this._plot.isVertical() ? measurement.width : measurement.height;
+        const secondaryTextMeasurement = this._plot.isVertical() ? measurement.height : measurement.width;
 
-        const x = this._isVertical
+        const x = this._plot.isVertical()
           ? primaryScale.scale(maximum.axisValue) - primaryTextMeasurement / 2
           : secondaryScale.scale(maximum.extent) + StackedBar._STACKED_BAR_LABEL_PADDING;
-        const y = this._isVertical
+        const y = this._plot.isVertical()
           ? secondaryScale.scale(maximum.extent) - secondaryTextMeasurement - StackedBar._STACKED_BAR_LABEL_PADDING
           : primaryScale.scale(maximum.axisValue) - primaryTextMeasurement / 2;
 
@@ -170,84 +171,18 @@ export class StackedBar<X, Y> extends Bar<X, Y> {
         const text = this.labelFormatter()(minimum.extent);
         const measurement = this._measurer.measure(text);
 
-        const primaryTextMeasurement = this._isVertical ? measurement.width : measurement.height;
-        const secondaryTextMeasurement = this._isVertical ? measurement.height : measurement.width;
+        const primaryTextMeasurement = this._plot.isVertical() ? measurement.width : measurement.height;
+        const secondaryTextMeasurement = this._plot.isVertical() ? measurement.height : measurement.width;
 
-        const x = this._isVertical
+        const x = this._plot.isVertical()
           ? primaryScale.scale(minimum.axisValue) - primaryTextMeasurement / 2
           : secondaryScale.scale(minimum.extent) - secondaryTextMeasurement - StackedBar._STACKED_BAR_LABEL_PADDING;
-        const y = this._isVertical
+        const y = this._plot.isVertical()
           ? secondaryScale.scale(minimum.extent) + StackedBar._STACKED_BAR_LABEL_PADDING
           : primaryScale.scale(minimum.axisValue) - primaryTextMeasurement / 2;
 
         drawLabel(text, measurement, { x, y });
       }
     });
-  }
-
-  protected _generateAttrToProjector() {
-    let attrToProjector = super._generateAttrToProjector();
-
-    let valueAttr = this._isVertical ? "y" : "x";
-    let keyAttr = this._isVertical ? "x" : "y";
-    let primaryScale: Scale<any, number> = this._isVertical ? this.y().scale : this.x().scale;
-    let primaryAccessor = this._propertyBindings.get(valueAttr).accessor;
-    let keyAccessor = this._propertyBindings.get(keyAttr).accessor;
-    let normalizedKeyAccessor = (datum: any, index: number, dataset: Dataset) => {
-      return Utils.Stacking.normalizeKey(keyAccessor(datum, index, dataset));
-    };
-    let getStart = (d: any, i: number, dataset: Dataset) =>
-      primaryScale.scale(this._stackingResult.get(dataset).get(normalizedKeyAccessor(d, i, dataset)).offset);
-    let getEnd = (d: any, i: number, dataset: Dataset) =>
-      primaryScale.scale(+primaryAccessor(d, i, dataset) +
-        this._stackingResult.get(dataset).get(normalizedKeyAccessor(d, i, dataset)).offset);
-
-    let heightF = (d: any, i: number, dataset: Dataset) => {
-      return Math.abs(getEnd(d, i, dataset) - getStart(d, i, dataset));
-    };
-    attrToProjector[this._isVertical ? "height" : "width"] = heightF;
-
-    let attrFunction = (d: any, i: number, dataset: Dataset) =>
-      +primaryAccessor(d, i, dataset) < 0 ? getStart(d, i, dataset) : getEnd(d, i, dataset);
-    attrToProjector[valueAttr] = (d: any, i: number, dataset: Dataset) =>
-      this._isVertical ? attrFunction(d, i, dataset) : attrFunction(d, i, dataset) - heightF(d, i, dataset);
-
-    return attrToProjector;
-  }
-
-  protected _onDatasetUpdate() {
-    this._updateStackExtentsAndOffsets();
-    super._onDatasetUpdate();
-    return this;
-  }
-
-  protected _updateExtentsForProperty(property: string) {
-    super._updateExtentsForProperty(property);
-    if ((property === "x" || property === "y") && this._projectorsReady()) {
-      this._updateStackExtentsAndOffsets();
-    }
-  }
-
-  protected _extentsForProperty(attr: string) {
-    let primaryAttr = this._isVertical ? "y" : "x";
-    if (attr === primaryAttr) {
-      return [this._stackedExtent];
-    } else {
-      return super._extentsForProperty(attr);
-    }
-  }
-
-  private _updateStackExtentsAndOffsets() {
-    if (!this._projectorsReady()) {
-      return;
-    }
-
-    let datasets = this.datasets();
-    let keyAccessor = this._isVertical ? this.x().accessor : this.y().accessor;
-    let valueAccessor = this._isVertical ? this.y().accessor : this.x().accessor;
-    let filter = this._filterForProperty(this._isVertical ? "y" : "x");
-
-    this._stackingResult = Utils.Stacking.stack(datasets, keyAccessor, valueAccessor, this._stackingOrder);
-    this._stackedExtent = Utils.Stacking.stackedExtent(this._stackingResult, keyAccessor, filter);
   }
 }

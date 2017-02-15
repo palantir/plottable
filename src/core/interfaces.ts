@@ -6,7 +6,7 @@
 import * as d3 from "d3";
 
 import { Dataset } from "./dataset";
-import { SVGComponent } from "../components/svgComponent";
+import { IComponent } from "../components";
 
 /**
  * Accesses a specific datum property.
@@ -75,9 +75,9 @@ export type Bounds = {
 /**
  * An object representing a data-backed visual entity inside a Component.
  */
-export interface Entity<C extends SVGComponent> {
+export interface Entity<C extends IComponent<any>> {
   datum: any;
   position: Point;
-  selection: d3.Selection<any>;
   component: C;
+  selection?: any;
 }
