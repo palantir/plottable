@@ -377,7 +377,7 @@ export class Category extends Axis<string> {
     super.renderImmediately();
     let catScale = <Scales.Category> this._scale;
     const { domain, stepWidth } = this.getDownsampleInfo(catScale);
-    let tickLabels = this._tickLabelContainer.selectAll("." + Axis.TICK_LABEL_CLASS).data(domain, (d) => d);
+    let tickLabels = this._tickLabelContainer.selectAll<SVGGElement, string>("." + Axis.TICK_LABEL_CLASS).data(domain, (d) => d);
     // Give each tick a stepWidth of space which will partition the entire axis evenly
     let availableTextSpace = stepWidth;
     if (this.isHorizontal() && this._tickLabelMaxWidth != null) {
