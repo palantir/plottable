@@ -481,7 +481,7 @@ export class Time extends Axis<Date> {
 
     let textSelection = tickLabels.selectAll("text");
     if (textSelection.size() > 0) {
-      Utils.DOM.translate(textSelection, xTranslate, yTranslate);
+      textSelection.attr("transform", `translate(${xTranslate},${yTranslate})`);
     }
     tickLabels.exit().remove();
     tickLabels.attr("transform", (d: any) => "translate(" + this._scale.scale(d) + ",0)");

@@ -17,6 +17,7 @@ import * as Scales from "../scales";
 import * as Utils from "../utils";
 
 import { Component } from "./component";
+import { parseSvgTransform } from "../utils/domUtils";
 
 /**
  * The Legend's column representation. Stores position information
@@ -533,12 +534,15 @@ export class Legend extends Component {
           const symbolElement = d3.select(entryElement).select(`.${Legend.LEGEND_SYMBOL_CLASS}`);
 
           // HACKHACK The 2.x API returns the center {x, y} of the symbol as the position.
-          const rowTranslate = d3.transform(d3.select(rowElement).attr("transform")).translate;
-          const symbolTranslate = d3.transform(symbolElement.attr("transform")).translate;
+          const rowTranslate = parseSvgTransform(d3.select(rowElement).attr("transform"));
+          const symbolTranslate = parseSvgTransform(symbolElement.attr("transform"));
 
           return [{
             datum: column.data.name,
-            position: { x: rowTranslate[0] + symbolTranslate[0], y: rowTranslate[1] + symbolTranslate[1] },
+            position: {
+              x: rowTranslate.translateX + symbolTranslate.translateX,
+              y: rowTranslate.translateY + symbolTranslate.translateY
+            },
             selection: d3.select(entryElement),
             component: this,
           }];

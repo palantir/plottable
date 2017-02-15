@@ -4,6 +4,7 @@
  */
 
 import * as d3 from "d3";
+import { parseSvg } from "d3-interpolate/src/transform/parse";
 
 import { Range, SimpleSelection } from "../core/interfaces";
 
@@ -77,34 +78,8 @@ export function elementHeight(element: Element) {
     + _parseStyleValue(style, "border-bottom-width");
 }
 
-/**
- * Retrieves the number array representing the translation for the selection
- *
- * @param {d3.Selection<any>} selection The selection to query
- * @returns {[number, number]} The number array representing the translation
- */
-export function translate(selection: SimpleSelection<any>): [number, number];
-/**
- * Translates the given selection by the input x / y pixel amounts.
- *
- * @param {d3.Selection<any>} selection The selection to translate
- * @param {number} x The amount to translate in the x direction
- * @param {number} y The amount to translate in the y direction
- * @returns {d3.Selection<any>} The input selection
- */
-export function translate(selection: SimpleSelection<any>, x: number, y: number): SimpleSelection<any>;
-export function translate(selection: SimpleSelection<any>, x?: number, y?: number): any {
-  let transformMatrix = d3.transform(selection.attr("transform"));
-
-  if (x == null) {
-    return transformMatrix.translate;
-  }
-
-  y = (y == null) ? 0 : y;
-  transformMatrix.translate[0] = x;
-  transformMatrix.translate[1] = y;
-  selection.attr("transform", transformMatrix.toString());
-  return selection;
+export function parseSvgTransform(transformString: string) {
+  return parseSvg(transformString);
 }
 
 /**
