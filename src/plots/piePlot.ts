@@ -266,13 +266,6 @@ export class Pie extends Plot implements IPiePlot {
     }
   }
 
-  protected _additionalPaint(time: number) {
-    this._renderArea.select(".label-area").remove();
-    let drawSteps = this._plot.generateStrokeDrawSteps();
-    let dataToDraw = this._plot.getDataToDraw();
-    this.datasets().forEach((dataset) => this._plot.drawer(dataset).draw(dataToDraw.get(dataset), drawSteps));
-  }
-
   public drawLabels(dataToDraw: Utils.Map<Dataset, any[]>, attrToProjector: AttributeToProjector) {
     this._renderArea.select(".label-area").remove();
 
@@ -281,7 +274,7 @@ export class Pie extends Plot implements IPiePlot {
       let measurer = new SVGTypewriter.CacheMeasurer(labelArea);
       let writer = new SVGTypewriter.Writer(measurer);
       let dataset = this.datasets()[0];
-      let data = this._plot.getDataToDraw().get(dataset);
+      let data = dataToDraw.get(dataset);
       data.forEach((datum, datumIndex) => {
         let value = this.sectorValue().accessor(datum, datumIndex, dataset);
         if (!Utils.Math.isValidNumber(value)) {

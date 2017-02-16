@@ -173,10 +173,6 @@ export class BasePiePlot extends BasePlot implements IPiePlot {
     return index == null ? [] : [this.entities()[index]];
   }
 
-  public getDataToDraw() {
-    return this._getDataToDraw();
-  }
-
   protected _getDataToDraw(): Utils.Map<Dataset, any[]> {
     let dataToDraw = super._getDataToDraw();
     if (this.datasets().length === 0) {
@@ -268,6 +264,10 @@ export class BasePiePlot extends BasePlot implements IPiePlot {
 
   protected _additionalPaint(time: number) {
     Utils.Window.setTimeout(() => this._component.drawLabels(this._getDataToDraw(), this._generateAttrToProjector()), time);
+
+    let drawSteps = this._generateStrokeDrawSteps();
+    let dataToDraw = this._getDataToDraw();
+    this.datasets().forEach((dataset) => this.drawer(dataset).draw(dataToDraw.get(dataset), drawSteps));
   }
 
   protected _pixelPoint(datum: any, index: number, dataset: Dataset) {
@@ -290,11 +290,6 @@ export class BasePiePlot extends BasePlot implements IPiePlot {
     let endAngle = pie[index].endAngle;
     let avgAngle = (startAngle + endAngle) / 2;
     return { x: avgRadius * Math.sin(avgAngle), y: -avgRadius * Math.cos(avgAngle) };
-  }
-
-  public generateStrokeDrawSteps() {
-    let attrToProjector = this._generateAttrToProjector();
-    return [{ attrToProjector: attrToProjector, animator: new Animators.Null() }];
   }
 
   public pieCenter(): Point {
@@ -462,6 +457,11 @@ export class BasePiePlot extends BasePlot implements IPiePlot {
     this._endAngles = [];
     this._strokeDrawers.get(dataset).remove();
     return this;
+  }
+
+  private _generateStrokeDrawSteps() {
+    let attrToProjector = this._generateAttrToProjector();
+    return [{ attrToProjector: attrToProjector, animator: new Animators.Null() }];
   }
 
   private _updatePieAngles() {

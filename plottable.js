@@ -13444,9 +13444,6 @@ var BasePiePlot = (function (_super) {
         var index = this.sliceIndexForPoint(adjustedQueryPoint);
         return index == null ? [] : [this.entities()[index]];
     };
-    BasePiePlot.prototype.getDataToDraw = function () {
-        return this._getDataToDraw();
-    };
     BasePiePlot.prototype._getDataToDraw = function () {
         var dataToDraw = _super.prototype._getDataToDraw.call(this);
         if (this.datasets().length === 0) {
@@ -13521,6 +13518,9 @@ var BasePiePlot = (function (_super) {
     BasePiePlot.prototype._additionalPaint = function (time) {
         var _this = this;
         Utils.Window.setTimeout(function () { return _this._component.drawLabels(_this._getDataToDraw(), _this._generateAttrToProjector()); }, time);
+        var drawSteps = this._generateStrokeDrawSteps();
+        var dataToDraw = this._getDataToDraw();
+        this.datasets().forEach(function (dataset) { return _this.drawer(dataset).draw(dataToDraw.get(dataset), drawSteps); });
     };
     BasePiePlot.prototype._pixelPoint = function (datum, index, dataset) {
         var scaledValueAccessor = BasePiePlot._scaledAccessor(this.sectorValue());
@@ -13540,10 +13540,6 @@ var BasePiePlot = (function (_super) {
         var endAngle = pie[index].endAngle;
         var avgAngle = (startAngle + endAngle) / 2;
         return { x: avgRadius * Math.sin(avgAngle), y: -avgRadius * Math.cos(avgAngle) };
-    };
-    BasePiePlot.prototype.generateStrokeDrawSteps = function () {
-        var attrToProjector = this._generateAttrToProjector();
-        return [{ attrToProjector: attrToProjector, animator: new Animators.Null() }];
     };
     BasePiePlot.prototype.pieCenter = function () {
         var a = this._startAngle < this._endAngle ? this._startAngle : this._endAngle;
@@ -13705,6 +13701,10 @@ var BasePiePlot = (function (_super) {
         this._endAngles = [];
         this._strokeDrawers.get(dataset).remove();
         return this;
+    };
+    BasePiePlot.prototype._generateStrokeDrawSteps = function () {
+        var attrToProjector = this._generateAttrToProjector();
+        return [{ attrToProjector: attrToProjector, animator: new Animators.Null() }];
     };
     BasePiePlot.prototype._updatePieAngles = function () {
         if (this.sectorValue() == null) {
@@ -14945,13 +14945,6 @@ var Pie = (function (_super) {
             return this;
         }
     };
-    Pie.prototype._additionalPaint = function (time) {
-        var _this = this;
-        this._renderArea.select(".label-area").remove();
-        var drawSteps = this._plot.generateStrokeDrawSteps();
-        var dataToDraw = this._plot.getDataToDraw();
-        this.datasets().forEach(function (dataset) { return _this._plot.drawer(dataset).draw(dataToDraw.get(dataset), drawSteps); });
-    };
     Pie.prototype.drawLabels = function (dataToDraw, attrToProjector) {
         var _this = this;
         this._renderArea.select(".label-area").remove();
@@ -14960,7 +14953,7 @@ var Pie = (function (_super) {
             var measurer_1 = new SVGTypewriter.CacheMeasurer(labelArea_1);
             var writer_1 = new SVGTypewriter.Writer(measurer_1);
             var dataset_1 = this.datasets()[0];
-            var data = this._plot.getDataToDraw().get(dataset_1);
+            var data = dataToDraw.get(dataset_1);
             data.forEach(function (datum, datumIndex) {
                 var value = _this.sectorValue().accessor(datum, datumIndex, dataset_1);
                 if (!Utils.Math.isValidNumber(value)) {
