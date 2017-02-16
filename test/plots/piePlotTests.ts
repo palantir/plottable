@@ -627,8 +627,8 @@ describe("Plots", () => {
         assert.lengthOf(piePlot.entities(), 4, "there should be exactly 4 entities, representing the valid values");
 
         for (let i = 0; i < 4; i++) {
-          let startAngle = (<any> piePlot)._startAngles[i];
-          let endAngle = (<any> piePlot)._endAngles[i];
+          let startAngle = (piePlot as any)._plot.startAngles()[i];
+          let endAngle = (piePlot as any)._plot.endAngles()[i];
           assert.closeTo(endAngle - startAngle, Math.PI / 2, 0.001, `slice with index ${i} is a quarter of the pie`);
         }
 

@@ -8,6 +8,7 @@ import * as Utils from "../utils";
 import {BaseBarPlot, IBarPlot } from "./baseBarPlot";
 import { LabeledComponent } from "../components/labeled";
 import * as Scales from "../scales";
+import { Category } from "../scales";
 
 import { PlotEntity } from "./";
 import { EntityAdapter, DrawerFactory } from "./basePlot";
@@ -23,10 +24,21 @@ export class BaseClusteredBarPlot<X, Y, P extends PlotEntity> extends BaseBarPlo
     this._clusterOffsets = new Utils.Map<Dataset, number>();
   }
 
+  /**
+   *  Public for testing
+   */
+  public makeInnerScale() {
+    let innerScale = new Scales.Category();
+    innerScale.domain(this.datasets().map((d, i) => String(i)));
+    let widthProjector = BaseClusteredBarPlot._scaledAccessor(this.attr("width"));
+    innerScale.range([0, widthProjector(null, 0, null)]);
+    return innerScale;
+  }
+
   protected _generateAttrToProjector() {
     let attrToProjector = super._generateAttrToProjector();
     // the width is constant, so set the inner scale range to that
-    let innerScale = this._makeInnerScale();
+    let innerScale = this.makeInnerScale();
     let innerWidthF = (d: any, i: number) => innerScale.rangeBand();
     attrToProjector["width"] = this._isVertical ? innerWidthF : attrToProjector["width"];
     attrToProjector["height"] = !this._isVertical ? innerWidthF : attrToProjector["height"];
@@ -49,15 +61,9 @@ export class BaseClusteredBarPlot<X, Y, P extends PlotEntity> extends BaseBarPlo
   }
 
   private _updateClusterPosition() {
-    let innerScale = this._makeInnerScale();
+    let innerScale = this.makeInnerScale();
     this.datasets().forEach((d, i) => this._clusterOffsets.set(d, innerScale.scale(String(i)) - innerScale.rangeBand() / 2));
   }
 
-  private _makeInnerScale() {
-    let innerScale = new Scales.Category();
-    innerScale.domain(this.datasets().map((d, i) => String(i)));
-    let widthProjector = BaseClusteredBarPlot._scaledAccessor(this.attr("width"));
-    innerScale.range([0, widthProjector(null, 0, null)]);
-    return innerScale;
-  }
+
 }

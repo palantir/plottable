@@ -591,6 +591,12 @@ export class BasePlot<P extends PlotEntity> implements IPlot {
   }
 
   private _includedValuesForScale<D>(scale: Scale<D, any>): D[] {
+    if (!this._component.anchored()) {
+      // until the component has anchored itself to the page,
+      // don't allow the scales to be affected by data added to the plot
+      return []
+    }
+
     let includedValues: D[] = [];
     this._attrBindings.forEach((attr, binding) => {
       if (binding.scale === scale) {

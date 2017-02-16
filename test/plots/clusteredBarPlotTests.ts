@@ -50,7 +50,7 @@ describe("Plots", () => {
         assert.strictEqual(bars.size(), 4, "Number of bars should be equivalent to number of datum");
 
         const maxValue = Math.max.apply(null, originalData1.map((d) => d.num).concat(originalData2.map((d) => d.num)));
-        const innerScale = (<any> clusterBarPlot)._makeInnerScale();
+        const innerScale = (<any> clusterBarPlot)._plot.makeInnerScale();
         const rangeBand = innerScale.rangeBand();
         const off = innerScale.scale("0");
         const width = categoryScale.rangeBand() / 2;

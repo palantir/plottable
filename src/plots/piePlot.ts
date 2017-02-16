@@ -19,6 +19,8 @@ import * as Utils from "../utils";
 import { SVGPlotEntity } from "../plots";
 import { IComponent } from "../components";
 
+import { LightweightPlotEntity } from "../plots";
+
 import { PlotEntity, AccessorScaleBinding } from "./";
 import { Plot } from "./plot";
 
@@ -69,7 +71,7 @@ export class Pie extends Plot implements IPiePlot {
   public selections(datasets = this.datasets()) {
     let allSelections = super.selections(datasets)[0];
     datasets.forEach((dataset) => {
-      let drawer = this._plot.drawer(dataset) as Drawers.Arc;
+      let drawer = this._plot.strokeDrawer(dataset) as Drawers.ArcOutline;
       if (drawer == null) {
         return;
       }
@@ -77,11 +79,16 @@ export class Pie extends Plot implements IPiePlot {
         allSelections.push(this);
       });
     });
+
     return d3.selectAll(allSelections);
   }
 
   protected _createPlot() {
-    return new BasePiePlot((dataset) => new Drawers.Arc(dataset), Pie.SVGEntityAdapter, this)
+    return new BasePiePlot(
+      (dataset) => new Drawers.Arc(dataset),
+      (dataset) => new Drawers.ArcOutline(dataset),
+      (entity, point) => this._pieEntityAdapter(entity, point),
+      this)
   }
 
   public entities(datasets = this.datasets()): SVGPlotEntity[] {
@@ -269,67 +276,88 @@ export class Pie extends Plot implements IPiePlot {
     }
   }
 
-  public drawLabels(dataToDraw: Utils.Map<Dataset, any[]>, attrToProjector: AttributeToProjector) {
+  public drawLabels(dataToDraw: Utils.Map<Dataset, any[]>, attrToProjector: AttributeToProjector, timeout: number) {
     this._renderArea.select(".label-area").remove();
 
-    if (this._labelsEnabled) {
-      let labelArea = this._renderArea.append("g").classed("label-area", true);
-      let measurer = new SVGTypewriter.CacheMeasurer(labelArea);
-      let writer = new SVGTypewriter.Writer(measurer);
-      let dataset = this.datasets()[0];
-      let data = dataToDraw.get(dataset);
-      data.forEach((datum, datumIndex) => {
-        let value = this.sectorValue().accessor(datum, datumIndex, dataset);
-        if (!Utils.Math.isValidNumber(value)) {
-          return;
-        }
-        value = this._labelFormatter(value);
-        let measurement = measurer.measure(value);
+    Utils.Window.setTimeout(() => {
+      if (this._labelsEnabled) {
+        let labelArea = this._renderArea.append("g").classed("label-area", true);
+        let measurer = new SVGTypewriter.CacheMeasurer(labelArea);
+        let writer = new SVGTypewriter.Writer(measurer);
+        let dataset = this.datasets()[0];
+        let data = dataToDraw.get(dataset);
+        data.forEach((datum, datumIndex) => {
+          let value = this.sectorValue().accessor(datum, datumIndex, dataset);
+          if (!Utils.Math.isValidNumber(value)) {
+            return;
+          }
+          value = this._labelFormatter(value);
+          let measurement = measurer.measure(value);
 
-        let theta = (this._plot.endAngles()[datumIndex] + this._plot.startAngles()[datumIndex]) / 2;
-        let outerRadius = this.outerRadius().accessor(datum, datumIndex, dataset);
-        if (this.outerRadius().scale) {
-          outerRadius = this.outerRadius().scale.scale(outerRadius);
-        }
-        let innerRadius = this.innerRadius().accessor(datum, datumIndex, dataset);
-        if (this.innerRadius().scale) {
-          innerRadius = this.innerRadius().scale.scale(innerRadius);
-        }
-        let labelRadius = (outerRadius + innerRadius) / 2;
+          let theta = (this._plot.endAngles()[datumIndex] + this._plot.startAngles()[datumIndex]) / 2;
+          let outerRadius = this.outerRadius().accessor(datum, datumIndex, dataset);
+          if (this.outerRadius().scale) {
+            outerRadius = this.outerRadius().scale.scale(outerRadius);
+          }
+          let innerRadius = this.innerRadius().accessor(datum, datumIndex, dataset);
+          if (this.innerRadius().scale) {
+            innerRadius = this.innerRadius().scale.scale(innerRadius);
+          }
+          let labelRadius = (outerRadius + innerRadius) / 2;
 
-        let x = Math.sin(theta) * labelRadius - measurement.width / 2;
-        let y = -Math.cos(theta) * labelRadius - measurement.height / 2;
+          let x = Math.sin(theta) * labelRadius - measurement.width / 2;
+          let y = -Math.cos(theta) * labelRadius - measurement.height / 2;
 
-        let corners = [
-          { x: x, y: y },
-          { x: x, y: y + measurement.height },
-          { x: x + measurement.width, y: y },
-          { x: x + measurement.width, y: y + measurement.height },
-        ];
+          let corners = [
+            { x: x, y: y },
+            { x: x, y: y + measurement.height },
+            { x: x + measurement.width, y: y },
+            { x: x + measurement.width, y: y + measurement.height },
+          ];
 
-        let showLabel = corners.every((corner) => {
-          return Math.abs(corner.x) <= this.width() / 2 && Math.abs(corner.y) <= this.height() / 2;
+          let showLabel = corners.every((corner) => {
+            return Math.abs(corner.x) <= this.width() / 2 && Math.abs(corner.y) <= this.height() / 2;
+          });
+
+          if (showLabel) {
+            let sliceIndices = corners.map((corner) => this._plot.sliceIndexForPoint(corner));
+            showLabel = sliceIndices.every((index) => index === datumIndex);
+          }
+
+          let color = attrToProjector["fill"](datum, datumIndex, dataset);
+          let dark = Utils.Color.contrast("white", color) * 1.6 < Utils.Color.contrast("black", color);
+          let g = labelArea.append("g").attr("transform", "translate(" + x + "," + y + ")");
+          let className = dark ? "dark-label" : "light-label";
+          g.classed(className, true);
+          g.style("visibility", showLabel ? "inherit" : "hidden");
+
+          writer.write(value, measurement.width, measurement.height, {
+            selection: g,
+            xAlign: "center",
+            yAlign: "center",
+            textRotation: 0,
+          });
         });
+      }
+    }, timeout);
+  }
 
-        if (showLabel) {
-          let sliceIndices = corners.map((corner) => this._plot.sliceIndexForPoint(corner));
-          showLabel = sliceIndices.every((index) => index === datumIndex);
-        }
+  private _selectionsForIndex(index: number, dataset: Dataset) {
+    return d3.selectAll([
+      (this._plot.drawer(dataset) as Drawers.Arc).selectionForIndex(index).node(),
+      (this._plot.strokeDrawer(dataset) as Drawers.ArcOutline).selectionForIndex(index).node()
+    ]);
+  }
 
-        let color = attrToProjector["fill"](datum, datumIndex, dataset);
-        let dark = Utils.Color.contrast("white", color) * 1.6 < Utils.Color.contrast("black", color);
-        let g = labelArea.append("g").attr("transform", "translate(" + x + "," + y + ")");
-        let className = dark ? "dark-label" : "light-label";
-        g.classed(className, true);
-        g.style("visibility", showLabel ? "inherit" : "hidden");
-
-        writer.write(value, measurement.width, measurement.height, {
-          selection: g,
-          xAlign: "center",
-          yAlign: "center",
-          textRotation: 0,
-        });
-      });
-    }
+  private _pieEntityAdapter(entity: LightweightPlotEntity, position: Point) {
+    return {
+      datum: entity.datum,
+      position,
+      dataset: entity.dataset,
+      datasetIndex: entity.datasetIndex,
+      index: entity.index,
+      component: entity.component,
+      selection: this._selectionsForIndex(entity.validDatumIndex, entity.dataset),
+    };
   }
 }

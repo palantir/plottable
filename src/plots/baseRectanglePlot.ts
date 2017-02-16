@@ -187,7 +187,7 @@ export class BaseRectanglePlot<X, Y, P extends PlotEntity> extends BaseXYPlot<X,
   }
 
   protected _additionalPaint(time: number) {
-    Utils.Window.setTimeout(() => this._component.drawLabels(this._getDataToDraw(), this._generateAttrToProjector()), time);
+    this._component.drawLabels(this._getDataToDraw(), this._generateAttrToProjector(), time);
   }
 
   protected _filterForProperty(property: string) {

@@ -201,18 +201,24 @@ export class Bar<X, Y> extends XYPlot<X, Y> implements IBarPlot<X, Y> {
     return this;
   }
 
-  public drawLabels(dataToDraw: Utils.Map<Dataset, any[]>, attrToProjector: AttributeToProjector) {
-    if (this._labelsEnabled) {
-      this.datasets().forEach((dataset) => this._labelConfig.get(dataset).labelArea.selectAll("g").remove());
-      let labelsTooWide = false;
-      this.datasets().forEach((dataset) => labelsTooWide = labelsTooWide || this._drawLabel(dataToDraw.get(dataset), dataset, attrToProjector));
-      if (this._hideBarsIfAnyAreTooWide && labelsTooWide) {
-        this.datasets().forEach((dataset) => this._labelConfig.get(dataset).labelArea.selectAll("g").remove());
+  public drawLabels(dataToDraw: Utils.Map<Dataset, any[]>, attrToProjector: AttributeToProjector, timeout: number) {
+    this.datasets().forEach((dataset) => this._labelConfig.get(dataset).labelArea.selectAll("g").remove());
+
+    Utils.Window.setTimeout(() => {
+      if (this._labelsEnabled) {
+        let labelsTooWide = false;
+        this.datasets().forEach((dataset) => labelsTooWide = labelsTooWide || this._drawLabel(dataToDraw.get(dataset), dataset, attrToProjector));
+        if (this._hideBarsIfAnyAreTooWide && labelsTooWide) {
+          this.datasets().forEach((dataset) => this._labelConfig.get(dataset).labelArea.selectAll("g").remove());
+        }
       }
-    }
+    }, timeout);
   }
 
-  private _drawLabel(data: any[], dataset: Dataset, attrToProjector: AttributeToProjector) {
+  /**
+   * Protected for testing
+   */
+  protected _drawLabel(data: any[], dataset: Dataset, attrToProjector: AttributeToProjector) {
     let labelConfig = this._labelConfig.get(dataset);
     let labelArea = labelConfig.labelArea;
     let measurer = labelConfig.measurer;

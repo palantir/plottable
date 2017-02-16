@@ -566,21 +566,11 @@ describe("Plots", () => {
 
         // HACKHACK: This test is a bit hacky, but it seems to be testing for a bug fixed in
         // https://github.com/palantir/plottable/pull/1240 . Leaving it until we find a better way to test for it.
-        it("removes labels instantly on dataset change", (done) => {
+        it("removes labels instantly on dataset change", () => {
           barPlot.labelsEnabled(true);
           let texts = barPlot.content().selectAll("text");
           assert.strictEqual(texts.size(), dataset.data().length, "one label drawn per datum");
-          const originalDrawLabels = (<any> barPlot)._drawLabels;
-          let called = false;
-          (<any> barPlot)._drawLabels = () => {
-            if (!called) {
-              originalDrawLabels.apply(barPlot);
-              texts = barPlot.content().selectAll("text");
-              assert.strictEqual(texts.size(), dataset.data().length, "texts were repopulated by drawLabels after the update");
-              called = true; // for some reason, in phantomJS, `done` was being called multiple times and this caused the test to fail.
-              done();
-            }
-          };
+          (<any> barPlot)._drawLabel = () => { }
           dataset.data(dataset.data());
           texts = barPlot.content().selectAll("text");
           assert.strictEqual(texts.size(), 0, "texts were immediately removed");

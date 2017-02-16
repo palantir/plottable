@@ -3068,6 +3068,9 @@ var AbstractComponent = (function () {
         this._xAlignment = "left";
         this._yAlignment = "top";
     }
+    AbstractComponent.prototype.anchored = function () {
+        return this._isAnchored;
+    };
     /**
      * Adds a callback to be called on anchoring the Component to the DOM.
      * If the Component is already anchored, the callback is called immediately.
@@ -3719,17 +3722,22 @@ var Bar = (function (_super) {
         this.animator("baseline").animate(this._baseline, baselineAttr);
         return this;
     };
-    Bar.prototype.drawLabels = function (dataToDraw, attrToProjector) {
+    Bar.prototype.drawLabels = function (dataToDraw, attrToProjector, timeout) {
         var _this = this;
-        if (this._labelsEnabled) {
-            this.datasets().forEach(function (dataset) { return _this._labelConfig.get(dataset).labelArea.selectAll("g").remove(); });
-            var labelsTooWide_1 = false;
-            this.datasets().forEach(function (dataset) { return labelsTooWide_1 = labelsTooWide_1 || _this._drawLabel(dataToDraw.get(dataset), dataset, attrToProjector); });
-            if (this._hideBarsIfAnyAreTooWide && labelsTooWide_1) {
-                this.datasets().forEach(function (dataset) { return _this._labelConfig.get(dataset).labelArea.selectAll("g").remove(); });
+        this.datasets().forEach(function (dataset) { return _this._labelConfig.get(dataset).labelArea.selectAll("g").remove(); });
+        Utils.Window.setTimeout(function () {
+            if (_this._labelsEnabled) {
+                var labelsTooWide_1 = false;
+                _this.datasets().forEach(function (dataset) { return labelsTooWide_1 = labelsTooWide_1 || _this._drawLabel(dataToDraw.get(dataset), dataset, attrToProjector); });
+                if (_this._hideBarsIfAnyAreTooWide && labelsTooWide_1) {
+                    _this.datasets().forEach(function (dataset) { return _this._labelConfig.get(dataset).labelArea.selectAll("g").remove(); });
+                }
             }
-        }
+        }, timeout);
     };
+    /**
+     * Protected for testing
+     */
     Bar.prototype._drawLabel = function (data, dataset, attrToProjector) {
         var _this = this;
         var labelConfig = this._labelConfig.get(dataset);
@@ -4071,8 +4079,7 @@ var BaseBarPlot = (function (_super) {
         return this;
     };
     BaseBarPlot.prototype._additionalPaint = function (time) {
-        var _this = this;
-        Utils.Window.setTimeout(function () { return _this._component.drawLabels(_this._getDataToDraw(), _this._generateAttrToProjector()); }, time);
+        this._component.drawLabels(this._getDataToDraw(), this._generateAttrToProjector(), time);
     };
     BaseBarPlot.prototype._addDataset = function (dataset) {
         dataset.onUpdate(this._updateBarPixelWidthCallback);
@@ -4643,6 +4650,11 @@ var BasePlot = (function () {
     };
     BasePlot.prototype._includedValuesForScale = function (scale) {
         var _this = this;
+        if (!this._component.anchored()) {
+            // until the component has anchored itself to the page,
+            // don't allow the scales to be affected by data added to the plot
+            return [];
+        }
         var includedValues = [];
         this._attrBindings.forEach(function (attr, binding) {
             if (binding.scale === scale) {
@@ -7554,8 +7566,7 @@ var BaseRectanglePlot = (function (_super) {
         return this;
     };
     BaseRectanglePlot.prototype._additionalPaint = function (time) {
-        var _this = this;
-        Utils.Window.setTimeout(function () { return _this._component.drawLabels(_this._getDataToDraw(), _this._generateAttrToProjector()); }, time);
+        this._component.drawLabels(this._getDataToDraw(), this._generateAttrToProjector(), time);
     };
     BaseRectanglePlot.prototype._filterForProperty = function (property) {
         if (property === "x2") {
@@ -13305,11 +13316,21 @@ var BaseClusteredBarPlot = (function (_super) {
         _super.call(this, drawerFactory, entityAdapter, component);
         this._clusterOffsets = new Utils.Map();
     }
+    /**
+     *  Public for testing
+     */
+    BaseClusteredBarPlot.prototype.makeInnerScale = function () {
+        var innerScale = new Scales.Category();
+        innerScale.domain(this.datasets().map(function (d, i) { return String(i); }));
+        var widthProjector = BaseClusteredBarPlot._scaledAccessor(this.attr("width"));
+        innerScale.range([0, widthProjector(null, 0, null)]);
+        return innerScale;
+    };
     BaseClusteredBarPlot.prototype._generateAttrToProjector = function () {
         var _this = this;
         var attrToProjector = _super.prototype._generateAttrToProjector.call(this);
         // the width is constant, so set the inner scale range to that
-        var innerScale = this._makeInnerScale();
+        var innerScale = this.makeInnerScale();
         var innerWidthF = function (d, i) { return innerScale.rangeBand(); };
         attrToProjector["width"] = this._isVertical ? innerWidthF : attrToProjector["width"];
         attrToProjector["height"] = !this._isVertical ? innerWidthF : attrToProjector["height"];
@@ -13329,15 +13350,8 @@ var BaseClusteredBarPlot = (function (_super) {
     };
     BaseClusteredBarPlot.prototype._updateClusterPosition = function () {
         var _this = this;
-        var innerScale = this._makeInnerScale();
+        var innerScale = this.makeInnerScale();
         this.datasets().forEach(function (d, i) { return _this._clusterOffsets.set(d, innerScale.scale(String(i)) - innerScale.rangeBand() / 2); });
-    };
-    BaseClusteredBarPlot.prototype._makeInnerScale = function () {
-        var innerScale = new Scales.Category();
-        innerScale.domain(this.datasets().map(function (d, i) { return String(i); }));
-        var widthProjector = BaseClusteredBarPlot._scaledAccessor(this.attr("width"));
-        innerScale.range([0, widthProjector(null, 0, null)]);
-        return innerScale;
     };
     return BaseClusteredBarPlot;
 }(baseBarPlot_1.BaseBarPlot));
@@ -13362,15 +13376,15 @@ var __extends = (this && this.__extends) || function (d, b) {
 var d3 = __webpack_require__(1);
 var Utils = __webpack_require__(0);
 var Animators = __webpack_require__(4);
-var Drawers = __webpack_require__(3);
 var basePlot_1 = __webpack_require__(27);
 var BasePiePlot = (function (_super) {
     __extends(BasePiePlot, _super);
-    function BasePiePlot(drawerFactory, entityAdapter, component) {
+    function BasePiePlot(drawerFactory, strokeDrawerFactory, entityAdapter, component) {
         _super.call(this, drawerFactory, entityAdapter, component);
         this._startAngle = 0;
         this._endAngle = 2 * Math.PI;
         this._strokeDrawers = new Utils.Map();
+        this._strokeDrawerFactory = strokeDrawerFactory;
     }
     BasePiePlot.prototype.startAngles = function () {
         return this._startAngles;
@@ -13442,6 +13456,18 @@ var BasePiePlot = (function (_super) {
         this._bindProperty(BasePiePlot._INNER_RADIUS_KEY, innerRadius, scale);
         return this;
     };
+    BasePiePlot.prototype.renderArea = function (renderArea) {
+        var _this = this;
+        var superRenderArea = _super.prototype.renderArea.call(this, renderArea);
+        if (renderArea === undefined) {
+            return superRenderArea;
+        }
+        // set the render area for all the stroke drawers
+        this.datasets().forEach(function (dataset) {
+            _this.strokeDrawer(dataset).renderArea(_this._renderArea(dataset));
+        });
+        return this;
+    };
     BasePiePlot.prototype.outerRadius = function (outerRadius, scale) {
         if (outerRadius == null) {
             return this._propertyBindings.get(BasePiePlot._OUTER_RADIUS_KEY);
@@ -13473,7 +13499,7 @@ var BasePiePlot = (function (_super) {
             return this;
         }
         this._updatePieAngles();
-        var strokeDrawer = new Drawers.ArcOutline(dataset);
+        var strokeDrawer = this._strokeDrawerFactory(dataset);
         if (this._renderArea != null) {
             strokeDrawer.renderArea(this._renderArea(dataset));
         }
@@ -13483,10 +13509,10 @@ var BasePiePlot = (function (_super) {
     };
     BasePiePlot.prototype._additionalPaint = function (time) {
         var _this = this;
-        Utils.Window.setTimeout(function () { return _this._component.drawLabels(_this._getDataToDraw(), _this._generateAttrToProjector()); }, time);
+        this._component.drawLabels(this._getDataToDraw(), this._generateAttrToProjector(), time);
         var drawSteps = this._generateStrokeDrawSteps();
         var dataToDraw = this._getDataToDraw();
-        this.datasets().forEach(function (dataset) { return _this.drawer(dataset).draw(dataToDraw.get(dataset), drawSteps); });
+        this.datasets().forEach(function (dataset) { return _this.strokeDrawer(dataset).draw(dataToDraw.get(dataset), drawSteps); });
     };
     BasePiePlot.prototype._pixelPoint = function (datum, index, dataset) {
         var scaledValueAccessor = BasePiePlot._scaledAccessor(this.sectorValue());
@@ -13657,15 +13683,18 @@ var BasePiePlot = (function (_super) {
         }
         return null;
     };
+    BasePiePlot.prototype.strokeDrawer = function (dataset) {
+        return this._strokeDrawers.get(dataset);
+    };
     BasePiePlot.prototype._onDatasetUpdate = function () {
-        _super.prototype._onDatasetUpdate.call(this);
         this._updatePieAngles();
+        _super.prototype._onDatasetUpdate.call(this);
     };
     BasePiePlot.prototype._removeDataset = function (dataset) {
         _super.prototype._removeDataset.call(this, dataset);
         this._startAngles = [];
         this._endAngles = [];
-        this._strokeDrawers.get(dataset).remove();
+        this.strokeDrawer(dataset).remove();
         return this;
     };
     BasePiePlot.prototype._generateStrokeDrawSteps = function () {
@@ -14826,7 +14855,7 @@ var Pie = (function (_super) {
         if (datasets === void 0) { datasets = this.datasets(); }
         var allSelections = _super.prototype.selections.call(this, datasets)[0];
         datasets.forEach(function (dataset) {
-            var drawer = _this._plot.drawer(dataset);
+            var drawer = _this._plot.strokeDrawer(dataset);
             if (drawer == null) {
                 return;
             }
@@ -14837,7 +14866,8 @@ var Pie = (function (_super) {
         return d3.selectAll(allSelections);
     };
     Pie.prototype._createPlot = function () {
-        return new basePiePlot_1.BasePiePlot(function (dataset) { return new Drawers.Arc(dataset); }, Pie.SVGEntityAdapter, this);
+        var _this = this;
+        return new basePiePlot_1.BasePiePlot(function (dataset) { return new Drawers.Arc(dataset); }, function (dataset) { return new Drawers.ArcOutline(dataset); }, function (entity, point) { return _this._pieEntityAdapter(entity, point); }, this);
     };
     Pie.prototype.entities = function (datasets) {
         if (datasets === void 0) { datasets = this.datasets(); }
@@ -14903,61 +14933,80 @@ var Pie = (function (_super) {
             return this;
         }
     };
-    Pie.prototype.drawLabels = function (dataToDraw, attrToProjector) {
+    Pie.prototype.drawLabels = function (dataToDraw, attrToProjector, timeout) {
         var _this = this;
         this._renderArea.select(".label-area").remove();
-        if (this._labelsEnabled) {
-            var labelArea_1 = this._renderArea.append("g").classed("label-area", true);
-            var measurer_1 = new SVGTypewriter.CacheMeasurer(labelArea_1);
-            var writer_1 = new SVGTypewriter.Writer(measurer_1);
-            var dataset_1 = this.datasets()[0];
-            var data = dataToDraw.get(dataset_1);
-            data.forEach(function (datum, datumIndex) {
-                var value = _this.sectorValue().accessor(datum, datumIndex, dataset_1);
-                if (!Utils.Math.isValidNumber(value)) {
-                    return;
-                }
-                value = _this._labelFormatter(value);
-                var measurement = measurer_1.measure(value);
-                var theta = (_this._plot.endAngles()[datumIndex] + _this._plot.startAngles()[datumIndex]) / 2;
-                var outerRadius = _this.outerRadius().accessor(datum, datumIndex, dataset_1);
-                if (_this.outerRadius().scale) {
-                    outerRadius = _this.outerRadius().scale.scale(outerRadius);
-                }
-                var innerRadius = _this.innerRadius().accessor(datum, datumIndex, dataset_1);
-                if (_this.innerRadius().scale) {
-                    innerRadius = _this.innerRadius().scale.scale(innerRadius);
-                }
-                var labelRadius = (outerRadius + innerRadius) / 2;
-                var x = Math.sin(theta) * labelRadius - measurement.width / 2;
-                var y = -Math.cos(theta) * labelRadius - measurement.height / 2;
-                var corners = [
-                    { x: x, y: y },
-                    { x: x, y: y + measurement.height },
-                    { x: x + measurement.width, y: y },
-                    { x: x + measurement.width, y: y + measurement.height },
-                ];
-                var showLabel = corners.every(function (corner) {
-                    return Math.abs(corner.x) <= _this.width() / 2 && Math.abs(corner.y) <= _this.height() / 2;
+        Utils.Window.setTimeout(function () {
+            if (_this._labelsEnabled) {
+                var labelArea_1 = _this._renderArea.append("g").classed("label-area", true);
+                var measurer_1 = new SVGTypewriter.CacheMeasurer(labelArea_1);
+                var writer_1 = new SVGTypewriter.Writer(measurer_1);
+                var dataset_1 = _this.datasets()[0];
+                var data = dataToDraw.get(dataset_1);
+                data.forEach(function (datum, datumIndex) {
+                    var value = _this.sectorValue().accessor(datum, datumIndex, dataset_1);
+                    if (!Utils.Math.isValidNumber(value)) {
+                        return;
+                    }
+                    value = _this._labelFormatter(value);
+                    var measurement = measurer_1.measure(value);
+                    var theta = (_this._plot.endAngles()[datumIndex] + _this._plot.startAngles()[datumIndex]) / 2;
+                    var outerRadius = _this.outerRadius().accessor(datum, datumIndex, dataset_1);
+                    if (_this.outerRadius().scale) {
+                        outerRadius = _this.outerRadius().scale.scale(outerRadius);
+                    }
+                    var innerRadius = _this.innerRadius().accessor(datum, datumIndex, dataset_1);
+                    if (_this.innerRadius().scale) {
+                        innerRadius = _this.innerRadius().scale.scale(innerRadius);
+                    }
+                    var labelRadius = (outerRadius + innerRadius) / 2;
+                    var x = Math.sin(theta) * labelRadius - measurement.width / 2;
+                    var y = -Math.cos(theta) * labelRadius - measurement.height / 2;
+                    var corners = [
+                        { x: x, y: y },
+                        { x: x, y: y + measurement.height },
+                        { x: x + measurement.width, y: y },
+                        { x: x + measurement.width, y: y + measurement.height },
+                    ];
+                    var showLabel = corners.every(function (corner) {
+                        return Math.abs(corner.x) <= _this.width() / 2 && Math.abs(corner.y) <= _this.height() / 2;
+                    });
+                    if (showLabel) {
+                        var sliceIndices = corners.map(function (corner) { return _this._plot.sliceIndexForPoint(corner); });
+                        showLabel = sliceIndices.every(function (index) { return index === datumIndex; });
+                    }
+                    var color = attrToProjector["fill"](datum, datumIndex, dataset_1);
+                    var dark = Utils.Color.contrast("white", color) * 1.6 < Utils.Color.contrast("black", color);
+                    var g = labelArea_1.append("g").attr("transform", "translate(" + x + "," + y + ")");
+                    var className = dark ? "dark-label" : "light-label";
+                    g.classed(className, true);
+                    g.style("visibility", showLabel ? "inherit" : "hidden");
+                    writer_1.write(value, measurement.width, measurement.height, {
+                        selection: g,
+                        xAlign: "center",
+                        yAlign: "center",
+                        textRotation: 0,
+                    });
                 });
-                if (showLabel) {
-                    var sliceIndices = corners.map(function (corner) { return _this._plot.sliceIndexForPoint(corner); });
-                    showLabel = sliceIndices.every(function (index) { return index === datumIndex; });
-                }
-                var color = attrToProjector["fill"](datum, datumIndex, dataset_1);
-                var dark = Utils.Color.contrast("white", color) * 1.6 < Utils.Color.contrast("black", color);
-                var g = labelArea_1.append("g").attr("transform", "translate(" + x + "," + y + ")");
-                var className = dark ? "dark-label" : "light-label";
-                g.classed(className, true);
-                g.style("visibility", showLabel ? "inherit" : "hidden");
-                writer_1.write(value, measurement.width, measurement.height, {
-                    selection: g,
-                    xAlign: "center",
-                    yAlign: "center",
-                    textRotation: 0,
-                });
-            });
-        }
+            }
+        }, timeout);
+    };
+    Pie.prototype._selectionsForIndex = function (index, dataset) {
+        return d3.selectAll([
+            this._plot.drawer(dataset).selectionForIndex(index).node(),
+            this._plot.strokeDrawer(dataset).selectionForIndex(index).node()
+        ]);
+    };
+    Pie.prototype._pieEntityAdapter = function (entity, position) {
+        return {
+            datum: entity.datum,
+            position: position,
+            dataset: entity.dataset,
+            datasetIndex: entity.datasetIndex,
+            index: entity.index,
+            component: entity.component,
+            selection: this._selectionsForIndex(entity.validDatumIndex, entity.dataset),
+        };
     };
     return Pie;
 }(plot_1.Plot));
@@ -15024,12 +15073,14 @@ var Rectangle = (function (_super) {
         this.render();
         return this;
     };
-    Rectangle.prototype.drawLabels = function (dataToDraw, attrToProjector) {
+    Rectangle.prototype.drawLabels = function (dataToDraw, attrToProjector, timeout) {
         var _this = this;
         this._renderArea.selectAll(".label-area").remove();
-        if (this._labelsEnabled && this.label() != null) {
-            this.datasets().forEach(function (dataset, i) { return _this._drawLabel(dataToDraw, dataset, i, attrToProjector); });
-        }
+        Utils.Window.setTimeout(function () {
+            if (_this._labelsEnabled && _this.label() != null) {
+                _this.datasets().forEach(function (dataset, i) { return _this._drawLabel(dataToDraw, dataset, i, attrToProjector); });
+            }
+        }, timeout);
     };
     Rectangle.prototype.label = function (label) {
         if (label == null) {
@@ -15402,68 +15453,72 @@ var StackedBar = (function (_super) {
     StackedBar.prototype._createPlot = function () {
         return new baseStackedBarPlot_1.BaseStackedBarPlot(function (dataset) { return new Drawers.Rectangle(dataset); }, StackedBar.SVGEntityAdapter, this);
     };
-    StackedBar.prototype.drawLabels = function (dataToDraw, attrToProjector) {
+    StackedBar.prototype.drawLabels = function (dataToDraw, attrToProjector, timeout) {
         var _this = this;
-        _super.prototype.drawLabels.call(this, dataToDraw, attrToProjector);
+        _super.prototype.drawLabels.call(this, dataToDraw, attrToProjector, timeout);
         // remove all current labels before redrawing
         this._labelArea.selectAll("g").remove();
-        var baselineValue = +this.baselineValue();
-        var primaryScale = this._plot.isVertical() ? this.x().scale : this.y().scale;
-        var secondaryScale = this._plot.isVertical() ? this.y().scale : this.x().scale;
-        var _a = Utils.Stacking.stackedExtents(this._plot.stackingResult()), maximumExtents = _a.maximumExtents, minimumExtents = _a.minimumExtents;
-        var barWidth = this._plot.getBarPixelWidth();
-        var drawLabel = function (text, measurement, labelPosition) {
-            var x = labelPosition.x, y = labelPosition.y;
-            var height = measurement.height, width = measurement.width;
-            var tooWide = _this._plot.getBarPixelWidth() ? (width > barWidth) : (height > barWidth);
-            var hideLabel = x < 0
-                || y < 0
-                || x + width > _this.width()
-                || y + height > _this.height()
-                || tooWide;
-            if (!hideLabel) {
-                var labelContainer = _this._labelArea.append("g").attr("transform", "translate(" + x + ", " + y + ")");
-                labelContainer.classed("stacked-bar-label", true);
-                var writeOptions = {
-                    selection: labelContainer,
-                    xAlign: "center",
-                    yAlign: "center",
-                    textRotation: 0,
+        if (this.labelsEnabled()) {
+            Utils.Window.setTimeout(function () {
+                var baselineValue = +_this.baselineValue();
+                var primaryScale = _this._plot.isVertical() ? _this.x().scale : _this.y().scale;
+                var secondaryScale = _this._plot.isVertical() ? _this.y().scale : _this.x().scale;
+                var _a = Utils.Stacking.stackedExtents(_this._plot.stackingResult()), maximumExtents = _a.maximumExtents, minimumExtents = _a.minimumExtents;
+                var barWidth = _this._plot.getBarPixelWidth();
+                var drawLabel = function (text, measurement, labelPosition) {
+                    var x = labelPosition.x, y = labelPosition.y;
+                    var height = measurement.height, width = measurement.width;
+                    var tooWide = _this._plot.isVertical() ? (width > barWidth) : (height > barWidth);
+                    var hideLabel = x < 0
+                        || y < 0
+                        || x + width > _this.width()
+                        || y + height > _this.height()
+                        || tooWide;
+                    if (!hideLabel) {
+                        var labelContainer = _this._labelArea.append("g").attr("transform", "translate(" + x + ", " + y + ")");
+                        labelContainer.classed("stacked-bar-label", true);
+                        var writeOptions = {
+                            selection: labelContainer,
+                            xAlign: "center",
+                            yAlign: "center",
+                            textRotation: 0,
+                        };
+                        _this._writer.write(text, measurement.width, measurement.height, writeOptions);
+                    }
                 };
-                _this._writer.write(text, measurement.width, measurement.height, writeOptions);
-            }
-        };
-        maximumExtents.forEach(function (maximum) {
-            if (maximum.extent !== baselineValue) {
-                // only draw sums for values not at the baseline
-                var text = _this.labelFormatter()(maximum.extent);
-                var measurement = _this._measurer.measure(text);
-                var primaryTextMeasurement = _this._plot.isVertical() ? measurement.width : measurement.height;
-                var secondaryTextMeasurement = _this._plot.isVertical() ? measurement.height : measurement.width;
-                var x = _this._plot.isVertical()
-                    ? primaryScale.scale(maximum.axisValue) - primaryTextMeasurement / 2
-                    : secondaryScale.scale(maximum.extent) + StackedBar._STACKED_BAR_LABEL_PADDING;
-                var y = _this._plot.isVertical()
-                    ? secondaryScale.scale(maximum.extent) - secondaryTextMeasurement - StackedBar._STACKED_BAR_LABEL_PADDING
-                    : primaryScale.scale(maximum.axisValue) - primaryTextMeasurement / 2;
-                drawLabel(text, measurement, { x: x, y: y });
-            }
-        });
-        minimumExtents.forEach(function (minimum) {
-            if (minimum.extent !== baselineValue) {
-                var text = _this.labelFormatter()(minimum.extent);
-                var measurement = _this._measurer.measure(text);
-                var primaryTextMeasurement = _this._plot.isVertical() ? measurement.width : measurement.height;
-                var secondaryTextMeasurement = _this._plot.isVertical() ? measurement.height : measurement.width;
-                var x = _this._plot.isVertical()
-                    ? primaryScale.scale(minimum.axisValue) - primaryTextMeasurement / 2
-                    : secondaryScale.scale(minimum.extent) - secondaryTextMeasurement - StackedBar._STACKED_BAR_LABEL_PADDING;
-                var y = _this._plot.isVertical()
-                    ? secondaryScale.scale(minimum.extent) + StackedBar._STACKED_BAR_LABEL_PADDING
-                    : primaryScale.scale(minimum.axisValue) - primaryTextMeasurement / 2;
-                drawLabel(text, measurement, { x: x, y: y });
-            }
-        });
+                maximumExtents.forEach(function (maximum) {
+                    if (maximum.extent !== baselineValue) {
+                        // only draw sums for values not at the baseline
+                        var text = _this.labelFormatter()(maximum.extent);
+                        var measurement = _this._measurer.measure(text);
+                        var primaryTextMeasurement = _this._plot.isVertical() ? measurement.width : measurement.height;
+                        var secondaryTextMeasurement = _this._plot.isVertical() ? measurement.height : measurement.width;
+                        var x = _this._plot.isVertical()
+                            ? primaryScale.scale(maximum.axisValue) - primaryTextMeasurement / 2
+                            : secondaryScale.scale(maximum.extent) + StackedBar._STACKED_BAR_LABEL_PADDING;
+                        var y = _this._plot.isVertical()
+                            ? secondaryScale.scale(maximum.extent) - secondaryTextMeasurement - StackedBar._STACKED_BAR_LABEL_PADDING
+                            : primaryScale.scale(maximum.axisValue) - primaryTextMeasurement / 2;
+                        drawLabel(text, measurement, { x: x, y: y });
+                    }
+                });
+                minimumExtents.forEach(function (minimum) {
+                    if (minimum.extent !== baselineValue) {
+                        var text = _this.labelFormatter()(minimum.extent);
+                        var measurement = _this._measurer.measure(text);
+                        var primaryTextMeasurement = _this._plot.isVertical() ? measurement.width : measurement.height;
+                        var secondaryTextMeasurement = _this._plot.isVertical() ? measurement.height : measurement.width;
+                        var x = _this._plot.isVertical()
+                            ? primaryScale.scale(minimum.axisValue) - primaryTextMeasurement / 2
+                            : secondaryScale.scale(minimum.extent) - secondaryTextMeasurement - StackedBar._STACKED_BAR_LABEL_PADDING;
+                        var y = _this._plot.isVertical()
+                            ? secondaryScale.scale(minimum.extent) + StackedBar._STACKED_BAR_LABEL_PADDING
+                            : primaryScale.scale(minimum.axisValue) - primaryTextMeasurement / 2;
+                        drawLabel(text, measurement, { x: x, y: y });
+                    }
+                });
+            }, timeout);
+        }
     };
     StackedBar._STACKED_BAR_LABEL_PADDING = 5;
     return StackedBar;

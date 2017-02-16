@@ -37,9 +37,13 @@ describe("Plots", () => {
         assert.strictEqual(stackedAreaPlot.x(constantValue), stackedAreaPlot, "setter returns calling object");
         stackedAreaPlot.renderTo(svg);
 
-        let stackedAreas = stackedAreaPlot.content().selectAll("path");
+        let stackedAreas = stackedAreaPlot.content().selectAll("path").filter(".area");
+        let stackedAreaLines = stackedAreaPlot.content().selectAll("path").filter(".line");
         assert.strictEqual(stackedAreas.size(),
           stackedAreaPlot.datasets().length, "same number of area selections as datasets");
+
+        assert.strictEqual(stackedAreaLines.size(),
+          stackedAreaPlot.datasets().length, "same number of area lines selections as datasets");
 
         stackedAreas.each(function(data, i) {
           let stackedAreaSelection = d3.select(this);
@@ -62,9 +66,14 @@ describe("Plots", () => {
         assert.strictEqual(stackedAreaPlot.x().accessor, accessor, `property set for datum`);
         stackedAreaPlot.renderTo(svg);
 
-        let stackedAreas = stackedAreaPlot.content().selectAll("path");
+        let stackedAreas = stackedAreaPlot.content().selectAll("path").filter(".area");
+        let stackedAreaLines = stackedAreaPlot.content().selectAll("path").filter(".line");
+
         assert.strictEqual(stackedAreas.size(),
           stackedAreaPlot.datasets().length, "same number of area selections as datasets");
+
+        assert.strictEqual(stackedAreaLines.size(),
+          stackedAreaPlot.datasets().length, "same number of area line selections as datasets");
 
         stackedAreas.each(function(data, i) {
           let stackedAreaSelection = d3.select(this);
@@ -91,9 +100,14 @@ describe("Plots", () => {
         assert.strictEqual(stackedAreaPlot.x().accessor, accessor, `property set for datum`);
         stackedAreaPlot.renderTo(svg);
 
-        let stackedAreas = stackedAreaPlot.content().selectAll("path");
+        let stackedAreas = stackedAreaPlot.content().selectAll("path").filter(".area");
+        let stackedAreaLines = stackedAreaPlot.content().selectAll("path").filter(".line");
+
         assert.strictEqual(stackedAreas.size(),
           stackedAreaPlot.datasets().length, "same number of area selections as datasets");
+
+        assert.strictEqual(stackedAreaLines.size(),
+          stackedAreaPlot.datasets().length, "same number of area line selections as datasets");
 
         stackedAreas.each(function(data, i) {
           let stackedAreaSelection = d3.select(this);
@@ -175,9 +189,14 @@ describe("Plots", () => {
         assert.strictEqual(stackedAreaPlot.y().accessor, accessor, "accessor set");
         stackedAreaPlot.renderTo(svg);
 
-        let stackedAreas = stackedAreaPlot.content().selectAll("path");
+        let stackedAreas = stackedAreaPlot.content().selectAll("path").filter(".area");
+        let stackedAreaLines = stackedAreaPlot.content().selectAll("path").filter(".line");
+
         assert.strictEqual(stackedAreas.size(),
           stackedAreaPlot.datasets().length, "same number of area selections as datasets");
+
+        assert.strictEqual(stackedAreaLines.size(),
+          stackedAreaPlot.datasets().length, "same number of area line selections as datasets");
 
         let stackedYs = calculateStackedYs(accessor);
         stackedAreas.each(function(data, i) {

@@ -33,7 +33,7 @@ describe("Plots", () => {
         const dataset = new Plottable.Dataset(data);
         plot.addDataset(dataset);
 
-        const lightweightPlotEntitySpy = sinon.spy(plot, "_buildLightweightPlotEntities");
+        const lightweightPlotEntitySpy = sinon.spy((plot as any)._plot, "_buildLightweightPlotEntities");
         const entities = plot.entities();
         const entities1 = plot.entities();
         assert.deepEqual(entities, entities1);
@@ -45,7 +45,7 @@ describe("Plots", () => {
         const dataset = new Plottable.Dataset(data);
         plot.addDataset(dataset);
 
-        const lightweightPlotEntitySpy = sinon.spy(plot, "_buildLightweightPlotEntities");
+        const lightweightPlotEntitySpy = sinon.spy((plot as any)._plot, "_buildLightweightPlotEntities");
         const entities = plot.entities([dataset]);
         const entities1 = plot.entities([dataset]);
         assert.deepEqual(entities, entities1);
@@ -58,7 +58,7 @@ describe("Plots", () => {
 
         plot.addDataset(dataset);
 
-        const lightweightPlotEntitySpy = sinon.spy(plot, "_buildLightweightPlotEntities");
+        const lightweightPlotEntitySpy = sinon.spy((plot as any)._plot, "_buildLightweightPlotEntities");
         const entities = plot.entities();
         assert.strictEqual(entities.length, 3);
 
@@ -97,7 +97,7 @@ describe("Plots", () => {
       it("builds entityStore if entity store is undefined", () => {
         const dataset = new Plottable.Dataset([5, -5, 10]);
         plot.addDataset(dataset);
-        const lightweightPlotEntitySpy = sinon.spy(plot, "_buildLightweightPlotEntities");
+        const lightweightPlotEntitySpy = sinon.spy((plot as any)._plot, "_buildLightweightPlotEntities");
         plot.entityNearest({ x: 5, y: 0 });
         assert.isTrue(lightweightPlotEntitySpy.calledOnce);
       });
@@ -150,10 +150,10 @@ describe("Plots", () => {
         const data = [5, -5, 10];
         const dataset = new Plottable.Dataset(data);
 
+        const oldDomain = scale.domain();
+
         plot.attr("foo", (d) => d, scale);
         plot.addDataset(dataset);
-
-        const oldDomain = scale.domain();
 
         const svg = TestMethods.generateSVG();
         plot.anchor(svg);
@@ -231,11 +231,11 @@ describe("Plots", () => {
       const scale = new Plottable.Scales.Linear();
       plot.attr("attr", (d) => d, scale);
 
+      const oldDomain = scale.domain();
+
       const data = [5, -5, 10];
       const dataset = new Plottable.Dataset(data);
       plot.addDataset(dataset);
-
-      const oldDomain = scale.domain();
 
       const svg = TestMethods.generateSVG();
       plot.anchor(svg);

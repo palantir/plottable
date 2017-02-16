@@ -269,7 +269,7 @@ export class BaseBarPlot<X, Y, P extends PlotEntity> extends BaseXYPlot<X, Y, P>
   }
 
   protected _additionalPaint(time: number) {
-    Utils.Window.setTimeout(() => this._component.drawLabels(this._getDataToDraw(), this._generateAttrToProjector()), time);
+    this._component.drawLabels(this._getDataToDraw(), this._generateAttrToProjector(), time);
   }
 
   protected _addDataset(dataset: Dataset) {

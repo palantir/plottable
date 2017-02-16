@@ -8,6 +8,9 @@ import { Map } from "../utils";
 import * as Animators from "../animators";
 import { Null } from "../animators";
 import * as Drawers from "../drawers";
+import { IDrawer } from "../drawers/drawer";
+
+import { RenderAreaAccessor } from "./basePlot";
 
 import { IComponent } from "../components";
 import { LabeledComponent } from "../components/labeled";
@@ -121,13 +124,19 @@ export class BasePiePlot<P extends PlotEntity> extends BasePlot<P> implements IP
   private _endAngle: number = 2 * Math.PI;
   private _startAngles: number[];
   private _endAngles: number[];
-  private _strokeDrawers: Utils.Map<Dataset, Drawers.ArcOutline>;
+  private _strokeDrawerFactory: DrawerFactory;
+  private _strokeDrawers: Utils.Map<Dataset, IDrawer>;
 
   protected _component: LabeledComponent;
 
-  constructor(drawerFactory: DrawerFactory, entityAdapter: EntityAdapter<P>, component: LabeledComponent) {
+  constructor(drawerFactory: DrawerFactory,
+    strokeDrawerFactory: DrawerFactory,
+    entityAdapter: EntityAdapter<P>,
+    component: LabeledComponent) {
+
     super(drawerFactory, entityAdapter, component);
-    this._strokeDrawers = new Utils.Map<Dataset, Drawers.ArcOutline>();
+    this._strokeDrawers = new Utils.Map<Dataset, IDrawer>();
+    this._strokeDrawerFactory = strokeDrawerFactory;
   }
 
   public startAngles() {
@@ -210,6 +219,21 @@ export class BasePiePlot<P extends PlotEntity> extends BasePlot<P> implements IP
     return this;
   }
 
+  public renderArea(): d3.Selection<void>;
+  public renderArea(renderArea: d3.Selection<void> | RenderAreaAccessor): this;
+  public renderArea(renderArea?: d3.Selection<void> | RenderAreaAccessor): any {
+    const superRenderArea = super.renderArea(renderArea);
+    if (renderArea === undefined) {
+        return superRenderArea;
+    }
+
+    // set the render area for all the stroke drawers
+    this.datasets().forEach((dataset) => {
+      this.strokeDrawer(dataset).renderArea(this._renderArea(dataset));
+    });
+
+    return this;
+  }
 
   public outerRadius<R>(): AccessorScaleBinding<R, number>;
   public outerRadius(outerRadius: number | Accessor<number>): this;
@@ -253,7 +277,7 @@ export class BasePiePlot<P extends PlotEntity> extends BasePlot<P> implements IP
       return this;
     }
     this._updatePieAngles();
-    let strokeDrawer = new Drawers.ArcOutline(dataset);
+    let strokeDrawer = this._strokeDrawerFactory(dataset);
     if (this._renderArea != null) {
       strokeDrawer.renderArea(this._renderArea(dataset));
     }
@@ -263,11 +287,11 @@ export class BasePiePlot<P extends PlotEntity> extends BasePlot<P> implements IP
   }
 
   protected _additionalPaint(time: number) {
-    Utils.Window.setTimeout(() => this._component.drawLabels(this._getDataToDraw(), this._generateAttrToProjector()), time);
+    this._component.drawLabels(this._getDataToDraw(), this._generateAttrToProjector(), time);
 
     let drawSteps = this._generateStrokeDrawSteps();
     let dataToDraw = this._getDataToDraw();
-    this.datasets().forEach((dataset) => this.drawer(dataset).draw(dataToDraw.get(dataset), drawSteps));
+    this.datasets().forEach((dataset) => this.strokeDrawer(dataset).draw(dataToDraw.get(dataset), drawSteps));
   }
 
   protected _pixelPoint(datum: any, index: number, dataset: Dataset) {
@@ -446,16 +470,21 @@ export class BasePiePlot<P extends PlotEntity> extends BasePlot<P> implements IP
     return null;
   }
 
+  public strokeDrawer(dataset: Dataset) {
+    return this._strokeDrawers.get(dataset);
+  }
+
   protected _onDatasetUpdate() {
-    super._onDatasetUpdate();
     this._updatePieAngles();
+
+    super._onDatasetUpdate();
   }
 
   protected _removeDataset(dataset: Dataset) {
     super._removeDataset(dataset);
     this._startAngles = [];
     this._endAngles = [];
-    this._strokeDrawers.get(dataset).remove();
+    this.strokeDrawer(dataset).remove();
     return this;
   }
 

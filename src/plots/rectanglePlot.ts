@@ -91,11 +91,14 @@ export class Rectangle<X, Y> extends XYPlot<X, Y> implements IRectanglePlot<X, Y
     return this;
   }
 
-  public drawLabels(dataToDraw: Utils.Map<Dataset, any[]>, attrToProjector: AttributeToProjector) {
+  public drawLabels(dataToDraw: Utils.Map<Dataset, any[]>, attrToProjector: AttributeToProjector, timeout: number) {
     this._renderArea.selectAll(".label-area").remove();
-    if (this._labelsEnabled && this.label() != null) {
-      this.datasets().forEach((dataset, i) => this._drawLabel(dataToDraw, dataset, i, attrToProjector));
-    }
+
+    Utils.Window.setTimeout(() => {
+      if (this._labelsEnabled && this.label() != null) {
+        this.datasets().forEach((dataset, i) => this._drawLabel(dataToDraw, dataset, i, attrToProjector));
+      }
+    }, timeout);
   }
 
   /**

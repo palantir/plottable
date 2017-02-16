@@ -20,6 +20,10 @@ export interface IComponent<D> {
    * @returns {Component} The calling Component.
    */
   anchor(selection: D): this;
+  /**
+   *  Returns whether the component is anchored or not
+   */
+  anchored(): boolean;
   anchorHTML(selection: HTMLElement): this;
   /**
    * Adds a callback to be called on anchoring the Component to the DOM.
@@ -276,6 +280,11 @@ export abstract class AbstractComponent<D> implements IComponent<D> {
    * @returns {Component} The calling Component.
    */
   abstract anchor(selection: D): this;
+
+  public anchored() {
+    return this._isAnchored;
+  }
+
   abstract anchorHTML(selection: HTMLElement): this;
   /**
    * Adds a callback to be called on anchoring the Component to the DOM.

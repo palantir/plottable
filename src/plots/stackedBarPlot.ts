@@ -81,82 +81,86 @@ export class StackedBar<X, Y> extends Bar<X, Y> {
     return new BaseStackedBarPlot((dataset) => new Drawers.Rectangle(dataset), StackedBar.SVGEntityAdapter, this);
   }
 
-  public drawLabels(dataToDraw: Utils.Map<Dataset, any[]>, attrToProjector: AttributeToProjector) {
-    super.drawLabels(dataToDraw, attrToProjector);
+  public drawLabels(dataToDraw: Utils.Map<Dataset, any[]>, attrToProjector: AttributeToProjector, timeout: number) {
+    super.drawLabels(dataToDraw, attrToProjector, timeout);
 
     // remove all current labels before redrawing
     this._labelArea.selectAll("g").remove();
 
-    const baselineValue = +this.baselineValue();
-    const primaryScale: Scale<any, number> = this._plot.isVertical() ? this.x().scale : this.y().scale;
-    const secondaryScale: Scale<any, number> = this._plot.isVertical() ? this.y().scale : this.x().scale;
-    const { maximumExtents, minimumExtents } = Utils.Stacking.stackedExtents<Date | string | number>(this._plot.stackingResult());
-    const barWidth = this._plot.getBarPixelWidth();
+    if (this.labelsEnabled()) {
+      Utils.Window.setTimeout(() => {
+        const baselineValue = +this.baselineValue();
+        const primaryScale: Scale<any, number> = this._plot.isVertical() ? this.x().scale : this.y().scale;
+        const secondaryScale: Scale<any, number> = this._plot.isVertical() ? this.y().scale : this.x().scale;
+        const { maximumExtents, minimumExtents } = Utils.Stacking.stackedExtents<Date | string | number>(this._plot.stackingResult());
+        const barWidth = this._plot.getBarPixelWidth();
 
-    const drawLabel = (text: string, measurement: { height: number, width: number }, labelPosition: Point) => {
-      const { x, y } = labelPosition;
-      const { height, width } = measurement;
-      const tooWide = this._plot.getBarPixelWidth() ? ( width > barWidth ) : ( height > barWidth );
+        const drawLabel = (text: string, measurement: { height: number, width: number }, labelPosition: Point) => {
+          const { x, y } = labelPosition;
+          const { height, width } = measurement;
+          const tooWide = this._plot.isVertical() ? ( width > barWidth ) : ( height > barWidth );
 
-      const hideLabel = x < 0
-        || y < 0
-        || x + width > this.width()
-        || y + height > this.height()
-        || tooWide;
+          const hideLabel = x < 0
+            || y < 0
+            || x + width > this.width()
+            || y + height > this.height()
+            || tooWide;
 
-      if (!hideLabel) {
-        const labelContainer = this._labelArea.append("g").attr("transform", `translate(${x}, ${y})`);
-        labelContainer.classed("stacked-bar-label", true);
+          if (!hideLabel) {
+            const labelContainer = this._labelArea.append("g").attr("transform", `translate(${x}, ${y})`);
+            labelContainer.classed("stacked-bar-label", true);
 
-        const writeOptions = {
-          selection: labelContainer,
-          xAlign: "center",
-          yAlign: "center",
-          textRotation: 0,
+            const writeOptions = {
+              selection: labelContainer,
+              xAlign: "center",
+              yAlign: "center",
+              textRotation: 0,
+            };
+
+            this._writer.write(text, measurement.width, measurement.height, writeOptions);
+          }
         };
 
-        this._writer.write(text, measurement.width, measurement.height, writeOptions);
-      }
-    };
+        maximumExtents.forEach((maximum) => {
+          if (maximum.extent !== baselineValue) {
+            // only draw sums for values not at the baseline
 
-    maximumExtents.forEach((maximum) => {
-      if (maximum.extent !== baselineValue) {
-        // only draw sums for values not at the baseline
+            const text = this.labelFormatter()(maximum.extent);
+            const measurement = this._measurer.measure(text);
 
-        const text = this.labelFormatter()(maximum.extent);
-        const measurement = this._measurer.measure(text);
+            const primaryTextMeasurement = this._plot.isVertical() ? measurement.width : measurement.height;
+            const secondaryTextMeasurement = this._plot.isVertical() ? measurement.height : measurement.width;
 
-        const primaryTextMeasurement = this._plot.isVertical() ? measurement.width : measurement.height;
-        const secondaryTextMeasurement = this._plot.isVertical() ? measurement.height : measurement.width;
+            const x = this._plot.isVertical()
+              ? primaryScale.scale(maximum.axisValue) - primaryTextMeasurement / 2
+              : secondaryScale.scale(maximum.extent) + StackedBar._STACKED_BAR_LABEL_PADDING;
+            const y = this._plot.isVertical()
+              ? secondaryScale.scale(maximum.extent) - secondaryTextMeasurement - StackedBar._STACKED_BAR_LABEL_PADDING
+              : primaryScale.scale(maximum.axisValue) - primaryTextMeasurement / 2;
 
-        const x = this._plot.isVertical()
-          ? primaryScale.scale(maximum.axisValue) - primaryTextMeasurement / 2
-          : secondaryScale.scale(maximum.extent) + StackedBar._STACKED_BAR_LABEL_PADDING;
-        const y = this._plot.isVertical()
-          ? secondaryScale.scale(maximum.extent) - secondaryTextMeasurement - StackedBar._STACKED_BAR_LABEL_PADDING
-          : primaryScale.scale(maximum.axisValue) - primaryTextMeasurement / 2;
+            drawLabel(text, measurement, { x, y });
+          }
+        });
 
-        drawLabel(text, measurement, { x, y });
-      }
-    });
+        minimumExtents.forEach((minimum) => {
+          if (minimum.extent !== baselineValue) {
+            const text = this.labelFormatter()(minimum.extent);
+            const measurement = this._measurer.measure(text);
 
-    minimumExtents.forEach((minimum) => {
-      if (minimum.extent !== baselineValue) {
-        const text = this.labelFormatter()(minimum.extent);
-        const measurement = this._measurer.measure(text);
+            const primaryTextMeasurement = this._plot.isVertical() ? measurement.width : measurement.height;
+            const secondaryTextMeasurement = this._plot.isVertical() ? measurement.height : measurement.width;
 
-        const primaryTextMeasurement = this._plot.isVertical() ? measurement.width : measurement.height;
-        const secondaryTextMeasurement = this._plot.isVertical() ? measurement.height : measurement.width;
+            const x = this._plot.isVertical()
+              ? primaryScale.scale(minimum.axisValue) - primaryTextMeasurement / 2
+              : secondaryScale.scale(minimum.extent) - secondaryTextMeasurement - StackedBar._STACKED_BAR_LABEL_PADDING;
+            const y = this._plot.isVertical()
+              ? secondaryScale.scale(minimum.extent) + StackedBar._STACKED_BAR_LABEL_PADDING
+              : primaryScale.scale(minimum.axisValue) - primaryTextMeasurement / 2;
 
-        const x = this._plot.isVertical()
-          ? primaryScale.scale(minimum.axisValue) - primaryTextMeasurement / 2
-          : secondaryScale.scale(minimum.extent) - secondaryTextMeasurement - StackedBar._STACKED_BAR_LABEL_PADDING;
-        const y = this._plot.isVertical()
-          ? secondaryScale.scale(minimum.extent) + StackedBar._STACKED_BAR_LABEL_PADDING
-          : primaryScale.scale(minimum.axisValue) - primaryTextMeasurement / 2;
-
-        drawLabel(text, measurement, { x, y });
-      }
-    });
+            drawLabel(text, measurement, { x, y });
+          }
+        });
+      }, timeout);
+    }
   }
 }
