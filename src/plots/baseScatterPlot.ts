@@ -91,9 +91,9 @@ export class BaseScatterPlot<X, Y, P extends PlotEntity> extends BaseXYPlot<X, Y
     });
   }
 
-  public entitiesIn(bounds: Bounds): PlotEntity[];
-  public entitiesIn(xRange: Range, yRange: Range): PlotEntity[];
-  public entitiesIn(xRangeOrBounds: Range | Bounds, yRange?: Range): PlotEntity[] {
+  public entitiesIn(bounds: Bounds): P[];
+  public entitiesIn(xRange: Range, yRange: Range): P[];
+  public entitiesIn(xRangeOrBounds: Range | Bounds, yRange?: Range): P[] {
     let dataXRange: Range;
     let dataYRange: Range;
     if (yRange == null) {

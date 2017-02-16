@@ -183,25 +183,6 @@ export class Bar<X, Y> extends XYPlot<X, Y> implements IBarPlot<X, Y> {
     }
   }
 
-  /**
-   * Gets the Entities that intersect the Bounds.
-   *
-   * @param {Bounds} bounds
-   * @returns {PlotEntity[]}
-   */
-  public entitiesIn(bounds: Bounds): PlotEntity[];
-  /**
-   * Gets the Entities that intersect the area defined by the ranges.
-   *
-   * @param {Range} xRange
-   * @param {Range} yRange
-   * @returns {PlotEntity[]}
-   */
-  public entitiesIn(xRange: Range, yRange: Range): PlotEntity[];
-  public entitiesIn(xRangeOrBounds: Range | Bounds, yRange?: Range): PlotEntity[] {
-    return this._plot.entitiesIn(xRangeOrBounds as Range, yRange);
-  }
-
   public renderImmediately() {
     super.renderImmediately();
 

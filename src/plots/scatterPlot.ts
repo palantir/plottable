@@ -100,25 +100,6 @@ export class Scatter<X, Y> extends XYPlot<X, Y> implements IScatterPlot<X, Y> {
     return this;
   }
 
-  /**
-   * Gets the Entities that intersect the Bounds.
-   *
-   * @param {Bounds} bounds
-   * @returns {PlotEntity[]}
-   */
-  public entitiesIn(bounds: Bounds): PlotEntity[];
-  /**
-   * Gets the Entities that intersect the area defined by the ranges.
-   *
-   * @param {Range} xRange
-   * @param {Range} yRange
-   * @returns {PlotEntity[]}
-   */
-  public entitiesIn(xRange: Range, yRange: Range): PlotEntity[];
-  public entitiesIn(xRangeOrBounds: Range | Bounds, yRange?: Range): PlotEntity[] {
-    return this._plot.entitiesIn(xRangeOrBounds as Range, yRange);
-  }
-
   protected _createPlot() {
     return new BaseScatterPlot((dataset) => new Drawers.Symbol(dataset), Scatter.SVGEntityAdapter, this);
   }

@@ -1500,6 +1500,9 @@ var BaseXYPlot = (function (_super) {
         }
         return this;
     };
+    BaseXYPlot.prototype.entitiesIn = function (xRangeOrBounds, yRange) {
+        throw new Error("Sub classes must implement this method");
+    };
     BaseXYPlot.prototype.destroy = function () {
         if (this.x().scale) {
             this.x().scale.offUpdate(this._adjustYDomainOnChangeFromXCallback);
@@ -2109,6 +2112,9 @@ var XYPlot = (function (_super) {
     XYPlot.prototype.showAllData = function () {
         this._plot.showAllData();
         return this;
+    };
+    XYPlot.prototype.entitiesIn = function (xRangeOrBounds, yRange) {
+        return this._plot.entitiesIn(xRangeOrBounds, yRange);
     };
     XYPlot.prototype._createPlot = function () {
         return new baseXYPlot_1.BaseXYPlot(function (dataset) { return new drawer_1.Drawer(dataset); }, XYPlot.SVGEntityAdapter, this);
@@ -3699,9 +3705,6 @@ var Bar = (function (_super) {
             labelConfig.labelArea.remove();
             this._labelConfig.delete(dataset);
         }
-    };
-    Bar.prototype.entitiesIn = function (xRangeOrBounds, yRange) {
-        return this._plot.entitiesIn(xRangeOrBounds, yRange);
     };
     Bar.prototype.renderImmediately = function () {
         _super.prototype.renderImmediately.call(this);
@@ -7813,9 +7816,6 @@ var Line = (function (_super) {
         }
         this.render();
         return this;
-    };
-    Line.prototype.entitiesIn = function (xRangeOrBounds, yRange) {
-        return this._plot.entitiesIn(xRangeOrBounds, yRange);
     };
     /**
      * Returns the PlotEntity nearest to the query point by X then by Y, or undefined if no PlotEntity can be found.
@@ -14700,29 +14700,12 @@ var CanvasRectangle = (function (_super) {
     CanvasRectangle.prototype.drawLabels = function () {
         // no labels yet
     };
-    CanvasRectangle.prototype.entitiesIn = function (xRangeOrBounds, yRange) {
-        return this._plot.entitiesIn(xRangeOrBounds, yRange);
-    };
-    CanvasRectangle.prototype.x = function (x, xScale) {
-        var xReturn = this._plot.x(x, xScale);
-        if (x == null) {
-            return xReturn;
-        }
-        return this;
-    };
     CanvasRectangle.prototype.x2 = function (x2) {
         var x2Return = this._plot.x2(x2);
         if (x2 == null) {
             return x2Return;
         }
         this.render();
-        return this;
-    };
-    CanvasRectangle.prototype.y = function (y, yScale) {
-        var yReturn = this._plot.y(y, yScale);
-        if (y == null) {
-            return yReturn;
-        }
         return this;
     };
     CanvasRectangle.prototype.y2 = function (y2) {
@@ -15043,9 +15026,6 @@ var Rectangle = (function (_super) {
         this.render();
         return this;
     };
-    Rectangle.prototype.entitiesIn = function (xRangeOrBounds, yRange) {
-        return this._plot.entitiesIn(xRangeOrBounds, yRange);
-    };
     Rectangle.prototype.drawLabels = function (dataToDraw, attrToProjector) {
         var _this = this;
         this._renderArea.selectAll(".label-area").remove();
@@ -15223,9 +15203,6 @@ var Scatter = (function (_super) {
         this.render();
         return this;
     };
-    Scatter.prototype.entitiesIn = function (xRangeOrBounds, yRange) {
-        return this._plot.entitiesIn(xRangeOrBounds, yRange);
-    };
     Scatter.prototype._createPlot = function () {
         return new baseScatterPlot_1.BaseScatterPlot(function (dataset) { return new Drawers.Symbol(dataset); }, Scatter.SVGEntityAdapter, this);
     };
@@ -15284,9 +15261,6 @@ var Segment = (function (_super) {
         }
         this.render();
         return this;
-    };
-    Segment.prototype.entitiesIn = function (xRangeOrBounds, yRange) {
-        return this._plot.entitiesIn(xRangeOrBounds, yRange);
     };
     return Segment;
 }(xyPlot_1.XYPlot));
@@ -15622,6 +15596,9 @@ var XYCanvasPlot = (function (_super) {
         _super.prototype.destroy.call(this);
         this._plot.destroy();
         return this;
+    };
+    XYCanvasPlot.prototype.entitiesIn = function (xRangeOrBounds, yRange) {
+        return this._plot.entitiesIn(xRangeOrBounds, yRange);
     };
     XYCanvasPlot.prototype.showAllData = function () {
         this._plot.showAllData();

@@ -8,7 +8,7 @@ import { LightweightPlotEntity, PlotEntity, TransformableAccessorScaleBinding } 
 
 import { IComponent } from "../components";
 import { Dataset } from "../core/dataset";
-import { Accessor, Point } from "../core/interfaces";
+import { Accessor, Bounds, Point, Range } from "../core/interfaces";
 import { Scale, ScaleCallback } from "../scales/scale";
 
 export interface IXYPlot<X, Y> extends IPlot {
@@ -30,6 +30,22 @@ export interface IXYPlot<X, Y> extends IPlot {
   autorangeMode(autorangeMode?: string): any
   computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number): this;
   destroy(): this;
+   /**
+   * Gets the Entities that intersect the Bounds.
+   *
+   * @param {Bounds} bounds
+   * @returns {PlotEntity[]}
+   */
+  entitiesIn(bounds: Bounds): PlotEntity[];
+  /**
+   * Gets the Entities that intersect the area defined by the ranges.
+   *
+   * @param {Range} xRange
+   * @param {Range} yRange
+   * @returns {PlotEntity[]}
+   */
+  entitiesIn(xRange: Range, yRange: Range): PlotEntity[];
+  entitiesIn(xRangeOrBounds: Range | Bounds, yRange?: Range): PlotEntity[];
   showAllData(): this;
   /**
    * Gets the TransformableAccessorScaleBinding for X.
@@ -141,6 +157,12 @@ export class BaseXYPlot<X, Y, P extends PlotEntity> extends BasePlot<P> implemen
     }
 
     return this;
+  }
+
+  public entitiesIn(bounds: Bounds): P[];
+  public entitiesIn(xRange: Range, yRange: Range): P[];
+  public entitiesIn(xRangeOrBounds: Range | Bounds, yRange?: Range): P[] {
+    throw new Error("Sub classes must implement this method");
   }
 
   public destroy() {
