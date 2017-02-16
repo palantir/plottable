@@ -7047,10 +7047,10 @@ var BaseAreaPlot = (function (_super) {
         return propertyToProjectors;
     };
     BaseAreaPlot.prototype._removeDataset = function (dataset) {
-        _super.prototype._removeDataset.call(this, dataset);
         if (this.datasets().indexOf(dataset) === -1) {
             return this;
         }
+        _super.prototype._removeDataset.call(this, dataset);
         var lineDrawer = this._lineDrawers.get(dataset);
         lineDrawer.remove();
         this._lineDrawers.delete(dataset);

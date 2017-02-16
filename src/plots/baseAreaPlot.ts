@@ -186,11 +186,11 @@ export class BaseAreaPlot<X> extends BaseLinePlot<X> implements IAreaPlot<X> {
   }
 
   protected _removeDataset(dataset: Dataset) {
-    super._removeDataset(dataset);
-
     if (this.datasets().indexOf(dataset) === -1) {
       return this;
     }
+
+    super._removeDataset(dataset);
 
     const lineDrawer = this._lineDrawers.get(dataset);
     lineDrawer.remove();
