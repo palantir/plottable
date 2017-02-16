@@ -68,9 +68,14 @@ export class Drawer {
    * @param{any[]} data The data to be drawn
    */
   private _bindSelectionData(data: any[]) {
-    let dataElements = this.selection().data(data);
-    dataElements.enter().append(this._svgElementName);
-    dataElements.exit().remove();
+    let dataElementsUpdate = this.selection().data(data);
+    const dataElements =
+      dataElementsUpdate
+        .enter()
+        .append(this._svgElementName)
+        .merge(dataElementsUpdate);
+    dataElementsUpdate.exit().remove();
+
     this._applyDefaultAttributes(dataElements);
   }
 

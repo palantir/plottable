@@ -11,7 +11,8 @@ import { Component } from "../components/component";
 export type SimpleSelection<Datum> = d3.Selection<d3.BaseType, Datum, any, any>;
 
 /**
- * Accesses a specific datum property.
+ * Accesses a specific datum property. Users supply Accessors to their
+ * plots' .x, .y, .attr, etc. functions.
  */
 export interface Accessor<T> {
   (datum: any, index: number, dataset: Dataset): T;
@@ -20,6 +21,7 @@ export interface Accessor<T> {
 /**
  * Retrieves a scaled datum property.
  * Essentially passes the result of an Accessor through a Scale.
+ * Projectors are exclusively built from Plot._scaledAccessor.
  */
 export type Projector = (datum: any, index: number, dataset: Dataset) => any;
 

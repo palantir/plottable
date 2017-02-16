@@ -314,8 +314,8 @@ export class Component {
       } else if (element instanceof Element) {
         selection = d3.select<d3.BaseType, void>(element);
       } else {
-        // coerce possibly external d3 instance into our own instance of d3 so we can use d3-selection-multi
-        selection = d3.selectAll<d3.BaseType, void>(element.nodes());
+        // coerce possibly external d3 v3 or v4 instance into our own instance of d3 so we can use d3-selection-multi
+        selection = d3.select<d3.BaseType, void>(element.node());
       }
       if (!selection.node() || (<Node> selection.node()).nodeName.toLowerCase() !== "svg") {
         throw new Error("Plottable requires a valid SVG to renderTo");
