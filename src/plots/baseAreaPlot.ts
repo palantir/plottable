@@ -8,8 +8,11 @@ import * as d3 from "d3";
 import * as Plots from "./";
 import * as Utils from "../utils";
 
+import { DrawerFactory, RenderAreaAccessor } from "./basePlot";
+
 import { BaseLinePlot, ILinePlot } from "./baseLinePlot";
 
+import { IComponent } from "../components";
 import { Dataset } from "../core/dataset";
 import { DrawStep } from "../drawers";
 import * as Drawers from "../drawers";
@@ -39,9 +42,38 @@ export class BaseAreaPlot<X> extends BaseLinePlot<X> implements IAreaPlot<X> {
 
   private _constantBaselineValueProvider: () => number[];
   private _lineDrawers = new Utils.Map<Dataset, IDrawer>();
+  private _lineDrawerFactory: DrawerFactory;
 
-  public drawers(dataset: Dataset) {
-    return this._lineDrawers.get(dataset);
+  constructor(drawerFactory: DrawerFactory, lineDrawerFactory: DrawerFactory, component: IComponent<any>) {
+    super(drawerFactory, component);
+    this._lineDrawerFactory = lineDrawerFactory;
+  }
+
+  public renderArea(): d3.Selection<void>;
+  public renderArea(renderArea: d3.Selection<void> | RenderAreaAccessor): this;
+  public renderArea(renderArea?: d3.Selection<void> | RenderAreaAccessor): any {
+    const superRenderArea = super.renderArea(renderArea);
+    if (renderArea === undefined) {
+        return superRenderArea;
+    }
+
+    // set the render area for all the line drawers of this plot
+    this.datasets().forEach((dataset) => {
+      this._lineDrawers.get(dataset).renderArea(this._renderArea(dataset));
+    });
+
+    return this;
+  }
+
+  public renderImmediately() {
+    // draw the line above the area
+    let drawSteps = this._generateLineDrawSteps();
+    let dataToDraw = this._getDataToDraw();
+    this.datasets().forEach((dataset) => this._lineDrawers.get(dataset).draw(dataToDraw.get(dataset), drawSteps));
+
+    super.renderImmediately();
+
+    return this;
   }
 
   public y(y?: number | Accessor<number>, yScale?: QuantitativeScale<number>): any {
@@ -78,19 +110,13 @@ export class BaseAreaPlot<X> extends BaseLinePlot<X> implements IAreaPlot<X> {
   }
 
   protected _addDataset(dataset: Dataset) {
-    let lineDrawer = new Drawers.Line(dataset);
+    let lineDrawer = this._lineDrawerFactory(dataset);
     if (this._renderArea != null) {
       lineDrawer.renderArea(this._renderArea(dataset));
     }
     this._lineDrawers.set(dataset, lineDrawer);
     super._addDataset(dataset);
     return this;
-  }
-
-  protected _additionalPaint() {
-    let drawSteps = this._generateLineDrawSteps();
-    let dataToDraw = this._getDataToDraw();
-    this.datasets().forEach((dataset) => this._lineDrawers.get(dataset).draw(dataToDraw.get(dataset), drawSteps));
   }
 
   protected _constructAreaProjector(xProjector: Projector, yProjector: Projector, y0Projector: Projector) {
@@ -128,13 +154,7 @@ export class BaseAreaPlot<X> extends BaseLinePlot<X> implements IAreaPlot<X> {
     return drawSteps;
   }
 
-  private _generateLineAttrToProjector() {
-    let lineAttrToProjector = this._generateAttrToProjector();
-    lineAttrToProjector["d"] = this._constructLineProjector(BaseAreaPlot._scaledAccessor(this.x()), BaseAreaPlot._scaledAccessor(this.y()));
-    return lineAttrToProjector;
-  }
-
-  private _generateLineDrawSteps() {
+  protected _generateLineDrawSteps() {
     let drawSteps: DrawStep[] = [];
     if (this._animateOnNextRender()) {
       let attrToProjector = this._generateLineAttrToProjector();
@@ -167,7 +187,15 @@ export class BaseAreaPlot<X> extends BaseLinePlot<X> implements IAreaPlot<X> {
 
   protected _removeDataset(dataset: Dataset) {
     super._removeDataset(dataset);
-    this._lineDrawers.get(dataset).remove();
+
+    if (this.datasets().indexOf(dataset) === -1) {
+      return this;
+    }
+
+    const lineDrawer = this._lineDrawers.get(dataset);
+    lineDrawer.remove();
+
+    this._lineDrawers.delete(dataset);
     return this;
   }
 
@@ -192,5 +220,11 @@ export class BaseAreaPlot<X> extends BaseLinePlot<X> implements IAreaPlot<X> {
       this._constantBaselineValueProvider = () => [constantBaseline];
       yScale.addPaddingExceptionsProvider(this._constantBaselineValueProvider);
     }
+  }
+
+  private _generateLineAttrToProjector() {
+    let lineAttrToProjector = this._generateAttrToProjector();
+    lineAttrToProjector["d"] = this._constructLineProjector(BaseAreaPlot._scaledAccessor(this.x()), BaseAreaPlot._scaledAccessor(this.y()));
+    return lineAttrToProjector;
   }
 }

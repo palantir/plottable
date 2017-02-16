@@ -213,10 +213,6 @@ export class Line<X> extends XYPlot<X, number> implements ILinePlot<X> {
   }
 
   protected _createPlot() {
-    return new BaseLinePlot((dataset) => new Drawers.Line(dataset),
-      this,
-      () => this.width(),
-      () => this.height()
-    );
+    return new BaseLinePlot((dataset) => new Drawers.Line(dataset), this);
   }
 }

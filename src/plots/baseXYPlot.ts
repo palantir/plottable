@@ -78,19 +78,14 @@ export interface IXYPlot<X, Y> extends IPlot {
 export class BaseXYPlot<X, Y> extends BasePlot implements IXYPlot<X, Y> {
   protected static _X_KEY = "x";
   protected static _Y_KEY = "y";
-  protected _width: () => number;
-  protected _height: () => number;
 
   private _autoAdjustYScaleDomain = false;
   private _autoAdjustXScaleDomain = false;
   private _adjustYDomainOnChangeFromXCallback: ScaleCallback<Scale<any, any>>;
   private _adjustXDomainOnChangeFromYCallback: ScaleCallback<Scale<any, any>>;
 
-  constructor(drawerFactory: DrawerFactory, component: IComponent<any>, width: () => number, height: () => number) {
+  constructor(drawerFactory: DrawerFactory, component: IComponent<any>) {
     super(drawerFactory, component);
-
-    this._width = width;
-    this._height = height;
 
     this._adjustXDomainOnChangeFromYCallback = (scale) => this._adjustXDomainOnChangeFromY();
     this._adjustYDomainOnChangeFromXCallback = (scale) => this._adjustYDomainOnChangeFromX();
@@ -133,15 +128,15 @@ export class BaseXYPlot<X, Y> extends BasePlot implements IXYPlot<X, Y> {
     let xBinding = this.x();
     let xScale = xBinding && xBinding.scale;
     if (xScale != null) {
-      xScale.range([0, this._width()]);
+      xScale.range([0, this._component.width()]);
     }
     let yBinding = this.y();
     let yScale = yBinding && yBinding.scale;
     if (yScale != null) {
       if (yScale instanceof Scales.Category) {
-        yScale.range([0, this._height()]);
+        yScale.range([0, this._component.height()]);
       } else {
-        yScale.range([this._height(), 0]);
+        yScale.range([this._component.height(), 0]);
       }
     }
 
@@ -183,7 +178,7 @@ export class BaseXYPlot<X, Y> extends BasePlot implements IXYPlot<X, Y> {
     }
     this._bindProperty(BaseXYPlot._X_KEY, x, xScale);
 
-    let width = this._width();
+    let width = this._component.width();
     if (xScale != null && width != null) {
       xScale.range([0, width]);
     }
@@ -204,7 +199,7 @@ export class BaseXYPlot<X, Y> extends BasePlot implements IXYPlot<X, Y> {
 
     this._bindProperty(BaseXYPlot._Y_KEY, y, yScale);
 
-    let height = this._height();
+    let height = this._component.height();
     if (yScale != null && height != null) {
       if (yScale instanceof Scales.Category) {
         yScale.range([0, height]);

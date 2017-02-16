@@ -103,6 +103,7 @@ export class BaseSegmentPlot<X, Y> extends BaseXYPlot<X, Y> implements ISegmentP
         this._bindProperty(BaseSegmentPlot._X2_KEY, x2, xScale);
       }
     }
+
     return this;
   }
 

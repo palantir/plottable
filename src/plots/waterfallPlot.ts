@@ -73,11 +73,7 @@ export class Waterfall<X, Y> extends Bar<X, number>  implements IWaterfallPlot<X
   }
 
   protected _createPlot() {
-    return new BaseWaterfallPlot((dataset) => new Drawers.Rectangle(dataset),
-      this,
-      () => this.width(),
-      () => this.height()
-    );
+    return new BaseWaterfallPlot((dataset) => new Drawers.Rectangle(dataset), this);
   }
 
 

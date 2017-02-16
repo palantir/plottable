@@ -242,9 +242,6 @@ export class XYPlot<X, Y> extends Plot implements IXYPlot<X, Y> {
   }
 
   protected _createPlot() {
-    return new BaseXYPlot((dataset) => new Drawer(dataset),
-      this,
-      () => this.width(),
-      () => this.height());
+    return new BaseXYPlot((dataset) => new Drawer(dataset), this);
   }
 }

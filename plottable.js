@@ -1444,13 +1444,11 @@ var Scales = __webpack_require__(2);
 var basePlot_1 = __webpack_require__(27);
 var BaseXYPlot = (function (_super) {
     __extends(BaseXYPlot, _super);
-    function BaseXYPlot(drawerFactory, component, width, height) {
+    function BaseXYPlot(drawerFactory, component) {
         var _this = this;
         _super.call(this, drawerFactory, component);
         this._autoAdjustYScaleDomain = false;
         this._autoAdjustXScaleDomain = false;
-        this._width = width;
-        this._height = height;
         this._adjustXDomainOnChangeFromYCallback = function (scale) { return _this._adjustXDomainOnChangeFromY(); };
         this._adjustYDomainOnChangeFromXCallback = function (scale) { return _this._adjustYDomainOnChangeFromX(); };
     }
@@ -1488,16 +1486,16 @@ var BaseXYPlot = (function (_super) {
         var xBinding = this.x();
         var xScale = xBinding && xBinding.scale;
         if (xScale != null) {
-            xScale.range([0, this._width()]);
+            xScale.range([0, this._component.width()]);
         }
         var yBinding = this.y();
         var yScale = yBinding && yBinding.scale;
         if (yScale != null) {
             if (yScale instanceof Scales.Category) {
-                yScale.range([0, this._height()]);
+                yScale.range([0, this._component.height()]);
             }
             else {
-                yScale.range([this._height(), 0]);
+                yScale.range([this._component.height(), 0]);
             }
         }
         return this;
@@ -1529,7 +1527,7 @@ var BaseXYPlot = (function (_super) {
             return this._propertyBindings.get(BaseXYPlot._X_KEY);
         }
         this._bindProperty(BaseXYPlot._X_KEY, x, xScale);
-        var width = this._width();
+        var width = this._component.width();
         if (xScale != null && width != null) {
             xScale.range([0, width]);
         }
@@ -1543,7 +1541,7 @@ var BaseXYPlot = (function (_super) {
             return this._propertyBindings.get(BaseXYPlot._Y_KEY);
         }
         this._bindProperty(BaseXYPlot._Y_KEY, y, yScale);
-        var height = this._height();
+        var height = this._component.height();
         if (yScale != null && height != null) {
             if (yScale instanceof Scales.Category) {
                 yScale.range([0, height]);
@@ -2100,8 +2098,7 @@ var XYPlot = (function (_super) {
         return this;
     };
     XYPlot.prototype._createPlot = function () {
-        var _this = this;
-        return new baseXYPlot_1.BaseXYPlot(function (dataset) { return new drawer_1.Drawer(dataset); }, this, function () { return _this.width(); }, function () { return _this.height(); });
+        return new baseXYPlot_1.BaseXYPlot(function (dataset) { return new drawer_1.Drawer(dataset); }, this);
     };
     return XYPlot;
 }(plot_1.Plot));
@@ -3655,8 +3652,7 @@ var Bar = (function (_super) {
         return this;
     };
     Bar.prototype._createPlot = function () {
-        var _this = this;
-        return new baseBarPlot_1.BaseBarPlot(function (dataset) { return new Drawers.Rectangle(dataset); }, this, function () { return _this.width(); }, function () { return _this.height(); });
+        return new baseBarPlot_1.BaseBarPlot(function (dataset) { return new Drawers.Rectangle(dataset); }, this);
     };
     Bar.prototype._setup = function () {
         var _this = this;
@@ -3923,9 +3919,9 @@ var baseXYPlot_1 = __webpack_require__(13);
 var quantitativeScale_1 = __webpack_require__(8);
 var BaseBarPlot = (function (_super) {
     __extends(BaseBarPlot, _super);
-    function BaseBarPlot(drawerFactory, component, width, height) {
+    function BaseBarPlot(drawerFactory, component) {
         var _this = this;
-        _super.call(this, drawerFactory, component, width, height);
+        _super.call(this, drawerFactory, component);
         this._barPixelWidth = 0;
         this._baselineValueProvider = function () { return [_this.baselineValue()]; };
         this._updateBarPixelWidthCallback = function () { return _this.updateBarPixelWidth(); };
@@ -4226,7 +4222,7 @@ var BaseBarPlot = (function (_super) {
             numberBarAccessorData.sort(function (a, b) { return a - b; });
             var scaledData = numberBarAccessorData.map(function (datum) { return barScale.scale(datum); });
             var barAccessorDataPairs = d3.pairs(scaledData);
-            var barWidthDimension = this._isVertical ? this._width() : this._height();
+            var barWidthDimension = this._isVertical ? this._component.width() : this._component.height();
             barPixelWidth = Utils.Math.min(barAccessorDataPairs, function (pair, i) {
                 return Math.abs(pair[1] - pair[0]);
             }, barWidthDimension * BaseBarPlot._SINGLE_BAR_DIMENSION_RATIO);
@@ -4372,14 +4368,21 @@ var BasePlot = (function () {
             this._renderArea = function () { return renderArea; };
         }
         this.datasets().forEach(function (dataset) {
-            _this._datasetToDrawer.get(dataset).renderArea(_this._renderArea(dataset));
+            var drawer = _this.drawer(dataset);
+            var existingRenderARea = drawer.renderArea();
+            // remove any existing render area before adding a new one
+            // so that sub classes can define custom render areas if they choose
+            if (existingRenderARea != null) {
+                existingRenderARea.remove();
+            }
+            _this.drawer(dataset).renderArea(_this._renderArea(dataset));
         });
         return this;
     };
     BasePlot.prototype.datasets = function (datasets) {
         var _this = this;
         var currentDatasets = [];
-        this._datasetToDrawer.forEach(function (drawer, dataset) { return currentDatasets.push(dataset); });
+        this._getDatasetToDrawer().forEach(function (drawer, dataset) { return currentDatasets.push(dataset); });
         if (datasets == null) {
             return currentDatasets;
         }
@@ -4394,7 +4397,7 @@ var BasePlot = (function () {
         this.datasets([]);
     };
     BasePlot.prototype.drawer = function (dataset) {
-        return this._datasetToDrawer.get(dataset);
+        return this._getDatasetToDrawer().get(dataset);
     };
     /**
      * Gets the Entities associated with the specified Datasets.
@@ -4471,7 +4474,7 @@ var BasePlot = (function () {
             // may not be initiated yet, we'll initiate everything later
             drawer.renderArea(this._renderArea(dataset));
         }
-        this._datasetToDrawer.set(dataset, drawer);
+        this._getDatasetToDrawer().set(dataset, drawer);
         this.clearDataCache();
         dataset.onUpdate(this._onDatasetUpdateAction);
     };
@@ -4502,7 +4505,7 @@ var BasePlot = (function () {
         var _this = this;
         var lightweightPlotEntities = [];
         datasets.forEach(function (dataset, datasetIndex) {
-            var drawer = _this._datasetToDrawer.get(dataset);
+            var drawer = _this.drawer(dataset);
             var validDatumIndex = 0;
             dataset.data().forEach(function (datum, datumIndex) {
                 var position = _this._pixelPoint(datum, datumIndex, dataset);
@@ -4558,9 +4561,12 @@ var BasePlot = (function () {
             return new animators_1.Null();
         }
     };
+    BasePlot.prototype._getDatasetToDrawer = function () {
+        return this._datasetToDrawer;
+    };
     BasePlot.prototype._getDrawersInOrder = function () {
         var _this = this;
-        return this.datasets().map(function (dataset) { return _this._datasetToDrawer.get(dataset); });
+        return this.datasets().map(function (dataset) { return _this.drawer(dataset); });
     };
     BasePlot.prototype._getDataToDraw = function () {
         var dataToDraw = new Utils.Map();
@@ -4622,9 +4628,9 @@ var BasePlot = (function () {
             return this;
         }
         dataset.offUpdate(this._onDatasetUpdateAction);
-        var drawer = this._datasetToDrawer.get(dataset);
+        var drawer = this.drawer(dataset);
         drawer.remove();
-        this._datasetToDrawer.delete(dataset);
+        this._getDatasetToDrawer().delete(dataset);
         this.clearDataCache();
         this._onDatasetRemovedCallback(dataset);
         return this;
@@ -6868,11 +6874,6 @@ var Area = (function (_super) {
         this.attr("fill-opacity", 0.25);
         this.attr("fill", new Scales.Color().range()[0]);
     }
-    Area.prototype._setup = function () {
-        var _this = this;
-        _super.prototype._setup.call(this);
-        this._plot.renderArea(function () { return _this._renderArea.append("g"); });
-    };
     Area.prototype.y = function (y, yScale) {
         var plotY = this._plot.y(y, yScale);
         if (y == null) {
@@ -6898,8 +6899,7 @@ var Area = (function (_super) {
         return d3.selectAll(allSelections);
     };
     Area.prototype._createPlot = function () {
-        var _this = this;
-        return new baseAreaPlot_1.BaseAreaPlot(function (dataset) { return new Drawers.Area(dataset); }, this, function () { return _this.width(); }, function () { return _this.height(); });
+        return new baseAreaPlot_1.BaseAreaPlot(function (dataset) { return new Drawers.Area(dataset); }, function (dataset) { return new Drawers.Line(dataset); }, this);
     };
     return Area;
 }(linePlot_1.Line));
@@ -6925,15 +6925,33 @@ var d3 = __webpack_require__(1);
 var Plots = __webpack_require__(12);
 var Utils = __webpack_require__(0);
 var baseLinePlot_1 = __webpack_require__(44);
-var Drawers = __webpack_require__(3);
 var BaseAreaPlot = (function (_super) {
     __extends(BaseAreaPlot, _super);
-    function BaseAreaPlot() {
-        _super.apply(this, arguments);
+    function BaseAreaPlot(drawerFactory, lineDrawerFactory, component) {
+        _super.call(this, drawerFactory, component);
         this._lineDrawers = new Utils.Map();
+        this._lineDrawerFactory = lineDrawerFactory;
     }
-    BaseAreaPlot.prototype.drawers = function (dataset) {
-        return this._lineDrawers.get(dataset);
+    BaseAreaPlot.prototype.renderArea = function (renderArea) {
+        var _this = this;
+        var superRenderArea = _super.prototype.renderArea.call(this, renderArea);
+        if (renderArea === undefined) {
+            return superRenderArea;
+        }
+        // set the render area for all the line drawers of this plot
+        this.datasets().forEach(function (dataset) {
+            _this._lineDrawers.get(dataset).renderArea(_this._renderArea(dataset));
+        });
+        return this;
+    };
+    BaseAreaPlot.prototype.renderImmediately = function () {
+        var _this = this;
+        // draw the line above the area
+        var drawSteps = this._generateLineDrawSteps();
+        var dataToDraw = this._getDataToDraw();
+        this.datasets().forEach(function (dataset) { return _this._lineDrawers.get(dataset).draw(dataToDraw.get(dataset), drawSteps); });
+        _super.prototype.renderImmediately.call(this);
+        return this;
     };
     BaseAreaPlot.prototype.y = function (y, yScale) {
         if (y == null) {
@@ -6965,19 +6983,13 @@ var BaseAreaPlot = (function (_super) {
         return this;
     };
     BaseAreaPlot.prototype._addDataset = function (dataset) {
-        var lineDrawer = new Drawers.Line(dataset);
+        var lineDrawer = this._lineDrawerFactory(dataset);
         if (this._renderArea != null) {
             lineDrawer.renderArea(this._renderArea(dataset));
         }
         this._lineDrawers.set(dataset, lineDrawer);
         _super.prototype._addDataset.call(this, dataset);
         return this;
-    };
-    BaseAreaPlot.prototype._additionalPaint = function () {
-        var _this = this;
-        var drawSteps = this._generateLineDrawSteps();
-        var dataToDraw = this._getDataToDraw();
-        this.datasets().forEach(function (dataset) { return _this._lineDrawers.get(dataset).draw(dataToDraw.get(dataset), drawSteps); });
     };
     BaseAreaPlot.prototype._constructAreaProjector = function (xProjector, yProjector, y0Projector) {
         var _this = this;
@@ -7009,11 +7021,6 @@ var BaseAreaPlot = (function (_super) {
         });
         return drawSteps;
     };
-    BaseAreaPlot.prototype._generateLineAttrToProjector = function () {
-        var lineAttrToProjector = this._generateAttrToProjector();
-        lineAttrToProjector["d"] = this._constructLineProjector(BaseAreaPlot._scaledAccessor(this.x()), BaseAreaPlot._scaledAccessor(this.y()));
-        return lineAttrToProjector;
-    };
     BaseAreaPlot.prototype._generateLineDrawSteps = function () {
         var drawSteps = [];
         if (this._animateOnNextRender()) {
@@ -7041,7 +7048,12 @@ var BaseAreaPlot = (function (_super) {
     };
     BaseAreaPlot.prototype._removeDataset = function (dataset) {
         _super.prototype._removeDataset.call(this, dataset);
-        this._lineDrawers.get(dataset).remove();
+        if (this.datasets().indexOf(dataset) === -1) {
+            return this;
+        }
+        var lineDrawer = this._lineDrawers.get(dataset);
+        lineDrawer.remove();
+        this._lineDrawers.delete(dataset);
         return this;
     };
     BaseAreaPlot.prototype._updateYScale = function () {
@@ -7062,6 +7074,11 @@ var BaseAreaPlot = (function (_super) {
             this._constantBaselineValueProvider = function () { return [constantBaseline]; };
             yScale.addPaddingExceptionsProvider(this._constantBaselineValueProvider);
         }
+    };
+    BaseAreaPlot.prototype._generateLineAttrToProjector = function () {
+        var lineAttrToProjector = this._generateAttrToProjector();
+        lineAttrToProjector["d"] = this._constructLineProjector(BaseAreaPlot._scaledAccessor(this.x()), BaseAreaPlot._scaledAccessor(this.y()));
+        return lineAttrToProjector;
     };
     BaseAreaPlot._Y0_KEY = "y0";
     return BaseAreaPlot;
@@ -7473,8 +7490,8 @@ var Scales = __webpack_require__(2);
 var Utils = __webpack_require__(0);
 var BaseRectanglePlot = (function (_super) {
     __extends(BaseRectanglePlot, _super);
-    function BaseRectanglePlot(drawerFactory, component, width, height) {
-        _super.call(this, drawerFactory, component, width, height);
+    function BaseRectanglePlot(drawerFactory, component) {
+        _super.call(this, drawerFactory, component);
     }
     BaseRectanglePlot.prototype.entitiesAt = function (point) {
         var attrToProjector = this._generateAttrToProjector();
@@ -7843,8 +7860,7 @@ var Line = (function (_super) {
         return this._plot.entityNearestByXThenY(queryPoint);
     };
     Line.prototype._createPlot = function () {
-        var _this = this;
-        return new baseLinePlot_1.BaseLinePlot(function (dataset) { return new Drawers.Line(dataset); }, this, function () { return _this.width(); }, function () { return _this.height(); });
+        return new baseLinePlot_1.BaseLinePlot(function (dataset) { return new Drawers.Line(dataset); }, this);
     };
     return Line;
 }(xyPlot_1.XYPlot));
@@ -13319,8 +13335,8 @@ var baseBarPlot_1 = __webpack_require__(26);
 var Scales = __webpack_require__(2);
 var BaseClusteredBarPlot = (function (_super) {
     __extends(BaseClusteredBarPlot, _super);
-    function BaseClusteredBarPlot(drawerFactory, component, width, height) {
-        _super.call(this, drawerFactory, component, width, height);
+    function BaseClusteredBarPlot(drawerFactory, component) {
+        _super.call(this, drawerFactory, component);
         this._clusterOffsets = new Utils.Map();
     }
     BaseClusteredBarPlot.prototype._generateAttrToProjector = function () {
@@ -14113,6 +14129,10 @@ var BaseStackedAreaPlot = (function (_super) {
             return _super.prototype._extentsForProperty.call(this, attr);
         }
     };
+    BaseStackedAreaPlot.prototype._generateLineDrawSteps = function () {
+        // We don't draw lines for area plots
+        return [];
+    };
     BaseStackedAreaPlot.prototype._onDatasetUpdate = function () {
         this._updateStackExtentsAndOffsets();
         _super.prototype._onDatasetUpdate.call(this);
@@ -14221,8 +14241,8 @@ var Utils = __webpack_require__(0);
 var baseBarPlot_1 = __webpack_require__(26);
 var BaseStackedBarPlot = (function (_super) {
     __extends(BaseStackedBarPlot, _super);
-    function BaseStackedBarPlot(drawerFactory, component, width, height) {
-        _super.call(this, drawerFactory, component, width, height);
+    function BaseStackedBarPlot(drawerFactory, component) {
+        _super.call(this, drawerFactory, component);
         this._stackingOrder = "bottomup";
         this._stackingResult = new Utils.Map();
         this._stackedExtent = [];
@@ -14738,8 +14758,7 @@ var CanvasRectangle = (function (_super) {
         return this;
     };
     CanvasRectangle.prototype._createPlot = function () {
-        var _this = this;
-        return new baseRectanglePlot_1.BaseRectanglePlot(function (dataset) { return new canvasRectangleDrawer_1.RectangleDrawer(dataset); }, this, function () { return _this.width(); }, function () { return _this.height(); });
+        return new baseRectanglePlot_1.BaseRectanglePlot(function (dataset) { return new canvasRectangleDrawer_1.RectangleDrawer(dataset); }, this);
     };
     return CanvasRectangle;
 }(xyCanvasPlot_1.XYCanvasPlot));
@@ -14779,8 +14798,7 @@ var ClusteredBar = (function (_super) {
         _super.call(this, orientation);
     }
     ClusteredBar.prototype._createPlot = function () {
-        var _this = this;
-        return new baseClusteredBarPlot_1.BaseClusteredBarPlot(function (dataset) { return new Drawers.Rectangle(dataset); }, this, function () { return _this.width(); }, function () { return _this.height(); });
+        return new baseClusteredBarPlot_1.BaseClusteredBarPlot(function (dataset) { return new Drawers.Rectangle(dataset); }, this);
     };
     return ClusteredBar;
 }(barPlot_1.Bar));
@@ -15184,8 +15202,7 @@ var Rectangle = (function (_super) {
         };
     };
     Rectangle.prototype._createPlot = function () {
-        var _this = this;
-        return new baseRectanglePlot_1.BaseRectanglePlot(function (dataset) { return new drawers_1.Rectangle(dataset); }, this, function () { return _this.width(); }, function () { return _this.height(); });
+        return new baseRectanglePlot_1.BaseRectanglePlot(function (dataset) { return new drawers_1.Rectangle(dataset); }, this);
     };
     return Rectangle;
 }(xyPlot_1.XYPlot));
@@ -15256,8 +15273,7 @@ var Scatter = (function (_super) {
         return this._plot.entitiesIn(xRangeOrBounds, yRange);
     };
     Scatter.prototype._createPlot = function () {
-        var _this = this;
-        return new baseScatterPlot_1.BaseScatterPlot(function (dataset) { return new Drawers.Symbol(dataset); }, this, function () { return _this.width(); }, function () { return _this.height(); });
+        return new baseScatterPlot_1.BaseScatterPlot(function (dataset) { return new Drawers.Symbol(dataset); }, this);
     };
     return Scatter;
 }(xyPlot_1.XYPlot));
@@ -15297,18 +15313,18 @@ var Segment = (function (_super) {
         this.attr("stroke-width", "2px");
     }
     Segment.prototype._createPlot = function () {
-        var _this = this;
-        return new baseSegmentPlot_1.BaseSegmentPlot(function (dataset) { return new Drawers.Segment(dataset); }, this, function () { return _this.width(); }, function () { return _this.height(); });
+        return new baseSegmentPlot_1.BaseSegmentPlot(function (dataset) { return new Drawers.Segment(dataset); }, this);
     };
     Segment.prototype.x = function (x, xScale) {
         var plotX = this._plot.x(x, xScale);
         if (x == null) {
             return plotX;
         }
+        this.render();
         return this;
     };
     Segment.prototype.x2 = function (x2) {
-        var plotX2 = this._plot.x2();
+        var plotX2 = this._plot.x2(x2);
         if (x2 == null) {
             return plotX2;
         }
@@ -15320,6 +15336,7 @@ var Segment = (function (_super) {
         if (y == null) {
             return plotY;
         }
+        this.render();
         return this;
     };
     Segment.prototype.y2 = function (y2) {
@@ -15431,8 +15448,7 @@ var StackedArea = (function (_super) {
         return this;
     };
     StackedArea.prototype._createPlot = function () {
-        var _this = this;
-        return new baseStackedAreaPlot_1.BaseStackedAreaPlot(function (dataset) { return new Drawers.Area(dataset); }, this, function () { return _this.width(); }, function () { return _this.height(); });
+        return new baseStackedAreaPlot_1.BaseStackedAreaPlot(function (dataset) { return new Drawers.Area(dataset); }, function (dataset) { return new Drawers.Line(dataset); }, this);
     };
     return StackedArea;
 }(areaPlot_1.Area));
@@ -15505,8 +15521,7 @@ var StackedBar = (function (_super) {
         this._writer = new SVGTypewriter.Writer(this._measurer);
     };
     StackedBar.prototype._createPlot = function () {
-        var _this = this;
-        return new baseStackedBarPlot_1.BaseStackedBarPlot(function (dataset) { return new Drawers.Rectangle(dataset); }, this, function () { return _this.width(); }, function () { return _this.height(); });
+        return new baseStackedBarPlot_1.BaseStackedBarPlot(function (dataset) { return new Drawers.Rectangle(dataset); }, this);
     };
     StackedBar.prototype.drawLabels = function (dataToDraw, attrToProjector) {
         var _this = this;
@@ -15620,8 +15635,7 @@ var Waterfall = (function (_super) {
         return this;
     };
     Waterfall.prototype._createPlot = function () {
-        var _this = this;
-        return new baseWaterfallPlot_1.BaseWaterfallPlot(function (dataset) { return new Drawers.Rectangle(dataset); }, this, function () { return _this.width(); }, function () { return _this.height(); });
+        return new baseWaterfallPlot_1.BaseWaterfallPlot(function (dataset) { return new Drawers.Rectangle(dataset); }, this);
     };
     Waterfall.prototype._setup = function () {
         _super.prototype._setup.call(this);
@@ -15720,8 +15734,7 @@ var XYCanvasPlot = (function (_super) {
         return this;
     };
     XYCanvasPlot.prototype._createPlot = function () {
-        var _this = this;
-        return new baseXYPlot_1.BaseXYPlot(function (dataset) { return new canvasDrawer_1.CanvasDrawer(dataset); }, this, function () { return _this.width(); }, function () { return _this.height(); });
+        return new baseXYPlot_1.BaseXYPlot(function (dataset) { return new canvasDrawer_1.CanvasDrawer(dataset); }, this);
     };
     return XYCanvasPlot;
 }(canvasPlot_1.CanvasPlot));

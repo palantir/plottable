@@ -33,11 +33,7 @@ export class Segment<X, Y> extends XYPlot<X, Y> implements ISegmentPlot<X, Y> {
   }
 
   protected _createPlot() {
-    return new BaseSegmentPlot((dataset) => new Drawers.Segment(dataset),
-      this,
-      () => this.width(),
-      () => this.height()
-    );
+    return new BaseSegmentPlot((dataset) => new Drawers.Segment(dataset), this);
   }
 
   /**
@@ -66,6 +62,7 @@ export class Segment<X, Y> extends XYPlot<X, Y> implements ISegmentPlot<X, Y> {
       return plotX;
     }
 
+    this.render();
     return this;
   }
 
@@ -82,7 +79,7 @@ export class Segment<X, Y> extends XYPlot<X, Y> implements ISegmentPlot<X, Y> {
    */
   public x2(x2: number | Accessor<number> | X | Accessor<X>): this;
   public x2(x2?: number | Accessor<number> | X | Accessor<X>): any {
-    const plotX2 = this._plot.x2();
+    const plotX2 = this._plot.x2(x2);
     if (x2 == null) {
       return plotX2;
     }
@@ -117,6 +114,7 @@ export class Segment<X, Y> extends XYPlot<X, Y> implements ISegmentPlot<X, Y> {
       return plotY;
     }
 
+    this.render();
     return this;
   }
 

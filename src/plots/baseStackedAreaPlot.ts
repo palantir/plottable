@@ -10,6 +10,8 @@ import * as Utils from "../utils";
 import { BaseAreaPlot, IAreaPlot } from "./baseAreaPlot";
 import { Accessor, Point, AttributeToProjector } from "../core/interfaces";
 import { Dataset } from "../core/dataset";
+import { DrawStep } from "../drawers";
+
 
 import { Scale } from "../scales/scale";
 import { QuantitativeScale } from "../scales/quantitativeScale";
@@ -85,6 +87,11 @@ export class BaseStackedAreaPlot<X> extends BaseAreaPlot<X> implements IStackedA
     } else {
       return super._extentsForProperty(attr);
     }
+  }
+
+  protected _generateLineDrawSteps(): DrawStep[] {
+    // We don't draw lines for area plots
+    return [];
   }
 
   protected _onDatasetUpdate() {

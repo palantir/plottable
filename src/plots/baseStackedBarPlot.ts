@@ -39,8 +39,9 @@ export class BaseStackedBarPlot<X, Y> extends BaseBarPlot<X, Y> implements IStac
   private _stackingResult: Utils.Stacking.StackingResult;
   private _stackedExtent: number[];
 
-  constructor(drawerFactory: DrawerFactory, component: LabeledComponent, width: () => number, height: () => number) {
-    super(drawerFactory, component, width, height);
+  constructor(drawerFactory: DrawerFactory, component: LabeledComponent) {
+    super(drawerFactory, component);
+
     this._stackingOrder = "bottomup";
     this._stackingResult = new Utils.Map<Dataset, Utils.Map<string, Utils.Stacking.StackedDatum>>();
     this._stackedExtent = [];

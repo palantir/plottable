@@ -100,11 +100,7 @@ export class StackedBar<X, Y> extends Bar<X, Y> {
   }
 
   protected _createPlot() {
-    return new BaseStackedBarPlot((dataset) => new Drawers.Rectangle(dataset),
-      this,
-      () => this.width(),
-      () => this.height()
-    );
+    return new BaseStackedBarPlot((dataset) => new Drawers.Rectangle(dataset), this);
   }
 
   public drawLabels(dataToDraw: Utils.Map<Dataset, any[]>, attrToProjector: AttributeToProjector) {

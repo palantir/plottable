@@ -10,6 +10,7 @@ import * as Drawers from "../drawers";
 import { IComponent } from "../components";
 import * as Scales from "../scales";
 import * as Utils from "../utils";
+import { Map } from "../utils";
 
 import { Dataset, DatasetCallback } from "../core/dataset";
 import { Accessor, AttributeToProjector, Bounds, Point } from "../core/interfaces";
@@ -235,7 +236,16 @@ export class BasePlot implements IPlot {
     }
 
     this.datasets().forEach((dataset) => {
-      this._datasetToDrawer.get(dataset).renderArea(this._renderArea(dataset));
+      const drawer = this.drawer(dataset);
+      const existingRenderARea = drawer.renderArea();
+
+      // remove any existing render area before adding a new one
+      // so that sub classes can define custom render areas if they choose
+      if (existingRenderARea != null) {
+        existingRenderARea.remove();
+      }
+
+      this.drawer(dataset).renderArea(this._renderArea(dataset));
     });
 
     return this;
@@ -245,7 +255,7 @@ export class BasePlot implements IPlot {
   public datasets(datasets: Dataset[]): this;
   public datasets(datasets?: Dataset[]): any {
     let currentDatasets: Dataset[] = [];
-    this._datasetToDrawer.forEach((drawer, dataset) => currentDatasets.push(dataset));
+    this._getDatasetToDrawer().forEach((drawer, dataset) => currentDatasets.push(dataset));
     if (datasets == null) {
        return currentDatasets;
     }
@@ -262,7 +272,7 @@ export class BasePlot implements IPlot {
   }
 
   public drawer(dataset: Dataset) {
-    return this._datasetToDrawer.get(dataset);
+    return this._getDatasetToDrawer().get(dataset);
   }
 
   /**
@@ -353,7 +363,7 @@ export class BasePlot implements IPlot {
       drawer.renderArea(this._renderArea(dataset));
     }
 
-    this._datasetToDrawer.set(dataset, drawer);
+    this._getDatasetToDrawer().set(dataset, drawer);
     this.clearDataCache();
     dataset.onUpdate(this._onDatasetUpdateAction);
   }
@@ -389,7 +399,7 @@ export class BasePlot implements IPlot {
   protected _buildLightweightPlotEntities(datasets: Dataset[]) {
     const lightweightPlotEntities: LightweightPlotEntity[] = [];
     datasets.forEach((dataset: Dataset, datasetIndex: number) => {
-      let drawer = this._datasetToDrawer.get(dataset);
+      let drawer = this.drawer(dataset);
       let validDatumIndex = 0;
 
       dataset.data().forEach((datum: any, datumIndex: number) => {
@@ -452,8 +462,12 @@ export class BasePlot implements IPlot {
     }
   }
 
+  protected _getDatasetToDrawer() {
+    return this._datasetToDrawer;
+  }
+
   protected _getDrawersInOrder(): IDrawer[] {
-    return this.datasets().map((dataset) => this._datasetToDrawer.get(dataset));
+    return this.datasets().map((dataset) => this.drawer(dataset));
   }
 
   protected _getDataToDraw(): Utils.Map<Dataset, any[]> {
@@ -526,9 +540,9 @@ export class BasePlot implements IPlot {
     }
 
     dataset.offUpdate(this._onDatasetUpdateAction);
-    const drawer = this._datasetToDrawer.get(dataset);
+    const drawer = this.drawer(dataset);
     drawer.remove();
-    this._datasetToDrawer.delete(dataset);
+    this._getDatasetToDrawer().delete(dataset);
 
     this.clearDataCache();
 

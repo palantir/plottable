@@ -17,8 +17,8 @@ export interface IClusteredBarPlot<X, Y> extends IBarPlot<X, Y> {}
 export class BaseClusteredBarPlot<X, Y> extends BaseBarPlot<X, Y> implements IClusteredBarPlot<X, Y> {
   private _clusterOffsets: Utils.Map<Dataset, number>;
 
-  constructor(drawerFactory: DrawerFactory, component: LabeledComponent, width: () => number, height: () => number) {
-    super(drawerFactory, component, width, height);
+  constructor(drawerFactory: DrawerFactory, component: LabeledComponent) {
+    super(drawerFactory, component);
     this._clusterOffsets = new Utils.Map<Dataset, number>();
   }
 

@@ -310,9 +310,6 @@ export class Rectangle<X, Y> extends XYPlot<X, Y> implements IRectanglePlot<X, Y
   }
 
   protected _createPlot() {
-    return new BaseRectanglePlot((dataset) => new RectangleDrawer(dataset),
-      this,
-      () => this.width(),
-      () => this.height());
+    return new BaseRectanglePlot((dataset) => new RectangleDrawer(dataset), this);
   }
 }

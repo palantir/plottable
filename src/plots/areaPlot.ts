@@ -33,11 +33,6 @@ export class Area<X> extends Line<X> implements IAreaPlot<X> {
     this.attr("fill", new Scales.Color().range()[0]);
   }
 
-  protected _setup() {
-    super._setup();
-    this._plot.renderArea(() => this._renderArea.append("g"));
-  }
-
   public y(): Plots.TransformableAccessorScaleBinding<number, number>;
   public y(y: number | Accessor<number>): this;
   public y(y: number | Accessor<number>, yScale: QuantitativeScale<number>): this;
@@ -80,9 +75,8 @@ export class Area<X> extends Line<X> implements IAreaPlot<X> {
 
   protected _createPlot() {
     return new BaseAreaPlot((dataset) => new Drawers.Area(dataset),
-      this,
-      () => this.width(),
-      () => this.height()
+      (dataset) => new Drawers.Line(dataset),
+      this
     );
   }
 }

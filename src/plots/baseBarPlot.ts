@@ -69,8 +69,8 @@ export class BaseBarPlot<X, Y> extends BaseXYPlot<X, Y> implements IBarPlot<X, Y
   private _baselineValueProvider: () => (X|Y)[];
   private _updateBarPixelWidthCallback: () => void;
 
-  constructor(drawerFactory: DrawerFactory, component: LabeledComponent, width: () => number, height: () => number) {
-    super(drawerFactory, component, width, height);
+  constructor(drawerFactory: DrawerFactory, component: LabeledComponent) {
+    super(drawerFactory, component);
     this._baselineValueProvider = () => [this.baselineValue()];
     this._updateBarPixelWidthCallback = () => this.updateBarPixelWidth();
 
@@ -416,7 +416,7 @@ export class BaseBarPlot<X, Y> extends BaseXYPlot<X, Y> implements IBarPlot<X, Y
 
       let scaledData = numberBarAccessorData.map((datum) => barScale.scale(datum));
       let barAccessorDataPairs = d3.pairs(scaledData);
-      let barWidthDimension = this._isVertical ? this._width() : this._height();
+      let barWidthDimension = this._isVertical ? this._component.width() : this._component.height();
 
       barPixelWidth = Utils.Math.min(barAccessorDataPairs, (pair: any[], i: number) => {
         return Math.abs(pair[1] - pair[0]);

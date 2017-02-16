@@ -166,9 +166,6 @@ export class CanvasRectangle<X, Y> extends XYCanvasPlot<X, Y> implements IRectan
   }
 
   protected _createPlot() {
-    return new BaseRectanglePlot((dataset) => new RectangleDrawer(dataset),
-      this,
-      () => this.width(),
-      () => this.height());
+    return new BaseRectanglePlot((dataset) => new RectangleDrawer(dataset), this);
   }
 }

@@ -67,11 +67,8 @@ export class BaseRectanglePlot<X, Y> extends BaseXYPlot<X, Y> implements IRectan
 
   protected _component: LabeledComponent;
 
-  constructor(drawerFactory: DrawerFactory,
-    component: LabeledComponent,
-    width: () => number,
-    height: () =>  number) {
-    super(drawerFactory, component, width, height);
+  constructor(drawerFactory: DrawerFactory, component: LabeledComponent) {
+    super(drawerFactory, component);
   }
 
   public entitiesAt(point: Point) {

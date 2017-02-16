@@ -115,10 +115,6 @@ export class Scatter<X, Y> extends XYPlot<X, Y> implements IScatterPlot<X, Y> {
   }
 
   protected _createPlot() {
-    return new BaseScatterPlot((dataset) => new Drawers.Symbol(dataset),
-      this,
-      () => this.width(),
-      () => this.height()
-    );
+    return new BaseScatterPlot((dataset) => new Drawers.Symbol(dataset), this);
   }
 }

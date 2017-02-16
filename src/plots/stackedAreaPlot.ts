@@ -144,10 +144,6 @@ export class StackedArea<X> extends Area<X> implements IStackedAreaPlot<X> {
   }
 
   protected _createPlot() {
-    return new BaseStackedAreaPlot((dataset) => new Drawers.Area(dataset),
-      this,
-      () => this.width(),
-      () => this.height()
-    );
+    return new BaseStackedAreaPlot((dataset) => new Drawers.Area(dataset), (dataset) => new Drawers.Line(dataset), this);
   }
 }

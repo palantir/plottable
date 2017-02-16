@@ -30,10 +30,6 @@ export class ClusteredBar<X, Y> extends Bar<X, Y> implements IClusteredBarPlot<X
   }
 
   protected _createPlot() {
-    return new BaseClusteredBarPlot((dataset) => new Drawers.Rectangle(dataset),
-      this,
-      () => this.width(),
-      () => this.height()
-    );
+    return new BaseClusteredBarPlot((dataset) => new Drawers.Rectangle(dataset), this);
   }
 }

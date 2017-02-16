@@ -111,9 +111,6 @@ export class XYCanvasPlot<X, Y> extends CanvasPlot implements IXYPlot<X, Y> {
   }
 
   protected _createPlot() {
-    return new BaseXYPlot((dataset) => new CanvasDrawer(dataset),
-      this,
-      () => this.width(),
-      () => this.height());
+    return new BaseXYPlot((dataset) => new CanvasDrawer(dataset), this);
   }
 }

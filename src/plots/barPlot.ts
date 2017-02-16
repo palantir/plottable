@@ -111,11 +111,7 @@ export class Bar<X, Y> extends XYPlot<X, Y> implements IBarPlot<X, Y> {
   }
 
   protected _createPlot() {
-    return new BaseBarPlot((dataset) => new Drawers.Rectangle(dataset),
-      this,
-      () => this.width(),
-      () => this.height()
-    );
+    return new BaseBarPlot((dataset) => new Drawers.Rectangle(dataset), this);
   }
 
   protected _setup() {
