@@ -188,12 +188,17 @@ export class Numeric extends Axis<number> {
     }
 
     let tickLabelValues = this._getTickValues();
-    let tickLabels = this._tickLabelContainer
+    let tickLabelsUpdate = this._tickLabelContainer
       .selectAll("." + Axis.TICK_LABEL_CLASS)
       .data(tickLabelValues);
-    tickLabels.enter().append("text").classed(Axis.TICK_LABEL_CLASS, true);
-    tickLabels.exit().remove();
+    tickLabelsUpdate.exit().remove();
 
+    const tickLabels =
+      tickLabelsUpdate
+        .enter()
+        .append("text")
+        .classed(Axis.TICK_LABEL_CLASS, true)
+        .merge(tickLabelsUpdate);
     tickLabels.style("text-anchor", tickLabelTextAnchor)
       .style("visibility", "inherit")
       .attrs(tickLabelAttrHash)

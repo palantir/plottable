@@ -147,11 +147,12 @@ export class Plot extends Component {
     return this;
   }
 
-  protected _bindProperty(property: string, value: any, scale: Scale<any, any>) {
+  protected _bindProperty(property: string, valueOrFn: any | Function, scale: Scale<any, any>) {
     let binding = this._propertyBindings.get(property);
     let oldScale = binding != null ? binding.scale : null;
 
-    this._propertyBindings.set(property, { accessor: () => value, scale: scale });
+    const accessor = typeof valueOrFn === "function" ? valueOrFn : () => valueOrFn;
+    this._propertyBindings.set(property, { accessor, scale });
     this._updateExtentsForProperty(property);
 
     if (oldScale != null) {
@@ -162,11 +163,12 @@ export class Plot extends Component {
     }
   }
 
-  private _bindAttr(attr: string, value: any, scale: Scale<any, any>) {
+  private _bindAttr(attr: string, valueOrFn: any | Function, scale: Scale<any, any>) {
     let binding = this._attrBindings.get(attr);
     let oldScale = binding != null ? binding.scale : null;
 
-    this._attrBindings.set(attr, { accessor: () => value, scale: scale });
+    const accessor = typeof valueOrFn === "function" ? valueOrFn : () => valueOrFn;
+    this._attrBindings.set(attr, { accessor, scale });
     this._updateExtentsForAttr(attr);
 
     if (oldScale != null) {

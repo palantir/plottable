@@ -464,8 +464,13 @@ export class Time extends Axis<Date> {
       labelPos = tickPos;
     }
 
-    let tickLabels = container.selectAll("." + Axis.TICK_LABEL_CLASS).data(labelPos, (d) => String(d.valueOf()));
-    let tickLabelsEnter = tickLabels.enter().append("g").classed(Axis.TICK_LABEL_CLASS, true);
+    let tickLabelsUpdate = container.selectAll("." + Axis.TICK_LABEL_CLASS).data(labelPos, (d) => String(d.valueOf()));
+    let tickLabelsEnter =
+      tickLabelsUpdate
+        .enter()
+        .append("g")
+          .classed(Axis.TICK_LABEL_CLASS, true);
+
     tickLabelsEnter.append("text");
     let xTranslate = (this._tierLabelPositions[index] === "center" || config.step === 1) ? 0 : this.tickLabelPadding();
     let yTranslate: number;
@@ -479,6 +484,8 @@ export class Time extends Axis<Date> {
       }
     }
 
+    const tickLabels = tickLabelsUpdate.merge(tickLabelsEnter);
+
     let textSelection = tickLabels.selectAll("text");
     if (textSelection.size() > 0) {
       textSelection.attr("transform", `translate(${xTranslate},${yTranslate})`);
@@ -490,8 +497,14 @@ export class Time extends Axis<Date> {
   }
 
   private _renderTickMarks(tickValues: Date[], index: number) {
-    let tickMarks = this._tierMarkContainers[index].selectAll("." + Axis.TICK_MARK_CLASS).data(tickValues);
-    tickMarks.enter().append("line").classed(Axis.TICK_MARK_CLASS, true);
+    let tickMarksUpdate = this._tierMarkContainers[index].selectAll("." + Axis.TICK_MARK_CLASS).data(tickValues);
+    const tickMarks =
+      tickMarksUpdate
+        .enter()
+        .append("line")
+          .classed(Axis.TICK_MARK_CLASS, true)
+        .merge(tickMarksUpdate);
+
     let attr = this._generateTickMarkAttrHash();
     let offset = this._tierHeights.slice(0, index).reduce((translate: number, height: number) => translate + height, 0);
     if (this.orientation() === "bottom") {
@@ -518,16 +531,21 @@ export class Time extends Axis<Date> {
     d3.select(tickMarks.nodes()[0]).classed(Axis.END_TICK_MARK_CLASS, true);
     d3.select(tickMarks.nodes()[tickMarks.size() - 1]).classed(Axis.END_TICK_MARK_CLASS, true);
 
-    tickMarks.exit().remove();
+    tickMarksUpdate.exit().remove();
   }
 
   private _renderLabellessTickMarks(tickValues: Date[]) {
-    let tickMarks = this._tickMarkContainer.selectAll("." + Axis.TICK_MARK_CLASS).data(tickValues);
-    tickMarks.enter().append("line").classed(Axis.TICK_MARK_CLASS, true);
+    let tickMarksUpdate = this._tickMarkContainer.selectAll("." + Axis.TICK_MARK_CLASS).data(tickValues);
+    const tickMarks =
+      tickMarksUpdate
+        .enter()
+        .append("line")
+          .classed(Axis.TICK_MARK_CLASS, true)
+        .merge(tickMarksUpdate);
     let attr = this._generateTickMarkAttrHash();
     attr["y2"] = (this.orientation() === "bottom") ? this.tickLabelPadding() : this.height() - this.tickLabelPadding();
     tickMarks.attrs(attr);
-    tickMarks.exit().remove();
+    tickMarksUpdate.exit().remove();
   }
 
   private _generateLabellessTicks() {
