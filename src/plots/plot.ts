@@ -99,7 +99,6 @@ export class Plot extends SVGComponent implements IPlot {
       return plotAttr;
     }
 
-    this.render(); // queue a re-render upon changing projector
     return this;
   }
 
@@ -253,6 +252,7 @@ export class Plot extends SVGComponent implements IPlot {
 
   protected _onDatasetRemoved(dataset: Dataset) {
     // sub classes implement
+
   }
 
   protected _createPlot() {

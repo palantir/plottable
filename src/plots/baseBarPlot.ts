@@ -72,13 +72,14 @@ export class BaseBarPlot<X, Y> extends BaseXYPlot<X, Y> implements IBarPlot<X, Y
   constructor(drawerFactory: DrawerFactory, component: LabeledComponent, width: () => number, height: () => number) {
     super(drawerFactory, component, width, height);
     this._baselineValueProvider = () => [this.baselineValue()];
-    this._updateBarPixelWidthCallback = () => this._updateBarPixelWidth();
+    this._updateBarPixelWidthCallback = () => this.updateBarPixelWidth();
+
+    this.attr("width", () => this._barPixelWidth);
   }
 
   public addDataset(dataset: Dataset) {
     super.addDataset(dataset);
-    this._updateBarPixelWidth();
-
+    this.updateBarPixelWidth();
     return this;
   }
 
@@ -116,7 +117,7 @@ export class BaseBarPlot<X, Y> extends BaseXYPlot<X, Y> implements IBarPlot<X, Y
     }
 
     super.datasets(datasets);
-    this._updateBarPixelWidth();
+    this.updateBarPixelWidth();
     return this;
   }
 
@@ -226,15 +227,12 @@ export class BaseBarPlot<X, Y> extends BaseXYPlot<X, Y> implements IBarPlot<X, Y
   public removeDataset(dataset: Dataset) {
     dataset.offUpdate(this._updateBarPixelWidthCallback);
     super.removeDataset(dataset);
-    this._updateBarPixelWidth();
+    this.updateBarPixelWidth();
     return this;
   }
 
-  public renderCallback(_renderCallback: ScaleCallback<Scale<any, any>>) {
-    this._renderCallback = (scale) => {
-        this._updateBarPixelWidth();
-        _renderCallback(scale);
-    };
+  public updateBarPixelWidth() {
+    this._barPixelWidth = this.getBarPixelWidth();
   }
 
   public x(x?: number | Accessor<number> | X | Accessor<X>, xScale?: Scale<X, number>): any {
@@ -480,9 +478,7 @@ export class BaseBarPlot<X, Y> extends BaseXYPlot<X, Y> implements IBarPlot<X, Y
     return intersected;
   }
 
-  private _updateBarPixelWidth() {
-    this._barPixelWidth = this.getBarPixelWidth();
-  }
+
 
   private _updateValueScale() {
     if (!this._projectorsReady()) {

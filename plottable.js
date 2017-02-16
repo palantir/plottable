@@ -1536,6 +1536,7 @@ var BaseXYPlot = (function (_super) {
         if (this._autoAdjustYScaleDomain) {
             this._updateYExtentsAndAutodomain();
         }
+        return this;
     };
     BaseXYPlot.prototype.y = function (y, yScale) {
         if (y == null) {
@@ -1818,7 +1819,6 @@ var Plot = (function (_super) {
         if (attrValue == null) {
             return plotAttr;
         }
-        this.render(); // queue a re-render upon changing projector
         return this;
     };
     Plot.prototype.renderImmediately = function () {
@@ -3609,13 +3609,12 @@ var Bar = (function (_super) {
      * @param {string} [orientation="vertical"] One of "vertical"/"horizontal".
      */
     function Bar(orientation) {
-        var _this = this;
         if (orientation === void 0) { orientation = Bar.ORIENTATION_VERTICAL; }
         _super.call(this);
         this._labelFormatter = Formatters.identity();
         this._labelsEnabled = false;
         this._hideBarsIfAnyAreTooWide = true;
-        this._barPixelWidth = 0;
+        this.renderCount = 0;
         this.addClass("bar-plot");
         if (orientation !== Bar.ORIENTATION_VERTICAL && orientation !== Bar.ORIENTATION_HORIZONTAL) {
             throw new Error(orientation + " is not a valid orientation for Plots.Bar");
@@ -3623,7 +3622,6 @@ var Bar = (function (_super) {
         this._plot.isVertical(orientation === Bar.ORIENTATION_VERTICAL);
         this.animator("baseline", new Animators.Null());
         this.attr("fill", new Scales.Color().range()[0]);
-        this.attr("width", function () { return _this._barPixelWidth; });
         this._labelConfig = new Utils.Map();
     }
     Bar.prototype.x = function (x, xScale) {
@@ -3631,6 +3629,7 @@ var Bar = (function (_super) {
         if (x == null) {
             return plotX;
         }
+        this.render();
         return this;
     };
     Bar.prototype.y = function (y, yScale) {
@@ -3638,6 +3637,7 @@ var Bar = (function (_super) {
         if (y == null) {
             return plotY;
         }
+        this.render();
         return this;
     };
     /**
@@ -3649,6 +3649,8 @@ var Bar = (function (_super) {
         return this._plot.isVertical() ? Bar.ORIENTATION_VERTICAL : Bar.ORIENTATION_HORIZONTAL;
     };
     Bar.prototype.render = function () {
+        this._plot.updateBarPixelWidth();
+        this._plot.updateExtents();
         _super.prototype.render.call(this);
         return this;
     };
@@ -3926,11 +3928,12 @@ var BaseBarPlot = (function (_super) {
         _super.call(this, drawerFactory, component, width, height);
         this._barPixelWidth = 0;
         this._baselineValueProvider = function () { return [_this.baselineValue()]; };
-        this._updateBarPixelWidthCallback = function () { return _this._updateBarPixelWidth(); };
+        this._updateBarPixelWidthCallback = function () { return _this.updateBarPixelWidth(); };
+        this.attr("width", function () { return _this._barPixelWidth; });
     }
     BaseBarPlot.prototype.addDataset = function (dataset) {
         _super.prototype.addDataset.call(this, dataset);
-        this._updateBarPixelWidth();
+        this.updateBarPixelWidth();
         return this;
     };
     BaseBarPlot.prototype.baselineValue = function (value) {
@@ -3959,7 +3962,7 @@ var BaseBarPlot = (function (_super) {
             return _super.prototype.datasets.call(this);
         }
         _super.prototype.datasets.call(this, datasets);
-        this._updateBarPixelWidth();
+        this.updateBarPixelWidth();
         return this;
     };
     BaseBarPlot.prototype.entities = function (datasets) {
@@ -4059,15 +4062,11 @@ var BaseBarPlot = (function (_super) {
     BaseBarPlot.prototype.removeDataset = function (dataset) {
         dataset.offUpdate(this._updateBarPixelWidthCallback);
         _super.prototype.removeDataset.call(this, dataset);
-        this._updateBarPixelWidth();
+        this.updateBarPixelWidth();
         return this;
     };
-    BaseBarPlot.prototype.renderCallback = function (_renderCallback) {
-        var _this = this;
-        this._renderCallback = function (scale) {
-            _this._updateBarPixelWidth();
-            _renderCallback(scale);
-        };
+    BaseBarPlot.prototype.updateBarPixelWidth = function () {
+        this._barPixelWidth = this.getBarPixelWidth();
     };
     BaseBarPlot.prototype.x = function (x, xScale) {
         if (x == null) {
@@ -4283,9 +4282,6 @@ var BaseBarPlot = (function (_super) {
         });
         return intersected;
     };
-    BaseBarPlot.prototype._updateBarPixelWidth = function () {
-        this._barPixelWidth = this.getBarPixelWidth();
-    };
     BaseBarPlot.prototype._updateValueScale = function () {
         if (!this._projectorsReady()) {
             return;
@@ -4355,6 +4351,9 @@ var BasePlot = (function () {
             return this._attrBindings.get(attr);
         }
         this._bindAttr(attr, attrValue, scale);
+        if (this._renderCallback != null) {
+            this._renderCallback(scale);
+        }
         return this;
     };
     BasePlot.prototype.clearDataCache = function () {

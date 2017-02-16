@@ -208,6 +208,11 @@ export class BasePlot implements IPlot {
     }
 
     this._bindAttr(attr, attrValue, scale);
+
+    if (this._renderCallback != null) {
+      this._renderCallback(scale);
+    }
+
     return this;
   }
 

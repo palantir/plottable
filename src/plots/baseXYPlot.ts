@@ -190,6 +190,8 @@ export class BaseXYPlot<X, Y> extends BasePlot implements IXYPlot<X, Y> {
     if (this._autoAdjustYScaleDomain) {
       this._updateYExtentsAndAutodomain();
     }
+
+    return this;
   }
 
   public y(): TransformableAccessorScaleBinding<Y, number>;

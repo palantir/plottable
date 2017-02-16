@@ -37,12 +37,12 @@ function run(div, data, Plottable) {
 
   var xAxis = new Plottable.Axes.Category(xScale, "top");
   var yAxis = new Plottable.Axes.Category(yScale, "left");
-  var plot = new Plottable.Plots.CanvasRectangle();
+  var plot = new Plottable.Plots.Rectangle();
   plot.addDataset(new Plottable.Dataset(data));
   plot.x(function(d){ return d.hospital; }, xScale)
       .y(function(d) { return d.hour; }, yScale)
-      // .label(function(d) { return d.percent + "%";  })
-      // .labelsEnabled(true)
+      .label(function(d) { return d.percent + "%";  })
+      .labelsEnabled(true)
       .attr("fill", function(d) { return d.percent; }, cs);
 
   var label = new Plottable.Components.Label("Born in hospital?", 0);

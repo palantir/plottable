@@ -46,10 +46,8 @@ export class Bar<X, Y> extends XYPlot<X, Y> implements IBarPlot<X, Y> {
   private _labelsEnabled = false;
   private _hideBarsIfAnyAreTooWide = true;
   private _labelConfig: Utils.Map<Dataset, LabelConfig>;
-
-  private _barPixelWidth = 0;
-
   protected _plot: BaseBarPlot<X, Y>;
+  private renderCount = 0;
 
   /**
    * A Bar Plot draws bars growing out from a baseline to some value
@@ -67,7 +65,6 @@ export class Bar<X, Y> extends XYPlot<X, Y> implements IBarPlot<X, Y> {
 
     this.animator("baseline", new Animators.Null());
     this.attr("fill", new Scales.Color().range()[0]);
-    this.attr("width", () => this._barPixelWidth);
     this._labelConfig = new Utils.Map<Dataset, LabelConfig>();
   }
 
@@ -80,6 +77,7 @@ export class Bar<X, Y> extends XYPlot<X, Y> implements IBarPlot<X, Y> {
       return plotX;
     }
 
+    this.render();
     return this;
   }
 
@@ -92,6 +90,7 @@ export class Bar<X, Y> extends XYPlot<X, Y> implements IBarPlot<X, Y> {
       return plotY;
     }
 
+    this.render();
     return this;
   }
 
@@ -105,6 +104,8 @@ export class Bar<X, Y> extends XYPlot<X, Y> implements IBarPlot<X, Y> {
   }
 
   public render() {
+    this._plot.updateBarPixelWidth();
+    this._plot.updateExtents();
     super.render();
     return this;
   }
