@@ -41,36 +41,6 @@ export class Segment<X, Y> extends XYPlot<X, Y> implements ISegmentPlot<X, Y> {
   }
 
   /**
-   * Gets the AccessorScaleBinding for X
-   */
-  public x(): TransformableAccessorScaleBinding<X, number>;
-  /**
-   * Sets X to a constant value or the result of an Accessor.
-   *
-   * @param {X|Accessor<X>} x
-   * @returns {Plots.Segment} The calling Segment Plot.
-   */
-  public x(x: number | Accessor<number>): this;
-  /**
-   * Sets X to a scaled constant value or scaled result of an Accessor.
-   * The provided Scale will account for the values when autoDomain()-ing.
-   *
-   * @param {X|Accessor<X>} x
-   * @param {Scale<X, number>} xScale
-   * @returns {Plots.Segment} The calling Segment Plot.
-   */
-  public x(x: X | Accessor<X>, xScale: Scale<X, number>): this;
-  public x(x?: number | Accessor<number> | X | Accessor<X>, xScale?: Scale<X, number>): any {
-    const plotX = this._plot.x(x as X, xScale);
-    if (x == null) {
-      return plotX;
-    }
-
-    this.render();
-    return this;
-  }
-
-  /**
    * Gets the AccessorScaleBinding for X2
    */
   public x2(): AccessorScaleBinding<X, number>;
@@ -86,36 +56,6 @@ export class Segment<X, Y> extends XYPlot<X, Y> implements ISegmentPlot<X, Y> {
     const plotX2 = this._plot.x2(x2);
     if (x2 == null) {
       return plotX2;
-    }
-
-    this.render();
-    return this;
-  }
-
-  /**
-   * Gets the AccessorScaleBinding for Y
-   */
-  public y(): TransformableAccessorScaleBinding<Y, number>;
-  /**
-   * Sets Y to a constant value or the result of an Accessor.
-   *
-   * @param {Y|Accessor<Y>} y
-   * @returns {Plots.Segment} The calling Segment Plot.
-   */
-  public y(y: number | Accessor<number>): this;
-  /**
-   * Sets Y to a scaled constant value or scaled result of an Accessor.
-   * The provided Scale will account for the values when autoDomain()-ing.
-   *
-   * @param {Y|Accessor<Y>} y
-   * @param {Scale<Y, number>} yScale
-   * @returns {Plots.Segment} The calling Segment Plot.
-   */
-  public y(y: Y | Accessor<Y>, yScale: Scale<Y, number>): this;
-  public y(y?: number | Accessor<number> | Y | Accessor<Y>, yScale?: Scale<Y, number>): any {
-    const plotY = this._plot.y(y as Y, yScale);
-    if (y == null) {
-      return plotY;
     }
 
     this.render();
@@ -142,10 +82,6 @@ export class Segment<X, Y> extends XYPlot<X, Y> implements ISegmentPlot<X, Y> {
 
     this.render();
     return this;
-  }
-
-  public entitiesAt(point: Point) {
-    return this._plot.entitiesAt(point);
   }
 
   /**

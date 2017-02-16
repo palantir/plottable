@@ -3634,22 +3634,6 @@ var Bar = (function (_super) {
         this.attr("fill", new Scales.Color().range()[0]);
         this._labelConfig = new Utils.Map();
     }
-    Bar.prototype.x = function (x, xScale) {
-        var plotX = this._plot.x(x, xScale);
-        if (x == null) {
-            return plotX;
-        }
-        this.render();
-        return this;
-    };
-    Bar.prototype.y = function (y, yScale) {
-        var plotY = this._plot.y(y, yScale);
-        if (y == null) {
-            return plotY;
-        }
-        this.render();
-        return this;
-    };
     /**
      * Gets the orientation of the plot
      *
@@ -3715,28 +3699,6 @@ var Bar = (function (_super) {
             labelConfig.labelArea.remove();
             this._labelConfig.delete(dataset);
         }
-    };
-    /**
-     * Returns the PlotEntity nearest to the query point according to the following algorithm:
-     *   - If the query point is inside a bar, returns the PlotEntity for that bar.
-     *   - Otherwise, gets the nearest PlotEntity by the primary direction (X for vertical, Y for horizontal),
-     *     breaking ties with the secondary direction.
-     * Returns undefined if no PlotEntity can be found.
-     *
-     * @param {Point} queryPoint
-     * @returns {PlotEntity} The nearest PlotEntity, or undefined if no PlotEntity can be found.
-     */
-    Bar.prototype.entityNearest = function (queryPoint) {
-        return this._plot.entityNearest(queryPoint);
-    };
-    /**
-     * Gets the Entities at a particular Point.
-     *
-     * @param {Point} p
-     * @returns {PlotEntity[]}
-     */
-    Bar.prototype.entitiesAt = function (p) {
-        return this._plot.entitiesAt(p);
     };
     Bar.prototype.entitiesIn = function (xRangeOrBounds, yRange) {
         return this._plot.entitiesIn(xRangeOrBounds, yRange);
@@ -6886,13 +6848,6 @@ var Area = (function (_super) {
         this.attr("fill-opacity", 0.25);
         this.attr("fill", new Scales.Color().range()[0]);
     }
-    Area.prototype.y = function (y, yScale) {
-        var plotY = this._plot.y(y, yScale);
-        if (y == null) {
-            return plotY;
-        }
-        return this;
-    };
     Area.prototype.y0 = function (y0) {
         var plotY0 = this._plot.y0(y0);
         if (y0 == null) {
@@ -15072,26 +15027,12 @@ var Rectangle = (function (_super) {
         this.addClass("rectangle-plot");
         this.attr("fill", new Scales.Color().range()[0]);
     }
-    Rectangle.prototype.x = function (x, xScale) {
-        var xReturn = this._plot.x(x, xScale);
-        if (x == null) {
-            return xReturn;
-        }
-        return this;
-    };
     Rectangle.prototype.x2 = function (x2) {
         var x2Return = this._plot.x2(x2);
         if (x2 == null) {
             return x2Return;
         }
         this.render();
-        return this;
-    };
-    Rectangle.prototype.y = function (y, yScale) {
-        var yReturn = this._plot.y(y, yScale);
-        if (y == null) {
-            return yReturn;
-        }
         return this;
     };
     Rectangle.prototype.y2 = function (y2) {
@@ -15328,26 +15269,10 @@ var Segment = (function (_super) {
     Segment.prototype._createPlot = function () {
         return new baseSegmentPlot_1.BaseSegmentPlot(function (dataset) { return new Drawers.Segment(dataset); }, Segment.SVGEntityAdapter, this);
     };
-    Segment.prototype.x = function (x, xScale) {
-        var plotX = this._plot.x(x, xScale);
-        if (x == null) {
-            return plotX;
-        }
-        this.render();
-        return this;
-    };
     Segment.prototype.x2 = function (x2) {
         var plotX2 = this._plot.x2(x2);
         if (x2 == null) {
             return plotX2;
-        }
-        this.render();
-        return this;
-    };
-    Segment.prototype.y = function (y, yScale) {
-        var plotY = this._plot.y(y, yScale);
-        if (y == null) {
-            return plotY;
         }
         this.render();
         return this;
@@ -15359,9 +15284,6 @@ var Segment = (function (_super) {
         }
         this.render();
         return this;
-    };
-    Segment.prototype.entitiesAt = function (point) {
-        return this._plot.entitiesAt(point);
     };
     Segment.prototype.entitiesIn = function (xRangeOrBounds, yRange) {
         return this._plot.entitiesIn(xRangeOrBounds, yRange);
@@ -15432,20 +15354,6 @@ var StackedArea = (function (_super) {
         _super.prototype._setup.call(this);
         this._baseline = this._renderArea.append("line").classed("baseline", true);
     };
-    StackedArea.prototype.x = function (x, xScale) {
-        var plotX = this._plot.x(x, xScale);
-        if (x == null) {
-            return plotX;
-        }
-        return this;
-    };
-    StackedArea.prototype.y = function (y, yScale) {
-        var plotY = this._plot.y(y, yScale);
-        if (y == null) {
-            return plotY;
-        }
-        return this;
-    };
     StackedArea.prototype.stackingOrder = function (stackingOrder) {
         var plotStackingOrder = this._plot.stackingOrder(stackingOrder);
         if (stackingOrder == null) {
@@ -15505,20 +15413,6 @@ var StackedBar = (function (_super) {
         _super.call(this, orientation);
         this.addClass("stacked-bar-plot");
     }
-    StackedBar.prototype.x = function (x, xScale) {
-        var plotX = this._plot.x(x, xScale);
-        if (x == null) {
-            return plotX;
-        }
-        return this;
-    };
-    StackedBar.prototype.y = function (y, yScale) {
-        var plotY = this._plot.y(y, yScale);
-        if (y == null) {
-            return plotY;
-        }
-        return this;
-    };
     StackedBar.prototype.stackingOrder = function (stackingOrder) {
         var plotStackingOrder = this._plot.stackingOrder(stackingOrder);
         if (stackingOrder == null) {

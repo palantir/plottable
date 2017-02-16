@@ -78,28 +78,6 @@ export class StackedArea<X> extends Area<X> implements IStackedAreaPlot<X> {
     this._baseline = this._renderArea.append("line").classed("baseline", true);
   }
 
-  public x(): Plots.TransformableAccessorScaleBinding<X, number>;
-  public x(x: number | Accessor<number>): this;
-  public x(x: X | Accessor<X>, xScale: Scale<X, number>): this;
-  public x(x?: number | Accessor<number> | X | Accessor<X>, xScale?: Scale<X, number>): any {
-    const plotX = this._plot.x(x as X, xScale);
-    if (x == null) {
-      return plotX;
-    }
-    return this;
-  }
-
-  public y(): Plots.TransformableAccessorScaleBinding<number, number>;
-  public y(y: number | Accessor<number>): this;
-  public y(y: number | Accessor<number>, yScale: QuantitativeScale<number>): this;
-  public y(y?: number | Accessor<number>, yScale?: QuantitativeScale<number>): any {
-    const plotY = this._plot.y(y as number, yScale);
-    if (y == null) {
-      return plotY;
-    }
-    return this;
-  }
-
   /**
    * Gets the stacking order of the plot.
    */

@@ -70,32 +70,6 @@ export class Bar<X, Y> extends XYPlot<X, Y> implements IBarPlot<X, Y> {
     this._labelConfig = new Utils.Map<Dataset, LabelConfig>();
   }
 
-  public x(): Plots.TransformableAccessorScaleBinding<X, number>;
-  public x(x: number | Accessor<number>): this;
-  public x(x: X | Accessor<X>, xScale: Scale<X, number>): this;
-  public x(x?: number | Accessor<number> | X | Accessor<X>, xScale?: Scale<X, number>): any {
-    const plotX = this._plot.x(x as X, xScale);
-    if (x == null) {
-      return plotX;
-    }
-
-    this.render();
-    return this;
-  }
-
-  public y(): Plots.TransformableAccessorScaleBinding<Y, number>;
-  public y(y: number | Accessor<number>): this;
-  public y(y: Y | Accessor<Y>, yScale: Scale<Y, number>): this;
-  public y(y?: number | Accessor<number> | Y | Accessor<Y>, yScale?: Scale<Y, number>): any {
-    const plotY = this._plot.y(y as Y, yScale);
-    if (y == null) {
-      return plotY;
-    }
-
-    this.render();
-    return this;
-  }
-
   /**
    * Gets the orientation of the plot
    *
@@ -207,31 +181,6 @@ export class Bar<X, Y> extends XYPlot<X, Y> implements IBarPlot<X, Y> {
       labelConfig.labelArea.remove();
       this._labelConfig.delete(dataset);
     }
-  }
-
-  /**
-   * Returns the PlotEntity nearest to the query point according to the following algorithm:
-   *   - If the query point is inside a bar, returns the PlotEntity for that bar.
-   *   - Otherwise, gets the nearest PlotEntity by the primary direction (X for vertical, Y for horizontal),
-   *     breaking ties with the secondary direction.
-   * Returns undefined if no PlotEntity can be found.
-   *
-   * @param {Point} queryPoint
-   * @returns {PlotEntity} The nearest PlotEntity, or undefined if no PlotEntity can be found.
-   */
-  public entityNearest(queryPoint: Point): SVGPlotEntity {
-    return this._plot.entityNearest(queryPoint);
-  }
-
-
-  /**
-   * Gets the Entities at a particular Point.
-   *
-   * @param {Point} p
-   * @returns {PlotEntity[]}
-   */
-  public entitiesAt(p: Point) {
-    return this._plot.entitiesAt(p);
   }
 
   /**

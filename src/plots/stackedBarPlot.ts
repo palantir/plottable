@@ -44,32 +44,6 @@ export class StackedBar<X, Y> extends Bar<X, Y> {
     this.addClass("stacked-bar-plot");
   }
 
-  public x(): Plots.TransformableAccessorScaleBinding<X, number>;
-  public x(x: number | Accessor<number>): this;
-  public x(x: X | Accessor<X>, xScale: Scale<X, number>): this;
-  public x(x?: number | Accessor<number> | X | Accessor<X>, xScale?: Scale<X, number>): any {
-    const plotX = this._plot.x(x as X, xScale);
-
-    if (x == null) {
-      return plotX;
-    }
-
-    return this;
-  }
-
-  public y(): Plots.TransformableAccessorScaleBinding<Y, number>;
-  public y(y: number | Accessor<number>): this;
-  public y(y: Y | Accessor<Y>, yScale: Scale<Y, number>): this;
-  public y(y?: number | Accessor<number> | Y | Accessor<Y>, yScale?: Scale<Y, number>): any {
-    const plotY = this._plot.y(y as Y, yScale);
-
-    if (y == null) {
-      return plotY;
-    }
-
-    return this;
-  }
-
   /**
    * Gets the stacking order of the plot.
    */

@@ -36,17 +36,6 @@ export class Area<X> extends Line<X> implements IAreaPlot<X> {
     this.attr("fill", new Scales.Color().range()[0]);
   }
 
-  public y(): Plots.TransformableAccessorScaleBinding<number, number>;
-  public y(y: number | Accessor<number>): this;
-  public y(y: number | Accessor<number>, yScale: QuantitativeScale<number>): this;
-  public y(y?: number | Accessor<number>, yScale?: QuantitativeScale<number>): any {
-    const plotY = this._plot.y(y, yScale);
-    if (y == null) {
-      return plotY;
-    }
-    return this;
-  }
-
   /**
    * Gets the AccessorScaleBinding for Y0.
    */
@@ -64,6 +53,7 @@ export class Area<X> extends Line<X> implements IAreaPlot<X> {
     if (y0 == null) {
       return plotY0;
     }
+
     this.render();
     return this;
   }

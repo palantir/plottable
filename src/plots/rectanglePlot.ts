@@ -49,34 +49,6 @@ export class Rectangle<X, Y> extends XYPlot<X, Y> implements IRectanglePlot<X, Y
   }
 
   /**
-   * Gets the AccessorScaleBinding for X.
-   */
-  public x(): Plots.TransformableAccessorScaleBinding<X, number>;
-  /**
-   * Sets X to a constant number or the result of an Accessor<number>.
-   *
-   * @param {number|Accessor<number>} x
-   * @returns {Plots.Rectangle} The calling Rectangle Plot.
-   */
-  public x(x: number | Accessor<number>): this;
-  /**
-   * Sets X to a scaled constant value or scaled result of an Accessor.
-   * The provided Scale will account for the values when autoDomain()-ing.
-   *
-   * @param {X|Accessor<X>} x
-   * @param {Scale<X, number>} xScale
-   * @returns {Plots.Rectangle} The calling Rectangle Plot.
-   */
-  public x(x: X | Accessor<X>, xScale: Scale<X, number>): this;
-  public x(x?: number | Accessor<number> | X | Accessor<X>, xScale?: Scale<X, number>): any {
-        const xReturn = this._plot.x(x as X, xScale);
-    if (x == null) {
-      return xReturn
-    }
-    return this;
-  }
-
-  /**
    * Gets the AccessorScaleBinding for X2.
    */
   public x2(): Plots.TransformableAccessorScaleBinding<X, number>;
@@ -95,34 +67,6 @@ export class Rectangle<X, Y> extends XYPlot<X, Y> implements IRectanglePlot<X, Y
     }
 
     this.render();
-    return this;
-  }
-
-  /**
-   * Gets the AccessorScaleBinding for Y.
-   */
-  public y(): Plots.TransformableAccessorScaleBinding<Y, number>;
-  /**
-   * Sets Y to a constant number or the result of an Accessor<number>.
-   *
-   * @param {number|Accessor<number>} y
-   * @returns {Plots.Rectangle} The calling Rectangle Plot.
-   */
-  public y(y: number | Accessor<number>): this;
-  /**
-   * Sets Y to a scaled constant value or scaled result of an Accessor.
-   * The provided Scale will account for the values when autoDomain()-ing.
-   *
-   * @param {Y|Accessor<Y>} y
-   * @param {Scale<Y, number>} yScale
-   * @returns {Plots.Rectangle} The calling Rectangle Plot.
-   */
-  public y(y: Y | Accessor<Y>, yScale: Scale<Y, number>): this;
-  public y(y?: number | Accessor<number> | Y | Accessor<Y>, yScale?: Scale<Y, number>): any {
-    const yReturn = this._plot.y(y as Y, yScale);
-    if (y == null) {
-      return yReturn;
-    }
     return this;
   }
 
