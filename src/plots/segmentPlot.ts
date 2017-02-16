@@ -3,6 +3,8 @@
  * @license MIT
  */
 
+import * as d3 from "d3";
+
 import * as Animators from "../animators";
 import { Accessor, Point, Bounds, Range, AttributeToProjector } from "../core/interfaces";
 import { Dataset } from "../core/dataset";
@@ -14,11 +16,13 @@ import * as Plots from "./";
 import { PlotEntity, TransformableAccessorScaleBinding, AccessorScaleBinding } from "./";
 import { Plot } from "./plot";
 import { XYPlot } from "./xyPlot";
+import { SVGPlotEntity } from "../plots";
+import { IComponent } from "../components";
 
 import { BaseSegmentPlot, ISegmentPlot } from "./baseSegmentPlot";
 
 export class Segment<X, Y> extends XYPlot<X, Y> implements ISegmentPlot<X, Y> {
-  protected _plot: BaseSegmentPlot<X, Y>;
+  protected _plot: BaseSegmentPlot<X, Y, SVGPlotEntity>;
 
   /**
    * A Segment Plot displays line segments based on the data.
@@ -33,7 +37,7 @@ export class Segment<X, Y> extends XYPlot<X, Y> implements ISegmentPlot<X, Y> {
   }
 
   protected _createPlot() {
-    return new BaseSegmentPlot((dataset) => new Drawers.Segment(dataset), this);
+    return new BaseSegmentPlot((dataset) => new Drawers.Segment(dataset), Segment.SVGEntityAdapter, this);
   }
 
   /**

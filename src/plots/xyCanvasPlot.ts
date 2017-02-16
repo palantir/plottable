@@ -7,6 +7,7 @@ import * as d3 from "d3";
 
 import * as Plots from "./";
 import { BaseXYPlot, IXYPlot } from "./baseXYPlot";
+import { IComponent } from "../components";
 
 import { Dataset } from "../core/dataset";
 import { Accessor, Point } from "../core/interfaces";
@@ -19,7 +20,7 @@ import { CanvasPlot } from "./canvasPlot";
 import { TransformableAccessorScaleBinding, LightweightPlotEntity, PlotEntity } from "./commons";
 
 export class XYCanvasPlot<X, Y> extends CanvasPlot implements IXYPlot<X, Y> {
-  protected _plot: BaseXYPlot<X, Y>;
+  protected _plot: BaseXYPlot<X, Y, PlotEntity>;
 
   public autorangeMode(): string;
   public autorangeMode(autorangeMode: string): this;
@@ -111,6 +112,6 @@ export class XYCanvasPlot<X, Y> extends CanvasPlot implements IXYPlot<X, Y> {
   }
 
   protected _createPlot() {
-    return new BaseXYPlot((dataset) => new CanvasDrawer(dataset), this);
+    return new BaseXYPlot((dataset) => new CanvasDrawer(dataset), XYCanvasPlot.EntityAdapter, this);
   }
 }

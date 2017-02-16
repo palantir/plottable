@@ -122,7 +122,9 @@ export interface IPlot {
 export type DrawerFactory = (dataset: Dataset) => IDrawer;
 export type RenderAreaAccessor = (dataset: Dataset) => d3.Selection<void>;
 
-export class BasePlot implements IPlot {
+export type EntityAdapter<P extends PlotEntity> = (entity: LightweightPlotEntity, position: Point) => P;
+
+export class BasePlot<P extends PlotEntity> implements IPlot {
   private _animate = false;
   private _animators: {[animator: string]: Animator} = {};
   private _attrBindings: d3.Map<Plots.AccessorScaleBinding<any, any>>;
@@ -141,6 +143,7 @@ export class BasePlot implements IPlot {
   private _onDatasetUpdateAction: DatasetCallback;
 
   protected _component: IComponent<any>;
+  protected _entityAdapter: EntityAdapter<P>;
   protected _onDatasetUpdateCallback: DatasetCallback;
   protected _onDatasetsUpdate: Function;
   protected _propertyBindings: d3.Map<Plots.AccessorScaleBinding<any, any>>;
@@ -148,12 +151,13 @@ export class BasePlot implements IPlot {
   protected _renderCallback: ScaleCallback<Scale<any, any>>;
   protected _renderArea: RenderAreaAccessor;
 
-  constructor(drawerFactory: DrawerFactory, component: IComponent<any>) {
+  constructor(drawerFactory: DrawerFactory, entityAdapter: EntityAdapter<P>, component: IComponent<any>) {
     this._attrBindings = d3.map<Plots.AccessorScaleBinding<any, any>>();
     this._attrExtents = d3.map<any[]>();
     this._component = component;
     this._drawerFactory = drawerFactory;
     this._datasetToDrawer = new Utils.Map<Dataset, IDrawer>();
+    this._entityAdapter = entityAdapter;
     this._propertyBindings = d3.map<Plots.AccessorScaleBinding<any, any>>();
     this._propertyExtents = d3.map<any[]>();
 
@@ -282,20 +286,29 @@ export class BasePlot implements IPlot {
    *   If not provided, returns defaults to all Datasets on the Plot.
    * @return {Plots.PlotEntity[]}
    */
-  public entities(datasets?: Dataset[]): PlotEntity[] {
-    return this._getEntityStore(datasets).map((entity) => this._lightweightPlotEntityToPlotEntity(entity));
+  public entities(datasets?: Dataset[]): P[] {
+
+    return this._getEntityStore(datasets).map((entity) => {
+      const point = this._pixelPoint(entity.datum, entity.index, entity.dataset);
+      return this._entityAdapter(entity, point);
+    });
   }
 
-  public entitiesAt(point: Point): PlotEntity[] {
+  public entitiesAt(point: Point): P[] {
     throw new Error("plots must implement entitiesAt");
   }
 
-  public entityNearest(queryPoint: Point, bounds: Bounds): PlotEntity {
+  public entityNearest(queryPoint: Point, bounds: Bounds): P {
     const nearest = this._getEntityStore().entityNearest(queryPoint, (entity: LightweightPlotEntity) => {
       return this._entityVisibleOnPlot(entity, bounds);
     });
 
-    return nearest === undefined ? undefined : this._lightweightPlotEntityToPlotEntity(nearest);
+    if (nearest === undefined) {
+      return undefined;
+    }
+
+    const point = this._pixelPoint(nearest.datum, nearest.index, nearest.dataset);
+    return this._entityAdapter(nearest, point);
   }
 
   public onDatasetRemoved(_onDatasetRemoved: DatasetCallback) {
@@ -476,7 +489,6 @@ export class BasePlot implements IPlot {
     return dataToDraw;
   }
 
-
   /**
    * _getEntityStore returns the store of all Entities associated with the specified dataset
    *
@@ -512,18 +524,6 @@ export class BasePlot implements IPlot {
   protected _installScaleForKey(scale: Scale<any, any>, key: string) {
     scale.onUpdate(this._renderCallback);
     scale.addIncludedValuesProvider(this._includedValuesProvider);
-  }
-
-  protected _lightweightPlotEntityToPlotEntity(entity: LightweightPlotEntity) {
-    let plotEntity: PlotEntity = {
-      datum: entity.datum,
-      position: this._pixelPoint(entity.datum, entity.index, entity.dataset),
-      dataset: entity.dataset,
-      datasetIndex: entity.datasetIndex,
-      index: entity.index,
-      component: entity.component,
-    };
-    return plotEntity;
   }
 
   protected _pixelPoint(datum: any, index: number, dataset: Dataset): Point {

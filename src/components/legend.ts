@@ -9,7 +9,7 @@ import * as SVGTypewriter from "svg-typewriter";
 import * as Configs from "../core/config";
 import * as Formatters from "../core/formatters";
 import { Formatter } from "../core/formatters";
-import { SpaceRequest, Point, Entity } from "../core/interfaces";
+import { SpaceRequest, Point, Entity, SVGEntity } from "../core/interfaces";
 import * as SymbolFactories from "../core/symbolFactories";
 import { SymbolFactory } from "../core/symbolFactories";
 import { ScaleCallback } from "../scales/scale";
@@ -17,6 +17,8 @@ import * as Scales from "../scales";
 import * as Utils from "../utils";
 
 import { SVGComponent } from "./svgComponent";
+
+export type LegendEntity = Entity<Legend> & SVGEntity<Legend>;
 
 /**
  * The Legend's column representation. Stores position information
@@ -498,7 +500,7 @@ export class Legend extends SVGComponent {
    * Returns an empty array if no Entities are present at that location.
    *
    * @param {Point} p
-   * @returns {Entity<Legend>[]}
+   * @returns {LegendEntity[]}
    */
   public entitiesAt(p: Point) {
     if (!this._isSetup) {
@@ -506,7 +508,7 @@ export class Legend extends SVGComponent {
     }
 
     const table = this._buildLegendTable(this.width(), this.height());
-    return table.rows.reduce((entity: Entity<Legend>[], row: LegendRow, rowIndex: number) => {
+    return table.rows.reduce((entity: LegendEntity[], row: LegendRow, rowIndex: number) => {
       if (entity.length !== 0) {
         // we've already found the nearest entity; just return it.
         return entity;
@@ -520,7 +522,7 @@ export class Legend extends SVGComponent {
         return entity;
       }
 
-      return row.columns.reduce((entity: Entity<Legend>[], column: LegendColumn<{ name: string, type: string }>, columnIndex: number) => {
+      return row.columns.reduce((entity: LegendEntity[], column: LegendColumn<{ name: string, type: string }>, columnIndex: number) => {
         const columnBounds = table.getColumnBounds(rowIndex, columnIndex);
         const withinColumn = Utils.Math.within(p, columnBounds);
 
@@ -547,7 +549,7 @@ export class Legend extends SVGComponent {
         return entity;
       }, entity);
 
-    }, [] as Entity<Legend>[])
+    }, [] as LegendEntity[])
   }
 
   public renderImmediately() {

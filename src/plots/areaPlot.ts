@@ -12,13 +12,16 @@ import * as Scales from "../scales";
 import { QuantitativeScale } from "../scales/quantitativeScale";
 import * as Utils from "../utils";
 
+import { SVGPlotEntity } from "../plots";
+import { IComponent } from "../components";
+
 import * as Plots from "./";
 import { Line } from "./linePlot";
 import { Plot } from "./plot";
 import { BaseAreaPlot, IAreaPlot } from "./baseAreaPlot";
 
 export class Area<X> extends Line<X> implements IAreaPlot<X> {
-  protected _plot: BaseAreaPlot<X>;
+  protected _plot: BaseAreaPlot<X, SVGPlotEntity>;
 
   /**
    * An Area Plot draws a filled region (area) between Y and Y0.
@@ -76,6 +79,7 @@ export class Area<X> extends Line<X> implements IAreaPlot<X> {
   protected _createPlot() {
     return new BaseAreaPlot((dataset) => new Drawers.Area(dataset),
       (dataset) => new Drawers.Line(dataset),
+      Area.SVGEntityAdapter,
       this
     );
   }

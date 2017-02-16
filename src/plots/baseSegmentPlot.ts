@@ -57,7 +57,7 @@ export interface ISegmentPlot<X, Y> extends IXYPlot<X, Y> {
   y2(y2?: number | Accessor<number> | Y | Accessor<Y>): any;
 }
 
-export class BaseSegmentPlot<X, Y> extends BaseXYPlot<X, Y> implements ISegmentPlot<X, Y> {
+export class BaseSegmentPlot<X, Y, P extends PlotEntity> extends BaseXYPlot<X, Y, P> implements ISegmentPlot<X, Y> {
   private static _X2_KEY = "x2";
   private static _Y2_KEY = "y2";
 
@@ -70,9 +70,9 @@ export class BaseSegmentPlot<X, Y> extends BaseXYPlot<X, Y> implements ISegmentP
     }
   }
 
-  public entitiesIn(bounds: Bounds): PlotEntity[];
-  public entitiesIn(xRange: Range, yRange: Range): PlotEntity[];
-  public entitiesIn(xRangeOrBounds: Range | Bounds, yRange?: Range): PlotEntity[] {
+  public entitiesIn(bounds: Bounds): P[];
+  public entitiesIn(xRange: Range, yRange: Range): P[];
+  public entitiesIn(xRangeOrBounds: Range | Bounds, yRange?: Range): P[] {
     let dataXRange: Range;
     let dataYRange: Range;
     if (yRange == null) {
@@ -182,8 +182,8 @@ export class BaseSegmentPlot<X, Y> extends BaseXYPlot<X, Y> implements ISegmentP
     }
   }
 
-  private _entitiesIntersecting(xRange: Range, yRange: Range): PlotEntity[] {
-    let intersected: PlotEntity[] = [];
+  private _entitiesIntersecting(xRange: Range, yRange: Range): P[] {
+    let intersected: P[] = [];
     let attrToProjector = this._generateAttrToProjector();
     this.entities().forEach((entity) => {
       if (this._lineIntersectsBox(entity, xRange, yRange, attrToProjector)) {

@@ -16,7 +16,7 @@ import { Scale } from "../scales/scale";
 import { PlotEntity, AccessorScaleBinding } from "./";
 import { Accessor, Point, AttributeToProjector } from "../core/interfaces";
 import { Dataset } from "../core/dataset";
-import { DrawerFactory } from "./basePlot";
+import { EntityAdapter, DrawerFactory } from "./basePlot";
 
 export interface IPiePlot extends IPlot {
   /**
@@ -112,7 +112,7 @@ export interface IPiePlot extends IPlot {
   startAngle(angle?: number): any
 }
 
-export class BasePiePlot extends BasePlot implements IPiePlot {
+export class BasePiePlot<P extends PlotEntity> extends BasePlot<P> implements IPiePlot {
   private static _INNER_RADIUS_KEY = "inner-radius";
   private static _OUTER_RADIUS_KEY = "outer-radius";
   private static _SECTOR_VALUE_KEY = "sector-value";
@@ -125,8 +125,8 @@ export class BasePiePlot extends BasePlot implements IPiePlot {
 
   protected _component: LabeledComponent;
 
-  constructor(drawerFactory: DrawerFactory, component: LabeledComponent) {
-    super(drawerFactory, component);
+  constructor(drawerFactory: DrawerFactory, entityAdapter: EntityAdapter<P>, component: LabeledComponent) {
+    super(drawerFactory, entityAdapter, component);
     this._strokeDrawers = new Utils.Map<Dataset, Drawers.ArcOutline>();
   }
 

@@ -16,13 +16,16 @@ import * as Scales from "../scales";
 import { Scale } from "../scales/scale";
 import * as Utils from "../utils";
 
+import { SVGPlotEntity } from "../plots";
+import { IComponent } from "../components";
+
 import { PlotEntity, AccessorScaleBinding } from "./";
 import { Plot } from "./plot";
 
 import { BasePiePlot, IPiePlot } from "./basePiePlot";
 
 export class Pie extends Plot implements IPiePlot {
-  protected _plot: BasePiePlot;
+  protected _plot: BasePiePlot<SVGPlotEntity>;
 
   private _labelFormatter: Formatter = Formatters.identity();
   private _labelsEnabled = false;
@@ -78,10 +81,10 @@ export class Pie extends Plot implements IPiePlot {
   }
 
   protected _createPlot() {
-    return new BasePiePlot((dataset) => new Drawers.Arc(dataset), this)
+    return new BasePiePlot((dataset) => new Drawers.Arc(dataset), Pie.SVGEntityAdapter, this)
   }
 
-  public entities(datasets = this.datasets()): PlotEntity[] {
+  public entities(datasets = this.datasets()): SVGPlotEntity[] {
     return this._plot.entities(datasets);
   }
 

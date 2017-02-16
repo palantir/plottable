@@ -72,7 +72,7 @@ export interface LightweightScatterPlotEntity extends LightweightPlotEntity {
   diameter: Point;
 }
 
-export class BaseScatterPlot<X, Y> extends BaseXYPlot<X, Y> implements IScatterPlot<X, Y> {
+export class BaseScatterPlot<X, Y, P extends PlotEntity> extends BaseXYPlot<X, Y, P> implements IScatterPlot<X, Y> {
   private static _SIZE_KEY = "size";
   private static _SYMBOL_KEY = "symbol";
 

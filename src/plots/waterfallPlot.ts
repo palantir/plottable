@@ -3,20 +3,24 @@
  * @license MIT
  */
 
+import * as d3 from "d3";
+
 import { Accessor, Point, Bounds, Range, AttributeToProjector } from "../core/interfaces";
 import { Dataset } from "../core/dataset";
 import { Drawer } from "../drawers/drawer";
 import * as Drawers from "../drawers";
 import * as Utils from "../utils";
 
+import { IComponent } from "../components";
 import * as Plots from "./";
 import { Bar } from "./barPlot";
+import { SVGPlotEntity } from "../plots";
 import { Plot } from "./plot";
 
 import { BaseWaterfallPlot, IWaterfallPlot } from "./baseWaterfallPlot";
 
 export class Waterfall<X, Y> extends Bar<X, number>  implements IWaterfallPlot<X, number> {
-  protected _plot: BaseWaterfallPlot<X, number>;
+  protected _plot: BaseWaterfallPlot<X, number, SVGPlotEntity>;
 
   private static _CONNECTOR_CLASS = "connector";
   private static _CONNECTOR_AREA_CLASS = "connector-area";
@@ -73,7 +77,7 @@ export class Waterfall<X, Y> extends Bar<X, number>  implements IWaterfallPlot<X
   }
 
   protected _createPlot() {
-    return new BaseWaterfallPlot((dataset) => new Drawers.Rectangle(dataset), this);
+    return new BaseWaterfallPlot((dataset) => new Drawers.Rectangle(dataset), Waterfall.SVGEntityAdapter, this);
   }
 
   protected _setup() {

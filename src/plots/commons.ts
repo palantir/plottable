@@ -5,7 +5,7 @@
 
 import { IComponent } from "../components";
 import { Dataset } from "../core/dataset";
-import { Point, Entity, Accessor } from "../core/interfaces";
+import { Point, SVGEntity, Entity, Accessor } from "../core/interfaces";
 import { Drawer, IDrawer } from "../drawers/drawer";
 import { Plot } from "../plots/plot";
 import { Scale, TransformableScale } from "../scales/scale";
@@ -32,6 +32,8 @@ export interface PlotEntity extends Entity<IComponent<any>> {
   index: number;
   component: IComponent<any>;
 }
+
+export type SVGPlotEntity = SVGEntity<IComponent<any>> & PlotEntity;
 
 export interface AccessorScaleBinding<D, R> {
   accessor: Accessor<any>;

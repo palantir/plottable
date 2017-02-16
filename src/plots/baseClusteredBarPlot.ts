@@ -9,16 +9,17 @@ import {BaseBarPlot, IBarPlot } from "./baseBarPlot";
 import { LabeledComponent } from "../components/labeled";
 import * as Scales from "../scales";
 
-import { DrawerFactory } from "./basePlot";
+import { PlotEntity } from "./";
+import { EntityAdapter, DrawerFactory } from "./basePlot";
 import { Dataset } from "../core/dataset";
 
 export interface IClusteredBarPlot<X, Y> extends IBarPlot<X, Y> {}
 
-export class BaseClusteredBarPlot<X, Y> extends BaseBarPlot<X, Y> implements IClusteredBarPlot<X, Y> {
+export class BaseClusteredBarPlot<X, Y, P extends PlotEntity> extends BaseBarPlot<X, Y, P> implements IClusteredBarPlot<X, Y> {
   private _clusterOffsets: Utils.Map<Dataset, number>;
 
-  constructor(drawerFactory: DrawerFactory, component: LabeledComponent) {
-    super(drawerFactory, component);
+  constructor(drawerFactory: DrawerFactory, entityAdapter: EntityAdapter<P>, component: LabeledComponent) {
+    super(drawerFactory, entityAdapter, component);
     this._clusterOffsets = new Utils.Map<Dataset, number>();
   }
 

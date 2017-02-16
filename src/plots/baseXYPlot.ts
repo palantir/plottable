@@ -3,7 +3,7 @@ import * as d3 from "d3";
 import * as Utils from "../utils";
 import * as Scales from "../scales";
 
-import { BasePlot, IPlot, DrawerFactory } from "./basePlot";
+import { BasePlot, EntityAdapter, IPlot, DrawerFactory } from "./basePlot";
 import { LightweightPlotEntity, PlotEntity, TransformableAccessorScaleBinding } from "./commons";
 
 import { IComponent } from "../components";
@@ -75,7 +75,7 @@ export interface IXYPlot<X, Y> extends IPlot {
   y(y?: number | Accessor<number> | Y | Accessor<Y>, yScale?: Scale<Y, number>): any;
 }
 
-export class BaseXYPlot<X, Y> extends BasePlot implements IXYPlot<X, Y> {
+export class BaseXYPlot<X, Y, P extends PlotEntity> extends BasePlot<P> implements IXYPlot<X, Y> {
   protected static _X_KEY = "x";
   protected static _Y_KEY = "y";
 
@@ -84,8 +84,8 @@ export class BaseXYPlot<X, Y> extends BasePlot implements IXYPlot<X, Y> {
   private _adjustYDomainOnChangeFromXCallback: ScaleCallback<Scale<any, any>>;
   private _adjustXDomainOnChangeFromYCallback: ScaleCallback<Scale<any, any>>;
 
-  constructor(drawerFactory: DrawerFactory, component: IComponent<any>) {
-    super(drawerFactory, component);
+  constructor(drawerFactory: DrawerFactory, entityAdapter: EntityAdapter<P>, component: IComponent<any>) {
+    super(drawerFactory, entityAdapter, component);
 
     this._adjustXDomainOnChangeFromYCallback = (scale) => this._adjustXDomainOnChangeFromY();
     this._adjustYDomainOnChangeFromXCallback = (scale) => this._adjustYDomainOnChangeFromX();
@@ -154,7 +154,7 @@ export class BaseXYPlot<X, Y> extends BasePlot implements IXYPlot<X, Y> {
     return this;
   }
 
-  public entityNearest(queryPoint: Point): PlotEntity {
+  public entityNearest(queryPoint: Point): P {
     // by default, the entity index stores position information in the data space
     // the default impelentation of the entityNearest must convert the chart bounding
     // box as well as the query point to the data space before it can make a comparison

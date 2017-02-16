@@ -20,7 +20,7 @@ import { QuantitativeScale } from "../scales/quantitativeScale";
 import { PlotEntity } from "./";
 import { LightweightPlotEntity } from "./commons";
 
-import { DrawerFactory } from "./basePlot";
+import { EntityAdapter, DrawerFactory } from "./basePlot";
 
 export interface IBarPlot<X, Y> extends IXYPlot<X, Y> {
   /**
@@ -57,7 +57,7 @@ export interface IBarPlot<X, Y> extends IXYPlot<X, Y> {
   entitiesIn(xRangeOrBounds: Range | Bounds, yRange?: Range): PlotEntity[]
 }
 
-export class BaseBarPlot<X, Y> extends BaseXYPlot<X, Y> implements IBarPlot<X, Y> {
+export class BaseBarPlot<X, Y, P extends PlotEntity> extends BaseXYPlot<X, Y, P> implements IBarPlot<X, Y> {
   private static _SINGLE_BAR_DIMENSION_RATIO = 0.4;
   private static _BAR_WIDTH_RATIO = 0.95;
 
@@ -69,8 +69,8 @@ export class BaseBarPlot<X, Y> extends BaseXYPlot<X, Y> implements IBarPlot<X, Y
   private _baselineValueProvider: () => (X|Y)[];
   private _updateBarPixelWidthCallback: () => void;
 
-  constructor(drawerFactory: DrawerFactory, component: LabeledComponent) {
-    super(drawerFactory, component);
+  constructor(drawerFactory: DrawerFactory, entityAdapter: EntityAdapter<P>, component: LabeledComponent) {
+    super(drawerFactory, entityAdapter, component);
     this._baselineValueProvider = () => [this.baselineValue()];
     this._updateBarPixelWidthCallback = () => this.updateBarPixelWidth();
 
@@ -121,7 +121,7 @@ export class BaseBarPlot<X, Y> extends BaseXYPlot<X, Y> implements IBarPlot<X, Y
     return this;
   }
 
-  public entities(datasets = this.datasets()): PlotEntity[] {
+  public entities(datasets = this.datasets()): P[] {
     if (!this._projectorsReady()) {
       return [];
     }
@@ -139,7 +139,7 @@ export class BaseBarPlot<X, Y> extends BaseXYPlot<X, Y> implements IBarPlot<X, Y
    * @param {Point} queryPoint
    * @returns {PlotEntity} The nearest PlotEntity, or undefined if no PlotEntity can be found.
    */
-  public entityNearest(queryPoint: Point): PlotEntity {
+  public entityNearest(queryPoint: Point): P {
     let minPrimaryDist = Infinity;
     let minSecondaryDist = Infinity;
 
@@ -190,7 +190,8 @@ export class BaseBarPlot<X, Y> extends BaseXYPlot<X, Y> implements IBarPlot<X, Y
     });
 
     if (closest !== undefined) {
-      return this._lightweightPlotEntityToPlotEntity(closest);
+      const point = this._pixelPoint(closest.datum, closest.index, closest.dataset);
+      return this._entityAdapter(closest, point);
     } else {
       return undefined;
     }
@@ -200,7 +201,7 @@ export class BaseBarPlot<X, Y> extends BaseXYPlot<X, Y> implements IBarPlot<X, Y
     return this._entitiesIntersecting(p.x, p.y);
   }
 
-  public entitiesIn(xRangeOrBounds: Range | Bounds, yRange?: Range): PlotEntity[] {
+  public entitiesIn(xRangeOrBounds: Range | Bounds, yRange?: Range): P[] {
     let dataXRange: Range;
     let dataYRange: Range;
     if (yRange == null) {
@@ -465,20 +466,19 @@ export class BaseBarPlot<X, Y> extends BaseXYPlot<X, Y> implements IBarPlot<X, Y
     super._uninstallScaleForKey(scale, key);
   }
 
-  private _entitiesIntersecting(xValOrRange: number | Range, yValOrRange: number | Range): PlotEntity[] {
-    let intersected: PlotEntity[] = [];
+  private _entitiesIntersecting(xValOrRange: number | Range, yValOrRange: number | Range): P[] {
+    let intersected: P[] = [];
     this._getEntityStore().forEach((entity) => {
 
       // HACKHACK Assume the drawer is SVG based
       const selection = (entity.drawer as Drawers.Rectangle).selectionForIndex(entity.validDatumIndex);
       if (Utils.DOM.intersectsBBox(xValOrRange, yValOrRange, Utils.DOM.elementBBox(selection))) {
-        intersected.push(this._lightweightPlotEntityToPlotEntity(entity));
+        const point = this._pixelPoint(entity.datum, entity.index, entity.dataset);
+        intersected.push(this._entityAdapter(entity, point));
       }
     });
     return intersected;
   }
-
-
 
   private _updateValueScale() {
     if (!this._projectorsReady()) {

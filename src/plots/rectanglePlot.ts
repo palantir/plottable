@@ -15,6 +15,9 @@ import * as Scales from "../scales";
 import { Scale } from "../scales/scale";
 import * as Utils from "../utils";
 
+import { IComponent } from "../components";
+import { SVGPlotEntity } from "../plots";
+
 import * as Plots from "./";
 import { PlotEntity } from "./";
 import { Plot } from "./plot";
@@ -24,7 +27,7 @@ import { BaseRectanglePlot, IRectanglePlot } from "./baseRectanglePlot";
 export class Rectangle<X, Y> extends XYPlot<X, Y> implements IRectanglePlot<X, Y> {
   private _labelsEnabled = false;
   private _label: Accessor<string> = null;
-  protected _plot: BaseRectanglePlot<X, Y>;
+  protected _plot: BaseRectanglePlot<X, Y, SVGPlotEntity>;
 
   /**
    * A Rectangle Plot displays rectangles based on the data.
@@ -310,6 +313,6 @@ export class Rectangle<X, Y> extends XYPlot<X, Y> implements IRectanglePlot<X, Y
   }
 
   protected _createPlot() {
-    return new BaseRectanglePlot((dataset) => new RectangleDrawer(dataset), this);
+    return new BaseRectanglePlot((dataset) => new RectangleDrawer(dataset), Rectangle.SVGEntityAdapter, this);
   }
 }

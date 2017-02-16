@@ -3,6 +3,8 @@
  * @license MIT
  */
 
+import * as d3 from "d3";
+
 import * as Animators from "../animators";
 import { Accessor, Point, Bounds, Range, AttributeToProjector } from "../core/interfaces";
 import { Dataset } from "../core/dataset";
@@ -13,6 +15,9 @@ import * as Scales from "../scales";
 import { Scale } from "../scales/scale";
 import * as Utils from "../utils";
 
+import { IComponent } from "../components";
+import { SVGPlotEntity } from "../plots";
+
 import * as Plots from "./";
 import { PlotEntity, LightweightPlotEntity, TransformableAccessorScaleBinding, AccessorScaleBinding } from "./";
 import { Plot } from "./plot";
@@ -21,7 +26,7 @@ import { XYPlot } from "./xyPlot";
 import { BaseScatterPlot, IScatterPlot } from "./baseScatterPlot";
 
 export class Scatter<X, Y> extends XYPlot<X, Y> implements IScatterPlot<X, Y> {
-  protected _plot: BaseScatterPlot<X, Y>;
+  protected _plot: BaseScatterPlot<X, Y, SVGPlotEntity>;
 
   /**
    * A Scatter Plot draws a symbol at each data point.
@@ -115,6 +120,6 @@ export class Scatter<X, Y> extends XYPlot<X, Y> implements IScatterPlot<X, Y> {
   }
 
   protected _createPlot() {
-    return new BaseScatterPlot((dataset) => new Drawers.Symbol(dataset), this);
+    return new BaseScatterPlot((dataset) => new Drawers.Symbol(dataset), Scatter.SVGEntityAdapter, this);
   }
 }

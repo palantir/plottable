@@ -3,6 +3,8 @@ import * as d3 from "d3";
 import { assert } from "chai";
 
 import * as Plottable from "../../src";
+import { LegendEntity } from "../../src/components/legend"
+import { SVGPlotEntity } from "../../src/plots";
 
 import * as TestMethods from "../testMethods";
 
@@ -495,13 +497,14 @@ describe("Legend", () => {
       let entities = legend.entitiesAt({x: 10, y: 10});
       const entries = legend.content().selectAll(ENTRY_SELECTOR);
 
-      let expectedEntity: Plottable.Entity<Plottable.Components.Legend> = {
+      let expectedEntity: LegendEntity = {
         datum: "AA",
         position: computeExpectedSymbolPosition(0, 0),
         selection: d3.select(entries[0][0]),
         component: legend,
       };
-      TestMethods.assertEntitiesEqual(entities[0], expectedEntity, "returned Entity corresponding to first entry");
+
+      TestMethods.assertEntitiesEqual(entities[0] as any, expectedEntity as any, "returned Entity corresponding to first entry");
 
       entities = legend.entitiesAt({x: 10, y: 30});
       expectedEntity = {
@@ -510,7 +513,7 @@ describe("Legend", () => {
         selection: d3.select(entries[0][1]),
         component: legend,
       };
-      TestMethods.assertEntitiesEqual(entities[0], expectedEntity, "returned Entity corresponding to second entry");
+      TestMethods.assertEntitiesEqual(entities[0] as any, expectedEntity as any, "returned Entity corresponding to second entry");
 
       legend.detach();
       entities = legend.entitiesAt({x: 10, y: 10});
@@ -525,13 +528,13 @@ describe("Legend", () => {
       legend.renderTo(svg);
       let entities = legend.entitiesAt({x: 10, y: 10});
       const entries = legend.content().selectAll(ENTRY_SELECTOR);
-      let expectedEntity: Plottable.Entity<Plottable.Components.Legend> = {
+      let expectedEntity: LegendEntity = {
         datum: "AA",
         position: computeExpectedSymbolPosition(0, 0),
         selection: d3.select(entries[0][0]),
         component: legend,
       };
-      TestMethods.assertEntitiesEqual(entities[0], expectedEntity, "returned Entity corresponding to first entry");
+      TestMethods.assertEntitiesEqual(entities[0] as any, expectedEntity as any, "returned Entity corresponding to first entry");
 
       entities = legend.entitiesAt({x: 50, y: 10});
       expectedEntity = {
@@ -540,7 +543,7 @@ describe("Legend", () => {
         selection: d3.select(entries[0][1]),
         component: legend,
       };
-      TestMethods.assertEntitiesEqual(entities[0], expectedEntity, "returned Entity corresponding to second entry");
+      TestMethods.assertEntitiesEqual(entities[0] as any, expectedEntity as any, "returned Entity corresponding to second entry");
 
       svg.remove();
     });

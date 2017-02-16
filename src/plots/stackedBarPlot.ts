@@ -3,15 +3,19 @@
  * @license MIT
  */
 
+import * as d3 from "d3";
+
 import * as SVGTypewriter from "svg-typewriter";
 import * as Drawers from "../drawers";
 
 import { Accessor, AttributeToProjector, Point } from "../core/interfaces";
+import { IComponent } from "../components";
 import { Dataset } from "../core/dataset";
 import { Scale } from "../scales/scale";
 import * as Utils from "../utils";
 
 import * as Plots from "./";
+import { SVGPlotEntity } from "../plots";
 import { Bar } from "./barPlot";
 
 import { BaseStackedBarPlot, IStackedBarPlot } from "./baseStackedBarPlot";
@@ -19,7 +23,7 @@ import { BaseStackedBarPlot, IStackedBarPlot } from "./baseStackedBarPlot";
 export class StackedBar<X, Y> extends Bar<X, Y> {
   protected static _STACKED_BAR_LABEL_PADDING = 5;
 
-  protected _plot: BaseStackedBarPlot<X, Y>;
+  protected _plot: BaseStackedBarPlot<X, Y, SVGPlotEntity>;
 
   private _labelArea: d3.Selection<void>;
   private _measurer: SVGTypewriter.Measurer;
@@ -100,7 +104,7 @@ export class StackedBar<X, Y> extends Bar<X, Y> {
   }
 
   protected _createPlot() {
-    return new BaseStackedBarPlot((dataset) => new Drawers.Rectangle(dataset), this);
+    return new BaseStackedBarPlot((dataset) => new Drawers.Rectangle(dataset), StackedBar.SVGEntityAdapter, this);
   }
 
   public drawLabels(dataToDraw: Utils.Map<Dataset, any[]>, attrToProjector: AttributeToProjector) {

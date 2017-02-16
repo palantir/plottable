@@ -1444,9 +1444,9 @@ var Scales = __webpack_require__(2);
 var basePlot_1 = __webpack_require__(27);
 var BaseXYPlot = (function (_super) {
     __extends(BaseXYPlot, _super);
-    function BaseXYPlot(drawerFactory, component) {
+    function BaseXYPlot(drawerFactory, entityAdapter, component) {
         var _this = this;
-        _super.call(this, drawerFactory, component);
+        _super.call(this, drawerFactory, entityAdapter, component);
         this._autoAdjustYScaleDomain = false;
         this._autoAdjustXScaleDomain = false;
         this._adjustXDomainOnChangeFromYCallback = function (scale) { return _this._adjustXDomainOnChangeFromY(); };
@@ -1936,7 +1936,20 @@ var Plot = (function (_super) {
         // sub classes implement
     };
     Plot.prototype._createPlot = function () {
-        return new basePlot_1.BasePlot(function (dataset) { return new drawer_1.Drawer(dataset); }, this);
+        return new basePlot_1.BasePlot(function (dataset) { return new drawer_1.Drawer(dataset); }, Plot.SVGEntityAdapter, this);
+    };
+    Plot.SVGEntityAdapter = function (entity, position) {
+        return {
+            datum: entity.datum,
+            position: position,
+            dataset: entity.dataset,
+            datasetIndex: entity.datasetIndex,
+            index: entity.index,
+            component: entity.component,
+            // HACKHACK we know this is an SVG drawer with a selectionForIndex method
+            // because we're in the SVG specific plot implementation
+            selection: entity.drawer.selectionForIndex(entity.validDatumIndex),
+        };
     };
     Plot._ANIMATION_MAX_DURATION = 600;
     return Plot;
@@ -2098,7 +2111,7 @@ var XYPlot = (function (_super) {
         return this;
     };
     XYPlot.prototype._createPlot = function () {
-        return new baseXYPlot_1.BaseXYPlot(function (dataset) { return new drawer_1.Drawer(dataset); }, this);
+        return new baseXYPlot_1.BaseXYPlot(function (dataset) { return new drawer_1.Drawer(dataset); }, XYPlot.SVGEntityAdapter, this);
     };
     return XYPlot;
 }(plot_1.Plot));
@@ -3652,7 +3665,7 @@ var Bar = (function (_super) {
         return this;
     };
     Bar.prototype._createPlot = function () {
-        return new baseBarPlot_1.BaseBarPlot(function (dataset) { return new Drawers.Rectangle(dataset); }, this);
+        return new baseBarPlot_1.BaseBarPlot(function (dataset) { return new Drawers.Rectangle(dataset); }, Bar.SVGEntityAdapter, this);
     };
     Bar.prototype._setup = function () {
         var _this = this;
@@ -3919,9 +3932,9 @@ var baseXYPlot_1 = __webpack_require__(13);
 var quantitativeScale_1 = __webpack_require__(8);
 var BaseBarPlot = (function (_super) {
     __extends(BaseBarPlot, _super);
-    function BaseBarPlot(drawerFactory, component) {
+    function BaseBarPlot(drawerFactory, entityAdapter, component) {
         var _this = this;
-        _super.call(this, drawerFactory, component);
+        _super.call(this, drawerFactory, entityAdapter, component);
         this._barPixelWidth = 0;
         this._baselineValueProvider = function () { return [_this.baselineValue()]; };
         this._updateBarPixelWidthCallback = function () { return _this.updateBarPixelWidth(); };
@@ -4025,7 +4038,8 @@ var BaseBarPlot = (function (_super) {
             }
         });
         if (closest !== undefined) {
-            return this._lightweightPlotEntityToPlotEntity(closest);
+            var point = this._pixelPoint(closest.datum, closest.index, closest.dataset);
+            return this._entityAdapter(closest, point);
         }
         else {
             return undefined;
@@ -4273,7 +4287,8 @@ var BaseBarPlot = (function (_super) {
             // HACKHACK Assume the drawer is SVG based
             var selection = entity.drawer.selectionForIndex(entity.validDatumIndex);
             if (Utils.DOM.intersectsBBox(xValOrRange, yValOrRange, Utils.DOM.elementBBox(selection))) {
-                intersected.push(_this._lightweightPlotEntityToPlotEntity(entity));
+                var point = _this._pixelPoint(entity.datum, entity.index, entity.dataset);
+                intersected.push(_this._entityAdapter(entity, point));
             }
         });
         return intersected;
@@ -4306,7 +4321,7 @@ var d3 = __webpack_require__(1);
 var animators_1 = __webpack_require__(4);
 var Utils = __webpack_require__(0);
 var BasePlot = (function () {
-    function BasePlot(drawerFactory, component) {
+    function BasePlot(drawerFactory, entityAdapter, component) {
         var _this = this;
         this._animate = false;
         this._animators = {};
@@ -4316,6 +4331,7 @@ var BasePlot = (function () {
         this._component = component;
         this._drawerFactory = drawerFactory;
         this._datasetToDrawer = new Utils.Map();
+        this._entityAdapter = entityAdapter;
         this._propertyBindings = d3.map();
         this._propertyExtents = d3.map();
         this._includedValuesProvider = function (scale) { return _this._includedValuesForScale(scale); };
@@ -4408,7 +4424,10 @@ var BasePlot = (function () {
      */
     BasePlot.prototype.entities = function (datasets) {
         var _this = this;
-        return this._getEntityStore(datasets).map(function (entity) { return _this._lightweightPlotEntityToPlotEntity(entity); });
+        return this._getEntityStore(datasets).map(function (entity) {
+            var point = _this._pixelPoint(entity.datum, entity.index, entity.dataset);
+            return _this._entityAdapter(entity, point);
+        });
     };
     BasePlot.prototype.entitiesAt = function (point) {
         throw new Error("plots must implement entitiesAt");
@@ -4418,7 +4437,11 @@ var BasePlot = (function () {
         var nearest = this._getEntityStore().entityNearest(queryPoint, function (entity) {
             return _this._entityVisibleOnPlot(entity, bounds);
         });
-        return nearest === undefined ? undefined : this._lightweightPlotEntityToPlotEntity(nearest);
+        if (nearest === undefined) {
+            return undefined;
+        }
+        var point = this._pixelPoint(nearest.datum, nearest.index, nearest.dataset);
+        return this._entityAdapter(nearest, point);
     };
     BasePlot.prototype.onDatasetRemoved = function (_onDatasetRemoved) {
         this._onDatasetRemovedCallback = _onDatasetRemoved;
@@ -4605,17 +4628,6 @@ var BasePlot = (function () {
     BasePlot.prototype._installScaleForKey = function (scale, key) {
         scale.onUpdate(this._renderCallback);
         scale.addIncludedValuesProvider(this._includedValuesProvider);
-    };
-    BasePlot.prototype._lightweightPlotEntityToPlotEntity = function (entity) {
-        var plotEntity = {
-            datum: entity.datum,
-            position: this._pixelPoint(entity.datum, entity.index, entity.dataset),
-            dataset: entity.dataset,
-            datasetIndex: entity.datasetIndex,
-            index: entity.index,
-            component: entity.component,
-        };
-        return plotEntity;
     };
     BasePlot.prototype._pixelPoint = function (datum, index, dataset) {
         return { x: 0, y: 0 };
@@ -6899,7 +6911,7 @@ var Area = (function (_super) {
         return d3.selectAll(allSelections);
     };
     Area.prototype._createPlot = function () {
-        return new baseAreaPlot_1.BaseAreaPlot(function (dataset) { return new Drawers.Area(dataset); }, function (dataset) { return new Drawers.Line(dataset); }, this);
+        return new baseAreaPlot_1.BaseAreaPlot(function (dataset) { return new Drawers.Area(dataset); }, function (dataset) { return new Drawers.Line(dataset); }, Area.SVGEntityAdapter, this);
     };
     return Area;
 }(linePlot_1.Line));
@@ -6927,8 +6939,8 @@ var Utils = __webpack_require__(0);
 var baseLinePlot_1 = __webpack_require__(44);
 var BaseAreaPlot = (function (_super) {
     __extends(BaseAreaPlot, _super);
-    function BaseAreaPlot(drawerFactory, lineDrawerFactory, component) {
-        _super.call(this, drawerFactory, component);
+    function BaseAreaPlot(drawerFactory, lineDrawerFactory, entityAdapter, component) {
+        _super.call(this, drawerFactory, entityAdapter, component);
         this._lineDrawers = new Utils.Map();
         this._lineDrawerFactory = lineDrawerFactory;
     }
@@ -7490,8 +7502,8 @@ var Scales = __webpack_require__(2);
 var Utils = __webpack_require__(0);
 var BaseRectanglePlot = (function (_super) {
     __extends(BaseRectanglePlot, _super);
-    function BaseRectanglePlot(drawerFactory, component) {
-        _super.call(this, drawerFactory, component);
+    function BaseRectanglePlot(drawerFactory, entityAdapter, component) {
+        _super.call(this, drawerFactory, entityAdapter, component);
     }
     BaseRectanglePlot.prototype.entitiesAt = function (point) {
         var attrToProjector = this._generateAttrToProjector();
@@ -7860,7 +7872,7 @@ var Line = (function (_super) {
         return this._plot.entityNearestByXThenY(queryPoint);
     };
     Line.prototype._createPlot = function () {
-        return new baseLinePlot_1.BaseLinePlot(function (dataset) { return new Drawers.Line(dataset); }, this);
+        return new baseLinePlot_1.BaseLinePlot(function (dataset) { return new Drawers.Line(dataset); }, Line.SVGEntityAdapter, this);
     };
     return Line;
 }(xyPlot_1.XYPlot));
@@ -10793,7 +10805,7 @@ var Legend = (function (_super) {
      * Returns an empty array if no Entities are present at that location.
      *
      * @param {Point} p
-     * @returns {Entity<Legend>[]}
+     * @returns {LegendEntity[]}
      */
     Legend.prototype.entitiesAt = function (p) {
         var _this = this;
@@ -13335,8 +13347,8 @@ var baseBarPlot_1 = __webpack_require__(26);
 var Scales = __webpack_require__(2);
 var BaseClusteredBarPlot = (function (_super) {
     __extends(BaseClusteredBarPlot, _super);
-    function BaseClusteredBarPlot(drawerFactory, component) {
-        _super.call(this, drawerFactory, component);
+    function BaseClusteredBarPlot(drawerFactory, entityAdapter, component) {
+        _super.call(this, drawerFactory, entityAdapter, component);
         this._clusterOffsets = new Utils.Map();
     }
     BaseClusteredBarPlot.prototype._generateAttrToProjector = function () {
@@ -13400,8 +13412,8 @@ var Drawers = __webpack_require__(3);
 var basePlot_1 = __webpack_require__(27);
 var BasePiePlot = (function (_super) {
     __extends(BasePiePlot, _super);
-    function BasePiePlot(drawerFactory, component) {
-        _super.call(this, drawerFactory, component);
+    function BasePiePlot(drawerFactory, entityAdapter, component) {
+        _super.call(this, drawerFactory, entityAdapter, component);
         this._startAngle = 0;
         this._endAngle = 2 * Math.PI;
         this._strokeDrawers = new Utils.Map();
@@ -14242,8 +14254,8 @@ var Utils = __webpack_require__(0);
 var baseBarPlot_1 = __webpack_require__(26);
 var BaseStackedBarPlot = (function (_super) {
     __extends(BaseStackedBarPlot, _super);
-    function BaseStackedBarPlot(drawerFactory, component) {
-        _super.call(this, drawerFactory, component);
+    function BaseStackedBarPlot(drawerFactory, entityAdapter, component) {
+        _super.call(this, drawerFactory, entityAdapter, component);
         this._stackingOrder = "bottomup";
         this._stackingResult = new Utils.Map();
         this._stackedExtent = [];
@@ -14664,7 +14676,7 @@ var CanvasPlot = (function (_super) {
         return this;
     };
     CanvasPlot.prototype._createPlot = function () {
-        return new basePlot_1.BasePlot(function (dataset) { return new canvasDrawer_1.CanvasDrawer(dataset); }, this);
+        return new basePlot_1.BasePlot(function (dataset) { return new canvasDrawer_1.CanvasDrawer(dataset); }, CanvasPlot.EntityAdapter, this);
     };
     CanvasPlot.prototype._onDatasetUpdate = function () {
         this._plot.updateExtents();
@@ -14675,6 +14687,16 @@ var CanvasPlot = (function (_super) {
     CanvasPlot.prototype._setup = function () {
         _super.prototype._setup.call(this);
         this._plot.renderArea(this.element().append("canvas"));
+    };
+    CanvasPlot.EntityAdapter = function (entity, position) {
+        return {
+            datum: entity.datum,
+            position: position,
+            dataset: entity.dataset,
+            datasetIndex: entity.datasetIndex,
+            index: entity.index,
+            component: entity.component
+        };
     };
     return CanvasPlot;
 }(htmlComponent_1.HTMLComponent));
@@ -14757,7 +14779,7 @@ var CanvasRectangle = (function (_super) {
         return this;
     };
     CanvasRectangle.prototype._createPlot = function () {
-        return new baseRectanglePlot_1.BaseRectanglePlot(function (dataset) { return new canvasRectangleDrawer_1.RectangleDrawer(dataset); }, this);
+        return new baseRectanglePlot_1.BaseRectanglePlot(function (dataset) { return new canvasRectangleDrawer_1.RectangleDrawer(dataset); }, CanvasRectangle.EntityAdapter, this);
     };
     return CanvasRectangle;
 }(xyCanvasPlot_1.XYCanvasPlot));
@@ -14797,7 +14819,7 @@ var ClusteredBar = (function (_super) {
         _super.call(this, orientation);
     }
     ClusteredBar.prototype._createPlot = function () {
-        return new baseClusteredBarPlot_1.BaseClusteredBarPlot(function (dataset) { return new Drawers.Rectangle(dataset); }, this);
+        return new baseClusteredBarPlot_1.BaseClusteredBarPlot(function (dataset) { return new Drawers.Rectangle(dataset); }, ClusteredBar.SVGEntityAdapter, this);
     };
     return ClusteredBar;
 }(barPlot_1.Bar));
@@ -14879,7 +14901,7 @@ var Pie = (function (_super) {
         return d3.selectAll(allSelections);
     };
     Pie.prototype._createPlot = function () {
-        return new basePiePlot_1.BasePiePlot(function (dataset) { return new Drawers.Arc(dataset); }, this);
+        return new basePiePlot_1.BasePiePlot(function (dataset) { return new Drawers.Arc(dataset); }, Pie.SVGEntityAdapter, this);
     };
     Pie.prototype.entities = function (datasets) {
         if (datasets === void 0) { datasets = this.datasets(); }
@@ -15193,7 +15215,7 @@ var Rectangle = (function (_super) {
         };
     };
     Rectangle.prototype._createPlot = function () {
-        return new baseRectanglePlot_1.BaseRectanglePlot(function (dataset) { return new drawers_1.Rectangle(dataset); }, this);
+        return new baseRectanglePlot_1.BaseRectanglePlot(function (dataset) { return new drawers_1.Rectangle(dataset); }, Rectangle.SVGEntityAdapter, this);
     };
     return Rectangle;
 }(xyPlot_1.XYPlot));
@@ -15264,7 +15286,7 @@ var Scatter = (function (_super) {
         return this._plot.entitiesIn(xRangeOrBounds, yRange);
     };
     Scatter.prototype._createPlot = function () {
-        return new baseScatterPlot_1.BaseScatterPlot(function (dataset) { return new Drawers.Symbol(dataset); }, this);
+        return new baseScatterPlot_1.BaseScatterPlot(function (dataset) { return new Drawers.Symbol(dataset); }, Scatter.SVGEntityAdapter, this);
     };
     return Scatter;
 }(xyPlot_1.XYPlot));
@@ -15304,7 +15326,7 @@ var Segment = (function (_super) {
         this.attr("stroke-width", "2px");
     }
     Segment.prototype._createPlot = function () {
-        return new baseSegmentPlot_1.BaseSegmentPlot(function (dataset) { return new Drawers.Segment(dataset); }, this);
+        return new baseSegmentPlot_1.BaseSegmentPlot(function (dataset) { return new Drawers.Segment(dataset); }, Segment.SVGEntityAdapter, this);
     };
     Segment.prototype.x = function (x, xScale) {
         var plotX = this._plot.x(x, xScale);
@@ -15439,7 +15461,7 @@ var StackedArea = (function (_super) {
         return this;
     };
     StackedArea.prototype._createPlot = function () {
-        return new baseStackedAreaPlot_1.BaseStackedAreaPlot(function (dataset) { return new Drawers.Area(dataset); }, function (dataset) { return new Drawers.Line(dataset); }, this);
+        return new baseStackedAreaPlot_1.BaseStackedAreaPlot(function (dataset) { return new Drawers.Area(dataset); }, function (dataset) { return new Drawers.Line(dataset); }, StackedArea.SVGEntityAdapter, this);
     };
     return StackedArea;
 }(areaPlot_1.Area));
@@ -15512,7 +15534,7 @@ var StackedBar = (function (_super) {
         this._writer = new SVGTypewriter.Writer(this._measurer);
     };
     StackedBar.prototype._createPlot = function () {
-        return new baseStackedBarPlot_1.BaseStackedBarPlot(function (dataset) { return new Drawers.Rectangle(dataset); }, this);
+        return new baseStackedBarPlot_1.BaseStackedBarPlot(function (dataset) { return new Drawers.Rectangle(dataset); }, StackedBar.SVGEntityAdapter, this);
     };
     StackedBar.prototype.drawLabels = function (dataToDraw, attrToProjector) {
         var _this = this;
@@ -15626,7 +15648,7 @@ var Waterfall = (function (_super) {
         return this;
     };
     Waterfall.prototype._createPlot = function () {
-        return new baseWaterfallPlot_1.BaseWaterfallPlot(function (dataset) { return new Drawers.Rectangle(dataset); }, this);
+        return new baseWaterfallPlot_1.BaseWaterfallPlot(function (dataset) { return new Drawers.Rectangle(dataset); }, Waterfall.SVGEntityAdapter, this);
     };
     Waterfall.prototype._setup = function () {
         _super.prototype._setup.call(this);
@@ -15728,7 +15750,7 @@ var XYCanvasPlot = (function (_super) {
         return this;
     };
     XYCanvasPlot.prototype._createPlot = function () {
-        return new baseXYPlot_1.BaseXYPlot(function (dataset) { return new canvasDrawer_1.CanvasDrawer(dataset); }, this);
+        return new baseXYPlot_1.BaseXYPlot(function (dataset) { return new canvasDrawer_1.CanvasDrawer(dataset); }, XYCanvasPlot.EntityAdapter, this);
     };
     return XYCanvasPlot;
 }(canvasPlot_1.CanvasPlot));

@@ -7,13 +7,15 @@ import * as Utils from "../utils";
 import * as Plots from "./";
 
 import { Map } from "../utils";
+import { PlotEntity } from "./";
 import { BaseBarPlot, IBarPlot } from "./baseBarPlot";
 import { Dataset, DatasetCallback } from "../core/dataset";
 import { Accessor, AttributeToProjector, Point } from "../core/interfaces";
 import { Scale } from "../scales/scale";
 
 import { LabeledComponent } from "../components/labeled";
-import { DrawerFactory } from "./basePlot";
+
+import { EntityAdapter, DrawerFactory } from "./basePlot";
 
 export interface IStackedBarPlot<X, Y> extends IBarPlot<X, Y> {
   /**
@@ -34,13 +36,13 @@ export interface IStackedBarPlot<X, Y> extends IBarPlot<X, Y> {
   stackingOrder(stackingOrder?: Utils.Stacking.IStackingOrder): any;
 }
 
-export class BaseStackedBarPlot<X, Y> extends BaseBarPlot<X, Y> implements IStackedBarPlot<X, Y> {
+export class BaseStackedBarPlot<X, Y, P extends PlotEntity> extends BaseBarPlot<X, Y, P> implements IStackedBarPlot<X, Y> {
   private _stackingOrder: Utils.Stacking.IStackingOrder;
   private _stackingResult: Utils.Stacking.StackingResult;
   private _stackedExtent: number[];
 
-  constructor(drawerFactory: DrawerFactory, component: LabeledComponent) {
-    super(drawerFactory, component);
+  constructor(drawerFactory: DrawerFactory, entityAdapter: EntityAdapter<P>, component: LabeledComponent) {
+    super(drawerFactory, entityAdapter, component);
 
     this._stackingOrder = "bottomup";
     this._stackingResult = new Utils.Map<Dataset, Utils.Map<string, Utils.Stacking.StackedDatum>>();

@@ -14,6 +14,7 @@ import { BaseXYPlot, IXYPlot } from "./baseXYPlot";
 import { Accessor, AttributeToProjector, Projector, Point, Bounds, Range } from "../core/interfaces";
 import { Dataset } from "../core/dataset";
 import { QuantitativeScale } from "../scales/quantitativeScale";
+import { SVGPlotEntity } from "../plots";
 import { DrawStep } from "../drawers";
 
 export type InterpolatorValue = "linear"
@@ -115,7 +116,7 @@ type EdgeIntersections = {
   bottom: Point[]
 };
 
-export class BaseLinePlot<X> extends BaseXYPlot<X, number> implements ILinePlot<X> {
+export class BaseLinePlot<X, P extends PlotEntity> extends BaseXYPlot<X, number, P> implements ILinePlot<X> {
   private _autorangeSmooth = false;
   private _croppedRenderingEnabled = true;
   private _downsamplingEnabled = false;
@@ -147,7 +148,7 @@ export class BaseLinePlot<X> extends BaseXYPlot<X, number> implements ILinePlot<
     return this;
   }
 
-  public entitiesAt(point: Point): PlotEntity[] {
+  public entitiesAt(point: Point): P[] {
     const entity = this.entityNearestByXThenY(point);
     if (entity != null) {
       return [entity];
@@ -162,7 +163,7 @@ export class BaseLinePlot<X> extends BaseXYPlot<X, number> implements ILinePlot<
    * @param {Bounds} bounds
    * @returns {PlotEntity[]}
    */
-  public entitiesIn(bounds: Bounds): PlotEntity[];
+  public entitiesIn(bounds: Bounds): P[];
   /**
    * Gets the Entities that intersect the area defined by the ranges.
    *
@@ -170,8 +171,8 @@ export class BaseLinePlot<X> extends BaseXYPlot<X, number> implements ILinePlot<
    * @param {Range} yRange
    * @returns {PlotEntity[]}
    */
-  public entitiesIn(xRange: Range, yRange: Range): PlotEntity[];
-  public entitiesIn(xRangeOrBounds: Range | Bounds, yRange?: Range): PlotEntity[] {
+  public entitiesIn(xRange: Range, yRange: Range): P[];
+  public entitiesIn(xRangeOrBounds: Range | Bounds, yRange?: Range): P[] {
     let dataXRange: Range;
     let dataYRange: Range;
     if (yRange == null) {
@@ -200,10 +201,10 @@ export class BaseLinePlot<X> extends BaseXYPlot<X, number> implements ILinePlot<
    * @param {Point} queryPoint
    * @returns {PlotEntity} The nearest PlotEntity, or undefined if no PlotEntity can be found.
    */
-  public entityNearestByXThenY(queryPoint: Point): PlotEntity {
+  public entityNearestByXThenY(queryPoint: Point): P {
     let minXDist = Infinity;
     let minYDist = Infinity;
-    let closest: PlotEntity;
+    let closest: P;
 
     const chartBounds = this._component.bounds();
     this.entities().forEach((entity) => {

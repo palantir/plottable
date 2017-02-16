@@ -13,6 +13,7 @@ import { RectangleDrawer } from "../drawers/canvasRectangleDrawer";
 import * as Scales from "../scales";
 import { Scale } from "../scales/scale";
 import * as Utils from "../utils";
+import { IComponent } from "../components";
 
 import * as Plots from "./";
 import { PlotEntity } from "./";
@@ -24,7 +25,7 @@ export class CanvasRectangle<X, Y> extends XYCanvasPlot<X, Y> implements IRectan
   private _labelsEnabled = false;
   private _label: Accessor<string> = null;
 
-  protected _plot: BaseRectanglePlot<X, Y>;
+  protected _plot: BaseRectanglePlot<X, Y, PlotEntity>;
 
   /**
    * A Rectangle Plot displays rectangles based on the data.
@@ -166,6 +167,6 @@ export class CanvasRectangle<X, Y> extends XYCanvasPlot<X, Y> implements IRectan
   }
 
   protected _createPlot() {
-    return new BaseRectanglePlot((dataset) => new RectangleDrawer(dataset), this);
+    return new BaseRectanglePlot((dataset) => new RectangleDrawer(dataset), CanvasRectangle.EntityAdapter, this);
   }
 }

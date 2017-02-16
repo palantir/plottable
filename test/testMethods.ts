@@ -2,6 +2,7 @@ import { assert } from "chai";
 import * as d3 from "d3";
 
 import * as Plottable from "../src";
+import { SVGPlotEntity } from "../src/plots";
 import { IComponent } from "../src/components";
 
 export function generateDIV(width = 400, height = 400) {
@@ -113,8 +114,8 @@ export function assertLineAttrs(line: d3.Selection<void>,
   assert.closeTo(numAttr(line, "y2"), expectedAttrs.y2, floatingPointError, message + " (y2)");
 }
 
-export function assertEntitiesEqual(actual: Plottable.Entity<Plottable.SVGComponent>,
-                                    expected: Plottable.Entity<Plottable.SVGComponent>,
+export function assertEntitiesEqual(actual: SVGPlotEntity,
+                                    expected: SVGPlotEntity,
                                     msg: string) {
   assert.deepEqual(actual.datum, expected.datum, msg + " (datum)");
   assertPointsClose(actual.position, expected.position, 0.01, msg);

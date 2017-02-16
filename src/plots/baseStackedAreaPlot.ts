@@ -7,6 +7,7 @@ import * as d3 from "d3";
 
 import * as Utils from "../utils";
 
+import { PlotEntity } from "./";
 import { BaseAreaPlot, IAreaPlot } from "./baseAreaPlot";
 import { Accessor, Point, AttributeToProjector } from "../core/interfaces";
 import { Dataset } from "../core/dataset";
@@ -35,7 +36,7 @@ export interface IStackedAreaPlot<X> extends IAreaPlot<X> {
   stackingOrder(stackingOrder?: Utils.Stacking.IStackingOrder): any;
 }
 
-export class BaseStackedAreaPlot<X> extends BaseAreaPlot<X> implements IStackedAreaPlot<X> {
+export class BaseStackedAreaPlot<X, P extends PlotEntity> extends BaseAreaPlot<X, P> implements IStackedAreaPlot<X> {
   public baselineValue = 0;
 
   private _stackingResult = new Utils.Map<Dataset, Utils.Map<string | number, Utils.Stacking.StackedDatum>>();

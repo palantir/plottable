@@ -3,6 +3,8 @@
  * @license MIT
  */
 
+import * as d3 from "d3";
+
 import { Accessor, Point } from "../core/interfaces";
 import { Dataset } from "../core/dataset";
 import { Drawer } from "../drawers/drawer";
@@ -10,12 +12,16 @@ import * as Scales from "../scales";
 import { Scale, ScaleCallback } from "../scales/scale";
 import * as Utils from "../utils";
 
+import { IComponent } from "../components";
+
+import { SVGPlotEntity } from "../plots";
+
 import { TransformableAccessorScaleBinding, LightweightPlotEntity, PlotEntity } from "./commons";
 import { Plot } from "./plot";
 import { BaseXYPlot, IXYPlot } from "./baseXYPlot";
 
 export class XYPlot<X, Y> extends Plot implements IXYPlot<X, Y> {
-  protected _plot: BaseXYPlot<X, Y>;
+  protected _plot: BaseXYPlot<X, Y, SVGPlotEntity>;
 
   private _deferredRendering = false;
   private _cachedDomainX: X[] = [null, null];
@@ -242,6 +248,6 @@ export class XYPlot<X, Y> extends Plot implements IXYPlot<X, Y> {
   }
 
   protected _createPlot() {
-    return new BaseXYPlot((dataset) => new Drawer(dataset), this);
+    return new BaseXYPlot((dataset) => new Drawer(dataset), XYPlot.SVGEntityAdapter, this);
   }
 }

@@ -72,6 +72,7 @@ export type Bounds = {
   bottomRight: Point;
 };
 
+
 /**
  * An object representing a data-backed visual entity inside a Component.
  */
@@ -79,5 +80,10 @@ export interface Entity<C extends IComponent<any>> {
   datum: any;
   position: Point;
   component: C;
-  selection?: any;
+}
+/**
+ * An object representing a data-backed visual entity inside a Component.
+ */
+export interface SVGEntity<C extends IComponent<any>> {
+  selection: d3.Selection<any>;
 }

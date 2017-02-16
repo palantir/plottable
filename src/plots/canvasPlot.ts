@@ -10,6 +10,9 @@ import { Animator } from "../animators/animator";
 import * as Utils from "../utils";
 import * as Plots from "../plots";
 import * as Scales from "../scales";
+
+import { LightweightPlotEntity } from "../plots";
+import { IComponent } from "../components";
 import { Scale, ScaleCallback } from "../scales/scale";
 
 import { BasePlot, IPlot } from "./basePlot";
@@ -20,11 +23,12 @@ import { Dataset, DatasetCallback } from "../core/dataset";
 import * as Drawers from "../drawers";
 import { CanvasDrawer } from "../drawers/canvasDrawer";
 import { Drawer } from "../drawers/drawer";
+import { PlotEntity } from "./";
 
 export class CanvasPlot extends HTMLComponent implements IPlot {
   private _cachedEntityStore: Utils.EntityStore<Plots.LightweightPlotEntity>;
   private _dataChanged = false;
-  protected _plot: BasePlot;
+  protected _plot: BasePlot<PlotEntity>;
 
   constructor() {
     super();
@@ -206,7 +210,7 @@ export class CanvasPlot extends HTMLComponent implements IPlot {
   }
 
   protected _createPlot() {
-    return new BasePlot((dataset) => new CanvasDrawer(dataset), this);
+    return new BasePlot((dataset) => new CanvasDrawer(dataset), CanvasPlot.EntityAdapter, this);
   }
 
   protected _onDatasetUpdate() {
@@ -219,5 +223,16 @@ export class CanvasPlot extends HTMLComponent implements IPlot {
   protected _setup() {
     super._setup();
     this._plot.renderArea(this.element().append("canvas"));
+  }
+
+  protected static EntityAdapter(entity: LightweightPlotEntity, position: Point){
+   return {
+      datum: entity.datum,
+      position,
+      dataset: entity.dataset,
+      datasetIndex: entity.datasetIndex,
+      index: entity.index,
+      component: entity.component
+    };
   }
 }

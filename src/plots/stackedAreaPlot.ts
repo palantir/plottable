@@ -13,6 +13,8 @@ import * as Drawers from "../drawers";
 import { Scale } from "../scales/scale";
 import { QuantitativeScale } from "../scales/quantitativeScale";
 import * as Utils from "../utils";
+import { SVGPlotEntity } from "../plots";
+import { IComponent } from "../components";
 
 import * as Plots from "./";
 import { Area } from "./areaPlot";
@@ -21,7 +23,7 @@ import { Plot } from "./plot";
 import { BaseStackedAreaPlot, IStackedAreaPlot } from "./baseStackedAreaPlot";
 
 export class StackedArea<X> extends Area<X> implements IStackedAreaPlot<X> {
-  protected _plot: BaseStackedAreaPlot<X>;
+  protected _plot: BaseStackedAreaPlot<X, SVGPlotEntity>;
 
   private _baseline: d3.Selection<void>;
 
@@ -144,6 +146,9 @@ export class StackedArea<X> extends Area<X> implements IStackedAreaPlot<X> {
   }
 
   protected _createPlot() {
-    return new BaseStackedAreaPlot((dataset) => new Drawers.Area(dataset), (dataset) => new Drawers.Line(dataset), this);
+    return new BaseStackedAreaPlot(
+      (dataset) => new Drawers.Area(dataset),
+      (dataset) => new Drawers.Line(dataset),
+      StackedArea.SVGEntityAdapter, this);
   }
 }

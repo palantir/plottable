@@ -6,12 +6,14 @@
 import * as d3 from "d3";
 import * as SVGTypewriter from "svg-typewriter";
 
+import { IComponent } from "../components";
 import * as Animators from "../animators";
 import { Accessor, AttributeToProjector, Point, Bounds, Range } from "../core/interfaces";
 import { Dataset } from "../core/dataset";
 import { Drawer } from "../drawers/drawer";
 import * as Drawers from "../drawers";
 import { Formatter } from "../core/formatters";
+import { SVGPlotEntity } from "../plots";
 import * as Formatters from "../core/formatters";
 import * as Scales from "../scales";
 import { QuantitativeScale } from "../scales/quantitativeScale";
@@ -46,7 +48,7 @@ export class Bar<X, Y> extends XYPlot<X, Y> implements IBarPlot<X, Y> {
   private _labelsEnabled = false;
   private _hideBarsIfAnyAreTooWide = true;
   private _labelConfig: Utils.Map<Dataset, LabelConfig>;
-  protected _plot: BaseBarPlot<X, Y>;
+  protected _plot: BaseBarPlot<X, Y, SVGPlotEntity>;
   private renderCount = 0;
 
   /**
@@ -111,7 +113,7 @@ export class Bar<X, Y> extends XYPlot<X, Y> implements IBarPlot<X, Y> {
   }
 
   protected _createPlot() {
-    return new BaseBarPlot((dataset) => new Drawers.Rectangle(dataset), this);
+    return new BaseBarPlot((dataset) => new Drawers.Rectangle(dataset), Bar.SVGEntityAdapter, this);
   }
 
   protected _setup() {
@@ -217,7 +219,7 @@ export class Bar<X, Y> extends XYPlot<X, Y> implements IBarPlot<X, Y> {
    * @param {Point} queryPoint
    * @returns {PlotEntity} The nearest PlotEntity, or undefined if no PlotEntity can be found.
    */
-  public entityNearest(queryPoint: Point): PlotEntity {
+  public entityNearest(queryPoint: Point): SVGPlotEntity {
     return this._plot.entityNearest(queryPoint);
   }
 

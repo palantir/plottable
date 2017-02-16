@@ -8,7 +8,8 @@ import * as d3 from "d3";
 import * as Plots from "./";
 import * as Utils from "../utils";
 
-import { DrawerFactory, RenderAreaAccessor } from "./basePlot";
+import { EntityAdapter, DrawerFactory, RenderAreaAccessor } from "./basePlot";
+import { PlotEntity } from "./commons";
 
 import { BaseLinePlot, ILinePlot } from "./baseLinePlot";
 
@@ -37,15 +38,19 @@ export interface IAreaPlot<X> extends ILinePlot<X> {
   y0(y0?: number | Accessor<number>): any;
 }
 
-export class BaseAreaPlot<X> extends BaseLinePlot<X> implements IAreaPlot<X> {
+export class BaseAreaPlot<X, P extends PlotEntity> extends BaseLinePlot<X, P> implements IAreaPlot<X> {
   private static _Y0_KEY = "y0";
 
   private _constantBaselineValueProvider: () => number[];
   private _lineDrawers = new Utils.Map<Dataset, IDrawer>();
   private _lineDrawerFactory: DrawerFactory;
 
-  constructor(drawerFactory: DrawerFactory, lineDrawerFactory: DrawerFactory, component: IComponent<any>) {
-    super(drawerFactory, component);
+  constructor(drawerFactory: DrawerFactory,
+    lineDrawerFactory: DrawerFactory,
+    entityAdapter: EntityAdapter<P>,
+    component: IComponent<any>) {
+
+    super(drawerFactory, entityAdapter, component);
     this._lineDrawerFactory = lineDrawerFactory;
   }
 

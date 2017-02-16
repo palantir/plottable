@@ -8,11 +8,16 @@ import * as d3 from "d3";
 import * as Animators from "../animators";
 import { Animator } from "../animators/animator";
 import { SVGComponent } from "../components/svgComponent";
+import { IComponent } from "../components";
 import { Accessor, Point, AttributeToProjector, Bounds } from "../core/interfaces";
 import { Dataset, DatasetCallback } from "../core/dataset";
+
+import { SVGPlotEntity } from "../plots";
+
 import * as Drawers from "../drawers";
 import { Drawer } from "../drawers/drawer";
 import * as Scales from "../scales";
+import { LightweightPlotEntity } from "../plots";
 import { Scale, ScaleCallback } from "../scales/scale";
 import * as Utils from "../utils";
 
@@ -23,7 +28,7 @@ export class Plot extends SVGComponent implements IPlot {
   protected static _ANIMATION_MAX_DURATION = 600;
 
   protected _renderArea: d3.Selection<void>;
-  protected _plot: BasePlot;
+  protected _plot: BasePlot<SVGPlotEntity>;
 
   /**
    * A Plot draws some visualization of the inputted Datasets.
@@ -218,7 +223,7 @@ export class Plot extends SVGComponent implements IPlot {
    *   If not provided, returns defaults to all Datasets on the Plot.
    * @return {Plots.PlotEntity[]}
    */
-  public entities(datasets?: Dataset[]): Plots.PlotEntity[] {
+  public entities(datasets?: Dataset[]): Plots.SVGPlotEntity[] {
     return this._plot.entities(datasets);
   }
 
@@ -256,6 +261,20 @@ export class Plot extends SVGComponent implements IPlot {
   }
 
   protected _createPlot() {
-    return new BasePlot((dataset) => new Drawer(dataset), this);
+    return new BasePlot<SVGPlotEntity>((dataset) => new Drawer(dataset), Plot.SVGEntityAdapter, this);
+  }
+
+  protected static SVGEntityAdapter(entity: LightweightPlotEntity, position: Point) {
+    return {
+      datum: entity.datum,
+      position,
+      dataset: entity.dataset,
+      datasetIndex: entity.datasetIndex,
+      index: entity.index,
+      component: entity.component,
+      // HACKHACK we know this is an SVG drawer with a selectionForIndex method
+      // because we're in the SVG specific plot implementation
+      selection: (entity.drawer as Drawer).selectionForIndex(entity.validDatumIndex),
+    };
   }
 }

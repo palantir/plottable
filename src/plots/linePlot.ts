@@ -13,19 +13,22 @@ import { Drawer } from "../drawers/drawer";
 import * as Scales from "../scales";
 import { QuantitativeScale } from "../scales/quantitativeScale";
 import { Scale } from "../scales/scale";
+import { IComponent } from "../components";
+
 import * as Utils from "../utils";
 
 import * as Plots from "./";
 import { PlotEntity } from "./";
 import { Plot } from "./plot";
 import { XYPlot } from "./xyPlot";
+import { SVGPlotEntity } from "../plots";
 
 import { BaseLinePlot, ILinePlot, InterpolatorValue } from "./baseLinePlot";
 
 
 export class Line<X> extends XYPlot<X, number> implements ILinePlot<X> {
 
-  protected _plot: BaseLinePlot<X>;
+  protected _plot: BaseLinePlot<X, SVGPlotEntity>;
 
   /**
    * A Line Plot draws line segments starting from the first data point to the next.
@@ -213,6 +216,6 @@ export class Line<X> extends XYPlot<X, number> implements ILinePlot<X> {
   }
 
   protected _createPlot() {
-    return new BaseLinePlot((dataset) => new Drawers.Line(dataset), this);
+    return new BaseLinePlot((dataset) => new Drawers.Line(dataset), Line.SVGEntityAdapter, this);
   }
 }

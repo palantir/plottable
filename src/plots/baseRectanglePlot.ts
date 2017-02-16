@@ -4,7 +4,7 @@ import { BaseXYPlot, IXYPlot } from "./baseXYPlot";
 
 import * as Plots from "./";
 import * as Drawers from "../drawers";
-import { DrawerFactory }  from "./basePlot";
+import { EntityAdapter, DrawerFactory }  from "./basePlot";
 import * as Scales from "../scales";
 import * as Utils from "../utils";
 import { Null } from "../animators";
@@ -61,14 +61,14 @@ export interface IRectanglePlot<X, Y> extends IXYPlot<X, Y> {
   y2(y2?: number | Accessor<number> | Y | Accessor<Y>): any
 }
 
-export class BaseRectanglePlot<X, Y> extends BaseXYPlot<X, Y> implements IRectanglePlot<X, Y> {
+export class BaseRectanglePlot<X, Y, P extends PlotEntity> extends BaseXYPlot<X, Y, P> implements IRectanglePlot<X, Y> {
   private static _X2_KEY = "x2";
   private static _Y2_KEY = "y2";
 
   protected _component: LabeledComponent;
 
-  constructor(drawerFactory: DrawerFactory, component: LabeledComponent) {
-    super(drawerFactory, component);
+  constructor(drawerFactory: DrawerFactory, entityAdapter: EntityAdapter<P>, component: LabeledComponent) {
+    super(drawerFactory, entityAdapter, component);
   }
 
   public entitiesAt(point: Point) {
@@ -85,10 +85,10 @@ export class BaseRectanglePlot<X, Y> extends BaseXYPlot<X, Y> implements IRectan
     });
   }
 
-  public entitiesIn(bounds: Bounds): PlotEntity[];
+  public entitiesIn(bounds: Bounds): P[];
 
-  public entitiesIn(xRange: Range, yRange: Range): PlotEntity[];
-  public entitiesIn(xRangeOrBounds: Range | Bounds, yRange?: Range): PlotEntity[] {
+  public entitiesIn(xRange: Range, yRange: Range): P[];
+  public entitiesIn(xRangeOrBounds: Range | Bounds, yRange?: Range): P[] {
     let dataXRange: Range;
     let dataYRange: Range;
     if (yRange == null) {
@@ -294,8 +294,8 @@ export class BaseRectanglePlot<X, Y> extends BaseXYPlot<X, Y> implements IRectan
     };
   }
 
-  private _entitiesIntersecting(xValOrRange: number | Range, yValOrRange: number | Range): PlotEntity[] {
-    let intersected: PlotEntity[] = [];
+  private _entitiesIntersecting(xValOrRange: number | Range, yValOrRange: number | Range): P[] {
+    let intersected: P[] = [];
     let attrToProjector = this._generateAttrToProjector();
     this.entities().forEach((entity) => {
       if (Utils.DOM.intersectsBBox(xValOrRange, yValOrRange,

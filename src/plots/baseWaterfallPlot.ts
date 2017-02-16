@@ -7,6 +7,8 @@ import { BaseBarPlot, IBarPlot } from "./baseBarPlot";
 
 import { Dataset } from "../core/dataset";
 import { Accessor, Point, Bounds, Range, AttributeToProjector } from "../core/interfaces";
+import { PlotEntity } from "./";
+
 import * as Plots from "../plots";
 
 export interface IWaterfallPlot<X, Y> extends IBarPlot<X, Y> {
@@ -24,7 +26,7 @@ export interface IWaterfallPlot<X, Y> extends IBarPlot<X, Y> {
   total(total?: Accessor<boolean>): any
 }
 
-export class BaseWaterfallPlot<X, Y> extends BaseBarPlot<X, Y> implements IWaterfallPlot<X, Y> {
+export class BaseWaterfallPlot<X, Y, P extends PlotEntity> extends BaseBarPlot<X, Y, P> implements IWaterfallPlot<X, Y> {
   private static _TOTAL_KEY = "total";
   private static _BAR_DECLINE_CLASS = "waterfall-decline";
   private static _BAR_GROWTH_CLASS = "waterfall-growth";
