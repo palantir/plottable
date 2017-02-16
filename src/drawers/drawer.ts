@@ -19,6 +19,7 @@ export class Drawer {
 
   private _cachedSelectionValid = false;
   private _cachedSelection: SimpleSelection<any>;
+  private _cachedSelectionNodes: d3.BaseType[];
 
   /**
    * A Drawer draws svg elements based on the input Dataset.
@@ -160,6 +161,7 @@ export class Drawer {
   public selection(): SimpleSelection<any> {
     if (!this._cachedSelectionValid) {
       this._cachedSelection = this.renderArea().selectAll(this.selector());
+      this._cachedSelectionNodes = this._cachedSelection.nodes();
       this._cachedSelectionValid = true;
     }
     return this._cachedSelection;
@@ -176,7 +178,7 @@ export class Drawer {
    * Returns the D3 selection corresponding to the datum with the specified index.
    */
   public selectionForIndex(index: number): SimpleSelection<any> {
-    return d3.select(this.selection().nodes()[index]);
+    return d3.select(this._cachedSelectionNodes[index]);
   }
 
 }
