@@ -490,7 +490,7 @@ export class Time extends Axis<Date> {
     if (textSelection.size() > 0) {
       textSelection.attr("transform", `translate(${xTranslate},${yTranslate})`);
     }
-    tickLabels.exit().remove();
+    tickLabelsUpdate.exit().remove();
     tickLabels.attr("transform", (d: any) => "translate(" + this._scale.scale(d) + ",0)");
     let anchor = (this._tierLabelPositions[index] === "center" || config.step === 1) ? "middle" : "start";
     tickLabels.selectAll("text").text(config.formatter).style("text-anchor", anchor);

@@ -91,7 +91,7 @@ export class Gridlines extends Component {
         .attr("x2", getScaledXValue)
         .attr("y2", this.height())
         .classed("zeroline", (t: number) => t === 0);
-      xLines.exit().remove();
+      xLinesUpdate.exit().remove();
     }
   }
 
@@ -106,7 +106,7 @@ export class Gridlines extends Component {
         .attr("x2", this.width())
         .attr("y2", getScaledYValue)
         .classed("zeroline", (t: number) => t === 0);
-      yLines.exit().remove();
+      yLinesUpdate.exit().remove();
     }
   }
 }
