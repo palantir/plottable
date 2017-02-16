@@ -10,6 +10,7 @@ import { Null } from "../animators";
 import * as Drawers from "../drawers";
 
 import { IComponent } from "../components";
+import { LabeledComponent } from "../components/labeled";
 import  { BasePlot, IPlot } from "./basePlot";
 import { Scale } from "../scales/scale";
 import { PlotEntity, AccessorScaleBinding } from "./";
@@ -122,7 +123,9 @@ export class BasePiePlot extends BasePlot implements IPiePlot {
   private _endAngles: number[];
   private _strokeDrawers: Utils.Map<Dataset, Drawers.ArcOutline>;
 
-  constructor(drawerFactory: DrawerFactory, component: IComponent<any>) {
+  protected _component: LabeledComponent;
+
+  constructor(drawerFactory: DrawerFactory, component: LabeledComponent) {
     super(drawerFactory, component);
     this._strokeDrawers = new Utils.Map<Dataset, Drawers.ArcOutline>();
   }
@@ -223,10 +226,6 @@ export class BasePiePlot extends BasePlot implements IPiePlot {
     return this;
   }
 
-  public generateAttrToProjector() {
-    return this._generateAttrToProjector();
-  }
-
   public sectorValue<S>(): AccessorScaleBinding<S, number>;
   public sectorValue(sectorValue: number | Accessor<number>): this;
 
@@ -265,6 +264,10 @@ export class BasePiePlot extends BasePlot implements IPiePlot {
     this._strokeDrawers.set(dataset, strokeDrawer);
     super._addDataset(dataset);
     return this;
+  }
+
+  protected _additionalPaint(time: number) {
+    Utils.Window.setTimeout(() => this._component.drawLabels(this._getDataToDraw(), this._generateAttrToProjector()), time);
   }
 
   protected _pixelPoint(datum: any, index: number, dataset: Dataset) {

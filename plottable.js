@@ -13486,9 +13486,6 @@ var BasePiePlot = (function (_super) {
         this._bindProperty(BasePiePlot._OUTER_RADIUS_KEY, outerRadius, scale);
         return this;
     };
-    BasePiePlot.prototype.generateAttrToProjector = function () {
-        return this._generateAttrToProjector();
-    };
     BasePiePlot.prototype.sectorValue = function (sectorValue, scale) {
         if (sectorValue == null) {
             return this._propertyBindings.get(BasePiePlot._SECTOR_VALUE_KEY);
@@ -13520,6 +13517,10 @@ var BasePiePlot = (function (_super) {
         this._strokeDrawers.set(dataset, strokeDrawer);
         _super.prototype._addDataset.call(this, dataset);
         return this;
+    };
+    BasePiePlot.prototype._additionalPaint = function (time) {
+        var _this = this;
+        Utils.Window.setTimeout(function () { return _this._component.drawLabels(_this._getDataToDraw(), _this._generateAttrToProjector()); }, time);
     };
     BasePiePlot.prototype._pixelPoint = function (datum, index, dataset) {
         var scaledValueAccessor = BasePiePlot._scaledAccessor(this.sectorValue());
@@ -14947,66 +14948,65 @@ var Pie = (function (_super) {
     Pie.prototype._additionalPaint = function (time) {
         var _this = this;
         this._renderArea.select(".label-area").remove();
-        if (this._labelsEnabled) {
-            Utils.Window.setTimeout(function () { return _this._drawLabels(); }, time);
-        }
         var drawSteps = this._plot.generateStrokeDrawSteps();
         var dataToDraw = this._plot.getDataToDraw();
         this.datasets().forEach(function (dataset) { return _this._plot.drawer(dataset).draw(dataToDraw.get(dataset), drawSteps); });
     };
-    Pie.prototype._drawLabels = function () {
+    Pie.prototype.drawLabels = function (dataToDraw, attrToProjector) {
         var _this = this;
-        var attrToProjector = this._plot.generateAttrToProjector();
-        var labelArea = this._renderArea.append("g").classed("label-area", true);
-        var measurer = new SVGTypewriter.CacheMeasurer(labelArea);
-        var writer = new SVGTypewriter.Writer(measurer);
-        var dataset = this.datasets()[0];
-        var data = this._plot.getDataToDraw().get(dataset);
-        data.forEach(function (datum, datumIndex) {
-            var value = _this.sectorValue().accessor(datum, datumIndex, dataset);
-            if (!Utils.Math.isValidNumber(value)) {
-                return;
-            }
-            value = _this._labelFormatter(value);
-            var measurement = measurer.measure(value);
-            var theta = (_this._plot.endAngles()[datumIndex] + _this._plot.startAngles()[datumIndex]) / 2;
-            var outerRadius = _this.outerRadius().accessor(datum, datumIndex, dataset);
-            if (_this.outerRadius().scale) {
-                outerRadius = _this.outerRadius().scale.scale(outerRadius);
-            }
-            var innerRadius = _this.innerRadius().accessor(datum, datumIndex, dataset);
-            if (_this.innerRadius().scale) {
-                innerRadius = _this.innerRadius().scale.scale(innerRadius);
-            }
-            var labelRadius = (outerRadius + innerRadius) / 2;
-            var x = Math.sin(theta) * labelRadius - measurement.width / 2;
-            var y = -Math.cos(theta) * labelRadius - measurement.height / 2;
-            var corners = [
-                { x: x, y: y },
-                { x: x, y: y + measurement.height },
-                { x: x + measurement.width, y: y },
-                { x: x + measurement.width, y: y + measurement.height },
-            ];
-            var showLabel = corners.every(function (corner) {
-                return Math.abs(corner.x) <= _this.width() / 2 && Math.abs(corner.y) <= _this.height() / 2;
+        this._renderArea.select(".label-area").remove();
+        if (this._labelsEnabled) {
+            var labelArea_1 = this._renderArea.append("g").classed("label-area", true);
+            var measurer_1 = new SVGTypewriter.CacheMeasurer(labelArea_1);
+            var writer_1 = new SVGTypewriter.Writer(measurer_1);
+            var dataset_1 = this.datasets()[0];
+            var data = this._plot.getDataToDraw().get(dataset_1);
+            data.forEach(function (datum, datumIndex) {
+                var value = _this.sectorValue().accessor(datum, datumIndex, dataset_1);
+                if (!Utils.Math.isValidNumber(value)) {
+                    return;
+                }
+                value = _this._labelFormatter(value);
+                var measurement = measurer_1.measure(value);
+                var theta = (_this._plot.endAngles()[datumIndex] + _this._plot.startAngles()[datumIndex]) / 2;
+                var outerRadius = _this.outerRadius().accessor(datum, datumIndex, dataset_1);
+                if (_this.outerRadius().scale) {
+                    outerRadius = _this.outerRadius().scale.scale(outerRadius);
+                }
+                var innerRadius = _this.innerRadius().accessor(datum, datumIndex, dataset_1);
+                if (_this.innerRadius().scale) {
+                    innerRadius = _this.innerRadius().scale.scale(innerRadius);
+                }
+                var labelRadius = (outerRadius + innerRadius) / 2;
+                var x = Math.sin(theta) * labelRadius - measurement.width / 2;
+                var y = -Math.cos(theta) * labelRadius - measurement.height / 2;
+                var corners = [
+                    { x: x, y: y },
+                    { x: x, y: y + measurement.height },
+                    { x: x + measurement.width, y: y },
+                    { x: x + measurement.width, y: y + measurement.height },
+                ];
+                var showLabel = corners.every(function (corner) {
+                    return Math.abs(corner.x) <= _this.width() / 2 && Math.abs(corner.y) <= _this.height() / 2;
+                });
+                if (showLabel) {
+                    var sliceIndices = corners.map(function (corner) { return _this._plot.sliceIndexForPoint(corner); });
+                    showLabel = sliceIndices.every(function (index) { return index === datumIndex; });
+                }
+                var color = attrToProjector["fill"](datum, datumIndex, dataset_1);
+                var dark = Utils.Color.contrast("white", color) * 1.6 < Utils.Color.contrast("black", color);
+                var g = labelArea_1.append("g").attr("transform", "translate(" + x + "," + y + ")");
+                var className = dark ? "dark-label" : "light-label";
+                g.classed(className, true);
+                g.style("visibility", showLabel ? "inherit" : "hidden");
+                writer_1.write(value, measurement.width, measurement.height, {
+                    selection: g,
+                    xAlign: "center",
+                    yAlign: "center",
+                    textRotation: 0,
+                });
             });
-            if (showLabel) {
-                var sliceIndices = corners.map(function (corner) { return _this._plot.sliceIndexForPoint(corner); });
-                showLabel = sliceIndices.every(function (index) { return index === datumIndex; });
-            }
-            var color = attrToProjector["fill"](datum, datumIndex, dataset);
-            var dark = Utils.Color.contrast("white", color) * 1.6 < Utils.Color.contrast("black", color);
-            var g = labelArea.append("g").attr("transform", "translate(" + x + "," + y + ")");
-            var className = dark ? "dark-label" : "light-label";
-            g.classed(className, true);
-            g.style("visibility", showLabel ? "inherit" : "hidden");
-            writer.write(value, measurement.width, measurement.height, {
-                selection: g,
-                xAlign: "center",
-                yAlign: "center",
-                textRotation: 0,
-            });
-        });
+        }
     };
     return Pie;
 }(plot_1.Plot));
