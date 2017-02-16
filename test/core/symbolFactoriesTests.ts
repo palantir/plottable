@@ -76,9 +76,9 @@ describe("SymbolFactory", () => {
     });
 
     it("returns an up triangle factory that generates up triangle based on symbolSize", () => {
-      let triangleUpFactory = Plottable.SymbolFactories.triangleUp();
+      let triangleFactory = Plottable.SymbolFactories.triangle();
       let actualSize = Math.sqrt(3) * Math.pow(symbolSize / 2, 2);
-      let d = triangleUpFactory(symbolSize);
+      let d = triangleFactory(symbolSize);
       let expectedD = d3.svg.symbol().type("triangle-up").size(actualSize)(null);
       assert.strictEqual(d, expectedD, "a up triangle of set size is generated");
       let path = svg.append("path").attr("d", d);
@@ -90,10 +90,11 @@ describe("SymbolFactory", () => {
       svg.remove();
     });
 
-    it("returns a down triangle factory that generates down triangle based on symbolSize", () => {
-      let triangleDownFactory = Plottable.SymbolFactories.triangleDown();
-      let actualSize = Math.sqrt(3) * Math.pow(symbolSize / 2, 2);
-      let d = triangleDownFactory(symbolSize);
+    it("returns a wye factory that generates down triangle based on symbolSize", () => {
+      let wyeFactory = Plottable.SymbolFactories.wye();
+      const a = ((1 / Math.sqrt(12)) / 2 + 1) * 3;
+      let actualSize = a * Math.pow(symbolSize / 2, 2);
+      let d = wyeFactory(symbolSize);
       let expectedD = d3.svg.symbol().type("triangle-down").size(actualSize)(null);
       assert.strictEqual(d, expectedD, "a down triangle of set size is generated");
       let path = svg.append("path").attr("d", d);
