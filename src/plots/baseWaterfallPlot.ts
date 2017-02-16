@@ -31,8 +31,8 @@ export class BaseWaterfallPlot<X, Y> extends BaseBarPlot<X, Y> implements IWater
   private static _BAR_TOTAL_CLASS = "waterfall-total";
 
   private _additionalPaintCallback: (time: number, attrToProjector: AttributeToProjector) => void;
-  private _extent: number[];
-  private _subtotals: number[];
+  private _extent: number[] = [];
+  private _subtotals: number[] = [];
 
   public onAdditionalPaint(_additionalPaintCallback: (time: number, attrToProjector: AttributeToProjector) => void) {
     this._additionalPaintCallback = _additionalPaintCallback;
@@ -52,14 +52,24 @@ export class BaseWaterfallPlot<X, Y> extends BaseBarPlot<X, Y> implements IWater
     return this;
   }
 
-  protected _addtionalPaint(time: number) {
+  public updateSubtotals() {
+    let datasets = this.datasets();
+    if (datasets.length > 0) {
+      let dataset = datasets[datasets.length - 1];
+      this._subtotals = new Array();
+      this._calculateSubtotalsAndExtent(dataset);
+    }
+  }
+
+  protected _additionalPaint(time: number) {
     this._additionalPaintCallback(time, this._generateAttrToProjector());
   }
 
   protected _extentsForProperty(attr: string) {
     let primaryAttr = "y";
+
     if (attr === primaryAttr) {
-      return [this._extent];
+      return this._extent == null ? [] : [this._extent];
     } else {
       return super._extentsForProperty(attr);
     }
@@ -133,11 +143,6 @@ export class BaseWaterfallPlot<X, Y> extends BaseBarPlot<X, Y> implements IWater
     return attrToProjector;
   }
 
-  protected _onDatasetUpdate() {
-    this._updateSubtotals();
-    super._onDatasetUpdate();
-  }
-
   private _calculateSubtotalsAndExtent(dataset: Dataset) {
     let min = Number.MAX_VALUE;
     let max = Number.MIN_VALUE;
@@ -178,12 +183,5 @@ export class BaseWaterfallPlot<X, Y> extends BaseBarPlot<X, Y> implements IWater
     this._extent = [min, max];
   }
 
-  private _updateSubtotals() {
-    let datasets = this.datasets();
-    if (datasets.length > 0) {
-      let dataset = datasets[datasets.length - 1];
-      this._subtotals = new Array();
-      this._calculateSubtotalsAndExtent(dataset);
-    }
-  }
+
 }

@@ -137,12 +137,12 @@ export class BasePlot implements IPlot {
   private _datasetToDrawer: Utils.Map<Dataset, IDrawer>;
   private _drawerFactory: DrawerFactory;
   private _includedValuesProvider: Scales.IncludedValuesProvider<any>;
-  private _onDatasetsUpdate: Function;
   private _onDatasetRemovedCallback: DatasetCallback;
   private _onDatasetUpdateAction: DatasetCallback;
 
   protected _component: IComponent<any>;
   protected _onDatasetUpdateCallback: DatasetCallback;
+  protected _onDatasetsUpdate: Function;
   protected _propertyBindings: d3.Map<Plots.AccessorScaleBinding<any, any>>;
   protected _propertyExtents: d3.Map<any[]>;
   protected _renderCallback: ScaleCallback<Scale<any, any>>;

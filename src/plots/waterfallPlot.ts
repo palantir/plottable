@@ -76,7 +76,6 @@ export class Waterfall<X, Y> extends Bar<X, number>  implements IWaterfallPlot<X
     return new BaseWaterfallPlot((dataset) => new Drawers.Rectangle(dataset), this);
   }
 
-
   protected _setup() {
     super._setup();
     this._connectorArea = this._renderArea.append("g").classed(Waterfall._CONNECTOR_AREA_CLASS, true);
@@ -105,5 +104,9 @@ export class Waterfall<X, Y> extends Bar<X, number>  implements IWaterfallPlot<X
       this._connectorArea.append("line").classed(Waterfall._CONNECTOR_CLASS, true)
         .attr("x1", x).attr("x2", x2).attr("y1", y).attr("y2", y);
     }
+  }
+
+  protected _onDatasetUpdate() {
+    this._plot.updateSubtotals();
   }
 }

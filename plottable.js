@@ -14372,6 +14372,8 @@ var BaseWaterfallPlot = (function (_super) {
     __extends(BaseWaterfallPlot, _super);
     function BaseWaterfallPlot() {
         _super.apply(this, arguments);
+        this._extent = [];
+        this._subtotals = [];
     }
     BaseWaterfallPlot.prototype.onAdditionalPaint = function (_additionalPaintCallback) {
         this._additionalPaintCallback = _additionalPaintCallback;
@@ -14386,13 +14388,21 @@ var BaseWaterfallPlot = (function (_super) {
         this._bindProperty(BaseWaterfallPlot._TOTAL_KEY, total, null);
         return this;
     };
-    BaseWaterfallPlot.prototype._addtionalPaint = function (time) {
+    BaseWaterfallPlot.prototype.updateSubtotals = function () {
+        var datasets = this.datasets();
+        if (datasets.length > 0) {
+            var dataset = datasets[datasets.length - 1];
+            this._subtotals = new Array();
+            this._calculateSubtotalsAndExtent(dataset);
+        }
+    };
+    BaseWaterfallPlot.prototype._additionalPaint = function (time) {
         this._additionalPaintCallback(time, this._generateAttrToProjector());
     };
     BaseWaterfallPlot.prototype._extentsForProperty = function (attr) {
         var primaryAttr = "y";
         if (attr === primaryAttr) {
-            return [this._extent];
+            return this._extent == null ? [] : [this._extent];
         }
         else {
             return _super.prototype._extentsForProperty.call(this, attr);
@@ -14467,10 +14477,6 @@ var BaseWaterfallPlot = (function (_super) {
         };
         return attrToProjector;
     };
-    BaseWaterfallPlot.prototype._onDatasetUpdate = function () {
-        this._updateSubtotals();
-        _super.prototype._onDatasetUpdate.call(this);
-    };
     BaseWaterfallPlot.prototype._calculateSubtotalsAndExtent = function (dataset) {
         var _this = this;
         var min = Number.MAX_VALUE;
@@ -14510,14 +14516,6 @@ var BaseWaterfallPlot = (function (_super) {
             }
         });
         this._extent = [min, max];
-    };
-    BaseWaterfallPlot.prototype._updateSubtotals = function () {
-        var datasets = this.datasets();
-        if (datasets.length > 0) {
-            var dataset = datasets[datasets.length - 1];
-            this._subtotals = new Array();
-            this._calculateSubtotalsAndExtent(dataset);
-        }
     };
     BaseWaterfallPlot._TOTAL_KEY = "total";
     BaseWaterfallPlot._BAR_DECLINE_CLASS = "waterfall-decline";
@@ -15664,6 +15662,9 @@ var Waterfall = (function (_super) {
             this._connectorArea.append("line").classed(Waterfall._CONNECTOR_CLASS, true)
                 .attr("x1", x).attr("x2", x2).attr("y1", y).attr("y2", y);
         }
+    };
+    Waterfall.prototype._onDatasetUpdate = function () {
+        this._plot.updateSubtotals();
     };
     Waterfall._CONNECTOR_CLASS = "connector";
     Waterfall._CONNECTOR_AREA_CLASS = "connector-area";
