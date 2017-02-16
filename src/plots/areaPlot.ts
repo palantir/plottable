@@ -60,8 +60,10 @@ export class Area<X> extends Line<X> implements IAreaPlot<X> {
 
   public selections(datasets = this.datasets()) {
     let allSelections = super.selections(datasets)[0];
-    let lineDrawers = datasets.map((dataset) => this._plot.drawer(dataset))
+
+    let lineDrawers = datasets.map((dataset) => this._plot.lineDrawer(dataset))
       .filter((drawer) => drawer != null);
+
     lineDrawers.forEach((ld, i) => allSelections.push((ld as Drawers.Area).selectionForIndex(i).node()));
     return d3.selectAll(allSelections);
   }

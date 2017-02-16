@@ -138,14 +138,13 @@ export class BasePlot<P extends PlotEntity> implements IPlot {
   private _dataChanged = false;
   private _datasetToDrawer: Utils.Map<Dataset, IDrawer>;
   private _drawerFactory: DrawerFactory;
+  private _handleDatasetUpdate: DatasetCallback;
   private _includedValuesProvider: Scales.IncludedValuesProvider<any>;
   private _onDatasetRemovedCallback: DatasetCallback;
-  private _onDatasetUpdateAction: DatasetCallback;
 
   protected _component: IComponent<any>;
   protected _entityAdapter: EntityAdapter<P>;
   protected _onDatasetUpdateCallback: DatasetCallback;
-  protected _onDatasetsUpdate: Function;
   protected _propertyBindings: d3.Map<Plots.AccessorScaleBinding<any, any>>;
   protected _propertyExtents: d3.Map<any[]>;
   protected _renderCallback: ScaleCallback<Scale<any, any>>;
@@ -162,14 +161,15 @@ export class BasePlot<P extends PlotEntity> implements IPlot {
     this._propertyExtents = d3.map<any[]>();
 
     this._includedValuesProvider = (scale: Scale<any, any>) => this._includedValuesForScale(scale);
-    this._onDatasetUpdateAction = (dataset: Dataset) => this._onDatasetUpdate(dataset);
+    this._handleDatasetUpdate = (dataset?: Dataset) => this._onDatasetUpdate(dataset);
   }
 
   public addDataset(dataset: Dataset) {
     this._addDataset(dataset);
-    this._onDatasetsUpdate();
+    this._handleDatasetUpdate(dataset);
     return this;
   }
+
   public animated(): boolean;
   public animated(willAnimate: boolean): this;
   public animated(willAnimate?: boolean): any {
@@ -266,7 +266,7 @@ export class BasePlot<P extends PlotEntity> implements IPlot {
 
     currentDatasets.forEach((dataset) => this._removeDataset(dataset));
     datasets.forEach((dataset) => this._addDataset(dataset));
-    this._onDatasetsUpdate();
+    this._handleDatasetUpdate(null);
     return this;
   }
 
@@ -315,10 +315,6 @@ export class BasePlot<P extends PlotEntity> implements IPlot {
     this._onDatasetRemovedCallback = _onDatasetRemoved;
   }
 
-  public onDatasetsUpdate(_onDatasetsUpdate: Function) {
-    this._onDatasetsUpdate = _onDatasetsUpdate;
-  }
-
   public onDatasetUpdate(_onDatasetUpdateCallback: DatasetCallback) {
     this._onDatasetUpdateCallback = _onDatasetUpdateCallback
   }
@@ -336,7 +332,7 @@ export class BasePlot<P extends PlotEntity> implements IPlot {
    */
   public removeDataset(dataset: Dataset) {
     this._removeDataset(dataset)
-    this._onDatasetsUpdate();
+    this._handleDatasetUpdate(dataset);
     return this;
   }
 
@@ -378,7 +374,7 @@ export class BasePlot<P extends PlotEntity> implements IPlot {
 
     this._getDatasetToDrawer().set(dataset, drawer);
     this.clearDataCache();
-    dataset.onUpdate(this._onDatasetUpdateAction);
+    dataset.onUpdate(this._handleDatasetUpdate);
   }
 
   protected _animateOnNextRender() {
@@ -539,7 +535,7 @@ export class BasePlot<P extends PlotEntity> implements IPlot {
       return this;
     }
 
-    dataset.offUpdate(this._onDatasetUpdateAction);
+    dataset.offUpdate(this._handleDatasetUpdate);
     const drawer = this.drawer(dataset);
     drawer.remove();
     this._getDatasetToDrawer().delete(dataset);

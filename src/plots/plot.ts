@@ -40,7 +40,6 @@ export class Plot extends SVGComponent implements IPlot {
     this._plot = this._createPlot();
     this._plot.onDatasetRemoved((dataset) => this._onDatasetRemoved(dataset));
     this._plot.onDatasetUpdate(() => this._onDatasetUpdate());
-    this._plot.onDatasetsUpdate(() => this._onDatasetUpdate());
     this._plot.renderCallback((scale) => this.render());
 
     this._clipPathEnabled = true;

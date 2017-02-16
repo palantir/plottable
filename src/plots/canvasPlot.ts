@@ -34,7 +34,6 @@ export class CanvasPlot extends HTMLComponent implements IPlot {
     super();
     this._plot = this._createPlot();
     this._plot.onDatasetUpdate(() => this._onDatasetUpdate());
-    this._plot.onDatasetsUpdate(() => this._onDatasetUpdate());
     this._plot.renderCallback((scale) => this.render());
   }
 

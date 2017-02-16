@@ -1787,7 +1787,6 @@ var Plot = (function (_super) {
         this._plot = this._createPlot();
         this._plot.onDatasetRemoved(function (dataset) { return _this._onDatasetRemoved(dataset); });
         this._plot.onDatasetUpdate(function () { return _this._onDatasetUpdate(); });
-        this._plot.onDatasetsUpdate(function () { return _this._onDatasetUpdate(); });
         this._plot.renderCallback(function (scale) { return _this.render(); });
         this._clipPathEnabled = true;
         this.addClass("plot");
@@ -4300,11 +4299,11 @@ var BasePlot = (function () {
         this._propertyBindings = d3.map();
         this._propertyExtents = d3.map();
         this._includedValuesProvider = function (scale) { return _this._includedValuesForScale(scale); };
-        this._onDatasetUpdateAction = function (dataset) { return _this._onDatasetUpdate(dataset); };
+        this._handleDatasetUpdate = function (dataset) { return _this._onDatasetUpdate(dataset); };
     }
     BasePlot.prototype.addDataset = function (dataset) {
         this._addDataset(dataset);
-        this._onDatasetsUpdate();
+        this._handleDatasetUpdate(dataset);
         return this;
     };
     BasePlot.prototype.animated = function (willAnimate) {
@@ -4369,7 +4368,7 @@ var BasePlot = (function () {
         }
         currentDatasets.forEach(function (dataset) { return _this._removeDataset(dataset); });
         datasets.forEach(function (dataset) { return _this._addDataset(dataset); });
-        this._onDatasetsUpdate();
+        this._handleDatasetUpdate(null);
         return this;
     };
     BasePlot.prototype.destroy = function () {
@@ -4411,9 +4410,6 @@ var BasePlot = (function () {
     BasePlot.prototype.onDatasetRemoved = function (_onDatasetRemoved) {
         this._onDatasetRemovedCallback = _onDatasetRemoved;
     };
-    BasePlot.prototype.onDatasetsUpdate = function (_onDatasetsUpdate) {
-        this._onDatasetsUpdate = _onDatasetsUpdate;
-    };
     BasePlot.prototype.onDatasetUpdate = function (_onDatasetUpdateCallback) {
         this._onDatasetUpdateCallback = _onDatasetUpdateCallback;
     };
@@ -4429,7 +4425,7 @@ var BasePlot = (function () {
      */
     BasePlot.prototype.removeDataset = function (dataset) {
         this._removeDataset(dataset);
-        this._onDatasetsUpdate();
+        this._handleDatasetUpdate(dataset);
         return this;
     };
     BasePlot.prototype.renderImmediately = function () {
@@ -4464,7 +4460,7 @@ var BasePlot = (function () {
         }
         this._getDatasetToDrawer().set(dataset, drawer);
         this.clearDataCache();
-        dataset.onUpdate(this._onDatasetUpdateAction);
+        dataset.onUpdate(this._handleDatasetUpdate);
     };
     BasePlot.prototype._animateOnNextRender = function () {
         return this._animate && this._dataChanged;
@@ -4604,7 +4600,7 @@ var BasePlot = (function () {
         if (this.datasets().indexOf(dataset) === -1) {
             return this;
         }
-        dataset.offUpdate(this._onDatasetUpdateAction);
+        dataset.offUpdate(this._handleDatasetUpdate);
         var drawer = this.drawer(dataset);
         drawer.remove();
         this._getDatasetToDrawer().delete(dataset);
@@ -6863,7 +6859,7 @@ var Area = (function (_super) {
         var _this = this;
         if (datasets === void 0) { datasets = this.datasets(); }
         var allSelections = _super.prototype.selections.call(this, datasets)[0];
-        var lineDrawers = datasets.map(function (dataset) { return _this._plot.drawer(dataset); })
+        var lineDrawers = datasets.map(function (dataset) { return _this._plot.lineDrawer(dataset); })
             .filter(function (drawer) { return drawer != null; });
         lineDrawers.forEach(function (ld, i) { return allSelections.push(ld.selectionForIndex(i).node()); });
         return d3.selectAll(allSelections);
@@ -6902,6 +6898,9 @@ var BaseAreaPlot = (function (_super) {
         this._lineDrawers = new Utils.Map();
         this._lineDrawerFactory = lineDrawerFactory;
     }
+    BaseAreaPlot.prototype.lineDrawer = function (dataset) {
+        return this._lineDrawers.get(dataset);
+    };
     BaseAreaPlot.prototype.renderArea = function (renderArea) {
         var _this = this;
         var superRenderArea = _super.prototype.renderArea.call(this, renderArea);
@@ -14520,7 +14519,6 @@ var CanvasPlot = (function (_super) {
         this._dataChanged = false;
         this._plot = this._createPlot();
         this._plot.onDatasetUpdate(function () { return _this._onDatasetUpdate(); });
-        this._plot.onDatasetsUpdate(function () { return _this._onDatasetUpdate(); });
         this._plot.renderCallback(function (scale) { return _this.render(); });
     }
     CanvasPlot.prototype.addDataset = function (dataset) {

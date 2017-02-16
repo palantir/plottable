@@ -54,6 +54,10 @@ export class BaseAreaPlot<X, P extends PlotEntity> extends BaseLinePlot<X, P> im
     this._lineDrawerFactory = lineDrawerFactory;
   }
 
+  public lineDrawer(dataset: Dataset) {
+    return this._lineDrawers.get(dataset);
+  }
+
   public renderArea(): d3.Selection<void>;
   public renderArea(renderArea: d3.Selection<void> | RenderAreaAccessor): this;
   public renderArea(renderArea?: d3.Selection<void> | RenderAreaAccessor): any {
