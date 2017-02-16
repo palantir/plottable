@@ -188,9 +188,7 @@ export class Numeric extends Axis<number> {
     }
 
     let tickLabelValues = this._getTickValues();
-    let tickLabelsUpdate = this._tickLabelContainer
-      .selectAll("." + Axis.TICK_LABEL_CLASS)
-      .data(tickLabelValues);
+    let tickLabelsUpdate = this._tickLabelContainer.selectAll("." + Axis.TICK_LABEL_CLASS).data(tickLabelValues);
     tickLabelsUpdate.exit().remove();
 
     const tickLabels =

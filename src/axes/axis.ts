@@ -322,9 +322,14 @@ export class Axis<D> extends Component {
     });
 
     let bindElements = (selection: SimpleSelection<any>, elementName: string, className: string) => {
-      let elements = selection.selectAll(`.${className}`).data(annotatedTicks);
-      elements.enter().append(elementName).classed(className, true);
-      elements.exit().remove();
+      let elementsUpdate = selection.selectAll(`.${className}`).data(annotatedTicks);
+      const elements =
+        elementsUpdate
+          .enter()
+          .append(elementName)
+            .classed(className, true)
+          .merge(elementsUpdate);
+      elementsUpdate.exit().remove();
       return elements;
     };
     let offsetF = (d: D) => {

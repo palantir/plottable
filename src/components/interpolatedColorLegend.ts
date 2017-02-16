@@ -307,8 +307,9 @@ export class InterpolatedColorLegend extends Component {
     this._swatchBoundingBox.attrs(boundingBoxAttr);
 
     let ticks = this._generateTicks(numSwatches);
-    let swatches = this._swatchContainer.selectAll("rect.swatch").data(ticks);
-    let rects = swatches.enter().append("rect").classed("swatch", true);
+    let swatchesUpdate = this._swatchContainer.selectAll("rect.swatch").data(ticks);
+    let rects = swatchesUpdate.enter().append("rect").classed("swatch", true);;
+    const swatches = swatchesUpdate.merge(rects);
     swatches.exit().remove();
     swatches.attrs({
       "fill": (d: any, i: number) => this._scale.scale(d),

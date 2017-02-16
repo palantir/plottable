@@ -562,9 +562,14 @@ export class Legend extends Component {
 
     // clear content from previous renders
     this.content().selectAll("*").remove();
-    const rows = this.content().selectAll("g." + Legend.LEGEND_ROW_CLASS).data(table.rows);
-    rows.enter().append("g").classed(Legend.LEGEND_ROW_CLASS, true);
-    rows.exit().remove();
+    const rowsUpdate = this.content().selectAll("g." + Legend.LEGEND_ROW_CLASS).data(table.rows);
+    const rows =
+      rowsUpdate
+        .enter()
+        .append("g")
+          .classed(Legend.LEGEND_ROW_CLASS, true)
+        .merge(rowsUpdate);
+    rowsUpdate.exit().remove();
     rows.attr("transform", (row, rowIndex) => {
       const rowBounds = table.getRowBounds(rowIndex);
       return `translate(${rowBounds.topLeft.x}, ${rowBounds.topLeft.y})`;
@@ -579,8 +584,13 @@ export class Legend extends Component {
         symbolEntryPairs.push([row.columns[i], row.columns[i + 1]]);
       }
 
-      const entries = d3.select(this).selectAll(`g.${Legend.LEGEND_ENTRY_CLASS}`).data(symbolEntryPairs);
-      const entriesEnter = entries.enter().append("g").classed(Legend.LEGEND_ENTRY_CLASS, true);
+      const entriesUpdate = d3.select(this).selectAll(`g.${Legend.LEGEND_ENTRY_CLASS}`).data(symbolEntryPairs);
+      const entriesEnter =
+        entriesUpdate
+          .enter()
+          .append("g")
+            .classed(Legend.LEGEND_ENTRY_CLASS, true)
+          .merge(entriesUpdate);
 
       entriesEnter.append("path")
         .attr("d", (symbolEntryPair, columnIndex) => {
@@ -620,7 +630,7 @@ export class Legend extends Component {
           self._writer.write(self._formatter(column.data.name), column.width, self.height(), writeOptions)
         });
 
-        entries.exit().remove();
+        entriesUpdate.exit().remove();
     });
 
     return this;
