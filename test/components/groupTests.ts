@@ -78,7 +78,7 @@ describe("Group", () => {
   });
 
   describe("Detaching constituent Components", () => {
-    it("takes its constutuent Components with it when detach()ed or anchor()ed", () => {
+    it("takes its constituent Components with it when detach()ed or anchor()ed", () => {
       let c1 = new Plottable.SVGComponent();
       let c2 = new Plottable.SVGComponent();
       let group = new Plottable.Components.Group([c1, c2]);

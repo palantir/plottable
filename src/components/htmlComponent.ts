@@ -19,25 +19,21 @@ import * as Utils from "../utils";
 
 export class HTMLComponent extends AbstractComponent<HTMLElement> {
 
-  public anchor(selection: HTMLElement) {
+  public anchor(selection: d3.Selection<void>) {
     if (this._destroyed) {
       throw new Error("Can't reuse destroy()-ed Components!");
     }
 
     if (this._element == null) {
-      this._element = d3.select(document.createElement("div"));
+      this._element = selection.append("div");
       this._setup();
+    } else {
+      selection.node().appendChild(this._element.node());
     }
-
-    selection.appendChild(this._element.node());
 
     this._isAnchored = true;
     this._onAnchorCallbacks.callCallbacks(this);
     return this;
-  }
-
-  public anchorHTML(selection: HTMLElement) {
-    return this.anchor(selection);
   }
 
   public computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number) {
@@ -113,7 +109,7 @@ export class HTMLComponent extends AbstractComponent<HTMLElement> {
       throw new Error("Plottable requires a valid HTMLElement to renderTo");
     }
 
-    this.anchor(element);
+    this.anchor(d3.select(element));
 
     if (this._element == null) {
       throw new Error("If a Component has never been rendered before, then renderTo must be given an HTMLElement to render to");

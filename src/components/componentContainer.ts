@@ -3,6 +3,8 @@
  * @license MIT
  */
 
+import * as d3 from "d3";
+
 import { GenericComponentCallback, IComponent } from "./abstractComponent";
 import { HTMLComponent } from "./htmlComponent";
 
@@ -18,10 +20,10 @@ export class ComponentContainer extends HTMLComponent {
     this._detachCallback = (component: IComponent<any>) => this.remove(component);
   }
 
-  public anchor(selection: HTMLElement) {
+  public anchor(selection: d3.Selection<void>) {
     super.anchor(selection);
 
-    this._forEach((c) => c.anchorHTML(this.content().node() as HTMLElement));
+    this._forEach((c) => c.anchor(this.content()));
 
     return this;
   }
@@ -42,7 +44,7 @@ export class ComponentContainer extends HTMLComponent {
     component.parent(this);
     component.onDetach(this._detachCallback);
     if (this._isAnchored) {
-      component.anchorHTML(this.content().node() as HTMLElement);
+      component.anchor(this.content());
     }
   }
 

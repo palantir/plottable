@@ -719,7 +719,6 @@ var SVGComponent = (function (_super) {
         _super.call(this);
         this._clipPathEnabled = false;
         this._boxes = [];
-        this._isTopLevelSVG = false;
         this._cssClasses.add("component");
     }
     /**
@@ -732,41 +731,45 @@ var SVGComponent = (function (_super) {
         if (this._destroyed) {
             throw new Error("Can't reuse destroy()-ed Components!");
         }
-        this._isTopLevelSVG = selection.node().nodeName.toLowerCase() === "svg";
-        if (this._isTopLevelSVG) {
+        /**
+         * The user has the option of passing an SVG element directly
+         * to the anchor method, in which case we will render directly
+         * to that SVG.
+         */
+        var isTopLevelSVG = selection.node().nodeName.toLowerCase() === "svg";
+        if (isTopLevelSVG) {
             this._rootSVG = selection;
-            // visible overflow for firefox https://stackoverflow.com/questions/5926986/why-does-firefox-appear-to-truncate-embedded-svgs
-            this._rootSVG.style("overflow", "visible");
-            // HACKHACK: Safari fails to register events on the <svg> itself
-            var safariBacking = this._rootSVG.select("." + SVGComponent._SAFARI_EVENT_BACKING_CLASS);
-            if (safariBacking.empty()) {
-                this._rootSVG.append("rect").classed(SVGComponent._SAFARI_EVENT_BACKING_CLASS, true).attr({
-                    x: 0,
-                    y: 0,
-                    width: "100%",
-                    height: "100%",
-                }).style("opacity", 0);
-            }
         }
-        if (this._isTopLevelSVG && !this.isNestedTopLevelSVG()) {
-            // non-nested top-level svg node gets the "plottable" CSS class
+        else {
+            this._rootSVG = selection.append("svg");
+        }
+        // visible overflow for firefox https://stackoverflow.com/questions/5926986/why-does-firefox-appear-to-truncate-embedded-svgs
+        this._rootSVG.style("overflow", "visible");
+        // HACKHACK: Safari fails to register events on the <svg> itself
+        var safariBacking = this._rootSVG.select("." + SVGComponent._SAFARI_EVENT_BACKING_CLASS);
+        if (safariBacking.empty()) {
+            this._rootSVG.append("rect").classed(SVGComponent._SAFARI_EVENT_BACKING_CLASS, true).attr({
+                x: 0,
+                y: 0,
+                width: "100%",
+                height: "100%",
+            }).style("opacity", 0);
+        }
+        if (this.parent() == null) {
+            // top-level component node gets the "plottable" CSS class
             this._rootSVG.classed("plottable", true);
         }
         if (this._element != null) {
             // reattach existing element
-            selection.node().appendChild(this._element.node());
+            this._rootSVG.node().appendChild(this._element.node());
         }
         else {
-            this._element = selection.append("g");
+            this._element = this._rootSVG.append("g");
             this._setup();
         }
         this._isAnchored = true;
         this._onAnchorCallbacks.callCallbacks(this);
         return this;
-    };
-    SVGComponent.prototype.anchorHTML = function (selection) {
-        var root = d3.select(selection).append("svg");
-        return this.anchor(root);
     };
     /**
      * Creates additional elements as necessary for the Component to function.
@@ -778,7 +781,7 @@ var SVGComponent = (function (_super) {
         if (this._isSetup) {
             return;
         }
-        if (this._isTopLevelSVG && this.parent() != null) {
+        if (this.parent() != null) {
             // this component is a top level SVG; however, it has parents
             // which means that it is nested within a div container
             this._rootSVG.classed("component", true);
@@ -814,7 +817,7 @@ var SVGComponent = (function (_super) {
             if (this._element == null) {
                 throw new Error("anchor() must be called before computeLayout()");
             }
-            else if (this._isTopLevelSVG && this.parent() == null) {
+            else if (this.parent() == null) {
                 // we are the root node, retrieve height/width from root SVG
                 origin = { x: 0, y: 0 };
                 // Set width/height to 100% if not specified, to allow accurate size calculation
@@ -843,7 +846,7 @@ var SVGComponent = (function (_super) {
             x: origin.x + (availableWidth - this.width()) * xAlignProportion,
             y: origin.y + (availableHeight - this.height()) * yAlignProportion,
         };
-        if (this.isNestedTopLevelSVG()) {
+        if (this.parent() != null) {
             // this is a top-level SVG nested within an HTML layout. Apply the styles
             // directly to the root SVG rather than to the g element
             this._rootSVG.style({
@@ -895,7 +898,7 @@ var SVGComponent = (function (_super) {
      */
     SVGComponent.prototype.redraw = function () {
         if (this._isAnchored && this._isSetup) {
-            if (this._isTopLevelSVG && this.parent() == null) {
+            if (this.parent() == null) {
                 // only redraw myself if I'm the root
                 this._scheduleComputeLayout();
             }
@@ -918,13 +921,13 @@ var SVGComponent = (function (_super) {
             if (typeof (element) === "string") {
                 selection = d3.select(element);
             }
-            else if (element instanceof Element) {
+            else if (element instanceof SVGElement) {
                 selection = d3.select(element);
             }
             else {
                 selection = element;
             }
-            if (!selection.node() || selection.node().nodeName.toLowerCase() !== "svg") {
+            if (!selection.node() || (selection.node().nodeName.toLowerCase() !== "svg")) {
                 throw new Error("Plottable requires a valid SVG to renderTo");
             }
             this.anchor(selection);
@@ -978,9 +981,7 @@ var SVGComponent = (function (_super) {
         this.parent(null);
         if (this._isAnchored) {
             this._element.remove();
-            if (this._isTopLevelSVG) {
-                this._rootSVG.select("." + SVGComponent._SAFARI_EVENT_BACKING_CLASS).remove();
-            }
+            this._rootSVG.select("." + SVGComponent._SAFARI_EVENT_BACKING_CLASS).remove();
         }
         this._isAnchored = false;
         this._onDetachCallbacks.callCallbacks(this);
@@ -1019,20 +1020,7 @@ var SVGComponent = (function (_super) {
         return this._content;
     };
     SVGComponent.prototype.element = function () {
-        if (this._isTopLevelSVG) {
-            return this._rootSVG;
-        }
-        return this._element;
-    };
-    /**
-     * Top-level SVGs <svg ...>  can exist as non *root* components. For example,
-     * you can place an <svg ..> within an HTMLTable or HTMLGroup, which themselves
-     * are not SVGs. This method determines whether the SVG element is 1) a top-level
-     * svg (<svg>) and 2) the root of the rendering tree. If both are true, then this
-     * is method will return false.
-     */
-    SVGComponent.prototype.isNestedTopLevelSVG = function () {
-        return this._isTopLevelSVG && this.parent() != null;
+        return this._rootSVG;
     };
     SVGComponent._SAFARI_EVENT_BACKING_CLASS = "safari-event-backing";
     return SVGComponent;
@@ -4784,7 +4772,7 @@ var ComponentContainer = (function (_super) {
     ComponentContainer.prototype.anchor = function (selection) {
         var _this = this;
         _super.prototype.anchor.call(this, selection);
-        this._forEach(function (c) { return c.anchorHTML(_this.content().node()); });
+        this._forEach(function (c) { return c.anchor(_this.content()); });
         return this;
     };
     ComponentContainer.prototype.render = function () {
@@ -4801,7 +4789,7 @@ var ComponentContainer = (function (_super) {
         component.parent(this);
         component.onDetach(this._detachCallback);
         if (this._isAnchored) {
-            component.anchorHTML(this.content().node());
+            component.anchor(this.content());
         }
     };
     /**
@@ -4872,16 +4860,15 @@ var HTMLComponent = (function (_super) {
             throw new Error("Can't reuse destroy()-ed Components!");
         }
         if (this._element == null) {
-            this._element = d3.select(document.createElement("div"));
+            this._element = selection.append("div");
             this._setup();
         }
-        selection.appendChild(this._element.node());
+        else {
+            selection.node().appendChild(this._element.node());
+        }
         this._isAnchored = true;
         this._onAnchorCallbacks.callCallbacks(this);
         return this;
-    };
-    HTMLComponent.prototype.anchorHTML = function (selection) {
-        return this.anchor(selection);
     };
     HTMLComponent.prototype.computeLayout = function (origin, availableWidth, availableHeight) {
         if (origin == null || availableWidth == null || availableHeight == null) {
@@ -4946,7 +4933,7 @@ var HTMLComponent = (function (_super) {
         if (element == null || !element.nodeName) {
             throw new Error("Plottable requires a valid HTMLElement to renderTo");
         }
-        this.anchor(element);
+        this.anchor(d3.select(element));
         if (this._element == null) {
             throw new Error("If a Component has never been rendered before, then renderTo must be given an HTMLElement to render to");
         }

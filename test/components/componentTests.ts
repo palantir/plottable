@@ -321,10 +321,13 @@ describe("Component", () => {
   describe("computing the layout", () => {
 
     let c: Plottable.SVGComponent;
+    let d: Plottable.Components.Group;
     let svg: d3.Selection<void>;
 
     beforeEach(() => {
       c = new Plottable.SVGComponent();
+      d = new Plottable.Components.Group();
+
       svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
     });
 
@@ -407,6 +410,7 @@ describe("Component", () => {
 
     it("requires arguments when not anchored directly under the svg", () => {
       const g = svg.append("g");
+      d.append(c);
       c.anchor(g);
       // HACKHACK: https://github.com/palantir/plottable/issues/2661 Cannot assert errors being thrown with description
       (<any> assert).throws(() => c.computeLayout(), "null arguments",
@@ -417,8 +421,8 @@ describe("Component", () => {
     it("requires arguments if not anchored directly under the svg, even if previously anchored directly under the svg", () => {
       c.anchor(svg);
       c.detach();
-      const g = svg.append("g");
-      c.anchor(g);
+      d.append(c);
+      c.anchor(svg);
       // HACKHACK: https://github.com/palantir/plottable/issues/2661 Cannot assert errors being thrown with description
       (<any> assert).throws(() => c.computeLayout(), "null arguments",
         "cannot compute layout with no arguments and not being the top svg element");
@@ -801,7 +805,7 @@ describe("Component", () => {
     });
 
     it("renders to a node chosen through DOM element", () => {
-      c.renderTo(<Element> svg.node());
+      c.renderTo(svg);
       assert.isTrue(svg.classed("plottable"), "correct svg chosen");
       assert.isTrue(renderFlag, "component has rendered");
       c.destroy();
@@ -813,9 +817,9 @@ describe("Component", () => {
       let div = parent.append("div");
 
       // HACKHACK #2614: chai-assert.d.ts has the wrong signature
-      (<any> assert).throws(() => c.renderTo(div.node() as HTMLElement), Error,
+      (<any> assert).throws(() => c.renderTo(div), Error,
         "Plottable requires a valid SVG to renderTo", "rejects selections that don't contain svgs");
-      (<any> assert).throws(() => c.renderTo(<Element> div.node()), Error,
+      (<any> assert).throws(() => c.renderTo(div), Error,
         "Plottable requires a valid SVG to renderTo", "rejects DOM nodes that are not svgs");
       (<any> assert).throws(() => c.renderTo("#not-an-element"), Error,
         "Plottable requires a valid SVG to renderTo", "rejects strings that don't correspond to DOM elements");
@@ -866,7 +870,7 @@ describe("Component", () => {
     it("is offset by the parent's origin", () => {
       const div = TestMethods.generateDIV(SVG_WIDTH, SVG_HEIGHT);
       let parent = new Plottable.Components.Group([c]);
-      parent.anchor(div.node() as HTMLElement);
+      parent.anchor(div);
       c.anchor(svg);
       parent.computeLayout({x: SVG_WIDTH / 4, y: SVG_HEIGHT / 4}, SVG_WIDTH / 2, SVG_HEIGHT / 2);
       c.computeLayout({x: SVG_WIDTH / 4, y: SVG_HEIGHT / 4}, SVG_WIDTH / 4, SVG_HEIGHT / 4);
@@ -1014,17 +1018,6 @@ describe("Component", () => {
       svg.remove();
     });
 
-    it("doesn't add a backing if it's not the root Component", () => {
-      const component = new Plottable.SVGComponent();
-      const svg = TestMethods.generateSVG();
-      const g = svg.append("g");
-      component.anchor(g);
-
-      const backing = svg.select(`.${backingClass}`);
-      assert.isTrue(backing.empty(), "did not add a backing element");
-      svg.remove();
-    });
-
     it("removes the backing when detached", () => {
       const component = new Plottable.SVGComponent();
       const svg = TestMethods.generateSVG();
@@ -1033,22 +1026,6 @@ describe("Component", () => {
 
       const backing = svg.select(`.${backingClass}`);
       assert.isTrue(backing.empty(), "backing element was removed");
-      svg.remove();
-    });
-
-    it("doesn't add the backing even if it was previously the root Component", () => {
-      const component = new Plottable.SVGComponent();
-      const svg = TestMethods.generateSVG();
-      component.anchor(svg);
-      const backingAsRoot = svg.select(`.${backingClass}`);
-      assert.isFalse(backingAsRoot.empty(), "backing was added when Component was root");
-
-      component.detach(); // HACKHACK #3013: need to detach before re-anchoring()
-      const g = svg.append("g");
-      component.anchor(g);
-      const backingNotAsRoot = svg.select(`.${backingClass}`);
-      assert.isTrue(backingNotAsRoot.empty(), "backing element was removed");
-
       svg.remove();
     });
 

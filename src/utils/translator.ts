@@ -5,8 +5,6 @@ import * as Utils from "../utils";
 import { Point } from "../";
 import { IComponent } from "../components";
 
-import { IPlottableElement } from "./abstractPlottableElement";
-
 const _TRANSLATOR_KEY = "__Plottable_ClientTranslator";
 
 export function getTranslator(component: IComponent<any>): Translator {

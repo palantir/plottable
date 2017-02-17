@@ -24,11 +24,10 @@ export interface IComponent<D> {
   /**
    * Attaches the Component as a child of a given html element.
    *
-   * @param {D} selection.
+   * @param {HTMLElement} The root element.
    * @returns {Component} The calling Component.
    */
-  anchor(selection: D): this;
-  anchorHTML(selection: HTMLElement): this;
+  anchor(selection: d3.Selection<void>): this;
   /**
    * Adds a callback to be called on anchoring the Component to the DOM.
    * If the Component is already anchored, the callback is called immediately.
@@ -276,8 +275,7 @@ export abstract class AbstractComponent<D> implements IComponent<D> {
    * @param {D} selection.
    * @returns {Component} The calling Component.
    */
-  abstract anchor(selection: D): this;
-  abstract anchorHTML(selection: HTMLElement): this;
+  abstract anchor(selection: d3.Selection<void>): this;
   /**
    * Adds a callback to be called on anchoring the Component to the DOM.
    * If the Component is already anchored, the callback is called immediately.
