@@ -3293,9 +3293,17 @@ var AbstractComponent = (function () {
         }
         return this;
     };
+    /**
+     * Checks if the Component has a fixed width or if it grows to fill available space.
+     * @default false
+     */
     AbstractComponent.prototype.fixedWidth = function () {
         return false;
     };
+    /**
+     * Checks if the Component has a fixed height or if it grows to fill available space.
+     * @default false
+     */
     AbstractComponent.prototype.fixedHeight = function () {
         return false;
     };

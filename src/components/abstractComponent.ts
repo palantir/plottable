@@ -141,12 +141,10 @@ export interface IComponent<D> {
   removeClass(cssClass: string): this;
   /**
    * Checks if the Component has a fixed width or if it grows to fill available space.
-   * Returns false by default on the base Component class.
    */
   fixedWidth(): boolean;
   /**
    * Checks if the Component has a fixed height or if it grows to fill available space.
-   * Returns false by default on the base Component class.
    */
   fixedHeight(): boolean;
   /**
@@ -362,10 +360,18 @@ export abstract class AbstractComponent<D> implements IComponent<D> {
     return this;
   }
 
+  /**
+   * Checks if the Component has a fixed width or if it grows to fill available space.
+   * @default false
+   */
   public fixedWidth() {
     return false;
   }
 
+  /**
+   * Checks if the Component has a fixed height or if it grows to fill available space.
+   * @default false
+   */
   public fixedHeight() {
     return false;
   }
