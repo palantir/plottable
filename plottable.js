@@ -1,5 +1,5 @@
 /*!
- * Plottable 2.9.1 (https://github.com/palantir/plottable)
+ * Plottable 3.0.0-beta.1 (https://github.com/palantir/plottable)
  * Copyright 2014-2017 Palantir Technologies
  * Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
  */
@@ -123,43 +123,6 @@ module.exports = __WEBPACK_EXTERNAL_MODULE_1__;
 
 /***/ }),
 /* 2 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-/**
- * Copyright 2014-present Palantir Technologies
- * @license MIT
- */
-
-function __export(m) {
-    for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
-}
-var TickGenerators = __webpack_require__(91);
-exports.TickGenerators = TickGenerators;
-__export(__webpack_require__(41));
-__export(__webpack_require__(87));
-__export(__webpack_require__(88));
-__export(__webpack_require__(89));
-__export(__webpack_require__(90));
-__export(__webpack_require__(92));
-// ---------------------------------------------------------
-var categoryScale_2 = __webpack_require__(41);
-var quantitativeScale_1 = __webpack_require__(10);
-/**
- * Type guarded function to check if the scale implements the
- * `TransformableScale` interface. Unfortunately, there is no way to do
- * runtime interface typechecking, so we have to explicitly list all classes
- * that implement the interface.
- */
-function isTransformable(scale) {
-    return (scale instanceof quantitativeScale_1.QuantitativeScale ||
-        scale instanceof categoryScale_2.Category);
-}
-exports.isTransformable = isTransformable;
-
-
-/***/ }),
-/* 3 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -656,6 +619,43 @@ var Plot = (function (_super) {
     return Plot;
 }(svgComponent_1.SVGComponent));
 exports.Plot = Plot;
+
+
+/***/ }),
+/* 3 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/**
+ * Copyright 2014-present Palantir Technologies
+ * @license MIT
+ */
+
+function __export(m) {
+    for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
+}
+var TickGenerators = __webpack_require__(91);
+exports.TickGenerators = TickGenerators;
+__export(__webpack_require__(41));
+__export(__webpack_require__(87));
+__export(__webpack_require__(88));
+__export(__webpack_require__(89));
+__export(__webpack_require__(90));
+__export(__webpack_require__(92));
+// ---------------------------------------------------------
+var categoryScale_2 = __webpack_require__(41);
+var quantitativeScale_1 = __webpack_require__(10);
+/**
+ * Type guarded function to check if the scale implements the
+ * `TransformableScale` interface. Unfortunately, there is no way to do
+ * runtime interface typechecking, so we have to explicitly list all classes
+ * that implement the interface.
+ */
+function isTransformable(scale) {
+    return (scale instanceof quantitativeScale_1.QuantitativeScale ||
+        scale instanceof categoryScale_2.Category);
+}
+exports.isTransformable = isTransformable;
 
 
 /***/ }),
@@ -1880,9 +1880,9 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var Scales = __webpack_require__(2);
+var Scales = __webpack_require__(3);
 var Utils = __webpack_require__(0);
-var plot_1 = __webpack_require__(3);
+var plot_1 = __webpack_require__(2);
 var XYPlot = (function (_super) {
     __extends(XYPlot, _super);
     /**
@@ -3149,6 +3149,10 @@ var Axis = (function (_super) {
             }
         });
     };
+    Axis.prototype.invalidateCache = function () {
+        _super.prototype.invalidateCache.call(this);
+        this._annotationMeasurer.reset();
+    };
     /**
      * The css class applied to each end tick mark (the line on the end tick).
      */
@@ -3339,6 +3343,9 @@ var AbstractComponent = (function () {
         var _a = this._origin, x = _a.x, y = _a.y;
         return { x: x, y: y };
     };
+    AbstractComponent.prototype.invalidateCache = function () {
+        // neither base component invalidates cache
+    };
     AbstractComponent._xAlignToProportion = {
         "left": 0,
         "center": 0.5,
@@ -3469,11 +3476,11 @@ var SVGTypewriter = __webpack_require__(4);
 var Animators = __webpack_require__(5);
 var Drawers = __webpack_require__(9);
 var Formatters = __webpack_require__(8);
-var Scales = __webpack_require__(2);
+var Scales = __webpack_require__(3);
 var quantitativeScale_1 = __webpack_require__(10);
 var Utils = __webpack_require__(0);
 var Plots = __webpack_require__(17);
-var plot_1 = __webpack_require__(3);
+var plot_1 = __webpack_require__(2);
 var xyPlot_1 = __webpack_require__(15);
 var Bar = (function (_super) {
     __extends(Bar, _super);
@@ -4081,8 +4088,8 @@ var Bar = (function (_super) {
     Bar._BAR_WIDTH_RATIO = 0.95;
     Bar._SINGLE_BAR_DIMENSION_RATIO = 0.4;
     Bar._BAR_AREA_CLASS = "bar-area";
-    Bar._LABEL_PADDING = 10;
     Bar._LABEL_AREA_CLASS = "bar-label-text-area";
+    Bar._LABEL_PADDING = 10;
     return Bar;
 }(xyPlot_1.XYPlot));
 exports.Bar = Bar;
@@ -4106,7 +4113,7 @@ var __extends = (this && this.__extends) || function (d, b) {
 var d3 = __webpack_require__(1);
 var SVGTypewriter = __webpack_require__(4);
 var Formatters = __webpack_require__(8);
-var Scales = __webpack_require__(2);
+var Scales = __webpack_require__(3);
 var Utils = __webpack_require__(0);
 var axis_1 = __webpack_require__(19);
 var TimeInterval;
@@ -4492,6 +4499,10 @@ var Time = (function (_super) {
             }
         });
     };
+    Time.prototype.invalidateCache = function () {
+        _super.prototype.invalidateCache.call(this);
+        this._measurer.reset();
+    };
     /**
      * The CSS class applied to each Time Axis tier
      */
@@ -4705,6 +4716,9 @@ var ComponentContainer = (function (_super) {
     ComponentContainer.prototype.destroy = function () {
         _super.prototype.destroy.call(this);
         this._forEach(function (c) { return c.destroy(); });
+    };
+    ComponentContainer.prototype.invalidateCache = function () {
+        this._forEach(function (c) { return c.invalidateCache(); });
     };
     return ComponentContainer;
 }(htmlComponent_1.HTMLComponent));
@@ -6323,11 +6337,11 @@ var __extends = (this && this.__extends) || function (d, b) {
 };
 var d3 = __webpack_require__(1);
 var Drawers = __webpack_require__(9);
-var Scales = __webpack_require__(2);
+var Scales = __webpack_require__(3);
 var Utils = __webpack_require__(0);
 var Plots = __webpack_require__(17);
 var linePlot_1 = __webpack_require__(40);
-var plot_1 = __webpack_require__(3);
+var plot_1 = __webpack_require__(2);
 var Area = (function (_super) {
     __extends(Area, _super);
     /**
@@ -6533,11 +6547,11 @@ var __extends = (this && this.__extends) || function (d, b) {
 var d3 = __webpack_require__(1);
 var Animators = __webpack_require__(5);
 var Drawers = __webpack_require__(9);
-var Scales = __webpack_require__(2);
+var Scales = __webpack_require__(3);
 var quantitativeScale_1 = __webpack_require__(10);
 var Utils = __webpack_require__(0);
 var Plots = __webpack_require__(17);
-var plot_1 = __webpack_require__(3);
+var plot_1 = __webpack_require__(2);
 var xyPlot_1 = __webpack_require__(15);
 var Line = (function (_super) {
     __extends(Line, _super);
@@ -7004,6 +7018,19 @@ var Category = (function (_super) {
         this._innerPadding = Category._convertToPlottableInnerPadding(d3InnerPadding);
         this._outerPadding = Category._convertToPlottableOuterPadding(0.5, d3InnerPadding);
     }
+    /**
+     * Return a clone of this category scale that holds the same pan/zoom, padding, domain and range, but
+     * without any included values providers.
+     */
+    Category.prototype.cloneWithoutProviders = function () {
+        var scale = new Category()
+            .domain(this.domain())
+            .range(this.range())
+            .innerPadding(this.innerPadding())
+            .outerPadding(this.outerPadding());
+        scale._d3TransformationScale.domain(this._d3TransformationScale.domain());
+        return scale;
+    };
     Category.prototype.extentOfValues = function (values) {
         return Utils.Array.uniq(values);
     };
@@ -7012,6 +7039,22 @@ var Category = (function (_super) {
     };
     Category.prototype.domain = function (values) {
         return _super.prototype.domain.call(this, values);
+    };
+    /**
+     * Returns domain values that lie inside the given range.
+     * @param range
+     * @returns {string[]}
+     */
+    Category.prototype.invertRange = function (range) {
+        if (range === void 0) { range = this.range(); }
+        var rangeBand = this._d3Scale.rangeBand();
+        // offset the domain by half the rangeBand such that we consider the
+        // center of the bars
+        var domainStartNormalized = this.invertedTransformation(range[0]) - rangeBand / 2;
+        var domainEndNormalized = this.invertedTransformation(range[1]) - rangeBand / 2;
+        var domainStart = d3.bisect(this._d3Scale.range(), domainStartNormalized);
+        var domainEnd = d3.bisect(this._d3Scale.range(), domainEndNormalized);
+        return this._d3Scale.domain().slice(domainStart, domainEnd);
     };
     Category.prototype.range = function (values) {
         return _super.prototype.range.call(this, values);
@@ -7737,7 +7780,12 @@ exports.Dataset = Dataset;
  * @license MIT
  */
 
-exports.version = "2.9.1";
+/*
+ * WARNING: The js output of this expression is searched by string (yes, I know) and replaced with a
+ * real version number during the dist phase for for npm module publishing. Modifying this line should
+ * be accompanied by modifying the "sed-version" task in package.json accordingly.
+ */
+exports.version = "3.0.0-beta.1";
 
 
 /***/ }),
@@ -7905,7 +7953,6 @@ var __extends = (this && this.__extends) || function (d, b) {
 var d3 = __webpack_require__(1);
 var SVGTypewriter = __webpack_require__(4);
 var axis_1 = __webpack_require__(19);
-var Scales = __webpack_require__(2);
 var Utils = __webpack_require__(0);
 var Category = (function (_super) {
     __extends(Category, _super);
@@ -7921,7 +7968,14 @@ var Category = (function (_super) {
     function Category(scale, orientation) {
         if (orientation === void 0) { orientation = "bottom"; }
         _super.call(this, scale, orientation);
+        /**
+         * The rotation angle of tick label text. Only 0, 90, -90 are supported
+         */
         this._tickLabelAngle = 0;
+        /**
+         * The shear angle of the tick label text. Only values -80 <= x <= 80 are supported
+         */
+        this._tickLabelShearAngle = 0;
         this.addClass("category-axis");
     }
     Object.defineProperty(Category.prototype, "_wrapper", {
@@ -8011,11 +8065,15 @@ var Category = (function (_super) {
      * @param {Scales.Category} scale - The scale being downsampled. Defaults to this Axis' scale.
      * @return {DownsampleInfo} an object holding the resultant domain and new stepWidth.
      */
-    Category.prototype.getDownsampleInfo = function (scale) {
+    Category.prototype.getDownsampleInfo = function (scale, domain) {
         if (scale === void 0) { scale = this._scale; }
-        var downsampleRatio = Math.ceil(Category._MINIMUM_WIDTH_PER_LABEL_PX / scale.stepWidth());
+        if (domain === void 0) { domain = scale.invertRange(); }
+        // account for how shearing tightens the space between vertically oriented ticks
+        var shearFactor = this._tickLabelAngle === 0 ? 1 : 1 / Math.cos(this._tickLabelShearAngle / 180 * Math.PI);
+        var shearedMinimumWidth = Category._MINIMUM_WIDTH_PER_LABEL_PX * shearFactor;
+        var downsampleRatio = Math.ceil(shearedMinimumWidth / scale.stepWidth());
         return {
-            domain: scale.domain().filter(function (d, i) { return i % downsampleRatio === 0; }),
+            domain: domain.filter(function (d, i) { return i % downsampleRatio === 0; }),
             stepWidth: downsampleRatio * scale.stepWidth(),
         };
     };
@@ -8027,6 +8085,17 @@ var Category = (function (_super) {
             throw new Error("Angle " + angle + " not supported; only 0, 90, and -90 are valid values");
         }
         this._tickLabelAngle = angle;
+        this.redraw();
+        return this;
+    };
+    Category.prototype.tickLabelShearAngle = function (angle) {
+        if (angle == null) {
+            return this._tickLabelShearAngle;
+        }
+        if (angle < -80 || angle > 80) {
+            throw new Error("Angle " + angle + " not supported; Must be between [-80, 80]");
+        }
+        this._tickLabelShearAngle = angle;
         this.redraw();
         return this;
     };
@@ -8105,6 +8174,7 @@ var Category = (function (_super) {
                 xAlign: xAlign[self.orientation()],
                 yAlign: yAlign[self.orientation()],
                 textRotation: self.tickLabelAngle(),
+                textShear: self.tickLabelShearAngle(),
             };
             if (self._tickLabelMaxWidth != null) {
                 // for left-oriented axes, we must move the ticks by the amount we've cut off in order to keep the text
@@ -8131,10 +8201,7 @@ var Category = (function (_super) {
         var _this = this;
         var thisScale = this._scale;
         // set up a test scale to simulate rendering ticks with the given width and height.
-        var scale = new Scales.Category()
-            .domain(thisScale.domain())
-            .innerPadding(thisScale.innerPadding())
-            .outerPadding(thisScale.outerPadding())
+        var scale = thisScale.cloneWithoutProviders()
             .range([0, this.isHorizontal() ? axisWidth : axisHeight]);
         var _a = this.getDownsampleInfo(scale), domain = _a.domain, stepWidth = _a.stepWidth;
         // HACKHACK: https://github.com/palantir/svg-typewriter/issues/25
@@ -8185,7 +8252,7 @@ var Category = (function (_super) {
         var _this = this;
         _super.prototype.renderImmediately.call(this);
         var catScale = this._scale;
-        var _a = this.getDownsampleInfo(), domain = _a.domain, stepWidth = _a.stepWidth;
+        var _a = this.getDownsampleInfo(catScale), domain = _a.domain, stepWidth = _a.stepWidth;
         var tickLabels = this._tickLabelContainer.selectAll("." + axis_1.Axis.TICK_LABEL_CLASS).data(domain, function (d) { return d; });
         // Give each tick a stepWidth of space which will partition the entire axis evenly
         var availableTextSpace = stepWidth;
@@ -8212,20 +8279,19 @@ var Category = (function (_super) {
         // hide ticks and labels that overflow the axis
         this._showAllTickMarks();
         this._showAllTickLabels();
-        this._hideOverflowingTickLabels();
         this._hideTickMarksWithoutLabel();
         return this;
     };
     Category.prototype.computeLayout = function (origin, availableWidth, availableHeight) {
-        // When anyone calls redraw(), computeLayout() will be called
-        // on everyone, including this. Since CSS or something might have
-        // affected the size of the characters, clear the cache.
-        this._measurer.reset();
         _super.prototype.computeLayout.call(this, origin, availableWidth, availableHeight);
         if (!this.isHorizontal()) {
             this._scale.range([0, this.height()]);
         }
         return this;
+    };
+    Category.prototype.invalidateCache = function () {
+        _super.prototype.invalidateCache.call(this);
+        this._measurer.reset();
     };
     /**
      * How many pixels to give labels at minimum before downsampling takes effect.
@@ -8536,6 +8602,10 @@ var Numeric = (function (_super) {
             }
         }
         return true;
+    };
+    Numeric.prototype.invalidateCache = function () {
+        _super.prototype.invalidateCache.call(this);
+        this._measurer.reset();
     };
     return Numeric;
 }(axis_1.Axis));
@@ -9227,6 +9297,10 @@ var Label = (function (_super) {
         this._writer.write(this._text, writeWidth, writeHeight, writeOptions);
         return this;
     };
+    Label.prototype.invalidateCache = function () {
+        _super.prototype.invalidateCache.call(this);
+        this._measurer.reset();
+    };
     return Label;
 }(svgComponent_1.SVGComponent));
 exports.Label = Label;
@@ -9777,7 +9851,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var plot_1 = __webpack_require__(3);
+var plot_1 = __webpack_require__(2);
 var Utils = __webpack_require__(0);
 var group_1 = __webpack_require__(35);
 var PlotGroup = (function (_super) {
@@ -11428,7 +11502,7 @@ var __extends = (this && this.__extends) || function (d, b) {
 };
 var d3 = __webpack_require__(1);
 var Dispatchers = __webpack_require__(11);
-var Scales = __webpack_require__(2);
+var Scales = __webpack_require__(3);
 var Utils = __webpack_require__(0);
 var interaction_1 = __webpack_require__(12);
 var Interactions = __webpack_require__(14);
@@ -12115,10 +12189,10 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var Scales = __webpack_require__(2);
+var Scales = __webpack_require__(3);
 var Utils = __webpack_require__(0);
 var barPlot_1 = __webpack_require__(23);
-var plot_1 = __webpack_require__(3);
+var plot_1 = __webpack_require__(2);
 var ClusteredBar = (function (_super) {
     __extends(ClusteredBar, _super);
     /**
@@ -12193,9 +12267,9 @@ var SVGTypewriter = __webpack_require__(4);
 var Animators = __webpack_require__(5);
 var Drawers = __webpack_require__(9);
 var Formatters = __webpack_require__(8);
-var Scales = __webpack_require__(2);
+var Scales = __webpack_require__(3);
 var Utils = __webpack_require__(0);
-var plot_1 = __webpack_require__(3);
+var plot_1 = __webpack_require__(2);
 var Pie = (function (_super) {
     __extends(Pie, _super);
     /**
@@ -12688,9 +12762,9 @@ var d3 = __webpack_require__(1);
 var SVGTypewriter = __webpack_require__(4);
 var Animators = __webpack_require__(5);
 var Drawers = __webpack_require__(9);
-var Scales = __webpack_require__(2);
+var Scales = __webpack_require__(3);
 var Utils = __webpack_require__(0);
-var plot_1 = __webpack_require__(3);
+var plot_1 = __webpack_require__(2);
 var xyPlot_1 = __webpack_require__(15);
 var Rectangle = (function (_super) {
     __extends(Rectangle, _super);
@@ -13053,10 +13127,10 @@ var __extends = (this && this.__extends) || function (d, b) {
 var Animators = __webpack_require__(5);
 var SymbolFactories = __webpack_require__(27);
 var Drawers = __webpack_require__(9);
-var Scales = __webpack_require__(2);
+var Scales = __webpack_require__(3);
 var Utils = __webpack_require__(0);
 var Plots = __webpack_require__(17);
-var plot_1 = __webpack_require__(3);
+var plot_1 = __webpack_require__(2);
 var xyPlot_1 = __webpack_require__(15);
 var Scatter = (function (_super) {
     __extends(Scatter, _super);
@@ -13230,8 +13304,8 @@ var __extends = (this && this.__extends) || function (d, b) {
 };
 var Animators = __webpack_require__(5);
 var Drawers = __webpack_require__(9);
-var Scales = __webpack_require__(2);
-var plot_1 = __webpack_require__(3);
+var Scales = __webpack_require__(3);
+var plot_1 = __webpack_require__(2);
 var xyPlot_1 = __webpack_require__(15);
 var Segment = (function (_super) {
     __extends(Segment, _super);
@@ -13430,7 +13504,7 @@ var d3 = __webpack_require__(1);
 var Animators = __webpack_require__(5);
 var Utils = __webpack_require__(0);
 var areaPlot_1 = __webpack_require__(38);
-var plot_1 = __webpack_require__(3);
+var plot_1 = __webpack_require__(2);
 var StackedArea = (function (_super) {
     __extends(StackedArea, _super);
     /**
@@ -13702,10 +13776,13 @@ var StackedBar = (function (_super) {
         var secondaryScale = this._isVertical ? this.y().scale : this.x().scale;
         var _a = Utils.Stacking.stackedExtents(this._stackingResult), maximumExtents = _a.maximumExtents, minimumExtents = _a.minimumExtents;
         var barWidth = this._getBarPixelWidth();
+        var anyTooWide = [];
         var drawLabel = function (text, measurement, labelPosition) {
             var x = labelPosition.x, y = labelPosition.y;
             var height = measurement.height, width = measurement.width;
-            var tooWide = _this._isVertical ? (width > barWidth) : (height > barWidth);
+            var tooWide = _this._isVertical
+                ? (width > barWidth - (2 * StackedBar._LABEL_PADDING))
+                : (height > barWidth - (2 * StackedBar._LABEL_PADDING));
             var hideLabel = x < 0
                 || y < 0
                 || x + width > _this.width()
@@ -13722,6 +13799,7 @@ var StackedBar = (function (_super) {
                 };
                 _this._writer.write(text, measurement.width, measurement.height, writeOptions);
             }
+            return tooWide;
         };
         maximumExtents.forEach(function (maximum) {
             if (maximum.extent !== baselineValue) {
@@ -13736,7 +13814,7 @@ var StackedBar = (function (_super) {
                 var y = _this._isVertical
                     ? secondaryScale.scale(maximum.extent) - secondaryTextMeasurement - StackedBar._STACKED_BAR_LABEL_PADDING
                     : primaryScale.scale(maximum.axisValue) - primaryTextMeasurement / 2;
-                drawLabel(text, measurement, { x: x, y: y });
+                anyTooWide.push(drawLabel(text, measurement, { x: x, y: y }));
             }
         });
         minimumExtents.forEach(function (minimum) {
@@ -13751,9 +13829,12 @@ var StackedBar = (function (_super) {
                 var y = _this._isVertical
                     ? secondaryScale.scale(minimum.extent) + StackedBar._STACKED_BAR_LABEL_PADDING
                     : primaryScale.scale(minimum.axisValue) - primaryTextMeasurement / 2;
-                drawLabel(text, measurement, { x: x, y: y });
+                anyTooWide.push(drawLabel(text, measurement, { x: x, y: y }));
             }
         });
+        if (anyTooWide.some(function (d) { return d; })) {
+            this._labelArea.selectAll("g").remove();
+        }
     };
     StackedBar.prototype._generateAttrToProjector = function () {
         var _this = this;
@@ -13816,6 +13897,10 @@ var StackedBar = (function (_super) {
         this._stackingResult = Utils.Stacking.stack(datasets, keyAccessor, valueAccessor, this._stackingOrder);
         this._stackedExtent = Utils.Stacking.stackedExtent(this._stackingResult, keyAccessor, filter);
     };
+    StackedBar.prototype.invalidateCache = function () {
+        _super.prototype.invalidateCache.call(this);
+        this._measurer.reset();
+    };
     StackedBar._STACKED_BAR_LABEL_PADDING = 5;
     return StackedBar;
 }(barPlot_1.Bar));
@@ -13839,7 +13924,7 @@ var __extends = (this && this.__extends) || function (d, b) {
 };
 var Utils = __webpack_require__(0);
 var barPlot_1 = __webpack_require__(23);
-var plot_1 = __webpack_require__(3);
+var plot_1 = __webpack_require__(2);
 var Waterfall = (function (_super) {
     __extends(Waterfall, _super);
     function Waterfall() {
@@ -14426,7 +14511,7 @@ var __extends = (this && this.__extends) || function (d, b) {
 };
 var d3 = __webpack_require__(1);
 var Utils = __webpack_require__(0);
-var Scales = __webpack_require__(2);
+var Scales = __webpack_require__(3);
 var quantitativeScale_1 = __webpack_require__(10);
 var ModifiedLog = (function (_super) {
     __extends(ModifiedLog, _super);
@@ -16334,7 +16419,7 @@ var Interactions = __webpack_require__(14);
 exports.Interactions = Interactions;
 var Plots = __webpack_require__(17);
 exports.Plots = Plots;
-var Scales = __webpack_require__(2);
+var Scales = __webpack_require__(3);
 exports.Scales = Scales;
 var Utils = __webpack_require__(0);
 exports.Utils = Utils;
@@ -16353,7 +16438,7 @@ __export(__webpack_require__(7));
 __export(__webpack_require__(12));
 __export(__webpack_require__(34));
 __export(__webpack_require__(15));
-__export(__webpack_require__(3));
+__export(__webpack_require__(2));
 __export(__webpack_require__(10));
 __export(__webpack_require__(18));
 

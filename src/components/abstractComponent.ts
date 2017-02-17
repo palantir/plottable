@@ -214,6 +214,13 @@ export interface IComponent<D> {
    * Gets the top-level element of the component
    */
   element(): d3.Selection<void>;
+ /**
+   * Tell this component to invalidate any caching. This function should be
+   * called when a CSS change has occurred that could influence the layout
+   * of the Component, such as changing the font size.
+   *
+   */
+  invalidateCache(): void;
 }
 
 export abstract class AbstractComponent<D> implements IComponent<D> {
@@ -422,4 +429,8 @@ export abstract class AbstractComponent<D> implements IComponent<D> {
 
   abstract content(): d3.Selection<void>;
   abstract element():  d3.Selection<void>;
+
+  public invalidateCache() {
+    // neither base component invalidates cache
+  }
 }

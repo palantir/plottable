@@ -17,7 +17,7 @@ export class StackedBar<X, Y> extends Bar<X, Y> {
   protected static _STACKED_BAR_LABEL_PADDING = 5;
 
   private _labelArea: d3.Selection<void>;
-  private _measurer: SVGTypewriter.Measurer;
+  private _measurer: SVGTypewriter.CacheMeasurer;
   private _writer: SVGTypewriter.Writer;
   private _stackingOrder: Utils.Stacking.IStackingOrder;
   private _stackingResult: Utils.Stacking.StackingResult;
@@ -117,11 +117,14 @@ export class StackedBar<X, Y> extends Bar<X, Y> {
     const secondaryScale: Scale<any, number> = this._isVertical ? this.y().scale : this.x().scale;
     const { maximumExtents, minimumExtents } = Utils.Stacking.stackedExtents<Date | string | number>(this._stackingResult);
     const barWidth = this._getBarPixelWidth();
+    const anyTooWide: boolean[] = [];
 
     const drawLabel = (text: string, measurement: { height: number, width: number }, labelPosition: Point) => {
       const { x, y } = labelPosition;
       const { height, width } = measurement;
-      const tooWide = this._isVertical ? ( width > barWidth ) : ( height > barWidth );
+      const tooWide = this._isVertical
+        ? ( width > barWidth - (2 * StackedBar._LABEL_PADDING) )
+        : ( height > barWidth - (2 * StackedBar._LABEL_PADDING) );
 
       const hideLabel = x < 0
         || y < 0
@@ -142,6 +145,8 @@ export class StackedBar<X, Y> extends Bar<X, Y> {
 
         this._writer.write(text, measurement.width, measurement.height, writeOptions);
       }
+
+      return tooWide;
     };
 
     maximumExtents.forEach((maximum) => {
@@ -161,7 +166,7 @@ export class StackedBar<X, Y> extends Bar<X, Y> {
           ? secondaryScale.scale(maximum.extent) - secondaryTextMeasurement - StackedBar._STACKED_BAR_LABEL_PADDING
           : primaryScale.scale(maximum.axisValue) - primaryTextMeasurement / 2;
 
-        drawLabel(text, measurement, { x, y });
+        anyTooWide.push(drawLabel(text, measurement, { x, y }));
       }
     });
 
@@ -180,9 +185,13 @@ export class StackedBar<X, Y> extends Bar<X, Y> {
           ? secondaryScale.scale(minimum.extent) + StackedBar._STACKED_BAR_LABEL_PADDING
           : primaryScale.scale(minimum.axisValue) - primaryTextMeasurement / 2;
 
-        drawLabel(text, measurement, { x, y });
+        anyTooWide.push(drawLabel(text, measurement, { x, y }));
       }
     });
+
+    if (anyTooWide.some((d) => d)) {
+      this._labelArea.selectAll("g").remove();
+    }
   }
 
   protected _generateAttrToProjector() {
@@ -249,5 +258,10 @@ export class StackedBar<X, Y> extends Bar<X, Y> {
 
     this._stackingResult = Utils.Stacking.stack(datasets, keyAccessor, valueAccessor, this._stackingOrder);
     this._stackedExtent = Utils.Stacking.stackedExtent(this._stackingResult, keyAccessor, filter);
+  }
+
+  public invalidateCache() {
+    super.invalidateCache();
+    this._measurer.reset();
   }
 }

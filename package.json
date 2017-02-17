@@ -1,7 +1,7 @@
 {
   "name": "plottable",
   "description": "A modular charting library built on D3",
-  "version": "2.9.1",
+  "version": "3.0.0-beta.1",
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -15,7 +15,10 @@
     "build:tsc": "tsc -p test/",
     "build:webpack": "webpack --config webpack.config.js",
     "check_version": "echo ${npm_package_version} $(npm view ${npm_package_name} version) | awk '{ if ($1 == $2) { exit 1 }}'",
-    "start": "npm-run-all -p start:watch-tsc start:watch-quicktests start:webpack-dev-server",
+    "dist-compile": "grunt dist-compile",
+    "sed-version": "sed -i.bak -e \"s/exports.version = __VERSION__/exports.version = \\\"${npm_package_version}\\\"/\" build/src/core/version.js",
+    "start": "npm-run-all -p start:update-quicktests start:watch-tsc start:watch-quicktests start:webpack-dev-server",
+    "start:update-quicktests": "grunt update-quicktests",
     "start:watch-quicktests": "grunt watch-quicktests",
     "start:watch-tsc": "tsc -w -p test/",
     "start:webpack-dev-server": "webpack-dev-server",
@@ -62,6 +65,6 @@
   },
   "dependencies": {
     "d3": "^3.5.16",
-    "svg-typewriter": "1.0.2"
+    "svg-typewriter": "1.1.0"
   }
 }

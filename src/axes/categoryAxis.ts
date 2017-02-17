@@ -22,7 +22,15 @@ export class Category extends Axis<string> {
    */
   private static _MINIMUM_WIDTH_PER_LABEL_PX = 15;
 
+  /**
+   * The rotation angle of tick label text. Only 0, 90, -90 are supported
+   */
   private _tickLabelAngle = 0;
+
+  /**
+   * The shear angle of the tick label text. Only values -80 <= x <= 80 are supported
+   */
+  private _tickLabelShearAngle = 0;
 
   /**
    * Maximum allowable px width of tick labels.
@@ -139,10 +147,13 @@ export class Category extends Axis<string> {
    * @param {Scales.Category} scale - The scale being downsampled. Defaults to this Axis' scale.
    * @return {DownsampleInfo} an object holding the resultant domain and new stepWidth.
    */
-  public getDownsampleInfo(scale: Scales.Category = <Scales.Category> this._scale): DownsampleInfo {
-    const downsampleRatio = Math.ceil(Category._MINIMUM_WIDTH_PER_LABEL_PX / scale.stepWidth());
+  public getDownsampleInfo(scale: Scales.Category = <Scales.Category> this._scale, domain = scale.invertRange()): DownsampleInfo {
+    // account for how shearing tightens the space between vertically oriented ticks
+    const shearFactor = this._tickLabelAngle === 0 ? 1 : 1 / Math.cos(this._tickLabelShearAngle / 180 * Math.PI);
+    const shearedMinimumWidth = Category._MINIMUM_WIDTH_PER_LABEL_PX * shearFactor;
+    const downsampleRatio = Math.ceil(shearedMinimumWidth / scale.stepWidth());
     return {
-      domain: scale.domain().filter((d, i) => i % downsampleRatio === 0),
+      domain: domain.filter((d, i) => i % downsampleRatio === 0),
       stepWidth: downsampleRatio * scale.stepWidth(),
     };
   }
@@ -167,6 +178,30 @@ export class Category extends Axis<string> {
       throw new Error("Angle " + angle + " not supported; only 0, 90, and -90 are valid values");
     }
     this._tickLabelAngle = angle;
+    this.redraw();
+    return this;
+  }
+
+  /**
+   * Gets the tick label shear angle in degrees.
+   */
+  public tickLabelShearAngle(): number;
+  /**
+   * Sets the tick label shear angle in degrees.
+   * Only angles between -80 and 80 are supported.
+   *
+   * @param {number} angle
+   * @returns {Category} The calling Category Axis.
+   */
+  public tickLabelShearAngle(angle: number): this;
+  public tickLabelShearAngle(angle?: number): any {
+    if (angle == null) {
+      return this._tickLabelShearAngle;
+    }
+    if (angle < -80 || angle > 80) {
+      throw new Error("Angle " + angle + " not supported; Must be between [-80, 80]");
+    }
+    this._tickLabelShearAngle = angle;
     this.redraw();
     return this;
   }
@@ -254,6 +289,7 @@ export class Category extends Axis<string> {
         xAlign: xAlign[self.orientation()],
         yAlign: yAlign[self.orientation()],
         textRotation: self.tickLabelAngle(),
+        textShear: self.tickLabelShearAngle(),
       };
       if (self._tickLabelMaxWidth != null) {
         // for left-oriented axes, we must move the ticks by the amount we've cut off in order to keep the text
@@ -265,6 +301,7 @@ export class Category extends Axis<string> {
         }
         width = Math.min(width, self._tickLabelMaxWidth);
       }
+
       self._writer.write(self.formatter()(d), width, height, writeOptions);
     });
   }
@@ -281,10 +318,7 @@ export class Category extends Axis<string> {
     const thisScale = <Scales.Category> this._scale;
 
     // set up a test scale to simulate rendering ticks with the given width and height.
-    const scale = new Scales.Category()
-      .domain(thisScale.domain())
-      .innerPadding(thisScale.innerPadding())
-      .outerPadding(thisScale.outerPadding())
+    const scale = thisScale.cloneWithoutProviders()
       .range([0, this.isHorizontal() ? axisWidth : axisHeight]);
 
     const { domain, stepWidth } = this.getDownsampleInfo(scale);
@@ -345,7 +379,7 @@ export class Category extends Axis<string> {
   public renderImmediately() {
     super.renderImmediately();
     let catScale = <Scales.Category> this._scale;
-    const { domain, stepWidth } = this.getDownsampleInfo();
+    const { domain, stepWidth } = this.getDownsampleInfo(catScale);
     let tickLabels = this._tickLabelContainer.selectAll("." + Axis.TICK_LABEL_CLASS).data(domain, (d) => d);
     // Give each tick a stepWidth of space which will partition the entire axis evenly
     let availableTextSpace = stepWidth;
@@ -375,20 +409,20 @@ export class Category extends Axis<string> {
     // hide ticks and labels that overflow the axis
     this._showAllTickMarks();
     this._showAllTickLabels();
-    this._hideOverflowingTickLabels();
     this._hideTickMarksWithoutLabel();
     return this;
   }
 
   public computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number) {
-    // When anyone calls redraw(), computeLayout() will be called
-    // on everyone, including this. Since CSS or something might have
-    // affected the size of the characters, clear the cache.
-    this._measurer.reset();
     super.computeLayout(origin, availableWidth, availableHeight);
     if (!this.isHorizontal()) {
       this._scale.range([0, this.height()]);
     }
     return this;
+  }
+
+  public invalidateCache() {
+    super.invalidateCache();
+    this._measurer.reset();
   }
 }

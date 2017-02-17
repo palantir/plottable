@@ -36,9 +36,9 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
   private static _BAR_WIDTH_RATIO = 0.95;
   private static _SINGLE_BAR_DIMENSION_RATIO = 0.4;
   private static _BAR_AREA_CLASS = "bar-area";
-  private static _LABEL_PADDING = 10;
 
   protected static _LABEL_AREA_CLASS = "bar-label-text-area";
+  protected static _LABEL_PADDING = 10;
 
   private _baseline: d3.Selection<void>;
   private _baselineValue: X|Y;
