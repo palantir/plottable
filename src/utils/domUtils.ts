@@ -77,6 +77,24 @@ export function elementHeight(element: Element) {
     + _parseStyleValue(style, "border-bottom-width");
 }
 
+const TRANSLATE_REGEX = /translate\(\s*([-+]?[0-9]*\.?[0-9]+)\s*,?\s*([-+]?[0-9]*\.?[0-9]+)\s*\)/;
+/**
+ * Accepts selections whose .transform contain a "translate(a, b)" and extracts the a and b
+ */
+export function getTranslateValues(el: SimpleSelection<any>): [number, number] {
+  const [, translateX, translateY] = TRANSLATE_REGEX.exec(el.attr("transform"));
+  return [+translateX, +translateY];
+}
+
+const ROTATE_REGEX = /rotate\(\s*([-+]?[0-9]*\.?[0-9]+)\s*\)/;
+/**
+ * Accepts selections whose .transform contain a "rotate(angle)" and returns the angle
+ */
+export function getRotate(el: SimpleSelection<any>): number {
+  const [, rotation] = ROTATE_REGEX.exec(el.attr("transform"));
+  return +rotation;
+}
+
 /**
  * Checks if the first ClientRect overlaps the second.
  *

@@ -6,6 +6,7 @@ import { assert } from "chai";
 import * as Plottable from "../../src";
 
 import * as TestMethods from "../testMethods";
+import { getTranslateValues, getRotate } from "../../src/utils/domUtils";
 
 describe("Category Axes", () => {
   describe("rendering the tick labels", () => {
@@ -17,7 +18,7 @@ describe("Category Axes", () => {
       axis.renderTo(svg);
 
       let ticks = axis.content().selectAll("text");
-      let texts = ticks[0].map((tick: any) => d3.select(tick).text());
+      let texts = ticks.nodes().map((tick: any) => d3.select(tick).text());
       assert.deepEqual(texts, domain[0].split("\n"), "newlines are supported in domains");
 
       svg.remove();
@@ -31,28 +32,28 @@ describe("Category Axes", () => {
       axis.renderTo(svg);
 
       let ticks = axis.content().selectAll("text");
-      let texts = ticks[0].map((tick: any) => d3.select(tick).text());
+      let texts = ticks.nodes().map((tick: any) => d3.select(tick).text());
       assert.deepEqual(texts, domain, "text displayed correctly when horizontal");
 
       axis.tickLabelAngle(90);
       ticks = axis.content().selectAll("text");
-      texts = ticks[0].map((d: any) => d3.select(d).text());
+      texts = ticks.nodes().map((d: any) => d3.select(d).text());
       assert.deepEqual(texts, domain, "text displayed correctly when horizontal");
-      assert.closeTo(d3.transform(axis.content().selectAll(".text-area").attr("transform")).rotate, 90,
+      assert.closeTo(getRotate(axis.content().selectAll(".text-area")), 90,
         window.Pixel_CloseTo_Requirement, "the ticks were rotated right");
 
       axis.tickLabelAngle(0);
       ticks = axis.content().selectAll("text");
-      texts = ticks[0].map((d: any) => d3.select(d).text());
+      texts = ticks.nodes().map((d: any) => d3.select(d).text());
       assert.deepEqual(texts, domain, "text displayed correctly when horizontal");
-      assert.closeTo(d3.transform(axis.content().selectAll(".text-area").attr("transform")).rotate, 0,
+      assert.closeTo(getRotate(axis.content().selectAll(".text-area")), 0,
         window.Pixel_CloseTo_Requirement, "the ticks were rotated right");
 
       axis.tickLabelAngle(-90);
       ticks = axis.content().selectAll("text");
-      texts = ticks[0].map((d: any) => d3.select(d).text());
+      texts = ticks.nodes().map((d: any) => d3.select(d).text());
       assert.deepEqual(texts, domain, "text displayed correctly when horizontal");
-      assert.closeTo(d3.transform(axis.content().selectAll(".text-area").attr("transform")).rotate, -90,
+      assert.closeTo(getRotate(axis.content().selectAll(".text-area")), -90,
         window.Pixel_CloseTo_Requirement, "the ticks were rotated left");
 
       svg.remove();
@@ -85,7 +86,7 @@ describe("Category Axes", () => {
 
       const tickLabels = axis.content().selectAll(".tick-label");
       assert.strictEqual(tickLabels.size(), 2, "only renders two labels");
-      const [longLabel, shortLabel] = tickLabels[0];
+      const [longLabel, shortLabel] = tickLabels.nodes();
       assert.strictEqual(d3.select(longLabel).selectAll("text").size(), 2, "first label is only two lines long");
       assert.strictEqual(d3.select(shortLabel).selectAll("text").size(), 1, "second label is only one line long");
 
@@ -138,9 +139,9 @@ describe("Category Axes", () => {
     it("does not overlap labels with tick marks", () => {
 
       function verifyTickLabelOverlaps(tickLabels: SimpleSelection<void>, tickMarks: SimpleSelection<void>) {
-          for (let i = 0; i < tickLabels[0].length; i++) {
-            let tickLabelRect = (<Element> tickLabels[0][i]).getBoundingClientRect();
-            let tickMarkRect = (<Element> tickMarks[0][i]).getBoundingClientRect();
+          for (let i = 0; i < tickLabels.nodes().length; i++) {
+            let tickLabelRect = (<Element> tickLabels.nodes()[i]).getBoundingClientRect();
+            let tickMarkRect = (<Element> tickMarks.nodes()[i]).getBoundingClientRect();
             assert.isFalse(Plottable.Utils.DOM.clientRectsOverlap(tickLabelRect, tickMarkRect), "tick label and rect do not overlap");
           }
       }
@@ -151,8 +152,8 @@ describe("Category Axes", () => {
       scale.domain(["A", "B", "C"]);
       axis.renderTo(svg);
 
-      let tickLabels = axis.content().selectAll(".tick-label");
-      let tickMarks = axis.content().selectAll(".tick-mark");
+      let tickLabels = axis.content().selectAll<SVGGElement, any>(".tick-label");
+      let tickMarks = axis.content().selectAll<SVGElement, any>(".tick-mark");
       verifyTickLabelOverlaps(tickLabels, tickMarks);
       axis.orientation("right");
       verifyTickLabelOverlaps(tickLabels, tickMarks);
@@ -170,7 +171,7 @@ describe("Category Axes", () => {
       assert.deepEqual(tickLabels.data(), domain, "tick label per datum in given order");
 
       let getYTransform = (selection: SimpleSelection<any>) => {
-        return d3.transform(selection.attr("transform")).translate[1];
+        return getTranslateValues(selection)[1];
       };
 
       tickLabels.each(function(d, i) {
@@ -178,7 +179,7 @@ describe("Category Axes", () => {
           return;
         }
         let tickLabel = d3.select(this);
-        let nextTickLabel = d3.select(tickLabels[0][i + 1]);
+        let nextTickLabel = d3.select(tickLabels.nodes()[i + 1]);
         assert.operator(getYTransform(tickLabel), "<", getYTransform(nextTickLabel), "labels render from top to bottom");
       });
 
@@ -197,7 +198,7 @@ describe("Category Axes", () => {
       assert.deepEqual(tickLabels.data(), domain, "tick label per datum in given order");
 
       let getXTransform = (selection: SimpleSelection<any>) => {
-        return d3.transform(selection.attr("transform")).translate[0];
+        return getTranslateValues(selection)[0];
       };
 
       tickLabels.each(function(d, i) {
@@ -205,7 +206,7 @@ describe("Category Axes", () => {
           return;
         }
         let tickLabel = d3.select(this);
-        let nextTickLabel = d3.select(tickLabels[0][i + 1]);
+        let nextTickLabel = d3.select(tickLabels.nodes()[i + 1]);
         assert.operator(getXTransform(tickLabel), "<", getXTransform(nextTickLabel), "labels render from left to right");
       });
 
@@ -345,7 +346,7 @@ describe("Category Axes", () => {
       let scale = new Plottable.Scales.Category().domain(domain);
       let axis = new Plottable.Axes.Category(scale, "bottom");
       axis.renderTo(svg);
-      let texts = svg.selectAll("text")[0].map((s: any) => d3.select(s).text());
+      let texts = svg.selectAll("text").nodes().map((s: any) => d3.select(s).text());
       assert.deepEqual(texts, domain.map((d) => String(d)));
       axis.destroy();
       svg.remove();

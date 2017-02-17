@@ -533,9 +533,8 @@ export class Legend extends Component {
           const symbolElement = d3.select(entryElement).select(`.${Legend.LEGEND_SYMBOL_CLASS}`);
 
           // HACKHACK The 2.x API returns the center {x, y} of the symbol as the position.
-          const translateRegex = /translate\(\s*([-+]?[0-9]*\.?[0-9]+),?\s*([-+]?[0-9]*\.?[0-9]+)\s*\)/;
-          const [, ...rowTranslate] = translateRegex.exec(d3.select(rowElement).attr("transform"));
-          const [, ...symbolTranslate] = translateRegex.exec(symbolElement.attr("transform"));
+          const rowTranslate = Utils.DOM.getTranslateValues(d3.select(rowElement));
+          const symbolTranslate = Utils.DOM.getTranslateValues(symbolElement);
 
           return [{
             datum: column.data.name,

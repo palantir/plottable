@@ -400,12 +400,12 @@ describe("Axis", () => {
         assert.strictEqual(annotationCircles.size(), annotatedTicks.length, "circle for each annotated tick");
 
         let axisPointX = (index: number) => {
-          let correspRect = d3.select(annotationRects[0][index]);
+          let correspRect = d3.select(annotationRects.nodes()[index]);
           return isHorizOrient(orientation) ? numAttr(correspRect, "x") : (orientation === "left" ? axis.width() : 0);
         };
 
         let axisPointY = (index: number) => {
-          let correspRect = d3.select(annotationRects[0][index]);
+          let correspRect = d3.select(annotationRects.nodes()[index]);
           return isHorizOrient(orientation) ? (orientation === "top" ? axis.height() : 0) : numAttr(correspRect, "y");
         };
 
@@ -421,7 +421,7 @@ describe("Axis", () => {
 
         annotationLines.each(function (d, i) {
           let annotationLine = d3.select(this);
-          let correspondingRect = d3.select(annotationRects[0][i]);
+          let correspondingRect = d3.select(annotationRects.nodes()[i]);
           let x2 = numAttr(correspondingRect, "x") + (orientation === "left" ? numAttr(correspondingRect, "width") : 0);
           let y2 = numAttr(correspondingRect, "y") + (orientation === "top" ? numAttr(correspondingRect, "height") : 0);
           assert.closeTo(numAttr(annotationLine, "x1"), axisPointX(i), window.Pixel_CloseTo_Requirement, `line ${i} x1`);
@@ -436,7 +436,7 @@ describe("Axis", () => {
 
         annotationLabelTexts.each(function (d, i) {
           let annotationLabel = d3.select(this);
-          let surroundingRect = d3.select(annotationRects[0][i]);
+          let surroundingRect = d3.select(annotationRects.nodes()[i]);
           TestMethods.assertBBoxInclusion(surroundingRect, annotationLabel);
         });
         axis.destroy();
@@ -456,7 +456,7 @@ describe("Axis", () => {
         axis.annotationsEnabled(true);
         axis.renderTo(svg);
 
-        let annotationRects = axis.content().selectAll(`.${Plottable.Axis.ANNOTATION_RECT_CLASS}`);
+        let annotationRects = axis.content().selectAll<Element, any>(`.${Plottable.Axis.ANNOTATION_RECT_CLASS}`);
 
         assert.strictEqual(annotationRects.size(), annotatedTicks.length, "same number of annotation rects as ticks");
 
@@ -526,8 +526,8 @@ describe("Axis", () => {
         axis.renderTo(svg);
 
         let annotationRects = axis.content().selectAll(`.${Plottable.Axis.ANNOTATION_RECT_CLASS}`);
-        let firstAnnotationRect = d3.select(annotationRects[0][0]);
-        let secondAnnotationRect = d3.select(annotationRects[0][1]);
+        let firstAnnotationRect = d3.select(annotationRects.nodes()[0]);
+        let secondAnnotationRect = d3.select(annotationRects.nodes()[1]);
 
         let positionAttr = isHorizOrient(orientation) ? "y" : "x";
         let offsetAttr = isHorizOrient(orientation) ? "height" : "width";
@@ -552,7 +552,7 @@ describe("Axis", () => {
     let svg = TestMethods.generateSVG(300, 300);
     axis.renderTo(svg);
 
-    let annotationRects = axis.content().selectAll(`.${Plottable.Axis.ANNOTATION_RECT_CLASS}`);
+    let annotationRects = axis.content().selectAll<SVGRectElement, any>(`.${Plottable.Axis.ANNOTATION_RECT_CLASS}`);
 
     assert.strictEqual(annotationRects.size(), annotatedTicks.length, "same number of annotation rects as ticks");
 
@@ -648,7 +648,7 @@ describe("Axis", () => {
     let annotationRects = axis.content().selectAll(`.${Plottable.Axis.ANNOTATION_RECT_CLASS}`);
     assert.strictEqual(annotationRects.size(), 1, "only one annotation rendered");
 
-    let annotationRect = d3.select(annotationRects[0][0]);
+    let annotationRect = d3.select(annotationRects.nodes()[0]);
     assert.closeTo(numAttr(annotationRect, "y") + numAttr(annotationRect, "height"),
       axis.height() - axis.margin(), window.Pixel_CloseTo_Requirement, "rectangle positioned correctly");
 
