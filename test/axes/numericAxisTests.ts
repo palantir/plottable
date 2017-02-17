@@ -16,7 +16,7 @@ describe("Axes", () => {
       assert.operator(inner.bottom, "<", outer.bottom + epsilon, message + " (box inside (bottom))");
     }
 
-    function applyVisibleFilter(selection: SimpleSelection<any>) {
+    function applyVisibleFilter<A extends d3.BaseType, B, C extends d3.BaseType, D>(selection: d3.Selection<A, B, C, D>) {
       return selection.filter(function() {
         const visibilityAttr =  d3.select(this).style("visibility");
         return visibilityAttr === "visible" || visibilityAttr === "inherit";
@@ -69,7 +69,7 @@ describe("Axes", () => {
             assert.strictEqual(tickLabels.size(), tickMarks.size(), "there is one label per mark");
 
             tickLabels.each(function(d, i) {
-              TestMethods.assertBBoxNonIntersection(d3.select(this), d3.select(tickMarks[0][i]));
+              TestMethods.assertBBoxNonIntersection(d3.select(this), d3.select(tickMarks.nodes()[i]));
             });
             svg.remove();
           });
@@ -87,11 +87,11 @@ describe("Axes", () => {
           const axis = new Plottable.Axes.Numeric(scale, orientation);
           axis.renderTo(svg);
 
-          const visibconstickLabels = applyVisibleFilter(axis.content().selectAll(`.${Plottable.Axis.TICK_LABEL_CLASS}`));
+          const visibconstickLabels = applyVisibleFilter(axis.content().selectAll<Element, any>(`.${Plottable.Axis.TICK_LABEL_CLASS}`));
 
           visibconstickLabels.each(function(d, i) {
             const labelRect = this.getBoundingClientRect();
-            visibconstickLabels[0].slice(i + 1).forEach(function(otherVisibconstickLabel, i2) {
+            visibconstickLabels.nodes().slice(i + 1).forEach(function(otherVisibconstickLabel, i2) {
               const labelRect2 = (<Element> otherVisibconstickLabel).getBoundingClientRect();
               const rectOverlap = Plottable.Utils.DOM.clientRectsOverlap(labelRect, labelRect2);
               assert.isFalse(rectOverlap, `tick label ${i} does not overlap with tick label ${i2}`);
@@ -113,7 +113,7 @@ describe("Axes", () => {
 
           const visibconstickLabels = applyVisibleFilter(axis.content().selectAll(`.${Plottable.Axis.TICK_LABEL_CLASS}`));
 
-          const visibconstickLabelRects = visibconstickLabels[0].map((label: Element) => label.getBoundingClientRect());
+          const visibconstickLabelRects = visibconstickLabels.nodes().map((label: Element) => label.getBoundingClientRect());
 
           function getClientRectCenter(rect: ClientRect) {
             return isHorizontalOrientation(orientation) ? rect.left + rect.width / 2 : rect.top + rect.height / 2;
@@ -141,7 +141,7 @@ describe("Axes", () => {
           const tickLabels = applyVisibleFilter(axis.content().selectAll(`.${Plottable.Axis.TICK_LABEL_CLASS}`));
           assert.operator(tickLabels.size(), ">", 1, "more than one tick label is shown");
 
-          const tickLabelElementPairs = d3.pairs(tickLabels[0]);
+          const tickLabelElementPairs = d3.pairs(tickLabels.nodes());
           tickLabelElementPairs.forEach(function(tickLabelElementPair, i) {
             const label1 = d3.select(tickLabelElementPair[0]);
             const label2 = d3.select(tickLabelElementPair[1]);
@@ -178,14 +178,14 @@ describe("Axes", () => {
           const axis = new Plottable.Axes.Numeric(scale, orientation);
           axis.renderTo(svg);
 
-          const tickLabels = axis.content().selectAll(`.${Plottable.Axis.TICK_LABEL_CLASS}`);
+          const tickLabels = axis.content().selectAll<Element, any>(`.${Plottable.Axis.TICK_LABEL_CLASS}`);
           assert.operator(tickLabels.size(), ">=", 2, "at least two tick labels were drawn");
-          const tickMarks = axis.content().selectAll(`.${Plottable.Axis.TICK_MARK_CLASS}`);
+          const tickMarks = axis.content().selectAll<Element, any>(`.${Plottable.Axis.TICK_MARK_CLASS}`);
           assert.strictEqual(tickLabels.size(), tickMarks.size(), "there is one label per mark");
 
           tickLabels.each(function(d, i) {
             const tickLabelClientRect = this.getBoundingClientRect();
-            const tickMarkClientRect = (<Element> tickMarks[0][i]).getBoundingClientRect();
+            const tickMarkClientRect = tickMarks.nodes()[i].getBoundingClientRect();
             const labelCenter = isHorizontalOrientation(orientation) ?
               (tickLabelClientRect.left + tickLabelClientRect.right) / 2 :
               (tickLabelClientRect.top + tickLabelClientRect.bottom) / 2;
@@ -208,9 +208,9 @@ describe("Axes", () => {
                                       .innerTickLength(50);
         axis.renderTo(svg);
 
-        const tickLabels = applyVisibleFilter(axis.content().selectAll("." + Plottable.Axis.TICK_LABEL_CLASS));
+        const tickLabels = applyVisibleFilter(axis.content().selectAll<Element, any>("." + Plottable.Axis.TICK_LABEL_CLASS));
 
-        const tickMarks = applyVisibleFilter(axis.content().selectAll("." + Plottable.Axis.TICK_MARK_CLASS));
+        const tickMarks = applyVisibleFilter(axis.content().selectAll<Element, any>("." + Plottable.Axis.TICK_MARK_CLASS));
 
         tickLabels.each(function(d, i) {
           const tickLabelRect = this.getBoundingClientRect();
@@ -266,8 +266,8 @@ describe("Axes", () => {
           const axis = new Plottable.Axes.Numeric(scale, orientation);
           axis.renderTo(svg);
 
-          const visibconstickLabels = applyVisibleFilter(axis.content().selectAll(`.${Plottable.Axis.TICK_LABEL_CLASS}`));
-          const boundingBox = (<Element> svg.select(".axis").select(".bounding-box").node()).getBoundingClientRect();
+          const visibconstickLabels = applyVisibleFilter(axis.content().selectAll<Element, any>(`.${Plottable.Axis.TICK_LABEL_CLASS}`));
+          const boundingBox = svg.select(".axis").select<Element>(".bounding-box").node().getBoundingClientRect();
           visibconstickLabels.each(function(d, i) {
             const visibconstickLabelRect = this.getBoundingClientRect();
             assertBoxInside(visibconstickLabelRect, boundingBox, 0.5, `tick label ${i} is inside the bounding box`);
@@ -283,8 +283,8 @@ describe("Axes", () => {
           const axis = new Plottable.Axes.Numeric(scale, verticalOrientation);
           axis.renderTo(svg);
 
-          const visibconstickLabels = applyVisibleFilter(axis.content().selectAll(`.${Plottable.Axis.TICK_LABEL_CLASS}`));
-          const boundingBox = (<Element> svg.select(".axis").select(".bounding-box").node()).getBoundingClientRect();
+          const visibconstickLabels = applyVisibleFilter(axis.content().selectAll<Element, any>(`.${Plottable.Axis.TICK_LABEL_CLASS}`));
+          const boundingBox = svg.select(".axis").select<Element>(".bounding-box").node().getBoundingClientRect();
           visibconstickLabels.each(function(d, i) {
             const visibconstickLabelRect = this.getBoundingClientRect();
             assertBoxInside(visibconstickLabelRect, boundingBox, 0, `long tick label ${i} is inside the bounding box`);
