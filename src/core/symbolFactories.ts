@@ -40,5 +40,5 @@ export function star(): SymbolFactory {
 // copied from https://github.com/d3/d3-shape/blob/c35b2303eb4836aba3171642f01c2653e4228b9c/src/symbol/wye.js#L2
 const a = ((1 / Math.sqrt(12)) / 2 + 1) * 3;
 export function wye(): SymbolFactory {
-  return (symbolSize: number) => d3.symbol().type(d3.symbolWye).size(a * Math.pow(symbolSize / 2, 2))(null);
+  return (symbolSize: number) => d3.symbol().type(d3.symbolWye).size(a * Math.pow(symbolSize / 2.4, 2))(null);
 }
