@@ -265,20 +265,8 @@ export abstract class AbstractComponent<D> implements IComponent<D> {
     "bottom": 1,
   };
 
-  /**
-   * Attaches the Component as a child of a given html element.
-   *
-   * @param {D} selection.
-   * @returns {Component} The calling Component.
-   */
   abstract anchor(selection: d3.Selection<void>): this;
-  /**
-   * Adds a callback to be called on anchoring the Component to the DOM.
-   * If the Component is already anchored, the callback is called immediately.
-   *
-   * @param {GenericComponentCallback} callback
-   * @return {Component}
-   */
+
   public onAnchor(callback: GenericComponentCallback<D>) {
     if (this._isAnchored) {
       callback(this);
@@ -286,95 +274,40 @@ export abstract class AbstractComponent<D> implements IComponent<D> {
     this._onAnchorCallbacks.add(callback);
     return this;
   }
-  /**
-   * Removes a callback that would be called on anchoring the Component to the DOM.
-   * The callback is identified by reference equality.
-   *
-   * @param {GenericComponentCallback} callback
-   * @return {Component}
-   */
+
   public offAnchor(callback: GenericComponentCallback<D>) {
     this._onAnchorCallbacks.delete(callback);
     return this;
   }
-  /**
-   * Given available space in pixels, returns the minimum width and height this Component will need.
-   *
-   * @param {number} availableWidth
-   * @param {number} availableHeight
-   * @returns {SpaceRequest}
-   */
+
   public requestedSpace(availableWidth: number, availableHeight: number) {
     return {
       minWidth: 0,
       minHeight: 0,
     };
   }
-  /**
-   * Computes and sets the size, position, and alignment of the Component from the specified values.
-   * If no parameters are supplied and the Component is a root node,
-   * they are inferred from the size of the Component's element.
-   *
-   * @param {Point} [origin] Origin of the space offered to the Component.
-   * @param {number} [availableWidth] Available width in pixels.
-   * @param {number} [availableHeight] Available height in pixels.
-   * @returns {IComponent} The calling Component.
-   */
+
   abstract computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number): this;
-  /**
-   * Queues the Component for rendering.
-   *
-   * @returns {IComponent} The calling Component.
-   */
+
   public render() {
     if (this._isAnchored && this._isSetup && this.width() >= 0 && this.height() >= 0) {
       RenderController.registerToRender(this);
     }
     return this;
   }
-  /**
-   * Sets a callback that gets called when the component resizes. The size change
-   * is not guaranteed to be reflected by the DOM at the time the callback is fired.
-   *
-   * @param {IResizeHandler} [resizeHandler] Callback to be called when component resizes
-   */
+
   public onResize(resizeHandler: IResizeHandler) {
     this._resizeHandler = resizeHandler;
     return this;
   }
-  /**
-   * Renders the Component without waiting for the next frame. This method is a no-op on
-   * Component, Table, and Group; render them immediately with .renderTo() instead.
-   *
-   * @returns {IComponent} The calling Component.
-   */
+
   abstract renderImmediately(): this;
-  /**
-   * Causes the Component to re-layout and render.
-   *
-   * This function should be called when a CSS change has occured that could
-   * influence the layout of the Component, such as changing the font size.
-   *
-   * @returns {IComponent} The calling Component.
-   */
+
   abstract redraw(): this;
-  /**
-   * Renders the Component to a given D
-   *
-   * @param {D} container The object to render to
-   * @returns {IComponent} The calling Component.
-   */
+
   abstract renderTo(container: D): this;
-  /**
-   * Gets the x alignment of the Component.
-   */
+
   public xAlignment(): string;
-  /**
-   * Sets the x alignment of the Component.
-   *
-   * @param {string} xAlignment The x alignment of the Component ("left"/"center"/"right").
-   * @returns {IComponent} The calling Component.
-   */
   public xAlignment(xAlignment: string): this;
   public xAlignment(xAlignment?: string): this | string {
     if (xAlignment == null) {
@@ -389,16 +322,8 @@ export abstract class AbstractComponent<D> implements IComponent<D> {
     this.redraw();
     return this;
   }
-  /**
-   * Gets the y alignment of the Component.
-   */
+
   public yAlignment(): string;
-  /**
-   * Sets the y alignment of the Component.
-   *
-   * @param {string} yAlignment The y alignment of the Component ("top"/"center"/"bottom").
-   * @returns {IComponent} The calling Component.
-   */
   public yAlignment(yAlignment: string): this;
   public yAlignment(yAlignment?: string): this | string {
     if (yAlignment == null) {
@@ -413,11 +338,7 @@ export abstract class AbstractComponent<D> implements IComponent<D> {
     this.redraw();
     return this;
   }
-  /**
-   * Checks if the Component has a given CSS class.
-   *
-   * @param {string} cssClass The CSS class to check for.
-   */
+
   public hasClass(cssClass: string) {
     if (cssClass == null) {
       return false;
@@ -430,12 +351,6 @@ export abstract class AbstractComponent<D> implements IComponent<D> {
     }
   }
 
-  /**
-   * Adds a given CSS class to the Component.
-   *
-   * @param {string} cssClass The CSS class to add.
-   * @returns {IComponent} The calling Component.
-   */
   public addClass(cssClass: string) {
     if (cssClass == null) {
       return this;
@@ -450,12 +365,6 @@ export abstract class AbstractComponent<D> implements IComponent<D> {
     return this;
   }
 
-  /**
-   * Removes a given CSS class from the Component.
-   *
-   * @param {string} cssClass The CSS class to remove.
-   * @returns {IComponent} The calling Component.
-   */
   public removeClass(cssClass: string) {
     if (cssClass == null) {
       return this;
@@ -470,59 +379,27 @@ export abstract class AbstractComponent<D> implements IComponent<D> {
     return this;
   }
 
-  /**
-   * Checks if the Component has a fixed width or if it grows to fill available space.
-   * Returns false by default on the base Component class.
-   */
   public fixedWidth() {
     return false;
   }
-  /**
-   * Checks if the Component has a fixed height or if it grows to fill available space.
-   * Returns false by default on the base Component class.
-   */
+
   public fixedHeight() {
     return false;
   }
-  /**
-   * Detaches a Component from the DOM. The Component can be reused.
-   *
-   * This should only be used if you plan on reusing the calling Component. Otherwise, use destroy().
-   *
-   * @returns The calling Component.
-   */
+
   abstract detach(): this;
-  /**
-   * Adds a callback to be called when the Component is detach()-ed.
-   *
-   * @param {GenericComponentCallback} callback
-   * @return {IComponent} The calling Component.
-   */
+
   public onDetach(callback: GenericComponentCallback<D>) {
     this._onDetachCallbacks.add(callback);
     return this;
   }
-  /**
-   * Removes a callback to be called when the Component is detach()-ed.
-   * The callback is identified by reference equality.
-   *
-   * @param {GenericComponentCallback} callback
-   * @return {IComponent} The calling Component.
-   */
+
   public offDetach(callback: GenericComponentCallback<D>) {
     this._onDetachCallbacks.delete(callback);
     return this;
   }
-  /**
-   * Gets the parent ComponentContainer for this Component.
-   */
+
   public parent(): ComponentContainer;
-  /**
-   * Sets the parent ComponentContainer for this Component.
-   * An error will be thrown if the parent does not contain this Component.
-   * Adding a Component to a ComponentContainer should be done
-   * using the appropriate method on the ComponentContainer.
-   */
   public parent(parent: ComponentContainer): this;
   public parent(parent?: ComponentContainer): this | ComponentContainer {
     if (parent === undefined) {
@@ -534,11 +411,7 @@ export abstract class AbstractComponent<D> implements IComponent<D> {
     this._parent = parent;
     return this;
   }
-  /**
-   * @returns {Bounds} for the component in pixel space, where the topLeft
-   * represents the component's minimum x and y values and the bottomRight represents
-   * the component's maximum x and y values.
-   */
+
   public bounds() {
     const topLeft = this.origin();
 
@@ -550,39 +423,25 @@ export abstract class AbstractComponent<D> implements IComponent<D> {
       },
     };
   }
-  /**
-   * Removes a Component from the DOM and disconnects all listeners.
-   */
+
   public destroy() {
     this._destroyed = true;
     this.detach();
   }
-  /**
-   * Gets the width of the Component in pixels.
-   */
+
   public width() {
     return this._width;
   }
-  /**
-   * Gets the height of the Component in pixels.
-   */
+
   public height() {
     return this._height;
   }
-  /**
-   * Gets the origin of the Component relative to its parent.
-   *
-   * @return {Point}
-   */
+
   public origin() {
     const { x, y } = this._origin;
     return { x, y };
   }
-  /**
-   * Gets the origin of the Component relative to the root
-   *
-   * @return {Point}
-   */
+
   public originToRoot() {
     let origin = this.origin();
     let ancestor = this.parent();
