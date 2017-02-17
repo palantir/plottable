@@ -1,3 +1,4 @@
+import { SimpleSelection } from "../../src/core/interfaces";
 import { assert } from "chai";
 import * as d3 from "d3";
 
