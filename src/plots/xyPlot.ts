@@ -409,7 +409,7 @@ export class XYPlot<X, Y> extends Plot {
    @returns {Bounds}
    */
   private _invertedBounds() {
-    const bounds = this.bounds();
+    const bounds = Utils.Component.bounds(this);
     const maybeTopLeft = this._invertPixelPoint(bounds.topLeft);
     const maybeBottomRight = this._invertPixelPoint(bounds.bottomRight);
 

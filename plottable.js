@@ -78,7 +78,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/ 	__webpack_require__.p = "";
 
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 115);
+/******/ 	return __webpack_require__(__webpack_require__.s = 116);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -98,18 +98,20 @@ var Array = __webpack_require__(93);
 exports.Array = Array;
 var Color = __webpack_require__(95);
 exports.Color = Color;
-var DOM = __webpack_require__(96);
+var Component = __webpack_require__(96);
+exports.Component = Component;
+var DOM = __webpack_require__(97);
 exports.DOM = DOM;
 var Math = __webpack_require__(29);
 exports.Math = Math;
-var Stacking = __webpack_require__(99);
+var Stacking = __webpack_require__(100);
 exports.Stacking = Stacking;
-var Window = __webpack_require__(100);
+var Window = __webpack_require__(101);
 exports.Window = Window;
 __export(__webpack_require__(94));
-__export(__webpack_require__(97));
-__export(__webpack_require__(30));
 __export(__webpack_require__(98));
+__export(__webpack_require__(30));
+__export(__webpack_require__(99));
 __export(__webpack_require__(42));
 
 
@@ -618,7 +620,7 @@ var Plot = (function (_super) {
      */
     Plot.prototype.entityNearest = function (queryPoint, bounds) {
         var _this = this;
-        if (bounds === void 0) { bounds = this.bounds(); }
+        if (bounds === void 0) { bounds = Utils.Component.bounds(this); }
         var nearest = this._getEntityStore().entityNearest(queryPoint, function (entity) {
             return _this._entityVisibleOnPlot(entity, bounds);
         });
@@ -670,11 +672,11 @@ exports.Plot = Plot;
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-__export(__webpack_require__(101));
-__export(__webpack_require__(105));
+__export(__webpack_require__(102));
+__export(__webpack_require__(106));
 __export(__webpack_require__(13));
-__export(__webpack_require__(111));
-__export(__webpack_require__(113));
+__export(__webpack_require__(112));
+__export(__webpack_require__(114));
 //# sourceMappingURL=index.js.map
 
 /***/ }),
@@ -986,15 +988,6 @@ var SVGComponent = (function (_super) {
         this._isAnchored = false;
         this._onDetachCallbacks.callCallbacks(this);
         return this;
-    };
-    /**
-     * Gets the origin of the Component relative to the root <svg>.
-     *
-     * @deprecated Use originToRoot instead
-     * @return {Point}
-     */
-    SVGComponent.prototype.originToSVG = function () {
-        return this.originToRoot();
     };
     /**
      * Gets the Selection containing the <g> in front of the visual elements of the Component.
@@ -1737,6 +1730,7 @@ __export(__webpack_require__(66));
  * @license MIT
  */
 
+var Utils = __webpack_require__(0);
 var Interaction = (function () {
     function Interaction() {
         var _this = this;
@@ -1807,7 +1801,7 @@ var Interaction = (function () {
      * @return {Point} The same location in Component-space coordinates.
      */
     Interaction.prototype._translateToComponentSpace = function (p) {
-        var origin = this._componentAttachedTo.originToRoot();
+        var origin = Utils.Component.originToRoot(this._componentAttachedTo);
         return {
             x: p.x - origin.x,
             y: p.y - origin.y,
@@ -1843,11 +1837,11 @@ exports.Interaction = Interaction;
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-__export(__webpack_require__(106));
 __export(__webpack_require__(107));
 __export(__webpack_require__(108));
 __export(__webpack_require__(109));
 __export(__webpack_require__(110));
+__export(__webpack_require__(111));
 //# sourceMappingURL=index.js.map
 
 /***/ }),
@@ -2181,7 +2175,7 @@ var XYPlot = (function (_super) {
      @returns {Bounds}
      */
     XYPlot.prototype._invertedBounds = function () {
-        var bounds = this.bounds();
+        var bounds = Utils.Component.bounds(this);
         var maybeTopLeft = this._invertPixelPoint(bounds.topLeft);
         var maybeBottomRight = this._invertPixelPoint(bounds.bottomRight);
         // Scale domains can map from lowest to highest or highest to lowest (eg [0, 1] or [1, 0]).
@@ -3213,13 +3207,6 @@ var AbstractComponent = (function () {
         this._xAlignment = "left";
         this._yAlignment = "top";
     }
-    /**
-     * Adds a callback to be called on anchoring the Component to the DOM.
-     * If the Component is already anchored, the callback is called immediately.
-     *
-     * @param {GenericComponentCallback} callback
-     * @return {Component}
-     */
     AbstractComponent.prototype.onAnchor = function (callback) {
         if (this._isAnchored) {
             callback(this);
@@ -3227,47 +3214,22 @@ var AbstractComponent = (function () {
         this._onAnchorCallbacks.add(callback);
         return this;
     };
-    /**
-     * Removes a callback that would be called on anchoring the Component to the DOM.
-     * The callback is identified by reference equality.
-     *
-     * @param {GenericComponentCallback} callback
-     * @return {Component}
-     */
     AbstractComponent.prototype.offAnchor = function (callback) {
         this._onAnchorCallbacks.delete(callback);
         return this;
     };
-    /**
-     * Given available space in pixels, returns the minimum width and height this Component will need.
-     *
-     * @param {number} availableWidth
-     * @param {number} availableHeight
-     * @returns {SpaceRequest}
-     */
     AbstractComponent.prototype.requestedSpace = function (availableWidth, availableHeight) {
         return {
             minWidth: 0,
             minHeight: 0,
         };
     };
-    /**
-     * Queues the Component for rendering.
-     *
-     * @returns {IComponent} The calling Component.
-     */
     AbstractComponent.prototype.render = function () {
         if (this._isAnchored && this._isSetup && this.width() >= 0 && this.height() >= 0) {
             RenderController.registerToRender(this);
         }
         return this;
     };
-    /**
-     * Sets a callback that gets called when the component resizes. The size change
-     * is not guaranteed to be reflected by the DOM at the time the callback is fired.
-     *
-     * @param {IResizeHandler} [resizeHandler] Callback to be called when component resizes
-     */
     AbstractComponent.prototype.onResize = function (resizeHandler) {
         this._resizeHandler = resizeHandler;
         return this;
@@ -3296,11 +3258,6 @@ var AbstractComponent = (function () {
         this.redraw();
         return this;
     };
-    /**
-     * Checks if the Component has a given CSS class.
-     *
-     * @param {string} cssClass The CSS class to check for.
-     */
     AbstractComponent.prototype.hasClass = function (cssClass) {
         if (cssClass == null) {
             return false;
@@ -3312,12 +3269,6 @@ var AbstractComponent = (function () {
             return this._element.classed(cssClass);
         }
     };
-    /**
-     * Adds a given CSS class to the Component.
-     *
-     * @param {string} cssClass The CSS class to add.
-     * @returns {IComponent} The calling Component.
-     */
     AbstractComponent.prototype.addClass = function (cssClass) {
         if (cssClass == null) {
             return this;
@@ -3330,12 +3281,6 @@ var AbstractComponent = (function () {
         }
         return this;
     };
-    /**
-     * Removes a given CSS class from the Component.
-     *
-     * @param {string} cssClass The CSS class to remove.
-     * @returns {IComponent} The calling Component.
-     */
     AbstractComponent.prototype.removeClass = function (cssClass) {
         if (cssClass == null) {
             return this;
@@ -3348,37 +3293,16 @@ var AbstractComponent = (function () {
         }
         return this;
     };
-    /**
-     * Checks if the Component has a fixed width or if it grows to fill available space.
-     * Returns false by default on the base Component class.
-     */
     AbstractComponent.prototype.fixedWidth = function () {
         return false;
     };
-    /**
-     * Checks if the Component has a fixed height or if it grows to fill available space.
-     * Returns false by default on the base Component class.
-     */
     AbstractComponent.prototype.fixedHeight = function () {
         return false;
     };
-    /**
-     * Adds a callback to be called when the Component is detach()-ed.
-     *
-     * @param {GenericComponentCallback} callback
-     * @return {IComponent} The calling Component.
-     */
     AbstractComponent.prototype.onDetach = function (callback) {
         this._onDetachCallbacks.add(callback);
         return this;
     };
-    /**
-     * Removes a callback to be called when the Component is detach()-ed.
-     * The callback is identified by reference equality.
-     *
-     * @param {GenericComponentCallback} callback
-     * @return {IComponent} The calling Component.
-     */
     AbstractComponent.prototype.offDetach = function (callback) {
         this._onDetachCallbacks.delete(callback);
         return this;
@@ -3393,71 +3317,19 @@ var AbstractComponent = (function () {
         this._parent = parent;
         return this;
     };
-    /**
-     * @returns {Bounds} for the component in pixel space, where the topLeft
-     * represents the component's minimum x and y values and the bottomRight represents
-     * the component's maximum x and y values.
-     */
-    AbstractComponent.prototype.bounds = function () {
-        var topLeft = this.origin();
-        return {
-            topLeft: topLeft,
-            bottomRight: {
-                x: topLeft.x + this.width(),
-                y: topLeft.y + this.height()
-            },
-        };
-    };
-    /**
-     * Removes a Component from the DOM and disconnects all listeners.
-     */
     AbstractComponent.prototype.destroy = function () {
         this._destroyed = true;
         this.detach();
     };
-    /**
-     * Gets the width of the Component in pixels.
-     */
     AbstractComponent.prototype.width = function () {
         return this._width;
     };
-    /**
-     * Gets the height of the Component in pixels.
-     */
     AbstractComponent.prototype.height = function () {
         return this._height;
     };
-    /**
-     * Gets the origin of the Component relative to its parent.
-     *
-     * @return {Point}
-     */
     AbstractComponent.prototype.origin = function () {
         var _a = this._origin, x = _a.x, y = _a.y;
         return { x: x, y: y };
-    };
-    /**
-     * Gets the origin of the Component relative to the root
-     *
-     * @return {Point}
-     */
-    AbstractComponent.prototype.originToRoot = function () {
-        var origin = this.origin();
-        var ancestor = this.parent();
-        while (ancestor != null) {
-            var ancestorOrigin = ancestor.origin();
-            origin.x += ancestorOrigin.x;
-            origin.y += ancestorOrigin.y;
-            ancestor = ancestor.parent();
-        }
-        return origin;
-    };
-    AbstractComponent.prototype.root = function () {
-        var parent = this;
-        while (parent.parent() != null) {
-            parent = parent.parent();
-        }
-        return parent;
     };
     AbstractComponent._xAlignToProportion = {
         "left": 0,
@@ -3780,7 +3652,7 @@ var Bar = (function (_super) {
         // for the x, y, height & width attributes), but user selections (e.g. via
         // mouse events) usually have pixel accuracy. We add a tolerance of 0.5 pixels.
         var tolerance = 0.5;
-        var chartBounds = this.bounds();
+        var chartBounds = Utils.Component.bounds(this);
         var closest;
         this._getEntityStore().forEach(function (entity) {
             if (!_this._entityVisibleOnPlot(entity, chartBounds)) {
@@ -5560,7 +5432,7 @@ function getTranslator(component) {
     // The Translator works by first calculating the offset to root of the chart and then calculating
     // the offset from the component to the root. It is imperative that the measureElement
     // be added to the root of the hierarchy and nowhere else.
-    var root = component.root().element().node();
+    var root = Utils.Component.root(component).element().node();
     var translator = root[_TRANSLATOR_KEY];
     if (translator == null) {
         var measurer = document.createElementNS(root.namespaceURI, "svg");
@@ -5620,7 +5492,7 @@ var Translator = (function () {
         return scaledPosition;
     };
     Translator.prototype.isInside = function (component, e) {
-        return Utils.DOM.contains(component.root().element().node(), e.target);
+        return Utils.DOM.contains(Utils.Component.root(component).element().node(), e.target);
     };
     return Translator;
 }());
@@ -6935,7 +6807,7 @@ var Line = (function (_super) {
         var minXDist = Infinity;
         var minYDist = Infinity;
         var closest;
-        var chartBounds = this.bounds();
+        var chartBounds = Utils.Component.bounds(this);
         this.entities().forEach(function (entity) {
             if (!_this._entityVisibleOnPlot(entity, chartBounds)) {
                 return;
@@ -10577,6 +10449,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
+var Utils = __webpack_require__(0);
 var translator_1 = __webpack_require__(30);
 var dispatcher_1 = __webpack_require__(22);
 var Mouse = (function (_super) {
@@ -10613,7 +10486,7 @@ var Mouse = (function (_super) {
      * @return {Dispatchers.Mouse}
      */
     Mouse.getDispatcher = function (component) {
-        var element = component.root().element();
+        var element = Utils.Component.root(component).element();
         var dispatcher = element[Mouse._DISPATCHER_KEY];
         if (dispatcher == null) {
             dispatcher = new Mouse(component);
@@ -10777,6 +10650,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
+var Utils = __webpack_require__(0);
 var translator_1 = __webpack_require__(30);
 var dispatcher_1 = __webpack_require__(22);
 var Touch = (function (_super) {
@@ -10790,7 +10664,7 @@ var Touch = (function (_super) {
     function Touch(component) {
         var _this = this;
         _super.call(this);
-        this._translator = translator_1.getTranslator(component.root());
+        this._translator = translator_1.getTranslator(Utils.Component.root(component));
         this._eventToProcessingFunction[Touch._TOUCHSTART_EVENT_NAME] =
             function (e) { return _this._measureAndDispatch(component, e, Touch._TOUCHSTART_EVENT_NAME, "page"); };
         this._eventToProcessingFunction[Touch._TOUCHMOVE_EVENT_NAME] =
@@ -10808,7 +10682,7 @@ var Touch = (function (_super) {
      * @return {Dispatchers.Touch}
      */
     Touch.getDispatcher = function (component) {
-        var element = component.root().element().node();
+        var element = Utils.Component.root(component).element().node();
         var dispatcher = element[Touch._DISPATCHER_KEY];
         if (dispatcher == null) {
             dispatcher = new Touch(component);
@@ -15141,6 +15015,65 @@ function luminance(color) {
  * @license MIT
  */
 
+/**
+ * @returns {Bounds} for the component in pixel space, where the topLeft
+ * represents the component's minimum x and y values and the bottomRight represents
+ * the component's maximum x and y values.
+ */
+function bounds(component) {
+    var topLeft = component.origin();
+    return {
+        topLeft: topLeft,
+        bottomRight: {
+            x: topLeft.x + component.width(),
+            y: topLeft.y + component.height()
+        }
+    };
+}
+exports.bounds = bounds;
+/**
+ * Gets the origin of the Component relative to the root
+ *
+ * @return {Point}
+ */
+function originToRoot(component) {
+    var origin = component.origin();
+    var ancestor = component.parent();
+    while (ancestor != null) {
+        var ancestorOrigin = ancestor.origin();
+        origin.x += ancestorOrigin.x;
+        origin.y += ancestorOrigin.y;
+        ancestor = ancestor.parent();
+    }
+    return origin;
+}
+exports.originToRoot = originToRoot;
+/**
+ * Gets the root component of the hierarchy. If the provided
+ * component is the root, that component will be returned.
+ *
+ * @return {IComponent}
+ */
+function root(component) {
+    var parent = component;
+    while (parent.parent() != null) {
+        parent = parent.parent();
+    }
+    return parent;
+}
+exports.root = root;
+
+
+/***/ }),
+/* 97 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/**
+ * Copyright 2014-present Palantir Technologies
+ * @license MIT
+ */
+
 var d3 = __webpack_require__(1);
 var nativeMath = window.Math;
 /**
@@ -15349,7 +15282,7 @@ function _parseStyleValue(style, property) {
 
 
 /***/ }),
-/* 97 */
+/* 98 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -15403,7 +15336,7 @@ exports.EntityArray = EntityArray;
 
 
 /***/ }),
-/* 98 */
+/* 99 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -15494,7 +15427,7 @@ exports.Map = Map;
 
 
 /***/ }),
-/* 99 */
+/* 100 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -15619,7 +15552,7 @@ exports.normalizeKey = normalizeKey;
 
 
 /***/ }),
-/* 100 */
+/* 101 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -15691,7 +15624,7 @@ exports.deprecated = deprecated;
 
 
 /***/ }),
-/* 101 */
+/* 102 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -15705,12 +15638,12 @@ function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
 __export(__webpack_require__(31));
-__export(__webpack_require__(102));
 __export(__webpack_require__(103));
+__export(__webpack_require__(104));
 //# sourceMappingURL=index.js.map
 
 /***/ }),
-/* 102 */
+/* 103 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -15746,7 +15679,7 @@ exports.OpacityAnimator = OpacityAnimator;
 //# sourceMappingURL=opacityAnimator.js.map
 
 /***/ }),
-/* 103 */
+/* 104 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -15821,7 +15754,7 @@ exports.UnveilAnimator = UnveilAnimator;
 //# sourceMappingURL=unveilAnimator.js.map
 
 /***/ }),
-/* 104 */
+/* 105 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -15863,7 +15796,7 @@ exports.CacheMeasurer = CacheMeasurer;
 //# sourceMappingURL=cacheMeasurer.js.map
 
 /***/ }),
-/* 105 */
+/* 106 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -15878,13 +15811,13 @@ function __export(m) {
 }
 __export(__webpack_require__(43));
 __export(__webpack_require__(44));
-__export(__webpack_require__(104));
+__export(__webpack_require__(105));
 __export(__webpack_require__(45));
 __export(__webpack_require__(46));
 //# sourceMappingURL=index.js.map
 
 /***/ }),
-/* 106 */
+/* 107 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -15933,7 +15866,7 @@ exports.Cache = Cache;
 //# sourceMappingURL=cache.js.map
 
 /***/ }),
-/* 107 */
+/* 108 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -15981,7 +15914,7 @@ exports.DOM = DOM;
 //# sourceMappingURL=dom.js.map
 
 /***/ }),
-/* 108 */
+/* 109 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -16039,7 +15972,7 @@ exports.Methods = Methods;
 //# sourceMappingURL=methods.js.map
 
 /***/ }),
-/* 109 */
+/* 110 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -16086,7 +16019,7 @@ exports.StringMethods = StringMethods;
 //# sourceMappingURL=stringMethods.js.map
 
 /***/ }),
-/* 110 */
+/* 111 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -16134,7 +16067,7 @@ exports.Tokenizer = Tokenizer;
 //# sourceMappingURL=tokenizer.js.map
 
 /***/ }),
-/* 111 */
+/* 112 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -16147,12 +16080,12 @@ exports.Tokenizer = Tokenizer;
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-__export(__webpack_require__(112));
+__export(__webpack_require__(113));
 __export(__webpack_require__(47));
 //# sourceMappingURL=index.js.map
 
 /***/ }),
-/* 112 */
+/* 113 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -16210,7 +16143,7 @@ exports.SingleLineWrapper = SingleLineWrapper;
 //# sourceMappingURL=singleLineWrapper.js.map
 
 /***/ }),
-/* 113 */
+/* 114 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -16223,11 +16156,11 @@ exports.SingleLineWrapper = SingleLineWrapper;
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-__export(__webpack_require__(114));
+__export(__webpack_require__(115));
 //# sourceMappingURL=index.js.map
 
 /***/ }),
-/* 114 */
+/* 115 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -16361,7 +16294,7 @@ exports.Writer = Writer;
 //# sourceMappingURL=writer.js.map
 
 /***/ }),
-/* 115 */
+/* 116 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";

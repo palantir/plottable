@@ -5,6 +5,7 @@
 
 import { IComponent } from "../components/abstractComponent";
 import { Point } from "../core/interfaces";
+import * as Utils from "../utils";
 
 export class Interaction {
   protected _componentAttachedTo: IComponent<any>;
@@ -95,7 +96,7 @@ export class Interaction {
    * @return {Point} The same location in Component-space coordinates.
    */
   protected _translateToComponentSpace(p: Point): Point {
-    let origin = this._componentAttachedTo.originToRoot();
+    let origin = Utils.Component.originToRoot(this._componentAttachedTo);
     return {
       x: p.x - origin.x,
       y: p.y - origin.y,

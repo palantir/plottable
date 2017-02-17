@@ -184,12 +184,7 @@ export interface IComponent<D> {
    */
   parent(parent: ComponentContainer): this;
   parent(parent?: ComponentContainer): any;
-  /**
-   * @returns {Bounds} for the component in pixel space, where the topLeft
-   * represents the component's minimum x and y values and the bottomRight represents
-   * the component's maximum x and y values.
-   */
-  bounds(): Bounds;
+
   /**
    * Removes a Component from the DOM and disconnects all listeners.
    */
@@ -209,12 +204,6 @@ export interface IComponent<D> {
    */
   origin(): Point;
   /**
-   * Gets the origin of the Component relative to the root
-   *
-   * @return {Point}
-   */
-  originToRoot(): Point;
-  /**
    * Gets the container holding the visual elements of the Component.
    *
    * Will return undefined if the Component has not been anchored.
@@ -226,12 +215,6 @@ export interface IComponent<D> {
    * Gets the top-level element of the component
    */
   element(): d3.Selection<void>;
-  /**
-   * Gets the root component of the hierarchy
-   *
-   * @return {IComponent}
-   */
-  root(): IComponent<any>;
 }
 
 export abstract class AbstractComponent<D> implements IComponent<D> {
@@ -412,18 +395,6 @@ export abstract class AbstractComponent<D> implements IComponent<D> {
     return this;
   }
 
-  public bounds() {
-    const topLeft = this.origin();
-
-    return {
-      topLeft,
-      bottomRight: {
-        x: topLeft.x + this.width(),
-        y: topLeft.y + this.height()
-      },
-    };
-  }
-
   public destroy() {
     this._destroyed = true;
     this.detach();
@@ -440,28 +411,6 @@ export abstract class AbstractComponent<D> implements IComponent<D> {
   public origin() {
     const { x, y } = this._origin;
     return { x, y };
-  }
-
-  public originToRoot() {
-    let origin = this.origin();
-    let ancestor = this.parent();
-    while (ancestor != null) {
-      let ancestorOrigin = ancestor.origin();
-      origin.x += ancestorOrigin.x;
-      origin.y += ancestorOrigin.y;
-      ancestor = ancestor.parent();
-    }
-    return origin;
-  }
-
-  public root() {
-    let parent: IComponent<any> = this;
-
-    while (parent.parent() != null) {
-      parent = parent.parent();
-    }
-
-    return parent;
   }
 
   abstract content(): d3.Selection<void>;

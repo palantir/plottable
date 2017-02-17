@@ -29,7 +29,7 @@ export class Touch extends Dispatcher {
    * @return {Dispatchers.Touch}
    */
   public static getDispatcher(component: IComponent<any>): Dispatchers.Touch {
-    let element  = component.root().element().node();
+    let element  = Utils.Component.root(component).element().node();
     let dispatcher: Dispatchers.Touch = (<any> element)[Touch._DISPATCHER_KEY];
     if (dispatcher == null) {
       dispatcher = new Touch(component);
@@ -47,7 +47,7 @@ export class Touch extends Dispatcher {
   constructor(component: IComponent<any>) {
     super();
 
-    this._translator = getTranslator(component.root());
+    this._translator = getTranslator(Utils.Component.root(component));
 
     this._eventToProcessingFunction[Touch._TOUCHSTART_EVENT_NAME] =
       (e: TouchEvent) => this._measureAndDispatch(component, e, Touch._TOUCHSTART_EVENT_NAME, "page");

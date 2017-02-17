@@ -18,7 +18,6 @@ describe("Dispatchers", () => {
       beforeEach(() => {
         component = new Plottable.SVGComponent();
         svg = TestMethods.generateSVG();
-        sinon.stub(component, "root", () => component);
         sinon.stub(component, "element", () => svg);
         svgNode = <SVGElement>svg.node();
       });
@@ -64,7 +63,6 @@ describe("Dispatchers", () => {
         // HACKHACK: PhantomJS can't measure SVGs unless they have something in them occupying space
         svg.append("rect").attr("width", SVG_WIDTH).attr("height", SVG_HEIGHT);
         sinon.stub(component, "element", () => svg);
-        sinon.stub(component, "root", () => component);
 
         mouseDispatcher = Plottable.Dispatchers.Mouse.getDispatcher(component);
       });

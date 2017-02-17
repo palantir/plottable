@@ -577,7 +577,7 @@ export class Plot extends SVGComponent {
    * the chart, relative to the parent.
    * @returns {Plots.PlotEntity} The nearest PlotEntity, or undefined if no {Plots.PlotEntity} can be found.
    */
-  public entityNearest(queryPoint: Point, bounds = this.bounds()): Plots.PlotEntity {
+  public entityNearest(queryPoint: Point, bounds = Utils.Component.bounds(this)): Plots.PlotEntity {
     const nearest = this._getEntityStore().entityNearest(queryPoint, (entity: Plots.LightweightPlotEntity) => {
       return this._entityVisibleOnPlot(entity, bounds);
     });

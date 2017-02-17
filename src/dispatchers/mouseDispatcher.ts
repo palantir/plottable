@@ -33,7 +33,7 @@ export class Mouse extends Dispatcher {
    * @return {Dispatchers.Mouse}
    */
   public static getDispatcher(component: IComponent<any>): Dispatchers.Mouse {
-    let element = component.root().element();
+    let element = Utils.Component.root(component).element();
     let dispatcher: Dispatchers.Mouse = (<any> element)[Mouse._DISPATCHER_KEY];
     if (dispatcher == null) {
       dispatcher = new Mouse(component);

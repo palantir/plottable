@@ -323,16 +323,6 @@ export class SVGComponent extends AbstractComponent<d3.Selection<void>> {
   }
 
   /**
-   * Gets the origin of the Component relative to the root <svg>.
-   *
-   * @deprecated Use originToRoot instead
-   * @return {Point}
-   */
-  public originToSVG() {
-    return this.originToRoot();
-  }
-
-  /**
    * Gets the Selection containing the <g> in front of the visual elements of the Component.
    *
    * Will return undefined if the Component has not been anchored.

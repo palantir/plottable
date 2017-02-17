@@ -862,7 +862,7 @@ describe("Component", () => {
     });
 
     it("returns origin without a parent", () => {
-      assert.deepEqual(c.originToSVG(), c.origin(), "same as origin with no parent");
+      assert.deepEqual(Plottable.Utils.Component.originToRoot(c), c.origin(), "same as origin with no parent");
       c.destroy();
       svg.remove();
     });
@@ -878,7 +878,7 @@ describe("Component", () => {
         x: parent.origin().x + c.origin().x,
         y: parent.origin().y + c.origin().y,
       };
-      assert.deepEqual(c.originToSVG(), originToSvg, "origin offsetted by parents");
+      assert.deepEqual(Plottable.Utils.Component.originToRoot(c), originToSvg, "origin offsetted by parents");
       parent.destroy();
       c.destroy();
       svg.remove();
@@ -898,7 +898,7 @@ describe("Component", () => {
     });
 
     it("calculates the bounds relative to the origin", () => {
-      assert.deepEqual(c.bounds(), {
+      assert.deepEqual(Plottable.Utils.Component.bounds(c), {
         topLeft: c.origin(),
         bottomRight: { x: SVG_WIDTH, y: SVG_HEIGHT }
       });

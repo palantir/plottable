@@ -298,7 +298,7 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
     // mouse events) usually have pixel accuracy. We add a tolerance of 0.5 pixels.
     let tolerance = 0.5;
 
-    const chartBounds = this.bounds();
+    const chartBounds = Utils.Component.bounds(this);
     let closest: LightweightPlotEntity;
     this._getEntityStore().forEach((entity: LightweightPlotEntity) => {
       if (!this._entityVisibleOnPlot(entity, chartBounds)) {
