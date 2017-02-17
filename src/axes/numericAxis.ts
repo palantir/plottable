@@ -345,14 +345,8 @@ export class Numeric extends Axis<number> {
     for (let i = 0; i < rects.length - (interval); i += interval) {
       let currRect = rects[i];
       let nextRect = rects[i + interval];
-      if (this.isHorizontal()) {
-        if (currRect.right + padding >= nextRect.left) {
-          return false;
-        }
-      } else {
-        if (currRect.top - padding <= nextRect.bottom) {
-          return false;
-        }
+      if (Utils.DOM.clientRectsOverlap(currRect, nextRect)) {
+        return false;
       }
     }
     return true;
