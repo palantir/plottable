@@ -171,7 +171,8 @@ export interface IComponent<D> {
    */
   offDetach(callback: GenericComponentCallback<D>): this;
   /**
-   * Gets the parent ComponentContainer for this Component.
+   * Gets the parent ComponentContainer for this Component or null
+   * if no parent exists.
    */
   parent(): ComponentContainer;
   /**
