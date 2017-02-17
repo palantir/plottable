@@ -237,15 +237,6 @@ export interface IComponent<D> {
    * @return {IComponent}
    */
   root(): IComponent<any>;
-  /**
-   * Gets the translator for the component. A translator
-   * converts client coordinates to component coordinates and
-   * takes into account any transformations that have been applied
-   * to the element.
-   *
-   * @return {Utils.ITranslator}
-   */
-   translator(): Utils.Translator;
 }
 
 export abstract class AbstractComponent<D> implements IComponent<D> {
@@ -622,5 +613,4 @@ export abstract class AbstractComponent<D> implements IComponent<D> {
 
   abstract content(): IContent;
   abstract element():  IContent;
-  abstract translator(): Utils.Translator;
 }

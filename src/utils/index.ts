@@ -20,8 +20,6 @@ export {
 };
 
 export * from "./callbackSet";
-export * from "./clientToHTMLTranslator";
-export * from "./clientToSVGTranslator";
 export * from "./entityStore";
 export * from "./translator";
 export * from "./map";

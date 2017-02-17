@@ -6,6 +6,7 @@
 import { IComponent } from "../components";
 import { Point } from "../core/interfaces";
 import * as Utils from "../utils";
+import { getTranslator } from "../utils/translator";
 
 import { Dispatcher } from "./dispatcher";
 import * as Dispatchers from "./";
@@ -46,7 +47,7 @@ export class Touch extends Dispatcher {
   constructor(component: IComponent<any>) {
     super();
 
-    this._translator = component.root().translator();
+    this._translator = getTranslator(component.root());
 
     this._eventToProcessingFunction[Touch._TOUCHSTART_EVENT_NAME] =
       (e: TouchEvent) => this._measureAndDispatch(component, e, Touch._TOUCHSTART_EVENT_NAME, "page");

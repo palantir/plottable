@@ -6,6 +6,7 @@
 import { IComponent } from "../components/abstractComponent";
 import { Point } from "../core/interfaces";
 import * as Utils from "../utils";
+import { getTranslator } from "../utils/translator";
 
 import { Dispatcher } from "./dispatcher";
 import * as Dispatchers from "./";
@@ -50,7 +51,7 @@ export class Mouse extends Dispatcher {
   private constructor(component: IComponent<any>) {
     super();
 
-    this._translator = component.root().translator();
+    this._translator = getTranslator(component);
 
     this._lastMousePosition = { x: -1, y: -1 };
 

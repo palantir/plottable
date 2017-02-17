@@ -364,10 +364,6 @@ export class SVGComponent extends AbstractComponent<d3.Selection<void>> {
     return this._element;
   }
 
-  public translator(): Utils.Translator {
-    return Utils.ClientToSVGTranslator.getTranslator(this);
-  }
-
   /**
    * Top-level SVGs <svg ...>  can exist as non *root* components. For example,
    * you can place an <svg ..> within an HTMLTable or HTMLGroup, which themselves

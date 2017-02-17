@@ -154,10 +154,6 @@ export class HTMLComponent extends AbstractComponent<HTMLElement> {
     return this._element;
   }
 
-  public translator(): Utils.Translator {
-    return Utils.ClientToHTMLTranslator.getTranslator(this);
-  }
-
   public element() {
     return this._element;
   }
