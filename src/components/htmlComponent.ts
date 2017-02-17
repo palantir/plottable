@@ -8,7 +8,6 @@ import * as d3 from "d3";
 import {
   AbstractComponent,
   IComponent,
-  IContent,
   GenericComponentCallback,
   IResizeHandler
 } from "./abstractComponent";

@@ -16,10 +16,6 @@ export type GenericComponentCallback<D> = (component: IComponent<D>) => void;
 
 export type IResizeHandler = (size: { height: number, width: number }) => void;
 
-export interface IContent {
-  node(): Node;
-}
-
 export interface IComponent<D> {
   /**
    * Attaches the Component as a child of a given html element.
@@ -225,11 +221,11 @@ export interface IComponent<D> {
    *
    * @return {IContent} content selection for the Component
    */
-  content(): IContent;
+  content(): d3.Selection<void>;
   /**
    * Gets the top-level element of the component
    */
-  element(): IContent;
+  element(): d3.Selection<void>;
   /**
    * Gets the root component of the hierarchy
    *
@@ -609,6 +605,6 @@ export abstract class AbstractComponent<D> implements IComponent<D> {
     return parent;
   }
 
-  abstract content(): IContent;
-  abstract element():  IContent;
+  abstract content(): d3.Selection<void>;
+  abstract element():  d3.Selection<void>;
 }
