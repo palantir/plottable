@@ -3,7 +3,7 @@
  * @license MIT
  */
 
-import * as d3 from "d3/build/d3.node";
+import * as d3 from "d3";
 
 import { Component, ComponentCallback } from "./component";
 import { SimpleSelection } from "../core/interfaces";

@@ -3,6 +3,6 @@
  * @license MIT
  */
 
-declare module "d3/build/d3.node" {
+declare module "d3" {
   export = d3;
 }

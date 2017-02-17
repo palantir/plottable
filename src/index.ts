@@ -1,5 +1,7 @@
-// import d3-selection-multi for side effects - it will modify d3's selection prototype
-import "d3-selection-multi/index";
+// HACKHACK d3-selection-multi doesn't play well with default "d3" package in a
+// bundler environment (e.g. webpack) - see https://github.com/d3/d3-selection-multi/issues/11
+// we add it manually to the default "d3" bundle
+import "./utils/addD3SelectionMulti";
 
 import * as Animators from "./animators";
 import * as Axes from "./axes";

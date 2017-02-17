@@ -1,4 +1,4 @@
-import * as d3 from "d3/build/d3.node";
+import * as d3 from "d3";
 
 import { assert } from "chai";
 

@@ -3,7 +3,7 @@
  * @license MIT
  */
 
-import * as d3 from "d3/build/d3.node";
+import * as d3 from "d3";
 
 import { Component } from "../components/component";
 import { Point } from "../core/interfaces";
