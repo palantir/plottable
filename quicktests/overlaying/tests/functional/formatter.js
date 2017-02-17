@@ -4,7 +4,7 @@ function makeData() {
   return [makeRandomData(10), makeRandomData(10)];
 }
 
-function run(div, data, Plottable) {
+function run(container, data, Plottable) {
   "use strict";
 
     var largeX = function(d, i){
@@ -37,7 +37,7 @@ function run(div, data, Plottable) {
   var bigTable = new Plottable.Components.Table([[basicTable], [formatChoices]]);
   formatChoices.xAlignment("center");
 
-  bigTable.renderTo(div);
+  bigTable.renderTo(container);
 
   function useIdentityFormatter() {
     xAxis.formatter(Plottable.Formatters.identity(2.1));

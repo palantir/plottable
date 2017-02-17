@@ -3,7 +3,7 @@ function makeData() {
   return [makeRandomData(50), makeRandomData(50)];
 }
 
-function run(div, data, Plottable) {
+function run(container, data, Plottable) {
   "use strict";
 
   //data
@@ -130,7 +130,7 @@ function run(div, data, Plottable) {
     [null, labelTable]
   ]);
 
-  basicTable.renderTo(div);
+  basicTable.renderTo(container);
 
   new Plottable.Interactions.Click().onClick(emptyTitle).attachTo(noTitleLabel);
   new Plottable.Interactions.Click().onClick(smallTitle).attachTo(shortTitleLabel);

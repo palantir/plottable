@@ -3,7 +3,7 @@ function makeData() {
   return makeRandomData(20);
 }
 
-function run(div, data, Plottable) {
+function run(container, data, Plottable) {
   "use strict";
 
   function makePlot(xDomain, yDomain) {
@@ -35,5 +35,5 @@ function run(div, data, Plottable) {
   new Plottable.Components.Table([
     [makePlot([3, -1], [3, -1]), makePlot([-1, 3], [3, -1])],
     [makePlot([3, -1], [-1, 3]), makePlot([-1, 3], [-1, 3])],
-  ]).renderTo(div);
+  ]).renderTo(container);
 }

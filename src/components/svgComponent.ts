@@ -14,7 +14,6 @@ import * as Utils from "../utils";
 export type ComponentCallback = (component: SVGComponent) => void;
 
 export class SVGComponent extends AbstractComponent<d3.Selection<void>> {
-  private _element: d3.Selection<void>;
   protected _boundingBox: d3.Selection<void>;
   private _backgroundContainer: d3.Selection<void>;
   private _foregroundContainer: d3.Selection<void>;
@@ -24,7 +23,6 @@ export class SVGComponent extends AbstractComponent<d3.Selection<void>> {
   private _boxContainer: d3.Selection<void>;
   private _rootSVG: d3.Selection<void>;
   private _isTopLevelSVG = false;
-  private _cssClasses = new Utils.Set<string>();
   private _clipPathID: string;
   private static _SAFARI_EVENT_BACKING_CLASS = "safari-event-backing";
 
@@ -299,63 +297,6 @@ export class SVGComponent extends AbstractComponent<d3.Selection<void>> {
     let prefix = /MSIE [5-9]/.test(navigator.userAgent) ? "" : document.location.href;
     prefix = prefix.split("#")[0]; // To fix cases where an anchor tag was used
     this._element.attr("clip-path", "url(\"" + prefix + "#" + this._clipPathID + "\")");
-  }
-
-  /**
-   * Checks if the Component has a given CSS class.
-   *
-   * @param {string} cssClass The CSS class to check for.
-   */
-  public hasClass(cssClass: string) {
-    if (cssClass == null) {
-      return false;
-    }
-
-    if (this._element == null) {
-      return this._cssClasses.has(cssClass);
-    } else {
-      return this._element.classed(cssClass);
-    }
-  }
-
-  /**
-   * Adds a given CSS class to the Component.
-   *
-   * @param {string} cssClass The CSS class to add.
-   * @returns {Component} The calling Component.
-   */
-  public addClass(cssClass: string) {
-    if (cssClass == null) {
-      return this;
-    }
-
-    if (this._element == null) {
-      this._cssClasses.add(cssClass);
-    } else {
-      this._element.classed(cssClass, true);
-    }
-
-    return this;
-  }
-
-  /**
-   * Removes a given CSS class from the Component.
-   *
-   * @param {string} cssClass The CSS class to remove.
-   * @returns {Component} The calling Component.
-   */
-  public removeClass(cssClass: string) {
-    if (cssClass == null) {
-      return this;
-    }
-
-    if (this._element == null) {
-      this._cssClasses.delete(cssClass);
-    } else {
-      this._element.classed(cssClass, false);
-    }
-
-    return this;
   }
 
   /**

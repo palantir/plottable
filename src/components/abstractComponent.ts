@@ -1,8 +1,16 @@
+/**
+ * Copyright 2014-present Palantir Technologies
+ * @license MIT
+ */
+
+import * as d3 from "d3";
+
 import { ComponentContainer } from "./componentContainer";
 
 import { Point, SpaceRequest, Bounds } from "../core/interfaces";
 import * as RenderController from "../core/renderController";
 import * as Utils from "../utils";
+import { Set } from "../utils/set";
 
 export type GenericComponentCallback<D> = (component: IComponent<D>) => void;
 
@@ -244,7 +252,9 @@ export abstract class AbstractComponent<D> implements IComponent<D> {
   private _parent: ComponentContainer;
 
   protected _content: D;
+  protected _cssClasses = new Utils.Set<string>();
   protected _destroyed = false;
+  protected _element: d3.Selection<void>;
   protected _height: number;
   protected _isAnchored = false;
   protected _isSetup = false;
@@ -423,21 +433,58 @@ export abstract class AbstractComponent<D> implements IComponent<D> {
    *
    * @param {string} cssClass The CSS class to check for.
    */
-  abstract hasClass(cssClass: string): boolean;
+  public hasClass(cssClass: string) {
+    if (cssClass == null) {
+      return false;
+    }
+
+    if (this._element == null) {
+      return this._cssClasses.has(cssClass);
+    } else {
+      return this._element.classed(cssClass);
+    }
+  }
+
   /**
    * Adds a given CSS class to the Component.
    *
    * @param {string} cssClass The CSS class to add.
    * @returns {IComponent} The calling Component.
    */
-  abstract addClass(cssClass: string): this;
+  public addClass(cssClass: string) {
+    if (cssClass == null) {
+      return this;
+    }
+
+    if (this._element == null) {
+      this._cssClasses.add(cssClass);
+    } else {
+      this._element.classed(cssClass, true);
+    }
+
+    return this;
+  }
+
   /**
    * Removes a given CSS class from the Component.
    *
    * @param {string} cssClass The CSS class to remove.
    * @returns {IComponent} The calling Component.
    */
-  abstract removeClass(cssClass: string): this;
+  public removeClass(cssClass: string) {
+    if (cssClass == null) {
+      return this;
+    }
+
+    if (this._element == null) {
+      this._cssClasses.delete(cssClass);
+    } else {
+      this._element.classed(cssClass, false);
+    }
+
+    return this;
+  }
+
   /**
    * Checks if the Component has a fixed width or if it grows to fill available space.
    * Returns false by default on the base Component class.

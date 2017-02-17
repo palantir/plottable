@@ -9,7 +9,7 @@ function makeData() {
   ];
 }
 
-function run(div, data, Plottable) {
+function run(container, data, Plottable) {
   "use strict";
 
   var xScale = new Plottable.Scales.Time();
@@ -31,7 +31,7 @@ function run(div, data, Plottable) {
                                             [yAxis, renderGroup],
                                             [null,  xAxis]]);
 
-  chart.renderTo(div);
+  chart.renderTo(container);
 
   new Plottable.Interactions.PanZoom(xScale, null).attachTo(hBarPlot);
 }

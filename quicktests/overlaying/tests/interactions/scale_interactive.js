@@ -4,7 +4,7 @@ function makeData() {
   return [makeRandomData(50), makeRandomData(50)];
 }
 
-function run(div, data, Plottable) {
+function run(container, data, Plottable) {
   "use strict";
 
   var dataseries = new Plottable.Dataset(data[0].slice(0, 20));
@@ -44,7 +44,7 @@ function run(div, data, Plottable) {
                                     [yAxisTable, renderGroup, yAxisTable2],
                                     [null, xAxisTable, null]]);
 
-  basicTable.renderTo(div);
+  basicTable.renderTo(container);
 
   new Plottable.Interactions.PanZoom(xScale, yScale).attachTo(renderGroup);
 

@@ -78,7 +78,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/ 	__webpack_require__.p = "";
 
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 118);
+/******/ 	return __webpack_require__(__webpack_require__.s = 119);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -94,24 +94,24 @@ return /******/ (function(modules) { // webpackBootstrap
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-var Array = __webpack_require__(95);
+var Array = __webpack_require__(96);
 exports.Array = Array;
-var Color = __webpack_require__(99);
+var Color = __webpack_require__(100);
 exports.Color = Color;
 var DOM = __webpack_require__(42);
 exports.DOM = DOM;
 var Math = __webpack_require__(29);
 exports.Math = Math;
-var Stacking = __webpack_require__(102);
+var Stacking = __webpack_require__(103);
 exports.Stacking = Stacking;
-var Window = __webpack_require__(103);
+var Window = __webpack_require__(104);
 exports.Window = Window;
-__export(__webpack_require__(96));
 __export(__webpack_require__(97));
 __export(__webpack_require__(98));
-__export(__webpack_require__(100));
-__export(__webpack_require__(30));
+__export(__webpack_require__(99));
 __export(__webpack_require__(101));
+__export(__webpack_require__(30));
+__export(__webpack_require__(102));
 __export(__webpack_require__(44));
 
 
@@ -672,11 +672,11 @@ exports.Plot = Plot;
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-__export(__webpack_require__(104));
-__export(__webpack_require__(108));
+__export(__webpack_require__(105));
+__export(__webpack_require__(109));
 __export(__webpack_require__(13));
-__export(__webpack_require__(114));
-__export(__webpack_require__(116));
+__export(__webpack_require__(115));
+__export(__webpack_require__(117));
 //# sourceMappingURL=index.js.map
 
 /***/ }),
@@ -722,7 +722,6 @@ var SVGComponent = (function (_super) {
         this._clipPathEnabled = false;
         this._boxes = [];
         this._isTopLevelSVG = false;
-        this._cssClasses = new Utils.Set();
         this._cssClasses.add("component");
     }
     /**
@@ -969,58 +968,6 @@ var SVGComponent = (function (_super) {
         var prefix = /MSIE [5-9]/.test(navigator.userAgent) ? "" : document.location.href;
         prefix = prefix.split("#")[0]; // To fix cases where an anchor tag was used
         this._element.attr("clip-path", "url(\"" + prefix + "#" + this._clipPathID + "\")");
-    };
-    /**
-     * Checks if the Component has a given CSS class.
-     *
-     * @param {string} cssClass The CSS class to check for.
-     */
-    SVGComponent.prototype.hasClass = function (cssClass) {
-        if (cssClass == null) {
-            return false;
-        }
-        if (this._element == null) {
-            return this._cssClasses.has(cssClass);
-        }
-        else {
-            return this._element.classed(cssClass);
-        }
-    };
-    /**
-     * Adds a given CSS class to the Component.
-     *
-     * @param {string} cssClass The CSS class to add.
-     * @returns {Component} The calling Component.
-     */
-    SVGComponent.prototype.addClass = function (cssClass) {
-        if (cssClass == null) {
-            return this;
-        }
-        if (this._element == null) {
-            this._cssClasses.add(cssClass);
-        }
-        else {
-            this._element.classed(cssClass, true);
-        }
-        return this;
-    };
-    /**
-     * Removes a given CSS class from the Component.
-     *
-     * @param {string} cssClass The CSS class to remove.
-     * @returns {Component} The calling Component.
-     */
-    SVGComponent.prototype.removeClass = function (cssClass) {
-        if (cssClass == null) {
-            return this;
-        }
-        if (this._element == null) {
-            this._cssClasses.delete(cssClass);
-        }
-        else {
-            this._element.classed(cssClass, false);
-        }
-        return this;
     };
     /**
      * Detaches a Component from the DOM. The Component can be reused.
@@ -1913,11 +1860,11 @@ exports.Interaction = Interaction;
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-__export(__webpack_require__(109));
 __export(__webpack_require__(110));
 __export(__webpack_require__(111));
 __export(__webpack_require__(112));
 __export(__webpack_require__(113));
+__export(__webpack_require__(114));
 //# sourceMappingURL=index.js.map
 
 /***/ }),
@@ -3264,11 +3211,16 @@ exports.Axis = Axis;
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
+/**
+ * Copyright 2014-present Palantir Technologies
+ * @license MIT
+ */
 
 var RenderController = __webpack_require__(16);
 var Utils = __webpack_require__(0);
 var AbstractComponent = (function () {
     function AbstractComponent() {
+        this._cssClasses = new Utils.Set();
         this._destroyed = false;
         this._isAnchored = false;
         this._isSetup = false;
@@ -3359,6 +3311,58 @@ var AbstractComponent = (function () {
         }
         this._yAlignment = yAlignment;
         this.redraw();
+        return this;
+    };
+    /**
+     * Checks if the Component has a given CSS class.
+     *
+     * @param {string} cssClass The CSS class to check for.
+     */
+    AbstractComponent.prototype.hasClass = function (cssClass) {
+        if (cssClass == null) {
+            return false;
+        }
+        if (this._element == null) {
+            return this._cssClasses.has(cssClass);
+        }
+        else {
+            return this._element.classed(cssClass);
+        }
+    };
+    /**
+     * Adds a given CSS class to the Component.
+     *
+     * @param {string} cssClass The CSS class to add.
+     * @returns {IComponent} The calling Component.
+     */
+    AbstractComponent.prototype.addClass = function (cssClass) {
+        if (cssClass == null) {
+            return this;
+        }
+        if (this._element == null) {
+            this._cssClasses.add(cssClass);
+        }
+        else {
+            this._element.classed(cssClass, true);
+        }
+        return this;
+    };
+    /**
+     * Removes a given CSS class from the Component.
+     *
+     * @param {string} cssClass The CSS class to remove.
+     * @returns {IComponent} The calling Component.
+     */
+    AbstractComponent.prototype.removeClass = function (cssClass) {
+        if (cssClass == null) {
+            return this;
+        }
+        if (this._element == null) {
+            this._cssClasses.delete(cssClass);
+        }
+        else {
+            this._element.classed(cssClass, false);
+        }
         return this;
     };
     /**
@@ -4760,6 +4764,10 @@ exports.Time = Time;
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
+/**
+ * Copyright 2014-present Palantir Technologies
+ * @license MIT
+ */
 
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
@@ -4845,6 +4853,10 @@ exports.ComponentContainer = ComponentContainer;
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
+/**
+ * Copyright 2014-present Palantir Technologies
+ * @license MIT
+ */
 
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
@@ -4859,21 +4871,16 @@ var HTMLComponent = (function (_super) {
     __extends(HTMLComponent, _super);
     function HTMLComponent() {
         _super.apply(this, arguments);
-        this._cssClasses = new Utils.Set();
     }
     HTMLComponent.prototype.anchor = function (selection) {
         if (this._destroyed) {
             throw new Error("Can't reuse destroy()-ed Components!");
         }
-        if (this._element != null) {
-            // reattach existing element
-            selection.appendChild(this._element);
-        }
-        else {
-            this._element = document.createElement("div");
-            selection.appendChild(this._element);
+        if (this._element == null) {
+            this._element = d3.select(document.createElement("div"));
             this._setup();
         }
+        selection.appendChild(this._element.node());
         this._isAnchored = true;
         this._onAnchorCallbacks.callCallbacks(this);
         return this;
@@ -4889,15 +4896,15 @@ var HTMLComponent = (function (_super) {
             else if (this.parent() == null) {
                 // if the parent is null we are the root node. In this case, we determine
                 // then sizing constraints for the remainder of the chart.
+                this._element.classed("root", true);
                 origin = { x: 0, y: 0 };
                 // this is the top-level element. make it 100% height and width
                 // so we can measure the amount of space available for the chart
                 // with respect to the total space allocated for charting as specified
                 // by the user.
-                this._element.style.width = "100%";
-                this._element.style.height = "100%";
-                availableWidth = Utils.DOM.elementWidth(this._element);
-                availableHeight = Utils.DOM.elementHeight(this._element);
+                this._element.style({ "width": "100%", "height": "100%" });
+                availableWidth = Utils.DOM.elementWidth(this._element.node());
+                availableHeight = Utils.DOM.elementHeight(this._element.node());
             }
             else {
                 throw new Error("null arguments cannot be passed to computeLayout() on a non-root node");
@@ -4914,7 +4921,7 @@ var HTMLComponent = (function (_super) {
         };
         // set the size and position of the root element given the
         // calculated space constraints
-        d3.select(this._element).style({
+        this._element.style({
             height: this._height + "px",
             left: this._origin.x + "px",
             top: this._origin.y + "px",
@@ -4961,59 +4968,26 @@ var HTMLComponent = (function (_super) {
             return this._cssClasses.has(cssClass);
         }
         else {
-            return this._element.className.split(" ").indexOf(cssClass) !== -1;
+            return this._element.classed(cssClass);
         }
-    };
-    HTMLComponent.prototype.addClass = function (cssClass) {
-        if (cssClass == null) {
-            return this;
-        }
-        if (this._element == null) {
-            this._cssClasses.add(cssClass);
-        }
-        else {
-            var classNames = this._element.className.split(" ");
-            if (classNames.indexOf(cssClass) !== -1) {
-                classNames.push(cssClass);
-                this._element.className = classNames.join(" ");
-            }
-        }
-        return this;
-    };
-    HTMLComponent.prototype.removeClass = function (cssClass) {
-        if (cssClass == null) {
-            return this;
-        }
-        if (this._element == null) {
-            this._cssClasses.delete(cssClass);
-        }
-        else {
-            var classNames = this._element.className.split(" ");
-            var indexOfClass = classNames.indexOf(cssClass);
-            if (indexOfClass > -1) {
-                classNames.splice(indexOfClass, 1);
-                this._element.className = classNames.join(" ");
-            }
-        }
-        return this;
     };
     HTMLComponent.prototype.detach = function () {
         this.parent(null);
         if (this._isAnchored) {
-            d3.select(this._element).remove();
+            this._element.remove();
         }
         this._isAnchored = false;
         this._onDetachCallbacks.callCallbacks(this);
         return this;
     };
     HTMLComponent.prototype.content = function () {
-        return d3.select(this._element);
+        return this._element;
     };
     HTMLComponent.prototype.translator = function () {
         return Utils.ClientToHTMLTranslator.getTranslator(this);
     };
     HTMLComponent.prototype.element = function () {
-        return d3.select(this._element);
+        return this._element;
     };
     /**
      * Gets the container holding the visual elements of the Component.
@@ -5023,22 +4997,20 @@ var HTMLComponent = (function (_super) {
      * @return {D} content selection for the Component
      */
     HTMLComponent.prototype._setup = function () {
+        var _this = this;
         if (this._isSetup) {
             return;
         }
-        var classListSet = new Utils.Set();
-        this._element.className.split(" ").forEach(function (className) { return classListSet.add(className); });
-        this._cssClasses.forEach(function (className) { return classListSet.add(className); });
-        var classList = [];
-        classListSet.forEach(function (className) { return classList.push(className); });
-        this._element.className = classList.join(" ");
+        this._cssClasses.forEach(function (cssClass) {
+            _this._element.classed(cssClass, true);
+        });
         if (this.parent() == null) {
             // the root element gets the plottable class name
-            d3.select(this._element).classed("plottable", true);
+            this._element.classed("plottable", true);
         }
         else {
             // non-root components are simple components
-            d3.select(this._element).classed("component", true);
+            this._element.classed("component", true);
         }
         this._cssClasses = new Utils.Set();
         this._isSetup = true;
@@ -7488,29 +7460,17 @@ function _parseStyleValue(style, property) {
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
+/**
+ * Copyright 2014-present Palantir Technologies
+ * @license MIT
+ */
 
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var PlottableElement = (function () {
-    function PlottableElement(element) {
-        this._element = element;
-    }
-    PlottableElement.prototype.appendChild = function (newChild) {
-        return this._element.appendChild(newChild);
-    };
-    PlottableElement.prototype.getBoundingClientRect = function () {
-        return this._element.getBoundingClientRect();
-    };
-    PlottableElement.prototype.setAttribute = function (name, value) {
-        this._element.setAttribute(name, value);
-        return this;
-    };
-    return PlottableElement;
-}());
-exports.PlottableElement = PlottableElement;
+var abstractPlottableElement_1 = __webpack_require__(95);
 var PlottableHTMLElement = (function (_super) {
     __extends(PlottableHTMLElement, _super);
     function PlottableHTMLElement() {
@@ -7525,7 +7485,7 @@ var PlottableHTMLElement = (function (_super) {
         return this;
     };
     return PlottableHTMLElement;
-}(PlottableElement));
+}(abstractPlottableElement_1.PlottableElement));
 exports.PlottableHTMLElement = PlottableHTMLElement;
 var PlottableSVGElement = (function (_super) {
     __extends(PlottableSVGElement, _super);
@@ -7541,7 +7501,7 @@ var PlottableSVGElement = (function (_super) {
         return this;
     };
     return PlottableSVGElement;
-}(PlottableElement));
+}(abstractPlottableElement_1.PlottableElement));
 exports.PlottableSVGElement = PlottableSVGElement;
 
 
@@ -15243,6 +15203,35 @@ exports.Time = Time;
  * @license MIT
  */
 
+var PlottableElement = (function () {
+    function PlottableElement(element) {
+        this._element = element;
+    }
+    PlottableElement.prototype.appendChild = function (newChild) {
+        return this._element.appendChild(newChild);
+    };
+    PlottableElement.prototype.getBoundingClientRect = function () {
+        return this._element.getBoundingClientRect();
+    };
+    PlottableElement.prototype.setAttribute = function (name, value) {
+        this._element.setAttribute(name, value);
+        return this;
+    };
+    return PlottableElement;
+}());
+exports.PlottableElement = PlottableElement;
+
+
+/***/ }),
+/* 96 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/**
+ * Copyright 2014-present Palantir Technologies
+ * @license MIT
+ */
+
 var d3 = __webpack_require__(1);
 var nativeArray = window.Array;
 /**
@@ -15304,7 +15293,7 @@ exports.createFilledArray = createFilledArray;
 
 
 /***/ }),
-/* 96 */
+/* 97 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -15346,10 +15335,14 @@ exports.CallbackSet = CallbackSet;
 
 
 /***/ }),
-/* 97 */
+/* 98 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
+/**
+ * Copyright 2014-present Palantir Technologies
+ * @license MIT
+ */
 
 var plottableElement_1 = __webpack_require__(43);
 var translator_1 = __webpack_require__(30);
@@ -15383,7 +15376,7 @@ exports.ClientToHTMLTranslator = ClientToHTMLTranslator;
 
 
 /***/ }),
-/* 98 */
+/* 99 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -15424,7 +15417,7 @@ exports.ClientToSVGTranslator = ClientToSVGTranslator;
 
 
 /***/ }),
-/* 99 */
+/* 100 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -15507,7 +15500,7 @@ function luminance(color) {
 
 
 /***/ }),
-/* 100 */
+/* 101 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -15561,7 +15554,7 @@ exports.EntityArray = EntityArray;
 
 
 /***/ }),
-/* 101 */
+/* 102 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -15652,7 +15645,7 @@ exports.Map = Map;
 
 
 /***/ }),
-/* 102 */
+/* 103 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -15777,7 +15770,7 @@ exports.normalizeKey = normalizeKey;
 
 
 /***/ }),
-/* 103 */
+/* 104 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -15849,7 +15842,7 @@ exports.deprecated = deprecated;
 
 
 /***/ }),
-/* 104 */
+/* 105 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -15863,12 +15856,12 @@ function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
 __export(__webpack_require__(31));
-__export(__webpack_require__(105));
 __export(__webpack_require__(106));
+__export(__webpack_require__(107));
 //# sourceMappingURL=index.js.map
 
 /***/ }),
-/* 105 */
+/* 106 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -15904,7 +15897,7 @@ exports.OpacityAnimator = OpacityAnimator;
 //# sourceMappingURL=opacityAnimator.js.map
 
 /***/ }),
-/* 106 */
+/* 107 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -15979,7 +15972,7 @@ exports.UnveilAnimator = UnveilAnimator;
 //# sourceMappingURL=unveilAnimator.js.map
 
 /***/ }),
-/* 107 */
+/* 108 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -16021,7 +16014,7 @@ exports.CacheMeasurer = CacheMeasurer;
 //# sourceMappingURL=cacheMeasurer.js.map
 
 /***/ }),
-/* 108 */
+/* 109 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -16036,13 +16029,13 @@ function __export(m) {
 }
 __export(__webpack_require__(45));
 __export(__webpack_require__(46));
-__export(__webpack_require__(107));
+__export(__webpack_require__(108));
 __export(__webpack_require__(47));
 __export(__webpack_require__(48));
 //# sourceMappingURL=index.js.map
 
 /***/ }),
-/* 109 */
+/* 110 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -16091,7 +16084,7 @@ exports.Cache = Cache;
 //# sourceMappingURL=cache.js.map
 
 /***/ }),
-/* 110 */
+/* 111 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -16139,7 +16132,7 @@ exports.DOM = DOM;
 //# sourceMappingURL=dom.js.map
 
 /***/ }),
-/* 111 */
+/* 112 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -16197,7 +16190,7 @@ exports.Methods = Methods;
 //# sourceMappingURL=methods.js.map
 
 /***/ }),
-/* 112 */
+/* 113 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -16244,7 +16237,7 @@ exports.StringMethods = StringMethods;
 //# sourceMappingURL=stringMethods.js.map
 
 /***/ }),
-/* 113 */
+/* 114 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -16292,7 +16285,7 @@ exports.Tokenizer = Tokenizer;
 //# sourceMappingURL=tokenizer.js.map
 
 /***/ }),
-/* 114 */
+/* 115 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -16305,12 +16298,12 @@ exports.Tokenizer = Tokenizer;
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-__export(__webpack_require__(115));
+__export(__webpack_require__(116));
 __export(__webpack_require__(49));
 //# sourceMappingURL=index.js.map
 
 /***/ }),
-/* 115 */
+/* 116 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -16368,7 +16361,7 @@ exports.SingleLineWrapper = SingleLineWrapper;
 //# sourceMappingURL=singleLineWrapper.js.map
 
 /***/ }),
-/* 116 */
+/* 117 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -16381,11 +16374,11 @@ exports.SingleLineWrapper = SingleLineWrapper;
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-__export(__webpack_require__(117));
+__export(__webpack_require__(118));
 //# sourceMappingURL=index.js.map
 
 /***/ }),
-/* 117 */
+/* 118 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -16519,7 +16512,7 @@ exports.Writer = Writer;
 //# sourceMappingURL=writer.js.map
 
 /***/ }),
-/* 118 */
+/* 119 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";

@@ -8,7 +8,7 @@ function makeData() {
 
 }
 
-function run(div, data, Plottable) {
+function run(container, data, Plottable) {
   "use strict";
   var title = new Plottable.Components.TitleLabel("Click legend entries to highlight plots", 0);
 
@@ -44,7 +44,7 @@ function run(div, data, Plottable) {
   var plotGroup = new Plottable.Components.Group(plotGroupArray);
   var table = new Plottable.Components.Table([[title, null],
                                               [plotGroup, legend]]);
-  table.renderTo(div);
+  table.renderTo(container);
 
   var legendInteraction = new Plottable.Interactions.Click();
   legendInteraction.onClick(function(point) {

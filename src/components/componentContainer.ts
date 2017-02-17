@@ -1,3 +1,8 @@
+/**
+ * Copyright 2014-present Palantir Technologies
+ * @license MIT
+ */
+
 import { GenericComponentCallback, IComponent } from "./abstractComponent";
 import { HTMLComponent } from "./htmlComponent";
 

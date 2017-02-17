@@ -45,7 +45,7 @@ svg.plottable {
 }
 
 /* Root-level html components are relative, all others are absolute */
-div.plottable {
+.root.plottable {
   position: relative;
 }
 

@@ -10,7 +10,7 @@ function makeData() {
   ];
 }
 
-function run(div, data, Plottable){
+function run(container, data, Plottable){
   "use strict";
 
   var cs = new Plottable.Scales.Color();
@@ -47,5 +47,5 @@ function run(div, data, Plottable){
           .attr("fill", function(d){ return d.key; }, cs);
 
   var pies = new Plottable.Components.Table([[topPie, rightPie], [leftPie, bottomPie]]);
-  pies.renderTo(div);
+  pies.renderTo(container);
 }

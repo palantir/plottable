@@ -229,12 +229,12 @@ function loadAllQuickTests(quicktestsPaths, firstQTBranch, secondQTBranch){
       var className = "quicktest " + name;
       var div = d3.select("#results").append("div").attr("class", className);
       div.insert("label").text(name);
-      var firstdiv = div.append("div").attr("class", "first").append("div").attr({width: svgWidth, height: svgHeight});
-      var seconddiv = div.append("div").attr("class", "second").append("div").attr({width: svgWidth, height: svgHeight});
+      var firstElement = div.append("div").attr("class", "first").append("div").attr({width: svgWidth, height: svgHeight});
+      var secondElement = div.append("div").attr("class", "second").append("div").attr({width: svgWidth, height: svgHeight});
       var data = result.makeData();
 
-      runQuickTest(result, firstdiv, data, firstQTBranch);
-      runQuickTest(result, seconddiv, data, secondQTBranch);
+      runQuickTest(result, firstElement, data, firstQTBranch);
+      runQuickTest(result, secondElement, data, secondQTBranch);
     });
   });
 }
@@ -255,12 +255,12 @@ function loadQuickTestsInCategory(quickTestNames, category, firstQTBranch, secon
 
       var div = d3.select("#results").append("div").attr("class", className);
       div.insert("label").text(name);
-      var firstdiv = div.append("div").attr("class", "first").append("div").attr({width: svgWidth, height: svgHeight});
-      var seconddiv = div.append("div").attr("class", "second").append("div").attr({width: svgWidth, height: svgHeight});
+      var firstElement = div.append("div").attr("class", "first").append("div").attr({width: svgWidth, height: svgHeight});
+      var secondElement = div.append("div").attr("class", "second").append("div").attr({width: svgWidth, height: svgHeight});
       var data = result.makeData();
 
-      runQuickTest(result, firstdiv, data, firstQTBranch);
-      runQuickTest(result, seconddiv, data, secondQTBranch);
+      runQuickTest(result, firstElement, data, firstQTBranch);
+      runQuickTest(result, secondElement, data, secondQTBranch);
     });
   });
 }

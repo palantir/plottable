@@ -20,7 +20,7 @@ function makeData() {
   return data;
 }
 
-function run(div, data, Plottable) {
+function run(container, data, Plottable) {
   "use strict";
 
   var xScale = new Plottable.Scales.Linear();
@@ -66,7 +66,7 @@ function run(div, data, Plottable) {
     [null, xAxis, null],
     [null, buttonGroup, null]
   ]);
-  chart.renderTo(div);
+  chart.renderTo(container);
   addButton.background().select(".background-fill").style("stroke", "black");
   removeButton.background().select(".background-fill").style("stroke", "black");
 }

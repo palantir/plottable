@@ -4,7 +4,7 @@ function makeData() {
 
 }
 
-function run(div, data, Plottable) {
+function run(container, data, Plottable) {
   "use strict";
 
   var ds = new Plottable.Dataset(data);
@@ -38,7 +38,7 @@ function run(div, data, Plottable) {
 
   var table = new Plottable.Components.Table([[yAxis, group],
                                              [null, xAxis]]);
-  table.renderTo(div);
+  table.renderTo(container);
 
   var pzi = new Plottable.Interactions.PanZoom(null, yScale);
   pzi.attachTo(plot);

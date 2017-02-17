@@ -3,7 +3,7 @@ function makeData() {
   return [makeRandomData(30), makeRandomData(30)];
 }
 
-function run(div, data, Plottable) {
+function run(container, data, Plottable) {
   "use strict";
 
   var xScaleSquare = new Plottable.Scales.Linear();
@@ -53,7 +53,7 @@ function run(div, data, Plottable) {
       [yAxis, plotGroup],
       [null, xAxisSquare],
       [null, squareLabel]]);
-  chart.renderTo(div);
+  chart.renderTo(container);
 
   var pointer = new Plottable.Interactions.Pointer();
   var pointerCallback = function(p) {

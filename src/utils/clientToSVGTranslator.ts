@@ -3,6 +3,8 @@
  * @license MIT
  */
 
+import * as d3 from "d3";
+
 import * as DOM from "./domUtils";
 import { PlottableSVGElement } from "./plottableElement";
 import { Translator } from "./translator";
@@ -16,7 +18,7 @@ export class ClientToSVGTranslator {
    * Returns the ClientToSVGTranslator for the <svg> containing elem.
    * If one already exists on that <svg>, it will be returned; otherwise, a new one will be created.
    */
-  public static getTranslator(component: IComponent<any>): Translator {
+  public static getTranslator(component: IComponent<d3.Selection<void>>): Translator {
     let svg = DOM.boundingSVG(component.element().node() as SVGElement);
 
     let translator: Translator = (<any> svg)[ClientToSVGTranslator._TRANSLATOR_KEY];

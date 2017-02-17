@@ -35,7 +35,7 @@ function makeData() {
   return makeWaterfallData(5, 3);
 }
 
-function run(div, data, Plottable) {
+function run(container, data, Plottable) {
   "use strict";
   var xScale = new Plottable.Scales.Category();
   var yScale = new Plottable.Scales.Linear();
@@ -64,5 +64,5 @@ function run(div, data, Plottable) {
   new Plottable.Components.Table([
       [yAxis, waterfall],
       [null, xAxis]
-  ]).renderTo(div);
+  ]).renderTo(container);
 }

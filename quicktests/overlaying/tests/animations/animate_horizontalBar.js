@@ -4,7 +4,7 @@ function makeData() {
   return makeRandomData(6);
 }
 
-function run(div, data, Plottable) {
+function run(container, data, Plottable) {
   "use strict";
 
   var doAnimate = true;
@@ -26,7 +26,7 @@ function run(div, data, Plottable) {
 
   var hBarChart = new Plottable.Components.Table([[yAxis, hBarRenderer],
    [null,  xAxis]]);
-  hBarChart.renderTo(div);
+  hBarChart.renderTo(container);
 
   var cb = function(){
     var d = dataset.data();

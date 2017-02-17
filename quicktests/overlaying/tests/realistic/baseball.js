@@ -2,7 +2,7 @@ function makeData() {
   "use strict";
 }
 
-function run(div, data, Plottable) {
+function run(container, data, Plottable) {
   "use strict";
 
   d3.csv("data/baseball.csv").get(function(error, rows) {
@@ -70,6 +70,6 @@ function run(div, data, Plottable) {
   var table = new Plottable.Components.Table([[null, legend],
                                              [yAxis, plots],
                                              [null, xAxis]]);
-  table.renderTo(div);
+  table.renderTo(container);
   });
 }

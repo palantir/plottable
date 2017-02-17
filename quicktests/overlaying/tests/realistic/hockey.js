@@ -2,7 +2,7 @@ function makeData() {
   "use strict";
 }
 
-function run(div, data, Plottable) {
+function run(container, data, Plottable) {
   "use strict";
 
   d3.csv("data/hockey.csv").get(function(error, rows) {
@@ -85,6 +85,6 @@ function run(div, data, Plottable) {
   var table = new Plottable.Components.Table([[yLabel, yAxis, mergedPlots],
                                              [null, null, xAxis],
                                              [null, null, xLabel]]);
-  table.renderTo(div);
+  table.renderTo(container);
   });
 }

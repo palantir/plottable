@@ -1,3 +1,8 @@
+/**
+ * Copyright 2014-present Palantir Technologies
+ * @license MIT
+ */
+
 import * as d3 from "d3";
 
 import {
@@ -13,23 +18,18 @@ import * as RenderController from "../core/renderController";
 import * as Utils from "../utils";
 
 export class HTMLComponent extends AbstractComponent<HTMLElement> {
-  private _cssClasses = new Utils.Set<string>();
-  private _element: HTMLDivElement;
 
   public anchor(selection: HTMLElement) {
     if (this._destroyed) {
       throw new Error("Can't reuse destroy()-ed Components!");
     }
 
-    if (this._element != null) {
-      // reattach existing element
-      selection.appendChild(this._element);
-    } else {
-      this._element = document.createElement("div");
-      selection.appendChild(this._element);
+    if (this._element == null) {
+      this._element = d3.select(document.createElement("div"));
       this._setup();
     }
 
+    selection.appendChild(this._element.node());
 
     this._isAnchored = true;
     this._onAnchorCallbacks.callCallbacks(this);
@@ -47,17 +47,17 @@ export class HTMLComponent extends AbstractComponent<HTMLElement> {
       } else if (this.parent() == null) {
         // if the parent is null we are the root node. In this case, we determine
         // then sizing constraints for the remainder of the chart.
+        this._element.classed("root", true);
 
         origin = { x: 0, y: 0 };
         // this is the top-level element. make it 100% height and width
         // so we can measure the amount of space available for the chart
         // with respect to the total space allocated for charting as specified
         // by the user.
-        this._element.style.width = "100%";
-        this._element.style.height = "100%";
+        this._element.style({ "width": "100%", "height": "100%" });
 
-        availableWidth = Utils.DOM.elementWidth(this._element);
-        availableHeight = Utils.DOM.elementHeight(this._element);
+        availableWidth = Utils.DOM.elementWidth(this._element.node() as HTMLElement);
+        availableHeight = Utils.DOM.elementHeight(this._element.node() as HTMLElement);
       } else {
         throw new Error("null arguments cannot be passed to computeLayout() on a non-root node");
       }
@@ -76,7 +76,7 @@ export class HTMLComponent extends AbstractComponent<HTMLElement> {
 
     // set the size and position of the root element given the
     // calculated space constraints
-    d3.select(this._element).style({
+    this._element.style({
       height: `${this._height}px`,
       left: `${this._origin.x}px`,
       top: `${this._origin.y}px`,
@@ -133,52 +133,15 @@ export class HTMLComponent extends AbstractComponent<HTMLElement> {
     if (this._element == null) {
       return this._cssClasses.has(cssClass);
     } else {
-      return this._element.className.split(" ").indexOf(cssClass) !== -1;
+      return this._element.classed(cssClass);
     }
-  }
-
-  public addClass(cssClass: string) {
-    if (cssClass == null) {
-      return this;
-    }
-
-    if (this._element == null) {
-      this._cssClasses.add(cssClass);
-    } else {
-      const classNames = this._element.className.split(" ");
-      if (classNames.indexOf(cssClass) !== -1) {
-        classNames.push(cssClass);
-        this._element.className = classNames.join(" ");
-      }
-    }
-
-    return this;
-  }
-
-  public removeClass(cssClass: string) {
-    if (cssClass == null) {
-      return this;
-    }
-
-    if (this._element == null) {
-      this._cssClasses.delete(cssClass);
-    } else {
-      const classNames = this._element.className.split(" ");
-      const indexOfClass = classNames.indexOf(cssClass);
-      if (indexOfClass > -1) {
-        classNames.splice(indexOfClass, 1);
-        this._element.className = classNames.join(" ");
-      }
-    }
-
-    return this;
   }
 
   public detach() {
     this.parent(null);
 
     if (this._isAnchored) {
-      d3.select(this._element).remove();
+      this._element.remove();
     }
 
     this._isAnchored = false;
@@ -188,7 +151,7 @@ export class HTMLComponent extends AbstractComponent<HTMLElement> {
   }
 
   public content() {
-    return d3.select(this._element);
+    return this._element;
   }
 
   public translator(): Utils.Translator {
@@ -196,7 +159,7 @@ export class HTMLComponent extends AbstractComponent<HTMLElement> {
   }
 
   public element() {
-    return d3.select(this._element);
+    return this._element;
   }
 
   /**
@@ -212,19 +175,16 @@ export class HTMLComponent extends AbstractComponent<HTMLElement> {
       return;
     }
 
-    const classListSet = new Utils.Set<string>();
-    this._element.className.split(" ").forEach((className) => classListSet.add(className));
-    this._cssClasses.forEach((className) => classListSet.add(className));
-    const classList: string[] = [];
-    classListSet.forEach((className) => classList.push(className));
-    this._element.className = classList.join(" ");
+    this._cssClasses.forEach((cssClass: string) => {
+      this._element.classed(cssClass, true);
+    });
 
     if (this.parent() == null) {
       // the root element gets the plottable class name
-      d3.select(this._element).classed("plottable", true);
+      this._element.classed("plottable", true);
     } else {
       // non-root components are simple components
-      d3.select(this._element).classed("component", true);
+      this._element.classed("component", true);
     }
 
     this._cssClasses = new Utils.Set<string>();

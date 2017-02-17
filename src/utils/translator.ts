@@ -3,7 +3,7 @@ import * as Utils from "../utils";
 import { Point } from "../";
 import { IComponent } from "../components";
 
-import { IPlottableElement } from "./plottableElement";
+import { IPlottableElement } from "./abstractPlottableElement";
 
 export class Translator {
   private _measurementElement: IPlottableElement<any>;

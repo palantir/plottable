@@ -5,7 +5,7 @@ function makeData() {
   return [blueSet, redSet];
 }
 
-function run(div, data, Plottable) {
+function run(container, data, Plottable) {
   "use strict";
 
   var xScale = new Plottable.Scales.Linear();
@@ -31,7 +31,7 @@ function run(div, data, Plottable) {
       [yAxis, plot],
       [null, xAxis]]);
 
-  chart.renderTo(div);
+  chart.renderTo(container);
 
   var hoverCircle = plot.foreground().append("circle").attr({
                                                "stroke": "black",

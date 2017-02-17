@@ -16,7 +16,7 @@ function makeData() {
 
 }
 
-function run(div, data, Plottable) {
+function run(container, data, Plottable) {
   "use strict";
     var xScale = new Plottable.Scales.Linear();
     var yScale = new Plottable.Scales.Linear();
@@ -59,5 +59,5 @@ function run(div, data, Plottable) {
     .movable(true);
 
     var group = new Plottable.Components.Group([segment, rectangle, dbl]);
-    new Plottable.Components.Table([[yAxis, group], [null, xAxis]]).renderTo(div);
+    new Plottable.Components.Table([[yAxis, group], [null, xAxis]]).renderTo(container);
 }

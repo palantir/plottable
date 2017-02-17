@@ -27,7 +27,7 @@ function makeData() {
          ];
 }
 
-function run(div, data, Plottable) {
+function run(container, data, Plottable) {
   "use strict";
 
   var xScale = new Plottable.Scales.Category();
@@ -54,5 +54,5 @@ function run(div, data, Plottable) {
                                               [null, label],
                                               [null, xAxis],
                                               [yAxis, plot]]);
-  table.renderTo(div);
+  table.renderTo(container);
 }

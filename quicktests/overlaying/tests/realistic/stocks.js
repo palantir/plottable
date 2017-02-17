@@ -3,7 +3,7 @@ function makeData() {
 
 }
 
-function run(div, data, Plottable) {
+function run(container, data, Plottable) {
   "use strict";
 
   function processDatum(d) {
@@ -107,7 +107,7 @@ function run(div, data, Plottable) {
 
           table.rowWeight(2, 0.3);
 
-          table.renderTo(div);
+          table.renderTo(container);
 
           var pzi = new Plottable.Interactions.PanZoom(xScale, null);
           pzi.attachTo(plotArea);

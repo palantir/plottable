@@ -53,7 +53,7 @@ function makeData() {
   };
 }
 
-function run(div, data, Plottable) {
+function run(container, data, Plottable) {
   "use strict";
 
   var AusColor = "#ff6969";
@@ -149,5 +149,5 @@ function run(div, data, Plottable) {
                                               [AusFeaturePlot,  AusLabels,  AusSmartPlot],
                                               [IndFeaturePlot,  IndLabels,  IndSmartPlot],
                                               [RoKFeaturePlot,  RoKLabels,  RoKSmartPlot]]);
-  table.renderTo(div);
+  table.renderTo(container);
 }

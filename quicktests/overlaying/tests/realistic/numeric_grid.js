@@ -13,7 +13,7 @@ function makeData() {
          ];
 }
 
-function run(div, data, Plottable) {
+function run(container, data, Plottable) {
   "use strict";
 
   var xScale = new Plottable.Scales.Linear();
@@ -30,7 +30,7 @@ function run(div, data, Plottable) {
       .attr("stroke", function(){ return "#000000"; })
       .attr("stroke-width", function(){ return 4; });
 
-  plot.renderTo(div);
+  plot.renderTo(container);
 
   var hover = new Plottable.Interactions.Pointer().attachTo(plot);
   hover.onPointerEnter(function() {

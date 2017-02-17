@@ -5,7 +5,7 @@ function makeData() {
   return [d];
 }
 
-function run(div, data, Plottable){
+function run(container, data, Plottable){
   "use strict";
 
   var plotData = [];
@@ -63,7 +63,7 @@ function run(div, data, Plottable){
   var table = new Plottable.Components.Table([[null, title, null],
                                              [yAxis, plot, legend],
                                              [null, xAxis, null]]);
-  table.renderTo(div);
+  table.renderTo(container);
 
   var pointer = new Plottable.Interactions.Pointer();
   var defaultTitleText = "n = new point, d = delete last point";
