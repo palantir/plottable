@@ -7,6 +7,7 @@ import * as SVGTypewriter from "svg-typewriter";
 import * as Plottable from "../../src";
 
 import * as TestMethods from "../testMethods";
+import { getTranslateValues } from "../../src/utils/domUtils";
 
 describe("Labels", () => {
   const LABEL_CLASS = "label";
@@ -62,8 +63,8 @@ describe("Labels", () => {
       it("positions centered text in the middle of horizontal space", () => {
         const SVG_WIDTH = TestMethods.numAttr(svg, "width");
         const label = new Plottable.Components.Label("X").renderTo(svg);
-        const textTranslate = d3.transform(label.content().select("g").attr("transform")).translate;
-        const eleTranslate = d3.transform((<any> label)._element.attr("transform")).translate;
+        const textTranslate = getTranslateValues(label.content().select("g"));
+        const eleTranslate = getTranslateValues((<any> label)._element);
         const textWidth = Plottable.Utils.DOM.elementBBox(label.content().select("text")).width;
         const midPoint = eleTranslate[0] + textTranslate[0] + textWidth / 2;
         assert.closeTo(midPoint, SVG_WIDTH / 2, window.Pixel_CloseTo_Requirement, "label is centered");

@@ -47,7 +47,7 @@ describe("Plots", () => {
         clusterBarPlot.addDataset(dataset1);
         clusterBarPlot.addDataset(dataset2);
 
-        const bars =  clusterBarPlot.content().selectAll(".bar-area").selectAll("rect");
+        const bars =  clusterBarPlot.content().selectAll<Element, any>(".bar-area").selectAll<Element, any>("rect");
         assert.strictEqual(bars.size(), 4, "Number of bars should be equivalent to number of datum");
 
         const maxValue = Math.max.apply(null, originalData1.map((d) => d.num).concat(originalData2.map((d) => d.num)));
@@ -95,17 +95,17 @@ describe("Plots", () => {
           {category: "C", num: 15},
         ]));
 
-        const bars =  clusterBarPlot.content().selectAll(".bar-area").selectAll("rect");
+        const bars =  clusterBarPlot.content().selectAll<Element, any>(".bar-area").selectAll<Element, any>("rect");
         assert.strictEqual(bars.size(), 7, "Number of bars should be equivalent to number of datum");
 
-        const aBar0 = d3.select(bars[0][0]);
+        const aBar0 = d3.select(bars.node());
         const aBar1 = d3.select(bars[1][0]);
 
-        const bBar0 = d3.select(bars[0][1]);
+        const bBar0 = d3.select(bars.nodes()[1]);
         const bBar1 = d3.select(bars[1][1]);
         const bBar2 = d3.select(bars[2][0]);
 
-        const cBar0 = d3.select(bars[0][2]);
+        const cBar0 = d3.select(bars.nodes()[2]);
         const cBar1 = d3.select(bars[2][1]);
 
         const attr = isVertical ? "x" : "y";

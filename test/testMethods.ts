@@ -3,6 +3,7 @@ import { assert } from "chai";
 import * as d3 from "d3";
 
 import * as Plottable from "../src";
+import { getTranslateValues } from "../src/utils/domUtils";
 
 export function generateSVG(width = 400, height = 400): SimpleSelection<void> {
   let parent = getSVGParent();
@@ -12,9 +13,9 @@ export function generateSVG(width = 400, height = 400): SimpleSelection<void> {
 export function getSVGParent(): SimpleSelection<void> {
   let mocha = d3.select("#mocha-report");
   if (mocha.node() != null) {
-    let suites = mocha.selectAll(".suite");
-    let lastSuite = d3.select(suites[0][suites[0].length - 1]);
-    return lastSuite.selectAll("ul");
+    let suites = mocha.selectAll<Element, any>(".suite");
+    let lastSuite = d3.select(suites.nodes()[suites.size() - 1]);
+    return lastSuite.selectAll<Element, any>("ul");
   } else {
     return d3.select("body");
   }
@@ -46,8 +47,9 @@ export function makeFixedSizeComponent(fixedWidth?: number, fixedHeight?: number
   return fixComponentSize(new Plottable.Component(), fixedWidth, fixedHeight);
 }
 
+// TODO deprecate
 export function getTranslate(element: SimpleSelection<void>) {
-  return d3.transform(element.attr("transform")).translate;
+  return getTranslateValues(element);
 }
 
 export function assertBBoxEquivalence(bbox: SVGRect, widthAndHeightPair: number[], message: string) {
@@ -115,7 +117,7 @@ export function assertEntitiesEqual(actual: Plottable.Entity<Plottable.Component
   assertPointsClose(actual.position, expected.position, 0.01, msg);
   assert.strictEqual(actual.selection.size(), expected.selection.size(), msg + " (selection length)");
   actual.selection[0].forEach((element: Element, index: number) => {
-    assert.strictEqual(element, expected.selection[0][index], msg + " (selection contents)");
+    assert.strictEqual(element, expected.selection.nodes()[index], msg + " (selection contents)");
   });
   assert.strictEqual(actual.component, expected.component, msg + " (component)");
 }
@@ -357,7 +359,7 @@ function tokenizePathString(pathString: string) {
 }
 
 export function verifyClipPath(c: Plottable.Component) {
-  let clipPathId = (<any>c)._boxContainer[0][0].firstChild.id;
+  let clipPathId = (<any>c)._boxContainer.node().firstChild.id;
   let expectedPrefix = /MSIE [5-9]/.test(navigator.userAgent) ? "" : document.location.href;
   expectedPrefix = expectedPrefix.replace(/#.*/g, "");
   let expectedClipPathURL = "url(" + expectedPrefix + "#" + clipPathId + ")";

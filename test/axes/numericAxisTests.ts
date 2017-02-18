@@ -63,8 +63,8 @@ describe("Axes", () => {
             axis.tickLabelPosition(labelPosition);
             axis.renderTo(svg);
 
-            const tickLabels = axis.content().selectAll(`.${Plottable.Axis.TICK_LABEL_CLASS}`);
-            const tickMarks = axis.content().selectAll(`.${Plottable.Axis.TICK_MARK_CLASS}`);
+            const tickLabels = axis.content().selectAll<Element, any>(`.${Plottable.Axis.TICK_LABEL_CLASS}`);
+            const tickMarks = axis.content().selectAll<Element, any>(`.${Plottable.Axis.TICK_MARK_CLASS}`);
             assert.operator(tickLabels.size(), ">=", 2, "at least two tick labels were drawn");
             assert.strictEqual(tickLabels.size(), tickMarks.size(), "there is one label per mark");
 
@@ -111,7 +111,7 @@ describe("Axes", () => {
           const axis = new Plottable.Axes.Numeric(scale, orientation);
           axis.renderTo(svg);
 
-          const visibconstickLabels = applyVisibleFilter(axis.content().selectAll(`.${Plottable.Axis.TICK_LABEL_CLASS}`));
+          const visibconstickLabels = applyVisibleFilter(axis.content().selectAll<Element, any>(`.${Plottable.Axis.TICK_LABEL_CLASS}`));
 
           const visibconstickLabelRects = visibconstickLabels.nodes().map((label: Element) => label.getBoundingClientRect());
 
@@ -138,7 +138,7 @@ describe("Axes", () => {
           const axis = new Plottable.Axes.Numeric(scale, orientation);
           axis.renderTo(svg);
 
-          const tickLabels = applyVisibleFilter(axis.content().selectAll(`.${Plottable.Axis.TICK_LABEL_CLASS}`));
+          const tickLabels = applyVisibleFilter(axis.content().selectAll<Element, any>(`.${Plottable.Axis.TICK_LABEL_CLASS}`));
           assert.operator(tickLabels.size(), ">", 1, "more than one tick label is shown");
 
           const tickLabelElementPairs = d3.pairs(tickLabels.nodes());
@@ -164,7 +164,7 @@ describe("Axes", () => {
 
           const tickLabelContainerClass = "tick-label-container";
           const labelContainer = axis.content().select(`.${tickLabelContainerClass}`);
-          axis.content().selectAll(`.${Plottable.Axis.TICK_LABEL_CLASS}`).each(function() {
+          axis.content().selectAll<Element, any>(`.${Plottable.Axis.TICK_LABEL_CLASS}`).each(function() {
             TestMethods.assertBBoxInclusion(labelContainer, d3.select(this));
           });
           svg.remove();
@@ -235,7 +235,7 @@ describe("Axes", () => {
         axis.formatter(formatter);
         axis.renderTo(svg);
 
-        const tickLabels = axis.content().selectAll(`.${Plottable.Axis.TICK_LABEL_CLASS}`);
+        const tickLabels = axis.content().selectAll<Element, any>(`.${Plottable.Axis.TICK_LABEL_CLASS}`);
         tickLabels.each(function(d, i) {
           const labelText = d3.select(this).text();
           assert.strictEqual(labelText, formatter(d), `formatter used to format tick label ${i}`);
@@ -305,7 +305,7 @@ describe("Axes", () => {
         });
         const axis = new Plottable.Axes.Numeric(scale, "bottom");
         axis.renderTo(svg);
-        const tickMarks = axis.content().selectAll(".tick-mark");
+        const tickMarks = axis.content().selectAll<Element, any>(".tick-mark");
         tickMarks.each(function(d, i) {
           const tickMark = d3.select(this);
           const tickMarkPosition = TestMethods.numAttr(tickMark, "x1");

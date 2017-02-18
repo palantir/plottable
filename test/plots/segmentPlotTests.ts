@@ -35,7 +35,7 @@ describe("Plots", () => {
         plot.y2((d) => d.y2);
         plot.renderTo(svg);
 
-        const lines = plot.content().selectAll("line");
+        const lines = plot.content().selectAll<Element, any>("line");
         assert.strictEqual(lines.size(), plot.datasets()[0].data().length, "line for each datum");
         lines.each(function(d, i) {
           const line = d3.select(this);
@@ -55,7 +55,7 @@ describe("Plots", () => {
         plot.y2((d) => d.y2);
         plot.renderTo(svg);
 
-        const lines = plot.content().selectAll("line");
+        const lines = plot.content().selectAll<Element, any>("line");
         assert.strictEqual(lines.size(), plot.datasets()[0].data().length, "line for each datum");
         lines.each(function(d, i) {
           const line = d3.select(this);
@@ -68,7 +68,7 @@ describe("Plots", () => {
         plot.x2((d) => d.x2);
         plot.renderTo(svg);
 
-        const lines = plot.content().selectAll("line");
+        const lines = plot.content().selectAll<Element, any>("line");
         assert.strictEqual(lines.size(), plot.datasets()[0].data().length, "line for each datum");
         lines.each(function(d, i) {
           const line = d3.select(this);

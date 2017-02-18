@@ -95,6 +95,12 @@ export function getRotate(el: SimpleSelection<any>): number {
   return +rotation;
 }
 
+const SCALE_REGEX = /scale\(\s*([-+]?[0-9]*\.?[0-9]+)\s*,?\s*([-+]?[0-9]*\.?[0-9]+)\s*\)/;
+export function getScaleValues(el: SimpleSelection<any>): [number, number] {
+  const [, scaleX, scaleY] = SCALE_REGEX.exec(el.attr("transform"));
+  return [+scaleX, +scaleY];
+}
+
 /**
  * Checks if the first ClientRect overlaps the second.
  *

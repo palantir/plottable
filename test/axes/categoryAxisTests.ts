@@ -17,7 +17,7 @@ describe("Category Axes", () => {
       let axis = new Plottable.Axes.Category(scale, "bottom");
       axis.renderTo(svg);
 
-      let ticks = axis.content().selectAll("text");
+      let ticks = axis.content().selectAll<Element, any>("text");
       let texts = ticks.nodes().map((tick: any) => d3.select(tick).text());
       assert.deepEqual(texts, domain[0].split("\n"), "newlines are supported in domains");
 
@@ -31,29 +31,29 @@ describe("Category Axes", () => {
       let axis = new Plottable.Axes.Category(scale, "bottom");
       axis.renderTo(svg);
 
-      let ticks = axis.content().selectAll("text");
+      let ticks = axis.content().selectAll<Element, any>("text");
       let texts = ticks.nodes().map((tick: any) => d3.select(tick).text());
       assert.deepEqual(texts, domain, "text displayed correctly when horizontal");
 
       axis.tickLabelAngle(90);
-      ticks = axis.content().selectAll("text");
+      ticks = axis.content().selectAll<Element, any>("text");
       texts = ticks.nodes().map((d: any) => d3.select(d).text());
       assert.deepEqual(texts, domain, "text displayed correctly when horizontal");
-      assert.closeTo(getRotate(axis.content().selectAll(".text-area")), 90,
+      assert.closeTo(getRotate(axis.content().selectAll<Element, any>(".text-area")), 90,
         window.Pixel_CloseTo_Requirement, "the ticks were rotated right");
 
       axis.tickLabelAngle(0);
-      ticks = axis.content().selectAll("text");
+      ticks = axis.content().selectAll<Element, any>("text");
       texts = ticks.nodes().map((d: any) => d3.select(d).text());
       assert.deepEqual(texts, domain, "text displayed correctly when horizontal");
-      assert.closeTo(getRotate(axis.content().selectAll(".text-area")), 0,
+      assert.closeTo(getRotate(axis.content().selectAll<Element, any>(".text-area")), 0,
         window.Pixel_CloseTo_Requirement, "the ticks were rotated right");
 
       axis.tickLabelAngle(-90);
-      ticks = axis.content().selectAll("text");
+      ticks = axis.content().selectAll<Element, any>("text");
       texts = ticks.nodes().map((d: any) => d3.select(d).text());
       assert.deepEqual(texts, domain, "text displayed correctly when horizontal");
-      assert.closeTo(getRotate(axis.content().selectAll(".text-area")), -90,
+      assert.closeTo(getRotate(axis.content().selectAll<Element, any>(".text-area")), -90,
         window.Pixel_CloseTo_Requirement, "the ticks were rotated left");
 
       svg.remove();
@@ -84,11 +84,11 @@ describe("Category Axes", () => {
       axis.tickLabelMaxLines(2);
       axis.renderTo(svg);
 
-      const tickLabels = axis.content().selectAll(".tick-label");
+      const tickLabels = axis.content().selectAll<Element, any>(".tick-label");
       assert.strictEqual(tickLabels.size(), 2, "only renders two labels");
       const [longLabel, shortLabel] = tickLabels.nodes();
-      assert.strictEqual(d3.select(longLabel).selectAll("text").size(), 2, "first label is only two lines long");
-      assert.strictEqual(d3.select(shortLabel).selectAll("text").size(), 1, "second label is only one line long");
+      assert.strictEqual(d3.select(longLabel).selectAll<Element, any>("text").size(), 2, "first label is only two lines long");
+      assert.strictEqual(d3.select(shortLabel).selectAll<Element, any>("text").size(), 1, "second label is only one line long");
 
       svg.remove();
     });
@@ -105,7 +105,7 @@ describe("Category Axes", () => {
       assert.strictEqual(stepWidth, 4 * scale.stepWidth(), "computes new stepWidth correctly");
       assert.deepEqual(downsampledDomain, ["one", "five"], "downsamples domain correctly");
 
-      const tickLabels = axis.content().selectAll(".tick-label");
+      const tickLabels = axis.content().selectAll<Element, any>(".tick-label");
       assert.strictEqual(tickLabels.size(), 2, "renders downsampled labels");
 
       svg.remove();
@@ -117,7 +117,7 @@ describe("Category Axes", () => {
       let scale = new Plottable.Scales.Category().domain(domain);
       let axis = new Plottable.Axes.Category(scale, "left");
       axis.renderTo(svg);
-      let tickLabels = axis.content().selectAll(".tick-label");
+      let tickLabels = axis.content().selectAll<Element, any>(".tick-label");
       assert.strictEqual(tickLabels.size(), domain.length, "same number of tick labels as domain entries");
       tickLabels.each(function(d, i) {
         let tickLabel = d3.select(this);
@@ -127,7 +127,7 @@ describe("Category Axes", () => {
       let changedDomain = ["bar", "baz", "bam"];
       scale.domain(changedDomain);
 
-      tickLabels = axis.content().selectAll(".tick-label");
+      tickLabels = axis.content().selectAll<Element, any>(".tick-label");
       assert.strictEqual(tickLabels.size(), changedDomain.length, "same number of tick labels as changed domain entries");
       tickLabels.each(function(d, i) {
         let tickLabel = d3.select(this);
@@ -167,7 +167,7 @@ describe("Category Axes", () => {
       let axis = new Plottable.Axes.Category(scale, "left");
       axis.renderTo(svg);
 
-      let tickLabels = axis.content().selectAll(".tick-label");
+      let tickLabels = axis.content().selectAll<Element, any>(".tick-label");
       assert.deepEqual(tickLabels.data(), domain, "tick label per datum in given order");
 
       let getYTransform = (selection: SimpleSelection<any>) => {
@@ -194,7 +194,7 @@ describe("Category Axes", () => {
       let axis = new Plottable.Axes.Category(scale, "bottom");
       axis.renderTo(svg);
 
-      let tickLabels = axis.content().selectAll(".tick-label");
+      let tickLabels = axis.content().selectAll<Element, any>(".tick-label");
       assert.deepEqual(tickLabels.data(), domain, "tick label per datum in given order");
 
       let getXTransform = (selection: SimpleSelection<any>) => {
@@ -346,7 +346,7 @@ describe("Category Axes", () => {
       let scale = new Plottable.Scales.Category().domain(domain);
       let axis = new Plottable.Axes.Category(scale, "bottom");
       axis.renderTo(svg);
-      let texts = svg.selectAll("text").nodes().map((s: any) => d3.select(s).text());
+      let texts = svg.selectAll<Element, any>("text").nodes().map((s: any) => d3.select(s).text());
       assert.deepEqual(texts, domain.map((d) => String(d)));
       axis.destroy();
       svg.remove();
@@ -363,7 +363,7 @@ describe("Category Axes", () => {
       axis.formatter(addPlane);
       axis.renderTo(svg);
       let expectedTexts = domain.map(addPlane);
-      axis.content().selectAll("text").each(function(d, i) {
+      axis.content().selectAll<Element, any>("text").each(function(d, i) {
         let actualText = d3.select(this).text();
         assert.strictEqual(actualText, expectedTexts[i], "formatter was applied");
       });
@@ -381,7 +381,7 @@ describe("Category Axes", () => {
       axis.innerTickLength(innerTickLength);
       axis.renderTo(svg);
 
-      let innerTickMarks = axis.content().selectAll(`.${Plottable.Axis.TICK_MARK_CLASS}:not(.${Plottable.Axis.END_TICK_MARK_CLASS})`);
+      let innerTickMarks = axis.content().selectAll<Element, any>(`.${Plottable.Axis.TICK_MARK_CLASS}:not(.${Plottable.Axis.END_TICK_MARK_CLASS})`);
       assert.strictEqual(innerTickMarks.size(), scale.domain().length - 2, "same number of inner ticks as domain entries minus 2");
 
       innerTickMarks.each(function(d, i) {
@@ -402,7 +402,7 @@ describe("Category Axes", () => {
       axis.endTickLength(endTickLength);
       axis.renderTo(svg);
 
-      let endTickMarks = axis.content().selectAll(`.${Plottable.Axis.END_TICK_MARK_CLASS}`);
+      let endTickMarks = axis.content().selectAll<Element, any>(`.${Plottable.Axis.END_TICK_MARK_CLASS}`);
       assert.strictEqual(endTickMarks.size(), 2, "2 end ticks");
 
       endTickMarks.each(function(d, i) {

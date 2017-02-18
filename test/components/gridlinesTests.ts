@@ -35,7 +35,7 @@ describe("Gridlines", () => {
   it("draws gridlines on ticks of its scales and updates when scale update", () => {
     gridlines.renderTo(svg);
 
-    let xGridlines = gridlines.content().select(".x-gridlines").selectAll("line");
+    let xGridlines = gridlines.content().select(".x-gridlines").selectAll<Element, any>("line");
     let xTicks = xScale.ticks();
     assert.strictEqual(xGridlines.size(), xTicks.length, "There is an x gridline for each x tick");
     xGridlines.each(function(gridline, i) {
@@ -43,7 +43,7 @@ describe("Gridlines", () => {
       assert.closeTo(x, xScale.scale(xTicks[i]), window.Pixel_CloseTo_Requirement, "x gridline drawn on ticks");
     });
 
-    let yGridlines = gridlines.content().select(".y-gridlines").selectAll("line");
+    let yGridlines = gridlines.content().select(".y-gridlines").selectAll<Element, any>("line");
     let yTicks = yScale.ticks();
     assert.strictEqual(yGridlines.size(), yTicks.length, "There is a y gridline for each y tick");
     yGridlines.each(function(gridline, i) {
@@ -54,14 +54,14 @@ describe("Gridlines", () => {
     xScale.domain([0, 8]);
     yScale.domain([0, 8]);
 
-    xGridlines = gridlines.content().select(".x-gridlines").selectAll("line");
+    xGridlines = gridlines.content().select(".x-gridlines").selectAll<Element, any>("line");
     xTicks = xScale.ticks();
     xGridlines.each(function(gridline, i) {
       const x = TestMethods.numAttr(d3.select(this), "x1");
       assert.closeTo(x, xScale.scale(xTicks[i]), window.Pixel_CloseTo_Requirement, "x gridline is updated");
     });
 
-    yGridlines = gridlines.content().select(".y-gridlines").selectAll("line");
+    yGridlines = gridlines.content().select(".y-gridlines").selectAll<Element, any>("line");
     yTicks = yScale.ticks();
     yGridlines.each(function(gridline, i) {
       const y = TestMethods.numAttr(d3.select(this), "y1");

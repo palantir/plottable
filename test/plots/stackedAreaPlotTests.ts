@@ -38,7 +38,7 @@ describe("Plots", () => {
         assert.strictEqual(stackedAreaPlot.x(constantValue), stackedAreaPlot, "setter returns calling object");
         stackedAreaPlot.renderTo(svg);
 
-        let stackedAreas = stackedAreaPlot.content().selectAll("path");
+        let stackedAreas = stackedAreaPlot.content().selectAll<Element, any>("path");
         assert.strictEqual(stackedAreas.size(),
           stackedAreaPlot.datasets().length, "same number of area selections as datasets");
 
@@ -63,7 +63,7 @@ describe("Plots", () => {
         assert.strictEqual(stackedAreaPlot.x().accessor, accessor, `property set for datum`);
         stackedAreaPlot.renderTo(svg);
 
-        let stackedAreas = stackedAreaPlot.content().selectAll("path");
+        let stackedAreas = stackedAreaPlot.content().selectAll<Element, any>("path");
         assert.strictEqual(stackedAreas.size(),
           stackedAreaPlot.datasets().length, "same number of area selections as datasets");
 
@@ -92,7 +92,7 @@ describe("Plots", () => {
         assert.strictEqual(stackedAreaPlot.x().accessor, accessor, `property set for datum`);
         stackedAreaPlot.renderTo(svg);
 
-        let stackedAreas = stackedAreaPlot.content().selectAll("path");
+        let stackedAreas = stackedAreaPlot.content().selectAll<Element, any>("path");
         assert.strictEqual(stackedAreas.size(),
           stackedAreaPlot.datasets().length, "same number of area selections as datasets");
 
@@ -176,7 +176,7 @@ describe("Plots", () => {
         assert.strictEqual(stackedAreaPlot.y().accessor, accessor, "accessor set");
         stackedAreaPlot.renderTo(svg);
 
-        let stackedAreas = stackedAreaPlot.content().selectAll("path");
+        let stackedAreas = stackedAreaPlot.content().selectAll<Element, any>("path");
         assert.strictEqual(stackedAreas.size(),
           stackedAreaPlot.datasets().length, "same number of area selections as datasets");
 
@@ -291,10 +291,10 @@ describe("Plots", () => {
         plot.x((d: any) => d.x, xScale).y((d: any) => d.y, yScale);
         plot.renderTo(svg);
 
-        let stackedAreaSelections = plot.content().selectAll("path");
-        let stackedAreaSelection0 = d3.select(stackedAreaSelections[0][0]);
-        let stackedAreaSelection1 = d3.select(stackedAreaSelections[0][1]);
-        let stackedAreaSelection2 = d3.select(stackedAreaSelections[0][2]);
+        let stackedAreaSelections = plot.content().selectAll<Element, any>("path");
+        let stackedAreaSelection0 = d3.select(stackedAreaSelections.node());
+        let stackedAreaSelection1 = d3.select(stackedAreaSelections.nodes()[1]);
+        let stackedAreaSelection2 = d3.select(stackedAreaSelections.nodes()[2]);
 
         let areaVertices0 = TestMethods.areaVertices(stackedAreaSelection0);
         let areaYs0 = areaVertices0.map((areaVertex) => areaVertex.y).slice(0, -2);
@@ -340,10 +340,10 @@ describe("Plots", () => {
         plot.x((d: any) => d.x, xScale).y((d: any) => d.y, yScale);
         plot.renderTo(svg);
 
-        let stackedAreaSelections = plot.content().selectAll("path");
-        let stackedAreaSelection0 = d3.select(stackedAreaSelections[0][0]);
-        let stackedAreaSelection1 = d3.select(stackedAreaSelections[0][1]);
-        let stackedAreaSelection2 = d3.select(stackedAreaSelections[0][2]);
+        let stackedAreaSelections = plot.content().selectAll<Element, any>("path");
+        let stackedAreaSelection0 = d3.select(stackedAreaSelections.node());
+        let stackedAreaSelection1 = d3.select(stackedAreaSelections.nodes()[1]);
+        let stackedAreaSelection2 = d3.select(stackedAreaSelections.nodes()[2]);
 
         let areaVertices0 = TestMethods.areaVertices(stackedAreaSelection0);
         let areaYs0 = areaVertices0.map((areaVertex) => areaVertex.y).slice(0, -2);
@@ -398,7 +398,7 @@ describe("Plots", () => {
       });
 
       it("stacks bottomup by default", () => {
-        let areas = stackedAreaPlot.content().selectAll("path");
+        let areas = stackedAreaPlot.content().selectAll<Element, any>("path");
         let area0 = areas.filter((d) => d === datas[0]);
         let area1 = areas.filter((d) => d === datas[1]);
         let areaYs0 = TestMethods.areaVertices(area0).map((areaVertex) => areaVertex.y);
@@ -411,7 +411,7 @@ describe("Plots", () => {
       it("stacks topdown", () => {
         stackedAreaPlot.stackingOrder("topdown");
 
-        let areas = stackedAreaPlot.content().selectAll("path");
+        let areas = stackedAreaPlot.content().selectAll<Element, any>("path");
         let area0 = areas.filter((d) => d === datas[0]);
         let area1 = areas.filter((d) => d === datas[1]);
         let areaYs0 = TestMethods.areaVertices(area0).map((areaVertex) => areaVertex.y);

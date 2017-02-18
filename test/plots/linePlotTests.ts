@@ -141,9 +141,9 @@ describe("Plots", () => {
       });
 
       it("sets interploation correctly", () => {
-        assert.strictEqual(linePlot.interpolator(), "linear", "the default interpolation mode is linear");
-        assert.strictEqual(linePlot.interpolator("step"), linePlot, "setting an interpolation mode returns the plot");
-        assert.strictEqual(linePlot.interpolator(), "step", "setting an interpolation mode works");
+        assert.strictEqual(linePlot.curve(), "linear", "the default interpolation mode is linear");
+        assert.strictEqual(linePlot.curve("step"), linePlot, "setting an interpolation mode returns the plot");
+        assert.strictEqual(linePlot.curve(), "step", "setting an interpolation mode works");
 
         svg.remove();
       });
@@ -166,7 +166,7 @@ describe("Plots", () => {
         let svgPath = linePlot.content().select("path").attr("d");
         TestMethods.assertPathEqualToDataPoints(svgPath, data, xScale, yScale);
 
-        linePlot.interpolator("step");
+        linePlot.curve("step");
 
         svgPath = linePlot.content().select("path").attr("d");
         let stepPoints = [data[0]];

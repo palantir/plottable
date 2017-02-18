@@ -79,7 +79,7 @@ describe("Drawers", () => {
       });
 
       it("draws elements accoding to a specified DrawStep", () => {
-        const drawn = svg.selectAll(MockDrawer.ELEMENT_NAME);
+        const drawn = svg.selectAll<Element, any>(MockDrawer.ELEMENT_NAME);
         assert.strictEqual(drawn.size(), data.length, "created one element per datum");
         drawn.each(function(datum, index) {
           const element = d3.select(this);
@@ -91,15 +91,15 @@ describe("Drawers", () => {
       it("can retrieve a selection containing elements it drew", () => {
         const selection = drawer.selection();
         assert.strictEqual(selection.size(), data.length, "retrieved one element per datum");
-        const drawn = svg.selectAll(MockDrawer.ELEMENT_NAME);
-        assert.deepEqual(selection[0], drawn[0], "retrieved all elements it drew");
+        const drawn = svg.selectAll<Element, any>(MockDrawer.ELEMENT_NAME);
+        assert.deepEqual(selection.node(), drawn.node(), "retrieved all elements it drew");
       });
 
       it("can retrieve the selection for a particular index", () => {
         const selection = drawer.selection();
         data.forEach((datum, index) => {
           const selectionForIndex = drawer.selectionForIndex(index);
-          assert.strictEqual(selectionForIndex.node(), selection[0][index], `retrieves the correct selection for index ${index}`);
+          assert.strictEqual(selectionForIndex.node(), selection.nodes()[index], `retrieves the correct selection for index ${index}`);
         });
       });
     });

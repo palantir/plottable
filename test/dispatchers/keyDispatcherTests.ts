@@ -19,7 +19,7 @@ describe("Dispatchers", () => {
       beforeEach(() => {
         keyCodeToSend = 65;
         keyDispatcher = Plottable.Dispatchers.Key.getDispatcher();
-        body = d3.select("body");
+        body = d3.select<Element, any>("body");
       });
 
       it("can set a callback to be called when a key is pressed down", () => {

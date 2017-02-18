@@ -139,7 +139,7 @@ describe("Plots", () => {
         const svg = TestMethods.generateSVG();
         plot.anchor(svg);
 
-        assert.strictEqual(plot.content().select(".render-area").selectAll("g").size(), datasetCount, "g for each dataset");
+        assert.strictEqual(plot.content().select(".render-area").selectAll<Element, any>("g").size(), datasetCount, "g for each dataset");
 
         svg.remove();
       });
@@ -286,7 +286,7 @@ describe("Plots", () => {
           window.history.replaceState(null, null, "clipPathTest");
           plot.render();
 
-          const clipPathId = (<any> plot)._boxContainer[0][0].firstChild.id;
+          const clipPathId = (<any> plot)._boxContainer.node().firstChild.id;
           const expectedPrefix = (/MSIE [5-9]/.test(navigator.userAgent) ? "" : document.location.href).replace(/#.*/g, "");
           const expectedClipPathURL = "url(" + expectedPrefix + "#" + clipPathId + ")";
 

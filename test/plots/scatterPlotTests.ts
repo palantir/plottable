@@ -7,6 +7,7 @@ import * as Plottable from "../../src";
 
 import * as Mocks from "../mocks";
 import * as TestMethods from "../testMethods";
+import { getTranslateValues } from "../../src/utils/domUtils";
 
 describe("Plots", () => {
   describe("ScatterPlot", () => {
@@ -162,10 +163,10 @@ describe("Plots", () => {
         let symbols = plot.selections();
         assert.strictEqual(symbols.size(), data.length, "exactly 2 symbols are rendered");
 
-        let c1 = d3.select(symbols[0][0]);
-        let c2 = d3.select(symbols[0][1]);
-        let c1Position = d3.transform(c1.attr("transform")).translate;
-        let c2Position = d3.transform(c2.attr("transform")).translate;
+        let c1 = d3.select(symbols.node());
+        let c2 = d3.select(symbols.nodes()[1]);
+        let c1Position = getTranslateValues(c1);
+        let c2Position = getTranslateValues(c2);
         assert.closeTo(c1Position[0], 0, 0.01, "first symbol cx is correct");
         assert.closeTo(c1Position[1], 380, 0.01, "first symbol cy is correct");
         assert.closeTo(c2Position[0], 11, 0.01, "second symbol cx is correct");
@@ -182,10 +183,10 @@ describe("Plots", () => {
         let symbols = plot.selections();
         assert.strictEqual(symbols.size(), data.length, "exactly 2 symbols are rendered");
 
-        let c1 = d3.select(symbols[0][0]);
-        let c2 = d3.select(symbols[0][1]);
-        let c1Position = d3.transform(c1.attr("transform")).translate;
-        let c2Position = d3.transform(c2.attr("transform")).translate;
+        let c1 = d3.select(symbols.node());
+        let c2 = d3.select(symbols.nodes()[1]);
+        let c1Position = getTranslateValues(c1);
+        let c2Position = getTranslateValues(c2);
         assert.closeTo(c1Position[0], 2, 0.01, "first symbol cx is correct after data change");
         assert.closeTo(c1Position[1], 380, 0.01, "first symbol cy is correct after data change");
         assert.closeTo(c2Position[0], 14, 0.01, "second symbol cx is correct after data change");
@@ -202,10 +203,10 @@ describe("Plots", () => {
         let symbols = plot.selections();
         assert.strictEqual(symbols.size(), 2, "exactly 2 symbols are rendered");
 
-        let c1 = d3.select(symbols[0][0]);
-        let c2 = d3.select(symbols[0][1]);
-        let c1Position = d3.transform(c1.attr("transform")).translate;
-        let c2Position = d3.transform(c2.attr("transform")).translate;
+        let c1 = d3.select(symbols.node());
+        let c2 = d3.select(symbols.nodes()[1]);
+        let c1Position = getTranslateValues(c1);
+        let c2Position = getTranslateValues(c2);
         assert.closeTo(c1Position[0], 0, 0.01, "first symbol cx is correct after metadata change");
         assert.closeTo(c1Position[1], 400, 0.01, "first symbol cy is correct after metadata change");
         assert.closeTo(c2Position[0], 1, 0.01, "second symbol cx is correct after metadata change");

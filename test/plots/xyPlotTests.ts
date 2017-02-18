@@ -6,6 +6,7 @@ import { assert } from "chai";
 import * as Plottable from "../../src";
 
 import * as TestMethods from "../testMethods";
+import { getTranslateValues, getScaleValues } from "../../src/utils/domUtils";
 
 describe("Plots", () => {
   describe("XY Plot", () => {
@@ -160,7 +161,7 @@ describe("Plots", () => {
 
         const translateAmount = 1;
         xScale.domain(xScale.domain().map((d) => d + translateAmount));
-        const renderAreaTranslate = d3.transform(plot.content().select(".render-area").attr("transform")).translate;
+        const renderAreaTranslate = getTranslateValues(plot.content().select(".render-area"));
         assert.deepEqual(renderAreaTranslate[0], -translateAmount, "translates with the same amount as domain shift");
 
         svg.remove();
@@ -177,7 +178,7 @@ describe("Plots", () => {
 
         const magnifyAmount = 2;
         xScale.domain(xScale.domain().map((d) => d * magnifyAmount));
-        const renderAreaScale = d3.transform(plot.content().select(".render-area").attr("transform")).scale;
+        const renderAreaScale = getScaleValues(plot.content().select(".render-area"));
         assert.deepEqual(renderAreaScale[0], 1 / magnifyAmount, "translates with the same amount as domain shift");
 
         svg.remove();

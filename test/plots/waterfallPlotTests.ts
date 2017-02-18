@@ -38,7 +38,7 @@ describe("Plots", () => {
       });
 
       it("classes growth bars", () => {
-        let bars = plot.content().selectAll("rect");
+        let bars = plot.content().selectAll<Element, any>("rect");
         assert.strictEqual(bars.size(), growthBarData.length, "same number of bars as data points");
         bars.each(function(d, i) {
           if (i === 0) {
@@ -52,7 +52,7 @@ describe("Plots", () => {
       });
 
       it("places bars at current sum", () => {
-        let bars = plot.content().selectAll(`rect.${growthClass}`);
+        let bars = plot.content().selectAll<Element, any>(`rect.${growthClass}`);
         assert.strictEqual(bars.size(), growthBarData.length - 1, "all bars are growth except for first");
         let yAccessor = plot.y().accessor;
         let sum = 0;
@@ -101,7 +101,7 @@ describe("Plots", () => {
       });
 
       it("classes decline bars", () => {
-        let bars = plot.content().selectAll("rect");
+        let bars = plot.content().selectAll<Element, any>("rect");
         assert.strictEqual(bars.size(), declineBarData.length, "same number of bars as data points");
         bars.each(function(d, i) {
           if (i === 0) {
@@ -115,7 +115,7 @@ describe("Plots", () => {
       });
 
       it("places bars at current sum", () => {
-        let bars = plot.content().selectAll(`rect.${declineClass}`);
+        let bars = plot.content().selectAll<Element, any>(`rect.${declineClass}`);
         assert.strictEqual(bars.size(), declineBarData.length - 1, "all bars are decline except for first");
         let yAccessor = plot.y().accessor;
         let sum = 0;
@@ -165,7 +165,7 @@ describe("Plots", () => {
 
         plot.addDataset(dataset);
         plot.renderTo(svg);
-        let bars = plot.content().selectAll("rect").filter((d) => accessor(d));
+        let bars = plot.content().selectAll<Element, any>("rect").filter((d) => accessor(d));
         bars.each(function(d) {
           let totalBar = d3.select(this);
           assert.isTrue(totalBar.classed(totalClass));
@@ -214,12 +214,12 @@ describe("Plots", () => {
         assert.isFalse(plot.connectorsEnabled(), "no connectors by default");
         assert.strictEqual(plot.connectorsEnabled(true), plot, "setter returns calling object");
         plot.renderTo(svg);
-        let bars = plot.content().selectAll("rect");
-        let connectors = plot.content().selectAll("line.connector");
+        let bars = plot.content().selectAll<Element, any>("rect");
+        let connectors = plot.content().selectAll<Element, any>("line.connector");
         assert.strictEqual(bars.size(), connectors.size() + 1, "there is one more bar than number of connectors");
         connectors.each(function(datum, index) {
           let connector = d3.select(this);
-          let bar = d3.select(bars[0][index]);
+          let bar = d3.select(bars.nodes()[index]);
           let connectorOnBottom = bar.classed("waterfall-decline");
           if (connectorOnBottom) {
             assert.closeTo(numAttr(connector, "y1"), numAttr(bar, "y") + numAttr(bar, "height"),

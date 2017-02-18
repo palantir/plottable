@@ -95,20 +95,20 @@ describe("Plots", () => {
 
       it("places the area before line", () => {
         let content = areaPlot.content();
-        let paths = content.selectAll("path")[0];
-        let areaElement = content.select(".area")[0][0];
-        let lineElement = content.select(".line")[0][0];
+        let paths = content.selectAll<Element, any>("path").nodes();
+        let areaElement = content.select<Element>(".area").node();
+        let lineElement = content.select<Element>(".line").node();
         assert.operator(paths.indexOf(areaElement), "<", paths.indexOf(lineElement), "area appended before line");
         svg.remove();
       });
 
       it("removes the plot svg elements when removing Datasets", () => {
         areaPlot.renderTo(svg);
-        let paths = areaPlot.content().selectAll("path");
+        let paths = areaPlot.content().selectAll<Element, any>("path");
         let pathSize = paths.size();
         let dataset = areaPlot.datasets()[0];
         areaPlot.removeDataset(dataset);
-        paths = areaPlot.content().selectAll("path");
+        paths = areaPlot.content().selectAll<Element, any>("path");
         assert.strictEqual(paths.size(), pathSize - 2, "removing a Dataset cleans up both <path>s associated with it");
         svg.remove();
       });

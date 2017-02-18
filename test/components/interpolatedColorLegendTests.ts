@@ -32,16 +32,16 @@ describe("InterpolatedColorLegend", () => {
       const scaleDomain = colorScale.domain();
       const legendContent = legend.content();
 
-      const swatches = legendContent.selectAll(SWATCH_SELECTOR);
-      assert.strictEqual(d3.select(swatches[0][0]).attr("fill"),
+      const swatchesNodes = legendContent.selectAll<Element, any>(SWATCH_SELECTOR).nodes();
+      assert.strictEqual(d3.select(swatchesNodes[0]).attr("fill"),
                         colorScale.scale(scaleDomain[0]),
                         "first swatch's color corresponds with first domain value");
-      assert.strictEqual(d3.select(swatches[0][swatches[0].length - 1]).attr("fill"),
+      assert.strictEqual(d3.select(swatchesNodes[swatchesNodes.length - 1]).attr("fill"),
                         colorScale.scale(scaleDomain[1]),
                         "last swatch's color corresponds with second domain value");
 
       const defaultNumSwatches = (<any> Plottable.Components.InterpolatedColorLegend)._DEFAULT_NUM_SWATCHES;
-      assert.operator(swatches.size(), ">=", defaultNumSwatches, "there are at least 11 swatches");
+      assert.operator(swatchesNodes.length, ">=", defaultNumSwatches, "there are at least 11 swatches");
 
       const swatchContainer = legendContent.select(SWATCH_CONTAINER_SELECTOR);
       const swatchContainerBCR = (<Element> swatchContainer.node()).getBoundingClientRect();
@@ -55,8 +55,8 @@ describe("InterpolatedColorLegend", () => {
                     "swatches are drawn within the legend's element");
 
       const formattedDomainValues = scaleDomain.map(legend.formatter());
-      const labels = legendContent.selectAll("text");
-      const labelTexts = labels[0].map((textNode: HTMLScriptElement) => textNode.textContent);
+      const labels = legendContent.selectAll<Element, any>("text");
+      const labelTexts = labels.nodes().map((textNode: HTMLScriptElement) => textNode.textContent);
       assert.deepEqual(labelTexts, formattedDomainValues, "formatter is used to format label text");
     }
 
@@ -66,12 +66,12 @@ describe("InterpolatedColorLegend", () => {
       assertBasicRendering();
 
       const legendContent = legend.content();
-      const labels = legendContent.selectAll("text");
+      const labels = legendContent.selectAll<Element, any>("text");
       const swatchContainer = legendContent.select(SWATCH_CONTAINER_SELECTOR);
       const swatchContainerBCR = (<Element> swatchContainer.node()).getBoundingClientRect();
 
-      const lowerLabelBCR = (<Element> labels[0][0]).getBoundingClientRect();
-      const upperLabelBCR = (<Element> labels[0][1]).getBoundingClientRect();
+      const lowerLabelBCR = labels.nodes()[0].getBoundingClientRect();
+      const upperLabelBCR = labels.nodes()[1].getBoundingClientRect();
       assert.operator(lowerLabelBCR.right, "<=", swatchContainerBCR.left, "first label to left of swatches");
       assert.operator(swatchContainerBCR.right, "<=", upperLabelBCR.left, "second label to right of swatches");
 
@@ -85,12 +85,12 @@ describe("InterpolatedColorLegend", () => {
       assertBasicRendering();
 
       const legendContent = legend.content();
-      const labels = legendContent.selectAll("text");
+      const labels = legendContent.selectAll<Element, any>("text");
       const swatchContainer = legendContent.select(SWATCH_CONTAINER_SELECTOR);
       const swatchContainerBCR = (<Element> swatchContainer.node()).getBoundingClientRect();
 
-      const lowerLabelBCR = (<Element> labels[0][0]).getBoundingClientRect();
-      const upperLabelBCR = (<Element> labels[0][1]).getBoundingClientRect();
+      const lowerLabelBCR = (labels.nodes()[0]).getBoundingClientRect();
+      const upperLabelBCR = (labels.nodes()[1]).getBoundingClientRect();
       assert.operator(swatchContainerBCR.right, "<=", lowerLabelBCR.left, "first label to right of swatches");
       assert.operator(swatchContainerBCR.right, "<=", upperLabelBCR.left, "second label to right of swatches");
       assert.operator(upperLabelBCR.bottom, "<=", lowerLabelBCR.top, "lower label is drawn below upper label");
@@ -105,12 +105,12 @@ describe("InterpolatedColorLegend", () => {
       assertBasicRendering();
 
       const legendContent = legend.content();
-      const labels = legendContent.selectAll("text");
+      const labels = legendContent.selectAll<Element, any>("text");
       const swatchContainer = legendContent.select(SWATCH_CONTAINER_SELECTOR);
       const swatchContainerBCR = (<Element> swatchContainer.node()).getBoundingClientRect();
 
-      const lowerLabelBCR = (<Element> labels[0][0]).getBoundingClientRect();
-      const upperLabelBCR = (<Element> labels[0][1]).getBoundingClientRect();
+      const lowerLabelBCR = (labels.nodes()[0]).getBoundingClientRect();
+      const upperLabelBCR = (labels.nodes()[1]).getBoundingClientRect();
       assert.operator(lowerLabelBCR.left, "<=", swatchContainerBCR.left, "first label to left of swatches");
       assert.operator(upperLabelBCR.left, "<=", swatchContainerBCR.left, "second label to left of swatches");
       assert.operator(upperLabelBCR.bottom, "<=", lowerLabelBCR.top, "lower label is drawn below upper label");
@@ -185,11 +185,11 @@ describe("InterpolatedColorLegend", () => {
     it("has the same number of swatches as its height when vertical", () => {
       legend.renderTo(svg);
       legend.orientation("left").expands(false);
-      const numSwatches = legend.content().selectAll(SWATCH_SELECTOR).size();
+      const numSwatches = legend.content().selectAll<Element, any>(SWATCH_SELECTOR).size();
       const swatchContainer = legend.content().select(SWATCH_CONTAINER_SELECTOR);
       const swatchContainerHeight = (<Element> swatchContainer.node()).getBoundingClientRect().height;
       legend.expands(true);
-      const newNumSwatches = legend.content().selectAll(SWATCH_SELECTOR).size();
+      const newNumSwatches = legend.content().selectAll<Element, any>(SWATCH_SELECTOR).size();
       const swatchContainerExpandedHeight = (<Element> swatchContainer.node()).getBoundingClientRect().height;
       assert.closeTo(numSwatches, swatchContainerHeight, 1, "non-expanded left legend has one swatch per pixel");
       assert.closeTo(newNumSwatches, swatchContainerExpandedHeight, 1, "expanded left legend has one swatch per pixel");
@@ -199,11 +199,11 @@ describe("InterpolatedColorLegend", () => {
     it("has the same number of swatches as its width when horizontal", () => {
       legend.renderTo(svg);
       legend.orientation("horizontal").expands(false);
-      const numSwatches = legend.content().selectAll(SWATCH_SELECTOR).size();
+      const numSwatches = legend.content().selectAll<Element, any>(SWATCH_SELECTOR).size();
       const swatchContainer = legend.content().select(SWATCH_CONTAINER_SELECTOR);
       const swatchContainerWidth = (<Element> swatchContainer.node()).getBoundingClientRect().width;
       legend.expands(true);
-      const newNumSwatches = legend.content().selectAll(SWATCH_SELECTOR).size();
+      const newNumSwatches = legend.content().selectAll<Element, any>(SWATCH_SELECTOR).size();
       const swatchContainerExpandedWidth = (<Element> swatchContainer.node()).getBoundingClientRect().width;
       assert.closeTo(numSwatches, swatchContainerWidth, 1, "non-expanded left legend has one swatch per pixel");
       assert.closeTo(newNumSwatches, swatchContainerExpandedWidth, 1, "expanded left legend has one swatch per pixel");
@@ -285,9 +285,9 @@ describe("InterpolatedColorLegend", () => {
       legend.renderTo(svg);
       ORIENTATIONS.forEach((orientation) => {
         legend.orientation(orientation).expands(false);
-        const numSwatches = legend.content().selectAll(SWATCH_SELECTOR).size();
+        const numSwatches = legend.content().selectAll<Element, any>(SWATCH_SELECTOR).size();
         legend.expands(true);
-        const newNumSwatches = legend.content().selectAll(SWATCH_SELECTOR).size();
+        const newNumSwatches = legend.content().selectAll<Element, any>(SWATCH_SELECTOR).size();
         assert.operator(newNumSwatches, ">", numSwatches, `there are more swatches when expanded (orientation: ${orientation})`);
       });
       svg.remove();
@@ -460,7 +460,7 @@ describe("InterpolatedColorLegend", () => {
       const constrainedWidth = 30;
       svg.attr("width", constrainedWidth);
       assert.doesNotThrow(() => legend.redraw(), Error, "rendering in a small space should not error");
-      const numSwatches = legend.content().selectAll(SWATCH_SELECTOR).size();
+      const numSwatches = legend.content().selectAll<Element, any>(SWATCH_SELECTOR).size();
       assert.strictEqual(0, numSwatches, "no swatches are drawn");
       svg.remove();
     });
@@ -483,7 +483,7 @@ describe("InterpolatedColorLegend", () => {
       legend.formatter(formatter);
       legend.renderTo(svg);
 
-      const entries = legend.content().selectAll("rect.swatch");
+      const entries = legend.content().selectAll<Element, any>("rect.swatch");
       assert.operator(entries.size(), ">=", 11, "there is at least 11 swatches");
       entries.each(function(d, i) {
         const swatch = d3.select(this);
@@ -498,9 +498,9 @@ describe("InterpolatedColorLegend", () => {
       legend.renderTo(svg);
       Plottable.Configs.ADD_TITLE_ELEMENTS = originalSetting;
 
-      const entries = legend.content().selectAll("rect.swatch");
+      const entries = legend.content().selectAll<Element, any>("rect.swatch");
       assert.operator(entries.size(), ">=", 11, "there is at least 11 swatches");
-      const titles = entries.selectAll("title");
+      const titles = entries.selectAll<Element, any>("title");
       assert.strictEqual(titles.size(), 0, "no titles should be rendered");
       svg.remove();
     });

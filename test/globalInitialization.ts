@@ -27,6 +27,6 @@ before(() => {
 });
 
 after(() => {
-  assert.strictEqual(d3.selectAll("svg").size(), 0, "all svgs have been removed");
-  assert.strictEqual(d3.selectAll("style").size(), 0, "all style nodes have been removed");
+  assert.strictEqual(d3.selectAll<Element, any>("svg").size(), 0, "all svgs have been removed");
+  assert.strictEqual(d3.selectAll<Element, any>("style").size(), 0, "all style nodes have been removed");
 });

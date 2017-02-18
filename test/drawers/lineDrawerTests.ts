@@ -38,7 +38,7 @@ describe("Drawers", () => {
     });
 
     it("retrieves the same path regardless of requested selection index", () => {
-      const expectedSelection = svg.selectAll("path");
+      const expectedSelection = svg.selectAll<Element, any>("path");
       data[0].forEach((datum, index) => {
         const selectionForIndex = drawer.selectionForIndex(index);
         assert.strictEqual(selectionForIndex.size(), 1, `selection for index ${index} contains only one element`);

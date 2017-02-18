@@ -102,7 +102,7 @@ describe("SelectionBoxLayer", () => {
 
         TestMethods.triggerFakeDragSequence(dbl.background(), quarterPoint, halfPoint);
 
-        const edges = dbl.content().selectAll("line");
+        const edges = dbl.content().selectAll<Element, any>("line");
         assert.strictEqual(edges.size(), 4, "the edges of a rectangle are drawn");
         edges.each(function() {
           const edge = d3.select(this);
@@ -110,7 +110,7 @@ describe("SelectionBoxLayer", () => {
           assert.strictEqual(strokeWidth, 2 * radius, "edge width was set correctly");
         });
 
-        const corners = dbl.content().selectAll("circle");
+        const corners = dbl.content().selectAll<Element, any>("circle");
         assert.strictEqual(corners.size(), 4, "the corners of a rectangle are drawn");
         corners.each(function() {
           const corner = d3.select(this);
@@ -374,14 +374,14 @@ describe("SelectionBoxLayer", () => {
 
       it("correctly sets pointer-events for resizable DragBoxLayer", () => {
         dbl.resizable(true);
-        const edges = dbl.content().selectAll("line");
+        const edges = dbl.content().selectAll<Element, any>("line");
         assert.strictEqual(edges.size(), 4, "there are 4 edges per box");
         edges.each(function() {
           const edge = d3.select(this);
           const computedStyle = window.getComputedStyle(<Element> edge.node());
           assert.strictEqual(computedStyle.pointerEvents.toLowerCase(), "visiblestroke", "pointer-events set correctly on edges");
         });
-        const corners = dbl.content().selectAll("circle");
+        const corners = dbl.content().selectAll<Element, any>("circle");
         assert.strictEqual(corners.size(), 4, "there are 4 corners per box");
         corners.each(function() {
           const corner = d3.select(this);
