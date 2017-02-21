@@ -3,10 +3,10 @@
  * @license MIT
  */
 
-import { Category } from "../scales/categoryScale";
 import { Dataset } from "../core/dataset";
 import { Accessor, Point } from "../core/interfaces";
 import * as Scales from "../scales";
+import { Category } from "../scales/categoryScale";
 import { Scale, ScaleCallback } from "../scales/scale";
 import * as Utils from "../utils";
 
