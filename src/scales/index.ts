@@ -19,8 +19,11 @@ export * from "./timeScale";
 // ---------------------------------------------------------
 
 import { Category } from "./categoryScale";
+import { Color } from "./colorScale";
+import { InterpolatedColor } from "./interpolatedColorScale";
 import { QuantitativeScale } from "./quantitativeScale";
 import { Scale } from "./scale";
+import { Time } from "./timeScale";
 
 /**
  * A function that supplies domain values to be included into a Scale.
@@ -99,4 +102,24 @@ export interface TransformableScale {
 export function isTransformable(scale: any): scale is TransformableScale {
   return (scale instanceof QuantitativeScale ||
   scale instanceof Category);
+}
+
+/*
+ * Whether scale should be comparable intuitively.
+ */
+export function isNotComparable(scale1: any, scale2: any): boolean {
+  const nonComparableScales = [Category, Color, InterpolatedColor];
+  const selfComparableScales = [Time];
+
+  const hasNonComparableScale = nonComparableScales.some(scale => {
+    return (scale1 instanceof scale || scale2 instanceof scale);
+  });
+
+  const hasOnlyOneSelfComparableScale = selfComparableScales.some(scale => {
+    const onlyFirstComparable = (scale1 instanceof scale && !(scale2 instanceof scale));
+    const onlySecondComparable = (!(scale1 instanceof scale) && scale2 instanceof scale);
+    return onlyFirstComparable || onlySecondComparable;
+  });
+
+  return hasNonComparableScale || hasOnlyOneSelfComparableScale;
 }

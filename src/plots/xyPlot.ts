@@ -432,8 +432,7 @@ export class XYPlot<X, Y> extends Plot {
   }
 
   /**
-   * _invertPixelPoint converts a point in pixel coordinates to a point in data coordinates
-   * (if neither scale is Category)
+   * _invertPixelPoint converts a point in pixel coordinates to a point in data coordinates if scales are comparable
    * @param {Point} point Representation of the point in pixel coordinates
    * @return {Point} Returns the point represented in data coordinates
    */
@@ -441,7 +440,7 @@ export class XYPlot<X, Y> extends Plot {
     const xScale = this.x();
     const yScale = this.y();
 
-    if (xScale.scale instanceof Category || yScale.scale instanceof Category) {
+    if (Scales.isNotComparable(xScale.scale, yScale.scale)) {
       return point;
     }
 
