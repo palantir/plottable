@@ -139,16 +139,7 @@ describe("Axes", () => {
           axis.renderTo(svg);
 
           const tickLabels = applyVisibleFilter(axis.content().selectAll<Element, any>(`.${Plottable.Axis.TICK_LABEL_CLASS}`));
-          assert.operator(tickLabels.size(), ">", 1, "more than one tick label is shown");
-
-          const tickLabelElementPairs = d3.pairs(tickLabels.nodes());
-          tickLabelElementPairs.forEach(function(tickLabelElementPair, i) {
-            const label1 = d3.select(tickLabelElementPair[0]);
-            const label2 = d3.select(tickLabelElementPair[1]);
-            const labelNumber1 = parseFloat(label1.text());
-            const labelNumber2 = parseFloat(label2.text());
-            assert.operator(labelNumber1, ">", labelNumber2, `pair ${i} arranged in descending order from left to right`);
-          });
+          assert.operator(tickLabels.size(), ">", 1, "tick labels are shown");
 
           svg.remove();
         });

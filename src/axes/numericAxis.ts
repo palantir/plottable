@@ -84,11 +84,7 @@ export class Numeric extends Axis<number> {
     let domain = scale.domain();
     let min = domain[0] <= domain[1] ? domain[0] : domain[1];
     let max = domain[0] >= domain[1] ? domain[0] : domain[1];
-    if (min === domain[0]) {
-      return scale.ticks().filter((i: number) => i >= min && i <= max);
-    } else {
-      return scale.ticks().filter((i: number) => i >= min && i <= max).reverse();
-    }
+    return scale.ticks().filter((i: number) => i >= min && i <= max);
   }
 
   protected _rescale() {
