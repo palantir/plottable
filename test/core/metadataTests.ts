@@ -70,8 +70,8 @@ describe("Metadata", () => {
     let circles = plot.selections().nodes();
     let c1 = d3.select(circles[0]);
     let c2 = d3.select(circles[1]);
-    let c3 = d3.select(circles[0]);
-    let c4 = d3.select(circles[0]);
+    let c3 = d3.select(circles[2]);
+    let c4 = d3.select(circles[3]);
 
     let c1Position = getTranslateValues(c1);
     let c2Position = getTranslateValues(c2);
