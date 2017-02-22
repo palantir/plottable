@@ -82,8 +82,13 @@ const TRANSLATE_REGEX = /translate\(\s*([-+]?[0-9]*\.?[0-9]+)\s*,?\s*([-+]?[0-9]
  * Accepts selections whose .transform contain a "translate(a, b)" and extracts the a and b
  */
 export function getTranslateValues(el: SimpleSelection<any>): [number, number] {
-  const [, translateX, translateY] = TRANSLATE_REGEX.exec(el.attr("transform"));
-  return [+translateX, +translateY];
+  const match = TRANSLATE_REGEX.exec(el.attr("transform"));
+  if (match != null) {
+    const [, translateX, translateY] = match;
+    return [+translateX, +translateY];
+  } else {
+    return [0, 0];
+  }
 }
 
 const ROTATE_REGEX = /rotate\(\s*([-+]?[0-9]*\.?[0-9]+)\s*\)/;
@@ -91,14 +96,24 @@ const ROTATE_REGEX = /rotate\(\s*([-+]?[0-9]*\.?[0-9]+)\s*\)/;
  * Accepts selections whose .transform contain a "rotate(angle)" and returns the angle
  */
 export function getRotate(el: SimpleSelection<any>): number {
-  const [, rotation] = ROTATE_REGEX.exec(el.attr("transform"));
-  return +rotation;
+  const match = ROTATE_REGEX.exec(el.attr("transform"));
+  if (match != null) {
+    const [, rotation] = match;
+    return +rotation;
+  } else {
+    return 0;
+  }
 }
 
 const SCALE_REGEX = /scale\(\s*([-+]?[0-9]*\.?[0-9]+)\s*,?\s*([-+]?[0-9]*\.?[0-9]+)\s*\)/;
 export function getScaleValues(el: SimpleSelection<any>): [number, number] {
-  const [, scaleX, scaleY] = SCALE_REGEX.exec(el.attr("transform"));
-  return [+scaleX, +scaleY];
+  const match = SCALE_REGEX.exec(el.attr("transform"));
+  if (match != null) {
+    const [, scaleX, scaleY] = match;
+    return [+scaleX, +scaleY];
+  } else {
+    return [0, 0];
+  }
 }
 
 /**
