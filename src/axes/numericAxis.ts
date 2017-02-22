@@ -348,4 +348,8 @@ export class Numeric extends Axis<number> {
     return true;
   }
 
+  public invalidateCache() {
+    super.invalidateCache();
+    (this._measurer as SVGTypewriter.CacheMeasurer).reset();
+  }
 }

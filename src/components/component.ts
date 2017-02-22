@@ -283,9 +283,6 @@ export class Component {
   /**
    * Causes the Component to re-layout and render.
    *
-   * This function should be called when a CSS change has occured that could
-   * influence the layout of the Component, such as changing the font size.
-   *
    * @returns {Component} The calling Component.
    */
   public redraw() {
@@ -297,6 +294,17 @@ export class Component {
       }
     }
     return this;
+  }
+
+  /**
+   * Tell this component to invalidate any caching. This function should be
+   * called when a CSS change has occurred that could influence the layout
+   * of the Component, such as changing the font size.
+   *
+   * Subclasses should override.
+   */
+  public invalidateCache() {
+    // Core component has no caching.
   }
 
   /**

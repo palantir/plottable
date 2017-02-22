@@ -829,5 +829,8 @@ export class Axis<D> extends Component {
     });
   }
 
-
+  public invalidateCache() {
+    super.invalidateCache();
+    (this._annotationMeasurer as SVGTypewriter.CacheMeasurer).reset();
+  }
 }

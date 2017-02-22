@@ -148,7 +148,10 @@ export class Category extends Axis<string> {
    * @return {DownsampleInfo} an object holding the resultant domain and new stepWidth.
    */
   public getDownsampleInfo(scale: Scales.Category = <Scales.Category> this._scale, domain = scale.invertRange()): DownsampleInfo {
-    const downsampleRatio = Math.ceil(Category._MINIMUM_WIDTH_PER_LABEL_PX / scale.stepWidth());
+    // account for how shearing tightens the space between vertically oriented ticks
+    const shearFactor = this._tickLabelAngle === 0 ? 1 : 1 / Math.cos(this._tickLabelShearAngle / 180 * Math.PI);
+    const shearedMinimumWidth = Category._MINIMUM_WIDTH_PER_LABEL_PX * shearFactor;
+    const downsampleRatio = Math.ceil(shearedMinimumWidth / scale.stepWidth());
     return {
       domain: domain.filter((d, i) => i % downsampleRatio === 0),
       stepWidth: downsampleRatio * scale.stepWidth(),
@@ -416,14 +419,15 @@ export class Category extends Axis<string> {
   }
 
   public computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number) {
-    // When anyone calls redraw(), computeLayout() will be called
-    // on everyone, including this. Since CSS or something might have
-    // affected the size of the characters, clear the cache.
-    this._measurer.reset();
     super.computeLayout(origin, availableWidth, availableHeight);
     if (!this.isHorizontal()) {
       this._scale.range([0, this.height()]);
     }
     return this;
+  }
+
+  public invalidateCache() {
+    super.invalidateCache();
+    this._measurer.reset();
   }
 }

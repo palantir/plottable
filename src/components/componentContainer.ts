@@ -85,4 +85,8 @@ export class ComponentContainer extends Component {
     super.destroy();
     this._forEach((c: Component) => c.destroy());
   }
+
+  public invalidateCache() {
+    this._forEach((c: Component) => c.invalidateCache());
+  }
 }
