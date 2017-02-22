@@ -8,7 +8,7 @@ import * as d3 from "d3";
 import { Dataset } from "./dataset";
 import { Component } from "../components/component";
 
-export type SimpleSelection<Datum> = d3.Selection<d3.BaseType, Datum, any, any>;
+export type SimpleSelection<Datum> = d3.Selection<d3.BaseType, Datum | {}, any, any>;
 
 /**
  * Accesses a specific datum property. Users supply Accessors to their

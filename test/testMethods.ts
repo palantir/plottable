@@ -1,13 +1,13 @@
-import { SimpleSelection } from "../../src/core/interfaces";
+import { SimpleSelection } from "../src/core/interfaces";
 import { assert } from "chai";
 import * as d3 from "d3";
 
 import * as Plottable from "../src";
 import { getTranslateValues } from "../src/utils/domUtils";
 
-export function generateSVG(width = 400, height = 400): SimpleSelection<void> {
+export function generateSVG(width = 400, height = 400): d3.Selection<SVGSVGElement, void | {}, any, any> {
   let parent = getSVGParent();
-  return parent.append("svg").attr("width", width).attr("height", height).attr("class", "svg");
+  return parent.append<SVGSVGElement>("svg").attr("width", width).attr("height", height).attr("class", "svg");
 }
 
 export function getSVGParent(): SimpleSelection<void> {
@@ -116,7 +116,7 @@ export function assertEntitiesEqual(actual: Plottable.Entity<Plottable.Component
   assert.deepEqual(actual.datum, expected.datum, msg + " (datum)");
   assertPointsClose(actual.position, expected.position, 0.01, msg);
   assert.strictEqual(actual.selection.size(), expected.selection.size(), msg + " (selection length)");
-  actual.selection[0].forEach((element: Element, index: number) => {
+  actual.selection.nodes().forEach((element: Element, index: number) => {
     assert.strictEqual(element, expected.selection.nodes()[index], msg + " (selection contents)");
   });
   assert.strictEqual(actual.component, expected.component, msg + " (component)");
@@ -177,7 +177,7 @@ export function numAttr(s: SimpleSelection<void>, a: string) {
 export function triggerFakeUIEvent(type: string, target: SimpleSelection<void>) {
   let e = <UIEvent> document.createEvent("UIEvents");
   e.initUIEvent(type, true, true, window, 1);
-  target.node().dispatchEvent(e);
+  (<HTMLElement> target.node()).dispatchEvent(e);
 }
 
 export function triggerFakeMouseEvent(type: string, target: SimpleSelection<void>, relativeX: number, relativeY: number, button = 0) {
@@ -190,7 +190,7 @@ export function triggerFakeMouseEvent(type: string, target: SimpleSelection<void
     xPos, yPos,
     false, false, false, false,
     button, null);
-  target.node().dispatchEvent(e);
+  (<HTMLElement> target.node()).dispatchEvent(e);
 }
 
 export function triggerFakeDragSequence(target: SimpleSelection<void>, start: Plottable.Point, end: Plottable.Point, numSteps = 2) {
@@ -226,7 +226,7 @@ export function triggerFakeWheelEvent(type: string, target: SimpleSelection<void
     event = new (<any> WheelEvent)("wheel", { bubbles: true, clientX: xPos, clientY: yPos, deltaY: deltaY });
   }
 
-  target.node().dispatchEvent(event);
+  (<HTMLElement> target.node()).dispatchEvent(event);
 }
 
 export function triggerFakeTouchEvent(type: string, target: SimpleSelection<void>, touchPoints: Plottable.Point[], ids: number[] = []) {
@@ -260,7 +260,7 @@ export function triggerFakeTouchEvent(type: string, target: SimpleSelection<void
   (e as any).metaKey = false;
   (e as any).ctrlKey = false;
   (e as any).shiftKey = false;
-  target.node().dispatchEvent(e);
+  (<HTMLElement> target.node()).dispatchEvent(e);
 }
 
 export enum InteractionMode {
@@ -331,7 +331,7 @@ export function triggerFakeKeyboardEvent(type: string, target: SimpleSelection<v
   if (options != null) {
     Object.keys(options).forEach((key) => (<any> event)[key] = options[key]);
   }
-  target.node().dispatchEvent(event);
+  (<HTMLElement> target.node()).dispatchEvent(event);
 }
 
 export function assertAreaPathCloseTo(actualPath: string, expectedPath: string, precision: number, msg: string) {

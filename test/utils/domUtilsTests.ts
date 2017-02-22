@@ -16,7 +16,7 @@ describe("Utils.DOM", () => {
       width: 40,
       height: 20,
     };
-    let rect = svg.append("rect").attr(expectedBox);
+    let rect = svg.append("rect").attrs(expectedBox);
     let measuredBox = Plottable.Utils.DOM.elementBBox(rect);
     assert.deepEqual(measuredBox, expectedBox, "getBBox measures correctly");
     svg.remove();
@@ -31,11 +31,11 @@ describe("Utils.DOM", () => {
     };
 
     let removedSVG = TestMethods.generateSVG().remove();
-    let rect = removedSVG.append("rect").attr(expectedBox);
+    let rect = removedSVG.append("rect").attrs(expectedBox);
     Plottable.Utils.DOM.elementBBox(rect); // could throw NS_ERROR on FF
 
     let noneSVG = TestMethods.generateSVG().style("display", "none");
-    rect = noneSVG.append("rect").attr(expectedBox);
+    rect = noneSVG.append("rect").attrs(expectedBox);
     Plottable.Utils.DOM.elementBBox(rect); // could throw NS_ERROR on FF
 
     noneSVG.remove();

@@ -979,7 +979,7 @@ describe("Component", () => {
 
       const expectedWidth = TestMethods.numAttr(svg, "width") + 100;
       const expectedHeight = TestMethods.numAttr(svg, "height") + 100;
-      svg.attr({
+      svg.attrs({
         width: expectedWidth,
         height: expectedHeight,
       });

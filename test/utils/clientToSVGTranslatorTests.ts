@@ -25,7 +25,7 @@ describe("ClientToSVGTranslator", () => {
       x: 19,
       y: 85,
     };
-    let rect = svg.append("rect").attr({
+    let rect = svg.append("rect").attrs({
       x: rectOrigin.x,
       y: rectOrigin.y,
       width: 30,

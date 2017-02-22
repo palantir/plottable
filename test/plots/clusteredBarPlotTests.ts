@@ -47,8 +47,8 @@ describe("Plots", () => {
         clusterBarPlot.addDataset(dataset1);
         clusterBarPlot.addDataset(dataset2);
 
-        const bars =  clusterBarPlot.content().selectAll<Element, any>(".bar-area").selectAll<Element, any>("rect");
-        assert.strictEqual(bars.size(), 4, "Number of bars should be equivalent to number of datum");
+        const barAreas = clusterBarPlot.content().selectAll<Element, any>(".bar-area");
+        assert.strictEqual(barAreas.selectAll("rect").size(), 4, "Number of bars should be equivalent to number of datum");
 
         const maxValue = Math.max.apply(null, originalData1.map((d) => d.num).concat(originalData2.map((d) => d.num)));
         const innerScale = (<any> clusterBarPlot)._makeInnerScale();
@@ -56,20 +56,22 @@ describe("Plots", () => {
         const off = innerScale.scale("0");
         const width = categoryScale.rangeBand() / 2;
 
-        bars.each(function(datum, index, outerIndex) {
-          const bar = d3.select(this);
-          const mainAttr = isVertical ? "height" : "width";
-          const secondaryAttr = isVertical ? "width" : "height";
-          const position = isVertical ? "x" : "y";
+        barAreas.each(function(_, outerIndex) {
+          d3.select(this).selectAll<Element, any>("rect").each(function(datum, index) {
+            const bar = d3.select(this);
+            const mainAttr = isVertical ? "height" : "width";
+            const secondaryAttr = isVertical ? "width" : "height";
+            const position = isVertical ? "x" : "y";
 
-          assert.closeTo(TestMethods.numAttr(bar, secondaryAttr), rangeBand, 2, `${secondaryAttr} is correct for bar ${index}`);
-          assert.closeTo(TestMethods.numAttr(bar, mainAttr), (isVertical ? SVG_HEIGHT : SVG_WIDTH) / maxValue * datum.num,
-            window.Pixel_CloseTo_Requirement, `${mainAttr} is correct for bar ${index}`);
+            assert.closeTo(TestMethods.numAttr(bar, secondaryAttr), rangeBand, 2, `${secondaryAttr} is correct for bar ${index}`);
+            assert.closeTo(TestMethods.numAttr(bar, mainAttr), (isVertical ? SVG_HEIGHT : SVG_WIDTH) / maxValue * datum.num,
+              window.Pixel_CloseTo_Requirement, `${mainAttr} is correct for bar ${index}`);
 
-          // check that clustering is correct
-          const offset = outerIndex === 0 ? off - width : width - off;
-          assert.closeTo(TestMethods.numAttr(bar, position) + TestMethods.numAttr(bar, secondaryAttr) / 2,
-            categoryScale.scale(datum.category) + offset, window.Pixel_CloseTo_Requirement, `${position} pos correct for bar ${index}`);
+            // check that clustering is correct
+            const offset = outerIndex === 0 ? off - width : width - off;
+            assert.closeTo(TestMethods.numAttr(bar, position) + TestMethods.numAttr(bar, secondaryAttr) / 2,
+              categoryScale.scale(datum.category) + offset, window.Pixel_CloseTo_Requirement, `${position} pos correct for bar ${index}`);
+          });
         });
 
         assert.deepEqual(dataset1.data(), originalData1, "underlying data is not modified for dataset1");
@@ -95,17 +97,21 @@ describe("Plots", () => {
           {category: "C", num: 15},
         ]));
 
-        const bars =  clusterBarPlot.content().selectAll<Element, any>(".bar-area").selectAll<Element, any>("rect");
-        assert.strictEqual(bars.size(), 7, "Number of bars should be equivalent to number of datum");
 
-        const aBar0 = d3.select(bars.node());
+        const barAreas = clusterBarPlot.content().selectAll<Element, any>(".bar-area");
+        assert.strictEqual(barAreas.selectAll("rect").size(), 7, "Number of bars should be equivalent to number of datum");
+
+        const bars = barAreas.nodes().map((node) => {
+          return d3.select(node).selectAll<Element, any>("rect").nodes();
+        });
+        const aBar0 = d3.select(bars[0][0]);
         const aBar1 = d3.select(bars[1][0]);
 
-        const bBar0 = d3.select(bars.nodes()[1]);
+        const bBar0 = d3.select(bars[0][1]);
         const bBar1 = d3.select(bars[1][1]);
         const bBar2 = d3.select(bars[2][0]);
 
-        const cBar0 = d3.select(bars.nodes()[2]);
+        const cBar0 = d3.select(bars[0][2]);
         const cBar1 = d3.select(bars[2][1]);
 
         const attr = isVertical ? "x" : "y";
