@@ -79,7 +79,7 @@ describe("Plots", () => {
         let plottableColors = new Plottable.Scales.Color().range();
 
         arcPaths.each(function(d, i) {
-          assert.strictEqual(d3.select(this).attr("fill"), plottableColors[i], `sector with index ${i} has the correct fill color`);
+          assert.deepEqual(d3.color(d3.select(this).attr("fill")), d3.color(plottableColors[i]), `sector with index ${i} has the correct fill color`);
         });
         svg.remove();
       });
@@ -498,9 +498,8 @@ describe("Plots", () => {
         let entities = piePlot.entities();
         assert.lengthOf(entities, data.length, "returned one Entity per datum");
         entities.forEach((entity) => {
-          assert.strictEqual(entity.selection.size(), 2, "each entity selection has 2 paths");
-          assert.strictEqual(entity.selection.filter(".fill").size(), 1, "each entity selection has 1 fill path");
-          assert.strictEqual(entity.selection.filter(".outline").size(), 1, "each entity selection has 1 stroke path");
+          assert.isNotNull(entity.selection, "entity has a fill selection");
+          assert.isNotNull(entity.strokeSelection, "entity has a stroke selection");
         });
         svg.remove();
       });

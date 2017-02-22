@@ -76,7 +76,7 @@ describe("Plots", () => {
 
           let linePath = content.select(".line");
           TestMethods.assertPathEqualToDataPoints(linePath.attr("d"), data, xScale, yScale);
-          assert.strictEqual(linePath.attr("stroke"), "#000000", "line stroke was set correctly");
+          assert.strictEqual(linePath.attr("stroke"), "rgb(0, 0, 0)", "line stroke was set correctly");
           assert.strictEqual(linePath.style("fill"), "none", "line fill renders as \"none\"");
         });
         svg.remove();

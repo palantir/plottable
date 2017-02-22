@@ -30,7 +30,7 @@ export class Time extends QuantitativeScale<Date> {
    * @param {number?} [step] The number of multiples of the interval between consecutive ticks.
    * @return {Date[]}
    */
-  public tickInterval(interval: string, step?: number): Date[] {
+  public tickInterval(interval: string, step: number = 1): Date[] {
     // temporarily creats a time scale from our linear scale into a time scale so we can get access to its api
     let tempScale = d3.scaleTime();
     let d3Interval = Time.timeIntervalToD3Time(interval).every(step);

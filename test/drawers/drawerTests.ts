@@ -34,7 +34,7 @@ describe("Drawers", () => {
     it("can set and get its renderArea", () => {
       const svg = TestMethods.generateSVG();
       assert.strictEqual(drawer.renderArea(svg), drawer, "setter mode returns the calling Drawer");
-      assert.strictEqual(drawer.renderArea(), svg, "getter mode returns the selection");
+      assert.sameMembers(drawer.renderArea().nodes(), svg.nodes(), "getter mode returns the selection");
       svg.remove();
     });
 
