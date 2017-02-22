@@ -39,7 +39,7 @@ export class NoOpAnimator implements Plottable.Animator {
     return 0;
   }
 
-  public animate(selection: SimpleSelection<any>) {
+  public animate(selection: SimpleSelection<any>): SimpleSelection<any> {
     return selection;
   }
 }
