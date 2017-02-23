@@ -7,6 +7,7 @@ import * as d3 from "d3";
 
 import { Component, ComponentCallback } from "./component";
 import { SimpleSelection } from "../core/interfaces";
+import { coerceExternalD3 } from "../utils/coerceD3";
 
 /*
  * ComponentContainer class encapsulates Table and ComponentGroup's shared functionality.
@@ -21,8 +22,7 @@ export class ComponentContainer extends Component {
   }
 
   public anchor(selection: SimpleSelection<void>) {
-    // coerce possibly external d3 instance into our own instance of d3 so we can use d3-selection-multi
-    selection = d3.selectAll<d3.BaseType, void>(selection.nodes());
+    selection = coerceExternalD3(selection);
     super.anchor(selection);
     this._forEach((c) => c.anchor(this.content()));
     return this;

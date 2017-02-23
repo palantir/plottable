@@ -108,6 +108,7 @@ var Window = __webpack_require__(99);
 exports.Window = Window;
 __export(__webpack_require__(93));
 __export(__webpack_require__(94));
+__export(__webpack_require__(126));
 __export(__webpack_require__(96));
 __export(__webpack_require__(97));
 __export(__webpack_require__(40));
@@ -140,6 +141,7 @@ var component_1 = __webpack_require__(5);
 var drawer_1 = __webpack_require__(7);
 var Utils = __webpack_require__(0);
 var Plots = __webpack_require__(36);
+var coerceD3_1 = __webpack_require__(126);
 var Plot = (function (_super) {
     __extends(Plot, _super);
     /**
@@ -168,8 +170,7 @@ var Plot = (function (_super) {
         this.animator(Plots.Animator.RESET, new Animators.Null());
     }
     Plot.prototype.anchor = function (selection) {
-        // coerce possibly external d3 instance into our own instance of d3 so we can use d3-selection-multi
-        selection = d3.selectAll(selection.nodes());
+        selection = coerceD3_1.coerceExternalD3(selection);
         _super.prototype.anchor.call(this, selection);
         this._dataChanged = true;
         this._cachedEntityStore = undefined;
@@ -694,6 +695,7 @@ __export(__webpack_require__(123));
 var d3 = __webpack_require__(1);
 var RenderController = __webpack_require__(24);
 var Utils = __webpack_require__(0);
+var coerceD3_1 = __webpack_require__(126);
 var Component = (function () {
     function Component() {
         this._clipPathEnabled = false;
@@ -717,8 +719,7 @@ var Component = (function () {
      * @returns {Component} The calling Component.
      */
     Component.prototype.anchor = function (selection) {
-        // coerce possibly external d3 instance into our own instance of d3 so we can use d3-selection-multi
-        selection = d3.selectAll(selection.nodes());
+        selection = coerceD3_1.coerceExternalD3(selection);
         if (this._destroyed) {
             throw new Error("Can't reuse destroy()-ed Components!");
         }
@@ -954,8 +955,7 @@ var Component = (function () {
                 selection = d3.select(element);
             }
             else {
-                // coerce possibly external d3 v3 or v4 instance into our own instance of d3 so we can use d3-selection-multi
-                selection = d3.select(element.node());
+                selection = coerceD3_1.coerceExternalD3(element);
             }
             if (!selection.node() || selection.node().nodeName.toLowerCase() !== "svg") {
                 throw new Error("Plottable requires a valid SVG to renderTo");
@@ -1277,6 +1277,7 @@ __export(__webpack_require__(51));
 
 var d3 = __webpack_require__(1);
 var Utils = __webpack_require__(0);
+var coerceD3_1 = __webpack_require__(126);
 var Drawer = (function () {
     /**
      * A Drawer draws svg elements based on the input Dataset.
@@ -1293,8 +1294,7 @@ var Drawer = (function () {
         if (area == null) {
             return this._renderArea;
         }
-        // coerce possibly external d3 instance into our own instance of d3 so we can use d3-selection-multi
-        area = d3.selectAll(area.nodes());
+        area = coerceD3_1.coerceExternalD3(area);
         this._renderArea = area;
         this._cachedSelectionValid = false;
         return this;
@@ -4608,8 +4608,8 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var d3 = __webpack_require__(1);
 var component_1 = __webpack_require__(5);
+var coerceD3_1 = __webpack_require__(126);
 /*
  * ComponentContainer class encapsulates Table and ComponentGroup's shared functionality.
  * It will not do anything if instantiated directly.
@@ -4623,8 +4623,7 @@ var ComponentContainer = (function (_super) {
     }
     ComponentContainer.prototype.anchor = function (selection) {
         var _this = this;
-        // coerce possibly external d3 instance into our own instance of d3 so we can use d3-selection-multi
-        selection = d3.selectAll(selection.nodes());
+        selection = coerceD3_1.coerceExternalD3(selection);
         _super.prototype.anchor.call(this, selection);
         this._forEach(function (c) { return c.anchor(_this.content()); });
         return this;
@@ -4882,11 +4881,11 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var d3 = __webpack_require__(1);
 var Interactions = __webpack_require__(14);
 var Utils = __webpack_require__(0);
 var _1 = __webpack_require__(29);
 var selectionBoxLayer_1 = __webpack_require__(34);
+var coerceD3_1 = __webpack_require__(126);
 var DragBoxLayer = (function (_super) {
     __extends(DragBoxLayer, _super);
     /**
@@ -5236,8 +5235,7 @@ var DragBoxLayer = (function (_super) {
         return this;
     };
     DragBoxLayer.prototype.anchor = function (selection) {
-        // coerce possibly external d3 instance into our own instance of d3 so we can use d3-selection-multi
-        selection = d3.selectAll(selection.nodes());
+        selection = coerceD3_1.coerceExternalD3(selection);
         this._dragInteraction.attachTo(this);
         _super.prototype.anchor.call(this, selection);
         return this;
@@ -7929,6 +7927,7 @@ exports.version = "3.0.0-beta.1";
  *
  * @fileoverview manually add d3-selection-multi to d3 default bundle. Most of this code is
  * copied from d3-selection-multi@1.0.0.
+ * See https://github.com/d3/d3-selection-multi/issues/11 for why we have to do this
  */
 
 var d3 = __webpack_require__(1);
@@ -8026,8 +8025,8 @@ d3Transition.transition.prototype.styles = transition_styles;
  * @license MIT
  */
 
-var d3 = __webpack_require__(1);
 var d3Ease = __webpack_require__(100);
+var coerceD3_1 = __webpack_require__(126);
 /**
  * Converts an easing mode string like "sin-in-out" to the corresponding function
  * in the d3-ease module.
@@ -8068,8 +8067,7 @@ var Easing = (function () {
     };
     Easing.prototype.animate = function (selection, attrToAppliedProjector) {
         var _this = this;
-        // coerce possibly external d3 instance into our own instance of d3 so we can use d3-selection-multi
-        selection = d3.selectAll(selection.nodes());
+        selection = coerceD3_1.coerceExternalD3(selection);
         var numberOfSteps = selection.size();
         var adjustedIterativeDelay = this._getAdjustedIterativeDelay(numberOfSteps);
         return selection.transition()
@@ -8167,7 +8165,7 @@ exports.Easing = Easing;
  * @license MIT
  */
 
-var d3 = __webpack_require__(1);
+var coerceD3_1 = __webpack_require__(126);
 /**
  * An animator implementation with no animation. The attributes are
  * immediately set on the selection.
@@ -8179,8 +8177,7 @@ var Null = (function () {
         return 0;
     };
     Null.prototype.animate = function (selection, attrToAppliedProjector) {
-        // coerce possibly external d3 instance into our own instance of d3 so we can use d3-selection-multi
-        selection = d3.selectAll(selection.nodes());
+        selection = coerceD3_1.coerceExternalD3(selection);
         return selection.attrs(attrToAppliedProjector);
     };
     return Null;
@@ -16900,6 +16897,42 @@ __export(__webpack_require__(15));
 __export(__webpack_require__(2));
 __export(__webpack_require__(10));
 __export(__webpack_require__(17));
+
+
+/***/ }),
+/* 126 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var d3 = __webpack_require__(1);
+/**
+ * Coerce possibly external d3 instance into our own instance of d3 so we can use d3-selection-multi.
+ * See https://github.com/d3/d3-selection-multi/issues/11 for why we have to do this.
+ *
+ * Any public facing API that accepts a d3 selection should first pass that user-supplied selection
+ * through here - this ensures all selection objects that go through the Plottable codebase are "vetted".
+ */
+function coerceExternalD3(externalD3Selection) {
+    // if .attrs isn't defined; convert the selection
+    if (externalD3Selection.attrs == null) {
+        if (externalD3Selection.nodes == null) {
+            // nodes isn't defined; this is probably a d3v3 selection. handle it accordingly
+            var nodes_1 = [];
+            externalD3Selection.each(function () {
+                nodes_1.push(this);
+            });
+            return d3.selectAll(nodes_1);
+        }
+        else {
+            return d3.selectAll(externalD3Selection.nodes());
+        }
+    }
+    else {
+        return externalD3Selection;
+    }
+}
+exports.coerceExternalD3 = coerceExternalD3;
 
 
 /***/ })

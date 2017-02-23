@@ -17,6 +17,7 @@ import { Scale, ScaleCallback } from "../scales/scale";
 import * as Utils from "../utils";
 
 import * as Plots from "./commons";
+import { coerceExternalD3 } from "../utils/coerceD3";
 
 export class Plot extends Component {
   protected static _ANIMATION_MAX_DURATION = 600;
@@ -67,8 +68,7 @@ export class Plot extends Component {
   }
 
   public anchor(selection: SimpleSelection<void>) {
-    // coerce possibly external d3 instance into our own instance of d3 so we can use d3-selection-multi
-    selection = d3.selectAll<d3.BaseType, void>(selection.nodes());
+    selection = coerceExternalD3(selection);
     super.anchor(selection);
     this._dataChanged = true;
     this._cachedEntityStore = undefined;

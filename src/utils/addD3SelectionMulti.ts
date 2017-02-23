@@ -4,6 +4,7 @@
  *
  * @fileoverview manually add d3-selection-multi to d3 default bundle. Most of this code is
  * copied from d3-selection-multi@1.0.0.
+ * See https://github.com/d3/d3-selection-multi/issues/11 for why we have to do this
  */
 
 import * as d3 from "d3";

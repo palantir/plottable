@@ -10,6 +10,7 @@ import { Dataset } from "../core/dataset";
 import { AttributeToProjector, AttributeToAppliedProjector, SimpleSelection } from "../core/interfaces";
 
 import * as Drawers from "./";
+import { coerceExternalD3 } from "../utils/coerceD3";
 
 export class Drawer {
   private _renderArea: SimpleSelection<void>;
@@ -47,8 +48,7 @@ export class Drawer {
     if (area == null) {
       return this._renderArea;
     }
-    // coerce possibly external d3 instance into our own instance of d3 so we can use d3-selection-multi
-    area = d3.selectAll<d3.BaseType, void>(area.nodes());
+    area = coerceExternalD3(area);
     this._renderArea = area;
     this._cachedSelectionValid = false;
     return this;

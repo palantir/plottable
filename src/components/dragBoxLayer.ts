@@ -11,6 +11,7 @@ import * as Utils from "../utils";
 
 import { PropertyMode } from "./";
 import { SelectionBoxLayer } from "./selectionBoxLayer";
+import { coerceExternalD3 } from "../utils/coerceD3";
 
 export type DragBoxCallback = (bounds: Bounds) => void;
 
@@ -461,8 +462,7 @@ export class DragBoxLayer extends SelectionBoxLayer {
   }
 
   public anchor(selection: SimpleSelection<void>) {
-    // coerce possibly external d3 instance into our own instance of d3 so we can use d3-selection-multi
-    selection = d3.selectAll<d3.BaseType, void>(selection.nodes());
+    selection = coerceExternalD3(selection);
     this._dragInteraction.attachTo(this);
     super.anchor(selection);
     return this;

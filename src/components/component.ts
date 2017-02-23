@@ -10,6 +10,7 @@ import * as RenderController from "../core/renderController";
 import * as Utils from "../utils";
 
 import { ComponentContainer } from "./componentContainer";
+import { coerceExternalD3 } from "../utils/coerceD3";
 
 export type ComponentCallback = (component: Component) => void;
 
@@ -65,8 +66,7 @@ export class Component {
    * @returns {Component} The calling Component.
    */
   public anchor(selection: SimpleSelection<void>) {
-    // coerce possibly external d3 instance into our own instance of d3 so we can use d3-selection-multi
-    selection = d3.selectAll<d3.BaseType, void>(selection.nodes());
+    selection = coerceExternalD3(selection);
     if (this._destroyed) {
       throw new Error("Can't reuse destroy()-ed Components!");
     }
@@ -322,8 +322,7 @@ export class Component {
       } else if (element instanceof Element) {
         selection = d3.select<d3.BaseType, void>(element);
       } else {
-        // coerce possibly external d3 v3 or v4 instance into our own instance of d3 so we can use d3-selection-multi
-        selection = d3.select<d3.BaseType, void>(element.node());
+        selection = coerceExternalD3(element);
       }
       if (!selection.node() || (<Node> selection.node()).nodeName.toLowerCase() !== "svg") {
         throw new Error("Plottable requires a valid SVG to renderTo");

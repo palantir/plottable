@@ -8,6 +8,7 @@ import * as d3Ease from "d3-ease";
 
 import { Animator } from "./animator";
 import { AttributeToAppliedProjector, SimpleSelection } from "../core/interfaces";
+import { coerceExternalD3 } from "../utils/coerceD3";
 
 /**
  * Converts an easing mode string like "sin-in-out" to the corresponding function
@@ -78,8 +79,7 @@ export class Easing implements Animator {
   }
 
   public animate(selection: SimpleSelection<any>, attrToAppliedProjector: AttributeToAppliedProjector): d3.Transition<any, any, any, any> {
-    // coerce possibly external d3 instance into our own instance of d3 so we can use d3-selection-multi
-    selection = d3.selectAll<d3.BaseType, void>(selection.nodes());
+    selection = coerceExternalD3(selection);
     let numberOfSteps = selection.size();
     let adjustedIterativeDelay = this._getAdjustedIterativeDelay(numberOfSteps);
 

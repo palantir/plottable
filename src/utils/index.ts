@@ -21,6 +21,7 @@ export {
 
 export * from "./callbackSet";
 export * from "./clientToSVGTranslator";
+export * from "./coerceD3";
 export * from "./entityStore";
 export * from "./map";
 export * from "./set";
