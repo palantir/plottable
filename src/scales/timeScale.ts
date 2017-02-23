@@ -8,6 +8,7 @@ import * as d3 from "d3";
 import { TimeInterval } from "../axes/timeAxis";
 
 import { QuantitativeScale } from "./quantitativeScale";
+import { Scale } from "./scale";
 
 export class Time extends QuantitativeScale<Date> {
   private _d3Scale: d3.time.Scale<number, number>;
@@ -137,6 +138,14 @@ export class Time extends QuantitativeScale<Date> {
         return d3.time.year;
       default:
         throw Error("TimeInterval specified does not exist: " + timeInterval);
+    }
+  }
+
+  public isComparable(scale: Scale<any, any>) {
+    if (scale instanceof Time) {
+      return true
+    } else {
+      return false;
     }
   }
 }

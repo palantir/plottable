@@ -67,7 +67,6 @@ describe("Scales", () => {
         let b = a.map((x) => scale.scale(x));
         assert.deepEqual(b, b.slice().sort().reverse(), "should be decreasing function; reverse is sorted");
       });
-
     });
 
     describe("Scale bases", () => {

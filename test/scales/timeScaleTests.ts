@@ -118,6 +118,12 @@ describe("Scales", () => {
         let secondTicks = scale.tickInterval(Plottable.TimeInterval.second);
         assert.strictEqual(secondTicks.length, 61, "generated correct number of ticks for 1 minute span, every second");
       });
+
+      it("is only comparable with itself", () => {
+        const scale2 = new Plottable.Scales.Linear();
+        assert.isFalse(scale.isComparable(scale2));
+        assert.isTrue(scale.isComparable(scale));
+      });
     });
 
     describe("Automatic Domain Calculation", () => {

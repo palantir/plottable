@@ -437,14 +437,14 @@ export class XYPlot<X, Y> extends Plot {
    * @return {Point} Returns the point represented in data coordinates
    */
   protected _invertPixelPoint(point: Point): Point {
-    const xScale = this.x();
-    const yScale = this.y();
+    const xScale = this.x().scale;
+    const yScale = this.y().scale;
 
-    if (Scales.isNotComparable(xScale.scale, yScale.scale)) {
+    if (!xScale.isComparable(yScale) || !yScale.isComparable(xScale)) {
       return point;
     }
 
-    return { x: xScale.scale.invertedTransformation(point.x), y: yScale.scale.invertedTransformation(point.y) };
+    return { x: xScale.invertedTransformation(point.x), y: yScale.invertedTransformation(point.y) };
   }
 
   protected _pixelPoint(datum: any, index: number, dataset: Dataset): Point {

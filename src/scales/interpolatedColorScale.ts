@@ -168,4 +168,8 @@ export class InterpolatedColor extends Scale<number, string> {
     this._colorRange = range;
     this._resetScale();
   }
+
+  public isComparable(_scale: Scale<any, any>) {
+    return false;
+  }
 }

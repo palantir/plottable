@@ -134,4 +134,8 @@ export class Color extends Scale<string, string> {
   protected _setRange(values: string[]) {
     this._d3Scale.range(values);
   }
+
+  public isComparable(_scale: Scale<any, any>) {
+    return false;
+  }
 }

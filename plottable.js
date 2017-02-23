@@ -642,10 +642,7 @@ __export(__webpack_require__(89));
 __export(__webpack_require__(41));
 // ---------------------------------------------------------
 var categoryScale_2 = __webpack_require__(38);
-var colorScale_2 = __webpack_require__(39);
-var interpolatedColorScale_2 = __webpack_require__(40);
 var quantitativeScale_1 = __webpack_require__(10);
-var timeScale_2 = __webpack_require__(41);
 /**
  * Type guarded function to check if the scale implements the
  * `TransformableScale` interface. Unfortunately, there is no way to do
@@ -657,23 +654,6 @@ function isTransformable(scale) {
         scale instanceof categoryScale_2.Category);
 }
 exports.isTransformable = isTransformable;
-/*
- * Whether scale should be comparable intuitively.
- */
-function isNotComparable(scale1, scale2) {
-    var nonComparableScales = [categoryScale_2.Category, colorScale_2.Color, interpolatedColorScale_2.InterpolatedColor];
-    var selfComparableScales = [timeScale_2.Time];
-    var hasNonComparableScale = nonComparableScales.some(function (scale) {
-        return (scale1 instanceof scale || scale2 instanceof scale);
-    });
-    var hasOnlyOneSelfComparableScale = selfComparableScales.some(function (scale) {
-        var onlyFirstComparable = (scale1 instanceof scale && !(scale2 instanceof scale));
-        var onlySecondComparable = (!(scale1 instanceof scale) && scale2 instanceof scale);
-        return onlyFirstComparable || onlySecondComparable;
-    });
-    return hasNonComparableScale || hasOnlyOneSelfComparableScale;
-}
-exports.isNotComparable = isNotComparable;
 
 
 /***/ }),
@@ -2455,12 +2435,12 @@ var XYPlot = (function (_super) {
      * @return {Point} Returns the point represented in data coordinates
      */
     XYPlot.prototype._invertPixelPoint = function (point) {
-        var xScale = this.x();
-        var yScale = this.y();
-        if (Scales.isNotComparable(xScale.scale, yScale.scale)) {
+        var xScale = this.x().scale;
+        var yScale = this.y().scale;
+        if (!xScale.isComparable(yScale) || !yScale.isComparable(xScale)) {
             return point;
         }
-        return { x: xScale.scale.invertedTransformation(point.x), y: yScale.scale.invertedTransformation(point.y) };
+        return { x: xScale.invertedTransformation(point.x), y: yScale.invertedTransformation(point.y) };
     };
     XYPlot.prototype._pixelPoint = function (datum, index, dataset) {
         var xProjector = plot_1.Plot._scaledAccessor(this.x());
@@ -2666,6 +2646,16 @@ var Scale = (function () {
         this._includedValuesProviders.delete(provider);
         this._autoDomainIfAutomaticMode();
         return this;
+    };
+    /**
+     * Whether Scale is comparable intuitively. eg. Quantitative vs Category, Time vs Time.
+     * Defaults to true.
+     *
+     * @param {Scale}
+     * @returns {boolean}
+     */
+    Scale.prototype.isComparable = function (_scale) {
+        return true;
     };
     return Scale;
 }());
@@ -6990,6 +6980,9 @@ var Category = (function (_super) {
     Category.prototype._rescaleBand = function (band) {
         return Math.abs(this._d3TransformationScale(band) - this._d3TransformationScale(0));
     };
+    Category.prototype.isComparable = function (_scale) {
+        return false;
+    };
     return Category;
 }(scale_1.Scale));
 exports.Category = Category;
@@ -7118,6 +7111,9 @@ var Color = (function (_super) {
     Color.prototype._setRange = function (values) {
         this._d3Scale.range(values);
     };
+    Color.prototype.isComparable = function (_scale) {
+        return false;
+    };
     Color._LOOP_LIGHTEN_FACTOR = 1.6;
     // The maximum number of colors we are getting from CSS stylesheets
     Color._MAXIMUM_COLORS_FROM_CSS = 256;
@@ -7245,6 +7241,9 @@ var InterpolatedColor = (function (_super) {
     InterpolatedColor.prototype._setRange = function (range) {
         this._colorRange = range;
         this._resetScale();
+    };
+    InterpolatedColor.prototype.isComparable = function (_scale) {
+        return false;
     };
     InterpolatedColor.REDS = [
         "#FFFFFF",
@@ -7420,6 +7419,14 @@ var Time = (function (_super) {
                 return d3.time.year;
             default:
                 throw Error("TimeInterval specified does not exist: " + timeInterval);
+        }
+    };
+    Time.prototype.isComparable = function (scale) {
+        if (scale instanceof Time) {
+            return true;
+        }
+        else {
+            return false;
         }
     };
     return Time;

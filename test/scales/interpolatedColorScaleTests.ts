@@ -57,6 +57,9 @@ describe("Scales", () => {
         assert.strictEqual(scale.scale(100), "#ffffff", "values larger than the domain maximum clamp to white");
       });
 
+      it("is not comparable with other scales", () => {
+        assert.isFalse(scale.isComparable(scale));
+      });
     });
   });
 });

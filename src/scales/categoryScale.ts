@@ -262,4 +262,8 @@ export class Category extends Scale<string, number> implements TransformableScal
   protected _rescaleBand(band: number) {
     return Math.abs(this._d3TransformationScale(band) - this._d3TransformationScale(0));
   }
+
+  public isComparable(_scale: Scale<any, any>) {
+    return false;
+  }
 }

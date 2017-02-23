@@ -200,4 +200,15 @@ export class Scale<D, R> {
     this._autoDomainIfAutomaticMode();
     return this;
   }
+
+  /**
+   * Whether Scale is comparable intuitively. eg. Quantitative vs Category, Time vs Time.
+   * Defaults to true.
+   *
+   * @param {Scale}
+   * @returns {boolean}
+   */
+  public isComparable(_scale: Scale<any, any>) {
+    return true;
+  }
 }

@@ -64,6 +64,11 @@ describe("Scales", () => {
         assert.strictEqual(scale.range(expectedRange), scale, "setter mode returns the calling Scale");
         assert.deepEqual(scale.range(), expectedRange, "returns the set range");
       });
+
+      it("is comparable by default", () => {
+        const scale = new MockScale();
+        assert.isTrue(scale.isComparable(scale));
+      });
     });
 
     describe("onUpdate", () => {
@@ -192,32 +197,6 @@ describe("Scales", () => {
         assert.strictEqual(autodomainCalls, 0, "scale did not autodomain when a provider was added");
         scale.removeIncludedValuesProvider(provider);
         assert.strictEqual(autodomainCalls, 0, "scale dit not autodomain when a provider was removed");
-      });
-    });
-
-    describe("comparable scales", () => {
-      it("should only be able to compare certain scales", () => {
-        const comparableScalePairs: any = [
-          [new Plottable.Scales.Linear(), new Plottable.Scales.ModifiedLog()],
-          [new Plottable.Scales.Time(), new Plottable.Scales.Time()],
-        ];
-
-        comparableScalePairs.forEach((pair: any) => {
-          assert.isFalse(Plottable.Scales.isNotComparable(pair[0], pair[1]));
-        });
-
-        const nonComparableScalePairs = [
-          [new Plottable.Scales.Category(), new Plottable.Scales.Category()],
-          [new Plottable.Scales.Linear(), new Plottable.Scales.Category()],
-          [new Plottable.Scales.Linear(), new Plottable.Scales.Time()],
-        ];
-
-        nonComparableScalePairs.forEach((pair: any) => {
-          if (!Plottable.Scales.isNotComparable(pair[0], pair[1])) {
-            console.log(pair);
-          }
-          assert.isTrue(Plottable.Scales.isNotComparable(pair[0], pair[1]));
-        });
       });
     });
   });

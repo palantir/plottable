@@ -67,6 +67,10 @@ describe("Scales", () => {
           });
         }
       });
+
+      it("is not comparable with other scales", () => {
+        assert.isFalse(scale.isComparable(scale));
+      });
     });
 
     describe("Extent calculation", () => {
