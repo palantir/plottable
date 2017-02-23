@@ -1,3 +1,4 @@
+import { SimpleSelection } from "../../src/core/interfaces";
 import * as d3 from "d3";
 
 import { assert } from "chai";
@@ -9,7 +10,7 @@ import * as TestMethods from "../testMethods";
 describe("Plots", () => {
   describe("PiePlot", () => {
     describe("Rendering", () => {
-      let svg: d3.Selection<void>;
+      let svg: SimpleSelection<void>;
       let dataset: Plottable.Dataset;
       let data: any[];
       let piePlot: Plottable.Plots.Pie;
@@ -25,9 +26,9 @@ describe("Plots", () => {
       });
 
       it("draws a fill path and a stroke path for each slice", () => {
-        let arcPaths = piePlot.content().selectAll(".arc");
-        let arcFillPaths = piePlot.content().selectAll(".arc.fill");
-        let arcOutlinePaths = piePlot.content().selectAll(".arc.outline");
+        let arcPaths = piePlot.content().selectAll<Element, any>(".arc");
+        let arcFillPaths = piePlot.content().selectAll<Element, any>(".arc.fill");
+        let arcOutlinePaths = piePlot.content().selectAll<Element, any>(".arc.outline");
         assert.strictEqual(arcPaths.size(), data.length * 2, "2 paths per datum");
         assert.strictEqual(arcFillPaths.size(), data.length, "1 fill path per datum");
         assert.strictEqual(arcOutlinePaths.size(), data.length, "1 outline path per datum");
@@ -37,10 +38,10 @@ describe("Plots", () => {
       });
 
       it("draws slices proportional in angle to their value", () => {
-        let arcPaths = piePlot.content().selectAll(".arc.fill");
+        let arcPaths = piePlot.content().selectAll<Element, any>(".arc.fill");
         assert.strictEqual(arcPaths.size(), 2, "has two sectors");
 
-        let pathString0 = d3.select(arcPaths[0][0]).attr("d");
+        let pathString0 = d3.select(arcPaths.node()).attr("d");
         let decomposedPath0 = TestMethods.decomposePath(TestMethods.normalizePath(pathString0));
 
         let moveCommand0 = decomposedPath0[0];
@@ -55,7 +56,7 @@ describe("Plots", () => {
         assert.closeTo(lineCommand0.arguments[0], 0, 1, "draws line to origin (x)");
         assert.closeTo(lineCommand0.arguments[1], 0, 1, "draws line to origin (y)");
 
-        let pathString1 = d3.select(arcPaths[0][1]).attr("d");
+        let pathString1 = d3.select(arcPaths.nodes()[1]).attr("d");
         let decomposedPath1 = TestMethods.decomposePath(TestMethods.normalizePath(pathString1));
 
         let moveCommand1 = decomposedPath1[0];
@@ -74,18 +75,18 @@ describe("Plots", () => {
       });
 
       it("uses Plottable colors for sectors by default", () => {
-        let arcPaths = piePlot.content().selectAll(".arc.fill");
+        let arcPaths = piePlot.content().selectAll<Element, any>(".arc.fill");
         let plottableColors = new Plottable.Scales.Color().range();
 
         arcPaths.each(function(d, i) {
-          assert.strictEqual(d3.select(this).attr("fill"), plottableColors[i], `sector with index ${i} has the correct fill color`);
+          assert.deepEqual(d3.color(d3.select(this).attr("fill")), d3.color(plottableColors[i]), `sector with index ${i} has the correct fill color`);
         });
         svg.remove();
       });
 
       it("updates slices when data changes", () => {
         let originalPathStrings: String[] = [];
-        piePlot.content().selectAll("path").each(function() {
+        piePlot.content().selectAll<Element, any>("path").each(function() {
           originalPathStrings.push(d3.select(this).attr("d"));
         });
         assert.lengthOf(originalPathStrings, data.length * 2, "2 paths per datum");
@@ -95,7 +96,7 @@ describe("Plots", () => {
         dataset.data(oneMoreSliceData);
 
         let oneMoreSlicePathStrings: String[] = [];
-        piePlot.content().selectAll("path").each(function() {
+        piePlot.content().selectAll<Element, any>("path").each(function() {
           oneMoreSlicePathStrings.push(d3.select(this).attr("d"));
         });
         assert.lengthOf(oneMoreSlicePathStrings, oneMoreSliceData.length * 2, "2 paths per datum");
@@ -109,10 +110,10 @@ describe("Plots", () => {
       it("can set innerRadius()", () => {
         let expectedInnerRadius = 5;
         assert.strictEqual(piePlot.innerRadius(expectedInnerRadius), piePlot, "setter returns the calling pie plot");
-        let arcPaths = piePlot.content().selectAll(".arc.fill");
+        let arcPaths = piePlot.content().selectAll<Element, any>(".arc.fill");
         assert.strictEqual(arcPaths.size(), 2, "has two sectors");
 
-        let decomposedPath0 = TestMethods.decomposePath(TestMethods.normalizePath(d3.select(arcPaths[0][0]).attr("d")));
+        let decomposedPath0 = TestMethods.decomposePath(TestMethods.normalizePath(d3.select(arcPaths.node()).attr("d")));
 
         let lineBeforeInnerArcCommand0 = decomposedPath0[2];
         assert.closeTo(lineBeforeInnerArcCommand0.arguments[0], expectedInnerRadius, 1, "inner arc starts at correct x");
@@ -130,10 +131,10 @@ describe("Plots", () => {
       it("can set outerRadius()", () => {
         let expectedOuterRadius = 150;
         assert.strictEqual(piePlot.outerRadius(() => expectedOuterRadius), piePlot, "setter returns the calling pie plot");
-        let arcPaths = piePlot.content().selectAll(".arc.fill");
+        let arcPaths = piePlot.content().selectAll<Element, any>(".arc.fill");
         assert.strictEqual(arcPaths.size(), 2, "has two sectors");
 
-        let decomposedPath0 = TestMethods.decomposePath(TestMethods.normalizePath(d3.select(arcPaths[0][0]).attr("d")));
+        let decomposedPath0 = TestMethods.decomposePath(TestMethods.normalizePath(d3.select(arcPaths.node()).attr("d")));
 
         let lineCommand0 = decomposedPath0[0];
         assert.closeTo(lineCommand0.arguments[0], 0, 1, "starts outer arc at correct position (x)");
@@ -151,10 +152,10 @@ describe("Plots", () => {
       it("can set startAngle()", () => {
         let expectedStartAngle = Math.PI;
         assert.strictEqual(piePlot.startAngle(expectedStartAngle), piePlot, "setter returns the calling pie plot");
-        let arcPaths = piePlot.content().selectAll(".arc.fill");
+        let arcPaths = piePlot.content().selectAll<Element, any>(".arc.fill");
         assert.strictEqual(arcPaths.size(), 2, "has two sectors");
 
-        let pathString0 = d3.select(arcPaths[0][0]).attr("d");
+        let pathString0 = d3.select(arcPaths.node()).attr("d");
         let decomposedPath0 = TestMethods.decomposePath(TestMethods.normalizePath(pathString0));
 
         let moveCommand0 = decomposedPath0[0];
@@ -169,7 +170,7 @@ describe("Plots", () => {
         assert.closeTo(lineCommand0.arguments[0], 0, 1, "draws line to origin (x)");
         assert.closeTo(lineCommand0.arguments[1], 0, 1, "draws line to origin (y)");
 
-        let pathString1 = d3.select(arcPaths[0][1]).attr("d");
+        let pathString1 = d3.select(arcPaths.nodes()[1]).attr("d");
         let decomposedPath1 = TestMethods.decomposePath(TestMethods.normalizePath(pathString1));
 
         let moveCommand1 = decomposedPath1[0];
@@ -190,10 +191,10 @@ describe("Plots", () => {
       it("can set endAngle()", () => {
         let expectedEndAngle = Math.PI;
         assert.strictEqual(piePlot.endAngle(expectedEndAngle), piePlot, "setter returns the calling pie plot");
-        let arcPaths = piePlot.content().selectAll(".arc.fill");
+        let arcPaths = piePlot.content().selectAll<Element, any>(".arc.fill");
         assert.strictEqual(arcPaths.size(), 2, "has two sectors");
 
-        let pathString0 = d3.select(arcPaths[0][0]).attr("d");
+        let pathString0 = d3.select(arcPaths.node()).attr("d");
         let decomposedPath0 = TestMethods.decomposePath(TestMethods.normalizePath(pathString0));
 
         let moveCommand0 = decomposedPath0[0];
@@ -208,7 +209,7 @@ describe("Plots", () => {
         assert.closeTo(lineCommand0.arguments[0], 0, 1, "draws line to origin (x)");
         assert.closeTo(lineCommand0.arguments[1], 0, 1, "draws line to origin (y)");
 
-        let pathString1 = d3.select(arcPaths[0][1]).attr("d");
+        let pathString1 = d3.select(arcPaths.nodes()[1]).attr("d");
         let decomposedPath1 = TestMethods.decomposePath(TestMethods.normalizePath(pathString1));
 
         let moveCommand1 = decomposedPath1[0];
@@ -232,7 +233,7 @@ describe("Plots", () => {
         piePlot.datasets([newDataset]);
 
         let originalStringPaths: String[] = [];
-        piePlot.content().selectAll("path").each(function() {
+        piePlot.content().selectAll<Element, any>("path").each(function() {
           const pathString = d3.select(this).attr("d");
           assert.notInclude(pathString, "NaN", "original pathString should not contain NaN");
           originalStringPaths.push(pathString);
@@ -241,7 +242,7 @@ describe("Plots", () => {
         const newData = [{value: 10}, {value: 20}];
         newDataset.data(newData);
 
-        piePlot.content().selectAll("path").each(function(path, index) {
+        piePlot.content().selectAll<Element, any>("path").each(function(path, index) {
           const pathString = d3.select(this).attr("d");
           assert.notInclude(pathString, "NaN", "new pathString should not contain NaN");
           assert.notStrictEqual(pathString, originalStringPaths[index], "new pathString should not equal old one");
@@ -252,7 +253,7 @@ describe("Plots", () => {
     });
 
     describe("Labels", () => {
-      let svg: d3.Selection<void>;
+      let svg: SimpleSelection<void>;
       let piePlot: Plottable.Plots.Pie;
 
       beforeEach(() => {
@@ -271,10 +272,10 @@ describe("Plots", () => {
         let dataset = new Plottable.Dataset(data);
         piePlot.addDataset(dataset);
         piePlot.renderTo(svg);
-        let labels = piePlot.content().selectAll("text");
+        let labels = piePlot.content().selectAll<Element, any>("text");
         assert.strictEqual(labels.size(), data.length, "one label per slice");
         piePlot.render();
-        labels = piePlot.content().selectAll("text");
+        labels = piePlot.content().selectAll<Element, any>("text");
         assert.strictEqual(labels.size(), data.length, "one label per slice after re-render()ing");
         svg.remove();
       });
@@ -288,7 +289,7 @@ describe("Plots", () => {
         let dataset = new Plottable.Dataset(data1);
         piePlot.addDataset(dataset);
         piePlot.renderTo(svg);
-        let labels = piePlot.content().selectAll("text");
+        let labels = piePlot.content().selectAll<Element, any>("text");
         assert.strictEqual(labels.size(), data1.length, "one label per datum");
         labels.each(function() {
           let labelText = d3.select(this).text();
@@ -299,7 +300,7 @@ describe("Plots", () => {
           { value: 2 },
         ];
         dataset.data(data2);
-        labels = piePlot.content().selectAll("text");
+        labels = piePlot.content().selectAll<Element, any>("text");
         assert.strictEqual(labels.size(), data2.length, "one label per datum");
         labels.each(function() {
           let labelText = d3.select(this).text();
@@ -317,10 +318,10 @@ describe("Plots", () => {
         let dataset = new Plottable.Dataset(data);
         piePlot.addDataset(dataset);
         piePlot.renderTo(svg);
-        let labels = piePlot.content().selectAll("text");
+        let labels = piePlot.content().selectAll<Element, any>("text");
         assert.strictEqual(labels.size(), data.length, "one label per datum");
         piePlot.labelsEnabled(false);
-        labels = piePlot.content().selectAll("text");
+        labels = piePlot.content().selectAll<Element, any>("text");
         assert.strictEqual(labels.size(), 0, "labels were removed");
         svg.remove();
       });
@@ -337,7 +338,7 @@ describe("Plots", () => {
         let dataset = new Plottable.Dataset(data);
         piePlot.addDataset(dataset);
         piePlot.renderTo(svg);
-        let labelGs = piePlot.content().select(".label-area").selectAll(".label-area > g");
+        let labelGs = piePlot.content().select(".label-area").selectAll<Element, any>(".label-area > g");
         labelGs.each(function(d, i) {
           let visibility = d3.select(this).style("visibility");
           if (data[i].value === 1) {
@@ -358,7 +359,7 @@ describe("Plots", () => {
         piePlot.addDataset(dataset);
         piePlot.labelFormatter((n: number) => n + " m");
         piePlot.renderTo(svg);
-        let texts = svg.selectAll("text")[0].map((n: any) => d3.select(n).text());
+        let texts = svg.selectAll<Element, any>("text").nodes().map((n: any) => d3.select(n).text());
         assert.lengthOf(texts, 2, "both labels are drawn");
         assert.strictEqual(texts[0], "5 m", "The formatter was used to format the label for slice index 0");
         assert.strictEqual(texts[1], "15 m", "The formatter was used to format the label for slice index 1");
@@ -378,7 +379,7 @@ describe("Plots", () => {
         piePlot.addDataset(dataset);
         piePlot.renderTo(svg);
 
-        let texts = svg.selectAll("text");
+        let texts = svg.selectAll<Element, any>("text");
         assert.strictEqual(texts.size(), data.length, "One label is rendered for each piece of data");
 
         texts.each(function(d, i) {
@@ -403,7 +404,7 @@ describe("Plots", () => {
         piePlot.addDataset(dataset).outerRadius(500);
         piePlot.renderTo(svg);
 
-        let texts = svg.selectAll("text");
+        let texts = svg.selectAll<Element, any>("text");
         assert.strictEqual(texts.size(), data.length, "One label is rendered for each piece of data");
 
         texts.each(function(d, i) {
@@ -427,7 +428,7 @@ describe("Plots", () => {
         piePlot.addDataset(dataset);
         piePlot.renderTo(svg);
 
-        let texts = svg.selectAll("text")[0].map((n: any) => d3.select(n).text());
+        let texts = svg.selectAll<Element, any>("text").nodes().map((n: any) => d3.select(n).text());
         assert.lengthOf(texts, 2, "One label is rendered for each valid datum");
         assert.strictEqual(texts[0], "1", "Label for the first valid datum is shown");
         assert.strictEqual(texts[1], "2", "Label for the second valid datum is shown");
@@ -436,7 +437,7 @@ describe("Plots", () => {
     });
 
     describe("Selections", () => {
-      let svg: d3.Selection<void>;
+      let svg: SimpleSelection<void>;
       let dataset: Plottable.Dataset;
       let data: any[];
       let piePlot: Plottable.Plots.Pie;
@@ -478,7 +479,7 @@ describe("Plots", () => {
     });
 
     describe("Entities", () => {
-      let svg: d3.Selection<void>;
+      let svg: SimpleSelection<void>;
       let dataset: Plottable.Dataset;
       let data = [{value: 5}, {value: 15}];
       let piePlot: Plottable.Plots.Pie;
@@ -497,9 +498,8 @@ describe("Plots", () => {
         let entities = piePlot.entities();
         assert.lengthOf(entities, data.length, "returned one Entity per datum");
         entities.forEach((entity) => {
-          assert.strictEqual(entity.selection.size(), 2, "each entity selection has 2 paths");
-          assert.strictEqual(entity.selection.filter(".fill").size(), 1, "each entity selection has 1 fill path");
-          assert.strictEqual(entity.selection.filter(".outline").size(), 1, "each entity selection has 1 stroke path");
+          assert.isNotNull(entity.selection, "entity has a fill selection");
+          assert.isNotNull(entity.strokeSelection, "entity has a stroke selection");
         });
         svg.remove();
       });
@@ -620,7 +620,7 @@ describe("Plots", () => {
 
         piePlot.renderTo(svg);
 
-        let elementsDrawnSel = piePlot.content().selectAll(".arc.fill");
+        let elementsDrawnSel = piePlot.content().selectAll<Element, any>(".arc.fill");
 
         assert.strictEqual(elementsDrawnSel.size(), 4,
           "There should be exactly 4 slices in the pie chart, representing the valid values");

@@ -23,7 +23,7 @@ describe("Animators", () => {
       const svg = TestMethods.generateSVG();
       const elementName = "g";
       attributeValues.forEach(() => svg.append(elementName));
-      const elements = svg.selectAll(elementName);
+      const elements = svg.selectAll<SVGGElement, any>(elementName);
 
       const animator = new Plottable.Animators.Null();
       animator.animate(elements, attrToAppliedProjector);

@@ -6,6 +6,8 @@
 import * as d3 from "d3";
 
 import { Component, ComponentCallback } from "./component";
+import { SimpleSelection } from "../core/interfaces";
+import { coerceExternalD3 } from "../utils/coerceD3";
 
 /*
  * ComponentContainer class encapsulates Table and ComponentGroup's shared functionality.
@@ -19,7 +21,8 @@ export class ComponentContainer extends Component {
     this._detachCallback = (component: Component) => this.remove(component);
   }
 
-  public anchor(selection: d3.Selection<void>) {
+  public anchor(selection: SimpleSelection<void>) {
+    selection = coerceExternalD3(selection);
     super.anchor(selection);
     this._forEach((c) => c.anchor(this.content()));
     return this;

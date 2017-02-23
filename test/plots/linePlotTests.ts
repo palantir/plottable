@@ -1,3 +1,4 @@
+import { SimpleSelection } from "../../src/core/interfaces";
 import * as d3 from "d3";
 
 import { assert } from "chai";
@@ -9,7 +10,7 @@ import * as TestMethods from "../testMethods";
 describe("Plots", () => {
   describe("LinePlot", () => {
     describe("Basic Usage", () => {
-      let svg: d3.Selection<void>;
+      let svg: SimpleSelection<void>;
       let xScale: Plottable.Scales.Linear;
       let yScale: Plottable.Scales.Linear;
       let linePlot: Plottable.Plots.Line<number>;
@@ -70,7 +71,7 @@ describe("Plots", () => {
         let linePath = linePlot.content().select(".line");
         TestMethods.assertPathEqualToDataPoints(linePath.attr("d"), data, xScale, yScale);
         assert.strictEqual(linePath.style("fill"), "none", "line fill renders as \"none\"");
-        assert.strictEqual(linePath.attr("stroke"), "#000000", "stroke set correctly");
+        assert.strictEqual(linePath.attr("stroke"), "rgb(0, 0, 0)", "stroke set correctly");
         svg.remove();
       });
 
@@ -125,7 +126,7 @@ describe("Plots", () => {
     });
 
     describe("interpolation", () => {
-      let svg: d3.Selection<void>;
+      let svg: SimpleSelection<void>;
       let xScale: Plottable.Scales.Linear;
       let yScale: Plottable.Scales.Linear;
       let linePlot: Plottable.Plots.Line<number>;
@@ -140,9 +141,9 @@ describe("Plots", () => {
       });
 
       it("sets interploation correctly", () => {
-        assert.strictEqual(linePlot.interpolator(), "linear", "the default interpolation mode is linear");
-        assert.strictEqual(linePlot.interpolator("step"), linePlot, "setting an interpolation mode returns the plot");
-        assert.strictEqual(linePlot.interpolator(), "step", "setting an interpolation mode works");
+        assert.strictEqual(linePlot.curve(), "linear", "the default interpolation mode is linear");
+        assert.strictEqual(linePlot.curve("step"), linePlot, "setting an interpolation mode returns the plot");
+        assert.strictEqual(linePlot.curve(), "step", "setting an interpolation mode works");
 
         svg.remove();
       });
@@ -165,7 +166,7 @@ describe("Plots", () => {
         let svgPath = linePlot.content().select("path").attr("d");
         TestMethods.assertPathEqualToDataPoints(svgPath, data, xScale, yScale);
 
-        linePlot.interpolator("step");
+        linePlot.curve("step");
 
         svgPath = linePlot.content().select("path").attr("d");
         let stepPoints = [data[0]];
@@ -183,7 +184,7 @@ describe("Plots", () => {
     });
 
     describe("selections", () => {
-      let svg: d3.Selection<void>;
+      let svg: SimpleSelection<void>;
       let xScale: Plottable.Scales.Linear;
       let yScale: Plottable.Scales.Linear;
       let data = [{ x: 0, y: 0.75 }, { x: 1, y: 0.25 }];
@@ -319,7 +320,7 @@ describe("Plots", () => {
 
     describe("smooth autoranging", () => {
 
-      let svg: d3.Selection<void>;
+      let svg: SimpleSelection<void>;
       let xScale: Plottable.Scales.Linear;
       let yScale: Plottable.Scales.Linear;
       let data = [
@@ -563,7 +564,7 @@ describe("Plots", () => {
     });
 
     describe("Cropped Rendering Performance", () => {
-      let svg: d3.Selection<void>;
+      let svg: SimpleSelection<void>;
       let plot: Plottable.Plots.Line<number>;
 
       let xScale: Plottable.Scales.Linear;
@@ -692,7 +693,7 @@ describe("Plots", () => {
     });
 
     describe("Downsampling Performance", () => {
-      let svg: d3.Selection<void>;
+      let svg: SimpleSelection<void>;
       let plot: Plottable.Plots.Line<number>;
 
       let xScale: Plottable.Scales.Linear;

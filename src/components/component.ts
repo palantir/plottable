@@ -5,22 +5,23 @@
 
 import * as d3 from "d3";
 
-import { Point, SpaceRequest, Bounds } from "../core/interfaces";
+import { Point, SpaceRequest, Bounds, SimpleSelection } from "../core/interfaces";
 import * as RenderController from "../core/renderController";
 import * as Utils from "../utils";
 
 import { ComponentContainer } from "./componentContainer";
+import { coerceExternalD3 } from "../utils/coerceD3";
 
 export type ComponentCallback = (component: Component) => void;
 
 export type IResizeHandler = (size: { height: number, width: number }) => void;
 
 export class Component {
-  private _element: d3.Selection<void>;
-  private _content: d3.Selection<void>;
-  protected _boundingBox: d3.Selection<void>;
-  private _backgroundContainer: d3.Selection<void>;
-  private _foregroundContainer: d3.Selection<void>;
+  private _element: SimpleSelection<void>;
+  private _content: SimpleSelection<void>;
+  protected _boundingBox: SimpleSelection<void>;
+  private _backgroundContainer: SimpleSelection<void>;
+  private _foregroundContainer: SimpleSelection<void>;
   protected _clipPathEnabled = false;
   private _resizeHandler: IResizeHandler;
   private _origin: Point = { x: 0, y: 0 }; // Origin of the coordinate space for the Component.
@@ -41,9 +42,9 @@ export class Component {
   protected _isSetup = false;
   protected _isAnchored = false;
 
-  private _boxes: d3.Selection<void>[] = [];
-  private _boxContainer: d3.Selection<void>;
-  private _rootSVG: d3.Selection<void>;
+  private _boxes: SimpleSelection<void>[] = [];
+  private _boxContainer: SimpleSelection<void>;
+  private _rootSVG: SimpleSelection<void>;
   private _isTopLevelComponent = false;
   private _width: number; // Width and height of the Component. Used to size the hitbox, bounding box, etc
   private _height: number;
@@ -64,7 +65,8 @@ export class Component {
    * @param {d3.Selection} selection.
    * @returns {Component} The calling Component.
    */
-  public anchor(selection: d3.Selection<void>) {
+  public anchor(selection: SimpleSelection<void>) {
+    selection = coerceExternalD3(selection);
     if (this._destroyed) {
       throw new Error("Can't reuse destroy()-ed Components!");
     }
@@ -81,7 +83,7 @@ export class Component {
       // HACKHACK: Safari fails to register events on the <svg> itself
       const safariBacking = this._rootSVG.select(`.${Component._SAFARI_EVENT_BACKING_CLASS}`);
       if (safariBacking.empty()) {
-        this._rootSVG.append("rect").classed(Component._SAFARI_EVENT_BACKING_CLASS, true).attr({
+        this._rootSVG.append("rect").classed(Component._SAFARI_EVENT_BACKING_CLASS, true).attrs({
           x: 0,
           y: 0,
           width: "100%",
@@ -221,7 +223,7 @@ export class Component {
       y: origin.y + (availableHeight - this.height()) * yAlignProportion,
     };
     this._element.attr("transform", "translate(" + this._origin.x + "," + this._origin.y + ")");
-    this._boxes.forEach((b: d3.Selection<void>) => b.attr("width", this.width()).attr("height", this.height()));
+    this._boxes.forEach((b: SimpleSelection<void>) => b.attr("width", this.width()).attr("height", this.height()));
 
     if (this._resizeHandler != null) {
       this._resizeHandler(size);
@@ -311,16 +313,16 @@ export class Component {
    * @param {String|d3.Selection} element A selector-string for the <svg>, or a d3 selection containing an <svg>.
    * @returns {Component} The calling Component.
    */
-  public renderTo(element: String | Element | d3.Selection<void>): this {
+  public renderTo(element: string | Element | SimpleSelection<void>): this {
     this.detach();
     if (element != null) {
-      let selection: d3.Selection<void>;
+      let selection: SimpleSelection<void>;
       if (typeof(element) === "string") {
-        selection = d3.select(<string> element);
+        selection = d3.select<d3.BaseType, void>(element);
       } else if (element instanceof Element) {
-        selection = d3.select(<Element> element);
+        selection = d3.select<d3.BaseType, void>(element);
       } else {
-        selection = <d3.Selection<void>> element;
+        selection = coerceExternalD3(element);
       }
       if (!selection.node() || (<Node> selection.node()).nodeName.toLowerCase() !== "svg") {
         throw new Error("Plottable requires a valid SVG to renderTo");
@@ -387,7 +389,7 @@ export class Component {
     return this;
   }
 
-  private _addBox(className?: string, parentElement?: d3.Selection<void>) {
+  private _addBox(className?: string, parentElement?: SimpleSelection<void>) {
     if (this._element == null) {
       throw new Error("Adding boxes before anchoring is currently disallowed");
     }
@@ -396,6 +398,7 @@ export class Component {
     if (className != null) {
       box.classed(className, true);
     }
+    box.attr("stroke-width", "0");
 
     this._boxes.push(box);
     if (this.width() != null && this.height() != null) {
@@ -635,7 +638,7 @@ export class Component {
    *
    * @return {d3.Selection}
    */
-  public foreground(): d3.Selection<void> {
+  public foreground(): SimpleSelection<void> {
     return this._foregroundContainer;
   }
 
@@ -646,7 +649,7 @@ export class Component {
    *
    * @return {d3.Selection} content selection for the Component
    */
-  public content(): d3.Selection<void> {
+  public content(): SimpleSelection<void> {
     return this._content;
   }
 
@@ -657,7 +660,7 @@ export class Component {
    *
    * @return {d3.Selection} background selection for the Component
    */
-  public background(): d3.Selection<void> {
+  public background(): SimpleSelection<void> {
     return this._backgroundContainer;
   }
 }

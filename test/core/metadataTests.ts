@@ -5,6 +5,7 @@ import { assert } from "chai";
 import * as Plottable from "../../src";
 
 import * as TestMethods from "../testMethods";
+import { getTranslateValues } from "../../src/utils/domUtils";
 
 describe("Metadata", () => {
   let xScale: Plottable.Scales.Linear;
@@ -29,11 +30,11 @@ describe("Metadata", () => {
                                   .y(yAccessor, yScale);
     plot.addDataset(dataset);
     plot.renderTo(svg);
-    let circles = plot.selections();
-    let c1 = d3.select(circles[0][0]);
-    let c2 = d3.select(circles[0][1]);
-    let c1Position = d3.transform(c1.attr("transform")).translate;
-    let c2Position = d3.transform(c2.attr("transform")).translate;
+    let circles = plot.selections().nodes();
+    let c1 = d3.select(circles[0]);
+    let c2 = d3.select(circles[1]);
+    let c1Position = getTranslateValues(c1);
+    let c2Position = getTranslateValues(c2);
     assert.closeTo(c1Position[0], 0, 0.01, "first circle cx is correct");
     assert.closeTo(c1Position[1], 20, 0.01, "first circle cy is correct");
     assert.closeTo(c2Position[0], 11, 0.01, "second circle cx is correct");
@@ -41,8 +42,8 @@ describe("Metadata", () => {
 
     let changedMetadata = {foo: 0, bar: 0};
     dataset.metadata(changedMetadata);
-    c1Position = d3.transform(c1.attr("transform")).translate;
-    c2Position = d3.transform(c2.attr("transform")).translate;
+    c1Position = getTranslateValues(c1);
+    c2Position = getTranslateValues(c2);
 
     assert.closeTo(c1Position[0], 0, 0.01, "first circle cx is correct after metadata change");
     assert.closeTo(c1Position[1], 0, 0.01, "first circle cy is correct after metadata change");
@@ -66,16 +67,16 @@ describe("Metadata", () => {
     plot.addDataset(dataset1);
     plot.addDataset(dataset2);
     plot.renderTo(svg);
-    let circles = plot.selections();
-    let c1 = d3.select(circles[0][0]);
-    let c2 = d3.select(circles[0][1]);
-    let c3 = d3.select(circles[0][2]);
-    let c4 = d3.select(circles[0][3]);
+    let circles = plot.selections().nodes();
+    let c1 = d3.select(circles[0]);
+    let c2 = d3.select(circles[1]);
+    let c3 = d3.select(circles[2]);
+    let c4 = d3.select(circles[3]);
 
-    let c1Position = d3.transform(c1.attr("transform")).translate;
-    let c2Position = d3.transform(c2.attr("transform")).translate;
-    let c3Position = d3.transform(c3.attr("transform")).translate;
-    let c4Position = d3.transform(c4.attr("transform")).translate;
+    let c1Position = getTranslateValues(c1);
+    let c2Position = getTranslateValues(c2);
+    let c3Position = getTranslateValues(c3);
+    let c4Position = getTranslateValues(c4);
     assert.closeTo(c1Position[0], 10, 0.01, "first circle is correct");
     assert.closeTo(c2Position[0], 21, 0.01, "second circle is correct");
     assert.closeTo(c3Position[0], 32, 0.01, "third circle is correct");

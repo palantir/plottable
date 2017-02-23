@@ -32,8 +32,8 @@ function makeData() {
 
 function run(svg, data, Plottable) {
   "use strict";
-  var timeFormatStart = function (d) { return d3.time.format("%m/%d/%Y").parse(d.x); };
-  var timeFormatEnd = function (d) { return d3.time.format("%m/%d/%Y").parse(d.x2); };
+  var timeFormatStart = function (d) { return d3.timeParse("%m/%d/%Y")(d.x); };
+  var timeFormatEnd = function (d) { return d3.timeParse("%m/%d/%Y")(d.x2); };
 
   var xScale = new Plottable.Scales.Time();
   var yScale = new Plottable.Scales.Category();

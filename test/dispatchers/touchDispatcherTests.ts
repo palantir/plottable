@@ -1,3 +1,4 @@
+import { SimpleSelection } from "../../src/core/interfaces";
 import * as d3 from "d3";
 
 import { assert } from "chai";
@@ -23,7 +24,7 @@ describe("Dispatchers", () => {
     });
 
     describe("Callbacks", () => {
-      let svg: d3.Selection<void>;
+      let svg: SimpleSelection<void>;
       let touchDispatcher: Plottable.Dispatchers.Touch;
       let callbackWasCalled: boolean;
 

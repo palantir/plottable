@@ -1,3 +1,4 @@
+import { SimpleSelection } from "../../src/core/interfaces";
 import * as d3 from "d3";
 
 import { assert } from "chai";
@@ -5,6 +6,7 @@ import { assert } from "chai";
 import * as Plottable from "../../src";
 
 import * as TestMethods from "../testMethods";
+import { getTranslateValues } from "../../src/utils/domUtils";
 
 describe("Legend", () => {
   const ENTRY_SELECTOR = "." + Plottable.Components.Legend.LEGEND_ENTRY_CLASS;
@@ -13,7 +15,7 @@ describe("Legend", () => {
   const ROW_SELECTOR = "." + Plottable.Components.Legend.LEGEND_ROW_CLASS;
 
   describe("Basic Usage", () => {
-    let svg: d3.Selection<void>;
+    let svg: SimpleSelection<void>;
     let color: Plottable.Scales.Color;
     let legend: Plottable.Components.Legend;
 
@@ -26,7 +28,7 @@ describe("Legend", () => {
     it("renders rows with correct text, fill, and opacity", () => {
       color.domain(["foo", "bar", "baz"]);
       legend.renderTo(svg);
-      let rows = legend.content().selectAll(ENTRY_SELECTOR);
+      let rows = legend.content().selectAll<Element, any>(ENTRY_SELECTOR);
       assert.strictEqual(rows.size(), color.domain().length, "one entry is created for each item in the domain");
 
       rows.each(function(d: any, i: number) {
@@ -58,7 +60,7 @@ describe("Legend", () => {
       assert.operator(minHeight3, ">", minHeight2, "adding to the domain increases the height requested");
       let actualHeight3 = legend.height();
       assert.operator(actualHeight2, "<", actualHeight3, "Changing the domain caused the legend to re-layout with more height");
-      assert.strictEqual(legend.content().selectAll(ROW_SELECTOR).size(), 3, "there are 3 rows");
+      assert.strictEqual(legend.content().selectAll<Element, any>(ROW_SELECTOR).size(), 3, "there are 3 rows");
       svg.remove();
     });
 
@@ -91,9 +93,9 @@ describe("Legend", () => {
     it("does not add more elements if legend.render is called multiple times", () => {
       color.domain(["foo", "bar", "baz"]);
       legend.renderTo(svg);
-      assert.strictEqual(legend.content().selectAll(ROW_SELECTOR).size(), 3, "there are 3 legend rows initially");
+      assert.strictEqual(legend.content().selectAll<Element, any>(ROW_SELECTOR).size(), 3, "there are 3 legend rows initially");
       legend.render();
-      assert.strictEqual(legend.content().selectAll(ROW_SELECTOR).size(), 3, "there are 3 legend rows after second render");
+      assert.strictEqual(legend.content().selectAll<Element, any>(ROW_SELECTOR).size(), 3, "there are 3 legend rows after second render");
       svg.remove();
     });
 
@@ -103,7 +105,7 @@ describe("Legend", () => {
       const newDomain = ["mushu", "foo", "persei", "baz", "eight"];
       color.domain(newDomain);
 
-      legend.content().selectAll(ENTRY_SELECTOR).each(function(d: any, i: number) {
+      legend.content().selectAll<Element, any>(ENTRY_SELECTOR).each(function(d: any, i: number) {
         const name = d[0].data.name;
         assert.strictEqual(name, newDomain[i], "the data is set correctly");
         const text = d3.select(this).select("text").text();
@@ -111,7 +113,7 @@ describe("Legend", () => {
         const fill = d3.select(this).select(SYMBOL_SELECTOR).attr("fill");
         assert.strictEqual(fill, color.scale(name), "the fill was set properly");
       });
-      assert.strictEqual(legend.content().selectAll(ENTRY_SELECTOR).size(), 5, "there are the right number of legend elements");
+      assert.strictEqual(legend.content().selectAll<Element, any>(ENTRY_SELECTOR).size(), 5, "there are the right number of legend elements");
       svg.remove();
     });
 
@@ -124,7 +126,7 @@ describe("Legend", () => {
       newColorScale.domain(newDomain);
       legend.colorScale(newColorScale);
 
-      legend.content().selectAll(ENTRY_SELECTOR).each(function(d: any, i: number) {
+      legend.content().selectAll<Element, any>(ENTRY_SELECTOR).each(function(d: any, i: number) {
         const name = d[0].data.name;
         assert.strictEqual(name, newDomain[i], "the data is set correctly");
         let text = d3.select(this).select("text").text();
@@ -147,7 +149,7 @@ describe("Legend", () => {
 
       const newDomain = ["a", "foo", "d"];
       newColorScale.domain(newDomain);
-      legend.content().selectAll(ENTRY_SELECTOR).each(function(d: any, i: number) {
+      legend.content().selectAll<Element, any>(ENTRY_SELECTOR).each(function(d: any, i: number) {
         const name = d[0].data.name;
         assert.strictEqual(name, newDomain[i], "the data is set correctly");
         const text = d3.select(this).select("text").text();
@@ -163,9 +165,9 @@ describe("Legend", () => {
       legend.renderTo(svg);
       legend.maxWidth(100);
       legend.maxLinesPerEntry(2);
-      assert.strictEqual(2, legend.content().selectAll(`${ROW_SELECTOR} ${TEXT_LINE_SELECTOR}`).size());
+      assert.strictEqual(2, legend.content().selectAll<Element, any>(`${ROW_SELECTOR} ${TEXT_LINE_SELECTOR}`).size());
       legend.maxLinesPerEntry(4);
-      assert.strictEqual(4, legend.content().selectAll(`${ROW_SELECTOR} ${TEXT_LINE_SELECTOR}`).size());
+      assert.strictEqual(4, legend.content().selectAll<Element, any>(`${ROW_SELECTOR} ${TEXT_LINE_SELECTOR}`).size());
       svg.remove();
     });
 
@@ -173,7 +175,7 @@ describe("Legend", () => {
       color.domain(["this is a very very very very very very very long"]);
       legend.renderTo(svg);
       legend.maxWidth(100);
-      assert.isTrue((legend.content()[0][0] as SVGElement).getBoundingClientRect().width <= 100);
+      assert.isTrue((legend.content().node() as SVGElement).getBoundingClientRect().width <= 100);
       svg.remove();
     });
 
@@ -183,10 +185,10 @@ describe("Legend", () => {
 
       function verifyMaxEntriesInRow (n: number) {
         legend.maxEntriesPerRow(n);
-        const rows = legend.content().selectAll(ROW_SELECTOR);
+        const rows = legend.content().selectAll<Element, any>(ROW_SELECTOR);
         assert.strictEqual(rows.size(), (6 / n), "number of rows is correct");
         rows.each(function(d: any) {
-          const entries = d3.select(this).selectAll(ENTRY_SELECTOR);
+          const entries = d3.select(this).selectAll<Element, any>(ENTRY_SELECTOR);
           assert.strictEqual(entries.size(), n, "number of entries in row is correct");
         });
       };
@@ -204,14 +206,14 @@ describe("Legend", () => {
       legend.maxEntriesPerRow(Infinity);
 
       legend.renderTo(svg);
-      let rows = legend.content().selectAll(ROW_SELECTOR);
+      let rows = legend.content().selectAll<Element, any>(ROW_SELECTOR);
       assert.strictEqual(rows.size(), 2, "Wrapped text on to two rows when space is constrained");
       legend.detach();
       svg.remove();
 
       svg = TestMethods.generateSVG(100, 100);
       legend.renderTo(svg);
-      rows = legend.content().selectAll(ROW_SELECTOR);
+      rows = legend.content().selectAll<Element, any>(ROW_SELECTOR);
       assert.strictEqual(rows.size(), 3, "Wrapped text on to three rows when further constrained");
       svg.remove();
     });
@@ -222,7 +224,7 @@ describe("Legend", () => {
       legend.maxEntriesPerRow(Infinity);
       legend.renderTo(svg);
 
-      let textEls = legend.content().selectAll("text");
+      let textEls = legend.content().selectAll<Element, any>("text");
       textEls.each(function(d: any) {
         const textEl = d3.select(this);
         TestMethods.assertBBoxInclusion(legend.content(), textEl);
@@ -232,7 +234,7 @@ describe("Legend", () => {
       svg.remove();
       svg = TestMethods.generateSVG(100, 50);
       legend.renderTo(svg);
-      textEls = legend.content().selectAll("text");
+      textEls = legend.content().selectAll<Element, any>("text");
       textEls.each(function(d: any) {
         let textEl = d3.select(this);
         TestMethods.assertBBoxInclusion(legend.content(), textEl);
@@ -243,7 +245,7 @@ describe("Legend", () => {
   });
 
   describe("Symbols", () => {
-    let svg: d3.Selection<void>;
+    let svg: SimpleSelection<void>;
     let color: Plottable.Scales.Color;
     let legend: Plottable.Components.Legend;
 
@@ -259,7 +261,7 @@ describe("Legend", () => {
       legend.symbolOpacity(opacity);
       legend.renderTo(svg);
 
-      let rows = legend.content().selectAll(ENTRY_SELECTOR);
+      let rows = legend.content().selectAll<Element, any>(ENTRY_SELECTOR);
 
       rows.each(function(d: any, i: number) {
         const row = d3.select(this);
@@ -271,7 +273,7 @@ describe("Legend", () => {
         return (d === "foo") ? 0.2 : 0.8;
       };
       legend.symbolOpacity(opacityFunction).redraw();
-      rows = legend.content().selectAll(ENTRY_SELECTOR);
+      rows = legend.content().selectAll<Element, any>(ENTRY_SELECTOR);
 
       rows.each(function(d: any, i: number) {
         const name = d[0].data.name;
@@ -346,7 +348,7 @@ describe("Legend", () => {
   });
 
   describe("Title Elements", () => {
-    let svg: d3.Selection<void>;
+    let svg: SimpleSelection<void>;
     let color: Plottable.Scales.Color;
     let legend: Plottable.Components.Legend;
 
@@ -360,14 +362,14 @@ describe("Legend", () => {
       color.domain(["foo", "bar", "baz"]);
       legend.renderTo(svg);
 
-      const entries = legend.content().selectAll(ENTRY_SELECTOR);
-      const titles = entries.selectAll("title");
+      const entries = legend.content().selectAll<Element, any>(ENTRY_SELECTOR);
+      const titles = entries.selectAll<Element, any>("title");
       assert.strictEqual(titles.size(), color.domain().length, "same number of title tags as legend entries");
 
       entries.each(function(d: any, i: number) {
         const entry = d3.select(this);
         const text = entry.select("text").text();
-        const title = entry.selectAll("title");
+        const title = entry.selectAll<Element, any>("title");
         assert.strictEqual(title.size(), 1, "only one title node per legend entry should be present");
         assert.strictEqual(text, title.text(), "the text and title node have the same text");
       });
@@ -381,15 +383,15 @@ describe("Legend", () => {
       legend.renderTo(svg);
       Plottable.Configs.ADD_TITLE_ELEMENTS = originalSetting;
 
-      const entries = legend.content().selectAll(ENTRY_SELECTOR);
-      const titles = entries.selectAll("title");
+      const entries = legend.content().selectAll<Element, any>(ENTRY_SELECTOR);
+      const titles = entries.selectAll<Element, any>("title");
       assert.strictEqual(titles.size(), 0, "no titles should be rendered");
       svg.remove();
     });
   });
 
   describe("Formatting and Sorting", () => {
-    let svg: d3.Selection<void>;
+    let svg: SimpleSelection<void>;
     let color: Plottable.Scales.Color;
     let legend: Plottable.Components.Legend;
 
@@ -404,7 +406,7 @@ describe("Legend", () => {
       const formatter = (id: string) => `${id}foo`;
       legend.formatter(formatter);
       legend.renderTo(svg);
-      const legendRows = svg.selectAll(ENTRY_SELECTOR);
+      const legendRows = svg.selectAll<Element, any>(ENTRY_SELECTOR);
       assert.operator(legendRows.size(), ">=", 1, "There is at least one entry in the test");
       legendRows.each(function(d, i){
         const expectedText = formatter(legend.colorScale().domain()[i]);
@@ -430,7 +432,7 @@ describe("Legend", () => {
       const comparator = (a: string, b: string) => a.charCodeAt(0) - b.charCodeAt(0);
       legend.comparator(comparator);
       legend.renderTo(svg);
-      const entryTexts = svg.selectAll(ENTRY_SELECTOR)[0].map((node: Element) => d3.select(node).select("text").text());
+      const entryTexts = svg.selectAll<Element, any>(ENTRY_SELECTOR).nodes().map((node: Element) => d3.select(node).select("text").text());
       expectedTexts.sort(comparator);
       assert.deepEqual(expectedTexts, entryTexts, "displayed texts should be sorted in alphabetic order");
       svg.remove();
@@ -440,7 +442,7 @@ describe("Legend", () => {
       const colorDomain = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k"];
       color.domain(colorDomain);
       legend.renderTo(svg);
-      const entryTexts = legend.content().selectAll(ENTRY_SELECTOR).data().map((datum) => datum[0].data.name);
+      const entryTexts = legend.content().selectAll<Element, any>(ENTRY_SELECTOR).data().map((datum) => datum[0].data.name);
       assert.deepEqual(colorDomain, entryTexts, "displayed texts should have the same order as the legend domain");
       svg.remove();
     });
@@ -449,14 +451,14 @@ describe("Legend", () => {
       const newDomain = ["F", "E", "D", "C", "B", "A"];
       color.domain(newDomain);
       legend.renderTo(svg);
-      let entries = legend.content().selectAll(ENTRY_SELECTOR);
-      let elementTexts = entries.select("text")[0].map((node: Element) => d3.select(node).text());
+      let entries = legend.content().selectAll<Element, any>(ENTRY_SELECTOR);
+      let elementTexts = entries.select("text").nodes().map((node: Element) => d3.select(node).text());
       assert.deepEqual(elementTexts, newDomain, "entry has not been sorted");
 
       const compareFunction = (a: string, b: string) => a.localeCompare(b);
       legend.comparator(compareFunction);
-      entries = legend.content().selectAll(ENTRY_SELECTOR);
-      elementTexts = entries.select("text")[0].map((node: Element) => d3.select(node).text());
+      entries = legend.content().selectAll<Element, any>(ENTRY_SELECTOR);
+      elementTexts = entries.select("text").nodes().map((node: Element) => d3.select(node).text());
       newDomain.sort(compareFunction);
       assert.deepEqual(elementTexts, newDomain, "entry has been sorted alphabetically");
 
@@ -465,7 +467,7 @@ describe("Legend", () => {
   });
 
   describe("Selection", () => {
-    let svg: d3.Selection<void>;
+    let svg: SimpleSelection<void>;
     let color: Plottable.Scales.Color;
     let legend: Plottable.Components.Legend;
 
@@ -476,12 +478,12 @@ describe("Legend", () => {
     });
 
     function computeExpectedSymbolPosition(rowIndex: number, entryIndexWithinRow: number) {
-      const row = d3.select(legend.content().selectAll(ROW_SELECTOR)[0][rowIndex]);
-      const entry = d3.select(row.selectAll(ENTRY_SELECTOR)[0][entryIndexWithinRow]);
+      const row = d3.select(legend.content().selectAll<Element, any>(ROW_SELECTOR).nodes()[rowIndex]);
+      const entry = d3.select(row.selectAll<Element, any>(ENTRY_SELECTOR).nodes()[entryIndexWithinRow]);
       const symbol = entry.select(SYMBOL_SELECTOR);
-      const rowTranslate = d3.transform(row.attr("transform")).translate;
-      const entryTranslate = d3.transform(entry.attr("transform")).translate;
-      const symbolTranslate = d3.transform(symbol.attr("transform")).translate;
+      const rowTranslate = getTranslateValues(row);
+      const entryTranslate = getTranslateValues(entry);
+      const symbolTranslate = getTranslateValues(symbol);
       return {
         x: rowTranslate[0] + entryTranslate[0] + symbolTranslate[0],
         y: rowTranslate[1] + entryTranslate[1] + symbolTranslate[1],
@@ -493,12 +495,12 @@ describe("Legend", () => {
       color.domain(domain);
       legend.renderTo(svg);
       let entities = legend.entitiesAt({x: 10, y: 10});
-      const entries = legend.content().selectAll(ENTRY_SELECTOR);
+      const entries = legend.content().selectAll<Element, any>(ENTRY_SELECTOR);
 
       let expectedEntity: Plottable.Entity<Plottable.Components.Legend> = {
         datum: "AA",
         position: computeExpectedSymbolPosition(0, 0),
-        selection: d3.select(entries[0][0]),
+        selection: d3.select(entries.nodes()[0]),
         component: legend,
       };
       TestMethods.assertEntitiesEqual(entities[0], expectedEntity, "returned Entity corresponding to first entry");
@@ -507,7 +509,7 @@ describe("Legend", () => {
       expectedEntity = {
         datum: "BB",
         position: computeExpectedSymbolPosition(1, 0),
-        selection: d3.select(entries[0][1]),
+        selection: d3.select(entries.nodes()[1]),
         component: legend,
       };
       TestMethods.assertEntitiesEqual(entities[0], expectedEntity, "returned Entity corresponding to second entry");
@@ -524,11 +526,11 @@ describe("Legend", () => {
       legend.maxEntriesPerRow(Infinity);
       legend.renderTo(svg);
       let entities = legend.entitiesAt({x: 10, y: 10});
-      const entries = legend.content().selectAll(ENTRY_SELECTOR);
+      const entries = legend.content().selectAll<Element, any>(ENTRY_SELECTOR);
       let expectedEntity: Plottable.Entity<Plottable.Components.Legend> = {
         datum: "AA",
         position: computeExpectedSymbolPosition(0, 0),
-        selection: d3.select(entries[0][0]),
+        selection: d3.select(entries.nodes()[0]),
         component: legend,
       };
       TestMethods.assertEntitiesEqual(entities[0], expectedEntity, "returned Entity corresponding to first entry");
@@ -537,7 +539,7 @@ describe("Legend", () => {
       expectedEntity = {
         datum: "BB",
         position: computeExpectedSymbolPosition(0, 1),
-        selection: d3.select(entries[0][1]),
+        selection: d3.select(entries.nodes()[1]),
         component: legend,
       };
       TestMethods.assertEntitiesEqual(entities[0], expectedEntity, "returned Entity corresponding to second entry");

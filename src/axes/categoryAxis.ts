@@ -7,7 +7,7 @@ import * as d3 from "d3";
 import * as SVGTypewriter from "svg-typewriter";
 
 import { Axis, AxisOrientation } from "./axis";
-import { SpaceRequest, Point } from "../core/interfaces";
+import { SpaceRequest, Point, SimpleSelection } from "../core/interfaces";
 import * as Scales from "../scales";
 import * as Utils from "../utils";
 
@@ -263,7 +263,7 @@ export class Category extends Axis<string> {
    * @param {Plottable.Scales.Category} scale The scale this axis is representing.
    * @param {d3.Selection} ticks The tick elements to write.
    */
-  private _drawTicks(stepWidth: number, ticks: d3.Selection<string>) {
+  private _drawTicks(stepWidth: number, ticks: SimpleSelection<string>) {
     let self = this;
     let xAlign: {[s: string]: string};
     let yAlign: {[s: string]: string};
@@ -380,7 +380,6 @@ export class Category extends Axis<string> {
     super.renderImmediately();
     let catScale = <Scales.Category> this._scale;
     const { domain, stepWidth } = this.getDownsampleInfo(catScale);
-    let tickLabels = this._tickLabelContainer.selectAll("." + Axis.TICK_LABEL_CLASS).data(domain, (d) => d);
     // Give each tick a stepWidth of space which will partition the entire axis evenly
     let availableTextSpace = stepWidth;
     if (this.isHorizontal() && this._tickLabelMaxWidth != null) {
@@ -395,8 +394,14 @@ export class Category extends Axis<string> {
       let y = this.isHorizontal() ? 0 : tickLabelEdge;
       return "translate(" + x + "," + y + ")";
     };
-    tickLabels.enter().append("g").classed(Axis.TICK_LABEL_CLASS, true);
-    tickLabels.exit().remove();
+    let tickLabelsUpdate = this._tickLabelContainer.selectAll<SVGGElement, string>("." + Axis.TICK_LABEL_CLASS).data(domain);
+    const tickLabels =
+      tickLabelsUpdate
+        .enter()
+        .append("g")
+          .classed(Axis.TICK_LABEL_CLASS, true)
+        .merge(tickLabelsUpdate);
+    tickLabelsUpdate.exit().remove();
     tickLabels.attr("transform", getTickLabelTransform);
     // erase all text first, then rewrite
     tickLabels.text("");
@@ -404,7 +409,7 @@ export class Category extends Axis<string> {
 
     let xTranslate = this.orientation() === "right" ? this._tickSpaceRequired() : 0;
     let yTranslate = this.orientation() === "bottom" ? this._tickSpaceRequired() : 0;
-    Utils.DOM.translate(this._tickLabelContainer, xTranslate, yTranslate);
+    this._tickLabelContainer.attr("transform", `translate(${xTranslate},${yTranslate})`);
 
     // hide ticks and labels that overflow the axis
     this._showAllTickMarks();

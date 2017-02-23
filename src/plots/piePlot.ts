@@ -7,7 +7,7 @@ import * as d3 from "d3";
 import * as SVGTypewriter from "svg-typewriter";
 
 import * as Animators from "../animators";
-import { Accessor, Point, AttributeToProjector } from "../core/interfaces";
+import { Accessor, Point, AttributeToProjector, SimpleSelection } from "../core/interfaces";
 import { Dataset } from "../core/dataset";
 import * as Drawers from "../drawers";
 import { Formatter } from "../core/formatters";
@@ -18,6 +18,10 @@ import * as Utils from "../utils";
 
 import { PlotEntity, AccessorScaleBinding } from "./";
 import { Plot } from "./plot";
+
+export interface PiePlotEntity extends PlotEntity {
+  strokeSelection: SimpleSelection<any>;
+}
 
 export class Pie extends Plot {
 
@@ -107,8 +111,8 @@ export class Pie extends Plot {
     return this;
   }
 
-  public selections(datasets = this.datasets()) {
-    let allSelections = super.selections(datasets)[0];
+  public selections(datasets = this.datasets()): SimpleSelection<any> {
+    let allSelections = super.selections(datasets).nodes();
     datasets.forEach((dataset) => {
       let drawer = this._strokeDrawers.get(dataset);
       if (drawer == null) {
@@ -131,15 +135,16 @@ export class Pie extends Plot {
     return new Drawers.Arc(dataset);
   }
 
-  public entities(datasets = this.datasets()): PlotEntity[] {
+  public entities(datasets = this.datasets()): PiePlotEntity[] {
     let entities = super.entities(datasets);
-    entities.forEach((entity) => {
+    return entities.map((entity) => {
       entity.position.x += this.width() / 2;
       entity.position.y += this.height() / 2;
       let stroke = this._strokeDrawers.get(entity.dataset).selectionForIndex(entity.index);
-      entity.selection[0].push(stroke[0][0]);
+      const piePlotEntity = entity as PiePlotEntity;
+      piePlotEntity.strokeSelection = stroke;
+      return piePlotEntity;
     });
-    return entities;
   }
 
   /**
@@ -340,7 +345,7 @@ export class Pie extends Plot {
     let innerRadiusAccessor = Plot._scaledAccessor(this.innerRadius());
     let outerRadiusAccessor = Plot._scaledAccessor(this.outerRadius());
     attrToProjector["d"] = (datum: any, index: number, ds: Dataset) => {
-      return d3.svg.arc().innerRadius(innerRadiusAccessor(datum, index, ds))
+      return d3.arc().innerRadius(innerRadiusAccessor(datum, index, ds))
         .outerRadius(outerRadiusAccessor(datum, index, ds))
         .startAngle(this._startAngles[index])
         .endAngle(this._endAngles[index])(datum, index);
@@ -358,7 +363,7 @@ export class Pie extends Plot {
     let sectorValueAccessor = Plot._scaledAccessor(this.sectorValue());
     let dataset = this.datasets()[0];
     let data = this._getDataToDraw().get(dataset);
-    let pie = d3.layout.pie().sort(null).startAngle(this._startAngle).endAngle(this._endAngle)
+    let pie = d3.pie().sort(null).startAngle(this._startAngle).endAngle(this._endAngle)
       .value((d, i) => sectorValueAccessor(d, i, dataset))(data);
     this._startAngles = pie.map((slice) => slice.startAngle);
     this._endAngles = pie.map((slice) => slice.endAngle);
@@ -520,7 +525,7 @@ export class Pie extends Plot {
     let outerRadius = Plot._scaledAccessor(this.outerRadius())(datum, index, dataset);
     let avgRadius = (innerRadius + outerRadius) / 2;
 
-    let pie = d3.layout.pie()
+    let pie = d3.pie()
       .sort(null)
       .value((d: any, i: number) => {
         let value = scaledValueAccessor(d, i, dataset);

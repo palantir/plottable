@@ -1,3 +1,4 @@
+import { SimpleSelection } from "../../src/core/interfaces";
 import * as d3 from "d3";
 
 import { assert } from "chai";
@@ -15,7 +16,7 @@ describe("Component", () => {
   describe("anchoring", () => {
 
     let c: Plottable.Component;
-    let svg: d3.Selection<void>;
+    let svg: SimpleSelection<void>;
 
     beforeEach(() => {
       c = new Plottable.Component();
@@ -38,11 +39,11 @@ describe("Component", () => {
       assert.isFalse(c.background().select(".background-fill").empty(), "background fill container exists in the DOM");
 
       let componentElement = svg.select(".component");
-      let containers = componentElement.selectAll("g");
-      assert.strictEqual(containers[0][0], c.background().node(), "background at the back");
-      assert.strictEqual(containers[0][1], c.content().node(), "content at the middle");
-      assert.strictEqual(containers[0][2], c.foreground().node(), "foreground at the front");
-      assert.strictEqual(containers[0][3], componentElement.select(".box-container").node(), "boxes at front of foreground");
+      let containerNodes = componentElement.selectAll<Element, any>("g").nodes();
+      assert.strictEqual(containerNodes[0], c.background().node(), "background at the back");
+      assert.strictEqual(containerNodes[1], c.content().node(), "content at the middle");
+      assert.strictEqual(containerNodes[2], c.foreground().node(), "foreground at the front");
+      assert.strictEqual(containerNodes[3], componentElement.select(".box-container").node(), "boxes at front of foreground");
       c.destroy();
       svg.remove();
     });
@@ -167,7 +168,7 @@ describe("Component", () => {
   describe("detaching", () => {
 
     let c: Plottable.Component;
-    let svg: d3.Selection<void>;
+    let svg: SimpleSelection<void>;
 
     beforeEach(() => {
       c = new Plottable.Component();
@@ -250,7 +251,7 @@ describe("Component", () => {
   describe("parent container", () => {
 
     let c: Plottable.Component;
-    let svg: d3.Selection<void>;
+    let svg: SimpleSelection<void>;
 
     beforeEach(() => {
       c = new Plottable.Component();
@@ -282,7 +283,7 @@ describe("Component", () => {
   describe("css classes", () => {
 
     let c: Plottable.Component;
-    let svg: d3.Selection<void>;
+    let svg: SimpleSelection<void>;
 
     beforeEach(() => {
       c = new Plottable.Component();
@@ -321,7 +322,7 @@ describe("Component", () => {
   describe("computing the layout", () => {
 
     let c: Plottable.Component;
-    let svg: d3.Selection<void>;
+    let svg: SimpleSelection<void>;
 
     beforeEach(() => {
       c = new Plottable.Component();
@@ -495,7 +496,7 @@ describe("Component", () => {
   describe("computing the layout when of fixed size", () => {
 
     let c: Plottable.Component;
-    let svg: d3.Selection<void>;
+    let svg: SimpleSelection<void>;
     let fixedWidth = 100;
     let fixedHeight = 100;
 
@@ -540,7 +541,7 @@ describe("Component", () => {
   describe("aligning", () => {
 
     let c: Plottable.Component;
-    let svg: d3.Selection<void>;
+    let svg: SimpleSelection<void>;
 
     beforeEach(() => {
       c = new Plottable.Component();
@@ -581,7 +582,7 @@ describe("Component", () => {
   describe("aligning when of fixed size", () => {
 
     let c: Plottable.Component;
-    let svg: d3.Selection<void>;
+    let svg: SimpleSelection<void>;
     let fixedWidth = 100;
     let fixedHeight = 100;
 
@@ -617,7 +618,7 @@ describe("Component", () => {
   describe("calculating the minimum requested space", () => {
 
     let c: Plottable.Component;
-    let svg: d3.Selection<void>;
+    let svg: SimpleSelection<void>;
 
     beforeEach(() => {
       c = new Plottable.Component();
@@ -637,7 +638,7 @@ describe("Component", () => {
   describe("destroying", () => {
 
     let c: Plottable.Component;
-    let svg: d3.Selection<void>;
+    let svg: SimpleSelection<void>;
 
     beforeEach(() => {
       c = new Plottable.Component();
@@ -668,7 +669,7 @@ describe("Component", () => {
   describe("rendering on the anchored svg", () => {
 
     let c: Plottable.Component;
-    let svg: d3.Selection<void>;
+    let svg: SimpleSelection<void>;
 
     beforeEach(() => {
       c = new Plottable.Component();
@@ -720,7 +721,7 @@ describe("Component", () => {
   describe("rendering to a DOM node", () => {
 
     let c: Plottable.Component;
-    let svg: d3.Selection<void>;
+    let svg: SimpleSelection<void>;
     let renderFlag: boolean;
 
     beforeEach(() => {
@@ -811,7 +812,7 @@ describe("Component", () => {
         "Plottable requires a valid SVG to renderTo", "rejects DOM nodes that are not svgs");
       (<any> assert).throws(() => c.renderTo("#not-an-element"), Error,
         "Plottable requires a valid SVG to renderTo", "rejects strings that don't correspond to DOM elements");
-      (<any> assert).throws(() => c.renderTo(d3.select(null)), Error,
+      (<any> assert).throws(() => c.renderTo(d3.select(null) as any), Error,
         "Plottable requires a valid SVG to renderTo", "rejects empty d3 selections");
       div.remove();
       c.destroy();
@@ -841,7 +842,7 @@ describe("Component", () => {
   describe("calculating the origin in relation to the svg", () => {
 
     let c: Plottable.Component;
-    let svg: d3.Selection<void>;
+    let svg: SimpleSelection<void>;
 
     beforeEach(() => {
       c = new Plottable.Component();
@@ -873,7 +874,7 @@ describe("Component", () => {
 
   describe("calculating the bounds", () => {
     let c: Plottable.Component;
-    let svg: d3.Selection<void>;
+    let svg: SimpleSelection<void>;
 
     beforeEach(() => {
       c = new Plottable.Component();
@@ -895,7 +896,7 @@ describe("Component", () => {
   describe("restricting rendering through clipPath", () => {
 
     let clippedComponent: Plottable.Component;
-    let svg: d3.Selection<void>;
+    let svg: SimpleSelection<void>;
 
     beforeEach(() => {
       clippedComponent = new Plottable.Component();
@@ -933,7 +934,7 @@ describe("Component", () => {
       window.history.replaceState(null, null, "clipPathTest");
       clippedComponent.render();
 
-      let clipPathId = (<any> clippedComponent)._boxContainer[0][0].firstChild.id;
+      let clipPathId = (<any> clippedComponent)._boxContainer.node().firstChild.id;
       let expectedPrefix = /MSIE [5-9]/.test(navigator.userAgent) ? "" : document.location.href;
       expectedPrefix = expectedPrefix.replace(/#.*/g, "");
       let expectedClipPathURL = "url(" + expectedPrefix + "#" + clipPathId + ")";
@@ -978,7 +979,7 @@ describe("Component", () => {
 
       const expectedWidth = TestMethods.numAttr(svg, "width") + 100;
       const expectedHeight = TestMethods.numAttr(svg, "height") + 100;
-      svg.attr({
+      svg.attrs({
         width: expectedWidth,
         height: expectedHeight,
       });
@@ -997,7 +998,7 @@ describe("Component", () => {
       component.anchor(svg);
       component.anchor(svg);
 
-      const backings = svg.selectAll(`.${backingClass}`);
+      const backings = svg.selectAll<Element, any>(`.${backingClass}`);
       assert.strictEqual(backings.size(), 1, "only one backing was added");
 
       svg.remove();

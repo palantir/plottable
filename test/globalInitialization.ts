@@ -20,13 +20,14 @@ before(() => {
     // HACKHACK #2122
     window.Pixel_CloseTo_Requirement = 2;
   } else if (TestMethods.isIE()) {
-    window.Pixel_CloseTo_Requirement = 1.5;
+    const FP_EPSILON = 1e-5;
+    window.Pixel_CloseTo_Requirement = 1.5 + FP_EPSILON;
   } else {
     window.Pixel_CloseTo_Requirement = 0.5;
   }
 });
 
 after(() => {
-  assert.strictEqual(d3.selectAll("svg").size(), 0, "all svgs have been removed");
-  assert.strictEqual(d3.selectAll("style").size(), 0, "all style nodes have been removed");
+  assert.strictEqual(d3.selectAll<Element, any>("svg").size(), 0, "all svgs have been removed");
+  assert.strictEqual(d3.selectAll<Element, any>("style").size(), 0, "all style nodes have been removed");
 });

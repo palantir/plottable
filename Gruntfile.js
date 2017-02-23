@@ -151,7 +151,7 @@ module.exports = function(grunt) {
           platform: "linux"
         }, {
           browserName: "internet explorer",
-          version: "9",
+          version: "11",
           platform: "WIN7"
         }, {
           browserName: "safari",

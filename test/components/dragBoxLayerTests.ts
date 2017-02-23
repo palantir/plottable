@@ -1,3 +1,4 @@
+import { SimpleSelection } from "../../src/core/interfaces";
 import * as d3 from "d3";
 
 import { assert } from "chai";
@@ -16,7 +17,7 @@ describe("SelectionBoxLayer", () => {
       const halfPoint = { x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2 };
       const DRAG_BOX_LAYER_EVENTS = ["dragStart", "drag", "dragEnd"];
 
-      let svg: d3.Selection<void>;
+      let svg: SimpleSelection<void>;
       let dbl: Plottable.Components.DragBoxLayer;
 
       beforeEach(() => {
@@ -101,7 +102,7 @@ describe("SelectionBoxLayer", () => {
 
         TestMethods.triggerFakeDragSequence(dbl.background(), quarterPoint, halfPoint);
 
-        const edges = dbl.content().selectAll("line");
+        const edges = dbl.content().selectAll<Element, any>("line");
         assert.strictEqual(edges.size(), 4, "the edges of a rectangle are drawn");
         edges.each(function() {
           const edge = d3.select(this);
@@ -109,7 +110,7 @@ describe("SelectionBoxLayer", () => {
           assert.strictEqual(strokeWidth, 2 * radius, "edge width was set correctly");
         });
 
-        const corners = dbl.content().selectAll("circle");
+        const corners = dbl.content().selectAll<Element, any>("circle");
         assert.strictEqual(corners.size(), 4, "the corners of a rectangle are drawn");
         corners.each(function() {
           const corner = d3.select(this);
@@ -289,7 +290,7 @@ describe("SelectionBoxLayer", () => {
       const SVG_WIDTH = 400;
       const SVG_HEIGHT = 400;
 
-      let svg: d3.Selection<void>;
+      let svg: SimpleSelection<void>;
       let dbl: Plottable.Components.DragBoxLayer;
 
       beforeEach(() => {
@@ -336,9 +337,9 @@ describe("SelectionBoxLayer", () => {
       const SVG_HEIGHT = 400;
       const midPoint = { x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2 };
 
-      let svg: d3.Selection<void>;
+      let svg: SimpleSelection<void>;
       let dbl: Plottable.Components.DragBoxLayer;
-      let target: d3.Selection<void>;
+      let target: SimpleSelection<void>;
       let initialBounds: Plottable.Bounds;
 
       function resetBox() {
@@ -373,14 +374,14 @@ describe("SelectionBoxLayer", () => {
 
       it("correctly sets pointer-events for resizable DragBoxLayer", () => {
         dbl.resizable(true);
-        const edges = dbl.content().selectAll("line");
+        const edges = dbl.content().selectAll<Element, any>("line");
         assert.strictEqual(edges.size(), 4, "there are 4 edges per box");
         edges.each(function() {
           const edge = d3.select(this);
           const computedStyle = window.getComputedStyle(<Element> edge.node());
           assert.strictEqual(computedStyle.pointerEvents.toLowerCase(), "visiblestroke", "pointer-events set correctly on edges");
         });
-        const corners = dbl.content().selectAll("circle");
+        const corners = dbl.content().selectAll<Element, any>("circle");
         assert.strictEqual(corners.size(), 4, "there are 4 corners per box");
         corners.each(function() {
           const corner = d3.select(this);
@@ -562,9 +563,9 @@ describe("SelectionBoxLayer", () => {
       const midPoint = { x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2 };
       const dragDistance = 10;
 
-      let svg: d3.Selection<void>;
+      let svg: SimpleSelection<void>;
       let dbl: Plottable.Components.DragBoxLayer;
-      let target: d3.Selection<void>;
+      let target: SimpleSelection<void>;
       let initialBounds: Plottable.Bounds;
 
       beforeEach(() => {

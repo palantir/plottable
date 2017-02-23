@@ -22,12 +22,12 @@ function run(svg, data, Plottable) {
     var renderAreaD0 = new Plottable.Plots.Line().addDataset(dataset1);
     renderAreaD0.x(function(d) { return d.x; }, xScale).y(function(d) { return d.y; }, yScale);
     var renderAreaD1 = new Plottable.Plots.Line().addDataset(dataset2)
-                                      .attr( "stroke", d3.functor("red"));
+                                      .attr( "stroke", function() { return "red"; });
     renderAreaD1.x(function(d) { return d.x; }, xScale).y(function(d) { return d.y; }, yScale);
     var renderAreaD2 = new Plottable.Plots.Area().addDataset(dataset1);
     renderAreaD2.x(function(d) { return d.x; }, xScale).y(function(d) { return d.y; }, yScale);
     var renderAreaD3 = new Plottable.Plots.Area().addDataset(dataset2)
-                                      .attr( "fill", d3.functor("red"));
+                                      .attr( "fill", function() { return "red"; });
     renderAreaD3.x(function(d) { return d.x; }, xScale).y(function(d) { return d.y; }, yScale);
 
     //test merge:

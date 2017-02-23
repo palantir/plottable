@@ -1,3 +1,4 @@
+import { SimpleSelection } from "../../src/core/interfaces";
 import * as d3 from "d3";
 
 import { assert } from "chai";
@@ -10,7 +11,7 @@ describe("GuideLineLayer", () => {
   describe("DragLineLayer", () => {
     describe("Basic Usage", () => {
       let dll: Plottable.Components.DragLineLayer<void>;
-      let svg: d3.Selection<void>;
+      let svg: SimpleSelection<void>;
 
       beforeEach(() => {
         svg = TestMethods.generateSVG();
@@ -92,7 +93,7 @@ describe("GuideLineLayer", () => {
         };
 
         let dll: Plottable.Components.DragLineLayer<number>;
-        let svg: d3.Selection<void>;
+        let svg: SimpleSelection<void>;
 
         beforeEach(() => {
           svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
@@ -254,7 +255,7 @@ describe("GuideLineLayer", () => {
       let callbackCalled = false;
       let pixelPositionOnCalling: number;
       let callback: (layer: Plottable.Components.DragLineLayer<any>) => void;
-      let svg: d3.Selection<void>;
+      let svg: SimpleSelection<void>;
 
       beforeEach(() => {
         dll = new Plottable.Components.DragLineLayer<void>("vertical");

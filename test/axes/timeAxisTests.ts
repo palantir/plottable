@@ -1,3 +1,4 @@
+import { SimpleSelection } from "../../src/core/interfaces";
 import * as d3 from "d3";
 
 import { assert } from "chai";
@@ -55,10 +56,10 @@ describe("TimeAxis", () => {
   });
 
   function assertVisibleLabelsDoNotOverlap(axis: Plottable.Axes.Time) {
-    axis.content().selectAll(`.${Plottable.Axis.TICK_LABEL_CLASS}-container`).each(function(d, i) {
+    axis.content().selectAll<Element, any>(`.${Plottable.Axis.TICK_LABEL_CLASS}-container`).each(function(d, i) {
       let container = d3.select(this);
       let visibleTickLabels = container
-        .selectAll(`.${Plottable.Axis.TICK_LABEL_CLASS}`)
+        .selectAll<Element, any>(`.${Plottable.Axis.TICK_LABEL_CLASS}`)
         .filter(function() {
           return d3.select(this).style("visibility") === "visible";
         });
@@ -107,9 +108,9 @@ describe("TimeAxis", () => {
   });
 
   function assertTickMarksAndLabelsDoNotOverlap(axis: Plottable.Axes.Time) {
-    let tickMarks = axis.content().selectAll(`.${Plottable.Axis.TICK_MARK_CLASS}:not(.${Plottable.Axis.END_TICK_MARK_CLASS})`);
+    let tickMarks = axis.content().selectAll<Element, any>(`.${Plottable.Axis.TICK_MARK_CLASS}:not(.${Plottable.Axis.END_TICK_MARK_CLASS})`);
     assert.operator(tickMarks.size(), ">=", 1, "There is at least one tick mark in the test");
-    let tickLabels = axis.content().selectAll(`.${Plottable.Axis.TICK_LABEL_CLASS}`).filter(function(d, i) {
+    let tickLabels = axis.content().selectAll<Element, any>(`.${Plottable.Axis.TICK_LABEL_CLASS}`).filter(function(d, i) {
         return d3.select(this).style("visibility") !== "hidden";
     });
     assert.operator(tickLabels.size(), ">=", 1, "There is at least one tick label in the test");
@@ -140,7 +141,7 @@ describe("TimeAxis", () => {
 
   describe("drawing tick marks", () => {
     let axis: Plottable.Axes.Time;
-    let svg: d3.Selection<void>;
+    let svg: SimpleSelection<void>;
 
     beforeEach(() => {
       let scale = new Plottable.Scales.Time();
@@ -175,7 +176,7 @@ describe("TimeAxis", () => {
     it("sets the length of the end ticks to the specified value when tierLabelPosition is set to center", () => {
       axis.tierLabelPositions(["center", "center"]);
       axis.renderTo(svg);
-      let endTicks = axis.content().selectAll(`.${Plottable.Axis.END_TICK_MARK_CLASS}`);
+      let endTicks = axis.content().selectAll<Element, any>(`.${Plottable.Axis.END_TICK_MARK_CLASS}`);
       assert.operator(endTicks.size(), ">=", 1, "At least one end tick mark is selected in the test");
       endTicks.each(function(d, i){
         let endTick = d3.select(this);
@@ -203,7 +204,7 @@ describe("TimeAxis", () => {
 
       axis.renderTo(svg);
 
-      let annotationLabels = axis.content().selectAll(".annotation-label");
+      let annotationLabels = axis.content().selectAll<Element, any>(".annotation-label");
       annotationLabels.each(function(d, i) {
         let annotationLabel = d3.select(this);
         assert.strictEqual(annotationLabel.text(), defaultFormatter(d), "formats to a default customized time formatter");
@@ -214,7 +215,7 @@ describe("TimeAxis", () => {
 
   describe("calculating space", () => {
     let axis: Plottable.Axes.Time;
-    let svg: d3.Selection<void>;
+    let svg: SimpleSelection<void>;
 
     beforeEach(() => {
       let scale = new Plottable.Scales.Time();
@@ -336,16 +337,16 @@ describe("TimeAxis", () => {
       };
 
       axis.content()
-        .selectAll(`.${Plottable.Axes.Time.TIME_AXIS_TIER_CLASS}`)
+        .selectAll<Element, any>(`.${Plottable.Axes.Time.TIME_AXIS_TIER_CLASS}`)
         .each(function(d, i) {
           let tier = d3.select(this);
           let visibility = tier.style("visibility");
 
           // HACKHACK window.getComputedStyle() is behaving weirdly in IE9. Further investigation required
           if (visibility === "inherit") {
-            visibility = getStyleInIE9(<Element> tier[0][0]);
+            visibility = getStyleInIE9(tier.node());
           }
-          if (isInsideAxisBoundingRect((<Element> tier[0][0]).getBoundingClientRect())) {
+          if (isInsideAxisBoundingRect(tier.node().getBoundingClientRect())) {
             assert.strictEqual(visibility, "visible", `tier ${i} inside axis should be visible`);
           } else {
             assert.strictEqual(visibility, "hidden", `tier ${i} outside axis should not be visible`);
@@ -380,7 +381,7 @@ describe("TimeAxis", () => {
         ],
       ]);
       axis.renderTo(svg);
-      let tickLabels = axis.content().selectAll(".tick-label");
+      let tickLabels = axis.content().selectAll<Element, any>(".tick-label");
       tickLabels.each(function(d, i) {
         let tickLabel = d3.select(this);
         assert.strictEqual(tickLabel.text(), formatter(d), "formats to a customized time formatter");

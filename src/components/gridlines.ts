@@ -8,15 +8,15 @@ import * as d3 from "d3";
 
 import { QuantitativeScale } from "../scales/quantitativeScale";
 import { ScaleCallback } from "../scales/scale";
-import { Point } from "../core/interfaces";
+import { Point, SimpleSelection } from "../core/interfaces";
 
 import { Component } from "./component";
 
 export class Gridlines extends Component {
   private _xScale: QuantitativeScale<any>;
   private _yScale: QuantitativeScale<any>;
-  private _xLinesContainer: d3.Selection<void>;
-  private _yLinesContainer: d3.Selection<void>;
+  private _xLinesContainer: SimpleSelection<void>;
+  private _yLinesContainer: SimpleSelection<void>;
 
   private _renderCallback: ScaleCallback<QuantitativeScale<any>>;
 
@@ -84,14 +84,14 @@ export class Gridlines extends Component {
     if (this._xScale) {
       let xTicks = this._xScale.ticks();
       let getScaledXValue = (tickVal: number) => this._xScale.scale(tickVal);
-      let xLines = this._xLinesContainer.selectAll("line").data(xTicks);
-      xLines.enter().append("line");
+      let xLinesUpdate = this._xLinesContainer.selectAll("line").data(xTicks);
+      const xLines = xLinesUpdate.enter().append("line").merge(xLinesUpdate);
       xLines.attr("x1", getScaledXValue)
         .attr("y1", 0)
         .attr("x2", getScaledXValue)
         .attr("y2", this.height())
         .classed("zeroline", (t: number) => t === 0);
-      xLines.exit().remove();
+      xLinesUpdate.exit().remove();
     }
   }
 
@@ -99,14 +99,14 @@ export class Gridlines extends Component {
     if (this._yScale) {
       let yTicks = this._yScale.ticks();
       let getScaledYValue = (tickVal: number) => this._yScale.scale(tickVal);
-      let yLines = this._yLinesContainer.selectAll("line").data(yTicks);
-      yLines.enter().append("line");
+      let yLinesUpdate = this._yLinesContainer.selectAll("line").data(yTicks);
+      const yLines = yLinesUpdate.enter().append("line").merge(yLinesUpdate);
       yLines.attr("x1", 0)
         .attr("y1", getScaledYValue)
         .attr("x2", this.width())
         .attr("y2", getScaledYValue)
         .classed("zeroline", (t: number) => t === 0);
-      yLines.exit().remove();
+      yLinesUpdate.exit().remove();
     }
   }
 }

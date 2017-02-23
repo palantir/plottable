@@ -27,8 +27,42 @@ type EdgeIntersections = {
   bottom: Point[]
 };
 
+const CURVE_NAME_MAPPING: { [name: string]: d3.CurveFactory | d3.CurveFactoryLineOnly } = {
+  "linear": d3.curveLinear,
+  "linearClosed": d3.curveLinearClosed,
+  "step": d3.curveStep,
+  "stepBefore": d3.curveStepBefore,
+  "stepAfter": d3.curveStepAfter,
+  "basis": d3.curveBasis,
+  "basisOpen": d3.curveBasisOpen,
+  "basisClosed": d3.curveBasisClosed,
+  "bundle": d3.curveBundle,
+  "cardinal": d3.curveCardinal,
+  "cardinalOpen": d3.curveCardinalOpen,
+  "cardinalClosed": d3.curveCardinalClosed,
+  "monotone": d3.curveMonotoneX,
+};
+
+/**
+ * Known curve types that line and area plot's .curve() methods understand
+ */
+export type CurveName =
+"linear" |
+"linearClosed" |
+"step" |
+"stepBefore" |
+"stepAfter" |
+"basis" |
+"basisOpen" |
+"basisClosed" |
+"bundle" |
+"cardinal" |
+"cardinalOpen" |
+"cardinalClosed" |
+"monotone";
+
 export class Line<X> extends XYPlot<X, number> {
-  private _interpolator: string | ((points: Array<[number, number]>) => string) = "linear";
+  private _curve: CurveName | d3.CurveFactory | d3.CurveFactoryLineOnly = "linear";
 
   private _autorangeSmooth = false;
   private _croppedRenderingEnabled = true;
@@ -45,7 +79,7 @@ export class Line<X> extends XYPlot<X, number> {
     this.addClass("line-plot");
     let animator = new Animators.Easing();
     animator.stepDuration(Plot._ANIMATION_MAX_DURATION);
-    animator.easingMode("exp-in-out");
+    animator.easingMode("expInOut");
     animator.maxTotalDuration(Plot._ANIMATION_MAX_DURATION);
     this.animator(Plots.Animator.MAIN, animator);
     this.attr("stroke", new Scales.Color().range()[0]);
@@ -125,36 +159,24 @@ export class Line<X> extends XYPlot<X, number> {
   }
 
   /**
-   * Gets the interpolation function associated with the plot.
+   * Gets the curve function associated with the plot.
    *
-   * @return {string | (points: Array<[number, number]>) => string)}
+   * @return {string | d3.CurveFactory | d3.CurveFactoryLineOnly}
    */
-  public interpolator(): string | ((points: Array<[number, number]>) => string);
+  public curve(): CurveName | d3.CurveFactory | d3.CurveFactoryLineOnly;
   /**
-   * Sets the interpolation function associated with the plot.
+   * Sets the curve function associated with the plot. The curve function specifies how to
+   * draw the interpolated line between successive points.
    *
-   * @param {string | points: Array<[number, number]>) => string} interpolator Interpolation function
+   * @param {string | points: Array<[number, number]>) => string} curve Curve function
    * @return Plots.Line
    */
-  public interpolator(interpolator: string | ((points: Array<[number, number]>) => string)): this;
-  public interpolator(interpolator: "linear"): this;
-  public interpolator(interpolator: "linear-closed"): this;
-  public interpolator(interpolator: "step"): this;
-  public interpolator(interpolator: "step-before"): this;
-  public interpolator(interpolator: "step-after"): this;
-  public interpolator(interpolator: "basis"): this;
-  public interpolator(interpolator: "basis-open"): this;
-  public interpolator(interpolator: "basis-closed"): this;
-  public interpolator(interpolator: "bundle"): this;
-  public interpolator(interpolator: "cardinal"): this;
-  public interpolator(interpolator: "cardinal-open"): this;
-  public interpolator(interpolator: "cardinal-closed"): this;
-  public interpolator(interpolator: "monotone"): this;
-  public interpolator(interpolator?: string | ((points: Array<[number, number]>) => string)): any {
-    if (interpolator == null) {
-      return this._interpolator;
+  public curve(curve: CurveName | d3.CurveFactory | d3.CurveFactoryLineOnly): this;
+  public curve(curve?: CurveName | d3.CurveFactory | d3.CurveFactoryLineOnly): any {
+    if (curve == null) {
+      return this._curve;
     }
-    this._interpolator = interpolator;
+    this._curve = curve;
     this.render();
     return this;
   }
@@ -456,12 +478,27 @@ export class Line<X> extends XYPlot<X, number> {
         positionY != null && !Utils.Math.isNaN(positionY);
     };
     return (datum: any, index: number, dataset: Dataset) => {
-      return d3.svg.line()
+      return d3.line()
         .x((innerDatum, innerIndex) => xProjector(innerDatum, innerIndex, dataset))
         .y((innerDatum, innerIndex) => yProjector(innerDatum, innerIndex, dataset))
-        .interpolate(this.interpolator())
+        .curve(this._getCurveFactory())
         .defined((innerDatum, innerIndex) => definedProjector(innerDatum, innerIndex, dataset))(datum);
     };
+  }
+
+  protected _getCurveFactory(): d3.CurveFactory | d3.CurveFactoryLineOnly {
+    const curve = this.curve();
+    if(typeof curve === "string") {
+      const maybeCurveFunction = CURVE_NAME_MAPPING[curve];
+      if (maybeCurveFunction == null) {
+        // oops; name is wrong - default to linear instead
+        return CURVE_NAME_MAPPING["linear"];
+      } else {
+        return maybeCurveFunction;
+      }
+    } else {
+      return curve;
+    }
   }
 
   protected _getDataToDraw(): Utils.Map<Dataset, any[]> {

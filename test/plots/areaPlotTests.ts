@@ -1,3 +1,4 @@
+import { SimpleSelection } from "../../src/core/interfaces";
 import * as d3 from "d3";
 
 import { assert } from "chai";
@@ -9,7 +10,7 @@ import * as TestMethods from "../testMethods";
 describe("Plots", () => {
   describe("AreaPlot", () => {
     describe("Basic Usage", () => {
-      let svg: d3.Selection<void>;
+      let svg: SimpleSelection<void>;
       let xScale: Plottable.Scales.Linear;
       let yScale: Plottable.Scales.Linear;
       let plot: Plottable.Plots.Area<{}>;
@@ -41,7 +42,7 @@ describe("Plots", () => {
     });
 
     describe("Rendering", () => {
-      let svg: d3.Selection<void>;
+      let svg: SimpleSelection<void>;
       let xScale: Plottable.Scales.Linear;
       let yScale: Plottable.Scales.Linear;
       let areaPlot: Plottable.Plots.Area<number>;
@@ -75,7 +76,7 @@ describe("Plots", () => {
 
           let linePath = content.select(".line");
           TestMethods.assertPathEqualToDataPoints(linePath.attr("d"), data, xScale, yScale);
-          assert.strictEqual(linePath.attr("stroke"), "#000000", "line stroke was set correctly");
+          assert.strictEqual(linePath.attr("stroke"), "rgb(0, 0, 0)", "line stroke was set correctly");
           assert.strictEqual(linePath.style("fill"), "none", "line fill renders as \"none\"");
         });
         svg.remove();
@@ -94,20 +95,20 @@ describe("Plots", () => {
 
       it("places the area before line", () => {
         let content = areaPlot.content();
-        let paths = content.selectAll("path")[0];
-        let areaElement = content.select(".area")[0][0];
-        let lineElement = content.select(".line")[0][0];
+        let paths = content.selectAll<Element, any>("path").nodes();
+        let areaElement = content.select<Element>(".area").node();
+        let lineElement = content.select<Element>(".line").node();
         assert.operator(paths.indexOf(areaElement), "<", paths.indexOf(lineElement), "area appended before line");
         svg.remove();
       });
 
       it("removes the plot svg elements when removing Datasets", () => {
         areaPlot.renderTo(svg);
-        let paths = areaPlot.content().selectAll("path");
+        let paths = areaPlot.content().selectAll<Element, any>("path");
         let pathSize = paths.size();
         let dataset = areaPlot.datasets()[0];
         areaPlot.removeDataset(dataset);
-        paths = areaPlot.content().selectAll("path");
+        paths = areaPlot.content().selectAll<Element, any>("path");
         assert.strictEqual(paths.size(), pathSize - 2, "removing a Dataset cleans up both <path>s associated with it");
         svg.remove();
       });
@@ -161,7 +162,7 @@ describe("Plots", () => {
     });
 
     describe("Selections", () => {
-      let svg: d3.Selection<void>;
+      let svg: SimpleSelection<void>;
       let xScale: Plottable.Scales.Linear;
       let yScale: Plottable.Scales.Linear;
       let areaPlot: Plottable.Plots.Area<number>;

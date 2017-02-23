@@ -10,7 +10,7 @@ import { Formatter } from "../core/formatters";
 import * as Formatters from "../core/formatters";
 import * as Scales from "../scales";
 import { ScaleCallback } from "../scales/scale";
-import { SpaceRequest, Point } from "../core/interfaces";
+import { SpaceRequest, Point, SimpleSelection } from "../core/interfaces";
 import * as Utils from "../utils";
 
 import { Component } from "./component";
@@ -27,10 +27,10 @@ export class InterpolatedColorLegend extends Component {
   private _formatter: Formatter;
   private _expands: boolean;
 
-  private _swatchContainer: d3.Selection<void>;
-  private _swatchBoundingBox: d3.Selection<void>;
-  private _lowerLabel: d3.Selection<void>;
-  private _upperLabel: d3.Selection<void>;
+  private _swatchContainer: SimpleSelection<void>;
+  private _swatchBoundingBox: SimpleSelection<void>;
+  private _lowerLabel: SimpleSelection<void>;
+  private _upperLabel: SimpleSelection<void>;
   private _redrawCallback: ScaleCallback<Scales.InterpolatedColor>;
 
   /**
@@ -304,13 +304,14 @@ export class InterpolatedColorLegend extends Component {
     let lowerTranslateString = "translate(" + lowerLabelShift.x + ", " + lowerLabelShift.y + ")";
     this._lowerLabel.attr("transform", lowerTranslateString);
 
-    this._swatchBoundingBox.attr(boundingBoxAttr);
+    this._swatchBoundingBox.attrs(boundingBoxAttr);
 
     let ticks = this._generateTicks(numSwatches);
-    let swatches = this._swatchContainer.selectAll("rect.swatch").data(ticks);
-    let rects = swatches.enter().append("rect").classed("swatch", true);
-    swatches.exit().remove();
-    swatches.attr({
+    let swatchesUpdate = this._swatchContainer.selectAll("rect.swatch").data(ticks);
+    let rects = swatchesUpdate.enter().append("rect").classed("swatch", true);;
+    const swatches = swatchesUpdate.merge(rects);
+    swatchesUpdate.exit().remove();
+    swatches.attrs({
       "fill": (d: any, i: number) => this._scale.scale(d),
       "width": swatchWidth,
       "height": swatchHeight,

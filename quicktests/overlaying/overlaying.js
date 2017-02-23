@@ -229,8 +229,8 @@ function loadAllQuickTests(quicktestsPaths, firstQTBranch, secondQTBranch){
       var className = "quicktest " + name;
       var div = d3.select("#results").append("div").attr("class", className);
       div.insert("label").text(name);
-      var firstsvg = div.append("div").attr("class", "first").append("svg").attr({width: svgWidth, height: svgHeight});
-      var secondsvg = div.append("div").attr("class", "second").append("svg").attr({width: svgWidth, height: svgHeight});
+      var firstsvg = div.append("div").attr("class", "first").append("svg").attr("width", svgWidth).attr("height", svgHeight);
+      var secondsvg = div.append("div").attr("class", "second").append("svg").attr("width", svgWidth).attr("height", svgHeight);
       var data = result.makeData();
 
       runQuickTest(result, firstsvg, data, firstQTBranch);
@@ -302,19 +302,20 @@ function loadPlottableBranches(category, branchList){
   });
 
   $.getScript(listOfUrl[0], function(data, textStatus) {
-    if(textStatus === "success"){
-      plottableBranches[branchName1] =  $.extend(true, {}, Plottable);
+    if(textStatus === "success") {
+      plottableBranches[branchName1] = $.extend(true, {}, Plottable);
       Plottable = null;
 
-      $.getScript(listOfUrl[1], function(innerData, innerTestStatus){ //load second
-        if(innerTestStatus === "success"){
+      $.getScript(listOfUrl[1]).then(
+        function() { //load second
           plottableBranches[branchName2] = $.extend(true, {}, Plottable);
           Plottable = null;
           filterQuickTests(category, branchList);
+        },
+        function(request, errName, error) {
+          throw error;
         }
-      });
-    } else if (textStatus === "error"){
-      throw new Error("could not retrieve Plottable branch, check if url " + listOfUrl[0] + " is correct!");
+      );
     }
   });
 }

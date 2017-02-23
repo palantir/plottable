@@ -1,3 +1,4 @@
+import { SimpleSelection } from "../../src/core/interfaces";
 import * as d3 from "d3";
 
 import { assert } from "chai";
@@ -11,7 +12,7 @@ describe("SelectionBoxLayer", () => {
     const SVG_WIDTH = 500;
     const SVG_HEIGHT = 500;
     const SELECTION_BOX_CLASSNAME = ".selection-box";
-    let svg: d3.Selection<void>;
+    let svg: SimpleSelection<void>;
     let sbl: Plottable.Components.SelectionBoxLayer;
 
     beforeEach(() => {
@@ -206,7 +207,7 @@ describe("SelectionBoxLayer", () => {
     const SVG_WIDTH = 500;
     const SVG_HEIGHT = 500;
     const SELECTION_AREA_CLASSNAME = ".selection-area";
-    let svg: d3.Selection<void>;
+    let svg: SimpleSelection<void>;
     let sbl: Plottable.Components.SelectionBoxLayer;
     let xScale: Plottable.Scales.Linear;
 
@@ -339,7 +340,7 @@ describe("SelectionBoxLayer", () => {
     const SVG_WIDTH = 500;
     const SVG_HEIGHT = 500;
     const SELECTION_AREA_CLASSNAME = ".selection-area";
-    let svg: d3.Selection<void>;
+    let svg: SimpleSelection<void>;
     let sbl: Plottable.Components.SelectionBoxLayer;
     let yScale: Plottable.Scales.Linear;
 

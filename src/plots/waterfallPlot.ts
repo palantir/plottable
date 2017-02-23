@@ -3,7 +3,7 @@
  * @license MIT
  */
 
-import { Accessor, Point, Bounds, Range, AttributeToProjector } from "../core/interfaces";
+import { Accessor, Point, Bounds, Range, AttributeToProjector, SimpleSelection } from "../core/interfaces";
 import { Dataset } from "../core/dataset";
 import { Drawer } from "../drawers/drawer";
 import * as Utils from "../utils";
@@ -19,7 +19,7 @@ export class Waterfall<X, Y> extends Bar<X, number> {
   private static _CONNECTOR_CLASS = "connector";
   private static _CONNECTOR_AREA_CLASS = "connector-area";
   private static _TOTAL_KEY = "total";
-  private _connectorArea: d3.Selection<void>;
+  private _connectorArea: SimpleSelection<void>;
   private _connectorsEnabled = false;
   private _extent: number[];
   private _subtotals: number[];

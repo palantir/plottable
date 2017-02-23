@@ -1,3 +1,4 @@
+import { SimpleSelection } from "../../src/core/interfaces";
 import * as d3 from "d3";
 
 import { assert } from "chai";
@@ -9,7 +10,7 @@ import * as TestMethods from "../testMethods";
 describe("Plots", () => {
   describe("SegmentPlot", () => {
     describe("rendering", () => {
-      let svg: d3.Selection<void>;
+      let svg: SimpleSelection<void>;
       let xScale: Plottable.Scales.Linear;
       let yScale: Plottable.Scales.Linear;
       let plot: Plottable.Plots.Segment<number, number>;
@@ -34,7 +35,7 @@ describe("Plots", () => {
         plot.y2((d) => d.y2);
         plot.renderTo(svg);
 
-        const lines = plot.content().selectAll("line");
+        const lines = plot.content().selectAll<Element, any>("line");
         assert.strictEqual(lines.size(), plot.datasets()[0].data().length, "line for each datum");
         lines.each(function(d, i) {
           const line = d3.select(this);
@@ -54,7 +55,7 @@ describe("Plots", () => {
         plot.y2((d) => d.y2);
         plot.renderTo(svg);
 
-        const lines = plot.content().selectAll("line");
+        const lines = plot.content().selectAll<Element, any>("line");
         assert.strictEqual(lines.size(), plot.datasets()[0].data().length, "line for each datum");
         lines.each(function(d, i) {
           const line = d3.select(this);
@@ -67,7 +68,7 @@ describe("Plots", () => {
         plot.x2((d) => d.x2);
         plot.renderTo(svg);
 
-        const lines = plot.content().selectAll("line");
+        const lines = plot.content().selectAll<Element, any>("line");
         assert.strictEqual(lines.size(), plot.datasets()[0].data().length, "line for each datum");
         lines.each(function(d, i) {
           const line = d3.select(this);
@@ -78,7 +79,7 @@ describe("Plots", () => {
     });
 
     describe("autoranging", () => {
-      let svg: d3.Selection<void>;
+      let svg: SimpleSelection<void>;
       let xScale: Plottable.Scales.Linear;
       let yScale: Plottable.Scales.Linear;
       let plot: Plottable.Plots.Segment<number, number>;
@@ -142,7 +143,7 @@ describe("Plots", () => {
     });
 
     describe("retrieving the entities in a specified area", () => {
-      let svg: d3.Selection<void>;
+      let svg: SimpleSelection<void>;
       let xScale: Plottable.Scales.Linear;
       let yScale: Plottable.Scales.Linear;
       let plot: Plottable.Plots.Segment<number, number>;

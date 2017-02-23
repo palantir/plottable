@@ -4,7 +4,7 @@
  */
 
 import { GuideLineLayer } from "../components/guideLineLayer";
-import { Point } from "../core/interfaces";
+import { Point, SimpleSelection } from "../core/interfaces";
 import * as Interactions from "../interactions";
 import * as Utils from "../utils";
 
@@ -15,7 +15,7 @@ export interface DragLineCallback<D> {
 export class DragLineLayer<D> extends GuideLineLayer<D> {
   private _dragInteraction: Interactions.Drag;
   private _detectionRadius = 3;
-  private _detectionEdge: d3.Selection<void>;
+  private _detectionEdge: SimpleSelection<void>;
   private _enabled = true;
 
   private _dragStartCallbacks: Utils.CallbackSet<DragLineCallback<D>>;
@@ -82,7 +82,7 @@ export class DragLineLayer<D> extends GuideLineLayer<D> {
 
   protected _setup() {
     super._setup();
-    this._detectionEdge = this.content().append("line").style({
+    this._detectionEdge = this.content().append("line").styles({
       "opacity": 0,
       "stroke": "pink",
       "pointer-events": "visibleStroke",
@@ -91,7 +91,7 @@ export class DragLineLayer<D> extends GuideLineLayer<D> {
 
   public renderImmediately() {
     super.renderImmediately();
-    this._detectionEdge.attr({
+    this._detectionEdge.attrs({
       x1: this._isVertical() ? this.pixelPosition() : 0,
       y1: this._isVertical() ? 0 : this.pixelPosition(),
       x2: this._isVertical() ? this.pixelPosition() : this.width(),

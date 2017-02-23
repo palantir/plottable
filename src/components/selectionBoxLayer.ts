@@ -5,7 +5,7 @@
 
 import * as d3 from "d3";
 
-import { Bounds, Point } from "../core/interfaces";
+import { Bounds, Point, SimpleSelection } from "../core/interfaces";
 import { QuantitativeScale } from "../scales/quantitativeScale";
 import { ScaleCallback } from "../scales/scale";
 import * as Utils from "../utils";
@@ -15,8 +15,8 @@ import { Component } from "./component";
 export enum PropertyMode { VALUE, PIXEL }
 
 export class SelectionBoxLayer extends Component {
-  protected _box: d3.Selection<void>;
-  private _boxArea: d3.Selection<void>;
+  protected _box: SimpleSelection<void>;
+  private _boxArea: SimpleSelection<void>;
   private _boxVisible = false;
   private _boxBounds: Bounds = {
     topLeft: { x: 0, y: 0 },
@@ -138,7 +138,7 @@ export class SelectionBoxLayer extends Component {
         throw new Error("bounds have not been properly set");
       }
 
-      this._boxArea.attr({
+      this._boxArea.attrs({
         x: l, y: t, width: r - l, height: b - t,
       });
       (<Node> this.content().node()).appendChild(<Node> this._box.node());

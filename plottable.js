@@ -78,7 +78,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/ 	__webpack_require__.p = "";
 
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 113);
+/******/ 	return __webpack_require__(__webpack_require__.s = 126);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -94,23 +94,24 @@ return /******/ (function(modules) { // webpackBootstrap
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-var Array = __webpack_require__(91);
+var Array = __webpack_require__(93);
 exports.Array = Array;
-var Color = __webpack_require__(94);
+var Color = __webpack_require__(96);
 exports.Color = Color;
-var DOM = __webpack_require__(39);
+var DOM = __webpack_require__(40);
 exports.DOM = DOM;
-var Math = __webpack_require__(27);
+var Math = __webpack_require__(28);
 exports.Math = Math;
-var Stacking = __webpack_require__(97);
+var Stacking = __webpack_require__(99);
 exports.Stacking = Stacking;
-var Window = __webpack_require__(98);
+var Window = __webpack_require__(100);
 exports.Window = Window;
-__export(__webpack_require__(92));
-__export(__webpack_require__(93));
+__export(__webpack_require__(94));
 __export(__webpack_require__(95));
-__export(__webpack_require__(96));
-__export(__webpack_require__(40));
+__export(__webpack_require__(11));
+__export(__webpack_require__(97));
+__export(__webpack_require__(98));
+__export(__webpack_require__(41));
 
 
 /***/ }),
@@ -139,7 +140,8 @@ var Animators = __webpack_require__(6);
 var component_1 = __webpack_require__(5);
 var drawer_1 = __webpack_require__(7);
 var Utils = __webpack_require__(0);
-var Plots = __webpack_require__(36);
+var Plots = __webpack_require__(37);
+var coerceD3_1 = __webpack_require__(11);
 var Plot = (function (_super) {
     __extends(Plot, _super);
     /**
@@ -168,6 +170,7 @@ var Plot = (function (_super) {
         this.animator(Plots.Animator.RESET, new Animators.Null());
     }
     Plot.prototype.anchor = function (selection) {
+        selection = coerceD3_1.coerceExternalD3(selection);
         _super.prototype.anchor.call(this, selection);
         this._dataChanged = true;
         this._cachedEntityStore = undefined;
@@ -216,10 +219,11 @@ var Plot = (function (_super) {
         this.render(); // queue a re-render upon changing projector
         return this;
     };
-    Plot.prototype._bindProperty = function (property, value, scale) {
+    Plot.prototype._bindProperty = function (property, valueOrFn, scale) {
         var binding = this._propertyBindings.get(property);
         var oldScale = binding != null ? binding.scale : null;
-        this._propertyBindings.set(property, { accessor: d3.functor(value), scale: scale });
+        var accessor = typeof valueOrFn === "function" ? valueOrFn : function () { return valueOrFn; };
+        this._propertyBindings.set(property, { accessor: accessor, scale: scale });
         this._updateExtentsForProperty(property);
         if (oldScale != null) {
             this._uninstallScaleForKey(oldScale, property);
@@ -228,10 +232,11 @@ var Plot = (function (_super) {
             this._installScaleForKey(scale, property);
         }
     };
-    Plot.prototype._bindAttr = function (attr, value, scale) {
+    Plot.prototype._bindAttr = function (attr, valueOrFn, scale) {
         var binding = this._attrBindings.get(attr);
         var oldScale = binding != null ? binding.scale : null;
-        this._attrBindings.set(attr, { accessor: d3.functor(value), scale: scale });
+        var accessor = typeof valueOrFn === "function" ? valueOrFn : function () { return valueOrFn; };
+        this._attrBindings.set(attr, { accessor: accessor, scale: scale });
         this._updateExtentsForAttr(attr);
         if (oldScale != null) {
             this._uninstallScaleForKey(oldScale, attr);
@@ -242,7 +247,7 @@ var Plot = (function (_super) {
     };
     Plot.prototype._generateAttrToProjector = function () {
         var h = {};
-        this._attrBindings.forEach(function (attr, binding) {
+        this._attrBindings.each(function (binding, attr) {
             var accessor = binding.accessor;
             var scale = binding.scale;
             var fn = scale ? function (d, i, dataset) { return scale.scale(accessor(d, i, dataset)); } : accessor;
@@ -282,13 +287,13 @@ var Plot = (function (_super) {
      */
     Plot.prototype._scales = function () {
         var scales = [];
-        this._attrBindings.forEach(function (attr, binding) {
+        this._attrBindings.each(function (binding, attr) {
             var scale = binding.scale;
             if (scale != null && scales.indexOf(scale) === -1) {
                 scales.push(scale);
             }
         });
-        this._propertyBindings.forEach(function (property, binding) {
+        this._propertyBindings.each(function (binding, property) {
             var scale = binding.scale;
             if (scale != null && scales.indexOf(scale) === -1) {
                 scales.push(scale);
@@ -301,8 +306,8 @@ var Plot = (function (_super) {
      */
     Plot.prototype._updateExtents = function () {
         var _this = this;
-        this._attrBindings.forEach(function (attr) { return _this._updateExtentsForAttr(attr); });
-        this._propertyExtents.forEach(function (property) { return _this._updateExtentsForProperty(property); });
+        this._attrBindings.each(function (_, attr) { return _this._updateExtentsForAttr(attr); });
+        this._propertyExtents.each(function (_, property) { return _this._updateExtentsForProperty(property); });
         this._scales().forEach(function (scale) { return scale.addIncludedValuesProvider(_this._includedValuesProvider); });
     };
     Plot.prototype._updateExtentsForAttr = function (attr) {
@@ -349,7 +354,7 @@ var Plot = (function (_super) {
             return [];
         }
         var includedValues = [];
-        this._attrBindings.forEach(function (attr, binding) {
+        this._attrBindings.each(function (binding, attr) {
             if (binding.scale === scale) {
                 var extents = _this._attrExtents.get(attr);
                 if (extents != null) {
@@ -357,7 +362,7 @@ var Plot = (function (_super) {
                 }
             }
         });
-        this._propertyBindings.forEach(function (property, binding) {
+        this._propertyBindings.each(function (binding, property) {
             if (binding.scale === scale) {
                 var extents = _this._extentsForProperty(property);
                 if (extents != null) {
@@ -489,7 +494,7 @@ var Plot = (function (_super) {
         this._additionalPaint(maxTime);
     };
     /**
-     * Retrieves Selections of this Plot for the specified Datasets.
+     * Retrieves the drawn visual elements for the specified Datasets as a d3 Selection.
      *
      * @param {Dataset[]} [datasets] The Datasets to retrieve the Selections for.
      *   If not provided, Selections will be retrieved for all Datasets on the Plot.
@@ -632,16 +637,16 @@ exports.Plot = Plot;
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-var TickGenerators = __webpack_require__(89);
+var TickGenerators = __webpack_require__(91);
 exports.TickGenerators = TickGenerators;
-__export(__webpack_require__(38));
-__export(__webpack_require__(85));
-__export(__webpack_require__(86));
+__export(__webpack_require__(39));
 __export(__webpack_require__(87));
 __export(__webpack_require__(88));
+__export(__webpack_require__(89));
 __export(__webpack_require__(90));
+__export(__webpack_require__(92));
 // ---------------------------------------------------------
-var categoryScale_2 = __webpack_require__(38);
+var categoryScale_2 = __webpack_require__(39);
 var quantitativeScale_1 = __webpack_require__(10);
 /**
  * Type guarded function to check if the scale implements the
@@ -670,11 +675,11 @@ exports.isTransformable = isTransformable;
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-__export(__webpack_require__(99));
-__export(__webpack_require__(103));
-__export(__webpack_require__(13));
-__export(__webpack_require__(109));
-__export(__webpack_require__(111));
+__export(__webpack_require__(112));
+__export(__webpack_require__(116));
+__export(__webpack_require__(12));
+__export(__webpack_require__(122));
+__export(__webpack_require__(124));
 //# sourceMappingURL=index.js.map
 
 /***/ }),
@@ -688,8 +693,9 @@ __export(__webpack_require__(111));
  */
 
 var d3 = __webpack_require__(1);
-var RenderController = __webpack_require__(24);
+var RenderController = __webpack_require__(25);
 var Utils = __webpack_require__(0);
+var coerceD3_1 = __webpack_require__(11);
 var Component = (function () {
     function Component() {
         this._clipPathEnabled = false;
@@ -713,6 +719,7 @@ var Component = (function () {
      * @returns {Component} The calling Component.
      */
     Component.prototype.anchor = function (selection) {
+        selection = coerceD3_1.coerceExternalD3(selection);
         if (this._destroyed) {
             throw new Error("Can't reuse destroy()-ed Components!");
         }
@@ -726,7 +733,7 @@ var Component = (function () {
             // HACKHACK: Safari fails to register events on the <svg> itself
             var safariBacking = this._rootSVG.select("." + Component._SAFARI_EVENT_BACKING_CLASS);
             if (safariBacking.empty()) {
-                this._rootSVG.append("rect").classed(Component._SAFARI_EVENT_BACKING_CLASS, true).attr({
+                this._rootSVG.append("rect").classed(Component._SAFARI_EVENT_BACKING_CLASS, true).attrs({
                     x: 0,
                     y: 0,
                     width: "100%",
@@ -948,7 +955,7 @@ var Component = (function () {
                 selection = d3.select(element);
             }
             else {
-                selection = element;
+                selection = coerceD3_1.coerceExternalD3(element);
             }
             if (!selection.node() || selection.node().nodeName.toLowerCase() !== "svg") {
                 throw new Error("Plottable requires a valid SVG to renderTo");
@@ -997,6 +1004,7 @@ var Component = (function () {
         if (className != null) {
             box.classed(className, true);
         }
+        box.attr("stroke-width", "0");
         this._boxes.push(box);
         if (this.width() != null && this.height() != null) {
             box.attr("width", this.width()).attr("height", this.height());
@@ -1253,8 +1261,8 @@ exports.Component = Component;
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-__export(__webpack_require__(49));
-__export(__webpack_require__(50));
+__export(__webpack_require__(51));
+__export(__webpack_require__(52));
 
 
 /***/ }),
@@ -1269,6 +1277,7 @@ __export(__webpack_require__(50));
 
 var d3 = __webpack_require__(1);
 var Utils = __webpack_require__(0);
+var coerceD3_1 = __webpack_require__(11);
 var Drawer = (function () {
     /**
      * A Drawer draws svg elements based on the input Dataset.
@@ -1285,6 +1294,7 @@ var Drawer = (function () {
         if (area == null) {
             return this._renderArea;
         }
+        area = coerceD3_1.coerceExternalD3(area);
         this._renderArea = area;
         this._cachedSelectionValid = false;
         return this;
@@ -1303,9 +1313,12 @@ var Drawer = (function () {
      * @param{any[]} data The data to be drawn
      */
     Drawer.prototype._bindSelectionData = function (data) {
-        var dataElements = this.selection().data(data);
-        dataElements.enter().append(this._svgElementName);
-        dataElements.exit().remove();
+        var dataElementsUpdate = this.selection().data(data);
+        var dataElements = dataElementsUpdate
+            .enter()
+            .append(this._svgElementName)
+            .merge(dataElementsUpdate);
+        dataElementsUpdate.exit().remove();
         this._applyDefaultAttributes(dataElements);
     };
     Drawer.prototype._applyDefaultAttributes = function (selection) {
@@ -1381,6 +1394,7 @@ var Drawer = (function () {
     Drawer.prototype.selection = function () {
         if (!this._cachedSelectionValid) {
             this._cachedSelection = this.renderArea().selectAll(this.selector());
+            this._cachedSelectionNodes = this._cachedSelection.nodes();
             this._cachedSelectionValid = true;
         }
         return this._cachedSelection;
@@ -1395,7 +1409,7 @@ var Drawer = (function () {
      * Returns the D3 selection corresponding to the datum with the specified index.
      */
     Drawer.prototype.selectionForIndex = function (index) {
-        return d3.select(this.selection()[0][index]);
+        return d3.select(this._cachedSelectionNodes[index]);
     };
     return Drawer;
 }());
@@ -1619,7 +1633,7 @@ function multiTime() {
         var specifier = acceptableFormats.length > 0
             ? acceptableFormats[0].specifier
             : "%Y";
-        return d3.time.format(specifier)(d);
+        return d3.timeFormat(specifier)(d);
     };
 }
 exports.multiTime = multiTime;
@@ -1633,7 +1647,7 @@ exports.multiTime = multiTime;
  * @returns {Formatter} A formatter for time/date values.
  */
 function time(specifier) {
-    return d3.time.format(specifier);
+    return d3.timeFormat(specifier);
 }
 exports.time = time;
 function verifyPrecision(precision) {
@@ -1659,13 +1673,13 @@ function verifyPrecision(precision) {
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-__export(__webpack_require__(65));
-__export(__webpack_require__(66));
 __export(__webpack_require__(67));
 __export(__webpack_require__(68));
 __export(__webpack_require__(69));
 __export(__webpack_require__(70));
 __export(__webpack_require__(71));
+__export(__webpack_require__(72));
+__export(__webpack_require__(73));
 
 
 /***/ }),
@@ -1684,9 +1698,9 @@ var __extends = (this && this.__extends) || function (d, b) {
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
 var d3 = __webpack_require__(1);
-var Interactions = __webpack_require__(14);
+var Interactions = __webpack_require__(15);
 var Utils = __webpack_require__(0);
-var scale_1 = __webpack_require__(17);
+var scale_1 = __webpack_require__(18);
 var QuantitativeScale = (function (_super) {
     __extends(QuantitativeScale, _super);
     /**
@@ -1943,6 +1957,63 @@ exports.QuantitativeScale = QuantitativeScale;
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
+
+var d3 = __webpack_require__(1);
+/**
+ * Coerce possibly external d3 instance into our own instance of d3 so we can use d3-selection-multi.
+ * See https://github.com/d3/d3-selection-multi/issues/11 for why we have to do this.
+ *
+ * Any public facing API that accepts a d3 selection should first pass that user-supplied selection
+ * through here - this ensures all selection objects that go through the Plottable codebase are "vetted".
+ */
+function coerceExternalD3(externalD3Selection) {
+    // if .attrs isn't defined; convert the selection
+    if (externalD3Selection.attrs == null) {
+        if (externalD3Selection.nodes == null) {
+            // nodes isn't defined; this is probably a d3v3 selection. handle it accordingly
+            var nodes_1 = [];
+            externalD3Selection.each(function () {
+                nodes_1.push(this);
+            });
+            return d3.selectAll(nodes_1);
+        }
+        else {
+            return d3.selectAll(externalD3Selection.nodes());
+        }
+    }
+    else {
+        return externalD3Selection;
+    }
+}
+exports.coerceExternalD3 = coerceExternalD3;
+
+
+/***/ }),
+/* 12 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/**
+ * Copyright 2017-present Palantir Technologies, Inc. All rights reserved.
+ * Licensed under the MIT License (the "License"); you may obtain a copy of the
+ * license at https://github.com/palantir/svg-typewriter/blob/develop/LICENSE
+ */
+
+function __export(m) {
+    for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
+}
+__export(__webpack_require__(117));
+__export(__webpack_require__(118));
+__export(__webpack_require__(119));
+__export(__webpack_require__(120));
+__export(__webpack_require__(121));
+//# sourceMappingURL=index.js.map
+
+/***/ }),
+/* 13 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
 /**
  * Copyright 2014-present Palantir Technologies
  * @license MIT
@@ -1951,13 +2022,13 @@ exports.QuantitativeScale = QuantitativeScale;
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-__export(__webpack_require__(62));
-__export(__webpack_require__(63));
 __export(__webpack_require__(64));
+__export(__webpack_require__(65));
+__export(__webpack_require__(66));
 
 
 /***/ }),
-/* 12 */
+/* 14 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2059,28 +2130,7 @@ exports.Interaction = Interaction;
 
 
 /***/ }),
-/* 13 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-/**
- * Copyright 2017-present Palantir Technologies, Inc. All rights reserved.
- * Licensed under the MIT License (the "License"); you may obtain a copy of the
- * license at https://github.com/palantir/svg-typewriter/blob/develop/LICENSE
- */
-
-function __export(m) {
-    for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
-}
-__export(__webpack_require__(104));
-__export(__webpack_require__(105));
-__export(__webpack_require__(106));
-__export(__webpack_require__(107));
-__export(__webpack_require__(108));
-//# sourceMappingURL=index.js.map
-
-/***/ }),
-/* 14 */
+/* 15 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2092,16 +2142,16 @@ __export(__webpack_require__(108));
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-__export(__webpack_require__(72));
-__export(__webpack_require__(73));
 __export(__webpack_require__(74));
-__export(__webpack_require__(31));
 __export(__webpack_require__(75));
 __export(__webpack_require__(76));
+__export(__webpack_require__(32));
+__export(__webpack_require__(77));
+__export(__webpack_require__(78));
 
 
 /***/ }),
-/* 15 */
+/* 16 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2466,7 +2516,7 @@ exports.XYPlot = XYPlot;
 
 
 /***/ }),
-/* 16 */
+/* 17 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2478,22 +2528,22 @@ exports.XYPlot = XYPlot;
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-__export(__webpack_require__(35));
-__export(__webpack_require__(21));
 __export(__webpack_require__(36));
-__export(__webpack_require__(77));
+__export(__webpack_require__(22));
 __export(__webpack_require__(37));
-__export(__webpack_require__(78));
 __export(__webpack_require__(79));
+__export(__webpack_require__(38));
 __export(__webpack_require__(80));
 __export(__webpack_require__(81));
 __export(__webpack_require__(82));
 __export(__webpack_require__(83));
 __export(__webpack_require__(84));
+__export(__webpack_require__(85));
+__export(__webpack_require__(86));
 
 
 /***/ }),
-/* 17 */
+/* 18 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2650,7 +2700,7 @@ exports.Scale = Scale;
 
 
 /***/ }),
-/* 18 */
+/* 19 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2791,15 +2841,19 @@ var Axis = (function (_super) {
      */
     Axis.prototype.renderImmediately = function () {
         var tickMarkValues = this._getTickValues();
-        var tickMarks = this._tickMarkContainer.selectAll("." + Axis.TICK_MARK_CLASS).data(tickMarkValues);
-        tickMarks.enter().append("line").classed(Axis.TICK_MARK_CLASS, true);
-        tickMarks.attr(this._generateTickMarkAttrHash());
-        d3.select(tickMarks[0][0]).classed(Axis.END_TICK_MARK_CLASS, true)
-            .attr(this._generateTickMarkAttrHash(true));
-        d3.select(tickMarks[0][tickMarkValues.length - 1]).classed(Axis.END_TICK_MARK_CLASS, true)
-            .attr(this._generateTickMarkAttrHash(true));
-        tickMarks.exit().remove();
-        this._baseline.attr(this._generateBaselineAttrHash());
+        var tickMarksUpdate = this._tickMarkContainer.selectAll("." + Axis.TICK_MARK_CLASS).data(tickMarkValues);
+        var tickMarks = tickMarksUpdate
+            .enter()
+            .append("line")
+            .classed(Axis.TICK_MARK_CLASS, true)
+            .merge(tickMarksUpdate);
+        tickMarks.attrs(this._generateTickMarkAttrHash());
+        d3.select(tickMarks.nodes()[0]).classed(Axis.END_TICK_MARK_CLASS, true)
+            .attrs(this._generateTickMarkAttrHash(true));
+        d3.select(tickMarks.nodes()[tickMarkValues.length - 1]).classed(Axis.END_TICK_MARK_CLASS, true)
+            .attrs(this._generateTickMarkAttrHash(true));
+        tickMarksUpdate.exit().remove();
+        this._baseline.attrs(this._generateBaselineAttrHash());
         if (this.annotationsEnabled()) {
             this._drawAnnotations();
         }
@@ -2868,9 +2922,13 @@ var Axis = (function (_super) {
             }
         });
         var bindElements = function (selection, elementName, className) {
-            var elements = selection.selectAll("." + className).data(annotatedTicks);
-            elements.enter().append(elementName).classed(className, true);
-            elements.exit().remove();
+            var elementsUpdate = selection.selectAll("." + className).data(annotatedTicks);
+            var elements = elementsUpdate
+                .enter()
+                .append(elementName)
+                .classed(className, true)
+                .merge(elementsUpdate);
+            elementsUpdate.exit().remove();
             return elements;
         };
         var offsetF = function (d) {
@@ -2900,7 +2958,7 @@ var Axis = (function (_super) {
         }
         var isHorizontal = this.isHorizontal();
         bindElements(this._annotationContainer.select(".annotation-line-container"), "line", Axis.ANNOTATION_LINE_CLASS)
-            .attr({
+            .attrs({
             x1: isHorizontal ? positionF : secondaryPosition,
             x2: isHorizontal ? positionF : offsetF,
             y1: isHorizontal ? secondaryPosition : positionF,
@@ -2908,7 +2966,7 @@ var Axis = (function (_super) {
             visibility: visibilityF,
         });
         bindElements(this._annotationContainer.select(".annotation-circle-container"), "circle", Axis.ANNOTATION_CIRCLE_CLASS)
-            .attr({
+            .attrs({
             cx: isHorizontal ? positionF : secondaryPosition,
             cy: isHorizontal ? secondaryPosition : positionF,
             r: 3,
@@ -2924,7 +2982,7 @@ var Axis = (function (_super) {
             }
         };
         bindElements(this._annotationContainer.select(".annotation-rect-container"), "rect", Axis.ANNOTATION_RECT_CLASS)
-            .attr({
+            .attrs({
             x: isHorizontal ? positionF : rectangleOffsetF,
             y: isHorizontal ? rectangleOffsetF : positionF,
             width: isHorizontal ? function (d) { return measurements.get(d).width; } : function (d) { return measurements.get(d).height; },
@@ -2935,7 +2993,7 @@ var Axis = (function (_super) {
         var annotationFormatter = this.annotationFormatter();
         var annotationLabels = bindElements(this._annotationContainer.select(".annotation-label-container"), "g", Axis.ANNOTATION_LABEL_CLASS);
         annotationLabels.selectAll(".text-container").remove();
-        annotationLabels.attr({
+        annotationLabels.attrs({
             transform: function (d) {
                 var xTranslate = isHorizontal ? positionF(d) : rectangleOffsetF(d);
                 var yTranslate = isHorizontal ? rectangleOffsetF(d) : positionF(d);
@@ -3242,8 +3300,7 @@ var Axis = (function (_super) {
             var visibility = d3.select(this).style("visibility");
             return (visibility === "inherit") || (visibility === "visible");
         });
-        var labelNumbersShown = [];
-        visibleTickLabels.each(function (labelNumber) { return labelNumbersShown.push(labelNumber); });
+        var labelNumbersShown = visibleTickLabels.data();
         visibleTickMarks.each(function (e, i) {
             if (labelNumbersShown.indexOf(e) === -1) {
                 d3.select(this).style("visibility", "hidden");
@@ -3289,7 +3346,7 @@ exports.Axis = Axis;
 
 
 /***/ }),
-/* 19 */
+/* 20 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3309,7 +3366,7 @@ exports.ADD_TITLE_ELEMENTS = true;
 
 
 /***/ }),
-/* 20 */
+/* 21 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3384,7 +3441,7 @@ exports.Dispatcher = Dispatcher;
 
 
 /***/ }),
-/* 21 */
+/* 22 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3406,9 +3463,9 @@ var Formatters = __webpack_require__(8);
 var Scales = __webpack_require__(3);
 var quantitativeScale_1 = __webpack_require__(10);
 var Utils = __webpack_require__(0);
-var Plots = __webpack_require__(16);
+var Plots = __webpack_require__(17);
 var plot_1 = __webpack_require__(2);
-var xyPlot_1 = __webpack_require__(15);
+var xyPlot_1 = __webpack_require__(16);
 var Bar = (function (_super) {
     __extends(Bar, _super);
     /**
@@ -4023,7 +4080,7 @@ exports.Bar = Bar;
 
 
 /***/ }),
-/* 22 */
+/* 23 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -4042,7 +4099,7 @@ var SVGTypewriter = __webpack_require__(4);
 var Formatters = __webpack_require__(8);
 var Scales = __webpack_require__(3);
 var Utils = __webpack_require__(0);
-var axis_1 = __webpack_require__(18);
+var axis_1 = __webpack_require__(19);
 var TimeInterval;
 (function (TimeInterval) {
     TimeInterval.second = "second";
@@ -4265,8 +4322,11 @@ var Time = (function (_super) {
         else {
             labelPos = tickPos;
         }
-        var tickLabels = container.selectAll("." + axis_1.Axis.TICK_LABEL_CLASS).data(labelPos, function (d) { return String(d.valueOf()); });
-        var tickLabelsEnter = tickLabels.enter().append("g").classed(axis_1.Axis.TICK_LABEL_CLASS, true);
+        var tickLabelsUpdate = container.selectAll("." + axis_1.Axis.TICK_LABEL_CLASS).data(labelPos, function (d) { return String(d.valueOf()); });
+        var tickLabelsEnter = tickLabelsUpdate
+            .enter()
+            .append("g")
+            .classed(axis_1.Axis.TICK_LABEL_CLASS, true);
         tickLabelsEnter.append("text");
         var xTranslate = (this._tierLabelPositions[index] === "center" || config.step === 1) ? 0 : this.tickLabelPadding();
         var yTranslate;
@@ -4281,18 +4341,23 @@ var Time = (function (_super) {
                 yTranslate = this.height() - d3.sum(this._tierHeights.slice(0, index)) - this.tickLabelPadding();
             }
         }
+        var tickLabels = tickLabelsUpdate.merge(tickLabelsEnter);
         var textSelection = tickLabels.selectAll("text");
         if (textSelection.size() > 0) {
-            Utils.DOM.translate(textSelection, xTranslate, yTranslate);
+            textSelection.attr("transform", "translate(" + xTranslate + "," + yTranslate + ")");
         }
-        tickLabels.exit().remove();
+        tickLabelsUpdate.exit().remove();
         tickLabels.attr("transform", function (d) { return "translate(" + _this._scale.scale(d) + ",0)"; });
         var anchor = (this._tierLabelPositions[index] === "center" || config.step === 1) ? "middle" : "start";
         tickLabels.selectAll("text").text(config.formatter).style("text-anchor", anchor);
     };
     Time.prototype._renderTickMarks = function (tickValues, index) {
-        var tickMarks = this._tierMarkContainers[index].selectAll("." + axis_1.Axis.TICK_MARK_CLASS).data(tickValues);
-        tickMarks.enter().append("line").classed(axis_1.Axis.TICK_MARK_CLASS, true);
+        var tickMarksUpdate = this._tierMarkContainers[index].selectAll("." + axis_1.Axis.TICK_MARK_CLASS).data(tickValues);
+        var tickMarks = tickMarksUpdate
+            .enter()
+            .append("line")
+            .classed(axis_1.Axis.TICK_MARK_CLASS, true)
+            .merge(tickMarksUpdate);
         var attr = this._generateTickMarkAttrHash();
         var offset = this._tierHeights.slice(0, index).reduce(function (translate, height) { return translate + height; }, 0);
         if (this.orientation() === "bottom") {
@@ -4304,7 +4369,7 @@ var Time = (function (_super) {
             attr["y2"] = this.height() - (offset + (this._tierLabelPositions[index] === "center" ?
                 this.innerTickLength() : this._tierHeights[index]));
         }
-        tickMarks.attr(attr);
+        tickMarks.attrs(attr);
         if (this.orientation() === "bottom") {
             attr["y1"] = offset;
             attr["y2"] = offset + (this._tierLabelPositions[index] === "center" ? this.endTickLength() : this._tierHeights[index]);
@@ -4314,20 +4379,24 @@ var Time = (function (_super) {
             attr["y2"] = this.height() - (offset + (this._tierLabelPositions[index] === "center" ?
                 this.endTickLength() : this._tierHeights[index]));
         }
-        d3.select(tickMarks[0][0]).attr(attr);
-        d3.select(tickMarks[0][tickMarks.size() - 1]).attr(attr);
+        d3.select(tickMarks.nodes()[0]).attrs(attr);
+        d3.select(tickMarks.nodes()[tickMarks.size() - 1]).attrs(attr);
         // Add end-tick classes to first and last tick for CSS customization purposes
-        d3.select(tickMarks[0][0]).classed(axis_1.Axis.END_TICK_MARK_CLASS, true);
-        d3.select(tickMarks[0][tickMarks.size() - 1]).classed(axis_1.Axis.END_TICK_MARK_CLASS, true);
-        tickMarks.exit().remove();
+        d3.select(tickMarks.nodes()[0]).classed(axis_1.Axis.END_TICK_MARK_CLASS, true);
+        d3.select(tickMarks.nodes()[tickMarks.size() - 1]).classed(axis_1.Axis.END_TICK_MARK_CLASS, true);
+        tickMarksUpdate.exit().remove();
     };
     Time.prototype._renderLabellessTickMarks = function (tickValues) {
-        var tickMarks = this._tickMarkContainer.selectAll("." + axis_1.Axis.TICK_MARK_CLASS).data(tickValues);
-        tickMarks.enter().append("line").classed(axis_1.Axis.TICK_MARK_CLASS, true);
+        var tickMarksUpdate = this._tickMarkContainer.selectAll("." + axis_1.Axis.TICK_MARK_CLASS).data(tickValues);
+        var tickMarks = tickMarksUpdate
+            .enter()
+            .append("line")
+            .classed(axis_1.Axis.TICK_MARK_CLASS, true)
+            .merge(tickMarksUpdate);
         var attr = this._generateTickMarkAttrHash();
         attr["y2"] = (this.orientation() === "bottom") ? this.tickLabelPadding() : this.height() - this.tickLabelPadding();
-        tickMarks.attr(attr);
-        tickMarks.exit().remove();
+        tickMarks.attrs(attr);
+        tickMarksUpdate.exit().remove();
     };
     Time.prototype._generateLabellessTicks = function () {
         if (this._mostPreciseConfigIndex < 1) {
@@ -4351,7 +4420,7 @@ var Time = (function (_super) {
             var attr = this._generateBaselineAttrHash();
             attr["y1"] += (this.orientation() === "bottom") ? baselineOffset : -baselineOffset;
             attr["y2"] = attr["y1"];
-            this._tierBaselines[i].attr(attr).style("visibility", "inherit");
+            this._tierBaselines[i].attrs(attr).style("visibility", "inherit");
             baselineOffset += this._tierHeights[i];
         }
         var labelLessTicks = [];
@@ -4401,7 +4470,7 @@ var Time = (function (_super) {
             return visibility === "visible" || visibility === "inherit";
         });
         // We use the ClientRects because x1/x2 attributes are not comparable to ClientRects of labels
-        var visibleTickMarkRects = visibleTickMarks[0].map(function (mark) { return mark.getBoundingClientRect(); });
+        var visibleTickMarkRects = visibleTickMarks.nodes().map(function (mark) { return mark.getBoundingClientRect(); });
         var visibleTickLabels = this._tierLabelContainers[index]
             .selectAll("." + axis_1.Axis.TICK_LABEL_CLASS)
             .filter(function (d, i) {
@@ -4561,7 +4630,7 @@ exports.Time = Time;
 
 
 /***/ }),
-/* 23 */
+/* 24 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -4576,6 +4645,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
 var component_1 = __webpack_require__(5);
+var coerceD3_1 = __webpack_require__(11);
 /*
  * ComponentContainer class encapsulates Table and ComponentGroup's shared functionality.
  * It will not do anything if instantiated directly.
@@ -4589,6 +4659,7 @@ var ComponentContainer = (function (_super) {
     }
     ComponentContainer.prototype.anchor = function (selection) {
         var _this = this;
+        selection = coerceD3_1.coerceExternalD3(selection);
         _super.prototype.anchor.call(this, selection);
         this._forEach(function (c) { return c.anchor(_this.content()); });
         return this;
@@ -4653,7 +4724,7 @@ exports.ComponentContainer = ComponentContainer;
 
 
 /***/ }),
-/* 24 */
+/* 25 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -4663,7 +4734,7 @@ exports.ComponentContainer = ComponentContainer;
  */
 
 var Utils = __webpack_require__(0);
-var RenderPolicies = __webpack_require__(30);
+var RenderPolicies = __webpack_require__(31);
 /**
  * The RenderController is responsible for enqueueing and synchronizing
  * layout and render calls for Components.
@@ -4787,7 +4858,7 @@ exports.flush = flush;
 
 
 /***/ }),
-/* 25 */
+/* 26 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -4798,33 +4869,41 @@ exports.flush = flush;
 
 var d3 = __webpack_require__(1);
 function circle() {
-    return function (symbolSize) { return d3.svg.symbol().type("circle").size(Math.PI * Math.pow(symbolSize / 2, 2))(null); };
+    return function (symbolSize) { return d3.symbol().type(d3.symbolCircle).size(Math.PI * Math.pow(symbolSize / 2, 2))(null); };
 }
 exports.circle = circle;
 function square() {
-    return function (symbolSize) { return d3.svg.symbol().type("square").size(Math.pow(symbolSize, 2))(null); };
+    return function (symbolSize) { return d3.symbol().type(d3.symbolSquare).size(Math.pow(symbolSize, 2))(null); };
 }
 exports.square = square;
 function cross() {
-    return function (symbolSize) { return d3.svg.symbol().type("cross").size((5 / 9) * Math.pow(symbolSize, 2))(null); };
+    return function (symbolSize) { return d3.symbol().type(d3.symbolCross).size((5 / 9) * Math.pow(symbolSize, 2))(null); };
 }
 exports.cross = cross;
 function diamond() {
-    return function (symbolSize) { return d3.svg.symbol().type("diamond").size(Math.tan(Math.PI / 6) * Math.pow(symbolSize, 2) / 2)(null); };
+    return function (symbolSize) { return d3.symbol().type(d3.symbolDiamond).size(Math.tan(Math.PI / 6) * Math.pow(symbolSize, 2) / 2)(null); };
 }
 exports.diamond = diamond;
-function triangleUp() {
-    return function (symbolSize) { return d3.svg.symbol().type("triangle-up").size(Math.sqrt(3) * Math.pow(symbolSize / 2, 2))(null); };
+function triangle() {
+    return function (symbolSize) { return d3.symbol().type(d3.symbolTriangle).size(Math.sqrt(3) * Math.pow(symbolSize / 2, 2))(null); };
 }
-exports.triangleUp = triangleUp;
-function triangleDown() {
-    return function (symbolSize) { return d3.svg.symbol().type("triangle-down").size(Math.sqrt(3) * Math.pow(symbolSize / 2, 2))(null); };
+exports.triangle = triangle;
+// copied from https://github.com/d3/d3-shape/blob/e2e57722004acba754ed9edff020282682450c5c/src/symbol/star.js#L3
+var ka = 0.89081309152928522810;
+function star() {
+    return function (symbolSize) { return d3.symbol().type(d3.symbolStar).size(ka * Math.pow(symbolSize / 2, 2))(null); };
 }
-exports.triangleDown = triangleDown;
+exports.star = star;
+// copied from https://github.com/d3/d3-shape/blob/c35b2303eb4836aba3171642f01c2653e4228b9c/src/symbol/wye.js#L2
+var a = ((1 / Math.sqrt(12)) / 2 + 1) * 3;
+function wye() {
+    return function (symbolSize) { return d3.symbol().type(d3.symbolWye).size(a * Math.pow(symbolSize / 2.4, 2))(null); };
+}
+exports.wye = wye;
 
 
 /***/ }),
-/* 26 */
+/* 27 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -4838,10 +4917,11 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var Interactions = __webpack_require__(14);
+var Interactions = __webpack_require__(15);
 var Utils = __webpack_require__(0);
-var _1 = __webpack_require__(29);
-var selectionBoxLayer_1 = __webpack_require__(34);
+var _1 = __webpack_require__(30);
+var selectionBoxLayer_1 = __webpack_require__(35);
+var coerceD3_1 = __webpack_require__(11);
 var DragBoxLayer = (function (_super) {
     __extends(DragBoxLayer, _super);
     /**
@@ -4974,7 +5054,7 @@ var DragBoxLayer = (function (_super) {
     DragBoxLayer.prototype._setup = function () {
         var _this = this;
         _super.prototype._setup.call(this);
-        var createLine = function () { return _this._box.append("line").style({
+        var createLine = function () { return _this._box.append("line").styles({
             "opacity": 0,
             "stroke": "pink",
             "pointer-events": "visibleStroke",
@@ -4985,7 +5065,7 @@ var DragBoxLayer = (function (_super) {
         this._detectionEdgeR = createLine().classed("drag-edge-lr", true);
         if (this._hasCorners) {
             var createCorner = function () { return _this._box.append("circle")
-                .style({
+                .styles({
                 "opacity": 0,
                 "fill": "pink",
                 "pointer-events": "visibleFill",
@@ -5030,27 +5110,27 @@ var DragBoxLayer = (function (_super) {
             var b = bounds.bottomRight.y;
             var l = bounds.topLeft.x;
             var r = bounds.bottomRight.x;
-            this._detectionEdgeT.attr({
+            this._detectionEdgeT.attrs({
                 x1: l, y1: t, x2: r, y2: t,
                 "stroke-width": this._detectionRadius * 2,
             });
-            this._detectionEdgeB.attr({
+            this._detectionEdgeB.attrs({
                 x1: l, y1: b, x2: r, y2: b,
                 "stroke-width": this._detectionRadius * 2,
             });
-            this._detectionEdgeL.attr({
+            this._detectionEdgeL.attrs({
                 x1: l, y1: t, x2: l, y2: b,
                 "stroke-width": this._detectionRadius * 2,
             });
-            this._detectionEdgeR.attr({
+            this._detectionEdgeR.attrs({
                 x1: r, y1: t, x2: r, y2: b,
                 "stroke-width": this._detectionRadius * 2,
             });
             if (this._hasCorners) {
-                this._detectionCornerTL.attr({ cx: l, cy: t, r: this._detectionRadius });
-                this._detectionCornerTR.attr({ cx: r, cy: t, r: this._detectionRadius });
-                this._detectionCornerBL.attr({ cx: l, cy: b, r: this._detectionRadius });
-                this._detectionCornerBR.attr({ cx: r, cy: b, r: this._detectionRadius });
+                this._detectionCornerTL.attrs({ cx: l, cy: t, r: this._detectionRadius });
+                this._detectionCornerTR.attrs({ cx: r, cy: t, r: this._detectionRadius });
+                this._detectionCornerBL.attrs({ cx: l, cy: b, r: this._detectionRadius });
+                this._detectionCornerBR.attrs({ cx: r, cy: b, r: this._detectionRadius });
             }
         }
         return this;
@@ -5191,6 +5271,7 @@ var DragBoxLayer = (function (_super) {
         return this;
     };
     DragBoxLayer.prototype.anchor = function (selection) {
+        selection = coerceD3_1.coerceExternalD3(selection);
         this._dragInteraction.attachTo(this);
         _super.prototype.anchor.call(this, selection);
         return this;
@@ -5207,7 +5288,7 @@ exports.DragBoxLayer = DragBoxLayer;
 
 
 /***/ }),
-/* 27 */
+/* 28 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -5323,7 +5404,7 @@ exports.within = within;
 
 
 /***/ }),
-/* 28 */
+/* 29 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -5334,6 +5415,7 @@ exports.within = within;
  */
 
 var d3 = __webpack_require__(1);
+var utils_1 = __webpack_require__(12);
 var BaseAnimator = (function () {
     function BaseAnimator() {
         this.duration(BaseAnimator.DEFAULT_DURATION_MILLISECONDS);
@@ -5343,18 +5425,17 @@ var BaseAnimator = (function () {
         this.moveY(0);
     }
     BaseAnimator.prototype.animate = function (selection) {
-        var xForm = d3.transform("");
-        xForm.translate = [this.moveX(), this.moveY()];
-        selection.attr("transform", xForm.toString());
-        xForm.translate = [0, 0];
-        return this._animate(selection, { transform: xForm.toString() });
+        utils_1.DOM.transform(selection, this.moveX(), this.moveY());
+        var initialTranslate = "translate(0, 0)";
+        return this._animate(selection, { transform: initialTranslate });
     };
     BaseAnimator.prototype._animate = function (selection, attr) {
-        return selection.transition()
+        var transition = selection.transition()
             .ease(this.easing())
             .duration(this.duration())
-            .delay(this.delay())
-            .attr(attr);
+            .delay(this.delay());
+        utils_1.DOM.applyAttrs(transition, attr);
+        return transition;
     };
     BaseAnimator.prototype.duration = function (duration) {
         if (duration == null) {
@@ -5410,12 +5491,12 @@ BaseAnimator.DEFAULT_DURATION_MILLISECONDS = 300;
 /**
  * The default easing of the animation
  */
-BaseAnimator.DEFAULT_EASING = "exp-out";
+BaseAnimator.DEFAULT_EASING = d3.easeExpOut;
 exports.BaseAnimator = BaseAnimator;
 //# sourceMappingURL=baseAnimator.js.map
 
 /***/ }),
-/* 29 */
+/* 30 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -5427,19 +5508,19 @@ exports.BaseAnimator = BaseAnimator;
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-__export(__webpack_require__(26));
-__export(__webpack_require__(53));
-__export(__webpack_require__(54));
-__export(__webpack_require__(32));
-__export(__webpack_require__(33));
+__export(__webpack_require__(27));
 __export(__webpack_require__(55));
 __export(__webpack_require__(56));
+__export(__webpack_require__(33));
+__export(__webpack_require__(34));
 __export(__webpack_require__(57));
 __export(__webpack_require__(58));
-__export(__webpack_require__(34));
 __export(__webpack_require__(59));
 __export(__webpack_require__(60));
+__export(__webpack_require__(35));
 __export(__webpack_require__(61));
+__export(__webpack_require__(62));
+__export(__webpack_require__(63));
 var Alignment = (function () {
     function Alignment() {
     }
@@ -5454,7 +5535,7 @@ exports.Alignment = Alignment;
 
 
 /***/ }),
-/* 30 */
+/* 31 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -5464,7 +5545,7 @@ exports.Alignment = Alignment;
  */
 
 var Utils = __webpack_require__(0);
-var RenderController = __webpack_require__(24);
+var RenderController = __webpack_require__(25);
 /**
  * Renders Components immediately after they are enqueued.
  * Useful for debugging, horrible for performance.
@@ -5509,7 +5590,7 @@ exports.Timeout = Timeout;
 
 
 /***/ }),
-/* 31 */
+/* 32 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -5523,9 +5604,9 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var Dispatchers = __webpack_require__(11);
+var Dispatchers = __webpack_require__(13);
 var Utils = __webpack_require__(0);
-var interaction_1 = __webpack_require__(12);
+var interaction_1 = __webpack_require__(14);
 var Key = (function (_super) {
     __extends(Key, _super);
     function Key() {
@@ -5635,7 +5716,7 @@ exports.Key = Key;
 
 
 /***/ }),
-/* 32 */
+/* 33 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -5650,7 +5731,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
 var Utils = __webpack_require__(0);
-var componentContainer_1 = __webpack_require__(23);
+var componentContainer_1 = __webpack_require__(24);
 var Group = (function (_super) {
     __extends(Group, _super);
     /**
@@ -5739,7 +5820,7 @@ exports.Group = Group;
 
 
 /***/ }),
-/* 33 */
+/* 34 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -5817,7 +5898,7 @@ var GuideLineLayer = (function (_super) {
     GuideLineLayer.prototype.renderImmediately = function () {
         _super.prototype.renderImmediately.call(this);
         this._syncPixelPositionAndValue();
-        this._guideLine.attr({
+        this._guideLine.attrs({
             x1: this._isVertical() ? this.pixelPosition() : 0,
             y1: this._isVertical() ? 0 : this.pixelPosition(),
             x2: this._isVertical() ? this.pixelPosition() : this.width(),
@@ -5895,7 +5976,7 @@ exports.GuideLineLayer = GuideLineLayer;
 
 
 /***/ }),
-/* 34 */
+/* 35 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -6013,7 +6094,7 @@ var SelectionBoxLayer = (function (_super) {
                 Utils.Math.isValidNumber(r))) {
                 throw new Error("bounds have not been properly set");
             }
-            this._boxArea.attr({
+            this._boxArea.attrs({
                 x: l, y: t, width: r - l, height: b - t,
             });
             this.content().node().appendChild(this._box.node());
@@ -6124,7 +6205,7 @@ exports.SelectionBoxLayer = SelectionBoxLayer;
 
 
 /***/ }),
-/* 35 */
+/* 36 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -6142,8 +6223,8 @@ var d3 = __webpack_require__(1);
 var Drawers = __webpack_require__(9);
 var Scales = __webpack_require__(3);
 var Utils = __webpack_require__(0);
-var Plots = __webpack_require__(16);
-var linePlot_1 = __webpack_require__(37);
+var Plots = __webpack_require__(17);
+var linePlot_1 = __webpack_require__(38);
 var plot_1 = __webpack_require__(2);
 var Area = (function (_super) {
     __extends(Area, _super);
@@ -6286,7 +6367,7 @@ var Area = (function (_super) {
     Area.prototype.selections = function (datasets) {
         var _this = this;
         if (datasets === void 0) { datasets = this.datasets(); }
-        var allSelections = _super.prototype.selections.call(this, datasets)[0];
+        var allSelections = _super.prototype.selections.call(this, datasets).nodes();
         var lineDrawers = datasets.map(function (dataset) { return _this._lineDrawers.get(dataset); })
             .filter(function (drawer) { return drawer != null; });
         lineDrawers.forEach(function (ld, i) { return allSelections.push(ld.selectionForIndex(i).node()); });
@@ -6300,11 +6381,13 @@ var Area = (function (_super) {
             return Utils.Math.isValidNumber(positionX) && Utils.Math.isValidNumber(positionY);
         };
         return function (datum, index, dataset) {
-            var areaGenerator = d3.svg.area()
+            // just runtime error if user passes curveBundle to area plot
+            var curveFactory = _this._getCurveFactory();
+            var areaGenerator = d3.area()
                 .x(function (innerDatum, innerIndex) { return xProjector(innerDatum, innerIndex, dataset); })
                 .y1(function (innerDatum, innerIndex) { return yProjector(innerDatum, innerIndex, dataset); })
                 .y0(function (innerDatum, innerIndex) { return y0Projector(innerDatum, innerIndex, dataset); })
-                .interpolate(_this.interpolator())
+                .curve(curveFactory)
                 .defined(function (innerDatum, innerIndex) { return definedProjector(innerDatum, innerIndex, dataset); });
             return areaGenerator(datum);
         };
@@ -6316,7 +6399,7 @@ exports.Area = Area;
 
 
 /***/ }),
-/* 36 */
+/* 37 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -6333,7 +6416,7 @@ var Animator;
 
 
 /***/ }),
-/* 37 */
+/* 38 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -6353,9 +6436,24 @@ var Drawers = __webpack_require__(9);
 var Scales = __webpack_require__(3);
 var quantitativeScale_1 = __webpack_require__(10);
 var Utils = __webpack_require__(0);
-var Plots = __webpack_require__(16);
+var Plots = __webpack_require__(17);
 var plot_1 = __webpack_require__(2);
-var xyPlot_1 = __webpack_require__(15);
+var xyPlot_1 = __webpack_require__(16);
+var CURVE_NAME_MAPPING = {
+    "linear": d3.curveLinear,
+    "linearClosed": d3.curveLinearClosed,
+    "step": d3.curveStep,
+    "stepBefore": d3.curveStepBefore,
+    "stepAfter": d3.curveStepAfter,
+    "basis": d3.curveBasis,
+    "basisOpen": d3.curveBasisOpen,
+    "basisClosed": d3.curveBasisClosed,
+    "bundle": d3.curveBundle,
+    "cardinal": d3.curveCardinal,
+    "cardinalOpen": d3.curveCardinalOpen,
+    "cardinalClosed": d3.curveCardinalClosed,
+    "monotone": d3.curveMonotoneX,
+};
 var Line = (function (_super) {
     __extends(Line, _super);
     /**
@@ -6365,14 +6463,14 @@ var Line = (function (_super) {
      */
     function Line() {
         _super.call(this);
-        this._interpolator = "linear";
+        this._curve = "linear";
         this._autorangeSmooth = false;
         this._croppedRenderingEnabled = true;
         this._downsamplingEnabled = false;
         this.addClass("line-plot");
         var animator = new Animators.Easing();
         animator.stepDuration(plot_1.Plot._ANIMATION_MAX_DURATION);
-        animator.easingMode("exp-in-out");
+        animator.easingMode("expInOut");
         animator.maxTotalDuration(plot_1.Plot._ANIMATION_MAX_DURATION);
         this.animator(Plots.Animator.MAIN, animator);
         this.attr("stroke", new Scales.Color().range()[0]);
@@ -6427,11 +6525,11 @@ var Line = (function (_super) {
             this.y().scale.snappingDomainEnabled(!this.autorangeSmooth());
         }
     };
-    Line.prototype.interpolator = function (interpolator) {
-        if (interpolator == null) {
-            return this._interpolator;
+    Line.prototype.curve = function (curve) {
+        if (curve == null) {
+            return this._curve;
         }
-        this._interpolator = interpolator;
+        this._curve = curve;
         this.render();
         return this;
     };
@@ -6661,12 +6759,28 @@ var Line = (function (_super) {
                 positionY != null && !Utils.Math.isNaN(positionY);
         };
         return function (datum, index, dataset) {
-            return d3.svg.line()
+            return d3.line()
                 .x(function (innerDatum, innerIndex) { return xProjector(innerDatum, innerIndex, dataset); })
                 .y(function (innerDatum, innerIndex) { return yProjector(innerDatum, innerIndex, dataset); })
-                .interpolate(_this.interpolator())
+                .curve(_this._getCurveFactory())
                 .defined(function (innerDatum, innerIndex) { return definedProjector(innerDatum, innerIndex, dataset); })(datum);
         };
+    };
+    Line.prototype._getCurveFactory = function () {
+        var curve = this.curve();
+        if (typeof curve === "string") {
+            var maybeCurveFunction = CURVE_NAME_MAPPING[curve];
+            if (maybeCurveFunction == null) {
+                // oops; name is wrong - default to linear instead
+                return CURVE_NAME_MAPPING["linear"];
+            }
+            else {
+                return maybeCurveFunction;
+            }
+        }
+        else {
+            return curve;
+        }
     };
     Line.prototype._getDataToDraw = function () {
         var _this = this;
@@ -6784,7 +6898,7 @@ exports.Line = Line;
 
 
 /***/ }),
-/* 38 */
+/* 39 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -6799,9 +6913,9 @@ var __extends = (this && this.__extends) || function (d, b) {
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
 var d3 = __webpack_require__(1);
-var Interactions = __webpack_require__(14);
+var Interactions = __webpack_require__(15);
 var Utils = __webpack_require__(0);
-var scale_1 = __webpack_require__(17);
+var scale_1 = __webpack_require__(18);
 var TRANSFORMATION_SPACE = [0, 1];
 var Category = (function (_super) {
     __extends(Category, _super);
@@ -6813,9 +6927,9 @@ var Category = (function (_super) {
     function Category() {
         _super.call(this);
         this._range = [0, 1];
-        this._d3Scale = d3.scale.ordinal();
+        this._d3Scale = d3.scaleBand();
         this._d3Scale.range(TRANSFORMATION_SPACE);
-        this._d3TransformationScale = d3.scale.linear();
+        this._d3TransformationScale = d3.scaleLinear();
         this._d3TransformationScale.domain(TRANSFORMATION_SPACE);
         var d3InnerPadding = 0.3;
         this._innerPadding = Category._convertToPlottableInnerPadding(d3InnerPadding);
@@ -6849,15 +6963,18 @@ var Category = (function (_super) {
      * @returns {string[]}
      */
     Category.prototype.invertRange = function (range) {
+        var _this = this;
         if (range === void 0) { range = this.range(); }
-        var rangeBand = this._d3Scale.rangeBand();
-        // offset the domain by half the rangeBand such that we consider the
-        // center of the bars
-        var domainStartNormalized = this.invertedTransformation(range[0]) - rangeBand / 2;
-        var domainEndNormalized = this.invertedTransformation(range[1]) - rangeBand / 2;
-        var domainStart = d3.bisect(this._d3Scale.range(), domainStartNormalized);
-        var domainEnd = d3.bisect(this._d3Scale.range(), domainEndNormalized);
-        return this._d3Scale.domain().slice(domainStart, domainEnd);
+        var rangeBand = this._d3Scale.bandwidth();
+        var domainStartNormalized = this.invertedTransformation(range[0]);
+        var domainEndNormalized = this.invertedTransformation(range[1]);
+        var domain = this._d3Scale.domain();
+        // map ["a", "b", "c"] to the normalized center position (e.g. [0.25, .5, 0.75]). We add
+        // half the rangeBand to consider the center of the bars
+        var normalizedDomain = domain.map(function (d) { return _this._d3Scale(d) + rangeBand / 2; });
+        var domainStart = d3.bisect(normalizedDomain, domainStartNormalized);
+        var domainEnd = d3.bisect(normalizedDomain, domainEndNormalized);
+        return domain.slice(domainStart, domainEnd);
     };
     Category.prototype.range = function (values) {
         return _super.prototype.range.call(this, values);
@@ -6871,7 +6988,8 @@ var Category = (function (_super) {
     Category.prototype._setBands = function () {
         var d3InnerPadding = 1 - 1 / (1 + this.innerPadding());
         var d3OuterPadding = this.outerPadding() / (1 + this.innerPadding());
-        this._d3Scale.rangeBands(TRANSFORMATION_SPACE, d3InnerPadding, d3OuterPadding);
+        this._d3Scale.paddingInner(d3InnerPadding);
+        this._d3Scale.paddingOuter(d3OuterPadding);
     };
     /**
      * Returns the width of the range band.
@@ -6879,7 +6997,7 @@ var Category = (function (_super) {
      * @returns {number} The range band width
      */
     Category.prototype.rangeBand = function () {
-        return this._rescaleBand(this._d3Scale.rangeBand());
+        return this._rescaleBand(this._d3Scale.bandwidth());
     };
     /**
      * Returns the step width of the scale.
@@ -6889,7 +7007,8 @@ var Category = (function (_super) {
      * @returns {number}
      */
     Category.prototype.stepWidth = function () {
-        return this._rescaleBand(this._d3Scale.rangeBand() * (1 + this.innerPadding()));
+        // todo consider replacing this with _d3Scale.step()
+        return this._rescaleBand(this._d3Scale.bandwidth() * (1 + this.innerPadding()));
     };
     Category.prototype.innerPadding = function (innerPadding) {
         if (innerPadding == null) {
@@ -6911,7 +7030,7 @@ var Category = (function (_super) {
     };
     Category.prototype.scale = function (value) {
         // Determine the middle of the range band for the value
-        var untransformed = this._d3Scale(value) + this._d3Scale.rangeBand() / 2;
+        var untransformed = this._d3Scale(value) + this._d3Scale.bandwidth() / 2;
         // Convert to screen space
         return this._d3TransformationScale(untransformed);
     };
@@ -6973,7 +7092,7 @@ exports.Category = Category;
 
 
 /***/ }),
-/* 39 */
+/* 40 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -6982,7 +7101,6 @@ exports.Category = Category;
  * @license MIT
  */
 
-var d3 = __webpack_require__(1);
 var nativeMath = window.Math;
 /**
  * Gets the bounding box of an element.
@@ -7053,18 +7171,52 @@ function elementHeight(element) {
         + _parseStyleValue(style, "border-bottom-width");
 }
 exports.elementHeight = elementHeight;
-function translate(selection, x, y) {
-    var transformMatrix = d3.transform(selection.attr("transform"));
-    if (x == null) {
-        return transformMatrix.translate;
+// taken from the BNF at https://www.w3.org/TR/SVG/coords.html
+var WSP = "\\s";
+var NUMBER = "(?:[-+]?[0-9]*\\.?[0-9]+)";
+var COMMA_WSP = "(?:(?:" + WSP + "+,?" + WSP + "*)|(?:," + WSP + "*))";
+var TRANSLATE_REGEX = new RegExp("translate" + WSP + "*\\(" + WSP + "*(" + NUMBER + ")(?:" + COMMA_WSP + "(" + NUMBER + "))?" + WSP + "*\\)");
+var ROTATE_REGEX = new RegExp("rotate" + WSP + "*\\(" + WSP + "*(" + NUMBER + ")" + WSP + "*\\)");
+var SCALE_REGEX = new RegExp("scale" + WSP + "*\\(" + WSP + "*(" + NUMBER + ")(?:" + COMMA_WSP + "(" + NUMBER + "))?" + WSP + "*\\)");
+/**
+ * Accepts selections whose .transform contain a "translate(a, b)" and extracts the a and b
+ */
+function getTranslateValues(el) {
+    var match = TRANSLATE_REGEX.exec(el.attr("transform"));
+    if (match != null) {
+        var translateX = match[1], _a = match[2], translateY = _a === void 0 ? 0 : _a;
+        return [+translateX, +translateY];
     }
-    y = (y == null) ? 0 : y;
-    transformMatrix.translate[0] = x;
-    transformMatrix.translate[1] = y;
-    selection.attr("transform", transformMatrix.toString());
-    return selection;
+    else {
+        return [0, 0];
+    }
 }
-exports.translate = translate;
+exports.getTranslateValues = getTranslateValues;
+/**
+ * Accepts selections whose .transform contain a "rotate(angle)" and returns the angle
+ */
+function getRotate(el) {
+    var match = ROTATE_REGEX.exec(el.attr("transform"));
+    if (match != null) {
+        var rotation = match[1];
+        return +rotation;
+    }
+    else {
+        return 0;
+    }
+}
+exports.getRotate = getRotate;
+function getScaleValues(el) {
+    var match = SCALE_REGEX.exec(el.attr("transform"));
+    if (match != null) {
+        var scaleX = match[1], scaleY = match[2];
+        return [+scaleX, scaleY == null ? +scaleX : +scaleY];
+    }
+    else {
+        return [0, 0];
+    }
+}
+exports.getScaleValues = getScaleValues;
 /**
  * Checks if the first ClientRect overlaps the second.
  *
@@ -7088,6 +7240,22 @@ function clientRectsOverlap(clientRectA, clientRectB) {
     return true;
 }
 exports.clientRectsOverlap = clientRectsOverlap;
+/**
+ * Return a new ClientRect that is the old ClientRect expanded by amount in all directions.
+ * @param rect
+ * @param amount
+ */
+function expandRect(rect, amount) {
+    return {
+        left: rect.left - amount,
+        top: rect.top - amount,
+        right: rect.right + amount,
+        bottom: rect.bottom + amount,
+        width: rect.width + amount * 2,
+        height: rect.height + amount * 2
+    };
+}
+exports.expandRect = expandRect;
 /**
  * Returns true if and only if innerClientRect is inside outerClientRect.
  *
@@ -7179,7 +7347,7 @@ function _parseStyleValue(style, property) {
 
 
 /***/ }),
-/* 40 */
+/* 41 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7251,7 +7419,7 @@ exports.Set = Set;
 
 
 /***/ }),
-/* 41 */
+/* 42 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7261,7 +7429,7 @@ exports.Set = Set;
  * license at https://github.com/palantir/svg-typewriter/blob/develop/LICENSE
  */
 
-var Utils = __webpack_require__(13);
+var utils_1 = __webpack_require__(12);
 ;
 var AbstractMeasurer = (function () {
     function AbstractMeasurer(area, className) {
@@ -7272,7 +7440,7 @@ var AbstractMeasurer = (function () {
         return this.textMeasurer(text);
     };
     AbstractMeasurer.prototype.checkSelectionIsText = function (d) {
-        return d[0][0].tagName === "text" || !d.select("text").empty();
+        return d.node().tagName === "text" || !d.select("text").empty();
     };
     AbstractMeasurer.prototype.getTextMeasurer = function (area, className) {
         var _this = this;
@@ -7292,7 +7460,7 @@ var AbstractMeasurer = (function () {
         else {
             var parentNode_1 = area.node().parentNode;
             var textSelection_1;
-            if (area[0][0].tagName === "text") {
+            if (area.node().tagName === "text") {
                 textSelection_1 = area;
             }
             else {
@@ -7309,7 +7477,7 @@ var AbstractMeasurer = (function () {
     };
     AbstractMeasurer.prototype.measureBBox = function (d, text) {
         d.text(text);
-        var bb = Utils.DOM.getBBox(d);
+        var bb = utils_1.DOM.getBBox(d);
         return { width: bb.width, height: bb.height };
     };
     return AbstractMeasurer;
@@ -7319,7 +7487,7 @@ exports.AbstractMeasurer = AbstractMeasurer;
 //# sourceMappingURL=abstractMeasurer.js.map
 
 /***/ }),
-/* 42 */
+/* 43 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7334,13 +7502,13 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var Utils = __webpack_require__(13);
-var characterMeasurer_1 = __webpack_require__(43);
+var utils_1 = __webpack_require__(12);
+var characterMeasurer_1 = __webpack_require__(44);
 var CacheCharacterMeasurer = (function (_super) {
     __extends(CacheCharacterMeasurer, _super);
     function CacheCharacterMeasurer(area, className, useGuards) {
         var _this = _super.call(this, area, className, useGuards) || this;
-        _this.cache = new Utils.Cache(function (c) {
+        _this.cache = new utils_1.Cache(function (c) {
             return _this._measureCharacterNotFromCache(c);
         });
         return _this;
@@ -7360,7 +7528,7 @@ exports.CacheCharacterMeasurer = CacheCharacterMeasurer;
 //# sourceMappingURL=cacheCharacterMeasurer.js.map
 
 /***/ }),
-/* 43 */
+/* 44 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7376,7 +7544,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
 var d3 = __webpack_require__(1);
-var measurer_1 = __webpack_require__(44);
+var measurer_1 = __webpack_require__(45);
 var CharacterMeasurer = (function (_super) {
     __extends(CharacterMeasurer, _super);
     function CharacterMeasurer() {
@@ -7399,7 +7567,7 @@ exports.CharacterMeasurer = CharacterMeasurer;
 //# sourceMappingURL=characterMeasurer.js.map
 
 /***/ }),
-/* 44 */
+/* 45 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7415,7 +7583,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
 var d3 = __webpack_require__(1);
-var abstractMeasurer_1 = __webpack_require__(41);
+var abstractMeasurer_1 = __webpack_require__(42);
 var Measurer = (function (_super) {
     __extends(Measurer, _super);
     function Measurer(area, className, useGuards) {
@@ -7461,7 +7629,7 @@ exports.Measurer = Measurer;
 //# sourceMappingURL=measurer.js.map
 
 /***/ }),
-/* 45 */
+/* 46 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7471,7 +7639,7 @@ exports.Measurer = Measurer;
  * license at https://github.com/palantir/svg-typewriter/blob/develop/LICENSE
  */
 
-var Utils = __webpack_require__(13);
+var Utils = __webpack_require__(12);
 var Wrapper = (function () {
     function Wrapper() {
         this.maxLines(Infinity);
@@ -7688,7 +7856,7 @@ exports.Wrapper = Wrapper;
 //# sourceMappingURL=wrapper.js.map
 
 /***/ }),
-/* 46 */
+/* 47 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7700,13 +7868,13 @@ exports.Wrapper = Wrapper;
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-__export(__webpack_require__(51));
-__export(__webpack_require__(52));
-__export(__webpack_require__(22));
+__export(__webpack_require__(53));
+__export(__webpack_require__(54));
+__export(__webpack_require__(23));
 
 
 /***/ }),
-/* 47 */
+/* 48 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7778,7 +7946,7 @@ exports.Dataset = Dataset;
 
 
 /***/ }),
-/* 48 */
+/* 49 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7796,7 +7964,106 @@ exports.version = "3.0.0-beta.1";
 
 
 /***/ }),
-/* 49 */
+/* 50 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/**
+ * Copyright 2014-present Palantir Technologies
+ * @license MIT
+ *
+ * @fileoverview manually add d3-selection-multi to d3 default bundle. Most of this code is
+ * copied from d3-selection-multi@1.0.0.
+ * See https://github.com/d3/d3-selection-multi/issues/11 for why we have to do this
+ */
+
+var d3 = __webpack_require__(1);
+var d3Selection = d3;
+var d3Transition = d3;
+function attrsFunction(selection, map) {
+    return selection.each(function () {
+        var x = map.apply(this, arguments), s = d3Selection.select(this);
+        for (var name in x)
+            s.attr(name, x[name]);
+    });
+}
+function attrsObject(selection, map) {
+    for (var name in map)
+        selection.attr(name, map[name]);
+    return selection;
+}
+function selection_attrs(map) {
+    return (typeof map === "function" ? attrsFunction : attrsObject)(this, map);
+}
+function stylesFunction(selection, map, priority) {
+    return selection.each(function () {
+        var x = map.apply(this, arguments), s = d3Selection.select(this);
+        for (var name in x)
+            s.style(name, x[name], priority);
+    });
+}
+function stylesObject(selection, map, priority) {
+    for (var name in map)
+        selection.style(name, map[name], priority);
+    return selection;
+}
+function selection_styles(map, priority) {
+    return (typeof map === "function" ? stylesFunction : stylesObject)(this, map, priority == null ? "" : priority);
+}
+function propertiesFunction(selection, map) {
+    return selection.each(function () {
+        var x = map.apply(this, arguments), s = d3Selection.select(this);
+        for (var name in x)
+            s.property(name, x[name]);
+    });
+}
+function propertiesObject(selection, map) {
+    for (var name in map)
+        selection.property(name, map[name]);
+    return selection;
+}
+function selection_properties(map) {
+    return (typeof map === "function" ? propertiesFunction : propertiesObject)(this, map);
+}
+function attrsFunction$1(transition, map) {
+    return transition.each(function () {
+        var x = map.apply(this, arguments), t = d3Selection.select(this).transition(transition);
+        for (var name in x)
+            t.attr(name, x[name]);
+    });
+}
+function attrsObject$1(transition, map) {
+    for (var name in map)
+        transition.attr(name, map[name]);
+    return transition;
+}
+function transition_attrs(map) {
+    return (typeof map === "function" ? attrsFunction$1 : attrsObject$1)(this, map);
+}
+function stylesFunction$1(transition, map, priority) {
+    return transition.each(function () {
+        var x = map.apply(this, arguments), t = d3Selection.select(this).transition(transition);
+        for (var name in x)
+            t.style(name, x[name], priority);
+    });
+}
+function stylesObject$1(transition, map, priority) {
+    for (var name in map)
+        transition.style(name, map[name], priority);
+    return transition;
+}
+function transition_styles(map, priority) {
+    return (typeof map === "function" ? stylesFunction$1 : stylesObject$1)(this, map, priority == null ? "" : priority);
+}
+d3Selection.selection.prototype.attrs = selection_attrs;
+d3Selection.selection.prototype.styles = selection_styles;
+d3Selection.selection.prototype.properties = selection_properties;
+d3Transition.transition.prototype.attrs = transition_attrs;
+d3Transition.transition.prototype.styles = transition_styles;
+
+
+/***/ }),
+/* 51 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7805,6 +8072,47 @@ exports.version = "3.0.0-beta.1";
  * @license MIT
  */
 
+var d3Ease = __webpack_require__(101);
+var coerceD3_1 = __webpack_require__(11);
+var EASE_NAME_MAPPING = {
+    "linear": d3Ease.easeLinear,
+    "quad": d3Ease.easeQuad,
+    "quadIn": d3Ease.easeQuadIn,
+    "quadOut": d3Ease.easeQuadOut,
+    "quadInOut": d3Ease.easeQuadInOut,
+    "cubic": d3Ease.easeCubic,
+    "cubicIn": d3Ease.easeCubicIn,
+    "cubicOut": d3Ease.easeCubicOut,
+    "cubicInOut": d3Ease.easeCubicInOut,
+    "poly": d3Ease.easePoly,
+    "polyIn": d3Ease.easePolyIn,
+    "polyOut": d3Ease.easePolyOut,
+    "polyInOut": d3Ease.easePolyInOut,
+    "sin": d3Ease.easeSin,
+    "sinIn": d3Ease.easeSinIn,
+    "sinOut": d3Ease.easeSinOut,
+    "sinInOut": d3Ease.easeSinInOut,
+    "exp": d3Ease.easeExp,
+    "expIn": d3Ease.easeExpIn,
+    "expOut": d3Ease.easeExpOut,
+    "expInOut": d3Ease.easeExpInOut,
+    "circle": d3Ease.easeCircle,
+    "circleIn": d3Ease.easeCircleIn,
+    "circleOut": d3Ease.easeCircleOut,
+    "circleInOut": d3Ease.easeCircleInOut,
+    "bounce": d3Ease.easeBounce,
+    "bounceIn": d3Ease.easeBounceIn,
+    "bounceOut": d3Ease.easeBounceOut,
+    "bounceInOut": d3Ease.easeBounceInOut,
+    "back": d3Ease.easeBack,
+    "backIn": d3Ease.easeBackIn,
+    "backOut": d3Ease.easeBackOut,
+    "backInOut": d3Ease.easeBackInOut,
+    "elastic": d3Ease.easeElastic,
+    "elasticIn": d3Ease.easeElasticIn,
+    "elasticOut": d3Ease.easeElasticOut,
+    "elasticInOut": d3Ease.easeElasticInOut,
+};
 /**
  * An Animator with easing and configurable durations and delays.
  */
@@ -7827,13 +8135,14 @@ var Easing = (function () {
     };
     Easing.prototype.animate = function (selection, attrToAppliedProjector) {
         var _this = this;
-        var numberOfSteps = selection[0].length;
+        selection = coerceD3_1.coerceExternalD3(selection);
+        var numberOfSteps = selection.size();
         var adjustedIterativeDelay = this._getAdjustedIterativeDelay(numberOfSteps);
         return selection.transition()
-            .ease(this.easingMode())
+            .ease(this._getEaseFactory())
             .duration(this.stepDuration())
             .delay(function (d, i) { return _this.startDelay() + adjustedIterativeDelay * i; })
-            .attr(attrToAppliedProjector);
+            .attrs(attrToAppliedProjector);
     };
     Easing.prototype.startDelay = function (startDelay) {
         if (startDelay == null) {
@@ -7880,6 +8189,22 @@ var Easing = (function () {
             return this;
         }
     };
+    Easing.prototype._getEaseFactory = function () {
+        var ease = this.easingMode();
+        if (typeof ease === "string") {
+            var maybeEaseFunction = EASE_NAME_MAPPING[ease];
+            if (maybeEaseFunction == null) {
+                // oops; name is wrong - default to linear instead
+                return EASE_NAME_MAPPING["linear"];
+            }
+            else {
+                return maybeEaseFunction;
+            }
+        }
+        else {
+            return ease;
+        }
+    };
     /**
      * Adjust the iterative delay, such that it takes into account the maxTotalDuration constraint
      */
@@ -7908,14 +8233,14 @@ var Easing = (function () {
     /**
      * The default easing of the animation
      */
-    Easing._DEFAULT_EASING_MODE = "exp-out";
+    Easing._DEFAULT_EASING_MODE = "expOut";
     return Easing;
 }());
 exports.Easing = Easing;
 
 
 /***/ }),
-/* 50 */
+/* 52 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7924,6 +8249,7 @@ exports.Easing = Easing;
  * @license MIT
  */
 
+var coerceD3_1 = __webpack_require__(11);
 /**
  * An animator implementation with no animation. The attributes are
  * immediately set on the selection.
@@ -7935,7 +8261,8 @@ var Null = (function () {
         return 0;
     };
     Null.prototype.animate = function (selection, attrToAppliedProjector) {
-        return selection.attr(attrToAppliedProjector);
+        selection = coerceD3_1.coerceExternalD3(selection);
+        return selection.attrs(attrToAppliedProjector);
     };
     return Null;
 }());
@@ -7943,7 +8270,7 @@ exports.Null = Null;
 
 
 /***/ }),
-/* 51 */
+/* 53 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7959,7 +8286,7 @@ var __extends = (this && this.__extends) || function (d, b) {
 };
 var d3 = __webpack_require__(1);
 var SVGTypewriter = __webpack_require__(4);
-var axis_1 = __webpack_require__(18);
+var axis_1 = __webpack_require__(19);
 var Utils = __webpack_require__(0);
 var Category = (function (_super) {
     __extends(Category, _super);
@@ -8260,7 +8587,6 @@ var Category = (function (_super) {
         _super.prototype.renderImmediately.call(this);
         var catScale = this._scale;
         var _a = this.getDownsampleInfo(catScale), domain = _a.domain, stepWidth = _a.stepWidth;
-        var tickLabels = this._tickLabelContainer.selectAll("." + axis_1.Axis.TICK_LABEL_CLASS).data(domain, function (d) { return d; });
         // Give each tick a stepWidth of space which will partition the entire axis evenly
         var availableTextSpace = stepWidth;
         if (this.isHorizontal() && this._tickLabelMaxWidth != null) {
@@ -8274,15 +8600,20 @@ var Category = (function (_super) {
             var y = _this.isHorizontal() ? 0 : tickLabelEdge;
             return "translate(" + x + "," + y + ")";
         };
-        tickLabels.enter().append("g").classed(axis_1.Axis.TICK_LABEL_CLASS, true);
-        tickLabels.exit().remove();
+        var tickLabelsUpdate = this._tickLabelContainer.selectAll("." + axis_1.Axis.TICK_LABEL_CLASS).data(domain);
+        var tickLabels = tickLabelsUpdate
+            .enter()
+            .append("g")
+            .classed(axis_1.Axis.TICK_LABEL_CLASS, true)
+            .merge(tickLabelsUpdate);
+        tickLabelsUpdate.exit().remove();
         tickLabels.attr("transform", getTickLabelTransform);
         // erase all text first, then rewrite
         tickLabels.text("");
         this._drawTicks(stepWidth, tickLabels);
         var xTranslate = this.orientation() === "right" ? this._tickSpaceRequired() : 0;
         var yTranslate = this.orientation() === "bottom" ? this._tickSpaceRequired() : 0;
-        Utils.DOM.translate(this._tickLabelContainer, xTranslate, yTranslate);
+        this._tickLabelContainer.attr("transform", "translate(" + xTranslate + "," + yTranslate + ")");
         // hide ticks and labels that overflow the axis
         this._showAllTickMarks();
         this._showAllTickLabels();
@@ -8310,7 +8641,7 @@ exports.Category = Category;
 
 
 /***/ }),
-/* 52 */
+/* 54 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8326,7 +8657,7 @@ var __extends = (this && this.__extends) || function (d, b) {
 };
 var d3 = __webpack_require__(1);
 var SVGTypewriter = __webpack_require__(4);
-var axis_1 = __webpack_require__(18);
+var axis_1 = __webpack_require__(19);
 var Formatters = __webpack_require__(8);
 var Utils = __webpack_require__(0);
 var Numeric = (function (_super) {
@@ -8393,12 +8724,7 @@ var Numeric = (function (_super) {
         var domain = scale.domain();
         var min = domain[0] <= domain[1] ? domain[0] : domain[1];
         var max = domain[0] >= domain[1] ? domain[0] : domain[1];
-        if (min === domain[0]) {
-            return scale.ticks().filter(function (i) { return i >= min && i <= max; });
-        }
-        else {
-            return scale.ticks().filter(function (i) { return i >= min && i <= max; }).reverse();
-        }
+        return scale.ticks().filter(function (i) { return i >= min && i <= max; });
     };
     Numeric.prototype._rescale = function () {
         if (!this._isSetup) {
@@ -8487,14 +8813,16 @@ var Numeric = (function (_super) {
                 break;
         }
         var tickLabelValues = this._getTickValues();
-        var tickLabels = this._tickLabelContainer
-            .selectAll("." + axis_1.Axis.TICK_LABEL_CLASS)
-            .data(tickLabelValues);
-        tickLabels.enter().append("text").classed(axis_1.Axis.TICK_LABEL_CLASS, true);
-        tickLabels.exit().remove();
+        var tickLabelsUpdate = this._tickLabelContainer.selectAll("." + axis_1.Axis.TICK_LABEL_CLASS).data(tickLabelValues);
+        tickLabelsUpdate.exit().remove();
+        var tickLabels = tickLabelsUpdate
+            .enter()
+            .append("text")
+            .classed(axis_1.Axis.TICK_LABEL_CLASS, true)
+            .merge(tickLabelsUpdate);
         tickLabels.style("text-anchor", tickLabelTextAnchor)
             .style("visibility", "inherit")
-            .attr(tickLabelAttrHash)
+            .attrs(tickLabelAttrHash)
             .text(function (s) { return _this.formatter()(s); });
         var labelGroupTransform = "translate(" + labelGroupTransformX + ", " + labelGroupTransformY + ")";
         this._tickLabelContainer.attr("transform", labelGroupTransform);
@@ -8504,10 +8832,7 @@ var Numeric = (function (_super) {
         }
         this._hideOverflowingTickLabels();
         this._hideOverlappingTickLabels();
-        if (this._tickLabelPositioning === "bottom" ||
-            this._tickLabelPositioning === "top" ||
-            this._tickLabelPositioning === "left" ||
-            this._tickLabelPositioning === "right") {
+        if (this._tickLabelPositioning !== "center") {
             this._hideTickMarksWithoutLabel();
         }
         return this;
@@ -8545,14 +8870,14 @@ var Numeric = (function (_super) {
     Numeric.prototype._hideEndTickLabels = function () {
         var boundingBox = this._boundingBox.node().getBoundingClientRect();
         var tickLabels = this._tickLabelContainer.selectAll("." + axis_1.Axis.TICK_LABEL_CLASS);
-        if (tickLabels[0].length === 0) {
+        if (tickLabels.size() === 0) {
             return;
         }
-        var firstTickLabel = tickLabels[0][0];
+        var firstTickLabel = tickLabels.nodes()[0];
         if (!Utils.DOM.clientRectInside(firstTickLabel.getBoundingClientRect(), boundingBox)) {
             d3.select(firstTickLabel).style("visibility", "hidden");
         }
-        var lastTickLabel = tickLabels[0][tickLabels[0].length - 1];
+        var lastTickLabel = tickLabels.nodes()[tickLabels.size() - 1];
         if (!Utils.DOM.clientRectInside(lastTickLabel.getBoundingClientRect(), boundingBox)) {
             d3.select(lastTickLabel).style("visibility", "hidden");
         }
@@ -8564,7 +8889,7 @@ var Numeric = (function (_super) {
             var visibility = d3.select(this).style("visibility");
             return (visibility === "inherit") || (visibility === "visible");
         });
-        var visibleTickLabelRects = visibleTickLabels[0].map(function (label) { return label.getBoundingClientRect(); });
+        var visibleTickLabelRects = visibleTickLabels.nodes().map(function (label) { return label.getBoundingClientRect(); });
         var interval = 1;
         while (!this._hasOverlapWithInterval(interval, visibleTickLabelRects) && interval < visibleTickLabelRects.length) {
             interval += 1;
@@ -8583,29 +8908,19 @@ var Numeric = (function (_super) {
      *
      * For top, bottom, left, right positioning of the thicks, we want the padding
      * between the labels to be 3x, such that the label will be  `padding` distance
-     * from the tick and 2 * `padding` distance (or more) from the next tick
-     *
+     * from the tick and 2 * `padding` distance (or more) from the next tick:
+     * see https://github.com/palantir/plottable/pull/1812
      */
     Numeric.prototype._hasOverlapWithInterval = function (interval, rects) {
-        var padding = this.tickLabelPadding();
-        if (this._tickLabelPositioning === "bottom" ||
-            this._tickLabelPositioning === "top" ||
-            this._tickLabelPositioning === "left" ||
-            this._tickLabelPositioning === "right") {
-            padding *= 3;
-        }
-        for (var i = 0; i < rects.length - (interval); i += interval) {
-            var currRect = rects[i];
-            var nextRect = rects[i + interval];
-            if (this.isHorizontal()) {
-                if (currRect.right + padding >= nextRect.left) {
-                    return false;
-                }
-            }
-            else {
-                if (currRect.top - padding <= nextRect.bottom) {
-                    return false;
-                }
+        var padding = (this._tickLabelPositioning === "center")
+            ? this.tickLabelPadding()
+            : this.tickLabelPadding() * 3;
+        var rectsWithPadding = rects.map(function (rect) { return Utils.DOM.expandRect(rect, padding); });
+        for (var i = 0; i < rectsWithPadding.length - interval; i += interval) {
+            var currRect = rectsWithPadding[i];
+            var nextRect = rectsWithPadding[i + interval];
+            if (Utils.DOM.clientRectsOverlap(currRect, nextRect)) {
+                return false;
             }
         }
         return true;
@@ -8620,7 +8935,7 @@ exports.Numeric = Numeric;
 
 
 /***/ }),
-/* 53 */
+/* 55 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8634,8 +8949,8 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var guideLineLayer_1 = __webpack_require__(33);
-var Interactions = __webpack_require__(14);
+var guideLineLayer_1 = __webpack_require__(34);
+var Interactions = __webpack_require__(15);
 var Utils = __webpack_require__(0);
 var DragLineLayer = (function (_super) {
     __extends(DragLineLayer, _super);
@@ -8690,7 +9005,7 @@ var DragLineLayer = (function (_super) {
     }
     DragLineLayer.prototype._setup = function () {
         _super.prototype._setup.call(this);
-        this._detectionEdge = this.content().append("line").style({
+        this._detectionEdge = this.content().append("line").styles({
             "opacity": 0,
             "stroke": "pink",
             "pointer-events": "visibleStroke",
@@ -8698,7 +9013,7 @@ var DragLineLayer = (function (_super) {
     };
     DragLineLayer.prototype.renderImmediately = function () {
         _super.prototype.renderImmediately.call(this);
-        this._detectionEdge.attr({
+        this._detectionEdge.attrs({
             x1: this._isVertical() ? this.pixelPosition() : 0,
             y1: this._isVertical() ? 0 : this.pixelPosition(),
             x2: this._isVertical() ? this.pixelPosition() : this.width(),
@@ -8809,7 +9124,7 @@ exports.DragLineLayer = DragLineLayer;
 
 
 /***/ }),
-/* 54 */
+/* 56 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8888,14 +9203,14 @@ var Gridlines = (function (_super) {
         if (this._xScale) {
             var xTicks = this._xScale.ticks();
             var getScaledXValue = function (tickVal) { return _this._xScale.scale(tickVal); };
-            var xLines = this._xLinesContainer.selectAll("line").data(xTicks);
-            xLines.enter().append("line");
+            var xLinesUpdate = this._xLinesContainer.selectAll("line").data(xTicks);
+            var xLines = xLinesUpdate.enter().append("line").merge(xLinesUpdate);
             xLines.attr("x1", getScaledXValue)
                 .attr("y1", 0)
                 .attr("x2", getScaledXValue)
                 .attr("y2", this.height())
                 .classed("zeroline", function (t) { return t === 0; });
-            xLines.exit().remove();
+            xLinesUpdate.exit().remove();
         }
     };
     Gridlines.prototype._redrawYLines = function () {
@@ -8903,14 +9218,14 @@ var Gridlines = (function (_super) {
         if (this._yScale) {
             var yTicks = this._yScale.ticks();
             var getScaledYValue = function (tickVal) { return _this._yScale.scale(tickVal); };
-            var yLines = this._yLinesContainer.selectAll("line").data(yTicks);
-            yLines.enter().append("line");
+            var yLinesUpdate = this._yLinesContainer.selectAll("line").data(yTicks);
+            var yLines = yLinesUpdate.enter().append("line").merge(yLinesUpdate);
             yLines.attr("x1", 0)
                 .attr("y1", getScaledYValue)
                 .attr("x2", this.width())
                 .attr("y2", getScaledYValue)
                 .classed("zeroline", function (t) { return t === 0; });
-            yLines.exit().remove();
+            yLinesUpdate.exit().remove();
         }
     };
     return Gridlines;
@@ -8919,7 +9234,7 @@ exports.Gridlines = Gridlines;
 
 
 /***/ }),
-/* 55 */
+/* 57 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8934,7 +9249,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
 var SVGTypewriter = __webpack_require__(4);
-var Configs = __webpack_require__(19);
+var Configs = __webpack_require__(20);
 var Formatters = __webpack_require__(8);
 var Utils = __webpack_require__(0);
 var component_1 = __webpack_require__(5);
@@ -9149,12 +9464,14 @@ var InterpolatedColorLegend = (function (_super) {
         this._writer.write(text0, this.width(), this.height(), lowerWriteOptions);
         var lowerTranslateString = "translate(" + lowerLabelShift.x + ", " + lowerLabelShift.y + ")";
         this._lowerLabel.attr("transform", lowerTranslateString);
-        this._swatchBoundingBox.attr(boundingBoxAttr);
+        this._swatchBoundingBox.attrs(boundingBoxAttr);
         var ticks = this._generateTicks(numSwatches);
-        var swatches = this._swatchContainer.selectAll("rect.swatch").data(ticks);
-        var rects = swatches.enter().append("rect").classed("swatch", true);
-        swatches.exit().remove();
-        swatches.attr({
+        var swatchesUpdate = this._swatchContainer.selectAll("rect.swatch").data(ticks);
+        var rects = swatchesUpdate.enter().append("rect").classed("swatch", true);
+        ;
+        var swatches = swatchesUpdate.merge(rects);
+        swatchesUpdate.exit().remove();
+        swatches.attrs({
             "fill": function (d, i) { return _this._scale.scale(d); },
             "width": swatchWidth,
             "height": swatchHeight,
@@ -9178,7 +9495,7 @@ exports.InterpolatedColorLegend = InterpolatedColorLegend;
 
 
 /***/ }),
-/* 56 */
+/* 58 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -9344,7 +9661,7 @@ exports.AxisLabel = AxisLabel;
 
 
 /***/ }),
-/* 57 */
+/* 59 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -9360,9 +9677,9 @@ var __extends = (this && this.__extends) || function (d, b) {
 };
 var d3 = __webpack_require__(1);
 var SVGTypewriter = __webpack_require__(4);
-var Configs = __webpack_require__(19);
+var Configs = __webpack_require__(20);
 var Formatters = __webpack_require__(8);
-var SymbolFactories = __webpack_require__(25);
+var SymbolFactories = __webpack_require__(26);
 var Utils = __webpack_require__(0);
 var component_1 = __webpack_require__(5);
 /**
@@ -9717,18 +10034,21 @@ var Legend = (function (_super) {
                 var columnBounds = table.getColumnBounds(rowIndex, columnIndex);
                 var withinColumn = Utils.Math.within(p, columnBounds);
                 if (withinColumn) {
-                    var rowElement = _this.content().selectAll("." + Legend.LEGEND_ROW_CLASS)[0][rowIndex];
+                    var rowElement = _this.content().selectAll("." + Legend.LEGEND_ROW_CLASS).nodes()[rowIndex];
                     // HACKHACK The 2.x API chooses the symbol element as the "selection" to return, regardless of what
                     // was actually selected
                     var entryElement = d3.select(rowElement)
-                        .selectAll("." + Legend.LEGEND_ENTRY_CLASS)[0][Math.floor(columnIndex / 2)];
+                        .selectAll("." + Legend.LEGEND_ENTRY_CLASS).nodes()[Math.floor(columnIndex / 2)];
                     var symbolElement = d3.select(entryElement).select("." + Legend.LEGEND_SYMBOL_CLASS);
                     // HACKHACK The 2.x API returns the center {x, y} of the symbol as the position.
-                    var rowTranslate = d3.transform(d3.select(rowElement).attr("transform")).translate;
-                    var symbolTranslate = d3.transform(symbolElement.attr("transform")).translate;
+                    var rowTranslate = Utils.DOM.getTranslateValues(d3.select(rowElement));
+                    var symbolTranslate = Utils.DOM.getTranslateValues(symbolElement);
                     return [{
                             datum: column.data.name,
-                            position: { x: rowTranslate[0] + symbolTranslate[0], y: rowTranslate[1] + symbolTranslate[1] },
+                            position: {
+                                x: rowTranslate[0] + symbolTranslate[0],
+                                y: rowTranslate[1] + symbolTranslate[1]
+                            },
                             selection: d3.select(entryElement),
                             component: _this,
                         }];
@@ -9744,57 +10064,65 @@ var Legend = (function (_super) {
         var entryNames = this._colorScale.domain().slice().sort(function (a, b) { return _this._comparator(_this._formatter(a), _this._formatter(b)); });
         // clear content from previous renders
         this.content().selectAll("*").remove();
-        var rows = this.content().selectAll("g." + Legend.LEGEND_ROW_CLASS).data(table.rows);
-        rows.enter().append("g").classed(Legend.LEGEND_ROW_CLASS, true);
-        rows.exit().remove();
+        var rowsUpdate = this.content().selectAll("g." + Legend.LEGEND_ROW_CLASS).data(table.rows);
+        var rows = rowsUpdate
+            .enter()
+            .append("g")
+            .classed(Legend.LEGEND_ROW_CLASS, true)
+            .merge(rowsUpdate);
+        rowsUpdate.exit().remove();
         rows.attr("transform", function (row, rowIndex) {
             var rowBounds = table.getRowBounds(rowIndex);
             return "translate(" + rowBounds.topLeft.x + ", " + rowBounds.topLeft.y + ")";
         });
-        var entries = rows.selectAll("g." + Legend.LEGEND_ENTRY_CLASS).data(function (row) {
+        var self = this;
+        rows.each(function (row, rowIndex) {
             var symbolEntryPairs = [];
             for (var i = 0; i < row.columns.length; i += 2) {
                 symbolEntryPairs.push([row.columns[i], row.columns[i + 1]]);
             }
-            return symbolEntryPairs;
+            var entriesUpdate = d3.select(this).selectAll("g." + Legend.LEGEND_ENTRY_CLASS).data(symbolEntryPairs);
+            var entriesEnter = entriesUpdate
+                .enter()
+                .append("g")
+                .classed(Legend.LEGEND_ENTRY_CLASS, true)
+                .merge(entriesUpdate);
+            entriesEnter.append("path")
+                .attr("d", function (symbolEntryPair, columnIndex) {
+                var symbol = symbolEntryPair[0];
+                return self.symbol()(symbol.data.name, rowIndex)(symbol.height * 0.6);
+            })
+                .attr("transform", function (symbolEntryPair, i) {
+                var symbol = symbolEntryPair[0];
+                var columnIndex = table.rows[rowIndex].columns.indexOf(symbol);
+                var columnBounds = table.getColumnBounds(rowIndex, columnIndex);
+                return "translate(" + (columnBounds.topLeft.x + symbol.width / 2) + ", " + symbol.height / 2 + ")";
+            })
+                .attr("fill", function (symbolEntryPair) { return self._colorScale.scale(symbolEntryPair[0].data.name); })
+                .attr("opacity", function (symbolEntryPair, _columnIndex) {
+                return self.symbolOpacity()(symbolEntryPair[0].data.name, rowIndex);
+            })
+                .classed(Legend.LEGEND_SYMBOL_CLASS, true);
+            entriesEnter.append("g").classed("text-container", true)
+                .attr("transform", function (symbolEntryPair, i) {
+                var entry = symbolEntryPair[1];
+                var columnIndex = table.rows[rowIndex].columns.indexOf(entry);
+                var columnBounds = table.getColumnBounds(rowIndex, columnIndex);
+                return "translate(" + columnBounds.topLeft.x + ", 0)";
+            })
+                .each(function (symbolEntryPair, i, rowIndex) {
+                var textContainer = d3.select(this);
+                var column = symbolEntryPair[1];
+                var writeOptions = {
+                    selection: textContainer,
+                    xAlign: "left",
+                    yAlign: "top",
+                    textRotation: 0,
+                };
+                self._writer.write(self._formatter(column.data.name), column.width, self.height(), writeOptions);
+            });
+            entriesUpdate.exit().remove();
         });
-        var entriesEnter = entries.enter().append("g").classed(Legend.LEGEND_ENTRY_CLASS, true);
-        entriesEnter.append("path")
-            .attr("d", function (symbolEntryPair, columnIndex, rowIndex) {
-            var symbol = symbolEntryPair[0];
-            return _this.symbol()(symbol.data.name, rowIndex)(symbol.height * 0.6);
-        })
-            .attr("transform", function (symbolEntryPair, i, rowIndex) {
-            var symbol = symbolEntryPair[0];
-            var columnIndex = table.rows[rowIndex].columns.indexOf(symbol);
-            var columnBounds = table.getColumnBounds(rowIndex, columnIndex);
-            return "translate(" + (columnBounds.topLeft.x + symbol.width / 2) + ", " + symbol.height / 2 + ")";
-        })
-            .attr("fill", function (symbolEntryPair) { return _this._colorScale.scale(symbolEntryPair[0].data.name); })
-            .attr("opacity", function (symbolEntryPair, _columnIndex, rowIndex) {
-            return _this.symbolOpacity()(symbolEntryPair[0].data.name, rowIndex);
-        })
-            .classed(Legend.LEGEND_SYMBOL_CLASS, true);
-        var self = this;
-        entriesEnter.append("g").classed("text-container", true)
-            .attr("transform", function (symbolEntryPair, i, rowIndex) {
-            var entry = symbolEntryPair[1];
-            var columnIndex = table.rows[rowIndex].columns.indexOf(entry);
-            var columnBounds = table.getColumnBounds(rowIndex, columnIndex);
-            return "translate(" + columnBounds.topLeft.x + ", 0)";
-        })
-            .each(function (symbolEntryPair, i, rowIndex) {
-            var textContainer = d3.select(this);
-            var column = symbolEntryPair[1];
-            var writeOptions = {
-                selection: textContainer,
-                xAlign: "left",
-                yAlign: "top",
-                textRotation: 0,
-            };
-            self._writer.write(self._formatter(column.data.name), column.width, self.height(), writeOptions);
-        });
-        entries.exit().remove();
         return this;
     };
     Legend.prototype.symbol = function (symbol) {
@@ -9844,7 +10172,7 @@ exports.Legend = Legend;
 
 
 /***/ }),
-/* 58 */
+/* 60 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -9860,7 +10188,7 @@ var __extends = (this && this.__extends) || function (d, b) {
 };
 var plot_1 = __webpack_require__(2);
 var Utils = __webpack_require__(0);
-var group_1 = __webpack_require__(32);
+var group_1 = __webpack_require__(33);
 var PlotGroup = (function (_super) {
     __extends(PlotGroup, _super);
     function PlotGroup() {
@@ -9901,7 +10229,7 @@ exports.PlotGroup = PlotGroup;
 
 
 /***/ }),
-/* 59 */
+/* 61 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -9917,7 +10245,7 @@ var __extends = (this && this.__extends) || function (d, b) {
 };
 var d3 = __webpack_require__(1);
 var Utils = __webpack_require__(0);
-var componentContainer_1 = __webpack_require__(23);
+var componentContainer_1 = __webpack_require__(24);
 var Table = (function (_super) {
     __extends(Table, _super);
     /**
@@ -10300,7 +10628,7 @@ exports.Table = Table;
 
 
 /***/ }),
-/* 60 */
+/* 62 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -10314,7 +10642,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var dragBoxLayer_1 = __webpack_require__(26);
+var dragBoxLayer_1 = __webpack_require__(27);
 var XDragBoxLayer = (function (_super) {
     __extends(XDragBoxLayer, _super);
     /**
@@ -10366,7 +10694,7 @@ exports.XDragBoxLayer = XDragBoxLayer;
 
 
 /***/ }),
-/* 61 */
+/* 63 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -10380,7 +10708,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var dragBoxLayer_1 = __webpack_require__(26);
+var dragBoxLayer_1 = __webpack_require__(27);
 var YDragBoxLayer = (function (_super) {
     __extends(YDragBoxLayer, _super);
     /**
@@ -10432,7 +10760,7 @@ exports.YDragBoxLayer = YDragBoxLayer;
 
 
 /***/ }),
-/* 62 */
+/* 64 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -10446,7 +10774,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var dispatcher_1 = __webpack_require__(20);
+var dispatcher_1 = __webpack_require__(21);
 var Key = (function (_super) {
     __extends(Key, _super);
     /**
@@ -10528,7 +10856,7 @@ exports.Key = Key;
 
 
 /***/ }),
-/* 63 */
+/* 65 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -10543,7 +10871,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
 var Utils = __webpack_require__(0);
-var dispatcher_1 = __webpack_require__(20);
+var dispatcher_1 = __webpack_require__(21);
 var Mouse = (function (_super) {
     __extends(Mouse, _super);
     /**
@@ -10728,7 +11056,7 @@ exports.Mouse = Mouse;
 
 
 /***/ }),
-/* 64 */
+/* 66 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -10743,7 +11071,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
 var Utils = __webpack_require__(0);
-var dispatcher_1 = __webpack_require__(20);
+var dispatcher_1 = __webpack_require__(21);
 var Touch = (function (_super) {
     __extends(Touch, _super);
     /**
@@ -10904,7 +11232,7 @@ exports.Touch = Touch;
 
 
 /***/ }),
-/* 65 */
+/* 67 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -10936,7 +11264,7 @@ exports.Arc = Arc;
 
 
 /***/ }),
-/* 66 */
+/* 68 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -10968,7 +11296,7 @@ exports.ArcOutline = ArcOutline;
 
 
 /***/ }),
-/* 67 */
+/* 69 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -10996,7 +11324,7 @@ var Area = (function (_super) {
         selection.style("stroke", "none");
     };
     Area.prototype.selectionForIndex = function (index) {
-        return d3.select(this.selection()[0][0]);
+        return d3.select(this.selection().node());
     };
     return Area;
 }(drawer_1.Drawer));
@@ -11004,7 +11332,7 @@ exports.Area = Area;
 
 
 /***/ }),
-/* 68 */
+/* 70 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -11032,7 +11360,7 @@ var Line = (function (_super) {
         selection.style("fill", "none");
     };
     Line.prototype.selectionForIndex = function (index) {
-        return d3.select(this.selection()[0][0]);
+        return d3.select(this.selection().node());
     };
     return Line;
 }(drawer_1.Drawer));
@@ -11040,7 +11368,7 @@ exports.Line = Line;
 
 
 /***/ }),
-/* 69 */
+/* 71 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -11067,7 +11395,7 @@ exports.Rectangle = Rectangle;
 
 
 /***/ }),
-/* 70 */
+/* 72 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -11094,7 +11422,7 @@ exports.Segment = Segment;
 
 
 /***/ }),
-/* 71 */
+/* 73 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -11122,7 +11450,7 @@ exports.Symbol = Symbol;
 
 
 /***/ }),
-/* 72 */
+/* 74 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -11136,9 +11464,9 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var Dispatchers = __webpack_require__(11);
+var Dispatchers = __webpack_require__(13);
 var Utils = __webpack_require__(0);
-var interaction_1 = __webpack_require__(12);
+var interaction_1 = __webpack_require__(14);
 var Click = (function (_super) {
     __extends(Click, _super);
     function Click() {
@@ -11211,7 +11539,7 @@ exports.Click = Click;
 
 
 /***/ }),
-/* 73 */
+/* 75 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -11225,9 +11553,9 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var Dispatchers = __webpack_require__(11);
+var Dispatchers = __webpack_require__(13);
 var Utils = __webpack_require__(0);
-var interaction_1 = __webpack_require__(12);
+var interaction_1 = __webpack_require__(14);
 var ClickState;
 (function (ClickState) {
     ClickState[ClickState["NotClicked"] = 0] = "NotClicked";
@@ -11330,7 +11658,7 @@ exports.DoubleClick = DoubleClick;
 
 
 /***/ }),
-/* 74 */
+/* 76 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -11344,9 +11672,9 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var Dispatchers = __webpack_require__(11);
+var Dispatchers = __webpack_require__(13);
 var Utils = __webpack_require__(0);
-var interaction_1 = __webpack_require__(12);
+var interaction_1 = __webpack_require__(14);
 var Drag = (function (_super) {
     __extends(Drag, _super);
     function Drag() {
@@ -11495,7 +11823,7 @@ exports.Drag = Drag;
 
 
 /***/ }),
-/* 75 */
+/* 77 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -11510,11 +11838,11 @@ var __extends = (this && this.__extends) || function (d, b) {
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
 var d3 = __webpack_require__(1);
-var Dispatchers = __webpack_require__(11);
+var Dispatchers = __webpack_require__(13);
 var Scales = __webpack_require__(3);
 var Utils = __webpack_require__(0);
-var interaction_1 = __webpack_require__(12);
-var Interactions = __webpack_require__(14);
+var interaction_1 = __webpack_require__(14);
+var Interactions = __webpack_require__(15);
 /**
  * Performs a zoom transformation of the `value` argument scaled by the
  * `zoom` argument about the point defined by the `center` argument.
@@ -12053,7 +12381,7 @@ exports.PanZoom = PanZoom;
 
 
 /***/ }),
-/* 76 */
+/* 78 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -12067,9 +12395,9 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var Dispatchers = __webpack_require__(11);
+var Dispatchers = __webpack_require__(13);
 var Utils = __webpack_require__(0);
-var interaction_1 = __webpack_require__(12);
+var interaction_1 = __webpack_require__(14);
 var Pointer = (function (_super) {
     __extends(Pointer, _super);
     function Pointer() {
@@ -12184,7 +12512,7 @@ exports.Pointer = Pointer;
 
 
 /***/ }),
-/* 77 */
+/* 79 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -12200,7 +12528,7 @@ var __extends = (this && this.__extends) || function (d, b) {
 };
 var Scales = __webpack_require__(3);
 var Utils = __webpack_require__(0);
-var barPlot_1 = __webpack_require__(21);
+var barPlot_1 = __webpack_require__(22);
 var plot_1 = __webpack_require__(2);
 var ClusteredBar = (function (_super) {
     __extends(ClusteredBar, _super);
@@ -12257,7 +12585,7 @@ exports.ClusteredBar = ClusteredBar;
 
 
 /***/ }),
-/* 78 */
+/* 80 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -12353,7 +12681,7 @@ var Pie = (function (_super) {
     Pie.prototype.selections = function (datasets) {
         var _this = this;
         if (datasets === void 0) { datasets = this.datasets(); }
-        var allSelections = _super.prototype.selections.call(this, datasets)[0];
+        var allSelections = _super.prototype.selections.call(this, datasets).nodes();
         datasets.forEach(function (dataset) {
             var drawer = _this._strokeDrawers.get(dataset);
             if (drawer == null) {
@@ -12377,13 +12705,14 @@ var Pie = (function (_super) {
         var _this = this;
         if (datasets === void 0) { datasets = this.datasets(); }
         var entities = _super.prototype.entities.call(this, datasets);
-        entities.forEach(function (entity) {
+        return entities.map(function (entity) {
             entity.position.x += _this.width() / 2;
             entity.position.y += _this.height() / 2;
             var stroke = _this._strokeDrawers.get(entity.dataset).selectionForIndex(entity.index);
-            entity.selection[0].push(stroke[0][0]);
+            var piePlotEntity = entity;
+            piePlotEntity.strokeSelection = stroke;
+            return piePlotEntity;
         });
-        return entities;
     };
     Pie.prototype.sectorValue = function (sectorValue, scale) {
         if (sectorValue == null) {
@@ -12470,7 +12799,7 @@ var Pie = (function (_super) {
         var innerRadiusAccessor = plot_1.Plot._scaledAccessor(this.innerRadius());
         var outerRadiusAccessor = plot_1.Plot._scaledAccessor(this.outerRadius());
         attrToProjector["d"] = function (datum, index, ds) {
-            return d3.svg.arc().innerRadius(innerRadiusAccessor(datum, index, ds))
+            return d3.arc().innerRadius(innerRadiusAccessor(datum, index, ds))
                 .outerRadius(outerRadiusAccessor(datum, index, ds))
                 .startAngle(_this._startAngles[index])
                 .endAngle(_this._endAngles[index])(datum, index);
@@ -12487,7 +12816,7 @@ var Pie = (function (_super) {
         var sectorValueAccessor = plot_1.Plot._scaledAccessor(this.sectorValue());
         var dataset = this.datasets()[0];
         var data = this._getDataToDraw().get(dataset);
-        var pie = d3.layout.pie().sort(null).startAngle(this._startAngle).endAngle(this._endAngle)
+        var pie = d3.pie().sort(null).startAngle(this._startAngle).endAngle(this._endAngle)
             .value(function (d, i) { return sectorValueAccessor(d, i, dataset); })(data);
         this._startAngles = pie.map(function (slice) { return slice.startAngle; });
         this._endAngles = pie.map(function (slice) { return slice.endAngle; });
@@ -12641,7 +12970,7 @@ var Pie = (function (_super) {
         var innerRadius = plot_1.Plot._scaledAccessor(this.innerRadius())(datum, index, dataset);
         var outerRadius = plot_1.Plot._scaledAccessor(this.outerRadius())(datum, index, dataset);
         var avgRadius = (innerRadius + outerRadius) / 2;
-        var pie = d3.layout.pie()
+        var pie = d3.pie()
             .sort(null)
             .value(function (d, i) {
             var value = scaledValueAccessor(d, i, dataset);
@@ -12753,7 +13082,7 @@ exports.Pie = Pie;
 
 
 /***/ }),
-/* 79 */
+/* 81 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -12774,7 +13103,7 @@ var Drawers = __webpack_require__(9);
 var Scales = __webpack_require__(3);
 var Utils = __webpack_require__(0);
 var plot_1 = __webpack_require__(2);
-var xyPlot_1 = __webpack_require__(15);
+var xyPlot_1 = __webpack_require__(16);
 var Rectangle = (function (_super) {
     __extends(Rectangle, _super);
     /**
@@ -13119,7 +13448,7 @@ exports.Rectangle = Rectangle;
 
 
 /***/ }),
-/* 80 */
+/* 82 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -13134,13 +13463,13 @@ var __extends = (this && this.__extends) || function (d, b) {
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
 var Animators = __webpack_require__(6);
-var SymbolFactories = __webpack_require__(25);
+var SymbolFactories = __webpack_require__(26);
 var Drawers = __webpack_require__(9);
 var Scales = __webpack_require__(3);
 var Utils = __webpack_require__(0);
-var Plots = __webpack_require__(16);
+var Plots = __webpack_require__(17);
 var plot_1 = __webpack_require__(2);
-var xyPlot_1 = __webpack_require__(15);
+var xyPlot_1 = __webpack_require__(16);
 var Scatter = (function (_super) {
     __extends(Scatter, _super);
     /**
@@ -13297,7 +13626,7 @@ exports.Scatter = Scatter;
 
 
 /***/ }),
-/* 81 */
+/* 83 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -13315,7 +13644,7 @@ var Animators = __webpack_require__(6);
 var Drawers = __webpack_require__(9);
 var Scales = __webpack_require__(3);
 var plot_1 = __webpack_require__(2);
-var xyPlot_1 = __webpack_require__(15);
+var xyPlot_1 = __webpack_require__(16);
 var Segment = (function (_super) {
     __extends(Segment, _super);
     /**
@@ -13495,7 +13824,7 @@ exports.Segment = Segment;
 
 
 /***/ }),
-/* 82 */
+/* 84 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -13512,7 +13841,7 @@ var __extends = (this && this.__extends) || function (d, b) {
 var d3 = __webpack_require__(1);
 var Animators = __webpack_require__(6);
 var Utils = __webpack_require__(0);
-var areaPlot_1 = __webpack_require__(35);
+var areaPlot_1 = __webpack_require__(36);
 var plot_1 = __webpack_require__(2);
 var StackedArea = (function (_super) {
     __extends(StackedArea, _super);
@@ -13698,7 +14027,7 @@ exports.StackedArea = StackedArea;
 
 
 /***/ }),
-/* 83 */
+/* 85 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -13714,7 +14043,7 @@ var __extends = (this && this.__extends) || function (d, b) {
 };
 var SVGTypewriter = __webpack_require__(4);
 var Utils = __webpack_require__(0);
-var barPlot_1 = __webpack_require__(21);
+var barPlot_1 = __webpack_require__(22);
 var StackedBar = (function (_super) {
     __extends(StackedBar, _super);
     /**
@@ -13917,7 +14246,7 @@ exports.StackedBar = StackedBar;
 
 
 /***/ }),
-/* 84 */
+/* 86 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -13932,7 +14261,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
 var Utils = __webpack_require__(0);
-var barPlot_1 = __webpack_require__(21);
+var barPlot_1 = __webpack_require__(22);
 var plot_1 = __webpack_require__(2);
 var Waterfall = (function (_super) {
     __extends(Waterfall, _super);
@@ -14128,7 +14457,7 @@ exports.Waterfall = Waterfall;
 
 
 /***/ }),
-/* 85 */
+/* 87 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -14144,7 +14473,7 @@ var __extends = (this && this.__extends) || function (d, b) {
 };
 var d3 = __webpack_require__(1);
 var Utils = __webpack_require__(0);
-var scale_1 = __webpack_require__(17);
+var scale_1 = __webpack_require__(18);
 var Color = (function (_super) {
     __extends(Color, _super);
     /**
@@ -14164,27 +14493,27 @@ var Color = (function (_super) {
                 if (Color._plottableColorCache == null) {
                     Color._plottableColorCache = Color._getPlottableColors();
                 }
-                scale = d3.scale.ordinal().range(Color._plottableColorCache);
+                scale = d3.scaleOrdinal().range(Color._plottableColorCache);
                 break;
             case "Category10":
             case "category10":
             case "10":
-                scale = d3.scale.category10();
+                scale = d3.scaleOrdinal(d3.schemeCategory10);
                 break;
             case "Category20":
             case "category20":
             case "20":
-                scale = d3.scale.category20();
+                scale = d3.scaleOrdinal(d3.schemeCategory20);
                 break;
             case "Category20b":
             case "category20b":
             case "20b":
-                scale = d3.scale.category20b();
+                scale = d3.scaleOrdinal(d3.schemeCategory20b);
                 break;
             case "Category20c":
             case "category20c":
             case "20c":
-                scale = d3.scale.category20c();
+                scale = d3.scaleOrdinal(d3.schemeCategory20c);
                 break;
             default:
                 throw new Error("Unsupported ColorScale type");
@@ -14259,7 +14588,7 @@ exports.Color = Color;
 
 
 /***/ }),
-/* 86 */
+/* 88 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -14275,7 +14604,7 @@ var __extends = (this && this.__extends) || function (d, b) {
 };
 var d3 = __webpack_require__(1);
 var Utils = __webpack_require__(0);
-var scale_1 = __webpack_require__(17);
+var scale_1 = __webpack_require__(18);
 var InterpolatedColor = (function (_super) {
     __extends(InterpolatedColor, _super);
     /**
@@ -14288,16 +14617,16 @@ var InterpolatedColor = (function (_super) {
         _super.call(this);
         switch (scaleType) {
             case "linear":
-                this._colorScale = d3.scale.linear();
+                this._colorScale = d3.scaleLinear();
                 break;
             case "log":
-                this._colorScale = d3.scale.log();
+                this._colorScale = d3.scaleLog();
                 break;
             case "sqrt":
-                this._colorScale = d3.scale.sqrt();
+                this._colorScale = d3.scaleSqrt();
                 break;
             case "pow":
-                this._colorScale = d3.scale.pow();
+                this._colorScale = d3.scalePow();
                 break;
         }
         if (this._colorScale == null) {
@@ -14425,7 +14754,7 @@ exports.InterpolatedColor = InterpolatedColor;
 
 
 /***/ }),
-/* 87 */
+/* 89 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -14448,7 +14777,7 @@ var Linear = (function (_super) {
      */
     function Linear() {
         _super.call(this);
-        this._d3Scale = d3.scale.linear();
+        this._d3Scale = d3.scaleLinear();
     }
     Linear.prototype._defaultExtent = function () {
         return [0, 1];
@@ -14504,7 +14833,7 @@ exports.Linear = Linear;
 
 
 /***/ }),
-/* 88 */
+/* 90 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -14555,7 +14884,7 @@ var ModifiedLog = (function (_super) {
     function ModifiedLog(base) {
         if (base === void 0) { base = 10; }
         _super.call(this);
-        this._d3Scale = d3.scale.linear();
+        this._d3Scale = d3.scaleLinear();
         this._base = base;
         this._pivot = this._base;
         this._setDomain(this._defaultExtent());
@@ -14638,11 +14967,11 @@ var ModifiedLog = (function (_super) {
         var positiveLogTicks = this._logTicks(positiveLower, positiveUpper);
         var linearMin = Math.max(min, -this._pivot);
         var linearMax = Math.min(max, this._pivot);
-        var linearTicks = d3.scale.linear().domain([linearMin, linearMax]).ticks(this._howManyTicks(linearMin, linearMax));
+        var linearTicks = d3.scaleLinear().domain([linearMin, linearMax]).ticks(this._howManyTicks(linearMin, linearMax));
         var ticks = negativeLogTicks.concat(linearTicks).concat(positiveLogTicks);
         // If you only have 1 tick, you can't tell how big the scale is.
         if (ticks.length <= 1) {
-            ticks = d3.scale.linear().domain([min, max]).ticks(Scales.ModifiedLog._DEFAULT_NUM_TICKS);
+            ticks = d3.scaleLinear().domain([min, max]).ticks(Scales.ModifiedLog._DEFAULT_NUM_TICKS);
         }
         return ticks;
     };
@@ -14728,7 +15057,7 @@ exports.ModifiedLog = ModifiedLog;
 
 
 /***/ }),
-/* 89 */
+/* 91 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -14778,7 +15107,7 @@ exports.integerTickGenerator = integerTickGenerator;
 
 
 /***/ }),
-/* 90 */
+/* 92 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -14793,7 +15122,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
 var d3 = __webpack_require__(1);
-var timeAxis_1 = __webpack_require__(22);
+var timeAxis_1 = __webpack_require__(23);
 var quantitativeScale_1 = __webpack_require__(10);
 var Time = (function (_super) {
     __extends(Time, _super);
@@ -14804,7 +15133,7 @@ var Time = (function (_super) {
      */
     function Time() {
         _super.call(this);
-        this._d3Scale = d3.time.scale();
+        this._d3Scale = d3.scaleTime();
         this.autoDomain();
     }
     /**
@@ -14815,12 +15144,13 @@ var Time = (function (_super) {
      * @return {Date[]}
      */
     Time.prototype.tickInterval = function (interval, step) {
+        if (step === void 0) { step = 1; }
         // temporarily creats a time scale from our linear scale into a time scale so we can get access to its api
-        var tempScale = d3.time.scale();
-        var d3Interval = Time.timeIntervalToD3Time(interval);
+        var tempScale = d3.scaleTime();
+        var d3Interval = Time.timeIntervalToD3Time(interval).every(step);
         tempScale.domain(this.domain());
         tempScale.range(this.range());
-        return tempScale.ticks(d3Interval, step);
+        return tempScale.ticks(d3Interval);
     };
     Time.prototype._setDomain = function (values) {
         if (values[1] < values[0]) {
@@ -14885,24 +15215,24 @@ var Time = (function (_super) {
     };
     /**
      * Transforms the Plottable TimeInterval string into a d3 time interval equivalent.
-     * If the provided TimeInterval is incorrect, the default is d3.time.year
+     * If the provided TimeInterval is incorrect, the default is d3.timeYear
      */
     Time.timeIntervalToD3Time = function (timeInterval) {
         switch (timeInterval) {
             case timeAxis_1.TimeInterval.second:
-                return d3.time.second;
+                return d3.timeSecond;
             case timeAxis_1.TimeInterval.minute:
-                return d3.time.minute;
+                return d3.timeMinute;
             case timeAxis_1.TimeInterval.hour:
-                return d3.time.hour;
+                return d3.timeHour;
             case timeAxis_1.TimeInterval.day:
-                return d3.time.day;
+                return d3.timeDay;
             case timeAxis_1.TimeInterval.week:
-                return d3.time.week;
+                return d3.timeWeek;
             case timeAxis_1.TimeInterval.month:
-                return d3.time.month;
+                return d3.timeMonth;
             case timeAxis_1.TimeInterval.year:
-                return d3.time.year;
+                return d3.timeYear;
             default:
                 throw Error("TimeInterval specified does not exist: " + timeInterval);
         }
@@ -14913,7 +15243,7 @@ exports.Time = Time;
 
 
 /***/ }),
-/* 91 */
+/* 93 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -14983,7 +15313,7 @@ exports.createFilledArray = createFilledArray;
 
 
 /***/ }),
-/* 92 */
+/* 94 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -14997,7 +15327,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var set_1 = __webpack_require__(40);
+var set_1 = __webpack_require__(41);
 /**
  * A set of callbacks which can be all invoked at once.
  * Each callback exists at most once in the set (based on reference equality).
@@ -15025,7 +15355,7 @@ exports.CallbackSet = CallbackSet;
 
 
 /***/ }),
-/* 93 */
+/* 95 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -15034,13 +15364,14 @@ exports.CallbackSet = CallbackSet;
  * @license MIT
  */
 
-var DOM = __webpack_require__(39);
+var DOM = __webpack_require__(40);
 var ClientToSVGTranslator = (function () {
     function ClientToSVGTranslator(svg) {
         this._svg = svg;
         this._measureRect = document.createElementNS(svg.namespaceURI, "rect");
         this._measureRect.setAttribute("class", "measure-rect");
         this._measureRect.setAttribute("style", "opacity: 0; visibility: hidden;");
+        this._measureRect.setAttribute("stroke-width", "0");
         this._measureRect.setAttribute("width", "1");
         this._measureRect.setAttribute("height", "1");
         this._svg.appendChild(this._measureRect);
@@ -15103,7 +15434,7 @@ exports.ClientToSVGTranslator = ClientToSVGTranslator;
 
 
 /***/ }),
-/* 94 */
+/* 96 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -15132,8 +15463,8 @@ exports.contrast = contrast;
  * Channel values are capped at the maximum value of 255, and the minimum value of 30.
  */
 function lightenColor(color, factor) {
-    var hsl = d3.hsl(color).brighter(factor);
-    return hsl.rgb().toString();
+    var brightened = d3.color(color).brighter(factor);
+    return brightened.rgb().toString();
 }
 exports.lightenColor = lightenColor;
 /**
@@ -15186,7 +15517,7 @@ function luminance(color) {
 
 
 /***/ }),
-/* 95 */
+/* 97 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -15195,7 +15526,7 @@ function luminance(color) {
  * @license MIT
  */
 
-var Math = __webpack_require__(27);
+var Math = __webpack_require__(28);
 /**
  * Array-backed implementation of {EntityStore}
  */
@@ -15240,7 +15571,7 @@ exports.EntityArray = EntityArray;
 
 
 /***/ }),
-/* 96 */
+/* 98 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -15249,7 +15580,7 @@ exports.EntityArray = EntityArray;
  * @license MIT
  */
 
-var Math = __webpack_require__(27);
+var Math = __webpack_require__(28);
 /**
  * Shim for ES6 map.
  * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map
@@ -15331,7 +15662,7 @@ exports.Map = Map;
 
 
 /***/ }),
-/* 97 */
+/* 99 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -15456,7 +15787,7 @@ exports.normalizeKey = normalizeKey;
 
 
 /***/ }),
-/* 98 */
+/* 100 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -15465,7 +15796,7 @@ exports.normalizeKey = normalizeKey;
  * @license MIT
  */
 
-var Configs = __webpack_require__(19);
+var Configs = __webpack_require__(20);
 /**
  * Print a warning message to the console, if it is available.
  *
@@ -15528,7 +15859,380 @@ exports.deprecated = deprecated;
 
 
 /***/ }),
-/* 99 */
+/* 101 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__src_linear__ = __webpack_require__(108);
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "easeLinear", function() { return __WEBPACK_IMPORTED_MODULE_0__src_linear__["a"]; });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__src_quad__ = __webpack_require__(110);
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "easeQuad", function() { return __WEBPACK_IMPORTED_MODULE_1__src_quad__["a"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "easeQuadIn", function() { return __WEBPACK_IMPORTED_MODULE_1__src_quad__["b"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "easeQuadOut", function() { return __WEBPACK_IMPORTED_MODULE_1__src_quad__["c"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "easeQuadInOut", function() { return __WEBPACK_IMPORTED_MODULE_1__src_quad__["a"]; });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__src_cubic__ = __webpack_require__(105);
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "easeCubic", function() { return __WEBPACK_IMPORTED_MODULE_2__src_cubic__["a"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "easeCubicIn", function() { return __WEBPACK_IMPORTED_MODULE_2__src_cubic__["b"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "easeCubicOut", function() { return __WEBPACK_IMPORTED_MODULE_2__src_cubic__["c"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "easeCubicInOut", function() { return __WEBPACK_IMPORTED_MODULE_2__src_cubic__["a"]; });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__src_poly__ = __webpack_require__(109);
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "easePoly", function() { return __WEBPACK_IMPORTED_MODULE_3__src_poly__["a"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "easePolyIn", function() { return __WEBPACK_IMPORTED_MODULE_3__src_poly__["b"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "easePolyOut", function() { return __WEBPACK_IMPORTED_MODULE_3__src_poly__["c"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "easePolyInOut", function() { return __WEBPACK_IMPORTED_MODULE_3__src_poly__["a"]; });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__src_sin__ = __webpack_require__(111);
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "easeSin", function() { return __WEBPACK_IMPORTED_MODULE_4__src_sin__["a"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "easeSinIn", function() { return __WEBPACK_IMPORTED_MODULE_4__src_sin__["b"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "easeSinOut", function() { return __WEBPACK_IMPORTED_MODULE_4__src_sin__["c"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "easeSinInOut", function() { return __WEBPACK_IMPORTED_MODULE_4__src_sin__["a"]; });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__src_exp__ = __webpack_require__(107);
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "easeExp", function() { return __WEBPACK_IMPORTED_MODULE_5__src_exp__["a"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "easeExpIn", function() { return __WEBPACK_IMPORTED_MODULE_5__src_exp__["b"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "easeExpOut", function() { return __WEBPACK_IMPORTED_MODULE_5__src_exp__["c"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "easeExpInOut", function() { return __WEBPACK_IMPORTED_MODULE_5__src_exp__["a"]; });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__src_circle__ = __webpack_require__(104);
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "easeCircle", function() { return __WEBPACK_IMPORTED_MODULE_6__src_circle__["a"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "easeCircleIn", function() { return __WEBPACK_IMPORTED_MODULE_6__src_circle__["b"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "easeCircleOut", function() { return __WEBPACK_IMPORTED_MODULE_6__src_circle__["c"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "easeCircleInOut", function() { return __WEBPACK_IMPORTED_MODULE_6__src_circle__["a"]; });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__src_bounce__ = __webpack_require__(103);
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "easeBounce", function() { return __WEBPACK_IMPORTED_MODULE_7__src_bounce__["a"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "easeBounceIn", function() { return __WEBPACK_IMPORTED_MODULE_7__src_bounce__["b"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "easeBounceOut", function() { return __WEBPACK_IMPORTED_MODULE_7__src_bounce__["a"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "easeBounceInOut", function() { return __WEBPACK_IMPORTED_MODULE_7__src_bounce__["c"]; });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__src_back__ = __webpack_require__(102);
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "easeBack", function() { return __WEBPACK_IMPORTED_MODULE_8__src_back__["a"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "easeBackIn", function() { return __WEBPACK_IMPORTED_MODULE_8__src_back__["b"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "easeBackOut", function() { return __WEBPACK_IMPORTED_MODULE_8__src_back__["c"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "easeBackInOut", function() { return __WEBPACK_IMPORTED_MODULE_8__src_back__["a"]; });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__src_elastic__ = __webpack_require__(106);
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "easeElastic", function() { return __WEBPACK_IMPORTED_MODULE_9__src_elastic__["a"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "easeElasticIn", function() { return __WEBPACK_IMPORTED_MODULE_9__src_elastic__["b"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "easeElasticOut", function() { return __WEBPACK_IMPORTED_MODULE_9__src_elastic__["a"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "easeElasticInOut", function() { return __WEBPACK_IMPORTED_MODULE_9__src_elastic__["c"]; });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/***/ }),
+/* 102 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return backIn; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "c", function() { return backOut; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return backInOut; });
+var overshoot = 1.70158;
+
+var backIn = (function custom(s) {
+  s = +s;
+
+  function backIn(t) {
+    return t * t * ((s + 1) * t - s);
+  }
+
+  backIn.overshoot = custom;
+
+  return backIn;
+})(overshoot);
+
+var backOut = (function custom(s) {
+  s = +s;
+
+  function backOut(t) {
+    return --t * t * ((s + 1) * t + s) + 1;
+  }
+
+  backOut.overshoot = custom;
+
+  return backOut;
+})(overshoot);
+
+var backInOut = (function custom(s) {
+  s = +s;
+
+  function backInOut(t) {
+    return ((t *= 2) < 1 ? t * t * ((s + 1) * t - s) : (t -= 2) * t * ((s + 1) * t + s) + 2) / 2;
+  }
+
+  backInOut.overshoot = custom;
+
+  return backInOut;
+})(overshoot);
+
+
+/***/ }),
+/* 103 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (immutable) */ __webpack_exports__["b"] = bounceIn;
+/* harmony export (immutable) */ __webpack_exports__["a"] = bounceOut;
+/* harmony export (immutable) */ __webpack_exports__["c"] = bounceInOut;
+var b1 = 4 / 11,
+    b2 = 6 / 11,
+    b3 = 8 / 11,
+    b4 = 3 / 4,
+    b5 = 9 / 11,
+    b6 = 10 / 11,
+    b7 = 15 / 16,
+    b8 = 21 / 22,
+    b9 = 63 / 64,
+    b0 = 1 / b1 / b1;
+
+function bounceIn(t) {
+  return 1 - bounceOut(1 - t);
+}
+
+function bounceOut(t) {
+  return (t = +t) < b1 ? b0 * t * t : t < b3 ? b0 * (t -= b2) * t + b4 : t < b6 ? b0 * (t -= b5) * t + b7 : b0 * (t -= b8) * t + b9;
+}
+
+function bounceInOut(t) {
+  return ((t *= 2) <= 1 ? 1 - bounceOut(1 - t) : bounceOut(t - 1) + 1) / 2;
+}
+
+
+/***/ }),
+/* 104 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (immutable) */ __webpack_exports__["b"] = circleIn;
+/* harmony export (immutable) */ __webpack_exports__["c"] = circleOut;
+/* harmony export (immutable) */ __webpack_exports__["a"] = circleInOut;
+function circleIn(t) {
+  return 1 - Math.sqrt(1 - t * t);
+}
+
+function circleOut(t) {
+  return Math.sqrt(1 - --t * t);
+}
+
+function circleInOut(t) {
+  return ((t *= 2) <= 1 ? 1 - Math.sqrt(1 - t * t) : Math.sqrt(1 - (t -= 2) * t) + 1) / 2;
+}
+
+
+/***/ }),
+/* 105 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (immutable) */ __webpack_exports__["b"] = cubicIn;
+/* harmony export (immutable) */ __webpack_exports__["c"] = cubicOut;
+/* harmony export (immutable) */ __webpack_exports__["a"] = cubicInOut;
+function cubicIn(t) {
+  return t * t * t;
+}
+
+function cubicOut(t) {
+  return --t * t * t + 1;
+}
+
+function cubicInOut(t) {
+  return ((t *= 2) <= 1 ? t * t * t : (t -= 2) * t * t + 2) / 2;
+}
+
+
+/***/ }),
+/* 106 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return elasticIn; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return elasticOut; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "c", function() { return elasticInOut; });
+var tau = 2 * Math.PI,
+    amplitude = 1,
+    period = 0.3;
+
+var elasticIn = (function custom(a, p) {
+  var s = Math.asin(1 / (a = Math.max(1, a))) * (p /= tau);
+
+  function elasticIn(t) {
+    return a * Math.pow(2, 10 * --t) * Math.sin((s - t) / p);
+  }
+
+  elasticIn.amplitude = function(a) { return custom(a, p * tau); };
+  elasticIn.period = function(p) { return custom(a, p); };
+
+  return elasticIn;
+})(amplitude, period);
+
+var elasticOut = (function custom(a, p) {
+  var s = Math.asin(1 / (a = Math.max(1, a))) * (p /= tau);
+
+  function elasticOut(t) {
+    return 1 - a * Math.pow(2, -10 * (t = +t)) * Math.sin((t + s) / p);
+  }
+
+  elasticOut.amplitude = function(a) { return custom(a, p * tau); };
+  elasticOut.period = function(p) { return custom(a, p); };
+
+  return elasticOut;
+})(amplitude, period);
+
+var elasticInOut = (function custom(a, p) {
+  var s = Math.asin(1 / (a = Math.max(1, a))) * (p /= tau);
+
+  function elasticInOut(t) {
+    return ((t = t * 2 - 1) < 0
+        ? a * Math.pow(2, 10 * t) * Math.sin((s - t) / p)
+        : 2 - a * Math.pow(2, -10 * t) * Math.sin((s + t) / p)) / 2;
+  }
+
+  elasticInOut.amplitude = function(a) { return custom(a, p * tau); };
+  elasticInOut.period = function(p) { return custom(a, p); };
+
+  return elasticInOut;
+})(amplitude, period);
+
+
+/***/ }),
+/* 107 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (immutable) */ __webpack_exports__["b"] = expIn;
+/* harmony export (immutable) */ __webpack_exports__["c"] = expOut;
+/* harmony export (immutable) */ __webpack_exports__["a"] = expInOut;
+function expIn(t) {
+  return Math.pow(2, 10 * t - 10);
+}
+
+function expOut(t) {
+  return 1 - Math.pow(2, -10 * t);
+}
+
+function expInOut(t) {
+  return ((t *= 2) <= 1 ? Math.pow(2, 10 * t - 10) : 2 - Math.pow(2, 10 - 10 * t)) / 2;
+}
+
+
+/***/ }),
+/* 108 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (immutable) */ __webpack_exports__["a"] = linear;
+function linear(t) {
+  return +t;
+}
+
+
+/***/ }),
+/* 109 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return polyIn; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "c", function() { return polyOut; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return polyInOut; });
+var exponent = 3;
+
+var polyIn = (function custom(e) {
+  e = +e;
+
+  function polyIn(t) {
+    return Math.pow(t, e);
+  }
+
+  polyIn.exponent = custom;
+
+  return polyIn;
+})(exponent);
+
+var polyOut = (function custom(e) {
+  e = +e;
+
+  function polyOut(t) {
+    return 1 - Math.pow(1 - t, e);
+  }
+
+  polyOut.exponent = custom;
+
+  return polyOut;
+})(exponent);
+
+var polyInOut = (function custom(e) {
+  e = +e;
+
+  function polyInOut(t) {
+    return ((t *= 2) <= 1 ? Math.pow(t, e) : 2 - Math.pow(2 - t, e)) / 2;
+  }
+
+  polyInOut.exponent = custom;
+
+  return polyInOut;
+})(exponent);
+
+
+/***/ }),
+/* 110 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (immutable) */ __webpack_exports__["b"] = quadIn;
+/* harmony export (immutable) */ __webpack_exports__["c"] = quadOut;
+/* harmony export (immutable) */ __webpack_exports__["a"] = quadInOut;
+function quadIn(t) {
+  return t * t;
+}
+
+function quadOut(t) {
+  return t * (2 - t);
+}
+
+function quadInOut(t) {
+  return ((t *= 2) <= 1 ? t * t : --t * (2 - t) + 1) / 2;
+}
+
+
+/***/ }),
+/* 111 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (immutable) */ __webpack_exports__["b"] = sinIn;
+/* harmony export (immutable) */ __webpack_exports__["c"] = sinOut;
+/* harmony export (immutable) */ __webpack_exports__["a"] = sinInOut;
+var pi = Math.PI,
+    halfPi = pi / 2;
+
+function sinIn(t) {
+  return 1 - Math.cos(t * halfPi);
+}
+
+function sinOut(t) {
+  return Math.sin(t * halfPi);
+}
+
+function sinInOut(t) {
+  return (1 - Math.cos(pi * t)) / 2;
+}
+
+
+/***/ }),
+/* 112 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -15541,13 +16245,13 @@ exports.deprecated = deprecated;
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-__export(__webpack_require__(28));
-__export(__webpack_require__(100));
-__export(__webpack_require__(101));
+__export(__webpack_require__(29));
+__export(__webpack_require__(113));
+__export(__webpack_require__(114));
 //# sourceMappingURL=index.js.map
 
 /***/ }),
-/* 100 */
+/* 113 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -15562,7 +16266,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var baseAnimator_1 = __webpack_require__(28);
+var baseAnimator_1 = __webpack_require__(29);
 var OpacityAnimator = (function (_super) {
     __extends(OpacityAnimator, _super);
     function OpacityAnimator() {
@@ -15583,7 +16287,7 @@ exports.OpacityAnimator = OpacityAnimator;
 //# sourceMappingURL=opacityAnimator.js.map
 
 /***/ }),
-/* 101 */
+/* 114 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -15598,8 +16302,8 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var Utils = __webpack_require__(13);
-var baseAnimator_1 = __webpack_require__(28);
+var Utils = __webpack_require__(12);
+var baseAnimator_1 = __webpack_require__(29);
 var UnveilAnimator = (function (_super) {
     __extends(UnveilAnimator, _super);
     function UnveilAnimator() {
@@ -15658,7 +16362,7 @@ exports.UnveilAnimator = UnveilAnimator;
 //# sourceMappingURL=unveilAnimator.js.map
 
 /***/ }),
-/* 102 */
+/* 115 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -15673,13 +16377,13 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var Utils = __webpack_require__(13);
-var cacheCharacterMeasurer_1 = __webpack_require__(42);
+var utils_1 = __webpack_require__(12);
+var cacheCharacterMeasurer_1 = __webpack_require__(43);
 var CacheMeasurer = (function (_super) {
     __extends(CacheMeasurer, _super);
     function CacheMeasurer(area, className) {
         var _this = _super.call(this, area, className) || this;
-        _this.dimCache = new Utils.Cache(function (s) {
+        _this.dimCache = new utils_1.Cache(function (s) {
             return _this._measureNotFromCache(s);
         });
         return _this;
@@ -15700,7 +16404,7 @@ exports.CacheMeasurer = CacheMeasurer;
 //# sourceMappingURL=cacheMeasurer.js.map
 
 /***/ }),
-/* 103 */
+/* 116 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -15713,15 +16417,15 @@ exports.CacheMeasurer = CacheMeasurer;
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-__export(__webpack_require__(41));
 __export(__webpack_require__(42));
-__export(__webpack_require__(102));
 __export(__webpack_require__(43));
+__export(__webpack_require__(115));
 __export(__webpack_require__(44));
+__export(__webpack_require__(45));
 //# sourceMappingURL=index.js.map
 
 /***/ }),
-/* 104 */
+/* 117 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -15770,7 +16474,7 @@ exports.Cache = Cache;
 //# sourceMappingURL=cache.js.map
 
 /***/ }),
-/* 105 */
+/* 118 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -15780,26 +16484,24 @@ exports.Cache = Cache;
  * license at https://github.com/palantir/svg-typewriter/blob/develop/LICENSE
  */
 
-var d3 = __webpack_require__(1);
 var DOM = (function () {
     function DOM() {
     }
     DOM.transform = function (s, x, y) {
-        var xform = d3.transform(s.attr("transform"));
         if (x == null) {
-            return xform.translate;
+            return s.attr("transform");
         }
         else {
             y = (y == null) ? 0 : y;
-            xform.translate[0] = x;
-            xform.translate[1] = y;
-            s.attr("transform", xform.toString());
+            var translate = "translate(" + x + ", " + y + ")";
+            s.attr("transform", translate);
             return s;
         }
     };
     DOM.getBBox = function (element) {
         var bbox;
         try {
+            // getBBox will only be avaiable on SVGLocatable. Otherwise return default.
             bbox = element.node().getBBox();
         }
         catch (err) {
@@ -15812,13 +16514,16 @@ var DOM = (function () {
         }
         return bbox;
     };
+    DOM.applyAttrs = function (element, attrs) {
+        Object.keys(attrs).forEach(function (key) { return element.attr(key, attrs[key]); });
+    };
     return DOM;
 }());
 exports.DOM = DOM;
 //# sourceMappingURL=dom.js.map
 
 /***/ }),
-/* 106 */
+/* 119 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -15876,7 +16581,7 @@ exports.Methods = Methods;
 //# sourceMappingURL=methods.js.map
 
 /***/ }),
-/* 107 */
+/* 120 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -15923,7 +16628,7 @@ exports.StringMethods = StringMethods;
 //# sourceMappingURL=stringMethods.js.map
 
 /***/ }),
-/* 108 */
+/* 121 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -15971,7 +16676,7 @@ exports.Tokenizer = Tokenizer;
 //# sourceMappingURL=tokenizer.js.map
 
 /***/ }),
-/* 109 */
+/* 122 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -15984,12 +16689,12 @@ exports.Tokenizer = Tokenizer;
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-__export(__webpack_require__(110));
-__export(__webpack_require__(45));
+__export(__webpack_require__(123));
+__export(__webpack_require__(46));
 //# sourceMappingURL=index.js.map
 
 /***/ }),
-/* 110 */
+/* 123 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -16004,7 +16709,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var wrapper_1 = __webpack_require__(45);
+var wrapper_1 = __webpack_require__(46);
 var SingleLineWrapper = (function (_super) {
     __extends(SingleLineWrapper, _super);
     function SingleLineWrapper() {
@@ -16047,7 +16752,7 @@ exports.SingleLineWrapper = SingleLineWrapper;
 //# sourceMappingURL=singleLineWrapper.js.map
 
 /***/ }),
-/* 111 */
+/* 124 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -16060,11 +16765,11 @@ exports.SingleLineWrapper = SingleLineWrapper;
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-__export(__webpack_require__(112));
+__export(__webpack_require__(125));
 //# sourceMappingURL=index.js.map
 
 /***/ }),
-/* 112 */
+/* 125 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -16074,8 +16779,7 @@ __export(__webpack_require__(112));
  * license at https://github.com/palantir/svg-typewriter/blob/develop/LICENSE
  */
 
-var d3 = __webpack_require__(1);
-var Utils = __webpack_require__(13);
+var utils_1 = __webpack_require__(12);
 var Writer = (function () {
     function Writer(measurer, wrapper) {
         this._writerID = Writer.nextID++;
@@ -16124,7 +16828,7 @@ var Writer = (function () {
         var shearCorrectedPrimaryDimension = primaryDimension / Math.cos(shearRadians) - Math.abs(shearShift);
         var shearCorrectedSecondaryDimension = secondaryDimension * Math.cos(shearRadians);
         // normalize and wrap text
-        var normalizedText = Utils.StringMethods.combineWhitespace(text);
+        var normalizedText = utils_1.StringMethods.combineWhitespace(text);
         var wrappedText = this._wrapper ?
             this._wrapper.wrap(normalizedText, this._measurer, shearCorrectedPrimaryDimension, shearCorrectedSecondaryDimension).wrappedText : normalizedText;
         var lines = wrappedText.split("\n");
@@ -16142,32 +16846,23 @@ var Writer = (function () {
             (shearCorrectedSecondaryDimension - (lines.length) * lineHeight);
         var shearCorrection = shearCorrectedXOffset - shearCorrectedYOffset;
         // build and apply transform
-        var xForm = d3.transform("");
-        xForm.rotate = options.textRotation + shearDegrees;
+        var translate = [0, 0];
+        var rotate = options.textRotation + shearDegrees;
         switch (options.textRotation) {
             case 90:
-                xForm.translate = [width + shearCorrection, 0];
+                translate = [width + shearCorrection, 0];
                 break;
             case -90:
-                xForm.translate = [-shearCorrection, height];
+                translate = [-shearCorrection, height];
                 break;
             case 180:
-                xForm.translate = [width, height + shearCorrection];
+                translate = [width, height + shearCorrection];
                 break;
             default:
-                xForm.translate = [0, -shearCorrection];
+                translate = [0, -shearCorrection];
                 break;
         }
-        textArea.attr("transform", xForm.toString());
-        // // DEBUG
-        // textArea.append("rect").attr({
-        //   x: Math.max(0, shearShift),
-        //   y: 0,
-        //   width: shearCorrectedPrimaryDimension,
-        //   height: shearCorrectedSecondaryDimension,
-        //   fill: "none",
-        //   stroke: "blue"
-        // });
+        textArea.attr("transform", "translate(" + translate[0] + ", " + translate[1] + ") rotate(" + rotate + ")");
         // TODO This has never taken into account the transform at all, so it's
         // certainly in the wrong place. Why do we need it?
         this.addClipPath(textContainer);
@@ -16181,7 +16876,7 @@ var Writer = (function () {
         xOffset += width * Writer.XOffsetFactor[xAlign];
         var anchor = Writer.AnchorConverter[xAlign];
         textEl.attr("text-anchor", anchor).classed("text-line", true);
-        Utils.DOM.transform(textEl, xOffset, yOffset).attr("y", "-0.25em");
+        utils_1.DOM.transform(textEl, xOffset, yOffset).attr("y", "-0.25em");
     };
     Writer.prototype.writeLines = function (lines, writingArea, width, shearShift, xAlign) {
         var _this = this;
@@ -16198,9 +16893,9 @@ var Writer = (function () {
         var clipPathID = "clipPath" + this._writerID + "_" + elementID;
         selection.select(".text-area").attr("clip-path", "url(\"" + prefix + "#" + clipPathID + "\")");
         var clipPathParent = selection.append("clipPath").attr("id", clipPathID);
-        var bboxAttrs = Utils.DOM.getBBox(selection.select(".text-area"));
+        var bboxAttrs = utils_1.DOM.getBBox(selection.select(".text-area"));
         var box = clipPathParent.append("rect");
-        box.classed("clip-rect", true).attr({
+        utils_1.DOM.applyAttrs(box.classed("clip-rect", true), {
             height: bboxAttrs.height,
             width: bboxAttrs.width,
             x: bboxAttrs.x,
@@ -16230,7 +16925,7 @@ exports.Writer = Writer;
 //# sourceMappingURL=writer.js.map
 
 /***/ }),
-/* 113 */
+/* 126 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -16238,50 +16933,54 @@ exports.Writer = Writer;
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
+// HACKHACK d3-selection-multi doesn't play well with default "d3" package in a
+// bundler environment (e.g. webpack) - see https://github.com/d3/d3-selection-multi/issues/11
+// we add it manually to the default "d3" bundle
+__webpack_require__(50);
 var Animators = __webpack_require__(6);
 exports.Animators = Animators;
-var Axes = __webpack_require__(46);
+var Axes = __webpack_require__(47);
 exports.Axes = Axes;
-var Components = __webpack_require__(29);
+var Components = __webpack_require__(30);
 exports.Components = Components;
-var Configs = __webpack_require__(19);
+var Configs = __webpack_require__(20);
 exports.Configs = Configs;
 var Formatters = __webpack_require__(8);
 exports.Formatters = Formatters;
-var RenderController = __webpack_require__(24);
+var RenderController = __webpack_require__(25);
 exports.RenderController = RenderController;
-var RenderPolicies = __webpack_require__(30);
+var RenderPolicies = __webpack_require__(31);
 exports.RenderPolicies = RenderPolicies;
-var SymbolFactories = __webpack_require__(25);
+var SymbolFactories = __webpack_require__(26);
 exports.SymbolFactories = SymbolFactories;
-var Dispatchers = __webpack_require__(11);
+var Dispatchers = __webpack_require__(13);
 exports.Dispatchers = Dispatchers;
 var Drawers = __webpack_require__(9);
 exports.Drawers = Drawers;
-var Interactions = __webpack_require__(14);
+var Interactions = __webpack_require__(15);
 exports.Interactions = Interactions;
-var Plots = __webpack_require__(16);
+var Plots = __webpack_require__(17);
 exports.Plots = Plots;
 var Scales = __webpack_require__(3);
 exports.Scales = Scales;
 var Utils = __webpack_require__(0);
 exports.Utils = Utils;
-__export(__webpack_require__(18));
-var timeAxis_1 = __webpack_require__(22);
+__export(__webpack_require__(19));
+var timeAxis_1 = __webpack_require__(23);
 exports.TimeInterval = timeAxis_1.TimeInterval;
 __export(__webpack_require__(5));
-__export(__webpack_require__(23));
-__export(__webpack_require__(47));
-var version_1 = __webpack_require__(48);
+__export(__webpack_require__(24));
+__export(__webpack_require__(48));
+var version_1 = __webpack_require__(49);
 exports.version = version_1.version;
-__export(__webpack_require__(20));
+__export(__webpack_require__(21));
 __export(__webpack_require__(7));
-__export(__webpack_require__(12));
-__export(__webpack_require__(31));
-__export(__webpack_require__(15));
+__export(__webpack_require__(14));
+__export(__webpack_require__(32));
+__export(__webpack_require__(16));
 __export(__webpack_require__(2));
 __export(__webpack_require__(10));
-__export(__webpack_require__(17));
+__export(__webpack_require__(18));
 
 
 /***/ })

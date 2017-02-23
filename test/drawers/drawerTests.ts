@@ -1,3 +1,4 @@
+import { SimpleSelection } from "../../src/core/interfaces";
 import * as d3 from "d3";
 
 import { assert } from "chai";
@@ -33,7 +34,7 @@ describe("Drawers", () => {
     it("can set and get its renderArea", () => {
       const svg = TestMethods.generateSVG();
       assert.strictEqual(drawer.renderArea(svg), drawer, "setter mode returns the calling Drawer");
-      assert.strictEqual(drawer.renderArea(), svg, "getter mode returns the selection");
+      assert.sameMembers(drawer.renderArea().nodes(), svg.nodes(), "getter mode returns the selection");
       svg.remove();
     });
 
@@ -47,7 +48,7 @@ describe("Drawers", () => {
     describe("drawing and retrieving elements", () => {
       const data = ["A", "B", "C"];
       const propertyName = "property";
-      let svg: d3.Selection<void>;
+      let svg: SimpleSelection<void>;
 
       beforeEach(() => {
         svg = TestMethods.generateSVG();
@@ -78,7 +79,7 @@ describe("Drawers", () => {
       });
 
       it("draws elements accoding to a specified DrawStep", () => {
-        const drawn = svg.selectAll(MockDrawer.ELEMENT_NAME);
+        const drawn = svg.selectAll<Element, any>(MockDrawer.ELEMENT_NAME);
         assert.strictEqual(drawn.size(), data.length, "created one element per datum");
         drawn.each(function(datum, index) {
           const element = d3.select(this);
@@ -90,15 +91,15 @@ describe("Drawers", () => {
       it("can retrieve a selection containing elements it drew", () => {
         const selection = drawer.selection();
         assert.strictEqual(selection.size(), data.length, "retrieved one element per datum");
-        const drawn = svg.selectAll(MockDrawer.ELEMENT_NAME);
-        assert.deepEqual(selection[0], drawn[0], "retrieved all elements it drew");
+        const drawn = svg.selectAll<Element, any>(MockDrawer.ELEMENT_NAME);
+        assert.deepEqual(selection.node(), drawn.node(), "retrieved all elements it drew");
       });
 
       it("can retrieve the selection for a particular index", () => {
         const selection = drawer.selection();
         data.forEach((datum, index) => {
           const selectionForIndex = drawer.selectionForIndex(index);
-          assert.strictEqual(selectionForIndex.node(), selection[0][index], `retrieves the correct selection for index ${index}`);
+          assert.strictEqual(selectionForIndex.node(), selection.nodes()[index], `retrieves the correct selection for index ${index}`);
         });
       });
     });
@@ -127,7 +128,7 @@ describe("Drawers", () => {
 
       let oldTimeout: any;
       let timings: number[];
-      let svg: d3.Selection<void>;
+      let svg: SimpleSelection<void>;
 
       before(() => {
         oldTimeout = Plottable.Utils.Window.setTimeout;

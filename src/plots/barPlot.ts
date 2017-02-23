@@ -7,7 +7,7 @@ import * as d3 from "d3";
 import * as SVGTypewriter from "svg-typewriter";
 
 import * as Animators from "../animators";
-import { Accessor, Point, Bounds, Range } from "../core/interfaces";
+import { Accessor, Point, Bounds, Range, SimpleSelection } from "../core/interfaces";
 import { Dataset } from "../core/dataset";
 import { Drawer } from "../drawers/drawer";
 import * as Drawers from "../drawers";
@@ -25,7 +25,7 @@ import { XYPlot } from "./xyPlot";
 import { LightweightPlotEntity } from "./commons";
 
 type LabelConfig = {
-  labelArea: d3.Selection<void>;
+  labelArea: SimpleSelection<void>;
   measurer: SVGTypewriter.Measurer;
   writer: SVGTypewriter.Writer;
 };
@@ -40,7 +40,7 @@ export class Bar<X, Y> extends XYPlot<X, Y> {
   protected static _LABEL_AREA_CLASS = "bar-label-text-area";
   protected static _LABEL_PADDING = 10;
 
-  private _baseline: d3.Selection<void>;
+  private _baseline: SimpleSelection<void>;
   private _baselineValue: X|Y;
   protected _isVertical: boolean;
   private _labelFormatter: Formatter = Formatters.identity();

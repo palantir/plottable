@@ -1,3 +1,4 @@
+import { SimpleSelection } from "../../src/core/interfaces";
 import * as d3 from "d3";
 
 import { assert } from "chai";
@@ -237,7 +238,7 @@ describe("Plots", () => {
   });
 
   describe("auto scale domain on numeric", () => {
-    let svg: d3.Selection<void>;
+    let svg: SimpleSelection<void>;
     let SVG_WIDTH = 600;
     let SVG_HEIGHT = 400;
     let yScale: Plottable.Scales.Linear;
@@ -290,7 +291,7 @@ describe("Plots", () => {
   });
 
   describe("auto scale domain on Category", () => {
-    let svg: d3.Selection<void>;
+    let svg: SimpleSelection<void>;
     let SVG_WIDTH = 600;
     let SVG_HEIGHT = 400;
     let yScale: Plottable.Scales.Linear;
@@ -342,7 +343,7 @@ describe("Plots", () => {
   });
 
   describe("scale extent updates", () => {
-    let svg: d3.Selection<void>;
+    let svg: SimpleSelection<void>;
     let xScale: Plottable.Scales.Category;
     let yScale: Plottable.Scales.Linear;
     let stackedBarPlot: Plottable.Plots.StackedBar<string, number>;

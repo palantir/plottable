@@ -1,3 +1,4 @@
+import { SimpleSelection } from "../../src/core/interfaces";
 import * as d3 from "d3";
 
 import { assert } from "chai";
@@ -42,7 +43,7 @@ describe("Plots", () => {
           { base: "C", value: -1 },
         ];
 
-        let svg: d3.Selection<void>;
+        let svg: SimpleSelection<void>;
         let barPlot: Plottable.Plots.Bar<string | number, number | string>;
         let baseScale: Plottable.Scales.Category;
         let valueScale: Plottable.Scales.Linear;
@@ -82,7 +83,7 @@ describe("Plots", () => {
           assert.strictEqual(TestMethods.numAttr(baseline, `${basePositionAttr}2`), TestMethods.numAttr(svg, baseSizeAttr),
             `baseline ${basePositionAttr}2 is correct`);
 
-          const bars = barPlot.content().selectAll("rect");
+          const bars = barPlot.content().selectAll<Element, any>("rect");
           assert.strictEqual(bars.size(), data.length, "One bar was created per data point");
           bars.each(function(datum, index) {
             const bar = d3.select(this);
@@ -147,12 +148,12 @@ describe("Plots", () => {
           barPlot.addDataset(dataset);
           barPlot.renderTo(svg);
 
-          assert.strictEqual(barPlot.content().selectAll("rect").size(), 0, "draws no bars when the domain contains no data points");
+          assert.strictEqual(barPlot.content().selectAll<Element, any>("rect").size(), 0, "draws no bars when the domain contains no data points");
         });
       });
 
       describe(`autodomaining when ${orientation}`, () => {
-        let svg: d3.Selection<void>;
+        let svg: SimpleSelection<void>;
         let baseScale: Plottable.Scales.Linear;
         let valueScale: Plottable.Scales.Linear;
         let barPlot: Plottable.Plots.Bar<number, number>;
@@ -211,7 +212,7 @@ describe("Plots", () => {
         const scaleTypes = ["Linear", "ModifiedLog", "Time"];
         scaleTypes.forEach((scaleType) => {
           describe(`using a ${scaleType} base Scale`, () => {
-            let svg: d3.Selection<void>;
+            let svg: SimpleSelection<void>;
             let barPlot: Plottable.Plots.Bar<number | Date, number | Date>;
             let baseScale: Plottable.QuantitativeScale<number | Date>;
             let valueScale: Plottable.Scales.Linear;
@@ -266,7 +267,7 @@ describe("Plots", () => {
               dataset.data(data);
 
               const closestSeparation = Math.abs(baseScale.scale(data[1].base) - baseScale.scale(data[0].base));
-              const bars = barPlot.content().selectAll("rect");
+              const bars = barPlot.content().selectAll<Element, any>("rect");
               assert.strictEqual(bars.size(), data.length, "one bar was drawn per datum");
               bars.each(function() {
                 const bar = d3.select(this);
@@ -285,7 +286,7 @@ describe("Plots", () => {
               ];
               dataset.data(data);
 
-              const bars = barPlot.content().selectAll("rect");
+              const bars = barPlot.content().selectAll<Element, any>("rect");
               assert.strictEqual(bars.size(), data.length, "one bar was drawn per datum");
               const svgSize = TestMethods.numAttr(svg, baseSizeAttr);
               bars.each(function() {
@@ -327,7 +328,7 @@ describe("Plots", () => {
               ];
               dataset.data(repeatedBaseData);
 
-              const bars = barPlot.content().selectAll("rect");
+              const bars = barPlot.content().selectAll<Element, any>("rect");
               assert.strictEqual(bars.size(), repeatedBaseData.length, "one bar was drawn per datum");
               const svgSize = TestMethods.numAttr(svg, baseSizeAttr);
               bars.each(function() {
@@ -347,7 +348,7 @@ describe("Plots", () => {
               dataset.data(unsortedData);
 
               const closestSeparation = Math.abs(baseScale.scale(unsortedData[1].base) - baseScale.scale(unsortedData[0].base));
-              const bars = barPlot.content().selectAll("rect");
+              const bars = barPlot.content().selectAll<Element, any>("rect");
               assert.strictEqual(bars.size(), unsortedData.length, "one bar was drawn per datum");
               bars.each(function() {
                 const bar = d3.select(this);
@@ -371,7 +372,7 @@ describe("Plots", () => {
         ];
         const DEFAULT_DOMAIN = [-5, 5];
 
-        let svg: d3.Selection<void>;
+        let svg: SimpleSelection<void>;
         let baseScale: Plottable.Scales.Linear;
         let valueScale: Plottable.Scales.Linear;
         let barPlot: Plottable.Plots.Bar<number, number>;
@@ -414,13 +415,13 @@ describe("Plots", () => {
         };
 
         it("does not show labels by default", () => {
-          const texts = barPlot.content().selectAll("text");
+          const texts = barPlot.content().selectAll<Element, any>("text");
           assert.strictEqual(texts.size(), 0, "by default, no texts are drawn");
         });
 
         it("draws one label per datum", () => {
           barPlot.labelsEnabled(true);
-          const texts = barPlot.content().selectAll("text");
+          const texts = barPlot.content().selectAll<Element, any>("text");
           assert.strictEqual(texts.size(), data.length, "one label drawn per datum");
           texts.each(function(d, i) {
             assert.strictEqual(d3.select(this).text(), data[i].value.toString(), `by default, label text is the bar's value (index ${i})`);
@@ -432,7 +433,7 @@ describe("Plots", () => {
           barPlot.redraw();
           barPlot.labelsEnabled(true);
 
-          const texts = barPlot.content().selectAll("text");
+          const texts = barPlot.content().selectAll<Element, any>("text");
           assert.strictEqual(texts.size(), 0, "no labels drawn");
         });
 
@@ -441,7 +442,7 @@ describe("Plots", () => {
           const formatter = (n: number) => `${n}%`;
           barPlot.labelFormatter(formatter);
 
-          const texts = barPlot.content().selectAll("text");
+          const texts = barPlot.content().selectAll<Element, any>("text");
           assert.strictEqual(texts.size(), data.length, "one label drawn per datum");
           const expectedTexts = data.map((d) => formatter(d.value));
           texts.each(function(d, i) {
@@ -452,18 +453,18 @@ describe("Plots", () => {
         it("shows labels inside or outside the bar as appropriate", () => {
           barPlot.labelsEnabled(true);
 
-          const labels = barPlot.content().selectAll(".on-bar-label, .off-bar-label");
+          const labels = barPlot.content().selectAll<SVGElement, any>(".on-bar-label, .off-bar-label");
           assert.strictEqual(labels.size(), data.length, "one label drawn per datum");
 
-          const bars = barPlot.content().select(".bar-area").selectAll("rect");
+          const bars = barPlot.content().select(".bar-area").selectAll<SVGElement, any>("rect");
           labels.each((d, i) => {
-            const labelBoundingClientRect = (<SVGElement> labels[0][i]).getBoundingClientRect();
-            const barBoundingClientRect = (<SVGElement> bars[0][i]).getBoundingClientRect();
+            const labelBoundingClientRect = labels.nodes()[i].getBoundingClientRect();
+            const barBoundingClientRect = bars.nodes()[i].getBoundingClientRect();
             if ((<any> labelBoundingClientRect)[valueSizeAttr] > (<any> barBoundingClientRect)[valueSizeAttr]) {
-              assert.isTrue(d3.select(labels[0][i]).classed("off-bar-label"),
+              assert.isTrue(d3.select(labels.nodes()[i]).classed("off-bar-label"),
                 `label with index ${i} doesn't fit and carries the off-bar class`);
             } else {
-              assert.isTrue(d3.select(labels[0][i]).classed("on-bar-label"),
+              assert.isTrue(d3.select(labels.nodes()[i]).classed("on-bar-label"),
                 `label with index ${i} fits and carries the on-bar class`);
             }
           });
@@ -491,13 +492,13 @@ describe("Plots", () => {
         it("hides labels cut off by lower end of base scale", () => {
           barPlot.labelsEnabled(true);
           data.forEach((d, i) => {
-            const textsBeforeRendering = barPlot.content().selectAll("text");
-            const centerOfText = getCenterOfText(<SVGElement> textsBeforeRendering[0][i]);
+            const textsBeforeRendering = barPlot.content().selectAll<SVGTextElement, any>("text");
+            const centerOfText = getCenterOfText(textsBeforeRendering.nodes()[i]);
             const centerValue = baseScale.invert(isVertical ? centerOfText.x : centerOfText.y);
             baseScale.domain([centerValue, centerValue + (DEFAULT_DOMAIN[1] - DEFAULT_DOMAIN[0])]);
 
-            const textsAfterRendering = barPlot.content().selectAll("text");
-            assert.strictEqual(d3.select(textsAfterRendering[0][i]).style("visibility"), "hidden",
+            const textsAfterRendering = barPlot.content().selectAll<SVGTextElement, any>("text");
+            assert.strictEqual(d3.select(textsAfterRendering.nodes()[i]).style("visibility"), "hidden",
               `label for bar with index ${i} is hidden`);
           });
           svg.remove();
@@ -506,35 +507,35 @@ describe("Plots", () => {
         it("hides labels cut off by upper end of base scale", () => {
           barPlot.labelsEnabled(true);
           data.forEach((d, i) => {
-            const textsBeforeRendering = barPlot.content().selectAll("text");
-            const centerOfText = getCenterOfText(<SVGElement> textsBeforeRendering[0][i]);
+            const textsBeforeRendering = barPlot.content().selectAll<SVGTextElement, any>("text");
+            const centerOfText = getCenterOfText(textsBeforeRendering.nodes()[i]);
             const centerValue = baseScale.invert(isVertical ? centerOfText.x : centerOfText.y);
             baseScale.domain([centerValue - (DEFAULT_DOMAIN[1] - DEFAULT_DOMAIN[0]), centerValue]);
 
-            const textsAfterRendering = barPlot.content().selectAll("text");
-            assert.strictEqual(d3.select(textsAfterRendering[0][i]).style("visibility"), "hidden",
+            const textsAfterRendering = barPlot.content().selectAll<SVGTextElement, any>("text");
+            assert.strictEqual(d3.select(textsAfterRendering.nodes()[i]).style("visibility"), "hidden",
               `label for bar with index ${i} is hidden`);
           });
         });
 
         it("hides or shifts labels cut off by lower end of value scale", () => {
           barPlot.labelsEnabled(true);
-          const labelsBeforeRendering = barPlot.content().selectAll(".on-bar-label, .off-bar-label");
-          const centerValues = labelsBeforeRendering.select("text")[0].map((textNode) => {
+          const labelsBeforeRendering = barPlot.content().selectAll<Element, any>(".on-bar-label, .off-bar-label");
+          const centerValues = labelsBeforeRendering.select<SVGTextElement>("text").nodes().map((textNode) => {
             const centerOfText = getCenterOfText(<SVGElement> textNode);
             return valueScale.invert(isVertical ? centerOfText.y : centerOfText.x);
           });
-          const wasOriginallyOnBar = labelsBeforeRendering[0].map((label) => d3.select(label).classed("on-bar-label"));
+          const wasOriginallyOnBar = labelsBeforeRendering.nodes().map((label) => d3.select(label).classed("on-bar-label"));
 
           data.forEach((d, i) => {
             const centerValue = centerValues[i];
             valueScale.domain([centerValue, centerValue + (DEFAULT_DOMAIN[1] - DEFAULT_DOMAIN[0])]);
-            const labels = barPlot.content().selectAll(".on-bar-label, .off-bar-label");
+            const labels = barPlot.content().selectAll<Element, any>(".on-bar-label, .off-bar-label");
             if (wasOriginallyOnBar[i] && d.value > 0) {
-              assert.isTrue(d3.select(labels[0][i]).classed("off-bar-label"),
+              assert.isTrue(d3.select(labels.nodes()[i]).classed("off-bar-label"),
                 `cut off on-bar label was switched to off-bar (index ${i})`);
             } else {
-              const textNode = labels.select("text")[0][i];
+              const textNode = labels.select("text").nodes()[i];
               assert.strictEqual(d3.select(textNode).style("visibility"), "hidden", `label for bar with index ${i} is hidden`);
             }
           });
@@ -543,22 +544,22 @@ describe("Plots", () => {
 
         it("hides or shifts labels cut off by upper end of value scale", () => {
           barPlot.labelsEnabled(true);
-          const labelsBeforeRendering = barPlot.content().selectAll(".on-bar-label, .off-bar-label");
-          const centerValues = labelsBeforeRendering.select("text")[0].map((textNode) => {
+          const labelsBeforeRendering = barPlot.content().selectAll<Element, any>(".on-bar-label, .off-bar-label");
+          const centerValues = labelsBeforeRendering.select("text").nodes().map((textNode) => {
             const centerOfText = getCenterOfText(<SVGElement> textNode);
             return valueScale.invert(isVertical ? centerOfText.y : centerOfText.x);
           });
-          const wasOriginallyOnBar = labelsBeforeRendering[0].map((label) => d3.select(label).classed("on-bar-label"));
+          const wasOriginallyOnBar = labelsBeforeRendering.nodes().map((label) => d3.select(label).classed("on-bar-label"));
 
           data.forEach((d, i) => {
             const centerValue = centerValues[i];
             valueScale.domain([centerValue - (DEFAULT_DOMAIN[1] - DEFAULT_DOMAIN[0]), centerValue]);
-            const labels = barPlot.content().selectAll(".on-bar-label, .off-bar-label");
+            const labels = barPlot.content().selectAll<Element, any>(".on-bar-label, .off-bar-label");
             if (wasOriginallyOnBar[i] && d.value < 0) {
-              assert.isTrue(d3.select(labels[0][i]).classed("off-bar-label"),
+              assert.isTrue(d3.select(labels.nodes()[i]).classed("off-bar-label"),
                 `cut-off on-bar label was switched to off-bar (index ${i})`);
             } else {
-              const textNode = labels.select("text")[0][i];
+              const textNode = labels.select("text").nodes()[i];
               assert.strictEqual(d3.select(textNode).style("visibility"), "hidden", `label for bar with index ${i} is hidden`);
             }
           });
@@ -568,21 +569,21 @@ describe("Plots", () => {
         // https://github.com/palantir/plottable/pull/1240 . Leaving it until we find a better way to test for it.
         it("removes labels instantly on dataset change", (done) => {
           barPlot.labelsEnabled(true);
-          let texts = barPlot.content().selectAll("text");
+          let texts = barPlot.content().selectAll<Element, any>("text");
           assert.strictEqual(texts.size(), dataset.data().length, "one label drawn per datum");
           const originalDrawLabels = (<any> barPlot)._drawLabels;
           let called = false;
           (<any> barPlot)._drawLabels = () => {
             if (!called) {
               originalDrawLabels.apply(barPlot);
-              texts = barPlot.content().selectAll("text");
+              texts = barPlot.content().selectAll<Element, any>("text");
               assert.strictEqual(texts.size(), dataset.data().length, "texts were repopulated by drawLabels after the update");
               called = true; // for some reason, in phantomJS, `done` was being called multiple times and this caused the test to fail.
               done();
             }
           };
           dataset.data(dataset.data());
-          texts = barPlot.content().selectAll("text");
+          texts = barPlot.content().selectAll<Element, any>("text");
           assert.strictEqual(texts.size(), 0, "texts were immediately removed");
         });
       });
@@ -595,7 +596,7 @@ describe("Plots", () => {
         ];
         const DEFAULT_DOMAIN = [-2, 2];
 
-        let svg: d3.Selection<void>;
+        let svg: SimpleSelection<void>;
         let barPlot: Plottable.Plots.Bar<number, number>;
         let baseScale: Plottable.Scales.Linear;
         let valueScale: Plottable.Scales.Linear;
@@ -656,7 +657,7 @@ describe("Plots", () => {
             dataset: dataset,
             datasetIndex: 0,
             position: getPointFromBaseAndValuePositions(basePosition, valuePosition),
-            selection: d3.select(barPlot.content().selectAll("rect")[0][index]),
+            selection: d3.select(barPlot.content().selectAll<Element, any>("rect").nodes()[index]),
             component: barPlot,
           };
         }

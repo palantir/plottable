@@ -5,12 +5,13 @@
 
 import * as d3 from "d3";
 
-import { Bounds, Point } from "../core/interfaces";
+import { Bounds, Point, SimpleSelection } from "../core/interfaces";
 import * as Interactions from "../interactions";
 import * as Utils from "../utils";
 
 import { PropertyMode } from "./";
 import { SelectionBoxLayer } from "./selectionBoxLayer";
+import { coerceExternalD3 } from "../utils/coerceD3";
 
 export type DragBoxCallback = (bounds: Bounds) => void;
 
@@ -23,14 +24,14 @@ type _EdgeIndicator = {
 
 export class DragBoxLayer extends SelectionBoxLayer {
   private _dragInteraction: Interactions.Drag;
-  private _detectionEdgeT: d3.Selection<void>;
-  private _detectionEdgeB: d3.Selection<void>;
-  private _detectionEdgeL: d3.Selection<void>;
-  private _detectionEdgeR: d3.Selection<void>;
-  private _detectionCornerTL: d3.Selection<void>;
-  private _detectionCornerTR: d3.Selection<void>;
-  private _detectionCornerBL: d3.Selection<void>;
-  private _detectionCornerBR: d3.Selection<void>;
+  private _detectionEdgeT: SimpleSelection<void>;
+  private _detectionEdgeB: SimpleSelection<void>;
+  private _detectionEdgeL: SimpleSelection<void>;
+  private _detectionEdgeR: SimpleSelection<void>;
+  private _detectionCornerTL: SimpleSelection<void>;
+  private _detectionCornerTR: SimpleSelection<void>;
+  private _detectionCornerBL: SimpleSelection<void>;
+  private _detectionCornerBR: SimpleSelection<void>;
 
   private _detectionRadius = 3;
   private _resizable = false;
@@ -180,7 +181,7 @@ export class DragBoxLayer extends SelectionBoxLayer {
   protected _setup() {
     super._setup();
 
-    let createLine = () => this._box.append("line").style({
+    let createLine = () => this._box.append("line").styles({
       "opacity": 0,
       "stroke": "pink",
       "pointer-events": "visibleStroke",
@@ -192,7 +193,7 @@ export class DragBoxLayer extends SelectionBoxLayer {
 
     if (this._hasCorners) {
       let createCorner = () => this._box.append("circle")
-        .style({
+        .styles({
           "opacity": 0,
           "fill": "pink",
           "pointer-events": "visibleFill",
@@ -245,28 +246,28 @@ export class DragBoxLayer extends SelectionBoxLayer {
       let l = bounds.topLeft.x;
       let r = bounds.bottomRight.x;
 
-      this._detectionEdgeT.attr({
+      this._detectionEdgeT.attrs({
         x1: l, y1: t, x2: r, y2: t,
         "stroke-width": this._detectionRadius * 2,
       });
-      this._detectionEdgeB.attr({
+      this._detectionEdgeB.attrs({
         x1: l, y1: b, x2: r, y2: b,
         "stroke-width": this._detectionRadius * 2,
       });
-      this._detectionEdgeL.attr({
+      this._detectionEdgeL.attrs({
         x1: l, y1: t, x2: l, y2: b,
         "stroke-width": this._detectionRadius * 2,
       });
-      this._detectionEdgeR.attr({
+      this._detectionEdgeR.attrs({
         x1: r, y1: t, x2: r, y2: b,
         "stroke-width": this._detectionRadius * 2,
       });
 
       if (this._hasCorners) {
-        this._detectionCornerTL.attr({ cx: l, cy: t, r: this._detectionRadius });
-        this._detectionCornerTR.attr({ cx: r, cy: t, r: this._detectionRadius });
-        this._detectionCornerBL.attr({ cx: l, cy: b, r: this._detectionRadius });
-        this._detectionCornerBR.attr({ cx: r, cy: b, r: this._detectionRadius });
+        this._detectionCornerTL.attrs({ cx: l, cy: t, r: this._detectionRadius });
+        this._detectionCornerTR.attrs({ cx: r, cy: t, r: this._detectionRadius });
+        this._detectionCornerBL.attrs({ cx: l, cy: b, r: this._detectionRadius });
+        this._detectionCornerBR.attrs({ cx: r, cy: b, r: this._detectionRadius });
       }
     }
     return this;
@@ -460,7 +461,8 @@ export class DragBoxLayer extends SelectionBoxLayer {
     return this;
   }
 
-  public anchor(selection: d3.Selection<void>) {
+  public anchor(selection: SimpleSelection<void>) {
+    selection = coerceExternalD3(selection);
     this._dragInteraction.attachTo(this);
     super.anchor(selection);
     return this;

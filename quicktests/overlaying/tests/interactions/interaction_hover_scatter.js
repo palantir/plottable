@@ -33,7 +33,7 @@ function run(svg, data, Plottable) {
 
   chart.renderTo(svg);
 
-  var hoverCircle = plot.foreground().append("circle").attr({
+  var hoverCircle = plot.foreground().append("circle").attrs({
                                                "stroke": "black",
                                                "fill": "none",
                                                "r": 15
@@ -61,7 +61,7 @@ function run(svg, data, Plottable) {
       var xString = datum.x.toFixed(2);
       var yString = datum.y.toFixed(2);
       title.text("[ " + xString + ", " + yString + " ]");
-      hoverCircle.attr({
+      hoverCircle.attrs({
         "cx": position.x,
         "cy": position.y
       }).style("visibility", "visible");

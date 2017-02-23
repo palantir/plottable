@@ -1,3 +1,4 @@
+import { SimpleSelection } from "../../src/core/interfaces";
 import * as d3 from "d3";
 
 import { assert } from "chai";
@@ -10,7 +11,7 @@ describe("Dispatchers", () => {
   describe("Mouse Dispatcher", () => {
 
     describe("Basic usage", () => {
-      let svg: d3.Selection<void>;
+      let svg: SimpleSelection<void>;
       let svgNode: SVGElement;
 
       beforeEach(() => {
@@ -46,7 +47,7 @@ describe("Dispatchers", () => {
         y: targetY,
       };
 
-      let svg: d3.Selection<void>;
+      let svg: d3.Selection<SVGSVGElement, any, any, any>;
       let mouseDispatcher: Plottable.Dispatchers.Mouse;
 
       beforeEach(() => {
@@ -56,7 +57,7 @@ describe("Dispatchers", () => {
         // HACKHACK: PhantomJS can't measure SVGs unless they have something in them occupying space
         svg.append("rect").attr("width", SVG_WIDTH).attr("height", SVG_HEIGHT);
 
-        mouseDispatcher = Plottable.Dispatchers.Mouse.getDispatcher(<SVGElement> svg.node());
+        mouseDispatcher = Plottable.Dispatchers.Mouse.getDispatcher(svg.node());
       });
 
       it("calls the mouseDown callback", () => {
@@ -249,7 +250,7 @@ describe("Dispatchers", () => {
         TestMethods.triggerFakeMouseEvent("mousedown", svg, targetX, targetY);
         assert.isTrue(callbackWasCalled, "callback was called on mousedown");
 
-        let element = <HTMLElement> svg[0][0];
+        let element = <HTMLElement> <any> svg.node();
         // Getting the absolute coordinates of the SVG in order to place the overlay at the right location
         let topLeftCorner = { x: 0, y: 0 };
         while (element != null) {
@@ -258,7 +259,7 @@ describe("Dispatchers", () => {
           element = <HTMLElement> (element.offsetParent || element.parentNode);
         }
 
-        let overlay = TestMethods.getSVGParent().append("div").style({
+        let overlay = TestMethods.getSVGParent().append("div").styles({
           height: "400px",
           width: "400px",
           topLeftCorner: "absolute",

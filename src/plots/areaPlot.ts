@@ -5,7 +5,7 @@
 
 import * as d3 from "d3";
 
-import { Accessor, AttributeToProjector, Projector } from "../core/interfaces";
+import { Accessor, AttributeToProjector, Projector, SimpleSelection } from "../core/interfaces";
 import { Dataset } from "../core/dataset";
 import * as Drawers from "../drawers";
 import * as Scales from "../scales";
@@ -197,8 +197,8 @@ export class Area<X> extends Line<X> {
     return propertyToProjectors;
   }
 
-  public selections(datasets = this.datasets()) {
-    let allSelections = super.selections(datasets)[0];
+  public selections(datasets = this.datasets()): SimpleSelection<any> {
+    let allSelections = super.selections(datasets).nodes();
     let lineDrawers = datasets.map((dataset) => this._lineDrawers.get(dataset))
       .filter((drawer) => drawer != null);
     lineDrawers.forEach((ld, i) => allSelections.push(ld.selectionForIndex(i).node()));
@@ -212,11 +212,13 @@ export class Area<X> extends Line<X> {
       return Utils.Math.isValidNumber(positionX) && Utils.Math.isValidNumber(positionY);
     };
     return (datum: any[], index: number, dataset: Dataset) => {
-      let areaGenerator = d3.svg.area()
+      // just runtime error if user passes curveBundle to area plot
+      const curveFactory = this._getCurveFactory() as d3.CurveFactory;
+      let areaGenerator = d3.area()
         .x((innerDatum, innerIndex) => xProjector(innerDatum, innerIndex, dataset))
         .y1((innerDatum, innerIndex) => yProjector(innerDatum, innerIndex, dataset))
         .y0((innerDatum, innerIndex) => y0Projector(innerDatum, innerIndex, dataset))
-        .interpolate(this.interpolator())
+        .curve(curveFactory)
         .defined((innerDatum, innerIndex) => definedProjector(innerDatum, innerIndex, dataset));
       return areaGenerator(datum);
     };

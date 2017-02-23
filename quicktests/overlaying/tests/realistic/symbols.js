@@ -20,15 +20,15 @@ function run(svg, data, Plottable){
   var plot = new Plottable.Plots.Scatter();
   plot.addDataset(dataset);
 
-  var triangleUpFactory = Plottable.SymbolFactories.triangleUp();
+  var triangleFactory = Plottable.SymbolFactories.triangle();
   var circleFactory = Plottable.SymbolFactories.circle();
   var crossFactory = Plottable.SymbolFactories.cross();
-  var triangleDownFactory = Plottable.SymbolFactories.triangleDown();
+  var wyeFactory = Plottable.SymbolFactories.wye();
   var fourSymbolAccessor = function (datum) {
     if (datum.y > 0) {
-      return (datum.x > 0) ? triangleUpFactory : circleFactory;
+      return (datum.x > 0) ? triangleFactory : circleFactory;
     } else {
-      return (datum.x > 0) ? crossFactory : triangleDownFactory;
+      return (datum.x > 0) ? crossFactory : wyeFactory;
     }
   };
   var symbolSize = 15;
@@ -46,17 +46,17 @@ function run(svg, data, Plottable){
 
   if (typeof legend.symbol === "function") {
     legend.symbol(function (d) {
-      if(d === "x+y+") { return triangleUpFactory; }
+      if(d === "x+y+") { return triangleFactory; }
       if(d === "x+y-") { return crossFactory; }
       if(d === "x-y+") { return circleFactory; }
-      if(d === "x-y-") { return triangleDownFactory; }
+      if(d === "x-y-") { return wyeFactory; }
     });
   } else {
     legend.symbolFactoryAccessor(function (d) {
-      if(d === "x+y+") { return triangleUpFactory; }
+      if(d === "x+y+") { return triangleFactory; }
       if(d === "x+y-") { return crossFactory; }
       if(d === "x-y+") { return circleFactory; }
-      if(d === "x-y-") { return triangleDownFactory; }
+      if(d === "x-y-") { return wyeFactory; }
     });
   }
 
