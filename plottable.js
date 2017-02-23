@@ -1004,6 +1004,7 @@ var Component = (function () {
         if (className != null) {
             box.classed(className, true);
         }
+        box.attr("stroke-width", "0");
         this._boxes.push(box);
         if (this.width() != null && this.height() != null) {
             box.attr("width", this.width()).attr("height", this.height());
@@ -7125,14 +7126,20 @@ function elementHeight(element) {
         + _parseStyleValue(style, "border-bottom-width");
 }
 exports.elementHeight = elementHeight;
-var TRANSLATE_REGEX = /translate\(\s*([-+]?[0-9]*\.?[0-9]+)\s*,?\s*([-+]?[0-9]*\.?[0-9]+)\s*\)/;
+// taken from the BNF at https://www.w3.org/TR/SVG/coords.html
+var WSP = "\\s";
+var NUMBER = "(?:[-+]?[0-9]*\\.?[0-9]+)";
+var COMMA_WSP = "(?:(?:" + WSP + "+,?" + WSP + "*)|(?:," + WSP + "*))";
+var TRANSLATE_REGEX = new RegExp("translate" + WSP + "*\\(" + WSP + "*(" + NUMBER + ")(?:" + COMMA_WSP + "(" + NUMBER + "))?" + WSP + "*\\)");
+var ROTATE_REGEX = new RegExp("rotate" + WSP + "*\\(" + WSP + "*(" + NUMBER + ")" + WSP + "*\\)");
+var SCALE_REGEX = new RegExp("scale" + WSP + "*\\(" + WSP + "*(" + NUMBER + ")(?:" + COMMA_WSP + "(" + NUMBER + "))?" + WSP + "*\\)");
 /**
  * Accepts selections whose .transform contain a "translate(a, b)" and extracts the a and b
  */
 function getTranslateValues(el) {
     var match = TRANSLATE_REGEX.exec(el.attr("transform"));
     if (match != null) {
-        var translateX = match[1], translateY = match[2];
+        var translateX = match[1], _a = match[2], translateY = _a === void 0 ? 0 : _a;
         return [+translateX, +translateY];
     }
     else {
@@ -7140,7 +7147,6 @@ function getTranslateValues(el) {
     }
 }
 exports.getTranslateValues = getTranslateValues;
-var ROTATE_REGEX = /rotate\(\s*([-+]?[0-9]*\.?[0-9]+)\s*\)/;
 /**
  * Accepts selections whose .transform contain a "rotate(angle)" and returns the angle
  */
@@ -7155,12 +7161,11 @@ function getRotate(el) {
     }
 }
 exports.getRotate = getRotate;
-var SCALE_REGEX = /scale\(\s*([-+]?[0-9]*\.?[0-9]+)\s*,?\s*([-+]?[0-9]*\.?[0-9]+)\s*\)/;
 function getScaleValues(el) {
     var match = SCALE_REGEX.exec(el.attr("transform"));
     if (match != null) {
         var scaleX = match[1], scaleY = match[2];
-        return [+scaleX, +scaleY];
+        return [+scaleX, scaleY == null ? +scaleX : +scaleY];
     }
     else {
         return [0, 0];
@@ -15275,6 +15280,7 @@ var ClientToSVGTranslator = (function () {
         this._measureRect = document.createElementNS(svg.namespaceURI, "rect");
         this._measureRect.setAttribute("class", "measure-rect");
         this._measureRect.setAttribute("style", "opacity: 0; visibility: hidden;");
+        this._measureRect.setAttribute("stroke-width", "0");
         this._measureRect.setAttribute("width", "1");
         this._measureRect.setAttribute("height", "1");
         this._svg.appendChild(this._measureRect);

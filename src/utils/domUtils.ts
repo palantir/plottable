@@ -77,21 +77,26 @@ export function elementHeight(element: Element) {
     + _parseStyleValue(style, "border-bottom-width");
 }
 
-const TRANSLATE_REGEX = /translate\(\s*([-+]?[0-9]*\.?[0-9]+)\s*,?\s*([-+]?[0-9]*\.?[0-9]+)\s*\)/;
+// taken from the BNF at https://www.w3.org/TR/SVG/coords.html
+const WSP = "\\s";
+const NUMBER = "(?:[-+]?[0-9]*\\.?[0-9]+)";
+const COMMA_WSP = `(?:(?:${WSP}+,?${WSP}*)|(?:,${WSP}*))`;
+const TRANSLATE_REGEX = new RegExp(`translate${WSP}*\\(${WSP}*(${NUMBER})(?:${COMMA_WSP}(${NUMBER}))?${WSP}*\\)`);
+const ROTATE_REGEX = new RegExp(`rotate${WSP}*\\(${WSP}*(${NUMBER})${WSP}*\\)`);
+const SCALE_REGEX = new RegExp(`scale${WSP}*\\(${WSP}*(${NUMBER})(?:${COMMA_WSP}(${NUMBER}))?${WSP}*\\)`);
+
 /**
  * Accepts selections whose .transform contain a "translate(a, b)" and extracts the a and b
  */
 export function getTranslateValues(el: SimpleSelection<any>): [number, number] {
   const match = TRANSLATE_REGEX.exec(el.attr("transform"));
   if (match != null) {
-    const [, translateX, translateY] = match;
+    const [, translateX, translateY = 0] = match;
     return [+translateX, +translateY];
   } else {
     return [0, 0];
   }
 }
-
-const ROTATE_REGEX = /rotate\(\s*([-+]?[0-9]*\.?[0-9]+)\s*\)/;
 /**
  * Accepts selections whose .transform contain a "rotate(angle)" and returns the angle
  */
@@ -105,12 +110,11 @@ export function getRotate(el: SimpleSelection<any>): number {
   }
 }
 
-const SCALE_REGEX = /scale\(\s*([-+]?[0-9]*\.?[0-9]+)\s*,?\s*([-+]?[0-9]*\.?[0-9]+)\s*\)/;
 export function getScaleValues(el: SimpleSelection<any>): [number, number] {
   const match = SCALE_REGEX.exec(el.attr("transform"));
   if (match != null) {
     const [, scaleX, scaleY] = match;
-    return [+scaleX, +scaleY];
+    return [+scaleX, scaleY == null ? +scaleX : +scaleY];
   } else {
     return [0, 0];
   }

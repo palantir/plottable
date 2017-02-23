@@ -399,6 +399,7 @@ export class Component {
     if (className != null) {
       box.classed(className, true);
     }
+    box.attr("stroke-width", "0");
 
     this._boxes.push(box);
     if (this.width() != null && this.height() != null) {

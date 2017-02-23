@@ -20,7 +20,8 @@ before(() => {
     // HACKHACK #2122
     window.Pixel_CloseTo_Requirement = 2;
   } else if (TestMethods.isIE()) {
-    window.Pixel_CloseTo_Requirement = 1.5;
+    const FP_EPSILON = 1e-5;
+    window.Pixel_CloseTo_Requirement = 1.5 + FP_EPSILON;
   } else {
     window.Pixel_CloseTo_Requirement = 0.5;
   }
