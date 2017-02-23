@@ -7196,6 +7196,22 @@ function clientRectsOverlap(clientRectA, clientRectB) {
 }
 exports.clientRectsOverlap = clientRectsOverlap;
 /**
+ * Return a new ClientRect that is the old ClientRect expanded by amount in all directions.
+ * @param rect
+ * @param amount
+ */
+function expandRect(rect, amount) {
+    return {
+        left: rect.left - amount,
+        top: rect.top - amount,
+        right: rect.right + amount,
+        bottom: rect.bottom + amount,
+        width: rect.width + amount * 2,
+        height: rect.height + amount * 2
+    };
+}
+exports.expandRect = expandRect;
+/**
  * Returns true if and only if innerClientRect is inside outerClientRect.
  *
  * @param {ClientRect} innerClientRect The first ClientRect
@@ -8019,10 +8035,10 @@ var d3Ease = __webpack_require__(100);
  * @param easingMode
  */
 function easingFnMapping(easingMode) {
-    // sin, [in, out]
     var words = easingMode.split("-");
     var capitalCaseWords = words.map(function (w) { return w[0].toUpperCase() + w.slice(1); });
     var methodName = "ease" + capitalCaseWords.join("");
+    // HACKHACK access the d3-ease module exports by the name we've constructed
     var easingFn = d3Ease[methodName];
     if (easingFn == null) {
         // default to easeLinear if we can't find the function
@@ -8735,10 +8751,7 @@ var Numeric = (function (_super) {
         }
         this._hideOverflowingTickLabels();
         this._hideOverlappingTickLabels();
-        if (this._tickLabelPositioning === "bottom" ||
-            this._tickLabelPositioning === "top" ||
-            this._tickLabelPositioning === "left" ||
-            this._tickLabelPositioning === "right") {
+        if (this._tickLabelPositioning !== "center") {
             this._hideTickMarksWithoutLabel();
         }
         return this;
@@ -8814,20 +8827,17 @@ var Numeric = (function (_super) {
      *
      * For top, bottom, left, right positioning of the thicks, we want the padding
      * between the labels to be 3x, such that the label will be  `padding` distance
-     * from the tick and 2 * `padding` distance (or more) from the next tick
-     *
+     * from the tick and 2 * `padding` distance (or more) from the next tick:
+     * see https://github.com/palantir/plottable/pull/1812
      */
     Numeric.prototype._hasOverlapWithInterval = function (interval, rects) {
-        var padding = this.tickLabelPadding();
-        if (this._tickLabelPositioning === "bottom" ||
-            this._tickLabelPositioning === "top" ||
-            this._tickLabelPositioning === "left" ||
-            this._tickLabelPositioning === "right") {
-            padding *= 3;
-        }
-        for (var i = 0; i < rects.length - (interval); i += interval) {
-            var currRect = rects[i];
-            var nextRect = rects[i + interval];
+        var padding = (this._tickLabelPositioning === "center")
+            ? this.tickLabelPadding()
+            : this.tickLabelPadding() * 3;
+        var rectsWithPadding = rects.map(function (rect) { return Utils.DOM.expandRect(rect, padding); });
+        for (var i = 0; i < rectsWithPadding.length - interval; i += interval) {
+            var currRect = rectsWithPadding[i];
+            var nextRect = rectsWithPadding[i + interval];
             if (Utils.DOM.clientRectsOverlap(currRect, nextRect)) {
                 return false;
             }

@@ -144,6 +144,22 @@ export function clientRectsOverlap(clientRectA: ClientRect, clientRectB: ClientR
 }
 
 /**
+ * Return a new ClientRect that is the old ClientRect expanded by amount in all directions.
+ * @param rect
+ * @param amount
+ */
+export function expandRect(rect: ClientRect, amount: number) {
+  return {
+    left: rect.left - amount,
+    top: rect.top - amount,
+    right: rect.right + amount,
+    bottom: rect.bottom + amount,
+    width: rect.width + amount * 2,
+    height: rect.height + amount * 2
+  };
+}
+
+/**
  * Returns true if and only if innerClientRect is inside outerClientRect.
  *
  * @param {ClientRect} innerClientRect The first ClientRect

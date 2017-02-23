@@ -210,10 +210,7 @@ export class Numeric extends Axis<number> {
     this._hideOverflowingTickLabels();
     this._hideOverlappingTickLabels();
 
-    if (this._tickLabelPositioning === "bottom" ||
-      this._tickLabelPositioning === "top" ||
-      this._tickLabelPositioning === "left" ||
-      this._tickLabelPositioning === "right") {
+    if (this._tickLabelPositioning !== "center") {
       this._hideTickMarksWithoutLabel();
     }
     return this;
@@ -324,23 +321,19 @@ export class Numeric extends Axis<number> {
    *
    * For top, bottom, left, right positioning of the thicks, we want the padding
    * between the labels to be 3x, such that the label will be  `padding` distance
-   * from the tick and 2 * `padding` distance (or more) from the next tick
-   *
+   * from the tick and 2 * `padding` distance (or more) from the next tick:
+   * see https://github.com/palantir/plottable/pull/1812
    */
   private _hasOverlapWithInterval(interval: number, rects: ClientRect[]): boolean {
+    const padding = (this._tickLabelPositioning === "center")
+      ? this.tickLabelPadding()
+      : this.tickLabelPadding() * 3;
 
-    let padding = this.tickLabelPadding();
+    const rectsWithPadding = rects.map((rect) => Utils.DOM.expandRect(rect, padding));
 
-    if (this._tickLabelPositioning === "bottom" ||
-      this._tickLabelPositioning === "top" ||
-      this._tickLabelPositioning === "left" ||
-      this._tickLabelPositioning === "right") {
-      padding *= 3;
-    }
-
-    for (let i = 0; i < rects.length - (interval); i += interval) {
-      let currRect = rects[i];
-      let nextRect = rects[i + interval];
+    for (let i = 0; i < rectsWithPadding.length - interval; i += interval) {
+      let currRect = rectsWithPadding[i];
+      let nextRect = rectsWithPadding[i + interval];
       if (Utils.DOM.clientRectsOverlap(currRect, nextRect)) {
         return false;
       }

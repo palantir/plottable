@@ -16,10 +16,10 @@ import { AttributeToAppliedProjector, SimpleSelection } from "../core/interfaces
  * @param easingMode
  */
 function easingFnMapping(easingMode: string) {
-  // sin, [in, out]
   const words = easingMode.split("-");
   const capitalCaseWords = words.map((w) => w[0].toUpperCase() + w.slice(1));
   const methodName = `ease${capitalCaseWords.join("")}`;
+  // HACKHACK access the d3-ease module exports by the name we've constructed
   let easingFn: (t: number) => number = (d3Ease as any)[methodName];
   if (easingFn == null) {
     // default to easeLinear if we can't find the function
