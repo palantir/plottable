@@ -98,7 +98,7 @@ var Array = __webpack_require__(91);
 exports.Array = Array;
 var Color = __webpack_require__(94);
 exports.Color = Color;
-var DOM = __webpack_require__(39);
+var DOM = __webpack_require__(42);
 exports.DOM = DOM;
 var Math = __webpack_require__(27);
 exports.Math = Math;
@@ -110,7 +110,7 @@ __export(__webpack_require__(92));
 __export(__webpack_require__(93));
 __export(__webpack_require__(95));
 __export(__webpack_require__(96));
-__export(__webpack_require__(40));
+__export(__webpack_require__(43));
 
 
 /***/ }),
@@ -632,14 +632,14 @@ exports.Plot = Plot;
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-var TickGenerators = __webpack_require__(89);
+var TickGenerators = __webpack_require__(90);
 exports.TickGenerators = TickGenerators;
 __export(__webpack_require__(38));
-__export(__webpack_require__(85));
-__export(__webpack_require__(86));
-__export(__webpack_require__(87));
+__export(__webpack_require__(39));
+__export(__webpack_require__(40));
 __export(__webpack_require__(88));
-__export(__webpack_require__(90));
+__export(__webpack_require__(89));
+__export(__webpack_require__(41));
 // ---------------------------------------------------------
 var categoryScale_2 = __webpack_require__(38);
 var quantitativeScale_1 = __webpack_require__(10);
@@ -1253,8 +1253,8 @@ exports.Component = Component;
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-__export(__webpack_require__(49));
-__export(__webpack_require__(50));
+__export(__webpack_require__(52));
+__export(__webpack_require__(53));
 
 
 /***/ }),
@@ -1659,13 +1659,13 @@ function verifyPrecision(precision) {
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-__export(__webpack_require__(65));
-__export(__webpack_require__(66));
-__export(__webpack_require__(67));
 __export(__webpack_require__(68));
 __export(__webpack_require__(69));
 __export(__webpack_require__(70));
 __export(__webpack_require__(71));
+__export(__webpack_require__(72));
+__export(__webpack_require__(73));
+__export(__webpack_require__(74));
 
 
 /***/ }),
@@ -1951,9 +1951,9 @@ exports.QuantitativeScale = QuantitativeScale;
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-__export(__webpack_require__(62));
-__export(__webpack_require__(63));
-__export(__webpack_require__(64));
+__export(__webpack_require__(65));
+__export(__webpack_require__(66));
+__export(__webpack_require__(67));
 
 
 /***/ }),
@@ -2092,12 +2092,12 @@ __export(__webpack_require__(108));
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-__export(__webpack_require__(72));
-__export(__webpack_require__(73));
-__export(__webpack_require__(74));
-__export(__webpack_require__(31));
 __export(__webpack_require__(75));
 __export(__webpack_require__(76));
+__export(__webpack_require__(77));
+__export(__webpack_require__(31));
+__export(__webpack_require__(78));
+__export(__webpack_require__(79));
 
 
 /***/ }),
@@ -2430,14 +2430,17 @@ var XYPlot = (function (_super) {
         };
     };
     /**
-     * _invertPixelPoint converts a point in pixel coordinates to a point in data coordinates
+     * _invertPixelPoint converts a point in pixel coordinates to a point in data coordinates if scales are comparable
      * @param {Point} point Representation of the point in pixel coordinates
      * @return {Point} Returns the point represented in data coordinates
      */
     XYPlot.prototype._invertPixelPoint = function (point) {
-        var xScale = this.x();
-        var yScale = this.y();
-        return { x: xScale.scale.invertedTransformation(point.x), y: yScale.scale.invertedTransformation(point.y) };
+        var xScale = this.x().scale;
+        var yScale = this.y().scale;
+        if (!xScale.isComparable(yScale) || !yScale.isComparable(xScale)) {
+            return point;
+        }
+        return { x: xScale.invertedTransformation(point.x), y: yScale.invertedTransformation(point.y) };
     };
     XYPlot.prototype._pixelPoint = function (datum, index, dataset) {
         var xProjector = plot_1.Plot._scaledAccessor(this.x());
@@ -2481,15 +2484,15 @@ function __export(m) {
 __export(__webpack_require__(35));
 __export(__webpack_require__(21));
 __export(__webpack_require__(36));
-__export(__webpack_require__(77));
-__export(__webpack_require__(37));
-__export(__webpack_require__(78));
-__export(__webpack_require__(79));
 __export(__webpack_require__(80));
+__export(__webpack_require__(37));
 __export(__webpack_require__(81));
 __export(__webpack_require__(82));
 __export(__webpack_require__(83));
 __export(__webpack_require__(84));
+__export(__webpack_require__(85));
+__export(__webpack_require__(86));
+__export(__webpack_require__(87));
 
 
 /***/ }),
@@ -2643,6 +2646,16 @@ var Scale = (function () {
         this._includedValuesProviders.delete(provider);
         this._autoDomainIfAutomaticMode();
         return this;
+    };
+    /**
+     * Whether Scale is comparable intuitively. eg. Quantitative vs Category, Time vs Time.
+     * Defaults to true.
+     *
+     * @param {Scale}
+     * @returns {boolean}
+     */
+    Scale.prototype.isComparable = function (_scale) {
+        return true;
     };
     return Scale;
 }());
@@ -5428,18 +5441,18 @@ function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
 __export(__webpack_require__(26));
-__export(__webpack_require__(53));
-__export(__webpack_require__(54));
-__export(__webpack_require__(32));
-__export(__webpack_require__(33));
-__export(__webpack_require__(55));
 __export(__webpack_require__(56));
 __export(__webpack_require__(57));
+__export(__webpack_require__(32));
+__export(__webpack_require__(33));
 __export(__webpack_require__(58));
-__export(__webpack_require__(34));
 __export(__webpack_require__(59));
 __export(__webpack_require__(60));
 __export(__webpack_require__(61));
+__export(__webpack_require__(34));
+__export(__webpack_require__(62));
+__export(__webpack_require__(63));
+__export(__webpack_require__(64));
 var Alignment = (function () {
     function Alignment() {
     }
@@ -6967,6 +6980,9 @@ var Category = (function (_super) {
     Category.prototype._rescaleBand = function (band) {
         return Math.abs(this._d3TransformationScale(band) - this._d3TransformationScale(0));
     };
+    Category.prototype.isComparable = function (_scale) {
+        return false;
+    };
     return Category;
 }(scale_1.Scale));
 exports.Category = Category;
@@ -6974,6 +6990,452 @@ exports.Category = Category;
 
 /***/ }),
 /* 39 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/**
+ * Copyright 2014-present Palantir Technologies
+ * @license MIT
+ */
+
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
+var d3 = __webpack_require__(1);
+var Utils = __webpack_require__(0);
+var scale_1 = __webpack_require__(17);
+var Color = (function (_super) {
+    __extends(Color, _super);
+    /**
+     * A Color Scale maps string values to color hex values expressed as a string.
+     *
+     * @constructor
+     * @param {string} [scaleType] One of "Category10"/"Category20"/"Category20b"/"Category20c".
+     *   (see https://github.com/mbostock/d3/wiki/Ordinal-Scales#categorical-colors)
+     *   If not supplied, reads the colors defined using CSS -- see plottable.css.
+     */
+    function Color(scaleType) {
+        _super.call(this);
+        var scale;
+        switch (scaleType) {
+            case null:
+            case undefined:
+                if (Color._plottableColorCache == null) {
+                    Color._plottableColorCache = Color._getPlottableColors();
+                }
+                scale = d3.scale.ordinal().range(Color._plottableColorCache);
+                break;
+            case "Category10":
+            case "category10":
+            case "10":
+                scale = d3.scale.category10();
+                break;
+            case "Category20":
+            case "category20":
+            case "20":
+                scale = d3.scale.category20();
+                break;
+            case "Category20b":
+            case "category20b":
+            case "20b":
+                scale = d3.scale.category20b();
+                break;
+            case "Category20c":
+            case "category20c":
+            case "20c":
+                scale = d3.scale.category20c();
+                break;
+            default:
+                throw new Error("Unsupported ColorScale type");
+        }
+        this._d3Scale = scale;
+    }
+    Color.prototype.extentOfValues = function (values) {
+        return Utils.Array.uniq(values);
+    };
+    // Duplicated from OrdinalScale._getExtent - should be removed in #388
+    Color.prototype._getExtent = function () {
+        return Utils.Array.uniq(this._getAllIncludedValues());
+    };
+    Color.invalidateColorCache = function () {
+        Color._plottableColorCache = null;
+    };
+    Color._getPlottableColors = function () {
+        var plottableDefaultColors = [];
+        var colorTester = d3.select("body").append("plottable-color-tester");
+        var defaultColorHex = Utils.Color.colorTest(colorTester, "");
+        var i = 0;
+        var colorHex = Utils.Color.colorTest(colorTester, "plottable-colors-0");
+        while (colorHex != null && i < this._MAXIMUM_COLORS_FROM_CSS) {
+            if (colorHex === defaultColorHex && colorHex === plottableDefaultColors[plottableDefaultColors.length - 1]) {
+                break;
+            }
+            plottableDefaultColors.push(colorHex);
+            i++;
+            colorHex = Utils.Color.colorTest(colorTester, "plottable-colors-" + i);
+        }
+        colorTester.remove();
+        return plottableDefaultColors;
+    };
+    /**
+     * Returns the color-string corresponding to a given string.
+     * If there are not enough colors in the range(), a lightened version of an existing color will be used.
+     *
+     * @param {string} value
+     * @returns {string}
+     */
+    Color.prototype.scale = function (value) {
+        var color = this._d3Scale(value);
+        var index = this.domain().indexOf(value);
+        var numLooped = Math.floor(index / this.range().length);
+        var modifyFactor = Math.log(numLooped * Color._LOOP_LIGHTEN_FACTOR + 1);
+        return Utils.Color.lightenColor(color, modifyFactor);
+    };
+    Color.prototype._getDomain = function () {
+        return this._backingScaleDomain();
+    };
+    Color.prototype._backingScaleDomain = function (values) {
+        if (values == null) {
+            return this._d3Scale.domain();
+        }
+        else {
+            this._d3Scale.domain(values);
+            return this;
+        }
+    };
+    Color.prototype._getRange = function () {
+        return this._d3Scale.range();
+    };
+    Color.prototype._setRange = function (values) {
+        this._d3Scale.range(values);
+    };
+    Color.prototype.isComparable = function (_scale) {
+        return false;
+    };
+    Color._LOOP_LIGHTEN_FACTOR = 1.6;
+    // The maximum number of colors we are getting from CSS stylesheets
+    Color._MAXIMUM_COLORS_FROM_CSS = 256;
+    return Color;
+}(scale_1.Scale));
+exports.Color = Color;
+
+
+/***/ }),
+/* 40 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/**
+ * Copyright 2014-present Palantir Technologies
+ * @license MIT
+ */
+
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
+var d3 = __webpack_require__(1);
+var Utils = __webpack_require__(0);
+var scale_1 = __webpack_require__(17);
+var InterpolatedColor = (function (_super) {
+    __extends(InterpolatedColor, _super);
+    /**
+     * An InterpolatedColor Scale maps numbers to color hex values, expressed as strings.
+     *
+     * @param {string} [scaleType="linear"] One of "linear"/"log"/"sqrt"/"pow".
+     */
+    function InterpolatedColor(scaleType) {
+        if (scaleType === void 0) { scaleType = "linear"; }
+        _super.call(this);
+        switch (scaleType) {
+            case "linear":
+                this._colorScale = d3.scale.linear();
+                break;
+            case "log":
+                this._colorScale = d3.scale.log();
+                break;
+            case "sqrt":
+                this._colorScale = d3.scale.sqrt();
+                break;
+            case "pow":
+                this._colorScale = d3.scale.pow();
+                break;
+        }
+        if (this._colorScale == null) {
+            throw new Error("unknown QuantitativeScale scale type " + scaleType);
+        }
+        this.range(InterpolatedColor.REDS);
+    }
+    InterpolatedColor.prototype.extentOfValues = function (values) {
+        var extent = d3.extent(values);
+        if (extent[0] == null || extent[1] == null) {
+            return [];
+        }
+        else {
+            return extent;
+        }
+    };
+    /**
+     * Generates the converted QuantitativeScale.
+     */
+    InterpolatedColor.prototype._d3InterpolatedScale = function () {
+        return this._colorScale.range([0, 1]).interpolate(this._interpolateColors());
+    };
+    /**
+     * Generates the d3 interpolator for colors.
+     */
+    InterpolatedColor.prototype._interpolateColors = function () {
+        var colors = this._colorRange;
+        if (colors.length < 2) {
+            throw new Error("Color scale arrays must have at least two elements.");
+        }
+        ;
+        return function (a, b) {
+            return function (t) {
+                // Clamp t parameter to [0,1]
+                t = Math.max(0, Math.min(1, t));
+                // Determine indices for colors
+                var tScaled = t * (colors.length - 1);
+                var i0 = Math.floor(tScaled);
+                var i1 = Math.ceil(tScaled);
+                var frac = (tScaled - i0);
+                // Interpolate in the L*a*b color space
+                return d3.interpolateLab(colors[i0], colors[i1])(frac);
+            };
+        };
+    };
+    InterpolatedColor.prototype._resetScale = function () {
+        this._d3Scale = this._d3InterpolatedScale();
+        this._autoDomainIfAutomaticMode();
+        this._dispatchUpdate();
+    };
+    InterpolatedColor.prototype.autoDomain = function () {
+        // InterpolatedColorScales do not pad
+        var includedValues = this._getAllIncludedValues();
+        if (includedValues.length > 0) {
+            this._setDomain([Utils.Math.min(includedValues, 0), Utils.Math.max(includedValues, 0)]);
+        }
+        return this;
+    };
+    InterpolatedColor.prototype.scale = function (value) {
+        return this._d3Scale(value);
+    };
+    InterpolatedColor.prototype._getDomain = function () {
+        return this._backingScaleDomain();
+    };
+    InterpolatedColor.prototype._backingScaleDomain = function (values) {
+        if (values == null) {
+            return this._d3Scale.domain();
+        }
+        else {
+            this._d3Scale.domain(values);
+            return this;
+        }
+    };
+    InterpolatedColor.prototype._getRange = function () {
+        return this._colorRange;
+    };
+    InterpolatedColor.prototype._setRange = function (range) {
+        this._colorRange = range;
+        this._resetScale();
+    };
+    InterpolatedColor.prototype.isComparable = function (_scale) {
+        return false;
+    };
+    InterpolatedColor.REDS = [
+        "#FFFFFF",
+        "#FFF6E1",
+        "#FEF4C0",
+        "#FED976",
+        "#FEB24C",
+        "#FD8D3C",
+        "#FC4E2A",
+        "#E31A1C",
+        "#B10026",
+    ];
+    InterpolatedColor.BLUES = [
+        "#FFFFFF",
+        "#CCFFFF",
+        "#A5FFFD",
+        "#85F7FB",
+        "#6ED3EF",
+        "#55A7E0",
+        "#417FD0",
+        "#2545D3",
+        "#0B02E1",
+    ];
+    InterpolatedColor.POSNEG = [
+        "#0B02E1",
+        "#2545D3",
+        "#417FD0",
+        "#55A7E0",
+        "#6ED3EF",
+        "#85F7FB",
+        "#A5FFFD",
+        "#CCFFFF",
+        "#FFFFFF",
+        "#FFF6E1",
+        "#FEF4C0",
+        "#FED976",
+        "#FEB24C",
+        "#FD8D3C",
+        "#FC4E2A",
+        "#E31A1C",
+        "#B10026",
+    ];
+    return InterpolatedColor;
+}(scale_1.Scale));
+exports.InterpolatedColor = InterpolatedColor;
+
+
+/***/ }),
+/* 41 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/**
+ * Copyright 2014-present Palantir Technologies
+ * @license MIT
+ */
+
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
+var d3 = __webpack_require__(1);
+var timeAxis_1 = __webpack_require__(22);
+var quantitativeScale_1 = __webpack_require__(10);
+var Time = (function (_super) {
+    __extends(Time, _super);
+    /**
+     * A Time Scale maps Date objects to numbers.
+     *
+     * @constructor
+     */
+    function Time() {
+        _super.call(this);
+        this._d3Scale = d3.time.scale();
+        this.autoDomain();
+    }
+    /**
+     * Returns an array of ticks values separated by the specified interval.
+     *
+     * @param {string} interval A string specifying the interval unit.
+     * @param {number?} [step] The number of multiples of the interval between consecutive ticks.
+     * @return {Date[]}
+     */
+    Time.prototype.tickInterval = function (interval, step) {
+        // temporarily creats a time scale from our linear scale into a time scale so we can get access to its api
+        var tempScale = d3.time.scale();
+        var d3Interval = Time.timeIntervalToD3Time(interval);
+        tempScale.domain(this.domain());
+        tempScale.range(this.range());
+        return tempScale.ticks(d3Interval, step);
+    };
+    Time.prototype._setDomain = function (values) {
+        if (values[1] < values[0]) {
+            throw new Error("Scale.Time domain values must be in chronological order");
+        }
+        return _super.prototype._setDomain.call(this, values);
+    };
+    Time.prototype._defaultExtent = function () {
+        return [new Date("1970-01-01"), new Date("1970-01-02")];
+    };
+    Time.prototype._expandSingleValueDomain = function (singleValueDomain) {
+        var startTime = singleValueDomain[0].getTime();
+        var endTime = singleValueDomain[1].getTime();
+        if (startTime === endTime) {
+            var startDate = new Date(startTime);
+            startDate.setDate(startDate.getDate() - 1);
+            var endDate = new Date(endTime);
+            endDate.setDate(endDate.getDate() + 1);
+            return [startDate, endDate];
+        }
+        return singleValueDomain;
+    };
+    Time.prototype.scale = function (value) {
+        return this._d3Scale(value);
+    };
+    Time.prototype.scaleTransformation = function (value) {
+        return this.scale(new Date(value));
+    };
+    Time.prototype.invertedTransformation = function (value) {
+        return this.invert(value).getTime();
+    };
+    Time.prototype.getTransformationDomain = function () {
+        var dates = this.domain();
+        return [dates[0].valueOf(), dates[1].valueOf()];
+    };
+    Time.prototype._getDomain = function () {
+        return this._backingScaleDomain();
+    };
+    Time.prototype._backingScaleDomain = function (values) {
+        if (values == null) {
+            return this._d3Scale.domain();
+        }
+        else {
+            this._d3Scale.domain(values);
+            return this;
+        }
+    };
+    Time.prototype._getRange = function () {
+        return this._d3Scale.range();
+    };
+    Time.prototype._setRange = function (values) {
+        this._d3Scale.range(values);
+    };
+    Time.prototype.invert = function (value) {
+        return this._d3Scale.invert(value);
+    };
+    Time.prototype.defaultTicks = function () {
+        return this._d3Scale.ticks(Time._DEFAULT_NUM_TICKS);
+    };
+    Time.prototype._niceDomain = function (domain) {
+        return this._d3Scale.copy().domain(domain).nice().domain();
+    };
+    /**
+     * Transforms the Plottable TimeInterval string into a d3 time interval equivalent.
+     * If the provided TimeInterval is incorrect, the default is d3.time.year
+     */
+    Time.timeIntervalToD3Time = function (timeInterval) {
+        switch (timeInterval) {
+            case timeAxis_1.TimeInterval.second:
+                return d3.time.second;
+            case timeAxis_1.TimeInterval.minute:
+                return d3.time.minute;
+            case timeAxis_1.TimeInterval.hour:
+                return d3.time.hour;
+            case timeAxis_1.TimeInterval.day:
+                return d3.time.day;
+            case timeAxis_1.TimeInterval.week:
+                return d3.time.week;
+            case timeAxis_1.TimeInterval.month:
+                return d3.time.month;
+            case timeAxis_1.TimeInterval.year:
+                return d3.time.year;
+            default:
+                throw Error("TimeInterval specified does not exist: " + timeInterval);
+        }
+    };
+    Time.prototype.isComparable = function (scale) {
+        if (scale instanceof Time) {
+            return true;
+        }
+        else {
+            return false;
+        }
+    };
+    return Time;
+}(quantitativeScale_1.QuantitativeScale));
+exports.Time = Time;
+
+
+/***/ }),
+/* 42 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7179,7 +7641,7 @@ function _parseStyleValue(style, property) {
 
 
 /***/ }),
-/* 40 */
+/* 43 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7251,7 +7713,7 @@ exports.Set = Set;
 
 
 /***/ }),
-/* 41 */
+/* 44 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7319,7 +7781,7 @@ exports.AbstractMeasurer = AbstractMeasurer;
 //# sourceMappingURL=abstractMeasurer.js.map
 
 /***/ }),
-/* 42 */
+/* 45 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7335,7 +7797,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
 var Utils = __webpack_require__(13);
-var characterMeasurer_1 = __webpack_require__(43);
+var characterMeasurer_1 = __webpack_require__(46);
 var CacheCharacterMeasurer = (function (_super) {
     __extends(CacheCharacterMeasurer, _super);
     function CacheCharacterMeasurer(area, className, useGuards) {
@@ -7360,7 +7822,7 @@ exports.CacheCharacterMeasurer = CacheCharacterMeasurer;
 //# sourceMappingURL=cacheCharacterMeasurer.js.map
 
 /***/ }),
-/* 43 */
+/* 46 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7376,7 +7838,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
 var d3 = __webpack_require__(1);
-var measurer_1 = __webpack_require__(44);
+var measurer_1 = __webpack_require__(47);
 var CharacterMeasurer = (function (_super) {
     __extends(CharacterMeasurer, _super);
     function CharacterMeasurer() {
@@ -7399,7 +7861,7 @@ exports.CharacterMeasurer = CharacterMeasurer;
 //# sourceMappingURL=characterMeasurer.js.map
 
 /***/ }),
-/* 44 */
+/* 47 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7415,7 +7877,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
 var d3 = __webpack_require__(1);
-var abstractMeasurer_1 = __webpack_require__(41);
+var abstractMeasurer_1 = __webpack_require__(44);
 var Measurer = (function (_super) {
     __extends(Measurer, _super);
     function Measurer(area, className, useGuards) {
@@ -7461,7 +7923,7 @@ exports.Measurer = Measurer;
 //# sourceMappingURL=measurer.js.map
 
 /***/ }),
-/* 45 */
+/* 48 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7688,7 +8150,7 @@ exports.Wrapper = Wrapper;
 //# sourceMappingURL=wrapper.js.map
 
 /***/ }),
-/* 46 */
+/* 49 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7700,13 +8162,13 @@ exports.Wrapper = Wrapper;
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-__export(__webpack_require__(51));
-__export(__webpack_require__(52));
+__export(__webpack_require__(54));
+__export(__webpack_require__(55));
 __export(__webpack_require__(22));
 
 
 /***/ }),
-/* 47 */
+/* 50 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7778,7 +8240,7 @@ exports.Dataset = Dataset;
 
 
 /***/ }),
-/* 48 */
+/* 51 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7796,7 +8258,7 @@ exports.version = "3.0.0-beta.1";
 
 
 /***/ }),
-/* 49 */
+/* 52 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7915,7 +8377,7 @@ exports.Easing = Easing;
 
 
 /***/ }),
-/* 50 */
+/* 53 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7943,7 +8405,7 @@ exports.Null = Null;
 
 
 /***/ }),
-/* 51 */
+/* 54 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8310,7 +8772,7 @@ exports.Category = Category;
 
 
 /***/ }),
-/* 52 */
+/* 55 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8620,7 +9082,7 @@ exports.Numeric = Numeric;
 
 
 /***/ }),
-/* 53 */
+/* 56 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8809,7 +9271,7 @@ exports.DragLineLayer = DragLineLayer;
 
 
 /***/ }),
-/* 54 */
+/* 57 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8919,7 +9381,7 @@ exports.Gridlines = Gridlines;
 
 
 /***/ }),
-/* 55 */
+/* 58 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -9178,7 +9640,7 @@ exports.InterpolatedColorLegend = InterpolatedColorLegend;
 
 
 /***/ }),
-/* 56 */
+/* 59 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -9344,7 +9806,7 @@ exports.AxisLabel = AxisLabel;
 
 
 /***/ }),
-/* 57 */
+/* 60 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -9844,7 +10306,7 @@ exports.Legend = Legend;
 
 
 /***/ }),
-/* 58 */
+/* 61 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -9901,7 +10363,7 @@ exports.PlotGroup = PlotGroup;
 
 
 /***/ }),
-/* 59 */
+/* 62 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -10300,7 +10762,7 @@ exports.Table = Table;
 
 
 /***/ }),
-/* 60 */
+/* 63 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -10366,7 +10828,7 @@ exports.XDragBoxLayer = XDragBoxLayer;
 
 
 /***/ }),
-/* 61 */
+/* 64 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -10432,7 +10894,7 @@ exports.YDragBoxLayer = YDragBoxLayer;
 
 
 /***/ }),
-/* 62 */
+/* 65 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -10528,7 +10990,7 @@ exports.Key = Key;
 
 
 /***/ }),
-/* 63 */
+/* 66 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -10728,7 +11190,7 @@ exports.Mouse = Mouse;
 
 
 /***/ }),
-/* 64 */
+/* 67 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -10904,7 +11366,7 @@ exports.Touch = Touch;
 
 
 /***/ }),
-/* 65 */
+/* 68 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -10936,7 +11398,7 @@ exports.Arc = Arc;
 
 
 /***/ }),
-/* 66 */
+/* 69 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -10968,7 +11430,7 @@ exports.ArcOutline = ArcOutline;
 
 
 /***/ }),
-/* 67 */
+/* 70 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -11004,7 +11466,7 @@ exports.Area = Area;
 
 
 /***/ }),
-/* 68 */
+/* 71 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -11040,7 +11502,7 @@ exports.Line = Line;
 
 
 /***/ }),
-/* 69 */
+/* 72 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -11067,7 +11529,7 @@ exports.Rectangle = Rectangle;
 
 
 /***/ }),
-/* 70 */
+/* 73 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -11094,7 +11556,7 @@ exports.Segment = Segment;
 
 
 /***/ }),
-/* 71 */
+/* 74 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -11122,7 +11584,7 @@ exports.Symbol = Symbol;
 
 
 /***/ }),
-/* 72 */
+/* 75 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -11211,7 +11673,7 @@ exports.Click = Click;
 
 
 /***/ }),
-/* 73 */
+/* 76 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -11330,7 +11792,7 @@ exports.DoubleClick = DoubleClick;
 
 
 /***/ }),
-/* 74 */
+/* 77 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -11495,7 +11957,7 @@ exports.Drag = Drag;
 
 
 /***/ }),
-/* 75 */
+/* 78 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -12053,7 +12515,7 @@ exports.PanZoom = PanZoom;
 
 
 /***/ }),
-/* 76 */
+/* 79 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -12184,7 +12646,7 @@ exports.Pointer = Pointer;
 
 
 /***/ }),
-/* 77 */
+/* 80 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -12257,7 +12719,7 @@ exports.ClusteredBar = ClusteredBar;
 
 
 /***/ }),
-/* 78 */
+/* 81 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -12753,7 +13215,7 @@ exports.Pie = Pie;
 
 
 /***/ }),
-/* 79 */
+/* 82 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -13119,7 +13581,7 @@ exports.Rectangle = Rectangle;
 
 
 /***/ }),
-/* 80 */
+/* 83 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -13297,7 +13759,7 @@ exports.Scatter = Scatter;
 
 
 /***/ }),
-/* 81 */
+/* 84 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -13495,7 +13957,7 @@ exports.Segment = Segment;
 
 
 /***/ }),
-/* 82 */
+/* 85 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -13698,7 +14160,7 @@ exports.StackedArea = StackedArea;
 
 
 /***/ }),
-/* 83 */
+/* 86 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -13917,7 +14379,7 @@ exports.StackedBar = StackedBar;
 
 
 /***/ }),
-/* 84 */
+/* 87 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -14128,304 +14590,7 @@ exports.Waterfall = Waterfall;
 
 
 /***/ }),
-/* 85 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-/**
- * Copyright 2014-present Palantir Technologies
- * @license MIT
- */
-
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
-var d3 = __webpack_require__(1);
-var Utils = __webpack_require__(0);
-var scale_1 = __webpack_require__(17);
-var Color = (function (_super) {
-    __extends(Color, _super);
-    /**
-     * A Color Scale maps string values to color hex values expressed as a string.
-     *
-     * @constructor
-     * @param {string} [scaleType] One of "Category10"/"Category20"/"Category20b"/"Category20c".
-     *   (see https://github.com/mbostock/d3/wiki/Ordinal-Scales#categorical-colors)
-     *   If not supplied, reads the colors defined using CSS -- see plottable.css.
-     */
-    function Color(scaleType) {
-        _super.call(this);
-        var scale;
-        switch (scaleType) {
-            case null:
-            case undefined:
-                if (Color._plottableColorCache == null) {
-                    Color._plottableColorCache = Color._getPlottableColors();
-                }
-                scale = d3.scale.ordinal().range(Color._plottableColorCache);
-                break;
-            case "Category10":
-            case "category10":
-            case "10":
-                scale = d3.scale.category10();
-                break;
-            case "Category20":
-            case "category20":
-            case "20":
-                scale = d3.scale.category20();
-                break;
-            case "Category20b":
-            case "category20b":
-            case "20b":
-                scale = d3.scale.category20b();
-                break;
-            case "Category20c":
-            case "category20c":
-            case "20c":
-                scale = d3.scale.category20c();
-                break;
-            default:
-                throw new Error("Unsupported ColorScale type");
-        }
-        this._d3Scale = scale;
-    }
-    Color.prototype.extentOfValues = function (values) {
-        return Utils.Array.uniq(values);
-    };
-    // Duplicated from OrdinalScale._getExtent - should be removed in #388
-    Color.prototype._getExtent = function () {
-        return Utils.Array.uniq(this._getAllIncludedValues());
-    };
-    Color.invalidateColorCache = function () {
-        Color._plottableColorCache = null;
-    };
-    Color._getPlottableColors = function () {
-        var plottableDefaultColors = [];
-        var colorTester = d3.select("body").append("plottable-color-tester");
-        var defaultColorHex = Utils.Color.colorTest(colorTester, "");
-        var i = 0;
-        var colorHex = Utils.Color.colorTest(colorTester, "plottable-colors-0");
-        while (colorHex != null && i < this._MAXIMUM_COLORS_FROM_CSS) {
-            if (colorHex === defaultColorHex && colorHex === plottableDefaultColors[plottableDefaultColors.length - 1]) {
-                break;
-            }
-            plottableDefaultColors.push(colorHex);
-            i++;
-            colorHex = Utils.Color.colorTest(colorTester, "plottable-colors-" + i);
-        }
-        colorTester.remove();
-        return plottableDefaultColors;
-    };
-    /**
-     * Returns the color-string corresponding to a given string.
-     * If there are not enough colors in the range(), a lightened version of an existing color will be used.
-     *
-     * @param {string} value
-     * @returns {string}
-     */
-    Color.prototype.scale = function (value) {
-        var color = this._d3Scale(value);
-        var index = this.domain().indexOf(value);
-        var numLooped = Math.floor(index / this.range().length);
-        var modifyFactor = Math.log(numLooped * Color._LOOP_LIGHTEN_FACTOR + 1);
-        return Utils.Color.lightenColor(color, modifyFactor);
-    };
-    Color.prototype._getDomain = function () {
-        return this._backingScaleDomain();
-    };
-    Color.prototype._backingScaleDomain = function (values) {
-        if (values == null) {
-            return this._d3Scale.domain();
-        }
-        else {
-            this._d3Scale.domain(values);
-            return this;
-        }
-    };
-    Color.prototype._getRange = function () {
-        return this._d3Scale.range();
-    };
-    Color.prototype._setRange = function (values) {
-        this._d3Scale.range(values);
-    };
-    Color._LOOP_LIGHTEN_FACTOR = 1.6;
-    // The maximum number of colors we are getting from CSS stylesheets
-    Color._MAXIMUM_COLORS_FROM_CSS = 256;
-    return Color;
-}(scale_1.Scale));
-exports.Color = Color;
-
-
-/***/ }),
-/* 86 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-/**
- * Copyright 2014-present Palantir Technologies
- * @license MIT
- */
-
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
-var d3 = __webpack_require__(1);
-var Utils = __webpack_require__(0);
-var scale_1 = __webpack_require__(17);
-var InterpolatedColor = (function (_super) {
-    __extends(InterpolatedColor, _super);
-    /**
-     * An InterpolatedColor Scale maps numbers to color hex values, expressed as strings.
-     *
-     * @param {string} [scaleType="linear"] One of "linear"/"log"/"sqrt"/"pow".
-     */
-    function InterpolatedColor(scaleType) {
-        if (scaleType === void 0) { scaleType = "linear"; }
-        _super.call(this);
-        switch (scaleType) {
-            case "linear":
-                this._colorScale = d3.scale.linear();
-                break;
-            case "log":
-                this._colorScale = d3.scale.log();
-                break;
-            case "sqrt":
-                this._colorScale = d3.scale.sqrt();
-                break;
-            case "pow":
-                this._colorScale = d3.scale.pow();
-                break;
-        }
-        if (this._colorScale == null) {
-            throw new Error("unknown QuantitativeScale scale type " + scaleType);
-        }
-        this.range(InterpolatedColor.REDS);
-    }
-    InterpolatedColor.prototype.extentOfValues = function (values) {
-        var extent = d3.extent(values);
-        if (extent[0] == null || extent[1] == null) {
-            return [];
-        }
-        else {
-            return extent;
-        }
-    };
-    /**
-     * Generates the converted QuantitativeScale.
-     */
-    InterpolatedColor.prototype._d3InterpolatedScale = function () {
-        return this._colorScale.range([0, 1]).interpolate(this._interpolateColors());
-    };
-    /**
-     * Generates the d3 interpolator for colors.
-     */
-    InterpolatedColor.prototype._interpolateColors = function () {
-        var colors = this._colorRange;
-        if (colors.length < 2) {
-            throw new Error("Color scale arrays must have at least two elements.");
-        }
-        ;
-        return function (a, b) {
-            return function (t) {
-                // Clamp t parameter to [0,1]
-                t = Math.max(0, Math.min(1, t));
-                // Determine indices for colors
-                var tScaled = t * (colors.length - 1);
-                var i0 = Math.floor(tScaled);
-                var i1 = Math.ceil(tScaled);
-                var frac = (tScaled - i0);
-                // Interpolate in the L*a*b color space
-                return d3.interpolateLab(colors[i0], colors[i1])(frac);
-            };
-        };
-    };
-    InterpolatedColor.prototype._resetScale = function () {
-        this._d3Scale = this._d3InterpolatedScale();
-        this._autoDomainIfAutomaticMode();
-        this._dispatchUpdate();
-    };
-    InterpolatedColor.prototype.autoDomain = function () {
-        // InterpolatedColorScales do not pad
-        var includedValues = this._getAllIncludedValues();
-        if (includedValues.length > 0) {
-            this._setDomain([Utils.Math.min(includedValues, 0), Utils.Math.max(includedValues, 0)]);
-        }
-        return this;
-    };
-    InterpolatedColor.prototype.scale = function (value) {
-        return this._d3Scale(value);
-    };
-    InterpolatedColor.prototype._getDomain = function () {
-        return this._backingScaleDomain();
-    };
-    InterpolatedColor.prototype._backingScaleDomain = function (values) {
-        if (values == null) {
-            return this._d3Scale.domain();
-        }
-        else {
-            this._d3Scale.domain(values);
-            return this;
-        }
-    };
-    InterpolatedColor.prototype._getRange = function () {
-        return this._colorRange;
-    };
-    InterpolatedColor.prototype._setRange = function (range) {
-        this._colorRange = range;
-        this._resetScale();
-    };
-    InterpolatedColor.REDS = [
-        "#FFFFFF",
-        "#FFF6E1",
-        "#FEF4C0",
-        "#FED976",
-        "#FEB24C",
-        "#FD8D3C",
-        "#FC4E2A",
-        "#E31A1C",
-        "#B10026",
-    ];
-    InterpolatedColor.BLUES = [
-        "#FFFFFF",
-        "#CCFFFF",
-        "#A5FFFD",
-        "#85F7FB",
-        "#6ED3EF",
-        "#55A7E0",
-        "#417FD0",
-        "#2545D3",
-        "#0B02E1",
-    ];
-    InterpolatedColor.POSNEG = [
-        "#0B02E1",
-        "#2545D3",
-        "#417FD0",
-        "#55A7E0",
-        "#6ED3EF",
-        "#85F7FB",
-        "#A5FFFD",
-        "#CCFFFF",
-        "#FFFFFF",
-        "#FFF6E1",
-        "#FEF4C0",
-        "#FED976",
-        "#FEB24C",
-        "#FD8D3C",
-        "#FC4E2A",
-        "#E31A1C",
-        "#B10026",
-    ];
-    return InterpolatedColor;
-}(scale_1.Scale));
-exports.InterpolatedColor = InterpolatedColor;
-
-
-/***/ }),
-/* 87 */
+/* 88 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -14504,7 +14669,7 @@ exports.Linear = Linear;
 
 
 /***/ }),
-/* 88 */
+/* 89 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -14728,7 +14893,7 @@ exports.ModifiedLog = ModifiedLog;
 
 
 /***/ }),
-/* 89 */
+/* 90 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -14775,141 +14940,6 @@ function integerTickGenerator() {
     };
 }
 exports.integerTickGenerator = integerTickGenerator;
-
-
-/***/ }),
-/* 90 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-/**
- * Copyright 2014-present Palantir Technologies
- * @license MIT
- */
-
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
-var d3 = __webpack_require__(1);
-var timeAxis_1 = __webpack_require__(22);
-var quantitativeScale_1 = __webpack_require__(10);
-var Time = (function (_super) {
-    __extends(Time, _super);
-    /**
-     * A Time Scale maps Date objects to numbers.
-     *
-     * @constructor
-     */
-    function Time() {
-        _super.call(this);
-        this._d3Scale = d3.time.scale();
-        this.autoDomain();
-    }
-    /**
-     * Returns an array of ticks values separated by the specified interval.
-     *
-     * @param {string} interval A string specifying the interval unit.
-     * @param {number?} [step] The number of multiples of the interval between consecutive ticks.
-     * @return {Date[]}
-     */
-    Time.prototype.tickInterval = function (interval, step) {
-        // temporarily creats a time scale from our linear scale into a time scale so we can get access to its api
-        var tempScale = d3.time.scale();
-        var d3Interval = Time.timeIntervalToD3Time(interval);
-        tempScale.domain(this.domain());
-        tempScale.range(this.range());
-        return tempScale.ticks(d3Interval, step);
-    };
-    Time.prototype._setDomain = function (values) {
-        if (values[1] < values[0]) {
-            throw new Error("Scale.Time domain values must be in chronological order");
-        }
-        return _super.prototype._setDomain.call(this, values);
-    };
-    Time.prototype._defaultExtent = function () {
-        return [new Date("1970-01-01"), new Date("1970-01-02")];
-    };
-    Time.prototype._expandSingleValueDomain = function (singleValueDomain) {
-        var startTime = singleValueDomain[0].getTime();
-        var endTime = singleValueDomain[1].getTime();
-        if (startTime === endTime) {
-            var startDate = new Date(startTime);
-            startDate.setDate(startDate.getDate() - 1);
-            var endDate = new Date(endTime);
-            endDate.setDate(endDate.getDate() + 1);
-            return [startDate, endDate];
-        }
-        return singleValueDomain;
-    };
-    Time.prototype.scale = function (value) {
-        return this._d3Scale(value);
-    };
-    Time.prototype.scaleTransformation = function (value) {
-        return this.scale(new Date(value));
-    };
-    Time.prototype.invertedTransformation = function (value) {
-        return this.invert(value).getTime();
-    };
-    Time.prototype.getTransformationDomain = function () {
-        var dates = this.domain();
-        return [dates[0].valueOf(), dates[1].valueOf()];
-    };
-    Time.prototype._getDomain = function () {
-        return this._backingScaleDomain();
-    };
-    Time.prototype._backingScaleDomain = function (values) {
-        if (values == null) {
-            return this._d3Scale.domain();
-        }
-        else {
-            this._d3Scale.domain(values);
-            return this;
-        }
-    };
-    Time.prototype._getRange = function () {
-        return this._d3Scale.range();
-    };
-    Time.prototype._setRange = function (values) {
-        this._d3Scale.range(values);
-    };
-    Time.prototype.invert = function (value) {
-        return this._d3Scale.invert(value);
-    };
-    Time.prototype.defaultTicks = function () {
-        return this._d3Scale.ticks(Time._DEFAULT_NUM_TICKS);
-    };
-    Time.prototype._niceDomain = function (domain) {
-        return this._d3Scale.copy().domain(domain).nice().domain();
-    };
-    /**
-     * Transforms the Plottable TimeInterval string into a d3 time interval equivalent.
-     * If the provided TimeInterval is incorrect, the default is d3.time.year
-     */
-    Time.timeIntervalToD3Time = function (timeInterval) {
-        switch (timeInterval) {
-            case timeAxis_1.TimeInterval.second:
-                return d3.time.second;
-            case timeAxis_1.TimeInterval.minute:
-                return d3.time.minute;
-            case timeAxis_1.TimeInterval.hour:
-                return d3.time.hour;
-            case timeAxis_1.TimeInterval.day:
-                return d3.time.day;
-            case timeAxis_1.TimeInterval.week:
-                return d3.time.week;
-            case timeAxis_1.TimeInterval.month:
-                return d3.time.month;
-            case timeAxis_1.TimeInterval.year:
-                return d3.time.year;
-            default:
-                throw Error("TimeInterval specified does not exist: " + timeInterval);
-        }
-    };
-    return Time;
-}(quantitativeScale_1.QuantitativeScale));
-exports.Time = Time;
 
 
 /***/ }),
@@ -14997,7 +15027,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var set_1 = __webpack_require__(40);
+var set_1 = __webpack_require__(43);
 /**
  * A set of callbacks which can be all invoked at once.
  * Each callback exists at most once in the set (based on reference equality).
@@ -15034,7 +15064,7 @@ exports.CallbackSet = CallbackSet;
  * @license MIT
  */
 
-var DOM = __webpack_require__(39);
+var DOM = __webpack_require__(42);
 var ClientToSVGTranslator = (function () {
     function ClientToSVGTranslator(svg) {
         this._svg = svg;
@@ -15674,7 +15704,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
 var Utils = __webpack_require__(13);
-var cacheCharacterMeasurer_1 = __webpack_require__(42);
+var cacheCharacterMeasurer_1 = __webpack_require__(45);
 var CacheMeasurer = (function (_super) {
     __extends(CacheMeasurer, _super);
     function CacheMeasurer(area, className) {
@@ -15713,11 +15743,11 @@ exports.CacheMeasurer = CacheMeasurer;
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-__export(__webpack_require__(41));
-__export(__webpack_require__(42));
-__export(__webpack_require__(102));
-__export(__webpack_require__(43));
 __export(__webpack_require__(44));
+__export(__webpack_require__(45));
+__export(__webpack_require__(102));
+__export(__webpack_require__(46));
+__export(__webpack_require__(47));
 //# sourceMappingURL=index.js.map
 
 /***/ }),
@@ -15985,7 +16015,7 @@ function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
 __export(__webpack_require__(110));
-__export(__webpack_require__(45));
+__export(__webpack_require__(48));
 //# sourceMappingURL=index.js.map
 
 /***/ }),
@@ -16004,7 +16034,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var wrapper_1 = __webpack_require__(45);
+var wrapper_1 = __webpack_require__(48);
 var SingleLineWrapper = (function (_super) {
     __extends(SingleLineWrapper, _super);
     function SingleLineWrapper() {
@@ -16240,7 +16270,7 @@ function __export(m) {
 }
 var Animators = __webpack_require__(6);
 exports.Animators = Animators;
-var Axes = __webpack_require__(46);
+var Axes = __webpack_require__(49);
 exports.Axes = Axes;
 var Components = __webpack_require__(29);
 exports.Components = Components;
@@ -16271,8 +16301,8 @@ var timeAxis_1 = __webpack_require__(22);
 exports.TimeInterval = timeAxis_1.TimeInterval;
 __export(__webpack_require__(5));
 __export(__webpack_require__(23));
-__export(__webpack_require__(47));
-var version_1 = __webpack_require__(48);
+__export(__webpack_require__(50));
+var version_1 = __webpack_require__(51);
 exports.version = version_1.version;
 __export(__webpack_require__(20));
 __export(__webpack_require__(7));

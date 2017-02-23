@@ -64,6 +64,11 @@ describe("Scales", () => {
         assert.strictEqual(scale.range(expectedRange), scale, "setter mode returns the calling Scale");
         assert.deepEqual(scale.range(), expectedRange, "returns the set range");
       });
+
+      it("is comparable by default", () => {
+        const scale = new MockScale();
+        assert.isTrue(scale.isComparable(scale));
+      });
     });
 
     describe("onUpdate", () => {

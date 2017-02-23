@@ -59,6 +59,10 @@ describe("Scales", () => {
         assert.strictEqual(scale.scale("no"), defaultColors[1], "second color used for second option");
         assert.strictEqual(scale.scale("maybe"), defaultColors[2], "third color used for third option");
       });
+
+      it("is not comparable with other scales", () => {
+        assert.isFalse(scale.isComparable(scale));
+      });
     });
 
     describe("CSS integration", () => {

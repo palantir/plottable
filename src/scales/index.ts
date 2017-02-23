@@ -19,8 +19,11 @@ export * from "./timeScale";
 // ---------------------------------------------------------
 
 import { Category } from "./categoryScale";
+import { Color } from "./colorScale";
+import { InterpolatedColor } from "./interpolatedColorScale";
 import { QuantitativeScale } from "./quantitativeScale";
 import { Scale } from "./scale";
+import { Time } from "./timeScale";
 
 /**
  * A function that supplies domain values to be included into a Scale.
