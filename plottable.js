@@ -6405,17 +6405,17 @@ var plot_1 = __webpack_require__(2);
 var xyPlot_1 = __webpack_require__(15);
 var CURVE_NAME_MAPPING = {
     "linear": d3.curveLinear,
-    "linear-closed": d3.curveLinearClosed,
+    "linearClosed": d3.curveLinearClosed,
     "step": d3.curveStep,
-    "step-before": d3.curveStepBefore,
-    "step-after": d3.curveStepAfter,
+    "stepBefore": d3.curveStepBefore,
+    "stepAfter": d3.curveStepAfter,
     "basis": d3.curveBasis,
-    "basis-open": d3.curveBasisOpen,
-    "basis-closed": d3.curveBasisClosed,
+    "basisOpen": d3.curveBasisOpen,
+    "basisClosed": d3.curveBasisClosed,
     "bundle": d3.curveBundle,
     "cardinal": d3.curveCardinal,
-    "cardinal-open": d3.curveCardinalOpen,
-    "cardinal-closed": d3.curveCardinalClosed,
+    "cardinalOpen": d3.curveCardinalOpen,
+    "cardinalClosed": d3.curveCardinalClosed,
     "monotone": d3.curveMonotoneX,
 };
 var Line = (function (_super) {
@@ -6434,7 +6434,7 @@ var Line = (function (_super) {
         this.addClass("line-plot");
         var animator = new Animators.Easing();
         animator.stepDuration(plot_1.Plot._ANIMATION_MAX_DURATION);
-        animator.easingMode("exp-in-out");
+        animator.easingMode("expInOut");
         animator.maxTotalDuration(plot_1.Plot._ANIMATION_MAX_DURATION);
         this.animator(Plots.Animator.MAIN, animator);
         this.attr("stroke", new Scales.Color().range()[0]);
@@ -6732,7 +6732,19 @@ var Line = (function (_super) {
     };
     Line.prototype._getCurveFactory = function () {
         var curve = this.curve();
-        return (typeof curve === "string") ? CURVE_NAME_MAPPING[curve] : curve;
+        if (typeof curve === "string") {
+            var maybeCurveFunction = CURVE_NAME_MAPPING[curve];
+            if (maybeCurveFunction == null) {
+                // oops; name is wrong - default to linear instead
+                return CURVE_NAME_MAPPING["linear"];
+            }
+            else {
+                return maybeCurveFunction;
+            }
+        }
+        else {
+            return curve;
+        }
     };
     Line.prototype._getDataToDraw = function () {
         var _this = this;
@@ -6918,12 +6930,11 @@ var Category = (function (_super) {
         var _this = this;
         if (range === void 0) { range = this.range(); }
         var rangeBand = this._d3Scale.bandwidth();
-        // offset the domain by half the rangeBand such that we consider the
-        // center of the bars
         var domainStartNormalized = this.invertedTransformation(range[0]);
         var domainEndNormalized = this.invertedTransformation(range[1]);
         var domain = this._d3Scale.domain();
-        // map ["a", "b", "c"] to the normalized center position (e.g. [0.25, .5, 0.75])
+        // map ["a", "b", "c"] to the normalized center position (e.g. [0.25, .5, 0.75]). We add
+        // half the rangeBand to consider the center of the bars
         var normalizedDomain = domain.map(function (d) { return _this._d3Scale(d) + rangeBand / 2; });
         var domainStart = d3.bisect(normalizedDomain, domainStartNormalized);
         var domainEnd = d3.bisect(normalizedDomain, domainEndNormalized);
@@ -8027,24 +8038,45 @@ d3Transition.transition.prototype.styles = transition_styles;
 
 var d3Ease = __webpack_require__(100);
 var coerceD3_1 = __webpack_require__(126);
-/**
- * Converts an easing mode string like "sin-in-out" to the corresponding function
- * in the d3-ease module.
- *
- * @param easingMode
- */
-function easingFnMapping(easingMode) {
-    var words = easingMode.split("-");
-    var capitalCaseWords = words.map(function (w) { return w[0].toUpperCase() + w.slice(1); });
-    var methodName = "ease" + capitalCaseWords.join("");
-    // HACKHACK access the d3-ease module exports by the name we've constructed
-    var easingFn = d3Ease[methodName];
-    if (easingFn == null) {
-        // default to easeLinear if we can't find the function
-        easingFn = d3Ease.easeLinear;
-    }
-    return easingFn;
-}
+var EASE_NAME_MAPPING = {
+    "linear": d3Ease.easeLinear,
+    "quad": d3Ease.easeQuad,
+    "quadIn": d3Ease.easeQuadIn,
+    "quadOut": d3Ease.easeQuadOut,
+    "quadInOut": d3Ease.easeQuadInOut,
+    "cubic": d3Ease.easeCubic,
+    "cubicIn": d3Ease.easeCubicIn,
+    "cubicOut": d3Ease.easeCubicOut,
+    "cubicInOut": d3Ease.easeCubicInOut,
+    "poly": d3Ease.easePoly,
+    "polyIn": d3Ease.easePolyIn,
+    "polyOut": d3Ease.easePolyOut,
+    "polyInOut": d3Ease.easePolyInOut,
+    "sin": d3Ease.easeSin,
+    "sinIn": d3Ease.easeSinIn,
+    "sinOut": d3Ease.easeSinOut,
+    "sinInOut": d3Ease.easeSinInOut,
+    "exp": d3Ease.easeExp,
+    "expIn": d3Ease.easeExpIn,
+    "expOut": d3Ease.easeExpOut,
+    "expInOut": d3Ease.easeExpInOut,
+    "circle": d3Ease.easeCircle,
+    "circleIn": d3Ease.easeCircleIn,
+    "circleOut": d3Ease.easeCircleOut,
+    "circleInOut": d3Ease.easeCircleInOut,
+    "bounce": d3Ease.easeBounce,
+    "bounceIn": d3Ease.easeBounceIn,
+    "bounceOut": d3Ease.easeBounceOut,
+    "bounceInOut": d3Ease.easeBounceInOut,
+    "back": d3Ease.easeBack,
+    "backIn": d3Ease.easeBackIn,
+    "backOut": d3Ease.easeBackOut,
+    "backInOut": d3Ease.easeBackInOut,
+    "elastic": d3Ease.easeElastic,
+    "elasticIn": d3Ease.easeElasticIn,
+    "elasticOut": d3Ease.easeElasticOut,
+    "elasticInOut": d3Ease.easeElasticInOut,
+};
 /**
  * An Animator with easing and configurable durations and delays.
  */
@@ -8071,7 +8103,7 @@ var Easing = (function () {
         var numberOfSteps = selection.size();
         var adjustedIterativeDelay = this._getAdjustedIterativeDelay(numberOfSteps);
         return selection.transition()
-            .ease(easingFnMapping(this.easingMode()))
+            .ease(this._getEaseFactory())
             .duration(this.stepDuration())
             .delay(function (d, i) { return _this.startDelay() + adjustedIterativeDelay * i; })
             .attrs(attrToAppliedProjector);
@@ -8121,6 +8153,22 @@ var Easing = (function () {
             return this;
         }
     };
+    Easing.prototype._getEaseFactory = function () {
+        var ease = this.easingMode();
+        if (typeof ease === "string") {
+            var maybeEaseFunction = EASE_NAME_MAPPING[ease];
+            if (maybeEaseFunction == null) {
+                // oops; name is wrong - default to linear instead
+                return EASE_NAME_MAPPING["linear"];
+            }
+            else {
+                return maybeEaseFunction;
+            }
+        }
+        else {
+            return ease;
+        }
+    };
     /**
      * Adjust the iterative delay, such that it takes into account the maxTotalDuration constraint
      */
@@ -8149,7 +8197,7 @@ var Easing = (function () {
     /**
      * The default easing of the animation
      */
-    Easing._DEFAULT_EASING_MODE = "exp-out";
+    Easing._DEFAULT_EASING_MODE = "expOut";
     return Easing;
 }());
 exports.Easing = Easing;

@@ -90,12 +90,11 @@ export class Category extends Scale<string, number> implements TransformableScal
    */
   public invertRange(range: [number, number] = this.range()): string[] {
     const rangeBand = this._d3Scale.bandwidth();
-    // offset the domain by half the rangeBand such that we consider the
-    // center of the bars
     const domainStartNormalized = this.invertedTransformation(range[0]);
     const domainEndNormalized = this.invertedTransformation(range[1]);
     const domain = this._d3Scale.domain();
-    // map ["a", "b", "c"] to the normalized center position (e.g. [0.25, .5, 0.75])
+    // map ["a", "b", "c"] to the normalized center position (e.g. [0.25, .5, 0.75]). We add
+    // half the rangeBand to consider the center of the bars
     const normalizedDomain = domain.map((d) => this._d3Scale(d) + rangeBand / 2);
     const domainStart = d3.bisect(normalizedDomain, domainStartNormalized);
     const domainEnd = d3.bisect(normalizedDomain, domainEndNormalized);

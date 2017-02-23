@@ -29,40 +29,40 @@ type EdgeIntersections = {
 
 const CURVE_NAME_MAPPING: { [name: string]: d3.CurveFactory | d3.CurveFactoryLineOnly } = {
   "linear": d3.curveLinear,
-  "linear-closed": d3.curveLinearClosed,
+  "linearClosed": d3.curveLinearClosed,
   "step": d3.curveStep,
-  "step-before": d3.curveStepBefore,
-  "step-after": d3.curveStepAfter,
+  "stepBefore": d3.curveStepBefore,
+  "stepAfter": d3.curveStepAfter,
   "basis": d3.curveBasis,
-  "basis-open": d3.curveBasisOpen,
-  "basis-closed": d3.curveBasisClosed,
+  "basisOpen": d3.curveBasisOpen,
+  "basisClosed": d3.curveBasisClosed,
   "bundle": d3.curveBundle,
   "cardinal": d3.curveCardinal,
-  "cardinal-open": d3.curveCardinalOpen,
-  "cardinal-closed": d3.curveCardinalClosed,
+  "cardinalOpen": d3.curveCardinalOpen,
+  "cardinalClosed": d3.curveCardinalClosed,
   "monotone": d3.curveMonotoneX,
 };
 
 /**
- * Known curve types that line and area plot's .curve() methods understan: d3.curve
+ * Known curve types that line and area plot's .curve() methods understand
  */
 export type CurveName =
 "linear" |
-"linear-closed" |
+"linearClosed" |
 "step" |
-"step-before" |
-"step-after" |
+"stepBefore" |
+"stepAfter" |
 "basis" |
-"basis-open" |
-"basis-closed" |
+"basisOpen" |
+"basisClosed" |
 "bundle" |
 "cardinal" |
-"cardinal-open" |
-"cardinal-closed" |
+"cardinalOpen" |
+"cardinalClosed" |
 "monotone";
 
 export class Line<X> extends XYPlot<X, number> {
-  private _curve: string | d3.CurveFactory | d3.CurveFactoryLineOnly = "linear";
+  private _curve: CurveName | d3.CurveFactory | d3.CurveFactoryLineOnly = "linear";
 
   private _autorangeSmooth = false;
   private _croppedRenderingEnabled = true;
@@ -79,7 +79,7 @@ export class Line<X> extends XYPlot<X, number> {
     this.addClass("line-plot");
     let animator = new Animators.Easing();
     animator.stepDuration(Plot._ANIMATION_MAX_DURATION);
-    animator.easingMode("exp-in-out");
+    animator.easingMode("expInOut");
     animator.maxTotalDuration(Plot._ANIMATION_MAX_DURATION);
     this.animator(Plots.Animator.MAIN, animator);
     this.attr("stroke", new Scales.Color().range()[0]);
@@ -163,7 +163,7 @@ export class Line<X> extends XYPlot<X, number> {
    *
    * @return {string | d3.CurveFactory | d3.CurveFactoryLineOnly}
    */
-  public curve(): string | d3.CurveFactory | d3.CurveFactoryLineOnly;
+  public curve(): CurveName | d3.CurveFactory | d3.CurveFactoryLineOnly;
   /**
    * Sets the curve function associated with the plot. The curve function specifies how to
    * draw the interpolated line between successive points.
@@ -171,8 +171,8 @@ export class Line<X> extends XYPlot<X, number> {
    * @param {string | points: Array<[number, number]>) => string} curve Curve function
    * @return Plots.Line
    */
-  public curve(curve: string | d3.CurveFactory | d3.CurveFactoryLineOnly): this;
-  public curve(curve?: string | d3.CurveFactory | d3.CurveFactoryLineOnly): any {
+  public curve(curve: CurveName | d3.CurveFactory | d3.CurveFactoryLineOnly): this;
+  public curve(curve?: CurveName | d3.CurveFactory | d3.CurveFactoryLineOnly): any {
     if (curve == null) {
       return this._curve;
     }
@@ -488,7 +488,17 @@ export class Line<X> extends XYPlot<X, number> {
 
   protected _getCurveFactory(): d3.CurveFactory | d3.CurveFactoryLineOnly {
     const curve = this.curve();
-    return (typeof curve === "string") ? CURVE_NAME_MAPPING[curve] : curve;
+    if(typeof curve === "string") {
+      const maybeCurveFunction = CURVE_NAME_MAPPING[curve];
+      if (maybeCurveFunction == null) {
+        // oops; name is wrong - default to linear instead
+        return CURVE_NAME_MAPPING["linear"];
+      } else {
+        return maybeCurveFunction;
+      }
+    } else {
+      return curve;
+    }
   }
 
   protected _getDataToDraw(): Utils.Map<Dataset, any[]> {
