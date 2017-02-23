@@ -307,7 +307,7 @@ function loadPlottableBranches(category, branchList){
       Plottable = null;
 
       $.getScript(listOfUrl[1]).then(
-        function(request) { //load second
+        function() { //load second
           plottableBranches[branchName2] = $.extend(true, {}, Plottable);
           Plottable = null;
           filterQuickTests(category, branchList);

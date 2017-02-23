@@ -3,6 +3,7 @@ import * as d3 from "d3";
 import { assert } from "chai";
 
 import * as Plottable from "../../src";
+import { EaseName } from "../../src/animators/easingAnimator";
 
 describe("Animators", () => {
   describe("EasingAnimator", () => {
@@ -39,9 +40,8 @@ describe("Animators", () => {
       });
 
       it("can get and set the easing mode", () => {
-        const setEasingMode = "test-easing";
-        assert.strictEqual(animator.easingMode(setEasingMode), animator, "setter mode returns the Animator");
-        assert.strictEqual(animator.easingMode(), setEasingMode, "retrieved the set value");
+        assert.strictEqual(animator.easingMode("bounce"), animator, "setter mode returns the Animator");
+        assert.strictEqual(animator.easingMode(), "bounce", "retrieved the set value");
       });
     });
 
