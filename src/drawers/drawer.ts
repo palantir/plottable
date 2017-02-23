@@ -159,11 +159,7 @@ export class Drawer {
   }
 
   public selection(): SimpleSelection<any> {
-    if (!this._cachedSelectionValid) {
-      this._cachedSelection = this.renderArea().selectAll(this.selector());
-      this._cachedSelectionNodes = this._cachedSelection.nodes();
-      this._cachedSelectionValid = true;
-    }
+    this.maybeRefreshCache();
     return this._cachedSelection;
   }
 
@@ -178,7 +174,16 @@ export class Drawer {
    * Returns the D3 selection corresponding to the datum with the specified index.
    */
   public selectionForIndex(index: number): SimpleSelection<any> {
+    this.maybeRefreshCache();
     return d3.select(this._cachedSelectionNodes[index]);
+  }
+
+  private maybeRefreshCache() {
+    if (!this._cachedSelectionValid) {
+      this._cachedSelection = this.renderArea().selectAll(this.selector());
+      this._cachedSelectionNodes = this._cachedSelection.nodes();
+      this._cachedSelectionValid = true;
+    }
   }
 
 }
