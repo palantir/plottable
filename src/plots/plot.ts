@@ -587,15 +587,20 @@ export class Plot extends Component {
         bounds = this.bounds(),
         transformPoint = (point: Point) => point): Plots.PlotEntity {
     const nearest = this._getEntityStore().entityNearest(queryPoint, transformPoint, (entity: Plots.LightweightPlotEntity) => {
-      return this._entityVisibleOnPlot(entity, bounds);
+      return this._entityVisibleOnPlot(entity, bounds, transformPoint);
     });
 
     return nearest === undefined ? undefined : this._lightweightPlotEntityToPlotEntity(nearest);
   }
 
-  protected _entityVisibleOnPlot(entity: Plots.PlotEntity | Plots.LightweightPlotEntity, chartBounds: Bounds) {
-    return !(entity.position.x < chartBounds.topLeft.x || entity.position.y < chartBounds.topLeft.y ||
-    entity.position.x > chartBounds.bottomRight.x || entity.position.y > chartBounds.bottomRight.y);
+  protected _entityVisibleOnPlot(
+      entity: Plots.PlotEntity | Plots.LightweightPlotEntity,
+      chartBounds: Bounds,
+      transformPoint = (point: Point) => point) {
+    const { x, y } = transformPoint(entity.position);
+
+    return !(x < chartBounds.topLeft.x || y < chartBounds.topLeft.y ||
+    x > chartBounds.bottomRight.x || y > chartBounds.bottomRight.y);
   }
 
   protected _uninstallScaleForKey(scale: Scale<any, any>, key: string) {

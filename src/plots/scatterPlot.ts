@@ -133,13 +133,15 @@ export class Scatter<X, Y> extends XYPlot<X, Y> {
     return drawSteps;
   }
 
-  protected _entityVisibleOnPlot(entity: LightweightScatterPlotEntity, bounds: Bounds) {
+  protected _entityVisibleOnPlot(entity: LightweightScatterPlotEntity, bounds: Bounds, transformPoint = (point: Point) => point) {
+    const { x, y } = transformPoint(entity.position);
+
     const xRange = { min: bounds.topLeft.x, max: bounds.bottomRight.x };
     const yRange = { min: bounds.topLeft.y, max: bounds.bottomRight.y };
 
     const translatedBbox = {
-      x: entity.position.x - entity.diameter.x,
-      y: entity.position.y - entity.diameter.y,
+      x: x - entity.diameter.x,
+      y: y - entity.diameter.y,
       width: entity.diameter.x,
       height: entity.diameter.y,
     };

@@ -590,13 +590,15 @@ var Plot = (function (_super) {
         if (bounds === void 0) { bounds = this.bounds(); }
         if (transformPoint === void 0) { transformPoint = function (point) { return point; }; }
         var nearest = this._getEntityStore().entityNearest(queryPoint, transformPoint, function (entity) {
-            return _this._entityVisibleOnPlot(entity, bounds);
+            return _this._entityVisibleOnPlot(entity, bounds, transformPoint);
         });
         return nearest === undefined ? undefined : this._lightweightPlotEntityToPlotEntity(nearest);
     };
-    Plot.prototype._entityVisibleOnPlot = function (entity, chartBounds) {
-        return !(entity.position.x < chartBounds.topLeft.x || entity.position.y < chartBounds.topLeft.y ||
-            entity.position.x > chartBounds.bottomRight.x || entity.position.y > chartBounds.bottomRight.y);
+    Plot.prototype._entityVisibleOnPlot = function (entity, chartBounds, transformPoint) {
+        if (transformPoint === void 0) { transformPoint = function (point) { return point; }; }
+        var _a = transformPoint(entity.position), x = _a.x, y = _a.y;
+        return !(x < chartBounds.topLeft.x || y < chartBounds.topLeft.y ||
+            x > chartBounds.bottomRight.x || y > chartBounds.bottomRight.y);
     };
     Plot.prototype._uninstallScaleForKey = function (scale, key) {
         scale.offUpdate(this._renderCallback);
@@ -13558,12 +13560,14 @@ var Scatter = (function (_super) {
         });
         return drawSteps;
     };
-    Scatter.prototype._entityVisibleOnPlot = function (entity, bounds) {
+    Scatter.prototype._entityVisibleOnPlot = function (entity, bounds, transformPoint) {
+        if (transformPoint === void 0) { transformPoint = function (point) { return point; }; }
+        var _a = transformPoint(entity.position), x = _a.x, y = _a.y;
         var xRange = { min: bounds.topLeft.x, max: bounds.bottomRight.x };
         var yRange = { min: bounds.topLeft.y, max: bounds.bottomRight.y };
         var translatedBbox = {
-            x: entity.position.x - entity.diameter.x,
-            y: entity.position.y - entity.diameter.y,
+            x: x - entity.diameter.x,
+            y: y - entity.diameter.y,
             width: entity.diameter.x,
             height: entity.diameter.y,
         };
