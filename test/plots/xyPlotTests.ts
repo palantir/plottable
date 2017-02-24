@@ -395,7 +395,7 @@ describe("Plots", () => {
       });
     });
 
-    describe("finding the neatest entity", () => {
+    describe("finding the nearest entity", () => {
       let svg: SimpleSelection<void>;
       let plot: Plottable.XYPlot<number, number>;
       let xAccessor = (d: any) => d.x;

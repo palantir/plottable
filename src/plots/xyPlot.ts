@@ -104,14 +104,19 @@ export class XYPlot<X, Y> extends Plot {
 
   public entityNearest(queryPoint: Point, dataspace = false): PlotEntity {
     if (dataspace) {
-      // convert the chart bounding box and query point to the data space
-      // for comparison
+      /**
+       * Convert the chart bounding box and query point to the data space
+       * for comparison
+       */
       const invertedChartBounds = this._invertedBounds();
       const invertedQueryPoint = this._invertPixelPoint(queryPoint);
       return super.entityNearest(invertedQueryPoint, dataspace, invertedChartBounds);
     } else {
-      // convert the position in the entities store back to screen space
-      // for comparison
+      /**
+       * Convert the position in the entities store back to screen space
+       * for comparison. We do this here because entities store points in data space
+       * for pan & zoom interactions (#3159).
+       */
       return super.entityNearest(queryPoint, dataspace, this.bounds(), (point) => {
         return {
           x: this.x().scale.scaleTransformation(point.x),

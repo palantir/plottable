@@ -2256,15 +2256,20 @@ var XYPlot = (function (_super) {
         var _this = this;
         if (dataspace === void 0) { dataspace = false; }
         if (dataspace) {
-            // convert the chart bounding box and query point to the data space
-            // for comparison
+            /**
+             * Convert the chart bounding box and query point to the data space
+             * for comparison
+             */
             var invertedChartBounds = this._invertedBounds();
             var invertedQueryPoint = this._invertPixelPoint(queryPoint);
             return _super.prototype.entityNearest.call(this, invertedQueryPoint, dataspace, invertedChartBounds);
         }
         else {
-            // convert the position in the entities store back to screen space
-            // for comparison
+            /**
+             * Convert the position in the entities store back to screen space
+             * for comparison. We do this here because entities store points in data space
+             * for pan & zoom interactions (#3159).
+             */
             return _super.prototype.entityNearest.call(this, queryPoint, dataspace, this.bounds(), function (point) {
                 return {
                     x: _this.x().scale.scaleTransformation(point.x),

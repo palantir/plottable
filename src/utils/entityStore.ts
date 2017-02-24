@@ -20,8 +20,8 @@ export interface EntityStore<T extends PositionedEntity> {
   /**
    * Returns closest entity to a given {Point}
    * @param {Point} [point] Point around which to search for a closest entity
-   * @param {(entity: T) => Point} [transformEntityPosition] method that transforms an entity's
-   * position when calculating the distance. Returns the position property by default.
+   * @param {(point: Point) => Point} [pointTransform] method to transform an entity's
+   * position when calculating the distance. Should default to the identify function.
    * @param {(entity: T) => boolean} [filter] optional method that is called while
    * searching for the entity nearest a point. If the filter returns false, the point
    * is considered invalid and is not considered. If the filter returns true, the point
