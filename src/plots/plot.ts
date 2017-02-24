@@ -577,13 +577,16 @@ export class Plot extends Component {
    * or undefined if no {Plots.PlotEntity} can be found.
    *
    * @param {Point} queryPoint
-   * @param {bounds} Bounds The bounding box within which to search. By default, bounds is the bounds of
+   * @param {boolean} dataspace Whether to find the nearest point in pixel space or data space.
+   * @param {Bounds} bounds The bounding box within which to search. By default, bounds is the bounds of
    * the chart, relative to the parent.
+   * @param {Function} transformPoint Function to transform entity position from data space to pixel space if
+   * dataspace is set to false.
    * @returns {Plots.PlotEntity} The nearest PlotEntity, or undefined if no {Plots.PlotEntity} can be found.
    */
   public entityNearest(
         queryPoint: Point,
-        dataSpace = false,
+        dataspace = false,
         bounds = this.bounds(),
         transformPoint = (point: Point) => point): Plots.PlotEntity {
     const nearest = this._getEntityStore().entityNearest(queryPoint, transformPoint, (entity: Plots.LightweightPlotEntity) => {

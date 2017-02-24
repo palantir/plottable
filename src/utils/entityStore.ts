@@ -20,7 +20,7 @@ export interface EntityStore<T extends PositionedEntity> {
   /**
    * Returns closest entity to a given {Point}
    * @param {Point} [point] Point around which to search for a closest entity
-   * @param {(point: Point) => Point} [pointTransform] method to transform an entity's
+   * @param {(point: Point) => Point} [transformPoint] method to transform an entity's
    * position when calculating the distance. Should default to the identify function.
    * @param {(entity: T) => boolean} [filter] optional method that is called while
    * searching for the entity nearest a point. If the filter returns false, the point
@@ -28,7 +28,7 @@ export interface EntityStore<T extends PositionedEntity> {
    * is considered valid and will be considered.
    * @returns {T} Will return the nearest entity or undefined if none are found
    */
-  entityNearest(point: Point, pointTransform: (point: Point) => Point, filter?: (entity: T) => boolean): T;
+  entityNearest(point: Point, transformPoint: (point: Point) => Point, filter?: (entity: T) => boolean): T;
   /**
    * Iterator that loops through entities and returns a transformed array
    * @param {(value: T) => S} [callback] transformation function that is passed
@@ -67,7 +67,7 @@ export class EntityArray<T extends PositionedEntity> implements EntityStore<T> {
    * Iterates through array of of entities and computes the closest point using
    * the standard Euclidean distance formula.
    */
-  public entityNearest(queryPoint: Point, pointTransform: (point: Point) => Point, filter?: (entity: T) => boolean) {
+  public entityNearest(queryPoint: Point, transformPoint: (point: Point) => Point, filter?: (entity: T) => boolean) {
     let closestDistanceSquared = Infinity;
     let closestPointEntity: T;
     this._entities.forEach((entity) => {
@@ -75,7 +75,7 @@ export class EntityArray<T extends PositionedEntity> implements EntityStore<T> {
         return;
       }
 
-      let distanceSquared = Math.distanceSquared(pointTransform(entity.position), queryPoint);
+      let distanceSquared = Math.distanceSquared(transformPoint(entity.position), queryPoint);
       if (distanceSquared < closestDistanceSquared) {
         closestDistanceSquared = distanceSquared;
         closestPointEntity = entity;

@@ -580,13 +580,16 @@ var Plot = (function (_super) {
      * or undefined if no {Plots.PlotEntity} can be found.
      *
      * @param {Point} queryPoint
-     * @param {bounds} Bounds The bounding box within which to search. By default, bounds is the bounds of
+     * @param {boolean} dataspace Whether to find the nearest point in pixel space or data space.
+     * @param {Bounds} bounds The bounding box within which to search. By default, bounds is the bounds of
      * the chart, relative to the parent.
+     * @param {Function} transformPoint Function to transform entity position from data space to pixel space if
+     * dataspace is set to false.
      * @returns {Plots.PlotEntity} The nearest PlotEntity, or undefined if no {Plots.PlotEntity} can be found.
      */
-    Plot.prototype.entityNearest = function (queryPoint, dataSpace, bounds, transformPoint) {
+    Plot.prototype.entityNearest = function (queryPoint, dataspace, bounds, transformPoint) {
         var _this = this;
-        if (dataSpace === void 0) { dataSpace = false; }
+        if (dataspace === void 0) { dataspace = false; }
         if (bounds === void 0) { bounds = this.bounds(); }
         if (transformPoint === void 0) { transformPoint = function (point) { return point; }; }
         var nearest = this._getEntityStore().entityNearest(queryPoint, transformPoint, function (entity) {
@@ -15569,14 +15572,14 @@ var EntityArray = (function () {
      * Iterates through array of of entities and computes the closest point using
      * the standard Euclidean distance formula.
      */
-    EntityArray.prototype.entityNearest = function (queryPoint, pointTransform, filter) {
+    EntityArray.prototype.entityNearest = function (queryPoint, transformPoint, filter) {
         var closestDistanceSquared = Infinity;
         var closestPointEntity;
         this._entities.forEach(function (entity) {
             if (filter !== undefined && filter(entity) === false) {
                 return;
             }
-            var distanceSquared = Math.distanceSquared(pointTransform(entity.position), queryPoint);
+            var distanceSquared = Math.distanceSquared(transformPoint(entity.position), queryPoint);
             if (distanceSquared < closestDistanceSquared) {
                 closestDistanceSquared = distanceSquared;
                 closestPointEntity = entity;
