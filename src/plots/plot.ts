@@ -581,8 +581,12 @@ export class Plot extends Component {
    * the chart, relative to the parent.
    * @returns {Plots.PlotEntity} The nearest PlotEntity, or undefined if no {Plots.PlotEntity} can be found.
    */
-  public entityNearest(queryPoint: Point, bounds = this.bounds()): Plots.PlotEntity {
-    const nearest = this._getEntityStore().entityNearest(queryPoint, (entity: Plots.LightweightPlotEntity) => {
+  public entityNearest(
+        queryPoint: Point,
+        dataSpace = false,
+        bounds = this.bounds(),
+        transformPoint = (point: Point) => point): Plots.PlotEntity {
+    const nearest = this._getEntityStore().entityNearest(queryPoint, transformPoint, (entity: Plots.LightweightPlotEntity) => {
       return this._entityVisibleOnPlot(entity, bounds);
     });
 

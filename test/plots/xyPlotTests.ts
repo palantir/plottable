@@ -1,12 +1,11 @@
 import { SimpleSelection } from "../../src/core/interfaces";
-import * as d3 from "d3";
 
 import { assert } from "chai";
 
 import * as Plottable from "../../src";
 
+import { getScaleValues, getTranslateValues } from "../../src/utils/domUtils";
 import * as TestMethods from "../testMethods";
-import { getTranslateValues, getScaleValues } from "../../src/utils/domUtils";
 
 describe("Plots", () => {
   describe("XY Plot", () => {
@@ -393,6 +392,67 @@ describe("Plots", () => {
         assert.deepEqual(scale.domain(), [mathUtils.min(data, 0), mathUtils.max(data, 0)], "range goes to width on scale");
 
         svg.remove();
+      });
+    });
+
+    describe("finding the neatest entity", () => {
+      let svg: SimpleSelection<void>;
+      let plot: Plottable.XYPlot<number, number>;
+      let xAccessor = (d: any) => d.x;
+      let yAccessor = (d: any) => d.y;
+
+      beforeEach(() => {
+        svg = TestMethods.generateSVG();
+      });
+
+      afterEach(() => {
+        svg.remove();
+      });
+
+      it("in point space", () => {
+        const xScale = new Plottable.Scales.Linear();
+        const yScale = new Plottable.Scales.Linear();
+
+        plot = new Plottable.XYPlot<number, number>();
+        const dataset = new Plottable.Dataset([
+          {x: 10, y: 10},
+          {x: 20, y: 10000},
+        ]);
+        plot.addDataset(dataset);
+        plot.x(xAccessor, xScale)
+            .y(yAccessor, yScale)
+            .anchor(svg);
+
+        const point = {
+          x: plot.x().scale.scaleTransformation(15),
+          y: plot.y().scale.scaleTransformation(10),
+        };
+
+        assert.equal(plot.entityNearest(point).datum, dataset.data()[0]);
+        assert.equal(plot.entityNearest(point, true).datum, dataset.data()[0]);
+      });
+
+      it("in data space", () => {
+        const xScale = new Plottable.Scales.Linear();
+        const yScale = new Plottable.Scales.ModifiedLog();
+
+        plot = new Plottable.XYPlot<number, number>();
+        const dataset = new Plottable.Dataset([
+          {x: 10, y: 100},
+          {x: 20, y: 10000},
+        ]);
+        plot.addDataset(dataset);
+        plot.x(xAccessor, xScale)
+            .y(yAccessor, yScale)
+            .anchor(svg);
+
+        const point = {
+          x: plot.x().scale.scale(20),
+          y: plot.y().scale.scale(1000),
+        };
+
+        assert.equal(plot.entityNearest(point).datum, dataset.data()[1]);
+        assert.equal(plot.entityNearest(point, true).datum, dataset.data()[0]);
       });
     });
   });

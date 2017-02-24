@@ -584,10 +584,12 @@ var Plot = (function (_super) {
      * the chart, relative to the parent.
      * @returns {Plots.PlotEntity} The nearest PlotEntity, or undefined if no {Plots.PlotEntity} can be found.
      */
-    Plot.prototype.entityNearest = function (queryPoint, bounds) {
+    Plot.prototype.entityNearest = function (queryPoint, dataSpace, bounds, transformPoint) {
         var _this = this;
+        if (dataSpace === void 0) { dataSpace = false; }
         if (bounds === void 0) { bounds = this.bounds(); }
-        var nearest = this._getEntityStore().entityNearest(queryPoint, function (entity) {
+        if (transformPoint === void 0) { transformPoint = function (point) { return point; }; }
+        var nearest = this._getEntityStore().entityNearest(queryPoint, transformPoint, function (entity) {
             return _this._entityVisibleOnPlot(entity, bounds);
         });
         return nearest === undefined ? undefined : this._lightweightPlotEntityToPlotEntity(nearest);
@@ -1392,11 +1394,7 @@ var Drawer = (function () {
         return this;
     };
     Drawer.prototype.selection = function () {
-        if (!this._cachedSelectionValid) {
-            this._cachedSelection = this.renderArea().selectAll(this.selector());
-            this._cachedSelectionNodes = this._cachedSelection.nodes();
-            this._cachedSelectionValid = true;
-        }
+        this.maybeRefreshCache();
         return this._cachedSelection;
     };
     /**
@@ -1409,7 +1407,15 @@ var Drawer = (function () {
      * Returns the D3 selection corresponding to the datum with the specified index.
      */
     Drawer.prototype.selectionForIndex = function (index) {
+        this.maybeRefreshCache();
         return d3.select(this._cachedSelectionNodes[index]);
+    };
+    Drawer.prototype.maybeRefreshCache = function () {
+        if (!this._cachedSelectionValid) {
+            this._cachedSelection = this.renderArea().selectAll(this.selector());
+            this._cachedSelectionNodes = this._cachedSelection.nodes();
+            this._cachedSelectionValid = true;
+        }
     };
     return Drawer;
 }());
@@ -2246,13 +2252,26 @@ var XYPlot = (function (_super) {
             }
         };
     }
-    XYPlot.prototype.entityNearest = function (queryPoint) {
-        // by default, the entity index stores position information in the data space
-        // the default impelentation of the entityNearest must convert the chart bounding
-        // box as well as the query point to the data space before it can make a comparison
-        var invertedChartBounds = this._invertedBounds();
-        var invertedQueryPoint = this._invertPixelPoint(queryPoint);
-        return _super.prototype.entityNearest.call(this, invertedQueryPoint, invertedChartBounds);
+    XYPlot.prototype.entityNearest = function (queryPoint, dataspace) {
+        var _this = this;
+        if (dataspace === void 0) { dataspace = false; }
+        if (dataspace) {
+            // convert the chart bounding box and query point to the data space
+            // for comparison
+            var invertedChartBounds = this._invertedBounds();
+            var invertedQueryPoint = this._invertPixelPoint(queryPoint);
+            return _super.prototype.entityNearest.call(this, invertedQueryPoint, dataspace, invertedChartBounds);
+        }
+        else {
+            // convert the position in the entities store back to screen space
+            // for comparison
+            return _super.prototype.entityNearest.call(this, queryPoint, dataspace, this.bounds(), function (point) {
+                return {
+                    x: _this.x().scale.scaleTransformation(point.x),
+                    y: _this.y().scale.scaleTransformation(point.y),
+                };
+            });
+        }
     };
     XYPlot.prototype.deferredRendering = function (deferredRendering) {
         if (deferredRendering == null) {
@@ -15541,14 +15560,14 @@ var EntityArray = (function () {
      * Iterates through array of of entities and computes the closest point using
      * the standard Euclidean distance formula.
      */
-    EntityArray.prototype.entityNearest = function (queryPoint, filter) {
+    EntityArray.prototype.entityNearest = function (queryPoint, pointTransform, filter) {
         var closestDistanceSquared = Infinity;
         var closestPointEntity;
         this._entities.forEach(function (entity) {
             if (filter !== undefined && filter(entity) === false) {
                 return;
             }
-            var distanceSquared = Math.distanceSquared(entity.position, queryPoint);
+            var distanceSquared = Math.distanceSquared(pointTransform(entity.position), queryPoint);
             if (distanceSquared < closestDistanceSquared) {
                 closestDistanceSquared = distanceSquared;
                 closestPointEntity = entity;

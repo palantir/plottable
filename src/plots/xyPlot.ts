@@ -3,13 +3,12 @@
  * @license MIT
  */
 
-import { Accessor, Point } from "../core/interfaces";
 import { Dataset } from "../core/dataset";
-import * as Scales from "../scales";
+import { Accessor, Point } from "../core/interfaces";
 import { Scale, ScaleCallback } from "../scales/scale";
+import * as Scales from "../scales";
 import * as Utils from "../utils";
-
-import { TransformableAccessorScaleBinding, LightweightPlotEntity, PlotEntity } from "./commons";
+import { LightweightPlotEntity, PlotEntity, TransformableAccessorScaleBinding } from "./commons";
 import { Plot } from "./plot";
 
 export class XYPlot<X, Y> extends Plot {
@@ -103,13 +102,23 @@ export class XYPlot<X, Y> extends Plot {
     };
   }
 
-  public entityNearest(queryPoint: Point): PlotEntity {
-    // by default, the entity index stores position information in the data space
-    // the default impelentation of the entityNearest must convert the chart bounding
-    // box as well as the query point to the data space before it can make a comparison
-    const invertedChartBounds = this._invertedBounds();
-    const invertedQueryPoint = this._invertPixelPoint(queryPoint);
-    return super.entityNearest(invertedQueryPoint, invertedChartBounds);
+  public entityNearest(queryPoint: Point, dataspace = false): PlotEntity {
+    if (dataspace) {
+      // convert the chart bounding box and query point to the data space
+      // for comparison
+      const invertedChartBounds = this._invertedBounds();
+      const invertedQueryPoint = this._invertPixelPoint(queryPoint);
+      return super.entityNearest(invertedQueryPoint, dataspace, invertedChartBounds);
+    } else {
+      // convert the position in the entities store back to screen space
+      // for comparison
+      return super.entityNearest(queryPoint, dataspace, this.bounds(), (point) => {
+        return {
+          x: this.x().scale.scaleTransformation(point.x),
+          y: this.y().scale.scaleTransformation(point.y),
+        };
+      });
+    }
   }
 
   /**
