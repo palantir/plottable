@@ -67,7 +67,6 @@
   },
   "dependencies": {
     "d3": "^4.5.0",
-    "d3-selection-multi": "1.0.0",
     "svg-typewriter": "^2.0.0"
   }
 }
