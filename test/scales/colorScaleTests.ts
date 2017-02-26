@@ -29,35 +29,29 @@ describe("Scales", () => {
         let colorRange = ["#5279c7", "#fd373e"];
         scale.range(colorRange);
         scale.domain(["a", "b", "c"]);
-        assert.strictEqual(scale.scale("a"), colorRange[0], "first color is used");
-        assert.strictEqual(scale.scale("b"), colorRange[1], "second color is used");
+        assert.deepEqual(d3.color(scale.scale("a")), d3.color(colorRange[0]), "first color is used");
+        assert.deepEqual(d3.color(scale.scale("b")), d3.color(colorRange[1]), "second color is used");
 
-        let alteredColor1Hex = scale.scale("c");
-        assert.notStrictEqual(alteredColor1Hex, colorRange[0], "first color has not been reused");
-        assert.notStrictEqual(alteredColor1Hex, colorRange[1], "second color has not been reused");
-        assert.notStrictEqual(alteredColor1Hex, "#000000", "the color does not fallback to black when running out of colors");
-        assert.notStrictEqual(alteredColor1Hex, "#ffffff", "the color does not fallback to white when running out of colors");
-
-        let color1 = TestMethods.colorHexToRGB(colorRange[0]);
-        let alteredColor1 = TestMethods.colorHexToRGB(alteredColor1Hex);
-        assert.operator(alteredColor1.red, ">", color1.red, "The resulting color should be lighter in the red component");
-        assert.operator(alteredColor1.green, ">", color1.green, "The resulting color should be lighter in the green component");
-        assert.operator(alteredColor1.blue, ">", color1.blue, "The resulting color should be lighter in the blue component");
+        let alteredColor1 = d3.color(scale.scale("c")).rgb();
+        let color1 = d3.color(colorRange[0]).rgb();
+        assert.operator(alteredColor1.r, ">", color1.r, "The resulting color should be lighter in the red component");
+        assert.operator(alteredColor1.g, ">", color1.g, "The resulting color should be lighter in the green component");
+        assert.operator(alteredColor1.b, ">", color1.b, "The resulting color should be lighter in the blue component");
       });
 
       it("interprets named color values correctly", () => {
         scale.range(["red", "blue"]);
         scale.domain(["a", "b"]);
-        assert.strictEqual(scale.scale("a"), "#ff0000", "red color as string should be correctly identified");
-        assert.strictEqual(scale.scale("b"), "#0000ff", "blue color as string should be correctly identified");
+        assert.deepEqual(d3.color(scale.scale("a")), d3.color("#ff0000"), "red color as string should be correctly identified");
+        assert.deepEqual(d3.color(scale.scale("b")), d3.color("#0000ff"), "blue color as string should be correctly identified");
         assert.deepEqual(scale.range(), ["red", "blue"], "the range itself does not convert to hex values");
       });
 
       it("accepts Category domain", () => {
         scale.domain(["yes", "no", "maybe"]);
-        assert.strictEqual(scale.scale("yes"), defaultColors[0], "first color used for first option");
-        assert.strictEqual(scale.scale("no"), defaultColors[1], "second color used for second option");
-        assert.strictEqual(scale.scale("maybe"), defaultColors[2], "third color used for third option");
+        assert.deepEqual(d3.color(scale.scale("yes")), d3.color(defaultColors[0]), "first color used for first option");
+        assert.deepEqual(d3.color(scale.scale("no")), d3.color(defaultColors[1]), "second color used for second option");
+        assert.deepEqual(d3.color(scale.scale("maybe")), d3.color(defaultColors[2]), "third color used for third option");
       });
     });
 
@@ -154,9 +148,9 @@ describe("Scales", () => {
         ];
 
         scale.domain(["yes", "no", "maybe"]);
-        assert.strictEqual(scale.scale("yes"), category10Colors[0], "D3 Category 10 Scale color 1 used for option 1");
-        assert.strictEqual(scale.scale("no"), category10Colors[1], "D3 Category 10 Scale color 2 used for option 2");
-        assert.strictEqual(scale.scale("maybe"), category10Colors[2], "D3 Category 10 Scale color 3 used for option 3");
+        assert.deepEqual(d3.color(scale.scale("yes")), d3.color(category10Colors[0]), "D3 Category 10 Scale color 1 used for option 1");
+        assert.deepEqual(d3.color(scale.scale("no")), d3.color(category10Colors[1]), "D3 Category 10 Scale color 2 used for option 2");
+        assert.deepEqual(d3.color(scale.scale("maybe")), d3.color(category10Colors[2]), "D3 Category 10 Scale color 3 used for option 3");
 
         assert.deepEqual(scale.range(), category10Colors, "The correct D3 Category 10 Scale colors are in range");
       });
@@ -172,7 +166,7 @@ describe("Scales", () => {
         ];
 
         scale.domain(["yes"]);
-        assert.strictEqual(scale.scale("yes"), category20Colors[0], "D3 Category 20 Scale color 1 used for option 1");
+        assert.deepEqual(d3.color(scale.scale("yes")), d3.color(category20Colors[0]), "D3 Category 20 Scale color 1 used for option 1");
 
         assert.deepEqual(scale.range(), category20Colors, "The correct D3 Category 20 Scale colors are in range");
       });

@@ -12,13 +12,15 @@ import {
   IResizeHandler
 } from "./abstractComponent";
 
-import { Point, SpaceRequest, Bounds } from "../core/interfaces";
+import { Point, SpaceRequest, Bounds, SimpleSelection } from "../core/interfaces";
 import * as RenderController from "../core/renderController";
 import * as Utils from "../utils";
+import { coerceExternalD3 } from "../utils/coerceD3";
 
 export class HTMLComponent extends AbstractComponent<HTMLElement> {
 
-  public anchor(selection: d3.Selection<void>) {
+  public anchor(selection: SimpleSelection<void>) {
+    selection = coerceExternalD3(selection);
     if (this._destroyed) {
       throw new Error("Can't reuse destroy()-ed Components!");
     }
@@ -27,7 +29,7 @@ export class HTMLComponent extends AbstractComponent<HTMLElement> {
       this._element = selection.append("div");
       this._setup();
     } else {
-      selection.node().appendChild(this._element.node());
+      (selection.node() as Element).appendChild(this._element.node() as Element);
     }
 
     this._isAnchored = true;
@@ -49,7 +51,7 @@ export class HTMLComponent extends AbstractComponent<HTMLElement> {
         // so we can measure the amount of space available for the chart
         // with respect to the total space allocated for charting as specified
         // by the user.
-        this._element.style({ "width": "100%", "height": "100%" });
+        this._element.styles({ "width": "100%", "height": "100%" });
 
         availableWidth = Utils.DOM.elementWidth(this._element.node() as HTMLElement);
         availableHeight = Utils.DOM.elementHeight(this._element.node() as HTMLElement);
@@ -71,7 +73,7 @@ export class HTMLComponent extends AbstractComponent<HTMLElement> {
 
     // set the size and position of the root element given the
     // calculated space constraints
-    this._element.style({
+    this._element.styles({
       height: `${this._height}px`,
       left: `${this._origin.x}px`,
       top: `${this._origin.y}px`,
@@ -145,11 +147,11 @@ export class HTMLComponent extends AbstractComponent<HTMLElement> {
     return this;
   }
 
-  public content() {
+  public content(): SimpleSelection<void> {
     return this._element;
   }
 
-  public element() {
+  public element(): SimpleSelection<void> {
     return this._element;
   }
 

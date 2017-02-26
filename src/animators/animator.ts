@@ -5,7 +5,7 @@
 
 import * as d3 from "d3";
 
-import { AttributeToAppliedProjector } from "../core/interfaces";
+import { AttributeToAppliedProjector, SimpleSelection } from "../core/interfaces";
 
 export interface Animator {
   /**
@@ -18,7 +18,7 @@ export interface Animator {
    *     transition object so that plots may chain the transitions between
    *     animators.
    */
-  animate(selection: d3.Selection<any>, attrToAppliedProjector: AttributeToAppliedProjector): d3.Selection<any> | d3.Transition<any>;
+  animate(selection: SimpleSelection<any>, attrToAppliedProjector: AttributeToAppliedProjector): SimpleSelection<any> | d3.Transition<any, any, any, any>;
 
   /**
    * Given the number of elements, return the total time the animation requires

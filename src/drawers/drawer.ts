@@ -7,18 +7,20 @@ import * as d3 from "d3";
 import * as Utils from "../utils";
 
 import { Dataset } from "../core/dataset";
-import { AttributeToProjector, AttributeToAppliedProjector } from "../core/interfaces";
+import { AttributeToProjector, AttributeToAppliedProjector, SimpleSelection } from "../core/interfaces";
 
 import * as Drawers from "./";
+import { coerceExternalD3 } from "../utils/coerceD3";
 
 export class Drawer {
-  private _renderArea: d3.Selection<void>;
+  private _renderArea: SimpleSelection<void>;
   protected _svgElementName: string;
   protected _className: string;
   private _dataset: Dataset;
 
   private _cachedSelectionValid = false;
-  private _cachedSelection: d3.Selection<any>;
+  private _cachedSelection: SimpleSelection<any>;
+  private _cachedSelectionNodes: d3.BaseType[];
 
   /**
    * A Drawer draws svg elements based on the input Dataset.
@@ -34,18 +36,19 @@ export class Drawer {
   /**
    * Retrieves the renderArea selection for the Drawer.
    */
-  public renderArea(): d3.Selection<void>;
+  public renderArea(): SimpleSelection<void>;
   /**
    * Sets the renderArea selection for the Drawer.
    *
    * @param {d3.Selection} Selection containing the <g> to render to.
    * @returns {Drawer} The calling Drawer.
    */
-  public renderArea(area: d3.Selection<void>): this;
-  public renderArea(area?: d3.Selection<void>): any {
+  public renderArea(area: SimpleSelection<void>): this;
+  public renderArea(area?: SimpleSelection<void>): any {
     if (area == null) {
       return this._renderArea;
     }
+    area = coerceExternalD3(area);
     this._renderArea = area;
     this._cachedSelectionValid = false;
     return this;
@@ -66,13 +69,18 @@ export class Drawer {
    * @param{any[]} data The data to be drawn
    */
   private _bindSelectionData(data: any[]) {
-    let dataElements = this.selection().data(data);
-    dataElements.enter().append(this._svgElementName);
-    dataElements.exit().remove();
+    let dataElementsUpdate = this.selection().data(data);
+    const dataElements =
+      dataElementsUpdate
+        .enter()
+        .append(this._svgElementName)
+        .merge(dataElementsUpdate);
+    dataElementsUpdate.exit().remove();
+
     this._applyDefaultAttributes(dataElements);
   }
 
-  protected _applyDefaultAttributes(selection: d3.Selection<any>) {
+  protected _applyDefaultAttributes(selection: SimpleSelection<any>) {
     if (this._className != null) {
       selection.classed(this._className, true);
     }
@@ -150,11 +158,8 @@ export class Drawer {
     return this;
   }
 
-  public selection() {
-    if (!this._cachedSelectionValid) {
-      this._cachedSelection = this.renderArea().selectAll(this.selector());
-      this._cachedSelectionValid = true;
-    }
+  public selection(): SimpleSelection<any> {
+    this.maybeRefreshCache();
     return this._cachedSelection;
   }
 
@@ -168,8 +173,17 @@ export class Drawer {
   /**
    * Returns the D3 selection corresponding to the datum with the specified index.
    */
-  public selectionForIndex(index: number): d3.Selection<any> {
-    return d3.select(this.selection()[0][index]);
+  public selectionForIndex(index: number): SimpleSelection<any> {
+    this.maybeRefreshCache();
+    return d3.select(this._cachedSelectionNodes[index]);
+  }
+
+  private maybeRefreshCache() {
+    if (!this._cachedSelectionValid) {
+      this._cachedSelection = this.renderArea().selectAll(this.selector());
+      this._cachedSelectionNodes = this._cachedSelection.nodes();
+      this._cachedSelectionValid = true;
+    }
   }
 
 }

@@ -4,9 +4,95 @@
  */
 
 import * as d3 from "d3";
+import * as d3Ease from "d3-ease";
 
 import { Animator } from "./animator";
-import { AttributeToAppliedProjector } from "../core/interfaces";
+import { AttributeToAppliedProjector, SimpleSelection } from "../core/interfaces";
+import { coerceExternalD3 } from "../utils/coerceD3";
+
+export type EaseFn = (normalizedTime: number) => number;
+
+const EASE_NAME_MAPPING: { [name: string]: EaseFn } = {
+  "linear": d3Ease.easeLinear,
+  "quad": d3Ease.easeQuad,
+  "quadIn": d3Ease.easeQuadIn,
+  "quadOut": d3Ease.easeQuadOut,
+  "quadInOut": d3Ease.easeQuadInOut,
+  "cubic": d3Ease.easeCubic,
+  "cubicIn": d3Ease.easeCubicIn,
+  "cubicOut": d3Ease.easeCubicOut,
+  "cubicInOut": d3Ease.easeCubicInOut,
+  "poly": d3Ease.easePoly,
+  "polyIn": d3Ease.easePolyIn,
+  "polyOut": d3Ease.easePolyOut,
+  "polyInOut": d3Ease.easePolyInOut,
+  "sin": d3Ease.easeSin,
+  "sinIn": d3Ease.easeSinIn,
+  "sinOut": d3Ease.easeSinOut,
+  "sinInOut": d3Ease.easeSinInOut,
+  "exp": d3Ease.easeExp,
+  "expIn": d3Ease.easeExpIn,
+  "expOut": d3Ease.easeExpOut,
+  "expInOut": d3Ease.easeExpInOut,
+  "circle": d3Ease.easeCircle,
+  "circleIn": d3Ease.easeCircleIn,
+  "circleOut": d3Ease.easeCircleOut,
+  "circleInOut": d3Ease.easeCircleInOut,
+  "bounce": d3Ease.easeBounce,
+  "bounceIn": d3Ease.easeBounceIn,
+  "bounceOut": d3Ease.easeBounceOut,
+  "bounceInOut": d3Ease.easeBounceInOut,
+  "back": d3Ease.easeBack,
+  "backIn": d3Ease.easeBackIn,
+  "backOut": d3Ease.easeBackOut,
+  "backInOut": d3Ease.easeBackInOut,
+  "elastic": d3Ease.easeElastic,
+  "elasticIn": d3Ease.easeElasticIn,
+  "elasticOut": d3Ease.easeElasticOut,
+  "elasticInOut": d3Ease.easeElasticInOut,
+};
+
+/**
+ * Known ease types that animator's .ease() methods understand
+ */
+export type EaseName =
+"linear" |
+"quad" |
+"quadIn" |
+"quadOut" |
+"quadInOut" |
+"cubic" |
+"cubicIn" |
+"cubicOut" |
+"cubicInOut" |
+"poly" |
+"polyIn" |
+"polyOut" |
+"polyInOut" |
+"sin" |
+"sinIn" |
+"sinOut" |
+"sinInOut" |
+"exp" |
+"expIn" |
+"expOut" |
+"expInOut" |
+"circle" |
+"circleIn" |
+"circleOut" |
+"circleInOut" |
+"bounce" |
+"bounceIn" |
+"bounceOut" |
+"bounceInOut" |
+"back" |
+"backIn" |
+"backOut" |
+"backInOut" |
+"elastic" |
+"elasticIn" |
+"elasticOut" |
+"elasticInOut";
 
 /**
  * An Animator with easing and configurable durations and delays.
@@ -31,13 +117,13 @@ export class Easing implements Animator {
   /**
    * The default easing of the animation
    */
-  private static _DEFAULT_EASING_MODE = "exp-out";
+  private static _DEFAULT_EASING_MODE: EaseName = "expOut";
 
   private _startDelay: number;
   private _stepDuration: number;
   private _stepDelay: number;
   private _maxTotalDuration: number;
-  private _easingMode: string;
+  private _easingMode: EaseName | EaseFn;
 
   /**
    * Constructs the default animator
@@ -57,15 +143,16 @@ export class Easing implements Animator {
     return this.startDelay() + adjustedIterativeDelay * (Math.max(numberOfSteps - 1, 0)) + this.stepDuration();
   }
 
-  public animate(selection: d3.Selection<any>, attrToAppliedProjector: AttributeToAppliedProjector) {
-    let numberOfSteps = selection[0].length;
+  public animate(selection: SimpleSelection<any>, attrToAppliedProjector: AttributeToAppliedProjector): d3.Transition<any, any, any, any> {
+    selection = coerceExternalD3(selection);
+    let numberOfSteps = selection.size();
     let adjustedIterativeDelay = this._getAdjustedIterativeDelay(numberOfSteps);
 
     return selection.transition()
-      .ease(this.easingMode())
+      .ease(this._getEaseFactory())
       .duration(this.stepDuration())
       .delay((d: any, i: number) => this.startDelay() + adjustedIterativeDelay * i)
-      .attr(attrToAppliedProjector);
+      .attrs(attrToAppliedProjector);
   }
 
   /**
@@ -169,20 +256,35 @@ export class Easing implements Animator {
    *
    * @returns {string} the current easing mode.
    */
-  public easingMode(): string;
+  public easingMode(): EaseName | EaseFn;
   /**
    * Sets the easing mode of the animation.
    *
    * @param {string} easingMode The desired easing mode.
    * @returns {Easing} The calling Easing Animator.
    */
-  public easingMode(easingMode: string): this;
-  public easingMode(easingMode?: string): any {
+  public easingMode(easingMode: EaseName | EaseFn): this;
+  public easingMode(easingMode?: EaseName | EaseFn): any {
     if (easingMode == null) {
       return this._easingMode;
     } else {
       this._easingMode = easingMode;
       return this;
+    }
+  }
+
+  protected _getEaseFactory() {
+    const ease = this.easingMode();
+    if(typeof ease === "string") {
+      const maybeEaseFunction = EASE_NAME_MAPPING[ease];
+      if (maybeEaseFunction == null) {
+        // oops; name is wrong - default to linear instead
+        return EASE_NAME_MAPPING["linear"];
+      } else {
+        return maybeEaseFunction;
+      }
+    } else {
+      return ease;
     }
   }
 

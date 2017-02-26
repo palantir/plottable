@@ -69,14 +69,14 @@ function run(container, data, Plottable) {
                                   .addDataset(aaplSource)
                                   .x(function(d) { return d.Date; }, xScale)
                                   .y(function(d) { return d["Adj Close"]; }, yScaleAAPL)
-                                  .interpolator("cardinal")
+                                  .curve("cardinal")
                                   .attr("stroke", function(d, index, dataset) { return dataset.metadata().name; }, colorScale);
           lineAAPL.autorangeMode("y");
           var lineGOOG = new Plottable.Plots.Line().animated(true)
                                   .addDataset(googSource)
                                   .x(function(d) { return d.Date; }, xScale)
                                   .y(function(d) { return d["Adj Close"]; }, yScaleGOOG)
-                                  .interpolator("cardinal")
+                                  .curve("cardinal")
                                   .attr("stroke", function(d, index, dataset) { return dataset.metadata().name; }, colorScale);
           lineGOOG.autorangeMode("y");
 

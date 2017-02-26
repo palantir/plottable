@@ -33,7 +33,7 @@ function run(container, data, Plottable) {
     .x(getX, xScale)
     .y(getY, yScale)
     .attr("stroke", color, cs)
-    .interpolator("step");
+    .curve("step");
     plotGroupArray.push(plots[color]);
   };
 

@@ -6,22 +6,23 @@
 import * as d3 from "d3";
 
 import { AbstractComponent, IComponent } from "./abstractComponent";
-import { Point, SpaceRequest, Bounds } from "../core/interfaces";
+import { Point, SpaceRequest, Bounds, SimpleSelection } from "../core/interfaces";
 import * as RenderController from "../core/renderController";
 import * as Utils from "../utils";
+import { coerceExternalD3 } from "../utils/coerceD3";
 
 // HACKHACK replace with GenericComponentCallback in 3.0
 export type ComponentCallback = (component: SVGComponent) => void;
 
-export class SVGComponent extends AbstractComponent<d3.Selection<void>> {
-  protected _boundingBox: d3.Selection<void>;
-  private _backgroundContainer: d3.Selection<void>;
-  private _foregroundContainer: d3.Selection<void>;
+export class SVGComponent extends AbstractComponent<SimpleSelection<void>> {
+  protected _boundingBox: SimpleSelection<void>;
+  private _backgroundContainer: SimpleSelection<void>;
+  private _foregroundContainer: SimpleSelection<void>;
   protected _clipPathEnabled = false;
 
-  private _boxes: d3.Selection<void>[] = [];
-  private _boxContainer: d3.Selection<void>;
-  private _rootSVG: d3.Selection<void>;
+  private _boxes: SimpleSelection<void>[] = [];
+  private _boxContainer: SimpleSelection<void>;
+  private _rootSVG: SimpleSelection<void>;
   private _clipPathID: string;
   private static _SAFARI_EVENT_BACKING_CLASS = "safari-event-backing";
 
@@ -33,10 +34,11 @@ export class SVGComponent extends AbstractComponent<d3.Selection<void>> {
   /**
    * Attaches the Component as a child of a given d3 Selection.
    *
-   * @param {d3.Selection} selection.
+   * @param {SimpleSelection} selection.
    * @returns {Component} The calling Component.
    */
-  public anchor(selection: d3.Selection<void>) {
+  public anchor(selection: SimpleSelection<void>) {
+    selection = coerceExternalD3(selection);
     if (this._destroyed) {
       throw new Error("Can't reuse destroy()-ed Components!");
     }
@@ -59,7 +61,7 @@ export class SVGComponent extends AbstractComponent<d3.Selection<void>> {
     // HACKHACK: Safari fails to register events on the <svg> itself
     const safariBacking = this._rootSVG.select(`.${SVGComponent._SAFARI_EVENT_BACKING_CLASS}`);
     if (safariBacking.empty()) {
-      this._rootSVG.append("rect").classed(SVGComponent._SAFARI_EVENT_BACKING_CLASS, true).attr({
+      this._rootSVG.append("rect").classed(SVGComponent._SAFARI_EVENT_BACKING_CLASS, true).attrs({
         x: 0,
         y: 0,
         width: "100%",
@@ -170,7 +172,7 @@ export class SVGComponent extends AbstractComponent<d3.Selection<void>> {
     if (this.parent() != null) {
       // this is a top-level SVG nested within an HTML layout. Apply the styles
       // directly to the root SVG rather than to the g element
-      this._rootSVG.style({
+      this._rootSVG.styles({
         height: `${this.height()}px`,
         left: `${this._origin.x}px`,
         top: `${this._origin.y}px`,
@@ -181,7 +183,7 @@ export class SVGComponent extends AbstractComponent<d3.Selection<void>> {
       this._element.attr("transform", "translate(" + this._origin.x + "," + this._origin.y + ")");
     }
 
-    this._boxes.forEach((b: d3.Selection<void>) => b.attr("width", this.width()).attr("height", this.height()));
+    this._boxes.forEach((b: SimpleSelection<void>) => b.attr("width", this.width()).attr("height", this.height()));
 
     if (this._resizeHandler != null) {
       this._resizeHandler(size);
@@ -238,19 +240,19 @@ export class SVGComponent extends AbstractComponent<d3.Selection<void>> {
   /**
    * Renders the Component to a given <svg>.
    *
-   * @param {String|d3.Selection} element A selector-string for the <svg>, or a d3 selection containing an <svg>.
+   * @param {String|SimpleSelection} element A selector-string for the <svg>, or a d3 selection containing an <svg>.
    * @returns {Component} The calling Component.
    */
-  public renderTo(element: String | SVGElement | d3.Selection<void>): this {
+  public renderTo(element: String | SVGElement | SimpleSelection<void>): this {
     this.detach();
     if (element != null) {
-      let selection: d3.Selection<void>;
+      let selection: SimpleSelection<void>;
       if (typeof(element) === "string") {
-        selection = d3.select(<string> element);
-      } else if (element instanceof SVGElement) {
-        selection = d3.select(element);
+        selection = d3.select<d3.BaseType, void>(element);
+      } else if (element instanceof Element) {
+        selection = d3.select<d3.BaseType, void>(element);
       } else {
-        selection = <d3.Selection<void>> element;
+        selection = coerceExternalD3(element as SimpleSelection<void>);
       }
 
       if (!selection.node() || ((selection.node() as SVGElement).nodeName.toLowerCase() !== "svg")) {
@@ -269,7 +271,7 @@ export class SVGComponent extends AbstractComponent<d3.Selection<void>> {
     return this;
   }
 
-  private _addBox(className?: string, parentElement?: d3.Selection<void>) {
+  private _addBox(className?: string, parentElement?: SimpleSelection<void>) {
     if (this._element == null) {
       throw new Error("Adding boxes before anchoring is currently disallowed");
     }
@@ -278,6 +280,7 @@ export class SVGComponent extends AbstractComponent<d3.Selection<void>> {
     if (className != null) {
       box.classed(className, true);
     }
+    box.attr("stroke-width", "0");
 
     this._boxes.push(box);
     if (this.width() != null && this.height() != null) {
@@ -327,9 +330,9 @@ export class SVGComponent extends AbstractComponent<d3.Selection<void>> {
    *
    * Will return undefined if the Component has not been anchored.
    *
-   * @return {d3.Selection}
+   * @return {SimpleSelection}
    */
-  public foreground(): d3.Selection<void> {
+  public foreground(): SimpleSelection<void> {
     return this._foregroundContainer;
   }
 
@@ -338,17 +341,17 @@ export class SVGComponent extends AbstractComponent<d3.Selection<void>> {
    *
    * Will return undefined if the Component has not been anchored.
    *
-   * @return {d3.Selection} background selection for the Component
+   * @return {SimpleSelection} background selection for the Component
    */
-  public background(): d3.Selection<void> {
+  public background(): SimpleSelection<void> {
     return this._backgroundContainer;
   }
 
-  public content(): d3.Selection<void> {
+  public content(): SimpleSelection<void> {
     return this._content;
   }
 
-  public element() {
+  public element(): SimpleSelection<void> {
     return this._rootSVG;
   }
 }

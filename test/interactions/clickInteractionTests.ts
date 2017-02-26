@@ -1,3 +1,4 @@
+import { SimpleSelection } from "../../src/core/interfaces";
 import * as d3 from "d3";
 
 import { assert } from "chai";
@@ -11,8 +12,8 @@ describe("Interactions", () => {
     const SVG_WIDTH = 400;
     const SVG_HEIGHT = 400;
 
-    let svg: d3.Selection<void>;
     let component: Plottable.SVGComponent;
+    let svg: SimpleSelection<void>;
     let clickInteraction: Plottable.Interactions.Click;
 
     beforeEach(() => {

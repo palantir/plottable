@@ -4,6 +4,7 @@
  */
 
 import * as d3 from "d3";
+import { SimpleSelection } from "../core/interfaces";
 
 let nativeMath: Math = (<any>window).Math;
 
@@ -25,8 +26,8 @@ export function contrast(a: string, b: string) {
  * Channel values are capped at the maximum value of 255, and the minimum value of 30.
  */
 export function lightenColor(color: string, factor: number) {
-  let hsl = <d3.Hsl> d3.hsl(color).brighter(factor);
-  return hsl.rgb().toString();
+  let brightened = d3.color(color).brighter(factor);
+  return brightened.rgb().toString();
 }
 
 /**
@@ -37,7 +38,7 @@ export function lightenColor(color: string, factor: number) {
  * @param {string} className The name of the class to be applied
  * @return {string} The hex code of the computed color
  */
-export function colorTest(colorTester: d3.Selection<void>, className: string) {
+export function colorTest(colorTester: SimpleSelection<any>, className: string) {
   colorTester.classed(className, true);
   // Use regex to get the text inside the rgb parentheses
   let colorStyle = colorTester.style("background-color");

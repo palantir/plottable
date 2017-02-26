@@ -8,14 +8,14 @@ import * as d3 from "d3";
 import { QuantitativeScale } from "./quantitativeScale";
 
 export class Linear extends QuantitativeScale<number> {
-  private _d3Scale: d3.scale.Linear<number, number>;
+  private _d3Scale: d3.ScaleLinear<number, number>;
 
   /**
    * @constructor
    */
   constructor() {
     super();
-    this._d3Scale = d3.scale.linear();
+    this._d3Scale = d3.scaleLinear();
   }
 
   protected _defaultExtent(): number[] {

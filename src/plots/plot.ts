@@ -8,7 +8,7 @@ import * as d3 from "d3";
 import * as Animators from "../animators";
 import { Animator } from "../animators/animator";
 import { SVGComponent } from "../components/svgComponent";
-import { Accessor, Point, AttributeToProjector, Bounds } from "../core/interfaces";
+import { Accessor, Point, AttributeToProjector, Bounds, SimpleSelection } from "../core/interfaces";
 import { Dataset, DatasetCallback } from "../core/dataset";
 import * as Drawers from "../drawers";
 import { Drawer } from "../drawers/drawer";
@@ -17,6 +17,7 @@ import { Scale, ScaleCallback } from "../scales/scale";
 import * as Utils from "../utils";
 
 import * as Plots from "./commons";
+import { coerceExternalD3 } from "../utils/coerceD3";
 
 export class Plot extends SVGComponent {
   protected static _ANIMATION_MAX_DURATION = 600;
@@ -30,7 +31,7 @@ export class Plot extends SVGComponent {
   private _dataChanged = false;
   private _datasetToDrawer: Utils.Map<Dataset, Drawer>;
 
-  protected _renderArea: d3.Selection<void>;
+  protected _renderArea: SimpleSelection<void>;
   private _attrBindings: d3.Map<Plots.AccessorScaleBinding<any, any>>;
   private _attrExtents: d3.Map<any[]>;
   private _includedValuesProvider: Scales.IncludedValuesProvider<any>;
@@ -66,7 +67,8 @@ export class Plot extends SVGComponent {
     this.animator(Plots.Animator.RESET, new Animators.Null());
   }
 
-  public anchor(selection: d3.Selection<void>) {
+  public anchor(selection: SimpleSelection<void>) {
+    selection = coerceExternalD3(selection);
     super.anchor(selection);
     this._dataChanged = true;
     this._cachedEntityStore = undefined;
@@ -145,11 +147,12 @@ export class Plot extends SVGComponent {
     return this;
   }
 
-  protected _bindProperty(property: string, value: any, scale: Scale<any, any>) {
+  protected _bindProperty(property: string, valueOrFn: any | Function, scale: Scale<any, any>) {
     let binding = this._propertyBindings.get(property);
     let oldScale = binding != null ? binding.scale : null;
 
-    this._propertyBindings.set(property, { accessor: d3.functor(value), scale: scale });
+    const accessor = typeof valueOrFn === "function" ? valueOrFn : () => valueOrFn;
+    this._propertyBindings.set(property, { accessor, scale });
     this._updateExtentsForProperty(property);
 
     if (oldScale != null) {
@@ -160,11 +163,12 @@ export class Plot extends SVGComponent {
     }
   }
 
-  private _bindAttr(attr: string, value: any, scale: Scale<any, any>) {
+  private _bindAttr(attr: string, valueOrFn: any | Function, scale: Scale<any, any>) {
     let binding = this._attrBindings.get(attr);
     let oldScale = binding != null ? binding.scale : null;
 
-    this._attrBindings.set(attr, { accessor: d3.functor(value), scale: scale });
+    const accessor = typeof valueOrFn === "function" ? valueOrFn : () => valueOrFn;
+    this._attrBindings.set(attr, { accessor, scale });
     this._updateExtentsForAttr(attr);
 
     if (oldScale != null) {
@@ -177,7 +181,7 @@ export class Plot extends SVGComponent {
 
   protected _generateAttrToProjector(): AttributeToProjector {
     let h: AttributeToProjector = {};
-    this._attrBindings.forEach((attr, binding) => {
+    this._attrBindings.each((binding, attr) => {
       let accessor = binding.accessor;
       let scale = binding.scale;
       let fn = scale ? (d: any, i: number, dataset: Dataset) => scale.scale(accessor(d, i, dataset)) : accessor;
@@ -230,13 +234,13 @@ export class Plot extends SVGComponent {
    */
   private _scales() {
     let scales: Scale<any, any>[] = [];
-    this._attrBindings.forEach((attr, binding) => {
+    this._attrBindings.each((binding, attr) => {
       let scale = binding.scale;
       if (scale != null && scales.indexOf(scale) === -1) {
         scales.push(scale);
       }
     });
-    this._propertyBindings.forEach((property, binding) => {
+    this._propertyBindings.each((binding, property) => {
       let scale = binding.scale;
       if (scale != null && scales.indexOf(scale) === -1) {
         scales.push(scale);
@@ -249,8 +253,8 @@ export class Plot extends SVGComponent {
    * Updates the extents associated with each attribute, then autodomains all scales the Plot uses.
    */
   protected _updateExtents() {
-    this._attrBindings.forEach((attr) => this._updateExtentsForAttr(attr));
-    this._propertyExtents.forEach((property) => this._updateExtentsForProperty(property));
+    this._attrBindings.each((_, attr) => this._updateExtentsForAttr(attr));
+    this._propertyExtents.each((_, property) => this._updateExtentsForProperty(property));
     this._scales().forEach((scale) => scale.addIncludedValuesProvider(this._includedValuesProvider));
   }
 
@@ -306,7 +310,7 @@ export class Plot extends SVGComponent {
       return [];
     }
     let includedValues: D[] = [];
-    this._attrBindings.forEach((attr, binding) => {
+    this._attrBindings.each((binding, attr) => {
       if (binding.scale === scale) {
         let extents = this._attrExtents.get(attr);
         if (extents != null) {
@@ -315,7 +319,7 @@ export class Plot extends SVGComponent {
       }
     });
 
-    this._propertyBindings.forEach((property, binding) => {
+    this._propertyBindings.each((binding, property) => {
       if (binding.scale === scale) {
         let extents = this._extentsForProperty(property);
         if (extents != null) {
@@ -483,14 +487,14 @@ export class Plot extends SVGComponent {
   }
 
   /**
-   * Retrieves Selections of this Plot for the specified Datasets.
+   * Retrieves the drawn visual elements for the specified Datasets as a d3 Selection.
    *
    * @param {Dataset[]} [datasets] The Datasets to retrieve the Selections for.
    *   If not provided, Selections will be retrieved for all Datasets on the Plot.
    * @returns {d3.Selection}
    */
-  public selections(datasets = this.datasets()): d3.Selection<any> {
-    let selections: Element[] = [];
+  public selections(datasets = this.datasets()): SimpleSelection<any> {
+    let selections: d3.BaseType[] = [];
 
     datasets.forEach((dataset) => {
       let drawer = this._datasetToDrawer.get(dataset);

@@ -84,11 +84,7 @@ export class Numeric extends Axis<number> {
     let domain = scale.domain();
     let min = domain[0] <= domain[1] ? domain[0] : domain[1];
     let max = domain[0] >= domain[1] ? domain[0] : domain[1];
-    if (min === domain[0]) {
-      return scale.ticks().filter((i: number) => i >= min && i <= max);
-    } else {
-      return scale.ticks().filter((i: number) => i >= min && i <= max).reverse();
-    }
+    return scale.ticks().filter((i: number) => i >= min && i <= max);
   }
 
   protected _rescale() {
@@ -188,15 +184,18 @@ export class Numeric extends Axis<number> {
     }
 
     let tickLabelValues = this._getTickValues();
-    let tickLabels = this._tickLabelContainer
-      .selectAll("." + Axis.TICK_LABEL_CLASS)
-      .data(tickLabelValues);
-    tickLabels.enter().append("text").classed(Axis.TICK_LABEL_CLASS, true);
-    tickLabels.exit().remove();
+    let tickLabelsUpdate = this._tickLabelContainer.selectAll("." + Axis.TICK_LABEL_CLASS).data(tickLabelValues);
+    tickLabelsUpdate.exit().remove();
 
+    const tickLabels =
+      tickLabelsUpdate
+        .enter()
+        .append("text")
+        .classed(Axis.TICK_LABEL_CLASS, true)
+        .merge(tickLabelsUpdate);
     tickLabels.style("text-anchor", tickLabelTextAnchor)
       .style("visibility", "inherit")
-      .attr(tickLabelAttrHash)
+      .attrs(tickLabelAttrHash)
       .text((s: any) => this.formatter()(s));
 
     let labelGroupTransform = "translate(" + labelGroupTransformX + ", " + labelGroupTransformY + ")";
@@ -211,10 +210,7 @@ export class Numeric extends Axis<number> {
     this._hideOverflowingTickLabels();
     this._hideOverlappingTickLabels();
 
-    if (this._tickLabelPositioning === "bottom" ||
-      this._tickLabelPositioning === "top" ||
-      this._tickLabelPositioning === "left" ||
-      this._tickLabelPositioning === "right") {
+    if (this._tickLabelPositioning !== "center") {
       this._hideTickMarksWithoutLabel();
     }
     return this;
@@ -282,14 +278,14 @@ export class Numeric extends Axis<number> {
   private _hideEndTickLabels() {
     let boundingBox = (<Element> this._boundingBox.node()).getBoundingClientRect();
     let tickLabels = this._tickLabelContainer.selectAll("." + Axis.TICK_LABEL_CLASS);
-    if (tickLabels[0].length === 0) {
+    if (tickLabels.size() === 0) {
       return;
     }
-    let firstTickLabel = <Element> tickLabels[0][0];
+    let firstTickLabel = <Element> tickLabels.nodes()[0];
     if (!Utils.DOM.clientRectInside(firstTickLabel.getBoundingClientRect(), boundingBox)) {
       d3.select(firstTickLabel).style("visibility", "hidden");
     }
-    let lastTickLabel = <Element> tickLabels[0][tickLabels[0].length - 1];
+    let lastTickLabel = <Element> tickLabels.nodes()[tickLabels.size() - 1];
     if (!Utils.DOM.clientRectInside(lastTickLabel.getBoundingClientRect(), boundingBox)) {
       d3.select(lastTickLabel).style("visibility", "hidden");
     }
@@ -303,7 +299,7 @@ export class Numeric extends Axis<number> {
         return (visibility === "inherit") || (visibility === "visible");
       });
 
-    let visibleTickLabelRects = visibleTickLabels[0].map((label: HTMLScriptElement) => label.getBoundingClientRect());
+    let visibleTickLabelRects = visibleTickLabels.nodes().map((label: HTMLScriptElement) => label.getBoundingClientRect());
     let interval = 1;
 
     while (!this._hasOverlapWithInterval(interval, visibleTickLabelRects) && interval < visibleTickLabelRects.length) {
@@ -325,31 +321,21 @@ export class Numeric extends Axis<number> {
    *
    * For top, bottom, left, right positioning of the thicks, we want the padding
    * between the labels to be 3x, such that the label will be  `padding` distance
-   * from the tick and 2 * `padding` distance (or more) from the next tick
-   *
+   * from the tick and 2 * `padding` distance (or more) from the next tick:
+   * see https://github.com/palantir/plottable/pull/1812
    */
   private _hasOverlapWithInterval(interval: number, rects: ClientRect[]): boolean {
+    const padding = (this._tickLabelPositioning === "center")
+      ? this.tickLabelPadding()
+      : this.tickLabelPadding() * 3;
 
-    let padding = this.tickLabelPadding();
+    const rectsWithPadding = rects.map((rect) => Utils.DOM.expandRect(rect, padding));
 
-    if (this._tickLabelPositioning === "bottom" ||
-      this._tickLabelPositioning === "top" ||
-      this._tickLabelPositioning === "left" ||
-      this._tickLabelPositioning === "right") {
-      padding *= 3;
-    }
-
-    for (let i = 0; i < rects.length - (interval); i += interval) {
-      let currRect = rects[i];
-      let nextRect = rects[i + interval];
-      if (this.isHorizontal()) {
-        if (currRect.right + padding >= nextRect.left) {
-          return false;
-        }
-      } else {
-        if (currRect.top - padding <= nextRect.bottom) {
-          return false;
-        }
+    for (let i = 0; i < rectsWithPadding.length - interval; i += interval) {
+      let currRect = rectsWithPadding[i];
+      let nextRect = rectsWithPadding[i + interval];
+      if (Utils.DOM.clientRectsOverlap(currRect, nextRect)) {
+        return false;
       }
     }
     return true;

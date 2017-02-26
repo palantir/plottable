@@ -1,3 +1,4 @@
+import { SimpleSelection } from "../../src/core/interfaces";
 import * as d3 from "d3";
 
 import { assert } from "chai";
@@ -9,7 +10,7 @@ import * as TestMethods from "../testMethods";
 describe("Plots", () => {
   describe("Vertical Stacked Bar Plot", () => {
     describe("rendering using positive data", () => {
-      let svg: d3.Selection<void>;
+      let svg: SimpleSelection<void>;
       let xScale: Plottable.Scales.Category;
       let yScale: Plottable.Scales.Linear;
       let stackedBarPlot: Plottable.Plots.StackedBar<string, number>;
@@ -44,7 +45,7 @@ describe("Plots", () => {
       });
 
       it("renders rects offset by previous values", () => {
-        let bars = stackedBarPlot.content().selectAll("rect");
+        let bars = stackedBarPlot.content().selectAll<Element, any>("rect");
 
         let dataLength = stackedBarPlot.datasets()[0].data().length;
         let dataCount = stackedBarPlot.datasets().length * dataLength;
@@ -79,7 +80,7 @@ describe("Plots", () => {
       it("doesn't show any off-bar labels", () => {
         stackedBarPlot.labelsEnabled(true);
         yScale.domain([0, 30]);
-        let offBarLabels = stackedBarPlot.content().selectAll(".off-bar-label");
+        let offBarLabels = stackedBarPlot.content().selectAll<Element, any>(".off-bar-label");
         assert.operator(offBarLabels.size(), ">", 0, "some off-bar labels are drawn");
         offBarLabels.each(function(d, i) {
           assert.isTrue(d3.select(this).style("visibility") === "hidden", `off-bar label ${i} is hidden`);
@@ -89,7 +90,7 @@ describe("Plots", () => {
       it("shows stacked bar labels", () => {
         stackedBarPlot.labelsEnabled(true);
         yScale.domain([0, 30]);
-        const stackedBarLabels = stackedBarPlot.content().selectAll(".stacked-bar-label");
+        const stackedBarLabels = stackedBarPlot.content().selectAll<Element, any>(".stacked-bar-label");
         assert.strictEqual(stackedBarLabels.size(), 2);
         const text: string[] = [];
         stackedBarLabels.each(function (d) {
@@ -131,7 +132,7 @@ describe("Plots", () => {
 
         stackedBar.labelsEnabled(true);
         yScale.domain([0, 30]);
-        const stackedBarLabels = stackedBar.content().selectAll(".stacked-bar-label");
+        const stackedBarLabels = stackedBar.content().selectAll<Element, any>(".stacked-bar-label");
         assert.strictEqual(stackedBarLabels.size(), 2);
         const text: string[] = [];
         stackedBarLabels.each(function (d) {
@@ -145,7 +146,7 @@ describe("Plots", () => {
       it("doesn't show stacked bar labels when columns are too tall", () => {
         stackedBarPlot.labelsEnabled(true);
         yScale.domain([0, 3]);
-        const stackedBarLabels = stackedBarPlot.content().selectAll(".stacked-bar-label");
+        const stackedBarLabels = stackedBarPlot.content().selectAll<Element, any>(".stacked-bar-label");
         assert.strictEqual(stackedBarLabels.size(), 0);
       });
 
@@ -153,7 +154,7 @@ describe("Plots", () => {
         stackedBarPlot.labelsEnabled(true);
         xScale.range([0, 20]);
         xScale.domain(xScale.domain());
-        const stackedBarLabels = stackedBarPlot.content().selectAll(".stacked-bar-label");
+        const stackedBarLabels = stackedBarPlot.content().selectAll<Element, any>(".stacked-bar-label");
         assert.strictEqual(stackedBarLabels.size(), 0);
       });
 
@@ -170,7 +171,7 @@ describe("Plots", () => {
     });
 
     describe("rendering using negative data", () => {
-      let svg: d3.Selection<void>;
+      let svg: SimpleSelection<void>;
       let xScale: Plottable.Scales.Category;
       let yScale: Plottable.Scales.Linear;
       let stackedBarPlot: Plottable.Plots.StackedBar<string, number>;
@@ -207,7 +208,7 @@ describe("Plots", () => {
       it("shows stacked bar labels", () => {
         yScale.domain([3, -3]);
         stackedBarPlot.labelsEnabled(true);
-        const stackedBarLabels = stackedBarPlot.content().selectAll(".stacked-bar-label");
+        const stackedBarLabels = stackedBarPlot.content().selectAll<Element, any>(".stacked-bar-label");
         assert.strictEqual(stackedBarLabels.size(), 2);
         const text: string[] = [];
         stackedBarLabels.each(function (d) {
@@ -219,7 +220,7 @@ describe("Plots", () => {
       it("doesn't show stacked bar labels when columns are too tall", () => {
         stackedBarPlot.labelsEnabled(true);
         yScale.domain([-3, 0]);
-        const stackedBarLabels = stackedBarPlot.content().selectAll(".stacked-bar-label");
+        const stackedBarLabels = stackedBarPlot.content().selectAll<Element, any>(".stacked-bar-label");
         assert.strictEqual(stackedBarLabels.size(), 0)
       });
 
@@ -227,12 +228,12 @@ describe("Plots", () => {
         stackedBarPlot.labelsEnabled(true);
         xScale.range([0, 40]);
         xScale.domain(xScale.domain());
-        const stackedBarLabels = stackedBarPlot.content().selectAll(".stacked-bar-label");
+        const stackedBarLabels = stackedBarPlot.content().selectAll<Element, any>(".stacked-bar-label");
         assert.strictEqual(stackedBarLabels.size(), 0)
       });
 
       it("renders rects offset by previous values", () => {
-        let bars = stackedBarPlot.content().selectAll("rect");
+        let bars = stackedBarPlot.content().selectAll<Element, any>("rect");
 
         let dataLength = stackedBarPlot.datasets()[0].data().length;
         let dataCount = stackedBarPlot.datasets().length * dataLength;
@@ -264,7 +265,7 @@ describe("Plots", () => {
     });
 
     describe("non-overlapping datasets", () => {
-      let svg: d3.Selection<void>;
+      let svg: SimpleSelection<void>;
       let xScale: Plottable.Scales.Category;
       let stackedBarPlot: Plottable.Plots.StackedBar<string, number>;
 
@@ -302,14 +303,14 @@ describe("Plots", () => {
       });
 
       it("draws bars at specified x location and stacks in order of datasets", () => {
-        let bars = stackedBarPlot.content().selectAll("rect");
+        let bars = stackedBarPlot.content().selectAll<Element, any>("rect");
 
         let datumCount = stackedBarPlot.datasets().reduce((prev, curr) => prev + curr.data().length, 0);
         assert.strictEqual(bars.size(), datumCount, "draws a bar for each datum");
 
         let domain = xScale.domain();
         domain.forEach((value) => {
-          let domainBarPairs = d3.pairs(bars.filter((d) => d.x === value)[0]);
+          let domainBarPairs = d3.pairs(bars.filter((d) => d.x === value).nodes());
           domainBarPairs.forEach((aBarPair) => {
             assert.closeTo(TestMethods.numAttr(d3.select(aBarPair[0]), "x"), TestMethods.numAttr(d3.select(aBarPair[1]), "x"),
               window.Pixel_CloseTo_Requirement, "bars at same x position");
@@ -323,14 +324,14 @@ describe("Plots", () => {
         // change stacking order
         stackedBarPlot.stackingOrder("topdown");
 
-        let bars = stackedBarPlot.content().selectAll("rect");
+        let bars = stackedBarPlot.content().selectAll<Element, any>("rect");
 
         let datumCount = stackedBarPlot.datasets().reduce((prev, curr) => prev + curr.data().length, 0);
         assert.strictEqual(bars.size(), datumCount, "draws a bar for each datum");
 
         let domain = xScale.domain();
         domain.forEach((value) => {
-          let domainBarPairs = d3.pairs(bars.filter((d) => d.x === value)[0]);
+          let domainBarPairs = d3.pairs(bars.filter((d) => d.x === value).nodes());
           domainBarPairs.forEach((aBarPair) => {
             assert.closeTo(TestMethods.numAttr(d3.select(aBarPair[0]), "x"), TestMethods.numAttr(d3.select(aBarPair[1]), "x"),
               window.Pixel_CloseTo_Requirement, "bars at same x position");
@@ -377,7 +378,7 @@ describe("Plots", () => {
         stackedBarPlot.x((d: any) => d.x, xScale).y((d: any) => d.y, yScale);
         stackedBarPlot.renderTo(svg);
 
-        let validBar = stackedBarPlot.content().selectAll("rect").filter((d) => d.y === 1);
+        let validBar = stackedBarPlot.content().selectAll<Element, any>("rect").filter((d) => d.y === 1);
         assert.closeTo(TestMethods.numAttr(validBar, "y"), yScale.scale(1),
           window.Pixel_CloseTo_Requirement, "bar stacks from 0");
 
@@ -389,7 +390,7 @@ describe("Plots", () => {
 
   describe("Horizontal Stacked Bar Plot", () => {
     describe("rendering using positive data", () => {
-      let svg: d3.Selection<void>;
+      let svg: SimpleSelection<void>;
       let xScale: Plottable.Scales.Linear;
       let yScale: Plottable.Scales.Category;
       let stackedBarPlot: Plottable.Plots.StackedBar<number, string>;
@@ -426,7 +427,7 @@ describe("Plots", () => {
       it("shows stacked bar labels", () => {
         xScale.domain([0, 30]);
         stackedBarPlot.labelsEnabled(true);
-        const stackedBarLabels = stackedBarPlot.content().selectAll(".stacked-bar-label");
+        const stackedBarLabels = stackedBarPlot.content().selectAll<Element, any>(".stacked-bar-label");
         assert.strictEqual(stackedBarLabels.size(), 2);
         const text: string[] = [];
         stackedBarLabels.each(function (d) {
@@ -438,7 +439,7 @@ describe("Plots", () => {
       it("doesn't show stacked bar labels when columns are too tall", () => {
         xScale.domain([0, 3]);
         stackedBarPlot.labelsEnabled(true);
-        const stackedBarLabels = stackedBarPlot.content().selectAll(".stacked-bar-label");
+        const stackedBarLabels = stackedBarPlot.content().selectAll<Element, any>(".stacked-bar-label");
         assert.strictEqual(stackedBarLabels.size(), 0)
       });
 
@@ -446,12 +447,12 @@ describe("Plots", () => {
         stackedBarPlot.labelsEnabled(true);
         yScale.range([0, 40]);
         yScale.domain(yScale.domain());
-        const stackedBarLabels = stackedBarPlot.content().selectAll(".stacked-bar-label");
+        const stackedBarLabels = stackedBarPlot.content().selectAll<Element, any>(".stacked-bar-label");
         assert.strictEqual(stackedBarLabels.size(), 0)
       });
 
       it("renders rects offset by previous values", () => {
-        let bars = stackedBarPlot.content().selectAll("rect");
+        let bars = stackedBarPlot.content().selectAll<Element, any>("rect");
 
         let dataLength = stackedBarPlot.datasets()[0].data().length;
         let dataCount = stackedBarPlot.datasets().length * dataLength;
@@ -485,7 +486,7 @@ describe("Plots", () => {
       it("doesn't show any off-bar labels", () => {
         stackedBarPlot.labelsEnabled(true);
         xScale.domain([0, 50]);
-        let offBarLabels = stackedBarPlot.content().selectAll(".off-bar-label");
+        let offBarLabels = stackedBarPlot.content().selectAll<Element, any>(".off-bar-label");
         assert.operator(offBarLabels.size(), ">", 0, "some off-bar labels are drawn");
         offBarLabels.each(function(d, i) {
           assert.strictEqual(d3.select(this).style("visibility"), "hidden", `off-bar label ${i} is hidden`);
@@ -494,7 +495,7 @@ describe("Plots", () => {
     });
 
     describe("non-overlapping datasets", () => {
-      let svg: d3.Selection<void>;
+      let svg: SimpleSelection<void>;
       let yScale: Plottable.Scales.Category;
       let stackedBarPlot: Plottable.Plots.StackedBar<number, string>;
 
@@ -532,14 +533,14 @@ describe("Plots", () => {
       });
 
       it("draws bars at specified y location and stacks in order of datasets", () => {
-        let bars = stackedBarPlot.content().selectAll("rect");
+        let bars = stackedBarPlot.content().selectAll<Element, any>("rect");
 
         let datumCount = stackedBarPlot.datasets().reduce((prev, curr) => prev + curr.data().length, 0);
         assert.strictEqual(bars.size(), datumCount, "draws a bar for each datum");
 
         let domain = yScale.domain();
         domain.forEach((value) => {
-          let domainBarPairs = d3.pairs(bars.filter((d) => d.y === value)[0]);
+          let domainBarPairs = d3.pairs(bars.filter((d) => d.y === value).nodes());
           domainBarPairs.forEach((aBarPair) => {
             assert.closeTo(TestMethods.numAttr(d3.select(aBarPair[0]), "y"), TestMethods.numAttr(d3.select(aBarPair[1]), "y"),
               window.Pixel_CloseTo_Requirement, "bars at same x position");
@@ -585,7 +586,7 @@ describe("Plots", () => {
         stackedBarPlot.x((d: any) => d.x, xScale).y((d: any) => d.y, yScale);
         stackedBarPlot.renderTo(svg);
 
-        let validBar = stackedBarPlot.content().selectAll("rect").filter((d) => d.x === 1);
+        let validBar = stackedBarPlot.content().selectAll<Element, any>("rect").filter((d) => d.x === 1);
         assert.closeTo(TestMethods.numAttr(validBar, "x"), xScale.scale(0),
           window.Pixel_CloseTo_Requirement, "bar stacks from 0");
 

@@ -3,7 +3,7 @@
  * @license MIT
  */
 
-import { Point } from "../core/interfaces";
+import { Point, SimpleSelection } from "../core/interfaces";
 import { QuantitativeScale } from "../scales/quantitativeScale";
 import { ScaleCallback } from "../scales/scale";
 import * as Utils from "../utils";
@@ -21,7 +21,7 @@ export class GuideLineLayer<D> extends SVGComponent {
   private _scale: QuantitativeScale<D>;
   private _pixelPosition: number;
   private _scaleUpdateCallback: ScaleCallback<QuantitativeScale<D>>;
-  private _guideLine: d3.Selection<void>;
+  private _guideLine: SimpleSelection<void>;
   private _mode = PropertyMode.VALUE;
 
   constructor(orientation: string) {
@@ -82,7 +82,7 @@ export class GuideLineLayer<D> extends SVGComponent {
   public renderImmediately() {
     super.renderImmediately();
     this._syncPixelPositionAndValue();
-    this._guideLine.attr({
+    this._guideLine.attrs({
       x1: this._isVertical() ? this.pixelPosition() : 0,
       y1: this._isVertical() ? 0 : this.pixelPosition(),
       x2: this._isVertical() ? this.pixelPosition() : this.width(),

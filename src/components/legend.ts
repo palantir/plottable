@@ -500,7 +500,7 @@ export class Legend extends SVGComponent {
    * @param {Point} p
    * @returns {Entity<Legend>[]}
    */
-  public entitiesAt(p: Point) {
+  public entitiesAt(p: Point): Entity<Legend>[] {
     if (!this._isSetup) {
       return [];
     }
@@ -525,20 +525,23 @@ export class Legend extends SVGComponent {
         const withinColumn = Utils.Math.within(p, columnBounds);
 
         if (withinColumn) {
-          const rowElement = this.content().selectAll(`.${Legend.LEGEND_ROW_CLASS}`)[0][rowIndex];
+          const rowElement = this.content().selectAll(`.${Legend.LEGEND_ROW_CLASS}`).nodes()[rowIndex];
           // HACKHACK The 2.x API chooses the symbol element as the "selection" to return, regardless of what
           // was actually selected
           const entryElement = d3.select(rowElement)
-            .selectAll(`.${Legend.LEGEND_ENTRY_CLASS}`)[0][Math.floor(columnIndex / 2)];
+            .selectAll(`.${Legend.LEGEND_ENTRY_CLASS}`).nodes()[Math.floor(columnIndex / 2)];
           const symbolElement = d3.select(entryElement).select(`.${Legend.LEGEND_SYMBOL_CLASS}`);
 
           // HACKHACK The 2.x API returns the center {x, y} of the symbol as the position.
-          const rowTranslate = d3.transform(d3.select(rowElement).attr("transform")).translate;
-          const symbolTranslate = d3.transform(symbolElement.attr("transform")).translate;
+          const rowTranslate = Utils.DOM.getTranslateValues(d3.select(rowElement));
+          const symbolTranslate = Utils.DOM.getTranslateValues(symbolElement);
 
           return [{
             datum: column.data.name,
-            position: { x: rowTranslate[0] + symbolTranslate[0], y: rowTranslate[1] + symbolTranslate[1] },
+            position: {
+              x: rowTranslate[0] + symbolTranslate[0],
+              y: rowTranslate[1] + symbolTranslate[1]
+            },
             selection: d3.select(entryElement),
             component: this,
           }];
@@ -558,65 +561,76 @@ export class Legend extends SVGComponent {
 
     // clear content from previous renders
     this.content().selectAll("*").remove();
-    const rows = this.content().selectAll("g." + Legend.LEGEND_ROW_CLASS).data(table.rows);
-    rows.enter().append("g").classed(Legend.LEGEND_ROW_CLASS, true);
-    rows.exit().remove();
+    const rowsUpdate = this.content().selectAll("g." + Legend.LEGEND_ROW_CLASS).data(table.rows);
+    const rows =
+      rowsUpdate
+        .enter()
+        .append("g")
+          .classed(Legend.LEGEND_ROW_CLASS, true)
+        .merge(rowsUpdate);
+    rowsUpdate.exit().remove();
     rows.attr("transform", (row, rowIndex) => {
       const rowBounds = table.getRowBounds(rowIndex);
       return `translate(${rowBounds.topLeft.x}, ${rowBounds.topLeft.y})`;
     });
 
-    const entries = rows.selectAll(`g.${Legend.LEGEND_ENTRY_CLASS}`).data((row) => {
-      const symbolEntryPairs: [
-        LegendColumn<{name: string, type: string }>,
-        LegendColumn<{ name: string, type: string}>][] = [];
+    type SymbolEntryPair = [ LegendColumn<{name: string, type: string }>, LegendColumn<{ name: string, type: string}> ];
+
+    const self = this;
+    rows.each(function (row, rowIndex) {
+      const symbolEntryPairs: SymbolEntryPair[] = [];
       for (let i = 0; i < row.columns.length; i += 2) {
         symbolEntryPairs.push([row.columns[i], row.columns[i + 1]]);
       }
-      return symbolEntryPairs;
+
+      const entriesUpdate = d3.select(this).selectAll(`g.${Legend.LEGEND_ENTRY_CLASS}`).data(symbolEntryPairs);
+      const entriesEnter =
+        entriesUpdate
+          .enter()
+          .append("g")
+            .classed(Legend.LEGEND_ENTRY_CLASS, true)
+          .merge(entriesUpdate);
+
+      entriesEnter.append("path")
+        .attr("d", (symbolEntryPair, columnIndex) => {
+          const symbol = symbolEntryPair[0];
+          return self.symbol()(symbol.data.name, rowIndex)(symbol.height * 0.6);
+        })
+        .attr("transform", (symbolEntryPair, i) => {
+          const symbol = symbolEntryPair[0];
+          const columnIndex = table.rows[rowIndex].columns.indexOf(symbol);
+          const columnBounds = table.getColumnBounds(rowIndex, columnIndex);
+          return `translate(${columnBounds.topLeft.x + symbol.width / 2}, ${symbol.height / 2})`;
+        })
+        .attr("fill", (symbolEntryPair) => self._colorScale.scale(symbolEntryPair[0].data.name))
+        .attr("opacity", (symbolEntryPair, _columnIndex) => {
+          return self.symbolOpacity()(symbolEntryPair[0].data.name, rowIndex);
+        })
+        .classed(Legend.LEGEND_SYMBOL_CLASS, true);
+
+      entriesEnter.append("g").classed("text-container", true)
+        .attr("transform", (symbolEntryPair, i) => {
+          const entry = symbolEntryPair[1];
+          const columnIndex = table.rows[rowIndex].columns.indexOf(entry);
+          const columnBounds = table.getColumnBounds(rowIndex, columnIndex);
+          return "translate(" + columnBounds.topLeft.x + ", 0)"
+        })
+        .each(function (symbolEntryPair, i, rowIndex) {
+          const textContainer = d3.select(this);
+          const column = symbolEntryPair[1];
+
+          const writeOptions = {
+            selection: textContainer,
+            xAlign: "left",
+            yAlign: "top",
+            textRotation: 0,
+          };
+
+          self._writer.write(self._formatter(column.data.name), column.width, self.height(), writeOptions)
+        });
+
+        entriesUpdate.exit().remove();
     });
-
-    const entriesEnter = entries.enter().append("g").classed(Legend.LEGEND_ENTRY_CLASS, true);
-    entriesEnter.append("path")
-      .attr("d", (symbolEntryPair, columnIndex, rowIndex) => {
-        const symbol = symbolEntryPair[0];
-        return this.symbol()(symbol.data.name, rowIndex)(symbol.height * 0.6);
-      })
-      .attr("transform", (symbolEntryPair, i, rowIndex) => {
-        const symbol = symbolEntryPair[0];
-        const columnIndex = table.rows[rowIndex].columns.indexOf(symbol);
-        const columnBounds = table.getColumnBounds(rowIndex, columnIndex);
-        return `translate(${columnBounds.topLeft.x + symbol.width / 2}, ${symbol.height / 2})`;
-      })
-      .attr("fill", (symbolEntryPair) => this._colorScale.scale(symbolEntryPair[0].data.name))
-      .attr("opacity", (symbolEntryPair, _columnIndex, rowIndex) => {
-        return this.symbolOpacity()(symbolEntryPair[0].data.name, rowIndex);
-      })
-      .classed(Legend.LEGEND_SYMBOL_CLASS, true);
-
-    const self = this;
-    entriesEnter.append("g").classed("text-container", true)
-      .attr("transform", (symbolEntryPair, i, rowIndex) => {
-        const entry = symbolEntryPair[1];
-        const columnIndex = table.rows[rowIndex].columns.indexOf(entry);
-        const columnBounds = table.getColumnBounds(rowIndex, columnIndex);
-        return "translate(" + columnBounds.topLeft.x + ", 0)"
-      })
-      .each(function (symbolEntryPair, i, rowIndex) {
-        const textContainer = d3.select(this);
-        const column = symbolEntryPair[1];
-
-        const writeOptions = {
-          selection: textContainer,
-          xAlign: "left",
-          yAlign: "top",
-          textRotation: 0,
-        };
-
-        self._writer.write(self._formatter(column.data.name), column.width, self.height(), writeOptions)
-      });
-
-    entries.exit().remove();
 
     return this;
   }

@@ -19,8 +19,9 @@ function run(container, data, Plottable) {
       Plottable.SymbolFactories.circle(),
       Plottable.SymbolFactories.cross(),
       Plottable.SymbolFactories.diamond(),
-      Plottable.SymbolFactories.triangleUp(),
-      Plottable.SymbolFactories.triangleDown()
+      Plottable.SymbolFactories.triangle(),
+      Plottable.SymbolFactories.star(),
+      Plottable.SymbolFactories.wye(),
     ];
 
     var xScale = new Plottable.Scales.Linear();

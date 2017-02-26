@@ -5,7 +5,7 @@
 
 import * as d3 from "d3";
 
-import { Range } from "../core/interfaces";
+import { Range, SimpleSelection } from "../core/interfaces";
 
 let nativeMath: Math = (<any>window).Math;
 
@@ -27,7 +27,7 @@ export function contains(parent: Element, child: Element): boolean {
  * @param {d3.Selection} element
  * @returns {SVGRed} The bounding box.
  */
-export function elementBBox(element: d3.Selection<any>) {
+export function elementBBox(element: SimpleSelection<any>) {
   let bbox: SVGRect;
   // HACKHACK: Firefox won't correctly measure nodes with style "display: none" or their descendents (FF Bug 612118).
   try {
@@ -90,34 +90,47 @@ export function elementHeight(element: Element) {
     + _parseStyleValue(style, "border-bottom-width");
 }
 
-/**
- * Retrieves the number array representing the translation for the selection
- *
- * @param {d3.Selection<any>} selection The selection to query
- * @returns {[number, number]} The number array representing the translation
- */
-export function translate(selection: d3.Selection<any>): [number, number];
-/**
- * Translates the given selection by the input x / y pixel amounts.
- *
- * @param {d3.Selection<any>} selection The selection to translate
- * @param {number} x The amount to translate in the x direction
- * @param {number} y The amount to translate in the y direction
- * @returns {d3.Selection<any>} The input selection
- */
-export function translate(selection: d3.Selection<any>, x: number, y: number): d3.Selection<any>;
-export function translate(selection: d3.Selection<any>, x?: number, y?: number): any {
-  let transformMatrix = d3.transform(selection.attr("transform"));
+// taken from the BNF at https://www.w3.org/TR/SVG/coords.html
+const WSP = "\\s";
+const NUMBER = "(?:[-+]?[0-9]*\\.?[0-9]+)";
+const COMMA_WSP = `(?:(?:${WSP}+,?${WSP}*)|(?:,${WSP}*))`;
+const TRANSLATE_REGEX = new RegExp(`translate${WSP}*\\(${WSP}*(${NUMBER})(?:${COMMA_WSP}(${NUMBER}))?${WSP}*\\)`);
+const ROTATE_REGEX = new RegExp(`rotate${WSP}*\\(${WSP}*(${NUMBER})${WSP}*\\)`);
+const SCALE_REGEX = new RegExp(`scale${WSP}*\\(${WSP}*(${NUMBER})(?:${COMMA_WSP}(${NUMBER}))?${WSP}*\\)`);
 
-  if (x == null) {
-    return transformMatrix.translate;
+/**
+ * Accepts selections whose .transform contain a "translate(a, b)" and extracts the a and b
+ */
+export function getTranslateValues(el: SimpleSelection<any>): [number, number] {
+  const match = TRANSLATE_REGEX.exec(el.attr("transform"));
+  if (match != null) {
+    const [, translateX, translateY = 0] = match;
+    return [+translateX, +translateY];
+  } else {
+    return [0, 0];
   }
+}
+/**
+ * Accepts selections whose .transform contain a "rotate(angle)" and returns the angle
+ */
+export function getRotate(el: SimpleSelection<any>): number {
+  const match = ROTATE_REGEX.exec(el.attr("transform"));
+  if (match != null) {
+    const [, rotation] = match;
+    return +rotation;
+  } else {
+    return 0;
+  }
+}
 
-  y = (y == null) ? 0 : y;
-  transformMatrix.translate[0] = x;
-  transformMatrix.translate[1] = y;
-  selection.attr("transform", transformMatrix.toString());
-  return selection;
+export function getScaleValues(el: SimpleSelection<any>): [number, number] {
+  const match = SCALE_REGEX.exec(el.attr("transform"));
+  if (match != null) {
+    const [, scaleX, scaleY] = match;
+    return [+scaleX, scaleY == null ? +scaleX : +scaleY];
+  } else {
+    return [0, 0];
+  }
 }
 
 /**
@@ -141,6 +154,22 @@ export function clientRectsOverlap(clientRectA: ClientRect, clientRectB: ClientR
     return false;
   }
   return true;
+}
+
+/**
+ * Return a new ClientRect that is the old ClientRect expanded by amount in all directions.
+ * @param rect
+ * @param amount
+ */
+export function expandRect(rect: ClientRect, amount: number) {
+  return {
+    left: rect.left - amount,
+    top: rect.top - amount,
+    right: rect.right + amount,
+    bottom: rect.bottom + amount,
+    width: rect.width + amount * 2,
+    height: rect.height + amount * 2
+  };
 }
 
 /**

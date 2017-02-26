@@ -4,6 +4,7 @@ import * as Utils from "../utils";
 
 import { Point } from "../";
 import { IComponent } from "../components";
+import { SimpleSelection } from "../core/interfaces";
 
 const _TRANSLATOR_KEY = "__Plottable_ClientTranslator";
 
@@ -11,7 +12,7 @@ export function getTranslator(component: IComponent<any>): Translator {
   // The Translator works by first calculating the offset to root of the chart and then calculating
   // the offset from the component to the root. It is imperative that the measureElement
   // be added to the root of the hierarchy and nowhere else.
-  let root = Utils.Component.root(component).element().node();
+  let root = Utils.Component.root(component).element().node() as Element;
 
   let translator: Translator = (<any> root)[_TRANSLATOR_KEY];
   if (translator == null) {
@@ -39,15 +40,15 @@ export function getTranslator(component: IComponent<any>): Translator {
  * When nested within an SVG, the attribute position is respected.
  * When nested within an HTML, the style position is respected.
  */
-function move(node: d3.Selection<any>, x: number, y: number) {
-  node.style({ "left": `${x}px`, "top": `${y}px` });
-  node.attr({ "x": `${x}`, "y": `${y}` });
+function move(node: SimpleSelection<any>, x: number, y: number) {
+  node.styles({ "left": `${x}px`, "top": `${y}px` });
+  node.attrs({ "x": `${x}`, "y": `${y}` });
 }
 
 export class Translator {
-  private _measurementElement: d3.Selection<void>;
+  private _measurementElement: SimpleSelection<void>;
 
-  constructor(measurementElement: d3.Selection<void>) {
+  constructor(measurementElement: SimpleSelection<void>) {
     this._measurementElement = measurementElement;
   }
 

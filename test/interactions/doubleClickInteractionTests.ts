@@ -1,3 +1,4 @@
+import { SimpleSelection } from "../../src/core/interfaces";
 import * as d3 from "d3";
 
 import { assert } from "chai";
@@ -9,7 +10,7 @@ import * as TestMethods from "../testMethods";
 describe("Interactions", () => {
   describe("DoubleClick Interaction", () => {
     let clickedPoint: Plottable.Point;
-    let svg: d3.Selection<void>;
+    let svg: SimpleSelection<void>;
     let doubleClickInteraction: Plottable.Interactions.DoubleClick;
     let component: Plottable.SVGComponent;
 

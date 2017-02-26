@@ -1,3 +1,4 @@
+import { SimpleSelection } from "../../src/core/interfaces";
 import * as d3 from "d3";
 
 import { assert } from "chai";
@@ -176,7 +177,7 @@ describe("GuideLineLayer", () => {
       const SVG_HEIGHT = orientation === "vertical" ? 300 : 400;
       const GUIDE_LINE_CLASS = ".guide-line";
 
-      let svg: d3.Selection<void>;
+      let svg: SimpleSelection<void>;
 
       beforeEach(() => {
         svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
@@ -221,14 +222,14 @@ describe("GuideLineLayer", () => {
         gll.pixelPosition(expectedPosition1);
         gll.renderTo(svg);
 
-        assert.strictEqual(gll.content().selectAll(GUIDE_LINE_CLASS).size(), 1, "exactly one line is drawn");
+        assert.strictEqual(gll.content().selectAll<Element, any>(GUIDE_LINE_CLASS).size(), 1, "exactly one line is drawn");
         const line = gll.content().select(GUIDE_LINE_CLASS);
         const expectedAttrs1 = getExpectedAttr(expectedPosition1);
         TestMethods.assertLineAttrs(line, expectedAttrs1, "the line was drawn at the specified position");
 
         const expectedPosition2 = range * 3 / 4;
         gll.pixelPosition(expectedPosition2);
-        assert.strictEqual(gll.content().selectAll(GUIDE_LINE_CLASS).size(), 1, "exactly one line is drawn");
+        assert.strictEqual(gll.content().selectAll<Element, any>(GUIDE_LINE_CLASS).size(), 1, "exactly one line is drawn");
         const line2 = gll.content().select(GUIDE_LINE_CLASS);
         const expectedAttrs2 = getExpectedAttr(expectedPosition2);
         TestMethods.assertLineAttrs(line2, expectedAttrs2, "the line was drawn at the updated position");
@@ -245,14 +246,14 @@ describe("GuideLineLayer", () => {
 
         const value1 = 5;
         gll.value(value1);
-        assert.strictEqual(gll.content().selectAll(GUIDE_LINE_CLASS).size(), 1, "exactly one line is drawn");
+        assert.strictEqual(gll.content().selectAll<Element, any>(GUIDE_LINE_CLASS).size(), 1, "exactly one line is drawn");
         const line = gll.content().select(GUIDE_LINE_CLASS);
         const expectedAttrs1 = getExpectedAttr(scale.scale(value1));
         TestMethods.assertLineAttrs(line, expectedAttrs1, "the line was drawn at the correct position");
 
         const value2 = 8;
         gll.value(value2);
-        assert.strictEqual(gll.content().selectAll(GUIDE_LINE_CLASS).size(), 1, "exactly one line is drawn");
+        assert.strictEqual(gll.content().selectAll<Element, any>(GUIDE_LINE_CLASS).size(), 1, "exactly one line is drawn");
         const line2 = gll.content().select(GUIDE_LINE_CLASS);
         const expectedAttrs2 = getExpectedAttr(scale.scale(value2));
         TestMethods.assertLineAttrs(line2, expectedAttrs2, "the line was redrawn at the new position when the value was changed");

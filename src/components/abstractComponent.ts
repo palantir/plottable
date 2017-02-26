@@ -7,7 +7,7 @@ import * as d3 from "d3";
 
 import { ComponentContainer } from "./componentContainer";
 
-import { Point, SpaceRequest, Bounds } from "../core/interfaces";
+import { Point, SpaceRequest, Bounds, SimpleSelection } from "../core/interfaces";
 import * as RenderController from "../core/renderController";
 import * as Utils from "../utils";
 import { Set } from "../utils/set";
@@ -23,7 +23,7 @@ export interface IComponent<D> {
    * @param {HTMLElement} The root element.
    * @returns {Component} The calling Component.
    */
-  anchor(selection: d3.Selection<void>): this;
+  anchor(selection: SimpleSelection<void>): this;
   /**
    * Adds a callback to be called on anchoring the Component to the DOM.
    * If the Component is already anchored, the callback is called immediately.
@@ -209,11 +209,11 @@ export interface IComponent<D> {
    *
    * @return {IContent} content selection for the Component
    */
-  content(): d3.Selection<void>;
+  content(): SimpleSelection<void>;
   /**
    * Gets the top-level element of the component
    */
-  element(): d3.Selection<void>;
+  element(): SimpleSelection<void>;
  /**
    * Tell this component to invalidate any caching. This function should be
    * called when a CSS change has occurred that could influence the layout
@@ -229,7 +229,7 @@ export abstract class AbstractComponent<D> implements IComponent<D> {
   protected _content: D;
   protected _cssClasses = new Utils.Set<string>();
   protected _destroyed = false;
-  protected _element: d3.Selection<void>;
+  protected _element: SimpleSelection<void>;
   protected _height: number;
   protected _isAnchored = false;
   protected _isSetup = false;
@@ -254,7 +254,7 @@ export abstract class AbstractComponent<D> implements IComponent<D> {
     "bottom": 1,
   };
 
-  abstract anchor(selection: d3.Selection<void>): this;
+  abstract anchor(selection: SimpleSelection<void>): this;
 
   public onAnchor(callback: GenericComponentCallback<D>) {
     if (this._isAnchored) {
@@ -427,8 +427,8 @@ export abstract class AbstractComponent<D> implements IComponent<D> {
     return { x, y };
   }
 
-  abstract content(): d3.Selection<void>;
-  abstract element():  d3.Selection<void>;
+  abstract content(): SimpleSelection<void>;
+  abstract element():  SimpleSelection<void>;
 
   public invalidateCache() {
     // neither base component invalidates cache

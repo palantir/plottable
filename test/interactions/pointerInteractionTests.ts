@@ -1,3 +1,4 @@
+import { SimpleSelection } from "../../src/core/interfaces";
 import * as d3 from "d3";
 
 import { assert } from "chai";
@@ -35,7 +36,7 @@ describe("Interactions", () => {
       return callback;
     }
 
-    function triggerPointerEvent(p: Plottable.Point, mode: TestMethods.InteractionMode, target: d3.Selection<void>) {
+    function triggerPointerEvent(p: Plottable.Point, mode: TestMethods.InteractionMode, target: SimpleSelection<void>) {
       const type = mode === TestMethods.InteractionMode.Mouse ? TestMethods.InteractionType.Move : TestMethods.InteractionType.Start;
       TestMethods.triggerFakeInteractionEvent(mode, type, target, p.x, p.y);
     }
@@ -43,9 +44,9 @@ describe("Interactions", () => {
     [TestMethods.InteractionMode.Mouse, TestMethods.InteractionMode.Touch].forEach((mode) => {
       describe(`Listening to ${MODE_NAME[mode]} events`, () => {
 
-        let svg: d3.Selection<void>;
+        let svg: SimpleSelection<void>;
         let pointerInteraction: Plottable.Interactions.Pointer;
-        let eventTarget: d3.Selection<void>;
+        let eventTarget: SimpleSelection<void>;
         let callback: PointerTestCallback;
 
         beforeEach(() => {
@@ -152,16 +153,16 @@ describe("Interactions", () => {
       });
 
       describe(`Interactions under overlay for ${MODE_NAME[mode]} events`, () => {
-        let svg: d3.Selection<void>;
+        let svg: SimpleSelection<void>;
         let pointerInteraction: Plottable.Interactions.Pointer;
-        let eventTarget: d3.Selection<void>;
+        let eventTarget: SimpleSelection<void>;
 
         let callback: PointerTestCallback;
-        let overlay: d3.Selection<void>;
+        let overlay: SimpleSelection<void>;
 
         beforeEach(() => {
           svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
-          overlay = TestMethods.getSVGParent().append("div").style({
+          overlay = TestMethods.getSVGParent().append("div").styles({
             height: `${SVG_HEIGHT}px`,
             width: `${SVG_WIDTH}px`,
             position: "relative",

@@ -1,3 +1,4 @@
+import { SimpleSelection } from "../src/core/interfaces";
 import * as d3 from "d3";
 
 import * as Plottable from "../src";
@@ -38,7 +39,7 @@ export class NoOpAnimator implements Plottable.Animator {
     return 0;
   }
 
-  public animate(selection: d3.Selection<any>) {
+  public animate(selection: SimpleSelection<any>): SimpleSelection<any> {
     return selection;
   }
 }

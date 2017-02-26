@@ -11,7 +11,8 @@
   "main": "build/src/index.js",
   "typings": "build/src/index.d.ts",
   "scripts": {
-    "build": "npm-run-all build:tsc build:webpack",
+    "build": "npm-run-all build:clean build:tsc build:webpack",
+    "build:clean": "rm -rf build/",
     "build:tsc": "tsc -p test/",
     "build:webpack": "webpack --config webpack.config.js",
     "check_version": "echo ${npm_package_version} $(npm view ${npm_package_name} version) | awk '{ if ($1 == $2) { exit 1 }}'",
@@ -26,6 +27,8 @@
   },
   "devDependencies": {
     "@types/chai": "^3.4.34",
+    "@types/d3": "4.5.0",
+    "@types/d3-selection-multi": "1.0.4",
     "@types/mocha": "^2.2.27",
     "@types/sinon": "^1.16.26",
     "chai": "2.0.0",
@@ -64,7 +67,7 @@
     "write-file-webpack-plugin": "3.4.2"
   },
   "dependencies": {
-    "d3": "^3.5.16",
-    "svg-typewriter": "1.1.0"
+    "d3": "^4.5.0",
+    "svg-typewriter": "^2.0.0"
   }
 }

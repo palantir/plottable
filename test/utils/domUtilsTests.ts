@@ -16,7 +16,7 @@ describe("Utils.DOM", () => {
       width: 40,
       height: 20,
     };
-    let rect = svg.append("rect").attr(expectedBox);
+    let rect = svg.append("rect").attrs(expectedBox);
     let measuredBox = Plottable.Utils.DOM.elementBBox(rect);
     assert.deepEqual(measuredBox, expectedBox, "getBBox measures correctly");
     svg.remove();
@@ -31,11 +31,11 @@ describe("Utils.DOM", () => {
     };
 
     let removedSVG = TestMethods.generateSVG().remove();
-    let rect = removedSVG.append("rect").attr(expectedBox);
+    let rect = removedSVG.append("rect").attrs(expectedBox);
     Plottable.Utils.DOM.elementBBox(rect); // could throw NS_ERROR on FF
 
     let noneSVG = TestMethods.generateSVG().style("display", "none");
-    rect = noneSVG.append("rect").attr(expectedBox);
+    rect = noneSVG.append("rect").attrs(expectedBox);
     Plottable.Utils.DOM.elementBBox(rect); // could throw NS_ERROR on FF
 
     noneSVG.remove();
@@ -46,7 +46,7 @@ describe("Utils.DOM", () => {
       let parent = TestMethods.getSVGParent();
       parent.style("width", "300px");
       parent.style("height", "200px");
-      let parentElem = <Element> parent[0][0];
+      let parentElem = <Element> parent.node();
 
       let width = Plottable.Utils.DOM.elementWidth(parentElem);
       assert.strictEqual(width, 300, "measured width matches set width");
@@ -56,7 +56,7 @@ describe("Utils.DOM", () => {
 
     it("can get the svg's size", () => {
       let svg = TestMethods.generateSVG(450, 120);
-      let svgElem = <Element> svg[0][0];
+      let svgElem = <Element> svg.node();
 
       let width = Plottable.Utils.DOM.elementWidth(svgElem);
       assert.strictEqual(width, 450, "measured width matches set width");
@@ -67,9 +67,9 @@ describe("Utils.DOM", () => {
 
     it("can accept multiple units and convert to pixels", () => {
       let parent = TestMethods.getSVGParent();
-      let parentElem = <Element> parent[0][0];
+      let parentElem = <Element> parent.node();
       let child = parent.append("div");
-      let childElem = <Element> child[0][0];
+      let childElem = <Element> child.node();
 
       parent.style("width", "200px");
       parent.style("height", "50px");

@@ -17,7 +17,7 @@ function run(container, data, Plottable) {
 
   var hBarPlot = new Plottable.Plots.Bar("horizontal");
   hBarPlot.addDataset(new Plottable.Dataset(data))
-    .x(function (d) { return d3.time.format("%x").parse(d.x); }, xScale)
+    .x(function (d) { return d3.timeParse("%x")(d.x); }, xScale)
     .y(function(d) { return d.y; }, yScale);
 
   var xAxis = new Plottable.Axes.Time(xScale, "bottom");

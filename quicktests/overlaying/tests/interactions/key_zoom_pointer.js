@@ -24,7 +24,7 @@ function run(container, data, Plottable) {
     if (ds.metadata().shape === "square") {
       return Plottable.SymbolFactories.square();
     } else {
-      return Plottable.SymbolFactories.triangleUp();
+      return Plottable.SymbolFactories.triangle();
     }
   };
 

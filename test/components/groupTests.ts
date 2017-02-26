@@ -1,3 +1,4 @@
+import { SimpleSelection } from "../../src/core/interfaces";
 import * as d3 from "d3";
 
 import { assert } from "chai";
@@ -187,7 +188,7 @@ describe("Group", () => {
   describe("Layout", () => {
     let SVG_WIDTH = 400;
     let SVG_HEIGHT = 400;
-    let div: d3.Selection<void>;
+    let div: SimpleSelection<void>;
 
     beforeEach(() => {
       div = TestMethods.generateDIV(SVG_WIDTH, SVG_HEIGHT);

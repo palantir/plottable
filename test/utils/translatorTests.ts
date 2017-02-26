@@ -31,7 +31,7 @@ it("getTranslator() creates only one Translator per html root", () => {
       x: 19,
       y: 85,
     };
-    let rect = div.append("div").style({
+    let rect = div.append("div").styles({
       left: `${divOrigin.x}px`,
       position: "absolute",
       top: `${divOrigin.y}px`,
@@ -70,7 +70,7 @@ it("getTranslator() creates only one Translator per html root", () => {
       x: 19,
       y: 85,
     };
-    let rect = svg.append("rect").attr({
+    let rect = svg.append("rect").attrs({
       x: rectOrigin.x,
       y: rectOrigin.y,
       width: 30,

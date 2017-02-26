@@ -1,3 +1,4 @@
+import { SimpleSelection } from "../../src/core/interfaces";
 import * as d3 from "d3";
 
 import { assert } from "chai";
@@ -31,7 +32,7 @@ describe("Plots", () => {
         plot.addDataset(new Plottable.Dataset(data));
         plot.renderTo(svg);
 
-        const rects = plot.content().selectAll("rect");
+        const rects = plot.content().selectAll<Element, any>("rect");
         assert.strictEqual(rects.size(), data.length, "one rectangle per datum");
         rects.each(function(d, i) {
           const rect = d3.select(this);
@@ -49,7 +50,7 @@ describe("Plots", () => {
     });
 
     describe("retreiving entities", () => {
-      let svg: d3.Selection<void>;
+      let svg: SimpleSelection<void>;
       let xScale: Plottable.Scales.Linear;
       let yScale: Plottable.Scales.Linear;
       let plot: Plottable.Plots.Rectangle<number, number>;
@@ -167,7 +168,7 @@ describe("Plots", () => {
     });
 
     describe("autoranging the x and y scales", () => {
-      let svg: d3.Selection<void>;
+      let svg: SimpleSelection<void>;
 
       beforeEach(() => {
         svg = TestMethods.generateSVG();
@@ -268,7 +269,7 @@ describe("Plots", () => {
     });
 
     describe("using category scales", () => {
-      let svg: d3.Selection<void>;
+      let svg: SimpleSelection<void>;
       let xScale: Plottable.Scales.Category;
       let yScale: Plottable.Scales.Category;
       let plot: Plottable.Plots.Rectangle<string, string>;
@@ -293,7 +294,7 @@ describe("Plots", () => {
         plot.addDataset(new Plottable.Dataset(data));
         plot.renderTo(svg);
 
-        const rects = plot.content().selectAll("rect");
+        const rects = plot.content().selectAll<Element, any>("rect");
         assert.strictEqual(rects.size(), data.length, "rect for each datum");
 
         rects.each(function(d, i) {
@@ -318,7 +319,7 @@ describe("Plots", () => {
         ];
         dataset.data(data);
 
-        const rects = plot.content().selectAll("rect");
+        const rects = plot.content().selectAll<Element, any>("rect");
         assert.strictEqual(rects.size(), data.length, "rect for each datum");
 
         rects.each(function(d, i) {
@@ -343,7 +344,7 @@ describe("Plots", () => {
         plot.addDataset(new Plottable.Dataset(data));
         plot.renderTo(svg);
 
-        const rects = plot.content().selectAll("rect");
+        const rects = plot.content().selectAll<Element, any>("rect");
         assert.strictEqual(rects.size(), data.length, "rect for each datum");
 
         rects.each(function(d, i) {
@@ -370,7 +371,7 @@ describe("Plots", () => {
 
         yScale.domain(yScale.domain().reverse());
 
-        const rects = plot.content().selectAll("rect");
+        const rects = plot.content().selectAll<Element, any>("rect");
         assert.strictEqual(rects.size(), data.length, "rect for each datum");
 
         rects.each(function(d, i) {
@@ -387,7 +388,7 @@ describe("Plots", () => {
     });
 
     describe("retrieving D3 Selections from the plot", () => {
-      let svg: d3.Selection<void>;
+      let svg: SimpleSelection<void>;
       let xScale: Plottable.Scales.Category;
       let yScale: Plottable.Scales.Category;
       let plot: Plottable.Plots.Rectangle<string, string>;
@@ -443,7 +444,7 @@ describe("Plots", () => {
       let plot: Plottable.Plots.Rectangle<number, number>;
       let xScale: Plottable.Scales.Linear;
       let yScale: Plottable.Scales.Linear;
-      let svg: d3.Selection<void>;
+      let svg: SimpleSelection<void>;
 
       beforeEach(() => {
         svg = TestMethods.generateSVG();
@@ -467,7 +468,7 @@ describe("Plots", () => {
 
       it("does not display rectangle labels by default", () => {
         plot.renderTo(svg);
-        const texts = plot.content().selectAll("text");
+        const texts = plot.content().selectAll<Element, any>("text");
         assert.strictEqual(texts.size(), 0, "no labels are drawn by default");
         svg.remove();
       });
@@ -475,7 +476,7 @@ describe("Plots", () => {
       it("renders correct text for the labels", () => {
         plot.renderTo(svg);
         plot.labelsEnabled(true);
-        const texts = plot.content().selectAll("text");
+        const texts = plot.content().selectAll<Element, any>("text");
         assert.strictEqual(texts.size(), 2, "all labels are drawn");
         texts.each(function(d, i) {
           const textString = d3.select(this).text();
@@ -490,7 +491,7 @@ describe("Plots", () => {
         plot.renderTo(svg);
         plot.labelsEnabled(true);
         plot.label(() => "a really really really long string");
-        const texts = plot.content().selectAll("text");
+        const texts = plot.content().selectAll<Element, any>("text");
         assert.strictEqual(texts.size(), 0, "labels not drawn if not enough width");
         svg.remove();
       });
@@ -501,7 +502,7 @@ describe("Plots", () => {
         plot.renderTo(svg);
         plot.labelsEnabled(true);
         plot.label((d: any) => d.val);
-        const texts = plot.content().selectAll("text");
+        const texts = plot.content().selectAll<Element, any>("text");
         assert.strictEqual(texts.size(), 0, "labels not drawn if not enough height");
         svg.remove();
       });
@@ -509,12 +510,12 @@ describe("Plots", () => {
       it("updates labels on dataset change", () => {
         plot.renderTo(svg);
         plot.labelsEnabled(true);
-        const texts = plot.content().selectAll("text");
+        const texts = plot.content().selectAll<Element, any>("text");
         assert.strictEqual(texts.size(), plot.datasets()[0].data().length, "all labels are drawn");
 
         const data2 = [{ x: 0, y: 0, x2: 1, y2: 1, val: "5" }];
         plot.datasets()[0].data(data2);
-        const updatedTexts = plot.content().selectAll("text");
+        const updatedTexts = plot.content().selectAll<Element, any>("text");
         assert.strictEqual(updatedTexts.size(), data2.length, "label for each datum");
         updatedTexts.each(function(d, i) {
           const textString = d3.select(this).text();
@@ -537,7 +538,7 @@ describe("Plots", () => {
         xScale.domain([xDomainMin, xDomainMax]);
         plot.renderTo(svg);
 
-        const texts = plot.content().selectAll("text");
+        const texts = plot.content().selectAll<Element, any>("text");
         assert.strictEqual(texts.size(), (xDomainMax - xDomainMin) / 0.5, "labels inside the edges are drawn");
         texts.each(function(d, i) {
           const value = parseFloat(d3.select(this).text());
@@ -557,7 +558,7 @@ describe("Plots", () => {
         plot.datasets()[0].data(overlappingRectangleData);
         plot.renderTo(svg);
 
-        let texts = plot.content().selectAll("text");
+        let texts = plot.content().selectAll<Element, any>("text");
         assert.strictEqual(texts.size(), 1, "only top most label is rendered");
         svg.remove();
       });

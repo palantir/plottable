@@ -1,3 +1,4 @@
+import { SimpleSelection } from "../../src/core/interfaces";
 import * as d3 from "d3";
 
 import { assert } from "chai";
@@ -13,12 +14,12 @@ describe("Dispatchers", () => {
       let keyCodeToSend: number;
       let keyDispatcher: Plottable.Dispatchers.Key;
 
-      let body: d3.Selection<void>;
+      let body: SimpleSelection<void>;
 
       beforeEach(() => {
         keyCodeToSend = 65;
         keyDispatcher = Plottable.Dispatchers.Key.getDispatcher();
-        body = d3.select("body");
+        body = d3.select<Element, any>("body");
       });
 
       it("can set a callback to be called when a key is pressed down", () => {

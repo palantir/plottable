@@ -8,6 +8,7 @@ import * as d3 from "d3";
 import { Dataset } from "../core/dataset";
 
 import { Drawer } from "./drawer";
+import { SimpleSelection } from "../core/interfaces";
 
 export class Line extends Drawer {
 
@@ -17,12 +18,12 @@ export class Line extends Drawer {
     this._svgElementName = "path";
   }
 
-  protected _applyDefaultAttributes(selection: d3.Selection<any>) {
+  protected _applyDefaultAttributes(selection: SimpleSelection<any>) {
     super._applyDefaultAttributes(selection);
     selection.style("fill", "none");
   }
 
-  public selectionForIndex(index: number): d3.Selection<any> {
-    return d3.select(this.selection()[0][0]);
+  public selectionForIndex(index: number): SimpleSelection<any> {
+    return d3.select(this.selection().node());
   }
 }

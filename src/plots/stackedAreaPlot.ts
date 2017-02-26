@@ -7,7 +7,7 @@ import * as d3 from "d3";
 
 import * as Animators from "../animators";
 import { Animator } from "../animators/animator";
-import { Accessor, Point, AttributeToProjector } from "../core/interfaces";
+import { Accessor, Point, AttributeToProjector, SimpleSelection } from "../core/interfaces";
 import { Dataset } from "../core/dataset";
 import { Scale } from "../scales/scale";
 import { QuantitativeScale } from "../scales/quantitativeScale";
@@ -22,7 +22,7 @@ export class StackedArea<X> extends Area<X> {
   private _stackingResult: Utils.Stacking.StackingResult;
   private _stackedExtent: number[];
 
-  private _baseline: d3.Selection<void>;
+  private _baseline: SimpleSelection<void>;
   private _baselineValue = 0;
   private _baselineValueProvider: () => number[];
 

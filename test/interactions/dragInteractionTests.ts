@@ -1,3 +1,4 @@
+import { SimpleSelection } from "../../src/core/interfaces";
 import * as d3 from "d3";
 
 import { assert } from "chai";
@@ -28,8 +29,8 @@ describe("Interactions", () => {
       y: -SVG_HEIGHT / 2,
     };
 
-    let svg: d3.Selection<void>;
     let component: Plottable.SVGComponent;
+    let svg: SimpleSelection<void>;
     let dragInteraction: Plottable.Interactions.Drag;
 
     interface DragTestCallback {

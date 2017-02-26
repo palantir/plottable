@@ -29,9 +29,9 @@ export class Category extends Scale<string, number> implements TransformableScal
    * *Transformation Space* and transformed to screen space in methods like
    * `rangeBand()` and `stepWidth()`.
    */
-  private _d3TransformationScale: d3.scale.Linear<number, number>;
+  private _d3TransformationScale: d3.ScaleLinear<number, number>;
 
-  private _d3Scale: d3.scale.Ordinal<string, number>;
+  private _d3Scale: d3.ScaleBand<string>;
   private _range = [0, 1];
 
   private _innerPadding: number;
@@ -44,10 +44,10 @@ export class Category extends Scale<string, number> implements TransformableScal
    */
   constructor() {
     super();
-    this._d3Scale = d3.scale.ordinal<string, number>();
+    this._d3Scale = d3.scaleBand<string>();
     this._d3Scale.range(TRANSFORMATION_SPACE);
 
-    this._d3TransformationScale = d3.scale.linear<number, number>();
+    this._d3TransformationScale = d3.scaleLinear<number, number>();
     this._d3TransformationScale.domain(TRANSFORMATION_SPACE);
 
     let d3InnerPadding = 0.3;
@@ -89,14 +89,16 @@ export class Category extends Scale<string, number> implements TransformableScal
    * @returns {string[]}
    */
   public invertRange(range: [number, number] = this.range()): string[] {
-    const rangeBand = this._d3Scale.rangeBand();
-    // offset the domain by half the rangeBand such that we consider the
-    // center of the bars
-    const domainStartNormalized = this.invertedTransformation(range[0]) - rangeBand / 2;
-    const domainEndNormalized = this.invertedTransformation(range[1]) - rangeBand / 2;
-    const domainStart = d3.bisect(this._d3Scale.range(), domainStartNormalized);
-    const domainEnd = d3.bisect(this._d3Scale.range(), domainEndNormalized);
-    return this._d3Scale.domain().slice(domainStart, domainEnd);
+    const rangeBand = this._d3Scale.bandwidth();
+    const domainStartNormalized = this.invertedTransformation(range[0]);
+    const domainEndNormalized = this.invertedTransformation(range[1]);
+    const domain = this._d3Scale.domain();
+    // map ["a", "b", "c"] to the normalized center position (e.g. [0.25, .5, 0.75]). We add
+    // half the rangeBand to consider the center of the bars
+    const normalizedDomain = domain.map((d) => this._d3Scale(d) + rangeBand / 2);
+    const domainStart = d3.bisect(normalizedDomain, domainStartNormalized);
+    const domainEnd = d3.bisect(normalizedDomain, domainEndNormalized);
+    return domain.slice(domainStart, domainEnd);
   }
 
   public range(): [number, number];
@@ -116,7 +118,8 @@ export class Category extends Scale<string, number> implements TransformableScal
   private _setBands() {
     let d3InnerPadding = 1 - 1 / (1 + this.innerPadding());
     let d3OuterPadding = this.outerPadding() / (1 + this.innerPadding());
-    this._d3Scale.rangeBands(TRANSFORMATION_SPACE, d3InnerPadding, d3OuterPadding);
+    this._d3Scale.paddingInner(d3InnerPadding);
+    this._d3Scale.paddingOuter(d3OuterPadding);
   }
 
   /**
@@ -125,7 +128,7 @@ export class Category extends Scale<string, number> implements TransformableScal
    * @returns {number} The range band width
    */
   public rangeBand(): number {
-    return this._rescaleBand(this._d3Scale.rangeBand());
+    return this._rescaleBand(this._d3Scale.bandwidth());
   }
 
   /**
@@ -136,7 +139,8 @@ export class Category extends Scale<string, number> implements TransformableScal
    * @returns {number}
    */
   public stepWidth(): number {
-    return this._rescaleBand(this._d3Scale.rangeBand() * (1 + this.innerPadding()));
+    // todo consider replacing this with _d3Scale.step()
+    return this._rescaleBand(this._d3Scale.bandwidth() * (1 + this.innerPadding()));
   }
 
   /**
@@ -197,7 +201,7 @@ export class Category extends Scale<string, number> implements TransformableScal
 
   public scale(value: string): number {
     // Determine the middle of the range band for the value
-    let untransformed = this._d3Scale(value) + this._d3Scale.rangeBand() / 2;
+    let untransformed = this._d3Scale(value) + this._d3Scale.bandwidth() / 2;
     // Convert to screen space
     return this._d3TransformationScale(untransformed);
   }

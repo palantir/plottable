@@ -22,6 +22,7 @@ export {
 };
 
 export * from "./callbackSet";
+export * from "./coerceD3";
 export * from "./entityStore";
 export * from "./translator";
 export * from "./map";

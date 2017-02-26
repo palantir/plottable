@@ -12,7 +12,7 @@ import { QuantitativeScale } from "./quantitativeScale";
 
 export class ModifiedLog extends QuantitativeScale<number> {
   private _base: number;
-  private _d3Scale: d3.scale.Linear<number, number>;
+  private _d3Scale: d3.ScaleLinear<number, number>;
   private _pivot: number;
   private _untransformedDomain: number[];
 
@@ -46,7 +46,7 @@ export class ModifiedLog extends QuantitativeScale<number> {
    */
   constructor(base = 10) {
     super();
-    this._d3Scale = d3.scale.linear();
+    this._d3Scale = d3.scaleLinear();
     this._base = base;
     this._pivot = this._base;
     this._setDomain(this._defaultExtent());
@@ -149,12 +149,12 @@ export class ModifiedLog extends QuantitativeScale<number> {
 
     let linearMin = Math.max(min, -this._pivot);
     let linearMax = Math.min(max, this._pivot);
-    let linearTicks = d3.scale.linear().domain([linearMin, linearMax]).ticks(this._howManyTicks(linearMin, linearMax));
+    let linearTicks = d3.scaleLinear().domain([linearMin, linearMax]).ticks(this._howManyTicks(linearMin, linearMax));
     let ticks = negativeLogTicks.concat(linearTicks).concat(positiveLogTicks);
 
     // If you only have 1 tick, you can't tell how big the scale is.
     if (ticks.length <= 1) {
-      ticks = d3.scale.linear().domain([min, max]).ticks(Scales.ModifiedLog._DEFAULT_NUM_TICKS);
+      ticks = d3.scaleLinear().domain([min, max]).ticks(Scales.ModifiedLog._DEFAULT_NUM_TICKS);
     }
     return ticks;
   }

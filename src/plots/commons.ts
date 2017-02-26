@@ -33,7 +33,17 @@ export interface PlotEntity extends Entity<Plot> {
 }
 
 export interface AccessorScaleBinding<D, R> {
+  /**
+   * The (possibly upcasted to a function) user defined accessor.
+   *
+   * The first argument in `plot.x((d) => d.x, scale)`.
+   */
   accessor: Accessor<any>;
+  /**
+   * The Scale that the accessor's result gets passed through.
+   *
+   * The second argument in `plot.x((d) => d.x, scale)`.
+   */
   scale?: Scale<D, R>;
 }
 
