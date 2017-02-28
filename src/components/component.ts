@@ -378,7 +378,7 @@ export class Component {
   public renderTo(element: string | Element | SimpleSelection<any>): this {
     this.detach();
     if (element != null) {
-      let selection: d3.Selection<Element, any, any, any>;
+      let selection: SimpleSelection<any>;
       if (typeof(element) === "string") {
         selection = d3.select<Element, any>(element);
       } else if (element instanceof Element) {
@@ -386,7 +386,7 @@ export class Component {
       } else {
         selection = coerceExternalD3(element);
       }
-      if (!selection.node() || selection.node().nodeName == null) {
+      if (!selection.node() || (<Element> selection.node()).nodeName == null) {
         throw new Error("Plottable requires a valid Element to renderTo");
       }
       this.anchor(selection);
