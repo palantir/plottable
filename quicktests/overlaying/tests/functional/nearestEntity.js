@@ -116,10 +116,8 @@ function createPie(data) {
     pointer.onPointerMove(function(p) {
         if (pie.entityNearest(p)) {
             title.text(
-                pie.entityNearest(p).datum);
-                // pie.entityNearest(p).datum.name + ", " +
-                // pie.entityNearest(p).datum.y + ", " +
-                // pie.entityNearest(p).datum.type);
+                pie.entityNearest(p).datum.x + ", " +
+                pie.entityNearest(p).datum.y);
         }
     });
     pointer.attachTo(pie);

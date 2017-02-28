@@ -421,18 +421,6 @@ export class XYPlot<X, Y> extends Plot {
   }
 
   /**
-   * _dataPointToPixelPoint converts a point in data coordinates to a point in pixel coordinates
-   * @param {Point} point Representation of the point in data coordinates
-   * @return {Point} Returns the point represented in pixel coordinates
-   */
-  protected _dataPointToPixelPoint(point: Point): Point {
-    return {
-      x: this.x().scale.scaleTransformation(point.x),
-      y: this.y().scale.scaleTransformation(point.y),
-    };
-  }
-
-  /**
    * _invertPixelPoint converts a point in pixel coordinates to a point in data coordinates
    * @param {Point} point Representation of the point in pixel coordinates
    * @return {Point} Returns the point represented in data coordinates

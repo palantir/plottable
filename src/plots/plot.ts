@@ -1,3 +1,4 @@
+import { LightweightPlotEntity } from "./commons";
 /**
  * Copyright 2014-present Palantir Technologies
  * @license MIT
@@ -574,7 +575,8 @@ export class Plot extends Component {
 
   /**
    * Returns the {Plots.PlotEntity} nearest to the query point,
-   * or undefined if no {Plots.PlotEntity} can be found.
+   * or undefined if no {Plots.PlotEntity} can be found. The closest point is computed using
+   * the standard Euclidean distance formula. Note that this is done in pixel space.
    *
    * @param {Point} queryPoint
    * @param {Bounds} bounds The bounding box within which to search. By default, bounds is the bounds of
@@ -582,17 +584,26 @@ export class Plot extends Component {
    * @returns {Plots.PlotEntity} The nearest PlotEntity, or undefined if no {Plots.PlotEntity} can be found.
    */
   public entityNearest(queryPoint: Point, bounds = this.bounds()): Plots.PlotEntity {
-    const nearest = this._getEntityStore().entityNearest(
-      queryPoint,
-      (point: Point) => this._dataPointToPixelPoint(point),
-      (entity: Plots.LightweightPlotEntity) => this._entityVisibleOnPlot(entity, bounds),
-    );
+    let closestDistanceSquared = Infinity;
+    let closestPointEntity: Plots.LightweightPlotEntity;
+    this._getEntityStore().forEach((entity) => {
+      if (this._entityVisibleOnPlot(entity, bounds) !== false) {
+        const entityPoint = this._pixelPoint(entity.datum, entity.index, entity.dataset);
+        let distanceSquared = Utils.Math.distanceSquared(entityPoint, queryPoint);
+        if (distanceSquared < closestDistanceSquared) {
+          closestDistanceSquared = distanceSquared;
+          closestPointEntity = entity;
+        }
+      }
+    });
 
-    return nearest === undefined ? undefined : this._lightweightPlotEntityToPlotEntity(nearest);
+    return closestPointEntity === undefined
+      ? undefined
+      : this._lightweightPlotEntityToPlotEntity(closestPointEntity);
   }
 
   protected _entityVisibleOnPlot(entity: Plots.PlotEntity | Plots.LightweightPlotEntity, chartBounds: Bounds) {
-    const { x, y } = this._dataPointToPixelPoint(entity.position);
+    const { x, y } = this._pixelPoint(entity.datum, entity.index, entity.dataset);
 
     return !(x < chartBounds.topLeft.x || y < chartBounds.topLeft.y ||
     x > chartBounds.bottomRight.x || y > chartBounds.bottomRight.y);
@@ -616,15 +627,6 @@ export class Plot extends Component {
     return binding.scale == null ?
       binding.accessor :
       (d: any, i: number, ds: Dataset) => binding.scale.scale(binding.accessor(d, i, ds));
-  }
-
-  /**
-   * Convert the position in the entities store back to screen space
-   * for comparison. We do this here because entities store points in data space
-   * for pan & zoom interactions (#3159).
-   */
-  protected _dataPointToPixelPoint(point: Point): Point {
-    throw new Error("plots must implement data point to pixel point");
   }
 
   protected _pixelPoint(datum: any, index: number, dataset: Dataset): Point {

@@ -98,9 +98,9 @@ var Array = __webpack_require__(93);
 exports.Array = Array;
 var Color = __webpack_require__(96);
 exports.Color = Color;
-var DOM = __webpack_require__(40);
+var DOM = __webpack_require__(39);
 exports.DOM = DOM;
-var Math = __webpack_require__(28);
+var Math = __webpack_require__(40);
 exports.Math = Math;
 var Stacking = __webpack_require__(99);
 exports.Stacking = Stacking;
@@ -125,22 +125,22 @@ module.exports = __WEBPACK_EXTERNAL_MODULE_1__;
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-/**
- * Copyright 2014-present Palantir Technologies
- * @license MIT
- */
 
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
+/**
+ * Copyright 2014-present Palantir Technologies
+ * @license MIT
+ */
 var d3 = __webpack_require__(1);
 var Animators = __webpack_require__(6);
 var component_1 = __webpack_require__(5);
 var drawer_1 = __webpack_require__(7);
 var Utils = __webpack_require__(0);
-var Plots = __webpack_require__(37);
+var Plots = __webpack_require__(36);
 var coerceD3_1 = __webpack_require__(11);
 var Plot = (function (_super) {
     __extends(Plot, _super);
@@ -577,7 +577,8 @@ var Plot = (function (_super) {
     };
     /**
      * Returns the {Plots.PlotEntity} nearest to the query point,
-     * or undefined if no {Plots.PlotEntity} can be found.
+     * or undefined if no {Plots.PlotEntity} can be found. The closest point is computed using
+     * the standard Euclidean distance formula. Note that this is done in pixel space.
      *
      * @param {Point} queryPoint
      * @param {Bounds} bounds The bounding box within which to search. By default, bounds is the bounds of
@@ -587,11 +588,24 @@ var Plot = (function (_super) {
     Plot.prototype.entityNearest = function (queryPoint, bounds) {
         var _this = this;
         if (bounds === void 0) { bounds = this.bounds(); }
-        var nearest = this._getEntityStore().entityNearest(queryPoint, function (point) { return _this._dataPointToPixelPoint(point); }, function (entity) { return _this._entityVisibleOnPlot(entity, bounds); });
-        return nearest === undefined ? undefined : this._lightweightPlotEntityToPlotEntity(nearest);
+        var closestDistanceSquared = Infinity;
+        var closestPointEntity;
+        this._getEntityStore().forEach(function (entity) {
+            if (_this._entityVisibleOnPlot(entity, bounds) !== false) {
+                var entityPoint = _this._pixelPoint(entity.datum, entity.index, entity.dataset);
+                var distanceSquared = Utils.Math.distanceSquared(entityPoint, queryPoint);
+                if (distanceSquared < closestDistanceSquared) {
+                    closestDistanceSquared = distanceSquared;
+                    closestPointEntity = entity;
+                }
+            }
+        });
+        return closestPointEntity === undefined
+            ? undefined
+            : this._lightweightPlotEntityToPlotEntity(closestPointEntity);
     };
     Plot.prototype._entityVisibleOnPlot = function (entity, chartBounds) {
-        var _a = this._dataPointToPixelPoint(entity.position), x = _a.x, y = _a.y;
+        var _a = this._pixelPoint(entity.datum, entity.index, entity.dataset), x = _a.x, y = _a.y;
         return !(x < chartBounds.topLeft.x || y < chartBounds.topLeft.y ||
             x > chartBounds.bottomRight.x || y > chartBounds.bottomRight.y);
     };
@@ -610,14 +624,6 @@ var Plot = (function (_super) {
         return binding.scale == null ?
             binding.accessor :
             function (d, i, ds) { return binding.scale.scale(binding.accessor(d, i, ds)); };
-    };
-    /**
-     * Convert the position in the entities store back to screen space
-     * for comparison. We do this here because entities store points in data space
-     * for pan & zoom interactions (#3159).
-     */
-    Plot.prototype._dataPointToPixelPoint = function (point) {
-        throw new Error("plots must implement data point to pixel point");
     };
     Plot.prototype._pixelPoint = function (datum, index, dataset) {
         return { x: 0, y: 0 };
@@ -646,14 +652,14 @@ function __export(m) {
 }
 var TickGenerators = __webpack_require__(91);
 exports.TickGenerators = TickGenerators;
-__export(__webpack_require__(39));
+__export(__webpack_require__(38));
 __export(__webpack_require__(87));
 __export(__webpack_require__(88));
 __export(__webpack_require__(89));
 __export(__webpack_require__(90));
 __export(__webpack_require__(92));
 // ---------------------------------------------------------
-var categoryScale_2 = __webpack_require__(39);
+var categoryScale_2 = __webpack_require__(38);
 var quantitativeScale_1 = __webpack_require__(10);
 /**
  * Type guarded function to check if the scale implements the
@@ -2156,7 +2162,7 @@ function __export(m) {
 __export(__webpack_require__(74));
 __export(__webpack_require__(75));
 __export(__webpack_require__(76));
-__export(__webpack_require__(32));
+__export(__webpack_require__(31));
 __export(__webpack_require__(77));
 __export(__webpack_require__(78));
 
@@ -2483,17 +2489,6 @@ var XYPlot = (function (_super) {
         };
     };
     /**
-     * _dataPointToPixelPoint converts a point in data coordinates to a point in pixel coordinates
-     * @param {Point} point Representation of the point in data coordinates
-     * @return {Point} Returns the point represented in pixel coordinates
-     */
-    XYPlot.prototype._dataPointToPixelPoint = function (point) {
-        return {
-            x: this.x().scale.scaleTransformation(point.x),
-            y: this.y().scale.scaleTransformation(point.y),
-        };
-    };
-    /**
      * _invertPixelPoint converts a point in pixel coordinates to a point in data coordinates
      * @param {Point} point Representation of the point in pixel coordinates
      * @return {Point} Returns the point represented in data coordinates
@@ -2542,11 +2537,11 @@ exports.XYPlot = XYPlot;
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-__export(__webpack_require__(36));
+__export(__webpack_require__(35));
 __export(__webpack_require__(22));
-__export(__webpack_require__(37));
+__export(__webpack_require__(36));
 __export(__webpack_require__(79));
-__export(__webpack_require__(38));
+__export(__webpack_require__(37));
 __export(__webpack_require__(80));
 __export(__webpack_require__(81));
 __export(__webpack_require__(82));
@@ -4748,7 +4743,7 @@ exports.ComponentContainer = ComponentContainer;
  */
 
 var Utils = __webpack_require__(0);
-var RenderPolicies = __webpack_require__(31);
+var RenderPolicies = __webpack_require__(30);
 /**
  * The RenderController is responsible for enqueueing and synchronizing
  * layout and render calls for Components.
@@ -4933,8 +4928,8 @@ var __extends = (this && this.__extends) || function (d, b) {
 };
 var Interactions = __webpack_require__(15);
 var Utils = __webpack_require__(0);
-var _1 = __webpack_require__(30);
-var selectionBoxLayer_1 = __webpack_require__(35);
+var _1 = __webpack_require__(29);
+var selectionBoxLayer_1 = __webpack_require__(34);
 var coerceD3_1 = __webpack_require__(11);
 var DragBoxLayer = (function (_super) {
     __extends(DragBoxLayer, _super);
@@ -5307,122 +5302,6 @@ exports.DragBoxLayer = DragBoxLayer;
 
 "use strict";
 /**
- * Copyright 2014-present Palantir Technologies
- * @license MIT
- */
-
-var d3 = __webpack_require__(1);
-var nativeMath = window.Math;
-/**
- * Checks if x is between a and b.
- *
- * @param {number} x The value to test if in range
- * @param {number} a The beginning of the (inclusive) range
- * @param {number} b The ending of the (inclusive) range
- * @return {boolean} Whether x is in [a, b]
- */
-function inRange(x, a, b) {
-    return (nativeMath.min(a, b) <= x && x <= nativeMath.max(a, b));
-}
-exports.inRange = inRange;
-/**
- * Clamps x to the range [min, max].
- *
- * @param {number} x The value to be clamped.
- * @param {number} min The minimum value.
- * @param {number} max The maximum value.
- * @return {number} A clamped value in the range [min, max].
- */
-function clamp(x, min, max) {
-    return nativeMath.min(nativeMath.max(min, x), max);
-}
-exports.clamp = clamp;
-function max(array, firstArg, secondArg) {
-    var accessor = typeof (firstArg) === "function" ? firstArg : null;
-    var defaultValue = accessor == null ? firstArg : secondArg;
-    /* tslint:disable:ban */
-    var maxValue = accessor == null ? d3.max(array) : d3.max(array, accessor);
-    /* tslint:enable:ban */
-    return maxValue !== undefined ? maxValue : defaultValue;
-}
-exports.max = max;
-function min(array, firstArg, secondArg) {
-    var accessor = typeof (firstArg) === "function" ? firstArg : null;
-    var defaultValue = accessor == null ? firstArg : secondArg;
-    /* tslint:disable:ban */
-    var minValue = accessor == null ? d3.min(array) : d3.min(array, accessor);
-    /* tslint:enable:ban */
-    return minValue !== undefined ? minValue : defaultValue;
-}
-exports.min = min;
-/**
- * Returns true **only** if x is NaN
- */
-function isNaN(n) {
-    return n !== n;
-}
-exports.isNaN = isNaN;
-/**
- * Returns true if the argument is a number, which is not NaN
- * Numbers represented as strings do not pass this function
- */
-function isValidNumber(n) {
-    return typeof n === "number" && !isNaN(n) && isFinite(n);
-}
-exports.isValidNumber = isValidNumber;
-/**
- * Generates an array of consecutive, strictly increasing numbers
- * in the range [start, stop) separeted by step
- */
-function range(start, stop, step) {
-    if (step === void 0) { step = 1; }
-    if (step === 0) {
-        throw new Error("step cannot be 0");
-    }
-    var length = nativeMath.max(nativeMath.ceil((stop - start) / step), 0);
-    var range = [];
-    for (var i = 0; i < length; ++i) {
-        range[i] = start + step * i;
-    }
-    return range;
-}
-exports.range = range;
-/**
- * Returns the square of the distance between two points
- *
- * @param {Point} p1
- * @param {Point} p2
- * @return {number} dist(p1, p2)^2
- */
-function distanceSquared(p1, p2) {
-    return nativeMath.pow(p2.y - p1.y, 2) + nativeMath.pow(p2.x - p1.x, 2);
-}
-exports.distanceSquared = distanceSquared;
-function degreesToRadians(degree) {
-    return degree / 360 * nativeMath.PI * 2;
-}
-exports.degreesToRadians = degreesToRadians;
-/**
- * Returns if the point is within the bounds. Points along
- * the bounds are considered "within" as well.
- * @param {Point} p Point in considerations.
- * @param {Bounds} bounds Bounds within which to check for inclusion.
- */
-function within(p, bounds) {
-    return bounds.topLeft.x <= p.x
-        && bounds.bottomRight.x >= p.x
-        && bounds.topLeft.y <= p.y
-        && bounds.bottomRight.y >= p.y;
-}
-exports.within = within;
-
-
-/***/ }),
-/* 29 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-/**
  * Copyright 2017-present Palantir Technologies, Inc. All rights reserved.
  * Licensed under the MIT License (the "License"); you may obtain a copy of the
  * license at https://github.com/palantir/svg-typewriter/blob/develop/LICENSE
@@ -5510,7 +5389,7 @@ exports.BaseAnimator = BaseAnimator;
 //# sourceMappingURL=baseAnimator.js.map
 
 /***/ }),
-/* 30 */
+/* 29 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -5525,13 +5404,13 @@ function __export(m) {
 __export(__webpack_require__(27));
 __export(__webpack_require__(55));
 __export(__webpack_require__(56));
+__export(__webpack_require__(32));
 __export(__webpack_require__(33));
-__export(__webpack_require__(34));
 __export(__webpack_require__(57));
 __export(__webpack_require__(58));
 __export(__webpack_require__(59));
 __export(__webpack_require__(60));
-__export(__webpack_require__(35));
+__export(__webpack_require__(34));
 __export(__webpack_require__(61));
 __export(__webpack_require__(62));
 __export(__webpack_require__(63));
@@ -5549,7 +5428,7 @@ exports.Alignment = Alignment;
 
 
 /***/ }),
-/* 31 */
+/* 30 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -5604,7 +5483,7 @@ exports.Timeout = Timeout;
 
 
 /***/ }),
-/* 32 */
+/* 31 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -5730,7 +5609,7 @@ exports.Key = Key;
 
 
 /***/ }),
-/* 33 */
+/* 32 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -5834,7 +5713,7 @@ exports.Group = Group;
 
 
 /***/ }),
-/* 34 */
+/* 33 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -5990,7 +5869,7 @@ exports.GuideLineLayer = GuideLineLayer;
 
 
 /***/ }),
-/* 35 */
+/* 34 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -6219,7 +6098,7 @@ exports.SelectionBoxLayer = SelectionBoxLayer;
 
 
 /***/ }),
-/* 36 */
+/* 35 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -6238,7 +6117,7 @@ var Drawers = __webpack_require__(9);
 var Scales = __webpack_require__(3);
 var Utils = __webpack_require__(0);
 var Plots = __webpack_require__(17);
-var linePlot_1 = __webpack_require__(38);
+var linePlot_1 = __webpack_require__(37);
 var plot_1 = __webpack_require__(2);
 var Area = (function (_super) {
     __extends(Area, _super);
@@ -6413,7 +6292,7 @@ exports.Area = Area;
 
 
 /***/ }),
-/* 37 */
+/* 36 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -6430,7 +6309,7 @@ var Animator;
 
 
 /***/ }),
-/* 38 */
+/* 37 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -6912,7 +6791,7 @@ exports.Line = Line;
 
 
 /***/ }),
-/* 39 */
+/* 38 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7106,7 +6985,7 @@ exports.Category = Category;
 
 
 /***/ }),
-/* 40 */
+/* 39 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7358,6 +7237,122 @@ function _parseStyleValue(style, property) {
     var parsedValue = parseFloat(value);
     return parsedValue || 0;
 }
+
+
+/***/ }),
+/* 40 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/**
+ * Copyright 2014-present Palantir Technologies
+ * @license MIT
+ */
+
+var d3 = __webpack_require__(1);
+var nativeMath = window.Math;
+/**
+ * Checks if x is between a and b.
+ *
+ * @param {number} x The value to test if in range
+ * @param {number} a The beginning of the (inclusive) range
+ * @param {number} b The ending of the (inclusive) range
+ * @return {boolean} Whether x is in [a, b]
+ */
+function inRange(x, a, b) {
+    return (nativeMath.min(a, b) <= x && x <= nativeMath.max(a, b));
+}
+exports.inRange = inRange;
+/**
+ * Clamps x to the range [min, max].
+ *
+ * @param {number} x The value to be clamped.
+ * @param {number} min The minimum value.
+ * @param {number} max The maximum value.
+ * @return {number} A clamped value in the range [min, max].
+ */
+function clamp(x, min, max) {
+    return nativeMath.min(nativeMath.max(min, x), max);
+}
+exports.clamp = clamp;
+function max(array, firstArg, secondArg) {
+    var accessor = typeof (firstArg) === "function" ? firstArg : null;
+    var defaultValue = accessor == null ? firstArg : secondArg;
+    /* tslint:disable:ban */
+    var maxValue = accessor == null ? d3.max(array) : d3.max(array, accessor);
+    /* tslint:enable:ban */
+    return maxValue !== undefined ? maxValue : defaultValue;
+}
+exports.max = max;
+function min(array, firstArg, secondArg) {
+    var accessor = typeof (firstArg) === "function" ? firstArg : null;
+    var defaultValue = accessor == null ? firstArg : secondArg;
+    /* tslint:disable:ban */
+    var minValue = accessor == null ? d3.min(array) : d3.min(array, accessor);
+    /* tslint:enable:ban */
+    return minValue !== undefined ? minValue : defaultValue;
+}
+exports.min = min;
+/**
+ * Returns true **only** if x is NaN
+ */
+function isNaN(n) {
+    return n !== n;
+}
+exports.isNaN = isNaN;
+/**
+ * Returns true if the argument is a number, which is not NaN
+ * Numbers represented as strings do not pass this function
+ */
+function isValidNumber(n) {
+    return typeof n === "number" && !isNaN(n) && isFinite(n);
+}
+exports.isValidNumber = isValidNumber;
+/**
+ * Generates an array of consecutive, strictly increasing numbers
+ * in the range [start, stop) separeted by step
+ */
+function range(start, stop, step) {
+    if (step === void 0) { step = 1; }
+    if (step === 0) {
+        throw new Error("step cannot be 0");
+    }
+    var length = nativeMath.max(nativeMath.ceil((stop - start) / step), 0);
+    var range = [];
+    for (var i = 0; i < length; ++i) {
+        range[i] = start + step * i;
+    }
+    return range;
+}
+exports.range = range;
+/**
+ * Returns the square of the distance between two points
+ *
+ * @param {Point} p1
+ * @param {Point} p2
+ * @return {number} dist(p1, p2)^2
+ */
+function distanceSquared(p1, p2) {
+    return nativeMath.pow(p2.y - p1.y, 2) + nativeMath.pow(p2.x - p1.x, 2);
+}
+exports.distanceSquared = distanceSquared;
+function degreesToRadians(degree) {
+    return degree / 360 * nativeMath.PI * 2;
+}
+exports.degreesToRadians = degreesToRadians;
+/**
+ * Returns if the point is within the bounds. Points along
+ * the bounds are considered "within" as well.
+ * @param {Point} p Point in considerations.
+ * @param {Bounds} bounds Bounds within which to check for inclusion.
+ */
+function within(p, bounds) {
+    return bounds.topLeft.x <= p.x
+        && bounds.bottomRight.x >= p.x
+        && bounds.topLeft.y <= p.y
+        && bounds.bottomRight.y >= p.y;
+}
+exports.within = within;
 
 
 /***/ }),
@@ -8963,7 +8958,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var guideLineLayer_1 = __webpack_require__(34);
+var guideLineLayer_1 = __webpack_require__(33);
 var Interactions = __webpack_require__(15);
 var Utils = __webpack_require__(0);
 var DragLineLayer = (function (_super) {
@@ -10202,7 +10197,7 @@ var __extends = (this && this.__extends) || function (d, b) {
 };
 var plot_1 = __webpack_require__(2);
 var Utils = __webpack_require__(0);
-var group_1 = __webpack_require__(33);
+var group_1 = __webpack_require__(32);
 var PlotGroup = (function (_super) {
     __extends(PlotGroup, _super);
     function PlotGroup() {
@@ -13549,7 +13544,7 @@ var Scatter = (function (_super) {
         return drawSteps;
     };
     Scatter.prototype._entityVisibleOnPlot = function (entity, bounds) {
-        var _a = this._dataPointToPixelPoint(entity.position), x = _a.x, y = _a.y;
+        var _a = this._pixelPoint(entity.datum, entity.index, entity.dataset), x = _a.x, y = _a.y;
         var xRange = { min: bounds.topLeft.x, max: bounds.bottomRight.x };
         var yRange = { min: bounds.topLeft.y, max: bounds.bottomRight.y };
         var translatedBbox = {
@@ -13856,7 +13851,7 @@ var __extends = (this && this.__extends) || function (d, b) {
 var d3 = __webpack_require__(1);
 var Animators = __webpack_require__(6);
 var Utils = __webpack_require__(0);
-var areaPlot_1 = __webpack_require__(36);
+var areaPlot_1 = __webpack_require__(35);
 var plot_1 = __webpack_require__(2);
 var StackedArea = (function (_super) {
     __extends(StackedArea, _super);
@@ -15379,7 +15374,7 @@ exports.CallbackSet = CallbackSet;
  * @license MIT
  */
 
-var DOM = __webpack_require__(40);
+var DOM = __webpack_require__(39);
 var ClientToSVGTranslator = (function () {
     function ClientToSVGTranslator(svg) {
         this._svg = svg;
@@ -15541,7 +15536,6 @@ function luminance(color) {
  * @license MIT
  */
 
-var Math = __webpack_require__(28);
 /**
  * Array-backed implementation of {EntityStore}
  */
@@ -15551,29 +15545,6 @@ var EntityArray = (function () {
     }
     EntityArray.prototype.add = function (entity) {
         this._entities.push(entity);
-    };
-    /**
-     * TODO: remove this logic from EntityStore (plots should own it internally since we do a position conversion)
-     * Iterates through array of of entities and computes the closest point using
-     * the standard Euclidean distance formula.
-     */
-    EntityArray.prototype.entityNearest = function (queryPoint, transformPoint, filter) {
-        var closestDistanceSquared = Infinity;
-        var closestPointEntity;
-        this._entities.forEach(function (entity) {
-            if (filter !== undefined && filter(entity) === false) {
-                return;
-            }
-            var distanceSquared = Math.distanceSquared(transformPoint(entity.position), queryPoint);
-            if (distanceSquared < closestDistanceSquared) {
-                closestDistanceSquared = distanceSquared;
-                closestPointEntity = entity;
-            }
-        });
-        if (closestPointEntity === undefined) {
-            return undefined;
-        }
-        return closestPointEntity;
     };
     EntityArray.prototype.map = function (callback) {
         return this._entities.map(function (entity) { return callback(entity); });
@@ -15596,7 +15567,7 @@ exports.EntityArray = EntityArray;
  * @license MIT
  */
 
-var Math = __webpack_require__(28);
+var Math = __webpack_require__(40);
 /**
  * Shim for ES6 map.
  * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map
@@ -16261,7 +16232,7 @@ function sinInOut(t) {
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-__export(__webpack_require__(29));
+__export(__webpack_require__(28));
 __export(__webpack_require__(113));
 __export(__webpack_require__(114));
 //# sourceMappingURL=index.js.map
@@ -16282,7 +16253,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var baseAnimator_1 = __webpack_require__(29);
+var baseAnimator_1 = __webpack_require__(28);
 var OpacityAnimator = (function (_super) {
     __extends(OpacityAnimator, _super);
     function OpacityAnimator() {
@@ -16319,7 +16290,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
 var Utils = __webpack_require__(12);
-var baseAnimator_1 = __webpack_require__(29);
+var baseAnimator_1 = __webpack_require__(28);
 var UnveilAnimator = (function (_super) {
     __extends(UnveilAnimator, _super);
     function UnveilAnimator() {
@@ -16957,7 +16928,7 @@ var Animators = __webpack_require__(6);
 exports.Animators = Animators;
 var Axes = __webpack_require__(47);
 exports.Axes = Axes;
-var Components = __webpack_require__(30);
+var Components = __webpack_require__(29);
 exports.Components = Components;
 var Configs = __webpack_require__(20);
 exports.Configs = Configs;
@@ -16965,7 +16936,7 @@ var Formatters = __webpack_require__(8);
 exports.Formatters = Formatters;
 var RenderController = __webpack_require__(25);
 exports.RenderController = RenderController;
-var RenderPolicies = __webpack_require__(31);
+var RenderPolicies = __webpack_require__(30);
 exports.RenderPolicies = RenderPolicies;
 var SymbolFactories = __webpack_require__(26);
 exports.SymbolFactories = SymbolFactories;
@@ -16992,7 +16963,7 @@ exports.version = version_1.version;
 __export(__webpack_require__(21));
 __export(__webpack_require__(7));
 __export(__webpack_require__(14));
-__export(__webpack_require__(32));
+__export(__webpack_require__(31));
 __export(__webpack_require__(16));
 __export(__webpack_require__(2));
 __export(__webpack_require__(10));
