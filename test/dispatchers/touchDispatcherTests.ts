@@ -1,5 +1,6 @@
 import { SimpleSelection } from "../../src/core/interfaces";
 import * as d3 from "d3";
+import * as sinon from  "sinon";
 
 import { assert } from "chai";
 
@@ -13,10 +14,12 @@ describe("Dispatchers", () => {
     describe("Basic usage", () => {
       it("creates only one Dispatcher.Touch per element", () => {
         const svg = TestMethods.generateSVG();
+        const component = new Plottable.Component();
+        sinon.stub(component, "rootSVG", () => svg);
 
-        const td1 = Plottable.Dispatchers.Touch.getDispatcher(<SVGElement> svg.node());
+        const td1 = Plottable.Dispatchers.Touch.getDispatcher(component);
         assert.isNotNull(td1, "created a new Dispatcher on an SVG");
-        const td2 = Plottable.Dispatchers.Touch.getDispatcher(<SVGElement> svg.node());
+        const td2 = Plottable.Dispatchers.Touch.getDispatcher(component);
         assert.strictEqual(td1, td2, "returned the existing Dispatcher if called again with same <svg>");
 
         svg.remove();
@@ -49,9 +52,11 @@ describe("Dispatchers", () => {
 
       beforeEach(() => {
         svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+        const component = new Plottable.Component();
+        sinon.stub(component, "rootSVG", () => svg);
         // HACKHACK: PhantomJS can't measure SVGs unless they have something in them occupying space
         svg.append("rect").attr("width", SVG_WIDTH).attr("height", SVG_HEIGHT);
-        touchDispatcher = Plottable.Dispatchers.Touch.getDispatcher(<SVGElement> svg.node());
+        touchDispatcher = Plottable.Dispatchers.Touch.getDispatcher(component);
         callbackWasCalled = false;
       });
 

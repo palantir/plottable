@@ -252,7 +252,7 @@ export class Component {
     if (origin == null || availableWidth == null || availableHeight == null) {
       if (this._element == null) {
         throw new Error("anchor() must be called before computeLayout()");
-      } else if (this.parent() == null) {
+      } else if (this._rootSVG != null) {
         // we are the root node, retrieve height/width from root SVG
         origin = { x: 0, y: 0 };
 
@@ -266,7 +266,7 @@ export class Component {
           this._rootSVG.attr("height", "100%");
         }
 
-        let elem: HTMLScriptElement = (<HTMLScriptElement> this._rootSVG.node());
+        const elem = <Element> this._rootSVG.node();
         availableWidth = Utils.DOM.elementWidth(elem);
         availableHeight = Utils.DOM.elementHeight(elem);
       } else {
@@ -570,7 +570,9 @@ export class Component {
 
     if (this._isAnchored) {
       this._element.remove();
-      this._rootSVG.select(`.${Component._SAFARI_EVENT_BACKING_CLASS}`).remove();
+      if (this._rootSVG != null) {
+        this._rootSVG.select(`.${Component._SAFARI_EVENT_BACKING_CLASS}`).remove();
+      }
     }
     this._isAnchored = false;
     this._onDetachCallbacks.callCallbacks(this);
@@ -727,8 +729,12 @@ export class Component {
     return this._content;
   }
 
+  /**
+   * Returns the top-level user supplied element that roots the tree that this Component lives in.
+   * @returns {SimpleSelection<void>}
+   */
   public rootSVG(): SimpleSelection<void> {
-    return this._rootSVG;
+    return this.root()._rootSVG;
   }
 
   /**

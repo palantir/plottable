@@ -25,7 +25,7 @@ describe("Component", () => {
 
     it("adds itself as a child element of the input selection", () => {
       assert.strictEqual(c.anchor(svg), c, "setter returns calling object");
-      assert.strictEqual(Plottable.Utils.DOM.boundingSVG(<SVGElement> c.content().node()),
+      assert.strictEqual(<SVGElement> c.rootSVG().node(),
         svg.node(), "component DOM elements are children of svg element");
       c.destroy();
       svg.remove();
@@ -78,9 +78,9 @@ describe("Component", () => {
 
       let svg2 = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
       c.anchor(svg2);
-      assert.notStrictEqual(Plottable.Utils.DOM.boundingSVG(<SVGElement> c.content().node()),
+      assert.notStrictEqual(<SVGElement> c.rootSVG().node(),
         svg.node(), "component DOM elements are not children of svg element");
-      assert.strictEqual(Plottable.Utils.DOM.boundingSVG(<SVGElement> c.content().node()),
+      assert.strictEqual(<SVGElement> c.rootSVG().node(),
         svg2.node(), "component DOM elements are children of second svg element");
       c.destroy();
       svg2.remove();
@@ -403,26 +403,6 @@ describe("Component", () => {
       // reset test page DOM
       parent.style("width", "auto");
       parent.style("height", "auto");
-      svg.remove();
-    });
-
-    it("requires arguments when not anchored directly under the svg", () => {
-      const g = svg.append("g");
-      c.anchor(g);
-      // HACKHACK: https://github.com/palantir/plottable/issues/2661 Cannot assert errors being thrown with description
-      (<any> assert).throws(() => c.computeLayout(), "null arguments",
-        "cannot compute layout with no arguments and not being the top svg element");
-      svg.remove();
-    });
-
-    it("requires arguments if not anchored directly under the svg, even if previously anchored directly under the svg", () => {
-      c.anchor(svg);
-      c.detach();
-      const g = svg.append("g");
-      c.anchor(g);
-      // HACKHACK: https://github.com/palantir/plottable/issues/2661 Cannot assert errors being thrown with description
-      (<any> assert).throws(() => c.computeLayout(), "null arguments",
-        "cannot compute layout with no arguments and not being the top svg element");
       svg.remove();
     });
 
@@ -802,19 +782,11 @@ describe("Component", () => {
       svg.remove();
     });
 
-    it("errors on inputs that do not evaluate to an SVG element", () => {
-      let parent = TestMethods.getSVGParent();
-      let div = parent.append("div");
-      // HACKHACK #2614: chai-assert.d.ts has the wrong signature
-      (<any> assert).throws(() => c.renderTo(div), Error,
-        "Plottable requires a valid SVG to renderTo", "rejects selections that don't contain svgs");
-      (<any> assert).throws(() => c.renderTo(<Element> div.node()), Error,
-        "Plottable requires a valid SVG to renderTo", "rejects DOM nodes that are not svgs");
+    it("errors on inputs that do not evaluate to an Element", () => {
       (<any> assert).throws(() => c.renderTo("#not-an-element"), Error,
-        "Plottable requires a valid SVG to renderTo", "rejects strings that don't correspond to DOM elements");
+        "Plottable requires a valid Element to renderTo", "rejects strings that don't correspond to DOM elements");
       (<any> assert).throws(() => c.renderTo(d3.select(null) as any), Error,
-        "Plottable requires a valid SVG to renderTo", "rejects empty d3 selections");
-      div.remove();
+        "Plottable requires a valid Element to renderTo", "rejects empty d3 selections");
       c.destroy();
       svg.remove();
     });
@@ -850,7 +822,7 @@ describe("Component", () => {
     });
 
     it("returns origin without a parent", () => {
-      assert.deepEqual(c.originToSVG(), c.origin(), "same as origin with no parent");
+      assert.deepEqual(c.originToRoot(), c.origin(), "same as origin with no parent");
       c.destroy();
       svg.remove();
     });
@@ -861,11 +833,11 @@ describe("Component", () => {
       c.anchor(svg);
       parent.computeLayout({x: SVG_WIDTH / 4, y: SVG_HEIGHT / 4}, SVG_WIDTH / 2, SVG_HEIGHT / 2);
       c.computeLayout({x: SVG_WIDTH / 4, y: SVG_HEIGHT / 4}, SVG_WIDTH / 4, SVG_HEIGHT / 4);
-      let originToSvg = {
+      let originToRoot = {
         x: parent.origin().x + c.origin().x,
         y: parent.origin().y + c.origin().y,
       };
-      assert.deepEqual(c.originToSVG(), originToSvg, "origin offsetted by parents");
+      assert.deepEqual(c.originToRoot(), originToRoot, "origin offsetted by parents");
       parent.destroy();
       c.destroy();
       svg.remove();
@@ -1004,17 +976,6 @@ describe("Component", () => {
       svg.remove();
     });
 
-    it("doesn't add a backing if it's not the root Component", () => {
-      const component = new Plottable.Component();
-      const svg = TestMethods.generateSVG();
-      const g = svg.append("g");
-      component.anchor(g);
-
-      const backing = svg.select(`.${backingClass}`);
-      assert.isTrue(backing.empty(), "did not add a backing element");
-      svg.remove();
-    });
-
     it("removes the backing when detached", () => {
       const component = new Plottable.Component();
       const svg = TestMethods.generateSVG();
@@ -1023,22 +984,6 @@ describe("Component", () => {
 
       const backing = svg.select(`.${backingClass}`);
       assert.isTrue(backing.empty(), "backing element was removed");
-      svg.remove();
-    });
-
-    it("doesn't add the backing even if it was previously the root Component", () => {
-      const component = new Plottable.Component();
-      const svg = TestMethods.generateSVG();
-      component.anchor(svg);
-      const backingAsRoot = svg.select(`.${backingClass}`);
-      assert.isFalse(backingAsRoot.empty(), "backing was added when Component was root");
-
-      component.detach(); // HACKHACK #3013: need to detach before re-anchoring()
-      const g = svg.append("g");
-      component.anchor(g);
-      const backingNotAsRoot = svg.select(`.${backingClass}`);
-      assert.isTrue(backingNotAsRoot.empty(), "backing element was removed");
-
       svg.remove();
     });
 

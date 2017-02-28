@@ -1,5 +1,6 @@
 import { SimpleSelection } from "../../src/core/interfaces";
 import * as d3 from "d3";
+import * as sinon from "sinon";
 
 import { assert } from "chai";
 
@@ -13,23 +14,26 @@ describe("Dispatchers", () => {
     describe("Basic usage", () => {
       let svg: SimpleSelection<void>;
       let svgNode: SVGElement;
+      let component: Plottable.Component;
 
       beforeEach(() => {
+        component = new Plottable.Component();
         svg = TestMethods.generateSVG();
+        sinon.stub(component, "rootSVG", () => svg);
         svgNode = <SVGElement>svg.node();
       });
 
       it("creates only one Dispatcher.Mouse per <svg> using getDispatcher() ", () => {
-        let dispatcher1 = Plottable.Dispatchers.Mouse.getDispatcher(svgNode);
+        let dispatcher1 = Plottable.Dispatchers.Mouse.getDispatcher(component);
         assert.isNotNull(dispatcher1, "created a new Dispatcher on an SVG");
-        let dispatcher2 = Plottable.Dispatchers.Mouse.getDispatcher(svgNode);
+        let dispatcher2 = Plottable.Dispatchers.Mouse.getDispatcher(component);
         assert.strictEqual(dispatcher1, dispatcher2, "returned the existing Dispatcher if called again with same <svg>");
 
         svg.remove();
       });
 
       it("returns non-null value for default lastMousePosition()", () => {
-        let mouseDispatcher = Plottable.Dispatchers.Mouse.getDispatcher(svgNode);
+        let mouseDispatcher = Plottable.Dispatchers.Mouse.getDispatcher(component);
         let point = mouseDispatcher.lastMousePosition();
         assert.isNotNull(point, "returns a value after initialization");
         assert.isNotNull(point.x, "x value is set");
@@ -47,17 +51,21 @@ describe("Dispatchers", () => {
         y: targetY,
       };
 
+      let component: Plottable.Component;
       let svg: d3.Selection<SVGSVGElement, any, any, any>;
       let mouseDispatcher: Plottable.Dispatchers.Mouse;
 
       beforeEach(() => {
         let SVG_WIDTH = 400;
         let SVG_HEIGHT = 400;
+
+        component = new Plottable.Component();
         svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
         // HACKHACK: PhantomJS can't measure SVGs unless they have something in them occupying space
         svg.append("rect").attr("width", SVG_WIDTH).attr("height", SVG_HEIGHT);
+        sinon.stub(component, "rootSVG", () => svg);
 
-        mouseDispatcher = Plottable.Dispatchers.Mouse.getDispatcher(svg.node());
+        mouseDispatcher = Plottable.Dispatchers.Mouse.getDispatcher(component);
       });
 
       it("calls the mouseDown callback", () => {
