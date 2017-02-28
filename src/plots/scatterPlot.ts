@@ -133,8 +133,8 @@ export class Scatter<X, Y> extends XYPlot<X, Y> {
     return drawSteps;
   }
 
-  protected _entityVisibleOnPlot(entity: LightweightScatterPlotEntity, bounds: Bounds, transformPoint = (point: Point) => point) {
-    const { x, y } = transformPoint(entity.position);
+  protected _entityVisibleOnPlot(entity: LightweightScatterPlotEntity, bounds: Bounds) {
+    const { x, y } = this._dataPointToPixelPoint(entity.position);
 
     const xRange = { min: bounds.topLeft.x, max: bounds.bottomRight.x };
     const yRange = { min: bounds.topLeft.y, max: bounds.bottomRight.y };

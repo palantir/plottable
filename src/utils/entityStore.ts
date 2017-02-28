@@ -64,6 +64,7 @@ export class EntityArray<T extends PositionedEntity> implements EntityStore<T> {
   }
 
   /**
+   * TODO: remove this logic from EntityStore (plots should own it internally since we do a position conversion)
    * Iterates through array of of entities and computes the closest point using
    * the standard Euclidean distance formula.
    */

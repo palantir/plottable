@@ -429,7 +429,6 @@ describe("Plots", () => {
         };
 
         assert.equal(plot.entityNearest(point).datum, dataset.data()[0]);
-        assert.equal(plot.entityNearest(point, true).datum, dataset.data()[0]);
       });
 
       it("in data space", () => {
@@ -452,7 +451,6 @@ describe("Plots", () => {
         };
 
         assert.equal(plot.entityNearest(point).datum, dataset.data()[1]);
-        assert.equal(plot.entityNearest(point, true).datum, dataset.data()[0]);
       });
     });
   });

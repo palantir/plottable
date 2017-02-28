@@ -580,26 +580,18 @@ var Plot = (function (_super) {
      * or undefined if no {Plots.PlotEntity} can be found.
      *
      * @param {Point} queryPoint
-     * @param {boolean} dataspace Whether to find the nearest point in pixel space or data space.
      * @param {Bounds} bounds The bounding box within which to search. By default, bounds is the bounds of
      * the chart, relative to the parent.
-     * @param {Function} transformPoint Function to transform entity position from data space to pixel space if
-     * dataspace is set to false.
      * @returns {Plots.PlotEntity} The nearest PlotEntity, or undefined if no {Plots.PlotEntity} can be found.
      */
-    Plot.prototype.entityNearest = function (queryPoint, dataspace, bounds, transformPoint) {
+    Plot.prototype.entityNearest = function (queryPoint, bounds) {
         var _this = this;
-        if (dataspace === void 0) { dataspace = false; }
         if (bounds === void 0) { bounds = this.bounds(); }
-        if (transformPoint === void 0) { transformPoint = function (point) { return point; }; }
-        var nearest = this._getEntityStore().entityNearest(queryPoint, transformPoint, function (entity) {
-            return _this._entityVisibleOnPlot(entity, bounds, transformPoint);
-        });
+        var nearest = this._getEntityStore().entityNearest(queryPoint, function (point) { return _this._dataPointToPixelPoint(point); }, function (entity) { return _this._entityVisibleOnPlot(entity, bounds); });
         return nearest === undefined ? undefined : this._lightweightPlotEntityToPlotEntity(nearest);
     };
-    Plot.prototype._entityVisibleOnPlot = function (entity, chartBounds, transformPoint) {
-        if (transformPoint === void 0) { transformPoint = function (point) { return point; }; }
-        var _a = transformPoint(entity.position), x = _a.x, y = _a.y;
+    Plot.prototype._entityVisibleOnPlot = function (entity, chartBounds) {
+        var _a = this._dataPointToPixelPoint(entity.position), x = _a.x, y = _a.y;
         return !(x < chartBounds.topLeft.x || y < chartBounds.topLeft.y ||
             x > chartBounds.bottomRight.x || y > chartBounds.bottomRight.y);
     };
@@ -618,6 +610,14 @@ var Plot = (function (_super) {
         return binding.scale == null ?
             binding.accessor :
             function (d, i, ds) { return binding.scale.scale(binding.accessor(d, i, ds)); };
+    };
+    /**
+     * Convert the position in the entities store back to screen space
+     * for comparison. We do this here because entities store points in data space
+     * for pan & zoom interactions (#3159).
+     */
+    Plot.prototype._dataPointToPixelPoint = function (point) {
+        throw new Error("plots must implement data point to pixel point");
     };
     Plot.prototype._pixelPoint = function (datum, index, dataset) {
         return { x: 0, y: 0 };
@@ -2257,32 +2257,6 @@ var XYPlot = (function (_super) {
             }
         };
     }
-    XYPlot.prototype.entityNearest = function (queryPoint, dataspace) {
-        var _this = this;
-        if (dataspace === void 0) { dataspace = false; }
-        if (dataspace) {
-            /**
-             * Convert the chart bounding box and query point to the data space
-             * for comparison
-             */
-            var invertedChartBounds = this._invertedBounds();
-            var invertedQueryPoint = this._invertPixelPoint(queryPoint);
-            return _super.prototype.entityNearest.call(this, invertedQueryPoint, dataspace, invertedChartBounds);
-        }
-        else {
-            /**
-             * Convert the position in the entities store back to screen space
-             * for comparison. We do this here because entities store points in data space
-             * for pan & zoom interactions (#3159).
-             */
-            return _super.prototype.entityNearest.call(this, queryPoint, dataspace, this.bounds(), function (point) {
-                return {
-                    x: _this.x().scale.scaleTransformation(point.x),
-                    y: _this.y().scale.scaleTransformation(point.y),
-                };
-            });
-        }
-    };
     XYPlot.prototype.deferredRendering = function (deferredRendering) {
         if (deferredRendering == null) {
             return this._deferredRendering;
@@ -2506,6 +2480,17 @@ var XYPlot = (function (_super) {
                 x: Math.max(maybeBottomRight.x, maybeTopLeft.x),
                 y: Math.max(maybeBottomRight.y, maybeTopLeft.y)
             }
+        };
+    };
+    /**
+     * _dataPointToPixelPoint converts a point in data coordinates to a point in pixel coordinates
+     * @param {Point} point Representation of the point in data coordinates
+     * @return {Point} Returns the point represented in pixel coordinates
+     */
+    XYPlot.prototype._dataPointToPixelPoint = function (point) {
+        return {
+            x: this.x().scale.scaleTransformation(point.x),
+            y: this.y().scale.scaleTransformation(point.y),
         };
     };
     /**
@@ -13563,9 +13548,8 @@ var Scatter = (function (_super) {
         });
         return drawSteps;
     };
-    Scatter.prototype._entityVisibleOnPlot = function (entity, bounds, transformPoint) {
-        if (transformPoint === void 0) { transformPoint = function (point) { return point; }; }
-        var _a = transformPoint(entity.position), x = _a.x, y = _a.y;
+    Scatter.prototype._entityVisibleOnPlot = function (entity, bounds) {
+        var _a = this._dataPointToPixelPoint(entity.position), x = _a.x, y = _a.y;
         var xRange = { min: bounds.topLeft.x, max: bounds.bottomRight.x };
         var yRange = { min: bounds.topLeft.y, max: bounds.bottomRight.y };
         var translatedBbox = {
@@ -15569,6 +15553,7 @@ var EntityArray = (function () {
         this._entities.push(entity);
     };
     /**
+     * TODO: remove this logic from EntityStore (plots should own it internally since we do a position conversion)
      * Iterates through array of of entities and computes the closest point using
      * the standard Euclidean distance formula.
      */

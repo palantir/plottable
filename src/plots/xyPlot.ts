@@ -102,30 +102,6 @@ export class XYPlot<X, Y> extends Plot {
     };
   }
 
-  public entityNearest(queryPoint: Point, dataspace = false): PlotEntity {
-    if (dataspace) {
-      /**
-       * Convert the chart bounding box and query point to the data space
-       * for comparison
-       */
-      const invertedChartBounds = this._invertedBounds();
-      const invertedQueryPoint = this._invertPixelPoint(queryPoint);
-      return super.entityNearest(invertedQueryPoint, dataspace, invertedChartBounds);
-    } else {
-      /**
-       * Convert the position in the entities store back to screen space
-       * for comparison. We do this here because entities store points in data space
-       * for pan & zoom interactions (#3159).
-       */
-      return super.entityNearest(queryPoint, dataspace, this.bounds(), (point) => {
-        return {
-          x: this.x().scale.scaleTransformation(point.x),
-          y: this.y().scale.scaleTransformation(point.y),
-        };
-      });
-    }
-  }
-
   /**
    * Returns the whether or not the rendering is deferred for performance boost.
    * @return {boolean} The deferred rendering option
@@ -441,6 +417,18 @@ export class XYPlot<X, Y> extends Plot {
         x: Math.max(maybeBottomRight.x, maybeTopLeft.x),
         y: Math.max(maybeBottomRight.y, maybeTopLeft.y)
       }
+    };
+  }
+
+  /**
+   * _dataPointToPixelPoint converts a point in data coordinates to a point in pixel coordinates
+   * @param {Point} point Representation of the point in data coordinates
+   * @return {Point} Returns the point represented in pixel coordinates
+   */
+  protected _dataPointToPixelPoint(point: Point): Point {
+    return {
+      x: this.x().scale.scaleTransformation(point.x),
+      y: this.y().scale.scaleTransformation(point.y),
     };
   }
 

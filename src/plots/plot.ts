@@ -577,30 +577,22 @@ export class Plot extends Component {
    * or undefined if no {Plots.PlotEntity} can be found.
    *
    * @param {Point} queryPoint
-   * @param {boolean} dataspace Whether to find the nearest point in pixel space or data space.
    * @param {Bounds} bounds The bounding box within which to search. By default, bounds is the bounds of
    * the chart, relative to the parent.
-   * @param {Function} transformPoint Function to transform entity position from data space to pixel space if
-   * dataspace is set to false.
    * @returns {Plots.PlotEntity} The nearest PlotEntity, or undefined if no {Plots.PlotEntity} can be found.
    */
-  public entityNearest(
-        queryPoint: Point,
-        dataspace = false,
-        bounds = this.bounds(),
-        transformPoint = (point: Point) => point): Plots.PlotEntity {
-    const nearest = this._getEntityStore().entityNearest(queryPoint, transformPoint, (entity: Plots.LightweightPlotEntity) => {
-      return this._entityVisibleOnPlot(entity, bounds, transformPoint);
-    });
+  public entityNearest(queryPoint: Point, bounds = this.bounds()): Plots.PlotEntity {
+    const nearest = this._getEntityStore().entityNearest(
+      queryPoint,
+      (point: Point) => this._dataPointToPixelPoint(point),
+      (entity: Plots.LightweightPlotEntity) => this._entityVisibleOnPlot(entity, bounds),
+    );
 
     return nearest === undefined ? undefined : this._lightweightPlotEntityToPlotEntity(nearest);
   }
 
-  protected _entityVisibleOnPlot(
-      entity: Plots.PlotEntity | Plots.LightweightPlotEntity,
-      chartBounds: Bounds,
-      transformPoint = (point: Point) => point) {
-    const { x, y } = transformPoint(entity.position);
+  protected _entityVisibleOnPlot(entity: Plots.PlotEntity | Plots.LightweightPlotEntity, chartBounds: Bounds) {
+    const { x, y } = this._dataPointToPixelPoint(entity.position);
 
     return !(x < chartBounds.topLeft.x || y < chartBounds.topLeft.y ||
     x > chartBounds.bottomRight.x || y > chartBounds.bottomRight.y);
@@ -624,6 +616,15 @@ export class Plot extends Component {
     return binding.scale == null ?
       binding.accessor :
       (d: any, i: number, ds: Dataset) => binding.scale.scale(binding.accessor(d, i, ds));
+  }
+
+  /**
+   * Convert the position in the entities store back to screen space
+   * for comparison. We do this here because entities store points in data space
+   * for pan & zoom interactions (#3159).
+   */
+  protected _dataPointToPixelPoint(point: Point): Point {
+    throw new Error("plots must implement data point to pixel point");
   }
 
   protected _pixelPoint(datum: any, index: number, dataset: Dataset): Point {
