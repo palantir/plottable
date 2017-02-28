@@ -107,11 +107,11 @@ exports.Stacking = Stacking;
 var Window = __webpack_require__(100);
 exports.Window = Window;
 __export(__webpack_require__(94));
-__export(__webpack_require__(95));
 __export(__webpack_require__(11));
 __export(__webpack_require__(97));
 __export(__webpack_require__(98));
 __export(__webpack_require__(41));
+__export(__webpack_require__(127));
 
 
 /***/ }),
@@ -696,17 +696,44 @@ var d3 = __webpack_require__(1);
 var RenderController = __webpack_require__(25);
 var Utils = __webpack_require__(0);
 var coerceD3_1 = __webpack_require__(11);
+/**
+ * The root class for all Plottable elements. Components are the core logical units
+ * that build Plottable visualizations.
+ *
+ * This class deals with Component lifecycle (anchoring, getting a size, and rendering
+ * infrastructure), as well as building the framework of DOM elements for all Components.
+ */
 var Component = (function () {
     function Component() {
+        /**
+         * guidelineLayer, plot, selectionBoxLayer set this.
+         * The clip path will prevent content from overflowing its Component space.
+         */
         this._clipPathEnabled = false;
         this._origin = { x: 0, y: 0 }; // Origin of the coordinate space for the Component.
         this._xAlignment = "left";
         this._yAlignment = "top";
         this._isSetup = false;
         this._isAnchored = false;
+        /**
+         * List of "boxes"; SVGComponent has a "box" API that lets subclasses add boxes
+         * with "addBox". Three boxes are added:
+         *
+         * .clip-rect - the clipPath rect, (basically overflow: hidden)
+         * .background-fill - for the background container (unclear what it's use is)
+         * .bounding-box - this._boundingBox
+         *
+         * boxes get their width/height attributes updated in computeLayout.
+         *
+         * I think this API is to make an idea of a "100% width/height" box that could be
+         * useful in a variety of situations. But enumerating the three usages of it, it
+         * doesn't look like it's being used very much.
+         */
         this._boxes = [];
-        this._isTopLevelComponent = false;
         this._cssClasses = new Utils.Set();
+        /**
+         * If .destroy() has been called on this Component.
+         */
         this._destroyed = false;
         this._onAnchorCallbacks = new Utils.CallbackSet();
         this._onDetachCallbacks = new Utils.CallbackSet();
@@ -723,8 +750,7 @@ var Component = (function () {
         if (this._destroyed) {
             throw new Error("Can't reuse destroy()-ed Components!");
         }
-        this._isTopLevelComponent = selection.node().nodeName.toLowerCase() === "svg";
-        if (this._isTopLevelComponent) {
+        if (this.parent() == null) {
             // svg node gets the "plottable" CSS class
             this._rootSVG = selection;
             this._rootSVG.classed("plottable", true);
@@ -833,7 +859,7 @@ var Component = (function () {
             if (this._element == null) {
                 throw new Error("anchor() must be called before computeLayout()");
             }
-            else if (this._isTopLevelComponent) {
+            else if (this.parent() == null) {
                 // we are the root node, retrieve height/width from root SVG
                 origin = { x: 0, y: 0 };
                 // Set width/height to 100% if not specified, to allow accurate size calculation
@@ -919,7 +945,7 @@ var Component = (function () {
      */
     Component.prototype.redraw = function () {
         if (this._isAnchored && this._isSetup) {
-            if (this._isTopLevelComponent) {
+            if (this.parent() == null) {
                 this._scheduleComputeLayout();
             }
             else {
@@ -939,9 +965,9 @@ var Component = (function () {
         // Core component has no caching.
     };
     /**
-     * Renders the Component to a given <svg>.
+     * Renders the Component to a given HTML Element.
      *
-     * @param {String|d3.Selection} element A selector-string for the <svg>, or a d3 selection containing an <svg>.
+     * @param {String|d3.Selection} element The element, a selector string for the element, or a d3.Selection for the element.
      * @returns {Component} The calling Component.
      */
     Component.prototype.renderTo = function (element) {
@@ -957,8 +983,8 @@ var Component = (function () {
             else {
                 selection = coerceD3_1.coerceExternalD3(element);
             }
-            if (!selection.node() || selection.node().nodeName.toLowerCase() !== "svg") {
-                throw new Error("Plottable requires a valid SVG to renderTo");
+            if (!selection.node() || selection.node().nodeName == null) {
+                throw new Error("Plottable requires a valid Element to renderTo");
             }
             this.anchor(selection);
         }
@@ -1102,9 +1128,7 @@ var Component = (function () {
         this.parent(null);
         if (this._isAnchored) {
             this._element.remove();
-            if (this._isTopLevelComponent) {
-                this._rootSVG.select("." + Component._SAFARI_EVENT_BACKING_CLASS).remove();
-            }
+            this._rootSVG.select("." + Component._SAFARI_EVENT_BACKING_CLASS).remove();
         }
         this._isAnchored = false;
         this._onDetachCallbacks.callCallbacks(this);
@@ -1187,11 +1211,11 @@ var Component = (function () {
         };
     };
     /**
-     * Gets the origin of the Component relative to the root <svg>.
+     * Gets the origin of the Component relative to the root Component.
      *
      * @return {Point}
      */
-    Component.prototype.originToSVG = function () {
+    Component.prototype.originToRoot = function () {
         var origin = this.origin();
         var ancestor = this.parent();
         while (ancestor != null) {
@@ -1201,6 +1225,17 @@ var Component = (function () {
             ancestor = ancestor.parent();
         }
         return origin;
+    };
+    /**
+     * Gets the root component of the hierarchy. If the provided
+     * component is the root, that component will be returned.
+     */
+    Component.prototype.root = function () {
+        var parent = this;
+        while (parent.parent() != null) {
+            parent = parent.parent();
+        }
+        return parent;
     };
     /**
      * Gets the Selection containing the <g> in front of the visual elements of the Component.
@@ -1221,6 +1256,9 @@ var Component = (function () {
      */
     Component.prototype.content = function () {
         return this._content;
+    };
+    Component.prototype.rootSVG = function () {
+        return this._rootSVG;
     };
     /**
      * Gets the Selection containing the <g> behind the visual elements of the Component.
@@ -1392,11 +1430,7 @@ var Drawer = (function () {
         return this;
     };
     Drawer.prototype.selection = function () {
-        if (!this._cachedSelectionValid) {
-            this._cachedSelection = this.renderArea().selectAll(this.selector());
-            this._cachedSelectionNodes = this._cachedSelection.nodes();
-            this._cachedSelectionValid = true;
-        }
+        this.maybeRefreshCache();
         return this._cachedSelection;
     };
     /**
@@ -1409,7 +1443,15 @@ var Drawer = (function () {
      * Returns the D3 selection corresponding to the datum with the specified index.
      */
     Drawer.prototype.selectionForIndex = function (index) {
+        this.maybeRefreshCache();
         return d3.select(this._cachedSelectionNodes[index]);
+    };
+    Drawer.prototype.maybeRefreshCache = function () {
+        if (!this._cachedSelectionValid) {
+            this._cachedSelection = this.renderArea().selectAll(this.selector());
+            this._cachedSelectionNodes = this._cachedSelection.nodes();
+            this._cachedSelectionValid = true;
+        }
     };
     return Drawer;
 }());
@@ -2107,7 +2149,7 @@ var Interaction = (function () {
      * @return {Point} The same location in Component-space coordinates.
      */
     Interaction.prototype._translateToComponentSpace = function (p) {
-        var origin = this._componentAttachedTo.originToSVG();
+        var origin = this._componentAttachedTo.originToRoot();
         return {
             x: p.x - origin.x,
             y: p.y - origin.y,
@@ -5621,7 +5663,7 @@ var Key = (function (_super) {
     }
     Key.prototype._anchor = function (component) {
         _super.prototype._anchor.call(this, component);
-        this._positionDispatcher = Dispatchers.Mouse.getDispatcher(this._componentAttachedTo._element.node());
+        this._positionDispatcher = Dispatchers.Mouse.getDispatcher(this._componentAttachedTo);
         this._positionDispatcher.onMouseMove(this._mouseMoveCallback);
         this._keyDispatcher = Dispatchers.Key.getDispatcher();
         this._keyDispatcher.onKeyDown(this._keyDownCallback);
@@ -7103,6 +7145,17 @@ exports.Category = Category;
 
 var nativeMath = window.Math;
 /**
+ * Returns whether the child is in fact a child of the parent
+ */
+function contains(parent, child) {
+    var maybeParent = child;
+    while (maybeParent != null && maybeParent !== parent) {
+        maybeParent = maybeParent.parentNode;
+    }
+    return maybeParent === parent;
+}
+exports.contains = contains;
+/**
  * Gets the bounding box of an element.
  * @param {d3.Selection} element
  * @returns {SVGRed} The bounding box.
@@ -7270,23 +7323,6 @@ function clientRectInside(innerClientRect, outerClientRect) {
         nativeMath.floor(innerClientRect.bottom) <= nativeMath.ceil(outerClientRect.bottom));
 }
 exports.clientRectInside = clientRectInside;
-/**
- * Retrieves the bounding svg of the input element
- *
- * @param {SVGElement} element The element to query
- * @returns {SVGElement} The bounding svg
- */
-function boundingSVG(element) {
-    var ownerSVG = element.ownerSVGElement;
-    if (ownerSVG != null) {
-        return ownerSVG;
-    }
-    if (element.nodeName.toLowerCase() === "svg") {
-        return element;
-    }
-    return null; // not in the DOM
-}
-exports.boundingSVG = boundingSVG;
 var _latestClipPathId = 0;
 /**
  * Generates a ClipPath ID that is unique for this instance of Plottable
@@ -10878,39 +10914,38 @@ var Mouse = (function (_super) {
      * This constructor not be invoked directly.
      *
      * @constructor
-     * @param {SVGElement} svg The root <svg> to attach to.
      */
-    function Mouse(svg) {
+    function Mouse(component) {
         var _this = this;
         _super.call(this);
-        this._translator = Utils.ClientToSVGTranslator.getTranslator(svg);
+        this._translator = Utils.getTranslator(component);
         this._lastMousePosition = { x: -1, y: -1 };
-        var processMoveCallback = function (e) { return _this._measureAndDispatch(e, Mouse._MOUSEMOVE_EVENT_NAME, "page"); };
+        var processMoveCallback = function (e) { return _this._measureAndDispatch(component, e, Mouse._MOUSEMOVE_EVENT_NAME, "page"); };
         this._eventToProcessingFunction[Mouse._MOUSEOVER_EVENT_NAME] = processMoveCallback;
         this._eventToProcessingFunction[Mouse._MOUSEMOVE_EVENT_NAME] = processMoveCallback;
         this._eventToProcessingFunction[Mouse._MOUSEOUT_EVENT_NAME] = processMoveCallback;
         this._eventToProcessingFunction[Mouse._MOUSEDOWN_EVENT_NAME] =
-            function (e) { return _this._measureAndDispatch(e, Mouse._MOUSEDOWN_EVENT_NAME); };
+            function (e) { return _this._measureAndDispatch(component, e, Mouse._MOUSEDOWN_EVENT_NAME); };
         this._eventToProcessingFunction[Mouse._MOUSEUP_EVENT_NAME] =
-            function (e) { return _this._measureAndDispatch(e, Mouse._MOUSEUP_EVENT_NAME, "page"); };
+            function (e) { return _this._measureAndDispatch(component, e, Mouse._MOUSEUP_EVENT_NAME, "page"); };
         this._eventToProcessingFunction[Mouse._WHEEL_EVENT_NAME] =
-            function (e) { return _this._measureAndDispatch(e, Mouse._WHEEL_EVENT_NAME); };
+            function (e) { return _this._measureAndDispatch(component, e, Mouse._WHEEL_EVENT_NAME); };
         this._eventToProcessingFunction[Mouse._DBLCLICK_EVENT_NAME] =
-            function (e) { return _this._measureAndDispatch(e, Mouse._DBLCLICK_EVENT_NAME); };
+            function (e) { return _this._measureAndDispatch(component, e, Mouse._DBLCLICK_EVENT_NAME); };
     }
     /**
-     * Get a Mouse Dispatcher for the <svg> containing elem.
+     * Get a Mouse Dispatcher for the component tree.
      * If one already exists on that <svg>, it will be returned; otherwise, a new one will be created.
      *
      * @param {SVGElement} elem
      * @return {Dispatchers.Mouse}
      */
-    Mouse.getDispatcher = function (elem) {
-        var svg = Utils.DOM.boundingSVG(elem);
-        var dispatcher = svg[Mouse._DISPATCHER_KEY];
+    Mouse.getDispatcher = function (component) {
+        var element = component.root().rootSVG();
+        var dispatcher = element[Mouse._DISPATCHER_KEY];
         if (dispatcher == null) {
-            dispatcher = new Mouse(svg);
-            svg[Mouse._DISPATCHER_KEY] = dispatcher;
+            dispatcher = new Mouse(component);
+            element[Mouse._DISPATCHER_KEY] = dispatcher;
         }
         return dispatcher;
     };
@@ -11018,12 +11053,12 @@ var Mouse = (function (_super) {
      * Computes the mouse position from the given event, and if successful
      * calls all the callbacks in the provided callbackSet.
      */
-    Mouse.prototype._measureAndDispatch = function (event, eventName, scope) {
+    Mouse.prototype._measureAndDispatch = function (component, event, eventName, scope) {
         if (scope === void 0) { scope = "element"; }
         if (scope !== "page" && scope !== "element") {
             throw new Error("Invalid scope '" + scope + "', must be 'element' or 'page'");
         }
-        if (scope === "page" || this.eventInsideSVG(event)) {
+        if (scope === "page" || this.eventInside(component, event)) {
             var newMousePosition = this._translator.computePosition(event.clientX, event.clientY);
             if (newMousePosition != null) {
                 this._lastMousePosition = newMousePosition;
@@ -11031,8 +11066,8 @@ var Mouse = (function (_super) {
             }
         }
     };
-    Mouse.prototype.eventInsideSVG = function (event) {
-        return this._translator.insideSVG(event);
+    Mouse.prototype.eventInside = function (component, event) {
+        return this._translator.isInside(component, event);
     };
     /**
      * Returns the last computed mouse position in <svg> coordinate space.
@@ -11077,34 +11112,33 @@ var Touch = (function (_super) {
     /**
      * This constructor should not be invoked directly.
      *
-     * @constructor
      * @param {SVGElement} svg The root <svg> to attach to.
      */
-    function Touch(svg) {
+    function Touch(component) {
         var _this = this;
         _super.call(this);
-        this._translator = Utils.ClientToSVGTranslator.getTranslator(svg);
+        this._translator = Utils.getTranslator(component);
         this._eventToProcessingFunction[Touch._TOUCHSTART_EVENT_NAME] =
-            function (e) { return _this._measureAndDispatch(e, Touch._TOUCHSTART_EVENT_NAME, "page"); };
+            function (e) { return _this._measureAndDispatch(component, e, Touch._TOUCHSTART_EVENT_NAME, "page"); };
         this._eventToProcessingFunction[Touch._TOUCHMOVE_EVENT_NAME] =
-            function (e) { return _this._measureAndDispatch(e, Touch._TOUCHMOVE_EVENT_NAME, "page"); };
+            function (e) { return _this._measureAndDispatch(component, e, Touch._TOUCHMOVE_EVENT_NAME, "page"); };
         this._eventToProcessingFunction[Touch._TOUCHEND_EVENT_NAME] =
-            function (e) { return _this._measureAndDispatch(e, Touch._TOUCHEND_EVENT_NAME, "page"); };
+            function (e) { return _this._measureAndDispatch(component, e, Touch._TOUCHEND_EVENT_NAME, "page"); };
         this._eventToProcessingFunction[Touch._TOUCHCANCEL_EVENT_NAME] =
-            function (e) { return _this._measureAndDispatch(e, Touch._TOUCHCANCEL_EVENT_NAME, "page"); };
+            function (e) { return _this._measureAndDispatch(component, e, Touch._TOUCHCANCEL_EVENT_NAME, "page"); };
     }
     /**
-     * Gets a Touch Dispatcher for the <svg> containing elem.
-     * If one already exists on that <svg>, it will be returned; otherwise, a new one will be created.
+     * Gets a Touch Dispatcher for the component.
+     * If one already exists, it will be returned; otherwise, a new one will be created.
      *
-     * @param {SVGElement} elem
+     * @param component
      * @return {Dispatchers.Touch}
      */
-    Touch.getDispatcher = function (elem) {
-        var svg = Utils.DOM.boundingSVG(elem);
+    Touch.getDispatcher = function (component) {
+        var svg = component.root().rootSVG();
         var dispatcher = svg[Touch._DISPATCHER_KEY];
         if (dispatcher == null) {
-            dispatcher = new Touch(svg);
+            dispatcher = new Touch(component);
             svg[Touch._DISPATCHER_KEY] = dispatcher;
         }
         return dispatcher;
@@ -11193,12 +11227,12 @@ var Touch = (function (_super) {
      * Computes the Touch position from the given event, and if successful
      * calls all the callbacks in the provided callbackSet.
      */
-    Touch.prototype._measureAndDispatch = function (event, eventName, scope) {
+    Touch.prototype._measureAndDispatch = function (component, event, eventName, scope) {
         if (scope === void 0) { scope = "element"; }
         if (scope !== "page" && scope !== "element") {
             throw new Error("Invalid scope '" + scope + "', must be 'element' or 'page'");
         }
-        if (scope === "element" && !this.eventInsideSVG(event)) {
+        if (scope === "element" && !this.eventInside(component, event)) {
             return;
         }
         var touches = event.changedTouches;
@@ -11218,8 +11252,8 @@ var Touch = (function (_super) {
             this._callCallbacksForEvent(eventName, touchIdentifiers, touchPositions, event);
         }
     };
-    Touch.prototype.eventInsideSVG = function (event) {
-        return this._translator.insideSVG(event);
+    Touch.prototype.eventInside = function (component, event) {
+        return this._translator.isInside(component, event);
     };
     Touch._DISPATCHER_KEY = "__Plottable_Dispatcher_Touch";
     Touch._TOUCHSTART_EVENT_NAME = "touchstart";
@@ -11482,10 +11516,10 @@ var Click = (function (_super) {
     }
     Click.prototype._anchor = function (component) {
         _super.prototype._anchor.call(this, component);
-        this._mouseDispatcher = Dispatchers.Mouse.getDispatcher(component.content().node());
+        this._mouseDispatcher = Dispatchers.Mouse.getDispatcher(component);
         this._mouseDispatcher.onMouseDown(this._mouseDownCallback);
         this._mouseDispatcher.onMouseUp(this._mouseUpCallback);
-        this._touchDispatcher = Dispatchers.Touch.getDispatcher(component.content().node());
+        this._touchDispatcher = Dispatchers.Touch.getDispatcher(component);
         this._touchDispatcher.onTouchStart(this._touchStartCallback);
         this._touchDispatcher.onTouchEnd(this._touchEndCallback);
         this._touchDispatcher.onTouchCancel(this._touchCancelCallback);
@@ -11579,11 +11613,11 @@ var DoubleClick = (function (_super) {
     }
     DoubleClick.prototype._anchor = function (component) {
         _super.prototype._anchor.call(this, component);
-        this._mouseDispatcher = Dispatchers.Mouse.getDispatcher(component.content().node());
+        this._mouseDispatcher = Dispatchers.Mouse.getDispatcher(component);
         this._mouseDispatcher.onMouseDown(this._mouseDownCallback);
         this._mouseDispatcher.onMouseUp(this._mouseUpCallback);
         this._mouseDispatcher.onDblClick(this._dblClickCallback);
-        this._touchDispatcher = Dispatchers.Touch.getDispatcher(component.content().node());
+        this._touchDispatcher = Dispatchers.Touch.getDispatcher(component);
         this._touchDispatcher.onTouchStart(this._touchStartCallback);
         this._touchDispatcher.onTouchEnd(this._touchEndCallback);
         this._touchDispatcher.onTouchCancel(this._touchCancelCallback);
@@ -11694,11 +11728,11 @@ var Drag = (function (_super) {
     }
     Drag.prototype._anchor = function (component) {
         _super.prototype._anchor.call(this, component);
-        this._mouseDispatcher = Dispatchers.Mouse.getDispatcher(this._componentAttachedTo.content().node());
+        this._mouseDispatcher = Dispatchers.Mouse.getDispatcher(this._componentAttachedTo);
         this._mouseDispatcher.onMouseDown(this._mouseDownCallback);
         this._mouseDispatcher.onMouseMove(this._mouseMoveCallback);
         this._mouseDispatcher.onMouseUp(this._mouseUpCallback);
-        this._touchDispatcher = Dispatchers.Touch.getDispatcher(this._componentAttachedTo.content().node());
+        this._touchDispatcher = Dispatchers.Touch.getDispatcher(this._componentAttachedTo);
         this._touchDispatcher.onTouchStart(this._touchStartCallback);
         this._touchDispatcher.onTouchMove(this._touchMoveCallback);
         this._touchDispatcher.onTouchEnd(this._touchEndCallback);
@@ -11929,9 +11963,9 @@ var PanZoom = (function (_super) {
     PanZoom.prototype._anchor = function (component) {
         _super.prototype._anchor.call(this, component);
         this._dragInteraction.attachTo(component);
-        this._mouseDispatcher = Dispatchers.Mouse.getDispatcher(this._componentAttachedTo.content().node());
+        this._mouseDispatcher = Dispatchers.Mouse.getDispatcher(this._componentAttachedTo);
         this._mouseDispatcher.onWheel(this._wheelCallback);
-        this._touchDispatcher = Dispatchers.Touch.getDispatcher(this._componentAttachedTo.content().node());
+        this._touchDispatcher = Dispatchers.Touch.getDispatcher(this._componentAttachedTo);
         this._touchDispatcher.onTouchStart(this._touchStartCallback);
         this._touchDispatcher.onTouchMove(this._touchMoveCallback);
         this._touchDispatcher.onTouchEnd(this._touchEndCallback);
@@ -12412,9 +12446,9 @@ var Pointer = (function (_super) {
     }
     Pointer.prototype._anchor = function (component) {
         _super.prototype._anchor.call(this, component);
-        this._mouseDispatcher = Dispatchers.Mouse.getDispatcher(this._componentAttachedTo.content().node());
+        this._mouseDispatcher = Dispatchers.Mouse.getDispatcher(this._componentAttachedTo);
         this._mouseDispatcher.onMouseMove(this._mouseMoveCallback);
-        this._touchDispatcher = Dispatchers.Touch.getDispatcher(this._componentAttachedTo.content().node());
+        this._touchDispatcher = Dispatchers.Touch.getDispatcher(this._componentAttachedTo);
         this._touchDispatcher.onTouchStart(this._touchStartCallback);
     };
     Pointer.prototype._unanchor = function () {
@@ -12425,11 +12459,11 @@ var Pointer = (function (_super) {
         this._touchDispatcher = null;
     };
     Pointer.prototype._handleMouseEvent = function (p, e) {
-        var insideSVG = this._mouseDispatcher.eventInsideSVG(e);
+        var insideSVG = this._mouseDispatcher.eventInside(this._componentAttachedTo, e);
         this._handlePointerEvent(p, insideSVG);
     };
     Pointer.prototype._handleTouchEvent = function (p, e) {
-        var insideSVG = this._touchDispatcher.eventInsideSVG(e);
+        var insideSVG = this._touchDispatcher.eventInside(this._componentAttachedTo, e);
         this._handlePointerEvent(p, insideSVG);
     };
     Pointer.prototype._handlePointerEvent = function (p, insideSVG) {
@@ -15355,85 +15389,7 @@ exports.CallbackSet = CallbackSet;
 
 
 /***/ }),
-/* 95 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-/**
- * Copyright 2014-present Palantir Technologies
- * @license MIT
- */
-
-var DOM = __webpack_require__(40);
-var ClientToSVGTranslator = (function () {
-    function ClientToSVGTranslator(svg) {
-        this._svg = svg;
-        this._measureRect = document.createElementNS(svg.namespaceURI, "rect");
-        this._measureRect.setAttribute("class", "measure-rect");
-        this._measureRect.setAttribute("style", "opacity: 0; visibility: hidden;");
-        this._measureRect.setAttribute("stroke-width", "0");
-        this._measureRect.setAttribute("width", "1");
-        this._measureRect.setAttribute("height", "1");
-        this._svg.appendChild(this._measureRect);
-    }
-    /**
-     * Returns the ClientToSVGTranslator for the <svg> containing elem.
-     * If one already exists on that <svg>, it will be returned; otherwise, a new one will be created.
-     */
-    ClientToSVGTranslator.getTranslator = function (elem) {
-        var svg = DOM.boundingSVG(elem);
-        var translator = svg[ClientToSVGTranslator._TRANSLATOR_KEY];
-        if (translator == null) {
-            translator = new ClientToSVGTranslator(svg);
-            svg[ClientToSVGTranslator._TRANSLATOR_KEY] = translator;
-        }
-        return translator;
-    };
-    /**
-     * Computes the position relative to the <svg> in svg-coordinate-space.
-     */
-    ClientToSVGTranslator.prototype.computePosition = function (clientX, clientY) {
-        // get the origin
-        this._measureRect.setAttribute("x", "0");
-        this._measureRect.setAttribute("y", "0");
-        var mrBCR = this._measureRect.getBoundingClientRect();
-        var origin = { x: mrBCR.left, y: mrBCR.top };
-        // calculate the scale
-        var sampleDistance = 100;
-        this._measureRect.setAttribute("x", String(sampleDistance));
-        this._measureRect.setAttribute("y", String(sampleDistance));
-        mrBCR = this._measureRect.getBoundingClientRect();
-        var testPoint = { x: mrBCR.left, y: mrBCR.top };
-        // invalid measurements -- SVG might not be in the DOM
-        if (origin.x === testPoint.x || origin.y === testPoint.y) {
-            return null;
-        }
-        var scaleX = (testPoint.x - origin.x) / sampleDistance;
-        var scaleY = (testPoint.y - origin.y) / sampleDistance;
-        // get the true cursor position
-        this._measureRect.setAttribute("x", String((clientX - origin.x) / scaleX));
-        this._measureRect.setAttribute("y", String((clientY - origin.y) / scaleY));
-        mrBCR = this._measureRect.getBoundingClientRect();
-        var trueCursorPosition = { x: mrBCR.left, y: mrBCR.top };
-        var scaledPosition = {
-            x: (trueCursorPosition.x - origin.x) / scaleX,
-            y: (trueCursorPosition.y - origin.y) / scaleY,
-        };
-        return scaledPosition;
-    };
-    /**
-     * Checks whether event happened inside <svg> element.
-     */
-    ClientToSVGTranslator.prototype.insideSVG = function (e) {
-        return DOM.boundingSVG(e.target) === this._svg;
-    };
-    ClientToSVGTranslator._TRANSLATOR_KEY = "__Plottable_ClientToSVGTranslator";
-    return ClientToSVGTranslator;
-}());
-exports.ClientToSVGTranslator = ClientToSVGTranslator;
-
-
-/***/ }),
+/* 95 */,
 /* 96 */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -16981,6 +16937,88 @@ __export(__webpack_require__(16));
 __export(__webpack_require__(2));
 __export(__webpack_require__(10));
 __export(__webpack_require__(18));
+
+
+/***/ }),
+/* 127 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var d3 = __webpack_require__(1);
+var Utils = __webpack_require__(0);
+var _TRANSLATOR_KEY = "__Plottable_ClientTranslator";
+function getTranslator(component) {
+    // The Translator works by first calculating the offset to root of the chart and then calculating
+    // the offset from the component to the root. It is imperative that the measureElement
+    // be added to the root of the hierarchy and nowhere else.
+    var root = component.root().rootSVG().node();
+    var translator = root[_TRANSLATOR_KEY];
+    if (translator == null) {
+        var measurer = document.createElementNS(root.namespaceURI, "svg");
+        measurer.setAttribute("class", "measurer");
+        measurer.setAttribute("style", "opacity: 0; visibility: hidden;");
+        measurer.setAttribute("width", "1");
+        measurer.setAttribute("height", "1");
+        measurer.setAttribute("style", "opacity: 0; visibility: hidden; position: absolute; width: 1px; height: 1px;");
+        root.appendChild(measurer);
+        translator = new Translator(d3.select(measurer));
+        root[_TRANSLATOR_KEY] = translator;
+    }
+    return translator;
+}
+exports.getTranslator = getTranslator;
+/**
+ * Applies position as a style and attribute to the svg element
+ * as the position of the element varies by the type of parent.
+ * When nested within an SVG, the attribute position is respected.
+ * When nested within an HTML, the style position is respected.
+ */
+function move(node, x, y) {
+    node.styles({ "left": x + "px", "top": y + "px" });
+    node.attrs({ "x": "" + x, "y": "" + y });
+}
+var Translator = (function () {
+    function Translator(measurementElement) {
+        this._measurementElement = measurementElement;
+    }
+    /**
+     * Computes the position relative to the component. Converts screen clientX/clientY
+     * coordinates to the coordinates relative to the measurementElement, taking into
+     * account transform() factors from CSS or SVG up the DOM tree.
+     */
+    Translator.prototype.computePosition = function (clientX, clientY) {
+        // get the origin
+        move(this._measurementElement, 0, 0);
+        var mrBCR = this._measurementElement.node().getBoundingClientRect();
+        var origin = { x: mrBCR.left, y: mrBCR.top };
+        // calculate the scale
+        var sampleDistance = 100;
+        move(this._measurementElement, sampleDistance, sampleDistance);
+        mrBCR = this._measurementElement.node().getBoundingClientRect();
+        var testPoint = { x: mrBCR.left, y: mrBCR.top };
+        // invalid measurements -- SVG might not be in the DOM
+        if (origin.x === testPoint.x || origin.y === testPoint.y) {
+            return null;
+        }
+        var scaleX = (testPoint.x - origin.x) / sampleDistance;
+        var scaleY = (testPoint.y - origin.y) / sampleDistance;
+        // get the true cursor position
+        move(this._measurementElement, ((clientX - origin.x) / scaleX), ((clientY - origin.y) / scaleY));
+        mrBCR = this._measurementElement.node().getBoundingClientRect();
+        var trueCursorPosition = { x: mrBCR.left, y: mrBCR.top };
+        var scaledPosition = {
+            x: (trueCursorPosition.x - origin.x) / scaleX,
+            y: (trueCursorPosition.y - origin.y) / scaleY,
+        };
+        return scaledPosition;
+    };
+    Translator.prototype.isInside = function (component, e) {
+        return Utils.DOM.contains(component.root().rootSVG().node(), e.target);
+    };
+    return Translator;
+}());
+exports.Translator = Translator;
 
 
 /***/ })

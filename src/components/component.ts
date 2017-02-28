@@ -727,8 +727,8 @@ export class Component {
     return this._content;
   }
 
-  public element(): SimpleSelection<void> {
-    return this._element;
+  public rootSVG(): SimpleSelection<void> {
+    return this._rootSVG;
   }
 
   /**

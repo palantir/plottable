@@ -12,7 +12,7 @@ export function getTranslator(component: Component): Translator {
   // The Translator works by first calculating the offset to root of the chart and then calculating
   // the offset from the component to the root. It is imperative that the measureElement
   // be added to the root of the hierarchy and nowhere else.
-  let root = component.root().element().node() as Element;
+  let root = component.root().rootSVG().node() as Element;
 
   let translator: Translator = (<any> root)[_TRANSLATOR_KEY];
   if (translator == null) {
@@ -94,7 +94,7 @@ export class Translator {
   }
 
   public isInside(component: Component, e: Event) {
-    return Utils.DOM.contains(component.root().element().node() as Element, e.target as Element);
+    return Utils.DOM.contains(component.root().rootSVG().node() as Element, e.target as Element);
   }
 }
 

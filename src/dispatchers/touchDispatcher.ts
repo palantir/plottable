@@ -28,7 +28,7 @@ export class Touch extends Dispatcher {
    * @return {Dispatchers.Touch}
    */
   public static getDispatcher(component: Component): Dispatchers.Touch {
-    let svg = component.root().element();
+    let svg = component.root().rootSVG();
 
     let dispatcher: Dispatchers.Touch = (<any> svg)[Touch._DISPATCHER_KEY];
     if (dispatcher == null) {
