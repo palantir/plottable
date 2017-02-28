@@ -33,12 +33,12 @@ export class DoubleClick extends Interaction {
   protected _anchor(component: Component) {
     super._anchor(component);
 
-    this._mouseDispatcher = Dispatchers.Mouse.getDispatcher(<SVGElement> component.content().node());
+    this._mouseDispatcher = Dispatchers.Mouse.getDispatcher(component);
     this._mouseDispatcher.onMouseDown(this._mouseDownCallback);
     this._mouseDispatcher.onMouseUp(this._mouseUpCallback);
     this._mouseDispatcher.onDblClick(this._dblClickCallback);
 
-    this._touchDispatcher = Dispatchers.Touch.getDispatcher(<SVGElement> component.content().node());
+    this._touchDispatcher = Dispatchers.Touch.getDispatcher(component);
     this._touchDispatcher.onTouchStart(this._touchStartCallback);
     this._touchDispatcher.onTouchEnd(this._touchEndCallback);
     this._touchDispatcher.onTouchCancel(this._touchCancelCallback);

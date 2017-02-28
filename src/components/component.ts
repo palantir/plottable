@@ -25,9 +25,10 @@ export type IResizeHandler = (size: { height: number, width: number }) => void;
  */
 export class Component {
   /**
-   * Holds all the DOM associated with this component. A direct child of the _rootElement that we control.
+   * Holds all the DOM associated with this component. A direct child of the element we're
+   * anchored to.
    */
-  private _element: SimpleSelection<void>;
+  private _element: d3.Selection<Element, void | {}, any, any>;
   /**
    * Container for the visual content that this Component displays. Subclasses should attach
    * elements onto the _content. In between the background and the foreground.
@@ -60,6 +61,10 @@ export class Component {
   private _resizeHandler: IResizeHandler;
   private _origin: Point = { x: 0, y: 0 }; // Origin of the coordinate space for the Component.
 
+  /**
+   * The ComponentContainer that holds this Component in its children, or null, if this
+   * Component is top-level.
+   */
   private _parent: ComponentContainer;
   private _xAlignment: string = "left";
   private static _xAlignToProportion: { [alignment: string]: number } = {
@@ -99,7 +104,6 @@ export class Component {
    * If we're the root Component (top-level), this is the Element we've anchored to (user-supplied).
    */
   private _rootSVG: SimpleSelection<void>;
-  private _isTopLevelComponent = false;
   private _width: number; // Width and height of the Component. Used to size the hitbox, bounding box, etc
   private _height: number;
   private _cssClasses = new Utils.Set<string>();
@@ -131,9 +135,7 @@ export class Component {
       throw new Error("Can't reuse destroy()-ed Components!");
     }
 
-    this._isTopLevelComponent = (<Node> selection.node()).nodeName.toLowerCase() === "svg";
-
-    if (this._isTopLevelComponent) {
+    if (this.parent() == null) {
       // svg node gets the "plottable" CSS class
       this._rootSVG = selection;
       this._rootSVG.classed("plottable", true);
@@ -156,7 +158,7 @@ export class Component {
       // reattach existing element
       (<Node> selection.node()).appendChild(<Node> this._element.node());
     } else {
-      this._element = selection.append("g");
+      this._element = selection.append<SVGGElement>("g");
       this._setup();
     }
 
@@ -250,7 +252,7 @@ export class Component {
     if (origin == null || availableWidth == null || availableHeight == null) {
       if (this._element == null) {
         throw new Error("anchor() must be called before computeLayout()");
-      } else if (this._isTopLevelComponent) {
+      } else if (this.parent() == null) {
         // we are the root node, retrieve height/width from root SVG
         origin = { x: 0, y: 0 };
 
@@ -347,7 +349,7 @@ export class Component {
    */
   public redraw() {
     if (this._isAnchored && this._isSetup) {
-      if (this._isTopLevelComponent) {
+      if (this.parent() == null) {
         this._scheduleComputeLayout();
       } else {
         this.parent().redraw();
@@ -368,24 +370,24 @@ export class Component {
   }
 
   /**
-   * Renders the Component to a given <svg>.
+   * Renders the Component to a given HTML Element.
    *
-   * @param {String|d3.Selection} element A selector-string for the <svg>, or a d3 selection containing an <svg>.
+   * @param {String|d3.Selection} element The element, a selector string for the element, or a d3.Selection for the element.
    * @returns {Component} The calling Component.
    */
-  public renderTo(element: string | Element | SimpleSelection<void>): this {
+  public renderTo(element: string | Element | SimpleSelection<any>): this {
     this.detach();
     if (element != null) {
-      let selection: SimpleSelection<void>;
+      let selection: d3.Selection<Element, any, any, any>;
       if (typeof(element) === "string") {
-        selection = d3.select<d3.BaseType, void>(element);
+        selection = d3.select<Element, any>(element);
       } else if (element instanceof Element) {
-        selection = d3.select<d3.BaseType, void>(element);
+        selection = d3.select<Element, any>(element);
       } else {
         selection = coerceExternalD3(element);
       }
-      if (!selection.node() || (<Node> selection.node()).nodeName.toLowerCase() !== "svg") {
-        throw new Error("Plottable requires a valid SVG to renderTo");
+      if (!selection.node() || selection.node().nodeName == null) {
+        throw new Error("Plottable requires a valid Element to renderTo");
       }
       this.anchor(selection);
     }
@@ -568,9 +570,7 @@ export class Component {
 
     if (this._isAnchored) {
       this._element.remove();
-      if (this._isTopLevelComponent) {
-        this._rootSVG.select(`.${Component._SAFARI_EVENT_BACKING_CLASS}`).remove();
-      }
+      this._rootSVG.select(`.${Component._SAFARI_EVENT_BACKING_CLASS}`).remove();
     }
     this._isAnchored = false;
     this._onDetachCallbacks.callCallbacks(this);
@@ -675,11 +675,11 @@ export class Component {
   }
 
   /**
-   * Gets the origin of the Component relative to the root <svg>.
+   * Gets the origin of the Component relative to the root Component.
    *
    * @return {Point}
    */
-  public originToSVG(): Point {
+  public originToRoot(): Point {
     let origin = this.origin();
     let ancestor = this.parent();
     while (ancestor != null) {
@@ -689,6 +689,20 @@ export class Component {
       ancestor = ancestor.parent();
     }
     return origin;
+  }
+
+  /**
+   * Gets the root component of the hierarchy. If the provided
+   * component is the root, that component will be returned.
+   */
+  public root(): Component {
+    let parent: Component = this;
+
+    while (parent.parent() != null) {
+      parent = parent.parent();
+    }
+
+    return parent;
   }
 
   /**
@@ -711,6 +725,10 @@ export class Component {
    */
   public content(): SimpleSelection<void> {
     return this._content;
+  }
+
+  public element(): SimpleSelection<void> {
+    return this._element;
   }
 
   /**
