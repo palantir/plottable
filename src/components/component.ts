@@ -16,12 +16,46 @@ export type ComponentCallback = (component: Component) => void;
 
 export type IResizeHandler = (size: { height: number, width: number }) => void;
 
+/**
+ * The root class for all Plottable elements. Components are the core logical units
+ * that build Plottable visualizations.
+ *
+ * This class deals with Component lifecycle (anchoring, getting a size, and rendering
+ * infrastructure), as well as building the framework of DOM elements for all Components.
+ */
 export class Component {
+  /**
+   * Holds all the DOM associated with this component. A direct child of the _rootElement that we control.
+   */
   private _element: SimpleSelection<void>;
+  /**
+   * Container for the visual content that this Component displays. Subclasses should attach
+   * elements onto the _content. In between the background and the foreground.
+   */
   private _content: SimpleSelection<void>;
+  /**
+   * Used by axes to hide cut off axis labels.
+   * css says "for collision testing", don't know what that means
+   */
   protected _boundingBox: SimpleSelection<void>;
+  /**
+   * Only referenced in interaction tests as the interaction target
+   *
+   * Also holds the .background-fill. Unclear what .background-fill
+   * does; it has fill: none and pointer-events: none
+   *
+   * I think the idea is to allow extension from 3rd party users to place
+   * more objects above/below the "content"
+   */
   private _backgroundContainer: SimpleSelection<void>;
+  /**
+   * Only referenced in a few tests; not used anywhere.
+   */
   private _foregroundContainer: SimpleSelection<void>;
+  /**
+   * guidelineLayer, plot, selectionBoxLayer set this.
+   * The clip path will prevent content from overflowing its Component space.
+   */
   protected _clipPathEnabled = false;
   private _resizeHandler: IResizeHandler;
   private _origin: Point = { x: 0, y: 0 }; // Origin of the coordinate space for the Component.
@@ -42,14 +76,40 @@ export class Component {
   protected _isSetup = false;
   protected _isAnchored = false;
 
+  /**
+   * List of "boxes"; SVGComponent has a "box" API that lets subclasses add boxes
+   * with "addBox". Three boxes are added:
+   *
+   * .clip-rect - the clipPath rect, (basically overflow: hidden)
+   * .background-fill - for the background container (unclear what it's use is)
+   * .bounding-box - this._boundingBox
+   *
+   * boxes get their width/height attributes updated in computeLayout.
+   *
+   * I think this API is to make an idea of a "100% width/height" box that could be
+   * useful in a variety of situations. But enumerating the three usages of it, it
+   * doesn't look like it's being used very much.
+   */
   private _boxes: SimpleSelection<void>[] = [];
+  /**
+   * Element containing all the boxes.
+   */
   private _boxContainer: SimpleSelection<void>;
+  /**
+   * If we're the root Component (top-level), this is the Element we've anchored to (user-supplied).
+   */
   private _rootSVG: SimpleSelection<void>;
   private _isTopLevelComponent = false;
   private _width: number; // Width and height of the Component. Used to size the hitbox, bounding box, etc
   private _height: number;
   private _cssClasses = new Utils.Set<string>();
+  /**
+   * If .destroy() has been called on this Component.
+   */
   private _destroyed = false;
+  /**
+   * internal clip path id of the clipPath, if it's being used
+   */
   private _clipPathID: string;
   private _onAnchorCallbacks = new Utils.CallbackSet<ComponentCallback>();
   private _onDetachCallbacks = new Utils.CallbackSet<ComponentCallback>();
