@@ -44,6 +44,15 @@ svg.plottable {
   pointer-events: visibleFill;
 }
 
+/* Root-level html components are relative, all others are absolute */
+.root.plottable {
+  position: relative;
+}
+
+.plottable .component {
+  position: absolute;
+}
+
 .plottable .background-fill {
   fill: none;
   pointer-events: none;

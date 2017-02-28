@@ -3,7 +3,7 @@ import * as d3 from "d3";
 
 import * as Plottable from "../src";
 
-export class FixedSizeComponent extends Plottable.Component {
+export class FixedSizeComponent extends Plottable.SVGComponent {
   public fsWidth: number;
   public fsHeight: number;
 

@@ -108,7 +108,7 @@ describe("Interactions", () => {
 
         svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
 
-        let component = new Plottable.Component();
+        let component = new Plottable.SVGComponent();
         component.renderTo(svg);
 
         panZoomInteraction = new Plottable.Interactions.PanZoom();
@@ -218,7 +218,7 @@ describe("Interactions", () => {
       let SVG_WIDTH = 400;
       let SVG_HEIGHT = 500;
 
-      let component: Plottable.Component;
+      let component: Plottable.SVGComponent;
       let eventTarget: SimpleSelection<void>;
 
       let xScale: Plottable.QuantitativeScale<number>;
@@ -233,7 +233,7 @@ describe("Interactions", () => {
 
         svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
 
-        component = new Plottable.Component();
+        component = new Plottable.SVGComponent();
         component.renderTo(svg);
 
         panZoomInteraction = new Plottable.Interactions.PanZoom();
@@ -321,18 +321,27 @@ describe("Interactions", () => {
       });
 
       it("can pinch inside one component and not affect another component", () => {
+
+        // its initially attached to the component rooted in an SVG
+        // which throws off measuring. It needs to be attached to the
+        // component once it's been attached to the group element
+        panZoomInteraction.detachFrom(component);
+
+        const div = TestMethods.generateDIV(SVG_WIDTH, SVG_HEIGHT);
+
         let xScale2 = new Plottable.Scales.Linear();
         let initialDomain = [0, SVG_WIDTH / 2];
         xScale2.domain(initialDomain).range([0, SVG_WIDTH]);
 
-        let component2 = new Plottable.Component();
+        let component2 = new Plottable.SVGComponent();
 
         let panZoomInteraction2 = new Plottable.Interactions.PanZoom();
         panZoomInteraction2.addXScale(xScale2);
         panZoomInteraction2.attachTo(component2);
 
         let table = new Plottable.Components.Table([[component, component2]]);
-        table.renderTo(svg);
+        panZoomInteraction.attachTo(component);
+        table.renderTo(div.node() as HTMLElement);
 
         let startPoint = { x: SVG_WIDTH / 4, y: SVG_HEIGHT / 2 };
         let startPoint2 = { x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2 };
@@ -344,6 +353,8 @@ describe("Interactions", () => {
         TestMethods.triggerFakeTouchEvent("touchend", eventTarget, [endPoint], [1] );
         assert.deepEqual(xScale.domain(), expectedXDomain, "xScale inside target component transforms via pinch");
         assert.deepEqual(xScale2.domain(), initialDomain, "xScale outside of target component does not transform via pinch");
+
+        div.remove();
         svg.remove();
       });
 
@@ -386,7 +397,7 @@ describe("Interactions", () => {
 
         svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
 
-        let component = new Plottable.Component();
+        let component = new Plottable.SVGComponent();
         component.renderTo(svg);
 
         panZoomInteraction = new Plottable.Interactions.PanZoom();
@@ -493,7 +504,7 @@ describe("Interactions", () => {
 
         svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
 
-        let component = new Plottable.Component();
+        let component = new Plottable.SVGComponent();
         component.renderTo(svg);
 
         panZoomInteraction = new Plottable.Interactions.PanZoom();
@@ -602,7 +613,7 @@ describe("Interactions", () => {
 
         svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
 
-        let component = new Plottable.Component();
+        let component = new Plottable.SVGComponent();
         component.renderTo(svg);
 
         panZoomInteraction = new Plottable.Interactions.PanZoom();
@@ -686,7 +697,7 @@ describe("Interactions", () => {
 
         svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
 
-        let component = new Plottable.Component();
+        let component = new Plottable.SVGComponent();
         component.renderTo(svg);
 
         panZoomInteraction = new Plottable.Interactions.PanZoom();
@@ -774,7 +785,7 @@ describe("Interactions", () => {
 
         svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
 
-        let component = new Plottable.Component();
+        let component = new Plottable.SVGComponent();
         component.renderTo(svg);
 
         panZoomInteraction = new Plottable.Interactions.PanZoom();
@@ -882,7 +893,7 @@ describe("Interactions", () => {
 
         svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
 
-        let component = new Plottable.Component();
+        let component = new Plottable.SVGComponent();
         component.renderTo(svg);
 
         panZoomInteraction = new Plottable.Interactions.PanZoom();

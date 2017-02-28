@@ -16,7 +16,7 @@ import { ScaleCallback } from "../scales/scale";
 import * as Scales from "../scales";
 import * as Utils from "../utils";
 
-import { Component } from "./component";
+import { SVGComponent } from "./svgComponent";
 
 /**
  * The Legend's column representation. Stores position information
@@ -212,7 +212,7 @@ class LegendTable {
   }
 }
 
-export class Legend extends Component {
+export class Legend extends SVGComponent {
   /**
    * The css class applied to each legend row
    */

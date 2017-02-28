@@ -6,7 +6,7 @@
 import * as d3 from "d3";
 
 import { Dataset } from "./dataset";
-import { Component } from "../components/component";
+import { SVGComponent } from "../components/svgComponent";
 
 export type SimpleSelection<Datum> = d3.Selection<d3.BaseType, Datum | {}, any, any>;
 
@@ -79,7 +79,7 @@ export type Bounds = {
 /**
  * An object representing a data-backed visual entity inside a Component.
  */
-export interface Entity<C extends Component> {
+export interface Entity<C extends SVGComponent> {
   datum: any;
   position: Point;
   selection: SimpleSelection<any>;

@@ -446,7 +446,7 @@ export class Line<X> extends XYPlot<X, number> {
     let minYDist = Infinity;
     let closest: PlotEntity;
 
-    const chartBounds = this.bounds();
+    const chartBounds = Utils.Component.bounds(this);
     this.entities().forEach((entity) => {
       if (!this._entityVisibleOnPlot(entity, chartBounds)) {
         return;

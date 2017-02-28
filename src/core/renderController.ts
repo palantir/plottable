@@ -3,7 +3,7 @@
  * @license MIT
  */
 
-import { Component } from "../components/component";
+import { IComponent } from "../components/abstractComponent";
 import * as Utils from "../utils";
 
 import * as RenderPolicies from "./renderPolicy";
@@ -24,8 +24,8 @@ import * as RenderPolicies from "./renderPolicy";
  * );
  * ```
  */
-let _componentsNeedingRender = new Utils.Set<Component>();
-let _componentsNeedingComputeLayout = new Utils.Set<Component>();
+let _componentsNeedingRender = new Utils.Set<IComponent<any>>();
+let _componentsNeedingComputeLayout = new Utils.Set<IComponent<any>>();
 let _animationRequested = false;
 let _isCurrentlyFlushing = false;
 export namespace Policy {
@@ -61,7 +61,7 @@ export function renderPolicy(renderPolicy?: string): any {
  *
  * @param {Component} component
  */
-export function registerToRender(component: Component) {
+export function registerToRender(component: IComponent<any>) {
   if (_isCurrentlyFlushing) {
     Utils.Window.warn("Registered to render while other components are flushing: request may be ignored");
   }
@@ -74,7 +74,7 @@ export function registerToRender(component: Component) {
  *
  * @param {Component} component
  */
-export function registerToComputeLayoutAndRender(component: Component) {
+export function registerToComputeLayoutAndRender(component: IComponent<any>) {
   _componentsNeedingComputeLayout.add(component);
   _componentsNeedingRender.add(component);
   requestRender();
@@ -86,7 +86,7 @@ export function registerToComputeLayoutAndRender(component: Component) {
  * @param {Component} component
  * @deprecated This method has been renamed to `RenderController.registerToComputeLayoutAndRender()`.
  */
-export function registerToComputeLayout(component: Component) {
+export function registerToComputeLayout(component: IComponent<any>) {
   registerToComputeLayoutAndRender(component);
 }
 
@@ -107,14 +107,14 @@ function requestRender() {
 export function flush() {
   if (_animationRequested) {
     // Layout
-    _componentsNeedingComputeLayout.forEach((component: Component) => component.computeLayout());
+    _componentsNeedingComputeLayout.forEach((component: IComponent<any>) => component.computeLayout());
 
     // Top level render; Containers will put their children in the toRender queue
-    _componentsNeedingRender.forEach((component: Component) => component.render());
+    _componentsNeedingRender.forEach((component: IComponent<any>) => component.render());
 
     _isCurrentlyFlushing = true;
-    let failed = new Utils.Set<Component>();
-    _componentsNeedingRender.forEach((component: Component) => {
+    let failed = new Utils.Set<IComponent<any>>();
+    _componentsNeedingRender.forEach((component: IComponent<any>) => {
       try {
         component.renderImmediately();
       } catch (err) {
@@ -125,7 +125,7 @@ export function flush() {
         failed.add(component);
       }
     });
-    _componentsNeedingComputeLayout = new Utils.Set<Component>();
+    _componentsNeedingComputeLayout = new Utils.Set<IComponent<any>>();
     _componentsNeedingRender = failed;
     _animationRequested = false;
     _isCurrentlyFlushing = false;

@@ -94,16 +94,16 @@ function loadQuickTest(path){
 
         d3.select("#app").html(`
             <a href="#"><div>&#x3008; quicktests</div></a><br/>
+            <h2>${name}</h2>
             <div class="quicktest">
-                <h2>${name}</h2>
-                <svg width="100%" height="100%">
+                <div class="chart-area" style="width: 100%; height: 100%;">
             </div>
         `)
 
-        const svg = d3.select("#app svg");
+        const div = d3.select("#app .chart-area").node();
 
         try {
-            closure.run(svg, closure.makeData(), Plottable);
+            closure.run(div, closure.makeData(), Plottable);
         } catch (err) {
             setTimeout(function(){ throw err; }, 0);
         }

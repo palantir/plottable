@@ -3,7 +3,7 @@
  * @license MIT
  */
 
-import { Component } from "../components/component";
+import { IComponent } from "../components/abstractComponent";
 import { Point } from "../core/interfaces";
 import * as Dispatchers from "../dispatchers";
 import * as Utils from "../utils";
@@ -30,14 +30,14 @@ export class Drag extends Interaction {
   private _touchMoveCallback = (ids: number[], idToPoint: Point[], e: UIEvent) => this._doDrag(idToPoint[ids[0]], e);
   private _touchEndCallback = (ids: number[], idToPoint: Point[], e: UIEvent) => this._endDrag(idToPoint[ids[0]], e);
 
-  protected _anchor(component: Component) {
+  protected _anchor(component: IComponent<any>) {
     super._anchor(component);
-    this._mouseDispatcher = Dispatchers.Mouse.getDispatcher(<SVGElement> this._componentAttachedTo.content().node());
+    this._mouseDispatcher = Dispatchers.Mouse.getDispatcher(component);
     this._mouseDispatcher.onMouseDown(this._mouseDownCallback);
     this._mouseDispatcher.onMouseMove(this._mouseMoveCallback);
     this._mouseDispatcher.onMouseUp(this._mouseUpCallback);
 
-    this._touchDispatcher = Dispatchers.Touch.getDispatcher(<SVGElement> this._componentAttachedTo.content().node());
+    this._touchDispatcher = Dispatchers.Touch.getDispatcher(component);
     this._touchDispatcher.onTouchStart(this._touchStartCallback);
     this._touchDispatcher.onTouchMove(this._touchMoveCallback);
     this._touchDispatcher.onTouchEnd(this._touchEndCallback);

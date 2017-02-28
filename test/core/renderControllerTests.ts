@@ -32,7 +32,7 @@ describe("RenderController", () => {
 
   it("can queue a component to render", () => {
     let svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
-    let component = new Plottable.Component();
+    let component = new Plottable.SVGComponent();
     let renderedClass = "rendered";
     component.renderImmediately = () => {
       component.content().append("g").classed(renderedClass, true);
@@ -47,7 +47,7 @@ describe("RenderController", () => {
 
   it("can queue a component to undergo layout computation and render", () => {
     let svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
-    let component = new Plottable.Component();
+    let component = new Plottable.SVGComponent();
     let renderedClass = "rendered";
     component.renderImmediately = () => {
       component.content().append("g").classed(renderedClass, true);
@@ -65,10 +65,10 @@ describe("RenderController", () => {
 
   // HACKHACK: https://github.com/palantir/plottable/issues/2083
   it.skip("can render components that are triggered by another component's render", () => {
-    let link1 = new Plottable.Component();
+    let link1 = new Plottable.SVGComponent();
     let svg1 = TestMethods.generateSVG();
     link1.anchor(svg1).computeLayout();
-    let link2 = new Plottable.Component();
+    let link2 = new Plottable.SVGComponent();
     let svg2 = TestMethods.generateSVG();
     link2.anchor(svg2).computeLayout();
 

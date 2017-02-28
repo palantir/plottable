@@ -13,29 +13,29 @@ describe("Group", () => {
     it("appends Components with append()", () => {
       let componentGroup = new Plottable.Components.Group();
 
-      let c1 = new Plottable.Component();
+      let c1 = new Plottable.SVGComponent();
       componentGroup.append(c1);
       assert.deepEqual(componentGroup.components(), [c1], "Component 1 was added to the Group");
 
-      let c2 = new Plottable.Component();
+      let c2 = new Plottable.SVGComponent();
       componentGroup.append(c2);
       assert.deepEqual(componentGroup.components(), [c1, c2], "appended Component 2 to the Group");
 
       componentGroup.append(c1);
       assert.deepEqual(componentGroup.components(), [c1, c2], "adding an already-added Component does nothing");
 
-      let svg = TestMethods.generateSVG();
-      componentGroup.renderTo(svg);
-      let c3 = new Plottable.Component();
+      let div = TestMethods.generateDIV();
+      componentGroup.renderTo(div.node() as HTMLElement);
+      let c3 = new Plottable.SVGComponent();
       componentGroup.append(c3);
       assert.deepEqual(componentGroup.components(), [c1, c2, c3], "Components can be append()ed after rendering");
 
-      svg.remove();
+      div.remove();
     });
 
     it("can append() null to a Group without failing", () => {
       let group = new Plottable.Components.Group();
-      let component = new Plottable.Component;
+      let component = new Plottable.SVGComponent;
 
       group.append(component);
 
@@ -47,9 +47,9 @@ describe("Group", () => {
     });
 
     it("removes Components using remove()", () => {
-      let c1 = new Plottable.Component();
-      let c2 = new Plottable.Component();
-      let c3 = new Plottable.Component();
+      let c1 = new Plottable.SVGComponent();
+      let c2 = new Plottable.SVGComponent();
+      let c3 = new Plottable.SVGComponent();
 
       let componentGroup = new Plottable.Components.Group([c1, c2, c3]);
       assert.deepEqual(componentGroup.components(), [c1, c2, c3], "Group initialized correctly");
@@ -68,7 +68,7 @@ describe("Group", () => {
     });
 
     it("checks for Components using has()", () => {
-      let component = new Plottable.Component();
+      let component = new Plottable.SVGComponent();
       let group = new Plottable.Components.Group([component]);
       assert.isTrue(group.has(component), "correctly checks that Component is in the Group");
       group.remove(component);
@@ -79,14 +79,14 @@ describe("Group", () => {
   });
 
   describe("Detaching constituent Components", () => {
-    it("takes its constutuent Components with it when detach()ed or anchor()ed", () => {
-      let c1 = new Plottable.Component();
-      let c2 = new Plottable.Component();
+    it("takes its constituent Components with it when detach()ed or anchor()ed", () => {
+      let c1 = new Plottable.SVGComponent();
+      let c2 = new Plottable.SVGComponent();
       let group = new Plottable.Components.Group([c1, c2]);
 
-      let svg = TestMethods.generateSVG();
+      let div = TestMethods.generateDIV();
 
-      group.renderTo(svg);
+      group.renderTo(div.node() as HTMLElement);
       assert.isTrue(TestMethods.isInDOM(group), "Group was added to the DOM");
       assert.isTrue(TestMethods.isInDOM(c1), "Component 1 was added to the DOM");
       assert.isTrue(TestMethods.isInDOM(c2), "Component 2 was added to the DOM");
@@ -96,16 +96,16 @@ describe("Group", () => {
       assert.isFalse(TestMethods.isInDOM(c1), "Component 1 was also removed from the DOM");
       assert.isFalse(TestMethods.isInDOM(c2), "Component 2 was also removed from the DOM");
 
-      group.renderTo(svg);
+      group.renderTo(div.node() as HTMLElement);
       assert.isTrue(TestMethods.isInDOM(group), "Group was added back to the DOM");
       assert.isTrue(TestMethods.isInDOM(c1), "Component 1 was also added back to the DOM");
       assert.isTrue(TestMethods.isInDOM(c2), "Component 2 was also added back to the DOM");
 
-      svg.remove();
+      div.remove();
     });
 
     it("detach()es Components from their previous location when they are append()ed", () => {
-      let component = new Plottable.Component;
+      let component = new Plottable.SVGComponent;
       let svg = TestMethods.generateSVG();
       component.renderTo(svg);
       let group = new Plottable.Components.Group();
@@ -115,7 +115,7 @@ describe("Group", () => {
     });
 
     it("removes Components if detach() is called on them (before rendering)", () => {
-      let component = new Plottable.Component();
+      let component = new Plottable.SVGComponent();
       let group = new Plottable.Components.Group([component]);
       component.detach();
       assert.lengthOf(group.components(), 0, "Component is no longer in the Group");
@@ -123,12 +123,12 @@ describe("Group", () => {
     });
 
     it("removes Components if detach() is called on them (after rendering)", () => {
-      let c1 = new Plottable.Component();
-      let c2 = new Plottable.Component();
+      let c1 = new Plottable.SVGComponent();
+      let c2 = new Plottable.SVGComponent();
       let group = new Plottable.Components.Group([c1, c2]);
 
-      let svg = TestMethods.generateSVG();
-      group.renderTo(svg);
+      let div = TestMethods.generateDIV();
+      group.renderTo(div.node() as HTMLElement);
 
       assert.isTrue(TestMethods.isInDOM(c1), "Component 1 was added to the DOM");
       assert.isTrue(TestMethods.isInDOM(c2), "Component 2 was added to the DOM");
@@ -139,19 +139,19 @@ describe("Group", () => {
       assert.isFalse(TestMethods.isInDOM(c2), "Component 2 was removed from the DOM");
       assert.isFalse(group.has(c2), "Component 2 was removed from the Group");
 
-      svg.remove();
+      div.remove();
     });
 
     it("can move Components to other Groups after anchoring", () => {
-      let svg = TestMethods.generateSVG();
+      let div = TestMethods.generateDIV();
 
       let group1 = new Plottable.Components.Group();
       let group2 = new Plottable.Components.Group();
-      let component = new Plottable.Component();
+      let component = new Plottable.SVGComponent();
 
       group1.append(component);
-      group1.renderTo(svg);
-      group2.renderTo(svg);
+      group1.renderTo(div.node() as HTMLElement);
+      group2.renderTo(div.node() as HTMLElement);
 
       assert.strictEqual(group2.components().length, 0, "second group should have no component before movement");
       assert.strictEqual(group1.components().length, 1, "first group should have 1 component before movement");
@@ -162,22 +162,25 @@ describe("Group", () => {
       assert.strictEqual(group1.components().length, 0, "first group should have no components after movement");
       assert.strictEqual(component.parent(), group2, "component's parent after movement should be the group 2");
 
-      svg.remove();
+      div.remove();
     });
 
     it("destroy()s its Components when destroy()ed", () => {
-      let c1 = new Plottable.Component();
-      let c2 = new Plottable.Component();
+      let c1 = new Plottable.SVGComponent();
+      let c2 = new Plottable.SVGComponent();
       let group = new Plottable.Components.Group([c1, c2]);
 
+      let div = TestMethods.generateDIV();
       let svg = TestMethods.generateSVG();
-      group.renderTo(svg);
+
+      group.renderTo(div.node() as HTMLElement);
 
       group.destroy();
       // HACKHACK #2614: chai-assert.d.ts has the wrong signature
       (<any> assert).throws(() => c1.renderTo(svg), Error, "Can't reuse destroy()-ed Components!", "Component 1 was destroyed");
       (<any> assert).throws(() => c2.renderTo(svg), Error, "Can't reuse destroy()-ed Components!", "Component 2 was destroyed");
 
+      div.remove();
       svg.remove();
     });
   });
@@ -185,10 +188,10 @@ describe("Group", () => {
   describe("Layout", () => {
     let SVG_WIDTH = 400;
     let SVG_HEIGHT = 400;
-    let svg: SimpleSelection<void>;
+    let div: SimpleSelection<void>;
 
     beforeEach(() => {
-      svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+      div = TestMethods.generateDIV(SVG_WIDTH, SVG_HEIGHT);
     });
 
     it("requests no space when empty, but occupies all offered space", () => {
@@ -197,15 +200,15 @@ describe("Group", () => {
       let request = group.requestedSpace(SVG_WIDTH, SVG_HEIGHT);
       TestMethods.verifySpaceRequest(request, 0, 0, "empty Group doesn't request any space");
 
-      group.renderTo(svg);
+      group.renderTo(div.node() as HTMLElement);
       assert.strictEqual(group.width(), SVG_WIDTH, "occupies all offered width");
       assert.strictEqual(group.height(), SVG_HEIGHT, "occupies all offered height");
-      svg.remove();
+      div.remove();
     });
 
     it("requests space correctly when it contains a non-fixed-size Component", () => {
-      let c1 = new Plottable.Component();
-      let c2 = new Plottable.Component();
+      let c1 = new Plottable.SVGComponent();
+      let c2 = new Plottable.SVGComponent();
       let group = new Plottable.Components.Group([c1, c2]);
 
       let groupRequest = group.requestedSpace(SVG_WIDTH, SVG_HEIGHT);
@@ -214,10 +217,10 @@ describe("Group", () => {
       assert.isFalse(group.fixedWidth(), "width is not fixed if subcomponents are not fixed width");
       assert.isFalse(group.fixedHeight(), "height is not fixed if subcomponents are not fixed height");
 
-      group.renderTo(svg);
+      group.renderTo(div.node() as HTMLElement);
       assert.strictEqual(group.width(), SVG_WIDTH, "occupies all offered width");
       assert.strictEqual(group.height(), SVG_HEIGHT, "occupies all offered height");
-      svg.remove();
+      div.remove();
     });
 
     it("requests space correctly when it contains fixed-size Components", () => {
@@ -234,20 +237,20 @@ describe("Group", () => {
       assert.strictEqual(constrainedRequest.minWidth, SVG_WIDTH / 2, "requested enough space for widest Component");
       assert.strictEqual(constrainedRequest.minHeight, SVG_HEIGHT / 2, "requested enough space for tallest Component");
 
-      group.renderTo(svg);
+      group.renderTo(div.node() as HTMLElement);
       assert.strictEqual(group.width(), SVG_WIDTH, "occupies all offered width");
       assert.strictEqual(group.height(), SVG_HEIGHT, "occupies all offered height");
-      svg.remove();
+      div.remove();
     });
 
     it("allocates space to its Components correctly", () => {
       let FIXED_COMPONENT_SIZE = SVG_WIDTH / 4;
       let fixedComponent = new Mocks.FixedSizeComponent(FIXED_COMPONENT_SIZE, FIXED_COMPONENT_SIZE);
       fixedComponent.xAlignment("right").yAlignment("bottom");
-      let unfixedComponent = new Plottable.Component();
+      let unfixedComponent = new Plottable.SVGComponent();
 
       let group = new Plottable.Components.Group([fixedComponent, unfixedComponent]);
-      group.renderTo(svg);
+      group.renderTo(div.node() as HTMLElement);
 
       assert.strictEqual(fixedComponent.width(), FIXED_COMPONENT_SIZE, "fixed-size Component has correct width");
       assert.strictEqual(fixedComponent.height(), FIXED_COMPONENT_SIZE, "fixed-size Component has correct height");
@@ -265,7 +268,7 @@ describe("Group", () => {
       };
       TestMethods.assertPointsClose(expectedUnfixedOrigin, unfixedComponent.origin(), 1, "non-fixed-size Component has correct origin");
 
-      svg.remove();
+      div.remove();
     });
   });
 });

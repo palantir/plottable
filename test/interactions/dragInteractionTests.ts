@@ -29,8 +29,8 @@ describe("Interactions", () => {
       y: -SVG_HEIGHT / 2,
     };
 
+    let component: Plottable.SVGComponent;
     let svg: SimpleSelection<void>;
-    let component: Plottable.Component;
     let dragInteraction: Plottable.Interactions.Drag;
 
     interface DragTestCallback {
@@ -72,7 +72,7 @@ describe("Interactions", () => {
 
     beforeEach(() => {
       svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
-      component = new Plottable.Component();
+      component = new Plottable.SVGComponent();
       component.renderTo(svg);
 
       dragInteraction = new Plottable.Interactions.Drag();

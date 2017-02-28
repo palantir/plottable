@@ -3,7 +3,7 @@
  * @license MIT
  */
 
-import { Component } from "../components/component";
+import { IComponent } from "../components/abstractComponent";
 import { Point } from "../core/interfaces";
 import * as Dispatchers from "../dispatchers";
 import * as Utils from "../utils";
@@ -27,14 +27,14 @@ export class Click extends Interaction {
   private _touchEndCallback = (ids: number[], idToPoint: Point[], event: TouchEvent) => this._handleClickUp(idToPoint[ids[0]], event);
   private _touchCancelCallback = (ids: number[], idToPoint: Point[]) => this._clickedDown = false;
 
-  protected _anchor(component: Component) {
+  protected _anchor(component: IComponent<any>) {
     super._anchor(component);
 
-    this._mouseDispatcher = Dispatchers.Mouse.getDispatcher(<SVGElement> component.content().node());
+    this._mouseDispatcher = Dispatchers.Mouse.getDispatcher(component);
     this._mouseDispatcher.onMouseDown(this._mouseDownCallback);
     this._mouseDispatcher.onMouseUp(this._mouseUpCallback);
 
-    this._touchDispatcher = Dispatchers.Touch.getDispatcher(<SVGElement> component.content().node());
+    this._touchDispatcher = Dispatchers.Touch.getDispatcher(component);
     this._touchDispatcher.onTouchStart(this._touchStartCallback);
     this._touchDispatcher.onTouchEnd(this._touchEndCallback);
     this._touchDispatcher.onTouchCancel(this._touchCancelCallback);

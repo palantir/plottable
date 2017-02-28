@@ -1,16 +1,11 @@
-/**
- * Copyright 2014-present Palantir Technologies
- * @license MIT
- */
-
 import { SpaceRequest, Point } from "../core/interfaces";
 import * as Utils from "../utils";
 
-import { Component } from "./component";
+import { IComponent } from "./abstractComponent";
 import { ComponentContainer } from "./componentContainer";
 
 export class Group extends ComponentContainer {
-  private _components: Component[] = [];
+  private _components: IComponent<any>[] = [];
 
   /**
    * Constructs a Group.
@@ -21,25 +16,25 @@ export class Group extends ComponentContainer {
    * @constructor
    * @param {Component[]} [components=[]] Components to be added to the Group.
    */
-  constructor(components: Component[] = []) {
+  constructor(components: IComponent<any>[] = []) {
     super();
     this.addClass("component-group");
-    components.forEach((c: Component) => this.append(c));
+    components.forEach((c: IComponent<any>) => this.append(c));
   }
 
-  protected _forEach(callback: (component: Component) => any) {
+  protected _forEach(callback: (component: IComponent<any>) => any) {
     this.components().forEach(callback);
   }
 
   /**
    * Checks whether the specified Component is in the Group.
    */
-  public has(component: Component) {
+  public has(component: IComponent<any>) {
     return this._components.indexOf(component) >= 0;
   }
 
   public requestedSpace(offeredWidth: number, offeredHeight: number): SpaceRequest {
-    let requests = this._components.map((c: Component) => c.requestedSpace(offeredWidth, offeredHeight));
+    let requests = this._components.map((c: IComponent<any>) => c.requestedSpace(offeredWidth, offeredHeight));
     return {
       minWidth: Utils.Math.max<SpaceRequest, number>(requests, (request) => request.minWidth, 0),
       minHeight: Utils.Math.max<SpaceRequest, number>(requests, (request) => request.minHeight, 0),
@@ -72,7 +67,7 @@ export class Group extends ComponentContainer {
   /**
    * @return {Component[]} The Components in this Group.
    */
-  public components(): Component[] {
+  public components(): IComponent<any>[] {
     return this._components.slice();
   }
 
@@ -80,7 +75,7 @@ export class Group extends ComponentContainer {
    * Adds a Component to this Group.
    * The added Component will be rendered above Components already in the Group.
    */
-  public append(component: Component): this {
+  public append(component: IComponent<any>): this {
     if (component != null && !this.has(component)) {
       component.detach();
       this._components.push(component);
@@ -90,7 +85,7 @@ export class Group extends ComponentContainer {
     return this;
   }
 
-  protected _remove(component: Component) {
+  protected _remove(component: IComponent<any>) {
     let removeIndex = this._components.indexOf(component);
     if (removeIndex >= 0) {
       this._components.splice(removeIndex, 1);

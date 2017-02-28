@@ -5,7 +5,8 @@
 
 import * as d3 from "d3";
 
-import { Component, ComponentCallback } from "./component";
+import { GenericComponentCallback, IComponent } from "./abstractComponent";
+import { HTMLComponent } from "./htmlComponent";
 import { SimpleSelection } from "../core/interfaces";
 import { coerceExternalD3 } from "../utils/coerceD3";
 
@@ -13,18 +14,20 @@ import { coerceExternalD3 } from "../utils/coerceD3";
  * ComponentContainer class encapsulates Table and ComponentGroup's shared functionality.
  * It will not do anything if instantiated directly.
  */
-export class ComponentContainer extends Component {
-  private _detachCallback: ComponentCallback;
+export class ComponentContainer extends HTMLComponent {
+  private _detachCallback: GenericComponentCallback<any>;
 
   constructor() {
     super();
-    this._detachCallback = (component: Component) => this.remove(component);
+    this._detachCallback = (component: IComponent<any>) => this.remove(component);
   }
 
   public anchor(selection: SimpleSelection<void>) {
     selection = coerceExternalD3(selection);
     super.anchor(selection);
+
     this._forEach((c) => c.anchor(this.content()));
+
     return this;
   }
 
@@ -36,11 +39,11 @@ export class ComponentContainer extends Component {
   /**
    * Checks whether the specified Component is in the ComponentContainer.
    */
-  public has(component: Component): boolean {
+  public has(component: IComponent<any>): boolean {
     throw new Error("has() is not implemented on ComponentContainer");
   }
 
-  protected _adoptAndAnchor(component: Component) {
+  protected _adoptAndAnchor(component: IComponent<any>) {
     component.parent(this);
     component.onDetach(this._detachCallback);
     if (this._isAnchored) {
@@ -51,7 +54,7 @@ export class ComponentContainer extends Component {
   /**
    * Removes the specified Component from the ComponentContainer.
    */
-  public remove(component: Component) {
+  public remove(component: IComponent<any>) {
     if (this.has(component)) {
       component.offDetach(this._detachCallback);
       this._remove(component);
@@ -67,14 +70,14 @@ export class ComponentContainer extends Component {
    *
    * @return {boolean} true if the Component was successfully removed, false otherwise.
    */
-  protected _remove(component: Component) {
+  protected _remove(component: IComponent<any>) {
     return false;
   }
 
   /**
    * Invokes a callback on each Component in the ComponentContainer.
    */
-  protected _forEach(callback: (component: Component) => void) {
+  protected _forEach(callback: (component: IComponent<any>) => void) {
     throw new Error("_forEach() is not implemented on ComponentContainer");
   }
 
@@ -83,10 +86,10 @@ export class ComponentContainer extends Component {
    */
   public destroy() {
     super.destroy();
-    this._forEach((c: Component) => c.destroy());
+    this._forEach((c: IComponent<any>) => c.destroy());
   }
 
   public invalidateCache() {
-    this._forEach((c: Component) => c.invalidateCache());
+    this._forEach((c: IComponent<any>) => c.invalidateCache());
   }
 }

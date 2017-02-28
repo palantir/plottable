@@ -100,9 +100,9 @@ function renderPlots(plottablePlots){
   plottablePlots.forEach(function(plot){
     var plotDivName = "." + plot.constructor.name;
     var plotDiv = d3.select(plotDivName);
-    var box = plotDiv.append("svg").attr("height", plotheight).attr("width", plotwidth);
+    var box = plotDiv.append("div").style("height", `${plotheight}px`).style("width", `${plotwidth}px`);
     var chart = new Plottable.Components.Table([[plot]]);
-    chart.renderTo(box);
+    chart.renderTo(box.node());
   });
 }
 
@@ -254,7 +254,7 @@ function initialize(){
   plotwidth = Number(d3.select("#width").node().value);
   plotheight = Number(d3.select("#height").node().value);
 
-  d3.selectAll("svg").remove();
+  d3.selectAll(".single-plot div").remove();
   var dataArray = prepareData(seriesNumber);
   generatePlots(dataArray);
 }

@@ -3,7 +3,7 @@
  * @license MIT
  */
 
-import { Component } from "../components/component";
+import { IComponent } from "../components/abstractComponent";
 import { Point } from "../core/interfaces";
 import * as Dispatchers from "../dispatchers";
 import * as Utils from "../utils";
@@ -30,15 +30,15 @@ export class DoubleClick extends Interaction {
   private _touchEndCallback = (ids: number[], idToPoint: Point[]) => this._handleClickUp(idToPoint[ids[0]]);
   private _touchCancelCallback = (ids: number[], idToPoint: Point[]) => this._handleClickCancel();
 
-  protected _anchor(component: Component) {
+  protected _anchor(component: IComponent<any>) {
     super._anchor(component);
 
-    this._mouseDispatcher = Dispatchers.Mouse.getDispatcher(<SVGElement> component.content().node());
+    this._mouseDispatcher = Dispatchers.Mouse.getDispatcher(component);
     this._mouseDispatcher.onMouseDown(this._mouseDownCallback);
     this._mouseDispatcher.onMouseUp(this._mouseUpCallback);
     this._mouseDispatcher.onDblClick(this._dblClickCallback);
 
-    this._touchDispatcher = Dispatchers.Touch.getDispatcher(<SVGElement> component.content().node());
+    this._touchDispatcher = Dispatchers.Touch.getDispatcher(component);
     this._touchDispatcher.onTouchStart(this._touchStartCallback);
     this._touchDispatcher.onTouchEnd(this._touchEndCallback);
     this._touchDispatcher.onTouchCancel(this._touchCancelCallback);
@@ -58,19 +58,19 @@ export class DoubleClick extends Interaction {
   }
 
   private _handleClickDown(p: Point) {
-    let translatedP = this._translateToComponentSpace(p);
-    if (this._isInsideComponent(translatedP)) {
-      if (!(this._clickState === ClickState.SingleClicked) || !DoubleClick._pointsEqual(translatedP, this._clickedPoint)) {
+    let translatedPoint = this._translateToComponentSpace(p);
+    if (this._isInsideComponent(translatedPoint)) {
+      if (!(this._clickState === ClickState.SingleClicked) || !DoubleClick._pointsEqual(translatedPoint, this._clickedPoint)) {
         this._clickState = ClickState.NotClicked;
       }
-      this._clickedPoint = translatedP;
+      this._clickedPoint = translatedPoint;
       this._clickedDown = true;
     }
   }
 
   private _handleClickUp(p: Point) {
-    let translatedP = this._translateToComponentSpace(p);
-    if (this._clickedDown && DoubleClick._pointsEqual(translatedP, this._clickedPoint)) {
+    let translatedPoint = this._translateToComponentSpace(p);
+    if (this._clickedDown && DoubleClick._pointsEqual(translatedPoint, this._clickedPoint)) {
       this._clickState = this._clickState === ClickState.NotClicked ? ClickState.SingleClicked : ClickState.DoubleClicked;
     } else {
       this._clickState = ClickState.NotClicked;

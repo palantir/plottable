@@ -3,8 +3,10 @@
  * @license MIT
  */
 
+import { IComponent } from "../components";
 import { Point } from "../core/interfaces";
 import * as Utils from "../utils";
+import { getTranslator } from "../utils/translator";
 
 import { Dispatcher } from "./dispatcher";
 import * as Dispatchers from "./";
@@ -17,7 +19,7 @@ export class Touch extends Dispatcher {
   private static _TOUCHMOVE_EVENT_NAME = "touchmove";
   private static _TOUCHEND_EVENT_NAME = "touchend";
   private static _TOUCHCANCEL_EVENT_NAME = "touchcancel";
-  private _translator: Utils.ClientToSVGTranslator;
+  private _translator: Utils.Translator;
 
   /**
    * Gets a Touch Dispatcher for the <svg> containing elem.
@@ -26,13 +28,12 @@ export class Touch extends Dispatcher {
    * @param {SVGElement} elem
    * @return {Dispatchers.Touch}
    */
-  public static getDispatcher(elem: SVGElement): Dispatchers.Touch {
-    let svg = Utils.DOM.boundingSVG(elem);
-
-    let dispatcher: Dispatchers.Touch = (<any> svg)[Touch._DISPATCHER_KEY];
+  public static getDispatcher(component: IComponent<any>): Dispatchers.Touch {
+    let element  = Utils.Component.root(component).element().node();
+    let dispatcher: Dispatchers.Touch = (<any> element)[Touch._DISPATCHER_KEY];
     if (dispatcher == null) {
-      dispatcher = new Touch(svg);
-      (<any> svg)[Touch._DISPATCHER_KEY] = dispatcher;
+      dispatcher = new Touch(component);
+      (<any> element)[Touch._DISPATCHER_KEY] = dispatcher;
     }
     return dispatcher;
   }
@@ -43,19 +44,19 @@ export class Touch extends Dispatcher {
    * @constructor
    * @param {SVGElement} svg The root <svg> to attach to.
    */
-  constructor(svg: SVGElement) {
+  constructor(component: IComponent<any>) {
     super();
 
-    this._translator = Utils.ClientToSVGTranslator.getTranslator(svg);
+    this._translator = getTranslator(Utils.Component.root(component));
 
     this._eventToProcessingFunction[Touch._TOUCHSTART_EVENT_NAME] =
-      (e: TouchEvent) => this._measureAndDispatch(e, Touch._TOUCHSTART_EVENT_NAME, "page");
+      (e: TouchEvent) => this._measureAndDispatch(component, e, Touch._TOUCHSTART_EVENT_NAME, "page");
     this._eventToProcessingFunction[Touch._TOUCHMOVE_EVENT_NAME] =
-      (e: TouchEvent) => this._measureAndDispatch(e, Touch._TOUCHMOVE_EVENT_NAME, "page");
+      (e: TouchEvent) => this._measureAndDispatch(component, e, Touch._TOUCHMOVE_EVENT_NAME, "page");
     this._eventToProcessingFunction[Touch._TOUCHEND_EVENT_NAME] =
-      (e: TouchEvent) => this._measureAndDispatch(e, Touch._TOUCHEND_EVENT_NAME, "page");
+      (e: TouchEvent) => this._measureAndDispatch(component, e, Touch._TOUCHEND_EVENT_NAME, "page");
     this._eventToProcessingFunction[Touch._TOUCHCANCEL_EVENT_NAME] =
-      (e: TouchEvent) => this._measureAndDispatch(e, Touch._TOUCHCANCEL_EVENT_NAME, "page");
+      (e: TouchEvent) => this._measureAndDispatch(component, e, Touch._TOUCHCANCEL_EVENT_NAME, "page");
   }
 
   /**
@@ -150,13 +151,14 @@ export class Touch extends Dispatcher {
    * Computes the Touch position from the given event, and if successful
    * calls all the callbacks in the provided callbackSet.
    */
-  private _measureAndDispatch(event: TouchEvent, eventName: string, scope = "element") {
+  private _measureAndDispatch(component: IComponent<any>, event: TouchEvent, eventName: string, scope = "element") {
     if (scope !== "page" && scope !== "element") {
       throw new Error("Invalid scope '" + scope + "', must be 'element' or 'page'");
     }
-    if (scope === "element" && !this.eventInsideSVG(event)) {
+    if (scope === "element" && !this.eventInside(component, event)) {
       return;
     }
+
     let touches = event.changedTouches;
     let touchPositions: { [id: number]: Point; } = {};
     let touchIdentifiers: number[] = [];
@@ -175,7 +177,7 @@ export class Touch extends Dispatcher {
     }
   }
 
-  public eventInsideSVG(event: TouchEvent) {
-    return this._translator.insideSVG(event);
+  public eventInside(component: IComponent<any>, event: TouchEvent) {
+    return this._translator.isInside(component, event);
   }
 }

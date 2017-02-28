@@ -10,9 +10,9 @@ import { QuantitativeScale } from "../scales/quantitativeScale";
 import { ScaleCallback } from "../scales/scale";
 import { Point, SimpleSelection } from "../core/interfaces";
 
-import { Component } from "./component";
+import { SVGComponent } from "./svgComponent";
 
-export class Gridlines extends Component {
+export class Gridlines extends SVGComponent {
   private _xScale: QuantitativeScale<any>;
   private _yScale: QuantitativeScale<any>;
   private _xLinesContainer: SimpleSelection<void>;

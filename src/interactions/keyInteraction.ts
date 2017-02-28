@@ -3,7 +3,7 @@
  * @license MIT
  */
 
-import { Component } from "../components/component";
+import { IComponent } from "../components/abstractComponent";
 import { Point } from "../core/interfaces";
 import * as Dispatchers from "../dispatchers";
 import * as Utils from "../utils";
@@ -26,11 +26,9 @@ export class Key extends Interaction {
   private _keyDownCallback = (keyCode: number, event: KeyboardEvent) => this._handleKeyDownEvent(keyCode, event);
   private _keyUpCallback = (keyCode: number) => this._handleKeyUpEvent(keyCode);
 
-  protected _anchor(component: Component) {
+  protected _anchor(component: IComponent<any>) {
     super._anchor(component);
-    this._positionDispatcher = Dispatchers.Mouse.getDispatcher(
-      <SVGElement> (<any> this._componentAttachedTo)._element.node()
-    );
+    this._positionDispatcher = Dispatchers.Mouse.getDispatcher(component);
     this._positionDispatcher.onMouseMove(this._mouseMoveCallback);
 
     this._keyDispatcher = Dispatchers.Key.getDispatcher();

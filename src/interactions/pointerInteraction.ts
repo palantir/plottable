@@ -3,7 +3,7 @@
  * @license MIT
  */
 
-import { Component } from "../components/component";
+import { IComponent } from "../components/abstractComponent";
 import { Point } from "../core/interfaces";
 import * as Dispatchers from "../dispatchers";
 import * as Utils from "../utils";
@@ -25,12 +25,12 @@ export class Pointer extends Interaction {
   private _mouseMoveCallback = (p: Point, e: MouseEvent) => this._handleMouseEvent(p, e);
   private _touchStartCallback = (ids: number[], idToPoint: Point[], e: TouchEvent) => this._handleTouchEvent(idToPoint[ids[0]], e);
 
-  protected _anchor(component: Component) {
+  protected _anchor(component: IComponent<any>) {
     super._anchor(component);
-    this._mouseDispatcher = Dispatchers.Mouse.getDispatcher(<SVGElement> this._componentAttachedTo.content().node());
+    this._mouseDispatcher = Dispatchers.Mouse.getDispatcher(component);
     this._mouseDispatcher.onMouseMove(this._mouseMoveCallback);
 
-    this._touchDispatcher = Dispatchers.Touch.getDispatcher(<SVGElement> this._componentAttachedTo.content().node());
+    this._touchDispatcher = Dispatchers.Touch.getDispatcher(component);
     this._touchDispatcher.onTouchStart(this._touchStartCallback);
   }
 
@@ -44,12 +44,12 @@ export class Pointer extends Interaction {
   }
 
   private _handleMouseEvent(p: Point, e: MouseEvent) {
-    let insideSVG = this._mouseDispatcher.eventInsideSVG(e);
+    let insideSVG = this._mouseDispatcher.eventInside(this._componentAttachedTo, e);
     this._handlePointerEvent(p, insideSVG);
   }
 
   private _handleTouchEvent(p: Point, e: TouchEvent) {
-    let insideSVG = this._touchDispatcher.eventInsideSVG(e);
+    let insideSVG = this._touchDispatcher.eventInside(this._componentAttachedTo, e);
     this._handlePointerEvent(p, insideSVG);
   }
 

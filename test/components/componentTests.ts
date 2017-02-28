@@ -15,11 +15,11 @@ describe("Component", () => {
 
   describe("anchoring", () => {
 
-    let c: Plottable.Component;
+    let c: Plottable.SVGComponent;
     let svg: SimpleSelection<void>;
 
     beforeEach(() => {
-      c = new Plottable.Component();
+      c = new Plottable.SVGComponent();
       svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
     });
 
@@ -100,8 +100,8 @@ describe("Component", () => {
 
     it("can undergo set behavior upon anchoring", () => {
       let callbackCalled = false;
-      let passedComponent: Plottable.Component;
-      let callback = (component: Plottable.Component) => {
+      let passedComponent: Plottable.SVGComponent;
+      let callback = (component: Plottable.SVGComponent) => {
         callbackCalled = true;
         passedComponent = component;
       };
@@ -116,8 +116,8 @@ describe("Component", () => {
 
     it("undergoes on-anchor behavior if already anchored", () => {
       let callbackCalled = false;
-      let passedComponent: Plottable.Component;
-      let callback = (component: Plottable.Component) => {
+      let passedComponent: Plottable.SVGComponent;
+      let callback = (component: Plottable.SVGComponent) => {
         callbackCalled = true;
         passedComponent = component;
       };
@@ -131,8 +131,8 @@ describe("Component", () => {
 
     it("calls callbacks upon anchoring to different svg", () => {
       let callbackCalled = false;
-      let passedComponent: Plottable.Component;
-      let callback = (component: Plottable.Component) => {
+      let passedComponent: Plottable.SVGComponent;
+      let callback = (component: Plottable.SVGComponent) => {
         callbackCalled = true;
         passedComponent = component;
       };
@@ -152,7 +152,7 @@ describe("Component", () => {
 
     it("can remove set behavior the component would have underwent upon anchoring", () => {
       let callbackCalled = false;
-      let callback = (component: Plottable.Component) => {
+      let callback = (component: Plottable.SVGComponent) => {
         callbackCalled = true;
       };
       c.onAnchor(callback);
@@ -167,11 +167,11 @@ describe("Component", () => {
 
   describe("detaching", () => {
 
-    let c: Plottable.Component;
+    let c: Plottable.SVGComponent;
     let svg: SimpleSelection<void>;
 
     beforeEach(() => {
-      c = new Plottable.Component();
+      c = new Plottable.SVGComponent();
       svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
     });
 
@@ -204,8 +204,8 @@ describe("Component", () => {
       c.renderTo(svg);
 
       let callbackCalled = false;
-      let passedComponent: Plottable.Component;
-      let callback = (component: Plottable.Component) => {
+      let passedComponent: Plottable.SVGComponent;
+      let callback = (component: Plottable.SVGComponent) => {
         callbackCalled = true;
         passedComponent = component;
       };
@@ -219,8 +219,8 @@ describe("Component", () => {
 
     it("calls callbacks upon detaching even if not anchored", () => {
       let callbackCalled = false;
-      let passedComponent: Plottable.Component;
-      let callback = (component: Plottable.Component) => {
+      let passedComponent: Plottable.SVGComponent;
+      let callback = (component: Plottable.SVGComponent) => {
         callbackCalled = true;
         passedComponent = component;
       };
@@ -235,7 +235,7 @@ describe("Component", () => {
 
     it("can remove callbacks that would have been called upon detaching", () => {
       let callbackCalled = false;
-      let callback = (component: Plottable.Component) => {
+      let callback = (component: Plottable.SVGComponent) => {
         callbackCalled = true;
       };
       c.onDetach(callback);
@@ -250,11 +250,11 @@ describe("Component", () => {
 
   describe("parent container", () => {
 
-    let c: Plottable.Component;
+    let c: Plottable.SVGComponent;
     let svg: SimpleSelection<void>;
 
     beforeEach(() => {
-      c = new Plottable.Component();
+      c = new Plottable.SVGComponent();
       svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
     });
 
@@ -270,7 +270,7 @@ describe("Component", () => {
 
     it("throws an error when the input parent does not contain this component", () => {
       let rejectingContainer: any = {
-        has: (component: Plottable.Component) => false,
+        has: (component: Plottable.SVGComponent) => false,
       };
       // HACKHACK: https://github.com/palantir/plottable/issues/2661 Cannot assert errors being thrown with description
       (<any> assert).throws(() => c.parent(rejectingContainer), Error,
@@ -282,11 +282,11 @@ describe("Component", () => {
 
   describe("css classes", () => {
 
-    let c: Plottable.Component;
+    let c: Plottable.SVGComponent;
     let svg: SimpleSelection<void>;
 
     beforeEach(() => {
-      c = new Plottable.Component();
+      c = new Plottable.SVGComponent();
       svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
     });
 
@@ -321,11 +321,14 @@ describe("Component", () => {
 
   describe("computing the layout", () => {
 
-    let c: Plottable.Component;
+    let c: Plottable.SVGComponent;
+    let d: Plottable.Components.Group;
     let svg: SimpleSelection<void>;
 
     beforeEach(() => {
-      c = new Plottable.Component();
+      c = new Plottable.SVGComponent();
+      d = new Plottable.Components.Group();
+
       svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
     });
 
@@ -408,6 +411,7 @@ describe("Component", () => {
 
     it("requires arguments when not anchored directly under the svg", () => {
       const g = svg.append("g");
+      d.append(c);
       c.anchor(g);
       // HACKHACK: https://github.com/palantir/plottable/issues/2661 Cannot assert errors being thrown with description
       (<any> assert).throws(() => c.computeLayout(), "null arguments",
@@ -418,8 +422,8 @@ describe("Component", () => {
     it("requires arguments if not anchored directly under the svg, even if previously anchored directly under the svg", () => {
       c.anchor(svg);
       c.detach();
-      const g = svg.append("g");
-      c.anchor(g);
+      d.append(c);
+      c.anchor(svg);
       // HACKHACK: https://github.com/palantir/plottable/issues/2661 Cannot assert errors being thrown with description
       (<any> assert).throws(() => c.computeLayout(), "null arguments",
         "cannot compute layout with no arguments and not being the top svg element");
@@ -495,7 +499,7 @@ describe("Component", () => {
 
   describe("computing the layout when of fixed size", () => {
 
-    let c: Plottable.Component;
+    let c: Plottable.SVGComponent;
     let svg: SimpleSelection<void>;
     let fixedWidth = 100;
     let fixedHeight = 100;
@@ -525,26 +529,30 @@ describe("Component", () => {
     });
 
     it("does not translate if more space was requested than offered", () => {
+      const div = TestMethods.generateDIV(SVG_WIDTH, SVG_HEIGHT);
+
       let requestedWidth = SVG_WIDTH * 2;
       let requestedHeight = SVG_HEIGHT * 2;
       c.destroy();
       c = new Mocks.FixedSizeComponent(requestedWidth, requestedHeight);
       let t = new Plottable.Components.Table([[c]]);
-      t.renderTo(svg);
+      t.renderTo(div.node() as HTMLElement);
 
-      let componentElement = svg.select(".component");
+      let componentElement = div.select(".component");
       assert.deepEqual(TestMethods.getTranslate(componentElement), [0, 0], "the element was not translated");
+
+      div.remove();
       svg.remove();
     });
   });
 
   describe("aligning", () => {
 
-    let c: Plottable.Component;
+    let c: Plottable.SVGComponent;
     let svg: SimpleSelection<void>;
 
     beforeEach(() => {
-      c = new Plottable.Component();
+      c = new Plottable.SVGComponent();
       svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
     });
 
@@ -581,7 +589,7 @@ describe("Component", () => {
 
   describe("aligning when of fixed size", () => {
 
-    let c: Plottable.Component;
+    let c: Plottable.SVGComponent;
     let svg: SimpleSelection<void>;
     let fixedWidth = 100;
     let fixedHeight = 100;
@@ -617,11 +625,11 @@ describe("Component", () => {
 
   describe("calculating the minimum requested space", () => {
 
-    let c: Plottable.Component;
+    let c: Plottable.SVGComponent;
     let svg: SimpleSelection<void>;
 
     beforeEach(() => {
-      c = new Plottable.Component();
+      c = new Plottable.SVGComponent();
       svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
     });
 
@@ -637,11 +645,11 @@ describe("Component", () => {
 
   describe("destroying", () => {
 
-    let c: Plottable.Component;
+    let c: Plottable.SVGComponent;
     let svg: SimpleSelection<void>;
 
     beforeEach(() => {
-      c = new Plottable.Component();
+      c = new Plottable.SVGComponent();
       svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
     });
 
@@ -668,11 +676,11 @@ describe("Component", () => {
 
   describe("rendering on the anchored svg", () => {
 
-    let c: Plottable.Component;
+    let c: Plottable.SVGComponent;
     let svg: SimpleSelection<void>;
 
     beforeEach(() => {
-      c = new Plottable.Component();
+      c = new Plottable.SVGComponent();
       svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
     });
 
@@ -720,13 +728,13 @@ describe("Component", () => {
 
   describe("rendering to a DOM node", () => {
 
-    let c: Plottable.Component;
+    let c: Plottable.SVGComponent;
     let svg: SimpleSelection<void>;
     let renderFlag: boolean;
 
     beforeEach(() => {
       renderFlag = false;
-      c = new Plottable.Component();
+      c = new Plottable.SVGComponent();
       svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
       c.renderImmediately = () => {
         renderFlag = true;
@@ -749,6 +757,8 @@ describe("Component", () => {
     });
 
     it("only computes layout once", (done) => {
+      const div = TestMethods.generateDIV(SVG_WIDTH, SVG_HEIGHT);
+
       // use async rendering so flushing doesn't happen immediately
       Plottable.RenderController.renderPolicy(Plottable.RenderController.Policy.ANIMATION_FRAME);
       // set up a bar plot with a color scale
@@ -768,11 +778,12 @@ describe("Component", () => {
       const table = new Plottable.Components.Table([[barPlot, legend]]);
       const computeLayoutSpy = sinon.spy(table, "computeLayout");
 
-      table.renderTo(svg);
+      table.renderTo(div.node() as HTMLElement);
 
       assert.strictEqual(computeLayoutSpy.callCount, 1, "component only computes layout once");
       table.destroy();
       svg.remove();
+      div.remove();
       done();
     });
 
@@ -795,7 +806,7 @@ describe("Component", () => {
     });
 
     it("renders to a node chosen through DOM element", () => {
-      c.renderTo(<Element> svg.node());
+      c.renderTo(svg);
       assert.isTrue(svg.classed("plottable"), "correct svg chosen");
       assert.isTrue(renderFlag, "component has rendered");
       c.destroy();
@@ -805,17 +816,19 @@ describe("Component", () => {
     it("errors on inputs that do not evaluate to an SVG element", () => {
       let parent = TestMethods.getSVGParent();
       let div = parent.append("div");
+
       // HACKHACK #2614: chai-assert.d.ts has the wrong signature
       (<any> assert).throws(() => c.renderTo(div), Error,
         "Plottable requires a valid SVG to renderTo", "rejects selections that don't contain svgs");
-      (<any> assert).throws(() => c.renderTo(<Element> div.node()), Error,
+      (<any> assert).throws(() => c.renderTo(div), Error,
         "Plottable requires a valid SVG to renderTo", "rejects DOM nodes that are not svgs");
       (<any> assert).throws(() => c.renderTo("#not-an-element"), Error,
         "Plottable requires a valid SVG to renderTo", "rejects strings that don't correspond to DOM elements");
       (<any> assert).throws(() => c.renderTo(d3.select(null) as any), Error,
         "Plottable requires a valid SVG to renderTo", "rejects empty d3 selections");
-      div.remove();
+
       c.destroy();
+      div.remove();
       svg.remove();
     });
 
@@ -841,23 +854,24 @@ describe("Component", () => {
 
   describe("calculating the origin in relation to the svg", () => {
 
-    let c: Plottable.Component;
+    let c: Plottable.SVGComponent;
     let svg: SimpleSelection<void>;
 
     beforeEach(() => {
-      c = new Plottable.Component();
+      c = new Plottable.SVGComponent();
       svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
     });
 
     it("returns origin without a parent", () => {
-      assert.deepEqual(c.originToSVG(), c.origin(), "same as origin with no parent");
+      assert.deepEqual(Plottable.Utils.Component.originToRoot(c), c.origin(), "same as origin with no parent");
       c.destroy();
       svg.remove();
     });
 
     it("is offset by the parent's origin", () => {
+      const div = TestMethods.generateDIV(SVG_WIDTH, SVG_HEIGHT);
       let parent = new Plottable.Components.Group([c]);
-      parent.anchor(svg);
+      parent.anchor(div);
       c.anchor(svg);
       parent.computeLayout({x: SVG_WIDTH / 4, y: SVG_HEIGHT / 4}, SVG_WIDTH / 2, SVG_HEIGHT / 2);
       c.computeLayout({x: SVG_WIDTH / 4, y: SVG_HEIGHT / 4}, SVG_WIDTH / 4, SVG_HEIGHT / 4);
@@ -865,26 +879,27 @@ describe("Component", () => {
         x: parent.origin().x + c.origin().x,
         y: parent.origin().y + c.origin().y,
       };
-      assert.deepEqual(c.originToSVG(), originToSvg, "origin offsetted by parents");
+      assert.deepEqual(Plottable.Utils.Component.originToRoot(c), originToSvg, "origin offsetted by parents");
       parent.destroy();
       c.destroy();
       svg.remove();
+      div.remove();
     });
   });
 
   describe("calculating the bounds", () => {
-    let c: Plottable.Component;
+    let c: Plottable.SVGComponent;
     let svg: SimpleSelection<void>;
 
     beforeEach(() => {
-      c = new Plottable.Component();
+      c = new Plottable.SVGComponent();
       svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
       c.anchor(svg);
       c.computeLayout();
     });
 
     it("calculates the bounds relative to the origin", () => {
-      assert.deepEqual(c.bounds(), {
+      assert.deepEqual(Plottable.Utils.Component.bounds(c), {
         topLeft: c.origin(),
         bottomRight: { x: SVG_WIDTH, y: SVG_HEIGHT }
       });
@@ -895,11 +910,11 @@ describe("Component", () => {
 
   describe("restricting rendering through clipPath", () => {
 
-    let clippedComponent: Plottable.Component;
+    let clippedComponent: Plottable.SVGComponent;
     let svg: SimpleSelection<void>;
 
     beforeEach(() => {
-      clippedComponent = new Plottable.Component();
+      clippedComponent = new Plottable.SVGComponent();
       // HACKHACK #2777: Can't use a Mocks Compnoent here because they descend from a different Plottable,
       // which has the wrong RenderPolicy in coverage.html
       (<any> clippedComponent)._clipPathEnabled = true;
@@ -952,12 +967,12 @@ describe("Component", () => {
     let backingClass: string;
 
     before(() => {
-      backingClass = <string> (<any> Plottable.Component)._SAFARI_EVENT_BACKING_CLASS;
+      backingClass = <string> (<any> Plottable.SVGComponent)._SAFARI_EVENT_BACKING_CLASS;
       assert.strictEqual(typeof(backingClass), "string", "test battery was able to extract backing CSS class");
     });
 
     it("adds an transparent backing rectangle if it is the root Component", () => {
-      const component = new Plottable.Component();
+      const component = new Plottable.SVGComponent();
       const svg = TestMethods.generateSVG();
       component.anchor(svg);
 
@@ -973,7 +988,7 @@ describe("Component", () => {
     });
 
     it("resizes the backing when the SVG size changes", () => {
-      const component = new Plottable.Component();
+      const component = new Plottable.SVGComponent();
       const svg = TestMethods.generateSVG();
       component.anchor(svg);
 
@@ -993,7 +1008,7 @@ describe("Component", () => {
     });
 
     it("only adds the backing once", () => {
-      const component = new Plottable.Component();
+      const component = new Plottable.SVGComponent();
       const svg = TestMethods.generateSVG();
       component.anchor(svg);
       component.anchor(svg);
@@ -1004,19 +1019,8 @@ describe("Component", () => {
       svg.remove();
     });
 
-    it("doesn't add a backing if it's not the root Component", () => {
-      const component = new Plottable.Component();
-      const svg = TestMethods.generateSVG();
-      const g = svg.append("g");
-      component.anchor(g);
-
-      const backing = svg.select(`.${backingClass}`);
-      assert.isTrue(backing.empty(), "did not add a backing element");
-      svg.remove();
-    });
-
     it("removes the backing when detached", () => {
-      const component = new Plottable.Component();
+      const component = new Plottable.SVGComponent();
       const svg = TestMethods.generateSVG();
       component.anchor(svg);
       component.detach();
@@ -1026,24 +1030,8 @@ describe("Component", () => {
       svg.remove();
     });
 
-    it("doesn't add the backing even if it was previously the root Component", () => {
-      const component = new Plottable.Component();
-      const svg = TestMethods.generateSVG();
-      component.anchor(svg);
-      const backingAsRoot = svg.select(`.${backingClass}`);
-      assert.isFalse(backingAsRoot.empty(), "backing was added when Component was root");
-
-      component.detach(); // HACKHACK #3013: need to detach before re-anchoring()
-      const g = svg.append("g");
-      component.anchor(g);
-      const backingNotAsRoot = svg.select(`.${backingClass}`);
-      assert.isTrue(backingNotAsRoot.empty(), "backing element was removed");
-
-      svg.remove();
-    });
-
     it("will add a backing even if it's not the first root Component anchored to an svg", () => {
-      const component = new Plottable.Component();
+      const component = new Plottable.SVGComponent();
       const svg = TestMethods.generateSVG();
       component.anchor(svg);
       component.detach(); // HACKHACK #3013: need to detach before re-anchoring()
@@ -1051,7 +1039,7 @@ describe("Component", () => {
       const backingWithoutComponents = svg.select(`.${backingClass}`);
       assert.isTrue(backingWithoutComponents.empty(), "no backing with no Components");
 
-      const component2 = new Plottable.Component();
+      const component2 = new Plottable.SVGComponent();
       component2.anchor(svg);
       const backingWithNewRoot = svg.select(`.${backingClass}`);
       assert.isFalse(backingWithNewRoot.empty(), "new root Component recreated backing");

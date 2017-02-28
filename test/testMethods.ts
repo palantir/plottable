@@ -3,7 +3,13 @@ import { assert } from "chai";
 import * as d3 from "d3";
 
 import * as Plottable from "../src";
+import { IComponent } from "../src/components";
 import { getTranslateValues } from "../src/utils/domUtils";
+
+export function generateDIV(width = 400, height = 400): d3.Selection<HTMLDivElement, void | {}, any, any> {
+  let parent = getSVGParent();
+  return parent.append<HTMLDivElement>("div").style("width", `${width}px`).style("height", `${height}px`).attr("class", "div");
+}
 
 export function generateSVG(width = 400, height = 400): d3.Selection<SVGSVGElement, void | {}, any, any> {
   let parent = getSVGParent();
@@ -21,9 +27,9 @@ export function getSVGParent(): SimpleSelection<void> {
   }
 }
 
-export function isInDOM(component: Plottable.Component) {
+export function isInDOM(component: IComponent<any>) {
   let contentNode = component.content().node();
-  return contentNode != null && Plottable.Utils.DOM.boundingSVG(<SVGElement> contentNode) != null;
+  return contentNode != null && Plottable.Utils.DOM.contains(document.body, contentNode as Element);
 };
 
 export function verifySpaceRequest(sr: Plottable.SpaceRequest, expectedMinWidth: number, expectedMinHeight: number, message: string) {
@@ -31,7 +37,7 @@ export function verifySpaceRequest(sr: Plottable.SpaceRequest, expectedMinWidth:
   assert.strictEqual(sr.minHeight, expectedMinHeight, message + " (space request: minHeight)");
 }
 
-export function fixComponentSize(c: Plottable.Component, fixedWidth?: number, fixedHeight?: number): Plottable.Component {
+export function fixComponentSize(c: Plottable.SVGComponent, fixedWidth?: number, fixedHeight?: number): Plottable.SVGComponent {
   c.requestedSpace = function (w, h) {
     return {
       minWidth: fixedWidth == null ? 0 : fixedWidth,
@@ -43,8 +49,8 @@ export function fixComponentSize(c: Plottable.Component, fixedWidth?: number, fi
   return c;
 }
 
-export function makeFixedSizeComponent(fixedWidth?: number, fixedHeight?: number): Plottable.Component {
-  return fixComponentSize(new Plottable.Component(), fixedWidth, fixedHeight);
+export function makeFixedSizeComponent(fixedWidth?: number, fixedHeight?: number): Plottable.SVGComponent {
+  return fixComponentSize(new Plottable.SVGComponent(), fixedWidth, fixedHeight);
 }
 
 // TODO deprecate
@@ -110,8 +116,8 @@ export function assertLineAttrs(line: SimpleSelection<void>,
   assert.closeTo(numAttr(line, "y2"), expectedAttrs.y2, floatingPointError, message + " (y2)");
 }
 
-export function assertEntitiesEqual(actual: Plottable.Entity<Plottable.Component>,
-                                    expected: Plottable.Entity<Plottable.Component>,
+export function assertEntitiesEqual(actual: Plottable.Entity<Plottable.SVGComponent>,
+                                    expected: Plottable.Entity<Plottable.SVGComponent>,
                                     msg: string) {
   assert.deepEqual(actual.datum, expected.datum, msg + " (datum)");
   assertPointsClose(actual.position, expected.position, 0.01, msg);
@@ -168,6 +174,10 @@ export function decomposePath(normalizedPathString: string) {
       arguments: argumentStrings[index].split(",").filter((s) => s !== "").map((s) => parseFloat(s)),
     };
   });
+}
+
+export function numStyle(s: HTMLElement, a: string) {
+  return parseFloat((s.style as any)[a]);
 }
 
 export function numAttr(s: SimpleSelection<void>, a: string) {
@@ -358,7 +368,7 @@ function tokenizePathString(pathString: string) {
   return numbers;
 }
 
-export function verifyClipPath(c: Plottable.Component) {
+export function verifyClipPath(c: Plottable.SVGComponent) {
   let clipPathId = (<any>c)._boxContainer.node().firstChild.id;
   let expectedPrefix = /MSIE [5-9]/.test(navigator.userAgent) ? "" : document.location.href;
   expectedPrefix = expectedPrefix.replace(/#.*/g, "");

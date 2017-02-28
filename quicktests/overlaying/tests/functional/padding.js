@@ -3,7 +3,7 @@ function makeData() {
   return [makeRandomData(50), makeRandomData(50)];
 }
 
-function run(svg, data, Plottable) {
+function run(container, data, Plottable) {
   "use strict";
 
   var dataseries1 = new Plottable.Dataset(data[0].slice(0, 10));
@@ -100,7 +100,7 @@ function run(svg, data, Plottable) {
                                                     [null, labelTable]
                                                   ]);
 
-  basicTable.renderTo(svg);
+  basicTable.renderTo(container);
   colorPoints();
 
   new Plottable.Interactions.Click().onClick(addBigVal).attachTo(addBig);

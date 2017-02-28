@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script src="../../node_modules/jquery/dist/jquery.js" charset="utf-8"></script>
+    <script src="../../node_modules/d3/d3.js" charset="utf-8"></script>
+    <script src="../exampleUtil.js"></script>
+    <link rel="stylesheet" type="text/css" href="../../plottable.css">
+    <script src="../../plottable.js"></script>
+    <style>
+        svg.plottable {
+            background: white;
+            display: inline-block;
+        }
+
+        .plottable .axis line.tick-mark,
+        .plottable .axis line.baseline {
+            stroke: #f00;
+        }
+
+        body {
+            background: #F3F3F3;
+        }
+
+        .bigdiv {
+            padding: 20px;
+        }
+    </style>
+
+    <title>Max Label Width</title>
+</head>
+
+<body>
+    <h1>SVG Component</h1>
+    <svg id="svg-component"></svg>
+    <h1>HTML Component</h1>
+    <div id="html-component" style="height: 150px"></div>
+    <h1> Nested Table SVG Component </h1>
+    <svg id="svg-nested-table-component" height="300"></svg>
+    <h1> Nested Table HTML Component </h1>
+    <div id="html-nested-table-component" style="height: 300px"></div>
+    <h1> SVG Group </h1>
+    <svg id="svg-group" height="300"></svg>
+    <h1> HTML Group <h1>
+    <div id="html-group" style="height: 300px;"></div>
+    <script>
+
+function makeBasicChart() {
+
+  var xScale = new Plottable.Scales.Linear();
+  var yScale = new Plottable.Scales.Linear();
+
+  var xAxis = new Plottable.Axes.Numeric(xScale, "bottom");
+  var yAxis = new Plottable.Axes.Numeric(yScale, "left");
+
+  var plot = new Plottable.Plots.Line();
+  plot.x(function(d) { return d.x; }, xScale);
+  plot.y(function(d) { return d.y; }, yScale);
+
+  var data = [
+    { "x": 0, "y": 1 },
+    { "x": 1, "y": 2 },
+    { "x": 2, "y": 4 },
+    { "x": 3, "y": 8 }
+  ];
+
+  var dataset = new Plottable.Dataset(data);
+  plot.addDataset(dataset);
+
+  return [
+    [yAxis, plot],
+    [null, xAxis]
+  ];
+}
+
+function create2By2Table(chartBuilder, type, nesting) {
+    if (nesting === 0) {
+        if (type === "html") {
+            const topLeftHTMLChart = new Plottable.Components.HTMLTable(chartBuilder());
+            const topRightHTMLChart = new Plottable.Components.HTMLTable(chartBuilder());
+            const bottomLeftHTMLChart = new Plottable.Components.HTMLTable(chartBuilder());
+            const bottomRightHTMLChart = new Plottable.Components.HTMLTable(chartBuilder());
+
+            return new Plottable.Components.HTMLTable([
+                [topLeftHTMLChart, topRightHTMLChart],
+                [bottomLeftHTMLChart, bottomRightHTMLChart]
+            ]);
+        } else {
+            const topLeftChart = new Plottable.Components.Table(chartBuilder());
+            const topRightChart = new Plottable.Components.Table(chartBuilder());
+            const bottomLeftChart = new Plottable.Components.Table(chartBuilder());
+            const bottomRightChart = new Plottable.Components.Table(chartBuilder());
+
+            return new Plottable.Components.Table([
+                [topLeftChart, topRightChart],
+                [bottomLeftChart, bottomRightChart]
+            ]);
+        }
+
+    } else if (type === "html") {
+        return new Plottable.Components.HTMLTable([
+            [create2By2Table(chartBuilder, type, nesting - 1), create2By2Table(chartBuilder, type, nesting - 1)],
+            [create2By2Table(chartBuilder, type, nesting - 1), create2By2Table(chartBuilder, type, nesting - 1)],
+        ]);
+    } else {
+        return new Plottable.Components.Table([
+            [create2By2Table(chartBuilder, type, nesting - 1), create2By2Table(chartBuilder, type, nesting - 1)],
+            [create2By2Table(chartBuilder, type, nesting - 1), create2By2Table(chartBuilder, type, nesting - 1)],
+        ]);
+    }
+}
+
+function makeBasicGroup() {
+  var xScale = new Plottable.Scales.Linear();
+  var yScale = new Plottable.Scales.Linear();
+
+  var line = new Plottable.Plots.Line();
+  line.x(function(d) { return d.x; }, xScale);
+  line.y(function(d) { return d.y; }, yScale);
+
+  var scatter = new Plottable.Plots.Scatter();
+  scatter.x(function(d) { return d.x; }, xScale);
+  scatter.y(function(d) { return d.y; }, yScale);
+
+  var data = [
+    { "x": 0, "y": 1 },
+    { "x": 1, "y": 2 },
+    { "x": 2, "y": 4 },
+    { "x": 3, "y": 8 }
+  ];
+
+  var dataset1 = new Plottable.Dataset(data);
+  var dataset2 = new Plottable.Dataset(data);
+
+  line.addDataset(dataset1);
+  scatter.addDataset(dataset2);
+
+  return [line, scatter];
+}
+
+$(document).ready(function() {
+  const chart = new Plottable.Components.Table(makeBasicChart());
+  const htmlChart= new Plottable.Components.HTMLTable(makeBasicChart());
+  const nestedSVGChart = create2By2Table(makeBasicChart, "svg", 1);
+  const nestedHTMLChart = create2By2Table(makeBasicChart, "html", 1);
+
+  chart.renderTo("svg#svg-component");
+  htmlChart.renderTo(document.getElementById("html-component"));
+  nestedSVGChart.renderTo("svg#svg-nested-table-component");
+  nestedHTMLChart.renderTo(document.getElementById("html-nested-table-component"));
+
+  const group = new Plottable.Components.Group(makeBasicGroup());
+  group.renderTo("svg#svg-group");
+
+  const htmlGroup = new Plottable.Components.HTMLGroup(makeBasicGroup());
+  htmlGroup.renderTo(document.getElementById("html-group"));
+});
+    </script>
+</body>
+</html>

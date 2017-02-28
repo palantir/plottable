@@ -7,7 +7,7 @@
 import * as d3 from "d3";
 import * as SVGTypewriter from "svg-typewriter";
 
-import { Component } from "../components/component";
+import { SVGComponent } from "../components/svgComponent";
 import { Scale, ScaleCallback } from "../scales/scale";
 import { Formatter } from "../core/formatters";
 import * as Formatters from "../core/formatters";
@@ -16,7 +16,7 @@ import * as Utils from "../utils";
 
 export type AxisOrientation =  "bottom" | "left" | "right" | "top";
 
-export class Axis<D> extends Component {
+export class Axis<D> extends SVGComponent {
   /**
    * The css class applied to each end tick mark (the line on the end tick).
    */

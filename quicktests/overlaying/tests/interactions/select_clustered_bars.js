@@ -8,7 +8,7 @@ function makeData() {
   return [data1, data2, data3];
 }
 
-function run(svg, data, Plottable) {
+function run(container, data, Plottable) {
   "use strict";
 
   var xScale = new Plottable.Scales.Category();
@@ -26,7 +26,7 @@ function run(svg, data, Plottable) {
 
   new Plottable.Components.Table([
                                   [yAxis, barPlot],
-                                  [null,  xAxis]]).renderTo(svg);
+                                  [null,  xAxis]]).renderTo(container);
 
   var clickInteraction = new Plottable.Interactions.Click();
   clickInteraction.attachTo(barPlot);

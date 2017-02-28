@@ -6,7 +6,7 @@ function makeData() {
   return data;
 }
 
-function run(svg, data, Plottable) {
+function run(container, data, Plottable) {
   "use strict";
   var doAnimate = true;
   var xScale = new Plottable.Scales.Time();
@@ -28,7 +28,7 @@ function run(svg, data, Plottable) {
 
   var lineChart = new Plottable.Components.Table([[yAxis, lineRenderer],
                                                  [null,  xAxis]]);
-  lineChart.renderTo(svg);
+  lineChart.renderTo(container);
 
   var cb = function(){
     var d = dataset.data();

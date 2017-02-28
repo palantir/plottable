@@ -8,7 +8,7 @@ function makeData() {
   return [data1, data2, data3];
 }
 
-function run(svg, data, Plottable) {
+function run(container, data, Plottable) {
   "use strict";
   var xScale1 = new Plottable.Scales.Category();
   var yScale1 = new Plottable.Scales.ModifiedLog();
@@ -67,5 +67,5 @@ function run(svg, data, Plottable) {
     [chart2]
     ]);
 
-  finalchart.renderTo(svg);
+  finalchart.renderTo(container);
 }

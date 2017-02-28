@@ -5,7 +5,7 @@
 
 import * as d3 from "d3";
 
-import { Component } from "../components/component";
+import { IComponent } from "../components/abstractComponent";
 import { Point } from "../core/interfaces";
 import * as Dispatchers from "../dispatchers";
 import * as Scales from "../scales";
@@ -126,14 +126,14 @@ export class PanZoom extends Interaction {
     });
   }
 
-  protected _anchor(component: Component) {
+  protected _anchor(component: IComponent<any>) {
     super._anchor(component);
     this._dragInteraction.attachTo(component);
 
-    this._mouseDispatcher = Dispatchers.Mouse.getDispatcher(<SVGElement> this._componentAttachedTo.content().node());
+    this._mouseDispatcher = Dispatchers.Mouse.getDispatcher(component);
     this._mouseDispatcher.onWheel(this._wheelCallback);
 
-    this._touchDispatcher = Dispatchers.Touch.getDispatcher(<SVGElement> this._componentAttachedTo.content().node());
+    this._touchDispatcher = Dispatchers.Touch.getDispatcher(component);
     this._touchDispatcher.onTouchStart(this._touchStartCallback);
     this._touchDispatcher.onTouchMove(this._touchMoveCallback);
     this._touchDispatcher.onTouchEnd(this._touchEndCallback);

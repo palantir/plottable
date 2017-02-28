@@ -12,13 +12,13 @@ describe("Interactions", () => {
     let clickedPoint: Plottable.Point;
     let svg: SimpleSelection<void>;
     let doubleClickInteraction: Plottable.Interactions.DoubleClick;
-    let component: Plottable.Component;
+    let component: Plottable.SVGComponent;
 
     beforeEach(() => {
       const svgWidth = 400;
       const svgHeight = 400;
       svg = TestMethods.generateSVG(svgWidth, svgHeight);
-      component = new Plottable.Component();
+      component = new Plottable.SVGComponent();
       component.renderTo(svg);
 
       doubleClickInteraction = new Plottable.Interactions.DoubleClick();

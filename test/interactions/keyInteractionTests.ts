@@ -45,7 +45,7 @@ describe("Interactions", () => {
 
         beforeEach(() => {
           svg = TestMethods.generateSVG();
-          let component = new Plottable.Component().renderTo(svg);
+          let component = new Plottable.SVGComponent().renderTo(svg);
           eventTarget = component.background();
           keyInteraction = new Plottable.Interactions.Key();
           keyInteraction.attachTo(component);
@@ -161,7 +161,7 @@ describe("Interactions", () => {
 
       beforeEach(() => {
         svg = TestMethods.generateSVG();
-        let component = new Plottable.Component().renderTo(svg);
+        let component = new Plottable.SVGComponent().renderTo(svg);
         eventTarget = component.background();
         keyInteraction = new Plottable.Interactions.Key();
         keyInteraction.attachTo(component);
@@ -206,7 +206,7 @@ describe("Interactions", () => {
 
       beforeEach(() => {
         svg = TestMethods.generateSVG();
-        let component = new Plottable.Component().renderTo(svg);
+        let component = new Plottable.SVGComponent().renderTo(svg);
         eventTarget = component.background();
         keyInteraction = new Plottable.Interactions.Key();
         keyInteraction.attachTo(component);

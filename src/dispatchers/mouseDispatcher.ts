@@ -3,8 +3,10 @@
  * @license MIT
  */
 
+import { IComponent } from "../components/abstractComponent";
 import { Point } from "../core/interfaces";
 import * as Utils from "../utils";
+import { getTranslator } from "../utils/translator";
 
 import { Dispatcher } from "./dispatcher";
 import * as Dispatchers from "./";
@@ -13,7 +15,7 @@ export type MouseCallback = (p: Point, event: MouseEvent) => void;
 
 export class Mouse extends Dispatcher {
   private static _DISPATCHER_KEY = "__Plottable_Dispatcher_Mouse";
-  private _translator: Utils.ClientToSVGTranslator;
+  private _translator: Utils.Translator;
   private _lastMousePosition: Point;
   private static _MOUSEOVER_EVENT_NAME = "mouseover";
   private static _MOUSEMOVE_EVENT_NAME = "mousemove";
@@ -30,13 +32,12 @@ export class Mouse extends Dispatcher {
    * @param {SVGElement} elem
    * @return {Dispatchers.Mouse}
    */
-  public static getDispatcher(elem: SVGElement): Dispatchers.Mouse {
-    let svg = Utils.DOM.boundingSVG(elem);
-
-    let dispatcher: Dispatchers.Mouse = (<any> svg)[Mouse._DISPATCHER_KEY];
+  public static getDispatcher(component: IComponent<any>): Dispatchers.Mouse {
+    let element = Utils.Component.root(component).element();
+    let dispatcher: Dispatchers.Mouse = (<any> element)[Mouse._DISPATCHER_KEY];
     if (dispatcher == null) {
-      dispatcher = new Mouse(svg);
-      (<any> svg)[Mouse._DISPATCHER_KEY] = dispatcher;
+      dispatcher = new Mouse(component);
+      (<any> element)[Mouse._DISPATCHER_KEY] = dispatcher;
     }
     return dispatcher;
   }
@@ -47,25 +48,25 @@ export class Mouse extends Dispatcher {
    * @constructor
    * @param {SVGElement} svg The root <svg> to attach to.
    */
-  constructor(svg: SVGElement) {
+  private constructor(component: IComponent<any>) {
     super();
 
-    this._translator = Utils.ClientToSVGTranslator.getTranslator(svg);
+    this._translator = getTranslator(component);
 
     this._lastMousePosition = { x: -1, y: -1 };
 
-    let processMoveCallback = (e: MouseEvent) => this._measureAndDispatch(e, Mouse._MOUSEMOVE_EVENT_NAME, "page");
+    let processMoveCallback = (e: MouseEvent) => this._measureAndDispatch(component, e, Mouse._MOUSEMOVE_EVENT_NAME, "page");
     this._eventToProcessingFunction[Mouse._MOUSEOVER_EVENT_NAME] = processMoveCallback;
     this._eventToProcessingFunction[Mouse._MOUSEMOVE_EVENT_NAME] = processMoveCallback;
     this._eventToProcessingFunction[Mouse._MOUSEOUT_EVENT_NAME] = processMoveCallback;
     this._eventToProcessingFunction[Mouse._MOUSEDOWN_EVENT_NAME] =
-      (e: MouseEvent) => this._measureAndDispatch(e, Mouse._MOUSEDOWN_EVENT_NAME);
+      (e: MouseEvent) => this._measureAndDispatch(component, e, Mouse._MOUSEDOWN_EVENT_NAME);
     this._eventToProcessingFunction[Mouse._MOUSEUP_EVENT_NAME] =
-      (e: MouseEvent) => this._measureAndDispatch(e, Mouse._MOUSEUP_EVENT_NAME, "page");
+      (e: MouseEvent) => this._measureAndDispatch(component, e, Mouse._MOUSEUP_EVENT_NAME, "page");
     this._eventToProcessingFunction[Mouse._WHEEL_EVENT_NAME] =
-      (e: WheelEvent) => this._measureAndDispatch(e, Mouse._WHEEL_EVENT_NAME);
+      (e: WheelEvent) => this._measureAndDispatch(component, e, Mouse._WHEEL_EVENT_NAME);
     this._eventToProcessingFunction[Mouse._DBLCLICK_EVENT_NAME] =
-      (e: MouseEvent) => this._measureAndDispatch(e, Mouse._DBLCLICK_EVENT_NAME);
+      (e: MouseEvent) => this._measureAndDispatch(component, e, Mouse._DBLCLICK_EVENT_NAME);
   }
 
   /**
@@ -186,11 +187,11 @@ export class Mouse extends Dispatcher {
    * Computes the mouse position from the given event, and if successful
    * calls all the callbacks in the provided callbackSet.
    */
-  private _measureAndDispatch(event: MouseEvent, eventName: string, scope = "element") {
+  private _measureAndDispatch(component: IComponent<any>, event: MouseEvent, eventName: string, scope = "element") {
     if (scope !== "page" && scope !== "element") {
       throw new Error("Invalid scope '" + scope + "', must be 'element' or 'page'");
     }
-    if (scope === "page" || this.eventInsideSVG(event)) {
+    if (scope === "page" || this.eventInside(component, event)) {
       let newMousePosition = this._translator.computePosition(event.clientX, event.clientY);
       if (newMousePosition != null) {
         this._lastMousePosition = newMousePosition;
@@ -199,8 +200,8 @@ export class Mouse extends Dispatcher {
     }
   }
 
-  public eventInsideSVG(event: MouseEvent) {
-    return this._translator.insideSVG(event);
+  public eventInside(component: IComponent<any>, event: MouseEvent) {
+    return this._translator.isInside(component, event);
   }
 
   /**

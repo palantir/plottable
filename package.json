@@ -11,7 +11,8 @@
   "main": "build/src/index.js",
   "typings": "build/src/index.d.ts",
   "scripts": {
-    "build": "npm-run-all build:tsc build:webpack",
+    "build": "npm-run-all build:clean build:tsc build:webpack",
+    "build:clean": "rm -rf build/",
     "build:tsc": "tsc -p test/",
     "build:webpack": "webpack --config webpack.config.js",
     "check_version": "echo ${npm_package_version} $(npm view ${npm_package_name} version) | awk '{ if ($1 == $2) { exit 1 }}'",

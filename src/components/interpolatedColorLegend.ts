@@ -13,9 +13,9 @@ import { ScaleCallback } from "../scales/scale";
 import { SpaceRequest, Point, SimpleSelection } from "../core/interfaces";
 import * as Utils from "../utils";
 
-import { Component } from "./component";
+import { SVGComponent } from "./svgComponent";
 
-export class InterpolatedColorLegend extends Component {
+export class InterpolatedColorLegend extends SVGComponent {
   private static _DEFAULT_NUM_SWATCHES = 11;
 
   private _measurer: SVGTypewriter.Measurer;

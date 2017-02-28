@@ -10,11 +10,11 @@ import { QuantitativeScale } from "../scales/quantitativeScale";
 import { ScaleCallback } from "../scales/scale";
 import * as Utils from "../utils";
 
-import { Component } from "./component";
+import { SVGComponent } from "./svgComponent";
 
 export enum PropertyMode { VALUE, PIXEL }
 
-export class SelectionBoxLayer extends Component {
+export class SelectionBoxLayer extends SVGComponent {
   protected _box: SimpleSelection<void>;
   private _boxArea: SimpleSelection<void>;
   private _boxVisible = false;

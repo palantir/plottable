@@ -13,7 +13,7 @@ describe("Interactions", () => {
 
     it("attaching/detaching a component modifies the state of the interaction", () => {
       let svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
-      let component = new Plottable.Component();
+      let component = new Plottable.SVGComponent();
       let interaction = new Plottable.Interaction();
       component.renderTo(svg);
 
@@ -30,7 +30,7 @@ describe("Interactions", () => {
 
     it("can attach interaction to component", () => {
       let svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
-      let component = new Plottable.Component();
+      let component = new Plottable.SVGComponent();
       component.renderTo(svg);
 
       let clickInteraction = new Plottable.Interactions.Click();
@@ -50,7 +50,7 @@ describe("Interactions", () => {
 
     it("can detach interaction from component", () => {
       let svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
-      let component = new Plottable.Component();
+      let component = new Plottable.SVGComponent();
       component.renderTo(svg);
 
       let clickInteraction = new Plottable.Interactions.Click();
@@ -77,7 +77,7 @@ describe("Interactions", () => {
 
     it("calling detachFrom() on a detached Interaction has no effect", () => {
       let svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
-      let component = new Plottable.Component();
+      let component = new Plottable.SVGComponent();
 
       let clickInteraction = new Plottable.Interactions.Click();
 
@@ -106,8 +106,8 @@ describe("Interactions", () => {
     it("can move interaction from one component to another", () => {
       let svg1 = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
       let svg2 = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
-      let component1 = new Plottable.Component();
-      let component2 = new Plottable.Component();
+      let component1 = new Plottable.SVGComponent();
+      let component2 = new Plottable.SVGComponent();
 
       component1.renderTo(svg1);
       component2.renderTo(svg2);
@@ -171,7 +171,7 @@ describe("Interactions", () => {
 
       it("no longer responds when disabled", () => {
         let svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
-        let component = new Plottable.Component();
+        let component = new Plottable.SVGComponent();
         component.renderTo(svg);
 
         let clickInteraction = new Plottable.Interactions.Click();
@@ -196,8 +196,8 @@ describe("Interactions", () => {
       it("can be attached to new Component while disabled", () => {
         let svg1 = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
         let svg2 = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
-        let component1 = new Plottable.Component();
-        let component2 = new Plottable.Component();
+        let component1 = new Plottable.SVGComponent();
+        let component2 = new Plottable.SVGComponent();
         component1.renderTo(svg1);
         component2.renderTo(svg2);
 

@@ -4,7 +4,7 @@ function makeData() {
   return [makeRandomData(50), makeRandomData(50)];
 }
 
-function run(svg, data, Plottable) {
+function run(container, data, Plottable) {
   "use strict";
 
     var dataset1 = new Plottable.Dataset(data[0]);
@@ -58,5 +58,5 @@ function run(svg, data, Plottable) {
                                           .add(basicTable3, 3, 2)
                                           .add(line1, 1, 1)
                                           .add(line2, 2, 1);
-    bigtable.renderTo(svg);
+    bigtable.renderTo(container);
 }

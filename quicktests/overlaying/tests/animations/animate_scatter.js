@@ -4,7 +4,7 @@ function makeData() {
   return [makeRandomData(20), makeRandomData(20)];
 }
 
-function run(svg, data, Plottable) {
+function run(container, data, Plottable) {
   "use strict";
 
   var xScale = new Plottable.Scales.Linear();
@@ -26,7 +26,7 @@ function run(svg, data, Plottable) {
 
   var circleChart = new Plottable.Components.Table([[yAxis, circleRenderer],
    [null,  xAxis]]);
-  circleChart.renderTo(svg);
+  circleChart.renderTo(container);
 
   var cb = function() {
     var tmp = d1.data();

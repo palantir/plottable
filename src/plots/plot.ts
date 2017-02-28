@@ -7,7 +7,7 @@ import * as d3 from "d3";
 
 import * as Animators from "../animators";
 import { Animator } from "../animators/animator";
-import { Component } from "../components/component";
+import { SVGComponent } from "../components/svgComponent";
 import { Accessor, Point, AttributeToProjector, Bounds, SimpleSelection } from "../core/interfaces";
 import { Dataset, DatasetCallback } from "../core/dataset";
 import * as Drawers from "../drawers";
@@ -19,7 +19,7 @@ import * as Utils from "../utils";
 import * as Plots from "./commons";
 import { coerceExternalD3 } from "../utils/coerceD3";
 
-export class Plot extends Component {
+export class Plot extends SVGComponent {
   protected static _ANIMATION_MAX_DURATION = 600;
 
   /**
@@ -581,7 +581,7 @@ export class Plot extends Component {
    * the chart, relative to the parent.
    * @returns {Plots.PlotEntity} The nearest PlotEntity, or undefined if no {Plots.PlotEntity} can be found.
    */
-  public entityNearest(queryPoint: Point, bounds = this.bounds()): Plots.PlotEntity {
+  public entityNearest(queryPoint: Point, bounds = Utils.Component.bounds(this)): Plots.PlotEntity {
     const nearest = this._getEntityStore().entityNearest(queryPoint, (entity: Plots.LightweightPlotEntity) => {
       return this._entityVisibleOnPlot(entity, bounds);
     });

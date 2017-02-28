@@ -30,7 +30,7 @@ function makeData() {
          ];
 }
 
-function run(svg, data, Plottable) {
+function run(container, data, Plottable) {
   "use strict";
   var timeFormatStart = function (d) { return d3.timeParse("%m/%d/%Y")(d.x); };
   var timeFormatEnd = function (d) { return d3.timeParse("%m/%d/%Y")(d.x2); };
@@ -50,5 +50,5 @@ function run(svg, data, Plottable) {
 
   var table = new Plottable.Components.Table([[yAxis, plot],
                                              [null, xAxis]]);
-  table.renderTo(svg);
+  table.renderTo(container);
 }

@@ -206,7 +206,7 @@ function setTestBoxDimensions(){
 //run a single quicktest
 function runQuickTest(result, svg, data, branch){
   try {
-    result.run(svg, data, plottableBranches[branch]);
+    result.run(svg.node(), data, plottableBranches[branch]);
     setTestBoxDimensions();
   } catch (err) {
     setTimeout(function() {throw err; }, 0);
@@ -229,12 +229,12 @@ function loadAllQuickTests(quicktestsPaths, firstQTBranch, secondQTBranch){
       var className = "quicktest " + name;
       var div = d3.select("#results").append("div").attr("class", className);
       div.insert("label").text(name);
-      var firstsvg = div.append("div").attr("class", "first").append("svg").attr("width", svgWidth).attr("height", svgHeight);
-      var secondsvg = div.append("div").attr("class", "second").append("svg").attr("width", svgWidth).attr("height", svgHeight);
+      var firstElement = div.append("div").attr("class", "first").append("div").attr("width", svgWidth).attr("height", svgHeight);
+      var secondElement = div.append("div").attr("class", "second").append("div").attr("width", svgWidth).attr("height", svgHeight);
       var data = result.makeData();
 
-      runQuickTest(result, firstsvg, data, firstQTBranch);
-      runQuickTest(result, secondsvg, data, secondQTBranch);
+      runQuickTest(result, firstElement, data, firstQTBranch);
+      runQuickTest(result, secondElement, data, secondQTBranch);
     });
   });
 }
@@ -255,12 +255,12 @@ function loadQuickTestsInCategory(quickTestNames, category, firstQTBranch, secon
 
       var div = d3.select("#results").append("div").attr("class", className);
       div.insert("label").text(name);
-      var firstsvg = div.append("div").attr("class", "first").append("svg").attr({width: svgWidth, height: svgHeight});
-      var secondsvg = div.append("div").attr("class", "second").append("svg").attr({width: svgWidth, height: svgHeight});
+      var firstElement = div.append("div").attr("class", "first").append("div").attr({width: svgWidth, height: svgHeight});
+      var secondElement = div.append("div").attr("class", "second").append("div").attr({width: svgWidth, height: svgHeight});
       var data = result.makeData();
 
-      runQuickTest(result, firstsvg, data, firstQTBranch);
-      runQuickTest(result, secondsvg, data, secondQTBranch);
+      runQuickTest(result, firstElement, data, firstQTBranch);
+      runQuickTest(result, secondElement, data, secondQTBranch);
     });
   });
 }

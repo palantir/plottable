@@ -11,7 +11,7 @@ function makeData() {
 
 }
 
-function run(svg, data, Plottable) {
+function run(container, data, Plottable) {
   "use strict";
 
     var symbols = [
@@ -77,5 +77,5 @@ function run(svg, data, Plottable) {
 
     var labels = new Plottable.Components.Table([[dragLabel], [clickLabel]]);
     var group = new Plottable.Components.Group([plot, dblX]);
-    new Plottable.Components.Table([[group], [labels]]).renderTo(svg);
+    new Plottable.Components.Table([[group], [labels]]).renderTo(container);
 }

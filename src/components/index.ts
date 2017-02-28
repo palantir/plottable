@@ -3,11 +3,13 @@
  * @license MIT
  */
 
+export * from "./abstractComponent";
 export * from "./dragBoxLayer";
 export * from "./dragLineLayer";
 export * from "./gridlines";
 export * from "./group";
 export * from "./guideLineLayer";
+export * from "./htmlComponent";
 export * from "./interpolatedColorLegend";
 export * from "./label";
 export * from "./legend";

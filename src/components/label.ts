@@ -7,9 +7,9 @@ import * as SVGTypewriter from "svg-typewriter";
 
 import { SpaceRequest, SimpleSelection } from "../core/interfaces";
 
-import { Component } from "./component";
+import { SVGComponent } from "./svgComponent";
 
-export class Label extends Component {
+export class Label extends SVGComponent {
   private _textContainer: SimpleSelection<void>;
   private _text: string; // text assigned to the Label; may not be the actual text displayed due to truncation
   private _angle: number;
