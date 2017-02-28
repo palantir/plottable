@@ -5,10 +5,10 @@
 
 import { Dataset } from "../core/dataset";
 import { Accessor, Point } from "../core/interfaces";
-import { Scale, ScaleCallback } from "../scales/scale";
 import * as Scales from "../scales";
+import { Scale, ScaleCallback } from "../scales/scale";
 import * as Utils from "../utils";
-import { LightweightPlotEntity, PlotEntity, TransformableAccessorScaleBinding } from "./commons";
+import { LightweightPlotEntity, TransformableAccessorScaleBinding } from "./commons";
 import { Plot } from "./plot";
 
 export class XYPlot<X, Y> extends Plot {

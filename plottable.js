@@ -125,23 +125,23 @@ module.exports = __WEBPACK_EXTERNAL_MODULE_1__;
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
+/**
+ * Copyright 2014-present Palantir Technologies
+ * @license MIT
+ */
 
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-/**
- * Copyright 2014-present Palantir Technologies
- * @license MIT
- */
 var d3 = __webpack_require__(1);
 var Animators = __webpack_require__(6);
 var component_1 = __webpack_require__(5);
 var drawer_1 = __webpack_require__(7);
 var Utils = __webpack_require__(0);
-var Plots = __webpack_require__(36);
 var coerceD3_1 = __webpack_require__(11);
+var Plots = __webpack_require__(36);
 var Plot = (function (_super) {
     __extends(Plot, _super);
     /**

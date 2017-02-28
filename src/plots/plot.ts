@@ -1,4 +1,3 @@
-import { LightweightPlotEntity } from "./commons";
 /**
  * Copyright 2014-present Palantir Technologies
  * @license MIT
@@ -9,16 +8,15 @@ import * as d3 from "d3";
 import * as Animators from "../animators";
 import { Animator } from "../animators/animator";
 import { Component } from "../components/component";
-import { Accessor, Point, AttributeToProjector, Bounds, SimpleSelection } from "../core/interfaces";
 import { Dataset, DatasetCallback } from "../core/dataset";
+import { Accessor, AttributeToProjector, Bounds, Point, SimpleSelection } from "../core/interfaces";
 import * as Drawers from "../drawers";
 import { Drawer } from "../drawers/drawer";
 import * as Scales from "../scales";
 import { Scale, ScaleCallback } from "../scales/scale";
 import * as Utils from "../utils";
-
-import * as Plots from "./commons";
 import { coerceExternalD3 } from "../utils/coerceD3";
+import * as Plots from "./commons";
 
 export class Plot extends Component {
   protected static _ANIMATION_MAX_DURATION = 600;

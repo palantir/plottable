@@ -395,7 +395,7 @@ describe("Plots", () => {
       });
     });
 
-    describe("finding the nearest entity", () => {
+    describe("nearest entity", () => {
       let svg: SimpleSelection<void>;
       let plot: Plottable.XYPlot<number, number>;
       let xAccessor = (d: any) => d.x;
@@ -409,7 +409,7 @@ describe("Plots", () => {
         svg.remove();
       });
 
-      it("in point space", () => {
+      it("finds the nearest entity in point space", () => {
         const xScale = new Plottable.Scales.Linear();
         const yScale = new Plottable.Scales.Linear();
 
@@ -431,7 +431,7 @@ describe("Plots", () => {
         assert.equal(plot.entityNearest(point).datum, dataset.data()[0]);
       });
 
-      it("in data space", () => {
+      it("independent of axes scales", () => {
         const xScale = new Plottable.Scales.Linear();
         const yScale = new Plottable.Scales.ModifiedLog();
 

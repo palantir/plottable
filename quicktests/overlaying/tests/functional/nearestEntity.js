@@ -16,7 +16,17 @@ function makeData() {
             [{name: "jon", y: 1, type: "q1"}, {name: "dan", y: 2, type: "q1"}, {name: "zoo", y: 1, type: "q1"}],
             [{name: "jon", y: 2, type: "q2"}, {name: "dan", y: 4, type: "q2"}, {name: "zoo", y: 2, type: "q2"}],
             [{name: "jon", y: 4, type: "q3"}, {name: "dan", y: 15, type: "q3"}, {name: "zoo", y: 15, type: "q3"}],
-        ]
+        ],
+        // numerical scatter
+        [
+            {x: 10, y: 0.1},
+            {x: 90, y: 0.30},
+            {x: 12, y: 0.9},
+            {x: 1, y: 0.30},
+            {x: 100, y: 0.94},
+            {x: 90, y: 0.29},
+            {x: 80, y: 0.30},
+        ],
     ];
 }
 
@@ -26,10 +36,12 @@ function makeData() {
 function run(svg, data, Plottable) {
     "use strict";
 
+    // TODO: fix entityNearest for pie charts, createPie(data[0])
+
     var chart = new Plottable.Components.Table([
         [createPlot(new Plottable.Plots.Line(), data[0]), createClusteredBar(data[1])],
-        [createPlot(new Plottable.Plots.Scatter(), data[0]), createPie(data[0])],
-        [createPlot(new Plottable.Plots.Bar(), data[0])],
+        [createPlot(new Plottable.Plots.Scatter(), data[0]), createSegmentPlot()],
+        [createPlot(new Plottable.Plots.Bar(), data[0]), createNumericalScatter(data[2])],
     ]);
 
     chart.renderTo(svg);
@@ -95,6 +107,76 @@ function createClusteredBar(data) {
     return new Plottable.Components.Table([
         [yAxis, barPlot],
         [null,  xAxis],
+        [null, title],
+    ]);
+}
+
+function createSegmentPlot() {
+    const plot = new Plottable.Plots.Segment();
+    const xScale = new Plottable.Scales.Linear();
+    const yScale = new Plottable.Scales.Linear();
+    var xAxis = new Plottable.Axes.Numeric(xScale, "bottom");
+    var yAxis = new Plottable.Axes.Numeric(yScale, "left");
+
+    const data = [
+        { x: 1, y: 1, x2: 4, y2: 4 },
+        { x: 2, y: 2, x2: 3, y2: 5 },
+        { x: 3, y: 3, x2: 5, y2: 2 },
+    ];
+    plot.addDataset(new Plottable.Dataset(data));
+    plot.x((d) => d.x, xScale);
+    plot.y((d) => d.y, yScale);
+    plot.x2((d) => d.x2);
+    plot.y2((d) => d.y2);
+
+    const defaultTitleText = "Closest entity";
+    const title = new Plottable.Components.TitleLabel(defaultTitleText);
+
+    const pointer = new Plottable.Interactions.Pointer();
+    pointer.onPointerMove(function(p) {
+        if (plot.entityNearest(p)) {
+            title.text(
+                plot.entityNearest(p).datum.x + ", " +
+                plot.entityNearest(p).datum.y + ", " +
+                plot.entityNearest(p).datum.x2 + ", " +
+                plot.entityNearest(p).datum.y2);
+        }
+    });
+    pointer.attachTo(plot);
+
+    return new Plottable.Components.Table([
+        [yAxis, plot],
+        [null,  xAxis],
+        [null, title],
+    ]);
+}
+
+function createNumericalScatter(data) {
+    var plot = new Plottable.Plots.Scatter()
+    var xScale = new Plottable.Scales.Linear();
+    var yScale = new Plottable.Scales.Linear();
+
+    plot.addDataset(new Plottable.Dataset(data))
+        .x(function (d) { return d.x; }, xScale)
+        .y(function(d) { return d.y; }, yScale);
+
+    var xAxis = new Plottable.Axes.Numeric(xScale, "bottom");
+    var yAxis = new Plottable.Axes.Numeric(yScale, "left");
+
+    var defaultTitleText = "Closest entity";
+    var title = new Plottable.Components.TitleLabel(defaultTitleText);
+
+    var pointer = new Plottable.Interactions.Pointer();
+    pointer.onPointerMove(function(p) {
+        if (plot.entityNearest(p)) {
+        title.text(plot.entityNearest(p).datum.x + ", " + plot.entityNearest(p).datum.y);
+        }
+    });
+    pointer.attachTo(plot);
+
+    return new Plottable.Components.Table([
+        [yAxis, plot],
+        [null, xAxis],
         [null, title],
     ]);
 }
