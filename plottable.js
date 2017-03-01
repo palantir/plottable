@@ -970,6 +970,9 @@ var Component = (function () {
             if (!selection.node() || selection.node().nodeName == null) {
                 throw new Error("Plottable requires a valid Element to renderTo");
             }
+            if (selection.node().nodeName === "svg") {
+                throw new Error("Plottable 3.x can only renderTo an HTML component; pass a div instead!");
+            }
             this.anchor(selection);
         }
         if (this._element == null) {
