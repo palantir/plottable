@@ -25,7 +25,7 @@ describe("Component", () => {
 
     it("adds itself as a child element of the input selection", () => {
       assert.strictEqual(c.anchor(svg), c, "setter returns calling object");
-      assert.strictEqual(<SVGElement> c.rootSVG().node(),
+      assert.strictEqual(<SVGElement> c.rootElement().node(),
         svg.node(), "component DOM elements are children of svg element");
       c.destroy();
       svg.remove();
@@ -78,9 +78,9 @@ describe("Component", () => {
 
       let svg2 = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
       c.anchor(svg2);
-      assert.notStrictEqual(<SVGElement> c.rootSVG().node(),
+      assert.notStrictEqual(<SVGElement> c.rootElement().node(),
         svg.node(), "component DOM elements are not children of svg element");
-      assert.strictEqual(<SVGElement> c.rootSVG().node(),
+      assert.strictEqual(<SVGElement> c.rootElement().node(),
         svg2.node(), "component DOM elements are children of second svg element");
       c.destroy();
       svg2.remove();

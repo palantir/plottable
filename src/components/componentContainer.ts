@@ -21,7 +21,7 @@ export class ComponentContainer extends Component {
     this._detachCallback = (component: Component) => this.remove(component);
   }
 
-  public anchor(selection: SimpleSelection<void>) {
+  public anchor(selection: d3.Selection<HTMLElement, any, any, any>) {
     selection = coerceExternalD3(selection);
     super.anchor(selection);
     this._forEach((c) => c.anchor(this.content()));

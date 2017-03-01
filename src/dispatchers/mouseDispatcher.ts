@@ -32,7 +32,7 @@ export class Mouse extends Dispatcher {
    * @return {Dispatchers.Mouse}
    */
   public static getDispatcher(component: Component): Dispatchers.Mouse {
-    let element = component.root().rootSVG();
+    let element = component.root().rootElement();
     let dispatcher: Dispatchers.Mouse = (<any> element)[Mouse._DISPATCHER_KEY];
 
     if (dispatcher == null) {

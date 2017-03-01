@@ -101,9 +101,9 @@ export class Component {
    */
   private _boxContainer: SimpleSelection<void>;
   /**
-   * If we're the root Component (top-level), this is the Element we've anchored to (user-supplied).
+   * If we're the root Component (top-level), this is the HTMLElement we've anchored to (user-supplied).
    */
-  private _rootSVG: SimpleSelection<void>;
+  private _rootElement: d3.Selection<HTMLElement, any, any, any>;
   private _width: number; // Width and height of the Component. Used to size the hitbox, bounding box, etc
   private _height: number;
   private _cssClasses = new Utils.Set<string>();
@@ -128,7 +128,7 @@ export class Component {
    * @param {d3.Selection} selection.
    * @returns {Component} The calling Component.
    */
-  public anchor(selection: SimpleSelection<void>) {
+  public anchor(selection: d3.Selection<HTMLElement, any, any, any>) {
     selection = coerceExternalD3(selection);
     if (this._destroyed) {
       throw new Error("Can't reuse destroy()-ed Components!");
@@ -136,17 +136,15 @@ export class Component {
 
     if (this.parent() == null) {
       // svg node gets the "plottable" CSS class
-      this._rootSVG = selection;
-      this._rootSVG.classed("plottable", true);
-      // visible overflow for firefox https://stackoverflow.com/questions/5926986/why-does-firefox-appear-to-truncate-embedded-svgs
-      this._rootSVG.style("overflow", "visible");
+      this._rootElement = selection;
+      this._rootElement.classed("plottable", true);
     }
 
     if (this._element != null) {
       // reattach existing element
       (<Node> selection.node()).appendChild(<Node> this._element.node());
     } else {
-      this._element = selection.append<SVGGElement>("g");
+      this._element = selection.append<SVGSVGElement>("svg");
       this._setup();
     }
 
@@ -198,7 +196,7 @@ export class Component {
 
     this._backgroundContainer = this._element.append("g").classed("background-container", true);
     this._addBox("background-fill", this._backgroundContainer);
-    this._content = this._element.append("g").classed("content", true);
+    this._content = this._element.append("svg").classed("content", true);
     this._foregroundContainer = this._element.append("g").classed("foreground-container", true);
     this._boxContainer = this._element.append("g").classed("box-container", true);
 
@@ -240,21 +238,10 @@ export class Component {
     if (origin == null || availableWidth == null || availableHeight == null) {
       if (this._element == null) {
         throw new Error("anchor() must be called before computeLayout()");
-      } else if (this._rootSVG != null) {
-        // we are the root node, retrieve height/width from root SVG
+      } else if (this._rootElement != null) {
+        // we are the top-level Component, retrieve height/width from rootElement
         origin = { x: 0, y: 0 };
-
-        // Set width/height to 100% if not specified, to allow accurate size calculation
-        // see http://www.w3.org/TR/CSS21/visudet.html#block-replaced-width
-        // and http://www.w3.org/TR/CSS21/visudet.html#inline-replaced-height
-        if (this._rootSVG.attr("width") == null) {
-          this._rootSVG.attr("width", "100%");
-        }
-        if (this._rootSVG.attr("height") == null) {
-          this._rootSVG.attr("height", "100%");
-        }
-
-        const elem = <Element> this._rootSVG.node();
+        const elem = this._rootElement.node();
         availableWidth = Utils.DOM.elementWidth(elem);
         availableHeight = Utils.DOM.elementHeight(elem);
       } else {
@@ -272,7 +259,13 @@ export class Component {
       x: origin.x + (availableWidth - this.width()) * xAlignProportion,
       y: origin.y + (availableHeight - this.height()) * yAlignProportion,
     };
-    this._element.attr("transform", "translate(" + this._origin.x + "," + this._origin.y + ")");
+    // this._element.attr("transform", "translate(" + this._origin.x + "," + this._origin.y + ")");
+    this._element.styles({
+      left: `${this._origin.x}px`,
+      height: `${this.height()}px`,
+      top: `${this._origin.y}px`,
+      width: `${this.width()}px`,
+    });
     this._boxes.forEach((b: SimpleSelection<void>) => b.attr("width", this.width()).attr("height", this.height()));
 
     if (this._resizeHandler != null) {
@@ -363,18 +356,18 @@ export class Component {
    * @param {String|d3.Selection} element The element, a selector string for the element, or a d3.Selection for the element.
    * @returns {Component} The calling Component.
    */
-  public renderTo(element: string | Element | SimpleSelection<any>): this {
+  public renderTo(element: string | HTMLElement | d3.Selection<HTMLElement, any, any, any>): this {
     this.detach();
     if (element != null) {
-      let selection: SimpleSelection<any>;
+      let selection: d3.Selection<HTMLElement, any, any, any>;
       if (typeof(element) === "string") {
-        selection = d3.select<Element, any>(element);
+        selection = d3.select<HTMLElement, any>(element);
       } else if (element instanceof Element) {
-        selection = d3.select<Element, any>(element);
+        selection = d3.select<HTMLElement, any>(element);
       } else {
         selection = coerceExternalD3(element);
       }
-      if (!selection.node() || (<Element> selection.node()).nodeName == null) {
+      if (!selection.node() || selection.node().nodeName == null) {
         throw new Error("Plottable requires a valid Element to renderTo");
       }
       this.anchor(selection);
@@ -718,8 +711,8 @@ export class Component {
    * Returns the top-level user supplied element that roots the tree that this Component lives in.
    * @returns {SimpleSelection<void>}
    */
-  public rootSVG(): SimpleSelection<void> {
-    return this.root()._rootSVG;
+  public rootElement(): SimpleSelection<void> {
+    return this.root()._rootElement;
   }
 
   /**

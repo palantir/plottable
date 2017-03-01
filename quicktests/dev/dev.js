@@ -96,11 +96,11 @@ function loadQuickTest(path){
             <a href="#"><div>&#x3008; quicktests</div></a><br/>
             <div class="quicktest">
                 <h2>${name}</h2>
-                <svg width="100%" height="100%">
+                <div class="dev-container">
             </div>
         `)
 
-        const svg = d3.select("#app svg");
+        const svg = d3.select("#app .dev-container");
 
         try {
             closure.run(svg, closure.makeData(), Plottable);

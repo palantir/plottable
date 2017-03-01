@@ -15,7 +15,7 @@ describe("Dispatchers", () => {
       it("creates only one Dispatcher.Touch per element", () => {
         const svg = TestMethods.generateSVG();
         const component = new Plottable.Component();
-        sinon.stub(component, "rootSVG", () => svg);
+        sinon.stub(component, "rootElement", () => svg);
 
         const td1 = Plottable.Dispatchers.Touch.getDispatcher(component);
         assert.isNotNull(td1, "created a new Dispatcher on an SVG");
@@ -53,7 +53,7 @@ describe("Dispatchers", () => {
       beforeEach(() => {
         svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
         const component = new Plottable.Component();
-        sinon.stub(component, "rootSVG", () => svg);
+        sinon.stub(component, "rootElement", () => svg);
         // HACKHACK: PhantomJS can't measure SVGs unless they have something in them occupying space
         svg.append("rect").attr("width", SVG_WIDTH).attr("height", SVG_HEIGHT);
         touchDispatcher = Plottable.Dispatchers.Touch.getDispatcher(component);

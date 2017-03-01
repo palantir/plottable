@@ -752,17 +752,15 @@ var Component = (function () {
         }
         if (this.parent() == null) {
             // svg node gets the "plottable" CSS class
-            this._rootSVG = selection;
-            this._rootSVG.classed("plottable", true);
-            // visible overflow for firefox https://stackoverflow.com/questions/5926986/why-does-firefox-appear-to-truncate-embedded-svgs
-            this._rootSVG.style("overflow", "visible");
+            this._rootElement = selection;
+            this._rootElement.classed("plottable", true);
         }
         if (this._element != null) {
             // reattach existing element
             selection.node().appendChild(this._element.node());
         }
         else {
-            this._element = selection.append("g");
+            this._element = selection.append("svg");
             this._setup();
         }
         this._isAnchored = true;
@@ -810,7 +808,7 @@ var Component = (function () {
         this._cssClasses = new Utils.Set();
         this._backgroundContainer = this._element.append("g").classed("background-container", true);
         this._addBox("background-fill", this._backgroundContainer);
-        this._content = this._element.append("g").classed("content", true);
+        this._content = this._element.append("svg").classed("content", true);
         this._foregroundContainer = this._element.append("g").classed("foreground-container", true);
         this._boxContainer = this._element.append("g").classed("box-container", true);
         if (this._clipPathEnabled) {
@@ -849,19 +847,10 @@ var Component = (function () {
             if (this._element == null) {
                 throw new Error("anchor() must be called before computeLayout()");
             }
-            else if (this._rootSVG != null) {
-                // we are the root node, retrieve height/width from root SVG
+            else if (this._rootElement != null) {
+                // we are the top-level Component, retrieve height/width from rootElement
                 origin = { x: 0, y: 0 };
-                // Set width/height to 100% if not specified, to allow accurate size calculation
-                // see http://www.w3.org/TR/CSS21/visudet.html#block-replaced-width
-                // and http://www.w3.org/TR/CSS21/visudet.html#inline-replaced-height
-                if (this._rootSVG.attr("width") == null) {
-                    this._rootSVG.attr("width", "100%");
-                }
-                if (this._rootSVG.attr("height") == null) {
-                    this._rootSVG.attr("height", "100%");
-                }
-                var elem = this._rootSVG.node();
+                var elem = this._rootElement.node();
                 availableWidth = Utils.DOM.elementWidth(elem);
                 availableHeight = Utils.DOM.elementHeight(elem);
             }
@@ -878,7 +867,13 @@ var Component = (function () {
             x: origin.x + (availableWidth - this.width()) * xAlignProportion,
             y: origin.y + (availableHeight - this.height()) * yAlignProportion,
         };
-        this._element.attr("transform", "translate(" + this._origin.x + "," + this._origin.y + ")");
+        // this._element.attr("transform", "translate(" + this._origin.x + "," + this._origin.y + ")");
+        this._element.styles({
+            left: this._origin.x + "px",
+            height: this.height() + "px",
+            top: this._origin.y + "px",
+            width: this.width() + "px",
+        });
         this._boxes.forEach(function (b) { return b.attr("width", _this.width()).attr("height", _this.height()); });
         if (this._resizeHandler != null) {
             this._resizeHandler(size);
@@ -1250,8 +1245,8 @@ var Component = (function () {
      * Returns the top-level user supplied element that roots the tree that this Component lives in.
      * @returns {SimpleSelection<void>}
      */
-    Component.prototype.rootSVG = function () {
-        return this.root()._rootSVG;
+    Component.prototype.rootElement = function () {
+        return this.root()._rootElement;
     };
     /**
      * Gets the Selection containing the <g> behind the visual elements of the Component.
@@ -10684,7 +10679,7 @@ var Mouse = (function (_super) {
      * @return {Dispatchers.Mouse}
      */
     Mouse.getDispatcher = function (component) {
-        var element = component.root().rootSVG();
+        var element = component.root().rootElement();
         var dispatcher = element[Mouse._DISPATCHER_KEY];
         if (dispatcher == null) {
             dispatcher = new Mouse(component);
@@ -10878,7 +10873,7 @@ var Touch = (function (_super) {
      * @return {Dispatchers.Touch}
      */
     Touch.getDispatcher = function (component) {
-        var svg = component.root().rootSVG();
+        var svg = component.root().rootElement();
         var dispatcher = svg[Touch._DISPATCHER_KEY];
         if (dispatcher == null) {
             dispatcher = new Touch(component);
@@ -15746,7 +15741,7 @@ function getTranslator(component) {
     // The Translator works by first calculating the offset to root of the chart and then calculating
     // the offset from the component to the root. It is imperative that the measureElement
     // be added to the root of the hierarchy and nowhere else.
-    var root = component.root().rootSVG().node();
+    var root = component.root().rootElement().node();
     var translator = root[_TRANSLATOR_KEY];
     if (translator == null) {
         var measurer = document.createElementNS(root.namespaceURI, "svg");
@@ -15808,7 +15803,7 @@ var Translator = (function () {
         return scaledPosition;
     };
     Translator.prototype.isInside = function (component, e) {
-        return Utils.DOM.contains(component.root().rootSVG().node(), e.target);
+        return Utils.DOM.contains(component.root().rootElement().node(), e.target);
     };
     return Translator;
 }());

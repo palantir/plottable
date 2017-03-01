@@ -11,7 +11,7 @@ describe("Translator", () => {
 it("getTranslator() creates only one Translator per html root", () => {
     let div = TestMethods.generateDIV();
     const component = new Plottable.Component();
-    sinon.stub(component, "rootSVG", () => div);
+    sinon.stub(component, "rootElement", () => div);
 
     let t1 = Plottable.Utils.getTranslator(component);
     assert.isNotNull(t1, "created a new Translator on a <svg>");
@@ -25,7 +25,7 @@ it("getTranslator() creates only one Translator per html root", () => {
     let div = TestMethods.generateDIV();
     div.style("position", "relative");
     const component = new Plottable.Component();
-    sinon.stub(component, "rootSVG", () => div);
+    sinon.stub(component, "rootElement", () => div);
 
     let divOrigin: Plottable.Point = {
       x: 19,
@@ -51,7 +51,7 @@ it("getTranslator() creates only one Translator per html root", () => {
   it("getTranslator() creates only one Translator per <svg>", () => {
     let svg = TestMethods.generateSVG();
     const component = new Plottable.Component();
-    sinon.stub(component, "rootSVG", () => svg);
+    sinon.stub(component, "rootElement", () => svg);
 
     let t1 = Plottable.Utils.getTranslator(component);
     assert.isNotNull(t1, "created a new Translator on a <svg>");
@@ -64,7 +64,7 @@ it("getTranslator() creates only one Translator per html root", () => {
   it("converts points to <svg>-space correctly", () => {
     let svg = TestMethods.generateSVG();
     const component = new Plottable.Component();
-    sinon.stub(component, "rootSVG", () => svg);
+    sinon.stub(component, "rootElement", () => svg);
 
     let rectOrigin: Plottable.Point = {
       x: 19,
