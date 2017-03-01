@@ -30,14 +30,10 @@ function makeData() {
     ];
 }
 
-
-// area, bar, clustered, line, pie, rectangle, scatter, segment, stackedarea,
-// stackedbar, waterfall
 function run(svg, data, Plottable) {
     "use strict";
 
     // TODO: fix entityNearest for pie charts, createPie(data[0])
-
     var chart = new Plottable.Components.Table([
         [createPlot(new Plottable.Plots.Line(), data[0]), createClusteredBar(data[1])],
         [createPlot(new Plottable.Plots.Scatter(), data[0]), createSegmentPlot()],
