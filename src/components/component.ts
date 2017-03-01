@@ -28,7 +28,7 @@ export class Component {
    * Holds all the DOM associated with this component. A direct child of the element we're
    * anchored to.
    */
-  private _element: d3.Selection<Element, void | {}, any, any>;
+  private _element: d3.Selection<HTMLElement, any, any, any>;
   /**
    * Container for the visual content that this Component displays. Subclasses should attach
    * elements onto the _content. In between the background and the foreground.
@@ -144,7 +144,7 @@ export class Component {
       // reattach existing element
       (<Node> selection.node()).appendChild(<Node> this._element.node());
     } else {
-      this._element = selection.append<SVGSVGElement>("svg");
+      this._element = selection.append<HTMLDivElement>("div");
       this._setup();
     }
 
@@ -194,11 +194,11 @@ export class Component {
     });
     this._cssClasses = new Utils.Set<string>();
 
-    this._backgroundContainer = this._element.append("g").classed("background-container", true);
+    this._backgroundContainer = this._element.append("svg").classed("background-container", true);
     this._addBox("background-fill", this._backgroundContainer);
     this._content = this._element.append("svg").classed("content", true);
-    this._foregroundContainer = this._element.append("g").classed("foreground-container", true);
-    this._boxContainer = this._element.append("g").classed("box-container", true);
+    this._foregroundContainer = this._element.append("svg").classed("foreground-container", true);
+    this._boxContainer = this._element.append("svg").classed("box-container", true);
 
     if (this._clipPathEnabled) {
       this._generateClipPath();
@@ -259,7 +259,6 @@ export class Component {
       x: origin.x + (availableWidth - this.width()) * xAlignProportion,
       y: origin.y + (availableHeight - this.height()) * yAlignProportion,
     };
-    // this._element.attr("transform", "translate(" + this._origin.x + "," + this._origin.y + ")");
     this._element.styles({
       left: `${this._origin.x}px`,
       height: `${this.height()}px`,
@@ -697,7 +696,7 @@ export class Component {
   }
 
   /**
-   * Gets a Selection containing a <g> that holds the visual elements of the Component.
+   * Gets the SVG that holds the visual elements of the Component.
    *
    * Will return undefined if the Component has not been anchored.
    *
@@ -705,6 +704,13 @@ export class Component {
    */
   public content(): SimpleSelection<void> {
     return this._content;
+  }
+
+  /**
+   * Returns the HTML Element at the root of this component's DOM tree.
+   */
+  public element(): d3.Selection<HTMLElement, any, any, any> {
+    return this._element;
   }
 
   /**

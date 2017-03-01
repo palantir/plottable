@@ -42,6 +42,17 @@
 .plottable {
   display: block; /* SVGs must be block elements for width/height calculations to work in Firefox. */
   pointer-events: visibleFill;
+  position: relative;
+}
+
+.plottable .component {
+  position: absolute;
+}
+
+.plottable .component > svg {
+  position: absolute;
+  width: 100%;
+  height: 100%;
 }
 
 .plottable .background-fill {

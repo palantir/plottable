@@ -760,7 +760,7 @@ var Component = (function () {
             selection.node().appendChild(this._element.node());
         }
         else {
-            this._element = selection.append("svg");
+            this._element = selection.append("div");
             this._setup();
         }
         this._isAnchored = true;
@@ -806,11 +806,11 @@ var Component = (function () {
             _this._element.classed(cssClass, true);
         });
         this._cssClasses = new Utils.Set();
-        this._backgroundContainer = this._element.append("g").classed("background-container", true);
+        this._backgroundContainer = this._element.append("svg").classed("background-container", true);
         this._addBox("background-fill", this._backgroundContainer);
         this._content = this._element.append("svg").classed("content", true);
-        this._foregroundContainer = this._element.append("g").classed("foreground-container", true);
-        this._boxContainer = this._element.append("g").classed("box-container", true);
+        this._foregroundContainer = this._element.append("svg").classed("foreground-container", true);
+        this._boxContainer = this._element.append("svg").classed("box-container", true);
         if (this._clipPathEnabled) {
             this._generateClipPath();
         }
@@ -867,7 +867,6 @@ var Component = (function () {
             x: origin.x + (availableWidth - this.width()) * xAlignProportion,
             y: origin.y + (availableHeight - this.height()) * yAlignProportion,
         };
-        // this._element.attr("transform", "translate(" + this._origin.x + "," + this._origin.y + ")");
         this._element.styles({
             left: this._origin.x + "px",
             height: this.height() + "px",
@@ -1232,7 +1231,7 @@ var Component = (function () {
         return this._foregroundContainer;
     };
     /**
-     * Gets a Selection containing a <g> that holds the visual elements of the Component.
+     * Gets the SVG that holds the visual elements of the Component.
      *
      * Will return undefined if the Component has not been anchored.
      *
@@ -1240,6 +1239,12 @@ var Component = (function () {
      */
     Component.prototype.content = function () {
         return this._content;
+    };
+    /**
+     * Returns the HTML Element at the root of this component's DOM tree.
+     */
+    Component.prototype.element = function () {
+        return this._element;
     };
     /**
      * Returns the top-level user supplied element that roots the tree that this Component lives in.
@@ -4690,7 +4695,7 @@ var ComponentContainer = (function (_super) {
         var _this = this;
         selection = coerceD3_1.coerceExternalD3(selection);
         _super.prototype.anchor.call(this, selection);
-        this._forEach(function (c) { return c.anchor(_this.content()); });
+        this._forEach(function (c) { return c.anchor(_this.element()); });
         return this;
     };
     ComponentContainer.prototype.render = function () {
@@ -4707,7 +4712,7 @@ var ComponentContainer = (function (_super) {
         component.parent(this);
         component.onDetach(this._detachCallback);
         if (this._isAnchored) {
-            component.anchor(this.content());
+            component.anchor(this.element());
         }
     };
     /**
