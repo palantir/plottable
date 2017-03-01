@@ -8,16 +8,15 @@ import * as d3 from "d3";
 import * as Animators from "../animators";
 import { Animator } from "../animators/animator";
 import { Component } from "../components/component";
-import { Accessor, Point, AttributeToProjector, Bounds, SimpleSelection } from "../core/interfaces";
 import { Dataset, DatasetCallback } from "../core/dataset";
+import { Accessor, AttributeToProjector, Bounds, Point, SimpleSelection } from "../core/interfaces";
 import * as Drawers from "../drawers";
 import { Drawer } from "../drawers/drawer";
 import * as Scales from "../scales";
 import { Scale, ScaleCallback } from "../scales/scale";
 import * as Utils from "../utils";
-
-import * as Plots from "./commons";
 import { coerceExternalD3 } from "../utils/coerceD3";
+import * as Plots from "./commons";
 
 export class Plot extends Component {
   protected static _ANIMATION_MAX_DURATION = 600;
@@ -574,24 +573,38 @@ export class Plot extends Component {
 
   /**
    * Returns the {Plots.PlotEntity} nearest to the query point,
-   * or undefined if no {Plots.PlotEntity} can be found.
+   * or undefined if no {Plots.PlotEntity} can be found. The closest point is computed using
+   * the standard Euclidean distance formula. Note that this is done in pixel space.
    *
    * @param {Point} queryPoint
-   * @param {bounds} Bounds The bounding box within which to search. By default, bounds is the bounds of
+   * @param {Bounds} bounds The bounding box within which to search. By default, bounds is the bounds of
    * the chart, relative to the parent.
    * @returns {Plots.PlotEntity} The nearest PlotEntity, or undefined if no {Plots.PlotEntity} can be found.
    */
   public entityNearest(queryPoint: Point, bounds = this.bounds()): Plots.PlotEntity {
-    const nearest = this._getEntityStore().entityNearest(queryPoint, (entity: Plots.LightweightPlotEntity) => {
-      return this._entityVisibleOnPlot(entity, bounds);
+    let closestDistanceSquared = Infinity;
+    let closestPointEntity: Plots.LightweightPlotEntity;
+    this._getEntityStore().forEach((entity) => {
+      if (this._entityVisibleOnPlot(entity, bounds) !== false) {
+        const entityPoint = this._pixelPoint(entity.datum, entity.index, entity.dataset);
+        let distanceSquared = Utils.Math.distanceSquared(entityPoint, queryPoint);
+        if (distanceSquared < closestDistanceSquared) {
+          closestDistanceSquared = distanceSquared;
+          closestPointEntity = entity;
+        }
+      }
     });
 
-    return nearest === undefined ? undefined : this._lightweightPlotEntityToPlotEntity(nearest);
+    return closestPointEntity === undefined
+      ? undefined
+      : this._lightweightPlotEntityToPlotEntity(closestPointEntity);
   }
 
   protected _entityVisibleOnPlot(entity: Plots.PlotEntity | Plots.LightweightPlotEntity, chartBounds: Bounds) {
-    return !(entity.position.x < chartBounds.topLeft.x || entity.position.y < chartBounds.topLeft.y ||
-    entity.position.x > chartBounds.bottomRight.x || entity.position.y > chartBounds.bottomRight.y);
+    const { x, y } = this._pixelPoint(entity.datum, entity.index, entity.dataset);
+
+    return !(x < chartBounds.topLeft.x || y < chartBounds.topLeft.y ||
+    x > chartBounds.bottomRight.x || y > chartBounds.bottomRight.y);
   }
 
   protected _uninstallScaleForKey(scale: Scale<any, any>, key: string) {

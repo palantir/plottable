@@ -3,13 +3,12 @@
  * @license MIT
  */
 
-import { Accessor, Point } from "../core/interfaces";
 import { Dataset } from "../core/dataset";
+import { Accessor, Point } from "../core/interfaces";
 import * as Scales from "../scales";
 import { Scale, ScaleCallback } from "../scales/scale";
 import * as Utils from "../utils";
-
-import { TransformableAccessorScaleBinding, LightweightPlotEntity, PlotEntity } from "./commons";
+import { LightweightPlotEntity, TransformableAccessorScaleBinding } from "./commons";
 import { Plot } from "./plot";
 
 export class XYPlot<X, Y> extends Plot {
@@ -101,15 +100,6 @@ export class XYPlot<X, Y> extends Plot {
         this.render();
       }
     };
-  }
-
-  public entityNearest(queryPoint: Point): PlotEntity {
-    // by default, the entity index stores position information in the data space
-    // the default impelentation of the entityNearest must convert the chart bounding
-    // box as well as the query point to the data space before it can make a comparison
-    const invertedChartBounds = this._invertedBounds();
-    const invertedQueryPoint = this._invertPixelPoint(queryPoint);
-    return super.entityNearest(invertedQueryPoint, invertedChartBounds);
   }
 
   /**
