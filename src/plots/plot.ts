@@ -8,7 +8,7 @@ import * as d3 from "d3";
 import * as Animators from "../animators";
 import { Animator } from "../animators/animator";
 import { Component } from "../components/component";
-import { Accessor, Point, AttributeToProjector, Bounds, SimpleSelection } from "../core/interfaces";
+import { Accessor, Point, AttributeToProjector, Bounds, SimpleSelection, Projector } from "../core/interfaces";
 import { Dataset, DatasetCallback } from "../core/dataset";
 import * as Drawers from "../drawers";
 import { Drawer } from "../drawers/drawer";
@@ -67,6 +67,21 @@ export class Plot extends Component {
     this.animator(Plots.Animator.RESET, new Animators.Null());
   }
 
+  private _canvas: d3.Selection<HTMLCanvasElement, any, any, any>;
+  private _createCanvas() {
+    const element = this.element();
+    this._canvas = element.append<HTMLCanvasElement>("canvas");
+  }
+
+  public computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number) {
+    super.computeLayout(origin, availableWidth, availableHeight);
+    this._canvas.attrs({
+      width: this.width(),
+      height: this.height()
+    });
+    return this;
+  }
+
   public anchor(selection: d3.Selection<HTMLElement, any, any, any>) {
     selection = coerceExternalD3(selection);
     super.anchor(selection);
@@ -80,6 +95,7 @@ export class Plot extends Component {
     super._setup();
     this._renderArea = this.content().append("g").classed("render-area", true);
     this.datasets().forEach((dataset) => this._createNodesForDataset(dataset));
+    this._createCanvas();
   }
 
   public destroy() {
@@ -479,11 +495,14 @@ export class Plot extends Component {
     let dataToDraw = this._getDataToDraw();
     let drawers = this._getDrawersInOrder();
 
-    this.datasets().forEach((ds, i) => drawers[i].draw(dataToDraw.get(ds), drawSteps));
+    // this.datasets().forEach((ds, i) => drawers[i].draw(dataToDraw.get(ds), drawSteps));
+    //
+    // let times = this.datasets().map((ds, i) => drawers[i].totalDrawTime(dataToDraw.get(ds), drawSteps));
+    // let maxTime = Utils.Math.max(times, 0);
+    // this._additionalPaint(maxTime);
 
-    let times = this.datasets().map((ds, i) => drawers[i].totalDrawTime(dataToDraw.get(ds), drawSteps));
-    let maxTime = Utils.Math.max(times, 0);
-    this._additionalPaint(maxTime);
+    const context = this._canvas.node().getContext("2d");
+    this.datasets().forEach((ds, i) => drawers[i].drawToCanvas(dataToDraw.get(ds), drawSteps, context));
   }
 
   /**

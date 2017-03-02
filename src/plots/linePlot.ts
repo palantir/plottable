@@ -501,6 +501,11 @@ export class Line<X> extends XYPlot<X, number> {
     }
   }
 
+  /**
+   * Line plots represent each dataset with a single <path> element, so we wrap the dataset data in a single element array.
+   * @returns {Map<Dataset, any[]>}
+   * @private
+   */
   protected _getDataToDraw(): Utils.Map<Dataset, any[]> {
     let dataToDraw = new Utils.Map<Dataset, any[]>();
 

@@ -12,7 +12,17 @@ import { AttributeToProjector, AttributeToAppliedProjector, SimpleSelection } fr
 import * as Drawers from "./";
 import { coerceExternalD3 } from "../utils/coerceD3";
 
-export class Drawer {
+/**
+ * A Drawer is responsible for actually committing the DrawSteps to the DOM. You first pass a renderArea
+ * to the Drawer, which is the root DOM node holding all the drawing elements. Subclasses set an _svgElementName
+ * which is an HTML/SVG tag name. Then you call .draw() with the DrawSteps to draw, and the Drawer will draw
+ * to the DOM by clearing old DOM elements, adding new DOM elements, and then passing those DOM elements to
+ * the animator, which will set the appropriate attributes on the DOM.
+ *
+ * "Drawing" in Plottable really means "making the DOM elements and their attributes correctly reflect
+ * the data being passed in".
+ */
+export abstract class Drawer {
   private _renderArea: SimpleSelection<void>;
   protected _svgElementName: string;
   protected _className: string;
@@ -92,6 +102,7 @@ export class Drawer {
    * @param{AppliedDrawStep} step The step, how data should be drawn.
    */
   private _drawStep(step: Drawers.AppliedDrawStep) {
+    console.log("Drawing", step.attrToAppliedProjector);
     let selection = this.selection();
     let colorAttributes = ["fill", "stroke"];
     colorAttributes.forEach((colorAttribute) => {
@@ -157,6 +168,39 @@ export class Drawer {
 
     return this;
   }
+
+  public drawToCanvas(data: any[], drawSteps: Drawers.DrawStep[], context: CanvasRenderingContext2D) {
+    let appliedDrawSteps: Drawers.AppliedDrawStep[] = drawSteps.map((dr: Drawers.DrawStep) => {
+      let attrToAppliedProjector = this._appliedProjectors(dr.attrToProjector);
+      return {
+        attrToAppliedProjector: attrToAppliedProjector,
+        animator: dr.animator,
+      };
+    });
+
+    // // in SVG world:
+    // const update = d3.selectAll("rect").data([ {x: 3, y: 9}, {x: 5, y: 12}]);
+    // // iterate through every data point and set the attrs
+    // update.attrs({ x: (d) => d.x, y: (d) => d.y, fill: ..., stroke: ... });
+    //
+    // // in Canvas world:
+    // data.forEach((point, index) => {
+    //   context.beginPath();
+    //   context.fillStyle = attrsToProjectors["fill"](point, index)
+    //   context.strokeStyle = attrsToProjectors["stroke"](point, index)
+    //   context.rect(attrsToProjectors["x"](point, index))
+    // });
+
+    let delay = 0;
+    appliedDrawSteps.forEach((drawStep, i) => {
+      Utils.Window.setTimeout(() => this._canvasDraw(data, drawStep, context), delay);
+      delay += drawStep.animator.totalTime(data.length);
+    });
+
+    return this;
+  }
+
+  protected abstract _canvasDraw(data: any[], step: Drawers.AppliedDrawStep, context: CanvasRenderingContext2D): void;
 
   public selection(): SimpleSelection<any> {
     this.maybeRefreshCache();
