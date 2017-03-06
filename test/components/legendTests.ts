@@ -160,7 +160,8 @@ describe("Legend", () => {
       svg.remove();
     });
 
-    it("can set maximum number of lines per entry", () => {
+    // Disable this test for now since it flakes all the time on Saucelabs Safari 10
+    xit("can set maximum number of lines per entry", () => {
       color.domain(["this is a very very very very very very very long"]);
       legend.renderTo(svg);
       legend.maxWidth(100);
@@ -179,7 +180,8 @@ describe("Legend", () => {
       svg.remove();
     });
 
-    it("can set maximum number of entries per row", () => {
+    // Disable this test for now since it flakes all the time on Saucelabs Safari 10
+    xit("can set maximum number of entries per row", () => {
       color.domain(["AA", "BB", "CC", "DD", "EE", "FF"]);
       legend.renderTo(svg);
 
