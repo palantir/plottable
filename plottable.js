@@ -1392,11 +1392,7 @@ var Drawer = (function () {
         return this;
     };
     Drawer.prototype.selection = function () {
-        if (!this._cachedSelectionValid) {
-            this._cachedSelection = this.renderArea().selectAll(this.selector());
-            this._cachedSelectionNodes = this._cachedSelection.nodes();
-            this._cachedSelectionValid = true;
-        }
+        this.maybeRefreshCache();
         return this._cachedSelection;
     };
     /**
@@ -1409,7 +1405,15 @@ var Drawer = (function () {
      * Returns the D3 selection corresponding to the datum with the specified index.
      */
     Drawer.prototype.selectionForIndex = function (index) {
+        this.maybeRefreshCache();
         return d3.select(this._cachedSelectionNodes[index]);
+    };
+    Drawer.prototype.maybeRefreshCache = function () {
+        if (!this._cachedSelectionValid) {
+            this._cachedSelection = this.renderArea().selectAll(this.selector());
+            this._cachedSelectionNodes = this._cachedSelection.nodes();
+            this._cachedSelectionValid = true;
+        }
     };
     return Drawer;
 }());
@@ -11473,11 +11477,18 @@ var Click = (function (_super) {
         var _this = this;
         _super.apply(this, arguments);
         this._clickedDown = false;
+        this._doubleClicking = false;
         this._onClickCallbacks = new Utils.CallbackSet();
-        this._mouseDownCallback = function (p, event) { return _this._handleClickDown(p, event); };
-        this._mouseUpCallback = function (p, event) { return _this._handleClickUp(p, event); };
-        this._touchStartCallback = function (ids, idToPoint, event) { return _this._handleClickDown(idToPoint[ids[0]], event); };
-        this._touchEndCallback = function (ids, idToPoint, event) { return _this._handleClickUp(idToPoint[ids[0]], event); };
+        this._onDoubleClickCallbacks = new Utils.CallbackSet();
+        /**
+         * Note: we bind to mousedown, mouseup, touchstart and touchend because browsers
+         * have a 300ms delay between touchstart and click to allow for scrolling cancelling etc.
+         */
+        this._mouseDownCallback = function (p) { return _this._handleClickDown(p); };
+        this._mouseUpCallback = function (p) { return _this._handleClickUp(p); };
+        this._dblClickCallback = function (p) { return _this._handleDblClick(); };
+        this._touchStartCallback = function (ids, idToPoint) { return _this._handleClickDown(idToPoint[ids[0]]); };
+        this._touchEndCallback = function (ids, idToPoint) { return _this._handleClickUp(idToPoint[ids[0]]); };
         this._touchCancelCallback = function (ids, idToPoint) { return _this._clickedDown = false; };
     }
     Click.prototype._anchor = function (component) {
@@ -11485,6 +11496,7 @@ var Click = (function (_super) {
         this._mouseDispatcher = Dispatchers.Mouse.getDispatcher(component.content().node());
         this._mouseDispatcher.onMouseDown(this._mouseDownCallback);
         this._mouseDispatcher.onMouseUp(this._mouseUpCallback);
+        this._mouseDispatcher.onDblClick(this._dblClickCallback);
         this._touchDispatcher = Dispatchers.Touch.getDispatcher(component.content().node());
         this._touchDispatcher.onTouchStart(this._touchStartCallback);
         this._touchDispatcher.onTouchEnd(this._touchEndCallback);
@@ -11494,24 +11506,42 @@ var Click = (function (_super) {
         _super.prototype._unanchor.call(this);
         this._mouseDispatcher.offMouseDown(this._mouseDownCallback);
         this._mouseDispatcher.offMouseUp(this._mouseUpCallback);
+        this._mouseDispatcher.offDblClick(this._dblClickCallback);
         this._mouseDispatcher = null;
         this._touchDispatcher.offTouchStart(this._touchStartCallback);
         this._touchDispatcher.offTouchEnd(this._touchEndCallback);
         this._touchDispatcher.offTouchCancel(this._touchCancelCallback);
         this._touchDispatcher = null;
     };
-    Click.prototype._handleClickDown = function (p, e) {
-        var translatedPoint = this._translateToComponentSpace(p);
-        if (this._isInsideComponent(translatedPoint)) {
+    Click.prototype._handleClickDown = function (p) {
+        var translatedP = this._translateToComponentSpace(p);
+        if (this._isInsideComponent(translatedP)) {
             this._clickedDown = true;
+            this._clickedPoint = translatedP;
         }
     };
-    Click.prototype._handleClickUp = function (p, e) {
-        var translatedPoint = this._translateToComponentSpace(p);
-        if (this._clickedDown && this._isInsideComponent(translatedPoint)) {
-            this._onClickCallbacks.callCallbacks(translatedPoint, e);
+    Click.prototype._handleClickUp = function (p) {
+        var _this = this;
+        var translatedP = this._translateToComponentSpace(p);
+        if (this._clickedDown && Click._pointsEqual(translatedP, this._clickedPoint)) {
+            setTimeout(function () {
+                if (!_this._doubleClicking) {
+                    console.log("single click called");
+                    _this._onClickCallbacks.callCallbacks(translatedP);
+                }
+            }, 0);
         }
         this._clickedDown = false;
+    };
+    Click.prototype._handleDblClick = function () {
+        var _this = this;
+        this._doubleClicking = true;
+        console.log("double click called");
+        this._onDoubleClickCallbacks.callCallbacks(this._clickedPoint);
+        setTimeout(function () { return _this._doubleClicking = false; }, 0);
+    };
+    Click._pointsEqual = function (p1, p2) {
+        return p1.x === p2.x && p1.y === p2.y;
     };
     /**
      * Adds a callback to be called when the Component is clicked.
@@ -11531,6 +11561,26 @@ var Click = (function (_super) {
      */
     Click.prototype.offClick = function (callback) {
         this._onClickCallbacks.delete(callback);
+        return this;
+    };
+    /**
+     * Adds a callback to be called when the Component is double-clicked.
+     *
+     * @param {ClickCallback} callback
+     * @return {Interactions.Click} The calling Click Interaction.
+     */
+    Click.prototype.onDoubleClick = function (callback) {
+        this._onDoubleClickCallbacks.add(callback);
+        return this;
+    };
+    /**
+     * Removes a callback that would be called when the Component is double-clicked.
+     *
+     * @param {ClickCallback} callback
+     * @return {Interactions.Click} The calling Click Interaction.
+     */
+    Click.prototype.offDoubleClick = function (callback) {
+        this._onDoubleClickCallbacks.delete(callback);
         return this;
     };
     return Click;
@@ -11556,28 +11606,23 @@ var __extends = (this && this.__extends) || function (d, b) {
 var Dispatchers = __webpack_require__(13);
 var Utils = __webpack_require__(0);
 var interaction_1 = __webpack_require__(14);
-var ClickState;
-(function (ClickState) {
-    ClickState[ClickState["NotClicked"] = 0] = "NotClicked";
-    ClickState[ClickState["SingleClicked"] = 1] = "SingleClicked";
-    ClickState[ClickState["DoubleClicked"] = 2] = "DoubleClicked";
-})(ClickState || (ClickState = {}));
-var DoubleClick = (function (_super) {
-    __extends(DoubleClick, _super);
-    function DoubleClick() {
+var Click = (function (_super) {
+    __extends(Click, _super);
+    function Click() {
         var _this = this;
         _super.apply(this, arguments);
-        this._clickState = ClickState.NotClicked;
         this._clickedDown = false;
+        this._doubleClicking = false;
+        this._onClickCallbacks = new Utils.CallbackSet();
         this._onDoubleClickCallbacks = new Utils.CallbackSet();
         this._mouseDownCallback = function (p) { return _this._handleClickDown(p); };
         this._mouseUpCallback = function (p) { return _this._handleClickUp(p); };
         this._dblClickCallback = function (p) { return _this._handleDblClick(); };
         this._touchStartCallback = function (ids, idToPoint) { return _this._handleClickDown(idToPoint[ids[0]]); };
         this._touchEndCallback = function (ids, idToPoint) { return _this._handleClickUp(idToPoint[ids[0]]); };
-        this._touchCancelCallback = function (ids, idToPoint) { return _this._handleClickCancel(); };
+        this._touchCancelCallback = function (ids, idToPoint) { return _this._clickedDown = false; };
     }
-    DoubleClick.prototype._anchor = function (component) {
+    Click.prototype._anchor = function (component) {
         _super.prototype._anchor.call(this, component);
         this._mouseDispatcher = Dispatchers.Mouse.getDispatcher(component.content().node());
         this._mouseDispatcher.onMouseDown(this._mouseDownCallback);
@@ -11588,7 +11633,7 @@ var DoubleClick = (function (_super) {
         this._touchDispatcher.onTouchEnd(this._touchEndCallback);
         this._touchDispatcher.onTouchCancel(this._touchCancelCallback);
     };
-    DoubleClick.prototype._unanchor = function () {
+    Click.prototype._unanchor = function () {
         _super.prototype._unanchor.call(this);
         this._mouseDispatcher.offMouseDown(this._mouseDownCallback);
         this._mouseDispatcher.offMouseUp(this._mouseUpCallback);
@@ -11599,46 +11644,61 @@ var DoubleClick = (function (_super) {
         this._touchDispatcher.offTouchCancel(this._touchCancelCallback);
         this._touchDispatcher = null;
     };
-    DoubleClick.prototype._handleClickDown = function (p) {
+    Click.prototype._handleClickDown = function (p) {
         var translatedP = this._translateToComponentSpace(p);
         if (this._isInsideComponent(translatedP)) {
-            if (!(this._clickState === ClickState.SingleClicked) || !DoubleClick._pointsEqual(translatedP, this._clickedPoint)) {
-                this._clickState = ClickState.NotClicked;
-            }
-            this._clickedPoint = translatedP;
             this._clickedDown = true;
+            this._clickedPoint = translatedP;
         }
     };
-    DoubleClick.prototype._handleClickUp = function (p) {
+    Click.prototype._handleClickUp = function (p) {
+        var _this = this;
         var translatedP = this._translateToComponentSpace(p);
-        if (this._clickedDown && DoubleClick._pointsEqual(translatedP, this._clickedPoint)) {
-            this._clickState = this._clickState === ClickState.NotClicked ? ClickState.SingleClicked : ClickState.DoubleClicked;
-        }
-        else {
-            this._clickState = ClickState.NotClicked;
+        if (this._clickedDown && Click._pointsEqual(translatedP, this._clickedPoint)) {
+            setTimeout(function () {
+                if (!_this._doubleClicking) {
+                    _this._onClickCallbacks.callCallbacks(translatedP);
+                }
+            }, 0);
         }
         this._clickedDown = false;
     };
-    DoubleClick.prototype._handleDblClick = function () {
-        if (this._clickState === ClickState.DoubleClicked) {
-            this._onDoubleClickCallbacks.callCallbacks(this._clickedPoint);
-            this._clickState = ClickState.NotClicked;
-        }
+    Click.prototype._handleDblClick = function () {
+        var _this = this;
+        this._doubleClicking = true;
+        this._onDoubleClickCallbacks.callCallbacks(this._clickedPoint);
+        setTimeout(function () { return _this._doubleClicking = false; }, 0);
     };
-    DoubleClick.prototype._handleClickCancel = function () {
-        this._clickState = ClickState.NotClicked;
-        this._clickedDown = false;
-    };
-    DoubleClick._pointsEqual = function (p1, p2) {
+    Click._pointsEqual = function (p1, p2) {
         return p1.x === p2.x && p1.y === p2.y;
+    };
+    /**
+     * Adds a callback to be called when the Component is clicked.
+     *
+     * @param {ClickCallback} callback
+     * @return {Interactions.Click} The calling Click Interaction.
+     */
+    Click.prototype.onClick = function (callback) {
+        this._onClickCallbacks.add(callback);
+        return this;
+    };
+    /**
+     * Removes a callback that would be called when the Component is clicked.
+     *
+     * @param {ClickCallback} callback
+     * @return {Interactions.Click} The calling Click Interaction.
+     */
+    Click.prototype.offClick = function (callback) {
+        this._onClickCallbacks.delete(callback);
+        return this;
     };
     /**
      * Adds a callback to be called when the Component is double-clicked.
      *
      * @param {ClickCallback} callback
-     * @return {Interactions.DoubleClick} The calling DoubleClick Interaction.
+     * @return {Interactions.Click} The calling Click Interaction.
      */
-    DoubleClick.prototype.onDoubleClick = function (callback) {
+    Click.prototype.onDoubleClick = function (callback) {
         this._onDoubleClickCallbacks.add(callback);
         return this;
     };
@@ -11646,15 +11706,15 @@ var DoubleClick = (function (_super) {
      * Removes a callback that would be called when the Component is double-clicked.
      *
      * @param {ClickCallback} callback
-     * @return {Interactions.DoubleClick} The calling DoubleClick Interaction.
+     * @return {Interactions.Click} The calling Click Interaction.
      */
-    DoubleClick.prototype.offDoubleClick = function (callback) {
+    Click.prototype.offDoubleClick = function (callback) {
         this._onDoubleClickCallbacks.delete(callback);
         return this;
     };
-    return DoubleClick;
+    return Click;
 }(interaction_1.Interaction));
-exports.DoubleClick = DoubleClick;
+exports.Click = Click;
 
 
 /***/ }),
