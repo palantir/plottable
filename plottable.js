@@ -169,6 +169,18 @@ var Plot = (function (_super) {
         this.animator(Plots.Animator.MAIN, mainAnimator);
         this.animator(Plots.Animator.RESET, new Animators.Null());
     }
+    Plot.prototype._createCanvas = function () {
+        var element = this.element();
+        this._canvas = element.append("canvas");
+    };
+    Plot.prototype.computeLayout = function (origin, availableWidth, availableHeight) {
+        _super.prototype.computeLayout.call(this, origin, availableWidth, availableHeight);
+        this._canvas.attrs({
+            width: this.width(),
+            height: this.height()
+        });
+        return this;
+    };
     Plot.prototype.anchor = function (selection) {
         selection = coerceD3_1.coerceExternalD3(selection);
         _super.prototype.anchor.call(this, selection);
@@ -182,6 +194,7 @@ var Plot = (function (_super) {
         _super.prototype._setup.call(this);
         this._renderArea = this.content().append("g").classed("render-area", true);
         this.datasets().forEach(function (dataset) { return _this._createNodesForDataset(dataset); });
+        this._createCanvas();
     };
     Plot.prototype.destroy = function () {
         var _this = this;
@@ -488,10 +501,13 @@ var Plot = (function (_super) {
         var drawSteps = this._generateDrawSteps();
         var dataToDraw = this._getDataToDraw();
         var drawers = this._getDrawersInOrder();
-        this.datasets().forEach(function (ds, i) { return drawers[i].draw(dataToDraw.get(ds), drawSteps); });
-        var times = this.datasets().map(function (ds, i) { return drawers[i].totalDrawTime(dataToDraw.get(ds), drawSteps); });
-        var maxTime = Utils.Math.max(times, 0);
-        this._additionalPaint(maxTime);
+        // this.datasets().forEach((ds, i) => drawers[i].draw(dataToDraw.get(ds), drawSteps));
+        //
+        // let times = this.datasets().map((ds, i) => drawers[i].totalDrawTime(dataToDraw.get(ds), drawSteps));
+        // let maxTime = Utils.Math.max(times, 0);
+        // this._additionalPaint(maxTime);
+        var context = this._canvas.node().getContext("2d");
+        this.datasets().forEach(function (ds, i) { return drawers[i].drawToCanvas(dataToDraw.get(ds), drawSteps, context); });
     };
     /**
      * Retrieves the drawn visual elements for the specified Datasets as a d3 Selection.
@@ -1311,6 +1327,16 @@ __export(__webpack_require__(51));
 var d3 = __webpack_require__(1);
 var Utils = __webpack_require__(0);
 var coerceD3_1 = __webpack_require__(11);
+/**
+ * A Drawer is responsible for actually committing the DrawSteps to the DOM. You first pass a renderArea
+ * to the Drawer, which is the root DOM node holding all the drawing elements. Subclasses set an _svgElementName
+ * which is an HTML/SVG tag name. Then you call .draw() with the DrawSteps to draw, and the Drawer will draw
+ * to the DOM by clearing old DOM elements, adding new DOM elements, and then passing those DOM elements to
+ * the animator, which will set the appropriate attributes on the DOM.
+ *
+ * "Drawing" in Plottable really means "making the DOM elements and their attributes correctly reflect
+ * the data being passed in".
+ */
 var Drawer = (function () {
     /**
      * A Drawer draws svg elements based on the input Dataset.
@@ -1420,6 +1446,34 @@ var Drawer = (function () {
         var delay = 0;
         appliedDrawSteps.forEach(function (drawStep, i) {
             Utils.Window.setTimeout(function () { return _this._drawStep(drawStep); }, delay);
+            delay += drawStep.animator.totalTime(data.length);
+        });
+        return this;
+    };
+    Drawer.prototype.drawToCanvas = function (data, drawSteps, context) {
+        var _this = this;
+        var appliedDrawSteps = drawSteps.map(function (dr) {
+            var attrToAppliedProjector = _this._appliedProjectors(dr.attrToProjector);
+            return {
+                attrToAppliedProjector: attrToAppliedProjector,
+                animator: dr.animator,
+            };
+        });
+        // // in SVG world:
+        // const update = d3.selectAll("rect").data([ {x: 3, y: 9}, {x: 5, y: 12}]);
+        // // iterate through every data point and set the attrs
+        // update.attrs({ x: (d) => d.x, y: (d) => d.y, fill: ..., stroke: ... });
+        //
+        // // in Canvas world:
+        // data.forEach((point, index) => {
+        //   context.beginPath();
+        //   context.fillStyle = attrsToProjectors["fill"](point, index)
+        //   context.strokeStyle = attrsToProjectors["stroke"](point, index)
+        //   context.rect(attrsToProjectors["x"](point, index))
+        // });
+        var delay = 0;
+        appliedDrawSteps.forEach(function (drawStep, i) {
+            Utils.Window.setTimeout(function () { return _this._canvasDraw(data, drawStep, context); }, delay);
             delay += drawStep.animator.totalTime(data.length);
         });
         return this;
@@ -6819,6 +6873,11 @@ var Line = (function (_super) {
             return curve;
         }
     };
+    /**
+     * Line plots represent each dataset with a single <path> element, so we wrap the dataset data in a single element array.
+     * @returns {Map<Dataset, any[]>}
+     * @private
+     */
     Line.prototype._getDataToDraw = function () {
         var _this = this;
         var dataToDraw = new Utils.Map();
@@ -11162,6 +11221,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
+var d3 = __webpack_require__(1);
 var drawer_1 = __webpack_require__(7);
 var Rectangle = (function (_super) {
     __extends(Rectangle, _super);
@@ -11169,6 +11229,36 @@ var Rectangle = (function (_super) {
         _super.call(this, dataset);
         this._svgElementName = "rect";
     }
+    Rectangle.prototype._canvasDraw = function (data, step, context) {
+        var attrToAppliedProjector = step.attrToAppliedProjector;
+        data.forEach(function (point, index) {
+            var resolvedAttrs = Object.keys(attrToAppliedProjector).reduce(function (obj, attrName) {
+                obj[attrName] = attrToAppliedProjector[attrName](point, index);
+                return obj;
+            }, {});
+            context.beginPath();
+            context.rect(resolvedAttrs["x"], resolvedAttrs["y"], resolvedAttrs["width"], resolvedAttrs["height"]);
+            if (resolvedAttrs["stroke"]) {
+                var strokeColor = d3.color(resolvedAttrs["stroke"]);
+                if (resolvedAttrs["opacity"]) {
+                    strokeColor.opacity = resolvedAttrs["opacity"];
+                }
+                context.strokeStyle = strokeColor.rgb().toString();
+                context.stroke();
+            }
+            if (resolvedAttrs["fill"]) {
+                var fillColor = d3.color(resolvedAttrs["fill"]);
+                if (resolvedAttrs["opacity"]) {
+                    fillColor.opacity = resolvedAttrs["opacity"];
+                }
+                context.fillStyle = fillColor.rgb().toString();
+                context.fill();
+            }
+        });
+        // if (this._className != null) {
+        //   this.selection().classed(this._className, true);
+        // }
+    };
     return Rectangle;
 }(drawer_1.Drawer));
 exports.Rectangle = Rectangle;

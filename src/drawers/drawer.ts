@@ -102,7 +102,6 @@ export abstract class Drawer {
    * @param{AppliedDrawStep} step The step, how data should be drawn.
    */
   private _drawStep(step: Drawers.AppliedDrawStep) {
-    console.log("Drawing", step.attrToAppliedProjector);
     let selection = this.selection();
     let colorAttributes = ["fill", "stroke"];
     colorAttributes.forEach((colorAttribute) => {
