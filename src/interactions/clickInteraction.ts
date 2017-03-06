@@ -28,12 +28,12 @@ export class Click extends Interaction {
    * Note: we bind to mousedown, mouseup, touchstart and touchend because browsers
    * have a 300ms delay between touchstart and click to allow for scrolling cancelling etc.
    */
-  private _mouseDownCallback = (p: Point) => this._handleClickDown(p);
-  private _mouseUpCallback = (p: Point) => this._handleClickUp(p);
-  private _dblClickCallback = (p: Point) => this._handleDblClick();
+  private _mouseDownCallback = (p: Point, event: MouseEvent) => this._handleClickDown(p, event);
+  private _mouseUpCallback = (p: Point, event: MouseEvent) => this._handleClickUp(p, event);
+  private _dblClickCallback = (p: Point, event: MouseEvent) => this._handleDblClick(p, event);
 
-  private _touchStartCallback = (ids: number[], idToPoint: Point[]) => this._handleClickDown(idToPoint[ids[0]]);
-  private _touchEndCallback = (ids: number[], idToPoint: Point[]) => this._handleClickUp(idToPoint[ids[0]]);
+  private _touchStartCallback = (ids: number[], idToPoint: Point[], event: TouchEvent) => this._handleClickDown(idToPoint[ids[0]], event);
+  private _touchEndCallback = (ids: number[], idToPoint: Point[], event: TouchEvent) => this._handleClickUp(idToPoint[ids[0]], event);
   private _touchCancelCallback = (ids: number[], idToPoint: Point[]) => this._clickedDown = false;
 
   protected _anchor(component: Component) {
@@ -63,7 +63,7 @@ export class Click extends Interaction {
     this._touchDispatcher = null;
   }
 
-  private _handleClickDown(p: Point) {
+  private _handleClickDown(p: Point, event: MouseEvent | TouchEvent) {
     let translatedP = this._translateToComponentSpace(p);
     if (this._isInsideComponent(translatedP)) {
       this._clickedDown = true;
@@ -71,23 +71,22 @@ export class Click extends Interaction {
     }
   }
 
-  private _handleClickUp(p: Point) {
+  private _handleClickUp(p: Point, event: MouseEvent | TouchEvent) {
     let translatedP = this._translateToComponentSpace(p);
     if (this._clickedDown && Click._pointsEqual(translatedP, this._clickedPoint)) {
       setTimeout(() => {
         if (!this._doubleClicking) {
-          console.log("single click called");
-          this._onClickCallbacks.callCallbacks(translatedP);
+          this._onClickCallbacks.callCallbacks(translatedP, event);
         }
       }, 0);
     }
     this._clickedDown = false;
   }
 
-  private _handleDblClick() {
+  private _handleDblClick(p: Point, event: MouseEvent | TouchEvent) {
+    const translatedP = this._translateToComponentSpace(p);
     this._doubleClicking = true;
-    console.log("double click called");
-    this._onDoubleClickCallbacks.callCallbacks(this._clickedPoint);
+    this._onDoubleClickCallbacks.callCallbacks(translatedP, event);
     setTimeout(() => this._doubleClicking = false, 0);
   }
 
