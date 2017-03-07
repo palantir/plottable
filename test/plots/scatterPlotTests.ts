@@ -68,7 +68,7 @@ describe("Plots", () => {
 
         const pathString = plot.content().select("path").attr("d");
         const zeroSizePathString = symbolFactory(0);
-        const normalizingPath = div.append("path"); // generated and normalized paths don't align on all browsers
+        const normalizingPath = plot.content().append("path"); // generated and normalized paths don't align on all browsers
         const expectedPathString = normalizingPath.attr("d", zeroSizePathString).attr("d");
         assert.strictEqual(pathString, expectedPathString, "path string is initialized with the correct symbol and a size of 0");
       });
