@@ -131,38 +131,17 @@ describe("Interactions", () => {
       });
     });
 
-    [TestMethods.InteractionMode.Mouse, TestMethods.InteractionMode.Touch].forEach((mode) => {
-      describe(`invoking callbacks with ${TestMethods.InteractionMode[mode]} events`, () => {
-        let callback: ClickTestCallback;
+    describe(`invoking callbacks with mouse events`, () => {
+      let callback: ClickTestCallback;
 
-        beforeEach(() => {
-          callback = makeClickCallback();
-          doubleClickInteraction.onDoubleClick(callback);
-        });
+      beforeEach(() => {
+        callback = makeClickCallback();
+        doubleClickInteraction.onDoubleClick(callback);
+      });
 
-        it("calls callback and passes correct click position", () => {
-          doubleClickPoint(mode);
-          assert.deepEqual(callback.lastPoint, clickedPoint, "was passed correct point");
-        });
-
-        it("does not call callback if clicked in different locations", () => {
-          doubleClickPointWithMove(clickedPoint, {x: clickedPoint.x + 10, y: clickedPoint.y + 10}, mode);
-          assert.isFalse(callback.called, "callback was not called");
-        });
-
-        if (mode === TestMethods.InteractionMode.Touch) {
-          it("does not trigger callback when touch event is cancelled", () => {
-            doubleClickInteraction.onDoubleClick(callback);
-
-            TestMethods.triggerFakeTouchEvent("touchstart", component.content(), [clickedPoint]);
-            TestMethods.triggerFakeTouchEvent("touchend", component.content(), [clickedPoint]);
-            TestMethods.triggerFakeTouchEvent("touchstart", component.content(), [clickedPoint]);
-            TestMethods.triggerFakeTouchEvent("touchend", component.content(), [clickedPoint]);
-            TestMethods.triggerFakeTouchEvent("touchcancel", component.content(), [clickedPoint]);
-            TestMethods.triggerFakeMouseEvent("dblclick", component.content(), clickedPoint.x, clickedPoint.y);
-            assert.isUndefined(callback.lastPoint, "point never set");
-          });
-        }
+      it("calls callback and passes correct click position", () => {
+        doubleClickPoint(TestMethods.InteractionMode.Mouse);
+        assert.deepEqual(callback.lastPoint, clickedPoint, "was passed correct point");
       });
     });
   });
