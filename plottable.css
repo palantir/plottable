@@ -46,6 +46,17 @@
   display: block; /* must be block elements for width/height calculations to work in Firefox. */
   pointer-events: visibleFill;
   position: relative;
+  /**
+   * Pre 3.0, users could set the dimension of the root element in two ways: either using CSS
+   * (inline or through a stylesheet), or using the SVG width/height attributes. By default, we
+   * set the SVG width/height attributes to 100%.
+   *
+   * Post 3.0 the root element is always a normal div and the only way to set the dimensions is
+   * to use CSS. To replicate the "100%-by-default" behavior, we apply width/height 100% to this
+   * selector.
+   */
+  width: 100%;
+  height: 100%;
 }
 
 /**

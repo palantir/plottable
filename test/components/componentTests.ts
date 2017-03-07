@@ -39,7 +39,7 @@ describe("Component", () => {
       assert.isFalse(c.background().select(".background-fill").empty(), "background fill container exists in the DOM");
 
       let componentElement = div.select(".component");
-      let containerNodes = componentElement.selectAll<Element, any>("g").nodes();
+      let containerNodes = componentElement.selectAll<Element, any>("svg").nodes();
       assert.strictEqual(containerNodes[0], c.background().node(), "background at the back");
       assert.strictEqual(containerNodes[1], c.content().node(), "content at the middle");
       assert.strictEqual(containerNodes[2], c.foreground().node(), "foreground at the front");
@@ -91,8 +91,8 @@ describe("Component", () => {
       c.anchor(div);
       let div2 = TestMethods.generateDiv(SVG_WIDTH, SVG_HEIGHT);
       c.anchor(div2);
-      assert.isTrue(div.select("g").empty(), "previous div element should not have any group child nodes");
-      assert.isFalse(div2.select("g").empty(), "new div element should have group child nodes");
+      assert.isTrue(div.select("svg").empty(), "previous div element should not have any group child nodes");
+      assert.isFalse(div2.select("svg").empty(), "new div element should have group child nodes");
       c.destroy();
       div.remove();
       div2.remove();
@@ -375,11 +375,12 @@ describe("Component", () => {
       let parentWidth = 400;
       let parentHeight = 200;
       // Manually size parent
-      let parent = d3.select(<Element> (<Element> div.node()).parentNode);
+      let parent = d3.select(<Element> div.node().parentNode);
       parent.style("width", `${parentWidth}px`);
       parent.style("height", `${parentHeight}px`);
 
-      // Remove width/height attributes and style with CSS
+      // Remove width/height on div directly
+      div.style("width", null).style("height", null);
       c.anchor(div);
       c.computeLayout();
       assert.strictEqual(c.width(), parentWidth, "defaults to width of parent");
