@@ -36,8 +36,8 @@ function run(svg, data, Plottable) {
     // TODO: fix entityNearest for [createPie(data[0]), createSegmentPlot()]
     var chart = new Plottable.Components.Table([
         [createPlot(new Plottable.Plots.Line(), data[0]), createClusteredBar(data[1])],
-        [createPlot(new Plottable.Plots.Scatter(), data[0]), createNumericalScatter(data[2])],
-        [createPlot(new Plottable.Plots.Bar(), data[0]), null],
+        [createPlot(new Plottable.Plots.Scatter(), data[0]), createPlot(new Plottable.Plots.Bar(), data[0])],
+        [createNumericalScatter(data[2]), createNumericalScatter(data[2], true)],
     ]);
 
     chart.renderTo(svg);
@@ -64,6 +64,8 @@ function createPlot(plot, data) {
         }
     });
     pointer.attachTo(plot);
+
+    new Plottable.Interactions.PanZoom(xScale, null).attachTo(plot);
 
     return new Plottable.Components.Table([
         [yAxis, plot],
@@ -99,6 +101,8 @@ function createClusteredBar(data) {
         }
     });
     pointer.attachTo(barPlot);
+
+    new Plottable.Interactions.PanZoom(xScale, null).attachTo(barPlot);
 
     return new Plottable.Components.Table([
         [yAxis, barPlot],
@@ -140,6 +144,8 @@ function createSegmentPlot() {
     });
     pointer.attachTo(plot);
 
+    new Plottable.Interactions.PanZoom(xScale, null).attachTo(plot);
+
     return new Plottable.Components.Table([
         [yAxis, plot],
         [null,  xAxis],
@@ -147,9 +153,14 @@ function createSegmentPlot() {
     ]);
 }
 
-function createNumericalScatter(data) {
+function createNumericalScatter(data, logarithmic = false) {
     var plot = new Plottable.Plots.Scatter()
-    var xScale = new Plottable.Scales.Linear();
+    let xScale;
+    if (logarithmic) {
+        xScale = new Plottable.Scales.ModifiedLog();
+    } else {
+        xScale = new Plottable.Scales.Linear();
+    }
     var yScale = new Plottable.Scales.Linear();
 
     plot.addDataset(new Plottable.Dataset(data))
@@ -169,6 +180,8 @@ function createNumericalScatter(data) {
         }
     });
     pointer.attachTo(plot);
+
+    new Plottable.Interactions.PanZoom(xScale, null).attachTo(plot);
 
     return new Plottable.Components.Table([
         [yAxis, plot],
