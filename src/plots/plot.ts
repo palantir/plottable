@@ -28,22 +28,71 @@ export class Plot extends Component {
    * to access the entity store.
    */
   private _cachedEntityStore: Utils.EntityStore<Plots.LightweightPlotEntity>;
+  /**
+   * Whether the backing datasets have changed since this plot's last render.
+   */
   private _dataChanged = false;
+  /**
+   * Stores the Drawer for each dataset attached to this plot.
+   */
   private _datasetToDrawer: Utils.Map<Dataset, Drawer>;
 
+  /**
+   * The _renderArea is the main SVG drawing area upon which this plot should draw to.
+   */
   protected _renderArea: SimpleSelection<void>;
+  /**
+   * Mapping from attribute names to the AccessorScale that defines that attribute.
+   */
   private _attrBindings: d3.Map<Plots.AccessorScaleBinding<any, any>>;
+  /**
+   * Mapping from attribute names to the extents ([min, max]) values that that attribute takes on.
+   */
   private _attrExtents: d3.Map<any[]>;
+  /**
+   * Callback that we register onto Scales that get bound to this Plot.
+   *
+   * TODO make this an arrow method instead of re-defining it in constructor()
+   */
   private _includedValuesProvider: Scales.IncludedValuesProvider<any>;
 
   private _animate = false;
+  /**
+   * The Animators for this plot. Each plot exposes a set of "animator key" strings that
+   * define how different parts of that particular Plot animates. For instance, Rectangle
+   * Plots have a "rectangles" animator key which controls how the <rect>s are animated.
+   * @see animator()
+   *
+   * There are two common animators that most Plots respect: "main" and "reset". In general,
+   * Plots draw in two steps: first they "reset" their visual elements (e.g. scatter plots set
+   * all the dots to size 0), and then they do the "main" animation into the correct visualization
+   * (e.g. scatter plot dots grow to their specified size).
+   */
   private _animators: {[animator: string]: Animator} = {};
 
+  /**
+   * Callback that triggers when any scale that's bound to this plot Updates.
+   *
+   * TODO make this an arrow method instead of re-defining it in constructor()
+   */
   protected _renderCallback: ScaleCallback<Scale<any, any>>;
+  /**
+   * Callback that triggers when any Dataset that's bound to this plot Updates.
+   *
+   * TODO make this an arrow method insteade of re-defining it in constructor()
+   */
   private _onDatasetUpdateCallback: DatasetCallback;
 
-  protected _propertyExtents: d3.Map<any[]>;
+  /**
+   * Mapping from property names to the AccessorScale that defines that property.
+   *
+   * TODO figure out the difference between properties and attributes
+   */
   protected _propertyBindings: d3.Map<Plots.AccessorScaleBinding<any, any>>;
+  /**
+   * Mapping from property names to the extents ([min, max]) values that that property takes on.
+   */
+  protected _propertyExtents: d3.Map<any[]>;
 
   /**
    * A Plot draws some visualization of the inputted Datasets.

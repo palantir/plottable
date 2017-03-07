@@ -152,8 +152,22 @@ var Plot = (function (_super) {
     function Plot() {
         var _this = this;
         _super.call(this);
+        /**
+         * Whether the backing datasets have changed since this plot's last render.
+         */
         this._dataChanged = false;
         this._animate = false;
+        /**
+         * The Animators for this plot. Each plot exposes a set of "animator key" strings that
+         * define how different parts of that particular Plot animates. For instance, Rectangle
+         * Plots have a "rectangles" animator key which controls how the <rect>s are animated.
+         * @see animator()
+         *
+         * There are two common animators that most Plots respect: "main" and "reset". In general,
+         * Plots draw in two steps: first they "reset" their visual elements (e.g. scatter plots set
+         * all the dots to size 0), and then they do the "main" animation into the correct visualization
+         * (e.g. scatter plot dots grow to their specified size).
+         */
         this._animators = {};
         this._overflowHidden = true;
         this.addClass("plot");
