@@ -1,5 +1,5 @@
 /*!
- * Plottable 3.0.0-beta.1 (https://github.com/palantir/plottable)
+ * Plottable 3.0.0-beta.2 (https://github.com/palantir/plottable)
  * Copyright 2014-2017 Palantir Technologies
  * Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
  */
@@ -94,24 +94,24 @@ return /******/ (function(modules) { // webpackBootstrap
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-var Array = __webpack_require__(92);
+var Array = __webpack_require__(93);
 exports.Array = Array;
-var Color = __webpack_require__(94);
+var Color = __webpack_require__(96);
 exports.Color = Color;
-var DOM = __webpack_require__(95);
+var DOM = __webpack_require__(40);
 exports.DOM = DOM;
 var Math = __webpack_require__(28);
 exports.Math = Math;
-var Stacking = __webpack_require__(98);
+var Stacking = __webpack_require__(99);
 exports.Stacking = Stacking;
 var Window = __webpack_require__(100);
 exports.Window = Window;
-__export(__webpack_require__(93));
-__export(__webpack_require__(127));
+__export(__webpack_require__(94));
+__export(__webpack_require__(95));
 __export(__webpack_require__(11));
-__export(__webpack_require__(96));
 __export(__webpack_require__(97));
-__export(__webpack_require__(40));
+__export(__webpack_require__(98));
+__export(__webpack_require__(41));
 
 
 /***/ }),
@@ -637,14 +637,14 @@ exports.Plot = Plot;
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-var TickGenerators = __webpack_require__(90);
+var TickGenerators = __webpack_require__(91);
 exports.TickGenerators = TickGenerators;
 __export(__webpack_require__(39));
-__export(__webpack_require__(86));
 __export(__webpack_require__(87));
 __export(__webpack_require__(88));
 __export(__webpack_require__(89));
-__export(__webpack_require__(91));
+__export(__webpack_require__(90));
+__export(__webpack_require__(92));
 // ---------------------------------------------------------
 var categoryScale_2 = __webpack_require__(39);
 var quantitativeScale_1 = __webpack_require__(10);
@@ -1261,8 +1261,8 @@ exports.Component = Component;
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-__export(__webpack_require__(50));
 __export(__webpack_require__(51));
+__export(__webpack_require__(52));
 
 
 /***/ }),
@@ -1677,13 +1677,13 @@ function verifyPrecision(precision) {
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-__export(__webpack_require__(66));
 __export(__webpack_require__(67));
 __export(__webpack_require__(68));
 __export(__webpack_require__(69));
 __export(__webpack_require__(70));
 __export(__webpack_require__(71));
 __export(__webpack_require__(72));
+__export(__webpack_require__(73));
 
 
 /***/ }),
@@ -2026,9 +2026,9 @@ __export(__webpack_require__(121));
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-__export(__webpack_require__(63));
 __export(__webpack_require__(64));
 __export(__webpack_require__(65));
+__export(__webpack_require__(66));
 
 
 /***/ }),
@@ -2146,12 +2146,12 @@ exports.Interaction = Interaction;
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-__export(__webpack_require__(73));
 __export(__webpack_require__(74));
 __export(__webpack_require__(75));
-__export(__webpack_require__(32));
 __export(__webpack_require__(76));
+__export(__webpack_require__(32));
 __export(__webpack_require__(77));
+__export(__webpack_require__(78));
 
 
 /***/ }),
@@ -2535,15 +2535,15 @@ function __export(m) {
 __export(__webpack_require__(36));
 __export(__webpack_require__(22));
 __export(__webpack_require__(37));
-__export(__webpack_require__(78));
-__export(__webpack_require__(38));
 __export(__webpack_require__(79));
+__export(__webpack_require__(38));
 __export(__webpack_require__(80));
 __export(__webpack_require__(81));
 __export(__webpack_require__(82));
 __export(__webpack_require__(83));
 __export(__webpack_require__(84));
 __export(__webpack_require__(85));
+__export(__webpack_require__(86));
 
 
 /***/ }),
@@ -5513,18 +5513,18 @@ function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
 __export(__webpack_require__(27));
-__export(__webpack_require__(54));
 __export(__webpack_require__(55));
+__export(__webpack_require__(56));
 __export(__webpack_require__(33));
 __export(__webpack_require__(34));
-__export(__webpack_require__(56));
 __export(__webpack_require__(57));
 __export(__webpack_require__(58));
 __export(__webpack_require__(59));
-__export(__webpack_require__(35));
 __export(__webpack_require__(60));
+__export(__webpack_require__(35));
 __export(__webpack_require__(61));
 __export(__webpack_require__(62));
+__export(__webpack_require__(63));
 var Alignment = (function () {
     function Alignment() {
     }
@@ -7105,6 +7105,261 @@ exports.Category = Category;
  * @license MIT
  */
 
+var nativeMath = window.Math;
+/**
+ * Gets the bounding box of an element.
+ * @param {d3.Selection} element
+ * @returns {SVGRed} The bounding box.
+ */
+function elementBBox(element) {
+    var bbox;
+    // HACKHACK: Firefox won't correctly measure nodes with style "display: none" or their descendents (FF Bug 612118).
+    try {
+        bbox = element.node().getBBox();
+    }
+    catch (err) {
+        bbox = { x: 0, y: 0, width: 0, height: 0 };
+    }
+    return bbox;
+}
+exports.elementBBox = elementBBox;
+/**
+ * Screen refresh rate which is assumed to be 60fps
+ */
+exports.SCREEN_REFRESH_RATE_MILLISECONDS = 1000 / 60;
+/**
+ * Polyfill for `window.requestAnimationFrame`.
+ * If the function exists, then we use the function directly.
+ * Otherwise, we set a timeout on `SCREEN_REFRESH_RATE_MILLISECONDS` and then perform the function.
+ *
+ * @param {() => void} callback The callback to call in the next animation frame
+ */
+function requestAnimationFramePolyfill(callback) {
+    if (window.requestAnimationFrame != null) {
+        window.requestAnimationFrame(callback);
+    }
+    else {
+        setTimeout(callback, exports.SCREEN_REFRESH_RATE_MILLISECONDS);
+    }
+}
+exports.requestAnimationFramePolyfill = requestAnimationFramePolyfill;
+/**
+ * Calculates the width of the element.
+ * The width includes the padding and the border on the element's left and right sides.
+ *
+ * @param {Element} element The element to query
+ * @returns {number} The width of the element.
+ */
+function elementWidth(element) {
+    var style = window.getComputedStyle(element);
+    return _parseStyleValue(style, "width")
+        + _parseStyleValue(style, "padding-left")
+        + _parseStyleValue(style, "padding-right")
+        + _parseStyleValue(style, "border-left-width")
+        + _parseStyleValue(style, "border-right-width");
+}
+exports.elementWidth = elementWidth;
+/**
+ * Calculates the height of the element.
+ * The height includes the padding the and the border on the element's top and bottom sides.
+ *
+ * @param {Element} element The element to query
+ * @returns {number} The height of the element
+ */
+function elementHeight(element) {
+    var style = window.getComputedStyle(element);
+    return _parseStyleValue(style, "height")
+        + _parseStyleValue(style, "padding-top")
+        + _parseStyleValue(style, "padding-bottom")
+        + _parseStyleValue(style, "border-top-width")
+        + _parseStyleValue(style, "border-bottom-width");
+}
+exports.elementHeight = elementHeight;
+// taken from the BNF at https://www.w3.org/TR/SVG/coords.html
+var WSP = "\\s";
+var NUMBER = "(?:[-+]?[0-9]*\\.?[0-9]+)";
+var COMMA_WSP = "(?:(?:" + WSP + "+,?" + WSP + "*)|(?:," + WSP + "*))";
+var TRANSLATE_REGEX = new RegExp("translate" + WSP + "*\\(" + WSP + "*(" + NUMBER + ")(?:" + COMMA_WSP + "(" + NUMBER + "))?" + WSP + "*\\)");
+var ROTATE_REGEX = new RegExp("rotate" + WSP + "*\\(" + WSP + "*(" + NUMBER + ")" + WSP + "*\\)");
+var SCALE_REGEX = new RegExp("scale" + WSP + "*\\(" + WSP + "*(" + NUMBER + ")(?:" + COMMA_WSP + "(" + NUMBER + "))?" + WSP + "*\\)");
+/**
+ * Accepts selections whose .transform contain a "translate(a, b)" and extracts the a and b
+ */
+function getTranslateValues(el) {
+    var match = TRANSLATE_REGEX.exec(el.attr("transform"));
+    if (match != null) {
+        var translateX = match[1], _a = match[2], translateY = _a === void 0 ? 0 : _a;
+        return [+translateX, +translateY];
+    }
+    else {
+        return [0, 0];
+    }
+}
+exports.getTranslateValues = getTranslateValues;
+/**
+ * Accepts selections whose .transform contain a "rotate(angle)" and returns the angle
+ */
+function getRotate(el) {
+    var match = ROTATE_REGEX.exec(el.attr("transform"));
+    if (match != null) {
+        var rotation = match[1];
+        return +rotation;
+    }
+    else {
+        return 0;
+    }
+}
+exports.getRotate = getRotate;
+function getScaleValues(el) {
+    var match = SCALE_REGEX.exec(el.attr("transform"));
+    if (match != null) {
+        var scaleX = match[1], scaleY = match[2];
+        return [+scaleX, scaleY == null ? +scaleX : +scaleY];
+    }
+    else {
+        return [0, 0];
+    }
+}
+exports.getScaleValues = getScaleValues;
+/**
+ * Checks if the first ClientRect overlaps the second.
+ *
+ * @param {ClientRect} clientRectA The first ClientRect
+ * @param {ClientRect} clientRectB The second ClientRect
+ * @returns {boolean} If the ClientRects overlap each other.
+ */
+function clientRectsOverlap(clientRectA, clientRectB) {
+    if (nativeMath.floor(clientRectA.right) <= nativeMath.ceil(clientRectB.left)) {
+        return false;
+    }
+    if (nativeMath.ceil(clientRectA.left) >= nativeMath.floor(clientRectB.right)) {
+        return false;
+    }
+    if (nativeMath.floor(clientRectA.bottom) <= nativeMath.ceil(clientRectB.top)) {
+        return false;
+    }
+    if (nativeMath.ceil(clientRectA.top) >= nativeMath.floor(clientRectB.bottom)) {
+        return false;
+    }
+    return true;
+}
+exports.clientRectsOverlap = clientRectsOverlap;
+/**
+ * Return a new ClientRect that is the old ClientRect expanded by amount in all directions.
+ * @param rect
+ * @param amount
+ */
+function expandRect(rect, amount) {
+    return {
+        left: rect.left - amount,
+        top: rect.top - amount,
+        right: rect.right + amount,
+        bottom: rect.bottom + amount,
+        width: rect.width + amount * 2,
+        height: rect.height + amount * 2
+    };
+}
+exports.expandRect = expandRect;
+/**
+ * Returns true if and only if innerClientRect is inside outerClientRect.
+ *
+ * @param {ClientRect} innerClientRect The first ClientRect
+ * @param {ClientRect} outerClientRect The second ClientRect
+ * @returns {boolean} If and only if the innerClientRect is inside outerClientRect.
+ */
+function clientRectInside(innerClientRect, outerClientRect) {
+    return (nativeMath.floor(outerClientRect.left) <= nativeMath.ceil(innerClientRect.left) &&
+        nativeMath.floor(outerClientRect.top) <= nativeMath.ceil(innerClientRect.top) &&
+        nativeMath.floor(innerClientRect.right) <= nativeMath.ceil(outerClientRect.right) &&
+        nativeMath.floor(innerClientRect.bottom) <= nativeMath.ceil(outerClientRect.bottom));
+}
+exports.clientRectInside = clientRectInside;
+/**
+ * Retrieves the bounding svg of the input element
+ *
+ * @param {SVGElement} element The element to query
+ * @returns {SVGElement} The bounding svg
+ */
+function boundingSVG(element) {
+    var ownerSVG = element.ownerSVGElement;
+    if (ownerSVG != null) {
+        return ownerSVG;
+    }
+    if (element.nodeName.toLowerCase() === "svg") {
+        return element;
+    }
+    return null; // not in the DOM
+}
+exports.boundingSVG = boundingSVG;
+var _latestClipPathId = 0;
+/**
+ * Generates a ClipPath ID that is unique for this instance of Plottable
+ */
+function generateUniqueClipPathId() {
+    return "plottableClipPath" + ++_latestClipPathId;
+}
+exports.generateUniqueClipPathId = generateUniqueClipPathId;
+/**
+ * Returns true if the supplied coordinates or Ranges intersect or are contained by bbox.
+ *
+ * @param {number | Range} xValOrRange The x coordinate or Range to test
+ * @param {number | Range} yValOrRange The y coordinate or Range to test
+ * @param {SVGRect} bbox The bbox
+ * @param {number} tolerance Amount by which to expand bbox, in each dimension, before
+ * testing intersection
+ *
+ * @returns {boolean} True if the supplied coordinates or Ranges intersect or are
+ * contained by bbox, false otherwise.
+ */
+function intersectsBBox(xValOrRange, yValOrRange, bbox, tolerance) {
+    if (tolerance === void 0) { tolerance = 0.5; }
+    var xRange = _parseRange(xValOrRange);
+    var yRange = _parseRange(yValOrRange);
+    // SVGRects are positioned with sub-pixel accuracy (the default unit
+    // for the x, y, height & width attributes), but user selections (e.g. via
+    // mouse events) usually have pixel accuracy. A tolerance of half-a-pixel
+    // seems appropriate.
+    return bbox.x + bbox.width >= xRange.min - tolerance &&
+        bbox.x <= xRange.max + tolerance &&
+        bbox.y + bbox.height >= yRange.min - tolerance &&
+        bbox.y <= yRange.max + tolerance;
+}
+exports.intersectsBBox = intersectsBBox;
+/**
+ * Create a Range from a number or an object with "min" and "max" defined.
+ *
+ * @param {any} input The object to parse
+ *
+ * @returns {Range} The generated Range
+ */
+function _parseRange(input) {
+    if (typeof (input) === "number") {
+        var value = input;
+        return { min: value, max: value };
+    }
+    var range = input;
+    if (range instanceof Object && "min" in range && "max" in range) {
+        return range;
+    }
+    throw new Error("input '" + input + "' can't be parsed as an Range");
+}
+function _parseStyleValue(style, property) {
+    var value = style.getPropertyValue(property);
+    var parsedValue = parseFloat(value);
+    return parsedValue || 0;
+}
+
+
+/***/ }),
+/* 41 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/**
+ * Copyright 2014-present Palantir Technologies
+ * @license MIT
+ */
+
 /**
  * Shim for ES6 set.
  * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Set
@@ -7168,7 +7423,7 @@ exports.Set = Set;
 
 
 /***/ }),
-/* 41 */
+/* 42 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7236,7 +7491,7 @@ exports.AbstractMeasurer = AbstractMeasurer;
 //# sourceMappingURL=abstractMeasurer.js.map
 
 /***/ }),
-/* 42 */
+/* 43 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7252,7 +7507,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
 var utils_1 = __webpack_require__(12);
-var characterMeasurer_1 = __webpack_require__(43);
+var characterMeasurer_1 = __webpack_require__(44);
 var CacheCharacterMeasurer = (function (_super) {
     __extends(CacheCharacterMeasurer, _super);
     function CacheCharacterMeasurer(area, className, useGuards) {
@@ -7277,7 +7532,7 @@ exports.CacheCharacterMeasurer = CacheCharacterMeasurer;
 //# sourceMappingURL=cacheCharacterMeasurer.js.map
 
 /***/ }),
-/* 43 */
+/* 44 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7293,7 +7548,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
 var d3 = __webpack_require__(1);
-var measurer_1 = __webpack_require__(44);
+var measurer_1 = __webpack_require__(45);
 var CharacterMeasurer = (function (_super) {
     __extends(CharacterMeasurer, _super);
     function CharacterMeasurer() {
@@ -7316,7 +7571,7 @@ exports.CharacterMeasurer = CharacterMeasurer;
 //# sourceMappingURL=characterMeasurer.js.map
 
 /***/ }),
-/* 44 */
+/* 45 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7332,7 +7587,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
 var d3 = __webpack_require__(1);
-var abstractMeasurer_1 = __webpack_require__(41);
+var abstractMeasurer_1 = __webpack_require__(42);
 var Measurer = (function (_super) {
     __extends(Measurer, _super);
     function Measurer(area, className, useGuards) {
@@ -7378,7 +7633,7 @@ exports.Measurer = Measurer;
 //# sourceMappingURL=measurer.js.map
 
 /***/ }),
-/* 45 */
+/* 46 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7605,7 +7860,7 @@ exports.Wrapper = Wrapper;
 //# sourceMappingURL=wrapper.js.map
 
 /***/ }),
-/* 46 */
+/* 47 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7617,13 +7872,13 @@ exports.Wrapper = Wrapper;
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-__export(__webpack_require__(52));
 __export(__webpack_require__(53));
+__export(__webpack_require__(54));
 __export(__webpack_require__(23));
 
 
 /***/ }),
-/* 47 */
+/* 48 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7695,7 +7950,7 @@ exports.Dataset = Dataset;
 
 
 /***/ }),
-/* 48 */
+/* 49 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7713,7 +7968,7 @@ exports.version = "3.0.0-beta.2";
 
 
 /***/ }),
-/* 49 */
+/* 50 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7812,7 +8067,7 @@ d3Transition.transition.prototype.styles = transition_styles;
 
 
 /***/ }),
-/* 50 */
+/* 51 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7989,7 +8244,7 @@ exports.Easing = Easing;
 
 
 /***/ }),
-/* 51 */
+/* 52 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8019,7 +8274,7 @@ exports.Null = Null;
 
 
 /***/ }),
-/* 52 */
+/* 53 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8390,7 +8645,7 @@ exports.Category = Category;
 
 
 /***/ }),
-/* 53 */
+/* 54 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8684,7 +8939,7 @@ exports.Numeric = Numeric;
 
 
 /***/ }),
-/* 54 */
+/* 55 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8873,7 +9128,7 @@ exports.DragLineLayer = DragLineLayer;
 
 
 /***/ }),
-/* 55 */
+/* 56 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8983,7 +9238,7 @@ exports.Gridlines = Gridlines;
 
 
 /***/ }),
-/* 56 */
+/* 57 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -9244,7 +9499,7 @@ exports.InterpolatedColorLegend = InterpolatedColorLegend;
 
 
 /***/ }),
-/* 57 */
+/* 58 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -9410,7 +9665,7 @@ exports.AxisLabel = AxisLabel;
 
 
 /***/ }),
-/* 58 */
+/* 59 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -9921,7 +10176,7 @@ exports.Legend = Legend;
 
 
 /***/ }),
-/* 59 */
+/* 60 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -9978,7 +10233,7 @@ exports.PlotGroup = PlotGroup;
 
 
 /***/ }),
-/* 60 */
+/* 61 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -10377,7 +10632,7 @@ exports.Table = Table;
 
 
 /***/ }),
-/* 61 */
+/* 62 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -10443,7 +10698,7 @@ exports.XDragBoxLayer = XDragBoxLayer;
 
 
 /***/ }),
-/* 62 */
+/* 63 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -10509,7 +10764,7 @@ exports.YDragBoxLayer = YDragBoxLayer;
 
 
 /***/ }),
-/* 63 */
+/* 64 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -10605,7 +10860,7 @@ exports.Key = Key;
 
 
 /***/ }),
-/* 64 */
+/* 65 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -10805,7 +11060,7 @@ exports.Mouse = Mouse;
 
 
 /***/ }),
-/* 65 */
+/* 66 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -10981,7 +11236,7 @@ exports.Touch = Touch;
 
 
 /***/ }),
-/* 66 */
+/* 67 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -11013,7 +11268,7 @@ exports.Arc = Arc;
 
 
 /***/ }),
-/* 67 */
+/* 68 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -11045,7 +11300,7 @@ exports.ArcOutline = ArcOutline;
 
 
 /***/ }),
-/* 68 */
+/* 69 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -11081,7 +11336,7 @@ exports.Area = Area;
 
 
 /***/ }),
-/* 69 */
+/* 70 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -11117,7 +11372,7 @@ exports.Line = Line;
 
 
 /***/ }),
-/* 70 */
+/* 71 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -11144,7 +11399,7 @@ exports.Rectangle = Rectangle;
 
 
 /***/ }),
-/* 71 */
+/* 72 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -11171,7 +11426,7 @@ exports.Segment = Segment;
 
 
 /***/ }),
-/* 72 */
+/* 73 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -11199,7 +11454,7 @@ exports.Symbol = Symbol;
 
 
 /***/ }),
-/* 73 */
+/* 74 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -11288,7 +11543,7 @@ exports.Click = Click;
 
 
 /***/ }),
-/* 74 */
+/* 75 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -11407,7 +11662,7 @@ exports.DoubleClick = DoubleClick;
 
 
 /***/ }),
-/* 75 */
+/* 76 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -11572,7 +11827,7 @@ exports.Drag = Drag;
 
 
 /***/ }),
-/* 76 */
+/* 77 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -12130,7 +12385,7 @@ exports.PanZoom = PanZoom;
 
 
 /***/ }),
-/* 77 */
+/* 78 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -12261,7 +12516,7 @@ exports.Pointer = Pointer;
 
 
 /***/ }),
-/* 78 */
+/* 79 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -12334,7 +12589,7 @@ exports.ClusteredBar = ClusteredBar;
 
 
 /***/ }),
-/* 79 */
+/* 80 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -12831,7 +13086,7 @@ exports.Pie = Pie;
 
 
 /***/ }),
-/* 80 */
+/* 81 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -13197,7 +13452,7 @@ exports.Rectangle = Rectangle;
 
 
 /***/ }),
-/* 81 */
+/* 82 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -13375,7 +13630,7 @@ exports.Scatter = Scatter;
 
 
 /***/ }),
-/* 82 */
+/* 83 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -13573,7 +13828,7 @@ exports.Segment = Segment;
 
 
 /***/ }),
-/* 83 */
+/* 84 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -13776,7 +14031,7 @@ exports.StackedArea = StackedArea;
 
 
 /***/ }),
-/* 84 */
+/* 85 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -13995,7 +14250,7 @@ exports.StackedBar = StackedBar;
 
 
 /***/ }),
-/* 85 */
+/* 86 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -14206,7 +14461,7 @@ exports.Waterfall = Waterfall;
 
 
 /***/ }),
-/* 86 */
+/* 87 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -14337,7 +14592,7 @@ exports.Color = Color;
 
 
 /***/ }),
-/* 87 */
+/* 88 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -14503,7 +14758,7 @@ exports.InterpolatedColor = InterpolatedColor;
 
 
 /***/ }),
-/* 88 */
+/* 89 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -14582,7 +14837,7 @@ exports.Linear = Linear;
 
 
 /***/ }),
-/* 89 */
+/* 90 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -14806,7 +15061,7 @@ exports.ModifiedLog = ModifiedLog;
 
 
 /***/ }),
-/* 90 */
+/* 91 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -14856,7 +15111,7 @@ exports.integerTickGenerator = integerTickGenerator;
 
 
 /***/ }),
-/* 91 */
+/* 92 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -14992,7 +15247,7 @@ exports.Time = Time;
 
 
 /***/ }),
-/* 92 */
+/* 93 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -15062,7 +15317,7 @@ exports.createFilledArray = createFilledArray;
 
 
 /***/ }),
-/* 93 */
+/* 94 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -15076,7 +15331,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var set_1 = __webpack_require__(40);
+var set_1 = __webpack_require__(41);
 /**
  * A set of callbacks which can be all invoked at once.
  * Each callback exists at most once in the set (based on reference equality).
@@ -15104,7 +15359,86 @@ exports.CallbackSet = CallbackSet;
 
 
 /***/ }),
-/* 94 */
+/* 95 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/**
+ * Copyright 2014-present Palantir Technologies
+ * @license MIT
+ */
+
+var DOM = __webpack_require__(40);
+var ClientToSVGTranslator = (function () {
+    function ClientToSVGTranslator(svg) {
+        this._svg = svg;
+        this._measureRect = document.createElementNS(svg.namespaceURI, "rect");
+        this._measureRect.setAttribute("class", "measure-rect");
+        this._measureRect.setAttribute("style", "opacity: 0; visibility: hidden;");
+        this._measureRect.setAttribute("stroke-width", "0");
+        this._measureRect.setAttribute("width", "1");
+        this._measureRect.setAttribute("height", "1");
+        this._svg.appendChild(this._measureRect);
+    }
+    /**
+     * Returns the ClientToSVGTranslator for the <svg> containing elem.
+     * If one already exists on that <svg>, it will be returned; otherwise, a new one will be created.
+     */
+    ClientToSVGTranslator.getTranslator = function (elem) {
+        var svg = DOM.boundingSVG(elem);
+        var translator = svg[ClientToSVGTranslator._TRANSLATOR_KEY];
+        if (translator == null) {
+            translator = new ClientToSVGTranslator(svg);
+            svg[ClientToSVGTranslator._TRANSLATOR_KEY] = translator;
+        }
+        return translator;
+    };
+    /**
+     * Computes the position relative to the <svg> in svg-coordinate-space.
+     */
+    ClientToSVGTranslator.prototype.computePosition = function (clientX, clientY) {
+        // get the origin
+        this._measureRect.setAttribute("x", "0");
+        this._measureRect.setAttribute("y", "0");
+        var mrBCR = this._measureRect.getBoundingClientRect();
+        var origin = { x: mrBCR.left, y: mrBCR.top };
+        // calculate the scale
+        var sampleDistance = 100;
+        this._measureRect.setAttribute("x", String(sampleDistance));
+        this._measureRect.setAttribute("y", String(sampleDistance));
+        mrBCR = this._measureRect.getBoundingClientRect();
+        var testPoint = { x: mrBCR.left, y: mrBCR.top };
+        // invalid measurements -- SVG might not be in the DOM
+        if (origin.x === testPoint.x || origin.y === testPoint.y) {
+            return null;
+        }
+        var scaleX = (testPoint.x - origin.x) / sampleDistance;
+        var scaleY = (testPoint.y - origin.y) / sampleDistance;
+        // get the true cursor position
+        this._measureRect.setAttribute("x", String((clientX - origin.x) / scaleX));
+        this._measureRect.setAttribute("y", String((clientY - origin.y) / scaleY));
+        mrBCR = this._measureRect.getBoundingClientRect();
+        var trueCursorPosition = { x: mrBCR.left, y: mrBCR.top };
+        var scaledPosition = {
+            x: (trueCursorPosition.x - origin.x) / scaleX,
+            y: (trueCursorPosition.y - origin.y) / scaleY,
+        };
+        return scaledPosition;
+    };
+    /**
+     * Checks whether event happened inside <svg> element.
+     */
+    ClientToSVGTranslator.prototype.insideSVG = function (e) {
+        return DOM.boundingSVG(e.target) === this._svg;
+    };
+    ClientToSVGTranslator._TRANSLATOR_KEY = "__Plottable_ClientToSVGTranslator";
+    return ClientToSVGTranslator;
+}());
+exports.ClientToSVGTranslator = ClientToSVGTranslator;
+
+
+/***/ }),
+/* 96 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -15187,262 +15521,7 @@ function luminance(color) {
 
 
 /***/ }),
-/* 95 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-/**
- * Copyright 2014-present Palantir Technologies
- * @license MIT
- */
-
-var nativeMath = window.Math;
-/**
- * Gets the bounding box of an element.
- * @param {d3.Selection} element
- * @returns {SVGRed} The bounding box.
- */
-function elementBBox(element) {
-    var bbox;
-    // HACKHACK: Firefox won't correctly measure nodes with style "display: none" or their descendents (FF Bug 612118).
-    try {
-        bbox = element.node().getBBox();
-    }
-    catch (err) {
-        bbox = { x: 0, y: 0, width: 0, height: 0 };
-    }
-    return bbox;
-}
-exports.elementBBox = elementBBox;
-/**
- * Screen refresh rate which is assumed to be 60fps
- */
-exports.SCREEN_REFRESH_RATE_MILLISECONDS = 1000 / 60;
-/**
- * Polyfill for `window.requestAnimationFrame`.
- * If the function exists, then we use the function directly.
- * Otherwise, we set a timeout on `SCREEN_REFRESH_RATE_MILLISECONDS` and then perform the function.
- *
- * @param {() => void} callback The callback to call in the next animation frame
- */
-function requestAnimationFramePolyfill(callback) {
-    if (window.requestAnimationFrame != null) {
-        window.requestAnimationFrame(callback);
-    }
-    else {
-        setTimeout(callback, exports.SCREEN_REFRESH_RATE_MILLISECONDS);
-    }
-}
-exports.requestAnimationFramePolyfill = requestAnimationFramePolyfill;
-/**
- * Calculates the width of the element.
- * The width includes the padding and the border on the element's left and right sides.
- *
- * @param {Element} element The element to query
- * @returns {number} The width of the element.
- */
-function elementWidth(element) {
-    var style = window.getComputedStyle(element);
-    return _parseStyleValue(style, "width")
-        + _parseStyleValue(style, "padding-left")
-        + _parseStyleValue(style, "padding-right")
-        + _parseStyleValue(style, "border-left-width")
-        + _parseStyleValue(style, "border-right-width");
-}
-exports.elementWidth = elementWidth;
-/**
- * Calculates the height of the element.
- * The height includes the padding the and the border on the element's top and bottom sides.
- *
- * @param {Element} element The element to query
- * @returns {number} The height of the element
- */
-function elementHeight(element) {
-    var style = window.getComputedStyle(element);
-    return _parseStyleValue(style, "height")
-        + _parseStyleValue(style, "padding-top")
-        + _parseStyleValue(style, "padding-bottom")
-        + _parseStyleValue(style, "border-top-width")
-        + _parseStyleValue(style, "border-bottom-width");
-}
-exports.elementHeight = elementHeight;
-// taken from the BNF at https://www.w3.org/TR/SVG/coords.html
-var WSP = "\\s";
-var NUMBER = "(?:[-+]?[0-9]*\\.?[0-9]+)";
-var COMMA_WSP = "(?:(?:" + WSP + "+,?" + WSP + "*)|(?:," + WSP + "*))";
-var TRANSLATE_REGEX = new RegExp("translate" + WSP + "*\\(" + WSP + "*(" + NUMBER + ")(?:" + COMMA_WSP + "(" + NUMBER + "))?" + WSP + "*\\)");
-var ROTATE_REGEX = new RegExp("rotate" + WSP + "*\\(" + WSP + "*(" + NUMBER + ")" + WSP + "*\\)");
-var SCALE_REGEX = new RegExp("scale" + WSP + "*\\(" + WSP + "*(" + NUMBER + ")(?:" + COMMA_WSP + "(" + NUMBER + "))?" + WSP + "*\\)");
-/**
- * Accepts selections whose .transform contain a "translate(a, b)" and extracts the a and b
- */
-function getTranslateValues(el) {
-    var match = TRANSLATE_REGEX.exec(el.attr("transform"));
-    if (match != null) {
-        var translateX = match[1], _a = match[2], translateY = _a === void 0 ? 0 : _a;
-        return [+translateX, +translateY];
-    }
-    else {
-        return [0, 0];
-    }
-}
-exports.getTranslateValues = getTranslateValues;
-/**
- * Accepts selections whose .transform contain a "rotate(angle)" and returns the angle
- */
-function getRotate(el) {
-    var match = ROTATE_REGEX.exec(el.attr("transform"));
-    if (match != null) {
-        var rotation = match[1];
-        return +rotation;
-    }
-    else {
-        return 0;
-    }
-}
-exports.getRotate = getRotate;
-function getScaleValues(el) {
-    var match = SCALE_REGEX.exec(el.attr("transform"));
-    if (match != null) {
-        var scaleX = match[1], scaleY = match[2];
-        return [+scaleX, scaleY == null ? +scaleX : +scaleY];
-    }
-    else {
-        return [0, 0];
-    }
-}
-exports.getScaleValues = getScaleValues;
-/**
- * Checks if the first ClientRect overlaps the second.
- *
- * @param {ClientRect} clientRectA The first ClientRect
- * @param {ClientRect} clientRectB The second ClientRect
- * @returns {boolean} If the ClientRects overlap each other.
- */
-function clientRectsOverlap(clientRectA, clientRectB) {
-    if (nativeMath.floor(clientRectA.right) <= nativeMath.ceil(clientRectB.left)) {
-        return false;
-    }
-    if (nativeMath.ceil(clientRectA.left) >= nativeMath.floor(clientRectB.right)) {
-        return false;
-    }
-    if (nativeMath.floor(clientRectA.bottom) <= nativeMath.ceil(clientRectB.top)) {
-        return false;
-    }
-    if (nativeMath.ceil(clientRectA.top) >= nativeMath.floor(clientRectB.bottom)) {
-        return false;
-    }
-    return true;
-}
-exports.clientRectsOverlap = clientRectsOverlap;
-/**
- * Return a new ClientRect that is the old ClientRect expanded by amount in all directions.
- * @param rect
- * @param amount
- */
-function expandRect(rect, amount) {
-    return {
-        left: rect.left - amount,
-        top: rect.top - amount,
-        right: rect.right + amount,
-        bottom: rect.bottom + amount,
-        width: rect.width + amount * 2,
-        height: rect.height + amount * 2
-    };
-}
-exports.expandRect = expandRect;
-/**
- * Returns true if and only if innerClientRect is inside outerClientRect.
- *
- * @param {ClientRect} innerClientRect The first ClientRect
- * @param {ClientRect} outerClientRect The second ClientRect
- * @returns {boolean} If and only if the innerClientRect is inside outerClientRect.
- */
-function clientRectInside(innerClientRect, outerClientRect) {
-    return (nativeMath.floor(outerClientRect.left) <= nativeMath.ceil(innerClientRect.left) &&
-        nativeMath.floor(outerClientRect.top) <= nativeMath.ceil(innerClientRect.top) &&
-        nativeMath.floor(innerClientRect.right) <= nativeMath.ceil(outerClientRect.right) &&
-        nativeMath.floor(innerClientRect.bottom) <= nativeMath.ceil(outerClientRect.bottom));
-}
-exports.clientRectInside = clientRectInside;
-/**
- * Retrieves the bounding svg of the input element
- *
- * @param {SVGElement} element The element to query
- * @returns {SVGElement} The bounding svg
- */
-function boundingSVG(element) {
-    var ownerSVG = element.ownerSVGElement;
-    if (ownerSVG != null) {
-        return ownerSVG;
-    }
-    if (element.nodeName.toLowerCase() === "svg") {
-        return element;
-    }
-    return null; // not in the DOM
-}
-exports.boundingSVG = boundingSVG;
-var _latestClipPathId = 0;
-/**
- * Generates a ClipPath ID that is unique for this instance of Plottable
- */
-function generateUniqueClipPathId() {
-    return "plottableClipPath" + ++_latestClipPathId;
-}
-exports.generateUniqueClipPathId = generateUniqueClipPathId;
-/**
- * Returns true if the supplied coordinates or Ranges intersect or are contained by bbox.
- *
- * @param {number | Range} xValOrRange The x coordinate or Range to test
- * @param {number | Range} yValOrRange The y coordinate or Range to test
- * @param {SVGRect} bbox The bbox
- * @param {number} tolerance Amount by which to expand bbox, in each dimension, before
- * testing intersection
- *
- * @returns {boolean} True if the supplied coordinates or Ranges intersect or are
- * contained by bbox, false otherwise.
- */
-function intersectsBBox(xValOrRange, yValOrRange, bbox, tolerance) {
-    if (tolerance === void 0) { tolerance = 0.5; }
-    var xRange = _parseRange(xValOrRange);
-    var yRange = _parseRange(yValOrRange);
-    // SVGRects are positioned with sub-pixel accuracy (the default unit
-    // for the x, y, height & width attributes), but user selections (e.g. via
-    // mouse events) usually have pixel accuracy. A tolerance of half-a-pixel
-    // seems appropriate.
-    return bbox.x + bbox.width >= xRange.min - tolerance &&
-        bbox.x <= xRange.max + tolerance &&
-        bbox.y + bbox.height >= yRange.min - tolerance &&
-        bbox.y <= yRange.max + tolerance;
-}
-exports.intersectsBBox = intersectsBBox;
-/**
- * Create a Range from a number or an object with "min" and "max" defined.
- *
- * @param {any} input The object to parse
- *
- * @returns {Range} The generated Range
- */
-function _parseRange(input) {
-    if (typeof (input) === "number") {
-        var value = input;
-        return { min: value, max: value };
-    }
-    var range = input;
-    if (range instanceof Object && "min" in range && "max" in range) {
-        return range;
-    }
-    throw new Error("input '" + input + "' can't be parsed as an Range");
-}
-function _parseStyleValue(style, property) {
-    var value = style.getPropertyValue(property);
-    var parsedValue = parseFloat(value);
-    return parsedValue || 0;
-}
-
-
-/***/ }),
-/* 96 */
+/* 97 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -15496,7 +15575,7 @@ exports.EntityArray = EntityArray;
 
 
 /***/ }),
-/* 97 */
+/* 98 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -15587,7 +15666,7 @@ exports.Map = Map;
 
 
 /***/ }),
-/* 98 */
+/* 99 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -15712,7 +15791,6 @@ exports.normalizeKey = normalizeKey;
 
 
 /***/ }),
-/* 99 */,
 /* 100 */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -16304,7 +16382,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
 var utils_1 = __webpack_require__(12);
-var cacheCharacterMeasurer_1 = __webpack_require__(42);
+var cacheCharacterMeasurer_1 = __webpack_require__(43);
 var CacheMeasurer = (function (_super) {
     __extends(CacheMeasurer, _super);
     function CacheMeasurer(area, className) {
@@ -16343,11 +16421,11 @@ exports.CacheMeasurer = CacheMeasurer;
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-__export(__webpack_require__(41));
 __export(__webpack_require__(42));
-__export(__webpack_require__(115));
 __export(__webpack_require__(43));
+__export(__webpack_require__(115));
 __export(__webpack_require__(44));
+__export(__webpack_require__(45));
 //# sourceMappingURL=index.js.map
 
 /***/ }),
@@ -16616,7 +16694,7 @@ function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
 __export(__webpack_require__(123));
-__export(__webpack_require__(45));
+__export(__webpack_require__(46));
 //# sourceMappingURL=index.js.map
 
 /***/ }),
@@ -16635,7 +16713,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var wrapper_1 = __webpack_require__(45);
+var wrapper_1 = __webpack_require__(46);
 var SingleLineWrapper = (function (_super) {
     __extends(SingleLineWrapper, _super);
     function SingleLineWrapper() {
@@ -16862,10 +16940,10 @@ function __export(m) {
 // HACKHACK d3-selection-multi doesn't play well with default "d3" package in a
 // bundler environment (e.g. webpack) - see https://github.com/d3/d3-selection-multi/issues/11
 // we add it manually to the default "d3" bundle
-__webpack_require__(49);
+__webpack_require__(50);
 var Animators = __webpack_require__(6);
 exports.Animators = Animators;
-var Axes = __webpack_require__(46);
+var Axes = __webpack_require__(47);
 exports.Axes = Axes;
 var Components = __webpack_require__(30);
 exports.Components = Components;
@@ -16896,8 +16974,8 @@ var timeAxis_1 = __webpack_require__(23);
 exports.TimeInterval = timeAxis_1.TimeInterval;
 __export(__webpack_require__(5));
 __export(__webpack_require__(24));
-__export(__webpack_require__(47));
-var version_1 = __webpack_require__(48);
+__export(__webpack_require__(48));
+var version_1 = __webpack_require__(49);
 exports.version = version_1.version;
 __export(__webpack_require__(21));
 __export(__webpack_require__(7));
@@ -16907,85 +16985,6 @@ __export(__webpack_require__(16));
 __export(__webpack_require__(2));
 __export(__webpack_require__(10));
 __export(__webpack_require__(18));
-
-
-/***/ }),
-/* 127 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-/**
- * Copyright 2014-present Palantir Technologies
- * @license MIT
- */
-
-var DOM = __webpack_require__(95);
-var ClientToSVGTranslator = (function () {
-    function ClientToSVGTranslator(svg) {
-        this._svg = svg;
-        this._measureRect = document.createElementNS(svg.namespaceURI, "rect");
-        this._measureRect.setAttribute("class", "measure-rect");
-        this._measureRect.setAttribute("style", "opacity: 0; visibility: hidden;");
-        this._measureRect.setAttribute("stroke-width", "0");
-        this._measureRect.setAttribute("width", "1");
-        this._measureRect.setAttribute("height", "1");
-        this._svg.appendChild(this._measureRect);
-    }
-    /**
-     * Returns the ClientToSVGTranslator for the <svg> containing elem.
-     * If one already exists on that <svg>, it will be returned; otherwise, a new one will be created.
-     */
-    ClientToSVGTranslator.getTranslator = function (elem) {
-        var svg = DOM.boundingSVG(elem);
-        var translator = svg[ClientToSVGTranslator._TRANSLATOR_KEY];
-        if (translator == null) {
-            translator = new ClientToSVGTranslator(svg);
-            svg[ClientToSVGTranslator._TRANSLATOR_KEY] = translator;
-        }
-        return translator;
-    };
-    /**
-     * Computes the position relative to the <svg> in svg-coordinate-space.
-     */
-    ClientToSVGTranslator.prototype.computePosition = function (clientX, clientY) {
-        // get the origin
-        this._measureRect.setAttribute("x", "0");
-        this._measureRect.setAttribute("y", "0");
-        var mrBCR = this._measureRect.getBoundingClientRect();
-        var origin = { x: mrBCR.left, y: mrBCR.top };
-        // calculate the scale
-        var sampleDistance = 100;
-        this._measureRect.setAttribute("x", String(sampleDistance));
-        this._measureRect.setAttribute("y", String(sampleDistance));
-        mrBCR = this._measureRect.getBoundingClientRect();
-        var testPoint = { x: mrBCR.left, y: mrBCR.top };
-        // invalid measurements -- SVG might not be in the DOM
-        if (origin.x === testPoint.x || origin.y === testPoint.y) {
-            return null;
-        }
-        var scaleX = (testPoint.x - origin.x) / sampleDistance;
-        var scaleY = (testPoint.y - origin.y) / sampleDistance;
-        // get the true cursor position
-        this._measureRect.setAttribute("x", String((clientX - origin.x) / scaleX));
-        this._measureRect.setAttribute("y", String((clientY - origin.y) / scaleY));
-        mrBCR = this._measureRect.getBoundingClientRect();
-        var trueCursorPosition = { x: mrBCR.left, y: mrBCR.top };
-        var scaledPosition = {
-            x: (trueCursorPosition.x - origin.x) / scaleX,
-            y: (trueCursorPosition.y - origin.y) / scaleY,
-        };
-        return scaledPosition;
-    };
-    /**
-     * Checks whether event happened inside <svg> element.
-     */
-    ClientToSVGTranslator.prototype.insideSVG = function (e) {
-        return DOM.boundingSVG(e.target) === this._svg;
-    };
-    ClientToSVGTranslator._TRANSLATOR_KEY = "__Plottable_ClientToSVGTranslator";
-    return ClientToSVGTranslator;
-}());
-exports.ClientToSVGTranslator = ClientToSVGTranslator;
 
 
 /***/ })
